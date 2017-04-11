@@ -40,7 +40,10 @@ public:
      * @note Required access role: account, cloud_db module (e.g., connection_mediator).
      */
     virtual void getSystems(
-        std::function<void(ResultCode, api::SystemDataExList)> completionHandler ) = 0;
+        std::function<void(ResultCode, api::SystemDataExList)> completionHandler) = 0;
+    virtual void getSystemsFiltered(
+        const api::Filter& filter,
+        std::function<void(ResultCode, api::SystemDataExList)> completionHandler) = 0;
     /**
      * Get system by id.
      */
@@ -93,6 +96,9 @@ public:
     virtual void recordUserSessionStart(
         const std::string& systemId,
         std::function<void(api::ResultCode)> completionHandler) = 0;
+    virtual void getSystemHealthHistory(
+        const std::string& systemId,
+        std::function<void(api::ResultCode, api::SystemHealthHistory)> completionHandler) = 0;
 };
 
 } // namespace api

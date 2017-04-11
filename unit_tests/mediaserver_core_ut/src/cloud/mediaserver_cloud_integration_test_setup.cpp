@@ -5,6 +5,7 @@
 #include <nx/utils/string.h>
 
 #include <cdb/connection.h>
+#include <api/app_server_connection.h>
 #include <utils/common/sync_call.h>
 
 #include <media_server/settings.h>
@@ -33,6 +34,9 @@ bool MediaServerCloudIntegrationTest::startMediaServer()
     if (!m_mediaServerLauncher.start())
         return false;
 
+    // TODO: #ak Remove it from here when mediaserver does it from QnMain::run, not from application's main thread.
+    QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
+
     m_mserverClient = std::make_unique<MediaServerClient>(
         m_mediaServerLauncher.endpoint());
     m_mserverClient->setUserName(lit("admin"));
@@ -40,44 +44,30 @@ bool MediaServerCloudIntegrationTest::startMediaServer()
     return true;
 }
 
-bool MediaServerCloudIntegrationTest::registerRandomCloudAccount(
-    std::string* const accountEmail,
-    std::string* const accountPassword)
+bool MediaServerCloudIntegrationTest::registerRandomCloudAccount()
 {
     api::AccountData accountData;
-    if (m_cdb.addActivatedAccount(&accountData, accountPassword) != api::ResultCode::ok)
+    if (m_cdb.addActivatedAccount(&accountData, &m_accountPassword) != api::ResultCode::ok)
         return false;
-    *accountEmail = accountData.email;
+    m_accountEmail = accountData.email;
     return true;
 }
 
-bool MediaServerCloudIntegrationTest::bindSystemToCloud(
-    const std::string& accountEmail,
-    const std::string& accountPassword,
-    std::string* const cloudSystemId,
-    std::string* const cloudSystemAuthKey)
+bool MediaServerCloudIntegrationTest::registerCloudSystem()
 {
-    api::SystemData system1;
-    const auto result = m_cdb.bindRandomSystem(accountEmail, accountPassword, &system1);
-    if (result != api::ResultCode::ok)
-        return false;
+    return m_cdb.bindRandomSystem(m_accountEmail, m_accountPassword, &m_cloudSystem) ==
+        api::ResultCode::ok;
+}
 
-    *cloudSystemId = system1.id;
-    *cloudSystemAuthKey = system1.authKey;
-
+bool MediaServerCloudIntegrationTest::saveCloudCredentialsToMediaServer()
+{
     CloudCredentialsData cloudData;
-    cloudData.cloudSystemID = QString::fromStdString(system1.id);
-    cloudData.cloudAuthKey = QString::fromStdString(system1.authKey);
-    cloudData.cloudAccountName = QString::fromStdString(accountEmail);
-    QnJsonRestResult resultCode;
-    std::tie(resultCode) =
-        makeSyncCall<QnJsonRestResult>(
-            std::bind(
-                &MediaServerClient::saveCloudSystemCredentials,
-                m_mserverClient.get(),
-                std::move(cloudData),
-                std::placeholders::_1));
-    return resultCode.error == QnJsonRestResult::NoError;
+    cloudData.cloudSystemID = QString::fromStdString(m_cloudSystem.id);
+    cloudData.cloudAuthKey = QString::fromStdString(m_cloudSystem.authKey);
+    cloudData.cloudAccountName = QString::fromStdString(m_accountEmail);
+    return
+        m_mserverClient->saveCloudSystemCredentials(std::move(cloudData)).error ==
+        QnJsonRestResult::NoError;
 }
 
 SocketAddress MediaServerCloudIntegrationTest::mediaServerEndpoint() const
@@ -128,10 +118,9 @@ void MediaServerCloudIntegrationTest::configureSystemAsLocal()
 
 void MediaServerCloudIntegrationTest::connectSystemToCloud()
 {
-    ASSERT_TRUE(registerRandomCloudAccount(&m_accountEmail, &m_accountPassword));
-    ASSERT_TRUE(bindSystemToCloud(
-        m_accountEmail, m_accountPassword,
-        &m_cloudSystemId, &m_cloudSystemAuthKey));
+    ASSERT_TRUE(registerRandomCloudAccount());
+    ASSERT_TRUE(registerCloudSystem());
+    ASSERT_TRUE(saveCloudCredentialsToMediaServer());
 
     if (m_ownerCredentials.first.isEmpty())
     {

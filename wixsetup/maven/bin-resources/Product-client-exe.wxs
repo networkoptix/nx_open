@@ -12,6 +12,8 @@
             UpgradeCode="$(var.clientBundleUpgradeCode)"
             DisableModify="yes">
         <util:RegistrySearchRef Id='ArchRegistrySearch' />
+        <util:ProductSearchRef Id='ClientMsiVersion' />
+        <util:ProductSearchRef Id='ServerMsiVersion2' />
 
         <Variable Name="InstallClientOnly" Type="numeric" Value="1" />
 
@@ -29,8 +31,9 @@
                 LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"/>
         </BootstrapperApplicationRef>
 
+        <Variable Name="InstallerTitle" Value="!(loc.InstallerTitleClientOnly)" />
         <WixVariable Id="WixExtbaThemeXml" Value="OptixTheme.xml" />
-        <WixVariable Id="WixExtbaThemeWxl" Value="OptixThemeClient.wxl" />
+        <WixVariable Id="WixExtbaThemeWxl" Value="OptixTheme_$(var.installerLanguage).wxl" />
 
         <Chain DisableSystemRestore="yes">
             <PackageGroupRef Id="ClientPackageGroup"/>

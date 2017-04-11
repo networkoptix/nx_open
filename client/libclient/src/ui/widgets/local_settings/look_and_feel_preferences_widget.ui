@@ -94,7 +94,7 @@
         <item>
          <widget class="QLabel" name="cycleHintLabel">
           <property name="text">
-           <string> seconds</string>
+           <string>seconds</string>
           </property>
          </widget>
         </item>
@@ -139,7 +139,7 @@
            <bool>true</bool>
           </property>
           <property name="placeholderText">
-           <string>&lt;No image&gt;</string>
+           <string notr="true">&lt;No image&gt;</string>
           </property>
          </widget>
         </item>
@@ -183,7 +183,7 @@
         <item>
          <widget class="QSpinBox" name="imageOpacitySpinBox">
           <property name="suffix">
-           <string>%</string>
+           <string notr="true">%</string>
           </property>
           <property name="minimum">
            <number>1</number>

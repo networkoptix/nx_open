@@ -17,6 +17,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/common/indents.h>
 #include <ui/delegates/resource_item_delegate.h>
+#include <ui/delegates/customizable_item_delegate.h>
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/models/resource/resource_list_sorted_model.h>
 #include <ui/style/helper.h>
@@ -28,6 +29,7 @@
 #include <utils/common/event_processors.h>
 
 #include <nx/utils/string.h>
+#include <nx/utils/app_info.h>
 
 namespace {
 
@@ -53,7 +55,6 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
     m_accessibleResourcesModel(new QnAccessibleResourcesModel(this))
 {
     ui->setupUi(this);
-
     switch (m_filter)
     {
         case QnResourceAccessFilter::LayoutsFilter:
@@ -106,15 +107,57 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
     auto setupTreeView = [itemDelegate](QnTreeView* treeView)
         {
             const QnIndents kIndents(1, 0);
-            treeView->setItemDelegate(itemDelegate);
+            treeView->setItemDelegateForColumn(QnAccessibleResourcesModel::NameColumn,
+                itemDelegate);
+            treeView->header()->setMinimumSectionSize(0);
             treeView->header()->setStretchLastSection(false);
             treeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-            treeView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+            treeView->header()->setSectionResizeMode(QnAccessibleResourcesModel::NameColumn,
+                QHeaderView::Stretch);
             treeView->setProperty(style::Properties::kSideIndentation, QVariant::fromValue(kIndents));
             treeView->setIgnoreDefaultSpace(true);
         };
     setupTreeView(ui->resourcesTreeView);
     setupTreeView(ui->controlsTreeView);
+
+    auto indirectAccessDelegate = new QnCustomizableItemDelegate(this);
+    indirectAccessDelegate->setCustomSizeHint(
+        [](const QStyleOptionViewItem& option, const QModelIndex& index)
+        {
+            return qnSkin->maximumSize(option.icon);
+        });
+
+    if (nx::utils::AppInfo::isLinux() || nx::utils::AppInfo::isMacOsX())
+    {
+        /**
+          * Workaround for incorrect selection behaviour on MacOS. For some reason QTreeview
+          * assumes that column 0 and 2 are selected, but column 1 is not.
+          */
+        indirectAccessDelegate->setCustomInitStyleOption(
+            [this](QStyleOptionViewItem* option, const QModelIndex& index)
+            {
+                const auto selectionModel = ui->resourcesTreeView->selectionModel();
+                const auto nameIndex = index.sibling(index.row(),
+                    QnAccessibleResourcesModel::NameColumn);
+                if (selectionModel->isSelected(nameIndex))
+                    option->state |= QStyle::State_Selected;
+            });
+    }
+
+    indirectAccessDelegate->setCustomPaint(
+        [](QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index)
+        {
+            option.widget->style()->drawPrimitive(QStyle::PE_PanelItemViewItem,
+                &option, painter, option.widget);
+            option.icon.paint(painter, option.rect, Qt::AlignCenter,
+                option.state.testFlag(QStyle::State_Selected)
+                    ? QIcon::Normal
+                    : QIcon::Disabled);
+        });
+
+    ui->resourcesTreeView->setItemDelegateForColumn(
+        QnAccessibleResourcesModel::IndirectAccessColumn,
+        indirectAccessDelegate);
 
     ui->resourcesTreeView->setMouseTracking(true);
 
@@ -162,6 +205,9 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
 
     connect(ui->resourcesTreeView, &QnTreeView::spacePressed, this, batchToggleCheckboxes);
     connect(ui->controlsTreeView,  &QnTreeView::spacePressed, this, batchToggleCheckboxes);
+
+    connect(ui->resourcesTreeView, &QnTreeView::selectionChanging,
+        this, &QnAccessibleResourcesWidget::handleSelectionChanging);
 
     connect(ui->resourcesTreeView, &QAbstractItemView::entered, this, &QnAccessibleResourcesWidget::updateThumbnail);
     updateThumbnail();
@@ -288,6 +334,7 @@ void QnAccessibleResourcesWidget::initControlsModel()
             m_controlsModel->index(0, QnResourceListModel::CheckColumn);
 
         bool checked = checkedIdx.data(Qt::CheckStateRole).toInt() == Qt::Checked;
+        ui->resourcesTreeView->selectionModel()->reset();
         ui->resourcesTreeView->setEnabled(!checked);
         ui->filter->setEnabled(!checked);
         emit controlsChanged(checked);
@@ -418,7 +465,7 @@ void QnAccessibleResourcesWidget::updateThumbnail(const QModelIndex& index)
     QModelIndex baseIndex = index.sibling(index.row(), QnAccessibleResourcesModel::NameColumn);
     QString toolTip = baseIndex.data(Qt::ToolTipRole).toString();
     ui->detailsWidget->setName(toolTip);
-    ui->detailsWidget->setTargetResource(index.data(Qn::ResourceRole).value<QnResourcePtr>());
+    ui->detailsWidget->setResource(index.data(Qn::ResourceRole).value<QnResourcePtr>());
     ui->detailsWidget->layout()->activate();
 }
 
@@ -477,5 +524,37 @@ void QnAccessibleResourcesWidget::at_itemViewKeyPress(QObject* watched, QEvent* 
             default:
                 break;
         }
+    }
+}
+
+/* Shift-mouseclick selection process should set checkboxes
+ * in all affected rows to the state the originating row has. */
+void QnAccessibleResourcesWidget::handleSelectionChanging(
+    QItemSelectionModel::SelectionFlags selectionFlags,
+    const QModelIndex& index, const QEvent* event)
+{
+    const bool specialHandling = event && event->type() == QEvent::MouseButtonPress
+        && static_cast<const QMouseEvent*>(event)->modifiers().testFlag(Qt::ShiftModifier);
+
+    if (!specialHandling)
+        return;
+
+    const auto current = ui->resourcesTreeView->currentIndex(); //< originating item
+    if (!current.isValid() || !index.isValid() || !selectionFlags.testFlag(QItemSelectionModel::Select))
+        return;
+
+    const auto newCheckValue = current.sibling(current.row(),
+        QnAccessibleResourcesModel::CheckColumn).data(Qt::CheckStateRole);
+
+    QAbstractItemModel* model = ui->resourcesTreeView->model();
+
+    QPair<int, int> range(index.row(), current.row());
+    if (range.first > range.second)
+        qSwap(range.first, range.second);
+
+    for (int i = range.first; i <= range.second; ++i)
+    {
+        model->setData(index.sibling(i, QnAccessibleResourcesModel::CheckColumn),
+            newCheckValue, Qt::CheckStateRole);
     }
 }

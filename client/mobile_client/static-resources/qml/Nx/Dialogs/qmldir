@@ -8,5 +8,5 @@ DialogSeparator 1.0 DialogSeparator.qml
 DialogButtonBox 1.0 DialogButtonBox.qml
 DialogListItem 1.0 DialogListItem.qml
 
-InformationDialog 1.0 InformationDialog.qml
+StandardDialog 1.0 StandardDialog.qml
 ItemSelectionDialog 1.0 ItemSelectionDialog.qml

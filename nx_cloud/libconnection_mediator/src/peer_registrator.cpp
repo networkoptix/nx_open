@@ -43,7 +43,7 @@ PeerRegistrator::PeerRegistrator(
 
 
         dispatcher->registerRequestProcessor(
-            stun::extension::methods::checkOwnState,
+            stun::extension::methods::getConnectionState,
             [this](const ConnectionStrongRef& connection, stun::Message message)
             {
                 processRequestWithOutput(
@@ -201,7 +201,7 @@ void PeerRegistrator::listen(
 
     api::ListenResponse response;
     response.tcpConnectionKeepAlive = m_settings.stun().keepAliveOptions;
-    response.cloudConnectVersion = hpm::api::kCurrentCloudConnectVersion;
+    response.cloudConnectOptions = m_settings.general().cloudConnectOptions;
     completionHandler(api::ResultCode::ok, std::move(response));
 
     for (auto& indication: clientBindIndications)
@@ -210,9 +210,9 @@ void PeerRegistrator::listen(
 
 void PeerRegistrator::checkOwnState(
     const ConnectionStrongRef& connection,
-    api::CheckOwnStateRequest /*requestData*/,
+    api::GetConnectionStateRequest /*requestData*/,
     stun::Message requestMessage,
-    std::function<void(api::ResultCode, api::CheckOwnStateResponse)> completionHandler)
+    std::function<void(api::ResultCode, api::GetConnectionStateResponse)> completionHandler)
 {
     MediaserverData mediaserverData;
     nx::String errorMessage;
@@ -229,9 +229,11 @@ void PeerRegistrator::checkOwnState(
         return;
     }
 
-    api::CheckOwnStateResponse response;
+    api::GetConnectionStateResponse response;
     auto peer = m_listeningPeerPool->findAndLockPeerDataByHostName(mediaserverData.hostName());
-    response.isListening = peer && peer->value().isListening;
+    if (peer && peer->value().isListening)
+        response.state = api::GetConnectionStateResponse::State::listening;
+
     completionHandler(api::ResultCode::ok, std::move(response));
 }
 

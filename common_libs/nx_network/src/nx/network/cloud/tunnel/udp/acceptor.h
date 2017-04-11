@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/network/cloud/data/connection_parameters.h>
-#include <nx/network/cloud/mediator_connections.h>
+#include <nx/network/cloud/mediator_server_connections.h>
 #include <nx/network/cloud/tunnel/abstract_tunnel_acceptor.h>
 #include <nx/network/cloud/tunnel/udp/incoming_control_connection.h>
 #include <nx/network/udt/udt_socket.h>

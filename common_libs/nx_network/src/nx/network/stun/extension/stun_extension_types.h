@@ -55,7 +55,7 @@ enum Value
     clientBind,
 
     /** Veifies current peer state from mediator's perspective (e.g. is listening). */
-    checkOwnState,
+    getConnectionState,
 };
 
 NX_NETWORK_API nx::String toString(Value val);
@@ -104,6 +104,7 @@ enum AttributeType
     peerId,
     connectionId,
     cloudConnectVersion,
+    cloudConnectOptions,
 
     hostName = stun::attrs::userDefined + 0x200,
     hostNameList,

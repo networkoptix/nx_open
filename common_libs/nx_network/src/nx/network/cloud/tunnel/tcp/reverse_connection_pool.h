@@ -1,6 +1,7 @@
 #pragma once
 
-#include <nx/network/cloud/mediator_connections.h>
+#include <nx/network/aio/basic_pollable.h>
+#include <nx/network/cloud/mediator_client_connections.h>
 
 #include "reverse_acceptor.h"
 
@@ -19,33 +20,40 @@ class ReverseConnectionHolder;
  * handlers even if it's stopped).
  */
 class NX_NETWORK_API ReverseConnectionPool:
-    public QnStoppableAsync
+    public aio::BasicPollable
 {
+    using Parent = aio::BasicPollable;
+
 public:
-    typedef hpm::api::MediatorClientTcpConnection MediatorConnection;
+    using MediatorConnection = hpm::api::MediatorClientTcpConnection;
+
     explicit ReverseConnectionPool(std::unique_ptr<MediatorConnection> mediatorConnection);
-    ~ReverseConnectionPool();
+    virtual ~ReverseConnectionPool() override;
 
     ReverseConnectionPool(const ReverseConnectionPool&) = delete;
     ReverseConnectionPool(ReverseConnectionPool&&) = delete;
     ReverseConnectionPool& operator=(const ReverseConnectionPool&) = delete;
     ReverseConnectionPool& operator=(ReverseConnectionPool&&) = delete;
 
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+
     bool start(HostAddress publicIp, uint16_t port, bool waitForRegistration = false);
     uint16_t port() const;
 
     std::shared_ptr<ReverseConnectionSource> getConnectionSource(const String& hostName);
-    void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
     // TODO: make is configurable for each client? can it be usefull?
     void setPoolSize(boost::optional<size_t> value);
     void setKeepAliveOptions(boost::optional<KeepAliveOptions> value);
 
+protected:
+    virtual void stopWhileInAioThread() override;
+
 private:
     bool registerOnMediator(bool waitForRegistration = false);
     std::shared_ptr<ReverseConnectionHolder> getOrCreateHolder(const String& hostName);
 
-    const std::unique_ptr<MediatorConnection> m_mediatorConnection;
+    std::unique_ptr<MediatorConnection> m_mediatorConnection;
     ReverseAcceptor m_acceptor;
     HostAddress m_publicIp;
     bool m_isReconnectHandlerSet;

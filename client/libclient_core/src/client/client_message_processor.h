@@ -26,7 +26,10 @@ protected:
     virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection) override;
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) override;
 
-    virtual void onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) override;
+    virtual void onResourceStatusChanged(
+        const QnResourcePtr &resource,
+        Qn::ResourceStatus status,
+        ec2::NotificationSource source) override;
     virtual void updateResource(const QnResourcePtr &resource, ec2::NotificationSource source) override;
     virtual void onGotInitialNotification(const ec2::ApiFullInfoData& fullData) override;
 

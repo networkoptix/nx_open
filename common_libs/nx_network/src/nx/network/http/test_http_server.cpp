@@ -1,8 +1,3 @@
-/**********************************************************
-* 9 jan 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "test_http_server.h"
 
 #include <QtCore/QFile>
@@ -61,12 +56,19 @@ TestHttpServer::TestHttpServer():
 TestHttpServer::~TestHttpServer()
 {
     m_httpServer->pleaseStopSync();
+    NX_LOGX("Stopped", cl_logINFO);
 }
 
 bool TestHttpServer::bindAndListen()
 {
-    return m_httpServer->bind(SocketAddress(HostAddress::localhost, 0))
-        && m_httpServer->listen();
+    if (!m_httpServer->bind(SocketAddress(HostAddress::localhost, 0)))
+        return false;
+
+    if (!m_httpServer->listen())
+        return false;
+
+    NX_LOGX(lm("Started on %1").str(m_httpServer->address()), cl_logINFO);
+    return true;
 }
 
 SocketAddress TestHttpServer::serverAddress() const

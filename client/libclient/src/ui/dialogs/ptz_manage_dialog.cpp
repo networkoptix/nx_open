@@ -16,8 +16,11 @@
 
 #include <client/client_settings.h>
 
-#include <utils/common/event_processors.h>
+#include <nx/client/messages/ptz_messages.h>
+
 #include <nx/utils/string.h>
+
+#include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/resource_property_adaptors.h>
 #include <utils/local_file_cache.h>
@@ -86,6 +89,8 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
     m_submitting(false)
 {
     ui->setupUi(this);
+    setupTableChangesConfirmation();
+
 
     ui->previewGroupBox->hide(); // TODO: #dklychkov implement preview fetching and remove this line
 
@@ -162,6 +167,17 @@ QnPtzManageDialog::~QnPtzManageDialog()
     return;
 }
 
+void QnPtzManageDialog::setupTableChangesConfirmation()
+{
+     // To make sure we committed all changes to the table we should remove focus from it
+    const auto confirmTableChanges = [this]() { ui->buttonBox->setFocus(); };
+    const auto buttons = findChildren<QAbstractButton*>(QString());
+    for (auto buttonBox : buttons)
+        buttonBox->connect(buttonBox, &QAbstractButton::clicked, this, confirmTableChanges);
+
+    connect(ui->buttonBox, &QDialogButtonBox::clicked, this, confirmTableChanges);
+}
+
 void QnPtzManageDialog::keyPressEvent(QKeyEvent *event)
 {
     switch (event->key())
@@ -187,8 +203,6 @@ void QnPtzManageDialog::reject()
 
 void QnPtzManageDialog::accept()
 {
-    ui->buttonBox->setFocus(); //< to force table editor to commit changes
-
     saveData();
 
     clear();
@@ -318,16 +332,6 @@ void QnPtzManageDialog::clear()
     ui->tourStackedWidget->setCurrentIndex(ui->tourStackedWidget->indexOf(ui->noTourPage));
 }
 
-void QnPtzManageDialog::showSetPositionWarning()
-{
-    QnMessageBox::critical(
-        this,
-        tr("Could not set position for camera."),
-        tr("An error has occurred while trying to set the current position for camera %1.").arg(m_resource->getName()) + L'\n'
-        + tr("Please wait for the camera to go online.")
-    );
-}
-
 void QnPtzManageDialog::saveData()
 {
     QN_SCOPED_VALUE_ROLLBACK(&m_submitting, true);
@@ -441,12 +445,7 @@ void QnPtzManageDialog::at_savePositionButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        QnMessageBox::critical(
-            this,
-            tr("Could not get position from camera."),
-            tr("An error has occurred while trying to get the current position from camera %1.").arg(m_resource->getName()) + L'\n'
-            + tr("Please wait for the camera to go online.")
-        );
+        nx::client::messages::Ptz::failedToGetPosition(this, m_resource->getName());
         return;
     }
 
@@ -465,7 +464,7 @@ void QnPtzManageDialog::at_goToPositionButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        showSetPositionWarning();
+        nx::client::messages::Ptz::failedToSetPosition(this, m_resource->getName());
         return;
     }
 
@@ -506,7 +505,7 @@ void QnPtzManageDialog::at_startTourButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        showSetPositionWarning();
+        nx::client::messages::Ptz::failedToSetPosition(this, m_resource->getName());
         return;
     }
 
@@ -561,36 +560,8 @@ void QnPtzManageDialog::at_deleteButton_clicked()
                     break;
             }
 
-            if (presetIsInUse)
-            {
-                Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
-                if (!messagesFilter.testFlag(Qn::ShowOnceMessage::PtzPresetInUse))
-                {
-                    QnMessageBox messageBox(
-                        QnMessageBox::Warning,
-                        Qn::Empty_Help,
-                        tr("Remove Preset"),
-                        tr("This preset is used in some tours.") + L'\n'
-                        + tr("These tours will become invalid if you remove it."),
-                        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-                        this
-                    );
-                    messageBox.setDefaultButton(QDialogButtonBox::Ok);
-                    messageBox.setCheckBoxText(tr("Do not show again."));
-
-                    int result = messageBox.exec();
-
-                    if (messageBox.isChecked())
-                    {
-                        messagesFilter |= Qn::ShowOnceMessage::PtzPresetInUse;
-                        qnSettings->setShowOnceMessages(messagesFilter);
-                        qnSettings->save();
-                    }
-
-                    if (result != QDialogButtonBox::Ok)
-                        break;
-                }
-            }
+            if (presetIsInUse && !nx::client::messages::Ptz::deletePresetInUse(this))
+                break;
 
             m_model->removePreset(data.presetModel.preset.id);
             break;
@@ -787,27 +758,22 @@ bool QnPtzManageDialog::tryClose(bool force)
 bool QnPtzManageDialog::askToSaveChanges(bool cancelIsAllowed /* = true*/)
 {
 
-    QDialogButtonBox::StandardButtons allowedButtons = QDialogButtonBox::Yes | QDialogButtonBox::No;
+    QDialogButtonBox::StandardButtons allowedButtons =
+        (QDialogButtonBox::Apply | QDialogButtonBox::Discard);
     if (cancelIsAllowed)
         allowedButtons |= QDialogButtonBox::Cancel;
 
-    QDialogButtonBox::StandardButton button = QnMessageBox::question(
-        this,
-        0,
-        tr("PTZ configuration has not been saved."),
-        tr("Changes have not been saved. Would you like to save them?"),
-        allowedButtons,
-        QDialogButtonBox::Yes);
+    const auto button = QnMessageBox::question(this,
+        tr("Apply changes before exit?"), QString(),
+        allowedButtons, QDialogButtonBox::Apply);
 
     switch (button)
     {
-        case QDialogButtonBox::Yes:
+        case QDialogButtonBox::Apply:
             saveChanges();
             return true;
         case QDialogButtonBox::Cancel:
-            if (cancelIsAllowed)
-                return false;
-            return true;
+            return (cancelIsAllowed ? false : true);
         default:
             return true;
     }

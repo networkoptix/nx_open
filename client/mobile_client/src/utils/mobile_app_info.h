@@ -13,7 +13,7 @@ public:
     Q_INVOKABLE QString organizationName() const;
     Q_INVOKABLE QString version() const;
     Q_INVOKABLE QString cloudName() const;
-    Q_INVOKABLE QString nx1CustomizedName() const;
+    Q_INVOKABLE QString liteDeviceName() const;
 
     Q_INVOKABLE QUrl oldMobileClientUrl() const;
 };

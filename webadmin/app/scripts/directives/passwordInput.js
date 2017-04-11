@@ -5,7 +5,7 @@ angular.module('webadminApp')
     .directive('passwordInput', ['mediaserver',function (mediaserver) {
         return {
             restrict: 'E',
-            templateUrl: 'views/components/passwordInput.html',
+            templateUrl: Config.viewsDir + 'components/passwordInput.html',
             require: "ngModel",
             scope:{
                 ngModel: '=',
@@ -13,6 +13,7 @@ angular.module('webadminApp')
             },
             link:function(scope, element, attrs, ngModel){
                 scope.Config = Config;
+                scope.L = L;
                 scope.fairPassword = true;
                 function loadCommonPasswords(){
                     if(!Config.commonPasswordsList) {

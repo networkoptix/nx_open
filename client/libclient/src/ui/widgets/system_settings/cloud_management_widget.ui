@@ -53,7 +53,7 @@
        </item>
        <item>
         <widget class="QnPanel" name="introWidget" native="true">
-         <layout class="QGridLayout" name="gridLayout" columnstretch="1,0,0,0,0">
+         <layout class="QGridLayout" name="introLayout" columnstretch="1,0,1,0,1">
           <property name="leftMargin">
            <number>20</number>
           </property>
@@ -64,15 +64,29 @@
            <number>20</number>
           </property>
           <property name="bottomMargin">
-           <number>0</number>
+           <number>16</number>
           </property>
           <property name="verticalSpacing">
            <number>16</number>
           </property>
+          <item row="0" column="3" rowspan="2">
+           <widget class="QLabel" name="arrow2Label">
+            <property name="text">
+             <string notr="true"/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" rowspan="2">
+           <widget class="QLabel" name="arrow1Label">
+            <property name="text">
+             <string notr="true"/>
+            </property>
+           </widget>
+          </item>
           <item row="1" column="2">
            <widget class="QLabel" name="promo2TextLabel">
             <property name="text">
-             <string>&lt;2. Connect system
+             <string notr="true">&lt;2. Connect system
 to the cloud&gt;</string>
             </property>
             <property name="alignment">
@@ -108,16 +122,13 @@ devices&gt;</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0" colspan="5">
+          <item row="3" column="0" colspan="5">
            <widget class="QLabel" name="learnMoreLabel">
             <property name="text">
              <string notr="true">&lt;Learn more about the cloud&gt;</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
-            </property>
-            <property name="margin">
-             <number>16</number>
             </property>
             <property name="openExternalLinks">
              <bool>true</bool>
@@ -158,19 +169,21 @@ Cloud Account&gt;</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="3" rowspan="2">
-           <widget class="QLabel" name="arrow2Label">
-            <property name="text">
-             <string notr="true"/>
+          <item row="2" column="0" colspan="5">
+           <spacer name="introSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
             </property>
-           </widget>
-          </item>
-          <item row="0" column="1" rowspan="2">
-           <widget class="QLabel" name="arrow1Label">
-            <property name="text">
-             <string notr="true"/>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
             </property>
-           </widget>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>16</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </widget>

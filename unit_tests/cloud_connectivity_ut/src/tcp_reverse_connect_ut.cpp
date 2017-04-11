@@ -55,7 +55,7 @@ protected:
         // Wait some time to let reverse connections to be estabilished.
         std::this_thread::sleep_for(kTunnelInactivityTimeout);
 
-        network::test::socketSimpleSync(
+        network::test::socketTransferSync(
             [&]() { return std::move(serverSocket); },
             []() { return std::make_unique<CloudStreamSocket>(AF_INET); },
             SocketAddress(hostName));
@@ -114,7 +114,7 @@ TEST_F(TcpReverseConnectTest, SimpleMultiserver)
     simpleTest(std::move(serverSocket2), m_system.id);
 }
 
-TEST_F(TcpReverseConnectTest, SimpleSyncSsl)
+TEST_F(TcpReverseConnectTest, TransferSyncSsl)
 {
     enableReveseConnectionsOnClient();
     std::unique_ptr<AbstractStreamServerSocket> serverSocket = cloudServerSocket(m_server);
@@ -122,7 +122,7 @@ TEST_F(TcpReverseConnectTest, SimpleSyncSsl)
     // Wait some time to let reverse connections to be estabilished.
     std::this_thread::sleep_for(kTunnelInactivityTimeout);
 
-    network::test::socketSimpleSync(
+    network::test::socketTransferSync(
         [&]() { return std::make_unique<SslServerSocket>(serverSocket.release(), false); },
         []() { return std::make_unique<SslSocket>(new CloudStreamSocket(AF_INET), false); },
         SocketAddress(m_server->fullName()));
@@ -158,9 +158,9 @@ TEST_F(TcpReverseConnectTest, Load)
     std::this_thread::sleep_for(testDuration);
     connectionsGenerator.pleaseStopSync();
 
-    ASSERT_GT(connectionsGenerator.totalBytesReceived(), 0);
-    ASSERT_GT(connectionsGenerator.totalBytesSent(), 0);
-    ASSERT_GT(connectionsGenerator.totalConnectionsEstablished(), 0);
+    ASSERT_GT(connectionsGenerator.totalBytesReceived(), 0U);
+    ASSERT_GT(connectionsGenerator.totalBytesSent(), 0U);
+    ASSERT_GT(connectionsGenerator.totalConnectionsEstablished(), 0U);
     server.pleaseStopSync();
 }
 

@@ -122,7 +122,7 @@ namespace {
     static const unsigned int MS_PER_SEC = 1000;
     static const unsigned int emailAggregationPeriodMS = 30 * MS_PER_SEC;
 
-    static const int kEmailSendDelay = 1000 * 3;
+    static const int kEmailSendDelay = 0;
 
     static const QChar kOldEmailDelimiter(L';');
     static const QChar kNewEmailDelimiter(L' ');
@@ -136,74 +136,61 @@ struct QnEmailAttachmentData {
         case QnBusiness::CameraMotionEvent:
             templatePath = lit(":/email_templates/camera_motion.mustache");
             imageName = lit("camera.png");
-            imagePath = lit(":/skin/email_attachments/camera.png");
             break;
         case QnBusiness::CameraInputEvent:
             templatePath = lit(":/email_templates/camera_input.mustache");
             imageName = lit("camera.png");
-            imagePath = lit(":/skin/email_attachments/camera.png");
             break;
         case QnBusiness::CameraDisconnectEvent:
             templatePath = lit(":/email_templates/camera_disconnect.mustache");
             imageName = lit("camera.png");
-            imagePath = lit(":/skin/email_attachments/camera.png");
             break;
         case QnBusiness::StorageFailureEvent:
             templatePath = lit(":/email_templates/storage_failure.mustache");
             imageName = lit("storage.png");
-            imagePath = lit(":/skin/email_attachments/storage.png");
             break;
         case QnBusiness::NetworkIssueEvent:
             templatePath = lit(":/email_templates/network_issue.mustache");
             imageName = lit("server.png");
-            imagePath = lit(":/skin/email_attachments/server.png");
             break;
         case QnBusiness::CameraIpConflictEvent:
             templatePath = lit(":/email_templates/camera_ip_conflict.mustache");
             imageName = lit("camera.png");
-            imagePath = lit(":/skin/email_attachments/camera.png");
             break;
         case QnBusiness::ServerFailureEvent:
             templatePath = lit(":/email_templates/mediaserver_failure.mustache");
             imageName = lit("server.png");
-            imagePath = lit(":/skin/email_attachments/server.png");
             break;
         case QnBusiness::ServerConflictEvent:
             templatePath = lit(":/email_templates/mediaserver_conflict.mustache");
             imageName = lit("server.png");
-            imagePath = lit(":/skin/email_attachments/server.png");
             break;
         case QnBusiness::ServerStartEvent:
             templatePath = lit(":/email_templates/mediaserver_started.mustache");
             imageName = lit("server.png");
-            imagePath = lit(":/skin/email_attachments/server.png");
             break;
         case QnBusiness::LicenseIssueEvent:
             templatePath = lit(":/email_templates/license_issue.mustache");
             imageName = lit("license.png");
-            imagePath = lit(":/skin/email_attachments/server.png");
             break;
         case QnBusiness::BackupFinishedEvent:
             templatePath = lit(":/email_templates/backup_finished.mustache");
             imageName = lit("server.png");
-            imagePath = lit(":/skin/email_attachments/server.png");
             break;
         case QnBusiness::UserDefinedEvent:
             templatePath = lit(":/email_templates/generic_event.mustache");
             imageName = lit("server.png");
-            imagePath = lit(":/skin/email_attachments/server.png");
             break;
         default:
             NX_ASSERT(false, Q_FUNC_INFO, "All cases must be implemented.");
             break;
         }
 
-        NX_ASSERT(!templatePath.isEmpty() && !imageName.isEmpty() && !imagePath.isEmpty(), Q_FUNC_INFO, "Template path must be filled");
+        NX_ASSERT(!templatePath.isEmpty() && !imageName.isEmpty(), Q_FUNC_INFO, "Template path must be filled");
     }
 
     QString templatePath;
     QString imageName;
-    QString imagePath;
 };
 
 QnMServerBusinessRuleProcessor::QnMServerBusinessRuleProcessor():
@@ -513,7 +500,7 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
     bookmark.durationMs += recordBeforeMs + recordAfterMs;
     bookmark.cameraId = camera->getId();
     bookmark.name = QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl);
-    bookmark.description = QnBusinessStringsHelper::eventDetails(action->getRuntimeParams(), lit("\n"));
+    bookmark.description = QnBusinessStringsHelper::eventDetails(action->getRuntimeParams()).join(L'\n');
     bookmark.tags = action->getParams().tags.split(L',', QString::SkipEmptyParts).toSet();
 
     return qnServerDb->addBookmark(bookmark);
@@ -607,7 +594,6 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
 
     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpSystemIcon, lit(":/skin/email_attachments/systemIcon.png"), tpImageMimeType)));
-//    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(attachmentData.imageName, attachmentData.imagePath, tpImageMimeType)));
     contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
     contextMap[tpSystemIcon] = lit("cid:") + tpSystemIcon;
     if (!cloudOwnerAccount.isEmpty())
@@ -954,8 +940,9 @@ void QnMServerBusinessRuleProcessor::updateRecipientsList(
             if (simplified.isEmpty()) //fast check
                 return;
 
-            if (nx::email::isValidAddress(simplified))
-                recipients.append(simplified);
+            QnEmailAddress address(simplified);
+            if (address.isValid())
+                recipients.append(address.value());
         };
 
 

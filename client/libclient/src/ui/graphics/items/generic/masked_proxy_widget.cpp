@@ -6,8 +6,8 @@
 #include <QtGui/QPainter>
 #include <QtGui/QPaintEngine>
 #include <QtWidgets/QStyleOptionGraphicsItem>
-#include <private/qgraphicsitem_p.h>
-#include <private/qwidget_p.h>
+#include <QtWidgets/private/qgraphicsitem_p.h>
+#include <QtWidgets/private/qwidget_p.h>
 
 #include <nx/utils/math/fuzzy.h>
 #include <ui/common/geometry.h>
@@ -50,7 +50,7 @@ QnMaskedProxyWidget::QnMaskedProxyWidget(QGraphicsItem* parent, Qt::WindowFlags 
      * but can achieve accelerated scroll. Therefore it's better used for
      * big scrolling items with fixed position, like resource tree widget. */
 
-     /* NoCache mode works only with patched Qt that ensures
+    /* NoCache mode works only with patched Qt that ensures
      * full update of embedded widget when it's scrolled. */
 
     setCacheMode(ItemCoordinateCache);
@@ -82,9 +82,12 @@ void QnMaskedProxyWidget::paint(QPainter* painter,
 
     if (!m_fullRepaintPending)
     {
-        updateRect &= m_itemCached
-            ? option->exposedRect.toAlignedRect()
-            : updateRect &= m_dirtyRect;
+        /* In cached modes we obtain dirty rects from paint requests.
+         * We accumulate them in case updates are disabled: */
+        if (m_itemCached)
+            m_dirtyRect |= option->exposedRect.toAlignedRect();
+
+        updateRect &= m_dirtyRect;
     }
 
     if (m_updatesEnabled)
@@ -228,8 +231,8 @@ void QnMaskedProxyWidget::setUpdatesEnabled(bool updatesEnabled)
 
     m_updatesEnabled = updatesEnabled;
 
-    if (m_updatesEnabled)
-        update();
+    if (m_updatesEnabled && !m_dirtyRect.isEmpty())
+        update(m_dirtyRect);
 }
 
 bool QnMaskedProxyWidget::eventFilter(QObject* watched, QEvent* event)
@@ -241,7 +244,8 @@ bool QnMaskedProxyWidget::eventFilter(QObject* watched, QEvent* event)
             case QEvent::UpdateRequest:
                 if (cacheMode() != NoCache)
                     break;
-                updateDirtyRect();
+                /* In not cached mode we obtain dirty rects from embedded widget updates: */
+                syncDirtyRect();
                 break;
 
             case QEvent::CursorChange:
@@ -256,10 +260,17 @@ bool QnMaskedProxyWidget::eventFilter(QObject* watched, QEvent* event)
     return base_type::eventFilter(watched, event);
 }
 
-void QnMaskedProxyWidget::updateDirtyRect()
+void QnMaskedProxyWidget::syncDirtyRect()
 {
     if (m_fullRepaintPending || !widget())
         return;
+
+    /*
+    * IF YOU DO NOT RECEIVE EMBEDDED WIDGET UPDATES WHEN THE WIDGET IS VISIBLE,
+    * it is most probably caused by it not having WA_Mapped attribute set due to Qt bug.
+    * Try to avoid changing visibility of embedded widget or its children while
+    * the proxy is invisible.
+    */
 
     QWidgetPrivate::get(widget())->syncBackingStore();
 

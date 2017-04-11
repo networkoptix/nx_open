@@ -1,0 +1,54 @@
+<div class="videowindow">
+
+    <div class="camera-view-informer camera-loading" ng-if="loading">
+        <div class="camera-view-preloader camera-view-message-icon"></div>
+    </div>
+
+    <div class="camera-view-informer" ng-if="flashRequired">
+        A videót nem lehet lejátszani.<br>
+        Kérjük <a href="https://get.adobe.com/flashplayer/" target="_blank">telepítse az Adobe Flash alkalmazást</a> a videó ARM szerveren történő lejátszásához.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="flashOrWebmRequired">
+        A videót nem lehet lejátszani.<br>
+        Kérjük <a href="https://get.adobe.com/flashplayer/" target="_blank">telepítse az Adobe Flash alkalmazást </a> vagy <a href="https://tools.google.com/dlpage/webmmf/" target="_blank">WebM codec-et </a> a videó Internet Explorerben történő lejátszásához.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="noArmSupport">
+        A videót nem lehet lejátszani.<br>
+        Ez a böngésző nem támogatja a videók ARM szerverről való lejátszását.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="noFormat">
+        A videót nem lehet lejátszani.<br>
+        Ez a böngésző vagy eszköz nem támogatja a videó lejátszását ebből a kamerából.<br>
+    </div>
+
+
+    <div class="camera-view-informer" ng-if="ieNoWebm">
+        A videót nem lehet lejátszani.<br>
+        Kérjük, telepítsen <a href="https://tools.google.com/dlpage/webmmf/" target="_blank">WebM codec-et</a> az Internet Explorerben.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="ieWin10">
+        A videót nem lehet lejátszani.<br>
+        Kérjük, használjon Microsoft Edge vagy Google Chrome böngészőt.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="ubuntuNX">
+        A videót nem lehet lejátszani.<br>
+        Ez a böngésző nem támogatja a videók ARM szerverről való lejátszását. Használjon helyette Chromium böngészőt.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="errorLoading">
+        A videót nem lehet lejátszani.<br>
+        Hiba történt.<br>
+    </div>
+
+
+    <div class="videoplayer" ng-if="flashls" ng-class="{'invisible':loading}" ng-include="Config.viewsDir + 'components/flashls.html'">
+    </div>
+
+    <div class="videoplayer" ng-hide="!native" ng-class="{'invisible': loading}">
+    </div>
+</div>

@@ -56,10 +56,14 @@ public:
     SystemError::ErrorCode lastSysErrorCode() const;
     bool isValid() const;
     bool eof() const;
+
     /**
-        Blocks, if internal message body buffer is empty
-    */
+     * Retrieve the currently accumulated message body, removing it from the internal buffer.
+     * Block while the internal message body buffer is empty. To read the whole message body,
+     * should be called in a loop while not eof().
+     */
     BufferType fetchMessageBodyBuffer();
+
     void addAdditionalHeader(const StringType& key, const StringType& value);
     const QUrl& url() const;
     const QUrl& contentLocationUrl() const;
@@ -111,7 +115,7 @@ private:
     template<typename AsyncClientFunc>
         bool doRequest(AsyncClientFunc func);
 
-    private slots:
+private slots:
     void onResponseReceived();
     void onSomeMessageBodyAvailable();
     void onDone();

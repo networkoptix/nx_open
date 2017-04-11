@@ -2,6 +2,12 @@
 /*exported Config */
 
 var Config = {
+    viewsDir: 'views/', //'lang_' + lang + '/views/';
+
+    defaultLanguage: 'en_US',
+    supportedLanguages:[
+        'en_US', 'ru'
+    ],
 
     defaultLogin: 'admin',
     defaultPassword: 'admin',
@@ -47,15 +53,10 @@ var Config = {
 
     passwordRequirements: {
         minLength: 8,
-        minLengthMessage:L.passwordRequirements.minLengthMessage,
         maxLength: 255,
         requiredRegex: '^[\x21-\x7E]$|^[\x21-\x7E][\x20-\x7E]*[\x21-\x7E]$',
-        requiredMessage: L.passwordRequirements.requiredMessage,
         minClassesCount: 2,
-        strongClassesCount: 3,
-        weakMessage: L.passwordRequirements.weakMessage,
-        strongMessage: L.passwordRequirements.strongMessage,
-        commonMessage: L.passwordRequirements.commonMessage
+        strongClassesCount: 3
     },
 
     undefinedValue:'__qn_undefined_value__',
@@ -154,5 +155,12 @@ var Config = {
             'Inactive',
             'Active'
         ]
+    },
+
+    setup:{
+        firstPollingRequest: 5000,
+        slowPollingTimeout: 5000,
+        pollingTimeout: 1000,
+        retriesForMergeCredentialsToApply: 15
     }
 };

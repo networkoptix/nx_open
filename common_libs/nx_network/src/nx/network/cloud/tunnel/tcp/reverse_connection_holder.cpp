@@ -135,7 +135,7 @@ void ReverseConnectionHolder::monitorSocket(
 
             NX_LOGX(lm("Unexpected event on socket(%1), size=%2: %3 (%4 sockets left)")
                 .strs(*it, size, SystemError::toString(code), m_socketCount.load() - 1),
-                    size ? cl_logERROR : cl_logDEBUG1);
+                    (size ? cl_logERROR : cl_logDEBUG1));
 
             (void)buffer; //< This buffer might be helpful for debug is case smth goes wrong!
             --m_socketCount;

@@ -8,6 +8,7 @@
 #include <client/client_settings.h>
 #include <ui/style/skin.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
+#include <ui/dialogs/common/file_messages.h>
 #include <ui/screen_recording/video_recorder_settings.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/workbench/workbench_display.h>
@@ -21,6 +22,8 @@
 #include <recording/stream_recorder.h>
 #include <core/resource/file_processor.h>
 #include <core/resource_management/resource_pool.h>
+
+#include <utils/common/delayed.h>
 
 namespace {
 
@@ -92,7 +95,10 @@ void QnWorkbenchScreenRecordingHandler::timerEvent(QTimerEvent* event)
         return;
 
     stopRecordingCountdown();
-    startRecordingInternal();
+
+    // Give some time to render at least one frame  to make sure messagebox is not recorded.
+    static const int kStartRecordingDelayMs = 50;
+    executeDelayedParented([this]{startRecordingInternal();}, kStartRecordingDelayMs, this);
 }
 
 bool QnWorkbenchScreenRecordingHandler::isRecording() const
@@ -305,11 +311,7 @@ void QnWorkbenchScreenRecordingHandler::onRecordingFinished(const QString& fileN
             QFile::remove(filePath);
             if (!QFile::rename(fileName, filePath))
             {
-                QString message = tr("Could not overwrite file '%1'. Please try a different name.").arg(filePath);
-                QnMessageBox::warning(
-                    mainWindow(),
-                    tr("Warning"),
-                    message);
+                QnFileMessages::overwriteFailed(mainWindow(), filePath);
                 continue;
             }
 
@@ -328,8 +330,5 @@ void QnWorkbenchScreenRecordingHandler::onError(const QString& reason)
 {
     stopRecording();
 
-    QnMessageBox::warning(
-        mainWindow(),
-        tr("Warning"),
-        tr("Unable to start recording due to the following error: %1").arg(reason));
+    QnMessageBox::critical(mainWindow(), tr("Failed to start recording"), reason);
 }

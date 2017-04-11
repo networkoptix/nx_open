@@ -25,9 +25,9 @@ void printConnectOptions(std::ostream* const outStream)
         "  --total-connections={"<< kDefaultTotalConnections <<"}\n"
         "                       Number of connections to try\n"
         "  --max-concurrent-connections={"<< kDefaultMaxConcurrentConnections <<"}\n"
-        "  --bytes-to-receive={" << nx::utils::bytesToString(kDefaultBytesToReceive).toStdString() << "}\n"
-        "                       Bytes to receive before closing connection\n"
-        "  --bytes-to-send={N}  Bytes to send before closing connection\n"
+        "  --bytes-to-receive={N}\n"
+        "                       Bytes to receive before closing connection. No limit by default\n"
+        "  --bytes-to-send={N}  Bytes to send before closing connection. No limit by default\n"
         "  --forward-address    Use only forwarded address for connect"
         "  --udt                Force using udt socket. Disables cloud connect\n"
         "  --ssl                Use SSL on top of client sockets\n";
@@ -58,7 +58,7 @@ static std::vector<SocketAddress> resolveTargets(
     }
 
     // Or resolve it.
-    std::promise<void> promise;
+    nx::utils::promise<void> promise;
     const auto port = targetAddress.port;
     nx::network::SocketGlobals::addressResolver().resolveDomain(
         std::move(targetAddress.address),
@@ -97,10 +97,11 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
     args.read("max-concurrent-connections", &maxConcurrentConnections);
 
     nx::network::test::TestTrafficLimitType
-        trafficLimitType = nx::network::test::TestTrafficLimitType::incoming;
+        trafficLimitType = nx::network::test::TestTrafficLimitType::none;
 
     QString trafficLimit = nx::utils::bytesToString(kDefaultBytesToReceive);
-    args.read("bytes-to-receive", &trafficLimit);
+    if (args.read("bytes-to-receive", &trafficLimit))
+        trafficLimitType = nx::network::test::TestTrafficLimitType::incoming;
 
     if (args.read("bytes-to-send", &trafficLimit))
         trafficLimitType = nx::network::test::TestTrafficLimitType::outgoing; 
@@ -108,6 +109,8 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
     auto transmissionMode = nx::network::test::TestTransmissionMode::spam;
     if (args.get("ping"))
         transmissionMode = nx::network::test::TestTransmissionMode::ping;
+    if (args.get("receive-only"))
+        transmissionMode = nx::network::test::TestTransmissionMode::receiveOnly;
 
     if (args.get("forward-address"))
     {
@@ -165,7 +168,7 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
         totalConnections,
         transmissionMode);
 
-    std::promise<void> finishedPromise;
+    nx::utils::promise<void> finishedPromise;
     connectionsGenerator.setOnFinishedHandler(
         [&finishedPromise]{ finishedPromise.set_value(); });
 

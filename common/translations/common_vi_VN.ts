@@ -17,10 +17,6 @@
 <context>
     <name>MergeSystemsStatusStrings</name>
     <message>
-        <source>The system was not found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The password or user name is invalid.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -33,18 +29,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Warning: You are about to merge Systems with START licenses.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If you understand this and would like to proceed please click Merge to continue.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>System name is not configured yet.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -53,38 +37,54 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The discovered system %1 has an incompatible version %2.</source>
-        <comment>%1 is name of the system, %2 is version information</comment>
+        <source>You are about to merge Systems with Starter licenses.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The discovered system %1 is in safe mode.</source>
-        <comment>%1 is name of the system</comment>
+        <source>Merge anyway?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not configure the remote system %1.</source>
-        <comment>%1 is name of the system</comment>
+        <source>System was not found.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>In this version you can only merge systems which are not connected to %1.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <source>The discovered System %1 has an incompatible version %2.</source>
+        <comment>%1 is name of System, %2 is version information</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Both systems are connected to %1. Merge is not allowed.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <source>Cannot connect to the other System because current System is already connected to %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>These systems are built with different %1 URL. Merge is not allowed.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <source>The discovered System %1 is in safe mode.</source>
+        <comment>%1 is name of System</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not configure the remote System %1.</source>
+        <comment>%1 is name of System</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Both Systems are connected to %1. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -139,16 +139,8 @@
         <translation>Lặp lại âm thanh</translation>
     </message>
     <message>
-        <source>Send email</source>
-        <translation>Gửi emai</translation>
-    </message>
-    <message>
         <source>Speak</source>
         <translation>nói</translation>
-    </message>
-    <message>
-        <source>Unknown (%1)</source>
-        <translation>không biết (%1)</translation>
     </message>
     <message>
         <source>Any Server Issue</source>
@@ -264,14 +256,6 @@
         <translation>trên %1 %2</translation>
     </message>
     <message>
-        <source>%1 --&gt; %2</source>
-        <translation>%1 --&gt; %2</translation>
-    </message>
-    <message>
-        <source>Server &apos;%1&apos; has a license problem</source>
-        <translation>máy chủ &apos;%1&apos; có một vấn đề giấy phép</translation>
-    </message>
-    <message>
         <source>An unknown event has occurred</source>
         <translation>Một sự kiện chưa biết</translation>
     </message>
@@ -290,17 +274,8 @@
         <translation>sự kiện chung</translation>
     </message>
     <message>
-        <source> (%1)</source>
-        <translation> (%1)</translation>
-    </message>
-    <message>
         <source>Caption: %1</source>
         <translation>Chú thích: %1</translation>
-    </message>
-    <message>
-        <source>MAC #%1: %2 </source>
-        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-        <translation>MAC #%1: %2 </translation>
     </message>
     <message>
         <source>Connection to camera (primary stream) was unexpectedly closed.</source>
@@ -373,10 +348,6 @@
         <translation>Lưu trữ bản sao lưu đã hoàn thành</translation>
     </message>
     <message>
-        <source>Server &apos;%1&apos; has finished an archive backup</source>
-        <translation>Server &apos;%1&apos; đã hoàn thành một bản sao lưu kho lưu trữ</translation>
-    </message>
-    <message>
         <source>Generic Event at %1</source>
         <translation>Sự kiện Generic %1</translation>
     </message>
@@ -417,58 +388,12 @@
         <translation>Lưu trữ bản sao lưu không: Danh mục tập tin lỗi</translation>
     </message>
     <message>
-        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
-        <translation>Lưu trữ bản sao lưu hoàn tất, nhưng không hoàn thành đầy đủ vì thời gian dự phòng là hơn. Dữ liệu được sao lưu vào %1</translation>
-    </message>
-    <message>
         <source>Archive backup is canceled by user. Data is backed up to %1</source>
         <translation>sao lưu kho lưu trữ được hủy bỏ bởi người dùng. Dữ liệu được sao lưu vào %1</translation>
     </message>
     <message>
         <source>Do HTTP request</source>
         <translation>gởi HTTP yêu cầu</translation>
-    </message>
-    <message numerus="yes">
-        <source>Motion on Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Input Signal on Device(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Input Signal on Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Device(s) Disconnected</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Camera(s) Disconnected</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Device(s) IP Conflict</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Camera(s) IP Conflict</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
     </message>
     <message>
         <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -500,6 +425,69 @@
     </message>
     <message>
         <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Motion on Cameras</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Input Signal on Devices</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Input Signal on Cameras</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Devices Disconnected</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Cameras Disconnected</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Devices IP Conflict</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Cameras IP Conflict</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; has a license problem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; has finished an archive backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MAC #%1: %2</source>
+        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+        <translation type="unfinished">MAC #%1: %2  {1:?} {2?}</translation>
+    </message>
+    <message>
+        <source>Send Email</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -546,24 +534,8 @@
         <translation>Không thể kết nối với http cổng %1.</translation>
     </message>
     <message>
-        <source>Cannot open media url %1. Failed to connect to media port %2.</source>
-        <translation>Không thể mở phương tiện truyền thông url %1. Không thể kết nối với cổng truyền thông %2.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
-        <translation>Không thể mở phương tiện truyền thông url %1. Kết nối đến cổng %2 đã được đóng cửa đột xuất.</translation>
-    </message>
-    <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
         <translation>Cuối cùng, cố gắng cập nhật firmware. Nếu vấn đề vẫn còn tồn tại, xin vui lòng liên hệ với hỗ trợ.</translation>
-    </message>
-    <message>
-        <source>No supported media tracks at url %1.</source>
-        <translation>Không hỗ trợ các bài hát truyền thông tại url %1.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Unsupported media protocol %2.</source>
-        <translation>Không thể mở phương tiện truyền thông url %1. Phương tiện truyền thông không được hỗ trợ giao thức %2.</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1.</source>
@@ -596,38 +568,6 @@
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>Hãy chắc chắn rằng các camera được cắm vào mạng. Hãy thử khởi động lại máy ảnh.</translation>
-    </message>
-    <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded).</source>
-        <translation>Hãy chắc chắn rằng cổng %2 có thể truy cập (ví dụ chuyển tiếp).</translation>
-    </message>
-    <message>
-        <source>Could not parse device response. Url %1, request name %2.</source>
-        <translation>Không thể phân tích phản ứng thiết bị. Url %1, yêu cầu tên %2.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation>Không thể phân tích ứng của máy ảnh. Url %1, yêu cầu tên %2.</translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>Không được cho phép. Url %1.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in device settings.</source>
-        <translation>Đầu tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt thiết bị.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation>Đầu tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt camera.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
-        <translation>Nếu nó không giúp, phục hồi mặc định nhà máy trên thiết bị web-page.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
-        <translation>Nếu nó không giúp, phục hồi mặc định nhà máy trên máy ảnh web-page.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -674,18 +614,6 @@
         <translation>Hãy chắc chắn rằng các I / O module được cắm vào mạng. Hãy thử khởi động lại các I / O module.</translation>
     </message>
     <message>
-        <source>Could not parse I/O module response. Url %1, request name %2.</source>
-        <translation>Không thể phân tích tôi phản ứng I / Omodule. Url %1, yêu cầu tên %2.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
-        <translation>Đầu tiên, hãy thử bật ghi âm (nếu mình off) và giảm fps trong cài đặt I / O module tôi.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
-        <translation>Đầu tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt I / O module tôi.</translation>
-    </message>
-    <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
         <translation>I / O Module yêu cầu &quot;%1&quot; thất bại với lỗi &quot;%2&quot;.</translation>
     </message>
@@ -713,6 +641,66 @@
         <source>I/O Module initialization process is in progress.</source>
         <translation>I / O Module khởi tạo quá trình được tiến hành.</translation>
     </message>
+    <message>
+        <source>Make sure port %1 is accessible (e.g. forwarded).</source>
+        <translation type="unfinished">Hãy chắc chắn rằng cổng %1 có thể truy cập (ví dụ chuyển tiếp).</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the device web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the camera web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse device response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse camera response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse I/O module response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No supported media tracks at URL %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not authorized. URL %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -737,23 +725,23 @@
         <translation type="unfinished">không thể tìm thấy %1 Một bộ mã hóa để mã hóa.</translation>
     </message>
     <message>
-        <source>Couldn&apos;t initialize resampling context, error code: %1</source>
+        <source>Could not initialize resampling context, error code: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t allocate sample buffers, error code: %1</source>
+        <source>Could not allocate sample buffers, error code: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t send audio frame to encoder, Error code: %1.</source>
+        <source>Could not send audio frame to encoder, Error code: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t receive audio packet from encoder, Error code: %1.</source>
+        <source>Could not receive audio packet from encoder, Error code: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t receive audio frame from decoder, Error code: %1.</source>
+        <source>Could not receive audio frame from decoder, Error code: %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -890,10 +878,6 @@
         <translation>Giấy phép không hợp lệ</translation>
     </message>
     <message>
-        <source>This license type requires higher software version.</source>
-        <translation>Loại giấy phép này đòi hỏi phiên bản phần mềm cao hơn.</translation>
-    </message>
-    <message>
         <source>Invalid signature</source>
         <translation type="unfinished">chữ ký không hợp lệ</translation>
     </message>
@@ -917,6 +901,10 @@
         <source>Free license</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>This license type requires higher software version</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLicenseUsageHelper</name>
@@ -932,18 +920,6 @@
             <numerusform>%n %2 sẽ được sử dụng trong tổng số %1.</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>Activate %n more %2. </source>
-        <translation>
-            <numerusform>Kích hoạt %n hơn %2.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n more %2 will be used. </source>
-        <translation>
-            <numerusform>%n hơn %2 sẽ được sử dụng.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
         <translation>Key bản quyền mà bạn đã nhập không hợp lệ. Hãy kiểm tra xem key bản quyền được nhập chính xác. Nếu vấn đề vẫn tiếp tục, vui lòng liên hệ với nhóm hỗ trợ để xác nhận nếu key bản quyền là hợp lệ hoặc để có được một chìa khóa giấy phép hợp lệ.</translation>
@@ -953,10 +929,6 @@
         <translation>Bạn đang cố gắng để kích hoạt một giấy phép tương thích với phần mềm của bạn. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation>Key bản quyền này trước đó đã được kích hoạt cho phần cứng id {{}} HWID vào {{}} thời gian. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. A database error occurred.</source>
         <translation>Có một vấn đề kích hoạt key bản quyền của bạn. xảy ra một lỗi cơ sở dữ liệu.</translation>
     </message>
@@ -964,19 +936,29 @@
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
         <translation>Có một vấn đề kích hoạt key bản quyền của bạn. dữ liệu không hợp lệ nhận được. Hãy liên hệ với nhóm hỗ trợ để báo cáo vấn đề.</translation>
     </message>
-</context>
-<context>
-    <name>QnLocalSystemDescription</name>
+    <message numerus="yes">
+        <source>Activate %n more %1.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n more %1 will be used.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <source>New System</source>
+        <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
+        <comment>%1 is a hardware ID, %2 is an activation time</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>QnPropertyStorage</name>
+    <name>QnLocalSystemDescription</name>
     <message>
-        <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
-        <translation>&apos;%1&apos; Giá trị tham số không hợp lệ - dự báo %2, cung cấp&apos;%3&apos;.</translation>
+        <source>New Server</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1073,24 +1055,24 @@
         <translation>không biết</translation>
     </message>
     <message>
-        <source>Hardware ID: </source>
-        <translation>Phần cứng ID:</translation>
-    </message>
-    <message>
-        <source>Watermark: </source>
-        <translation>watermark:</translation>
-    </message>
-    <message>
         <source>Trial License</source>
         <translation>giấy phép thử nghiệm</translation>
     </message>
     <message>
-        <source>Licensed To: </source>
-        <translation>Licensed to:</translation>
-    </message>
-    <message>
         <source>FREE License</source>
         <translation>miễn phí bản quyền</translation>
+    </message>
+    <message>
+        <source>Hardware ID: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Licensed To: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watermark: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1153,11 +1135,6 @@
         <extracomment>Short for &apos;Preset&apos;</extracomment>
         <translation>Short cho đặt trước</translation>
     </message>
-    <message>
-        <source>-</source>
-        <extracomment>Short for &apos;Undefined&apos;</extracomment>
-        <translation>Short cho Không xác định</translation>
-    </message>
 </context>
 <context>
     <name>QnStreamRecorder</name>
@@ -1186,10 +1163,6 @@
         <translation>Video hay mã hóa âm thanh không thể tương thích với các định dạng đã chọn.</translation>
     </message>
     <message>
-        <source>Error during watermark generation for file &apos;%1&apos;.</source>
-        <translation>Lỗi trong hệ watermark cho tập tin %1.</translation>
-    </message>
-    <message>
         <source>File write error. Not enough free space.</source>
         <translation>Nộp ghi lỗi. Không đủ không gian trống.</translation>
     </message>
@@ -1201,7 +1174,7 @@
 <context>
     <name>QnSystemDescription</name>
     <message>
-        <source>&lt;Unnamed system&gt;</source>
+        <source>Unnamed System</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1421,14 +1394,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Has access to whole system and can do everything.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Has access to whole system and can manage it. Can create users.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Can manage all cameras and bookmarks.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1446,6 +1411,14 @@
     </message>
     <message>
         <source>Custom permissions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Has access to whole System and can do everything.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Has access to whole System and can manage it. Can create users.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

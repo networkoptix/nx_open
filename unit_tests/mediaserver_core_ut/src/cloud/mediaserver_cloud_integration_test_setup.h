@@ -16,14 +16,9 @@ public:
     bool startCloudDB();
     bool startMediaServer();
 
-    bool registerRandomCloudAccount(
-        std::string* const accountEmail,
-        std::string* const accountPassword);
-    bool bindSystemToCloud(
-        const std::string& accountEmail,
-        const std::string& accountPassword,
-        std::string* const cloudSystemId,
-        std::string* const cloudSystemAuthKey);
+    bool registerRandomCloudAccount();
+    bool registerCloudSystem();
+    bool saveCloudCredentialsToMediaServer();
 
     SocketAddress mediaServerEndpoint() const;
     nx::cdb::CdbLauncher* cdb();
@@ -34,8 +29,7 @@ public:
 
     std::string accountEmail() const { return m_accountEmail; }
     std::string accountPassword() const { return m_accountPassword; }
-    std::string cloudSystemId() const { return m_cloudSystemId; }
-    std::string cloudSystemAuthKey() const { return m_cloudSystemAuthKey; }
+    nx::cdb::api::SystemData cloudSystem() const { return m_cloudSystem; }
 
 private:
     nx::cdb::CdbLauncher m_cdb;
@@ -43,6 +37,7 @@ private:
     std::unique_ptr<MediaServerClient> m_mserverClient;
     const std::pair<QString, QString> m_defaultOwnerCredentials;
     std::pair<QString, QString> m_ownerCredentials;
+    nx::cdb::api::SystemData m_cloudSystem;
 
     std::string m_accountEmail;
     std::string m_accountPassword;

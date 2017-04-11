@@ -91,6 +91,7 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (BookmarkUpdateObject, "cameraBookmarks/update")
     (BookmarkDeleteObject, "cameraBookmarks/delete")
     (InstallUpdateObject, "installUpdate")
+    (InstallUpdateUnauthenticatedObject, "installUpdateUnauthenticated")
     (Restart, "restart")
     (ConfigureObject, "configure")
     (PingSystemObject, "pingSystem")
@@ -271,6 +272,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             processJsonReply<QnCameraBookmark>(this, response, handle);
             break;
         case InstallUpdateObject:
+        case InstallUpdateUnauthenticatedObject:
             processJsonReply<QnUploadUpdateReply>(this, response, handle);
             break;
         case Restart:
@@ -926,6 +928,17 @@ int QnMediaServerConnection::installUpdate(
         params, QN_STRINGIZE_TYPE(QnUploadUpdateReply), target, slot);
 }
 
+int QnMediaServerConnection::installUpdateUnauthenticated(
+    const QString& updateId, bool delayed, QObject* target, const char* slot)
+{
+    QnRequestParamList params;
+    params << QnRequestParam("updateId", updateId);
+    params << QnRequestParam("delayed", delayed);
+
+    return sendAsyncGetRequestLogged(InstallUpdateUnauthenticatedObject,
+        params, QN_STRINGIZE_TYPE(QnUploadUpdateReply), target, slot);
+}
+
 int QnMediaServerConnection::uploadUpdateChunk(
     const QString& updateId, const QByteArray& data, qint64 offset, QObject* target,
     const char* slot)
@@ -1079,7 +1092,7 @@ int QnMediaServerConnection::getBookmarksAsync(
     const QnGetBookmarksRequestData& request, QObject* target, const char* slot)
 {
     return sendAsyncGetRequestLogged(ec2BookmarksObject,
-        request.toParams(), QN_STRINGIZE_TYPE(QnCameraBookmarkList) ,target, slot);
+        request.toParams(), QN_STRINGIZE_TYPE(QnCameraBookmarkList), target, slot);
 }
 
 int QnMediaServerConnection::getBookmarkTagsAsync(

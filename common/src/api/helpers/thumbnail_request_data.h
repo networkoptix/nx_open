@@ -41,7 +41,7 @@ struct QnThumbnailRequestData: public QnMultiserverRequestData
     static const int kMinimumSize = 128;
 
     /** Target camera. */
-    QnSecurityCamResourcePtr camera;
+    QnVirtualCameraResourcePtr camera;
 
     /** Timestamp. Negative value means 'latest'. Can take the special value DATETIME_NOW. */
     qint64 msecSinceEpoch;

@@ -56,7 +56,7 @@ public:
 
     /* [1] Constructors and Destructors */
 
-    SmtpClient(const QString & host = lit("locahost"), int port = 25, ConnectionType ct = TcpConnection);
+    SmtpClient(const QString& host = QStringLiteral("locahost"), int port = 25, ConnectionType ct = TcpConnection);
 
     ~SmtpClient();
 

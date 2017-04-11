@@ -14,6 +14,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 
+#include <nx/client/messages/resources_messages.h>
+
 #include <ui/common/palette.h>
 #include <ui/actions/action_manager.h>
 #include <ui/common/item_view_hover_tracker.h>
@@ -42,15 +44,39 @@
 
 namespace {
 
-class QnUserListDelegate : public QStyledItemDelegate
+static constexpr int kMaximumColumnWidth = 200;
+
+class QnUserListDelegate: public QStyledItemDelegate
 {
-    typedef QStyledItemDelegate base_type;
+    using base_type = QStyledItemDelegate;
     Q_DECLARE_TR_FUNCTIONS(QnUserManagementWidget)
+
+    struct LinkMetrics
+    {
+        const int textWidth = 0;
+        const int iconWidth = 0;
+
+        static constexpr int kIconPadding = 0;
+
+        LinkMetrics(int textWidth, int iconWidth) :
+            textWidth(textWidth),
+            iconWidth(iconWidth)
+        {
+        }
+
+        int totalWidth() const
+        {
+            return textWidth + iconWidth + kIconPadding;
+        }
+    };
+
+    static constexpr int kLinkPadding = 0;
 
 public:
     explicit QnUserListDelegate(QnItemViewHoverTracker* hoverTracker, QObject* parent = nullptr) :
         base_type(parent),
         m_hoverTracker(hoverTracker),
+        m_linkText(tr("Edit")),
         m_editIcon(qnSkin->icon("user_settings/user_edit.png"))
     {
         NX_ASSERT(m_hoverTracker);
@@ -58,10 +84,18 @@ public:
 
     virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override
     {
-        if (index.column() == QnUserListModel::UserTypeColumn)
-            return QnSkin::maximumSize(index.data(Qt::DecorationRole).value<QIcon>());
+        switch (index.column())
+        {
+            case QnUserListModel::UserTypeColumn:
+                return QnSkin::maximumSize(index.data(Qt::DecorationRole).value<QIcon>());
 
-        return base_type::sizeHint(option, index);
+            case QnUserListModel::UserRoleColumn:
+                return base_type::sizeHint(option, index) + QSize(
+                    linkMetrics(option).totalWidth() + kLinkPadding, 0);
+
+            default:
+                return base_type::sizeHint(option, index);
+        }
     }
 
     virtual void paint(QPainter* painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override
@@ -109,37 +143,38 @@ public:
         QStyle* style = newOption.widget ? newOption.widget->style() : QApplication::style();
         QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &newOption, newOption.widget);
 
-        /* Link text: */
-        QString linkText = tr("Edit");
-
-        /* Measure link width: */
-        const int kTextFlags = Qt::TextSingleLine | Qt::AlignVCenter;
-        int linkWidth = option.fontMetrics.width(linkText, -1, kTextFlags);
-
-        int lineHeight = option.rect.height();
-        QSize iconSize = m_editIcon.actualSize(QSize(lineHeight, lineHeight));
-        const int kIconPadding = 0;
-        linkWidth += iconSize.width() + kIconPadding;
+        /* Measure link metrics: */
+        const auto linkMetrics = this->linkMetrics(option);
 
         /* Draw original text elided: */
-        int newTextWidth = textRect.width() - linkWidth - style::Metrics::kStandardPadding;
-        newOption.text = newOption.fontMetrics.elidedText(newOption.text, newOption.textElideMode, newTextWidth);
+        const int newTextWidth = textRect.width() - linkMetrics.totalWidth() - kLinkPadding;
+        newOption.text = newOption.fontMetrics.elidedText(
+            newOption.text, newOption.textElideMode, newTextWidth);
         style->drawControl(QStyle::CE_ItemViewItem, &newOption, painter, newOption.widget);
 
         opacityRollback.rollback();
 
         /* Draw link icon: */
-        QRect iconRect(textRect.right() - linkWidth + 1, option.rect.top(), iconSize.width(), lineHeight);
+        QRect iconRect(textRect.right() - linkMetrics.totalWidth() + 1, option.rect.top(),
+            linkMetrics.iconWidth, option.rect.height());
         m_editIcon.paint(painter, iconRect, Qt::AlignCenter, QIcon::Active);
 
         /* Draw link text: */
         QnScopedPainterPenRollback penRollback(painter, style::linkColor(newOption.palette, true));
-        painter->drawText(textRect, kTextFlags | Qt::AlignRight, linkText);
+        painter->drawText(textRect, Qt::AlignVCenter | Qt::AlignRight, m_linkText);
+    }
+
+    LinkMetrics linkMetrics(const QStyleOptionViewItem &option) const
+    {
+        return LinkMetrics(
+            option.fontMetrics.width(m_linkText),
+            qnSkin->maximumSize(m_editIcon).width());
     }
 
 private:
     QPointer<QnItemViewHoverTracker> m_hoverTracker;
-    QIcon m_editIcon;
+    const QString m_linkText;
+    const QIcon m_editIcon;
 };
 
 } // unnamed namespace
@@ -170,8 +205,9 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
     ui->usersTable->setItemDelegateForColumn(QnUserListModel::EnabledColumn,  switchItemDelegate);
 
     m_header->setVisible(true);
+    m_header->setMaximumSectionSize(kMaximumColumnWidth);
     m_header->setSectionResizeMode(QHeaderView::ResizeToContents);
-    m_header->setSectionResizeMode(QnUserListModel::UserRoleColumn, QHeaderView::Stretch);
+    m_header->setSectionResizeMode(QnUserListModel::FullNameColumn, QHeaderView::Stretch);
     m_header->setSectionsClickable(true);
     connect(m_header, &QnCheckBoxedHeaderView::checkStateChanged, this, &QnUserManagementWidget::at_headerCheckStateChanged);
 
@@ -303,10 +339,22 @@ void QnUserManagementWidget::applyChanges()
     }
 
     /* User still can press cancel on 'Confirm Remove' dialog. */
-    if (confirmUsersDelete(usersToDelete))
-        qnResourcesChangesManager->deleteResources(usersToDelete);
+    if (nx::client::messages::Resources::deleteResources(this, usersToDelete))
+    {
+        setEnabled(false);
+        qnResourcesChangesManager->deleteResources(usersToDelete,
+            [this, guard = QPointer<QnUserManagementWidget>(this)](bool /* success */)
+            {
+                if (guard)
+                    setEnabled(true);
+
+                emit hasChangesChanged();
+            });
+    }
     else
+    {
         m_usersModel->resetUsers(qnResPool->getResources<QnUserResource>());
+    }
 }
 
 bool QnUserManagementWidget::hasChanges() const
@@ -528,37 +576,4 @@ QnUserResourceList QnUserManagementWidget::visibleSelectedUsers() const
     }
 
     return result;
-}
-
-bool QnUserManagementWidget::confirmUsersDelete(const QnUserResourceList& users)
-{
-    if (users.isEmpty())
-        return false;
-
-    /* Check if user have already silenced this warning. */
-    if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::DeleteResources))
-        return true;
-
-    QnMessageBox messageBox(
-        QnMessageBox::Warning,
-        Qn::Empty_Help,
-        tr("Delete Users..."),
-        tr("Confirm Delete Users"),
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-        this);
-    messageBox.setDefaultButton(QDialogButtonBox::Ok);
-    messageBox.setInformativeText(tr("Do you really want to delete the following %n users?",
-        "", users.size()));
-    messageBox.setCheckBoxText(tr("Do not show this message anymore"));
-    messageBox.addCustomWidget(new QnResourceListView(users));
-
-    auto result = messageBox.exec();
-    if (messageBox.isChecked())
-    {
-        Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
-        messagesFilter |= Qn::ShowOnceMessage::DeleteResources;
-        qnSettings->setShowOnceMessages(messagesFilter);
-    }
-
-    return result == QDialogButtonBox::Ok;
 }

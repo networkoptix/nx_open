@@ -35,6 +35,9 @@ bool CLPing::ping(const QString& ip, int retry, int /*timeoutPerRetry*/, int pac
     process.waitForFinished();
     return process.exitCode() == 0;
 #elif defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+    Q_UNUSED(ip)
+    Q_UNUSED(retry)
+    Q_UNUSED(packetSize)
     return false; // TODO: #android
 #else
     QString cmd = QLatin1String("/bin/ping %1 -c %2 -s %3");

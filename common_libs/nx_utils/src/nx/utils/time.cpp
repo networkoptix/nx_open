@@ -4,7 +4,7 @@
 #include <QtCore/QTimeZone>
 
 #include <nx/utils/log/log.h>
-#include <utils/common/unused.h>
+#include <nx/utils/unused.h>
 
 #if defined(Q_OS_LINUX)
     #include <sys/time.h>
@@ -18,8 +18,6 @@ using namespace std::chrono;
 namespace nx {
 namespace utils {
 
-namespace {
-
 static milliseconds utcTimeShift(0);
 static milliseconds monotonicTimeShift(0);
 
@@ -29,7 +27,7 @@ static milliseconds monotonicTimeShift(0);
  * @return On Linux - time zone file name, or a null string if time zone id is not valid; on
  *     other platforms - an empty string.
  */
-QString getTimeZoneFile(const QString& timeZoneId)
+static QString getTimeZoneFile(const QString& timeZoneId)
 {
     #if defined(Q_OS_LINUX)
         QString timeZoneFile = lit("/usr/share/zoneinfo/%1").arg(timeZoneId);
@@ -41,8 +39,6 @@ QString getTimeZoneFile(const QString& timeZoneId)
         return lit("");
     #endif
 }
-
-} // namespace
 
 //-------------------------------------------------------------------------------------------------
 

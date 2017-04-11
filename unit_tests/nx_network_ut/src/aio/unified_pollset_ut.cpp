@@ -38,10 +38,8 @@ public:
     }
 
 protected:
-    virtual bool simulateSocketEvent(Pollable* socket, int eventMask) override
+    virtual bool simulateSocketEvent(Pollable* socket, int /*eventMask*/) override
     {
-        eventMask = eventMask;
-
         const auto udtSocket = dynamic_cast<UdtStreamSocket*>(socket);
         if (udtSocket)
         {
@@ -120,6 +118,8 @@ TEST(UnifiedPollSet, all_tests)
 {
     UnifiedPollSet::runTests<UnifiedPollSet>();
 }
+
+INSTANTIATE_TYPED_TEST_CASE_P(UnifiedPollSet, PollSetPerformance, aio::UnifiedPollSet);
 
 } // namespace test
 } // namespace aio

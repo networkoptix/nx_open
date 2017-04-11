@@ -240,7 +240,8 @@ protected:
     bool isObjectExists(const QString& objectType, const QString& objectName, QSqlDatabase& database);
     void addDatabase(const QString& fileName, const QString& dbname);
     void removeDatabase();
-
+private:
+    static bool validateParams(const QSqlQuery& query);
 protected:
     QSqlDatabase m_sdb;
     mutable QnReadWriteLock m_mutex;

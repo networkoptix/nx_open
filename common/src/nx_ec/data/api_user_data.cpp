@@ -4,6 +4,8 @@
 
 namespace ec2 {
 
+constexpr const char* ApiUserData::kCloudPasswordStub;
+
 bool ApiUserData::operator==(const ApiUserData& rhs) const
 {
     if (!ApiResourceData::operator==(rhs))

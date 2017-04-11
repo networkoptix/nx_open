@@ -24,6 +24,7 @@ Page
             flat: true
             leftPadding: 0
             rightPadding: 0
+            labelPadding: 8
             visible: cloudStatusWatcher.status == QnCloudStatusWatcher.LoggedOut
             onClicked: Workflow.openCloudScreen()
         }
@@ -58,12 +59,20 @@ Page
         }
     }
 
-    ListView
+    GridView
     {
         id: sessionsList
 
         anchors.fill: parent
-        spacing: 1
+        anchors.margins: -4
+
+        property real horizontalSpacing: 8
+        property real verticalSpacing: cellsInRow > 1 ? 8 : 1
+        readonly property real maxCellWidth: 488 + horizontalSpacing
+        property int cellsInRow: Math.max(1, Math.ceil(width / maxCellWidth))
+
+        cellWidth: (width - leftMargin - rightMargin) / cellsInRow
+        cellHeight: 98 + verticalSpacing
 
         model: OrderedSystemsModel
         {
@@ -71,33 +80,45 @@ Page
             minimalVersion: "2.5"
         }
 
-        delegate: SessionItem
+        delegate: Item
         {
-            width: sessionsList.width
-            systemName: model.systemName
-            systemId: model.systemId
-            localId: model.localId
-            cloudSystem: model.isCloudSystem
-            ownerDescription: cloudSystem ? model.ownerDescription : ""
-            online: model.isConnectable
-            compatible: model.isCompatible
-            invalidVersion: !compatible && !model.isCompatibleVesion ? model.wrongVersion : ""
+            width: sessionsList.cellWidth
+            height: sessionsList.cellHeight
+
+            SessionItem
+            {
+                anchors.fill: parent
+                anchors.leftMargin: sessionsList.horizontalSpacing / 2
+                anchors.rightMargin: sessionsList.horizontalSpacing / 2
+                anchors.topMargin: Math.floor(sessionsList.verticalSpacing / 2)
+                anchors.bottomMargin: sessionsList.verticalSpacing - anchors.topMargin
+
+                systemName: model.systemName
+                systemId: model.systemId
+                localId: model.localId
+                cloudSystem: model.isCloudSystem
+                ownerDescription: cloudSystem ? model.ownerDescription : ""
+                online: model.isConnectable
+                compatible: model.isCompatible
+                invalidVersion: model.wrongVersion ? model.wrongVersion.toString() : ""
+            }
         }
         highlight: Rectangle
         {
+            width: sessionsList.cellWidth
+            height: sessionsList.cellHeight
             z: 2.0
             color: "transparent"
             border.color: ColorTheme.contrast9
             border.width: 4
             visible: liteMode
         }
-        highlightResizeDuration: 0
         highlightMoveDuration: 0
 
         displayMarginBeginning: 16
         displayMarginEnd: 16 + mainWindow.bottomPadding
 
-        focus: true
+        focus: liteMode
 
         Keys.onPressed:
         {
@@ -145,7 +166,7 @@ Page
         anchors.fill: parent
         anchors.topMargin: -16
         anchors.bottomMargin: -24
-        title: qsTr("No systems found")
+        title: qsTr("No Systems found")
         description: qsTr(
              "Check your network connection or press \"%1\" button "
                  + "to enter a known server address.").arg(customConnectionButton.text)
@@ -165,8 +186,9 @@ Page
     function openConnectionWarningDialog(systemName)
     {
         var message = systemName ?
-                    qsTr("Cannot connect to the system \"%1\"").arg(systemName) :
-                    qsTr("Cannot connect to the server")
-        Workflow.openInformationDialog(message, qsTr("Check your network connection or contact a system administrator"))
+                    qsTr("Cannot connect to System \"%1\"").arg(systemName) :
+                    qsTr("Cannot connect to Server")
+        Workflow.openStandardDialog(
+            message, qsTr("Check your network connection or contact a system administrator"))
     }
 }

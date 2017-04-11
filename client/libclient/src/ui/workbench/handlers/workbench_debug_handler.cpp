@@ -19,7 +19,12 @@
 
 #include <nx/client/ui/dialogs/debug/animations_control_dialog.h>
 #include <nx/client/ui/dialogs/debug/applauncher_control_dialog.h>
+#include <finders/test_systems_finder.h>
+#include <finders/system_tiles_test_case.h>
+#include <finders/systems_finder.h>
 
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_welcome_screen.h>
 
 //#ifdef _DEBUG
 #define DEBUG_ACTIONS
@@ -104,16 +109,25 @@ public:
             {
                 QnPaletteWidget *w = new QnPaletteWidget(this);
                 w->setPalette(qApp->palette());
-                auto messageBox = new QnMessageBox(mainWindow(), Qt::Window);
+                auto messageBox = new QnMessageBox(mainWindow());
+                messageBox->setWindowFlags(Qt::Window);
                 messageBox->addCustomWidget(w);
                 messageBox->show();
             });
 
         addButton(lit("Resource Pool"), [this]
             {
-                auto messageBox = new QnMessageBox(mainWindow(), Qt::Window);
-                messageBox->addCustomWidget(new QnResourceListView(qnResPool->getResources()));
+                auto messageBox = new QnMessageBox(mainWindow());
+                messageBox->setWindowFlags(Qt::Window);
+                messageBox->addCustomWidget(new QnResourceListView(qnResPool->getResources(), messageBox));
                 messageBox->show();
+            });
+
+        addButton(lit("Tiles tests"),
+            [this]()
+            {
+                runTilesTest();
+                close();
             });
 
     }
@@ -126,8 +140,51 @@ private:
         button->setToolButtonStyle(Qt::ToolButtonTextOnly);
         return button;
     }
+
+    static QnSystemTilesTestCase *m_tilesTests;
+
+    void runTilesTest()
+    {
+        if (!m_tilesTests)
+        {
+            static constexpr auto kSomeFarPriority = 1000;
+            const auto testSystemsFinder = new QnTestSystemsFinder(qnSystemsFinder);
+            qnSystemsFinder->addSystemsFinder(testSystemsFinder, kSomeFarPriority);
+
+            m_tilesTests = new QnSystemTilesTestCase(testSystemsFinder, this);
+
+            const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+
+            connect(m_tilesTests, &QnSystemTilesTestCase::openTile,
+                welcomeScreen, &QnWorkbenchWelcomeScreen::openTile);
+            connect(m_tilesTests, &QnSystemTilesTestCase::switchPage,
+                welcomeScreen, &QnWorkbenchWelcomeScreen::switchPage);
+            connect(m_tilesTests, &QnSystemTilesTestCase::collapseExpandedTile, this,
+                [welcomeScreen]() { emit welcomeScreen->openTile(QString());});
+            connect(m_tilesTests, &QnSystemTilesTestCase::restoreApp, this,
+                [this]()
+                {
+                    const auto maximizeAction = action(QnActions::FullscreenAction);
+                    if (maximizeAction->isChecked())
+                        maximizeAction->toggle();
+                });
+            connect(m_tilesTests, &QnSystemTilesTestCase::makeFullscreen, this,
+                [this]()
+                {
+                    const auto maximizeAction = action(QnActions::FullscreenAction);
+                    if (!maximizeAction->isChecked())
+                        maximizeAction->toggle();
+                });
+
+            connect(m_tilesTests, &QnSystemTilesTestCase::messageChanged,
+                welcomeScreen, &QnWorkbenchWelcomeScreen::setMessage);
+        }
+
+        m_tilesTests->runTestSequence(QnTileTest::First);
+    }
 };
 
+QnSystemTilesTestCase *QnDebugControlDialog::m_tilesTests = nullptr;
 
 
 } // namespace

@@ -480,6 +480,8 @@ void QnScheduleGridWidget::mouseReleaseEvent(QMouseEvent* event)
 {
     if (m_mousePressed)
     {
+        m_trackedChanges = false;
+
         QPoint mouseReleaseCell = mapToGrid(event->pos(), false);
         if (m_mousePressCell == mouseReleaseCell)
         {
@@ -500,6 +502,9 @@ void QnScheduleGridWidget::mouseReleaseEvent(QMouseEvent* event)
                 for (int y = y1; y <= y2; ++y)
                     updateCellValueInternal(QPoint(x, y));
         }
+
+        if (m_trackedChanges)
+            emit cellValuesChanged();
     }
 
     m_mousePressed = false;
@@ -570,6 +575,8 @@ void QnScheduleGridWidget::setCellValue(const QPoint& cell, const CellParams& va
     localValue = value;
 
     update();
+    m_trackedChanges = true;
+
     emit cellValueChanged(cell);
 }
 
@@ -602,6 +609,8 @@ void QnScheduleGridWidget::resetCellValues()
     for (int col = 0; col < columnCount(); ++col)
         for (int row = 0; row < rowCount(); ++row)
             setCellValue(QPoint(col, row), emptyParams);
+
+    emit cellValuesChanged();
 }
 
 bool QnScheduleGridWidget::isReadOnly() const

@@ -394,13 +394,13 @@
         <number>16</number>
        </property>
        <property name="topMargin">
-        <number>16</number>
+        <number>0</number>
        </property>
        <property name="rightMargin">
         <number>16</number>
        </property>
        <property name="bottomMargin">
-        <number>16</number>
+        <number>0</number>
        </property>
        <item>
         <widget class="QnCameraScheduleWidget" name="cameraScheduleWidget" native="true"/>
@@ -624,6 +624,11 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QnAlertBar</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/common/alert_bar.h</header>
+  </customwidget>
+  <customwidget>
    <class>QnFisheyeSettingsWidget</class>
    <extends>QWidget</extends>
    <header>ui/widgets/properties/fisheye_settings_widget.h</header>
@@ -664,11 +669,6 @@
    <extends>QWidget</extends>
    <header location="global">ui/widgets/properties/camera_schedule_widget.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QnAlertBar</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/alert_bar.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

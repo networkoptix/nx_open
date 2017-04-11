@@ -23,6 +23,7 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <common/common_module.h>
 #include <plugins/resource/hikvision/hikvision_onvif_resource.h>
+#include <nx/utils/log/log.h>
 
 using namespace nx::plugins::onvif;
 
@@ -145,6 +146,38 @@ bool OnvifResourceInformationFetcher::isModelSupported(const QString& manufactur
     return NameHelper::instance().isManufacturerSupported(manufacturer) && NameHelper::instance().isSupported(modelName);
 }
 
+bool OnvifResourceInformationFetcher::needIgnoreCamera(
+    const QString& host,
+    const QString& manufacturer,
+    const QString& model)
+{
+    const bool forceOnvif = QnPlOnvifResource::isCameraForcedToOnvif(manufacturer, model);
+    if (forceOnvif)
+        return false;
+
+    auto normilizedModel = QString(model).replace(manufacturer, QString()).trimmed();
+    if (NameHelper::instance().isManufacturerSupported(manufacturer) &&
+        NameHelper::instance().isSupported(normilizedModel))
+    {
+        NX_LOG(lit("Discovery----:  ignore ONVIF camera %1 (%2-%3) because it supported by native driver").
+            arg(host).
+            arg(manufacturer).
+            arg(model),
+            cl_logDEBUG1);
+        return true;
+    }
+    if (ignoreCamera(manufacturer, normilizedModel))
+    {
+        NX_LOG(lit("Discovery----:  ignore ONVIF camera %1 (%2-%3) because it is in the special blocking list").
+            arg(host).
+            arg(manufacturer).
+            arg(model),
+            cl_logDEBUG1);
+        return true;
+    }
+    return false;
+}
+
 void OnvifResourceInformationFetcher::findResources(const QString& endpoint, const EndpointAdditionalInfo& originalInfo, QnResourceList& result, DiscoveryMode discoveryMode) const
 {
     if (endpoint.isEmpty()) {
@@ -164,17 +197,8 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     //    int n = 0;
 
 
-    const bool forceOnvif = QnPlOnvifResource::isCameraForcedToOnvif(info.manufacturer, info.name);
-    if (!forceOnvif)
-    {
-        if (ignoreCamera(info.manufacturer, info.name))
-            return;
-
-        if (isModelSupported(info.manufacturer, info.name)) {
-            //qDebug() << "OnvifResourceInformationFetcher::findResources: skipping camera " << info.name;
-            return;
-        }
-    }
+    if (needIgnoreCamera(QUrl(endpoint).host(), info.manufacturer, info.name))
+        return;
 
     QString manufacturer = info.manufacturer;
     QString model = info.name;
@@ -185,7 +209,8 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 
     QnVirtualCameraResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
 
-    if (existResource && existResource->getStatus() >= Qn::Online) {
+    if (existResource)
+    {
         QAuthenticator auth = existResource->getAuth();
 
         if (!auth.isNull())
@@ -243,15 +268,8 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         if (!extInfo.mac.isEmpty())
             mac = extInfo.mac;
 
-        if (!forceOnvif)
-        {
-            if ((camersNamesData.isManufacturerSupported(manufacturer) && camersNamesData.isSupported(QString(model).replace(manufacturer, QString()))) ||
-                ignoreCamera(manufacturer, model))
-            {
-                qDebug() << "OnvifResourceInformationFetcher::findResources: (later step) skipping camera " << model;
-                return;
-            }
-        }
+        if (needIgnoreCamera(QUrl(endpoint).host(), manufacturer, model))
+            return;
     }
 
     if (model.isEmpty()) {

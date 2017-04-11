@@ -3,6 +3,8 @@
 #include "globals.h"
 #include "skin.h"
 
+#include <cmath>
+
 #include <QtCore/QtMath>
 #include <QtGui/QPainter>
 #include <QtWidgets/QApplication>
@@ -25,8 +27,9 @@
 #include <QtWidgets/QFormLayout>
 #include <QtWidgets/QProxyStyle>
 #include <QtWidgets/QInputDialog>
-#include <private/qfont_p.h>
-#include <private/qabstractitemview_p.h>
+
+#include <QtGui/private/qfont_p.h>
+#include <QtWidgets/private/qabstractitemview_p.h>
 
 #include <ui/common/indents.h>
 #include <ui/common/popup_shadow.h>
@@ -34,6 +37,7 @@
 #include <ui/delegates/styled_combo_box_delegate.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/widgets/common/input_field.h>
+#include <ui/widgets/calendar_widget.h>
 
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
@@ -42,6 +46,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <utils/math/color_transformations.h>
+#include <nx/utils/math/fuzzy.h>
 
 
 using namespace style;
@@ -3272,7 +3277,13 @@ QSize QnNxStyle::sizeFromContents(
                     width += iconSize + kQtHeaderIconMargin;
                 }
 
-                return QSize(width, qMax(textSize.height(), Metrics::kHeaderSize));
+                static constexpr int kUnusedHeight = 0;
+
+                const int height = header->orientation == Qt::Horizontal
+                    ? qMax(textSize.height(), Metrics::kHeaderSize)
+                    : kUnusedHeight; //< vertical header height is calculated elsewhere
+
+                return QSize(width, height);
             }
             break;
         }
@@ -3472,6 +3483,9 @@ int QnNxStyle::pixelMetric(
             return 1;
 
         case PM_SmallIconSize:
+            if (qobject_cast<const QMenu*>(widget))
+                return 0; //< we don't show icons in menus
+            /* FALL THROUGH */
         case PM_ListViewIconSize:
         case PM_TabBarIconSize:
         case PM_ButtonIconSize:
@@ -3838,7 +3852,8 @@ void QnNxStyle::polish(QWidget *widget)
                     widget->setFont(font);
                 }
 
-                if (!QnObjectCompanionManager::companion(calendar, kCalendarDelegateCompanion))
+                if (!QnObjectCompanionManager::companion(calendar, kCalendarDelegateCompanion)
+                    && !qobject_cast<QnCalendarWidget*>(calendar))
                 {
                     QnObjectCompanionManager::attach(calendar,
                         new CalendarDelegateReplacement(view, calendar),
@@ -4160,4 +4175,80 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
     }
 
     return base_type::eventFilter(object, event);
+}
+
+namespace {
+
+template<class Rect>
+void paintRectFrame(QPainter* painter, const Rect& rect,
+    const QColor& color, int width, int shift)
+{
+    Rect outerRect = rect.adjusted(shift, shift, -shift, -shift);
+    Rect innerRect = outerRect.adjusted(width, width, -width, -width);
+
+    if (width < 0) //< if outer frame
+    {
+        qSwap(outerRect, innerRect);
+        width = -width;
+    }
+
+    const Rect topRect(outerRect.left(), outerRect.top(), outerRect.width(), width);
+    const Rect leftRect(outerRect.left(), innerRect.top(), width, innerRect.height());
+    const Rect rightRect(innerRect.right() + 1, innerRect.top(), width, innerRect.height());
+    const Rect bottomRect(outerRect.left(), innerRect.bottom() + 1, outerRect.width(), width);
+
+    const QBrush brush(color);
+    painter->fillRect(topRect, brush);
+    painter->fillRect(leftRect, brush);
+    painter->fillRect(rightRect, brush);
+    painter->fillRect(bottomRect, brush);
+}
+
+} // namespace
+
+void QnNxStyle::paintCosmeticFrame(QPainter* painter, const QRectF& rect,
+    const QColor& color, int width, int shift)
+{
+    if (width == 0)
+        return;
+
+    const auto& transform = painter->transform();
+    const auto type = transform.type();
+
+    /* 1. The simplest case: only translate & scale. */
+    if (type <= QTransform::TxScale)
+    {
+        const QRect deviceRect = transform.mapRect(rect).toAlignedRect();
+        const QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
+        const QnScopedPainterTransformRollback transformRollback(painter, QTransform());
+        paintRectFrame(painter, deviceRect, color, width, shift);
+        return;
+    }
+
+    /* 2. More complicated case: with possible rotation. */
+    if (type <= QTransform::TxRotate)
+    {
+        const auto sx = std::hypot(transform.m11(), transform.m12());
+        const auto sy = std::hypot(transform.m21(), transform.m22());
+
+        if (qFuzzyEquals(qAbs(sx), qAbs(sy))) //< uniform scale, no shear; possible mirroring
+        {
+            if (qFuzzyIsNull(sx)) //< just in case
+                return;
+
+            /* Strip transformation of scale: */
+            const QnScopedPainterTransformRollback transformRollback(painter, QTransform(
+                transform.m11() / sx, transform.m12() / sx,
+                transform.m21() / sy, transform.m22() / sy,
+                transform.dx(), transform.dy()));
+
+            const QRectF scaledRect = QTransform::fromScale(sx, sy).mapRect(rect);
+            const QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
+            paintRectFrame(painter, scaledRect, color, width, shift);
+            return;
+        }
+    }
+
+    /* 3. The most complicated case: non-conformal mapping. */
+    NX_ASSERT(false, Q_FUNC_INFO, "Non-conformal mapping is not supported.");
 }

@@ -48,6 +48,12 @@ signals:
      */
     void spacePressed(const QModelIndex& index);
 
+    /**
+    * This signal is emitted from selectionCommand whenever selection change is about to occur
+    */
+    void selectionChanging(QItemSelectionModel::SelectionFlags selectionFlags,
+        const QModelIndex& index, const QEvent* event) const;
+
 protected:
     virtual void keyPressEvent(QKeyEvent* event) override;
     virtual void dragMoveEvent(QDragMoveEvent* event) override;
@@ -56,6 +62,8 @@ protected:
     virtual void timerEvent(QTimerEvent* event) override;
     virtual void scrollContentsBy(int dx, int dy) override;
     virtual QSize viewportSizeHint() const override;
+    virtual QItemSelectionModel::SelectionFlags selectionCommand(
+        const QModelIndex& index, const QEvent* event = nullptr) const override;
 
 private:
     QBasicTimer m_openTimer;

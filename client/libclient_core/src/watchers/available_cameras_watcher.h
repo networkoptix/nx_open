@@ -1,11 +1,11 @@
 #pragma once
 
-#include <utils/common/id.h>
+#include <nx/utils/uuid.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/connective.h>
 
 class QnAvailableCamerasWatcherPrivate;
-class QnAvailableCamerasWatcher : public Connective<QObject>
+class QnAvailableCamerasWatcher: public Connective<QObject>
 {
     Q_OBJECT
 
@@ -18,11 +18,10 @@ public:
     QnUserResourcePtr user() const;
     void setUser(const QnUserResourcePtr& user);
 
-    bool isCameraAvailable(const QnUuid& cameraId) const;
     QnVirtualCameraResourceList availableCameras() const;
 
-    bool useLayouts() const;
-    void setUseLayouts(bool useLayouts);
+    bool compatibilityMode() const;
+    void setCompatiblityMode(bool compatibilityMode);
 
 signals:
     void cameraAdded(const QnResourcePtr& resource);

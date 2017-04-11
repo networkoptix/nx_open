@@ -5,98 +5,98 @@
     <name>EmptyTilesPlaceholder</name>
     <message>
         <source>Searching servers in your local network...</source>
-        <translation type="unfinished"></translation>
+        <translation>Nach Servern im lokalen Netzwerk suchen...</translation>
     </message>
     <message>
         <source>No servers found</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Server gefunden</translation>
     </message>
     <message>
         <source>Check your network connection or press &quot;Connect to Server&quot; button to enter known server address</source>
-        <translation type="unfinished"></translation>
+        <translation>Überprüfen Sie Ihre Netzwerkverbindung oder drücken Sie die &quot;Verbinde zum Server&quot;-Schaltfläche, um eine bekannte Serveradresse einzugeben</translation>
     </message>
 </context>
 <context>
     <name>FactorySystemTileArea</name>
     <message>
         <source>Click to setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Klicken zum Einrichten</translation>
     </message>
 </context>
 <context>
     <name>LocalSystemTileExpandedAreaPart</name>
     <message>
         <source>Login</source>
-        <translation type="unfinished">Login</translation>
+        <translation>Login</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished">Passwort</translation>
+        <translation>Passwort</translation>
     </message>
     <message>
         <source>Save password</source>
-        <translation type="unfinished">Passwort speichern</translation>
+        <translation>Passwort speichern</translation>
     </message>
     <message>
         <source>Auto-login</source>
-        <translation type="unfinished"></translation>
+        <translation>Autologin</translation>
     </message>
     <message>
         <source>Connect</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbinden</translation>
     </message>
 </context>
 <context>
     <name>NxSearchEdit</name>
     <message>
         <source>Search</source>
-        <translation type="unfinished">Suche</translation>
+        <translation>Suche</translation>
     </message>
 </context>
 <context>
     <name>SystemTile</name>
     <message>
         <source>SAFE MODE</source>
-        <translation type="unfinished"></translation>
+        <translation>ABGESICHERTER MODUS</translation>
     </message>
     <message>
         <source>INCOMPATIBLE</source>
-        <translation type="unfinished"></translation>
+        <translation>NICHT KOMPATIBEL</translation>
     </message>
     <message>
         <source>OFFLINE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>New System</source>
-        <translation type="unfinished"></translation>
+        <translation>OFFLINE</translation>
     </message>
     <message>
         <source>UNREACHABLE</source>
-        <translation type="unfinished"></translation>
+        <translation>NICHT ERREICHBAR</translation>
+    </message>
+    <message>
+        <source>New Server</source>
+        <translation>Neuer Server</translation>
     </message>
 </context>
 <context>
     <name>WelcomeScreen</name>
     <message>
         <source>Nothing found</source>
-        <translation type="unfinished"></translation>
+        <translation>Nichts gefunden</translation>
     </message>
     <message>
         <source>You have no access to %1. Some features could be unavailable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sie haben keinen Zugang zu %1. Einige Funktionen sind möglicherweise nicht verfügbar.</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation type="unfinished">Lade...</translation>
+        <translation>Wird geladen...</translation>
     </message>
     <message>
         <source>Connect to Another Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Mit einem anderen Server verbinden...</translation>
     </message>
     <message>
         <source>Connect to Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Mit Server verbinden...</translation>
     </message>
 </context>
 </TS>

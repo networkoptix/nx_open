@@ -34,6 +34,11 @@ public:
         NX_FLAG(0, addressResolver, "Extra debug info from cloud::AddressResolver");
         NX_FLAG(0, sslSocketWrappers, "Extra debug info from SslSocket* classes");
         NX_FLAG(0, httpClientTraffic, "Trace HTTP traffic for nx_http::AsyncHttpClient");
+
+        // TODO: Should be moved to a different flag config, because module finders live in common.
+        // This flag resides here just because there are no other flag configs for logging.
+        NX_FLAG(0, moduleFinders, "Extra debug info for Qn*ModuleFinder classes");
+        NX_INT_PARAM(0, multicastModuleFinderTimeout, "Use timeout instead of poll in QnMMF");
     };
 
     struct NX_NETWORK_API Config: nx::utils::FlagConfig

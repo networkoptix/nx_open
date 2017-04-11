@@ -51,12 +51,13 @@ static SocketAddress findFreeTcpAndUdpLocalAddress()
     return SocketAddress::anyPrivateAddress;
 }
 
-MediatorFunctionalTest::MediatorFunctionalTest():
+MediatorFunctionalTest::MediatorFunctionalTest(int flags):
+    m_testFlags(flags),
     m_stunPort(0),
     m_httpPort(0)
 {
-    //starting clean test
-    nx::network::SocketGlobalsHolder::instance()->reinitialize();
+    if (m_testFlags & initiailizeSocketGlobals)
+        nx::network::SocketGlobalsHolder::instance()->reinitialize();
 
     m_tmpDir = QDir::homePath() + "/hpm_ut.data";
     QDir(m_tmpDir).removeRecursively();
@@ -72,7 +73,8 @@ MediatorFunctionalTest::MediatorFunctionalTest():
     addArg("-log/logLevel", "DEBUG2");
     addArg("-general/dataDir", m_tmpDir.toLatin1().constData());
 
-    registerCloudDataProvider(&m_cloudDataProvider);
+    if (m_testFlags & MediatorTestFlags::useTestCloudDataProvider)
+        registerCloudDataProvider(&m_cloudDataProvider);
 }
 
 MediatorFunctionalTest::~MediatorFunctionalTest()
@@ -80,6 +82,12 @@ MediatorFunctionalTest::~MediatorFunctionalTest()
     stop();
 
     QDir(m_tmpDir).removeRecursively();
+
+    if (m_factoryFuncToRestore)
+    {
+        AbstractCloudDataProviderFactory::setFactoryFunc(std::move(*m_factoryFuncToRestore));
+        m_factoryFuncToRestore.reset();
+    }
 }
 
 bool MediatorFunctionalTest::waitUntilStarted()
@@ -128,15 +136,16 @@ std::unique_ptr<nx::hpm::api::MediatorServerTcpConnection>
 void MediatorFunctionalTest::registerCloudDataProvider(
     AbstractCloudDataProvider* cloudDataProvider)
 {
-    AbstractCloudDataProviderFactory::setFactoryFunc(
-        [cloudDataProvider](
-            const boost::optional<QUrl>& /*cdbUrl*/,
-            const std::string& /*user*/,
-            const std::string& /*password*/,
-            std::chrono::milliseconds /*updateInterval*/)
-        {
-            return std::make_unique<CloudDataProviderStub>(cloudDataProvider);
-        });
+    m_factoryFuncToRestore = 
+        AbstractCloudDataProviderFactory::setFactoryFunc(
+            [cloudDataProvider](
+                const boost::optional<QUrl>& /*cdbUrl*/,
+                const std::string& /*user*/,
+                const std::string& /*password*/,
+                std::chrono::milliseconds /*updateInterval*/)
+            {
+                return std::make_unique<CloudDataProviderStub>(cloudDataProvider);
+            });
 }
 
 AbstractCloudDataProvider::System MediatorFunctionalTest::addRandomSystem()

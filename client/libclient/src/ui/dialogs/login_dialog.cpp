@@ -304,18 +304,24 @@ void QnLoginDialog::accept()
             if (m_requestHandle != handle)
                 return; //connect was cancelled
 
-            m_requestHandle = -1;
-            updateUsability();
 
-            auto status = QnConnectionDiagnosticsHelper::validateConnection(
+            const auto status = QnConnectionDiagnosticsHelper::validateConnection(
                 connectionInfo, errorCode, this);
 
             if (!guard)
                 return;
+
+            m_requestHandle = -1;
+            updateUsability();
+
             switch (status)
             {
                 case Qn::SuccessConnectionResult:
                 {
+                    // In most cases we will connect succesfully by this url. Sow we can store it.
+                    qnSettings->setLastLocalConnectionUrl(url);
+                    qnSettings->save();
+
                     const bool autoLogin = ui->autoLoginCheckBox->isChecked();
                     QnActionParameters params;
                     const bool storePassword =
@@ -325,6 +331,7 @@ void QnLoginDialog::accept()
                     params.setArgument(Qn::StorePasswordRole, storePassword);
                     params.setArgument(Qn::ForceRole, true);
                     menu()->trigger(QnActions::ConnectAction, params);
+
                     break;
                 }
                 case Qn::IncompatibleProtocolConnectionResult:
@@ -387,16 +394,27 @@ void QnLoginDialog::hideEvent(QHideEvent *event)
     m_renderingWidget->stopPlayback();
 }
 
+QString QnLoginDialog::defaultLastUsedConnectionName()
+{
+    return tr("* Last used connection *");
+}
+
+QString QnLoginDialog::deprecatedLastUsedConnectionName()
+{
+    return lit("* Last used connection *");
+}
+
 void QnLoginDialog::resetConnectionsModel()
 {
     if (m_lastUsedItem != NULL)
         m_connectionsModel->removeRow(0); //last-used-connection row
 
     QModelIndex selectedIndex;
-    const auto lastConnection = qnSettings->lastUsedConnection();
-    m_lastUsedItem = (lastConnection.url.host().isEmpty()
+
+    const auto url = qnSettings->lastLocalConnectionUrl();
+    m_lastUsedItem = (url.host().isEmpty()
         ? nullptr
-        : ::newConnectionItem(tr("* Last used connection *"), lastConnection.url));
+        : ::newConnectionItem(defaultLastUsedConnectionName(), url));
 
     if (m_lastUsedItem != NULL)
     {
@@ -417,7 +435,6 @@ void QnLoginDialog::resetConnectionsModel()
 void QnLoginDialog::resetSavedSessionsModel()
 {
     auto customConnections = qnSettings->customConnections();
-
     if (!m_lastUsedItem || customConnections.isEmpty())
     {
         QUrl url;
@@ -439,6 +456,16 @@ void QnLoginDialog::resetSavedSessionsModel()
     for (const auto& connection : customConnections)
     {
         NX_ASSERT(!connection.name.isEmpty());
+        if (connection.name == deprecatedLastUsedConnectionName())
+        {
+            /**
+              * Client with version which is less than 3.0 stores last used connection in custom
+              * connections. To prevent placing two "* Last Used Connection *" items in the
+              * connections combobox we have to filter out this item from saved connections.
+              * See VMS-5889.
+              */
+            continue;
+        }
         m_savedSessionsItem->appendRow(newConnectionItem(connection));
     }
 }
@@ -448,7 +475,7 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
     m_autoFoundItem->removeRows(0, m_autoFoundItem->rowCount());
     if (m_foundSystems.size() == 0)
     {
-        QStandardItem* noLocalEcs = new QStandardItem(tr("<none>"));
+        QStandardItem* noLocalEcs = new QStandardItem(L'<' + tr("none") + L'>');
         noLocalEcs->setFlags(Qt::ItemIsEnabled);
         m_autoFoundItem->appendRow(noLocalEcs);
         return;
@@ -484,8 +511,15 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
 
         if (!vm.isValid)
         {
+            const bool showBuild = compatibilityCode == Qn::IncompatibleProtocolConnectionResult
+                || compatibilityCode == Qn::IncompatibleCloudHostConnectionResult;
+
+            auto versionFormat = showBuild
+                ? QnSoftwareVersion::FullFormat
+                : QnSoftwareVersion::BugfixFormat;
+
             vm.title += lit(" (v%1)")
-                .arg(data.info.version.toString(QnSoftwareVersion::BugfixFormat));
+                .arg(data.info.version.toString(versionFormat));
         }
 
         viewModels.push_back(vm);
@@ -616,26 +650,17 @@ void QnLoginDialog::at_saveButton_clicked()
     auto connections = qnSettings->customConnections();
     if (connections.contains(name))
     {
-        const auto button = QnMessageBox::question(
-            this,
+        QnMessageBox dialog(QnMessageBoxIcon::Question,
             tr("Overwrite existing connection?"),
-            tr("There is an another connection with the same name."),
-            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-            QDialogButtonBox::Yes);
+            tr("There is another connection with the same name."),
+            QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, this);
 
-        switch (button)
-        {
-            case QDialogButtonBox::Cancel:
-                return;
-            case QDialogButtonBox::No:
-                name = connections.generateUniqueName(name);
-                break;
-            case QDialogButtonBox::Yes:
-                connections.removeOne(name);
-                break;
-            default:
-                break;
-        }
+        dialog.addCustomButton(QnMessageBoxCustomButton::Overwrite,
+            QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+        if (dialog.exec() == QDialogButtonBox::Cancel)
+            return;
+
+        connections.removeOne(name);
     }
 
     const QUrl url = currentUrl();
@@ -682,16 +707,14 @@ void QnLoginDialog::at_deleteButton_clicked()
     if (!connections.contains(connection.name))
         return;
 
-    const auto result = QnMessageBox::question(
-        this,
-        tr("Delete connection?"),
-//         tr("Are you sure you want to delete this connection: %1?")
-//         + L'\n' + connection.name,
-        connection.name,
-        QDialogButtonBox::Yes | QDialogButtonBox::No,
-        QDialogButtonBox::Yes);
+    QnMessageBox dialog(QnMessageBoxIcon::Question,
+        tr("Delete connection?"), connection.name,
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
+        this);
 
-    if (result != QDialogButtonBox::Yes)
+    dialog.addCustomButton(QnMessageBoxCustomButton::Delete,
+        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+    if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
     connections.removeOne(connection.name);

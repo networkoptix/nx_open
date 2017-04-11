@@ -94,10 +94,10 @@
         "_": "Globals settings. These ones will go away in one of the future versions.",
 
         "frameColor":               "QColor(128, 128, 128, 196)",
-        "businessRuleDisabledHighlightColor": "QColor(64, 64, 64)",
-        "businessRuleInvalidBackgroundColor": "QColor(150, 0, 0)",
-        "businessRuleInvalidColumnBackgroundColor": "QColor(204, 0, 0)",
-        "businessRuleInvalidHighlightColor": "brand_core",
+        "businessRuleInvalidBackgroundColor": "red_core.setAlpha(77)",
+        "businessRuleInvalidColumnBackgroundColor": "red_core.setAlpha(77)",
+        "businessRuleDisabledHighlightColor": "brand_core.setAlpha(77)",
+        "businessRuleInvalidHighlightColor": "brand_core.setAlpha(77)",
         "errorTextColor": "red_l2",
         "warningTextColor": "yellow_core",
         "successTextColor": "green_l2",
@@ -212,21 +212,21 @@
         "palette": {
             "default": {
                 "base":             "transparent",
-                "midlight":         "dark10.setAlpha(102)",
+                "midlight":         "dark12.setAlpha(102)",
                 "highlight":        "brand_core.setAlpha(77)",
                 "text":             "light10",
                 "highlightedText":  "light4"
             },
             "disabled": {
                 "base":             "transparent",
-                "midlight":         "dark10.setAlpha(102)",
+                "midlight":         "dark12.setAlpha(102)",
                 "highlight":        "brand_core.setAlpha(77)",
                 "text":             "light10.setAlpha(77)",
                 "highlightedText":  "light4.setAlpha(77)"
             },
             "inactive": {
                 "base":             "transparent",
-                "midlight":         "dark10.setAlpha(102)",
+                "midlight":         "dark12.setAlpha(102)",
                 "highlight":        "brand_core.setAlpha(77)",
                 "text":             "light10",
                 "highlightedText":  "light4"
@@ -434,6 +434,7 @@
             "default": {
                 "dark": "dark4",
                 "midlight": "dark12",
+                "light": "dark16",
                 "text": "light4"
             }
         }
@@ -627,7 +628,10 @@
 
     "QnCalendarWidget": {
         "palette": { "default": {
-            "highlight": "dark4"
+            "highlight": "dark4",
+            "base":  "dark7",
+            "alternateBase": "dark7",
+            "window": "dark7"
         }}
     },
 
@@ -730,15 +734,6 @@
         "color": "dark1.setAlpha(38)"
     },
 
-    "QnBackupCamerasDialog": {
-        "colors": {
-            "disabled": "#808080",
-            "low":  "#9eb236",
-            "high": "#ff5500",
-            "both": "#cc853d"
-        }
-    },
-
     "QnFailoverPriorityDialog": {
         "colors": {
             "never": "#808080",
@@ -768,10 +763,12 @@
     },
 
     "QnNotificationWidget" : {
+        "_": "'dark' is used to paint horizontal line, 'alternateBase' - to paint More Notifications",
         "palette": {
             "default": {
                 "dark": "dark6",
-                "windowText": "light10"
+                "windowText": "light10",
+                "alternateBase": "dark17"
             }
         }
     },

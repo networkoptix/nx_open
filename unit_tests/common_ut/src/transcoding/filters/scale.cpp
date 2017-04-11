@@ -1,4 +1,6 @@
 #include <gtest/gtest.h>
+
+#include <nx/utils/app_info.h>
 #include <transcoding/filters/scale_image_filter.h>
 #include <utils/media/frame_info.h>
 
@@ -98,6 +100,9 @@ private:
         m_startSize = startSize;
         m_endSize = endSize;
         m_step = step;
+
+        if (nx::utils::AppInfo::isArm()) //< Reduce load to make test run faster.
+            m_step *= 2;
     }
 
     void setShouldFail(bool shouldFail)
@@ -149,7 +154,6 @@ private:
     FilterTest m_filterTest;
     bool m_shouldFail;
 };
-
 
 TEST_F(ScaleFilterTest, ImageSizes)
 {

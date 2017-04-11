@@ -6,8 +6,10 @@ Item
 {
     id: root
 
+    property alias defaultWindowSize: timeline.defaultWindowSize
     property alias windowStart: timeline.windowStart
     property alias windowEnd: timeline.windowEnd
+    property alias windowSize: timeline.windowSize
     property alias position: timeline.position
     property alias positionDate: timeline.positionDate
     property alias chunkBarHeight: timeline.chunkBarHeight
@@ -16,6 +18,7 @@ Item
     property alias chunkProvider: timeline.chunkProvider
     property alias startBound: timeline.startBound
     property alias autoPlay: timeline.autoPlay
+    property alias autoReturnToBounds: timeline.autoReturnToBounds
     readonly property bool dragging: timeline.dragging
     readonly property bool moving: timeline.moving
     readonly property var timelineView: timeline
@@ -40,6 +43,11 @@ Item
     function clearCorrection()
     {
         timelineView.clearCorrection()
+    }
+
+    function jumpTo(position)
+    {
+        timeline.setPositionImmediately(position)
     }
 
     QnTimelineView

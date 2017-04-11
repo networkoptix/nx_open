@@ -9,8 +9,6 @@ GPIO.setup(GPIO.PI+3,GPIO.OUT)
 old = 1
 new = 0
 
-GPIO.output(GPIO.PH+15,False)
-
 def switch (led_pin):
     current_value=GPIO.input(led_pin)
     if current_value == 0:

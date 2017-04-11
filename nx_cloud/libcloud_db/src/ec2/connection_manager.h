@@ -11,6 +11,7 @@
 
 #include <cdb/maintenance_manager.h>
 #include <cdb/result_code.h>
+#include <cdb/system_data.h>
 #include <nx/network/http/abstract_msg_body_source.h>
 #include <nx/network/http/server/abstract_http_request_handler.h>
 #include <nx/utils/move_only_func.h>
@@ -54,6 +55,9 @@ class TransactionTransportHeader;
 class ConnectionManager
 {
 public:
+    using SystemStatusChangedSubscription = 
+        nx::utils::Subscription<std::string /*systemId*/, api::SystemHealth>;
+
     ConnectionManager(
         const QnUuid& moduleGuid,
         const Settings& settings,
@@ -89,11 +93,16 @@ public:
         std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer);
 
     api::VmsConnectionDataList getVmsConnections() const;
+    std::size_t getVmsConnectionCount() const;
     bool isSystemConnected(const std::string& systemId) const;
+
+    unsigned int getConnectionCountBySystemId(const nx::String& systemId) const;
 
     void closeConnectionsToSystem(
         const nx::String& systemId,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
+
+    SystemStatusChangedSubscription& systemStatusChangedSubscription();
 
 private:
     class FullPeerName
@@ -115,6 +124,14 @@ private:
         std::unique_ptr<TransactionTransport> connection;
         nx::String connectionId;
         FullPeerName fullPeerName;
+    };
+
+    struct ConnectionRequestAttributes
+    {
+        nx::String connectionId;
+        ::ec2::ApiPeerData remotePeer;
+        nx::String contentEncoding;
+        int remotePeerProtocolVersion = 0;
     };
 
     typedef boost::multi_index::multi_index_container<
@@ -146,6 +163,7 @@ private:
     mutable QnMutex m_mutex;
     QnCounter m_startedAsyncCallsCounter;
     nx::utils::SubscriptionId m_onNewTransactionSubscriptionId;
+    SystemStatusChangedSubscription m_systemStatusChangedSubscription;
 
     bool addNewConnection(ConnectionContext connectionContext);
     
@@ -159,16 +177,18 @@ private:
     
     template<int connectionIndexNumber, typename ConnectionKeyType>
         void removeExistingConnection(
-            QnMutexLockerBase* const /*lock*/,
+            const QnMutexLockerBase& /*lock*/,
             ConnectionKeyType connectionKey);
     
     template<typename ConnectionIndex, typename Iterator, typename CompletionHandler>
     void removeConnectionByIter(
-        QnMutexLockerBase* const /*lock*/,
+        const QnMutexLockerBase& /*lock*/,
         ConnectionIndex& connectionIndex,
         Iterator connectionIterator,
         CompletionHandler completionHandler);
     
+    void sendSystemOfflineNotificationIfNeeded(const nx::String systemId);
+
     void removeConnection(const nx::String& connectionId);
     
     void onGotTransaction(
@@ -181,9 +201,7 @@ private:
     
     bool fetchDataFromConnectRequest(
         const nx_http::Request& request,
-        nx::String* const connectionId,
-        ::ec2::ApiPeerData* const remotePeer,
-        nx::String* const contentEncoding);
+        ConnectionRequestAttributes* connectionRequestAttributes);
 
     template<typename TransactionDataType>
     void processSpecialTransaction(
@@ -193,8 +211,7 @@ private:
         TransactionProcessedHandler handler);
 
     nx_http::RequestResult prepareOkResponseToCreateTransactionConnection(
-        const nx::String& connectionId,
-        const nx::String& contentEncoding,
+        const ConnectionRequestAttributes& connectionRequestAttributes,
         nx_http::Response* const response);
 };
 

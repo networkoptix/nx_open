@@ -68,6 +68,7 @@ public:
 signals:
     void cellActivated(const QPoint& cell);
     void cellValueChanged(const QPoint& cell);
+    void cellValuesChanged();
 
     void colorsChanged();
 
@@ -134,6 +135,7 @@ private:
 
     bool m_readOnly = false;
     bool m_active = true;
+    bool m_trackedChanges = false;
 
     mutable int m_cellSize = -1;
 };

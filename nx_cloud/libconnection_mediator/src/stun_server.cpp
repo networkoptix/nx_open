@@ -24,7 +24,7 @@ bool StunServer::bind()
     m_tcpStunServer->forEachListener(
         [this](stun::SocketServer* server)
         {
-            server->setConnectionInactivityTimeout(m_settings.stun().inactivityTimeout);
+            server->setConnectionInactivityTimeout(m_settings.stun().connectionInactivityTimeout);
         });
 
     if (!m_tcpStunServer->bind(m_settings.stun().addrToListenList))

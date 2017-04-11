@@ -2,6 +2,7 @@
 
 #include <nx/network/abstract_socket.h>
 #include <nx/network/cloud/cloud_connect_version.h>
+#include <nx/network/cloud/cloud_connect_options.h>
 #include <nx/network/stun/message.h>
 
 #include "stun_message_data.h"
@@ -35,7 +36,7 @@ public:
     constexpr static const auto kMethod = stun::extension::methods::listen;
 
     boost::optional<KeepAliveOptions> tcpConnectionKeepAlive;
-    CloudConnectVersion cloudConnectVersion;
+    CloudConnectOptions cloudConnectOptions;
 
     ListenResponse();
     void serializeAttributes(nx::stun::Message* const message);

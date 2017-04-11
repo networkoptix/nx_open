@@ -28,6 +28,8 @@ QnAlertBar::QnAlertBar(QWidget* parent):
     auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_label);
+
+    setHidden(!m_reservedSpace);
 }
 
 QString QnAlertBar::text() const

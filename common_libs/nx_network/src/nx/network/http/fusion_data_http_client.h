@@ -1,10 +1,4 @@
-/**********************************************************
-* Sep 3, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_FUSION_DATA_HTTP_CLIENT_H
-#define NX_FUSION_DATA_HTTP_CLIENT_H
+#pragma once 
 
 #include <functional>
 
@@ -16,7 +10,6 @@
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical_functions.h>
-
 
 namespace nx_http {
 namespace detail {
@@ -91,9 +84,22 @@ public:
     {
         m_handler = std::move(handler);
         if (m_requestContentType.isEmpty())
+        {
             m_httpClient->doGet(m_url);
+        }
         else
-            m_httpClient->doPost(m_url, m_requestContentType, std::move(m_requestBody));
+        {
+            decltype(m_requestBody) requestBody;
+            requestBody.swap(m_requestBody);
+            m_httpClient->doPost(m_url, m_requestContentType, std::move(requestBody));
+        }
+    }
+
+    void setRequestTimeout(std::chrono::milliseconds timeout)
+    {
+        m_httpClient->setSendTimeoutMs(timeout.count());
+        m_httpClient->setResponseReadTimeoutMs(timeout.count());
+        m_httpClient->setMessageBodyReadTimeoutMs(timeout.count());
     }
 
 protected:
@@ -108,7 +114,7 @@ private:
     nx_http::AsyncHttpClientPtr m_httpClient;
 };
 
-}   //detail
+} // namespace detail
 
 //!HTTP client that uses \a fusion to serialize/deserialize input/output data
 /*!
@@ -145,8 +151,10 @@ public:
 private:
     virtual void requestDone(nx_http::AsyncHttpClientPtr client) override
     {
+        decltype(this->m_handler) handler;
+        handler.swap(this->m_handler);
         detail::processHttpResponse(
-            std::move(this->m_handler),
+            std::move(handler),
             client->failed() ? client->lastSysErrorCode() : SystemError::noError,
             client->response(),
             client->fetchMessageBodyBuffer());
@@ -173,8 +181,10 @@ public:
 private:
     virtual void requestDone(nx_http::AsyncHttpClientPtr client) override
     {
+        decltype(this->m_handler) handler;
+        handler.swap(this->m_handler);
         detail::processHttpResponse(
-            std::move(this->m_handler),
+            std::move(handler),
             client->failed() ? client->lastSysErrorCode() : SystemError::noError,
             client->response(),
             client->fetchMessageBodyBuffer());
@@ -208,7 +218,8 @@ public:
 private:
     virtual void requestDone(nx_http::AsyncHttpClientPtr client) override
     {
-        auto handler = std::move(this->m_handler);
+        decltype(this->m_handler) handler;
+        handler.swap(this->m_handler);
         handler(
             client->lastSysErrorCode(),
             client->response());
@@ -235,13 +246,12 @@ public:
 private:
     virtual void requestDone(nx_http::AsyncHttpClientPtr client) override
     {
-        auto handler = std::move(this->m_handler);
+        decltype(this->m_handler) handler;
+        handler.swap(this->m_handler);
         handler(
             client->lastSysErrorCode(),
             client->response());
     }
 };
 
-}   //nx_http
-
-#endif  //NX_FUSION_DATA_HTTP_CLIENT_H
+} // namespace nx_http

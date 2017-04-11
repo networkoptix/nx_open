@@ -18,6 +18,8 @@
 
 #include <client/client_settings.h>
 
+#include <nx/client/messages/ptz_messages.h>
+
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
@@ -29,6 +31,7 @@
 
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
 
 namespace
 {
@@ -137,6 +140,14 @@ QnWorkbenchPtzHandler::QnWorkbenchPtzHandler(QObject *parent):
     connect(action(QnActions::PtzManageAction), &QAction::triggered, this, &QnWorkbenchPtzHandler::at_ptzManageAction_triggered);
     connect(action(QnActions::DebugCalibratePtzAction), &QAction::triggered, this, &QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered);
     connect(action(QnActions::DebugGetPtzPositionAction), &QAction::triggered, this, &QnWorkbenchPtzHandler::at_debugGetPtzPositionAction_triggered);
+
+    connect(
+        action(QnActions::PtzContinuousMoveAction), &QAction::triggered, 
+        this, &QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered);
+
+    connect(
+        action(QnActions::PtzActivatePresetByIndexAction), &QAction::triggered, 
+        this, &QnWorkbenchPtzHandler::at_ptzActivatePresetByIndexAction_triggered);
 }
 
 QnWorkbenchPtzHandler::~QnWorkbenchPtzHandler()
@@ -154,14 +165,8 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered()
     //TODO: #GDM #PTZ fix the text
     if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
     {
-        QnMessageBox::critical(
-            mainWindow(),
-            tr("Unable to get position from camera."),
-            tr("An error has occurred while trying to get the current position from camera %1.")
-            .arg(QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()))
-            + L'\n'
-            + tr("Please wait for the camera to go online.")
-        );
+        nx::client::messages::Ptz::failedToGetPosition(mainWindow(),
+        QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()));
         return;
     }
 
@@ -366,14 +371,89 @@ void QnWorkbenchPtzHandler::showSetPositionWarning(const QnResourcePtr& resource
 {
     if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
     {
-        QnMessageBox::critical(
-            mainWindow(),
-            tr("Unable to set position on camera."),
-            tr("An error has occurred while trying to set the current position for camera %1.")
-            .arg(QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()))
-            + L'\n'
-            + tr("Please wait for the camera to go online.")
-        );
+        nx::client::messages::Ptz::failedToSetPosition(mainWindow(),
+            QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()));
     }
     //TODO: #GDM #PTZ check other cases
 }
+
+void QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered()
+{
+    auto widget = dynamic_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
+
+    if (!widget)
+        return;
+
+    auto speed = menu()->currentParameters(sender())
+        .argument<QVector3D>(Qn::ItemDataRole::PtzSpeedRole);
+
+    auto item = widget->item();
+
+    if (!item)
+        return;
+
+    auto rotation = item->rotation() + (item->data<bool>(Qn::ItemFlipRole, false) ? 0.0 : 180.0);
+    auto controller = widget->ptzController();
+
+    if (!controller)
+        return;
+
+    speed = applyRotation(speed, rotation);
+    widget->ptzController()->continuousMove(speed);
+}
+
+void QnWorkbenchPtzHandler::at_ptzActivatePresetByIndexAction_triggered()
+{
+    auto widget = dynamic_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
+
+    if (!widget)
+        return;
+    auto controller = widget->ptzController();
+    auto presetIndex = menu()->currentParameters(sender())
+        .argument<uint>(Qn::ItemDataRole::PtzPresetIndexRole);
+
+    QnPtzPresetList presetList;
+    controller->getPresets(&presetList);
+    std::sort(
+        presetList.begin(),
+        presetList.end(), 
+        [](QnPtzPreset f, QnPtzPreset s){ return f.name < s.name; });
+
+    if (presetIndex < presetList.size() && presetIndex >= 0)
+    {
+        menu()->trigger(
+            QnActions::PtzActivateObjectAction, 
+            QnActionParameters(widget)
+                .withArgument(
+                    Qn::PtzObjectIdRole,
+                    presetList[presetIndex].id));
+    }
+}
+
+QVector3D QnWorkbenchPtzHandler::applyRotation(const QVector3D& speed, qreal rotation) const
+{
+    QVector3D transformedSpeed = speed;
+
+    rotation = static_cast<qint64>(rotation >= 0 ? rotation + 0.5 : rotation - 0.5) % 360;
+    if (rotation < 0)
+        rotation += 360;
+
+    if (rotation >= 45 && rotation < 135)
+    {
+        transformedSpeed.setX(-speed.y());
+        transformedSpeed.setY(speed.x());
+    }
+    else if (rotation >= 135 && rotation < 225)
+    {
+        transformedSpeed.setX(-speed.x());
+        transformedSpeed.setY(-speed.y());
+    }
+    else if (rotation >= 225 && rotation < 315)
+    {
+        transformedSpeed.setX(speed.y());
+        transformedSpeed.setY(-speed.x());
+    }
+
+    return transformedSpeed;
+}
+

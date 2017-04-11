@@ -46,6 +46,8 @@ public:
 
     void updateNativeSize();
 
+    Q_INVOKABLE void clear();
+
 signals:
     void playerChanged();
     void fillModeChanged(QnVideoOutput::FillMode);

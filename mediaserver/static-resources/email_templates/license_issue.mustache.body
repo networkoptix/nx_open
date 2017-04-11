@@ -12,7 +12,7 @@
         {{#reasonContext}}
             {{#disabledCameras}}
                 <tr>
-                    <td><b>{{.}}</b></td>
+                    <td>{{.}}</td>
                     <td>{{{timestamp}}}</td>
                 </tr>
             {{/disabledCameras}}

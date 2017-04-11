@@ -11,6 +11,18 @@ class QnUserWatcher;
 class QnCloudUrlHelper;
 class NxGlobalsObject;
 
+namespace nx {
+namespace client {
+namespace mobile {
+
+class QmlSettingsAdaptor;
+
+} // namespace mobile
+} // namespace client
+} // namespace nx
+
+using nx::client::mobile::QmlSettingsAdaptor;
+
 class QnContext: public QObject
 {
     Q_OBJECT
@@ -18,6 +30,7 @@ class QnContext: public QObject
 
     Q_PROPERTY(NxGlobalsObject* Nx MEMBER m_nxGlobals CONSTANT)
     Q_PROPERTY(QnConnectionManager* connectionManager MEMBER m_connectionManager CONSTANT)
+    Q_PROPERTY(nx::client::mobile::QmlSettingsAdaptor* settings MEMBER m_settings CONSTANT)
     Q_PROPERTY(QnMobileAppInfo* applicationInfo MEMBER m_appInfo CONSTANT)
     Q_PROPERTY(QnCloudStatusWatcher* cloudStatusWatcher READ cloudStatusWatcher CONSTANT)
     Q_PROPERTY(QnMobileClientUiController* uiController READ uiController CONSTANT)
@@ -26,6 +39,8 @@ class QnContext: public QObject
     Q_PROPERTY(bool liteMode READ liteMode CONSTANT)
     Q_PROPERTY(bool autoLoginEnabled READ autoLoginEnabled WRITE setAutoLoginEnabled
         NOTIFY autoLoginEnabledChanged)
+    Q_PROPERTY(bool showCameraInfo READ showCameraInfo WRITE setShowCameraInfo
+        NOTIFY showCameraInfoChanged)
     Q_PROPERTY(bool testMode READ testMode CONSTANT)
     Q_PROPERTY(QString initialTest READ initialTest CONSTANT)
 
@@ -36,6 +51,7 @@ public:
     QnMobileClientUiController* uiController() const { return m_uiController; }
     QnCloudStatusWatcher* cloudStatusWatcher() const;
     QnUserWatcher* userWatcher() const;
+    QmlSettingsAdaptor* settings() const;
 
     Q_INVOKABLE void quitApplication();
 
@@ -55,13 +71,19 @@ public:
 
     Q_INVOKABLE bool liteMode() const;
 
+    // TODO: #dklychkov Move settings properties to a dedicated object.
+
     Q_INVOKABLE bool autoLoginEnabled() const;
     Q_INVOKABLE void setAutoLoginEnabled(bool enabled);
+
+    Q_INVOKABLE bool showCameraInfo() const;
+    Q_INVOKABLE void setShowCameraInfo(bool showCameraInfo);
 
     Q_INVOKABLE bool testMode() const;
     Q_INVOKABLE QString initialTest() const;
 
-    Q_INVOKABLE void removeSavedConnection(const QString& localSystemId);
+    Q_INVOKABLE void removeSavedConnection(
+        const QString& localSystemId, const QString& userName = QString());
 
     Q_INVOKABLE void clearLastUsedConnection();
     Q_INVOKABLE QString getLastUsedSystemName() const;
@@ -77,10 +99,12 @@ public:
 
 signals:
     bool autoLoginEnabledChanged();
+    bool showCameraInfoChanged();
 
 private:
     NxGlobalsObject* m_nxGlobals;
     QnConnectionManager *m_connectionManager;
+    QmlSettingsAdaptor* m_settings;
     QnMobileAppInfo *m_appInfo;
     QnMobileClientUiController* m_uiController;
     QnCloudUrlHelper* m_cloudUrlHelper;

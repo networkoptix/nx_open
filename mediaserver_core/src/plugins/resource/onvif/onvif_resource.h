@@ -221,8 +221,8 @@ public:
 
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
 
-    void calcTimeDrift() const; // calculate clock diff between camera and local clock at seconds
-    static int calcTimeDrift(const QString& deviceUrl);
+    void calcTimeDrift(int* outSoapRes = nullptr) const; // calculate clock diff between camera and local clock at seconds
+    static int calcTimeDrift(const QString& deviceUrl, int* outSoapRes = nullptr);
 
     virtual bool getParamPhysical(const QString &id, QString &value) override;
     virtual bool getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result);
@@ -521,6 +521,10 @@ private:
     void removePullPointSubscription();
     void pullMessages( quint64 timerID );
     void onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode);
+    /**
+     * Used for cameras that do not support renew request.
+     */
+    void renewPullPointSubscriptionFallback(quint64 timerId);
     void onPullMessagesResponseReceived(
         PullPointSubscriptionWrapper* soapWrapper,
         int resultCode,

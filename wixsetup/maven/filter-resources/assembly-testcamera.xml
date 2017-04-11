@@ -12,13 +12,23 @@
                 <include>avcodec*.dll</include>
                 <include>avformat*.dll</include>
                 <include>avutil*.dll</include>
-                <include>icu*.dll</include>
                 <include>testcamera.exe</include>
                 <include>libmp3lame*.dll</include>
                 <include>libogg*.dll</include>
                 <include>libvorbis*.dll</include>
                 <include>nx_network.dll</include>
                 <include>nx_utils.dll</include>
+
+                <include>swresample*.dll</include>
+                <include>swscale*.dll</include>
+                <include>udt.dll</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${qt.dir}/bin</directory>
+            <outputDirectory>..</outputDirectory>
+            <includes>
+                <include>icu*.dll</include>
                 <include>Qt5Concurrent.dll</include>
                 <include>Qt5Core.dll</include>
                 <include>Qt5Gui.dll</include>
@@ -26,11 +36,8 @@
                 <include>Qt5Network.dll</include>
                 <include>Qt5Sql.dll</include>
                 <include>Qt5Xml.dll</include>
-                <include>swresample*.dll</include>
-                <include>swscale*.dll</include>
-                <include>udt.dll</include>
             </includes>
-        </fileSet>
+        </fileSet>        
         <fileSet>
             <directory>${VC14RedistPath}/bin</directory>
             <outputDirectory>..</outputDirectory>

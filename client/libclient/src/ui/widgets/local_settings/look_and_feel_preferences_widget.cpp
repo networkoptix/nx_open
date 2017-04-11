@@ -19,7 +19,6 @@
 #include <ui/models/translation_list_model.h>
 #include <ui/style/custom_style.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_auto_starter.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <utils/common/app_info.h>
@@ -50,6 +49,8 @@ QnLookAndFeelPreferencesWidget::QnLookAndFeelPreferencesWidget(QWidget *parent) 
     ui->timeModeWarningLabel->setText(
         tr("This option will not affect Recording Schedule. "
            "Recording Schedule is always based on Server Time."));
+
+    ui->imageNameLineEdit->setPlaceholderText(L'<' + tr("No image") + L'>');
 
     setHelpTopic(this,                                                        Qn::SystemSettings_General_Customizing_Help);
     setHelpTopic(ui->languageLabel,           ui->languageComboBox,           Qn::SystemSettings_General_Language_Help);

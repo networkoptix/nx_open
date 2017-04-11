@@ -52,13 +52,13 @@ private:
             Attribute testAttribute = testData.value;
 
             nx::Buffer serializedBuffer;
-            serializedBuffer.reserve(sizeof(serializedPrototype));
+            serializedBuffer.reserve(serializedPrototype.size());
             std::size_t bytesWritten = 0;
             MessageSerializerBuffer stream(&serializedBuffer);
             ASSERT_EQ(
                 nx_api::SerializerState::done,
                 testAttribute.serialize(&stream, &bytesWritten));
-            ASSERT_EQ(serializedPrototype.size(), bytesWritten);
+            ASSERT_EQ((size_t)serializedPrototype.size(), bytesWritten);
             ASSERT_EQ(serializedPrototype, serializedBuffer);
         }
     }

@@ -30,6 +30,19 @@ void MediaServerClient::saveCloudSystemCredentials(
     performApiRequest("api/saveCloudSystemCredentials", inputData, std::move(completionHandler));
 }
 
+QnJsonRestResult MediaServerClient::saveCloudSystemCredentials(
+    const CloudCredentialsData& request)
+{
+    using SaveCloudSystemCredentialsAsyncFuncPointer =
+        void(MediaServerClient::*)(
+            const CloudCredentialsData&, std::function<void(QnJsonRestResult)>);
+
+    return syncCallWrapper(
+        static_cast<SaveCloudSystemCredentialsAsyncFuncPointer>(
+            &MediaServerClient::saveCloudSystemCredentials),
+        request);
+}
+
 void MediaServerClient::getModuleInformation(
     std::function<void(QnJsonRestResult, QnModuleInformation)> completionHandler)
 {
@@ -61,8 +74,26 @@ QnJsonRestResult MediaServerClient::setupLocalSystem(const SetupLocalSystemData&
             const SetupLocalSystemData&, std::function<void(QnJsonRestResult)>);
 
     return syncCallWrapper(
-        static_cast<SetupLocalSystemAsyncFuncPointer>(
-            &MediaServerClient::setupLocalSystem),
+        static_cast<SetupLocalSystemAsyncFuncPointer>(&MediaServerClient::setupLocalSystem),
+        request);
+}
+
+void MediaServerClient::setupCloudSystem(
+    const SetupCloudSystemData& request,
+    std::function<void(QnJsonRestResult)> completionHandler)
+{
+    performApiRequest("api/setupCloudSystem", request, std::move(completionHandler));
+}
+
+QnJsonRestResult MediaServerClient::setupCloudSystem(
+    const SetupCloudSystemData& request)
+{
+    using SetupCloudSystemAsyncFuncPointer =
+        void(MediaServerClient::*)(
+            const SetupCloudSystemData&, std::function<void(QnJsonRestResult)>);
+
+    return syncCallWrapper(
+        static_cast<SetupCloudSystemAsyncFuncPointer>(&MediaServerClient::setupCloudSystem),
         request);
 }
 

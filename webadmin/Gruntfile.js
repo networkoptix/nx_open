@@ -503,6 +503,10 @@ module.exports = function (grunt) {
             merge: {
                 command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r prod_3.0.0;python ../../devtools/util/merge_dev.py -t prod_3.0.0;hg push;'
             },
+
+            pull: {
+                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r prod_3.0.0;'
+            },
             merge_release: {
                 command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r release_3.0;python ../../devtools/util/merge_dev.py -t release_3.0;hg push;'
             },
@@ -513,10 +517,10 @@ module.exports = function (grunt) {
                 command: 'hg parent'
             },
             generate_translation:{
-                command: 'cd translation; python generate_ts.py; python localize.py'
+                command: 'cd translation; ./language_pack.sh'
             },
             localize:{
-                command: 'cd translation; python localize.py'
+                command: 'cd translation; ./localize.sh'
             },
             run_ffmpeg:{
                 command: './ffmpeg.sh'
@@ -803,7 +807,7 @@ module.exports = function (grunt) {
         'usemin',
         'htmlmin',
         'shell:version',
-        'shell:generate_translation',
+        //'shell:generate_translation',
         'shell:localize'
     ]);
 
@@ -830,6 +834,9 @@ module.exports = function (grunt) {
         'shell:merge'
     ]);
 
+    grunt.registerTask('pull', [
+        'shell:pull'
+    ]);
 
     grunt.registerTask('merge_release', [
         'shell:merge_release'

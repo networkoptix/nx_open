@@ -6,11 +6,15 @@
 #include <media_server_process.h>
 #include <nx/network/socket_global.h>
 
-MediaServerLauncher::MediaServerLauncher(const QString& tmpDir):
+MediaServerLauncher::MediaServerLauncher(const QString& tmpDir, DisabledFeatures disabledFeatures):
     m_workDirResource(tmpDir),
-    m_serverEndpoint(HostAddress::localhost, nx::utils::random::number<int>(45000, 50000)),
+    m_serverEndpoint(HostAddress::localhost, 0),
     m_firstStartup(true)
 {
+    if (disabledFeatures.testFlag(DisabledFeature::noResourceDiscovery))
+        addSetting(QnServer::kNoResourceDiscovery, "1");
+    if (disabledFeatures.testFlag(DisabledFeature::noMonitorStatistics))
+        addSetting(QnServer::kNoMonitorStatistics, "1");
 }
 
 MediaServerLauncher::~MediaServerLauncher()
@@ -20,12 +24,17 @@ MediaServerLauncher::~MediaServerLauncher()
 
 SocketAddress MediaServerLauncher::endpoint() const
 {
-    return m_serverEndpoint;
+    return SocketAddress(HostAddress::localhost, m_mediaServerProcess->getTcpPort());
 }
 
-void MediaServerLauncher::addSetting(const QString& name, const QString& value)
+int MediaServerLauncher::port() const
 {
-    m_customSettings.emplace_back(name, value);
+    return m_mediaServerProcess->getTcpPort();
+}
+
+void MediaServerLauncher::addSetting(const QString& name, const QVariant& value)
+{
+    m_customSettings.emplace_back(name, value.toString());
 }
 
 void MediaServerLauncher::prepareToStart()
@@ -70,24 +79,28 @@ bool MediaServerLauncher::start()
 {
     prepareToStart();
 
-    std::promise<bool> processStartedPromise;
+    nx::utils::promise<bool> processStartedPromise;
     auto future = processStartedPromise.get_future();
 
     connect(
         m_mediaServerProcess.get(),
         &MediaServerProcess::started,
         this,
-        [&processStartedPromise]()
-        {
-            processStartedPromise.set_value(true);
-        }, Qt::DirectConnection);
+        [&processStartedPromise]() { processStartedPromise.set_value(true); },
+        Qt::DirectConnection);
     m_mediaServerProcess->start();
 
     //waiting for server to come up
     const auto startTime = std::chrono::steady_clock::now();
     constexpr const auto maxPeriodToWaitForMediaServerStart = std::chrono::seconds(150);
     auto result = future.wait_for(maxPeriodToWaitForMediaServerStart);
-    return result == std::future_status::ready;
+    if (result != std::future_status::ready)
+        return false;
+
+    while (m_mediaServerProcess->getTcpPort() == 0)
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    return true;
 }
 
 bool MediaServerLauncher::startAsync()
@@ -111,5 +124,5 @@ bool MediaServerLauncher::stopAsync()
 
 QUrl MediaServerLauncher::apiUrl() const
 {
-    return QUrl(lit("http://") + m_serverEndpoint.toString());
+    return QUrl(lit("http://") + endpoint().toString());
 }

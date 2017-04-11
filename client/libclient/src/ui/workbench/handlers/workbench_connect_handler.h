@@ -47,9 +47,8 @@ public:
 private:
     enum ConnectionOption
     {
-        IsCloudConnection = 0x1,
-        StorePassword = 0x2,
-        AutoLogin = 0x4
+        StorePassword = 0x1,
+        AutoLogin = 0x2
     };
     Q_DECLARE_FLAGS(ConnectionOptions, ConnectionOption)
 
@@ -69,7 +68,16 @@ private:
 
     void connectToServer(const QUrl& url);
 
-    bool disconnectFromServer(bool force, bool isErrorReason = false);
+    enum DisconnectFlag
+    {
+        NoFlags = 0x0,
+        Force = 0x1,
+        ErrorReason = 0x2,
+        ClearAutoLogin = 0x4
+    };
+    Q_DECLARE_FLAGS(DisconnectFlags, DisconnectFlag)
+
+    bool disconnectFromServer(DisconnectFlags flags);
 
     void handleTestConnectionReply(
         int handle,
@@ -121,7 +129,14 @@ private:
     void showPreloader();
 
 private:
-    int m_connectingHandle;
+    struct
+    {
+        int handle = 0;
+        QUrl url;
+
+        void reset() { handle = 0; url = QUrl(); }
+    } m_connecting;
+
     LogicalState m_logicalState;
     PhysicalState m_physicalState;
 

@@ -168,7 +168,7 @@ void fromApiToResource(const ApiCameraData& src, QnVirtualCameraResourcePtr& dst
     // Validate camera unique id
     const auto dstId = dst->getId();
     const auto dstUid = dst->getUniqueId();
-    const auto uidToId = QnVirtualCameraResource::uniqueIdToId(dstUid);
+    const auto uidToId = QnVirtualCameraResource::physicalIdToId(dstUid);
     if (dstId == uidToId)
         return;
 

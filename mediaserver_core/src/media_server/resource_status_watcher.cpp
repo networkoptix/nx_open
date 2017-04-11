@@ -9,6 +9,12 @@
 QnResourceStatusWatcher::QnResourceStatusWatcher()
 {
     connect(qnResPool, &QnResourcePool::statusChanged, this, &QnResourceStatusWatcher::at_resource_statusChanged);
+    connect(this, &QnResourceStatusWatcher::statusChanged, this, &QnResourceStatusWatcher::updateResourceStatusInternal, Qt::QueuedConnection);
+}
+
+void QnResourceStatusWatcher::updateResourceStatus(const QnResourcePtr& resource)
+{
+    emit statusChanged(resource);
 }
 
 bool QnResourceStatusWatcher::isSetStatusInProgress(const QnResourcePtr &resource)
@@ -18,13 +24,16 @@ bool QnResourceStatusWatcher::isSetStatusInProgress(const QnResourcePtr &resourc
 
 void QnResourceStatusWatcher::at_resource_statusChanged(const QnResourcePtr &resource, Qn::StatusChangeReason reason)
 {
-    if (reason == Qn::StatusChangeReason::Default)
-    {
-        if (!isSetStatusInProgress(resource))
-            updateResourceStatusAsync(resource);
-        else
-            m_awaitingSetStatus << resource->getId();
-    }
+    if (reason == Qn::StatusChangeReason::Local)
+        updateResourceStatusInternal(resource);
+}
+
+void QnResourceStatusWatcher::updateResourceStatusInternal(const QnResourcePtr& resource)
+{
+    if (!isSetStatusInProgress(resource))
+        updateResourceStatusAsync(resource);
+    else
+        m_awaitingSetStatus << resource->getId();
 }
 
 void QnResourceStatusWatcher::updateResourceStatusAsync(const QnResourcePtr &resource)

@@ -12,10 +12,10 @@ public:
     enum Column
     {
           kName
+        , kCamera
         , kStartTime
         , kLength
         , kTags
-        , kCamera
         , kColumnsCount
     };
 

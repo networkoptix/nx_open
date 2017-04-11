@@ -18,7 +18,7 @@
 
 #if defined(Q_OS_MACX)
 #include <nx/utils/platform/core_foundation_mac/cf_url.h>
-#include <nx/utils/platform/core_foundation_mac/cf_string.h>
+#include <nx/utils/platform/core_foundation_mac/cf_dictionary.h>
 #endif
 
 namespace {
@@ -37,20 +37,26 @@ namespace {
             return version.toString();
     }
 
+    QString applicationRootPath()
+    {
+        const QDir dir(qApp->applicationDirPath());
+
+        if (QnAppInfo::applicationPlatform() == lit("linux"))
+            return dir.absoluteFilePath("..");
+
+        return dir.absolutePath();
+    }
 
 #if defined(Q_OS_MACX)
     QString extractVersion(const QString& fullPath)
     {
-        const auto url = cf::QnCFUrl::createFileUrl(fullPath);
-        const cf::QnCFRefHolder<CFBundleRef> bundle(
-            CFBundleCreate(kCFAllocatorDefault, url.ref()));
+        static const auto kShortVersionTag = lit("CFBundleShortVersionString");
+        static const auto kBundleVersionTag = lit("CFBundleVersion");
 
-        static const auto kShortVersionTag = cf::QnCFString(lit("CFBundleShortVersionString"));
-        static const auto kBundleVersionTag = cf::QnCFString(lit("CFBundleVersion"));
-        const auto shortVersion = cf::QnCFString(static_cast<CFStringRef>(
-            CFBundleGetValueForInfoDictionaryKey(bundle.ref(), kShortVersionTag.ref()))).toString();
-        const auto bundleVersion = cf::QnCFString(static_cast<CFStringRef>(
-            CFBundleGetValueForInfoDictionaryKey(bundle.ref(), kBundleVersionTag.ref()))).toString();
+        const auto url = cf::QnCFUrl::createFileUrl(fullPath);
+        const cf::QnCFDictionary infoPlist(CFBundleCopyInfoDictionaryInDirectory(url.ref()));
+        const auto shortVersion = infoPlist.getStringValue(kShortVersionTag);
+        const auto bundleVersion = infoPlist.getStringValue(kBundleVersionTag);
         return lit("%1.%2").arg(shortVersion, bundleVersion);
     }
 #endif
@@ -94,7 +100,7 @@ void InstallationManager::updateInstalledVersionsInformation()
     // detect current installation
     NX_LOG(QString::fromLatin1("Checking current version (%1)").arg(QnAppInfo::applicationVersion()), cl_logDEBUG1);
 
-    QnClientInstallationPtr current = QnClientInstallation::installationForPath(QCoreApplication::applicationDirPath());
+    const auto current = QnClientInstallation::installationForPath(applicationRootPath());
     if (current)
     {
         current->setVersion(QnSoftwareVersion(QnAppInfo::applicationVersion()));

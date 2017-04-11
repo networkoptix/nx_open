@@ -1,237 +1,141 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.7.0 FATAL_ERROR)
 
-# Default configuration values. These must be before the project command or
-# they won't work in Windows.
-# If no build type is specified, default to "Release"
-set(majorVersion 2)
-set(minorVersion 6)
-set(incrementalVersion 0)
+set(customization "default" CACHE STRING "Product customization")
+set(box "none" CACHE STRING "Target box")
+option(beta "Is this build is beta build" ON)
+set(buildNumber "0" CACHE STRING "Build number")
 
-project(vms)
-set(PROJECT_SHORTNAME "vms")
+option(analyzeMutexLocksForDeadlock
+    "Analyze mutex locks for deadlock. WARNING: this can significantly reduce performance!"
+    OFF)
 
-# Global CMake options
+option(rdepSync
+    "Whether rdep should sync packages or use only existing copies"
+    ON)
+
+set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
+    "One of [Debug Release RelWithDebInfo MinSizeRel].")
+
+project(vms VERSION 3.0.0)
+
+set(releaseVersion ${PROJECT_VERSION})
+set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
+set(releaseVersion.full ${PROJECT_VERSION}.${buildNumber})
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOMOC_MOC_OPTIONS "-bstdafx.h")
-set(AUTOGEN_TARGETS_FOLDER ${PROJECT_BINARY_DIR}/generated)
-set(CMAKE_AUTOUIC ON)
 
-if(NOT customization)
-    set(customization default)
-endif()
-if(NOT arch)
-    set(arch x64)
-endif()
-if(NOT configuration)
-    set(configuration release)
-endif()
-if(NOT beta)
-    set(beta true)
-endif()
-if(NOT buildNumber)
-    set(buildNumber 0)
-endif()
-if(NOT box)
-    set(box none)
-endif()
-if(WIN32)
-    set(platform "windows")
-    set(additional.compiler "msvc2012u3")
-    set(modification "winxp")
-    set(platformToolSet "v110_xp")
-    if(MSVC)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
-        message(STATUS "Added parallel build arguments to CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
-    endif()
+if(NOT WIN32 AND NOT ANDROID AND NOT IOS)
+    set(BUILD_SHARED_LIBS ON)
 endif()
 
-if(WIN32)
-    set(TARGET_TYPE "windows-${arch}")
-elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    if(NOT box OR ${box} MATCHES "none")
-        set(TARGET_TYPE "linux-${arch}")
-    else()
-        set(TARGET_TYPE ${box})
-    endif()
-elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    set(TARGET_TYPE "macosx-x64")
-elseif(${CMAKE_SYSTEM_NAME} MATCHES "Android")
-    set(TARGET_TYPE "android-arm")
-elseif(${CMAKE_SYSTEM_NAME} MATCHES "iOS")
-    set(TARGET_TYPE "ios")
-endif()
-
-set(CMAKE_MODULE_PATH
-    ${CMAKE_MODULE_PATH}
+list(APPEND CMAKE_MODULE_PATH
     ${PROJECT_SOURCE_DIR}/build_utils/cmake
-    ${PROJECT_SOURCE_DIR}/customization
-    ${PROJECT_SOURCE_DIR}/customization/${customization}
-)
+    ${PROJECT_SOURCE_DIR}/cmake)
 
-include(default_properties)
-include(add_module)
-include(cotire)
+include(CMakeParseArguments)
+include(utils)
 include(find_sources)
-include(add_translations)
-include(process_rc)
-include(process_resources)
+include(qrc_utils)
 include(precompiled_header)
-include(python_exec)
-include(external_dependencies)
+include(rdep)
+include(mercurial)
+include(project_utils)
 
-message("---- Building for: ${CMAKE_VS_PLATFORM_NAME}")
+find_python()
+detect_platform()
+rdep_configure()
 
-set (openal.version "1.16")
-set (directx.version "JUN2010")
-set (festival.version "2.1")
-set (ffmpeg.version "0.11.4")
-set (gmock.version "1.7.0")
-set (gtest.version "1.7.0")
-set (mfx.version "2012-R2")
-set (onvif.version "2.1.2-io")
-set (openssl.version "1.0.2e")
-set (quazip.version "0.7.1")
-set (sigar.version "1.7")
-set (vmax_integration.version "2.1")
-set (qt.version 5.6.0)
-set (boost.version 1.56.0)
+include(android-ndk-workaround)
 
-get_external_dependencies(qt boost)
+include(package_versions)
+include(ec_protocol)
+include(maven_compatibility)
 
-if(${CMAKE_BUILD_TYPE} MATCHES Debug)
-    include(${CMAKE_CURRENT_BINARY_DIR}/dependencies-debug.cmake)
+set(customization_dir "${PROJECT_SOURCE_DIR}/customization/${customization}")
+
+include(customization/default-values.cmake)
+include(${customization_dir}/customization.cmake)
+include(properties)
+include(cloud_host)
+include(vms_parts)
+include(compiler_options)
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+rdep_add_package(qt)
+get_full_package_name(qt QT_DIR)
+set(QT_DIR "${PACKAGES_DIR}/${QT_DIR}")
+if(CMAKE_CROSSCOMPILING)
+    set(QT_PREFIX "..")
 else()
-    include(${CMAKE_CURRENT_BINARY_DIR}/dependencies.cmake)
+    set(QT_PREFIX "${QT_DIR}")
+endif()
+list(APPEND CMAKE_PREFIX_PATH ${QT_DIR})
+if(MACOSX)
+    set(CMAKE_FRAMEWORK_PATH "${QT_DIR}/lib")
+endif()
+if(NOT WIN32)
+    set(CMAKE_EXE_LINKER_FLAGS
+        "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath-link,${QT_DIR}/lib")
+    set(CMAKE_SHARED_LINKER_FLAGS
+        "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath-link,${QT_DIR}/lib")
 endif()
 
-set(CMAKE_PREFIX_PATH ${QT_DIR})
+rdep_add_package(any/boost)
+rdep_add_package(any/qtservice)
+rdep_add_package(any/qtsinglecoreapplication)
+rdep_add_package(any/qtsingleapplication)
 
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release CACHE STRING
-        "Debug Release RelWithDebInfo"
-        FORCE)
+find_package(Qt5
+    COMPONENTS
+        LinguistTools
+        Core
+        Gui
+        Network
+        Xml
+        XmlPatterns
+        Sql
+        Concurrent
+        Multimedia)
+
+if(withDesktopClient OR withMobileClient)
+    find_package(Qt5
+        COMPONENTS
+            OpenGL
+            Qml
+            Quick)
 endif()
 
-if(NOT MSVC)
-    # Enable the C++11 standard
-    set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}
-        -std=c++11
-        -Werror=enum-compare
-        -Werror=reorder
-        -Werror=delete-non-virtual-dtor
-        -Werror=return-type
-        -Werror=conversion-null
-        -Wuninitialized)
+if(ANDROID)
+    find_package(Qt5 COMPONENTS AndroidExtras)
 endif()
 
-add_definitions(-DUSE_NX_HTTP
-                -DNOMINMAX=
-                -D__STDC_CONSTANT_MACROS
-                -D_USING_V110_SDK71_
-                -DENABLE_VMAX
-                -DQN_EXPORT=
-                -DUNICODE
-                -DENABLE_ONVIF
-                -DENABLE_AXIS
-                -DENABLE_ACTI
-                -DENABLE_ARECONT
-                -DENABLE_DLINK
-                -DENABLE_DROID
-                -DENABLE_TEST_CAMERA
-                -DENABLE_STARDOT
-                -DENABLE_IQE
-                -DENABLE_ISD
-                -DENABLE_PULSE_CAMERA
-                -DENABLE_COLDSTORE
-                -DENABLE_MDNS
-                -DENABLE_THIRD_PARTY
-                -DENABLE_SOFTWARE_MOTION_DETECTION
-                -DENABLE_DESKTOP_CAMERA
-                -DENABLE_DATA_PROVIDERS
-                -DENABLE_SENDMAIL
-                -DENABLE_SSL
-                -DUSE_OWN_MUTEX
-                -DNX_NETWORK_API=__declspec\(dllimport\)
-                -DNX_UTILS_API=__declspec\(dllimport\)
-                -DUDT_API=__declspec\(dllimport\)
-                )
+# Required for QN_DECLARE_METAOBJECT_HEADER
+include_directories("${PROJECT_SOURCE_DIR}/common_libs/nx_fusion/src")
 
-if(WIN32)
-    set(DEFAULT_LIBRARY_TYPE STATIC)
-else()
-    set(DEFAULT_LIBRARY_TYPE SHARED)
+add_subdirectory(common_libs)
+add_subdirectory(common)
+add_subdirectory(appserver2)
+add_subdirectory(nx_cloud)
+
+if(withMediaServer)
+    rdep_add_package(any/apidoctool PATH_VARIABLE APIDOCTOOL_PATH)
+    add_subdirectory(mediaserver_core)
+    add_subdirectory(mediaserver)
+    add_subdirectory(plugins)
+    add_subdirectory(storage_plugins)
 endif()
 
-include(default_properties)
-include(add_module)
-include(cotire)
-include(find_sources)
-include(add_translations)
-include(process_rc)
-include(process_resources)
-include(qt_custom)
-include(precompiled_header)
-include(python_exec)
-include(external_dependencies)
+if(withDesktopClient OR withMobileClient)
+    add_subdirectory(client)
+endif()
 
-include_directories(${BOOST_INCLUDE}
-                    ${CMAKE_SOURCE_DIR}/common/src
-                    $ENV{environment}/include/ffmpeg-misc-headers-win32
-                    $ENV{environment}/include/glext
-                    $ENV{environment}/qt5-custom
-                    ${CMAKE_SOURCE_DIR}/common_libs/nx_utils/src
-                    ${CMAKE_SOURCE_DIR}/common_libs/nx_utils/src/nx
-                    ${CMAKE_SOURCE_DIR}/common_libs/nx_network/src
-                    ${CMAKE_SOURCE_DIR}/common_libs/nx_streaming/src
-                    ${CMAKE_SOURCE_DIR}/common_libs/nx_media/src
-                    ${CMAKE_SOURCE_DIR}/common_libs/nx_audio/src
-                    ${CMAKE_SOURCE_DIR}/common_libs/udt/src
-                    $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include
-                    $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtZlib
-                    $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtCore/${qt.version}/QtCore
-                    $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtCore/${qt.version}
-                    $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtCore
-                    $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtQuick/${qt.version}/QtQuick
-                    $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtQuick/${qt.version}
-                    $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtQuick
-                    $ENV{environment}/artifacts/openal/${openal.version}/include
-                    $ENV{environment}/artifacts/openal/${openal.version}/include/AL
-                    $ENV{environment}/artifacts/directx/${directx.version}/include
-                    $ENV{environment}/artifacts/festival/${festival.version}/include
-                    $ENV{environment}/artifacts/ffmpeg/${ffmpeg.version}/include
-                    $ENV{environment}/artifacts/gmock/${gmock.version}/include
-                    $ENV{environment}/artifacts/gtest/${gtest.version}/include
-                    $ENV{environment}/artifacts/mfx/${mfx.version}/include
-                    $ENV{environment}/artifacts/onvif/${onvif.version}/include
-                    $ENV{environment}/artifacts/sigar/${sigar.version}/include
-                    $ENV{environment}/artifacts/vmax_integration/${vmax_integration.version}/include
-                    )
+if(withTests)
+    rdep_add_package(gtest)
+    rdep_add_package(gmock)
+    add_subdirectory(unit_tests)
+endif()
 
-LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/common
-                $ENV{environment}/artifacts/openal/${openal.version}/${platform}/${box}/${arch}/lib/${configuration}
-                $ENV{environment}/artifacts/directx/${directx.version}/${platform}/${box}/${arch}/lib/${configuration}
-                $ENV{environment}/artifacts/festival/${festival.version}/${platform}/${box}/${arch}/lib/${configuration}
-                $ENV{environment}/artifacts/ffmpeg/${ffmpeg.version}/${platform}/${box}/${arch}/lib/${configuration}
-                $ENV{environment}/artifacts/gmock/${gmock.version}/${platform}/${box}/${arch}/lib/${configuration}
-                $ENV{environment}/artifacts/gtest/${gtest.version}/${platform}/${box}/${arch}/lib/${configuration}
-                $ENV{environment}/artifacts/mfx/${mfx.version}/${platform}/${box}/${arch}/lib/${configuration}
-                $ENV{environment}/artifacts/onvif/${onvif.version}/${platform}/${box}/${arch}/lib/${configuration}
-                $ENV{environment}/artifacts/sigar/${sigar.version}/${platform}/${box}/${arch}/lib/${configuration}
-                $ENV{environment}/artifacts/vmax_integration/${vmax_integration.version}/${platform}/${box}/${arch}/lib/${configuration}
-                )
-
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5Core REQUIRED)
-find_package(Qt5LinguistTools)
-
-add_module(
-    NAMES
-        nxtool
-        common
-        common_libs
-        appserver2
-        applauncher
-        traytool
-    STATUS_SHORT_NAMES
-)
+include(fix_qt_vars)

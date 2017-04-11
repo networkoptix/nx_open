@@ -1,14 +1,8 @@
-/**********************************************************
-* Apr 13, 2016
-* akolesnikov
-***********************************************************/
-
 #include "rendezvous_connector.h"
 
 #include <nx/utils/log/log.h>
 
 #include <nx/utils/std/cpp14.h>
-
 
 namespace nx {
 namespace network {
@@ -82,26 +76,13 @@ void RendezvousConnector::connect(
         {
             auto udtConnection = std::make_unique<UdtStreamSocket>(AF_INET);
             udtConnection->bindToAioThread(m_aioThreadBinder.getAioThread());
-            //moving system socket handler from m_mediatorUdpClient to m_udtConnection
-            bool result = true;
-            if (m_udpSocket)
+            if (!initializeUdtConnection(udtConnection.get(), timeout))
             {
-                result = udtConnection->bindToUdpSocket(std::move(*m_udpSocket));
-                m_udpSocket.reset();
-            }
-            if (m_localAddressToBindTo && result)
-                result = udtConnection->bind(*m_localAddressToBindTo);
-            if (!result ||
-                !udtConnection->setRendezvous(true) ||
-                !udtConnection->setNonBlockingMode(true) ||
-                !udtConnection->setSendTimeout(timeout.count()))
-            {
-                const auto errorCode = SystemError::getLastOSErrorCode();
+                const auto sysErrorCode = SystemError::getLastOSErrorCode();
                 NX_LOGX(lm("session %1. Failed to create UDT socket. %2")
-                    .arg(m_connectSessionId).arg(SystemError::toString(errorCode)),
+                    .arg(m_connectSessionId).arg(SystemError::toString(sysErrorCode)),
                     cl_logDEBUG1);
-                completionHandler(errorCode);
-                return;
+                return completionHandler(sysErrorCode);
             }
 
             m_completionHandler = std::move(completionHandler);
@@ -111,11 +92,7 @@ void RendezvousConnector::connect(
                 [this](SystemError::ErrorCode errorCode)
                 {
                     //need post to be sure that aio subsystem does not use socket anymore
-                    post(
-                        std::bind(
-                            &RendezvousConnector::onUdtConnectFinished,
-                            this,
-                            errorCode));
+                    post(std::bind(&RendezvousConnector::onUdtConnectFinished, this, errorCode));
                 });
         });
 }
@@ -135,6 +112,39 @@ const SocketAddress& RendezvousConnector::remoteAddress() const
     return m_remotePeerAddress;
 }
 
+bool RendezvousConnector::initializeUdtConnection(
+    UdtStreamSocket* udtConnection,
+    std::chrono::milliseconds timeout)
+{
+    auto udpSocket = std::move(m_udpSocket);
+    if (udpSocket)
+    {
+        // Moving system socket handler from m_mediatorUdpClient to m_udtConnection.
+        const bool result = udtConnection->bindToUdpSocket(std::move(*udpSocket));
+        // udpSocket destructor may reset system error code.
+        const auto sysErrorCodeBak = SystemError::getLastOSErrorCode();
+        udpSocket.reset();
+        SystemError::setLastErrorCode(sysErrorCodeBak);
+        if (!result)
+            return false;
+    }
+
+    if (m_localAddressToBindTo)
+    {
+        if (!udtConnection->bind(*m_localAddressToBindTo))
+            return false;
+    }
+
+    if (!udtConnection->setRendezvous(true) ||
+        !udtConnection->setNonBlockingMode(true) ||
+        !udtConnection->setSendTimeout(timeout.count()))
+    {
+        return false;
+    }
+
+    return true;
+}
+
 void RendezvousConnector::onUdtConnectFinished(
     SystemError::ErrorCode errorCode)
 {
@@ -149,7 +159,7 @@ void RendezvousConnector::onUdtConnectFinished(
         return;
     }
 
-    //TODO #ak validating that remote side uses same connection id
+    //TODO #ak Validating that remote side uses same connection id.
 
     NX_LOGX(lm("session %1. Successfully established rendezvous udt connection to %2")
         .arg(m_connectSessionId).arg(m_remotePeerAddress.toString()),

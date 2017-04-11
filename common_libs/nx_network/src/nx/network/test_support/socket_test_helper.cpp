@@ -10,10 +10,10 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
-
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
 
+#include <utils/math/math.h>
 
 namespace nx {
 namespace network {
@@ -52,6 +52,7 @@ QString NX_NETWORK_API toString(TestTransmissionMode type)
         case TestTransmissionMode::spam: return lit("spam");
         case TestTransmissionMode::ping: return lit("ping");
         case TestTransmissionMode::pong: return lit("pong");
+        case TestTransmissionMode::receiveOnly: return lit("receiveOnly");
     }
 
     NX_CRITICAL(false, lm("Unexpected value: %1").arg(static_cast<int>(type)));
@@ -64,21 +65,15 @@ TestConnection::TestConnection(
     size_t trafficLimit,
     TestTransmissionMode transmissionMode)
 :
-    m_socket( std::move( socket ) ),
-    m_limitType( limitType ),
-    m_trafficLimit( trafficLimit ),
-    m_transmissionMode( transmissionMode ),
-    m_connected( true ),
-    m_totalBytesSent( 0 ),
-    m_totalBytesReceived( 0 ),
-    m_timeoutsInARow( 0 ),
-    m_id( ++TestConnectionIDCounter ),
-    m_accepted(true)
+    TestConnection(
+        std::move(socket),
+        SocketAddress(),
+        limitType,
+        trafficLimit,
+        transmissionMode,
+        true,
+        true)
 {
-    m_readBuffer.reserve( kReadBufferSize );
-    m_outData = nx::utils::random::generate( kReadBufferSize );
-
-    ++TestConnection_count;
 }
 
 TestConnection::TestConnection(
@@ -87,24 +82,17 @@ TestConnection::TestConnection(
     size_t trafficLimit,
     TestTransmissionMode transmissionMode)
 :
-    m_socket( SocketFactory::createStreamSocket() ),
-    m_limitType(limitType),
-    m_trafficLimit( trafficLimit ),
-    m_transmissionMode( transmissionMode ),
-    m_connected( false ),
-    m_remoteAddress(
-        remoteAddress.address == HostAddress::anyHost ? HostAddress::localhost : remoteAddress.address,
-        remoteAddress.port ),
-    m_totalBytesSent( 0 ),
-    m_totalBytesReceived( 0 ),
-    m_timeoutsInARow( 0 ),
-    m_id( ++TestConnectionIDCounter ),
-    m_accepted(false)
+    TestConnection(
+        SocketFactory::createStreamSocket(),
+        SocketAddress(
+            remoteAddress.address == HostAddress::anyHost ? HostAddress::localhost : remoteAddress.address,
+            remoteAddress.port),
+        limitType,
+        trafficLimit,
+        transmissionMode,
+        false,
+        false)
 {
-    m_readBuffer.reserve( kReadBufferSize );
-    m_outData = nx::utils::random::generate( kReadBufferSize );
-
-    ++TestConnection_count;
 }
 
 static std::mutex terminatedSocketsIDsMutex;
@@ -211,6 +199,36 @@ void TestConnection::setOnFinishedEventHandler(
     m_finishedEventHandler = std::move(handler);
 }
 
+TestConnection::TestConnection(
+    std::unique_ptr<AbstractStreamSocket> socket,
+    const SocketAddress& remoteAddress,
+    TestTrafficLimitType limitType,
+    size_t trafficLimit,
+    TestTransmissionMode transmissionMode,
+    bool isConnected,
+    bool isAccepted)
+    :
+    m_socket(std::move(socket)),
+    m_limitType(limitType),
+    m_trafficLimit(trafficLimit),
+    m_transmissionMode(transmissionMode),
+    m_connected(isConnected),
+    m_remoteAddress(remoteAddress),
+    m_totalBytesSent(0),
+    m_totalBytesReceived(0),
+    m_timeoutsInARow(0),
+    m_id(++TestConnectionIDCounter),
+    m_accepted(isAccepted),
+    m_dataSequence(0),
+    m_curStreamPos(0),
+    m_lastSequenceReceived(0)
+{
+    m_readBuffer.reserve(kReadBufferSize);
+    m_outData = nx::utils::random::generate(kReadBufferSize);
+
+    ++TestConnection_count;
+}
+
 void TestConnection::onConnected( SystemError::ErrorCode errorCode )
 {
 #ifdef DEBUG_OUTPUT
@@ -235,11 +253,11 @@ void TestConnection::startIO()
         case TestTransmissionMode::spam: return startSpamIO();
         case TestTransmissionMode::pong: return startEchoIO();
         case TestTransmissionMode::ping: return startEchoTestIO();
+        case TestTransmissionMode::receiveOnly: return startReceiveOnlyTestIO();
     };
 
     NX_ASSERT(false);
 }
-
 
 void TestConnection::startSpamIO()
 {
@@ -251,6 +269,7 @@ void TestConnection::startSpamIO()
         .arg(m_accepted).arg(m_outData.size())
         .arg(m_socket->getForeignAddress().toString()),
         cl_logDEBUG2);
+    prepareConsequentDataToSend(&m_outData);
     m_socket->sendAsync(
         m_outData,
         std::bind(&TestConnection::onDataSent, this, _1, _2));
@@ -300,6 +319,14 @@ void TestConnection::startEchoTestIO()
         });
 }
 
+void TestConnection::startReceiveOnlyTestIO()
+{
+    using namespace std::placeholders;
+    m_socket->readSomeAsync(
+        &m_readBuffer,
+        std::bind(&TestConnection::onDataReceived, this, _1, _2));
+}
+
 void TestConnection::readAllAsync( std::function<void()> handler )
 {
     if (m_limitType == TestTrafficLimitType::incoming &&
@@ -332,6 +359,7 @@ void TestConnection::sendAllAsync( std::function<void()> handler )
         return reportFinish( SystemError::noError );
     }
 
+    prepareConsequentDataToSend(&m_outData);
     m_socket->sendAsync(
         m_outData,
         [this, handler = std::move(handler)](
@@ -365,6 +393,8 @@ void TestConnection::onDataReceived(
     {
         return reportFinish( errorCode );
     }
+
+    verifyDataReceived(m_readBuffer, bytesRead);
 
     m_totalBytesReceived += bytesRead;
     m_readBuffer.clear();
@@ -407,18 +437,50 @@ void TestConnection::onDataSent(
         .arg(m_accepted).arg(m_outData.size())
         .arg(m_socket->getForeignAddress().toString()),
         cl_logDEBUG2);
+    prepareConsequentDataToSend(&m_outData);
     m_socket->sendAsync(
         m_outData,
         std::bind(&TestConnection::onDataSent, this, _1, _2) );
 }
 
-void TestConnection::reportFinish( SystemError::ErrorCode code )
+void TestConnection::reportFinish(SystemError::ErrorCode code)
 {
     if (!m_finishedEventHandler)
         return;
 
     auto handler = std::move(m_finishedEventHandler);
     return handler(m_id, this, code);
+}
+
+void TestConnection::prepareConsequentDataToSend(QByteArray* buffer)
+{
+    for (char* 
+        pos = buffer->data();
+        pos <= (buffer->data() + buffer->size() - sizeof(m_dataSequence));
+        pos += sizeof(m_dataSequence))
+    {
+        uint64_t x = htonll(m_dataSequence);
+        memcpy(pos, &x, sizeof(x));
+        ++m_dataSequence;
+    }
+}
+
+void TestConnection::verifyDataReceived(const QByteArray& buf, size_t bytesRead)
+{
+    const auto sequenceOffset = sizeof(m_dataSequence) - (m_curStreamPos % sizeof(m_dataSequence));
+
+    if (bytesRead < (sequenceOffset + sizeof(m_dataSequence)))
+    {
+        m_curStreamPos += bytesRead;
+        return;
+    }
+
+    uint64_t x = 0;
+    memcpy(&x, buf.data() + sequenceOffset, sizeof(x));
+    m_lastSequenceReceived = ntohll(x);
+    //std::cout << "Received sequence " << m_lastSequenceReceived << std::endl;
+
+    m_curStreamPos += bytesRead;
 }
 
 
@@ -522,16 +584,18 @@ bool RandomDataTcpServer::start(std::chrono::milliseconds rwTimeout)
     m_rwTimeout = rwTimeout;
     if (!m_serverSocket)
         m_serverSocket = SocketFactory::createStreamServerSocket();
-    if( !(m_doNotBind || m_serverSocket->bind(m_localAddress)) ||
-        !m_serverSocket->listen() )
+
+    if (!(m_doNotBind || m_serverSocket->bind(m_localAddress)) ||
+        !m_serverSocket->listen() ||
+        !m_serverSocket->setNonBlockingMode(true))
     {
         m_serverSocket.reset();
         return false;
     }
-    m_serverSocket->acceptAsync( std::bind(
-        &RandomDataTcpServer::onNewConnection, this,
-        std::placeholders::_1, std::placeholders::_2 ) );
 
+    m_serverSocket->acceptAsync(std::bind(
+        &RandomDataTcpServer::onNewConnection, this,
+        std::placeholders::_1, std::placeholders::_2));
     return true;
 }
 

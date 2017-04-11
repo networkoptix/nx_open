@@ -28,6 +28,7 @@ Drawer
             anchors.fill: parent
             anchors.topMargin: getStatusBarHeight()
             anchors.bottomMargin: bottomContent.height
+            bottomMargin: 8
             flickableDirection: Flickable.VerticalFlick
             clip: true
 
@@ -110,6 +111,7 @@ Drawer
                 visible: connectionManager.connectionState === QnConnectionManager.Disconnected
                 onClicked:
                 {
+                    bottomContent.enabled = false
                     sideNavigation.close()
                     Workflow.openNewSessionScreen()
                 }
@@ -122,15 +124,24 @@ Drawer
                 icon: lp("/images/disconnect.png")
                 text: qsTr("Disconnect from Server")
                 visible: connectionManager.connectionState !== QnConnectionManager.Disconnected
-                onClicked: uiController.disconnectFromSystem()
+                onClicked:
+                {
+                    bottomContent.enabled = false
+                    sideNavigation.close()
+                    uiController.disconnectFromSystem()
+                }
             }
 
             SideNavigationButton
             {
                 icon: lp("/images/settings.png")
                 text: qsTr("Settings")
-                visible: false//!liteMode
-                onClicked: Workflow.openSettingsScreen()
+                onClicked:
+                {
+                    bottomContent.enabled = false
+                    sideNavigation.close()
+                    Workflow.openSettingsScreen()
+                }
             }
 
             SideNavigationButton
@@ -155,6 +166,8 @@ Drawer
     {
         if (opened)
         {
+            bottomContent.enabled = true
+
             if (liteMode)
             {
                 // TODO: #dklychkov Implement proper focus control

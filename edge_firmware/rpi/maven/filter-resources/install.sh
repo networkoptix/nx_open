@@ -16,15 +16,16 @@ exec 2>&1
 
 echo "Starting upgrade ..."
 COMPANY_NAME=${deb.customization.company.name}
+MEDIASERVER_DIR=/opt/$COMPANY_NAME/mediaserver
 export DISTRIB=${artifact.name.server}
 
 update () {
   cp $DISTRIB.tar.gz /tmp
-  rm -Rf /opt/networkoptix/mediaserver/lib
+  rm -Rf $MEDIASERVER_DIR/lib $MEDIASERVER_DIR/bin/core*
   mkdir -p ./$DISTRIB
   tar xfv $DISTRIB.tar.gz -C ./$DISTRIB
   cp -Rf ./$DISTRIB/* /
-  if [[ "${box}" == "bpi" ]]; then 
+  if [[ "${box}" == "bpi" ]]; then
     #avoid grabbing libstdc++ from mediaserver lib folder
     export LD_LIBRARY_PATH=
     export DATAPART=/dev/mmcblk0p2
@@ -62,7 +63,7 @@ update () {
     umount $DATAPART
     /etc/init.d/nx1boot upgrade
     rm -Rf ./$DISTRIB
-    sync    
+    sync
   fi
   # TODO: add errorlevel handling
   rm /tmp/$DISTRIB.tar.gz
@@ -81,7 +82,7 @@ SERVER_PORT=`cat /opt/$COMPANY_NAME/mediaserver/etc/mediaserver.conf | grep port
 # Determining process that occupies Server Port
 PORT_PROCESS=`netstat -tpan | grep $SERVER_PORT | grep LISTEN | awk {'print $NF'} | grep -o '[0-9]\+'`
 # Checking if the process belongs to our server. Netstat always shows process name like "xxxxx/mediaserver", but it may be mediaserver of a different customization
-SERVER_PROCESS=`ps $PORT_PROCESS | grep $'/opt/'$COMPANY_NAME'/mediaserver'`
+SERVER_PROCESS=`ps $PORT_PROCESS | grep '/opt/'$COMPANY_NAME'/mediaserver'`
 # Note that $SERVER_PROCESS may contain spaces or \n in this case we need to convert it to empty string
 while [ -z "${SERVER_PROCESS// }" ]; do
   echo "Restarting "$COMPANY_NAME"-mediaserver" >> /opt/$COMPANY_NAME/mediaserver/var/log/update.log
@@ -89,6 +90,6 @@ while [ -z "${SERVER_PROCESS// }" ]; do
   kill -9 $PORT_PROCESS
   /etc/init.d/$COMPANY_NAME-mediaserver start
   sleep 3
-  PORT_PROCESS=`netstat -tpan | grep $SERVER_PORT | grep LISTEN | awk {'print $NF'} | grep -o '[0-9]\+'` 
-  SERVER_PROCESS=`ps $PORT_PROCESS | grep $'/opt/'$COMPANY_NAME'/mediaserver'`  
+  PORT_PROCESS=`netstat -tpan | grep $SERVER_PORT | grep LISTEN | awk {'print $NF'} | grep -o '[0-9]\+'`
+  SERVER_PROCESS=`ps $PORT_PROCESS | grep $'/opt/'$COMPANY_NAME'/mediaserver'`
 done

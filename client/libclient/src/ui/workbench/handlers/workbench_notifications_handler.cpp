@@ -7,6 +7,7 @@
 
 #include <client/client_settings.h>
 #include <client/client_message_processor.h>
+#include <client/client_show_once_settings.h>
 
 #include <business/business_strings_helper.h>
 
@@ -25,6 +26,14 @@
 #include <utils/common/warnings.h>
 #include <utils/email/email.h>
 #include <utils/media/audio_player.h>
+
+#include <watchers/cloud_status_watcher.h>
+
+namespace {
+
+static const QString kCloudPromoShowOnceKey(lit("CloudPromoNotification"));
+
+}
 
 
 QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent):
@@ -80,6 +89,12 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
         [this]
         {
             setSystemHealthEventVisible(QnSystemHealth::NoPrimaryTimeServer, false);
+        });
+
+    connect(action(QnActions::HideCloudPromoAction), &QAction::triggered, this,
+        [this]
+        {
+            qnClientShowOnce->setFlag(kCloudPromoShowOnceKey);
         });
 
     connect(qnSettings->notifier(QnClientSettings::POPUP_SYSTEM_HEALTH),
@@ -326,9 +341,23 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
             return;
 
         case QnSystemHealth::CloudPromo:
-            setSystemHealthEventVisible(message, context()->user());
-            return;
+        {
+            const bool isOwner = context()->user()
+                && context()->user()->userRole() == Qn::UserRole::Owner;
+            const bool isLoggedIntoCloud = qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut;
 
+            const bool canShow =
+                // show only to owners
+                isOwner
+                // hide if we are already in the cloud
+                && !isLoggedIntoCloud
+                // only if system is not connected to the cloud
+                && qnGlobalSettings->cloudSystemId().isNull()
+                // and if user did not close notification manually at least once
+                && !qnClientShowOnce->testFlag(kCloudPromoShowOnceKey);
+            setSystemHealthEventVisible(message, canShow);
+            return;
+        }
         default:
             break;
 

@@ -20,6 +20,13 @@ NxTextEdit
     state: "masked";
     width: 280;
 
+    function clear()
+    {
+        text = "";
+        state = "masked";
+        animation.complete();
+    }
+
     leftControlDelegate: Image
     {
         source: "qrc:/skin/welcome_page/search.png";
@@ -136,6 +143,8 @@ NxTextEdit
     {
         SequentialAnimation
         {
+            id: animation;
+
             NumberAnimation
             {
                 target: searchLabel;

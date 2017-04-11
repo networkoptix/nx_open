@@ -23,8 +23,9 @@ namespace
             <parameters>                                                  \
                 <group name=\"Main\">                                     \
                     <param                                                \
-                        name=\"rtsp_url\"                                 \
-                        description=\"RTSP URL\"                          \
+                        id=\"rtsp_url\"                                   \
+                        name=\"RTSP URL\"                                 \
+                        description=\"Original URL of the stream\"        \
                         dataType=\"String\"                               \
                         readOnly=\"true\"/>                               \
                 </group>                                                  \
@@ -180,7 +181,7 @@ const char* GenericRTSPCameraManager::getParametersDescriptionXML() const
 
 int GenericRTSPCameraManager::getParamValue( const char* paramName, char* valueBuf, int* valueBufSize ) const
 {
-    if( strcmp(paramName, "/main/rtsp_url") == 0 )
+    if( strcmp(paramName, "rtsp_url") == 0 )
     {
         const int requiredBufSize = strlen( m_info.url )+1;
         if( *valueBufSize < requiredBufSize )
@@ -198,7 +199,7 @@ int GenericRTSPCameraManager::getParamValue( const char* paramName, char* valueB
 
 int GenericRTSPCameraManager::setParamValue( const char* paramName, const char* /*value*/ )
 {
-    if( strcmp(paramName, "/main/rtsp_url") == 0 )
+    if( strcmp(paramName, "rtsp_url") == 0 )
         return nxcip::NX_PARAM_READ_ONLY;
 
     return nxcip::NX_UNKNOWN_PARAMETER;

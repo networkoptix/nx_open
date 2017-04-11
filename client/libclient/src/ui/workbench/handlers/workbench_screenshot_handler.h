@@ -12,6 +12,7 @@
 
 #include <utils/image_provider.h>
 #include <utils/color_space/image_correction.h>
+#include <utils/common/connective.h>
 
 class QPainter;
 class QnProgressDialog;
@@ -35,6 +36,7 @@ struct QnScreenshotParameters
     QString timeString() const;
 };
 
+/* Proxy class, that starts loading instantly after base provider is set and notifies only once. */
 class QnScreenshotLoader: public QnImageProvider {
     Q_OBJECT
 public:
@@ -44,6 +46,8 @@ public:
     void setBaseProvider(QnImageProvider* imageProvider);
 
     virtual QImage image() const override;
+    virtual QSize sizeHint() const override;
+    virtual Qn::ThumbnailStatus status() const override;
 
     QnScreenshotParameters parameters() const;
     void setParameters(const QnScreenshotParameters &parameters);
@@ -63,8 +67,13 @@ private:
 /**
  * @brief The QnWorkbenchScreenshotHandler class            Handler for the screenshots related actions.
  */
-class QnWorkbenchScreenshotHandler: public QObject, public QnWorkbenchContextAware {
+class QnWorkbenchScreenshotHandler:
+    public Connective<QObject>,
+    public QnWorkbenchContextAware
+{
     Q_OBJECT
+    using base_type = Connective<QObject>;
+
 public:
     QnWorkbenchScreenshotHandler(QObject *parent = NULL);
 

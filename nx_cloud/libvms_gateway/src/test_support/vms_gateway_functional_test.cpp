@@ -35,13 +35,12 @@ namespace {
 QString sTemporaryDirectoryPath;
 }
 
-VmsGatewayFunctionalTest::VmsGatewayFunctionalTest()
-:
-    m_httpPort(0),
-    m_testHttpServer(std::make_unique<TestHttpServer>())
+VmsGatewayFunctionalTest::VmsGatewayFunctionalTest():
+    m_httpPort(0)
 {
     //starting clean test
     nx::network::SocketGlobalsHolder::instance()->reinitialize();
+    m_testHttpServer = std::make_unique<TestHttpServer>();
 
     m_tmpDir = 
         (sTemporaryDirectoryPath.isEmpty() ? QDir::homePath(): sTemporaryDirectoryPath) +

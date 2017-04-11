@@ -74,8 +74,13 @@ QString QnLayoutResource::toSearchString() const
 void QnLayoutResource::setItems(const QnLayoutItemDataList& items)
 {
     QnLayoutItemDataMap map;
-    for (const QnLayoutItemData &item : items)
+    for (QnLayoutItemData item: items)
+    {
+        // Workaround against corrupted layouts in the database
+        if (item.uuid.isNull())
+            item.uuid = QnUuid::createUuid();
         map[item.uuid] = item;
+    }
     setItems(map);
 }
 
@@ -359,7 +364,12 @@ QSet<QnUuid> QnLayoutResource::layoutResourceIds() const
 {
     QSet<QnUuid> result;
     for (const auto& item: m_items->getItems())
+    {
+        if (item.uuid.isNull())
+            continue;
+
         result << item.resource.id;
+    }
     return result;
 }
 
@@ -373,6 +383,9 @@ QSet<QnResourcePtr> QnLayoutResource::layoutResources(const QnLayoutItemDataMap&
     QSet<QnResourcePtr> result;
     for (const auto& item : items)
     {
+        if (item.uuid.isNull())
+            continue;
+
         if (auto resource = qnResPool->getResourceByDescriptor(item.resource))
             result << resource;
     }

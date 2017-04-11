@@ -17,14 +17,17 @@ Pane
     background: null
 
     property alias hostsModel: hostSelectionDialog.model
-    property alias authenticationDataModel: userSelectionDialog.model;
+    property alias authenticationDataModel: userSelectionDialog.model
     property alias address: addressField.text
     property alias login: loginField.text
     property alias password: passwordField.text
 
     property bool displayAddressError: false
-    property bool displayUserCredentialsError: false
+    property bool displayLoginError: false
+    property bool displayPasswordError: false
     property alias addressErrorText: addressErrorPanel.text
+    property alias loginErrorText: loginErrorPanel.text
+    property alias passwordErrorText: passwordErrorPanel.text
 
     signal accepted()
     signal changed()
@@ -45,7 +48,7 @@ Pane
             selectionAllowed: false
             inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
             activeFocusOnTab: true
-            onAccepted: KeyNavigation.tab.forceActiveFocus()
+            onAccepted: nextItemInFocusChain(true).forceActiveFocus()
             rightPadding: chooseHostButton.visible ? chooseHostButton.width : 8
 
             IconButton
@@ -83,7 +86,7 @@ Pane
 
             width: parent.width
             placeholderText: qsTr("Login")
-            showError: displayUserCredentialsError
+            showError: displayLoginError
             onTextChanged: credentialsEditor.changed()
             selectionAllowed: false
             inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData
@@ -100,12 +103,18 @@ Pane
                 visible: authenticationDataAccessor.count > 1
             }
 
-            onAccepted: KeyNavigation.tab.forceActiveFocus()
+            onAccepted: nextItemInFocusChain(true).forceActiveFocus()
             onActiveFocusChanged:
             {
                 if (activeFocus)
-                    displayUserCredentialsError = false
+                    displayLoginError = false
             }
+        }
+        FieldWarning
+        {
+            id: loginErrorPanel
+            width: parent.width
+            opened: displayLoginError && text
         }
 
         TextField
@@ -114,30 +123,25 @@ Pane
 
             width: parent.width
             placeholderText: qsTr("Password")
-            showError: displayUserCredentialsError
+            showError: displayPasswordError
             echoMode: TextInput.Password
             passwordMaskDelay: 1500
             onTextChanged: credentialsEditor.changed()
             selectionAllowed: false
-            inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData | Qt.ImhHiddenText
+            inputMethodHints: Qt.ImhSensitiveData | Qt.ImhPreferLatin
             activeFocusOnTab: true
             onAccepted: credentialsEditor.accepted()
-            Component.onCompleted:
-            {
-                if (Qt.platform.os == "android")
-                    passwordCharacter = "\u2022"
-            }
             onActiveFocusChanged:
             {
                 if (activeFocus)
-                    displayUserCredentialsError = false
+                    displayPasswordError = false
             }
         }
         FieldWarning
         {
-            text: LoginUtils.connectionErrorText(QnConnectionManager.UnauthorizedConnectionResult)
+            id: passwordErrorPanel
             width: parent.width
-            opened: displayUserCredentialsError
+            opened: displayPasswordError && text
         }
     }
 

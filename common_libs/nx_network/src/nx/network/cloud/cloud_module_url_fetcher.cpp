@@ -2,6 +2,7 @@
 
 #include <QtCore/QBuffer>
 
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 
 #include <plugins/videodecoder/stree/resourcecontainer.h>
@@ -19,6 +20,7 @@ namespace cloud {
 static constexpr const char* const kCloudDbModuleName = "cdb";
 static constexpr const char* const kConnectionMediatorModuleName = "hpm";
 static constexpr const char* const kNotificationModuleName = "notification_module";
+static constexpr std::chrono::seconds kHttpRequestTimeout = std::chrono::seconds(10);
 
 //-------------------------------------------------------------------------------------------------
 // class CloudInstanceSelectionAttributeNameset
@@ -85,15 +87,16 @@ void CloudModuleUrlFetcher::setUrl(QUrl endpoint)
     m_url = std::move(endpoint);
 }
 
-//!Retrieves endpoint if unknown. If endpoint is known, then calls \a handler directly from this method
 void CloudModuleUrlFetcher::get(Handler handler)
 {
     get(nx_http::AuthInfo(), std::move(handler));
 }
 
-//!Retrieves endpoint if unknown. If endpoint is known, then calls \a handler directly from this method
 void CloudModuleUrlFetcher::get(nx_http::AuthInfo auth, Handler handler)
 {
+    using namespace std::chrono;
+    using namespace std::placeholders;
+
     //if requested endpoint is known, providing it to the output
     QnMutexLocker lk(&m_mutex);
     if (m_url)
@@ -115,16 +118,27 @@ void CloudModuleUrlFetcher::get(nx_http::AuthInfo auth, Handler handler)
     m_httpClient = nx_http::AsyncHttpClient::create();
     m_httpClient->setAuth(auth);
     m_httpClient->bindToAioThread(getAioThread());
-    QObject::connect(
-        m_httpClient.get(), &nx_http::AsyncHttpClient::done,
-        m_httpClient.get(),
-        [this](nx_http::AsyncHttpClientPtr client)
-        {
-            onHttpClientDone(std::move(client));
-        },
-        Qt::DirectConnection);
+
+    for (const auto& header: m_additionalHttpHeadersForGetRequest)
+        m_httpClient->addAdditionalHeader(header.first, header.second);
+
+    m_httpClient->setSendTimeoutMs(
+        duration_cast<milliseconds>(kHttpRequestTimeout).count());
+    m_httpClient->setResponseReadTimeoutMs(
+        duration_cast<milliseconds>(kHttpRequestTimeout).count());
+    m_httpClient->setMessageBodyReadTimeoutMs(
+        duration_cast<milliseconds>(kHttpRequestTimeout).count());
+
     m_requestIsRunning = true;
-    m_httpClient->doGet(QUrl(m_modulesXmlUrl));
+    m_httpClient->doGet(
+        m_modulesXmlUrl,
+        std::bind(&CloudModuleUrlFetcher::onHttpClientDone, this, _1));
+}
+
+void CloudModuleUrlFetcher::addAdditionalHttpHeaderForGetRequest(
+    nx::String name, nx::String value)
+{
+    m_additionalHttpHeadersForGetRequest.emplace_back(name, value);
 }
 
 void CloudModuleUrlFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr client)

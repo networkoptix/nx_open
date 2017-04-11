@@ -88,7 +88,10 @@ protected:
     virtual void handleRemotePeerLost(const ec2::ApiPeerAliveData &data);
 
     virtual void onGotInitialNotification(const ec2::ApiFullInfoData& fullData);
-    virtual void onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) = 0;
+    virtual void onResourceStatusChanged(
+        const QnResourcePtr &resource,
+        Qn::ResourceStatus status,
+        ec2::NotificationSource source) = 0;
     virtual void execBusinessActionInternal(const QnAbstractBusinessActionPtr& /*action*/) {}
 
     void resetResourceTypes(const ec2::ApiResourceTypeDataList& resTypes);
@@ -114,10 +117,11 @@ private slots:
     void on_remotePeerFound(const ec2::ApiPeerAliveData& data);
     void on_remotePeerLost(const ec2::ApiPeerAliveData& data);
 
-    void on_resourceStatusChanged(const QnUuid &resourceId, Qn::ResourceStatus status );
+    void on_resourceStatusChanged(const QnUuid &resourceId, Qn::ResourceStatus status, ec2::NotificationSource source);
     void on_resourceParamChanged(const ec2::ApiResourceParamWithRefData& param );
     void on_resourceParamRemoved(const ec2::ApiResourceParamWithRefData& param );
     void on_resourceRemoved(const QnUuid& resourceId );
+    void on_resourceStatusRemoved(const QnUuid& resourceId);
 
     void on_accessRightsChanged(const ec2::ApiAccessRightsData& accessRights);
     void on_userRoleChanged(const ec2::ApiUserRoleData& userRole);

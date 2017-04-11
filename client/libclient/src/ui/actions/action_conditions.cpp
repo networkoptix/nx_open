@@ -32,6 +32,8 @@
 
 #include <client/client_settings.h>
 
+#include <network/cloud_url_validator.h>
+
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
 #include <recording/time_period.h>
@@ -41,7 +43,6 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
 #include <ui/workbench/workbench.h>
-#include <ui/workbench/workbench_auto_starter.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
@@ -49,6 +50,8 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/dialogs/ptz_manage_dialog.h>
+
+#include <nx/vms/utils/platform/autorun.h>
 
 #include "action_parameter_types.h"
 #include "action_manager.h"
@@ -790,8 +793,8 @@ Qn::ActionVisibility QnTreeNodeTypeCondition::check(const QnActionParameters &pa
     if (parameters.hasArgument(Qn::NodeTypeRole))
     {
         Qn::NodeType nodeType = parameters.argument(Qn::NodeTypeRole).value<Qn::NodeType>();
-        return m_nodeTypes.contains(nodeType) 
-            ? Qn::EnabledAction 
+        return m_nodeTypes.contains(nodeType)
+            ? Qn::EnabledAction
             : Qn::InvisibleAction;
     }
     return Qn::EnabledAction;
@@ -969,10 +972,6 @@ Qn::ActionVisibility QnChangeResolutionActionCondition::check(const QnActionPara
         return Qn::InvisibleAction;
 
     return Qn::EnabledAction;
-}
-
-Qn::ActionVisibility QnShowcaseActionCondition::check(const QnActionParameters &) {
-    return qnSettings->isShowcaseEnabled() ? Qn::EnabledAction : Qn::InvisibleAction;
 }
 
 Qn::ActionVisibility QnPtzActionCondition::check(const QnActionParameters &parameters) {
@@ -1158,6 +1157,9 @@ Qn::ActionVisibility QnDetachFromVideoWallActionCondition::check(const QnActionP
     if (!context()->user() || parameters.videoWallItems().isEmpty())
         return Qn::InvisibleAction;
 
+    if (qnCommon->isReadOnly())
+        return Qn::InvisibleAction;
+
     foreach (const QnVideoWallItemIndex &index, parameters.videoWallItems()) {
         if (index.isNull())
             continue;
@@ -1245,7 +1247,7 @@ Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParamet
 
 Qn::ActionVisibility QnAutoStartAllowedActionCodition::check(const QnActionParameters &parameters) {
     Q_UNUSED(parameters)
-    if(!context()->instance<QnWorkbenchAutoStarter>()->isSupported())
+    if (!nx::vms::utils::isAutoRunSupported())
         return Qn::InvisibleAction;
     return Qn::EnabledAction;
 }
@@ -1334,4 +1336,36 @@ Qn::ActionVisibility QnFakeServerActionCondition::check(const QnResourceList &re
             return Qn::InvisibleAction;
     }
     return found ? Qn::EnabledAction : Qn::InvisibleAction;
+}
+
+QnCloudServerActionCondition::QnCloudServerActionCondition(Qn::MatchMode matchMode, QObject* parent):
+    QnActionCondition(parent),
+    m_matchMode(matchMode)
+{
+}
+
+Qn::ActionVisibility QnCloudServerActionCondition::check(const QnResourceList& resources)
+{
+    auto isCloudServer = [](const QnResourcePtr& resource)
+        {
+            return nx::network::isCloudServer(resource.dynamicCast<QnMediaServerResource>());
+        };
+
+    bool success = false;
+    switch (m_matchMode)
+    {
+        case Qn::Any:
+            success = any_of(resources, isCloudServer);
+            break;
+        case Qn::All:
+            success = all_of(resources, isCloudServer);
+            break;
+        case Qn::ExactlyOne:
+            success = (boost::count_if(resources, isCloudServer) == 1);
+            break;
+        default:
+            break;
+    }
+
+    return success ? Qn::EnabledAction : Qn::InvisibleAction;
 }

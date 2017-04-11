@@ -214,7 +214,7 @@ api::ResultCode AuthenticationManager::authenticateInDataManagers(
 
     for (AbstractAuthenticationDataProvider* authDataProvider: m_authDataProviders)
     {
-        std::promise<api::ResultCode> authPromise;
+        nx::utils::promise<api::ResultCode> authPromise;
         auto authFuture = authPromise.get_future();
         authDataProvider->authenticateByName(
             username,

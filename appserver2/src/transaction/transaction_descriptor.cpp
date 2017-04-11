@@ -130,7 +130,7 @@ struct InvalidGetHashHelper
     template<typename Param>
     QnUuid operator ()(const Param &)
     {
-        NX_ASSERT(0, Q_FUNC_INFO, "Invalid transaction for hash!");
+        // NX_ASSERT(0, Q_FUNC_INFO, "Invalid transaction for hash!");
         return QnUuid();
     }
 };
@@ -243,6 +243,7 @@ void apiIdDataTriggerNotificationHelper(const QnTransaction<ApiIdData> &tran, co
         case ApiCommand::removeServerUserAttributes:
             return notificationParams.mediaServerNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::removeResource:
+        case ApiCommand::removeResourceStatus:
             return notificationParams.resourceNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::removeCamera:
             return notificationParams.cameraNotificationManager->triggerNotification(tran, notificationParams.source);
@@ -264,7 +265,6 @@ void apiIdDataTriggerNotificationHelper(const QnTransaction<ApiIdData> &tran, co
             return notificationParams.cameraNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::forcePrimaryTimeServer:
         case ApiCommand::removeAccessRights:
-        case ApiCommand::removeResourceStatus:
             //#ak no notification needed
             break;
         default:
@@ -558,6 +558,25 @@ struct ModifyResourceAccess
 
     bool isRemove;
 };
+
+struct ModifyCameraDataAccess
+{
+    bool operator()(const Qn::UserAccessData& accessData, const ApiCameraData& param)
+    {
+        if (!hasSystemAccess(accessData))
+        {
+            if (!param.physicalId.isEmpty() && !param.id.isNull())
+            {
+                auto expectedId = ApiCameraData::physicalIdToId(param.physicalId);
+                if (expectedId != param.id)
+                    return false;
+            }
+        }
+
+        return ModifyResourceAccess(/*isRemove*/ false)(accessData, param);
+    }
+};
+
 
 template<typename Param>
 void applyColumnFilter(const Qn::UserAccessData& /*accessData*/, Param& /*data*/) {}
@@ -881,7 +900,7 @@ struct RemoveUserRoleAccess
     }
 };
 
-struct ControlVideowallAccess
+struct VideoWallControlAccess
 {
     bool operator()(const Qn::UserAccessData& accessData, const ApiVideowallControlMessageData&)
     {

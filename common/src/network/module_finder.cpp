@@ -275,7 +275,9 @@ Qn::ResourceStatus QnModuleFinder::moduleStaus(const QnUuid &id) const
     return m_moduleItemById.value(id).status;
 }
 
-void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInformation, const SocketAddress &endpoint)
+void QnModuleFinder::at_responseReceived(
+    const QnModuleInformation &moduleInformation,
+    const SocketAddress &endpoint, const HostAddress &ip)
 {
     if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(moduleInformation.id))
         return;
@@ -422,15 +424,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
     int count = item.addresses.size();
     item.addresses.insert(endpoint);
     m_idByAddress[endpoint] = moduleInformation.id;
-    const auto cloudModuleId = moduleInformation.cloudId();
-    if (!cloudModuleId.isEmpty())
-    {
-        auto& resolver = nx::network::SocketGlobals::addressResolver();
-        if (const auto ipV4 = endpoint.address.ipV4())
-            resolver.addFixedAddress(cloudModuleId, SocketAddress(*ipV4, endpoint.port));
-        else if (const auto ipV6 = endpoint.address.ipV6())
-            resolver.addFixedAddress(cloudModuleId, SocketAddress(*ipV6, endpoint.port));
-    }
+    updateAddressResolver(moduleInformation.cloudId(), endpoint, &ip);
 
     if (count < item.addresses.size()) {
         if (!ignoredAddress && isBetterAddress(endpoint.address, item.primaryAddress.address)) {
@@ -535,9 +529,7 @@ void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem, 
            .arg(moduleInformation.id.toString()).arg(address.address.toString()).arg(moduleInformation.port), cl_logDEBUG2);
 
     emit moduleAddressLost(moduleInformation, address);
-    nx::network::SocketGlobals::addressResolver().removeFixedAddress(
-        moduleInformation.cloudId(), address);
-
+    updateAddressResolver(moduleInformation.cloudId(), address, nullptr);
     if (!it->addresses.isEmpty())
         return;
 
@@ -622,6 +614,27 @@ void QnModuleFinder::removeModule(const QnUuid &id)
         NX_LOG(lit("QnModuleFinder::removeModule(%1). Removing address %2")
             .arg(id.toString()).arg(address.toString()), cl_logDEBUG2);
         removeAddress(address, false);
+    }
+}
+
+void QnModuleFinder::updateAddressResolver(
+    const QString& cloudModuleId, const SocketAddress& endpoint, const HostAddress* ip)
+{
+    auto& resolver = nx::network::SocketGlobals::addressResolver();
+    if (cloudModuleId.isEmpty())
+        return;
+
+    const auto ipIterator = m_ipByAddress.find(endpoint);
+    if (ipIterator != m_ipByAddress.end() && (ip == nullptr || ipIterator.value() != *ip))
+    {
+        resolver.removeFixedAddress(cloudModuleId, SocketAddress(ipIterator.value(), endpoint.port));
+        m_ipByAddress.remove(endpoint);
+    }
+
+    if (ip)
+    {
+        resolver.addFixedAddress(cloudModuleId, SocketAddress(*ip, endpoint.port));
+        m_ipByAddress.insert(endpoint, *ip);
     }
 }
 

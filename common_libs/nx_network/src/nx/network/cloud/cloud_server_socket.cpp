@@ -80,7 +80,7 @@ CloudServerSocket::CloudServerSocket(
     m_acceptQueueLen(kDefaultAcceptQueueSize),
     m_state(State::init)
 {
-    m_mediatorConnection->bindToAioThread(getAioThread());
+    bindToAioThread(getAioThread());
 
     // TODO: #mu default values for m_socketAttributes shall match default
     //           system vales: think how to implement this...
@@ -401,7 +401,7 @@ void CloudServerSocket::onListenRequestCompleted(
         const auto keepAliveOptions = response.tcpConnectionKeepAlive
             ? *response.tcpConnectionKeepAlive : kDefaultKeepAlive;
 
-        if (response.cloudConnectVersion >= hpm::api::CloudConnectVersion::serverChecksOwnState)
+        if (response.cloudConnectOptions.testFlag(hpm::api::serverChecksConnectionState))
             m_mediatorConnection->monitorListeningState(keepAliveOptions.maxDelay());
         else
             m_mediatorConnection->client()->setKeepAliveOptions(keepAliveOptions);

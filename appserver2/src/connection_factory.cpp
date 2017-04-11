@@ -81,13 +81,8 @@ void Ec2DirectConnectionFactory::pleaseStop()
 
 void Ec2DirectConnectionFactory::join()
 {
-    QnMutexLocker lk(&m_mutex);
-    while(m_runningRequests > 0)
-    {
-        lk.unlock();
-        QThread::msleep(1000);
-        lk.relock();
-    }
+    // Cancelling all ongoing requests.
+    m_remoteQueryProcessor.pleaseStopSync();
 }
 
 // Implementation of AbstractECConnectionFactory::testConnectionAsync
@@ -450,7 +445,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value FP_Low Low priority against other cameras.
      *     %value FP_Medium Medium priority against other cameras.
      *     %value FP_High High priority against other cameras.
-     * %param backupType Combination (via "|") of flags defining backup options.
+     * %param backupType Combination (via "|") of the flags defining backup options.
      *     %value CameraBackup_Disabled Backup is disabled.
      *     %value CameraBackup_HighQuality Backup is in high quality.
      *     %value CameraBackup_LowQuality Backup is in low quality.
@@ -553,7 +548,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value FP_Low Low priority against other cameras.
      *     %value FP_Medium Medium priority against other cameras.
      *     %value FP_High High priority against other cameras.
-     * %param backupType Combination (via "|") of flags defining backup options.
+     * %param backupType Combination (via "|") of the flags defining backup options.
      *     %value CameraBackup_Disabled Backup is disabled.
      *     %value CameraBackup_HighQuality Backup is in high quality.
      *     %value CameraBackup_LowQuality Backup is in low quality.
@@ -654,7 +649,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value FP_Low Low priority against other cameras.
      *         %value FP_Medium Medium priority against other cameras.
      *         %value FP_High High priority against other cameras.
-     *     %param backupType Combination (via "|") of flags defining backup options.
+     *     %param backupType Combination (via "|") of the flags defining backup options.
      *         %value CameraBackup_Disabled Backup is disabled.
      *         %value CameraBackup_HighQuality Backup is in high quality.
      *         %value CameraBackup_LowQuality Backup is in low quality.
@@ -793,7 +788,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value FP_Low Low priority against other cameras.
      *         %value FP_Medium Medium priority against other cameras.
      *         %value FP_High High priority against other cameras.
-     *     %param backupType Combination (via "|") of flags defining backup options.
+     *     %param backupType Combination (via "|") of the flags defining backup options.
      *         %value CameraBackup_Disabled Backup is disabled.
      *         %value CameraBackup_HighQuality Backup is in high quality.
      *         %value CameraBackup_LowQuality Backup is in low quality.
@@ -815,12 +810,12 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     /**%apidoc GET /ec2/getStorages
      * Read the list of current storages.
      * %param[default] format
-     * %param[opt] id Server unique id. If omitted, return storages for all servers.
+     * %param[opt] id Parent server unique id. If omitted, return storages for all servers.
      * %return List of storages.
      *     %param id Storage unique id.
-     *     %param parentId Is empty.
+     *     %param parentId Id of a server to which the storage belongs.
      *     %param name Storage name.
-     *     %param url Is empty.
+     *     %param url Storage URL.
      *     %param spaceLimit Storage space to leave free on the storage,
      *         in bytes.
      *     %param usedForWriting Whether writing to the storage is allowed.
@@ -830,7 +825,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value local
      *         %value smb
      *     %param addParams List of storage additional parameters.
-     *         Intended for internal use; leave empty when creating a new storage.
+     *         Intended for internal use.
      *     %param isBackup Whether the storage is used for backup.
      *         %value false
      *         %value true
@@ -1629,40 +1624,42 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
             nx_http::getHeaderValue(response->headers, Qn::EFFECTIVE_USER_NAME_HEADER_NAME);
     }
 
-    if (!loginInfo.clientInfo.id.isNull())
-    {
-        auto clientInfo = loginInfo.clientInfo;
-        clientInfo.parentId = qnCommon->moduleGUID();
-
-        ApiClientInfoDataList infoList;
-        auto result = dbManager(Qn::kSystemAccess).doQuery(clientInfo.id, infoList);
-        if (result != ErrorCode::ok)
-            return result;
-
-        if (infoList.size() > 0
-            && QJson::serialized(clientInfo) == QJson::serialized(infoList.front()))
+    #ifdef ENABLE_EXTENDED_STATISTICS
+        if (!loginInfo.clientInfo.id.isNull())
         {
-            NX_LOG(lit("Ec2DirectConnectionFactory: New client had already been registered with the same params"),
-                cl_logDEBUG2);
-            return ErrorCode::ok;
-        }
+            auto clientInfo = loginInfo.clientInfo;
+            clientInfo.parentId = qnCommon->moduleGUID();
 
-        m_serverQueryProcessor.getAccess(Qn::kSystemAccess).processUpdateAsync(
-            ApiCommand::saveClientInfo, clientInfo,
-            [&](ErrorCode result)
+            ApiClientInfoDataList infoList;
+            auto result = dbManager(Qn::kSystemAccess).doQuery(clientInfo.id, infoList);
+            if (result != ErrorCode::ok)
+                return result;
+
+            if (infoList.size() > 0
+                && QJson::serialized(clientInfo) == QJson::serialized(infoList.front()))
             {
-                if (result == ErrorCode::ok)
+                NX_LOG(lit("Ec2DirectConnectionFactory: New client had already been registered with the same params"),
+                    cl_logDEBUG2);
+                return ErrorCode::ok;
+            }
+
+            m_serverQueryProcessor.getAccess(Qn::kSystemAccess).processUpdateAsync(
+                ApiCommand::saveClientInfo, clientInfo,
+                [&](ErrorCode result)
                 {
-                    NX_LOG(lit("Ec2DirectConnectionFactory: New client has been registered"),
-                        cl_logINFO);
-                }
-                else
-                {
-                    NX_LOG(lit("Ec2DirectConnectionFactory: New client transaction has failed %1")
-                        .arg(toString(result)), cl_logERROR);
-                }
-            });
-    }
+                    if (result == ErrorCode::ok)
+                    {
+                        NX_LOG(lit("Ec2DirectConnectionFactory: New client has been registered"),
+                            cl_logINFO);
+                    }
+                    else
+                    {
+                        NX_LOG(lit("Ec2DirectConnectionFactory: New client transaction has failed %1")
+                            .arg(toString(result)), cl_logERROR);
+                    }
+                });
+        }
+    #endif
 
     return ErrorCode::ok;
 }

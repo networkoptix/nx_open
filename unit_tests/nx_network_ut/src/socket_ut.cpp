@@ -23,24 +23,24 @@
 #include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/test_options.h>
 
+#include <utils/common/guard.h>
+
 namespace nx {
 namespace network {
 namespace test {
 
-namespace
-{
-    const int SECONDS_TO_WAIT_AFTER_TEST = 5;
+namespace {
+
+const int SECONDS_TO_WAIT_AFTER_TEST = 5;
+
 }
 
-/*!
-    This test verifies that AbstractCommunicatingSocket::cancelAsyncIO method works fine
-*/
-TEST( Socket, AsyncOperationCancellation )
+static void runCancelAsyncIOTest()
 {
-    static const std::chrono::milliseconds TEST_DURATION( 200 );
+    static const std::chrono::milliseconds TEST_DURATION(200);
     static const int TEST_RUNS = 8;
     static const int MAX_SIMULTANEOUS_CONNECTIONS = 100;
-    static const int BYTES_TO_SEND_THROUGH_CONNECTION = 1*1024;
+    static const int BYTES_TO_SEND_THROUGH_CONNECTION = 1 * 1024;
 
     const QString kTestHost = QLatin1String("some-test-host-456233.com");
     std::vector<HostAddress> kTestAddresses;
@@ -50,22 +50,22 @@ TEST( Socket, AsyncOperationCancellation )
 
     auto& dnsResolver = SocketGlobals::addressResolver().dnsResolver();
     dnsResolver.addEtcHost(kTestHost, kTestAddresses);
-    auto onExit = [&]( void* ) { dnsResolver.removeEtcHost(kTestHost); };
-    std::unique_ptr<void, decltype(onExit)> guard(this, std::move(onExit));
 
-    for( int i = 0; i < TEST_RUNS; ++i )
+    auto onExit = makeScopedGuard([&]() { dnsResolver.removeEtcHost(kTestHost); });
+
+    for (int i = 0; i < TEST_RUNS; ++i)
     {
         std::vector<HostAddress> kConnectAddresses;
         kConnectAddresses.push_back(HostAddress("localhost"));
         kConnectAddresses.push_back(kTestHost);
-        for (const auto host: kConnectAddresses)
+        for (const auto host : kConnectAddresses)
         {
             RandomDataTcpServer server(
                 TestTrafficLimitType::none,
                 BYTES_TO_SEND_THROUGH_CONNECTION,
                 SocketFactory::isSslEnforced()
-                    ? TestTransmissionMode::pong
-                    : TestTransmissionMode::spam);
+                ? TestTransmissionMode::pong
+                : TestTransmissionMode::spam);
             ASSERT_TRUE(server.start());
 
             ConnectionsGenerator connectionsGenerator(
@@ -84,7 +84,22 @@ TEST( Socket, AsyncOperationCancellation )
     }
 
     //waiting for some calls to deleted objects
-    QThread::sleep( SECONDS_TO_WAIT_AFTER_TEST );
+    QThread::sleep(SECONDS_TO_WAIT_AFTER_TEST);
+}
+
+TEST(Socket, AsyncOperationCancellation)
+{
+    runCancelAsyncIOTest();
+}
+
+TEST(SslSocket, AsyncOperationCancellation)
+{
+    const auto isSslEnforcedBak = SocketFactory::isSslEnforced();
+    SocketFactory::enforceSsl(true);
+
+    runCancelAsyncIOTest();
+
+    SocketFactory::enforceSsl(isSslEnforcedBak);
 }
 
 TEST(Socket, postCancellation)

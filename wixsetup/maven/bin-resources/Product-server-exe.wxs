@@ -14,6 +14,7 @@
             DisableModify="yes">
         <util:RegistrySearchRef Id='SearchForIsConnectedToCloud' />
         <util:RegistrySearchRef Id='ArchRegistrySearch' />
+        <util:ProductSearchRef Id='ServerMsiVersion' />
 
         <Variable Name="InstallServerOnly" Type="numeric" Value="1" />
 
@@ -30,8 +31,10 @@
                 LicenseUrl="License.html" />
         </BootstrapperApplicationRef>
 
+        <Variable Name="InstallerTitle" Value="!(loc.InstallerTitleServerOnly)" />
+
         <WixVariable Id="WixExtbaThemeXml" Value="OptixTheme.xml" />
-        <WixVariable Id="WixExtbaThemeWxl" Value="OptixThemeServer.wxl" />
+        <WixVariable Id="WixExtbaThemeWxl" Value="OptixTheme_$(var.installerLanguage).wxl" />
 
         <Chain DisableSystemRestore="yes">
             <PackageGroupRef Id="ServerPackageGroup"/>

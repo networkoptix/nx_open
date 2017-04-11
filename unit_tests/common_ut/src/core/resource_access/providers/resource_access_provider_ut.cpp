@@ -214,3 +214,38 @@ TEST_F(QnResourceAccessProviderTest, checkAccessProviders)
     accessProvider()->accessibleVia(user, camera, &providers);
     ASSERT_EQ(expectedProviders, providers);
 }
+
+
+TEST_F(QnResourceAccessProviderTest, checkAccessLevels)
+{
+    auto camera = addCamera();
+
+    auto sharedLayout = addLayout();
+    QnLayoutItemData layoutItem;
+    layoutItem.resource.id = camera->getId();
+    sharedLayout->addItem(layoutItem);
+
+    auto videoWall = addVideoWall();
+    auto videoWallLayout = addLayoutForVideoWall(videoWall);
+    videoWallLayout->addItem(layoutItem);
+
+    QSet<QnAbstractResourceAccessProvider::Source> expectedLevels;
+    expectedLevels << QnAbstractResourceAccessProvider::Source::videowall;
+    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+
+    ASSERT_EQ(expectedLevels, accessProvider()->accessLevels(user, camera));
+
+    auto sharedIds = QSet<QnUuid>() << sharedLayout->getId();
+    qnSharedResourcesManager->setSharedResources(user, sharedIds);
+    expectedLevels << QnAbstractResourceAccessProvider::Source::layout;
+    ASSERT_EQ(expectedLevels, accessProvider()->accessLevels(user, camera));
+
+    sharedIds << camera->getId();
+    qnSharedResourcesManager->setSharedResources(user, sharedIds);
+    expectedLevels << QnAbstractResourceAccessProvider::Source::shared;
+    ASSERT_EQ(expectedLevels, accessProvider()->accessLevels(user, camera));
+
+    user->setRawPermissions(Qn::GlobalAdminPermission);
+    expectedLevels << QnAbstractResourceAccessProvider::Source::permissions;
+    ASSERT_EQ(expectedLevels, accessProvider()->accessLevels(user, camera));
+}

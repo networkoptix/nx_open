@@ -3,6 +3,7 @@
 #include <memory>
 
 #include <QtWidgets/QApplication>
+#include <QtWebKit/QWebSettings>
 
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
@@ -14,6 +15,8 @@
 #include <nx/utils/crash_dump/systemexcept.h>
 
 #include <camera/camera_bookmarks_manager.h>
+
+#include <client_core/client_core_settings.h>
 
 #include <client/client_app_info.h>
 #include <client/client_settings.h>
@@ -27,7 +30,8 @@
 #include <client/forgotten_systems_manager.h>
 #include <client/startup_tile_manager.h>
 #include <client/client_settings_watcher.h>
-#include <client_core/client_core_settings.h>
+#include <client/client_show_once_settings.h>
+#include <client/client_autorun_watcher.h>
 
 #include <cloud/cloud_connection.h>
 
@@ -52,7 +56,6 @@
 #include <nx/utils/log/log.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/ec2_lib.h>
-#include <nx_speech_synthesizer/text_to_wav.h>
 
 #include <platform/platform_abstraction.h>
 
@@ -166,12 +169,17 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     initNetwork(startupParams);
     initSkin(startupParams);
     initLocalResources(startupParams);
+
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
+    QWebSettings::globalSettings()->enablePersistentStorage();
 }
 
 QnClientModule::~QnClientModule()
 {
-    if (QnResourceDiscoveryManager::instance())
-        QnResourceDiscoveryManager::instance()->stop();
+    // Stop all long runnables before deinitializing singletons. Pool may not exist in update mode.
+    if (auto longRunnablePool = QnLongRunnablePool::instance())
+        longRunnablePool->stopAll();
+
     QnResource::stopAsyncTasks();
 
     QNetworkProxyFactory::setApplicationProxyFactory(nullptr);
@@ -225,7 +233,6 @@ void QnClientModule::startLocalSearchers()
 void QnClientModule::initMetaInfo()
 {
     Q_INIT_RESOURCE(appserver2);
-    Q_INIT_RESOURCE(libclient_core);
     Q_INIT_RESOURCE(libclient);
     QnClientMetaTypes::initialize();
 }
@@ -265,8 +272,14 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     /* Depends on QnClientSettings. */
     auto clientInstanceManager = common->store(new QnClientInstanceManager());
 
-    /* Depends on QnClientSettings and QnClientInstanceManager, never used by anyone else. */
+    /* Depends on nothing. */
+    common->store(new QnClientShowOnceSettings());
+
+    /* Depends on QnClientSettings, QnClientInstanceManager and QnClientShowOnceSettings, never used directly. */
     common->store(new QnClientSettingsWatcher());
+
+    /* Depends on QnClientSettings, never used directly. */
+    common->store(new QnClientAutoRunWatcher());
 
     common->setModuleGUID(clientInstanceManager->instanceGuid());
     nx::network::SocketGlobals::outgoingTunnelPool()
@@ -307,14 +320,9 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
 #ifdef Q_OS_WIN
     common->store(new QnIexploreUrlHandler());
+#endif
+
     common->store(new QnQtbugWorkaround());
-#endif
-
-#ifndef DISABLE_FESTIVAL
-    auto textToWaveServer = qnCommon->store(new TextToWaveServer());
-    textToWaveServer->start();
-#endif
-
     common->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
 }
 
@@ -391,6 +399,19 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
             : startupParams.videoWallItemGuid.toString();
         logFileNameSuffix.replace(QRegExp(QLatin1String("[{}]")), QLatin1String("_"));
     }
+    else if (startupParams.selfUpdateMode)
+    {
+        // we hope self-updater will run only once per time and will not overflow log-file
+        // qnClientInstanceManager is not initialized in self-update mode
+        logFileNameSuffix = lit("self_update");
+    }
+    else if (qnClientInstanceManager && qnClientInstanceManager->isValid())
+    {
+        int idx = qnClientInstanceManager->instanceIndex();
+        if (idx > 0)
+            logFileNameSuffix = L'_' + QString::number(idx) + L'_';
+    }
+
 
     static const int DEFAULT_MAX_LOG_FILE_SIZE = 10 * 1024 * 1024;
     static const int DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;

@@ -10,7 +10,7 @@
 //!VMS Camera Integration Plugin API (c++)
 /*!
     Contains structures and abstract classes to be implemented in real plugin.
-    
+
     \par Following interfaces can be implemented by plugin:
     - \a nxcip::CameraDiscoveryManager. Mandatory. Used to discover camera and instanciate \a nxcip::BaseCameraManager
     - \a nxcip::BaseCameraManager. Mandatory. Used to get camera properties and get pointers to other interfaces
@@ -20,7 +20,7 @@
 
     \note all text values are NULL-terminated utf-8
     \note If not specified in interface's description, plugin interfaces are used in multithreaded environment the following way:\n
-        - single interface instance is never used concurrently by multiple threads, but different instances of the same interface 
+        - single interface instance is never used concurrently by multiple threads, but different instances of the same interface
             (e.g., \a nxcip::BaseCameraManager) can be used by different threads concurrently
 */
 namespace nxcip
@@ -95,12 +95,12 @@ namespace nxcip
 
     //!This interface is used to find cameras and create \a BaseCameraManager instance
     /*!
-        Mediaserver has built-in UPNP & MDNS support, plugin needs only implement \a nxcip::CameraDiscoveryManager::fromUpnpData or 
+        Mediaserver has built-in UPNP & MDNS support, plugin needs only implement \a nxcip::CameraDiscoveryManager::fromUpnpData or
         \a nxcip::CameraDiscoveryManager::fromMDNSData method.
         If camera do support neither UPNP nor MDNS, plugin can provide its own search method by implementing \a nxcip::CameraDiscoveryManager::findCameras
 
         In case camera is supported by multiple plugins, plugin to use is selected under following rules:\n
-        - each received MDNS and UPNP response packet is first processed by plugins, then by built-in drivers. 
+        - each received MDNS and UPNP response packet is first processed by plugins, then by built-in drivers.
             Plugins are iterated in vendor name (\a nxcip::CameraDiscoveryManager::getVendorName) ascending order
         - it is undefined when \a CameraDiscoveryManager::findCameras is called (with regard to mdns and upnp search)
         - plugin can reserve model name(s) by implementing nxcip::CameraDiscoveryManager::getReservedModelList so that built-in drivers do not process cameras with that name
@@ -177,17 +177,17 @@ namespace nxcip
 
         //!Get model names, reserved by the plugin
         /*!
-            For example, let camera support ONVIF, and plugin uses native API. In this case, plugin MUST implement this function and reserve model name, 
+            For example, let camera support ONVIF, and plugin uses native API. In this case, plugin MUST implement this function and reserve model name,
             provided by onvif implementation. Also, CameraDiscoveryManager::getVendorName MUST be same as ONVIF vendor anem
 
             \param[out] modelList        Array of \a char* buffers of size \a MAX_MODEL_NAME_SIZE where camera model names will be written. May be NULL.
-            \param[in, out] count        A pointer to a variable that specifies the size of array pointed to by the \a modelList parameter. 
+            \param[in, out] count        A pointer to a variable that specifies the size of array pointed to by the \a modelList parameter.
                                           When the function returns, this variable contains the number of model names copied to \a modelList.
-                                          If the buffer specified by \a modelList parameter is not large enough to hold the data, 
-                                          the function returns NX_MORE_DATA and stores the required buffer size in the variable pointed to by \a count. 
+                                          If the buffer specified by \a modelList parameter is not large enough to hold the data,
+                                          the function returns NX_MORE_DATA and stores the required buffer size in the variable pointed to by \a count.
                                           In this case, the contents of the \a modelList array are undefined.
             \return \a NX_MORE_DATA if input buffer size is not sufficient
-        */         
+        */
         virtual int getReservedModelList( char** modelList, int* count ) = 0;
     };
 
@@ -475,7 +475,7 @@ namespace nxcip
 
         //!Enumeration of supported camera capabilities (bit flags)
         enum CameraCapability
-        { 
+        {
             hardwareMotionCapability            = 0x0001,     //!< camera supports hardware motion. Plugin, returning this flag, MUST implement \a BaseCameraManager::nativeMediaStreamCapability also
             relayInputCapability                = 0x0002,     //!< if this flag is enabled, \a CameraRelayIOManager MUST be implemented
             relayOutputCapability               = 0x0004,     //!< if this flag is enabled, \a CameraRelayIOManager MUST be implemented
@@ -520,7 +520,7 @@ namespace nxcip
         /*!
             \note Increases \a CameraMotionDataProvider instance reference counter
             \note Most likely will return same pointer on multiple requests
-            \deprecated To receive motion data, use 
+            \deprecated To receive motion data, use
         */
         virtual CameraMotionDataProvider* getCameraMotionDataProvider() const = 0;
         //!MUST return not-NULL if \a BaseCameraManager::relayInputCapability is present
@@ -605,7 +605,7 @@ namespace nxcip
     {
     public:
         /*!
-            monochrome (format \a nxcip::AV_PIX_FMT_MONOBLACK) picture of size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
+            monochrome (format \a nxcip::AV_PIX_FMT_MONOBLACK) picture of size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels,
                 1-bit designates that pixel MUST take part in motion search. Dimensions of this data are not
                 the same as those of video picture. Motion data just designates video frame regions that are of interest.
                 If \a motionMask is NULL, then whole picture is of interest
@@ -649,7 +649,7 @@ namespace nxcip
     public:
         //!Enumeration of supported camera capabilities (bit flags)
         enum CameraCapability2
-        { 
+        {
             searchByMotionMaskCapability = 0x1000,  //!<if present, \a nxcip::BaseCameraManager2::find supports \a ArchiveSearchOptions::motionMask()
             motionRegionCapability = 0x2000         //!<if present, \a nxcip::BaseCameraManager3::setMotionMask is implemented
         };
@@ -674,10 +674,10 @@ namespace nxcip
         virtual int find( ArchiveSearchOptions* searchOptions, TimePeriods** timePeriods ) const = 0;
         //!If camera plugin implements this method, it MUST report motion only on for region specified (\a motionMask)
         /*!
-            \param motionMask 8bpp (format \a nxcip::AV_PIX_FMT_GRAY8) picture of size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
+            \param motionMask 8bpp (format \a nxcip::AV_PIX_FMT_GRAY8) picture of size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels,
                 pixel value designates motion sensitivity for pixel position.
-                255 - no motion for pixel coordinates(aka motion mask), 0 - maximum possible motion sensitivity. 
-                For instance: motion detection algorithm may use this value to compare absolute difference between pixels of Y plane in subsequent frames. 
+                255 - no motion for pixel coordinates(aka motion mask), 0 - maximum possible motion sensitivity.
+                For instance: motion detection algorithm may use this value to compare absolute difference between pixels of Y plane in subsequent frames.
                 If difference is less then value in a mask, motion is not detected.
             \warning motion mask is rotated by 90 degrees clock-wise! That means, \a motionMask is actually \a nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT pixels wide and
                 \a nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH pixels in height
@@ -701,7 +701,7 @@ namespace nxcip
     {
     public:
         enum CameraCapability3
-        { 
+        {
             cameraParamsPersistentCapability   = 0x0800,    //!< Camera parameters can be read/set even if camera is not accessible at the moment
         };
 
@@ -713,8 +713,7 @@ namespace nxcip
         virtual const char* getParametersDescriptionXML() const = 0;
         //!Reads value of parameter \a paramName
         /*!
-            \param paramName \0-terminated utf-8 string specifing name of parameter.
-                This is a full name. I.e., if parameter belongs to some group, then /group_name/param_name is specified here
+            \param paramName \0-terminated utf-8 string specifing unique id of the parameter.
             \param valueBufSize IN: Length of \a valueBuf, OUT: length of string value not including \0-character
             \return\n
                 - \a NX_NO_ERROR if value loaded to value buf. Value is always \0-terminated utf8 string
@@ -724,8 +723,7 @@ namespace nxcip
         virtual int getParamValue( const char* paramName, char* valueBuf, int* valueBufSize ) const = 0;
         //!Set value of parameter \a paramName to \a value
         /*!
-            \param paramName \0-terminated utf-8 string specifing name of parameter.
-                This is a full name. I.e., if parameter belongs to some group, then /group_name/param_name is specified here
+            \param paramName \0-terminated utf-8 string specifing unique id of the parameter.
             \param value \0-terminated utf8 string
             \return\n
                 - \a NX_NO_ERROR if value successfully applied
@@ -750,7 +748,7 @@ namespace nxcip
         - Absolute PTZ. Manager must additionally support absolute positioning.
           This adds support for saved positions and tours.
         - Advanced PTZ. Manager must additionally support absolute positioning in
-          logical space --- that is, in degrees for pan, tilt and fov. 
+          logical space --- that is, in degrees for pan, tilt and fov.
           On this support level user can zoom in by selecting a region on an
           image from camera and can center the camera on an object by clicking on it.
 
@@ -771,11 +769,11 @@ namespace nxcip
             ContinuousPanCapability             = 0x00000001,   //!< Camera supports continuous pan.
             ContinuousTiltCapability            = 0x00000002,   //!< Camera supports continuous tilt.
             ContinuousZoomCapability            = 0x00000004,   //!< Camera supports continuous zoom.
-            
+
             AbsolutePanCapability               = 0x00000010,   //!< Camera supports absolute pan.
             AbsoluteTiltCapability              = 0x00000020,   //!< Camera supports absolute tilt.
             AbsoluteZoomCapability              = 0x00000040,   //!< Camera supports absolute zoom.
-            
+
             FlipPtzCapability                   = 0x00000100,   //!< Camera supports flip state queries.
             LimitsPtzCapability                 = 0x00000200,   //!< Camera supports coordinate space limits queries.
 
@@ -811,17 +809,17 @@ namespace nxcip
         //!Returns bitset of \a Capability enumeration members.
         virtual int getCapabilities() const = 0;
 
-        //!Starts or stops continuous PTZ movement. 
+        //!Starts or stops continuous PTZ movement.
         /*!
-            Speed is specified in image-based coordinate space and all of its 
-            components are expected to be in range <tt>[-1, 1]</tt>. This means that 
-            implementation must handle flipped / mirrored state of the video stream. 
-         
+            Speed is specified in image-based coordinate space and all of its
+            components are expected to be in range <tt>[-1, 1]</tt>. This means that
+            implementation must handle flipped / mirrored state of the video stream.
+
             Passing zero in speed should stop PTZ movement.
-        
+
             This function is expected to be implemented if this controller has
             at least one of the <tt>Qn::ContinuousPtzCapabilities</tt>.
-          
+
             \param panSpeed
             \param tiltSpeed
             \param zoomSpeed
@@ -829,16 +827,16 @@ namespace nxcip
         */
         virtual int continuousMove( double panSpeed, double tiltSpeed, double zoomSpeed ) = 0;
 
-        //!Sets camera PTZ position in the given coordinate space. 
+        //!Sets camera PTZ position in the given coordinate space.
         /*!
-            Note that for the function to succeed, this controller must have a 
-            capability corresponding to the provided coordinate space, 
-            that is <tt>DevicePositioningPtzCapability</tt> or 
+            Note that for the function to succeed, this controller must have a
+            capability corresponding to the provided coordinate space,
+            that is <tt>DevicePositioningPtzCapability</tt> or
             <tt>LogicalPositioningPtzCapability</tt>.
-     
+
             This function is expected to be implemented if this controller has
             at least one of the <tt>AbsolutePtzCapabilities</tt>.
-     
+
             \param space                Coordinate space of the provided position.
             \param pan
             \param tilt
@@ -852,7 +850,7 @@ namespace nxcip
         /*!
             This function is expected to be implemented if this controller has
             at least one of the <tt>AbsolutePtzCapabilities</tt>.
-         
+
             \param space                Coordinate space to get position in.
             \param[out] pan
             \param[out] tilt
@@ -864,20 +862,20 @@ namespace nxcip
 
         //!Gets PTZ limits of the camera.
         /*!
-            This function is expected to be implemented only if this controller has 
+            This function is expected to be implemented only if this controller has
             <tt>LimitsPtzCapability<tt>.
-         
+
             \param space                Coordinate space to get limits in.
             \param[out] limits          Ptz limits.
             \returns                    NX_NO_ERROR on success, error code otherwise.
         */
         virtual int getLimits( CoordinateSpace space, Limits *limits ) = 0;
 
-        //!Gets the camera streams's flipped state. 
+        //!Gets the camera streams's flipped state.
         /*!
             This function is expected to be implemented only if this controller has
             <tt>FlipPtzCapability</tt>.
-            
+
             \param[out] flip            Flipped state of the camera's video stream,
                                         a bitset of \a Orientation enumeration members.
             \returns                    NX_NO_ERROR on success, error code otherwise.
@@ -910,7 +908,7 @@ namespace nxcip
 
     //!Portion of media data
     /*!
-        \warning Buffer returned by \a MediaDataPacket::data() MUST be \a MEDIA_PACKET_BUFFER_PADDING_SIZE larger than \a MediaDataPacket::dataSize() returns 
+        \warning Buffer returned by \a MediaDataPacket::data() MUST be \a MEDIA_PACKET_BUFFER_PADDING_SIZE larger than \a MediaDataPacket::dataSize() returns
             and this padding MUST be filled with zeros. This is required by decoder, since this buffer may (and will!) be used as decoder input
     */
     class MediaDataPacket
@@ -928,7 +926,7 @@ namespace nxcip
             fReverseBlockStart  = 0x04,
             DEPRECATED_fLowQuality = 0x08,
             /*!
-                MUST be set after each \a nxcip::DtsArchiveReader::seek, \a nxcip::DtsArchiveReader::reverseModeCapability, 
+                MUST be set after each \a nxcip::DtsArchiveReader::seek, \a nxcip::DtsArchiveReader::reverseModeCapability,
                 \a nxcip::DtsArchiveReader::setQuality to signal discontinuity in timestamp
             */
             fStreamReset        = 0x10
@@ -941,19 +939,19 @@ namespace nxcip
         //!Coded media stream data
         /*!
             Data format for different codecs:\n
-                - h.264 (\a nxcip::AV_CODEC_ID_H264): [iso-14496-10, AnnexB] byte stream. SPS and PPS MUST be available in the stream. 
+                - h.264 (\a nxcip::AV_CODEC_ID_H264): [iso-14496-10, AnnexB] byte stream. SPS and PPS MUST be available in the stream.
                     It is recommended that SPS and PPS are repeated before each group of pictures
                 - motion jpeg (\a nxcip::AV_CODEC_ID_MJPEG): Each packet is a complete jpeg picture
                 - aac (\a nxcip::AV_CODEC_ID_AAC): ADTS stream
             \return Media data. Returned buffer MUST be aligned on \a MEDIA_DATA_BUFFER_ALIGNMENT - byte boundary (this restriction helps for some optimization).
                 \a nxpt::mallocAligned and \a nxpt::freeAligned routines can be used for that purpose
-            \warning Actual buffer size MUST be \a MEDIA_PACKET_BUFFER_PADDING_SIZE larger than \a MediaDataPacket::dataSize() returns 
+            \warning Actual buffer size MUST be \a MEDIA_PACKET_BUFFER_PADDING_SIZE larger than \a MediaDataPacket::dataSize() returns
                 and this padding MUST be filled with zeros. This is required by decoder, since this buffer may (and will!) be used as decoder input
         */
         virtual const void* data() const = 0;
         //!Returns size (in bytes) of packet's data
         /*!
-            \warning Actual buffer size MUST be \a MEDIA_PACKET_BUFFER_PADDING_SIZE larger than this method returns 
+            \warning Actual buffer size MUST be \a MEDIA_PACKET_BUFFER_PADDING_SIZE larger than this method returns
                 and this padding MUST be filled with zeros. This is required by decoder, since this buffer may (and will!) be used as decoder input
         */
         virtual unsigned int dataSize() const = 0;
@@ -990,8 +988,8 @@ namespace nxcip
     public:
         //!Returns motion data. Can be NULL, if no motion
         /*!
-            Motion data is a monochrome (format \a nxcip::AV_PIX_FMT_MONOBLACK) picture of size (\a nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
-                '1' bit designates motion presence in that pixel. It is not required that motion data dimensions same as 
+            Motion data is a monochrome (format \a nxcip::AV_PIX_FMT_MONOBLACK) picture of size (\a nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels,
+                '1' bit designates motion presence in that pixel. It is not required that motion data dimensions same as
                 those of video picture. Motion data just designates regions of video picture where motion has been detected.
             \warning motion data MUST be rotated by 90 degrees clock-wise! That means, picture returned here is \a nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT pixels wide and
                 \a nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH pixels height
@@ -1010,7 +1008,7 @@ namespace nxcip
     /*!
         Provides synchronous API to receiving media stream
         \note returns stream of media data of different types (video, audio)
-        \note This class itself does not add any delay into media stream. Data is returned upon its availability. 
+        \note This class itself does not add any delay into media stream. Data is returned upon its availability.
             E.g., while reading media stream from file with 30fps, actual data rate is not limited with 30fps, but with read speed only
     */
     class StreamReader
@@ -1156,7 +1154,7 @@ namespace nxcip
             \param[out] selectedPosition Timestamp of actually selected position
             \return\n
                 - \a NX_NO_ERROR on success
-                - \a NX_NO_DATA if \a timestamp is greater than timestamp of the last frame of the archive (in case of if forward play) and 
+                - \a NX_NO_DATA if \a timestamp is greater than timestamp of the last frame of the archive (in case of if forward play) and
                     if \a timestamp is less than timestamp of the first frame of the archive (in case of reverse play)
             \note This funtionality is required
         */
@@ -1169,7 +1167,7 @@ namespace nxcip
         /*!
             If \a timestamp is not equal to \a INVALID_TIMESTAMP_VALUE, seek is performed along with playback direction change
             \param[in] cSeq New value of command sequence counter
-            \param[in] isReverse If true, playback 
+            \param[in] isReverse If true, playback
             \param[in] position if not \a INVALID_TIMESTAMP_VALUE, playback SHOULD jump to this position (with rules, defined for \a DtsArchiveReader::seek)
             \param[out] selectedPosition Timestamp of actually selected position
             \note This method is used only if \a DtsArchiveReader::reverseModeCapability is supported
@@ -1301,7 +1299,7 @@ namespace nxcip
         /*!
             Implementation MUST guarantee:\n
                 - no \a CameraInputEventHandler::inputPortStateChanged method MUST be called after this method have returned
-                - if \a CameraInputEventHandler::inputPortStateChanged is currently running in different thread, 
+                - if \a CameraInputEventHandler::inputPortStateChanged is currently running in different thread,
                     this method MUST block until \a CameraInputEventHandler::inputPortStateChanged has returned
             \note Multiple \a startInputPortMonitoring() require multiple \a stopInputPortMonitoring() call.
         */
@@ -1319,9 +1317,9 @@ namespace nxcip
             If \a handler is not registered, nothing is done
             Implementation MUST guarantee:\n
                 - no \a handler->inputPortStateChanged method MUST be called after this method have returned
-                - if \a handler->inputPortStateChanged is currently running in different thread, 
+                - if \a handler->inputPortStateChanged is currently running in different thread,
                     this method MUST block until \a handler->inputPortStateChanged has returned
-            
+
             \note \a handler->releaseRef() is not called in this method
         */
         virtual void unregisterEventHandler( CameraInputEventHandler* handler ) = 0;

@@ -66,7 +66,7 @@ angular.module('webadminApp')
         function callLogin(){
             if (loginDialog === null) { //Dialog is not displayed
                 loginDialog = $modal.open({
-                    templateUrl: 'views/login.html',
+                    templateUrl: Config.viewsDir + 'login.html',
                     keyboard:false,
                     backdrop:'static'
                 });
@@ -113,7 +113,7 @@ angular.module('webadminApp')
             if(offlineDialog === null) { //Dialog is not displayed
                 getModuleInformation().catch(function (/*error*/) {
                     offlineDialog = $modal.open({
-                        templateUrl: 'offline_modal',
+                        templateUrl: Config.viewsDir + 'components/offline.html',
                         controller: 'OfflineCtrl',
                         keyboard:false,
                         backdrop:'static'
@@ -213,6 +213,7 @@ angular.module('webadminApp')
                         var nonce = data.data.reply.nonce;
 
                         var auth = self.digest(login, password, realm, nonce);
+                        var authRtsp = self.digest(login, password, realm, nonce, 'PLAY');
 
                         $log.log("Login2: nonce is " + nonce);
                         $log.log("Login2: auth is " + auth);
@@ -233,6 +234,7 @@ angular.module('webadminApp')
                             $localStorage.nonce = nonce;
                             $localStorage.realm = realm;
                             $localStorage.auth = auth;
+                            $localStorage.authRtsp = authRtsp;
 
                             $log.log("Login3: cookieLogin success!");
                             return data.data.reply;
@@ -257,7 +259,7 @@ angular.module('webadminApp')
                 return $localStorage.auth;
             },
             authForRtsp:function(){
-                return $localStorage.auth; // auth_rtsp
+                return $localStorage.authRtsp; // auth_rtsp
             },
 
             previewUrl:function(cameraPhysicalId,time,width,height){
@@ -410,8 +412,6 @@ angular.module('webadminApp')
                         url: url,
                         takeRemoteSettings: !keepMySystem
                     });
-                },function(error){
-                    return $q.reject(error);
                 });
             },
             pingSystem: function(url, remoteLogin, remotePassword){
@@ -589,6 +589,13 @@ angular.module('webadminApp')
             },
             getCommonPasswords:function(){
                 return wrapGet('commonPasswordsList.json');
+            },
+            getLanguages:function(){
+                return wrapGet('languages.json').then(function(data){
+                    return _.filter(data.data,function(language){
+                        return Config.supportedLanguages.indexOf(language.language) >= 0;
+                    });
+                });
             },
 
             networkSettings:function(settings){

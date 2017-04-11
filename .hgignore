@@ -32,12 +32,16 @@ donotrebuild
 vms*.pro
 .idea
 .branch.properties
+.cloudHost.properties
 x86/*
 x64/*
 target/*
 target-bpi/*
 packages.config
 .vs
+.git
+TAGS
+*.kdev4
 
 .DS_Store
 Debug
@@ -139,6 +143,7 @@ webadmin/external.dat
 webadmin/.tmp
 webadmin/.idea
 webadmin/.sass-cache
+webadmin/translation/language_pack
 app/bower_components
 
 plugins/acs/Paxton/packages
@@ -153,19 +158,20 @@ statserver/build
 statserver/dist
 
 *test-tmp.cfg
-func_tests/ssh.*.conf
+func_tests_old/ssh.*.conf
 
 statserver/statserver.egg-info
 
 common/src/plugins/resource/avi/filetypes.h
 
 *test-tmp.cfg
-func_tests/ssh.*.conf
 
 customization/*.html
 
 .sources_cache
+plugins/acs/paxton-plugin/packages/*
+plugins/acs/paxton-plugin/CustomProperties.cs
 syntax: regexp
 ^core$
 ^Makefile$
-
+^app_process$

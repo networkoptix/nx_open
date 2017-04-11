@@ -12,6 +12,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <recorder/file_deletor.h>
 #include <recorder/storage_manager.h>
+#include <recorder/space_info.h>
 #include <plugins/plugin_manager.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
 #include <plugins/storage/third_party_storage_resource/third_party_storage_resource.h>
@@ -89,7 +90,7 @@ protected:
         fileDeletor = std::unique_ptr<QnFileDeletor>(new QnFileDeletor);
         pluginManager = std::unique_ptr<PluginManager>( new PluginManager);
 
-        platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction);
+        platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction(0));
 
         QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true);
         PluginManager::instance()->loadPlugins(MSSettings::roSettings());
@@ -361,292 +362,94 @@ TEST_F(AbstractStorageResourceTest, IODevice)
     }
 }
 
-class AbstractMockStorageResource : public QnStorageResource {
-public:
-	std::atomic<qint64> freeSpace;
+using StorageDistributionMap = std::unordered_map<int, double>;
+using StorageSelectionsMap = std::unordered_map<int, int>;
 
-	AbstractMockStorageResource(qint64 freeSpace) : freeSpace(freeSpace) {}
+using namespace nx::recorder;
 
-    virtual QIODevice* open(const QString&, QIODevice::OpenMode) override {
-        return nullptr;
-    }
-
-    virtual float getAvarageWritingUsage() const override {
-        NX_ASSERT(0);
-        return 0.0;
-    }
-
-    virtual QnAbstractStorageResource::FileInfoList getFileList(const QString&) override {
-        NX_ASSERT(0);
-        return QnAbstractStorageResource::FileInfoList();
-    }
-
-    virtual qint64 getFileSize(const QString&) const override {
-        NX_ASSERT(0);
-        return 0;
-    }
-
-    virtual bool removeFile(const QString&) override {
-        NX_ASSERT(0);
-        return true;
-    }
-
-    virtual bool removeDir(const QString&) override {
-        NX_ASSERT(0);
-        return true;
-    }
-
-    virtual bool renameFile(const QString&, const QString&) override {
-        NX_ASSERT(0);
-        return true;
-    }
-
-    virtual bool isFileExists(const QString&) override {
-        return true;
-    }
-
-    virtual bool isDirExists(const QString&) override {
-        NX_ASSERT(0);
-        return true;
-    }
-
-    virtual qint64 getFreeSpace() override {
-        NX_ASSERT(0);
-        return 0;
-    }
-
-    virtual int getCapabilities() const override {
-        return QnAbstractStorageResource::cap::DBReady || QnAbstractStorageResource::cap::ReadFile ||
-            QnAbstractStorageResource::cap::WriteFile || QnAbstractStorageResource::cap::RemoveFile ||
-            QnAbstractStorageResource::cap::ListFile;
-    }
-
-    virtual Qn::StorageInitResult initOrUpdate() override {
-        NX_ASSERT(0);
-        return Qn::StorageInit_Ok;
-    }
-
-    virtual void setUrl(const QString& url) override {
-        QnStorageResource::setUrl(url);
-    }
-
-private:
-    virtual QString getPath() const override {
-        return QnStorageResource::getPath();
-    }
-};
-
-class MockStorageResource1 : public AbstractMockStorageResource {
-public:
-	MockStorageResource1() : AbstractMockStorageResource((qint64)10 * 1024 * 1024 * 1024) {}
-
-    virtual qint64 getTotalSpace() const override {
-        return (qint64)10 * 1024 * 1024 * 1024;
-    }
-
-    virtual qint64 getFreeSpace() override {
-        return freeSpace;
-    }
-};
-
-class MockStorageResource2 : public AbstractMockStorageResource {
-public:
-	MockStorageResource2() : AbstractMockStorageResource((qint64)20 * 1024 * 1024 * 1024) {}
-
-    virtual qint64 getTotalSpace() const override {
-        return (qint64)20 * 1024 * 1024 * 1024;
-    }
-
-    virtual qint64 getFreeSpace() override {
-        return freeSpace;
-    }
-};
-
-class MockStorageResource3 : public AbstractMockStorageResource {
-public:
-	MockStorageResource3() : AbstractMockStorageResource((qint64)30 * 1024 * 1024 * 1024) {}
-
-    virtual qint64 getTotalSpace() const override {
-        return (qint64)30 * 1024 * 1024 * 1024;
-    }
-
-    virtual qint64 getFreeSpace() override {
-		return freeSpace;
-    }
-};
-
-struct OccupiedSpaceAccess
+StorageDistributionMap getStorageDistribution(
+    const SpaceInfo& spaceInfo, 
+    int iterations,
+    const std::vector<int>& allowedIndexes)
 {
-	static void addSpaceInfoOccupiedValue(QnStorageManager* storageManager, int storageIndex, qint64 value)
-	{
-		storageManager->addSpaceInfoOccupiedValue(storageIndex, value);
-	}
+    StorageSelectionsMap selectionsData;
+    for (int i = 0; i < iterations; ++i)
+        ++selectionsData.emplace(spaceInfo.getOptimalStorageIndex(allowedIndexes), 0).first->second;
 
-	static void subtractSpaceInfoOccupiedValue(QnStorageManager* storageManager, int storageIndex, qint64 value)
-	{
-		storageManager->subtractSpaceInfoOccupiedValue(storageIndex, value);
-	}
+    StorageDistributionMap result;
+    for (const auto& p: selectionsData)
+        result.emplace(p.first, p.second / (double)iterations);
 
-	static qint64 getSpaceInfoOccupiedValue(QnStorageManager* storageManager, int storageIndex)
-	{
-		return storageManager->getSpaceInfoOccupiedValue(storageIndex);
-	}
+    return result;
+}
 
-	static void setSpaceInfoUsageCoeff(QnStorageManager* storageManager, int storageIndex, double coeff)
-	{
-		storageManager->setSpaceInfoUsageCoeff(storageIndex, coeff);
-	}
+class StorageBalancingAlgorithmTest : public ::testing::Test
+{
+protected:
+    SpaceInfo spaceInfo;
 
-	static double getSpaceInfoUsageCoeff(QnStorageManager* storageManager, int storageIndex)
-	{
-		return storageManager->getSpaceInfoUsageCoeff(storageIndex);
-	}
+    virtual void SetUp() override
+    {
+        spaceInfo.storageAdded(0, 100);
+        spaceInfo.storageAdded(1, 100);
+        spaceInfo.storageAdded(2, 100);
+    }
 };
 
-TEST(Storage_load_balancing_algorithm_test, Main)
+TEST_F(StorageBalancingAlgorithmTest, EqualStorages_NxSpaceNotKnown)
 {
-    MSSettings::initializeROSettings();
-    std::unique_ptr<QnCommonModule> commonModule;
-    if (!qnCommon) {
-        commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
-    }
-    commonModule->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
+    spaceInfo.storageRebuilded(0, 50, 20, 10);
+    spaceInfo.storageRebuilded(1, 30, 20, 10);
 
-    std::unique_ptr<QnStorageManager> storageManager;
-    if (!qnNormalStorageMan) {
-        storageManager = std::unique_ptr<QnStorageManager>(
-                new QnStorageManager(QnServer::StoragePool::Normal));
-    }
-    storageManager->stopAsyncTasks();
-
-    std::unique_ptr<QnResourceStatusDictionary> statusDictionary;
-    if (!qnStatusDictionary) {
-        statusDictionary = std::unique_ptr<QnResourceStatusDictionary>(
-                new QnResourceStatusDictionary);
-    }
-
-    std::unique_ptr<QnResourcePropertyDictionary> propDictionary;
-    if (!propertyDictionary) {
-        propDictionary = std::unique_ptr<QnResourcePropertyDictionary>(
-                new QnResourcePropertyDictionary);
-    }
-
-    std::unique_ptr<QnStorageDbPool> dbPool;
-    if (!qnStorageDbPool) {
-        dbPool = std::unique_ptr<QnStorageDbPool>(new QnStorageDbPool);
-    }
-
-    nx::ut::utils::WorkDirResource workDirResource;
-    ASSERT_TRUE((bool)workDirResource.getDirName());
-    QString basePath = *workDirResource.getDirName();
-
-    auto storage1 = QnStorageResourcePtr(new MockStorageResource1);
-    QString storage1Path = basePath + lit("/s1");
-    ASSERT_TRUE(QDir().mkdir(storage1Path));
-    storage1->setUrl(storage1Path);
-    storage1->setId(QnUuid("{45FF0AD9-649B-4EDC-B032-13603EA37077}"));
-    storage1->setUsedForWriting(true);
-
-    QnStorageResourcePtr storage2 = QnStorageResourcePtr(new MockStorageResource2);
-    QString storage2Path = basePath + lit("/s2");
-    ASSERT_TRUE(QDir().mkdir(storage2Path));
-    storage2->setUrl(storage2Path);
-    storage2->setId(QnUuid("{22E3AD7E-F4E7-4AE5-AD70-0790B05B4566}"));
-    storage2->setUsedForWriting(true);
-
-    QnStorageResourcePtr storage3 = QnStorageResourcePtr(new MockStorageResource3);
-    QString storage3Path = basePath + lit("/s3");
-    ASSERT_TRUE(QDir().mkdir(storage3Path));
-    storage3->setUrl(storage3Path);
-    storage3->setId(QnUuid("{30E7F3EA-F4DB-403F-B9DD-66A38DA784CF}"));
-    storage3->setUsedForWriting(true);
-
-    qnNormalStorageMan->addStorage(storage1);
-    qnNormalStorageMan->addStorage(storage2);
-    qnNormalStorageMan->addStorage(storage3);
-
-    storage1->setStatus(Qn::Online);
-    storage2->setStatus(Qn::Online);
-    storage3->setStatus(Qn::Online);
-
-    QnUuid currentStorageId;
-
-    const int kMaxStorageUseInARow = 15;
-    const int kMaxUseInARowOverflowCount = 5;
-    const int kWriteCount = 500;
-	const int kWrittenBlock = 10 * 1024;
-	const size_t kRecordersCount = 10;
-
-	struct StorageUseStats
-	{
-		int selected;
-		qint64 written;
-		StorageUseStats() : selected(0), written(0) {}
-	};
-
-    int currentStorageUseCount = 0;
-    int useInARowOverflowCount = 0;
-	std::unordered_map<int, StorageUseStats> storagesUsageData;
-	std::mutex testMutex;
-	std::vector<std::thread> recorders;
-
-	for (size_t i = 0; i < kRecordersCount; ++i)
-	{
-		recorders.emplace_back(std::thread(
-		[&]
-		{
-			for (int i = 0; i < kWriteCount; ++i)
-			{
-				auto storage = qnNormalStorageMan->getOptimalStorageRoot(nullptr);
-				storage.dynamicCast<AbstractMockStorageResource>()->freeSpace -= kWrittenBlock;
-				int storageIndex = qnStorageDbPool->getStorageIndex(storage);
-				OccupiedSpaceAccess::addSpaceInfoOccupiedValue(qnNormalStorageMan, storageIndex, kWrittenBlock);
-
-				std::lock_guard<std::mutex> lock(testMutex);
-				++storagesUsageData[storageIndex].selected;
-				storagesUsageData[storageIndex].written += kWrittenBlock;
-
-				if (currentStorageId != storage->getId())
-				{
-					currentStorageId = storage->getId();
-					if (currentStorageUseCount > kMaxStorageUseInARow)
-						++useInARowOverflowCount;
-					currentStorageUseCount = 0;
-				}
-				else
-				{
-					++currentStorageUseCount;
-				}
-			}
-		}));
-	}
-
-	for (auto& t: recorders)
-		if (t.joinable())
-			t.join();
-
-    /*  Actually, due to probabilistic nature of selecting storage algorithm
-    *   some storage may be selected more than kMaxStorageUseIARow times.
-    *   Let's at least check that such peaks are not too often.
-    *   kMaxUseInARowOverflowCount peak breaches on 1 * 1000 * 100 selections seem fair enough.
+    /* no storage rebulded call for the third storage. getOptimalStorageIndex() should be 
+    *  equally distributed 
     */
-    ASSERT_TRUE(useInARowOverflowCount < kMaxUseInARowOverflowCount);
+    auto storageDistribution = getStorageDistribution(spaceInfo, 100 * 1000, {0, 1, 2});
+    ASSERT_LT(storageDistribution[0] - 0.33, 0.05);
+    ASSERT_LT(storageDistribution[1] - 0.33, 0.05);
+    ASSERT_LT(storageDistribution[2] - 0.33, 0.05);
+}
 
-	/*	Storages are of 10, 20, and 30 gb size accordingly.
-	*	So we should've recorded on the second storage twice as much as on the first
-	*	and on the third - roughly the same amount as the first + the second.
-	*
-	*	As for deltas.
-	*	Total recorded size is 100'000 * 10240 bytes ~= 980 mb.
-	*	Hence roughly we should have in the end:
-	*		- 1st - 170mb
-	*		- 2nd - 330mb
-	*		- 3rd - 500mb
-	*	Hence, a fair delta amount would be around dozen(s) of megabytes.
-	*	Let it be 10mb in the first check and 20mb in the second check.
-	*/
-	ASSERT_TRUE(std::abs(storagesUsageData[0].written*2 - storagesUsageData[1].written) <= 10 * 1024 * 1024);
-	ASSERT_TRUE(std::abs(storagesUsageData[0].written +
-						 storagesUsageData[1].written -
-						 storagesUsageData[2].written) <= 20 * 1024 * 1024);
+TEST_F(StorageBalancingAlgorithmTest, EqualStorages_NxSpaceKnown)
+{
+    spaceInfo.storageRebuilded(0, 50, 20, 10); // Es = 70
+    spaceInfo.storageRebuilded(1, 30, 20, 10); // Es = 50
+    spaceInfo.storageRebuilded(2, 10, 30, 10); // Es = 40
+
+    /* Total Es = 160 => 0 - 0.4375, 1 - 0.3125, 2 - 0.25 */
+
+    auto storageDistribution = getStorageDistribution(spaceInfo, 100 * 1000, {0, 1, 2});
+    ASSERT_LT(storageDistribution[0] - 0.4375, 0.05);
+    ASSERT_LT(storageDistribution[1] - 0.3125, 0.05);
+    ASSERT_LT(storageDistribution[2] - 0.25, 0.05);
+}
+
+TEST_F(StorageBalancingAlgorithmTest, EqualStorages_NxSpaceKnown_OneRemoved)
+{
+    spaceInfo.storageRebuilded(0, 50, 20, 10); // Es = 70
+    spaceInfo.storageRebuilded(1, 30, 20, 10); // Es = 50
+    spaceInfo.storageRebuilded(2, 10, 30, 10); // Es = 40, This will be removed
+
+    /* Total Es = 120 => 0 - 0.5833, 1 - 0.4166 */
+
+    spaceInfo.storageRemoved(2);
+
+    auto storageDistribution = getStorageDistribution(spaceInfo, 100 * 1000, {0, 1, 2});
+    ASSERT_EQ(storageDistribution.find(2), storageDistribution.cend());
+    ASSERT_LT(storageDistribution[0] - 0.5833, 0.05);
+    ASSERT_LT(storageDistribution[1] - 0.4166, 0.05);
+}
+
+
+TEST_F(StorageBalancingAlgorithmTest, EqualStorages_NxSpaceKnown_NotAllAllowed)
+{
+    spaceInfo.storageRebuilded(0, 50, 20, 10); // Es = 70
+    spaceInfo.storageRebuilded(1, 30, 20, 10); // Es = 50
+    spaceInfo.storageRebuilded(2, 10, 30, 10); // Es = 40. This won't be allowed
+    /* Total Es = 120 => 0 - 0.5833, 1 - 0.4166 */
+
+    auto storageDistribution = getStorageDistribution(spaceInfo, 100 * 1000, {0, 1});
+    ASSERT_EQ(storageDistribution.find(2), storageDistribution.cend());
+    ASSERT_LT(storageDistribution[0] - 0.5833, 0.05);
+    ASSERT_LT(storageDistribution[1] - 0.4166, 0.05);
 }

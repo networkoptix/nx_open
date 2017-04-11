@@ -36,7 +36,7 @@ public:
     static QnUuid instanceGuid();
     static void setInstanceGuid(const QnUuid &uuid);
 
-    static const QnConnectionInfo& connectionInfo();
+    static QnConnectionInfo connectionInfo();
     static void setConnectionInfo(const QnConnectionInfo& connectionInfo);
 
     static void setEC2ConnectionFactory( ec2::AbstractECConnectionFactory* ec2ConnectionFactory );

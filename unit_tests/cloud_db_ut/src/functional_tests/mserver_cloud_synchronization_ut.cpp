@@ -16,19 +16,38 @@
 #include <utils/common/app_info.h>
 #include <utils/common/id.h>
 
+#include <test_support/transaction_connection_helper.h>
+
 #include "ec2/cloud_vms_synchro_test_helper.h"
-#include "ec2/transaction_connection_helper.h"
 #include "email_manager_mocked.h"
 
 namespace nx {
 namespace cdb {
 
-TEST_F(Ec2MserverCloudSynchronization, general)
+class FtEc2MserverCloudSynchronization:
+    public Ec2MserverCloudSynchronization
 {
-    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
-    ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
-    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
+public:
+    FtEc2MserverCloudSynchronization()
+    {
+        init();
+    }
 
+    ~FtEc2MserverCloudSynchronization()
+    {
+    }
+
+private:
+    void init()
+    {
+        ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
+        ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
+        ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
+    }
+};
+
+TEST_F(FtEc2MserverCloudSynchronization, general)
+{
     for (int i = 0; i < 2; ++i)
     {
         // Cdb can change port after restart.
@@ -45,14 +64,10 @@ TEST_F(Ec2MserverCloudSynchronization, general)
     }
 }
 
-TEST_F(Ec2MserverCloudSynchronization, reconnecting)
+TEST_F(FtEc2MserverCloudSynchronization, reconnecting)
 {
     constexpr const int minDelay = 0;
     constexpr const int maxDelay = 100;
-
-    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
-    ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
-    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
 
     for (int i = 0; i < 50; ++i)
     {
@@ -74,12 +89,8 @@ TEST_F(Ec2MserverCloudSynchronization, reconnecting)
     waitForCloudAndVmsToSyncUsers();
 }
 
-TEST_F(Ec2MserverCloudSynchronization, adding_user_locally_while_offline)
+TEST_F(FtEc2MserverCloudSynchronization, adding_user_locally_while_offline)
 {
-    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
-    ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
-    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
-
     // Sharing system with some account.
     api::AccountData account2;
     std::string account2Password;
@@ -125,7 +136,7 @@ TEST_F(Ec2MserverCloudSynchronization, adding_user_locally_while_offline)
         {
             // Removing user locally.
             ASSERT_EQ(
-                ec2::ErrorCode::ok,
+                ::ec2::ErrorCode::ok,
                 appserver2()->moduleInstance()->ecConnection()
                 ->getUserManager(Qn::kSystemAccess)->removeSync(account2VmsData.id));
 
@@ -135,13 +146,9 @@ TEST_F(Ec2MserverCloudSynchronization, adding_user_locally_while_offline)
     }
 }
 
-TEST_F(Ec2MserverCloudSynchronization, merging_offline_changes)
+TEST_F(FtEc2MserverCloudSynchronization, merging_offline_changes)
 {
     constexpr const int kTestAccountNumber = 10;
-
-    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
-    ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
-    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
 
     // Adding multiple accounts.
     // vector<pair<account, password>>
@@ -190,12 +197,8 @@ TEST_F(Ec2MserverCloudSynchronization, merging_offline_changes)
     }
 }
 
-TEST_F(Ec2MserverCloudSynchronization, adding_user_in_cloud_and_removing_locally)
+TEST_F(FtEc2MserverCloudSynchronization, adding_user_in_cloud_and_removing_locally)
 {
-    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
-    ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
-    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
-
     api::AccountData testAccount;
     std::string testAccountPassword;
     ASSERT_EQ(
@@ -208,7 +211,7 @@ TEST_F(Ec2MserverCloudSynchronization, adding_user_in_cloud_and_removing_locally
         addCloudUserLocally(testAccount.email, &accountVmsData);
 
         ASSERT_EQ(
-            ec2::ErrorCode::ok,
+            ::ec2::ErrorCode::ok,
             appserver2()->moduleInstance()->ecConnection()
                 ->getUserManager(Qn::kSystemAccess)->removeSync(accountVmsData.id));
 
@@ -227,7 +230,7 @@ TEST_F(Ec2MserverCloudSynchronization, adding_user_in_cloud_and_removing_locally
         waitForCloudAndVmsToSyncUsers();
 
         ASSERT_EQ(
-            ec2::ErrorCode::ok,
+            ::ec2::ErrorCode::ok,
             appserver2()->moduleInstance()->ecConnection()
                 ->getUserManager(Qn::kSystemAccess)->removeSync(accountVmsData.id));
 
@@ -240,12 +243,8 @@ TEST_F(Ec2MserverCloudSynchronization, adding_user_in_cloud_and_removing_locally
         fetchCloudTransactionLog(&transactionList));
 }
 
-TEST_F(Ec2MserverCloudSynchronization, sync_from_cloud)
+TEST_F(FtEc2MserverCloudSynchronization, sync_from_cloud)
 {
-    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
-    ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
-    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
-
     api::AccountData testAccount;
     std::string testAccountPassword;
     ASSERT_EQ(
@@ -265,12 +264,8 @@ TEST_F(Ec2MserverCloudSynchronization, sync_from_cloud)
     waitForCloudAndVmsToSyncUsers();
 }
 
-TEST_F(Ec2MserverCloudSynchronization, rebinding_system_to_cloud)
+TEST_F(FtEc2MserverCloudSynchronization, rebinding_system_to_cloud)
 {
-    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
-    ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
-    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
-
     api::AccountData testAccount;
     std::string testAccountPassword;
     ASSERT_EQ(
@@ -302,12 +297,8 @@ TEST_F(Ec2MserverCloudSynchronization, rebinding_system_to_cloud)
     }
 }
 
-TEST_F(Ec2MserverCloudSynchronization, new_transaction_timestamp)
+TEST_F(FtEc2MserverCloudSynchronization, new_transaction_timestamp)
 {
-    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
-    ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
-    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
-
     api::AccountData testAccount;
     std::string testAccountPassword;
     ASSERT_EQ(
@@ -349,12 +340,8 @@ TEST_F(Ec2MserverCloudSynchronization, new_transaction_timestamp)
     }
 }
 
-TEST_F(Ec2MserverCloudSynchronization, rename_system)
+TEST_F(FtEc2MserverCloudSynchronization, rename_system)
 {
-    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
-    ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
-    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
-
     appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
 
     for (int i = 0; i < 4; ++i)
@@ -393,7 +380,7 @@ TEST_F(Ec2MserverCloudSynchronization, rename_system)
 
             ::ec2::ApiResourceParamWithRefDataList resultParamList;
             ASSERT_EQ(
-                ec2::ErrorCode::ok,
+                ::ec2::ErrorCode::ok,
                 appserver2()->moduleInstance()->ecConnection()
                     ->getResourceManager(Qn::kSystemAccess)
                     ->saveSync(paramList, &resultParamList));
@@ -489,12 +476,8 @@ TEST_F(Ec2MserverCloudSynchronization, migrate_transactions)
     waitForCloudAndVmsToSyncUsers();
 }
 
-TEST_F(Ec2MserverCloudSynchronization, transaction_timestamp)
+TEST_F(FtEc2MserverCloudSynchronization, transaction_timestamp)
 {
-    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
-    ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
-    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
-
     appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
     waitForCloudAndVmsToSyncUsers();
 
@@ -544,33 +527,11 @@ TEST_F(Ec2MserverCloudSynchronization, transaction_timestamp)
     }
 }
 
-class Ec2MserverCloudSynchronizationNew:
-    public Ec2MserverCloudSynchronization
+TEST_F(FtEc2MserverCloudSynchronization, user_fullname_modification_pushed_to_vms_from_cloud)
 {
-public:
-    Ec2MserverCloudSynchronizationNew()
-    {
-        init();
-    }
+    establishConnectionBetweenVmsAndCloud();
+    waitForCloudAndVmsToSyncUsers();
 
-    ~Ec2MserverCloudSynchronizationNew()
-    {
-    }
-
-private:
-    void init()
-    {
-        ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
-        ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
-        ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
-
-        establishConnectionBetweenVmsAndCloud();
-        waitForCloudAndVmsToSyncUsers();
-    }
-};
-
-TEST_F(Ec2MserverCloudSynchronizationNew, user_fullname_modification_pushed_to_vms_from_cloud)
-{
     api::AccountUpdateData update;
     update.fullName = ownerAccount().fullName + "new";
     ASSERT_EQ(

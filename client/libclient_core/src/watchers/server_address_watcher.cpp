@@ -7,7 +7,6 @@
 #include <network/direct_module_finder.h>
 #include <network/direct_module_finder_helper.h>
 #include <client/client_message_processor.h>
-#include <client_core/client_core_settings.h>
 #include <nx/network/url/url_builder.h>
 
 namespace {
@@ -16,10 +15,26 @@ const int kMaxUrlsToStore = 8;
 
 } // namespace
 
-QnServerAddressWatcher::QnServerAddressWatcher(
-        QObject* parent)
-    : QObject(parent)
+QnServerAddressWatcher::QnServerAddressWatcher(QObject* parent):
+    QObject(parent)
 {
+}
+
+QnServerAddressWatcher::QnServerAddressWatcher(
+    const Getter& getter,
+    const Setter& setter,
+    QObject* parent)
+    :
+    QObject(parent)
+{
+    setAccessors(getter, setter);
+}
+
+void QnServerAddressWatcher::setAccessors(const Getter& getter, const Setter& setter)
+{
+    if (!getter || !setter)
+        return;
+
     using namespace nx::utils;
 
     const auto moduleFinder = qnModuleFinder;
@@ -34,11 +49,11 @@ QnServerAddressWatcher::QnServerAddressWatcher(
 
     const auto directModuleFinder = moduleFinder->directModuleFinder();
 
-    m_urls = qnClientCoreSettings->knownServerUrls();
+    m_urls = getter();
     if (m_urls.size() > kMaxUrlsToStore)
     {
         shrinkUrlsList();
-        qnClientCoreSettings->setKnownServerUrls(m_urls);
+        setter(m_urls);
     }
     directModuleFinderHelper->setForcedUrls(this, QSet<QUrl>::fromList(m_urls));
 
@@ -46,7 +61,7 @@ QnServerAddressWatcher::QnServerAddressWatcher(
         directModuleFinder->checkUrl(url);
 
     connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionOpened,
-        this, [this, directModuleFinderHelper, directModuleFinder]()
+        this, [this, directModuleFinderHelper, directModuleFinder, setter]()
         {
             QUrl url = QnAppServerConnectionFactory::url();
             if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
@@ -67,8 +82,7 @@ QnServerAddressWatcher::QnServerAddressWatcher(
 
             directModuleFinderHelper->setForcedUrls(this, QSet<QUrl>::fromList(m_urls));
 
-            qnClientCoreSettings->setKnownServerUrls(m_urls);
-            qnClientCoreSettings->save();
+            setter(m_urls);
         }
     );
 }

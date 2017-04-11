@@ -47,15 +47,13 @@ public:
 public:
     AvFrameMemoryBufferPrivate(AVFrame* _frame):
         QAbstractVideoBufferPrivate(),
-        frame(av_frame_alloc()),
+        frame(_frame),
         mapMode(QAbstractVideoBuffer::NotMapped)
     {
-        av_frame_move_ref(frame, _frame);
     }
 
     virtual ~AvFrameMemoryBufferPrivate()
     {
-        av_buffer_unref(&frame->buf[0]);
         av_frame_free(&frame);
     }
 
@@ -139,7 +137,7 @@ public:
     ~FfmpegVideoDecoderPrivate()
     {
         closeCodecContext();
-        av_free(frame);
+        av_frame_free(&frame);
         sws_freeContext(scaleContext);
     }
 
@@ -172,7 +170,7 @@ void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr&
         return;
     }
 
-    // keep frame unless we call 'av_buffer_unref'
+    // keep frame unless we call 'av_frame_unref'
     codecContext->refcounted_frames = 1;
 }
 
@@ -287,8 +285,7 @@ int FfmpegVideoDecoder::decode(
             return -1; //< error
     }
 
-    AVPacket avpkt;
-    av_init_packet(&avpkt);
+    QnFfmpegAvPacket avpkt;
     if (compressedVideoData)
     {
         avpkt.data = (unsigned char*)compressedVideoData->data();
@@ -314,8 +311,6 @@ int FfmpegVideoDecoder::decode(
         // flushing internal buffer. So, repeat this time for the empty packet in order to avoid
         // the bug.
         avpkt.pts = avpkt.dts = d->lastPts;
-        avpkt.data = nullptr;
-        avpkt.size = 0;
     }
 
     int gotPicture = 0;
@@ -325,13 +320,7 @@ int FfmpegVideoDecoder::decode(
 
     QSize frameSize(d->frame->width, d->frame->height);
     qint64 startTimeMs = d->frame->pkt_dts / 1000;
-    int frameNum = d->frame->coded_picture_number;
-    if (d->codecContext->codec_id == AV_CODEC_ID_MJPEG)
-    {
-        // Workaround for MJPEG decoder bug: it always sets coded_picture_number to 0, and
-        // need monotonic frame number to associate decoder's input and output frames.
-        frameNum = qMax(0, d->codecContext->frame_number - 1);
-    }
+    int frameNum = qMax(0, d->codecContext->frame_number - 1);
 
     auto qtPixelFormat = toQtPixelFormat((AVPixelFormat)d->frame->format);
 

@@ -1,5 +1,6 @@
 import QtQuick 2.6
 import Nx 1.0
+import Nx.Media 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
 import com.networkoptix.qml 1.0
@@ -150,12 +151,12 @@ PageBase
         {
             if (event.key == Qt.Key_Left)
             {
-                nextCameraRequested()
+                previousCameraRequested()
                 event.accepted = true
             }
             else if (event.key == Qt.Key_Right)
             {
-                previousCameraRequested()
+                nextCameraRequested()
                 event.accepted = true
             }
         }
@@ -179,6 +180,8 @@ PageBase
         anchors.fill: parent
         onDoubleClicked: Workflow.popCurrentScreen()
     }
+
+    onResourceIdChanged: video.clear()
 
     onNextCameraRequested:
     {

@@ -15,6 +15,7 @@
 #include <utils/gzip/gzip_compressor.h>
 #include <utils/common/util.h>
 #include <network/tcp_listener.h>
+#include <common/common_module.h>
 
 namespace {
     static const qint64 CACHE_SIZE = 1024 * 1024;
@@ -136,7 +137,7 @@ bool QnFileConnectionProcessor::loadFile(
         return false;
 
     *outData = file->readAll();
-    *outLastModified = staticFileLastModified(file);
+    *outLastModified = qnCommon->startupTime(); //staticFileLastModified(file);
     if (outData->size() < cachedFiles.maxCost())
         cachedFiles.insert(path, new CacheEntry(*outData, *outLastModified), outData->size());
     return true;

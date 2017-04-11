@@ -12,23 +12,25 @@ namespace test {
 
 using nx::hpm::MediaServerEmulator;
 
-class TcpTunnelConnector
-:
+class TcpTunnelConnector:
     public cloud::test::TunnelConnector
 {
 public:
-    TcpTunnelConnector()
+    TcpTunnelConnector():
+        m_cloudConnectMaskBak(ConnectorFactory::getEnabledCloudConnectMask())
     {
-        //disabling udp hole punching and enabling tcp port forwarding
+        // Disabling udp hole punching and enabling tcp port forwarding.
         ConnectorFactory::setEnabledCloudConnectMask(
             (int)CloudConnectType::forwardedTcpPort);
     }
 
     ~TcpTunnelConnector()
     {
-        ConnectorFactory::setEnabledCloudConnectMask(
-            (int)CloudConnectType::all);
+        ConnectorFactory::setEnabledCloudConnectMask(m_cloudConnectMaskBak);
     }
+
+private:
+    int m_cloudConnectMaskBak;
 };
 
 TEST_F(TcpTunnelConnector, general)

@@ -12,6 +12,7 @@
 #include "utils/fs/file.h"
 #include <common/common_module.h>
 #include <utils/common/writer_pool.h>
+#include <nx/fusion/serialization/lexical.h>
 
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>
@@ -836,6 +837,8 @@ bool QnFileStorageResource::testWriteCapInternal() const
 
 Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
 {
+    NX_LOG("QnFileStorageResource::initOrUpdate begin", cl_logDEBUG1);
+
     Qn::StorageInitResult result;
     {
         QnMutexLocker lock(&m_mutexCheckStorage);
@@ -862,6 +865,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
     }
     QString localPath = getLocalPathSafe();
     m_cachedTotalSpace = getDiskTotalSpace(localPath.isEmpty() ? getPath() : localPath); // update cached value periodically
+    NX_LOG("QnFileStorageResource::initOrUpdate completed", cl_logDEBUG1);
 
     return Qn::StorageInit_Ok;
 }
@@ -879,14 +883,10 @@ QnStorageResource* QnFileStorageResource::instance(const QString&)
 
 qint64 QnFileStorageResource::calcInitialSpaceLimit()
 {
-    QString url = getUrl();
-    NX_ASSERT(!url.isEmpty());
-    bool local = isLocal(url);
-
+    auto local = isLocal();
     qint64 baseSpaceLimit = calcSpaceLimit(
-        local
-        ? QnPlatformMonitor::LocalDiskPartition
-        : QnPlatformMonitor::NetworkPartition);
+        local ? QnPlatformMonitor::LocalDiskPartition : 
+        QnPlatformMonitor::NetworkPartition);
 
     if (m_cachedTotalSpace < 0)
         return baseSpaceLimit;
@@ -913,23 +913,30 @@ qint64 QnFileStorageResource::calcSpaceLimit(QnPlatformMonitor::PartitionType pt
            QnStorageResource::kNasStorageLimit;
 }
 
-bool QnFileStorageResource::isLocal(const QString &url)
+bool QnFileStorageResource::isLocal()
 {
+    auto url = getUrl();
     if (url.contains(lit("://")))
         return false;
 
-    auto platformMonitor = static_cast<QnPlatformMonitor*>(qnPlatform->monitor());
+    auto storageTypeString = getStorageType();
+    if (!storageTypeString.isEmpty())
+    {
+       if (storageTypeString == QnLexical::serialized(QnPlatformMonitor::LocalDiskPartition))
+          return true; 
+       return false;
+    }
 
-    QList<QnPlatformMonitor::PartitionSpace> partitions =
-        platformMonitor->totalPartitionSpaceInfo(
-            QnPlatformMonitor::LocalDiskPartition
-        );
+    auto platformMonitor = static_cast<QnPlatformMonitor*>(qnPlatform->monitor());
+    auto partitions = platformMonitor->totalPartitionSpaceInfo(QnPlatformMonitor::NetworkPartition);
 
     for (const auto &partition : partitions)
+    {
         if (url.startsWith(partition.path))
-            return true;
+            return false;
+    }
 
-    return false;
+    return true;
 }
 
 float QnFileStorageResource::getAvarageWritingUsage() const

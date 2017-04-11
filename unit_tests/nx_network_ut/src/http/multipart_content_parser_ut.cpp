@@ -4,13 +4,13 @@
 ***********************************************************/
 
 #include <deque>
-#include <random>
 
 #include <gtest/gtest.h>
 
-#include <utils/media/custom_output_stream.h>
 #include <nx/network/http/multipart_content_parser.h>
+#include <nx/utils/random.h>
 
+#include <utils/media/custom_output_stream.h>
 
 TEST( HttpMultipartContentParser, genericTest )
 {
@@ -87,13 +87,13 @@ TEST( HttpMultipartContentParser, genericTest )
             if (closeContent)
             {
                 ASSERT_TRUE(parser.eof());
-                ASSERT_EQ(5, frames.size());
+                ASSERT_EQ(5U, frames.size());
                 ASSERT_TRUE(frames[4].isEmpty());
             }
             else
             {
                 ASSERT_FALSE(parser.eof());
-                ASSERT_EQ(4, frames.size());
+                ASSERT_EQ(4U, frames.size());
             }
             ASSERT_EQ(frames[0], frame1);
             ASSERT_EQ(frames[1], frame2);
@@ -177,13 +177,13 @@ TEST( HttpMultipartContentParser, onlySizedData )
             if (closeContent)
             {
                 ASSERT_TRUE(parser.eof());
-                ASSERT_EQ(5, frames.size());
+                ASSERT_EQ(5U, frames.size());
                 ASSERT_TRUE(frames[4].isEmpty());
             }
             else
             {
                 ASSERT_FALSE(parser.eof());
-                ASSERT_EQ(4, frames.size());
+                ASSERT_EQ(4U, frames.size());
             }
             ASSERT_EQ(frame1, frames[0]);
             ASSERT_EQ(frame2, frames[1]);
@@ -236,7 +236,7 @@ TEST( HttpMultipartContentParser, unSizedDataSimple )
                 pos + dataStep <= testData.size() ? dataStep : QnByteArrayConstRef::npos ) );
         parser.flush();
 
-        ASSERT_EQ( frames.size(), 2 );
+        ASSERT_EQ( 2U, frames.size() );
         ASSERT_EQ( frames[0], frame1 );
         ASSERT_EQ( frames[1], frame2 );
     }
@@ -244,31 +244,29 @@ TEST( HttpMultipartContentParser, unSizedDataSimple )
 
 TEST( HttpMultipartContentParser, unSizedData )
 {
-    static const size_t FRAMES_COUNT = 10;
-    static const size_t FRAME_SIZE_MIN = 4096;
-    static const size_t FRAME_SIZE_MAX = 1024*1024;
+    static const size_t FRAMES_COUNT = nx::utils::random::number<size_t>(3, 7);
+    static const size_t FRAME_SIZE_MIN = 1024;
+    static const size_t FRAME_SIZE_MAX = 256*1024;
 
     //static const size_t FRAMES_COUNT = 2000;
     //static const size_t FRAME_SIZE_MIN = 10;
     //static const size_t FRAME_SIZE_MAX = 10000;
 
     //const size_t DATA_STEPS[] = { 1 };
-    const size_t DATA_STEPS[] = { 1, 2, 3, 20, 48, 4*1024, 64*1024 };
+    const size_t DATA_STEPS[] = { 1, 2, 3, 20, 48, 4*1024, 16*1024 };
 
     //for( int j = 0; j < 2000; ++j )
     {
         //generating test frames
         std::vector<nx::Buffer> testFrames( FRAMES_COUNT );
-        std::random_device rd;
-        std::uniform_int_distribution<size_t> frameSizeDistr( FRAME_SIZE_MIN, FRAME_SIZE_MAX );
-        std::uniform_int_distribution<int> frameContentDistr(0, std::numeric_limits<char>::max());
         for( nx::Buffer& testFrame : testFrames )
         {
-            testFrame.resize( frameSizeDistr(rd) );
+            testFrame.resize( nx::utils::random::number<size_t>(FRAME_SIZE_MIN, FRAME_SIZE_MAX) );
+
             std::generate(
                 testFrame.data(),
                 testFrame.data()+ testFrame.size(),
-                [&]{ return frameContentDistr(rd); } );
+                []{ return nx::utils::random::number<int>(0, std::numeric_limits<char>::max()); } );
             ASSERT_EQ( testFrame.indexOf( "--fbdr" ), -1 );
         }
 
@@ -336,7 +334,7 @@ TEST(HttpMultipartContentParser, epilogueOnly)
         //parser.flush();
 
         ASSERT_TRUE(parser.eof());
-        ASSERT_EQ(1, frames.size());
+        ASSERT_EQ(1U, frames.size());
         ASSERT_TRUE(frames[0].isEmpty());
     }
 }

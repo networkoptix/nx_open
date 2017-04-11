@@ -247,11 +247,11 @@ bool QnArchiveStreamReader::init()
 
     m_jumpMtx.unlock();
 
+    m_delegate->setQuality(quality, true, resolution);
     // It is optimization: open and jump at same time
     if (jumpTime != qint64(AV_NOPTS_VALUE))
         m_delegate->seek(jumpTime, true);
 
-    m_delegate->setQuality(quality, true, resolution);
     bool opened = m_delegate->open(m_resource);
 
     if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
@@ -552,7 +552,11 @@ begin_label:
     }
 
     if (m_outOfPlaybackMask)
-        return createEmptyPacket(reverseMode); // EOF reached
+    {
+        auto result = createEmptyPacket(reverseMode); // EOF reached
+        result->flags |= QnAbstractMediaData::MediaFlags_AfterEOF;
+        return result;
+    }
 
     if (m_afterMotionData)
     {

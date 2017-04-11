@@ -10,6 +10,8 @@
 #include <sstream>
 #include <fstream>
 
+#include <nx/utils/std/thread.h>
+
 #if 0
 #  include <time.h>
 #  define debug_printf(...) fprintf(stderr, "<%.1f> ", clock()/100000.0), fprintf(stderr, __VA_ARGS__)
@@ -39,7 +41,7 @@ public:
             }
         }
 
-        m_thread = std::thread(
+        m_thread = nx::utils::thread(
             [this]
             {
                 while (true)
@@ -91,7 +93,7 @@ private:
     TaskQueue m_queue;
     std::mutex m_mutex;
     std::condition_variable m_cond;
-    std::thread m_thread;
+    nx::utils::thread m_thread;
     std::atomic<bool> m_needStop;
     std::chrono::time_point<std::chrono::system_clock> m_startPoint;
     std::shared_ptr<std::ostream> m_ostream;
@@ -99,7 +101,7 @@ private:
 
 extern Logger logger;
 
-#ifdef _DEBUG
+#if 0
 #   define NO_LOG 0
 #else
 #   define NO_LOG 1

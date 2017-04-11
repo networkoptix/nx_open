@@ -14,7 +14,6 @@
   <Font Id="10" Height="-26" Weight="700" Foreground="000000" Background="FFFFFF">Segoe UI</Font>
   <Font Id="11" Height="-16" Weight="500" Foreground="000000" Background="FFFFFF">Segoe UI</Font>
 
-<!--  <Text X="130" Y="-45" Width="500" Height="2" FontId="5" Visible="yes"></Text> -->
   <Page Name="Help">
     <Image X="-1" Y="1" Width="349" Height="252" ImageFile="installer_bg.png"/>
     <Button Name="HelpCancelButton" X="-12" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0">#(loc.HelpCloseButton)</Button>
@@ -25,25 +24,25 @@
     <Image X="223" Y="56" Width="102" Height="102" ImageFile="logo-102x102.png"/>
     <Text X="12" Y="174" Width="-12" Height="40" FontId="1" DisablePrefix="yes" Center="yes">${display.product.name} ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</Text>
     <Text X="12" Y="214" Width="-12" Height="24" FontId="8" DisablePrefix="yes" Center="yes">#(loc.Components)</Text>
-    <Text X="12" Y="-64" Width="-12" Height="16" FontId="7" DisablePrefix="yes" Center="yes">By clicking "Accept and Install" you are agreeing to our</Text>
-    <Hypertext Name="EulaHyperlink" X="190" Y="-48" Width="-12" Height="16" TabStop="no" FontId="7" HideWhenDisabled="yes">#(loc.InstallLicenseLinkText)</Hypertext>
+    <Text X="12" Y="-64" Width="-12" Height="16" FontId="7" DisablePrefix="yes" Center="yes">#(loc.InstallLicenseText)</Text>
+    <Hypertext Name="EulaHyperlink" X="190" Y="-48" Width="-12" Height="16" TabStop="no" FontId="7" HideWhenDisabled="yes">&lt;a href="#"&gt;#(loc.InstallLicenseLinkText)&lt;/a&gt;</Hypertext>
     <Button Name="OptionsButton" X="12" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0" HideWhenDisabled="yes">#(loc.InstallOptionsButton)</Button>
-    <Button Name="InstallButton" X="-12" Y="-12" Width="150" Height="28" TabStop="yes" FontId="0">Accept and Install</Button>
+    <Button Name="InstallButton" X="-12" Y="-12" Width="150" Height="28" TabStop="yes" FontId="0">#(loc.InstallInstallButton)</Button>
   </Page>
   <Page Name="Options">
     <Image X="-1" Y="1" Width="349" Height="252" ImageFile="installer_bg.png"/>
     <Image X="24" Y="24" Width="64" Height="64" ImageFile="logo-64x64.png"/>
-    <Text X="24" Y="104" Width="-12" Height="32" FontId="6">Options</Text>
-    <Text X="24" Y="141" Width="-12" Height="17" FontId="9">Select applications to be installed:</Text>
-    <Button Name="InstallClientAndServer" X="24" Y="166" Width="210" Height="17" TabStop="yes" FontId="3" HideWhenDisabled="no" HexStyle="0x000009">Client and Server</Button>
-    <Button Name="InstallClientOnly" X="24" Y="186" Width="210" Height="17" TabStop="yes" FontId="3" HideWhenDisabled="no" HexStyle="0x000009">Client only</Button>
-    <Button Name="InstallServerOnly" X="24" Y="206" Width="210" Height="17" TabStop="yes" FontId="3" HideWhenDisabled="no" HexStyle="0x000009">Server only</Button>
+    <Text X="24" Y="104" Width="-12" Height="32" FontId="6">#(loc.Options)</Text>
+    <Text X="24" Y="141" Width="-12" Height="17" FontId="9">#(loc.SelectApps)</Text>
+    <Button Name="InstallClientAndServer" X="24" Y="166" Width="210" Height="17" TabStop="yes" FontId="3" HideWhenDisabled="no" HexStyle="0x000009">#(loc.ClientAndServer)</Button>
+    <Button Name="InstallClientOnly" X="24" Y="186" Width="210" Height="17" TabStop="yes" FontId="3" HideWhenDisabled="no" HexStyle="0x000009">#(loc.ClientOnly)</Button>
+    <Button Name="InstallServerOnly" X="24" Y="206" Width="210" Height="17" TabStop="yes" FontId="3" HideWhenDisabled="no" HexStyle="0x000009">#(loc.ServerOnly)</Button>
 
-    <Text X="24" Y="241" Width="-12" Height="20" FontId="9" DisablePrefix="yes">The Server application is used to to store System information and archives.</Text>
-    <Text X="24" Y="261" Width="-12" Height="20" FontId="9" DisablePrefix="yes">The Client application is used to view video and manage the System</Text>
+    <Text X="24" Y="241" Width="-12" Height="20" FontId="9" DisablePrefix="yes">#(loc.ServerOnlyDesc)</Text>
+    <Text X="24" Y="261" Width="-12" Height="20" FontId="9" DisablePrefix="yes">#(loc.ClientOnlyDesc)</Text>
 
-    <Button Name="OptionsCancelButton" X="12" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0">Cancel</Button>
-    <Button Name="OptionsOkButton" X="-12" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0">OK</Button>
+    <Button Name="OptionsCancelButton" X="12" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0">#(loc.OptionsCancelButton)</Button>
+    <Button Name="OptionsOkButton" X="-12" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0">#(loc.OptionsOkButton)</Button>
   </Page>
   <Page Name="FilesInUse">
     <Image X="-1" Y="1" Width="349" Height="252" ImageFile="installer_bg.png"/>

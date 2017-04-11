@@ -86,7 +86,7 @@ private:
     QByteArray m_connectSessionId;
     nx::utils::promise<void> m_fsmFinishedPromise;
 
-    void connectFsmFinished(api::ResultCode /*resultCode*/)
+    void connectFsmFinished(api::NatTraversalResultCode /*resultCode*/)
     {
         m_fsmFinishedPromise.set_value();
     }

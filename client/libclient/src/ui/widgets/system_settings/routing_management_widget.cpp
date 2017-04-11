@@ -400,7 +400,7 @@ void QnRoutingManagementWidget::updateUi() {
     QModelIndex sourceIndex = m_sortedServerAddressesModel->mapToSource(ui->addressesView->currentIndex());
 
     ui->buttonsWidget->setVisible(ui->serversView->currentIndex().isValid() && !isReadOnly());
-    ui->removeButton->setEnabled(m_serverAddressesModel->isManualAddress(sourceIndex) && !isReadOnly());
+    ui->removeButton->setVisible(m_serverAddressesModel->isManualAddress(sourceIndex) && !isReadOnly());
 }
 
 quint16 QnRoutingManagementWidget::getCurrentServerPort()
@@ -434,7 +434,9 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
     QUrl url = QUrl::fromUserInput(urlString);
     url.setScheme(lit("http"));
 
-    if (!url.isValid()) {
+    const bool validUrl = url.isValid() && !url.host().isEmpty();
+    if (!validUrl)
+    {
         reportUrlEditingError(QnServerAddressesModel::InvalidUrl);
         return;
     }
@@ -517,10 +519,10 @@ void QnRoutingManagementWidget::at_serverAddressesModel_dataChanged(const QModel
 void QnRoutingManagementWidget::reportUrlEditingError(int error) {
     switch (error) {
     case QnServerAddressesModel::InvalidUrl:
-        QnMessageBox::critical(this, tr("Error"), tr("You have entered an invalid URL."));
+        QnMessageBox::warning(this, tr("Invalid URL"));
         break;
     case QnServerAddressesModel::ExistingUrl:
-        QnMessageBox::warning(this, tr("Warning"), tr("This URL is already in the address list."));
+        QnMessageBox::information(this, tr("URL already added"));
         break;
     }
 }

@@ -549,13 +549,46 @@ void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex 
 
 void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &index)
 {
-    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-    if ((resource && resource->hasFlags(Qn::server))
-        || nodeType == Qn::ServersNode
-        || nodeType == Qn::UserResourcesNode)
+    /* Auto-expand certain nodes. */
+    switch (index.data(Qn::NodeTypeRole).value<Qn::NodeType>())
     {
-        ui->resourcesTreeView->expand(index);
+        case Qn::ResourceNode:
+        {
+            const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+            if (!resource || !resource->hasFlags(Qn::server))
+                break;
+        }
+        /* FALL THROUGH */
+        case Qn::ServersNode:
+        case Qn::UserResourcesNode:
+            ui->resourcesTreeView->expand(index);
+            break;
+
+        default:
+            break;
     }
+
     at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);
+}
+
+void QnResourceTreeWidget::update(const QnResourcePtr& resource)
+{
+    if (!resource)
+        return;
+
+    const auto model = ui->resourcesTreeView->model();
+    if (!model)
+        return;
+
+    const auto start = model->index(0, 0, ui->resourcesTreeView->rootIndex());
+
+    const auto indices = model->match(
+        start,
+        Qn::ResourceRole,
+        QVariant::fromValue(resource),
+        -1,
+        Qt::MatchExactly | Qt::MatchRecursive);
+
+    for (const auto& index: indices)
+        ui->resourcesTreeView->update(index);
 }

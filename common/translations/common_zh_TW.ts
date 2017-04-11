@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_TW" sourcelanguage="en">
+<TS version="2.1" language="zh-TW" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -17,106 +17,82 @@
 <context>
     <name>MergeSystemsStatusStrings</name>
     <message>
-        <source>The system was not found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The password or user name is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>密碼或使用者名稱有誤</translation>
     </message>
     <message>
         <source>This user does not have permissions for the requested operation.</source>
-        <translation type="unfinished"></translation>
+        <translation>此使用者沒有執行此動作的權限.</translation>
     </message>
     <message>
         <source>Cannot create database backup.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Warning: You are about to merge Systems with START licenses.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If you understand this and would like to proceed please click Merge to continue.</source>
-        <translation type="unfinished"></translation>
+        <translation>不能建立資料庫備份.</translation>
     </message>
     <message>
         <source>System name is not configured yet.</source>
-        <translation type="unfinished"></translation>
+        <translation>系統名稱尚未配置.</translation>
     </message>
     <message>
         <source>Unknown error.</source>
-        <translation type="unfinished"></translation>
+        <translation>未知錯誤.</translation>
     </message>
     <message>
-        <source>The discovered system %1 has an incompatible version %2.</source>
-        <comment>%1 is name of the system, %2 is version information</comment>
-        <translation type="unfinished"></translation>
+        <source>You are about to merge Systems with Starter licenses.</source>
+        <translation>您正要用 Starter license 合併系統.</translation>
     </message>
     <message>
-        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
+        <translation>一個系統只允許一個 Starter license 存在, 所以第二個 Starter license 將被停用.</translation>
     </message>
     <message>
-        <source>The discovered system %1 is in safe mode.</source>
-        <comment>%1 is name of the system</comment>
-        <translation type="unfinished"></translation>
+        <source>Merge anyway?</source>
+        <translation>仍要合併?</translation>
     </message>
     <message>
-        <source>Could not configure the remote system %1.</source>
-        <comment>%1 is name of the system</comment>
-        <translation type="unfinished"></translation>
+        <source>System was not found.</source>
+        <translation>找不到系統.</translation>
     </message>
     <message>
-        <source>In this version you can only merge systems which are not connected to %1.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <source>The discovered System %1 has an incompatible version %2.</source>
+        <comment>%1 is name of System, %2 is version information</comment>
+        <translation>找到的系統 %1 為不相容的版本 %2.</translation>
     </message>
     <message>
-        <source>Both systems are connected to %1. Merge is not allowed.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <source>Cannot connect to the other System because current System is already connected to %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>無法連接到另一個系統, 因為目前的系統已連接到 %1.</translation>
     </message>
     <message>
-        <source>These systems are built with different %1 URL. Merge is not allowed.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <source>The discovered System %1 is in safe mode.</source>
+        <comment>%1 is name of System</comment>
+        <translation>找到的系統 %1 在安全模式下.</translation>
+    </message>
+    <message>
+        <source>Could not configure the remote System %1.</source>
+        <comment>%1 is name of System</comment>
+        <translation>無法配置遠端系統 %1.</translation>
+    </message>
+    <message>
+        <source>Both Systems are connected to %1. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>這兩個系統都連接到 %1. 不允許合併.</translation>
+    </message>
+    <message>
+        <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>這些系統用了不同的 %1 URL建立. 不允許合併.</translation>
+    </message>
+    <message>
+        <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>雲端系統只可以與非雲端系統合併. 系統名稱和密碼將取自雲端系統.</translation>
     </message>
 </context>
 <context>
     <name>QnBusinessStringsHelper</name>
     <message>
-        <source>Storage Failure</source>
-        <translation>儲存裝置故障</translation>
-    </message>
-    <message>
-        <source>Network Issue</source>
-        <translation>網路問題</translation>
-    </message>
-    <message>
-        <source>Input on %1</source>
-        <translation>%1 輸入</translation>
-    </message>
-    <message>
-        <source>Motion on %1</source>
-        <translation>%1 位移偵測</translation>
-    </message>
-    <message>
-        <source>Storage Failure at %1</source>
-        <translation>%1 儲存裝置故障</translation>
-    </message>
-    <message>
-        <source>Network Issue at %1</source>
-        <translation>%1 網路問題</translation>
-    </message>
-    <message>
         <source>Bookmark</source>
-        <translation>書籤</translation>
+        <translation>寫入書籤</translation>
     </message>
     <message>
         <source>Panic recording</source>
@@ -124,43 +100,31 @@
     </message>
     <message>
         <source>Write to log</source>
-        <translation>寫入至記錄</translation>
+        <translation>寫入至日誌</translation>
     </message>
     <message>
         <source>Show notification</source>
         <translation>顯示通知</translation>
     </message>
     <message>
-        <source>Play sound</source>
-        <translation>播放聲音</translation>
-    </message>
-    <message>
         <source>Repeat sound</source>
         <translation>重複播放聲音</translation>
     </message>
     <message>
-        <source>Send email</source>
-        <translation>寄 Email</translation>
+        <source>Play sound</source>
+        <translation>播放聲音</translation>
     </message>
     <message>
         <source>Speak</source>
         <translation>說</translation>
     </message>
     <message>
-        <source>Unknown (%1)</source>
-        <translation>未知 (%1)</translation>
+        <source>Storage Failure</source>
+        <translation>儲存裝置故障</translation>
     </message>
     <message>
-        <source>Any Server Issue</source>
-        <translation>任何伺服器問題</translation>
-    </message>
-    <message>
-        <source>Any Event</source>
-        <translation>任何事件</translation>
-    </message>
-    <message>
-        <source>Undefined event has occurred on %1</source>
-        <translation>未定義事件發生在 %1</translation>
+        <source>Network Issue</source>
+        <translation>網路問題</translation>
     </message>
     <message>
         <source>Server Failure</source>
@@ -177,6 +141,34 @@
     <message>
         <source>License Issue</source>
         <translation>授權問題</translation>
+    </message>
+    <message>
+        <source>Any Server Issue</source>
+        <translation>任何伺服器問題</translation>
+    </message>
+    <message>
+        <source>Any Event</source>
+        <translation>任何事件</translation>
+    </message>
+    <message>
+        <source>Undefined event has occurred on %1</source>
+        <translation>未定義事件發生在 %1</translation>
+    </message>
+    <message>
+        <source>Input on %1</source>
+        <translation>%1 輸入</translation>
+    </message>
+    <message>
+        <source>Motion on %1</source>
+        <translation>%1 位移偵測</translation>
+    </message>
+    <message>
+        <source>Storage Failure at %1</source>
+        <translation>%1 儲存裝置故障</translation>
+    </message>
+    <message>
+        <source>Network Issue at %1</source>
+        <translation>%1 網路問題</translation>
     </message>
     <message>
         <source>Server &quot;%1&quot; Failure</source>
@@ -264,14 +256,6 @@
         <translation>在 %1 %2</translation>
     </message>
     <message>
-        <source>%1 --&gt; %2</source>
-        <translation>%1 --&gt; %2</translation>
-    </message>
-    <message>
-        <source>Server &apos;%1&apos; has a license problem</source>
-        <translation>伺服器 %1 發生授權問題</translation>
-    </message>
-    <message>
         <source>An unknown event has occurred</source>
         <translation>發生未知事件</translation>
     </message>
@@ -290,17 +274,8 @@
         <translation>通用事件</translation>
     </message>
     <message>
-        <source> (%1)</source>
-        <translation>(%1)</translation>
-    </message>
-    <message>
         <source>Caption: %1</source>
         <translation>敘述: %1</translation>
-    </message>
-    <message>
-        <source>MAC #%1: %2 </source>
-        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-        <translation>MAC #%1: %2</translation>
     </message>
     <message>
         <source>Connection to camera (primary stream) was unexpectedly closed.</source>
@@ -358,7 +333,7 @@
     </message>
     <message>
         <source>Execute PTZ preset</source>
-        <translation>移動至PTZ預設點</translation>
+        <translation>移動PTZ至預設點</translation>
     </message>
     <message>
         <source>Show text overlay</source>
@@ -371,10 +346,6 @@
     <message>
         <source>Archive backup finished</source>
         <translation>影像備份完成</translation>
-    </message>
-    <message>
-        <source>Server &apos;%1&apos; has finished an archive backup</source>
-        <translation>伺服器 %1 已完成影像備份</translation>
     </message>
     <message>
         <source>Generic Event at %1</source>
@@ -417,10 +388,6 @@
         <translation>影像備份失敗: 檔案目錄錯誤</translation>
     </message>
     <message>
-        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
-        <translation>影像備份結束但未完全成功, 因為已超過設定時間. 檔案已備份至 %1</translation>
-    </message>
-    <message>
         <source>Archive backup is canceled by user. Data is backed up to %1</source>
         <translation>檔案備份已被使用者取消. 資料已備份至 %1</translation>
     </message>
@@ -428,79 +395,100 @@
         <source>Do HTTP request</source>
         <translation>發送一則HTTP命令</translation>
     </message>
-    <message numerus="yes">
-        <source>Motion on Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Input Signal on Device(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Input Signal on Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Device(s) Disconnected</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Camera(s) Disconnected</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Device(s) IP Conflict</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Camera(s) IP Conflict</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
         <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
         <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
         <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 次, 第一次: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         </translation>
     </message>
     <message>
         <source>Device does not respond to network requests.</source>
-        <translation type="unfinished"></translation>
+        <translation>設備未回應網路請求.</translation>
     </message>
     <message>
         <source>Server stopped unexpectedly.</source>
-        <translation type="unfinished"></translation>
+        <translation>伺服器無預警停止.</translation>
     </message>
     <message>
         <source>Not enough licenses. Recording has been disabled on following devices:</source>
-        <translation type="unfinished"></translation>
+        <translation>沒有足夠的授權. 以下設備錄影已被停用:</translation>
     </message>
     <message>
         <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-        <translation type="unfinished"></translation>
+        <translation>沒有足夠的授權. 以下攝影機錄影已被停用:</translation>
     </message>
     <message>
         <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-        <translation type="unfinished"></translation>
+        <translation>沒有足夠的授權. 以下 I/O 模組已被停用:</translation>
+    </message>
+    <message numerus="yes">
+        <source>Motion on Cameras</source>
+        <translation>
+            <numerusform>攝影機位移偵測</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Input Signal on Devices</source>
+        <translation>
+            <numerusform>設備上的 DI</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Input Signal on Cameras</source>
+        <translation>
+            <numerusform>攝影機上的 DI</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Devices Disconnected</source>
+        <translation>
+            <numerusform>設備斷線</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Cameras Disconnected</source>
+        <translation>
+            <numerusform>攝影機斷線</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Devices IP Conflict</source>
+        <translation>
+            <numerusform>設備 IP 衝突</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Cameras IP Conflict</source>
+        <translation>
+            <numerusform>攝影機 IP 衝突</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; has a license problem</source>
+        <translation>伺服器 &quot;%1&quot; 有授權問題</translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; has finished an archive backup</source>
+        <translation>伺服器 &quot;%1&quot; 已完成錄影備份</translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
+        <translation>錄影備份結束, 但尚未完全完成因為設定的備份時間已經結束. 資料將備份到 %1</translation>
+    </message>
+    <message>
+        <source>MAC #%1: %2</source>
+        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+        <translation>MAC #%1: %2 {1:?} {2?}</translation>
+    </message>
+    <message>
+        <source>Send Email</source>
+        <translation>傳送郵件</translation>
     </message>
 </context>
 <context>
@@ -510,12 +498,12 @@
         <translation>確定</translation>
     </message>
     <message>
-        <source>Media stream is opened but no media data was received.</source>
-        <translation>媒體串流已開啟但沒有接收到媒體資料。</translation>
-    </message>
-    <message>
         <source>Server has been stopped.</source>
         <translation>伺服器已停止運作。</translation>
+    </message>
+    <message>
+        <source>Media stream is opened but no media data was received.</source>
+        <translation>媒體串流已開啟但沒有接收到媒體資料。</translation>
     </message>
     <message>
         <source>Unknown error. Please contact support.</source>
@@ -546,24 +534,8 @@
         <translation>無法連線至 http port %1.</translation>
     </message>
     <message>
-        <source>Cannot open media url %1. Failed to connect to media port %2.</source>
-        <translation>無法開啟媒體 url %1. 連線至媒體 port %2 錯誤.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
-        <translation>無法開啟媒體 url %1. 與 port %2 的連線被中斷.</translation>
-    </message>
-    <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
         <translation>最後, 試著更新分位. 若問題持續發生, 請連繫技術支援部門.</translation>
-    </message>
-    <message>
-        <source>No supported media tracks at url %1.</source>
-        <translation>url %1 中並無支援的媒體.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Unsupported media protocol %2.</source>
-        <translation>無法開啟媒體 url %1. 不支援的媒體協定 %2.</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1.</source>
@@ -596,38 +568,6 @@
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>請確認攝影機已接入至網路. 請嘗試重啟此攝影機.</translation>
-    </message>
-    <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded).</source>
-        <translation>請確認 %2 埠可被連結 (譬如已開啟轉發埠).</translation>
-    </message>
-    <message>
-        <source>Could not parse device response. Url %1, request name %2.</source>
-        <translation>無法解析裝置的回應. Url %1, 請求名稱 %2.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation>無法解析攝影機的回應. Url %1, 請求名稱 %2.</translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>未授權. Url %1.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in device settings.</source>
-        <translation>首先, 請試著啟動錄影 (若目前為關閉) 接著在裝置設定中降低FPS.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation>首先, 請試著啟動錄影 (若目前為關閉) 接著在攝影機設定中降低FPS.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
-        <translation>若仍無效, 請在裝置網頁中還原預設值.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
-        <translation>若仍無效, 請在攝影機網頁中還原預設值.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -674,18 +614,6 @@
         <translation>請確認 I/O 裝置已連接至網路. 試著重啟 I/O 模組.</translation>
     </message>
     <message>
-        <source>Could not parse I/O module response. Url %1, request name %2.</source>
-        <translation>無法解析 I/O 模組的回應. Url %1, 要求名稱 %2.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
-        <translation>首先, 請試著開啟錄影(若目前為關閉)接著在 I/O 模組設定中降低 fps.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
-        <translation>若仍無效, 請至網頁界面上還原 I/O 模組預設參數.</translation>
-    </message>
-    <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
         <translation>I/O 模組要求 &quot;%1&quot; 失敗, 錯誤訊息為 &quot;%2&quot;.</translation>
     </message>
@@ -713,6 +641,66 @@
         <source>I/O Module initialization process is in progress.</source>
         <translation>I/O 模組初始程序進行中.</translation>
     </message>
+    <message>
+        <source>Make sure port %1 is accessible (e.g. forwarded).</source>
+        <translation>請確認 %1 埠可被連結 (譬如已開啟轉發埠).</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
+        <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps.</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
+        <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps.</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
+        <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps.</translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the device web-page.</source>
+        <translation>若無幫助, 請在設備 Web 頁面上還原預設值.</translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the camera web-page.</source>
+        <translation>若無幫助, 請在攝影機 Web 頁面上還原預設值.</translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
+        <translation>若無幫助, 請在 I/O 模組 Web 頁面上還原預設值.</translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
+        <translation>無法開啟媒體 URL %1. 連接到通訊埠 %2 失敗.</translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
+        <translation>無法開啟媒體 URL %1. 與通訊埠 %2 的連線無預警關閉.</translation>
+    </message>
+    <message>
+        <source>Could not parse device response. URL %1, request name %2.</source>
+        <translation>無法分析設備回應. URL %1, 請求名稱 %2.</translation>
+    </message>
+    <message>
+        <source>Could not parse camera response. URL %1, request name %2.</source>
+        <translation>無法分析攝影機回應. URL %1, 請求名稱 %2.</translation>
+    </message>
+    <message>
+        <source>Could not parse I/O module response. URL %1, request name %2.</source>
+        <translation>無法分析 I/O 模組回應. URL %1, 請求名稱 %2.</translation>
+    </message>
+    <message>
+        <source>No supported media tracks at URL %1.</source>
+        <translation>不支援的媒體軌於 URL %1.</translation>
+    </message>
+    <message>
+        <source>Not authorized. URL %1.</source>
+        <translation>未認証. URL %1.</translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
+        <translation>無法打開媒體 URL %1. 不支援的媒體協議 %2.</translation>
+    </message>
 </context>
 <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -734,27 +722,27 @@
     </message>
     <message>
         <source>Could not find decoder for codec %1.</source>
-        <translation type="unfinished">找不到 %1 編碼的編碼器.</translation>
+        <translation>找不到 %1 編碼的編碼器.</translation>
     </message>
     <message>
-        <source>Couldn&apos;t initialize resampling context, error code: %1</source>
-        <translation type="unfinished"></translation>
+        <source>Could not initialize resampling context, error code: %1</source>
+        <translation>無法初始化重採樣內容, 錯誤代碼: %1</translation>
     </message>
     <message>
-        <source>Couldn&apos;t allocate sample buffers, error code: %1</source>
-        <translation type="unfinished"></translation>
+        <source>Could not allocate sample buffers, error code: %1</source>
+        <translation>無法分配樣本緩衝, 錯誤代碼: %1</translation>
     </message>
     <message>
-        <source>Couldn&apos;t send audio frame to encoder, Error code: %1.</source>
-        <translation type="unfinished"></translation>
+        <source>Could not send audio frame to encoder, Error code: %1.</source>
+        <translation>無法傳送音訊至編碼器, 錯誤代碼: %1.</translation>
     </message>
     <message>
-        <source>Couldn&apos;t receive audio packet from encoder, Error code: %1.</source>
-        <translation type="unfinished"></translation>
+        <source>Could not receive audio packet from encoder, Error code: %1.</source>
+        <translation>無法從編碼器接收音訊封包, 錯誤代碼: %1.</translation>
     </message>
     <message>
-        <source>Couldn&apos;t receive audio frame from decoder, Error code: %1.</source>
-        <translation type="unfinished"></translation>
+        <source>Could not receive audio frame from decoder, Error code: %1.</source>
+        <translation>無法從解碼器接收音訊封包, 錯誤代碼: %1.</translation>
     </message>
 </context>
 <context>
@@ -811,11 +799,11 @@
     </message>
     <message>
         <source>Edge</source>
-        <translation>Edge Camera</translation>
+        <translation type="unfinished">Edge</translation>
     </message>
     <message>
         <source>Vmax</source>
-        <translation>Vmax</translation>
+        <translation type="unfinished">Vmax</translation>
     </message>
     <message>
         <source>Video Wall</source>
@@ -835,7 +823,7 @@
     </message>
     <message>
         <source>Start</source>
-        <translation>開始</translation>
+        <translation type="unfinished">Start</translation>
     </message>
     <message>
         <source>Analog Encoder</source>
@@ -890,32 +878,32 @@
         <translation>無效的授權</translation>
     </message>
     <message>
-        <source>This license type requires higher software version.</source>
-        <translation>此授權類型需要更高階軟體.</translation>
-    </message>
-    <message>
         <source>Invalid signature</source>
-        <translation type="unfinished">無效的簽章</translation>
+        <translation>無效的簽章</translation>
     </message>
     <message>
         <source>Invalid customization</source>
-        <translation type="unfinished">無效的自定義參數</translation>
+        <translation>無效的自定義參數</translation>
     </message>
     <message>
         <source>License is expired</source>
-        <translation type="unfinished"></translation>
+        <translation>授權已過期</translation>
     </message>
     <message>
         <source>Invalid type</source>
-        <translation type="unfinished">無效的類型</translation>
+        <translation>無效的類型</translation>
     </message>
     <message>
         <source>Free</source>
-        <translation type="unfinished"></translation>
+        <translation>可用</translation>
     </message>
     <message>
         <source>Free license</source>
-        <translation type="unfinished"></translation>
+        <translation>可用授權</translation>
+    </message>
+    <message>
+        <source>This license type requires higher software version</source>
+        <translation>這授權類型需要較高的軟體版本</translation>
     </message>
 </context>
 <context>
@@ -932,18 +920,6 @@
             <numerusform>%n %2 將使用 %1.</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>Activate %n more %2. </source>
-        <translation>
-            <numerusform>啟動 %n 更多 %2. </numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n more %2 will be used. </source>
-        <translation>
-            <numerusform>%n 更多 %2 將被使用. </numerusform>
-        </translation>
-    </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
         <translation>您輸入的授權有誤. 請檢查您輸入的授權. 如果問題持續發生, 請聯繫您的廠商以確認授權是否有誤或是取得正確授權.</translation>
@@ -953,10 +929,6 @@
         <translation>您正嘗試啟動不相容於軟體的授權. 請聯繫您的廠商以取得有效授權.</translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation>此授權在 {{time}} 已被硬體 ID {{hwid}} 啟動過. 請聯繫您的廠商以取得有效授權.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. A database error occurred.</source>
         <translation>啟動授權碼時發生錯誤. 資料庫發生錯誤.</translation>
     </message>
@@ -964,19 +936,29 @@
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
         <translation>啟動授權碼時發生錯誤. 接收到無效的資料. 請聯絡您的廠商回報此問題.</translation>
     </message>
+    <message numerus="yes">
+        <source>Activate %n more %1.</source>
+        <translation>
+            <numerusform>再啟動 %n 個 %1.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n more %1 will be used.</source>
+        <translation>
+            <numerusform>需要再 %n 個 %1.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
+        <comment>%1 is a hardware ID, %2 is an activation time</comment>
+        <translation>此授權已被啟動到硬體 ID %1 於 %2. 請連線我們的支援小組以獲得一個有效的授權.</translation>
+    </message>
 </context>
 <context>
     <name>QnLocalSystemDescription</name>
     <message>
-        <source>New System</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnPropertyStorage</name>
-    <message>
-        <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
-        <translation>&apos;%1&apos; 參數值無效 - 預計 %2，提供&apos;%3&apos;。</translation>
+        <source>New Server</source>
+        <translation>新的伺服器</translation>
     </message>
 </context>
 <context>
@@ -1073,24 +1055,24 @@
         <translation>未知</translation>
     </message>
     <message>
-        <source>Hardware ID: </source>
-        <translation>硬體 ID:</translation>
-    </message>
-    <message>
-        <source>Watermark: </source>
-        <translation>浮水印:</translation>
-    </message>
-    <message>
         <source>Trial License</source>
         <translation>測試用授權</translation>
     </message>
     <message>
-        <source>Licensed To: </source>
-        <translation>授權給:</translation>
-    </message>
-    <message>
         <source>FREE License</source>
         <translation>免費授權</translation>
+    </message>
+    <message>
+        <source>Hardware ID: %1</source>
+        <translation>硬體 ID: %1</translation>
+    </message>
+    <message>
+        <source>Licensed To: %1</source>
+        <translation>授權給: %1</translation>
+    </message>
+    <message>
+        <source>Watermark: %1</source>
+        <translation>浮水印: %1</translation>
     </message>
 </context>
 <context>
@@ -1153,11 +1135,6 @@
         <extracomment>Short for &apos;Preset&apos;</extracomment>
         <translation>預</translation>
     </message>
-    <message>
-        <source>-</source>
-        <extracomment>Short for &apos;Undefined&apos;</extracomment>
-        <translation>-</translation>
-    </message>
 </context>
 <context>
     <name>QnStreamRecorder</name>
@@ -1186,23 +1163,19 @@
         <translation>影像或聲音編碼無法相容於選擇的格式。</translation>
     </message>
     <message>
-        <source>Error during watermark generation for file &apos;%1&apos;.</source>
-        <translation>生成檔案 %1 的浮水印時發生錯誤。</translation>
-    </message>
-    <message>
         <source>File write error. Not enough free space.</source>
         <translation>檔案寫入錯誤. 無足夠空間.</translation>
     </message>
     <message>
         <source>Invalid resource type for data export.</source>
-        <translation type="unfinished"></translation>
+        <translation>無效的資料匯出資源類型.</translation>
     </message>
 </context>
 <context>
     <name>QnSystemDescription</name>
     <message>
-        <source>&lt;Unnamed system&gt;</source>
-        <translation type="unfinished"></translation>
+        <source>Unnamed System</source>
+        <translation>未命名的系統</translation>
     </message>
 </context>
 <context>
@@ -1237,137 +1210,137 @@
     <message>
         <source>ms</source>
         <comment>Suffix for displaying milliseconds</comment>
-        <translation type="unfinished"></translation>
+        <translation>毫秒</translation>
     </message>
     <message>
         <source>s</source>
         <comment>Suffix for displaying seconds</comment>
-        <translation type="unfinished"></translation>
+        <translation>秒</translation>
     </message>
     <message>
         <source>m</source>
         <comment>Suffix for displaying minutes</comment>
-        <translation type="unfinished"></translation>
+        <translation>分</translation>
     </message>
     <message>
         <source>h</source>
         <comment>Suffix for displaying hours</comment>
-        <translation type="unfinished"></translation>
+        <translation>時</translation>
     </message>
     <message>
         <source>d</source>
         <comment>Suffix for displaying days</comment>
-        <translation type="unfinished"></translation>
+        <translation>日</translation>
     </message>
     <message>
         <source>w</source>
         <comment>Suffix for displaying weeks</comment>
-        <translation type="unfinished"></translation>
+        <translation>週</translation>
     </message>
     <message>
         <source>M</source>
         <comment>Suffix for displaying months</comment>
-        <translation type="unfinished"></translation>
+        <translation>月</translation>
     </message>
     <message>
         <source>y</source>
         <comment>Suffix for displaying years</comment>
-        <translation type="unfinished"></translation>
+        <translation>年</translation>
     </message>
     <message>
         <source>msec</source>
         <comment>Long suffix for displaying milliseconds</comment>
-        <translation type="unfinished"></translation>
+        <translation>毫秒</translation>
     </message>
     <message>
         <source>sec</source>
         <comment>Long suffix for displaying seconds</comment>
-        <translation type="unfinished"></translation>
+        <translation>秒</translation>
     </message>
     <message>
         <source>min</source>
         <comment>Long suffix for displaying minutes</comment>
-        <translation type="unfinished"></translation>
+        <translation>分</translation>
     </message>
     <message>
         <source>hrs</source>
         <comment>Long suffix for displaying hours</comment>
-        <translation type="unfinished"></translation>
+        <translation>時</translation>
     </message>
     <message>
         <source>days</source>
         <comment>Long suffix for displaying days</comment>
-        <translation type="unfinished"></translation>
+        <translation>日</translation>
     </message>
     <message>
         <source>wks</source>
         <comment>Long suffix for displaying weeks</comment>
-        <translation type="unfinished"></translation>
+        <translation>週</translation>
     </message>
     <message>
         <source>mos</source>
         <comment>Long suffix for displaying months</comment>
-        <translation type="unfinished"></translation>
+        <translation>月</translation>
     </message>
     <message>
         <source>yrs</source>
         <comment>Long suffix for displaying years</comment>
-        <translation type="unfinished"></translation>
+        <translation>年</translation>
     </message>
     <message numerus="yes">
         <source>milliseconds</source>
         <comment>Full suffix for displaying milliseconds</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>毫秒</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>seconds</source>
         <comment>Full suffix for displaying seconds</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>秒</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>minutes</source>
         <comment>Full suffix for displaying minutes</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>分</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>hours</source>
         <comment>Full suffix for displaying hours</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>時</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>days</source>
         <comment>Full suffix for displaying days</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>日</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>weeks</source>
         <comment>Full suffix for displaying weeks</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>週</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>months</source>
         <comment>Full suffix for displaying months</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>月</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>years</source>
         <comment>Full suffix for displaying years</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>年</numerusform>
         </translation>
     </message>
 </context>
@@ -1394,59 +1367,59 @@
     <name>QnUserRolesManager</name>
     <message>
         <source>Owner</source>
-        <translation type="unfinished"></translation>
+        <translation>擁有者</translation>
     </message>
     <message>
         <source>Administrator</source>
-        <translation type="unfinished"></translation>
+        <translation>管理者</translation>
     </message>
     <message>
         <source>Advanced Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>進階瀏覽</translation>
     </message>
     <message>
         <source>Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>瀏覽</translation>
     </message>
     <message>
         <source>Live Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>即時影像瀏覽</translation>
     </message>
     <message>
         <source>Custom Role</source>
-        <translation type="unfinished"></translation>
+        <translation>自訂角色</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Has access to whole system and can do everything.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Has access to whole system and can manage it. Can create users.</source>
-        <translation type="unfinished"></translation>
+        <translation>自定</translation>
     </message>
     <message>
         <source>Can manage all cameras and bookmarks.</source>
-        <translation type="unfinished"></translation>
+        <translation>可以管理所有的攝影機和書籤</translation>
     </message>
     <message>
         <source>Can view all cameras and export video.</source>
-        <translation type="unfinished"></translation>
+        <translation>可以瀏覽所有的攝影機及匯出影像.</translation>
     </message>
     <message>
         <source>Can view live video from all cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>可以瀏覽即時影像.</translation>
     </message>
     <message>
         <source>Custom user role.</source>
-        <translation type="unfinished"></translation>
+        <translation>自訂使用者角色.</translation>
     </message>
     <message>
         <source>Custom permissions.</source>
-        <translation type="unfinished"></translation>
+        <translation>自訂權限.</translation>
+    </message>
+    <message>
+        <source>Has access to whole System and can do everything.</source>
+        <translation>擁有整個系統的權限且可做所有事.</translation>
+    </message>
+    <message>
+        <source>Has access to whole System and can manage it. Can create users.</source>
+        <translation>擁有整個系統的權限且可管理系統. 可新增使用者.</translation>
     </message>
 </context>
 <context>

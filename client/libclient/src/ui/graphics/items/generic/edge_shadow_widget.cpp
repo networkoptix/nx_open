@@ -3,13 +3,18 @@
 #include <nx/utils/log/assert.h>
 
 
-QnEdgeShadowWidget::QnEdgeShadowWidget(QGraphicsWidget* shadowCaster,
-        Qt::Edge edge, qreal thickness, bool inner) :
-    base_type(shadowCaster),
+QnEdgeShadowWidget::QnEdgeShadowWidget(
+            QGraphicsItem* parent,
+            QGraphicsWidget* shadowCaster,
+            Qt::Edge edge,
+            qreal thickness,
+            Location location)
+    :
+    base_type(parent),
     m_shadowCaster(shadowCaster),
     m_edge(edge),
     m_thickness(thickness),
-    m_inner(inner)
+    m_location(location)
 {
     NX_ASSERT(m_shadowCaster, Q_FUNC_INFO, "Caster should not be null");
     if (!m_shadowCaster)
@@ -34,29 +39,52 @@ QnEdgeShadowWidget::QnEdgeShadowWidget(QGraphicsWidget* shadowCaster,
 
 void QnEdgeShadowWidget::at_shadowCasterGeometryChanged()
 {
-    auto delta = m_inner ? 0.0 : m_thickness;
-    auto shadowCasterRect = m_shadowCaster->rect();
+    if (!parentItem())
+        return;
+
+    const auto delta = m_location == kInner ? 0.0 : m_thickness;
+
+    /* Bounding rect of shadow caster geometry in shadow parent coordinates: */
+    const auto shadowCasterGeom = [this, parent = parentItem()]() -> QRectF
+        {
+            const auto rect = m_shadowCaster->rect();
+
+            if (parent == m_shadowCaster)
+                return rect;
+
+            if (m_shadowCaster->sceneTransform().type() > QTransform::TxScale
+                && parent->sceneTransform().type() > QTransform::TxScale)
+            {
+                /* If rotations are different the shadow will be along
+                 * bounding rect edge, not shadow casters edge. */
+                return parent->mapFromScene(m_shadowCaster->mapToScene(rect)).boundingRect();
+            }
+
+            return QRectF(
+                parent->mapFromScene(m_shadowCaster->mapToScene(rect.topLeft())),
+                parent->mapFromScene(m_shadowCaster->mapToScene(rect.bottomRight())));
+        }();
 
     switch (m_edge)
     {
         case Qt::LeftEdge:
-            setGeometry({ shadowCasterRect.topLeft() - QPointF(delta, 0.0),
-                QSizeF(m_thickness, shadowCasterRect.height()) });
+            setGeometry({ shadowCasterGeom.topLeft() - QPointF(delta, 0.0),
+                QSizeF(m_thickness, shadowCasterGeom.height()) });
             break;
 
         case Qt::RightEdge:
-            setGeometry({ shadowCasterRect.topRight() - QPointF(m_thickness - delta, 0.0),
-                QSizeF(m_thickness, shadowCasterRect.height()) });
+            setGeometry({ shadowCasterGeom.topRight() - QPointF(m_thickness - delta, 0.0),
+                QSizeF(m_thickness, shadowCasterGeom.height()) });
             break;
 
         case Qt::TopEdge:
-            setGeometry({ shadowCasterRect.topLeft() - QPointF(0.0, delta),
-                QSizeF(shadowCasterRect.width(), m_thickness) });
+            setGeometry({ shadowCasterGeom.topLeft() - QPointF(0.0, delta),
+                QSizeF(shadowCasterGeom.width(), m_thickness) });
             break;
 
         case Qt::BottomEdge:
-            setGeometry({ shadowCasterRect.bottomLeft() - QPointF(0.0, m_thickness - delta),
-                QSizeF(shadowCasterRect.width(), m_thickness) });
+            setGeometry({ shadowCasterGeom.bottomLeft() - QPointF(0.0, m_thickness - delta),
+                QSizeF(shadowCasterGeom.width(), m_thickness) });
             break;
     }
 }

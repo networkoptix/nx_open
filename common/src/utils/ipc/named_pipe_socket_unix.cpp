@@ -91,9 +91,12 @@ SystemError::ErrorCode NamedPipeSocket::write( const void* buf, unsigned int byt
 
 //!Reads in synchronous mode
 SystemError::ErrorCode NamedPipeSocket::read(
-    void* buf, unsigned int bytesToRead, unsigned int* const bytesRead)
+    void* buf,
+    unsigned int bytesToRead,
+    unsigned int* const bytesRead,
+    int timeoutMs)
 {
-    timeval timeout{3, 0};
+    timeval timeout{timeoutMs / 1000, timeoutMs % 1000};
 
     for (;;)
     {

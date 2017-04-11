@@ -5,118 +5,118 @@
     <name>QnCloudResultInfo</name>
     <message>
         <source>Successful.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sikeres.</translation>
     </message>
     <message>
         <source>Invalid login or password.</source>
-        <translation type="unfinished"></translation>
+        <translation>Érvénytelen felhasználónév vagy jelszó.</translation>
     </message>
     <message>
         <source>Requested operation is not allowed with provided credentials.</source>
-        <translation type="unfinished"></translation>
+        <translation>A kért művelet nem engedélyezett a megadott hitelesítő adatokkal.</translation>
     </message>
     <message>
         <source>This account is not activated. Please check your email.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ez a fiók nincs aktiválva. Kérjük ellenőrizze Emailjét.</translation>
     </message>
     <message>
         <source>This account is blocked.</source>
-        <translation type="unfinished"></translation>
+        <translation>A fiók zárolva van.</translation>
     </message>
     <message>
         <source>Requested feature is not implemented.</source>
-        <translation type="unfinished"></translation>
+        <translation>Igényelt szolgáltatás nem elérhető.</translation>
     </message>
     <message>
         <source>Unknown realm.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ismeretlen realm.</translation>
     </message>
     <message>
         <source>Bad request.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hibás kérés.</translation>
     </message>
     <message>
         <source>Invalid nonce.</source>
-        <translation type="unfinished"></translation>
+        <translation>Érvénytelen alkalom.</translation>
     </message>
     <message>
         <source>Credentials are no longer valid.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hitelesítő adatok nem érvényesek.</translation>
     </message>
     <message>
         <source>Invalid data received.</source>
-        <translation type="unfinished"></translation>
+        <translation>Érvénytelen adat érkezett.</translation>
     </message>
     <message>
         <source>Unknown error.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Internal %1 error. Please contact support team.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <translation>Ismeretlen hiba.</translation>
     </message>
     <message>
         <source>Unexpected network error. Please check your Internet connection and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Váratlan hálózati hiba. Ellenőrizze az Internetkapcsolatot és próbálkozzon újra.</translation>
     </message>
     <message>
         <source>Invalid login.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sorry, %1 Service is temporary unavailable. We&apos;re doing our best to restore it. Please try again later.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sorry, %1 Service couldn&apos;t process your request. Please try again in a few moments.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <translation>Érvénytelen bejelentkezés.</translation>
     </message>
     <message>
         <source>Requested object is not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>A kért objektum nem található.</translation>
     </message>
     <message>
         <source>Object already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation>Objektum már létezik.</translation>
+    </message>
+    <message>
+        <source>Internal %1 error. Please contact support team.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Belső %1 hiba. Kérjük lépjen kapcsolatba az ügyfélszolgálattal.</translation>
+    </message>
+    <message>
+        <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Sajnáljuk, de %1 szolgáltatás ideiglenesen nem elérhető. Mindent megteszünk a hiba mihamarabbi elhárítása érdekében. Kérjük, próbálkozzon újra később.</translation>
+    </message>
+    <message>
+        <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Sajnáljuk, de %1 szolgáltatás nem tudta feldolgozni a kérést. Próbálja újra pár perc múlva.</translation>
     </message>
 </context>
 <context>
     <name>QnCloudSystemInformationWatcher</name>
     <message>
-        <source>Your system</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Owner: %1</source>
         <comment>%1 is a user name</comment>
-        <translation type="unfinished"></translation>
+        <translation>Tulajdonos: %1</translation>
+    </message>
+    <message>
+        <source>Your System</source>
+        <translation>Az Ön rendszere</translation>
     </message>
 </context>
 <context>
     <name>QnDirectSystemsFinder</name>
     <message>
         <source>System</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendszer</translation>
     </message>
     <message>
         <source>System (%1)</source>
         <comment>%1 is ip and port of system</comment>
-        <translation type="unfinished"></translation>
+        <translation>Rendszer (%1)</translation>
     </message>
 </context>
 <context>
     <name>QnSystemsModel</name>
     <message>
-        <source>Your system</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Owner: %1</source>
         <comment>%1 is a user name</comment>
-        <translation type="unfinished"></translation>
+        <translation>Tulajdonos: %1</translation>
+    </message>
+    <message>
+        <source>Your System</source>
+        <translation>Az Ön rendszere</translation>
     </message>
 </context>
 </TS>

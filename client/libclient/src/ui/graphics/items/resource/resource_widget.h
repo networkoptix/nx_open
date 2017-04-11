@@ -9,7 +9,6 @@
 
 #include <utils/common/connective.h>
 #include <ui/utils/viewport_scale_watcher.h>
-#include <ui/graphics/painters/cosmetic_frame_painter.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
@@ -192,9 +191,7 @@ public:
     /**
      * \returns                         Options for this widget.
      */
-    Options options() const {
-        return m_options;
-    }
+    Options options() const;
 
     /**
      * \param option                    Affected option.
@@ -236,7 +233,7 @@ public:
     void setTitleTextFormat(const QString &titleTextFormat);
 
     bool isInfoVisible() const;
-    Q_SLOT void setInfoVisible(bool visible, bool animate = true);
+    Q_SLOT void setInfoVisible(bool visible, bool animate);
 
     bool isLocalActive() const;
     void setLocalActive(bool localActive);
@@ -286,7 +283,7 @@ protected:
     void setChannelScreenSize(const QSize &size);
     virtual void channelScreenSizeChangedNotify() {}
 
-    virtual void updateHud(bool animate = true);
+    virtual void updateHud(bool animate);
 
     virtual bool isHovered() const;
 
@@ -349,12 +346,7 @@ protected:
     OverlayWidgets* overlayWidgets() const;
 
 private:
-    void updateFrameWidth();
-
-    void updateFrameGeometry();
-
     QColor calculateFrameColor() const;
-
     qreal calculateFrameWidth() const;
 
     void createButtons();
@@ -448,7 +440,6 @@ private:
     SelectionState m_selectionState;
 
     QnViewportScaleWatcher m_scaleWatcher;
-    QnCosmeticFramePainter m_framePainter;
 };
 
 typedef QList<QnResourceWidget *> QnResourceWidgetList;

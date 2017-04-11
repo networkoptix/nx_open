@@ -20,14 +20,14 @@
         <template>lib</template>
 
         <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <global.libs>-lcommon -lappserver2 -ludt -lnx_email -lnx_streaming -lnx_network -lnx_speech_synthesizer -lnx_fusion -lnx_utils</global.libs>
+        <global.libs>-lcommon -lappserver2 -lcloud_db_client -ludt -lnx_email -lnx_streaming -lnx_network -lnx_speech_synthesizer -lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
         <linux.oslibs>-ldl</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
 
-        <rdep.packages>any/server-external-${branch}|any/server-external openssl ffmpeg onvif quazip sigar any/qtsinglecoreapplication any/qtservice</rdep.packages>
+        <rdep.packages>any/server-external-${branch}|any/server-external any/apidoctool openssl ffmpeg onvif quazip sigar any/qtsinglecoreapplication any/qtservice</rdep.packages>
         <rdep.linux.arm.packages>openldap</rdep.linux.arm.packages>
     </properties>
 
@@ -94,15 +94,6 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_speech_synthesizer/pom.xml</systemPath>
         </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>cloud_db_client</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/nx_cloud/cloud_db_client/pom.xml</systemPath>
-        </dependency>
     </dependencies>
 
     <build>
@@ -122,7 +113,7 @@
                             <executable>java</executable>
                             <arguments>
                                 <argument>-jar</argument>
-                                <argument>${environment.dir}/bin/apidoctool.jar</argument>
+                                <argument>${packages.dir}/any/apidoctool/apidoctool.jar</argument>
                                 <argument>code-to-xml</argument>
                                 <argument>-vms-path</argument>
                                 <argument>${root.dir}</argument>

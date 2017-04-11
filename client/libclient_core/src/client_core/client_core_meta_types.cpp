@@ -23,7 +23,7 @@ void QnClientCoreMetaTypes::initialize()
     qmlRegisterType<QnQmlTestHelper>("Nx.Test", 1, 0, "QmlTestHelper");
     qmlRegisterType<QnScenePositionListener>("com.networkoptix.qml", 1, 0, "QnScenePositionListener");
     qmlRegisterType<QnAppInfo>("com.networkoptix.qml", 1, 0, "QnAppInfo");
-    qmlRegisterType<QnVideoOutput>("com.networkoptix.qml", 1, 0, "QnVideoOutput");
+    qmlRegisterType<QnVideoOutput>("Nx.Media", 1, 0, "VideoOutput");
 
     qmlRegisterType<AuthenticationDataModel>("Nx.Models", 1, 0, "AuthenticationDataModel");
     qmlRegisterType<QnSystemHostsModel>("Nx.Models", 1, 0, "SystemHostsModel");
@@ -36,4 +36,6 @@ void QnClientCoreMetaTypes::initialize()
     qRegisterMetaType<QnUrlHelper>();
     qmlRegisterUncreatableType<QnUrlHelper>(
         "Nx", 1, 0, "UrlHelper", lit("Cannot create an instance of UrlHelper."));
+    qmlRegisterUncreatableType<QnSoftwareVersion>(
+        "Nx", 1, 0, "SoftwareVersion", lit("Cannot create an instance of SoftwareVersion."));
 }

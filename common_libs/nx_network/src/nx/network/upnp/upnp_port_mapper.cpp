@@ -17,10 +17,10 @@ static const quint16 MAPPING_TIME_RATIO = 10; // 10 times longer then we check
 
 namespace nx_upnp {
 
-PortMapper::PortMapper( quint64 checkMappingsInterval,
+PortMapper::PortMapper( bool isEnabled, quint64 checkMappingsInterval,
                         const QString& description, const QString& device )
     : SearchAutoHandler( device )
-    , m_isEnabled( true )
+    , m_isEnabled( isEnabled )
     , m_upnpClient( new AsyncClient() )
     , m_description( description )
     , m_checkMappingsInterval( checkMappingsInterval )
@@ -43,7 +43,7 @@ PortMapper::~PortMapper()
     m_upnpClient.reset();
 }
 
-const quint64 PortMapper::DEFAULT_CHECK_MAPPINGS_INTERVAL = 10 * 60  * 1000; // 10 min
+const quint64 PortMapper::DEFAULT_CHECK_MAPPINGS_INTERVAL = 1 * 60  * 1000; // 10 min
 
 bool PortMapper::enableMapping( quint16 port, Protocol protocol,
                                 std::function< void( SocketAddress ) > callback )
@@ -445,7 +445,7 @@ std::list< Guard > PortMapper::changeIpEvents( Device& device, HostAddress exter
 {
     std::list< Guard > callbackGuards;
 
-    std::swap( device.externalIp, externalIp );
+    device.externalIp.swap(externalIp);
     for( auto& map : device.mapped )
     {
         const auto it = m_mapRequests.find( map.first );

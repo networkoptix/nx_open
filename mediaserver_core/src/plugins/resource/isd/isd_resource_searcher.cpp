@@ -11,10 +11,11 @@
 #include <utils/common/credentials.h>
 #include <plugins/resource/mdns/mdns_packet.h>
 
+using nx::common::utils::Credentials;
 
 extern QString getValueFromString(const QString& line);
 
-typedef QList<QnCredentials> DefaultCredentialsList;
+using DefaultCredentialsList = QList<Credentials>;
 
 namespace
 {
@@ -95,7 +96,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(
         auto possibleCreds = resData.value<DefaultCredentialsList>(
             Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
 
-        possibleCreds << QnCredentials(kDefaultIsdUsername, kDefaultIsdPassword);
+        possibleCreds << Credentials(kDefaultIsdUsername, kDefaultIsdPassword);
 
         for (const auto& creds: possibleCreds)
         {
@@ -143,6 +144,9 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
     const QAuthenticator &authOriginal)
 {
 
+    if (shouldStop())
+        return QList<QnResourcePtr>();
+
     QAuthenticator auth( authOriginal );
 
     QString host = url.host();
@@ -177,6 +181,8 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
     if (name.isEmpty() || (vendor != kIsdFullVendorName && vendor != kDwFullVendorName))
         return QList<QnResourcePtr>();
 
+    if (shouldStop())
+        return QList<QnResourcePtr>();
 
     QString mac = QString(QLatin1String(
         downloadFile(
@@ -426,7 +432,7 @@ bool QnPlISDResourceSearcher::processPacket(
     if ( existingRes )
         cameraMAC = existingRes->getMAC();
 
-    if (existingRes && existingRes->getStatus() >= Qn::Online)
+    if (existingRes)
     {
         auto existAuth = existingRes->getAuth();
         cameraAuth = existAuth;

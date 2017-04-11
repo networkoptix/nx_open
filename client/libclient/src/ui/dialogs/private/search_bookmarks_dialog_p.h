@@ -23,8 +23,6 @@ public:
 
     ~QnSearchBookmarksDialogPrivate();
 
-    void updateHeadersWidth();
-
     void refresh();
 
     void setParameters(const QString &filterText
@@ -68,4 +66,7 @@ private:
     QAction * const m_exportBookmarkAction;
     QAction * const m_removeBookmarksAction;
     bool m_updatingNow;
+
+    const qint64 utcRangeStartMs;
+    const qint64 utcRangeEndMs;
 };

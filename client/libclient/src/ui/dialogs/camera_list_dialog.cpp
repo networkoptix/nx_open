@@ -5,6 +5,8 @@
 #include <QtWidgets/QMenu>
 #include <QtCore/QMimeData>
 
+#include <common/common_module.h>
+
 #include <core/resource/resource_display_info.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
@@ -34,6 +36,10 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
 {
     ui->setupUi(this);
 
+    setWindowFlags(windowFlags()
+        | Qt::WindowMaximizeButtonHint
+        | Qt::MaximizeUsingFullscreenGeometryHint);
+
     QnSnappedScrollBar* verticalScrollBar = new QnSnappedScrollBar(Qt::Vertical, this);
     ui->camerasView->setVerticalScrollBar(verticalScrollBar->proxyScrollBar());
     QnSnappedScrollBar* horizontalScrollBar = new QnSnappedScrollBar(Qt::Horizontal, this);
@@ -53,6 +59,12 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged,                 this,   &QnCameraListDialog::updateCriterion);
     connect(ui->camerasView,    &QTableView::customContextMenuRequested,        this,   &QnCameraListDialog::at_camerasView_customContextMenuRequested);
     connect(ui->camerasView,    &QTableView::doubleClicked,                     this,   &QnCameraListDialog::at_camerasView_doubleClicked);
+
+    connect(ui->addDeviceButton, &QPushButton::clicked, this,
+        [this]
+        {
+            menu()->trigger(QnActions::ServerAddCameraManuallyAction, qnCommon->currentServer());
+        });
 
 
     m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);

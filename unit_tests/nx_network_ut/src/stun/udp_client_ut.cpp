@@ -103,10 +103,60 @@ protected:
         return *m_udpServers[index];
     }
 
+    void addAdditionalServers(int serverCount)
+    {
+        for (int i = 0; i < serverCount; ++i)
+            addServer();
+    }
+
+    void issueMultipleRequestsToRandomServers(
+        stun::UdpClient* client,
+        int requestCount)
+    {
+        std::list<nx::stun::Message> requestsToSend;
+
+        for (int i = 0; i < requestCount; ++i)
+        {
+            nx::stun::Message requestMessage(
+                stun::Header(
+                    nx::stun::MessageClass::request,
+                    nx::stun::bindingMethod));
+            m_expectedTransactionIDs.insert(requestMessage.header.transactionId);
+            requestsToSend.push_back(std::move(requestMessage));
+        }
+
+        for (auto& request: requestsToSend)
+        {
+            client->sendRequestTo(
+                anyServerEndpoint(),
+                std::move(request),
+                [this](
+                    SystemError::ErrorCode errorCode,
+                    Message response)
+                {
+                    ASSERT_EQ(SystemError::noError, errorCode);
+
+                    std::unique_lock<std::mutex> lk(m_mutex);
+                    ASSERT_EQ(1U, m_expectedTransactionIDs.erase(response.header.transactionId));
+                    if (m_expectedTransactionIDs.empty())
+                        m_allResponsesHaveBeenReceived.set_value();
+                });
+        }
+    }
+
+    void assertAllResponsesHaveBeenReceived()
+    {
+        m_allResponsesHaveBeenReceived.get_future().wait();
+        ASSERT_TRUE(m_expectedTransactionIDs.empty());
+    }
+
 private:
     std::vector<std::unique_ptr<ServerContext>> m_udpServers;
     size_t m_messagesToIgnore;
     size_t m_totalMessagesReceived;
+    std::mutex m_mutex;
+    nx::utils::promise<void> m_allResponsesHaveBeenReceived;
+    std::set<nx::String> m_expectedTransactionIDs;
 
     void onMessage(
         std::shared_ptr< AbstractServerConnection > connection,
@@ -152,6 +202,8 @@ TEST_F(UdpClient, client_test_sync)
         addServer();
 
     stun::UdpClient client;
+    auto clientGuard = makeScopedGuard([&client]() { client.pleaseStopSync(); });
+
     for (int i = 0; i < REQUESTS_TO_SEND; ++i)
     {
         nx::stun::Message requestMessage(
@@ -171,61 +223,20 @@ TEST_F(UdpClient, client_test_sync)
         ASSERT_EQ(SystemError::noError, errorCode);
         ASSERT_EQ(requestMessage.header.transactionId, response.header.transactionId);
     }
-
-    client.pleaseStopSync();
 }
 
-TEST_F(UdpClient, client_test_async)
+TEST_F(UdpClient, multiple_concurrent_async_requests)
 {
-    static const int kRequestToSendCount = 1000;
+    static const int kRequestToSendCount = 67;
     static const int kLocalServersCount = 10;
-    static const std::chrono::seconds kMaxResponsesWaitTime(
-        3 * utils::TestOptions::timeoutMultiplier());
 
-    for (int i = 1; i < kLocalServersCount; ++i)
-        addServer();
+    addAdditionalServers(kLocalServersCount-1);
 
     stun::UdpClient client;
     auto clientGuard = makeScopedGuard([&client](){ client.pleaseStopSync(); });
 
-    std::mutex mutex;
-    std::condition_variable cond;
-    std::set<nx::String> expectedTransactionIDs;
-
-    for (int i = 0; i < kRequestToSendCount; ++i)
-    {
-        nx::stun::Message requestMessage(
-            stun::Header(
-                nx::stun::MessageClass::request,
-                nx::stun::bindingMethod));
-
-        {
-            std::unique_lock<std::mutex> lk(mutex);
-            expectedTransactionIDs.insert(requestMessage.header.transactionId);
-        }
-        client.sendRequestTo(
-            anyServerEndpoint(),
-            std::move(requestMessage),
-            [&mutex, &cond, &expectedTransactionIDs](
-                SystemError::ErrorCode errorCode,
-                Message response)
-        {
-            ASSERT_EQ(SystemError::noError, errorCode);
-            std::unique_lock<std::mutex> lk(mutex);
-            ASSERT_EQ(1, expectedTransactionIDs.erase(response.header.transactionId));
-            if (expectedTransactionIDs.empty())
-                cond.notify_all();
-        });
-    }
-
-    {
-        std::unique_lock<std::mutex> lk(mutex);
-        ASSERT_TRUE(cond.wait_for(
-            lk,
-            kMaxResponsesWaitTime,
-            [&expectedTransactionIDs]()->bool {return expectedTransactionIDs.empty();}));
-        ASSERT_TRUE(expectedTransactionIDs.empty());
-    }
+    issueMultipleRequestsToRandomServers(&client, kRequestToSendCount);
+    assertAllResponsesHaveBeenReceived();
 }
 
 /**
@@ -241,6 +252,8 @@ TEST_F(UdpClient, client_retransmits_general)
     ignoreNextMessage();
 
     stun::UdpClient client;
+    auto clientGuard = makeScopedGuard([&client]() { client.pleaseStopSync(); });
+
     nx::stun::Message requestMessage(
         stun::Header(
             nx::stun::MessageClass::request,
@@ -257,9 +270,7 @@ TEST_F(UdpClient, client_retransmits_general)
             std::placeholders::_1));
     ASSERT_EQ(SystemError::noError, errorCode);
     ASSERT_EQ(requestMessage.header.transactionId, response.header.transactionId);
-    ASSERT_EQ(2, totalMessagesReceived());
-
-    client.pleaseStopSync();
+    ASSERT_EQ(2U, totalMessagesReceived());
 }
 
 /**
@@ -276,6 +287,8 @@ TEST_F(UdpClient, client_retransmits_max_retransmits)
     ignoreNextMessage(MAX_RETRANSMISSIONS+1);
 
     stun::UdpClient client;
+    auto clientGuard = makeScopedGuard([&client]() { client.pleaseStopSync(); });
+
     client.setRetransmissionTimeOut(std::chrono::milliseconds(100));
     client.setMaxRetransmissions(MAX_RETRANSMISSIONS);
     nx::stun::Message requestMessage(
@@ -293,9 +306,7 @@ TEST_F(UdpClient, client_retransmits_max_retransmits)
             requestMessage,
             std::placeholders::_1));
     ASSERT_EQ(SystemError::timedOut, errorCode);
-    ASSERT_EQ(MAX_RETRANSMISSIONS+1, totalMessagesReceived());
-
-    client.pleaseStopSync();
+    ASSERT_EQ((size_t)MAX_RETRANSMISSIONS+1, totalMessagesReceived());
 }
 
 /**
@@ -306,6 +317,8 @@ TEST_F(UdpClient, client_cancellation)
     const int REQUESTS_TO_SEND = 3;
 
     stun::UdpClient client;
+    auto clientGuard = makeScopedGuard([&client]() { client.pleaseStopSync(); });
+
     client.setRetransmissionTimeOut(std::chrono::seconds(100));
     nx::stun::Message requestMessage(
         stun::Header(
@@ -332,8 +345,6 @@ TEST_F(UdpClient, client_cancellation)
             requestMessage,
             completionHandler);
     }
-
-    client.pleaseStopSync();
 }
 
 /**
@@ -359,6 +370,8 @@ TEST_F(UdpClient, client_response_injection)
     SystemError::ErrorCode responseErrorCode = SystemError::noError;
 
     stun::UdpClient client;
+    auto clientGuard = makeScopedGuard([&client]() { client.pleaseStopSync(); });
+
     ASSERT_TRUE(client.bind(SocketAddress(HostAddress::localhost, 0)));
     client.sendRequestTo(
         SocketAddress(HostAddress::localhost, serverEndpoint.port),
@@ -418,8 +431,6 @@ TEST_F(UdpClient, client_response_injection)
     const auto* nonceAttr = response->getAttribute<stun::attrs::Nonce>();
     ASSERT_NE(nullptr, nonceAttr);
     ASSERT_EQ(kServerResponseNonce, nonceAttr->getString());
-
-    client.pleaseStopSync();
 }
 
 class UdpClientRedirect:

@@ -18,6 +18,9 @@ constexpr const std::chrono::milliseconds RetryPolicy::kNoMaxDelay;
 constexpr const std::chrono::milliseconds RetryPolicy::kDefaultInitialDelay;
 constexpr const std::chrono::milliseconds RetryPolicy::kDefaultMaxDelay;
 
+const RetryPolicy RetryPolicy::kNoRetries(
+    0, kDefaultInitialDelay, kDefaultDelayMultiplier, kDefaultMaxDelay);
+
 RetryPolicy::RetryPolicy():
     maxRetryCount(kDefaultMaxRetryCount),
     initialDelay(kDefaultInitialDelay),
@@ -54,11 +57,12 @@ bool RetryPolicy::operator==(const RetryPolicy& rhs) const
 
 RetryTimer::RetryTimer(const RetryPolicy& policy, aio::AbstractAioThread* aioThread):
     aio::BasicPollable(aioThread),
+    m_timer(std::make_unique<aio::Timer>(aioThread)),
     m_retryPolicy(policy),
     m_triesMade(0)
 {
+    bindToAioThread(getAioThread());
     reset();
-    m_timer = std::make_unique<aio::Timer>(aioThread);
 }
 
 RetryTimer::~RetryTimer()

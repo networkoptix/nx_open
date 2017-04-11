@@ -5,8 +5,9 @@
 
 #include <boost/optional.hpp>
 
-#include <QtCore/QString>
 #include <QtCore/QByteArray>
+#include <QtCore/QString>
+#include <QtCore/QUrl>
 
 template<typename T>
 QString toStringSfinae(const T& t, decltype(&T::toString))
@@ -26,8 +27,10 @@ QString toString(const T& t)
     return toStringSfinae(t, 0);
 }
 
+NX_UTILS_API QString toString(const char* s);
 NX_UTILS_API QString toString(void* p);
 NX_UTILS_API QString toString(const QByteArray& t);
+NX_UTILS_API QString toString(const QUrl& url);
 NX_UTILS_API QString toString(const std::string& t);
 
 NX_UTILS_API QString toString(const std::chrono::hours& t);
@@ -38,13 +41,13 @@ NX_UTILS_API QString toString(const std::chrono::milliseconds& t);
 template<typename T>
 QString toString(const std::unique_ptr<T>& p)
 {
-    return toString((void*)p.get());
+    return toString((void*) p.get());
 }
 
 template<typename T>
 QString toString(const std::shared_ptr<T>& p)
 {
-    return toString((void*)p.get());
+    return toString((void*) p.get());
 }
 
 template<typename T>

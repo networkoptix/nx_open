@@ -19,6 +19,11 @@ SocketFactory::CreateStreamServerSocketFuncType createStreamServerSocketFunc;
 
 std::unique_ptr<AbstractDatagramSocket> SocketFactory::createDatagramSocket()
 {
+    return createUdpSocket();
+}
+
+std::unique_ptr<UDPSocket> SocketFactory::createUdpSocket()
+{
     return std::make_unique<UDPSocket>(s_udpIpVersion.load());
 }
 
@@ -187,6 +192,13 @@ void SocketFactory::setIpVersion(const QString& ipVersion)
     ::abort();
 }
 
+nx::network::IpVersion SocketFactory::setUdpIpVersion(nx::network::IpVersion ipVersion)
+{
+    const int prevVersion = s_udpIpVersion.load();
+    s_udpIpVersion = static_cast<int>(ipVersion);
+    return static_cast<nx::network::IpVersion>(prevVersion);
+}
+
 int SocketFactory::udpIpVersion()
 {
     return s_udpIpVersion;
@@ -211,7 +223,7 @@ std::atomic< bool > SocketFactory::s_isSslEnforced(false);
 #if TARGET_OS_IPHONE
     std::atomic<int> SocketFactory::s_tcpServerIpVersion(AF_INET6);
     std::atomic<int> SocketFactory::s_tcpClientIpVersion(AF_INET6);
-    std::atomic<int> SocketFactory::s_udpIpVersion(AF_INET6);
+    std::atomic<int> SocketFactory::s_udpIpVersion(AF_INET);
 #else
     std::atomic<int> SocketFactory::s_tcpServerIpVersion(AF_INET);
     std::atomic<int> SocketFactory::s_tcpClientIpVersion(AF_INET);

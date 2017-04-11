@@ -9,7 +9,7 @@ namespace nx {
 namespace stun {
 
 class NX_NETWORK_API AbstractAsyncClient:
-    public network::aio::Timer
+    public network::aio::BasicPollable
 {
 public:
     struct Settings
@@ -18,8 +18,7 @@ public:
         std::chrono::milliseconds recvTimeout;
         nx::network::RetryPolicy reconnectPolicy;
 
-        Settings() /* Defaults */
-        :
+        Settings():
             sendTimeout(3000),
             recvTimeout(3000),
             reconnectPolicy(
@@ -30,22 +29,23 @@ public:
         {}
     };
 
-    static const Settings kDefaultSettings;
-
     virtual ~AbstractAsyncClient() = default;
 
+    typedef nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> ConnectHandler;
     typedef std::function<void(Message)> IndicationHandler;
     typedef std::function<void()> ReconnectHandler;
-    typedef utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode, Message)> RequestHandler;
+    typedef utils::MoveOnlyFunc<void(SystemError::ErrorCode, Message)> RequestHandler;
+    typedef std::function<void()> TimerHandler;
 
     /** Asynchronously openes connection to the server
      *
      * \param endpoint Address to use
+     * \param handler Is called when 1st connection attempt has passed regadless of it's success.
      * \note shall be called only once (to provide address) reconnect will
      *      happen automatically
      */
-    virtual void connect(SocketAddress endpoint, bool useSsl = false) = 0;
+    virtual void connect(
+        SocketAddress endpoint, bool useSsl = false, ConnectHandler handler = nullptr) = 0;
 
     /** Subscribes for certain indications
      *
@@ -78,6 +78,13 @@ public:
      */
     virtual void sendRequest(
         Message request, RequestHandler handler, void* client = 0) = 0;
+
+    /**
+     * Schedules repetable timer until disconnect.
+     * @return false if timer has not been scheduled (e.g., no connection is established at the moment).
+     */
+    virtual bool addConnectionTimer(
+        std::chrono::milliseconds period, TimerHandler handler, void* client) = 0;
 
     /** Returns local address if client is connected to the server */
     virtual SocketAddress localAddress() const = 0;

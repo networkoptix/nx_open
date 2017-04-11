@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="es" sourcelanguage="en">
+<TS version="2.1" language="es-ES" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -17,103 +17,79 @@
 <context>
     <name>MergeSystemsStatusStrings</name>
     <message>
-        <source>The system was not found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The password or user name is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>El nombre de usuario o contraseña no es válido.</translation>
     </message>
     <message>
         <source>This user does not have permissions for the requested operation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Este usuario no tiene permisos para la operación solicitada.</translation>
     </message>
     <message>
         <source>Cannot create database backup.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Warning: You are about to merge Systems with START licenses.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If you understand this and would like to proceed please click Merge to continue.</source>
-        <translation type="unfinished"></translation>
+        <translation>No se puede crear una copia de seguridad de la base de datos.</translation>
     </message>
     <message>
         <source>System name is not configured yet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre del sistema no está configurado todavía.</translation>
     </message>
     <message>
         <source>Unknown error.</source>
-        <translation type="unfinished"></translation>
+        <translation>Error desconocido.</translation>
     </message>
     <message>
-        <source>The discovered system %1 has an incompatible version %2.</source>
-        <comment>%1 is name of the system, %2 is version information</comment>
-        <translation type="unfinished"></translation>
+        <source>You are about to merge Systems with Starter licenses.</source>
+        <translation>Está a punto de combinar sistemas con licencias de inicio.</translation>
     </message>
     <message>
-        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
+        <translation>Sólo se permite una licencia de inicio por sistema, por lo que la segunda licencia se desactivará.</translation>
     </message>
     <message>
-        <source>The discovered system %1 is in safe mode.</source>
-        <comment>%1 is name of the system</comment>
-        <translation type="unfinished"></translation>
+        <source>Merge anyway?</source>
+        <translation>¿De todos modos se combinan?</translation>
     </message>
     <message>
-        <source>Could not configure the remote system %1.</source>
-        <comment>%1 is name of the system</comment>
-        <translation type="unfinished"></translation>
+        <source>System was not found.</source>
+        <translation>Sistema no fue encontrado.</translation>
     </message>
     <message>
-        <source>In this version you can only merge systems which are not connected to %1.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <source>The discovered System %1 has an incompatible version %2.</source>
+        <comment>%1 is name of System, %2 is version information</comment>
+        <translation>El %1 sistema descubierto tiene un %2 de versión incompatible.</translation>
     </message>
     <message>
-        <source>Both systems are connected to %1. Merge is not allowed.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <source>Cannot connect to the other System because current System is already connected to %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>No se puede conectar a otro sistema porque el sistema actual ya está conectado a %1.</translation>
     </message>
     <message>
-        <source>These systems are built with different %1 URL. Merge is not allowed.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <source>The discovered System %1 is in safe mode.</source>
+        <comment>%1 is name of System</comment>
+        <translation>El %1 descubierto de sistema está en modo seguro.</translation>
+    </message>
+    <message>
+        <source>Could not configure the remote System %1.</source>
+        <comment>%1 is name of System</comment>
+        <translation>No se pudo configurar el sistema remoto %1.</translation>
+    </message>
+    <message>
+        <source>Both Systems are connected to %1. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Ambos sistemas están conectados a %1. No se permite la fusión.</translation>
+    </message>
+    <message>
+        <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Estos sistemas se construyen con diferentes %1 URL. No se permite la fusión.</translation>
+    </message>
+    <message>
+        <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>El Sistema de la nube sólo puede ser combinado con la no nube. El nombre del sistema y la contraseña son tomados del Sistema de la Nube.</translation>
     </message>
 </context>
 <context>
     <name>QnBusinessStringsHelper</name>
-    <message>
-        <source>Storage Failure</source>
-        <translation>Fallo de Almacenamiento</translation>
-    </message>
-    <message>
-        <source>Network Issue</source>
-        <translation>Problema de red</translation>
-    </message>
-    <message>
-        <source>Input on %1</source>
-        <translation>Entrada en %1</translation>
-    </message>
-    <message>
-        <source>Motion on %1</source>
-        <translation>Movimiento en %1</translation>
-    </message>
-    <message>
-        <source>Storage Failure at %1</source>
-        <translation>Fallo de Almacenamiento en%1</translation>
-    </message>
-    <message>
-        <source>Network Issue at %1</source>
-        <translation>Problema de red en %1</translation>
-    </message>
     <message>
         <source>Bookmark</source>
         <translation>Marcador</translation>
@@ -131,36 +107,24 @@
         <translation>Mostrar notificación</translation>
     </message>
     <message>
-        <source>Play sound</source>
-        <translation>Reproducir sonido</translation>
-    </message>
-    <message>
         <source>Repeat sound</source>
         <translation>Repetir sonido</translation>
     </message>
     <message>
-        <source>Send email</source>
-        <translation>Enviar correo electrónico</translation>
+        <source>Play sound</source>
+        <translation>Reproducir sonido</translation>
     </message>
     <message>
         <source>Speak</source>
         <translation>Habla</translation>
     </message>
     <message>
-        <source>Unknown (%1)</source>
-        <translation>Desconocido (%1)</translation>
+        <source>Storage Failure</source>
+        <translation>Fallo de Almacenamiento</translation>
     </message>
     <message>
-        <source>Any Server Issue</source>
-        <translation>Cualquier problema del servidor</translation>
-    </message>
-    <message>
-        <source>Any Event</source>
-        <translation>Cualquier evento</translation>
-    </message>
-    <message>
-        <source>Undefined event has occurred on %1</source>
-        <translation>Evento indefinido ha ocurrido en %1</translation>
+        <source>Network Issue</source>
+        <translation>Problema de red</translation>
     </message>
     <message>
         <source>Server Failure</source>
@@ -177,6 +141,34 @@
     <message>
         <source>License Issue</source>
         <translation>Problema de licensia</translation>
+    </message>
+    <message>
+        <source>Any Server Issue</source>
+        <translation>Cualquier problema del servidor</translation>
+    </message>
+    <message>
+        <source>Any Event</source>
+        <translation>Cualquier evento</translation>
+    </message>
+    <message>
+        <source>Undefined event has occurred on %1</source>
+        <translation>Evento indefinido ha ocurrido en %1</translation>
+    </message>
+    <message>
+        <source>Input on %1</source>
+        <translation>Entrada en %1</translation>
+    </message>
+    <message>
+        <source>Motion on %1</source>
+        <translation>Movimiento en %1</translation>
+    </message>
+    <message>
+        <source>Storage Failure at %1</source>
+        <translation>Fallo de Almacenamiento en%1</translation>
+    </message>
+    <message>
+        <source>Network Issue at %1</source>
+        <translation>Problema de red en %1</translation>
     </message>
     <message>
         <source>Server &quot;%1&quot; Failure</source>
@@ -220,8 +212,8 @@
         <source>First occurrence: %1 on %2 (%n times total)</source>
         <comment>%1 means time, %2 means date</comment>
         <translation>
-            <numerusform>Primera aparición: %1 en %2 %n veces en total)</numerusform>
-            <numerusform>Primera aparición: %1 en %2 %n veces en total)</numerusform>
+            <numerusform>Primera aparición: %1 en %2 (%n veces en total)</numerusform>
+            <numerusform>Primera aparición: %1 en %2 (%n veces en total)</numerusform>
         </translation>
     </message>
     <message>
@@ -250,7 +242,7 @@
     </message>
     <message>
         <source>start</source>
-        <translation>Comenzar</translation>
+        <translation>comenzar</translation>
     </message>
     <message>
         <source>stop</source>
@@ -263,14 +255,6 @@
     <message>
         <source>On %1 %2</source>
         <translation>En %1 %2</translation>
-    </message>
-    <message>
-        <source>%1 --&gt; %2</source>
-        <translation>%1 --&gt; %2</translation>
-    </message>
-    <message>
-        <source>Server &apos;%1&apos; has a license problem</source>
-        <translation>Servidor &apos;%1&apos; tiene un problema de licencia</translation>
     </message>
     <message>
         <source>An unknown event has occurred</source>
@@ -292,17 +276,8 @@
         <translation>Evento genérico</translation>
     </message>
     <message>
-        <source> (%1)</source>
-        <translation> (%1)</translation>
-    </message>
-    <message>
         <source>Caption: %1</source>
         <translation>Título: %1</translation>
-    </message>
-    <message>
-        <source>MAC #%1: %2 </source>
-        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-        <translation>MAC #%1: %2</translation>
     </message>
     <message>
         <source>Connection to camera (primary stream) was unexpectedly closed.</source>
@@ -375,10 +350,6 @@
         <translation>Archivo de copia de seguridad a acabado</translation>
     </message>
     <message>
-        <source>Server &apos;%1&apos; has finished an archive backup</source>
-        <translation>Servidor &apos;%1&apos; ha terminado la copia de seguridad de archivo</translation>
-    </message>
-    <message>
         <source>Generic Event at %1</source>
         <translation>Evento genérico %1</translation>
     </message>
@@ -419,10 +390,6 @@
         <translation>Archivo de copia de seguridad ha fallado: Archivo de error catálogo</translation>
     </message>
     <message>
-        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
-        <translation>La copia de seguridad del archivo a terminado, pero no se completa totalmente, porque el tiempo de copia de seguridad ha terminado. Los datos se copian al %1</translation>
-    </message>
-    <message>
         <source>Archive backup is canceled by user. Data is backed up to %1</source>
         <translation>Archivo de copia de seguridad es cancelado por el usuario. Los datos se copian al %1</translation>
     </message>
@@ -430,87 +397,108 @@
         <source>Do HTTP request</source>
         <translation>Haga solicitud de HTTP</translation>
     </message>
-    <message numerus="yes">
-        <source>Motion on Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Input Signal on Device(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Input Signal on Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Device(s) Disconnected</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Camera(s) Disconnected</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Device(s) IP Conflict</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Camera(s) IP Conflict</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
         <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
         <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
         <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n veces, en primer lugar: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+            <numerusform>%n veces, en primer lugar: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         </translation>
     </message>
     <message>
         <source>Device does not respond to network requests.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dispositivo no responde a las solicitudes de red.</translation>
     </message>
     <message>
         <source>Server stopped unexpectedly.</source>
-        <translation type="unfinished"></translation>
+        <translation>Servidor se detiene inesperadamente.</translation>
     </message>
     <message>
         <source>Not enough licenses. Recording has been disabled on following devices:</source>
-        <translation type="unfinished"></translation>
+        <translation>No hay suficientes licencias. Grabación está desactivada en los siguientes dispositivos:</translation>
     </message>
     <message>
         <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-        <translation type="unfinished"></translation>
+        <translation>No hay suficientes licencias. Grabación está desactivada en las siguientes cámaras:</translation>
     </message>
     <message>
         <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-        <translation type="unfinished"></translation>
+        <translation>No hay suficientes licencias. Grabación se ha desactivado en los módulos de E/S siguientes:</translation>
+    </message>
+    <message numerus="yes">
+        <source>Motion on Cameras</source>
+        <translation>
+            <numerusform>Movimiento en las cámaras</numerusform>
+            <numerusform>Movimiento en las cámaras</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Input Signal on Devices</source>
+        <translation>
+            <numerusform>Señal de entrada en dispositivos</numerusform>
+            <numerusform>Señal de entrada en dispositivos</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Input Signal on Cameras</source>
+        <translation>
+            <numerusform>Señal de entrada en las cámaras</numerusform>
+            <numerusform>Señal de entrada en las cámaras</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Devices Disconnected</source>
+        <translation>
+            <numerusform>Dispositivos desconectados</numerusform>
+            <numerusform>Dispositivos desconectados</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Cameras Disconnected</source>
+        <translation>
+            <numerusform>Cámaras desconectadas</numerusform>
+            <numerusform>Cámaras desconectadas</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Devices IP Conflict</source>
+        <translation>
+            <numerusform>Conflicto de dispositivos IP</numerusform>
+            <numerusform>Conflicto de dispositivos IP</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Cameras IP Conflict</source>
+        <translation>
+            <numerusform>Conflicto de IP cámaras</numerusform>
+            <numerusform>Conflicto de IP cámaras</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; has a license problem</source>
+        <translation>Servidor &quot;%1&quot; tiene un problema de licencia</translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; has finished an archive backup</source>
+        <translation>Servidor &quot;%1&quot; ha terminado una copia de seguridad de archivo</translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
+        <translation>Backup de archivo terminado, pero no totalmente completa porque el tiempo de copia de seguridad. Se copiarán los datos a %1</translation>
+    </message>
+    <message>
+        <source>MAC #%1: %2</source>
+        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+        <translation>MAC #%1: %2 {1:?} {2?}</translation>
+    </message>
+    <message>
+        <source>Send Email</source>
+        <translation>Enviar correo electrónico</translation>
     </message>
 </context>
 <context>
@@ -520,12 +508,12 @@
         <translation>OK</translation>
     </message>
     <message>
-        <source>Media stream is opened but no media data was received.</source>
-        <translation>Secuencia de los medios estan abiertos pero no se recibieron datos de medios.</translation>
+        <source>Server has been stopped.</source>
+        <translation>Servidor se ha detenido.</translation>
     </message>
     <message>
-        <source>Server has been stopped.</source>
-        <translation>Server has been stopped.</translation>
+        <source>Media stream is opened but no media data was received.</source>
+        <translation>Secuencia de los medios estan abiertos pero no se recibieron datos de medios.</translation>
     </message>
     <message>
         <source>Unknown error. Please contact support.</source>
@@ -556,24 +544,8 @@
         <translation>No se puede conectar al puerto http %1.</translation>
     </message>
     <message>
-        <source>Cannot open media url %1. Failed to connect to media port %2.</source>
-        <translation>No puede abrir url multimedia %1. Error al conectar al puerto de medios %2.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
-        <translation>No puede abrir url multimedia %1. Conexión al puerto %2 se cerró inesperadamente.</translation>
-    </message>
-    <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
         <translation>Por último, intente actualizar el firmware. Si el problema persiste, póngase en contacto con el servicio de asistencia técnica.</translation>
-    </message>
-    <message>
-        <source>No supported media tracks at url %1.</source>
-        <translation>No admite las pistas de medios en la dirección url %1.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Unsupported media protocol %2.</source>
-        <translation>No puede abrir url multimedia %1. Protocolo multimedia no compatible %2.</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1.</source>
@@ -606,38 +578,6 @@
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>Asegúrese de que la cámara esté conectada a la red. Intentar reiniciar la cámara.</translation>
-    </message>
-    <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded).</source>
-        <translation>Asegúrese de que el puerto %2 es accesible (por ejemplo, reenviar).</translation>
-    </message>
-    <message>
-        <source>Could not parse device response. Url %1, request name %2.</source>
-        <translation>No podía analizar la respuesta del dispositivo. URL %1, el nombre %2 de solicitud.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation>No podía analizar la respuesta de la cámara. URL %1, el nombre %2 de solicitud.</translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>No autorizado. URL %1.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in device settings.</source>
-        <translation>En primer lugar, trate de encender la grabación (si es desconectado) y disminuya fps en ajustes del dispositivo.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation>En primer lugar, tratar de activar la grabación (si está apagado) y disminuya fps en ajustes de la cámara.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
-        <translation>Si no ayuda, restaurar valores predeterminados de fábrica en la página web del dispositivo.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
-        <translation>Si no ayuda, restaurar valores predeterminados de fábrica en la página web de la cámara.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -684,18 +624,6 @@
         <translation>Asegúrese de que el módulo de E/S está conectado a la red. Intente reiniciar el módulo de E/S.</translation>
     </message>
     <message>
-        <source>Could not parse I/O module response. Url %1, request name %2.</source>
-        <translation>No se pudo analizar la respuesta del módulo de E/S. La dirección URL %1, %2 el nombre de la solicitud.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
-        <translation>En primer lugar, pruebe a activar la grabación (si está desactivado) y disminuir fps en los ajustes del módulo de E/S.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
-        <translation>Si esto no ayuda, restaurar los valores predeterminados de fábrica en el módulo I/O página web.</translation>
-    </message>
-    <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
         <translation>Módulo E/S pedir &quot;%1&quot; con el error &quot;%2&quot;.</translation>
     </message>
@@ -723,6 +651,66 @@
         <source>I/O Module initialization process is in progress.</source>
         <translation>Módulo E/S está en proceso de inicialización.</translation>
     </message>
+    <message>
+        <source>Make sure port %1 is accessible (e.g. forwarded).</source>
+        <translation>Asegúrese de que el puerto %1 es accesible (por ejemplo, reenviar).</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
+        <translation>En primer lugar, trate de girar sobre la grabación (si está apagado) y disminución de la fps en ajustes de dispositivo.</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
+        <translation>En primer lugar, trate de girar sobre la grabación (si está apagado) y disminución de la fps en ajustes de dispositivo.</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
+        <translation>En primer lugar, trate de girar sobre la grabación (si está apagado) y disminución de la fps en ajustes del módulo de I/O.</translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the device web-page.</source>
+        <translation>Si no funciona, restaurar valores predeterminados de fábrica en la página web del dispositivo.</translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the camera web-page.</source>
+        <translation>Si no funciona, restaurar valores predeterminados de fábrica en la página web del dispositivo.</translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
+        <translation>Si no funciona, restablezca los valores predeterminados de fábrica en la página web del módulo de E/S.</translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
+        <translation>No se puede abrir la URL de medios %1. No se pudo conectar al puerto de medios %2.</translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
+        <translation>No se puede abrir la URL de medios %1. La conexión al puerto %2 se cerró inesperadamente.</translation>
+    </message>
+    <message>
+        <source>Could not parse device response. URL %1, request name %2.</source>
+        <translation>No se pudo analizar la respuesta del dispositivo. URL %1, nombre de la solicitud %2.</translation>
+    </message>
+    <message>
+        <source>Could not parse camera response. URL %1, request name %2.</source>
+        <translation>No se pudo analizar la respuesta de la cámara. URL %1, nombre de la solicitud %2.</translation>
+    </message>
+    <message>
+        <source>Could not parse I/O module response. URL %1, request name %2.</source>
+        <translation>No se pudo analizar la respuesta del módulo de E/S. URL %1, nombre de la solicitud %2.</translation>
+    </message>
+    <message>
+        <source>No supported media tracks at URL %1.</source>
+        <translation>No hay pistas multimedia soportadas en la URL %1.</translation>
+    </message>
+    <message>
+        <source>Not authorized. URL %1.</source>
+        <translation>No autorizado. URL %1.</translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
+        <translation>No se puede abrir la URL de medios %1. Protocolo de medios no soportado %2.</translation>
+    </message>
 </context>
 <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -740,31 +728,31 @@
     </message>
     <message>
         <source>Could not initialize audio decoder.</source>
-        <translation>no se pudo inicializar decodificador de audio.</translation>
+        <translation>No se pudo inicializar decodificador de audio.</translation>
     </message>
     <message>
         <source>Could not find decoder for codec %1.</source>
-        <translation type="unfinished">No se pudo encontrar el codificador para codec %1.</translation>
+        <translation>No se pudo encontrar el codificador para codec %1.</translation>
     </message>
     <message>
-        <source>Couldn&apos;t initialize resampling context, error code: %1</source>
-        <translation type="unfinished"></translation>
+        <source>Could not initialize resampling context, error code: %1</source>
+        <translation>No se pudo inicializar el contexto de remuestreo, código de error: %1</translation>
     </message>
     <message>
-        <source>Couldn&apos;t allocate sample buffers, error code: %1</source>
-        <translation type="unfinished"></translation>
+        <source>Could not allocate sample buffers, error code: %1</source>
+        <translation>No se pudo asignar buffers de ejemplo, código de error: %1</translation>
     </message>
     <message>
-        <source>Couldn&apos;t send audio frame to encoder, Error code: %1.</source>
-        <translation type="unfinished"></translation>
+        <source>Could not send audio frame to encoder, Error code: %1.</source>
+        <translation>No se pudo enviar el marco de audio al codificador, Código de error: %1.</translation>
     </message>
     <message>
-        <source>Couldn&apos;t receive audio packet from encoder, Error code: %1.</source>
-        <translation type="unfinished"></translation>
+        <source>Could not receive audio packet from encoder, Error code: %1.</source>
+        <translation>No se pudo recibir el paquete de audio del codificador, Código de error: %1.</translation>
     </message>
     <message>
-        <source>Couldn&apos;t receive audio frame from decoder, Error code: %1.</source>
-        <translation type="unfinished"></translation>
+        <source>Could not receive audio frame from decoder, Error code: %1.</source>
+        <translation>No se pudo recibir el marco de audio del decodificador, Código de error: %1.</translation>
     </message>
 </context>
 <context>
@@ -787,7 +775,7 @@
     </message>
     <message>
         <source>Could not find codec %1.</source>
-        <translation>Could not find codec %1.</translation>
+        <translation>No se pudo encontrar el códec %1.</translation>
     </message>
     <message>
         <source>Video or audio codec is incompatible with container %1.</source>
@@ -821,11 +809,11 @@
     </message>
     <message>
         <source>Edge</source>
-        <translation>Edge</translation>
+        <translation type="unfinished">Edge</translation>
     </message>
     <message>
         <source>Vmax</source>
-        <translation>Vmax</translation>
+        <translation type="unfinished">Vmax</translation>
     </message>
     <message>
         <source>Video Wall</source>
@@ -845,7 +833,7 @@
     </message>
     <message>
         <source>Start</source>
-        <translation>Comenzar</translation>
+        <translation type="unfinished">Start</translation>
     </message>
     <message>
         <source>Analog Encoder</source>
@@ -900,32 +888,32 @@
         <translation>Licensias invalidas</translation>
     </message>
     <message>
-        <source>This license type requires higher software version.</source>
-        <translation>Este tipo de la licencia requiere la versión del software más alta.</translation>
-    </message>
-    <message>
         <source>Invalid signature</source>
-        <translation type="unfinished">Firma no válida</translation>
+        <translation>Firma no válida</translation>
     </message>
     <message>
         <source>Invalid customization</source>
-        <translation type="unfinished">Personalización no es válida</translation>
+        <translation>Personalización no es válida</translation>
     </message>
     <message>
         <source>License is expired</source>
-        <translation type="unfinished"></translation>
+        <translation>Licencia ha caducado</translation>
     </message>
     <message>
         <source>Invalid type</source>
-        <translation type="unfinished">Tipo no válido</translation>
+        <translation>Tipo no válido</translation>
     </message>
     <message>
         <source>Free</source>
-        <translation type="unfinished"></translation>
+        <translation>Gratis</translation>
     </message>
     <message>
         <source>Free license</source>
-        <translation type="unfinished"></translation>
+        <translation>Licencia gratuita</translation>
+    </message>
+    <message>
+        <source>This license type requires higher software version</source>
+        <translation>Este tipo de licencia requiere una versión de software más alta</translation>
     </message>
 </context>
 <context>
@@ -944,20 +932,6 @@
             <numerusform>%n %2 se utilizarán de %1.</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>Activate %n more %2. </source>
-        <translation>
-            <numerusform>Activar %n más %2.</numerusform>
-            <numerusform>Activar %n más %2.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n more %2 will be used. </source>
-        <translation>
-            <numerusform>%n %2 más será utilizado.</numerusform>
-            <numerusform>%n %2 más será utilizado.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
         <translation>La clave de licencia que ha introducido no es válida. Compruebe por favor que la clave de licencia es introducida correctamente. Si el problema persiste, póngase en contacto con el equipo de asistencia para confirmar si la clave de licencia es válida o para obtener una clave de licencia válida.</translation>
@@ -967,10 +941,6 @@
         <translation>Intentas activar una licencia incompatible con su software. Póngase en contacto con el equipo de asistencia para obtener una clave de licencia válida.</translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation>Esta clave de licencia se ha activado anteriormente en el hardware id { {hwid}} { {tiempo} }. Póngase en contacto con el equipo de asistencia para obtener una clave de licencia válida.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. A database error occurred.</source>
         <translation>Hubo un problema al activar su clave de licencia. Se produjo un error de base de datos.</translation>
     </message>
@@ -978,19 +948,31 @@
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
         <translation>Hubo un problema de activación de su clave de licencia. Se recibieron datos inválidos. Por favor, póngase en contacto con el equipo de apoyo para informar sobre el problema.</translation>
     </message>
+    <message numerus="yes">
+        <source>Activate %n more %1.</source>
+        <translation>
+            <numerusform>Activar %n más %1.</numerusform>
+            <numerusform>Activar %n más %1.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n more %1 will be used.</source>
+        <translation>
+            <numerusform>%n más %1 se utilizará.</numerusform>
+            <numerusform>%n más %1 se utilizará.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
+        <comment>%1 is a hardware ID, %2 is an activation time</comment>
+        <translation>Esta clave de licencia se ha activado previamente en ID de hardware %1 en %2. Póngase en contacto con el equipo de soporte técnico para obtener una clave de licencia válida.</translation>
+    </message>
 </context>
 <context>
     <name>QnLocalSystemDescription</name>
     <message>
-        <source>New System</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnPropertyStorage</name>
-    <message>
-        <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
-        <translation>Valor no válido para &apos;%1&apos; argumento -que se espera %2, siempre &quot; %3&quot;.</translation>
+        <source>New Server</source>
+        <translation>Nuevo servidor</translation>
     </message>
 </context>
 <context>
@@ -998,28 +980,28 @@
     <message numerus="yes">
         <source>%n Camera(s)</source>
         <translation>
-            <numerusform>%n Camaras</numerusform>
+            <numerusform>%n Camara</numerusform>
             <numerusform>%n Camaras</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n camera(s)</source>
         <translation>
-            <numerusform>%n Camaras</numerusform>
-            <numerusform>%n Camaras</numerusform>
+            <numerusform>%n camara</numerusform>
+            <numerusform>%n camaras</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Device(s)</source>
         <translation>
-            <numerusform>%n Dispositivos</numerusform>
+            <numerusform>%n Dispositivo</numerusform>
             <numerusform>%n Dispositivos</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n device(s)</source>
         <translation>
-            <numerusform>%n Dispositivos</numerusform>
+            <numerusform>%n Dispositivo</numerusform>
             <numerusform>%n Dispositivos</numerusform>
         </translation>
     </message>
@@ -1029,7 +1011,7 @@
     </message>
     <message>
         <source>cameras</source>
-        <translation>Camaras</translation>
+        <translation>camaras</translation>
     </message>
     <message>
         <source>Camera</source>
@@ -1037,7 +1019,7 @@
     </message>
     <message>
         <source>camera</source>
-        <translation>Camara</translation>
+        <translation>camara</translation>
     </message>
     <message>
         <source>Devices</source>
@@ -1045,7 +1027,7 @@
     </message>
     <message>
         <source>devices</source>
-        <translation>Dispositivos</translation>
+        <translation>dispositivos</translation>
     </message>
     <message>
         <source>Device</source>
@@ -1053,7 +1035,7 @@
     </message>
     <message>
         <source>device</source>
-        <translation>Dispositivo</translation>
+        <translation>dispositivo</translation>
     </message>
     <message numerus="yes">
         <source>%n I/O Module(s)</source>
@@ -1071,7 +1053,6 @@
     </message>
     <message>
         <source>I/O Modules</source>
-        <translatorcomment>I/O Modulos</translatorcomment>
         <translation>I/O Modulos</translation>
     </message>
     <message>
@@ -1094,24 +1075,24 @@
         <translation>Desconocido</translation>
     </message>
     <message>
-        <source>Hardware ID: </source>
-        <translation>Hardware ID:</translation>
-    </message>
-    <message>
-        <source>Watermark: </source>
-        <translation>Filigrana:</translation>
-    </message>
-    <message>
         <source>Trial License</source>
         <translation>Las licencias de prueba</translation>
     </message>
     <message>
-        <source>Licensed To: </source>
-        <translation>Licencia para:</translation>
-    </message>
-    <message>
         <source>FREE License</source>
         <translation>Licencia GRATIS</translation>
+    </message>
+    <message>
+        <source>Hardware ID: %1</source>
+        <translation>ID de hardware: %1</translation>
+    </message>
+    <message>
+        <source>Licensed To: %1</source>
+        <translation>Licenciado a: %1</translation>
+    </message>
+    <message>
+        <source>Watermark: %1</source>
+        <translation>Filigrana: %1</translation>
     </message>
 </context>
 <context>
@@ -1174,17 +1155,12 @@
         <extracomment>Short for &apos;Preset&apos;</extracomment>
         <translation>Predeterminado</translation>
     </message>
-    <message>
-        <source>-</source>
-        <extracomment>Short for &apos;Undefined&apos;</extracomment>
-        <translation>-</translation>
-    </message>
 </context>
 <context>
     <name>QnStreamRecorder</name>
     <message>
         <source>Corresponding container in FFMPEG library was not found.</source>
-        <translation>Contenedor correspondiente  no se encontró en la biblioteca FFMPEG.</translation>
+        <translation>Contenedor correspondiente no se encontró en la biblioteca FFMPEG.</translation>
     </message>
     <message>
         <source>Could not create output file for video recording.</source>
@@ -1207,23 +1183,19 @@
         <translation>Codec de audio o video es incompatible con el formato seleccionado.</translation>
     </message>
     <message>
-        <source>Error during watermark generation for file &apos;%1&apos;.</source>
-        <translation>Error durante la generación de la filigrana para el archivo &apos;%1&apos;.</translation>
-    </message>
-    <message>
         <source>File write error. Not enough free space.</source>
         <translation>Error al escribir archivo. No hay suficiente espacio libre.</translation>
     </message>
     <message>
         <source>Invalid resource type for data export.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo de recurso no válido para la exportación de datos.</translation>
     </message>
 </context>
 <context>
     <name>QnSystemDescription</name>
     <message>
-        <source>&lt;Unnamed system&gt;</source>
-        <translation type="unfinished"></translation>
+        <source>Unnamed System</source>
+        <translation>Sistema sin nombre</translation>
     </message>
 </context>
 <context>
@@ -1258,145 +1230,145 @@
     <message>
         <source>ms</source>
         <comment>Suffix for displaying milliseconds</comment>
-        <translation type="unfinished"></translation>
+        <translation>ms</translation>
     </message>
     <message>
         <source>s</source>
         <comment>Suffix for displaying seconds</comment>
-        <translation type="unfinished"></translation>
+        <translation>s</translation>
     </message>
     <message>
         <source>m</source>
         <comment>Suffix for displaying minutes</comment>
-        <translation type="unfinished"></translation>
+        <translation>m</translation>
     </message>
     <message>
         <source>h</source>
         <comment>Suffix for displaying hours</comment>
-        <translation type="unfinished"></translation>
+        <translation>h</translation>
     </message>
     <message>
         <source>d</source>
         <comment>Suffix for displaying days</comment>
-        <translation type="unfinished"></translation>
+        <translation>d</translation>
     </message>
     <message>
         <source>w</source>
         <comment>Suffix for displaying weeks</comment>
-        <translation type="unfinished"></translation>
+        <translation>w</translation>
     </message>
     <message>
         <source>M</source>
         <comment>Suffix for displaying months</comment>
-        <translation type="unfinished"></translation>
+        <translation>M</translation>
     </message>
     <message>
         <source>y</source>
         <comment>Suffix for displaying years</comment>
-        <translation type="unfinished"></translation>
+        <translation>y</translation>
     </message>
     <message>
         <source>msec</source>
         <comment>Long suffix for displaying milliseconds</comment>
-        <translation type="unfinished"></translation>
+        <translation>msec</translation>
     </message>
     <message>
         <source>sec</source>
         <comment>Long suffix for displaying seconds</comment>
-        <translation type="unfinished"></translation>
+        <translation>seg</translation>
     </message>
     <message>
         <source>min</source>
         <comment>Long suffix for displaying minutes</comment>
-        <translation type="unfinished"></translation>
+        <translation>mín</translation>
     </message>
     <message>
         <source>hrs</source>
         <comment>Long suffix for displaying hours</comment>
-        <translation type="unfinished"></translation>
+        <translation>hrs</translation>
     </message>
     <message>
         <source>days</source>
         <comment>Long suffix for displaying days</comment>
-        <translation type="unfinished"></translation>
+        <translation>días</translation>
     </message>
     <message>
         <source>wks</source>
         <comment>Long suffix for displaying weeks</comment>
-        <translation type="unfinished"></translation>
+        <translation>sem</translation>
     </message>
     <message>
         <source>mos</source>
         <comment>Long suffix for displaying months</comment>
-        <translation type="unfinished"></translation>
+        <translation>mes</translation>
     </message>
     <message>
         <source>yrs</source>
         <comment>Long suffix for displaying years</comment>
-        <translation type="unfinished"></translation>
+        <translation>años</translation>
     </message>
     <message numerus="yes">
         <source>milliseconds</source>
         <comment>Full suffix for displaying milliseconds</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>milisegundo</numerusform>
+            <numerusform>milisegundos</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>seconds</source>
         <comment>Full suffix for displaying seconds</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>segundo</numerusform>
+            <numerusform>segundos</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>minutes</source>
         <comment>Full suffix for displaying minutes</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>minuto</numerusform>
+            <numerusform>minutos</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>hours</source>
         <comment>Full suffix for displaying hours</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>hora</numerusform>
+            <numerusform>horas</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>days</source>
         <comment>Full suffix for displaying days</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>días</numerusform>
+            <numerusform>días</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>weeks</source>
         <comment>Full suffix for displaying weeks</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>semanas</numerusform>
+            <numerusform>semanas</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>months</source>
         <comment>Full suffix for displaying months</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>meses</numerusform>
+            <numerusform>meses</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>years</source>
         <comment>Full suffix for displaying years</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>años</numerusform>
+            <numerusform>años</numerusform>
         </translation>
     </message>
 </context>
@@ -1423,66 +1395,66 @@
     <name>QnUserRolesManager</name>
     <message>
         <source>Owner</source>
-        <translation type="unfinished"></translation>
+        <translation>Propietaria</translation>
     </message>
     <message>
         <source>Administrator</source>
-        <translation type="unfinished"></translation>
+        <translation>Administrador</translation>
     </message>
     <message>
         <source>Advanced Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Visor avanzado</translation>
     </message>
     <message>
         <source>Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Espectador</translation>
     </message>
     <message>
         <source>Live Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Visor en vivo</translation>
     </message>
     <message>
         <source>Custom Role</source>
-        <translation type="unfinished"></translation>
+        <translation>Función personalizada</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Has access to whole system and can do everything.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Has access to whole system and can manage it. Can create users.</source>
-        <translation type="unfinished"></translation>
+        <translation>Personalizado</translation>
     </message>
     <message>
         <source>Can manage all cameras and bookmarks.</source>
-        <translation type="unfinished"></translation>
+        <translation>Puede administrar todas las cámaras y marcadores.</translation>
     </message>
     <message>
         <source>Can view all cameras and export video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Puede ver todas las cámaras y exportar vídeo.</translation>
     </message>
     <message>
         <source>Can view live video from all cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>Puede ver video en vivo de todas las cámaras.</translation>
     </message>
     <message>
         <source>Custom user role.</source>
-        <translation type="unfinished"></translation>
+        <translation>Función de usuario personalizada.</translation>
     </message>
     <message>
         <source>Custom permissions.</source>
-        <translation type="unfinished"></translation>
+        <translation>Permisos personalizados.</translation>
+    </message>
+    <message>
+        <source>Has access to whole System and can do everything.</source>
+        <translation>Tiene acceso a todo el sistema y puede hacer todo.</translation>
+    </message>
+    <message>
+        <source>Has access to whole System and can manage it. Can create users.</source>
+        <translation>Tiene acceso a todo el Sistema y puede manejarlo. Puede crear usuarios.</translation>
     </message>
 </context>
 <context>
     <name>utils::QnCameraNamesWatcher</name>
     <message>
         <source>Removed camera</source>
-        <translation>cámara eliminada</translation>
+        <translation>Cámara eliminada</translation>
     </message>
 </context>
 </TS>

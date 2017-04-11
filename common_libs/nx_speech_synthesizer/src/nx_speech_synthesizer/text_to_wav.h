@@ -4,9 +4,10 @@
 #define TEXT_TO_WAV_H
 
 #include <QtCore/QIODevice>
-#include <nx/utils/thread/mutex.h>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QString>
+
+#include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <utils/common/long_runnable.h>
 #include <utils/common/threadqueue.h>
@@ -20,16 +21,17 @@
     \param text Only latin1 string is supported
     \note Has internal thread. Holds queue of text to synthetise
 */
-class TextToWaveServer
-:
+class TextToWaveServer:
     public QnLongRunnable,
     public Singleton<TextToWaveServer>
 {
     Q_OBJECT
 
 public:
-    TextToWaveServer();
+    TextToWaveServer(const QString& binaryPath);
     virtual ~TextToWaveServer();
+
+    void waitForStarted();
 
     virtual void pleaseStop() override;
 
@@ -42,7 +44,7 @@ public slots:
     //!Adds task to the queue and blocks till speech is generated (or failed)
     /*!
         \return generation result
-        \note This method is synchronous and reenterable
+        \note This method is synchronous and reentrant
     */
     bool generateSoundSync(
         const QString& text,
@@ -50,7 +52,7 @@ public slots:
         QnAudioFormat* outFormat = nullptr);
 
 signals:
-    //!Emmitted in any case on text generation done (successfull or not)
+    //!Emitted in any case on text generation done (successful or not)
     void done( int textID, bool result );
 
 protected:
@@ -78,10 +80,14 @@ private:
         }
     };
 
+    QString m_binaryPath;
     QnSafeQueue<QSharedPointer<SynthetiseSpeechTask> > m_textQueue;
     QAtomicInt m_prevTaskID;
     QnWaitCondition m_cond;
     QnMutex m_mutex;
+
+    nx::utils::promise<void> m_initializedPromise;
+    nx::utils::future<void> m_initializedFuture;
 
     QSharedPointer<SynthetiseSpeechTask> addTaskToQueue( const QString& text, QIODevice* const dest );
 };

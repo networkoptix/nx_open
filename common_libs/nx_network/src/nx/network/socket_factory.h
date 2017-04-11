@@ -2,8 +2,10 @@
 
 #include <atomic>
 
-#include "socket_common.h"
 #include "abstract_socket.h"
+#include "socket_common.h"
+
+namespace nx { namespace network { class UDPSocket; } }
 
 /**
  * Contains factory methods for creating sockets.
@@ -26,8 +28,8 @@ public:
         bool /*sslRequired*/,
         nx::network::NatTraversalSupport /*natTraversalRequired*/)> CreateStreamServerSocketFuncType;
 
-
     static std::unique_ptr< AbstractDatagramSocket > createDatagramSocket();
+    static std::unique_ptr< nx::network::UDPSocket > createUdpSocket();
 
     /**
      * @param sslRequired If true than it is guaranteed that returned object 
@@ -64,6 +66,11 @@ public:
         setCreateStreamServerSocketFunc(CreateStreamServerSocketFuncType newFactoryFunc);
 
     static void setIpVersion(const QString& ipVersion);
+
+    /**
+     * @return Previous version.
+     */
+    static nx::network::IpVersion setUdpIpVersion(nx::network::IpVersion ipVersion);
 
     static int udpIpVersion();
     static int tcpClientIpVersion();

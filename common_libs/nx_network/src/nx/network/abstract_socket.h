@@ -15,9 +15,6 @@
 #include "nettools.h"
 #include "socket_common.h"
 
-//todo: #ak cancel asynchoronous operations
-
-// forward
 namespace nx {
 namespace network {
 
@@ -210,6 +207,9 @@ public:
               certaind thread type is not the same)
      */
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) = 0;
+
+    //!Returns true if this socket in own AIO thread
+    virtual bool isInSelfAioThread() const;
 };
 
 //!Interface for writing to/reading from socket
@@ -489,6 +489,8 @@ class NX_NETWORK_API AbstractStreamServerSocket
     public AbstractSocket
 {
 public:
+    static const int kDefaultBacklogSize = 128;
+
     //!Start listening for incoming connections
     /*!
         \note Method returns immediately
@@ -496,7 +498,7 @@ public:
             If queue is full and new connection arrives, it receives ECONNREFUSED error
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
-    virtual bool listen( int queueLen = 128 ) = 0;
+    virtual bool listen(int backlog = kDefaultBacklogSize) = 0;
     //!Accepts new connection
     /*!
         \return NULL in case of error (use \a SystemError::getLastOSErrorCode() to get error description)

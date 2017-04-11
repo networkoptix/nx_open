@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source> ms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Browse Logs</source>
         <translation type="unfinished">lịch sử</translation>
     </message>
@@ -324,11 +319,6 @@
     </message>
     <message>
         <location/>
-        <source>&lt;Cameras...&gt; </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Backup Quality</source>
         <translation type="unfinished"></translation>
     </message>
@@ -400,11 +390,6 @@
         <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
         <source>Refresh</source>
         <translation>Làm mới</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt; Any camera &gt;</source>
-        <translation>&lt;Bất kỳ máy ảnh&gt;</translation>
     </message>
     <message>
         <location/>
@@ -557,18 +542,8 @@
     </message>
     <message>
         <location/>
-        <source>0.0.0.0</source>
-        <translation type="unfinished">0.0.0.0</translation>
-    </message>
-    <message>
-        <location/>
         <source>End IP</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>0.0.0.255</source>
-        <translation type="unfinished">0.0.0.255</translation>
     </message>
     <message>
         <location/>
@@ -638,11 +613,6 @@
         <location/>
         <source>Camera Settings Control</source>
         <translation>Cài đặt camera kiểm soát</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Keep camera streams&apos; and profiles&apos; settings</source>
-        <translation>Camera Retention streaming và cài đặt liên quan</translation>
     </message>
     <message>
         <location/>
@@ -721,16 +691,6 @@
     </message>
     <message>
         <location/>
-        <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
-        <translation>&quot;Cho phép hệ thống để tối ưu hóa các cài đặt máy ảnh&quot; bị vô hiệu hóa trong Quản trị hệ thống.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
-        <translation>Tính toán bitrate mỗi GOP thay vì bitrate mỗi giây (Nó sẽ làm tăng tốc độ bit cho máy ảnh)</translation>
-    </message>
-    <message>
-        <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
         <translation>Cảnh báo! Điều này sẽ làm cho chất lượng và tỷ lệ khung hình (FPS) thiết lập trong Biểu ghi không liên quan.</translation>
     </message>
@@ -746,8 +706,33 @@
     </message>
     <message>
         <location/>
-        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-        <translation>Cảnh báo! Không thay đổi các thiết lập này, trừ khi bạn hoàn toàn chắc chắn về tác động tiềm năng của họ về hiệu năng hệ thống của bạn.</translation>
+        <source>Motion detection control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Force motion detection for stream:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Keep camera streams and profiles settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -757,6 +742,14 @@
         <source>Input ID:</source>
         <translatorcomment>vào ID:</translatorcomment>
         <translation>vào ID:</translation>
+    </message>
+</context>
+<context>
+    <name>CameraListDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
+        <source>Add Device...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -781,11 +774,6 @@
     <name>CameraScheduleWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
-        <source>Panic Mode: </source>
-        <translation>Chế độ khẩn cấp:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Schedule Settings</source>
         <translation>Lịch tập</translation>
     </message>
@@ -831,12 +819,6 @@
     </message>
     <message>
         <location/>
-        <source> s</source>
-        <extracomment>Short for &quot;seconds&quot;</extracomment>
-        <translation>s</translation>
-    </message>
-    <message>
-        <location/>
         <source>Post-Recording</source>
         <translation>video liên tục</translation>
     </message>
@@ -844,11 +826,6 @@
         <location/>
         <source>Copy Schedule...</source>
         <translation>Lịch sao chép…</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion + Low-Res </source>
-        <translation>Motion + Low-Res </translation>
     </message>
     <message>
         <location/>
@@ -895,6 +872,16 @@
         <source>Apply changes before copying schedule.</source>
         <translation type="unfinished">Áp dụng trước khi thay đổi lịch trình sao chép</translation>
     </message>
+    <message>
+        <location/>
+        <source>Panic Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion + Lo-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChangeUserPasswordDialog</name>
@@ -905,24 +892,15 @@
     </message>
 </context>
 <context>
-    <name>CloudManagementWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/system_settings/cloud_management_widget.ui"/>
-        <source>&lt;2. Connect system
-to the cloud&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>ConnectToCloudDialog</name>
     <message>
         <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
-        <source>Email or password is not recognized.</source>
+        <source>Stay logged in</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Stay logged in</source>
+        <source>Incorrect Email or Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -994,14 +972,6 @@ to the cloud&gt;</source>
     </message>
 </context>
 <context>
-    <name>DateRangeWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/common/date_range_widget.ui"/>
-        <source>-</source>
-        <translation type="unfinished">-</translation>
-    </message>
-</context>
-<context>
     <name>EventLogDialog</name>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
@@ -1025,11 +995,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>&lt; Any camera &gt;</source>
-        <translation type="unfinished">&lt;Bất kỳ máy ảnh&gt;</translation>
-    </message>
-    <message>
-        <location/>
         <source>Event Rules...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1040,11 +1005,6 @@ to the cloud&gt;</source>
         <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
         <source>HTTP content</source>
         <translation>HTTP Nội dung</translation>
-    </message>
-    <message>
-        <location/>
-        <source>HTTP url</source>
-        <translation>HTTP url</translation>
     </message>
     <message>
         <location/>
@@ -1065,6 +1025,16 @@ to the cloud&gt;</source>
         <location/>
         <source>Password</source>
         <translation>Mật khẩu</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Content type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>HTTP URL</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1133,11 +1103,6 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Mount Angle Correction:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>°</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1220,7 +1185,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Run application when PC Boots</source>
+        <source>Run Application when PC Boots up</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1264,13 +1229,13 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>&lt;No image&gt;</source>
-        <translation>&lt;Không có hình ảnh&gt;</translation>
+        <source>Loading Image...Please Wait.</source>
+        <translation>Đang tải hình ảnh ... Xin vui lòng chờ đợi.</translation>
     </message>
     <message>
         <location/>
-        <source>Loading Image...Please Wait.</source>
-        <translation>Đang tải hình ảnh ... Xin vui lòng chờ đợi.</translation>
+        <source>No image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1304,16 +1269,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Clear</source>
         <translation>tẩy</translation>
-    </message>
-    <message>
-        <location/>
-        <source> cells</source>
-        <translation>tế bào</translation>
-    </message>
-    <message>
-        <location/>
-        <source>%</source>
-        <translation>%</translation>
     </message>
     <message>
         <location/>
@@ -1408,16 +1363,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Select users to import</source>
-        <translation>Chọn người dùng để nhập khẩu</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Filter...</source>
-        <translation>Lọc...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Loading...</source>
         <translation>Đang tải...</translation>
     </message>
@@ -1425,6 +1370,16 @@ to the cloud&gt;</source>
         <location/>
         <source>Connection error</source>
         <translation>Lôi kêt nôi</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Role to assign to imported users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disable imported users</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1458,11 +1413,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Features</source>
         <translation>Features</translation>
-    </message>
-    <message>
-        <location/>
-        <source>This license type requires a higher software version.</source>
-        <translation>loại giấy phép này đòi hỏi phải có một phiên bản phần mềm cao hơn.</translation>
     </message>
 </context>
 <context>
@@ -1652,23 +1602,8 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source> seconds</source>
-        <translation>thứ hai</translation>
-    </message>
-    <message>
-        <location/>
-        <source>%</source>
-        <translation>%</translation>
-    </message>
-    <message>
-        <location/>
         <source>Background Image</source>
         <translation>hình nền</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;No image&gt;</source>
-        <translation>&lt;không có ảnh&gt;</translation>
     </message>
     <message>
         <location/>
@@ -1710,6 +1645,19 @@ to the cloud&gt;</source>
         <source>Tour cycle</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>seconds</source>
+        <translation type="unfinished">giây</translation>
+    </message>
+</context>
+<context>
+    <name>MessageBox</name>
+    <message>
+        <location filename="../src/ui/dialogs/common/message_box.ui"/>
+        <source>Do not show this message again</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MultipleCameraSettingsWidget</name>
@@ -1747,11 +1695,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Enable Audio</source>
         <translation>cho phép âm thanh</translation>
-    </message>
-    <message>
-        <location/>
-        <source>TextLabel</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1961,7 +1904,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Email or password is not recognized.</source>
+        <source>Incorrect Email or Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1992,11 +1935,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>The new system will have password and name from the system:</source>
-        <translation>Hệ thống mới sẽ có mật khẩu và tên từ hệ thống:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Check</source>
         <translation>kiểm tra</translation>
     </message>
@@ -2012,7 +1950,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>admin</source>
+        <source>The new System will have password and name from System:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2066,13 +2004,13 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Removing this connection option could lead to system malfunction.</source>
-        <translation>Loại bỏ các tùy chọn kết nối này có thể dẫn đến hệ thống bị trục trặc.</translation>
+        <source>Add</source>
+        <translation type="unfinished">thêm</translation>
     </message>
     <message>
         <location/>
-        <source>Add</source>
-        <translation type="unfinished">thêm</translation>
+        <source>Removing this connection option could lead to System malfunction.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2094,11 +2032,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Applying system updates at the end of the week is not recommended.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Updating to...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2110,6 +2043,11 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>You have the latest version installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Applying System updates at the end of the week is not recommended.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2145,13 +2083,13 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Warning: file with same name already exists!</source>
-        <translation>Cảnh báo: file có cùng tên đã tồn tại!</translation>
+        <source>Options</source>
+        <translation>Tùy chọn</translation>
     </message>
     <message>
         <location/>
-        <source>Options</source>
-        <translation>Tùy chọn</translation>
+        <source>Warning: file with the same name already exists!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2397,11 +2335,6 @@ to the cloud&gt;</source>
         <location filename="../src/ui/widgets/properties/server_settings_widget.ui"/>
         <source>Ping</source>
         <translation>Ping</translation>
-    </message>
-    <message>
-        <location/>
-        <source>9000</source>
-        <translation>9000</translation>
     </message>
     <message>
         <location/>
@@ -2729,36 +2662,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>1 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>0 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>1000 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>100 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source> TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>10 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Additional storage:</source>
         <translation type="unfinished">Lưu trữ bổ sung:</translation>
     </message>
@@ -2884,8 +2787,8 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>System time is synchronized with the Internet and is independent from server&apos;s local time.
-Selected server will be used as a time server if the system has no Internet access.</source>
+        <source>System time is synchronized with the Internet and is independent from server local time.
+Selected server will be used as a time server if System has no Internet access.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

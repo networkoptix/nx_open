@@ -15,8 +15,10 @@
 #include <nx/utils/math/fuzzy.h>
 
 namespace {
-const int toolTipHideDelay = 2500;
-} // anonymous namespace
+
+const int kDefaultToolTipHideDelayMs = 2500;
+
+} // namespace
 
 /**
  * Note that this is a separate class so that user classes derived from
@@ -57,7 +59,8 @@ QnToolTipSlider::QnToolTipSlider(QGraphicsItem* parent):
     m_pendingPositionUpdate(false),
     m_instantPositionUpdate(false),
     m_tooltipMargin(0),
-    m_toolTipEnabled(true)
+    m_toolTipEnabled(true),
+    m_toolTipHideDelayMs(kDefaultToolTipHideDelayMs)
 {
     setOrientation(Qt::Horizontal);
 
@@ -304,7 +307,7 @@ bool QnToolTipSlider::eventFilter(QObject *target, QEvent *event) {
             break;
         case QEvent::GraphicsSceneHoverLeave:
             m_toolTipUnderMouse = false;
-            m_hideTimer.start(toolTipHideDelay, this);
+            m_hideTimer.start(m_toolTipHideDelayMs, this);
             updateToolTipVisibility();
             break;
         default:
@@ -322,7 +325,7 @@ void QnToolTipSlider::sliderChange(SliderChange change) {
     if(toolTipItem()) {
         if(change == SliderValueChange) {
             if(m_autoHideToolTip)
-                m_hideTimer.start(toolTipHideDelay, this);
+                m_hideTimer.start(m_toolTipHideDelayMs, this);
             updateToolTipVisibility();
             updateToolTipPosition();
         } else if(change == SliderMappingChange) {
@@ -371,7 +374,7 @@ void QnToolTipSlider::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
 void QnToolTipSlider::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverLeaveEvent(event);
     m_sliderUnderMouse = false;
-    m_hideTimer.start(toolTipHideDelay, this);
+    m_hideTimer.start(m_toolTipHideDelayMs, this);
 
     updateToolTipVisibility();
 }
@@ -382,3 +385,12 @@ void QnToolTipSlider::resizeEvent(QGraphicsSceneResizeEvent *event) {
     updateToolTipPosition();
 }
 
+int QnToolTipSlider::toolTipHideDelayMs() const
+{
+    return m_toolTipHideDelayMs;
+}
+
+void QnToolTipSlider::setToolTipHideDelayMs(int delayMs)
+{
+    m_toolTipHideDelayMs = delayMs;
+}

@@ -89,7 +89,8 @@ struct ConfigureSystemData : public PasswordData
         wholeSystem(params.value(lit("wholeSystem"), lit("false")) != lit("false")),
         sysIdTime(params.value(lit("sysIdTime")).toLongLong()),
         //tranLogTime(params.value(lit("tranLogTime")).toLongLong()),
-        port(params.value(lit("port")).toInt())
+        port(params.value(lit("port")).toInt()),
+        systemName(params.value(lit("systemName")))
     {
         tranLogTime.sequence = params.value(lit("tranLogTimeSequence")).toULongLong();
         tranLogTime.ticks = params.value(lit("tranLogTimeTicks")).toULongLong();
@@ -105,6 +106,7 @@ struct ConfigureSystemData : public PasswordData
     ec2::ApiResourceParamDataList foreignSettings;
     ec2::ApiResourceParamWithRefDataList additionParams;
     bool rewriteLocalSettings;
+    QString systemName; //added for compatibility with NxTool
 };
 
 /*

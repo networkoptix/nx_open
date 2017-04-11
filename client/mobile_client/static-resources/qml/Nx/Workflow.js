@@ -178,13 +178,14 @@ function openDialog(path, properties)
     return dialog
 }
 
-function openInformationDialog(title, message)
+function openStandardDialog(title, message, buttonsModel)
 {
-    openDialog(
-        "Dialogs/InformationDialog.qml",
+    return openDialog(
+        "Dialogs/StandardDialog.qml",
         {
             "title": title,
-            "message": message
+            "message": message,
+            "buttonsModel": buttonsModel ? buttonsModel : ["OK"]
         }
     )
 }

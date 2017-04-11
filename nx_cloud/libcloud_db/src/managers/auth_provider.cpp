@@ -9,7 +9,6 @@
 #include <nx/utils/random.h>
 #include <nx/utils/time.h>
 #include <nx/utils/uuid.h>
-#include <utils/common/util.h>
 
 #include "access_control/authentication_manager.h"
 #include "account_manager.h"

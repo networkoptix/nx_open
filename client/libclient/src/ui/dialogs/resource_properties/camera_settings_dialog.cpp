@@ -119,11 +119,19 @@ void QnCameraSettingsDialog::retranslateUi()
 
     auto cameras = m_settingsWidget->cameras();
 
-    const QString windowTitle = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
+    static const QString kWindowTitlePattern = lit("%1 - %2");
+
+    const QString caption = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
         tr("Device Settings"), tr("Devices Settings"),
         tr("Camera Settings"), tr("Cameras Settings"),
         tr("I/O Module Settings"), tr("I/O Modules Settings")
     ), cameras);
+
+    const QString description = cameras.size() == 1
+        ? cameras.first()->getName()
+        : QnDeviceDependentStrings::getNumericName(cameras);
+
+    setWindowTitle(kWindowTitlePattern.arg(caption).arg(description));
 
     const QString rulesTitle = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
         tr("Device Rules..."), tr("Devices Rules..."),
@@ -131,7 +139,6 @@ void QnCameraSettingsDialog::retranslateUi()
         tr("I/O Module Rules..."), tr("I/O Modules Rules...")
     ), cameras);
 
-    setWindowTitle(windowTitle);
     m_rulesButton->setText(rulesTitle);
 }
 
@@ -229,29 +236,25 @@ bool QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& camer
     {
         auto unsavedCameras = m_settingsWidget->cameras();
 
-        const auto question = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
-            tr("Apply changes to the following %n devices?", "", unsavedCameras.size()),
-            tr("Apply changes to the following %n cameras?", "", unsavedCameras.size()),
-            tr("Apply changes to the following %n I/O modules?", "", unsavedCameras.size())
+        const auto extras = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
+            tr("Changes to the following %n devices are not saved:", "", unsavedCameras.size()),
+            tr("Changes to the following %n cameras are not saved:", "", unsavedCameras.size()),
+            tr("Changes to the following %n I/O Modules are not saved:", "", unsavedCameras.size())
         ), unsavedCameras);
 
-        QnMessageBox messageBox(
-            QnMessageBox::Warning,
-            Qn::Empty_Help,
-            tr("Changes are not saved"),
-            tr("Changes are not saved"),
-            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-            mainWindow());
-        messageBox.setDefaultButton(QDialogButtonBox::Yes);
-        messageBox.setInformativeText(question);
-        messageBox.addCustomWidget(new QnResourceListView(unsavedCameras));
-        auto result = messageBox.exec();
+        QnMessageBox messageBox(QnMessageBoxIcon::Question,
+            tr("Apply changes before switching to another camera?"), extras,
+            QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
+            QDialogButtonBox::Apply, mainWindow());
+
+        messageBox.addCustomWidget(new QnResourceListView(unsavedCameras, &messageBox));
+        const auto result = messageBox.exec();
         switch (result)
         {
-            case QDialogButtonBox::Yes:
+            case QDialogButtonBox::Apply:
                 submitToResources();
                 break;
-            case QDialogButtonBox::No:
+            case QDialogButtonBox::Discard:
                 break;
             default:
                 /* Cancel changes. */

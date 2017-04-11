@@ -136,65 +136,33 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
 {
     m_notifiedVersion = info.currentRelease;
 
-    QnSoftwareVersion current = qnCommon->engineVersion();
-    bool majorVersionChange = info.currentRelease.major() > current.major() || info.currentRelease.minor() > current.minor();
+    const QnSoftwareVersion current = qnCommon->engineVersion();
+    const bool majorVersionChange = ((info.currentRelease.major() > current.major())
+        || (info.currentRelease.minor() > current.minor()));
 
-    QString title;
-    QString message;
+    const auto text = tr("%1 version available").arg(info.currentRelease.toString());
+    const auto releaseNotesLink = makeHref(tr("Release Notes"), info.releaseNotesUrl);
+    const auto extras = (majorVersionChange
+        ? releaseNotesLink
+        : tr("Major issues have been fixed. Update is strongly recommended.")
+            + L'\n' + releaseNotesLink);
 
-    if (majorVersionChange)
+
+    QnMessageBox messageBox(QnMessageBoxIcon::Question,
+        text, extras, QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
+        mainWindow());
+
+    messageBox.addButton(tr("Update..."), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+    messageBox.setCustomCheckBoxText(tr("Do not notify again about this update"));
+
+    const auto result = messageBox.exec();
+
+    if (messageBox.isChecked())
     {
-        title = tr("A newer version is available.");
-        message = tr("New version %1 is available.").arg(htmlBold(info.currentRelease.toString()));
-        message += lit("<br/>");
-    }
-    else
-    {
-        title = tr("Update is recommended.");
-        message = tr("New version %1 is available.").arg(htmlBold(info.currentRelease.toString()));
-        message += lit("<br/>");
-        message += tr("Major issues have been fixed.");
-        message += lit("<br/><span style=\"color:%1;\">").arg(qnGlobals->errorTextColor().name());
-        message += tr("Update is strongly recommended.");
-        message += lit("</span><br/>");
-    }
-
-    QnMessageBox messageBox(mainWindow());
-
-    messageBox.setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
-    messageBox.setIcon(QnMessageBox::Question);
-
-    message += tr("Would you like to update?");;
-
-    messageBox.setWindowTitle(title);
-    messageBox.setTextFormat(Qt::RichText);
-    messageBox.setText(message);
-    messageBox.setCheckBoxText(tr("Do not notify me again about this update."));
-    setHelpTopic(&messageBox, Qn::Upgrade_Help);
-
-    if (info.releaseNotesUrl.isValid())
-    {
-        QPushButton* button = messageBox.addButton(tr("Release Notes"), QDialogButtonBox::ActionRole);
-        connect(button, &QPushButton::clicked, this, [info]
-        {
-            QDesktopServices::openUrl(info.releaseNotesUrl);
-        });
-    }
-
-    //TODO: #dklychkov refactor update notifications in 2.4
-    messageBox.adjustSize();
-    messageBox.setGeometry(QnGeometry::aligned(messageBox.size(), mainWindow()->geometry(), Qt::AlignCenter));
-
-    int result = messageBox.exec();
-
-    /* We check for 'Yes' button. 'No' and even 'Ok' buttons are considered negative. */
-    if (result == QDialogButtonBox::Yes)
-    {
-        action(QnActions::SystemUpdateAction)->trigger();
-    }
-    else
-    {
-        qnSettings->setIgnoredUpdateVersion(messageBox.isChecked() ? info.currentRelease : QnSoftwareVersion());
+        qnSettings->setIgnoredUpdateVersion(info.currentRelease);
         qnSettings->save();
     }
+
+    if (result != QDialogButtonBox::Cancel)
+        action(QnActions::SystemUpdateAction)->trigger();
 }

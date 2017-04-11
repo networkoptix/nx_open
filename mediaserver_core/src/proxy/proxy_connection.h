@@ -20,11 +20,19 @@ public:
         QSharedPointer<AbstractStreamSocket> socket,
         QnHttpConnectionListener* owner);
 
+
+    static void cleanupProxyInfo(nx_http::Request* request);
+
     virtual ~QnProxyConnectionProcessor();
 protected:
     virtual void run() override;
 private:
-    static bool doProxyData(AbstractStreamSocket* srcSocket, AbstractStreamSocket* dstSocket, char* buffer, int bufferSize);
+    bool doProxyData(
+        AbstractStreamSocket* srcSocket,
+        AbstractStreamSocket* dstSocket,
+        char* buffer,
+        int bufferSize,
+        bool* outSomeBytesRead);
     static int getDefaultPortByProtocol(const QString& protocol);
     QString connectToRemoteHost(const QnRoute& route, const QUrl& url); // return new client request buffer size or -1 if error
     bool isProtocol(const QString& protocol) const;
@@ -34,6 +42,10 @@ private:
     QUrl getDefaultProxyUrl();
     bool updateClientRequest(QUrl& dstUrl, QnRoute& dstRoute);
     bool replaceAuthHeader();
+
+    /** Returns false if socket would block in blocking mode */
+    bool readSocketNonBlock(
+        int* returnValue, AbstractStreamSocket* socket, void* buffer, int bufferSize);
 private:
     Q_DECLARE_PRIVATE(QnProxyConnectionProcessor);
 };

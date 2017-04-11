@@ -104,6 +104,11 @@ public:
         const std::string& email,
         const std::string& password,
         std::vector<api::SystemDataEx>* const systems);
+    api::ResultCode getSystemsFiltered(
+        const std::string& email,
+        const std::string& password,
+        const api::Filter& filter,
+        std::vector<api::SystemDataEx>* const systems);
     api::ResultCode getSystem(
         const std::string& email,
         const std::string& password,
@@ -203,15 +208,52 @@ public:
         const std::string& systemId,
         api::SystemDataEx* const systemData);
 
+    api::ResultCode getSystemHealthHistory(
+        const std::string& accountEmail,
+        const std::string& accountPassword,
+        const std::string& systemId,
+        api::SystemHealthHistory* history);
+
     api::ResultCode recordUserSessionStart(
         const AccountWithPassword& account,
         const std::string& systemId);
 
-    api::ResultCode getVmsConnections(
-        api::VmsConnectionDataList* const vmsConnections);
+    api::ResultCode getVmsConnections(api::VmsConnectionDataList* const vmsConnections);
+    api::ResultCode getStatistics(api::Statistics* const statistics);
 
     bool isStartedWithExternalDb() const;
     bool placePreparedDB(const QString& dbDumpPath);
+
+    /**
+     * Convenience functions.
+     * These methods throw on failure.
+     */
+
+    AccountWithPassword addActivatedAccount2();
+    api::SystemData addRandomSystemToAccount(
+        const AccountWithPassword& account);
+    api::SystemData addRandomSystemToAccount(
+        const AccountWithPassword& account,
+        const api::SystemData& systemPrototype);
+    void shareSystemEx(
+        const AccountWithPassword& from,
+        const api::SystemData& what,
+        const AccountWithPassword& to,
+        api::SystemAccessRole targetRole);
+    void shareSystemEx(
+        const AccountWithPassword& from,
+        const api::SystemData& what,
+        const std::string& emailToShareWith,
+        api::SystemAccessRole targetRole);
+
+    void enableUser(
+        const AccountWithPassword& who,
+        const api::SystemData& what,
+        const AccountWithPassword& whom);
+    void disableUser(
+        const AccountWithPassword& who,
+        const api::SystemData& what,
+        const AccountWithPassword& whom);
 
 private:
     int m_port;
@@ -220,6 +262,12 @@ private:
         decltype(&destroyConnectionFactory)
     > m_connectionFactory;
     api::ModuleInfo m_moduleInfo;
+
+    void setUserEnabledFlag(
+        const AccountWithPassword& who,
+        const api::SystemData& what,
+        const AccountWithPassword& whom,
+        bool isEnabled);
 };
 
 namespace api {

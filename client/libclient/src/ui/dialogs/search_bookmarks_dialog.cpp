@@ -15,6 +15,10 @@ QnSearchBookmarksDialog::QnSearchBookmarksDialog(
     d_ptr(new QnSearchBookmarksDialogPrivate(filterText, utcStartTimeMs, utcFinishTimeMs, this))
 {
     setHelpTopic(this, Qn::Bookmarks_Search_Help);
+
+    setWindowFlags(windowFlags()
+        | Qt::WindowMaximizeButtonHint
+        | Qt::MaximizeUsingFullscreenGeometryHint);
 }
 
 QnSearchBookmarksDialog::~QnSearchBookmarksDialog()
@@ -26,15 +30,6 @@ void QnSearchBookmarksDialog::setParameters(qint64 utcStartTimeMs, qint64 utcFin
 {
     Q_D(QnSearchBookmarksDialog);
     d->setParameters(filterText, utcStartTimeMs, utcFinishTimeMs);
-}
-
-
-void QnSearchBookmarksDialog::resizeEvent(QResizeEvent* event)
-{
-    base_type::resizeEvent(event);
-
-    Q_D(QnSearchBookmarksDialog);
-    d->updateHeadersWidth();
 }
 
 void QnSearchBookmarksDialog::showEvent(QShowEvent* event)

@@ -36,8 +36,7 @@ if (android | ios) {
     DISABLE_MDNS \
     DISABLE_DATA_PROVIDERS \
     DISABLE_SOFTWARE_MOTION_DETECTION \
-    DISABLE_SENDMAIL \
-    DISABLE_SSL
+    DISABLE_SENDMAIL
 }
 
 include( optional_functionality.pri )
@@ -258,6 +257,7 @@ linux*:!android {
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
 
   equals(TEMPLATE, app): QMAKE_RPATHDIR += $ORIGIN/../lib
+  contains(TEMPLATE, "lib"): LIBS += "-Wl,--allow-shlib-undefined"
 }
 
 ## MAC OS

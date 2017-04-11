@@ -51,7 +51,7 @@ protected:
                 &m_temporaryCredentials));
     }
 
-    void assertIfTemporaryCredentialsAreNotLowCase()
+    void assertTemporaryCredentialsAreLowCase()
     {
         for (auto c: m_temporaryCredentials.login)
             ASSERT_EQ(std::tolower(c), c);
@@ -272,7 +272,7 @@ TEST_F(AccountTemporaryCredentials, temporary_credentials_removed_on_password_ch
 TEST_F(AccountTemporaryCredentials, temporary_credentials_are_low_case)
 {
     allocateAccountTemporaryCredentials();
-    assertIfTemporaryCredentialsAreNotLowCase();
+    assertTemporaryCredentialsAreLowCase();
 }
 
 } // namespace cdb

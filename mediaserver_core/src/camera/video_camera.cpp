@@ -18,6 +18,7 @@
 
 #include <media_server/settings.h>
 #include <streaming/hls/hls_types.h>
+#include <api/global_settings.h>
 
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
 static const qint64 KEEP_IFRAMES_INTERVAL = 1000000ll * 80;
@@ -33,26 +34,34 @@ static const int CAMERA_PULLING_STOP_TIMEOUT = 1000 * 3;
 class QnVideoCameraGopKeeper: public QnResourceConsumer, public QnAbstractDataConsumer
 {
 public:
-    virtual void beforeDisconnectFromResource();
     QnVideoCameraGopKeeper(QnVideoCamera* camera, const QnResourcePtr &resource,  QnServer::ChunksCatalog catalog);
     virtual ~QnVideoCameraGopKeeper();
-    QnAbstractMediaStreamDataProvider* getLiveReader();
+
+    virtual void beforeDisconnectFromResource();
 
     int copyLastGop(qint64 skipTime, QnDataPacketQueue& dstQueue, int cseq, bool iFramesOnly);
 
-    // QnAbstractDataConsumer
     virtual bool canAcceptData() const;
     virtual void putData(const QnAbstractDataPacketPtr& data);
     virtual bool processData(const QnAbstractDataPacketPtr& data);
 
-    //QnMediaContextPtr getVideoCodecContext();
-    //QnMediaContextPtr getAudioCodecContext();
     QnConstCompressedVideoDataPtr getLastVideoFrame(int channel) const;
-    QnConstCompressedVideoDataPtr GetIFrameByTime(qint64 time, bool iFrameAfterTime, int channel) const;
     QnConstCompressedAudioDataPtr getLastAudioFrame() const;
+
+    QnConstCompressedVideoDataPtr getIframeByTimeUnsafe(
+        qint64 time,
+        int channel,
+        QnThumbnailRequestData::RoundMethod roundMethod) const;
+
+    QnConstCompressedVideoDataPtr getIframeByTime(
+        qint64 time,
+        int channel,
+        QnThumbnailRequestData::RoundMethod roundMethod) const;
+
+    std::unique_ptr<QnConstDataPacketQueue> getGopTillTime(qint64 time, int channel) const;
+
     void updateCameraActivity();
     virtual bool needConfigureProvider() const override { return false; }
-
     void clearVideoData();
 
 private:
@@ -192,25 +201,84 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, QnDataPacketQueue& dstQ
     return rez;
 }
 
-
-QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::GetIFrameByTime(qint64 time, bool iFrameAfterTime, int channel) const
+QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::getIframeByTimeUnsafe(
+    qint64 time,
+    int channel,
+    QnThumbnailRequestData::RoundMethod roundMethod) const
 {
-    QnMutexLocker lock( &m_queueMtx );
     const auto &queue = m_lastKeyFrames[channel];
     if (queue.empty())
         return QnConstCompressedVideoDataPtr(); // no video data
-    auto itr = std::lower_bound(queue.begin(), queue.end(), time, [](const QnConstCompressedVideoDataPtr& data, qint64 time) { return data->timestamp < time; } );
-    if (itr == queue.end()) {
-        if (m_lastKeyFrame[channel] && (m_lastKeyFrame[channel]->timestamp <= time || iFrameAfterTime))
+
+    auto condition =
+        [](const QnConstCompressedVideoDataPtr& data, qint64 time)
+        {
+            return data->timestamp < time;
+        };
+
+    auto itr = std::lower_bound(
+        queue.begin(),
+        queue.end(),
+        time,
+        condition);
+
+    if (itr == queue.end())
+    {
+        const bool returnLastKeyFrame = m_lastKeyFrame[channel]
+            && (m_lastKeyFrame[channel]->timestamp <= time
+                || roundMethod != QnThumbnailRequestData::RoundMethod::KeyFrameBeforeMethod);
+
+        if (returnLastKeyFrame)
             return m_lastKeyFrame[channel];
         else
             return queue.back();
     }
-    if (itr != queue.begin() && (*itr)->timestamp > time && !iFrameAfterTime)
+
+    const bool returnIframeBeforeTime = itr != queue.begin()
+        && (*itr)->timestamp > time
+        && roundMethod == QnThumbnailRequestData::RoundMethod::KeyFrameBeforeMethod;
+
+    if (returnIframeBeforeTime)
         --itr; // prefer frame before defined time if no exact match
+
     return *itr;
 }
 
+QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::getIframeByTime(
+    qint64 time,
+    int channel,
+    QnThumbnailRequestData::RoundMethod roundMethod) const
+{
+    QnMutexLocker lock( &m_queueMtx );
+    return getIframeByTimeUnsafe(time, channel, roundMethod);
+}
+
+std::unique_ptr<QnConstDataPacketQueue> QnVideoCameraGopKeeper::getGopTillTime(qint64 time, int channel) const
+{
+    QnMutexLocker lock(&m_queueMtx);
+
+    auto frameSequence = std::make_unique<QnConstDataPacketQueue>();
+    auto randomAccess = m_dataQueue.lock();
+    for (int i = 0; i < randomAccess.size(); ++i)
+    {
+        const QnConstAbstractDataPacketPtr& data = randomAccess.at(i);
+        auto video = std::dynamic_pointer_cast<const QnCompressedVideoData>(data);
+        if (video && video->timestamp <= time && video->channelNumber == channel)
+            frameSequence->push(video);
+    }
+
+	if (frameSequence->isEmpty())
+	{
+        auto iframe = getIframeByTimeUnsafe(
+            time,
+            channel,
+            QnThumbnailRequestData::RoundMethod::KeyFrameAfterMethod);
+       if (iframe)
+	       frameSequence->push(iframe);
+	}
+
+    return frameSequence;
+}
 
 QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::getLastVideoFrame(int channel) const
 {
@@ -234,7 +302,8 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
             lastKeyTime = m_lastKeyFrame[0]->timestamp;
     }
     if (!m_resource->hasFlags(Qn::foreigner) && m_resource->isInitialized() &&
-       (lastKeyTime == (qint64)AV_NOPTS_VALUE || qnSyncTime->currentUSecsSinceEpoch() - lastKeyTime > CAMERA_UPDATE_INTERNVAL))
+       (lastKeyTime == (qint64)AV_NOPTS_VALUE || qnSyncTime->currentUSecsSinceEpoch() - lastKeyTime > CAMERA_UPDATE_INTERNVAL) &&
+        qnGlobalSettings->isAutoUpdateThumbnailsEnabled())
     {
         if (m_nextMinTryTime == 0) // get first screenshot after minor delay
             m_nextMinTryTime = usecTime + nx::utils::random::number(5000, 10000) * 1000ll;
@@ -481,13 +550,39 @@ QnMediaContextPtr QnVideoCamera::getAudioCodecContext(bool primaryLiveStream)
 }
 */
 
-QnConstCompressedVideoDataPtr QnVideoCamera::getFrameByTime(bool primaryLiveStream, qint64 time, bool iFrameAfterTime, int channel) const
+std::unique_ptr<QnConstDataPacketQueue> QnVideoCamera::getFrameSequenceByTime(
+    bool primaryLiveStream,
+    qint64 time,
+    int channel,
+    QnThumbnailRequestData::RoundMethod roundMethod) const
 {
-    QnVideoCameraGopKeeper* gopKeeper = primaryLiveStream ? m_primaryGopKeeper : m_secondaryGopKeeper;
+    QnVideoCameraGopKeeper* gopKeeper = primaryLiveStream
+        ? m_primaryGopKeeper
+        : m_secondaryGopKeeper;
+
     if (gopKeeper)
-        return gopKeeper->GetIFrameByTime(time, iFrameAfterTime, channel);
-    else
-        return QnCompressedVideoDataPtr();
+    {
+        if (roundMethod == QnThumbnailRequestData::RoundMethod::PreciseMethod)
+            return gopKeeper->getGopTillTime(time, channel);
+
+        auto frame = gopKeeper->getIframeByTime(time, channel, roundMethod);
+        if (frame)
+        {
+            if (roundMethod == QnThumbnailRequestData::KeyFrameAfterMethod
+                && frame->timestamp < time)
+            {
+                // After frame not found. Return preceise frame instead.
+                return gopKeeper->getGopTillTime(time, channel);
+            }
+
+            auto queue = std::make_unique<QnConstDataPacketQueue>();
+            queue->push(frame);
+
+            return queue;
+        }
+    }
+
+    return nullptr;
 }
 
 QnConstCompressedVideoDataPtr QnVideoCamera::getLastVideoFrame(bool primaryLiveStream, int channel) const

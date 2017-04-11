@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>441</width>
-    <height>174</height>
+    <width>776</width>
+    <height>222</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -288,14 +288,7 @@
         </layout>
        </item>
        <item row="1" column="1">
-        <widget class="QLabel" name="manualActivationTextWidget">
-         <property name="text">
-          <string notr="true"/>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
+        <widget class="QnWordWrappedLabel" name="manualActivationTextWidget" native="true"/>
        </item>
       </layout>
      </widget>
@@ -308,6 +301,12 @@
    <class>QnBusyIndicatorButton</class>
    <extends>QPushButton</extends>
    <header location="global">ui/widgets/common/busy_indicator_button.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

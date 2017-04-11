@@ -100,11 +100,6 @@
     </message>
     <message>
         <location/>
-        <source> ms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Browse Logs</source>
         <translation type="unfinished">סייר בתיעוד(log)</translation>
     </message>
@@ -325,11 +320,6 @@
     </message>
     <message>
         <location/>
-        <source>&lt;Cameras...&gt; </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Backup Quality</source>
         <translation type="unfinished"></translation>
     </message>
@@ -401,11 +391,6 @@
         <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
         <source>Refresh</source>
         <translation>רענן</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt; Any camera &gt;</source>
-        <translation>&lt;כל מצלמה&gt;</translation>
     </message>
     <message>
         <location/>
@@ -553,18 +538,8 @@
     </message>
     <message>
         <location/>
-        <source>0.0.0.0</source>
-        <translation type="unfinished">0.0.0.0</translation>
-    </message>
-    <message>
-        <location/>
         <source>End IP</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>0.0.0.255</source>
-        <translation type="unfinished">0.0.0.255</translation>
     </message>
     <message>
         <location/>
@@ -637,18 +612,8 @@
     </message>
     <message>
         <location/>
-        <source>Keep camera streams&apos; and profiles&apos; settings</source>
-        <translation>שמור את הגדרות הזרמים והפרופילים של המצלמה</translation>
-    </message>
-    <message>
-        <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
         <translation>אזהרה! צעד זה יהפוך את הגדרות האיכות וקצב הפריימים(FPS) ב&quot;לוח זמני הקלטות&quot; ללא רלוונטיים.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
-        <translation>&quot;אפשר למערכת למטב את הגדרות המצלמה&quot; מבוטל ב&quot;ניהול המערכת&quot;.</translation>
     </message>
     <message>
         <location/>
@@ -732,18 +697,38 @@
     </message>
     <message>
         <location/>
-        <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
-        <translation>חשב קצב נתונים לכל GOP (קבוצת תמונות) במקום קצב נתונים לשניה (קצב הנתונים של המצלמה יגדל)</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-        <translation>אזהרה! אל תשנה הגדרות אלו במידה ואינך מבין לחלוטין את ההשפעה האפשרית שלהם על ביצועי המערכת שלך.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Restore Defaults</source>
         <translation>שחזר לברירת המחדל</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion detection control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Force motion detection for stream:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Keep camera streams and profiles settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -752,6 +737,14 @@
         <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
         <source>Input ID:</source>
         <translation>מזהה קלט:</translation>
+    </message>
+</context>
+<context>
+    <name>CameraListDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
+        <source>Add Device...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -776,11 +769,6 @@
     <name>CameraScheduleWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
-        <source>Panic Mode: </source>
-        <translation>מצב מצוקה:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Schedule Settings</source>
         <translation>הגדרות לוח זמנים</translation>
     </message>
@@ -803,11 +791,6 @@
         <location/>
         <source>Motion Only</source>
         <translation>תנועה בלבד</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion + Low-Res </source>
-        <translation>תנועה + רזולוציה נמוכה</translation>
     </message>
     <message>
         <location/>
@@ -843,12 +826,6 @@
         <location/>
         <source>Pre-Recording</source>
         <translation>משך הקלטה לפני </translation>
-    </message>
-    <message>
-        <location/>
-        <source> s</source>
-        <extracomment>Short for &quot;seconds&quot;</extracomment>
-        <translation>ש</translation>
     </message>
     <message>
         <location/>
@@ -890,6 +867,16 @@
         <source>Apply changes before copying schedule.</source>
         <translation type="unfinished">החלת השינויים לפני העתקת לוח הזמנים</translation>
     </message>
+    <message>
+        <location/>
+        <source>Panic Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion + Lo-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChangeUserPasswordDialog</name>
@@ -900,24 +887,15 @@
     </message>
 </context>
 <context>
-    <name>CloudManagementWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/system_settings/cloud_management_widget.ui"/>
-        <source>&lt;2. Connect system
-to the cloud&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>ConnectToCloudDialog</name>
     <message>
         <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
-        <source>Email or password is not recognized.</source>
+        <source>Stay logged in</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Stay logged in</source>
+        <source>Incorrect Email or Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -989,14 +967,6 @@ to the cloud&gt;</source>
     </message>
 </context>
 <context>
-    <name>DateRangeWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/common/date_range_widget.ui"/>
-        <source>-</source>
-        <translation type="unfinished">-</translation>
-    </message>
-</context>
-<context>
     <name>EventLogDialog</name>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
@@ -1020,11 +990,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>&lt; Any camera &gt;</source>
-        <translation type="unfinished">&lt;כל מצלמה&gt;</translation>
-    </message>
-    <message>
-        <location/>
         <source>Event Rules...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1035,11 +1000,6 @@ to the cloud&gt;</source>
         <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
         <source>HTTP content</source>
         <translation>תוכן HTTP</translation>
-    </message>
-    <message>
-        <location/>
-        <source>HTTP url</source>
-        <translation>כתובת HTTP</translation>
     </message>
     <message>
         <location/>
@@ -1060,6 +1020,16 @@ to the cloud&gt;</source>
         <location/>
         <source>Password</source>
         <translation>סיסמא</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Content type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>HTTP URL</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1128,11 +1098,6 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Mount Angle Correction:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>°</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1215,7 +1180,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Run application when PC Boots</source>
+        <source>Run Application when PC Boots up</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1259,13 +1224,13 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>&lt;No image&gt;</source>
-        <translation>אין תמונה</translation>
+        <source>Loading Image...Please Wait.</source>
+        <translation>טוען תמונה... אנא המתן.</translation>
     </message>
     <message>
         <location/>
-        <source>Loading Image...Please Wait.</source>
-        <translation>טוען תמונה... אנא המתן.</translation>
+        <source>No image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1309,16 +1274,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Processing Image...Please Wait.</source>
         <translation>מעבד תמונה... אנא המתן.</translation>
-    </message>
-    <message>
-        <location/>
-        <source> cells</source>
-        <translation>תאים</translation>
-    </message>
-    <message>
-        <location/>
-        <source>%</source>
-        <translation>%</translation>
     </message>
     <message>
         <location/>
@@ -1403,16 +1358,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Select users to import</source>
-        <translation>בחר משתמשים ליבוא</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Filter...</source>
-        <translation>פילטר...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Loading...</source>
         <translation>טוען...</translation>
     </message>
@@ -1420,6 +1365,16 @@ to the cloud&gt;</source>
         <location/>
         <source>Connection error</source>
         <translation>שגיאת חיבור</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Role to assign to imported users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disable imported users</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1453,11 +1408,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Features</source>
         <translation>תכונות</translation>
-    </message>
-    <message>
-        <location/>
-        <source>This license type requires a higher software version.</source>
-        <translation>רשיון זה דורש גרסת תוכנה גבוהה יותר</translation>
     </message>
 </context>
 <context>
@@ -1647,23 +1597,8 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source> seconds</source>
-        <translation>שניות</translation>
-    </message>
-    <message>
-        <location/>
-        <source>%</source>
-        <translation>%</translation>
-    </message>
-    <message>
-        <location/>
         <source>Background Image</source>
         <translation>תמונת רקע</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;No image&gt;</source>
-        <translation>&lt;ללא תמונה&gt;</translation>
     </message>
     <message>
         <location/>
@@ -1705,6 +1640,19 @@ to the cloud&gt;</source>
         <source>Tour cycle</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>seconds</source>
+        <translation type="unfinished">שניות</translation>
+    </message>
+</context>
+<context>
+    <name>MessageBox</name>
+    <message>
+        <location filename="../src/ui/dialogs/common/message_box.ui"/>
+        <source>Do not show this message again</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MultipleCameraSettingsWidget</name>
@@ -1742,11 +1690,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Expert</source>
         <translation>מומחה</translation>
-    </message>
-    <message>
-        <location/>
-        <source>TextLabel</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1956,7 +1899,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Email or password is not recognized.</source>
+        <source>Incorrect Email or Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1992,11 +1935,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>The new system will have password and name from the system:</source>
-        <translation>המערכת החדשה תקבל שם וסיסמה מהמערכת:</translation>
-    </message>
-    <message>
-        <location/>
         <source>You will be reconnected.</source>
         <translation>תחובר מחדש.</translation>
     </message>
@@ -2007,7 +1945,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>admin</source>
+        <source>The new System will have password and name from System:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2061,13 +1999,13 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Removing this connection option could lead to system malfunction.</source>
-        <translation>הסרת אפשרות חיבור זה עלולה להביא לבעיות בתפקוד המערכת.</translation>
+        <source>Add</source>
+        <translation type="unfinished">הוסף</translation>
     </message>
     <message>
         <location/>
-        <source>Add</source>
-        <translation type="unfinished">הוסף</translation>
+        <source>Removing this connection option could lead to System malfunction.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2089,11 +2027,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Applying system updates at the end of the week is not recommended.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Updating to...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2105,6 +2038,11 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>You have the latest version installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Applying System updates at the end of the week is not recommended.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2140,13 +2078,13 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Warning: file with same name already exists!</source>
-        <translation>אזהרה: קיים קובץ בעל שם זהה!</translation>
+        <source>Options</source>
+        <translation>אפשרויות</translation>
     </message>
     <message>
         <location/>
-        <source>Options</source>
-        <translation>אפשרויות</translation>
+        <source>Warning: file with the same name already exists!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2392,11 +2330,6 @@ to the cloud&gt;</source>
         <location filename="../src/ui/widgets/properties/server_settings_widget.ui"/>
         <source>Ping</source>
         <translation>פינג</translation>
-    </message>
-    <message>
-        <location/>
-        <source>9000</source>
-        <translation>9000</translation>
     </message>
     <message>
         <location/>
@@ -2724,36 +2657,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>1 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>0 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>1000 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>100 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source> TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>10 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Additional storage:</source>
         <translation type="unfinished">אחסון נוסף:</translation>
     </message>
@@ -2879,8 +2782,8 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>System time is synchronized with the Internet and is independent from server&apos;s local time.
-Selected server will be used as a time server if the system has no Internet access.</source>
+        <source>System time is synchronized with the Internet and is independent from server local time.
+Selected server will be used as a time server if System has no Internet access.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

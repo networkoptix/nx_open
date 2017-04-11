@@ -13,6 +13,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             High: 'hi',
             Low: 'lo'
         };
+        $scope.Config = Config;
         $scope.session = $sessionStorage;
         $scope.storage = $localStorage;
         $scope.storage.serverStates = $scope.storage.serverStates || {};
@@ -401,8 +402,11 @@ angular.module('webadminApp').controller('ViewCtrl',
         });
 
 
-
         function searchCams(){
+            if($scope.searchCams.toLowerCase() == "links panel"){ // Enable cameras and clean serach fields
+                $scope.cameraLinksEnabled = true;
+                $scope.searchCams = "";
+            }
             function has(str, substr){
                 return str && str.toLowerCase().indexOf(substr.toLowerCase()) >= 0;
             }

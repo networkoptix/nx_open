@@ -3,6 +3,7 @@
 #include <thread>
 
 #include <nx/utils/async_operation_guard.h>
+#include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/sync_queue.h>
 
 namespace nx {
@@ -14,7 +15,7 @@ class AsyncRunner
 public:
     AsyncRunner()
     {
-        m_thread = std::thread([this]()
+        m_thread = nx::utils::thread([this]()
         {
             while(1)
             {
@@ -40,7 +41,7 @@ public:
     }
 
 private:
-    std::thread m_thread;
+    utils::thread m_thread;
     utils::TestSyncQueue<std::function<void()>> m_tasks;
 };
 

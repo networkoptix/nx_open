@@ -6,6 +6,7 @@
 #include <api/helpers/thumbnail_request_data.h>
 
 #include <core/resource/resource_fwd.h>
+#include <camera/video_camera.h>
 
 class CLVideoDecoderOutput;
 class QnServerArchiveDelegate;
@@ -42,6 +43,16 @@ private:
         , const QSize& size
         , QnThumbnailRequestData::RoundMethod roundMethod = QnThumbnailRequestData::KeyFrameBeforeMethod
         , int rotation = -1 );
+
+    static QSharedPointer<CLVideoDecoderOutput> getMostPreciseImageFromLive(
+        QnVideoCameraPtr& camera,
+        bool useHq,
+        quint64 time,
+        int channel);
+
+    static CLVideoDecoderOutputPtr decodeFrameSequence(
+        std::unique_ptr<QnConstDataPacketQueue>& sequence,
+        quint64 time);
 };
 
 #endif // __GET_IMAGE_HELPER_H__

@@ -34,7 +34,7 @@ void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const ur
 
 #define SystemData_Fields (id)(name)(customization)(authKey)(ownerAccountEmail) \
                           (status)(cloudConnectionSubscriptionStatus)(systemSequence) \
-                          (opaque)
+                          (opaque)(registrationTime)
 #define SystemDataList_Fields (systems)
 
 //!for requests passing just system id
@@ -52,6 +52,12 @@ void serializeToUrlQuery(const SystemId& data, QUrlQuery* const urlQuery);
 
 #define SystemId_Fields (systemId)
 
+//-------------------------------------------------------------------------------------------------
+// Filter
+
+void serializeToUrlQuery(const Filter& data, QUrlQuery* const urlQuery);
+void serialize(QnJsonContext* ctx, const Filter& filter, QJsonValue* target);
+
 
 //-------------------------------------------------------------------------------------------------
 // SystemAttributesUpdate
@@ -62,11 +68,14 @@ void serializeToUrlQuery(const SystemAttributesUpdate& data, QUrlQuery* const ur
 void serialize(QnJsonContext*, const SystemAttributesUpdate&, QJsonValue*);
 bool deserialize(QnJsonContext*, const QJsonValue&, SystemAttributesUpdate*);
 
+//-------------------------------------------------------------------------------------------------
+// SystemHealthHistory
 
+#define SystemHealthHistoryItem_Fields (timestamp)(state)
+#define SystemHealthHistory_Fields (events)
 
-////////////////////////////////////////////////////////////
-//// system sharing data
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// System sharing data
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemSharing);
 void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery);
@@ -104,12 +113,14 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (SystemDataEx)(SystemDataList)(SystemDataExList)(SystemSharingList)(SystemSharingEx) \
-        (SystemSharingExList)(SystemAccessRoleData)(SystemAccessRoleList),
+        (SystemSharingExList)(SystemAccessRoleData)(SystemAccessRoleList) \
+        (SystemHealthHistoryItem)(SystemHealthHistory),
     (json));
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemStatus)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemHealth)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemAccessRole)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::FilterField)
 
 }   //api
 }   //cdb
@@ -118,5 +129,6 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemAccessRole)
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemStatus), (lexical))
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemHealth), (lexical))
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemAccessRole), (lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::FilterField), (lexical))
 
 #endif //CLOUD_DB_CL_SYSTEM_DATA_H

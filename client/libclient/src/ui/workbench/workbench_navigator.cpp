@@ -139,8 +139,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_preciseNextSeek(false),
     m_autoPaused(false),
     m_lastSpeed(0.0),
-    m_lastMinimalSpeed(0.0),
-    m_lastMaximalSpeed(0.0),
+    m_lastSpeedRange(0.0, 0.0),
     m_lastAdjustTimelineToPosition(false),
     m_timelineRelevant(false),
     m_startSelectionAction(new QAction(this)),
@@ -639,7 +638,7 @@ qreal QnWorkbenchNavigator::speed() const
 
 void QnWorkbenchNavigator::setSpeed(qreal speed)
 {
-    speed = qBound(minimalSpeed(), speed, maximalSpeed());
+    speed = speedRange().boundSpeed(speed);
     if (qFuzzyEquals(speed, this->speed()))
         return;
 
@@ -654,6 +653,8 @@ void QnWorkbenchNavigator::setSpeed(qreal speed)
 
         if (speed <= 0.0)
             setLive(false);
+        else if (!hasArchive())
+            setLive(true);
 
         updateSpeed();
     }
@@ -716,28 +717,21 @@ bool QnWorkbenchNavigator::currentWidgetHasVideo() const
     return m_currentMediaWidget && m_currentMediaWidget->hasVideo();
 }
 
+QnSpeedRange QnWorkbenchNavigator::speedRange() const
+{
+    return m_currentMediaWidget
+        ? m_currentMediaWidget->speedRange()
+        : QnSpeedRange();
+}
+
 qreal QnWorkbenchNavigator::minimalSpeed() const
 {
-    if (!isPlayingSupported())
-        return 0.0;
-
-    if (QnAbstractArchiveStreamReader *reader = m_currentMediaWidget->display()->archiveReader())
-        if (!reader->isNegativeSpeedSupported())
-            return 0.0;
-
-    return currentWidgetHasVideo()
-        ? -16.0
-        : 0.0;
+    return -speedRange().backward;
 }
 
 qreal QnWorkbenchNavigator::maximalSpeed() const
 {
-    if (!isPlayingSupported())
-        return 0.0;
-
-    return currentWidgetHasVideo()
-        ? 16.0
-        : 1.0;
+    return speedRange().forward;
 }
 
 qint64 QnWorkbenchNavigator::positionUsec() const
@@ -1151,10 +1145,11 @@ void QnWorkbenchNavigator::updateCurrentWidget()
     updateLines();
     updateCalendar();
 
-    if (!((m_currentWidgetFlags & WidgetSupportsSync) && (previousWidgetFlags & WidgetSupportsSync) && m_streamSynchronizer->isRunning()) && m_currentWidget)
+    if (!(isCurrentWidgetSynced() && previousWidgetFlags.testFlag(WidgetSupportsSync)) && m_currentWidget)
     {
         m_sliderDataInvalid = true;
-        m_sliderWindowInvalid |= (m_currentWidgetFlags & WidgetUsesUTC) != (previousWidgetFlags & WidgetUsesUTC);
+        m_sliderWindowInvalid |= (m_currentWidgetFlags.testFlag(WidgetUsesUTC)
+            != previousWidgetFlags.testFlag(WidgetUsesUTC));
     }
 
     updateSliderFromReader(false);
@@ -1344,6 +1339,11 @@ bool QnWorkbenchNavigator::isTimelineCatchingUp() const
         m_positionAnimator->targetValue() == m_previousMediaPosition;
 }
 
+bool QnWorkbenchNavigator::isCurrentWidgetSynced() const
+{
+    return m_streamSynchronizer->isRunning() && m_currentWidgetFlags.testFlag(WidgetSupportsSync);
+}
+
 void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
 {
     if (!m_timeSlider)
@@ -1419,7 +1419,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
             {
                 /* Set to last minute. */
                 endTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
-                startTimeMSec = m_recordingStartUtcMs;
+                startTimeMSec = endTimeMSec - kTimelineWindowNearLive;
             }
             else
             {
@@ -1434,11 +1434,6 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
             endTimeMSec = endTimeUSec == DATETIME_NOW
                 ? qnSyncTime->currentMSecsSinceEpoch()
                 : endTimeUSec / 1000;
-
-            //TODO: #vkutin Change this later:
-            /* Temporary fix until we redesign "initializing recording" state: */
-            if (m_isRecording && m_syncedWidgets.contains(m_currentMediaWidget))
-                m_recordingStartUtcMs = startTimeMSec;
         }
     }
 
@@ -1464,7 +1459,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
                 return DATETIME_NOW;
 
             qint64 timeUSec;
-            if (m_streamSynchronizer->isRunning() && m_currentWidgetFlags.testFlag(WidgetSupportsSync))
+            if (isCurrentWidgetSynced())
                 timeUSec = m_streamSynchronizer->state().time; // Fetch "current" time instead of "displayed"
             else
                 timeUSec = mediaWidget->display()->camera()->getCurrentTime();
@@ -1494,6 +1489,12 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
             : isLiveSupported() ? DATETIME_NOW : startTimeMSec;
 
         qint64 timeMSec = usecToMsec(timeUSec);
+
+        /* If in Live we change speed from 1 downwards, we go out of Live, but then
+         * receive next frame from camera which immediately jerks us back to Live.
+         * This evil hack is to prevent going back to Live in such case: */
+        if (timeMSec >= m_timeSlider->maximum() && speed() <= 0.0)
+            timeMSec = m_timeSlider->maximum() - 1;
 
         if (!keepInWindow || m_sliderDataInvalid)
         {
@@ -1540,8 +1541,10 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
         if (timeUSec >= 0)
             updateLive();
 
-        bool sync = (m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods));
-        if (isSearch || !sync)
+        const bool syncSupportedButDisabled = !m_streamSynchronizer->isRunning()
+            && m_currentWidgetFlags.testFlag(WidgetSupportsSync);
+
+        if (isSearch || syncSupportedButDisabled)
         {
             QVector<qint64> indicators;
             for (QnResourceWidget *widget : display()->widgets())
@@ -1829,14 +1832,12 @@ void QnWorkbenchNavigator::updateSpeed()
 
 void QnWorkbenchNavigator::updateSpeedRange()
 {
-    qreal minimalSpeed = this->minimalSpeed();
-    qreal maximalSpeed = this->maximalSpeed();
-    if (qFuzzyEquals(minimalSpeed, m_lastMinimalSpeed) && qFuzzyEquals(maximalSpeed, m_lastMaximalSpeed))
+    const auto newSpeedRange = speedRange();
+
+    if (newSpeedRange.fuzzyEquals(m_lastSpeedRange))
         return;
 
-    m_lastMinimalSpeed = minimalSpeed;
-    m_lastMaximalSpeed = maximalSpeed;
-
+    m_lastSpeedRange = newSpeedRange;
     emit speedRangeChanged();
 }
 
@@ -1853,6 +1854,9 @@ void QnWorkbenchNavigator::updateTimelineRelevancy()
 
     m_timelineRelevant = value;
     emit timelineRelevancyChanged(value);
+
+    if (!m_timelineRelevant && !qFuzzyIsNull(speed()))
+        setLive(true);
 }
 
 void QnWorkbenchNavigator::updateThumbnailsLoader()

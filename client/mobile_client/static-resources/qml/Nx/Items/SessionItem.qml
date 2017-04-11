@@ -15,9 +15,11 @@ Pane
     property alias systemName: informationBlock.systemName
     property alias cloudSystem: informationBlock.cloud
     property alias online: informationBlock.online
-    property alias compatible: informationBlock.compatible
     property alias ownerDescription: informationBlock.ownerDescription
-    property alias invalidVersion: informationBlock.invalidVersion
+    property bool compatible: true
+    property string invalidVersion
+
+    readonly property string kMinimimVersion: "1.3.1"
 
     padding: 0
 
@@ -28,7 +30,30 @@ Pane
     {
         id: hostsModel
         systemId: control.systemId
+        localSystemId: control.localId
     }
+    ModelDataAccessor
+    {
+        id: hostsModelAccessor
+        model: hostsModel
+
+        property string defaultAddress: ""
+
+        onDataChanged:
+        {
+            if (startRow === 0)
+                updateDefaultAddress()
+        }
+        onCountChanged: updateDefaultAddress()
+
+        function updateDefaultAddress()
+        {
+            defaultAddress = count > 0
+                ? getData(0, "url")
+                : ""
+        }
+    }
+
     AuthenticationDataModel
     {
         id: authenticationDataModel
@@ -65,7 +90,7 @@ Pane
     {
         id: informationBlock
         enabled: compatible && online
-        address: Nx.url(hostsModel.firstHost).address()
+        address: Nx.url(hostsModelAccessor.defaultAddress).address()
         user: authenticationDataModel.defaultCredentials.user
     }
 
@@ -78,7 +103,7 @@ Pane
         z: 1
         anchors.right: parent.right
         icon: lp("/images/edit.png")
-        visible: authenticationDataModel.hasData
+        visible: !cloudSystem && authenticationDataModel.hasData
         onClicked:
         {
             Workflow.openSavedSession(
@@ -91,10 +116,43 @@ Pane
         }
     }
 
+    IssueLabel
+    {
+        id: issueLabel
+        anchors
+        {
+            bottom: parent.bottom
+            bottomMargin: 12
+            right: parent.right
+            rightMargin: 12
+        }
+        color: cloudSystem ? ColorTheme.base14 : ColorTheme.red_main
+        visible: text !== ""
+        text:
+        {
+            if (cloudSystem)
+            {
+                return !online && cloudStatusWatcher.status === QnCloudStatusWatcher.Online
+                    ? qsTr("OFFLINE") : ""
+            }
+
+            return compatible ? "" : (invalidVersion || qsTr("INCOMPATIBLE"))
+        }
+    }
+
     function open()
     {
         if (!compatible)
         {
+            if (Nx.softwareVersion(invalidVersion).isLessThan(Nx.softwareVersion(kMinimimVersion))
+                || applicationInfo.oldMobileClientUrl() == "")
+            {
+                Workflow.openStandardDialog("",
+                    qsTr("This server has too old version. "
+                        + "Please update it to the latest version."))
+                return
+            }
+
             Workflow.openOldClientDownloadSuggestion()
             return
         }
@@ -103,10 +161,15 @@ Pane
         {
             if (!hostsModel.isEmpty)
             {
-                connectionManager.connectToServer(
-                    hostsModel.firstHost,
+                if (!connectionManager.connectToServer(
+                    hostsModelAccessor.defaultAddress,
                     cloudStatusWatcher.credentials.user,
-                    cloudStatusWatcher.credentials.password)
+                    cloudStatusWatcher.credentials.password))
+                {
+                    sessionsScreen.openConnectionWarningDialog(systemName)
+                    return
+                }
+
                 Workflow.openResourcesScreen(systemName)
             }
         }
@@ -114,10 +177,15 @@ Pane
         {
             if (authenticationDataModel.hasStoredPassword)
             {
-                connectionManager.connectToServer(
-                    hostsModel.firstHost,
+                if (!connectionManager.connectToServer(
+                    hostsModelAccessor.defaultAddress,
                     authenticationDataModel.defaultCredentials.user,
-                    authenticationDataModel.defaultCredentials.password)
+                    authenticationDataModel.defaultCredentials.password))
+                {
+                    sessionsScreen.openConnectionWarningDialog(systemName)
+                    return
+                }
+
                 Workflow.openResourcesScreen(systemName)
             }
             else

@@ -220,7 +220,7 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
             if (cloudSystemId != moduleInformation.cloudSystemId)
                 return;
 
-            clearServersTask = QnRaiiGuardPtr();
+            clearServersTask->disableDestructionHandler();
 
             const auto serverId = moduleInformation.id;
             if (systemDescription->containsServer(serverId))
@@ -233,9 +233,9 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
                 systemDescription->addServer(moduleInformation, 0);
             }
 
-
             QUrl url;
             url.setHost(moduleInformation.cloudId());
+            url.setScheme( moduleInformation.sslAllowed ? lit("https") : lit("http"));
             systemDescription->setServerHost(serverId, url);
         };
 

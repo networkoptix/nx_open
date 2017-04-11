@@ -20,7 +20,7 @@ namespace hpm {
 UDPHolePunchingConnectionInitiationFsm::UDPHolePunchingConnectionInitiationFsm(
     nx::String connectionID,
     const ListeningPeerData& serverPeerData,
-    std::function<void(api::ResultCode)> onFsmFinishedEventHandler,
+    std::function<void(api::NatTraversalResultCode)> onFsmFinishedEventHandler,
     const conf::Settings& settings)
 :
     m_state(State::init),
@@ -309,6 +309,10 @@ void UDPHolePunchingConnectionInitiationFsm::sendConnectResponse(
     api::ResultCode resultCode,
     api::ConnectResponse connectResponse)
 {
+    NX_LOGX(lm("Connection %1. Sending connect response (%2) while in state %3")
+        .arg(m_connectionID).arg(QnLexical::serialized(resultCode)).arg(toString(m_state)),
+        cl_logDEBUG2);
+
     NX_CRITICAL(m_connectResponseSender);
     decltype(m_connectResponseSender) connectResponseSender;
     connectResponseSender.swap(m_connectResponseSender);
@@ -345,7 +349,7 @@ void UDPHolePunchingConnectionInitiationFsm::done(api::ResultCode result)
     m_state = State::fini;
 
     auto onFinishedHandler = std::move(m_onFsmFinishedEventHandler);
-    onFinishedHandler(result);
+    onFinishedHandler(m_sessionStatisticsInfo.resultCode);
 }
 
 const char* UDPHolePunchingConnectionInitiationFsm::toString(State state)

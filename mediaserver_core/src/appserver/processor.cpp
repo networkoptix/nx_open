@@ -187,7 +187,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
 
     ec2::ApiCameraData apiCameraData;
     fromResourceToApi(cameraResource, apiCameraData);
-    apiCameraData.id = cameraResource->uniqueIdToId(uniqueId);
+    apiCameraData.id = cameraResource->physicalIdToId(uniqueId);
 
     ec2::ErrorCode errCode = addAndPropagateCamResource(apiCameraData, cameraResource->getRuntimeProperties());
     if (errCode != ec2::ErrorCode::ok)

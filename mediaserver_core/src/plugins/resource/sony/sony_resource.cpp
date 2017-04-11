@@ -289,8 +289,12 @@ void QnPlSonyResource::onMonitorConnectionClosed( AsyncHttpClientPtr httpClient 
     if (m_inputMonitorHttpClient != httpClient)
         return;
 
-    if (!httpClient->response() || 
-        httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok)
+    if (getStatus() < Qn::Online)
+        return;
+
+    auto response = httpClient->response();
+    if (static_cast<bool>(response) && 
+        response->statusLine.statusCode != nx_http::StatusCode::ok)
     {
         return;
     }

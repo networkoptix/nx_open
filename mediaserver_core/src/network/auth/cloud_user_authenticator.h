@@ -83,7 +83,6 @@ private:
     /** set<pair<username, nonce>, auth_data> */
     std::set<std::pair<nx_http::StringType, nx_http::BufferType>> m_requestInProgress;
 
-    bool isValidCloudUserName(const nx_http::StringType& userName) const;
     void removeExpiredRecordsFromCache(QnMutexLockerBase* const lk);
     QnUserResourcePtr getMappedLocalUserForCloudCredentials(
         const nx_http::StringType& userName) const;
@@ -100,6 +99,5 @@ private:
         const nx_http::Method::ValueType& method,
         const nx_http::header::Authorization& authorizationHeader) const;
 
-private slots:
     void cloudBindingStatusChanged(bool boundToCloud);
 };

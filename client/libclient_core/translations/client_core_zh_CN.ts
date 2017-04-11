@@ -52,26 +52,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Internal %1 error. Please contact support team.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Unexpected network error. Please check your Internet connection and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Invalid login.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sorry, %1 Service is temporary unavailable. We&apos;re doing our best to restore it. Please try again later.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sorry, %1 Service couldn&apos;t process your request. Please try again in a few moments.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -82,16 +67,31 @@
         <source>Object already exists.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Internal %1 error. Please contact support team.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCloudSystemInformationWatcher</name>
     <message>
-        <source>Your system</source>
+        <source>Owner: %1</source>
+        <comment>%1 is a user name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Owner: %1</source>
-        <comment>%1 is a user name</comment>
+        <source>Your System</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -110,12 +110,12 @@
 <context>
     <name>QnSystemsModel</name>
     <message>
-        <source>Your system</source>
+        <source>Owner: %1</source>
+        <comment>%1 is a user name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Owner: %1</source>
-        <comment>%1 is a user name</comment>
+        <source>Your System</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

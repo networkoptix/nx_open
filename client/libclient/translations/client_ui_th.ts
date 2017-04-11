@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source> ms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Browse Logs</source>
         <translation type="unfinished">ค้นหา logs</translation>
     </message>
@@ -324,11 +319,6 @@
     </message>
     <message>
         <location/>
-        <source>&lt;Cameras...&gt; </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Backup Quality</source>
         <translation type="unfinished"></translation>
     </message>
@@ -400,11 +390,6 @@
         <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
         <source>Refresh</source>
         <translation>รีเฟรช</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt; Any camera &gt;</source>
-        <translation>&lt;กล้องอื่นๆ&gt;</translation>
     </message>
     <message>
         <location/>
@@ -552,18 +537,8 @@
     </message>
     <message>
         <location/>
-        <source>0.0.0.0</source>
-        <translation type="unfinished">0.0.0.0</translation>
-    </message>
-    <message>
-        <location/>
         <source>End IP</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>0.0.0.255</source>
-        <translation type="unfinished">0.0.0.255</translation>
     </message>
     <message>
         <location/>
@@ -633,11 +608,6 @@
         <location/>
         <source>Camera Settings Control</source>
         <translation>การตั้งค่าของกล้อง</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Keep camera streams&apos; and profiles&apos; settings</source>
-        <translation>เก็บสัญญาณภาพและโปรไฟล์การตั้งค่าของกล้อง</translation>
     </message>
     <message>
         <location/>
@@ -716,16 +686,6 @@
     </message>
     <message>
         <location/>
-        <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
-        <translation>&quot;อนุญาตให้ระบบที่จะเพิ่มประสิทธิภาพการตั้งค่ากล้อง&quot; ถูกปิดใช้งานในระบบการบริหาร.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
-        <translation>คำนวณอัตราบิตต่อ GOP แทนบิตต่อวินาที (มันจะเพิ่มบิตสำหรับกล้อง)</translation>
-    </message>
-    <message>
-        <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
         <translation>คำเตือน! สิ่งนี้จะทำให้คุณภาพและอัตราเฟรม (FPS) การตั้งค่าในตารางเวลาการบันทึกที่ไม่เกี่ยวข้อง.</translation>
     </message>
@@ -741,8 +701,33 @@
     </message>
     <message>
         <location/>
-        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-        <translation>คำเตือน! อย่าเปลี่ยนการตั้งค่าเหล่านี้นอกจากคุณจะแน่ใจจริงๆ กับของผลกระทบที่อาจเกิดกับประสิทธิภาพของระบบ.</translation>
+        <source>Motion detection control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Force motion detection for stream:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Keep camera streams and profiles settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -751,6 +736,14 @@
         <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
         <source>Input ID:</source>
         <translation>หมายเลข ID:</translation>
+    </message>
+</context>
+<context>
+    <name>CameraListDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
+        <source>Add Device...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -775,11 +768,6 @@
     <name>CameraScheduleWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
-        <source>Panic Mode: </source>
-        <translation>โหมด Panic:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Schedule Settings</source>
         <translation>กำหนดการตั้งค่า</translation>
     </message>
@@ -825,12 +813,6 @@
     </message>
     <message>
         <location/>
-        <source> s</source>
-        <extracomment>Short for &quot;seconds&quot;</extracomment>
-        <translation>วินาที</translation>
-    </message>
-    <message>
-        <location/>
         <source>Post-Recording</source>
         <translation>โพสต์บันทึก</translation>
     </message>
@@ -838,11 +820,6 @@
         <location/>
         <source>Copy Schedule...</source>
         <translation>คัดคอกกำหนดการ...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion + Low-Res </source>
-        <translation>การเคลื่อนไหว + ความละเอียดต่ำ</translation>
     </message>
     <message>
         <location/>
@@ -889,6 +866,16 @@
         <source>Apply changes before copying schedule.</source>
         <translation type="unfinished">เปลี่ยนแปลงตารางการคัดลอก</translation>
     </message>
+    <message>
+        <location/>
+        <source>Panic Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion + Lo-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChangeUserPasswordDialog</name>
@@ -899,24 +886,15 @@
     </message>
 </context>
 <context>
-    <name>CloudManagementWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/system_settings/cloud_management_widget.ui"/>
-        <source>&lt;2. Connect system
-to the cloud&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>ConnectToCloudDialog</name>
     <message>
         <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
-        <source>Email or password is not recognized.</source>
+        <source>Stay logged in</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Stay logged in</source>
+        <source>Incorrect Email or Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -988,14 +966,6 @@ to the cloud&gt;</source>
     </message>
 </context>
 <context>
-    <name>DateRangeWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/common/date_range_widget.ui"/>
-        <source>-</source>
-        <translation type="unfinished">-</translation>
-    </message>
-</context>
-<context>
     <name>EventLogDialog</name>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
@@ -1019,11 +989,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>&lt; Any camera &gt;</source>
-        <translation type="unfinished">&lt;กล้องอื่นๆ&gt;</translation>
-    </message>
-    <message>
-        <location/>
         <source>Event Rules...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1034,11 +999,6 @@ to the cloud&gt;</source>
         <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
         <source>HTTP content</source>
         <translation>HTTP เนื้อหา</translation>
-    </message>
-    <message>
-        <location/>
-        <source>HTTP url</source>
-        <translation>HTTP url</translation>
     </message>
     <message>
         <location/>
@@ -1059,6 +1019,16 @@ to the cloud&gt;</source>
         <location/>
         <source>Password</source>
         <translation>รหัสผ่าน</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Content type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>HTTP URL</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1127,11 +1097,6 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Mount Angle Correction:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>°</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1214,7 +1179,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Run application when PC Boots</source>
+        <source>Run Application when PC Boots up</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1258,13 +1223,13 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>&lt;No image&gt;</source>
-        <translation>ไม่มีภาพ</translation>
+        <source>Loading Image...Please Wait.</source>
+        <translation>กำลังโหลดภาพ..กรุณารอสักครู่.</translation>
     </message>
     <message>
         <location/>
-        <source>Loading Image...Please Wait.</source>
-        <translation>กำลังโหลดภาพ..กรุณารอสักครู่.</translation>
+        <source>No image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1298,16 +1263,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Clear</source>
         <translation>ล้าง</translation>
-    </message>
-    <message>
-        <location/>
-        <source> cells</source>
-        <translation>ตาราง</translation>
-    </message>
-    <message>
-        <location/>
-        <source>%</source>
-        <translation>%</translation>
     </message>
     <message>
         <location/>
@@ -1402,16 +1357,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Select users to import</source>
-        <translation>เลือก ผู้ใช้ ที่จะนำเข้า</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Filter...</source>
-        <translation>ตัวกรอง ...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Loading...</source>
         <translation>กำลังโหลด ...</translation>
     </message>
@@ -1419,6 +1364,16 @@ to the cloud&gt;</source>
         <location/>
         <source>Connection error</source>
         <translation>การเชื่อมต่อผิดพลาด</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Role to assign to imported users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disable imported users</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1452,11 +1407,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Features</source>
         <translation>คุณสมบัติ</translation>
-    </message>
-    <message>
-        <location/>
-        <source>This license type requires a higher software version.</source>
-        <translation>ใบอนุญาตประเภทนี้ต้องใช้ซอฟต์แวร์รุ่นที่สูงขึ้น.</translation>
     </message>
 </context>
 <context>
@@ -1646,23 +1596,8 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source> seconds</source>
-        <translation>วินาที</translation>
-    </message>
-    <message>
-        <location/>
-        <source>%</source>
-        <translation>%</translation>
-    </message>
-    <message>
-        <location/>
         <source>Background Image</source>
         <translation>ภาพพื้นหลัง</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;No image&gt;</source>
-        <translation>&lt;No image&gt;</translation>
     </message>
     <message>
         <location/>
@@ -1704,6 +1639,19 @@ to the cloud&gt;</source>
         <source>Tour cycle</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>seconds</source>
+        <translation type="unfinished">วินาที</translation>
+    </message>
+</context>
+<context>
+    <name>MessageBox</name>
+    <message>
+        <location filename="../src/ui/dialogs/common/message_box.ui"/>
+        <source>Do not show this message again</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MultipleCameraSettingsWidget</name>
@@ -1741,11 +1689,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Enable Audio</source>
         <translation>เปิดเสียง</translation>
-    </message>
-    <message>
-        <location/>
-        <source>TextLabel</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1955,7 +1898,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Email or password is not recognized.</source>
+        <source>Incorrect Email or Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1986,11 +1929,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>The new system will have password and name from the system:</source>
-        <translation>ระบบใหม่จะมีรหัสผ่านและชื่อจากระบบ:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Check</source>
         <translation>ตรวจสอบ</translation>
     </message>
@@ -2006,7 +1944,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>admin</source>
+        <source>The new System will have password and name from System:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2060,13 +1998,13 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Removing this connection option could lead to system malfunction.</source>
-        <translation>การถอดตัวเลือกการเชื่อมต่อนี้จะนำไปสู่ความผิดปกติของระบบ.</translation>
+        <source>Add</source>
+        <translation type="unfinished">เพิ่ม</translation>
     </message>
     <message>
         <location/>
-        <source>Add</source>
-        <translation type="unfinished">เพิ่ม</translation>
+        <source>Removing this connection option could lead to System malfunction.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2088,11 +2026,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Applying system updates at the end of the week is not recommended.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Updating to...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2104,6 +2037,11 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>You have the latest version installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Applying System updates at the end of the week is not recommended.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2139,13 +2077,13 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Warning: file with same name already exists!</source>
-        <translation>คำเตือน: ไฟล์ที่มีชื่อเดียวกันอยู่แล้ว!</translation>
+        <source>Options</source>
+        <translation>ตัวเลือก</translation>
     </message>
     <message>
         <location/>
-        <source>Options</source>
-        <translation>ตัวเลือก</translation>
+        <source>Warning: file with the same name already exists!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2391,11 +2329,6 @@ to the cloud&gt;</source>
         <location filename="../src/ui/widgets/properties/server_settings_widget.ui"/>
         <source>Ping</source>
         <translation>Ping ทดสอบ</translation>
-    </message>
-    <message>
-        <location/>
-        <source>9000</source>
-        <translation>9000</translation>
     </message>
     <message>
         <location/>
@@ -2723,36 +2656,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>1 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>0 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>1000 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>100 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source> TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>10 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Additional storage:</source>
         <translation type="unfinished">เพิ่มเติมพื้นที่จัดเก็บข้อมูล:</translation>
     </message>
@@ -2878,8 +2781,8 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>System time is synchronized with the Internet and is independent from server&apos;s local time.
-Selected server will be used as a time server if the system has no Internet access.</source>
+        <source>System time is synchronized with the Internet and is independent from server local time.
+Selected server will be used as a time server if System has no Internet access.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

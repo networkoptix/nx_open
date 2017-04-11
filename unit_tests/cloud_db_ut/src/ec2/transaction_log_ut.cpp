@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/utils.h>
@@ -93,7 +94,7 @@ private:
     {
         m_transactionLog = std::make_unique<ec2::TransactionLog>(
             m_peerId,
-            persistentDbManager()->queryExecutor().get(),
+            &persistentDbManager()->queryExecutor(),
             &m_outgoingTransactionDispatcher);
     }
 };
@@ -333,7 +334,8 @@ private:
             queryContext.get(),
             m_systemId.c_str(),
             cdb::ec2::UbjsonSerializedTransaction<::ec2::ApiUserData>(std::move(transaction)));
-        ASSERT_TRUE(dbResult == nx::db::DBResult::ok || dbResult == nx::db::DBResult::cancelled);
+        ASSERT_TRUE(dbResult == nx::db::DBResult::ok || dbResult == nx::db::DBResult::cancelled)
+            << "Got " << QnLexical::serialized(dbResult).toStdString();
     }
 
     ::ec2::QnTransaction<::ec2::ApiUserData> getTransactionFromLog()
@@ -611,7 +613,7 @@ protected:
     {
         constexpr std::size_t transactionCount = 5;
 
-        persistentDbManager()->queryExecutor()->reserveConnections(transactionCount);
+        persistentDbManager()->queryExecutor().reserveConnections(transactionCount);
 
         auto dbTransactions = startDbTransactions(transactionCount);
         for (std::size_t i = 0; i < dbTransactions.size(); ++i)

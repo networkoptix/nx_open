@@ -19,10 +19,10 @@ namespace ec2
 
         void triggerNotification( const QnTransaction<ApiResourceStatusData>& tran, NotificationSource source)
         {
-            NX_LOG(lit("%1 Emit statusChanged signal for id %2")
+            NX_LOG(lit("%1 Emit statusChanged signal for resource %2")
                     .arg(QString::fromLatin1(Q_FUNC_INFO))
                     .arg(tran.params.id.toString()), cl_logDEBUG2);
-            emit statusChanged( QnUuid(tran.params.id), tran.params.status );
+            emit statusChanged( QnUuid(tran.params.id), tran.params.status, source);
         }
 
         void triggerNotification( const QnTransaction<ApiLicenseOverflowData>& /*tran*/, NotificationSource /*source*/) {
@@ -50,8 +50,12 @@ namespace ec2
             }
         }
 
-        void triggerNotification( const QnTransaction<ApiIdData>& tran, NotificationSource /*source*/) {
-            emit resourceRemoved( tran.params.id );
+        void triggerNotification( const QnTransaction<ApiIdData>& tran, NotificationSource /*source*/)
+        {
+            if (tran.command == ApiCommand::removeResourceStatus)
+                emit resourceStatusRemoved(tran.params.id);
+            else
+                emit resourceRemoved(tran.params.id);
         }
 
         void triggerNotification( const QnTransaction<ApiIdDataList>& tran, NotificationSource /*source*/) {

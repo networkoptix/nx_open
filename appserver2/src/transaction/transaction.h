@@ -289,7 +289,7 @@ APPLY(301, saveCamera, ApiCameraData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        CameraNotificationManagerHelper(), \
-                       ModifyResourceAccess(false), /* save permission checker */ \
+                       ModifyCameraDataAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -743,7 +743,7 @@ APPLY(703, videowallControl, ApiVideowallControlMessageData, \
                        false, /* system*/ \
                        InvalidGetHashHelper(), \
                        VideowallNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       VideoWallControlAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \

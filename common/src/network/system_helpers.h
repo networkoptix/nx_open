@@ -42,4 +42,9 @@ bool currentSystemIsNew();
 
 bool serverBelongsToCurrentSystem(const QnModuleInformation& info);
 
+/**
+ * Checks whether user login is local or cloud.
+ * We suppose local login does not have '@' symbol whereas cloud does
+ */
+bool isLocalUser(const QString& login);
 } // helpers

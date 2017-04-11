@@ -1,7 +1,8 @@
 import QtQuick 2.6
-import QtMultimedia 5.5
 import Qt.labs.templates 1.0
 import Nx 1.0
+import Nx.Media 1.0
+import Nx.Core 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
 import com.networkoptix.qml 1.0
@@ -24,7 +25,7 @@ Control
     signal nextCameraRequested()
     signal previousCameraRequested()
 
-    QnMediaResourceHelper
+    MediaResourceHelper
     {
         id: resourceHelper
     }
@@ -33,10 +34,10 @@ Control
     {
         id: d
 
-        property bool offline: resourceHelper.resourceStatus == QnMediaResourceHelper.Offline ||
-                               resourceHelper.resourceStatus == QnMediaResourceHelper.NotDefined ||
-                               resourceHelper.resourceStatus == QnMediaResourceHelper.Unauthorized
-        property bool unauthorized: resourceHelper.resourceStatus == QnMediaResourceHelper.Unauthorized
+        property bool offline: resourceHelper.resourceStatus === MediaResourceHelper.Offline ||
+                               resourceHelper.resourceStatus === MediaResourceHelper.NotDefined ||
+                               resourceHelper.resourceStatus === MediaResourceHelper.Unauthorized
+        property bool unauthorized: resourceHelper.resourceStatus === MediaResourceHelper.Unauthorized
     }
 
     background: Rectangle
@@ -202,7 +203,7 @@ Control
             VideoPositioner
             {
                 anchors.fill: parent
-                customAspectRatio: resourceHelper.customAspectRatio || player.aspectRatio
+                customAspectRatio: resourceHelper.customAspectRatio || mediaPlayer.aspectRatio
                 videoRotation: resourceHelper.customRotation
                 sourceSize: Qt.size(videoOutput.sourceRect.width, videoOutput.sourceRect.height)
 
@@ -210,7 +211,7 @@ Control
                 {
                     id: videoOutput
 
-                    source: player
+                    player: mediaPlayer
                     fillMode: VideoOutput.Stretch
 
                     QnScenePositionListener
@@ -218,19 +219,25 @@ Control
                         item: parent
                         onScenePosChanged:
                         {
-                            player.videoGeometry = Qt.rect(
+                            mediaPlayer.videoGeometry = Qt.rect(
                                 scenePos.x,
                                 scenePos.y,
                                 parent.width,
                                 parent.height)
                         }
                     }
+
+                    Connections
+                    {
+                        target: cameraItem
+                        onResourceIdChanged: videoOutput.clear()
+                    }
                 }
             }
 
             MediaPlayer
             {
-                id: player
+                id: mediaPlayer
 
                 resourceId: cameraItem.resourceId
                 Component.onCompleted:
@@ -238,7 +245,7 @@ Control
                     if (!paused)
                         playLive()
                 }
-                videoQuality: QnPlayer.LowVideoQuality
+                videoQuality: MediaPlayer.LowVideoQuality
             }
 
             Connections
@@ -247,9 +254,9 @@ Control
                 onPausedChanged:
                 {
                     if (cameraItem.paused)
-                        player.stop()
+                        mediaPlayer.stop()
                     else
-                        player.play()
+                        mediaPlayer.play()
                 }
             }
         }
@@ -341,12 +348,12 @@ Control
         {
             if (event.key == Qt.Key_Left)
             {
-                nextCameraRequested()
+                previousCameraRequested()
                 event.accepted = true
             }
             else if (event.key == Qt.Key_Right)
             {
-                previousCameraRequested()
+                nextCameraRequested()
                 event.accepted = true
             }
         }

@@ -3,6 +3,8 @@
 
 #include <memory>
 
+#include <boost/optional/optional.hpp>
+
 #include <QtCore/QVector>
 #include <QtCore/QStringList>
 #include <QtCore/QPoint>
@@ -87,6 +89,11 @@ public:
      */
     virtual QPoint position(int channel) const = 0;
 
+    /**
+    * \returns                          Matrix data assumed to be in row-major order.
+    */
+    virtual QVector<int> getChannels() const = 0;
+
     virtual QString toString() const { return QString(); }
 };
 
@@ -112,6 +119,11 @@ public:
     virtual QPoint position(int) const override {
         return QPoint(0, 0);
     }
+
+    virtual QVector<int> getChannels() const override
+    {
+        return QVector<int>() << 0;
+    }
 };
 
 
@@ -122,88 +134,33 @@ typedef QSharedPointer<const QnCustomResourceVideoLayout> QnConstCustomResourceV
 
 class QnCustomResourceVideoLayout : public QnResourceVideoLayout {
 public:
-    static QnCustomResourceVideoLayoutPtr fromString(const QString &value)
-    {
-        QStringList params = value.split(QLatin1Char(';'));
-        int width = 1;
-        int height = 1;
-        QStringList sensors;
-        for (int i = 0; i < params.size(); ++i) {
-            QStringList values = params[i].split(QLatin1Char('='));
-            if (values.size() < 2)
-                continue;
 
-            if (values[0] == QLatin1String("width")) {
-                width = values[1].toInt();
-            } else if (values[0] == QLatin1String("height")) {
-                height = values[1].toInt();
-            } else if (values[0] == QLatin1String("sensors")) {
-                sensors = values[1].split(QLatin1Char(','));
-            }
-        }
+    QnCustomResourceVideoLayout(const QSize &size);
 
-        QnCustomResourceVideoLayoutPtr result( new QnCustomResourceVideoLayout(QSize(width, height)) );
-        for (int i = 0; i < sensors.size(); ++i)
-            result->setChannel(i, sensors[i].toInt());
-        return result;
-    }
+    static QnCustomResourceVideoLayoutPtr fromString(const QString &value);
 
-    virtual QString toString() const override
-    {
-        QString result(lit("width=%1;height=%2;sensors=%3"));
-        QString sensors;
-        for (int i = 0; i < m_channels.size(); ++i)
-        {
-            if (i > 0)
-                sensors += L',';
-            sensors += QString::number(m_channels[i]);
-        }
-        return result.arg(m_size.width()).arg(m_size.height()).arg(sensors);
-    }
+    virtual QString toString() const override;
 
-    QnCustomResourceVideoLayout(const QSize &size):
-        m_size(size)
-    {
-        m_channels.resize(m_size.width() * m_size.height());
-    }
+    virtual int channelCount() const override;
 
-    virtual int channelCount() const override {
-        return m_size.width() * m_size.height();
-    }
+    virtual QSize size() const override;
 
-    virtual QSize size() const override {
-        return m_size;
-    }
+    void setSize(const QSize &size);
 
-    void setSize(const QSize &size) {
-        m_size = size;
-        m_channels.resize(m_size.width() * m_size.height());
-    }
+    void setChannel(int x, int y, int channel);
 
-    void setChannel(int x, int y, int channel) {
-        setChannel(y * m_size.width() + x, channel);
-    }
+    void setChannel(int index, int channel);
 
-    void setChannel(int index, int channel) {
-        if (index >= m_size.width() * m_size.height())
-            return;
-        m_channels[index] = channel;
-    }
+    virtual QPoint position(int channel) const override;
 
-    virtual QPoint position(int channel) const override {
-        for (int i = 0; i < m_size.width() * m_size.height(); ++i)
-            if (m_channels[i] == channel)
-                return QPoint(i % m_size.width(), i / m_size.width());
+    virtual QVector<int> getChannels() const override;
 
-        return QPoint();
-    }
-
-    QVector<int> getChannels() const            { return m_channels; }
-    void setChannels(const QVector<int>& value) { m_channels = value; }
+    void setChannels(const QVector<int>& value);
 
 protected:
     QVector<int> m_channels;
     QSize m_size;
+    mutable boost::optional<int> m_cachedChannelCount;
 };
 
 #endif // QN_RESOURCE_LAYOUT_H

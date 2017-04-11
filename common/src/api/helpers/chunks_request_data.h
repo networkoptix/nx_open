@@ -31,7 +31,7 @@ struct QnChunksRequestData
     qint64 endTimeMs;
     qint64 detailLevel;
     bool keepSmallChunks;
-    QString filter;
+    QString filter; //< TODO: This string is a json. Consider changing to QList<QRegion>.
     bool isLocal;
     Qn::SerializationFormat format;
     int limit;

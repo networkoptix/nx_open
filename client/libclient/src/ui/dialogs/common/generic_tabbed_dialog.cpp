@@ -100,9 +100,9 @@ bool QnGenericTabbedDialog::forcefullyClose()
     if (!canDiscardChanges())
         return false;
 
+    hide();
     discardChanges();
     loadDataToUi();
-    hide();
     return true;
 }
 
@@ -331,7 +331,10 @@ void QnGenericTabbedDialog::buttonBoxClicked(QDialogButtonBox::StandardButton bu
     {
     case QDialogButtonBox::Apply:
         if (canApplyChanges() && hasChanges())
+        {
             applyChanges();
+            updateButtonBox();
+        }
         break;
     default:
         break;

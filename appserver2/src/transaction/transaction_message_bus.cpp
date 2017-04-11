@@ -49,9 +49,9 @@ static const int ALIVE_RESEND_TIMEOUT_MIN = 100;
 //!introduced to make discovery interval dependent of peer alive update interval
 static const int PEER_DISCOVERY_BY_ALIVE_UPDATE_INTERVAL_FACTOR = 3;
 
-QString printTransaction(const char* prefix, const QnAbstractTransaction& tran, const QnTransactionTransportHeader &transportHeader, QnTransactionTransport* sender)
+QString printTransaction(const char* prefix, const QnAbstractTransaction& tran, const QnUuid& hash, const QnTransactionTransportHeader &transportHeader, QnTransactionTransport* sender)
 {
-    return lit("%1 %2 %3 gotVia=%4").arg(prefix).arg(tran.toString()).arg(toString(transportHeader)).arg(sender->remotePeer().id.toString());
+    return lit("%1, hash=%2  %3 %4 gotVia=%5").arg(hash.toString()).arg(prefix).arg(tran.toString()).arg(toString(transportHeader)).arg(sender->remotePeer().id.toString());
 }
 
 struct GotTransactionFuction
@@ -330,7 +330,9 @@ void QnTransactionMessageBus::removeAlivePeer(const QnUuid& id, bool sendTran, b
         QnTranState runtimeState;
         QList<QnTransaction<ApiRuntimeData>> result;
         m_runtimeTransactionLog->getTransactionsAfter(runtimeState, result);
-        NX_ASSERT(result.size() == 1 && result[0].peerID == qnCommon->moduleGUID());
+        const bool validPeerId = result.size() == 1 && result[0].peerID == qnCommon->moduleGUID();
+        if (!validPeerId)
+            NX_LOG("ASSERT(result.size() == 1 && result[0].peerID == qnCommon->moduleGUID())", cl_logERROR);
     }
 #endif
 
@@ -736,23 +738,25 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
 #endif
     updateLastActivity(sender, transportHeader);
 
+    auto transactionDescriptor = getTransactionDescriptorByTransaction(tran);
+    auto transactionHash = transactionDescriptor ? transactionDescriptor->getHashFunc(tran.params) : QnUuid();
+
     if (!checkSequence(transportHeader, tran, sender))
         return;
 
     if (!sender->isReadSync(tran.command))
     {
-        NX_LOG(QnLog::EC2_TRAN_LOG, printTransaction("reject transaction (no readSync)", tran, transportHeader, sender), cl_logDEBUG1);
+        NX_LOG(QnLog::EC2_TRAN_LOG, printTransaction("reject transaction (no readSync)", tran, transactionHash, transportHeader, sender), cl_logDEBUG1);
         return;
     }
 
     if (tran.isLocal() && ApiPeerData::isServer(m_localPeerType))
     {
-        NX_LOG(QnLog::EC2_TRAN_LOG, printTransaction("reject local transaction", tran, transportHeader, sender), cl_logDEBUG1);
+        NX_LOG(QnLog::EC2_TRAN_LOG, printTransaction("reject local transaction", tran, transactionHash, transportHeader, sender), cl_logDEBUG1);
         return;
     }
 
-
-    NX_LOG(QnLog::EC2_TRAN_LOG, printTransaction("got transaction", tran, transportHeader, sender), cl_logDEBUG1);
+    NX_LOG(QnLog::EC2_TRAN_LOG, printTransaction("got transaction", tran, transactionHash, transportHeader, sender), cl_logDEBUG1);
     // process system transactions
     switch (tran.command)
     {
@@ -1486,8 +1490,6 @@ QSet<QnUuid> QnTransactionMessageBus::checkAlivePeerRouteTimeout()
                 ++itr;
             }
         }
-        {
-        }
         if (peerInfo.routingInfo.isEmpty())
             lostPeers << peerInfo.peer.id;
     }
@@ -1578,6 +1580,14 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(
     connect(transport, &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::emitRemotePeerUnauthorized, Qt::DirectConnection);
 
     QnMutexLocker lock(&m_mutex);
+
+    NX_ASSERT(
+        std::find_if(
+            m_connectingConnections.begin(), m_connectingConnections.end(),
+            [&connectionGuid](QnTransactionTransport* connection)
+                { return connection->connectionGuid() == connectionGuid; }
+        ) == m_connectingConnections.end());
+
     transport->moveToThread(thread());
     m_connectingConnections << transport;
     NX_ASSERT(!m_connections.contains(remotePeer.id));

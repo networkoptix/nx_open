@@ -17,103 +17,79 @@
 <context>
     <name>MergeSystemsStatusStrings</name>
     <message>
-        <source>The system was not found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The password or user name is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>암호나 사용자 이름이 올바르지 않습니다.</translation>
     </message>
     <message>
         <source>This user does not have permissions for the requested operation.</source>
-        <translation type="unfinished"></translation>
+        <translation>이 사용자는 요청한 작업에 대 한 권한이 없다.</translation>
     </message>
     <message>
         <source>Cannot create database backup.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Warning: You are about to merge Systems with START licenses.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If you understand this and would like to proceed please click Merge to continue.</source>
-        <translation type="unfinished"></translation>
+        <translation>데이터베이스 백업을 만들 수 없습니다.</translation>
     </message>
     <message>
         <source>System name is not configured yet.</source>
-        <translation type="unfinished"></translation>
+        <translation>시스템 이름은 아직 구성 되지 않습니다.</translation>
     </message>
     <message>
         <source>Unknown error.</source>
-        <translation type="unfinished"></translation>
+        <translation>알수없는 오류</translation>
     </message>
     <message>
-        <source>The discovered system %1 has an incompatible version %2.</source>
-        <comment>%1 is name of the system, %2 is version information</comment>
-        <translation type="unfinished"></translation>
+        <source>You are about to merge Systems with Starter licenses.</source>
+        <translation>Starter 라이센스를 이용하여 병합하려고 합니다.</translation>
     </message>
     <message>
-        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
+        <translation>오직 한개의 starter라이센스만 허용됩니다. 두번째 라이센스는 비활성화 됩니다.</translation>
     </message>
     <message>
-        <source>The discovered system %1 is in safe mode.</source>
-        <comment>%1 is name of the system</comment>
-        <translation type="unfinished"></translation>
+        <source>Merge anyway?</source>
+        <translation>그래도 병합하시겠습니까?</translation>
     </message>
     <message>
-        <source>Could not configure the remote system %1.</source>
-        <comment>%1 is name of the system</comment>
-        <translation type="unfinished"></translation>
+        <source>System was not found.</source>
+        <translation>시스템 찾을 수 없습니다.</translation>
     </message>
     <message>
-        <source>In this version you can only merge systems which are not connected to %1.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <source>The discovered System %1 has an incompatible version %2.</source>
+        <comment>%1 is name of System, %2 is version information</comment>
+        <translation>검색 된 시스템 %1는 호환 되지 않는 버전 %2.</translation>
     </message>
     <message>
-        <source>Both systems are connected to %1. Merge is not allowed.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <source>Cannot connect to the other System because current System is already connected to %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>현재 시스템 %1에 이미 연결 되어 있기 때문에 다른 시스템에 연결할 수 없습니다.</translation>
     </message>
     <message>
-        <source>These systems are built with different %1 URL. Merge is not allowed.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <source>The discovered System %1 is in safe mode.</source>
+        <comment>%1 is name of System</comment>
+        <translation>검색 된 시스템 %1 안전 모드입니다.</translation>
+    </message>
+    <message>
+        <source>Could not configure the remote System %1.</source>
+        <comment>%1 is name of System</comment>
+        <translation>원격 시스템 %1를 구성할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Both Systems are connected to %1. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>두 시스템은 %1에 연결 됩니다. 병합 허용 되지 않습니다.</translation>
+    </message>
+    <message>
+        <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>이러한 시스템은 다른 %1 URL로 연결됩니다. 병합할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</translation>
     </message>
 </context>
 <context>
     <name>QnBusinessStringsHelper</name>
-    <message>
-        <source>Storage Failure</source>
-        <translation>저장기 오류</translation>
-    </message>
-    <message>
-        <source>Network Issue</source>
-        <translation>네트워크 이슈</translation>
-    </message>
-    <message>
-        <source>Input on %1</source>
-        <translation>%1의 입력</translation>
-    </message>
-    <message>
-        <source>Motion on %1</source>
-        <translation>%1의 모션</translation>
-    </message>
-    <message>
-        <source>Storage Failure at %1</source>
-        <translation>%1 내 저장기 오류</translation>
-    </message>
-    <message>
-        <source>Network Issue at %1</source>
-        <translation>%1 내 네트워크 오류</translation>
-    </message>
     <message>
         <source>Bookmark</source>
         <translation>북마크(책갈피)</translation>
@@ -131,36 +107,24 @@
         <translation>알림 보기</translation>
     </message>
     <message>
-        <source>Play sound</source>
-        <translation>음원 재생</translation>
-    </message>
-    <message>
         <source>Repeat sound</source>
         <translation>음원 반복</translation>
     </message>
     <message>
-        <source>Send email</source>
-        <translation>보내는 이메일</translation>
+        <source>Play sound</source>
+        <translation>음원 재생</translation>
     </message>
     <message>
         <source>Speak</source>
         <translation>음성출력</translation>
     </message>
     <message>
-        <source>Unknown (%1)</source>
-        <translation>알수 없음 (%1)</translation>
+        <source>Storage Failure</source>
+        <translation>저장기 오류</translation>
     </message>
     <message>
-        <source>Any Server Issue</source>
-        <translation>모든 서버 이슈</translation>
-    </message>
-    <message>
-        <source>Any Event</source>
-        <translation>모든 이벤트</translation>
-    </message>
-    <message>
-        <source>Undefined event has occurred on %1</source>
-        <translation>%1에 정의되지 않은 이벤트 발생</translation>
+        <source>Network Issue</source>
+        <translation>네트워크 이슈</translation>
     </message>
     <message>
         <source>Server Failure</source>
@@ -177,6 +141,34 @@
     <message>
         <source>License Issue</source>
         <translation>인증키 이슈</translation>
+    </message>
+    <message>
+        <source>Any Server Issue</source>
+        <translation>모든 서버 이슈</translation>
+    </message>
+    <message>
+        <source>Any Event</source>
+        <translation>모든 이벤트</translation>
+    </message>
+    <message>
+        <source>Undefined event has occurred on %1</source>
+        <translation>%1에 정의되지 않은 이벤트 발생</translation>
+    </message>
+    <message>
+        <source>Input on %1</source>
+        <translation>%1의 입력</translation>
+    </message>
+    <message>
+        <source>Motion on %1</source>
+        <translation>%1의 모션</translation>
+    </message>
+    <message>
+        <source>Storage Failure at %1</source>
+        <translation>%1 내 저장기 오류</translation>
+    </message>
+    <message>
+        <source>Network Issue at %1</source>
+        <translation>%1 내 네트워크 오류</translation>
     </message>
     <message>
         <source>Server &quot;%1&quot; Failure</source>
@@ -200,7 +192,7 @@
     </message>
     <message>
         <source>Url: %1</source>
-        <translation></translation>
+        <translation>URL: %1</translation>
     </message>
     <message>
         <source>Reason: %1</source>
@@ -225,7 +217,7 @@
     </message>
     <message>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-        <translation>RTP 패킷 손실이 발생함,  prev seq.=%1 next seq.=%2.</translation>
+        <translation>RTP 패킷 손실이 발생함, prev seq.=%1 next seq.=%2.</translation>
     </message>
     <message>
         <source>RTP packet loss detected.</source>
@@ -237,7 +229,7 @@
     </message>
     <message>
         <source>Not enough HDD/SSD speed for recording to %1.</source>
-        <translation>%1.에 저장을 위한 HDD/SSD 속도 정보.</translation>
+        <translation>%1. 에 저장을 위한 HDD/SSD 속도 정보.</translation>
     </message>
     <message>
         <source>HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.</source>
@@ -245,7 +237,7 @@
     </message>
     <message>
         <source>Conflicting Server: %1</source>
-        <translation>서버 충돌 : %1</translation>
+        <translation>서버 충돌: %1</translation>
     </message>
     <message>
         <source>start</source>
@@ -257,19 +249,11 @@
     </message>
     <message>
         <source>While %1</source>
-        <translation></translation>
+        <translation>%1 동안</translation>
     </message>
     <message>
         <source>On %1 %2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%1 --&gt; %2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server &apos;%1&apos; has a license problem</source>
-        <translation>서버 %1 라이센스 문제 보유 </translation>
+        <translation>%1 %2에</translation>
     </message>
     <message>
         <source>An unknown event has occurred</source>
@@ -290,17 +274,8 @@
         <translation>일반 이벤트</translation>
     </message>
     <message>
-        <source> (%1)</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Caption: %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>MAC #%1: %2 </source>
-        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-        <translation></translation>
+        <translation>캡션: %1</translation>
     </message>
     <message>
         <source>Connection to camera (primary stream) was unexpectedly closed.</source>
@@ -358,168 +333,181 @@
     </message>
     <message>
         <source>Execute PTZ preset</source>
-        <translation type="unfinished"></translation>
+        <translation>PTZ 프리셋 실행</translation>
     </message>
     <message>
         <source>Show text overlay</source>
-        <translation type="unfinished"></translation>
+        <translation>텍스트 오버레이 표시</translation>
     </message>
     <message>
         <source>Show on Alarm Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>알람 레이아웃에 표시</translation>
     </message>
     <message>
         <source>Archive backup finished</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server &apos;%1&apos; has finished an archive backup</source>
-        <translation type="unfinished"></translation>
+        <translation>아카이브 백업 완료</translation>
     </message>
     <message>
         <source>Generic Event at %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1에서 일반 이벤트</translation>
     </message>
     <message>
         <source>Input Port: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1의 입력</translation>
     </message>
     <message>
         <source>Archive backup is successfully completed</source>
-        <translation type="unfinished"></translation>
+        <translation>아카이브 백업이 성공적으로 완료</translation>
     </message>
     <message>
         <source>I/O Module %1 was disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O 모듈 %1이 끊어졌습니다.</translation>
     </message>
     <message>
         <source>Conflicting Address: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>충돌 주소: %1</translation>
     </message>
     <message>
         <source>Archive backup failed: No available backup storages with sufficient free space</source>
-        <translation type="unfinished"></translation>
+        <translation>아카이브 백업 실패: 충분 한 공간이 없습니다</translation>
     </message>
     <message>
         <source>Archive backup failed: Target storage failure</source>
-        <translation type="unfinished"></translation>
+        <translation>아카이브 백업 실패: 대상 저장 실패</translation>
     </message>
     <message>
         <source>Archive backup failed: Source file open/read error</source>
-        <translation type="unfinished"></translation>
+        <translation>아카이브 백업 실패: 소스 파일 열기/읽기 오류</translation>
     </message>
     <message>
         <source>Archive backup failed: Target file create/write error</source>
-        <translation type="unfinished"></translation>
+        <translation>아카이브 백업 실패: 대상으로 파일 생성/쓰기 오류</translation>
     </message>
     <message>
         <source>Archive backup failed: File catalog error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>아카이브 백업 실패: 파일 카탈로그 오류</translation>
     </message>
     <message>
         <source>Archive backup is canceled by user. Data is backed up to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>아카이브 백업 사용자에 의해 취소 됩니다. %1에 데이터 백업</translation>
     </message>
     <message>
         <source>Do HTTP request</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>Motion on Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Input Signal on Device(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Input Signal on Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Device(s) Disconnected</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Camera(s) Disconnected</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Device(s) IP Conflict</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Camera(s) IP Conflict</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+        <translation>HTTP 요청</translation>
     </message>
     <message>
         <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
         <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
         <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
         <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         </translation>
     </message>
     <message>
         <source>Device does not respond to network requests.</source>
-        <translation type="unfinished"></translation>
+        <translation>장치는 네트워크 요청에 응답 하지 않습니다.</translation>
     </message>
     <message>
         <source>Server stopped unexpectedly.</source>
-        <translation type="unfinished"></translation>
+        <translation>서버는 예기치 않게 중단 되었습니다.</translation>
     </message>
     <message>
         <source>Not enough licenses. Recording has been disabled on following devices:</source>
-        <translation type="unfinished"></translation>
+        <translation>라이센스가 충분하지 않습니다. 다음 장치에서 녹화 비활성화 되었습니다.</translation>
     </message>
     <message>
         <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-        <translation type="unfinished"></translation>
+        <translation>라이센스가 충분하지 않습니다. 다음 장치에서 녹화 비활성화 되었습니다.</translation>
     </message>
     <message>
         <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-        <translation type="unfinished"></translation>
+        <translation>라이센스가 충분하지 않습니다. 다음 장치에서 녹화 비활성화 되었습니다.</translation>
+    </message>
+    <message numerus="yes">
+        <source>Motion on Cameras</source>
+        <translation>
+            <numerusform>카메라에 모션</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Input Signal on Devices</source>
+        <translation>
+            <numerusform>장치에 입력된 신호</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Input Signal on Cameras</source>
+        <translation>
+            <numerusform>카메라에 입력된 신호</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Devices Disconnected</source>
+        <translation>
+            <numerusform>장치 연결끊김</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Cameras Disconnected</source>
+        <translation>
+            <numerusform>카메라 연결이 끊어졌습니다.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Devices IP Conflict</source>
+        <translation>
+            <numerusform>장치 IP 충돌</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Cameras IP Conflict</source>
+        <translation>
+            <numerusform>카메라 IP 충돌</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; has a license problem</source>
+        <translation>서버 &quot;%1&quot;는 라이센스 문제</translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; has finished an archive backup</source>
+        <translation>서버 &quot;%1&quot;는 아카이브 백업 완료</translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
+        <translation>아카이브 백업 완료, 하지만 백업 시간 초과 때문에 완전히 완료 되지 않습니다. %1의 데이터 백업</translation>
+    </message>
+    <message>
+        <source>MAC #%1: %2</source>
+        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+        <translation>맥 #%1: %2</translation>
+    </message>
+    <message>
+        <source>Send Email</source>
+        <translation>이메일 전송</translation>
     </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
         <source>OK</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Media stream is opened but no media data was received.</source>
-        <translation>미디어 스트림은 열려 있지만 미디어 데이터를 받을 수 없습니다.</translation>
+        <translation>확인</translation>
     </message>
     <message>
         <source>Server has been stopped.</source>
         <translation>서버가 중지 되었습니다.</translation>
     </message>
     <message>
+        <source>Media stream is opened but no media data was received.</source>
+        <translation>미디어 스트림은 열려 있지만 미디어 데이터를 받을 수 없습니다.</translation>
+    </message>
+    <message>
         <source>Unknown error. Please contact support.</source>
-        <translation>알수없는 오류가 발생하였습니다.관리자의 지원을 받으십시오.</translation>
+        <translation>알수없는 오류가 발생하였습니다. 관리자의 지원을 받으십시오.</translation>
     </message>
     <message>
         <source>(unknown)</source>
@@ -535,7 +523,7 @@
     </message>
     <message>
         <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-        <translation>%1 서버로 부터 잘못된 응답이 접수됨 : &quot;%2&quot;.</translation>
+        <translation>%1 서버로 부터 잘못된 응답이 접수됨: &quot;%2&quot;.</translation>
     </message>
     <message>
         <source>Check if Server is up and has the proper version.</source>
@@ -546,24 +534,8 @@
         <translation>http 포트 %1에 연결할 수 없습니다.</translation>
     </message>
     <message>
-        <source>Cannot open media url %1. Failed to connect to media port %2.</source>
-        <translation>%1 미디어 URL을 열수 없습니다. %2 미디어 포트의 연결에 실패하였습니다.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
-        <translation>미디어 URL %1 을 열수 없습니다. %2 포트의 연결이 예기치 못한 문제로 종료되었습니다.</translation>
-    </message>
-    <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
         <translation>마지막으로, 카메라 업데잍를 시도합니다. 만약 문제가 지속될 경우 고객지원으로 연락해 주세요.</translation>
-    </message>
-    <message>
-        <source>No supported media tracks at url %1.</source>
-        <translation>URL %1의 미디어트랙을 지원하지 않습니다.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Unsupported media protocol %2.</source>
-        <translation>%1 미디어 URL을 열수 없습니다. %2 미디어 프로토콜을 지원하지 않습니다.</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1.</source>
@@ -575,7 +547,7 @@
     </message>
     <message>
         <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-        <translation>입, 출력 오류가 발생하였습니다. OS 메세지 : &quot;%1&quot;.</translation>
+        <translation>입, 출력 오류가 발생하였습니다. OS 메세지: &quot;%1&quot;.</translation>
     </message>
     <message>
         <source>Parameters:</source>
@@ -596,38 +568,6 @@
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>카메라가 네트워크에 연결되었는지 확인후, 카메라 재시작 하세요.</translation>
-    </message>
-    <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded).</source>
-        <translation>%2포트가 접속가능한지 확인하세요.</translation>
-    </message>
-    <message>
-        <source>Could not parse device response. Url %1, request name %2.</source>
-        <translation>장치로 부터 반응 없음 :URL%1, 요청이름 %2.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation>장치로 부터 반응 없음 :URL%1, 요청이름 %2.</translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>로그인 정보 오류. URL %1.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in device settings.</source>
-        <translation>먼저, 장치설정에서 녹화설정을 셋팅하고 fps를 줄여보세요.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation>먼저, 카메라설정에서 녹화설정을 셋팅하고 fps를 줄여보세요.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
-        <translation>문제가 해결되지 않았습니다. 장치 웹페이지를 통해 초기화 하세요.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
-        <translation>문제가 해결되지 않았습니다. 카메라 웹페이지를 통해 초기화 하세요.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -663,55 +603,103 @@
     </message>
     <message>
         <source>Camera plugin error. %1</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라 플러그인 오류입니다. %1</translation>
     </message>
     <message>
         <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished">카메라 재시작후 카메라 웹페이지를 통해 장치를 초기화 해주세요.</translation>
+        <translation>카메라 재시작후 카메라 웹페이지를 통해 장치를 초기화 해주세요.</translation>
     </message>
     <message>
         <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not parse I/O module response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
-        <translation type="unfinished">먼저, 카메라설정에서 녹화설정을 셋팅하고 fps를 줄여보세요.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
-        <translation type="unfinished">문제가 해결되지 않았습니다. 카메라 웹페이지를 통해 초기화 하세요.</translation>
+        <translation>장치가 네트워크에 연결되었는지 확인후, 장치 재시작 하세요.</translation>
     </message>
     <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1에 대한 I/O 모듈 요청 실패, 에러 %2.</translation>
     </message>
     <message>
         <source>Unknown I/O module issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>알 수 없는 I/O 모듈 문제.</translation>
     </message>
     <message>
         <source>Invalid data was received from the I/O module %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>장치 %1로 부터 유효하지 않은 데이터 입수됨.</translation>
     </message>
     <message>
         <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-        <translation type="unfinished">미디어 에러 경고, 상세 내용은 장치 문제 창을 열어서 확인하세요.</translation>
+        <translation>미디어 에러 경고, 상세 내용은 장치 문제 창을 열어서 확인하세요.</translation>
     </message>
     <message>
         <source>Device initialization process is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>장치 초기화 프로세스 진행 중입니다.</translation>
     </message>
     <message>
         <source>Camera initialization process is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라 초기화 프로세스가 진행 중입니다.</translation>
     </message>
     <message>
         <source>I/O Module initialization process is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O 모듈 초기화 과정이 진행 중입니다.</translation>
+    </message>
+    <message>
+        <source>Make sure port %1 is accessible (e.g. forwarded).</source>
+        <translation>%1포트가 접속가능한지 확인하세요.</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
+        <translation>장치 설정에서 우선 녹화모드 On하고 Fps를 줄이세요</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
+        <translation>장치 설정에서 우선 녹화모드 On하고 Fps를 줄이세요</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
+        <translation>장치 설정에서 우선 녹화모드 On하고 Fps를 줄이세요</translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the device web-page.</source>
+        <translation>도움이 되지 않는 경우 장치 웹 페이지에서 기본값 복원.</translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the camera web-page.</source>
+        <translation>도움이 되지 않는 경우 장치 웹 페이지를 통해 시스템 초기화 하세요</translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
+        <translation>도움이 되지 않는 경우 장치 웹 페이지를 통해 시스템 초기화 하세요</translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
+        <translation>미디어 URL %1를 열 수 없습니다. 미디어 포트 %2에 연결 하지 못했습니다.</translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
+        <translation>미디어 URL %1를 열 수 없습니다. 연결 포트 %2 예기치 않게 닫혔습니다.</translation>
+    </message>
+    <message>
+        <source>Could not parse device response. URL %1, request name %2.</source>
+        <translation>장치에서 응답을 확인 할수 없습니다. URL %1, 요청명칭 %2</translation>
+    </message>
+    <message>
+        <source>Could not parse camera response. URL %1, request name %2.</source>
+        <translation>장치에서 응답을 확인 할수 없습니다. URL %1, 요청명칭 %2</translation>
+    </message>
+    <message>
+        <source>Could not parse I/O module response. URL %1, request name %2.</source>
+        <translation>장치에서 응답을 확인 할수 없습니다. URL %1, 요청명칭 %2</translation>
+    </message>
+    <message>
+        <source>No supported media tracks at URL %1.</source>
+        <translation>URL %1의 미디어를 지원하지 않습니다.</translation>
+    </message>
+    <message>
+        <source>Not authorized. URL %1.</source>
+        <translation>권한이 없습니다. URL %1입니다.</translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
+        <translation>미디어 URL %1를 열 수 없습니다. 지원 되지 않는 미디어 프로토콜 %2입니다.</translation>
     </message>
 </context>
 <context>
@@ -726,35 +714,35 @@
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>오디오 인코더를 초기화할 수 없습니다.</translation>
     </message>
     <message>
         <source>Could not initialize audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>오디오 인코더를 초기화할 수 없습니다.</translation>
     </message>
     <message>
         <source>Could not find decoder for codec %1.</source>
-        <translation type="unfinished">%1 codec의 인코더를 찾을 수 없습니다.</translation>
+        <translation>%1 codec의 인코더를 찾을 수 없습니다.</translation>
     </message>
     <message>
-        <source>Couldn&apos;t initialize resampling context, error code: %1</source>
-        <translation type="unfinished"></translation>
+        <source>Could not initialize resampling context, error code: %1</source>
+        <translation>리샘플링 컨텍스트, 오류 코드를 초기화할 수 없습니다: %1</translation>
     </message>
     <message>
-        <source>Couldn&apos;t allocate sample buffers, error code: %1</source>
-        <translation type="unfinished"></translation>
+        <source>Could not allocate sample buffers, error code: %1</source>
+        <translation>샘플 버러를 할당 할 수업습니다: 에러코드: %1</translation>
     </message>
     <message>
-        <source>Couldn&apos;t send audio frame to encoder, Error code: %1.</source>
-        <translation type="unfinished"></translation>
+        <source>Could not send audio frame to encoder, Error code: %1.</source>
+        <translation>디코더롤 오디오 프레임을 전송할 수 없습니다: 에러코드 %1.</translation>
     </message>
     <message>
-        <source>Couldn&apos;t receive audio packet from encoder, Error code: %1.</source>
-        <translation type="unfinished"></translation>
+        <source>Could not receive audio packet from encoder, Error code: %1.</source>
+        <translation>디코더에서 오디오 패킷을 받을 수 없습니다: 에러코드 %1.</translation>
     </message>
     <message>
-        <source>Couldn&apos;t receive audio frame from decoder, Error code: %1.</source>
-        <translation type="unfinished"></translation>
+        <source>Could not receive audio frame from decoder, Error code: %1.</source>
+        <translation>디코더에서 오디오 프레임을 받을 수 없습니다: 에러코드 %1.</translation>
     </message>
 </context>
 <context>
@@ -792,7 +780,7 @@
     </message>
     <message>
         <source>Could not initialize video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>비디오 인코더를 초기화 할 수 없습니다.</translation>
     </message>
 </context>
 <context>
@@ -811,11 +799,11 @@
     </message>
     <message>
         <source>Edge</source>
-        <translation>Edge</translation>
+        <translation type="unfinished">Edge</translation>
     </message>
     <message>
         <source>Vmax</source>
-        <translation>Vmax</translation>
+        <translation type="unfinished">Vmax</translation>
     </message>
     <message>
         <source>Video Wall</source>
@@ -823,7 +811,7 @@
     </message>
     <message>
         <source>Only single license is allowed for this device</source>
-        <translation>이 장치는 하나의(단일) 인증키만 허용합니다</translation>
+        <translation>이 장치는 하나의 (단일) 인증키만 허용합니다</translation>
     </message>
     <message>
         <source>Unknown error</source>
@@ -835,7 +823,7 @@
     </message>
     <message>
         <source>Start</source>
-        <translation>시작</translation>
+        <translation type="unfinished">Start</translation>
     </message>
     <message>
         <source>Analog Encoder</source>
@@ -890,32 +878,32 @@
         <translation>유효하지 않은 라이센스</translation>
     </message>
     <message>
-        <source>This license type requires higher software version.</source>
-        <translation>이 라이센스는 상위 버젼의 SW가 필요합니다.</translation>
-    </message>
-    <message>
         <source>Invalid signature</source>
-        <translation type="unfinished">유효하지 않은 서명</translation>
+        <translation>유효하지 않은 서명</translation>
     </message>
     <message>
         <source>Invalid customization</source>
-        <translation type="unfinished">유효하지 않은 변경</translation>
+        <translation>유효하지 않은 변경</translation>
     </message>
     <message>
         <source>License is expired</source>
-        <translation type="unfinished"></translation>
+        <translation>라이센스 만료</translation>
     </message>
     <message>
         <source>Invalid type</source>
-        <translation type="unfinished">유효하지 않은 방식</translation>
+        <translation>유효하지 않은 방식</translation>
     </message>
     <message>
         <source>Free</source>
-        <translation type="unfinished"></translation>
+        <translation>무료</translation>
     </message>
     <message>
         <source>Free license</source>
-        <translation type="unfinished"></translation>
+        <translation>무료 라이센스</translation>
+    </message>
+    <message>
+        <source>This license type requires higher software version</source>
+        <translation>이 라이선스 유형은 상위버젼 소프트웨어 필요</translation>
     </message>
 </context>
 <context>
@@ -932,18 +920,6 @@
             <numerusform>%n %2 는(은) %1에서 사용될 것입니다.</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>Activate %n more %2. </source>
-        <translation>
-            <numerusform>%n은 %2의 등록을 추가합니다.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n more %2 will be used. </source>
-        <translation>
-            <numerusform>%n 와(과) %2 가 사용됩니다. </numerusform>
-        </translation>
-    </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
         <translation>입력한 인증키가 유효하지 않습니다. 입력한 인증키가 맞는지 다시 확인해 주십시오. 문제가 지속 될 경우 관리자를 통해 정상적인 인증키인지 확인하십시오.</translation>
@@ -953,30 +929,36 @@
         <translation>부정확한 인증키의 등록을 시도 중입니다. 관리자를 통해 유효한 인증키를 발급 받으십시오.</translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation>{{hwid}} on {{time}}에서 이미 사용된 인증 키입니다. 관리자를 통해 유효한 인증키를 발급 받으세요.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. A database error occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation>라이센스 키를 활성화 하는 문제가 있었습니다. 데이터베이스 오류가 발생 했습니다.</translation>
     </message>
     <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>라이센스 키를 활성화 하는 문제가 있었습니다. 잘못 된 데이터를 받았습니다. 문제를 보고 지원 팀에 문의 하십시오.</translation>
+    </message>
+    <message numerus="yes">
+        <source>Activate %n more %1.</source>
+        <translation>
+            <numerusform>더 많은 %1 %n을 활성화 합니다.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n more %1 will be used.</source>
+        <translation>
+            <numerusform>%n 더 많은 %1 사용 됩니다.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
+        <comment>%1 is a hardware ID, %2 is an activation time</comment>
+        <translation>이 라이센스 키가 %2에 하드웨어 ID %1에 이전 활성화 되었습니다. 유효한 라이센스 키를 얻기 위해 지원 팀에 문의 하십시오.</translation>
     </message>
 </context>
 <context>
     <name>QnLocalSystemDescription</name>
     <message>
-        <source>New System</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnPropertyStorage</name>
-    <message>
-        <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
-        <translation>&apos;%1&apos; 인수 값이 유효하지 않습니다. - %2 예상, &apos;%3&apos;제공.</translation>
+        <source>New Server</source>
+        <translation>새 서버</translation>
     </message>
 </context>
 <context>
@@ -984,25 +966,25 @@
     <message numerus="yes">
         <source>%n Camera(s)</source>
         <translation>
-            <numerusform></numerusform>
+            <numerusform>%n 카메라 (들)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n camera(s)</source>
         <translation>
-            <numerusform></numerusform>
+            <numerusform>%n 카메라 (들)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Device(s)</source>
         <translation>
-            <numerusform></numerusform>
+            <numerusform>%n 장치</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n device(s)</source>
         <translation>
-            <numerusform></numerusform>
+            <numerusform>%n 장치</numerusform>
         </translation>
     </message>
     <message>
@@ -1039,31 +1021,31 @@
     </message>
     <message numerus="yes">
         <source>%n I/O Module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n I/O 모듈</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n I/O module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n I/O 모듈</numerusform>
         </translation>
     </message>
     <message>
         <source>I/O Modules</source>
-        <translation type="unfinished">IO장치</translation>
+        <translation>IO장치</translation>
     </message>
     <message>
         <source>I/O modules</source>
-        <translation type="unfinished">IO장치</translation>
+        <translation>IO장치</translation>
     </message>
     <message>
         <source>I/O Module</source>
-        <translation type="unfinished">IO장치</translation>
+        <translation>IO장치</translation>
     </message>
     <message>
         <source>I/O module</source>
-        <translation type="unfinished">IO장치</translation>
+        <translation>IO장치</translation>
     </message>
 </context>
 <context>
@@ -1073,24 +1055,24 @@
         <translation>알수 없음</translation>
     </message>
     <message>
-        <source>Hardware ID: </source>
-        <translation>하드웨어 ID:</translation>
-    </message>
-    <message>
-        <source>Watermark: </source>
-        <translation>파일변조:</translation>
-    </message>
-    <message>
         <source>Trial License</source>
         <translation>기간한정 인증키</translation>
     </message>
     <message>
-        <source>Licensed To: </source>
-        <translation>인증키:</translation>
-    </message>
-    <message>
         <source>FREE License</source>
         <translation>무료 인증키</translation>
+    </message>
+    <message>
+        <source>Hardware ID: %1</source>
+        <translation>하드웨어 ID: %1</translation>
+    </message>
+    <message>
+        <source>Licensed To: %1</source>
+        <translation>%1 에게 라이선스를 허가함</translation>
+    </message>
+    <message>
+        <source>Watermark: %1</source>
+        <translation>워터 마크: %1</translation>
     </message>
 </context>
 <context>
@@ -1153,11 +1135,6 @@
         <extracomment>Short for &apos;Preset&apos;</extracomment>
         <translation>프리셋</translation>
     </message>
-    <message>
-        <source>-</source>
-        <extracomment>Short for &apos;Undefined&apos;</extracomment>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>QnStreamRecorder</name>
@@ -1186,30 +1163,26 @@
         <translation>비디오 또는 오디오 코덱은 선택된 포맷과 호환되지 않습니다.</translation>
     </message>
     <message>
-        <source>Error during watermark generation for file &apos;%1&apos;.</source>
-        <translation>&apos;%1&apos; 파일의 파일 변조 검사 중 오류가 발생하였습니다.</translation>
-    </message>
-    <message>
         <source>File write error. Not enough free space.</source>
-        <translation type="unfinished"></translation>
+        <translation>파일 쓰기 오류입니다. 충분 하지 않은 여유 공간입니다.</translation>
     </message>
     <message>
         <source>Invalid resource type for data export.</source>
-        <translation type="unfinished"></translation>
+        <translation>데이터 내보내기에 대 한 잘못 된 리소스 형식입니다.</translation>
     </message>
 </context>
 <context>
     <name>QnSystemDescription</name>
     <message>
-        <source>&lt;Unnamed system&gt;</source>
-        <translation type="unfinished"></translation>
+        <source>Unnamed System</source>
+        <translation>명명 되지 않은 시스템</translation>
     </message>
 </context>
 <context>
     <name>QnTCPConnectionProcessor</name>
     <message>
         <source>OK</source>
-        <translation></translation>
+        <translation>확인</translation>
     </message>
     <message>
         <source>Not Found</source>
@@ -1237,137 +1210,137 @@
     <message>
         <source>ms</source>
         <comment>Suffix for displaying milliseconds</comment>
-        <translation type="unfinished"></translation>
+        <translation>ms</translation>
     </message>
     <message>
         <source>s</source>
         <comment>Suffix for displaying seconds</comment>
-        <translation type="unfinished"></translation>
+        <translation>초</translation>
     </message>
     <message>
         <source>m</source>
         <comment>Suffix for displaying minutes</comment>
-        <translation type="unfinished"></translation>
+        <translation>분</translation>
     </message>
     <message>
         <source>h</source>
         <comment>Suffix for displaying hours</comment>
-        <translation type="unfinished"></translation>
+        <translation>시간</translation>
     </message>
     <message>
         <source>d</source>
         <comment>Suffix for displaying days</comment>
-        <translation type="unfinished"></translation>
+        <translation>일</translation>
     </message>
     <message>
         <source>w</source>
         <comment>Suffix for displaying weeks</comment>
-        <translation type="unfinished"></translation>
+        <translation>주</translation>
     </message>
     <message>
         <source>M</source>
         <comment>Suffix for displaying months</comment>
-        <translation type="unfinished"></translation>
+        <translation>월</translation>
     </message>
     <message>
         <source>y</source>
         <comment>Suffix for displaying years</comment>
-        <translation type="unfinished"></translation>
+        <translation>년</translation>
     </message>
     <message>
         <source>msec</source>
         <comment>Long suffix for displaying milliseconds</comment>
-        <translation type="unfinished"></translation>
+        <translation>밀리초</translation>
     </message>
     <message>
         <source>sec</source>
         <comment>Long suffix for displaying seconds</comment>
-        <translation type="unfinished"></translation>
+        <translation>초</translation>
     </message>
     <message>
         <source>min</source>
         <comment>Long suffix for displaying minutes</comment>
-        <translation type="unfinished"></translation>
+        <translation>분</translation>
     </message>
     <message>
         <source>hrs</source>
         <comment>Long suffix for displaying hours</comment>
-        <translation type="unfinished"></translation>
+        <translation>시간</translation>
     </message>
     <message>
         <source>days</source>
         <comment>Long suffix for displaying days</comment>
-        <translation type="unfinished"></translation>
+        <translation>일</translation>
     </message>
     <message>
         <source>wks</source>
         <comment>Long suffix for displaying weeks</comment>
-        <translation type="unfinished"></translation>
+        <translation>wks</translation>
     </message>
     <message>
         <source>mos</source>
         <comment>Long suffix for displaying months</comment>
-        <translation type="unfinished"></translation>
+        <translation>mos</translation>
     </message>
     <message>
         <source>yrs</source>
         <comment>Long suffix for displaying years</comment>
-        <translation type="unfinished"></translation>
+        <translation>년</translation>
     </message>
     <message numerus="yes">
         <source>milliseconds</source>
         <comment>Full suffix for displaying milliseconds</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>밀리초</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>seconds</source>
         <comment>Full suffix for displaying seconds</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>초</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>minutes</source>
         <comment>Full suffix for displaying minutes</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>분</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>hours</source>
         <comment>Full suffix for displaying hours</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>시간</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>days</source>
         <comment>Full suffix for displaying days</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>일</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>weeks</source>
         <comment>Full suffix for displaying weeks</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>주</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>months</source>
         <comment>Full suffix for displaying months</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>개월</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>years</source>
         <comment>Full suffix for displaying years</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>년</numerusform>
         </translation>
     </message>
 </context>
@@ -1394,66 +1367,66 @@
     <name>QnUserRolesManager</name>
     <message>
         <source>Owner</source>
-        <translation type="unfinished"></translation>
+        <translation>소유자</translation>
     </message>
     <message>
         <source>Administrator</source>
-        <translation type="unfinished"></translation>
+        <translation>관리자</translation>
     </message>
     <message>
         <source>Advanced Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>고급 뷰어</translation>
     </message>
     <message>
         <source>Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>뷰어</translation>
     </message>
     <message>
         <source>Live Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>라이브 뷰어</translation>
     </message>
     <message>
         <source>Custom Role</source>
-        <translation type="unfinished"></translation>
+        <translation>사용자 지정 역할</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Has access to whole system and can do everything.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Has access to whole system and can manage it. Can create users.</source>
-        <translation type="unfinished"></translation>
+        <translation>사용자 지정.</translation>
     </message>
     <message>
         <source>Can manage all cameras and bookmarks.</source>
-        <translation type="unfinished"></translation>
+        <translation>모든 카메라와 책갈피를 관리할 수 있습니다.</translation>
     </message>
     <message>
         <source>Can view all cameras and export video.</source>
-        <translation type="unfinished"></translation>
+        <translation>모든 카메라를 볼 하 고 비디오를 내보낼 수 있습니다.</translation>
     </message>
     <message>
         <source>Can view live video from all cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>모든 카메라에서에서 실시간 영상을 볼 수 있습니다.</translation>
     </message>
     <message>
         <source>Custom user role.</source>
-        <translation type="unfinished"></translation>
+        <translation>사용자 지정 사용자 역할입니다.</translation>
     </message>
     <message>
         <source>Custom permissions.</source>
-        <translation type="unfinished"></translation>
+        <translation>사용자 지정 권한입니다.</translation>
+    </message>
+    <message>
+        <source>Has access to whole System and can do everything.</source>
+        <translation>전체 시스템에 액세스할 수 있으며 모든 것을 할 수 있습니다.</translation>
+    </message>
+    <message>
+        <source>Has access to whole System and can manage it. Can create users.</source>
+        <translation>전체 시스템에 액세스할 수 있으며 그것을 관리할 수 있습니다. 사용자를 만들 수 있습니다.</translation>
     </message>
 </context>
 <context>
     <name>utils::QnCameraNamesWatcher</name>
     <message>
         <source>Removed camera</source>
-        <translation type="unfinished"></translation>
+        <translation>제거된 카메라</translation>
     </message>
 </context>
 </TS>

@@ -72,10 +72,14 @@ QtDevice& qtDevice()
 
 QByteArray generate(std::size_t count)
 {
+    auto& device = qtDevice();
     QByteArray data(static_cast<int>(count), Qt::Uninitialized);
     for (int i = 0; i != data.size(); ++i)
     {
-        const auto n = number<short>(0, 255);
+        // NOTE: Direct device access with simple cast works significantly faster than
+        //     uniform_int_distribution on a number of platforms (stl implemenations).
+        //     Found on iOS by profiler.
+        const auto n = device();
         data[i] = reinterpret_cast<const char&>(n);
     }
 

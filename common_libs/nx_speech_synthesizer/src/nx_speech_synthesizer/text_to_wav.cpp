@@ -1,21 +1,19 @@
 #if !defined(EDGE_SERVER) && !defined(DISABLE_FESTIVAL)
 #include "text_to_wav.h"
 
-#include <QtCore/QCoreApplication>
 #include <QtCore/QFile>
 
 #include <mutex>
 #include <memory>
 
 #include <festival/festival.h>
-#include <festival/EST_wave_aux.h>
+#include <EST_wave_aux.h>
 
 #ifdef QN_USE_VLD
 #include <vld.h>
 #endif
 
 static char festivalVoxPath[256];
-
 
 #if (_XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L) && 0
 #include <stdio.h>
@@ -50,7 +48,6 @@ namespace
         chars[i] = (data[i]/256)+128;
 
     }
-
 
     int get_word_size(enum EST_sample_type_t sample_type)
     {
@@ -253,10 +250,7 @@ namespace
 }
 #endif
 
-static std::once_flag festivalInitialized;
-static std::once_flag festivalDenitialized;
-
-static void initFestival()
+static void initFestival(const QString binaryPath)
 {
 #ifdef QN_USE_VLD
     VLDDisable();
@@ -264,9 +258,9 @@ static void initFestival()
     //initializing festival engine
     //sprintf( festivalVoxPath, "%s/festival.vox/lib/", QN_BUILDENV_PATH );
 #ifndef Q_OS_MAC
-    sprintf( festivalVoxPath, "%s/vox/", QCoreApplication::applicationDirPath().toLatin1().constData() );
+    sprintf( festivalVoxPath, "%s/vox/", binaryPath.toLatin1().constData() );
 #else
-    sprintf( festivalVoxPath, "%s/../Resources/vox/", QCoreApplication::applicationDirPath().toLatin1().constData() );
+    sprintf( festivalVoxPath, "%s/../Resources/vox/", binaryPath.toLatin1().constData() );
 #endif
     festival_libdir = festivalVoxPath;
 
@@ -283,25 +277,6 @@ static void deinitFestival()
     festival_wait_for_spooler();
     festival_tidy_up();
 }
-
-
-class FestivalInitializer
-{
-public:
-    FestivalInitializer()
-    {
-        std::call_once(festivalInitialized, initFestival);
-    }
-
-    ~FestivalInitializer()
-    {
-        /*
-         * Really we should not do it more than once.
-         * Guarding to prevent troubles in unit tests.
-         */
-        std::call_once(festivalDenitialized, deinitFestival);
-    }
-};
 
 static int my_festival_text_to_wave(const EST_String &text,EST_Wave &wave)
 {
@@ -369,16 +344,38 @@ static bool textToWavInternal(const QString& text, QIODevice* const dest, QnAudi
     return result;
 }
 
-
-TextToWaveServer::TextToWaveServer()
-:
-    m_prevTaskID( 1 )
+class FestivalInitializer
 {
+
+public:
+    FestivalInitializer(const QString& binaryPath, nx::utils::promise<void>& initializedPromise)
+    {
+        initFestival(binaryPath);
+        initializedPromise.set_value();
+    };
+
+    ~FestivalInitializer()
+    {
+        deinitFestival();
+    };
+};
+
+
+TextToWaveServer::TextToWaveServer(const QString& binaryPath):
+    m_binaryPath(binaryPath),
+    m_prevTaskID(1)
+{
+    m_initializedFuture = m_initializedPromise.get_future();
 }
 
 TextToWaveServer::~TextToWaveServer()
 {
     stop();
+}
+
+void TextToWaveServer::waitForStarted()
+{
+    m_initializedFuture.get();
 }
 
 void TextToWaveServer::pleaseStop()
@@ -413,7 +410,7 @@ void TextToWaveServer::run()
 {
     initSystemThreadId();
 
-    FestivalInitializer festivalInitializer;
+    FestivalInitializer(m_binaryPath, m_initializedPromise);
 
     while( !needToStop() )
     {

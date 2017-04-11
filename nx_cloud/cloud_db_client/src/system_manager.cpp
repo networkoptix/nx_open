@@ -1,8 +1,3 @@
-/**********************************************************
-* Sep 3, 2015
-* akolesnikov
-***********************************************************/
-
 #include "system_manager.h"
 
 #include "cdb_request_path.h"
@@ -14,7 +9,9 @@ namespace nx {
 namespace cdb {
 namespace client {
 
-SystemManager::SystemManager(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher):
+SystemManager::SystemManager(
+    network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher)
+    :
     AsyncRequestsExecutor(cloudModuleEndPointFetcher)
 {
 }
@@ -23,7 +20,8 @@ void SystemManager::bindSystem(
     api::SystemRegistrationData registrationData,
     std::function<void(api::ResultCode, api::SystemData)> completionHandler)
 {
-    registrationData.customization = QnAppInfo::customizationName().toStdString();
+    if (registrationData.customization.empty())
+        registrationData.customization = QnAppInfo::customizationName().toStdString();
     executeRequest(
         kSystemBindPath,
         std::move(registrationData),
@@ -45,8 +43,20 @@ void SystemManager::unbindSystem(
 void SystemManager::getSystems(
     std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler)
 {
+    api::Filter filter;
+    filter.nameToValue.emplace(
+        api::FilterField::customization,
+        QnAppInfo::customizationName().toStdString());
+    getSystemsFiltered(filter, std::move(completionHandler));
+}
+
+void SystemManager::getSystemsFiltered(
+    const api::Filter& filter,
+    std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler)
+{
     executeRequest(
         kSystemGetPath,
+        filter,
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::SystemDataExList()));
 }
@@ -145,6 +155,17 @@ void SystemManager::recordUserSessionStart(
         completionHandler);
 }
 
-}   //client
-}   //cdb
-}   //nx
+void SystemManager::getSystemHealthHistory(
+    const std::string& systemId,
+    std::function<void(api::ResultCode, api::SystemHealthHistory)> completionHandler)
+{
+    executeRequest(
+        kSystemHealthHistoryPath,
+        api::SystemId(systemId),
+        completionHandler,
+        std::bind(completionHandler, std::placeholders::_1, api::SystemHealthHistory()));
+}
+
+} // namespace client
+} // namespace cdb
+} // namespace nx

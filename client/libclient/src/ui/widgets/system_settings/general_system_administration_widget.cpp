@@ -153,6 +153,7 @@ void QnGeneralSystemAdministrationWidget::applyChanges()
     ui->systemSettingsWidget->applyChanges();
     ui->systemNameLabel->setEditing(false);
     qnGlobalSettings->setSystemName(ui->systemNameLabel->text().trimmed());
+    qnGlobalSettings->synchronizeNow();
 }
 
 bool QnGeneralSystemAdministrationWidget::hasChanges() const

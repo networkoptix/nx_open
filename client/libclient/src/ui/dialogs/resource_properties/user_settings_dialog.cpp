@@ -302,7 +302,11 @@ void QnUserSettingsDialog::updatePermissions()
 {
     updateControlsVisibility();
 
-    PermissionsInfoTable helper(context()->user());
+    const auto currentUser = context()->user();
+    if (!currentUser)
+        return;
+
+    PermissionsInfoTable helper(currentUser);
     if (isPageVisible(ProfilePage))
     {
         Qn::UserRole role = m_user->userRole();
@@ -405,20 +409,22 @@ QDialogButtonBox::StandardButton QnUserSettingsDialog::showConfirmationDialog()
     NX_ASSERT(m_user, Q_FUNC_INFO, "User must exist here");
 
     if (m_model->mode() != QnUserSettingsModel::OwnProfile && m_model->mode() != QnUserSettingsModel::OtherSettings)
-        return QDialogButtonBox::No;
+        return QDialogButtonBox::Cancel;
 
     if (!canApplyChanges())
+        return QDialogButtonBox::Cancel;
+
+    const auto result = QnMessageBox::question(this,
+        tr("Apply changes before switching to another user?"), QString(),
+        QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
+        QDialogButtonBox::Apply);
+
+    if (result == QDialogButtonBox::Apply)
+        return QDialogButtonBox::Yes;
+    if (result == QDialogButtonBox::Discard)
         return QDialogButtonBox::No;
 
-    return QnMessageBox::question(
-        this,
-        tr("User not saved"),
-        tr("Apply changes to user %1?")
-        .arg(m_user
-            ? m_user->getName()
-            : QString()),
-        QDialogButtonBox::Yes | QDialogButtonBox::No,
-        QDialogButtonBox::Yes);
+    return QDialogButtonBox::Cancel;
 }
 
 void QnUserSettingsDialog::retranslateUi()

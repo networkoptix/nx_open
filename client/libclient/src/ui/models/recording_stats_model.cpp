@@ -17,6 +17,7 @@
 namespace {
 
 //TODO: #vkutin #common Refactor all this to use some common formatting
+//TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
 const qreal kBytesInKB = 1024.0;
 
 const qreal kBytesInMB = kBytesInKB * kBytesInKB;
@@ -137,11 +138,15 @@ QString QnRecordingStatsModel::footerDisplayData(const QModelIndex &index) const
                 if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(data.uniqueId))
                     cameras << camera;
             //NX_ASSERT(cameras.size() == m_data.size(), Q_FUNC_INFO, "Make sure all cameras exist");
+            static const auto kNDash = QString::fromWCharArray(L"\x2013");
             return QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(
-                    tr("Total %n devices",      "", cameras.size()),
-                    tr("Total %n cameras",      "", cameras.size()),
-                    tr("Total %n I/O modules",  "", cameras.size())
+                    tr("Total %1 %n devices", "%1 is long dash, do not replace",
+                        cameras.size()).arg(kNDash),
+                    tr("Total %1 %n cameras", "%1 is long dash, do not replace",
+                        cameras.size()).arg(kNDash),
+                    tr("Total %1 %n I/O modules", "%1 is long dash, do not replace",
+                        cameras.size()).arg(kNDash)
                 ), cameras
             );
         }
@@ -203,16 +208,32 @@ qreal QnRecordingStatsModel::chartData(const QModelIndex& index) const
 
 QVariant QnRecordingStatsModel::footerData(const QModelIndex &index, int role) const
 {
-    switch(role) {
-    case Qt::DisplayRole:
-        return footerDisplayData(index);
-    case Qt::ToolTipRole:
-        return tooltipText(static_cast<Columns>(index.column()));
+    switch(role)
+    {
+        case Qt::DisplayRole:
+            return footerDisplayData(index);
+        case Qt::ToolTipRole:
+            return tooltipText(static_cast<Columns>(index.column()));
+        case Qt::DecorationRole:
+        {
+            if (index.column() != CameraNameColumn)
+                break;
 
-    case Qn::RecordingStatsDataRole:
-        return QVariant::fromValue<QnCamRecordingStatsData>(m_footer);
-    default:
-        break;
+            // Makes always-selected cameras icon
+            const auto source = qnResIconCache->icon(QnResourceIconCache::Cameras);
+            QIcon result;
+            for (const auto& size: source.availableSizes(QIcon::Selected))
+            {
+                const auto selectedPixmap = source.pixmap(size, QIcon::Selected);
+                result.addPixmap(selectedPixmap, QIcon::Normal);
+                result.addPixmap(selectedPixmap, QIcon::Selected);
+            }
+            return result;
+        }
+        case Qn::RecordingStatsDataRole:
+            return QVariant::fromValue<QnCamRecordingStatsData>(m_footer);
+        default:
+            break;
     }
 
     return QVariant();
@@ -289,7 +310,7 @@ QVariant QnRecordingStatsModel::headerData(int section, Qt::Orientation orientat
             case CameraNameColumn: return QnDeviceDependentStrings::getDefaultNameFromSet(tr("Device"), tr("Camera"));
             case BytesColumn:      return tr("Space");
             case DurationColumn:   return tr("Calendar Days");
-            case BitrateColumn:    return tr("Bitrate for");
+            case BitrateColumn:    return tr("Bitrate");
             default:               break;
         }
     }
@@ -367,11 +388,10 @@ QString QnRecordingStatsModel::formatDurationString(const QnCamRecordingStatsDat
     static const int kMsecPerSec = 1000;
     static const QString kSeparator(L' ');
     static const Qt::TimeSpanFormat kFormat = Qt::Years | Qt::Months | Qt::Days | Qt::Hours;
-    static const int kDoNotSuppress = -1;
 
     qint64 durationMs = data.archiveDurationSecs * kMsecPerSec;
     qint64 referenceMs = qnSyncTime->currentMSecsSinceEpoch();
 
     return QTimeSpan(QDateTime::fromMSecsSinceEpoch(referenceMs), durationMs)
-        .toApproximateString(kDoNotSuppress, kFormat, QTimeSpan::SuffixFormat::Full, kSeparator);
+        .toApproximateString(QTimeSpan::kDoNotSuppressSecondUnit, kFormat, QTimeSpan::SuffixFormat::Full, kSeparator);
 }

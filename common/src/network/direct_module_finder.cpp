@@ -19,9 +19,15 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/async_http_client_reply.h>
+#include <nx/network/socket_global.h>
 
 #include <utils/common/app_info.h>
 
+#define TIMER_DEBUG_LOG(MESSAGE) do \
+{ \
+    if (nx::network::SocketGlobals::debugConfig().moduleFinders) \
+        NX_LOGX(lm("at_checkTimer_timeout %1").str(MESSAGE), cl_logDEBUG1); \
+} while (0)
 
 using std::chrono::duration_cast;
 using std::chrono::seconds;
@@ -118,7 +124,9 @@ void QnDirectModuleFinder::start() {
 void QnDirectModuleFinder::pleaseStop() {
     m_checkTimer->stop();
     m_requestQueue.clear();
-    for (QnAsyncHttpClientReply *reply: m_activeRequests) {
+    for (auto reply: m_activeRequests)
+    {
+        reply->disconnect(this);
         reply->asyncHttpClient()->pleaseStopSync();
         reply->deleteLater();
     }
@@ -230,44 +238,45 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply)
     NX_LOG(lit("QnDirectModuleFinder. Received success reply from url %1")
         .arg(url.toString()), cl_logDEBUG2);
 
-    emit responseReceived(moduleInformation, SocketAddress(url.host(), url.port()));
+    emit responseReceived(
+        moduleInformation,
+        SocketAddress(url.host(), url.port()),
+        reply->asyncHttpClient()->socket()->getForeignAddress().address);
 }
 
-void QnDirectModuleFinder::at_checkTimer_timeout() {
-    NX_LOG(lit("QnDirectModuleFinder::at_checkTimer_timeout"), cl_logDEBUG2);
-
+void QnDirectModuleFinder::at_checkTimer_timeout()
+{
+    TIMER_DEBUG_LOG("Enter");
     qint64 currentTime = m_elapsedTimer.elapsed();
 
-    for (const QUrl &url: m_urls) {
-        NX_LOG(lit("QnDirectModuleFinder::at_checkTimer_timeout. url %1")
-                .arg(url.toString(QUrl::RemovePassword)),
-            cl_logDEBUG2);
-
+    for (const QUrl &url: m_urls)
+    {
         const bool alive = currentTime - m_lastPingByUrl.value(url) < maxPingTimeout().count();
         const qint64 lastCheck = m_lastCheckByUrl.value(url);
         if (alive) {
             if (currentTime - lastCheck < aliveCheckInterval().count())
             {
-                NX_LOG(lit("QnDirectModuleFinder::at_checkTimer_timeout. url %1. Not adding (1) since %2 < %3")
+                TIMER_DEBUG_LOG(lm("Not adding alive %1 since %2 < %3")
                         .arg(url.toString(QUrl::RemovePassword))
                         .arg(currentTime - lastCheck)
-                        .arg(aliveCheckInterval().count()),
-                    cl_logDEBUG2);
+                        .arg(aliveCheckInterval().count()));
                 continue;
             }
         } else {
             if (currentTime - lastCheck < discoveryCheckInterval().count())
             {
-                NX_LOG(lit("QnDirectModuleFinder::at_checkTimer_timeout. url %1. Not adding (2) since %2 < %3")
+                TIMER_DEBUG_LOG(lm("Not adding discovered %1 since %2 < %3")
                         .arg(url.toString(QUrl::RemovePassword))
                         .arg(currentTime - lastCheck)
-                        .arg(discoveryCheckInterval().count()),
-                    cl_logDEBUG2);
+                        .arg(discoveryCheckInterval().count()));
                 continue;
             }
         }
+
+        TIMER_DEBUG_LOG(lm("Add url %1").arg(url.toString(QUrl::RemovePassword)));
         enqueRequest(url);
     }
+
     activateRequests();
 }
 

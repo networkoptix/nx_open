@@ -81,20 +81,25 @@
 #include <api/common_message_processor.h>
 #include <business/actions/abstract_business_action.h>
 #include <utils/media/sse_helper.h>
+#include <plugins/resource/avi/avi_resource.h>
 
 namespace {
 
-static const int kMicroInMilliSeconds = 1000;
+static constexpr int kMicroInMilliSeconds = 1000;
 
 // TODO: #rvasilenko Change to other constant - 0 is 1/1/1970
 // Note: -1 is used for invalid time
 // Now it is returned when there is no archive data and archive is played backwards.
 // Who returns it? --gdm?
-const int kNoTimeValue = 0;
+static constexpr int kNoTimeValue = 0;
 
-static const qreal kTwoWayAudioButtonSize = 44.0;
+static constexpr qreal kTwoWayAudioButtonSize = 44.0;
 
-static const qreal kMotionRegionAlpha = 0.4;
+static constexpr qreal kMotionRegionAlpha = 0.4;
+
+static constexpr qreal kMaxForwardSpeed = 16.0;
+static constexpr qreal kMaxBackwardSpeed = 16.0;
+
 
 bool isSpecialDateTimeValueUsec(qint64 dateTimeUsec)
 {
@@ -348,7 +353,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         addOverlayWidget(m_ioModuleOverlayWidget, detail::OverlayParams(Visible, true, true));
 
         connect(m_ioLicenceStatusHelper, &QnSingleCamLicenceStatusHelper::licenceStatusChanged,
-            this, [this]() { updateIoModuleVisibility(true); });
+            this,
+            [this]
+            {
+                updateIoModuleVisibility(animationAllowed());
+            });
 
         updateButtonsVisibility();
         updateIoModuleVisibility(false);
@@ -373,7 +382,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         if (m_camera->hasFlags(Qn::io_module))
         {
             connect(m_camera, &QnResource::statusChanged, this,
-                [this]() { updateIoModuleVisibility(true); });
+                [this]
+                {
+                    updateIoModuleVisibility(animationAllowed());
+                });
         }
 
         connect(m_camera, &QnSecurityCamResource::scheduleTasksChanged, this,
@@ -452,7 +464,6 @@ void QnMediaResourceWidget::createButtons()
         QnImageButtonWidget *screenshotButton = createStatisticAwareButton(lit("media_widget_screenshot"));
         screenshotButton->setIcon(qnSkin->icon("item/screenshot.png"));
         screenshotButton->setCheckable(false);
-        screenshotButton->setProperty(Qn::NoBlockMotionSelection, true);
         screenshotButton->setToolTip(tr("Screenshot"));
         setHelpTopic(screenshotButton, Qn::MainWindow_MediaItem_Screenshot_Help);
         connect(screenshotButton, &QnImageButtonWidget::clicked, this,
@@ -464,7 +475,6 @@ void QnMediaResourceWidget::createButtons()
         QnImageButtonWidget *searchButton = createStatisticAwareButton(lit("media_widget_msearch"));
         searchButton->setIcon(qnSkin->icon("item/search.png"));
         searchButton->setCheckable(true);
-        searchButton->setProperty(Qn::NoBlockMotionSelection, true);
         searchButton->setToolTip(tr("Smart Search"));
         setHelpTopic(searchButton, Qn::MainWindow_MediaItem_SmartSearch_Help);
         connect(searchButton, &QnImageButtonWidget::toggled, this,
@@ -476,7 +486,6 @@ void QnMediaResourceWidget::createButtons()
         QnImageButtonWidget *ptzButton = createStatisticAwareButton(lit("media_widget_ptz"));
         ptzButton->setIcon(qnSkin->icon("item/ptz.png"));
         ptzButton->setCheckable(true);
-        ptzButton->setProperty(Qn::NoBlockMotionSelection, true);
         ptzButton->setToolTip(tr("PTZ"));
         setHelpTopic(ptzButton, Qn::MainWindow_MediaItem_Ptz_Help);
         connect(ptzButton, &QnImageButtonWidget::toggled, this,
@@ -488,7 +497,6 @@ void QnMediaResourceWidget::createButtons()
         QnImageButtonWidget *fishEyeButton = createStatisticAwareButton(lit("media_widget_fisheye"));
         fishEyeButton->setIcon(qnSkin->icon("item/fisheye.png"));
         fishEyeButton->setCheckable(true);
-        fishEyeButton->setProperty(Qn::NoBlockMotionSelection, true);
         fishEyeButton->setToolTip(tr("Dewarping"));
         fishEyeButton->setChecked(item()->dewarpingParams().enabled);
         setHelpTopic(fishEyeButton, Qn::MainWindow_MediaItem_Dewarping_Help);
@@ -501,7 +509,6 @@ void QnMediaResourceWidget::createButtons()
         QnImageButtonWidget *zoomWindowButton = createStatisticAwareButton(lit("media_widget_zoom"));
         zoomWindowButton->setIcon(qnSkin->icon("item/zoom_window.png"));
         zoomWindowButton->setCheckable(true);
-        zoomWindowButton->setProperty(Qn::NoBlockMotionSelection, true);
         zoomWindowButton->setToolTip(tr("Create Zoom Window"));
         setHelpTopic(zoomWindowButton, Qn::MainWindow_MediaItem_ZoomWindows_Help);
         connect(zoomWindowButton, &QnImageButtonWidget::toggled, this,
@@ -513,7 +520,6 @@ void QnMediaResourceWidget::createButtons()
         QnImageButtonWidget *enhancementButton = createStatisticAwareButton(lit("media_widget_enchancement"));
         enhancementButton->setIcon(qnSkin->icon("item/image_enhancement.png"));
         enhancementButton->setCheckable(true);
-        enhancementButton->setProperty(Qn::NoBlockMotionSelection, true);
         enhancementButton->setToolTip(tr("Image Enhancement"));
         enhancementButton->setChecked(item()->imageEnhancement().enabled);
         setHelpTopic(enhancementButton, Qn::MainWindow_MediaItem_ImageEnhancement_Help);
@@ -527,7 +533,6 @@ void QnMediaResourceWidget::createButtons()
         ioModuleButton->setIcon(qnSkin->icon("item/io.png"));
         ioModuleButton->setCheckable(true);
         ioModuleButton->setChecked(false);
-        ioModuleButton->setProperty(Qn::NoBlockMotionSelection, true);
         ioModuleButton->setToolTip(tr("I/O Module"));
         connect(ioModuleButton, &QnImageButtonWidget::toggled, this,
             &QnMediaResourceWidget::at_ioModuleButton_toggled);
@@ -539,7 +544,6 @@ void QnMediaResourceWidget::createButtons()
         QnImageButtonWidget *debugScreenshotButton = createStatisticAwareButton(lit("media_widget_debug_screenshot"));
         debugScreenshotButton->setIcon(qnSkin->icon("item/screenshot.png"));
         debugScreenshotButton->setCheckable(false);
-        debugScreenshotButton->setProperty(Qn::NoBlockMotionSelection, true);
         debugScreenshotButton->setToolTip(lit("Debug set of screenshots"));
         connect(debugScreenshotButton, &QnImageButtonWidget::clicked, this,
             [this]
@@ -593,6 +597,14 @@ void QnMediaResourceWidget::createPtzController()
 
 qreal QnMediaResourceWidget::calculateVideoAspectRatio() const
 {
+    const auto aviResource = m_resource.dynamicCast<QnAviResource>();
+    if (aviResource && aviResource->flags().testFlag(Qn::still_image))
+    {
+        const auto aspect = aviResource->imageAspectRatio();
+        if (aspect.isValid())
+            return aspect.toFloat();
+    }
+
     /* Here we get 0.0 if no custom aspect ratio set. */
     qreal result = resource()->customAspectRatio();
     if (!qFuzzyIsNull(result))
@@ -695,6 +707,11 @@ void QnMediaResourceWidget::ensureTwoWayAudioWidget()
     /* Items are ordered left-to-right and top-to bottom, so we are inserting two-way audio item on top. */
     overlayWidgets()->positionOverlay->insertItem(0, m_twoWayAudioWidget);
     overlayWidgets()->positionOverlay->setMaxFillCoeff(QSizeF(1.0, 0.8));
+}
+
+bool QnMediaResourceWidget::animationAllowed() const
+{
+    return QnWorkbenchContextAware::display()->animationAllowed();
 }
 
 void QnMediaResourceWidget::resumeHomePtzController()
@@ -1009,11 +1026,12 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display)
         connect(m_display->camDisplay(), SIGNAL(liveMode(bool)), this, SLOT(at_camDisplay_liveChanged()));
         connect(m_resource->toResource(), SIGNAL(videoLayoutChanged(const QnResourcePtr &)), this, SLOT(at_videoLayoutChanged()));
 
-        connect(m_display->camDisplay(), &QnCamDisplay::liveMode, this, [this](bool /* live */)
-        {
-            if (m_camera && m_camera->hasFlags(Qn::io_module))
-                updateIoModuleVisibility(true);
-        });
+        connect(m_display->camDisplay(), &QnCamDisplay::liveMode, this,
+            [this](bool /* live */)
+            {
+                if (m_camera && m_camera->hasFlags(Qn::io_module))
+                    updateIoModuleVisibility(animationAllowed());
+            });
 
         setChannelLayout(m_display->videoLayout());
         m_display->addRenderer(m_renderer);
@@ -1469,7 +1487,7 @@ QString QnMediaResourceWidget::calculateDetailsText() const
 
     QString hqLqString;
     if (hasVideo() && !m_resource->toResource()->hasFlags(Qn::local))
-        hqLqString = (m_renderer->isLowQualityImage(0)) ? tr("Low-Res") : tr("Hi-Res");
+        hqLqString = (m_renderer->isLowQualityImage(0)) ? tr("Lo-Res") : tr("Hi-Res");
 
     static const int kDetailsTextPixelSize = 11;
 
@@ -1562,6 +1580,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         && !url.endsWith(lit(".jpeg"))
         )
         rgbImage = true;
+
     if (!rgbImage && hasVideo)
         result |= Qn::EnhancementButton;
 
@@ -1597,11 +1616,8 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         result &= ~Qn::PtzButton;
     }
 
-    if ((resource()->toResource()->hasFlags(Qn::io_module)))
-    {
-        if (hasVideo)
-            result |= Qn::IoModuleButton;
-    }
+    if (hasVideo && resource()->toResource()->hasFlags(Qn::io_module))
+        result |= Qn::IoModuleButton;
 
     if (hasVideo && !qnSettings->lightMode().testFlag(Qn::LightModeNoZoomWindows))
     {
@@ -1625,6 +1641,17 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     /// TODO: #ynikitenkov It needs to refactor error\status overlays totally!
     const ResourceStates states = getResourceStates();
 
+    //TODO: #GDM #3.1 This really requires hell a lot of refactoring
+    // for live video make a quick check: status has higher priority than EOF
+    if (states.isRealTimeSource)
+    {
+        if (states.isOffline)
+            return Qn::OfflineOverlay;
+
+        if (states.isUnauthorized)
+            return Qn::UnauthorizedOverlay;
+    }
+
     if (m_camera && m_camera->hasFlags(Qn::io_module))
     {
         if (states.isOffline)
@@ -1647,11 +1674,16 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
             return Qn::IoModuleDisabledOverlay;
     }
 
+    if (m_display->camDisplay()->isEOFReached())
+    {
+        return resource->getStatus() == Qn::Online && states.isRealTimeSource
+            ? Qn::LoadingOverlay
+            : Qn::NoDataOverlay;
+    }
+
     if (resource->hasFlags(Qn::local_image))
     {
         if (resource->getStatus() == Qn::Offline)
-            return Qn::NoDataOverlay;
-        if (m_display->camDisplay()->isStillImage() && m_display->camDisplay()->isEOFReached())
             return Qn::NoDataOverlay;
         return Qn::EmptyOverlay;
     }
@@ -1678,9 +1710,6 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
     if (m_display->camDisplay()->isLongWaiting())
     {
-        if (m_display->camDisplay()->isEOFReached())
-            return Qn::NoDataOverlay;
-
         auto loader = context()->instance<QnCameraDataManager>()->loader(m_resource, false);
         if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
             return base_type::calculateStatusOverlay(Qn::Online, states.hasVideo);
@@ -1690,9 +1719,6 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
     if (m_display->isPaused())
     {
-        if (m_display->camDisplay()->isEOFReached())
-            return Qn::NoDataOverlay;
-
         if (!states.hasVideo)
             return Qn::NoVideoDataOverlay;
 
@@ -1860,11 +1886,10 @@ void QnMediaResourceWidget::at_histogramButton_toggled(bool checked)
     setImageEnhancement(params);
 }
 
-void QnMediaResourceWidget::at_ioModuleButton_toggled(bool checked)
+void QnMediaResourceWidget::at_ioModuleButton_toggled(bool /*checked*/)
 {
-    Q_UNUSED(checked);
     if (m_ioModuleOverlayWidget)
-        updateIoModuleVisibility(true);
+        updateIoModuleVisibility(animationAllowed());
 }
 
 void QnMediaResourceWidget::at_renderWatcher_widgetChanged(QnResourceWidget *widget)
@@ -2015,7 +2040,8 @@ void QnMediaResourceWidget::processIoEnableRequest()
             camera->setLicenseUsed(true);
         });
 
-    updateIoModuleVisibility(true);
+    const bool animate = QnWorkbenchContextAware::display()->animationAllowed();
+    updateIoModuleVisibility(animate);
 }
 
 void QnMediaResourceWidget::processSettingsRequest()
@@ -2130,4 +2156,28 @@ void QnMediaResourceWidget::setMotionSearchModeEnabled(bool enabled)
     setOption(WindowResizingForbidden, enabled);
 
     emit motionSearchModeEnabled(enabled);
+}
+
+QnSpeedRange QnMediaResourceWidget::speedRange() const
+{
+    static constexpr qreal kUnitSpeed = 1.0;
+    static constexpr qreal kZeroSpeed = 0.0;
+
+    if (!m_display || !m_display->archiveReader())
+        return QnSpeedRange(kZeroSpeed, kZeroSpeed);
+
+    if (!hasVideo())
+        return QnSpeedRange(kUnitSpeed, kZeroSpeed);
+
+    const qreal backward = m_display->archiveReader()->isNegativeSpeedSupported()
+        ? availableSpeedRange().backward
+        : kZeroSpeed;
+
+    return QnSpeedRange(availableSpeedRange().forward, backward);
+}
+
+const QnSpeedRange& QnMediaResourceWidget::availableSpeedRange()
+{
+    static const QnSpeedRange kAvailableSpeedRange(kMaxForwardSpeed, kMaxBackwardSpeed);
+    return kAvailableSpeedRange;
 }

@@ -57,15 +57,15 @@ public:
     std::string authKey;
     std::string ownerAccountEmail;
     SystemStatus status;
-    /** \a true, if cloud connection is activated for this system. */
+    /** true, if cloud connection is activated for this system. */
     bool cloudConnectionSubscriptionStatus;
     /** MUST be used as upper 64 bits of 128-bit transaction timestamp. */
     std::uint64_t systemSequence;
     /** Vms-specific data. Same as SystemRegistrationData::opaque. */
     std::string opaque;
+    std::chrono::system_clock::time_point registrationTime;
 
-    SystemData()
-    :
+    SystemData():
         status(SystemStatus::ssInvalid),
         cloudConnectionSubscriptionStatus(true),
         systemSequence(0)
@@ -124,8 +124,7 @@ public:
     //TODO #ak this field is redundant here. Move it to libcloud_db internal data structures
     std::string vmsUserId;
 
-    SystemSharing()
-    :
+    SystemSharing():
         accessRole(SystemAccessRole::none),
         isEnabled(true)
     {
@@ -137,6 +136,7 @@ public:
             return accountEmail < rhs.accountEmail;
         return systemId < rhs.systemId;
     }
+
     bool operator==(const SystemSharing& rhs) const
     {
         return accountEmail == rhs.accountEmail
@@ -155,15 +155,13 @@ public:
 };
 
 /**
- * Expands \a SystemSharing to contain more data.
+ * Expands SystemSharing to contain more data.
  */
-class SystemSharingEx
-:
+class SystemSharingEx:
     public SystemSharing
 {
 public:
-    SystemSharingEx()
-    :
+    SystemSharingEx():
         usageFrequency(0.0)
     {
     }
@@ -194,14 +192,12 @@ class SystemAccessRoleData
 public:
     SystemAccessRole accessRole;
 
-    SystemAccessRoleData()
-    :
+    SystemAccessRoleData():
         accessRole(SystemAccessRole::none)
     {
     }
 
-    SystemAccessRoleData(SystemAccessRole _accessRole)
-    :
+    SystemAccessRoleData(SystemAccessRole _accessRole):
         accessRole(_accessRole)
     {
     }
@@ -215,12 +211,11 @@ public:
 
 enum class SystemHealth
 {
-    offline,
+    offline = 0,
     online
 };
 
-class SystemDataEx
-:
+class SystemDataEx:
     public SystemData
 {
 public:
@@ -236,20 +231,18 @@ public:
     float usageFrequency;
     /**
      * Time of last reported login of authenticated user to this system.
-     * \note Fact of login is reported by \a SystemManager::recordUserSessionStart()
+     * @note Fact of login is reported by SystemManager::recordUserSessionStart()
      */
     std::chrono::system_clock::time_point lastLoginTime;
 
-    SystemDataEx()
-    :
+    SystemDataEx():
         accessRole(SystemAccessRole::none),
         stateOfHealth(SystemHealth::offline),
         usageFrequency(0)
     {
     }
 
-    SystemDataEx(SystemData systemData)
-    :
+    SystemDataEx(SystemData systemData):
         SystemData(std::move(systemData)),
         accessRole(SystemAccessRole::none),
         stateOfHealth(SystemHealth::offline),
@@ -264,6 +257,24 @@ public:
     std::vector<SystemDataEx> systems;
 };
 
+class SystemHealthHistoryItem
+{
+public:
+    std::chrono::system_clock::time_point timestamp;
+    SystemHealth state;
+    
+    SystemHealthHistoryItem():
+        state(SystemHealth::offline)
+    {
+    }
+};
+
+class SystemHealthHistory
+{
+public:
+    std::vector<SystemHealthHistoryItem> events;
+};
+
 /**
  * Information about newly started user session.
  */
@@ -272,6 +283,17 @@ class UserSessionDescriptor
 public:
     boost::optional<std::string> accountEmail;
     boost::optional<std::string> systemId;
+};
+
+enum class FilterField
+{
+    customization,
+};
+
+class Filter
+{
+public:
+    std::map<FilterField, std::string> nameToValue;
 };
 
 } // namespace api

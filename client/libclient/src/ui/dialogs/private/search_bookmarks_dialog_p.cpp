@@ -1,5 +1,7 @@
 #include "search_bookmarks_dialog_p.h"
 
+#include <QtWidgets/QStyledItemDelegate>
+
 #include "ui_search_bookmarks_dialog.h"
 
 #include <client/client_settings.h>
@@ -17,6 +19,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
 #include <ui/common/read_only.h>
+#include <ui/delegates/customizable_item_delegate.h>
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/models/search_bookmarks_model.h>
@@ -32,6 +35,7 @@
 
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
+
 
 QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &filterText
     , qint64 utcStartTimeMs
@@ -51,6 +55,9 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     , m_exportBookmarkAction    (new QAction(tr("Export Bookmark..."), this))
     , m_removeBookmarksAction   (new QAction(action(QnActions::RemoveBookmarksAction)->text(), this))
     , m_updatingNow(false)
+
+    , utcRangeStartMs(utcStartTimeMs)
+    , utcRangeEndMs(utcFinishTimeMs)
 {
     m_ui->setupUi(m_owner);
     m_ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
@@ -86,6 +93,8 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     connect(m_ui->dateRangeWidget, &QnDateRangeWidget::rangeChanged, this,
         [this](qint64 startTimeMs, qint64 endTimeMs)
         {
+            if (m_updatingNow)
+                return;
             m_model->setRange(startTimeMs, endTimeMs);
             applyModelChanges();
         });
@@ -120,9 +129,25 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
         &QnSearchBookmarksDialogPrivate::reset);
 
     m_ui->filterLineEdit->lineEdit()->setPlaceholderText(
-        tr("Search bookmarks by name, tag or description"));
+        tr("Search"));
 
-    QnItemViewAutoHider::create(m_ui->gridBookmarks, tr("No bookmarks"));
+    const auto grid = m_ui->gridBookmarks;
+    QnItemViewAutoHider::create(grid, tr("No bookmarks"));
+
+    const auto header = grid->horizontalHeader();
+    header->setStretchLastSection(false);
+    header->setSectionResizeMode(QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(QnSearchBookmarksModel::kTags, QHeaderView::Stretch);
+
+    auto boldItemDelegate = new QnCustomizableItemDelegate(this);
+    boldItemDelegate->setCustomInitStyleOption(
+        [](QStyleOptionViewItem* option, const QModelIndex& /*index*/)
+        {
+            option->font.setBold(true);
+        });
+
+    grid->setItemDelegateForColumn(QnSearchBookmarksModel::kCamera, boldItemDelegate);
+    grid->setStyleSheet(lit("QTableView::item { padding-right: 24px }"));
 }
 
 QnSearchBookmarksDialogPrivate::~QnSearchBookmarksDialogPrivate()
@@ -137,14 +162,7 @@ void QnSearchBookmarksDialogPrivate::applyModelChanges()
 
 void QnSearchBookmarksDialogPrivate::reset()
 {
-    {
-        QN_SCOPED_VALUE_ROLLBACK(&m_updatingNow, true);
-        resetToAllAvailableCameras();
-        m_ui->filterLineEdit->clear();
-        m_ui->dateRangeWidget->reset();
-    }
-
-    applyModelChanges();
+    setParameters(QString(), utcRangeStartMs, utcRangeEndMs);
 }
 
 void QnSearchBookmarksDialogPrivate::setParameters(const QString &filterText
@@ -155,16 +173,11 @@ void QnSearchBookmarksDialogPrivate::setParameters(const QString &filterText
         QN_SCOPED_VALUE_ROLLBACK(&m_updatingNow, true);
 
         resetToAllAvailableCameras();
-
         m_ui->filterLineEdit->lineEdit()->setText(filterText);
         m_ui->dateRangeWidget->setRange(utcStartTimeMs, utcFinishTimeMs);
-
-        m_model->setFilterText(filterText);
-        /* Start/end values are rounded in the widget to 1-day granularity. */
-        m_model->setRange(m_ui->dateRangeWidget->startTimeMs(), m_ui->dateRangeWidget->endTimeMs());
     }
 
-    applyModelChanges();
+    refresh();
 }
 
 bool QnSearchBookmarksDialogPrivate::fillActionParameters(QnActionParameters &params, QnTimePeriod &window)
@@ -271,27 +284,6 @@ void QnSearchBookmarksDialogPrivate::openInNewLayout(const QnActionParameters &p
     menu()->trigger(QnActions::BookmarksModeAction);
 }
 
-void QnSearchBookmarksDialogPrivate::updateHeadersWidth()
-{
-    enum
-    {
-        kNamePart = 8
-        , kStartTimePart = 3
-        , kLengthPart = 3
-        , kTagsPart = 4
-        , kCameraPart = 3
-        , kPartsTotalNumber = kNamePart + kStartTimePart + kLengthPart + kTagsPart + kCameraPart
-    };
-
-    QHeaderView * const header = m_ui->gridBookmarks->horizontalHeader();
-    const int totalWidth = header->width();
-    header->resizeSection(QnSearchBookmarksModel::kName, totalWidth * kNamePart / kPartsTotalNumber);
-    header->resizeSection(QnSearchBookmarksModel::kStartTime, totalWidth * kStartTimePart / kPartsTotalNumber);
-    header->resizeSection(QnSearchBookmarksModel::kLength, totalWidth * kLengthPart / kPartsTotalNumber);
-    header->resizeSection(QnSearchBookmarksModel::kTags, totalWidth * kTagsPart / kPartsTotalNumber);
-    header->resizeSection(QnSearchBookmarksModel::kCamera, totalWidth * kCameraPart / kPartsTotalNumber);
-}
-
 void QnSearchBookmarksDialogPrivate::refresh()
 {
     {
@@ -299,7 +291,8 @@ void QnSearchBookmarksDialogPrivate::refresh()
         m_model->setFilterText(m_ui->filterLineEdit->lineEdit()->text());
         m_model->setRange(m_ui->dateRangeWidget->startTimeMs(), m_ui->dateRangeWidget->endTimeMs());
     }
-    m_model->applyFilter();
+
+    applyModelChanges();
 }
 
 

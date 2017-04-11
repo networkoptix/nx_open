@@ -5,7 +5,6 @@
 
 #include <QtXml/QXmlDefaultHandler>
 
-#include <api/global_settings.h>
 #include <common/common_globals.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
@@ -33,14 +32,16 @@ static DeviceSearcher* UPNPDeviceSearcherInstance = nullptr;
 const QString DeviceSearcher::DEFAULT_DEVICE_TYPE = lit("%1 Server")
         .arg(QnAppInfo::organizationName());
 
-DeviceSearcher::DeviceSearcher( unsigned int discoverTryTimeoutMS )
+DeviceSearcher::DeviceSearcher(
+    QnGlobalSettings* globalSettings, unsigned int discoverTryTimeoutMS )
 :
+    m_globalSettings(globalSettings),
     m_discoverTryTimeoutMS( discoverTryTimeoutMS == 0 ? DEFAULT_DISCOVER_TRY_TIMEOUT_MS : discoverTryTimeoutMS ),
     m_timerID( 0 ),
-    m_readBuf( new char[READ_BUF_CAPACITY] ),
     m_terminated( false ),
     m_needToUpdateReceiveSocket(false)
 {
+    m_receiveBuffer.reserve(READ_BUF_CAPACITY);
     {
         QnMutexLocker lk(&m_mutex);
         m_timerID = nx::utils::TimerManager::instance()->addTimer(
@@ -56,9 +57,6 @@ DeviceSearcher::DeviceSearcher( unsigned int discoverTryTimeoutMS )
 DeviceSearcher::~DeviceSearcher()
 {
     pleaseStop();
-
-    delete[] m_readBuf;
-    m_readBuf = NULL;
 
     UPNPDeviceSearcherInstance = nullptr;
 }
@@ -285,8 +283,22 @@ void DeviceSearcher::onSomeBytesRead(
         startFetchDeviceXml( uuidStr, descriptionUrl, remoteHost );
 }
 
+static bool isUpnpMulticastEnabled(const QnGlobalSettings* settings)
+{
+    if (!settings)
+        return true;
+
+    if (settings->isNewSystem())
+        return false;
+
+    return settings->isAutoDiscoveryEnabled() || settings->isUpnpPortMappingEnabled();
+}
+
 void DeviceSearcher::dispatchDiscoverPackets()
 {
+    if (!isUpnpMulticastEnabled(m_globalSettings))
+        return;
+
     for(const  QnInterfaceAndAddr& iface: getAllIPv4Interfaces() )
     {
         const std::shared_ptr<AbstractDatagramSocket>& sock = getSockByIntf(iface);
@@ -325,8 +337,6 @@ bool DeviceSearcher::needToUpdateReceiveSocket() const
 
 nx::utils::AtomicUniquePtr<AbstractDatagramSocket> DeviceSearcher::updateReceiveSocketUnsafe()
 {
-    m_receiveBuffer.reserve(READ_BUF_CAPACITY);
-
     auto oldSock = std::move(m_receiveSocket);
 
     m_receiveSocket.reset(new UDPSocket(AF_INET));
@@ -339,15 +349,6 @@ nx::utils::AtomicUniquePtr<AbstractDatagramSocket> DeviceSearcher::updateReceive
     for(const auto iface: getAllIPv4Interfaces())
         m_receiveSocket->joinGroup( groupAddress.toString(), iface.address.toString() );
 
-    m_receiveSocket->readSomeAsync(
-        &m_receiveBuffer,
-        [this, sock = m_receiveSocket.get(), buf = &m_receiveBuffer](
-            SystemError::ErrorCode errorCode,
-            std::size_t bytesRead)
-        {
-            onSomeBytesRead(sock, errorCode, buf, bytesRead);
-        });
-
     m_needToUpdateReceiveSocket = false;
 
     return oldSock;
@@ -357,15 +358,28 @@ std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf( const QnI
 {
 
     nx::utils::AtomicUniquePtr<AbstractDatagramSocket> oldSock;
-
+    bool isReceiveSocketUpdated = false;
     {
         QnMutexLocker lock(&m_mutex);
-        if(needToUpdateReceiveSocket())
+        isReceiveSocketUpdated = needToUpdateReceiveSocket();
+        if(isReceiveSocketUpdated)
             oldSock = updateReceiveSocketUnsafe();
     }
 
     if (oldSock)
         oldSock->pleaseStopSync(true);
+    if (isReceiveSocketUpdated)
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_receiveSocket->readSomeAsync(
+            &m_receiveBuffer,
+            [this, sock = m_receiveSocket.get(), buf = &m_receiveBuffer](
+                SystemError::ErrorCode errorCode,
+                std::size_t bytesRead)
+        {
+            onSomeBytesRead(sock, errorCode, buf, bytesRead);
+        });
+    }
 
     const QString& localAddress = iface.address.toString();
 

@@ -31,8 +31,10 @@
             />
         </BootstrapperApplicationRef>
 
+        <Variable Name="InstallerTitle" Value="!(loc.InstallerTitleBundle)" />
+
         <WixVariable Id="WixExtbaThemeXml" Value="OptixTheme.xml" />
-        <WixVariable Id="WixExtbaThemeWxl" Value="OptixThemeFull.wxl" />
+        <WixVariable Id="WixExtbaThemeWxl" Value="OptixTheme_$(var.installerLanguage).wxl" />
 
         <Variable Name="InstallClientAndServer" Type="numeric" Value="1" />
         <Variable Name="InstallClientOnly" Type="numeric" Value="0" />

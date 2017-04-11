@@ -18,60 +18,47 @@ namespace api {
 using namespace nx::network;
 
 ////////////////////////////////////////////////////////////
-//// class AccountData
+//// class AccountRegistrationData
 ////////////////////////////////////////////////////////////
 
-MAKE_FIELD_NAME_STR_CONST(AccountData, id)
-MAKE_FIELD_NAME_STR_CONST(AccountData, email)
-MAKE_FIELD_NAME_STR_CONST(AccountData, passwordHa1)
-MAKE_FIELD_NAME_STR_CONST(AccountData, passwordHa1Sha256)
-MAKE_FIELD_NAME_STR_CONST(AccountData, fullName)
-MAKE_FIELD_NAME_STR_CONST(AccountData, customization)
-MAKE_FIELD_NAME_STR_CONST(AccountData, statusCode)
+MAKE_FIELD_NAME_STR_CONST(AccountRegistrationData, email)
+MAKE_FIELD_NAME_STR_CONST(AccountRegistrationData, passwordHa1)
+MAKE_FIELD_NAME_STR_CONST(AccountRegistrationData, passwordHa1Sha256)
+MAKE_FIELD_NAME_STR_CONST(AccountRegistrationData, fullName)
+MAKE_FIELD_NAME_STR_CONST(AccountRegistrationData, customization)
 
-bool loadFromUrlQuery( const QUrlQuery& urlQuery, AccountData* const accountData )
+bool loadFromUrlQuery( const QUrlQuery& urlQuery, AccountRegistrationData* const accountData )
 {
-    accountData->id = urlQuery.queryItemValue(AccountData_id_field).toStdString();
-    accountData->email = urlQuery.queryItemValue(AccountData_email_field).toStdString();
-    accountData->passwordHa1 = urlQuery.queryItemValue(AccountData_passwordHa1_field).toStdString();
-    accountData->passwordHa1Sha256 = urlQuery.queryItemValue(AccountData_passwordHa1Sha256_field).toStdString();
-    accountData->fullName = urlQuery.queryItemValue(AccountData_fullName_field).toStdString();
-    accountData->customization = urlQuery.queryItemValue(AccountData_customization_field).toStdString();
-    bool success = true;
-    if (urlQuery.hasQueryItem(AccountData_statusCode_field))
-        accountData->statusCode = QnLexical::deserialized<api::AccountStatus>(
-            urlQuery.queryItemValue(AccountData_statusCode_field),
-            api::AccountStatus::invalid,
-            &success);
-    else
-        accountData->statusCode = api::AccountStatus::invalid;
+    accountData->email = 
+        urlQuery.queryItemValue(AccountRegistrationData_email_field).toStdString();
+    accountData->passwordHa1 = 
+        urlQuery.queryItemValue(AccountRegistrationData_passwordHa1_field).toStdString();
+    accountData->passwordHa1Sha256 = 
+        urlQuery.queryItemValue(AccountRegistrationData_passwordHa1Sha256_field).toStdString();
+    accountData->fullName = 
+        urlQuery.queryItemValue(AccountRegistrationData_fullName_field).toStdString();
+    accountData->customization =
+        urlQuery.queryItemValue(AccountRegistrationData_customization_field).toStdString();
 
-    success &= !accountData->email.empty();
-    return success;
+    return !accountData->email.empty();
 }
 
-void serializeToUrlQuery(const AccountData& data, QUrlQuery* const urlQuery)
+void serializeToUrlQuery(const AccountRegistrationData& data, QUrlQuery* const urlQuery)
 {
     urlQuery->addQueryItem(
-        AccountData_id_field,
-        QString::fromStdString(data.id));
-    urlQuery->addQueryItem(
-        AccountData_email_field,
+        AccountRegistrationData_email_field,
         QString::fromStdString(data.email));
     urlQuery->addQueryItem(
-        AccountData_passwordHa1_field,
+        AccountRegistrationData_passwordHa1_field,
         QString::fromStdString(data.passwordHa1));
     urlQuery->addQueryItem(
-        AccountData_passwordHa1Sha256_field,
+        AccountRegistrationData_passwordHa1Sha256_field,
         QString::fromStdString(data.passwordHa1Sha256));
     urlQuery->addQueryItem(
-        AccountData_fullName_field,
+        AccountRegistrationData_fullName_field,
         QString::fromStdString(data.fullName));
     urlQuery->addQueryItem(
-        AccountData_statusCode_field,
-        QnLexical::serialized(data.statusCode));
-    urlQuery->addQueryItem(
-        AccountData_customization_field,
+        AccountRegistrationData_customization_field,
         QString::fromStdString(data.customization));
 }
 
@@ -97,9 +84,10 @@ void serializeToUrlQuery(const AccountConfirmationCode& data, QUrlQuery* const u
         QString::fromStdString(data.code));
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((AccountData), (json)(sql_record), _Fields)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((AccountConfirmationCode), (json)(sql_record), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (AccountRegistrationData)(AccountData)(AccountConfirmationCode),
+    (json)(sql_record),
+    _Fields)
 
 ////////////////////////////////////////////////////////////
 //// class AccountUpdateData

@@ -17,10 +17,6 @@
 <context>
     <name>MergeSystemsStatusStrings</name>
     <message>
-        <source>The system was not found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The password or user name is invalid.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -33,18 +29,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Warning: You are about to merge Systems with START licenses.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If you understand this and would like to proceed please click Merge to continue.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>System name is not configured yet.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -53,38 +37,54 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The discovered system %1 has an incompatible version %2.</source>
-        <comment>%1 is name of the system, %2 is version information</comment>
+        <source>You are about to merge Systems with Starter licenses.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The discovered system %1 is in safe mode.</source>
-        <comment>%1 is name of the system</comment>
+        <source>Merge anyway?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not configure the remote system %1.</source>
-        <comment>%1 is name of the system</comment>
+        <source>System was not found.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>In this version you can only merge systems which are not connected to %1.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <source>The discovered System %1 has an incompatible version %2.</source>
+        <comment>%1 is name of System, %2 is version information</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Both systems are connected to %1. Merge is not allowed.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <source>Cannot connect to the other System because current System is already connected to %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>These systems are built with different %1 URL. Merge is not allowed.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <source>The discovered System %1 is in safe mode.</source>
+        <comment>%1 is name of System</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not configure the remote System %1.</source>
+        <comment>%1 is name of System</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Both Systems are connected to %1. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -97,10 +97,6 @@
     <message>
         <source>Panic recording</source>
         <translation>הקלטת מצוקה</translation>
-    </message>
-    <message>
-        <source>Send email</source>
-        <translation>שלח אימייל</translation>
     </message>
     <message>
         <source>Write to log</source>
@@ -121,10 +117,6 @@
     <message>
         <source>Speak</source>
         <translation>דבר</translation>
-    </message>
-    <message>
-        <source>Unknown (%1)</source>
-        <translation>לא ידוע (%1)</translation>
     </message>
     <message>
         <source>Storage Failure</source>
@@ -189,10 +181,6 @@
     <message>
         <source>Server &quot;%1&quot; Started</source>
         <translation>שרת &quot;%1&quot; הופעל</translation>
-    </message>
-    <message>
-        <source>Server &apos;%1&apos; has a license problem</source>
-        <translation>בשרת &quot;%1&quot; קיימת בעיית רשיון</translation>
     </message>
     <message>
         <source>An unknown event has occurred</source>
@@ -276,10 +264,6 @@
         <source>On %1 %2</source>
         <translation>ב%1 %2</translation>
     </message>
-    <message>
-        <source>%1 --&gt; %2</source>
-        <translation>%1 --&gt; %2</translation>
-    </message>
     <message numerus="yes">
         <source>No data received during last %n seconds.</source>
         <translation>
@@ -306,10 +290,6 @@
     <message>
         <source>Generic Event</source>
         <translation>אירוע כללי</translation>
-    </message>
-    <message>
-        <source> (%1)</source>
-        <translation>(%1)</translation>
     </message>
     <message>
         <source>Any Device Issue</source>
@@ -342,11 +322,6 @@
         <translation>כתובית: %1</translation>
     </message>
     <message>
-        <source>MAC #%1: %2 </source>
-        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-        <translation>MAC #%1: %2 </translation>
-    </message>
-    <message>
         <source>Connection to device was unexpectedly closed.</source>
         <translation>החיבור להתקן נסגר באופן בלתי צפוי.</translation>
     </message>
@@ -373,10 +348,6 @@
     <message>
         <source>Archive backup finished</source>
         <translation>גיבוי ארכיון הסתיים</translation>
-    </message>
-    <message>
-        <source>Server &apos;%1&apos; has finished an archive backup</source>
-        <translation>שרת  &apos;%1סיים את גיבוי הארכיון</translation>
     </message>
     <message>
         <source>Generic Event at %1</source>
@@ -419,65 +390,12 @@
         <translation>גיבוי ארכיון נכשל: שגיאה בקטלוג הקבצים</translation>
     </message>
     <message>
-        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
-        <translation>גיבוי הארכיון הסתיים, אבל לא באופן מלא מאחר וזמן סיום הגיבוי הגיע. המידע גובה ל %1</translation>
-    </message>
-    <message>
         <source>Archive backup is canceled by user. Data is backed up to %1</source>
         <translation>גיבוי ארכיון בוטל על ידי משתמש. המידע גובה ל %1</translation>
     </message>
     <message>
         <source>Do HTTP request</source>
         <translation>בצע בקשת HTTP</translation>
-    </message>
-    <message numerus="yes">
-        <source>Motion on Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Input Signal on Device(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Input Signal on Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Device(s) Disconnected</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Camera(s) Disconnected</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Device(s) IP Conflict</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Camera(s) IP Conflict</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
     </message>
     <message>
         <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -512,6 +430,76 @@
         <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message numerus="yes">
+        <source>Motion on Cameras</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Input Signal on Devices</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Input Signal on Cameras</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Devices Disconnected</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Cameras Disconnected</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Devices IP Conflict</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Cameras IP Conflict</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; has a license problem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; has finished an archive backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MAC #%1: %2</source>
+        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+        <translation type="unfinished">MAC #%1: %2  {1:?} {2?}</translation>
+    </message>
+    <message>
+        <source>Send Email</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
@@ -540,24 +528,8 @@
         <translation>לא ניתן להתחבר ליציאת http %1.</translation>
     </message>
     <message>
-        <source>Cannot open media url %1. Failed to connect to media port %2.</source>
-        <translation>לא ניתן לפתוח את כתובת המדיה %1. ההתחברות ליציאת המדיה %2 נכשלה.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
-        <translation>לא ניתן לפתוח את כתובת המדיה %1. ההתחברות ליציאה %2 נסגרה באופן לא צפוי.</translation>
-    </message>
-    <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
         <translation>לבסוף, נסה לעדכן את הקושחה. במידה והבעיה נמשכת, אנא צור קשר עם התמיכה.</translation>
-    </message>
-    <message>
-        <source>No supported media tracks at url %1.</source>
-        <translation>לא נמצאו קבצי מדיה נתמכים בכתובת %1.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Unsupported media protocol %2.</source>
-        <translation>לא ניתן לפתוח את כתובת המדיה %1. פרוטוקול מדיה שאיננו נתמך %2.</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1.</source>
@@ -608,38 +580,6 @@
         <translation>וודא שהמצלמה מחוברת לרשת. נסה לאתחלה.</translation>
     </message>
     <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded).</source>
-        <translation>וודא שפורט %2 נגישץ (כלומר שהוא מופנה).</translation>
-    </message>
-    <message>
-        <source>Could not parse device response. Url %1, request name %2.</source>
-        <translation>לא ניתן לפענח את תגובתו של ההתקן.URL %1, שם מבוקש %2.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation>לא ניתן לפענח את תגובתה של המצלמה.URL %1, שם מבוקש %2.</translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>לא מאושר. URL %1.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in device settings.</source>
-        <translation>קודם כל נסה להפעיל הקלטה (במידה והיא כבויה) ולהוריד את מספר הפריימים לשניה בהגדרות ההתקן.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation>קודם כל נסה להפעיל הקלטה (במידה והיא כבויה) ולהוריד את מספר הפריימים לשניה בהגדרות המצלמה.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
-        <translation>במידה וזה לא עוזר, שחזר הגדרות ברירת מחדל בדף האינטרנט של ההתקן.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
-        <translation>במידה וזה לא עוזר, שחזר הגדרות ברירת מחדל בדף האינטרנט של המצלמה.</translation>
-    </message>
-    <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
         <translation>הבקשה של התקן &quot;%1&quot; נכשלה עם שגיאה &quot;%2&quot;.</translation>
     </message>
@@ -684,18 +624,6 @@
         <translation>יש לוודא שמודול הקלט/פלט מחובר לרשת. נסה לאתחל את המודול.</translation>
     </message>
     <message>
-        <source>Could not parse I/O module response. Url %1, request name %2.</source>
-        <translation>לא ניתן לנתח את תגובת מודול הקלט/פלט. Url %1 שם בקשה %2.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
-        <translation>נסה תחילה, להפעיל הקלטה (אם היא כבויה) ולהוריד את קצב התמונות בהגדרות מודול הקלט/פלט.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
-        <translation>במידה וזה אינו עוזר, החזר הגדרות יצרן בדף האינטרנט של מודול הקלט/פלט.</translation>
-    </message>
-    <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
         <translation>בקשת מודול קלט/פלט &quot;%1&quot; נכשלה עם שגיאה &quot;%2&quot;.</translation>
     </message>
@@ -723,6 +651,66 @@
         <source>I/O Module initialization process is in progress.</source>
         <translation>כעת מתבצע תהליך איתחול מודול הקלט/פלט.</translation>
     </message>
+    <message>
+        <source>Make sure port %1 is accessible (e.g. forwarded).</source>
+        <translation type="unfinished">וודא שפורט %1 נגישץ (כלומר שהוא מופנה).</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the device web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the camera web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse device response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse camera response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse I/O module response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No supported media tracks at URL %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not authorized. URL %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -747,23 +735,23 @@
         <translation type="unfinished">לא נמצא מקודד לקודק %1.</translation>
     </message>
     <message>
-        <source>Couldn&apos;t initialize resampling context, error code: %1</source>
+        <source>Could not initialize resampling context, error code: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t allocate sample buffers, error code: %1</source>
+        <source>Could not allocate sample buffers, error code: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t send audio frame to encoder, Error code: %1.</source>
+        <source>Could not send audio frame to encoder, Error code: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t receive audio packet from encoder, Error code: %1.</source>
+        <source>Could not receive audio packet from encoder, Error code: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t receive audio frame from decoder, Error code: %1.</source>
+        <source>Could not receive audio frame from decoder, Error code: %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -900,10 +888,6 @@
         <translation>רשיונות שאינם תקינים</translation>
     </message>
     <message>
-        <source>This license type requires higher software version.</source>
-        <translation>סוג רשיון זה דורש גירסת תוכנה גבוהה יותר.</translation>
-    </message>
-    <message>
         <source>Invalid signature</source>
         <translation type="unfinished">החתימה איננה תקינה</translation>
     </message>
@@ -927,6 +911,10 @@
         <source>Free license</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>This license type requires higher software version</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLicenseUsageHelper</name>
@@ -944,20 +932,6 @@
             <numerusform>מתוך %1, יתבצע שימוש ב%n %2.</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>Activate %n more %2. </source>
-        <translation>
-            <numerusform>הפעל עוד %n %2. </numerusform>
-            <numerusform>הפעל %n עוד %2.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n more %2 will be used. </source>
-        <translation>
-            <numerusform>יתבצע שימוש בעוד %n %2.</numerusform>
-            <numerusform>יתבצע שימוש בעוד %n %2.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
         <translation>מפתח הרשיון שהכנסת שגוי. אנא בדוק שהזנת את המפתח כראוי. במידה והבעיה נמשכת, אנא צור קשר עם קבוצת התמיכה על מנת לוודא את תקינות המפתח או להשיג מפתח תקין.</translation>
@@ -967,10 +941,6 @@
         <translation>אתה מנסה להפעיל רשיון שאיננו תואם לתוכנה. אנא צור קשר עם קבוצת התמיכה על מנת להשיג מפתח רשיון תקין.</translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation>מפתח הרשיון הופעל בעבר למזהה החומרה {{hwid}} ב{{time}}. אנא צור קשר עם קבוצת התמיכה על מנת להשיג מפתח רשיון תקין.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. A database error occurred.</source>
         <translation>התרחשה שגיאה בזמן הפעלת מפתח הרשיון. שגיאת בסיס נתונים.</translation>
     </message>
@@ -978,19 +948,31 @@
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
         <translation>התרחשה שגיאה בזמן הפעלת מפתח הרשיון. מידע לא תקין התקבל. פנה למרכז התמיכה ודווח על התקלה.</translation>
     </message>
-</context>
-<context>
-    <name>QnLocalSystemDescription</name>
+    <message numerus="yes">
+        <source>Activate %n more %1.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n more %1 will be used.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <source>New System</source>
+        <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
+        <comment>%1 is a hardware ID, %2 is an activation time</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>QnPropertyStorage</name>
+    <name>QnLocalSystemDescription</name>
     <message>
-        <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
-        <translation>ערך שגוי בארגומנט &apos;%1&apos;. נדרש %2, סופק &apos;%3&apos;.</translation>
+        <source>New Server</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1097,20 +1079,20 @@
         <translation>רשיון נסיון</translation>
     </message>
     <message>
-        <source>Hardware ID: </source>
-        <translation>מזהה חומרה:</translation>
-    </message>
-    <message>
-        <source>Licensed To: </source>
-        <translation>מורשה ל:</translation>
-    </message>
-    <message>
-        <source>Watermark: </source>
-        <translation>סימן מים:</translation>
-    </message>
-    <message>
         <source>FREE License</source>
         <translation>רשיון חינמי</translation>
+    </message>
+    <message>
+        <source>Hardware ID: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Licensed To: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watermark: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1173,11 +1155,6 @@
         <extracomment>Short for &apos;Preset&apos;</extracomment>
         <translation>פריסט</translation>
     </message>
-    <message>
-        <source>-</source>
-        <extracomment>Short for &apos;Undefined&apos;</extracomment>
-        <translation>-</translation>
-    </message>
 </context>
 <context>
     <name>QnStreamRecorder</name>
@@ -1206,10 +1183,6 @@
         <translation>קודק הוידאו/אודיו אינו תואם לפורמט שנבחר.</translation>
     </message>
     <message>
-        <source>Error during watermark generation for file &apos;%1&apos;.</source>
-        <translation>אירעה שגיאה במהלך יצירת סימן מים לקובץ &apos;%1&apos;.</translation>
-    </message>
-    <message>
         <source>File write error. Not enough free space.</source>
         <translation>שגיאה בכתיבת קובץ.אין מספיק מקום פנוי.</translation>
     </message>
@@ -1221,7 +1194,7 @@
 <context>
     <name>QnSystemDescription</name>
     <message>
-        <source>&lt;Unnamed system&gt;</source>
+        <source>Unnamed System</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1450,14 +1423,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Has access to whole system and can do everything.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Has access to whole system and can manage it. Can create users.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Can manage all cameras and bookmarks.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1475,6 +1440,14 @@
     </message>
     <message>
         <source>Custom permissions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Has access to whole System and can do everything.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Has access to whole System and can manage it. Can create users.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

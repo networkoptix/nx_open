@@ -180,7 +180,7 @@ private:
         qreal opacity);
 
     Qn::RenderStatus prepareBlurBuffers();
-    void renderBlurFBO(const QRectF &sourceRect);
+    Qn::RenderStatus renderBlurFBO(const QRectF &sourceRect);
     void doBlurStep(
         const QRectF& sourceRect,
         const QRectF& dstRect,

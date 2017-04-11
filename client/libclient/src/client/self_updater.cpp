@@ -10,6 +10,7 @@
 #include <client/client_app_info.h>
 #include <client/client_module.h>
 #include <client/client_startup_parameters.h>
+#include <client/client_installations_manager.h>
 
 #include <nx/vms/utils/app_info.h>
 #include <nx/vms/utils/platform/protocol_handler.h>
@@ -18,6 +19,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/file_system.h>
 #include <nx/utils/raii_guard.h>
+#include <nx/utils/app_info.h>
 #include <utils/common/app_info.h>
 #include <utils/applauncher_utils.h>
 
@@ -49,9 +51,18 @@ SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
         m_clientVersion = nx::utils::SoftwareVersion(startupParams.engineVersion);
 
     QMap<Operation, Result> results;
+    // TODO: #3.1 #gdm #dklychkov Move function calls inside osCheck() method.
     results[Operation::RegisterUriHandler] = osCheck(Operation::RegisterUriHandler, registerUriHandler());
     results[Operation::UpdateApplauncher] = osCheck(Operation::UpdateApplauncher, updateApplauncher());
-    results[Operation::UpdateMinilauncher] = osCheck(Operation::UpdateMinilauncher, updateMinilauncher());
+    if (nx::utils::AppInfo::isLinux() || nx::utils::AppInfo::isMacOsX())
+    {
+        results[Operation::UpdateMinilauncher] = Result::Success;
+    }
+    else
+    {
+        results[Operation::UpdateMinilauncher] =
+            osCheck(Operation::UpdateMinilauncher, updateMinilauncher());
+    }
 
     /* If we are already in self-update mode, just exit in any case. */
     if (startupParams.selfUpdateMode)
@@ -315,9 +326,19 @@ bool SelfUpdater::updateMinilauncher()
         return true;
     }
 
+    const auto sourceMinilauncherPath = QDir(qApp->applicationDirPath()).absoluteFilePath(
+        QnClientAppInfo::minilauncherBinaryName());
+    if (!QFileInfo::exists(sourceMinilauncherPath))
+    {
+        NX_LOGX(lit("Source minilauncher could not be found at %1!")
+            .arg(sourceMinilauncherPath), cl_logERROR);
+        // Silently exiting because we still can't do anything.
+        return true;
+    }
+
     bool success = true;
-    for (const QString& installRoot : getClientInstallRoots())
-        success &= updateMinilauncherInDir(installRoot);
+    for (const QString& installRoot: QnClientInstallationsManager::clientInstallRoots())
+        success &= updateMinilauncherInDir(installRoot, sourceMinilauncherPath);
     return success;
 }
 
@@ -445,7 +466,8 @@ bool SelfUpdater::runMinilaucher()
     return false;
 }
 
-bool SelfUpdater::updateMinilauncherInDir(const QDir& installRoot)
+bool SelfUpdater::updateMinilauncherInDir(const QDir& installRoot,
+    const QString& sourceMinilauncherPath)
 {
     if (isMinilaucherUpdated(installRoot))
         return true;
@@ -481,15 +503,6 @@ bool SelfUpdater::updateMinilauncherInDir(const QDir& installRoot)
     /* On linux (and mac?) applaucher binary should not be renamed, we only update shell script. */
 
     NX_LOGX(lit("Updating minilauncher..."), cl_logINFO);
-    const auto sourceMinilauncherPath = QDir(qApp->applicationDirPath()).absoluteFilePath(
-        QnClientAppInfo::minilauncherBinaryName());
-    if (!QFileInfo::exists(sourceMinilauncherPath))
-    {
-        NX_LOGX(lit("Source minilauncher could not be found at %1!")
-            .arg(sourceMinilauncherPath), cl_logERROR);
-        return false;
-    }
-
     const QDir binDir(installRoot.absoluteFilePath(QnClientAppInfo::binDirSuffix()));
 
     const QString minilauncherPath =
@@ -552,22 +565,38 @@ bool SelfUpdater::updateApplauncherDesktopIcon()
         if (dataLocation.isEmpty())
             return false;
 
-        const auto iconsPath = QDir(QApplication::applicationDirPath()).absoluteFilePath(
-            lit("../share/icons"));
-        file_system::copy(iconsPath, dataLocation, file_system::OverwriteExisting);
+        const auto applauncherPath =
+            QDir(dataLocation).absoluteFilePath(lit("%1/applauncher/%2")
+                .arg(QnAppInfo::organizationName(), QnAppInfo::customizationName()));
+
+        auto iconName = AppInfo::iconFileName();
+
+        const auto iconPath =
+            QDir(QApplication::applicationDirPath()).absoluteFilePath(
+                lit("../share/icons/%1").arg(iconName));
+
+        if (QFile::exists(iconPath))
+        {
+            const auto targetIconPath =
+                QDir(applauncherPath).absoluteFilePath(lit("share/icons/%1").arg(iconName));
+
+            if (file_system::copy(iconPath, targetIconPath,
+                file_system::OverwriteExisting | file_system::CreateTargetPath))
+            {
+                iconName = targetIconPath;
+            }
+        }
 
         const auto appsLocation =
             QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation);
         if (appsLocation.isEmpty())
             return false;
 
-        const auto filePath = QDir(appsLocation).filePath(AppInfo::iconFileName());
+        const auto filePath = QDir(appsLocation).filePath(AppInfo::desktopFileName());
 
         const auto applauncherBinaryPath =
-            QDir(dataLocation).absoluteFilePath(lit("%1/applauncher/%2/bin/%3")
-                .arg(QnAppInfo::organizationName(),
-                    QnAppInfo::customizationName(),
-                    QnAppInfo::applauncherExecutableName()));
+            QDir(applauncherPath).absoluteFilePath(lit("bin/%1")
+                .arg(QnAppInfo::applauncherExecutableName()));
 
         if (!QFile::exists(applauncherBinaryPath))
             return false;
@@ -577,39 +606,11 @@ bool SelfUpdater::updateApplauncherDesktopIcon()
             applauncherBinaryPath,
             QnAppInfo::productNameLong(),
             QnClientAppInfo::applicationDisplayName(),
-            QnAppInfo::customizationName(),
+            iconName,
             SoftwareVersion(QnAppInfo::engineVersion()));
     #endif // defined(Q_OS_LINUX)
 
     return true;
-}
-
-QStringList SelfUpdater::getClientInstallRoots() const
-{
-    QStringList result;
-
-    const QDir baseRoot(QnClientAppInfo::installationRoot() + lit("/client"));
-    for (const auto& entry: baseRoot.entryInfoList(QDir::NoDotAndDotDot | QDir::Dirs))
-    {
-        nx::utils::SoftwareVersion version(entry.fileName());
-        if (version.isNull())
-            continue;
-
-        const auto clientRoot = entry.absoluteFilePath();
-        const auto binDir = QDir(clientRoot).absoluteFilePath(QnClientAppInfo::binDirSuffix());
-        const auto clientBinary = QDir(binDir).absoluteFilePath(QnClientAppInfo::clientBinaryName());
-
-        if (!QFileInfo::exists(clientBinary))
-        {
-            NX_LOGX(lit("Could not find client binary in %1").arg(clientBinary), cl_logINFO);
-            NX_LOGX(lit("Skip client root: %1").arg(clientRoot), cl_logINFO);
-            continue;
-        }
-
-        result << clientRoot;
-    }
-
-    return result;
 }
 
 } // namespace client

@@ -384,8 +384,37 @@
                 "DW|DW-CPUHDE04",
                 "DW|DW-CPUHDE08",
                 "DW|DW-CPUHDE16",
+                "DW|DW-CPUHD4",
+                "DW|DW-CPUHD8",
+                "DW|DW-CPUHD16",
                 "DW|VMAX A1",
-                "Pravis Systems Co., Ltd.|VMAX A1"                
+                "Pravis Systems Co., Ltd.|VMAX A1",
+                "ACTI|TCD2100",
+                "Axis|AXISM7011*",
+                "Axis|AXISM7001*",
+                "Axis|AXISM7010*",
+                "Axis|AXISP7210*",
+                "Axis|AXISQ7401*",
+                "Axis|AXISQ7404*",
+                "Axis|AXISQ7406*",
+                "Axis|AXISQ7411*",
+                "BOSCH|VIP X16 XF E",
+                "BOSCH|VIP-X1600-XFM4",
+                "BOSCH|VIP_X16_XF_E",
+                "BOSCH|VJT-X40XF-E",
+                "CAP|NVN4100",
+                "DS-6701HWI|Embedded Net DVS",
+                "GrandStream|GXV3504",
+                "Hikvision|DS-6701*",
+                "Hikvision|DS-6704*",
+                "Hikvision|DS-6716*",
+                "Honeywell|HVE4",
+                "Pelco|NET5504",
+                "Pelco|NET5508",
+                "Pelco|NET5516",
+                "Samsung*|SPE-100",
+                "Samsung*|SPE-101",
+                "Samsung*|SPE-1600*"
             ],
             "analogEncoder": true
         },
@@ -546,7 +575,8 @@
                 "General|IP Camera",
                 "H264|N51820L",
                 "TRUEN Co., Ltd.|TN-P4230CSLXIR",
-                "TRUEN Co. Ltd.|*"
+                "TRUEN Co. Ltd.|*",
+				"Vista|VK2-3MPEFEDre"
             ],
             "ptzTraits": "FourWayPtz"
         },
@@ -580,7 +610,9 @@
             "keys": [
                 "VISTA|VK2-600PTZ",
                 "VISTA|VK2-1080PTZ",
-                "VISTA|VK2-ENCODER"
+                "VISTA|VK2-ENCODER",
+		"Pelco|D5220",
+                "Pelco|PelcoD5220"
             ],
             "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability|PresetsPtzCapability"
         },
@@ -632,7 +664,26 @@
         },
         {
             "keys": [
-                "Hikvision|DS-6716HWI"
+                "Hikvision|DS-2CD6362F-I","Hikvision|HNCA12-FEA"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "VideoEncoderToken_101,VideoEncoderToken_102",
+                    "VideoEncoderToken_201",
+                    "VideoEncoderToken_301",
+                    "VideoEncoderToken_401"
+                ]
+            },
+            "fpsBounds": {
+                "max": 15,
+                "min": 1
+            }
+        },
+        {
+            "keys": [
+                "Hikvision|DS-6716HWI", "Hikvision|DS-6716HFI", "Hikvision|DS-6716*"
             ],
             "forcedOnvifParams":
             {
@@ -656,6 +707,10 @@
                     "VideoEncoderConfigurationA16,VideoEncoderConfigurationA32"   
                 ]
             }
+        },
+        {
+            "keys": ["Hikvision|DS-2CD63C2F-IS"],
+            "parseOnvifNotificationsWithHttpReader": true
         },
         {
             "keys": [
@@ -741,7 +796,11 @@
                 "Honeywell|H4D2S2",
                 "Honeywell|H4D3S2",
                 "Honeywell|H4D5S2",
-                "Honeywell|HDZ302LIW"
+                "Honeywell|HDZ302LIW",
+                "Dahua|DH-SD6AL240-HNI",
+                "Dahua|RPZ-230F-HNI",
+                "Dahua|DH-SD6AL230F-HNI",
+                "General|RPZ-230F-HNI"
             ],
             "preferredAuthScheme": "Automatic"
         },
@@ -1592,7 +1651,7 @@
 			],
 			"shouldAppearAsSingleChannel": true,
 			"doNotAddVendorToDeviceName": true,
-			"videoLayout": "width=3;height=2;sensors=0,1,2,4,3,5",
+			"videoLayout": "width=3;height=2;sensors=0,1,2,-1,3,-1",
 			"defaultAR":"4x3"
 		},
 		{
@@ -1652,6 +1711,17 @@
 			"urlLocalePath": "/cgi-bin/admin/setup_main.cgi",
             "desiredH264Profile": "High"
 		},
+        {
+            "keys":[
+                "DW|DWC-MTT4W*",
+                "DigitalWatchdog|DWC-MTT4W*",
+                "DW|DWC-MVT4W*",
+                "DigitalWatchdog|DWC-MVT4W*",
+                "DW|DWC-MBT4W*",
+                "DigitalWatchdog|DWC-MBT4W*"
+             ],
+             "trustToVideoSourceSize": false
+        },
         {
             "keys":[
                 "Digital_Watchdog|DWC-PF5M1TIR", "DigitalWatchdog|DWC-MD85DiA", "DigitalWatchdog|DWC-MV85DiA", "Digital_Watchdog|DWC-MV85DiA"
@@ -1750,7 +1820,61 @@
             "ignoreMultisensors": true,
             "shouldAppearAsSingleChannel": true,
             "videoLayout": "width=3;height=1;sensors=0,1,2"
-        }
+        },
+        {
+            "keys": [
+                "Cellinx|STH795"
+            ],
+			"_comment": "Calibration for camera fw ver. 3.2.1, Build at 2016-07-28",
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [-1,   1],
+                        "logical": [ 0, 360]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [  -1,    1],
+                        "logical": [  0,  -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 1],
+                        "logical": [1, 31.55],
+                        "logicalMultiplier": 37.5,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+                "Redvision|RVX-IP30-IRWL-W"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [-1,   1],
+                        "logical": [ 0, 360]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [  0.3333,    -1],
+                        "logical": [  -90,  60]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [1, 7],
+                        "logicalMultiplier": 75,
+                        "space": "35MmEquiv"
+                    }
+                }
+            },
+            "onvifPtzDigitsAfterDecimalPoint": 7
+        }		
     ]
 }
 

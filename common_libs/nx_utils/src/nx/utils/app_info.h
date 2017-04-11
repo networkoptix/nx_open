@@ -6,12 +6,6 @@ namespace utils {
 class NX_UTILS_API AppInfo
 {
 public:
-    /** History name, used as a key in windows registry, appdata folder, etc. */
-    static QString applicationName();
-
-    /** Real application name, visible to the user. */
-    static QString applicationDisplayName();
-
     static QString applicationFullVersion();
     static bool beta();
     static QString applicationVersion();
@@ -27,6 +21,9 @@ public:
     static bool isAndroid() { return applicationPlatform() == lit("android"); }
     static bool isIos() { return applicationPlatform() == lit("ios"); }
     static bool isMobile() { return isAndroid() || isIos(); }
+    static bool isLinux() { return applicationPlatform() == lit("linux"); }
+    static bool isWindows() { return applicationPlatform() == lit("windows"); }
+    static bool isMacOsX() { return applicationPlatform() == lit("macosx"); }
 };
 
 } // namespace nx

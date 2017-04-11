@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="he">
+<TS language="he" sourcelanguage="en_US" version="2.1">
 <context>
     <name>CloseButton</name>
     <message>
         <source>Close Tab</source>
-        <translation>סגור כרטיסיה</translation>
+        <translation>סגור כרטיסייה</translation>
     </message>
 </context>
 <context>
@@ -16,7 +16,7 @@
     </message>
     <message>
         <source>Hide %1</source>
-        <translation>הסתר %1</translation>
+        <translation>הסתר את %1</translation>
     </message>
     <message>
         <source>Hide Others</source>
@@ -32,7 +32,7 @@
     </message>
     <message>
         <source>Quit %1</source>
-        <translation>צא מ%1</translation>
+        <translation>צא מתוך %1</translation>
     </message>
     <message>
         <source>About %1</source>
@@ -47,11 +47,11 @@
     </message>
     <message>
         <source>&amp;Step up</source>
-        <translation>&amp;למעלה</translation>
+        <translation>הע&amp;לה</translation>
     </message>
     <message>
         <source>Step &amp;down</source>
-        <translation>&amp;למטה</translation>
+        <translation>הו&amp;רד</translation>
     </message>
 </context>
 <context>
@@ -62,11 +62,11 @@
     </message>
     <message>
         <source>Increase</source>
-        <translation>הגדל</translation>
+        <translation>הגבר</translation>
     </message>
     <message>
         <source>Decrease</source>
-        <translation>הפחת</translation>
+        <translation>הנמך</translation>
     </message>
     <message>
         <source>ShowMenu</source>
@@ -78,19 +78,43 @@
     </message>
     <message>
         <source>Toggle</source>
-        <translation>החלף</translation>
+        <translation>הדלק/כבה</translation>
+    </message>
+    <message>
+        <source>Scroll Left</source>
+        <translation>גלול שמאלה</translation>
+    </message>
+    <message>
+        <source>Scroll Right</source>
+        <translation>גלול ימינה</translation>
+    </message>
+    <message>
+        <source>Scroll Up</source>
+        <translation>גלול מעלה</translation>
+    </message>
+    <message>
+        <source>Scroll Down</source>
+        <translation>גלול מטה</translation>
+    </message>
+    <message>
+        <source>Previous Page</source>
+        <translation>דף קודם</translation>
+    </message>
+    <message>
+        <source>Next Page</source>
+        <translation>דף הבא</translation>
     </message>
     <message>
         <source>Triggers the action</source>
-        <translation>גורם לפעולה</translation>
+        <translation>מתניע את הפעולה</translation>
     </message>
     <message>
         <source>Increase the value</source>
-        <translation>הגדל את הערך</translation>
+        <translation>מגביר את הערך</translation>
     </message>
     <message>
         <source>Decrease the value</source>
-        <translation>הקטן את הערך</translation>
+        <translation>מנמיך את הערך</translation>
     </message>
     <message>
         <source>Shows the menu</source>
@@ -98,11 +122,54 @@
     </message>
     <message>
         <source>Sets the focus</source>
-        <translation>מגדיר את המיקוד</translation>
+        <translation>קובע את המיקוד</translation>
     </message>
     <message>
         <source>Toggles the state</source>
-        <translation>מחליף בין המצבים</translation>
+        <translation>משנה את המצב</translation>
+    </message>
+    <message>
+        <source>Scrolls to the left</source>
+        <translation>גולל שמאלה</translation>
+    </message>
+    <message>
+        <source>Scrolls to the right</source>
+        <translation>גולל ימינה</translation>
+    </message>
+    <message>
+        <source>Scrolls up</source>
+        <translation>גולל מעלה</translation>
+    </message>
+    <message>
+        <source>Scrolls down</source>
+        <translation>גולל מטה</translation>
+    </message>
+    <message>
+        <source>Goes back a page</source>
+        <translation>הולך דף אחורה</translation>
+    </message>
+    <message>
+        <source>Goes to the next page</source>
+        <translation>הולך לדף הבא</translation>
+    </message>
+</context>
+<context>
+    <name>QAndroidPlatformTheme</name>
+    <message>
+        <source>Yes</source>
+        <translation>כן</translation>
+    </message>
+    <message>
+        <source>Yes to All</source>
+        <translation>כן להכל</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>לא</translation>
+    </message>
+    <message>
+        <source>No to All</source>
+        <translation>לא להכל</translation>
     </message>
 </context>
 <context>
@@ -113,11 +180,11 @@
     </message>
     <message>
         <source>About</source>
-        <translation>אודות</translation>
+        <translation>שירותים</translation>
     </message>
     <message>
         <source>Config</source>
-        <translation>תצורה</translation>
+        <translation>הגדרות</translation>
     </message>
     <message>
         <source>Preference</source>
@@ -133,22 +200,45 @@
     </message>
     <message>
         <source>Setup</source>
-        <translation>הגדרות</translation>
+        <translation>תצורה</translation>
     </message>
     <message>
         <source>Quit</source>
-        <translation>צא</translation>
+        <translation>יציאה</translation>
     </message>
     <message>
         <source>Exit</source>
         <translation>יציאה</translation>
+    </message>
+    <message>
+        <source>Cut</source>
+        <translation>גזור</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation>העתק</translation>
+    </message>
+    <message>
+        <source>Paste</source>
+        <translation>הדבק</translation>
+    </message>
+    <message>
+        <source>Select All</source>
+        <translation>בחר הכל</translation>
+    </message>
+</context>
+<context>
+    <name>QCocoaTheme</name>
+    <message>
+        <source>Don't Save</source>
+        <translation>אל תשמור</translation>
     </message>
 </context>
 <context>
     <name>QColorDialog</name>
     <message>
         <source>Hu&amp;e:</source>
-        <translation>גוו&amp;ן:</translation>
+        <translation>&amp;גוון:</translation>
     </message>
     <message>
         <source>&amp;Sat:</source>
@@ -164,15 +254,29 @@
     </message>
     <message>
         <source>&amp;Green:</source>
-        <translation>&amp;ירוק:</translation>
+        <translation>ירו&amp;ק:</translation>
     </message>
     <message>
         <source>Bl&amp;ue:</source>
-        <translation>כח&amp;ול:</translation>
+        <translation>&amp;כחול:</translation>
     </message>
     <message>
         <source>A&amp;lpha channel:</source>
-        <translation>ערוץ אל&amp;פה:</translation>
+        <translation>ע&amp;רוץ אלפא:</translation>
+    </message>
+    <message>
+        <source>&amp;HTML:</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Cursor at %1, %2
+Press ESC to cancel</source>
+        <translation>סמן במיקום ‎%1, %2
+הקש ESC לביטול</translation>
+    </message>
+    <message>
+        <source>&amp;Pick Screen Color</source>
+        <translation>&amp;בחר צבע מסך</translation>
     </message>
     <message>
         <source>Select Color</source>
@@ -203,40 +307,32 @@
     </message>
     <message>
         <source>Open the combo box selection popup</source>
-        <translation>פתח את חלון הבחירה</translation>
+        <translation>פתח את חלונית הבחירה של תיבת הבחירה</translation>
     </message>
 </context>
 <context>
-    <name>QCoreApplication</name>
-    <message>
-        <source>QT_LAYOUT_DIRECTION</source>
-        <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
-        <translation>LTR</translation>
-    </message>
-</context>
-<context>
-    <name>QDateTimeEdit</name>
+    <name>QDateTimeParser</name>
     <message>
         <source>AM</source>
-        <translation>לפנה&quot;צ</translation>
+        <translation>לפני הצהריים</translation>
     </message>
     <message>
         <source>am</source>
-        <translation>לפנה&quot;צ</translation>
+        <translation>לפני הצהריים</translation>
     </message>
     <message>
         <source>PM</source>
-        <translation>אחה&quot;צ</translation>
+        <translation>אחרי הצהריים</translation>
     </message>
     <message>
         <source>pm</source>
-        <translation>אחה&quot;צ</translation>
+        <translation>אחרי הצהריים</translation>
     </message>
 </context>
 <context>
     <name>QDialog</name>
     <message>
-        <source>What&apos;s This?</source>
+        <source>What's This?</source>
         <translation>מה זה?</translation>
     </message>
 </context>
@@ -245,98 +341,6 @@
     <message>
         <source>OK</source>
         <translation>אישור</translation>
-    </message>
-    <message>
-        <source>&amp;OK</source>
-        <translation>&amp;אישור</translation>
-    </message>
-    <message>
-        <source>&amp;Save</source>
-        <translation>&amp;שמור</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation>שמור</translation>
-    </message>
-    <message>
-        <source>Open</source>
-        <translation>פתח</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation>&amp;בטל</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>בטל</translation>
-    </message>
-    <message>
-        <source>&amp;Close</source>
-        <translation>&amp;סגור</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation>סגור</translation>
-    </message>
-    <message>
-        <source>Apply</source>
-        <translation>החל</translation>
-    </message>
-    <message>
-        <source>Reset</source>
-        <translation>אתחל</translation>
-    </message>
-    <message>
-        <source>Help</source>
-        <translation>עזרה</translation>
-    </message>
-    <message>
-        <source>Don&apos;t Save</source>
-        <translation>אל תשמור</translation>
-    </message>
-    <message>
-        <source>Close without Saving</source>
-        <translation>סגור ללא שמירה</translation>
-    </message>
-    <message>
-        <source>Discard</source>
-        <translation>בטל</translation>
-    </message>
-    <message>
-        <source>&amp;Yes</source>
-        <translation>&amp;כן</translation>
-    </message>
-    <message>
-        <source>Yes to &amp;All</source>
-        <translation>כן &amp;להכל</translation>
-    </message>
-    <message>
-        <source>&amp;No</source>
-        <translation>&amp;לא</translation>
-    </message>
-    <message>
-        <source>N&amp;o to All</source>
-        <translation>לא ל&amp;הכל</translation>
-    </message>
-    <message>
-        <source>Save All</source>
-        <translation>שמור הכל</translation>
-    </message>
-    <message>
-        <source>Abort</source>
-        <translation>בטל</translation>
-    </message>
-    <message>
-        <source>Retry</source>
-        <translation>נסה שנית</translation>
-    </message>
-    <message>
-        <source>Ignore</source>
-        <translation>התעלם</translation>
-    </message>
-    <message>
-        <source>Restore Defaults</source>
-        <translation>שחזר ברירות מחדל</translation>
     </message>
 </context>
 <context>
@@ -361,93 +365,93 @@
     </message>
     <message>
         <source>Date Modified</source>
-        <translation>התאריך שונה</translation>
+        <translation>תאריך שינוי</translation>
     </message>
 </context>
 <context>
     <name>QFile</name>
     <message>
         <source>Destination file is the same file.</source>
-        <translation>קובץ היעד הינו אותו הקובץ.</translation>
+        <translation>קובץ יעד הוא אותו קובץ.</translation>
     </message>
     <message>
         <source>Source file does not exist.</source>
-        <translation>קובץ המקור איננו קיים.</translation>
+        <translation>קובץ מקור לא קיים.</translation>
     </message>
     <message>
         <source>Destination file exists</source>
-        <translation>קובץ היעד קיים</translation>
+        <translation>קובץ יעד קיים</translation>
     </message>
     <message>
         <source>Error while renaming.</source>
-        <translation>שגיאה במהלך שינוי השם.</translation>
+        <translation>שגיאה בשינוי שם.</translation>
     </message>
     <message>
         <source>Unable to restore from %1: %2</source>
-        <translation>לא ניתן לשחזר מ%1: %2</translation>
+        <translation>לא ניתן לשחזר מתוך %1: %2</translation>
     </message>
     <message>
         <source>Will not rename sequential file using block copy</source>
-        <translation>לא ישנה שם לקובץ העוקב בשימוש בהעתקת בלוק</translation>
+        <translation>לא יתבצע שינוי שם לקובץ סדרתי באמצעות העתקת בלוק</translation>
     </message>
     <message>
         <source>Cannot remove source file</source>
-        <translation>לא ניתן להסיר את קובץ המקור</translation>
+        <translation>אין אפשרות להסיר קובץ מקור</translation>
     </message>
     <message>
         <source>Cannot open %1 for input</source>
-        <translation>לא ניתן לפתוח את ה%1 לקלט</translation>
+        <translation>אין אפשרות לפתוח את %1 לקריאה</translation>
     </message>
     <message>
         <source>Cannot open for output</source>
-        <translation>לא ניתן לפתוח לפלט</translation>
+        <translation>אין אפשרות לפתוח לכתיבה</translation>
     </message>
     <message>
         <source>Failure to write block</source>
-        <translation>כשל בכתיבת הבלוק</translation>
+        <translation>אין אפשרות לכתוב בלוק</translation>
     </message>
     <message>
         <source>Cannot create %1 for output</source>
-        <translation>לא ניתן ליצור %1 לפלט</translation>
+        <translation>אין אפשרות ליצור את %1 לכתיבה</translation>
     </message>
 </context>
 <context>
     <name>QFileDialog</name>
     <message>
         <source>Look in:</source>
-        <translation>צפה ב:</translation>
+        <translation>חפש בתוך:</translation>
     </message>
     <message>
         <source>Back</source>
-        <translation>חזור</translation>
+        <translation>אחורה</translation>
     </message>
     <message>
         <source>Go back</source>
-        <translation>חזור</translation>
+        <translation>לך אחורה</translation>
     </message>
     <message>
         <source>Forward</source>
-        <translation>התקדם</translation>
+        <translation>קדימה</translation>
     </message>
     <message>
         <source>Go forward</source>
-        <translation>התקדם</translation>
+        <translation>לך קדימה</translation>
     </message>
     <message>
         <source>Parent Directory</source>
-        <translation>תיקיית אב</translation>
+        <translation>ספרייה מעלה</translation>
     </message>
     <message>
         <source>Go to the parent directory</source>
-        <translation>עבור לתיקיית האב</translation>
+        <translation>לך אל ספרייה מעלה</translation>
     </message>
     <message>
         <source>Create New Folder</source>
-        <translation>צור תיקיה חדשה</translation>
+        <translation>צור תיקייה חדשה</translation>
     </message>
     <message>
         <source>Create a New Folder</source>
-        <translation>צור תיקיה חדשה</translation>
+        <translation>צור תיקייה חדשה</translation>
     </message>
     <message>
         <source>List View</source>
@@ -455,7 +459,7 @@
     </message>
     <message>
         <source>Change to list view mode</source>
-        <translation>שנה למצב תצוגת רשימה</translation>
+        <translation>החלף למצב תצוגת רשימה</translation>
     </message>
     <message>
         <source>Detail View</source>
@@ -463,7 +467,7 @@
     </message>
     <message>
         <source>Change to detail view mode</source>
-        <translation>שנה למצב תצוגת פרטים</translation>
+        <translation>החלף למצב תצוגת פרטים</translation>
     </message>
     <message>
         <source>Files of type:</source>
@@ -471,19 +475,19 @@
     </message>
     <message>
         <source>Find Directory</source>
-        <translation>מצא תיקיה</translation>
+        <translation>חפש ספרייה</translation>
     </message>
     <message>
         <source>Open</source>
-        <translation>פתח</translation>
+        <translation>פתיחה</translation>
     </message>
     <message>
         <source>Save As</source>
-        <translation>שמור כ</translation>
+        <translation>שמירה בשם</translation>
     </message>
     <message>
         <source>Directory:</source>
-        <translation>תיקיה:</translation>
+        <translation>ספרייה:</translation>
     </message>
     <message>
         <source>File &amp;name:</source>
@@ -495,11 +499,11 @@
     </message>
     <message>
         <source>&amp;Choose</source>
-        <translation>&amp;בחר</translation>
+        <translation>בח&amp;ר</translation>
     </message>
     <message>
         <source>&amp;Save</source>
-        <translation>ש&amp;מור</translation>
+        <translation>&amp;שמור</translation>
     </message>
     <message>
         <source>All Files (*)</source>
@@ -511,7 +515,7 @@
     </message>
     <message>
         <source>&amp;Rename</source>
-        <translation>&amp;שנה שם</translation>
+        <translation>ש&amp;נה שם</translation>
     </message>
     <message>
         <source>&amp;Delete</source>
@@ -519,28 +523,32 @@
     </message>
     <message>
         <source>Show &amp;hidden files</source>
-        <translation>הצג &amp;קבצים מוסתרים</translation>
+        <translation>ה&amp;צג קבצים מוסתרים</translation>
     </message>
     <message>
         <source>&amp;New Folder</source>
-        <translation>&amp;תיקיה חדשה</translation>
+        <translation>תיקייה &amp;חדשה</translation>
+    </message>
+    <message>
+        <source>All files (*)</source>
+        <translation>כל הקבצים (*)</translation>
     </message>
     <message>
         <source>Directories</source>
-        <translation>תיקיות</translation>
+        <translation>ספריות</translation>
     </message>
     <message>
         <source>%1
 Directory not found.
 Please verify the correct directory name was given.</source>
         <translation>%1
-התיקיה לא נמצאה.
-אנא ודא שסיפקת את שם התיקיה הנכון.</translation>
+ספרייה לא נמצאה.
+אנא ודא כי ניתן שם ספרייה מדויק.</translation>
     </message>
     <message>
         <source>%1 already exists.
 Do you want to replace it?</source>
-        <translation>%1 כבר קיים.
+        <translation>‏%1 כבר קיים.
 האם ברצונך להחליף אותו?</translation>
     </message>
     <message>
@@ -549,29 +557,29 @@ File not found.
 Please verify the correct file name was given.</source>
         <translation>%1
 הקובץ לא נמצא.
-אנא ודא שסיפקת את שם הקובץ הנכון.</translation>
+אנא ודא כי שם הקובץ הנכון הוזן.</translation>
     </message>
     <message>
         <source>New Folder</source>
-        <translation>תיקיה חדשה</translation>
+        <translation>תיקייה חדשה</translation>
     </message>
     <message>
         <source>Delete</source>
         <translation>מחק</translation>
     </message>
     <message>
-        <source>&apos;%1&apos; is write protected.
+        <source>'%1' is write protected.
 Do you want to delete it anyway?</source>
-        <translation>%1 מוגן מכתיבה.
-האם ברצונך למחוק אותו בכל מקרה?</translation>
+        <translation>%1 מוגן בפני כתיבה.
+האם ברצונך למחוק אותו בכל זאת?</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete &apos;%1&apos;?</source>
-        <translation>האם אתה בטוח שברצונך למחוק את &apos;%1&apos;?</translation>
+        <source>Are you sure you want to delete '%1'?</source>
+        <translation>האם אתה בטוח כי ברצונך למחוק את '%1'?</translation>
     </message>
     <message>
         <source>Could not delete directory.</source>
-        <translation>לא ניתן למחוק את התיקיה.</translation>
+        <translation>אין אפשרות למחוק ספרייה.</translation>
     </message>
     <message>
         <source>Recent Places</source>
@@ -590,6 +598,11 @@ Do you want to delete it anyway?</source>
         <translation>כונן</translation>
     </message>
     <message>
+        <source>%1 File</source>
+        <extracomment>%1 is a file name suffix, for example txt</extracomment>
+        <translation>קובץ %1</translation>
+    </message>
+    <message>
         <source>File</source>
         <translation>קובץ</translation>
     </message>
@@ -601,12 +614,12 @@ Do you want to delete it anyway?</source>
     <message>
         <source>Folder</source>
         <comment>All other platforms</comment>
-        <translation>תיקיה</translation>
+        <translation>תיקייה</translation>
     </message>
     <message>
         <source>Alias</source>
-        <comment>Mac OS X Finder</comment>
-        <translation>קיצור דרך</translation>
+        <comment>OS X Finder</comment>
+        <translation>כינוי</translation>
     </message>
     <message>
         <source>Shortcut</source>
@@ -631,46 +644,46 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
         <source>Alt+Left</source>
-        <translation>Alt+חץ שמאלי</translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Alt+Right</source>
-        <translation>Alt+חץ ימני</translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Alt+Up</source>
-        <translation>Alt+חץ עליון</translation>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
     <name>QFileSystemModel</name>
     <message>
         <source>%1 TB</source>
-        <translation>%1 TB</translation>
+        <translation>%1 ט"ב</translation>
     </message>
     <message>
         <source>%1 GB</source>
-        <translation>%1 GB</translation>
+        <translation>%1 ג"ב</translation>
     </message>
     <message>
         <source>%1 MB</source>
-        <translation>%1 MB</translation>
+        <translation>%1 מ"ב</translation>
     </message>
     <message>
         <source>%1 KB</source>
-        <translation>%1 KB</translation>
+        <translation>%1 ק"ב</translation>
     </message>
     <message>
         <source>%1 bytes</source>
-        <translation>%1 ביתים</translation>
+        <translation>%1 בתים</translation>
     </message>
     <message>
         <source>Invalid filename</source>
         <translation>שם קובץ לא תקין</translation>
     </message>
     <message>
-        <source>&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
-        <translation>&lt;b&gt; השם %1 לא ניתן לשימוש. &lt;/b&gt; &lt;p&gt; נסה להשתמש בשם אחר, עם פחות אותיות או ללא סימני פיסוק.</translation>
+        <source>&lt;b&gt;The name "%1" can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
+        <translation>&lt;b&gt;אין אפשרות להשתמש בשם "%1".&lt;/b&gt;&lt;p&gt;נסה שם אחר, עם פחות תווים או בלי סימני פיסוק.</translation>
     </message>
     <message>
         <source>Name</source>
@@ -692,7 +705,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
         <source>Date Modified</source>
-        <translation>התאריך שונה</translation>
+        <translation>תאריך שינוי</translation>
     </message>
     <message>
         <source>My Computer</source>
@@ -704,14 +717,45 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
         <source>%1 byte(s)</source>
-        <translation>%1 בית/ים</translation>
+        <translation>%1 בתים</translation>
+    </message>
+</context>
+<context>
+    <name>QGnomeTheme</name>
+    <message>
+        <source>&amp;OK</source>
+        <translation>&amp;אישור</translation>
+    </message>
+    <message>
+        <source>&amp;Save</source>
+        <translation>&amp;שמור</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;ביטול</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>&amp;סגור</translation>
+    </message>
+    <message>
+        <source>Close without Saving</source>
+        <translation>סגור ללא שמירה</translation>
+    </message>
+</context>
+<context>
+    <name>QGuiApplication</name>
+    <message>
+        <source>QT_LAYOUT_DIRECTION</source>
+        <comment>Translate this string to the string 'LTR' in left-to-right languages or to 'RTL' in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
+        <translation>RTL</translation>
     </message>
 </context>
 <context>
     <name>QIODevice</name>
     <message>
         <source>Permission denied</source>
-        <translation>ההרשאה נדחתה</translation>
+        <translation>הרשאה נדחתה</translation>
     </message>
     <message>
         <source>Too many open files</source>
@@ -719,15 +763,61 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
         <source>No such file or directory</source>
-        <translation>אין תיקיה/קובץ כזה</translation>
+        <translation>לא קיים קובץ או ספרייה</translation>
     </message>
     <message>
         <source>No space left on device</source>
-        <translation>לא נותר מקום במכשיר</translation>
+        <translation>לא נשאר מקום בהתקן</translation>
     </message>
     <message>
         <source>Unknown error</source>
-        <translation>שגיאה לא ידועה</translation>
+        <translation>שגיאה לא מוכרת</translation>
+    </message>
+    <message>
+        <source>file to open is a directory</source>
+        <translation>קובץ לפתיחה הוא ספרייה</translation>
+    </message>
+</context>
+<context>
+    <name>QImageReader</name>
+    <message>
+        <source>Invalid device</source>
+        <translation>התקן לא תקין</translation>
+    </message>
+    <message>
+        <source>File not found</source>
+        <translation>קובץ לא נמצא</translation>
+    </message>
+    <message>
+        <source>Unsupported image format</source>
+        <translation>פורמט תמונה לא נתמך</translation>
+    </message>
+    <message>
+        <source>Unable to read image data</source>
+        <translation>לא ניתן לקרוא מידע תמונה</translation>
+    </message>
+    <message>
+        <source>Unknown error</source>
+        <translation>שגיאה לא מוכרת</translation>
+    </message>
+</context>
+<context>
+    <name>QImageWriter</name>
+    <message>
+        <source>Unknown error</source>
+        <translation>שגיאה לא מוכרת</translation>
+    </message>
+    <message>
+        <source>Device is not set</source>
+        <translation>התקן אינו מוגדר</translation>
+    </message>
+    <message>
+        <source>Device not writable</source>
+        <translation>התקן לא ניתן לכתיבה</translation>
+    </message>
+    <message>
+        <source>Unsupported image format</source>
+        <translation>פורמט תמונה לא נתמך</translation>
     </message>
 </context>
 <context>
@@ -738,6 +828,18 @@ Do you want to delete it anyway?</source>
     </message>
 </context>
 <context>
+    <name>QKeySequenceEdit</name>
+    <message>
+        <source>Press shortcut</source>
+        <translation>לחץ על קיצור דרך</translation>
+    </message>
+    <message>
+        <source>%1, ...</source>
+        <extracomment>This text is an "unfinished" shortcut, expands like "Ctrl+A, ..."</extracomment>
+        <translation>%1, ...</translation>
+    </message>
+</context>
+<context>
     <name>QLineEdit</name>
     <message>
         <source>&amp;Undo</source>
@@ -745,15 +847,15 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
         <source>&amp;Redo</source>
-        <translation>&amp;חזור</translation>
+        <translation>בצע &amp;שוב</translation>
     </message>
     <message>
         <source>Cu&amp;t</source>
-        <translation>ח&amp;תוך</translation>
+        <translation>&amp;גזור</translation>
     </message>
     <message>
         <source>&amp;Copy</source>
-        <translation>&amp;העתק</translation>
+        <translation>הע&amp;תק</translation>
     </message>
     <message>
         <source>&amp;Paste</source>
@@ -788,6 +890,81 @@ Do you want to delete it anyway?</source>
     </message>
 </context>
 <context>
+    <name>QPlatformTheme</name>
+    <message>
+        <source>OK</source>
+        <translation>אישור</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>שמור</translation>
+    </message>
+    <message>
+        <source>Save All</source>
+        <translation>שמור הכל</translation>
+    </message>
+    <message>
+        <source>Open</source>
+        <translation>פתיחה</translation>
+    </message>
+    <message>
+        <source>&amp;Yes</source>
+        <translation>&amp;כן</translation>
+    </message>
+    <message>
+        <source>Yes to &amp;All</source>
+        <translation>כן ל&amp;הכל</translation>
+    </message>
+    <message>
+        <source>&amp;No</source>
+        <translation>&amp;לא</translation>
+    </message>
+    <message>
+        <source>N&amp;o to All</source>
+        <translation>ל&amp;א להכל</translation>
+    </message>
+    <message>
+        <source>Abort</source>
+        <translation>בטל</translation>
+    </message>
+    <message>
+        <source>Retry</source>
+        <translation>נסה שוב</translation>
+    </message>
+    <message>
+        <source>Ignore</source>
+        <translation>התעלם</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>סגור</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>ביטול</translation>
+    </message>
+    <message>
+        <source>Discard</source>
+        <translation>שכח</translation>
+    </message>
+    <message>
+        <source>Help</source>
+        <translation>עזרה</translation>
+    </message>
+    <message>
+        <source>Apply</source>
+        <translation>החל</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation>אפס</translation>
+    </message>
+    <message>
+        <source>Restore Defaults</source>
+        <translation>שחזר ברירות מחדל</translation>
+    </message>
+</context>
+<context>
     <name>QProgressDialog</name>
     <message>
         <source>Cancel</source>
@@ -795,14 +972,25 @@ Do you want to delete it anyway?</source>
     </message>
 </context>
 <context>
+    <name>QQnxFileDialogHelper</name>
+    <message>
+        <source>All files (*.*)</source>
+        <translation type="unfinished" />
+    </message>
+</context>
+<context>
     <name>QSaveFile</name>
     <message>
         <source>Existing file %1 is not writable</source>
-        <translation>הקובץ הקיים %1 לא ניתן לכתיבה</translation>
+        <translation>קובץ קיים %1 אינו בר כתיבה</translation>
+    </message>
+    <message>
+        <source>Filename refers to a directory</source>
+        <translation>שם קובץ מפנה לספרייה</translation>
     </message>
     <message>
         <source>Writing canceled by application</source>
-        <translation>הכתיבה בוטלה על ידי התוכנה</translation>
+        <translation>כתיבה התבטלה ע״י היישום</translation>
     </message>
 </context>
 <context>
@@ -825,23 +1013,23 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
         <source>Bottom</source>
-        <translation>תחתית</translation>
+        <translation>קצה תחתון</translation>
     </message>
     <message>
         <source>Page left</source>
-        <translation>דף לשמאל</translation>
+        <translation>עמוד שמאלה</translation>
     </message>
     <message>
         <source>Page up</source>
-        <translation>דף למעלה</translation>
+        <translation>עמוד מעלה</translation>
     </message>
     <message>
         <source>Page right</source>
-        <translation>דף לימין</translation>
+        <translation>עמוד ימינה</translation>
     </message>
     <message>
         <source>Page down</source>
-        <translation>דף למטה</translation>
+        <translation>עמוד מטה</translation>
     </message>
     <message>
         <source>Scroll left</source>
@@ -849,7 +1037,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
         <source>Scroll up</source>
-        <translation>גלול למעלה</translation>
+        <translation>גלול מעלה</translation>
     </message>
     <message>
         <source>Scroll right</source>
@@ -857,14 +1045,14 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
         <source>Scroll down</source>
-        <translation>גלול למטה</translation>
+        <translation>גלול מטה</translation>
     </message>
 </context>
 <context>
     <name>QStandardPaths</name>
     <message>
         <source>Desktop</source>
-        <translation>שולחן העבודה</translation>
+        <translation>שולחן עבודה</translation>
     </message>
     <message>
         <source>Documents</source>
@@ -876,7 +1064,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
         <source>Applications</source>
-        <translation>תוכנות</translation>
+        <translation>יישומים</translation>
     </message>
     <message>
         <source>Music</source>
@@ -892,7 +1080,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
         <source>Temporary Directory</source>
-        <translation>תיקיה זמנית</translation>
+        <translation>ספרייה זמנית</translation>
     </message>
     <message>
         <source>Home</source>
@@ -900,7 +1088,11 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
         <source>Application Data</source>
-        <translation>נתוני יישום</translation>
+        <translation>נתוני יישומים</translation>
+    </message>
+    <message>
+        <source>Application Configuration</source>
+        <translation>תצורת יישומים</translation>
     </message>
     <message>
         <source>Cache</source>
@@ -908,7 +1100,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
         <source>Shared Data</source>
-        <translation>נתונים משותפים</translation>
+        <translation>מידע משותף</translation>
     </message>
     <message>
         <source>Runtime</source>
@@ -919,12 +1111,16 @@ Do you want to delete it anyway?</source>
         <translation>תצורה</translation>
     </message>
     <message>
+        <source>Shared Configuration</source>
+        <translation>תצורה משותפת</translation>
+    </message>
+    <message>
         <source>Shared Cache</source>
         <translation>מטמון משותף</translation>
     </message>
     <message>
         <source>Download</source>
-        <translation>הורד</translation>
+        <translation>הורדה</translation>
     </message>
 </context>
 <context>
@@ -941,7 +1137,7 @@ Do you want to delete it anyway?</source>
 <context>
     <name>QWhatsThisAction</name>
     <message>
-        <source>What&apos;s This?</source>
+        <source>What's This?</source>
         <translation>מה זה?</translation>
     </message>
 </context>
@@ -953,7 +1149,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
         <source>&amp;Redo</source>
-        <translation>&amp;חזור</translation>
+        <translation>בצע &amp;שוב</translation>
     </message>
     <message>
         <source>Cu&amp;t</source>
@@ -961,15 +1157,15 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
         <source>&amp;Copy</source>
-        <translation>&amp;העתק</translation>
+        <translation>הע&amp;תק</translation>
     </message>
     <message>
         <source>Copy &amp;Link Location</source>
-        <translation>העתק &amp;מיקום קישור</translation>
+        <translation>העתק כתובת &amp;קישור</translation>
     </message>
     <message>
         <source>&amp;Paste</source>
-        <translation>&amp;הדבק</translation>
+        <translation>ה&amp;דבק</translation>
     </message>
     <message>
         <source>Delete</source>

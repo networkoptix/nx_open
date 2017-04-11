@@ -161,10 +161,10 @@ public:
     bool validate(const QSet<QnUuid>& selected) override;
     bool isValid(const QnUuid& resourceId) const override;
 
-    static bool isValidList(const QSet<QnUuid>& ids, const QString& additional = QString());
+    static bool isValidList(const QSet<QnUuid>& ids, const QString& additional);
 
-    static QString getText(const QSet<QnUuid>& ids, const bool detailed = true,
-        const QString& additional = QString());
+    static QString getText(const QSet<QnUuid>& ids, const bool detailed,
+        const QString& additional);
 private:
     static QStringList parseAdditional(const QString& additional);
     static bool isValidUser(const QnUserResourcePtr& user);

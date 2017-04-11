@@ -261,6 +261,13 @@ void QnPlAxisResource::stopInputPortMonitoringAsync()
     resetHttpClient(m_ioHttpMonitor[0].httpClient);
     resetHttpClient(m_ioHttpMonitor[1].httpClient);
     resetHttpClient(m_inputPortStateReader);
+
+    auto timeMs = qnSyncTime->currentMSecsSinceEpoch();
+    for (const auto& state: ioStates())
+    {
+        if (state.isActive)
+            updateIOState(state.id, false /*inactive*/, timeMs, true /*override*/);
+    }
 }
 
 void QnPlAxisResource::resetHttpClient(nx_http::AsyncHttpClientPtr& value)
@@ -420,7 +427,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
     QnPhysicalCameraResource::initInternal();
 
     updateDefaultAuthIfEmpty(QLatin1String("root"), QLatin1String("root"));
-	QAuthenticator auth = getAuth();
+    QAuthenticator auth = getAuth();
 
     //TODO #ak check firmware version. it must be >= 5.0.0 to support I/O ports
     {
@@ -544,6 +551,9 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
         if (m_resolutions[SECONDARY_ENCODER_INDEX].size.isEmpty())
             m_resolutions[SECONDARY_ENCODER_INDEX] = getNearestResolution(QSize(480,316), 0.0); // try to get secondary resolution again (ignore aspect ratio)
     }
+    
+    enableDuplexMode();
+    
     //root.Image.MotionDetection=no
     //root.Image.I0.TriggerData.MotionDetectionEnabled=yes
     //root.Image.I1.TriggerData.MotionDetectionEnabled=yes
@@ -796,6 +806,19 @@ bool QnPlAxisResource::setRelayOutputState(
     return true;
 }
 
+bool QnPlAxisResource::enableDuplexMode() const
+{
+    CLSimpleHTTPClient http (
+        getHostAddress(),
+        QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT),
+        getNetworkTimeout(),
+        getAuth());
+
+    auto status = http.doGET(lit("/axis-cgi/param.cgi?action=update&root.Audio.DuplexMode=full"));
+
+    return status == CL_HTTP_SUCCESS;
+}
+
 CLHttpStatus QnPlAxisResource::readAxisParameters(
     const QString& rootPath,
     CLSimpleHTTPClient* const httpClient,
@@ -1033,7 +1056,7 @@ bool QnPlAxisResource::readPortSettings( CLSimpleHTTPClient* const http, QnIOPor
             if(!portData.id.isEmpty())
                 ioPortList.push_back(std::move(portData));
             portData = QnIOPortData();
-			portData.id = portName;
+            portData.id = portName;
         }
         QByteArray paramName;
         for (int i = 3; i < nameParts.size(); ++i)

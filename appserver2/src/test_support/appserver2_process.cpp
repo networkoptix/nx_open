@@ -124,7 +124,8 @@ public:
 protected:
     virtual void onResourceStatusChanged(
         const QnResourcePtr& /*resource*/,
-        Qn::ResourceStatus /*status*/) override
+        Qn::ResourceStatus /*status*/,
+        ec2::NotificationSource /*source*/) override
     {
     }
 

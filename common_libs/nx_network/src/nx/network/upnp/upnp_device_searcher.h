@@ -13,6 +13,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
+#include <api/global_settings.h>
 #include <utils/common/long_runnable.h>
 #include <utils/common/stoppable.h>
 
@@ -68,10 +69,12 @@ public:
     static const QString DEFAULT_DEVICE_TYPE;
 
     /*!
-        \param discoverDeviceTypes Devies to discover, mediaservers by default
-        \param discoverTryTimeoutMS Timeout between UPnP discover packet dispatch
+        \param globalSettings Controlls if multicasts should be enabled, always enabled if nullptr.
+        \param discoverTryTimeoutMS Timeout between UPnP discover packet dispatch.
     */
-    DeviceSearcher( unsigned int discoverTryTimeoutMS = DEFAULT_DISCOVER_TRY_TIMEOUT_MS );
+    explicit DeviceSearcher(
+        QnGlobalSettings* globalSettings,
+        unsigned int discoverTryTimeoutMS = DEFAULT_DISCOVER_TRY_TIMEOUT_MS );
     virtual ~DeviceSearcher();
 
     //!Implementation of \a QnStoppable::pleaseStop
@@ -141,6 +144,7 @@ private:
         nx::Buffer buf;
     };
 
+    const QnGlobalSettings* m_globalSettings;
     const unsigned int m_discoverTryTimeoutMS;
     mutable QnMutex m_mutex;
     quint64 m_timerID;
@@ -149,7 +153,6 @@ private:
     mutable QSet<QnInterfaceAndAddr> m_interfacesCache;
     //map<local interface ip, socket>
     std::map<QString, SocketReadCtx> m_socketList;
-    char* m_readBuf;
     HttpClientsDict m_httpClients;
     //!map<device host address, device info>
     std::map<HostAddress, DiscoveredDeviceInfo> m_discoveredDevices;

@@ -1,10 +1,10 @@
 #pragma once
 
+#include <api/model/setup_cloud_system_data.h>
 #include <rest/server/json_rest_handler.h>
 #include <core/resource_access/user_access_data.h>
 
 struct CloudManagerGroup;
-struct SetupRemoveSystemData;
 
 class QnSetupCloudSystemRestHandler: public QnJsonRestHandler
 {
@@ -18,7 +18,7 @@ private:
     CloudManagerGroup* m_cloudManagerGroup;
 
     int execute(
-        SetupRemoveSystemData data,
+        SetupCloudSystemData data,
         const QnRestConnectionProcessor* owner,
         QnJsonRestResult &result);
 };

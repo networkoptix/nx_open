@@ -24,6 +24,12 @@ angular.module('webadminApp')
         }
 
         return {
+            webSocketUrlPath:function(){
+                if($sessionStorage.clientWebSocket){
+                    return 'clientWebSocket=' + $sessionStorage.clientWebSocket;
+                }
+                return '';
+            },
             init:function(){
                 $log.log("try to init native client");
                 if(nativeClientObject){

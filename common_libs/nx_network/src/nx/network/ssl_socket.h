@@ -10,6 +10,7 @@
 #include "abstract_socket.h"
 #include "socket_common.h"
 #include "socket_impl_helper.h"
+#include "ssl/ssl_engine.h"
 
 // Forward
 struct bio_st;
@@ -31,27 +32,7 @@ typedef AbstractSocketImplementationDelegate<
         std::function<AbstractStreamServerSocket*()>
     > SslSocketServerImplementationDelegate;
 
-class NX_NETWORK_API SslEngine
-{
-    static const size_t kBufferSize;
-    static const int kRsaLength;
-    static const std::chrono::seconds kCertExpiration;
-
-public:
-    static String makeCertificateAndKey(
-        const String& name, const String& country, const String& company);
-
-    static bool useCertificateAndPkey(const String& certData);
-
-    static void useOrCreateCertificate(
-        const QString& filePath,
-        const String& name, const String& country, const String& company);
-
-    static void useRandomCertificate(const String& module);
-};
-
-class NX_NETWORK_API SslSocket
-:
+class NX_NETWORK_API SslSocket:
     public SslSocketImplementationDelegate
 {
     typedef SslSocketImplementationDelegate base_type;
@@ -88,23 +69,19 @@ public:
     virtual bool enableClientEncryption() override;
     virtual bool isEncryptionEnabled() const override;
 
-    virtual void cancelIOAsync(
-        nx::network::aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
+    virtual void cancelIOAsync(aio::EventType eventType, utils::MoveOnlyFunc<void()> handler) override;
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
     virtual bool setNonBlockingMode(bool val) override;
     virtual bool getNonBlockingMode(bool* val) const override;
     virtual bool shutdown() override;
 
-    enum IOMode { ASYNC, SYNC };
-
 protected:
     Q_DECLARE_PRIVATE(SslSocket);
     SslSocketPrivate *d_ptr;
 
     SslSocket(
-        SslSocketPrivate* priv, AbstractStreamSocket* wrappedSocket,
+        SslSocketPrivate* priv,AbstractStreamSocket* wrappedSocket,
         bool isServerSide, bool encriptionEnforced);
 
     int recvInternal(void* buffer, unsigned int bufferLen, int flags);
@@ -131,7 +108,6 @@ private:
     bool doHandshake();
     int asyncRecvInternal(void* buffer , unsigned int bufferLen);
     int asyncSendInternal(const void* buffer , unsigned int bufferLen);
-    IOMode ioMode() const;
     void init();
 
     static int bioRead(BIO* bio, char* out, int outl);
@@ -153,8 +129,10 @@ class NX_NETWORK_API MixedSslSocket: public SslSocket
 {
 public:
     MixedSslSocket(AbstractStreamSocket* wrappedSocket);
+
     virtual int recv(void* buffer, unsigned int bufferLen, int flags) override;
     virtual int send(const void* buffer, unsigned int bufferLen) override;
+    virtual bool setNonBlockingMode(bool val) override;
 
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
@@ -173,11 +151,12 @@ public:
         std::function<void(SystemError::ErrorCode, size_t)> handler) override;
 
 private:
+    bool updateInternalBlockingMode();
+
     Q_DECLARE_PRIVATE(MixedSslSocket);
 };
 
-class NX_NETWORK_API SslServerSocket
-:
+class NX_NETWORK_API SslServerSocket:
     public SslSocketServerImplementationDelegate
 {
     typedef SslSocketServerImplementationDelegate base_type;
@@ -190,6 +169,7 @@ public:
     virtual bool listen(int queueLen) override;
     virtual AbstractStreamSocket* accept() override;
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
 
     virtual void acceptAsync(
         nx::utils::MoveOnlyFunc<void(

@@ -126,6 +126,7 @@ bool QnTcpListener::bindToLocalAddress()
     {
         QnMutexLocker lk(&d->mutex);
         d->localEndpoint = d->serverSocket->getLocalAddress();
+        d->localPort = d->localEndpoint.port;
     }
 
     NX_LOGX(lm("Server started at %1").str(localAddress), cl_logINFO);
@@ -320,6 +321,7 @@ void QnTcpListener::run()
             if (d->localPort == 0 && d->serverSocket)
                 d->localPort = d->serverSocket->getLocalAddress().port;
 
+            doPeriodicTasks();
             AbstractStreamSocket* clientSocket = d->serverSocket->accept();
             if(clientSocket)
             {
@@ -327,7 +329,9 @@ void QnTcpListener::run()
                 {
                     if (!d->ddosWarned)
                     {
-                        qWarning() << "Too many TCP connections. Possible ddos attack! Ignore connection";
+                        qWarning() << "Amount of TCP connections reached"
+                            << d->connections.size() << "of" << d->maxConnections
+                            << "Possible ddos attack! Reject incoming TCP connection";
                         d->ddosWarned = true;
                     }
                     delete clientSocket;
@@ -360,7 +364,6 @@ void QnTcpListener::run()
                     d->newPort.compare_exchange_strong(zero, d->localPort); //< reopen tcp socket
                 }
             }
-            doPeriodicTasks();
         }
     }
     catch (const std::exception& e)
