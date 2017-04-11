@@ -388,10 +388,10 @@ protected:
 };
 
 /**
- * Result of concurrent task execution
- * Provides methods to wait for concurrent computation completion, get computation progress and get results
+ * Result of concurrent task execution.
+ * Provides methods to wait for concurrent computation completion, get computation progress and get results.
  * 
- * @note Contains array of T elements
+ * NOTE: Contains array of T elements.
  */
 template<class T>
 class Future:
@@ -497,7 +497,7 @@ Future<typename std::result_of<Function(typename Container::value_type)>::type> 
 }
 
 /**
- * Executes with default priority.
+ * Executes function with default priority.
  * @param function To pass member-function here, you have to use std::mem_fn (for now).
  */
 template<typename Container, typename Function>
@@ -510,7 +510,7 @@ Future<typename std::result_of<Function(typename Container::value_type)>::type> 
 }
 
 /**
- * Executes in global thread pool with default priority.
+ * Executes function in global thread pool with default priority.
  * @param function To pass member-function here, you have to use std::mem_fn (for now).
  */
 template<typename Container, typename Function>
@@ -523,7 +523,7 @@ Future<typename std::result_of<Function(typename Container::value_type)>::type> 
 
 /**
  * Runs function in threadPool with priority.
- * @note Execution cannot be canceled.
+ * NOTE: Execution cannot be canceled.
  */
 template<typename Function>
 Future<typename std::result_of<Function()>::type> run(
