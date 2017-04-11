@@ -46,6 +46,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <utils/math/color_transformations.h>
+#include <nx/utils/string.h>
 #include <nx/utils/math/fuzzy.h>
 
 
@@ -2459,7 +2460,8 @@ void QnNxStyle::drawControl(
                         | Qt::TextHideMnemonic;
 
                     /* Measurements don't support Qt::TextHideMnemonic, must use Qt::TextShowMnemonic: */
-                    QString text = buttonOption->fontMetrics.elidedText(buttonOption->text,
+                    const auto fixedText = nx::utils::removeMnemonics(buttonOption->text);
+                    const QString text = buttonOption->fontMetrics.elidedText(fixedText,
                         Qt::ElideRight, textRect.width(), Qt::TextShowMnemonic);
 
                     proxy()->drawItemText(painter, textRect, textFlags, buttonOption->palette,

@@ -1,15 +1,3 @@
-set(_fullRpath ON)
-
-if(CMAKE_CROSSCOMPILING)
-    set(_fullRpath OFF)
-endif()
-
-option(fullRpath
-    "Unset to leave only relative RPATHs (Must be OFF for production builds)."
-    ${_fullRpath})
-
-unset(_fullRpath)
-
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -140,12 +128,10 @@ if(LINUX)
         -Wno-unknown-pragmas
         -Wno-ignored-qualifiers)
 
-    if(fullRpath)
-        set(CMAKE_SKIP_BUILD_RPATH OFF)
-        set(CMAKE_BUILD_WITH_INSTALL_RPATH OFF)
-    else()
-        set(CMAKE_SKIP_BUILD_RPATH ON)
-        set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+    set(CMAKE_SKIP_BUILD_RPATH ON)
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+
+    if(LINUX)
         set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
     endif()
 
