@@ -134,7 +134,7 @@ namespace LLUtil {
             QStringList macs = getMacAddressList(g_hardwareInfo.nics);
             if (macs.isEmpty())
             {
-                qWarning() << "No network cards detected. HardwareID can't be calculated.";
+                NX_LOG(QnLog::HWID_LOG, "No network cards detected. HardwareID can't be calculated.", cl_logERROR);
             }
 
             g_storedMac = saveMac(macs, settings);
@@ -148,7 +148,7 @@ namespace LLUtil {
         }
         catch (const LLUtil::HardwareIdError& err)
         {
-            qWarning() << QLatin1String("getHardwareId()") << err.what();
+            NX_LOG(QnLog::HWID_LOG, QLatin1String("getHardwareId(): %1").arg(err.what()), cl_logERROR);
         }
     }
 
@@ -159,7 +159,7 @@ namespace LLUtil {
     {
         if (version < 0 || version > LATEST_HWID_VERSION)
         {
-            qWarning() << QLatin1String("getHardwareId(): requested hwid of invalid version: ") << version;
+            NX_LOG(QnLog::HWID_LOG, QLatin1String("getHardwareId(): requested hwid of invalid version: $1").arg(version) , cl_logERROR)
             return QStringList();
         }
 
