@@ -5,9 +5,9 @@
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 
-#include <common/common_globals.h>
 #include <nx/network/async_stoppable.h>
 #include <nx/network/http/asynchttpclient.h>
+#include <nx/fusion/serialization_format.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical_functions.h>
 

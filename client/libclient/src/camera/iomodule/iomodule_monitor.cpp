@@ -1,4 +1,7 @@
 #include "iomodule_monitor.h"
+
+#include <common/common_module.h>
+
 #include <nx/utils/log/log.h>
 #include "core/resource/camera_resource.h"
 #include "core/resource/media_server_resource.h"
@@ -76,15 +79,15 @@ bool QnIOModuleMonitor::open()
     query.addQueryItem(lit("physicalId"), m_camera->getUniqueId());
     requestUrl.setQuery(query);
 
-    QnRoute route = QnRouter::instance()->routeTo(server->getId());
+    QnRoute route = commonModule()->router()->routeTo(server->getId());
     if (!route.gatewayId.isNull()) {
         NX_ASSERT(!route.addr.isNull());
         requestUrl.setHost(route.addr.address.toString());
         requestUrl.setPort(route.addr.port);
     }
 
-    m_httpClient->setUserName( QnAppServerConnectionFactory::url().userName().toLower() );
-    m_httpClient->setUserPassword( QnAppServerConnectionFactory::url().password() );
+    m_httpClient->setUserName( commonModule()->currentUrl().userName().toLower() );
+    m_httpClient->setUserPassword( commonModule()->currentUrl().password() );
 
     m_httpClient->doGet(requestUrl);
     return true;

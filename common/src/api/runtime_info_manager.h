@@ -8,8 +8,12 @@
 
 #include <nx/utils/singleton.h>
 #include <utils/common/threadsafe_item_storage.h>
+#include <common/common_module_aware.h>
 
-struct QnPeerRuntimeInfo {
+class QnCommonMessageProcessor;
+
+struct QnPeerRuntimeInfo
+{
     QnPeerRuntimeInfo(){}
     QnPeerRuntimeInfo(const ec2::ApiRuntimeData& runtimeData):
         uuid(runtimeData.peer.id),
@@ -39,13 +43,14 @@ Q_DECLARE_METATYPE(QnPeerRuntimeInfoList)
 Q_DECLARE_METATYPE(QnPeerRuntimeInfoMap)
 
 
-class QnRuntimeInfoManager: public QObject,
-    public Singleton<QnRuntimeInfoManager>,
+class QnRuntimeInfoManager:
+    public QObject,
+    public QnCommonModuleAware,
     private QnThreadsafeItemStorageNotifier<QnPeerRuntimeInfo>
 {
     Q_OBJECT
 public:
-    QnRuntimeInfoManager(QObject* parent = NULL);
+    QnRuntimeInfoManager(QObject* parent);
 
     const QnThreadsafeItemStorage<QnPeerRuntimeInfo> *items() const;
 
@@ -54,6 +59,7 @@ public:
     bool hasItem(const QnUuid& id);
     QnPeerRuntimeInfo item(const QnUuid& id) const;
 
+    void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
     void updateLocalItem(const QnPeerRuntimeInfo& value);
 signals:
     void runtimeInfoAdded(const QnPeerRuntimeInfo &data);
@@ -68,6 +74,6 @@ private:
     mutable QnMutex m_mutex;
     mutable QnMutex m_updateMutex;
     QScopedPointer<QnThreadsafeItemStorage<QnPeerRuntimeInfo> > m_items;
+    QnCommonMessageProcessor* m_messageProcessor = nullptr;
 };
 
-#define qnRuntimeInfoManager QnRuntimeInfoManager::instance()

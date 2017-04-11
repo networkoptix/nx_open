@@ -25,6 +25,15 @@
 #include "settings.h"
 
 #include <utils/common/delayed.h>
+#include <business/business_message_bus.h>
+#include <plugins/storage/dts/vmax480/vmax480_tcp_server.h>
+#include <streaming/streaming_chunk_cache.h>
+#include <recorder/file_deletor.h>
+#include <core/ptz/server_ptz_controller_pool.h>
+#include <recorder/storage_db_pool.h>
+#include <recorder/storage_manager.h>
+#include <common/static_common_module.h>
+#include <utils/common/app_info.h>
 
 namespace {
 
@@ -39,8 +48,16 @@ void installTranslations()
 
 } // namespace
 
-QnMediaServerModule::QnMediaServerModule(const QString& enforcedMediatorEndpoint, QObject *parent):
-    QObject(parent)
+QnMediaServerModule::QnMediaServerModule(
+    const QString& enforcedMediatorEndpoint,
+    QObject* parent)
+:
+    m_staticCommon(new QnStaticCommonModule(
+        Qn::PT_Server,
+        QnAppInfo::productNameShort(),
+        QnAppInfo::customizationName(),
+        this)),
+    m_commonModule(new QnCommonModule(/*clientMode*/ false, this))
 {
     instance<QnLongRunnablePool>();
 
@@ -62,18 +79,52 @@ QnMediaServerModule::QnMediaServerModule(const QString& enforcedMediatorEndpoint
     }
 #endif //ENABLE_ONVIF
 
-    m_common = new QnCommonModule(this);
-    m_common->store(new QnFfmpegInitializer());
+    store(new QnFfmpegInitializer());
 
     if (!enforcedMediatorEndpoint.isEmpty())
         nx::network::SocketGlobals::mediatorConnector().mockupAddress(enforcedMediatorEndpoint);
     nx::network::SocketGlobals::mediatorConnector().enable(true);
 
-    m_common->store(new QnNewSystemServerFlagWatcher());
+    store(new QnNewSystemServerFlagWatcher(commonModule()));
+    store(new QnBusinessMessageBus(commonModule()));
+#ifdef ENABLE_VMAX
+    store(new QnVMax480Server(commonModule()));
+#endif
+
+    store(new QnServerPtzControllerPool(commonModule()));
+
+    store(new QnStorageDbPool(commonModule()));
+
+    m_streamingChunkCache.reset(new StreamingChunkCache(commonModule()));
+
+    m_normalStorageManager.reset(
+        new QnStorageManager(
+            commonModule(),
+            QnServer::StoragePool::Normal
+        ));
+
+    m_backupStorageManager.reset(
+        new QnStorageManager(
+            commonModule(),
+            QnServer::StoragePool::Backup
+        ));
+
+    store(new QnFileDeletor(commonModule()));
 
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
 }
 
-QnMediaServerModule::~QnMediaServerModule() {
+QnMediaServerModule::~QnMediaServerModule()
+{
+}
+
+StreamingChunkCache* QnMediaServerModule::streamingChunkCache() const
+{
+    return m_streamingChunkCache.get();
+}
+
+QnCommonModule* QnMediaServerModule::commonModule() const
+{
+    return m_commonModule;
 }

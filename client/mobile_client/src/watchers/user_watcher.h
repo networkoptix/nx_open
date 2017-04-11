@@ -2,10 +2,12 @@
 
 #include <QtCore/QObject>
 
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource/resource_fwd.h>
 #include <utils/common/connective.h>
 
-class QnUserWatcher: public Connective<QObject>
+class QnUserWatcher: public Connective<QObject>, public QnConnectionContextAware
 {
     Q_OBJECT
     /* This property should remain read-only for QML! */

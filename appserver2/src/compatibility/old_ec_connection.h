@@ -54,7 +54,6 @@ namespace ec2
 
         virtual void addRemotePeer(const QUrl& url) override;
         virtual void deleteRemotePeer(const QUrl& url) override;
-        virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) override;
 
         virtual Timestamp getTransactionLogTime() const override;
         virtual void setTransactionLogTime(Timestamp value) override;
@@ -63,6 +62,8 @@ namespace ec2
         virtual void startReceivingNotifications() override;
         virtual void stopReceivingNotifications() override;
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
+        virtual QnTransactionMessageBus* messageBus() const override { return nullptr; }
+        virtual QnCommonModule* commonModule() const override { return nullptr; }
     protected:
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;
         virtual int dumpDatabaseToFileAsync( const QString& dumpFilePath, ec2::impl::SimpleHandlerPtr) override;

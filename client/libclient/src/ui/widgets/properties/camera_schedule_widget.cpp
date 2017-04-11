@@ -116,9 +116,9 @@ public:
 
     virtual bool validate(const QSet<QnUuid>& selected) override
     {
-        auto cameras = qnResPool->getResources<QnVirtualCameraResource>(selected);
+        auto cameras = resourcePool()->getResources<QnVirtualCameraResource>(selected);
 
-        QnCamLicenseUsageHelper helper(cameras, m_recordingEnabled);
+        QnCamLicenseUsageHelper helper(cameras, m_recordingEnabled, commonModule());
 
         QPalette palette = m_parentPalette;
         bool licensesOk = helper.isValid();
@@ -223,7 +223,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
         &QnCameraScheduleWidget::updateColors);
     updateColors();
 
-    QnCamLicenseUsageHelper helper;
+    QnCamLicenseUsageHelper helper(commonModule());
     ui->licensesUsageWidget->init(&helper);
 
     QnCheckbox::autoCleanTristate(ui->enableRecordingCheckBox);
@@ -820,7 +820,7 @@ void QnCameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList& value)
 
 bool QnCameraScheduleWidget::canEnableRecording() const
 {
-    QnCamLicenseUsageHelper licenseHelper(m_cameras, true);
+    QnCamLicenseUsageHelper licenseHelper(m_cameras, true, commonModule());
     return all_of(m_cameras,
         [&licenseHelper](const QnVirtualCameraResourcePtr& camera)
         {
@@ -957,7 +957,7 @@ void QnCameraScheduleWidget::updateGridEnabledState()
 
 void QnCameraScheduleWidget::updateLicensesLabelText()
 {
-    QnCamLicenseUsageHelper helper;
+    QnCamLicenseUsageHelper helper(commonModule());
 
     switch (ui->enableRecordingCheckBox->checkState())
     {
@@ -1227,7 +1227,7 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked()
         camera->setScheduleTasks(tasks);
     };
 
-    auto selectedCameras = qnResPool->getResources<QnVirtualCameraResource>(
+    auto selectedCameras = resourcePool()->getResources<QnVirtualCameraResource>(
         dialog->selectedResources());
     qnResourcesChangesManager->saveCameras(selectedCameras, applyChanges);
     updateLicensesLabelText();
@@ -1302,6 +1302,7 @@ void QnCameraScheduleWidget::validateArchiveLength()
     if (alertVisible)
     {
         alertText = QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
             tr("High minimum value can lead to archive length decrease on other devices."),
             tr("High minimum value can lead to archive length decrease on other cameras."));
     }

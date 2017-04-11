@@ -6,6 +6,7 @@
 #include <QTime>
 
 #include <common/common_module.h>
+
 #include <utils/common/enable_multi_thread_direct_connection.h>
 
 #include <nx_ec/ec_api.h>
@@ -28,18 +29,21 @@ class QnRuntimeTransactionLog;
 
 namespace ec2 {
 class ECConnectionNotificationManager;
+class TimeSynchronizationManager;
 
 class QnTransactionMessageBus
     :
     public QObject,
-    public EnableMultiThreadDirectConnection<QnTransactionMessageBus>
+    public EnableMultiThreadDirectConnection<QnTransactionMessageBus>,
+    public QnCommonModuleAware
 {
     Q_OBJECT
 public:
-    QnTransactionMessageBus(Qn::PeerType peerType);
-    virtual ~QnTransactionMessageBus();
+    QnTransactionMessageBus(detail::QnDbManager* db,
+        Qn::PeerType peerType,
+        QnCommonModule* commonModule);
 
-    static QnTransactionMessageBus* instance();
+    virtual ~QnTransactionMessageBus();
 
     void addConnectionToPeer(const QUrl& url);
     void removeConnectionFromPeer(const QUrl& url);
@@ -94,8 +98,8 @@ public:
         QnMutexLocker lock(&m_mutex);
         if (m_connections.isEmpty())
             return;
-        QnTransactionTransportHeader ttHeader(connectedServerPeers() << qnCommon->moduleGUID(), dstPeers);
-        ttHeader.fillSequence();
+        QnTransactionTransportHeader ttHeader(connectedServerPeers() << commonModule()->moduleGUID(), dstPeers);
+        ttHeader.fillSequence(commonModule()->moduleGUID(), commonModule()->runningInstanceGUID());
         sendTransactionInternal(tran, ttHeader);
     }
 
@@ -148,6 +152,7 @@ public:
 
     ConnectionGuardSharedState* connectionGuardSharedState();
 
+    void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager);
 signals:
     void peerLost(ApiPeerAliveData data);
     //!Emitted when a new peer has joined cluster or became online
@@ -261,6 +266,7 @@ private:
     void sendDelayedAliveTran();
     void reconnectAllPeers(QnMutexLockerBase* const /*lock*/);
 
+    QUrl addCurrentPeerInfo(const QUrl& srcUrl) const;
 private slots:
     void at_stateChanged(QnTransactionTransport::State state);
     void at_gotTransaction(
@@ -275,10 +281,12 @@ private slots:
     void onEc2ConnectionSettingsChanged(const QString& key);
 
 private:
+    detail::QnDbManager* m_db = nullptr;
+    TimeSynchronizationManager* m_timeSyncManager = nullptr;
+
     /** Info about us. */
     Qn::PeerType m_localPeerType;
 
-    //QScopedPointer<QnBinaryTransactionSerializer> m_binaryTranSerializer;
     QScopedPointer<QnJsonTransactionSerializer> m_jsonTranSerializer;
     QScopedPointer<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
 
@@ -322,4 +330,3 @@ private:
 
 } //namespace ec2
 
-#define qnTransactionBus ec2::QnTransactionMessageBus::instance()

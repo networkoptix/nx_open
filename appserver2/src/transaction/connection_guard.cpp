@@ -9,18 +9,22 @@ namespace ec2
 *************************************************************/
 
 ConnectionLockGuard::ConnectionLockGuard(
+    const QnUuid& localId,
     ConnectionGuardSharedState* const sharedState)
     :
+    m_localId(localId),
     m_sharedState(sharedState),
     m_state(State::Initial)
 {
 }
 
 ConnectionLockGuard::ConnectionLockGuard(
+    const QnUuid& localId,
     ConnectionGuardSharedState* const sharedState,
     const QnUuid& peerGuid,
     Direction direction)
     :
+    m_localId(localId),
     m_sharedState(sharedState),
     m_peerGuid(peerGuid),
     m_direction(direction),
@@ -31,6 +35,10 @@ ConnectionLockGuard::ConnectionLockGuard(
 ConnectionLockGuard::ConnectionLockGuard(ConnectionLockGuard&& rhs):
     m_sharedState(rhs.m_sharedState)
 {
+
+    m_localId = std::move(rhs.m_localId);
+    rhs.m_localId = QnUuid();
+
     m_peerGuid = std::move(rhs.m_peerGuid);
     rhs.m_peerGuid = QnUuid();
 
@@ -44,6 +52,9 @@ ConnectionLockGuard& ConnectionLockGuard::operator=(ConnectionLockGuard&& rhs)
         return *this;
 
     NX_CRITICAL(m_sharedState == rhs.m_sharedState);
+
+    m_localId = std::move(rhs.m_localId);
+    rhs.m_localId = QnUuid();
 
     m_peerGuid = std::move(rhs.m_peerGuid);
     rhs.m_peerGuid = QnUuid();
@@ -69,7 +80,7 @@ bool ConnectionLockGuard::tryAcquireConnecting()
     bool isTowardConnecting = (m_direction == Direction::Outgoing)
         ? m_sharedState->m_connectingList.value(m_peerGuid).second
         : m_sharedState->m_connectingList.value(m_peerGuid).first;
-    bool fail = isExist || (isTowardConnecting && m_peerGuid.toRfc4122() > qnCommon->moduleGUID().toRfc4122());
+    bool fail = isExist || (isTowardConnecting && m_peerGuid.toRfc4122() > m_localId.toRfc4122());
     if (!fail)
     {
         if (m_direction == Direction::Outgoing)
@@ -94,7 +105,7 @@ bool ConnectionLockGuard::tryAcquireConnected()
     bool isTowardConnecting = (m_direction == Direction::Outgoing)
         ? m_sharedState->m_connectingList.value(m_peerGuid).second
         : m_sharedState->m_connectingList.value(m_peerGuid).first;
-    bool fail = isTowardConnecting && m_peerGuid.toRfc4122() > qnCommon->moduleGUID().toRfc4122();
+    bool fail = isTowardConnecting && m_peerGuid.toRfc4122() > m_localId.toRfc4122();
     if (fail)
         return false;
 

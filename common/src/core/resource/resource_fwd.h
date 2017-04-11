@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include <licensing/license_fwd.h>
+
 #include "shared_resource_pointer.h"
 #include "shared_resource_pointer_list.h"
 
@@ -23,10 +25,6 @@ struct QnCameraHistoryItem;
 class QnCameraHistory;
 typedef QSharedPointer<QnCameraHistory> QnCameraHistoryPtr;
 typedef QList<QnCameraHistoryPtr> QnCameraHistoryList;
-
-class QnLicense;
-typedef QSharedPointer<QnLicense> QnLicensePtr;
-typedef QList<QnLicensePtr> QnLicenseList;
 
 class QnVideoWallItem;
 class QnVideoWallMatrix;

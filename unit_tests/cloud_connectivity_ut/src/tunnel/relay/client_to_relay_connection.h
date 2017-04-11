@@ -9,9 +9,9 @@ namespace relay {
 namespace test {
 
 class ClientToRelayConnection:
-    public api::ClientToRelayConnection
+    public nx::cloud::relay::api::ClientToRelayConnection
 {
-    using base_type = api::ClientToRelayConnection;
+    using base_type = nx::cloud::relay::api::ClientToRelayConnection;
 
 public:
     ClientToRelayConnection();
@@ -20,10 +20,10 @@ public:
     virtual void startSession(
         const nx::String& desiredSessionId,
         const nx::String& /*targetPeerName*/,
-        api::StartClientConnectSessionHandler handler) override;
+        nx::cloud::relay::api::StartClientConnectSessionHandler handler) override;
     virtual void openConnectionToTheTargetHost(
         const nx::String& /*sessionId*/,
-        api::OpenRelayConnectionHandler handler) override;
+        nx::cloud::relay::api::OpenRelayConnectionHandler handler) override;
     virtual SystemError::ErrorCode prevRequestSysErrorCode() const override;
 
     int scheduledRequestCount() const;

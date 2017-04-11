@@ -29,12 +29,14 @@ int QnPermissionsHelper::safeModeError(QnRestResult &result)
     return nx_http::StatusCode::forbidden;
 }
 
-bool QnPermissionsHelper::hasOwnerPermissions(const Qn::UserAccessData& accessRights)
+bool QnPermissionsHelper::hasOwnerPermissions(
+    QnResourcePool* resPool,
+    const Qn::UserAccessData& accessRights)
 {
     if (accessRights == Qn::kSystemAccess)
         return true; //< serve auth key authrozation
 
-    auto userResource = qnResPool->getResourceById<QnUserResource>(accessRights.userId);
+    auto userResource = resPool->getResourceById<QnUserResource>(accessRights.userId);
     return userResource && userResource->isOwner();
 }
 

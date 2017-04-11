@@ -21,6 +21,9 @@
 #include <client/client_runtime_settings.h>
 
 #include <common/common_meta_types.h>
+#include <common/common_module.h>
+
+#include <client_core/client_core_module.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
@@ -88,7 +91,8 @@ static void updateTreeItem(QnResourceTreeWidget* tree, const QnWorkbenchItem* it
     if (!item)
         return;
 
-    const auto resource = qnResPool->getResourceByUniqueId(item->resourceUid());
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    const auto resource = resourcePool->getResourceByUniqueId(item->resourceUid());
     if (!resource)
         return;
 
@@ -117,6 +121,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     ui->typeComboBox->addItem(tr("Video Files"), static_cast<int>(Qn::local | Qn::video));
     ui->typeComboBox->addItem(tr("Image Files"), static_cast<int>(Qn::still_image));
     ui->typeComboBox->addItem(QnDeviceDependentStrings::getDefaultNameFromSet(
+        resourcePool(),
         tr("Live Devices"),
         tr("Live Cameras")
     ), static_cast<int>(Qn::live));
@@ -185,7 +190,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     *m_disconnectHelper << connect(this->context(), &QnWorkbenchContext::userChanged,
         this, [this]() { ui->tabWidget->setCurrentWidget(ui->resourcesTab); });
 
-    *m_disconnectHelper << connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    *m_disconnectHelper << connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
         {
             if (resource == m_tooltipResource)
@@ -432,7 +437,7 @@ QnVideoWallItemIndexList QnResourceBrowserWidget::selectedVideoWallItems() const
         QnUuid uuid = modelIndex.data(Qn::ItemUuidRole).value<QnUuid>();
         if (uuid.isNull())
             continue;
-        QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(uuid);
+        QnVideoWallItemIndex index = resourcePool()->getVideoWallItemByUuid(uuid);
         if (!index.isNull())
             result.push_back(index);
     }
@@ -450,7 +455,7 @@ QnVideoWallMatrixIndexList QnResourceBrowserWidget::selectedVideoWallMatrices() 
         if (uuid.isNull())
             continue;
 
-        QnVideoWallMatrixIndex index = qnResPool->getVideoWallMatrixByUuid(uuid);
+        QnVideoWallMatrixIndex index = resourcePool()->getVideoWallMatrixByUuid(uuid);
         if (!index.isNull())
             result.push_back(index);
     }
@@ -937,7 +942,7 @@ void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool
 
     if (nodeType == Qn::VideoWallItemNode)
     {
-        auto item = qnResPool->getVideoWallItemByUuid(index.data(Qn::UuidRole).value<QnUuid>());
+        auto item = resourcePool()->getVideoWallItemByUuid(index.data(Qn::UuidRole).value<QnUuid>());
         menu()->triggerIfPossible(QnActions::StartVideoWallControlAction,
             QnVideoWallItemIndexList() << item);
         return;

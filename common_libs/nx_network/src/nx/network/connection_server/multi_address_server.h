@@ -10,12 +10,10 @@
 #include <memory>
 #include <tuple>
 
-#include <common/common_globals.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/log/log.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_factory.h>
-
 
 //!Listens multiple addresses by creating multiple servers (\a SocketServerType)
 template<class SocketServerType>

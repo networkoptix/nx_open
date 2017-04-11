@@ -35,10 +35,10 @@ QnUserRolesSettingsModel::QnUserRolesSettingsModel(QObject* parent /*= nullptr*/
     m_currentUserRoleId(),
     m_userRoles()
 {
-    auto predefinedRoles = qnUserRolesManager->predefinedRoles();
+    auto predefinedRoles = userRolesManager()->predefinedRoles();
     predefinedRoles << Qn::UserRole::CustomPermissions << Qn::UserRole::CustomUserRole;
     for (auto role : predefinedRoles)
-        m_predefinedNames << qnUserRolesManager->userRoleName(role).trimmed().toLower();
+        m_predefinedNames << userRolesManager()->userRoleName(role).trimmed().toLower();
 }
 
 QnUserRolesSettingsModel::~QnUserRolesSettingsModel()
@@ -64,7 +64,7 @@ void QnUserRolesSettingsModel::setUserRoles(const ec2::ApiUserRoleDataList& valu
 
     m_accessibleResources.clear();
     for (const auto& role : m_userRoles)
-        m_accessibleResources[role.id] = qnSharedResourcesManager->sharedResources(role);
+        m_accessibleResources[role.id] = sharedResourcesManager()->sharedResources(role);
 
     m_replacements.clear();
 
@@ -233,7 +233,7 @@ void QnUserRolesSettingsModel::setAccessibleResources(const QSet<QnUuid>& value)
 
 QnResourceAccessSubject QnUserRolesSettingsModel::subject() const
 {
-    return qnUserRolesManager->userRole(m_currentUserRoleId);
+    return userRolesManager()->userRole(m_currentUserRoleId);
 }
 
 ec2::ApiUserRoleDataList::iterator QnUserRolesSettingsModel::currentRole()
@@ -260,7 +260,7 @@ QnUserResourceList QnUserRolesSettingsModel::users(
     if (userRoleId.isNull())
         return QnUserResourceList();
 
-    return qnResPool->getResources<QnUserResource>().filtered(
+    return resourcePool()->getResources<QnUserResource>().filtered(
         [this, userRoleId, withCandidates](const QnUserResourcePtr& user)
         {
             QnUuid id = user->userRoleId();

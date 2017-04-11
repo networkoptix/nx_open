@@ -1,5 +1,7 @@
 #pragma once
 
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource/layout_tour_item.h>
 
 #include <nx_ec/data/api_layout_tour_data.h>
@@ -8,7 +10,9 @@
 #include <nx/utils/singleton.h>
 #include <nx/utils/uuid.h>
 
-class QnLayoutTourManager: public QObject, public Singleton<QnLayoutTourManager>
+class QnLayoutTourManager: public QObject,
+    public Singleton<QnLayoutTourManager>,
+    public QnConnectionContextAware
 {
     Q_OBJECT
     using base_type = QObject;

@@ -1,7 +1,5 @@
 #include "stun_extension_types.h"
 
-#include <common/common_globals.h>
-
 namespace nx {
 namespace stun {
 namespace extension {

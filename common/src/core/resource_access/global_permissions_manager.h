@@ -10,15 +10,17 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <utils/common/connective.h>
+#include <common/common_module_aware.h>
 
-class QnGlobalPermissionsManager: public Connective<QObject>,
-    public Singleton<QnGlobalPermissionsManager>
+class QnGlobalPermissionsManager:
+    public Connective<QObject>,
+    public QnCommonModuleAware
 {
     Q_OBJECT
 
     using base_type = Connective<QObject>;
 public:
-    QnGlobalPermissionsManager(QObject* parent = nullptr);
+    QnGlobalPermissionsManager(QObject* parent);
     virtual ~QnGlobalPermissionsManager();
 
     /** Get a set of global permissions that will not work without the given one. */
@@ -72,5 +74,3 @@ private:
     mutable QnMutex m_mutex;
     QHash<QnUuid, Qn::GlobalPermissions> m_cache;
 };
-
-#define qnGlobalPermissionsManager QnGlobalPermissionsManager::instance()

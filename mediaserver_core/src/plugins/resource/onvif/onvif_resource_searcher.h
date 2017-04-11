@@ -9,10 +9,10 @@
 //#include "onvif_resource_searcher_mdns.h"
 
 
-class OnvifResourceSearcher : public QnAbstractNetworkResourceSearcher
+class OnvifResourceSearcher: public QnAbstractNetworkResourceSearcher
 {
 public:
-    OnvifResourceSearcher();
+    OnvifResourceSearcher(QnCommonModule* commonModule);
     virtual ~OnvifResourceSearcher();
 
     virtual void pleaseStop() override;
@@ -26,8 +26,10 @@ public:
     virtual QString manufacture() const override;
 
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
+protected:
+    std::unique_ptr<OnvifResourceInformationFetcher> m_informationFetcher;
 private:
-    OnvifResourceSearcherWsdd m_wsddSearcher;
+    std::unique_ptr<OnvifResourceSearcherWsdd> m_wsddSearcher;
     int autoDetectDevicePort(const QUrl& url);
     //OnvifResourceSearcherMdns m_mdnsSearcher;
 

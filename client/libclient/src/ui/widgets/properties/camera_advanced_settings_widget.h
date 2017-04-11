@@ -2,6 +2,8 @@
 
 #include <QtWidgets/QWidget>
 
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource/resource_fwd.h>
 
 #include <utils/common/connective.h>
@@ -15,7 +17,7 @@ class QNetworkProxy;
 class QAuthenticator;
 class CameraAdvancedSettingsWebPage;
 
-class QnCameraAdvancedSettingsWidget: public Connective<QWidget>
+class QnCameraAdvancedSettingsWidget: public Connective<QWidget>, public QnConnectionContextAware
 {
     Q_OBJECT
 

@@ -51,6 +51,7 @@ QnStatusOverlayController::QnStatusOverlayController(
 
     m_isErrorOverlay(isErrorOverlayCheck(m_statusOverlay))
 {
+    NX_ASSERT(resource);
     NX_ASSERT(m_widget, "Status overlay widget can't be nullptr");
     if (!m_widget)
         return;
@@ -260,6 +261,8 @@ QString QnStatusOverlayController::statusIcon(Qn::ResourceStatusOverlay overlay)
 QnStatusOverlayController::IntStringHash
 QnStatusOverlayController::getButtonCaptions(const QnResourcePtr& resource)
 {
+    NX_ASSERT(resource);
+
     const auto settingNameSet = QnCameraDeviceStringSet(
         tr("Device Settings"),
         tr("Camera Settings"),
@@ -272,7 +275,13 @@ QnStatusOverlayController::getButtonCaptions(const QnResourcePtr& resource)
     result.insert(toInt(Qn::ResourceOverlayButton::Diagnostics), tr("Diagnostics"));
     result.insert(toInt(Qn::ResourceOverlayButton::IoEnable), tr("Enable"));
     result.insert(toInt(Qn::ResourceOverlayButton::MoreLicenses), tr("Activate License"));
-    result.insert(toInt(Qn::ResourceOverlayButton::Settings),
-        QnDeviceDependentStrings::getNameFromSet(settingNameSet, camera));
+    if (resource)
+    {
+        result.insert(toInt(Qn::ResourceOverlayButton::Settings),
+            QnDeviceDependentStrings::getNameFromSet(
+                resource->resourcePool(),
+                settingNameSet,
+                camera));
+    }
     return result;
 }

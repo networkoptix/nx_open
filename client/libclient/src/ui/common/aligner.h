@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QPointer>
+
 class AbstractAccessor;
 
 /** Helper class to make several widgets always have the same width (yet). */
@@ -56,6 +58,7 @@ private:
     QList<QnAligner*> m_aligners;
     QHash<QLatin1String, AbstractAccessor *> m_accessorByClassName;
     QScopedPointer<AbstractAccessor> m_defaultAccessor;
+    QPointer<QnAligner> m_masterAligner;
     bool m_skipInvisible;
     int m_minimumWidth;
 };

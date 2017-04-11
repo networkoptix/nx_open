@@ -135,6 +135,7 @@ namespace Qn
         ResourceSearchStringRole,                   /**< Role for resource search string. Value of type QString. */
         ResourceStatusRole,                         /**< Role for resource status. Value of type int (Qn::ResourceStatus). */
         ResourceUidRole,                            /**< Role for resource unique id. Value of type QString. */
+        ResourceIconKeyRole,                        /**< Role for resource custom icon key. Value of type QString. */
 
         VideoWallGuidRole,                          /**< Role for videowall resource unique id. Value of type QnUuid. */
         VideoWallItemGuidRole,                      /**< Role for videowall item unique id. Value of type QnUuid. */

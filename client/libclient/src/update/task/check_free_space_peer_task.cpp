@@ -72,7 +72,7 @@ void QnCheckFreeSpacePeerTask::doStart()
             QSet<QnUuid> failed;
             for (const auto& id: peers())
             {
-                const auto server = qnResPool->getResourceById<QnMediaServerResource>(id);
+                const auto server = resourcePool()->getResourceById<QnMediaServerResource>(id);
                 if (!server)
                 {
                     finish(CheckFailed, peers());
@@ -105,7 +105,7 @@ void QnCheckFreeSpacePeerTask::doStart()
                 finish(NotEnoughFreeSpaceError, failed);
         };
 
-    const auto currentServer = qnCommon->currentServer();
+    const auto currentServer = commonModule()->currentServer();
     if (!currentServer)
     {
         finish(CheckFailed);
@@ -119,7 +119,7 @@ void QnCheckFreeSpacePeerTask::doCancel()
 {
     if (m_requestId >= 0)
     {
-        const auto currentServer = qnCommon->currentServer();
+        const auto currentServer = commonModule()->currentServer();
         if (currentServer)
             currentServer->restConnection()->cancelRequest(m_requestId);
         m_requestId = -1;

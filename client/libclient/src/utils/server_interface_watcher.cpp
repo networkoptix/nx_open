@@ -14,13 +14,13 @@ QnServerInterfaceWatcher::QnServerInterfaceWatcher(QObject *parent) :
 {
     connect(qnModuleFinder,     &QnModuleFinder::moduleAddressFound,     this,   &QnServerInterfaceWatcher::at_connectionChanged);
     connect(qnModuleFinder,     &QnModuleFinder::moduleAddressLost,     this,   &QnServerInterfaceWatcher::at_connectionChanged);
-    connect(qnResPool,  &QnResourcePool::statusChanged, this,   &QnServerInterfaceWatcher::at_resourcePool_statusChanged);
-    connect(qnResPool,  &QnResourcePool::resourceAdded, this,   &QnServerInterfaceWatcher::at_resourcePool_resourceAdded);
+    connect(resourcePool(),  &QnResourcePool::statusChanged, this,   &QnServerInterfaceWatcher::at_resourcePool_statusChanged);
+    connect(resourcePool(),  &QnResourcePool::resourceAdded, this,   &QnServerInterfaceWatcher::at_resourcePool_resourceAdded);
 }
 
 void QnServerInterfaceWatcher::at_connectionChanged(const QnModuleInformation &moduleInformation) 
 {
-    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(moduleInformation.id);
+    QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(moduleInformation.id);
     if (!server)
         return;
     updatePrimaryInterface(server);
@@ -30,12 +30,12 @@ void QnServerInterfaceWatcher::at_resourcePool_resourceAdded(const QnResourcePtr
     if (!resource->hasFlags(Qn::server))
         return;
 
-    QnMediaServerResourcePtr currentServer = qnCommon->currentServer();
+    QnMediaServerResourcePtr currentServer = commonModule()->currentServer();
     if (resource != currentServer)
         return;
 
     const SocketAddress address = 
-        nx::network::url::getEndpoint(QnAppServerConnectionFactory::url());
+        nx::network::url::getEndpoint(commonModule()->currentUrl());
     currentServer->setPrimaryAddress(address);
     NX_LOG(
         lit("QnServerInterfaceWatcher: Set primary address of %1 (%2) to default %3")

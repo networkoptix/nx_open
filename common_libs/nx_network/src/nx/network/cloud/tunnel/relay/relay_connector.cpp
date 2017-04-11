@@ -18,7 +18,8 @@ Connector::Connector(
     m_relayEndpoint(relayEndpoint),
     m_targetHostAddress(std::move(targetHostAddress)),
     m_connectSessionId(std::move(connectSessionId)),
-    m_clientToRelayConnection(api::ClientToRelayConnectionFactory::create(relayEndpoint))
+    m_clientToRelayConnection(
+        nx::cloud::relay::api::ClientToRelayConnectionFactory::create(relayEndpoint))
 {
     bindToAioThread(getAioThread());
 }
@@ -56,7 +57,7 @@ void Connector::connect(
         m_connectSessionId,
         m_targetHostAddress.host.toString().toUtf8(),
         [this](
-            api::ResultCode resultCode,
+            nx::cloud::relay::api::ResultCode resultCode,
             nx::String sessionId)
         {
             onStartRelaySessionResponse(
@@ -78,14 +79,14 @@ void Connector::stopWhileInAioThread()
 }
 
 void Connector::onStartRelaySessionResponse(
-    api::ResultCode resultCode,
+    nx::cloud::relay::api::ResultCode resultCode,
     SystemError::ErrorCode sysErrorCode,
     nx::String sessionId)
 {
     decltype(m_handler) handler;
     handler.swap(m_handler);
 
-    if (resultCode != api::ResultCode::ok)
+    if (resultCode != nx::cloud::relay::api::ResultCode::ok)
     {
         m_clientToRelayConnection.reset();
         m_timer.pleaseStopSync();
@@ -110,7 +111,7 @@ void Connector::onStartRelaySessionResponse(
 void Connector::connectTimedOut()
 {
     onStartRelaySessionResponse(
-        api::ResultCode::timedOut,
+        nx::cloud::relay::api::ResultCode::timedOut,
         SystemError::timedOut,
         nx::String());
 }

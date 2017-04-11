@@ -22,6 +22,7 @@
 #include <nx/network/socket_global.h>
 
 #include <utils/common/app_info.h>
+#include <common/common_module.h>
 
 #define TIMER_DEBUG_LOG(MESSAGE) do \
 { \
@@ -62,6 +63,7 @@ namespace {
 QnDirectModuleFinder::QnDirectModuleFinder(QObject* parent)
 :
     QObject(parent),
+    QnCommonModuleAware(parent),
     m_maxConnections(kDefaultMaxConnections),
     m_checkTimer(new QTimer(this))
 {
@@ -133,7 +135,10 @@ void QnDirectModuleFinder::pleaseStop() {
     m_activeRequests.clear();
 }
 
-void QnDirectModuleFinder::enqueRequest(const QUrl &url) {
+void QnDirectModuleFinder::enqueRequest(const QUrl &url)
+{
+    NX_ASSERT(!url.host().isEmpty());
+
     QUrl reqUrl = requestUrl(url);
     if (m_activeRequests.contains(reqUrl) || m_requestQueue.contains(reqUrl))
         return;
@@ -221,6 +226,7 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply)
         return;
     }
 
+
     auto connectionResult = QnConnectionValidator::validateConnection(moduleInformation);
     if (connectionResult == Qn::IncompatibleInternalConnectionResult)
     {
@@ -282,7 +288,7 @@ void QnDirectModuleFinder::at_checkTimer_timeout()
 
 std::chrono::milliseconds QnDirectModuleFinder::maxPingTimeout() const
 {
-    return QnGlobalSettings::instance()->serverDiscoveryAliveCheckTimeout();
+    return commonModule()->globalSettings()->serverDiscoveryAliveCheckTimeout();
 }
 
 std::chrono::milliseconds QnDirectModuleFinder::aliveCheckInterval() const
@@ -295,5 +301,5 @@ std::chrono::milliseconds QnDirectModuleFinder::aliveCheckInterval() const
 
 std::chrono::milliseconds QnDirectModuleFinder::discoveryCheckInterval() const
 {
-    return QnGlobalSettings::instance()->serverDiscoveryPingTimeout();
+    return commonModule()->globalSettings()->serverDiscoveryPingTimeout();
 }

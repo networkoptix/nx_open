@@ -26,11 +26,11 @@ class QnMultiserverBookmarksRestHandlerPrivate
 {
 public:
     static QString urlPath;
-    static QnCameraBookmarkList getBookmarks(QnGetBookmarksRequestContext& context);
-    static QnCameraBookmarkTagList getBookmarkTags(QnGetBookmarkTagsRequestContext& context);
-    static bool addBookmark(QnUpdateBookmarkRequestContext &context);
-    static bool updateBookmark(QnUpdateBookmarkRequestContext &context);
-    static bool deleteBookmark(QnDeleteBookmarkRequestContext &context);
+    static QnCameraBookmarkList getBookmarks(QnCommonModule* commonModule, QnGetBookmarksRequestContext& context);
+    static QnCameraBookmarkTagList getBookmarkTags(QnCommonModule* commonModule, QnGetBookmarkTagsRequestContext& context);
+    static bool addBookmark(QnCommonModule* commonModule, QnUpdateBookmarkRequestContext &context);
+    static bool updateBookmark(QnCommonModule* commonModule, QnUpdateBookmarkRequestContext &context);
+    static bool deleteBookmark(QnCommonModule* commonModule, QnDeleteBookmarkRequestContext &context);
 
     static QnBookmarkOperation getOperation(const QString &path);
 };

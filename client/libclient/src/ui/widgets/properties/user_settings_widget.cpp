@@ -4,6 +4,8 @@
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 
+#include <common/common_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 
@@ -391,7 +393,7 @@ void QnUserSettingsWidget::setupInputFields()
             if (text.trimmed().isEmpty())
                 return Qn::ValidationResult(tr("Login cannot be empty."));
 
-            for (const QnUserResourcePtr& user : qnResPool->getResources<QnUserResource>())
+            for (const QnUserResourcePtr& user : resourcePool()->getResources<QnUserResource>())
             {
                 if (user == m_model->user())
                     continue;
@@ -450,7 +452,7 @@ void QnUserSettingsWidget::setupInputFields()
                 return result;
 
             auto email = text.trimmed().toLower();
-            for (const auto& user : qnResPool->getResources<QnUserResource>())
+            for (const auto& user : resourcePool()->getResources<QnUserResource>())
             {
                 if (!user->isCloud())
                     continue;

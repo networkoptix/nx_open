@@ -6,6 +6,8 @@
 #include <api/model/rebuild_archive_reply.h>
 #include <api/model/storage_space_reply.h>
 
+#include <common/common_module.h>
+
 #include <nx_ec/managers/abstract_server_manager.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
@@ -140,10 +142,10 @@ QnServerStorageManager::QnServerStorageManager( QObject *parent )
         disconnect(server, nullptr, this, nullptr);
     };
 
-    connect(qnResPool, &QnResourcePool::resourceAdded,      this, resourceAdded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved,    this, resourceRemoved);
+    connect(resourcePool(), &QnResourcePool::resourceAdded,      this, resourceAdded);
+    connect(resourcePool(), &QnResourcePool::resourceRemoved,    this, resourceRemoved);
 
-    const auto allServers = qnResPool->getAllServers(Qn::AnyStatus);
+    const auto allServers = resourcePool()->getAllServers(Qn::AnyStatus);
     for (const QnMediaServerResourcePtr &server: allServers)
         resourceAdded(server);
 
@@ -238,7 +240,7 @@ void QnServerStorageManager::checkStoragesStatus( const QnMediaServerResourcePtr
 //TODO: #GDM SafeMode
 void QnServerStorageManager::saveStorages(const QnStorageResourceList &storages )
 {
-    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+    ec2::AbstractECConnectionPtr conn = commonModule()->ec2Connection();
     if (!conn)
         return;
 
@@ -261,7 +263,7 @@ void QnServerStorageManager::saveStorages(const QnStorageResourceList &storages 
 //TODO: #GDM SafeMode
 void QnServerStorageManager::deleteStorages(const ec2::ApiIdDataList &ids )
 {
-    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+    ec2::AbstractECConnectionPtr conn = commonModule()->ec2Connection();
     if (!conn)
         return;
 
@@ -408,7 +410,7 @@ void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSp
 {
     for (const QnStorageSpaceData &spaceInfo: reply.storages)
     {
-        QnClientStorageResourcePtr storage = qnResPool->getResourceById<QnClientStorageResource>(spaceInfo.storageId);
+        QnClientStorageResourcePtr storage = resourcePool()->getResourceById<QnClientStorageResource>(spaceInfo.storageId);
         if (!storage)
             continue;
 
@@ -460,8 +462,8 @@ void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSp
         QnClientStorageResourcePtr storage = QnClientStorageResource::newStorage(requestKey.server, spaceInfo.url);
         storage->setStorageType(spaceInfo.storageType);
 
+        resourcePool()->addResource(storage);
         processStorage(storage, spaceInfo);
-        qnResPool->addResource(storage);
 
         existingStorages.insert(spaceInfo.url);
     }
@@ -490,7 +492,7 @@ void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSp
         storagesToDelete << storage;
     }
 
-    qnResPool->removeResources(storagesToDelete);
+    resourcePool()->removeResources(storagesToDelete);
 
     auto replyProtocols = reply.storageProtocols.toSet();
     if (serverInfo.protocols != replyProtocols)

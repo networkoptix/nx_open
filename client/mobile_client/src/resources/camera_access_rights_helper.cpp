@@ -1,5 +1,7 @@
 #include "camera_access_rights_helper.h"
 
+#include <client_core/connection_context_aware.h>
+
 #include <nx/utils/log/assert.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
@@ -8,7 +10,8 @@
 #include <watchers/user_watcher.h>
 #include <common/common_module.h>
 
-class QnCameraAccessRightsHelperPrivate : public QObject {
+class QnCameraAccessRightsHelperPrivate : public QObject, public QnConnectionContextAware
+{
     QnCameraAccessRightsHelper * const q_ptr;
     Q_DECLARE_PUBLIC(QnCameraAccessRightsHelper)
 
@@ -24,13 +27,13 @@ public:
     bool canViewArchive;
 };
 
-QnCameraAccessRightsHelper::QnCameraAccessRightsHelper(QObject *parent)
-    : QObject(parent)
-    , d_ptr(new QnCameraAccessRightsHelperPrivate(this))
+QnCameraAccessRightsHelper::QnCameraAccessRightsHelper(QObject *parent):
+    QObject(parent),
+    d_ptr(new QnCameraAccessRightsHelperPrivate(this))
 {
     Q_D(QnCameraAccessRightsHelper);
 
-    QnUserWatcher *userWatcher = qnCommon->instance<QnUserWatcher>();
+    QnUserWatcher *userWatcher = commonModule()->instance<QnUserWatcher>();
     connect(userWatcher, &QnUserWatcher::userChanged, d, &QnCameraAccessRightsHelperPrivate::at_userWatcher_userChanged);
     d->user = userWatcher->user();
 }
@@ -54,7 +57,7 @@ void QnCameraAccessRightsHelper::setResourceId(const QString &id)
         return;
 
     Q_D(QnCameraAccessRightsHelper);
-    d->camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid(id));
+    d->camera = resourcePool()->getResourceById<QnVirtualCameraResource>(QnUuid(id));
     d->updateAccessRights();
 }
 
@@ -75,7 +78,7 @@ void QnCameraAccessRightsHelperPrivate::updateAccessRights()
 {
     if (camera && user)
     {
-        canViewArchive = qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalViewArchivePermission);
+        canViewArchive = resourceAccessManager()->hasGlobalPermission(user, Qn::GlobalViewArchivePermission);
     }
     else
     {

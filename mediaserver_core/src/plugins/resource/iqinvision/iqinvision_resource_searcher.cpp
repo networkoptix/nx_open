@@ -7,6 +7,7 @@
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
+#include <common/static_common_module.h>
 
 #if !defined(Q_OS_WIN)
     #include <arpa/inet.h>
@@ -29,7 +30,10 @@ static const QString kDefaultResourceType(lit("IQA32N"));
 
 } // namespace
 
-QnPlIqResourceSearcher::QnPlIqResourceSearcher()
+QnPlIqResourceSearcher::QnPlIqResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule),
+    QnMdnsResourceSearcher(commonModule)
 {
 }
 
@@ -142,7 +146,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
             return localResults; //< Already found.
     }
 
-    QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), name);
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), name);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return localResults; //< Model forced by ONVIF.
 

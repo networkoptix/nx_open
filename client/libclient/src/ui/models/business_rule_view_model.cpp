@@ -10,6 +10,8 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource/resource_display_info.h>
 
+#include <common/common_module.h>
+#include <client_core/client_core_module.h>
 #include <client/client_settings.h>
 
 #include <business/business_action_parameters.h>
@@ -87,12 +89,6 @@ QList<Columns> allColumns()
     return result;
 }
 
-template <class T>
-QnSharedResourcePointerList<T> toResources(const QSet<QnUuid> &idList)
-{
-    return qnResPool->getResources<T>(idList);
-}
-
 QSet<QnUuid> toIds(const QnResourceList& resources)
 {
     QSet<QnUuid> result;
@@ -104,24 +100,28 @@ QSet<QnUuid> toIds(const QnResourceList& resources)
 
 QSet<QnUuid> filterEventResources(const QSet<QnUuid>& ids, EventType eventType)
 {
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+
     if (requiresCameraResource(eventType))
-        return toIds(qnResPool->getResources<QnVirtualCameraResource>(ids));
+        return toIds(resourcePool->getResources<QnVirtualCameraResource>(ids));
 
     if (requiresServerResource(eventType))
-        return toIds(qnResPool->getResources<QnMediaServerResource>(ids));
+        return toIds(resourcePool->getResources<QnMediaServerResource>(ids));
 
     return QSet<QnUuid>();
 }
 
 QSet<QnUuid> filterActionResources(const QSet<QnUuid>& ids, ActionType actionType)
 {
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+
     if (requiresCameraResource(actionType))
-        return toIds(qnResPool->getResources<QnVirtualCameraResource>(ids));
+        return toIds(resourcePool->getResources<QnVirtualCameraResource>(ids));
 
     if (requiresUserResource(actionType))
     {
-        auto users = qnResPool->getResources<QnUserResource>(ids);
-        auto roles = qnUserRolesManager->userRoles(ids);
+        auto users = resourcePool->getResources<QnUserResource>(ids);
+        auto roles = qnClientCoreModule->commonModule()->userRolesManager()->userRoles(ids);
         auto result = toIds(users);
         for (auto role: roles)
             result << role.id;
@@ -155,13 +155,14 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent)
     , m_disabled(false)
     , m_eventTypesModel(new QStandardItemModel(this))
     , m_eventStatesModel(new QStandardItemModel(this))
-    , m_actionTypesModel(new QStandardItemModel(this))
+    , m_actionTypesModel(new QStandardItemModel(this)),
+    m_helper(new QnBusinessStringsHelper(commonModule()))
 {
 
     QnBusinessTypesComparator lexComparator;
     for (QnBusiness::EventType eventType : lexComparator.lexSortedEvents())
     {
-        QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::eventName(eventType));
+        QStandardItem *item = new QStandardItem(m_helper->eventName(eventType));
         item->setData(eventType);
 
         QList<QStandardItem *> row;
@@ -171,7 +172,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent)
 
     for (QnBusiness::ActionType actionType : lexComparator.lexSortedActions())
     {
-        QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(actionType));
+        QStandardItem *item = new QStandardItem(m_helper->actionName(actionType));
         item->setData(actionType);
         item->setData(!QnBusiness::canBeInstant(actionType), ProlongedActionRole);
 
@@ -730,13 +731,13 @@ QString QnBusinessRuleViewModel::getText(const int column, const bool detailed) 
         case QnBusiness::ModifiedColumn:
             return (m_modified ? QLatin1String("*") : QString());
         case QnBusiness::EventColumn:
-            return QnBusinessStringsHelper::eventTypeString(m_eventType, m_eventState, m_actionType, m_actionParams);
+            return m_helper->eventTypeString(m_eventType, m_eventState, m_actionType, m_actionParams);
         case QnBusiness::SourceColumn:
             return getSourceText(detailed);
         case QnBusiness::SpacerColumn:
             return QString();
         case QnBusiness::ActionColumn:
-            return QnBusinessStringsHelper::actionName(m_actionType);
+            return m_helper->actionName(m_actionType);
         case QnBusiness::TargetColumn:
             return getTargetText(detailed);
         case QnBusiness::AggregationColumn:
@@ -778,7 +779,7 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const
         case QnBusiness::SourceColumn:
         {
             //TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
-            auto resources = qnResPool->getResources(eventResources());
+            auto resources = resourcePool()->getResources(eventResources());
             if (!QnBusiness::isResourceRequired(m_eventType))
             {
                 return qnResIconCache->icon(QnResourceIconCache::CurrentSystem);
@@ -828,7 +829,7 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const
             }
 
             //TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
-            QnResourceList resources = qnResPool->getResources(actionResources());
+            QnResourceList resources = resourcePool()->getResources(actionResources());
             if (!QnBusiness::requiresCameraResource(m_actionType))
             {
                 return qnResIconCache->icon(QnResourceIconCache::Servers);
@@ -884,10 +885,10 @@ bool QnBusinessRuleViewModel::isValid(int column) const
             {
                 case QnBusiness::CameraMotionEvent:
                     return isResourcesListValid<QnCameraMotionPolicy>(
-                        qnResPool->getResources<QnCameraMotionPolicy::resource_type>(filtered));
+                        resourcePool()->getResources<QnCameraMotionPolicy::resource_type>(filtered));
                 case QnBusiness::CameraInputEvent:
                     return isResourcesListValid<QnCameraInputPolicy>(
-                        qnResPool->getResources<QnCameraInputPolicy::resource_type>(filtered));
+                        resourcePool()->getResources<QnCameraInputPolicy::resource_type>(filtered));
                 default:
                     return true;
             }
@@ -901,31 +902,31 @@ bool QnBusinessRuleViewModel::isValid(int column) const
                     return QnSendEmailActionDelegate::isValidList(filtered, m_actionParams.emailAddress);
                 case QnBusiness::CameraRecordingAction:
                     return isResourcesListValid<QnCameraRecordingPolicy>(
-                        QnBusiness::toResources<QnCameraRecordingPolicy::resource_type>(filtered));
+                        resourcePool()->getResources<QnCameraRecordingPolicy::resource_type>(filtered));
                 case QnBusiness::BookmarkAction:
                     return isResourcesListValid<QnCameraRecordingPolicy>(
-                        QnBusiness::toResources<QnBookmarkActionPolicy::resource_type>(filtered));
+                        resourcePool()->getResources<QnBookmarkActionPolicy::resource_type>(filtered));
                 case QnBusiness::CameraOutputAction:
                     return isResourcesListValid<QnCameraOutputPolicy>(
-                        QnBusiness::toResources<QnCameraOutputPolicy::resource_type>(filtered));
+                        resourcePool()->getResources<QnCameraOutputPolicy::resource_type>(filtered));
                 case QnBusiness::PlaySoundAction:
                 case QnBusiness::PlaySoundOnceAction:
 		            return !m_actionParams.url.isEmpty()
 		                && (isResourcesListValid<QnCameraAudioTransmitPolicy>(
-		                    QnBusiness::toResources<QnCameraAudioTransmitPolicy::resource_type>(filtered))
+		                    resourcePool()->getResources<QnCameraAudioTransmitPolicy::resource_type>(filtered))
 		                    || m_actionParams.playToClient
 		                );
 
                 case QnBusiness::SayTextAction:
 		            return !m_actionParams.sayText.isEmpty()
 		                && (isResourcesListValid<QnCameraAudioTransmitPolicy>(
-		                    QnBusiness::toResources<QnCameraAudioTransmitPolicy::resource_type>(filtered))
+		                    resourcePool()->getResources<QnCameraAudioTransmitPolicy::resource_type>(filtered))
 		                    || m_actionParams.playToClient
 		                );
 
                 case QnBusiness::ExecutePtzPresetAction:
                     return isResourcesListValid<QnExecPtzPresetPolicy>(
-                        QnBusiness::toResources<QnExecPtzPresetPolicy::resource_type>(filtered))
+                        resourcePool()->getResources<QnExecPtzPresetPolicy::resource_type>(filtered))
                         && m_actionResources.size() == 1
                         && !m_actionParams.presetId.isEmpty();
                 case QnBusiness::ShowTextOverlayAction:
@@ -951,7 +952,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const
             }
 
             //TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
-            auto resources = qnResPool->getResources(filtered);
+            auto resources = resourcePool()->getResources(filtered);
             if (QnBusiness::requiresCameraResource(m_actionType) && resources.isEmpty())
             {
                 return false;
@@ -993,7 +994,7 @@ void QnBusinessRuleViewModel::updateActionTypesModel()
 
 QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const
 {
-    QnResourceList resources = qnResPool->getResources(eventResources());
+    QnResourceList resources = resourcePool()->getResources(eventResources());
     if (m_eventType == QnBusiness::CameraMotionEvent)
         return QnCameraMotionPolicy::getText(resources, detailed);
 
@@ -1018,18 +1019,19 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const
     if (cameras.isEmpty())
     {
         return braced(QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
             tr("Any Device"),
             tr("Any Camera")
         ));
     }
 
-    return QnDeviceDependentStrings::getNumericName(cameras);
+    return QnDeviceDependentStrings::getNumericName(resourcePool(), cameras);
 
 }
 
 QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
 {
-    QnResourceList resources = qnResPool->getResources(actionResources());
+    QnResourceList resources = resourcePool()->getResources(actionResources());
     switch (m_actionType)
     {
         case QnBusiness::SendMailAction:
@@ -1070,7 +1072,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
 
             if (canUseSource)
             {
-                QnVirtualCameraResourceList targetCameras = QnBusiness::toResources<QnVirtualCameraResource>(m_actionResources);
+                QnVirtualCameraResourceList targetCameras = resourcePool()->getResources<QnVirtualCameraResource>(m_actionResources);
 
                 if (targetCameras.isEmpty())
                     return tr("Source camera");
@@ -1095,11 +1097,12 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
 
     if (cameras.isEmpty())
         return QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
             tr("Select at least one device"),
             tr("Select at least one camera")
         );
 
-    return QnDeviceDependentStrings::getNumericName(cameras);
+    return QnDeviceDependentStrings::getNumericName(resourcePool(), cameras);
 }
 
 QString QnBusinessRuleViewModel::getAggregationText() const

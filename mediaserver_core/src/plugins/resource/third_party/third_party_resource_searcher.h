@@ -33,7 +33,7 @@ public:
     /*!
         Adds ref to \a plugin
     */
-    ThirdPartyResourceSearcher();
+    ThirdPartyResourceSearcher(QnCommonModule* commonModule);
     /*!
         Releases ref to \a plugin
     */

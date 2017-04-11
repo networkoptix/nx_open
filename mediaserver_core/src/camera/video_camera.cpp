@@ -20,6 +20,7 @@
 #include <media_server/settings.h>
 #include <streaming/hls/hls_types.h>
 #include <api/global_settings.h>
+#include <common/common_module.h>
 
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
 static const qint64 KEEP_IFRAMES_INTERVAL = 1000000ll * 80;
@@ -304,7 +305,7 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
     }
     if (!m_resource->hasFlags(Qn::foreigner) && m_resource->isInitialized() &&
        (lastKeyTime == (qint64)AV_NOPTS_VALUE || qnSyncTime->currentUSecsSinceEpoch() - lastKeyTime > CAMERA_UPDATE_INTERNVAL) &&
-        qnGlobalSettings->isAutoUpdateThumbnailsEnabled())
+        m_resource->commonModule()->globalSettings()->isAutoUpdateThumbnailsEnabled())
     {
         if (m_nextMinTryTime == 0) // get first screenshot after minor delay
             m_nextMinTryTime = usecTime + nx::utils::random::number(5000, 10000) * 1000ll;

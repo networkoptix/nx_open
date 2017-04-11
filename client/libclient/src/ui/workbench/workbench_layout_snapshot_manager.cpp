@@ -32,10 +32,10 @@ QnWorkbenchLayoutSnapshotManager::QnWorkbenchLayoutSnapshotManager(QObject *pare
     m_storage(new QnWorkbenchLayoutSnapshotStorage(this))
 {
     /* Start listening to changes. */
-    connect(qnResPool,  &QnResourcePool::resourceRemoved, this,   &QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceRemoved);
-    connect(qnResPool,  &QnResourcePool::resourceAdded,   this,   &QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded);
+    connect(resourcePool(),  &QnResourcePool::resourceRemoved, this,   &QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceRemoved);
+    connect(resourcePool(),  &QnResourcePool::resourceAdded,   this,   &QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded);
 
-    for(const QnLayoutResourcePtr &layout: qnResPool->getResources<QnLayoutResource>())
+    for(const QnLayoutResourcePtr &layout: resourcePool()->getResources<QnLayoutResource>())
         at_resourcePool_resourceAdded(layout);
 }
 
@@ -127,7 +127,7 @@ bool QnWorkbenchLayoutSnapshotManager::isModified(const QnLayoutResourcePtr &res
 
 bool QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &layout, SaveLayoutResultFunction callback)
 {
-    if (qnCommon->isReadOnly())
+    if (commonModule()->isReadOnly())
         return false;
 
     NX_ASSERT(!layout->isFile());
@@ -141,7 +141,7 @@ bool QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &layout, S
     ec2::ApiLayoutData apiLayout;
     ec2::fromResourceToApi(layout, apiLayout);
 
-    int reqID = QnAppServerConnectionFactory::getConnection2()->getLayoutManager(Qn::kSystemAccess)->save(
+    int reqID = commonModule()->ec2Connection()->getLayoutManager(Qn::kSystemAccess)->save(
         apiLayout, this, [this, layout, callback](int reqID, ec2::ErrorCode errorCode)
     {
         Q_UNUSED(reqID);

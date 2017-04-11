@@ -10,9 +10,10 @@
 #include <api/model/manual_camera_seach_reply.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource_management/resource_searcher.h>
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 #include <utils/common/threadqueue.h>
 #include <nx/network/ip_range_checker_async.h>
+#include <common/common_module_aware.h>
 
 
 class QnSearchTask
@@ -65,7 +66,8 @@ private:
 
 
 //!Scans different addresses simultaneously (using aio or concurrent operations)
-class QnManualCameraSearcher {
+class QnManualCameraSearcher: public QnCommonModuleAware
+{
 
     struct SearchTaskQueueContext
     {
@@ -80,7 +82,7 @@ class QnManualCameraSearcher {
     };
 
 public:
-    QnManualCameraSearcher();
+    QnManualCameraSearcher(QnCommonModule* commonModule);
     ~QnManualCameraSearcher();
 
     /*!
@@ -97,7 +99,7 @@ private:
         int port = nx_http::DEFAULT_HTTP_PORT);
 
     void runTasksUnsafe(QThreadPool* threadPool);
-
+    QList<QnAbstractNetworkResourceSearcher*> getAllNetworkSearchers() const;
 private:
     mutable QnMutex m_mutex;
 

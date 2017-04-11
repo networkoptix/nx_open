@@ -179,8 +179,8 @@ bool QnWorkbenchIncompatibleServersActionHandler::validateStartLicenses(
     if (!server)
         return true;
 
-    const auto licenseHelper = QnLicenseListHelper(qnLicensePool->getLicenses());
-    if (licenseHelper.totalLicenseByType(Qn::LC_Start) == 0)
+    const auto licenseHelper = QnLicenseListHelper(licensePool()->getLicenses());
+    if (licenseHelper.totalLicenseByType(Qn::LC_Start, licensePool()->validator()) == 0)
         return true; /* We have no start licenses so all is OK. */
 
     if (!serverHasStartLicenses(server, adminPassword))
@@ -208,7 +208,7 @@ bool QnWorkbenchIncompatibleServersActionHandler::serverHasStartLicenses(
     const auto remoteLicensesList = remoteLicenses(server->getUrl(), auth);
 
     /* Warn that some of the licenses will be deactivated. */
-    return QnLicenseListHelper(remoteLicensesList).totalLicenseByType(Qn::LC_Start, true) > 0;
+    return QnLicenseListHelper(remoteLicensesList).totalLicenseByType(Qn::LC_Start, nullptr) > 0;
 }
 
 QString QnWorkbenchIncompatibleServersActionHandler::requestPassword() const

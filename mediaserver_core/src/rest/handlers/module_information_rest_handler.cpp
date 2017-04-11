@@ -43,13 +43,13 @@ int QnModuleInformationRestHandler::executeGet(
 
     if (checkOwnerPermissions)
     {
-        if (!QnPermissionsHelper::hasOwnerPermissions(owner->accessRights()))
+        if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), owner->accessRights()))
             return QnPermissionsHelper::notOwnerError(result);
     }
 
     if (allModules)
     {
-        const auto allServers = qnResPool->getAllServers(Qn::AnyStatus);
+        const auto allServers = owner->resourcePool()->getAllServers(Qn::AnyStatus);
         if (useAddresses)
         {
             QList<QnModuleInformationWithAddresses> modules;
@@ -71,15 +71,15 @@ int QnModuleInformationRestHandler::executeGet(
     }
     else if (useAddresses)
     {
-        QnModuleInformationWithAddresses moduleInformation(qnCommon->moduleInformation());
-        QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+        QnModuleInformationWithAddresses moduleInformation(owner->commonModule()->moduleInformation());
+        QnMediaServerResourcePtr server = owner->resourcePool()->getResourceById<QnMediaServerResource>(owner->commonModule()->moduleGUID());
         if (server)
             moduleInformation.remoteAddresses = getAddresses(server);
         result.setReply(moduleInformation);
     }
     else
     {
-        result.setReply(qnCommon->moduleInformation());
+        result.setReply(owner->commonModule()->moduleInformation());
     }
     return CODE_OK;
 }

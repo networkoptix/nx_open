@@ -22,10 +22,10 @@ public:
     static void setUnauthorizedPageBody(const QByteArray& value, AuthMethod::Values methods);
     static QByteArray unauthorizedPageBody();
 
-    static bool isProxy(const nx_http::Request& request);
-    static bool isProxyForCamera(const nx_http::Request& request);
+    static bool isProxy(QnCommonModule* commonModule, const nx_http::Request& request);
+    static bool isProxyForCamera(QnCommonModule* commonModule, const nx_http::Request& request);
     static bool isCloudRequest(const nx_http::Request& request);
-    static bool needStandardProxy(const nx_http::Request& request);
+    static bool needStandardProxy(QnCommonModule* commonModule, const nx_http::Request& request);
 protected:
     virtual void run() override;
     virtual void pleaseStop() override;

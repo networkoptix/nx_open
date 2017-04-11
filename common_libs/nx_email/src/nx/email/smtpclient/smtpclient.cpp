@@ -226,7 +226,7 @@ SmtpOperationResult SmtpClient::connectToHost()
             if (responseCode != SmtpReplyCode::ServiceReady)
                 return {SmtpError::ServerError, responseCode};
 
-            m_socket = std::make_unique<nx::network::SslSocket>(
+            m_socket = std::make_unique<nx::network::deprecated::SslSocket>(
                 m_socket.release(), /*isServerSide*/ false);
 
             // Send ELHO one more time

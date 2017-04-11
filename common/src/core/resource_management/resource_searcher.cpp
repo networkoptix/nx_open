@@ -2,22 +2,30 @@
 
 #include <core/resource/resource_type.h>
 #include <api/global_settings.h>
+#include <common/common_module.h>
+#include <core/resource/resource.h>
 
-QnAbstractResourceSearcher::QnAbstractResourceSearcher() :
+QnAbstractResourceSearcher::QnAbstractResourceSearcher(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule),
     m_discoveryMode(DiscoveryMode::fullyEnabled),
     m_localResources(false),
     m_shouldStop(false)
-{}
+{
+}
 
 QnAbstractResourceSearcher::~QnAbstractResourceSearcher()
 {
     return;
 }
 
-QnResourceList QnAbstractResourceSearcher::search() {
+QnResourceList QnAbstractResourceSearcher::search()
+{
     m_shouldStop = false;
 
-    return findResources();
+    auto result = findResources();
+    for (const auto& resource: result)
+        resource->setCommonModule(commonModule());
+    return result;
 }
 
 void QnAbstractResourceSearcher::setDiscoveryMode( DiscoveryMode mode )
@@ -27,7 +35,8 @@ void QnAbstractResourceSearcher::setDiscoveryMode( DiscoveryMode mode )
 
 DiscoveryMode QnAbstractResourceSearcher::discoveryMode() const
 {
-    if (qnGlobalSettings->isInitialized() && qnGlobalSettings->isNewSystem())
+    const auto& settings = commonModule()->globalSettings();
+    if (settings->isInitialized() && settings->isNewSystem())
         return DiscoveryMode::disabled;
     return m_discoveryMode;
 }
@@ -62,6 +71,12 @@ bool QnAbstractResourceSearcher::isResourceTypeSupported(QnUuid resourceTypeId) 
 }
 
 
+QnAbstractFileResourceSearcher::QnAbstractFileResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule)
+{
+
+}
+
 // =============================================================================
 
 QStringList QnAbstractFileResourceSearcher::getPathCheckList() const
@@ -85,4 +100,10 @@ QnResourceList QnAbstractFileResourceSearcher::checkFiles(const QStringList &fil
     }
 
     return result;
+}
+
+QnAbstractNetworkResourceSearcher::QnAbstractNetworkResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule)
+{
+
 }

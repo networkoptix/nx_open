@@ -101,7 +101,7 @@ void QnSelectDevicesButton::selectDevices(const QnVirtualCameraResourceList& dev
 
     auto count = devices.size();
     if (count > 1 || (count == 1 && !singleSelectionParameters().showName))
-        setText(QnDeviceDependentStrings::getNumericName(devices));
+        setText(QnDeviceDependentStrings::getNumericName(resourcePool(), devices));
 }
 
 QnSelectResourcesButton::Appearance QnSelectDevicesButton::appearanceForAny() const
@@ -109,6 +109,7 @@ QnSelectResourcesButton::Appearance QnSelectDevicesButton::appearanceForAny() co
     return {
         iconHelper(QnResourceIconCache::Camera),
         QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
             tr("Any Device"),
             tr("Any Camera")) };
 }
@@ -118,6 +119,7 @@ QnSelectResourcesButton::Appearance QnSelectDevicesButton::appearanceForAll() co
     return {
         iconHelper(QnResourceIconCache::Cameras),
         QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
             tr("All Devices"),
             tr("All Cameras")) };
 }
@@ -129,6 +131,7 @@ QnSelectResourcesButton::Appearance QnSelectDevicesButton::appearanceForSelected
         return {
             QIcon(),
             QnDeviceDependentStrings::getDefaultNameFromSet(
+                resourcePool(),
                 tr("Select devices..."),
                 tr("Select cameras...")) };
     }

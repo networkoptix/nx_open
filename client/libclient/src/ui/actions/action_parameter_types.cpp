@@ -2,6 +2,9 @@
 
 #include <nx/utils/flat_map.h>
 
+#include <common/common_module.h>
+#include <client_core/client_core_module.h>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
@@ -188,7 +191,8 @@ QnResourceList QnActionParameterTypes::resources(const QnLayoutItemIndexList &la
 
         QnLayoutItemData data = index.layout()->getItem(index.uuid());
 
-        QnResourcePtr resource = qnResPool->getResourceByDescriptor(data.resource);
+        QnResourcePtr resource = qnClientCoreModule->commonModule()->
+            resourcePool()->getResourceByDescriptor(data.resource);
         if(resource)
             result.push_back(resource);
     }

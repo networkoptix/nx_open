@@ -22,13 +22,19 @@ QnGraphicsStackedWidgetPrivate::QnGraphicsStackedWidgetPrivate(QnGraphicsStacked
     base_type(),
     q_ptr(main)
 {
+    installEventHandler(main, QEvent::LayoutRequest, this,
+        [this]()
+        {
+            Q_Q(QnGraphicsStackedWidget);
+            q->updateGeometry();
+            updateGeometries();
+        });
+
     installEventHandler(main, QEvent::ContentsRectChange,
         this, &QnGraphicsStackedWidgetPrivate::updateGeometries);
 
     connect(main, &QnGraphicsStackedWidget::geometryChanged,
         this, &QnGraphicsStackedWidgetPrivate::updateGeometries);
-
-    //TODO: #vkutin Think how to handle child widgets size hint change
 }
 
 QnGraphicsStackedWidgetPrivate::~QnGraphicsStackedWidgetPrivate()
@@ -54,6 +60,7 @@ int QnGraphicsStackedWidgetPrivate::insertWidget(int index, QGraphicsWidget* wid
     Q_Q(QnGraphicsStackedWidget);
     widget->setParent(q);
     widget->setParentItem(q);
+    widget->setParentLayoutItem(q);
 
     setWidgetGeometry(widget, q->contentsRect());
 
@@ -87,6 +94,7 @@ QGraphicsWidget* QnGraphicsStackedWidgetPrivate::removeWidget(int index)
 
     if (widget && !QObjectPrivate::get(widget)->wasDeleted)
     {
+        widget->setParentLayoutItem(nullptr);
         widget->setParentItem(nullptr);
         widget->setParent(nullptr);
         widget->disconnect(this);

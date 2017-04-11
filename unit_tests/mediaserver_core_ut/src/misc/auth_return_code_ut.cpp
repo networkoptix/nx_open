@@ -17,7 +17,8 @@
 #include <rest/server/json_rest_result.h>
 #include "utils/common/sleep.h"
 
-class AuthReturnCodeTest : public ::testing::Test
+class AuthReturnCodeTest:
+    public ::testing::Test
 {
 public:
     static void SetUpTestCase()
@@ -33,7 +34,7 @@ public:
 
     virtual void SetUp() override
     {
-        auto ec2Connection = QnAppServerConnectionFactory::getConnection2();
+        auto ec2Connection = mediaServerLauncher->commonModule()->ec2Connection();
         ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
 
         userData.id = QnUuid::createUuid();
@@ -59,7 +60,7 @@ public:
 
     void addLocalUser(QString userName, QString password)
     {
-        auto ec2Connection = QnAppServerConnectionFactory::getConnection2();
+        auto ec2Connection = mediaServerLauncher->commonModule()->ec2Connection();
         ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
 
         userData.id = QnUuid::createUuid();

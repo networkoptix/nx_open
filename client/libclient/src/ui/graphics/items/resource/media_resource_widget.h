@@ -129,7 +129,7 @@ public:
 
     void hideTextOverlay(const QnUuid& id);
     void showTextOverlay(const QnUuid& id, const QString& text,
-        const QnHtmlTextItemOptions& options, int timeoutMs);
+        const QnHtmlTextItemOptions& options);
 
     QVector<QColor> motionSensitivityColors() const;
     void setMotionSensitivityColors(const QVector<QColor>& value);
@@ -250,8 +250,8 @@ private:
 
     void setupHud();
 
-    void setTextOverlayParameters(const QnUuid& id, bool visible, const QString& text,
-        const QnHtmlTextItemOptions& options, int timeoutMs);
+    void setTextOverlayParameters(const QnUuid& id, bool visible,
+        const QString& text, const QnHtmlTextItemOptions& options);
 
 private:
     struct SoftwareTriggerInfo

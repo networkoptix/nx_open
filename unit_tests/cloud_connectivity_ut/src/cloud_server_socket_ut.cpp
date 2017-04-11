@@ -240,8 +240,8 @@ NX_NETWORK_SERVER_SOCKET_TEST_CASE(
 TEST_F(CloudServerSocketTcpTest, TransferSyncSsl)
 {
     network::test::socketTransferSync(
-        [&]() { return std::make_unique<SslServerSocket>(makeServerTester().release(), false); },
-        [&]() { return std::make_unique<SslSocket>(makeClientTester().release(), false); });
+        [&]() { return std::make_unique<deprecated::SslServerSocket>(makeServerTester().release(), false); },
+        [&]() { return std::make_unique<deprecated::SslSocket>(makeClientTester().release(), false); });
 }
 
 TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)

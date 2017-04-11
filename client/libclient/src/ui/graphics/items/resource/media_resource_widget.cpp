@@ -21,6 +21,7 @@
 #include <client/client_settings.h>
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
+#include <client/client_module.h>
 
 #include <common/common_module.h>
 
@@ -102,8 +103,6 @@
 namespace {
 
 static constexpr int kMicroInMilliSeconds = 1000;
-
-static constexpr int kMinimumTextOverlayDurationMs = 5000;
 
 // TODO: #rvasilenko Change to other constant - 0 is 1/1/1970
 // Note: -1 is used for invalid time
@@ -308,7 +307,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     connect(navigator(), &QnWorkbenchNavigator::bookmarksModeEnabledChanged, this,
         &QnMediaResourceWidget::updateCompositeOverlayMode);
 
-    const auto messageProcessor = QnCommonMessageProcessor::instance();
+    const auto messageProcessor = qnCommonMessageProcessor;
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
         [this](const QnAbstractBusinessActionPtr &businessAction)
         {
@@ -570,13 +569,22 @@ void QnMediaResourceWidget::createButtons()
 
 void QnMediaResourceWidget::createPtzController()
 {
+    auto threadPool = qnClientModule->ptzControllerPool()->commandThreadPool();
+    auto executorThread = qnClientModule->ptzControllerPool()->executorThread();
+
     /* Set up PTZ controller. */
     QnPtzControllerPtr fisheyeController;
     fisheyeController.reset(new QnFisheyePtzController(this), &QObject::deleteLater);
     fisheyeController.reset(new QnViewportPtzController(fisheyeController));
     fisheyeController.reset(new QnPresetPtzController(fisheyeController));
-    fisheyeController.reset(new QnTourPtzController(fisheyeController));
-    fisheyeController.reset(new QnActivityPtzController(QnActivityPtzController::Local, fisheyeController));
+    fisheyeController.reset(new QnTourPtzController(
+        fisheyeController,
+        threadPool,
+        executorThread));
+    fisheyeController.reset(new QnActivityPtzController(
+        commonModule(),
+        QnActivityPtzController::Local,
+        fisheyeController));
 
     // Small hack because widget's zoomRect is set only in Synchronize method, not instantly --gdm
     if (item() && item()->zoomRect().isNull())
@@ -590,7 +598,8 @@ void QnMediaResourceWidget::createPtzController()
     {
         if (QnPtzControllerPtr serverController = qnPtzPool->controller(m_camera))
         {
-            serverController.reset(new QnActivityPtzController(QnActivityPtzController::Client, serverController));
+            serverController.reset(new QnActivityPtzController(commonModule(),
+                QnActivityPtzController::Client, serverController));
             m_ptzController.reset(new QnFallbackPtzController(fisheyeController, serverController));
         }
         else
@@ -691,70 +700,31 @@ void QnMediaResourceWidget::suspendHomePtzController()
 
 void QnMediaResourceWidget::hideTextOverlay(const QnUuid& id)
 {
-    setTextOverlayParameters(id, false, QString(), QnHtmlTextItemOptions(), -1);
+    setTextOverlayParameters(id, false, QString(), QnHtmlTextItemOptions());
 }
 
 void QnMediaResourceWidget::showTextOverlay(const QnUuid& id, const QString& text,
-    const QnHtmlTextItemOptions& options, int timeoutMs)
+    const QnHtmlTextItemOptions& options)
 {
-    setTextOverlayParameters(id, true, text, options, timeoutMs);
+    setTextOverlayParameters(id, true, text, options);
 }
 
 void QnMediaResourceWidget::setTextOverlayParameters(const QnUuid& id, bool visible,
-    const QString& text, const QnHtmlTextItemOptions& options, int timeoutMs)
+    const QString& text, const QnHtmlTextItemOptions& options)
 {
     if (!m_textOverlayWidget)
         return;
 
-    static QElapsedTimer referenceTimer =
-        []()
-        {
-            QElapsedTimer timer;
-            timer.start();
-            return timer;
-        }();
-
-    const auto scheduleTimedDelete =
-        [this](QPointer<QGraphicsWidget> item, int timeoutMs)
-        {
-            executeDelayedParented([item] { delete item; }, timeoutMs, this);
-        };
-
-    static const char* kReferenceTimePropertyName = "_qn_textOverlayReferenceTime";
+    m_textOverlayWidget->deleteItem(id);
 
     if (!visible)
-    {
-        auto item = m_textOverlayWidget->item(id);
-        if (!item)
-            return;
-
-        const auto elapsed = referenceTimer.elapsed()
-            - item->property(kReferenceTimePropertyName).value<qint64>();
-
-        if (elapsed > kMinimumTextOverlayDurationMs)
-            delete item;
-        else
-            scheduleTimedDelete(item, kMinimumTextOverlayDurationMs - elapsed);
-
         return;
-    }
-
-    m_textOverlayWidget->deleteItem(id);
 
     /* Do not add empty text items: */
     if (text.trimmed().isEmpty())
         return;
 
     m_textOverlayWidget->addItem(text, options, id);
-    auto item = m_textOverlayWidget->item(id);
-    NX_EXPECT(item);
-    if (!item)
-        return;
-
-    item->setProperty(kReferenceTimePropertyName, referenceTimer.elapsed());
-
-    if (timeoutMs >= 0)
-        scheduleTimedDelete(item, qMax(kMinimumTextOverlayDurationMs, timeoutMs));
 }
 
 void QnMediaResourceWidget::setupHud()
@@ -2395,7 +2365,7 @@ void QnMediaResourceWidget::resetTriggers()
         return;
 
     /* Create new relevant triggers: */
-    for (const auto& rule: QnCommonMessageProcessor::instance()->businessRules())
+    for (const auto& rule: qnCommonMessageProcessor->businessRules())
         createTriggerIfRelevant(rule); //< creates a trigger only if the rule is relevant
 }
 
@@ -2445,7 +2415,7 @@ void QnMediaResourceWidget::invokeTrigger(
                 cl_logERROR);
         };
 
-    qnCommon->currentServer()->restConnection()->softwareTriggerCommand(
+    commonModule()->currentServer()->restConnection()->softwareTriggerCommand(
         m_resource->toResource()->getId(), id, toggleState,
         responseHandler, QThread::currentThread());
 }

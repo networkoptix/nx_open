@@ -302,7 +302,7 @@ bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
         m_eofReached = false;
         QString url = m_resource->getUrl();
         if (m_storage == 0) {
-            m_storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(url));
+            m_storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(resource->commonModule(), url));
             if(!m_storage)
                 return false;
         }
@@ -394,6 +394,7 @@ QnConstResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
     {
         m_videoLayout.reset( new QnCustomResourceVideoLayout(QSize(1, 1)) );
 
+        bool found = false;
         m_metadata = QnAviArchiveMetadata::loadFromFile(m_formatContext);
 
         if (QnAviResourcePtr aviRes = m_resource.dynamicCast<QnAviResource>())
@@ -408,6 +409,14 @@ QnConstResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
             m_videoLayout->setChannels(m_metadata.videoLayoutChannels);
         }
 
+        if (QnMediaResourcePtr mediaRes = m_resource.dynamicCast<QnMediaResource>())
+        {
+            if (m_metadata.dewarpingParams != QnMediaDewarpingParams())
+                mediaRes->setDewarpingParams(m_metadata.dewarpingParams);
+            if (!qFuzzyIsNull(m_metadata.overridenAr))
+                mediaRes->setCustomAspectRatio(m_metadata.overridenAr);
+        }
+
         if (m_useAbsolutePos)
         {
             m_startTimeUs = 1000ll * m_metadata.startTimeMs;
@@ -417,12 +426,6 @@ QnConstResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
                 if (qSharedPointerDynamicCast<QnLayoutFileStorageResource>(m_storage))
                     m_resource->addFlags(Qn::sync | Qn::periods | Qn::motion); // use sync for exported layout only
             }
-        }
-
-        if (QnMediaResourcePtr mediaRes = m_resource.dynamicCast<QnMediaResource>())
-        {
-            mediaRes->setDewarpingParams(m_metadata.dewarpingParams);
-            mediaRes->setCustomAspectRatio(m_metadata.overridenAr);
         }
     }
 

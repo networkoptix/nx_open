@@ -29,12 +29,17 @@ public:
      * \param resource                  Network resource representing the camera to work with.
      * \param parent                    Parent object.
      */
-    QnFlatCameraDataLoader(const QnVirtualCameraResourcePtr &camera, Qn::TimePeriodContent dataType, QObject *parent = NULL);
+    QnFlatCameraDataLoader(const QnVirtualCameraResourcePtr& camera,
+        const QnMediaServerResourcePtr& server,
+        Qn::TimePeriodContent dataType,
+        QObject* parent = nullptr);
     virtual ~QnFlatCameraDataLoader();
 
     virtual int load(const QString &filter = QString(), const qint64 resolutionMs = 1) override;
 
     virtual void discardCachedData(const qint64 resolutionMs = 0) override;
+
+    void updateServer(const QnMediaServerResourcePtr& server);
 
 private slots:
     void at_timePeriodsReceived(int status, const MultiServerPeriodDataList &timePeriods, int requestHandle);
@@ -62,6 +67,8 @@ private:
 
         void clear();
     };
+
+    QnMediaServerResourcePtr m_server;
 
     QString m_filter;
 

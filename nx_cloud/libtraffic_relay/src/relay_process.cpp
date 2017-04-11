@@ -7,6 +7,9 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/system_error.h>
 
+#include "controller/controller.h"
+#include "model/model.h"
+#include "view/view.h"
 #include "settings.h"
 #include "libtraffic_relay_app_info.h"
 
@@ -48,7 +51,6 @@ int RelayProcess::exec()
 
     try
     {
-        // Initializing.
         conf::Settings settings;
         settings.load(m_argc, m_argv);
         if (settings.isShowHelpRequested())
@@ -57,29 +59,38 @@ int RelayProcess::exec()
             return 0;
         }
 
-        utils::log::initialize(
-            settings.logging(),
-            settings.dataDir(),
-            TrafficRelayAppInfo::applicationDisplayName(),
-            "log_file",
-            QnLog::MAIN_LOG_ID);
+        initializeLog(settings);
+
+        Model model(settings);
+        Controller controller(settings, &model);
+        View view(settings, model, &controller);
 
         // TODO: #ak: process rights reduction should be done here.
 
-        // Initialization succeeded.
+        view.start();
 
         processStartResult = true;
         triggerOnStartedEventHandlerGuard.fire();
 
         m_processTerminationEvent.get_future().wait();
+
+        return 0;
     }
     catch (const std::exception& e)
     {
         NX_LOGX(lm("Error starting. %1").arg(e.what()), cl_logERROR);
         return 3;
     }
+}
 
-    return 0;
+void RelayProcess::initializeLog(const conf::Settings& settings)
+{
+    utils::log::initialize(
+        settings.logging(),
+        settings.dataDir(),
+        TrafficRelayAppInfo::applicationDisplayName(),
+        "log_file",
+        QnLog::MAIN_LOG_ID);
 }
 
 } // namespace relay

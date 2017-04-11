@@ -8,6 +8,10 @@
 
 #include "business/business_strings_helper.h"
 
+#include <client_core/client_core_module.h>
+
+#include <common/common_module.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/network_resource.h>
@@ -38,9 +42,11 @@ namespace
 {
     QString firstResourceName(const QnAuditRecord *d1)
     {
+        auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+
         if (d1->resources.empty())
             return QString();
-        if (QnResourcePtr res = qnResPool->getResourceById(d1->resources[0]))
+        if (QnResourcePtr res = resourcePool->getResourceById(d1->resources[0]))
             return res->getName();
         else
             return QString();
@@ -48,9 +54,11 @@ namespace
 
     QString firstResourceIp(const QnAuditRecord *d1)
     {
+        auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+
         if (d1->resources.empty())
             return QString();
-        if (QnNetworkResourcePtr res = qnResPool->getResourceById<QnNetworkResource>(d1->resources[0]))
+        if (QnNetworkResourcePtr res = resourcePool->getResourceById<QnNetworkResource>(d1->resources[0]))
             return res->getHostAddress();
         else
             return QString();
@@ -248,7 +256,8 @@ void QnAuditLogModel::clear() {
 
 QString QnAuditLogModel::getResourceNameById(const QnUuid &id)
 {
-    return QnResourceDisplayInfo(qnResPool->getResourceById(id)).toString(qnSettings->extraInfoInTree());
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    return QnResourceDisplayInfo(resourcePool->getResourceById(id)).toString(qnSettings->extraInfoInTree());
 }
 
 QString QnAuditLogModel::formatDateTime(int timestampSecs, bool showDate, bool showTime) const
@@ -288,6 +297,7 @@ QString QnAuditLogModel::formatDuration(int durationSecs)
 
 QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
 {
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
     switch (eventType)
     {
     case Qn::AR_NotDefined:
@@ -306,11 +316,13 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
         return tr("Exporting video");
     case Qn::AR_CameraUpdate:
         return QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool,
             tr("Device updated"),
             tr("Camera updated")
             );
     case Qn::AR_CameraInsert:
         return QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool,
             tr("Device added"),
             tr("Camera added")
             );
@@ -328,6 +340,7 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
         return tr("Email settings changed");
     case Qn::AR_CameraRemove:
         return QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool,
             tr("Device removed"),
             tr("Camera removed")
             );
@@ -352,9 +365,10 @@ QnVirtualCameraResourceList QnAuditLogModel::getCameras(const QnAuditRecord* rec
 
 QnVirtualCameraResourceList QnAuditLogModel::getCameras(const std::vector<QnUuid>& resources)
 {
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
     QnVirtualCameraResourceList result;
     for (const auto& id : resources)
-        if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceById<QnVirtualCameraResource>(id))
+        if (QnVirtualCameraResourcePtr camera = resourcePool->getResourceById<QnVirtualCameraResource>(id))
             result << camera;
     return result;
 }
@@ -397,7 +411,9 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data) const
         //fall-through
     case Qn::AR_CameraUpdate:
     case Qn::AR_CameraInsert:
-        result += QnDeviceDependentStrings::getNumericName(getCameras(data->resources));
+        result += QnDeviceDependentStrings::getNumericName(
+            resourcePool(),
+            getCameras(data->resources));
         break;
 
     default:
@@ -426,7 +442,9 @@ QString QnAuditLogModel::htmlData(const Column& column, const QnAuditRecord* dat
         case Qn::AR_CameraInsert:
         case Qn::AR_CameraUpdate:
         {
-            QString txt = QnDeviceDependentStrings::getNumericName(getCameras(data->resources));
+            QString txt = QnDeviceDependentStrings::getNumericName(
+                resourcePool(),
+                getCameras(data->resources));
             QString linkColor = lit("#%1").arg(QString::number(m_colors.httpLink.rgb(), 16));
             if (hovered)
                 result += lit("<font color=%1><u><b>%2</b></u></font>").arg(linkColor).arg(txt);
@@ -488,7 +506,7 @@ QString QnAuditLogModel::searchData(const Column& column, const QnAuditRecord* d
     if (column == DescriptionColumn && (data->isPlaybackType() || data->eventType == Qn::AR_CameraUpdate || data->eventType == Qn::AR_CameraInsert))
     {
         QString result;
-        for (const auto& res : qnResPool->getResources(data->resources))
+        for (const auto& res : resourcePool()->getResources(data->resources))
         {
             result += res->toSearchString();
             result += lit(" ");
@@ -599,7 +617,10 @@ QVariant QnAuditLogModel::headerData(int section, Qt::Orientation orientation, i
         case EventTypeColumn:
             return tr("Activity");
         case CameraNameColumn:
-            return QnDeviceDependentStrings::getDefaultNameFromSet(tr("Device name"), tr("Camera name"));
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                resourcePool(),
+                tr("Device name"),
+                tr("Camera name"));
         case CameraIpColumn:
             return tr("IP");
         case DateColumn:

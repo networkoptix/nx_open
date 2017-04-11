@@ -82,8 +82,13 @@ void QnTcpListener::setAuth(const QByteArray& userName, const QByteArray& passwo
 }
 
 QnTcpListener::QnTcpListener(
-    const QHostAddress& address, int port, int maxConnections, bool useSSL)
-    :
+    QnCommonModule* commonModule,
+    const QHostAddress& address,
+    int port,
+    int maxConnections,
+    bool useSSL)
+:
+    QnCommonModuleAware(commonModule),
     d_ptr(new QnTcpListenerPrivate())
 {
     Q_D(QnTcpListener);

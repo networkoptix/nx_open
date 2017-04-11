@@ -5,6 +5,8 @@
 #include <QtCore/QSet>
 #include <QtCore/QHash>
 
+#include <client_core/connection_context_aware.h>
+
 #include <utils/common/matrix_map.h>
 #include <utils/common/rect_set.h>
 #include <utils/common/hash.h> /* For qHash(const QnUuid &). */
@@ -36,7 +38,8 @@ Q_DECLARE_FLAGS(QnLayoutFlags, QnLayoutFlag)
  * Contains workbench items and information on their positions. Provides the
  * necessary functions for moving items around.
  */
-class QnWorkbenchLayout: public QObject {
+class QnWorkbenchLayout: public QObject, public QnConnectionContextAware
+{
     Q_OBJECT;
 public:
     /**

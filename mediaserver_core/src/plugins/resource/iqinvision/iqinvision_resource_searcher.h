@@ -7,7 +7,7 @@
 class QnPlIqResourceSearcher: public QnMdnsResourceSearcher
 {
 public:
-    QnPlIqResourceSearcher();
+    QnPlIqResourceSearcher(QnCommonModule* commonModule);
 
     virtual QnResourcePtr createResource(
         const QnUuid &resourceTypeId, const QnResourceParams& params) override;

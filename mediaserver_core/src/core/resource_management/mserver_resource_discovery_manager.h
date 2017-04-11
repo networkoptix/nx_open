@@ -11,7 +11,7 @@ class QnMServerResourceDiscoveryManager: public QnResourceDiscoveryManager
 public:
     typedef QnResourceDiscoveryManager base_type;
 
-    QnMServerResourceDiscoveryManager();
+    QnMServerResourceDiscoveryManager(QnCommonModule* commonModule);
     virtual ~QnMServerResourceDiscoveryManager();
 
     //!Implementation of QnResourceFactory::createResource

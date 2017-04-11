@@ -9,12 +9,15 @@
 #include <quazip/quazipfile.h>
 
 #include <api/global_settings.h>
+
+#include <common/common_module.h>
+#include <common/static_common_module.h>
+
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <common/common_module.h>
 
 #include <utils/update/update_utils.h>
 #include <utils/update/zip_utils.h>
@@ -159,7 +162,7 @@ QnCheckForUpdateResult::Value QnCheckForUpdatesPeerTask::checkUpdateCoverage()
     bool needUpdate = false;
     for (const auto& peerId: peers())
     {
-        const auto server = qnResPool->getIncompatibleResourceById(peerId, true)
+        const auto server = resourcePool()->getIncompatibleResourceById(peerId, true)
             .dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
@@ -176,7 +179,7 @@ QnCheckForUpdateResult::Value QnCheckForUpdatesPeerTask::checkUpdateCoverage()
 
     if (!m_target.denyClientUpdates && !m_clientRequiresInstaller)
     {
-        bool updateClient = isUpdateNeed(qnCommon->engineVersion(), m_target.version);
+        bool updateClient = isUpdateNeed(qnStaticCommon->engineVersion(), m_target.version);
 
         if (updateClient && !m_clientUpdateFile)
         {
@@ -199,10 +202,10 @@ bool QnCheckForUpdatesPeerTask::isDowngradeAllowed()
 
     // Check if all server's version is not higher then target. Server downgrade is prohibited.
     return boost::algorithm::all_of(m_target.targets,
-        [targetVersion = m_target.version]
+        [targetVersion = m_target.version, this]
         (const QnUuid& serverId)
         {
-            const auto server = qnResPool->getIncompatibleResourceById(serverId, true)
+            const auto server = resourcePool()->getIncompatibleResourceById(serverId, true)
                 .dynamicCast<QnMediaServerResource>();
             if (!server)
                 return true;
@@ -320,8 +323,8 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply* 
     }
 
     QString currentRelease = customizationInfo.current_release;
-    if (QnSoftwareVersion(currentRelease) < qnCommon->engineVersion())
-        currentRelease = qnCommon->engineVersion().toString(QnSoftwareVersion::MinorFormat);
+    if (QnSoftwareVersion(currentRelease) < qnStaticCommon->engineVersion())
+        currentRelease = qnStaticCommon->engineVersion().toString(QnSoftwareVersion::MinorFormat);
 
     const auto latestVersion = customizationInfo.releases[currentRelease];
     const QString updatesPrefix = customizationInfo.updates_prefix;

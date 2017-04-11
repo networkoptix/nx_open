@@ -1,11 +1,13 @@
-#ifndef NETWORK_PEER_TASK_H
-#define NETWORK_PEER_TASK_H
+#pragma once
 
 #include <QtCore/QObject>
 
+#include <client_core/connection_context_aware.h>
+
 #include <utils/common/id.h>
 
-class QnNetworkPeerTask : public QObject {
+class QnNetworkPeerTask : public QObject, public QnConnectionContextAware
+{
     Q_OBJECT
 public:
     explicit QnNetworkPeerTask(QObject *parent = 0);
@@ -31,5 +33,3 @@ protected:
 private:
     QSet<QnUuid> m_peers;
 };
-
-#endif // NETWORK_PEER_TASK_H

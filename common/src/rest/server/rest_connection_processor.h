@@ -9,12 +9,14 @@
 #include "request_handler.h"
 #include <core/resource_access/user_access_data.h>
 
+class QnHttpConnectionListener;
+
 class QnRestProcessorPool
-:
-    public Singleton<QnRestProcessorPool>
 {
 public:
     typedef QMap<QString, QnRestRequestHandlerPtr> Handlers;
+
+    QnRestProcessorPool();
 
     /*!
         Takes ownership of \a handler
@@ -29,11 +31,14 @@ private:
 
 class QnRestConnectionProcessorPrivate;
 
-class QnRestConnectionProcessor: public QnTCPConnectionProcessor {
+class QnRestConnectionProcessor: public QnTCPConnectionProcessor
+{
     Q_OBJECT
 
 public:
-    QnRestConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnRestConnectionProcessor(
+        QSharedPointer<AbstractStreamSocket> socket,
+        QnHttpConnectionListener* owner);
     virtual ~QnRestConnectionProcessor();
     void setAuthNotRequired(bool noAuth);
 

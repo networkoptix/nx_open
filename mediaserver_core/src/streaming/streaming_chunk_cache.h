@@ -9,6 +9,7 @@
 #include "streaming_chunk.h"
 #include "streaming_chunk_cache_key.h"
 #include "streaming_chunk_provider.h"
+#include <common/common_module.h>
 
 
 /*!
@@ -19,9 +20,7 @@ class StreamingChunkCache
     public ItemCache<StreamingChunkCacheKey, StreamingChunkPtr, StreamingChunkProvider>
 {
 public:
-    StreamingChunkCache();
-
-    static StreamingChunkCache* instance();
+    StreamingChunkCache(QnCommonModule* commonModule);
 };
 
 #endif  //STREAMING_CHUNK_CACHE_H

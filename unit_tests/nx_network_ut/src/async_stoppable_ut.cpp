@@ -50,6 +50,7 @@ private:
 
 TEST( QnStoppableAsync, SingleAsync )
 {
+    nx::utils::DetachedThreads detachedThreadsGuard;
     StoppableTestClass s;
     nx::utils::promise< bool > p;
     s.pleaseStop([ & ](){ p.set_value( true ); });
@@ -59,6 +60,7 @@ TEST( QnStoppableAsync, SingleAsync )
 
 TEST( QnStoppableAsync, SingleSync )
 {
+    nx::utils::DetachedThreads detachedThreadsGuard;
     StoppableTestClass s;
     s.pleaseStopSync();
     ASSERT_FALSE( s.isRunning() );
@@ -66,6 +68,7 @@ TEST( QnStoppableAsync, SingleSync )
 
 TEST( QnStoppableAsync, MultiManual )
 {
+    nx::utils::DetachedThreads detachedThreadsGuard;
     StoppableTestClass s1;
     StoppableTestClass s2;
     StoppableTestClass s3;

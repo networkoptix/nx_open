@@ -21,7 +21,7 @@ public:
         ContainsCameras = 0x2,
     };
 
-    QnClientStorageResource();
+    QnClientStorageResource(QnCommonModule* commonModule);
     virtual ~QnClientStorageResource();
 
     static QnClientStorageResourcePtr newStorage(const QnMediaServerResourcePtr &parentServer, const QString &url);

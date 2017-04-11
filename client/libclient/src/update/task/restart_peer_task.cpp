@@ -23,7 +23,7 @@ void QnRestartPeerTask::doStart() {
     m_restartingServers.clear();
 
     foreach (const QnUuid &id, peers()) {
-        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = resourcePool()->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             NX_ASSERT(0, "Non-server resource in server task.", Q_FUNC_INFO);
 
