@@ -2456,10 +2456,25 @@ void QnNxStyle::drawControl(
                     const int textFlags = textHorizontalAlignment
                         | Qt::AlignVCenter
                         | Qt::TextSingleLine
-                        | Qt::TextHideMnemonic;
+                        | Qt::TextHideMnemonic
+                        | Qt::TextLongestVariant | Qt::TextBypassShaping;
+
+                    const auto removeAmpersands =
+                        [](QString text) -> QString
+                        {
+                            /**
+                             * Removes all ampersands that are not concatenated with others
+                             * and not followed by whitespace.
+                             * Regular expression is:
+                             * (not match '&') match '&' (not match whitespace or '&')
+                             */
+                            return text.remove(QRegularExpression(lit("(?<!&)&(?![\\s&])")));
+
+                        };
 
                     /* Measurements don't support Qt::TextHideMnemonic, must use Qt::TextShowMnemonic: */
-                    QString text = buttonOption->fontMetrics.elidedText(buttonOption->text,
+                    const auto fixedText = removeAmpersands(buttonOption->text);
+                    const QString text = buttonOption->fontMetrics.elidedText(fixedText,
                         Qt::ElideRight, textRect.width(), Qt::TextShowMnemonic);
 
                     proxy()->drawItemText(painter, textRect, textFlags, buttonOption->palette,
