@@ -63,8 +63,8 @@ bool hasRunningLiveProvider(QnNetworkResourcePtr netRes)
 }
 
 OnvifResourceSearcher::OnvifResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractNetworkResourceSearcher(commonModule),
     QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule),
     m_informationFetcher(new OnvifResourceInformationFetcher(commonModule)),
     m_wsddSearcher(new OnvifResourceSearcherWsdd(m_informationFetcher.get()))
 {

@@ -10,8 +10,8 @@
 static const qint64 SOCK_UPDATE_INTERVAL = 1000000ll * 60 * 5;
 
 QnTestCameraResourceSearcher::QnTestCameraResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractNetworkResourceSearcher(commonModule),
     QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule),
     m_sockUpdateTime(0)
 {
 }

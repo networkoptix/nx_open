@@ -35,8 +35,8 @@ namespace
 }
 
 QnPlISDResourceSearcher::QnPlISDResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractNetworkResourceSearcher(commonModule),
-    QnAbstractResourceSearcher(commonModule)
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule)
 {
     QnMdnsListener::instance()->registerConsumer((std::uintptr_t) this);
 	nx_upnp::DeviceSearcher::instance()->registerHandler(this, kUpnpBasicDeviceType);

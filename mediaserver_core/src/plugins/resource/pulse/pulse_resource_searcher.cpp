@@ -13,8 +13,8 @@
 #include <common/static_common_module.h>
 
 QnPlPulseSearcher::QnPlPulseSearcher(QnCommonModule* commonModule):
-    QnAbstractNetworkResourceSearcher(commonModule),
-    QnAbstractResourceSearcher(commonModule)
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule)
 {
 }
 

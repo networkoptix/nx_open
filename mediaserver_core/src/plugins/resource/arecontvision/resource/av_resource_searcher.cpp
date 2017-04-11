@@ -24,8 +24,8 @@
 extern QString getValueFromString(const QString& line);
 
 QnPlArecontResourceSearcher::QnPlArecontResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractNetworkResourceSearcher(commonModule),
-    QnAbstractResourceSearcher(commonModule)
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule)
 {
     // everything related to Arecont must be initialized here
     AVJpeg::Header::Initialize("ArecontVision", "CamLabs", "ArecontVision");
