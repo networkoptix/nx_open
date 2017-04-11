@@ -1,5 +1,7 @@
 #include "ssl_stream_server_socket.h"
 
+#include "ssl_stream_socket.h"
+
 namespace nx {
 namespace network {
 namespace ssl {
@@ -34,8 +36,7 @@ void StreamServerSocket::onAcceptCompletion(
     {
         streamSocket = new StreamSocket(
             std::unique_ptr<AbstractStreamSocket>(streamSocket),
-            true,
-            m_encryptionUse);
+            true);
     }
 
     handler(sysErrorCode, streamSocket);

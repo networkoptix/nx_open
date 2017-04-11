@@ -1,11 +1,16 @@
 #pragma once
 
-#include "ssl_stream_socket.h"
 #include "../socket_delegate.h"
 
 namespace nx {
 namespace network {
 namespace ssl {
+
+enum class EncryptionUse
+{
+    always,
+    autoDetectByReceivedData
+};
 
 class NX_NETWORK_API StreamServerSocket:
     public StreamServerSocketDelegate

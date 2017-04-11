@@ -8,8 +8,7 @@ namespace ssl {
 
 StreamSocket::StreamSocket(
     std::unique_ptr<AbstractStreamSocket> delegatee,
-    bool isServerSide,
-    EncryptionUse /*encryptionUse*/)
+    bool isServerSide)
     :
     base_type(delegatee.get()),
     m_delegatee(std::move(delegatee))
