@@ -9,12 +9,6 @@ angular.module('webadminApp')
         	},
         	templateUrl: Config.viewsDir + 'components/volumeControl.html',
         	link: function(scope, element){
-        		//window.alert("directive loaded");
-        		function valueOutput(element) {
-		            var value = element.value;
-		            var output = element.parentNode.getElementsByTagName('output')[0] || element.parentNode.parentNode.getElementsByTagName('output')[0];
-		            output.innerText = value;
-		        }
 		        var selector = '[data-rangeslider]';
         		$('volume-control>.bar').rangeslider({
 		        	// Deactivate the feature detection
@@ -22,21 +16,22 @@ angular.module('webadminApp')
 		        	// Callback function
 		            onInit: function() {
 		            	this.$element[0].value = scope.volumeLevel;
-		                valueOutput(this.$element[0]);
 		            },
 		            // Callback function
 		            onSlide: function(position, value) {
 		            	if(isNaN(value))
 		            		return;
-		                valueOutput(this.$element[0]);
+		                //console.log("In VolumeControl", new Date());
 		                scope.volumeLevel = value;
+		                scope.$apply();
 		            },
 		            // Callback function
 		            onSlideEnd: function(position, value) {
 		            	if(isNaN(value))
 		            		return;
-		                valueOutput(this.$element[0]);
+		                //console.log("In Volume Control", new Date());
 		                scope.volumeLevel = value;
+		                scope.$apply();
 		            }
 		        });
         	}

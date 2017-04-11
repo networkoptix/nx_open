@@ -36,8 +36,8 @@ var nativePlayer = new (function () {
         }
     };
 
-    this.Volume = function(volumeLevel){
-        currentVideo.volume = volumeLevel;
+    this.volume = function(volumeLevel){
+        currentVideo.volume = volumeLevel/100;
     }
 
     this.destroy = function(){
