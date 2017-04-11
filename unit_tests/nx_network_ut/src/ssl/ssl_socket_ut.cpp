@@ -155,6 +155,8 @@ TEST_F(SslSocketServerSide, DISABLED_send_receive_data)
 //-------------------------------------------------------------------------------------------------
 // Common socket tests. These are not enough since they do not even check ssl is actually used.
 
+#if 0
+
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST, SslSocketNotEncryptedConnection,
     []()
@@ -184,6 +186,8 @@ NX_NETWORK_BOTH_SOCKET_TEST_CASE(
             EncryptionUse::autoDetectByReceivedData);
     },
     []() { return std::make_unique<ssl::StreamSocket>(std::make_unique<TCPSocket>(AF_INET), false); });
+
+#endif
 
 } // namespace test
 } // namespace ssl
