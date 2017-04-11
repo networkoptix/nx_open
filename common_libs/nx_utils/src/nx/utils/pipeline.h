@@ -3,6 +3,7 @@
 #include <memory>
 
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/thread/mutex.h>
 
 namespace nx {
 namespace utils {
@@ -110,7 +111,7 @@ public:
      */
     std::size_t totalBytesThrough() const;
 
-    const QByteArray& internalBuffer() const;
+    QByteArray internalBuffer() const;
 
     /**
      * Subsequent read operation will report read error after depleting internal buffer.
@@ -118,6 +119,7 @@ public:
     void writeEof();
 
 private:
+    mutable QnMutex m_mutex;
     QByteArray m_buffer;
     std::size_t m_totalBytesThrough;
     std::size_t m_maxSize;
