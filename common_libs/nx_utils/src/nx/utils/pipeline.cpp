@@ -58,7 +58,9 @@ ReflectingPipeline::ReflectingPipeline(QByteArray initialData):
 
 int ReflectingPipeline::write(const void* data, size_t count)
 {
-    if (m_maxSize > 0 && m_buffer.size() >= m_maxSize)
+    QnMutexLocker lock(&m_mutex);
+
+    if ((m_maxSize > 0) && ((std::size_t)m_buffer.size() >= m_maxSize))
         return StreamIoError::wouldBlock;
 
     m_buffer.append(static_cast<const char*>(data), count);
@@ -68,6 +70,8 @@ int ReflectingPipeline::write(const void* data, size_t count)
 
 int ReflectingPipeline::read(void* data, size_t count)
 {
+    QnMutexLocker lock(&m_mutex);
+
     if (m_buffer.isEmpty())
         return m_eof ? StreamIoError::osError : StreamIoError::wouldBlock;
 
@@ -85,16 +89,19 @@ void ReflectingPipeline::setMaxBufferSize(std::size_t maxSize)
 
 std::size_t ReflectingPipeline::totalBytesThrough() const
 {
+    QnMutexLocker lock(&m_mutex);
     return m_totalBytesThrough;
 }
 
-const QByteArray& ReflectingPipeline::internalBuffer() const
+QByteArray ReflectingPipeline::internalBuffer() const
 {
+    QnMutexLocker lock(&m_mutex);
     return m_buffer;
 }
 
 void ReflectingPipeline::writeEof()
 {
+    QnMutexLocker lock(&m_mutex);
     m_eof = true;
 }
 

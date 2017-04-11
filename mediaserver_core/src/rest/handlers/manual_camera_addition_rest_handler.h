@@ -54,5 +54,5 @@ private:
     QnMutex m_searchProcessMutex;
 
     QHash<QnUuid, QnManualCameraSearcher*> m_searchProcesses;
-    QHash<QnUuid, nx::utils::concurrent::QnFuture<bool>> m_searchProcessRuns;
+    QHash<QnUuid, nx::utils::concurrent::Future<bool>> m_searchProcessRuns;
 };

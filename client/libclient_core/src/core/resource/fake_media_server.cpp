@@ -1,5 +1,7 @@
 #include "fake_media_server.h"
 
+#include <nx/network/url/url_builder.h>
+
 QnFakeMediaServerResource::QnFakeMediaServerResource():
     QnMediaServerResource()
 {
@@ -31,9 +33,11 @@ void QnFakeMediaServerResource::setFakeServerModuleInformation(const ec2::ApiDis
 
     if (!addressList.isEmpty())
     {
-        const SocketAddress address(addressList.first().toString(), serverData.port);
-        const auto url = address.toUrl(apiUrlScheme(serverData.sslAllowed)).toString();
-        setUrl(url);
+        const SocketAddress endpoint(addressList.first().toString(), serverData.port);
+        const auto url = nx::network::url::Builder()
+            .setScheme(apiUrlScheme(serverData.sslAllowed))
+            .setEndpoint(endpoint);
+        setUrl(url.toString());
     }
     if (!serverData.name.isEmpty())
         setName(serverData.name);

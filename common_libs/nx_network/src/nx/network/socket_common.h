@@ -18,7 +18,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QHash>
 #include <QtCore/QString>
-#include <QtCore/QUrl>
 
 #ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
@@ -149,7 +148,6 @@ public:
 
     QString toString() const;
     std::string toStdString() const;
-    QUrl toUrl(const QString& scheme = QString()) const;
     bool isNull() const;
 
     static const SocketAddress anyAddress;
