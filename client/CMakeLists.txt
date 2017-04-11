@@ -1,6 +1,6 @@
-rdep_add_package(any/qtsingleguiapplication)
-rdep_add_package(any/roboto-ttf)
-rdep_add_package(any/roboto-mono-ttf)
+nx_rdep_add_package(any/qtsingleguiapplication)
+nx_rdep_add_package(any/roboto-ttf)
+nx_rdep_add_package(any/roboto-mono-ttf)
 
 add_subdirectory(libclient_core)
 
