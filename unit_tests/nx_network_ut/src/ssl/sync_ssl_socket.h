@@ -23,7 +23,7 @@ class SyncSslSocket:
 
 public:
     SyncSslSocket(
-        std::unique_ptr<AbstractStreamSocket> wrappedSocket,
+        std::unique_ptr<AbstractStreamSocket> delegatee,
         bool isServerSide);
     virtual ~SyncSslSocket();
 
@@ -31,6 +31,9 @@ public:
     virtual int send(const void* buffer, unsigned int bufferLen) override;
 
 protected:
+    quint8 m_extraBuffer[32];
+    int m_extraBufferLen;
+
     friend int sock_read(BIO *b, char *out, int outl);
     friend int sock_write(BIO *b, const char *in, int inl);
 
@@ -40,13 +43,10 @@ protected:
 private:
     SSL* m_ssl;
     bool m_isServerSide;
+    std::unique_ptr<AbstractStreamSocket> m_delegatee;
 
     bool doServerHandshake();
     bool doClientHandshake();
-
-protected:
-    quint8 m_extraBuffer[32];
-    int m_extraBufferLen;
 };
 
 class ClientSyncSslSocket:

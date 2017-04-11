@@ -20,8 +20,8 @@ class SocketDelegate:
         "You MUST use class derived of AbstractSocket as a template argument");
 
 public:
-    SocketDelegate(std::unique_ptr<SocketInterfaceToImplement> target):
-        m_target(std::move(target))
+    SocketDelegate(SocketInterfaceToImplement* target):
+        m_target(target)
     {
     }
 
@@ -156,7 +156,7 @@ public:
     }
 
 protected:
-    std::unique_ptr<SocketInterfaceToImplement> m_target;
+    SocketInterfaceToImplement* m_target;
 };
 
 template<typename SocketInterfaceToImplement>
@@ -170,8 +170,8 @@ class CommunicatingSocketDelegate:
     using base_type = SocketDelegate<SocketInterfaceToImplement>;
 
 public:
-    CommunicatingSocketDelegate(std::unique_ptr<SocketInterfaceToImplement> target):
-        base_type(std::move(target))
+    CommunicatingSocketDelegate(SocketInterfaceToImplement* target):
+        base_type(target)
     {
     }
 
@@ -250,101 +250,44 @@ public:
     }
 };
 
-class StreamSocketDelegate:
+/**
+ * Does not takes ownership.
+ */
+class NX_NETWORK_API StreamSocketDelegate:
     public CommunicatingSocketDelegate<AbstractStreamSocket>
 {
     using base_type = CommunicatingSocketDelegate<AbstractStreamSocket>;
 
 public:
-    StreamSocketDelegate(std::unique_ptr<AbstractStreamSocket> target):
-        base_type(std::move(target))
-    {
-    }
+    StreamSocketDelegate(AbstractStreamSocket* target);
 
-    virtual bool reopen() override
-    {
-        return this->m_target->reopen();
-    }
-
-    virtual bool setNoDelay(bool value) override
-    {
-        return this->m_target->setNoDelay(value);
-    }
-
-    virtual bool getNoDelay(bool* value) const override
-    {
-        return this->m_target->getNoDelay(value);
-    }
-
-    virtual bool toggleStatisticsCollection(bool val) override
-    {
-        return this->m_target->toggleStatisticsCollection(val);
-    }
-
-    virtual bool getConnectionStatistics(StreamSocketInfo* info) override
-    {
-        return this->m_target->getConnectionStatistics(info);
-    }
-
-    virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override
-    {
-        return this->m_target->setKeepAlive(info);
-    }
-
-    virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const override
-    {
-        return this->m_target->getKeepAlive(result);
-    }
+    virtual bool reopen() override;
+    virtual bool setNoDelay(bool value) override;
+    virtual bool getNoDelay(bool* value) const override;
+    virtual bool toggleStatisticsCollection(bool val) override;
+    virtual bool getConnectionStatistics(StreamSocketInfo* info) override;
+    virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override;
+    virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const override;
 };
 
-class StreamServerSocketDelegate:
+class NX_NETWORK_API StreamServerSocketDelegate:
     public SocketDelegate<AbstractStreamServerSocket>
 {
     using base_type = SocketDelegate<AbstractStreamServerSocket>;
 
 public:
-    StreamServerSocketDelegate(std::unique_ptr<AbstractStreamServerSocket> target):
-        base_type(std::move(target))
-    {
-    }
+    StreamServerSocketDelegate(AbstractStreamServerSocket* target);
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
-    {
-        this->m_target->pleaseStop(std::move(handler));
-    }
-
-    virtual void pleaseStopSync(bool assertIfCalledUnderLock = true)
-    {
-        this->m_target->pleaseStopSync(assertIfCalledUnderLock);
-    }
-
-    virtual bool listen(int backlog = kDefaultBacklogSize) override
-    {
-        return this->m_target->listen(backlog);
-    }
-
-    virtual AbstractStreamSocket* accept()
-    {
-        return this->m_target->accept();
-    }
-
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler);
+    virtual void pleaseStopSync(bool assertIfCalledUnderLock = true);
+    virtual bool listen(int backlog = kDefaultBacklogSize) override;
+    virtual AbstractStreamSocket* accept();
     virtual void acceptAsync(
         nx::utils::MoveOnlyFunc<void(
             SystemError::ErrorCode,
-            AbstractStreamSocket*)> handler)
-    {
-        return this->m_target->acceptAsync(std::move(handler));
-    }
-
-    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
-    {
-        return this->m_target->cancelIOAsync(std::move(handler));
-    }
-
-    virtual void cancelIOSync()
-    {
-        return this->m_target->cancelIOSync();
-    }
+            AbstractStreamSocket*)> handler);
+    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler);
+    virtual void cancelIOSync();
 };
 
 } // namespace network

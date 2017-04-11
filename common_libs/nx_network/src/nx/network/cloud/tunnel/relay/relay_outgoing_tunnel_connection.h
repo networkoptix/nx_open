@@ -78,11 +78,12 @@ class OutgoingConnection:
 {
 public:
     OutgoingConnection(
-        std::unique_ptr<AbstractStreamSocket> delegate,
+        std::unique_ptr<AbstractStreamSocket> delegatee,
         std::shared_ptr<int> usageCounter);
     virtual ~OutgoingConnection() override;
 
 private:
+    std::unique_ptr<AbstractStreamSocket> m_delegatee;
     std::shared_ptr<int> m_usageCounter;
 };
 

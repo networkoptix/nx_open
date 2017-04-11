@@ -123,13 +123,14 @@ static BIO_METHOD Proxy_server_socket =
 // SyncSslSocket
 
 SyncSslSocket::SyncSslSocket(
-    std::unique_ptr<AbstractStreamSocket> wrappedSocket,
+    std::unique_ptr<AbstractStreamSocket> delegatee,
     bool isServerSide)
     :
-    base_type(std::move(wrappedSocket)),
+    base_type(delegatee.get()),
+    m_delegatee(std::move(delegatee)),
+    m_extraBufferLen(0),
     m_ssl(nullptr),
-    m_isServerSide(isServerSide),
-    m_extraBufferLen(0)
+    m_isServerSide(isServerSide)
 {
     BIO* readBio = BIO_new(&Proxy_server_socket);
     BIO_set_nbio(readBio, 1);

@@ -5,11 +5,12 @@ namespace network {
 namespace ssl {
 
 StreamSocket::StreamSocket(
-    std::unique_ptr<AbstractStreamSocket> wrappedSocket,
+    std::unique_ptr<AbstractStreamSocket> delegatee,
     bool /*isServerSide*/,
     EncryptionUse /*encryptionUse*/)
     :
-    base_type(std::move(wrappedSocket))
+    base_type(delegatee.get()),
+    m_delegatee(std::move(delegatee))
 {
 }
 

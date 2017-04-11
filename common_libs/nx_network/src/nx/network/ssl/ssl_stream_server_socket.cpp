@@ -5,17 +5,18 @@ namespace network {
 namespace ssl {
 
 StreamServerSocket::StreamServerSocket(
-    std::unique_ptr<AbstractStreamServerSocket> delegateSocket,
+    std::unique_ptr<AbstractStreamServerSocket> delegatee,
     EncryptionUse encryptionUse)
     :
-    base_type(std::move(delegateSocket)),
+    base_type(delegatee.get()),
+    m_delegatee(std::move(delegatee)),
     m_encryptionUse(encryptionUse)
 {
 }
 
 void StreamServerSocket::acceptAsync(AcceptCompletionHandler handler)
 {
-    return m_target->acceptAsync(
+    return m_delegatee->acceptAsync(
         [this, handler = std::move(handler)](
             SystemError::ErrorCode sysErrorCode,
             AbstractStreamSocket* streamSocket) mutable
