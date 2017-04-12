@@ -52,16 +52,15 @@ QnMediaServerModule::QnMediaServerModule(
     const QString& enforcedMediatorEndpoint,
     QObject* parent)
 {
-    m_staticCommon.reset(new QnStaticCommonModule(
-        Qn::PT_Server,
-        QnAppInfo::productNameShort(),
-        QnAppInfo::customizationName(),
-        this));
-
-    m_commonModule.reset(new QnCommonModule(/*clientMode*/ false, this));
-
     Q_INIT_RESOURCE(mediaserver_core);
     Q_INIT_RESOURCE(appserver2);
+
+    store(new QnStaticCommonModule(
+        Qn::PT_Server,
+        QnAppInfo::productNameShort(),
+        QnAppInfo::customizationName()));
+
+    m_commonModule = store(new QnCommonModule(/*clientMode*/ false));
 
     instance<QnLongRunnablePool>();
     instance<QnWriterPool>();
@@ -86,6 +85,8 @@ QnMediaServerModule::QnMediaServerModule(
     nx::network::SocketGlobals::mediatorConnector().enable(true);
 
     store(new QnNewSystemServerFlagWatcher(commonModule()));
+    store(new QnMasterServerStatusWatcher(commonModule()));
+
     store(new QnBusinessMessageBus(commonModule()));
 #ifdef ENABLE_VMAX
     store(new QnVMax480Server(commonModule()));
@@ -95,7 +96,9 @@ QnMediaServerModule::QnMediaServerModule(
 
     store(new QnStorageDbPool(commonModule()));
 
-    m_streamingChunkCache.reset(new StreamingChunkCache(commonModule()));
+    m_streamingChunkCache = store(new StreamingChunkCache(commonModule()));
+
+    // std::shared_pointer based singletones should be placed after InstanceStorage singletones
 
     m_normalStorageManager.reset(
         new QnStorageManager(
@@ -122,10 +125,10 @@ QnMediaServerModule::~QnMediaServerModule()
 
 StreamingChunkCache* QnMediaServerModule::streamingChunkCache() const
 {
-    return m_streamingChunkCache.get();
+    return m_streamingChunkCache;
 }
 
 QnCommonModule* QnMediaServerModule::commonModule() const
 {
-    return m_commonModule.get();
+    return m_commonModule;
 }
