@@ -4156,7 +4156,7 @@ to %1</source>
     </message>
     <message>
         <source>Stretch</source>
-        <translation>モニターサイズに合す</translation>
+        <translation>モニターサイズに合せる</translation>
     </message>
     <message>
         <source>Fit</source>
@@ -6821,7 +6821,7 @@ to %1</source>
     </message>
     <message>
         <source>Beta version %1</source>
-        <translation>ベタバージョン %1</translation>
+        <translation>ベータバージョン %1</translation>
     </message>
     <message>
         <source>Open File</source>
