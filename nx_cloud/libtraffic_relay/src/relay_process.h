@@ -1,7 +1,10 @@
 #pragma once
 
+#include <memory>
+
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/service.h>
 #include <nx/utils/thread/stoppable.h>
 
 namespace nx {
@@ -11,26 +14,16 @@ namespace relay {
 namespace conf { class Settings; }
 
 class RelayProcess:
-    public QnStoppable
+    public nx::utils::Service
 {
+    using base_type = nx::utils::Service;
+
 public:
     RelayProcess(int argc, char **argv);
-    virtual ~RelayProcess();
 
-    virtual void pleaseStop() override;
-
-    void setOnStartedEventHandler(
-        nx::utils::MoveOnlyFunc<void(bool /*isStarted*/)> handler);
-
-    int exec();
-
-private:
-    int m_argc;
-    char** m_argv;
-    nx::utils::promise<void> m_processTerminationEvent;
-    nx::utils::MoveOnlyFunc<void(bool /*isStarted*/)> m_startedEventHandler;
-
-    void initializeLog(const conf::Settings& settings);
+protected:
+    virtual std::unique_ptr<utils::AbstractServiceSettings> createSettings() override;
+    virtual int serviceMain(const utils::AbstractServiceSettings& settings) override;
 };
 
 } // namespace relay

@@ -100,7 +100,7 @@ QString Settings::dataDir() const
 #endif
 }
 
-const utils::log::Settings& Settings::logging() const
+utils::log::Settings Settings::logging() const
 {
     return m_logging;
 }

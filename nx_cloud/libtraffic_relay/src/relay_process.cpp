@@ -1,12 +1,5 @@
 #include "relay_process.h"
 
-#include <nx/network/socket_common.h>
-#include <nx/network/time/time_protocol_client.h>
-#include <nx/utils/log/log.h>
-#include <nx/utils/log/log_initializer.h>
-#include <nx/utils/scope_guard.h>
-#include <nx/utils/system_error.h>
-
 #include "controller/controller.h"
 #include "model/model.h"
 #include "view/view.h"
@@ -18,79 +11,28 @@ namespace cloud {
 namespace relay {
 
 RelayProcess::RelayProcess(int argc, char **argv):
-    m_argc(argc),
-    m_argv(argv)
+    base_type(argc, argv, TrafficRelayAppInfo::applicationDisplayName())
 {
 }
 
-RelayProcess::~RelayProcess()
+std::unique_ptr<utils::AbstractServiceSettings> RelayProcess::createSettings()
 {
-    // TODO: waiting for exec() to return
+    return std::make_unique<conf::Settings>();
 }
 
-void RelayProcess::pleaseStop()
+int RelayProcess::serviceMain(const utils::AbstractServiceSettings& abstractSettings)
 {
-    m_processTerminationEvent.set_value();
-}
+    const conf::Settings& settings = static_cast<const conf::Settings&>(abstractSettings);
 
-void RelayProcess::setOnStartedEventHandler(
-    nx::utils::MoveOnlyFunc<void(bool /*isStarted*/)> handler)
-{
-    m_startedEventHandler = std::move(handler);
-}
+    Model model(settings);
+    Controller controller(settings, &model);
+    View view(settings, model, &controller);
 
-int RelayProcess::exec()
-{
-    bool processStartResult = false;
-    auto triggerOnStartedEventHandlerGuard = makeScopeGuard(
-        [this, &processStartResult]
-        {
-            if (m_startedEventHandler)
-                m_startedEventHandler(processStartResult);
-        });
+    // TODO: #ak: process rights reduction should be done here.
 
-    try
-    {
-        conf::Settings settings;
-        settings.load(m_argc, m_argv);
-        if (settings.isShowHelpRequested())
-        {
-            settings.printCmdLineArgsHelp();
-            return 0;
-        }
+    view.start();
 
-        initializeLog(settings);
-
-        Model model(settings);
-        Controller controller(settings, &model);
-        View view(settings, model, &controller);
-
-        // TODO: #ak: process rights reduction should be done here.
-
-        view.start();
-
-        processStartResult = true;
-        triggerOnStartedEventHandlerGuard.fire();
-
-        m_processTerminationEvent.get_future().wait();
-
-        return 0;
-    }
-    catch (const std::exception& e)
-    {
-        NX_LOGX(lm("Error starting. %1").arg(e.what()), cl_logERROR);
-        return 3;
-    }
-}
-
-void RelayProcess::initializeLog(const conf::Settings& settings)
-{
-    utils::log::initialize(
-        settings.logging(),
-        settings.dataDir(),
-        TrafficRelayAppInfo::applicationDisplayName(),
-        "log_file",
-        QnLog::MAIN_LOG_ID);
+    return runMainLoop();
 }
 
 } // namespace relay

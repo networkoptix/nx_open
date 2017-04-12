@@ -10,7 +10,7 @@
 
 #include "relay_process.h"
 
-static nx::cloud::relay::RelayProcess* serviceInstance = NULL;
+static nx::utils::Service* serviceInstance = NULL;
 
 void stopServer(int /*signal*/)
 {
