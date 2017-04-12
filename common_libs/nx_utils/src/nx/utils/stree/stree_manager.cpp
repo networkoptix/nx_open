@@ -15,10 +15,12 @@
 #include "streesaxhandler.h"
 
 
+namespace nx {
+namespace utils {
 namespace stree {
 
 StreeManager::StreeManager(
-    const stree::ResourceNameSet& resourceNameSet,
+    const nx::utils::stree::ResourceNameSet& resourceNameSet,
     const QString& xmlFilePath) throw(std::runtime_error)
 :
     m_attrNameSet(resourceNameSet),
@@ -28,22 +30,22 @@ StreeManager::StreeManager(
 }
 
 void StreeManager::search(
-    const stree::AbstractResourceReader& input,
-    stree::AbstractResourceWriter* const output) const
+    const nx::utils::stree::AbstractResourceReader& input,
+    nx::utils::stree::AbstractResourceWriter* const output) const
 {
     m_stree->get(input, output);
 }
 
-const stree::ResourceNameSet& StreeManager::resourceNameSet() const
+const nx::utils::stree::ResourceNameSet& StreeManager::resourceNameSet() const
 {
     return m_attrNameSet;
 }
 
-std::unique_ptr<stree::AbstractNode> StreeManager::loadStree(
+std::unique_ptr<nx::utils::stree::AbstractNode> StreeManager::loadStree(
     QIODevice* const dataSource,
-    const stree::ResourceNameSet& resourceNameSet)
+    const nx::utils::stree::ResourceNameSet& resourceNameSet)
 {
-    stree::SaxHandler xmlHandler(resourceNameSet);
+    nx::utils::stree::SaxHandler xmlHandler(resourceNameSet);
 
     QXmlSimpleReader reader;
     reader.setContentHandler(&xmlHandler);
@@ -71,4 +73,6 @@ void StreeManager::loadStree() throw(std::runtime_error)
         throw std::runtime_error("Failed to parse stree xml file " + m_xmlFilePath.toStdString());
 }
 
-}   //namespace stree
+} // namespace stree
+} // namespace utils
+} // namespace nx

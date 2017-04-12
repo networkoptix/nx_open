@@ -33,7 +33,7 @@ class AuthenticationManager:
 public:
     AuthenticationManager(
         const QnAuthMethodRestrictionList& authRestrictionList,
-        const stree::StreeManager& stree);
+        const nx::utils::stree::StreeManager& stree);
 
     virtual void authenticate(
         const nx_http::HttpServerConnection& connection,
@@ -44,7 +44,7 @@ public:
 
 private:
     const QnAuthMethodRestrictionList& m_authRestrictionList;
-    const stree::StreeManager& m_stree;
+    const nx::utils::stree::StreeManager& m_stree;
     std::random_device m_rd;
     std::uniform_int_distribution<size_t> m_dist;
 

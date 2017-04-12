@@ -143,7 +143,7 @@ int VmsGatewayProcess::exec()
         timerManager.start();
 
         CdbAttrNameSet attrNameSet;
-        stree::StreeManager streeManager(
+        nx::utils::stree::StreeManager streeManager(
             attrNameSet,
             settings.auth().rulesXmlPath);
 

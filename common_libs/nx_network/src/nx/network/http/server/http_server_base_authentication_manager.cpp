@@ -71,7 +71,7 @@ void BaseAuthenticationManager::reportAuthenticationFailure(
 {
     completionHandler(
         false,
-        stree::ResourceContainer(),
+        nx::utils::stree::ResourceContainer(),
         generateWwwAuthenticateHeader(),
         nx_http::HttpHeaders(),
         nullptr);
@@ -114,7 +114,7 @@ void BaseAuthenticationManager::reportSuccess(
 {
     completionHandler(
         true,
-        stree::ResourceContainer(),
+        nx::utils::stree::ResourceContainer(),
         header::WWWAuthenticate(),
         nx_http::HttpHeaders(),
         nullptr);

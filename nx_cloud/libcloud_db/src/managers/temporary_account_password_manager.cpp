@@ -43,8 +43,8 @@ TemporaryAccountPasswordManager::~TemporaryAccountPasswordManager()
 void TemporaryAccountPasswordManager::authenticateByName(
     const nx_http::StringType& username,
     std::function<bool(const nx::Buffer&)> checkPasswordHash,
-    const stree::AbstractResourceReader& authSearchInputData,
-    stree::ResourceContainer* const authProperties,
+    const nx::utils::stree::AbstractResourceReader& authSearchInputData,
+    nx::utils::stree::ResourceContainer* const authProperties,
     nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
     QnMutexLocker lk(&m_mutex);

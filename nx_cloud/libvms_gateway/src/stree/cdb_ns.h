@@ -61,7 +61,7 @@ enum Value
 //!Contains description of stree attributes used by cloud_db
 class CdbAttrNameSet
 :
-    public stree::ResourceNameSet
+    public nx::utils::stree::ResourceNameSet
 {
 public:
     CdbAttrNameSet();

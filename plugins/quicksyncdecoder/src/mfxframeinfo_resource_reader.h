@@ -11,12 +11,12 @@
 
 class MFXFrameInfoResourceReader
 :
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
     MFXFrameInfoResourceReader( const mfxFrameInfo& frameInfo );
 
-    //!Implementation of stree::AbstractResourceReader::get
+    //!Implementation of nx::utils::stree::AbstractResourceReader::get
     /*!
         Following parameters are supported:\n
             - framePictureWidth

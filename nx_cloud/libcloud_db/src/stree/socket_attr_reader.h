@@ -15,7 +15,7 @@ namespace cdb {
 
 class SocketResourceReader
 :
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
     SocketResourceReader(const AbstractCommunicatingSocket& sock);

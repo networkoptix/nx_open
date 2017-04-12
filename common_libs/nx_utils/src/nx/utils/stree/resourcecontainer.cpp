@@ -7,8 +7,10 @@
 #include <nx/utils/std/cpp14.h>
 
 
-namespace stree
-{
+namespace nx {
+namespace utils {
+namespace stree {
+
     namespace detail
     {
         class ResourceContainerConstIterator
@@ -111,7 +113,7 @@ namespace stree
         return std::make_unique<detail::ResourceContainerConstIterator>(m_mediaStreamPameters);
     }
 
-    QString ResourceContainer::toString( const stree::ResourceNameSet& rns ) const
+    QString ResourceContainer::toString( const nx::utils::stree::ResourceNameSet& rns ) const
     {
         QString str;
         for( auto resPair: m_mediaStreamPameters )
@@ -227,8 +229,8 @@ namespace stree
         {
         public:
             MultiConstIterator(
-                std::unique_ptr<stree::AbstractConstIterator> one,
-                std::unique_ptr<stree::AbstractConstIterator> two);
+                std::unique_ptr<nx::utils::stree::AbstractConstIterator> one,
+                std::unique_ptr<nx::utils::stree::AbstractConstIterator> two);
 
             virtual bool next() override;
             virtual bool atEnd() const override;
@@ -236,14 +238,14 @@ namespace stree
             virtual QVariant value() const override;
 
         private:
-            std::unique_ptr<stree::AbstractConstIterator> m_one;
-            std::unique_ptr<stree::AbstractConstIterator> m_two;
+            std::unique_ptr<nx::utils::stree::AbstractConstIterator> m_one;
+            std::unique_ptr<nx::utils::stree::AbstractConstIterator> m_two;
         };
 
 
         MultiConstIterator::MultiConstIterator(
-            std::unique_ptr<stree::AbstractConstIterator> one,
-            std::unique_ptr<stree::AbstractConstIterator> two)
+            std::unique_ptr<nx::utils::stree::AbstractConstIterator> one,
+            std::unique_ptr<nx::utils::stree::AbstractConstIterator> two)
         :
             m_one(std::move(one)),
             m_two(std::move(two))
@@ -281,8 +283,11 @@ namespace stree
     {
     }
 
-    std::unique_ptr<stree::AbstractConstIterator> MultiIteratableResourceReader::begin() const
+    std::unique_ptr<nx::utils::stree::AbstractConstIterator> MultiIteratableResourceReader::begin() const
     {
         return std::make_unique<detail::MultiConstIterator>(m_rc1.begin(), m_rc2.begin());
     }
-}
+
+} // namespace stree
+} // namespace utils
+} // namespace nx

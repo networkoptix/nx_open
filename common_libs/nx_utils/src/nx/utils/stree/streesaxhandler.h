@@ -13,8 +13,10 @@
 #include "resourcenameset.h"
 
 
-namespace stree
-{
+namespace nx {
+namespace utils {
+namespace stree {
+
     class AbstractNode;
 
     namespace MatchType
@@ -73,6 +75,9 @@ namespace stree
         template<typename T> std::unique_ptr<AbstractNode> createConditionNode( MatchType::Value matchType, int matchResID ) const;
         std::unique_ptr<AbstractNode> createConditionNodeForStringRes( MatchType::Value matchType, int matchResID ) const;
     };
-}
+
+} // namespace stree
+} // namespace utils
+} // namespace nx
 
 #endif  //STREESAXHANDLER_H

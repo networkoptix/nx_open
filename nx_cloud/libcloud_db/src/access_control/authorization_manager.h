@@ -38,11 +38,11 @@ public:
         \note This method cannot block
     */
     bool authorize(
-        const stree::AbstractResourceReader& authenticationProperties,
-        const stree::AbstractResourceReader& dataToAuthorize,
+        const nx::utils::stree::AbstractResourceReader& authenticationProperties,
+        const nx::utils::stree::AbstractResourceReader& dataToAuthorize,
         EntityType requestedEntity,
         DataActionType requestedAction,
-        stree::AbstractResourceWriter* const authzInfo ) const;
+        nx::utils::stree::AbstractResourceWriter* const authzInfo ) const;
 
 private:
     const StreeManager& m_stree;

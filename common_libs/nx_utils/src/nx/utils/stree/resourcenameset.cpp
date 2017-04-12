@@ -7,8 +7,10 @@
 
 using namespace std;
 
-namespace stree
-{
+namespace nx {
+namespace utils {
+namespace stree {
+
     bool ResourceNameSet::registerResource( int id, const QString& name, QVariant::Type type )
     {
         pair<ResNameToIDDict::iterator, bool> p = m_resNameToID.insert( 
@@ -49,4 +51,7 @@ namespace stree
         m_resNameToID.erase( it->second );
         m_resIDToName.erase( it );
     }
-}
+
+} // namespace stree
+} // namespace utils
+} // namespace nx

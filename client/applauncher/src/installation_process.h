@@ -90,7 +90,7 @@ private:
     std::shared_ptr<RDirSyncher> m_syncher;
     QString m_errorText;
     mutable std::mutex m_mutex;
-    std::unique_ptr<stree::AbstractNode> m_currentTree;
+    std::unique_ptr<nx::utils::stree::AbstractNode> m_currentTree;
     int64_t m_totalBytesDownloaded;
     std::map<QString, int64_t> m_unfinishedFilesBytesDownloaded;
     int64_t m_totalBytesToDownload;

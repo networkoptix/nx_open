@@ -10,8 +10,9 @@
 #include <nx/utils/match/wildcard.h>
 
 
-namespace stree
-{
+namespace nx {
+namespace utils {
+namespace stree {
     /*!
         Associative dictionary. Element key interpreted as wildcard mask. \a find methods finds first element with mask, supplying searched string
         \note Performs validation to mask by sequentially checking all elements. So do not use it when high performance is needed
@@ -97,6 +98,8 @@ namespace stree
     private:
         InternalContainerType m_container;
     };
-}
+} // namespace stree
+} // namespace utils
+} // namespace nx
 
 #endif  //WILDCARDMATCHCONTAINER_H

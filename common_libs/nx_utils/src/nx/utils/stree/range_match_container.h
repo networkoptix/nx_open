@@ -10,6 +10,8 @@
 #include <QtCore/QString>
 
 
+namespace nx {
+namespace utils {
 namespace stree {
 
 namespace detail {
@@ -156,4 +158,6 @@ public:
     }
 };
 
-}   // namespace stree
+} // namespace stree
+} // namespace utils
+} // namespace nx

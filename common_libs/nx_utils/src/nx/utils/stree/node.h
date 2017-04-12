@@ -15,8 +15,10 @@
 /*!
     Contains implementation of simple search tree
 */
-namespace stree
-{
+namespace nx {
+namespace utils {
+namespace stree {
+
     //!Base class for all nodes
     /*!
         \note Descendant is not required to be thread-safe
@@ -198,6 +200,8 @@ namespace stree
         const QVariant m_valueToSet;
     };
 
-}
+} // namespace stree
+} // namespace utils
+} // namespace nx
 
 #endif  //ABSTRACTNODE_H

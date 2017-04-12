@@ -11,8 +11,10 @@
 #include <QtCore/QVariant>
 
 
-namespace stree
-{
+namespace nx {
+namespace utils {
+namespace stree {
+
     static const int INVALID_RES_ID = -1;
 
     /*!
@@ -70,6 +72,9 @@ namespace stree
         ResNameToIDDict m_resNameToID;
         ResIDToNameDict m_resIDToName;
     };
-}
+
+} // namespace stree
+} // namespace utils
+} // namespace nx
 
 #endif  //RESOURCENAMESET_H

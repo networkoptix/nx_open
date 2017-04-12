@@ -18,8 +18,10 @@
 #include "resourcenameset.h"
 
 
-namespace stree
-{
+namespace nx {
+namespace utils {
+namespace stree {
+
     //!Implement this interface to allow reading resource values from object
     class NX_UTILS_API AbstractResourceReader
     {
@@ -138,7 +140,7 @@ namespace stree
         virtual ~AbstractIteratableContainer() {}
 
         //!Returns iterator set to the first element
-        virtual std::unique_ptr<stree::AbstractConstIterator> begin() const = 0;
+        virtual std::unique_ptr<nx::utils::stree::AbstractConstIterator> begin() const = 0;
     };
 
 
@@ -163,9 +165,9 @@ namespace stree
         virtual void put( int resID, const QVariant& value ) override;
 
         //!Implementation of AbstractIteratableContainer::begin
-        virtual std::unique_ptr<stree::AbstractConstIterator> begin() const override;
+        virtual std::unique_ptr<nx::utils::stree::AbstractConstIterator> begin() const override;
 
-        QString toString( const stree::ResourceNameSet& rns ) const;
+        QString toString( const nx::utils::stree::ResourceNameSet& rns ) const;
         bool empty() const;
 
     private:
@@ -237,7 +239,7 @@ namespace stree
             const AbstractIteratableContainer& rc2);
 
         //!Implementation of AbstractIteratableContainer::begin
-        virtual std::unique_ptr<stree::AbstractConstIterator> begin() const override;
+        virtual std::unique_ptr<nx::utils::stree::AbstractConstIterator> begin() const override;
 
     private:
         const AbstractIteratableContainer& m_rc1;
@@ -252,12 +254,12 @@ namespace stree
      */
     class NX_UTILS_API ResourceWriterProxy
     :
-        public stree::AbstractResourceWriter
+        public nx::utils::stree::AbstractResourceWriter
     {
     public:
         ResourceWriterProxy(
-            stree::AbstractResourceWriter* target,
-            stree::AbstractResourceWriter* additionalOutput)
+            nx::utils::stree::AbstractResourceWriter* target,
+            nx::utils::stree::AbstractResourceWriter* additionalOutput)
         :
             m_target(target),
             m_additionalOutput(additionalOutput)
@@ -274,6 +276,9 @@ namespace stree
         AbstractResourceWriter* m_target;
         AbstractResourceWriter* m_additionalOutput;
     };
-}
+
+} // namespace stree
+} // namespace utils
+} // namespace nx
 
 #endif  //RESOURCECONTAINER_H

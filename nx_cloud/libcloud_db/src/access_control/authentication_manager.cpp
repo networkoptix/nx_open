@@ -57,7 +57,7 @@ void AuthenticationManager::authenticate(
     nx_http::server::AuthenticationCompletionHandler completionHandler)
 {
     boost::optional<nx_http::header::WWWAuthenticate> wwwAuthenticate;
-    stree::ResourceContainer authProperties;
+    nx::utils::stree::ResourceContainer authProperties;
     nx_http::HttpHeaders responseHeaders;
     std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody;
 
@@ -115,13 +115,13 @@ void AuthenticationManager::authenticate(
     }
 
     //performing stree search
-    stree::ResourceContainer authTraversalResult;
-    stree::ResourceContainer inputRes;
+    nx::utils::stree::ResourceContainer authTraversalResult;
+    nx::utils::stree::ResourceContainer inputRes;
     if (authzHeader && !authzHeader->userid().isEmpty())
         inputRes.put(attr::userName, authzHeader->userid());
     SocketResourceReader socketResources(*connection.socket());
     HttpRequestResourceReader httpRequestResources(request);
-    const auto authSearchInputData = stree::MultiSourceResourceReader(
+    const auto authSearchInputData = nx::utils::stree::MultiSourceResourceReader(
         socketResources,
         httpRequestResources,
         inputRes,
@@ -207,8 +207,8 @@ bool AuthenticationManager::validateNonce(const nx_http::StringType& nonce)
 api::ResultCode AuthenticationManager::authenticateInDataManagers(
     const nx_http::StringType& username,
     std::function<bool(const nx::Buffer&)> validateHa1Func,
-    const stree::AbstractResourceReader& authSearchInputData,
-    stree::ResourceContainer* const authProperties)
+    const nx::utils::stree::AbstractResourceReader& authSearchInputData,
+    nx::utils::stree::ResourceContainer* const authProperties)
 {
     //TODO #ak AuthenticationManager has to become async some time...
 

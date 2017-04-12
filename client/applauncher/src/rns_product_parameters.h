@@ -33,7 +33,7 @@ namespace ProductParameters
 
 class ProductResourcesNameset
 :
-    public stree::ResourceNameSet
+    public nx::utils::stree::ResourceNameSet
 {
 public:
     ProductResourcesNameset();

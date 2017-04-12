@@ -8,8 +8,10 @@
 #include <map>
 
 
-namespace stree
-{
+namespace nx {
+namespace utils {
+namespace stree {
+
     //TODO #ak use template alias here
     template <class KeyType, class MappedType>
         class EqualMatchContainer : public std::map<KeyType, MappedType>
@@ -96,6 +98,9 @@ namespace stree
         public ConditionMatchContainer<KeyType, MappedType, std::greater<KeyType> >
     {
     };
-}
+
+} // namespace stree
+} // namespace utils
+} // namespace nx
 
 #endif  //STREECONTAINER_H

@@ -15,8 +15,10 @@
 #include "wildcardmatchcontainer.h"
 
 
-namespace stree
-{
+namespace nx {
+namespace utils {
+namespace stree {
+
     namespace MatchType
     {
         Value fromString( const QString& str )
@@ -274,4 +276,7 @@ namespace stree
                 return NULL;
         }
     }
-}
+
+} // namespace stree
+} // namespace utils
+} // namespace nx

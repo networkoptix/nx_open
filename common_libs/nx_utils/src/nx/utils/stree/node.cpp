@@ -5,8 +5,10 @@
 #include "node.h"
 
 
-namespace stree
-{
+namespace nx {
+namespace utils {
+namespace stree {
+
     ////////////////////////////////////////////////////////////
     //// class SequenceNode
     ////////////////////////////////////////////////////////////
@@ -98,4 +100,6 @@ namespace stree
         return true;
     }
 
-}
+} // namespace stree
+} // namespace utils
+} // namespace nx

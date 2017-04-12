@@ -18,10 +18,10 @@ namespace data {
 class AuthRequest
 :
     public api::AuthRequest,
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
-    //!Implementation of \a stree::AbstractResourceReader::getAsVariant
+    //!Implementation of \a nx::utils::stree::AbstractResourceReader::getAsVariant
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
 };
 

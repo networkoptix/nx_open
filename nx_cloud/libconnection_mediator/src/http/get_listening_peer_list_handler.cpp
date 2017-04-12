@@ -16,7 +16,7 @@ GetListeningPeerListHandler::GetListeningPeerListHandler(const PeerRegistrator& 
 void GetListeningPeerListHandler::processRequest(
     nx_http::HttpServerConnection* const /*connection*/,
     const nx_http::Request& /*request*/,
-    stree::ResourceContainer /*authInfo*/)
+    nx::utils::stree::ResourceContainer /*authInfo*/)
 {
     requestCompleted(nx_http::FusionRequestResult(), m_registrator.getListeningPeers());
 }

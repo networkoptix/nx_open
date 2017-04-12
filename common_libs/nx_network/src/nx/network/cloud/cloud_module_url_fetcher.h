@@ -26,7 +26,7 @@ namespace network {
 namespace cloud {
 
 class CloudInstanceSelectionAttributeNameset:
-    public stree::ResourceNameSet
+    public nx::utils::stree::ResourceNameSet
 {
 public:
     enum AttributeType
@@ -115,7 +115,7 @@ private:
 
     void onHttpClientDone(nx_http::AsyncHttpClientPtr client);
     bool findModuleUrl(
-        const stree::AbstractNode& treeRoot,
+        const nx::utils::stree::AbstractNode& treeRoot,
         const int moduleAttrName,
         QUrl* const moduleEndpoint);
     void signalWaitingHandlers(

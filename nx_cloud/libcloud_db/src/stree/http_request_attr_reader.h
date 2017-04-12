@@ -15,7 +15,7 @@ namespace cdb {
 
 class HttpRequestResourceReader
 :
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
     HttpRequestResourceReader(const nx_http::Request& request);
