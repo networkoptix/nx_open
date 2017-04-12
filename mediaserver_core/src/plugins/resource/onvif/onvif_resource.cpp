@@ -1,4 +1,3 @@
-
 #ifdef ENABLE_ONVIF
 
 #include <algorithm>
@@ -180,6 +179,7 @@ public:
     int govMin;
     int govMax;
     bool usedInProfiles;
+    QString currentProfile;
 
 private:
     int restrictFrameRate(int frameRate, QnBounds frameRateBounds) const
@@ -190,6 +190,8 @@ private:
         return qBound((int)frameRateBounds.min, frameRate, (int)frameRateBounds.max);
     }
 };
+
+typedef std::function<bool(const VideoOptionsLocal&, const VideoOptionsLocal&)> VideoOptionsComparator;
 
 bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &s2)
 {
@@ -228,6 +230,41 @@ bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &
         return true;
 
     return s1.id < s2.id; // sort by name
+}
+
+bool compareByProfiles(const VideoOptionsLocal &s1, const VideoOptionsLocal &s2, const QMap<QString, int>& profilePriorities)
+{
+    auto firstPriority = profilePriorities.contains(s1.currentProfile)
+        ? profilePriorities[s1.currentProfile]
+        : -1;
+
+    auto secondPriority = profilePriorities.contains(s2.currentProfile)
+        ? profilePriorities[s2.currentProfile]
+        : -1;
+
+    if (firstPriority != secondPriority)
+        return firstPriority > secondPriority;
+    
+    return videoOptsGreaterThan(s1, s2);
+}
+
+VideoOptionsComparator createComparator(const QString& profiles)
+{
+    if (!profiles.isEmpty())
+    {
+        auto profileList = profiles.split(L',');
+        QMap<QString, int> profilePriorities;
+        for (auto i = 0; i < profileList.size(); ++i)
+            profilePriorities[profileList[i]] = profileList.size() - i;
+
+        return 
+            [profilePriorities](const VideoOptionsLocal &s1, const VideoOptionsLocal &s2) -> bool
+            {
+                return compareByProfiles(s1, s2, profilePriorities);
+            };
+    }
+
+    return videoOptsGreaterThan;
 }
 
 //
@@ -1867,7 +1904,10 @@ CameraDiagnostics::Result QnPlOnvifResource::updateVEncoderUsage(QList<VideoOpti
             QString vEncoderID = QString::fromStdString(profile->VideoEncoderConfiguration->token);
             for (int i = 0; i < optionsList.size(); ++i) {
                 if (optionsList[i].id == vEncoderID)
+                {
                     optionsList[i].usedInProfiles = true;
+                    optionsList[i].currentProfile = QString::fromStdString(profile->Name);
+                }
             }
         }
         return CameraDiagnostics::NoErrorResult();
@@ -1966,7 +2006,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
 
     auto frameRateBounds = resourceData.value<QnBounds>(Qn::FPS_BOUNDS_PARAM_NAME, QnBounds());
 
-    if (forcedParams && forcedParams->videoEncoders.size() >= getChannel())
+    if (forcedParams && forcedParams->videoEncoders.size() > getChannel()) 
     {
         videoEncodersTokens = forcedParams->videoEncoders[getChannel()].split(L',');
     }
@@ -2042,7 +2082,16 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
     CameraDiagnostics::Result result = updateVEncoderUsage(optionsList);
     if (!result)
         return result;
-    std::sort(optionsList.begin(), optionsList.end(), videoOptsGreaterThan);
+
+    auto profiles = forcedParams ? forcedParams->profiles : QVector<QString>();
+    auto channel = getChannel();
+    QString channelProfiles;
+
+    if (profiles.size() > channel)
+        channelProfiles = profiles[channel];
+
+    auto comparator = createComparator(channelProfiles);
+    std::sort(optionsList.begin(), optionsList.end(), comparator);
 
     /*
     if (optionsList.size() <= m_channelNumer)
