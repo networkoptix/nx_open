@@ -1,9 +1,4 @@
-/**********************************************************
-* 8 may 2015
-* a.kolesnikov
-***********************************************************/
-
-#include "cloud_db_process.h"
+#include "cloud_db_service.h"
 
 #include <algorithm>
 #include <chrono>
@@ -18,16 +13,15 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/socket_global.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
+#include <nx/utils/system_error.h>
 #include <nx/utils/type_utils.h>
 
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <platform/process/current_process.h>
 #include <utils/common/app_info.h>
-#include <nx/utils/scope_guard.h>
-#include <nx/utils/system_error.h>
 #include <utils/db/db_structure_updater.h>
 
 #include <cloud_db_client/src/cdb_request_path.h>
@@ -60,10 +54,8 @@ static int registerQtResources()
 namespace nx {
 namespace cdb {
 
-CloudDBProcess::CloudDBProcess(int argc, char **argv):
-    m_argc(argc),
-    m_argv(argv),
-    m_terminated(false),
+CloudDbService::CloudDbService(int argc, char **argv):
+    base_type(argc, argv, QnLibCloudDbAppInfo::applicationDisplayName()),
     m_settings(nullptr),
     m_emailManager(nullptr),
     m_streeManager(nullptr),
@@ -80,239 +72,198 @@ CloudDBProcess::CloudDBProcess(int argc, char **argv):
     registerQtResources();
 }
 
-void CloudDBProcess::pleaseStop()
-{
-    m_processTerminationEvent.set_value();
-}
-
-void CloudDBProcess::setOnStartedEventHandler(
-    nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler)
-{
-    m_startedEventHandler = std::move(handler);
-}
-
-const std::vector<SocketAddress>& CloudDBProcess::httpEndpoints() const
+const std::vector<SocketAddress>& CloudDbService::httpEndpoints() const
 {
     return m_httpEndpoints;
 }
 
 static const QnUuid kCdbGuid("{674bafd7-4eec-4bba-84aa-a1baea7fc6db}");
 
-int CloudDBProcess::exec()
+std::unique_ptr<utils::AbstractServiceSettings> CloudDbService::createSettings()
 {
-    bool processStartResult = false;
-    auto triggerOnStartedEventHandlerGuard = makeScopeGuard(
-        [this, &processStartResult]
-        {
-            if (m_startedEventHandler)
-                m_startedEventHandler(processStartResult);
-        });
-
-    try
-    {
-        //reading settings
-        conf::Settings settings;
-        //parsing command line arguments
-        settings.load( m_argc, (const char**) m_argv );
-        if( settings.showHelp() )
-        {
-            settings.printCmdLineArgsHelpToCout();
-            return 0;
-        }
-
-        nx::utils::log::initialize(
-            settings.logging(), settings.dataDir(),
-            QnLibCloudDbAppInfo::applicationDisplayName(), "log_file", QnLog::MAIN_LOG_ID);
-
-        nx::utils::log::initialize(
-            settings.vmsSynchronizationLogging(), settings.dataDir(),
-            QnLibCloudDbAppInfo::applicationDisplayName(), "sync_log", QnLog::EC2_TRAN_LOG);
-
-        const auto& httpAddrToListenList = settings.endpointsToListen();
-        m_settings = &settings;
-        if( httpAddrToListenList.empty() )
-        {
-            NX_LOG( "No HTTP address to listen", cl_logALWAYS );
-            return 1;
-        }
-
-        dao::rdb::DbInstanceController dbInstanceController(
-            settings.dbConnectionOptions());
-        if (!dbInstanceController.initialize())
-        {
-            NX_LOG( lit("Failed to initialize DB connection"), cl_logALWAYS );
-            return 2;
-        }
-
-        nx::utils::TimerManager timerManager;
-        timerManager.start();
-
-        std::unique_ptr<AbstractEmailManager> emailManager(
-            EMailManagerFactory::create(settings));
-        m_emailManager = emailManager.get();
-
-        CdbAttrNameSet cdbAttrNameSet;
-        StreeManager streeManager(
-            cdbAttrNameSet,
-            settings.auth().rulesXmlPath);
-        m_streeManager = &streeManager;
-
-        nx_http::MessageDispatcher httpMessageDispatcher;
-        m_httpMessageDispatcher = &httpMessageDispatcher;
-
-        TemporaryAccountPasswordManager tempPasswordManager(
-            settings,
-            &dbInstanceController.queryExecutor());
-        m_tempPasswordManager = &tempPasswordManager;
-
-        AccountManager accountManager(
-            settings,
-            streeManager,
-            &tempPasswordManager,
-            &dbInstanceController.queryExecutor(),
-            emailManager.get());
-        m_accountManager = &accountManager;
-
-        EventManager eventManager(settings);
-        m_eventManager = &eventManager;
-
-        ec2::SyncronizationEngine ec2SyncronizationEngine(
-            kCdbGuid,
-            settings.p2pDb(),
-            &dbInstanceController.queryExecutor());
-
-        SystemHealthInfoProvider systemHealthInfoProvider(
-            &ec2SyncronizationEngine.connectionManager(),
-            &dbInstanceController.queryExecutor());
-
-        SystemManager systemManager(
-            settings,
-            &timerManager,
-            &accountManager,
-            systemHealthInfoProvider,
-            &dbInstanceController.queryExecutor(),
-            emailManager.get(),
-            &ec2SyncronizationEngine);
-        m_systemManager = &systemManager;
-
-        ec2SyncronizationEngine.subscribeToSystemDeletedNotification(
-            systemManager.systemMarkedAsDeletedSubscription());
-
-        //TODO #ak move following to stree xml
-        QnAuthMethodRestrictionList authRestrictionList;
-        authRestrictionList.allow(http_handler::GetCloudModulesXml::kHandlerPath, AuthMethod::noAuth);
-        authRestrictionList.allow(http_handler::Ping::kHandlerPath, AuthMethod::noAuth);
-        authRestrictionList.allow(kAccountRegisterPath, AuthMethod::noAuth);
-        authRestrictionList.allow(kAccountActivatePath, AuthMethod::noAuth);
-        authRestrictionList.allow(kAccountReactivatePath, AuthMethod::noAuth);
-
-        std::vector<AbstractAuthenticationDataProvider*> authDataProviders;
-        authDataProviders.push_back(&accountManager);
-        authDataProviders.push_back(&systemManager);
-        AuthenticationManager authenticationManager(
-            std::move(authDataProviders),
-            authRestrictionList,
-            streeManager);
-        m_authenticationManager = &authenticationManager;
-
-        AuthorizationManager authorizationManager(
-            streeManager,
-            accountManager,
-            systemManager);
-        m_authorizationManager = &authorizationManager;
-
-        AuthenticationProvider authProvider(
-            settings,
-            accountManager,
-            systemManager,
-            tempPasswordManager);
-        m_authProvider = &authProvider;
-
-        MaintenanceManager maintenanceManager(
-            kCdbGuid,
-            &ec2SyncronizationEngine,
-            dbInstanceController);
-
-        CloudModuleUrlProvider cloudModuleUrlProvider(
-            settings.moduleFinder().cloudModulesXmlTemplatePath);
-
-        //registering HTTP handlers
-        registerApiHandlers(
-            &httpMessageDispatcher,
-            authorizationManager,
-            &accountManager,
-            &systemManager,
-            &systemHealthInfoProvider,
-            &authProvider,
-            &eventManager,
-            &ec2SyncronizationEngine.connectionManager(),
-            &maintenanceManager,
-            cloudModuleUrlProvider);
-        //TODO #ak remove eventManager.registerHttpHandlers and register in registerApiHandlers
-        eventManager.registerHttpHandlers(
-            authorizationManager,
-            &httpMessageDispatcher);
-
-        MultiAddressServer<nx_http::HttpStreamSocketServer> multiAddressHttpServer(
-            &authenticationManager,
-            &httpMessageDispatcher,
-            false,  //TODO #ak enable ssl when it works properly
-            nx::network::NatTraversalSupport::disabled );
-
-        if (m_settings->auth().connectionInactivityPeriod.count())
-        {
-            multiAddressHttpServer.forEachListener(
-                [&](nx_http::HttpStreamSocketServer* server)
-                {
-                    server->setConnectionInactivityTimeout(
-                        m_settings->auth().connectionInactivityPeriod);
-                });
-        }
-
-        if (!multiAddressHttpServer.bind(httpAddrToListenList))
-            return 3;
-
-        // process privilege reduction
-        CurrentProcess::changeUser(settings.changeUser());
-
-        if (!multiAddressHttpServer.listen(settings.http().tcpBacklogSize))
-            return 5;
-        m_httpEndpoints = multiAddressHttpServer.endpoints();
-        NX_LOGX(lm("Listening on %1").container(m_httpEndpoints), cl_logINFO);
-
-        if (m_terminated)
-            return 0;
-
-        NX_LOG(lm("%1 has been started")
-            .arg(QnLibCloudDbAppInfo::applicationDisplayName()), cl_logALWAYS);
-
-        processStartResult = true;
-        triggerOnStartedEventHandlerGuard.fire();
-
-        // This is actually the main loop.
-        m_processTerminationEvent.get_future().wait();
-
-        NX_LOGX(lm("Stopping..."), cl_logALWAYS);
-
-        // First of all, cancelling accepting new requests.
-        multiAddressHttpServer.forEachListener(
-            [](nx_http::HttpStreamSocketServer* listener) { listener->pleaseStopSync(); });
-
-        NX_LOGX(lm("Http server stopped"), cl_logDEBUG1);
-
-        ec2SyncronizationEngine.unsubscribeFromSystemDeletedNotification(
-            systemManager.systemMarkedAsDeletedSubscription());
-
-        return 0;
-    }
-    catch (const std::exception& e)
-    {
-        NX_LOG(lit("Failed to start application. %1").arg(e.what()), cl_logALWAYS);
-        return 3;
-    }
+    return std::make_unique<conf::Settings>();
 }
 
-void CloudDBProcess::registerApiHandlers(
+int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSettings)
+{
+    const conf::Settings& settings = static_cast<const conf::Settings&>(abstractSettings);
+
+    nx::utils::log::initialize(
+        settings.vmsSynchronizationLogging(), settings.dataDir(),
+        QnLibCloudDbAppInfo::applicationDisplayName(), "sync_log", QnLog::EC2_TRAN_LOG);
+
+    const auto& httpAddrToListenList = settings.endpointsToListen();
+    m_settings = &settings;
+    if( httpAddrToListenList.empty() )
+    {
+        NX_LOG( "No HTTP address to listen", cl_logALWAYS );
+        return 1;
+    }
+
+    dao::rdb::DbInstanceController dbInstanceController(
+        settings.dbConnectionOptions());
+    if (!dbInstanceController.initialize())
+    {
+        NX_LOG( lit("Failed to initialize DB connection"), cl_logALWAYS );
+        return 2;
+    }
+
+    nx::utils::TimerManager timerManager;
+    timerManager.start();
+
+    std::unique_ptr<AbstractEmailManager> emailManager(
+        EMailManagerFactory::create(settings));
+    m_emailManager = emailManager.get();
+
+    CdbAttrNameSet cdbAttrNameSet;
+    StreeManager streeManager(
+        cdbAttrNameSet,
+        settings.auth().rulesXmlPath);
+    m_streeManager = &streeManager;
+
+    nx_http::MessageDispatcher httpMessageDispatcher;
+    m_httpMessageDispatcher = &httpMessageDispatcher;
+
+    TemporaryAccountPasswordManager tempPasswordManager(
+        settings,
+        &dbInstanceController.queryExecutor());
+    m_tempPasswordManager = &tempPasswordManager;
+
+    AccountManager accountManager(
+        settings,
+        streeManager,
+        &tempPasswordManager,
+        &dbInstanceController.queryExecutor(),
+        emailManager.get());
+    m_accountManager = &accountManager;
+
+    EventManager eventManager(settings);
+    m_eventManager = &eventManager;
+
+    ec2::SyncronizationEngine ec2SyncronizationEngine(
+        kCdbGuid,
+        settings.p2pDb(),
+        &dbInstanceController.queryExecutor());
+
+    SystemHealthInfoProvider systemHealthInfoProvider(
+        &ec2SyncronizationEngine.connectionManager(),
+        &dbInstanceController.queryExecutor());
+
+    SystemManager systemManager(
+        settings,
+        &timerManager,
+        &accountManager,
+        systemHealthInfoProvider,
+        &dbInstanceController.queryExecutor(),
+        emailManager.get(),
+        &ec2SyncronizationEngine);
+    m_systemManager = &systemManager;
+
+    ec2SyncronizationEngine.subscribeToSystemDeletedNotification(
+        systemManager.systemMarkedAsDeletedSubscription());
+
+    //TODO #ak move following to stree xml
+    QnAuthMethodRestrictionList authRestrictionList;
+    authRestrictionList.allow(http_handler::GetCloudModulesXml::kHandlerPath, AuthMethod::noAuth);
+    authRestrictionList.allow(http_handler::Ping::kHandlerPath, AuthMethod::noAuth);
+    authRestrictionList.allow(kAccountRegisterPath, AuthMethod::noAuth);
+    authRestrictionList.allow(kAccountActivatePath, AuthMethod::noAuth);
+    authRestrictionList.allow(kAccountReactivatePath, AuthMethod::noAuth);
+
+    std::vector<AbstractAuthenticationDataProvider*> authDataProviders;
+    authDataProviders.push_back(&accountManager);
+    authDataProviders.push_back(&systemManager);
+    AuthenticationManager authenticationManager(
+        std::move(authDataProviders),
+        authRestrictionList,
+        streeManager);
+    m_authenticationManager = &authenticationManager;
+
+    AuthorizationManager authorizationManager(
+        streeManager,
+        accountManager,
+        systemManager);
+    m_authorizationManager = &authorizationManager;
+
+    AuthenticationProvider authProvider(
+        settings,
+        accountManager,
+        systemManager,
+        tempPasswordManager);
+    m_authProvider = &authProvider;
+
+    MaintenanceManager maintenanceManager(
+        kCdbGuid,
+        &ec2SyncronizationEngine,
+        dbInstanceController);
+
+    CloudModuleUrlProvider cloudModuleUrlProvider(
+        settings.moduleFinder().cloudModulesXmlTemplatePath);
+
+    //registering HTTP handlers
+    registerApiHandlers(
+        &httpMessageDispatcher,
+        authorizationManager,
+        &accountManager,
+        &systemManager,
+        &systemHealthInfoProvider,
+        &authProvider,
+        &eventManager,
+        &ec2SyncronizationEngine.connectionManager(),
+        &maintenanceManager,
+        cloudModuleUrlProvider);
+    //TODO #ak remove eventManager.registerHttpHandlers and register in registerApiHandlers
+    eventManager.registerHttpHandlers(
+        authorizationManager,
+        &httpMessageDispatcher);
+
+    MultiAddressServer<nx_http::HttpStreamSocketServer> multiAddressHttpServer(
+        &authenticationManager,
+        &httpMessageDispatcher,
+        false,  //TODO #ak enable ssl when it works properly
+        nx::network::NatTraversalSupport::disabled );
+
+    if (m_settings->auth().connectionInactivityPeriod.count())
+    {
+        multiAddressHttpServer.forEachListener(
+            [&](nx_http::HttpStreamSocketServer* server)
+            {
+                server->setConnectionInactivityTimeout(
+                    m_settings->auth().connectionInactivityPeriod);
+            });
+    }
+
+    if (!multiAddressHttpServer.bind(httpAddrToListenList))
+        return 3;
+
+    // process privilege reduction
+    CurrentProcess::changeUser(settings.changeUser());
+
+    if (!multiAddressHttpServer.listen(settings.http().tcpBacklogSize))
+        return 5;
+    m_httpEndpoints = multiAddressHttpServer.endpoints();
+    NX_LOGX(lm("Listening on %1").container(m_httpEndpoints), cl_logINFO);
+
+    NX_LOG(lm("%1 has been started")
+        .arg(QnLibCloudDbAppInfo::applicationDisplayName()), cl_logALWAYS);
+
+    const auto result = runMainLoop();
+
+    NX_LOGX(lm("Stopping..."), cl_logALWAYS);
+
+    // First of all, cancelling accepting new requests.
+    multiAddressHttpServer.forEachListener(
+        [](nx_http::HttpStreamSocketServer* listener) { listener->pleaseStopSync(); });
+
+    NX_LOGX(lm("Http server stopped"), cl_logDEBUG1);
+
+    ec2SyncronizationEngine.unsubscribeFromSystemDeletedNotification(
+        systemManager.systemMarkedAsDeletedSubscription());
+
+    return result;
+}
+
+void CloudDbService::registerApiHandlers(
     nx_http::MessageDispatcher* const msgDispatcher,
     const AuthorizationManager& authorizationManager,
     AccountManager* const accountManager,
@@ -481,7 +432,7 @@ void CloudDBProcess::registerApiHandlers(
 }
 
 template<typename ManagerType, typename InputData, typename... OutputData>
-void CloudDBProcess::registerHttpHandler(
+void CloudDbService::registerHttpHandler(
     const char* handlerPath,
     void (ManagerType::*managerFunc)(
         const AuthorizationInfo& authzInfo,
@@ -514,7 +465,7 @@ void CloudDBProcess::registerHttpHandler(
 }
 
 template<typename ManagerType, typename... OutputData>
-void CloudDBProcess::registerHttpHandler(
+void CloudDbService::registerHttpHandler(
     const char* handlerPath,
     void (ManagerType::*managerFunc)(
         const AuthorizationInfo& authzInfo,
@@ -545,7 +496,7 @@ void CloudDBProcess::registerHttpHandler(
 }
 
 template<typename ManagerType>
-void CloudDBProcess::registerHttpHandler(
+void CloudDbService::registerHttpHandler(
     const char* handlerPath,
     typename CustomHttpHandler<ManagerType>::ManagerFuncType managerFuncPtr,
     ManagerType* manager)

@@ -116,8 +116,8 @@ SystemManager::~SystemManager()
 void SystemManager::authenticateByName(
     const nx_http::StringType& username,
     std::function<bool(const nx::Buffer&)> validateHa1Func,
-    const stree::AbstractResourceReader& /*authSearchInputData*/,
-    stree::ResourceContainer* const authProperties,
+    const nx::utils::stree::AbstractResourceReader& /*authSearchInputData*/,
+    nx::utils::stree::ResourceContainer* const authProperties,
     nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
     api::ResultCode result = api::ResultCode::notAuthorized;
@@ -236,8 +236,8 @@ namespace {
  * Returns true, if record contains every single resource present in filter.
  */
 static bool applyFilter(
-    const stree::AbstractResourceReader& record,
-    const stree::AbstractIteratableContainer& filter)
+    const nx::utils::stree::AbstractResourceReader& record,
+    const nx::utils::stree::AbstractIteratableContainer& filter)
 {
     // TODO: #ak this method should be moved to stree and have linear complexity, not n*log(n)!
     for (auto it = filter.begin(); !it->atEnd(); it->next())
@@ -262,7 +262,7 @@ void SystemManager::getSystems(
         attr::systemStatus,
         static_cast<int>(api::SystemStatus::ssActivated));
 
-    stree::MultiSourceResourceReader wholeFilterMap(filter, authzInfo);
+    nx::utils::stree::MultiSourceResourceReader wholeFilterMap(filter, authzInfo);
 
     const auto accountEmail = wholeFilterMap.get<std::string>(cdb::attr::authAccountEmail);
 

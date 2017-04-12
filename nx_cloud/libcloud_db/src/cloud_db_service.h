@@ -1,26 +1,21 @@
-/**********************************************************
-* 8 may 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef CLOUD_DB_PROCESS_H
-#define CLOUD_DB_PROCESS_H
+#pragma once
 
 #include <atomic>
 #include <functional>
 #include <memory>
 
-#include <nx/utils/thread/stoppable.h>
-#include <utils/db/async_sql_query_executor.h>
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/http/abstract_msg_body_source.h>
 #include <nx/network/http/server/abstract_http_request_handler.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/http/server/http_server_connection.h>
+#include <nx/utils/service.h>
 #include <nx/utils/std/future.h>
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/thread/stoppable.h>
 
 #include <cdb/result_code.h>
+#include <nx/utils/stree/resourcecontainer.h>
+#include <utils/db/async_sql_query_executor.h>
 
 #include "access_control/auth_types.h"
 #include "managers/managers_types.h"
@@ -54,21 +49,19 @@ class CloudModuleUrlProvider;
 namespace conf { class Settings; }
 namespace ec2 { class ConnectionManager; }
 
-class CloudDBProcess:
-    public QnStoppable
+class CloudDbService:
+    public nx::utils::Service
 {
+    using base_type = nx::utils::Service;
+
 public:
-    CloudDBProcess( int argc, char **argv );
-
-    //!Implementation of QnStoppable::pleaseStop
-    virtual void pleaseStop() override;
-
-    void setOnStartedEventHandler(
-        nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler);
+    CloudDbService(int argc, char **argv);
 
     const std::vector<SocketAddress>& httpEndpoints() const;
 
-    int exec();
+protected:
+    virtual std::unique_ptr<utils::AbstractServiceSettings> createSettings() override;
+    virtual int serviceMain(const utils::AbstractServiceSettings& settings) override;
 
 private:
     template<typename ManagerType>
@@ -78,7 +71,7 @@ private:
     public:
         typedef void (ManagerType::*ManagerFuncType)(
             nx_http::HttpServerConnection* const connection,
-            stree::ResourceContainer authInfo,
+            nx::utils::stree::ResourceContainer authInfo,
             nx_http::Request request,
             nx_http::Response* const response,
             nx_http::RequestProcessedHandler completionHandler);
@@ -95,7 +88,7 @@ private:
     protected:
         virtual void processRequest(
             nx_http::HttpServerConnection* const connection,
-            stree::ResourceContainer authInfo,
+            nx::utils::stree::ResourceContainer authInfo,
             nx_http::Request request,
             nx_http::Response* const response,
             nx_http::RequestProcessedHandler completionHandler) override
@@ -113,15 +106,10 @@ private:
         ManagerFuncType m_managerFuncPtr;
     };
 
-    int m_argc;
-    char** m_argv;
-    std::atomic<bool> m_terminated;
-    nx::utils::MoveOnlyFunc<void(bool /*result*/)> m_startedEventHandler;
     std::vector<SocketAddress> m_httpEndpoints;
-    nx::utils::promise<void> m_processTerminationEvent;
 
     //following pointers are here for debugging convenience
-    conf::Settings* m_settings;
+    const conf::Settings* m_settings;
     AbstractEmailManager* m_emailManager;
     StreeManager* m_streeManager;
     nx_http::MessageDispatcher* m_httpMessageDispatcher;
@@ -178,5 +166,3 @@ private:
 
 } // namespace cdb
 } // namespace nx
-
-#endif  //HOLE_PUNCHER_SERVICE_H

@@ -13,7 +13,7 @@
 #include "utils/common/util.h"
 #include "utils/common/synctime.h"
 #include <nx/network/simple_http_client.h>
-#include <utils/match/wildcard.h>
+#include <nx/utils/match/wildcard.h>
 #include "api/app_server_connection.h"
 #include "common/common_module.h"
 #include "core/resource/media_server_resource.h"

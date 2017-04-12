@@ -44,7 +44,7 @@ AbstractHttpRequestHandler::~AbstractHttpRequestHandler()
 bool AbstractHttpRequestHandler::processRequest(
     nx_http::HttpServerConnection* const connection,
     nx_http::Message&& requestMsg,
-    stree::ResourceContainer&& authInfo,
+    nx::utils::stree::ResourceContainer&& authInfo,
     ResponseIsReadyHandler completionHandler)
 {
     NX_ASSERT(requestMsg.type == nx_http::MessageType::request);

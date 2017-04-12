@@ -6,14 +6,14 @@
 namespace nx {
 namespace cdb {
 
-class CloudDBProcess;
+class CloudDbService;
 
-class CloudDBProcessPublic:
+class CloudDbServicePublic:
     public QnStoppable
 {
 public:
-    CloudDBProcessPublic(int argc, char **argv);
-    virtual ~CloudDBProcessPublic();
+    CloudDbServicePublic(int argc, char **argv);
+    virtual ~CloudDbServicePublic();
 
     virtual void pleaseStop() override;
 
@@ -22,10 +22,10 @@ public:
 
     int exec();
 
-    const CloudDBProcess* impl() const;
+    const CloudDbService* impl() const;
 
 private:
-    CloudDBProcess* m_impl;
+    CloudDbService* m_impl;
 };
 
 } // namespace cdb
