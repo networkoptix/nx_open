@@ -1,7 +1,9 @@
 #include <vector>
+#include <algorithm>
+#include <iterator>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include <nx/network/websocket/parser.h>
+#include <nx/network/websocket/websocket_parser.h>
 
 using namespace nx::network::websocket;
 
@@ -51,6 +53,15 @@ TEST(WebsocketParser, SimpleTestMessage_SeveralParts)
         p.consume((char*)kShortTextMessageFinNoMask + i, 1);
 }
 
+int calcHeaderSize(bool masked, int payloadLenType)
+{
+    int result = 2;
+    result += masked ? 4 : 0;
+    result += payloadLenType <= 125 ? 0 : payloadLenType == 126 ? 2 : 8;
+
+    return result;
+}
+
 int fillHeader(char* data, bool fin, int opCode, int payloadLenType, int64_t payloadLen, bool masked, int mask)
 {
     data[0] |= (int)fin << 7;
@@ -76,28 +87,62 @@ int fillHeader(char* data, bool fin, int opCode, int payloadLenType, int64_t pay
     return maskOffset;
 }
 
+int payloadLenTypeByLen(int64_t len)
+{
+    if (len <= 125)
+        return len;
+    else if (len < 65536)
+        return 126;
+    else
+        return 127;
+}
+
+//nx::Buffer createFrame()
+//{
+//}
+
+std::vector<char> prepareMessage(const std::vector<char>& payload, int frameCount, FrameType type, bool masked, int mask)
+{
+    std::vector<char> result;
+    std::vector<char> headerBuf;
+    int payloadSize = payload.size();
+    int frameLen = payloadSize / frameCount;
+    int payloadLenType = payloadLenTypeByLen(frameLen);
+    auto headerSize = calcHeaderSize(masked, payloadLenType);
+
+    result.resize(payload.size() + headerSize*frameCount);
+    for (int i = 0; i < frameCount; ++ i)
+    {
+        headerBuf.assign(headerSize, 0);
+        fillHeader(headerBuf.data(), (i == frameCount - 1) ? true : false, 
+            (i > 0 ? FrameType::continuation : type), payloadLenType, frameLen, masked, mask);
+        std::copy(headerBuf.cbegin(), headerBuf.cend(), result.begin() + i*frameLen + i*headerSize);
+        std::copy(payload.cbegin() + i*frameLen, payload.cbegin() + (i + 1)*frameLen, result.begin() + i*frameLen + (i + 1)*headerSize);
+    }
+
+    return result;
+}
+
 TEST(WebsocketParser, BinaryMessage_2Frames_LengthShort_NoMask)
 {
     TestParserHandler ph;
     Parser p(Role::client, &ph);
     const int kMessageSize = 1008;
-    std::vector<char> message(kMessageSize, 0);
-
-    ASSERT_EQ(fillHeader(message.data(), false, FrameType::binary, 126, 500, false, 0), 4);
-    for (int i = 0; i < 500; i += 5)
-        memcpy(message.data() + i + 4, "hello", 5);
-
-    ASSERT_EQ(fillHeader(message.data() + 504, true, FrameType::binary, 126, 500, false, 0), 4);
-    for (int i = 0; i < 500; i += 5)
-        memcpy(message.data() + i + 508, "hello", 5);
 
     EXPECT_CALL(ph, frameStarted(FrameType::binary, false)).Times(1);
-    EXPECT_CALL(ph, frameStarted(FrameType::binary, true)).Times(1);
+    EXPECT_CALL(ph, frameStarted(FrameType::continuation, true)).Times(1);
     EXPECT_CALL(ph, framePayload(_, _)).Times(AtLeast(1));
     EXPECT_CALL(ph, frameEnded()).Times(2);
     EXPECT_CALL(ph, messageEnded()).Times(1);
 
+    std::vector<char> payload;
+    payload.resize(1000);
+    for (int i = 0; i < 1000; i += 5)
+        memcpy(payload.data() + i, "hello", 5);
+
     int messageOffset = 0;
+    auto message = prepareMessage(payload, 2, FrameType::binary, false, 0);
+
     for (int i = 0; ; ++i) 
     {
         int consumeLen = std::min(kMessageSize - messageOffset, 13);

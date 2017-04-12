@@ -1,5 +1,5 @@
 #include <algorithm>
-#include <nx/network/websocket/parser.h>
+#include <nx/network/websocket/websocket_parser.h>
 
 namespace nx {
 namespace network {

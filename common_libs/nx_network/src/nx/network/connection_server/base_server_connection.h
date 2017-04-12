@@ -23,13 +23,13 @@ struct BaseServerConnectionAccess
     template<typename Derived, typename Base>
     static void bytesReceived(Base* base, nx::Buffer& buffer)
     {
-        static_cast<Derived*>(base)->on_bytesReceived(buffer);
+        static_cast<Derived*>(base)->bytesReceived(buffer);
     }
 
     template<typename Derived, typename Base>
     static void readyToSendData(Base* base)
     {
-        static_cast<Derived*>(base)->on_readyToSendData();
+        static_cast<Derived*>(base)->readyToSendData();
     }
 };
 
@@ -320,6 +320,46 @@ private:
     {
         m_streamSocket->cancelIOSync(nx::network::aio::etTimedOut);
     }
+};
+
+
+/**
+ * These two classes enable BaseServerConnection alternative usage without inheritance.
+ */
+class BaseServerConnectionHandler
+{
+public:
+    virtual void bytesReceived(const nx::Buffer& buffer) = 0;
+    virtual void readyToSendData() = 0;
+};
+
+class BaseServerConnectionWrapper : 
+    public BaseServerConnection<BaseServerConnectionWrapper> 
+{
+    friend struct BaseServerConnectionAccess;
+public:
+    BaseServerConnectionWrapper(
+        StreamConnectionHolder<BaseServerConnectionWrapper>* connectionManager,
+        std::unique_ptr<AbstractStreamSocket> streamSocket,
+        BaseServerConnectionHandler* handler) 
+        : 
+        BaseServerConnection<BaseServerConnectionWrapper>(connectionManager, std::move(streamSocket)),
+        m_handler(handler) 
+    {}
+
+private:
+    void bytesReceived(const nx::Buffer& buf)
+    {
+        m_handler->bytesReceived(buf);
+    }
+
+    void readyToSendData()
+    {
+        m_handler->readyToSendData();
+    }
+
+private:
+    BaseServerConnectionHandler* m_handler;
 };
 
 } // namespace nx_api

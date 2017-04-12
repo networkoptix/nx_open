@@ -2,7 +2,7 @@
 
 #include <cstdint>
 #include <nx/network/buffer.h>
-#include <nx/network/websocket/common_types.h>
+#include <nx/network/websocket/websocket_common_types.h>
 
 namespace nx {
 namespace network {

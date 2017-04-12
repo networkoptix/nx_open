@@ -1,18 +1,18 @@
 #pragma once
 
 #include <nx/network/connection_server/base_server_connection.h>
-#include <nx/network/websocket/parser.h>
-#include <nx/network/websocket/serializer.h>
+#include <nx/network/websocket/websocket_parser.h>
+#include <nx/network/websocket/websocket_serializer.h>
 #include <nx/network/aio/abstract_async_channel.h>
-#include <nx/network/websocket/common_types.h>
+#include <nx/network/websocket/websocket_common_types.h>
 
 namespace nx {
 namespace network {
 namespace websocket {
 
-class AsyncChannel : 
+class Websocket : 
     public aio::AbstractAsyncChannel,
-    private nx_api::BaseServerConnection<AsyncChannel>
+    public nx_api::BaseServerConnectionHandler
 {
     friend struct BaseServerConnectionAccess;
 public:
@@ -30,7 +30,7 @@ public:
     };
 
 public:
-    AsyncChannel(
+    Websocket(
         std::unique_ptr<AbstractStreamSocket> streamSocket,
         const nx::Buffer& requestData,
         Role role = Role::undefined); /**< if role is undefined, payload won't be masked (unmasked) */
@@ -55,16 +55,15 @@ public:
     }
 
 private:
-    void on_bytesReceived(const nx::Buffer& buf);
-    void on_readyToSendData();
+    virtual void bytesReceived(const nx::Buffer& buffer) override;
+    virtual void readyToSendData() override;
 
 private:
     std::chrono::milliseconds m_keepAliveTimeout;
+    nx_api::BaseServerConnectionWrapper m_baseConnection;
 };
 
 }
-
-using Websocket = websocket::AsyncChannel;
 
 }
 }
