@@ -13,11 +13,6 @@ Service::Service(int argc, char **argv, const QString& applicationDisplayName):
 {
 }
 
-Service::~Service()
-{
-    // TODO: waiting for exec() to return
-}
-
 void Service::pleaseStop()
 {
     m_processTerminationEvent.set_value(0);

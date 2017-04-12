@@ -15,7 +15,7 @@ class NX_UTILS_API Service:
 {
 public:
     Service(int argc, char **argv, const QString& applicationDisplayName);
-    virtual ~Service();
+    virtual ~Service() = default;
 
     virtual void pleaseStop() override;
 
