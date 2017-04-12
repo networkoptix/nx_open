@@ -12,7 +12,7 @@ class NX_UTILS_API AbstractServiceSettings
 public:
     virtual ~AbstractServiceSettings() = default;
 
-    virtual void load(int argc, char **argv) = 0;
+    virtual void load(int argc, const char **argv) = 0;
     virtual bool isShowHelpRequested() const = 0;
     virtual void printCmdLineArgsHelp() = 0;
 

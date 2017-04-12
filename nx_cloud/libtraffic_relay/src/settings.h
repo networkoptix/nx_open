@@ -39,7 +39,7 @@ public:
     Settings(const Settings&) = delete;
     Settings& operator=(const Settings&) = delete;
 
-    virtual void load(int argc, char **argv) override;
+    virtual void load(int argc, const char **argv) override;
     virtual bool isShowHelpRequested() const override;
     virtual void printCmdLineArgsHelp() override;
 

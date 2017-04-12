@@ -36,7 +36,7 @@ int Service::exec()
     try
     {
         auto settings = createSettings();
-        settings->load(m_argc, m_argv);
+        settings->load(m_argc, const_cast<const char**>(m_argv));
         if (settings->isShowHelpRequested())
         {
             settings->printCmdLineArgsHelp();

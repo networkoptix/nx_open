@@ -135,10 +135,10 @@ Settings::Settings():
     m_dbConnectionOptions.maxPeriodQueryWaitsForAvailableConnection = std::chrono::minutes(1);
 }
 
-void Settings::load(int argc, char **argv)
+void Settings::load(int argc, const char **argv)
 {
-    m_commandLineParser.parse(argc, const_cast<const char**>(argv), stderr);
-    m_settings.parseArgs(argc, const_cast<const char**>(argv));
+    m_commandLineParser.parse(argc, argv, stderr);
+    m_settings.parseArgs(argc, argv);
 
     loadConfiguration();
 }

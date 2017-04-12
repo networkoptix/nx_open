@@ -106,7 +106,7 @@ public:
     Settings& operator=(const Settings&) = delete;
 
     /** Loads settings from both command line and conf file (or win32 registry). */
-    virtual void load(int argc, char **argv) override;
+    virtual void load(int argc, const char **argv) override;
     virtual bool isShowHelpRequested() const override;
     virtual void printCmdLineArgsHelp() override;
     virtual QString dataDir() const override;

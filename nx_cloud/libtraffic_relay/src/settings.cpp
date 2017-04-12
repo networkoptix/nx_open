@@ -69,10 +69,10 @@ bool Settings::isShowHelpRequested() const
     return m_showHelpRequested;
 }
 
-void Settings::load(int argc, char **argv)
+void Settings::load(int argc, const char **argv)
 {
-    m_commandLineParser.parse(argc, (const char**) argv, stderr);
-    m_settings.parseArgs(argc, (const char**) argv);
+    m_commandLineParser.parse(argc, argv, stderr);
+    m_settings.parseArgs(argc, argv);
 
     loadSettings();
 }
