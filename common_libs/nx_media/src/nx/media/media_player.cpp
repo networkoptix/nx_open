@@ -800,7 +800,9 @@ qint64 Player::position() const
 void Player::setPosition(qint64 value)
 {
     Q_D(Player);
-    d->log(lit("setPosition(%1)").arg(value));
+    d->log(lit("setPosition(%1: %2)")
+        .arg(value)
+        .arg(QDateTime::fromMSecsSinceEpoch(value, Qt::UTC).toString()));
 
     d->positionMs = d->lastSeekTimeMs = value;
     if (d->archiveReader)
