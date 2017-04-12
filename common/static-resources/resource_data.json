@@ -1498,15 +1498,21 @@
             ]
         },
         {
-            "keys": ["Samsung Techwin|SNP-6320RH"],
+            "keys": ["Samsung*|SNP-6320RH", "Samsung*|SNO-7084R"], 
             "forcedOnvifParams": {
                 "profiles": ["H.264,MOBILE"]
             }
         },
         {
-            "keys": ["Samsung Techwin|SNF-8010"],
+            "keys": ["Samsung*|SNF-8010"],
             "forcedOnvifParams": {
                 "profiles": ["SourceH264,MOBILE"]
+            }
+        },
+        {
+            "keys": ["Samsung*|PNF-9010"],
+            "forcedOnvifParams": {
+                "profiles": ["FisheyeView,MOBILE"]
             }
         },
         {
