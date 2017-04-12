@@ -30,6 +30,21 @@
 
 #include <utils/common/delayed.h>
 
+namespace {
+
+//TODO: #vkutin #common Move this function to some common helpers file
+template<class... Args>
+auto safeProcedure(std::function<void(Args...)> proc)
+{
+    return [proc](Args... args)
+        {
+            if (proc)
+                proc(args...);
+        };
+}
+
+} // namespace
+
 QnResourcesChangesManager::QnResourcesChangesManager(QObject* parent /*= nullptr*/):
     base_type(parent)
 {}
@@ -45,12 +60,7 @@ void QnResourcesChangesManager::deleteResources(
     const QnResourceList& resources,
     const ActionResultCallback& callback)
 {
-    const auto safeCallback =
-        [callback](bool success)
-        {
-            if (callback)
-                callback(success);
-        };
+    const auto safeCallback = safeProcedure(callback);
 
     if (resources.isEmpty())
     {
@@ -317,12 +327,7 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
 void QnResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
     UserChangesFunction applyChanges, const ActionResultCallback& callback)
 {
-    const auto safeCallback =
-        [callback](bool success)
-        {
-            if (callback)
-                callback(success);
-        };
+    const auto safeCallback = safeProcedure(callback);
 
     if (!applyChanges)
     {
