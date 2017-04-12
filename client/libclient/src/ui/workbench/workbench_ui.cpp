@@ -308,9 +308,6 @@ void QnWorkbenchUi::updateCursor()
 
 bool QnWorkbenchUi::calculateTimelineVisible(QnResourceWidget* widget) const
 {
-    if (action(QnActions::ToggleLayoutTourModeAction)->isChecked())
-        return false;
-
     if (!widget)
         return false;
 
@@ -384,6 +381,15 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate)
         : true);
     const bool timelineVisible =
         (allowedByLayout && calculateTimelineVisible(navigator()->currentWidget()));
+
+    if (action(QnActions::ToggleLayoutTourModeAction)->isChecked())
+    {
+        setTimelineVisible(false, animate);
+        setTreeVisible(false, animate);
+        setTitleVisible(false, animate);
+        setNotificationsVisible(false, animate);
+        return;
+    }
 
     if (qnRuntime->isVideoWallMode())
     {

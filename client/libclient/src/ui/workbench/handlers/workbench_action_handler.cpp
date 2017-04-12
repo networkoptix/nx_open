@@ -1927,9 +1927,6 @@ void ActionHandler::at_togglePanicModeAction_toggled(bool checked) {
 
 void ActionHandler::at_workbench_itemChanged(Qn::ItemRole role)
 {
-    if (!workbench()->item(Qn::ZoomedRole))
-        action(QnActions::ToggleLayoutTourModeAction)->setChecked(false);
-
     if (role == Qn::CentralRole && adjustVideoDialog() && adjustVideoDialog()->isVisible())
     {
         QnWorkbenchItem *item = context()->workbench()->item(Qn::CentralRole);

@@ -1797,7 +1797,7 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnConjunctionActionCondition(
             new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this),
             new QnVideoWallReviewModeCondition(true, this),
-            new QnToggleTourActionCondition(this),
+     //       new QnToggleTourActionCondition(this), //TODO: #GDM #3.1 implement with review mode
             this
         ));
 
