@@ -19,6 +19,7 @@
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
+#include <common/static_common_module.h>
 #include "soap_wrapper.h"
 #include <onvif/soapStub.h>
 #include "gsoap_async_call_wrapper.h"
@@ -61,7 +62,11 @@ bool hasRunningLiveProvider(QnNetworkResourcePtr netRes)
     return rez;
 }
 
-OnvifResourceSearcher::OnvifResourceSearcher()
+OnvifResourceSearcher::OnvifResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule),
+    m_informationFetcher(new OnvifResourceInformationFetcher(commonModule)),
+    m_wsddSearcher(new OnvifResourceSearcherWsdd(m_informationFetcher.get()))
 {
 }
 
@@ -161,7 +166,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
     QString onvifUrl(QLatin1String("onvif/device_service"));
 
     QString urlBase = urlStr.left(urlStr.indexOf(QLatin1String("?")));
-    QnPlOnvifResourcePtr rpResource = qnResPool->getResourceByUrl(urlBase).dynamicCast<QnPlOnvifResource>();
+    QnPlOnvifResourcePtr rpResource = resourcePool()->getResourceByUrl(urlBase).dynamicCast<QnPlOnvifResource>();
 
     QnPlOnvifResourcePtr resource = createResource(rpResource ? rpResource->getTypeId() : typePtr->getId(), QnResourceParams()).dynamicCast<QnPlOnvifResource>();
     resource->setDefaultAuth(auth);
@@ -187,7 +192,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         if (channel > 0)
             resource->updateToChannel(channel-1);
 
-        auto resData = qnCommon
+        auto resData = qnStaticCommon
             ->dataPool()
             ->data(rpResource->getVendor(), rpResource->getModel());
 
@@ -242,13 +247,12 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
             }
         }
 
-        OnvifResourceInformationFetcher fetcher;
-        auto resData = qnCommon->dataPool()->data(manufacturer, modelName);
+        auto resData = qnStaticCommon->dataPool()->data(manufacturer, modelName);
         auto manufacturerAlias = resData.value<QString>(Qn::ONVIF_VENDOR_SUBTYPE);
 
         manufacturer = manufacturerAlias.isEmpty() ? manufacturer : manufacturerAlias;
 
-        QnUuid rt = fetcher.getOnvifResourceType(manufacturer, modelName);
+        QnUuid rt = m_informationFetcher->getOnvifResourceType(manufacturer, modelName);
         resource->setVendor( manufacturer );
         if (!modelName.isEmpty())
             resource->setName( modelName );
@@ -305,7 +309,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
 void OnvifResourceSearcher::pleaseStop()
 {
     QnAbstractNetworkResourceSearcher::pleaseStop();
-    m_wsddSearcher.pleaseStop();
+    m_wsddSearcher->pleaseStop();
 }
 
 QnResourceList OnvifResourceSearcher::findResources()
@@ -318,7 +322,7 @@ QnResourceList OnvifResourceSearcher::findResources()
     if (shouldStop())
          return QnResourceList();
 
-    m_wsddSearcher.findResources( result, discoveryMode() );
+    m_wsddSearcher->findResources( result, discoveryMode() );
 
     return result;
 }
@@ -346,7 +350,7 @@ QnResourcePtr OnvifResourceSearcher::createResource(const QnUuid &resourceTypeId
     result = OnvifResourceInformationFetcher::createOnvifResourceByManufacture(
         resourceType->getName() == lit("ONVIF") && !params.vendor.isEmpty()
         ? params.vendor
-        : resourceType->getName() ); // use name instead of manufacture to instanciate child onvif resource
+        : resourceType->getName() ); // use name instead of manufacture to instantiate child onvif resource
     if (!result )
         return result; // not found
 
@@ -355,7 +359,7 @@ QnResourcePtr OnvifResourceSearcher::createResource(const QnUuid &resourceTypeId
     NX_LOG(lit("OnvifResourceSearcher::createResource: create ONVIF camera resource. TypeID: %1.").arg(resourceTypeId.toString()), cl_logDEBUG1);
 
     //result->deserialize(parameters);
-
+    result->setCommonModule(commonModule());
     return result;
 
 }

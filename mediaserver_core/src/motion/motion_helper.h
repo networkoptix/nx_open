@@ -8,14 +8,13 @@
 #include "recorder/device_file_catalog.h"
 #include "motion_archive.h"
 #include "core/resource/resource_fwd.h"
+#include <nx/utils/singleton.h>
 
 class QnTimePeriodList;
 
-class QnMotionHelper
+class QnMotionHelper: public Singleton<QnMotionHelper>
 {
 public:
-    static void initStaticInstance( QnMotionHelper* inst );
-    static QnMotionHelper* instance();
     virtual ~QnMotionHelper();
 
     // write motion data to file

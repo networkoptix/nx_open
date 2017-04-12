@@ -32,6 +32,11 @@ int MediaServerLauncher::port() const
     return m_mediaServerProcess->getTcpPort();
 }
 
+QnCommonModule* MediaServerLauncher::commonModule() const
+{
+    return m_mediaServerProcess->commonModule();
+}
+
 void MediaServerLauncher::addSetting(const QString& name, const QVariant& value)
 {
     m_customSettings.emplace_back(name, value.toString());

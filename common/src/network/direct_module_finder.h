@@ -6,6 +6,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QQueue>
 #include <QtCore/QElapsedTimer>
+#include <common/common_module_aware.h>
 
 class QTimer;
 class QnAsyncHttpClientReply;
@@ -13,7 +14,8 @@ class HostAddress;
 class SocketAddress;
 struct QnModuleInformation;
 
-class QnDirectModuleFinder : public QObject {
+class QnDirectModuleFinder: public QObject, public QnCommonModuleAware
+{
     Q_OBJECT
 public:
     explicit QnDirectModuleFinder(QObject *parent);

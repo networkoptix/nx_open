@@ -16,6 +16,7 @@
 #include <utils/common/synctime.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/datetime.h>
 
 namespace {
     /** Fake handle for simultaneous load request. Initial value is big enough to not conflict with real request handles. */
@@ -29,8 +30,14 @@ namespace {
     }
 }
 
-QnFlatCameraDataLoader::QnFlatCameraDataLoader(const QnVirtualCameraResourcePtr &camera, Qn::TimePeriodContent dataType, QObject *parent):
-    QnAbstractCameraDataLoader(camera, dataType, parent)
+QnFlatCameraDataLoader::QnFlatCameraDataLoader(
+    const QnVirtualCameraResourcePtr& camera,
+    const QnMediaServerResourcePtr& server,
+    Qn::TimePeriodContent dataType,
+    QObject* parent)
+    :
+    QnAbstractCameraDataLoader(camera, dataType, parent),
+    m_server(server)
 {
     trace(lit("Creating loader"));
     if(!camera)
@@ -92,15 +99,23 @@ void QnFlatCameraDataLoader::discardCachedData(const qint64 resolutionMs)
     m_loadedData.clear();
 }
 
-int QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs) {
-    auto server = qnCommon->currentServer();
-    if (!server)
+void QnFlatCameraDataLoader::updateServer(const QnMediaServerResourcePtr& server)
+{
+    if (m_server == server)
+        return;
+
+    m_server = server;
+}
+
+int QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs)
+{
+    if (!m_server)
     {
         trace(lit("There is no current server, cannot send request"));
         return 0;   //TODO: #GDM #bookmarks make sure invalid value is handled
     }
 
-    auto connection = server->apiConnection();
+    auto connection = m_server->apiConnection();
     if (!connection)
     {
         trace(lit("There is no server api connection, cannot send request"));

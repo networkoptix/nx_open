@@ -11,6 +11,7 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
+class QnBusinessStringsHelper;
 
 class QnEventLogModel: public QAbstractItemModel, public QnWorkbenchContextAware
 {
@@ -67,7 +68,7 @@ private:
 
     static int helpTopicIdData(Column column, const QnBusinessActionData& action);
 
-    static QString motionUrl(Column column, const QnBusinessActionData& action);
+    QString motionUrl(Column column, const QnBusinessActionData& action) const;
     static QString getUserNameById(const QnUuid& id);
     static QString getResourceNameString(const QnUuid& id);
     static QString getUserGroupString(QnBusiness::UserGroup value);
@@ -79,4 +80,5 @@ private:
     QList<Column> m_columns;
     QBrush m_linkBrush;
     QScopedPointer<DataIndex> m_index;
+    std::unique_ptr<QnBusinessStringsHelper> m_helper;
 };

@@ -6,6 +6,8 @@
 #include <QtWidgets/QPushButton>
 
 #include <licensing/license.h>
+#include <licensing/license_validator.h>
+
 #include <ui/style/custom_style.h>
 
 QnLicenseDetailsDialog::QnLicenseDetailsDialog(const QnLicensePtr &license, QWidget *parent /* = NULL*/):
@@ -35,7 +37,7 @@ QnLicenseDetailsDialog::QnLicenseDetailsDialog(const QnLicensePtr &license, QWid
     }
 
     setWarningStyle(ui->errorLabel);
-    ui->errorLabel->setText(QnLicense::errorMessage(QnLicense::FutureLicense));
+    ui->errorLabel->setText(QnLicenseValidator::errorMessage(QnLicenseErrorCode::FutureLicense));
     ui->errorLabel->setVisible(license->type() == Qn::LC_Invalid);
 
     QString licenseText = licenseDescription(license);

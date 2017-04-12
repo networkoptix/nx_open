@@ -5,7 +5,7 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 
-#include <common/common_module.h>
+#include <common/static_common_module.h>
 
 #include <update/update_info.h>
 
@@ -39,8 +39,8 @@ void QnUpdateChecker::at_networkReply_finished() {
     map = map.value(QnAppInfo::customizationName()).toMap();
 
     QString currentRelease = map.value(lit("current_release")).toString();
-    if (qnCommon->engineVersion() > QnSoftwareVersion(currentRelease))
-        currentRelease = qnCommon->engineVersion().toString(QnSoftwareVersion::MinorFormat);
+    if (qnStaticCommon->engineVersion() > QnSoftwareVersion(currentRelease))
+        currentRelease = qnStaticCommon->engineVersion().toString(QnSoftwareVersion::MinorFormat);
 
     if (currentRelease.isEmpty())
         return;

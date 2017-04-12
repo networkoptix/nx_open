@@ -36,7 +36,7 @@ AudioPlayer::AudioPlayer( const QString& filePath )
     m_rtStartTime( AV_NOPTS_VALUE ),
     m_lastRtTime( 0 ),
     m_state( sInit ),
-    m_storage( new QnExtIODeviceStorageResource() ),
+    m_storage( new QnExtIODeviceStorageResource(nullptr) ),
     m_synthesizingTarget( NULL ),
     m_resultCode( rcNoError )
 {

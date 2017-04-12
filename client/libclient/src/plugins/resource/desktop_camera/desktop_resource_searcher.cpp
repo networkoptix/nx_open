@@ -1,4 +1,7 @@
 #include "desktop_resource_searcher.h"
+
+#include <client_core/client_core_module.h>
+
 #ifdef Q_OS_WIN
     #include <plugins/resource/desktop_win/desktop_resource_searcher_impl.h>
 #else
@@ -11,6 +14,7 @@ namespace {
 
 QnDesktopResourceSearcher::QnDesktopResourceSearcher(QGLWidget* mainWidget, QObject* parent):
     base_type(parent),
+    QnAbstractResourceSearcher(qnClientCoreModule->commonModule()),
     m_impl(new QnDesktopResourceSearcherImpl(mainWidget))
 {
 }

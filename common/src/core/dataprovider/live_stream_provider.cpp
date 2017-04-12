@@ -356,7 +356,7 @@ void QnLiveStreamProvider::onGotAudioFrame(const QnCompressedAudioDataPtr& audio
         if (savedCodec.isEmpty())
         {
             m_cameraRes->setProperty(Qn::CAMERA_AUDIO_CODEC_PARAM_NAME, actualCodec);
-            propertyDictionary->saveParams(m_cameraRes->getId());
+            m_cameraRes->saveParams();
         }
     }
 }

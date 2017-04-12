@@ -48,7 +48,11 @@ public:
                         m_moduleStartedPromise->set_value(isStarted);
                     });
                 moduleInstantiatedCreatedPromise.set_value();
-                return m_moduleInstance->exec();
+                auto result = m_moduleInstance->exec();
+
+                std::lock_guard<std::mutex> lock(m_mutex);
+                m_moduleInstance.reset();
+                return result;
             });
         moduleInstantiatedCreatedFuture.wait();
     }
@@ -76,10 +80,13 @@ public:
 
     void stop()
     {
-        if (!m_moduleInstance)
-            return;
+        {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            if (!m_moduleInstance)
+                return;
+            m_moduleInstance->pleaseStop();
+        }
 
-        m_moduleInstance->pleaseStop();
         m_moduleProcessThread.join();
         m_moduleInstance.reset();
     }
@@ -113,6 +120,7 @@ private:
     std::unique_ptr<ModuleProcessType> m_moduleInstance;
     nx::utils::thread m_moduleProcessThread;
     std::unique_ptr<nx::utils::promise<bool /*result*/>> m_moduleStartedPromise;
+    mutable std::mutex m_mutex;
 };
 
 }   // namespace test

@@ -51,7 +51,7 @@ TEST(GetStorages, saveAndMerge)
 
     NX_LOG("[TEST] Create a new storage with auto-generated id.", cl_logINFO);
     storage.name = "original name";
-    storage.parentId = qnCommon->moduleGUID();
+    storage.parentId = launcher.commonModule()->moduleGUID();
     storage.spaceLimit = 113326;
     storage.storageType = "local";
     NX_TEST_API_POST(&launcher,

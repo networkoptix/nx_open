@@ -1,5 +1,7 @@
 #include "system_helpers.h"
 
+#include <core/resource/media_server_resource.h>
+
 #include <network/cloud_system_data.h>
 #include <network/module_information.h>
 #include <api/model/connection_info.h>
@@ -123,20 +125,30 @@ bool isCloudSystem(const QnModuleInformation& info)
     return (info.version < kMinVersionWithLocalId ? false : !info.cloudSystemId.isEmpty());
 }
 
-QnUuid currentSystemLocalId()
+QnUuid currentSystemLocalId(const QnCommonModule* commonModule)
 {
-    const auto localId = qnGlobalSettings->localSystemId();
-    return (localId.isNull() ? qnCommon->remoteGUID() : localId);
+    if (!commonModule)
+        return QnUuid();
+
+    const auto& settings = commonModule->globalSettings();
+    const auto localId = settings->localSystemId();
+    return (localId.isNull() ? commonModule->remoteGUID() : localId);
 }
 
-bool serverBelongsToCurrentSystem(const QnModuleInformation& info)
+bool serverBelongsToCurrentSystem(const QnModuleInformation& info, const QnCommonModule* commonModule)
 {
-    return (getLocalSystemId(info) == currentSystemLocalId());
+    return (getLocalSystemId(info) == currentSystemLocalId(commonModule));
 }
 
-bool currentSystemIsNew()
+bool serverBelongsToCurrentSystem(const QnMediaServerResourcePtr& server)
 {
-    return qnGlobalSettings->localSystemId().isNull();
+    return serverBelongsToCurrentSystem(server->getModuleInformation(), server->commonModule());
+}
+
+bool currentSystemIsNew(const QnCommonModule* commonModule)
+{
+    const auto& settings = commonModule->globalSettings();
+    return settings->localSystemId().isNull();
 }
 
 bool isLocalUser(const QString& login)

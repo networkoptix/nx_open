@@ -45,5 +45,6 @@ private:
     Qt::Alignment m_alignment = Qt::AlignLeft | Qt::AlignTop;
     QnGraphicsScrollArea* const m_scrollArea;
     QGraphicsLinearLayout* const m_contentLayout;
+    QGraphicsLinearLayout* m_mainLayout{nullptr};
     QHash<QnUuid, QGraphicsWidget*> m_items;
 };

@@ -205,18 +205,6 @@ struct QnBookmarkColors {
     (buttonsSeparator)(bookmarksSeparatorTop)(bookmarksSeparatorBottom) \
     (tagBgNormal)(tagBgHovered)(tagTextNormal)(tagTextHovered)(moreItemsText)
 
-struct QnCompositeTextOverlayColors
-{
-    QnCompositeTextOverlayColors();
-
-    QnBookmarkColors bookmarkColors;
-
-    QColor textOverlayItemColor;
-
-};
-#define QnCompositeTextOverlayColors_Fields (bookmarkColors)(textOverlayItemColor)
-
-
 struct QnVideowallManageWidgetColors {
     QnVideowallManageWidgetColors();
 
@@ -327,13 +315,6 @@ struct QnPasswordStrengthColors
 };
 #define QnPasswordStrengthColors_Fields (inacceptable)(acceptable)(good)
 
-struct QnResourceHudColors
-{
-    QColor detailsBackgroundColor  = Qt::black;
-    QColor positionBackgroundColor = Qt::black;
-};
-#define QnResourceHudColors_Fields (detailsBackgroundColor)(positionBackgroundColor)
-
 #define QN_CLIENT_COLOR_TYPES \
     (QnTimeSliderColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
@@ -344,11 +325,9 @@ struct QnResourceHudColors
     (QnBackupScheduleColors) \
     (QnFailoverPriorityColors) \
     (QnBookmarkColors) \
-    (QnCompositeTextOverlayColors) \
     (QnGraphicsMessageBoxColors) \
     (QnResourceItemColors) \
-    (QnPasswordStrengthColors) \
-    (QnResourceHudColors)
+    (QnPasswordStrengthColors)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,

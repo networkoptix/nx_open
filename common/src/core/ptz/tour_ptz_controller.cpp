@@ -21,16 +21,18 @@ bool deserialize(const QString& /*value*/, QnPtzTourHash* /*target*/)
 // -------------------------------------------------------------------------- //
 // QnTourPtzController
 // -------------------------------------------------------------------------- //
-QnTourPtzController::QnTourPtzController(const QnPtzControllerPtr &baseController):
+QnTourPtzController::QnTourPtzController(
+    const QnPtzControllerPtr &baseController,
+    QThreadPool* threadPool,
+    QThread* executorThread):
     base_type(baseController),
     m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzTourHash>(lit("ptzTours"), QnPtzTourHash(), this)),
-    m_executor(new QnTourPtzExecutor(baseController))
+    m_executor(new QnTourPtzExecutor(baseController, threadPool))
 {
-    NX_ASSERT(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
     NX_ASSERT(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
 
     if(!baseController->hasCapabilities(Qn::VirtualPtzCapability)) // TODO: #Elric implement it in a saner way
-        m_executor->moveToThread(qnPtzPool->executorThread());
+        m_executor->moveToThread(executorThread);
 
     m_adaptor->setResource(baseController->resource());
     connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, [this]{ emit changed(Qn::ToursPtzField); }, Qt::QueuedConnection);

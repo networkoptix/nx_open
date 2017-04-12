@@ -4,6 +4,8 @@
 #include <QtCore/QFileInfo>
 #include <nx/utils/uuid.h>
 
+#include <common/common_module.h>
+
 #include <client/client_message_processor.h>
 
 #include <transcoding/file_transcoder.h>
@@ -22,10 +24,10 @@ QnAppServerNotificationCache::QnAppServerNotificationCache(QObject *parent) :
     base_type(folder, parent),
     m_model(new QnNotificationSoundModel(this))
 {
-    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::fileAdded,                   this,   &QnAppServerNotificationCache::at_fileAddedEvent);
-    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::fileUpdated,                 this,   &QnAppServerNotificationCache::at_fileUpdatedEvent);
-    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::fileRemoved,                 this,   &QnAppServerNotificationCache::at_fileRemovedEvent);
-    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::initialResourcesReceived,    this,   &QnAppServerNotificationCache::getFileList);
+    connect(qnClientMessageProcessor,   &QnClientMessageProcessor::fileAdded,                   this,   &QnAppServerNotificationCache::at_fileAddedEvent);
+    connect(qnClientMessageProcessor,   &QnClientMessageProcessor::fileUpdated,                 this,   &QnAppServerNotificationCache::at_fileUpdatedEvent);
+    connect(qnClientMessageProcessor,   &QnClientMessageProcessor::fileRemoved,                 this,   &QnAppServerNotificationCache::at_fileRemovedEvent);
+    connect(qnClientMessageProcessor,   &QnClientMessageProcessor::initialResourcesReceived,    this,   &QnAppServerNotificationCache::getFileList);
 
     connect(this, &QnAppServerFileCache::fileListReceived,  this,   &QnAppServerNotificationCache::at_fileListReceived);
     connect(this, &QnAppServerFileCache::fileDownloaded,    this,   &QnAppServerNotificationCache::at_fileAdded);

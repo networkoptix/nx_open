@@ -113,7 +113,7 @@ QnSearchBookmarksModel::Impl::Impl(QnSearchBookmarksModel *owner
     , m_filter()
     , m_query()
     , m_bookmarks()
-    , m_cameraNamesWatcher()
+    , m_cameraNamesWatcher(commonModule())
 {
     m_filter.limit = kMaxVisibleRows;
     m_filter.orderBy = QnSearchBookmarksModel::defaultSortOrder();
@@ -212,7 +212,7 @@ void QnSearchBookmarksModel::Impl::sort(int column
     m_filter.orderBy = calculateSortOrder(column, order);
     if (m_bookmarks.size() < kMaxVisibleRows)   // All bookmarks should be loaded here
     {
-        QnCameraBookmark::sortBookmarks(m_bookmarks, m_filter.orderBy);
+        QnCameraBookmark::sortBookmarks(commonModule(), m_bookmarks, m_filter.orderBy);
         emit m_owner->dataChanged(m_owner->index(0, 0)
             , m_owner->index(m_bookmarks.size() - 1, kColumnsCount - 1));
     }

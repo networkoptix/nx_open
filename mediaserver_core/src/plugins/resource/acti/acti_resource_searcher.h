@@ -8,12 +8,14 @@
 #include <plugins/resource/upnp/upnp_resource_searcher.h>
 #include <nx/network/mac_address.h>
 
-class QnActiResourceSearcher : public QObject, public QnUpnpResourceSearcherAsync
+class QnActiResourceSearcher:
+    public QObject,
+    public QnUpnpResourceSearcherAsync
 {
-    Q_OBJECT
-
+    Q_OBJECT;
+    using base_type = QnUpnpResourceSearcherAsync;
 public:
-    QnActiResourceSearcher();
+    QnActiResourceSearcher(QnCommonModule* commonModule);
     virtual ~QnActiResourceSearcher();
 
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params);

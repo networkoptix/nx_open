@@ -11,10 +11,12 @@
 #include <api/session_manager.h>
 #include <api/model/connection_info.h>
 
+#include <common/common_module.h>
+
+#include <client_core/client_core_module.h>
+
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
-
-#include <common/common_module.h>
 
 #include <core/resource/resource.h>
 
@@ -295,7 +297,7 @@ void QnLoginDialog::accept()
 
     QUrl url = currentUrl();
 	const auto guard = QPointer<QnLoginDialog>(this);
-    m_requestHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
+    m_requestHandle = qnClientCoreModule->connectionFactory()->testConnection(
         url, this,
         [this, url, guard](int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo)
         {

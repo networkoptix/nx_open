@@ -41,7 +41,14 @@ QnAligner::QnAligner(QObject* parent /*= nullptr*/):
     m_minimumWidth(style::Hints::kMinimumFormLabelWidth)
 {
     if (parent)
-        installEventHandler(parent, { QEvent::Show, QEvent::LayoutRequest }, this, &QnAligner::align);
+    {
+        installEventHandler(parent, { QEvent::Show, QEvent::LayoutRequest }, this,
+            [this]()
+            {
+                if (!m_masterAligner)
+                    align();
+            });
+    }
 }
 
 QnAligner::~QnAligner()
@@ -65,7 +72,19 @@ void QnAligner::addWidgets(std::initializer_list<QWidget*> widgets)
 
 void QnAligner::addAligner(QnAligner* aligner)
 {
+    if (aligner->m_masterAligner == this)
+    {
+        NX_ASSERT(m_aligners.contains(aligner));
+        return;
+    }
+
+    NX_ASSERT(aligner->m_masterAligner.isNull());
+    if (aligner->m_masterAligner)
+        return;
+
     m_aligners << aligner;
+    aligner->m_masterAligner = this;
+
     align();
 
     connect(aligner, &QObject::destroyed, this,

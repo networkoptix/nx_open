@@ -110,8 +110,11 @@ public:
 QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
     void* sslContext,
-    QnDesktopResource* desktop):
-  QnTCPConnectionProcessor(new QnDesktopCameraConnectionProcessorPrivate(), socket)
+    QnDesktopResource* desktop)
+    :
+    QnTCPConnectionProcessor(new QnDesktopCameraConnectionProcessorPrivate(),
+        socket,
+        desktop->commonModule())
 {
     Q_UNUSED(sslContext)
     Q_D(QnDesktopCameraConnectionProcessor);
@@ -268,8 +271,8 @@ void QnDesktopCameraConnection::run()
     while (!m_needStop)
     {
         QAuthenticator auth;
-        auth.setUser(QnAppServerConnectionFactory::url().userName());
-        auth.setPassword(QnAppServerConnectionFactory::url().password());
+        auth.setUser(commonModule()->currentUrl().userName());
+        auth.setPassword(commonModule()->currentUrl().password());
         {
             decltype(httpClient) localHttpClient(new nx_http::HttpClient());
             QnMutexLocker lock(&m_mutex);
@@ -279,7 +282,7 @@ void QnDesktopCameraConnection::run()
         }
 
         httpClient->addAdditionalHeader("user-name", auth.user().toUtf8());
-        httpClient->addAdditionalHeader("user-id", qnCommon->moduleGUID().toByteArray());
+        httpClient->addAdditionalHeader("user-id", commonModule()->moduleGUID().toByteArray());
         httpClient->setSendTimeoutMs(CONNECT_TIMEOUT);
         httpClient->setResponseReadTimeoutMs(CONNECT_TIMEOUT);
 

@@ -26,18 +26,18 @@
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include "database/server_db.h"
+#include <common/common_module.h>
 
-QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
-
-QnBusinessRuleProcessor::QnBusinessRuleProcessor()
+QnBusinessRuleProcessor::QnBusinessRuleProcessor(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
 {
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionDelivered, this, &QnBusinessRuleProcessor::at_actionDelivered);
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionDeliveryFail, this, &QnBusinessRuleProcessor::at_actionDeliveryFailed);
 
-    connect(qnResPool, &QnResourcePool::resourceAdded,
+    connect(resourcePool(), &QnResourcePool::resourceAdded,
         this, [this](const QnResourcePtr& resource) { toggleInputPortMonitoring( resource, true ); },
 		Qt::QueuedConnection);
-    connect(qnResPool, &QnResourcePool::resourceRemoved,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved,
         this, [this](const QnResourcePtr& resource) { toggleInputPortMonitoring( resource, false ); },
 		Qt::QueuedConnection);
 
@@ -45,11 +45,11 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
         this, static_cast<void (QnBusinessRuleProcessor::*)(const QnAbstractBusinessActionPtr&)>(&QnBusinessRuleProcessor::executeAction),
 		Qt::QueuedConnection);
 
-    connect(QnCommonMessageProcessor::instance(),       &QnCommonMessageProcessor::businessRuleChanged,
+    connect(commonModule->messageProcessor(),       &QnCommonMessageProcessor::businessRuleChanged,
             this, &QnBusinessRuleProcessor::at_businessRuleChanged);
-    connect(QnCommonMessageProcessor::instance(),       &QnCommonMessageProcessor::businessRuleDeleted,
+    connect(commonModule->messageProcessor(),       &QnCommonMessageProcessor::businessRuleDeleted,
             this, &QnBusinessRuleProcessor::at_businessRuleDeleted);
-    connect(QnCommonMessageProcessor::instance(),       &QnCommonMessageProcessor::businessRuleReset,
+    connect(commonModule->messageProcessor(),       &QnCommonMessageProcessor::businessRuleReset,
             this, &QnBusinessRuleProcessor::at_businessRuleReset);
 
     connect(&m_timer, &QTimer::timeout, this, &QnBusinessRuleProcessor::at_timer, Qt::QueuedConnection);
@@ -68,11 +68,11 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(const QnAbstrac
         case QnBusiness::SendMailAction:
         {
             // looking for server with public IP address
-            const QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+            const QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
             if (!mServer || (mServer->getServerFlags() & Qn::SF_HasPublicIP))
                 return QnMediaServerResourcePtr(); // do not proxy
 
-            const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+            const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
             for (const QnMediaServerResourcePtr& mServer: onlineServers)
             {
                 if (mServer->getServerFlags() & Qn::SF_HasPublicIP)
@@ -89,7 +89,7 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(const QnAbstrac
         default:
             if (!res)
                 return QnMediaServerResourcePtr(); // can not find routeTo resource
-            return qnResPool->getResourceById<QnMediaServerResource>(res->getParentId());
+            return resourcePool()->getResourceById<QnMediaServerResource>(res->getParentId());
     }
 }
 
@@ -163,14 +163,14 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
     }
     prepareAdditionActionParams(action);
 
-    QnNetworkResourceList resources = qnResPool->getResources<QnNetworkResource>(action->getResources());
+    QnNetworkResourceList resources = resourcePool()->getResources<QnNetworkResource>(action->getResources());
 
     switch (action->actionType())
     {
     case QnBusiness::ShowTextOverlayAction:
     case QnBusiness::ShowOnAlarmLayoutAction:
         if (action->getParams().useSource)
-            resources << qnResPool->getResources<QnNetworkResource>(action->getSourceResources());
+            resources << resourcePool()->getResources<QnNetworkResource>(action->getSourceResources());
         break;
 
     case QnBusiness::SayTextAction:
@@ -209,7 +209,7 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
 bool QnBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActionPtr& action)
 {
     auto bRuleId = action->getBusinessRuleId();
-    QnResourcePtr res = qnResPool->getResourceById(action->getParams().actionResourceId);
+    QnResourcePtr res = resourcePool()->getResourceById(action->getParams().actionResourceId);
     if (action->isProlonged()) {
         // check for duplicate actions. For example: camera start recording by 2 different events e.t.c
         QString actionKey = action->getExternalUniqKey();
@@ -246,37 +246,6 @@ bool QnBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActi
     }
 
     return false;
-}
-
-class QnBusinessRuleProcessorInstanceDeleter
-{
-public:
-    ~QnBusinessRuleProcessorInstanceDeleter()
-    {
-        QnBusinessRuleProcessor::fini();
-    }
-};
-
-static QnBusinessRuleProcessorInstanceDeleter qnBusinessRuleProcessorInstanceDeleter;
-
-QnBusinessRuleProcessor* QnBusinessRuleProcessor::instance()
-{
-    // this call is not thread safe! You should init from main thread e.t.c
-    NX_ASSERT(m_instance, Q_FUNC_INFO, "QnBusinessRuleProcessor::init must be called first!");
-    return m_instance;
-}
-
-void QnBusinessRuleProcessor::init(QnBusinessRuleProcessor* instance)
-{
-    // this call is not thread safe! You should init from main thread e.t.c
-    NX_ASSERT(!m_instance, Q_FUNC_INFO, "QnBusinessRuleProcessor::init must be called once!");
-    m_instance = instance;
-}
-
-void QnBusinessRuleProcessor::fini()
-{
-    delete m_instance;
-    m_instance = NULL;
 }
 
 void QnBusinessRuleProcessor::addBusinessRule(const QnBusinessEventRulePtr& value)
@@ -330,12 +299,21 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(const Q
         // if toggled action is used and condition is no longer valid - stop action
         // Or toggle event goes to 'off'. stop action
         if (!condOK || bEvent->getToggleState() == QnBusiness::InactiveState)
-            action = QnBusinessActionFactory::instantiateAction(rule, bEvent, QnBusiness::InactiveState);
+            action = QnBusinessActionFactory::instantiateAction(
+                rule,
+                bEvent,
+                commonModule()->moduleGUID(),
+                QnBusiness::InactiveState);
         else
             return QnAbstractBusinessActionPtr(); // ignore repeating 'On' event
     }
     else if (condOK)
-        action = QnBusinessActionFactory::instantiateAction(rule, bEvent);
+    {
+        action = QnBusinessActionFactory::instantiateAction(
+            rule,
+            bEvent,
+            commonModule()->moduleGUID());
+    }
 
     bool isActionRunning = action && action->getToggleState() == QnBusiness::ActiveState;
     if (isActionRunning)
@@ -346,7 +324,9 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(const Q
     return action;
 }
 
-QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule)
+QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(
+    const QnAbstractBusinessEventPtr& bEvent,
+    const QnBusinessEventRulePtr& rule)
 {
     bool condOK = checkRuleCondition(bEvent, rule);
     RunningRuleMap::iterator itr = m_rulesInProgress.find(rule->getUniqueId());
@@ -374,7 +354,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(const 
 
 
     if (rule->aggregationPeriod() == 0 || !QnBusiness::allowsAggregation(rule->actionType()))
-        return QnBusinessActionFactory::instantiateAction(rule, bEvent);
+        return QnBusinessActionFactory::instantiateAction(rule, bEvent, commonModule()->moduleGUID());
 
     QString eventKey = rule->getUniqueId();
     if (bEvent->getResource())
@@ -388,9 +368,11 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(const 
 
     if (aggInfo.isExpired())
     {
-        QnAbstractBusinessActionPtr result = QnBusinessActionFactory::instantiateAction(aggInfo.rule(),
-                                                                                        aggInfo.event(),
-                                                                                        aggInfo.info());
+        QnAbstractBusinessActionPtr result = QnBusinessActionFactory::instantiateAction(
+            aggInfo.rule(),
+            aggInfo.event(),
+            commonModule()->moduleGUID(),
+            aggInfo.info());
         aggInfo.reset();
         return result;
     }
@@ -407,9 +389,11 @@ void QnBusinessRuleProcessor::at_timer()
         QnProcessorAggregationInfo& aggInfo = itr.value();
         if (aggInfo.totalCount() > 0 && aggInfo.isExpired())
         {
-            executeAction(QnBusinessActionFactory::instantiateAction(aggInfo.rule(),
-                                                                     aggInfo.event(),
-                                                                     aggInfo.info()));
+            executeAction(QnBusinessActionFactory::instantiateAction(
+                aggInfo.rule(),
+                aggInfo.event(),
+                commonModule()->moduleGUID(),
+                aggInfo.info()));
             aggInfo.reset();
         }
         ++itr;
@@ -489,7 +473,7 @@ void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished( int handle, ec
 
 bool QnBusinessRuleProcessor::broadcastBusinessAction(const QnAbstractBusinessActionPtr& action)
 {
-    QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager(Qn::kSystemAccess)->broadcastBusinessAction(
+    commonModule()->ec2Connection()->getBusinessEventManager(Qn::kSystemAccess)->broadcastBusinessAction(
         action, this, &QnBusinessRuleProcessor::at_broadcastBusinessActionFinished );
     return true;
 }
@@ -555,7 +539,7 @@ void QnBusinessRuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& res
 
         if( rule->eventType() == QnBusiness::CameraInputEvent)
         {
-            QnVirtualCameraResourceList resList = qnResPool->getResources<QnVirtualCameraResource>(rule->eventResources());
+            QnVirtualCameraResourceList resList = resourcePool()->getResources<QnVirtualCameraResource>(rule->eventResources());
             if( resList.isEmpty() ||            //listening all cameras
                 resList.contains(camResource) )
             {
@@ -583,8 +567,13 @@ void QnBusinessRuleProcessor::terminateRunningRule(const QnBusinessEventRulePtr&
                 bEvent = runtimeRule.resources.value(resId);
             else
                 bEvent = runtimeRule.resources.begin().value(); // for continues action resourceID is not specified and only one record is used
-            if (bEvent) {
-                QnAbstractBusinessActionPtr action = QnBusinessActionFactory::instantiateAction(rule, bEvent, QnBusiness::InactiveState);
+            if (bEvent)
+            {
+                QnAbstractBusinessActionPtr action = QnBusinessActionFactory::instantiateAction(
+                    rule,
+                    bEvent,
+                    commonModule()->moduleGUID(),
+                    QnBusiness::InactiveState);
                 if (action)
                     executeAction(action);
             }
@@ -625,9 +614,9 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( const QnBus
     {
         if( businessRule->eventType() == QnBusiness::CameraInputEvent)
         {
-            QnVirtualCameraResourceList resList = qnResPool->getResources<QnVirtualCameraResource>(businessRule->eventResources());
+            QnVirtualCameraResourceList resList = resourcePool()->getResources<QnVirtualCameraResource>(businessRule->eventResources());
             if (resList.isEmpty())
-                resList = qnResPool->getAllCameras(QnResourcePtr(), true);
+                resList = resourcePool()->getAllCameras(QnResourcePtr(), true);
 
             for(const QnVirtualCameraResourcePtr &camera: resList)
             {
@@ -643,7 +632,7 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( const QnBus
     {
         if( businessRule->actionType() == QnBusiness::CameraRecordingAction)
         {
-            QnVirtualCameraResourceList resList = qnResPool->getResources<QnVirtualCameraResource>(businessRule->actionResources());
+            QnVirtualCameraResourceList resList = resourcePool()->getResources<QnVirtualCameraResource>(businessRule->actionResources());
             for(const QnVirtualCameraResourcePtr &camera: resList)
             {
                 if( isRuleAdded )

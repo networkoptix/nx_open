@@ -281,7 +281,7 @@ Qn::ImageBehaviour QnLookAndFeelPreferencesWidget::selectedImageMode() const
 void QnLookAndFeelPreferencesWidget::setupLanguageUi()
 {
     auto model = new QnTranslationListModel(this);
-    model->setTranslations(qnCommon->instance<QnClientTranslationManager>()->loadTranslations());
+    model->setTranslations(commonModule()->instance<QnClientTranslationManager>()->loadTranslations());
     ui->languageComboBox->setModel(model);
 
     connect(ui->languageComboBox, QnComboboxCurrentIndexChanged, this,

@@ -12,7 +12,8 @@ static const int SPACE_CLEARANCE_INTERVAL = 10;
 
 QnFileDeletor* QnFileDeletor_inst = 0;
 
-QnFileDeletor::QnFileDeletor()
+QnFileDeletor::QnFileDeletor(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
 {
     m_postponeTimer.start();
     m_storagesTimer.start();
@@ -41,7 +42,7 @@ void QnFileDeletor::run()
             processPostponedFiles();
             m_postponeTimer.restart();
         }
-        
+
         static const int DELTA = 5; // in range [-5..+5] seconds
         int thresholdSecs = nx::utils::random::numberDelta<int>(SPACE_CLEARANCE_INTERVAL, DELTA);
         if (qnBackupStorageMan && qnNormalStorageMan && m_storagesTimer.elapsed() > thresholdSecs * 1000)
@@ -120,7 +121,7 @@ void QnFileDeletor::processPostponedFiles()
         m_newPostponedFiles.clear();
     }
 
-    while (!newPostponedFiles.isEmpty()) 
+    while (!newPostponedFiles.isEmpty())
     {
         PostponedFileData fileData = newPostponedFiles.dequeue();
         if (m_postponedFiles.find(fileData) != m_postponedFiles.cend())
@@ -143,7 +144,7 @@ void QnFileDeletor::processPostponedFiles()
             internalDeleteFile(itr->fileName);
         else
         {
-            auto storage = qnResPool->getResourceById(itr->storageId);
+            auto storage = resourcePool()->getResourceById(itr->storageId);
             if (!storage) // Unknown storage. Try once and discard.
             {
                 internalDeleteFile(itr->fileName);

@@ -11,8 +11,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
-#include <ui/graphics/items/overlays/text_overlay_widget.h>
-#include <ui/graphics/items/overlays/composite_text_overlay.h>
+#include <ui/graphics/items/overlays/scrollable_text_items_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
 #include <utils/common/scoped_timer.h>
@@ -51,6 +50,13 @@ namespace
     const qint64 kMinWindowChangeNearLiveMs = 10000;
     const qint64 kMinWindowChangeInArchiveMs = 2 * 60 * 1000;
 
+    struct QnOverlayTextItemData
+    {
+        QnUuid id;
+        QString text;
+        QnHtmlTextItemOptions options;
+    };
+
     QnOverlayTextItemData makeBookmarkItem(const QnCameraBookmark &bookmark
         , const QnBookmarkColors &colors)
     {
@@ -82,7 +88,7 @@ namespace
         static const auto kComplexHtml = lit("%1%2");
 
         const auto bookmarkHtml = kHtmlPageTemplate.arg(kComplexHtml.arg(captionHtml, descHtml));
-        return QnOverlayTextItemData(bookmark.guid, bookmarkHtml, options);
+        return QnOverlayTextItemData({ bookmark.guid, bookmarkHtml, options });
     };
 }
 
@@ -114,7 +120,7 @@ private:
 
     void updateBookmarks(const QnCameraBookmarkList &newBookmarks);
 
-    void sendBookmarksToCompositeOverlay();
+    void sendBookmarksToOverlay();
 
 private:
     const QnTimelineBookmarksWatcherPtr m_timelineWatcher;
@@ -227,7 +233,7 @@ void QnWorkbenchItemBookmarksWatcher::WidgetData::updateBookmarksAtPosition()
     if (m_timelineWatcher)
         m_bookmarksAtPos.mergeBookmarkList(m_timelineWatcher->rawBookmarksAtPosition(m_camera, m_posMs));
 
-    sendBookmarksToCompositeOverlay();
+    sendBookmarksToOverlay();
 }
 
 void QnWorkbenchItemBookmarksWatcher::WidgetData::updateBookmarks(const QnCameraBookmarkList &newBookmarks)
@@ -239,12 +245,12 @@ void QnWorkbenchItemBookmarksWatcher::WidgetData::updateBookmarks(const QnCamera
     updateBookmarksAtPosition();
 }
 
-void QnWorkbenchItemBookmarksWatcher::WidgetData::sendBookmarksToCompositeOverlay()
+void QnWorkbenchItemBookmarksWatcher::WidgetData::sendBookmarksToOverlay()
 {
     QN_LOG_TIME(Q_FUNC_INFO);
 
-    const auto compositeTextOverlay = m_mediaWidget->compositeTextOverlay();
-    if (!compositeTextOverlay)
+    const auto bookmarksContainer = m_mediaWidget->bookmarksContainer();
+    if (!bookmarksContainer)
         return;
 
     QnCameraBookmarkList bookmarksToDisplay;
@@ -252,6 +258,7 @@ void QnWorkbenchItemBookmarksWatcher::WidgetData::sendBookmarksToCompositeOverla
     {
         if (bookmark.name.trimmed().isEmpty() && bookmark.description.trimmed().isEmpty())
             continue;
+
         bookmarksToDisplay << bookmark;
         if (bookmarksToDisplay.size() >= kBookmarksDisplayLimit)
             break;
@@ -259,12 +266,17 @@ void QnWorkbenchItemBookmarksWatcher::WidgetData::sendBookmarksToCompositeOverla
 
     if (m_displayedBookmarks == bookmarksToDisplay)
         return;
+
     m_displayedBookmarks = bookmarksToDisplay;
 
-    compositeTextOverlay->resetModeData(QnCompositeTextOverlay::kBookmarksMode);
+    bookmarksContainer->clear();
+
     const QnBookmarkColors colors = m_parent->bookmarkColors();
-    for (const auto &bookmark: bookmarksToDisplay)
-        compositeTextOverlay->addModeData(QnCompositeTextOverlay::kBookmarksMode, makeBookmarkItem(bookmark, colors));
+    for (const auto& bookmark: bookmarksToDisplay)
+    {
+        const auto item = makeBookmarkItem(bookmark, colors);
+        bookmarksContainer->addItem(item.text, item.options, item.id);
+    }
 }
 
 //

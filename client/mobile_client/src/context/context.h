@@ -3,6 +3,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 
+#include <client_core/connection_context_aware.h>
+
 class QnConnectionManager;
 class QnMobileAppInfo;
 class QnCloudStatusWatcher;
@@ -23,7 +25,7 @@ class QmlSettingsAdaptor;
 
 using nx::client::mobile::QmlSettingsAdaptor;
 
-class QnContext: public QObject
+class QnContext: public QObject, public QnConnectionContextAware
 {
     Q_OBJECT
     typedef QObject base_type;

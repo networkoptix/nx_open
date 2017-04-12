@@ -2,10 +2,14 @@
 
 #include <QtCore/QDateTime>
 
+#include <client_core/client_core_module.h>
+
 #include "ui/style/skin.h"
 #include "sign_dialog.h"
 
-QnSignInfo::QnSignInfo(QWidget* parent): QLabel(parent)
+QnSignInfo::QnSignInfo(QWidget* parent):
+    QLabel(parent),
+    m_signHelper(qnClientCoreModule->commonModule())
 {
     m_finished = false;
     m_textureWidth = 1920.0;

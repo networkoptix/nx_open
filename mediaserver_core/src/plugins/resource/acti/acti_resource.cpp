@@ -20,6 +20,7 @@
 #include <nx/utils/log/log.h>
 #include <core/resource/param.h>
 #include "acti_resource_searcher.h"
+#include <common/static_common_module.h>
 
 const QString QnActiResource::MANUFACTURE(lit("ACTI"));
 const QString QnActiResource::CAMERA_PARAMETER_GROUP_ENCODER(lit("encoder"));
@@ -339,7 +340,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
 
     updateDefaultAuthIfEmpty(lit("admin"), lit("123456"));
 
-    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
 
     auto serverReport = makeActiRequest(
         lit("system"),
@@ -404,12 +405,12 @@ CameraDiagnostics::Result QnActiResource::initInternal()
                 dualStreamingCapability = true;
 
             if (cap.trimmed() == kActiFisheyeStreamingMode)
-                fisheyeStreamingCapability = true;            
+                fisheyeStreamingCapability = true;
         }
     }
 
-    bool dualStreaming = report.value("channels").toInt() > 1 
-        || !report.value("video2_resolution_cap").isEmpty() 
+    bool dualStreaming = report.value("channels").toInt() > 1
+        || !report.value("video2_resolution_cap").isEmpty()
         || dualStreamingCapability
         || fisheyeStreamingCapability;
 
@@ -458,7 +459,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
         }
     }
 
-    // Resolution list depends on streaming mode, so we should make this request 
+    // Resolution list depends on streaming mode, so we should make this request
     // after setting proper streaming mode.
     QByteArray resolutions= makeActiRequest(
         lit("system"),
@@ -466,9 +467,9 @@ CameraDiagnostics::Result QnActiResource::initInternal()
         status);
 
     // Save this check for backward compatibility
-    // since SYSTEM_INFO request potentially can work without auth 
+    // since SYSTEM_INFO request potentially can work without auth
     if (status == CL_HTTP_AUTH_REQUIRED)
-        setStatus(Qn::Unauthorized); 
+        setStatus(Qn::Unauthorized);
 
     if (status != CL_HTTP_SUCCESS)
     {
@@ -1404,7 +1405,7 @@ void QnActiResource::fetchAndSetAdvancedParameters()
 
 QString QnActiResource::getAdvancedParametersTemplate() const
 {
-    QnResourceData resourceData = qnCommon->dataPool()->data(getVendor(), getModel());
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(getVendor(), getModel());
     auto advancedParametersTemplate = resourceData.value<QString>(ADVANCED_PARAMETERS_TEMPLATE_PARAMETER_NAME);
     return advancedParametersTemplate.isEmpty() ?
         DEFAULT_ADVANCED_PARAMETERS_TEMPLATE : advancedParametersTemplate;

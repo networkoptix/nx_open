@@ -74,7 +74,7 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject *parent)
     m_timlineFilter.sparsing.used = true;
     m_timlineFilter.limit = kMaxTimelineBookmarksConut;
 
-    connect(qnResPool, &QnResourcePool::resourceRemoved
+    connect(resourcePool(), &QnResourcePool::resourceRemoved
         , this, &QnTimelineBookmarksWatcher::onResourceRemoved);
 
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged

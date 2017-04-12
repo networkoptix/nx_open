@@ -21,7 +21,7 @@ QnClientPtzControllerPool::QnClientPtzControllerPool(QObject *parent /*= NULL*/)
     : base_type(parent)
 {
     /* Auto-update presets when camera goes online. */
-    connect(qnResPool, &QnResourcePool::statusChanged, this, [this](const QnResourcePtr &resource)
+    connect(resourcePool(), &QnResourcePool::statusChanged, this, [this](const QnResourcePtr &resource)
 	    {
 	        cacheCameraPresets(resource.dynamicCast<QnVirtualCameraResource>());
 	    });

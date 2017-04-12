@@ -28,6 +28,7 @@ namespace ec2
 
         //!Implementation of AbstractCameraManager::getCameras
         virtual int getCameras(impl::GetCamerasHandlerPtr handler) override;
+        virtual int getCamerasEx(impl::GetCamerasExHandlerPtr handler) override;
         //!Implementation of AbstractCameraManager::addCamera
         virtual int addCamera(const ec2::ApiCameraData&, impl::SimpleHandlerPtr handler) override;
         //!Implementation of AbstractCameraManager::save

@@ -1,14 +1,13 @@
-#ifndef APP_SERVER_FILE_CACHE_H
-#define APP_SERVER_FILE_CACHE_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QHash>
 
+#include <client_core/connection_context_aware.h>
+
 #include <nx_ec/ec_api.h>
 
-#include <ui/workbench/workbench_context_aware.h>
-
-class QnAppServerFileCache : public QObject
+class QnAppServerFileCache : public QObject, public QnConnectionContextAware
 {
     Q_OBJECT
 public:
@@ -82,5 +81,3 @@ private:
 };
 
 Q_DECLARE_METATYPE(QnAppServerFileCache::OperationResult)
-
-#endif // APP_SERVER_FILE_CACHE_H

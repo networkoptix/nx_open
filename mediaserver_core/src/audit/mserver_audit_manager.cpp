@@ -18,7 +18,9 @@ QnAuditRecord filteredRecord(QnAuditRecord record)
 }
 
 
-QnMServerAuditManager::QnMServerAuditManager(): QnAuditManager(), m_internalId(-1)
+QnMServerAuditManager::QnMServerAuditManager(QObject* parent):
+    QnAuditManager(parent),
+    m_internalId(-1)
 {
     m_internalId = qnServerDb->auditRecordMaxId();
     connect (&m_timer, &QTimer::timeout, this,

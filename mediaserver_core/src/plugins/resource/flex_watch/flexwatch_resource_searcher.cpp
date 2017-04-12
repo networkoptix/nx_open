@@ -11,8 +11,10 @@
 
 static const qint64 SOCK_UPDATE_INTERVAL = 1000000ll * 60 * 5;
 
-QnFlexWatchResourceSearcher::QnFlexWatchResourceSearcher(): OnvifResourceSearcher()
-    ,m_sockUpdateTime(0)
+QnFlexWatchResourceSearcher::QnFlexWatchResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
+    OnvifResourceSearcher(commonModule),
+    m_sockUpdateTime(0)
 {
 }
 
@@ -116,9 +118,7 @@ QnResourceList QnFlexWatchResourceSearcher::findResources()
             info.uniqId = info.mac;
             info.discoveryIp = senderEndpoint.address.toString();
 
-            OnvifResourceInformationFetcher onfivFetcher;
-            onfivFetcher.findResources(QString(QLatin1String("http://%1/onvif/device_service")).arg(info.discoveryIp), info, result, discoveryMode());
-
+            m_informationFetcher->findResources(QString(QLatin1String("http://%1/onvif/device_service")).arg(info.discoveryIp), info, result, discoveryMode());
         }
 
     }

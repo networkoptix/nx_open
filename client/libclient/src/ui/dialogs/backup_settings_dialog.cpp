@@ -83,7 +83,7 @@ QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget* parent) :
             if (dialog->exec() != QDialog::Accepted || isReadOnly())
                 return;
 
-            setCamerasToBackup(qnResPool->getResources(dialog->selectedResources())
+            setCamerasToBackup(resourcePool()->getResources(dialog->selectedResources())
                 .filtered<QnVirtualCameraResource>());
             m_backupNewCameras = dialog->backupNewCameras();
         });

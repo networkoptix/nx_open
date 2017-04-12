@@ -27,12 +27,12 @@ namespace update_http_handler_detail {
 // TODO: Move to ApiIdData. Then consider moving this and fillId() methods out of Api*Data.
 
 template<typename RequestData>
-void fixRequestDataIfNeeded(RequestData* const /*requestData*/)
+inline void fixRequestDataIfNeeded(RequestData* const /*requestData*/)
 {
 }
 
 template<>
-void fixRequestDataIfNeeded<ApiUserData>(ApiUserData* const userData)
+inline void fixRequestDataIfNeeded<ApiUserData>(ApiUserData* const userData)
 {
     if (userData->isCloud)
     {

@@ -12,6 +12,8 @@
 #include "../move_only_func.h"
 #include "../type_utils.h"
 
+#include <nx/utils/singleton.h>
+
 namespace nx {
 namespace utils {
 
@@ -76,6 +78,21 @@ public:
 
 private:
     std::unique_ptr<detail::thread> m_actualThread;
+};
+
+class NX_UTILS_API DetachedThreads: public Singleton<DetachedThreads>
+{
+public:
+    DetachedThreads();
+    ~DetachedThreads();
+
+    void addThread(std::unique_ptr<detail::thread> thread);
+
+private:
+    utils::promise<void> m_stopPromise;
+    std::mutex m_mutex;
+    std::list<std::unique_ptr<detail::thread>> m_garbage;
+    thread m_collector;
 };
 
 }   //namespace utils

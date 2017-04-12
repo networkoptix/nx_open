@@ -65,13 +65,9 @@ public:
         m_fired = true;
     }
 
-    typedef void (ScopeGuard< Callback >::*safe_bool_type)() const;
-    void safe_bool_type_retval() const {}
-
-    /** Checks if guard is armed */
-    operator safe_bool_type() const
+    explicit operator bool() const
     {
-        return m_fired ? 0 : &ScopeGuard< Callback >::safe_bool_type_retval;
+        return !m_fired;
     }
 
 private:

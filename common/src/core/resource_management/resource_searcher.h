@@ -7,6 +7,7 @@
 #include <QtCore/QStringList>
 
 #include <core/resource/resource_factory.h>
+#include <common/common_module_aware.h>
 
 class QUrl;
 class QAuthenticator;
@@ -23,10 +24,10 @@ enum class DiscoveryMode
 /**
  * Interface for resource searcher plugins.
  */
-class QnAbstractResourceSearcher : public QnResourceFactory
+class QnAbstractResourceSearcher: public QnResourceFactory, public QnCommonModuleAware
 {
 protected:
-    QnAbstractResourceSearcher();
+    explicit QnAbstractResourceSearcher(QnCommonModule* commonModule);
 
 public:
     virtual ~QnAbstractResourceSearcher();
@@ -35,10 +36,10 @@ public:
     void setDiscoveryMode( DiscoveryMode mode );
     DiscoveryMode discoveryMode() const;
 
-    /** 
+    /**
      * Some searchers should be run first and in sequential order.
-     * It's needed because some devices just are not able to handle  
-     * many search request at the same time. If such a searcher returns 
+     * It's needed because some devices just are not able to handle
+     * many search request at the same time. If such a searcher returns
      * not empty list of found resources then search process stops and no searcher
      * checks this url after that.
      *
@@ -107,10 +108,10 @@ private:
 
 
 // =====================================================================
-class QnAbstractNetworkResourceSearcher : virtual public QnAbstractResourceSearcher
+class QnAbstractNetworkResourceSearcher: virtual public QnAbstractResourceSearcher
 {
 protected:
-    QnAbstractNetworkResourceSearcher (){};
+    QnAbstractNetworkResourceSearcher(QnCommonModule* commonModule);
 public:
 
     // checks this QHostAddress and creates a QnResource in case of success
@@ -123,7 +124,7 @@ public:
 class QnAbstractFileResourceSearcher : virtual public QnAbstractResourceSearcher // TODO: #Elric why virtual inheritance? -- because of rombic ThirdPartyResourceSearcher
 {
 protected:
-    QnAbstractFileResourceSearcher() {}
+    explicit QnAbstractFileResourceSearcher(QnCommonModule* commonModule);
 
 public:
     QStringList getPathCheckList() const;

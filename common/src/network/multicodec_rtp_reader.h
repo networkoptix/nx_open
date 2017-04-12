@@ -138,9 +138,8 @@ private:
     QString m_currentStreamUrl;
     QString m_rtpTransport;
 
-    int m_maxRtpRetryCount;
-
-    int m_rtpFrameTimeoutMs;
+    int m_maxRtpRetryCount{0};
+    int m_rtpFrameTimeoutMs{0};
 };
 
 #endif // ENABLE_DATA_PROVIDERS

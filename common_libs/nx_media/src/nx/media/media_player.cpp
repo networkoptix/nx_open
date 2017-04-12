@@ -6,6 +6,8 @@
 #include <QtCore/QTimer>
 #include <QtCore/QMutex>
 
+#include <common/common_module.h>
+
 #include <nx/utils/debug_utils.h>
 #include <nx/utils/flag_config.h>
 #include <nx/utils/log/log.h>
@@ -922,7 +924,7 @@ void Player::setSource(const QUrl& url)
     }
     else
     {
-        d->resource = qnResPool->getResourceById(QnUuid(path));
+        d->resource = commonModule()->resourcePool()->getResourceById(QnUuid(path));
     }
 
     if (d->resource && currentState == State::Playing)

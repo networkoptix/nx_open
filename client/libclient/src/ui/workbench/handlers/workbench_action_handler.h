@@ -122,7 +122,6 @@ protected slots:
     void submitDelayedDrops();
     void submitInstantDrop();
 
-    protected slots:
     void at_context_userChanged(const QnUserResourcePtr &user);
 
     void at_workbench_cellSpacingChanged();
@@ -188,8 +187,6 @@ protected slots:
     void at_scheduleWatcher_scheduleEnabledChanged();
     void at_togglePanicModeAction_toggled(bool checked);
 
-    void at_toggleTourAction_toggled(bool checked);
-    void at_tourTimer_timeout();
     void at_workbench_itemChanged(Qn::ItemRole role);
 
     void at_whatsThisAction_triggered();
@@ -255,7 +252,6 @@ private:
     QnLayoutResourcePtr m_exportLayout;
     QnStorageResourcePtr m_exportStorage;
 
-    QTimer *m_tourTimer;
     struct CameraMovingInfo
     {
         CameraMovingInfo() {}

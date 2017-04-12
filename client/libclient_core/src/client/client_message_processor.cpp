@@ -28,10 +28,8 @@ void trace(const QString& message)
 
 }
 
-QnClientMessageProcessor::QnClientMessageProcessor()
-    :
-    base_type(),
-
+QnClientMessageProcessor::QnClientMessageProcessor(QObject* parent):
+    base_type(parent),
     m_status(),
     m_connected(false),
     m_holdConnection(false)
@@ -57,7 +55,7 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
 
     if (connection)
     {
-        const auto& info = connection->connectionInfo();
+        auto info = connection->connectionInfo();
         const auto serverId = info.serverId();
         trace(lit("Connection established to %1").arg(serverId.toString()));
 
@@ -66,7 +64,7 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
          * In that case each request may potentially be sent to another server, which may lead
          * to undefined behavior. So we are fixing server which we were connected to in the url.
          */
-        auto currentUrl = QnAppServerConnectionFactory::url();
+        auto currentUrl = info.ecUrl;
         QString host = currentUrl.host();
         if (nx::network::SocketGlobals::addressResolver().isCloudHostName(host))
         {
@@ -75,25 +73,29 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
             if (host != fullHost)
             {
                 trace(lit("Url fixed from %1 to %2").arg(host).arg(fullHost));
-                currentUrl.setHost(fullHost);
-                QnAppServerConnectionFactory::setUrl(currentUrl);
+                NX_ASSERT(false, "Correct url must be filled in ecUrl");
+                //TODO: #GDM #FIXME #3.1 Restore functionality
+//                 info.ecUrl.setHost(fullHost);
+//                 connection->setConnectionInfo(info);
+//
+//                 QnAppServerConnectionFactory::setUrl(currentUrl);
             }
         }
 
-        qnCommon->setRemoteGUID(serverId);
+        commonModule()->setRemoteGUID(serverId);
     }
     else if (m_connected)
     { // double init by null is allowed
-        NX_ASSERT(!qnCommon->remoteGUID().isNull());
+        NX_ASSERT(!commonModule()->remoteGUID().isNull());
         ec2::ApiPeerAliveData data;
-        data.peer.id = qnCommon->remoteGUID();
-        qnCommon->setRemoteGUID(QnUuid());
+        data.peer.id = commonModule()->remoteGUID();
+        commonModule()->setRemoteGUID(QnUuid());
         m_connected = false;
         emit connectionClosed();
     }
-    else if (!qnCommon->remoteGUID().isNull())
+    else if (!commonModule()->remoteGUID().isNull())
     { // we are trying to reconnect to server now
-        qnCommon->setRemoteGUID(QnUuid());
+        commonModule()->setRemoteGUID(QnUuid());
     }
 
     QnCommonMessageProcessor::init(connection);
@@ -111,7 +113,7 @@ void QnClientMessageProcessor::setHoldConnection(bool holdConnection)
 
     m_holdConnection = holdConnection;
 
-    if (!m_holdConnection && !m_connected && !qnCommon->remoteGUID().isNull())
+    if (!m_holdConnection && !m_connected && !commonModule()->remoteGUID().isNull())
         emit connectionClosed();
 }
 
@@ -152,7 +154,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource, ec2
         return layout && layout->isFile();
     };
 
-    QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId());
+    QnResourcePtr ownResource = resourcePool()->getResourceById(resource->getId());
 
     /* Security check. Local layouts must not be overridden by server's.
     * Really that means GUID conflict, caused by saving of local layouts to server. */
@@ -165,7 +167,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource, ec2
     QnCommonMessageProcessor::updateResource(resource, source);
     if (!ownResource)
     {
-        qnResPool->addResource(resource);
+        resourcePool()->addResource(resource);
     }
     else
     {
@@ -189,13 +191,13 @@ void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData
     if (m_connected)
         return;
 
-    if (qnCommon->remoteGUID().isNull())
+    if (commonModule()->remoteGUID().isNull())
     {
         qWarning() << "at_remotePeerFound received while disconnected";
         return;
     }
 
-    if (data.peer.id != qnCommon->remoteGUID())
+    if (data.peer.id != commonModule()->remoteGUID())
         return;
 
     trace(lit("peer found, state -> Connected"));
@@ -208,13 +210,13 @@ void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
 {
     base_type::handleRemotePeerLost(data);
 
-    if (qnCommon->remoteGUID().isNull())
+    if (commonModule()->remoteGUID().isNull())
     {
         qWarning() << "at_remotePeerLost received while disconnected";
         return;
     }
 
-    if (data.peer.id != qnCommon->remoteGUID())
+    if (data.peer.id != commonModule()->remoteGUID())
         return;
 
     /*
@@ -229,7 +231,7 @@ void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
     m_status.setState(QnConnectionState::Reconnecting);
 
     /* Mark server as offline, so user will understand why is he reconnecting. */
-    if (auto server = qnCommon->currentServer())
+    if (auto server = commonModule()->currentServer())
         server->setStatus(Qn::Offline);
 
     m_connected = false;
@@ -244,8 +246,8 @@ void QnClientMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
     m_status.setState(QnConnectionState::Ready);
     trace(lit("Received initial notification while connected to %1")
-        .arg(qnCommon->remoteGUID().toString()));
-    NX_EXPECT(qnCommon->currentServer());
+        .arg(commonModule()->remoteGUID().toString()));
+    NX_EXPECT(commonModule()->currentServer());
 
     /* Get server time as soon as we setup connection. */
     qnSyncTime->currentMSecsSinceEpoch();

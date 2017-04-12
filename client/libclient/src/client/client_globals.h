@@ -19,6 +19,7 @@ namespace Qn
         ServersNode,            /**< Root node for servers for admin user. */
         UserResourcesNode,      /**< Root node for cameras, i/o modules and statistics for non-admin user. */
         LayoutsNode,            /**< Root node for current user's layouts and shared layouts. */
+        LayoutToursNode,        /**< Root node for the layout tours. */
         WebPagesNode,           /**< Root node for web pages. */
         UsersNode,              /**< Root node for user resources. */
         OtherSystemsNode,       /**< Root node for remote systems. */
@@ -42,6 +43,8 @@ namespace Qn
         ResourceNode,           /**< Node that represents a resource. Has only resource. */
         LayoutItemNode,         /**< Node that represents a layout item. Has both guid and resource. */
         EdgeNode,               /**< Node that represents an EDGE server with a camera. Has only resource - server's only camera. */
+
+        LayoutTourNode,         /**< Node that represents a layout tour. Has a guid. */
 
         VideoWallItemNode,      /**< Node that represents a videowall item. Has a guid and can have resource. */
         VideoWallMatrixNode,    /**< Node that represents a videowall saved matrix. Has a guid. */
@@ -132,6 +135,7 @@ namespace Qn
         ResourceSearchStringRole,                   /**< Role for resource search string. Value of type QString. */
         ResourceStatusRole,                         /**< Role for resource status. Value of type int (Qn::ResourceStatus). */
         ResourceUidRole,                            /**< Role for resource unique id. Value of type QString. */
+        ResourceIconKeyRole,                        /**< Role for resource custom icon key. Value of type QString. */
 
         VideoWallGuidRole,                          /**< Role for videowall resource unique id. Value of type QnUuid. */
         VideoWallItemGuidRole,                      /**< Role for videowall item unique id. Value of type QnUuid. */

@@ -30,9 +30,8 @@
 #include "http/custom_headers.h"
 #include "resource_status_watcher.h"
 
-QnServerMessageProcessor::QnServerMessageProcessor()
-:
-    base_type(),
+QnServerMessageProcessor::QnServerMessageProcessor(QnCommonModule* commonModule):
+    base_type(commonModule),
     m_serverPort( MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt() )
 {
 }
@@ -40,7 +39,7 @@ QnServerMessageProcessor::QnServerMessageProcessor()
 void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource, ec2::NotificationSource source)
 {
     QnCommonMessageProcessor::updateResource(resource, source);
-    QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceById<QnMediaServerResource>(serverGuid());
+    QnMediaServerResourcePtr ownMediaServer = resourcePool()->getResourceById<QnMediaServerResource>(serverGuid());
 
     if (resource.dynamicCast<QnVirtualCameraResource>())
     {
@@ -62,15 +61,8 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource, ec2
             if (ownData != newData && source == ec2::NotificationSource::Remote)
             {
                 // if remote peer send update for our server then ignore it and resend our own data
-                QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(Qn::kSystemAccess)->saveSync(ownData);
+                commonModule()->ec2Connection()->getMediaServerManager(Qn::kSystemAccess)->saveSync(ownData);
                 return;
-            }
-
-            // We are always online
-            if (resource->getStatus() != Qn::Online && resource->getStatus() != Qn::NotDefined)
-            {
-                qWarning() << "ServerMessageProcessor: Received message that our status is " << resource->getStatus() << ". change to online";
-                resource->setStatus(Qn::Online);
             }
         }
         else
@@ -80,10 +72,10 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource, ec2
     }
 
     QnUuid resId = resource->getId();
-    if (QnResourcePtr ownResource = qnResPool->getResourceById(resId))
+    if (QnResourcePtr ownResource = resourcePool()->getResourceById(resId))
         ownResource->update(resource);
     else
-        qnResPool->addResource(resource);
+        resourcePool()->addResource(resource);
 
     if (m_delayedOnlineStatus.contains(resId))
     {
@@ -129,7 +121,8 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
                       configSystemData.sysIdTime = sysIdTime;
                       configSystemData.tranLogTime = tranLogTime;
                       configSystemData.wholeSystem = true;
-                      changeLocalSystemId(configSystemData);
+                      if (m_connection)
+                        changeLocalSystemId(configSystemData, m_connection->messageBus());
                   });
 }
 
@@ -141,30 +134,30 @@ void QnServerMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
 
 void QnServerMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data) {
     base_type::handleRemotePeerFound(data);
-    QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
+    QnResourcePtr res = resourcePool()->getResourceById(data.peer.id);
     if (res)
         res->setStatus(Qn::Online);
     else
         m_delayedOnlineStatus << data.peer.id;
 
-    if (QnModuleFinder *moduleFinder = QnModuleFinder::instance())
+    if (QnModuleFinder *moduleFinder = commonModule()->moduleFinder())
         moduleFinder->setModuleStatus(data.peer.id, Qn::Online);
 }
 
 void QnServerMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data) {
     base_type::handleRemotePeerLost(data);
-    QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
+    QnResourcePtr res = resourcePool()->getResourceById(data.peer.id);
     if (res) {
         res->setStatus(Qn::Offline);
         if (data.peer.peerType != Qn::PT_Server) {
             // This server hasn't own DB
-            for(const QnResourcePtr& camera: qnResPool->getAllCameras(res))
+            for(const QnResourcePtr& camera: resourcePool()->getAllCameras(res))
                 camera->setStatus(Qn::Offline);
         }
     }
     m_delayedOnlineStatus.remove(data.peer.id);
 
-    if (QnModuleFinder *moduleFinder = QnModuleFinder::instance())
+    if (QnModuleFinder *moduleFinder = commonModule()->moduleFinder())
         moduleFinder->setModuleStatus(data.peer.id, Qn::Offline);
 }
 
@@ -173,16 +166,16 @@ void QnServerMessageProcessor::onResourceStatusChanged(
     Qn::ResourceStatus status,
     ec2::NotificationSource source)
 {
-    if (resource->getId() == qnCommon->moduleGUID() && status != Qn::Online)
+    if (resource->getId() == commonModule()->moduleGUID() && status != Qn::Online)
     {
         // it's own server. change status to online
         // it's own server. change status to online
-        auto connection = QnAppServerConnectionFactory::getConnection2();
+        auto connection = commonModule()->ec2Connection();
         auto manager = connection->getResourceManager(Qn::kSystemAccess);
         manager->setResourceStatusSync(resource->getId(), Qn::Online);
         resource->setStatus(Qn::Online, Qn::StatusChangeReason::GotFromRemotePeer);
     }
-    else if (resource->getParentId() == qnCommon->moduleGUID() &&
+    else if (resource->getParentId() == commonModule()->moduleGUID() &&
         resource.dynamicCast<QnStorageResource>())
     {
         NX_LOG(lit("%1 Received statusChanged signal for storage %2 from remote peer. This storage is our own resource. Ignoring.")
@@ -204,7 +197,7 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
     if (addr == "localhost" || addr == "127.0.0.1")
         return true;
     if( !m_mServer )
-        m_mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+        m_mServer = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     if (m_mServer)
     {
         HostAddress hostAddr(addr);
@@ -236,7 +229,7 @@ void QnServerMessageProcessor::at_updateInstallationRequested(const QString &upd
 
 void QnServerMessageProcessor::at_reverseConnectionRequested(const ec2::ApiReverseConnectionData &data) {
     if (m_universalTcpListener) {
-        QnRoute route = QnRouter::instance()->routeTo(data.targetServer);
+        QnRoute route = commonModule()->router()->routeTo(data.targetServer);
 
         // just to be sure that we have direct access to the server
         if (route.gatewayId.isNull() && !route.addr.isNull())
@@ -246,23 +239,23 @@ void QnServerMessageProcessor::at_reverseConnectionRequested(const ec2::ApiRever
 
 void QnServerMessageProcessor::at_remotePeerUnauthorized(const QnUuid& id)
 {
-    QnResourcePtr mServer = qnResPool->getResourceById(id);
+    QnResourcePtr mServer = resourcePool()->getResourceById(id);
     if (mServer)
         mServer->setStatus(Qn::Unauthorized);
 
-    if (QnModuleFinder *moduleFinder = QnModuleFinder::instance())
+    if (QnModuleFinder *moduleFinder = commonModule()->moduleFinder())
         moduleFinder->setModuleStatus(id, Qn::Unauthorized);
 }
 
 bool QnServerMessageProcessor::canRemoveResource(const QnUuid& resourceId)
 {
-    QnResourcePtr res = qnResPool->getResourceById(resourceId);
-    bool isOwnServer = (res && res->getId() == qnCommon->moduleGUID());
+    QnResourcePtr res = resourcePool()->getResourceById(resourceId);
+    bool isOwnServer = (res && res->getId() == commonModule()->moduleGUID());
     if (isOwnServer)
         return false;
 
     QnStorageResourcePtr storage = res.dynamicCast<QnStorageResource>();
-    bool isOwnStorage = (storage && storage->getParentId() == qnCommon->moduleGUID());
+    bool isOwnStorage = (storage && storage->getParentId() == commonModule()->moduleGUID());
     if (!isOwnStorage)
         return true;
 
@@ -271,26 +264,26 @@ bool QnServerMessageProcessor::canRemoveResource(const QnUuid& resourceId)
 
 void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId)
 {
-    QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(resourceId);
-    QnStorageResourcePtr storage = qnResPool->getResourceById<QnStorageResource>(resourceId);
-    bool isOwnServer = (mServer && mServer->getId() == qnCommon->moduleGUID());
-    bool isOwnStorage = (storage && storage->getParentId() == qnCommon->moduleGUID());
+    QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(resourceId);
+    QnStorageResourcePtr storage = resourcePool()->getResourceById<QnStorageResource>(resourceId);
+    bool isOwnServer = (mServer && mServer->getId() == commonModule()->moduleGUID());
+    bool isOwnStorage = (storage && storage->getParentId() == commonModule()->moduleGUID());
     if (isOwnServer)
     {
         ec2::ApiMediaServerData apiServer;
         ec2::fromResourceToApi(mServer, apiServer);
-        auto connection = QnAppServerConnectionFactory::getConnection2();
+        auto connection = commonModule()->ec2Connection();
         connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer);
     }
     else if (isOwnStorage && !storage->isExternal() && storage->isWritable())
     {
         ec2::ApiStorageDataList apiStorages;
         fromResourceListToApi(QnStorageResourceList() << storage, apiStorages);
-        QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(Qn::kSystemAccess)->saveStoragesSync(apiStorages);
+        commonModule()->ec2Connection()->getMediaServerManager(Qn::kSystemAccess)->saveStoragesSync(apiStorages);
     }
 }
 
 QnResourceFactory* QnServerMessageProcessor::getResourceFactory() const
 {
-    return QnResourceDiscoveryManager::instance();
+    return commonModule()->resourceDiscoveryManager();
 }

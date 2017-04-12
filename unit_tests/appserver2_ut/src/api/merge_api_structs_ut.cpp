@@ -10,6 +10,9 @@
 #include <nx_ec/data/api_data.h>
 
 #include "mock_stream_socket.h"
+#include <network/tcp_listener.h>
+#include "network/http_connection_listener.h"
+#include <rest/server/rest_connection_processor.h>
 
 namespace ec2 {
 namespace test {
@@ -18,6 +21,21 @@ namespace {
 
 //-------------------------------------------------------------------------------------------------
 // Test/mock classes.
+
+class MockQnHttpConnectionListener: public QnHttpConnectionListener
+{
+public:
+    MockQnHttpConnectionListener(QnCommonModule* commonModule):
+        QnHttpConnectionListener(commonModule, QHostAddress::Any, /*port*/ 0)
+    {
+    }
+
+    virtual QnTCPConnectionProcessor* createRequestProcessor(
+        QSharedPointer<AbstractStreamSocket> clientSocket) override
+    {
+        return nullptr;
+    }
+};
 
 struct ApiMockInnerData
 {
@@ -302,7 +320,9 @@ private:
         }
     )};
 
-    QnRestConnectionProcessor m_restConnectionProcessor{m_socket, /*owner*/ nullptr};
+    QnCommonModule m_commonModule{/*clientMode*/ false};
+    MockQnHttpConnectionListener listener{&m_commonModule};
+    QnRestConnectionProcessor m_restConnectionProcessor{m_socket, /*owner*/ &listener };
 
     std::unique_ptr<TestUpdateHttpHandler> m_updateHttpHandler{new TestUpdateHttpHandler(
         m_connection)};
@@ -323,7 +343,7 @@ protected:
     static void SetUpTestCase()
     {
         // Init singletons.
-        m_common = new QnCommonModule();
+        m_common = new QnCommonModule(false);
         m_common->setModuleGUID(QnUuid::createUuid());
     }
 

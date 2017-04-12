@@ -11,36 +11,40 @@
 namespace QnUbjsonDetail {
 
     template<class T>
-    T fromBigEndian(const T &value) {
+    T fromBigEndian(const char* data)
+    {
+        T value = *((T*) data);
         return qFromBigEndian(value);
     }
 
-    inline char fromBigEndian(char value) {
-        return value;
+    template<>
+    inline char fromBigEndian(const char* data)
+    {
+        return data[0];
     }
 
-    inline float fromBigEndian(float value) {
-        /* Avoid breaking strict aliasing rules by using a union. */
+    template<>
+    inline float fromBigEndian(const char* data)
+    {
         union {
             quint32 i;
             float f;
         } tmp;
 
-        tmp.f = value;
-        tmp.i = qFromBigEndian(tmp.i);
+        tmp.i = qFromBigEndian(*((quint32*) data));
         return tmp.f;
     }
 
-    inline double fromBigEndian(double value) {
-        /* Avoid breaking strict aliasing rules by using a union. */
+    template<>
+    inline double fromBigEndian(const char* data)
+    {
         union {
             quint64 i;
-            double f;
+            double d;
         } tmp;
 
-        tmp.f = value;
-        tmp.i = qFromBigEndian(tmp.i);
-        return tmp.f;
+        tmp.i = qFromBigEndian(*((quint64*) data));
+        return tmp.d;
     }
 
     template<class T>
@@ -52,7 +56,7 @@ namespace QnUbjsonDetail {
         return value;
     }
 
-    inline float toBigEndian(float value) {
+    inline quint32 toBigEndian(float value) {
         /* Avoid breaking strict aliasing rules by using a union. */
         union {
             quint32 i;
@@ -60,11 +64,10 @@ namespace QnUbjsonDetail {
         } tmp;
 
         tmp.f = value;
-        tmp.i = qToBigEndian(tmp.i);
-        return tmp.f;
+        return qToBigEndian(tmp.i);
     }
 
-    inline double toBigEndian(double value) {
+    inline quint64 toBigEndian(double value) {
         /* Avoid breaking strict aliasing rules by using a union. */
         union {
             quint64 i;
@@ -72,8 +75,7 @@ namespace QnUbjsonDetail {
         } tmp;
 
         tmp.f = value;
-        tmp.i = qToBigEndian(tmp.i);
-        return tmp.f;
+        return qToBigEndian(tmp.i);
     }
 
 
@@ -130,11 +132,13 @@ namespace QnUbjsonDetail {
         }
 
         template<class T>
-        bool readNumber(T *target) {
-            if(m_stream.read(target, sizeof(T)) != sizeof(T))
+        bool readNumber(T *target)
+        {
+            char data[sizeof(T)];
+            if(m_stream.read(data, sizeof(T)) != sizeof(T))
                 return false;
 
-            *target = fromBigEndian(*target);
+            *target = fromBigEndian<T>(data);
             return true;
         }
 
@@ -197,8 +201,9 @@ namespace QnUbjsonDetail {
 
         template<class T>
         void writeNumber(T value) {
-            value = toBigEndian(value);
-            m_stream.write(&value, sizeof(T));
+            auto bigEndianValue = toBigEndian(value);
+            static_assert(sizeof(T) == sizeof(bigEndianValue), "Invalid type conversion");
+            m_stream.write(&bigEndianValue, sizeof(bigEndianValue));
         }
 
         void writeBytes(const QByteArray &value) {

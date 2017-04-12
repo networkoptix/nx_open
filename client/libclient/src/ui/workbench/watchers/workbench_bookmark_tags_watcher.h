@@ -1,11 +1,16 @@
 #pragma once
 
 #include <QtCore/QObject>
+
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/camera_bookmark.h>
 
-// TODO: #ynikitenkov Thionk about usage only on bookmarks dialog showing 
-class QnWorkbenchBookmarkTagsWatcher : public QObject {
+
+// TODO: #ynikitenkov Thionk about usage only on bookmarks dialog showing
+class QnWorkbenchBookmarkTagsWatcher : public QObject, public QnConnectionContextAware
+{
     Q_OBJECT
 public:
     explicit QnWorkbenchBookmarkTagsWatcher(QObject *parent = 0);

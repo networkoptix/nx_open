@@ -14,10 +14,10 @@ class QnResourceListView: public QnTreeView
 public:
     /* If parent is specified, the view creates snapped vertical scroll bar at window edge.
      * If parent is not specified, the view uses normal vertical scroll bar. */
-    explicit QnResourceListView(QWidget* parent);
-    QnResourceListView(const QnResourceList& resources, QWidget* parent);
+    explicit QnResourceListView(QWidget* parent = nullptr);
+    QnResourceListView(const QnResourceList& resources, QWidget* parent = nullptr);
     QnResourceListView(const QnResourceList& resources, bool simplify,
-        QWidget* parent);
+        QWidget* parent = nullptr);
 
     QnResourceList resources() const;
     void setResources(const QnResourceList& resources);
@@ -25,6 +25,11 @@ public:
     /** Simplified view hides resource statuses and displays servers as health monitors. */
     bool isSimplified() const;
     void setSimplified(bool value);
+
+    bool isSelectionEnabled() const;
+    void setSelectionEnabled(bool value);
+
+    QnResourcePtr selectedResource() const;
 
 protected:
     virtual QSize sizeHint() const override;

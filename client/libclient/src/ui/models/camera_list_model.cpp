@@ -15,11 +15,11 @@ QnCameraListModel::QnCameraListModel(QObject *parent):
     QnWorkbenchContextAware(parent)
 {
     /* Connect to context. */
-    connect(qnResPool,     SIGNAL(resourceAdded(QnResourcePtr)),   this, SLOT(addCamera(QnResourcePtr)), Qt::QueuedConnection);
-    connect(qnResPool,     SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(removeCamera(QnResourcePtr)), Qt::QueuedConnection);
+    connect(resourcePool(),     SIGNAL(resourceAdded(QnResourcePtr)),   this, SLOT(addCamera(QnResourcePtr)), Qt::QueuedConnection);
+    connect(resourcePool(),     SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(removeCamera(QnResourcePtr)), Qt::QueuedConnection);
 
     /* It is important to connect before iterating as new resources may be added to the pool asynchronously. */
-    for (const QnResourcePtr &resource: qnResPool->getAllCameras(QnResourcePtr(), true))
+    for (const QnResourcePtr &resource: resourcePool()->getAllCameras(QnResourcePtr(), true))
         addCamera(resource);
 }
 
@@ -143,7 +143,7 @@ void QnCameraListModel::setServer(const QnMediaServerResourcePtr & server) {
     while (!m_cameras.isEmpty())
         removeCamera(m_cameras.first());
 
-    QnResourceList resources = qnResPool->getAllCameras(m_server, true);
+    QnResourceList resources = resourcePool()->getAllCameras(m_server, true);
     foreach(const QnResourcePtr &resource, resources)
         addCamera(resource);
 

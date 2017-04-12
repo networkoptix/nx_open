@@ -199,11 +199,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_cursorPos(invalidCursorPos()),
     m_resizedWidget(NULL),
     m_dragDelta(invalidDragDelta()),
-    m_tourModeHintLabel(NULL),
     m_menuEnabled(true)
 {
-    ::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
-
     QEvent::Type mouseEventTypeArray[] = {
         QEvent::GraphicsSceneMousePress,
         QEvent::GraphicsSceneMouseMove,
@@ -466,7 +463,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(action(QnActions::MaximizeItemAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_maximizeItemAction_triggered()));
     connect(action(QnActions::UnmaximizeItemAction), SIGNAL(triggered()),                                                                  this,                           SLOT(at_unmaximizeItemAction_triggered()));
     connect(action(QnActions::FitInViewAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_fitInViewAction_triggered()));
-    connect(action(QnActions::ToggleTourModeAction), SIGNAL(triggered(bool)),                                                              this,                           SLOT(at_toggleTourModeAction_triggered(bool)));
+
     connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
         &QnWorkbenchController::at_accessController_permissionsChanged);
 
@@ -1226,28 +1223,41 @@ void QnWorkbenchController::at_item_doubleClicked(QnMediaResourceWidget *widget)
     at_item_doubleClicked(static_cast<QnResourceWidget *>(widget));
 }
 
-void QnWorkbenchController::at_item_doubleClicked(QnResourceWidget *widget) {
+void QnWorkbenchController::at_item_doubleClicked(QnResourceWidget *widget)
+{
     display()->scene()->clearSelection();
     widget->setSelected(true);
 
     QnWorkbenchItem *workbenchItem = widget->item();
     QnWorkbenchItem *zoomedItem = workbench()->item(Qn::ZoomedRole);
-    if(zoomedItem == workbenchItem) {
-        if (action(QnActions::ToggleTourModeAction)->isChecked()){
-            action(QnActions::ToggleTourModeAction)->toggle();
+    if (zoomedItem == workbenchItem)
+    {
+        // Stop layout tour if it is running.
+        if (action(QnActions::ToggleLayoutTourModeAction)->isChecked())
+        {
+            menu()->trigger(QnActions::ToggleLayoutTourModeAction);
             return;
         }
 
         QRectF viewportGeometry = display()->viewportGeometry();
         QRectF zoomedItemGeometry = display()->itemGeometry(zoomedItem);
 
-        if(viewportGeometry.width() < zoomedItemGeometry.width() * 0.975 || viewportGeometry.height() < zoomedItemGeometry.height() * 0.975) {
-            workbench()->setItem(Qn::ZoomedRole, NULL);
+        // Magic const from v1.0
+        static const qreal kOversizeCoeff{0.975};
+
+        if (viewportGeometry.width() < zoomedItemGeometry.width() * kOversizeCoeff
+            || viewportGeometry.height() < zoomedItemGeometry.height() *kOversizeCoeff)
+        {
+            workbench()->setItem(Qn::ZoomedRole, nullptr);
             workbench()->setItem(Qn::ZoomedRole, workbenchItem);
-        } else {
-            workbench()->setItem(Qn::ZoomedRole, NULL);
         }
-    } else {
+        else
+        {
+            workbench()->setItem(Qn::ZoomedRole, nullptr);
+        }
+    }
+    else
+    {
         workbench()->setItem(Qn::ZoomedRole, workbenchItem);
     }
 }
@@ -1467,24 +1477,6 @@ void QnWorkbenchController::at_maximizeItemAction_triggered() {
 
 void QnWorkbenchController::at_unmaximizeItemAction_triggered() {
     workbench()->setItem(Qn::ZoomedRole, NULL);
-}
-
-void QnWorkbenchController::at_toggleTourModeAction_triggered(bool checked) {
-    if (!checked) {
-        if (m_tourModeHintLabel) {
-            disconnect(m_tourModeHintLabel, NULL, this, NULL);
-            m_tourModeHintLabel->hideImmideately();
-            m_tourModeHintLabel = NULL;
-        }
-        return;
-    }
-    m_tourModeHintLabel = QnGraphicsMessageBox::information(tr("Press any key to stop the tour."));
-    connect(m_tourModeHintLabel, SIGNAL(finished()), this, SLOT(at_tourModeLabel_finished()));
-}
-
-void QnWorkbenchController::at_tourModeLabel_finished() {
-    if (m_tourModeHintLabel)
-       m_tourModeHintLabel = NULL;
 }
 
 void QnWorkbenchController::at_fitInViewAction_triggered() {

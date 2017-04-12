@@ -1,12 +1,19 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QScopedPointer>
 
 #include <client/client_startup_parameters.h>
 
-class QGLWidget;
+#include <nx/utils/singleton.h>
 
-class QnClientModule: public QObject
+class QGLWidget;
+class QnClientCoreModule;
+class QnPtzControllerPool;
+class QnNetworkProxyFactory;
+class QnStaticCommonModule;
+
+class QnClientModule: public QObject, public Singleton<QnClientModule>
 {
     Q_OBJECT
 
@@ -16,6 +23,10 @@ public:
 
     void initDesktopCamera(QGLWidget* window);
     void startLocalSearchers();
+
+    QnPtzControllerPool* ptzControllerPool() const;
+    QnNetworkProxyFactory* networkProxyFactory() const;
+
 private:
     void initApplication();
     void initThread();
@@ -26,4 +37,11 @@ private:
     void initNetwork        (const QnStartupParameters& startupParams);
     void initSkin           (const QnStartupParameters& startupParams);
     void initLocalResources (const QnStartupParameters& startupParams);
+
+private:
+    QScopedPointer<QnStaticCommonModule> m_staticCommon;
+    QScopedPointer<QnClientCoreModule> m_clientCoreModule;
+    QnNetworkProxyFactory* m_networkProxyFactory;
 };
+
+#define qnClientModule QnClientModule::instance()

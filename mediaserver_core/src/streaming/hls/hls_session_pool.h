@@ -65,6 +65,8 @@ namespace nx_hls
         const bool m_live;
         const MediaQuality m_streamQuality;
         const QnUuid m_cameraId;
+        QnResourcePool* m_resPool;
+
         std::vector<AbstractPlaylistManagerPtr> m_playlistManagers;
         //!map<pair<quality, alias>, pair<start timestamp, duration> >
         std::map<std::pair<MediaQuality, QString>, std::pair<quint64, quint64> > m_chunksByAlias;

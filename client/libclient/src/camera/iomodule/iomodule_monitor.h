@@ -1,16 +1,17 @@
-#ifndef __IOMODULE_MONITOR_H_
-#define __IOMODULE_MONITOR_H_
+#pragma once
 
-#include <nx/utils/thread/mutex.h>
+#include <client_core/connection_context_aware.h>
 
 #include "api/model/api_ioport_data.h"
 #include "core/resource/resource_fwd.h"
+
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/multipart_content_parser.h>
+#include <nx/utils/thread/mutex.h>
 
 class AbstractByteStreamFilter;
 
-class QnIOModuleMonitor: public QObject
+class QnIOModuleMonitor: public QObject, public QnConnectionContextAware
 {
     Q_OBJECT
 public:
@@ -32,5 +33,3 @@ private:
 };
 
 typedef QSharedPointer<QnIOModuleMonitor> QnIOModuleMonitorPtr;
-
-#endif // __IOMODULE_MONITOR_H_

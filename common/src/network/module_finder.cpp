@@ -60,37 +60,13 @@ namespace
         return result;
     }
 
-    QSet<QUrl> ignoredUrlsForServer(const QnUuid &id)
-    {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(id);
-        if (!server)
-            return QSet<QUrl>();
-
-        QSet<QUrl> result = QSet<QUrl>::fromList(server->getIgnoredUrls());
-
-        /* Currently used EC URL should be non-ignored. */
-        if (id == qnCommon->remoteGUID()) {
-            QUrl ecUrl = QnAppServerConnectionFactory::getConnection2()->connectionInfo().ecUrl;
-
-            QUrl url;
-            url.setScheme(lit("http"));
-            url.setHost(ecUrl.host());
-
-            result.remove(url);
-
-            url.setPort(ecUrl.port());
-            result.remove(url);
-        }
-
-        return result;
-    }
-
     Qn::ResourceStatus calculateModuleStatus(
-            const QnModuleInformation &moduleInformation,
-            Qn::ResourceStatus currentStatus = Qn::Online)
+        QnCommonModule* commonModule,
+        const QnModuleInformation &moduleInformation,
+        Qn::ResourceStatus currentStatus = Qn::Online)
     {
         Qn::ResourceStatus status =
-            QnConnectionValidator::isCompatibleToCurrentSystem(moduleInformation)
+            QnConnectionValidator::isCompatibleToCurrentSystem(moduleInformation, commonModule)
             ? Qn::Online
             : Qn::Incompatible;
         if (status == Qn::Online && currentStatus == Qn::Unauthorized)
@@ -100,29 +76,31 @@ namespace
     }
 }
 
-QnModuleFinder::QnModuleFinder(bool clientMode) :
+QnModuleFinder::QnModuleFinder(QObject* parent, bool clientMode):
+    QObject(parent),
+    QnCommonModuleAware(parent),
     m_itemsMutex(QnMutex::Recursive),
     m_elapsedTimer(),
     m_timer(new QTimer(this)),
     m_clientMode(clientMode),
-    m_multicastModuleFinder(new QnMulticastModuleFinder(clientMode)),
+    m_multicastModuleFinder(new QnMulticastModuleFinder(this, clientMode)),
     m_directModuleFinder(new QnDirectModuleFinder(this)),
     m_helper(new QnDirectModuleFinderHelper(this, clientMode))
 {
-    connect(m_multicastModuleFinder.data(), &QnMulticastModuleFinder::responseReceived,     this, &QnModuleFinder::at_responseReceived);
+    connect(m_multicastModuleFinder, &QnMulticastModuleFinder::responseReceived,     this, &QnModuleFinder::at_responseReceived);
     connect(m_directModuleFinder,           &QnDirectModuleFinder::responseReceived,        this, &QnModuleFinder::at_responseReceived);
 
     m_timer->setInterval(kCheckInterval);
     connect(m_timer, &QTimer::timeout, this, &QnModuleFinder::at_timer_timeout);
 
 
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, [this](const QnResourcePtr &resource) {
+    connect(commonModule()->resourcePool(), &QnResourcePool::resourceAdded, this, [this](const QnResourcePtr &resource) {
         QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
         if (!server)
             return;
         connect(server.data(), &QnMediaServerResource::auxUrlsChanged, this, &QnModuleFinder::at_server_auxUrlsChanged);
     });
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr &resource) {
+    connect(commonModule()->resourcePool(), &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr &resource) {
         QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
         if (!server)
             return;
@@ -135,17 +113,46 @@ QnModuleFinder::~QnModuleFinder()
     pleaseStop();
 }
 
-QnMulticastModuleFinder *QnModuleFinder::multicastModuleFinder() const
+QSet<QUrl> QnModuleFinder::ignoredUrlsForServer(const QnUuid &id)
 {
-    return m_multicastModuleFinder.data();
+    QnMediaServerResourcePtr server = commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(id);
+    if (!server)
+        return QSet<QUrl>();
+
+    QSet<QUrl> result = QSet<QUrl>::fromList(server->getIgnoredUrls());
+
+    /* Currently used EC URL should be non-ignored. */
+    if (id == commonModule()->remoteGUID())
+    {
+        QUrl ecUrl;
+        if (const auto& connection = commonModule()->ec2Connection())
+            ecUrl = connection->connectionInfo().ecUrl;
+
+        QUrl url;
+        url.setScheme(lit("http"));
+        url.setHost(ecUrl.host());
+
+        result.remove(url);
+
+        url.setPort(ecUrl.port());
+        result.remove(url);
+    }
+
+    return result;
 }
 
-QnDirectModuleFinder *QnModuleFinder::directModuleFinder() const
+
+QnMulticastModuleFinder* QnModuleFinder::multicastModuleFinder() const
+{
+    return m_multicastModuleFinder;
+}
+
+QnDirectModuleFinder* QnModuleFinder::directModuleFinder() const
 {
     return m_directModuleFinder;
 }
 
-QnDirectModuleFinderHelper *QnModuleFinder::directModuleFinderHelper() const
+QnDirectModuleFinderHelper* QnModuleFinder::directModuleFinderHelper() const
 {
     return m_helper;
 }
@@ -154,7 +161,7 @@ std::chrono::milliseconds QnModuleFinder::pingTimeout() const
 {
     // ModuleFinder uses amplified timeout to fix possible temporary problems
     // in QnMulticastModuleFinder (e.g. extend default timeouts 15 sec to 30 sec)
-    return QnGlobalSettings::instance()->serverDiscoveryAliveCheckTimeout() * 2;
+    return commonModule()->globalSettings()->serverDiscoveryAliveCheckTimeout() * 2;
 }
 
 void QnModuleFinder::setModuleStatus(const QnUuid &moduleId, Qn::ResourceStatus status)
@@ -245,8 +252,8 @@ ec2::ApiDiscoveredServerDataList QnModuleFinder::discoveredServers() const
 
 QnModuleInformation QnModuleFinder::moduleInformation(const QnUuid &moduleId) const
 {
-    if (moduleId == qnCommon->moduleGUID())
-        return qnCommon->moduleInformation();
+    if (moduleId == commonModule()->moduleGUID())
+        return commonModule()->moduleInformation();
 
     QnMutexLocker lk(&m_itemsMutex);
     return m_moduleItemById.value(moduleId).moduleInformation;
@@ -279,10 +286,10 @@ void QnModuleFinder::at_responseReceived(
     const QnModuleInformation &moduleInformation,
     const SocketAddress &endpoint, const HostAddress &ip)
 {
-    if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(moduleInformation.id))
+    if (!commonModule()->allowedPeers().isEmpty() && !commonModule()->allowedPeers().contains(moduleInformation.id))
         return;
 
-    if (moduleInformation.id == qnCommon->moduleGUID()) {
+    if (moduleInformation.id == commonModule()->moduleGUID()) {
         handleSelfResponse(moduleInformation, endpoint);
         return;
     }
@@ -318,8 +325,8 @@ void QnModuleFinder::at_responseReceived(
         !item.addresses.contains(endpoint)) // Same ip:port with different runtime id means that
                                             // server was restarted
     {
-        bool oldModuleIsValid = item.moduleInformation.localSystemId == qnGlobalSettings->localSystemId();
-        bool newModuleIsValid = moduleInformation.localSystemId == qnGlobalSettings->localSystemId();
+        bool oldModuleIsValid = item.moduleInformation.localSystemId == commonModule()->globalSettings()->localSystemId();
+        bool newModuleIsValid = moduleInformation.localSystemId == commonModule()->globalSettings()->localSystemId();
 
         if (oldModuleIsValid == newModuleIsValid)
         {
@@ -328,9 +335,9 @@ void QnModuleFinder::at_responseReceived(
         }
 
         if (oldModuleIsValid == newModuleIsValid) {
-            QnUuid remoteId = qnCommon->remoteGUID();
+            QnUuid remoteId = commonModule()->remoteGUID();
             if (!remoteId.isNull() && remoteId == moduleInformation.id) {
-                QnUuid correctRuntimeId = QnRuntimeInfoManager::instance()->item(remoteId).uuid;
+                QnUuid correctRuntimeId = commonModule()->runtimeInfoManager()->item(remoteId).uuid;
                 oldModuleIsValid = item.moduleInformation.runtimeId == correctRuntimeId;
                 newModuleIsValid = moduleInformation.runtimeId == correctRuntimeId;
             }
@@ -403,7 +410,7 @@ void QnModuleFinder::at_responseReceived(
             updatePrimaryAddress(item, endpoint);
 
         SocketAddress addressToSend = item.primaryAddress;
-        item.status = calculateModuleStatus(item.moduleInformation, item.status);
+        item.status = calculateModuleStatus(commonModule(), item.moduleInformation, item.status);
         Qn::ResourceStatus statusToSend = item.status;
         lk.unlock();
 
@@ -555,7 +562,7 @@ void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem, 
 
 void QnModuleFinder::handleSelfResponse(const QnModuleInformation &moduleInformation, const SocketAddress &address)
 {
-    QnModuleInformation current = qnCommon->moduleInformation();
+    QnModuleInformation current = commonModule()->moduleInformation();
     if (current.runtimeId == moduleInformation.runtimeId)
         return;
 
@@ -589,9 +596,13 @@ void QnModuleFinder::sendModuleInformation(
     NX_LOG(lit("QnModuleFinder: Send info for %1: %2 -> %3.")
            .arg(moduleInformation.id.toString()).arg(address.toString()).arg(status), cl_logDEBUG2);
 
-    QnAppServerConnectionFactory::getConnection2()->getDiscoveryManager(Qn::kSystemAccess)->sendDiscoveredServer(
-                std::move(serverData),
-                ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    if (const auto& connection = commonModule()->ec2Connection())
+    {
+        connection->getDiscoveryManager(Qn::kSystemAccess)->sendDiscoveredServer(
+            connection->messageBus(),
+            std::move(serverData),
+            ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    }
 }
 
 void QnModuleFinder::removeModule(const QnUuid &id)

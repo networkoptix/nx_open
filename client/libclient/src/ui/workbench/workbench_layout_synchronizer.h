@@ -1,10 +1,11 @@
-#ifndef QN_WORKBENCH_LAYOUT_SYNCHRONIZER_H
-#define QN_WORKBENCH_LAYOUT_SYNCHRONIZER_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QMetaType>
 #include <QtCore/QSet>
 #include <nx/utils/uuid.h>
+
+#include <client_core/connection_context_aware.h>
 
 #include <utils/common/connective.h>
 
@@ -20,7 +21,8 @@ class QnWorkbenchLayout;
  * This class performs bidirectional synchronization of instances of
  * <tt>QnWorkbenchLayout</tt> and <tt>QnLayoutResource</tt>.
  */
-class QnWorkbenchLayoutSynchronizer: public Connective<QObject> {
+class QnWorkbenchLayoutSynchronizer: public Connective<QObject>, public QnConnectionContextAware
+{
     Q_OBJECT
     typedef Connective<QObject> base_type;
 
@@ -131,5 +133,3 @@ private:
 };
 
 Q_DECLARE_METATYPE(QnWorkbenchLayoutSynchronizer *);
-
-#endif // QN_WORKBENCH_LAYOUT_SYNCHRONIZER_H

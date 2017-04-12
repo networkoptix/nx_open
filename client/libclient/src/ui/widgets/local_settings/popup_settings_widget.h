@@ -13,6 +13,7 @@ namespace Ui {
 class PopupSettingsWidget;
 }
 
+class QnBusinessStringsHelper;
 class QnBusinessEventsFilterResourcePropertyAdaptor;
 
 class QnPopupSettingsWidget: public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
@@ -38,4 +39,5 @@ private:
     QMap<QnSystemHealth::MessageType, QCheckBox*> m_systemHealthCheckBoxes;
     QnBusinessEventsFilterResourcePropertyAdaptor* m_adaptor;
     bool m_updating;
+    std::unique_ptr<QnBusinessStringsHelper> m_helper;
 };

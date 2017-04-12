@@ -124,7 +124,7 @@ public:
             {
                 auto messageBox = new QnMessageBox(mainWindow());
                 messageBox->setWindowFlags(Qt::Window);
-                messageBox->addCustomWidget(new QnResourceListView(qnResPool->getResources(), messageBox));
+                messageBox->addCustomWidget(new QnResourceListView(resourcePool()->getResources(), messageBox));
                 messageBox->show();
             });
 
