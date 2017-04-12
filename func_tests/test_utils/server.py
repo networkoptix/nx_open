@@ -22,7 +22,7 @@ import utils
 from .server_rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT_SEC, HttpError, ServerRestApi
 from .vagrant_box_config import MEDIASERVER_LISTEN_PORT, BoxConfigFactory, BoxConfig
 from .cloud_host import CloudHost
-from .camera import Camera, SampleMediaFile
+from .camera import make_schedule_task, Camera, SampleMediaFile
 from .media_stream import open_media_stream
 
 
@@ -30,6 +30,7 @@ MEDIASERVER_DIR = '/opt/{company_name}/mediaserver'
 MEDIASERVER_CONFIG_PATH = 'etc/mediaserver.conf'
 MEDIASERVER_CONFIG_PATH_INITIAL = 'etc/mediaserver.conf.initial'
 MEDIASERVER_CLOUDHOST_PATH = 'lib/libcommon.so'
+MEDIASERVER_VAR_PATH = 'var'
 MEDIASERVER_STORAGE_PATH = 'var/data'
 MEDIASERVER_LOG_PATH = 'var/log/log_file.log'
 
@@ -149,12 +150,12 @@ class ServerConfig(object):
 
 class Server(object):
 
-    def __init__(self, company_name, name, box, rest_api_url):
+    def __init__(self, company_name, name, box, rest_api_url, host=None):
         self._company_name = company_name
         self.title = name
         self.name = '%s-%s' % (name, str(uuid.uuid4())[-12:])
         self.box = box
-        self.host = box.host
+        self.host = host or box.host
         self.rest_api_url = rest_api_url
         self.dir = MEDIASERVER_DIR.format(company_name=self._company_name)
         self._config_path = os.path.join(self.dir, MEDIASERVER_CONFIG_PATH)
@@ -189,7 +190,7 @@ class Server(object):
         if reset:
             if was_started:
                 self.stop_service()
-            self.storage.cleanup()
+            self._cleanup_var_dir()
             if patch_set_cloud_host:
                 self.patch_binary_set_cloud_host(patch_set_cloud_host)  # may be changed by previous tests...
             self.reset_config(logLevel=log_level, tranLogLevel=log_level, **(config_file_params or {}))
@@ -202,6 +203,9 @@ class Server(object):
         if self._is_started:
             self.load_system_settings()
             assert not reset or not self.is_system_set_up(), 'Failed to properly reinit server - it reported to be already set up'
+
+    def _cleanup_var_dir(self):
+        self.host.run_command(['rm', '-rf', os.path.join(self.dir, MEDIASERVER_VAR_PATH, '*')])
 
     def list_core_files(self):
         return (self.host.run_command(
@@ -267,12 +271,18 @@ class Server(object):
             return 'local'
 
     def reset(self):
-        self.reset_config()
-        self.restart()
+        was_started = self.service.get_status()
+        if was_started:
+            self.stop_service()
+        self._cleanup_var_dir()
+        if was_started:
+            self.start_service()
 
     def reset_config(self, **kw):
         self.host.run_command(['cp', self._config_path_initial, self._config_path])
-        self.change_config(removeDbOnStartup=1, **kw)
+        default_config = dict(removeDbOnStartup=1)
+        config = dict(default_config, **kw)
+        self.change_config(**config)
 
     def restart(self, timeout=30):
         t = time.time()
@@ -449,9 +459,23 @@ class Server(object):
         assert self.local_system_id == new_guid
 
     def add_camera(self, camera):
+        assert not camera.id, 'Already added to a server with id %r' % camera.id
         params = camera.get_info(parent_id=self.ecs_guid)
         result = self.rest_api.ec2.saveCamera.POST(**params)
-        return result['id']
+        camera.id = result['id']
+        return camera.id
+
+    def set_camera_recording(self, camera, recording):
+        assert camera, 'Camera %r is not yet registered on server' % camera
+        schedule_tasks=[make_schedule_task(day_of_week + 1) for day_of_week in range(7)]
+        self.rest_api.ec2.saveCameraUserAttributes.POST(
+            cameraId=camera.id, scheduleEnabled=recording, scheduleTasks=schedule_tasks)
+
+    def start_recording_camera(self, camera):
+        self.set_camera_recording(camera, recording=True)
+
+    def stop_recording_camera(self, camera):
+        self.set_camera_recording(camera, recording=False)
 
     # if there are more than one return first
     def _get_storage(self):
@@ -472,12 +496,14 @@ class Server(object):
             time.sleep(0.3)
         assert False, 'Timed out waiting for archive to rebuild'
 
-    def get_recorded_time_periods(self, camera_id):
+    def get_recorded_time_periods(self, camera):
+        assert camera.id, 'Camera %r is not yet registered on server' % camera.name
         periods = [TimePeriod(datetime.datetime.utcfromtimestamp(int(d['startTimeMs'])/1000.).replace(tzinfo=pytz.utc),
                     datetime.timedelta(seconds=int(d['durationMs'])/1000.))
-                    for d in self.rest_api.ec2.recordedTimePeriods.GET(cameraId=camera_id, flat=True)]
-        log.info('Server %r returned recorded periods:', self.name)
-        log.info('\t%s', '\n\t'.join(map(str, periods)))
+                    for d in self.rest_api.ec2.recordedTimePeriods.GET(cameraId=camera.id, flat=True)]
+        log.info('Server %r returned %d recorded periods:', self.name, len(periods))
+        for period in periods:
+            log.info('\t%s', period)
         return periods
 
     def get_media_stream(self, stream_type, camera):

@@ -12,6 +12,7 @@
 namespace Qn
 {
     static const QByteArray GUID_HEADER_NAME = "X-guid";
+    static const QByteArray PROXY_SENDER_HEADER_NAME = "Nx-Proxy-Sender";
     static const QByteArray SERVER_GUID_HEADER_NAME = "X-server-guid";
     static const QByteArray CAMERA_GUID_HEADER_NAME = "X-camera-guid";
     static const QByteArray VIDEOWALL_GUID_HEADER_NAME = "X-NetworkOptix-VideoWall";

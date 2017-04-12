@@ -33,65 +33,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 namespace
 {
-    QnNetworkAddressEntryList readNetworSettings(bool* ok)
-    {
-        QnNetworkAddressEntryList result;
-    #ifdef Q_OS_WIN
-        QFile netSettings(lit("c:/etc/network/interfaces"));
-    #else
-        QFile netSettings(lit("/etc/network/interfaces"));
-    #endif
-        *ok = true;
-        if (!netSettings.open(QFile::ReadOnly))
-        {
-            qWarning() << "Can't read network settings file";
-            *ok = false;
-            return result;
-        }
-        const QByteArray data = netSettings.readAll();
-
-        nx_http::LineSplitter lineSplitter;
-        QnByteArrayConstRef line;
-        size_t bytesRead = 0;
-        size_t dataOffset = 0;
-        QByteArray lastIfName;
-        while( lineSplitter.parseByLines( nx_http::ConstBufferRefType(data, dataOffset), &line, &bytesRead) )
-        {
-            dataOffset += bytesRead;
-
-            QByteArray data = line.toByteArrayWithRawData().trimmed();
-            QList<QByteArray> worlds = data.split(' ');
-            if (worlds.size() < 2)
-                continue;
-
-            if (data.startsWith("iface"))
-            {
-                result.push_back(QnNetworkAddressEntry());
-                result.last().name = worlds[1].trimmed();
-                result.last().dhcp = data.contains("dhcp");
-            }
-            else {
-                if (result.isEmpty())
-                    continue;
-
-                if (data.startsWith("address"))
-                    result.last().ipAddr = worlds[1].trimmed();
-                else if (data.startsWith("netmask"))
-                    result.last().netMask = worlds[1].trimmed();
-                else if (data.startsWith("gateway"))
-                    result.last().gateway = worlds[1].trimmed();
-                else if (data.startsWith("dns-nameservers"))
-                    result.last().dns_servers = worlds[1].trimmed();
-                else if (data.startsWith("auto"))
-                    ;
-                else
-                    result.last().extraParams.insert(worlds[0], worlds[1]);
-            }
-        }
-
-        return result;
-    }
-
     bool writeNetworSettings(const QnNetworkAddressEntryList& settings)
     {
         static const char ENDL = '\n';
@@ -288,7 +229,7 @@ int QnIfConfigRestHandler::executePost(const QString &path, const QnRequestParam
     }
 
     bool ok = false;
-    QnNetworkAddressEntryList currentSettings = readNetworSettings(&ok);
+    QnNetworkAddressEntryList currentSettings = systemNetworkAddressEntryList(&ok, /* addLoopback */ true);
     if (!ok)
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't read network settings file"));
@@ -339,7 +280,7 @@ void QnIfConfigRestHandler::afterExecute(const QString &path, const QnRequestPar
         return;
 
     bool ok = false;
-    QnNetworkAddressEntryList currentSettings = readNetworSettings(&ok);
+    QnNetworkAddressEntryList currentSettings = systemNetworkAddressEntryList(&ok, /* addLoopback */ true);
     if (!ok)
         return;
 

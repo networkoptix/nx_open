@@ -3,6 +3,7 @@
 #include <array>
 #include "migrate_oldwin_dir.h"
 #include <media_server/serverutil.h>
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace misc {
@@ -42,9 +43,13 @@ class MigrateOldWindowsDataHelper
 public:
     MigrateOldWindowsDataHelper(MigrateDataHandler* handler):
         m_handler(handler),
-        m_currentDataDir(handler->currentDataDir()),
-        m_windowsDir(handler->windowsDir())
-    {}
+        m_currentDataDir(handler->currentDataDir().toLower()),
+        m_windowsDir(handler->windowsDir().toLower())
+    {
+        NX_LOG(lit("[Moving data] Current data dir: %1, windows dir: %2")
+                .arg(m_currentDataDir)
+                .arg(m_windowsDir), cl_logDEBUG2);
+    }
 
     MigrateDataResult moveData()
     {
@@ -71,18 +76,23 @@ private:
         const QString basePath = m_windowsDir.mid(0, m_windowsDir.lastIndexOf(lit("\\")) + 1);
         const QString dataSubPath = m_currentDataDir.mid(m_windowsDir.size()); 
 
-        std::array<QString, 3> baseNames = {lit("Windows"), lit("windows"), lit("WINDOWS")};
-        std::array<QString, 3> suffixes = {lit(".old"), lit(".OLD"), lit(".000")};
+        QString baseName = lit("windows");
+        std::array<QString, 2> suffixes = {lit(".old"), lit(".000")};
 
-        for (const auto& baseName: baseNames)
-            for (const auto& suffix: suffixes)
-                m_oldDataDirCandidates.append(basePath + baseName + suffix + dataSubPath);
+        for (const auto& suffix : suffixes)
+        {
+            m_oldDataDirCandidates.append(basePath + baseName + suffix + dataSubPath);
+            m_oldDataDirCandidates.append(basePath + baseName + suffix + lit("\\") + baseName + dataSubPath);
+        }
     }
 
     MigrateDataResult tryToMoveFromCandidate(const QString& oldDataDirCandidate)
     {
         if (!m_handler->dirExists(oldDataDirCandidate))
+        {
+            NX_LOG(lit("[Moving data] candidate: %1 doesn't exist").arg(oldDataDirCandidate), cl_logDEBUG2);
             return MigrateDataResult::NoNeedToMigrate;
+        }
 
         if (!m_handler->makePath(m_currentDataDir) || !m_handler->moveDir(oldDataDirCandidate, m_currentDataDir))
             return MigrateDataResult::MoveDataFailed;
