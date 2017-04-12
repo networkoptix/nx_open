@@ -31,7 +31,7 @@ struct ApiLayoutTourItemData: ApiData
 struct ApiLayoutTourData: ApiIdData
 {
     QString name;
-    std::vector<ApiLayoutTourItemData> items;
+    ApiLayoutTourItemDataList items;
 
     bool isValid() const;
 

@@ -103,6 +103,7 @@ namespace ec2 {
     typedef std::vector<ApiCameraDataEx> ApiCameraDataExList;
     typedef std::vector<ApiLayoutData> ApiLayoutDataList;
     using ApiLayoutTourDataList = std::vector<ApiLayoutTourData>;
+    using ApiLayoutTourItemDataList = std::vector<ApiLayoutTourItemData>;
     typedef std::vector<ApiLicenseData> ApiLicenseDataList;
     typedef std::vector<ApiDetailedLicenseData> ApiDetailedLicenseDataList;
     typedef std::vector<ApiMediaServerData> ApiMediaServerDataList;

@@ -33,9 +33,6 @@ class QnVideoWallControlMessage;
 struct QnLayoutItemData;
 struct QnLayoutItemResourceDescriptor;
 
-struct QnLayoutTourItem;
-using QnLayoutTourItemList = std::vector<QnLayoutTourItem>;
-
 struct QnServerBackupSchedule;
 
 class QnResourceCommand;

@@ -1779,15 +1779,6 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::NoTarget).
         separator();
 
-    factory(QnActions::ToggleTourModeAction).
-        flags(Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey).
-        mode(QnActionTypes::DesktopMode).
-        text(tr("Start Tour")).
-        toggledText(tr("Stop Tour")).
-        shortcut(lit("Alt+T")).
-        autoRepeat(false).
-        condition(new QnToggleTourActionCondition(this));
-
     factory(QnActions::OpenLayoutTourAction).
         flags(Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).
@@ -1795,18 +1786,20 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(lit("Alt+L")).
         autoRepeat(false);
 
-    factory(QnActions::StartLayoutTourAction).
-        flags(Qn::Scene | Qn::Tree | Qn::NoTarget).
+    factory(QnActions::ToggleLayoutTourModeAction).
+        flags(Qn::Scene | Qn::Tree | Qn::NoTarget | Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).
-        text(tr("Start Layouts Tour")).
+        text(tr("Start Tour")).
+        toggledText(tr("Stop Tour")).
+        shortcut(lit("Alt+T")).
+        autoRepeat(false).
         icon(qnSkin->icon("slider/navigation/play.png")).
-        condition(new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this));
-
-    factory(QnActions::StopLayoutTourAction).
-        flags(Qn::Scene | Qn::NoTarget).
-        text(tr("Stop Layouts Tour")).
-        mode(QnActionTypes::DesktopMode).
-        icon(qnSkin->icon("slider/navigation/pause.png"));
+        condition(new QnConjunctionActionCondition(
+            new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this),
+            new QnVideoWallReviewModeCondition(true, this),
+     //       new QnToggleTourActionCondition(this), //TODO: #GDM #3.1 implement with review mode
+            this
+        ));
 
     factory(QnActions::LayoutTourSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::NoTarget).

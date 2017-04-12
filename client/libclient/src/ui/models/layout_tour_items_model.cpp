@@ -24,7 +24,7 @@ QnLayoutTourItemsModel::~QnLayoutTourItemsModel()
 
 int QnLayoutTourItemsModel::rowCount(const QModelIndex& parent) const
 {
-    return parent.isValid() ? 0 : (int)m_items.size();
+    return parent.isValid() ? 0 : (int) m_items.size();
 }
 
 int QnLayoutTourItemsModel::columnCount(const QModelIndex& /*parent*/) const
@@ -39,12 +39,12 @@ QVariant QnLayoutTourItemsModel::data(const QModelIndex& index, int role) const
         return QVariant();
 
     const bool hasItem = qBetween(0, index.row(), (int)m_items.size());
-    NX_ASSERT(hasItem);
+    NX_EXPECT(hasItem);
     if (!hasItem)
         return QVariant();
 
     Column column = static_cast<Column>(index.column());
-    QnLayoutTourItem item = m_items[index.row()];
+    const QnLayoutTourItem& item = m_items[index.row()];
 
     switch (role)
     {
@@ -174,7 +174,7 @@ bool QnLayoutTourItemsModel::setData(const QModelIndex &index, const QVariant &v
         return false;
 
     const bool hasItem = qBetween(0, index.row(), (int)m_items.size());
-    NX_ASSERT(hasItem);
+    NX_EXPECT(hasItem);
     if (!hasItem)
         return false;
 

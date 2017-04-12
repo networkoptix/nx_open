@@ -308,9 +308,6 @@ void QnWorkbenchUi::updateCursor()
 
 bool QnWorkbenchUi::calculateTimelineVisible(QnResourceWidget* widget) const
 {
-    if (action(QnActions::ToggleTourModeAction)->isChecked())
-        return false;
-
     if (!widget)
         return false;
 
@@ -384,6 +381,15 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate)
         : true);
     const bool timelineVisible =
         (allowedByLayout && calculateTimelineVisible(navigator()->currentWidget()));
+
+    if (action(QnActions::ToggleLayoutTourModeAction)->isChecked())
+    {
+        setTimelineVisible(false, animate);
+        setTreeVisible(false, animate);
+        setTitleVisible(false, animate);
+        setNotificationsVisible(false, animate);
+        return;
+    }
 
     if (qnRuntime->isVideoWallMode())
     {
@@ -1306,7 +1312,7 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
-    connect(action(QnActions::ToggleTourModeAction), &QAction::toggled, this,
+    connect(action(QnActions::ToggleLayoutTourModeAction), &QAction::toggled, this,
         [this](bool toggled)
         {
             /// If tour mode is going to be turned on, focus should be forced to main window
@@ -1315,10 +1321,8 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
                 mainWindow()->setFocus();
         });
 
-    connect(action(QnActions::ToggleTourModeAction), &QAction::toggled, this,
+    connect(action(QnActions::ToggleLayoutTourModeAction), &QAction::toggled, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
-
-
 }
 
 #pragma endregion Timeline methods
