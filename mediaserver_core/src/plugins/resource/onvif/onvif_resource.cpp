@@ -2095,7 +2095,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
     bool dualStreamingAllowed = optionsList.size() >= 2;
     if (dualStreamingAllowed)
     {
-        int secondaryIndex = profiles.isEmpty() ? getSecondaryIndex(optionsList) : 1; 
+        int secondaryIndex = channelProfiles.isEmpty() ? getSecondaryIndex(optionsList) : 1; 
         QnMutexLocker lock( &m_mutex );
 
         m_secondaryVideoEncoderId = optionsList[secondaryIndex].id;
