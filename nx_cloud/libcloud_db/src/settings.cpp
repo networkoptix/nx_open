@@ -135,12 +135,42 @@ Settings::Settings():
     m_dbConnectionOptions.maxPeriodQueryWaitsForAvailableConnection = std::chrono::minutes(1);
 }
 
-bool Settings::showHelp() const
+void Settings::load(int argc, char **argv)
+{
+    m_commandLineParser.parse(argc, const_cast<const char**>(argv), stderr);
+    m_settings.parseArgs(argc, const_cast<const char**>(argv));
+
+    loadConfiguration();
+}
+
+bool Settings::isShowHelpRequested() const
 {
     return m_showHelp;
 }
 
-const nx::utils::log::Settings& Settings::logging() const
+void Settings::printCmdLineArgsHelp()
+{
+    // TODO: #ak
+}
+
+QString Settings::dataDir() const
+{
+    const QString& dataDirFromSettings = m_settings.value(kDataDir).toString();
+    if (!dataDirFromSettings.isEmpty())
+        return dataDirFromSettings;
+
+#ifdef Q_OS_LINUX
+    QString defVarDirName = QString("/opt/%1/%2/var")
+        .arg(QnAppInfo::linuxOrganizationName()).arg(kModuleName);
+    QString varDirName = m_settings.value("varDir", defVarDirName).toString();
+    return varDirName;
+#else
+    const QStringList& dataDirList = QStandardPaths::standardLocations(QStandardPaths::DataLocation);
+    return dataDirList.isEmpty() ? QString() : dataDirList[0];
+#endif
+}
+
+nx::utils::log::Settings Settings::logging() const
 {
     return m_logging;
 }
@@ -213,36 +243,6 @@ std::list<SocketAddress> Settings::endpointsToListen() const
         []( const QString& str ) { return SocketAddress( str ); } );
 
     return httpAddrToListenList;
-}
-
-QString Settings::dataDir() const
-{
-    const QString& dataDirFromSettings = m_settings.value( kDataDir ).toString();
-    if( !dataDirFromSettings.isEmpty() )
-        return dataDirFromSettings;
-
-#ifdef Q_OS_LINUX
-    QString defVarDirName = QString( "/opt/%1/%2/var" )
-            .arg(QnAppInfo::linuxOrganizationName()).arg( kModuleName );
-    QString varDirName = m_settings.value( "varDir", defVarDirName ).toString();
-    return varDirName;
-#else
-    const QStringList& dataDirList = QStandardPaths::standardLocations( QStandardPaths::DataLocation );
-    return dataDirList.isEmpty() ? QString() : dataDirList[0];
-#endif
-}
-
-void Settings::load( int argc, const char **argv )
-{
-    m_commandLineParser.parse(argc, argv, stderr);
-    m_settings.parseArgs(argc, argv);
-
-    loadConfiguration();
-}
-
-void Settings::printCmdLineArgsHelpToCout()
-{
-    // TODO: #ak
 }
 
 void Settings::fillSupportedCmdParameters()

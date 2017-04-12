@@ -8,6 +8,7 @@
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_settings.h>
 #include <nx/utils/settings.h>
+#include <nx/utils/abstract_service_settings.h>
 
 #include <utils/common/command_line_parser.h>
 #include <utils/db/types.h>
@@ -95,7 +96,8 @@ public:
 /**
  * @note Values specified via command-line have priority over conf file (or win32 registry) values.
  */
-class Settings
+class Settings:
+    public utils::AbstractServiceSettings
 {
 public:
     Settings();
@@ -103,13 +105,16 @@ public:
     Settings(const Settings&) = delete;
     Settings& operator=(const Settings&) = delete;
 
-    bool showHelp() const;
+    /** Loads settings from both command line and conf file (or win32 registry). */
+    virtual void load(int argc, char **argv) override;
+    virtual bool isShowHelpRequested() const override;
+    virtual void printCmdLineArgsHelp() override;
+    virtual QString dataDir() const override;
+    virtual nx::utils::log::Settings logging() const override;
 
     /** List of local endpoints to bind to. By default, 0.0.0.0:3346. */
     std::list<SocketAddress> endpointsToListen() const;
-    QString dataDir() const;
     
-    const nx::utils::log::Settings& logging() const;
     const nx::utils::log::Settings& vmsSynchronizationLogging() const;
     const db::ConnectionOptions& dbConnectionOptions() const;
     const Auth& auth() const;
@@ -121,10 +126,6 @@ public:
     const QString& changeUser() const;
     const ModuleFinder& moduleFinder() const;
     const Http& http() const;
-
-    /** Loads settings from both command line and conf file (or win32 registry). */
-    void load( int argc, const char **argv );
-    void printCmdLineArgsHelpToCout();
 
 private:
     QnCommandLineParser m_commandLineParser;
