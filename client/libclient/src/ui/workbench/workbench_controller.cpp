@@ -1223,28 +1223,36 @@ void QnWorkbenchController::at_item_doubleClicked(QnMediaResourceWidget *widget)
     at_item_doubleClicked(static_cast<QnResourceWidget *>(widget));
 }
 
-void QnWorkbenchController::at_item_doubleClicked(QnResourceWidget *widget) {
+void QnWorkbenchController::at_item_doubleClicked(QnResourceWidget *widget)
+{
     display()->scene()->clearSelection();
     widget->setSelected(true);
 
     QnWorkbenchItem *workbenchItem = widget->item();
     QnWorkbenchItem *zoomedItem = workbench()->item(Qn::ZoomedRole);
-    if(zoomedItem == workbenchItem) {
-        if (action(QnActions::ToggleTourModeAction)->isChecked()){
-            action(QnActions::ToggleTourModeAction)->toggle();
-            return;
-        }
+    if (zoomedItem == workbenchItem)
+    {
+        menu()->trigger(QnActions::StopLayoutTourAction);
 
         QRectF viewportGeometry = display()->viewportGeometry();
         QRectF zoomedItemGeometry = display()->itemGeometry(zoomedItem);
 
-        if(viewportGeometry.width() < zoomedItemGeometry.width() * 0.975 || viewportGeometry.height() < zoomedItemGeometry.height() * 0.975) {
-            workbench()->setItem(Qn::ZoomedRole, NULL);
+        // Magic const from v1.0
+        static const qreal kOversizeCoeff{0.975};
+
+        if (viewportGeometry.width() < zoomedItemGeometry.width() * kOversizeCoeff
+            || viewportGeometry.height() < zoomedItemGeometry.height() *kOversizeCoeff)
+        {
+            workbench()->setItem(Qn::ZoomedRole, nullptr);
             workbench()->setItem(Qn::ZoomedRole, workbenchItem);
-        } else {
-            workbench()->setItem(Qn::ZoomedRole, NULL);
         }
-    } else {
+        else
+        {
+            workbench()->setItem(Qn::ZoomedRole, nullptr);
+        }
+    }
+    else
+    {
         workbench()->setItem(Qn::ZoomedRole, workbenchItem);
     }
 }

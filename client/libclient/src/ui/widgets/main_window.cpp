@@ -732,10 +732,12 @@ void MainWindow::changeEvent(QEvent *event) {
     base_type::changeEvent(event);
 }
 
-void MainWindow::paintEvent(QPaintEvent *event) {
+void MainWindow::paintEvent(QPaintEvent* event)
+{
     base_type::paintEvent(event);
 
-    if(m_drawCustomFrame) {
+    if (m_drawCustomFrame)
+    {
         QPainter painter(this);
 
         painter.setPen(QPen(QColor(255, 255, 255, 64), 1));
@@ -743,15 +745,14 @@ void MainWindow::paintEvent(QPaintEvent *event) {
     }
 }
 
-void MainWindow::keyPressEvent(QKeyEvent *event) {
+void MainWindow::keyPressEvent(QKeyEvent* event)
+{
     base_type::keyPressEvent(event);
-
-    if (!action(QnActions::ToggleTourModeAction)->isChecked())
-        return;
 
     if (event->key() == Qt::Key_Alt || event->key() == Qt::Key_Control)
         return;
-    menu()->trigger(QnActions::ToggleTourModeAction);
+
+    menu()->trigger(QnActions::StopLayoutTourAction);
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
