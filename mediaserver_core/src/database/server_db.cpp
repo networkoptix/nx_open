@@ -22,6 +22,7 @@
 #include <nx/fusion/model_functions.h>
 #include <api/global_settings.h>
 #include <common/common_module.h>
+#include <media_server/media_server_module.h>
 
 namespace {
 
@@ -294,7 +295,7 @@ QnServerDb::QnServerDb(QnCommonModule* commonModule):
 {
     const QString fileName =
         closeDirPath(
-            MSSettings::roSettings()->value("eventsDBFilePath", getDataDirectory()).toString())
+            qnServerModule->roSettings()->value("eventsDBFilePath", getDataDirectory()).toString())
         + QString(lit("mserver.sqlite"));
     addDatabase(fileName, "QnServerDb");
     if (m_sdb.open())

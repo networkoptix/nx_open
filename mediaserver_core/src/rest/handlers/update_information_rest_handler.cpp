@@ -15,6 +15,7 @@
 #include <network/tcp_listener.h>
 #include <network/module_finder.h>
 #include <api/global_settings.h>
+#include <media_server/media_server_module.h>
 
 namespace {
 
@@ -34,7 +35,7 @@ QUrl getServerApiUrl(
 
 qint64 freeSpaceForUpdate()
 {
-    auto updatesDir = MSSettings::roSettings()->value("dataDir").toString();
+    auto updatesDir = qnServerModule->roSettings()->value("dataDir").toString();
     if (updatesDir.isEmpty())
         updatesDir = QDir::tempPath();
 

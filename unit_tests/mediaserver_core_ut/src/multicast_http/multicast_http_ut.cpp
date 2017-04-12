@@ -22,7 +22,8 @@ namespace
 
     QUuid getServerGuid()
     {
-        return QUuid(MSSettings::roSettings()->value(lit("serverGuid")).toString());
+        static QUuid uuid(QnUuid::createUuid().toString());
+        return uuid;
     }
 
 }

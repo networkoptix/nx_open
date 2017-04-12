@@ -8,6 +8,7 @@
 #include <cdb/ec2_request_paths.h>
 
 #include "settings.h"
+#include "media_server_module.h"
 
 namespace {
     static const int kUpdateIfFailIntervalMs = 1000 * 60;
@@ -58,7 +59,7 @@ void QnConnectToCloudWatcher::at_updateConnection()
     }
 
     const auto cdbEndpoint =
-        MSSettings::roSettings()->value(nx_ms_conf::CDB_ENDPOINT, "").toString();
+        qnServerModule->roSettings()->value(nx_ms_conf::CDB_ENDPOINT, "").toString();
     if (!cdbEndpoint.isEmpty())
     {
         addCloudPeer((QString)lm("http://%1").arg(cdbEndpoint));

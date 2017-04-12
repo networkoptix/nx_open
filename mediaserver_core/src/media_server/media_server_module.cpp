@@ -50,6 +50,8 @@ void installTranslations()
 
 QnMediaServerModule::QnMediaServerModule(
     const QString& enforcedMediatorEndpoint,
+    const QString& roSettingsPath,
+    const QString& rwSettingsPath,
     QObject* parent)
 {
     Q_INIT_RESOURCE(mediaserver_core);
@@ -60,6 +62,8 @@ QnMediaServerModule::QnMediaServerModule(
         QnAppInfo::productNameShort(),
         QnAppInfo::customizationName()));
 
+    m_settings = store(new MSSettings(roSettingsPath, rwSettingsPath));
+
     m_commonModule = store(new QnCommonModule(/*clientMode*/ false));
 
     instance<QnLongRunnablePool>();
@@ -68,7 +72,7 @@ QnMediaServerModule::QnMediaServerModule(
     store<PasswordHelper>(new PasswordHelper());
 
     const bool isDiscoveryDisabled =
-        MSSettings::roSettings()->value(QnServer::kNoResourceDiscovery, false).toBool();
+        m_settings->roSettings()->value(QnServer::kNoResourceDiscovery, false).toBool();
     QnSoapServer* soapServer = nullptr;
     if (!isDiscoveryDisabled)
     {
@@ -100,13 +104,15 @@ QnMediaServerModule::QnMediaServerModule(
 
     // std::shared_pointer based singletones should be placed after InstanceStorage singletones
 
-    m_normalStorageManager.reset(
+    m_context.reset(new UniquePtrContext());
+
+    m_context->normalStorageManager.reset(
         new QnStorageManager(
             commonModule(),
             QnServer::StoragePool::Normal
         ));
 
-    m_backupStorageManager.reset(
+    m_context->backupStorageManager.reset(
         new QnStorageManager(
             commonModule(),
             QnServer::StoragePool::Backup
@@ -120,6 +126,7 @@ QnMediaServerModule::QnMediaServerModule(
 
 QnMediaServerModule::~QnMediaServerModule()
 {
+    m_context.reset();
     clear();
 }
 
@@ -131,4 +138,14 @@ StreamingChunkCache* QnMediaServerModule::streamingChunkCache() const
 QnCommonModule* QnMediaServerModule::commonModule() const
 {
     return m_commonModule;
+}
+
+QSettings* QnMediaServerModule::roSettings() const
+{
+    return m_settings->roSettings();
+}
+
+QSettings* QnMediaServerModule::runTimeSettings() const
+{
+    return m_settings->runTimeSettings();
 }

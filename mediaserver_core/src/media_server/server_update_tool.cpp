@@ -20,6 +20,7 @@
 #include <media_server/serverutil.h>
 #include <utils/common/delayed.h>
 #include <common/static_common_module.h>
+#include <media_server/media_server_module.h>
 
 namespace {
 
@@ -29,7 +30,7 @@ namespace {
     const int installationDelay = 15000;
 
     QDir getUpdatesDir() {
-        const QString& dataDir = MSSettings::roSettings()->value( "dataDir" ).toString();
+        const QString& dataDir = qnServerModule->roSettings()->value( "dataDir" ).toString();
         QDir dir = dataDir.isEmpty() ? QDir::temp() : dataDir;
         if (!dir.exists(updatesDirSuffix))
             dir.mkpath(updatesDirSuffix);
@@ -63,7 +64,7 @@ QnServerUpdateTool::~QnServerUpdateTool()
 
 bool QnServerUpdateTool::initializeUpdateLog(const QString& targetVersion, QString* logFileName) const
 {
-    QString logDir = MSSettings::roSettings()->value(lit("logDir"), getDataDirectory() + lit("/log/")).toString();
+    QString logDir = qnServerModule->roSettings()->value(lit("logDir"), getDataDirectory() + lit("/log/")).toString();
     if (logDir.isEmpty())
         return false;
 

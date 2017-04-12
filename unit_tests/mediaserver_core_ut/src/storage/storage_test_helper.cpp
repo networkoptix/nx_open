@@ -13,7 +13,7 @@ namespace utils {
 
 FileStorageTestHelper::FileStorageTestHelper() :
     m_commonModule(new QnCommonModule(/*isClient*/false)),
-    m_platformAbstraction(new QnPlatformAbstraction(0))
+    m_platformAbstraction(new QnPlatformAbstraction())
 {
     m_commonModule->setModuleGUID(QnUuid::createUuid());
 }

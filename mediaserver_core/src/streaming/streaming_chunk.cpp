@@ -12,8 +12,8 @@
 #include <api/helpers/camera_id_helper.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
-
 #include "media_server/settings.h"
+#include <media_server/media_server_module.h>
 
 StreamingChunk::SequentialReadingContext::SequentialReadingContext(StreamingChunk* chunk):
     m_currentOffset( 0 ),
@@ -33,7 +33,7 @@ StreamingChunk::StreamingChunk(
     m_params(params),
     m_modificationState( State::init ),
     m_maxInternalBufferSize(
-        MSSettings::roSettings()->value(
+        qnServerModule->roSettings()->value(
             nx_ms_conf::HLS_MAX_CHUNK_BUFFER_SIZE,
             nx_ms_conf::DEFAULT_HLS_MAX_CHUNK_BUFFER_SIZE).toUInt() ),
     m_dataOffsetAtTheFrontOfTheBuffer(0)

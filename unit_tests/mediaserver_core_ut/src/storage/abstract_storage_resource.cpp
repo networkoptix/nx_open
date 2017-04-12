@@ -81,8 +81,6 @@ protected:
 
     void prepare()
     {
-        MSSettings::initializeROSettings();
-
         this->ftpStorageUrl = config.ftpUrl;
         this->smbStorageUrl = config.smbUrl;
 
@@ -90,10 +88,10 @@ protected:
 
         pluginManager = std::unique_ptr<PluginManager>( new PluginManager);
 
-        platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction(0));
+        platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
 
         QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true);
-        PluginManager::instance()->loadPlugins(MSSettings::roSettings());
+        PluginManager::instance()->loadPlugins(roSettings());
 
         for (const auto storagePlugin : PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
         {
