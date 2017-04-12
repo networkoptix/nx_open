@@ -115,6 +115,7 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(Filter filter, QWidget* par
 
         case Filter::cameras:
             setWindowTitle(QnDeviceDependentStrings::getDefaultNameFromSet(
+                resourcePool(),
                 tr("Select Devices..."),
                 tr("Select Cameras...")));
             break;

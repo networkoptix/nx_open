@@ -1,5 +1,9 @@
 #include "resource_list_view.h"
 
+#include <client/client_globals.h>
+
+#include <core/resource/resource.h>
+
 #include <ui/common/indents.h>
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/models/resource/resource_list_model.h>
@@ -28,9 +32,8 @@ QnResourceListView::QnResourceListView(QWidget* parent):
     setUniformRowHeights(true);
     setHeaderHidden(true);
     setFocusPolicy(Qt::NoFocus);
-    setSelectionMode(QAbstractItemView::NoSelection);
+    setSelectionEnabled(false);
     setProperty(style::Properties::kSideIndentation, qVariantFromValue(QnIndents()));
-    setProperty(style::Properties::kSuppressHoverPropery, true);
 
     auto itemDelegate = new QnResourceItemDelegate(this);
     itemDelegate->setCustomInfoLevel(Qn::RI_WithUrl);
@@ -76,6 +79,26 @@ bool QnResourceListView::isSimplified() const
 void QnResourceListView::setSimplified(bool value)
 {
     m_model->setSimplified(value);
+}
+
+bool QnResourceListView::isSelectionEnabled() const
+{
+    return selectionMode() != QAbstractItemView::NoSelection;
+}
+
+void QnResourceListView::setSelectionEnabled(bool value)
+{
+    setSelectionMode(value ? QAbstractItemView::SingleSelection : QAbstractItemView::NoSelection);
+    setProperty(style::Properties::kSuppressHoverPropery, !value);
+}
+
+QnResourcePtr QnResourceListView::selectedResource() const
+{
+    if (!isSelectionEnabled())
+        return QnResourcePtr();
+
+    auto index = selectionModel()->currentIndex();
+    return index.data(Qn::ResourceRole).value<QnResourcePtr>();
 }
 
 QSize QnResourceListView::sizeHint() const

@@ -23,7 +23,10 @@ class QnTimeLapseRecorder: public QnStreamRecorder
     static const qint64 kOutputDeltaUsec = 1000000ll / 30; //< 30 fps
 
 public:
-    QnTimeLapseRecorder(const QnResourcePtr& resource, qint64 timeStepUsec):
+    QnTimeLapseRecorder(
+        const QnResourcePtr& resource,
+        qint64 timeStepUsec)
+        :
         QnStreamRecorder(resource),
         m_currentRelativeTimeUsec(0),
         m_currentAbsoluteTimeUsec(std::numeric_limits<qint64>::min()),

@@ -107,6 +107,7 @@ void QnCameraDiagnosticsDialog::retranslateUi()
     }
 
     ui->titleLabel->setText(QnDeviceDependentStrings::getNameFromSet(
+        resourcePool(),
         QnCameraDeviceStringSet(
             tr("Diagnostics for device %1"),
             tr("Diagnostics for camera %1"),
@@ -116,6 +117,7 @@ void QnCameraDiagnosticsDialog::retranslateUi()
 
 
     setWindowTitle(QnDeviceDependentStrings::getNameFromSet(
+        resourcePool(),
         QnCameraDeviceStringSet(
             tr("Device Diagnostics"),
             tr("Camera Diagnostics"),
@@ -137,6 +139,7 @@ QString QnCameraDiagnosticsDialog::diagnosticsStepText(int stepType) {
         return tr("Confirming server availability.");
     case CameraDiagnostics::Step::cameraAvailability:
         return QnDeviceDependentStrings::getNameFromSet(
+            resourcePool(),
             QnCameraDeviceStringSet(
                 tr("Confirming device is accessible."),
                 tr("Confirming camera is accessible."),
@@ -144,6 +147,7 @@ QString QnCameraDiagnosticsDialog::diagnosticsStepText(int stepType) {
             ), m_resource);
     case CameraDiagnostics::Step::mediaStreamAvailability:
         return QnDeviceDependentStrings::getNameFromSet(
+            resourcePool(),
             QnCameraDeviceStringSet(
                 tr("Confirming target device provides media stream."),
                 tr("Confirming target camera provides media stream."),

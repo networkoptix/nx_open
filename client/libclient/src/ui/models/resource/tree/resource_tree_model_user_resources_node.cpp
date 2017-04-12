@@ -17,7 +17,7 @@ QnResourceTreeModelUserResourcesNode::QnResourceTreeModelUserResourcesNode(
     :
     base_type(model, Qn::UserResourcesNode)
 {
-    connect(qnResourceAccessProvider, &QnResourceAccessProvider::accessChanged, this,
+    connect(resourceAccessProvider(), &QnResourceAccessProvider::accessChanged, this,
         &QnResourceTreeModelUserResourcesNode::handleAccessChanged);
 
     connect(context(), &QnWorkbenchContext::userChanged, this,
@@ -38,7 +38,7 @@ void QnResourceTreeModelUserResourcesNode::initialize()
 
 void QnResourceTreeModelUserResourcesNode::deinitialize()
 {
-    disconnect(qnResourceAccessProvider, nullptr, this, nullptr);
+    disconnect(resourceAccessProvider(), nullptr, this, nullptr);
     disconnect(context(), nullptr, this, nullptr);
     clean();
     base_type::deinitialize();
@@ -51,7 +51,7 @@ void QnResourceTreeModelUserResourcesNode::handleAccessChanged(
     if (!context()->user() || subject.user() != context()->user())
         return;
 
-    if (qnResourceAccessProvider->hasAccess(subject, resource))
+    if (resourceAccessProvider()->hasAccess(subject, resource))
     {
         if (isResourceVisible(resource))
             ensureResourceNode(resource)->update();
@@ -82,7 +82,7 @@ bool QnResourceTreeModelUserResourcesNode::isResourceVisible(const QnResourcePtr
     if (resource->hasFlags(Qn::web_page))
         return false;
 
-    if (!qnResourceAccessProvider->hasAccess(context()->user(), resource))
+    if (!resourceAccessProvider()->hasAccess(context()->user(), resource))
         return false;
 
     if (model()->scope() == QnResourceTreeModel::CamerasScope)
@@ -145,7 +145,7 @@ void QnResourceTreeModelUserResourcesNode::rebuild()
     if (!context()->user())
         return;
 
-    for (const auto& resource: qnResPool->getResources())
+    for (const auto& resource: resourcePool()->getResources())
     {
         if (isResourceVisible(resource))
             ensureResourceNode(resource);

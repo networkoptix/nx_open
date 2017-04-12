@@ -68,7 +68,7 @@ QnUserRolesDialog::QnUserRolesDialog(QWidget* parent):
     // Hiding Apply button, otherwise it will be enabled in the QnGenericTabbedDialog code.
     safeModeWatcher->addControlledWidget(applyButton, QnWorkbenchSafeModeWatcher::ControlMode::Hide);
 
-    m_model->setUserRoles(qnUserRolesManager->userRoles());
+    m_model->setUserRoles(userRolesManager()->userRoles());
     ui->userRolesTreeView->setModel(m_model);
 
     connect(ui->userRolesTreeView->selectionModel(), &QItemSelectionModel::currentChanged, this,
@@ -146,17 +146,17 @@ bool QnUserRolesDialog::canApplyChanges() const
 bool QnUserRolesDialog::hasChanges() const
 {
     /* Quick check */
-    if (qnUserRolesManager->userRoles().size() != m_model->userRoles().size())
+    if (userRolesManager()->userRoles().size() != m_model->userRoles().size())
         return true;
 
     for (const auto& userRole: m_model->userRoles())
     {
-        auto existing = qnUserRolesManager->userRole(userRole.id);
+        auto existing = userRolesManager()->userRole(userRole.id);
 
         if (existing != userRole)
             return true;
 
-        if (qnSharedResourcesManager->sharedResources(userRole) !=
+        if (sharedResourcesManager()->sharedResources(userRole) !=
             m_model->accessibleResources(userRole))
         {
             return true;
@@ -178,13 +178,13 @@ void QnUserRolesDialog::applyChanges()
     for (const auto& userRole: m_model->userRoles())
     {
         userRolesLeft << userRole.id;
-        auto existing = qnUserRolesManager->userRole(userRole.id);
+        auto existing = userRolesManager()->userRole(userRole.id);
 
         if (existing != userRole)
             qnResourcesChangesManager->saveUserRole(userRole);
 
         auto resources = m_model->accessibleResources(userRole);
-        QnLayoutResourceList layoutsToShare = qnResPool->getResources(resources)
+        QnLayoutResourceList layoutsToShare = resourcePool()->getResources(resources)
             .filtered<QnLayoutResource>(
                 [](const QnLayoutResourcePtr& layout)
                 {
@@ -200,7 +200,7 @@ void QnUserRolesDialog::applyChanges()
         qnResourcesChangesManager->saveAccessibleResources(userRole, resources);
     }
 
-    for (const auto& userRole: qnUserRolesManager->userRoles())
+    for (const auto& userRole: userRolesManager()->userRoles())
     {
         if (userRolesLeft.contains(userRole.id))
             continue;

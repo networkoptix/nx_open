@@ -148,7 +148,7 @@ QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(QnCameraBookmar
     connect(m_operationsTimer, &QTimer::timeout, this, &QnCameraBookmarksManagerPrivate::checkPendingBookmarks);
     connect(m_operationsTimer, &QTimer::timeout, this, &QnCameraBookmarksManagerPrivate::checkQueriesUpdate);
 
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnCameraBookmarksManagerPrivate::removeCameraFromQueries);
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this, &QnCameraBookmarksManagerPrivate::removeCameraFromQueries);
 }
 
 QnCameraBookmarksManagerPrivate::~QnCameraBookmarksManagerPrivate()
@@ -179,7 +179,7 @@ int QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraReso
     , const QnCameraBookmarkSearchFilter &filter
     , BookmarksInternalCallbackType callback)
 {
-    auto server = qnCommon->currentServer();
+    auto server = commonModule()->currentServer();
     if (!server)
     {
         executeCallbackDelayed(callback);
@@ -210,10 +210,10 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmark(const QnCameraBookmark &
     if (!bookmark.isValid())
         return;
 
-    QnVirtualCameraResourcePtr camera = qnResPool->getResourceById<QnVirtualCameraResource>(bookmark.cameraId);
-    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
+    QnVirtualCameraResourcePtr camera = resourcePool()->getResourceById<QnVirtualCameraResource>(bookmark.cameraId);
+    QnMediaServerResourcePtr server = cameraHistoryPool()->getMediaServerOnTime(camera, bookmark.startTimeMs);
     if (!server || server->getStatus() != Qn::Online)
-        server = qnCommon->currentServer();
+        server = commonModule()->currentServer();
 
     if (!server)
     {
@@ -235,7 +235,7 @@ void QnCameraBookmarksManagerPrivate::updateCameraBookmark(const QnCameraBookmar
         return;
 
     setEnabled(true); // Forcefully enable on modifying operation
-    int handle = qnCommon->currentServer()->apiConnection()->updateBookmarkAsync(bookmark, this, SLOT(handleBookmarkOperation(int, int)));
+    int handle = commonModule()->currentServer()->apiConnection()->updateBookmarkAsync(bookmark, this, SLOT(handleBookmarkOperation(int, int)));
     m_operations[handle] = OperationInfo(OperationInfo::OperationType::Update, bookmark.guid, callback);
 
     addUpdatePendingBookmark(bookmark);
@@ -244,7 +244,7 @@ void QnCameraBookmarksManagerPrivate::updateCameraBookmark(const QnCameraBookmar
 void QnCameraBookmarksManagerPrivate::deleteCameraBookmark(const QnUuid &bookmarkId, OperationCallbackType callback)
 {
     setEnabled(true); // Forcefully enable on modifying operation
-    int handle = qnCommon->currentServer()->apiConnection()->deleteBookmarkAsync(bookmarkId, this, SLOT(handleBookmarkOperation(int, int)));
+    int handle = commonModule()->currentServer()->apiConnection()->deleteBookmarkAsync(bookmarkId, this, SLOT(handleBookmarkOperation(int, int)));
     m_operations[handle] = OperationInfo(OperationInfo::OperationType::Delete, bookmarkId, callback);
 
     addRemovePendingBookmark(bookmarkId);

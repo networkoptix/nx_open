@@ -6,6 +6,11 @@ namespace nx {
 namespace plugins {
 namespace utils {
 
+IsolatedStreamReaderResource::IsolatedStreamReaderResource(QnCommonModule* commonModule):
+    QnPlOnvifResource(commonModule)
+{
+}
+
 bool IsolatedStreamReaderResource::hasProperty(const QString &key) const
 {
     QnMutexLocker lock(&m_propertyMutex);

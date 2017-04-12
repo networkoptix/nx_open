@@ -86,7 +86,7 @@ void Writer::write()
 bool Writer::isWriteNeeded(const QString& infoFilePath, const QByteArray& infoFileData) const
 {
     bool isDataAndPathValid = !infoFilePath.isEmpty() && !infoFileData.isEmpty();
-    bool isDataChanged = !m_infoPathToCameraInfo.contains(infoFilePath) || 
+    bool isDataChanged = !m_infoPathToCameraInfo.contains(infoFilePath) ||
                           m_infoPathToCameraInfo[infoFilePath] != infoFileData;
 
     return isDataAndPathValid && isDataChanged;
@@ -94,9 +94,9 @@ bool Writer::isWriteNeeded(const QString& infoFilePath, const QByteArray& infoFi
 
 void Writer::writeInfoIfNeeded(const QString& infoFilePath, const QByteArray& infoFileData)
 {
-    NX_LOG(lit("%1: write camera info to %2. Data changed: %3") 
+    NX_LOG(lit("%1: write camera info to %2. Data changed: %3")
             .arg(Q_FUNC_INFO)
-            .arg(infoFilePath) 
+            .arg(infoFilePath)
             .arg(isWriteNeeded(infoFilePath, infoFileData)), cl_logDEBUG2);
 
     if (isWriteNeeded(infoFilePath, infoFileData))
@@ -122,8 +122,12 @@ void Writer::setWriteInterval(std::chrono::milliseconds interval)
 }
 
 
-ServerWriterHandler::ServerWriterHandler(QnStorageManager* storageManager):
-    m_storageManager(storageManager)
+ServerWriterHandler::ServerWriterHandler(
+    QnStorageManager* storageManager,
+    QnResourcePool* resPool)
+:
+    m_storageManager(storageManager),
+    m_resPool(resPool)
 {}
 
 QStringList ServerWriterHandler::storagesUrls() const
@@ -207,15 +211,15 @@ QList<QPair<QString, QString>> ServerWriterHandler::properties() const
 
 ComposerHandler* ServerWriterHandler::composerHandler(const QString& cameraId)
 {
-    m_camera = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(cameraId);
+    m_camera = m_resPool->getResourceByUniqueId<QnSecurityCamResource>(cameraId);
     if (!static_cast<bool>(m_camera))
         return nullptr;
     return this;
 }
 
 
-Reader::Reader(ReaderHandler* readerHandler, 
-               const QnAbstractStorageResource::FileInfo& fileInfo, 
+Reader::Reader(ReaderHandler* readerHandler,
+               const QnAbstractStorageResource::FileInfo& fileInfo,
                std::function<QByteArray(const QString&)> getFileDataFunc):
     m_handler(readerHandler),
     m_fileInfo(&fileInfo),
@@ -249,7 +253,7 @@ bool Reader::initArchiveCamData()
     coreData.parentId = m_handler->moduleGuid();
     if (coreData.parentId.isNull())
     {
-        m_lastError = { 
+        m_lastError = {
             lit("Unable to get parent id for the archive camera %1")
                 .arg(m_archiveCamData.coreData.physicalId),
             cl_logERROR
@@ -262,7 +266,7 @@ bool Reader::initArchiveCamData()
     {
         m_lastError = {
             lit("Unable to get type id for the archive camera %1")
-                .arg(m_archiveCamData.coreData.physicalId), 
+                .arg(m_archiveCamData.coreData.physicalId),
             cl_logERROR
         };
         return false;
@@ -276,7 +280,7 @@ bool Reader::cameraAlreadyExists(const ArchiveCameraDataList* cameraList) const
     if (m_handler->isCameraInResPool(m_archiveCamData.coreData.id))
     {
         m_lastError = {
-            lit("Archive camera %1 found but we already have camera with this id in the resource pool. Skipping.") 
+            lit("Archive camera %1 found but we already have camera with this id in the resource pool. Skipping.")
                 .arg(m_archiveCamData.coreData.physicalId),
             cl_logDEBUG2
         };
@@ -293,7 +297,7 @@ bool Reader::cameraAlreadyExists(const ArchiveCameraDataList* cameraList) const
     {
         m_lastError = {
             lit("Camera %1 is already in the archive camera list")
-                .arg(m_archiveCamData.coreData.physicalId), 
+                .arg(m_archiveCamData.coreData.physicalId),
             cl_logDEBUG2
         };
         return true;
@@ -313,9 +317,9 @@ bool Reader::readFileData()
 
     if (m_fileData.isNull())
     {
-        m_lastError =  { 
+        m_lastError =  {
             lit("File data is NULL for archive camera %1")
-                .arg(m_archiveCamData.coreData.physicalId), 
+                .arg(m_archiveCamData.coreData.physicalId),
             cl_logERROR
         };
         return false;
@@ -336,7 +340,7 @@ bool Reader::parseData()
         case ParseResult::ParseCode::RegexpFailed:
             m_lastError = {
                 lit("Camera info file %1 parse failed")
-                    .arg(infoFilePath()), 
+                    .arg(infoFilePath()),
                 cl_logERROR
             };
             return false;
@@ -382,9 +386,15 @@ void Reader::addProperty(const ParseResult& result)
         m_archiveCamData.properties.emplace_back(result.key(), result.value());
 }
 
+ServerReaderHandler::ServerReaderHandler(const QnUuid& moduleId, QnResourcePool* resPool):
+    m_moduleId(moduleId),
+    m_resPool(resPool)
+{
+}
+
 QnUuid ServerReaderHandler::moduleGuid() const
 {
-    return qnCommon->moduleGUID();
+    return m_moduleId;
 }
 
 QnUuid ServerReaderHandler::archiveCamTypeId() const
@@ -396,7 +406,7 @@ QnUuid ServerReaderHandler::archiveCamTypeId() const
 
 bool ServerReaderHandler::isCameraInResPool(const QnUuid& cameraId) const
 {
-    return static_cast<bool>(qnResPool->getResourceById(cameraId));
+    return static_cast<bool>(m_resPool->getResourceById(cameraId));
 }
 
 void ServerReaderHandler::handleError(const ReaderErrorInfo& errorInfo) const

@@ -41,7 +41,9 @@ static QString toString(const QnSecurityCamResourceList& cameras)
 }
 
 static void loadRemoteDataAsync(
-    MultiServerPeriodDataList& outputData, const QnMediaServerResourcePtr& server,
+    QnCommonModule* commonModule,
+    MultiServerPeriodDataList& outputData,
+    const QnMediaServerResourcePtr& server,
     QnChunksRequestContext* ctx,
     int requestNum, const QElapsedTimer& timer)
 {
@@ -81,13 +83,16 @@ static void loadRemoteDataAsync(
     modifiedRequest.isLocal = true;
     apiUrl.setQuery(modifiedRequest.toUrlQuery());
 
-    runMultiserverDownloadRequest(apiUrl, server, requestCompletionFunc, ctx);
+    runMultiserverDownloadRequest(commonModule->router(), apiUrl, server, requestCompletionFunc, ctx);
 }
 
-static void loadLocalData(MultiServerPeriodDataList& outputData, QnChunksRequestContext* ctx)
+static void loadLocalData(
+    QnCommonModule* commonModule,
+    MultiServerPeriodDataList& outputData,
+    QnChunksRequestContext* ctx)
 {
     MultiServerPeriodData record;
-    record.guid = qnCommon->moduleGUID();
+    record.guid = commonModule->moduleGUID();
     record.periods = QnChunksRequestHelper::load(ctx->request());
 
     if (!record.periods.empty())
@@ -139,7 +144,7 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(
     MultiServerPeriodDataList outputData;
     if (request.isLocal)
     {
-        loadLocalData(outputData, &ctx);
+        loadLocalData(owner->commonModule(), outputData, &ctx);
         qDebug() << " In progress request QnMultiserverChunksRestHandler::executeGet #"
             << requestNum << ". After loading local data timeout=" << timer.elapsed();
     }
@@ -147,19 +152,19 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(
     {
         QSet<QnMediaServerResourcePtr> onlineServers;
         for (const auto& camera: ctx.request().resList)
-            onlineServers += qnCameraHistoryPool->getCameraFootageData(camera, true).toSet();
+            onlineServers += owner->commonModule()->cameraHistoryPool()->getCameraFootageData(camera, true).toSet();
 
         for (const auto& server: onlineServers)
         {
-            if (server->getId() == qnCommon->moduleGUID())
+            if (server->getId() == owner->commonModule()->moduleGUID())
             {
-                loadLocalData(outputData, &ctx);
+                loadLocalData(owner->commonModule(), outputData, &ctx);
                 qDebug() << " In progress request QnMultiserverChunksRestHandler::executeGet #"
                     << requestNum << ". After loading local data. timeout=" << timer.elapsed();
             }
             else
             {
-                loadRemoteDataAsync(outputData, server, &ctx, requestNum, timer);
+                loadRemoteDataAsync(owner->commonModule(), outputData, server, &ctx, requestNum, timer);
                 qDebug() << " In progress request QnMultiserverChunksRestHandler::executeGet #"
                     << requestNum << ". After loading remote data from server" << server->getId()
                     << ". timeout=" << timer.elapsed();
@@ -172,12 +177,15 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(
 }
 
 int QnMultiserverChunksRestHandler::executeGet(
-    const QString& /*path*/, const QnRequestParamList& params, QByteArray& result,
-    QByteArray& contentType, const QnRestConnectionProcessor* owner)
+    const QString& /*path*/,
+    const QnRequestParamList& params,
+    QByteArray& result,
+    QByteArray& contentType,
+    const QnRestConnectionProcessor* owner)
 {
     MultiServerPeriodDataList outputData;
     QnRestResult restResult;
-    QnChunksRequestData request = QnChunksRequestData::fromParams(params);
+    QnChunksRequestData request = QnChunksRequestData::fromParams(owner->commonModule()->resourcePool(), params);
 
     int requestNum = ++staticRequestNum;
     QElapsedTimer timer;

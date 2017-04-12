@@ -4,7 +4,9 @@
 #include <QtCore/QList>
 #include <QtCore/QObject>
 
-class QnServerAddressWatcher : public QObject
+#include <common/common_module_aware.h>
+
+class QnServerAddressWatcher : public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
 public:

@@ -7,10 +7,12 @@
 
 #include <QtConcurrent/QtConcurrent>
 
+#include <common/common_module.h>
+#include <common/static_common_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/incompatible_server_watcher.h>
-#include <common/common_module.h>
 #include <utils/update/update_utils.h>
 #include <update/task/check_update_peer_task.h>
 #include <update/low_free_space_warning.h>
@@ -27,10 +29,10 @@ namespace {
 
     const bool defaultEnableClientUpdates = true;
 
-    QnSoftwareVersion getCurrentVersion()
+    QnSoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
     {
-        QnSoftwareVersion minimalVersion = qnCommon->engineVersion();
-        const auto allServers = qnResPool->getAllServers(Qn::AnyStatus);
+        QnSoftwareVersion minimalVersion = qnStaticCommon->engineVersion();
+        const auto allServers = resourcePool->getAllServers(Qn::AnyStatus);
         for(const QnMediaServerResourcePtr &server: allServers)
         {
             if (server->getVersion() < minimalVersion)
@@ -55,9 +57,9 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject* parent):
 
         emit targetsChanged(actualTargetIds());
     };
-    connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   targetsWatcher);
-    connect(qnResPool,  &QnResourcePool::resourceChanged,   this,   targetsWatcher);
-    connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   targetsWatcher);
+    connect(resourcePool(),  &QnResourcePool::resourceAdded,     this,   targetsWatcher);
+    connect(resourcePool(),  &QnResourcePool::resourceChanged,   this,   targetsWatcher);
+    connect(resourcePool(),  &QnResourcePool::resourceRemoved,   this,   targetsWatcher);
 }
 
 QnMediaServerUpdateTool::~QnMediaServerUpdateTool()
@@ -136,7 +138,7 @@ void QnMediaServerUpdateTool::setTargets(const QSet<QnUuid> &targets, bool clien
     m_enableClientUpdates = client;
 
     foreach (const QnUuid &id, targets) {
-        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = resourcePool()->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
 
@@ -151,14 +153,14 @@ QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
         return m_targets;
 
     QnMediaServerResourceList result;
-    foreach (const QnMediaServerResourcePtr &server, qnResPool->getResourcesWithFlag(Qn::server).filtered<QnMediaServerResource>()) {
+    foreach (const QnMediaServerResourcePtr &server, resourcePool()->getResourcesWithFlag(Qn::server).filtered<QnMediaServerResource>()) {
         if (server->getStatus() == Qn::Online)
             result.append(server);
     }
 
-    foreach (const QnMediaServerResourcePtr &server, qnResPool->getAllIncompatibleResources().filtered<QnMediaServerResource>())
+    foreach (const QnMediaServerResourcePtr &server, resourcePool()->getAllIncompatibleResources().filtered<QnMediaServerResource>())
     {
-        if (helpers::serverBelongsToCurrentSystem(server->getModuleInformation()) &&
+        if (helpers::serverBelongsToCurrentSystem(server) &&
             server.dynamicCast<QnFakeMediaServerResource>())
         {
             result.append(server);
@@ -180,7 +182,7 @@ QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl(const QnSoftwareVersion &
     QString versionSuffix;
     if (targetVersion.isNull()) {
         query.addQueryItem(lit("version"), lit("latest"));
-        query.addQueryItem(lit("current"), getCurrentVersion().toString());
+        query.addQueryItem(lit("current"), getCurrentVersion(resourcePool()).toString());
     } else {
         query.addQueryItem(lit("version"), targetVersion.toString());
         query.addQueryItem(lit("password"), passwordForBuild(static_cast<unsigned>(targetVersion.build())));
@@ -320,7 +322,7 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget& target)
 
         for (const auto& id: target.targets)
         {
-            const auto server = qnResPool->getIncompatibleResourceById(id)
+            const auto server = resourcePool()->getIncompatibleResourceById(id)
                 .dynamicCast<QnFakeMediaServerResource>();
             if (!server)
                 continue;

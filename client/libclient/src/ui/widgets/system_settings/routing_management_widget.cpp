@@ -32,10 +32,6 @@
 
 namespace {
 
-    ec2::AbstractECConnectionPtr connection2() {
-        return QnAppServerConnectionFactory::getConnection2();
-    }
-
     class SortedServersProxyModel : public QSortFilterProxyModel {
     public:
         SortedServersProxyModel(QObject *parent = 0) : QSortFilterProxyModel(parent) {}
@@ -246,10 +242,10 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     connect(ui->addButton,                      &QPushButton::clicked,                          this,   &QnRoutingManagementWidget::at_addButton_clicked);
     connect(ui->removeButton,                   &QPushButton::clicked,                          this,   &QnRoutingManagementWidget::at_removeButton_clicked);
 
-    connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnRoutingManagementWidget::at_resourcePool_resourceAdded);
-    connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnRoutingManagementWidget::at_resourcePool_resourceRemoved);
+    connect(resourcePool(),  &QnResourcePool::resourceAdded,     this,   &QnRoutingManagementWidget::at_resourcePool_resourceAdded);
+    connect(resourcePool(),  &QnResourcePool::resourceRemoved,   this,   &QnRoutingManagementWidget::at_resourcePool_resourceRemoved);
 
-    m_serverListModel->setResources(qnResPool->getResourcesWithFlag(Qn::server));
+    m_serverListModel->setResources(resourcePool()->getResourcesWithFlag(Qn::server));
 
     updateUi();
 
@@ -282,7 +278,7 @@ void QnRoutingManagementWidget::applyChanges() {
 
     for (auto it = m_changes->changes.begin(); it != m_changes->changes.end(); ++it) {
         QnUuid serverId = it.key();
-        QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(serverId);
+        QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
         if (!server)
             continue;
 
@@ -295,6 +291,7 @@ void QnRoutingManagementWidget::applyChanges() {
         QHash<QUrl, bool> additional = it->addresses;
         QHash<QUrl, bool> ignored = it->ignoredAddresses;
 
+        auto connection = commonModule()->ec2Connection();
         for (auto it = additional.begin(); it != additional.end(); ++it) {
             QUrl url = it.key();
 
@@ -303,22 +300,22 @@ void QnRoutingManagementWidget::applyChanges() {
                 if (ignored.contains(url))
                     ign = ignored.take(url);
 
-                connection2()->getDiscoveryManager(Qn::kSystemAccess)->addDiscoveryInformation(serverId, url, ign, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+                connection->getDiscoveryManager(Qn::kSystemAccess)->addDiscoveryInformation(serverId, url, ign, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
             } else {
                 ignored.remove(url);
-                connection2()->getDiscoveryManager(Qn::kSystemAccess)->removeDiscoveryInformation(serverId, url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+                connection->getDiscoveryManager(Qn::kSystemAccess)->removeDiscoveryInformation(serverId, url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
             }
         }
         for (auto it = ignored.begin(); it != ignored.end(); ++it) {
             QUrl url = it.key();
 
             if (it.value())
-                connection2()->getDiscoveryManager(Qn::kSystemAccess)->addDiscoveryInformation(serverId, url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+                connection->getDiscoveryManager(Qn::kSystemAccess)->addDiscoveryInformation(serverId, url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
             else {
                 if (autoUrls.contains(url))
-                    connection2()->getDiscoveryManager(Qn::kSystemAccess)->removeDiscoveryInformation(serverId, url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+                    connection->getDiscoveryManager(Qn::kSystemAccess)->removeDiscoveryInformation(serverId, url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
                 else
-                    connection2()->getDiscoveryManager(Qn::kSystemAccess)->addDiscoveryInformation(serverId, url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+                    connection->getDiscoveryManager(Qn::kSystemAccess)->addDiscoveryInformation(serverId, url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
             }
         }
     }

@@ -8,10 +8,10 @@ QnWorkbenchScheduleWatcher::QnWorkbenchScheduleWatcher(QObject *parent):
     QnWorkbenchContextAware(parent),
     m_scheduleEnabled(false)
 {
-    connect(qnResPool, SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
-    connect(qnResPool, SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
+    connect(resourcePool(), SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
+    connect(resourcePool(), SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
 
-    foreach(const QnResourcePtr &resource, qnResPool->getResources())
+    foreach(const QnResourcePtr &resource, resourcePool()->getResources())
         at_resourcePool_resourceAdded(resource);
 }
 

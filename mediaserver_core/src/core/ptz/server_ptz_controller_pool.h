@@ -8,7 +8,8 @@
 #include <nx/utils/thread/wait_condition.h>
 
 
-class QnServerPtzControllerPool: public QnPtzControllerPool {
+class QnServerPtzControllerPool: public QnPtzControllerPool
+{
     Q_OBJECT
     typedef QnPtzControllerPool base_type;
 

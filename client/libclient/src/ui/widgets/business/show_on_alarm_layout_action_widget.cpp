@@ -89,8 +89,8 @@ void QnShowOnAlarmLayoutActionWidget::selectUsers()
 void QnShowOnAlarmLayoutActionWidget::updateUsersButtonText()
 {
     auto ids = model()->actionParams().additionalResources;
-    auto users = qnResPool->getResources<QnUserResource>(ids);
-    auto roles = qnUserRolesManager->userRoles(ids);
+    auto users = resourcePool()->getResources<QnUserResource>(ids);
+    auto roles = userRolesManager()->userRoles(ids);
 
     QString title;
     if (users.size() == 1 && roles.empty())

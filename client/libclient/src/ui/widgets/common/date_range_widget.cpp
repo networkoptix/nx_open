@@ -119,7 +119,7 @@ QDateTime QnDateRangeWidget::actualDateTime(const QDate& userDate) const
         return QDateTime(userDate);
 
     const auto timeWatcher = context()->instance<QnWorkbenchServerTimeWatcher>();
-    const auto server = qnCommon->currentServer();
+    const auto server = commonModule()->currentServer();
     const auto serverUtcOffsetMs = timeWatcher->utcOffset(server);
 
     static const QTime kMidnight(0, 0);

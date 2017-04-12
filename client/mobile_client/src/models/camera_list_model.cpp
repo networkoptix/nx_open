@@ -94,7 +94,7 @@ void QnCameraListModel::setLayoutId(const QString& layoutId)
 
     const auto id = QnUuid::fromStringSafe(layoutId);
     if (!id.isNull())
-        layout = qnResPool->getResourceById<QnLayoutResource>(id);
+        layout = resourcePool()->getResourceById<QnLayoutResource>(id);
 
     if (d->model->layout() == layout)
         return;
@@ -237,5 +237,5 @@ void QnCameraListModelPrivate::at_thumbnailUpdated(
 {
     Q_UNUSED(thumbnailId);
 
-    model->refreshResource(qnResPool->getResourceById(resourceId), Qn::ThumbnailRole);
+    model->refreshResource(model->resourcePool()->getResourceById(resourceId), Qn::ThumbnailRole);
 }

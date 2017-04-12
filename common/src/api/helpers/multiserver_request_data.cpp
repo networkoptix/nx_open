@@ -19,10 +19,13 @@ QnMultiserverRequestData::QnMultiserverRequestData():
 {
 }
 
-QnMultiserverRequestData::QnMultiserverRequestData(const QnRequestParamList& params):
+QnMultiserverRequestData::QnMultiserverRequestData(
+    QnResourcePool* resourcePool,
+    const QnRequestParamList& params)
+    :
     QnMultiserverRequestData()
 {
-    loadFromParams(params);
+    loadFromParams(resourcePool, params);
 }
 
 QnMultiserverRequestData::QnMultiserverRequestData(const QnMultiserverRequestData& src):
@@ -32,14 +35,16 @@ QnMultiserverRequestData::QnMultiserverRequestData(const QnMultiserverRequestDat
 {
 }
 
-void QnMultiserverRequestData::loadFromParams(const QnRequestParamList& params)
+void QnMultiserverRequestData::loadFromParams(QnResourcePool* resourcePool,
+    const QnRequestParamList& params)
 {
     isLocal = params.contains(kLocalParam);
     extraFormatting = params.contains(kExtraFormattingParam);
     format = QnLexical::deserialized(params.value(kFormatParam), kDefaultFormat);
 }
 
-void QnMultiserverRequestData::loadFromParams(const QnRequestParams& params)
+void QnMultiserverRequestData::loadFromParams(QnResourcePool* resourcePool,
+    const QnRequestParams& params)
 {
     isLocal = params.contains(kLocalParam);
     extraFormatting = params.contains(kExtraFormattingParam);

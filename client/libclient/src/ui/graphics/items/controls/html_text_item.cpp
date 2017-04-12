@@ -14,6 +14,7 @@
 #include <nx/utils/string.h>
 #include <nx/fusion/model_functions.h>
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/event_processors.h>
 
 namespace
 {
@@ -80,6 +81,12 @@ QnHtmlTextItemPrivate::QnHtmlTextItemPrivate(const QnHtmlTextItemOptions &option
     , html()
     , pixmap()
 {
+    installEventHandler(parent, QEvent::PaletteChange, parent,
+        [this]()
+        {
+            if (!this->options.backgroundColor.isValid())
+                updatePixmap();
+        });
 }
 
 void QnHtmlTextItemPrivate::updatePixmap() {
@@ -116,8 +123,12 @@ void QnHtmlTextItemPrivate::updatePixmap() {
     pixmap.setDevicePixelRatio(ratio);
     pixmap.fill(Qt::transparent);
 
+    const auto backgroundColor = options.backgroundColor.isValid()
+        ? options.backgroundColor
+        : q->palette().color(QPalette::Window);
+
     QPainter painter(&pixmap);
-    painter.setBrush(options.backgroundColor);
+    painter.setBrush(backgroundColor);
     painter.setPen(Qt::NoPen);
 
     {

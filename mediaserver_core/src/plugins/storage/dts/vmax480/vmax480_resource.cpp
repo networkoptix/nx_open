@@ -213,7 +213,7 @@ QnPhysicalCameraResourcePtr QnPlVmax480Resource::getOtherResource(int channel)
     urlQuery.setQueryItems(items);
     url.setQuery(urlQuery);
     QString urlStr = url.toString();
-    return qnResPool->getResourceByUrl(urlStr).dynamicCast<QnPhysicalCameraResource>();
+    return resourcePool()->getResourceByUrl(urlStr).dynamicCast<QnPhysicalCameraResource>();
 }
 
 void QnPlVmax480Resource::at_gotChunks(int channel, QnTimePeriodList chunks)

@@ -507,9 +507,9 @@ QHostAddress DeviceSearcher::findBestIface( const HostAddress& host )
 
 int DeviceSearcher::cacheTimeout()
 {
-    if( auto settings = QnGlobalSettings::instance() )
+    if (m_globalSettings)
     {
-        const auto disabledVendors = settings->disabledVendorsSet();
+        const auto disabledVendors = m_globalSettings->disabledVendorsSet();
         if( disabledVendors.size() == 1 && disabledVendors.contains( lit("all=partial") ) )
             return PARTIAL_DISCOVERY_XML_DESCRIPTION_LIVE_TIME_MS;
     }

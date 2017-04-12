@@ -11,11 +11,13 @@
 
 void QnAccessProviderTestFixture::SetUp()
 {
-    m_module.reset(new QnCommonModule());
+    m_module.reset(new QnCommonModule(true));
+    initializeContext(m_module.data());
 }
 
 void QnAccessProviderTestFixture::TearDown()
 {
+    deinitializeContext();
     ASSERT_TRUE(m_awaitedAccessQueue.empty());
     m_module.clear();
 }

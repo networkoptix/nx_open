@@ -4,6 +4,8 @@
 
 #include <QtCore/QObject>
 
+#include <common/common_module_aware.h>
+
 #include <nx/utils/uuid.h>
 #include <nx/utils/singleton.h>
 
@@ -14,7 +16,7 @@ class QSettings;
 class QnSystemDescription;
 class QnCloudStatusWatcherPrivate;
 
-class QnCloudStatusWatcher : public QObject, public Singleton<QnCloudStatusWatcher>
+class QnCloudStatusWatcher : public QObject, public Singleton<QnCloudStatusWatcher>, public QnCommonModuleAware
 {
     Q_OBJECT
     Q_PROPERTY(QnEncodedCredentials credentials READ credentials NOTIFY credentialsChanged)

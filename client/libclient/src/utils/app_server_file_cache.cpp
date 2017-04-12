@@ -61,7 +61,8 @@ QnAppServerFileCache::~QnAppServerFileCache() {
 
 QString QnAppServerFileCache::getFullPath(const QString &filename) const {
     /* Avoid empty folder name and collisions with our folders such as 'log'. */
-    QString systemName = L'_' + nx::utils::replaceNonFileNameCharacters(helpers::currentSystemLocalId().toString(), L'_');
+    QString systemName = L'_' + nx::utils::replaceNonFileNameCharacters(
+        helpers::currentSystemLocalId(commonModule()).toString(), L'_');
 
     QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     return QDir::toNativeSeparators(QString(lit("%1/cache/%2/%3/%4"))
@@ -88,7 +89,7 @@ void QnAppServerFileCache::clearLocalCache() {
 }
 
 bool QnAppServerFileCache::isConnectedToServer() const {
-    return QnAppServerConnectionFactory::getConnection2() != NULL;
+    return commonModule()->ec2Connection() != NULL;
 }
 
 qint64 QnAppServerFileCache::maximumFileSize() {
@@ -104,7 +105,7 @@ void QnAppServerFileCache::getFileList() {
         return;
     }
 
-    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto connection = commonModule()->ec2Connection();
     connection->getStoredFileManager(Qn::kSystemAccess)->listDirectory(m_folderName, this, [this](int handle, ec2::ErrorCode errorCode, const QStringList& filenames) {
         Q_UNUSED(handle);
         bool ok = errorCode == ec2::ErrorCode::ok;
@@ -139,7 +140,7 @@ void QnAppServerFileCache::downloadFile(const QString &filename) {
     if (m_loading.values().contains(filename))
       return;
 
-    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto connection = commonModule()->ec2Connection();
     int handle = connection->getStoredFileManager(Qn::kSystemAccess)->getStoredFile(
                 m_folderName + QLatin1Char('/') + filename,
                 this,
@@ -209,7 +210,7 @@ void QnAppServerFileCache::uploadFile(const QString &filename) {
     QByteArray data = file.readAll();
     file.close();
 
-    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto connection = commonModule()->ec2Connection();
     int handle = connection->getStoredFileManager(Qn::kSystemAccess)->addStoredFile(
                 m_folderName + QLatin1Char('/') +filename,
                 data,
@@ -263,7 +264,7 @@ void QnAppServerFileCache::deleteFile(const QString &filename) {
     if (m_deleting.values().contains(filename))
       return;
 
-    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto connection = commonModule()->ec2Connection();
     int handle = connection->getStoredFileManager(Qn::kSystemAccess)->deleteStoredFile(
                     m_folderName + QLatin1Char('/') +filename,
                     this,

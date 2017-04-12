@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/resource/client_resource_fwd.h>
+#include <core/resource/client_core_resource_fwd.h>
 
 #include <core/resource/storage_resource.h>
 
@@ -21,7 +21,7 @@ public:
         ContainsCameras = 0x2,
     };
 
-    QnClientStorageResource();
+    QnClientStorageResource(QnCommonModule* commonModule);
     virtual ~QnClientStorageResource();
 
     static QnClientStorageResourcePtr newStorage(const QnMediaServerResourcePtr &parentServer, const QString &url);

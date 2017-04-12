@@ -2,8 +2,8 @@
 
 #include <business/business_strings_helper.h>
 
-QnBusinessTypesComparator::QnBusinessTypesComparator( QObject *parent )
-    : QObject(parent)
+QnBusinessTypesComparator::QnBusinessTypesComparator(QObject* parent):
+    base_type(parent)
 {
     initLexOrdering();
 }
@@ -16,12 +16,15 @@ bool QnBusinessTypesComparator::lexicographicalLessThan( QnBusiness::ActionType 
     return toLexActionType(left) < toLexActionType(right);
 }
 
-void QnBusinessTypesComparator::initLexOrdering() {
+void QnBusinessTypesComparator::initLexOrdering()
+{
+    QnBusinessStringsHelper helper(commonModule());
+
     // event types to lex order
     int maxType = 0;
     QMap<QString, int> eventTypes;
     for (auto eventType: QnBusiness::allEvents()) {
-        eventTypes.insert(QnBusinessStringsHelper::eventName(eventType), eventType);
+        eventTypes.insert(helper.eventName(eventType), eventType);
         if (maxType < eventType)
             maxType = eventType;
     }
@@ -35,7 +38,7 @@ void QnBusinessTypesComparator::initLexOrdering() {
     maxType = 0;
     QMap<QString, int> actionTypes;
     for (auto actionType: QnBusiness::allActions()) {
-        actionTypes.insert(QnBusinessStringsHelper::actionName(actionType), actionType);
+        actionTypes.insert(helper.actionName(actionType), actionType);
         if (maxType < actionType)
             maxType = actionType;
     }

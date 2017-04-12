@@ -35,6 +35,7 @@
 namespace ec2
 {
     class ECConnectionNotificationManager;
+    class Ec2DirectConnectionFactory;
 
     // TODO: #2.4 remove Ec2 suffix to avoid ec2::BaseEc2Connection
     template<class QueryProcessorType>
@@ -43,7 +44,9 @@ namespace ec2
         public AbstractECConnection
     {
     public:
-        BaseEc2Connection(QueryProcessorType* queryProcessor);
+        BaseEc2Connection(
+            const AbstractECConnectionFactory* connectionFactory,
+            QueryProcessorType* queryProcessor);
         virtual ~BaseEc2Connection();
 
         virtual AbstractResourceManagerPtr getResourceManager(const Qn::UserAccessData &userAccessData) override;
@@ -76,6 +79,8 @@ namespace ec2
         virtual AbstractStoredFileNotificationManagerPtr getStoredFileNotificationManager() override;
         virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() override;
 
+        virtual QnCommonModule* commonModule() const override;
+
         virtual void startReceivingNotifications() override;
         virtual void stopReceivingNotifications() override;
 
@@ -85,18 +90,17 @@ namespace ec2
 
         virtual void addRemotePeer(const QUrl& url) override;
         virtual void deleteRemotePeer(const QUrl& url) override;
-        virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) override;
-
-        virtual Timestamp getTransactionLogTime() const override;
-        virtual void setTransactionLogTime(Timestamp value) override;
 
         QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
-        virtual ECConnectionNotificationManager* notificationManager() override 
+        virtual ECConnectionNotificationManager* notificationManager() override
         { return m_notificationManager.get(); }
         ECConnectionAuditManager* auditManager() { return m_auditManager.get(); }
 
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
+
+        virtual QnTransactionMessageBus* messageBus() const override;
     protected:
+        const AbstractECConnectionFactory* m_connectionFactory;
         QueryProcessorType* m_queryProcessor;
         QnLicenseNotificationManagerPtr m_licenseNotificationManager;
         QnResourceNotificationManagerPtr m_resourceNotificationManager;

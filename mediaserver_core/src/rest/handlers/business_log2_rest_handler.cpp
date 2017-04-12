@@ -13,6 +13,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/string.h>
 #include <api/helpers/camera_id_helper.h>
+#include <rest/server/rest_connection_processor.h>
 
 namespace {
 
@@ -22,8 +23,11 @@ static const QString kDeprecatedPhysicalIdParam = lit("physicalId");
 } // namespace
 
 int QnBusinessLog2RestHandler::executeGet(
-    const QString& /*path*/, const QnRequestParamList& params, QByteArray& contentBody,
-    QByteArray& contentType, const QnRestConnectionProcessor* /*owner*/)
+    const QString& /*path*/,
+    const QnRequestParamList& params,
+    QByteArray& contentBody,
+    QByteArray& contentType,
+    const QnRestConnectionProcessor* owner)
 {
     QnTimePeriod period(-1, -1);
     QnSecurityCamResourceList resList;
@@ -32,7 +36,10 @@ int QnBusinessLog2RestHandler::executeGet(
     QnBusiness::ActionType actionType = QnBusiness::UndefinedAction;
     QnUuid businessRuleId;
 
-    nx::camera_id_helper::findAllCamerasByFlexibleIds(&resList, params,
+    nx::camera_id_helper::findAllCamerasByFlexibleIds(
+        owner->resourcePool(),
+        &resList,
+        params,
         {kCameraIdParam, kDeprecatedPhysicalIdParam});
 
     for (int i = 0; i < params.size(); ++i)

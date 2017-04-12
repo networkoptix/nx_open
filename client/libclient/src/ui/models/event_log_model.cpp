@@ -8,6 +8,9 @@
 #include <business/business_strings_helper.h>
 #include <business/business_types_comparator.h>
 
+#include <common/common_module.h>
+#include <client_core/client_core_module.h>
+
 #include <core/resource_management/resource_pool.h>
 
 #include <core/resource/resource.h>
@@ -179,7 +182,8 @@ QnEventLogModel::QnEventLogModel(QObject* parent):
     QnWorkbenchContextAware(parent),
     m_columns(),
     m_linkBrush(QPalette().link()),
-    m_index(new DataIndex(this))
+    m_index(new DataIndex(this)),
+    m_helper(new QnBusinessStringsHelper(commonModule()))
 {
 }
 
@@ -250,7 +254,7 @@ bool QnEventLogModel::hasVideoLink(const QnBusinessActionData& action) const
     {
         for (const QnUuid& id: action.eventParams.metadata.cameraRefs)
         {
-            if (qnResPool->getResourceById(id) && hasAccessToCamera(id))
+            if (resourcePool()->getResourceById(id) && hasAccessToCamera(id))
                 return true;
         }
     }
@@ -276,9 +280,9 @@ QnResourcePtr QnEventLogModel::getResource(Column column, const QnBusinessAction
     switch (column)
     {
         case EventCameraColumn:
-            return qnResPool->getResourceById(action.eventParams.eventResourceId);
+            return resourcePool()->getResourceById(action.eventParams.eventResourceId);
         case ActionCameraColumn:
-            return qnResPool->getResourceById(action.actionParams.actionResourceId);
+            return resourcePool()->getResourceById(action.actionParams.actionResourceId);
         default:
             break;
     }
@@ -289,7 +293,8 @@ QString QnEventLogModel::getUserNameById(const QnUuid& id)
 {
     static const auto kRemovedUserName = L'<' + tr("User removed") + L'>';
 
-    const auto userResource = qnResPool->getResourceById(id).dynamicCast<QnUserResource>();
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    const auto userResource = resourcePool->getResourceById(id).dynamicCast<QnUserResource>();
     return (userResource.isNull() ? kRemovedUserName : userResource->getName());
 }
 
@@ -339,12 +344,14 @@ QVariant QnEventLogModel::iconData(Column column, const QnBusinessActionData& ac
             break;
     }
 
-    return qnResIconCache->icon(qnResPool->getResourceById(resId));
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    return qnResIconCache->icon(resourcePool->getResourceById(resId));
 }
 
 QString QnEventLogModel::getResourceNameString(const QnUuid& id)
 {
-    return QnResourceDisplayInfo(qnResPool->getResourceById(id))
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    return QnResourceDisplayInfo(resourcePool->getResourceById(id))
         .toString(qnSettings->extraInfoInTree());
 }
 
@@ -374,7 +381,7 @@ QString QnEventLogModel::textData(Column column, const QnBusinessActionData& act
             return dt.toString(Qt::DefaultLocaleShortDate);
         }
         case EventColumn:
-            return QnBusinessStringsHelper::eventName(action.eventParams.eventType);
+            return m_helper->eventName(action.eventParams.eventType);
         case EventCameraColumn:
         {
             QString result = getResourceNameString(action.eventParams.eventResourceId);
@@ -383,7 +390,7 @@ QString QnEventLogModel::textData(Column column, const QnBusinessActionData& act
             return result;
         }
         case ActionColumn:
-            return QnBusinessStringsHelper::actionName(action.actionType);
+            return m_helper->actionName(action.actionType);
         case ActionCameraColumn:
         {
             QnBusiness::ActionType actionType = action.actionType;
@@ -440,7 +447,7 @@ QString QnEventLogModel::textData(Column column, const QnBusinessActionData& act
             }
             else
             {
-                result = QnBusinessStringsHelper::eventDetails(action.eventParams).join(L'\n');
+                result = m_helper->eventDetails(action.eventParams).join(L'\n');
             }
 
             if (!QnBusiness::hasToggleState(eventType))
@@ -472,7 +479,7 @@ QString QnEventLogModel::tooltip(Column column, const QnBusinessActionData& acti
         QStringList userNames;
         if (users.empty())
         {
-            const auto userResources = qnResPool->getResources<QnUserResource>();
+            const auto userResources = resourcePool()->getResources<QnUserResource>();
             for (const auto& resource: userResources)
                 userNames.append(resource->getName());
         }
@@ -507,7 +514,7 @@ QString QnEventLogModel::tooltip(Column column, const QnBusinessActionData& acti
         {
             QnUuid id = QnUuid::fromStringSafe(stringId);
             NX_ASSERT(!id.isNull());
-            if (auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(id))
+            if (auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id))
                 disabledCameras << QnResourceDisplayInfo(camera).toString(Qn::RI_WithUrl);
         }
 
@@ -528,21 +535,21 @@ QString QnEventLogModel::tooltip(Column column, const QnBusinessActionData& acti
 
 bool QnEventLogModel::hasAccessToCamera(const QnUuid& cameraId) const
 {
-    const auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(cameraId);
+    const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId);
     NX_ASSERT(camera, "Resource is not a camera");
     if (!camera)
         return false;
-    return qnResourceAccessProvider->hasAccess(context()->user(), camera);
+    return resourceAccessProvider()->hasAccess(context()->user(), camera);
 }
 
 bool QnEventLogModel::hasAccessToArchive(const QnUuid& cameraId) const
 {
-    const auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(cameraId);
+    const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId);
     NX_ASSERT(camera, "Resource is not a camera");
     if (!camera)
         return false;
 
-    return qnResourceAccessProvider->hasAccess(context()->user(), camera)
+    return resourceAccessProvider()->hasAccess(context()->user(), camera)
         && accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission);
 }
 
@@ -566,12 +573,12 @@ void QnEventLogModel::sort(int column, Qt::SortOrder order)
     endResetModel();
 }
 
-QString QnEventLogModel::motionUrl(Column column, const QnBusinessActionData& action)
+QString QnEventLogModel::motionUrl(Column column, const QnBusinessActionData& action) const
 {
     if (column != DescriptionColumn || !action.hasFlags(QnBusinessActionData::VideoLinkExists))
         return QString();
 
-    return QnBusinessStringsHelper::urlForCamera(action.eventParams.eventResourceId, action.eventParams.eventTimestampUsec, true);
+    return m_helper->urlForCamera(action.eventParams.eventResourceId, action.eventParams.eventTimestampUsec, true);
 }
 
 QnResourceList QnEventLogModel::resourcesForPlayback(const QModelIndex &index) const
@@ -582,11 +589,11 @@ QnResourceList QnEventLogModel::resourcesForPlayback(const QModelIndex &index) c
     const QnBusinessActionData& action = m_index->at(index.row());
     if (action.hasFlags(QnBusinessActionData::VideoLinkExists))
     {
-        QnResourcePtr resource = qnResPool->getResourceById(action.eventParams.eventResourceId);
+        QnResourcePtr resource = resourcePool()->getResourceById(action.eventParams.eventResourceId);
         if (resource)
             result << resource;
     }
-    result << qnResPool->getResources(action.eventParams.metadata.cameraRefs);
+    result << resourcePool()->getResources(action.eventParams.metadata.cameraRefs);
     return result;
 }
 
@@ -690,7 +697,7 @@ QnResourcePtr QnEventLogModel::eventResource(int row) const
     if (row >= 0)
     {
         const QnBusinessActionData& action = m_index->at(row);
-        return qnResPool->getResourceById(action.eventParams.eventResourceId);
+        return resourcePool()->getResourceById(action.eventParams.eventResourceId);
     }
     return QnResourcePtr();
 }

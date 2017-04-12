@@ -3,6 +3,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QHash>
 
+#include <client_core/connection_context_aware.h>
+
 #include <common/common_globals.h>
 
 #include <core/resource/resource_fwd.h>
@@ -11,7 +13,8 @@
 
 struct QnTimeReply;
 
-class QnWorkbenchServerTimeWatcher: public Connective<QObject> {
+class QnWorkbenchServerTimeWatcher: public Connective<QObject>, public QnConnectionContextAware
+{
     Q_OBJECT;
 
     typedef Connective<QObject> base_type;

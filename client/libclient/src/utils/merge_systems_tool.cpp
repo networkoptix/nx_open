@@ -36,7 +36,7 @@ void QnMergeSystemsTool::pingSystem(const QUrl& url, const QAuthenticator& userA
     ctx.url = url;
     ctx.auth = userAuth;
 
-    const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+    const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
     for (const QnMediaServerResourcePtr &server: onlineServers)
     {
         ctx.proxy = server;

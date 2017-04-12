@@ -94,6 +94,7 @@ private:
 
     void updateScreenInfo();
 
+    std::pair<int, bool> calculateHelpTopic() const;
     void updateHelpTopic();
 
 private:

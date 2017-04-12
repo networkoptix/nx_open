@@ -31,6 +31,7 @@
 #include <nx/fusion/model_functions.h>
 #include <utils/app_server_image_cache.h>
 #include <utils/local_file_cache.h>
+#include <client_core/client_core_module.h>
 
 #ifdef Q_OS_WIN
 #   include <launcher/nov_launcher_win.h>
@@ -111,7 +112,7 @@ bool QnLayoutExportTool::prepareStorage()
         QFile::remove(m_realFilename);
     }
 
-    m_storage = QnStorageResourcePtr(new QnLayoutFileStorageResource());
+    m_storage = QnStorageResourcePtr(new QnLayoutFileStorageResource(qnClientCoreModule->commonModule()));
     m_storage->setUrl(m_realFilename);
     return true;
 }
@@ -125,7 +126,7 @@ QnLayoutExportTool::ItemInfoList QnLayoutExportTool::prepareLayout()
 
     for (const QnLayoutItemData &item: m_layout->getItems())
     {
-        QnResourcePtr resource = qnResPool->getResourceByDescriptor(item.resource);
+        QnResourcePtr resource = resourcePool()->getResourceByDescriptor(item.resource);
         if (!resource)
             continue;
 
@@ -331,7 +332,7 @@ void QnLayoutExportTool::finishExport(bool success)
     if (m_realFilename != m_targetFilename)
         m_storage->renameFile(m_storage->getUrl(), m_targetFilename);
 
-    auto existing = qnResPool->getResourceByUrl(m_targetFilename)
+    auto existing = resourcePool()->getResourceByUrl(m_targetFilename)
         .dynamicCast<QnLayoutResource>();
 
     switch (m_mode)
@@ -352,9 +353,9 @@ void QnLayoutExportTool::finishExport(bool success)
         {
             /* Existing is present if we did 'Save As..' with another existing layout name. */
             if (existing)
-                qnResPool->removeResources(existing->layoutResources().toList() << existing);
+                resourcePool()->removeResources(existing->layoutResources().toList() << existing);
 
-            auto layout = QnResourceDirectoryBrowser::layoutFromFile(m_storage->getUrl());
+            auto layout = QnResourceDirectoryBrowser::layoutFromFile(m_storage->getUrl(), resourcePool());
             if (!layout)
             {
                 /* Something went wrong */
@@ -364,7 +365,7 @@ void QnLayoutExportTool::finishExport(bool success)
                 return;
             }
             layout->setStatus(Qn::Online);
-            qnResPool->addResource(layout);
+            resourcePool()->addResource(layout);
             break;
         }
         default:
@@ -380,7 +381,7 @@ void QnLayoutExportTool::finishExport(bool success)
 
         for (const QnLayoutItemData &item : m_layout->getItems())
         {
-            QnAviResourcePtr aviRes = qnResPool->getResourceByUniqueId<QnAviResource>(item.resource.uniqueId);
+            QnAviResourcePtr aviRes = resourcePool()->getResourceByUniqueId<QnAviResource>(item.resource.uniqueId);
             if (aviRes)
             {
                 aviRes->setUniqueId(QnLayoutFileStorageResource::itemUniqueId(newUrl,
@@ -474,6 +475,7 @@ void QnLayoutExportTool::at_camera_exportFinished(const StreamRecorderErrorStruc
         NX_ASSERT(camRes, Q_FUNC_INFO, "Make sure camera exists");
         //: "Could not export camera AXIS1334"
         m_errorMessage = QnDeviceDependentStrings::getNameFromSet(
+            resourcePool(),
             QnCameraDeviceStringSet(
                 tr("Could not export device %1."),
                 tr("Could not export camera %1."),

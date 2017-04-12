@@ -30,6 +30,7 @@
 
 #include "../utils.h"
 #include <media_server/settings.h>
+#include <media_server/media_server_module.h>
 
 template<qint64 From, qint64 To>
 qint64 genRandomNumber()
@@ -819,27 +820,12 @@ TEST(MediaDbTest, StorageDB)
     const QString workDirPath = *workDirResource.getDirName();
 
     QnWriterPool writerPool;
-    std::unique_ptr<QnCommonModule> commonModule;
-    if (!qnCommon) {
-        commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
-    }
-    commonModule->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
+    std::unique_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule());
+    serverModule->commonModule()->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
     auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction(0));
 
-    std::unique_ptr<QnResourceStatusDictionary> statusDictionary;
-    if (!qnStatusDictionary) {
-        statusDictionary = std::unique_ptr<QnResourceStatusDictionary>(
-                new QnResourceStatusDictionary);
-    }
-
-    std::unique_ptr<QnResourcePropertyDictionary> propDictionary;
-    if (!propertyDictionary) {
-        propDictionary = std::unique_ptr<QnResourcePropertyDictionary>(
-            new QnResourcePropertyDictionary);
-    }
-
     bool result;
-    QnFileStorageResourcePtr storage(new QnFileStorageResource);
+    QnFileStorageResourcePtr storage(new QnFileStorageResource(serverModule->commonModule()));
     storage->setUrl(workDirPath);
     result = storage->initOrUpdate() == Qn::StorageInit_Ok;
     ASSERT_TRUE(result);
@@ -962,33 +948,15 @@ TEST(MediaDbTest, Migration_from_sqlite)
 {
     MSSettings::initializeROSettings();
 
-    QnWriterPool writerPool;
-    std::unique_ptr<QnCommonModule> commonModule;
-    if (!qnCommon) {
-        commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
-    }
-    commonModule->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
-
-    std::unique_ptr<QnResourceStatusDictionary> statusDictionary;
-    if (!qnStatusDictionary) {
-        statusDictionary = std::unique_ptr<QnResourceStatusDictionary>(
-                new QnResourceStatusDictionary);
-    }
-
+    std::unique_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule());
+    serverModule->commonModule()->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
     auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction(0));
-    std::unique_ptr<QnResourcePropertyDictionary> propDictionary;
-    if (!propertyDictionary) {
-        propDictionary = std::unique_ptr<QnResourcePropertyDictionary>(
-            new QnResourcePropertyDictionary);
-    }
-
-    auto dbPoolRef = qnStorageDbPool->create();
 
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
 
     const QString workDirPath = *workDirResource.getDirName();
-    QString simplifiedGUID = QnStorageDbPool::getLocalGuid();
+    QString simplifiedGUID = QnStorageDbPool::getLocalGuid(serverModule->commonModule());
     QString fileName = closeDirPath(workDirPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
     //QString fileName = closeDirPath(workDirPath) + lit("media.sqlite");
     auto sqlDb = std::unique_ptr<QSqlDatabase>(
@@ -1045,7 +1013,7 @@ TEST(MediaDbTest, Migration_from_sqlite)
     }
 
     bool result;
-    QnFileStorageResourcePtr storage(new QnFileStorageResource);
+    QnFileStorageResourcePtr storage(new QnFileStorageResource(serverModule->commonModule()));
     storage->setUrl(workDirPath);
     result = storage->initOrUpdate() == Qn::StorageInit_Ok;
     ASSERT_TRUE(result);
@@ -1069,7 +1037,7 @@ TEST(MediaDbTest, Migration_from_sqlite)
         }
     }
 
-    QnStorageManager::migrateSqliteDatabase(storage);
+    qnNormalStorageMan->migrateSqliteDatabase(storage);
     auto mergedCatalogs = sdb->loadFullFileCatalog();
 
     for (size_t i = 0; i < kMaxCatalogs; ++i)
@@ -1079,7 +1047,10 @@ TEST(MediaDbTest, Migration_from_sqlite)
                                      { return c->cameraUniqueId() == referenceCatalogs[i]->cameraUniqueId() &&
                                               c->getCatalog() == referenceCatalogs[i]->getCatalog(); });
         ASSERT_TRUE(mergedIt != mergedCatalogs.cend());
-        ASSERT_TRUE((*mergedIt)->getChunksUnsafe() == referenceCatalogs[i]->getChunksUnsafe());
+        auto left = (*mergedIt)->getChunksUnsafe();
+        auto right = referenceCatalogs[i]->getChunksUnsafe();
+        ASSERT_TRUE(left == right);
+
     }
 }
 

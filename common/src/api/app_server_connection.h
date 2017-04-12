@@ -19,40 +19,7 @@ class QnApiSerializer;
 class QN_EXPORT QnAppServerConnectionFactory
 {
 public:
-    QnAppServerConnectionFactory();
-    virtual ~QnAppServerConnectionFactory();
-
-    static QUrl url();
-    static QnResourceFactory* defaultFactory();
-
-    static void setUrl(const QUrl &url);
-    static void setDefaultFactory(QnResourceFactory *);
-
-    /** If the client is started in videowall mode, videowall's guid is stored here. */
-    static QnUuid videowallGuid();
-    static void setVideowallGuid(const QnUuid &uuid);
-
-    /** If the client is started in videowall mode, instance's guid is stored here. */
-    static QnUuid instanceGuid();
-    static void setInstanceGuid(const QnUuid &uuid);
-
-    static QnConnectionInfo connectionInfo();
-    static void setConnectionInfo(const QnConnectionInfo& connectionInfo);
-
-    static void setEC2ConnectionFactory( ec2::AbstractECConnectionFactory* ec2ConnectionFactory );
-    static ec2::AbstractECConnectionFactory* ec2ConnectionFactory();
     static void setEc2Connection(const ec2::AbstractECConnectionPtr &connection );
-    static ec2::AbstractECConnectionPtr getConnection2();
+    static ec2::AbstractECConnectionPtr ec2Connection(); // renamed to show compile errors. use commonModule->ec2Connection() instead
 
-private:
-    QnMutex m_mutex;
-    QUrl m_url;
-
-    /** Videowall-related fields */
-    QnUuid m_videowallGuid;
-    QnUuid m_instanceGuid;
-
-    QnConnectionInfo m_connectionInfo;
-
-    QnResourceFactory *m_resourceFactory;
 };

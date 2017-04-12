@@ -7,6 +7,8 @@
 
 #include <core/resource/user_resource.h>
 
+#include <common/common_module.h>
+
 #include <helpers/cloud_url_helper.h>
 
 #include <ui/dialogs/cloud/connect_to_cloud_dialog.h>

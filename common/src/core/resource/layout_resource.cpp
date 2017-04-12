@@ -7,8 +7,8 @@
 #include "plugins/resource/avi/avi_resource.h"
 #include "core/resource_management/resource_pool.h"
 
-QnLayoutResource::QnLayoutResource():
-    base_type(),
+QnLayoutResource::QnLayoutResource(QnCommonModule* commonModule):
+    base_type(commonModule),
     m_items(new QnThreadsafeItemStorage<QnLayoutItemData>(&m_mutex, this)),
     m_cellAspectRatio(-1.0),
     m_cellSpacing(-1.0),
@@ -395,10 +395,10 @@ QSet<QnUuid> QnLayoutResource::layoutResourceIds() const
 
 QSet<QnResourcePtr> QnLayoutResource::layoutResources() const
 {
-    return layoutResources(m_items->getItems());
+    return layoutResources(resourcePool(), m_items->getItems());
 }
 
-QSet<QnResourcePtr> QnLayoutResource::layoutResources(const QnLayoutItemDataMap& items)
+QSet<QnResourcePtr> QnLayoutResource::layoutResources(QnResourcePool* resourcePool, const QnLayoutItemDataMap& items)
 {
     QSet<QnResourcePtr> result;
     for (const auto& item : items)
@@ -406,7 +406,7 @@ QSet<QnResourcePtr> QnLayoutResource::layoutResources(const QnLayoutItemDataMap&
         if (item.uuid.isNull())
             continue;
 
-        if (auto resource = qnResPool->getResourceByDescriptor(item.resource))
+        if (auto resource = resourcePool->getResourceByDescriptor(item.resource))
             result << resource;
     }
     return result;

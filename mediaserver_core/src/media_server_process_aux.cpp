@@ -7,6 +7,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/user_resource.h>
+#include <common/common_module_aware.h>
 
 namespace nx {
 namespace mserver_aux {
@@ -158,9 +159,16 @@ SystemNameProxyPtr createServerSystemNameProxy()
     return std::unique_ptr<SystemNameProxy>(new ServerSystemNameProxy);
 }
 
-class ServerSettingsProxy : public SettingsProxy
+class ServerSettingsProxy: public SettingsProxy, public QnCommonModuleAware
 {
 public:
+    ServerSettingsProxy(QnCommonModule* commonModule):
+        SettingsProxy(),
+        QnCommonModuleAware(commonModule)
+    {
+
+    }
+
     virtual QString systemName() const override
     {
         return qnGlobalSettings->systemName();
@@ -200,16 +208,16 @@ public:
     virtual QString getMaxServerKey() const override
     {
         QString serverKey;
-        for (const auto server: qnResPool->getAllServers(Qn::AnyStatus))
+        for (const auto server: resourcePool()->getAllServers(Qn::AnyStatus))
             serverKey = qMax(serverKey, server->getAuthKey());
 
         return serverKey;
     }
 };
 
-SettingsProxyPtr createServerSettingsProxy()
+SettingsProxyPtr createServerSettingsProxy(QnCommonModule* commonModule)
 {
-    return std::unique_ptr<ServerSettingsProxy>(new ServerSettingsProxy);
+    return std::unique_ptr<ServerSettingsProxy>(new ServerSettingsProxy(commonModule));
 }
 
 bool needToResetSystem(bool isNewServerInstance, const SettingsProxy* settings)
@@ -219,7 +227,7 @@ bool needToResetSystem(bool isNewServerInstance, const SettingsProxy* settings)
 }
 
 bool isNewServerInstance(
-    const BeforeRestoreDbData& restoreData, 
+    const BeforeRestoreDbData& restoreData,
     bool foundOwnServerInDb,
     bool noSetupWizardFlag)
 {
@@ -235,7 +243,7 @@ bool setUpSystemIdentity(
         SystemNameProxyPtr systemNameProxy)
 {
     LocalSystemIndentityHelper systemIdentityHelper(
-            restoreData, 
+            restoreData,
             std::move(systemNameProxy),
             settings);
 

@@ -4,14 +4,14 @@
 
 namespace detail {
 
-class Watcher: public Connective<QObject>
+class Watcher: public Connective<QObject>, public QnCommonModuleAware
 {
     Q_OBJECT
 
     using base_type = Connective<QObject>;
 
 public:
-    explicit Watcher(const QnUserResourcePtr& user);
+    Watcher(const QnUserResourcePtr& user, QnCommonModule* commonModule);
 
     QnUserResourcePtr user() const;
 
@@ -28,7 +28,7 @@ private:
 class LayoutBasedWatcher: public Watcher
 {
 public:
-    LayoutBasedWatcher(const QnUserResourcePtr& user);
+    LayoutBasedWatcher(const QnUserResourcePtr& user, QnCommonModule* commonModule);
 
     virtual QHash<QnUuid, QnVirtualCameraResourcePtr> cameras() const override;
 
@@ -46,7 +46,7 @@ private:
 class PermissionsBasedWatcher: public Watcher
 {
 public:
-    PermissionsBasedWatcher(const QnUserResourcePtr& user);
+    PermissionsBasedWatcher(const QnUserResourcePtr& user, QnCommonModule* commonModule);
 
     virtual QHash<QnUuid, QnVirtualCameraResourcePtr> cameras() const override;
 

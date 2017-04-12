@@ -1,5 +1,4 @@
-#ifndef QN_WORKBENCH_ITEM_H
-#define QN_WORKBENCH_ITEM_H
+#pragma once
 
 #include <QtCore/QHash>
 #include <QtCore/QObject>
@@ -7,6 +6,8 @@
 #include <QtCore/QScopedPointer>
 #include <nx/utils/uuid.h>
 #include <QtCore/QVariant>
+
+#include <client_core/connection_context_aware.h>
 
 #include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>
@@ -18,7 +19,7 @@ class QnWorkbenchLayout;
 /**
  * Layout item. Video, image, server, or anything else.
  */
-class QnWorkbenchItem: public QObject
+class QnWorkbenchItem: public QObject, public QnConnectionContextAware
 {
     Q_OBJECT
     Q_PROPERTY(QString resourceUid READ resourceUid)
@@ -369,5 +370,3 @@ private:
     /** Should the info be always displayed on the item. */
     bool m_displayInfo;
 };
-
-#endif // QN_WORKBENCH_ITEM_H

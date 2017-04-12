@@ -34,11 +34,13 @@ class QnResourceDisplay;
 class QnResourceWidgetRenderer;
 class QnFisheyeHomePtzController;
 class QnIoModuleOverlayWidget;
-class QnCompositeTextOverlay;
 class QnScrollableItemsWidget;
-class QnTextOverlayWidget;
+class QnScrollableTextItemsWidget;
+class QnGraphicsStackedWidget;
 class QnTwoWayAudioWidget;
 class QnSoftwareTriggerButton;
+
+struct QnHtmlTextItemOptions;
 
 class QnMediaResourceWidget: public Customized<QnResourceWidget>
 {
@@ -123,7 +125,11 @@ public:
     /** Check if the widget has video. It can be absent in I/O Module, for example. */
     bool hasVideo() const;
 
-    QnCompositeTextOverlay *compositeTextOverlay();
+    QnScrollableTextItemsWidget* bookmarksContainer();
+
+    void hideTextOverlay(const QnUuid& id);
+    void showTextOverlay(const QnUuid& id, const QString& text,
+        const QnHtmlTextItemOptions& options);
 
     QVector<QColor> motionSensitivityColors() const;
     void setMotionSensitivityColors(const QVector<QColor>& value);
@@ -244,6 +250,9 @@ private:
 
     void setupHud();
 
+    void setTextOverlayParameters(const QnUuid& id, bool visible,
+        const QString& text, const QnHtmlTextItemOptions& options);
+
 private:
     struct SoftwareTriggerInfo
     {
@@ -334,8 +343,6 @@ private:
 
     QnMediaDewarpingParams m_dewarpingParams;
 
-    QnCompositeTextOverlay *m_compositeTextOverlay;
-
     QnIoModuleOverlayWidget *m_ioModuleOverlayWidget;
     bool m_ioCouldBeShown;
 
@@ -347,6 +354,9 @@ private:
     QVector<QColor> m_motionSensitivityColors;
 
     QnScrollableItemsWidget* m_triggersContainer = nullptr;
+    QnScrollableTextItemsWidget* m_bookmarksContainer = nullptr;
+    QnScrollableTextItemsWidget* m_textOverlayWidget = nullptr;
+    QnGraphicsStackedWidget* m_compositeOverlay = nullptr;
 
     QnTwoWayAudioWidget* m_twoWayAudioWidget = nullptr;
 

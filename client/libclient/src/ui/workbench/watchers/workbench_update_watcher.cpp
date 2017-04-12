@@ -6,11 +6,14 @@
 #include <QtGui/QDesktopServices>
 
 #include <api/global_settings.h>
+
+#include <common/common_module.h>
+#include <common/static_common_module.h>
+
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <client/client_settings.h>
-#include <common/common_module.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/help/help_topic_accessor.h>
@@ -92,7 +95,7 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &in
         return;
 
     /* Current version is greater or equal to latest. */
-    if (qnCommon->engineVersion() >= info.currentRelease)
+    if (qnStaticCommon->engineVersion() >= info.currentRelease)
         return;
 
     /* User is not interested in this update. */
@@ -100,7 +103,7 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &in
         return;
 
     /* Administrator disabled update notifications globally. */
-    if (!QnGlobalSettings::instance()->isUpdateNotificationsEnabled())
+    if (!qnGlobalSettings->isUpdateNotificationsEnabled())
         return;
 
     /* Do not show notifications near the end of the week or on our holidays. */
@@ -136,7 +139,7 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
 {
     m_notifiedVersion = info.currentRelease;
 
-    const QnSoftwareVersion current = qnCommon->engineVersion();
+    const QnSoftwareVersion current = qnStaticCommon->engineVersion();
     const bool majorVersionChange = ((info.currentRelease.major() > current.major())
         || (info.currentRelease.minor() > current.minor()));
 

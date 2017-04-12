@@ -1,9 +1,12 @@
 #include "fisheye_home_ptz_controller.h"
 
+#include <client/client_module.h>
+
+#include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/home_ptz_executor.h>
 
 QnFisheyeHomePtzController::QnFisheyeHomePtzController(const QnPtzControllerPtr &baseController) :
-    QnHomePtzController(baseController),
+    QnHomePtzController(baseController, qnClientModule->ptzControllerPool()->executorThread()),
     m_suspended(false)
 {
 }

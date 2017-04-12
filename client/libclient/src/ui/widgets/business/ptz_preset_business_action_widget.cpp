@@ -48,7 +48,7 @@ void QnExecPtzPresetBusinessActionWidget::at_model_dataChanged(QnBusiness::Field
         ui->presetComboBox->clear();
         m_presets.clear();
         m_ptzController.reset();
-        auto cameras = qnResPool->getResources<QnVirtualCameraResource>(model()->actionResources());
+        auto cameras = resourcePool()->getResources<QnVirtualCameraResource>(model()->actionResources());
         if (cameras.size() != 1)
             return; // single camera only allowed
         setupPtzController(cameras[0]);
@@ -67,17 +67,23 @@ void QnExecPtzPresetBusinessActionWidget::setupPtzController(const QnVirtualCame
     fisheyeController.reset(new QnFisheyePtzController(camera), &QObject::deleteLater);
     fisheyeController.reset(new QnPresetPtzController(fisheyeController));
 
-    if (QnPtzControllerPtr serverController = qnPtzPool->controller(camera)) {
-        serverController.reset(new QnActivityPtzController(QnActivityPtzController::Client, serverController));
+    if (QnPtzControllerPtr serverController = qnPtzPool->controller(camera))
+    {
+        serverController.reset(new QnActivityPtzController(commonModule(),
+            QnActivityPtzController::Client, serverController));
         m_ptzController.reset(new QnFallbackPtzController(fisheyeController, serverController));
-    } else {
+    }
+    else
+    {
         m_ptzController = fisheyeController;
     }
 
-    connect(m_ptzController.data(), &QnAbstractPtzController::changed, this, [this](Qn::PtzDataFields fields) {
-        if (fields & Qn::PresetsPtzField)
-            updateComboboxItems(ui->presetComboBox->currentData().toString());
-    });
+    connect(m_ptzController.data(), &QnAbstractPtzController::changed, this,
+        [this](Qn::PtzDataFields fields)
+        {
+            if (fields & Qn::PresetsPtzField)
+                updateComboboxItems(ui->presetComboBox->currentData().toString());
+        });
     m_ptzController->getPresets(&m_presets);
 }
 

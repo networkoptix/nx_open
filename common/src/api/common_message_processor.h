@@ -1,5 +1,4 @@
-#ifndef COMMON_MESSAGE_PROCESSOR_H
-#define COMMON_MESSAGE_PROCESSOR_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -15,19 +14,22 @@
 
 #include <nx/utils/singleton.h>
 #include <utils/common/connective.h>
+#include <common/common_module_aware.h>
 
 class QnResourceFactory;
 
-class QnCommonMessageProcessor: public Connective<QObject>, public Singleton<QnCommonMessageProcessor>
+class QnCommonMessageProcessor: public Connective<QObject>, public QnCommonModuleAware
 {
     Q_OBJECT
 
     typedef Connective<QObject> base_type;
 public:
-    explicit QnCommonMessageProcessor(QObject *parent = 0);
+    explicit QnCommonMessageProcessor(QObject* parent = nullptr);
     virtual ~QnCommonMessageProcessor() {}
 
     virtual void init(const ec2::AbstractECConnectionPtr& connection);
+
+    ec2::AbstractECConnectionPtr connection() const;
 
     /**
      * @param resource resource to update
@@ -146,4 +148,4 @@ protected:
     QMap<QnUuid, QnBusinessEventRulePtr> m_rules;
 };
 
-#endif // COMMON_MESSAGE_PROCESSOR_H
+#define qnCommonMessageProcessor commonModule()->messageProcessor()

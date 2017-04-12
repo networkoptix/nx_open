@@ -2,10 +2,16 @@
 
 #include <QtCore/QObject>
 
+#include <client_core/connection_context_aware.h>
+
 #include <camera/thumbnail_cache_base.h>
 
 class QnActiveCameraThumbnailLoaderPrivate;
-class QnActiveCameraThumbnailLoader : public QObject, public QnThumbnailCacheBase {
+class QnActiveCameraThumbnailLoader:
+    public QObject,
+    public QnThumbnailCacheBase,
+    public QnConnectionContextAware
+{
     Q_OBJECT
 
     Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)

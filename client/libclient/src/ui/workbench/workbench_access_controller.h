@@ -7,6 +7,8 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <client_core/connection_context_aware.h>
+
 #include <client/client_globals.h>
 
 #include <utils/common/connective.h>
@@ -32,7 +34,7 @@ private:
 /**
  * This class implements access control.
  */
-class QnWorkbenchAccessController: public Connective<QObject>
+class QnWorkbenchAccessController: public Connective<QObject>, public QnConnectionContextAware
 {
     Q_OBJECT
 

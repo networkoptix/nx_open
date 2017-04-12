@@ -24,7 +24,10 @@ public:
         QnJsonRestResult& result, const QnRestConnectionProcessor* owner) override;
 
 private:
-    int searchStartAction(const QnRequestParams& params, QnJsonRestResult& result);
+    int searchStartAction(
+        const QnRequestParams& params,
+        QnJsonRestResult& result,
+        const QnRestConnectionProcessor* owner);
     int searchStatusAction(const QnRequestParams& params, QnJsonRestResult& result);
     int searchStopAction(const QnRequestParams& params, QnJsonRestResult& result);
     int addCamerasAction(const QnRequestParams& params, QnJsonRestResult& result,

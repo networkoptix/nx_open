@@ -7,6 +7,10 @@
 #include "io_module_form_overlay_contents.h"
 #include "io_module_grid_overlay_contents.h"
 
+#include <client_core/connection_context_aware.h>
+
+#include <common/common_module.h>
+
 #include <api/app_server_connection.h>
 #include <core/resource/camera_resource.h>
 #include <camera/iomodule/iomodule_monitor.h>
@@ -26,7 +30,8 @@ constexpr int kStateCheckIntervalMs = 1000;
 
 } // namespace
 
-class QnIoModuleOverlayWidgetPrivate: public Connective<QObject>
+class QnIoModuleOverlayWidgetPrivate: public Connective<QObject>,
+    public QnConnectionContextAware
 {
     using base_type = Connective<QObject>;
 
@@ -301,7 +306,7 @@ void QnIoModuleOverlayWidgetPrivate::toggleState(const QString& port)
     action->setResources({ module->getId() });
     action->setToggleState(it->state.isActive ? QnBusiness::InactiveState : QnBusiness::ActiveState);
 
-    ec2::AbstractECConnectionPtr connection = QnAppServerConnectionFactory::getConnection2();
+    ec2::AbstractECConnectionPtr connection = commonModule()->ec2Connection();
     // we are not interested in client->server transport error code because of real port checking by timer
     if (connection)
         connection->getBusinessEventManager(Qn::kSystemAccess)->sendBusinessAction(action, module->getParentId(), this, [] {});

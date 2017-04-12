@@ -48,6 +48,10 @@ namespace ec2
 
         void addAuditRecord(ApiCommand::Value command,  const ApiResetBusinessRuleData& params, const QnAuthSession& authInfo);
         void addAuditRecord(ApiCommand::Value command,  const ApiDatabaseDumpData& params, const QnAuthSession& authInfo);
+
+        AbstractECConnection* ec2Connection() const;
+    private:
+        AbstractECConnection* m_connection;
     };
 
 }
