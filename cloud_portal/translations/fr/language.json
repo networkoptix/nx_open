@@ -7,7 +7,7 @@
     "okButton":"Ok",
     "cancelButton":"Annuler",
     "loginTitle":"Connexion à {{PRODUCT_NAME}}",
-    "loginButton":"Log in",
+    "loginButton":"Connexion",
     "logoutAuthorisedText":"",
     "logoutAuthorisedTitle":"Vous êtes déjà connecté",
     "logoutAuthorisedContinueButton":"Continuer",
@@ -151,15 +151,15 @@
     "confirmUnshareTitle":"Supprimer usager?",
     "confirmUnshareAction":"Supprimer",
     "successDisconnected":"Système correctement déconnecté de {{PRODUCT_NAME}}",
-    "successDeleted":"System {{systemName}} is successfully deleted from your account",
-    "permissionsRemoved":"Permissions were removed from {{email}}"
+    "successDeleted":"Système {{systemName}} a correctement été supprimé de votre compte",
+    "permissionsRemoved":"Autorisations retirées de {{email}}"
   },
   "account":{
     "accountSavedSuccess":"Votre compte est enregistré avec succès",
     "passwordChangedSuccess":"Votre compte est enregistré avec succès",
-    "changePassword":"Change Password",
-    "newPasswordLabel":"New password",
-    "saveChanges":"Save"
+    "changePassword":"Changer mot de passe",
+    "newPasswordLabel":"Nouveau mot de passe",
+    "saveChanges":"Enregistrer"
   },
   "downloads":{
     "noClientDetectedTitle":"Installer {{VMS_NAME}} pour visionner votre Système",
@@ -203,13 +203,13 @@
     }
   },
   "activeActions":{
-    "sendConfirm":"Send",
-    "resetPassword":"Reset Password",
-    "setNewPassword":"Save password",
-    "setNewPasswordLabel":"New password"
+    "sendConfirm":"Envoyer",
+    "resetPassword":"Réinitialiser mot de passe",
+    "setNewPassword":"Sauvergarder mot de passe",
+    "setNewPasswordLabel":"Nouveau mot de passe"
   },
   "regActions":{
-    "passwordLabel":"Password",
-    "createAccount":"Create Account"
+    "passwordLabel":"Mot de passe",
+    "createAccount":"Créer compte"
   }
 }

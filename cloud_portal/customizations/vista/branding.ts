@@ -4,7 +4,7 @@
     <name>global</name>
     <message>
       <source>{{PRODUCT_NAME}}</source>
-      <translation>Qloud</translation>
+      <translation>Qcloud</translation>
     </message>
     <message>
       <source>{{CLIENT_PROTOCOL}}</source>

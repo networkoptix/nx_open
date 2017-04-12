@@ -7,7 +7,7 @@
     "okButton":"確定",
     "cancelButton":"取消",
     "loginTitle":"登入到 {{PRODUCT_NAME}}",
-    "loginButton":"Log in",
+    "loginButton":"登入",
     "logoutAuthorisedText":"",
     "logoutAuthorisedTitle":"您已經登入",
     "logoutAuthorisedContinueButton":"繼續",
@@ -151,15 +151,15 @@
     "confirmUnshareTitle":"刪除使用者?",
     "confirmUnshareAction":"刪除",
     "successDisconnected":"系統成功地斷開 {{PRODUCT_NAME}}",
-    "successDeleted":"System {{systemName}} is successfully deleted from your account",
-    "permissionsRemoved":"Permissions were removed from {{email}}"
+    "successDeleted":"從您的帳戶成功刪除系統 {{systemName}}",
+    "permissionsRemoved":"權限從 {{email}} 被移除"
   },
   "account":{
     "accountSavedSuccess":"您的帳號已成功儲存",
     "passwordChangedSuccess":"您的帳號已成功儲存",
-    "changePassword":"Change Password",
-    "newPasswordLabel":"New password",
-    "saveChanges":"Save"
+    "changePassword":"變更密碼",
+    "newPasswordLabel":"新密碼",
+    "saveChanges":"儲存"
   },
   "downloads":{
     "noClientDetectedTitle":"安裝 {{VMS_NAME}} 來查看您的系統",
@@ -203,13 +203,13 @@
     }
   },
   "activeActions":{
-    "sendConfirm":"Send",
-    "resetPassword":"Reset Password",
-    "setNewPassword":"Save password",
-    "setNewPasswordLabel":"New password"
+    "sendConfirm":"發送",
+    "resetPassword":"重置密碼",
+    "setNewPassword":"儲存密碼",
+    "setNewPasswordLabel":"新密碼"
   },
   "regActions":{
-    "passwordLabel":"Password",
-    "createAccount":"Create Account"
+    "passwordLabel":"密碼",
+    "createAccount":"新建帳號"
   }
 }

@@ -7,7 +7,7 @@
     "okButton":"Ok",
     "cancelButton":"Cancelar",
     "loginTitle":"Iniciar sesión a {{PRODUCT_NAME}}",
-    "loginButton":"Log in",
+    "loginButton":"Inicia sesión",
     "logoutAuthorisedText":"",
     "logoutAuthorisedTitle":"Ya se ha conectado",
     "logoutAuthorisedContinueButton":"Continuar",
@@ -151,15 +151,15 @@
     "confirmUnshareTitle":"¿Eliminar el usuario?",
     "confirmUnshareAction":"Borrar",
     "successDisconnected":"El sistema está desconectado de {{PRODUCT_NAME}}",
-    "successDeleted":"System {{systemName}} is successfully deleted from your account",
-    "permissionsRemoved":"Permissions were removed from {{email}}"
+    "successDeleted":"Sistema {{systemName}} se ha eliminado de su cuenta",
+    "permissionsRemoved":"Los permisos fueron removidos de {{email}}"
   },
   "account":{
     "accountSavedSuccess":"Su cuenta se ha guardado",
     "passwordChangedSuccess":"Su cuenta se ha guardado",
-    "changePassword":"Change Password",
-    "newPasswordLabel":"New password",
-    "saveChanges":"Save"
+    "changePassword":"Cambiar contraseña",
+    "newPasswordLabel":"Nueva contraseña",
+    "saveChanges":"Guardar"
   },
   "downloads":{
     "noClientDetectedTitle":"Instalar {{VMS_NAME}} para ver su sistema",
@@ -203,13 +203,13 @@
     }
   },
   "activeActions":{
-    "sendConfirm":"Send",
-    "resetPassword":"Reset Password",
-    "setNewPassword":"Save password",
-    "setNewPasswordLabel":"New password"
+    "sendConfirm":"Enviar",
+    "resetPassword":"Restablecer contraseña",
+    "setNewPassword":"Guardar contraseña",
+    "setNewPasswordLabel":"Nueva contraseña"
   },
   "regActions":{
-    "passwordLabel":"Password",
-    "createAccount":"Create Account"
+    "passwordLabel":"Contraseña",
+    "createAccount":"Crear Cuenta"
   }
 }
