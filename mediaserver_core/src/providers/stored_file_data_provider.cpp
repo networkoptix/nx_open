@@ -9,18 +9,20 @@
 
 namespace {
     const QString kNotificationsPathPrefix("notifications/");
-}
+} // namespace
 
-QnStoredFileDataProvider::QnStoredFileDataProvider(const QString &filePath, int cyclesCount) :
+QnStoredFileDataProvider::QnStoredFileDataProvider(
+    ec2::AbstractECConnectionPtr connection,
+    const QString &filePath,
+    int cyclesCount)
+:
     QnAbstractStreamDataProvider(QnResourcePtr(new QnResource())),
     m_state(StoredFileDataProviderState::Waiting),
     m_filePath(kNotificationsPathPrefix + filePath),
-    m_storage(new QnExtIODeviceStorageResource()),
+    m_storage(new QnExtIODeviceStorageResource(connection->commonModule())),
     m_cyclesCount(cyclesCount)
 
 {
-    auto connection = QnAppServerConnectionFactory::getConnection2();
-
     connect(
         this, &QnStoredFileDataProvider::fileLoaded,
         this, &QnStoredFileDataProvider::at_fileLoaded);

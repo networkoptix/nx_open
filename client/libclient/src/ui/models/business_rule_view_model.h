@@ -49,6 +49,7 @@ namespace QnBusiness {
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnBusiness::Fields)
 
 typedef QVector<QnUuid> IDList;
+class QnBusinessStringsHelper;
 
 class QnBusinessRuleViewModel: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -162,6 +163,8 @@ private:
     QStandardItemModel *m_eventTypesModel;
     QStandardItemModel *m_eventStatesModel;
     QStandardItemModel *m_actionTypesModel;
+
+    std::unique_ptr<QnBusinessStringsHelper> m_helper;
 };
 
 typedef QSharedPointer<QnBusinessRuleViewModel> QnBusinessRuleViewModelPtr;

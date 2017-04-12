@@ -5,6 +5,7 @@
 #include <api/model/connection_info.h>
 
 #include <common/common_module.h>
+#include <common/static_common_module.h>
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -61,7 +62,7 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
     static const QString kRowMarker = lit(" - ");
     QString versionDetails =
         kRowMarker
-        + tr("Client version: %1.").arg(qnCommon->engineVersion().toString())
+        + tr("Client version: %1.").arg(qnStaticCommon->engineVersion().toString())
         + L'\n'
         + kRowMarker
         + tr("Server version: %1.").arg(connectionInfo.version.toString())
@@ -177,14 +178,14 @@ void QnConnectionDiagnosticsHelper::showValidateConnectionErrorMessage(
         case Qn::IncompatibleVersionConnectionResult:
             QnMessageBox::critical(parentWidget,
                 getDiffVersionsText(),
-                getDiffVersionsExtra(qnCommon->engineVersion().toString(), serverVersion) + L'\n'
+                getDiffVersionsExtra(qnStaticCommon->engineVersion().toString(), serverVersion) + L'\n'
                     + tr("Compatibility mode for versions lower than %1 is not supported.")
                         .arg(QnConnectionValidator::minSupportedVersion().toString()));
             break;
         case Qn::IncompatibleProtocolConnectionResult:
             QnMessageBox::warning(parentWidget,
                 QString(),
-                getDiffVersionsFullText(qnCommon->engineVersion().toString(), serverVersion)
+                getDiffVersionsFullText(qnStaticCommon->engineVersion().toString(), serverVersion)
                     + L'\n' + tr("Restart %1 in compatibility mode "
                         "will be required.").arg(QnClientAppInfo::applicationDisplayName()));
             break;
@@ -295,7 +296,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
                 : QnSoftwareVersion::MinorFormat);
 
             const auto extras =
-                getDiffVersionFullExtras(qnCommon->engineVersion().toString(), versionString,
+                getDiffVersionFullExtras(qnStaticCommon->engineVersion().toString(), versionString,
                     tr("You have to download another version of %1 to "
                         "connect to this Server.").arg(QnClientAppInfo::applicationDisplayName()));
 
@@ -321,7 +322,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
 
         //version is installed, trying to run
         const auto extras = getDiffVersionFullExtras(
-            qnCommon->engineVersion().toString(), connectionInfo.version.toString(),
+            qnStaticCommon->engineVersion().toString(), connectionInfo.version.toString(),
             tr("You have to restart %1 in compatibility"
                 " mode to connect to this Server.").arg(QnClientAppInfo::applicationDisplayName()));
 

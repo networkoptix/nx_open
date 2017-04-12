@@ -1,5 +1,8 @@
 #include "updates_common.h"
 
+#include <common/common_module.h>
+#include <client_core/client_core_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
@@ -27,16 +30,18 @@ QString serverNamesString(const QnMediaServerResourceList& servers)
 
 QSet<QnUuid> QnUpdateUtils::getServersLinkedToCloud(const QSet<QnUuid>& peers)
 {
+    auto commonModule = qnClientCoreModule->commonModule();
+
     QSet<QnUuid> result;
 
-    const auto moduleFinder = qnModuleFinder;
+    const auto moduleFinder = commonModule->moduleFinder();
     if (!moduleFinder)
         return result;
 
     for (const auto& id: peers)
     {
         const auto server =
-            qnResPool->getIncompatibleResourceById(id, false).dynamicCast<QnMediaServerResource>();
+            commonModule->resourcePool()->getIncompatibleResourceById(id, false).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
 

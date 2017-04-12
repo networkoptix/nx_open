@@ -64,11 +64,15 @@ namespace ui {
 namespace workbench {
 
 namespace {
-QString generateUniqueLayoutName(const QnUserResourcePtr &user, const QString &defaultName, const QString &nameTemplate)
+QString generateUniqueLayoutName(
+    QnResourcePool* resourcePool,
+    const QnUserResourcePtr &user,
+    const QString &defaultName,
+    const QString &nameTemplate)
 {
     QStringList usedNames;
     QnUuid parentId = user ? user->getId() : QnUuid();
-    for (const auto layout : qnResPool->getResources<QnLayoutResource>())
+    for (const auto layout : resourcePool->getResources<QnLayoutResource>())
     {
         if (layout->isShared() || layout->getParentId() == parentId)
             usedNames.push_back(layout->getName());
@@ -84,10 +88,14 @@ QString generateUniqueLayoutName(const QnUserResourcePtr &user, const QString &d
  * @param layout                    Layout that we want to rename (if any).
  * @return                          List of existing layouts with same name.
  */
-QnLayoutResourceList alreadyExistingLayouts(const QString &name, const QnUuid &parentId, const QnLayoutResourcePtr &layout = QnLayoutResourcePtr())
+QnLayoutResourceList alreadyExistingLayouts(
+    QnResourcePool* resourcePool,
+    const QString &name,
+    const QnUuid &parentId,
+    const QnLayoutResourcePtr &layout = QnLayoutResourcePtr())
 {
     QnLayoutResourceList result;
-    for (const auto& existingLayout : qnResPool->getResourcesWithParentId(parentId).filtered<QnLayoutResource>())
+    for (const auto& existingLayout : resourcePool->getResourcesWithParentId(parentId).filtered<QnLayoutResource>())
     {
         if (existingLayout == layout)
             continue;
@@ -108,7 +116,8 @@ QnResourceList calculateResourcesToShare(const QnResourceList& resources,
             if (!QnResourceAccessFilter::isShareableMedia(resource))
                 return false;
 
-            return !qnResourceAccessProvider->hasAccess(user, resource);
+            auto accessProvider = resource->commonModule()->resourceAccessProvider();
+            return !accessProvider->hasAccess(user, resource);
         };
     return resources.filtered(sharingRequired);
 }
@@ -137,7 +146,7 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
     connect(action(QnActions::RemoveLayoutItemFromSceneAction), &QAction::triggered, this,
         &LayoutsHandler::at_removeLayoutItemFromSceneAction_triggered);
 
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
         {
             if (!resource->hasFlags(Qn::layout))
@@ -167,7 +176,8 @@ LayoutsHandler::~LayoutsHandler()
 
 void LayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, const QString &newName)
 {
-    QnLayoutResourceList existing = alreadyExistingLayouts(newName, layout->getParentId(), layout);
+    QnLayoutResourceList existing = alreadyExistingLayouts(resourcePool(),
+        newName, layout->getParentId(), layout);
     if (!canRemoveLayouts(existing))
     {
         messages::Resources::layoutAlreadyExists(mainWindow());
@@ -271,7 +281,7 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
 
         QString proposedName = hasSavePermission
             ? layout->getName()
-            : generateUniqueLayoutName(context()->user(), layout->getName(), layout->getName() + lit(" %1"));
+            : generateUniqueLayoutName(resourcePool(), context()->user(), layout->getName(), layout->getName() + lit(" %1"));
 
         dialog->setName(proposedName);
         setHelpTopic(dialog.data(), Qn::SaveLayout_Help);
@@ -303,7 +313,7 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
 
             /* Check if we have rights to overwrite the layout */
             QnLayoutResourcePtr excludingSelfLayout = hasSavePermission ? layout : QnLayoutResourcePtr();
-            QnLayoutResourceList existing = alreadyExistingLayouts(name, user->getId(), excludingSelfLayout);
+            QnLayoutResourceList existing = alreadyExistingLayouts(resourcePool(), name, user->getId(), excludingSelfLayout);
             if (!canRemoveLayouts(existing))
             {
                 messages::Resources::layoutAlreadyExists(mainWindow());
@@ -324,7 +334,7 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
     }
     else
     {
-        QnLayoutResourceList existing = alreadyExistingLayouts(name, user->getId(), layout);
+        QnLayoutResourceList existing = alreadyExistingLayouts(resourcePool(), name, user->getId(), layout);
         if (!canRemoveLayouts(existing))
         {
             messages::Resources::layoutAlreadyExists(mainWindow());
@@ -350,7 +360,7 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
     newLayout->setBackgroundImageFilename(layout->backgroundImageFilename());
     newLayout->setBackgroundOpacity(layout->backgroundOpacity());
     newLayout->setBackgroundSize(layout->backgroundSize());
-    qnResPool->addResource(newLayout);
+    resourcePool()->addResource(newLayout);
 
     QnLayoutItemDataList items = layout->getItems().values();
     QHash<QnUuid, QnUuid> newUuidByOldUuid;
@@ -468,10 +478,10 @@ void LayoutsHandler::shareLayoutWith(const QnLayoutResourcePtr &layout,
         return;
 
     /* Admins anyway have all shared layouts. */
-    if (qnResourceAccessManager->hasGlobalPermission(subject, Qn::GlobalAdminPermission))
+    if (resourceAccessManager()->hasGlobalPermission(subject, Qn::GlobalAdminPermission))
         return;
 
-    auto accessible = qnSharedResourcesManager->sharedResources(subject);
+    auto accessible = sharedResourcesManager()->sharedResources(subject);
     if (accessible.contains(layout->getId()))
         return;
 
@@ -487,8 +497,8 @@ LayoutsHandler::LayoutChange LayoutsHandler::calculateLayoutChange(
 
     /* Share added resources. */
     auto snapshot = snapshotManager()->snapshot(layout);
-    auto oldResources = QnLayoutResource::layoutResources(snapshot.items);
-    auto newResources = QnLayoutResource::layoutResources(layout->getItems());
+    auto oldResources = QnLayoutResource::layoutResources(resourcePool(), snapshot.items);
+    auto newResources = layout->layoutResources();
 
     result.added = (newResources - oldResources).toList();
     result.removed = (oldResources - newResources).toList();
@@ -512,7 +522,7 @@ bool LayoutsHandler::confirmLayoutChange(const LayoutChange& change,
         return confirmChangeVideoWallLayout(change);
 
     /* Never ask for auto-generated (e.g. preview search) layouts. */
-    if (qnResPool->isAutoGeneratedLayout(change.layout))
+    if (resourcePool()->isAutoGeneratedLayout(change.layout))
         return true;
 
     /* Check shared layout */
@@ -525,12 +535,12 @@ bool LayoutsHandler::confirmLayoutChange(const LayoutChange& change,
 bool LayoutsHandler::confirmChangeSharedLayout(const LayoutChange& change)
 {
     /* Checking if custom users have access to this shared layout. */
-    auto allUsers = qnResPool->getResources<QnUserResource>();
+    auto allUsers = resourcePool()->getResources<QnUserResource>();
     auto accessibleToCustomUsers = any_of(
         allUsers,
-        [layout = change.layout](const QnUserResourcePtr& user)
+        [this, layout = change.layout](const QnUserResourcePtr& user)
         {
-            return qnResourceAccessProvider->accessibleVia(user, layout) ==
+            return resourceAccessProvider()->accessibleVia(user, layout) ==
                 QnAbstractResourceAccessProvider::Source::shared;
         });
 
@@ -544,14 +554,14 @@ bool LayoutsHandler::confirmChangeSharedLayout(const LayoutChange& change)
 bool LayoutsHandler::confirmDeleteSharedLayouts(const QnLayoutResourceList& layouts)
 {
     /* Checking if custom users have access to this shared layout. */
-    auto allUsers = qnResPool->getResources<QnUserResource>();
+    auto allUsers = resourcePool()->getResources<QnUserResource>();
     auto accessibleToCustomUsers = any_of(allUsers,
-        [layouts](const QnUserResourcePtr& user)
+        [this, layouts](const QnUserResourcePtr& user)
         {
             return any_of(layouts,
-                [user](const QnLayoutResourcePtr& layout)
+                [this, user](const QnLayoutResourcePtr& layout)
                 {
-                    return qnResourceAccessProvider->accessibleVia(user, layout) ==
+                    return resourceAccessProvider()->accessibleVia(user, layout) ==
                         QnAbstractResourceAccessProvider::Source::shared;
                 });
         });
@@ -595,7 +605,7 @@ bool LayoutsHandler::confirmDeleteLocalLayouts(const QnUserResourcePtr& user,
     if (!user)
         return true;
 
-    if (qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission))
+    if (resourceAccessManager()->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission))
         return true;
 
     /* Never ask for own layouts. */
@@ -607,10 +617,10 @@ bool LayoutsHandler::confirmDeleteLocalLayouts(const QnUserResourcePtr& user,
     for (const auto& layout : layouts)
     {
         auto snapshot = snapshotManager()->snapshot(layout);
-        removedResources += QnLayoutResource::layoutResources(snapshot.items);
+        removedResources += QnLayoutResource::layoutResources(resourcePool(), snapshot.items);
     }
 
-    auto accessible = qnSharedResourcesManager->sharedResources(user);
+    auto accessible = sharedResourcesManager()->sharedResources(user);
     QnResourceList stillAccessible;
     for (const QnResourcePtr& resource : removedResources)
     {
@@ -625,7 +635,7 @@ bool LayoutsHandler::confirmDeleteLocalLayouts(const QnUserResourcePtr& user,
 bool LayoutsHandler::confirmStopSharingLayouts(const QnResourceAccessSubject& subject,
     const QnLayoutResourceList& layouts)
 {
-    if (qnResourceAccessManager->hasGlobalPermission(subject, Qn::GlobalAccessAllMediaPermission))
+    if (resourceAccessManager()->hasGlobalPermission(subject, Qn::GlobalAccessAllMediaPermission))
         return true;
 
     /* Calculate all resources that were available through these layouts. */
@@ -644,7 +654,7 @@ bool LayoutsHandler::confirmStopSharingLayouts(const QnResourceAccessSubject& su
             continue;
 
         QnResourceList providers;
-        auto accessSource = qnResourceAccessProvider->accessibleVia(subject, resource, &providers);
+        auto accessSource = resourceAccessProvider()->accessibleVia(subject, resource, &providers);
         if (accessSource != QnAbstractResourceAccessProvider::Source::layout)
             continue;
 
@@ -676,10 +686,10 @@ void LayoutsHandler::grantMissingAccessRights(const QnUserResourcePtr& user,
     if (!user)
         return;
 
-    if (qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission))
+    if (resourceAccessManager()->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission))
         return;
 
-    auto accessible = qnSharedResourcesManager->sharedResources(user);
+    auto accessible = sharedResourcesManager()->sharedResources(user);
     for (const auto& toShare : calculateResourcesToShare(change.added, user))
         accessible << toShare->getId();
     qnResourcesChangesManager->saveAccessibleResources(user, accessible);
@@ -710,7 +720,7 @@ void LayoutsHandler::removeLayouts(const QnLayoutResourceList &layouts)
             continue;
 
         if (layout->hasFlags(Qn::local))
-            qnResPool->removeResource(layout); /*< This one can be simply deleted from resource pool. */
+            resourcePool()->removeResource(layout); /*< This one can be simply deleted from resource pool. */
         else
             remoteResources << layout;
     }
@@ -770,7 +780,7 @@ void LayoutsHandler::closeLayoutsInternal(
         }
 
         if (resource->hasFlags(Qn::local) && !resource->isFile())
-            qnResPool->removeResource(resource);
+            resourcePool()->removeResource(resource);
     }
 
     if (workbench()->layouts().empty())
@@ -779,7 +789,7 @@ void LayoutsHandler::closeLayoutsInternal(
 
 bool LayoutsHandler::closeAllLayouts(bool force)
 {
-    return closeLayouts(qnResPool->getResources<QnLayoutResource>(), force);
+    return closeLayouts(resourcePool()->getResources<QnLayoutResource>(), force);
 }
 
 // -------------------------------------------------------------------------- //
@@ -798,13 +808,13 @@ void LayoutsHandler::at_newUserLayoutAction_triggered()
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
     dialog->setWindowTitle(tr("New Layout"));
     dialog->setText(tr("Enter the name of the layout to create:"));
-    dialog->setName(generateUniqueLayoutName(user, tr("New Layout"), tr("New Layout %1")));
+    dialog->setName(generateUniqueLayoutName(resourcePool(), user, tr("New Layout"), tr("New Layout %1")));
     dialog->setWindowModality(Qt::ApplicationModal);
 
     if (!dialog->exec())
         return;
 
-    QnLayoutResourceList existing = alreadyExistingLayouts(dialog->name(), user->getId());
+    QnLayoutResourceList existing = alreadyExistingLayouts(resourcePool(), dialog->name(), user->getId());
     if (!canRemoveLayouts(existing))
     {
         messages::Resources::layoutAlreadyExists(mainWindow());
@@ -830,7 +840,7 @@ void LayoutsHandler::at_newUserLayoutAction_triggered()
     layout->setId(QnUuid::createUuid());
     layout->setName(dialog->name());
     layout->setParentId(user->getId());
-    qnResPool->addResource(layout);
+    resourcePool()->addResource(layout);
 
     snapshotManager()->save(layout);
 
@@ -905,7 +915,7 @@ void LayoutsHandler::at_removeFromServerAction_triggered()
             continue;
 
         auto owner = layout->getParentResource().dynamicCast<QnUserResource>();
-        if (qnResPool->isAutoGeneratedLayout(layout) || layout->hasFlags(Qn::local))
+        if (resourcePool()->isAutoGeneratedLayout(layout) || layout->hasFlags(Qn::local))
             canAutoDelete << layout;
         else if (layout->isShared())
             shared << layout;
@@ -945,7 +955,7 @@ void LayoutsHandler::at_shareLayoutAction_triggered()
 
     QnResourceAccessSubject subject = user
         ? QnResourceAccessSubject(user)
-        : QnResourceAccessSubject(qnUserRolesManager->userRole(roleId));
+        : QnResourceAccessSubject(userRolesManager()->userRole(roleId));
 
     QnUserResourcePtr owner = layout->getParentResource().dynamicCast<QnUserResource>();
     if (owner && owner == user)
@@ -969,14 +979,14 @@ void LayoutsHandler::at_stopSharingLayoutAction_triggered()
 
     QnResourceAccessSubject subject = user
         ? QnResourceAccessSubject(user)
-        : QnResourceAccessSubject(qnUserRolesManager->userRole(roleId));
+        : QnResourceAccessSubject(userRolesManager()->userRole(roleId));
     if (!subject.isValid())
         return;
 
     QnLayoutResourceList sharedLayouts;
     for (auto resource: params.resources().filtered<QnLayoutResource>())
     {
-        if (qnResourceAccessProvider->accessibleVia(subject, resource) == QnAbstractResourceAccessProvider::Source::shared)
+        if (resourceAccessProvider()->accessibleVia(subject, resource) == QnAbstractResourceAccessProvider::Source::shared)
             sharedLayouts << resource;
     }
     if (sharedLayouts.isEmpty())
@@ -985,7 +995,7 @@ void LayoutsHandler::at_stopSharingLayoutAction_triggered()
     if (!confirmStopSharingLayouts(subject, sharedLayouts))
         return;
 
-    auto accessible = qnSharedResourcesManager->sharedResources(subject);
+    auto accessible = sharedResourcesManager()->sharedResources(subject);
     for (const auto& layout : sharedLayouts)
     {
         NX_ASSERT(!layout->isFile());
@@ -998,7 +1008,7 @@ void LayoutsHandler::at_openNewTabAction_triggered()
 {
     QnWorkbenchLayout *layout = qnWorkbenchLayoutsFactory->create(this);
 
-    layout->setName(generateUniqueLayoutName(context()->user(), tr("New Layout"), tr("New Layout %1")));
+    layout->setName(generateUniqueLayoutName(resourcePool(), context()->user(), tr("New Layout"), tr("New Layout %1")));
 
     workbench()->addLayout(layout);
     workbench()->setCurrentLayout(layout);

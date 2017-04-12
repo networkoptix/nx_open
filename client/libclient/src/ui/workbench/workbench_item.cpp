@@ -25,7 +25,7 @@ QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUid, const QnUuid &uuid,
     if (resourceUid.isEmpty())
         return;
 
-    QnResourcePtr resource = qnResPool->getResourceByUniqueId(resourceUid);
+    QnResourcePtr resource = resourcePool()->getResourceByUniqueId(resourceUid);
     if (!resource)
         return;
 
@@ -48,7 +48,7 @@ QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
         qnWarning("Creating a workbench item from item data with invalid unique id.");
         // TODO: #Elric fix layout item data conventions.
 
-        QnResourcePtr resource = qnResPool->getResourceById(data.resource.id);
+        QnResourcePtr resource = resourcePool()->getResourceById(data.resource.id);
         if (resource)
             m_resourceUid = resource->getUniqueId(); // TODO: #Elric add warning if NULL?
     }
@@ -70,7 +70,7 @@ QnWorkbenchItem::~QnWorkbenchItem()
 
 QnLayoutItemData QnWorkbenchItem::data() const
 {
-    QnResourcePtr resource = qnResPool->getResourceByUniqueId(m_resourceUid);
+    QnResourcePtr resource = resourcePool()->getResourceByUniqueId(m_resourceUid);
 
     QnLayoutItemData data;
 
@@ -93,7 +93,7 @@ bool QnWorkbenchItem::update(const QnLayoutItemData &data)
 {
 #ifdef _DEBUG
     NX_ASSERT(data.uuid == uuid());
-    QnResourcePtr resource = qnResPool->getResourceByUniqueId(resourceUid());
+    QnResourcePtr resource = resourcePool()->getResourceByUniqueId(resourceUid());
     QnUuid localId = resource ? resource->getId() : QnUuid();
     NX_ASSERT(data.resource.id == localId || data.resource.uniqueId == m_resourceUid);
 #endif
@@ -117,7 +117,7 @@ void QnWorkbenchItem::submit(QnLayoutItemData &data) const
 {
 #ifdef _DEBUG
     NX_ASSERT(data.uuid == uuid());
-    QnResourcePtr resource = qnResPool->getResourceByUniqueId(resourceUid());
+    QnResourcePtr resource = resourcePool()->getResourceByUniqueId(resourceUid());
     QnUuid localId = resource ? resource->getId() : QnUuid();
     NX_ASSERT(data.resource.id == localId || data.resource.uniqueId == m_resourceUid);
 #endif

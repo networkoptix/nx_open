@@ -4,6 +4,8 @@
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
 
+#include <common/common_module.h>
+
 #include <client/client_globals.h>
 
 #include <api/global_settings.h>
@@ -51,7 +53,7 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
 
     connect(ui->settingsDisableControlCheckBox, &QCheckBox::toggled, ui->qualityGroupBox, &QGroupBox::setDisabled);
     connect(ui->settingsDisableControlCheckBox, &QCheckBox::toggled, this, &QnCameraExpertSettingsWidget::updateControlBlock);
-    connect(QnGlobalSettings::instance(), &QnGlobalSettings::cameraSettingsOptimizationChanged, this, &QnCameraExpertSettingsWidget::updateControlBlock);
+    connect(qnGlobalSettings, &QnGlobalSettings::cameraSettingsOptimizationChanged, this, &QnCameraExpertSettingsWidget::updateControlBlock);
     updateControlBlock();
 
     connect(ui->qualityOverrideCheckBox, SIGNAL(toggled(bool)), ui->qualitySlider, SLOT(setVisible(bool)));
@@ -307,7 +309,7 @@ void QnCameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResour
 
     bool disableControls = ui->settingsDisableControlCheckBox->checkState() == Qt::Checked;
     bool enableControls = ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked;
-    bool globalControlEnabled = QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled();
+    bool globalControlEnabled = qnGlobalSettings->isCameraSettingsOptimizationEnabled();
 
     Qn::SecondStreamQuality quality = (Qn::SecondStreamQuality) sliderPosToQuality(ui->qualitySlider->value());
 
@@ -398,7 +400,7 @@ void QnCameraExpertSettingsWidget::at_qualitySlider_valueChanged(int value) {
 }
 
 void QnCameraExpertSettingsWidget::updateControlBlock() {
-    bool globalControlEnabled = QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled();
+    bool globalControlEnabled = qnGlobalSettings->isCameraSettingsOptimizationEnabled();
     ui->settingsDisableControlCheckBox->setEnabled(globalControlEnabled);
     ui->settingsDisabledWarningLabel->setVisible(!globalControlEnabled);
     ui->settingsWarningLabel->setVisible(globalControlEnabled && !ui->settingsDisableControlCheckBox->isChecked());

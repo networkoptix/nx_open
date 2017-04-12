@@ -17,13 +17,18 @@
 #include "network/tcp_connection_priv.h"
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/json_functions.h>
+#include <rest/server/rest_connection_processor.h>
+#include <common/common_module.h>
 
 int QnRecordedChunksRestHandler::executeGet(
-    const QString& /*path*/, const QnRequestParamList& params, QByteArray& result,
-    QByteArray& contentType, const QnRestConnectionProcessor* /*owner*/)
+    const QString& /*path*/,
+    const QnRequestParamList& params,
+    QByteArray& result,
+    QByteArray& contentType,
+    const QnRestConnectionProcessor* owner)
 {
     QByteArray errStr;
-    QnChunksRequestData request = QnChunksRequestData::fromParams(params);
+    QnChunksRequestData request = QnChunksRequestData::fromParams(owner->commonModule()->resourcePool(), params);
     QString callback = params.value("callback");
 
     if (request.resList.isEmpty())

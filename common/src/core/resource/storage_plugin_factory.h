@@ -10,7 +10,7 @@
 class QnStoragePluginFactory
 {
 public:
-    typedef std::function<QnStorageResource *(const QString &)> StorageFactory;
+    typedef std::function<QnStorageResource *(QnCommonModule*, const QString &)> StorageFactory;
 
     QnStoragePluginFactory();
     virtual ~QnStoragePluginFactory();
@@ -18,7 +18,10 @@ public:
 
     bool existsFactoryForProtocol(const QString &protocol);
     void registerStoragePlugin(const QString &protocol, const StorageFactory &factory, bool isDefaultProtocol = false);
-    QnStorageResource *createStorage(const QString &url, bool useDefaultForUnknownPrefix = true);
+    QnStorageResource *createStorage(
+        QnCommonModule* commonModule,
+        const QString &url,
+        bool useDefaultForUnknownPrefix = true);
 
 private:
     QHash<QString, StorageFactory> m_factoryByProtocol;

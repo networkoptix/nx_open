@@ -14,7 +14,7 @@ public:
 
 QnProxyReceiverConnection::QnProxyReceiverConnection(QSharedPointer<AbstractStreamSocket> socket,
                                                      QnHttpConnectionListener* owner):
-    QnTCPConnectionProcessor(new QnProxyReceiverConnectionPrivate, socket)
+    QnTCPConnectionProcessor(new QnProxyReceiverConnectionPrivate, socket, owner->commonModule())
 {
     Q_D(QnProxyReceiverConnection);
 

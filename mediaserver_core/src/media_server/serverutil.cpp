@@ -96,7 +96,12 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (json),
     _Fields)
 
-bool updateUserCredentials(PasswordData data, QnOptionalBool isEnabled, const QnUserResourcePtr& userRes, QString* errString)
+bool updateUserCredentials(
+    std::shared_ptr<ec2::AbstractECConnection> connection,
+    PasswordData data,
+    QnOptionalBool isEnabled,
+    const QnUserResourcePtr& userRes,
+    QString* errString)
 {
     if (!userRes)
     {
@@ -142,9 +147,7 @@ bool updateUserCredentials(PasswordData data, QnOptionalBool isEnabled, const Qn
 
     ec2::ApiUserData apiUser;
     fromResourceToApi(updatedUser, apiUser);
-    auto errCode = QnAppServerConnectionFactory::getConnection2()
-        ->getUserManager(Qn::kSystemAccess)
-        ->saveSync(apiUser, data.password);
+    auto errCode = connection->getUserManager(Qn::kSystemAccess)->saveSync(apiUser, data.password);
     NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
     if (errCode != ec2::ErrorCode::ok)
     {
@@ -179,7 +182,8 @@ bool validatePasswordData(const PasswordData& passwordData, QString* errStr)
 }
 
 
-bool backupDatabase() {
+bool backupDatabase(std::shared_ptr<ec2::AbstractECConnection> connection)
+{
     QString dir = getDataDirectory() + lit("/");
     QString fileName;
     for (int i = -1; ; i++) {
@@ -189,7 +193,7 @@ bool backupDatabase() {
             break;
     }
 
-    const ec2::ErrorCode errorCode = QnAppServerConnectionFactory::getConnection2()->dumpDatabaseToFileSync( fileName );
+    const ec2::ErrorCode errorCode = connection->dumpDatabaseToFileSync( fileName );
     if (errorCode != ec2::ErrorCode::ok) {
         NX_LOG(lit("Failed to dump EC database: %1").arg(ec2::toString(errorCode)), cl_logERROR);
         return false;
@@ -198,12 +202,12 @@ bool backupDatabase() {
     return true;
 }
 
-void dropConnectionsToRemotePeers()
+void dropConnectionsToRemotePeers(ec2::QnTransactionMessageBus* messageBus)
 {
     if (QnServerConnector::instance())
         QnServerConnector::instance()->stop();
 
-    qnTransactionBus->dropConnections();
+    messageBus->dropConnections();
 }
 
 void resumeConnectionsToRemotePeers()
@@ -212,21 +216,22 @@ void resumeConnectionsToRemotePeers()
         QnServerConnector::instance()->start();
 }
 
-bool changeLocalSystemId(const ConfigureSystemData& data)
+bool changeLocalSystemId(const ConfigureSystemData& data, ec2::QnTransactionMessageBus* messageBus)
 {
-    if (qnGlobalSettings->localSystemId() == data.localSystemId)
+    const auto& commonModule = messageBus->commonModule();
+    if (commonModule->globalSettings()->localSystemId() == data.localSystemId)
         return true;
 
-    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    QnMediaServerResourcePtr server = commonModule->resourcePool()->getResourceById<QnMediaServerResource>(commonModule->moduleGUID());
     if (!server) {
         NX_LOG("Cannot find self server resource!", cl_logERROR);
         return false;
     }
 
     if (!data.wholeSystem)
-        dropConnectionsToRemotePeers();
+        dropConnectionsToRemotePeers(messageBus);
 
-    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto connection = commonModule->ec2Connection();
 
     // add foreign users
     for (const auto& user: data.foreignUsers)
@@ -249,7 +254,7 @@ bool changeLocalSystemId(const ConfigureSystemData& data)
     }
 
     // apply remove settings
-    const auto& settings = QnGlobalSettings::instance()->allSettings();
+    const auto& settings = commonModule->globalSettings()->allSettings();
     for(const auto& foreignSetting: data.foreignSettings)
     {
         for(QnAbstractResourcePropertyAdaptor* setting: settings)
@@ -262,14 +267,14 @@ bool changeLocalSystemId(const ConfigureSystemData& data)
         }
     }
 
-    qnCommon->setSystemIdentityTime(data.sysIdTime, qnCommon->moduleGUID());
+    commonModule->setSystemIdentityTime(data.sysIdTime, commonModule->moduleGUID());
 
     if (data.localSystemId.isNull())
-        qnGlobalSettings->resetCloudParams();
-    qnGlobalSettings->setLocalSystemId(data.localSystemId);
-    qnGlobalSettings->synchronizeNowSync();
+        commonModule->globalSettings()->resetCloudParams();
+    commonModule->globalSettings()->setLocalSystemId(data.localSystemId);
+    commonModule->globalSettings()->synchronizeNowSync();
 
-    QnAppServerConnectionFactory::getConnection2()->setTransactionLogTime(data.tranLogTime);
+    commonModule->ec2Connection()->setTransactionLogTime(data.tranLogTime);
 
     // update auth key if system name is changed
     server->setAuthKey(QnUuid::createUuid().toString());
@@ -296,21 +301,21 @@ bool changeLocalSystemId(const ConfigureSystemData& data)
     return true;
 }
 
-bool resetSystemToStateNew()
+bool resetSystemToStateNew(QnCommonModule* commonModule)
 {
     NX_LOG(lit("Resetting system to the \"new\" state"), cl_logINFO);
 
-    qnGlobalSettings->setLocalSystemId(QnUuid());   //< Marking system as a "new".
-    if (!qnGlobalSettings->synchronizeNowSync())
+    commonModule->globalSettings()->setLocalSystemId(QnUuid());   //< Marking system as a "new".
+    if (!commonModule->globalSettings()->synchronizeNowSync())
     {
         NX_LOG(lit("Error saving changes to global settings"), cl_logINFO);
         return false;
     }
 
-    auto adminUserResource = qnResPool->getAdministrator();
+    auto adminUserResource = commonModule->resourcePool()->getAdministrator();
     PasswordData data;
     data.password = helpers::kFactorySystemPassword;
-    return updateUserCredentials(data, QnOptionalBool(true), adminUserResource, nullptr);
+    return updateUserCredentials(commonModule->ec2Connection(), data, QnOptionalBool(true), adminUserResource, nullptr);
 }
 
 // -------------- nx::ServerSetting -----------------------

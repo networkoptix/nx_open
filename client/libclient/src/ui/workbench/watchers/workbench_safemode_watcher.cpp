@@ -14,11 +14,11 @@ QnWorkbenchSafeModeWatcher::QnWorkbenchSafeModeWatcher(QWidget *parentWidget /*=
     , m_parentWidget(parentWidget)
     , m_warnLabel(nullptr)
 {
-    connect(qnCommon, &QnCommonModule::readOnlyChanged, this, &QnWorkbenchSafeModeWatcher::updateReadOnlyMode);
+    connect(commonModule(), &QnCommonModule::readOnlyChanged, this, &QnWorkbenchSafeModeWatcher::updateReadOnlyMode);
 }
 
 void QnWorkbenchSafeModeWatcher::updateReadOnlyMode() {
-    bool readOnly = qnCommon->isReadOnly();
+    bool readOnly = commonModule()->isReadOnly();
 
     if (m_warnLabel)
         m_warnLabel->setVisible(readOnly);

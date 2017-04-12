@@ -1,7 +1,9 @@
 #pragma once
 
+#include <client_core/connection_context_aware.h>
+
 class QnCameraAccessRightsHelperPrivate;
-class QnCameraAccessRightsHelper : public QObject
+class QnCameraAccessRightsHelper: public QObject, public QnConnectionContextAware
 {
     Q_OBJECT
     Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)

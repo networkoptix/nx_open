@@ -114,7 +114,7 @@ QString QnRecordingStatsModel::displayData(const QModelIndex &index) const {
             return isForeign
                 ? foreignText
                 : nx::utils::elideString(
-                    QnResourceDisplayInfo(qnResPool->getResourceByUniqueId(value.uniqueId)).toString(qnSettings->extraInfoInTree()),
+                    QnResourceDisplayInfo(resourcePool()->getResourceByUniqueId(value.uniqueId)).toString(qnSettings->extraInfoInTree()),
                     maxLength);
         }
     case BytesColumn:
@@ -135,11 +135,12 @@ QString QnRecordingStatsModel::footerDisplayData(const QModelIndex &index) const
         {
             QnVirtualCameraResourceList cameras;
             for (const QnCamRecordingStatsData &data: m_data)
-                if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(data.uniqueId))
+                if (QnVirtualCameraResourcePtr camera = resourcePool()->getResourceByUniqueId<QnVirtualCameraResource>(data.uniqueId))
                     cameras << camera;
             //NX_ASSERT(cameras.size() == m_data.size(), Q_FUNC_INFO, "Make sure all cameras exist");
             static const auto kNDash = QString::fromWCharArray(L"\x2013");
             return QnDeviceDependentStrings::getNameFromSet(
+                resourcePool(),
                 QnCameraDeviceStringSet(
                     tr("Total %1 %n devices", "%1 is long dash, do not replace",
                         cameras.size()).arg(kNDash),
@@ -168,7 +169,7 @@ QnResourcePtr QnRecordingStatsModel::getResource(const QModelIndex &index) const
     switch(index.column())
     {
     case CameraNameColumn:
-        return qnResPool->getResourceByUniqueId(value.uniqueId);
+        return resourcePool()->getResourceByUniqueId(value.uniqueId);
     default:
         return QnResourcePtr();
     }
@@ -245,11 +246,13 @@ QString QnRecordingStatsModel::tooltipText(Columns column) const
     {
         case CameraNameColumn:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
+                resourcePool(),
                 tr("Devices with non-empty archive"),
                 tr("Cameras with non-empty archive")
                 );
         case BytesColumn:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
+                resourcePool(),
                 tr("Storage space occupied by devices"),
                 tr("Storage space occupied by cameras")
                 );
@@ -307,7 +310,11 @@ QVariant QnRecordingStatsModel::headerData(int section, Qt::Orientation orientat
     {
         switch (section)
         {
-            case CameraNameColumn: return QnDeviceDependentStrings::getDefaultNameFromSet(tr("Device"), tr("Camera"));
+            case CameraNameColumn:
+                return QnDeviceDependentStrings::getDefaultNameFromSet(
+                    resourcePool(),
+                    tr("Device"),
+                    tr("Camera"));
             case BytesColumn:      return tr("Space");
             case DurationColumn:   return tr("Calendar Days");
             case BitrateColumn:    return tr("Bitrate");

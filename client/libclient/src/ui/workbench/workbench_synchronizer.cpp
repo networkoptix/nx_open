@@ -23,7 +23,7 @@ QnWorkbenchSynchronizer::QnWorkbenchSynchronizer(QObject *parent):
         delete workbench()->layouts().back();
 
     /* Start listening to changes. */
-    connect(qnResPool,      &QnResourcePool::resourceRemoved,  this,   &QnWorkbenchSynchronizer::at_resourcePool_resourceRemoved);
+    connect(resourcePool(),      &QnResourcePool::resourceRemoved,  this,   &QnWorkbenchSynchronizer::at_resourcePool_resourceRemoved);
     connect(workbench(),    &QnWorkbench::layoutsChanged,      this,   &QnWorkbenchSynchronizer::at_workbench_layoutsChanged);
 
     m_submit = m_update = true;
@@ -33,7 +33,7 @@ QnWorkbenchSynchronizer::~QnWorkbenchSynchronizer() {
     m_submit = m_update = false;
 
     /* Stop listening to changes. */
-    disconnect(qnResPool, NULL, this, NULL);
+    disconnect(resourcePool(), NULL, this, NULL);
     disconnect(workbench(), NULL, this, NULL);
 
     /* Clean workbench's layouts. */
@@ -70,7 +70,7 @@ void QnWorkbenchSynchronizer::submit()
             if (context()->user())
                 resource->setParentId(context()->user()->getId());
 
-            qnResPool->addResource(resource);
+            resourcePool()->addResource(resource);
         }
     }
 }

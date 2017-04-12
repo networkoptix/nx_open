@@ -683,7 +683,7 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
 
     for (const QnLayoutItemData &item : layout->getItems())
     {
-        QnResourcePtr resource = qnResPool->getResourceByDescriptor(item.resource);
+        QnResourcePtr resource = resourcePool()->getResourceByDescriptor(item.resource);
         if (!resource)
             continue;
         if (resource->getParentResource() == layout)
@@ -939,7 +939,7 @@ void QnWorkbenchExportHandler::at_camera_exportFinished(bool success, const QStr
     {
         QnAviResourcePtr file(new QnAviResource(fileName));
         file->setStatus(Qn::Online);
-        qnResPool->addResource(file);
+        resourcePool()->addResource(file);
         showExportCompleteMessage();
     }
     else if (tool->status() != StreamRecorderError::noError)

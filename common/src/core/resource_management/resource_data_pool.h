@@ -7,7 +7,8 @@
 #include <core/resource/resource_data.h>
 #include <core/resource/resource_fwd.h>
 
-class QnResourceDataPool: public QObject {
+class QnResourceDataPool: public QObject
+{
     Q_OBJECT;
 public:
     QnResourceDataPool(QObject *parent = NULL);
@@ -26,7 +27,7 @@ public:
     QnResourceData data(const QnConstSecurityCamResourcePtr &camera) const;
     QnResourceData data(const QString& _vendor, const QString& model, const QString& firmware = QString()) const;
 
-    
+
     bool load(const QString &fileName);
 
 private:

@@ -3,11 +3,23 @@
 #include "transaction/transaction_message_bus.h"
 #include <nx/fusion/model_functions.h>
 
-int QnActiveConnectionsRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor *) {
+QnActiveConnectionsRestHandler::QnActiveConnectionsRestHandler(
+    const ec2::QnTransactionMessageBus* messageBus):
+    QnJsonRestHandler(),
+    m_messageBus(messageBus)
+{
+}
+
+int QnActiveConnectionsRestHandler::executeGet(
+    const QString &path,
+    const QnRequestParams &params,
+    QnJsonRestResult &result,
+    const QnRestConnectionProcessor *)
+{
     Q_UNUSED(path)
     Q_UNUSED(params)
 
-    QList<ec2::QnTransportConnectionInfo> connectionsInfo = qnTransactionBus->connectionsInfo();
+    QList<ec2::QnTransportConnectionInfo> connectionsInfo = m_messageBus->connectionsInfo();
 
     QJsonArray connections;
     for (const ec2::QnTransportConnectionInfo &info: connectionsInfo) {

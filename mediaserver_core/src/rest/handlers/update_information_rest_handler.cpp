@@ -43,22 +43,23 @@ qint64 freeSpaceForUpdate()
 
 template<typename ReplyType, typename MergeFunction>
 void requestRemotePeers(
+    QnCommonModule* commonModule,
     const QString& path,
     ReplyType& outputReply,
     QnMultiserverRequestContext<QnEmptyRequestData>* context,
     const MergeFunction& mergeFunction)
 {
-    const auto systemName = qnGlobalSettings->systemName();
+    const auto systemName = commonModule->globalSettings()->systemName();
 
-    auto servers = QSet<QnMediaServerResourcePtr>::fromList(qnResPool->getAllServers(Qn::Online));
+    auto servers = QSet<QnMediaServerResourcePtr>::fromList(commonModule->resourcePool()->getAllServers(Qn::Online));
 
-    for (const auto& moduleInformation: QnModuleFinder::instance()->foundModules())
+    for (const auto& moduleInformation: commonModule->moduleFinder()->foundModules())
     {
         if (moduleInformation.systemName != systemName)
             continue;
 
         const auto server =
-            qnResPool->getResourceById<QnMediaServerResource>(moduleInformation.id);
+            commonModule->resourcePool()->getResourceById<QnMediaServerResource>(moduleInformation.id);
         if (!server)
             continue;
 
@@ -91,12 +92,13 @@ void requestRemotePeers(
             };
 
         const QUrl apiUrl = getServerApiUrl(path, server, context);
-        runMultiserverDownloadRequest(apiUrl, server, completionFunc, context);
+        runMultiserverDownloadRequest(commonModule->router(), apiUrl, server, completionFunc, context);
         context->waitForDone();
     }
 }
 
 void loadFreeSpaceRemotely(
+    QnCommonModule* commonModule,
     const QString& path,
     QnUpdateFreeSpaceReply& outputReply,
     QnMultiserverRequestContext<QnEmptyRequestData>* context)
@@ -116,10 +118,11 @@ void loadFreeSpaceRemotely(
             }
         };
 
-    requestRemotePeers(path, outputReply, context, mergeFunction);
+    requestRemotePeers(commonModule, path, outputReply, context, mergeFunction);
 }
 
 void checkCloudHostRemotely(
+    QnCommonModule* commonModule,
     const QString& path,
     QnCloudHostCheckReply& outputReply,
     QnMultiserverRequestContext<QnEmptyRequestData>* context)
@@ -135,7 +138,7 @@ void checkCloudHostRemotely(
                 outputReply.failedServers.append(serverId);
         };
 
-    requestRemotePeers(path, outputReply, context, mergeFunction);
+    requestRemotePeers(commonModule, path, outputReply, context, mergeFunction);
 }
 
 } // namespace
@@ -147,7 +150,7 @@ int QnUpdateInformationRestHandler::executeGet(
     QByteArray& contentType,
     const QnRestConnectionProcessor* processor)
 {
-    const auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(params);
+    const auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(processor->resourcePool(), params);
 
     QnMultiserverRequestContext<QnEmptyRequestData> context(
         request, processor->owner()->getPort());
@@ -155,11 +158,11 @@ int QnUpdateInformationRestHandler::executeGet(
     if (path.endsWith(lit("/freeSpaceForUpdateFiles")))
     {
         QnUpdateFreeSpaceReply reply;
-        const auto moduleGuid = qnCommon->moduleGUID();
+        const auto moduleGuid = processor->commonModule()->moduleGUID();
         reply.freeSpaceByServerId[moduleGuid] = freeSpaceForUpdate();
 
         if (!request.isLocal)
-            loadFreeSpaceRemotely(path, reply, &context);
+            loadFreeSpaceRemotely(processor->commonModule(), path, reply, &context);
 
         QnFusionRestHandlerDetail::serialize(reply, result, contentType, request.format);
         return nx_http::StatusCode::ok;
@@ -167,10 +170,10 @@ int QnUpdateInformationRestHandler::executeGet(
     else if (path.endsWith(lit("/checkCloudHost")))
     {
         QnCloudHostCheckReply reply;
-        reply.cloudHost = qnGlobalSettings->cloudHost();
+        reply.cloudHost = processor->globalSettings()->cloudHost();
 
         if (!request.isLocal)
-            checkCloudHostRemotely(path, reply, &context);
+            checkCloudHostRemotely(processor->commonModule(), path, reply, &context);
 
         QnFusionRestHandlerDetail::serialize(reply, result, contentType, request.format);
         return nx_http::StatusCode::ok;

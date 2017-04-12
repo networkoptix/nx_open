@@ -7,14 +7,16 @@
 
 #include "streaming_chunk.h"
 #include "streaming_chunk_cache_key.h"
+#include <common/common_module_aware.h>
 
 
 /*!
     \note Not thread-safe
 */
-class StreamingChunkProvider
+class StreamingChunkProvider: public QnCommonModuleAware
 {
 public:
+    StreamingChunkProvider(QnCommonModule* commonModule);
     /*!
         Posts a task to transcoder to create required chunk.
         Does not wait for transcoding to complete, so returned chunk is still filled with data, or transcoding could be not even started if chunk time is in future

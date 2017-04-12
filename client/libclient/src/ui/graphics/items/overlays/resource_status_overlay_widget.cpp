@@ -428,7 +428,12 @@ void QnStatusOverlayWidget::updateAreasSizes()
         imageSceneSize.setHeight(thirdHeight);
         imageSceneSize.setWidth(thirdHeight * aspect);
     }
-    m_imageItem.setScale(imageSceneSize.width() / imageSize.width());
+
+    const auto imageItemScale = qFuzzyIsNull(imageSize.width())
+        ? 1.0
+        : imageSceneSize.width() / imageSize.width();
+
+    m_imageItem.setScale(imageItemScale);
     m_imageItem.setPos((rect.width() - imageSceneSize.width()) / 2,
         (rect.height() - imageSceneSize.height()) / 2);
 

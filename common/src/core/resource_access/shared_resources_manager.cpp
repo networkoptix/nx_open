@@ -17,17 +17,18 @@ static const QSet<QnUuid> kEmpty;
 
 QnSharedResourcesManager::QnSharedResourcesManager(QObject* parent):
     base_type(parent),
+    QnCommonModuleAware(parent),
     m_mutex(QnMutex::NonRecursive),
     m_sharedResources()
 {
-    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         &QnSharedResourcesManager::handleResourceAdded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnSharedResourcesManager::handleResourceRemoved);
 
-    connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
+    connect(userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
         &QnSharedResourcesManager::handleRoleAddedOrUpdated);
-    connect(qnUserRolesManager, &QnUserRolesManager::userRoleRemoved, this,
+    connect(userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
         &QnSharedResourcesManager::handleRoleRemoved);
 }
 
@@ -50,7 +51,7 @@ void QnSharedResourcesManager::reset(const ec2::ApiAccessRightsDataList& accessi
         }
     }
 
-    for (const auto& subject: qnResourceAccessSubjectsCache->allSubjects())
+    for (const auto& subject: resourceAccessSubjectsCache()->allSubjects())
     {
         auto oldValues = oldValuesMap.value(subject.id());
         auto newValues = sharedResources(subject);
@@ -124,7 +125,7 @@ void QnSharedResourcesManager::handleRoleAddedOrUpdated(const ec2::ApiUserRoleDa
 void QnSharedResourcesManager::handleRoleRemoved(const ec2::ApiUserRoleData& userRole)
 {
     handleSubjectRemoved(userRole);
-    for (auto subject: qnResourceAccessSubjectsCache->usersInRole(userRole.id))
+    for (auto subject: resourceAccessSubjectsCache()->usersInRole(userRole.id))
         setSharedResourcesInternal(subject, kEmpty);
 }
 

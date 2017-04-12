@@ -1,5 +1,4 @@
-#ifndef _STREAM_RECORDER_H__
-#define _STREAM_RECORDER_H__
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -32,12 +31,16 @@ extern "C"
 
 #include <recording/stream_recorder_data.h>
 #include <boost/optional.hpp>
+#include <common/common_module_aware.h>
 
 class QnAbstractMediaStreamDataProvider;
 class QnFfmpegAudioTranscoder;
 class QnFfmpegVideoTranscoder;
 
-class QnStreamRecorder : public QnAbstractDataConsumer, public QnResourceConsumer
+class QnStreamRecorder:
+    public QnAbstractDataConsumer,
+    public QnResourceConsumer,
+    public QnCommonModuleAware
 {
     Q_OBJECT
 
@@ -206,5 +209,3 @@ private:
 };
 
 #endif // ENABLE_DATA_PROVIDERS
-
-#endif // _STREAM_RECORDER_H__

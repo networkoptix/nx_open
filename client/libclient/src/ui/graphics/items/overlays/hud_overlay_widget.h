@@ -1,7 +1,5 @@
 #pragma once
 
-#include <client/client_color_types.h>
-
 #include <ui/customization/customized.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 
@@ -14,8 +12,6 @@ class QnHudOverlayWidgetPrivate;
 class QnHudOverlayWidget: public Customized<QnViewportBoundWidget>
 {
     Q_OBJECT
-    Q_PROPERTY(QnResourceHudColors colors READ colors WRITE setColors)
-
     using base_type = Customized<QnViewportBoundWidget>;
 
 public:
@@ -36,10 +32,6 @@ public:
 
     /** Right container for additional data (above position). */
     QGraphicsWidget* right() const;
-
-    /** Colors. */
-    QnResourceHudColors colors() const;
-    void setColors(const QnResourceHudColors& colors);
 
 private:
     Q_DECLARE_PRIVATE(QnHudOverlayWidget)

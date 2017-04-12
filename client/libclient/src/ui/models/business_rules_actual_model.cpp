@@ -3,20 +3,22 @@
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
 
+#include <common/common_module.h>
+
 #include "ui/workbench/workbench_context.h"
 
 QnBusinessRulesActualModel::QnBusinessRulesActualModel(QObject *parent):
     QnBusinessRulesViewModel(parent)
 {
-    connect(QnCommonMessageProcessor::instance(),           &QnCommonMessageProcessor::businessRuleChanged, this, &QnBusinessRulesActualModel::at_message_ruleChanged);
-    connect(QnCommonMessageProcessor::instance(),           &QnCommonMessageProcessor::businessRuleDeleted, this, &QnBusinessRulesActualModel::at_message_ruleDeleted);
-    connect(QnCommonMessageProcessor::instance(),           &QnCommonMessageProcessor::businessRuleReset,   this, &QnBusinessRulesActualModel::at_message_ruleReset);
+    connect(qnCommonMessageProcessor,           &QnCommonMessageProcessor::businessRuleChanged, this, &QnBusinessRulesActualModel::at_message_ruleChanged);
+    connect(qnCommonMessageProcessor,           &QnCommonMessageProcessor::businessRuleDeleted, this, &QnBusinessRulesActualModel::at_message_ruleDeleted);
+    connect(qnCommonMessageProcessor,           &QnCommonMessageProcessor::businessRuleReset,   this, &QnBusinessRulesActualModel::at_message_ruleReset);
 
     reset();
 }
 
 void QnBusinessRulesActualModel::reset() {
-    at_message_ruleReset(QnCommonMessageProcessor::instance()->businessRules().values());
+    at_message_ruleReset(qnCommonMessageProcessor->businessRules().values());
 }
 
 void QnBusinessRulesActualModel::saveRule(const QModelIndex &index) {
@@ -25,13 +27,13 @@ void QnBusinessRulesActualModel::saveRule(const QModelIndex &index) {
     if (m_savingRules.values().contains(ruleModel))
         return;
 
-    if (!QnAppServerConnectionFactory::getConnection2())
+    if (!commonModule()->ec2Connection())
         return;
 
     QnBusinessEventRulePtr rule = ruleModel->createRule();
 
     //TODO: #GDM SafeMode
-    int handle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager(Qn::kSystemAccess)->save(
+    int handle = commonModule()->ec2Connection()->getBusinessEventManager(Qn::kSystemAccess)->save(
         rule, this, [this, rule]( int handle, ec2::ErrorCode errorCode ){ at_resources_saved( handle, errorCode, rule ); } );
     m_savingRules[handle] = ruleModel;
 }

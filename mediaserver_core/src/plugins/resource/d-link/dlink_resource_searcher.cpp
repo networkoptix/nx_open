@@ -9,6 +9,7 @@
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
+#include <common/static_common_module.h>
 
 unsigned char request[] = {0xfd, 0xfd, 0x06, 0x00, 0xa1, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00};
 QByteArray barequest(reinterpret_cast<char *>(request), sizeof(request));
@@ -19,7 +20,9 @@ extern QString getValueFromString(const QString& line);
 
 #define CL_BROAD_CAST_RETRY 1
 
-QnPlDlinkResourceSearcher::QnPlDlinkResourceSearcher()
+QnPlDlinkResourceSearcher::QnPlDlinkResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule)
 {
 }
 
@@ -144,7 +147,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             if (rt.isNull())
                 continue;
 
-            QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), name);
+            QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), name);
             if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
                 continue; // model forced by ONVIF
 
@@ -219,7 +222,7 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, c
     if (rt.isNull())
         return QList<QnResourcePtr>();
 
-    QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), name);
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), name);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return QList<QnResourcePtr>(); // model forced by ONVIF
 

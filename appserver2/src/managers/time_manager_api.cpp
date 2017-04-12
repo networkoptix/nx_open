@@ -14,15 +14,17 @@
 namespace ec2
 {
     template<typename QueryProcessorType>
-    QnTimeNotificationManager<QueryProcessorType>::QnTimeNotificationManager()
+    QnTimeNotificationManager<QueryProcessorType>::QnTimeNotificationManager(
+        TimeSynchronizationManager* timeSyncManager):
+        m_timeSyncManager(timeSyncManager)
     {
-        connect (TimeSynchronizationManager::instance(), &TimeSynchronizationManager::primaryTimeServerSelectionRequired,
+        connect (timeSyncManager, &TimeSynchronizationManager::primaryTimeServerSelectionRequired,
                  this, &QnTimeNotificationManager<QueryProcessorType>::timeServerSelectionRequired,
                  Qt::DirectConnection );
-        connect (TimeSynchronizationManager::instance(), &TimeSynchronizationManager::timeChanged,
+        connect (timeSyncManager, &TimeSynchronizationManager::timeChanged,
                  this, &QnTimeNotificationManager<QueryProcessorType>::timeChanged,
                  Qt::DirectConnection );
-        connect (TimeSynchronizationManager::instance(), &TimeSynchronizationManager::peerTimeChanged,
+        connect (timeSyncManager, &TimeSynchronizationManager::peerTimeChanged,
                  this, &QnTimeNotificationManager<QueryProcessorType>::peerTimeChanged,
                  Qt::DirectConnection );
     }
@@ -31,14 +33,18 @@ namespace ec2
     QnTimeNotificationManager<QueryProcessorType>::~QnTimeNotificationManager()
     {
         //safely disconnecting from TimeSynchronizationManager
-        if (TimeSynchronizationManager::instance())
-            TimeSynchronizationManager::instance()->disconnectAndJoin( this );
+        if (m_timeSyncManager)
+            m_timeSyncManager->disconnectAndJoin( this );
     }
 
     template<class QueryProcessorType>
-    QnTimeManager<QueryProcessorType>::QnTimeManager(QueryProcessorType* queryProcessor, const Qn::UserAccessData &userAccessData)
+    QnTimeManager<QueryProcessorType>::QnTimeManager(
+        QueryProcessorType* queryProcessor,
+        TimeSynchronizationManager* timeSyncManager,
+        const Qn::UserAccessData &userAccessData)
     :
         m_queryProcessor( queryProcessor ),
+        m_timeSyncManager(timeSyncManager),
         m_userAccessData(userAccessData)
     {
     }
@@ -51,7 +57,7 @@ namespace ec2
     template<class QueryProcessorType>
     QnPeerTimeInfoList QnTimeManager<QueryProcessorType>::getPeerTimeInfoList() const
     {
-        return TimeSynchronizationManager::instance()->getPeerTimeInfoList();
+        return m_timeSyncManager->getPeerTimeInfoList();
     }
 
     template<class QueryProcessorType>
@@ -60,7 +66,7 @@ namespace ec2
         const int reqID = generateRequestID();
         nx::utils::concurrent::run(
             Ec2ThreadPool::instance(),
-            std::bind( &impl::CurrentTimeHandler::done, handler, reqID, ec2::ErrorCode::ok, TimeSynchronizationManager::instance()->getSyncTime() ) );
+            std::bind( &impl::CurrentTimeHandler::done, handler, reqID, ec2::ErrorCode::ok, m_timeSyncManager->getSyncTime() ) );
         return reqID;
     }
 
@@ -81,7 +87,7 @@ namespace ec2
     template<class QueryProcessorType>
     void QnTimeManager<QueryProcessorType>::forceTimeResync()
     {
-        return TimeSynchronizationManager::instance()->forceTimeResync();
+        return m_timeSyncManager->forceTimeResync();
     }
 
 

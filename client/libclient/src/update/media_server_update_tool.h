@@ -4,6 +4,8 @@
 
 #include <QtCore/QObject>
 
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource/resource_fwd.h>
 
 #include <update/updates_common.h>
@@ -19,7 +21,7 @@ class QnInstallUpdatesPeerTask;
 class QnRestUpdatePeerTask;
 struct QnLowFreeSpaceWarning;
 
-class QnMediaServerUpdateTool: public Connective<QObject>
+class QnMediaServerUpdateTool: public Connective<QObject>, public QnConnectionContextAware
 {
     Q_OBJECT
 

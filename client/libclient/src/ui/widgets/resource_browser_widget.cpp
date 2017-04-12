@@ -21,6 +21,9 @@
 #include <client/client_runtime_settings.h>
 
 #include <common/common_meta_types.h>
+#include <common/common_module.h>
+
+#include <client_core/client_core_module.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
@@ -88,7 +91,8 @@ static void updateTreeItem(QnResourceTreeWidget* tree, const QnWorkbenchItem* it
     if (!item)
         return;
 
-    const auto resource = qnResPool->getResourceByUniqueId(item->resourceUid());
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    const auto resource = resourcePool->getResourceByUniqueId(item->resourceUid());
     if (!resource)
         return;
 
@@ -117,6 +121,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     ui->typeComboBox->addItem(tr("Video Files"), static_cast<int>(Qn::local | Qn::video));
     ui->typeComboBox->addItem(tr("Image Files"), static_cast<int>(Qn::still_image));
     ui->typeComboBox->addItem(QnDeviceDependentStrings::getDefaultNameFromSet(
+        resourcePool(),
         tr("Live Devices"),
         tr("Live Cameras")
     ), static_cast<int>(Qn::live));
@@ -138,6 +143,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
 
     m_renameActions.insert(QnActions::RenameResourceAction, new QAction(this));
     m_renameActions.insert(QnActions::RenameVideowallEntityAction, new QAction(this));
+    m_renameActions.insert(QnActions::RenameLayoutTourAction, new QAction(this));
 
     setHelpTopic(this, Qn::MainWindow_Tree_Help);
     setHelpTopic(ui->searchTab, Qn::MainWindow_Tree_Search_Help);
@@ -184,7 +190,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     *m_disconnectHelper << connect(this->context(), &QnWorkbenchContext::userChanged,
         this, [this]() { ui->tabWidget->setCurrentWidget(ui->resourcesTab); });
 
-    *m_disconnectHelper << connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    *m_disconnectHelper << connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
         {
             if (resource == m_tooltipResource)
@@ -431,7 +437,7 @@ QnVideoWallItemIndexList QnResourceBrowserWidget::selectedVideoWallItems() const
         QnUuid uuid = modelIndex.data(Qn::ItemUuidRole).value<QnUuid>();
         if (uuid.isNull())
             continue;
-        QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(uuid);
+        QnVideoWallItemIndex index = resourcePool()->getVideoWallItemByUuid(uuid);
         if (!index.isNull())
             result.push_back(index);
     }
@@ -449,7 +455,7 @@ QnVideoWallMatrixIndexList QnResourceBrowserWidget::selectedVideoWallMatrices() 
         if (uuid.isNull())
             continue;
 
-        QnVideoWallMatrixIndex index = qnResPool->getVideoWallMatrixByUuid(uuid);
+        QnVideoWallMatrixIndex index = resourcePool()->getVideoWallMatrixByUuid(uuid);
         if (!index.isNull())
             result.push_back(index);
     }
@@ -586,6 +592,7 @@ QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope sc
         }
         case Qn::LayoutItemNode:
             return withNodeType(selectedLayoutItems());
+
         default:
             break;
     }
@@ -598,10 +605,7 @@ QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope sc
 
     /* We can select several layouts and some other resources in any part of tree - in this case just do not set anything. */
     QnUserResourcePtr user;
-    QnUuid roleId;
-
-    if (nodeType == Qn::RoleNode)
-        roleId = index.data(Qn::UuidRole).value<QnUuid>();
+    QnUuid uuid = index.data(Qn::UuidRole).value<QnUuid>();
 
     switch (parentNodeType)
     {
@@ -611,7 +615,7 @@ QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope sc
         case Qn::SharedResourcesNode:
         case Qn::SharedLayoutsNode:
             user = parentIndex.parent().data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
-            roleId = parentIndex.parent().data(Qn::UuidRole).value<QnUuid>();
+            uuid = parentIndex.parent().data(Qn::UuidRole).value<QnUuid>();
             break;
         case Qn::ResourceNode:
             user = parentIndex.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
@@ -621,7 +625,7 @@ QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope sc
     }
 
     result.setArgument(Qn::UserResourceRole, user);
-    result.setArgument(Qn::UuidRole, roleId);
+    result.setArgument(Qn::UuidRole, uuid);
     result.setArgument(Qn::NodeTypeRole, nodeType);
     return result;
 }
@@ -938,7 +942,7 @@ void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool
 
     if (nodeType == Qn::VideoWallItemNode)
     {
-        auto item = qnResPool->getVideoWallItemByUuid(index.data(Qn::UuidRole).value<QnUuid>());
+        auto item = resourcePool()->getVideoWallItemByUuid(index.data(Qn::UuidRole).value<QnUuid>());
         menu()->triggerIfPossible(QnActions::StartVideoWallControlAction,
             QnVideoWallItemIndexList() << item);
         return;

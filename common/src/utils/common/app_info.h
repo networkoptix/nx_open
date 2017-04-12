@@ -37,6 +37,11 @@ public:
     static Q_INVOKABLE QString productNameLong();
     static Q_INVOKABLE QString customizationName();
 
+    static Q_INVOKABLE QString brand()
+    {
+        return productNameShort();
+    }
+
     static Q_INVOKABLE QString defaultLanguage();
 
     static Q_INVOKABLE QString clientExecutableName();

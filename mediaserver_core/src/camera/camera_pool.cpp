@@ -30,7 +30,6 @@ VideoCameraLocker::~VideoCameraLocker()
 //-------------------------------------------------------------------------------------------------
 // QnVideoCameraPool
 
-QnMutex QnVideoCameraPool::m_staticMtx;
 
 void QnVideoCameraPool::stop()
 {
@@ -44,29 +43,19 @@ void QnVideoCameraPool::stop()
     m_cameras.clear();
 }
 
+QnVideoCameraPool::QnVideoCameraPool(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
+{
+}
+
 QnVideoCameraPool::~QnVideoCameraPool()
 {
     stop();
 }
 
-static QnVideoCameraPool* globalInstance = NULL;
-
-void QnVideoCameraPool::initStaticInstance( QnVideoCameraPool* inst )
-{
-    globalInstance = inst;
-}
-
-QnVideoCameraPool* QnVideoCameraPool::instance()
-{
-    return globalInstance;
-    //QnMutexLocker lock( &m_staticMtx );
-    //static QnVideoCameraPool inst;
-    //return &inst;
-}
-
 void QnVideoCameraPool::updateActivity()
 {
-    QnMutexLocker lock(&m_staticMtx);
+    QnMutexLocker lock(&m_mutex);
     for (const auto&camera: m_cameras)
         camera->updateActivity();
 }
@@ -75,7 +64,7 @@ QnVideoCameraPtr QnVideoCameraPool::getVideoCamera(const QnResourcePtr& res) con
 {
     if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))
         return QnVideoCameraPtr();
-    QnMutexLocker lock(&m_staticMtx);
+    QnMutexLocker lock(&m_mutex);
     CameraMap::const_iterator itr = m_cameras.find(res);
     return itr == m_cameras.cend() ? QnVideoCameraPtr() : itr.value();
 }
@@ -84,20 +73,20 @@ QnVideoCameraPtr QnVideoCameraPool::addVideoCamera(const QnResourcePtr& res)
 {
     if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))
         return QnVideoCameraPtr();
-    QnMutexLocker lock(&m_staticMtx);
+    QnMutexLocker lock(&m_mutex);
     return m_cameras.insert(res, QnVideoCameraPtr(new QnVideoCamera(res))).value();
 }
 
 void QnVideoCameraPool::removeVideoCamera(const QnResourcePtr& res)
 {
-    QnMutexLocker lock( &m_staticMtx );
+    QnMutexLocker lock( &m_mutex );
     m_cameras.remove( res );
 }
 
-std::unique_ptr<VideoCameraLocker> 
+std::unique_ptr<VideoCameraLocker>
     QnVideoCameraPool::getVideoCameraLockerByResourceId(const QnUuid& id) const
 {
-    QnResourcePtr resource = qnResPool->getResourceById(id);
+    QnResourcePtr resource = resourcePool()->getResourceById(id);
     if (!resource)
         return nullptr;
 

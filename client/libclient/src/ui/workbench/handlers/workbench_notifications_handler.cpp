@@ -63,19 +63,19 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
     connect(context(), &QnWorkbenchContext::userChanged,
         this, &QnWorkbenchNotificationsHandler::at_context_userChanged);
 
-    connect(qnLicensePool, &QnLicensePool::licensesChanged, this,
+    connect(licensePool(), &QnLicensePool::licensesChanged, this,
         [this]
         {
             checkAndAddSystemHealthMessage(QnSystemHealth::NoLicenses);
         });
 
-    connect(qnCommon, &QnCommonModule::readOnlyChanged, this,
+    connect(commonModule(), &QnCommonModule::readOnlyChanged, this,
         [this]
         {
             checkAndAddSystemHealthMessage(QnSystemHealth::SystemIsReadOnly);
         });
 
-    QnCommonMessageProcessor *messageProcessor = QnCommonMessageProcessor::instance();
+    QnCommonMessageProcessor *messageProcessor = qnCommonMessageProcessor;
     connect(messageProcessor, &QnCommonMessageProcessor::connectionOpened, this,
         &QnWorkbenchNotificationsHandler::at_eventManager_connectionOpened);
     connect(messageProcessor, &QnCommonMessageProcessor::connectionClosed, this,
@@ -105,7 +105,7 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
         &QnPropertyNotifier::valueChanged, this,
         &QnWorkbenchNotificationsHandler::at_settings_valueChanged);
 
-    connect(QnGlobalSettings::instance(), &QnGlobalSettings::emailSettingsChanged, this,
+    connect(qnGlobalSettings, &QnGlobalSettings::emailSettingsChanged, this,
         &QnWorkbenchNotificationsHandler::at_emailSettingsChanged);
 }
 
@@ -270,7 +270,7 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(QnSyst
 {
     bool canShow = true;
 
-    bool connected = !qnCommon->remoteGUID().isNull();
+    bool connected = !commonModule()->remoteGUID().isNull();
 
     if (!connected)
     {
@@ -324,7 +324,7 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
             return;
 
         case QnSystemHealth::SystemIsReadOnly:
-            setSystemHealthEventVisible(message, context()->user() && qnCommon->isReadOnly());
+            setSystemHealthEventVisible(message, context()->user() && commonModule()->isReadOnly());
             return;
 
         case QnSystemHealth::EmailIsEmpty:
@@ -337,7 +337,7 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
             return;
 
         case QnSystemHealth::NoLicenses:
-            setSystemHealthEventVisible(message, context()->user() && qnLicensePool->isEmpty());
+            setSystemHealthEventVisible(message, context()->user() && licensePool()->isEmpty());
             return;
 
         case QnSystemHealth::SmtpIsNotSet:
@@ -394,7 +394,7 @@ void QnWorkbenchNotificationsHandler::at_eventManager_connectionOpened()
 void QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed()
 {
     clear();
-    if (!qnCommon->remoteGUID().isNull())
+    if (!commonModule()->remoteGUID().isNull())
         setSystemHealthEventVisible(QnSystemHealth::ConnectionLost, true);
 }
 
@@ -469,6 +469,6 @@ void QnWorkbenchNotificationsHandler::at_settings_valueChanged(int id)
 
 void QnWorkbenchNotificationsHandler::at_emailSettingsChanged()
 {
-    QnEmailSettings settings = QnGlobalSettings::instance()->emailSettings();
+    QnEmailSettings settings = qnGlobalSettings->emailSettings();
     setSystemHealthEventVisible(QnSystemHealth::SmtpIsNotSet, context()->user() && !settings.isValid());
 }

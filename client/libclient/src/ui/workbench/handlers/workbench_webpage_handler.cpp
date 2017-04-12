@@ -1,5 +1,7 @@
 #include "workbench_webpage_handler.h"
 
+#include <common/common_module.h>
+
 #include <client/client_message_processor.h>
 
 #include <core/resource/webpage_resource.h>
@@ -15,11 +17,12 @@ QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject* parent /*= nullptr
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
+
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
-        []()
+        [this]
         {
-            /* Online status is set by default, page will go offline if will be unreachable on opening. */
-            for (const auto& webPage: qnResPool->getResources<QnWebPageResource>())
+            // Online status by default, page will go offline if will be unreachable on opening.
+            for (auto webPage: resourcePool()->getResources<QnWebPageResource>())
                 webPage->setStatus(Qn::Online);
         });
 

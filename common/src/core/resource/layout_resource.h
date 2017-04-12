@@ -27,7 +27,7 @@ class QnLayoutResource: public QnResource,
     typedef QnResource base_type;
 
 public:
-    QnLayoutResource();
+    QnLayoutResource(QnCommonModule* commonModule = nullptr);
 
     virtual QString getUniqueId() const override;
     virtual Qn::ResourceStatus getStatus() const override;
@@ -109,7 +109,7 @@ public:
     QSet<QnResourcePtr> layoutResources() const;
 
     /** Get all resources placed on the layout. WARNING: method is SLOW! */
-    static QSet<QnResourcePtr> layoutResources(const QnLayoutItemDataMap& items);
+    static QSet<QnResourcePtr> layoutResources(QnResourcePool* resourcePool, const QnLayoutItemDataMap& items);
 
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);

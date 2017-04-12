@@ -17,7 +17,6 @@
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
 #include <api/runtime_info_manager.h>
-#include <common/common_module.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <llutil/hardware_id.h>
@@ -28,6 +27,7 @@
 #include <nx1/info.h>
 
 #include "ec2_connection_processor.h"
+#include <test_support/resource/test_resource_factory.h>
 
 static int registerQtResources()
 {
@@ -37,6 +37,8 @@ static int registerQtResources()
 
 //namespace nx {
 namespace ec2 {
+
+QnStaticCommonModule Appserver2ProcessPublic::staticCommon(Qn::PT_NotDefined, QString(), QString());
 
 namespace conf {
 
@@ -64,6 +66,11 @@ public:
         return m_settings.value("dbFile", "ecs.sqlite").toString();
     }
 
+    int moduleInstance() const
+    {
+        return m_settings.value("moduleInstance").toInt();
+    }
+
     SocketAddress endpoint() const
     {
         return SocketAddress(m_settings.value("endpoint", "0.0.0.0:0").toString());
@@ -82,12 +89,13 @@ class QnSimpleHttpConnectionListener:
 {
 public:
     QnSimpleHttpConnectionListener(
+        QnCommonModule* commonModule,
         const QHostAddress& address,
         int port,
         int maxConnections,
         bool useSsl)
     :
-        QnHttpConnectionListener(address, port, maxConnections, useSsl)
+        QnHttpConnectionListener(commonModule, address, port, maxConnections, useSsl)
     {
     }
 
@@ -112,12 +120,9 @@ class Appserver2MessageProcessor:
     public QnCommonMessageProcessor
 {
 public:
-    Appserver2MessageProcessor(
-        QnResourcePool* const resourcePool,
-        QnResourceDiscoveryManager* resourceDiscoveryManager)
-        :
-        m_resourcePool(resourcePool),
-        m_resourceDiscoveryManager(resourceDiscoveryManager)
+    Appserver2MessageProcessor(QObject* parent):
+        QnCommonMessageProcessor(parent),
+        m_factory(new nx::TestResourceFactory())
     {
     }
 
@@ -131,19 +136,18 @@ protected:
 
     virtual QnResourceFactory* getResourceFactory() const override
     {
-        return m_resourceDiscoveryManager;
+        return nx::TestResourceFactory::instance();
     }
 
     virtual void updateResource(
         const QnResourcePtr& resource,
         ec2::NotificationSource /*source*/) override
     {
-        m_resourcePool->addResource(resource);
+        commonModule()->resourcePool()->addResource(resource);
     }
 
 protected:
-    QnResourcePool* const m_resourcePool;
-    QnResourceDiscoveryManager* m_resourceDiscoveryManager;
+    std::unique_ptr<nx::TestResourceFactory> m_factory;
 };
 
 Appserver2Process::Appserver2Process(int argc, char** argv)
@@ -165,7 +169,7 @@ void Appserver2Process::pleaseStop()
     //m_processTerminationEvent.set_value();
     QnMutexLocker lk(&m_mutex);
     m_terminated = true;
-    m_cond.wakeAll();
+    m_eventLoop.quit();
 }
 
 void Appserver2Process::setOnStartedEventHandler(
@@ -189,20 +193,16 @@ int Appserver2Process::exec()
 
     registerQtResources();
 
-    QnCommonModule commonModule;
-    commonModule.setModuleGUID(QnUuid::createUuid());
+    m_commonModule.reset(new QnCommonModule(false));
+    m_commonModule->setModuleGUID(QnUuid::createUuid());
 
-    QnResourceDiscoveryManager resourceDiscoveryManager;
+    QnResourceDiscoveryManager resourceDiscoveryManager(m_commonModule.get());
     // Starting receiving notifications.
-    auto messageProcessor = std::make_unique<Appserver2MessageProcessor>(
-        QnResourcePool::instance(),
-        &resourceDiscoveryManager);
-
-    QnRuntimeInfoManager runtimeInfoManager;
+    m_commonModule->createMessageProcessor<Appserver2MessageProcessor>();
 
     ec2::ApiRuntimeData runtimeData;
-    runtimeData.peer.id = qnCommon->moduleGUID();
-    runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
+    runtimeData.peer.id = m_commonModule->moduleGUID();
+    runtimeData.peer.instanceId = m_commonModule->runningInstanceGUID();
     runtimeData.peer.peerType = Qn::PT_Server;
     runtimeData.box = QnAppInfo::armBox();
     runtimeData.brand = QnAppInfo::productNameShort();
@@ -215,7 +215,7 @@ int Appserver2Process::exec()
     }
 
     runtimeData.hardwareIds << QnUuid::createUuid().toString();
-    runtimeInfoManager.updateLocalItem(runtimeData);    // initializing localInfo
+    m_commonModule->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
 
     conf::Settings settings;
     //parsing command line arguments
@@ -226,10 +226,11 @@ int Appserver2Process::exec()
         //TODO
         return 0;
     }
+    m_commonModule->setInstanceCounter(settings.moduleInstance());
 
     //initializeLogging(settings);
     std::unique_ptr<ec2::AbstractECConnectionFactory>
-        ec2ConnectionFactory(getConnectionFactory(Qn::PT_Server, &timerManager));
+        ec2ConnectionFactory(getConnectionFactory(Qn::PT_Server, &timerManager, m_commonModule.get()));
 
     std::map<QString, QVariant> confParams;
     ec2ConnectionFactory->setConfParams(std::move(confParams));
@@ -253,24 +254,28 @@ int Appserver2Process::exec()
         std::this_thread::sleep_for(std::chrono::seconds(3));
     }
 
-    std::unique_ptr<QnRestProcessorPool> restProcessorPool(new QnRestProcessorPool());
-    ec2ConnectionFactory->registerRestHandlers(restProcessorPool.get());
+    //QnAppServerConnectionFactory appServerConnectionFactory;
+    //appServerConnectionFactory.setUrl(dbUrl);
+    //appServerConnectionFactory.setEC2ConnectionFactory(ec2ConnectionFactory.get());
 
-    QnAppServerConnectionFactory appServerConnectionFactory;
-    appServerConnectionFactory.setUrl(dbUrl);
-    appServerConnectionFactory.setEC2ConnectionFactory(ec2ConnectionFactory.get());
-    appServerConnectionFactory.setEc2Connection(ec2Connection);
+    //Must call messageProcessor->init(ec2Connection)
+    //commonModule->setEc2Connection(ec2Connection);
 
     nx_http::HttpModManager httpModManager;
     QnSimpleHttpConnectionListener tcpListener(
+        m_commonModule.get(),
         QHostAddress::Any,
         settings.endpoint().port,
         QnTcpListener::DEFAULT_MAX_CONNECTIONS,
         true);
+
+    ec2ConnectionFactory->registerRestHandlers(tcpListener.processorPool());
+
     if (!tcpListener.bindToLocalAddress())
     {
-        appServerConnectionFactory.setEc2Connection(nullptr);
-        appServerConnectionFactory.setEC2ConnectionFactory(nullptr);
+        //Must call messageProcessor->init(ec2Connection)
+        //commonModule->setEc2Connection(nullptr);
+        //appServerConnectionFactory.setEC2ConnectionFactory(nullptr);
         return 1;
     }
 
@@ -280,10 +285,11 @@ int Appserver2Process::exec()
     }
 
     tcpListener.addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
+    ec2ConnectionFactory->registerTransactionListener(&tcpListener);
 
     tcpListener.start();
 
-    messageProcessor->init(QnAppServerConnectionFactory::getConnection2());
+    m_commonModule->messageProcessor()->init(ec2Connection);
     //ec2Connection->startReceivingNotifications();
 
     processStartResult = true;
@@ -291,22 +297,16 @@ int Appserver2Process::exec()
 
     m_ecConnection = ec2Connection.get();
 
-    {
-        QnMutexLocker lk(&m_mutex);
-        while (!m_terminated)
-            m_cond.wait(lk.mutex());
+    m_eventLoop.exec();
 
-        m_tcpListener = nullptr;
-    }
-
+    m_tcpListener = nullptr;
     tcpListener.pleaseStop();
 
     ec2Connection->stopReceivingNotifications();
-    appServerConnectionFactory.setEc2Connection(nullptr);
-    appServerConnectionFactory.setEC2ConnectionFactory(nullptr);
-
-    m_ecConnection = nullptr;
+    //Must call messageProcessor->init(ec2Connection)
+    m_commonModule->messageProcessor()->init(nullptr);
     ec2Connection.reset();
+    m_ecConnection = nullptr;
 
     return 0;
 }
@@ -314,6 +314,11 @@ int Appserver2Process::exec()
 ec2::AbstractECConnection* Appserver2Process::ecConnection()
 {
     return m_ecConnection.load();
+}
+
+QnCommonModule* Appserver2Process::commonModule() const
+{
+    return m_commonModule.get();
 }
 
 SocketAddress Appserver2Process::endpoint() const
@@ -324,7 +329,6 @@ SocketAddress Appserver2Process::endpoint() const
         endpoint.address = HostAddress::localhost;
     return endpoint;
 }
-
 
 ////////////////////////////////////////////////////////////
 //// class Appserver2ProcessPublic
@@ -371,6 +375,11 @@ ec2::AbstractECConnection* Appserver2ProcessPublic::ecConnection()
 SocketAddress Appserver2ProcessPublic::endpoint() const
 {
     return m_impl->endpoint();
+}
+
+QnCommonModule* Appserver2ProcessPublic::commonModule() const
+{
+    return m_impl->commonModule();
 }
 
 }   // namespace ec2

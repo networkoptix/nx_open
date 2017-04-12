@@ -14,16 +14,18 @@
 #include <nx/utils/thread/mutex.h>
 
 #include "module_information.h"
+#include <common/common_module_aware.h>
 
 class QnMulticastModuleFinder;
 class QnDirectModuleFinder;
 class QnDirectModuleFinderHelper;
 class QTimer;
 
-class QnModuleFinder : public QObject, public Singleton<QnModuleFinder> {
+class QnModuleFinder: public QObject, public QnCommonModuleAware
+{
     Q_OBJECT
 public:
-    QnModuleFinder(bool clientMode);
+    QnModuleFinder(QObject* parent, bool clientMode);
 
     virtual ~QnModuleFinder();
 
@@ -96,9 +98,8 @@ private:
         {}
     };
 
-    void updatePrimaryAddress(ModuleItem &item
-        , const SocketAddress &address);
-
+    void updatePrimaryAddress(ModuleItem &item, const SocketAddress &address);
+    QSet<QUrl> ignoredUrlsForServer(const QnUuid &id);
 private:
     /* Mutex prevents concurrent reading/wrighting of m_moduleItemById content.
      * All modifications are done in private methods and work always in the same thread,
@@ -112,9 +113,9 @@ private:
 
     bool m_clientMode;
 
-    QScopedPointer<QnMulticastModuleFinder> m_multicastModuleFinder;
-    QnDirectModuleFinder *m_directModuleFinder;
-    QnDirectModuleFinderHelper *m_helper;
+    QnMulticastModuleFinder* m_multicastModuleFinder;
+    QnDirectModuleFinder* m_directModuleFinder;
+    QnDirectModuleFinderHelper* m_helper;
 
     QHash<QnUuid, ModuleItem> m_moduleItemById;
     QHash<SocketAddress, QnUuid> m_idByAddress;
@@ -125,4 +126,4 @@ private:
     int m_selfConflictCount;
 };
 
-#define qnModuleFinder QnModuleFinder::instance()
+#define qnModuleFinder commonModule()->moduleFinder()

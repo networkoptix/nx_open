@@ -3,9 +3,11 @@
 #include <QtCore/QFutureWatcher>
 #include <QtConcurrent/QtConcurrent>
 
-#include <client/client_settings.h>
 #include <common/common_module.h>
 #include <common/common_globals.h>
+#include <common/static_common_module.h>
+
+#include <client/client_settings.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
@@ -97,7 +99,7 @@ void QnUpdateProcess::run() {
         setAllPeersStage(QnPeerUpdateStage::Init);
     }
 
-    QnRuntimeInfoManager::instance()->disconnect(this);
+    runtimeInfoManager()->disconnect(this);
     clearUpdateFlag();
 
     QnUpdateResult result(m_updateResult);
@@ -106,7 +108,7 @@ void QnUpdateProcess::run() {
     result.protocolChanged = m_protocolChanged;
 
     for (const QnUuid &id: m_failedPeerIds) {
-        if (QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>())
+        if (QnMediaServerResourcePtr server = resourcePool()->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>())
             result.failedServers.append(server);
     }
 
@@ -146,7 +148,7 @@ void QnUpdateProcess::downloadUpdates() {
         }
     }
 
-    if (qnCommon->engineVersion() != m_target.version && !m_clientRequiresInstaller) {
+    if (qnStaticCommon->engineVersion() != m_target.version && !m_clientRequiresInstaller) {
         QString fileName = m_clientUpdateFile->fileName;
         if (fileName.isEmpty())
             fileName = updateFilePath(m_clientUpdateFile->baseFileName);
@@ -157,7 +159,7 @@ void QnUpdateProcess::downloadUpdates() {
             downloadTargets.insert(m_clientUpdateFile->url, m_clientUpdateFile->baseFileName);
             hashByUrl.insert(m_clientUpdateFile->url, m_clientUpdateFile->md5);
             fileSizeByUrl.insert(m_clientUpdateFile->url, m_clientUpdateFile->fileSize);
-            peerAssociations.insert(m_clientUpdateFile->url, qnCommon->moduleGUID());
+            peerAssociations.insert(m_clientUpdateFile->url, commonModule()->moduleGUID());
         }
     }
 
@@ -238,7 +240,7 @@ void QnUpdateProcess::at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* 
     m_clientUpdateFile = task->clientUpdateFile();
 
     foreach (const QnUuid &serverId, m_target.targets) {
-        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(serverId, true).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = resourcePool()->getIncompatibleResourceById(serverId, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
 
@@ -317,7 +319,7 @@ void QnUpdateProcess::checkFreeSpace()
 
     for (const auto& targetId: m_targetPeerIds)
     {
-        const auto server = qnResPool->getResourceById<QnMediaServerResource>(targetId);
+        const auto server = resourcePool()->getResourceById<QnMediaServerResource>(targetId);
         if (!server || server->getStatus() != Qn::Online)
             m_failedPeerIds.insert(targetId);
     }
@@ -352,7 +354,7 @@ void QnUpdateProcess::installClientUpdate()
     if (m_clientRequiresInstaller
         || m_target.denyClientUpdates
         || qnSettings->isClientUpdateDisabled()
-        || m_clientUpdateFile->version == qnCommon->engineVersion())
+        || m_clientUpdateFile->version == qnStaticCommon->engineVersion())
     {
             NX_LOG(lit("Update: QnUpdateProcess: Client update skipped."), cl_logDEBUG1);
             checkFreeSpace();
@@ -408,7 +410,7 @@ void QnUpdateProcess::at_clientUpdateInstalled()
 }
 
 void QnUpdateProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo &data) {
-    if (data.uuid == qnCommon->moduleGUID())
+    if (data.uuid == commonModule()->moduleGUID())
         return;
 
     if (data.data.updateStarted)
@@ -439,7 +441,7 @@ void QnUpdateProcess::installIncompatiblePeers() {
 void QnUpdateProcess::at_restUpdateTask_peerUpdateFinished(const QnUuid &incompatibleId, const QnUuid &id) {
     QnPeerUpdateInformation info = m_updateInformationById.take(incompatibleId);
     info.stage = QnPeerUpdateStage::Init;
-    info.server = qnResPool->getResourceById<QnMediaServerResource>(id);
+    info.server = resourcePool()->getResourceById<QnMediaServerResource>(id);
     m_updateInformationById.insert(id, info);
     emit targetsChanged(QSet<QnUuid>::fromList(m_updateInformationById.keys()));
     emit peerStageChanged(id, QnPeerUpdateStage::Init);
@@ -485,7 +487,7 @@ void QnUpdateProcess::prepareToUpload() {
     setStage(QnFullUpdateStage::Push);
 
     foreach (const QnUuid &target, m_targetPeerIds) {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(target);
+        QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(target);
         if (!server || server->getStatus() != Qn::Online)
             m_failedPeerIds.insert(target);
     }
@@ -495,8 +497,8 @@ void QnUpdateProcess::prepareToUpload() {
         return;
     }
 
-    connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoAdded,    this,   &QnUpdateProcess::at_runtimeInfoChanged);
-    connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this,   &QnUpdateProcess::at_runtimeInfoChanged);
+    connect(runtimeInfoManager(),   &QnRuntimeInfoManager::runtimeInfoAdded,    this,   &QnUpdateProcess::at_runtimeInfoChanged);
+    connect(runtimeInfoManager(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this,   &QnUpdateProcess::at_runtimeInfoChanged);
 
     if (!setUpdateFlag()) {
         finishUpdate(QnUpdateResult::LockFailed);
@@ -507,22 +509,22 @@ void QnUpdateProcess::prepareToUpload() {
 }
 
 bool QnUpdateProcess::setUpdateFlag() {
-    QnRuntimeInfoManager *runtimeInfoManager = QnRuntimeInfoManager::instance();
-    foreach (const QnPeerRuntimeInfo &runtimeInfo, runtimeInfoManager->items()->getItems()) {
+    for (const QnPeerRuntimeInfo &runtimeInfo: runtimeInfoManager()->items()->getItems())
+    {
         if (runtimeInfo.data.updateStarted)
             return false;
     }
-    QnPeerRuntimeInfo localInfo = runtimeInfoManager->localInfo();
+    QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
     localInfo.data.updateStarted = true;
-    runtimeInfoManager->updateLocalItem(localInfo);
+    runtimeInfoManager()->updateLocalItem(localInfo);
     return true;
 }
 
 void QnUpdateProcess::clearUpdateFlag() {
-    QnPeerRuntimeInfo runtimeInfo = QnRuntimeInfoManager::instance()->localInfo();
+    QnPeerRuntimeInfo runtimeInfo = runtimeInfoManager()->localInfo();
     if (runtimeInfo.data.updateStarted) {
         runtimeInfo.data.updateStarted = false;
-        QnRuntimeInfoManager::instance()->updateLocalItem(runtimeInfo);
+        runtimeInfoManager()->updateLocalItem(runtimeInfo);
     }
 }
 
@@ -550,7 +552,7 @@ void QnUpdateProcess::uploadUpdatesToServers() {
 
     QPointer<QnUploadUpdatesPeerTask> uploadUpdatesPeerTaskPtr(uploadUpdatesPeerTask);
 
-    connect(qnResPool, &QnResourcePool::statusChanged, this, [this, uploadUpdatesPeerTaskPtr](const QnResourcePtr &resource) {
+    connect(resourcePool(), &QnResourcePool::statusChanged, this, [this, uploadUpdatesPeerTaskPtr](const QnResourcePtr &resource) {
         if (m_stage != QnFullUpdateStage::Push)
             return;
 

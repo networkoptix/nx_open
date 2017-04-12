@@ -2,6 +2,8 @@
 
 #include <QtWidgets/QWidget>
 
+#include <client_core/connection_context_aware.h>
+
 #include <common/common_globals.h>
 
 #include <core/resource/resource_fwd.h>
@@ -10,7 +12,8 @@ namespace Ui {
     class CameraExpertSettingsWidget;
 }
 
-class QnCameraExpertSettingsWidget : public QWidget {
+class QnCameraExpertSettingsWidget : public QWidget, public QnConnectionContextAware
+{
     Q_OBJECT
 public:
     QnCameraExpertSettingsWidget(QWidget* parent = 0);

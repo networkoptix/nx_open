@@ -1,10 +1,10 @@
-#ifndef QN_THUMBNAILS_LOADER_H
-#define QN_THUMBNAILS_LOADER_H
+#pragma once
 
 #include <QtCore/QScopedPointer>
 #include <QtCore/QMetaType>
-#include <nx/utils/thread/mutex.h>
 #include <QtCore/QStack>
+
+#include <client_core/connection_context_aware.h>
 
 #include <utils/common/long_runnable.h>
 #include <core/resource/resource_fwd.h>
@@ -12,6 +12,7 @@
 #include "thumbnail.h"
 
 #include <nx/streaming/abstract_archive_delegate.h>
+#include <nx/utils/thread/mutex.h>
 
 class CLVideoDecoderOutput;
 class QnRtspClientArchiveDelegate;
@@ -20,9 +21,8 @@ class QnTimePeriod;
 
 struct SwsContext;
 
-
-
-class QnThumbnailsLoader: public QnLongRunnable {
+class QnThumbnailsLoader: public QnLongRunnable, public QnConnectionContextAware
+{
     Q_OBJECT;
 
     typedef QnLongRunnable base_type;
@@ -33,10 +33,10 @@ public:
         Strict                          /**< Strict mode is used in preview search. */
     };
 
-    /** 
+    /**
      *  Thumbnail loader constructor.
      *  \param resource                 Target camera or archive file
-     *  \param mode                     Working mode. In default mode loader will adjust given time periods (add margins, etc) to show thumbnails 
+     *  \param mode                     Working mode. In default mode loader will adjust given time periods (add margins, etc) to show thumbnails
      *                                  from the middle of the each given period. In strict mode thumbnail is taken from the beginning of the period.
      */
     QnThumbnailsLoader(const QnMediaResourcePtr &resource, Mode mode = Mode::Default);
@@ -48,7 +48,7 @@ public:
 
     void setBoundingSize(const QSize &size);
     QSize boundingSize() const;
-    
+
     QSize sourceSize() const;
     QSize thumbnailSize() const;
 
@@ -113,14 +113,14 @@ private:
 
     QSize m_boundingSize;
     QSize m_targetSize;
-    
+
     SwsContext *m_scaleContext;
     quint8 *m_scaleBuffer;
     QSize m_scaleSourceSize;
     QSize m_scaleTargetSize;
     int m_scaleSourceLine;
     int m_scaleSourceFormat;
-    
+
     QHash<qint64, QnThumbnail> m_thumbnailByTime;
     qint64 m_maxLoadedTime;
     QStack<QnTimePeriod> m_processingStack;
@@ -128,6 +128,3 @@ private:
     int m_generation;
     qreal m_cachedAspectRatio;
 };
-
-#endif // __THUMBNAILS_LOADER_H__
-

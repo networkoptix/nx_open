@@ -24,18 +24,18 @@ QnWorkbenchResourcesChangesWatcher::~QnWorkbenchResourcesChangesWatcher() {
 
 void QnWorkbenchResourcesChangesWatcher::showWarningDialog(const QnResourceList& resources)
 {
-    const auto extras = (qnCommon->isReadOnly()
+    const auto extras = (commonModule()->isReadOnly()
         ? tr("System is in Safe Mode. It is not allowed "
             "to make any changes except license activation.")
             + L'\n' + tr("The following %n items are not saved:", "", resources.size())
 
         : tr("The following %n items are not saved:", "", resources.size()));
 
-    const auto icon = static_cast<QnMessageBoxIcon>(qnCommon->isReadOnly()
+    const auto icon = static_cast<QnMessageBoxIcon>(commonModule()->isReadOnly()
         ? QnMessageBoxIcon::Warning
         : QnMessageBoxIcon::Critical);
 
-    const auto text = (qnCommon->isReadOnly()
+    const auto text = (commonModule()->isReadOnly()
         ? tr("Changing System configuration not allowed in Safe Mode")
         : tr("Failed to save changes"));
 
@@ -48,18 +48,18 @@ void QnWorkbenchResourcesChangesWatcher::showWarningDialog(const QnResourceList&
 
 void QnWorkbenchResourcesChangesWatcher::showDeleteErrorDialog(const QnResourceList& resources)
 {
-    const auto extras = (qnCommon->isReadOnly()
+    const auto extras = (commonModule()->isReadOnly()
         ? tr("System is in Safe Mode. It is not allowed to "
             "make any changes except license activation.")
         + L'\n' + tr("The following %n items are not deleted:", "", resources.size())
 
         : QString());
 
-    const auto icon = static_cast<QnMessageBoxIcon>(qnCommon->isReadOnly()
+    const auto icon = static_cast<QnMessageBoxIcon>(commonModule()->isReadOnly()
         ? QnMessageBoxIcon::Warning
         : QnMessageBoxIcon::Critical);
 
-    const auto text = (qnCommon->isReadOnly()
+    const auto text = (commonModule()->isReadOnly()
         ? tr("Deleting objects not allowed in Safe Mode")
         : tr("Failed to delete %n items:", "", resources.size()));
 

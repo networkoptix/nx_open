@@ -1,5 +1,4 @@
-#ifndef BUSINESS_RULE_ITEM_DELEGATE_H
-#define BUSINESS_RULE_ITEM_DELEGATE_H
+#pragma once
 
 #include <QtWidgets/QStyledItemDelegate>
 #include <QtWidgets/QPushButton>
@@ -70,5 +69,3 @@ private slots:
 private:
     QScopedPointer<QnBusinessTypesComparator> m_lexComparator;
 };
-
-#endif // BUSINESS_RULE_ITEM_DELEGATE_H

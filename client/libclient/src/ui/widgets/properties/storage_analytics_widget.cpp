@@ -414,7 +414,7 @@ void QnStorageAnalyticsWidget::requestFinished()
 
     for (const auto& camera : m_allData)
     {
-        const auto& cam = qnResPool->getResourceByUniqueId(camera.uniqueId);
+        const auto& cam = resourcePool()->getResourceByUniqueId(camera.uniqueId);
         if (cam && cam->getParentId() == m_server->getId())
             existsCameras << camera;
         else
@@ -566,7 +566,7 @@ QnRecordingStatsReply QnStorageAnalyticsWidget::getForecastData(qint64 extraSize
     {
         ForecastDataPerCamera cameraForecast;
 
-        QnSecurityCamResourcePtr camRes = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(cameraStats.uniqueId);
+        QnSecurityCamResourcePtr camRes = resourcePool()->getResourceByUniqueId<QnSecurityCamResource>(cameraStats.uniqueId);
         if (camRes)
         {
             cameraForecast.expand = !camRes->isScheduleDisabled();
@@ -608,7 +608,7 @@ QnRecordingStatsReply QnStorageAnalyticsWidget::getForecastData(qint64 extraSize
     // 2.1 add free storage space
     for (const auto& storageData: m_availStorages)
     {
-        QnResourcePtr storageRes = qnResPool->getResourceById(storageData.storageId);
+        QnResourcePtr storageRes = resourcePool()->getResourceById(storageData.storageId);
         if (!storageRes)
             continue;
 

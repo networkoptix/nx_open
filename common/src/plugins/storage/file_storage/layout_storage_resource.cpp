@@ -227,7 +227,8 @@ void QnLayoutFileStorageResource::restoreOpenedFiles()
     }
 }
 
-QnLayoutFileStorageResource::QnLayoutFileStorageResource():
+QnLayoutFileStorageResource::QnLayoutFileStorageResource(QnCommonModule* commonModule):
+    base_type(commonModule),
     m_fileSync(QnMutex::Recursive),
     m_capabilities(0)
 {
@@ -369,9 +370,9 @@ Qn::StorageInitResult QnLayoutFileStorageResource::initOrUpdate()
     return Qn::StorageInit_WrongPath;
 }
 
-QnStorageResource* QnLayoutFileStorageResource::instance(const QString&)
+QnStorageResource* QnLayoutFileStorageResource::instance(QnCommonModule* commonModule, const QString&)
 {
-    return new QnLayoutFileStorageResource();
+    return new QnLayoutFileStorageResource(commonModule);
 }
 
 bool QnLayoutFileStorageResource::readIndexHeader()

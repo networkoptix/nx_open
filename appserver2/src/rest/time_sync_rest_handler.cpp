@@ -10,12 +10,18 @@
 #include <nx/network/http/httptypes.h>
 
 #include "managers/time_manager.h"
+#include "connection_factory.h"
 
 
 namespace ec2 {
 
 const QString QnTimeSyncRestHandler::PATH = QString::fromLatin1( "ec2/timeSync" );
 const QByteArray QnTimeSyncRestHandler::TIME_SYNC_HEADER_NAME( "NX-TIME-SYNC-DATA" );
+
+QnTimeSyncRestHandler::QnTimeSyncRestHandler(Ec2DirectConnectionFactory* connection) :
+    m_appServerConnection(connection)
+{
+}
 
 int QnTimeSyncRestHandler::executeGet(
     const QString& /*path*/,
@@ -41,7 +47,7 @@ int QnTimeSyncRestHandler::executeGet(
             if (connection->socket() && connection->socket()->getConnectionStatistics(&sockInfo))
                 rttMillis = sockInfo.rttVar;
         }
-        TimeSynchronizationManager::instance()->processTimeSyncInfoHeader(
+        m_appServerConnection->timeSyncManager()->processTimeSyncInfoHeader(
             QnUuid::fromStringSafe(peerGuid->second),
             timeSyncHeaderIter->second,
             rttMillis);
@@ -50,10 +56,10 @@ int QnTimeSyncRestHandler::executeGet(
     //sending our time synchronization information to remote peer
     connection->response()->headers.emplace(
         TIME_SYNC_HEADER_NAME,
-        TimeSynchronizationManager::instance()->getTimeSyncInfo().toString() );
+        m_appServerConnection->timeSyncManager()->getTimeSyncInfo().toString() );
     connection->response()->headers.emplace(
         Qn::PEER_GUID_HEADER_NAME,
-        qnCommon->moduleGUID().toByteArray() );
+        m_appServerConnection->commonModule()->moduleGUID().toByteArray() );
 
     return nx_http::StatusCode::ok;
 }

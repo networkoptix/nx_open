@@ -26,6 +26,7 @@ static const int kTotalListeningSockets = 2;
 #endif
 
 QnUniversalTcpListener::QnUniversalTcpListener(
+    QnCommonModule* commonModule,
     const CloudConnectionManager& cloudConnectionManager,
     const QHostAddress& address,
     int port,
@@ -33,6 +34,7 @@ QnUniversalTcpListener::QnUniversalTcpListener(
     bool useSsl)
 :
     QnHttpConnectionListener(
+        commonModule,
         address,
         port,
         maxConnections,
@@ -40,7 +42,7 @@ QnUniversalTcpListener::QnUniversalTcpListener(
     m_cloudConnectionManager(cloudConnectionManager),
     m_boundToCloud(false)
 {
-    m_cloudCredentials.serverId = qnCommon->moduleGUID().toByteArray();
+    m_cloudCredentials.serverId = commonModule->moduleGUID().toByteArray();
     Qn::directConnect(
         &cloudConnectionManager, &CloudConnectionManager::cloudBindingStatusChanged,
         this,
@@ -70,7 +72,7 @@ void QnUniversalTcpListener::addProxySenderConnections(
     for (int i = 0; i < size; ++i)
     {
         auto connect = new QnProxySenderConnection(
-            proxyUrl, qnCommon->moduleGUID(), this);
+            proxyUrl, commonModule()->moduleGUID(), this);
         connect->start();
         addOwnership(connect);
     }

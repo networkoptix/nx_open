@@ -53,7 +53,7 @@ void QnActiveCameraThumbnailLoader::setResourceId(const QString &id) {
         return;
 
     d->clear();
-    d->camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid::fromStringSafe(id));
+    d->camera = resourcePool()->getResourceById<QnVirtualCameraResource>(QnUuid::fromStringSafe(id));
     d->refresh();
 
     emit resourceIdChanged();

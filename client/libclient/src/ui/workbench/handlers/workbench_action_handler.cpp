@@ -31,6 +31,7 @@
 #include <client/client_startup_parameters.h>
 #include <client/desktop_client_message_processor.h>
 #include <client/client_show_once_settings.h>
+#include <client/client_module.h>
 
 #include <common/common_module.h>
 
@@ -206,10 +207,8 @@ using utils::UnityLauncherWorkaround;
 ActionHandler::ActionHandler(QObject *parent) :
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    m_delayedDropGuard(false),
-    m_tourTimer(new QTimer(this))
+    m_delayedDropGuard(false)
 {
-    connect(m_tourTimer, SIGNAL(timeout()), this, SLOT(at_tourTimer_timeout()));
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &ActionHandler::at_context_userChanged);
 
@@ -336,7 +335,7 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(QnActions::SelectTimeServerAction), SIGNAL(triggered()), this, SLOT(at_selectTimeServerAction_triggered()));
 
     connect(action(QnActions::TogglePanicModeAction), SIGNAL(toggled(bool)), this, SLOT(at_togglePanicModeAction_toggled(bool)));
-    connect(action(QnActions::ToggleTourModeAction), SIGNAL(toggled(bool)), this, SLOT(at_toggleTourAction_toggled(bool)));
+
     //connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
     connect(context()->instance<QnWorkbenchScheduleWatcher>(), SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
 
@@ -460,7 +459,7 @@ void ActionHandler::openNewWindow(const QStringList &args) {
     {
         arguments << lit("--auth");
         arguments << QnStartupParameters::createAuthenticationString(
-            QnAppServerConnectionFactory::url());
+            commonModule()->currentUrl());
     }
 
     if (mainWindow())
@@ -574,7 +573,7 @@ void ActionHandler::submitDelayedDrops() {
 
 void ActionHandler::submitInstantDrop() {
 
-    if (QnResourceDiscoveryManager::instance()->state() == QnResourceDiscoveryManager::InitialSearch) {
+    if (commonModule()->instance<QnResourceDiscoveryManager>()->state() == QnResourceDiscoveryManager::InitialSearch) {
         // local resources are not ready yet
         QTimer::singleShot(100, this, SLOT(submitInstantDrop()));
         return;
@@ -628,10 +627,10 @@ void ActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
     // TODO: #dklychkov Do not create new empty layout before this method end. See: at_openNewTabAction_triggered()
     if (user && !qnRuntime->isActiveXMode())
     {
-        for (const QnLayoutResourcePtr &layout : qnResPool->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>())
+        for (const QnLayoutResourcePtr &layout : resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>())
         {
             if (layout->hasFlags(Qn::local) && !layout->isFile())
-                qnResPool->removeResource(layout);
+                resourcePool()->removeResource(layout);
         }
     }
 
@@ -793,7 +792,7 @@ void ActionHandler::at_openInCurrentLayoutAction_triggered()
     QnUuid videoWallItemGuid = currentLayout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
     if (!videoWallItemGuid.isNull())
     {
-        QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(videoWallItemGuid);
+        QnVideoWallItemIndex index = resourcePool()->getVideoWallItemByUuid(videoWallItemGuid);
         const auto resources = parameters.resources();
 
         // Displaying message delayed to avoid waiting cursor (see drop_instrument.cpp:245)
@@ -872,6 +871,7 @@ void ActionHandler::at_cameraListChecked(int status, const QnCameraListReply& re
     if (status != 0)
     {
         const auto text = QnDeviceDependentStrings::getNameFromSet(
+            resourcePool(),
             QnCameraDeviceStringSet(
                 tr("Failed to move %n devices", "", modifiedResources.size()),
                 tr("Failed to move %n cameras", "", modifiedResources.size()),
@@ -905,6 +905,7 @@ void ActionHandler::at_cameraListChecked(int status, const QnCameraListReply& re
     if (!errorResources.empty())
     {
         const auto text = QnDeviceDependentStrings::getNameFromSet(
+            resourcePool(),
             QnCameraDeviceStringSet(
                 tr("Server \"%1\" cannot access %n devices. Move them anyway?",
                     "", errorResources.size()),
@@ -1135,7 +1136,7 @@ void ActionHandler::at_webClientAction_triggered()
     static const auto kPath = lit("/static/index.html");
     static const auto kFragment = lit("/view");
 
-    const auto server = qnCommon->currentServer();
+    const auto server = commonModule()->currentServer();
     if (!server)
         return;
 
@@ -1444,7 +1445,7 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
     layout->setCellAspectRatio(desiredCellAspectRatio);
     layout->setLocalRange(period);
 
-    qnResPool->addResource(layout);
+    resourcePool()->addResource(layout);
     menu()->trigger(QnActions::OpenSingleLayoutAction, layout);
 }
 
@@ -1602,7 +1603,7 @@ bool ActionHandler::validateResourceName(const QnResourcePtr &resource, const QS
     /* Resource cannot have both of these flags at once. */
     NX_ASSERT(checkedFlags == Qn::user || checkedFlags == Qn::videowall);
 
-    foreach(const QnResourcePtr &resource, qnResPool->getResources()) {
+    foreach(const QnResourcePtr &resource, resourcePool()->getResources()) {
         if (!resource->hasFlags(checkedFlags))
             continue;
         if (resource->getName().compare(newName, Qt::CaseInsensitive) != 0)
@@ -1684,7 +1685,7 @@ void ActionHandler::at_renameAction_triggered()
         /* Recorder name should not be validated. */
         QString groupId = camera->getGroupId();
 
-        QnVirtualCameraResourceList modified = qnResPool->getResources().filtered<QnVirtualCameraResource>([groupId](const QnVirtualCameraResourcePtr &camera)
+        QnVirtualCameraResourceList modified = resourcePool()->getResources().filtered<QnVirtualCameraResource>([groupId](const QnVirtualCameraResourcePtr &camera)
         {
             return camera->getGroupId() == groupId;
         });
@@ -1909,7 +1910,7 @@ void ActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
 }
 
 void ActionHandler::at_togglePanicModeAction_toggled(bool checked) {
-    QnMediaServerResourceList resources = qnResPool->getAllServers(Qn::AnyStatus);
+    QnMediaServerResourceList resources = resourcePool()->getAllServers(Qn::AnyStatus);
 
     foreach(QnMediaServerResourcePtr resource, resources)
     {
@@ -1919,53 +1920,13 @@ void ActionHandler::at_togglePanicModeAction_toggled(bool checked) {
             if (checked)
                 val = Qn::PM_User;
             resource->setPanicMode(val);
-            propertyDictionary->saveParamsAsync(resource->getId());
+            propertyDictionary()->saveParamsAsync(resource->getId());
         }
     }
 }
 
-void ActionHandler::at_toggleTourAction_toggled(bool checked) {
-    if (!checked) {
-        m_tourTimer->stop();
-        context()->workbench()->setItem(Qn::ZoomedRole, NULL);
-    }
-    else {
-        m_tourTimer->start(qnSettings->tourCycleTime());
-        at_tourTimer_timeout();
-    }
-}
-
-struct ItemPositionCmp {
-    bool operator()(QnWorkbenchItem *l, QnWorkbenchItem *r) const {
-        QRect lg = l->geometry();
-        QRect rg = r->geometry();
-        return lg.y() < rg.y() || (lg.y() == rg.y() && lg.x() < rg.x());
-    }
-};
-
-void ActionHandler::at_tourTimer_timeout() {
-    QList<QnWorkbenchItem *> items = context()->workbench()->currentLayout()->items().toList();
-    std::sort(items.begin(), items.end(), ItemPositionCmp());
-
-    if (items.empty()) {
-        action(QnActions::ToggleTourModeAction)->setChecked(false);
-        return;
-    }
-
-    QnWorkbenchItem *item = context()->workbench()->item(Qn::ZoomedRole);
-    if (item) {
-        item = items[(items.indexOf(item) + 1) % items.size()];
-    }
-    else {
-        item = items[0];
-    }
-    context()->workbench()->setItem(Qn::ZoomedRole, item);
-}
-
-void ActionHandler::at_workbench_itemChanged(Qn::ItemRole role) {
-    if (!workbench()->item(Qn::ZoomedRole))
-        action(QnActions::ToggleTourModeAction)->setChecked(false);
-
+void ActionHandler::at_workbench_itemChanged(Qn::ItemRole role)
+{
     if (role == Qn::CentralRole && adjustVideoDialog() && adjustVideoDialog()->isVisible())
     {
         QnWorkbenchItem *item = context()->workbench()->item(Qn::CentralRole);
@@ -1975,21 +1936,18 @@ void ActionHandler::at_workbench_itemChanged(Qn::ItemRole role) {
     }
 }
 
-void ActionHandler::at_whatsThisAction_triggered() {
+void ActionHandler::at_whatsThisAction_triggered()
+{
     if (QWhatsThis::inWhatsThisMode())
         QWhatsThis::leaveWhatsThisMode();
     else
         QWhatsThis::enterWhatsThisMode();
 }
 
-void ActionHandler::at_escapeHotkeyAction_triggered() {
-    if (QWhatsThis::inWhatsThisMode()) {
+void ActionHandler::at_escapeHotkeyAction_triggered()
+{
+    if (QWhatsThis::inWhatsThisMode())
         QWhatsThis::leaveWhatsThisMode();
-        return;
-    }
-
-    if (action(QnActions::ToggleTourModeAction)->isChecked())
-        menu()->trigger(QnActions::ToggleTourModeAction);
 }
 
 void ActionHandler::at_browseUrlAction_triggered() {
@@ -2002,7 +1960,7 @@ void ActionHandler::at_browseUrlAction_triggered() {
 
 void ActionHandler::at_versionMismatchMessageAction_triggered()
 {
-    if (qnCommon->isReadOnly())
+    if (commonModule()->isReadOnly())
         return;
 
     if (qnRuntime->ignoreVersionMismatch())
@@ -2103,7 +2061,7 @@ void ActionHandler::at_betaVersionMessageAction_triggered()
 
 void ActionHandler::checkIfStatisticsReportAllowed() {
 
-    const QnMediaServerResourceList servers = qnResPool->getResources<QnMediaServerResource>();
+    const QnMediaServerResourceList servers = resourcePool()->getResources<QnMediaServerResource>();
 
     /* Check if we are not connected yet. */
     if (servers.isEmpty())
@@ -2114,7 +2072,7 @@ void ActionHandler::checkIfStatisticsReportAllowed() {
         return;
 
     /* User cannot disable statistics collecting, so don't make him sorrow. */
-    if (qnCommon->isReadOnly())
+    if (commonModule()->isReadOnly())
         return;
 
     /* Suppress notification if no server has internet access. */
@@ -2188,7 +2146,7 @@ void ActionHandler::openInBrowserDirectly(const QnMediaServerResourcePtr& server
     url.setScheme(lit("http"));
     url.setPath(path);
     url.setFragment(fragment);
-    url = QnNetworkProxyFactory::instance()->urlToResource(url, server, lit("proxy"));
+    url = qnClientModule->networkProxyFactory()->urlToResource(url, server, lit("proxy"));
     QDesktopServices::openUrl(url);
 }
 
@@ -2202,7 +2160,7 @@ void ActionHandler::openInBrowser(const QnMediaServerResourcePtr& server,
     QUrl serverUrl(server->getApiUrl().toString() + path);
     serverUrl.setFragment(fragment);
 
-    QUrl proxyUrl = QnNetworkProxyFactory::instance()->urlToResource(serverUrl, server);
+    QUrl proxyUrl = qnClientModule->networkProxyFactory()->urlToResource(serverUrl, server);
     proxyUrl.setPath(lit("/api/getNonce"));
 
     if (m_serverRequests.find(proxyUrl) == m_serverRequests.end())
@@ -2245,7 +2203,7 @@ void ActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
 
     for (const auto& request: requests)
     {
-        const auto appserverUrl = QnAppServerConnectionFactory::url();
+        const auto appserverUrl = commonModule()->currentUrl();
         const auto authParam = createHttpQueryAuthParam(
             appserverUrl.userName(), appserverUrl.password(),
             auth.realm, nx_http::Method::GET, auth.nonce.toUtf8());
@@ -2255,7 +2213,7 @@ void ActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
         urlQuery.addQueryItem(lit("auth"), QLatin1String(authParam));
         targetUrl.setQuery(urlQuery);
 
-        targetUrl = QnNetworkProxyFactory::instance()->urlToResource(targetUrl, request.server);
+        targetUrl = qnClientModule->networkProxyFactory()->urlToResource(targetUrl, request.server);
 
         auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
         targetUrl = QUrl(lit("http://%1/%2:%3:%4%5?%6")

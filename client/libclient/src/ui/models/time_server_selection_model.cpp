@@ -4,6 +4,8 @@
 #include <api/common_message_processor.h>
 #include <api/runtime_info_manager.h>
 
+#include <common/common_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
@@ -76,7 +78,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
     m_sameTimezone(false),
     m_sameTimezoneValid(false)
 {
-    auto processor = QnCommonMessageProcessor::instance();
+    auto processor = qnCommonMessageProcessor;
 
     /* Handle peer time updates. */
     connect(processor, &QnCommonMessageProcessor::peerTimeChanged, this,
@@ -111,7 +113,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
         });
 
     /* Handle adding new online server peers. */
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this,
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded, this,
         [this](const QnPeerRuntimeInfo& info)
         {
             if (info.data.peer.peerType != Qn::PT_Server)
@@ -123,7 +125,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
         });
 
     /* Handle changing server peers priority (selection). */
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this,
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged, this,
         [this](const QnPeerRuntimeInfo& info)
         {
             if (info.data.peer.peerType != Qn::PT_Server)
@@ -137,7 +139,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
         });
 
     /* Handle removing online server peers. */
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoRemoved, this,
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved, this,
         [this](const QnPeerRuntimeInfo& info)
         {
             if (info.data.peer.peerType != Qn::PT_Server)
@@ -164,7 +166,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
         });
 
     /* Handle adding new servers (to display name correctly). */
-    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         [this](const QnResourcePtr& resource)
         {
             if (!resource.dynamicCast<QnMediaServerResource>())
@@ -265,7 +267,7 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex& index, int role) co
 
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
 
-    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(item.peerId);
+    QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(item.peerId);
     QString title = serverName(server);
 
     switch (role)
@@ -419,7 +421,7 @@ void QnTimeServerSelectionModel::addItem(const QnPeerRuntimeInfo& info)
 {
     PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is added");
 #ifdef _DEBUG
-    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(info.uuid);
+    QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(info.uuid);
     QString title = serverName(server);
     PRINT_DEBUG("peer " + info.uuid.toByteArray() + " name is " + title.toUtf8());
 #endif // DEBUG
@@ -546,7 +548,7 @@ bool QnTimeServerSelectionModel::calculateSameTimezone() const
 
     for (const auto& item : m_items)
     {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(item.peerId);
+        QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(item.peerId);
         if (!server || server->getStatus() != Qn::Online)
             continue;
 
@@ -567,7 +569,7 @@ bool QnTimeServerSelectionModel::calculateSameTimezone() const
 
 void QnTimeServerSelectionModel::resetData(qint64 currentSyncTime)
 {
-    if (auto connection = QnAppServerConnectionFactory::getConnection2())
+    if (auto connection = commonModule()->ec2Connection())
     {
         auto timeManager = connection->getTimeManager(Qn::kSystemAccess);
         for (const auto& info : timeManager->getPeerTimeInfoList())
@@ -577,7 +579,7 @@ void QnTimeServerSelectionModel::resetData(qint64 currentSyncTime)
     /* Fill table with current data. */
     ScopedReset modelReset(this);
     m_items.clear();
-    for (const auto& runtimeInfo : qnRuntimeInfoManager->items()->getItems())
+    for (const auto& runtimeInfo : runtimeInfoManager()->items()->getItems())
     {
         if (runtimeInfo.data.peer.peerType != Qn::PT_Server)
             continue;

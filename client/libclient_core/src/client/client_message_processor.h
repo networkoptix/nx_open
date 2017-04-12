@@ -1,5 +1,4 @@
-#ifndef QN_CLIENT_MESSAGE_PROCESSOR_H
-#define QN_CLIENT_MESSAGE_PROCESSOR_H
+#pragma once
 
 #include <api/common_message_processor.h>
 
@@ -15,7 +14,7 @@ class QnClientMessageProcessor : public QnCommonMessageProcessor
     typedef QnCommonMessageProcessor base_type;
 
 public:
-    QnClientMessageProcessor();
+    explicit QnClientMessageProcessor(QObject* parent = nullptr);
     virtual void init(const ec2::AbstractECConnectionPtr& connection) override;
 
     const QnClientConnectionStatus* connectionStatus() const;
@@ -41,6 +40,5 @@ private:
     bool m_holdConnection;
 };
 
-#define qnClientMessageProcessor static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())
-
-#endif // _client_event_manager_h
+#define qnClientMessageProcessor \
+    static_cast<QnClientMessageProcessor*>(commonModule()->messageProcessor())

@@ -9,11 +9,15 @@ namespace ec2
 {
 
 class QnTransactionTcpProcessorPrivate;
+class QnTransactionMessageBus;
 
 class QnTransactionTcpProcessor: public QnTCPConnectionProcessor
 {
 public:
-    QnTransactionTcpProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnTransactionTcpProcessor(
+        QnTransactionMessageBus* messageBus,
+        QSharedPointer<AbstractStreamSocket> socket,
+        QnTcpListener* owner);
     virtual ~QnTransactionTcpProcessor();
     virtual bool isTakeSockOwnership() const override { return true; }
 protected:

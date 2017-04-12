@@ -478,6 +478,9 @@ public:
     virtual bool isEncryptionEnabled() const = 0;
 };
 
+using AcceptCompletionHandler = 
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, AbstractStreamSocket*)>;
+
 //!Interface for server socket, accepting stream connections
 /*!
     \note This socket has default recv timeout of 250ms for backward compatibility
@@ -512,10 +515,7 @@ public:
             \endcode
             \a newConnection is NULL, if errorCode is not SystemError::noError
     */
-    virtual void acceptAsync(
-        nx::utils::MoveOnlyFunc<void(
-            SystemError::ErrorCode,
-            AbstractStreamSocket*)> handler) = 0;
+    virtual void acceptAsync(AcceptCompletionHandler handler) = 0;
     /** Cancel active \a AbstractStreamServerSocket::acceptAsync */
     virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) = 0;
     /** Cancel active \a AbstractStreamServerSocket::acceptAsync waiting for completion.

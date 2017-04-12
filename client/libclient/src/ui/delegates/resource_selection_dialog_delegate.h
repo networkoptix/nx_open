@@ -3,11 +3,13 @@
 #include <QtCore/QObject>
 #include <QtWidgets/QLabel>
 
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource/resource_fwd.h>
 
 class QnResourceTreeModelCustomColumnDelegate;
 
-class QnResourceSelectionDialogDelegate: public QObject
+class QnResourceSelectionDialogDelegate: public QObject, public QnConnectionContextAware
 {
     Q_OBJECT
 public:

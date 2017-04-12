@@ -9,7 +9,8 @@
 #include <rest/server/json_rest_handler.h>
 #include <functional>
 
-class QnPtzRestHandler: public QnJsonRestHandler {
+class QnPtzRestHandler: public QnJsonRestHandler
+{
     Q_OBJECT
 public:
     virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
@@ -20,7 +21,7 @@ private:
     int executeContinuousFocus(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
     int executeAbsoluteMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
     int executeViewportMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
-    
+
     int executeGetPosition(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
 
     int executeCreatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
@@ -57,12 +58,12 @@ private:
     };
 
     bool m_detectAvailableOnly;
-    
+
     QMap<QString, SequenceInfo> m_sequencedRequests;
     QnMutex m_sequenceMutex;
 
-    
-    struct AsyncExecInfo 
+
+    struct AsyncExecInfo
     {
         AsyncExecInfo(): inProgress() {}
 
@@ -71,7 +72,7 @@ private:
     };
     static QMap<QString, AsyncExecInfo> m_workers;
     static QnMutex m_asyncExecMutex;
-    
+
 };
 
 #endif // QN_PTZ_REST_HANDLER_H

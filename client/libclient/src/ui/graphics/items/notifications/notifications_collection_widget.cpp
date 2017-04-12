@@ -78,7 +78,8 @@ const char* kItemTimeStampPropertyName = "_qn_itemTimeStamp";
 QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* parent, Qt::WindowFlags flags, QnWorkbenchContext* context) :
     base_type(parent, flags),
     QnWorkbenchContextAware(context),
-    m_headerWidget(new GraphicsWidget(this))
+    m_headerWidget(new GraphicsWidget(this)),
+    m_helper(new QnBusinessStringsHelper(commonModule()))
 {
     int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
     auto newButton = [this, maxIconSize](QnActions::IDType actionId, int helpTopicId)
@@ -234,16 +235,16 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
     QnBusiness::EventType eventType = params.eventType;
     QnUuid ruleId = businessAction->getBusinessRuleId();
-    QString title = QnBusinessStringsHelper::eventAtResource(params, qnSettings->extraInfoInTree());
+    QString title = m_helper->eventAtResource(params, qnSettings->extraInfoInTree());
     qint64 timestampMs = params.eventTimestampUsec / 1000;
 
-    auto alarmCameras = qnResPool->getResources<QnVirtualCameraResource>(businessAction->getResources());
+    auto alarmCameras = resourcePool()->getResources<QnVirtualCameraResource>(businessAction->getResources());
     if (businessAction->getParams().useSource)
-        alarmCameras << qnResPool->getResources<QnVirtualCameraResource>(businessAction->getSourceResources());
+        alarmCameras << resourcePool()->getResources<QnVirtualCameraResource>(businessAction->getSourceResources());
     alarmCameras = accessController()->filtered(alarmCameras, Qn::ViewContentPermission);
     alarmCameras = alarmCameras.toSet().toList();
 
-    QnResourcePtr resource = qnResPool->getResourceById(params.eventResourceId);
+    QnResourcePtr resource = resourcePool()->getResourceById(params.eventResourceId);
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
 
@@ -282,7 +283,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         }
     }
 
-    QStringList tooltip = QnBusinessStringsHelper::eventDescription(businessAction,
+    QStringList tooltip = m_helper->eventDescription(businessAction,
         QnBusinessAggregationInfo(), qnSettings->extraInfoInTree());
 
     //TODO: #GDM #3.1 move this code to ::eventDetails()
@@ -294,7 +295,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         {
             QnUuid id = QnUuid::fromStringSafe(stringId);
             NX_ASSERT(!id.isNull());
-            if (auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(id))
+            if (auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id))
                 tooltip << QnResourceDisplayInfo(camera).toString(qnSettings->extraInfoInTree());
         }
     }
@@ -404,7 +405,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
             case QnBusiness::UserDefinedEvent:
             {
-                auto sourceCameras = qnResPool->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
+                auto sourceCameras = resourcePool()->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
                 sourceCameras = accessController()->filtered(sourceCameras, Qn::ViewContentPermission);
                 if (!sourceCameras.isEmpty())
                 {
@@ -448,7 +449,7 @@ void QnNotificationsCollectionWidget::hideBusinessAction(const QnAbstractBusines
         }
     }
 
-    QnResourcePtr resource = qnResPool->getResourceById(businessAction->getRuntimeParams().eventResourceId);
+    QnResourcePtr resource = resourcePool()->getResourceById(businessAction->getRuntimeParams().eventResourceId);
     if (!resource)
         return;
 
@@ -500,7 +501,7 @@ QIcon QnNotificationsCollectionWidget::iconForAction(const QnAbstractBusinessAct
 
     if (eventType >= QnBusiness::UserDefinedEvent)
     {
-        QnVirtualCameraResourceList camList = qnResPool->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
+        QnVirtualCameraResourceList camList = resourcePool()->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
         if (!camList.isEmpty())
             return qnResIconCache->icon(QnResourceIconCache::Camera);
 
@@ -515,7 +516,7 @@ QIcon QnNotificationsCollectionWidget::iconForAction(const QnAbstractBusinessAct
         case QnBusiness::CameraIpConflictEvent:
         case QnBusiness::NetworkIssueEvent:
         {
-            auto resource = qnResPool->getResourceById(params.eventResourceId);
+            auto resource = resourcePool()->getResourceById(params.eventResourceId);
             return resource
                 ? qnResIconCache->icon(resource)
                 : qnResIconCache->icon(QnResourceIconCache::Camera);
@@ -559,7 +560,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         if (businessAction)
         {
             auto resourceId = businessAction->getRuntimeParams().eventResourceId;
-            resource = qnResPool->getResourceById(resourceId);
+            resource = resourcePool()->getResourceById(resourceId);
         }
     }
 

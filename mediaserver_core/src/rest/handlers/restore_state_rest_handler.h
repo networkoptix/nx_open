@@ -34,6 +34,6 @@ private:
         const QnRestConnectionProcessor* owner) override;
     int execute(
         PasswordData passwordData,
-        const Qn::UserAccessData& accessRights,
+        const QnRestConnectionProcessor* owner,
         QnJsonRestResult& result);
 };

@@ -11,6 +11,8 @@
 #include <api/session_manager.h>
 #include <api/app_server_connection.h>
 
+#include <client_core/client_core_module.h>
+
 #include <core/resource/resource.h>
 
 #include <common/common_module.h>
@@ -62,8 +64,7 @@ QnConnectionTestingDialog::QnConnectionTestingDialog( QWidget *parent)
 
 void QnConnectionTestingDialog::testConnection(const QUrl &url) {
     setHelpTopic(this, Qn::Login_Help);
-
-    QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
+    qnClientCoreModule->connectionFactory()->testConnection(
         url,
         this,
         &QnConnectionTestingDialog::at_ecConnection_result );

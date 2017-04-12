@@ -10,16 +10,3 @@ if [ -n "$DEBIAN_SCRIPT_DEBUG" ]; then set -v -x; DEBIAN_SCRIPT_TRACE=1; fi
 ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
 
 pkill applauncher-bin || true
-
-#Installing shortcut to current users' desktop
-for HOME_U in /home/*?; do
-    USER=$( basename ${HOME_U} )
-    if [ -d "$HOME_U/Desktop" ]; then
-        cp /usr/share/applications/${installer.name}.desktop $HOME_U/Desktop
-    fi    
-    chown $USER $HOME_U/Desktop/${installer.name}.desktop
-    chmod +x $HOME_U/Desktop/${installer.name}.desktop
-done
-#Copying shortcut to skel in order to be automatically placed to new users' desktop
-mkdir -p /etc/skel/Desktop
-cp /usr/share/applications/${installer.name}.desktop /etc/skel/Desktop

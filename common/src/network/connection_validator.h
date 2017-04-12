@@ -7,6 +7,7 @@
 struct QnConnectionInfo;
 struct QnModuleInformation;
 class QnSoftwareVersion;
+class QnCommonModule;
 
 /**
 * Helper class to diagnose connection possibility.
@@ -30,7 +31,8 @@ public:
     static Qn::ConnectionResult validateConnection(const QnConnectionInfo& connectionInfo,
         ec2::ErrorCode networkError);
 
-    static bool isCompatibleToCurrentSystem(const QnModuleInformation& info);
+    static bool isCompatibleToCurrentSystem(const QnModuleInformation& info,
+        const QnCommonModule* commonModule);
 
 protected:
     static Qn::ConnectionResult validateConnectionInternal(

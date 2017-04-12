@@ -23,6 +23,7 @@
 #include <nx/utils/system_error.h>
 #include <http/custom_headers.h>
 #include <api/global_settings.h>
+#include <common/common_module.h>
 
 //#define USE_SINGLE_TWO_WAY_CONNECTION
 //!if not defined, ubjson is used
@@ -86,12 +87,14 @@ const char* QnTransactionTransportBase::TUNNEL_MULTIPART_BOUNDARY = "ec2boundary
 const char* QnTransactionTransportBase::TUNNEL_CONTENT_TYPE = "multipart/mixed; boundary=ec2boundary";
 
 QnTransactionTransportBase::QnTransactionTransportBase(
+    const QnUuid& localSystemId,
     ConnectionGuardSharedState* const connectionGuardSharedState,
     const ApiPeerData& localPeer,
     PeerRole peerRole,
     std::chrono::milliseconds tcpKeepAliveTimeout,
     int keepAliveProbeCount)
 :
+    m_localSystemId(localSystemId),
     m_localPeer(localPeer),
     m_peerRole(peerRole),
     m_connectionGuardSharedState(connectionGuardSharedState),
@@ -128,6 +131,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
 }
 
 QnTransactionTransportBase::QnTransactionTransportBase(
+    const QnUuid& localSystemId,
     const QnUuid& connectionGuid,
     ConnectionLockGuard connectionLockGuard,
     const ApiPeerData& localPeer,
@@ -139,6 +143,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     int keepAliveProbeCount)
 :
     QnTransactionTransportBase(
+        localSystemId,
         nullptr,
         localPeer,
         prAccepting,
@@ -207,12 +212,14 @@ QnTransactionTransportBase::QnTransactionTransportBase(
 }
 
 QnTransactionTransportBase::QnTransactionTransportBase(
+    const QnUuid& localSystemId,
     ConnectionGuardSharedState* const connectionGuardSharedState,
     const ApiPeerData& localPeer,
     std::chrono::milliseconds tcpKeepAliveTimeout,
     int keepAliveProbeCount)
 :
     QnTransactionTransportBase(
+        localSystemId,
         connectionGuardSharedState,
         localPeer,
         prOriginating,
@@ -535,10 +542,10 @@ void QnTransactionTransportBase::doOutgoingConnect(const QUrl& remotePeerUrl)
         m_httpClient->setUserPassword(remotePeerUrl.password());
     }
 
-    if (m_localPeer.isServer() && QnCommonModule::instance())
+    if (m_localPeer.isServer())
         m_httpClient->addAdditionalHeader(
             Qn::EC2_SYSTEM_ID_HEADER_NAME,
-            qnGlobalSettings->localSystemId().toByteArray());
+            m_localSystemId.toByteArray());
     if (m_base64EncodeOutgoingTransactions)    //requesting server to encode transactions
         m_httpClient->addAdditionalHeader(
             Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME,
@@ -1272,6 +1279,7 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
     {
         NX_CRITICAL(m_connectionGuardSharedState);
         m_connectionLockGuard = std::make_unique<ConnectionLockGuard>(
+            m_localPeer.id,
             m_connectionGuardSharedState,
             m_remotePeer.id,
             ConnectionLockGuard::Direction::Outgoing);

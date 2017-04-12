@@ -100,11 +100,13 @@ void QnBusinessRuleWidget::retranslateUi()
         };
 
     ui->eventResourcesHolder->setText(braced(QnDeviceDependentStrings::getDefaultNameFromSet(
+        resourcePool(),
         tr("Any Device"),
         tr("Any Camera")
     )));
 
     ui->actionResourcesHolder->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
+        resourcePool(),
         tr("Select at least one device"),
         tr("Select at least one camera")
     ));
@@ -194,7 +196,10 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusiness::Fields fields)
                 actionAtLabelText = tr("to");
                 break;
             case QnBusiness::ShowOnAlarmLayoutAction:
-                actionAtLabelText = QnDeviceDependentStrings::getDefaultNameFromSet(tr("Devices"), tr("Cameras"));
+                actionAtLabelText = QnDeviceDependentStrings::getDefaultNameFromSet(
+                    resourcePool(),
+                    tr("Devices"),
+                    tr("Cameras"));
                 break;
             default:
                 //: "at" is from the sentence "Display the text _at_ these cameras"

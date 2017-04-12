@@ -2,6 +2,8 @@
 
 #include <QtCore/QObject>
 
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource/resource_fwd.h>
 #include <nx_ec/data/api_discovery_data.h>
 #include <nx/utils/uuid.h>
@@ -9,7 +11,7 @@
 
 class QnIncompatibleServerWatcherPrivate;
 
-class QnIncompatibleServerWatcher : public QObject
+class QnIncompatibleServerWatcher : public QObject, public QnConnectionContextAware
 {
     Q_OBJECT
 public:

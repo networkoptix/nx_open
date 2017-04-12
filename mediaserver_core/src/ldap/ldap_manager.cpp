@@ -1,5 +1,7 @@
 #include "ldap_manager.h"
 
+#include <api/global_settings.h>
+#include <common/common_module.h>
 #include <iostream>
 #include <cstdio>
 #include <sstream>
@@ -11,7 +13,6 @@
 
 #include <utils/crypt/symmetrical.h>
 
-#include "api/global_settings.h"
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -198,7 +199,8 @@ namespace {
     }
 }
 
-QnLdapManager::QnLdapManager()
+QnLdapManager::QnLdapManager(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
 {
 }
 
@@ -551,12 +553,12 @@ Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers &users, const QnLdapSetting
 }
 
 Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers &users) {
-    QnLdapSettings settings = QnGlobalSettings::instance()->ldapSettings();
+    QnLdapSettings settings = qnGlobalSettings->ldapSettings();
     return fetchUsers(users, settings);
 }
 
 Qn::AuthResult QnLdapManager::authenticateWithDigest(const QString &login, const QString &digest) {
-    QnLdapSettings settings = QnGlobalSettings::instance()->ldapSettings();
+    QnLdapSettings settings = qnGlobalSettings->ldapSettings();
     LdapSession session(settings);
     if (!session.connect())
     {
@@ -573,7 +575,7 @@ Qn::AuthResult QnLdapManager::authenticateWithDigest(const QString &login, const
 
 Qn::AuthResult  QnLdapManager::realm(QString* realm) const
 {
-    QnLdapSettings settings = QnGlobalSettings::instance()->ldapSettings();
+    QnLdapSettings settings = qnGlobalSettings->ldapSettings();
     QString uriString = settings.uri.toString();
     *realm = QString();
 

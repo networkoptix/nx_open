@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace nx {
@@ -9,6 +10,8 @@ namespace desktop {
 namespace ui {
 namespace workbench {
 
+class LayoutTourController;
+
 class LayoutToursHandler: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
@@ -16,9 +19,13 @@ class LayoutToursHandler: public QObject, public QnWorkbenchContextAware
 
 public:
     LayoutToursHandler(QObject* parent = nullptr);
+    virtual ~LayoutToursHandler() override;
 
 private:
     void openToursLayout();
+
+private:
+    LayoutTourController* m_controller;
 };
 
 } // namespace workbench
