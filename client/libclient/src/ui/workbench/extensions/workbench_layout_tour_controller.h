@@ -40,14 +40,13 @@ public:
     /** Stop tour with given id if it is running. */
     void stopTour(const QnUuid& id);
 
+    /** Start tour over single layout. */
+    void startSingleLayoutTour();
+
     /** Stop currently running tour (if any). */
     void stopCurrentTour();
 
-    /** Start/stop tour over the current layout. */
-    void toggleLayoutTour(bool start);
-
     QnUuid runningTour() const;
-
 protected:
     virtual void timerEvent(QTimerEvent* event) override;
 

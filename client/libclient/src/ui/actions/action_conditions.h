@@ -503,9 +503,10 @@ public:
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
-class QnToggleTourActionCondition: public QnVideoWallReviewModeCondition {
+class QnToggleTourActionCondition: public QnActionCondition
+{
 public:
-    QnToggleTourActionCondition(QObject *parent): QnVideoWallReviewModeCondition(true, parent) {}
+    QnToggleTourActionCondition(QObject *parent): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };

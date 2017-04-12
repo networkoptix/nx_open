@@ -1232,7 +1232,12 @@ void QnWorkbenchController::at_item_doubleClicked(QnResourceWidget *widget)
     QnWorkbenchItem *zoomedItem = workbench()->item(Qn::ZoomedRole);
     if (zoomedItem == workbenchItem)
     {
-        menu()->trigger(QnActions::StopLayoutTourAction);
+        // Stop layout tour if it is running.
+        if (action(QnActions::ToggleLayoutTourModeAction)->isChecked())
+        {
+            menu()->trigger(QnActions::ToggleLayoutTourModeAction);
+            return;
+        }
 
         QRectF viewportGeometry = display()->viewportGeometry();
         QRectF zoomedItemGeometry = display()->itemGeometry(zoomedItem);

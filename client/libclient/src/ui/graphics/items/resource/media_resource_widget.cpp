@@ -1443,7 +1443,7 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const
             return (m_ioModuleOverlayWidget && overlayWidgetVisibility(m_ioModuleOverlayWidget) == OverlayVisibility::Visible);
         };
 
-    if (action(QnActions::ToggleTourModeAction)->isChecked())
+    if (action(QnActions::ToggleLayoutTourModeAction)->isChecked())
         return Qn::MainWindow_Scene_TourInProgress_Help;
 
     const Qn::ResourceStatusOverlay statusOverlay = statusOverlayController()->statusOverlay();

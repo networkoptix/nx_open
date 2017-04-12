@@ -308,7 +308,7 @@ void QnWorkbenchUi::updateCursor()
 
 bool QnWorkbenchUi::calculateTimelineVisible(QnResourceWidget* widget) const
 {
-    if (action(QnActions::ToggleTourModeAction)->isChecked())
+    if (action(QnActions::ToggleLayoutTourModeAction)->isChecked())
         return false;
 
     if (!widget)
@@ -1306,7 +1306,7 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
-    connect(action(QnActions::ToggleTourModeAction), &QAction::toggled, this,
+    connect(action(QnActions::ToggleLayoutTourModeAction), &QAction::toggled, this,
         [this](bool toggled)
         {
             /// If tour mode is going to be turned on, focus should be forced to main window
@@ -1315,10 +1315,8 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
                 mainWindow()->setFocus();
         });
 
-    connect(action(QnActions::ToggleTourModeAction), &QAction::toggled, this,
+    connect(action(QnActions::ToggleLayoutTourModeAction), &QAction::toggled, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
-
-
 }
 
 #pragma endregion Timeline methods

@@ -694,11 +694,12 @@ Qn::ActionVisibility QnPanicActionCondition::check(const QnActionParameters &) {
     return context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() ? Qn::EnabledAction : Qn::DisabledAction;
 }
 
-Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters &parameters) {
-    Q_UNUSED(parameters)
-    if (isVideoWallReviewMode())
-        return Qn::InvisibleAction;
-    return context()->workbench()->currentLayout()->items().size() <= 1 ? Qn::DisabledAction : Qn::EnabledAction;
+Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters &parameters)
+{
+    //TODO: #GDM #3.1 on tour review layout skip this check if needed
+    return context()->workbench()->currentLayout()->items().size() <= 1
+        ? Qn::DisabledAction
+        : Qn::EnabledAction;
 }
 
 Qn::ActionVisibility QnArchiveActionCondition::check(const QnResourceList &resources)

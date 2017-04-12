@@ -201,7 +201,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
         }
         updateHelpTopic();
     });
-    connect(action(QnActions::ToggleTourModeAction), &QAction::toggled, this, &MainWindow::updateHelpTopic);
+    connect(action(QnActions::ToggleLayoutTourModeAction), &QAction::toggled, this, &MainWindow::updateHelpTopic);
     updateHelpTopic();
 
     m_view.reset(new QnGraphicsView(m_scene.data()));
@@ -305,7 +305,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     addAction(action(QnActions::TakeScreenshotAction));
     addAction(action(QnActions::AdjustVideoAction));
     addAction(action(QnActions::TogglePanicModeAction));
-    addAction(action(QnActions::ToggleTourModeAction));
+    addAction(action(QnActions::ToggleLayoutTourModeAction));
     addAction(action(QnActions::OpenLayoutTourAction));
     addAction(action(QnActions::DebugIncrementCounterAction));
     addAction(action(QnActions::DebugDecrementCounterAction));
@@ -524,7 +524,7 @@ void MainWindow::updateScreenInfo() {
 
 std::pair<int, bool> MainWindow::calculateHelpTopic() const
 {
-    if (action(QnActions::ToggleTourModeAction)->isChecked())
+    if (action(QnActions::ToggleLayoutTourModeAction)->isChecked())
         return {Qn::MainWindow_Scene_TourInProgress_Help, true};
 
     if (auto layout = workbench()->currentLayout())
@@ -752,7 +752,9 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
     if (event->key() == Qt::Key_Alt || event->key() == Qt::Key_Control)
         return;
 
-    menu()->trigger(QnActions::StopLayoutTourAction);
+    // Stop layout tour if it is running.
+    if (action(QnActions::ToggleLayoutTourModeAction)->isChecked())
+        menu()->trigger(QnActions::ToggleLayoutTourModeAction);
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {

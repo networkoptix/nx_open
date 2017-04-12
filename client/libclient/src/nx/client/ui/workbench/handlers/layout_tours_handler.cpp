@@ -92,25 +92,26 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             qnLayoutTourManager->saveTour(tour);
         });
 
-    connect(action(QnActions::StartLayoutTourAction), &QAction::triggered, this,
-        [this]()
+    connect(action(QnActions::ToggleLayoutTourModeAction), &QAction::triggered, this,
+        [this](bool toggled)
         {
+            if (!toggled)
+            {
+                m_controller->stopCurrentTour();
+                return;
+            }
+
             QnActionParameters parameters = menu()->currentParameters(sender());
             auto id = parameters.argument<QnUuid>(Qn::UuidRole);
             auto tour = qnLayoutTourManager->tour(id);
-            if (!tour.isValid())
-                return;
-            m_controller->startTour(tour);
+            if (tour.isValid())
+                m_controller->startTour(tour);
+            else
+                m_controller->startSingleLayoutTour();
         });
 
     connect(action(QnActions::OpenLayoutTourAction), &QAction::triggered, this,
         &LayoutToursHandler::openToursLayout);
-
-    connect(action(QnActions::StopLayoutTourAction), &QAction::triggered, m_controller,
-        &LayoutTourController::stopCurrentTour);
-
-    connect(action(QnActions::ToggleTourModeAction), &QAction::triggered, m_controller,
-        &LayoutTourController::toggleLayoutTour);
 
     connect(action(QnActions::EscapeHotkeyAction), &QAction::triggered, m_controller,
         &LayoutTourController::stopCurrentTour);
@@ -123,8 +124,7 @@ LayoutToursHandler::~LayoutToursHandler()
 void LayoutToursHandler::openToursLayout()
 {
     const auto actions = QList<QnActions::IDType>()
-        << QnActions::StartLayoutTourAction
-        << QnActions::StopLayoutTourAction
+        << QnActions::ToggleLayoutTourModeAction
         << QnActions::RemoveLayoutTourAction;
 
     const auto resource = QnLayoutResourcePtr(new QnLayoutResource());
@@ -132,18 +132,13 @@ void LayoutToursHandler::openToursLayout()
     resource->setData(Qn::LayoutIconRole, qnSkin->icon(lit("tree/videowall.png")));
     resource->setData(Qn::CustomPanelActionsRoleRole, QVariant::fromValue(actions));
 
-    const auto startLayoutTourAction = action(QnActions::StartLayoutTourAction);
-    const auto stopLayoutTourAction = action(QnActions::StopLayoutTourAction);
+    const auto startLayoutTourAction = action(QnActions::ToggleLayoutTourModeAction);
     const auto removeLayoutTourAction = action(QnActions::RemoveLayoutTourAction);
 
-    startLayoutTourAction->setChecked(false);
     const auto updateState =
-        [startLayoutTourAction, stopLayoutTourAction, removeLayoutTourAction, resource]()
+        [startLayoutTourAction, removeLayoutTourAction, resource]()
         {
             const bool started = startLayoutTourAction->isChecked();
-            startLayoutTourAction->setVisible(!started);
-            stopLayoutTourAction->setEnabled(started);
-            stopLayoutTourAction->setVisible(started);
             removeLayoutTourAction->setEnabled(!started);
 
             static const auto kStarted = tr(" (STARTED)");
@@ -156,8 +151,6 @@ void LayoutToursHandler::openToursLayout()
 
     updateState();
     connect(startLayoutTourAction, &QAction::toggled, this, updateState);
-    connect(stopLayoutTourAction, &QAction::triggered, this,
-        [startLayoutTourAction]() { startLayoutTourAction->setChecked(false); });
 
     resource->setId(QnUuid::createUuid());
     resourcePool()->addResource(resource);

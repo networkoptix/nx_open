@@ -88,17 +88,10 @@ void LayoutTourController::stopTour(const QnUuid& id)
         stopCurrentTour();
 }
 
-void LayoutTourController::toggleLayoutTour(bool start)
+void LayoutTourController::startSingleLayoutTour()
 {
-    // Stop layouts tour if running
-    if (!start || m_mode == Mode::MultipleLayouts)
-        stopCurrentTour();
-
-    if (start)
-    {
-        m_mode = Mode::SingleLayout;
-        startTourInternal();
-    }
+    m_mode = Mode::SingleLayout;
+    startTourInternal();
 }
 
 QnUuid LayoutTourController::runningTour() const

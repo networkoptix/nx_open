@@ -921,16 +921,14 @@ enum IDType
     TogglePanicModeAction,
 
     /**
-     * Toggles tour mode.
+     * Toggles layout tour mode.
      */
-    ToggleTourModeAction,
+    ToggleLayoutTourModeAction,
 
     NewLayoutTourAction,
     LayoutTourSettingsAction,
     RenameLayoutTourAction,
     OpenLayoutTourAction,
-    StartLayoutTourAction,
-    StopLayoutTourAction,
     RemoveLayoutTourAction,
 
     /* Timeline actions. */
