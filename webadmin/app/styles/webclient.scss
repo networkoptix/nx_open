@@ -316,7 +316,7 @@ volume-control{
   width: 44px;
   height: 44px;
 }
-.volume-icons .glyphicon-volume-up{
+.volume-icons .glyphicon{
   position: relative;
   top: 14px;
   left: 16px;
@@ -387,6 +387,7 @@ div.text-center{
   color:black;
 }
 
+.glyphicon-volume-off,
 .glyphicon-volume-up,
 .glyphicon-minus,
 .glyphicon-plus {

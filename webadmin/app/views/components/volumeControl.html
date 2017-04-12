@@ -1,5 +1,6 @@
-<span class="inline-block pull-left volume-icons">
-    <span class="glyphicon glyphicon-volume-up"></span>
+<span class="inline-block pull-left volume-icons" ng-click="toggleMute()">
+    <span ng-if="!mute" class="glyphicon glyphicon-volume-up"></span>
+    <span ng-if="mute" class="glyphicon glyphicon-volume-off"></span>
 </span>
 
 <div class="bar"></div>
