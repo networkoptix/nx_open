@@ -159,7 +159,7 @@ namespace LLUtil {
     {
         if (version < 0 || version > LATEST_HWID_VERSION)
         {
-            NX_LOG(QnLog::HWID_LOG, QString(lit("getHardwareId(): requested hwid of invalid version: $1")).arg(version) , cl_logERROR)
+            NX_LOG(QnLog::HWID_LOG, QString(lit("getHardwareId(): requested hwid of invalid version: $1")).arg(version) , cl_logERROR);
             return QStringList();
         }
 
