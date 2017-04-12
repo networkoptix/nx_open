@@ -7,7 +7,7 @@
 #include <boost/optional.hpp>
 
 #include <nx/utils/move_only_func.h>
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 
 #include "../abstract_msg_body_source.h"
 

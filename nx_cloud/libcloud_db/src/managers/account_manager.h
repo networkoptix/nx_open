@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 #include <nx/network/buffer.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/counter.h>

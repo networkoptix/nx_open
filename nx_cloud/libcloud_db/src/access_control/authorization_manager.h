@@ -6,7 +6,7 @@
 #ifndef cloud_db_authorization_manager_h
 #define cloud_db_authorization_manager_h
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 
 #include "managers/managers_types.h"
 #include "auth_types.h"

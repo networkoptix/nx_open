@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 #include <nx/fusion/fusion/fusion_fwd.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>

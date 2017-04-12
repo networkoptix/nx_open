@@ -4,7 +4,7 @@
 #include <memory>
 #include <mutex>
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 
 #include "http_server_connection.h"
 #include "../abstract_msg_body_source.h"

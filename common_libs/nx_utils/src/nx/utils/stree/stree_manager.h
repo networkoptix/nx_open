@@ -15,7 +15,7 @@
 
 namespace stree {
 
-class StreeManager
+class NX_UTILS_API StreeManager
 {
 public:
     /*!

@@ -10,7 +10,7 @@
 #include <nx/utils/uuid.h>
 
 #include <cloud_db_client/src/data/account_data.h>
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 
 namespace nx {
 namespace cdb {

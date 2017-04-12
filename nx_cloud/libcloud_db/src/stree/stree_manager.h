@@ -9,7 +9,7 @@
 #include <memory>
 #include <stdexcept>
 
-#include <plugins/videodecoder/stree/stree_manager.h>
+#include <nx/utils/stree/stree_manager.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/singleton.h>
 

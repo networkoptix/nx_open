@@ -14,7 +14,7 @@
     \param str String being validated for appliance to \a mask
     \return true, if \a str has been validated with \a mask. false, otherwise
 */
-bool wildcardMatch( const char* mask, const char* str );
+NX_UTILS_API bool wildcardMatch( const char* mask, const char* str );
 
 inline bool wildcardMatch( const QString& mask, const QString& str )
 {

@@ -30,11 +30,11 @@ namespace stree
             range,
         };
 
-        Value fromString( const QString& str );
+        NX_UTILS_API Value fromString( const QString& str );
     };
 
 
-    class SaxHandler
+    class NX_UTILS_API SaxHandler
     :
         public QXmlDefaultHandler
     {

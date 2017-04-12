@@ -21,10 +21,10 @@
 namespace stree
 {
     //!Implement this interface to allow reading resource values from object
-    class AbstractResourceReader
+    class NX_UTILS_API AbstractResourceReader
     {
     public:
-        virtual ~AbstractResourceReader() {}
+        virtual ~AbstractResourceReader() = default;
 
         /*!
             \return true, if resource \a resID found, false otherwise
@@ -99,7 +99,7 @@ namespace stree
     };
 
     //!Implement this interface to allow writing resource values to object
-    class AbstractResourceWriter
+    class NX_UTILS_API AbstractResourceWriter
     {
     public:
         virtual ~AbstractResourceWriter() {}
@@ -110,7 +110,7 @@ namespace stree
         virtual void put( int resID, const QVariant& value ) = 0;
     };
 
-    class AbstractConstIterator
+    class NX_UTILS_API AbstractConstIterator
     {
     public:
         virtual ~AbstractConstIterator() {}
@@ -132,7 +132,7 @@ namespace stree
             //accessing data through iterator
         }
     */
-    class AbstractIteratableContainer
+    class NX_UTILS_API AbstractIteratableContainer
     {
     public:
         virtual ~AbstractIteratableContainer() {}
@@ -143,7 +143,7 @@ namespace stree
 
 
     //!Allows to add/get resources. Represents associative container
-    class ResourceContainer
+    class NX_UTILS_API ResourceContainer
     :
         public AbstractResourceReader,
         public AbstractResourceWriter,
@@ -172,7 +172,7 @@ namespace stree
         std::map<int, QVariant> m_mediaStreamPameters;
     };
 
-    class SingleResourceContainer
+    class NX_UTILS_API SingleResourceContainer
     :
         public AbstractResourceReader,
         public AbstractResourceWriter
@@ -194,7 +194,7 @@ namespace stree
     };
 
     //!Reads from two AbstractResourceReader
-    class MultiSourceResourceReader
+    class NX_UTILS_API MultiSourceResourceReader
     :
         public AbstractResourceReader
     {
@@ -227,7 +227,7 @@ namespace stree
     //TODO #ak using variadic template add method makeMultiSourceResourceReader that accepts any number of aguments
 
 
-    class MultiIteratableResourceReader
+    class NX_UTILS_API MultiIteratableResourceReader
     :
         public AbstractIteratableContainer
     {
@@ -250,7 +250,7 @@ namespace stree
     /**
      * Writes to \a target and \a additionalOutput.
      */
-    class ResourceWriterProxy
+    class NX_UTILS_API ResourceWriterProxy
     :
         public stree::AbstractResourceWriter
     {

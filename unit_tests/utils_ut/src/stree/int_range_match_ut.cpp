@@ -10,7 +10,7 @@
 
 #include <QtCore/QBuffer>
 
-#include <plugins/videodecoder/stree/stree_manager.h>
+#include <nx/utils/stree/stree_manager.h>
 
 
 namespace nx {

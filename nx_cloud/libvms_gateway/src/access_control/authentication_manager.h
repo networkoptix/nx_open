@@ -10,7 +10,7 @@
 
 #include <nx/network/http/server/abstract_authentication_manager.h>
 
-#include <plugins/videodecoder/stree/stree_manager.h>
+#include <nx/utils/stree/stree_manager.h>
 
 
 class QnAuthMethodRestrictionList;

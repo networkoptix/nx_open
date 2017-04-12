@@ -5,7 +5,7 @@
 #include <utils/common/warnings.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <core/resource/camera_resource.h>
-#include "utils/match/wildcard.h"
+#include "nx/utils/match/wildcard.h"
 
 struct QnResourceDataPoolChunk {
     QList<QString> keys;

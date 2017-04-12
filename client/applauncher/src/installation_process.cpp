@@ -11,7 +11,7 @@
 #include <QtXml/QXmlInputSource>
 #include <QtXml/QXmlSimpleReader>
 
-#include <plugins/videodecoder/stree/streesaxhandler.h>
+#include <nx/utils/stree/streesaxhandler.h>
 #include <nx/utils/log/log.h>
 
 #include "mirror_list_xml_parse_handler.h"

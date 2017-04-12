@@ -7,8 +7,8 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/software_version.h>
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
-#include <plugins/videodecoder/stree/stree_manager.h>
+#include <nx/utils/stree/resourcecontainer.h>
+#include <nx/utils/stree/stree_manager.h>
 #include <utils/common/app_info.h>
 
 #include "cloud_modules_xml_sax_handler.h"

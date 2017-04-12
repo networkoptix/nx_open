@@ -19,7 +19,7 @@ namespace stree
         \note Resource id -1 is reserved for error reporting
         \note Methods of this class are not thread-safe
     */
-    class ResourceNameSet
+    class NX_UTILS_API ResourceNameSet
     {
     public:
         class ResourceDescription

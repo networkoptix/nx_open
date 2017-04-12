@@ -7,7 +7,7 @@
 
 #include <map>
 
-#include <utils/match/wildcard.h>
+#include <nx/utils/match/wildcard.h>
 
 
 namespace stree

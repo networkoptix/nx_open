@@ -11,7 +11,7 @@
 #include <cdb/result_code.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/utils/move_only_func.h>
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 
 
 namespace nx {

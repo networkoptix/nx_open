@@ -16,8 +16,8 @@
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/move_only_func.h>
 
-#include <plugins/videodecoder/stree/node.h>
-#include <plugins/videodecoder/stree/resourcenameset.h>
+#include <nx/utils/stree/node.h>
+#include <nx/utils/stree/resourcenameset.h>
 
 #include "endpoint_selector.h"
 

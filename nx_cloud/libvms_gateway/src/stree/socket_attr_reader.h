@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 #include <nx/network/socket.h>
 
 

@@ -6,7 +6,7 @@
 #ifndef CLOUD_DB_AUTH_TYPES_H
 #define CLOUD_DB_AUTH_TYPES_H
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 
 
 namespace nx {

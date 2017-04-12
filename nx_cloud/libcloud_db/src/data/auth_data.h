@@ -6,7 +6,7 @@
 #ifndef CDB_AUTH_DATA_H
 #define CDB_AUTH_DATA_H
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 
 #include <cloud_db_client/src/data/auth_data.h>
 

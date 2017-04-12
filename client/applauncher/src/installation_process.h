@@ -16,8 +16,8 @@
 #include <nx/utils/thread/stoppable.h>
 #include <nx/utils/thread/joinable.h>
 #include <nx/network/http/asynchttpclient.h>
-#include <plugins/videodecoder/stree/node.h>
-#include <plugins/videodecoder/stree/resourcenameset.h>
+#include <nx/utils/stree/node.h>
+#include <nx/utils/stree/resourcenameset.h>
 
 #include "rdir_syncher.h"
 #include "rns_product_parameters.h"

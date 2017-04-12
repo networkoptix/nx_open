@@ -10,7 +10,7 @@
 
 #include <nx/utils/thread/mutex.h>
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 #include <nx/utils/counter.h>
 #include <utils/db/async_sql_query_executor.h>
 

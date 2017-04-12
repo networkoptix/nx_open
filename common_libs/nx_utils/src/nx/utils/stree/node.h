@@ -21,7 +21,7 @@ namespace stree
     /*!
         \note Descendant is not required to be thread-safe
     */
-    class AbstractNode
+    class NX_UTILS_API AbstractNode
     {
     public:
         virtual ~AbstractNode() {}
@@ -40,11 +40,17 @@ namespace stree
     /*!
         \note Children with same value are iterated in order they were added
     */
-    class SequenceNode
+    class NX_UTILS_API SequenceNode
     :
         public AbstractNode
     {
     public:
+        SequenceNode() = default;
+        SequenceNode(SequenceNode&&) = delete;
+        SequenceNode& operator=(SequenceNode&&) = delete;
+        SequenceNode(const SequenceNode&) = delete;
+        SequenceNode& operator=(const SequenceNode&) = delete;
+
         //!Implementation of AbstractNode::get
         virtual void get( const AbstractResourceReader& in, AbstractResourceWriter* const out ) const override;
         //!Implementation of AbstractNode::addChild
@@ -150,7 +156,7 @@ namespace stree
     /*!
         Allows only 2 children: \a false and \a true
     */
-    class ResPresenceNode
+    class NX_UTILS_API ResPresenceNode
     :
         public AbstractNode
     {
@@ -169,7 +175,7 @@ namespace stree
     };
 
     //!Puts some resource value to output
-    class SetNode
+    class NX_UTILS_API SetNode
     :
         public AbstractNode
     {
