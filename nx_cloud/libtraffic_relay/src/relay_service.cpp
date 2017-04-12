@@ -1,4 +1,4 @@
-#include "relay_process.h"
+#include "relay_service.h"
 
 #include "controller/controller.h"
 #include "model/model.h"
@@ -10,17 +10,17 @@ namespace nx {
 namespace cloud {
 namespace relay {
 
-RelayProcess::RelayProcess(int argc, char **argv):
+RelayService::RelayService(int argc, char **argv):
     base_type(argc, argv, TrafficRelayAppInfo::applicationDisplayName())
 {
 }
 
-std::unique_ptr<utils::AbstractServiceSettings> RelayProcess::createSettings()
+std::unique_ptr<utils::AbstractServiceSettings> RelayService::createSettings()
 {
     return std::make_unique<conf::Settings>();
 }
 
-int RelayProcess::serviceMain(const utils::AbstractServiceSettings& abstractSettings)
+int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSettings)
 {
     const conf::Settings& settings = static_cast<const conf::Settings&>(abstractSettings);
 

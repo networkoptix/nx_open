@@ -1,10 +1,4 @@
-/**********************************************************
-* 8 may 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef CLOUD_DB_PROCESS_H
-#define CLOUD_DB_PROCESS_H
+#pragma once
 
 #include <atomic>
 #include <functional>
@@ -55,13 +49,13 @@ class CloudModuleUrlProvider;
 namespace conf { class Settings; }
 namespace ec2 { class ConnectionManager; }
 
-class CloudDBProcess:
+class CloudDbService:
     public nx::utils::Service
 {
     using base_type = nx::utils::Service;
 
 public:
-    CloudDBProcess(int argc, char **argv);
+    CloudDbService(int argc, char **argv);
 
     const std::vector<SocketAddress>& httpEndpoints() const;
 
@@ -172,5 +166,3 @@ private:
 
 } // namespace cdb
 } // namespace nx
-
-#endif  //HOLE_PUNCHER_SERVICE_H

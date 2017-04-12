@@ -13,13 +13,13 @@ namespace relay {
 
 namespace conf { class Settings; }
 
-class RelayProcess:
+class RelayService:
     public nx::utils::Service
 {
     using base_type = nx::utils::Service;
 
 public:
-    RelayProcess(int argc, char **argv);
+    RelayService(int argc, char **argv);
 
 protected:
     virtual std::unique_ptr<utils::AbstractServiceSettings> createSettings() override;

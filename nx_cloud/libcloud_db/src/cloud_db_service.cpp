@@ -1,9 +1,4 @@
-/**********************************************************
-* 8 may 2015
-* a.kolesnikov
-***********************************************************/
-
-#include "cloud_db_process.h"
+#include "cloud_db_service.h"
 
 #include <algorithm>
 #include <chrono>
@@ -59,7 +54,7 @@ static int registerQtResources()
 namespace nx {
 namespace cdb {
 
-CloudDBProcess::CloudDBProcess(int argc, char **argv):
+CloudDbService::CloudDbService(int argc, char **argv):
     base_type(argc, argv, QnLibCloudDbAppInfo::applicationDisplayName()),
     m_settings(nullptr),
     m_emailManager(nullptr),
@@ -77,19 +72,19 @@ CloudDBProcess::CloudDBProcess(int argc, char **argv):
     registerQtResources();
 }
 
-const std::vector<SocketAddress>& CloudDBProcess::httpEndpoints() const
+const std::vector<SocketAddress>& CloudDbService::httpEndpoints() const
 {
     return m_httpEndpoints;
 }
 
 static const QnUuid kCdbGuid("{674bafd7-4eec-4bba-84aa-a1baea7fc6db}");
 
-std::unique_ptr<utils::AbstractServiceSettings> CloudDBProcess::createSettings()
+std::unique_ptr<utils::AbstractServiceSettings> CloudDbService::createSettings()
 {
     return std::make_unique<conf::Settings>();
 }
 
-int CloudDBProcess::serviceMain(const utils::AbstractServiceSettings& abstractSettings)
+int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSettings)
 {
     const conf::Settings& settings = static_cast<const conf::Settings&>(abstractSettings);
 
@@ -268,7 +263,7 @@ int CloudDBProcess::serviceMain(const utils::AbstractServiceSettings& abstractSe
     return result;
 }
 
-void CloudDBProcess::registerApiHandlers(
+void CloudDbService::registerApiHandlers(
     nx_http::MessageDispatcher* const msgDispatcher,
     const AuthorizationManager& authorizationManager,
     AccountManager* const accountManager,
@@ -437,7 +432,7 @@ void CloudDBProcess::registerApiHandlers(
 }
 
 template<typename ManagerType, typename InputData, typename... OutputData>
-void CloudDBProcess::registerHttpHandler(
+void CloudDbService::registerHttpHandler(
     const char* handlerPath,
     void (ManagerType::*managerFunc)(
         const AuthorizationInfo& authzInfo,
@@ -470,7 +465,7 @@ void CloudDBProcess::registerHttpHandler(
 }
 
 template<typename ManagerType, typename... OutputData>
-void CloudDBProcess::registerHttpHandler(
+void CloudDbService::registerHttpHandler(
     const char* handlerPath,
     void (ManagerType::*managerFunc)(
         const AuthorizationInfo& authzInfo,
@@ -501,7 +496,7 @@ void CloudDBProcess::registerHttpHandler(
 }
 
 template<typename ManagerType>
-void CloudDBProcess::registerHttpHandler(
+void CloudDbService::registerHttpHandler(
     const char* handlerPath,
     typename CustomHttpHandler<ManagerType>::ManagerFuncType managerFuncPtr,
     ManagerType* manager)
