@@ -6,8 +6,10 @@ Used to create test environmant - virtual boxes, servers.
 import os
 import os.path
 import logging
+import re
 import shutil
 import subprocess
+import netaddr
 from .host import host_from_config
 from .vagrant_box_config import BoxConfig
 from .vagrant_box import Vagrant
@@ -81,10 +83,11 @@ class EnvironmentBuilder(object):
             config = required_config.clone(
                 idx=self._last_box_idx,
                 vm_name_prefix=self._vm_name_prefix,
-                vm_port_base=self._vm_port_base)
+                vm_port_base=self._vm_port_base,
+                )
             self._boxes_config.append(config)
         config.is_allocated = True
-        log.info('BOX CONFIG %s: %s', config.box_name(), config)
+        log.info('BOX CONFIG %s: %s', config.box_name, config)
         return config
 
     def _find_matching_box_config(self, required_config):
@@ -97,7 +100,7 @@ class EnvironmentBuilder(object):
 
     def _init_server(self, box_config_to_box, http_schema, config):
         box = box_config_to_box[config.box]
-        url = '%s://%s:%d/' % (http_schema, self._vm_host.host, config.box.rest_api_forwarded_port())
+        url = '%s://%s:%d/' % (http_schema, self._vm_host.host, config.box.rest_api_forwarded_port)
         server = Server(self._company_name, config.name, box, url)
         if config.leave_initial_cloud_host:
             patch_set_cloud_host = None

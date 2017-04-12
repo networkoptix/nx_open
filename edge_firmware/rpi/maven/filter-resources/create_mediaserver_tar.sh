@@ -256,7 +256,11 @@ if [[ "${box}" == "bpi" ]]; then
     do
       echo "Adding lib" ${var}
       cp $SYSROOT_PREFIX/${var}* $BUILD_DIR/$TARGET_LIB_DIR/ -av
-done
+    done
+elif [[ "${box}" == "bananapi" ]]; then
+    # Add files required for bananapi on Debian 8 "Jessie".
+    cp -r "$SYSROOT_PREFIX"/libglib* "$BUILD_DIR/$TARGET_LIB_DIR/"
+    cp -r "$PACKAGES_ROOT/sysroot/usr/bin/hdparm" "$BUILD_DIR/$PREFIX_DIR/mediaserver/bin/"
 fi
 
 #copying vox

@@ -10,7 +10,6 @@ import os
 import server_api_data_generators as generator
 import test_utils.utils as utils
 from datetime import datetime
-from test_utils.camera import Camera
 from test_utils.host import ProcessError
 
 log = logging.getLogger(__name__)
@@ -152,8 +151,8 @@ def wait_backup_finish(server, expected_backup_time):
         time.sleep(BACKUP_SCHEDULE_TIMEOUT_SEC / 10.)
 
 
-def add_camera(server, camera_id, backup_type):
-    camera = Camera('Camera_%d' % camera_id, generator.generate_mac(camera_id))
+def add_camera(camera_factory, server, camera_id, backup_type):
+    camera = camera_factory('Camera_%d' % camera_id, generator.generate_mac(camera_id))
     camera_guid = server.add_camera(camera)
     if backup_type:
         camera_attr = generator.generate_camera_user_attributes_data(
@@ -197,13 +196,13 @@ def assert_backup_equal_to_archive(server, camera, system_backup_type, backup_ne
         assert_paths_are_equal(server, low_quality_backup_path, low_quality_server_archive_path)
 
 
-def test_backup_by_request(env, sample_media_file, system_backup_type, backup_new_camera,
+def test_backup_by_request(env, camera_factory, sample_media_file, system_backup_type, backup_new_camera,
                            second_camera_backup_type):
     env.one.set_system_settings(
         backupNewCamerasByDefault=backup_new_camera)
     start_time = datetime(2017, 3, 27, tzinfo=pytz.utc)
-    camera_1 = add_camera(env.one, camera_id=1, backup_type=BACKUP_BOTH)
-    camera_2 = add_camera(env.one, camera_id=2, backup_type=second_camera_backup_type)
+    camera_1 = add_camera(camera_factory, env.one, camera_id=1, backup_type=BACKUP_BOTH)
+    camera_2 = add_camera(camera_factory, env.one, camera_id=2, backup_type=second_camera_backup_type)
     env.one.storage.save_media_sample(camera_1, start_time, sample_media_file)
     env.one.storage.save_media_sample(camera_2, start_time, sample_media_file)
     env.one.rebuild_archive()
@@ -216,10 +215,10 @@ def test_backup_by_request(env, sample_media_file, system_backup_type, backup_ne
                                    second_camera_backup_type)
 
 
-def test_backup_by_schedule(env, sample_media_file, system_backup_type):
+def test_backup_by_schedule(env, camera_factory, sample_media_file, system_backup_type):
     start_time_1 = datetime(2017, 3, 28, 9, 52, 16, tzinfo=pytz.utc)
     start_time_2 = start_time_1 + sample_media_file.duration*2
-    camera = add_camera(env.one, camera_id=1, backup_type=BACKUP_LOW)
+    camera = add_camera(camera_factory, env.one, camera_id=1, backup_type=BACKUP_LOW)
     env.one.storage.save_media_sample(camera, start_time_1, sample_media_file)
     env.one.storage.save_media_sample(camera, start_time_2, sample_media_file)
     env.one.rebuild_archive()
