@@ -63,10 +63,10 @@ void QnLayoutTourManager::saveTour(const ec2::ApiLayoutTourData& tour)
 {
     NX_EXPECT(this->tour(tour.id).isValid());
 
-//     const auto connection = QnAppServerConnectionFactory::getConnection2();
-//     if (!connection)
-//         return;
-//     connection->getLayoutTourManager(Qn::kSystemAccess)->save(tour, this, nullptr);
+    const auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection)
+        return;
+    connection->getLayoutTourManager(Qn::kSystemAccess)->save(tour, this, nullptr);
 }
 
 void QnLayoutTourManager::removeTour(const ec2::ApiLayoutTourData& tour)

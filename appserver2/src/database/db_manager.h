@@ -289,11 +289,10 @@ namespace detail
         ErrorCode doQueryNoLock(const ApiTranLogFilter&, ApiTransactionDataList& tranList);
 
         // Stub - acts as if nothing is found in the database. Needed for merge algorithm.
-        ErrorCode doQueryNoLock(const QnUuid& /*id*/, ApiUpdateUploadResponceDataList& data)
-        {
-            data.clear();
-            return ErrorCode::ok;
-        }
+        ErrorCode doQueryNoLock(const QnUuid& /*id*/, ApiUpdateUploadResponceDataList& data);
+
+        // getLayoutTours
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutTourDataList& data);
 
         // ------------ transactions --------------------------------------
 
@@ -311,6 +310,7 @@ namespace detail
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStorageData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiMediaServerUserAttributesData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutTourData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceStatusData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamWithRefData>& tran);
@@ -521,6 +521,9 @@ namespace detail
 
         ErrorCode removeLayout(const QnUuid& id);
         ErrorCode saveLayout(const ApiLayoutData& params);
+
+        ErrorCode removeLayoutTour(const QnUuid& id);
+        ErrorCode saveLayoutTour(const ApiLayoutTourData& params);
 
         ErrorCode deleteUserProfileTable(const qint32 id);
         ErrorCode removeUser( const QnUuid& guid );

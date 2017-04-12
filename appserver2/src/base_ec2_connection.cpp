@@ -46,6 +46,7 @@ BaseEc2Connection<QueryProcessorType>::BaseEc2Connection(
             m_userNotificationManager.get(),
             m_businessEventNotificationManager.get(),
             m_layoutNotificationManager.get(),
+            m_layoutTourNotificationManager.get(),
             m_videowallNotificationManager.get(),
             m_webPageNotificationManager.get(),
             m_storedFileNotificationManager.get(),
@@ -177,10 +178,24 @@ AbstractLayoutManagerPtr BaseEc2Connection<QueryProcessorType>::getLayoutManager
 }
 
 template<class QueryProcessorType>
+AbstractLayoutTourManagerPtr BaseEc2Connection<QueryProcessorType>::getLayoutTourManager(
+    const Qn::UserAccessData& userAccessData)
+{
+    return std::make_shared<QnLayoutTourManager<QueryProcessorType>>(m_queryProcessor, userAccessData);
+}
+
+template<class QueryProcessorType>
 AbstractLayoutNotificationManagerPtr
     BaseEc2Connection<QueryProcessorType>::getLayoutNotificationManager()
 {
     return m_layoutNotificationManager;
+}
+
+template<class QueryProcessorType>
+AbstractLayoutTourNotificationManagerPtr
+    BaseEc2Connection<QueryProcessorType>::getLayoutTourNotificationManager()
+{
+    return m_layoutTourNotificationManager;
 }
 
 template<class QueryProcessorType>
@@ -293,6 +308,12 @@ AbstractTimeNotificationManagerPtr
     BaseEc2Connection<QueryProcessorType>::getTimeNotificationManager()
 {
     return m_timeNotificationManager;
+}
+
+template<class QueryProcessorType>
+ECConnectionNotificationManager* BaseEc2Connection<QueryProcessorType>::notificationManager()
+{
+    return m_notificationManager.get();
 }
 
 template<class QueryProcessorType>

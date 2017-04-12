@@ -243,6 +243,9 @@ namespace ec2
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER(GetLayouts,                  ec2::ErrorCode, ec2::ApiLayoutDataList)
 
+        // Handlers for AbstractLayoutTourManager.
+        DEFINE_TWO_ARG_HANDLER(GetLayoutTours, ec2::ErrorCode, ec2::ApiLayoutTourDataList)
+
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractVideowallManager
         //////////////////////////////////////////////////////////
