@@ -47,7 +47,9 @@ QnAdamResourceSearcher::QnAdamAsciiCommand::QnAdamAsciiCommand(const QString& co
     wordNum = byteNum / 2;
 }
 
-QnAdamResourceSearcher::QnAdamResourceSearcher()
+QnAdamResourceSearcher::QnAdamResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule)
 {
 }
 
@@ -225,7 +227,7 @@ QnResourceList QnAdamResourceSearcher::findResources()
             if (remoteEndpoint.port != kAdamAutodiscoveryPort)
                 continue;
 
-            auto existingResources = qnResPool->getAllNetResourceByHostAddress(remoteEndpoint.address.toString());
+            auto existingResources = resourcePool()->getAllNetResourceByHostAddress(remoteEndpoint.address.toString());
 
             if (!existingResources.isEmpty())
             {

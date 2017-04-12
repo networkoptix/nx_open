@@ -12,6 +12,8 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/user_access_data.h>
+#include <common/common_module.h>
+#include <network/http_connection_listener.h>
 
 static const QByteArray NOT_AUTHORIZED_HTML("\
     <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd\">\
@@ -24,6 +26,9 @@ static const QByteArray NOT_AUTHORIZED_HTML("\
     </HTML>"
 );
 
+QnRestProcessorPool::QnRestProcessorPool()
+{
+}
 
 void QnRestProcessorPool::registerHandler(const QString& path, QnRestRequestHandler* handler, Qn::GlobalPermission permissions )
 {
@@ -60,11 +65,14 @@ const QnRestProcessorPool::Handlers& QnRestProcessorPool::handlers() const
 class QnRestConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
-    QnTcpListener* owner;
+    QnHttpConnectionListener* owner = nullptr;
 };
 
-QnRestConnectionProcessor::QnRestConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket),
+QnRestConnectionProcessor::QnRestConnectionProcessor(
+    QSharedPointer<AbstractStreamSocket> socket,
+    QnHttpConnectionListener* _owner)
+:
+    QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket, _owner->commonModule()),
     m_noAuth(false)
 {
     Q_D(QnRestConnectionProcessor);
@@ -102,18 +110,18 @@ void QnRestConnectionProcessor::run()
     QList<QPair<QString, QString> > params = QUrlQuery(url.query()).queryItems(QUrl::FullyDecoded);
     int rez = CODE_OK;
     QByteArray contentType = "application/xml";
-    QnRestRequestHandlerPtr handler = QnRestProcessorPool::instance()->findHandler(url.path());
+    QnRestRequestHandlerPtr handler = d->owner->processorPool()->findHandler(url.path());
     if (handler)
     {
         if (!m_noAuth && d->accessRights != Qn::kSystemAccess)
         {
-            QnUserResourcePtr user = qnResPool->getResourceById<QnUserResource>(d->accessRights.userId);
+            QnUserResourcePtr user = resourcePool()->getResourceById<QnUserResource>(d->accessRights.userId);
             if (!user)
             {
                 sendUnauthorizedResponse(nx_http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
                 return;
             }
-            if (!qnResourceAccessManager->hasGlobalPermission(user, handler->permissions()))
+            if (!resourceAccessManager()->hasGlobalPermission(user, handler->permissions()))
             {
                 sendUnauthorizedResponse(nx_http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
                 return;

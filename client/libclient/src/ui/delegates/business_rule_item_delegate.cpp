@@ -1,5 +1,7 @@
 #include "business_rule_item_delegate.h"
 
+#include <QtGui/QPainter>
+
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QComboBox>
@@ -118,25 +120,13 @@ int QnBusinessRuleItemDelegate::optimalWidth(int column, const QFontMetrics &met
     {
         case QnBusiness::EventColumn:
         {
-            auto eventWidth = [metrics](QnBusiness::EventType eventType)
-            {
-                return metrics.width(QnBusinessStringsHelper::eventName(eventType));
-            };
-            int result = -1;
-            for (QnBusiness::EventType eventType : QnBusiness::allEvents())
-                result = qMax(result, eventWidth(eventType));
-            return kExtraSpace + result;
+            //TODO: #GDM #3.1 #refactor table
+            return kExtraSpace + 100;
         }
         case QnBusiness::ActionColumn:
         {
-            auto actionWidth = [metrics](QnBusiness::ActionType actionType)
-            {
-                return metrics.width(QnBusinessStringsHelper::actionName(actionType));
-            };
-            int result = -1;
-            for (QnBusiness::ActionType actionType : QnBusiness::allActions())
-                result = qMax(result, actionWidth(actionType));
-            return kExtraSpace + result;
+            //TODO: #GDM #3.1 #refactor table
+            return kExtraSpace + 100;
         }
         case QnBusiness::AggregationColumn:
         {
@@ -253,8 +243,9 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         {
             QComboBox* comboBox = new QComboBox(parent);
             comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
-            for (QnBusiness::EventType eventType : m_lexComparator->lexSortedEvents())
-                comboBox->addItem(QnBusinessStringsHelper::eventName(eventType), eventType);
+            //TODO: #GDM #3.1 #refactor table
+//             for (QnBusiness::EventType eventType : m_lexComparator->lexSortedEvents())
+//                 comboBox->addItem(QnBusinessStringsHelper::eventName(eventType), eventType);
             return comboBox;
         }
         case QnBusiness::ActionColumn:
@@ -266,7 +257,8 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
             {
                 if (instantOnly && !QnBusiness::canBeInstant(actionType))
                     continue;
-                comboBox->addItem(QnBusinessStringsHelper::actionName(actionType), actionType);
+                //TODO: #GDM #3.1 #refactor table
+//                comboBox->addItem(QnBusinessStringsHelper::actionName(actionType), actionType);
             }
             return comboBox;
         }

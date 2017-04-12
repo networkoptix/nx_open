@@ -6,10 +6,20 @@
 #include <QtCore/QTimer>
 #include <QtCore/QMutex>
 
+#include <common/common_module.h>
+
+#include <nx/utils/debug_utils.h>
+#include <nx/utils/flag_config.h>
+#include <nx/utils/log/log.h>
+#include <utils/common/long_runable_cleanup.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
+
+#include <plugins/resource/avi/avi_resource.h>
+#include <plugins/resource/avi/avi_archive_delegate.h>
 
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/rtsp_client_archive_delegate.h>
@@ -19,16 +29,7 @@
 #include "video_decoder_registry.h"
 #include "audio_output.h"
 
-#include <plugins/resource/avi/avi_resource.h>
-#include <plugins/resource/avi/avi_archive_delegate.h>
-#include <nx/utils/flag_config.h>
-#include <nx/utils/log/log.h>
-
-#define OUTPUT_PREFIX "media_player: "
-#include <nx/utils/debug_utils.h>
-
 #include "media_player_quality_chooser.h"
-#include <utils/common/long_runable_cleanup.h>
 
 namespace nx {
 namespace media {
@@ -36,29 +37,31 @@ namespace media {
 namespace {
 
 // Max allowed frame duration. If the distance is higher, then the discontinuity is detected.
-static const qint64 kMaxFrameDurationMs = 1000 * 5;
+static constexpr qint64 kMaxFrameDurationMs = 1000 * 5;
 
-static const qint64 kLivePosition = -1;
+static constexpr qint64 kLivePosition = -1;
 
 // Resync playback timer if a video frame is too late.
-static const int kMaxDelayForResyncMs = 500;
+static constexpr int kMaxDelayForResyncMs = 500;
 
 // Max allowed amount of underflow/overflow issues in Live mode before extending live buffer.
-static const int kMaxCounterForWrongLiveBuffer = 2;
+static constexpr int kMaxCounterForWrongLiveBuffer = 2;
 
 // Calculate next time to render later. It used for AV sync in case of audio buffer has hole in the middle.
 // At this case current audio playback position may be significant less than video frame PTS.
 // Audio and video timings will became similar as soon as audio buffer passes a hole.
-static const int kTryLaterIntervalMs = 16;
+static constexpr int kTryLaterIntervalMs = 16;
 
 // Default value for max openGL texture size
-static const int kDefaultMaxTextureSize = 2048;
+static constexpr int kDefaultMaxTextureSize = 2048;
 
 // Player will go to the invalid state if no data is received within this timeout.
-static const int kGotDataTimeoutMs = 1000 * 30;
+static constexpr int kGotDataTimeoutMs = 1000 * 30;
 
 // Periodic tasks timer interval
-static const int kPeriodicTasksTimeoutMs = 1000;
+static constexpr int kPeriodicTasksTimeoutMs = 1000;
+
+static constexpr const char* OUTPUT_PREFIX = "media_player: ";
 
 struct NxMediaFlagConfig: public nx::utils::FlagConfig
 {
@@ -90,7 +93,7 @@ static qint64 usecToMsec(qint64 posUsec)
 class PlayerPrivate: public QObject
 {
     Q_DECLARE_PUBLIC(Player)
-    Player *q_ptr;
+    Player* q_ptr;
 
 public:
     // Holds QT property value.
@@ -922,7 +925,7 @@ void Player::setSource(const QUrl& url)
     }
     else
     {
-        d->resource = qnResPool->getResourceById(QnUuid(path));
+        d->resource = commonModule()->resourcePool()->getResourceById(QnUuid(path));
     }
 
     if (d->resource && currentState == State::Playing)

@@ -530,7 +530,7 @@ void AddressResolver::mediatorResolve(
         resolveResult = SystemError::hostNotFound;
     }
 
-    const auto unlockedGuard = makeScopedGuard(
+    const auto unlockedGuard = makeScopeGuard(
         [lk, guards = grabHandlers(resolveResult, info)]() mutable
         {
             QnMutexUnlocker ulk(lk);

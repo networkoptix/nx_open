@@ -17,7 +17,7 @@
 #include <QString>
 #include <QUrl>
 
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 #include <utils/fs/file.h>
 #include <nx/network/http/asynchttpclient.h>
 

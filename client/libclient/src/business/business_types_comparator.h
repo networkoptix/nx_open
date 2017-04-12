@@ -2,8 +2,12 @@
 
 #include <business/business_fwd.h>
 
+#include <client_core/connection_context_aware.h>
+
 /** Helper class to sort business types lexicographically. */
-class QnBusinessTypesComparator: public QObject {
+class QnBusinessTypesComparator: public QObject, public QnConnectionContextAware
+{
+    using base_type = QObject;
 public:
     QnBusinessTypesComparator(QObject *parent = nullptr);
 

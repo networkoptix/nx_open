@@ -2,22 +2,26 @@
 
 #include <QUrlQuery>
 
+#include <common/common_globals.h>
+
 #include <utils/common/request_param.h>
+
+class QnResourcePool;
 
 struct QnMultiserverRequestData
 {
     template<typename T, typename Params>
-    static T fromParams(const Params& params)
+    static T fromParams(QnResourcePool* resourcePool, const Params& params)
     {
         T request;
-        request.loadFromParams(params);
+        request.loadFromParams(resourcePool, params);
         return request;
     }
 
-    explicit QnMultiserverRequestData(const QnRequestParamList& params);
+    QnMultiserverRequestData(QnResourcePool* resourcePool, const QnRequestParamList& params);
 
-    virtual void loadFromParams(const QnRequestParamList& params);
-    virtual void loadFromParams(const QnRequestParams& params);
+    virtual void loadFromParams(QnResourcePool* resourcePool, const QnRequestParamList& params);
+    virtual void loadFromParams(QnResourcePool* resourcePool, const QnRequestParams& params);
     virtual QnRequestParamList toParams() const;
     virtual QUrlQuery toUrlQuery() const;
     virtual bool isValid() const;

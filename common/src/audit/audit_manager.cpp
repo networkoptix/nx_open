@@ -2,7 +2,10 @@
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
 #include "api/global_settings.h"
+
+#include <nx/utils/datetime.h>
 #include <nx/utils/log/assert.h>
+#include <common/common_module.h>
 
 namespace
 {
@@ -43,13 +46,16 @@ QnAuditRecord QnAuditManager::ChangedSettingInfo::toAuditRecord() const
     return QnAuditManager::prepareRecord(session, eventType);
 }
 
-QnAuditManager::QnAuditManager()
+QnAuditManager::QnAuditManager(QObject* parent):
+    QObject(parent),
+    QnCommonModuleAware(parent)
 {
+    const auto& settings = commonModule()->globalSettings();
     m_sessionCleanupTimer.restart();
-    m_enabled = qnGlobalSettings->isAuditTrailEnabled();
-    connect(QnGlobalSettings::instance(), &QnGlobalSettings::auditTrailEnableChanged, this,
+    m_enabled = settings->isAuditTrailEnabled();
+    connect(settings, &QnGlobalSettings::auditTrailEnableChanged, this,
         [this]() {
-            setEnabled(QnGlobalSettings::instance()->isAuditTrailEnabled());
+            setEnabled(commonModule()->globalSettings()->isAuditTrailEnabled());
         }
     );
 

@@ -15,6 +15,8 @@
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 
+#include <common/common_module.h>
+
 #include <core/resource/resource_display_info.h>
 #include "core/resource/resource_type.h"
 #include "core/resource_management/resource_pool.h"
@@ -56,7 +58,7 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
 
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QnAboutDialog::reject);
     connect(m_copyButton, &QPushButton::clicked, this, &QnAboutDialog::at_copyButton_clicked);
-    connect(QnGlobalSettings::instance(), &QnGlobalSettings::emailSettingsChanged, this, &QnAboutDialog::retranslateUi);
+    connect(qnGlobalSettings, &QnGlobalSettings::emailSettingsChanged, this, &QnAboutDialog::retranslateUi);
     connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(), &QnWorkbenchVersionMismatchWatcher::mismatchDataChanged, this, &QnAboutDialog::retranslateUi);
 
     retranslateUi();
@@ -95,7 +97,7 @@ QString QnAboutDialog::connectedServers() const
         if (!server)
             continue;
 
-        /* Consistency with QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered */
+        /* Consistency with ActionHandler::at_versionMismatchMessageAction_triggered */
         QString version = L'v' + data.version.toString();
         bool updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
         if (updateRequested)
@@ -163,7 +165,7 @@ void QnAboutDialog::retranslateUi()
     ui->gpuLabel->setText(gpu.join(lineSeparator));
     ui->serversLabel->setText(servers);
 
-    QString supportAddress = QnGlobalSettings::instance()->emailSettings().supportEmail;
+    QString supportAddress = qnGlobalSettings->emailSettings().supportEmail;
     QString supportLink = supportAddress;
     QnEmailAddress supportEmail(supportAddress);
 

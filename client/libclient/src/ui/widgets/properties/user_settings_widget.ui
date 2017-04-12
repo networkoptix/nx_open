@@ -249,7 +249,7 @@
       </spacer>
      </item>
      <item row="1" column="1" colspan="3">
-      <widget class="QLabel" name="permissionsLabel">
+      <widget class="QnWordWrappedLabel" name="permissionsLabel">
        <property name="text">
         <string notr="true">&lt;table&gt;
 &lt;tr&gt;&lt;td&gt;&lt;b&gt;3&lt;/b&gt; / 6&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;Permissions&lt;/td&gt;&lt;/tr&gt;
@@ -291,6 +291,12 @@
    <class>QnCloudUserPanelWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/properties/cloud_user_panel_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

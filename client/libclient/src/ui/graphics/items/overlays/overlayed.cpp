@@ -1,11 +1,13 @@
 #include "overlayed.h"
 
 #include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsLinearLayout>
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 
 #include <nx/client/ui/workbench/workbench_animations.h>
+#include <nx/utils/math/fuzzy.h>
 
 #include <utils/common/warnings.h>
 
@@ -173,22 +175,31 @@ void detail::OverlayedBase::setOverlayWidgetVisible(QGraphicsWidget* widget, boo
     if (!widget)
         return;
 
-    qreal opacity = visible ? 1.0 : 0.0;
-
+    const qreal opacity = visible ? 1.0 : 0.0;
     if (animate)
     {
-        using namespace nx::client::ui::workbench;
+        using namespace nx::client::desktop::ui::workbench;
         auto animator = opacityAnimator(widget);
 
-        qnWorkbenchAnimations->setupAnimator(animator, visible
-            ? Animations::Id::ItemOverlayShow
-            : Animations::Id::ItemOverlayHide);
-        animator->animateTo(opacity);
+        const bool sameTarget = animator->isRunning()
+            && qFuzzyEquals(animator->targetValue().toReal(), opacity);
+
+        if (!sameTarget)
+        {
+            animator->stop();
+
+            qnWorkbenchAnimations->setupAnimator(animator, visible
+                ? Animations::Id::ItemOverlayShow
+                : Animations::Id::ItemOverlayHide);
+
+            animator->animateTo(opacity);
+        }
     }
     else
     {
         if (hasOpacityAnimator(widget))
             opacityAnimator(widget)->stop();
+
         widget->setOpacity(opacity);
     }
 

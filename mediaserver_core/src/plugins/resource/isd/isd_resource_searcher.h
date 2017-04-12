@@ -8,13 +8,13 @@
 #include <plugins/resource/mdns/mdns_listener.h>
 #include <nx/network/upnp/upnp_device_searcher.h>
 
-class QnPlISDResourceSearcher : 
+class QnPlISDResourceSearcher:
 	public QnAbstractNetworkResourceSearcher,
 	public nx_upnp::SearchHandler
 {
 
 public:
-    QnPlISDResourceSearcher();
+    QnPlISDResourceSearcher(QnCommonModule* commonModule);
 
     virtual QnResourcePtr createResource(
         const QnUuid &resourceTypeId,

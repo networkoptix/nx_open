@@ -46,6 +46,14 @@ typedef std::shared_ptr<AbstractMediaServerNotificationManager> AbstractMediaSer
             }, serverList );
         }
 
+        ErrorCode getServersExSync(ec2::ApiMediaServerDataExList* const serverList)
+        {
+            return impl::doSyncCall<impl::GetServersExHandler>([this](const impl::GetServersExHandlerPtr &handler)
+            {
+                return this->getServersEx(handler);
+            }, serverList);
+        }
+
         /*!
         \param handler Functor with params: (ErrorCode)
         */
@@ -184,6 +192,7 @@ typedef std::shared_ptr<AbstractMediaServerNotificationManager> AbstractMediaSer
 
     protected:
         virtual int getServers(impl::GetServersHandlerPtr handler) = 0;
+        virtual int getServersEx(impl::GetServersExHandlerPtr handler) = 0;
         virtual int save(const ec2::ApiMediaServerData&, impl::SimpleHandlerPtr handler) = 0;
         virtual int remove(const QnUuid& id, impl::SimpleHandlerPtr handler) = 0;
         virtual int saveUserAttributes(const ec2::ApiMediaServerUserAttributesDataList& serverAttrs, impl::SimpleHandlerPtr handler) = 0;

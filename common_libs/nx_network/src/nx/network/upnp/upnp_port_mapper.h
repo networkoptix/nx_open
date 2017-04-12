@@ -1,13 +1,14 @@
 #ifndef UPNP_PORT_MAPPER_H
 #define UPNP_PORT_MAPPER_H
 
-#include "upnp_device_searcher.h"
-#include "upnp_async_client.h"
-
-#include "utils/common/app_info.h"
-#include "utils/common/guard.h"
-
 #include <QWaitCondition>
+
+#include <nx/utils/scope_guard.h>
+
+#include <utils/common/app_info.h>
+
+#include "upnp_async_client.h"
+#include "upnp_device_searcher.h"
 
 namespace nx_upnp {
 

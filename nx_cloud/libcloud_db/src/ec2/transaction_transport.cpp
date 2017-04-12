@@ -27,8 +27,10 @@ TransactionTransport::TransactionTransport(
     const QByteArray& contentEncoding)
 :
     ::ec2::QnTransactionTransportBase(
+        QnUuid(), //< localSystemId. Not used here
         QnUuid::fromStringSafe(connectionId),
         ::ec2::ConnectionLockGuard(
+            localPeer.id,
             connectionGuardSharedState,
             remotePeer.id,
             ::ec2::ConnectionLockGuard::Direction::Incoming),
@@ -118,7 +120,7 @@ void TransactionTransport::setOnGotTransaction(GotTransactionEventHandler handle
 
 void TransactionTransport::startOutgoingChannel()
 {
-    NX_LOGX(QnLog::EC2_TRAN_LOG, 
+    NX_LOGX(QnLog::EC2_TRAN_LOG,
         lm("Starting outgoing transaction channel to %1")
         .str(m_commonTransportHeaderOfRemoteTransaction),
         cl_logDEBUG1);
@@ -200,7 +202,7 @@ void TransactionTransport::sendTransaction(
         highestProtocolVersionCompatibleWithRemotePeer());
 
     post(
-        [this, 
+        [this,
             serializedTransaction = std::move(serializedTransaction),
             transactionHeader = transactionSerializer->transactionHeader()]()
         {
@@ -230,7 +232,7 @@ void TransactionTransport::sendTransaction(
         });
 }
 
-const TransactionTransportHeader& 
+const TransactionTransportHeader&
     TransactionTransport::commonTransportHeaderOfRemoteTransaction() const
 {
     return m_commonTransportHeaderOfRemoteTransaction;
@@ -269,11 +271,11 @@ void TransactionTransport::onGotTransaction(
 {
     NX_CRITICAL(isInSelfAioThread());
 
-    // ::ec2::QnTransactionTransportBase::gotTransaction allows binding to 
+    // ::ec2::QnTransactionTransportBase::gotTransaction allows binding to
     //  itself only as QueuedConnection, so we have to use post to exit this handler ASAP.
 
     post(
-        [this, 
+        [this,
             tranFormat,
             data = std::move(data),
             transportHeader = std::move(transportHeader)]() mutable
@@ -321,7 +323,7 @@ void TransactionTransport::onStateChanged(
 {
     NX_CRITICAL(isInSelfAioThread());
 
-    // ::ec2::QnTransactionTransportBase::gotTransaction allows binding to 
+    // ::ec2::QnTransactionTransportBase::gotTransaction allows binding to
     //  itself only as QueuedConnection, so we have to use post to exit this handler ASAP.
 
     post(
@@ -358,7 +360,7 @@ void TransactionTransport::onTransactionsReadFromLog(
 
     if ((resultCode != api::ResultCode::ok) && (resultCode != api::ResultCode::partialContent))
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG, 
+        NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("systemId %1. Error reading transaction log (%2). "
                "Closing connection to the peer %3")
                 .arg(m_systemId).arg(api::toString(resultCode))

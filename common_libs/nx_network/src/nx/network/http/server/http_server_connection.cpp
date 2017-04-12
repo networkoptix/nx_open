@@ -5,8 +5,6 @@
 
 #include <QtCore/QDateTime>
 
-#include <utils/common/util.h>
-
 #include "http_message_dispatcher.h"
 #include "http_stream_socket_server.h"
 
@@ -61,7 +59,7 @@ void HttpServerConnection::processMessage( nx_http::Message&& requestMessage )
     {
         onAuthenticationDone(
             true,
-            stree::ResourceContainer(),
+            nx::utils::stree::ResourceContainer(),
             std::move(requestMessage),
             boost::none,
             nx_http::HttpHeaders(),
@@ -78,7 +76,7 @@ void HttpServerConnection::processMessage( nx_http::Message&& requestMessage )
         [this, weakThis = std::move(weakThis),
             requestMessage = std::move(requestMessage)](
                 bool authenticationResult,
-                stree::ResourceContainer authInfo,
+                nx::utils::stree::ResourceContainer authInfo,
                 boost::optional<header::WWWAuthenticate> wwwAuthenticate,
                 nx_http::HttpHeaders responseHeaders,
                 std::unique_ptr<AbstractMsgBodySource> msgBody) mutable
@@ -115,7 +113,7 @@ void HttpServerConnection::processMessage( nx_http::Message&& requestMessage )
 
 void HttpServerConnection::onAuthenticationDone(
     bool authenticationResult,
-    stree::ResourceContainer authInfo,
+    nx::utils::stree::ResourceContainer authInfo,
     nx_http::Message requestMessage,
     boost::optional<header::WWWAuthenticate> wwwAuthenticate,
     nx_http::HttpHeaders responseHeaders,
@@ -222,7 +220,7 @@ void HttpServerConnection::prepareAndSendResponse(
         nx_http::HttpHeader(nx_http::header::Server::NAME, nx_http::serverString() ) );
     nx_http::insertOrReplaceHeader(
         &msg.response->headers,
-        nx_http::HttpHeader( "Date", dateTimeToHTTPFormat( QDateTime::currentDateTime() ) ) );
+        nx_http::HttpHeader( "Date", nx_http::formatDateTime( QDateTime::currentDateTime() ) ) );
 
     //TODO #ak connection persistency
 

@@ -12,6 +12,14 @@ namespace nx {
 namespace plugins {
 namespace flir {
 
+
+OnvifResourceSearcher::OnvifResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
+    ::OnvifResourceSearcher(commonModule)
+{
+
+}
+
 QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(
     const QUrl& url,
     const QAuthenticator& auth,

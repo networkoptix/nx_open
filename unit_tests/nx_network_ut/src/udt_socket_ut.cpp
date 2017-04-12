@@ -9,7 +9,7 @@
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/utils/std/future.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
 #include <nx/utils/test_support/test_options.h>
 
@@ -88,7 +88,7 @@ public:
 
     virtual void processRequest(
         nx_http::HttpServerConnection* const /*connection*/,
-        stree::ResourceContainer /*authInfo*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
         const nx_http::Request& /*request*/,
         nx_http::Response* const /*response*/,
         std::function<void(
@@ -205,7 +205,7 @@ TEST_F(SocketUdt, rendezvousConnect)
     const auto connectorSocket = rendezvousUdtSocket(kConnectTimeout);
     const auto acceptorSocket = rendezvousUdtSocket(kConnectTimeout);
 
-    auto socketStoppedGuard = makeScopedGuard(
+    auto socketStoppedGuard = makeScopeGuard(
         [&connectorSocket, &acceptorSocket]
         {
             //cleaning up
@@ -358,7 +358,7 @@ TEST_F(SocketUdt, acceptingFirstConnection)
     for (int i = 0; i < loopLength; ++i)
     {
         UdtStreamServerSocket serverSocket(AF_INET);
-        auto serverSocketGuard = makeScopedGuard(
+        auto serverSocketGuard = makeScopeGuard(
             [&serverSocket]() { serverSocket.pleaseStopSync(); });
 
         ASSERT_TRUE(serverSocket.bind(SocketAddress(HostAddress::localhost, 0)));

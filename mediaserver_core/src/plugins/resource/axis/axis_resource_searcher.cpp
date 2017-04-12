@@ -11,6 +11,7 @@
 #include <common/common_module.h>
 #include <plugins/resource/mdns/mdns_packet.h>
 #include <utils/common/credentials.h>
+#include <common/static_common_module.h>
 
 extern QString getValueFromString(const QString& line);
 
@@ -20,7 +21,10 @@ namespace
     const int kDefaultAxisTimeout = 4000;
 }
 
-QnPlAxisResourceSearcher::QnPlAxisResourceSearcher()
+QnPlAxisResourceSearcher::QnPlAxisResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule),
+    QnMdnsResourceSearcher(commonModule)
 {
 }
 
@@ -117,7 +121,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     if (typeId.isNull())
         return QList<QnResourcePtr>();
 
-    QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), name);
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), name);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return QList<QnResourcePtr>(); // model forced by ONVIF
 
@@ -222,7 +226,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
         }
     }
 
-    QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), name);
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), name);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return local_results; // model forced by ONVIF
 
@@ -280,7 +284,7 @@ bool QnPlAxisResourceSearcher::testCredentials(
 
     CLHttpStatus status;
     auto response = downloadFile(status, kTestCredentialsUrl, host, port, kDefaultAxisTimeout, auth);
-    
+
     if (status != CL_HTTP_SUCCESS)
         return false;
 
@@ -293,11 +297,11 @@ QAuthenticator QnPlAxisResourceSearcher::determineResourceCredentials(
     if (!resource)
         return QAuthenticator();
 
-    auto existingResource = qnResPool->getNetResourceByPhysicalId(resource->getPhysicalId());
+    auto existingResource = resourcePool()->getNetResourceByPhysicalId(resource->getPhysicalId());
     if (existingResource)
         return existingResource->getAuth();
 
-    auto resData = qnCommon->dataPool()->data(resource->getVendor(), resource->getModel());
+    auto resData = qnStaticCommon->dataPool()->data(resource->getVendor(), resource->getModel());
     auto possibleCredentials = resData.value<QList<nx::common::utils::Credentials>>(
         Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
 

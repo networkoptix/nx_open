@@ -780,7 +780,7 @@ enum IDType
     /**
      * Activates preset by index
      */
-    PtzActivatePresetByIndexAction, 
+    PtzActivatePresetByIndexAction,
 
     /* Layout actions. */
 
@@ -921,9 +921,15 @@ enum IDType
     TogglePanicModeAction,
 
     /**
-     * Toggles tour mode.
+     * Toggles layout tour mode.
      */
-    ToggleTourModeAction,
+    ToggleLayoutTourModeAction,
+
+    NewLayoutTourAction,
+    LayoutTourSettingsAction,
+    RenameLayoutTourAction,
+    OpenLayoutTourAction,
+    RemoveLayoutTourAction,
 
     /* Timeline actions. */
 
@@ -1108,7 +1114,7 @@ enum IDType
 
     /** Hide cloud promo */
     HideCloudPromoAction,
-	
+
     /**
      * Go to the next item on layout.
      */
@@ -1123,7 +1129,11 @@ enum IDType
      * Maximizes/Unmaximizes current item
      **/
     ToggleCurrentItemMaximizationStateAction,
-	
+
+    /**
+    * Opens Web Page settings dialog.
+    */
+    WebPageSettingsAction,
 
     ActionCount,
 

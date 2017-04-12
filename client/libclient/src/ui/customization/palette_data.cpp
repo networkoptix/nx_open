@@ -1,8 +1,7 @@
 #include "palette_data.h"
 
+#include <array>
 #include <cassert>
-
-#include <boost/array.hpp>
 
 #include <nx/fusion/serialization/json_functions.h>
 
@@ -10,8 +9,8 @@
 // -------------------------------------------------------------------------- //
 // QnPaletteData
 // -------------------------------------------------------------------------- //
-typedef boost::array<QColor, QPalette::NColorRoles> QnColorGroup;
-typedef boost::array<QnColorGroup, QPalette::NColorGroups> QnPaletteColors;
+typedef std::array<QColor, QPalette::NColorRoles> QnColorGroup;
+typedef std::array<QnColorGroup, QPalette::NColorGroups> QnPaletteColors;
 
 class QnPaletteDataPrivate: public QSharedData {
 public:

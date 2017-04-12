@@ -1,6 +1,8 @@
 #include "camera_output_business_action_widget.h"
 #include "ui_camera_output_business_action_widget.h"
 
+#include <QtCore/QScopedValueRollback>
+
 #include <business/business_action_parameters.h>
 #include <business/actions/camera_output_business_action.h>
 
@@ -73,7 +75,7 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields
         QnIOPortDataList outputPorts;
         bool inited = false;
 
-        auto cameras = qnResPool->getResources<QnVirtualCameraResource>(model()->actionResources());
+        auto cameras = resourcePool()->getResources<QnVirtualCameraResource>(model()->actionResources());
         foreach(const QnVirtualCameraResourcePtr &camera, cameras)
         {
             QnIOPortDataList cameraOutputs = camera->getRelayOutputList();

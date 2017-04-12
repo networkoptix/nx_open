@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QItemSelectionModel>
+
 #include <QtWidgets/QWidget>
 
 #include <core/resource_access/resource_access_filter.h>

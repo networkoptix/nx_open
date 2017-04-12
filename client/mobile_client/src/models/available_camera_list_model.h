@@ -2,12 +2,16 @@
 
 #include <QtCore/QAbstractListModel>
 
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource/resource_fwd.h>
 #include <utils/common/connective.h>
 #include <utils/common/id.h>
 
 class QnAvailableCameraListModelPrivate;
-class QnAvailableCameraListModel : public Connective<QAbstractListModel>
+class QnAvailableCameraListModel:
+    public Connective<QAbstractListModel>,
+    public QnConnectionContextAware
 {
     Q_OBJECT
 
@@ -30,9 +34,6 @@ public:
 
 protected:
     virtual bool filterAcceptsResource(const QnResourcePtr& resource) const;
-
-protected:
-    void resetResourcesInternal();
 
 private:
     QScopedPointer<QnAvailableCameraListModelPrivate> d_ptr;

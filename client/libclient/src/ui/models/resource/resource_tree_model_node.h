@@ -2,6 +2,8 @@
 
 #include <nx/utils/uuid.h>
 
+#include <common/common_globals.h>
+
 #include <client/client_globals.h>
 
 #include <core/resource/resource_fwd.h>

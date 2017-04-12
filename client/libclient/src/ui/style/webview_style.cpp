@@ -1,5 +1,8 @@
 #include "webview_style.h"
 
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QStyleFactory>
+
 #include <QtWebKitWidgets/QWebView>
 #include <QtWebKitWidgets/QGraphicsWebView>
 

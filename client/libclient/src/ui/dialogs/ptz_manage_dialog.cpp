@@ -445,7 +445,7 @@ void QnPtzManageDialog::at_savePositionButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        nx::client::messages::Ptz::failedToGetPosition(this, m_resource->getName());
+        nx::client::desktop::messages::Ptz::failedToGetPosition(this, m_resource->getName());
         return;
     }
 
@@ -464,7 +464,7 @@ void QnPtzManageDialog::at_goToPositionButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        nx::client::messages::Ptz::failedToSetPosition(this, m_resource->getName());
+        nx::client::desktop::messages::Ptz::failedToSetPosition(this, m_resource->getName());
         return;
     }
 
@@ -505,7 +505,7 @@ void QnPtzManageDialog::at_startTourButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        nx::client::messages::Ptz::failedToSetPosition(this, m_resource->getName());
+        nx::client::desktop::messages::Ptz::failedToSetPosition(this, m_resource->getName());
         return;
     }
 
@@ -560,7 +560,7 @@ void QnPtzManageDialog::at_deleteButton_clicked()
                     break;
             }
 
-            if (presetIsInUse && !nx::client::messages::Ptz::deletePresetInUse(this))
+            if (presetIsInUse && !nx::client::desktop::messages::Ptz::deletePresetInUse(this))
                 break;
 
             m_model->removePreset(data.presetModel.preset.id);

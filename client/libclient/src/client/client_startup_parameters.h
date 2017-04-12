@@ -20,6 +20,8 @@ struct QnStartupParameters
 
     QUrl parseAuthenticationString() const;
 
+    bool isDevMode() const;
+
     int screen;
     const static QString kScreenKey;
 

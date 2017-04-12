@@ -129,7 +129,7 @@ ReverseAcceptor::NxRcHandler::NxRcHandler(ReverseAcceptor* acceptor):
 
 void ReverseAcceptor::NxRcHandler::processRequest(
     nx_http::HttpServerConnection* const connection,
-    stree::ResourceContainer,
+    nx::utils::stree::ResourceContainer,
     nx_http::Request request,
     nx_http::Response* const response,
     nx_http::RequestProcessedHandler handler)

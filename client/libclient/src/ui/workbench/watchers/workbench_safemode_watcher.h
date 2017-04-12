@@ -1,6 +1,11 @@
 #pragma once
 
-class QnWorkbenchSafeModeWatcher: public QObject {
+#include <client_core/connection_context_aware.h>
+
+class QLabel;
+
+class QnWorkbenchSafeModeWatcher: public QObject, public QnConnectionContextAware
+{
     Q_OBJECT
 public:
     enum class ControlMode {

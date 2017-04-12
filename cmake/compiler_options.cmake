@@ -1,15 +1,3 @@
-set(_fullRpath ON)
-
-if(CMAKE_CROSSCOMPILING)
-    set(_fullRpath OFF)
-endif()
-
-option(fullRpath
-    "Unset to leave only relative RPATHs (Must be OFF for production builds)."
-    ${_fullRpath})
-
-unset(_fullRpath)
-
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -109,8 +97,11 @@ if(WIN32)
         add_compile_options(/wd4250)
     endif()
 
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /LARGEADDRESSAWARE")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /LARGEADDRESSAWARE")
+    set(_extra_linker_flags "/LARGEADDRESSAWARE /OPT:NOREF /ignore:4221")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${_extra_linker_flags}")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${_extra_linker_flags}")
+    set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /ignore:4221")
+    unset(_extra_linker_flags)
 endif()
 
 if(UNIX)
@@ -137,12 +128,10 @@ if(LINUX)
         -Wno-unknown-pragmas
         -Wno-ignored-qualifiers)
 
-    if(fullRpath)
-        set(CMAKE_SKIP_BUILD_RPATH OFF)
-        set(CMAKE_BUILD_WITH_INSTALL_RPATH OFF)
-    else()
-        set(CMAKE_SKIP_BUILD_RPATH ON)
-        set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+    set(CMAKE_SKIP_BUILD_RPATH ON)
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+
+    if(LINUX)
         set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
     endif()
 

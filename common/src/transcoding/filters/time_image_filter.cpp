@@ -21,19 +21,21 @@ static const int TEXT_HEIGHT_IN_FRAME_PARTS = 20;
 static const int MIN_TEXT_HEIGHT = 14;
 //static const double FPS_EPS = 1e-8;
 
-QnTimeImageFilter::QnTimeImageFilter(const QSharedPointer<const QnResourceVideoLayout>& videoLayout, Qn::Corner datePos, qint64 timeOffsetMs, qint64 timeMsec):
+QnTimeImageFilter::QnTimeImageFilter(
+    const QSharedPointer<const QnResourceVideoLayout>& videoLayout,
+    const QnTimeStampParams& params)
+    :
     m_dateTimeXOffs(0),
     m_dateTimeYOffs(0),
     m_bufXOffs(0),
     m_bufYOffs(0),
     m_timeImg(0),
-    m_onscreenDateOffset(timeOffsetMs),
     m_imageBuffer(0),
-    m_dateTextPos(datePos),
     m_checkHash(videoLayout && videoLayout->channelCount() > 1),
     m_hash(-1),
-    m_timeMsec(timeMsec)
+    m_params(params)
 {
+    NX_ASSERT(m_params.enabled);
 }
 
 QnTimeImageFilter::~QnTimeImageFilter()
@@ -58,21 +60,21 @@ void QnTimeImageFilter::initTimeDrawing(const CLVideoDecoderOutputPtr& frame, co
         metric = QFontMetrics(m_timeFont);
     }
 
-    switch(m_dateTextPos)
+    switch(m_params.corner)
     {
-    case Qn::TopLeftCorner:
+    case Qt::TopLeftCorner:
         m_bufYOffs = 0;
         m_dateTimeXOffs = metric.averageCharWidth()/2;
         break;
-    case Qn::TopRightCorner:
+    case Qt::TopRightCorner:
         m_bufYOffs = 0;
         m_dateTimeXOffs = frame->width - metric.width(timeStr) - metric.averageCharWidth()/2;
         break;
-    case Qn::BottomRightCorner:
+    case Qt::BottomRightCorner:
         m_bufYOffs = frame->height - metric.height();
         m_dateTimeXOffs = frame->width - metric.boundingRect(timeStr).width() - metric.averageCharWidth()/2; // - metric.width(QLatin1String("0"));
         break;
-    case Qn::BottomLeftCorner:
+    case Qt::BottomLeftCorner:
     default:
         m_bufYOffs = frame->height - metric.height();
         m_dateTimeXOffs = metric.averageCharWidth()/2;
@@ -110,11 +112,11 @@ CLVideoDecoderOutputPtr QnTimeImageFilter::updateImage(const CLVideoDecoderOutpu
 {
 
     QString timeStr;
-    qint64 displayTime = m_timeMsec > 0
-        ? m_timeMsec
+    qint64 displayTime = m_params.timeMs > 0
+        ? m_params.timeMs
         : frame->pts / 1000;
 
-    displayTime += m_onscreenDateOffset;
+    displayTime += m_params.displayOffset;
 
     if (displayTime * 1000 >= UTC_TIME_DETECTION_THRESHOLD)
         timeStr = QDateTime::fromMSecsSinceEpoch(displayTime).toString(QLatin1String("yyyy-MMM-dd hh:mm:ss"));

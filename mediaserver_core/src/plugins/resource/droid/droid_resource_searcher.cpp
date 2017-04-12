@@ -9,7 +9,9 @@
 const int androidRecvPort = 5559;
 static const int READ_IF_TIMEOUT = 1000000ll * 30;
 
-QnPlDroidResourceSearcher::QnPlDroidResourceSearcher()
+QnPlDroidResourceSearcher::QnPlDroidResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule)
 {
     m_lastReadSocketTime = 0;
 }
@@ -69,7 +71,7 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
             {
                 continue;
             }
-        
+
             QHostAddress hostAddr(ipParams[0]);
             if (foundDevSet.contains(hostAddr))
                 continue;

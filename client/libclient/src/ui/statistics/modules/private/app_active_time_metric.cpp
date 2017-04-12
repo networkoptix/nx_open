@@ -1,6 +1,6 @@
-
 #include "app_active_time_metric.h"
 
+#include <QtWidgets/QApplication>
 
 AppActiveTimeMetric::AppActiveTimeMetric(QObject *parent)
     : base_type(parent)

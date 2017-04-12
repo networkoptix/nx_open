@@ -13,6 +13,8 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
+class QnCommonModule;
+
 struct QnBookmarkSortOrder
 {
     Qn::BookmarkSortField column;
@@ -84,9 +86,13 @@ struct QnCameraBookmark
     static QString tagsToString(
         const QnCameraBookmarkTags& tags, const QString& delimiter = lit(", "));
 
-    static void sortBookmarks(QnCameraBookmarkList& bookmarks, const QnBookmarkSortOrder orderBy);
+    static void sortBookmarks(
+        QnCommonModule* commonModule,
+        QnCameraBookmarkList& bookmarks,
+        const QnBookmarkSortOrder orderBy);
 
     static QnCameraBookmarkList mergeCameraBookmarks(
+        QnCommonModule* commonModule,
         const QnMultiServerCameraBookmarkList& source,
         const QnBookmarkSortOrder& sortOrder = QnBookmarkSortOrder::defaultOrder,
         const QnBookmarkSparsingOptions& sparsing = QnBookmarkSparsingOptions(),

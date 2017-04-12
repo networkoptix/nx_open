@@ -1,6 +1,9 @@
 #include "setup_wizard_dialog.h"
 
+#include <QtCore/QUrlQuery>
+
 #include <QtWidgets/QBoxLayout>
+#include <QtWidgets/QLineEdit>
 
 #include <common/common_module.h>
 
@@ -14,7 +17,7 @@ namespace
 {
     static const QSize kSetupWizardSize(496, 392);
 
-    QUrl constructUrl(const QUrl &baseUrl)
+    QUrl constructUrl(const QUrl &baseUrl, QnCommonModule* commonModule)
     {
         QUrl url(baseUrl);
         url.setScheme(baseUrl.scheme());
@@ -24,7 +27,7 @@ namespace
         url.setFragment(lit("/setup"));
 
         QUrlQuery q;
-        q.addQueryItem(lit("lang"), qnCommon->instance<QnClientTranslationManager>()->getCurrentLanguage());
+        q.addQueryItem(lit("lang"), commonModule->instance<QnClientTranslationManager>()->getCurrentLanguage());
         url.setQuery(q);
         return url;
     }
@@ -61,7 +64,7 @@ int QnSetupWizardDialog::exec()
 {
     Q_D(QnSetupWizardDialog);
 
-    QUrl url = constructUrl(d->url);
+    QUrl url = constructUrl(d->url, commonModule());
 
 #ifdef _DEBUG
     if (auto lineEdit = findChild<QLineEdit*>())

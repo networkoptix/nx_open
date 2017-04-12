@@ -1,6 +1,8 @@
 #include "general_system_administration_widget.h"
 #include "ui_general_system_administration_widget.h"
 
+#include <QtWidgets/QPushButton>
+
 #include <api/runtime_info_manager.h>
 
 #include <common/common_module.h>
@@ -132,7 +134,7 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
         [this] { menu()->trigger(QnActions::OpenBusinessLogAction); });
 
     connect(m_buttons[kHealthMonitorButton], &QPushButton::clicked, this,
-        [this] { menu()->trigger(QnActions::OpenInNewLayoutAction, qnResPool->getResourcesWithFlag(Qn::server)); });
+        [this] { menu()->trigger(QnActions::OpenInNewLayoutAction, resourcePool()->getResourcesWithFlag(Qn::server)); });
 
     connect(m_buttons[kBookmarksButton], &QPushButton::clicked, this,
         [this] { menu()->trigger(QnActions::OpenBookmarksSearchAction); });
@@ -172,7 +174,7 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
     m_buttons[kHealthMonitorButton]->setText(tr("Health Monitoring"));
     m_buttons[kBookmarksButton    ]->setText(tr("Bookmarks"));
     m_buttons[kCameraListButton   ]->setText(
-        QnDeviceDependentStrings::getDefaultNameFromSet(tr("Device List"), tr("Camera List")));
+        QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(), tr("Device List"), tr("Camera List")));
 
     auto shortcutString = [this](const QnActions::IDType actionId, const QString &baseString) -> QString
     {
@@ -200,14 +202,17 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
         tr("Monitor All Servers on a Single Layout"));
 
     m_buttons[kCameraListButton]->setToolTip(shortcutString(QnActions::CameraListAction,
-        QnDeviceDependentStrings::getDefaultNameFromSet(tr("Open Device List"), tr("Open Camera List"))));
+        QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
+            tr("Open Device List"),
+            tr("Open Camera List"))));
 
     ui->systemSettingsWidget->retranslateUi();
 }
 
 bool QnGeneralSystemAdministrationWidget::isDatabaseBackupAvailable() const
 {
-    return QnRuntimeInfoManager::instance()->remoteInfo().data.box != lit("isd");
+    return runtimeInfoManager()->remoteInfo().data.box != lit("isd");
 }
 
 void QnGeneralSystemAdministrationWidget::setReadOnlyInternal(bool readOnly)

@@ -1,5 +1,7 @@
 #include "joystick_config_holder.h"
 
+#include <QtCore/QFile>
+
 #include <nx/fusion/model_functions.h>
 
 namespace nx {

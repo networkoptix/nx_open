@@ -13,8 +13,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <utils/crypt/linux_passwd_crypt.h>
-#include <utils/common/systemerror.h>
-#include <utils/common/util.h>
+#include <nx/utils/system_error.h>
 
 #include "auth_tools.h"
 
@@ -776,7 +775,7 @@ void AsyncHttpClient::processReceivedBytes(
         const size_t bytesParsed = parseReceivedBytes(bytesRead);
         QByteArray receivedBytesLeft;
         if (bytesParsed != (std::size_t)-1)
-            receivedBytesLeft = m_responseBuffer.mid(bytesParsed);
+            receivedBytesLeft = m_responseBuffer.mid((int)bytesParsed);
         m_responseBuffer.resize(0);
 
         bool continueReceiving = false;
@@ -1047,15 +1046,22 @@ void AsyncHttpClient::composeRequest(const nx_http::StringType& httpMethod)
     const bool useHttp11 = true;   //TODO #ak check if we need it (e.g. we using keep-alive or requesting live capture)
 
     m_request.requestLine.method = httpMethod;
+
     if (m_proxyEndpoint)
+    {
         m_request.requestLine.url = m_contentLocationUrl;
+    }
     else    //if no proxy specified then erasing http://host:port from request url
-        m_request.requestLine.url = m_contentLocationUrl.path() + (m_contentLocationUrl.hasQuery() ? (QLatin1String("?") + m_contentLocationUrl.query()) : QString());
+    {
+        m_request.requestLine.url = m_contentLocationUrl.path();
+        m_request.requestLine.url.setQuery(m_contentLocationUrl.query());
+        m_request.requestLine.url.setFragment(m_contentLocationUrl.fragment());
+    }
     m_request.requestLine.version = useHttp11 ? nx_http::http_1_1 : nx_http::http_1_0;
 
     nx_http::insertOrReplaceHeader(
         &m_request.headers,
-        HttpHeader("Date", dateTimeToHTTPFormat(QDateTime::currentDateTime())));
+        HttpHeader("Date", nx_http::formatDateTime(QDateTime::currentDateTime())));
     m_request.headers.emplace(
         "User-Agent",
         m_userAgent.isEmpty() ? nx_http::userAgentString() : m_userAgent.toLatin1());

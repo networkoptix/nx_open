@@ -5,12 +5,11 @@
 
 #include <QtXml/QXmlDefaultHandler>
 
-#include <common/common_globals.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 
 #include <utils/common/app_info.h>
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 
 #include <QDateTime>
 
@@ -508,9 +507,9 @@ QHostAddress DeviceSearcher::findBestIface( const HostAddress& host )
 
 int DeviceSearcher::cacheTimeout()
 {
-    if( auto settings = QnGlobalSettings::instance() )
+    if (m_globalSettings)
     {
-        const auto disabledVendors = settings->disabledVendorsSet();
+        const auto disabledVendors = m_globalSettings->disabledVendorsSet();
         if( disabledVendors.size() == 1 && disabledVendors.contains( lit("all=partial") ) )
             return PARTIAL_DISCOVERY_XML_DESCRIPTION_LIVE_TIME_MS;
     }
@@ -541,7 +540,7 @@ void DeviceSearcher::updateItemInCache( DiscoveredDeviceInfo info )
     cacheItem.xmlDevInfo = info.xmlDevInfo;
     cacheItem.creationTimestamp = m_cacheTimer.elapsed();
 
-    QnConcurrent::run(
+    nx::utils::concurrent::run(
         QThreadPool::globalInstance(),
         [ this, info = std::move(info), guard = m_handlerGuard.sharedGuard() ]()
         {

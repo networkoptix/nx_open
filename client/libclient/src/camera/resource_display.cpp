@@ -9,7 +9,7 @@
 #include <camera/client_video_camera.h>
 #include <camera/abstract_renderer.h>
 #include <utils/common/warnings.h>
-#include <utils/common/counter.h>
+#include <nx/utils/counter.h>
 #include <utils/common/util.h>
 
 QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *parent):
@@ -40,17 +40,17 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
 
             connect(this, &QObject::destroyed, m_camera, &QnClientVideoCamera::beforeStopDisplay);
 
-            m_counter = new QnCounter(1);
-            connect(m_camera->getCamDisplay(), &QnCamDisplay::finished, m_counter, &QnCounter::decrement);
+            m_counter = new nx::utils::Counter(1);
+            connect(m_camera->getCamDisplay(), &QnCamDisplay::finished, m_counter, &nx::utils::Counter::decrement);
             if (m_mediaProvider->hasThread())
             {
                 connect(m_camera->getStreamreader(), &QnAbstractMediaStreamDataProvider::finished,
-                    m_counter, &QnCounter::decrement);
+                    m_counter, &nx::utils::Counter::decrement);
                 m_counter->increment();
             }
 
-            connect(m_counter, &QnCounter::reachedZero, m_counter, &QObject::deleteLater);
-            connect(m_counter, &QnCounter::reachedZero, m_camera, &QObject::deleteLater);
+            connect(m_counter, &nx::utils::Counter::reachedZero, m_counter, &QObject::deleteLater);
+            connect(m_counter, &nx::utils::Counter::reachedZero, m_camera, &QObject::deleteLater);
         }
         else
         {

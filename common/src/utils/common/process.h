@@ -6,7 +6,7 @@
 #ifndef NX_PROCESS_H
 #define NX_PROCESS_H
 
-#include "systemerror.h"
+#include <nx/utils/system_error.h>
 
 
 namespace nx

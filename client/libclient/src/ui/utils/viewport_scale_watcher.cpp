@@ -1,5 +1,11 @@
-
 #include "viewport_scale_watcher.h"
+
+#include <cmath>
+
+#include <QtCore/QEvent>
+
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
 
 QnViewportScaleWatcher::QnViewportScaleWatcher(QObject* parent)
     :

@@ -31,7 +31,7 @@ bool QnWorkbenchLayoutsChangeValidator::confirmChangeVideoWallLayout(
         [this, layout](const QnResourcePtr& resource) -> bool
         {
             QnResourceList providers;
-            const auto accessSource = qnResourceAccessProvider->accessibleVia(
+            const auto accessSource = resourceAccessProvider()->accessibleVia(
                 context()->user(), resource, &providers);
 
             // We need to get only resources which are accessible only by this layout
@@ -53,6 +53,6 @@ bool QnWorkbenchLayoutsChangeValidator::confirmChangeVideoWallLayout(
     if (inaccessible.isEmpty())
         return true;
 
-    return nx::client::messages::Resources::changeVideoWallLayout(mainWindow(), inaccessible);
+    return nx::client::desktop::messages::Resources::changeVideoWallLayout(mainWindow(), inaccessible);
 }
 

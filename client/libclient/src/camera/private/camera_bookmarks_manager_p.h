@@ -2,12 +2,19 @@
 
 #include <functional>
 
+#include <QtCore/QElapsedTimer>
+
+#include <client_core/connection_context_aware.h>
+
 #include <camera/camera_bookmarks_manager_fwd.h>
 #include <core/resource/camera_bookmark.h>
 #include <utils/common/id.h>
 #include <utils/common/connective.h>
 
-class QnCameraBookmarksManagerPrivate : public Connective<QObject> {
+class QnCameraBookmarksManagerPrivate:
+    public Connective<QObject>,
+    public QnConnectionContextAware
+{
     Q_OBJECT
 
     typedef Connective<QObject> base_type;

@@ -1,9 +1,13 @@
 #include "cloud_management_widget.h"
 #include "ui_cloud_management_widget.h"
 
+#include <QtGui/QDesktopServices>
+
 #include <api/global_settings.h>
 
 #include <core/resource/user_resource.h>
+
+#include <common/common_module.h>
 
 #include <helpers/cloud_url_helper.h>
 

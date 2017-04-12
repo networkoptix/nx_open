@@ -14,7 +14,7 @@
 #include <QObject>
 #include <QSettings>
 
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/stoppable.h>
 #include <nx/utils/timer_manager.h>
 
 #include "abstract_request_processor.h"

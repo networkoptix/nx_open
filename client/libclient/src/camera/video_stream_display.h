@@ -1,14 +1,14 @@
-
-#ifndef QN_VIDEO_STREAM_DISPLAY_H
-#define QN_VIDEO_STREAM_DISPLAY_H
+#pragma once
 
 extern "C"
 {
     #include <libswscale/swscale.h>
 }
 
+#include <QtCore/QQueue>
+
 #include "decoders/video/abstract_video_decoder.h"
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/stoppable.h>
 #include "frame_scaler.h"
 #include "transcoding/filters/filter_helper.h"
 
@@ -168,5 +168,3 @@ private:
 
     bool downscaleFrame(const CLVideoDecoderOutputPtr& src, const CLVideoDecoderOutputPtr& dst, QnFrameScaler::DownscaleFactor scaleFactor, AVPixelFormat pixFmt);
 };
-
-#endif //QN_VIDEO_STREAM_DISPLAY_H

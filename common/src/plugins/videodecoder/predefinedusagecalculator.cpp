@@ -5,14 +5,14 @@
 #include "predefinedusagecalculator.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/stree/node.h>
+#include <nx/utils/stree/streesaxhandler.h>
 
-#include "stree/streesaxhandler.h"
-#include "stree/node.h"
 #include "pluginusagewatcher.h"
 
 
 PredefinedUsageCalculator::PredefinedUsageCalculator(
-    const stree::ResourceNameSet& rns,
+    const nx::utils::stree::ResourceNameSet& rns,
     const QString& predefinedDataFilePath,
     PluginUsageWatcher* const )
 :
@@ -25,8 +25,8 @@ PredefinedUsageCalculator::PredefinedUsageCalculator(
 
 //!Implementation of AbstractVideoDecoderUsageCalculator::isEnoughHWResourcesForAnotherDecoder
 bool PredefinedUsageCalculator::isEnoughHWResourcesForAnotherDecoder(
-    const stree::AbstractResourceReader& mediaStreamParams,
-    const stree::AbstractResourceReader& curUsageParams ) const
+    const nx::utils::stree::AbstractResourceReader& mediaStreamParams,
+    const nx::utils::stree::AbstractResourceReader& curUsageParams ) const
 {
     //retrieving existing sessions' info
     //summarizing current sessions' parameters and new session parameters
@@ -34,7 +34,7 @@ bool PredefinedUsageCalculator::isEnoughHWResourcesForAnotherDecoder(
         m_rns,
         curUsageParams,
         mediaStreamParams );
-    stree::ResourceContainer rc;
+    nx::utils::stree::ResourceContainer rc;
     {
         QnMutexLocker lk( &m_treeMutex );
         if( m_currentTree.get() )
@@ -83,10 +83,10 @@ void PredefinedUsageCalculator::updateTree()
     }
 }
 
-std::unique_ptr<stree::AbstractNode> PredefinedUsageCalculator::loadXml(
+std::unique_ptr<nx::utils::stree::AbstractNode> PredefinedUsageCalculator::loadXml(
     const QString& filePath)
 {
-    stree::SaxHandler xmlHandler( m_rns );
+    nx::utils::stree::SaxHandler xmlHandler( m_rns );
 
     QXmlSimpleReader reader;
     reader.setContentHandler( &xmlHandler );
@@ -96,14 +96,14 @@ std::unique_ptr<stree::AbstractNode> PredefinedUsageCalculator::loadXml(
     if( !xmlFile.open( QIODevice::ReadOnly ) )
     {
         NX_LOG( lit( "Failed to open stree xml file (%1). %2" ).arg(filePath).arg(xmlFile.errorString()), cl_logERROR );
-        return std::unique_ptr<stree::AbstractNode>();
+        return std::unique_ptr<nx::utils::stree::AbstractNode>();
     }
     QXmlInputSource input( &xmlFile );
     NX_LOG( lit( "Parsing stree xml file (%1)" ).arg(filePath), cl_logDEBUG1 );
     if( !reader.parse( &input ) )
     {
         NX_LOG( lit( "Failed to parse stree xml (%1). %2" ).arg(filePath).arg(xmlHandler.errorString()), cl_logERROR );
-        return std::unique_ptr<stree::AbstractNode>();
+        return std::unique_ptr<nx::utils::stree::AbstractNode>();
     }
 
     return xmlHandler.releaseTree();

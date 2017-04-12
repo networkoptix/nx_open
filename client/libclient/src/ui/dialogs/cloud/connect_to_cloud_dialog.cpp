@@ -1,6 +1,8 @@
 #include "connect_to_cloud_dialog.h"
 #include "ui_connect_to_cloud_dialog.h"
 
+#include <QtWidgets/QGraphicsOpacityEffect>
+
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
 
@@ -41,9 +43,9 @@ QString kCreateAccountPath = lit("/static/index.html#/register");
 const int kHeaderFontSizePixels = 15;
 const int kHeaderFontWeight = QFont::DemiBold;
 
-rest::QnConnectionPtr getPublicServerConnection()
+rest::QnConnectionPtr getPublicServerConnection(QnResourcePool* resourcePool)
 {
-    for (const QnMediaServerResourcePtr server: qnResPool->getAllServers(Qn::Online))
+    for (const QnMediaServerResourcePtr server: resourcePool->getAllServers(Qn::Online))
     {
         if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
             continue;
@@ -55,7 +57,7 @@ rest::QnConnectionPtr getPublicServerConnection()
 
 }
 
-class QnConnectToCloudDialogPrivate : public QObject
+class QnConnectToCloudDialogPrivate: public QObject, public QnConnectionContextAware
 {
     QnConnectToCloudDialog *q_ptr;
 
@@ -228,7 +230,7 @@ void QnConnectToCloudDialogPrivate::bindSystem()
 
     q->ui->invalidCredentialsLabel->hide();
 
-    auto serverConnection = getPublicServerConnection();
+    auto serverConnection = getPublicServerConnection(resourcePool());
     if (!serverConnection)
     {
         showFailure(tr("None of your servers is connected to the Internet."));
@@ -262,7 +264,7 @@ void QnConnectToCloudDialogPrivate::bindSystem()
     cloudConnection->systemManager()->bindSystem(sysRegistrationData, completionHandler);
 }
 
-void QnConnectToCloudDialogPrivate::showSuccess(const QString& cloudLogin)
+void QnConnectToCloudDialogPrivate::showSuccess(const QString& /*cloudLogin*/)
 {
     Q_Q(QnConnectToCloudDialog);
 
@@ -311,7 +313,7 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
         return;
     }
 
-    const auto& admin = qnResPool->getAdministrator();
+    const auto& admin = resourcePool()->getAdministrator();
     if (!admin)
     {
         q->reject();

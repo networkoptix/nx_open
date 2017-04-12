@@ -39,6 +39,13 @@ private:
 class NX_NETWORK_API TestHttpServer
 {
 public:
+    using ProcessHttpRequestFunc = nx::utils::MoveOnlyFunc<void(
+        nx_http::HttpServerConnection* const /*connection*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
+        nx_http::Request /*request*/,
+        nx_http::Response* const /*response*/,
+        nx_http::RequestProcessedHandler /*completionHandler*/)>;
+
     TestHttpServer();
     ~TestHttpServer();
 
@@ -78,6 +85,7 @@ public:
                 return std::make_unique<RequestHandlerType>(func);
             });
     }
+
 
     bool registerStaticProcessor(
         const QString& path,

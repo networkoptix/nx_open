@@ -2,12 +2,14 @@
 
 #include <QtCore/QObject>
 
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
 #include "network/module_information.h"
 
 //TODO: #dklychkov move the watcher to the network folder, as the router and module finder
-class QnServerInterfaceWatcher : public QObject
+class QnServerInterfaceWatcher : public QObject, public QnConnectionContextAware
 {
     Q_OBJECT
 public:

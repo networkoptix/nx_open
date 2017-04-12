@@ -1,5 +1,8 @@
 #include "camera_settings_dialog.h"
 
+#include <QtGui/QWindow>
+#include <QtGui/QScreen>
+
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QPushButton>
@@ -121,7 +124,9 @@ void QnCameraSettingsDialog::retranslateUi()
 
     static const QString kWindowTitlePattern = lit("%1 - %2");
 
-    const QString caption = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
+    const QString caption = QnDeviceDependentStrings::getNameFromSet(
+        resourcePool(),
+        QnCameraDeviceStringSet(
         tr("Device Settings"), tr("Devices Settings"),
         tr("Camera Settings"), tr("Cameras Settings"),
         tr("I/O Module Settings"), tr("I/O Modules Settings")
@@ -129,11 +134,13 @@ void QnCameraSettingsDialog::retranslateUi()
 
     const QString description = cameras.size() == 1
         ? cameras.first()->getName()
-        : QnDeviceDependentStrings::getNumericName(cameras);
+        : QnDeviceDependentStrings::getNumericName(resourcePool(), cameras);
 
     setWindowTitle(kWindowTitlePattern.arg(caption).arg(description));
 
-    const QString rulesTitle = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
+    const QString rulesTitle = QnDeviceDependentStrings::getNameFromSet(
+        resourcePool(),
+        QnCameraDeviceStringSet(
         tr("Device Rules..."), tr("Devices Rules..."),
         tr("Camera Rules..."), tr("Cameras Rules..."),
         tr("I/O Module Rules..."), tr("I/O Modules Rules...")
@@ -177,7 +184,7 @@ void QnCameraSettingsDialog::reject()
 void QnCameraSettingsDialog::at_settingsWidget_hasChangesChanged()
 {
     bool hasChanges = m_settingsWidget->hasDbChanges();
-    m_applyButton->setEnabled(hasChanges && !qnCommon->isReadOnly());
+    m_applyButton->setEnabled(hasChanges && !commonModule()->isReadOnly());
     m_settingsWidget->setExportScheduleButtonEnabled(!hasChanges);
 }
 
@@ -185,7 +192,7 @@ void QnCameraSettingsDialog::at_settingsWidget_modeChanged()
 {
     QnCameraSettingsWidget::Mode mode = m_settingsWidget->mode();
     bool isValidMode = (mode == QnCameraSettingsWidget::SingleMode || mode == QnCameraSettingsWidget::MultiMode);
-    m_okButton->setEnabled(isValidMode && !qnCommon->isReadOnly());
+    m_okButton->setEnabled(isValidMode && !commonModule()->isReadOnly());
     m_openButton->setVisible(isValidMode);
     m_diagnoseButton->setVisible(isValidMode);
     m_rulesButton->setVisible(mode == QnCameraSettingsWidget::SingleMode);  //TODO: #GDM implement
@@ -236,7 +243,9 @@ bool QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& camer
     {
         auto unsavedCameras = m_settingsWidget->cameras();
 
-        const auto extras = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
+        const auto extras = QnDeviceDependentStrings::getNameFromSet(
+            resourcePool(),
+            QnCameraDeviceStringSet(
             tr("Changes to the following %n devices are not saved:", "", unsavedCameras.size()),
             tr("Changes to the following %n cameras are not saved:", "", unsavedCameras.size()),
             tr("Changes to the following %n I/O Modules are not saved:", "", unsavedCameras.size())

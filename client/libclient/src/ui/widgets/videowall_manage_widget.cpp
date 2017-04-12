@@ -1,6 +1,7 @@
 #include "videowall_manage_widget.h"
 
 #include <QtGui/QIcon>
+#include <QtGui/QMouseEvent>
 
 #include <client/client_settings.h>
 
@@ -32,14 +33,14 @@ QnVideowallManageWidget::QnVideowallManageWidget(QWidget *parent /* = 0*/):
     QAnimationTimer *animationTimer = new QAnimationTimer(this);
     setTimer(animationTimer);
     startListening();
-    
+
     connect(d_ptr.data(), &QnVideowallManageWidgetPrivate::itemsChanged, this, &QnVideowallManageWidget::itemsChanged);
 }
 
 QnVideowallManageWidget::~QnVideowallManageWidget() { }
 
-void QnVideowallManageWidget::paintEvent(QPaintEvent *event) {
-    QN_UNUSED(event);
+void QnVideowallManageWidget::paintEvent(QPaintEvent* /*event*/)
+{
     Q_D(QnVideowallManageWidget);
 
     QScopedPointer<QPainter> painter(new QPainter(this));
@@ -91,7 +92,7 @@ void QnVideowallManageWidget::mouseMoveEvent(QMouseEvent *event) {
     Q_D(QnVideowallManageWidget);
 
     QTransform transform(d->getInvertedTransform(d->targetRect(this->rect())));
-    d->mouseMoveAt(transform.map(event->pos()));  
+    d->mouseMoveAt(transform.map(event->pos()));
 }
 
 void QnVideowallManageWidget::mouseReleaseEvent(QMouseEvent *event) {
@@ -157,5 +158,5 @@ int QnVideowallManageWidget::proposedItemsCount() const {
 QSize QnVideowallManageWidget::minimumSizeHint() const {
     Q_D(const QnVideowallManageWidget);
     QRect source(QPoint(0, 0), minimumWidgetSizeHint);
-    return d->targetRect(source).size();  
+    return d->targetRect(source).size();
 }

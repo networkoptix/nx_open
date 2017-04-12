@@ -1,5 +1,4 @@
-#ifndef QN_LICENSING_LICENSE
-#define QN_LICENSING_LICENSE
+#pragma once
 
 #include <QtCore/QByteArray>
 #include <QtCore/QCoreApplication>
@@ -13,10 +12,15 @@
 #include <QtCore/QTextStream>
 #include <QTimer>
 
+#include <licensing/license_fwd.h>
+
+#include <common/common_module_aware.h>
+
 #include "core/resource/resource_fwd.h"
 #include "nx/utils/latin1_array.h"
 #include "utils/common/id.h"
 #include "nx_ec/data/api_fwd.h"
+#include <common/common_module_aware.h>
 
 #ifdef __APPLE__
 #undef verify
@@ -32,40 +36,15 @@ struct LicenseTypeInfo
     bool allowedForARM;
 };
 
-class QnLicense {
+class QnLicense
+{
     Q_DECLARE_TR_FUNCTIONS(QnLicense);
 public:
-
-    enum ErrorCode {
-        NoError,
-        InvalidSignature,           /**< License digital signature is not match */
-        InvalidHardwareID,          /**< Invalid hardware ID */
-        InvalidBrand,               /**< License belong to other customization */
-        Expired,                    /**< Expired */
-        InvalidType,                /**< Such license type isn't allowed for that device. */
-        TooManyLicensesPerDevice,   /**< Too many licenses of this type per device. */
-        FutureLicense               /**< License type is unknown, may be license from future version. */
-    };
-
-    enum ValidationMode {
-        VM_Regular,
-        VM_CheckInfo,
-        VM_JustCreated
-    };
-
     QnLicense();
     QnLicense(const QByteArray& licenseBlock);
     virtual ~QnLicense();
 
     void loadLicenseBlock( const QByteArray& licenseBlock );
-
-    /**
-     * Check if signature matches other fields, also check hardwareId and brand
-     */
-    virtual bool isValid(ErrorCode* errCode = 0, ValidationMode mode = VM_Regular) const;
-    QString validationInfo(ValidationMode mode = VM_Regular) const;
-
-    static QString errorMessage(ErrorCode errCode);
 
     QString name() const;
     QByteArray key() const;
@@ -76,6 +55,7 @@ public:
 
     QString hardwareId() const;
     QByteArray signature() const;
+    bool isValidSignature() const;
 
     QString xclass() const;
     QString version() const;
@@ -104,35 +84,24 @@ public:
     QString longDisplayName() const;
     static QString longDisplayName(Qn::LicenseType licenseType);
 
-    /** Id of the server this license attached to (if it is present in the current system). */
-    QnUuid serverId() const;
-
     static LicenseTypeInfo licenseTypeInfo(Qn::LicenseType licenseType);
 
 protected:
-    bool isValidEdgeLicense(ErrorCode* errCode = 0, ValidationMode mode = VM_Regular) const;
-    bool isValidStartLicense(ErrorCode* errCode = 0, ValidationMode mode = VM_Regular) const;
-    bool isAllowedForArm() const;
-
     void setClass(const QString &xclass);
 private:
     void parseLicenseBlock(
         const QByteArray& licenseBlock,
         QByteArray* const v1LicenseBlock,
         QByteArray* const v2LicenseBlock );
-    void licenseBlockFromData(
-        QByteArray* const v1LicenseBlock,
-        QByteArray* const v2LicenseBlock );
     void verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock );
 
-    bool gotError(ErrorCode* errCode, ErrorCode errorCode) const;
 
 private:
     QByteArray m_rawLicense;
 
     QString m_name;
     QByteArray m_key;
-    qint32 m_cameraCount;
+    qint32 m_cameraCount = 0;
     QString m_hardwareId;
     QByteArray m_signature;
 
@@ -143,15 +112,13 @@ private:
     QByteArray m_signature2;
 
     // Is partial v1 license valid (signature1 is used)
-    bool m_isValid1;
+    bool m_isValid1 = false;
 
     // Is full license valid (signature2 is used)
-    bool m_isValid2;
+    bool m_isValid2 = false;
 };
 
 Q_DECLARE_METATYPE(QnLicensePtr)
-
-typedef QMap<QByteArray, QnLicensePtr> QnLicenseDict;
 
 class QnLicenseListHelper
 {
@@ -164,9 +131,9 @@ public:
     QList<QByteArray> allLicenseKeys() const;
     bool haveLicenseKey(const QByteArray& key) const;
     QnLicensePtr getLicenseByKey(const QByteArray& key) const;
-    int totalLicenseByType(Qn::LicenseType licenseType, bool ignoreValidity = false) const;
 
-private:
+    /** If validator is passed, only valid licenses are counted. */
+    int totalLicenseByType(Qn::LicenseType licenseType, QnLicenseValidator* validator) const;
 
 private:
     QnLicenseDict m_licenseDict;
@@ -178,12 +145,12 @@ Q_DECLARE_METATYPE(QnLicenseList)
 /**
  * License storage which is associated with instance of Server (i.e. should be reloaded when switching appserver).
  */
-class QnLicensePool : public QObject
+class QnLicensePool: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
 
 public:
-    static QnLicensePool* instance();
+    QnLicensePool(QObject* parent);
 
     /** Number of cameras per analog encoder that require 1 license. */
     static int camerasPerAnalogEncoder();
@@ -200,24 +167,21 @@ public:
 
     QVector<QString> hardwareIds() const;
     QString currentHardwareId() const;
-    bool isLicenseValid(QnLicensePtr license, QnLicense::ErrorCode* errCode = 0) const;
+
+    QnLicenseValidator* validator() const;
+    QnLicenseErrorCode validateLicense(const QnLicensePtr& license) const;
+    bool isLicenseValid(const QnLicensePtr& license) const;
 signals:
     void licensesChanged();
 
-protected:
-    QnLicensePool();
 private slots:
     void at_timer();
 private:
-    bool isLicenseMatchesCurrentSystem(const QnLicensePtr &license);
     bool addLicense_i(const QnLicensePtr &license);
     bool addLicenses_i(const QnLicenseList &licenses);
 private:
     QMap<QByteArray, QnLicensePtr> m_licenseDict;
     mutable QnMutex m_mutex;
     QTimer m_timer;
+    QnLicenseValidator* m_licenseValidator;
 };
-
-#define qnLicensePool QnLicensePool::instance()
-
-#endif // QN_LICENSING_LICENSE

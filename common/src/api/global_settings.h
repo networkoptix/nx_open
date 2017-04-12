@@ -18,6 +18,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx_ec/data/api_resource_data.h>
+#include <common/common_module_aware.h>
 
 class QnAbstractResourcePropertyAdaptor;
 
@@ -81,12 +82,13 @@ const QString kKeepAliveProbeCountKey(lit("ec2KeepAliveProbeCount"));
 } // namespace settings_names
 } // namespace nx
 
-class QnGlobalSettings: public Connective<QObject>, public Singleton<QnGlobalSettings> {
+class QnGlobalSettings: public Connective<QObject>, public QnCommonModuleAware
+{
     Q_OBJECT
     typedef Connective<QObject> base_type;
 
 public:
-    QnGlobalSettings(QObject *parent = NULL);
+    QnGlobalSettings(QObject* parent = nullptr);
     virtual ~QnGlobalSettings();
 
     void initialize();
@@ -191,7 +193,10 @@ public:
 
     std::chrono::seconds serverDiscoveryAliveCheckTimeout() const;
     bool isTimeSynchronizationEnabled() const;
+
     bool isSynchronizingTimeWithInternet() const;
+    void setSynchronizingTimeWithInternet(bool value);
+
     bool takeCameraOwnershipWithoutLock() const;
 
     // -- Cloud settings
@@ -237,7 +242,7 @@ public:
     */
     const QList<QnAbstractResourcePropertyAdaptor*>& allSettings() const;
 
-    bool isGlobalSetting(const ec2::ApiResourceParamWithRefData& param) const;
+    static bool isGlobalSetting(const ec2::ApiResourceParamWithRefData& param);
 
     int maxRecorderQueueSizeBytes() const;
     int maxRecorderQueueSizePackets() const;
@@ -357,4 +362,4 @@ private:
     QnUserResourcePtr m_admin;
 };
 
-#define qnGlobalSettings QnGlobalSettings::instance()
+#define qnGlobalSettings commonModule()->globalSettings()

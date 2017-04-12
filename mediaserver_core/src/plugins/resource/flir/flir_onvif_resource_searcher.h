@@ -12,6 +12,8 @@ class OnvifResourceSearcher: public ::OnvifResourceSearcher
 {
 
 public:
+    OnvifResourceSearcher(QnCommonModule* commonModule);
+
     virtual QList<QnResourcePtr> checkHostAddr(
         const QUrl& url,
         const QAuthenticator& auth,

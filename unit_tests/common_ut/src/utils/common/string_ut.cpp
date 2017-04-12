@@ -8,7 +8,7 @@
 #include <gtest/gtest.h>
 
 #include <QtCore/QDateTime>
-
+#include <QtCore/QString>
 
 TEST( parseDateTime, general )
 {
@@ -22,4 +22,12 @@ TEST( parseDateTime, general )
     ASSERT_EQ( nx::utils::parseDateTime( testDateStr ), testTimestampUSec );
     ASSERT_EQ( nx::utils::parseDateTime( QString::number(testTimestamp) ), testTimestampUSec );
     ASSERT_EQ( nx::utils::parseDateTime( QString::number(testTimestampUSec) ), testTimestampUSec );
+}
+
+TEST(removeMnemonics, general)
+{
+    static const auto source = lit("& && &a &&a &&& b&b &a a& a&");
+    static const auto changed = nx::utils::removeMnemonics(source);
+    static const auto target = lit("& && a &&a &&& bb a a& a&");
+    ASSERT_EQ(changed, target);
 }

@@ -18,7 +18,7 @@
 
 #include <nx/streaming/media_data_packet.h> /* For QnMetaDataV1Ptr. */
 #include <utils/common/safepool.h>
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/stoppable.h>
 #include <ui/graphics/opengl/gl_fence.h>
 #include <utils/media/frame_info.h>
 

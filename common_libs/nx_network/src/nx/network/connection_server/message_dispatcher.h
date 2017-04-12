@@ -10,7 +10,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include <utils/common/stoppable.h>
+#include <nx/network/async_stoppable.h>
 
 
 //!Dispatches STUN protocol messages to corresponding processor

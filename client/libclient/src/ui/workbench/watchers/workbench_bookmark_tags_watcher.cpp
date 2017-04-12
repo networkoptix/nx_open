@@ -28,7 +28,7 @@ QnCameraBookmarkTagList QnWorkbenchBookmarkTagsWatcher::tags() const {
 }
 
 void QnWorkbenchBookmarkTagsWatcher::refresh() {
-    QnMediaServerResourcePtr server = qnCommon->currentServer();
+    QnMediaServerResourcePtr server = commonModule()->currentServer();
     if (!server)
         return;
 

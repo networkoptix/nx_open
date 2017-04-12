@@ -5,14 +5,13 @@
 
 class QnIncompatibleServerWatcher;
 
-class QnDesktopClientMessageProcessor : public QnClientMessageProcessor
+class QnDesktopClientMessageProcessor: public QnClientMessageProcessor
 {
     Q_OBJECT
-
-    typedef QnClientMessageProcessor base_type;
-
+    using base_type = QnClientMessageProcessor;
 public:
-    QnDesktopClientMessageProcessor();
+    explicit QnDesktopClientMessageProcessor(QObject* parent = nullptr);
+    virtual ~QnDesktopClientMessageProcessor() override;
 
     QnIncompatibleServerWatcher *incompatibleServerWatcher() const;
 
@@ -27,8 +26,8 @@ private slots:
     void at_gotInitialDiscoveredServers(const ec2::ApiDiscoveredServerDataList &discoveredServers);
 
 private:
-    QnIncompatibleServerWatcher *m_incompatibleServerWatcher;
+    QScopedPointer<QnIncompatibleServerWatcher> m_incompatibleServerWatcher;
 };
 
 #define qnDesktopClientMessageProcessor \
-    static_cast<QnDesktopClientMessageProcessor*>(QnDesktopClientMessageProcessor::instance())
+    static_cast<QnDesktopClientMessageProcessor*>(commonModule()->messageProcessor())

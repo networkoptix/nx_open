@@ -1,5 +1,9 @@
 #include "resources_messages.h"
 
+#include <common/common_module.h>
+
+#include <client_core/client_core_module.h>
+
 #include <client/client_show_once_settings.h>
 
 #include <core/resource/resource.h>
@@ -74,6 +78,7 @@ bool showCompositeDialog(
 
 namespace nx {
 namespace client {
+namespace desktop {
 namespace messages {
 
 void Resources::layoutAlreadyExists(QWidget* parent)
@@ -239,6 +244,7 @@ bool Resources::deleteResources(QWidget* parent, const QnResourceList& resources
 
         text = (cameras.size() == resources.size()
             ? QnDeviceDependentStrings::getNameFromSet(
+                qnClientCoreModule->commonModule()->resourcePool(),
                 QnCameraDeviceStringSet(
                     tr("Delete %n devices?", "", cameras.size()),
                     tr("Delete %n cameras?", "", cameras.size()),
@@ -249,6 +255,7 @@ bool Resources::deleteResources(QWidget* parent, const QnResourceList& resources
         extras = (onlineAutoDiscoveredCameras.isEmpty()
             ? QString()
             : QnDeviceDependentStrings::getNameFromSet(
+                qnClientCoreModule->commonModule()->resourcePool(),
                 QnCameraDeviceStringSet(
                     tr("%n of them are auto-discovered.",
                         "", onlineAutoDiscoveredCameras.size()),
@@ -277,5 +284,6 @@ bool Resources::deleteResources(QWidget* parent, const QnResourceList& resources
 }
 
 } // namespace messages
+} // namespace desktop
 } // namespace client
 } // namespace nx

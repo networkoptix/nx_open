@@ -1,6 +1,8 @@
 #include "emulated_frame_widget.h"
 
+#include <QtGui/QWindow>
 #include <QtGui/QMouseEvent>
+#include <QtGui/QScreen>
 
 #include <ui/common/frame_section.h>
 #include <ui/workaround/hidpi_workarounds.h>

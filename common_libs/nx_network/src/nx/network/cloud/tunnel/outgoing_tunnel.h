@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <utils/common/stoppable.h>
+#include <nx/network/async_stoppable.h>
 
 #include "abstract_tunnel_connector.h"
 #include "cross_nat_connector.h"

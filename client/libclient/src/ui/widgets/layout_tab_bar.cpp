@@ -1,9 +1,10 @@
 #include "layout_tab_bar.h"
 
 #include <QtCore/QVariant>
-#include <nx/utils/uuid.h>
 
 #include <QtGui/QContextMenuEvent>
+
+#include <QtWidgets/QLayout>
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QMenu>
 
@@ -32,6 +33,9 @@
 #include <ui/style/skin.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/custom_style.h>
+#include <nx/client/ui/workbench/layouts/layout_factory.h>
+
+#include <nx/utils/uuid.h>
 
 namespace {
 static const int kMinimumTabSizeWidth = 50;
@@ -148,7 +152,7 @@ QString QnLayoutTabBar::layoutText(QnWorkbenchLayout* layout) const
     QnUuid videoWallInstanceGuid = layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
     if (!videoWallInstanceGuid.isNull())
     {
-        QnVideoWallItemIndex idx = qnResPool->getVideoWallItemByUuid(videoWallInstanceGuid);
+        QnVideoWallItemIndex idx = resourcePool()->getVideoWallItemByUuid(videoWallInstanceGuid);
         if (!idx.isNull())
             baseName = idx.item().name;
     }
@@ -164,7 +168,13 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout* layout) const
     if (!layout)
         return QIcon();
 
-    QIcon layoutIcon = layout->data(Qt::DecorationRole).value<QIcon>();
+    auto layoutIcon = layout->icon();
+    if (!layoutIcon.isNull())
+        return layoutIcon;
+
+    // TODO: #ynikitenkov #high refactor code below to use only layout->icon()
+
+    layoutIcon = layout->data(Qt::DecorationRole).value<QIcon>();
     if (!layoutIcon.isNull())
         return layoutIcon;
 
@@ -176,7 +186,7 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout* layout) const
     QnUuid videoWallInstanceGuid = layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
     if (!videoWallInstanceGuid.isNull())
     {
-        QnVideoWallItemIndex idx = qnResPool->getVideoWallItemByUuid(videoWallInstanceGuid);
+        QnVideoWallItemIndex idx = resourcePool()->getVideoWallItemByUuid(videoWallInstanceGuid);
         if (idx.isNull())
             return QIcon();
 
@@ -184,7 +194,7 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout* layout) const
         {
             if (idx.item().runtimeStatus.controlledBy.isNull())
                 return qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
-            if (idx.item().runtimeStatus.controlledBy == qnCommon->moduleGUID())
+            if (idx.item().runtimeStatus.controlledBy == commonModule()->moduleGUID())
                 return qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Control);
             return qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Locked);
         }
@@ -386,7 +396,7 @@ void QnLayoutTabBar::tabInserted(int index)
         QString name;
         if (m_layouts.size() != count())
         { /* Not inserted yet, allocate new one. It will be deleted with this tab bar. */
-            QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
+            QnWorkbenchLayout *layout = qnWorkbenchLayoutsFactory->create(this);
             m_layouts.insert(index, layout);
             name = tabText(index);
         }
@@ -405,6 +415,8 @@ void QnLayoutTabBar::tabInserted(int index)
             updateTabText(layout);
             updateTabIcon(layout);
         });
+        connect(layout, &QnWorkbenchLayout::iconChanged, this,
+            [this, layout](){ updateTabIcon(layout); });
 
         if (!name.isNull())
             layout->setName(name); /* It is important to set the name after connecting so that the name change signal is delivered to us. */

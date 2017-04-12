@@ -1,5 +1,6 @@
-
 #include "workbench_alarm_layout_handler.h"
+
+#include <QtWidgets/QAction>
 
 #include <api/runtime_info_manager.h>
 #include <nx/streaming/archive_stream_reader.h>
@@ -39,6 +40,7 @@
 
 #include <nx/streaming/archive_stream_reader.h>
 #include <utils/common/delayed.h>
+#include <nx/client/ui/workbench/layouts/layout_factory.h>
 
 namespace {
     class QnAlarmLayoutResource: public QnLayoutResource {
@@ -47,7 +49,7 @@ namespace {
         QnAlarmLayoutResource():
             QnLayoutResource()
         {
-            NX_ASSERT(qnResPool->getResources<QnAlarmLayoutResource>().isEmpty(), Q_FUNC_INFO, "The Alarm Layout must exist in a single instance");
+            NX_ASSERT(resourcePool()->getResources<QnAlarmLayoutResource>().isEmpty(), Q_FUNC_INFO, "The Alarm Layout must exist in a single instance");
 
             setId(QnUuid::createUuid());
             addFlags(Qn::local);
@@ -77,7 +79,7 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
             openCamerasInAlarmLayout(cameras, true);
         });
 
-    const auto messageProcessor = QnClientMessageProcessor::instance();
+    const auto messageProcessor = qnClientMessageProcessor;
 
     auto allowedForUser =
         [this](const std::vector<QnUuid>& ids)
@@ -112,9 +114,9 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
             if (!allowedForUser(businessAction->getParams().additionalResources))
                 return;
 
-            auto targetCameras = qnResPool->getResources<QnVirtualCameraResource>(businessAction->getResources());
+            auto targetCameras = resourcePool()->getResources<QnVirtualCameraResource>(businessAction->getResources());
             if (businessAction->getParams().useSource)
-                targetCameras << qnResPool->getResources<QnVirtualCameraResource>(businessAction->getSourceResources());
+                targetCameras << resourcePool()->getResources<QnVirtualCameraResource>(businessAction->getSourceResources());
             targetCameras = accessController()->filtered(targetCameras, Qn::ViewContentPermission);
             targetCameras = targetCameras.toSet().toList();
 
@@ -218,19 +220,20 @@ QnWorkbenchLayout* QnWorkbenchAlarmLayoutHandler::findOrCreateAlarmLayout() {
 
     QnAlarmLayoutResourcePtr alarmLayout;
 
-    QnAlarmLayoutResourceList layouts = qnResPool->getResources<QnAlarmLayoutResource>();
+    QnAlarmLayoutResourceList layouts = resourcePool()->getResources<QnAlarmLayoutResource>();
     NX_ASSERT(layouts.size() < 2, Q_FUNC_INFO, "There must be only one alarm layout, if any");
     if (!layouts.empty()) {
         alarmLayout = layouts.first();
     } else {
         alarmLayout = QnAlarmLayoutResourcePtr(new QnAlarmLayoutResource());
         alarmLayout->setParentId(context()->user()->getId());
-        qnResPool->addResource(alarmLayout);
+        resourcePool()->addResource(alarmLayout);
     }
 
     QnWorkbenchLayout* workbenchAlarmLayout = QnWorkbenchLayout::instance(QnLayoutResourcePtr(alarmLayout));
-    if (!workbenchAlarmLayout) {
-        workbenchAlarmLayout = new QnWorkbenchLayout(alarmLayout, workbench());
+    if (!workbenchAlarmLayout)
+    {
+        workbenchAlarmLayout = qnWorkbenchLayoutsFactory->create(alarmLayout, workbench());
         workbenchAlarmLayout->setData(Qt::DecorationRole, qnSkin->icon("layouts/alarm.png"));
         workbench()->addLayout(workbenchAlarmLayout);
     }
@@ -242,7 +245,7 @@ bool QnWorkbenchAlarmLayoutHandler::alarmLayoutExists() const {
     if (!context()->user())
         return false;
 
-    QnAlarmLayoutResourceList layouts = qnResPool->getResources<QnAlarmLayoutResource>();
+    QnAlarmLayoutResourceList layouts = resourcePool()->getResources<QnAlarmLayoutResource>();
     NX_ASSERT(layouts.size() < 2, Q_FUNC_INFO, "There must be only one alarm layout, if any");
     if (layouts.empty())
         return false;
@@ -296,10 +299,10 @@ bool QnWorkbenchAlarmLayoutHandler::currentInstanceIsMain() const
     if (runningInstances.isEmpty())
         return true;
 
-    QnUuid localUserId = qnRuntimeInfoManager->localInfo().data.userId;
+    QnUuid localUserId = runtimeInfoManager()->localInfo().data.userId;
 
     QSet<QnUuid> connectedInstances;
-    for (const QnPeerRuntimeInfo &info: qnRuntimeInfoManager->items()->getItems())
+    for (const QnPeerRuntimeInfo &info: runtimeInfoManager()->items()->getItems())
     {
         if (info.data.userId != localUserId)
             continue;

@@ -3,6 +3,10 @@
 
 #include <QtCore/QTimer>
 
+#include <QtWidgets/QPushButton>
+
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <api/app_server_connection.h>
@@ -25,7 +29,8 @@ namespace {
     const int kTestInvalidHandle = -1;
 }
 
-class QnLdapSettingsDialogPrivate: public QObject {
+class QnLdapSettingsDialogPrivate: public QObject, public QnConnectionContextAware
+{
     Q_DECLARE_PUBLIC(QnLdapSettingsDialog)
     Q_DECLARE_TR_FUNCTIONS(QnLdapSettingsDialogPrivate)
 
@@ -53,7 +58,7 @@ QnLdapSettingsDialogPrivate::QnLdapSettingsDialogPrivate(QnLdapSettingsDialog *p
     , testHandle(kTestInvalidHandle)
     , timeoutTimer(new QTimer(parent))
 {
-    connect(QnGlobalSettings::instance(), &QnGlobalSettings::ldapSettingsChanged, this, &QnLdapSettingsDialogPrivate::updateFromSettings);
+    connect(qnGlobalSettings, &QnGlobalSettings::ldapSettingsChanged, this, &QnLdapSettingsDialogPrivate::updateFromSettings);
     connect(timeoutTimer, &QTimer::timeout, this, &QnLdapSettingsDialogPrivate::at_timeoutTimer_timeout);
 }
 
@@ -70,7 +75,7 @@ void QnLdapSettingsDialogPrivate::testSettings() {
 
     // TODO: #dklychkov #3.0 testLdapSettings rest request (on server side) should check all servers.
     QnMediaServerConnectionPtr serverConnection;
-    const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+    const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
     for (const QnMediaServerResourcePtr server: onlineServers)
     {
         if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
@@ -82,7 +87,7 @@ void QnLdapSettingsDialogPrivate::testSettings() {
 
     if (!serverConnection)
     {
-        QnMediaServerResourcePtr server = qnCommon->currentServer();
+        QnMediaServerResourcePtr server = commonModule()->currentServer();
 
         if (!server)
         {
@@ -158,7 +163,7 @@ void QnLdapSettingsDialogPrivate::updateFromSettings() {
 
     stopTesting();
 
-    const QnLdapSettings &settings = QnGlobalSettings::instance()->ldapSettings();
+    const QnLdapSettings &settings = qnGlobalSettings->ldapSettings();
 
     QUrl url = settings.uri;
     if (url.port() == QnLdapSettings::defaultPort(url.scheme() == lit("ldaps")))

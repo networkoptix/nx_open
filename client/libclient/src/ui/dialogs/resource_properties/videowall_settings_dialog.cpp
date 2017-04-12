@@ -1,6 +1,10 @@
 #include "videowall_settings_dialog.h"
 #include "ui_videowall_settings_dialog.h"
 
+#include <QtCore/QStandardPaths>
+
+#include <common/common_module.h>
+
 #include <api/app_server_connection.h>
 
 #include <client/client_settings.h>
@@ -93,7 +97,7 @@ bool QnVideowallSettingsDialog::createShortcut(const QnVideoWallResourcePtr &vid
     arguments << lit("--videowall");
     arguments << videowall->getId().toString();
 
-    QUrl url = QnAppServerConnectionFactory::url();
+    QUrl url = commonModule()->currentUrl();
     url.setUserName(QString());
     url.setPassword(QString());
 

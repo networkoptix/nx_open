@@ -3,13 +3,15 @@
 
 #include <QtCore/QObject>
 
+#include <client_core/connection_context_aware.h>
+
 #include <camera/camera_bookmarks_manager_fwd.h>
 
 #include <utils/common/connective.h>
 
 // TODO: #ynikitenkov Move caching from QnWorkbenchHandler to this class
 
-class QnWorkbenchBookmarksWatcher : public Connective<QObject>
+class QnWorkbenchBookmarksWatcher : public Connective<QObject>, public QnConnectionContextAware
 {
     Q_OBJECT
 

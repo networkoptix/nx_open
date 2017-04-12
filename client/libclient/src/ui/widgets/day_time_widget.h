@@ -1,5 +1,6 @@
-#ifndef QN_DAY_TIME_WIDGET_H
-#define QN_DAY_TIME_WIDGET_H
+#pragma once
+
+#include <QtCore/QDate>
 
 #include <QtWidgets/QWidget>
 
@@ -57,5 +58,3 @@ private:
     QString m_timeFormat;
     qint64 m_localOffset;
 };
-
-#endif // QN_DAY_TIME_WIDGET_H

@@ -1,7 +1,7 @@
 #ifndef NX_CC_COMMON_H
 #define NX_CC_COMMON_H
 
-#include "utils/common/systemerror.h"
+#include <nx/utils/system_error.h>
 
 namespace nx {
 namespace network {

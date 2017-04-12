@@ -141,7 +141,7 @@ void VideoDecoderSwitcher::setSpeed( float newValue )
 //!Implementation of AbstractDecoderManagerCallback::streamParamsChanged
 AbstractDecoderEventReceiver::DecoderBehaviour VideoDecoderSwitcher::streamParamsChanged(
     QnAbstractVideoDecoder* /*decoder*/,
-    const stree::AbstractResourceReader& newStreamParams )
+    const nx::utils::stree::AbstractResourceReader& newStreamParams )
 {
     //NOTE no need to lock mutex, since this method can only be called from decode, so mutex is already locked
 

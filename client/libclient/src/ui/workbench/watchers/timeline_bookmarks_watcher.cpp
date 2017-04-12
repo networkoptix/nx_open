@@ -1,5 +1,6 @@
-
 #include "timeline_bookmarks_watcher.h"
+
+#include <QtCore/QTimer>
 
 #include <utils/common/delayed.h>
 #include <utils/camera/bookmark_helpers.h>
@@ -73,7 +74,7 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject *parent)
     m_timlineFilter.sparsing.used = true;
     m_timlineFilter.limit = kMaxTimelineBookmarksConut;
 
-    connect(qnResPool, &QnResourcePool::resourceRemoved
+    connect(resourcePool(), &QnResourcePool::resourceRemoved
         , this, &QnTimelineBookmarksWatcher::onResourceRemoved);
 
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged

@@ -8,16 +8,14 @@
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_statistics.h>
 
-
 namespace ec2
 {
     // TODO: #2.4 remove Ec2 prefix to avoid ec2::Ec2StaticticsReporter
-    class Ec2StaticticsReporter
-            : public QObject
+    class Ec2StaticticsReporter: public QObject
     {
     public:
         /** Collects and reports statistics in automatic mode (by internal timer) */
-        Ec2StaticticsReporter(const AbstractMediaServerManagerPtr& msManager);
+        Ec2StaticticsReporter(ec2::AbstractECConnection* ec2Connection);
 
         ~Ec2StaticticsReporter();
 
@@ -46,7 +44,7 @@ namespace ec2
         void finishReport(nx_http::AsyncHttpClientPtr httpClient);
 
     private:
-        AbstractMediaServerManagerPtr m_msManager;
+        ec2::AbstractECConnection* m_ec2Connection;
 
         nx_http::AsyncHttpClientPtr m_httpClient;
         bool m_firstTime;

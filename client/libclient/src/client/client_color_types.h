@@ -205,18 +205,6 @@ struct QnBookmarkColors {
     (buttonsSeparator)(bookmarksSeparatorTop)(bookmarksSeparatorBottom) \
     (tagBgNormal)(tagBgHovered)(tagTextNormal)(tagTextHovered)(moreItemsText)
 
-struct QnCompositeTextOverlayColors
-{
-    QnCompositeTextOverlayColors();
-
-    QnBookmarkColors bookmarkColors;
-
-    QColor textOverlayItemColor;
-
-};
-#define QnCompositeTextOverlayColors_Fields (bookmarkColors)(textOverlayItemColor)
-
-
 struct QnVideowallManageWidgetColors {
     QnVideowallManageWidgetColors();
 
@@ -327,7 +315,7 @@ struct QnPasswordStrengthColors
 };
 #define QnPasswordStrengthColors_Fields (inacceptable)(acceptable)(good)
 
-#define QN_CLIENT_COLOR_TYPES                                                   \
+#define QN_CLIENT_COLOR_TYPES \
     (QnTimeSliderColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
     (QnHistogramColors)(QnResourceWidgetFrameColors) \
@@ -337,17 +325,13 @@ struct QnPasswordStrengthColors
     (QnBackupScheduleColors) \
     (QnFailoverPriorityColors) \
     (QnBookmarkColors) \
-    (QnCompositeTextOverlayColors) \
     (QnGraphicsMessageBoxColors) \
     (QnResourceItemColors) \
     (QnPasswordStrengthColors)
 
-
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,
     (metatype)(json)(eq)
-
-
 );
 
 #endif // QN_CLIENT_COLOR_TYPES_H

@@ -16,10 +16,15 @@
 #include <nx/network/http/http_serializer.h>
 
 
-namespace stree
-{
+namespace nx {
+namespace utils {
+namespace stree {
+
 class ResourceContainer;
-}   //namespace stree
+
+} //namespace stree
+} //namespace utils
+} //namespace nx
 
 namespace nx_http {
 
@@ -107,7 +112,7 @@ private:
 
     void onAuthenticationDone(
         bool authenticationResult,
-        stree::ResourceContainer authInfo,
+        nx::utils::stree::ResourceContainer authInfo,
         nx_http::Message requestMessage,
         boost::optional<header::WWWAuthenticate> wwwAuthenticate,
         nx_http::HttpHeaders responseHeaders,

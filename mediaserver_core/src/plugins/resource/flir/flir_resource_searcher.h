@@ -14,11 +14,11 @@ struct FlirDeviceInfo
     QUrl url;
 };
 
-class QnFlirResourceSearcher : public QnMdnsResourceSearcher
+class QnFlirResourceSearcher: public QnMdnsResourceSearcher
 {
-
+    using base_type = QnMdnsResourceSearcher;
 public:
-    QnFlirResourceSearcher();
+    QnFlirResourceSearcher(QnCommonModule* commonModule);
     ~QnFlirResourceSearcher();
 
     static const quint16 kFlirVendorId = 1161;

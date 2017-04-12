@@ -1,12 +1,18 @@
 #include "storage_config_widget.h"
 #include "ui_storage_config_widget.h"
 
+#include <QtGui/QKeyEvent>
+
+#include <QtWidgets/QMenu>
+
+#include <boost/range/algorithm/count_if.hpp>
+
 #include <api/global_settings.h>
 #include <api/model/storage_space_reply.h>
 #include <api/model/backup_status_reply.h>
 #include <api/model/rebuild_archive_reply.h>
 
-#include <boost/range/algorithm/count_if.hpp>
+#include <common/common_module.h>
 
 #include <camera/camera_data_manager.h>
 #include <core/resource/client_storage_resource.h>
@@ -176,14 +182,14 @@ namespace
         int m_editedRow;
     };
 
-    QnVirtualCameraResourceList getCurrentSelectedCameras()
+    QnVirtualCameraResourceList getCurrentSelectedCameras(QnResourcePool* resourcePool)
     {
         const auto isSelectedForBackup = [](const QnVirtualCameraResourcePtr& camera)
         {
             return camera->getActualBackupQualities() != Qn::CameraBackup_Disabled;
         };
 
-        QnVirtualCameraResourceList serverCameras = qnResPool->getAllCameras(QnResourcePtr(), true);
+        QnVirtualCameraResourceList serverCameras = resourcePool->getAllCameras(QnResourcePtr(), true);
         QnVirtualCameraResourceList selectedCameras = serverCameras.filtered(isSelectedForBackup);
         return selectedCameras;
     }
@@ -398,7 +404,7 @@ QnStorageConfigWidget::~QnStorageConfigWidget()
 
 void QnStorageConfigWidget::restoreCamerasToBackup()
 {
-    updateCamerasForBackup(getCurrentSelectedCameras());
+    updateCamerasForBackup(getCurrentSelectedCameras(resourcePool()));
 }
 
 void QnStorageConfigWidget::setReadOnlyInternal(bool readOnly)
@@ -442,7 +448,7 @@ bool QnStorageConfigWidget::hasChanges() const
         return true;
 
     // Check if cameras on !all! servers are different with selected
-    if (getCurrentSelectedCameras().toSet() != m_camerasToBackup.toSet())
+    if (getCurrentSelectedCameras(resourcePool()).toSet() != m_camerasToBackup.toSet())
         return true;
 
     return (m_server->getBackupSchedule() != m_backupSchedule);
@@ -482,7 +488,7 @@ void QnStorageConfigWidget::loadDataToUi()
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
     loadStoragesFromResources();
     m_backupSchedule = m_server->getBackupSchedule();
-    m_camerasToBackup = getCurrentSelectedCameras();
+    m_camerasToBackup = getCurrentSelectedCameras(resourcePool());
 
     updateDisabledStoragesWarning(false);
 
@@ -614,7 +620,7 @@ void QnStorageConfigWidget::applyStoragesChanges(QnStorageResourceList& result, 
             storage->setBackup(storageData.isBackup);
             storage->setSpaceLimit(storageData.reservedSpace);
 
-            qnResPool->addResource(storage);
+            resourcePool()->addResource(storage);
             result << storage;
         }
     }
@@ -628,7 +634,7 @@ bool QnStorageConfigWidget::hasStoragesChanges(const QnStorageModelInfoList& sto
     for (const auto& storageData: storages)
     {
         /* New storage was added. */
-        QnStorageResourcePtr storage = qnResPool->getResourceById<QnStorageResource>(storageData.id);
+        QnStorageResourcePtr storage = resourcePool()->getResourceById<QnStorageResource>(storageData.id);
         if (!storage || storage->getParentId() != m_server->getId())
             return true;
 
@@ -663,7 +669,7 @@ void QnStorageConfigWidget::applyChanges()
         if (!newIdList.contains(storage->getId()))
         {
             storagesToRemove.push_back(storage->getId());
-            qnResPool->removeResource(storage);
+            resourcePool()->removeResource(storage);
         }
     }
 
@@ -793,6 +799,7 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data,
     if (selectedCamerasCount == 0)
     {
         const auto text = QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
             tr("Select at least one device in the Backup Settings to start backup."),
             tr("Select at least one camera in the Backup Settings to start backup."));
         return error(text);
@@ -1016,7 +1023,7 @@ void QnStorageConfigWidget::applyCamerasToBackup(const QnVirtualCameraResourceLi
         return camera->getBackupQualities() != qualityForCamera(camera);
     };
 
-    const auto modified = qnResPool->getAllCameras(QnResourcePtr(), true).filtered(modifiedFilter);
+    const auto modified = resourcePool()->getAllCameras(QnResourcePtr(), true).filtered(modifiedFilter);
 
     if (modified.isEmpty())
         return;

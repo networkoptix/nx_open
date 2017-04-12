@@ -16,7 +16,7 @@
 
   <Page Name="Help">
     <Image X="-1" Y="1" Width="349" Height="252" ImageFile="installer_bg.png"/>
-    <Button Name="HelpCancelButton" X="-12" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0">#(loc.HelpCloseButton)</Button>
+    <Button Name="HelpCancelButton" X="-12" Y="-12" Width="90" Height="28" TabStop="yes" FontId="0">#(loc.HelpCloseButton)</Button>
   </Page>
 
   <Page Name="Install">
@@ -26,7 +26,7 @@
     <Text X="12" Y="214" Width="-12" Height="24" FontId="8" DisablePrefix="yes" Center="yes">#(loc.Components)</Text>
     <Text X="12" Y="-64" Width="-12" Height="16" FontId="7" DisablePrefix="yes" Center="yes">#(loc.InstallLicenseText)</Text>
     <Hypertext Name="EulaHyperlink" X="190" Y="-48" Width="-12" Height="16" TabStop="no" FontId="7" HideWhenDisabled="yes">&lt;a href="#"&gt;#(loc.InstallLicenseLinkText)&lt;/a&gt;</Hypertext>
-    <Button Name="OptionsButton" X="12" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0" HideWhenDisabled="yes">#(loc.InstallOptionsButton)</Button>
+    <Button Name="OptionsButton" X="12" Y="-12" Width="90" Height="28" TabStop="yes" FontId="0" HideWhenDisabled="yes">#(loc.InstallOptionsButton)</Button>
     <Button Name="InstallButton" X="-12" Y="-12" Width="150" Height="28" TabStop="yes" FontId="0">#(loc.InstallInstallButton)</Button>
   </Page>
   <Page Name="Options">
@@ -41,8 +41,8 @@
     <Text X="24" Y="241" Width="-12" Height="20" FontId="9" DisablePrefix="yes">#(loc.ServerOnlyDesc)</Text>
     <Text X="24" Y="261" Width="-12" Height="20" FontId="9" DisablePrefix="yes">#(loc.ClientOnlyDesc)</Text>
 
-    <Button Name="OptionsCancelButton" X="12" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0">#(loc.OptionsCancelButton)</Button>
-    <Button Name="OptionsOkButton" X="-12" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0">#(loc.OptionsOkButton)</Button>
+    <Button Name="OptionsCancelButton" X="12" Y="-12" Width="90" Height="28" TabStop="yes" FontId="0">#(loc.OptionsCancelButton)</Button>
+    <Button Name="OptionsOkButton" X="-12" Y="-12" Width="90" Height="28" TabStop="yes" FontId="0">#(loc.OptionsOkButton)</Button>
   </Page>
   <Page Name="FilesInUse">
     <Image X="-1" Y="1" Width="349" Height="252" ImageFile="installer_bg.png"/>
@@ -53,8 +53,8 @@
     <Button Name="FilesInUseCloseRadioButton" X="12" Y="-64" Width="-164" Height="23" TabStop="yes" FontId="0" HideWhenDisabled="yes" HexStyle="0x000009">#(loc.FilesInUseCloseRadioButton)</Button>
     <Button Name="FilesInUseDontCloseRadioButton" X="12" Y="-44" Width="-164" Height="23" TabStop="yes" FontId="0" HideWhenDisabled="yes" HexStyle="0x000009">#(loc.FilesInUseDontCloseRadioButton)</Button>
 
-    <Button Name="FilesInUseOkButton" X="-92" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0" HideWhenDisabled="yes">#(loc.FilesInUseOkButton)</Button>
-    <Button Name="FilesInUseCancelButton" X="-12" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0">#(loc.FilesInUseCancelButton)</Button>
+    <Button Name="FilesInUseOkButton" X="-92" Y="-12" Width="90" Height="28" TabStop="yes" FontId="0" HideWhenDisabled="yes">#(loc.FilesInUseOkButton)</Button>
+    <Button Name="FilesInUseCancelButton" X="-12" Y="-12" Width="90" Height="28" TabStop="yes" FontId="0">#(loc.FilesInUseCancelButton)</Button>
   </Page>
   <Page Name="Progress">
     <Image X="-1" Y="1" Width="349" Height="252" ImageFile="installer_bg.png"/>
@@ -62,7 +62,7 @@
     <Text X="12" Y="184" Width="-12" Height="40" FontId="1" DisablePrefix="yes" Center="yes">${display.product.name} ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</Text>
     <Progressbar Name="OverallCalculatedProgressbar" X="150" Y="256" Width="250" Height="18" />
     <Text X="12" Y="282" Width="-12" Height="40" FontId="8" DisablePrefix="yes" Center="yes">#(loc.ProgressLabel)</Text>
-    <Button Name="ProgressCancelButton" X="-12" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0">#(loc.ProgressCancelButton)</Button>
+    <Button Name="ProgressCancelButton" X="-12" Y="-12" Width="90" Height="28" TabStop="yes" FontId="0">#(loc.ProgressCancelButton)</Button>
   </Page>
   <Page Name="Modify">
     <Image X="-1" Y="1" Width="349" Height="252" ImageFile="installer_bg.png"/>
@@ -70,8 +70,8 @@
     <Text X="12" Y="174" Width="-12" Height="40" FontId="1" DisablePrefix="yes" Center="yes">Uninstall ${display.product.name}</Text>
     <Text X="12" Y="214" Width="-12" Height="24" FontId="8" DisablePrefix="yes" Center="yes">#(loc.Components)</Text>
 
-    <Button Name="UninstallButton" X="-92" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0">#(loc.ModifyUninstallButton)</Button>
-    <Button Name="ModifyCancelButton" X="-12" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0">#(loc.ModifyCloseButton)</Button>
+    <Button Name="UninstallButton" X="-92" Y="-12" Width="90" Height="28" TabStop="yes" FontId="0">#(loc.ModifyUninstallButton)</Button>
+    <Button Name="ModifyCancelButton" X="-12" Y="-12" Width="90" Height="28" TabStop="yes" FontId="0">#(loc.ModifyCloseButton)</Button>
   </Page>
   <Page Name="Success">
     <Image X="-1" Y="1" Width="349" Height="252" ImageFile="installer_bg.png"/>
@@ -80,10 +80,10 @@
     <Text Name="SuccessInstallHeader" Center="yes" X="12" Y="174" Width="-12" Height="40" FontId="6" HideWhenDisabled="yes" DisablePrefix="yes">#(loc.SuccessInstallHeader)</Text>
     <Text Name="SuccessUninstallHeader" Center="yes" X="12" Y="174" Width="-12" Height="40" FontId="6" HideWhenDisabled="yes" DisablePrefix="yes">#(loc.SuccessUninstallHeader)</Text> 
 
-    <Button Name="LaunchButton" X="-91" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0" HideWhenDisabled="yes">#(loc.SuccessLaunchButton)</Button>
+    <Button Name="LaunchButton" X="-91" Y="-12" Width="90" Height="28" TabStop="yes" FontId="0" HideWhenDisabled="yes">#(loc.SuccessLaunchButton)</Button>
     <Text Name="SuccessRestartText" X="150" Y="-51" Width="-12" Height="34" FontId="7" HideWhenDisabled="yes" DisablePrefix="yes">#(loc.SuccessRestartText)</Text>
-    <Button Name="SuccessRestartButton" X="-92" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0" HideWhenDisabled="yes">#(loc.SuccessRestartButton)</Button>
-    <Button Name="SuccessCancelButton" X="-12" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0">#(loc.SuccessCloseButton)</Button>
+    <Button Name="SuccessRestartButton" X="-92" Y="-12" Width="90" Height="28" TabStop="yes" FontId="0" HideWhenDisabled="yes">#(loc.SuccessRestartButton)</Button>
+    <Button Name="SuccessCancelButton" X="-12" Y="-12" Width="90" Height="28" TabStop="yes" FontId="0">#(loc.SuccessCloseButton)</Button>
   </Page>
   <Page Name="Failure">
     <Image X="-1" Y="1" Width="349" Height="252" ImageFile="installer_bg.png"/>
@@ -92,7 +92,7 @@
     <Hypertext Name="FailureLogFileLink" X="24" Y="145" Width="-164" Height="51" FontId="7" TabStop="yes" HideWhenDisabled="yes">#(loc.FailureHyperlinkLogText)</Hypertext>
     <Hypertext Name="FailureMessageText" X="24" Y="195" Width="-164" Height="71" FontId="7" TabStop="yes" HideWhenDisabled="yes" />
     <Text Name="FailureRestartText" X="24" Y="245" Width="-164" Height="34" FontId="7" HideWhenDisabled="yes" DisablePrefix="yes">#(loc.FailureRestartText)</Text>
-    <Button Name="FailureRestartButton" X="-92" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0" HideWhenDisabled="yes">#(loc.FailureRestartButton)</Button>
-    <Button Name="FailureCloseButton" X="-12" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0">#(loc.FailureCloseButton)</Button>
+    <Button Name="FailureRestartButton" X="-92" Y="-12" Width="90" Height="28" TabStop="yes" FontId="0" HideWhenDisabled="yes">#(loc.FailureRestartButton)</Button>
+    <Button Name="FailureCloseButton" X="-12" Y="-12" Width="90" Height="28" TabStop="yes" FontId="0">#(loc.FailureCloseButton)</Button>
   </Page>
 </Theme>

@@ -1,5 +1,9 @@
 #include "calendar_workbench_panel.h"
 
+#include <QtWidgets/QAction>
+#include <QtWidgets/QGraphicsItem>
+#include <QtWidgets/QLineEdit>
+
 #include <nx/client/ui/workbench/workbench_animations.h>
 
 #include <ui/help/help_topic_accessor.h>
@@ -75,7 +79,7 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
     navigator()->setDayTimeWidget(m_dayTimeWidget);
 
     const int kShowHideAnimationPeriodMs = qnWorkbenchAnimations->timeLimit(
-        nx::client::ui::workbench::Animations::Id::CalendarShow);
+        nx::client::desktop::ui::workbench::Animations::Id::CalendarShow);
 
     item->setWidget(m_widget);
     item->resize(kCalendarSize);
@@ -224,7 +228,7 @@ bool CalendarWorkbenchPanel::isOpened() const
 
 void CalendarWorkbenchPanel::setOpened(bool opened, bool animate)
 {
-    using namespace nx::client::ui::workbench;
+    using namespace nx::client::desktop::ui::workbench;
 
     ensureAnimationAllowed(&animate);
 

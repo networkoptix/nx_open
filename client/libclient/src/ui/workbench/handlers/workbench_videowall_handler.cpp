@@ -15,6 +15,8 @@
 
 #include <common/common_module.h>
 
+#include <client_core/client_core_module.h>
+
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -98,10 +100,11 @@
 
 #include <utils/license_usage_helper.h>
 #include <utils/common/uuid_pool.h>
-#include <utils/common/counter.h>
+#include <nx/utils/counter.h>
 #include <utils/unity_launcher_workaround.h>
 
 #include <nx/vms/utils/platform/autorun.h>
+#include <nx/client/ui/workbench/layouts/layout_factory.h>
 
 //#define SENDER_DEBUG
 //#define RECEIVER_DEBUG
@@ -280,6 +283,7 @@ QString binaryPath()
 //TODO: #GDM #VW clean nonexistent videowalls sometimes
 void setAutoRunEnabled(const QnUuid& videoWallUuid, bool value)
 {
+    auto commonModule = qnClientCoreModule->commonModule();
     const QString key = qApp->applicationName() + L' ' + videoWallUuid.toString();
 
     const QString path = binaryPath();
@@ -289,7 +293,7 @@ void setAutoRunEnabled(const QnUuid& videoWallUuid, bool value)
     QStringList arguments;
     arguments << lit("--videowall");
     arguments << videoWallUuid.toString();
-    QUrl url = QnAppServerConnectionFactory::url();
+    QUrl url = commonModule->currentUrl();
     url.setUserName(QString());
     url.setPassword(QString());
     arguments << lit("--auth");
@@ -330,7 +334,7 @@ auto offlineItemOnThisPc = []
 QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_licensesHelper(new QnVideoWallLicenseUsageHelper())
+    m_licensesHelper(new QnVideoWallLicenseUsageHelper(this))
 #ifdef _DEBUG
     /* Limit by reasonable size. */
     , m_uuidPool(new QnUuidPool(uuidPoolBase, 256))
@@ -358,14 +362,14 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     m_controlMode.pcUuid = pcUuid.toString();
 
     /* Common connections */
-    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         &QnWorkbenchVideoWallHandler::at_resPool_resourceAdded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved);
-    for (const QnResourcePtr& resource: qnResPool->getResources())
+    for (const QnResourcePtr& resource: resourcePool()->getResources())
         at_resPool_resourceAdded(resource);
 
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this,
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded, this,
         [this](const QnPeerRuntimeInfo &info)
         {
             if (info.data.peer.peerType == Qn::PT_VideowallClient)
@@ -382,7 +386,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
             }
         });
 
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoRemoved, this,
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved, this,
         [this](const QnPeerRuntimeInfo &info)
         {
             if (info.data.peer.peerType == Qn::PT_VideowallClient)
@@ -396,11 +400,11 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         });
 
     /* Handle simultaneous control mode enter. */
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this,
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged, this,
         [this](const QnPeerRuntimeInfo &info)
         {
             /* Ignore own info change. */
-            if (info.uuid == qnCommon->moduleGUID())
+            if (info.uuid == commonModule()->moduleGUID())
                 return;
 
             bool isControlled = !info.data.videoWallControlSession.isNull();
@@ -418,7 +422,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
                 return;
 
             /* Order by guid. */
-            if (info.uuid < qnCommon->moduleGUID())
+            if (info.uuid < commonModule()->moduleGUID())
             {
                 setControlMode(false);
                 showControlledByAnotherUserMessage();
@@ -427,7 +431,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         });
 
 
-    foreach(const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems())
+    foreach(const QnPeerRuntimeInfo &info, runtimeInfoManager()->items()->getItems())
     {
         if (info.data.peer.peerType != Qn::PT_VideowallClient)
             continue;
@@ -439,7 +443,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         setItemOnline(info.data.videoWallInstanceGuid, true);
     }
 
-    const auto clientMessageProcessor = QnClientMessageProcessor::instance();
+    const auto clientMessageProcessor = qnClientMessageProcessor;
     connect(clientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
         &QnWorkbenchVideoWallHandler::cleanupUnusedLayouts);
 
@@ -538,7 +542,7 @@ QnWorkbenchVideoWallHandler::~QnWorkbenchVideoWallHandler()
 
 ec2::AbstractECConnectionPtr QnWorkbenchVideoWallHandler::connection2() const
 {
-    return QnAppServerConnectionFactory::getConnection2();
+    return commonModule()->ec2Connection();
 }
 
 void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &items, const QnLayoutResourcePtr &layout)
@@ -569,7 +573,7 @@ void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &it
                 updateMode();
             };
         snapshotManager()->save(layout, callback);
-        propertyDictionary->saveParamsAsync(layout->getId());
+        propertyDictionary()->saveParamsAsync(layout->getId());
     }
     else
     {
@@ -623,8 +627,8 @@ void QnWorkbenchVideoWallHandler::swapLayouts(const QnVideoWallItemIndex firstIn
             /* Avoiding double swap */
             //TODO: #GDM refactor it
             bool bothSuccess = true;
-            QnCounter *counter = new QnCounter(2);
-            connect(counter, &QnCounter::reachedZero, this, [callback, &bothSuccess, counter]()
+            nx::utils::Counter *counter = new nx::utils::Counter(2);
+            connect(counter, &nx::utils::Counter::reachedZero, this, [callback, &bothSuccess, counter]()
             {
                 callback(bothSuccess, QnLayoutResourcePtr());
                 counter->deleteLater();
@@ -691,7 +695,7 @@ void QnWorkbenchVideoWallHandler::switchToVideoWallMode(const QnVideoWallResourc
         return;
 
     bool closeCurrentInstance = false;
-    if (!nx::client::messages::VideoWall::switchToVideoWallMode(mainWindow(), &closeCurrentInstance))
+    if (!nx::client::desktop::messages::VideoWall::switchToVideoWallMode(mainWindow(), &closeCurrentInstance))
         return;
 
     if (closeCurrentInstance)
@@ -712,7 +716,7 @@ void QnWorkbenchVideoWallHandler::openNewWindow(const QStringList &args)
 {
     QStringList arguments = args;
 
-    QUrl url = QnAppServerConnectionFactory::url();
+    QUrl url = commonModule()->currentUrl();
     url.setUserName(QString());
     url.setPassword(QString());
 
@@ -737,7 +741,7 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
     QnVideoWallItem item = videoWall->items()->getItem(m_videoWallMode.instanceGuid);
     updateMainWindowGeometry(item.screenSnaps); //TODO: #GDM check if it is needed at all
 
-    QnLayoutResourcePtr layout = qnResPool->getResourceById<QnLayoutResource>(item.layout);
+    QnLayoutResourcePtr layout = resourcePool()->getResourceById<QnLayoutResource>(item.layout);
 
     if (workbench()->currentLayout() && workbench()->currentLayout()->resource() == layout)
         return;
@@ -1047,7 +1051,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
         }
         case QnVideoWallControlMessage::Identify:
         {
-            QnVideoWallResourcePtr videoWall = qnResPool->getResourceById<QnVideoWallResource>(m_videoWallMode.guid);
+            QnVideoWallResourcePtr videoWall = resourcePool()->getResourceById<QnVideoWallResource>(m_videoWallMode.guid);
             if (!videoWall)
                 return;
 
@@ -1109,7 +1113,7 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const
     }
 
 
-    QnVideoWallLicenseUsageProposer proposer(m_licensesHelper.data(), 0, 1);
+    QnVideoWallLicenseUsageProposer proposer(m_licensesHelper, 0, 1);
     if (!validateLicenses(tr("Activate one more license to start Video Wall control session.")))
         return false;
 
@@ -1117,13 +1121,13 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const
     if (!layout)
         return false;
 
-    foreach(const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems())
+    foreach(const QnPeerRuntimeInfo &info, runtimeInfoManager()->items()->getItems())
     {
         if (info.data.videoWallControlSession != layout->getId())
             continue;
 
         /* Ignore our control session. */
-        if (info.uuid == QnRuntimeInfoManager::instance()->localInfo().uuid)
+        if (info.uuid == runtimeInfoManager()->localInfo().uuid)
             continue;
 
         showControlledByAnotherUserMessage();
@@ -1181,9 +1185,9 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active)
         m_controlMode.cacheTimer->start();
         sendMessage(QnVideoWallControlMessage(QnVideoWallControlMessage::ControlStarted));  //TODO: #GDM #VW start control when item goes online
 
-        QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+        QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
         localInfo.data.videoWallControlSession = layoutResource->getId();
-        QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
+        runtimeInfoManager()->updateLocalItem(localInfo);
 
         setItemControlledBy(localInfo.data.videoWallControlSession, localInfo.uuid, true);
     }
@@ -1208,9 +1212,9 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active)
         m_controlMode.active = active;
         m_controlMode.cacheTimer->stop();
 
-        QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+        QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
         localInfo.data.videoWallControlSession = QnUuid();
-        QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
+        runtimeInfoManager()->updateLocalItem(localInfo);
 
         setItemControlledBy(localInfo.data.videoWallControlSession, localInfo.uuid, false);
     }
@@ -1224,10 +1228,10 @@ void QnWorkbenchVideoWallHandler::updateMode()
     bool control = false;
     if (!itemUuid.isNull())
     {
-        auto index = qnResPool->getVideoWallItemByUuid(itemUuid);
+        auto index = resourcePool()->getVideoWallItemByUuid(itemUuid);
         auto item = index.item();
         if (item.runtimeStatus.online
-            && (item.runtimeStatus.controlledBy.isNull() || item.runtimeStatus.controlledBy == qnCommon->moduleGUID())
+            && (item.runtimeStatus.controlledBy.isNull() || item.runtimeStatus.controlledBy == commonModule()->moduleGUID())
             && layout->resource()
             && item.layout == layout->resource()->getId()
             )
@@ -1258,7 +1262,7 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen()
 
     m_videoWallMode.opening = false;
 
-    QnVideoWallResourcePtr videoWall = qnResPool->getResourceById<QnVideoWallResource>(m_videoWallMode.guid);
+    QnVideoWallResourcePtr videoWall = resourcePool()->getResourceById<QnVideoWallResource>(m_videoWallMode.guid);
     if (!videoWall || videoWall->items()->getItems().isEmpty())
     {
         QString message = videoWall
@@ -1315,7 +1319,7 @@ QnVideoWallItemIndexList QnWorkbenchVideoWallHandler::targetList() const
 
     QnVideoWallItemIndexList indices;
 
-    for (const QnVideoWallResourcePtr& videoWall : qnResPool->getResources<QnVideoWallResource>())
+    for (const QnVideoWallResourcePtr& videoWall : resourcePool()->getResources<QnVideoWallResource>())
     {
         for (const QnVideoWallItem &item : videoWall->items()->getItems())
         {
@@ -1381,8 +1385,6 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
         QnLayoutResourcePtr(new QnLayoutResource());
 
     layout->setId(m_uuidPool->getFreeId());
-
-    qnResPool->markLayoutAutoGenerated(layout);
     layout->addFlags(Qn::local); // TODO: #Elric #EC2
 
     if (!sourceLayout)
@@ -1421,7 +1423,7 @@ void QnWorkbenchVideoWallHandler::cleanupUnusedLayouts()
 {
     QnLayoutResourceList layoutsToDelete;
 
-    for (const auto& videowall: qnResPool->getResources<QnVideoWallResource>())
+    for (const auto& videowall: resourcePool()->getResources<QnVideoWallResource>())
     {
         QSet<QnUuid> used;
         for (const QnVideoWallItem& item: videowall->items()->getItems())
@@ -1434,7 +1436,7 @@ void QnWorkbenchVideoWallHandler::cleanupUnusedLayouts()
         }
 
         QnUuid videoWallId = videowall->getId();
-        QnLayoutResourceList unused = qnResPool->getResourcesByParentId(videoWallId)
+        QnLayoutResourceList unused = resourcePool()->getResourcesByParentId(videoWallId)
             .filtered<QnLayoutResource>(
             [used](const QnLayoutResourcePtr& layout)
             {
@@ -1461,8 +1463,8 @@ void QnWorkbenchVideoWallHandler::cleanupUnusedLayouts()
 void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
 {
 
-    QnLicenseListHelper licenseList(qnLicensePool->getLicenses());
-    if (licenseList.totalLicenseByType(Qn::LC_VideoWall) == 0)
+    QnLicenseListHelper licenseList(licensePool()->getLicenses());
+    if (licenseList.totalLicenseByType(Qn::LC_VideoWall, licensePool()->validator()) == 0)
     {
         QnMessageBox::warning(mainWindow(),
             tr("Video Wall license required"),
@@ -1471,7 +1473,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
     } //TODO: #GDM add "Licenses" button
 
     QStringList usedNames;
-    foreach(const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::videowall))
+    foreach(const QnResourcePtr &resource, resourcePool()->getResourcesWithFlag(Qn::videowall))
         usedNames << resource->getName().trimmed().toLower();
 
     //TODO: #GDM #VW refactor to corresponding dialog
@@ -1494,7 +1496,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
 
         if (usedNames.contains(proposedName.toLower()))
         {
-            nx::client::messages::VideoWall::anotherVideoWall(mainWindow());
+            nx::client::desktop::messages::VideoWall::anotherVideoWall(mainWindow());
             continue;
         }
 
@@ -1549,9 +1551,9 @@ void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered()
             continue;
 
         QnVideoWallItem existingItem = index.item();
-        if (const auto layout = qnResPool->getResourceById<QnLayoutResource>(existingItem.layout))
+        if (const auto layout = resourcePool()->getResourceById<QnLayoutResource>(existingItem.layout))
         {
-            auto removedResources = qnResPool->getResources(layout->layoutResourceIds());
+            auto removedResources = resourcePool()->getResources(layout->layoutResourceIds());
             if (!confirmRemoveResourcesFromLayout(layout, removedResources))
                 break;
         }
@@ -1594,6 +1596,9 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()
 
     if (result == QDialogButtonBox::Cancel)
         return;
+
+    for (auto resource : resources)
+        qnResIconCache->clearKey(resource);
 
     QSet<QnVideoWallResourcePtr> videoWalls;
     for (const auto& index: items)
@@ -1773,21 +1778,22 @@ void QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered()
 
         QnLayoutResourcePtr layoutResource = item.layout.isNull()
             ? QnLayoutResourcePtr()
-            : qnResPool->getResourceById<QnLayoutResource>(item.layout);
+            : resourcePool()->getResourceById<QnLayoutResource>(item.layout);
 
         if (!layoutResource)
         {
             layoutResource = constructLayout(QnResourceList());
             layoutResource->setParentId(index.videowall()->getId());
             layoutResource->setName(index.item().name);
-            qnResPool->addResource(layoutResource);
+            resourcePool()->addResource(layoutResource);
+            resourcePool()->markLayoutAutoGenerated(layoutResource);
             resetLayout(QnVideoWallItemIndexList() << index, layoutResource);
         }
 
         layout = QnWorkbenchLayout::instance(layoutResource);
         if (!layout)
         {
-            layout = new QnWorkbenchLayout(layoutResource, workbench());
+            layout = qnWorkbenchLayoutsFactory->create(layoutResource, workbench());
             workbench()->addLayout(layout);
         }
         layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(item.uuid));
@@ -1818,7 +1824,6 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered()
             layout->setParentId(context()->user()->getId());
         if (accessController()->hasGlobalPermission(Qn::GlobalControlVideoWallPermission))
             layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadWriteSavePermission));
-        qnResPool->markLayoutAutoGenerated(layout);
 
         QMap<ScreenWidgetKey, QnVideoWallItemIndexList> itemGroups;
 
@@ -1831,7 +1836,8 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered()
         foreach(const QnVideoWallItemIndexList &indices, itemGroups)
             addItemToLayout(layout, indices);
 
-        qnResPool->addResource(layout);
+        resourcePool()->addResource(layout);
+        resourcePool()->markLayoutAutoGenerated(layout);
 
         menu()->trigger(QnActions::OpenSingleLayoutAction, layout);
 
@@ -1862,12 +1868,12 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
 {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnUuid targetUuid = parameters.argument(Qn::VideoWallItemGuidRole).value<QnUuid>();
-    QnVideoWallItemIndex targetIndex = qnResPool->getVideoWallItemByUuid(targetUuid);
+    QnVideoWallItemIndex targetIndex = resourcePool()->getVideoWallItemByUuid(targetUuid);
     if (targetIndex.isNull())
         return;
 
     /* Layout that is currently on the drop-target item. */
-    QnLayoutResourcePtr currentLayout = qnResPool->getResourceById<QnLayoutResource>(targetIndex.item().layout);
+    QnLayoutResourcePtr currentLayout = resourcePool()->getResourceById<QnLayoutResource>(targetIndex.item().layout);
 
     Qt::KeyboardModifiers keyboardModifiers = parameters.argument<Qt::KeyboardModifiers>(Qn::KeyboardModifiersRole);
 
@@ -1885,7 +1891,7 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
             if (!index.isValid())
                 continue;
 
-            if (QnLayoutResourcePtr layout = qnResPool->getResourceById<QnLayoutResource>(index.item().layout))
+            if (QnLayoutResourcePtr layout = resourcePool()->getResourceById<QnLayoutResource>(index.item().layout))
                 targetResources << layout;
         }
 
@@ -1915,7 +1921,7 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
     if (currentLayout)
         hasDesktopCamera |= boost::algorithm::any_of(currentLayout->getItems().values(), [this](const QnLayoutItemData &item)
     {
-        QnResourcePtr childResource = qnResPool->getResourceById(item.resource.id);
+        QnResourcePtr childResource = resourcePool()->getResourceById(item.resource.id);
         return childResource && childResource->hasFlags(Qn::desktop_camera);
     });
 
@@ -1961,13 +1967,13 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
         const auto oldResources = currentLayout->layoutResourceIds();
         const auto newResources = targetLayout->layoutResourceIds();
 
-        const auto removedResources = qnResPool->getResources(oldResources - newResources);
+        const auto removedResources = resourcePool()->getResources(oldResources - newResources);
         if (!confirmRemoveResourcesFromLayout(currentLayout, removedResources))
             return;
     }
 
     if (!targetLayout->resourcePool())
-        qnResPool->addResource(targetLayout);
+        resourcePool()->addResource(targetLayout);
 
     switch (dropAction)
     {
@@ -1991,7 +1997,7 @@ void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered()
     if (!context()->user())
         return;
 
-    QnVirtualCameraResourcePtr desktopCamera = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(qnCommon->moduleGUID().toString());
+    QnVirtualCameraResourcePtr desktopCamera = resourcePool()->getResourceByUniqueId<QnVirtualCameraResource>(commonModule()->moduleGUID().toString());
     if (!desktopCamera || !desktopCamera->hasFlags(Qn::desktop_camera))
         return;
 
@@ -2034,7 +2040,7 @@ void QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered()
 
     foreach(const QnVideoWallItem &item, videowall->items()->getItems())
     {
-        if (item.layout.isNull() || !qnResPool->getResourceById(item.layout))
+        if (item.layout.isNull() || !resourcePool()->getResourceById(item.layout))
             continue;
         matrix.layoutByItem[item.uuid] = item.layout;
     }
@@ -2077,7 +2083,7 @@ void QnWorkbenchVideoWallHandler::at_loadVideowallMatrixAction_triggered()
             continue;
 
         QnUuid layoutUuid = matrix.layoutByItem[item.uuid];
-        if (!layoutUuid.isNull() && !qnResPool->getResourceById(layoutUuid))
+        if (!layoutUuid.isNull() && !resourcePool()->getResourceById(layoutUuid))
             layoutUuid = QnUuid();
 
         if (item.layout == layoutUuid)
@@ -2123,6 +2129,9 @@ void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
 
     if (messageBox.exec() == QDialogButtonBox::Cancel)
         return;
+
+    for (auto resource: resources)
+        qnResIconCache->clearKey(resource);
 
     QSet<QnVideoWallResourcePtr> videoWalls;
     for (const auto& matrix: matrices)
@@ -2216,7 +2225,7 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved(const QnResourcePtr
     {
         QnWorkbenchLayout* layout = QnWorkbenchLayout::instance(videoWall);
         if (layout && layout->resource())
-            qnResPool->removeResource(layout->resource());
+            resourcePool()->removeResource(layout->resource());
     }
 }
 
@@ -2269,7 +2278,7 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemAdded(const QnVideoWallResour
     QnVideoWallItem updatedItem(item);
     bool hasChanges = false;
 
-    foreach(const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems())
+    foreach(const QnPeerRuntimeInfo &info, runtimeInfoManager()->items()->getItems())
     {
         if (info.data.videoWallInstanceGuid == item.uuid)
         {
@@ -2806,7 +2815,7 @@ void QnWorkbenchVideoWallHandler::setItemOnline(const QnUuid &instanceGuid, bool
 {
     NX_ASSERT(!instanceGuid.isNull());
 
-    QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(instanceGuid);
+    QnVideoWallItemIndex index = resourcePool()->getVideoWallItemByUuid(instanceGuid);
     if (index.isNull())
         return;
 
@@ -2826,7 +2835,7 @@ void QnWorkbenchVideoWallHandler::setItemControlledBy(const QnUuid &layoutId, co
         return;
 
     QnUuid currentId = layout->getId();
-    foreach(const QnVideoWallResourcePtr &videoWall, qnResPool->getResources<QnVideoWallResource>())
+    foreach(const QnVideoWallResourcePtr &videoWall, resourcePool()->getResources<QnVideoWallResource>())
     {
         foreach(const QnVideoWallItem &item, videoWall->items()->getItems())
         {
@@ -2849,7 +2858,7 @@ void QnWorkbenchVideoWallHandler::setItemControlledBy(const QnUuid &layoutId, co
     }
 
     /* Ignore local changes. */
-    if (controllerId != qnCommon->moduleGUID() && needUpdate)
+    if (controllerId != commonModule()->moduleGUID() && needUpdate)
         updateMode();
 }
 
@@ -2898,13 +2907,13 @@ void QnWorkbenchVideoWallHandler::updateControlLayout(const QnVideoWallResourceP
 
         // add new layout if needed
         {
-            QnLayoutResourcePtr layoutResource = qnResPool->getResourceById<QnLayoutResource>(item.layout);
+            QnLayoutResourcePtr layoutResource = resourcePool()->getResourceById<QnLayoutResource>(item.layout);
             if (!layoutResource)
                 return;
 
             QnWorkbenchLayout* layout = QnWorkbenchLayout::instance(layoutResource);
             if (!layout)
-                layout = new QnWorkbenchLayout(layoutResource, workbench());
+                layout = qnWorkbenchLayoutsFactory->create(layoutResource, workbench());
 
             if (workbench()->layoutIndex(layout) < 0)
                 workbench()->insertLayout(layout, layoutIndex);
@@ -3045,7 +3054,7 @@ bool QnWorkbenchVideoWallHandler::checkLocalFiles(const QnVideoWallItemIndex& in
     if (!layout)
         return true;
 
-    return nx::client::messages::VideoWall::checkLocalFiles(mainWindow(), index,
+    return nx::client::desktop::messages::VideoWall::checkLocalFiles(mainWindow(), index,
         layout->layoutResources().toList());
 }
 
@@ -3065,7 +3074,7 @@ QnUuid QnWorkbenchVideoWallHandler::getLayoutController(const QnUuid &layoutId)
     if (layoutId.isNull())
         return QnUuid();
 
-    foreach(const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems())
+    foreach(const QnPeerRuntimeInfo &info, runtimeInfoManager()->items()->getItems())
     {
         if (info.data.videoWallControlSession != layoutId)
             continue;

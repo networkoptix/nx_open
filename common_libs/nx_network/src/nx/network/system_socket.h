@@ -15,12 +15,12 @@
 #   include <arpa/inet.h>
 #endif
 
+#include <nx/utils/system_error.h>
+
 #include "abstract_socket.h"
 #include "aio/pollable.h"
 #include "nettools.h"
 #include "socket_factory.h"
-#include "utils/common/byte_array.h"
-#include "utils/common/systemerror.h"
 
 namespace nx {
 namespace network {

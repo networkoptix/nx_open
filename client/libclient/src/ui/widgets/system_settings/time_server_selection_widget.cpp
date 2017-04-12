@@ -3,8 +3,12 @@
 
 #include <QtCore/QSortFilterProxyModel>
 
+#include <api/global_settings.h>
+
 #include <api/app_server_connection.h>
 #include <api/runtime_info_manager.h>
+
+#include <common/common_module.h>
 
 #include <nx_ec/data/api_runtime_data.h>
 
@@ -26,52 +30,54 @@
 
 namespace {
 
-    static const int kTimeFontSizePixels = 40;
-    static const int kTimeFontWeight = QFont::Normal;
-    static const int kDateFontSizePixels = 14;
-    static const int kDateFontWeight = QFont::Bold;
-    static const int kZoneFontSizePixels = 14;
-    static const int kZoneFontWeight = QFont::Normal;
-    static const int kMinimumDateTimeWidth = 84;
+static const int kTimeFontSizePixels = 40;
+static const int kTimeFontWeight = QFont::Normal;
+static const int kDateFontSizePixels = 14;
+static const int kDateFontWeight = QFont::Bold;
+static const int kZoneFontSizePixels = 14;
+static const int kZoneFontWeight = QFont::Normal;
+static const int kMinimumDateTimeWidth = 84;
 
-    class QnSortServersByPriorityProxyModel: public QSortFilterProxyModel
+class QnSortServersByPriorityProxyModel: public QSortFilterProxyModel
+{
+public:
+    explicit QnSortServersByPriorityProxyModel(QObject* parent = nullptr):
+        QSortFilterProxyModel(parent)
     {
-    public:
-        explicit QnSortServersByPriorityProxyModel(QObject* parent = nullptr) :
-            QSortFilterProxyModel(parent) {}
+    }
 
-    protected:
-        virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const
-        {
-            return left.data(Qn::PriorityRole).toULongLong() < right.data(Qn::PriorityRole).toULongLong();
-        }
-    };
-
-    class QnTimeServerDelegate : public QStyledItemDelegate
+protected:
+    virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const
     {
-        using base_type = QStyledItemDelegate;
+        return left.data(Qn::PriorityRole).toULongLong() < right.data(Qn::PriorityRole).toULongLong();
+    }
+};
 
-    public:
-        QnTimeServerDelegate(QObject* parent = nullptr) : base_type(parent) {}
+class QnTimeServerDelegate: public QStyledItemDelegate
+{
+    using base_type = QStyledItemDelegate;
 
-        virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override
+public:
+    QnTimeServerDelegate(QObject* parent = nullptr): base_type(parent) {}
+
+    virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override
+    {
+        QSize size = base_type::sizeHint(option, index);
+
+        switch (index.column())
         {
-            QSize size = base_type::sizeHint(option, index);
+            case QnTimeServerSelectionModel::DateColumn:
+            case QnTimeServerSelectionModel::TimeColumn:
+                size.setWidth(qMax(size.width(), kMinimumDateTimeWidth));
+                break;
 
-            switch (index.column())
-            {
-                case QnTimeServerSelectionModel::DateColumn:
-                case QnTimeServerSelectionModel::TimeColumn:
-                    size.setWidth(qMax(size.width(), kMinimumDateTimeWidth));
-                    break;
-
-                default:
-                    break;
-            }
-
-            return size;
+            default:
+                break;
         }
-    };
+
+        return size;
+    }
+};
 
 } // namespace
 
@@ -83,6 +89,15 @@ QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /* = NU
 {
     ui->setupUi(this);
     setHelpTopic(this, Qn::Administration_TimeSynchronization_Help);
+
+    ui->syncWithInternetCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
+    ui->syncWithInternetCheckBox->setForegroundRole(QPalette::ButtonText);
+    connect(ui->syncWithInternetCheckBox, &QAbstractButton::toggled, this,
+        [this](bool checked)
+        {
+            ui->serversTable->setEnabled(!checked);
+        });
+    ui->serversTable->setEnabled(!ui->syncWithInternetCheckBox->isChecked());
 
     QFont font;
     font.setPixelSize(kTimeFontSizePixels);
@@ -100,13 +115,6 @@ QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /* = NU
     ui->zoneLabel->setFont(font);
     ui->zoneLabel->setForegroundRole(QPalette::Light);
 
-    ui->timeSourceLabel->setVisible(false);
-#if 0
-    if (true)
-        ui->timeSourceLabel->setText(tr("Time is taken from the Internet."));
-    else
-        ui->timeSourceLabel->setText(tr("Time is taken from %1."));
-#endif
     QnSortServersByPriorityProxyModel* sortModel = new QnSortServersByPriorityProxyModel(this);
     sortModel->setSourceModel(m_model);
 
@@ -148,12 +156,13 @@ void QnTimeServerSelectionWidget::loadDataToUi()
 {
     PRINT_DEBUG("provide selected server to model:");
     m_model->setSelectedServer(selectedServer());
+    ui->syncWithInternetCheckBox->setChecked(qnGlobalSettings->isSynchronizingTimeWithInternet());
     updateTime();
 }
 
 void QnTimeServerSelectionWidget::applyChanges()
 {
-    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto connection = commonModule()->ec2Connection();
     if (!connection)
         return;
 
@@ -166,6 +175,9 @@ void QnTimeServerSelectionWidget::applyChanges()
             Q_UNUSED(errCode);  //suppress warning in the release code
             PRINT_DEBUG("forcing selected server finished with result " + ec2::toString(errCode).toUtf8());
         });
+
+    qnGlobalSettings->setSynchronizingTimeWithInternet(ui->syncWithInternetCheckBox->isChecked());
+    qnGlobalSettings->synchronizeNow();
 }
 
 bool QnTimeServerSelectionWidget::hasChanges() const
@@ -178,7 +190,7 @@ QnUuid QnTimeServerSelectionWidget::selectedServer() const
 {
     PRINT_DEBUG("check selected server by runtime info");
 
-    for (const auto& runtimeInfo : qnRuntimeInfoManager->items()->getItems())
+    for (const auto& runtimeInfo : runtimeInfoManager()->items()->getItems())
     {
         if (runtimeInfo.data.peer.peerType != Qn::PT_Server)
             continue;

@@ -1,6 +1,10 @@
 #pragma once
 
+#include <QtCore/QObject>
+#include <QtCore/QPointer>
 #include <nx/utils/app_info.h>
+class QWidget;
+class QEvent;
 
 class QnShowDialogHelper {
 public:
@@ -15,27 +19,9 @@ public:
 class QnDelayedShowHelper: public QObject, public QnShowDialogHelper {
     Q_OBJECT
 public:
-    QnDelayedShowHelper(QWidget* targetWidget, const QRect &targetGeometry, int sourceCount, QObject *parent = NULL):
-        QObject(parent),
-        m_targetWidget(targetWidget),
-        m_targetGeometry(targetGeometry),
-        m_sourceCount(sourceCount)
-    {}
+    QnDelayedShowHelper(QWidget* targetWidget, const QRect &targetGeometry, int sourceCount, QObject *parent = NULL);
 
-    virtual bool eventFilter(QObject *watched, QEvent *event) override {
-        if (m_targetWidget && event->type() == QEvent::Hide) {
-            watched->removeEventFilter(this);   //avoid double call
-            m_sourceCount--;
-
-            if (m_sourceCount <= 0) {
-                show(m_targetWidget.data(), m_targetGeometry);
-                deleteLater();
-            }
-
-        }
-
-        return QObject::eventFilter(watched, event);
-    }
+    virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
     /** Invalidate stored geometry so dialog will be displayed in the center of the screen. */
     void resetGeometry()

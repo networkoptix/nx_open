@@ -2,6 +2,11 @@
 
 #include <limits>
 
+#include <QtWidgets/QGraphicsWidget>
+
+#include <common/common_module.h>
+#include <client_core/client_core_module.h>
+
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
@@ -19,7 +24,10 @@
 
 
 #include "extensions/workbench_stream_synchronizer.h"
+
 #include "utils/common/util.h"
+
+#include <nx/utils/datetime.h>
 
 namespace {
     template<class PointContainer>
@@ -34,39 +42,57 @@ namespace {
 
 } // anonymous namespace
 
-QnWorkbenchLayout::QnWorkbenchLayout(QObject *parent):
-    QObject(parent)
-{
-    // TODO: #Elric this does not belong here.
-    setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0)));
-
-    initCellParameters();
-}
-
 QnWorkbenchLayout::QnWorkbenchLayout(const QnLayoutResourcePtr &resource, QObject *parent):
     QObject(parent)
 {
-    if(resource.isNull()) {
-        qnNullWarning(resource);
-        return;
-    }
 
     // TODO: #Elric this does not belong here.
     setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0)));
 
     initCellParameters();
 
+    if(resource.isNull())
+        return;
+
+    m_icon = resource->data(Qn::LayoutIconRole).value<QIcon>();
     QnWorkbenchLayoutSynchronizer *synchronizer = new QnWorkbenchLayoutSynchronizer(this, resource, this);
     synchronizer->setAutoDeleting(true);
     synchronizer->update();
+
+    connect(this, &QnWorkbenchLayout::dataChanged, this,
+        [this](int role)
+        {
+            if (role == Qn::LayoutIconRole)
+                emit iconChanged();
+        });
 }
 
-QnWorkbenchLayout::~QnWorkbenchLayout() {
+QnWorkbenchLayout::~QnWorkbenchLayout()
+{
     bool signalsBlocked = blockSignals(false);
     emit aboutToBeDestroyed();
     blockSignals(signalsBlocked);
 
     clear();
+}
+
+QnLayoutFlags QnWorkbenchLayout::flags() const
+{
+    return m_flags;
+}
+
+QIcon QnWorkbenchLayout::icon() const
+{
+    return m_icon;
+}
+
+void QnWorkbenchLayout::setFlags(QnLayoutFlags value)
+{
+    if (m_flags == value)
+        return;
+
+    m_flags = value;
+    emit flagsChanged();
 }
 
 QnLayoutResourcePtr QnWorkbenchLayout::resource() const {
@@ -85,8 +111,11 @@ QnWorkbenchLayout *QnWorkbenchLayout::instance(const QnLayoutResourcePtr &layout
     return synchronizer->layout();
 }
 
-QnWorkbenchLayout *QnWorkbenchLayout::instance(const QnVideoWallResourcePtr &videoWall) {
-    foreach (const QnLayoutResourcePtr &layout, qnResPool->getResources<QnLayoutResource>()) {
+QnWorkbenchLayout *QnWorkbenchLayout::instance(const QnVideoWallResourcePtr &videoWall)
+{
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    for (const QnLayoutResourcePtr &layout: resourcePool->getResources<QnLayoutResource>())
+    {
         if (layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>() == videoWall)
             return QnWorkbenchLayout::instance(layout);
     }
@@ -560,11 +589,14 @@ QRect QnWorkbenchLayout::closestFreeSlot(const QPointF &gridPos, const QSize &si
     qreal bestDistance = std::numeric_limits<qreal>::max();
     QPoint bestDelta = QPoint(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
 
+    Qt::Edge noEdge = static_cast<Qt::Edge>(0);
+    Qt::Edges allEdges = (Qt::TopEdge | Qt::LeftEdge | Qt::RightEdge | Qt::BottomEdge);
+
     /* Border being walked. */
-    Qn::Border checkedBorder = Qn::NoBorders;
+    Qt::Edge checkedBorder = noEdge;
 
     /* Borders that are known not to contain positions closer to the target than current best. */
-    Qn::Borders checkedBorders = 0;
+    Qt::Edges checkedBorders = 0;
 
     QnWorkbenchGridWalker walker;
     while(true) {
@@ -574,7 +606,7 @@ QRect QnWorkbenchLayout::closestFreeSlot(const QPointF &gridPos, const QSize &si
             qreal distance = metric->calculate(gridCell + delta);
             if(distance > bestDistance || qFuzzyEquals(distance, bestDistance))
                 continue;
-            checkedBorder = Qn::NoBorders;
+            checkedBorder = noEdge;
 
             if(m_itemMap.isOccupied(QRect(gridCell + delta, size)))
                 continue;
@@ -584,20 +616,20 @@ QRect QnWorkbenchLayout::closestFreeSlot(const QPointF &gridPos, const QSize &si
             bestDelta = delta;
         } else {
             checkedBorders |= checkedBorder;
-            if(checkedBorders == Qn::AllBorders && bestDistance < std::numeric_limits<qreal>::max())
+            if(checkedBorders == allEdges && bestDistance < std::numeric_limits<qreal>::max())
                 return QRect(gridCell + bestDelta, size);
 
             struct {
-                Qn::Border border;
+                Qt::Edge border;
                 QPoint delta;
             } expansion[4] = {
-                {Qn::RightBorder,   QPoint(walker.rect().right() + 1,   gridCell.y())},
-                {Qn::LeftBorder,    QPoint(walker.rect().left() - 1,    gridCell.y())},
-                {Qn::BottomBorder,  QPoint(gridCell.x(),                walker.rect().bottom() + 1)},
-                {Qn::TopBorder,     QPoint(gridCell.x(),                walker.rect().top() - 1)},
+                {Qt::RightEdge,   QPoint(walker.rect().right() + 1,   gridCell.y())},
+                {Qt::LeftEdge,    QPoint(walker.rect().left() - 1,    gridCell.y())},
+                {Qt::BottomEdge,  QPoint(gridCell.x(),                walker.rect().bottom() + 1)},
+                {Qt::TopEdge,     QPoint(gridCell.x(),                walker.rect().top() - 1)},
             };
 
-            Qn::Border bestBorder = Qn::NoBorders;
+            Qt::Edge bestBorder = noEdge;
             qreal bestBorderDistance = std::numeric_limits<qreal>::max();
             for(int i = 0; i < 4; i++) {
                 qreal distance = metric->calculate(gridCell + expansion[i].delta);

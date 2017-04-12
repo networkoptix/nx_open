@@ -1,5 +1,7 @@
-
 #pragma once
+
+#include <QtCore/QPointer>
+#include <QtGui/QTransform>
 
 class QGraphicsScene;
 class QGraphicsView;

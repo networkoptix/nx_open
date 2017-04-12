@@ -20,7 +20,7 @@ QnResourceTreeModelLayoutNodeManager::QnResourceTreeModelLayoutNodeManager(QnRes
                 snapshotManager()->isModified(layout));
         });
 
-    connect(qnResourceAccessProvider, &QnResourceAccessProvider::accessChanged, this,
+    connect(resourceAccessProvider(), &QnResourceAccessProvider::accessChanged, this,
         [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource)
         {
             auto primary = nodeForResource(resource).objectCast<QnResourceTreeModelLayoutNode>();
@@ -33,7 +33,7 @@ QnResourceTreeModelLayoutNodeManager::QnResourceTreeModelLayoutNodeManager(QnRes
             chainCall(primary.data(), &QnResourceTreeModelNode::update);
         });
 
-    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         &QnResourceTreeModelLayoutNodeManager::handleResourceAdded);
 }
 

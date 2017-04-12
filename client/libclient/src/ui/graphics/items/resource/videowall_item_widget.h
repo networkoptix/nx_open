@@ -1,5 +1,4 @@
-#ifndef LAYOUT_RESOURCE_OVERLAY_WIDGET_H
-#define LAYOUT_RESOURCE_OVERLAY_WIDGET_H
+#pragma once
 
 #include <client/client_color_types.h>
 
@@ -29,6 +28,7 @@ class QnViewportBoundWidget;
 
 class GraphicsLabel;
 class GraphicsWidget;
+class QGraphicsLinearLayout;
 
 class QnVideowallItemWidget : public Overlayed<Animated<Connective<QnClickableWidget>>>, protected DragProcessHandler, public QnWorkbenchContextAware {
     typedef Overlayed<Animated<Connective<QnClickableWidget>>> base_type;
@@ -117,5 +117,3 @@ private:
     GraphicsWidget *m_headerWidget;
     GraphicsLabel *m_headerLabel;
 };
-
-#endif // LAYOUT_RESOURCE_OVERLAY_WIDGET_H

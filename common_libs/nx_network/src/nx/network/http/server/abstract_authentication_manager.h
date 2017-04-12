@@ -7,7 +7,7 @@
 #include <boost/optional.hpp>
 
 #include <nx/utils/move_only_func.h>
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 
 #include "../abstract_msg_body_source.h"
 
@@ -17,7 +17,7 @@ namespace server {
 using AuthenticationCompletionHandler =
     nx::utils::MoveOnlyFunc<void(
         bool authenticationResult,
-        stree::ResourceContainer authInfo,
+        nx::utils::stree::ResourceContainer authInfo,
         boost::optional<nx_http::header::WWWAuthenticate> wwwAuthenticate,
         nx_http::HttpHeaders responseHeaders,
         std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody)>;

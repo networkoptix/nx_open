@@ -43,9 +43,12 @@ namespace {
     };
 
 
-    QnCameraDeviceType calculateDeviceType(const QnVirtualCameraResourceList &devices) {
+    QnCameraDeviceType calculateDeviceType(
+        const QnResourcePool* resPool,
+        const QnVirtualCameraResourceList &devices)
+    {
         /* Quick check - if there are no i/o modules in the system at all. */
-        if (!qnResPool || !qnResPool->containsIoModules())
+        if (!resPool || !resPool->containsIoModules())
             return QnCameraDeviceType::Camera;
 
         using boost::algorithm::any_of;
@@ -70,8 +73,9 @@ namespace {
         return QnCameraDeviceType::Mixed;
     }
 
-    QnCameraDeviceType calculateDefaultDeviceType() {
-        if (!qnResPool || !qnResPool->containsIoModules())
+    QnCameraDeviceType calculateDefaultDeviceType(const QnResourcePool* resPool)
+    {
+        if (!resPool || !resPool->containsIoModules())
             return QnCameraDeviceType::Camera;
         return QnCameraDeviceType::Mixed;
     }
@@ -142,8 +146,12 @@ bool QnCameraDeviceStringSet::isValid() const {
 /************************************************************************/
 /* QnDeviceDependentStrings                                             */
 /************************************************************************/
-QString QnDeviceDependentStrings::getNumericName(const QnVirtualCameraResourceList &devices, bool capitalize /*= true*/) {
-    QnCameraDeviceType deviceType = calculateDeviceType(devices);
+QString QnDeviceDependentStrings::getNumericName(
+    QnResourcePool* resPool,
+    const QnVirtualCameraResourceList &devices,
+    bool capitalize /*= true*/)
+{
+    QnCameraDeviceType deviceType = calculateDeviceType(resPool, devices);
     switch (deviceType) {
     case Camera:
         return QnResourceNameStrings::numericCameras(devices.size(), capitalize);
@@ -156,22 +164,37 @@ QString QnDeviceDependentStrings::getNumericName(const QnVirtualCameraResourceLi
     return QnResourceNameStrings::numericDevices(devices.size(), capitalize);
 }
 
-QString QnDeviceDependentStrings::getNameFromSet(const QnCameraDeviceStringSet &set, const QnVirtualCameraResourceList &devices) {
-    return set.getString(calculateDeviceType(devices), devices.size() != 1);
+QString QnDeviceDependentStrings::getNameFromSet(
+    QnResourcePool* resPool,
+    const QnCameraDeviceStringSet &set,
+    const QnVirtualCameraResourceList &devices)
+{
+    return set.getString(calculateDeviceType(resPool, devices), devices.size() != 1);
 }
 
-QString QnDeviceDependentStrings::getNameFromSet(const QnCameraDeviceStringSet &set, const QnVirtualCameraResourcePtr &device) {
+QString QnDeviceDependentStrings::getNameFromSet(
+    QnResourcePool* resPool,
+    const QnCameraDeviceStringSet &set,
+    const QnVirtualCameraResourcePtr &device)
+{
     return set.getString(
         device
-        ? calculateDeviceType(QnVirtualCameraResourceList() << device)
-        : calculateDefaultDeviceType()
+        ? calculateDeviceType(resPool, QnVirtualCameraResourceList() << device)
+        : calculateDefaultDeviceType(resPool)
     , false);
 }
 
-QString QnDeviceDependentStrings::getDefaultNameFromSet(const QnCameraDeviceStringSet &set) {
-    return set.getString(calculateDefaultDeviceType(), true);
+QString QnDeviceDependentStrings::getDefaultNameFromSet(
+    QnResourcePool* resPool,
+    const QnCameraDeviceStringSet &set)
+{
+    return set.getString(calculateDefaultDeviceType(resPool), true);
 }
 
-QString QnDeviceDependentStrings::getDefaultNameFromSet(const QString &mixedString, const QString &cameraString) {
-    return QnCameraDeviceStringSet(mixedString, cameraString).getString(calculateDefaultDeviceType(), true);
+QString QnDeviceDependentStrings::getDefaultNameFromSet(
+    QnResourcePool* resPool,
+    const QString &mixedString,
+    const QString &cameraString)
+{
+    return QnCameraDeviceStringSet(mixedString, cameraString).getString(calculateDefaultDeviceType(resPool), true);
 }

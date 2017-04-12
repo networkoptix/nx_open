@@ -8,6 +8,8 @@
 
 #include <ui/dialogs/common/session_aware_dialog.h>
 
+class QComboBox;
+
 namespace Ui {
     class BackupScheduleDialog;
 }

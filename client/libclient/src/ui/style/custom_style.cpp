@@ -2,7 +2,11 @@
 
 #include <QtCore/QTimer>
 #include <QtCore/QElapsedTimer>
+
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QTabWidget>
+#include <QtWidgets/QStackedWidget>
+#include <QtWidgets/QGraphicsOpacityEffect>
 
 #include <ui/style/generic_palette.h>
 #include <ui/style/nx_style.h>

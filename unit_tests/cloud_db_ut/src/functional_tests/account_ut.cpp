@@ -886,16 +886,28 @@ protected:
 
     void assertRegistrationTimestampIsCorrect()
     {
+        using namespace std::chrono;
+
         const auto account = getFreshAccountCopy();
-        ASSERT_GE(account.registrationTime, m_registrationTimeRange.first);
-        ASSERT_LE(account.registrationTime, m_registrationTimeRange.second);
+        ASSERT_GE(
+            nx::utils::floor<milliseconds>(account.registrationTime),
+            nx::utils::floor<milliseconds>(m_registrationTimeRange.first));
+        ASSERT_LE(
+            nx::utils::floor<milliseconds>(account.registrationTime),
+            nx::utils::floor<milliseconds>(m_registrationTimeRange.second));
     }
     
     void assertActivationTimestampIsCorrect()
     {
+        using namespace std::chrono;
+
         const auto account = getFreshAccountCopy();
-        ASSERT_GE(account.activationTime, m_activationTimeRange.first);
-        ASSERT_LE(account.activationTime, m_activationTimeRange.second);
+        ASSERT_GE(
+            nx::utils::floor<milliseconds>(account.activationTime),
+            nx::utils::floor<milliseconds>(m_activationTimeRange.first));
+        ASSERT_LE(
+            nx::utils::floor<milliseconds>(account.activationTime),
+            nx::utils::floor<milliseconds>(m_activationTimeRange.second));
     }
 
     void whenRestartedCloudDb()

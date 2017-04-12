@@ -1,5 +1,6 @@
 #include "item_view_auto_hider.h"
 
+#include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QAbstractItemView>
 #include <QtWidgets/QStackedWidget>

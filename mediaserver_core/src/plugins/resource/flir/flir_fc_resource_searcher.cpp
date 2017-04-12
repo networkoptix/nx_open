@@ -31,7 +31,9 @@ namespace nx {
 namespace plugins {
 namespace flir {
 
-FcResourceSearcher::FcResourceSearcher():
+FcResourceSearcher::FcResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule),
     m_flirFcTypeId(qnResTypePool->getResourceTypeId(manufacture(), kFlirFcResourceTypeName, true)),
     m_terminated(false)
 {
@@ -249,7 +251,7 @@ void FcResourceSearcher::receiveFromCallback(
         return;
     }
 
-    auto url = senderAddress.toUrl(lit("http"));
+    auto url = QUrl(lit("http://%1").arg(senderAddress.toString()));
     url.setPort(nx_http::DEFAULT_HTTP_PORT);
     url.setPath(kDeviceInfoUrlPath);
 
@@ -327,7 +329,7 @@ void FcResourceSearcher::handleDeviceInfoResponseUnsafe(
         return;
     }
 
-    auto url = senderAddress.toUrl(lit("http"));
+    auto url = QUrl(lit("http://%1").arg(senderAddress.toString()));
     url.setPort(nx_http::DEFAULT_HTTP_PORT);
     deviceInfo->url = url;
 

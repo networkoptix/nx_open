@@ -1,5 +1,7 @@
 #include "aligner.h"
 
+#include <QtWidgets/QLayout>
+
 #include <ui/common/accessor.h>
 #include <ui/style/helper.h>
 #include <utils/common/event_processors.h>
@@ -36,10 +38,17 @@ QnAligner::QnAligner(QObject* parent /*= nullptr*/):
     base_type(parent),
     m_defaultAccessor(new WidgetSizeAccessor()),
     m_skipInvisible(false),
-    m_minimumSize(style::Hints::kMinimumFormLabelWidth)
+    m_minimumWidth(style::Hints::kMinimumFormLabelWidth)
 {
     if (parent)
-        installEventHandler(parent, { QEvent::Show, QEvent::LayoutRequest }, this, &QnAligner::align);
+    {
+        installEventHandler(parent, { QEvent::Show, QEvent::LayoutRequest }, this,
+            [this]()
+            {
+                if (!m_masterAligner)
+                    align();
+            });
+    }
 }
 
 QnAligner::~QnAligner()
@@ -61,9 +70,34 @@ void QnAligner::addWidgets(std::initializer_list<QWidget*> widgets)
     align();
 }
 
+void QnAligner::addAligner(QnAligner* aligner)
+{
+    if (aligner->m_masterAligner == this)
+    {
+        NX_ASSERT(m_aligners.contains(aligner));
+        return;
+    }
+
+    NX_ASSERT(aligner->m_masterAligner.isNull());
+    if (aligner->m_masterAligner)
+        return;
+
+    m_aligners << aligner;
+    aligner->m_masterAligner = this;
+
+    align();
+
+    connect(aligner, &QObject::destroyed, this,
+        [this, aligner]()
+        {
+            m_aligners.removeAll(aligner);
+        });
+}
+
 void QnAligner::clear()
 {
     m_widgets.clear();
+    m_aligners.clear();
 }
 
 void QnAligner::registerTypeAccessor(const QLatin1String& className, AbstractAccessor* accessor)
@@ -72,27 +106,48 @@ void QnAligner::registerTypeAccessor(const QLatin1String& className, AbstractAcc
     m_accessorByClassName[className] = accessor;
 }
 
-void QnAligner::align()
+int QnAligner::maxWidth() const
 {
-    if (m_widgets.isEmpty())
-        return;
-
-    int maxWidth = m_minimumSize;
+    int maxWidth = m_minimumWidth;
     const bool alignInvisible = !m_skipInvisible;
 
-    for (auto w : m_widgets)
+    for (auto w: m_widgets)
+    {
         if (alignInvisible || w->isVisible())
             maxWidth = std::max(accessor(w)->get(w).toInt(), maxWidth);
+    }
 
-    for (QWidget* w : m_widgets)
+    for (auto a: m_aligners)
+        maxWidth = std::max(a->maxWidth(), maxWidth);
+
+    return maxWidth;
+}
+
+void QnAligner::enforceWidth(int width)
+{
+    const bool alignInvisible = !m_skipInvisible;
+    for (auto w: m_widgets)
+    {
         if (alignInvisible || w->isVisible())
-            accessor(w)->set(w, maxWidth);
+            accessor(w)->set(w, width);
+    }
+
+    for (auto a: m_aligners)
+        a->enforceWidth(width);
 
     if (auto parentWidget = qobject_cast<QWidget*>(parent()))
     {
         if (parentWidget->layout())
             parentWidget->layout()->activate();
     }
+}
+
+void QnAligner::align()
+{
+    if (m_widgets.isEmpty() && m_aligners.isEmpty())
+        return;
+
+    enforceWidth(maxWidth());
 }
 
 AbstractAccessor* QnAligner::accessor(QWidget* widget) const
@@ -123,16 +178,16 @@ void QnAligner::setSkipInvisible(bool value)
     align();
 }
 
-int QnAligner::minimumSize() const
+int QnAligner::minimumWidth() const
 {
-    return m_minimumSize;
+    return m_minimumWidth;
 }
 
-void QnAligner::setMinimumSize(int value)
+void QnAligner::setMinimumWidth(int value)
 {
-    if (m_minimumSize == value)
+    if (m_minimumWidth == value)
         return;
 
-    m_minimumSize = value;
+    m_minimumWidth = value;
     align();
 }

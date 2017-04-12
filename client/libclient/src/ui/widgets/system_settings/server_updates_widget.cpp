@@ -6,9 +6,14 @@
 #include <QtCore/QUrlQuery>
 #include <QtCore/QTimer>
 
+#include <QtGui/QClipboard>
+
+#include <QtWidgets/QMenu>
+
 #include <api/global_settings.h>
 
 #include <common/common_module.h>
+#include <common/static_common_module.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
@@ -272,7 +277,7 @@ void QnServerUpdatesWidget::initDropdownActions()
                 return;
 
             setMode(Mode::SpecificBuild);
-            QnSoftwareVersion version = qnCommon->engineVersion();
+            QnSoftwareVersion version = qnStaticCommon->engineVersion();
             m_targetVersion = QnSoftwareVersion(version.major(), version.minor(), version.bugfix(), dialog.buildNumber());
             m_localFileName = QString();
             m_updatesModel->setLatestVersion(m_targetVersion);
@@ -794,7 +799,7 @@ void QnServerUpdatesWidget::at_tool_stageProgressChanged(QnFullUpdateStage stage
 void QnServerUpdatesWidget::at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning& lowFreeSpaceWarning)
 {
     const auto failedServers =
-        qnResPool->getResources<QnMediaServerResource>(lowFreeSpaceWarning.failedPeers);
+        resourcePool()->getResources<QnMediaServerResource>(lowFreeSpaceWarning.failedPeers);
     QnMessageBox dialog(QnMessageBoxIcon::Warning,
         tr("Not enough free space at %n Servers:", "", failedServers.size()),
         tr("Attempt to update may fail or cause Server malfunction."),
@@ -844,7 +849,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
         {
             case QnUpdateResult::Successful:
             {
-                const bool clientUpdated = (result.targetVersion != qnCommon->engineVersion());
+                const bool clientUpdated = (result.targetVersion != qnStaticCommon->engineVersion());
                 if (clientUpdated)
                 {
                     if (result.clientInstallerRequired)

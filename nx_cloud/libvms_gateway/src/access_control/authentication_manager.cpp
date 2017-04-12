@@ -17,7 +17,7 @@
 
 #include <http/custom_headers.h>
 #include <utils/common/app_info.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
 
@@ -34,7 +34,7 @@ using namespace nx_http;
 
 AuthenticationManager::AuthenticationManager(
     const QnAuthMethodRestrictionList& authRestrictionList,
-    const stree::StreeManager& stree)
+    const nx::utils::stree::StreeManager& stree)
 :
     m_authRestrictionList(authRestrictionList),
     m_stree(stree),
@@ -48,11 +48,11 @@ void AuthenticationManager::authenticate(
     nx_http::server::AuthenticationCompletionHandler completionHandler)
 {
     bool authenticationResult = false;
-    stree::ResourceContainer authInfo;
+    nx::utils::stree::ResourceContainer authInfo;
     boost::optional<nx_http::header::WWWAuthenticate> wwwAuthenticate;
     nx_http::HttpHeaders responseHeaders;
     std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody;
-    auto scopedGuard = makeScopedGuard(
+    auto scopedGuard = makeScopeGuard(
         [&authenticationResult, &authInfo, &wwwAuthenticate,
             &responseHeaders, &msgBody, &completionHandler]() mutable
         {
@@ -88,13 +88,13 @@ void AuthenticationManager::authenticate(
     }
 
     //performing stree search
-    stree::ResourceContainer authTraversalResult;
-    stree::ResourceContainer inputRes;
+    nx::utils::stree::ResourceContainer authTraversalResult;
+    nx::utils::stree::ResourceContainer inputRes;
     if (authzHeader && !authzHeader->userid().isEmpty())
         inputRes.put(attr::userName, authzHeader->userid());
     SocketResourceReader socketResources(*connection.socket());
     HttpRequestResourceReader httpRequestResources(request);
-    const auto authSearchInputData = stree::MultiSourceResourceReader(
+    const auto authSearchInputData = nx::utils::stree::MultiSourceResourceReader(
         socketResources,
         httpRequestResources,
         inputRes);

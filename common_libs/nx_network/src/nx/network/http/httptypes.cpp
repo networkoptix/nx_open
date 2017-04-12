@@ -1782,4 +1782,36 @@ StringType serverString()
     return defaultServerString;
 }
 
+static const char* weekDaysStr[] = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+static const char* months[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+QByteArray formatDateTime(const QDateTime& value)
+{
+    static const int SECONDS_PER_MINUTE = 60;
+    static const int SECONDS_PER_HOUR = 3600;
+
+    if (value.isNull() || !value.isValid())
+        return QByteArray();
+
+    const QDate& date = value.date();
+    const QTime& time = value.time();
+    const int offsetFromUtcSeconds = value.offsetFromUtc();
+    const int offsetFromUtcHHMM =
+        (offsetFromUtcSeconds / SECONDS_PER_HOUR) * 100 +
+        (offsetFromUtcSeconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE;
+
+    char strDateBuf[256];
+    sprintf(strDateBuf, "%s, %02d %s %d %02d:%02d:%02d %+05d",
+        weekDaysStr[date.dayOfWeek() - 1],
+        date.day(),
+        months[date.month() - 1],
+        date.year(),
+        time.hour(),
+        time.minute(),
+        time.second(),
+        offsetFromUtcHHMM);
+
+    return QByteArray(strDateBuf);
+}
+
 } // namespace nx_http

@@ -1,5 +1,6 @@
 #include "workbench_export_handler.h"
 
+#include <QtWidgets/QAction>
 #include <QtWidgets/QComboBox>
 
 #include <client/client_settings.h>
@@ -256,7 +257,6 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
     qint64 timelapseFrameStepMs
 )
 {
-
     qint64 durationMs = period.durationMs;
     auto loader = context()->instance<QnCameraDataManager>()->loader(mediaResource);
     if (loader)
@@ -312,15 +312,16 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
     QRectF zoomRect = itemData.zoomRect;
     qreal customAr = mediaResource->customAspectRatio();
 
-    int timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(mediaResource);
+    QnTimeStampParams timestampParams;
+    timestampParams.displayOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(mediaResource);
 
     QString namePart = nx::utils::replaceNonFileNameCharacters(mediaResource->toResourcePtr()->getName(), L'_');
     QString timePart = (mediaResource->toResource()->flags() & Qn::utc)
-        ? QDateTime::fromMSecsSinceEpoch(period.startTimeMs + timeOffset).toString(lit("yyyy_MMM_dd_hh_mm_ss"))
+        ? QDateTime::fromMSecsSinceEpoch(period.startTimeMs + timestampParams.displayOffset).toString(lit("yyyy_MMM_dd_hh_mm_ss"))
         : QTime(0, 0, 0, 0).addMSecs(period.startTimeMs).toString(lit("hh_mm_ss"));
     QString suggestion = QnEnvironment::getUniqueFileName(previousDir, namePart + lit("_") + timePart);
 
-    Qn::Corner timestampPos = Qn::NoCorner;
+
 
     bool transcodeWarnShown = false;
     QnImageFilterHelper imageParameters;
@@ -352,11 +353,11 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
         if (mediaResource->hasVideo(dataProvider))
         {
             comboBox = new QComboBox(dialog.data());
-            comboBox->addItem(tr("No Timestamp"), Qn::NoCorner);
-            comboBox->addItem(tr("Top Left Corner (requires transcoding)"), Qn::TopLeftCorner);
-            comboBox->addItem(tr("Top Right Corner (requires transcoding)"), Qn::TopRightCorner);
-            comboBox->addItem(tr("Bottom Left Corner (requires transcoding)"), Qn::BottomLeftCorner);
-            comboBox->addItem(tr("Bottom Right Corner (requires transcoding)"), Qn::BottomRightCorner);
+            comboBox->addItem(tr("No Timestamp"), -1);
+            comboBox->addItem(tr("Top Left Corner (requires transcoding)"), Qt::TopLeftCorner);
+            comboBox->addItem(tr("Top Right Corner (requires transcoding)"), Qt::TopRightCorner);
+            comboBox->addItem(tr("Bottom Left Corner (requires transcoding)"), Qt::BottomLeftCorner);
+            comboBox->addItem(tr("Bottom Right Corner (requires transcoding)"), Qt::BottomRightCorner);
 
             bool isPanoramic = mediaResource->getVideoLayout(0)->channelCount() > 1;
             if (isPanoramic)
@@ -389,7 +390,12 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
             : false;
 
         if (comboBox)
-            timestampPos = (Qn::Corner) comboBox->itemData(comboBox->currentIndex()).toInt();
+        {
+            int corner = comboBox->itemData(comboBox->currentIndex()).toInt();
+            timestampParams.enabled = (corner >= 0);
+            if (timestampParams.enabled)
+                timestampParams.corner = static_cast<Qt::Corner>(corner);
+        }
 
         if (binaryExport)
         {
@@ -398,7 +404,7 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
                     continue;
 
             transcodeCheckbox = false;
-            timestampPos = Qn::NoCorner;
+            timestampParams.enabled = false;
         }
 
         if (!transcodeCheckbox)
@@ -436,12 +442,12 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
         imageParameters.setDewarpingParams(mediaResource->getDewarpingParams(), dewarpingParams);
         imageParameters.setRotation(rotation);
         imageParameters.setCustomAR(customAr);
-        imageParameters.setTimeCorner(timestampPos, timeOffset, 0);
+        imageParameters.setTimeStampParams(timestampParams);
         imageParameters.setVideoLayout(mediaResource->getVideoLayout());
 
         auto videoLayout = mediaResource->getVideoLayout();
         bool doTranscode = transcodeCheckbox ||
-            timestampPos != Qn::NoCorner ||
+            timestampParams.enabled ||
             (!binaryExport && videoLayout && videoLayout->channelCount() > 1);
 
         if (doTranscode)
@@ -677,7 +683,7 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
 
     for (const QnLayoutItemData &item : layout->getItems())
     {
-        QnResourcePtr resource = qnResPool->getResourceByDescriptor(item.resource);
+        QnResourcePtr resource = resourcePool()->getResourceByDescriptor(item.resource);
         if (!resource)
             continue;
         if (resource->getParentResource() == layout)
@@ -933,7 +939,7 @@ void QnWorkbenchExportHandler::at_camera_exportFinished(bool success, const QStr
     {
         QnAviResourcePtr file(new QnAviResource(fileName));
         file->setStatus(Qn::Online);
-        qnResPool->addResource(file);
+        resourcePool()->addResource(file);
         showExportCompleteMessage();
     }
     else if (tool->status() != StreamRecorderError::noError)

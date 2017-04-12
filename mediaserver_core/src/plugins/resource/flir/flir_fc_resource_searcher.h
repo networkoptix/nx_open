@@ -25,7 +25,7 @@ class FcResourceSearcher: public QnAbstractNetworkResourceSearcher
     };
 
 public:
-    FcResourceSearcher();
+    FcResourceSearcher(QnCommonModule* commonModule);
     virtual ~FcResourceSearcher();
 
     virtual QList<QnResourcePtr> checkHostAddr(

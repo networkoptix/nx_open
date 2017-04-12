@@ -1,12 +1,11 @@
-#ifndef QN_GL_NATIVE_PAINTING_H
-#define QN_GL_NATIVE_PAINTING_H
+#pragma once
 
 class QPainter;
+class QGLContext;
 
-class QnGlNativePainting {
+class QnGlNativePainting
+{
 public:
-    static void begin(const QGLContext* context,QPainter *painter);
-    static void end(QPainter *painter);
+    static void begin(const QGLContext* context, QPainter* painter);
+    static void end(QPainter* painter);
 };
-
-#endif // QN_GL_NATIVE_PAINTING_H

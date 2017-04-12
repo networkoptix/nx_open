@@ -22,7 +22,7 @@ QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnVirtualCameraResourcePt
     m_status(Qn::ThumbnailStatus::Invalid)
 {
     NX_ASSERT(camera, Q_FUNC_INFO, "Camera must exist here");
-    NX_ASSERT(qnCommon->currentServer(), Q_FUNC_INFO, "We must be connected here");
+    NX_ASSERT(commonModule()->currentServer(), Q_FUNC_INFO, "We must be connected here");
 
     m_request.camera = camera;
     m_request.msecSinceEpoch = msecSinceEpoch;
@@ -92,7 +92,7 @@ void QnSingleThumbnailLoader::doLoadAsync()
 
     setStatus(Qn::ThumbnailStatus::Loading);
 
-    if (!qnCommon->currentServer())
+    if (!commonModule()->currentServer())
     {
         setStatus(Qn::ThumbnailStatus::NoData);
         emit imageLoaded(QByteArray());
@@ -100,7 +100,7 @@ void QnSingleThumbnailLoader::doLoadAsync()
     }
 
     QPointer<QnSingleThumbnailLoader> guard(this);
-    auto handle = qnCommon->currentServer()->restConnection()->cameraThumbnailAsync(m_request,
+    auto handle = commonModule()->currentServer()->restConnection()->cameraThumbnailAsync(m_request,
         [this, guard] (bool success, rest::Handle id, const QByteArray &imageData)
         {
             if (!guard)

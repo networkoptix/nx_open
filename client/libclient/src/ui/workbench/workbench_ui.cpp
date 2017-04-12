@@ -65,6 +65,7 @@
 #include <ui/workbench/panels/title_workbench_panel.h>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/client/ui/workbench/panels/special_layout_panel.h>
 
 #include <utils/common/event_processors.h>
 
@@ -144,19 +145,13 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     QnPaneSettingsMap settings = qnSettings->paneSettings();
 
-    /* Tree panel. */
     if (qnRuntime->isDesktopMode())
-        createTreeWidget(settings[Qn::WorkbenchPane::Tree]);
-
-    /* Title bar. */
-    if (qnRuntime->isDesktopMode())
-        createTitleWidget(settings[Qn::WorkbenchPane::Title]);
-
-    /* Notifications. */
-    if (qnRuntime->isDesktopMode()
-        && !qnSettings->lightMode().testFlag(Qn::LightModeNoNotifications))
     {
-        createNotificationsWidget(settings[Qn::WorkbenchPane::Notifications]);
+        createTreeWidget(settings[Qn::WorkbenchPane::Tree]); //< Tree panel.
+        createTitleWidget(settings[Qn::WorkbenchPane::Title]); //< Title bar.
+        createLayoutPanelWidget(settings[Qn::WorkbenchPane::SpecialLayout]); //< Special layout
+        if (!qnSettings->lightMode().testFlag(Qn::LightModeNoNotifications))
+            createNotificationsWidget(settings[Qn::WorkbenchPane::Notifications]); //< Notifications
     }
 
     /* Calendar. */
@@ -224,6 +219,32 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
             if (!m_inFreespace)
                 storeSettings();
         });
+
+    // TODO: #ynikitenkov before final commit: add currentLayoutFlags to the workbench()?
+    // Possibly it should be usedd in several places
+    connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged, this,
+        [this]()
+        {
+            const auto layout = workbench()->currentLayout();
+            if (!layout)
+                return;
+
+            disconnect(layout, &QnWorkbenchLayout::flagsChanged,
+                this, &QnWorkbenchUi::updateControlsVisibilityAnimated);
+        });
+
+    connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
+        [this]()
+        {
+            const auto layout = workbench()->currentLayout();
+            if (!layout)
+                return;
+
+            connect(layout, &QnWorkbenchLayout::flagsChanged,
+                this, &QnWorkbenchUi::updateControlsVisibilityAnimated);
+            updateControlsVisibilityAnimated();
+            updateLayoutPanelGeometry();
+        });
 }
 
 QnWorkbenchUi::~QnWorkbenchUi()
@@ -240,6 +261,7 @@ QnWorkbenchUi::~QnWorkbenchUi()
     delete m_calendar;
     delete m_notifications;
     delete m_title;
+    delete m_layoutPanel;
     delete m_tree;
 
     delete m_controlsWidget;
@@ -286,9 +308,6 @@ void QnWorkbenchUi::updateCursor()
 
 bool QnWorkbenchUi::calculateTimelineVisible(QnResourceWidget* widget) const
 {
-    if (action(QnActions::ToggleTourModeAction)->isChecked())
-        return false;
-
     if (!widget)
         return false;
 
@@ -356,7 +375,21 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate)
 {    // TODO
     ensureAnimationAllowed(animate);
 
-    bool timelineVisible = calculateTimelineVisible(navigator()->currentWidget());
+    const auto layout = workbench()->currentLayout();
+    const bool allowedByLayout = (layout
+        ? !layout->flags().testFlag(QnLayoutFlag::NoTimeline)
+        : true);
+    const bool timelineVisible =
+        (allowedByLayout && calculateTimelineVisible(navigator()->currentWidget()));
+
+    if (action(QnActions::ToggleLayoutTourModeAction)->isChecked())
+    {
+        setTimelineVisible(false, animate);
+        setTreeVisible(false, animate);
+        setTitleVisible(false, animate);
+        setNotificationsVisible(false, animate);
+        return;
+    }
 
     if (qnRuntime->isVideoWallMode())
     {
@@ -400,13 +433,18 @@ QMargins QnWorkbenchUi::calculateViewportMargins(
     const QRectF& treeGeometry,
     const QRectF& titleGeometry,
     const QRectF& timelineGeometry,
-    const QRectF& notificationsGeometry)
+    const QRectF& notificationsGeometry,
+    const QRectF& layoutPanelGeometry)
 {
     using namespace std;
     QMargins result;
     if (treeGeometry.isValid())
         result.setLeft(max(0.0, floor(treeGeometry.left() + treeGeometry.width())));
-    result.setTop(max(0.0, floor(titleGeometry.bottom())));
+
+    const auto bottom = floor(layoutPanelGeometry.isValid()
+        ? layoutPanelGeometry.bottom()
+        : titleGeometry.bottom());
+    result.setTop(max(0.0, bottom));
 
     if (notificationsGeometry.isValid())
         result.setRight(max(0.0, floor(m_controlsWidgetRect.right() - notificationsGeometry.left())));
@@ -469,7 +507,8 @@ void QnWorkbenchUi::updateViewportMargins(bool animate)
             panelEffectiveGeometry(m_tree),
             panelEffectiveGeometry(m_title),
             timelineEffectiveGeometry,
-            panelEffectiveGeometry(m_notifications)
+            panelEffectiveGeometry(m_notifications),
+            panelEffectiveGeometry(m_layoutPanel)
         );
     }
 
@@ -503,10 +542,11 @@ bool QnWorkbenchUi::isHovered() const
 QnWorkbenchUi::Panels QnWorkbenchUi::openedPanels() const
 {
     return
-        (isTreeOpened() ? TreePanel : NoPanel) |
-        (isTitleOpened() ? TitlePanel : NoPanel) |
-        (isTimelineOpened() ? TimelinePanel : NoPanel) |
-        (isNotificationsOpened() ? NotificationsPanel : NoPanel);
+        (isTreeOpened() ? TreePanel : NoPanel)
+        | (isTitleOpened() ? TitlePanel : NoPanel)
+        | (isTimelineOpened() ? TimelinePanel : NoPanel)
+        | (isNotificationsOpened() ? NotificationsPanel : NoPanel)
+        | (isLayoutPanelOpened() ? LayoutPanel : NoPanel);
 }
 
 void QnWorkbenchUi::setOpenedPanels(Panels panels, bool animate)
@@ -748,6 +788,7 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged()
 
     updateTreeGeometry();
     updateNotificationsGeometry();
+    updateLayoutPanelGeometry();
     updateFpsGeometry();
     updateViewportMargins(false);
 }
@@ -880,7 +921,8 @@ void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
 
     connect(m_tree, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
         &QnWorkbenchUi::updateViewportMarginsAnimated);
-
+    connect(m_tree, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
+        &QnWorkbenchUi::updateLayoutPanelGeometry);
 }
 
 #pragma endregion Tree widget methods
@@ -915,6 +957,11 @@ bool QnWorkbenchUi::isTitleOpened() const
     return m_title && m_title->isOpened();
 }
 
+bool QnWorkbenchUi::isLayoutPanelOpened() const
+{
+    return m_layoutPanel && m_layoutPanel->isOpened();
+}
+
 void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
 {
     m_title = new NxUi::TitleWorkbenchPanel(settings, m_controlsWidget, this);
@@ -935,6 +982,7 @@ void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
         {
             updateTreeGeometry();
             updateNotificationsGeometry();
+            updateLayoutPanelGeometry();
             updateFpsGeometry();
             updateViewportMargins(animated);
         });
@@ -944,9 +992,19 @@ void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
         {
             updateTreeGeometry();
             updateNotificationsGeometry();
+            updateLayoutPanelGeometry();
             updateFpsGeometry();
             updateViewportMargins();
         });
+}
+
+void QnWorkbenchUi::createLayoutPanelWidget(const QnPaneSettings& settings)
+{
+    m_layoutPanel = new nx::client::desktop::ui::workbench::SpecialLayoutPanel(
+        settings, m_controlsWidget, this);
+
+    connect(m_layoutPanel, &NxUi::AbstractWorkbenchPanel::geometryChanged,
+        this, &QnWorkbenchUi::updateViewportMarginsAnimated);
 }
 
 #pragma endregion Title methods
@@ -994,6 +1052,28 @@ QRectF QnWorkbenchUi::updatedNotificationsGeometry(const QRectF &notificationsGe
 
     QSizeF size(notificationsGeometry.width(), maxHeight);
     return QRectF(pos, size);
+}
+
+void QnWorkbenchUi::updateLayoutPanelGeometry()
+{
+    if (!m_layoutPanel || !m_layoutPanel->widget())
+        return;
+
+    const auto titleGeometry = m_title && m_title->isVisible()
+        ? m_title->item->geometry()
+        : QRectF();
+
+    const auto notificationsLeft = m_notifications && m_notifications->isVisible()
+        ? m_notifications->item->geometry().left()
+        : m_controlsWidgetRect.left();
+
+    const auto treeRight = m_tree && m_tree->isVisible()
+        ? m_tree->item->geometry().right()
+        : 0;
+
+    const auto topLeft = QPointF(treeRight, titleGeometry.bottom());
+    const auto size = QSizeF(notificationsLeft - treeRight, 0); // TODO #ynikitenkov: add height handling
+    m_layoutPanel->widget()->setGeometry(QRectF(topLeft, size));
 }
 
 void QnWorkbenchUi::updateNotificationsGeometry()
@@ -1079,6 +1159,8 @@ void QnWorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
         &QnWorkbenchUi::updateViewportMarginsAnimated);
     connect(m_notifications, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
         &QnWorkbenchUi::updateFpsGeometry);
+    connect(m_notifications, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
+        &QnWorkbenchUi::updateLayoutPanelGeometry);
 }
 
 #pragma endregion Notifications widget methods
@@ -1230,7 +1312,7 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
-    connect(action(QnActions::ToggleTourModeAction), &QAction::toggled, this,
+    connect(action(QnActions::ToggleLayoutTourModeAction), &QAction::toggled, this,
         [this](bool toggled)
         {
             /// If tour mode is going to be turned on, focus should be forced to main window
@@ -1239,10 +1321,8 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
                 mainWindow()->setFocus();
         });
 
-    connect(action(QnActions::ToggleTourModeAction), &QAction::toggled, this,
+    connect(action(QnActions::ToggleLayoutTourModeAction), &QAction::toggled, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
-
-
 }
 
 #pragma endregion Timeline methods

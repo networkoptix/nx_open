@@ -2,9 +2,12 @@
 
 #include <limits>
 
+#include <QtCore/QMimeData>
+#include <QtCore/QFile>
+
+#include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsSceneDragDropEvent>
 #include <QtWidgets/QGraphicsItem>
-#include <QtCore/QMimeData>
 
 #include <common/common_globals.h>
 
@@ -162,7 +165,7 @@ bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent
     m_resources << videowalls;
     m_resources << webPages;
 
-    m_videoWallItems = qnResPool->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData));
+    m_videoWallItems = resourcePool()->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData));
 
     if (m_resources.empty() && m_videoWallItems.empty()) {
         event->ignore();

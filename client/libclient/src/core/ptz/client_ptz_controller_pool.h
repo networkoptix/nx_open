@@ -1,9 +1,9 @@
-#ifndef QN_CLIENT_PTZ_CONTROLLER_POOL_H
-#define QN_CLIENT_PTZ_CONTROLLER_POOL_H
+#pragma once
 
 #include <core/ptz/ptz_controller_pool.h>
 
-class QnClientPtzControllerPool: public QnPtzControllerPool {
+class QnClientPtzControllerPool: public QnPtzControllerPool
+{
     Q_OBJECT
     typedef QnPtzControllerPool base_type;
 
@@ -18,5 +18,3 @@ protected:
 private:
     void cacheCameraPresets(const QnResourcePtr &resource);
 };
-
-#endif // QN_CLIENT_PTZ_CONTROLLER_POOL_H

@@ -4,11 +4,13 @@
 
 #include <business/business_fwd.h>
 
+#include <client_core/connection_context_aware.h>
+
 #include <ui/models/business_rules_view_model.h>
 
 #include <utils/common/connective.h>
 
-class QnAbstractBusinessParamsWidget : public Connective<QWidget>
+class QnAbstractBusinessParamsWidget : public Connective<QWidget>, public QnConnectionContextAware
 {
     Q_OBJECT
 

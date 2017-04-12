@@ -1,7 +1,8 @@
-#ifndef QN_LICENSES_USAGE_WIDGET_H
-#define QN_LICENSES_USAGE_WIDGET_H
+#pragma once
 
 #include <QtWidgets/QWidget>
+
+#include <common/common_globals.h>
 
 class QnLicenseUsageWidgetRow;
 class QnLicenseUsageHelper;
@@ -19,6 +20,3 @@ private:
     QHash<Qn::LicenseType, QnLicenseUsageWidgetRow*> m_rows;
 
 };
-
-
-#endif //QN_LICENSES_USAGE_WIDGET_H

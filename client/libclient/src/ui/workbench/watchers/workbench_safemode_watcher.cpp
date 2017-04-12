@@ -1,20 +1,24 @@
 #include "workbench_safemode_watcher.h"
 
+#include <QtWidgets/QBoxLayout>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QPushButton>
+
 #include <common/common_module.h>
 
 #include <ui/common/palette.h>
 #include <ui/common/read_only.h>
 #include <ui/style/custom_style.h>
 
-QnWorkbenchSafeModeWatcher::QnWorkbenchSafeModeWatcher(QWidget *parentWidget /*= nullptr*/) : QObject(parentWidget) 
+QnWorkbenchSafeModeWatcher::QnWorkbenchSafeModeWatcher(QWidget *parentWidget /*= nullptr*/) : QObject(parentWidget)
     , m_parentWidget(parentWidget)
     , m_warnLabel(nullptr)
 {
-    connect(qnCommon, &QnCommonModule::readOnlyChanged, this, &QnWorkbenchSafeModeWatcher::updateReadOnlyMode);
+    connect(commonModule(), &QnCommonModule::readOnlyChanged, this, &QnWorkbenchSafeModeWatcher::updateReadOnlyMode);
 }
 
 void QnWorkbenchSafeModeWatcher::updateReadOnlyMode() {
-    bool readOnly = qnCommon->isReadOnly();
+    bool readOnly = commonModule()->isReadOnly();
 
     if (m_warnLabel)
         m_warnLabel->setVisible(readOnly);
@@ -33,7 +37,7 @@ void QnWorkbenchSafeModeWatcher::updateReadOnlyMode() {
         }
     }
 }
-        
+
 
 void QnWorkbenchSafeModeWatcher::addWarningLabel(QDialogButtonBox *buttonBox, QWidget *beforeWidget) {
     QHBoxLayout* layout = qobject_cast<QHBoxLayout*>(buttonBox->layout());

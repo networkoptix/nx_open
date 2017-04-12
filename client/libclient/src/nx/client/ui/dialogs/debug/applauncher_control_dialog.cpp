@@ -1,11 +1,17 @@
 #include "applauncher_control_dialog.h"
 #include "ui_applauncher_control_dialog.h"
 
-#include <common/common_module.h>
+#include <common/static_common_module.h>
 
 #include <utils/applauncher_utils.h>
 
-nx::client::ui::dialogs::QnApplauncherControlDialog::QnApplauncherControlDialog(QWidget* parent):
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+namespace dialogs {
+
+QnApplauncherControlDialog::QnApplauncherControlDialog(QWidget* parent):
     base_type(parent, Qt::Window),
     ui(new Ui::ApplauncherControlDialog)
 {
@@ -18,7 +24,7 @@ nx::client::ui::dialogs::QnApplauncherControlDialog::QnApplauncherControlDialog(
         {
             QnSoftwareVersion v(ui->checkVersionlineEdit->text());
             if (v.isNull())
-                v = qnCommon->engineVersion();
+                v = qnStaticCommon->engineVersion();
 
             bool isInstalled = false;
             auto errCode = isVersionInstalled(v, &isInstalled);
@@ -49,3 +55,9 @@ nx::client::ui::dialogs::QnApplauncherControlDialog::QnApplauncherControlDialog(
         });
 
 }
+
+} // namespace dialogs
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx

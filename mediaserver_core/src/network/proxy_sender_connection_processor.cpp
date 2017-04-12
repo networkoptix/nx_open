@@ -35,12 +35,12 @@ public:
 
 QnProxySenderConnection::QnProxySenderConnection(
         const SocketAddress& proxyServerUrl, const QnUuid& guid,
-        QnUniversalTcpListener* owner, bool needAuth)
+        QnUniversalTcpListener* owner)
     : QnUniversalRequestProcessor(
           new QnProxySenderConnectionPrivate,
           QSharedPointer<AbstractStreamSocket>(
                 SocketFactory::createStreamSocket().release()),
-          owner, needAuth)
+          owner, false)
 {
     Q_D(QnProxySenderConnection);
     d->proxyServerUrl = proxyServerUrl;
@@ -97,14 +97,14 @@ int QnProxySenderConnection::sendRequest(const QByteArray& data)
     return totalSend;
 }
 
-static QByteArray makeProxyRequest(const QnUuid& serverUuid, const SocketAddress& address)
+QByteArray QnProxySenderConnection::makeProxyRequest(const QnUuid& serverUuid, const QUrl& url) const
 {
     const QByteArray H_REALM("NX");
     const QByteArray H_METHOD("CONNECT");
     const QByteArray H_PATH("/proxy-reverse");
     const QByteArray H_AUTH("auth-int");
 
-    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(serverUuid);
+    QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(serverUuid);
     if (!server)
         return QByteArray();
 
@@ -121,7 +121,7 @@ static QByteArray makeProxyRequest(const QnUuid& serverUuid, const SocketAddress
         server->getId().toByteArray(),
         server->getAuthKey().toUtf8(),
         boost::none,
-        H_PATH,
+        url.path().toUtf8(),
         authHeader,
         &digestHeader))
     {
@@ -130,14 +130,14 @@ static QByteArray makeProxyRequest(const QnUuid& serverUuid, const SocketAddress
 
     return QString(QLatin1String(
        "%1 %2 HTTP/1.1\r\n" \
-       "Host: %3\r\n" \
-       "Authorization: %4\r\n"\
-       "%5: %6\r\n" \
+       "Host: %3:%4\r\n" \
+       "Authorization: %5\r\n"\
+       "%6: %7\r\n" \
        "\r\n"))
             .arg(QString::fromUtf8(H_METHOD)).arg(QString::fromUtf8(H_PATH))
-            .arg(address.toString())
+            .arg(url.host()).arg(url.port(nx_http::DEFAULT_HTTP_PORT))
             .arg(QString::fromUtf8(digestHeader.serialized()))
-            .arg(QLatin1String(Qn::PROXY_SENDER_HEADER_NAME)).arg(serverUuid.toString())
+            .arg(QLatin1String(Qn::SERVER_GUID_HEADER_NAME)).arg(serverUuid.toString())
             .toUtf8();
 }
 
@@ -147,7 +147,7 @@ void QnProxySenderConnection::run()
 
     initSystemThreadId();
 
-    auto proxyRequest = makeProxyRequest(d->guid, d->proxyServerUrl.address);
+    auto proxyRequest = makeProxyRequest(d->guid, QUrl(d->proxyServerUrl.address.toString()));
     if (proxyRequest.isEmpty())
     {
         NX_LOG(lit("QnProxySenderConnection: can not generate request")
@@ -206,11 +206,8 @@ void QnProxySenderConnection::run()
     if (!m_needStop && gotRequest)
     {
         parseRequest();
-        NX_LOG(lm("QnProxySenderConnection: process request %1")
-               .str(d->request.requestLine), cl_logDEBUG2);
-
         auto handler = d->owner->findHandler(d->protocol, d->request);
-        bool noAuth = false;
+        bool noAuth;
         if (handler && authenticate(&d->accessRights, &noAuth))
             processRequest(noAuth);
     }

@@ -1,5 +1,7 @@
 #include "multi_image_provider.h"
 
+#include <QtGui/QPainter>
+
 #include <client/client_globals.h>
 
 #include <ui/common/geometry.h>

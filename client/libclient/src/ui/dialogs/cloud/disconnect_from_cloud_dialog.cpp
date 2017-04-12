@@ -205,10 +205,10 @@ void QnDisconnectFromCloudDialogPrivate::unbindSystem()
             }
         };
 
-    if (!qnCommon->currentServer())
+    if (!commonModule()->currentServer())
         return;
 
-    auto serverConnection = qnCommon->currentServer()->restConnection();
+    auto serverConnection = commonModule()->currentServer()->restConnection();
     if (!serverConnection)
         return;
 
@@ -236,9 +236,9 @@ void QnDisconnectFromCloudDialogPrivate::showFailure(const QString &message)
 void QnDisconnectFromCloudDialogPrivate::setVisibleButton(VisibleButton button)
 {
     const bool okButtonVisible = (button == VisibleButton::Ok);
-    const auto style = static_cast<QnButtonAccent>(okButtonVisible
+    const auto style = okButtonVisible
         ? QnButtonAccent::Warning
-        : QnButtonAccent::Standard);
+        : QnButtonAccent::Standard;
     const auto defaultButton = (okButtonVisible ? okButton : nextButton);
 
     okButton->setVisible(okButtonVisible);
@@ -506,7 +506,7 @@ void QnDisconnectFromCloudDialogPrivate::createResetPasswordWidget()
     layout->setSpacing(style::Metrics::kDefaultLayoutSpacing.height());
     layout->setContentsMargins(style::Metrics::kDefaultTopLevelMargins);
 
-    auto owner = qnResPool->getAdministrator();
+    auto owner = resourcePool()->getAdministrator();
     NX_ASSERT(owner);
 
     auto loginField = new QnInputField(resetPasswordWidget);
@@ -561,7 +561,7 @@ QnDisconnectFromCloudDialogPrivate::Scenario QnDisconnectFromCloudDialogPrivate:
     if (user->isLocal())
         return Scenario::LocalOwner;
 
-    auto localOwners = qnResPool->getResources().filtered<QnUserResource>(
+    auto localOwners = resourcePool()->getResources().filtered<QnUserResource>(
         [](const QnUserResourcePtr& user)
         {
             return !user->isCloud()

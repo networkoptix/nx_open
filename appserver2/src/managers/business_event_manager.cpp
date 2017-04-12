@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 
 #include "ec2_thread_pool.h"
 #include "fixed_url_client_query_processor.h"
@@ -12,15 +12,18 @@
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
 
-
 namespace ec2
 {
 
 template<class QueryProcessorType>
-QnBusinessEventManager<QueryProcessorType>::QnBusinessEventManager(QueryProcessorType* const queryProcessor , const Qn::UserAccessData &userAccessData)
+QnBusinessEventManager<QueryProcessorType>::QnBusinessEventManager(
+    QnTransactionMessageBus* messageBus,
+    QueryProcessorType* const queryProcessor,
+    const Qn::UserAccessData &userAccessData)
 :
-  m_queryProcessor( queryProcessor ),
-  m_userAccessData(userAccessData)
+    m_messageBus(messageBus),
+    m_queryProcessor( queryProcessor ),
+    m_userAccessData(userAccessData)
 {
 }
 
@@ -78,8 +81,8 @@ int QnBusinessEventManager<T>::broadcastBusinessAction( const QnAbstractBusiness
 {
     const int reqID = generateRequestID();
     auto tran = prepareTransaction( ApiCommand::broadcastAction, businessAction );
-    QnTransactionMessageBus::instance()->sendTransaction(tran);
-    QnConcurrent::run(
+    m_messageBus->sendTransaction(tran);
+    nx::utils::concurrent::run(
         Ec2ThreadPool::instance(),
         std::bind( &impl::SimpleHandler::done, handler, reqID, ErrorCode::ok ) );
     return reqID;
@@ -90,8 +93,8 @@ int QnBusinessEventManager<T>::sendBusinessAction( const QnAbstractBusinessActio
 {
     const int reqID = generateRequestID();
     auto tran = prepareTransaction( ApiCommand::execAction, businessAction );
-    QnTransactionMessageBus::instance()->sendTransaction(tran, dstPeer);
-    QnConcurrent::run(
+    m_messageBus->sendTransaction(tran, dstPeer);
+    nx::utils::concurrent::run(
         Ec2ThreadPool::instance(),
         std::bind( &impl::SimpleHandler::done, handler, reqID, ErrorCode::ok ) );
     return reqID;
@@ -115,7 +118,7 @@ int QnBusinessEventManager<T>::resetBusinessRules( impl::SimpleHandlerPtr handle
 template<class T>
 QnTransaction<ApiBusinessActionData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnAbstractBusinessActionPtr& resource )
 {
-    QnTransaction<ApiBusinessActionData> tran(command);
+    QnTransaction<ApiBusinessActionData> tran(command, m_messageBus->commonModule()->moduleGUID());
     fromResourceToApi(resource, tran.params);
     return tran;
 }

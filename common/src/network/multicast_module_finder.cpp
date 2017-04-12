@@ -6,8 +6,10 @@
 #include <QtCore/QDateTime>
 #include <QtNetwork/QNetworkInterface>
 
+#include <common/static_common_module.h>
+
 #include <nx/utils/log/log.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 #include <nx/utils/std/cpp14.h>
 
 #include <nx/network/socket.h>
@@ -48,12 +50,15 @@ const quint16 defaultModuleRevealMulticastGroupPort = 5007;
 using namespace nx::network;
 
 QnMulticastModuleFinder::QnMulticastModuleFinder(
+    QObject* parent,
     bool clientOnly,
     const QHostAddress &multicastGroupAddress,
     const quint16 multicastGroupPort,
     const unsigned int pingTimeoutMillis,
     const unsigned int keepAliveMultiply)
     :
+    QnLongRunnable(parent),
+    QnCommonModuleAware(parent),
     m_clientMode(clientOnly),
     m_serverSocket(nullptr),
     m_pingTimeoutMillis(pingTimeoutMillis == 0 ? defaultPingTimeoutMs : pingTimeoutMillis),
@@ -65,7 +70,7 @@ QnMulticastModuleFinder::QnMulticastModuleFinder(
     m_multicastGroupPort(multicastGroupPort == 0 ? defaultModuleRevealMulticastGroupPort : multicastGroupPort),
     m_cachedResponse(MAX_CACHE_SIZE_BYTES)
 {
-    connect(qnCommon, &QnCommonModule::moduleInformationChanged, this, &QnMulticastModuleFinder::at_moduleInformationChanged, Qt::DirectConnection);
+    connect(commonModule(), &QnCommonModule::moduleInformationChanged, this, &QnMulticastModuleFinder::at_moduleInformationChanged, Qt::DirectConnection);
 }
 
 QnMulticastModuleFinder::~QnMulticastModuleFinder()
@@ -212,7 +217,7 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket)
     {
         QnMutexLocker lock(&m_moduleInfoMutex);
         if (m_serializedModuleInfo.isEmpty())
-            m_serializedModuleInfo = RevealResponse(qnCommon->moduleInformation()).serialize();
+            m_serializedModuleInfo = RevealResponse(commonModule()->moduleInformation()).serialize();
     }
     if (!udpSocket->sendTo(m_serializedModuleInfo.data(), m_serializedModuleInfo.size(), remoteEndpoint))
     {
@@ -313,7 +318,9 @@ void QnMulticastModuleFinder::run()
     initSystemThreadId();
     NX_LOGX(lit("Has started"), cl_logDEBUG1);
 
-    QByteArray revealRequest = RevealRequest::serialize();
+    QByteArray revealRequest = RevealRequest(
+        commonModule()->moduleGUID(),
+        qnStaticCommon->localPeerType()).serialize();
 
     if (!m_clientMode)
     {
@@ -338,10 +345,11 @@ void QnMulticastModuleFinder::run()
         }
 
         currentClock = QDateTime::currentMSecsSinceEpoch();
+        const auto& settings = commonModule()->globalSettings();
 
         if (currentClock - m_prevPingClock >= m_pingTimeoutMillis)
         {
-            if (m_clientMode || qnGlobalSettings->isAutoDiscoveryEnabled())
+            if (m_clientMode || settings->isAutoDiscoveryEnabled())
             {
                 QnMutexLocker lk(&m_mutex);
                 for (UDPSocket *socket : m_clientSockets)

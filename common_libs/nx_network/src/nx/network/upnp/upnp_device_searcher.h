@@ -15,7 +15,7 @@
 
 #include <api/global_settings.h>
 #include <utils/common/long_runnable.h>
-#include <utils/common/stoppable.h>
+#include <nx/network/async_stoppable.h>
 
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/timer_manager.h>
@@ -104,7 +104,7 @@ public:
     void processDiscoveredDevices( SearchHandler* handlerToUse = NULL );
 
     static DeviceSearcher* instance();
-    static int cacheTimeout();
+    int cacheTimeout();
 
 private:
     class DiscoveredDeviceInfo

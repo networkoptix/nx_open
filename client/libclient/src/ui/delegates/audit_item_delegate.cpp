@@ -1,5 +1,10 @@
 #include "audit_item_delegate.h"
 
+#include <QtGui/QMouseEvent>
+
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QAbstractScrollArea>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
@@ -482,7 +487,7 @@ void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painte
     QString linkText;
     if (!cameras.empty())
     {
-        linkText = QnDeviceDependentStrings::getNumericName(cameras);
+        linkText = QnDeviceDependentStrings::getNumericName(resourcePool(), cameras);
         if (!mainText.isEmpty())
             mainText += lit(",  ");
     }

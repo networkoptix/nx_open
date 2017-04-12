@@ -8,7 +8,7 @@
 
 #include <QtCore/QUrlQuery>
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/fusion/fusion/fusion_fwd.h>
 
@@ -19,26 +19,26 @@ namespace data {
 
 class DataFilter
 :
-    public stree::AbstractIteratableContainer,
-    public stree::AbstractResourceReader,
-    public stree::AbstractResourceWriter
+    public nx::utils::stree::AbstractIteratableContainer,
+    public nx::utils::stree::AbstractResourceReader,
+    public nx::utils::stree::AbstractResourceWriter
 {
 public:
-    //!Implementation of \a stree::AbstractIteratableContainer::begin
-    virtual std::unique_ptr<stree::AbstractConstIterator> begin() const override;
-    //!Implementation of \a stree::AbstractResourceReader::getAsVariant
+    //!Implementation of \a nx::utils::stree::AbstractIteratableContainer::begin
+    virtual std::unique_ptr<nx::utils::stree::AbstractConstIterator> begin() const override;
+    //!Implementation of \a nx::utils::stree::AbstractResourceReader::getAsVariant
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
-    //!Implementation of \a stree::AbstractResourceWriter::put
+    //!Implementation of \a nx::utils::stree::AbstractResourceWriter::put
     virtual void put(int resID, const QVariant& value) override;
 
     //!Empty filter means data should not be filtered
     bool empty() const;
 
-    stree::ResourceContainer& resources();
-    const stree::ResourceContainer& resources() const;
+    nx::utils::stree::ResourceContainer& resources();
+    const nx::utils::stree::ResourceContainer& resources() const;
 
 private:
-    stree::ResourceContainer m_rc;
+    nx::utils::stree::ResourceContainer m_rc;
 };
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, DataFilter* const dataFilter);

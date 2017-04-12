@@ -11,7 +11,7 @@ class QnPlVmax480ResourceSearcher : public QnUpnpResourceSearcherAsync
 {
 public:
 
-    QnPlVmax480ResourceSearcher();
+    QnPlVmax480ResourceSearcher(QnCommonModule* commonModule);
     ~QnPlVmax480ResourceSearcher();
 
     virtual void processPacket(

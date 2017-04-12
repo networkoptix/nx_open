@@ -18,12 +18,12 @@
 
 #include <api/global_settings.h>
 #include <platform/process/current_process.h>
-#include <plugins/videodecoder/stree/stree_manager.h>
+#include <nx/utils/stree/stree_manager.h>
 #include <utils/common/app_info.h>
 #include <nx/utils/std/cpp14.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 #include <utils/common/public_ip_discovery.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 #include "access_control/authentication_manager.h"
 #include "http/connect_handler.h"
@@ -80,7 +80,7 @@ int VmsGatewayProcess::exec()
     using namespace std::placeholders;
 
     bool processStartResult = false;
-    auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
+    auto triggerOnStartedEventHandlerGuard = makeScopeGuard(
         [this, &processStartResult]
         {
             if (m_startedEventHandler)
@@ -143,7 +143,7 @@ int VmsGatewayProcess::exec()
         timerManager.start();
 
         CdbAttrNameSet attrNameSet;
-        stree::StreeManager streeManager(
+        nx::utils::stree::StreeManager streeManager(
             attrNameSet,
             settings.auth().rulesXmlPath);
 
@@ -161,7 +161,7 @@ int VmsGatewayProcess::exec()
 
         if (settings.http().sslSupport)
         {
-            network::SslEngine::useOrCreateCertificate(
+            network::ssl::Engine::useOrCreateCertificate(
                 settings.http().sslCertPath, QnAppInfo::productName().toUtf8(),
                 "US", QnAppInfo::organizationName().toUtf8());
         }

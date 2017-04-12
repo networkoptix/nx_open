@@ -5,12 +5,15 @@
 #endif
 
 #include <QtCore/QFile>
+
+#include <QtGui/QFileOpenEvent>
+
+#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QDesktopWidget>
-#include <QtGui/QFileOpenEvent>
-#include <QtNetwork/QNetworkReply>
+#include <QtWidgets/QStackedWidget>
 
 #include <utils/common/warnings.h>
 #include <utils/common/event_processors.h>
@@ -54,6 +57,7 @@
 #include <ui/workbench/handlers/workbench_cloud_handler.h>
 #include <ui/workbench/handlers/workbench_webpage_handler.h>
 #include <ui/workbench/handlers/workbench_screen_recording_handler.h>
+#include <ui/workbench/handlers/workbench_text_overlays_handler.h>
 
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
@@ -92,9 +96,17 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/screen_manager.h>
 
+#include <nx/client/ui/workbench/handlers/layout_tours_handler.h>
+#include <nx/utils/app_info.h>
+
 #include "resource_browser_widget.h"
 #include "layout_tab_bar.h"
 #include "dwm.h"
+
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
 
 namespace
 {
@@ -118,18 +130,18 @@ namespace
 #ifdef Q_OS_MACX
 extern "C" {
     void disable_animations(void *qnmainwindow) {
-        QnMainWindow* mainwindow = (QnMainWindow*)qnmainwindow;
+        MainWindow* mainwindow = (MainWindow*)qnmainwindow;
         mainwindow->setAnimationsEnabled(false);
     }
 
     void enable_animations(void *qnmainwindow) {
-        QnMainWindow* mainwindow = (QnMainWindow*)qnmainwindow;
+        MainWindow* mainwindow = (MainWindow*)qnmainwindow;
         mainwindow->setAnimationsEnabled(true);
     }
 }
 #endif
 
-QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags) :
+MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags) :
     base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint
 #ifdef Q_OS_MACX
         | Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::WindowMinMaxButtonsHint
@@ -154,18 +166,18 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     setAttribute(Qt::WA_AlwaysShowToolTips);
 
     /* And file open events on Mac. */
-    installEventHandler(qApp, QEvent::FileOpen, this, &QnMainWindow::at_fileOpenSignalizer_activated);
+    installEventHandler(qApp, QEvent::FileOpen, this, &MainWindow::at_fileOpenSignalizer_activated);
 
     /* Set up dwm. */
     m_dwm = new QnDwm(this);
 
-    connect(m_dwm, &QnDwm::compositionChanged, this, &QnMainWindow::updateDwmState);
+    connect(m_dwm, &QnDwm::compositionChanged, this, &MainWindow::updateDwmState);
 
     /* Set up properties. */
     setWindowTitle(QString());
 
     /* Initialize animations manager. */
-    context->instance<nx::client::ui::workbench::Animations>();
+    context->instance<workbench::Animations>();
 
     if (!qnRuntime->isVideoWallMode()) {
         bool smallWindow = qnSettings->lightMode() & Qn::LightModeSmallWindow;
@@ -185,11 +197,11 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     connect(workbench(), &QnWorkbench::currentLayoutChanged, this, [this]() {
         if (QnWorkbenchLayout *layout = workbench()->currentLayout()) {
             if (QnLayoutResourcePtr resource = layout->resource())
-                connect(resource.data(), &QnLayoutResource::backgroundImageChanged, this, &QnMainWindow::updateHelpTopic);
+                connect(resource.data(), &QnLayoutResource::backgroundImageChanged, this, &MainWindow::updateHelpTopic);
         }
         updateHelpTopic();
     });
-    connect(action(QnActions::ToggleTourModeAction), &QAction::toggled, this, &QnMainWindow::updateHelpTopic);
+    connect(action(QnActions::ToggleLayoutTourModeAction), &QAction::toggled, this, &MainWindow::updateHelpTopic);
     updateHelpTopic();
 
     m_view.reset(new QnGraphicsView(m_scene.data()));
@@ -218,12 +230,12 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchStateManager>();
 
     /* Set up handlers. */
-    context->instance<QnWorkbenchActionHandler>();
+    context->instance<workbench::ActionHandler>();
     context->instance<QnWorkbenchConnectHandler>();
     context->instance<QnWorkbenchNotificationsHandler>();
     context->instance<QnWorkbenchScreenshotHandler>();
     context->instance<QnWorkbenchExportHandler>();
-    context->instance<QnWorkbenchLayoutsHandler>();
+    context->instance<workbench::LayoutsHandler>();
     context->instance<QnWorkbenchPtzHandler>();
     context->instance<QnWorkbenchDebugHandler>();
     context->instance<QnWorkbenchVideoWallHandler>();
@@ -232,7 +244,9 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchResourcesSettingsHandler>();
     context->instance<QnWorkbenchBookmarksHandler>();
     context->instance<QnWorkbenchAlarmLayoutHandler>();
+    context->instance<QnWorkbenchTextOverlaysHandler>();
     context->instance<QnWorkbenchCloudHandler>();
+    context->instance<workbench::LayoutToursHandler>();
 
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();
@@ -291,7 +305,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(QnActions::TakeScreenshotAction));
     addAction(action(QnActions::AdjustVideoAction));
     addAction(action(QnActions::TogglePanicModeAction));
-    addAction(action(QnActions::ToggleTourModeAction));
+    addAction(action(QnActions::ToggleLayoutTourModeAction));
+    addAction(action(QnActions::OpenLayoutTourAction));
     addAction(action(QnActions::DebugIncrementCounterAction));
     addAction(action(QnActions::DebugDecrementCounterAction));
     addAction(action(QnActions::DebugControlPanelAction));
@@ -299,16 +314,20 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     if (auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction))
         addAction(screenRecordingAction);
 
-    connect(action(QnActions::MaximizeAction),     SIGNAL(toggled(bool)),                          this,                                   SLOT(setMaximized(bool)));
-    connect(action(QnActions::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
-    connect(action(QnActions::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));
-    connect(action(QnActions::FullscreenMaximizeHotkeyAction), SIGNAL(triggered()),                action(QnActions::EffectiveMaximizeAction),    SLOT(trigger()));
+    connect(action(QnActions::MaximizeAction), &QAction::toggled, this,
+        &MainWindow::setMaximized);
+    connect(action(QnActions::FullscreenAction), &QAction::toggled, this,
+        &MainWindow::setFullScreen);
+    connect(action(QnActions::MinimizeAction), &QAction::triggered, this,
+        &QWidget::showMinimized);
+    connect(action(QnActions::FullscreenMaximizeHotkeyAction), &QAction::triggered,
+        action(QnActions::EffectiveMaximizeAction), &QAction::trigger);
 
     menu()->setTargetProvider(m_ui.data());
 
     const auto welcomeScreen = context->instance<QnWorkbenchWelcomeScreen>();
     connect(welcomeScreen, &QnWorkbenchWelcomeScreen::visibleChanged,
-        this, &QnMainWindow::updateWidgetsVisibility);
+        this, &MainWindow::updateWidgetsVisibility);
 
     /* Layouts. */
 
@@ -330,18 +349,15 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_currentPageHolder->addWidget(m_view.data());
     m_currentPageHolder->addWidget(welcomeScreen->widget());
 
-/* Post-initialize. */
+    // Post-initialize.
+    if (nx::utils::AppInfo::isMacOsX())
+        setOptions(Options());
+    else
+        setOptions(TitleBarDraggable);
 
-#ifdef Q_OS_MACX
-    setOptions(Options());
-#else
-    setOptions(TitleBarDraggable);
-#endif
-
-#ifdef Q_OS_MACX
-    //initialize system-wide menu
-    menu()->newMenu(Qn::MainScope);
-#endif
+    // Initialize system-wide menu
+    if (nx::utils::AppInfo::isMacOsX())
+        menu()->newMenu(Qn::MainScope);
 
     /* VSync workaround must always be enabled to limit fps usage in following cases:
      * * VSync is not supported by drivers
@@ -354,26 +370,27 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     updateWidgetsVisibility();
 }
 
-QnMainWindow::~QnMainWindow() {
+MainWindow::~MainWindow()
+{
     m_dwm = NULL;
 }
 
-QWidget *QnMainWindow::viewport() const {
+QWidget *MainWindow::viewport() const {
     return m_view->viewport();
 }
 
-bool QnMainWindow::isTitleVisible() const
+bool MainWindow::isTitleVisible() const
 {
     return m_titleVisible || isWelcomeScreenVisible();
 }
 
-bool QnMainWindow::isWelcomeScreenVisible() const
+bool MainWindow::isWelcomeScreenVisible() const
 {
     const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
     return (welcomeScreen && welcomeScreen->isVisible());
 }
 
-void QnMainWindow::updateWidgetsVisibility()
+void MainWindow::updateWidgetsVisibility()
 {
     const auto updateWelcomeScreenVisibility =
         [this](bool welcomeScreenIsVisible)
@@ -425,7 +442,7 @@ void QnMainWindow::updateWidgetsVisibility()
     updateDwmState();
 }
 
-void QnMainWindow::setTitleVisible(bool visible)
+void MainWindow::setTitleVisible(bool visible)
 {
     if(m_titleVisible == visible)
         return;
@@ -435,7 +452,7 @@ void QnMainWindow::setTitleVisible(bool visible)
     updateWidgetsVisibility();
 }
 
-void QnMainWindow::setMaximized(bool maximized) {
+void MainWindow::setMaximized(bool maximized) {
     if(maximized == isMaximized())
         return;
 
@@ -446,7 +463,7 @@ void QnMainWindow::setMaximized(bool maximized) {
     }
 }
 
-void QnMainWindow::setFullScreen(bool fullScreen) {
+void MainWindow::setFullScreen(bool fullScreen) {
     if(fullScreen == isFullScreen())
         return;
 
@@ -473,12 +490,12 @@ void QnMainWindow::setFullScreen(bool fullScreen) {
     }
 }
 
-void QnMainWindow::setAnimationsEnabled(bool enabled) {
+void MainWindow::setAnimationsEnabled(bool enabled) {
     InstrumentManager *manager = InstrumentManager::instance(m_scene.data());
     manager->setAnimationsEnabled(enabled);
 }
 
-void QnMainWindow::showFullScreen() {
+void MainWindow::showFullScreen() {
 #if defined Q_OS_MACX
     mac_showFullScreen((void*)winId(), true);
     updateDecorationsState();
@@ -490,7 +507,7 @@ void QnMainWindow::showFullScreen() {
 #endif
 }
 
-void QnMainWindow::showNormal() {
+void MainWindow::showNormal() {
 #if defined Q_OS_MACX
     mac_showFullScreen((void*)winId(), false);
     updateDecorationsState();
@@ -501,47 +518,46 @@ void QnMainWindow::showNormal() {
 #endif
 }
 
-void QnMainWindow::updateScreenInfo() {
+void MainWindow::updateScreenInfo() {
     context()->instance<QnScreenManager>()->updateCurrentScreens(this);
 }
 
-void QnMainWindow::updateHelpTopic() {
-    if (action(QnActions::ToggleTourModeAction)->isChecked()) {
-        setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_TourInProgress_Help, true);
-        return;
-    }
+std::pair<int, bool> MainWindow::calculateHelpTopic() const
+{
+    if (action(QnActions::ToggleLayoutTourModeAction)->isChecked())
+        return {Qn::MainWindow_Scene_TourInProgress_Help, true};
 
-    if (QnWorkbenchLayout *layout = workbench()->currentLayout()) {
-        if (!layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull()) {
-            setHelpTopic(m_scene.data(), Qn::Videowall_Appearance_Help);
-            return;
-        }
-        if (layout->isSearchLayout()) {
-            setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_PreviewSearch_Help, true);
-            return;
-        }
+    if (auto layout = workbench()->currentLayout())
+    {
+        if (!layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
+            return {Qn::Videowall_Appearance_Help, false};
+
+        if (layout->isSearchLayout())
+            return {Qn::MainWindow_Scene_PreviewSearch_Help, true};
+
         if (QnLayoutResourcePtr resource = layout->resource())
         {
             if (resource->isFile())
-            {
-                setHelpTopic(m_scene.data(), Qn::MainWindow_Tree_MultiVideo_Help, true);
-                return;
-            }
+                return{Qn::MainWindow_Tree_MultiVideo_Help, true};
+
             if (!resource->backgroundImageFilename().isEmpty())
-            {
-                setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_EMapping_Help);
-                return;
-            }
+                return {Qn::MainWindow_Scene_EMapping_Help, false};
         }
     }
-    setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_Help);
+    return {Qn::MainWindow_Scene_Help, false};
 }
 
-void QnMainWindow::minimize() {
+void MainWindow::updateHelpTopic()
+{
+    auto topic = calculateHelpTopic();
+    setHelpTopic(m_scene.data(), topic.first, topic.second);
+}
+
+void MainWindow::minimize() {
     showMinimized();
 }
 
-bool QnMainWindow::handleMessage(const QString &message) {
+bool MainWindow::handleMessage(const QString &message) {
     const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
 
     QnResourceList resources = QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(files));
@@ -552,18 +568,18 @@ bool QnMainWindow::handleMessage(const QString &message) {
     return true;
 }
 
-QnMainWindow::Options QnMainWindow::options() const {
+MainWindow::Options MainWindow::options() const {
     return m_options;
 }
 
-void QnMainWindow::setOptions(Options options) {
+void MainWindow::setOptions(Options options) {
     if(m_options == options)
         return;
 
     m_options = options;
 }
 
-void QnMainWindow::updateDecorationsState() {
+void MainWindow::updateDecorationsState() {
 #ifdef Q_OS_MACX
     bool fullScreen = mac_isFullscreen((void*)winId());
 #else
@@ -589,7 +605,7 @@ void QnMainWindow::updateDecorationsState() {
     m_currentPageHolder->updateGeometry();
 }
 
-void QnMainWindow::updateDwmState() {
+void MainWindow::updateDwmState() {
     if (isFullScreen())
     {
         /* Full screen mode. */
@@ -683,7 +699,7 @@ void QnMainWindow::updateDwmState() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-bool QnMainWindow::event(QEvent *event) {
+bool MainWindow::event(QEvent *event) {
     bool result = base_type::event(event);
 
     if ((event->type() == QEvent::WindowActivate) && isWelcomeScreenVisible())
@@ -703,23 +719,25 @@ bool QnMainWindow::event(QEvent *event) {
     return result;
 }
 
-void QnMainWindow::closeEvent(QCloseEvent* event)
+void MainWindow::closeEvent(QCloseEvent* event)
 {
     event->ignore();
     menu()->trigger(QnActions::ExitAction);
 }
 
-void QnMainWindow::changeEvent(QEvent *event) {
+void MainWindow::changeEvent(QEvent *event) {
     if(event->type() == QEvent::WindowStateChange)
         updateDecorationsState();
 
     base_type::changeEvent(event);
 }
 
-void QnMainWindow::paintEvent(QPaintEvent *event) {
+void MainWindow::paintEvent(QPaintEvent* event)
+{
     base_type::paintEvent(event);
 
-    if(m_drawCustomFrame) {
+    if (m_drawCustomFrame)
+    {
         QPainter painter(this);
 
         painter.setPen(QPen(QColor(255, 255, 255, 64), 1));
@@ -727,28 +745,29 @@ void QnMainWindow::paintEvent(QPaintEvent *event) {
     }
 }
 
-void QnMainWindow::keyPressEvent(QKeyEvent *event) {
+void MainWindow::keyPressEvent(QKeyEvent* event)
+{
     base_type::keyPressEvent(event);
-
-    if (!action(QnActions::ToggleTourModeAction)->isChecked())
-        return;
 
     if (event->key() == Qt::Key_Alt || event->key() == Qt::Key_Control)
         return;
-    menu()->trigger(QnActions::ToggleTourModeAction);
+
+    // Stop layout tour if it is running.
+    if (action(QnActions::ToggleLayoutTourModeAction)->isChecked())
+        menu()->trigger(QnActions::ToggleLayoutTourModeAction);
 }
 
-void QnMainWindow::resizeEvent(QResizeEvent *event) {
+void MainWindow::resizeEvent(QResizeEvent *event) {
     base_type::resizeEvent(event);
     updateScreenInfo();
 }
 
-void QnMainWindow::moveEvent(QMoveEvent *event) {
+void MainWindow::moveEvent(QMoveEvent *event) {
     base_type::moveEvent(event);
     updateScreenInfo();
 }
 
-bool QnMainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result) {
+bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result) {
     /* Note that we may get here from destructor, so check for dwm is needed. */
     if(m_dwm && m_dwm->widgetNativeEvent(eventType, message, result))
         return true;
@@ -756,7 +775,7 @@ bool QnMainWindow::nativeEvent(const QByteArray &eventType, void *message, long 
     return base_type::nativeEvent(eventType, message, result);
 }
 
-Qt::WindowFrameSection QnMainWindow::windowFrameSectionAt(const QPoint &pos) const
+Qt::WindowFrameSection MainWindow::windowFrameSectionAt(const QPoint &pos) const
 {
     if (isFullScreen() && !isTitleVisible())
         return Qt::NoSection;
@@ -777,7 +796,7 @@ Qt::WindowFrameSection QnMainWindow::windowFrameSectionAt(const QPoint &pos) con
     return result;
 }
 
-void QnMainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event) {
+void MainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event) {
     if(event->type() != QEvent::FileOpen) {
         qnWarning("Expected event of type %1, received an event of type %2.", static_cast<int>(QEvent::FileOpen), static_cast<int>(event->type()));
         return;
@@ -785,3 +804,8 @@ void QnMainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event) {
 
     handleMessage(static_cast<QFileOpenEvent *>(event)->file());
 }
+
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx

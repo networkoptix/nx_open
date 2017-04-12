@@ -7,6 +7,7 @@ class ExportTimelapseDialog;
 }
 
 class QnFilteredUnitsModel;
+class QStandardItemModel;
 
 class QnExportTimelapseDialog : public QnSessionAwareButtonBoxDialog
 {

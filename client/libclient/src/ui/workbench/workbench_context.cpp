@@ -79,26 +79,28 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
 
     // Adds statistics modules
 
+    auto statisticsManager = commonModule()->instance<QnStatisticsManager>();
+
     const auto actionsStatModule = instance<QnActionsStatisticsModule>();
     actionsStatModule->setActionManager(m_menu.data()); // TODO: #ynikitenkov refactor QnActionManager to singleton
-    qnStatisticsManager->registerStatisticsModule(lit("actions"), actionsStatModule);
+    statisticsManager->registerStatisticsModule(lit("actions"), actionsStatModule);
 
     const auto userStatModule = instance<QnUsersStatisticsModule>();
-    qnStatisticsManager->registerStatisticsModule(lit("users"), userStatModule);
+    statisticsManager->registerStatisticsModule(lit("users"), userStatModule);
 
     const auto graphicsStatModule = instance<QnGraphicsStatisticsModule>();
-    qnStatisticsManager->registerStatisticsModule(lit("graphics"), graphicsStatModule);
+    statisticsManager->registerStatisticsModule(lit("graphics"), graphicsStatModule);
 
     const auto durationStatModule = instance<QnDurationStatisticsModule>();
-    qnStatisticsManager->registerStatisticsModule(lit("durations"), durationStatModule);
+    statisticsManager->registerStatisticsModule(lit("durations"), durationStatModule);
 
     m_statisticsModule.reset(new QnControlsStatisticsModule());
-    qnStatisticsManager->registerStatisticsModule(lit("controls"), m_statisticsModule.data());
+    statisticsManager->registerStatisticsModule(lit("controls"), m_statisticsModule.data());
 
-    connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionOpened
-                     , qnStatisticsManager, &QnStatisticsManager::resetStatistics);
-    connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::initialResourcesReceived
-                     , qnStatisticsManager, &QnStatisticsManager::sendStatistics);
+    connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionOpened,
+        statisticsManager, &QnStatisticsManager::resetStatistics);
+    connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived,
+        statisticsManager, &QnStatisticsManager::sendStatistics);
 
     initWorkarounds();
 }
@@ -223,7 +225,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
         case SystemUri::ClientCommand::LoginToCloud:
         {
             NX_LOG(lit("Custom URI: Connecting to cloud"), cl_logDEBUG1);
-            qnCommon->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
+            commonModule()->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
             break;
         }
         case SystemUri::ClientCommand::Client:
@@ -242,7 +244,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
 
             if (systemIsCloud)
             {
-                qnCommon->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
+                commonModule()->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
                 NX_LOG(lit("Custom URI: System is cloud, connecting to cloud first"), cl_logDEBUG1);
             }
 
@@ -292,7 +294,7 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
     /* Process input files. */
     bool haveInputFiles = false;
     {
-        QnMainWindow* window = qobject_cast<QnMainWindow*>(mainWindow());
+        auto window = qobject_cast<nx::client::desktop::ui::MainWindow*>(mainWindow());
         NX_ASSERT(window);
 
         bool skipArg = true;

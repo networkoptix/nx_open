@@ -12,6 +12,7 @@
 class QnAbstractStreamDataProvider;
 class QnResourceVideoLayout;
 class QnResourceAudioLayout;
+class QnCameraUserAttributePool;
 
 namespace Qn {
 
@@ -73,7 +74,7 @@ public:
 
 protected:
     void initMediaResource();
-
+    QnCameraUserAttributePool* userAttributesPool() const;
 protected:
     mutable QnCustomResourceVideoLayoutPtr m_customVideoLayout;
     //QnMediaDewarpingParams m_dewarpingParams;
