@@ -42,7 +42,6 @@
                 <data android:host="${cloudHost}"/>
                 <data android:path="/client"/>
                 <data android:path="/cloud"/>
-                <data android:pathPrefix="/systems"/>
             </intent-filter>
 
             <meta-data android:name="android.app.lib_name" android:value="-- %%INSERT_APP_LIB_NAME%% --"/>

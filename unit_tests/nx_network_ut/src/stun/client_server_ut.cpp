@@ -1,11 +1,8 @@
-
 #include <thread>
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
-#include <common/common_globals.h>
-#include <nx/utils/test_support/sync_queue.h>
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/stun/async_client.h>
 #include <nx/network/stun/async_client_user.h>
@@ -13,6 +10,10 @@
 #include <nx/network/stun/stream_socket_server.h>
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/test_support/sync_queue.h>
+
+#include <common/common_globals.h>
+#include <utils/common/guard.h>
 
 namespace nx {
 namespace stun {
@@ -23,33 +24,48 @@ class TestServer:
 {
 public:
     TestServer(const nx::stun::MessageDispatcher& dispatcher):
-        SocketServer(&dispatcher, false)
+        SocketServer(&dispatcher, false),
+        m_totalConnectionsAccepted(0)
     {
     }
 
     virtual ~TestServer() override
     {
-        pleaseStop();
-        for (auto& connection: connections)
+        pleaseStopSync();
+        for (auto& connection: m_connections)
         {
             connection->pleaseStopSync();
             connection.reset();
         }
     }
 
-    std::vector<std::shared_ptr<ServerConnection>> connections;
+    std::size_t totalConnectionsAccepted() const
+    {
+        return m_totalConnectionsAccepted.load();
+    }
+
+    std::vector<std::shared_ptr<ServerConnection>>& connections()
+    {
+        return m_connections;
+    }
 
 protected:
     virtual std::shared_ptr<ServerConnection> createConnection(
         std::unique_ptr<AbstractStreamSocket> _socket) override
     {
+        ++m_totalConnectionsAccepted;
         auto connection = SocketServer::createConnection(std::move(_socket));
-        connections.push_back(connection);
+        m_connections.push_back(connection);
         return connection;
     };
+
+private:
+    std::atomic<std::size_t> m_totalConnectionsAccepted;
+    std::vector<std::shared_ptr<ServerConnection>> m_connections;
 };
 
-class StunClientServerTest: public ::testing::Test
+class StunClientServerTest:
+    public ::testing::Test
 {
 protected:
     static AbstractAsyncClient::Settings defaultSettings()
@@ -57,7 +73,11 @@ protected:
         AbstractAsyncClient::Settings settings;
         settings.sendTimeout = std::chrono::seconds(1);
         settings.recvTimeout = std::chrono::seconds(1);
-        settings.reconnectPolicy.setInitialDelay(std::chrono::seconds(3));
+
+        settings.reconnectPolicy.delayMultiplier = 2;
+        settings.reconnectPolicy.initialDelay = std::chrono::milliseconds(500);
+        settings.reconnectPolicy.maxDelay = std::chrono::seconds(5);
+        settings.reconnectPolicy.maxRetryCount = network::RetryPolicy::kInfiniteRetries;
         return settings;
     }
 
@@ -71,7 +91,7 @@ protected:
         if (client)
             client->pleaseStopSync();
         if (server)
-            server->pleaseStop();
+            server->pleaseStopSync();
     }
 
     SystemError::ErrorCode sendTestRequestSync()
@@ -99,7 +119,7 @@ protected:
     SystemError::ErrorCode sendIndicationSync(int method)
     {
         utils::TestSyncQueue<SystemError::ErrorCode> sendWaiter;
-        const auto connection = server->connections.front();
+        const auto connection = server->connections().front();
         connection->sendMessage(
             Message(Header(MessageClass::indication, method)),
             sendWaiter.pusher());
@@ -114,32 +134,66 @@ protected:
 
 TEST_F(StunClientServerTest, Connectivity)
 {
-    EXPECT_EQ(sendTestRequestSync(), SystemError::notConnected); // no address
+    std::atomic<size_t> timerTicks;
+    const auto incrementTimer = [&timerTicks]() { ++timerTicks; };
+    const auto timerPeriod = defaultSettings().reconnectPolicy.initialDelay / 2;
+    utils::TestSyncQueue<bool> reconnectEvents;
+    auto reconnectHandler =
+        [&reconnectEvents] { reconnectEvents.push(true); };
+
+    EXPECT_EQ(SystemError::notConnected, sendTestRequestSync()); //< No address.
 
     const auto address = startServer();
     server.reset();
     client->connect(address);
+    auto clientGuard = makeScopedGuard([this]() { client->pleaseStopSync(); });
+
     EXPECT_THAT(sendTestRequestSync(), testing::AnyOf(
         SystemError::connectionRefused, SystemError::connectionReset,
-        SystemError::timedOut)); // no server to connect
+        SystemError::timedOut)); //< No server to connect.
 
     startServer(address);
-    EXPECT_EQ(sendTestRequestSync(), SystemError::noError); // ok
-    EXPECT_EQ(server->connections.size(), 1);
+    ASSERT_EQ(SystemError::noError, sendTestRequestSync());
+    ASSERT_EQ(1U, server->connectionCount());
 
     server.reset();
-    EXPECT_NE(sendTestRequestSync(), SystemError::noError); // no server
+    ASSERT_NE(SystemError::noError, sendTestRequestSync());
 
-    utils::promise<void> promise;
-    client->addOnReconnectedHandler([&]{ promise.set_value(); });
+    client->addOnReconnectedHandler(reconnectHandler);
 
     startServer(address);
-    promise.get_future().wait(); // automatic reconnect is expected
+    reconnectEvents.pop(); //< Automatic reconnect is expected.
 
-    // there might be a small delay before server creates connection from
-    // accepted socket
+    // There might be a small delay before server creates connection from accepted socket.
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    EXPECT_EQ(server->connections.size(), 1);
+    ASSERT_EQ(1U, server->connectionCount());
+
+    ASSERT_TRUE(client->addConnectionTimer(timerPeriod, incrementTimer, nullptr));
+    // Checking that timer ticks certain times per some period is not reliable.
+    while (timerTicks < 3)
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+    server.reset();
+    ASSERT_NE(sendTestRequestSync(), SystemError::noError);
+    timerTicks = 0;
+
+    // Wait some time so client will retry to connect again and again.
+    std::this_thread::sleep_for(defaultSettings().reconnectPolicy.initialDelay * 5);
+    ASSERT_EQ(0U, timerTicks); //< Timer does not tick while connection is broken;
+
+    startServer(address);
+    reconnectEvents.pop(); // Automatic reconnect is expected, again.
+
+    while (server->totalConnectionsAccepted() == 0)
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    ASSERT_EQ(1U, server->connectionCount()) << 
+        "Total connections accepted: " << server->totalConnectionsAccepted();
+
+    ASSERT_TRUE(client->addConnectionTimer(timerPeriod, incrementTimer, nullptr)) <<
+        "Server connection count " << server->connectionCount();
+    // Checking that timer ticks certain times per some period is not reliable.
+    while (timerTicks < 3)
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
 
 TEST_F(StunClientServerTest, RequestResponse)
@@ -169,7 +223,8 @@ TEST_F(StunClientServerTest, RequestResponse)
         const auto addr = response.getAttribute<stun::attrs::XorMappedAddress>();
         ASSERT_NE(nullptr, addr);
         ASSERT_EQ(stun::attrs::XorMappedAddress::IPV4, addr->family);
-        ASSERT_EQ(ntohl(HostAddress::localhost.ipV4()->s_addr), addr->address.ipv4);
+        const auto ipv4 = ntohl(HostAddress::localhost.ipV4()->s_addr);
+        ASSERT_EQ(ipv4, addr->address.ipv4);
     }
     {
         Message request(Header(MessageClass::request, 0xFFF /* unknown */));
@@ -184,7 +239,7 @@ TEST_F(StunClientServerTest, RequestResponse)
         ASSERT_EQ(response.header.messageClass, MessageClass::errorResponse);
         ASSERT_EQ(response.header.method, 0xFFF);
 
-        const auto error = response.getAttribute<stun::attrs::ErrorDescription>();
+        const auto error = response.getAttribute<stun::attrs::ErrorCode>();
         ASSERT_NE(error, nullptr);
         ASSERT_EQ(error->getCode(), 404);
         ASSERT_EQ(error->getString(), String("Method is not supported"));
@@ -201,7 +256,7 @@ TEST_F(StunClientServerTest, Indications)
     client->setIndicationHandler(0xCD, recvWaiter.pusher());
 
     EXPECT_EQ(sendTestRequestSync(), SystemError::noError);
-    EXPECT_EQ(server->connections.size(), 1);
+    EXPECT_EQ(1U, server->connectionCount());
 
     EXPECT_EQ(sendIndicationSync(0xAB), SystemError::noError);
     EXPECT_EQ(sendIndicationSync(0xCD), SystemError::noError);
@@ -212,9 +267,10 @@ TEST_F(StunClientServerTest, Indications)
     EXPECT_TRUE(recvWaiter.isEmpty()); // 3rd indication is not subscribed
 }
 
-struct TestUser
-    : public AsyncClientUser
+class TestUser:
+    public AsyncClientUser
 {
+public:
     TestUser(std::shared_ptr<AbstractAsyncClient> client):
         AsyncClientUser(std::move(client))
     {
@@ -248,56 +304,26 @@ TEST_F(StunClientServerTest, AsyncClientUser)
     }
 }
 
-class StunClient:
-    public StunClientServerTest
+TEST_F(StunClientServerTest, cancellation)
 {
-public:
-    ~StunClient()
-    {
-        m_stunClient.pleaseStopSync();
-    }
+    const auto address = startServer();
 
-protected:
-    void givenClientConnectedToServer()
-    {
-        const auto address = startServer();
-        nx::utils::promise<SystemError::ErrorCode> connectedPromise;
-        m_stunClient.setOnConnectionClosedHandler(
-            [this](SystemError::ErrorCode closeReason)
-            {
-                m_connectionClosedPromise.set_value(closeReason);
-            });
-        m_stunClient.connect(
-            address,
-            false,
-            [&connectedPromise](SystemError::ErrorCode sysErrorCode)
-            {
-                connectedPromise.set_value(sysErrorCode);
-            });
-        ASSERT_EQ(SystemError::noError, connectedPromise.get_future().get());
-    }
+    utils::TestSyncQueue<bool> reconnectEvents;
+    auto reconnectHandler =
+        [&reconnectEvents] { reconnectEvents.push(true); };
 
-    void whenServerTerminatedAbruptly()
-    {
-        server->pleaseStop();
-        server.reset();
-    }
+    std::atomic<size_t> timerTicks(0);
+    const auto incrementTimer = [&timerTicks]() { ++timerTicks; };
+    const auto timerPeriod = defaultSettings().reconnectPolicy.initialDelay / 2;
 
-    void verifyClientProcessedConnectionCloseProperly()
-    {
-        ASSERT_NE(SystemError::noError, m_connectionClosedPromise.get_future().get());
-    }
+    auto clientGuard = makeScopedGuard([this]() { client->pleaseStopSync(); });
+    client->connect(address);
+    client->addOnReconnectedHandler(reconnectHandler);
+    client->addConnectionTimer(timerPeriod, incrementTimer, nullptr);
 
-private:
-    nx::stun::AsyncClient m_stunClient;
-    nx::utils::promise<SystemError::ErrorCode> m_connectionClosedPromise;
-};
+    std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 50));
 
-TEST_F(StunClient, proper_cancellation_when_connection_terminated_by_remote_side)
-{
-    givenClientConnectedToServer();
-    whenServerTerminatedAbruptly();
-    verifyClientProcessedConnectionCloseProperly();
+    server.reset();
 }
 
 } // namespace test

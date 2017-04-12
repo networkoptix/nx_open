@@ -172,6 +172,7 @@ QnCommonModule::QnCommonModule(QObject *parent):
     m_systemIdentityTime = 0;
     m_lowPriorityAdminPassword = false;
     m_localPeerType = Qn::PT_NotDefined;
+    m_startupTime = QDateTime::currentDateTime();
 }
 
 QnCommonModule::~QnCommonModule()
@@ -188,6 +189,7 @@ void QnCommonModule::bindModuleinformation(const QnMediaServerResourcePtr &serve
     connect(server.data(),  &QnMediaServerResource::nameChanged,    this,   &QnCommonModule::resetCachedValue);
     connect(server.data(),  &QnMediaServerResource::apiUrlChanged,  this,   &QnCommonModule::resetCachedValue);
     connect(server.data(),  &QnMediaServerResource::serverFlagsChanged,  this,   &QnCommonModule::resetCachedValue);
+    connect(server.data(),  &QnMediaServerResource::primaryAddressChanged,  this,   &QnCommonModule::resetCachedValue);
 
     connect(qnGlobalSettings, &QnGlobalSettings::systemNameChanged, this, &QnCommonModule::resetCachedValue);
     connect(qnGlobalSettings, &QnGlobalSettings::localSystemIdChanged, this, &QnCommonModule::resetCachedValue);
@@ -367,4 +369,9 @@ void QnCommonModule::setLocalPeerType(Qn::PeerType peerType)
 Qn::PeerType QnCommonModule::localPeerType() const
 {
     return m_localPeerType;
+}
+
+QDateTime QnCommonModule::startupTime() const
+{
+    return m_startupTime;
 }

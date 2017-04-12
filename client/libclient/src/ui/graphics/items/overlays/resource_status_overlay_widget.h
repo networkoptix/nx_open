@@ -68,10 +68,10 @@ private:
     QGraphicsPixmapItem m_imageItem;
 
     // Central area
-    QLabel* m_centralAreaImage;
-    QLabel* m_caption;
+    QLabel* const m_centralAreaImage;
+    QLabel* const m_caption;
+    QLabel* const m_description;
 
     // Extras
     QPushButton* const m_button;
-    QnWordWrappedLabel* const m_description;
 };

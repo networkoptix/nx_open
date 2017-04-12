@@ -1,13 +1,11 @@
-/**********************************************************
-* Jul 25, 2016
-* akolesnikov
-***********************************************************/
-
 #include "direct_endpoint_tunnel.h"
 
 #include <nx/network/system_socket.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
+
+static const KeepAliveOptions kControlConnectionKeepAlive(
+    std::chrono::minutes(1), std::chrono::seconds(10), 3);
 
 namespace nx {
 namespace network {
@@ -23,10 +21,10 @@ DirectTcpEndpointTunnel::DirectTcpEndpointTunnel(
     AbstractOutgoingTunnelConnection(aioThread),
     m_connectSessionId(std::move(connectSessionId)),
     m_targetEndpoint(std::move(targetEndpoint)),
-    m_tcpConnection(std::move(connection))
+    m_controlConnection(std::move(connection))
 {
-    if (m_tcpConnection && aioThread)
-        m_tcpConnection->bindToAioThread(aioThread);
+    if (aioThread && m_controlConnection)
+        m_controlConnection->bindToAioThread(aioThread);
 }
 
 DirectTcpEndpointTunnel::~DirectTcpEndpointTunnel()
@@ -36,22 +34,39 @@ DirectTcpEndpointTunnel::~DirectTcpEndpointTunnel()
 
 void DirectTcpEndpointTunnel::stopWhileInAioThread()
 {
-    m_tcpConnection.reset();
+    m_controlConnection.reset();
     
     auto connectionClosedHandler = std::move(m_connectionClosedHandler);
     m_connectionClosedHandler = nullptr;
 
-    auto connections = std::move(m_connections);
-    for (auto& connectionContext : connections)
-    {
-        connectionContext.handler(
-            SystemError::interrupted,
-            nullptr,
-            false);
-    }
+    m_connections.clear();
 
     if (connectionClosedHandler)
         connectionClosedHandler(SystemError::interrupted);
+}
+
+void DirectTcpEndpointTunnel::start()
+{
+    NX_LOGX(lm("Start %1 control connection").arg(m_controlConnection ? "with" : "without"),
+        cl_logDEBUG2);
+
+    if (!m_controlConnection)
+        return;
+
+    const auto buffer = std::make_shared<Buffer>();
+    buffer->reserve(1);
+    NX_ASSERT(m_controlConnection->setKeepAlive(kControlConnectionKeepAlive));
+    m_controlConnection->readSomeAsync(
+        buffer.get(),
+        [this, buffer](SystemError::ErrorCode code, size_t size)
+        {
+            NX_LOGX(lm("Unexpected event on control connection (size=%1): %2").strs(
+                size, SystemError::toString(code)), cl_logDEBUG1);
+
+            m_controlConnection.reset();
+            if (m_connectionClosedHandler)
+                utils::moveAndCall(m_connectionClosedHandler, SystemError::connectionReset);
+        });
 }
 
 void DirectTcpEndpointTunnel::establishNewConnection(
@@ -81,26 +96,6 @@ void DirectTcpEndpointTunnel::startConnection(
     std::list<ConnectionContext>::iterator connectionContextIter,
     std::chrono::milliseconds timeout)
 {
-    using namespace std::placeholders;
-
-    if (m_tcpConnection)
-    {
-        auto tcpConnection = std::move(m_tcpConnection);
-        m_tcpConnection = nullptr;
-        SystemError::ErrorCode sysErrorCodeToReport = SystemError::noError;
-        if (!connectionContextIter->socketAttributes.applyTo(tcpConnection.get()))
-        {
-            sysErrorCodeToReport = SystemError::getLastOSErrorCode();
-            tcpConnection.reset();
-        }
-        reportConnectResult(
-            connectionContextIter,
-            sysErrorCodeToReport,
-            std::move(tcpConnection),
-            true);
-        return;
-    }
-
     connectionContextIter->tcpSocket = std::make_unique<TCPSocket>(AF_INET);
     connectionContextIter->tcpSocket->bindToAioThread(getAioThread());
     if (!connectionContextIter->tcpSocket->setNonBlockingMode(true) ||
@@ -114,6 +109,7 @@ void DirectTcpEndpointTunnel::startConnection(
         return;
     }
 
+    using namespace std::placeholders;
     connectionContextIter->tcpSocket->connectAsync(
         m_targetEndpoint,
         std::bind(&DirectTcpEndpointTunnel::onConnectDone, this, _1, connectionContextIter));

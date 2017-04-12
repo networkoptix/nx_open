@@ -1,15 +1,17 @@
 #include "listen_mode.h"
 
+#include <nx/fusion/serialization/lexical.h>
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/multiple_server_socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/udt/udt_socket.h>
 #include <nx/network/ssl_socket.h>
+#include <nx/utils/string.h>
 
 #include <utils/common/command_line_parser.h>
-#include <nx/utils/string.h>
-#include <nx/fusion/serialization/lexical.h>
+
+#include "dynamic_statistics.h"
 
 namespace nx {
 namespace cctu {
@@ -161,6 +163,7 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
     auto transmissionMode = test::TestTransmissionMode::spam;
     if (args.get("ping"))
         transmissionMode = test::TestTransmissionMode::pong;
+    std::cout << lm("Server mode: %1").strs(transmissionMode).toStdString() << std::endl;
 
     auto multiServerSocket = new network::MultipleServerSocket();
     std::unique_ptr<AbstractStreamServerSocket> serverSocket(multiServerSocket);
@@ -170,7 +173,17 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
             serverSocket->pleaseStopSync();
     });
 
-    std::cout << lm("Server mode: %1").strs(transmissionMode).toStdString() << std::endl;
+    std::chrono::milliseconds rwTimeout = nx::network::test::TestConnection::kDefaultRwTimeout;
+    {
+        QString value;
+        if (args.read("rw-timeout", &value))
+            rwTimeout = nx::utils::parseTimerDuration(value, rwTimeout);
+
+        stun::AbstractAsyncClient::Settings settings;
+        settings.sendTimeout = rwTimeout;
+        settings.recvTimeout = rwTimeout;
+        hpm::api::MediatorConnector::setStunClientSettings(settings);
+    }
 
     CloudServerSocketGenerator cloudServerSocketGenerator;
     test::RandomDataTcpServer server(
@@ -179,6 +192,7 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
     SocketAddress localAddress(HostAddress::localhost);
     if (const auto address = args.get("local-address"))
         localAddress = SocketAddress(*address);
+
     {
         std::unique_ptr<AbstractStreamServerSocket> localServer;
         if (args.get("udt"))
@@ -186,9 +200,10 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
         else
             localServer = std::make_unique<TCPServerSocket>(AF_INET);
 
-        if (!localServer->bind(localAddress))
+        if (!localServer->setReuseAddrFlag(true) ||
+            !localServer->bind(localAddress))
         {
-            std::cout << "Error: can bot bind to " << localAddress.toString().toStdString() << std::endl;
+            std::cout << "Error: Unable to bind to " << localAddress.toString().toStdString() << std::endl;
             return 1;
         }
 
@@ -228,10 +243,10 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
             args.read("server-id", &serverId);
             serverIds.push_back(serverId.toUtf8());
 
-            int serverCount = 1;
+            size_t serverCount = 1;
             args.read("server-count", &serverCount);
-            for (int i = serverIds.size(); i < serverCount; i++)
-                serverIds.push_back((serverId + QString::number(i)).toUtf8());
+            for (size_t i = serverIds.size(); i < serverCount; i++)
+                serverIds.push_back(makeServerName(serverId, i));
         }
 
         for (auto& id : serverIds)
@@ -272,13 +287,6 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
         serverSocket.reset(new SslServerSocket(serverSocket.release(), false));
     }
 
-    std::chrono::milliseconds rwTimeout = nx::network::test::TestConnection::kDefaultRwTimeout;
-    {
-        QString value;
-        if (args.read("rw-timeout", &value))
-            rwTimeout = nx::utils::parseTimerDuration(value, rwTimeout);
-    }
-
     server.setServerSocket(std::move(serverSocket));
     if (!server.start(rwTimeout))
     {
@@ -316,6 +324,7 @@ int printStatsAndWaitForCompletion(
     ConnectionTestStatistics baseStatisticsData = kZeroStatistics;
     boost::optional<steady_clock::time_point> sameStatisticsInterval;
     std::string prevStatToDisplayStr;
+    DynamicStatistics dynamicStatistics;
     for (;;)
     {
         if (interruptCondition && interruptCondition())
@@ -356,8 +365,11 @@ int printStatsAndWaitForCompletion(
             sameStatisticsInterval.reset();
         }
 
+        dynamicStatistics.addValue(statToDisplay);
+
         prevStatistics = data;
-        const auto statToDisplayStr = toString(statToDisplay).toStdString();
+        const auto statToDisplayStr = 
+            toString(statToDisplay).toStdString() + " " + dynamicStatistics.toStdString();
 
         std::cout << '\r';
         std::cout << statToDisplayStr;
@@ -369,6 +381,12 @@ int printStatsAndWaitForCompletion(
     }
 
     return 0;
+}
+
+String makeServerName(const QString& prefix, size_t number)
+{
+    static const QString kFormat = QLatin1String("%1-%2");
+    return kFormat.arg(prefix).arg((uint) number, 5, 10, QLatin1Char('0')).toUtf8();
 }
 
 void limitStringList(QStringList* list)

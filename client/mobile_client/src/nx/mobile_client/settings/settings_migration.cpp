@@ -6,6 +6,8 @@
 #include <nx/utils/log/log.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <client_core/client_core_settings.h>
+#include <helpers/url_helper.h>
+#include <helpers/system_helpers.h>
 
 #include "login_session.h"
 
@@ -71,44 +73,34 @@ static void migrateFrom24To25()
 
 static void migrateFrom26To30()
 {
+    using namespace client::core;
+    using namespace client::core::helpers;
+
     const QVariantList sessions = qnSettings->savedSessions();
     if (sessions.isEmpty())
         return;
 
-    auto recentConnections = qnClientCoreSettings->recentLocalConnections();
     auto weights = qnClientCoreSettings->localSystemWeightsData();
+    auto knownServerUrls = qnClientCoreSettings->knownServerUrls();
 
     const auto dateTime = QDateTime::currentMSecsSinceEpoch();
 
-    for (const QVariant& sessionVariant: sessions)
+    for (const auto& sessionVariant: sessions)
     {
         const auto session = QnLoginSession::fromVariant(sessionVariant.toMap());
 
-        if (any_of(recentConnections,
-            [&session](const QnLocalConnectionData& data)
-            {
-                return data.localId == session.id
-                        && data.url.userName().compare(
-                            session.url.userName(), Qt::CaseInsensitive) == 0;
-            }))
-        {
+        if (qnClientCoreSettings->recentLocalConnections().contains(session.id))
             continue;
-        }
 
-        const QnLocalConnectionData connectionData(session.systemName, session.id, session.url);
-        recentConnections.append(connectionData);
-
-        if (!any_of(weights,
-            [session](const QnWeightData& data) { return data.localId == session.id; }))
-        {
-            weights.append(QnWeightData{session.id, 1.0, dateTime, true});
-        }
+        storeConnection(session.id, session.systemName, session.url);
+        storeCredentials(
+            session.id, QnEncodedCredentials(session.url.userName(), session.url.password()));
+        weights.append(WeightData{session.id, 1.0, dateTime, true});
     }
 
-    qnClientCoreSettings->setRecentLocalConnections(recentConnections);
     qnClientCoreSettings->setLocalSystemWeightsData(weights);
+    qnClientCoreSettings->setKnownServerUrls(knownServerUrls);
     qnClientCoreSettings->save();
-    qnSettings->setSavedSessions(QVariantList());
     qnSettings->save();
 }
 

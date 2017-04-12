@@ -33,6 +33,12 @@
 #include <utils/common/scoped_value_rollback.h>
 
 namespace {
+
+QString braced(const QString& source)
+{
+    return L'<' + source + L'>';
+};
+
     /** Possible states of the dialog contents. */
     enum DialogState {
         /** No image is selected. */
@@ -59,6 +65,7 @@ namespace {
 
     /** If difference between image AR and screen AR is smaller than this value, cropped preview will not be generated */
     const qreal aspectRatioVariation = 0.05;
+
 }
 
 
@@ -140,6 +147,9 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     m_isUpdating(false)
 {
     ui->setupUi(this);
+
+    ui->widthSpinBox->setSuffix(L' ' + tr("cells"));
+    ui->heightSpinBox->setSuffix(L' ' + tr("cells"));
 
     setHelpTopic(ui->lockedCheckBox,        Qn::LayoutSettings_Locking_Help);
     setHelpTopic(ui->backgroundGroupBox,    Qn::LayoutSettings_EMapping_Help);
@@ -323,7 +333,7 @@ void QnLayoutSettingsDialog::updateControls() {
     if (!imagePresent) {
         ui->imageLabel->setPixmap(QPixmap());
         ui->imageLabel->setText(d->state != Error
-                            ? tr("<No picture>")
+                            ? braced(tr("No picture"))
                             : d->errorText);
     } else {
         image = (d->canChangeAspectRatio() && ui->cropToMonitorCheckBox->isChecked())
@@ -346,9 +356,17 @@ void QnLayoutSettingsDialog::updateControls() {
         qreal width = height * targetAspectRatio;
         ui->widthSpinBox->setValue(width);
         ui->heightSpinBox->setValue(height);
-    } else {
+    }
+    else
+    {
         ui->widthSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().width());
         ui->heightSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().height());
+
+        if (!ui->keepAspectRatioCheckBox->isChecked())
+        {
+            ui->widthSpinBox->setMinimum(qnGlobals->layoutBackgroundMinSize().width());
+            ui->heightSpinBox->setMinimum(qnGlobals->layoutBackgroundMinSize().height());
+        }
     }
 
 }
@@ -441,7 +459,7 @@ void QnLayoutSettingsDialog::at_imageLoaded(const QString &filename, bool ok) {
 
     if (!ok) {
         d->state = Error;
-        d->errorText = tr("<Error while loading picture>");
+        d->errorText = braced(tr("Error while loading picture"));
     } else {
         d->state = ImageDownloaded;
     }
@@ -454,7 +472,7 @@ void QnLayoutSettingsDialog::at_imageStored(const QString &filename, bool ok) {
 
     if (!ok) {
         d->state = Error;
-        d->errorText = tr("<Error while uploading picture>");
+        d->errorText = braced(tr("Error while uploading picture"));
         updateControls();
         return;
     }
@@ -530,14 +548,17 @@ void QnLayoutSettingsDialog::selectFile() {
     QFileInfo fileInfo(fileName);
     if (fileInfo.size() == 0) {
         d->state = Error;
-        d->errorText = tr("<Picture cannot be read>");
+        d->errorText = braced(tr("Picture cannot be read"));
         updateControls();
         return;
     }
 
     if (fileInfo.size() > QnAppServerFileCache::maximumFileSize()) {
         d->state = Error;
-        d->errorText = tr("<Picture is too big. Maximum size is %1 Mb>").arg(QnAppServerFileCache::maximumFileSize() / (1024*1024));
+        //TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
+        //Important: maximumFileSize() is hardcoded in 1024-base
+        d->errorText = braced(tr("Picture is too big. Maximum size is %1 MB")
+            .arg(QnAppServerFileCache::maximumFileSize() / (1024*1024)));
         updateControls();
         return;
     }
@@ -562,7 +583,7 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
 
     if (image.isNull()) {
         d->state = Error;
-        d->errorText = tr("<Picture cannot be loaded>");
+        d->errorText = braced(tr("Picture cannot be loaded"));
         updateControls();
         return;
     }

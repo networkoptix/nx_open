@@ -292,13 +292,37 @@ private:
                                                                currentTimeZone()/60,
                                                                lit("/"));
             pathString = lit("%2/%1/%3").arg(cameraFolder).arg(quality).arg(pathString);
-            QDir().mkpath(QDir(root).absoluteFilePath(pathString));
+            auto fullDirPath = QDir(root).absoluteFilePath(pathString);
+            decltype(curStartTime + curDuration) error = -1;
+            
+            if (!QDir().mkpath(fullDirPath))
+            {
+                qDebug() << "Create directory" << fullDirPath << "failed";
+                return error;
+            }
             QString fullFileName = closeDirPath(root) + closeDirPath(pathString)
                                                       + fileName;
             if (curDuration == duration_1)
-                testFile_1.copy(fullFileName);
+            {
+                if (!testFile_1.copy(fullFileName))
+                {
+                    qDebug() << "Copy file" << fullFileName << "failed";
+                    if (QFile(fullFileName).exists())
+                        qDebug() << "Already exsits";
+                    return error;
+                }
+            }
             else
-                testFile_2.copy(fullFileName);
+            {
+                if (!testFile_2.copy(fullFileName))
+                {
+
+                    qDebug() << "Copy file" << fullFileName << "failed";
+                    if (QFile(fullFileName).exists())
+                        qDebug() << "Already exsits";
+                    return error;
+                }
+            }
 
             writeHeaderTimestamp(fullFileName, curStartTime);
             m_timeLine.addTimePeriod(curStartTime, curDuration);
@@ -310,6 +334,8 @@ private:
             for (int j = 0; j < m_storageUrls.size(); ++j) {
                 int64_t d1 = copyFile(m_storageUrls[j], lqFolder);
                 int64_t d2 = copyFile(m_storageUrls[j], hqFolder);
+                if (d1 == -1 || d2 == -1)
+                    continue;
                 newTime = newTime > (d1 > d2 ? d1 : d2) ? newTime : (d1 > d2 ? d1 : d2);
             }
             startTimeMs = newTime;
@@ -335,7 +361,7 @@ private:
 
     void loadMedia()
     {
-        QnStorageManager::ArchiveCameraDataList archiveCameras;
+        nx::caminfo::ArchiveCameraDataList archiveCameras;
         for (int i = 0; i < m_storageUrls.size(); ++i)
         {
             QnStorageManager *manager = i % 2 == 0 ? qnNormalStorageMan : qnBackupStorageMan;
@@ -429,6 +455,7 @@ TEST(ServerArchiveDelegate_playback_test, Main)
         commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
     }
     commonModule->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
+    MSSettings::initializeROSettings();
 
     std::unique_ptr<QnStorageManager> normalStorageManager;
     if (!qnNormalStorageMan) {
@@ -461,12 +488,15 @@ TEST(ServerArchiveDelegate_playback_test, Main)
         dbPool = std::unique_ptr<QnStorageDbPool>(new QnStorageDbPool);
     }
 
-    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction);
+    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction(0));
 
     MSSettings::roSettings()->remove(lit("NORMAL_SCAN_ARCHIVE_FROM"));
     MSSettings::roSettings()->remove(lit("BACKUP_SCAN_ARCHIVE_FROM"));
-
+#if defined (__arm__)
+    TestHelper testHelper(std::move(QStringList() << storageUrl_1 << storageUrl_2), 5);
+#else
     TestHelper testHelper(std::move(QStringList() << storageUrl_1 << storageUrl_2), 200);
+#endif
     testHelper.print();
 
     QnNetworkResourcePtr cameraResource = QnNetworkResourcePtr(new QnNetworkResource);

@@ -164,7 +164,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
     }
 
     /* Try to consider model's foreground color override: */
-    QVariant modelColorOverride = index.data(Qt::ForegroundRole);
+    const auto modelColorOverride = index.data(Qt::ForegroundRole);
     if (modelColorOverride.canConvert<QBrush>())
         mainColor = modelColorOverride.value<QBrush>().color();
 
@@ -180,11 +180,11 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 
     /* Due to Qt bug, State_Editing is not set in option.state, so detect editing differently: */
     const QAbstractItemView* view = qobject_cast<const QAbstractItemView*>(option.widget);
-    bool editing = view && view->indexWidget(option.index);
+    const bool editing = view && view->indexWidget(option.index);
 
     /* Obtain sub-element rectangles: */
-    QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget);
-    QRect iconRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &option, option.widget);
+    const QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget);
+    const QRect iconRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &option, option.widget);
 
     /* Paint background: */
     style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, option.widget);
@@ -205,38 +205,39 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         QString extraInfo;
         getDisplayInfo(index, baseName, extraInfo);
 
-        QnScopedPainterFontRollback fontRollback(painter, option.font);
-        QnScopedPainterPenRollback penRollback(painter, mainColor);
-
-        const int textFlags = Qt::TextSingleLine | option.displayAlignment;
         const int textPadding = style->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1; /* As in Qt */
-        textRect.adjust(textPadding, 0, -textPadding, 0);
+        const int textEnd = textRect.right() - textPadding + 1;
 
-        QString elidedName = option.fontMetrics.elidedText(baseName, option.textElideMode, textRect.width());
+        QPoint textPos = textRect.topLeft() + QPoint(textPadding, option.fontMetrics.ascent()
+            + qCeil((textRect.height() - option.fontMetrics.height()) / 2.0));
 
-        QRect actualRect;
-        painter->drawText(textRect, textFlags, elidedName, &actualRect);
-
-        if (elidedName == baseName && !extraInfo.isEmpty())
+        if (textEnd > textPos.x())
         {
-            option.font.setWeight(QFont::Normal);
-            QFontMetrics extraMetrics(option.font);
+            const auto main = m_textPixmapCache.pixmap(baseName, option.font, mainColor,
+                textEnd - textPos.x(), option.textElideMode);
 
-            /* If name was empty, actualRect will be invalid: */
-            int startPos = actualRect.isValid() ? actualRect.right() : textRect.left();
+            if (!main.pixmap.isNull())
+            {
+                painter->drawPixmap(textPos + main.origin, main.pixmap);
+                textPos.rx() += main.origin.x() + main.size().width() + kExtraTextMargin;
+            }
 
-            textRect.setLeft(startPos + kExtraTextMargin);
-            QString elidedHost = extraMetrics.elidedText(extraInfo, option.textElideMode, textRect.width());
+            if (textEnd > textPos.x() && !main.elided() && !extraInfo.isEmpty())
+            {
+                option.font.setWeight(QFont::Normal);
 
-            painter->setFont(option.font);
-            painter->setPen(extraColor);
-            painter->drawText(textRect, textFlags, elidedHost);
+                const auto extra = m_textPixmapCache.pixmap(extraInfo, option.font, extraColor,
+                    textEnd - textPos.x(), option.textElideMode);
+
+                if (!extra.pixmap.isNull())
+                    painter->drawPixmap(textPos + extra.origin, extra.pixmap);
+            }
         }
     }
 
     QRect extraIconRect(iconRect);
-    auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-    auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
 
     /* Draw "recording" or "scheduled" icon: */
     if (m_options.testFlag(RecordingIcons))

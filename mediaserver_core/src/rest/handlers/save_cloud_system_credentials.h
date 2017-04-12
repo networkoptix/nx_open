@@ -1,8 +1,3 @@
-/**********************************************************
-* Sep 21, 2015
-* a.kolesnikov
-***********************************************************/
-
 #pragma once
 
 #include "rest/server/json_rest_handler.h"
@@ -46,7 +41,9 @@ private:
 
     bool fetchNecessaryDataFromCloud(const CloudCredentialsData& data, QnJsonRestResult* result);
     bool saveLocalSystemIdToCloud(const CloudCredentialsData& data, QnJsonRestResult* result);
-    bool initializeCloudRelatedManagers(QnJsonRestResult* result);
+    bool initializeCloudRelatedManagers(
+        const CloudCredentialsData& data,
+        QnJsonRestResult* result);
 
     bool rollback();
 };

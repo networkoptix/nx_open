@@ -1,6 +1,8 @@
 #include "delayed.h"
 
 #include <QtCore/QTimer>
+#include <QtCore/QThread>
+
 #include <nx/utils/log/assert.h>
 
 namespace
@@ -16,7 +18,7 @@ namespace
         {
             /* NX_ASSERT does not stop debugging here. */
             NX_ASSERT(parent->thread() == QThread::currentThread(), Q_FUNC_INFO,
-                "Timer cannot be child of QObject, located in an another thread. Use targetThread "
+                "Timer cannot be child of QObject, located in another thread. Use targetThread "
                 "parameter instead and guarded callback.");
         }
 
@@ -50,5 +52,16 @@ QTimer *executeDelayedParented(const Callback &callback
     , QObject *parent)
 {
     return executeDelayedImpl(callback, delayMs, nullptr, parent);
+}
+
+void executeInThread(QThread* thread, const Callback& callback)
+{
+    if (!callback)
+        return;
+
+    if (QThread::currentThread() == thread)
+        callback();
+    else
+        executeDelayedImpl(callback, 0, thread, nullptr);
 }
 

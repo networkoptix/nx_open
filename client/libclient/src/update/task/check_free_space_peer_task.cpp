@@ -11,8 +11,11 @@
 namespace {
 
 const qreal kReserveFactor = 1.2;
+const qreal kWindowsReservedFreeSpace = 500 * 1024 * 1024;
+const QnSoftwareVersion kRequireFreeSpaceVersion(3, 0);
 
-qint64 spaceRequiredForUpdate(const QString& fileName)
+qint64 spaceRequiredForUpdate(
+    const QnSystemInformation& systemInformation, const QString& fileName)
 {
     QFile updateFile(fileName);
 
@@ -22,10 +25,15 @@ qint64 spaceRequiredForUpdate(const QString& fileName)
     qint64 result = updateFile.size();
 
     QuaZip zip(fileName);
-    for (const auto info: zip.getFileInfoList64())
+    for (const auto& info: zip.getFileInfoList64())
         result += info.uncompressedSize;
 
-    return result * kReserveFactor;
+    result *= kReserveFactor;
+
+    if (systemInformation.platform == lit("windows"))
+        result += kWindowsReservedFreeSpace;
+
+    return result;
 }
 
 } // namespace
@@ -45,7 +53,7 @@ void QnCheckFreeSpacePeerTask::doStart()
 {
     m_requiredSpaceBySystemInformation.clear();
     for (auto it = m_files.begin(); it != m_files.end(); ++it)
-        m_requiredSpaceBySystemInformation[it.key()] = spaceRequiredForUpdate(it.value());
+        m_requiredSpaceBySystemInformation[it.key()] = spaceRequiredForUpdate(it.key(), *it);
 
     auto handleReply =
         [this](bool success, rest::Handle requestId, const QnUpdateFreeSpaceReply& reply)
@@ -71,12 +79,23 @@ void QnCheckFreeSpacePeerTask::doStart()
                     return;
                 }
 
-                const auto systemInformation = server->getModuleInformation().systemInformation;
                 const auto freeSpaceAvailable = reply.freeSpaceByServerId.value(id, -1);
+                if (freeSpaceAvailable < 0)
+                {
+                    if (server->getVersion() >= kRequireFreeSpaceVersion)
+                    {
+                        finish(CheckFailed, { id });
+                        return;
+                    }
+
+                    continue;
+                }
+
+                const auto systemInformation = server->getModuleInformation().systemInformation;
                 const auto freeSpaceRequired =
                     m_requiredSpaceBySystemInformation.value(systemInformation);
 
-                if (freeSpaceAvailable >= 0 && freeSpaceAvailable < freeSpaceRequired)
+                if (freeSpaceAvailable < freeSpaceRequired)
                     failed.insert(id);
             }
 

@@ -55,6 +55,7 @@ private:
     void updateRoleComboBox();
     void updateControlsAccess();
     bool validMode() const;
+    bool mustUpdatePassword() const;
 
 private:
     QScopedPointer<Ui::UserSettingsWidget> ui;
@@ -63,4 +64,5 @@ private:
     QList<QnInputField*> m_localInputFields;
     QList<QnInputField*> m_cloudInputFields;
     QnAligner* const m_aligner;
+    int m_lastUserTypeIndex;
 };

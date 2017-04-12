@@ -18,7 +18,7 @@ MediaserverApiBase::MediaserverApiBase( AbstractCloudDataProvider* cloudData,
     using namespace std::placeholders;
     const auto result =
         dispatcher->registerRequestProcessor(
-            stun::cc::methods::ping,
+            stun::extension::methods::ping,
             [this](ConnectionStrongRef connection, stun::Message message)
                 { ping(std::move(connection), std::move(message)); });
 
@@ -59,7 +59,7 @@ void MediaserverApiBase::ping( const ConnectionStrongRef& connection,
     }
 
     const auto endpointsAttr =
-            message.getAttribute< stun::cc::attrs::PublicEndpointList >();
+            message.getAttribute< stun::extension::attrs::PublicEndpointList >();
     if( !endpointsAttr )
     {
         sendErrorResponse(
@@ -95,7 +95,7 @@ void MediaserverApiBase::ping( const ConnectionStrongRef& connection,
                 stun::MessageClass::successResponse, method,
                 std::move( transactionId ) ) );
 
-            response.newAttribute< stun::cc::attrs::PublicEndpointList >(
+            response.newAttribute< stun::extension::attrs::PublicEndpointList >(
                         collector->endpoints );
 
             connection->sendMessage( std::move( response ) );

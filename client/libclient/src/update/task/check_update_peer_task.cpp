@@ -10,6 +10,7 @@
 
 #include <api/global_settings.h>
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
@@ -131,6 +132,12 @@ void QnCheckForUpdatesPeerTask::checkUpdate()
 
 bool QnCheckForUpdatesPeerTask::checkCloudHost()
 {
+    /* Ignore cloud host for versions lower than 3.0. */
+    static const QnSoftwareVersion kCloudRequiredVersion(3, 0);
+
+    if (m_target.version < kCloudRequiredVersion)
+        return true;
+
     /* Update is allowed if either target version has the same cloud host or
        there are no servers linked to the cloud in the system. */
     if (m_cloudHost == QnAppInfo::defaultCloudHost())
@@ -183,6 +190,32 @@ QnCheckForUpdateResult::Value QnCheckForUpdatesPeerTask::checkUpdateCoverage()
     return needUpdate
         ? QnCheckForUpdateResult::UpdateFound
         : QnCheckForUpdateResult::NoNewerVersion;
+}
+
+bool QnCheckForUpdatesPeerTask::isDowngradeAllowed()
+{
+    if (qnRuntime->isDevMode())
+        return true;
+
+    // Check if all server's version is not higher then target. Server downgrade is prohibited.
+    return boost::algorithm::all_of(m_target.targets,
+        [targetVersion = m_target.version]
+        (const QnUuid& serverId)
+        {
+            const auto server = qnResPool->getIncompatibleResourceById(serverId, true)
+                .dynamicCast<QnMediaServerResource>();
+            if (!server)
+                return true;
+
+            const auto status = server->getStatus();
+
+            // Ignore invalid servers, they will not be updated
+            if (status == Qn::Offline || status == Qn::Unauthorized)
+                return true;
+
+            return server->getVersion() <= targetVersion;
+        }
+    );
 }
 
 void QnCheckForUpdatesPeerTask::checkBuildOnline()
@@ -362,14 +395,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply* r
 
     m_cloudHost = buildInformation.cloudHost;
 
-    auto currentRelease = qnCommon->engineVersion();
-    currentRelease = QnSoftwareVersion(
-        currentRelease.major(), currentRelease.minor(), currentRelease.bugfix());
-    /* Server downgrade is allowed to another builds of the same release only.
-       E.g. 2.3.1.9300 -> 2.3.1.9200 is ok, but 2.3.1.9300 -> 2.3.0.9000 is not.
-       Client could be downgraded with no limits.
-     */
-    if (!m_target.targets.isEmpty() && m_target.version < currentRelease)
+    if (!isDowngradeAllowed())
     {
         finishTask(QnCheckForUpdateResult::DowngradeIsProhibited);
         return;

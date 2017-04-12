@@ -24,8 +24,6 @@ UINT __stdcall DetectIfSystemIsStandalone(MSIHANDLE hInstall)
 
     InitWinsock();
 
-    CRegKey RegKey;
-
     CAtlString appserverHost;
     CAtlStringA lappserverHost;
 
@@ -370,19 +368,19 @@ UINT __stdcall BackupDatabaseFile(MSIHANDLE hInstall)
     WcaLog(LOGMSG_STANDARD, "Initialized.");
 
     {
-        CAtlString params, fromFile, versionPath, versionName;
+        CAtlString params, fromDir, fromFile, versionPath, versionName;
         params = GetProperty(hInstall, L"CustomActionData");
 
         // Extract "from" and "to" files from filesString
         int curPos = 0;
-        fromFile = params.Tokenize(_T(";"), curPos);
+        fromDir = params.Tokenize(_T(";"), curPos);
         versionPath = params.Tokenize(_T(";"), curPos);
         versionName = params.Tokenize(_T(";"), curPos);
 
         CString localAppDataFolder = GetAppDataLocalFolderPath();
-        fromFile.Replace(L"#LocalAppDataFolder#", localAppDataFolder);
+        fromDir.Replace(L"#LocalAppDataFolder#", localAppDataFolder);
 
-        WcaLog(LOGMSG_STANDARD, "DB file: %S", fromFile);
+        WcaLog(LOGMSG_STANDARD, "DB dir: %S", fromDir);
         CRegKey key;
         static const int MAX_VERSION_SIZE = 50;
         TCHAR szBuffer[MAX_VERSION_SIZE + 1];
@@ -403,6 +401,11 @@ UINT __stdcall BackupDatabaseFile(MSIHANDLE hInstall)
             key.Close();
 
             if (!version.IsEmpty()) {
+                fromFile = fromDir + "\\ecs.sqlite";
+                WcaLog(LOGMSG_STANDARD, "Copying %S to %S", fromFile, fromFile + "." + version);
+                CopyFile(fromFile, fromFile + "." + version, FALSE);
+
+                fromFile = fromDir + "\\mserver.sqlite";
                 WcaLog(LOGMSG_STANDARD, "Copying %S to %S", fromFile, fromFile + "." + version);
                 CopyFile(fromFile, fromFile + "." + version, FALSE);
             }
@@ -656,3 +659,58 @@ LExit:
     return WcaFinalize(er);
 }
 
+UINT __stdcall CleanAutorunRegistryKeys(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize(hInstall, "CleanAutorunRegistryKeys");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    {
+        CAtlString registryPath(L"Software\\Microsoft\\Windows\\CurrentVersion\\Run");
+        CAtlString keyPrefix = GetProperty(hInstall, L"CLIENT_NAME");
+        WcaLog(LOGMSG_STANDARD, "Key Prefix is: %S", (LPCWSTR)keyPrefix);
+
+        CRegKey RegKey;
+
+        if (RegKey.Open(HKEY_CURRENT_USER, registryPath, KEY_READ | KEY_WRITE | KEY_WOW64_64KEY) != ERROR_SUCCESS) {
+            WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S", (LPCWSTR)registryPath);
+            goto LExit;
+        }
+
+		if (keyPrefix.GetLength() == 0) {
+			WcaLog(LOGMSG_STANDARD, "Client name is empty");
+			goto LExit;
+		}
+        DWORD dwSize = MAX_PATH, dwIndex = 0;
+        TCHAR tcsStringName[MAX_PATH];
+
+		std::vector<CAtlString> valuesToRemove;
+
+        while (RegEnumValue(RegKey.m_hKey, dwIndex, tcsStringName, &dwSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS) {
+            CAtlString stringName(tcsStringName);
+            WcaLog(LOGMSG_STANDARD, "Found key: %S", tcsStringName);
+            if (stringName.Find(keyPrefix) == 0) {
+				valuesToRemove.push_back(stringName);
+                WcaLog(LOGMSG_STANDARD, "Deleting");
+            } else {
+                WcaLog(LOGMSG_STANDARD, "Skipping");
+            }
+
+            dwIndex++;
+			dwSize = MAX_PATH;
+        }
+
+		for (const auto& value : valuesToRemove) {
+			RegKey.DeleteValue(value);
+		}
+    }
+
+LExit:
+
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}

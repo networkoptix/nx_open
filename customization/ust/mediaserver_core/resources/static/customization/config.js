@@ -1,7 +1,7 @@
 Config.helpLinks.push({
-    url: "http://tricomresearch.com/support.html",
+    url: "http://www.ubiquitysmart.com/",
     title: "Support",
-    description:"Have a question about specific features of your MVSS system?",
+    description:"Have a question about specific features of your system?",
     button:"get support",
     target: "new" // new|frame
 });
@@ -10,3 +10,5 @@ Config.allowDebugMode = false;
 //Config.webclientEnabled = false; // Uncomment this string to disable web client
 Config.productName = 'VMS DTV';
 Config.cloud.productName = 'DTV Cloud';
+
+Config.supportedLanguages = ['en_US', 'en_GB', 'fr', 'de', 'ru', 'es', 'ja', 'ko', 'tr', 'zh_CN', 'zh_TW', 'hu', 'he'];

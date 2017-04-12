@@ -36,7 +36,7 @@ void testNumberGeneration(
     testContainer(container, std::forward<Expects>(expects) ...);
 }
 
-TEST(RandomNumber, generation)
+TEST(Random, Numbers)
 {
     testNumberGeneration<int>(
         0, 1, 100,
@@ -63,6 +63,11 @@ TEST(RandomNumber, generation)
         0, 1, 100,
         [](double a) { return a > 0.8; },
         [](double a) { return a < 0.2; });
+
+    testNumberGeneration<uint64_t>(
+        0, std::numeric_limits<uint64_t>::max(), 100,
+        [](uint64_t a) { return a > (std::numeric_limits<uint64_t>::max() / 10) * 8; },
+        [](uint64_t a) { return a < (std::numeric_limits<uint64_t>::max() / 10) * 2; });
 }
 
 } // namespace test

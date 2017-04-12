@@ -39,6 +39,10 @@ void OutgoingReverseTunnelConnection::stopWhileInAioThread()
     m_timer.reset();
 }
 
+void OutgoingReverseTunnelConnection::start()
+{
+}
+
 void OutgoingReverseTunnelConnection::establishNewConnection(
     std::chrono::milliseconds timeout,
     SocketAttributes socketAttributes,

@@ -1,78 +1,46 @@
-project(common)
-set(PROJECT_SHORTNAME "common")
-set(PROJECT_LONGNAME "${company.name} Common Library")
+rdep_add_package(openssl)
+rdep_add_package(ffmpeg)
 
-include(default_project_properties)
+nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/qt.conf"
+    ${CMAKE_CURRENT_BINARY_DIR}/resources/qt/etc/qt.conf)
 
-# Additional Include Directories
-include_directories (${include_directories} src)
+nx_configure_file(
+    maven/filter-resources/app_info_impl.cpp
+    ${CMAKE_CURRENT_BINARY_DIR})
 
-# Configure Qt
-find_package(Qt5Gui REQUIRED)
-find_package(Qt5Network REQUIRED)
-find_package(Qt5Xml REQUIRED)
-find_package(Qt5XmlPatterns REQUIRED)
-find_package(Qt5Sql REQUIRED)
-find_package(Qt5Concurrent REQUIRED)
-find_package(Qt5Multimedia REQUIRED)
-
-find_sources(src)
-ADD_MSVC_PRECOMPILED_HEADER("StdAfx.h" "${PROJECT_SOURCE_DIR}/src/StdAfx.cpp" CPP_FILES)
-process_resources()
-add_translations(translations)
-qt5_wrap_ui(UI_HEADERS ${UI_FILES})
-qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)
-
-get_external_dependencies(openssl quazip)
-
-if(${CMAKE_BUILD_TYPE} MATCHES Debug)
-   include(${CMAKE_CURRENT_BINARY_DIR}/dependencies-debug.cmake)
-else()
-   include(${CMAKE_CURRENT_BINARY_DIR}/dependencies.cmake)
+if(MACOSX)
+    set(mac_sources src/utils/mac_utils.mm)
 endif()
 
-include_directories(${OPENSSL_INCLUDE}
-                    ${QUAZIP_INCLUDE}
-)
+nx_add_target(common LIBRARY
+    ADDITIONAL_SOURCES
+        "${CMAKE_CURRENT_BINARY_DIR}/app_info_impl.cpp"
+        ${mac_sources}
+    ADDITIONAL_RESOURCES
+        "${CMAKE_CURRENT_BINARY_DIR}/resources"
+    PUBLIC_LIBS
+        Qt5::Gui Qt5::Concurrent Qt5::Network Qt5::Multimedia
+        Qt5::Xml Qt5::XmlPatterns Qt5::Sql
+        openssl ffmpeg
+        nx_utils nx_fusion)
 
-add_library(${PROJECT_SHORTNAME} ${DEFAULT_LIBRARY_TYPE}
-            ${UI_HEADERS}
-            ${CPP_FILES}
-            ${HEADER_FILES}
-            ${RESOURCE_FILES}
-)
+if(NOT ANDROID AND NOT IOS)
+    rdep_add_package(quazip)
+    target_link_libraries(common PUBLIC quazip)
+endif()
 
-target_link_libraries(${PROJECT_SHORTNAME}
-                      nx_utils
-                      nx_streaming
-                      Qt5::Core
-                      Qt5::Gui
-                      Qt5::Network
-                      Qt5::Xml
-                      Qt5::XmlPatterns
-                      Qt5::Sql
-                      Qt5::Concurrent
-                      Qt5::Multimedia
-                      ws2_32
-                      Iphlpapi
-                      Ole32
-                      sigar
-                      Secur32
-                      avcodec
-                      avdevice
-                      avfilter
-                      avformat
-                      avutil
-                      swscale
-                      postproc
-                      ${OPENSSL_LIB}
-                      ${QUAZIP_LIB}
-)
+target_include_directories(common
+    PRIVATE
+        ${Qt5Core_PRIVATE_INCLUDE_DIRS}
+        "${CMAKE_SOURCE_DIR}/common_libs/nx_streaming/src"
+    PUBLIC
+        "${CMAKE_SOURCE_DIR}/common_libs/nx_network/src")
 
-if (UNIX)
-    install(TARGETS ${PROJECT_SHORTNAME}
-            LIBRARY DESTINATION lib)
-elseif (WIN32)
-    install(TARGETS ${PROJECT_SHORTNAME}
-            DESTINATION .)
+target_compile_definitions(common
+    PUBLIC NX_NETWORK_API=${API_IMPORT_MACRO})
+
+if(MACOSX)
+    find_library(CoreGraphics_LIBRARY CoreGraphics)
+    mark_as_advanced(CoreGraphics_LIBRARY)
+    target_link_libraries(common PUBLIC ${CoreGraphics_LIBRARY})
 endif()

@@ -85,62 +85,60 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
     const nx_http::header::Authorization& authorizationHeader,
     nx_http::HttpHeaders* const responseHeaders)
 {
+    const QByteArray userName = authorizationHeader.userid().toLower();
+
+    auto cloudUsers = qnResPool->getResources<QnUserResource>().filtered(
+        [userName](const QnUserResourcePtr& user)
+        {
+            return user->isCloud() &&
+                user->isEnabled() &&
+                user->getName().toUtf8().toLower() == userName;
+        });
+    const bool isCloudUser = !cloudUsers.isEmpty();
+
     if (authorizationHeader.authScheme != nx_http::header::AuthScheme::digest)
     {
         //supporting only digest authentication for cloud-based authentication
+
+        if (isCloudUser)
+        {
+            NX_LOGX(lm("Refusing non-digest authentication of user %1")
+                .arg(authorizationHeader.userid()), cl_logDEBUG2);
+            return std::tuple<Qn::AuthResult, QnResourcePtr>(Qn::Auth_Forbidden, cloudUsers[0]);
+        }
+
+        NX_LOGX(lm("Passing non-digest authentication of user %1 to the default authenticator")
+            .arg(authorizationHeader.userid()), cl_logDEBUG2);
+
         return m_defaultAuthenticator->authorize(
             method,
             authorizationHeader,
             responseHeaders);
     }
 
-    const QByteArray userName = authorizationHeader.userid().toLower();
-    bool isCloudUser = isValidCloudUserName(userName);
-    bool isCloudNonce = m_cdbNonceFetcher.isValidCloudNonce(authorizationHeader.digest->params["nonce"]);
+    const auto nonce = authorizationHeader.digest->params["nonce"];
 
-    auto cloudUsers = qnResPool->getResources<QnUserResource>().filtered(
-        [userName](const QnUserResourcePtr& user)
-    {
-        return user->isCloud() &&
-            user->isEnabled() &&
-            user->getName().toUtf8().toLower() == userName;
-    });
+    bool isCloudNonce = m_cdbNonceFetcher.isValidCloudNonce(nonce);
 
-
-    // Server has provided to the client non-cloud nonce 
+    // Server has provided to the client non-cloud nonce
     // for cloud user due to no cloud connection so far.
-    if (isCloudUser && !isCloudNonce && m_cloudConnectionManager->boundToCloud())
+    if (isCloudUser && !isCloudNonce)
     {
         if (!cloudUsers.isEmpty())
         {
+            NX_LOGX(lm("Refusing digest authentication of user %1 due to non-cloud nonce %2")
+                .arg(authorizationHeader.userid()).arg(nonce), cl_logDEBUG2);
             return std::make_tuple<Qn::AuthResult, QnResourcePtr>(
                 Qn::Auth_CloudConnectError,
                 cloudUsers.first());
-
         }
     }
 
     if (!isCloudUser || !isCloudNonce)    //nonce must be valid cloud nonce
     {
-        if (authorizationHeader.authScheme == nx_http::header::AuthScheme::basic)
-        {
-            NX_LOGX(lm("Refusing basic authentication. username %1")
-                .arg(authorizationHeader.userid()),
-                cl_logDEBUG2);
-        }
-        else if (authorizationHeader.authScheme == nx_http::header::AuthScheme::digest)
-        {
-            NX_LOGX(lm("Refusing digest authentication. username %1, nonce %2")
-                .arg(authorizationHeader.userid())
-                .arg(authorizationHeader.digest->params["nonce"]),
-                cl_logDEBUG2);
-        }
-        else
-        {
-            NX_LOGX(lm("Unknown authentication type: %1")
-                .arg(nx_http::header::AuthScheme::toString(authorizationHeader.authScheme)),
-                cl_logDEBUG2);
-        }
+        NX_LOGX(lm("Passing digest authentication of user %1 to the default authenticator. Nonce %2")
+            .arg(authorizationHeader.userid()).arg(nonce), cl_logDEBUG2);
+
         const std::tuple<Qn::AuthResult, QnResourcePtr> authResult =
             m_defaultAuthenticator->authorize(
                 method,
@@ -148,14 +146,15 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
                 responseHeaders);
         if (std::get<0>(authResult) == Qn::Auth_OK)
         {
+            NX_LOGX(lm("User %1 has been authenticated successully by default authenticator. Nonce %2")
+                .arg(authorizationHeader.userid()).arg(nonce), cl_logDEBUG2);
+
             const auto authResource = std::get<1>(authResult).dynamicCast<QnUserResource>();
             bool isCloudUser = authResource && authResource->isCloud();
             if (!isCloudUser)
                 return authResult;
         }
     }
-
-    const auto nonce = authorizationHeader.digest->params["nonce"];
 
     NX_LOGX(lm("Cloud authentication requested. username %1, nonce %2")
         .arg(authorizationHeader.userid()).arg(nonce), cl_logDEBUG2);
@@ -164,7 +163,9 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
     nx::String nonceTrailer;
     if (!CdbNonceFetcher::parseCloudNonce(nonce, &cloudNonce, &nonceTrailer))
     {
-        NX_LOGX(lm("Bad nonce. username %1, nonce %2")
+        NX_LOGX(lm("Refusing authentication of user %1 due to invalid cloud nonce %2")
+            .arg(authorizationHeader.userid()).arg(nonce), cl_logDEBUG2);
+        NX_LOGX(lm("Passing digest authentication of user %1 to the default authenticator. Nonce %2")
             .arg(authorizationHeader.userid()).arg(nonce), cl_logDEBUG2);
         return m_defaultAuthenticator->authorize(
             method,
@@ -209,10 +210,15 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
 
         if (!cloudUsers.isEmpty())
         {
+            NX_LOGX(lm("Refusing authentication of user %1 due to cloud connect error")
+                .arg(authorizationHeader.userid()), cl_logDEBUG1);
             return std::make_tuple<Qn::AuthResult, QnResourcePtr>(
                 Qn::Auth_CloudConnectError,
                 cloudUsers.first());
         }
+
+        NX_LOGX(lm("Passing digest authentication of user %1 to the default authenticator. Nonce %2")
+            .arg(authorizationHeader.userid()).arg(nonce), cl_logDEBUG2);
 
         return m_defaultAuthenticator->authorize(
             method,
@@ -234,12 +240,6 @@ void CloudUserAuthenticator::clear()
 {
     QnMutexLocker lk(&m_mutex);
     m_authorizationCache.clear();
-}
-
-bool CloudUserAuthenticator::isValidCloudUserName(const nx_http::StringType& userName) const
-{
-    //TODO #ak check for email
-    return userName.indexOf('@') >= 0;
 }
 
 void CloudUserAuthenticator::removeExpiredRecordsFromCache(QnMutexLockerBase* const /*lk*/)
@@ -280,7 +280,7 @@ void CloudUserAuthenticator::fetchAuthorizationFromCloud(
     const nx_http::StringType& cloudNonce)
 {
     NX_LOGX(lm("Auth data for username %1, cloudNonce %2 not found in cache. Quering cloud...")
-        .arg(cloudNonce).arg(cloudNonce), cl_logDEBUG2);
+        .arg(userid).arg(cloudNonce), cl_logDEBUG2);
 
     nx::cdb::api::AuthRequest authRequest;
     authRequest.nonce = std::string(cloudNonce.constData(), cloudNonce.size());
@@ -375,7 +375,8 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorizeWithC
 
     if (!cacheItem.authorized)
     {
-        NX_LOGX(lm("Cached item not authorized"), cl_logDEBUG2);
+        NX_LOGX(lm("Refusing authentication of user %1 due to cached \"not authorized\" status")
+            .arg(authorizationHeader.userid()), cl_logDEBUG2);
         return std::make_tuple(Qn::Auth_WrongLogin, QnResourcePtr());
     }
 
@@ -384,8 +385,8 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorizeWithC
         cacheItem.data.authenticatedAccountData.accountEmail.c_str());
     if (!localUser)
     {
-        NX_LOGX(lm("Failed to translate cloud user %1 to local user")
-            .arg(authorizationHeader.userid()), cl_logWARNING);
+        NX_LOGX(lm("Refusing authentication of user %1: could not find user record in local database")
+            .arg(authorizationHeader.userid()), cl_logINFO);
         return std::make_tuple(Qn::Auth_WrongLogin, QnResourcePtr());
     }
 
@@ -407,6 +408,8 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorizeWithC
     }
     else
     {
+        NX_LOGX(lm("Refusing authentication of user %1: response digest validation failed")
+            .arg(authorizationHeader.userid()), cl_logDEBUG2);
         return std::make_tuple(Qn::Auth_WrongPassword, std::move(localUser));
     }
 }

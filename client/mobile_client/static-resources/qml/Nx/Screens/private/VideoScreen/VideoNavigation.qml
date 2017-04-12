@@ -3,6 +3,7 @@ import QtGraphicalEffects 1.0
 import QtQuick.Window 2.2
 import Qt.labs.controls 1.0
 import Nx 1.0
+import Nx.Media 1.0
 import Nx.Controls 1.0
 import com.networkoptix.qml 1.0
 
@@ -11,9 +12,10 @@ Item
     id: videoNavigation
 
     property string resourceId
-    property var mediaPlayer
+    property var videoScreenController
+    property bool paused: videoScreenController.mediaPlayer.playbackState !== MediaPlayer.Playing
 
-    property bool paused: mediaPlayer.playbackState != QnPlayer.Playing
+    property real controlsOpacity: 1.0
 
     implicitWidth: parent ? parent.width : 0
     implicitHeight: navigator.height + navigationPanel.height
@@ -23,11 +25,33 @@ Item
     {
         id: d
 
+        property bool playbackStarted: false
+        property bool controlsNeeded:
+            !cameraChunkProvider.loading || (playbackStarted
+                && videoScreenController.mediaPlayer.mediaStatus === MediaPlayer.Loaded)
+
+        property real controlsOpacity:
+            Math.min(videoNavigation.controlsOpacity, controlsOpacityInternal)
+
+        property real controlsOpacityInternal: controlsNeeded ? 1.0 : 0.0
+        Behavior on controlsOpacityInternal { NumberAnimation { duration: 200 } }
+
+        property real timelineOpacity: cameraChunkProvider.loading ? 0.0 : 1.0
+        Behavior on timelineOpacity
+        {
+            NumberAnimation { duration: d.timelineOpacity > 0 ? 0 : 200 }
+        }
+
         readonly property bool hasArchive: timeline.startBound > 0
+        readonly property bool liveMode:
+            videoScreenController
+                && videoScreenController.mediaPlayer.liveMode
+                && !playbackController.paused
+        property real resumePosition: -1
 
         function updateNavigatorPosition()
         {
-            if (Screen.primaryOrientation == Qt.PortraitOrientation)
+            if (Screen.primaryOrientation === Qt.PortraitOrientation)
             {
                 navigator.y = 0
                 navigatorMouseArea.drag.target = undefined
@@ -45,7 +69,22 @@ Item
     QnCameraChunkProvider
     {
         id: cameraChunkProvider
-        resourceId: mediaPlayer.resourceId
+        resourceId: videoScreenController.resourceId
+
+        onLoadingChanged:
+        {
+            if (loading)
+                return
+
+            var liveMs = (new Date()).getTime()
+            var lastChunkEndMs = closestChunkEndMs(liveMs, false)
+
+            if (lastChunkEndMs <= 0)
+                lastChunkEndMs = liveMs
+
+            timeline.windowSize =
+                Math.max((liveMs - lastChunkEndMs) / 0.4, timeline.defaultWindowSize)
+        }
     }
 
     Timer
@@ -121,6 +160,16 @@ Item
 
         Image
         {
+            width: parent.width
+            anchors.bottom: timeline.bottom
+            height: timeline.chunkBarHeight
+            source: lp("/images/timeline_chunkbar_preloader.png")
+            sourceSize: Qt.size(timeline.chunkBarHeight, timeline.chunkBarHeight)
+            fillMode: Image.Tile
+        }
+
+        Image
+        {
             width: timeline.width
             height: sourceSize.height
             anchors.bottom: timeline.bottom
@@ -135,13 +184,13 @@ Item
 
             property bool resumeWhenDragFinished: false
 
-            enabled: startBound > 0
+            enabled: d.hasArchive
 
             anchors.bottom: parent.bottom
             width: parent.width
             height: 104
 
-            stickToEnd: mediaPlayer.liveMode && !paused
+            stickToEnd: d.liveMode && !paused
 
             chunkBarHeight: 32
             textY: height - chunkBarHeight - 16 - 24
@@ -153,18 +202,25 @@ Item
             {
                 if (!moving)
                 {
-                    mediaPlayer.position = position
+                    videoScreenController.setPosition(position, true)
                     if (resumeWhenDragFinished)
-                        mediaPlayer.play()
+                        videoScreenController.play()
+                    else
+                        videoScreenController.pause()
+                    timeline.autoReturnToBounds = true
                 }
             }
-            onPositionTapped: mediaPlayer.position = position
+            onPositionTapped:
+            {
+                d.resumePosition = -1
+                videoScreenController.setPosition(position, true)
+            }
             onPositionChanged:
             {
                 if (!dragging)
                     return
 
-                mediaPlayer.position = position
+                videoScreenController.setPosition(position)
             }
 
             onDraggingChanged:
@@ -172,16 +228,25 @@ Item
                 if (dragging)
                 {
                     resumeWhenDragFinished = !videoNavigation.paused
-                    mediaPlayer.pause()
+                    videoScreenController.preview()
+                    d.resumePosition = -1
                 }
             }
 
-            Binding
+            Connections
             {
-                target: timeline
-                property: "position"
-                value: mediaPlayer.position
-                when: !timeline.moving && !mediaPlayer.liveMode
+                target: videoScreenController.mediaPlayer
+                onPositionChanged:
+                {
+                    if (videoScreenController.mediaPlayer.mediaStatus !== MediaPlayer.Loaded)
+                        return
+
+                    if (!timeline.moving && !d.liveMode)
+                    {
+                        timeline.autoReturnToBounds = false
+                        timeline.position = videoScreenController.mediaPlayer.position
+                    }
+                }
             }
         }
 
@@ -196,8 +261,8 @@ Item
             {
                 id: blurRectangle
 
-                readonly property real blurWidth: 36
-                readonly property real margin: 18
+                readonly property real blurWidth: 16
+                readonly property real margin: 8
 
                 width: timeline.height - timeline.chunkBarHeight
                 height: timeline.width
@@ -227,9 +292,12 @@ Item
 
         OpacityMask
         {
+            id: timelineOpactiyMask
+
             anchors.fill: timeline
             source: timeline.timelineView
             maskSource: timelineMask
+            opacity: Math.min(d.controlsOpacity, d.timelineOpacity)
 
             Component.onCompleted: timeline.timelineView.visible = false
         }
@@ -243,8 +311,8 @@ Item
             anchors.bottom: timeline.bottom
             anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2
             color: ColorTheme.windowText
-            visible: timeline.startBound <= 0
-            opacity: 0.5
+            visible: !d.hasArchive
+            opacity: 0.5 * timelineOpactiyMask.opacity
         }
 
         Pane
@@ -264,9 +332,9 @@ Item
                 enabled: d.hasArchive
                 onClicked:
                 {
-                    calendarPanelLoader.active = true
-                    calendarPanelLoader.item.date = timeline.positionDate
-                    calendarPanelLoader.item.open()
+                    calendarPanel.chunkProvider = cameraChunkProvider
+                    calendarPanel.date = timeline.positionDate
+                    calendarPanel.open()
                 }
             }
 
@@ -302,9 +370,9 @@ Item
                 onClicked:
                 {
                     playbackController.checked = false
-                    mediaPlayer.playLive()
+                    videoScreenController.playLive()
                 }
-                opacity: mediaPlayer.liveMode ? 0.0 : 1.0
+                opacity: d.liveMode ? 0.0 : 1.0
                 Behavior on opacity { NumberAnimation { duration: 200 } }
             }
 
@@ -332,6 +400,7 @@ Item
             width: parent.width
             anchors.bottom: timeline.bottom
             anchors.bottomMargin: timeline.chunkBarHeight + 16
+            opacity: d.controlsOpacity
 
             Text
             {
@@ -348,7 +417,7 @@ Item
                 text: timeline.positionDate.toLocaleDateString(d.locale, qsTr("d MMMM yyyy", "DO NOT TRANSLATE THIS STRING!"))
                 color: ColorTheme.windowText
 
-                opacity: mediaPlayer.liveMode ? 0.0 : 1.0
+                opacity: d.liveMode ? 0.0 : 1.0
                 Behavior on opacity { NumberAnimation { duration: 200 } }
             }
 
@@ -358,7 +427,7 @@ Item
 
                 anchors.horizontalCenter: parent.horizontalCenter
 
-                y: mediaPlayer.liveMode ? (parent.height - height) / 2 : parent.height - height
+                y: d.liveMode ? (parent.height - height) / 2 : parent.height - height
                 Behavior on y { NumberAnimation { duration: 200 } }
 
                 width: timeLabel.visible ? timeLabel.width : liveLabel.width
@@ -368,7 +437,7 @@ Item
                 {
                     id: timeLabel
                     dateTime: timeline.positionDate
-                    visible: !mediaPlayer.liveMode
+                    visible: !d.liveMode
                 }
 
                 Text
@@ -379,7 +448,7 @@ Item
                     font.weight: Font.Normal
                     color: ColorTheme.windowText
                     text: qsTr("LIVE")
-                    visible: mediaPlayer.liveMode
+                    visible: d.liveMode
                 }
             }
         }
@@ -392,14 +461,28 @@ Item
             anchors.verticalCenterOffset: -150
             anchors.horizontalCenter: parent.horizontalCenter
 
-            loading: !paused && (mediaPlayer.loading || timeline.dragging)
+            loading: !paused && (videoScreenController.mediaPlayer.loading || timeline.dragging)
             paused: videoNavigation.paused
+
+            opacity: d.controlsOpacity
+
             onClicked:
             {
                 if (paused)
-                    mediaPlayer.play()
+                {
+                    if (d.resumePosition > 0)
+                    {
+                        videoScreenController.setPosition(d.resumePosition)
+                        d.resumePosition = -1
+                    }
+                    videoScreenController.play()
+                }
                 else
-                    mediaPlayer.pause()
+                {
+                    if (d.liveMode)
+                        d.resumePosition = videoScreenController.mediaPlayer.position
+                    videoScreenController.pause()
+                }
             }
         }
 
@@ -410,7 +493,8 @@ Item
             anchors.bottom: playbackController.bottom
             width: 2
             height: 8
-            visible: timeline.startBound > 0
+            visible: d.hasArchive
+            opacity: timelineOpactiyMask.opacity
         }
 
         Rectangle
@@ -420,7 +504,8 @@ Item
             anchors.bottom: parent.bottom
             width: 2
             height: timeline.chunkBarHeight + 8
-            visible: timeline.startBound > 0
+            visible: d.hasArchive
+            opacity: timelineOpactiyMask.opacity
         }
     }
 
@@ -433,28 +518,36 @@ Item
         height: navigationPanel.height
     }
 
-    Component
+    CalendarPanel
     {
-        id: calendarPanelComponent
+        id: calendarPanel
 
-        CalendarPanel
+        onDatePicked:
         {
-            chunkProvider: cameraChunkProvider
-            onDatePicked:
-            {
-                close()
-                mediaPlayer.position = date.getTime()
-            }
+            close()
+            d.resumePosition = -1
+            timeline.jumpTo(date.getTime())
+            videoScreenController.setPosition(date.getTime(), true)
         }
     }
 
-    Loader
+    Connections
     {
-        id: calendarPanelLoader
-        sourceComponent: calendarPanelComponent
-        active: false
-        y: parent.height - height
+        target: videoScreenController
+        onPlayerJump:
+        {
+            timeline.autoReturnToBounds = false
+            timeline.jumpTo(position)
+        }
+        onGotFirstPosition:
+        {
+            timeline.autoReturnToBounds = false
+            timeline.jumpTo(position)
+            d.playbackStarted = true
+        }
     }
+
+    onResourceIdChanged: d.playbackStarted = false
 
     Component.onCompleted: d.updateNavigatorPosition()
 }

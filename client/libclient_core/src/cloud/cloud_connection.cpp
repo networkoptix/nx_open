@@ -16,12 +16,7 @@ QnCloudConnectionProvider::QnCloudConnectionProvider(QObject* parent):
     if (!url.isValid())
         return;
 
-    auto cloudHost = url.host().toStdString();
-    auto cloudPort = url.port();
-    if (!cloudHost.empty() || cloudPort <= 0)
-        return;
-
-    connectionFactory->setCloudEndpoint(cloudHost, cloudPort);
+    connectionFactory->setCloudUrl(url.toString().toStdString());
 }
 
 QnCloudConnectionProvider::~QnCloudConnectionProvider()

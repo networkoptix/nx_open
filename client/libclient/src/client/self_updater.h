@@ -59,11 +59,10 @@ private:
 
     bool isMinilaucherUpdated(const QDir& installRoot) const;
 
-    bool updateMinilauncherInDir(const QDir& installRoot);
+    bool updateMinilauncherInDir(const QDir& installRoot, const QString& sourceMinilauncherPath);
     bool updateApplauncherDesktopIcon();
 
-    /** Get all paths where client might be installed. */
-    QStringList getClientInstallRoots() const;
+
 private:
     nx::utils::SoftwareVersion m_clientVersion;
 };

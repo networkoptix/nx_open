@@ -48,6 +48,13 @@
 #include "timeline_placeholder.h"
 #include "clock_label.h"
 
+namespace {
+
+/* Speed and volume slider tooltip autohide delay: */
+static constexpr int kToolTipHideDelayMs = 100;
+
+} // namespace
+
 QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent->toGraphicsObject()),
@@ -120,12 +127,14 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_speedSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
     m_speedSlider->installEventFilter(this);
     m_speedSlider->setPreferredHeight(28.0);
+    m_speedSlider->setToolTipHideDelayMs(kToolTipHideDelayMs);
     context()->statisticsModule()->registerSlider(lit("speed_slider"), m_speedSlider);
 
     m_volumeSlider = new QnVolumeSlider(this);
     m_volumeSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
     m_volumeSlider->toolTipItem()->setParentItem(parent);
     m_volumeSlider->setPreferredHeight(28.0);
+    m_volumeSlider->setToolTipHideDelayMs(kToolTipHideDelayMs);
 
     m_timeSlider = new QnTimeSlider(this, parent);
     m_timeSlider->setOption(QnTimeSlider::UnzoomOnDoubleClick, false);
@@ -153,6 +162,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
             timelinePlaceholder->setVisible(!isRelevant);
             m_separators->setFrameColor(palette().color(isRelevant ? QPalette::Shadow : QPalette::Midlight));
             m_separators->setFrameWidth(isRelevant ? 2.0 : 1.0);
+            updatePlaybackButtonsEnabled();
             if (reset)
                 m_timeSlider->invalidateWindow();
         });
@@ -268,7 +278,6 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,       this,   &QnNavigationItem::updateSyncButtonState);
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,       this,   &QnNavigationItem::updateJumpButtonsTooltips);
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,       this,   &QnNavigationItem::updateBookButtonEnabled);
-    connect(navigator(), &QnWorkbenchNavigator::speedRangeChanged,          this,   &QnNavigationItem::updateSpeedSliderParametersFromNavigator);
     connect(navigator(), &QnWorkbenchNavigator::liveChanged,                this,   &QnNavigationItem::updateLiveButtonState);
     connect(navigator(), &QnWorkbenchNavigator::liveChanged,                this,   &QnNavigationItem::updatePlaybackButtonsEnabled);
     connect(navigator(), &QnWorkbenchNavigator::liveSupportedChanged,       this,   &QnNavigationItem::updateLiveButtonState);
@@ -371,7 +380,6 @@ void QnNavigationItem::updateSpeedSliderSpeedFromNavigator()
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updatingSpeedSliderFromNavigator, true);
     m_speedSlider->setSpeed(navigator()->speed());
-    updatePlaybackButtonsPressed();
     updatePlayButtonChecked();
 }
 
@@ -382,28 +390,6 @@ void QnNavigationItem::updateNavigatorSpeedFromSpeedSlider()
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updatingNavigatorFromSpeedSlider, true);
     navigator()->setSpeed(m_speedSlider->roundedSpeed());
-    updatePlaybackButtonsPressed();
-}
-
-void QnNavigationItem::updatePlaybackButtonsPressed()
-{
-    qreal speed = navigator()->speed();
-
-    if (qFuzzyCompare(speed, 1.0) || qFuzzyIsNull(speed) || (speed > 0.0 && speed < 1.0))
-    {
-        m_stepForwardButton->setPressed(false);
-        m_stepBackwardButton->setPressed(false);
-    }
-    else if (speed > 1.0)
-    {
-        m_stepForwardButton->setPressed(true);
-        m_stepBackwardButton->setPressed(false);
-    }
-    else if (speed < 0.0)
-    {
-        m_stepForwardButton->setPressed(false);
-        m_stepBackwardButton->setPressed(true);
-    }
 }
 
 void QnNavigationItem::updatePlaybackButtonsIcons()
@@ -509,7 +495,7 @@ void QnNavigationItem::updatePlaybackButtonsEnabled()
      * client will be in strange state: speed slider allows only 0x and 1x, but current speed is -16x.
      * So we making the slider enabled for I/O module to do not make the situation even stranger.
      */
-    m_speedSlider->setEnabled(playable);
+    m_speedSlider->setEnabled(playable && m_timeSlider->isVisible());
 }
 
 void QnNavigationItem::updateVolumeButtonsEnabled()

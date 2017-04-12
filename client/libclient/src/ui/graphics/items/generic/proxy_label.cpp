@@ -31,8 +31,8 @@ void QnProxyLabel::init() {
         setWidget(m_label.data());
     }
 
-    connect(m_label, SIGNAL(linkActivated(const QString &)), this, SIGNAL(linkActivated(const QString &)));
-    connect(m_label, SIGNAL(linkHovered(const QString &)), this, SIGNAL(linkHovered(const QString &)));
+    connect(m_label, &QLabel::linkActivated, this, &QnProxyLabel::linkActivated);
+    connect(m_label, &QLabel::linkHovered, this, &QnProxyLabel::linkHovered);
 }
 
 QnProxyLabel::~QnProxyLabel()

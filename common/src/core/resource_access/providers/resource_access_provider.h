@@ -28,6 +28,12 @@ public:
         QnResourceList* providers = nullptr) const override;
 
     /**
+     * Get all access ways to the given resource.
+     */
+    QSet<Source> accessLevels(const QnResourceAccessSubject& subject,
+        const QnResourcePtr& resource) const;
+
+    /**
      * Add new base provider to the end of the list.
      * NOTICE: this class will take ownership!
      */

@@ -52,9 +52,6 @@ void OutgoingTunnel::stopWhileInAioThread()
     m_connector.reset();
     m_connection.reset();
     m_timer.reset();
-
-    for (auto& connectRequest: m_connectHandlers)
-        connectRequest.second.handler(SystemError::interrupted, nullptr);
     m_connectHandlers.clear();
 }
 

@@ -68,7 +68,7 @@ protected:
 private:
     std::unique_ptr<nx::db::DbConnectionHolder> m_dbConnection;
     std::unique_ptr<rdb::InstanceController> m_dbInstance;
-    rdb::RdbDataObject m_dao;
+    rdb::DataObject m_dao;
     std::deque<stats::ConnectSession> m_records;
 
     void init()

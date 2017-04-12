@@ -6,7 +6,9 @@
 
 namespace ec2 {
 
-void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiSystemIdData> &transaction)
+void QnMiscNotificationManager::triggerNotification(
+    const QnTransaction<ApiSystemIdData> &transaction, 
+    NotificationSource /*source*/)
 {
     emit systemIdChangeRequested(transaction.params.systemId,
                                    transaction.params.sysIdTime,
@@ -77,7 +79,7 @@ int QnMiscManager<QueryProcessorType>::markLicenseOverflow(
     using namespace std::placeholders;
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
         ApiCommand::markLicenseOverflow, params,
-        [handler, reqId, &params](ErrorCode errorCode)
+        [handler, reqId, params](ErrorCode errorCode)
         {
             handler->done(reqId, errorCode);
             if (errorCode == ErrorCode::ok)

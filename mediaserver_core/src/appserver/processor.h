@@ -26,7 +26,8 @@ public:
     virtual void processResources(const QnResourceList &resources) override;
 
     static ec2::ErrorCode addAndPropagateCamResource(
-        const ec2::ApiCameraData& apiCameraData
+        const ec2::ApiCameraData& apiCameraData,
+        const ec2::ApiResourceParamDataList& properties
     );
 
 private:

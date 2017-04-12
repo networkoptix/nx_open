@@ -1,12 +1,15 @@
 #pragma once
 
+#include <memory>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/argument_parser.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/flag_config.h>
 
-#include "aio/aioservice.h"
+#include "aio/aio_service.h"
+#include "aio/pollset_factory.h"
 
 #include "cloud/address_resolver.h"
 #include "cloud/cloud_connect_settings.h"
@@ -14,8 +17,7 @@
 #include "cloud/mediator_connector.h"
 #include "cloud/tunnel/outgoing_tunnel_pool.h"
 #include "cloud/tunnel/tcp/reverse_connection_pool.h"
-
-#define NX_NETWORK_SOCKET_GLOBALS
+#include "socket_common.h"
 
 namespace nx {
 namespace network {
@@ -23,13 +25,20 @@ namespace network {
 class NX_NETWORK_API SocketGlobals
 {
 public:
-    struct NX_NETWORK_API DebugConfiguration: nx::utils::FlagConfig
+    struct NX_NETWORK_API DebugConfig: nx::utils::FlagConfig
     {
-        DebugConfiguration(): nx::utils::FlagConfig("nx_network_debug") { reload(); }
+        DebugConfig(): nx::utils::FlagConfig("nx_network_debug") { reload(); }
 
         NX_FLAG(0, multipleServerSocket, "Extra debug info from MultipleServerSocket");
         NX_FLAG(0, cloudServerSocket, "Extra debug info from cloud::CloudServerSocket");
         NX_FLAG(0, addressResolver, "Extra debug info from cloud::AddressResolver");
+        NX_FLAG(0, sslSocketWrappers, "Extra debug info from SslSocket* classes");
+        NX_FLAG(0, httpClientTraffic, "Trace HTTP traffic for nx_http::AsyncHttpClient");
+
+        // TODO: Should be moved to a different flag config, because module finders live in common.
+        // This flag resides here just because there are no other flag configs for logging.
+        NX_FLAG(0, moduleFinders, "Extra debug info for Qn*ModuleFinder classes");
+        NX_INT_PARAM(0, multicastModuleFinderTimeout, "Use timeout instead of poll in QnMMF");
     };
 
     struct NX_NETWORK_API Config: nx::utils::FlagConfig
@@ -49,16 +58,17 @@ public:
     typedef cloud::tcp::ReverseConnectionPool TcpReversePool;
 
     static Config& config() { return s_instance->m_config; }
-    static DebugConfiguration& debugConfiguration() { return s_instance->m_debugConfiguration; }
-    static aio::AIOService& aioService() { return s_instance->m_aioService; }
+    static DebugConfig& debugConfig() { return s_instance->m_debugConfig; }
+    static aio::AIOService& aioService() { return s_instance->m_aioServiceGuard.aioService(); }
     static cloud::AddressResolver& addressResolver() { return *s_instance->m_addressResolver; }
     static AddressPublisher& addressPublisher() { return *s_instance->m_addressPublisher; }
     static MediatorConnector& mediatorConnector() { return *s_instance->m_mediatorConnector; }
     static OutgoingTunnelPool& outgoingTunnelPool() { return *s_instance->m_outgoingTunnelPool; }
     static CloudSettings& cloudConnectSettings() { return s_instance->m_cloudConnectSettings; }
     static TcpReversePool& tcpReversePool() { return *s_instance->m_tcpReversePool; }
+    static int initializationFlags() { return s_instance->m_initializationFlags; }
 
-    static void init(); /**< Should be called before any socket use */
+    static void init(int initializationFlags = 0); /**< Should be called before any socket use */
     static void deinit(); /**< Should be called when sockets are not needed any more */
     static void verifyInitialization();
     static bool isInitialized();
@@ -74,7 +84,7 @@ public:
     class InitGuard
     {
     public:
-        InitGuard() { init(); }
+        InitGuard(int initializationFlags = 0) { init(initializationFlags); }
         ~InitGuard() { deinit(); }
 
         InitGuard( const InitGuard& ) = delete;
@@ -84,9 +94,12 @@ public:
     };
 
 private:
-    SocketGlobals();
+    /**
+     * @param initializationFlags Bitset of nx::network::InitializationFlags.
+     */
+    SocketGlobals(int initializationFlags);
     ~SocketGlobals();
-    void setDebugConfigurationTimer();
+    void setDebugConfigTimer();
 
     enum class InitState { none, inintializing, done, deinitializing };
 
@@ -96,20 +109,36 @@ private:
     static SocketGlobals* s_instance;
 
 private:
+    class AioServiceGuard
+    {
+    public:
+        AioServiceGuard();
+        ~AioServiceGuard();
+
+        void initialize();
+
+        aio::AIOService& aioService();
+
+    private:
+        std::unique_ptr<aio::AIOService> m_aioService;
+    };
+
     // TODO: Initialization and deinitialization of this class is brocken by design (because of
     //     wrong dependencies). Should be fixed to separate singltones with strict dependencies:
     // 1. CommonSocketGlobals (AIO Service, DNS Resolver) - required for all system sockets.
     // 2. CloudSocketGlobals (cloud singletones) - required for cloud sockets.
 
+    const int m_initializationFlags;
     Config m_config;
-    DebugConfiguration m_debugConfiguration;
+    DebugConfig m_debugConfig;
     std::shared_ptr<QnLog::Logs> m_log;
 
     // Is unique_ptr because it should be initiated after m_aioService but removed after.
     std::unique_ptr<cloud::AddressResolver> m_addressResolver;
 
-    aio::AIOService m_aioService;
-    std::unique_ptr<aio::Timer> m_debugConfigurationTimer;
+    aio::PollSetFactory m_pollSetFactory;
+    AioServiceGuard m_aioServiceGuard;
+    std::unique_ptr<aio::Timer> m_debugConfigTimer;
 
     // Is unique_ptr becaule it should be initiated before cloud classes but removed before.
     std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
@@ -125,26 +154,27 @@ private:
     void initializeCloudConnectivity();
 };
 
-class SocketGlobalsHolder
-:
+class SocketGlobalsHolder:
     public Singleton<SocketGlobalsHolder>
 {
 public:
-    SocketGlobalsHolder():
-        m_socketGlobalsGuard(std::make_unique<SocketGlobals::InitGuard>())
+    SocketGlobalsHolder(int initializationFlags = 0):
+        m_initializationFlags(initializationFlags),
+        m_socketGlobalsGuard(std::make_unique<SocketGlobals::InitGuard>(initializationFlags))
     {
     }
 
     void reinitialize(bool initializePeerId = true)
     {
         m_socketGlobalsGuard.reset();
-        m_socketGlobalsGuard = std::make_unique<SocketGlobals::InitGuard>();
+        m_socketGlobalsGuard = std::make_unique<SocketGlobals::InitGuard>(m_initializationFlags);
 
         if (initializePeerId)
             SocketGlobals::outgoingTunnelPool().assignOwnPeerId("re", QnUuid::createUuid());
     }
 
 private:
+    const int m_initializationFlags;
     std::unique_ptr<SocketGlobals::InitGuard> m_socketGlobalsGuard;
 };
 

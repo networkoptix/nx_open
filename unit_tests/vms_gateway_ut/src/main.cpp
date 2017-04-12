@@ -1,15 +1,13 @@
 #include <gtest/gtest.h>
 #include <QCoreApplication>
 
-#include <nx/network/socket_global.h>
 #include <nx/network/ssl_socket.h>
-#include <nx/utils/test_support/run_test.h>
-
+#include <nx/network/test_support/run_test.h>
 #include <test_support/vms_gateway_functional_test.h>
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-    return nx::utils::runTest(
+    return nx::network::test::runTest(
         argc, argv,
         [](const nx::utils::ArgumentParser& args)
         {
@@ -19,5 +17,7 @@ int main(int argc, char **argv)
                 nx::cloud::gateway::VmsGatewayFunctionalTest::
                     setTemporaryDirectoryPath(*value);
             }
+
+            return nx::utils::test::DeinitFunctions();
         });
 }

@@ -7,8 +7,8 @@
 #include <nx/network/dns_resolver.h>
 #include <utils/common/guard.h>
 
-#include "cdb_endpoint_fetcher.h"
-#include "mediator_connections.h"
+#include "cloud_module_url_fetcher.h"
+#include "mediator_client_connections.h"
 
 
 //!Types used in resolving peer names

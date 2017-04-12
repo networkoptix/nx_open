@@ -5,20 +5,19 @@
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/auth_tools.h>
-#include <nx/network/socket_global.h>
 
 #include "functional_tests/test_setup.h"
 
 #define USE_GMOCK
-#include <nx/utils/test_support/run_test.h>
+#include <nx/network/test_support/run_test.h>
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     // QCoreApplication::applicationdirPath() is used throughout code (common, appserver2, etc...)
     QCoreApplication application(argc, argv);
 
     Q_INIT_RESOURCE(cloud_db_ut);
-    const auto resultCode = nx::utils::runTest(
+    const auto resultCode = nx::network::test::runTest(
         argc, argv,
         [](const nx::utils::ArgumentParser& args)
         {
@@ -40,6 +39,10 @@ int main(int argc, char **argv)
 
             nx::cdb::CdbFunctionalTest::setDbConnectionOptions(
                 std::move(connectionOptions));
-        });
+
+            return nx::utils::test::DeinitFunctions();
+        },
+        nx::network::InitializationFlags::disableUdt);
+
     return resultCode;
 }

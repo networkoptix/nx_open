@@ -38,7 +38,7 @@ void ProxyHandler::processRequest(
         return;
     }
 
-    if (requestOptions.sslMode == conf::SslMode::undefined
+    if (requestOptions.sslMode == conf::SslMode::followIncomingConnection
         && m_settings.http().sslSupport
         && m_runTimeOptions.isSslEnforced(requestOptions.target))
     {
@@ -123,10 +123,10 @@ ProxyHandler::TargetWithOptions ProxyHandler::cutTargetFromRequest(
             requestOptions.target.port = m_settings.http().proxyTargetPort;
     }
 
-    if (requestOptions.sslMode == conf::SslMode::undefined)
+    if (requestOptions.sslMode == conf::SslMode::followIncomingConnection)
         requestOptions.sslMode = m_settings.cloudConnect().preferedSslMode;
 
-    if (requestOptions.sslMode == conf::SslMode::undefined && connection.isSsl())
+    if (requestOptions.sslMode == conf::SslMode::followIncomingConnection && connection.isSsl())
         requestOptions.sslMode = conf::SslMode::enabled;
 
     if (requestOptions.sslMode == conf::SslMode::enabled && !m_settings.http().sslSupport)

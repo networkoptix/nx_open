@@ -130,7 +130,7 @@ struct InvalidGetHashHelper
     template<typename Param>
     QnUuid operator ()(const Param &)
     {
-        NX_ASSERT(0, Q_FUNC_INFO, "Invalid transaction for hash!");
+        // NX_ASSERT(0, Q_FUNC_INFO, "Invalid transaction for hash!");
         return QnUuid();
     }
 };
@@ -241,30 +241,30 @@ void apiIdDataTriggerNotificationHelper(const QnTransaction<ApiIdData> &tran, co
     switch (tran.command)
     {
         case ApiCommand::removeServerUserAttributes:
-            return notificationParams.mediaServerNotificationManager->triggerNotification(tran);
+            return notificationParams.mediaServerNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::removeResource:
-            return notificationParams.resourceNotificationManager->triggerNotification(tran);
+        case ApiCommand::removeResourceStatus:
+            return notificationParams.resourceNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::removeCamera:
-            return notificationParams.cameraNotificationManager->triggerNotification(tran);
+            return notificationParams.cameraNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::removeMediaServer:
         case ApiCommand::removeStorage:
-            return notificationParams.mediaServerNotificationManager->triggerNotification(tran);
+            return notificationParams.mediaServerNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::removeUser:
         case ApiCommand::removeUserRole:
-            return notificationParams.userNotificationManager->triggerNotification(tran);
+            return notificationParams.userNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::removeEventRule:
-            return notificationParams.businessEventNotificationManager->triggerNotification(tran);
+            return notificationParams.businessEventNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::removeLayout:
-            return notificationParams.layoutNotificationManager->triggerNotification(tran);
+            return notificationParams.layoutNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::removeVideowall:
-            return notificationParams.videowallNotificationManager->triggerNotification(tran);
+            return notificationParams.videowallNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::removeWebPage:
-            return notificationParams.webPageNotificationManager->triggerNotification(tran);
+            return notificationParams.webPageNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::removeCameraUserAttributes:
-            return notificationParams.cameraNotificationManager->triggerNotification(tran);
+            return notificationParams.cameraNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::forcePrimaryTimeServer:
         case ApiCommand::removeAccessRights:
-        case ApiCommand::removeResourceStatus:
             //#ak no notification needed
             break;
         default:
@@ -312,7 +312,7 @@ struct CameraNotificationManagerHelper
     template<typename Param>
     void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
     {
-        notificationParams.cameraNotificationManager->triggerNotification(tran);
+        notificationParams.cameraNotificationManager->triggerNotification(tran, notificationParams.source);
     }
 };
 
@@ -321,7 +321,7 @@ struct ResourceNotificationManagerHelper
     template<typename Param>
     void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
     {
-        notificationParams.resourceNotificationManager->triggerNotification(tran);
+        notificationParams.resourceNotificationManager->triggerNotification(tran, notificationParams.source);
     }
 };
 
@@ -330,7 +330,7 @@ struct MediaServerNotificationManagerHelper
     template<typename Param>
     void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
     {
-        notificationParams.mediaServerNotificationManager->triggerNotification(tran);
+        notificationParams.mediaServerNotificationManager->triggerNotification(tran, notificationParams.source);
     }
 };
 
@@ -339,7 +339,7 @@ struct UserNotificationManagerHelper
     template<typename Param>
     void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
     {
-        notificationParams.userNotificationManager->triggerNotification(tran);
+        notificationParams.userNotificationManager->triggerNotification(tran, notificationParams.source);
     }
 };
 
@@ -348,7 +348,7 @@ struct LayoutNotificationManagerHelper
     template<typename Param>
     void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
     {
-        notificationParams.layoutNotificationManager->triggerNotification(tran);
+        notificationParams.layoutNotificationManager->triggerNotification(tran, notificationParams.source);
     }
 };
 
@@ -357,7 +357,7 @@ struct VideowallNotificationManagerHelper
     template<typename Param>
     void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
     {
-        notificationParams.videowallNotificationManager->triggerNotification(tran);
+        notificationParams.videowallNotificationManager->triggerNotification(tran, notificationParams.source);
     }
 };
 
@@ -366,7 +366,7 @@ struct BusinessEventNotificationManagerHelper
     template<typename Param>
     void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
     {
-        notificationParams.businessEventNotificationManager->triggerNotification(tran);
+        notificationParams.businessEventNotificationManager->triggerNotification(tran, notificationParams.source);
     }
 };
 
@@ -375,7 +375,7 @@ struct StoredFileNotificationManagerHelper
     template<typename Param>
     void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
     {
-        notificationParams.storedFileNotificationManager->triggerNotification(tran);
+        notificationParams.storedFileNotificationManager->triggerNotification(tran, notificationParams.source);
     }
 };
 
@@ -384,7 +384,7 @@ struct LicenseNotificationManagerHelper
     template<typename Param>
     void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
     {
-        notificationParams.licenseNotificationManager->triggerNotification(tran);
+        notificationParams.licenseNotificationManager->triggerNotification(tran, notificationParams.source);
     }
 };
 
@@ -393,7 +393,7 @@ struct UpdateNotificationManagerHelper
     template<typename Param>
     void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
     {
-        notificationParams.updatesNotificationManager->triggerNotification(tran);
+        notificationParams.updatesNotificationManager->triggerNotification(tran, notificationParams.source);
     }
 };
 
@@ -402,7 +402,7 @@ struct DiscoveryNotificationManagerHelper
     template<typename Param>
     void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
     {
-        notificationParams.discoveryNotificationManager->triggerNotification(tran);
+        notificationParams.discoveryNotificationManager->triggerNotification(tran, notificationParams.source);
     }
 };
 
@@ -411,7 +411,7 @@ struct WebPageNotificationManagerHelper
     template<typename Param>
     void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
     {
-        notificationParams.webPageNotificationManager->triggerNotification(tran);
+        notificationParams.webPageNotificationManager->triggerNotification(tran, notificationParams.source);
     }
 };
 
@@ -426,9 +426,9 @@ void apiIdDataListTriggerNotificationHelper(const QnTransaction<ApiIdDataList> &
     switch (tran.command)
     {
         case ApiCommand::removeStorages:
-            return notificationParams.mediaServerNotificationManager->triggerNotification(tran);
+            return notificationParams.mediaServerNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::removeResources:
-            return notificationParams.resourceNotificationManager->triggerNotification(tran);
+            return notificationParams.resourceNotificationManager->triggerNotification(tran, notificationParams.source);
         default:
             NX_ASSERT(false);
     }
@@ -558,6 +558,25 @@ struct ModifyResourceAccess
 
     bool isRemove;
 };
+
+struct ModifyCameraDataAccess
+{
+    bool operator()(const Qn::UserAccessData& accessData, const ApiCameraData& param)
+    {
+        if (!hasSystemAccess(accessData))
+        {
+            if (!param.physicalId.isEmpty() && !param.id.isNull())
+            {
+                auto expectedId = ApiCameraData::physicalIdToId(param.physicalId);
+                if (expectedId != param.id)
+                    return false;
+            }
+        }
+
+        return ModifyResourceAccess(/*isRemove*/ false)(accessData, param);
+    }
+};
+
 
 template<typename Param>
 void applyColumnFilter(const Qn::UserAccessData& /*accessData*/, Param& /*data*/) {}
@@ -881,7 +900,7 @@ struct RemoveUserRoleAccess
     }
 };
 
-struct ControlVideowallAccess
+struct VideoWallControlAccess
 {
     bool operator()(const Qn::UserAccessData& accessData, const ApiVideowallControlMessageData&)
     {

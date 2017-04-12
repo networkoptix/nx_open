@@ -21,3 +21,4 @@ DeleteOldMediaserverSettings
 GenerateSystemName
 DetectIfSystemIsStandalone
 SetPreviousServerInstalled
+CleanAutorunRegistryKeys

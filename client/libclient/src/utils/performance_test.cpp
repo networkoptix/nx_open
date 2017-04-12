@@ -5,13 +5,13 @@
 #include <QtCore/QCoreApplication>
 #include <QtOpenGL/QGLWidget>
 
-#include <utils/common/app_info.h>
 #include <utils/common/performance.h>
 #include <nx/utils/log/log.h>
 
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
+#include <client/client_app_info.h>
 
 #ifdef Q_OS_LINUX
 #include <X11/X.h>
@@ -54,15 +54,19 @@ void QnPerformanceTest::detectLightMode() {
     }
 #endif
 
-    if (poorCpu && poorGpu) {
+    if (poorCpu && poorGpu)
+    {
         qnSettings->setLightMode(Qn::LightModeFull);
-        QString message = QCoreApplication::translate("QnPerformanceTest",
-                                                      "Performance of this computer allows running %1 in configuration mode only.")
-                          .arg(QnAppInfo::productNameLong());
-        message += lit(" ");
-        message += QCoreApplication::translate("QnPerformanceTest", "For full-featured mode please use another computer.");
-        QnMessageBox::warning(NULL, 0,
-                              QCoreApplication::translate("QnPerformanceTest", "Warning!"), message,
-                              QDialogButtonBox::StandardButtons(QDialogButtonBox::Ok), QDialogButtonBox::Ok);
+
+        const auto text = QCoreApplication::translate("QnPerformanceTest",
+            "%1 can work in configuration mode only").arg(QnClientAppInfo::applicationDisplayName());
+
+        QString extras = QCoreApplication::translate("QnPerformanceTest",
+            "Performance of this computer allows running %1"
+            " in configuration mode only.").arg(QnClientAppInfo::applicationDisplayName());
+        extras += L'\n' + QCoreApplication::translate("QnPerformanceTest",
+            "For full - featured mode, please use another computer");
+
+        QnMessageBox::warning(nullptr, text, extras);
     }
 }

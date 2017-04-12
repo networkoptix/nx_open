@@ -8,6 +8,13 @@ namespace ec2
 
 struct ApiCleanupDatabaseData: ApiData
 {
+    ApiCleanupDatabaseData():
+        ApiData(),
+        cleanupDbObjects(false),
+        cleanupTransactionLog(false)
+    {
+    }
+
     bool cleanupDbObjects;
     bool cleanupTransactionLog;
     QString reserved;

@@ -7,14 +7,14 @@
 
 namespace aux
 {
-    class ThirdPartyIODevice 
+    class ThirdPartyIODevice
         : public QIODevice
     {
     public: //ctor, dtor
         ThirdPartyIODevice(
             const QnThirdPartyStorageResource::IODevicePtrType &io,
             QIODevice::OpenMode                                 mode
-        )   
+        )
             : m_io(io)
         {
             if (!m_io)
@@ -22,7 +22,7 @@ namespace aux
             open(mode);
         }
 
-        ~ThirdPartyIODevice() 
+        ~ThirdPartyIODevice()
         {
             QIODevice::close();
         }
@@ -43,7 +43,7 @@ namespace aux
 
             if (ecode != nx_spl::error::NoError)
                 return -1;
-            
+
             return bytesRead;
         }
 
@@ -57,10 +57,10 @@ namespace aux
 
             if (ecode != nx_spl::error::NoError)
                 return -1;
-            
+
             return len;
         }
- 
+
         qint64 size() const override
         {
             int ecode;
@@ -105,13 +105,13 @@ namespace aux
         }
 
         virtual bool open(
-            const QIODevice::OpenMode  &mode, 
+            const QIODevice::OpenMode  &mode,
             unsigned int                /*systemDependentFlags*/
         ) override
         {
             return m_impl->open(mode);
         }
-    
+
         virtual void close() override
         {
             m_impl->close();
@@ -157,7 +157,7 @@ namespace aux
 } //namespace aux
 
 QnStorageResource* QnThirdPartyStorageResource::instance(
-    const QString               &url, 
+    const QString               &url,
     const StorageFactoryPtrType &sf
 )
 {
@@ -239,7 +239,7 @@ void QnThirdPartyStorageResource::openStorage(
 }
 
 QIODevice *QnThirdPartyStorageResource::open(
-    const QString       &fileName, 
+    const QString       &fileName,
     QIODevice::OpenMode  openMode
 )
 {
@@ -258,8 +258,8 @@ QIODevice *QnThirdPartyStorageResource::open(
         ioFlags |= nx_spl::io::WriteOnly;
 
     nx_spl::IODevice* ioRaw = m_storage->open(
-        QUrl(fileName).path().toLatin1().constData(), 
-        ioFlags, 
+        QUrl(fileName).path().toLatin1().constData(),
+        ioFlags,
         &ecode
     );
 
@@ -284,23 +284,28 @@ QIODevice *QnThirdPartyStorageResource::open(
         int ioBlockSize = 0;
         int ffmpegBufferSize = 0;
 
-        if (openMode & QIODevice::WriteOnly) 
+        int ffmpegMaxBufferSize =
+            MSSettings::roSettings()->value(
+                nx_ms_conf::MAX_FFMPEG_BUFFER_SIZE,
+                nx_ms_conf::DEFAULT_MAX_FFMPEG_BUFFER_SIZE).toInt();
+
+        if (openMode & QIODevice::WriteOnly)
         {
             ioBlockSize = MSSettings::roSettings()->value(
-                nx_ms_conf::IO_BLOCK_SIZE, 
-                nx_ms_conf::DEFAULT_IO_BLOCK_SIZE 
+                nx_ms_conf::IO_BLOCK_SIZE,
+                nx_ms_conf::DEFAULT_IO_BLOCK_SIZE
             ).toInt();
 
             ffmpegBufferSize = MSSettings::roSettings()->value(
-                nx_ms_conf::FFMPEG_BUFFER_SIZE, 
-                nx_ms_conf::DEFAULT_FFMPEG_BUFFER_SIZE 
+                nx_ms_conf::FFMPEG_BUFFER_SIZE,
+                nx_ms_conf::DEFAULT_FFMPEG_BUFFER_SIZE
             ).toInt();
         }
         std::unique_ptr<QBufferedFile> rez(
             new QBufferedFile(
                 std::shared_ptr<IQnFile>(
                     new aux::ThirdPartyFile(
-                        fileName, 
+                        fileName,
                         std::shared_ptr<aux::ThirdPartyIODevice>(
                             new aux::ThirdPartyIODevice(
                                 IODevicePtrType(
@@ -309,16 +314,17 @@ QIODevice *QnThirdPartyStorageResource::open(
                                     {
                                         p->releaseRef();
                                     }
-                                ), 
+                                ),
                                 openMode
                             )
-                        )        
+                        )
                     )
                 ),
-                ioBlockSize, 
+                ioBlockSize,
                 ffmpegBufferSize,
+                ffmpegMaxBufferSize,
                 getId()
-            ) 
+            )
         );
         if (!rez->open(openMode))
             return nullptr;
@@ -330,7 +336,7 @@ int QnThirdPartyStorageResource::getCapabilities() const
 {
     return m_valid ? m_storage->getCapabilities() : 0;
 }
-    
+
 qint64 QnThirdPartyStorageResource::getFreeSpace()
 {
     if (!m_valid)
@@ -355,7 +361,7 @@ qint64 QnThirdPartyStorageResource::getTotalSpace() const
     return totalSpace;
 }
 
-Qn::StorageInitResult QnThirdPartyStorageResource::initOrUpdate() 
+Qn::StorageInitResult QnThirdPartyStorageResource::initOrUpdate()
 {
     if (!m_valid)
        return Qn::StorageInit_WrongPath;
@@ -369,7 +375,7 @@ bool QnThirdPartyStorageResource::removeFile(const QString& url)
 
     int ecode;
     m_storage->removeFile(
-        urlToPath(url).toLatin1().constData(), 
+        urlToPath(url).toLatin1().constData(),
         &ecode
     );
     if (ecode != nx_spl::error::NoError)
@@ -384,7 +390,7 @@ bool QnThirdPartyStorageResource::removeDir(const QString& url)
 
     int ecode;
     m_storage->removeDir(
-        urlToPath(url).toLatin1().constData(), 
+        urlToPath(url).toLatin1().constData(),
         &ecode
     );
     if (ecode != nx_spl::error::NoError)
@@ -393,7 +399,7 @@ bool QnThirdPartyStorageResource::removeDir(const QString& url)
 }
 
 bool QnThirdPartyStorageResource::renameFile(
-    const QString   &oldName, 
+    const QString   &oldName,
     const QString   &newName
 )
 {
@@ -402,8 +408,8 @@ bool QnThirdPartyStorageResource::renameFile(
 
     int ecode;
     m_storage->renameFile(
-        urlToPath(oldName).toLatin1().constData(), 
-        urlToPath(newName).toLatin1().constData(), 
+        urlToPath(oldName).toLatin1().constData(),
+        urlToPath(newName).toLatin1().constData(),
         &ecode
     );
     if (ecode != nx_spl::error::NoError)
@@ -412,7 +418,7 @@ bool QnThirdPartyStorageResource::renameFile(
 }
 
 
-QnAbstractStorageResource::FileInfoList 
+QnAbstractStorageResource::FileInfoList
 QnThirdPartyStorageResource::getFileList(const QString& dirName)
 {
     if (!m_valid)
@@ -421,7 +427,7 @@ QnThirdPartyStorageResource::getFileList(const QString& dirName)
     QnMutexLocker lock(&m_mutex);
     int ecode;
     nx_spl::FileInfoIterator* fitRaw = m_storage->getFileIterator(
-        urlToPath(dirName).toLatin1().constData(), 
+        urlToPath(dirName).toLatin1().constData(),
         &ecode
     );
     if (fitRaw == nullptr)
@@ -461,11 +467,15 @@ QnThirdPartyStorageResource::getFileList(const QString& dirName)
 
             if (fi == nullptr || ecode != nx_spl::error::NoError)
                 break;
-            
+
+            QString urlString = QString::fromLatin1(fi->url);
+            if (!urlString.contains("://"))
+                urlString = QUrl(dirName).toString(QUrl::RemovePath) + QString::fromLatin1(fi->url);
+
             ret.append(
                 QnAbstractStorageResource::FileInfo(
-                    QUrl(dirName).toString(QUrl::RemovePath) + QString::fromLatin1(fi->url), 
-                    fi->size, 
+                    urlString,
+                    fi->size,
                     (fi->type & nx_spl::isDir) ? true : false
                 )
             );
@@ -482,7 +492,7 @@ bool QnThirdPartyStorageResource::isFileExists(const QString& url)
     QnMutexLocker lock(&m_mutex);
     int ecode;
     int result = m_storage->fileExists(
-        urlToPath(url).toLatin1().constData(), 
+        urlToPath(url).toLatin1().constData(),
         &ecode
     );
     if (ecode != nx_spl::error::NoError)
@@ -498,7 +508,7 @@ bool QnThirdPartyStorageResource::isDirExists(const QString& url)
     QnMutexLocker lock(&m_mutex);
     int ecode;
     int result = m_storage->dirExists(
-        urlToPath(url).toLatin1().constData(), 
+        urlToPath(url).toLatin1().constData(),
         &ecode
     );
     if (ecode != nx_spl::error::NoError)
@@ -514,7 +524,7 @@ qint64 QnThirdPartyStorageResource::getFileSize(const QString& url) const
     QnMutexLocker lock(&m_mutex);
     int ecode;
     qint64 fsize = m_storage->fileSize(
-        urlToPath(url).toLatin1().constData(), 
+        urlToPath(url).toLatin1().constData(),
         &ecode
     );
 

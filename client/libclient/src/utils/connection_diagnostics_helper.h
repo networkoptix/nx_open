@@ -33,9 +33,32 @@ public:
         const QnConnectionInfo &connectionInfo,
         ec2::ErrorCode errorCode);
 
+
+    static void failedRestartClientMessage(QWidget* parent);
+
 private:
     static bool getInstalledVersions(QList<QnSoftwareVersion>* versions);
-    static Qn::ConnectionResult showApplauncherError(QWidget* parentWidget, const QString& details);
+    static Qn::ConnectionResult handleApplauncherError(QWidget* parentWidget);
+
+    static QString getDiffVersionsText();
+    static QString getDiffVersionsExtra(
+        const QString& clientVersion,
+        const QString& serverVersion);
+    static QString getDiffVersionsFullText(
+        const QString& clientVersion,
+        const QString& serverVersion);
+
+    static QString getDiffVersionFullExtras(
+        const QString& clientVersion,
+        const QString& serverVersion,
+        const QString& extraText);
+
+    static void showValidateConnectionErrorMessage(
+        QWidget* parentWidget,
+        Qn::ConnectionResult result,
+        const QString& serverVersion);
+
+    static QString ldapServerTimeoutMessage();
 
     static Qn::ConnectionResult handleCompatibilityMode(
         const QnConnectionInfo &connectionInfo,
@@ -45,7 +68,8 @@ private:
     enum class ErrorStrings
     {
         ContactAdministrator,
-        UnableConnect
+        UnableConnect,
+        CloudIsNotReady
     };
 
     static QString getErrorString(ErrorStrings id);

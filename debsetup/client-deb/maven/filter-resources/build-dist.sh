@@ -62,6 +62,7 @@ mkdir -p "$STAGE/etc/xdg/$FULL_COMPANY_NAME"
 mv -f debian/client.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_PRODUCT_NAME"
 mv -f debian/applauncher.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_APPLAUNCHER_NAME"
 mv -f usr/share/applications/icon.desktop usr/share/applications/${installer.name}.desktop
+mv -f usr/share/applications/protocol.desktop usr/share/applications/${uri.protocol}.desktop
 
 # Copy client binary, old version libs
 cp -r $CLIENT_BIN_PATH/desktop_client $BINSTAGE/client-bin
@@ -77,6 +78,9 @@ for f in `find $ICONSTAGE -name "*.png"`; do mv $f `dirname $f`/`basename $f .pn
 
 # Copy help
 cp -r $CLIENT_HELP_PATH/* $HELPSTAGE
+
+# Copy fonts
+cp -r "$CLIENT_BIN_PATH/fonts" "$BINSTAGE"
 
 # Copy backgrounds
 cp -r $CLIENT_BG_PATH/* $BGSTAGE
@@ -127,20 +131,19 @@ INSTALLED_SIZE=`du -s $STAGE | awk '{print $1;}'`
 
 cat debian/control.template | sed "s/INSTALLED_SIZE/$INSTALLED_SIZE/g" | sed "s/VERSION/$VERSION/g" | sed "s/ARCHITECTURE/$ARCHITECTURE/g" > $STAGE/DEBIAN/control
 
-install -m 755 debian/prerm $STAGE/DEBIAN
-install -m 755 debian/preinst $STAGE/DEBIAN
-install -m 755 debian/postinst $STAGE/DEBIAN
-install -m 644 debian/templates $STAGE/DEBIAN
+for f in $(ls debian); do 
+    if [ $f != 'control.template' ]; then install -m 755 debian/$f $STAGE/DEBIAN; fi
+done
 
 (cd $STAGE; find * -type f -not -regex '^DEBIAN/.*' -print0 | xargs -0 md5sum > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 
 (cd $STAGEBASE; fakeroot dpkg-deb -b $FINALNAME)
 
-mkdir -p $STAGETARGET/share/icons
-cp -r $ICONSTAGE/* $STAGETARGET/share/icons
-cp -r bin/update.json $STAGETARGET
+mkdir -p "$STAGETARGET/share/icons"
+cp "$ICONSTAGE/hicolor/scalable/apps"/* "$STAGETARGET/share/icons"
+cp "bin/update.json" "$STAGETARGET"
 echo "client.finalName=$FINALNAME" >> finalname-client.properties
 echo "zip -y -r $UPDATE_NAME $STAGETARGET"
-cd $STAGETARGET
-zip -y -r $UPDATE_NAME ./*
-mv -f $UPDATE_NAME ${project.build.directory}
+cd "$STAGETARGET"
+zip -y -r "$UPDATE_NAME" ./*
+mv -f "$UPDATE_NAME" "${project.build.directory}"

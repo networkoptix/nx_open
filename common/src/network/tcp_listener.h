@@ -18,6 +18,8 @@ class QnTcpListenerPrivate;
 
 class QnTcpListener: public QnLongRunnable
 {
+    Q_OBJECT;
+
 public:
     static const int DEFAULT_MAX_CONNECTIONS = 2000;
 
@@ -59,6 +61,9 @@ public:
 
     /** Norlimize url path. cut off web prefix and '/' chars */
     static QString normalizedPath(const QString& path);
+
+signals:
+    void portChanged();
 
 public slots:
     virtual void pleaseStop() override;

@@ -38,6 +38,13 @@ public:
             std::bind(static_cast<RealFactoryFuncType>(&realFactoryFunc), args...);
     }
 
+    // TODO: #ak inherit this class from QnStoppableAsync.
+    void pleaseStopSync(bool assertIfCalledUnderMutex = true)
+    {
+        for (auto& listener: m_listeners)
+            listener->pleaseStopSync(assertIfCalledUnderMutex);
+    }
+
     /**
         \param bindToEveryAddress If \a true, this method returns success if bind to every input address succeeded.
         if \a false - just one successful bind is required for this method to succeed
@@ -82,11 +89,11 @@ public:
     }
 
     //!Returns true, if all binded addresses are successfully listened
-    bool listen()
+    bool listen(int backlogSize = AbstractStreamServerSocket::kDefaultBacklogSize)
     {
         for (auto it = m_listeners.cbegin(); it != m_listeners.cend(); )
         {
-            if (!(*it)->listen())
+            if (!(*it)->listen(backlogSize))
             {
                 const auto& errorText = SystemError::getLastOSErrorText();
                 NX_LOG(QString::fromLatin1("Failed to listen address %1. %2")
@@ -107,6 +114,13 @@ public:
     {
         for (auto& listener: m_listeners)
             function(listener.get());
+    }
+
+    template<typename ... Args>
+    void forEachListener(void(SocketServerType::*function)(Args...), Args&& ... args)
+    {
+        for (auto& listener: m_listeners)
+            (listener.get()->*function)(std::forward<Args>(args)...);
     }
 
 private:

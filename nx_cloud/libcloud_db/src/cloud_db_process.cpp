@@ -13,7 +13,6 @@
 #include <type_traits>
 
 #include <QtCore/QDir>
-#include <QtSql/QSqlQuery>
 
 #include <nx/network/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
@@ -32,14 +31,17 @@
 #include <utils/db/db_structure_updater.h>
 
 #include <cloud_db_client/src/cdb_request_path.h>
+#include <cdb/ec2_request_paths.h>
 
 #include "access_control/authentication_manager.h"
 #include "dao/rdb/db_instance_controller.h"
 #include "ec2/synchronization_engine.h"
+#include "http_handlers/get_cloud_modules_xml.h"
 #include "http_handlers/ping.h"
 #include "libcloud_db_app_info.h"
 #include "managers/account_manager.h"
 #include "managers/auth_provider.h"
+#include "managers/cloud_module_url_provider.h"
 #include "managers/email_manager.h"
 #include "managers/event_manager.h"
 #include "managers/maintenance_manager.h"
@@ -111,7 +113,7 @@ int CloudDBProcess::exec()
         //reading settings
         conf::Settings settings;
         //parsing command line arguments
-        settings.load( m_argc, m_argv );
+        settings.load( m_argc, (const char**) m_argv );
         if( settings.showHelp() )
         {
             settings.printCmdLineArgsHelpToCout();
@@ -158,17 +160,16 @@ int CloudDBProcess::exec()
         nx_http::MessageDispatcher httpMessageDispatcher;
         m_httpMessageDispatcher = &httpMessageDispatcher;
 
-        //creating data managers
         TemporaryAccountPasswordManager tempPasswordManager(
             settings,
-            dbInstanceController.queryExecutor().get());
+            &dbInstanceController.queryExecutor());
         m_tempPasswordManager = &tempPasswordManager;
 
         AccountManager accountManager(
             settings,
             streeManager,
             &tempPasswordManager,
-            dbInstanceController.queryExecutor().get(),
+            &dbInstanceController.queryExecutor(),
             emailManager.get());
         m_accountManager = &accountManager;
 
@@ -178,17 +179,18 @@ int CloudDBProcess::exec()
         ec2::SyncronizationEngine ec2SyncronizationEngine(
             kCdbGuid,
             settings.p2pDb(),
-            dbInstanceController.queryExecutor().get());
+            &dbInstanceController.queryExecutor());
 
         SystemHealthInfoProvider systemHealthInfoProvider(
-            ec2SyncronizationEngine.connectionManager());
+            &ec2SyncronizationEngine.connectionManager(),
+            &dbInstanceController.queryExecutor());
 
         SystemManager systemManager(
             settings,
             &timerManager,
             &accountManager,
             systemHealthInfoProvider,
-            dbInstanceController.queryExecutor().get(),
+            &dbInstanceController.queryExecutor(),
             emailManager.get(),
             &ec2SyncronizationEngine);
         m_systemManager = &systemManager;
@@ -198,7 +200,8 @@ int CloudDBProcess::exec()
 
         //TODO #ak move following to stree xml
         QnAuthMethodRestrictionList authRestrictionList;
-        authRestrictionList.allow(PingHandler::kHandlerPath, AuthMethod::noAuth);
+        authRestrictionList.allow(http_handler::GetCloudModulesXml::kHandlerPath, AuthMethod::noAuth);
+        authRestrictionList.allow(http_handler::Ping::kHandlerPath, AuthMethod::noAuth);
         authRestrictionList.allow(kAccountRegisterPath, AuthMethod::noAuth);
         authRestrictionList.allow(kAccountActivatePath, AuthMethod::noAuth);
         authRestrictionList.allow(kAccountReactivatePath, AuthMethod::noAuth);
@@ -227,7 +230,11 @@ int CloudDBProcess::exec()
 
         MaintenanceManager maintenanceManager(
             kCdbGuid,
-            &ec2SyncronizationEngine);
+            &ec2SyncronizationEngine,
+            dbInstanceController);
+
+        CloudModuleUrlProvider cloudModuleUrlProvider(
+            settings.moduleFinder().cloudModulesXmlTemplatePath);
 
         //registering HTTP handlers
         registerApiHandlers(
@@ -235,10 +242,12 @@ int CloudDBProcess::exec()
             authorizationManager,
             &accountManager,
             &systemManager,
+            &systemHealthInfoProvider,
             &authProvider,
             &eventManager,
             &ec2SyncronizationEngine.connectionManager(),
-            &maintenanceManager);
+            &maintenanceManager,
+            cloudModuleUrlProvider);
         //TODO #ak remove eventManager.registerHttpHandlers and register in registerApiHandlers
         eventManager.registerHttpHandlers(
             authorizationManager,
@@ -266,16 +275,16 @@ int CloudDBProcess::exec()
         // process privilege reduction
         CurrentProcess::changeUser(settings.changeUser());
 
-        if (!multiAddressHttpServer.listen())
+        if (!multiAddressHttpServer.listen(settings.http().tcpBacklogSize))
             return 5;
         m_httpEndpoints = multiAddressHttpServer.endpoints();
+        NX_LOGX(lm("Listening on %1").container(m_httpEndpoints), cl_logINFO);
 
         if (m_terminated)
             return 0;
 
-        NX_LOG(lit("%1 has been started")
-                .arg(QnLibCloudDbAppInfo::applicationDisplayName()),
-               cl_logALWAYS);
+        NX_LOG(lm("%1 has been started")
+            .arg(QnLibCloudDbAppInfo::applicationDisplayName()), cl_logALWAYS);
 
         processStartResult = true;
         triggerOnStartedEventHandlerGuard.fire();
@@ -283,9 +292,13 @@ int CloudDBProcess::exec()
         // This is actually the main loop.
         m_processTerminationEvent.get_future().wait();
 
+        NX_LOGX(lm("Stopping..."), cl_logALWAYS);
+
         // First of all, cancelling accepting new requests.
         multiAddressHttpServer.forEachListener(
-            [](nx_http::HttpStreamSocketServer* listener) { listener->pleaseStop(); });
+            [](nx_http::HttpStreamSocketServer* listener) { listener->pleaseStopSync(); });
+
+        NX_LOGX(lm("Http server stopped"), cl_logDEBUG1);
 
         ec2SyncronizationEngine.unsubscribeFromSystemDeletedNotification(
             systemManager.systemMarkedAsDeletedSubscription());
@@ -304,16 +317,18 @@ void CloudDBProcess::registerApiHandlers(
     const AuthorizationManager& authorizationManager,
     AccountManager* const accountManager,
     SystemManager* const systemManager,
+    SystemHealthInfoProvider* const systemHealthInfoProvider,
     AuthenticationProvider* const authProvider,
     EventManager* const /*eventManager*/,
     ec2::ConnectionManager* const ec2ConnectionManager,
-    MaintenanceManager* const maintenanceManager)
+    MaintenanceManager* const maintenanceManager,
+    const CloudModuleUrlProvider& cloudModuleUrlProvider)
 {
-    msgDispatcher->registerRequestProcessor<PingHandler>(
-        PingHandler::kHandlerPath,
-        [&authorizationManager]() -> std::unique_ptr<PingHandler>
+    msgDispatcher->registerRequestProcessor<http_handler::Ping>(
+        http_handler::Ping::kHandlerPath,
+        [&authorizationManager]() -> std::unique_ptr<http_handler::Ping>
         {
-            return std::make_unique<PingHandler>(authorizationManager);
+            return std::make_unique<http_handler::Ping>(authorizationManager);
         });
 
     //---------------------------------------------------------------------------------------------
@@ -401,6 +416,11 @@ void CloudDBProcess::registerApiHandlers(
         EntityType::account, DataActionType::update);
     //< TODO: #ak: current entity:action is not suitable for this request
 
+    registerHttpHandler(
+        kSystemHealthHistoryPath,
+        &SystemHealthInfoProvider::getSystemHealthHistory, systemHealthInfoProvider,
+        EntityType::system, DataActionType::fetch);
+
     //---------------------------------------------------------------------------------------------
     // AuthenticationProvider
     registerHttpHandler(
@@ -417,7 +437,7 @@ void CloudDBProcess::registerApiHandlers(
     // ec2::ConnectionManager
     // TODO: #ak remove after 3.0 release.
     registerHttpHandler(
-        kEstablishEc2TransactionConnectionDeprecatedPath,
+        kDeprecatedEstablishEc2TransactionConnectionPath,
         &ec2::ConnectionManager::createTransactionConnection,
         ec2ConnectionManager);
 
@@ -427,8 +447,8 @@ void CloudDBProcess::registerApiHandlers(
         ec2ConnectionManager);
 
     registerHttpHandler(
-        //kPushEc2TransactionPath,
-        nx_http::kAnyPath.toStdString().c_str(),   //dispatcher does not support max prefix by now
+        //api::kPushEc2TransactionPath,
+        nx_http::kAnyPath.toStdString().c_str(), //< Dispatcher does not support max prefix by now.
         &ec2::ConnectionManager::pushTransaction,
         ec2ConnectionManager);
 
@@ -443,6 +463,21 @@ void CloudDBProcess::registerApiHandlers(
         kMaintenanceGetTransactionLog,
         &MaintenanceManager::getTransactionLog, maintenanceManager,
         EntityType::maintenance, DataActionType::fetch);
+
+    registerHttpHandler(
+        kMaintenanceGetStatistics,
+        &MaintenanceManager::getStatistics, maintenanceManager,
+        EntityType::maintenance, DataActionType::fetch);
+
+    //---------------------------------------------------------------------------------------------
+    msgDispatcher->registerRequestProcessor<http_handler::GetCloudModulesXml>(
+        http_handler::GetCloudModulesXml::kHandlerPath,
+        [&authorizationManager, &cloudModuleUrlProvider]()
+            -> std::unique_ptr<http_handler::GetCloudModulesXml>
+        {
+            return std::make_unique<http_handler::GetCloudModulesXml>(
+                cloudModuleUrlProvider);
+        });
 }
 
 template<typename ManagerType, typename InputData, typename... OutputData>

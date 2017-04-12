@@ -42,25 +42,25 @@ PlayerDataConsumer::PlayerDataConsumer(
     const std::unique_ptr<QnArchiveStreamReader>& archiveReader)
     :
     QnAbstractDataConsumer(kMaxMediaQueueLen),
-    m_awaitJumpCounter(0),
-    m_buffering(0),
-    m_noDelayState(NoDelayState::Disabled),
+    m_awaitingJumpCounter(0),
     m_sequence(0),
     m_lastFrameTimeUs(AV_NOPTS_VALUE),
     m_lastDisplayedTimeUs(AV_NOPTS_VALUE),
-    m_emptyPacketCounter(0)
+    m_emptyPacketCounter(0),
+    m_audioEnabled(true)
 {
-    connect(archiveReader.get(), &QnArchiveStreamReader::beforeJump,
-        this, &PlayerDataConsumer::onBeforeJump, Qt::DirectConnection);
-    connect(archiveReader.get(), &QnArchiveStreamReader::jumpOccured,
-        this, &PlayerDataConsumer::onJumpOccurred, Qt::DirectConnection);
-    connect(archiveReader.get(), &QnArchiveStreamReader::jumpCanceled,
-        this, &PlayerDataConsumer::onJumpCanceled, Qt::DirectConnection);
+    Qn::directConnect(archiveReader.get(), &QnArchiveStreamReader::beforeJump,
+        this, &PlayerDataConsumer::onBeforeJump);
+    Qn::directConnect(archiveReader.get(), &QnArchiveStreamReader::jumpOccured,
+        this, &PlayerDataConsumer::onJumpOccurred);
+    Qn::directConnect(archiveReader.get(), &QnArchiveStreamReader::jumpCanceled,
+        this, &PlayerDataConsumer::onJumpCanceled);
 }
 
 PlayerDataConsumer::~PlayerDataConsumer()
 {
     stop();
+    directDisconnectAll();
 }
 
 void PlayerDataConsumer::pleaseStop()
@@ -76,10 +76,13 @@ void PlayerDataConsumer::pleaseStop()
 
 bool PlayerDataConsumer::canAcceptData() const
 {
-    if (m_audioOutput && !m_audioOutput->canAcceptData())
-        return false;
-    else
-        return base_type::canAcceptData();
+    {
+        QnMutexLocker lock(&m_decoderMutex);
+        if (m_audioOutput && !m_audioOutput->canAcceptData())
+            return false;
+    }
+
+    return base_type::canAcceptData();
 }
 
 int PlayerDataConsumer::getBufferingMask() const
@@ -111,13 +114,22 @@ qint64 PlayerDataConsumer::queueVideoDurationUsec() const
     return std::max(0ll, maxTime - minTime);
 }
 
-const AudioOutput* PlayerDataConsumer::audioOutput() const
+ConstAudioOutputPtr PlayerDataConsumer::audioOutput() const
 {
-    return m_audioOutput.get();
+    QnMutexLocker lock(&m_decoderMutex);
+    return m_audioOutput;
 }
 
 bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
 {
+    {
+        if (!m_audioEnabled && m_audioOutput)
+        {
+            QnMutexLocker lock(&m_decoderMutex);
+            m_audioOutput.reset();
+        }
+    }
+
     auto emptyFrame = std::dynamic_pointer_cast<QnEmptyMediaData>(data);
     if (emptyFrame)
         return processEmptyFrame(emptyFrame);
@@ -128,16 +140,28 @@ bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
         return processVideoFrame(videoFrame);
 
     auto audioFrame = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
-    if (audioFrame)
+    if (audioFrame && m_audioEnabled)
         return processAudioFrame(audioFrame);
 
     return true; //< Just ignore unknown frame type.
 }
 
-bool PlayerDataConsumer::processEmptyFrame(const QnEmptyMediaDataPtr& /*data*/)
+bool PlayerDataConsumer::processEmptyFrame(const QnEmptyMediaDataPtr& data)
 {
-    if(++m_emptyPacketCounter > kEmptyPacketThreshold)
-        emit onEOF();
+    if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_GotFromRemotePeer))
+        return true; //< Ignore locally generated packets. It occurs when TCP connection is closed.
+
+    if (m_awaitingJumpCounter > 0)
+        return true; //< ignore EOF due to we are going set new position
+
+    ++m_emptyPacketCounter;
+    if (m_emptyPacketCounter > kEmptyPacketThreshold)
+    {
+        QVideoFramePtr eofPacket(new QVideoFrame());
+        FrameMetadata metadata = FrameMetadata(data);
+        metadata.serialize(eofPacket);
+        enqueueVideoFrame(eofPacket);
+    }
     return true;
 }
 
@@ -208,28 +232,6 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
         return true; //< The frame is processed.
     }
 
-    // First packet after a jump.
-    const bool isBofData = (data->flags & QnAbstractMediaData::MediaFlags_BOF);
-
-    bool displayImmediately = isBofData; //< display data immediately with no delay
-    {
-        QnMutexLocker lock(&m_dataProviderMutex);
-        if (m_noDelayState != NoDelayState::Disabled)
-        {
-            // Display any data immediately (include intermediate frames between BOF frames) if the
-            // jumps are not processed yet.
-            displayImmediately = true;
-        }
-        if (m_noDelayState == NoDelayState::WaitForNextBOF && isBofData)
-            m_noDelayState = NoDelayState::Disabled;
-    }
-    if (displayImmediately)
-    {
-        m_hurryUpToFrame.videoChannel = videoChannel;
-        m_hurryUpToFrame.frameNumber = videoDecoder->currentFrameNumber();
-        emit hurryUp(); //< Hint to a player to avoid waiting for the currently displaying frame.
-    }
-
     QVideoFramePtr decodedFrame;
     if (!videoDecoder->decode(data, &decodedFrame))
     {
@@ -298,25 +300,28 @@ QVideoFramePtr PlayerDataConsumer::dequeueVideoFrame()
 
     FrameMetadata metadata = FrameMetadata::deserialize(result);
 
-    /**
-     * m_hurryUpToFrame hold frame number from which player should display data without delay.
-     * Additionally, for panoramic cameras frames should be processed without delay unless
-     * it got at least 1 frame for each channel
-     */
-    if ((metadata.videoChannel != m_hurryUpToFrame.videoChannel &&
-        m_awaitingFramesMask.hasChannel(m_hurryUpToFrame.videoChannel)) ||
-        metadata.frameNum < m_hurryUpToFrame.frameNumber)
     {
-        metadata.noDelay = true;
+        QnMutexLocker lock(&m_jumpMutex);
+        if (!checkSequence(metadata.sequence) || m_awaitingJumpCounter > 0)
+        {
+            // Frame became deprecated because a new jump was queued. Mark it as noDelay
+            metadata.displayHint = DisplayHint::noDelay;
+        }
+        else if (metadata.flags.testFlag(QnAbstractMediaData::MediaFlags_Ignore))
+        {
+            metadata.displayHint = DisplayHint::noDelay; //< coarse time frame
+        }
+        else if (!m_awaitingFramesMask.isEmpty())
+        {
+            m_awaitingFramesMask.removeChannel(metadata.videoChannel);
+            if (m_awaitingFramesMask.isEmpty())
+                metadata.displayHint = DisplayHint::firstRegular;
+            else
+                metadata.displayHint = DisplayHint::noDelay;
+        }
     }
-    else
-    {
-        if (!m_awaitingFramesMask.isEmpty())
-            metadata.noDelay = true; //< include noDelay to the first displayed frame
-        m_awaitingFramesMask.removeChannel(metadata.videoChannel);
-    }
-    if (metadata.noDelay)
-        metadata.serialize(result);
+
+    metadata.serialize(result);
 
     m_queueWaitCond.wakeAll();
 
@@ -344,7 +349,10 @@ bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data)
         return true; //< decoder is buffering. true means input frame processed
 
     if (!m_audioOutput)
+    {
+        QnMutexLocker lock(&m_decoderMutex);
         m_audioOutput.reset(new AudioOutput(kInitialBufferMs * 1000, kMaxLiveBufferMs * 1000));
+    }
     m_audioOutput->write(decodedFrame);
     return true;
 }
@@ -352,15 +360,13 @@ bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data)
 void PlayerDataConsumer::onBeforeJump(qint64 timeUsec)
 {
     // This function is called directly from an archiveReader thread. Should be thread safe.
-    QnMutexLocker lock(&m_dataProviderMutex);
-    ++m_awaitJumpCounter;
-    m_buffering = getBufferingMask();
+    QnMutexLocker lock(&m_jumpMutex);
+    ++m_awaitingJumpCounter;
+    m_emptyPacketCounter = 0; //< ignore EOF due to we are going to set new position
 
     // The purpose of this variable is prevent doing delay between frames while they are displayed.
     // We supposed to decode/display them at maximum speed unless the last jump command is
     // processed.
-    m_noDelayState = NoDelayState::Activated;
-    m_awaitingFramesMask.setMask();
     m_lastDisplayedTimeUs = m_lastFrameTimeUs = timeUsec; //< force position to the new place
 }
 
@@ -368,29 +374,29 @@ void PlayerDataConsumer::onJumpCanceled(qint64 /*timeUsec*/)
 {
     // This function is called directly from an archiveReader thread. Should be thread safe.
     // Previous jump command has not been executed due to the new jump command received.
-    QnMutexLocker lock(&m_dataProviderMutex);
-    --m_awaitJumpCounter;
-    NX_ASSERT(m_awaitJumpCounter >= 0);
+    QnMutexLocker lock(&m_jumpMutex);
+    --m_awaitingJumpCounter;
+    NX_ASSERT(m_awaitingJumpCounter >= 0);
 }
 
 void PlayerDataConsumer::onJumpOccurred(qint64 /*timeUsec*/, int sequence)
 {
     // This function is called directly from an archiveReader thread. Should be thread safe.
     {
-        QnMutexLocker lock(&m_dataProviderMutex);
-        --m_awaitJumpCounter;
-        if (m_awaitJumpCounter == 0)
+        QnMutexLocker lock(&m_jumpMutex);
+        --m_awaitingJumpCounter;
+        if (m_awaitingJumpCounter == 0)
         {
             // This function is called from dataProvider thread. PlayerConsumer may still process the
             // previous frame. So, leave noDelay state a bit later, when the next BOF frame will be
             // received.
-            m_noDelayState = NoDelayState::WaitForNextBOF;
             m_sequence = sequence;
+            m_awaitingFramesMask.setMask();
         }
     }
 
     clearUnprocessedData(); //< Clear input (undecoded) data queue.
-    if (m_awaitJumpCounter == 0)
+    if (m_awaitingJumpCounter == 0)
         emit jumpOccurred(m_sequence);
     else
         emit hurryUp();
@@ -452,6 +458,11 @@ qint64 PlayerDataConsumer::getNextTime() const
 qint64 PlayerDataConsumer::getExternalTime() const
 {
     return m_lastDisplayedTimeUs;
+}
+
+void PlayerDataConsumer::setAudioEnabled(bool value)
+{
+    m_audioEnabled = value;
 }
 
 } // namespace media

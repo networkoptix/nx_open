@@ -3,8 +3,11 @@
 
 #include <network/module_finder.h>
 #include <network/system_helpers.h>
+#include <network/local_system_description.h>
+
 #include <nx/network/socket_global.h>
 #include <nx/network/socket_common.h>
+#include <nx/network/url/url_parse_helper.h>
 
 namespace {
 
@@ -123,8 +126,8 @@ void QnDirectSystemsFinder::addServer(QnModuleInformation moduleInformation)
         const bool isNewSystem = helpers::isNewSystem(moduleInformation);
         const auto localId = helpers::getLocalSystemId(moduleInformation);
         const auto systemDescription = (isNewSystem
-            ? QnSystemDescription::createFactorySystem(systemId)
-            : QnSystemDescription::createLocalSystem(systemId, localId, systemName));
+            ? QnLocalSystemDescription::createFactory(systemId)
+            : QnLocalSystemDescription::create(systemId, localId, systemName));
 
         itSystem = m_systems.insert(systemId, systemDescription);
     }
@@ -174,18 +177,15 @@ void QnDirectSystemsFinder::updateServer(const SystemsHash::iterator systemIt
 
     auto systemDescription = systemIt.value();
     const auto changes = systemDescription->updateServer(moduleInformation);
-    if (!changes.testFlag(QnServerField::SystemName)
-        && !changes.testFlag(QnServerField::CloudId))
-    {
+    if (!changes.testFlag(QnServerField::CloudId))
         return;
-    }
 
-    // System name or factory status has changed. We have to
+    // Factory status has changed. We have to
     // remove server from current system and add to new
     const auto serverHost = systemDescription->getServerHost(moduleInformation.id);
     removeServer(moduleInformation);
     addServer(moduleInformation);
-    updatePrimaryAddress(moduleInformation, SocketAddress(serverHost));
+    updatePrimaryAddress(moduleInformation, nx::network::url::getEndpoint(serverHost));
 }
 
 void QnDirectSystemsFinder::updatePrimaryAddress(const QnModuleInformation &moduleInformation

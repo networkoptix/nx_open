@@ -5,6 +5,25 @@
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
 
+namespace {
+
+ec2::QnPeerSet getDirectClientPeers()
+{
+    ec2::QnPeerSet result;
+
+    auto clients = ec2::QnTransactionMessageBus::instance()->aliveClientPeers();
+    for (auto it = clients.begin(); it != clients.end(); ++it)
+    {
+        const auto& clientId = it.key();
+        if (it->routingInfo.contains(clientId))
+            result.insert(clientId);
+    }
+
+    return result;
+}
+
+} // namespace
+
 namespace ec2 {
 
 ApiDiscoveryData toApiDiscoveryData(
@@ -20,7 +39,7 @@ ApiDiscoveryData toApiDiscoveryData(
 }
 
 
-void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoverPeerData> &transaction)
+void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoverPeerData> &transaction, NotificationSource /*source*/)
 {
     NX_ASSERT(transaction.command == ApiCommand::discoverPeer, "Invalid command for this function", Q_FUNC_INFO);
 
@@ -32,7 +51,7 @@ void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<Api
 //    emit peerDiscoveryRequested(QUrl(transaction.params.url));
 }
 
-void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveryData> &transaction)
+void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveryData> &transaction, NotificationSource /*source*/)
 {
     NX_ASSERT(transaction.command == ApiCommand::addDiscoveryInformation ||
                transaction.command == ApiCommand::removeDiscoveryInformation,
@@ -46,18 +65,18 @@ void QnDiscoveryNotificationManager::triggerNotification(const ApiDiscoveryData 
     emit discoveryInformationChanged(discoveryData, addInformation);
 }
 
-void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveryDataList> &tran)
+void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveryDataList> &tran, NotificationSource /*source*/)
 {
     for (const ApiDiscoveryData &data: tran.params)
         emit discoveryInformationChanged(data, true);
 }
 
-void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveredServerData> &tran)
+void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveredServerData> &tran, NotificationSource /*source*/)
 {
     emit discoveredServerChanged(tran.params);
 }
 
-void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveredServerDataList> &tran)
+void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveredServerDataList> &tran, NotificationSource /*source*/)
 {
     emit gotInitialDiscoveredServers(tran.params);
 }
@@ -158,17 +177,18 @@ int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServer(
         const ApiDiscoveredServerData &discoveredServer,
         impl::SimpleHandlerPtr handler)
 {
+    const auto peers = getDirectClientPeers();
+    if (peers.isEmpty())
+        return -1;
+
+    QnTransaction<ApiDiscoveredServerData> transaction(
+        ApiCommand::discoveredServerChanged, discoveredServer);
+
     const int reqId = generateRequestID();
 
-    using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
-        ApiCommand::discoveredServerChanged,
-        discoveredServer,
-        [handler, reqId](ErrorCode errorCode)
-        {
-            handler->done(reqId, errorCode);
-        }
-    );
+    QnTransactionMessageBus::instance()->sendTransaction(transaction, peers);
+    QnConcurrent::run(Ec2ThreadPool::instance(),
+        [handler, reqId]{ handler->done(reqId, ErrorCode::ok); });
 
     return reqId;
 }
@@ -178,17 +198,18 @@ int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServersList(
         const ApiDiscoveredServerDataList &discoveredServersList,
         impl::SimpleHandlerPtr handler)
 {
+    const auto peers = getDirectClientPeers();
+    if (peers.isEmpty())
+        return -1;
+
+    QnTransaction<ApiDiscoveredServerDataList> transaction(
+        ApiCommand::discoveredServersList, discoveredServersList);
+
     const int reqId = generateRequestID();
 
-    using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
-        ApiCommand::discoveredServersList,
-        discoveredServersList,
-        [handler, reqId](ErrorCode errorCode)
-        {
-            handler->done(reqId, errorCode);
-        }
-    );
+    QnTransactionMessageBus::instance()->sendTransaction(transaction, peers);
+    QnConcurrent::run(Ec2ThreadPool::instance(),
+        [handler, reqId]{ handler->done(reqId, ErrorCode::ok); });
 
     return reqId;
 }

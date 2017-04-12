@@ -42,29 +42,29 @@ struct ALCdevice_struct
 
 int AudioDevice::internalBufferInSamples(ALCdevice* device)
 {
-#if defined(Q_OS_MACX)
-    /**
-     * Looks like Mac OS has a bug in the standard OpenAL implementation.
-     * It returns invalid pointer with alcOpenDevice (0x18) and alcCreateContext(0x19).
-     * As it is invalid pointer, we can't use it accessing ALCdevice_struct' fields.
-     * From the other side we can continue to use it as opaque handle for OpenAL functions.
-     *
-     * Problem is known:
-     * https://github.com/hajimehoshi/ebiten/issues/195
-     * https://groups.google.com/forum/#!topic/golang-bugs/nARJpJCYum4
-     *
-     * Possible workarounds are:
-     * 1. Fix OpenAL sources and rebuild it for Mac OS;
-     * 2. Do not use direct access to ALCdevice_struct' fields.
-     *
-     * Since we have correct handling of zero return value, it was decided to
-     * workaround it with second option.
-     */
-    return 0;
-#else
-    const ALCdevice_struct* devicePriv = (const ALCdevice_struct*) device;
-    return devicePriv->UpdateSize;
-#endif
+    #if defined(Q_OS_MACX) || defined(Q_OS_IOS)
+        /**
+         * Looks like Mac OS has a bug in the standard OpenAL implementation.
+         * It returns invalid pointer with alcOpenDevice (0x18) and alcCreateContext(0x19).
+         * As it is invalid pointer, we can't use it accessing ALCdevice_struct' fields.
+         * From the other side we can continue to use it as opaque handle for OpenAL functions.
+         *
+         * Problem is known:
+         * https://github.com/hajimehoshi/ebiten/issues/195
+         * https://groups.google.com/forum/#!topic/golang-bugs/nARJpJCYum4
+         *
+         * Possible workarounds are:
+         * 1. Fix OpenAL sources and rebuild it for Mac OS;
+         * 2. Do not use direct access to ALCdevice_struct' fields.
+         *
+         * Since we have correct handling of zero return value, it was decided to
+         * workaround it with second option.
+         */
+        return 0;
+    #else
+        const ALCdevice_struct* devicePriv = (const ALCdevice_struct*) device;
+        return devicePriv->UpdateSize;
+    #endif
 }
 
 AudioDevice *AudioDevice::instance()

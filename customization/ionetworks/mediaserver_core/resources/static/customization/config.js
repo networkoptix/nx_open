@@ -8,3 +8,5 @@ Config.allowDebugMode = false;
 //Config.webclientEnabled = false; // Uncomment this string to disable web client
 Config.productName = 'EZ Pro';
 Config.cloud.productName = 'EZ Pro Cloud';
+
+Config.supportedLanguages = ['en_US', 'en_GB', 'fr', 'de', 'ru', 'es', 'ja', 'ko', 'tr', 'zh_CN', 'zh_TW', 'hu', 'he'];

@@ -5,23 +5,23 @@
     "Note: 1/2.8 is 5.2mm x 3.9mm, D=6.5mm.                          ",
     "                                                                ",
     "Calculate width-based crop factor C = 36/W.                     ",
-    "                                                                ",                                                                    
+    "                                                                ",
     "Multiply focal lengths by width-based crop factor to get        ",
     "width-based equivalent focal length.                            ",
     "                                                                ",
-    "Another important note.                                         ",  
+    "Another important note.                                         ",
     "If the camera overshoots on movement, then it means that 35m    ",
     "fov in this file should be increased.                           ",
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
-    
+
     "version": "1.0",
     "data": [
         {
             "keys": [
                 "Sony|SNC-VM772R"
             ],
-            "forcedOnvifParams": 
+            "forcedOnvifParams":
             {
                 "videoEncoders": [
                     "video_encoder_config1,video_encoder_config3"
@@ -255,6 +255,30 @@
         },
         {
             "keys": [
+                "Network Optix|Nx-Cube",
+                "Network Optix|E12A"
+            ],
+            "nxDeviceModel": "Nx-Cube-0512A",
+            "nxDeviceName": "Nx-Cube"
+        },
+        {
+            "keys": [
+                "Network Optix|Nx-Dome",
+                "Network Optix|E924"
+            ],
+            "nxDeviceModel": "Nx-Dome-05924",
+            "nxDeviceName": "Nx-Dome"
+        },
+        {
+            "keys": [
+                "Network Optix|Nx-Fisheye",
+                "Network Optix|E925"
+            ],
+            "nxDeviceModel": "Nx-Fisheye-05925",
+            "nxDeviceName": "Nx-Fisheye"
+        },
+        {
+            "keys": [
                 "Network Optix|Nx-Cube-0512A"
             ],
             "advancedParametersTemplate": "nx-cube.xml"
@@ -267,7 +291,7 @@
         },
         {
             "keys": [
-                "Network Optix|Nx-Fisheye-05925"
+               "Network Optix|Nx-Fisheye-05925"
             ],
             "advancedParametersTemplate": "nx-fisheye.xml"
         },
@@ -310,12 +334,6 @@
                 "ACTI|ACM3411", "ACTI|ACM3401"
             ],
             "desiredTransport":"UDP"
-        },
-        {
-            "keys": [
-                "Camera"
-            ],
-            "forceONVIF": false
         },
         {
             "keys": [
@@ -381,7 +399,43 @@
                 "VS8801|*",
                 "*|VS8801",
                 "VS8401|*",
-                "*|VS8401"
+                "*|VS8401",
+                "DW|DW-CPUHDE04",
+                "DW|DW-CPUHDE08",
+                "DW|DW-CPUHDE16",
+                "DW|DW-CPUHD4",
+                "DW|DW-CPUHD8",
+                "DW|DW-CPUHD16",
+                "DW|VMAX A1",
+                "Pravis Systems Co., Ltd.|VMAX A1",
+                "ACTI|TCD2100",
+                "Axis|AXISM7011*",
+                "Axis|AXISM7001*",
+                "Axis|AXISM7010*",
+                "Axis|AXISP7210*",
+                "Axis|AXISQ7401*",
+                "Axis|AXISQ7404*",
+                "Axis|AXISQ7406*",
+                "Axis|AXISQ7411*",
+                "BOSCH|VIP X16 XF E",
+                "BOSCH|VIP-X1600-XFM4",
+                "BOSCH|VIP_X16_XF_E",
+                "BOSCH|VJT-X40XF-E",
+                "CAP|NVN4100",
+                "DS-6701HWI|Embedded Net DVS",
+                "GrandStream|GXV3504",
+                "Hikvision|DS-6701*",
+                "Hikvision|DS-6704*",
+                "Hikvision|DS-6716*",
+                "Honeywell|HVE4",
+                "Pelco|NET5504",
+                "Pelco|NET5508",
+                "Pelco|NET5516",
+                "Samsung*|SPE-100",
+                "Samsung*|SPE-101",
+                "Samsung*|SPE-1600*",
+                "BOSCH|VIDEO JET multi 4000",
+                "DW-CP16|Digital Watchdog*"                
             ],
             "analogEncoder": true
         },
@@ -392,7 +446,7 @@
             ],
             "isRebrendedActiCamera": true
         },
-		
+
         {
             "keys": [
                 "ISD|*"
@@ -419,11 +473,11 @@
             "showUrl": true,
             "urlLocalePath": "priv/cam.html"
         },
-		
+
         {
             "keys": [
-                "DW|DWCA-C128-64", 
-                "DW|DWCA-C12C-64", 
+                "DW|DWCA-C128-64",
+                "DW|DWCA-C12C-64",
                 "DW|DWCA-VF25W28-64",
                 "DW|DWCA-VF25WIR4-64",
                 "DW|DWCA-VF25WIR8-64",
@@ -431,7 +485,7 @@
             ],
             "isdDwCam": true
         },
-		
+
         {
             "keys": [
                 "vista|*"
@@ -462,10 +516,10 @@
         },
         {
             "keys": [
-                "VIVOTEK|DM368", "VIVOTEK|FD8161", "VIVOTEK|FD8362E", "VIVOTEK|FD8361", "VIVOTEK|FD8136", 
-                "VIVOTEK|FD8162", "VIVOTEK|FD8372", "VIVOTEK|FD8135H", "VIVOTEK|IP8151", "VIVOTEK|IP8335H", 
+                "VIVOTEK|DM368", "VIVOTEK|FD8161", "VIVOTEK|FD8362E", "VIVOTEK|FD8361", "VIVOTEK|FD8136",
+                "VIVOTEK|FD8162", "VIVOTEK|FD8372", "VIVOTEK|FD8135H", "VIVOTEK|IP8151", "VIVOTEK|IP8335H",
                 "VIVOTEK|IP8362", "VIVOTEK|MD8562", "VIVOTEK|IP8371E", "VIVOTEK|FD8363",
-                "ACTI|KCM5211", "ACTI|TCM3511", 
+                "ACTI|KCM5211", "ACTI|TCM3511",
                 "AXIS|AXISP3344", "AXIS|AXISP1344",
                 "*|IPC-HDB3200C", "*|N53F-F",
                 "*|LR01", "*|IPCAM_M1", "*|RL01",
@@ -479,7 +533,8 @@
                 "DW|DWC-MF21M4TIR","Win4NET Co., Ltd.|Clebo-MF21M4TIR",
                 "DW|DWC-MF21M8TIR","Win4NET Co., Ltd.|Clebo-MF21M8TIR",
                 "DW|DWC-MF21M4FM","Win4NET Co., Ltd.|Clebo-MF21M4FM",
-                "DW|DWC-MF21M8FM","Win4NET Co., Ltd.|Clebo-MF21M8FM"
+                "DW|DWC-MF21M8FM","Win4NET Co., Ltd.|Clebo-MF21M8FM",
+                "DW|DWC-MB950TIR", "DW|DWC-MV950TIR"
             ],
             "ptzCapabilities": "NoPtzCapabilities"
         },
@@ -490,9 +545,8 @@
                 "*|FW3471-PS-E",
                 "VISTA|VK2-ENCODER",
                 "*|DW-CP04", "*|DW-CP16",
-                "ACTI|I96","ACTI|I98", 
-                "UNIVIEW|IPC6242SR-X22",
-                "TRUEN Co., Ltd.|TN-P4230CSLXIR"
+                "ACTI|I96","ACTI|I98",
+                "UNIVIEW|IPC6242SR-X22"
             ],
             "ptzTraits": "EightWayPtz"
         },
@@ -539,7 +593,11 @@
         },
         {
             "keys": [
-                "General|IP Camera"
+                "General|IP Camera",
+                "H264|N51820L",
+                "TRUEN Co., Ltd.|TN-P4230CSLXIR",
+                "TRUEN Co. Ltd.|*",
+				"Vista|VK2-3MPEFEDre"
             ],
             "ptzTraits": "FourWayPtz"
         },
@@ -550,7 +608,9 @@
                 "VISTA|VK2-600PTZ",
                 "*|DW-CP04",
                 "Cellinx|STH795",
-                "Honeywell Security Group|HISD-2201WE", "MESSOA|SPD970"
+                "Honeywell Security Group|HISD-2201WE", "MESSOA|SPD970",
+                "H264|N51820L",
+                "onvif|v047-1"
             ],
             "onvifPtzPresetsEnabled": true
         },
@@ -571,7 +631,9 @@
             "keys": [
                 "VISTA|VK2-600PTZ",
                 "VISTA|VK2-1080PTZ",
-                "VISTA|VK2-ENCODER"
+                "VISTA|VK2-ENCODER",
+		"Pelco|D5220",
+                "Pelco|PelcoD5220"
             ],
             "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability|PresetsPtzCapability"
         },
@@ -584,7 +646,7 @@
         },
     {
             "keys": [
-                "Win4NET Co., Ltd.|Clebo-FD20"
+                "DW|DWC-MD421D","Win4NET Co., Ltd.|Clebo-FD20"
             ],
             "ptzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability"
         },
@@ -610,7 +672,7 @@
             "keys": [
                 "Honeywell|HVE4", "Hikvision|DS-6704HFI"
             ],
-            "forcedOnvifParams": 
+            "forcedOnvifParams":
             {
                 "videoEncoders":
                 [
@@ -623,7 +685,26 @@
         },
         {
             "keys": [
-                "Hikvision|DS-6716HWI"
+                "Hikvision|DS-2CD6362F-I","Hikvision|HNCA12-FEA"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "VideoEncoderToken_101,VideoEncoderToken_102",
+                    "VideoEncoderToken_201",
+                    "VideoEncoderToken_301",
+                    "VideoEncoderToken_401"
+                ]
+            },
+            "fpsBounds": {
+                "max": 15,
+                "min": 1
+            }
+        },
+        {
+            "keys": [
+                "Hikvision|DS-6716HWI", "Hikvision|DS-6716HFI", "Hikvision|DS-6716*"
             ],
             "forcedOnvifParams":
             {
@@ -644,13 +725,17 @@
                     "VideoEncoderConfigurationA13,VideoEncoderConfigurationA29",
                     "VideoEncoderConfigurationA14,VideoEncoderConfigurationA30",
                     "VideoEncoderConfigurationA15,VideoEncoderConfigurationA31",
-                    "VideoEncoderConfigurationA16,VideoEncoderConfigurationA32"   
+                    "VideoEncoderConfigurationA16,VideoEncoderConfigurationA32"
                 ]
             }
         },
         {
+            "keys": ["Hikvision|DS-2CD63C2F-IS"],
+            "parseOnvifNotificationsWithHttpReader": true
+        },
+        {
             "keys": [
-                "DW|DWC-MPTZ20X", 
+                "DW|DWC-MPTZ20X",
                 "DW|DWC-MPZ20XFM|2.1.0.8", "DW|DWC-MPZ20XFM"
             ],
             "ptzMapper": {
@@ -677,8 +762,8 @@
         },
         {
             "keys":[
-                "Honeywell|H4D3PRV3", 
-                "Honeywell|H4D3PRV2", 
+                "Honeywell|H4D3PRV3",
+                "Honeywell|H4D3PRV2",
                 "Honeywell|HBD2PR1",
                 "Honeywell|H2D2PR1",
                 "Honeywell|HED1PR3",
@@ -732,7 +817,11 @@
                 "Honeywell|H4D2S2",
                 "Honeywell|H4D3S2",
                 "Honeywell|H4D5S2",
-                "Honeywell|HDZ302LIW"
+                "Honeywell|HDZ302LIW",
+                "Dahua|DH-SD6AL240-HNI",
+                "Dahua|RPZ-230F-HNI",
+                "Dahua|DH-SD6AL230F-HNI",
+                "General|RPZ-230F-HNI"
             ],
             "preferredAuthScheme": "Automatic"
         },
@@ -1022,7 +1111,7 @@
                     }
                 }
             }
-        },    
+        },
         {
             "keys": [
                 "VISTA|VK2-1080XPTZF"
@@ -1049,7 +1138,7 @@
                     }
                 }
             }
-        },            
+        },
         {
             "keys": [
                 "VISTA|VK2-HD30IR-PM", "VISTA|VK2-1080XIRPTZF", "VISTA|NFX-22053H3", "HITRON|NFX-22053H3", "VISTA|VK2-HD30LRIR-PM"
@@ -1103,7 +1192,7 @@
                     }
                 }
             }
-        },        
+        },
         {
             "keys": [
                 "eneo|PXD-2030PTZ1080"
@@ -1131,7 +1220,7 @@
                 }
             },
             "onvifPtzDigitsAfterDecimalPoint": 0
-        },        
+        },
         {
             "keys": [
                 "SONY|SNC-EP580|unknown"
@@ -1302,7 +1391,7 @@
                     }
                 }
             }
-        },        
+        },
         {
             "keys": [
                 "VIVOTEK|SD8363E", "VIVOTEK|SD8363E|SD8363-VVTK-0200f", "SD8363|SD8363"
@@ -1333,7 +1422,7 @@
         },
         {
             "keys": [
-                "Sony|SNC-WR630", "Sony|SNC-WR630|2.1.2"
+                "Sony|SNC-WR630", "Sony|SNC-WR600"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -1432,6 +1521,24 @@
             "keys": [
                 "MOOG|MOOG-EXO-HD", "MOOG|MOOG-EXO-HD|3.8.0.7"
             ]
+        },
+        {
+            "keys": ["Samsung*|SNP-6320RH", "Samsung*|SNO-7084R"], 
+            "forcedOnvifParams": {
+                "profiles": ["H.264,MOBILE"]
+            }
+        },
+        {
+            "keys": ["Samsung*|SNF-8010*"],
+            "forcedOnvifParams": {
+                "profiles": ["SourceH264,MOBILE"]
+            }
+        },
+        {
+            "keys": ["Samsung*|PNF-9010*"],
+            "forcedOnvifParams": {
+                "profiles": ["FisheyeView,MOBILE"]
+            }
         },
         {
             "keys": [
@@ -1583,7 +1690,7 @@
 			],
 			"shouldAppearAsSingleChannel": true,
 			"doNotAddVendorToDeviceName": true,
-			"videoLayout": "width=3;height=2;sensors=0,1,2,4,3,5",
+			"videoLayout": "width=3;height=2;sensors=0,1,2,-1,3,-1",
 			"defaultAR":"4x3"
 		},
 		{
@@ -1645,6 +1752,17 @@
 		},
         {
             "keys":[
+                "DW|DWC-MTT4W*",
+                "DigitalWatchdog|DWC-MTT4W*",
+                "DW|DWC-MVT4W*",
+                "DigitalWatchdog|DWC-MVT4W*",
+                "DW|DWC-MBT4W*",
+                "DigitalWatchdog|DWC-MBT4W*"
+             ],
+             "trustToVideoSourceSize": false
+        },
+        {
+            "keys":[
                 "Digital_Watchdog|DWC-PF5M1TIR", "DigitalWatchdog|DWC-MD85DiA", "DigitalWatchdog|DWC-MV85DiA", "Digital_Watchdog|DWC-MV85DiA"
             ],
             "highStreamBitrateBounds": {
@@ -1658,9 +1776,9 @@
         },
         {
             "keys": [
-                "*|WH-D5216A" 
+                "*|WH-D5216A"
             ],
-            "forcedOnvifParams": 
+            "forcedOnvifParams":
             {
                 "videoEncoders":
                 [
@@ -1696,6 +1814,111 @@
             "keys": ["DW|DWC-MV950TIR"],
             "forceOnvifAdvancedParameters": true
 
+        },
+        {
+            "keys":["Digital_Watchdog|DWC-PB6M4T"],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "0,3",
+                    "1,4",
+                    "2,5"
+                ]
+            },
+            "multiresourceVideoChannelMapping": [
+                {
+                    "resourceChannel": 1,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [0]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 2,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [1]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 3,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [2]
+                        }
+                    ]
+                }
+            ],
+            "doNotConfigureCamera": false,
+            "ignoreMultisensors": true,
+            "shouldAppearAsSingleChannel": true,
+            "videoLayout": "width=3;height=1;sensors=0,1,2"
+        },
+        {
+            "keys": [
+                "Cellinx|STH795"
+            ],
+			"_comment": "Calibration for camera fw ver. 3.2.1, Build at 2016-07-28",
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [-1,   1],
+                        "logical": [ 0, 360]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [  -1,    1],
+                        "logical": [  0,  -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 1],
+                        "logical": [1, 31.55],
+                        "logicalMultiplier": 37.5,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+                "Redvision|RVX-IP30-IRWL-W"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [-1,   1],
+                        "logical": [ 0, 360]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [  0.3333,    -1],
+                        "logical": [  -90,  60]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [1, 7],
+                        "logicalMultiplier": 75,
+                        "space": "35MmEquiv"
+                    }
+                }
+            },
+            "onvifPtzDigitsAfterDecimalPoint": 7
+        },
+        {
+            "keys": [
+                "Bosch|IP5000*"
+            ],
+            "onvifPtzSpeedBroken": true
         }
     ]
 }

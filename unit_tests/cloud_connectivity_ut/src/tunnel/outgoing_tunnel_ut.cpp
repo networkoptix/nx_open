@@ -10,6 +10,7 @@
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/network/cloud/tunnel/connector_factory.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel.h>
+#include <nx/network/cloud/tunnel/outgoing_tunnel_connection_watcher.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
@@ -28,6 +29,8 @@ class DummyConnection:
 {
 public:
     static std::atomic<size_t> instanceCount;
+    static std::set<DummyConnection*> instances;
+    static QnMutex instanceSetMutex;
 
     DummyConnection(
         const String& /*remotePeerId*/,
@@ -37,19 +40,30 @@ public:
     :
         m_connectionShouldWorkFine(connectionShouldWorkFine),
         m_singleShot(singleShot),
-        m_tunnelConnectionInvokedPromise(tunnelConnectionInvokedPromise)
+        m_tunnelConnectionInvokedPromise(tunnelConnectionInvokedPromise),
+        m_ignoreConnectRequest(false)
     {
         ++instanceCount;
         bindToAioThread(SocketGlobals::aioService().getCurrentAioThread());
+
+        QnMutexLocker lock(&instanceSetMutex);
+        instances.insert(this);
     }
 
     ~DummyConnection()
     {
         stopWhileInAioThread();
         --instanceCount;
+
+        QnMutexLocker lock(&instanceSetMutex);
+        instances.erase(this);
     }
 
     virtual void stopWhileInAioThread() override
+    {
+    }
+
+    virtual void start() override
     {
     }
 
@@ -58,6 +72,9 @@ public:
         SocketAttributes /*socketAttributes*/,
         OnNewConnectionHandler handler) override
     {
+        if (m_ignoreConnectRequest)
+            return;
+
         if (m_tunnelConnectionInvokedPromise)
         {
             m_tunnelConnectionInvokedPromise->set_value(timeout);
@@ -85,17 +102,32 @@ public:
     }
 
     virtual void setControlConnectionClosedHandler(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> /*errorCode*/) override
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
     {
+        m_onClosedHandler = std::move(handler);
+    }
+
+    void ignoreConnectRequests()
+    {
+        m_ignoreConnectRequest = true;
+    }
+
+    void reportClosure(SystemError::ErrorCode sysErrorCode)
+    {
+        post([this, sysErrorCode](){ m_onClosedHandler(sysErrorCode); });
     }
 
 private:
     bool m_connectionShouldWorkFine;
     const bool m_singleShot;
     nx::utils::promise<std::chrono::milliseconds>* m_tunnelConnectionInvokedPromise;
+    bool m_ignoreConnectRequest;
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onClosedHandler;
 };
 
 std::atomic<size_t> DummyConnection::instanceCount(0);
+std::set<DummyConnection*> DummyConnection::instances;
+QnMutex DummyConnection::instanceSetMutex;
 
 
 class DummyConnector:
@@ -232,35 +264,63 @@ private:
                     m_canSucceedEvent->get_future().wait();
 
                 if (m_connectSuccessfully)
+                {
+                    auto dummyConnection = std::make_unique<DummyConnection>(
+                        m_targetPeerAddress.host.toString().toLatin1(),
+                        m_connectionShouldWorkFine,
+                        m_singleShotConnection,
+                        m_tunnelConnectionInvokedPromise);
+
+                    auto tunnelWatcher = std::make_unique<OutgoingTunnelConnectionWatcher>(
+                        std::move(nx::hpm::api::ConnectionParameters()),
+                        std::move(dummyConnection));
+                    tunnelWatcher->bindToAioThread(getAioThread());
+                    tunnelWatcher->start();
+
                     handler(
                         SystemError::noError,
-                        std::make_unique<DummyConnection>(
-                            m_targetPeerAddress.host.toString().toLatin1(),
-                            m_connectionShouldWorkFine,
-                            m_singleShotConnection,
-                            m_tunnelConnectionInvokedPromise));
+                        std::move(tunnelWatcher));
+                }
                 else
+                {
                     handler(
                         SystemError::connectionRefused,
                         std::unique_ptr<DummyConnection>());
+                }
             });
     }
 };
 
 std::atomic<size_t> DummyConnector::instanceCount(0);
 
+//-------------------------------------------------------------------------------------------------
+// Test fixture
 
 class OutgoingTunnel:
     public ::testing::Test
 {
 public:
-    typedef nx::utils::promise<std::pair<
-        SystemError::ErrorCode,
-        std::unique_ptr<AbstractStreamSocket >> > ConnectionCompletedPromise;
+    struct ConnectionResult
+    {
+        SystemError::ErrorCode sysErrorCode;
+        std::unique_ptr<AbstractStreamSocket> connection;
+
+        ConnectionResult(
+            SystemError::ErrorCode sysErrorCode,
+            std::unique_ptr<AbstractStreamSocket> connection)
+            :
+            sysErrorCode(sysErrorCode),
+            connection(std::move(connection))
+        {
+        }
+    };
+
+    typedef nx::utils::promise<ConnectionResult> ConnectionCompletedPromise;
 
     struct ConnectionContext
     {
         ConnectionCompletedPromise completionPromise;
+        boost::optional<ConnectionResult> result;
         std::chrono::steady_clock::time_point startTime;
         std::chrono::steady_clock::time_point endTime;
     };
@@ -273,6 +333,9 @@ public:
 
     ~OutgoingTunnel()
     {
+        if (m_tunnel)
+            m_tunnel->pleaseStopSync();
+
         if (m_oldFactoryFunc)
             ConnectorFactory::setFactoryFunc(std::move(*m_oldFactoryFunc));
 
@@ -287,10 +350,117 @@ public:
             m_oldFactoryFunc = std::move(oldFunc);
     }
 
+protected:
+    std::unique_ptr<cloud::OutgoingTunnel> m_tunnel;
+    std::vector<ConnectionContext> m_connectedPromises;
+
+    void initializeTargetThatAlwaysTimesOut()
+    {
+        // Using large timeout so that connector can never succeed.
+        const auto connectorTimeout = std::chrono::hours(1);
+
+        m_addressEntry = AddressEntry("nx_test.com:12345");
+        setConnectorFactoryFunc(
+            [connectorTimeout](const AddressEntry& targetAddress)
+                -> std::unique_ptr<AbstractCrossNatConnector>
+            {
+                return std::make_unique<DummyConnector>(
+                    targetAddress,
+                    connectorTimeout,
+                    nullptr);
+            });
+    }
+
+    void setConnectTimeout(std::chrono::milliseconds timeout)
+    {
+        m_connectTimeout = timeout;
+    }
+
+    AddressEntry targetAddress() const
+    {
+        return m_addressEntry;
+    }
+
+    void requestSeveralConnectionsToTheTarget()
+    {
+        using namespace std::chrono;
+
+        if (!m_tunnel)
+            m_tunnel = std::make_unique<cloud::OutgoingTunnel>(targetAddress());
+
+        const int connectionsToCreate = 7;
+        m_connectedPromises.resize(connectionsToCreate);
+
+        for (auto& connectionContext : m_connectedPromises)
+        {
+            std::this_thread::sleep_for(microseconds(utils::random::number(0, 0xFFFF)));
+            connectionContext.startTime = steady_clock::now();
+            m_tunnel->establishNewConnection(
+                m_connectTimeout,
+                SocketAttributes(),
+                [&connectionContext](
+                    SystemError::ErrorCode errorCode,
+                    std::unique_ptr<AbstractStreamSocket> socket)
+                {
+                    connectionContext.endTime = steady_clock::now();
+                    connectionContext.completionPromise.set_value(
+                        ConnectionResult(errorCode, std::move(socket)));
+                });
+        }
+    }
+
+    void assertConnectResultIs(SystemError::ErrorCode sysErrorCode)
+    {
+        waitForConnectionResult();
+
+        for (auto& connectionContext: m_connectedPromises)
+            ASSERT_EQ(sysErrorCode, connectionContext.result->sysErrorCode);
+    }
+
+    void assertNoConnectionsHaveBeenCreated()
+    {
+        waitForConnectionResult();
+
+        for (auto& connectionContext: m_connectedPromises)
+            ASSERT_EQ(nullptr, connectionContext.result->connection);
+    }
+
+    void assertActualTimeoutErrorDoesNotExceed(
+        std::chrono::milliseconds minTimeoutCorrection)
+    {
+        waitForConnectionResult();
+
+        const std::chrono::milliseconds timeoutCorrection =
+            (m_connectTimeout / 5) > minTimeoutCorrection
+            ? (m_connectTimeout / 5)
+            : minTimeoutCorrection;
+
+        for (auto& connectionContext: m_connectedPromises)
+        {
+            const auto actualTimeout = connectionContext.endTime - connectionContext.startTime;
+
+            EXPECT_GT(actualTimeout, m_connectTimeout - timeoutCorrection);
+            EXPECT_LT(actualTimeout, m_connectTimeout + timeoutCorrection);
+        }
+    }
+
 private:
     boost::optional<ConnectorFactory::FactoryFunc> m_oldFactoryFunc;
+    AddressEntry m_addressEntry;
+    std::chrono::milliseconds m_connectTimeout;
+
+    void waitForConnectionResult()
+    {
+        for (auto& connectionContext: m_connectedPromises)
+        {
+            if (!connectionContext.result)
+                connectionContext.result = connectionContext.completionPromise.get_future().get();
+        }
+    }
 };
 
+//-------------------------------------------------------------------------------------------------
+// Test cases
 
 TEST_F(OutgoingTunnel, general)
 {
@@ -303,6 +473,7 @@ TEST_F(OutgoingTunnel, general)
 
         AddressEntry addressEntry("nx_test.com:12345");
         cloud::OutgoingTunnel tunnel(std::move(addressEntry));
+        auto tunnelGuard = makeScopedGuard([&tunnel]() { tunnel.pleaseStopSync(); });
 
         setConnectorFactoryFunc(
             [connectorWillSucceed, connectionWillSucceed, singleShotConnection](
@@ -324,7 +495,7 @@ TEST_F(OutgoingTunnel, general)
                     SystemError::ErrorCode errorCode,
                     std::unique_ptr<AbstractStreamSocket> socket)
                 {
-                    connectedPromise.set_value(std::make_pair(errorCode, std::move(socket)));
+                    connectedPromise.set_value(ConnectionResult(errorCode, std::move(socket)));
                 });
 
             const auto result = connectedPromise.get_future().get();
@@ -334,36 +505,32 @@ TEST_F(OutgoingTunnel, general)
                 if (singleShotConnection)
                 {
                     if (i == 0)
-                        ASSERT_EQ(SystemError::noError, result.first);
+                        ASSERT_EQ(SystemError::noError, result.sysErrorCode);
                     else // i > 0
-                        ASSERT_EQ(SystemError::connectionReset, result.first);  //tunnel signals broken connection
+                        ASSERT_EQ(SystemError::connectionReset, result.sysErrorCode);  //tunnel signals broken connection
                 }
                 else
                 {
-                    ASSERT_EQ(SystemError::noError, result.first);
-                    ASSERT_NE(nullptr, result.second);
+                    ASSERT_EQ(SystemError::noError, result.sysErrorCode);
+                    ASSERT_NE(nullptr, result.connection);
                 }
             }
             else
             {
                 if (!connectorWillSucceed)
-                    ASSERT_EQ(
-                        SystemError::connectionRefused,
-                        result.first);
+                    ASSERT_EQ(SystemError::connectionRefused, result.sysErrorCode);
                 else if (!connectionWillSucceed)
-                    ASSERT_EQ(SystemError::connectionReset, result.first);
-                ASSERT_EQ(nullptr, result.second);
+                    ASSERT_EQ(SystemError::connectionReset, result.sysErrorCode);
+                ASSERT_EQ(nullptr, result.connection);
             }
 
-            if (result.first != SystemError::noError)
+            if (result.sysErrorCode != SystemError::noError)
             {
                 //tunnel should be closed by now, checking it has called "closed" handler
                 if (utils::random::number(0, 1))
                     break;
             }
         }
-
-        tunnel.pleaseStopSync();
     }
 }
 
@@ -401,13 +568,13 @@ TEST_F(OutgoingTunnel, singleShotConnection)
                     SystemError::ErrorCode errorCode,
                     std::unique_ptr<AbstractStreamSocket> socket)
                 {
-                    connectedPromise.set_value(std::make_pair(errorCode, std::move(socket)));
+                    connectedPromise.set_value(ConnectionResult(errorCode, std::move(socket)));
                 });
 
             const auto result = connectedPromise.get_future().get();
 
-            ASSERT_EQ(SystemError::connectionRefused, result.first);
-            ASSERT_EQ(nullptr, result.second);
+            ASSERT_EQ(SystemError::connectionRefused, result.sysErrorCode);
+            ASSERT_EQ(nullptr, result.connection);
         }
 
         tunnel.pleaseStopSync();
@@ -444,8 +611,7 @@ TEST_F(OutgoingTunnel, handlersQueueingWhileInConnectingState)
                 SystemError::ErrorCode errorCode,
                 std::unique_ptr<AbstractStreamSocket> socket)
             {
-                connectedPromise.set_value(
-                    std::make_pair(errorCode, std::move(socket)));
+                connectedPromise.set_value(ConnectionResult(errorCode, std::move(socket)));
             });
     }
 
@@ -456,8 +622,8 @@ TEST_F(OutgoingTunnel, handlersQueueingWhileInConnectingState)
     for (int i = 0; i < connectionsToCreate; ++i)
     {
         const auto result = promises[i].get_future().get();
-        ASSERT_EQ(SystemError::noError, result.first);
-        ASSERT_NE(nullptr, result.second);
+        ASSERT_EQ(SystemError::noError, result.sysErrorCode);
+        ASSERT_NE(nullptr, result.connection);
     }
 
     tunnel.pleaseStopSync();
@@ -495,7 +661,7 @@ TEST_F(OutgoingTunnel, cancellation)
                     SystemError::ErrorCode errorCode,
                     std::unique_ptr<AbstractStreamSocket> socket)
                 {
-                    connectedPromise.set_value(std::make_pair(errorCode, std::move(socket)));
+                    connectedPromise.set_value(ConnectionResult(errorCode, std::move(socket)));
                 });
 
             if (waitConnectionCompletion)
@@ -517,75 +683,18 @@ TEST_F(OutgoingTunnel, cancellation)
 
 TEST_F(OutgoingTunnel, connectTimeout)
 {
-    const auto connectorTimeout = std::chrono::seconds(7);
-    const int connectionsToCreate = 70;
+    initializeTargetThatAlwaysTimesOut();
 
-    for (int i = 0; i < 5; ++i)
-    {
-        nx::utils::promise<void> doConnectEvent;
+    setConnectTimeout(std::chrono::milliseconds(utils::random::number(1, 2000)));
 
-        setConnectorFactoryFunc(
-            [connectorTimeout, &doConnectEvent](const AddressEntry& targetAddress)
-                -> std::unique_ptr<AbstractCrossNatConnector>
-            {
-                return std::make_unique<DummyConnector>(
-                    targetAddress,
-                    connectorTimeout,
-                    utils::random::number(0, 1) ? &doConnectEvent : nullptr);
-            });
+    requestSeveralConnectionsToTheTarget();
+    assertConnectResultIs(SystemError::timedOut);
+    assertNoConnectionsHaveBeenCreated();
 
-        const std::chrono::milliseconds timeout(utils::random::number(1, 2000));
-        const std::chrono::milliseconds minTimeoutCorrection(500);
-        const std::chrono::milliseconds timeoutCorrection =
-            (timeout / 5) > minTimeoutCorrection
-            ? (timeout / 5)
-            : minTimeoutCorrection;
-
-        std::vector<ConnectionContext> connectedPromises;
-        connectedPromises.resize(connectionsToCreate);
-
-        AddressEntry addressEntry("nx_test.com:12345");
-        cloud::OutgoingTunnel tunnel(std::move(addressEntry));
-        auto tunnelGuard = makeScopedGuard([&tunnel] { tunnel.pleaseStopSync(); });
-
-        for (auto& connectionContext: connectedPromises)
-        {
-            std::this_thread::sleep_for(std::chrono::microseconds(utils::random::number(0, 0xFFFF)));
-            connectionContext.startTime = std::chrono::steady_clock::now();
-            tunnel.establishNewConnection(
-                timeout,
-                SocketAttributes(),
-                [&connectionContext](
-                    SystemError::ErrorCode errorCode,
-                    std::unique_ptr<AbstractStreamSocket> socket)
-                {
-                    connectionContext.endTime = std::chrono::steady_clock::now();
-                    connectionContext.completionPromise.set_value(
-                        std::make_pair(errorCode, std::move(socket)));
-                });
-        }
-
-        //signalling connector to succeed
-        doConnectEvent.set_value();
-
-        for (auto& connectionContext : connectedPromises)
-        {
-            const auto result = connectionContext.completionPromise.get_future().get();
-            ASSERT_EQ(SystemError::timedOut, result.first);
-            ASSERT_EQ(nullptr, result.second);
-
-            #ifdef _DEBUG
-                if (!utils::TestOptions::areTimeAssertsDisabled())
-                {
-                    const auto actualTimeout =
-                        connectionContext.endTime - connectionContext.startTime;
-
-                    EXPECT_GT(actualTimeout, timeout - timeoutCorrection);
-                    EXPECT_LT(actualTimeout, timeout + timeoutCorrection);
-                }
-            #endif
-        }
-    }
+    #ifdef _DEBUG
+        if (!utils::TestOptions::areTimeAssertsDisabled())
+            assertActualTimeoutErrorDoesNotExceed(std::chrono::milliseconds(500));
+    #endif
 }
 
 /** testing that tunnel passes correct connect timeout to tunnel connection */
@@ -621,7 +730,7 @@ TEST_F(OutgoingTunnel, connectTimeout2)
         {
             connectionContext.endTime = std::chrono::steady_clock::now();
             connectionContext.completionPromise.set_value(
-                std::make_pair(errorCode, std::move(socket)));
+                ConnectionResult(errorCode, std::move(socket)));
         });
 
     ASSERT_EQ(
@@ -645,6 +754,8 @@ TEST_F(OutgoingTunnel, connectTimeout2)
 TEST_F(OutgoingTunnel, pool)
 {
     OutgoingTunnelPool tunnelPool;
+    auto tunnelPoolGuard = makeScopedGuard(
+        [&tunnelPool]() { tunnelPool.pleaseStopSync(); });
 
     AddressEntry addressEntry("nx_test.com:12345");
 
@@ -674,20 +785,106 @@ TEST_F(OutgoingTunnel, pool)
                 std::unique_ptr<AbstractStreamSocket> socket)
             {
                 connectionContext.completionPromise.set_value(
-                    std::make_pair(errorCode, std::move(socket)));
+                    ConnectionResult(errorCode, std::move(socket)));
             });
     }
 
-    for (auto& connectionContext : connectionContexts)
+    for (auto& connectionContext: connectionContexts)
     {
         const auto result = connectionContext.completionPromise.get_future().get();
         ASSERT_TRUE(
-            result.first == SystemError::connectionRefused ||
-            result.first == SystemError::interrupted);
-        ASSERT_EQ(nullptr, result.second);
+            result.sysErrorCode == SystemError::connectionRefused ||
+            result.sysErrorCode == SystemError::interrupted);
+        ASSERT_EQ(nullptr, result.connection);
+    }
+}
+
+class OutgoingTunnelCancellation:
+    public OutgoingTunnel
+{
+public:
+    OutgoingTunnelCancellation():
+        m_connection(nullptr)
+    {
+        setConnectorFactoryFunc(
+            [](const AddressEntry& targetAddress) -> std::unique_ptr<AbstractCrossNatConnector>
+            {
+                auto connector = std::make_unique<DummyConnector>(
+                    targetAddress,
+                    true,
+                    true,
+                    false);
+                return std::move(connector);
+            });
     }
 
-    tunnelPool.pleaseStopSync();
+protected:
+    void givenOpenedTunnel()
+    {
+        m_tunnel = openTunnel();
+
+        {
+            QnMutexLocker lock(&DummyConnection::instanceSetMutex);
+            ASSERT_EQ(1U, DummyConnection::instances.size());
+            m_connection = *DummyConnection::instances.begin();
+        }
+
+        m_connection->ignoreConnectRequests();
+
+        m_tunnel->setOnClosedHandler(
+            [this]()
+            {
+                // Tunnel supports removal within "on close" handler, so doing it.
+                m_tunnel.reset();
+                m_tunnelHasBeenClosed.set_value();
+            });
+    }
+
+    void requestNewConnectionFromTunnel()
+    {
+        m_tunnel->establishNewConnection(
+            SocketAttributes(),
+            [](SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>) {});
+    }
+
+    void whenTunnelConnectionHasBeenClosed()
+    {
+        m_connection->reportClosure(SystemError::connectionReset);
+    }
+
+    void thenTunnelShouldStopCorrectly()
+    {
+        m_tunnelHasBeenClosed.get_future().wait();
+        ASSERT_EQ(nullptr, m_tunnel.get());
+    }
+
+private:
+    std::unique_ptr<cloud::OutgoingTunnel> m_tunnel;
+    nx::utils::promise<void> m_tunnelHasBeenClosed;
+    DummyConnection* m_connection;
+
+    std::unique_ptr<cloud::OutgoingTunnel> openTunnel()
+    {
+        auto tunnel = std::make_unique<cloud::OutgoingTunnel>(AddressEntry("example.com:80"));
+        nx::utils::promise<void> tunnelOpened;
+        tunnel->establishNewConnection(
+            SocketAttributes(),
+            [&tunnelOpened](SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>)
+            {
+                tunnelOpened.set_value();
+            });
+        tunnelOpened.get_future().wait();
+
+        return tunnel;
+    }
+};
+
+TEST_F(OutgoingTunnelCancellation, cancellation2)
+{
+    givenOpenedTunnel();
+    requestNewConnectionFromTunnel();
+    whenTunnelConnectionHasBeenClosed();
+    thenTunnelShouldStopCorrectly();
 }
 
 } // namespace test

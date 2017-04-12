@@ -45,7 +45,7 @@ AuthenticationManager::AuthenticationManager(
 void AuthenticationManager::authenticate(
     const nx_http::HttpServerConnection& connection,
     const nx_http::Request& request,
-    nx_http::AuthenticationCompletionHandler completionHandler)
+    nx_http::server::AuthenticationCompletionHandler completionHandler)
 {
     bool authenticationResult = false;
     stree::ResourceContainer authInfo;

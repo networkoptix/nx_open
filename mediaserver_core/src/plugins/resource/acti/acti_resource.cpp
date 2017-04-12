@@ -19,6 +19,7 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <nx/utils/log/log.h>
 #include <core/resource/param.h>
+#include "acti_resource_searcher.h"
 
 const QString QnActiResource::MANUFACTURE(lit("ACTI"));
 const QString QnActiResource::CAMERA_PARAMETER_GROUP_ENCODER(lit("encoder"));
@@ -29,15 +30,23 @@ const QString QnActiResource::ADVANCED_PARAMETERS_TEMPLATE_PARAMETER_NAME(lit("a
 
 namespace {
 
-const int TCP_TIMEOUT = 3000;
+const int TCP_TIMEOUT = 8000;
 const int DEFAULT_RTSP_PORT = 7070;
 int actiEventPort = 0;
-int DEFAULT_AVAIL_BITRATE_KBPS[] = {
-    28, 56, 128, 256,
-    384, 500, 750, 1000,
-    1200, 1500, 2000, 2500,
-    3000, 3500, 4000, 4500,
-    5000, 5500, 6000};
+int DEFAULT_AVAIL_BITRATE_KBPS[] = { 28, 56, 128, 256, 384, 500, 750, 1000, 1200, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000 };
+
+const QLatin1String CAMERA_EVENT_ACTIVATED_PARAM_NAME("activated");
+const QLatin1String CAMERA_EVENT_DEACTIVATED_PARAM_NAME("deactivated");
+const QLatin1String CAMERA_INPUT_NUMBER_PARAM_NAME("di");
+const QString kActiDualStreamingMode = lit("dual");
+const QString kActiFisheyeStreamingMode = lit("fisheye_view");
+const QString kActiCurrentStreamingModeParamName = lit("streaming mode");
+const QString kActiGetStreamingModeCapabilitiesParamName = lit("streaming mode cap");
+const QString kActiSetStreamingModeCapabilitiesParamName = lit("VIDEO_STREAM");
+const QString kActiFirmawareVersionParamName = lit("firmware version");
+const QString kActiMacAddressParamName = lit("mac address");
+const QString kActiPlatformParamName = lit("platform");
+const QString kActiEncoderCapabilitiesParamName = lit("encoder_cap");
 
 const QString kTwoAudioParamName = lit("factory default type");
 const QString kTwoWayAudioDeviceType = lit("Two Ways Audio (0x71)");
@@ -217,17 +226,17 @@ QnActiResource::ActiSystemInfo QnActiResource::parseSystemInfo(const QByteArray&
     for(const auto& line: lines)
     {
         auto tmp = line.split('=');
+        if (tmp.size() != 2)
+            continue;
+
         result.insert(
-            QString::fromUtf8(tmp[0]).trimmed().toLower(), 
-            QString::fromUtf8(tmp.size() >= 2 ? tmp[1].trimmed() : ""));
+            QString::fromUtf8(tmp[0]).trimmed().toLower(),
+            QString::fromUtf8(tmp[1].trimmed()));
     }
 
     return result;
 }
 
-static const QLatin1String CAMERA_EVENT_ACTIVATED_PARAM_NAME( "activated" );
-static const QLatin1String CAMERA_EVENT_DEACTIVATED_PARAM_NAME( "deactivated" );
-static const QLatin1String CAMERA_INPUT_NUMBER_PARAM_NAME( "di" );
 
 void QnActiResource::cameraMessageReceived( const QString& path, const QnRequestParamList& /*params*/ )
 {
@@ -326,33 +335,20 @@ bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByt
 CameraDiagnostics::Result QnActiResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
+    CLHttpStatus status;
 
     updateDefaultAuthIfEmpty(lit("admin"), lit("123456"));
 
     auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
 
-    CLHttpStatus status;
-
-    QByteArray resolutions= makeActiRequest(
-        lit("system"),
-        lit("VIDEO_RESOLUTION_CAP"),
-        status);
-
-    if (status == CL_HTTP_AUTH_REQUIRED)
-        setStatus(Qn::Unauthorized);
-
-    if (status != CL_HTTP_SUCCESS)
-    {
-        return CameraDiagnostics::RequestFailedResult(
-            lit("/cgi-bin/encoder?VIDEO_RESOLUTION_CAP"),
-            QString::fromUtf8(resolutions));
-    }
-
-    QByteArray serverReport = makeActiRequest(
+    auto serverReport = makeActiRequest(
         lit("system"),
         lit("SYSTEM_INFO"),
         status,
         true);
+
+    if (status == CL_HTTP_AUTH_REQUIRED)
+        setStatus(Qn::Unauthorized);
 
     if (status != CL_HTTP_SUCCESS)
     {
@@ -363,15 +359,15 @@ CameraDiagnostics::Result QnActiResource::initInternal()
 
     auto report = parseSystemInfo(serverReport);
 
-    setFirmware(report.value("firmware version"));
-    setMAC(QnMacAddress(report.value("mac address")));
+    setFirmware(report.value(kActiFirmawareVersionParamName));
+    setMAC(QnMacAddress(report.value(kActiMacAddressParamName)));
 
-    m_platform = report.value("platform")
+    m_platform = report.value(kActiPlatformParamName)
         .trimmed()
         .toUpper()
         .toLatin1();
 
-    auto encodersStr = report.value("encoder_cap");
+    auto encodersStr = report.value(kActiEncoderCapabilitiesParamName);
 
     if (!encodersStr.isEmpty())
     {
@@ -385,30 +381,101 @@ CameraDiagnostics::Result QnActiResource::initInternal()
         m_availableEncoders.insert(lit("H264"));
     }
 
-    auto desiredTransport = resData.value<QString>(Qn::DESIRED_TRANSPORT_PARAM_NAME, RtpTransport::_auto);
+    auto desiredTransport = resData.value<QString>(
+        Qn::DESIRED_TRANSPORT_PARAM_NAME,
+        RtpTransport::_auto);
+
     m_desiredTransport = RtpTransport::fromString(desiredTransport);
 
-    auto dualStreamingCapability = false;
+    bool dualStreamingCapability = false;
+    bool fisheyeStreamingCapability = false;
 
-    if (report.contains("streaming mode cap"))
+    auto streamingModeCapabilities = tryToGetSystemInfoValue(report, kActiGetStreamingModeCapabilitiesParamName);
+
+    if (streamingModeCapabilities)
     {
-        auto streamingModeCapabilities = report.value("streaming mode cap")
+        auto caps = streamingModeCapabilities.get()
             .toLower()
             .split(',');
 
-        for (const auto& cap: streamingModeCapabilities)
+        for (const auto& cap: caps)
         {
-            if (cap.trimmed() == lit("dual"))
-            {
+            if (cap.trimmed() == kActiDualStreamingMode)
                 dualStreamingCapability = true;
-                break;
-            }
+
+            if (cap.trimmed() == kActiFisheyeStreamingMode)
+                fisheyeStreamingCapability = true;            
         }
     }
 
-    bool dualStreaming = report.value("channels").toInt() > 1 ||
-        !report.value("video2_resolution_cap").isEmpty() ||
-        dualStreamingCapability;
+    bool dualStreaming = report.value("channels").toInt() > 1 
+        || !report.value("video2_resolution_cap").isEmpty() 
+        || dualStreamingCapability
+        || fisheyeStreamingCapability;
+
+    bool needToSwitchToFisheyeMode = fisheyeStreamingCapability
+        && report.contains(kActiCurrentStreamingModeParamName)
+        && report.value(kActiCurrentStreamingModeParamName).toLower() != kActiFisheyeStreamingMode;
+
+    bool needToSwitchToDualMode = !fisheyeStreamingCapability
+        && dualStreaming
+        && report.contains(kActiCurrentStreamingModeParamName)
+        && report.value(kActiCurrentStreamingModeParamName).toLower() != kActiDualStreamingMode;
+
+    if (needToSwitchToFisheyeMode)
+    {
+        makeActiRequest(lit("encoder"), lit("VIDEO_STREAM=FISHEYE_VIEW"), status);
+
+        if (status != CL_HTTP_SUCCESS)
+        {
+            auto message =
+                lit("Unable to set up fisheye view streaming mode for camera %1, %2")
+                .arg(getModel())
+                .arg(getUrl());
+
+            NX_LOG(message, cl_logDEBUG1);
+
+            return CameraDiagnostics::RequestFailedResult(
+                lit("/cgi-bin/encoder?VIDEO_STREAM=FISHEYE_VIEW"),
+                message);
+        }
+    }
+
+    if (needToSwitchToDualMode)
+    {
+        makeActiRequest(lit("encoder"), lit("VIDEO_STREAM=DUAL"), status);
+
+        if (status != CL_HTTP_SUCCESS)
+        {
+            auto message =
+                lit("Unable to set up dual streaming mode for camera %1, %2")
+                .arg(getModel())
+                .arg(getUrl());
+
+            NX_LOG(message, cl_logDEBUG1);
+
+            dualStreaming = false;
+        }
+    }
+
+    // Resolution list depends on streaming mode, so we should make this request 
+    // after setting proper streaming mode.
+    QByteArray resolutions= makeActiRequest(
+        lit("system"),
+        lit("VIDEO_RESOLUTION_CAP"),
+        status);
+
+    // Save this check for backward compatibility
+    // since SYSTEM_INFO request potentially can work without auth 
+    if (status == CL_HTTP_AUTH_REQUIRED)
+        setStatus(Qn::Unauthorized); 
+
+    if (status != CL_HTTP_SUCCESS)
+    {
+        return CameraDiagnostics::RequestFailedResult(
+            lit("/cgi-bin/encoder?VIDEO_RESOLUTION_CAP"),
+            QString::fromUtf8(resolutions));
+    }
 
     QList<QSize> availResolutions = parseResolutionStr(resolutions);
     if (availResolutions.isEmpty() || availResolutions[0].isEmpty())
@@ -418,28 +485,6 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     }
 
     m_resolution[0] = availResolutions.first();
-
-    if (dualStreaming)
-    {
-        if (report.contains("streaming mode")
-            && report.value("streaming mode").toLower() != lit("dual"))
-        {
-            makeActiRequest(lit("encoder"), lit("VIDEO_STREAM=DUAL"), status);
-
-            if (status != CL_HTTP_SUCCESS)
-            {
-                auto message =
-                    lit("Unable to set up dual streaming mode for camera %1, %2")
-                    .arg(getModel())
-                    .arg(getUrl());
-
-                qDebug () << message;
-                NX_LOG(message, cl_logDEBUG1);
-
-                dualStreaming = false;
-            }
-        }
-    }
 
     if (dualStreaming) {
         resolutions = makeActiRequest(
@@ -534,13 +579,15 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     std::unique_ptr<QnAbstractPtzController> ptzController(
         createPtzControllerInternal());
 
-    setPtzCapabilities(ptzController->getCapabilities());
-
     fetchAndSetAdvancedParameters();
 
     setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0);
     setProperty(Qn::MAX_FPS_PARAM_NAME, getMaxFps());
     setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, !m_resolution[1].isEmpty() ? 1 : 0);
+    QString serialNumber = report.value(QnActiResourceSearcher::kSystemInfoProductionIdParamName);
+    if (!serialNumber.isEmpty())
+        setProperty(QnActiResourceSearcher::kSystemInfoProductionIdParamName, serialNumber);
+
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();
@@ -1052,6 +1099,24 @@ QString QnActiResource::fillMissingParams(const QString &unresolvedTemplate, con
     }
 
     return templateValues.join(',');
+}
+
+boost::optional<QString> QnActiResource::tryToGetSystemInfoValue(const ActiSystemInfo& report, const QString& key) const
+{
+    auto modifiedKey = key;
+
+    if (report.contains(modifiedKey))
+        return report.value(modifiedKey);
+
+    modifiedKey.replace(' ', '_');
+
+    if (report.contains(modifiedKey))
+        return report.value(modifiedKey);
+
+    modifiedKey.replace('_', ' ');
+        return report.value(modifiedKey);
+
+    return boost::none;
 }
 
 QMap<QString, QString> QnActiResource::buildGetParamsQueries(const QList<QnCameraAdvancedParameter> &params) const

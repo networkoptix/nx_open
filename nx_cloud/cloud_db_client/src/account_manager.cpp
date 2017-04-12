@@ -11,16 +11,15 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
-AccountManager::AccountManager(network::cloud::CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher)
-:
+AccountManager::AccountManager(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher):
     AsyncRequestsExecutor(cloudModuleEndPointFetcher)
 {
 }
 
 void AccountManager::registerNewAccount(
-    api::AccountData accountData,
+    api::AccountRegistrationData accountData,
     std::function<void(api::ResultCode, api::AccountConfirmationCode)> completionHandler)
 {
     auto errorHandler = std::bind(completionHandler, std::placeholders::_1, api::AccountConfirmationCode());
@@ -104,6 +103,6 @@ void AccountManager::createTemporaryCredentials(
         std::move(errorHandler));
 }
 
-}   //cl
+}   //client
 }   //cdb
 }   //nx

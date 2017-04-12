@@ -1,8 +1,3 @@
-/**********************************************************
-* 9 jan 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "test_http_server.h"
 
 #include <QtCore/QFile>
@@ -12,11 +7,47 @@
 #include <nx/network/http/server/handler/http_server_handler_static_data.h>
 #include <nx/utils/random.h>
 
-TestHttpServer::TestHttpServer()
+//-------------------------------------------------------------------------------------------------
+
+TestAuthenticationManager::TestAuthenticationManager(
+    nx_http::server::AbstractAuthenticationDataProvider* authenticationDataProvider)
+    :
+    BaseType(authenticationDataProvider),
+    m_authenticationEnabled(false)
 {
+}
+
+void TestAuthenticationManager::authenticate(
+    const nx_http::HttpServerConnection& connection,
+    const nx_http::Request& request,
+    nx_http::server::AuthenticationCompletionHandler completionHandler)
+{
+    if (m_authenticationEnabled)
+    {
+        BaseType::authenticate(connection, request, std::move(completionHandler));
+    }
+    else
+    {
+        completionHandler(
+            true, stree::ResourceContainer(), boost::none, nx_http::HttpHeaders(), nullptr);
+    }
+}
+
+void TestAuthenticationManager::setAuthenticationEnabled(bool value)
+{
+    m_authenticationEnabled = value;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+TestHttpServer::TestHttpServer():
+    m_authenticationManager(&m_credentialsProvider)
+{
+    m_authenticationManager.setAuthenticationEnabled(false);
+
     m_httpServer.reset(
         new nx_http::HttpStreamSocketServer(
-            nullptr,
+            &m_authenticationManager,
             &m_httpMessageDispatcher,
             true,
             nx::network::NatTraversalSupport::disabled));
@@ -24,13 +55,20 @@ TestHttpServer::TestHttpServer()
 
 TestHttpServer::~TestHttpServer()
 {
-    m_httpServer->pleaseStop();
+    m_httpServer->pleaseStopSync();
+    NX_LOGX("Stopped", cl_logINFO);
 }
 
 bool TestHttpServer::bindAndListen()
 {
-    return m_httpServer->bind(SocketAddress(HostAddress::localhost, 0))
-        && m_httpServer->listen();
+    if (!m_httpServer->bind(SocketAddress(HostAddress::localhost, 0)))
+        return false;
+
+    if (!m_httpServer->listen())
+        return false;
+
+    NX_LOGX(lm("Started on %1").str(m_httpServer->address()), cl_logINFO);
+    return true;
 }
 
 SocketAddress TestHttpServer::serverAddress() const
@@ -46,6 +84,18 @@ void TestHttpServer::setPersistentConnectionEnabled(bool value)
 void TestHttpServer::addModRewriteRule(QString oldPrefix, QString newPrefix)
 {
     m_httpMessageDispatcher.addModRewriteRule(std::move(oldPrefix), std::move(newPrefix));
+}
+
+void TestHttpServer::setAuthenticationEnabled(bool value)
+{
+    m_authenticationManager.setAuthenticationEnabled(value);
+}
+
+void TestHttpServer::registerUserCredentials(
+    const nx::String& userName,
+    const nx::String& password)
+{
+    m_credentialsProvider.addCredentials(userName, password);
 }
 
 bool TestHttpServer::registerStaticProcessor(
@@ -94,7 +144,7 @@ bool TestHttpServer::registerRedirectHandler(
 
 RandomlyFailingHttpConnection::RandomlyFailingHttpConnection(
     StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
-    std::unique_ptr<AbstractCommunicatingSocket> sock)
+    std::unique_ptr<AbstractStreamSocket> sock)
     :
     BaseType(socketServer, std::move(sock)),
     m_requestsToAnswer(nx::utils::random::number<int>(0, 3))

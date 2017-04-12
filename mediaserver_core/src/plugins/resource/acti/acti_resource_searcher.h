@@ -1,7 +1,8 @@
-#ifndef _ACTI_RESOURCE_SEARCHER_H__
-#define _ACTI_RESOURCE_SEARCHER_H__
+#pragma once
 
 #ifdef ENABLE_ACTI
+
+#include "acti_system_info_checker.h"
 
 #include <QtCore/QElapsedTimer>
 #include <plugins/resource/upnp/upnp_resource_searcher.h>
@@ -23,6 +24,7 @@ public:
 
     virtual QnResourceList findResources(void) override;
 
+    static const QString kSystemInfoProductionIdParamName;
 protected:
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
@@ -57,8 +59,14 @@ private:
 
     bool isNxDevice(const nx_upnp::DeviceInfo& devInfo) const;
 
-    QString chooseProperPhysicalId(const QString& serialNumber, const QString& macAddress);
-    QnNetworkResourcePtr findExistingResource(const QString& serialNumber, const QString& macAddress);
+    QString chooseProperPhysicalId(
+        const QString& hostAddress,
+        const QString& serialNumber,
+        const QString& macAddress);
+    QnNetworkResourcePtr findExistingResource(
+        const QString& hostAddress,
+        const QString& serialNumber,
+        const QString& macAddress);
 
     void createResource(
         const nx_upnp::DeviceInfo& devInfo,
@@ -72,12 +80,17 @@ private:
         const HostAddress& sender,
         QnResourceList& result );
 
+    boost::optional<QnActiResource::ActiSystemInfo> getActiSystemInfo(
+        const QnActiResourcePtr& actiResource);
+
+    QString retreiveModel(const QString& model, const QString& serialNumber) const;
+
 private slots:
     void at_httpConnectionDone(nx_http::AsyncHttpClientPtr reply);
 
 private:
     QnUuid m_resTypeId;
+    QMap<QString, std::shared_ptr<QnActiSystemInfoChecker>> m_systemInfoCheckers;
 };
 
 #endif // #ifdef ENABLE_ACTI
-#endif // _ACTI_RESOURCE_SEARCHER_H__

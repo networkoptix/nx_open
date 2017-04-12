@@ -137,12 +137,22 @@ AndroidAudioDecoder::~AndroidAudioDecoder()
 {
 }
 
+bool AndroidAudioDecoder::isDecoderCompatibleToPlatform()
+{
+    return QAndroidJniObject::callStaticMethod<jboolean>(
+        "com/networkoptix/nxwitness/media/QnAudioDecoder",
+        "isDecoderCompatibleToPlatform");
+}
+
 bool AndroidAudioDecoder::isCompatible(const AVCodecID codec)
 {
     static QMap<AVCodecID, QSize> maxDecoderSize;
     static QMutex mutex;
 
     QMutexLocker lock(&mutex);
+
+    if (!isDecoderCompatibleToPlatform())
+        return false;
 
     const QString codecMimeType = codecToString(codec);
     return !codecMimeType.isEmpty();
@@ -189,7 +199,7 @@ bool AndroidAudioDecoder::decode(const QnConstCompressedAudioDataPtr& frame, Aud
         d->audioFrame->context = frame->context;
         *outFrame = std::move(d->audioFrame);
     }
-    
+
     return true;
 }
 

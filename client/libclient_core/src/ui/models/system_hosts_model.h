@@ -1,72 +1,44 @@
 #pragma once
 
 #include <QtCore/QUrl>
-#include <QtCore/QAbstractListModel>
+#include <QtCore/QUuid>
 
-#include <network/system_description.h>
-#include <utils/common/connective.h>
+#include <ui/models/sort_filter_list_model.h>
 
-class QnDisconnectHelper;
-
-class QnSystemHostsModel: public Connective<QAbstractListModel>
+class QnSystemHostsModel: public QnSortFilterListModel
 {
     Q_OBJECT
 
     Q_PROPERTY(QString systemId READ systemId WRITE setSystemId NOTIFY systemIdChanged)
-    Q_PROPERTY(QUrl firstHost READ firstHost NOTIFY firstHostChanged)
-    Q_PROPERTY(bool isEmpty READ isEmpty NOTIFY isEmptyChanged)
-    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    Q_PROPERTY(QUuid localSystemId READ localSystemId WRITE setLocalSystemId
+        NOTIFY localSystemIdChanged)
 
-    using base_type = Connective<QAbstractListModel>;
+    using base_type = QnSortFilterListModel;
 
 public:
-    QnSystemHostsModel(QObject *parent = nullptr);
+    enum Roles
+    {
+        UrlRole = Qt::UserRole + 1
+    };
 
-    virtual ~QnSystemHostsModel();
+    QnSystemHostsModel(QObject* parent = nullptr);
 
-public: // Properties
+    virtual bool lessThan(
+        const QModelIndex& sourceLeft,
+        const QModelIndex& sourceRight) const override;
+
+public: // properties
     QString systemId() const;
+    void setSystemId(const QString& id);
 
-    void setSystemId(const QString &id);
-    QUrl firstHost() const;
-    bool isEmpty() const;
-    int count() const;
-
-public: // overrides
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-
-    QHash<int, QByteArray> roleNames() const override;
-
-public: // QML reachable functions
-    Q_INVOKABLE QVariant getData(const QString& dataRole, int row);
-
-private:
-    void reloadHosts();
-
-    void addServer(const QnSystemDescriptionPtr& systemDescription, const QnUuid& serverId);
-
-    typedef QPair<QnUuid, QUrl> ServerIdHostPair;
-    typedef QList<ServerIdHostPair> ServerIdHostList;
-    void updateServerHost(const QnSystemDescriptionPtr& systemDescription, const QnUuid& serverId);
-    bool updateServerHostInternal(const ServerIdHostList::iterator& it, const QUrl& host);
-
-    void removeServer(const QnSystemDescriptionPtr& systemDescription, const QnUuid& serverId);
-    void removeServerInternal(const ServerIdHostList::iterator &it);
-
-    ServerIdHostList::iterator getDataIt(const QnUuid &serverId);
+    QUuid localSystemId() const;
+    void setLocalSystemId(const QUuid& id);
 
 signals:
     void systemIdChanged();
-    void firstHostChanged();
-    void isEmptyChanged();
-    void countChanged();
+    void localSystemIdChanged();
 
 private:
-    typedef QScopedPointer<QnDisconnectHelper> DisconnectHelper;
-
-    DisconnectHelper m_disconnectHelper;
-    QString m_systemId;
-    ServerIdHostList m_hosts;
+    class HostsModel;
+    HostsModel* hostsModel() const;
 };

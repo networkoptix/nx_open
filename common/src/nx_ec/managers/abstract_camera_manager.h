@@ -15,7 +15,7 @@ class AbstractCameraNotificationManager : public QObject
     Q_OBJECT
 public:
 signals:
-    void addedOrUpdated(const ec2::ApiCameraData& camera, const QnUuid& peerId);
+    void addedOrUpdated(const ec2::ApiCameraData& camera, NotificationSource source);
     void cameraHistoryChanged(const ec2::ApiServerFootageData& cameraHistory);
     void removed(const QnUuid& id);
 
@@ -65,6 +65,14 @@ typedef std::shared_ptr<AbstractCameraNotificationManager> AbstractCameraNotific
             return impl::doSyncCall<impl::SimpleHandler>([this, camera](impl::SimpleHandlerPtr handler)
             {
                 this->addCamera(camera, handler);
+            });
+        }
+
+        ErrorCode addCamerasSync(const ec2::ApiCameraDataList& cameras)
+        {
+            return impl::doSyncCall<impl::SimpleHandler>([this, cameras](impl::SimpleHandlerPtr handler)
+            {
+                this->save(cameras, handler);
             });
         }
 

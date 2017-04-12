@@ -42,7 +42,6 @@ class QnResourceWidget;
 class QnResourceDisplay;
 typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;
 class ViewportAnimator;
-class VariantAnimator;
 class WidgetAnimator;
 class QnCurtainAnimator;
 class QnCurtainItem;
@@ -261,9 +260,9 @@ public:
 
     qreal layerZValue(Qn::ItemLayer layer) const;
 
-    void synchronize(QnWorkbenchItem *item, bool animate = true);
+    void synchronize(QnWorkbenchItem *item, bool animate);
 
-    void synchronize(QnResourceWidget *widget, bool animate = true);
+    void synchronize(QnResourceWidget *widget, bool animate);
 
 
     QPoint mapViewportToGrid(const QPoint &viewportPoint) const;
@@ -282,8 +281,6 @@ public:
 
     QnResourceWidget *zoomTargetWidget(QnResourceWidget *widget) const;
 
-    void ensureRaisedConeItem(QnResourceWidget *widget);
-
     QRectF raisedGeometry(const QRectF &widgetGeometry, qreal rotation) const;
 
     QGLWidget *newGlWidget(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0) const;
@@ -291,8 +288,10 @@ public:
     QSet<QnWorkbenchItem*> draggedItems() const;
     void setDraggedItems(const QSet<QnWorkbenchItem*>& value);
 
+    bool animationAllowed() const;
+
 public slots:
-    void fitInView(bool animate = true);
+    void fitInView(bool animate);
 
 signals:
     void viewportGrabbed();
@@ -322,15 +321,15 @@ protected:
 
     void updateCurrentMarginFlags();
 
-    void adjustGeometryLater(QnWorkbenchItem *item, bool animate = true);
-    Q_SLOT void adjustGeometry(QnWorkbenchItem *item, bool animate = true);
-    Q_SIGNAL void geometryAdjustmentRequested(QnWorkbenchItem *item, bool animate = true);
+    void adjustGeometryLater(QnWorkbenchItem *item, bool animate);
+    Q_SLOT void adjustGeometry(QnWorkbenchItem *item, bool animate);
+    Q_SIGNAL void geometryAdjustmentRequested(QnWorkbenchItem *item, bool animate);
 
     qreal layerFrontZValue(Qn::ItemLayer layer) const;
     Qn::ItemLayer synchronizedLayer(QnResourceWidget *widget) const;
     Qn::ItemLayer shadowLayer(Qn::ItemLayer itemLayer) const;
 
-    bool addItemInternal(QnWorkbenchItem *item, bool animate = true, bool startDisplay = true);
+    bool addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay);
     bool removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem);
 
     bool addZoomLinkInternal(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);
@@ -487,9 +486,6 @@ private:
 
     /** Curtain animator. */
     QnCurtainAnimator *m_curtainAnimator;
-
-    /** Frame opacity animator. */
-    VariantAnimator *m_frameOpacityAnimator;
 
     QnThumbnailsLoader *m_loader;
 };

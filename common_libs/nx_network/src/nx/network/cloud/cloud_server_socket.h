@@ -2,7 +2,7 @@
 #define nx_cc_cloud_server_socket_h
 
 #include <nx/network/abstract_socket.h>
-#include <nx/network/cloud/mediator_connections.h>
+#include <nx/network/cloud/mediator_server_connections.h>
 #include <nx/network/cloud/tunnel/incoming_tunnel_pool.h>
 #include <nx/network/retry_timer.h>
 #include <nx/network/socket_attributes_cache.h>
@@ -69,6 +69,8 @@ public:
     virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
     //!Implementation of AbstractStreamServerSocket::cancelIOSync
     virtual void cancelIOSync() override;
+
+    bool isInSelfAioThread();
 
     /** Invokes listen on mediator */
     void registerOnMediator(

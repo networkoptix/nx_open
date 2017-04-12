@@ -11,7 +11,7 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/object_destruction_flag.h>
 
-#include "aioeventhandler.h"
+#include "aio_event_handler.h"
 #include "basic_pollable.h"
 
 namespace nx {
@@ -26,7 +26,7 @@ class NX_NETWORK_API Timer:
     private AIOEventHandler<Pollable>
 {
 public:
-    Timer();
+    Timer(aio::AbstractAioThread* aioThread = nullptr);
     virtual ~Timer() override;
 
     Timer(const Timer&) = delete;
@@ -38,24 +38,27 @@ public:
     void start(
         std::chrono::milliseconds timeout,
         nx::utils::MoveOnlyFunc<void()> timerFunc);
-    std::chrono::nanoseconds timeToEvent() const;
+
+    boost::optional<std::chrono::nanoseconds> timeToEvent() const;
     void cancelAsync(nx::utils::MoveOnlyFunc<void()> completionHandler);
+
     /**
      * Cancels timer waiting for timerFunc to complete.
      * Can be safely called within timer's aio thread.
      */
     void cancelSync();
 
+protected:
+    virtual void stopWhileInAioThread() override;
+    virtual void eventTriggered(Pollable* sock, aio::EventType eventType) throw() override;
+
 private:
     nx::utils::MoveOnlyFunc<void()> m_handler;
     std::chrono::milliseconds m_timeout;
-    std::chrono::steady_clock::time_point m_timerStartClock;
+    boost::optional<std::chrono::steady_clock::time_point> m_timerStartClock;
     AIOService& m_aioService;
     nx::utils::ObjectDestructionFlag m_destructionFlag;
     int m_internalTimerId;
-
-    virtual void stopWhileInAioThread() override;
-    virtual void eventTriggered(Pollable* sock, aio::EventType eventType) throw() override;
 };
 
 } // namespace aio

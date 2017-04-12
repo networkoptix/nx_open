@@ -94,8 +94,9 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
         NX_ASSERT(!helpers::isNewSystem(system), "Cloud system can't be NEW system");
 
         const auto targetId = helpers::getTargetSystemId(system);
-        const auto systemDescription = QnSystemDescription::createCloudSystem(targetId,
-            system.localId, system.name, system.ownerAccountEmail, system.ownerFullName);
+        const auto systemDescription = QnCloudSystemDescription::create(
+            targetId, system.localId, system.name, system.ownerAccountEmail,
+            system.ownerFullName, system.online);
         updatedSystems.insert(system.cloudId, systemDescription);
     }
 
@@ -127,6 +128,8 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
             removedTargetIds.insert(system->id(), system->localId());
             m_systems.remove(removedCloudId);
         }
+
+        updateOnlineStateUnsafe(systems);
     }
 
     for (const auto id: removedTargetIds.keys())
@@ -134,6 +137,16 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
         const auto localId = removedTargetIds[id];
         emit systemLostInternal(id, localId);
         emit systemLost(id);
+    }
+}
+
+void QnCloudSystemsFinder::updateOnlineStateUnsafe(const QnCloudSystemList& targetSystems)
+{
+    for (const auto system: targetSystems)
+    {
+        const auto itCurrent = m_systems.find(system.cloudId);
+        if (itCurrent != m_systems.end())
+            itCurrent.value()->setRunning(system.online);
     }
 }
 
@@ -207,7 +220,7 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
             if (cloudSystemId != moduleInformation.cloudSystemId)
                 return;
 
-            clearServersTask = QnRaiiGuardPtr();
+            clearServersTask->disableDestructionHandler();
 
             const auto serverId = moduleInformation.id;
             if (systemDescription->containsServer(serverId))
@@ -220,9 +233,9 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
                 systemDescription->addServer(moduleInformation, 0);
             }
 
-
             QUrl url;
             url.setHost(moduleInformation.cloudId());
+            url.setScheme( moduleInformation.sslAllowed ? lit("https") : lit("http"));
             systemDescription->setServerHost(serverId, url);
         };
 

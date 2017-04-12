@@ -26,22 +26,19 @@ public:
      * @brief eventDescription      Form full event description, split to lines.
      * @param action                Action that describes the event.
      * @param aggregationInfo       Aggregation details if events were aggregated.
-     * @param useIp                 Use resources addresses in the 'Source' field.
-     * @param useHtml               Create html-formatted output.
+     * @param detailLevel           Format of resource names.
      * @return                      Event description like this:
      *                                  Event: Motion on camera
      *                                  Source: Entrance Camera (192.168.0.5)
      *                                  Time: 5 times, first time at 15.00 on 19.06.2013
      *                                  ...
      */
-    static QString eventDescription(const QnAbstractBusinessActionPtr& action,
+    static QStringList eventDescription(const QnAbstractBusinessActionPtr& action,
                                     const QnBusinessAggregationInfo& aggregationInfo,
-                                    Qn::ResourceInfoLevel detailLevel,
-                                    bool useHtml);
+                                    Qn::ResourceInfoLevel detailLevel);
 
-    static QString eventDetailsWithTimestamp(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter);
-    static QString eventDetails(const QnBusinessEventParameters &params, const QString& delimiter);
-    static QString renderEventDetailsText(QVariantMap contextMap);
+    static QStringList eventDetailsWithTimestamp(const QnBusinessEventParameters &params, int aggregationCount);
+    static QStringList eventDetails(const QnBusinessEventParameters &params);
 
     //TODO: #vasilenko isPublic field is not used, why?
     static QString urlForCamera(const QnUuid& id, qint64 timestampUsec, bool isPublic);
@@ -54,10 +51,9 @@ public:
     static QString bruleDescriptionText(const QnBusinessEventRulePtr& bRule);
     static QnResourcePtr eventSource(const QnBusinessEventParameters &params);
 
-    /** Details of event: aggregation info, date and time, other info */
-    static QString aggregatedEventDetails(const QnAbstractBusinessActionPtr& action,
-                                              const QnBusinessAggregationInfo& aggregationInfo,
-                                              const QString& delimiter);
+    /** Details of event: aggregation info, date and time, other info, split by lines. */
+    static QStringList aggregatedEventDetails(const QnAbstractBusinessActionPtr& action,
+                                              const QnBusinessAggregationInfo& aggregationInfo);
     static QString eventReason(const QnBusinessEventParameters& params);
 
     static QString eventTimestamp(const QnBusinessEventParameters &params, int aggregationCount);

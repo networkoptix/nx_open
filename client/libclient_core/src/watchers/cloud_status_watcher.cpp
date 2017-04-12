@@ -58,6 +58,7 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
         if (system.localId.isNull())
             system.localId = guidFromArbitraryData(system.cloudId);
 
+        system.online = (systemData.stateOfHealth == nx::cdb::api::SystemHealth::online);
         system.name = QString::fromStdString(systemData.name);
         system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail);
         system.ownerFullName = QString::fromStdString(systemData.ownerFullName);
@@ -83,7 +84,7 @@ public:
 
     std::string cloudHost;
     int cloudPort;
-    QnCredentials credentials;
+    QnEncodedCredentials credentials;
     QString effectiveUserName;
     bool stayConnected;
     QnCloudStatusWatcher::ErrorCode errorCode;
@@ -159,7 +160,7 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
         });
 
     //TODO: #GDM store temporary credentials
-    setCredentials(QnCredentials(
+    setCredentials(QnEncodedCredentials(
         qnClientCoreSettings->cloudLogin(), qnClientCoreSettings->cloudPassword()), true);
 
     connect(qnClientCoreSettings, &QnClientCoreSettings::valueChanged, this,
@@ -176,7 +177,7 @@ QnCloudStatusWatcher::~QnCloudStatusWatcher()
 {
 }
 
-QnCredentials QnCloudStatusWatcher::credentials() const
+QnEncodedCredentials QnCloudStatusWatcher::credentials() const
 {
     Q_D(const QnCloudStatusWatcher);
     return d->credentials;
@@ -189,7 +190,7 @@ QString QnCloudStatusWatcher::cloudLogin() const
 
 QString QnCloudStatusWatcher::cloudPassword() const
 {
-    return credentials().password;
+    return credentials().password.value();
 }
 
 QString QnCloudStatusWatcher::effectiveUserName() const
@@ -246,15 +247,15 @@ void QnCloudStatusWatcher::logSession(const QString& cloudSystemId)
 
 void QnCloudStatusWatcher::resetCredentials()
 {
-    setCredentials(QnCredentials());
+    setCredentials(QnEncodedCredentials());
 }
 
-void QnCloudStatusWatcher::setCredentials(const QnCredentials& credentials, bool initial)
+void QnCloudStatusWatcher::setCredentials(const QnEncodedCredentials& credentials, bool initial)
 {
     Q_D(QnCloudStatusWatcher);
 
     const auto loweredCredentials =
-        QnCredentials(credentials.user.toLower(), credentials.password);
+        QnEncodedCredentials(credentials.user.toLower(), credentials.password.value());
 
     if (d->credentials == loweredCredentials)
         return;
@@ -274,10 +275,10 @@ void QnCloudStatusWatcher::setCredentials(const QnCredentials& credentials, bool
         emit this->passwordChanged();
 }
 
-QnCredentials QnCloudStatusWatcher::createTemporaryCredentials() const
+QnEncodedCredentials QnCloudStatusWatcher::createTemporaryCredentials() const
 {
     Q_D(const QnCloudStatusWatcher);
-    return QnCredentials(
+    return QnEncodedCredentials(
         QString::fromStdString(d->temporaryCredentials.login),
         QString::fromStdString(d->temporaryCredentials.password));
 }
@@ -436,7 +437,7 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
 
     cloudConnection = qnCloudConnectionProvider->createConnection();
     cloudConnection->setCredentials(credentials.user.toStdString(),
-        credentials.password.toStdString());
+        credentials.password.value().toStdString());
 
     /* Very simple email check. */
     if (credentials.user.contains(L'@'))
@@ -470,7 +471,7 @@ void QnCloudStatusWatcherPrivate::setStatus(QnCloudStatusWatcher::Status newStat
         emit q->statusChanged(status);
 
     if (isNewErrorCode && (errorCode != QnCloudStatusWatcher::NoError))
-        emit q->errorChanged();
+        emit q->errorChanged(errorCode);
 }
 
 void QnCloudStatusWatcherPrivate::setCloudSystems(const QnCloudSystemList &newCloudSystems)

@@ -89,8 +89,12 @@ private:
     void sendAggregationEmail( const SendEmailAggregationKey& aggregationKey );
     bool sendMailInternal(const QnSendMailBusinessActionPtr& action, int aggregatedResCount );
     void sendEmailAsync(QnSendMailBusinessActionPtr action, QStringList recipients, int aggregatedResCount);
+
+    /**
+     * This method is called once per action, calculates all recipients and packs them into
+     * emailAddress action parameter with new delimiter.
+     */
     void updateRecipientsList(const QnSendMailBusinessActionPtr& action) const;
-    QStringList getRecipients(const QnSendMailBusinessActionPtr& action) const;
 
     static QByteArray getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize);
 

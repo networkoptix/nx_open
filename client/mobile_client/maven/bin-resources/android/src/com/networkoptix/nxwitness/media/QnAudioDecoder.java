@@ -20,9 +20,19 @@ import android.media.MediaCodecInfo;
 import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaCodecInfo.VideoCapabilities;
 import android.media.MediaCodecList;
+import android.os.Build;
 
 public class QnAudioDecoder 
 {
+
+    static public boolean isDecoderCompatibleToPlatform()
+    {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP)
+            return true;
+        final boolean is64bit = Build.SUPPORTED_64_BIT_ABIS.length > 0;
+        return !is64bit;
+    }
+
 
     public boolean init(String codecName,  int sampleRate, int channelCount,
                         long extraDataPtr, int extraDataSize)

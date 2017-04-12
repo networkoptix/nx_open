@@ -29,7 +29,9 @@ public:
         SafeModeRoleId,
 
         IsCloudSystemRoleId,
-        IsOnlineRoleId,
+        IsRunningRoleId,
+        IsReachableRoleId,
+        IsConnectableRoleId,
         IsCompatibleRoleId,
         IsCompatibleVersionRoleId,
         IsCompatibleInternalRoleId,

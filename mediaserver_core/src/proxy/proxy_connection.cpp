@@ -18,6 +18,7 @@
 #include "transaction/transaction_message_bus.h"
 
 #include <nx/network/socket.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 #include <utils/common/systemerror.h>
@@ -39,27 +40,8 @@ class QnTcpListener;
 
 static const int kMaxProxyTtl = 8;
 static const std::chrono::milliseconds kIoTimeout = std::chrono::minutes(16);
-static const std::chrono::milliseconds kPollTimeout = std::chrono::milliseconds(100);
-
-/** Returns false if socket would block in blocking mode */
-static bool readSocketNonBlock(
-    int* returnValue, AbstractStreamSocket* socket, 
-    void* buffer, int bufferSize)
-{
-    *returnValue = socket->recv(buffer, bufferSize, MSG_DONTWAIT);
-    if (*returnValue < 0)
-    {
-        auto code = SystemError::getLastOSErrorCode();
-        if (code == SystemError::interrupted ||
-            code == SystemError::wouldBlock ||
-            code == SystemError::again)
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
+static const std::chrono::milliseconds kPollTimeout = std::chrono::milliseconds(1);
+static const int kReadBufferSize = 1024 * 128; /* ~ 1 gbit/s */
 
 // ----------------------------- QnProxyConnectionProcessor ----------------------------
 
@@ -100,25 +82,29 @@ bool QnProxyConnectionProcessor::isProtocol(const QString& protocol) const
 
 int QnProxyConnectionProcessor::getDefaultPortByProtocol(const QString& protocol)
 {
-    QString p = protocol.toLower();
-    if (p == "http")
-        return 80;
-    else if (p == "https")
-        return 443;
-    else if (p == "rtsp")
-        return 554;
-    else
-        return -1;
+    const auto port = nx::network::url::getDefaultPortForScheme(protocol);
+    return port == 0 ? -1 : port;
 }
 
-bool QnProxyConnectionProcessor::doProxyData(AbstractStreamSocket* srcSocket, AbstractStreamSocket* dstSocket, char* buffer, int bufferSize)
+bool QnProxyConnectionProcessor::doProxyData(
+    AbstractStreamSocket* srcSocket,
+    AbstractStreamSocket* dstSocket,
+    char* buffer,
+    int bufferSize,
+    bool* outSomeBytesRead)
 {
+    if (outSomeBytesRead)
+        *outSomeBytesRead = false;
     int readed;
     if( !readSocketNonBlock(&readed, srcSocket, buffer, bufferSize) )
         return true;
 
     if (readed < 1)
         return false;
+
+    if (outSomeBytesRead)
+        *outSomeBytesRead = true;
+
     for( ;; )
     {
         int sended = dstSocket->send(buffer, readed);
@@ -262,6 +248,18 @@ bool QnProxyConnectionProcessor::replaceAuthHeader()
     return true;
 }
 
+void QnProxyConnectionProcessor::cleanupProxyInfo(nx_http::Request* request)
+{
+    static const char* kProxyHeadersPrefix = "Proxy-";
+
+    auto itr = request->headers.lower_bound(kProxyHeadersPrefix);
+    while (itr != request->headers.end() && itr->first.startsWith(kProxyHeadersPrefix))
+        itr = request->headers.erase(itr);
+
+    request->requestLine.url = request->requestLine.url.toString(
+        QUrl::RemoveScheme | QUrl::RemovePort | QUrl::RemoveAuthority);
+}
+
 bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstRoute)
 {
     Q_D(QnProxyConnectionProcessor);
@@ -320,12 +318,14 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
 
         if (urlPath.isEmpty())
             urlPath = "/";
-        QString query = url.query();
-        if (!query.isEmpty()) {
-            urlPath += lit("?");
-            urlPath += query;
-        }
-        d->request.requestLine.url = urlPath;
+
+        auto updatedUrl = urlPath;
+        if (!url.query().isEmpty())
+            updatedUrl += lit("?") + url.query();
+        if (!url.fragment().isEmpty())
+            updatedUrl += lit("#") + url.fragment();
+
+        d->request.requestLine.url = updatedUrl;
     }
 
     nx_http::HttpHeaders::const_iterator xCameraGuidIter = d->request.headers.find( Qn::CAMERA_GUID_HEADER_NAME );
@@ -339,14 +339,17 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
             dstRoute.id = camera->getParentId();
     }
 
-    nx_http::HttpHeaders::const_iterator itr = d->request.headers.find( Qn::SERVER_GUID_HEADER_NAME );
+    const auto itr = d->request.headers.find(Qn::SERVER_GUID_HEADER_NAME);
     if (itr != d->request.headers.end())
         dstRoute.id = QnUuid::fromStringSafe(itr->second);
+    else if (!dstRoute.id.isNull())
+        d->request.headers.emplace(Qn::SERVER_GUID_HEADER_NAME, dstRoute.id.toByteArray());
 
     if (dstRoute.id == qnCommon->moduleGUID())
     {
         if (!cameraGuid.isNull())
         {
+            // TODO: destination device is a camera. Remove proxy headers here as well.
             if (QnNetworkResourcePtr camera = qnResPool->getResourceById<QnNetworkResource>(cameraGuid))
                 dstRoute.addr = SocketAddress(camera->getHostAddress(), camera->httpPort());
         }
@@ -363,9 +366,17 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
         }
     }
     else if (!dstRoute.id.isNull())
+    {
         dstRoute = QnRouter::instance()->routeTo(dstRoute.id);
+    }
     else
+    {
         dstRoute.addr = SocketAddress(dstUrl.host(), dstUrl.port(80));
+
+        // No dst route Id means proxy to external resource.
+        // All proxy hops have already been passed. Remove proxy-auth header.
+        cleanupProxyInfo(&d->request);
+    }
 
     if (!dstRoute.id.isNull() && dstRoute.id != qnCommon->moduleGUID())
     {
@@ -391,15 +402,6 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
             nx_http::StringType existAuthSession = nx_http::getHeaderValue(d->request.headers, Qn::AUTH_SESSION_HEADER_NAME);
             if (existAuthSession.isEmpty())
                 nx_http::insertOrReplaceHeader(&d->request.headers, nx_http::HttpHeader(Qn::AUTH_SESSION_HEADER_NAME, authSession().toByteArray()));
-
-            QString path = d->request.requestLine.url.path();
-            if (!path.startsWith(QLatin1Char('/')))
-                path.prepend(QLatin1Char('/'));
-            if (dstRoute.id.isNull())
-                path.prepend(QString(lit("/proxy/%1/%2:%3")).arg(dstUrl.scheme()).arg(dstUrl.host()).arg(dstUrl.port()));
-            else
-                path.prepend(QString(lit("/proxy/%1/%2")).arg(dstUrl.scheme()).arg(dstRoute.id.toString()));
-            d->request.requestLine.url = path;
         }
         dstUrl.setHost(dstRoute.addr.address.toString());
         dstUrl.setPort(dstRoute.addr.port);
@@ -490,159 +492,128 @@ void QnProxyConnectionProcessor::run()
         d->socket->close();
 }
 
-static const size_t READ_BUFFER_SIZE = 1024*64;
-
 void QnProxyConnectionProcessor::doRawProxy()
 {
     Q_D(QnProxyConnectionProcessor);
-    nx::Buffer buffer(READ_BUFFER_SIZE, Qt::Uninitialized);
+    nx::Buffer buffer(kReadBufferSize, Qt::Uninitialized);
 
-    nx::network::aio::UnifiedPollSet pollSet;
-    pollSet.add(d->socket->pollable(), nx::network::aio::etRead);
-    pollSet.add(d->dstSocket->pollable(), nx::network::aio::etRead);
+    // NOTE: Poll set would be more effective than a busy loop, but we can not use it because
+    //     SSL sockets do not support it properly.
     while (!m_needStop)
     {
-        int rez = 0;
-        auto pollLimitTime = std::chrono::steady_clock::now() + kIoTimeout;
-        while (rez == 0)
-        {
-            if (pollLimitTime <= std::chrono::steady_clock::now())
-                return; // IO timeout
+        const auto timeSinseLastIo = std::chrono::steady_clock::now() - d->lastIoTimePoint;
+        if (m_needStop || timeSinseLastIo >= kIoTimeout)
+            return;
 
-            rez = pollSet.poll(kPollTimeout);
-            if (rez == -1 && SystemError::getLastOSErrorCode() == SystemError::interrupted)
-                rez = 0; // the same as timeout
+        bool someBytesRead1 = false;
+        bool someBytesRead2 = false;
+        if (!doProxyData(d->socket.data(), d->dstSocket.data(), buffer.data(), buffer.size(), &someBytesRead1))
+            return;
 
-            if (m_needStop || rez < 0)
-                return; // stop or error
-        }
+        if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.data(), buffer.size(), &someBytesRead2))
+            return;
 
-        for (auto it = pollSet.begin(); it != pollSet.end(); ++it)
-        {
-            if (it.eventType() != nx::network::aio::etRead)
-            {
-                NX_LOGX(lm("Error polling socket: %1").arg(it.socket()), cl_logDEBUG1);
-                return;
-            }
-
-            if (it.socket() == d->socket->pollable())
-            {
-                if (!doProxyData(d->socket.data(), d->dstSocket.data(), buffer.data(), buffer.size()))
-                    return;
-            }
-            else if (it.socket() == d->dstSocket->pollable())
-            {
-                if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.data(), buffer.size()))
-                    return;
-            }
-            else
-            {
-                NX_ASSERT(false, lm("Unexpected pollable: %1").arg(it.socket()));
-            }
-        }
+        if (!someBytesRead1 && !someBytesRead2)
+            std::this_thread::sleep_for(kPollTimeout);
     }
 }
 
 void QnProxyConnectionProcessor::doSmartProxy()
 {
     Q_D(QnProxyConnectionProcessor);
-    nx::Buffer buffer(READ_BUFFER_SIZE, Qt::Uninitialized);
+    nx::Buffer buffer(kReadBufferSize, Qt::Uninitialized);
     d->clientRequest.clear();
 
-    nx::network::aio::UnifiedPollSet pollSet;
-    pollSet.add(d->socket->pollable(), nx::network::aio::etRead);
-    pollSet.add(d->dstSocket->pollable(), nx::network::aio::etRead);
+    // NOTE: Poll set would be more effective than a busy loop, but we can not use it because
+    //     SSL sockets do not support it properly.
     while (!m_needStop)
     {
-        int rez = 0;
-        auto pollLimitTime = std::chrono::steady_clock::now() + kIoTimeout;
-        while (rez == 0)
+        const auto timeSinseLastIo = std::chrono::steady_clock::now() - d->lastIoTimePoint;
+        if (m_needStop || timeSinseLastIo >= kIoTimeout)
+            return;
+
+        bool someBytesRead1 = false;
+        int readed;
+        if (readSocketNonBlock(&readed, d->socket.data(), d->tcpReadBuffer, TCP_READ_BUFFER_SIZE))
         {
-            if (pollLimitTime <= std::chrono::steady_clock::now())
-                return; // IO timeout
+            if (readed < 1)
+                return;
 
-            rez = pollSet.poll(kPollTimeout);
-            if (rez == -1 && SystemError::getLastOSErrorCode() == SystemError::interrupted)
-                rez = 0; // the same as timeout
+            someBytesRead1 = true;
 
-            if (m_needStop || rez < 0)
-                return; // stop or error
+            d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
+            if (isFullMessage(d->clientRequest))
+            {
+                parseRequest();
+                QString path = d->request.requestLine.url.path();
+                // parse next request and change dst if required
+                QUrl dstUrl;
+                QnRoute dstRoute;
+                updateClientRequest(dstUrl, dstRoute);
+                bool isWebSocket = nx_http::getHeaderValue( d->request.headers, "Upgrade").toLower() == lit("websocket");
+                bool isSameAddr = d->lastConnectedUrl == dstRoute.addr.toString() || d->lastConnectedUrl == dstUrl;
+                if (isSameAddr)
+                {
+                    d->dstSocket->send(d->clientRequest);
+                    if (isWebSocket)
+                    {
+                        if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.data(), kReadBufferSize, nullptr))
+                            return; // send rest of data
+
+                        doRawProxy(); // switch to binary mode
+                        return;
+                    }
+                }
+                else
+                {
+                    // new server
+                    d->lastConnectedUrl = connectToRemoteHost(dstRoute, dstUrl);
+                    if (d->lastConnectedUrl.isEmpty())
+                    {
+                        d->socket->close();
+                        return; // invalid dst address
+                    }
+
+                    d->dstSocket->send(d->clientRequest.data(), d->clientRequest.size());
+
+                    if (isWebSocket)
+                    {
+                        doRawProxy(); // switch to binary mode
+                        return;
+                    }
+
+                    d->clientRequest.clear();
+                    break;
+                }
+                d->clientRequest.clear();
+            }
         }
 
-        for (auto it = pollSet.begin(); it != pollSet.end(); ++it)
+        bool someBytesRead2 = false;
+        if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.data(), kReadBufferSize, &someBytesRead2))
+            return;
+
+        if (!someBytesRead1 && !someBytesRead2)
+            std::this_thread::sleep_for(kPollTimeout);
+    }
+}
+
+bool QnProxyConnectionProcessor::readSocketNonBlock(
+    int* returnValue, AbstractStreamSocket* socket, void* buffer, int bufferSize)
+{
+    *returnValue = socket->recv(buffer, bufferSize, MSG_DONTWAIT);
+    if (*returnValue < 0)
+    {
+        auto code = SystemError::getLastOSErrorCode();
+        if (code == SystemError::interrupted ||
+            code == SystemError::wouldBlock ||
+            code == SystemError::again)
         {
-            if (it.eventType() != nx::network::aio::etRead)
-            {
-                NX_LOGX(lm("Error polling socket: %1").arg(it.socket()), cl_logDEBUG1);
-                return;
-            }
-
-            if (it.socket() == d->socket->pollable())
-            {
-                int readed;
-                if (!readSocketNonBlock(&readed, d->socket.data(), d->tcpReadBuffer, TCP_READ_BUFFER_SIZE))
-                    continue;
-
-                if (readed < 1)
-                    return;
-
-                d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
-                if (isFullMessage(d->clientRequest))
-                {
-                    parseRequest();
-                    QString path = d->request.requestLine.url.path();
-                    // parse next request and change dst if required
-                    QUrl dstUrl;
-                    QnRoute dstRoute;
-                    updateClientRequest(dstUrl, dstRoute);
-                    bool isWebSocket = nx_http::getHeaderValue( d->request.headers, "Upgrade").toLower() == lit("websocket");
-                    bool isSameAddr = d->lastConnectedUrl == dstRoute.addr.toString() || d->lastConnectedUrl == dstUrl;
-                    if (isSameAddr)
-                    {
-                        d->dstSocket->send(d->clientRequest);
-                        if (isWebSocket)
-                        {
-                            if( rez == 2 ) //same as FD_ISSET(d->dstSocket->handle(), &read_set), since we have only 2 sockets
-                                if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.data(), READ_BUFFER_SIZE))
-                                    return; // send rest of data
-                            doRawProxy(); // switch to binary mode
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        // new server
-                        pollSet.remove(d->dstSocket->pollable(), nx::network::aio::etRead);
-                        d->lastConnectedUrl = connectToRemoteHost(dstRoute, dstUrl);
-                        if (d->lastConnectedUrl.isEmpty())
-                        {
-                            d->socket->close();
-                            return; // invalid dst address
-                        }
-
-                        d->dstSocket->send(d->clientRequest.data(), d->clientRequest.size());
-
-                        if (isWebSocket)
-                        {
-                            doRawProxy(); // switch to binary mode
-                            return;
-                        }
-                        pollSet.add(d->dstSocket->pollable(), nx::network::aio::etRead);
-                        d->clientRequest.clear();
-                        break;
-                    }
-                    d->clientRequest.clear();
-                }
-            }
-            else if (it.socket() == d->dstSocket->pollable())
-            {
-                if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.data(), READ_BUFFER_SIZE))
-                    return;
-            }
-            else
-            {
-                NX_ASSERT(false, lm("Unexpected pollable: %1").arg(it.socket()));
-            }
+            return false;
         }
     }
+
+    Q_D(QnProxyConnectionProcessor);
+    d->lastIoTimePoint = std::chrono::steady_clock::now();
+    return true;
 }

@@ -1,11 +1,6 @@
-/**********************************************************
-* Aug 12, 2015
-* a.kolesnikov
-***********************************************************/
+#pragma once
 
-#ifndef NX_CLOUD_DB_EMAIL_MANAGER_H
-#define NX_CLOUD_DB_EMAIL_MANAGER_H
-
+#include <atomic>
 #include <functional>
 #include <memory>
 #include <thread>
@@ -26,13 +21,12 @@
 #include "notification.h"
 #include "settings.h"
 
-
 namespace nx {
 namespace cdb {
 
 namespace conf {
 class Settings;
-}   // namespace conf
+} // namespace conf
 
 class AbstractEmailManager
 {
@@ -45,8 +39,7 @@ public:
 };
 
 //!Responsible for sending emails
-class EMailManager
-:
+class EMailManager:
     public AbstractEmailManager
 {
 public:
@@ -71,26 +64,31 @@ private:
     QUrl m_notificationModuleUrl;
     std::set<nx_http::AsyncHttpClientPtr> m_ongoingRequests;
     QnCounter m_startedAsyncCallsCounter;
+    std::atomic<std::uint64_t> m_notificationSequence;
 
     void onSendNotificationRequestDone(
         QnCounter::ScopedIncrement asyncCallLocker,
         nx_http::AsyncHttpClientPtr client,
+        std::uint64_t notificationIndex,
         std::function<void(bool)> completionHandler);
 };
 
-/*!
-    \note Access to internal factory func is not synchronized
-*/
+/**
+ * @note Access to internal factory func is not synchronized.
+ */
 class EMailManagerFactory
 {
 public:
+    using FactoryFunc =
+        std::function<std::unique_ptr<AbstractEmailManager>(const conf::Settings& settings)>;
+
     static std::unique_ptr<AbstractEmailManager> create(const conf::Settings& settings);
-    static void setFactory(
-        std::function<std::unique_ptr<AbstractEmailManager>(
-            const conf::Settings& settings)> factoryFunc);
+    /**
+     * Default is nullptr.
+     * @return Previous factory func.
+     */
+    static FactoryFunc setFactory(FactoryFunc factoryFunc);
 };
 
-}   //cdb
-}   //nx
-
-#endif  //NX_CLOUD_DB_EMAIL_MANAGER_H
+} // namespace cdb
+} // namespace nx

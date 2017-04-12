@@ -21,13 +21,13 @@ PingRequest::PingRequest(std::list<SocketAddress> _endpoints)
 
 void PingRequest::serializeAttributes(nx::stun::Message* const message)
 {
-    message->newAttribute< stun::cc::attrs::PublicEndpointList >(
+    message->newAttribute< stun::extension::attrs::PublicEndpointList >(
         std::move(endpoints));
 }
 
 bool PingRequest::parseAttributes(const nx::stun::Message& message)
 {
-    return readAttributeValue<stun::cc::attrs::PublicEndpointList>(
+    return readAttributeValue<stun::extension::attrs::PublicEndpointList>(
         message, &endpoints);
 }
 
@@ -40,13 +40,13 @@ PingResponse::PingResponse()
 
 void PingResponse::serializeAttributes(nx::stun::Message* const message)
 {
-    message->newAttribute< stun::cc::attrs::PublicEndpointList >(
+    message->newAttribute< stun::extension::attrs::PublicEndpointList >(
         std::move(endpoints));
 }
 
 bool PingResponse::parseAttributes(const nx::stun::Message& message)
 {
-    return readAttributeValue<stun::cc::attrs::PublicEndpointList>(
+    return readAttributeValue<stun::extension::attrs::PublicEndpointList>(
         message, &endpoints);
 }
 

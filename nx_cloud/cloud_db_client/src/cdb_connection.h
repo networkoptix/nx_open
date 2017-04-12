@@ -1,10 +1,4 @@
-/**********************************************************
-* Sep 3, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_CDB_CL_CDB_CONNECTION_H
-#define NX_CDB_CL_CDB_CONNECTION_H
+#pragma once
 
 #include <include/cdb/connection.h>
 
@@ -14,25 +8,16 @@
 #include "maintenance_manager.h"
 #include "system_manager.h"
 
-
-namespace nx {
-namespace cc {
-    class CloudModuleEndPointFetcher;
-}   //cc
-}   //nx
-
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
-class Connection
-:
-    public api::Connection,
-    public AsyncRequestsExecutor
+class Connection:
+    public api::Connection
 {
 public:
     Connection(
-        network::cloud::CloudModuleEndPointFetcher* const endPointFetcher);
+        network::cloud::CloudModuleUrlFetcher* const endPointFetcher);
 
     //!Implemetation of api::Connection::getAccountManager
     virtual api::AccountManager* accountManager() override;
@@ -57,6 +42,9 @@ public:
         const std::string& proxyHost,
         std::uint16_t proxyPort) override;
 
+    virtual void setRequestTimeout(std::chrono::milliseconds) override;
+    virtual std::chrono::milliseconds requestTimeout() const override;
+
     //!Implemetation of api::Connection::ping
     virtual void ping(
         std::function<void(api::ResultCode, api::ModuleInfo)> completionHandler) override;
@@ -66,10 +54,9 @@ private:
     std::unique_ptr<SystemManager> m_systemManager;
     std::unique_ptr<AuthProvider> m_authProvider;
     std::unique_ptr<MaintenanceManager> m_maintenanceManager;
+    AsyncRequestsExecutor m_requestExecutor;
 };
 
-}   //cl
-}   //cdb
-}   //nx
-
-#endif  //NX_CDB_CL_CDB_CONNECTION_H
+} // namespace client
+} // namespace cdb
+} // namespace nx

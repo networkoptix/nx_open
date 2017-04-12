@@ -101,7 +101,7 @@
           <attribute name="title">
            <string>Forecast for Full Storage Usage</string>
           </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0">
+          <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0,0">
            <property name="topMargin">
             <number>12</number>
            </property>
@@ -152,6 +152,19 @@
             </widget>
            </item>
            <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <item>
               <widget class="QWidget" name="forecastControlWidget" native="true">
@@ -168,133 +181,66 @@
                 <property name="bottomMargin">
                  <number>0</number>
                 </property>
-                <item row="2" column="2">
-                 <widget class="QLabel" name="label_2">
-                  <property name="minimumSize">
-                   <size>
-                    <width>64</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>1 TB</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QLabel" name="label_3">
-                  <property name="minimumSize">
-                   <size>
-                    <width>64</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>0 TB</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="5">
-                 <widget class="QLabel" name="label_4">
-                  <property name="minimumSize">
-                   <size>
-                    <width>64</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>1000 TB</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1" colspan="5">
-                 <widget class="QSlider" name="extraSpaceSlider">
-                  <property name="maximum">
-                   <number>400</number>
-                  </property>
-                  <property name="pageStep">
-                   <number>100</number>
-                  </property>
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="tickPosition">
-                   <enum>QSlider::TicksBelow</enum>
-                  </property>
-                  <property name="tickInterval">
-                   <number>100</number>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="4">
-                 <widget class="QLabel" name="label_6">
-                  <property name="minimumSize">
-                   <size>
-                    <width>64</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>100 TB</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="6" rowspan="3">
-                 <widget class="QDoubleSpinBox" name="extraSizeSpinBox">
-                  <property name="suffix">
-                   <string> TB</string>
-                  </property>
-                  <property name="maximum">
-                   <double>1000.000000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="3">
-                 <widget class="QLabel" name="label_5">
-                  <property name="minimumSize">
-                   <size>
-                    <width>64</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>10 TB</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="0" rowspan="3">
+                <item row="0" column="0" rowspan="4">
                  <widget class="QLabel" name="label">
                   <property name="text">
                    <string>Additional storage:</string>
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="2" colspan="2">
-                 <spacer name="horizontalSpacer_3">
+                <item row="0" column="1" rowspan="4">
+                 <widget class="QDoubleSpinBox" name="extraSizeSpinBox">
+                  <property name="suffix">
+                   <string notr="true">&lt; TB&gt;</string>
+                  </property>
+                  <property name="maximum">
+                   <double>1000.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="3" rowspan="4">
+                 <widget class="QSlider" name="extraSpaceSlider">
+                  <property name="minimumSize">
+                   <size>
+                    <width>350</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximum">
+                   <number>400</number>
+                  </property>
+                  <property name="pageStep">
+                   <number>100</number>
+                  </property>
+                  <property name="tracking">
+                   <bool>true</bool>
+                  </property>
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
                   </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>16</height>
-                   </size>
+                  <property name="tickPosition">
+                   <enum>QSlider::NoTicks</enum>
                   </property>
-                 </spacer>
+                  <property name="tickInterval">
+                   <number>100</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="2" rowspan="4">
+                 <widget class="QLabel" name="label_2">
+                  <property name="text">
+                   <string notr="true">0</string>
+                  </property>
+                 </widget>
                 </item>
                </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="maxSizeLabel">
+               <property name="text">
+                <string notr="true">1000 TB</string>
+               </property>
               </widget>
              </item>
              <item>

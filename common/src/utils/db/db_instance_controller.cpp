@@ -10,11 +10,15 @@
 namespace nx {
 namespace db {
 
+constexpr static std::chrono::minutes kDefaultStatisticsAggregationPeriod = std::chrono::minutes(1);
+
 InstanceController::InstanceController(const ConnectionOptions& dbConnectionOptions):
     m_dbConnectionOptions(dbConnectionOptions),
     m_queryExecutor(std::make_unique<AsyncSqlQueryExecutor>(dbConnectionOptions)),
+    m_statisticsCollector(kDefaultStatisticsAggregationPeriod),
     m_dbStructureUpdater(m_queryExecutor.get())
 {
+    m_queryExecutor->setStatisticsCollector(&m_statisticsCollector);
 }
 
 bool InstanceController::initialize()
@@ -40,9 +44,24 @@ bool InstanceController::initialize()
     return true;
 }
 
-const std::unique_ptr<AsyncSqlQueryExecutor>& InstanceController::queryExecutor()
+AsyncSqlQueryExecutor& InstanceController::queryExecutor()
 {
-    return m_queryExecutor;
+    return *m_queryExecutor;
+}
+
+const AsyncSqlQueryExecutor& InstanceController::queryExecutor() const
+{
+    return *m_queryExecutor;
+}
+
+const StatisticsCollector& InstanceController::statisticsCollector() const
+{
+    return m_statisticsCollector;
+}
+
+StatisticsCollector& InstanceController::statisticsCollector()
+{
+    return m_statisticsCollector;
 }
 
 DbStructureUpdater& InstanceController::dbStructureUpdater()
@@ -62,7 +81,7 @@ bool InstanceController::configureDb()
     if (m_dbConnectionOptions.driverType != RdbmsDriverType::sqlite)
         return true;
 
-    std::promise<DBResult> cacheFilledPromise;
+    nx::utils::promise<DBResult> cacheFilledPromise;
     auto future = cacheFilledPromise.get_future();
 
     m_queryExecutor->executeUpdateWithoutTran(

@@ -1,11 +1,15 @@
 pragma Singleton
 
 import QtQuick 2.5;
-import NetworkOptix.Qml 1.0;
 
 QtObject
 {
     id: thisComponent;
+
+    function getPaletteColor(color, offset)
+    {
+        return context.getPaletteColor(color, offset);
+    }
 
     function darkerColor(color, offset)
     {
@@ -50,14 +54,15 @@ QtObject
         readonly property font font: Qt.font({ pixelSize: 14, weight: Font.Normal });
         readonly property font fontReadOnly: Qt.font({ pixelSize: 14, weight: Font.Medium });
         readonly property color color: colors.text;
+        readonly property color selectionColor: colors.highlight;
     }
 
     property QtObject dropDown: QtObject
     {
-        readonly property color bkgColor: colors.text;
+        readonly property color bkgColor: colors.midlight;
         readonly property color hoveredBkgColor: colors.brand;
 
-        readonly property color textColor: context.getPaletteColor("dark", 3)
+        readonly property color textColor: colors.text;
         readonly property color hoveredTextColor: colors.brandContrast;
     }
 
@@ -93,11 +98,13 @@ QtObject
         readonly property color buttonText: text;
         readonly property color brightText: context.getPaletteColor("light", 16);
         readonly property color mid: context.getPaletteColor("dark", 9);
+        readonly property color dark: context.getPaletteColor("dark", 8);
         readonly property color midlight: context.getPaletteColor("dark", 12);
         readonly property color button: context.getPaletteColor("dark", 10);
         readonly property color brand: context.getPaletteColor("brand", 7);
 
         readonly property color brandContrast: context.getContrastColor("brand");
+        readonly property color highlight: brand;
         readonly property color red_main: context.getPaletteColor("red", 4);
         readonly property color yellow_main: context.getPaletteColor("yellow", 0);
 
@@ -120,6 +127,11 @@ QtObject
             {
                 readonly property color link: context.getPaletteColor("blue", 2);
                 readonly property color linkHovered: context.getPaletteColor("blue", 4);
+            }
+
+            property QtObject titleBar: QtObject
+            {
+                readonly property color shadow: colorWithAlpha(getPaletteColor("dark", 0), 0.15);
             }
         }
     }

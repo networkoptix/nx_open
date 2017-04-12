@@ -17,7 +17,7 @@ namespace utils {
 class NX_UTILS_API BarrierHandler
 {
 public:
-    BarrierHandler(nx::utils::MoveOnlyFunc<void()> handler );
+    BarrierHandler(nx::utils::MoveOnlyFunc<void()> handler);
     std::function<void()> fork();
 
 protected:

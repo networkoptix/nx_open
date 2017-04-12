@@ -54,7 +54,7 @@ AuthenticationManager::AuthenticationManager(
 void AuthenticationManager::authenticate(
     const nx_http::HttpServerConnection& connection,
     const nx_http::Request& request,
-    nx_http::AuthenticationCompletionHandler completionHandler)
+    nx_http::server::AuthenticationCompletionHandler completionHandler)
 {
     boost::optional<nx_http::header::WWWAuthenticate> wwwAuthenticate;
     stree::ResourceContainer authProperties;
@@ -214,7 +214,7 @@ api::ResultCode AuthenticationManager::authenticateInDataManagers(
 
     for (AbstractAuthenticationDataProvider* authDataProvider: m_authDataProviders)
     {
-        std::promise<api::ResultCode> authPromise;
+        nx::utils::promise<api::ResultCode> authPromise;
         auto authFuture = authPromise.get_future();
         authDataProvider->authenticateByName(
             username,

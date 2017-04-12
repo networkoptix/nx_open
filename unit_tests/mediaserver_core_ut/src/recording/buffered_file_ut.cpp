@@ -31,6 +31,7 @@ void doTestInternal(int systemFlags)
         std::shared_ptr<IQnFile>(new QnFile(kTestFileName)),
         1024*1024*2,
         1024*1024*4,
+        1024*1024*4,
         QnUuid::createUuid()
         ));
 
@@ -160,6 +161,7 @@ TEST(BufferedFileWriter, AdaptiveBufferSize)
     const size_t kFileCount = 5;
     const int kIoBlockSize = 1024 * 1024 * 4;
     const int kFfmpegBufferSize = 1024;
+    const int kFfmpegMaxBufferSize = 1024*1024*4;
     const QnUuid kWriterPoolId = QnUuid::createUuid();
     std::vector<FileTestData> files;
     files.reserve(kFileCount);
@@ -173,6 +175,7 @@ TEST(BufferedFileWriter, AdaptiveBufferSize)
                 std::shared_ptr<IQnFile>(new QnFile(fileName)),
                 kIoBlockSize,
                 kFfmpegBufferSize,
+                kFfmpegMaxBufferSize,
                 kWriterPoolId);
 #ifdef Q_OS_WIN
         ioDevice->setSystemFlags(FILE_FLAG_NO_BUFFERING);
@@ -263,4 +266,32 @@ TEST(BufferedFileWriter, AdaptiveBufferSize)
         auto fileRecIt = bufferManager.getFileToRec().find(filePtr);
         ASSERT_TRUE(fileRecIt == bufferManager.getFileToRec().end());
     }
+}
+
+TEST(BufferedFileWriter, VariousSizes)
+{
+    QnWriterPool writerPool;
+
+    const QByteArray kTestFileName("test_data1.bin");
+    const QByteArray kTestPattern("1234567890");
+    for (int fileBlockSize = 32768; fileBlockSize < 327680; fileBlockSize += 15000)
+        for (int minBufSize = 1; minBufSize < 10000; minBufSize += 2000)
+            for (int testDataSize = 65536; testDataSize < 65536 * 5; testDataSize += 5000)
+            {
+                QFile::remove(kTestFileName);
+
+                std::unique_ptr<QBufferedFile> testFile(
+                    new QBufferedFile(
+                        std::shared_ptr<IQnFile>(new QnFile(kTestFileName)),
+                        fileBlockSize,
+                        minBufSize,
+                        1024*64,
+                        QnUuid::fromStringSafe("{33531ee9-c4c5-4a95-b708-25e3fa00ff5f}")
+                    ));
+
+                ASSERT_TRUE(testFile->open(QIODevice::WriteOnly));
+
+                std::vector<char> testData(testDataSize);
+                testFile->writeData(testData.data(), testData.size());
+            }
 }

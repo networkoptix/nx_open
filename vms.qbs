@@ -29,7 +29,7 @@ Project
     property string platform: VmsUtils.currentPlatform()
 
     property bool withMediaServer:
-        ["linux", "windows"].contains(platform) || box
+        ["linux", "windows"].contains(platform) || box != undefined
     property bool withDesktopClient:
         ["linux", "windows", "macosx"].contains(platform) || box == "tx1"
     property bool withMobileClient:
@@ -66,6 +66,13 @@ Project
         condition: qbs.targetOS.contains("macos")
         quazipVersion: "0.7.2"
         onvifVersion: "2.1.2-io"
+    }
+
+    Properties
+    {
+        condition: qbs.targetOS.contains("android")
+        opensslVersion: "1.0.2g"
+        openalVersion: "1.17.2"
     }
 
     property path buildenvDirectory: Environment.getEnv("environment")

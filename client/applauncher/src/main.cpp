@@ -106,7 +106,10 @@ int main(int argc, char* argv[])
     QString fileToDownload;
     QString destFilePath;
 
+    QStringList applicationParameters;
+
     QnCommandLineParser commandLineParser;
+    commandLineParser.storeUnparsed(&applicationParameters);
     commandLineParser.addParameter(&logLevel, "--log-level", NULL, QString());
     commandLineParser.addParameter(&logFilePath, "--log-file", NULL, QString());
     commandLineParser.addParameter(&mirrorListUrl, "--mirror-list-url", NULL, QString());
@@ -125,7 +128,7 @@ int main(int argc, char* argv[])
     commandLineParser.addParameter(&devModeKey, "--dev-mode-key", NULL, QString(), QString());
     commandLineParser.addParameter(&fileToDownload, "--get", "-g", QString(), QString());
     commandLineParser.addParameter(&destFilePath, "--out-file", "-o", QString(), QString());
-    commandLineParser.parse(argc, argv, stderr);
+    commandLineParser.parse(argc, (const char**) argv, stderr);
 
     qApp->setOrganizationName(QnAppInfo::organizationName());
     qApp->setApplicationName(QnApplauncherAppInfo::applicationName());
@@ -189,6 +192,7 @@ int main(int argc, char* argv[])
         &userSettings,
         &installationManager,
         mode,
+        applicationParameters,
         mirrorListUrl);
 
     applauncherProcess.setDevModeKey(devModeKey);

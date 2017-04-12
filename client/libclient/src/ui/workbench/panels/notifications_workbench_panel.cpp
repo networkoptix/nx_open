@@ -116,7 +116,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(pinButton));
 
     /* Create a shadow: */
-    auto shadow = new QnEdgeShadowWidget(item, Qt::LeftEdge, NxUi::kShadowThickness);
+    auto shadow = new QnEdgeShadowWidget(item, item, Qt::LeftEdge, NxUi::kShadowThickness);
     shadow->setZValue(NxUi::ShadowItemZOrder);
 
     updateControlsGeometry();

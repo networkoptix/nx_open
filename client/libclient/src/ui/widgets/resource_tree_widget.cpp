@@ -80,11 +80,8 @@ public:
 private:
     /**
      * Helper function to list nodes in the correct order.
-     * Root nodes are strictly ordered, but there are two types of nodes which
-     * are inserted in between: current user node and videowall node.
-     * Videowalls are pinned between Layouts and WebPages.
-     * CurrentUser is pinned between CurrentSystem and Separator.
-     * Also when we are not logged in, LocalResources node is displayed on top.
+     * Root nodes are strictly ordered, but there is one type of node which is inserted in between:
+     * videowall nodes, which are pinned between Layouts and WebPages.
      */
     qreal nodeOrder(const QModelIndex &index) const
     {
@@ -93,24 +90,10 @@ private:
             return nodeType;
 
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        bool isUser = resource->flags().testFlag(Qn::user);
-        if (isUser)
-            return 0.5 * (Qn::CurrentSystemNode + Qn::SeparatorNode);
-
         bool isVideoWall = resource->flags().testFlag(Qn::videowall);
         if (isVideoWall)
             return 0.5 * (Qn::LayoutsNode + Qn::WebPagesNode);
 
-        /* Comparison between layouts and shared layouts. */
-        bool isLayout = resource->flags().testFlag(Qn::layout);
-        if (isLayout)
-            return nodeType;
-
-        /* We should get here only when comparing local resources node with resources when we are not logged in. */
-        if (resource->hasFlags(Qn::local))
-            return Qn::LocalSeparatorNode + 1;
-
-        /* We still can get here when comparing recorders with cameras. */
         return nodeType;
     }
 
@@ -168,7 +151,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     m_itemDelegate->setFixedHeight(0); // automatic height
     ui->resourcesTreeView->setItemDelegateForColumn(Qn::NameColumn, m_itemDelegate);
     ui->resourcesTreeView->setProperty(style::Properties::kSideIndentation,
-        QVariant::fromValue(QnIndents(0, 0)));
+        QVariant::fromValue(QnIndents(0, 1)));
 
     connect(ui->resourcesTreeView, &QnTreeView::enterPressed, this,
         [this](const QModelIndex& index){emit activated(index, false); });
@@ -356,10 +339,15 @@ void QnResourceTreeWidget::setGraphicsTweaks(Qn::GraphicsTweaksFlags flags)
 
     m_graphicsTweaksFlags = flags;
 
+    /*
+     * Currently this is not working: hidden row does not receive full update when scrolled up.
+     * It was working only due to full tree repainting inside graphics proxy widget.
+
     if (flags & Qn::HideLastRow)
         ui->resourcesTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, true);
     else
         ui->resourcesTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, QVariant());
+    */
 
     if (flags & Qn::BypassGraphicsProxy)
     {
@@ -561,13 +549,46 @@ void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex 
 
 void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &index)
 {
-    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-    if ((resource && resource->hasFlags(Qn::server))
-        || nodeType == Qn::ServersNode
-        || nodeType == Qn::UserResourcesNode)
+    /* Auto-expand certain nodes. */
+    switch (index.data(Qn::NodeTypeRole).value<Qn::NodeType>())
     {
-        ui->resourcesTreeView->expand(index);
+        case Qn::ResourceNode:
+        {
+            const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+            if (!resource || !resource->hasFlags(Qn::server))
+                break;
+        }
+        /* FALL THROUGH */
+        case Qn::ServersNode:
+        case Qn::UserResourcesNode:
+            ui->resourcesTreeView->expand(index);
+            break;
+
+        default:
+            break;
     }
+
     at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);
+}
+
+void QnResourceTreeWidget::update(const QnResourcePtr& resource)
+{
+    if (!resource)
+        return;
+
+    const auto model = ui->resourcesTreeView->model();
+    if (!model)
+        return;
+
+    const auto start = model->index(0, 0, ui->resourcesTreeView->rootIndex());
+
+    const auto indices = model->match(
+        start,
+        Qn::ResourceRole,
+        QVariant::fromValue(resource),
+        -1,
+        Qt::MatchExactly | Qt::MatchRecursive);
+
+    for (const auto& index: indices)
+        ui->resourcesTreeView->update(index);
 }

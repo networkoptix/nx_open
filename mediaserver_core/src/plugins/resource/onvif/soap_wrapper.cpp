@@ -1,9 +1,10 @@
-
 #ifdef ENABLE_ONVIF
 
 #include <set>
 
 #include "openssl/evp.h"
+
+#include <QElapsedTimer>
 
 #include "soap_wrapper.h"
 #include <onvif/Onvif.nsmap>
@@ -26,6 +27,8 @@
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
 #include "media_server/settings.h"
+
+using nx::common::utils::Credentials;
 
 namespace {
 
@@ -120,7 +123,7 @@ const int kSoapDefaultAcceptTimeoutSeconds = 5;
 
 struct SoapTimeouts
 {
-    SoapTimeouts(): 
+    SoapTimeouts():
         sendTimeoutSeconds(kSoapDefaultSendTimeoutSeconds),
         recvTimeoutSeconds(kSoapDefaultRecvTimeoutSeconds),
         connectTimeoutSeconds(kSoapDefaultConnectTimeoutSeconds),
@@ -172,7 +175,7 @@ struct SoapTimeouts
     }
 
     QString serialize()
-    { 
+    {
         return lit("%1;%2;%3;%4")
             .arg(sendTimeoutSeconds.count())
             .arg(recvTimeoutSeconds.count())
@@ -418,23 +421,23 @@ QAuthenticator DeviceSoapWrapper::getDefaultPassword(const QString& manufacturer
     return result;
 }
 
-std::list<QnCredentials> DeviceSoapWrapper::getPossibleCredentials(
+std::list<nx::common::utils::Credentials> DeviceSoapWrapper::getPossibleCredentials(
     const QString& manufacturer,
     const QString& model) const
 {
     QnResourceData resData = qnCommon->dataPool()->data(manufacturer, model);
-    auto credentials = resData.value<QList<QnCredentials>>(
+    auto credentials = resData.value<QList<nx::common::utils::Credentials>>(
         Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
 
     return credentials.toStdList();
 }
 
-QnCredentials DeviceSoapWrapper::getForcedCredentials(
+nx::common::utils::Credentials DeviceSoapWrapper::getForcedCredentials(
     const QString& manufacturer,
     const QString& model)
 {
     QnResourceData resData = qnCommon->dataPool()->data(manufacturer, model);
-    auto credentials = resData.value<QnCredentials>(
+    auto credentials = resData.value<nx::common::utils::Credentials>(
         Qn::FORCED_DEFAULT_CREDENTIALS_PARAM_NAME);
 
     return credentials;
@@ -442,8 +445,6 @@ QnCredentials DeviceSoapWrapper::getForcedCredentials(
 
 bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QString& model)
 {
-    calcTimeDrift();
-
     auto forcedCredentials = getForcedCredentials(manufacturer, model);
 
     if (!forcedCredentials.user.isEmpty())
@@ -453,52 +454,64 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QS
         return true;
     }
 
-    std::list<QnCredentials> possibleCredentials;
+    const auto oldCredentials =
+        PasswordHelper::instance()->getCredentialsByManufacturer(manufacturer);
+
+    auto possibleCredentials = oldCredentials;
+
     const auto credentialsFromResourceData = getPossibleCredentials(manufacturer, model);
-    const auto& oldPasswords = PasswordHelper::instance()->getPasswordsByManufacturer(manufacturer);
-
-    std::set<QnCredentials> oldCredentialsSet;
-
-    for (const auto& creds: oldPasswords)
+    for (const auto& credentials: credentialsFromResourceData)
     {
-        QnCredentials auth(QLatin1String(creds.first), QLatin1String(creds.second));
-        oldCredentialsSet.insert(auth);
-        possibleCredentials.push_back(auth);
+        if (!oldCredentials.contains(credentials))
+            possibleCredentials.append(credentials);
     }
 
-    for (const auto& creds: credentialsFromResourceData)
+    if (possibleCredentials.size() <= 1)
     {
-        if (!oldCredentialsSet.count(creds))
-            possibleCredentials.push_back(creds);
+        nx::common::utils::Credentials credentials;
+        if (!possibleCredentials.isEmpty())
+            credentials = possibleCredentials.first();
+        setLogin(credentials.user);
+        setPassword(credentials.password);
+        return true;
     }
 
-    for (const auto& auth: possibleCredentials)
+    // Start logging timeouts as soon as network requests appear.
+    QElapsedTimer timer;
+    timer.restart();
+    auto logTimeout = [&](bool found)
+    {
+        NX_LOG(lit("Discovery----: autodetect credentials for camera %1 took %2 ms. Credentials found: %3").
+            arg(getEndpointUrl()).
+            arg(timer.elapsed()).
+            arg(found),
+            cl_logDEBUG1);
+    };
+
+    calcTimeDrift();
+    for (const auto& credentials: possibleCredentials)
     {
         if (QnResource::isStopping())
             return false;
 
-        setLogin(auth.user);
-        setPassword(auth.password);
+        setLogin(credentials.user);
+        setPassword(credentials.password);
 
         NetIfacesReq request;
         NetIfacesResp response;
         auto soapRes = getNetworkInterfaces(request, response);
 
         if (soapRes == SOAP_OK || !isNotAuthenticated())
+        {
+            logTimeout(soapRes == SOAP_OK);
             return soapRes == SOAP_OK;
+        }
     }
+    logTimeout(false);
 
-    if (!possibleCredentials.empty())
-    {
-        auto first = possibleCredentials.cbegin();
-        setLogin(first->user);
-        setPassword(first->password);
-    }
-    else
-    {
-        setLogin(QString());
-        setPassword(QString());
-    }
+    const auto& credentials = possibleCredentials.first();
+    setLogin(credentials.user);
+    setPassword(credentials.password);
 
     return false;
 }

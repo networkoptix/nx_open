@@ -48,7 +48,7 @@ void QnWorkbenchWebPageHandler::at_newWebPageAction_triggered()
 {
     QScopedPointer<QnInputDialog> dialog(new QnInputDialog(mainWindow()));
     dialog->setWindowTitle(tr("New Web Page..."));
-    dialog->setCaption(tr("Enter the url of the Web Page to add:"));
+    dialog->setCaption(tr("Enter URL of Web Page to add:"));
     dialog->setPlaceholderText(lit("example.org"));
     dialog->setWindowModality(Qt::ApplicationModal);
 
@@ -63,11 +63,7 @@ void QnWorkbenchWebPageHandler::at_newWebPageAction_triggered()
         QnWebPageResourcePtr webPage(new QnWebPageResource(url));
         if (qnResPool->getResourceById(webPage->getId()))
         {
-            QnMessageBox::warning(
-                mainWindow(),
-                tr("Web Page already exists."),
-                tr("This Web Page is already exists.")
-            );
+            QnMessageBox::warning(mainWindow(), tr("This Web Page already exists"));
             continue;
         }
 

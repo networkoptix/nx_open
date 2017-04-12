@@ -43,7 +43,7 @@
     </div>
     <div ng-if="settings.needOldPassword">
         <form class="form" name="oldPasswordForm" novalidate>
-            <label for="oldSystemPassword" class="control-label">Enter your password to confirm action:</label>
+            <label for="oldSystemPassword" class="control-label">Enter the current password to continue.</label>
             <input id="oldSystemPassword" type="password" ng-model="settings.oldPassword"
                    class="form-control" placeholder="password" required auto-focus/>
         </form>
@@ -55,5 +55,5 @@
     <button type="button" class="btn" ng-class="settings.buttonClass" enter-button
             ng-disabled="settings.needOldPassword && !settings.oldPassword || settings.createLoginAndPassword && !forms.localForm.$valid"
             ng-if="!settings.cancellable" ng-click="ok()" >{{settings.actionLabel}}</button>
-    <button type="button" class="btn" ng-class="settings.buttonClass" ng-if="settings.cancellable" ng-click="close()" >Close</button>
+    <button type="button" class="btn" ng-class="settings.buttonClass" enter-button auto-focus ng-if="settings.cancellable" ng-click="close()" >Close</button>
 </div>

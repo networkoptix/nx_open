@@ -35,12 +35,12 @@ public:
     {
     public:
         /*!
-            QnAbstractPictureDataRef implementation MUST increment this value at object instanciation and decrement at object destruction
+            QnAbstractPictureDataRef implementation MUST increment this value at object instantiation and decrement at object destruction
         */
         std::atomic<int> externalRefCounter;
         //!Sequence counter incremented by the decoder to invalidate references to the picture
         /*!
-            QnAbstractPictureDataRef implementation should save sequence number at object instanciation and compare saved
+            QnAbstractPictureDataRef implementation should save sequence number at object instantiation and compare saved
             value this one to check, whether its reference is still valid
         */
         std::atomic<int> sequence;

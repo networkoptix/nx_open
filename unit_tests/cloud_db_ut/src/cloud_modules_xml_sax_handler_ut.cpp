@@ -13,7 +13,7 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
 TEST(CloudModulesXmlHandler, common)
 {
@@ -52,6 +52,6 @@ TEST(CloudModulesXmlHandler, common)
     ASSERT_EQ(*std::next(hpmEndpoints.begin(), 1), SocketAddress("10.0.2.103:456"));
 }
 
-}   //cl
+}   //client
 }   //cdb
 }   //nx

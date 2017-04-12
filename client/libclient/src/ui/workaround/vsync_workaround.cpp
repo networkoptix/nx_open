@@ -5,8 +5,8 @@
 #include <QtCore/QCoreApplication>
 
 namespace {
-    const int fpsLimit = 60;
-    const int millisecondsBetweenUpdates = 1000 / fpsLimit;
+    const int kFpsLimit = 60;
+    const int kTimeBetweenUpdatesMs = 1000 / kFpsLimit;
 }
 
 QnVSyncWorkaround::QnVSyncWorkaround(QObject *watched, QObject *parent) :
@@ -18,7 +18,7 @@ QnVSyncWorkaround::QnVSyncWorkaround(QObject *watched, QObject *parent) :
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &QnVSyncWorkaround::updateWatchedWidget);
-    timer->start(millisecondsBetweenUpdates);   // to achieve 60 fps
+    timer->start(kTimeBetweenUpdatesMs);   // to achieve 60 fps
 
     m_elapsedTimer.start();
 }
@@ -28,7 +28,7 @@ bool QnVSyncWorkaround::eventFilter(QObject *object, QEvent *event) {
         return false;
 
     qint64 elapsed = m_elapsedTimer.elapsed();
-    if (elapsed < millisecondsBetweenUpdates && event != m_updateEventToPass)
+    if (elapsed < kTimeBetweenUpdatesMs && event != m_updateEventToPass)
         return true;
 
     /* Avoiding double-redraw if someone will update us */
@@ -37,9 +37,10 @@ bool QnVSyncWorkaround::eventFilter(QObject *object, QEvent *event) {
     return false;
 }
 
-void QnVSyncWorkaround::updateWatchedWidget() {
-    QEvent* forcedUpdate = new QEvent(QEvent::UpdateRequest);
-    m_updateEventToPass = forcedUpdate;
-    QCoreApplication::sendEvent(m_watched, m_updateEventToPass);
-    delete forcedUpdate;
+void QnVSyncWorkaround::updateWatchedWidget()
+{
+    QEvent forcedUpdate(QEvent::UpdateRequest);
+    m_updateEventToPass = &forcedUpdate;
+    QCoreApplication::sendEvent(m_watched, &forcedUpdate);
+    m_updateEventToPass = nullptr;
 }

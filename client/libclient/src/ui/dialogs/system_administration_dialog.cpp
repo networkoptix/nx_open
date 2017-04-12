@@ -17,6 +17,8 @@
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 
+#include <ui/style/custom_style.h>
+
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
@@ -34,7 +36,6 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent)
     auto generalWidget = new QnGeneralSystemAdministrationWidget(this);
     auto smtpWidget = new QnSmtpSettingsWidget(this);
     auto routingWidget = new QnRoutingManagementWidget(this);
-
     addPage(GeneralPage,            generalWidget,                          tr("General"));
     addPage(LicensesPage,           new QnLicenseManagerWidget(this),       tr("Licenses"));
     addPage(SmtpPage,               smtpWidget,                             tr("Email"));
@@ -45,6 +46,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent)
     addPage(CloudManagement,        new QnCloudManagementWidget(this),      QnAppInfo::cloudName());
 
     loadDataToUi();
+    autoResizePagesToContents(ui->tabWidget,  { QSizePolicy::Preferred, QSizePolicy::Preferred }, false);
 
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);

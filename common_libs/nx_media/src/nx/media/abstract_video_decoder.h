@@ -86,13 +86,13 @@ public:
     }
 
     /**
-     * Returns square(pixel) aspect ratio (sar) for the last decoded frame
-     * or 1.0 if context isn't initialized yet.
+     * @return Square(pixel) aspect ratio (sar) for the last decoded frame,
+     * or 1.0 if context is not initialized yet.
      */
     virtual double getSampleAspectRatio() const { return 1.0; }
 
     /**
-     * Returns frame size in pixels.
+     * @return Frame size in pixels.
      */
     static QSize mediaSizeFromRawData(const QnConstCompressedVideoDataPtr& frame);
 

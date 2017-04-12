@@ -1,0 +1,22 @@
+add_subdirectory(appserver2_ut)
+add_subdirectory(common_ut)
+add_subdirectory(nx_fusion_ut)
+add_subdirectory(utils_ut)
+add_subdirectory(nx_media_ut)
+add_subdirectory(nx_network_ut)
+
+if(withDesktopClient)
+    add_subdirectory(client_ut)
+    add_subdirectory(vms_utils_ut)
+endif()
+
+if(withMediaServer)
+    add_subdirectory(mediaserver_core_ut)
+endif()
+
+if(withClouds)
+    add_subdirectory(vms_gateway_ut)
+    add_subdirectory(cloud_connectivity_ut)
+    add_subdirectory(cloud_db_ut)
+    add_subdirectory(connection_mediator_ut)
+endif()

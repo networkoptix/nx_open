@@ -60,9 +60,7 @@ public:
     virtual int mediaPort() const;
     void setMediaPort( int newPort );
 
-    virtual QString toString() const;
-    QString toSearchString() const;
-
+    virtual QString toSearchString() const override;
 
     void addNetworkStatus(NetworkStatus status);
     void removeNetworkStatus(NetworkStatus status);
@@ -101,7 +99,7 @@ public:
     */
     virtual void checkIfOnlineAsync( std::function<void(bool)> completionHandler );
 
-    static QnUuid uniqueIdToId(const QString& uniqId);
+    static QnUuid physicalIdToId(const QString& uniqId);
     virtual void initializationDone() override;
 
 private:

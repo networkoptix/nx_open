@@ -1,5 +1,14 @@
 #include "notification_sound_model.h"
 
+namespace {
+
+QString braced(const QString& source)
+{
+    return L'<' + source + L'>';
+};
+
+}
+
 QnNotificationSoundModel::QnNotificationSoundModel(QObject *parent) :
     base_type(parent)
 {
@@ -10,7 +19,7 @@ void QnNotificationSoundModel::init() {
     clear();
     m_loaded = false;
     QList<QStandardItem *> row;
-    row << new QStandardItem(tr("<Downloading sound list...>"))
+    row << new QStandardItem(braced(tr("Downloading sound list...")))
         << new QStandardItem(QString());
     appendRow(row);
 }
@@ -20,7 +29,7 @@ void QnNotificationSoundModel::loadList(const QStringList &filenames) {
 
 
     QList<QStandardItem *> row;
-    row << new QStandardItem(tr("<No Sound>"))
+    row << new QStandardItem(braced(tr("No Sound")))
         << new QStandardItem(QString());
     appendRow(row);
 
@@ -32,7 +41,7 @@ void QnNotificationSoundModel::loadList(const QStringList &filenames) {
 
 void QnNotificationSoundModel::addDownloading(const QString &filename, bool silent) {
     QList<QStandardItem *> row;
-    row << new QStandardItem(tr("<Downloading sound...>"))
+    row << new QStandardItem(braced(tr("Downloading sound...")))
         << new QStandardItem(filename);
     //TODO: #GDM #Business append columns: duration, date added (?)
     appendRow(row);
@@ -42,7 +51,7 @@ void QnNotificationSoundModel::addDownloading(const QString &filename, bool sile
 
 void QnNotificationSoundModel::addUploading(const QString &filename) {
     QList<QStandardItem *> row;
-    row << new QStandardItem(tr("<Uploading sound...>"))
+    row << new QStandardItem(braced(tr("Uploading sound...")))
         << new QStandardItem(filename);
     //TODO: #GDM #Business append columns: duration, date added (?)
     appendRow(row);

@@ -69,10 +69,10 @@ int QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const
 }
 
 void QnMergeSystemsTool::at_getNonceForMergeFinished(
-    int status,
+    int /*status*/,
     const QnGetNonceReply& nonceReply,
     int handle,
-    const QString& errorString)
+    const QString& /*errorString*/)
 {
     if (!m_twoStepRequests.contains(handle))
         return;
@@ -105,10 +105,10 @@ void QnMergeSystemsTool::at_getNonceForMergeFinished(
 }
 
 void QnMergeSystemsTool::at_getNonceForPingFinished(
-    int status,
+    int /*status*/,
     const QnGetNonceReply& nonceReply,
     int handle,
-    const QString& errorString)
+    const QString& /*errorString*/)
 {
     if (!m_twoStepRequests.contains(handle))
         return;

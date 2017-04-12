@@ -1,18 +1,40 @@
-/**********************************************************
-* 9 jan 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef TEST_HTTP_SERVER_H
-#define TEST_HTTP_SERVER_H
+#pragma once
 
 #include <memory>
 
 #include <QtCore/QString>
 
 #include <nx/network/connection_server/multi_address_server.h>
-#include <nx/network/http/server/http_stream_socket_server.h>
-#include <nx/network/http/server/http_message_dispatcher.h>
+
+#include "server/http_message_dispatcher.h"
+#include "server/http_server_base_authentication_manager.h"
+#include "server/http_server_plain_text_credentials_provider.h"
+#include "server/http_stream_socket_server.h"
+#include "server/handler/http_server_handler_custom.h"
+
+//-------------------------------------------------------------------------------------------------
+
+class TestAuthenticationManager:
+    public nx_http::server::BaseAuthenticationManager
+{
+    typedef nx_http::server::BaseAuthenticationManager BaseType;
+
+public:
+    TestAuthenticationManager(
+        nx_http::server::AbstractAuthenticationDataProvider* authenticationDataProvider);
+
+    virtual void authenticate(
+        const nx_http::HttpServerConnection& connection,
+        const nx_http::Request& request,
+        nx_http::server::AuthenticationCompletionHandler completionHandler) override;
+
+    void setAuthenticationEnabled(bool value);
+
+private:
+    bool m_authenticationEnabled;
+};
+
+//-------------------------------------------------------------------------------------------------
 
 class NX_NETWORK_API TestHttpServer
 {
@@ -44,6 +66,19 @@ public:
             });
     }
 
+    template<typename Func>
+    bool registerRequestProcessorFunc(const QString& path, Func func)
+    {
+        using RequestHandlerType = nx_http::server::handler::CustomRequestHandler<const Func&>;
+
+        return m_httpMessageDispatcher.registerRequestProcessor<RequestHandlerType>(
+            path,
+            [func = std::move(func)]() -> std::unique_ptr<RequestHandlerType>
+            {
+                return std::make_unique<RequestHandlerType>(func);
+            });
+    }
+
     bool registerStaticProcessor(
         const QString& path,
         QByteArray msgBody,
@@ -62,10 +97,15 @@ public:
     void setPersistentConnectionEnabled(bool value);
     void addModRewriteRule(QString oldPrefix, QString newPrefix);
 
+    void setAuthenticationEnabled(bool value);
+    void registerUserCredentials(const nx::String& userName, const nx::String& password);
+
     nx_http::HttpStreamSocketServer& server() { return *m_httpServer; }
 
 private:
     nx_http::MessageDispatcher m_httpMessageDispatcher;
+    nx_http::server::PlainTextCredentialsProvider m_credentialsProvider;
+    TestAuthenticationManager m_authenticationManager;
     std::unique_ptr<nx_http::HttpStreamSocketServer> m_httpServer;
 };
 
@@ -81,7 +121,7 @@ public:
 
     RandomlyFailingHttpConnection(
         StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
-        std::unique_ptr<AbstractCommunicatingSocket> sock);
+        std::unique_ptr<AbstractStreamSocket> sock);
     virtual ~RandomlyFailingHttpConnection();
 
     void setResponseBuffer(const QByteArray& buf);
@@ -113,5 +153,3 @@ private:
     virtual std::shared_ptr<RandomlyFailingHttpConnection> createConnection(
         std::unique_ptr<AbstractStreamSocket> _socket) override;
 };
-
-#endif  //TEST_HTTP_SERVER_H

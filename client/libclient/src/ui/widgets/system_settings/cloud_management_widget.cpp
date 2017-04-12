@@ -11,16 +11,19 @@
 #include <ui/dialogs/cloud/disconnect_from_cloud_dialog.h>
 #include <ui/help/help_topics.h>
 #include <ui/common/palette.h>
+#include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/common/app_info.h>
 #include <utils/common/html.h>
 
-namespace
-{
+namespace {
+
+const bool kShowPromoBar = true;
 const int kAccountFontPixelSize = 24;
-}
+
+} // namespace
 
 QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
     base_type(parent),
@@ -53,23 +56,49 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
 
     // TODO: #help Set help topic
 
-    ui->unlinkButton->setText(tr("Disconnect System from %1").arg(QnAppInfo::cloudName()));
-    ui->goToCloudButton->setText(tr("Open %1 Portal", "Open Nx Cloud Portal").arg(QnAppInfo::cloudName()));
+    ui->unlinkButton->setText(tr("Disconnect System from %1",
+        "%1 is the cloud name (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
+    ui->goToCloudButton->setText(tr("Open %1 Portal",
+        "%1 is the cloud name (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
 
-    ui->createAccountButton->setText(tr("Create %1 Account").arg(QnAppInfo::cloudName()));
-    ui->linkButton->setText(tr("Connect System to %1").arg(QnAppInfo::cloudName()));
+    ui->createAccountButton->setText(tr("Create %1 Account",
+        "%1 is the cloud name (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
+    ui->linkButton->setText(tr("Connect System to %1...",
+        "%1 is the cloud name (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
 
-    ui->promo1TextLabel->setText(tr("1. Create %1\naccount").arg(QnAppInfo::cloudName()));
-    ui->promo2TextLabel->setText(tr("2. Connect system\nto %1").arg(QnAppInfo::cloudName()));
-    ui->promo3TextLabel->setText(tr("3. Connect to your systems\nfrom anywhere with any\ndevices"));
+    ui->promo1TextLabel->setText(tr("Create %1\naccount",
+        "%1 is the cloud name (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
+    ui->promo2TextLabel->setText(tr("Connect System\nto %1",
+        "%1 is the cloud name (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
+    ui->promo3TextLabel->setText(tr("Connect to your Systems\nfrom anywhere with any\ndevices"));
 
     using nx::vms::utils::SystemUri;
     QnCloudUrlHelper urlHelper(
         SystemUri::ReferralSource::DesktopClient,
         SystemUri::ReferralContext::SettingsDialog);
 
+    const QString kLimitationsLink = makeHref(tr("Known limitations"), urlHelper.faqUrl());
+    const QString kPromoText = tr("%1 is in Beta.", "%1 is the cloud name (like 'Nx Cloud')")
+        .arg(QnAppInfo::cloudName());
+
+    /* Realign content in intro panel if promo bar is shown: */
+    if (kShowPromoBar)
+    {
+        ui->promoBar->setText(kPromoText + L' ' + kLimitationsLink);
+
+        QMargins margins = ui->introLayout->contentsMargins();
+        margins.setTop(margins.top() - style::Metrics::kHeaderSize / 2);
+        ui->introLayout->setContentsMargins(margins);
+
+        ui->introSpacer->changeSize(
+            ui->introSpacer->sizeHint().width(),
+            ui->introSpacer->sizeHint().height() - style::Metrics::kHeaderSize / 2,
+            ui->introSpacer->sizePolicy().horizontalPolicy(),
+            ui->introSpacer->sizePolicy().verticalPolicy());
+    }
+
     ui->learnMoreLabel->setText(
-        makeHref(tr("Learn more about %1").arg(
+        makeHref(tr("Learn more about %1", "%1 is the cloud name (like 'Nx Cloud')").arg(
             QnAppInfo::cloudName()), urlHelper.aboutUrl()));
 
     connect(ui->goToCloudButton, &QPushButton::clicked, this,

@@ -1,6 +1,6 @@
-
 import QtQuick 2.6;
-import NetworkOptix.Qml 1.0;
+import Nx 1.0;
+import Nx.Models 1.0;
 
 import "."
 
@@ -16,13 +16,14 @@ BaseTile
     property bool safeMode: false;
     property bool isFactoryTile: impl.isFactoryTile;
 
+    property bool isRunning: false;
+    property bool isReachable: false;
+
     property string wrongVersion;
     property string compatibleVersion;
 
     // TODO: #ynikitenkov Will be available in 3.1, remove property and related code.
     readonly property bool offlineCloudConnectionsDisabled: true;
-
-    onSystemIdChanged: { forceCollapsedState(); }
 
     isConnecting: ((control.systemId == context.connectingToSystem)
         && context.connectingToSystem.length && !impl.isFactoryTile);
@@ -32,7 +33,7 @@ BaseTile
         if (impl.isFactoryTile)
             return true;
 
-        if (wrongVersion.length || !isCompatibleInternal)
+        if (wrongVersion || !isCompatibleInternal)
             return false;
 
 
@@ -40,7 +41,7 @@ BaseTile
         if (offlineCloudConnectionsDisabled && isCloudTile && !context.isCloudEnabled)
             return false;
 
-        return control.isOnline;
+        return control.isConnectable;
     }
 
     tileColor:
@@ -73,43 +74,55 @@ BaseTile
             if (control.impl.isFactoryTile)
                 return false;    //< We don't have indicator for new systems
 
-            return (wrongVersion.length || compatibleVersion.length
-                || !control.isOnline || !isCompatibleInternal);
+            return (wrongVersion || compatibleVersion
+                || !control.isConnectable || !isCompatibleInternal);
         }
 
         text:
         {
             if (!isCompatibleInternal)
                 return qsTr("INCOMPATIBLE");
-            if (wrongVersion.length)
-                return wrongVersion;
-            if (compatibleVersion.length)
-                return compatibleVersion;
-            if (!control.isOnline)
+            if (wrongVersion)
+                return wrongVersion.toString(SoftwareVersion.BugfixFormat);
+            if (compatibleVersion)
+                return compatibleVersion.toString(SoftwareVersion.BugfixFormat);
+            if (!control.isRunning)
                 return qsTr("OFFLINE");
+            if (!control.isReachable)
+                return qsTr("UNREACHABLE");
 
             return "";
         }
 
         textColor:
         {
-           if (wrongVersion.length ||
-                compatibleVersion.length || !isCompatibleInternal)
-           {
+           if (wrongVersion || compatibleVersion || !isCompatibleInternal)
                return Style.colors.shadow;
-           }
            else
                return Style.colors.windowText;
         }
 
         color:
         {
-            if (wrongVersion.length || !isCompatibleInternal)
+            if (wrongVersion || !isCompatibleInternal)
                 return Style.colors.red_main;
-            else if (compatibleVersion.length)
+            else if (compatibleVersion)
                 return Style.colors.yellow_main;
             else
                 return Style.colors.custom.systemTile.offlineIndicatorBkg;
+        }
+    }
+
+    NxPopupMenu
+    {
+        id: tileMenu;
+        NxMenuItem
+        {
+            text: "Edit";
+            leftPadding: 16;
+            rightPadding: 16;
+
+            onTriggered: control.toggle();
         }
     }
 
@@ -117,6 +130,17 @@ BaseTile
     {
         if (!control.isAvailable)
             return;
+
+        if (buttons == Qt.RightButton)
+        {
+            if (control.menuButton.visible)
+            {
+                tileMenu.x = x;
+                tileMenu.y = y;
+                tileMenu.open();
+            }
+            return;
+        }
 
         switch(control.impl.tileType)
         {
@@ -126,7 +150,7 @@ BaseTile
                 break;
 
             case control.impl.kCloudSystemTileType:
-                var cloudHost = control.impl.hostsModel.firstHost;
+                var cloudHost = control.impl.hostsModelAccessor.getData(0, "url") || "";
                 console.log("Connecting to cloud system <", systemName,
                     ">, through the host <", cloudHost, ">");
                 context.connectToCloudSystem(control.systemId, cloudHost);
@@ -147,23 +171,13 @@ BaseTile
     }
 
     titleLabel.text: (control.impl.tileType == control.impl.kFactorySystemTileType
-        ? qsTr("New System") : systemName);
+        ? qsTr("New Server") : systemName);
 
     menuButton
     {
         visible: impl.hasSavedConnection && control.isAvailable;
 
-        menu: NxPopupMenu
-        {
-            NxMenuItem
-            {
-                text: "Edit";
-                leftPadding: 16;
-                rightPadding: 16;
-
-                onTriggered: control.toggle();
-            }
-        }
+        menu: tileMenu;
     }
 
     areaLoader.source:
@@ -201,7 +215,7 @@ BaseTile
                 currentAreaItem.isExpandedTile = Qt.binding( function() { return control.isExpanded; });
                 currentAreaItem.expandedOpacity = Qt.binding( function() { return control.expandedOpacity; });
                 currentAreaItem.hostsModel = control.impl.hostsModel;
-                currentAreaItem.recentLocalConnectionsModel = control.impl.recentConnectionsModel;
+                currentAreaItem.authenticationDataModel = control.impl.authenticationDataModel;
                 currentAreaItem.enabled = Qt.binding( function () { return control.isAvailable; });
                 currentAreaItem.prevTabObject = Qt.binding( function() { return control.collapseButton; });
                 currentAreaItem.isConnecting = Qt.binding( function() { return control.isConnecting; });
@@ -210,21 +224,14 @@ BaseTile
             }
             else if (control.impl.tileType === control.impl.kFactorySystemTileType)
             {
-                currentAreaItem.host = Qt.binding( function()
-                {
-                    return (control.impl.hostsModel ?
-                        control.impl.hostsModel.getData("url", 0): "");
-                });
-                currentAreaItem.displayHost = Qt.binding( function()
-                {
-                    return (control.impl.hostsModel ?
-                        control.impl.hostsModel.getData("display", 0): "");
-                });
+                currentAreaItem.host = control.impl.hostsModelAccessor.getData(0, "url") || "";
+                currentAreaItem.displayHost =
+                    control.impl.hostsModelAccessor.getData(0, "display") || "";
             }
             else // Cloud system
             {
                 currentAreaItem.userName = Qt.binding( function() { return control.ownerDescription; });
-                currentAreaItem.isOnline = Qt.binding( function() { return control.isOnline; });
+                currentAreaItem.isConnectable = Qt.binding( function() { return control.isConnectable; });
                 currentAreaItem.enabled = Qt.binding( function() { return control.isAvailable; });
             }
         }
@@ -250,8 +257,17 @@ BaseTile
 
     property QtObject impl: QtObject
     {
-        property var hostsModel: QnSystemHostsModel { systemId: control.systemId; }
-        property var recentConnectionsModel: QnRecentLocalConnectionsModel { systemId: control.localId; }
+        property var hostsModel: SystemHostsModel
+        {
+            systemId: control.systemId;
+            localSystemId: control.localId;
+        }
+
+        property var hostsModelAccessor: ModelDataAccessor { model: control.impl.hostsModel; }
+        property var authenticationDataModel: AuthenticationDataModel
+        {
+            systemId: control.localId;
+        }
 
         // TODO: add enum to c++ code, add type info to model
         readonly property int kFactorySystemTileType: 0;

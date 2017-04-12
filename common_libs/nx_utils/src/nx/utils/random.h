@@ -5,28 +5,79 @@
 #include <type_traits>
 #include <QByteArray>
 
+// #define NX_UTILS_USE_OWN_INT_DISTRIBUTION
+
 namespace nx {
 namespace utils {
 namespace random {
 
 /**
  * Exception free, qrand based random device.
+ * @note Should be used on platforms where std::random_device does not work as expected.
  */
 class NX_UTILS_API QtDevice
 {
 public:
-    typedef int result_type;
+    typedef uint result_type;
     QtDevice();
 
     result_type operator()();
     double entropy() const;
 
-    static constexpr result_type min() { return 0; }
-    static constexpr result_type max() { return RAND_MAX; }
+    static constexpr result_type min() { return std::random_device::min(); }
+    static constexpr result_type max() { return std::random_device::max(); }
 };
 
-/** Thread local std::random_device. */
-NX_UTILS_API std::random_device& device();
+/**
+ * Simple implementaion of std::uniform_int_distribution.
+ * @note Currenty this distribution is not uniform, because of overflow bug.
+ *     Do not use it without a dare need.
+ */
+template<typename Type = int>
+class UniformIntDistribution
+{
+public:
+    UniformIntDistribution(Type min, Type max):
+        m_min(min),
+        m_range(max - min)
+    {
+    }
+
+    template<typename Device>
+    Type operator()(Device& device) const
+    {
+        // NOTE: uint64_t is used becauce it is likely biggest type avalible.
+        static const uint64_t deviceRange = (uint64_t) (Device::max() - Device::min());
+        const auto makeNumber = [&device]() { return (Type) (device() - Device::min()); };
+
+        Type number = makeNumber();
+        uint64_t range = deviceRange;
+        while (range < (uint64_t) m_range)
+        {
+            number = number * deviceRange + makeNumber();
+
+            const auto oldRange = range;
+            range *= deviceRange;
+            if (range / deviceRange != oldRange)
+                break; // Range overflow, we got enough.
+        }
+
+        if (std::numeric_limits<Type>::max() == m_range)
+            return m_min + number; //< Awoid range owerflow.
+
+        return m_min + (number % (m_range + 1));
+    }
+
+private:
+    const Type m_min;
+    const Type m_range;
+};
+
+template<>
+class UniformIntDistribution<char>
+{
+    // Char specialization is not defined by standart, as it is not even clear if it is signed.
+};
 
 /** Thread local QtDevice. */
 NX_UTILS_API QtDevice& qtDevice();
@@ -34,10 +85,7 @@ NX_UTILS_API QtDevice& qtDevice();
 /**
  * Generates uniform_int_distribution random data the length of count.
  */
-NX_UTILS_API QByteArray generate(
-    std::size_t count,
-    char min = std::numeric_limits<char>::min(),
-    char max = std::numeric_limits<char>::max());
+NX_UTILS_API QByteArray generate(std::size_t count);
 
 /**
  * Generates uniform_int_distribution random integer in [min, max]
@@ -48,15 +96,12 @@ Type number(
     Type max = std::numeric_limits<Type>::max(),
     typename std::enable_if<std::is_integral<Type>::value>::type* = 0)
 {
-    std::uniform_int_distribution<Type> distribution(min, max);
-    try
-    {
-        return distribution(device());
-    }
-    catch(const std::exception&)
-    {
-        return distribution(qtDevice());
-    }
+    #ifdef NX_UTILS_USE_OWN_INT_DISTRIBUTION
+        UniformIntDistribution<Type> distribution(min, max);
+    #else
+        std::uniform_int_distribution<Type> distribution(min, max);
+    #endif
+    return distribution(qtDevice());
 }
 
 /**
@@ -69,14 +114,7 @@ Type number(
     typename std::enable_if<std::is_floating_point<Type>::value>::type* = 0)
 {
     std::uniform_real_distribution<Type> distribution(min, max);
-    try
-    {
-        return distribution(device());
-    }
-    catch(const std::exception&)
-    {
-        return distribution(qtDevice());
-    }
+    return distribution(qtDevice());
 }
 
 /**

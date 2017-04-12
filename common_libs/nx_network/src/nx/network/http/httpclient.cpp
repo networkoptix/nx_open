@@ -134,6 +134,11 @@ const QUrl& HttpClient::url() const
     return m_asyncHttpClient->url();
 }
 
+const QUrl& HttpClient::contentLocationUrl() const
+{
+    return m_asyncHttpClient->contentLocationUrl();
+}
+
 StringType HttpClient::contentType() const
 {
     return m_asyncHttpClient->contentType();
@@ -183,6 +188,13 @@ void HttpClient::setUserPassword(const QString& userPassword)
         m_asyncHttpClient->setUserPassword(userPassword);
 }
 
+void HttpClient::setAuthType(AsyncHttpClient::AuthType value)
+{
+    m_authType = value;
+    if (m_asyncHttpClient)
+        m_asyncHttpClient->setAuthType(value);
+}
+
 void HttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
 {
     m_proxyEndpoint = proxyEndpoint;
@@ -200,8 +212,13 @@ std::unique_ptr<AbstractStreamSocket> HttpClient::takeSocket()
     nx::utils::promise<void> socketTakenPromise;
     m_asyncHttpClient->dispatch(
         [this, &sock, &socketTakenPromise]()
-        {
+        {   
+            QnMutexLocker lock(&m_mutex);
+            m_terminated = true;
+            
             sock = std::move(m_asyncHttpClient->takeSocket());
+
+            m_msgBodyBuffer.append(m_asyncHttpClient->fetchMessageBodyBuffer());
             socketTakenPromise.set_value();
         });
     socketTakenPromise.get_future().wait();
@@ -264,6 +281,8 @@ bool HttpClient::doRequest(AsyncClientFunc func)
             m_asyncHttpClient->setUserName(m_userName.get());
         if (m_userPassword)
             m_asyncHttpClient->setUserPassword(m_userPassword.get());
+        if (m_authType)
+            m_asyncHttpClient->setAuthType(m_authType.get());
         if (m_proxyEndpoint)
             m_asyncHttpClient->setProxyVia(m_proxyEndpoint.get());
 
@@ -286,7 +305,7 @@ void HttpClient::onResponseReceived()
     QnMutexLocker lk(&m_mutex);
     //message body buffer can be non-empty
     m_msgBodyBuffer += m_asyncHttpClient->fetchMessageBodyBuffer();
-    if (m_msgBodyBuffer.size() > m_maxInternalBufferSize)
+    if ((std::size_t)m_msgBodyBuffer.size() > m_maxInternalBufferSize)
     {
         NX_LOG(
             lit("Sync HttpClient: internal buffer overflow. Max buffer size: %1, current buffer size: %2, requested url: %3.")
@@ -303,7 +322,7 @@ void HttpClient::onSomeMessageBodyAvailable()
 {
     QnMutexLocker lk(&m_mutex);
     m_msgBodyBuffer += m_asyncHttpClient->fetchMessageBodyBuffer();
-    if (m_msgBodyBuffer.size() > m_maxInternalBufferSize)
+    if ((std::size_t)m_msgBodyBuffer.size() > m_maxInternalBufferSize)
     {
         NX_LOG(
             lit("Sync HttpClient: internal buffer overflow. Max buffer size: %1, current buffer size: %2, requested url: %3.")

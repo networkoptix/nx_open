@@ -29,13 +29,16 @@
    <property name="bottomMargin">
     <number>16</number>
    </property>
-   <property name="spacing">
+   <property name="horizontalSpacing">
     <number>8</number>
+   </property>
+   <property name="verticalSpacing">
+    <number>0</number>
    </property>
    <item row="0" column="0">
     <widget class="QLabel" name="iconLabel">
      <property name="alignment">
-      <set>Qt::AlignCenter</set>
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
      </property>
     </widget>
    </item>

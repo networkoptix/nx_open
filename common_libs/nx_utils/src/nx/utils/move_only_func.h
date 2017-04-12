@@ -1,24 +1,18 @@
-/**********************************************************
-* Feb 11, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <cassert>
 #include <functional>
 #include <nx/utils/log/assert.h>
 
-
 namespace nx {
 namespace utils {
 
-/** Move-only analogue of \a std::function.
-    Can be used to store lambda which has \a std::unique_ptr as its capture
-*/
+/**
+ * Move-only analogue of std::function.
+ * Can be used to store lambda which has std::unique_ptr as its capture.
+ */
 template<class F>
-class MoveOnlyFunc
-:
+class MoveOnlyFunc:
     private std::function<F>
 {
     using BaseType = std::function<F>;
@@ -30,27 +24,29 @@ class MoveOnlyFunc
         Func m_func;
 
     public:
-        MoveOnlyFuncWrapper(Func p)
-        :
+        MoveOnlyFuncWrapper(Func p):
             m_func(std::move(p))
         {
         }
-        MoveOnlyFuncWrapper(const MoveOnlyFuncWrapper& rhs)
-        :
+
+        MoveOnlyFuncWrapper(const MoveOnlyFuncWrapper& rhs):
             m_func(std::move(const_cast<MoveOnlyFuncWrapper&>(rhs).m_func))
         {
             NX_ASSERT(false);
         }
+
         MoveOnlyFuncWrapper& operator=(const MoveOnlyFuncWrapper&)
         {
             NX_ASSERT(false);
+            return *this;
         }
-        MoveOnlyFuncWrapper(MoveOnlyFuncWrapper&& rhs)
-        :
+
+        MoveOnlyFuncWrapper(MoveOnlyFuncWrapper&& rhs):
             m_func(std::move(rhs.m_func))
         {
         }
-        MoveOnlyFuncWrapper& operator=(MoveOnlyFuncWrapper&& rhs)
+
+        MoveOnlyFuncWrapper& operator=(MoveOnlyFuncWrapper&& rhs) noexcept
         {
             if (&rhs == this)
                 return *this;
@@ -67,16 +63,16 @@ class MoveOnlyFunc
     };
 
 public:
+    using result_type = typename std::function<F>::result_type;
+
     MoveOnlyFunc() = default;
-    
-    MoveOnlyFunc(std::function<F> func)
-    :
+
+    MoveOnlyFunc(std::function<F> func):
         std::function<F>(std::move(func))
     {
     }
 
-    MoveOnlyFunc(std::nullptr_t val)
-    :
+    MoveOnlyFunc(std::nullptr_t val):
         std::function<F>(val)
     {
     }
@@ -87,18 +83,9 @@ public:
     MoveOnlyFunc& operator=(const MoveOnlyFunc&) = delete;
 
     template<class _Func>
-    MoveOnlyFunc(_Func func)
-    :
+    MoveOnlyFunc(_Func func):
         std::function<F>(MoveOnlyFuncWrapper<_Func>(std::move(func)))
     {
-    }
-
-    template<class _Func>
-    const MoveOnlyFunc& operator=(_Func func)
-    {
-        auto x = MoveOnlyFuncWrapper<_Func>(std::move(func));
-        std::function<F>::operator=(std::move(x));
-        return *this;
     }
 
     MoveOnlyFunc& operator=(std::nullptr_t val)
@@ -107,7 +94,14 @@ public:
         return *this;
     }
 
-    using std::function<F>::operator();
+    template<typename ... Args>
+    result_type operator()(Args&& ... args) const
+    {
+        NX_CRITICAL(*this);
+        return std::function<F>::operator()(std::forward<Args>(args)...);
+    }
+
+    //using std::function<F>::operator();
     using std::function<F>::operator bool;
 
     void swap(MoveOnlyFunc& other)
@@ -116,5 +110,22 @@ public:
     }
 };
 
-}   //utils
-}   //nx
+template<typename Function, typename ... Args>
+void moveAndCall(Function& function, Args&& ... args)
+{
+    const auto handler = std::move(function);
+    function = nullptr;
+    handler(std::forward<Args>(args) ...);
+}
+
+template<typename Function, typename ... Args>
+void moveAndCallOptional(Function& function, Args&& ... args)
+{
+    if (!function)
+        return;
+
+    moveAndCall(function, std::forward<Args>(args) ...);
+}
+
+} // namespace utils
+} // namespace nx

@@ -53,10 +53,8 @@ public:
                             break;
 
                         default:
-                        {
-                            const int kValidateDelayMs = 150;
-                            executeDelayedParented([this]() { validate(); }, kValidateDelayMs, this);
-                        }
+                            updateDisplayStateDelayed();
+                            break;
                     }
                     break;
                 }
@@ -68,6 +66,19 @@ public:
 
         /* Always pass event further */
         return false;
+    }
+
+    void updateDisplayStateDelayed()
+    {
+        const auto handler =
+            [this]()
+            {
+                if (!input->hasFocus())
+                    validate();
+            };
+
+        const int kValidateDelayMs = 150;
+        executeDelayedParented(handler, kValidateDelayMs, this);
     }
 
     void setHintText(const QString& text)
@@ -327,6 +338,12 @@ bool QnInputField::validate()
     Q_D(QnInputField);
     d->validate();
     return lastValidationResult();
+}
+
+void QnInputField::updateDisplayStateDelayed()
+{
+    Q_D(QnInputField);
+    d->updateDisplayStateDelayed();
 }
 
 void QnInputField::clear()

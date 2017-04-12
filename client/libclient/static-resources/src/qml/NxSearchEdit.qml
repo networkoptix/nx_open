@@ -13,19 +13,38 @@ NxTextEdit
 
     property string query;
 
-    backgroundColor: activeColor;
-    activeColor: Style.darkerColor(Style.colors.shadow, 2)
+    backgroundColor: Style.colors.window;
+    activeColor: Style.getPaletteColor("dark", 2);
     textControlEnabled: (state != "masked");
 
     state: "masked";
-    width: mask.width;
+    width: 280;
+
+    function clear()
+    {
+        text = "";
+        state = "masked";
+        animation.complete();
+    }
 
     leftControlDelegate: Image
     {
         source: "qrc:/skin/welcome_page/search.png";
     }
 
-    rightControlDelegate: (text.length ? cleanTextControl : null);
+    rightControlDelegate: NxImageButton
+    {
+        visible: text.length;
+        standardIconUrl: "qrc:/skin/welcome_page/input_clear.png";
+        hoveredIconUrl: "qrc:/skin/welcome_page/input_clear_hovered.png";
+        pressedIconUrl: "qrc:/skin/welcome_page/input_clear_pressed.png";
+
+        onClicked:
+        {
+            control.text = "";
+            control.forceActiveFocus();
+        }
+    }
 
     onVisibleChanged:
     {
@@ -35,87 +54,64 @@ NxTextEdit
 
     onTextChanged: { timer.restart(); }
 
+    NxLabel
+    {
+        id: searchLabel;
+
+        text: qsTr("Search");
+
+        anchors.verticalCenter: parent.verticalCenter;
+        x: (parent.width - width) / 2;
+        visible: (opacity != 0 && !control.text.length);
+    }
+
+    MouseArea
+    {
+        id: activationArea;
+        anchors.fill: parent;
+
+        hoverEnabled: true;
+        visible: (control.state == "masked");
+        acceptedButtons: (control.state == "editable" ? Qt.NoButton : Qt.AllButtons);
+        onClicked:
+        {
+            control.forceActiveFocus();
+            control.state = "editable";
+        }
+    }
 
     MouseArea
     {
         id: cancelArea;
 
-        property bool cursorIsOutsideArea:
-        {
-            if (!containsMouse)
-                return false;
-
-            var editAreaPos = cancelArea.mapToItem(control, mouseX, mouseY);
-            return ((editAreaPos.x < 0) || (editAreaPos.y < 0)
-                || (editAreaPos.x > control.width) || (editAreaPos.y > control.height));
-        }
-
-        parent: control.visualParent;
         anchors.fill: parent;
+        parent: (visualParent ? visualParent : control.parent);
 
         visible: control.visible && control.state == "editable";
 
-        hoverEnabled: true;
-        cursorShape: (cursorIsOutsideArea ? Qt.ArrowCursor : Qt.IBeamCursor);
         onPressed:
         {
-            if (!control.text.length && cancelArea.cursorIsOutsideArea)
+            if (!control.text.length)
                 control.state = "masked";
 
             mouse.accepted = false;
         }
     }
 
-    Item
+    Rectangle
     {
-        id: mask;
+        x: -1;
+        y: 0;
+        width: parent.width + 2;
+        height: parent.height;
 
-        width: row.width;
-        height: row.height;
-        anchors.centerIn: parent;
-
-        Rectangle
-        {
-            id: maskBackground;
-            color: Style.colors.window;
-            anchors.fill: parent;
-            anchors.margins: -2;
-
-            visible: (searchCaption.opacity == 1);
-        }
-
-        Row
-        {
-            id: row;
-
-            Image
-            {
-                source: "qrc:/skin/welcome_page/search.png";
-                opacity: (searchCaption.opacity == 1 ? 1 : 0);
-            }
-
-            NxLabel
-            {
-                id: searchCaption;
-                text: qsTr("Search");
-                anchors.verticalCenter: parent.verticalCenter;
-            }
-        }
-
-        MouseArea
-        {
-            anchors.fill: parent;
-
-            visible: (control.state == "masked");
-            cursorShape: Qt.PointingHandCursor;
-            acceptedButtons: (control.state == "editable" ? Qt.NoButton : Qt.AllButtons);
-            onClicked:
-            {
-                control.forceActiveFocus();
-                control.state = "editable";
-            }
-        }
+        color: "#00000000";
+        radius: 1;
+        border.color: (control.hasFocus || activationArea.containsMouse
+            ? Style.colors.mid
+            : Style.colors.dark)
     }
+
 
     states:
     [
@@ -125,14 +121,9 @@ NxTextEdit
 
             PropertyChanges
             {
-                target: control;
-                width: control.targetWidth;
-            }
-
-            PropertyChanges
-            {
-                target: searchCaption;
-                opacity: 0;
+                target: searchLabel;
+                x: leftControl.width
+                    + 8; //< Offset for cursor position
             }
         },
 
@@ -142,14 +133,8 @@ NxTextEdit
 
             PropertyChanges
             {
-                target: control;
-                width: mask.width;
-            }
-
-            PropertyChanges
-            {
-                target: searchCaption;
-                opacity: 1;
+                target: searchLabel;
+                x: (control.width - searchLabel.width) / 2;
             }
         }
     ]
@@ -158,23 +143,14 @@ NxTextEdit
     {
         SequentialAnimation
         {
-            ParallelAnimation
-            {
-                NumberAnimation
-                {
-                    target: control;
-                    property: "width";
-                    duration: 200;
-                    easing.type: Easing.InOutCubic;
-                }
+            id: animation;
 
-                NumberAnimation
-                {
-                    target: searchCaption;
-                    property: "opacity";
-                    duration: 200;
-                    easing.type: Easing.InOutCubic;
-                }
+            NumberAnimation
+            {
+                target: searchLabel;
+                property: "x";
+                duration: 200;
+                easing.type: Easing.OutCubic;
             }
 
             ScriptAction
@@ -186,23 +162,6 @@ NxTextEdit
                     else
                         control.focus = false;
                 }
-            }
-        }
-    }
-
-    Component
-    {
-        id: cleanTextControl
-        NxImageButton
-        {
-            standardIconUrl: "qrc:/skin/welcome_page/input_clear.png";
-            hoveredIconUrl: "qrc:/skin/welcome_page/input_clear_hovered.png";
-            pressedIconUrl: "qrc:/skin/welcome_page/input_clear_pressed.png";
-
-            onClicked:
-            {
-                control.text = "";
-                control.forceActiveFocus();
             }
         }
     }

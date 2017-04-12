@@ -54,6 +54,11 @@ static const GLfloat g_texture_data[] = {
     0.f, 1.f
 };
 
+
+/**
+ * Convert codec from ffmpeg enum to Android codec string representation.
+ * Only codeccs listed below are supported by AndroidVideoDecoder.
+ */
 static QString codecToString(AVCodecID codecId)
 {
     switch(codecId)
@@ -109,7 +114,6 @@ public:
             //if (!m_fbo)
             //    m_fbo = FboPtr(new QOpenGLFramebufferObject(m_frameSize));
             //return m_fbo;
-
         #else
             return FboPtr(new QOpenGLFramebufferObject(m_frameSize));
         #endif
@@ -166,6 +170,7 @@ class AndroidVideoDecoderPrivate: public QObject
 {
     Q_DECLARE_PUBLIC(AndroidVideoDecoder)
     AndroidVideoDecoder *q_ptr;
+
 public:
     AndroidVideoDecoderPrivate(const ResourceAllocatorPtr& allocator):
         frameNumber(0),
@@ -203,7 +208,8 @@ public:
     void registerNativeMethods()
     {
         JNINativeMethod methods[] {
-            {"fillInputBuffer", "(Ljava/nio/ByteBuffer;JII)V", reinterpret_cast<void *>(nx::media::fillInputBuffer)}
+            {"fillInputBuffer", "(Ljava/nio/ByteBuffer;JII)V",
+                reinterpret_cast<void*>(nx::media::fillInputBuffer)}
         };
 
         QAndroidJniEnvironment env;
@@ -445,11 +451,25 @@ void AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(const AVCodecID codec)
     {
         QAndroidJniObject jCodecName = QAndroidJniObject::fromString(codecMimeType);
         QAndroidJniObject javaDecoder("com/networkoptix/nxwitness/media/QnVideoDecoder");
-        jint maxWidth = javaDecoder.callMethod<jint>("maxDecoderWidth", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
-        jint maxHeight = javaDecoder.callMethod<jint>("maxDecoderHeight", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
-        QSize size(maxWidth, maxHeight);
-        maxResolutions[codec] = size;
-        qDebug() << "Maximum hardware decoder resolution:" << size << "for codec" << codecMimeType;
+        jint maxWidth = javaDecoder.callMethod<jint>(
+            "maxDecoderWidth", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
+        jint maxHeight = javaDecoder.callMethod<jint>(
+            "maxDecoderHeight", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
+        NX_LOG(lm("Maximum hardware decoder resolution: (%1, %2) for codec %3")
+            .arg(maxWidth).arg(maxHeight).arg(codecMimeType), cl_logWARNING);
+        const QSize maxSize{maxWidth, maxHeight};
+        if (maxSize.isEmpty())
+        {
+            // NOTE: Zeroes come from JNI in case the Java class was not loaded due to some issue.
+            NX_LOG(lm("ERROR: Android Video Decoder failed to report max resolution for codec %1")
+                .arg(codecMimeType), cl_logERROR);
+        }
+        else
+        {
+            NX_LOG(lm("Maximum hardware decoder resolution: (%1, %2) for codec %3")
+                .arg(maxSize.width()).arg(maxSize.height()).arg(codecMimeType), cl_logWARNING);
+            maxResolutions[codec] = maxSize;
+        }
     }
 }
 
@@ -459,7 +479,20 @@ bool AndroidVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resol
 
     QMutexLocker lock(&AndroidVideoDecoderPrivate::maxResolutionsMutex);
     const QSize maxSize = AndroidVideoDecoderPrivate::maxResolutions[codec];
-    return resolution.width() <= maxSize.width() && resolution.height() <= maxSize.height();
+
+    if (maxSize.isEmpty())
+        return false;
+
+    if (resolution.width() > maxSize.width() || resolution.height() > maxSize.height())
+    {
+        NX_LOG(lm("Codec for %1 is not compatible with resolution (%2, %3) because max is (%4, %5)")
+            .arg(codecToString(codec))
+            .arg(resolution.width()).arg(resolution.height())
+            .arg(maxSize.width()).arg(maxSize.height()), cl_logWARNING);
+        return false;
+    }
+
+    return true;
 }
 
 QSize AndroidVideoDecoder::maxResolution(const AVCodecID codec)
@@ -502,12 +535,13 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
     {
         if (frame)
         {
+            ++d->frameNumber; //< put input frames in range [1..N]
             d->frameNumToPtsCache.push_back(AndroidVideoDecoderPrivate::PtsData(d->frameNumber, frame->timestamp));
             outFrameNum = d->javaDecoder.callMethod<jlong>(
                 "decodeFrame", "(JIJ)J",
                 (jlong) frame->data(),
                 (jint) frame->dataSize(),
-                (jlong) ++d->frameNumber); //< put input frames in range [1..N]
+                (jlong) d->frameNumber);
             if (outFrameNum == kNoInputBuffers)
             {
                 if (d->javaDecoder.callMethod<jlong>("flushFrame", "(J)J", (jlong) kDecodeOneFrameTimeout) <= 0)

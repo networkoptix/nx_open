@@ -31,6 +31,11 @@ QString QnMobileAppInfo::cloudName() const
     return QnAppInfo::cloudName();
 }
 
+QString QnMobileAppInfo::liteDeviceName() const
+{
+    return QnMobileClientAppInfo::liteDeviceName();
+}
+
 QUrl QnMobileAppInfo::oldMobileClientUrl() const
 {
 #if defined(Q_OS_ANDROID)

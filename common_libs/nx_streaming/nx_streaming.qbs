@@ -12,6 +12,13 @@ GenericProduct
 
     Export
     {
+        Depends { name: "cpp" }
         Depends { name: "common" }
+
+        Properties
+        {
+            condition: qbs.targetOS.contains("android")
+            cpp.libraryPaths: [product.buildDirectory]
+        }
     }
 }

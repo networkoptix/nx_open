@@ -52,7 +52,13 @@ void QnCommandLineParser::addParameter(const QnCommandLineParameter &parameter) 
         addName(index, parameter.shortName());
 }
 
-void QnCommandLineParser::addName(int index, const QString &name) {
+void QnCommandLineParser::storeUnparsed(QStringList* unparsed)
+{
+    m_unparsed = unparsed;
+}
+
+void QnCommandLineParser::addName(int index, const QString &name)
+{
     int currentIndex = m_indexByName.value(name, -1);
     if(currentIndex != -1 && currentIndex != index) {
         qnWarning("Given parameter name '%1' is already registered with this command line parser. This may lead to unexpected behavior when parsing command line.", name);
@@ -116,7 +122,7 @@ void QnCommandLineParser::print(QTextStream &stream) const {
     }
 }
 
-bool QnCommandLineParser::parse(int &argc, char **argv, FILE *errorFile)
+bool QnCommandLineParser::parse(int &argc, const char **argv, FILE *errorFile)
 {
     if (errorFile)
     {
@@ -129,7 +135,7 @@ bool QnCommandLineParser::parse(int &argc, char **argv, FILE *errorFile)
     }
 }
 
-bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream)
+bool QnCommandLineParser::parse(int &argc, const char **argv, QTextStream *errorStream)
 {
     bool result = true;
     int pos = 0;
@@ -150,6 +156,8 @@ bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream
         int index = m_indexByName.value(name, -1);
         if (index == -1)
         {
+            if (m_unparsed)
+                m_unparsed->append(QString::fromUtf8(argv[pos]));
             pos++;
             continue;
         }

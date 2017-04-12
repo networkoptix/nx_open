@@ -30,6 +30,7 @@
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
+#include <ui/dialogs/common/file_messages.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
@@ -88,11 +89,12 @@ QnScreenshotLoader::QnScreenshotLoader(const QnScreenshotParameters& parameters,
 {
 }
 
-QnScreenshotLoader::~QnScreenshotLoader() {
-    return;
+QnScreenshotLoader::~QnScreenshotLoader()
+{
 }
 
-void QnScreenshotLoader::setBaseProvider(QnImageProvider *imageProvider) {
+void QnScreenshotLoader::setBaseProvider(QnImageProvider *imageProvider)
+{
     m_baseProvider.reset(imageProvider);
     if (!imageProvider)
         return;
@@ -101,21 +103,39 @@ void QnScreenshotLoader::setBaseProvider(QnImageProvider *imageProvider) {
     imageProvider->loadAsync();
 }
 
-QImage QnScreenshotLoader::image() const {
+QImage QnScreenshotLoader::image() const
+{
     if (!m_baseProvider)
         return QImage();
     return m_baseProvider->image();
 }
 
-QnScreenshotParameters QnScreenshotLoader::parameters() const {
+QSize QnScreenshotLoader::sizeHint() const
+{
+    if (!m_baseProvider)
+        return QSize();
+    return m_baseProvider->sizeHint();
+}
+
+Qn::ThumbnailStatus QnScreenshotLoader::status() const
+{
+    if (!m_baseProvider)
+        return Qn::ThumbnailStatus::Invalid;
+    return m_baseProvider->status();
+}
+
+QnScreenshotParameters QnScreenshotLoader::parameters() const
+{
     return m_parameters;
 }
 
-void QnScreenshotLoader::setParameters(const QnScreenshotParameters &parameters) {
+void QnScreenshotLoader::setParameters(const QnScreenshotParameters &parameters)
+{
     m_parameters = parameters;
 }
 
-void QnScreenshotLoader::doLoadAsync() {
+void QnScreenshotLoader::doLoadAsync()
+{
     m_isReady = true;
 
     QImage img = image();
@@ -127,7 +147,8 @@ void QnScreenshotLoader::doLoadAsync() {
     m_isReady = false;
 }
 
-void QnScreenshotLoader::at_imageLoaded(const QImage &image) {
+void QnScreenshotLoader::at_imageLoaded(const QImage &image)
+{
     if (!m_isReady)
         return;
     emit imageChanged(image);
@@ -138,7 +159,7 @@ void QnScreenshotLoader::at_imageLoaded(const QImage &image) {
 // QnWorkbenchScreenshotHandler
 // -------------------------------------------------------------------------- //
 QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent):
-    QObject(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     m_screenshotProgressDialog(0),
     m_progressShowTime(0),
@@ -320,7 +341,8 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
 
     dialog->hide();
     qint64 endTime = QDateTime::currentMSecsSinceEpoch();
-    QnMessageBox::information(mainWindow(), lit("Success"), lit("%1 screenshots done for %2 seconds").arg(count).arg((endTime - startTime) / 1000));
+    QnMessageBox::success(mainWindow(),
+        lit("%1 screenshots done for %2 seconds").arg(count).arg((endTime - startTime) / 1000));
 }
 
 
@@ -422,15 +444,11 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
         if (!fileName.toLower().endsWith(selectedExtension)) {
             fileName += selectedExtension;
 
-            if (QFile::exists(fileName)) {
-                QDialogButtonBox::StandardButton button = QnMessageBox::information(
-                    mainWindow(),
-                    tr("Save As"),
-                    tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).fileName()),
-                    QDialogButtonBox::Yes | QDialogButtonBox::No
-                    );
-                if (button == QDialogButtonBox::No)
-                    continue;
+            if (QFile::exists(fileName)
+                && !QnFileMessages::confirmOverwrite(
+                    mainWindow(), QFileInfo(fileName).fileName()))
+            {
+                continue;
             }
         }
 
@@ -439,13 +457,10 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
         if (wasLoggedIn && !context()->user())
             return false;
 
-        if (QFile::exists(fileName) && !QFile::remove(fileName)) {
-            QnMessageBox::critical(
-                mainWindow(),
-                tr("Could not overwrite file."),
-                tr("File '%1' is used by another process. Please enter another name.").arg(QFileInfo(fileName).fileName()),
-                QDialogButtonBox::Ok
-                );
+        if (QFile::exists(fileName) && !QFile::remove(fileName))
+        {
+            QnFileMessages::overwriteFailed(
+                mainWindow(), QFileInfo(fileName).fileName());
             continue;
         }
 
@@ -511,14 +526,11 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
 
     QString filename = parameters.filename;
 
-    if (result.isNull() || !result.save(filename)) {
+    if (result.isNull() || !result.save(filename))
+    {
         hideProgress();
 
-        QnMessageBox::critical(
-            mainWindow(),
-            tr("Could not save screenshot."),
-            tr("An error occurred while saving screenshot '%1'.").arg(QFileInfo(filename).fileName())
-        );
+        QnMessageBox::critical(mainWindow(), tr("Failed to save screenshot"));
         return;
     }
 
@@ -611,13 +623,11 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
 
     if (!imageProvider)
     {
-        QnMessageBox::warning(mainWindow()
-            , tr("Error")
-            , tr("Error while taking screenshot"));
+        QnMessageBox::critical(mainWindow(), tr("Failed to take screenshot"));
         return;
     }
 
-    QnScreenshotLoader* loader = new QnScreenshotLoader(localParameters, this);
+    QScopedPointer<QnScreenshotLoader> loader(new QnScreenshotLoader(localParameters, this));
     connect(loader, &QnImageProvider::imageChanged, this,   &QnWorkbenchScreenshotHandler::at_imageLoaded);
     loader->setBaseProvider(imageProvider); // preload screenshot here
 
@@ -626,6 +636,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
         localParameters.filename = widget->resource()->toResource()->getName();  /*< suggested name */
         if (!updateParametersFromDialog(localParameters))
             return;
+
         loader->setParameters(localParameters); //update changed fields
         qnSettings->setLastScreenshotDir(QFileInfo(localParameters.filename).absolutePath());
         qnSettings->setTimestampCorner(localParameters.timestampPosition);
@@ -635,5 +646,5 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
     }
 
     m_canceled = false;
-    loader->loadAsync();
+    loader.take()->loadAsync(); //< Remove owning
 }

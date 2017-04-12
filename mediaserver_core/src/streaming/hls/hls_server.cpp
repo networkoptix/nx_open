@@ -62,18 +62,22 @@ namespace nx_hls
 
     //static const int DEFAULT_SECONDARY_STREAM_BITRATE = 512*1024;
 
+    size_t QnHttpLiveStreamingProcessor::m_minPlaylistSizeToStartStreaming = nx_ms_conf::DEFAULT_HLS_PLAYLIST_PRE_FILL_CHUNKS;
+
     QnHttpLiveStreamingProcessor::QnHttpLiveStreamingProcessor( QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* /*owner*/ )
     :
         QnTCPConnectionProcessor( socket ),
         m_state( sReceiving ),
         m_switchToChunkedTransfer( false ),
         m_useChunkedTransfer( false ),
-        m_bytesSent( 0 ),
-        m_minPlaylistSizeToStartStreaming(MSSettings::roSettings()->value(
-            nx_ms_conf::HLS_PLAYLIST_PRE_FILL_CHUNKS,
-            nx_ms_conf::DEFAULT_HLS_PLAYLIST_PRE_FILL_CHUNKS).toInt())
+        m_bytesSent( 0 )
     {
         setObjectName( "QnHttpLiveStreamingProcessor" );
+    }
+
+    void QnHttpLiveStreamingProcessor::setMinPlayListSizeToStartStreaming(size_t value)
+    {
+        m_minPlaylistSizeToStartStreaming = value;
     }
 
     QnHttpLiveStreamingProcessor::~QnHttpLiveStreamingProcessor()
@@ -117,17 +121,17 @@ namespace nx_hls
     {
         if (response->statusLine.reasonPhrase.isEmpty())
         {
-            response->statusLine.reasonPhrase = 
+            response->statusLine.reasonPhrase =
                 StatusCode::toString(response->statusLine.statusCode);
         }
 
-        const auto currentTimeInHttpFormat = 
+        const auto currentTimeInHttpFormat =
             QLocale(QLocale::English).toString(
                 QDateTime::currentDateTime(),
                 lit("ddd, d MMM yyyy hh:mm:ss t")).toLatin1();
 
         response->headers.emplace("Date", currentTimeInHttpFormat);
-        response->headers.emplace("Server", nx_http::serverString());
+        response->headers.emplace(nx_http::header::Server::NAME, nx_http::serverString());
         response->headers.emplace("Cache-Control", "no-cache");
 
         if (request.requestLine.version == nx_http::http_1_1)
@@ -419,7 +423,7 @@ namespace nx_hls
     {
         if (extension.toLower() == lit("m3u8"))
             return kApplicationMpegUrlMimeType;
-        
+
         return kAudioMpegUrlMimeType;
     }
 
@@ -499,6 +503,12 @@ namespace nx_hls
             }
         }
 
+        if (!session->isLive() &&
+            !qnResourceAccessManager->hasGlobalPermission(accessRights, Qn::GlobalViewArchivePermission))
+        {
+            return nx_http::StatusCode::forbidden;
+        }
+
         ensureChunkCacheFilledEnoughForPlayback(session, session->streamQuality());
 
         QByteArray serializedPlaylist;
@@ -512,7 +522,7 @@ namespace nx_hls
             response->statusLine.statusCode = getChunkedPlaylist(
                 session, request, camResource, requestParams, &serializedPlaylist);
         }
-        
+
         if (response->statusLine.statusCode != nx_http::StatusCode::ok)
             return static_cast<nx_http::StatusCode::Value>(response->statusLine.statusCode);
 
@@ -809,6 +819,12 @@ namespace nx_hls
             streamQuality,
             requestParams );
 
+        if (!currentChunkKey.live() &&
+            !qnResourceAccessManager->hasGlobalPermission(d_ptr->accessRights, Qn::GlobalViewArchivePermission))
+        {
+            return nx_http::StatusCode::forbidden;
+        }
+
         //retrieving streaming chunk
         StreamingChunkPtr chunk;
         if( !StreamingChunkCache::instance()->takeForUse( currentChunkKey, &chunk ) )
@@ -842,7 +858,7 @@ namespace nx_hls
 
         response->headers.insert( make_pair( "Content-Type", m_currentChunk->mimeType().toLatin1() ) );
         if( acceptEncoding.encodingIsAllowed("chunked")
-            || (acceptEncodingHeaderIter == request.headers.end() 
+            || (acceptEncodingHeaderIter == request.headers.end()
                 && request.requestLine.version == nx_http::http_1_1) )  //if no Accept-Encoding then it is supported by HTTP/1.1
         {
             response->headers.insert( make_pair( "Transfer-Encoding", "chunked" ) );
@@ -851,7 +867,7 @@ namespace nx_hls
         }
         else if( acceptEncoding.encodingIsAllowed("identity") )
         {
-            //if chunk exceeds maximum allowed size then proving 
+            //if chunk exceeds maximum allowed size then proving
             //  it in streaming mode. That means no Content-Length in response
             const bool chunkCompleted = m_currentChunk->waitForChunkReadyOrInternalBufferFilled();
 

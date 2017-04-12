@@ -31,4 +31,4 @@ set -e
 make install --makefile=Makefile.${build.configuration} INSTALL_ROOT=$BUILD_TARGET
 ${qt.dir}/bin/androiddeployqt $BUILD_TYPE $SIGN --input android-libmobile_client.so-deployment-settings.json --output $BUILD_TARGET $*
 
-cp $SOURCE_APK $TARGET_APK
+mv $SOURCE_APK $TARGET_APK

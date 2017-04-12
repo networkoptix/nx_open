@@ -81,6 +81,8 @@ namespace nx_ms_conf
     static const QLatin1String RESOURCE_INIT_THREADS_COUNT( "resourceInitThreadsCount" );
     static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = 32;
 
+    static const QLatin1String ALLOWED_SSL_VERSIONS( "allowedSslVersions" );
+    static const QLatin1String ALLOWED_SSL_CIPHERS( "allowedSslCiphers" );
     static const QLatin1String SSL_CERTIFICATE_PATH( "sslCertificatePath" );
 
     static const QLatin1String PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME( "progressiveDownloadSessionLiveTimeSec" );
@@ -108,6 +110,8 @@ namespace nx_ms_conf
     static const QLatin1String CDB_ENDPOINT( "cdbEndpoint" );
 
     static const QLatin1String ONVIF_TIMEOUTS( "onvifTimeouts" );
+
+    static const QLatin1String ENABLE_MULTIPLE_INSTANCES("enableMultipleInstances");
 }
 
 /*!
@@ -118,10 +122,12 @@ class MSSettings
 public:
     static QString defaultROSettingsFilePath();
     static void initializeROSettingsFromConfFile( const QString& fileName );
+    static void initializeROSettings();
     static QSettings* roSettings();
 
     static QString defaultRunTimeSettingsFilePath();
     static void initializeRunTimeSettingsFromConfFile( const QString& fileName );
+    static void initializeRunTimeSettings();
     static QSettings* runTimeSettings();
 };
 

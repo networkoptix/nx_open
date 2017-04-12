@@ -13,7 +13,7 @@
                         </div>
                         <div>
                             <span class="caption-row ">
-                                Please, use mobile application to view video
+                                Please, use the mobile application to view video
                             </span>
                         </div>
                     </div>
@@ -36,7 +36,7 @@
                     <div class="webclient-panel mobile-alert" ng-if="webclientDisabled">
                         <div>
                             <span class="caption-row ">
-                                Web Client flash player support was disabled for your system. You may have problems with playing video.
+                                Web Client flash player support is disabled. Issues may occur during video playback.
                             </span>
                         </div>
                     </div>
@@ -55,6 +55,10 @@
                                     <span ng-hide="!searchCams || searchCams==''" class="input-group-addon clear-button" ng-click="searchCams=''" ><span class="glyphicon glyphicon-remove"></span></span>
                                 </label>
                             </div>
+                            <camera-links ng-if="cameraLinksEnabled"
+                                          position="positionProvider.playedPosition"
+                                          live-mode="positionProvider.liveMode"
+                                          active-camera="activeCamera"></camera-links>
                             <ul class="tree nav" >
                                 <li ng-repeat="server in mediaServers" ng-if="server.visible">
                                     <a ng-if="server.allowAutoRedundancy || server.flags.indexOf('SF_Edge')<0 "
@@ -84,7 +88,7 @@
                                         <li ng-repeat="camera in cameras[server.id]"
                                             ng-class="{active:activeCamera===camera}"
                                             ng-if="camera.visible"
-                                            ng-include="camera.isGroup?'views/components/camerasGroupNode.html':'views/components/cameraNode.html'" >
+                                            ng-include="Config.viewsDir + (camera.isGroup?'components/camerasGroupNode.html':'components/cameraNode.html')" >
                                         </li>
                                     </ul>
                                 </li>
@@ -95,10 +99,10 @@
                 <td width="100%" >
                     <div class="view-wrapper not-supported visible-mobile view-panel camera-view-message">
                         <div ng-if="!hasMobileApp">
-                            Unfortunately, webclient isn't supported on your device.
+                            Unfortunately, web client is not supported on this device.
                         </div>
                         <div ng-if="hasMobileApp">
-                            Please, use mobile application to view video:<br>
+                            Please, use the mobile application to view video:<br>
                             <a ng-href="{{mobileAppLink}}" class="btn webclient-button caption-row" ng-class="mobileStore">
                                 Install
                             </a>
@@ -169,7 +173,7 @@
 
                                 <div class="camera-view-informer" ng-if="iOSVideoTooLarge">
                                     Video cannot be played.<br>
-                                    iOS doesn't support video larger than fullHD (2MP: 1920x1080).<br>
+                                    iOS does not support video larger than fullHD (2MP: 1920x1080).<br>
                                 </div>
 
                                 <videowindow ng-class="{invisible: iOSVideoTooLarge || !positionSelected && (activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')}"

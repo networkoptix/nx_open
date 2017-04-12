@@ -1,5 +1,4 @@
-#ifndef QN_LOG_H
-#define QN_LOG_H
+#pragma once
 
 #include <memory>
 #include <mutex>
@@ -56,6 +55,8 @@ public:
 
     void log(const QString &msg, QnLogLevel logLevel);
     void log(QnLogLevel logLevel, const char *format, ...);
+
+    static void writeToStdout(const QString& str, QnLogLevel logLevel);
 
 #define QN_LOG_BODY(ARGS)                                                       \
         if(!isActive(logLevel))                                                 \
@@ -134,23 +135,28 @@ private:
 #define GET_NX_LOG_MACRO(_1, _2, _3, NAME, ...) NAME
 #define NX_LOG(...) NX_MSVC_EXPAND(GET_NX_LOG_MACRO(__VA_ARGS__, NX_LOG_3, NX_LOG_2)(__VA_ARGS__))
 
-#define NX_LOG_2(msg, level)                    \
-    if( auto _nx_logs = QnLog::logs() )         \
-    {                                           \
-        auto& _nx_log = _nx_logs->get();        \
-        if( level <= _nx_log->logLevel() )      \
-            _nx_log->log( msg, level );         \
-    }
+#define NX_LOG_2(msg, level) do                     \
+    {                                               \
+        if (auto _nx_logs = QnLog::logs())          \
+        {                                           \
+            auto& _nx_log = _nx_logs->get();        \
+            if (level <= _nx_log->logLevel())       \
+                _nx_log->log(msg, level);           \
+        }                                           \
+    } while (0)
 
-#define NX_LOG_3(logID, msg, level)             \
-    if( auto _nx_logs = QnLog::logs() )         \
-    {                                           \
-        auto& _nx_log = _nx_logs->get( logID ); \
-        if( level <= _nx_log->logLevel() )      \
-            _nx_log->log( msg, level );         \
-    }
+#define NX_LOG_3(logID, msg, level) do              \
+    {                                               \
+        if (auto _nx_logs = QnLog::logs())          \
+        {                                           \
+            auto& _nx_log = _nx_logs->get(logID);   \
+            if (level <= _nx_log->logLevel())       \
+                _nx_log->log(msg, level);           \
+        }                                           \
+    } while (0)
 
-#define NX_CLASS_NAME QString::fromStdString(boost::core::demangle(typeid(*this).name()))
+#define NX_TYPE_NAME(TYPE_INFO) QString::fromStdString(boost::core::demangle(TYPE_INFO.name()))
+#define NX_CLASS_NAME NX_TYPE_NAME(typeid(*this))
 #define NX_OBJECT_MESSAGE lm("%1(%2) %3").arg(NX_CLASS_NAME).arg(this)
 #define NX_LOGX(...) NX_MSVC_EXPAND(GET_NX_LOG_MACRO(__VA_ARGS__, NX_LOGX_3, NX_LOGX_2)(__VA_ARGS__))
 
@@ -160,14 +166,3 @@ private:
 #define cl_log (*QnLog::instance())
 
 NX_UTILS_API void qnLogMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg);
-
-
-template<class T>
-QString toDebugString(const T &value) {
-    QString result;
-    QDebug stream(&result);
-    stream << value;
-    return result;
-}
-
-#endif // QN_LOG_H

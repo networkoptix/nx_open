@@ -52,7 +52,7 @@ protected:
         connectionRequests(0)
     {
         stunMessageDispatcher.registerRequestProcessor(
-            stun::cc::methods::connectionAck,
+            stun::extension::methods::connectionAck,
             [this](
                 std::shared_ptr<stun::AbstractServerConnection> c,
                 stun::Message m)
@@ -144,9 +144,9 @@ protected:
 
         stun::Message response(stun::Header(
             stun::MessageClass::successResponse,
-            stun::cc::methods::connectionAck,
+            stun::extension::methods::connectionAck,
             std::move(message.header.transactionId)));
-        response.newAttribute<stun::cc::attrs::ResultCode>(
+        response.newAttribute<stun::extension::attrs::ResultCode>(
             hpm::api::ResultCode::ok);
         connection->sendMessage(std::move(response));
     }
@@ -182,7 +182,7 @@ protected:
     {
         stun::Message request(stun::Header(
             stun::MessageClass::request,
-            stun::cc::methods::tunnelConnectionChosen));
+            stun::extension::methods::tunnelConnectionChosen));
 
         auto buffer = std::make_shared<Buffer>();
         buffer->reserve(1000);
@@ -196,7 +196,7 @@ protected:
             [=](SystemError::ErrorCode code, size_t size)
         {
             ASSERT_EQ(code, SystemError::noError);
-            ASSERT_EQ(buffer->size(), size);
+            ASSERT_EQ((size_t)buffer->size(), size);
             buffer->resize(0);
             socket->readSomeAsync(
                 buffer.get(),
@@ -214,7 +214,7 @@ protected:
                     ASSERT_EQ(response.header.messageClass,
                               stun::MessageClass::successResponse);
                     ASSERT_EQ(response.header.method,
-                              stun::cc::methods::tunnelConnectionChosen);
+                              stun::extension::methods::tunnelConnectionChosen);
 
                     connectClientSocket(destinationAddress);
                 });
@@ -273,7 +273,7 @@ protected:
     std::unique_ptr<AbstractStreamSocket> m_udtAddressKeeper;
     std::unique_ptr<TunnelAcceptor> tunnelAcceptor;
     stun::MessageDispatcher stunMessageDispatcher;
-    stun::UDPServer udpStunServer;
+    stun::UdpServer udpStunServer;
 
     bool isUdpServerEnabled;
     size_t connectionRequests;

@@ -25,8 +25,8 @@ class NX_NETWORK_API ConnectionResultRequest:
     public StunRequestData
 {
 public:
-    constexpr static const stun::cc::methods::Value kMethod =
-        stun::cc::methods::connectionResult;
+    constexpr static const stun::extension::methods::Value kMethod =
+        stun::extension::methods::connectionResult;
 
     nx::String connectSessionId;
     NatTraversalResultCode resultCode;

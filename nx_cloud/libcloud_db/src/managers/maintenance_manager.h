@@ -6,7 +6,9 @@
 #include <nx_ec/data/api_fwd.h>
 #include <nx/network/aio/timer.h>
 #include <utils/common/counter.h>
+#include <utils/db/db_instance_controller.h>
 
+#include "data/statistics_data.h"
 #include "data/system_data.h"
 #include "ec2/serialization/transaction_serializer.h"
 #include "ec2/transaction_log.h"
@@ -27,7 +29,8 @@ class MaintenanceManager
 public:
     MaintenanceManager(
         const QnUuid& moduleGuid,
-        ec2::SyncronizationEngine* const syncronizationEngine);
+        ec2::SyncronizationEngine* const syncronizationEngine,
+        const db::InstanceController& dbInstanceController);
     ~MaintenanceManager();
 
     void getVmsConnections(
@@ -45,9 +48,14 @@ public:
             api::ResultCode,
             ::ec2::ApiTransactionDataList)> completionHandler);
 
+    void getStatistics(
+        const AuthorizationInfo& authzInfo,
+        std::function<void(api::ResultCode, data::Statistics)> completionHandler);
+
 private:
     const QnUuid m_moduleGuid;
     ec2::SyncronizationEngine* const m_syncronizationEngine;
+    const db::InstanceController& m_dbInstanceController;
     nx::network::aio::Timer m_timer;
     QnCounter m_startedAsyncCallsCounter;
 

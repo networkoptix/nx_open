@@ -28,7 +28,7 @@
 #include "access_control/abstract_authentication_data_provider.h"
 #include "cache.h"
 #include "dao/rdb/system_sharing_data_object.h"
-#include "dao/rdb/system_data_object.h"
+#include "dao/abstract_system_data_object.h"
 #include "data/account_data.h"
 #include "data/data_filter.h"
 #include "data/system_data.h"
@@ -112,7 +112,7 @@ public:
     void getSystems(
         const AuthorizationInfo& authzInfo,
         data::DataFilter filter,
-        std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler );
+        std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler);
     void shareSystem(
         const AuthorizationInfo& authzInfo,
         data::SystemSharing sharingData,
@@ -149,11 +149,6 @@ public:
     boost::optional<api::SystemSharingEx> getSystemSharingData(
         const std::string& accountEmail,
         const std::string& systemId) const;
-
-    /** Create data view restricted by authzInfo and filter. */
-    DataView<data::SystemData> createView(
-        const AuthorizationInfo& authzInfo,
-        data::DataFilter filter);
 
     nx::utils::Subscription<std::string>& systemMarkedAsDeletedSubscription();
     const nx::utils::Subscription<std::string>& systemMarkedAsDeletedSubscription() const;
@@ -237,7 +232,7 @@ private:
     uint64_t m_dropSystemsTimerId;
     std::atomic<bool> m_dropExpiredSystemsTaskStillRunning;
     nx::utils::Subscription<std::string> m_systemMarkedAsDeletedSubscription;
-    dao::rdb::SystemDataObject m_systemDao;
+    std::unique_ptr<dao::AbstractSystemDataObject> m_systemDao;
     dao::rdb::SystemSharingDataObject m_systemSharingDao;
 
     nx::db::DBResult insertSystemToDB(
@@ -294,6 +289,14 @@ private:
         const data::SystemSharing& sharing,
         NotificationCommand notificationCommand,
         data::AccountData* const inviteeAccount);
+    nx::db::DBResult addNewSharing(
+        nx::db::QueryContext* const queryContext,
+        const data::AccountData& inviteeAccount,
+        const data::SystemSharing& sharing);
+    nx::db::DBResult deleteSharing(
+        nx::db::QueryContext* const queryContext,
+        const std::string& systemId,
+        const data::AccountData& inviteeAccount);
 
     nx::db::DBResult insertOrReplaceSharing(
         nx::db::QueryContext* const queryContext,
@@ -307,9 +310,10 @@ private:
         const std::string& inviteeEmail,
         Notification* const notification);
 
-    nx::db::DBResult scheduleSystemHasBeenSharedNotification(
+    nx::db::DBResult notifyUserAboutNewSystem(
         nx::db::QueryContext* const queryContext,
         const std::string& grantorEmail,
+        const data::AccountData& inviteeAccount,
         const api::SystemSharing& sharing);
 
     /**
@@ -381,6 +385,11 @@ private:
         data::SystemAttributesUpdate data,
         std::function<void(api::ResultCode)> completionHandler);
 
+    template<typename SystemDictionary>
+    void activateSystemIfNeeded(
+        const QnMutexLockerBase& lock,
+        SystemDictionary& systemByIdIndex,
+        typename SystemDictionary::iterator systemIter);
     void systemActivated(
         QnCounter::ScopedIncrement asyncCallLocker,
         nx::db::QueryContext* /*queryContext*/,
@@ -455,11 +464,6 @@ private:
     void onEc2RemoveResourceParamDone(
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult);
-
-    nx::db::DBResult deleteSharing(
-        nx::db::QueryContext* const queryContext,
-        const std::string& systemId,
-        const data::AccountData& inviteeAccount);
 };
 
 } // namespace cdb

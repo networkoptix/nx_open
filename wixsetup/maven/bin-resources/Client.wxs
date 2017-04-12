@@ -47,7 +47,7 @@
 
                     <Component Id="ClientUriHandler">
                         <RegistryKey Root="HKCR" Key="$(var.uriProtocol)">
-                            <RegistryValue Type="string" Value="URL:[ProductName] Protocol"/>
+                            <RegistryValue Type="string" Value="$(var.clientDisplayName)"/>
                             <RegistryValue Type="string" Name="URL Protocol" Value=""/>
                             <RegistryValue Type="string" Name="version" Value="$(var.releaseVersionFull)"/>
                             <RegistryKey Key="DefaultIcon">

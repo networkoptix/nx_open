@@ -5,6 +5,11 @@ GenericProduct
     name: "nx_audio"
 
     Depends { name: "common" }
+    Depends
+    {
+        name: "openal"
+        condition: qbs.targetOS.contains("windows") || qbs.targetOS.contains("android")
+    }
 
     Properties
     {
@@ -20,5 +25,10 @@ GenericProduct
     Export
     {
         Depends { name: "common" }
+        Depends
+        {
+            name: "openal"
+            condition: qbs.targetOS.contains("windows") || qbs.targetOS.contains("android")
+        }
     }
 }

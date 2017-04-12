@@ -15,7 +15,7 @@ GenericProduct
         configure.outputTags: "cpp"
         configure.replacements: ({
             "uri.protocol": customization.uriProtocol,
-            "display.product.name": customization.productDisplayName,
+            "client.display.name": customization.productDisplayName + " Client",
             "installer.name": customization.installerName
         })
     }

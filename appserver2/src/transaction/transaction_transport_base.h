@@ -52,8 +52,7 @@ namespace ConnectionType
 }
 
 
-class QnTransactionTransportBase
-:
+class QnTransactionTransportBase:
     public QObject,
     public nx::network::aio::BasicPollable
 {
@@ -123,6 +122,8 @@ public:
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
     virtual void stopWhileInAioThread() override;
+
+    void setLocalPeerProtocolVersion(int version);
 
     /** Enables outgoing transaction channel. */
     void setOutgoingConnection(QSharedPointer<AbstractCommunicatingSocket> socket);
@@ -352,6 +353,7 @@ private:
     bool m_remotePeerSupportsKeepAlive;
     bool m_isKeepAliveEnabled;
     int m_remotePeerEcProtoVersion;
+    int m_localPeerProtocolVersion;
 
 private:
     QnTransactionTransportBase(

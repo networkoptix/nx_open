@@ -9,16 +9,17 @@ GridView
     property real spacing: 8
     property alias layoutId: camerasModel.layoutId
     property bool keepStatuses: false
+    property bool active: false
 
     cellWidth: (width - leftMargin - rightMargin) / d.thumbnailsInRow
-    cellHeight: cellWidth * 3 / 4 + 24 + 16
+    cellHeight: cellWidth * 9 / 16 + 24 + 16
 
     QtObject
     {
         id: d
 
-        readonly property real maxItemWidth: 192
-        property int thumbnailsInRow: Math.max(2, Math.floor(camerasGrid.width / maxItemWidth))
+        readonly property real maxItemWidth: 320 + camerasGrid.spacing
+        property int thumbnailsInRow: Math.max(2, Math.ceil(camerasGrid.width / maxItemWidth))
     }
 
     model: QnCameraListModel
@@ -35,6 +36,8 @@ GridView
         status: model.resourceStatus
         thumbnail: model.thumbnail
         keepStatus: camerasGrid.keepStatuses
+        resourceId: model.uuid
+        active: camerasGrid.active
 
         onClicked:
         {

@@ -18,6 +18,7 @@ extern "C" {
 #include "aligned_mem_video_buffer.h"
 
 #include <QtCore/QFile>
+#include <QtCore/QDebug>
 
 #if defined(TARGET_OS_IPHONE)
 #include <CoreVideo/CoreVideo.h>
@@ -31,12 +32,36 @@ namespace media {
 
 namespace {
 
+
+    bool isFatalError(int ffmpegErrorCode)
+    {
+        static const int kHWAcceleratorFailed = 0xb1b4b1ab;
+
+        return ffmpegErrorCode == kHWAcceleratorFailed;
+    }
+
     static enum AVPixelFormat get_format(AVCodecContext *s, const enum AVPixelFormat *pix_fmts)
     {
         int status = av_videotoolbox_default_init(s);
         if (status != 0)
             qWarning() << "IOS hardware decoder init failure:" << status;
         return pix_fmts[0];
+    }
+
+    QVideoFrame::PixelFormat toQtPixelFormat(AVPixelFormat pixFormat)
+    {
+        switch (pixFormat)
+        {
+            case AV_PIX_FMT_YUV420P:
+            case AV_PIX_FMT_YUVJ420P:
+                return QVideoFrame::Format_YUV420P;
+            case AV_PIX_FMT_BGRA:
+                return QVideoFrame::Format_BGRA32;
+            case AV_PIX_FMT_NV12:
+                return QVideoFrame::Format_NV12;
+            default:
+                return QVideoFrame::Format_Invalid;
+        }
     }
 
     QVideoFrame::PixelFormat toQtPixelFormat(OSType pixFormat)
@@ -52,6 +77,7 @@ namespace {
             case kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange:
                 return QVideoFrame::Format_NV12;
             default:
+                qWarning() << "unknown OSType format " << (int) pixFormat;
                 return QVideoFrame::Format_Invalid;
         }
     }
@@ -65,15 +91,13 @@ public:
 public:
     IOSMemoryBufferPrivate(AVFrame* _frame):
         QAbstractVideoBufferPrivate(),
-        frame(av_frame_alloc()),
+        frame(_frame),
         mapMode(QAbstractVideoBuffer::NotMapped)
     {
-        av_frame_move_ref(frame, _frame);
     }
 
     virtual ~IOSMemoryBufferPrivate()
     {
-        av_buffer_unref(&frame->buf[0]);
         av_frame_free(&frame);
     }
 
@@ -83,26 +107,52 @@ public:
                     int linesize[4],
                     uchar* data[4]) override
     {
-        CVPixelBufferRef pixbuf = (CVPixelBufferRef)frame->data[3];
-        CVPixelBufferLockBaseAddress(pixbuf, kCVPixelBufferLock_ReadOnly);
-
         int planes = 1;
         *numBytes = 0;
-        if (CVPixelBufferIsPlanar(pixbuf))
+
+        if (frame->data[3])
         {
-            planes = CVPixelBufferGetPlaneCount(pixbuf);
-            for (int i = 0; i < planes; i++)
+            // map frame to the internal buffer
+            CVPixelBufferRef pixbuf = (CVPixelBufferRef)frame->data[3];
+            CVPixelBufferLockBaseAddress(pixbuf, kCVPixelBufferLock_ReadOnly);
+
+            if (CVPixelBufferIsPlanar(pixbuf))
             {
-                data[i]     = (uint8_t*)CVPixelBufferGetBaseAddressOfPlane(pixbuf, i);
-                linesize[i] = CVPixelBufferGetBytesPerRowOfPlane(pixbuf, i);
-                *numBytes += linesize[i] * CVPixelBufferGetHeightOfPlane(pixbuf, i);
+                planes = CVPixelBufferGetPlaneCount(pixbuf);
+                for (int i = 0; i < planes; i++)
+                {
+                    data[i]     = (uint8_t*)CVPixelBufferGetBaseAddressOfPlane(pixbuf, i);
+                    linesize[i] = CVPixelBufferGetBytesPerRowOfPlane(pixbuf, i);
+                    *numBytes += linesize[i] * CVPixelBufferGetHeightOfPlane(pixbuf, i);
+                }
+            }
+            else
+            {
+                data[0] = (uchar*) CVPixelBufferGetBaseAddress(pixbuf);
+                linesize[0] = CVPixelBufferGetBytesPerRow(pixbuf);
+                *numBytes = linesize[0] * CVPixelBufferGetHeight(pixbuf);
             }
         }
         else
         {
-            data[0] = (uchar*) CVPixelBufferGetBaseAddress(pixbuf);
-            linesize[0] = CVPixelBufferGetBytesPerRow(pixbuf);
-            *numBytes = linesize[0] * CVPixelBufferGetHeight(pixbuf);
+            // map frame to the ffmpeg buffer
+            planes = 0;
+            const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) frame->format);
+            for (int i = 0; i < descr->nb_components && frame->data[i]; ++i)
+            {
+                ++planes;
+                data[i] = frame->data[i];
+                linesize[i] = frame->linesize[i];
+                
+                int bytesPerPlane = linesize[i] * frame->height;
+                if (i > 0)
+                {
+                    bytesPerPlane >>= descr->log2_chroma_h + descr->log2_chroma_w;
+                    bytesPerPlane *= descr->comp->step;
+                }
+                *numBytes += bytesPerPlane;
+            }
+        
         }
 
         return planes;
@@ -162,9 +212,6 @@ public:
 
     ~IOSVideoDecoderPrivate()
     {
-        if (codecContext)
-            av_videotoolbox_default_free(codecContext);
-
         closeCodecContext();
         av_frame_free(&frame);
     }
@@ -205,6 +252,9 @@ void IOSVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& fr
 
 void IOSVideoDecoderPrivate::closeCodecContext()
 {
+    if (codecContext)
+        av_videotoolbox_default_free(codecContext);
+
     QnFfmpegHelper::deleteAvCodecContext(codecContext);
     codecContext = 0;
 }
@@ -264,8 +314,7 @@ int IOSVideoDecoder::decode(
             return -1;
     }
 
-    AVPacket avpkt;
-    av_init_packet(&avpkt);
+    QnFfmpegAvPacket avpkt;
     if (compressedVideoData)
     {
         avpkt.data = (unsigned char*) compressedVideoData->data();
@@ -291,25 +340,48 @@ int IOSVideoDecoder::decode(
         // flushing internal buffer. So, repeat this time for the empty packet in order to avoid
         // the bug.
         avpkt.pts = avpkt.dts = d->lastPts;
-        avpkt.data = nullptr;
-        avpkt.size = 0;
     }
 
     int gotPicture = 0;
     int res = avcodec_decode_video2(d->codecContext, d->frame, &gotPicture, &avpkt);
     if (res <= 0 || !gotPicture)
+    {
+        qWarning() << "IOS decoder error. gotPicture=" << gotPicture << "errCode=" << QString::number(res, 16);
+        // hardware decoder crash if use same frame after decoding error. It seems
+        // leaves invalid ref_count on error.
+        av_frame_free(&d->frame);
+        d->frame = av_frame_alloc();
+
+        if (isFatalError(res))
+            d->closeCodecContext(); //< reset all
+
         return res; //< Negative value means error, zero means buffering.
+    }
 
     QSize frameSize(d->frame->width, d->frame->height);
     qint64 startTimeMs = d->frame->pkt_dts / 1000;
-    int frameNum = d->frame->coded_picture_number;
+    int frameNum = qMax(0, d->codecContext->frame_number - 1);
 
-    CVPixelBufferRef pixBuf = (CVPixelBufferRef)d->frame->data[3];
-    auto qtPixelFormat = toQtPixelFormat(CVPixelBufferGetPixelFormatType(pixBuf));
+    QVideoFrame::PixelFormat qtPixelFormat = QVideoFrame::Format_Invalid;
+    if (d->frame->data[3])
+    {
+        CVPixelBufferRef pixBuf = (CVPixelBufferRef)d->frame->data[3];
+        qtPixelFormat = toQtPixelFormat(CVPixelBufferGetPixelFormatType(pixBuf));
+    }
+    else
+    {
+        qtPixelFormat = toQtPixelFormat((AVPixelFormat)d->frame->format);
+    }
     if (qtPixelFormat == QVideoFrame::Format_Invalid)
+    {
+        // Recreate frame just in case.
+        // I am not sure hardware decoder can reuse it.
+        av_frame_free(&d->frame);
+        d->frame = av_frame_alloc();
         return -1; //< report error
+    }
 
-    QAbstractVideoBuffer* buffer = new IOSMemoryBuffer(d->frame); //< frame is moved here. null object after the call
+    QAbstractVideoBuffer* buffer = new IOSMemoryBuffer(d->frame);
     d->frame = av_frame_alloc();
     QVideoFrame* videoFrame = new QVideoFrame(buffer, frameSize, qtPixelFormat);
     videoFrame->setStartTime(startTimeMs);

@@ -1,0 +1,1 @@
+nx_add_target(vms_gateway EXECUTABLE PUBLIC_LIBS libvms_gateway)

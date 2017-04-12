@@ -12,8 +12,8 @@ class NX_NETWORK_API ClientBindRequest:
     public StunRequestData
 {
 public:
-    constexpr static const stun::cc::methods::Value kMethod =
-        stun::cc::methods::clientBind;
+    constexpr static const stun::extension::methods::Value kMethod =
+        stun::extension::methods::clientBind;
 
     nx::String originatingPeerID;
     std::list<SocketAddress> tcpReverseEndpoints;
@@ -27,8 +27,8 @@ class NX_NETWORK_API ClientBindResponse:
     public StunResponseData
 {
 public:
-    constexpr static const stun::cc::methods::Value kMethod =
-        stun::cc::methods::clientBind;
+    constexpr static const stun::extension::methods::Value kMethod =
+        stun::extension::methods::clientBind;
 
     boost::optional<KeepAliveOptions> tcpConnectionKeepAlive;
 

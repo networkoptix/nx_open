@@ -1,9 +1,12 @@
 #include "text_input.h"
 
+#include <QtCore/QTimer>
+
+#include <QtQuick/private/qquickevents_p_p.h>
 #include <QtQuick/private/qquicktextinput_p_p.h>
 #include <QtQuick/private/qquickclipnode_p.h>
 
-class QnQuickTextInputPrivate : public QQuickTextInputPrivate
+class QnQuickTextInputPrivate: public QQuickTextInputPrivate
 {
     Q_DECLARE_PUBLIC(QnQuickTextInput)
 
@@ -17,21 +20,24 @@ public:
         SelectionEndHandle
     };
 
-    bool scrollByMouse;
-    qreal hscrollWhenPressed;
-    QQuickItem* background;
+    bool scrollByMouse = true;
+    qreal hscrollWhenPressed = 0.0;
+    QQuickItem* background = nullptr;
     QString placeholder;
-    bool dragStarted;
+    bool dragStarted = false;
+    QnQuickTextInput::EnterKeyType enterKeyType = QnQuickTextInput::EnterKeyDefault;
+
+    QTimer* pressAndHoldTimer = nullptr;
+    QPoint lastPos;
+    Qt::MouseButton lastButton;
+    Qt::MouseButtons lastButtons;
+    Qt::KeyboardModifiers lastModifiers;
 
     void resizeBackground();
     void updateInputMethod();
 };
 
-QnQuickTextInputPrivate::QnQuickTextInputPrivate() :
-    scrollByMouse(true),
-    hscrollWhenPressed(0),
-    background(nullptr),
-    dragStarted(false)
+QnQuickTextInputPrivate::QnQuickTextInputPrivate()
 {
 }
 
@@ -72,12 +78,7 @@ void QnQuickTextInputPrivate::updateInputMethod()
 }
 
 QnQuickTextInput::QnQuickTextInput(QQuickItem* parent) :
-    base_type(*(new QnQuickTextInputPrivate), parent),
-    m_contextMenuPos(),
-    m_selectionStart(-1),
-    m_selectionEnd(-1),
-    m_cursorPosition(-1),
-    m_pressAndHoldTimer(new QTimer(this))
+    base_type(*(new QnQuickTextInputPrivate), parent)
 {
     Q_D(QnQuickTextInput);
 
@@ -86,10 +87,17 @@ QnQuickTextInput::QnQuickTextInput(QQuickItem* parent) :
     connect(this, &QnQuickTextInput::visibleChanged, updateInputMethod);
     connect(this, &QnQuickTextInput::enabledChanged, updateInputMethod);
 
-    m_pressAndHoldTimer->setInterval(QGuiApplication::styleHints()->mousePressAndHoldInterval());
-    m_pressAndHoldTimer->setSingleShot(true);
-    connect(m_pressAndHoldTimer, &QTimer::timeout, this, &QnQuickTextInput::emitPressAndHold);
-    setPersistentSelection(true);
+    d->pressAndHoldTimer = new QTimer(this);
+    d->pressAndHoldTimer->setInterval(QGuiApplication::styleHints()->mousePressAndHoldInterval());
+    d->pressAndHoldTimer->setSingleShot(true);
+    connect(d->pressAndHoldTimer, &QTimer::timeout, this,
+        [this, d]()
+        {
+            QQuickMouseEvent event(
+                d->lastPos.x(), d->lastPos.y(),
+                d->lastButton, d->lastButtons, d->lastModifiers, false, true);
+            emit pressAndHold(&event);
+        });
 }
 
 QnQuickTextInput::~QnQuickTextInput()
@@ -158,6 +166,27 @@ void QnQuickTextInput::setPlaceholderText(const QString& text)
     emit placeholderTextChanged();
 }
 
+QnQuickTextInput::EnterKeyType QnQuickTextInput::enterKeyType() const
+{
+    Q_D(const QnQuickTextInput);
+    return d->enterKeyType;
+}
+
+void QnQuickTextInput::setEnterKeyType(EnterKeyType enterKeyType)
+{
+    Q_D(QnQuickTextInput);
+
+    if (d->enterKeyType == enterKeyType)
+        return;
+
+    d->enterKeyType = enterKeyType;
+    emit enterKeyTypeChanged();
+
+    #ifndef QT_NO_IM
+        updateInputMethod(Qt::ImEnterKeyType);
+    #endif
+}
+
 QSGNode* QnQuickTextInput::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintNodeData* data)
 {
     /* Copy paste from QQuickTextField (Qt.labs.controls) */
@@ -175,6 +204,38 @@ QSGNode* QnQuickTextInput::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdateP
     return clipNode;
 }
 
+#ifndef QT_NO_IM
+
+QVariant QnQuickTextInput::inputMethodQuery(Qt::InputMethodQuery query) const
+{
+    Q_D(const QnQuickTextInput);
+
+    switch (query)
+    {
+        case Qt::ImEnterKeyType:
+            if (d->enterKeyType == EnterKeyDefault && nextInputItem())
+                return EnterKeyNext;
+
+            return d->enterKeyType;
+
+        default:
+            break;
+    }
+
+    return base_type::inputMethodQuery(query);
+}
+
+#endif
+
+QQuickItem* QnQuickTextInput::nextInputItem() const
+{
+    // Seems like somebody forgot to make the getter const.
+    const auto nextItem = const_cast<QnQuickTextInput*>(this)->nextItemInFocusChain();
+    if (nextItem && nextItem->flags().testFlag(QQuickItem::ItemAcceptsInputMethod))
+        return nextItem;
+    return nullptr;
+}
+
 void QnQuickTextInput::geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry)
 {
     Q_D(QnQuickTextInput);
@@ -182,32 +243,18 @@ void QnQuickTextInput::geometryChanged(const QRectF& newGeometry, const QRectF& 
     d->resizeBackground();
 }
 
-void QnQuickTextInput::emitPressAndHold()
-{
-    if (m_contextMenuPos.isNull())
-        return;
-
-    const auto textLen = text().length();
-    if (m_selectionStart != m_selectionEnd)
-        select(m_selectionStart, m_selectionEnd);
-    else
-        setCursorPosition(m_cursorPosition);
-    emit pressAndHold(m_contextMenuPos);
-};
-
-
 void QnQuickTextInput::mousePressEvent(QMouseEvent* event)
 {
     Q_D(QnQuickTextInput);
 
-    m_contextMenuPos = event->pos();
-    m_selectionStart = selectionStart();
-    m_selectionEnd = selectionEnd();
-    if (event->button() == Qt::LeftButton)
-        m_pressAndHoldTimer->start();
+    d->lastPos = event->pos();
+    d->lastButton = event->button();
+    d->lastButtons = event->buttons();
+    d->lastModifiers = event->modifiers();
+    d->pressAndHoldTimer->start();
 
-    base_type::mousePressEvent(event);
-    m_cursorPosition = cursorPosition();
+    if (event->button() == Qt::LeftButton)
+        base_type::mousePressEvent(event);
 
     d->hscrollWhenPressed = d->hscroll;
     d->dragStarted = false;
@@ -217,18 +264,14 @@ void QnQuickTextInput::mouseMoveEvent(QMouseEvent* event)
 {
     Q_D(QnQuickTextInput);
 
-    if (qAbs(int(event->localPos().x() - d->pressPos.x())) > QGuiApplication::styleHints()->startDragDistance())
+    if (qAbs(int(event->localPos().x() - d->pressPos.x()))
+        > QGuiApplication::styleHints()->startDragDistance())
+    {
         d->dragStarted = true;
+    }
 
     if (d->dragStarted)
-    {
-        m_contextMenuPos = QPoint();
-        m_pressAndHoldTimer->stop();
-    }
-    else
-    {
-        m_contextMenuPos = event->pos();
-    }
+        d->pressAndHoldTimer->stop();
 
     if (!d->scrollByMouse)
     {
@@ -249,7 +292,7 @@ void QnQuickTextInput::mouseMoveEvent(QMouseEvent* event)
         hscrollMax = qMax(textLine.naturalTextWidth(), cursorWidth) - width;
     }
 
-    int dx = event->localPos().x() - d->pressPos.x();
+    auto dx = event->localPos().x() - d->pressPos.x();
     d->hscroll = qBound(0.0, d->hscrollWhenPressed - dx, hscrollMax);
 
     d->textLayoutDirty = true;
@@ -259,7 +302,7 @@ void QnQuickTextInput::mouseMoveEvent(QMouseEvent* event)
     emit cursorRectangleChanged();
     if (d->cursorItem)
     {
-        QRectF r = cursorRectangle();
+        const auto r = cursorRectangle();
         d->cursorItem->setPosition(r.topLeft());
         d->cursorItem->setHeight(r.height());
     }
@@ -272,10 +315,44 @@ void QnQuickTextInput::mouseReleaseEvent(QMouseEvent* event)
 {
     Q_D(QnQuickTextInput);
     if (!d->dragStarted)
-        emit clicked();
+    {
+        QQuickMouseEvent mouseEvent(
+            event->pos().x(), event->pos().y(),
+            event->button(), event->buttons(), event->modifiers(), true, false);
+        emit clicked(&mouseEvent);
+    }
 
-    m_contextMenuPos = QPoint();
-    m_pressAndHoldTimer->stop();
+    d->pressAndHoldTimer->stop();
 
-    base_type::mouseReleaseEvent(event);
+    if (event->button() == Qt::LeftButton)
+        base_type::mouseReleaseEvent(event);
+}
+
+void QnQuickTextInput::mouseDoubleClickEvent(QMouseEvent* event)
+{
+    Q_D(QnQuickTextInput);
+    d->pressAndHoldTimer->stop();
+
+    QQuickMouseEvent mouseEvent(
+        event->pos().x(), event->pos().y(),
+        event->button(), event->buttons(), event->modifiers(), true, false);
+    emit doubleClicked(&mouseEvent);
+
+    if (event->button() == Qt::LeftButton)
+        base_type::mouseDoubleClickEvent(event);
+}
+
+void QnQuickTextInput::keyPressEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
+    {
+        if (const auto item = nextInputItem())
+        {
+            item->forceActiveFocus();
+            event->ignore();
+            return;
+        }
+    }
+
+    base_type::keyPressEvent(event);
 }

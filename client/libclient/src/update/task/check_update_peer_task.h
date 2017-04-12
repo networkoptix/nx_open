@@ -38,12 +38,11 @@ private:
     void checkUpdate();
     bool checkCloudHost();
     QnCheckForUpdateResult::Value checkUpdateCoverage();
+    bool isDowngradeAllowed();
 
     void checkBuildOnline();
     void checkOnlineUpdates();
     void checkLocalUpdates();
-
-    void cleanUp();
 
     void finishTask(QnCheckForUpdateResult::Value result);
 

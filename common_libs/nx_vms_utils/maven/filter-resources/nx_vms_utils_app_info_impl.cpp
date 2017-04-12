@@ -12,10 +12,20 @@ QString AppInfo::nativeUriProtocol()
 
 QString AppInfo::nativeUriProtocolDescription()
 {
-    return QStringLiteral("${display.product.name} Client Protocol");
+    return QStringLiteral("${client.display.name}");
+}
+
+QString AppInfo::desktopFileName()
+{
+    return QStringLiteral("${installer.name}.desktop");
 }
 
 QString AppInfo::iconFileName()
 {
-    return QStringLiteral("${installer.name}.desktop");
+    return QStringLiteral("vmsclient-${customization}.png");
+}
+
+QString AppInfo::productNameShort()
+{
+    return QStringLiteral("${product.name.short}");
 }

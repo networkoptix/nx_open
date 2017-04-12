@@ -141,7 +141,6 @@ private:
         QN_DECLARE_R_PROPERTY(QColor,   selectionOpacityDelta,          SELECTION_OPACITY_DELTA,                QColor(0, 0, 0, 0x80))
         QN_DECLARE_R_PROPERTY(QColor,   selectionBorderDelta,           SELECTION_BORDER_DELTA,                 QColor(48, 48, 48, 0))
 
-        QN_DECLARE_R_PROPERTY(QColor,   notificationColorSystem,        NOTIFICATION_COLOR_SYSTEM,              QColor(255, 0, 0))
         QN_DECLARE_R_PROPERTY(QColor,   notificationColorCommon,        NOTIFICATION_COLOR_COMMON,              QColor(103, 237, 66))
         QN_DECLARE_R_PROPERTY(QColor,   notificationColorImportant,     NOTIFICATION_COLOR_IMPORTANT,           QColor(237, 200, 66))
         QN_DECLARE_R_PROPERTY(QColor,   notificationColorCritical,      NOTIFICATION_COLOR_CRITICAL,            QColor(255, 131, 48))

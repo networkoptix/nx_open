@@ -4,8 +4,7 @@
 
 #include "network/auth/generic_user_data_provider.h"
 
-CloudManagerGroup::CloudManagerGroup(AbstractNonceProvider* defaultNonceFetcher)
-    :
+CloudManagerGroup::CloudManagerGroup(AbstractNonceProvider* defaultNonceFetcher):
     authenticationNonceFetcher(&connectionManager, defaultNonceFetcher),
     userAuthenticator(
         &connectionManager,

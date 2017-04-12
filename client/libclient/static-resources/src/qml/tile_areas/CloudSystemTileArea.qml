@@ -7,9 +7,9 @@ Column
     id: control;
 
     property string userName;
-    property bool isOnline: false;
+    property bool isConnectable: false;
 
-    spacing: 10; // TODO: check is bottom margin is 8px
+    spacing: 14; // TODO: check is bottom margin is 8px
 
     NxLabel
     {
@@ -19,6 +19,7 @@ Column
         anchors.right: parent.right;
 
         anchors.leftMargin: 4;
+        elide: Text.ElideRight;
 
         disableable: false;
         enabled: control.enabled;
@@ -35,16 +36,16 @@ Column
 
         anchors.left: parent.left;
 
-        width: 24;
-        height: 24;
+        width: 20;
+        height: 20;
         source:
         {
            if (!context.isCloudEnabled)
-               return "qrc:/skin/welcome_page/cloud_unavailable.png";
+               return "qrc:/skin/cloud/cloud_20_offline_disabled.png";
 
-           return (control.isOnline
-            ? "qrc:/skin/welcome_page/cloud_online.png"
-            : "qrc:/skin/welcome_page/cloud_offline.png");
+           return (control.isConnectable
+            ? "qrc:/skin/cloud/cloud_20_accented.png"
+            : "qrc:/skin/cloud/cloud_20_disabled.png");
         }
     }
 }

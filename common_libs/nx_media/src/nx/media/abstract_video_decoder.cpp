@@ -10,20 +10,20 @@ QSize AbstractVideoDecoder::mediaSizeFromRawData(const QnConstCompressedVideoDat
 {
     switch (frame->context->getCodecId())
     {
-    case AV_CODEC_ID_H264:
-    {
-        QSize result;
-        extractSpsPps(frame, &result, nullptr);
-        return result;
-    }
-    case AV_CODEC_ID_MJPEG:
-    {
-        nx_jpg::ImageInfo imgInfo;
-        nx_jpg::readJpegImageInfo((const quint8*)frame->data(), frame->dataSize(), &imgInfo);
-        return QSize(imgInfo.width, imgInfo.height);
-    }
-    default:
-        return QSize();
+        case AV_CODEC_ID_H264:
+        {
+            QSize result;
+            extractSpsPps(frame, &result, nullptr);
+            return result;
+        }
+        case AV_CODEC_ID_MJPEG:
+        {
+            nx_jpg::ImageInfo imgInfo;
+            nx_jpg::readJpegImageInfo((const quint8*) frame->data(), frame->dataSize(), &imgInfo);
+            return QSize(imgInfo.width, imgInfo.height);
+        }
+        default:
+            return QSize();
     }
 }
 

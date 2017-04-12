@@ -14,8 +14,8 @@ class NX_NETWORK_API ConnectionRequestedEvent
     public StunIndicationData
 {
 public:
-    constexpr static const stun::cc::indications::Value kMethod =
-        stun::cc::indications::connectionRequested;
+    constexpr static const stun::extension::indications::Value kMethod =
+        stun::extension::indications::connectionRequested;
 
     nx::String connectSessionId;
     nx::String originatingPeerID;

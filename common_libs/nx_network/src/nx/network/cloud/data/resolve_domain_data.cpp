@@ -1,6 +1,6 @@
 #include "resolve_domain_data.h"
 
-#include <nx/network/stun/cc/custom_stun.h>
+#include <nx/network/stun/extension/stun_extension_types.h>
 
 
 namespace nx {
@@ -16,12 +16,12 @@ ResolveDomainRequest::ResolveDomainRequest(nx::String domainName_)
 
 void ResolveDomainRequest::serializeAttributes(nx::stun::Message* const message)
 {
-    message->newAttribute<stun::cc::attrs::HostName>(domainName);
+    message->newAttribute<stun::extension::attrs::HostName>(domainName);
 }
 
 bool ResolveDomainRequest::parseAttributes(const nx::stun::Message& message)
 {
-    return readStringAttributeValue<stun::cc::attrs::HostName>(message, &domainName);
+    return readStringAttributeValue<stun::extension::attrs::HostName>(message, &domainName);
 }
 
 
@@ -34,12 +34,12 @@ ResolveDomainResponse::ResolveDomainResponse(std::vector<nx::String> hostNames_)
 
 void ResolveDomainResponse::serializeAttributes(nx::stun::Message* const message)
 {
-    message->newAttribute< stun::cc::attrs::HostNameList >(std::move(hostNames));
+    message->newAttribute< stun::extension::attrs::HostNameList >(std::move(hostNames));
 }
 
 bool ResolveDomainResponse::parseAttributes(const nx::stun::Message& message)
 {
-    return readAttributeValue<stun::cc::attrs::HostNameList>(message, &hostNames);
+    return readAttributeValue<stun::extension::attrs::HostNameList>(message, &hostNames);
 }
 
 } // namespace api

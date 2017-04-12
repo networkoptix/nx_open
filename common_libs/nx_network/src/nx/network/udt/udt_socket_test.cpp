@@ -437,7 +437,7 @@ void UdtSocketProfileClient::ScheduleConnection() {
     // Schedule the connection
     std::size_t per_conn_size = static_cast<std::size_t>(random_.RandomRange( conn_size_lower_ , conn_size_upper_ ));
     std::size_t scheduled_size = 0;
-    for( std::size_t i = active_conn_sockets_size_ ; (i < maximum_allowed_concurrent_connection_) &&
+    for( std::size_t i = active_conn_sockets_size_ ; (i < (std::size_t)maximum_allowed_concurrent_connection_) &&
                                                (connected_socket_size_ < maximum_allowed_concurrent_connection_) ; ++i ) {
         if( random_.Roll( GetConnectionProbability() ) ) {
             NatTraversalSupport type = tcp_ ? NatTraversalSupport::disabled : NatTraversalSupport::enabled;

@@ -244,6 +244,8 @@ public:
      */
     void setCellAspectRatio(float cellAspectRatio);
 
+    static qreal cellSpacingValue(Qn::CellSpacing spacing);
+
     /**
      * \returns                         Spacing between cells of this layout,
      *                                  relative to cell size.

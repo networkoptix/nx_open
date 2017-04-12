@@ -25,15 +25,15 @@ void printConnectOptions(std::ostream* const outStream)
         "  --total-connections={"<< kDefaultTotalConnections <<"}\n"
         "                       Number of connections to try\n"
         "  --max-concurrent-connections={"<< kDefaultMaxConcurrentConnections <<"}\n"
-        "  --bytes-to-receive={" << nx::utils::bytesToString(kDefaultBytesToReceive).toStdString() << "}\n"
-        "                       Bytes to receive before closing connection\n"
-        "  --bytes-to-send={N}  Bytes to send before closing connection\n"
+        "  --bytes-to-receive={N}\n"
+        "                       Bytes to receive before closing connection. No limit by default\n"
+        "  --bytes-to-send={N}  Bytes to send before closing connection. No limit by default\n"
         "  --forward-address    Use only forwarded address for connect"
         "  --udt                Force using udt socket. Disables cloud connect\n"
         "  --ssl                Use SSL on top of client sockets\n";
 }
 
-std::vector<SocketAddress> resolveTargets(
+static std::vector<SocketAddress> resolveTargets(
     SocketAddress targetAddress,
     const nx::utils::ArgumentParser& args)
 {
@@ -51,17 +51,14 @@ std::vector<SocketAddress> resolveTargets(
     {
         const auto systemSuffix = '.' + targetAddress.address.toString().toUtf8();
         targets.push_back(SocketAddress(serverId + systemSuffix, 0));
-        for (std::size_t i = 1; i < serverCount; ++i)
-        {
-            targets.push_back(SocketAddress(
-                serverId + QString::number(i).toUtf8() + systemSuffix, 0));
-        }
+        for (size_t i = 1; i < serverCount; ++i)
+            targets.push_back(SocketAddress(makeServerName(serverId, i) + systemSuffix));
 
         return targets;
     }
 
     // Or resolve it.
-    std::promise<void> promise;
+    nx::utils::promise<void> promise;
     const auto port = targetAddress.port;
     nx::network::SocketGlobals::addressResolver().resolveDomain(
         std::move(targetAddress.address),
@@ -79,6 +76,9 @@ std::vector<SocketAddress> resolveTargets(
 
 int runInConnectMode(const nx::utils::ArgumentParser& args)
 {
+    auto& mediatorResultCounter = network::cloud::CrossNatConnector::mediatorResponseCounter();
+    mediatorResultCounter.enable();
+
     QString target;
     if (!args.read("target", &target))
     {
@@ -87,6 +87,8 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
     }
 
     nx::network::SocketGlobals::mediatorConnector().enable(true);
+    nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId(
+        "cc-tu-connect", QnUuid::createUuid());
 
     int totalConnections = kDefaultTotalConnections;
     args.read("total-connections", &totalConnections);
@@ -95,10 +97,11 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
     args.read("max-concurrent-connections", &maxConcurrentConnections);
 
     nx::network::test::TestTrafficLimitType
-        trafficLimitType = nx::network::test::TestTrafficLimitType::incoming;
+        trafficLimitType = nx::network::test::TestTrafficLimitType::none;
 
     QString trafficLimit = nx::utils::bytesToString(kDefaultBytesToReceive);
-    args.read("bytes-to-receive", &trafficLimit);
+    if (args.read("bytes-to-receive", &trafficLimit))
+        trafficLimitType = nx::network::test::TestTrafficLimitType::incoming;
 
     if (args.read("bytes-to-send", &trafficLimit))
         trafficLimitType = nx::network::test::TestTrafficLimitType::outgoing; 
@@ -106,6 +109,8 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
     auto transmissionMode = nx::network::test::TestTransmissionMode::spam;
     if (args.get("ping"))
         transmissionMode = nx::network::test::TestTransmissionMode::ping;
+    if (args.get("receive-only"))
+        transmissionMode = nx::network::test::TestTransmissionMode::receiveOnly;
 
     if (args.get("forward-address"))
     {
@@ -163,7 +168,7 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
         totalConnections,
         transmissionMode);
 
-    std::promise<void> finishedPromise;
+    nx::utils::promise<void> finishedPromise;
     connectionsGenerator.setOnFinishedHandler(
         [&finishedPromise]{ finishedPromise.set_value(); });
 
@@ -183,11 +188,6 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
         std::chrono::duration_cast<std::chrono::seconds>(
             std::chrono::steady_clock::now() - startTime);
 
-    QStringList returnCodes;
-    for (const auto& code : connectionsGenerator.returnCodes())
-        returnCodes << lm("%2 [%1 time(s)]").arg(code.second)
-            .arg(SystemError::toString(code.first));
-
     std::cout << "\n\nConnect summary:\n"
         "  total time: " << testDuration.count() << " s\n"
         "  total connections: " <<
@@ -198,8 +198,11 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
             nx::utils::bytesToString(connectionsGenerator.totalBytesReceived()).toStdString() << "\n"
         "  total incomplete tasks: " <<
             connectionsGenerator.totalIncompleteTasks() << "\n"
-        "  return codes: " << returnCodes.join(QLatin1Literal("; ")).toStdString() << "\n" <<
-            std::endl;
+        "  mediator results: " <<
+            mediatorResultCounter.stringStatus().toStdString() << "\n" <<
+        "  connect results: " <<
+            connectionsGenerator.results().stringStatus().toStdString() << "\n" <<
+        std::endl;
 
     return 0;
 }
@@ -223,7 +226,7 @@ int runInHttpClientMode(const nx::utils::ArgumentParser& args)
 
     nx::network::SocketGlobals::mediatorConnector().enable(true);
     nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId(
-        "cloud_connectivity_test_util", QnUuid::createUuid());
+        "cc-tu-http", QnUuid::createUuid());
 
     NX_LOG(lm("Issuing request to %1").arg(urlStr), cl_logALWAYS);
 

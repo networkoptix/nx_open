@@ -20,7 +20,7 @@ public:
 
     /**
     * Establishes connection to DB.
-    * This method MUST be called after class instanciation
+    * This method MUST be called after class instantiation
     * @note Method is needed because we do not use exceptions
     */
     bool open();
@@ -34,6 +34,7 @@ public:
 private:
     QSqlDatabase m_dbConnection;
     const ConnectionOptions m_connectionOptions;
+    QString m_connectionName;
 
     bool tuneConnection();
     bool tuneMySqlConnection();

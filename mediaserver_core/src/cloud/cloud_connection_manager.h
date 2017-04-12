@@ -42,10 +42,10 @@ public:
 
     void processCloudErrorCode(nx::cdb::api::ResultCode resultCode);
 
-    bool detachFromCloudSilently();
-    bool cleanUpCloudDataInLocalDb();
-
     void setProxyVia(const SocketAddress& proxyEndpoint);
+
+    bool detachSystemFromCloud();
+    bool resetCloudData();
 
 signals:
     void cloudBindingStatusChanged(bool boundToCloud);
@@ -53,15 +53,14 @@ signals:
     void disconnectedFromCloud();
 
 private:
-    QString m_cloudSystemId;
-    QString m_cloudAuthKey;
-    SocketAddress m_proxyAddress;
+    boost::optional<SocketAddress> m_proxyAddress;
     mutable QnMutex m_mutex;
     std::unique_ptr<
         nx::cdb::api::ConnectionFactory,
         decltype(&destroyConnectionFactory)> m_cdbConnectionFactory;
 
-    bool boundToCloud(QnMutexLockerBase* const lk) const;
+    void setCloudCredentials(const QString& cloudSystemId, const QString& cloudAuthKey);
+    bool makeSystemLocal();
     void startEventConnection();
     void onEventConnectionEstablished(nx::cdb::api::ResultCode resultCode);
 

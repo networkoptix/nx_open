@@ -4,12 +4,12 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/barrier_handler.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/stun/cc/custom_stun.h>
+#include <nx/network/stun/extension/stun_extension_types.h>
 #include <nx/fusion/serialization/lexical.h>
 
 #define DEBUG_LOG(MESSAGE) do \
 { \
-    if (nx::network::SocketGlobals::debugConfiguration().addressResolver) \
+    if (nx::network::SocketGlobals::debugConfig().addressResolver) \
         NX_LOGX(MESSAGE, cl_logDEBUG1); \
 } while (0)
 
@@ -201,25 +201,30 @@ void AddressResolver::resolveAsync(
 {
     if (hostName.isIpAddress())
     {
+        DEBUG_LOG(lm("IP %1 is already resolved").str(hostName));
         AddressEntry entry(AddressType::direct, hostName);
         return handler(SystemError::noError, std::deque<AddressEntry>({std::move(entry)}));
     }
 
-    // Checking if hostName is fixed address.
-    const auto hostStr = hostName.toString().toStdString();
-    const auto ipv4Address = inet_addr(hostStr.c_str());
-    if (ipv4Address != INADDR_NONE)
+    // Checking if hostName is fixed address, to speed up resolution when IPv6 is disabled.
+    if (ipVersion == AF_INET)
     {
-        // Resolved.
-        struct in_addr resolvedAddress;
-        memset(&resolvedAddress, 0, sizeof(resolvedAddress));
-        resolvedAddress.s_addr = ipv4Address;
-        AddressEntry entry(AddressType::direct, HostAddress(resolvedAddress));
-        return handler(SystemError::noError, std::deque<AddressEntry>({ std::move(entry) }));
+        const auto hostStr = hostName.toString().toStdString();
+        const auto ipv4Address = inet_addr(hostStr.c_str());
+        if (ipv4Address != INADDR_NONE)
+        {
+            // Resolved.
+            DEBUG_LOG("Hostname %1 is IP v4 address");
+            struct in_addr resolvedAddress;
+            memset(&resolvedAddress, 0, sizeof(resolvedAddress));
+            resolvedAddress.s_addr = ipv4Address;
+            AddressEntry entry(AddressType::direct, HostAddress(resolvedAddress));
+            return handler(SystemError::noError, std::deque<AddressEntry>({ std::move(entry) }));
+        }
     }
 
     if (SocketGlobals::config().isHostDisabled(hostName))
-        return handler(SystemError::noPermission, {});
+        return handler(SystemError::noPermission, std::deque<AddressEntry>());
 
     QnMutexLocker lk(&m_mutex);
     auto info = m_info.emplace(
@@ -230,6 +235,18 @@ void AddressResolver::resolveAsync(
     if (info->second.isResolved(natTraversalSupport))
     {
         auto entries = info->second.getAll();
+
+        // TODO: #mux This is ugly fix for VMS-5777, should be properly fixed in 3.1.
+        if (info->second.isLikelyCloudAddress && isMediatorAvailable())
+        {
+            const bool cloudAddressEntryPresent =
+                std::count_if(
+                    entries.begin(), entries.end(),
+                    [](const AddressEntry& entry) { return entry.type == AddressType::cloud; }) > 0;
+            if (!cloudAddressEntryPresent)
+                entries.push_back(AddressEntry(AddressType::cloud, hostName));
+        }
+
         lk.unlock();
 
         DEBUG_LOG(lm("Address %1 resolved from cache: %2").str(hostName).container(entries));

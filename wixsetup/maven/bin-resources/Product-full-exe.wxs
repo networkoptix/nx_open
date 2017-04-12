@@ -13,57 +13,39 @@
             DisableModify="yes">
         <util:RegistrySearchRef Id='SearchForIsConnectedToCloud' />
         <util:RegistrySearchRef Id='ArchRegistrySearch' />
+        <util:ProductSearchRef Id='ServerMsiSearch' />
+        <util:ProductSearchRef Id='ClientMsiSearch' />
 
         <BootstrapperApplicationRef Id="WixExtendedBootstrapperApplication.HyperlinkLicense">
             <Payload SourceFile="License.html" />
             <Payload SourceFile="installer_bg.png" />
-            <Payload SourceFile="logo_big.png" />
-            <Payload SourceFile="logo_small.png" />
+            <Payload SourceFile="logo-102x102.png" />
+            <Payload SourceFile="logo-64x64.png" />
 
-            <bal:WixExtendedBootstrapperApplication SuppressOptionsUI="no" LicenseUrl="License.html" />
+            <bal:WixExtendedBootstrapperApplication 
+                SuppressOptionsUI="no"
+                SuppressRepair="yes"
+                ShowFilesInUse="yes"
+                LicenseUrl="License.html"
+                LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"
+            />
         </BootstrapperApplicationRef>
 
+        <Variable Name="InstallerTitle" Value="!(loc.InstallerTitleBundle)" />
+
         <WixVariable Id="WixExtbaThemeXml" Value="OptixTheme.xml" />
-        <WixVariable Id="WixExtbaThemeWxl" Value="OptixTheme.wxl" />
+        <WixVariable Id="WixExtbaThemeWxl" Value="OptixTheme_$(var.installerLanguage).wxl" />
 
         <Variable Name="InstallClientAndServer" Type="numeric" Value="1" />
         <Variable Name="InstallClientOnly" Type="numeric" Value="0" />
         <Variable Name="InstallServerOnly" Type="numeric" Value="0" />
 
-<!--        <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
-            <bal:WixStandardBootstrapperApplication
-                LicenseFile="License.rtf"
-                LogoFile="logo-64x64.png"
-                SuppressRepair="yes"
-                SuppressOptionsUI="yes"
-                ShowFilesInUse="yes"
-                LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"
-            />
-        </BootstrapperApplicationRef> -->
+        <util:RegistrySearch Condition="ServerInstalled = 5" Root="HKLM" Key="SOFTWARE\**NoValue**" Value="**NoValue**" Variable="InstallClientOnly" />
+        <util:RegistrySearch Condition="ClientInstalled = 5" Root="HKLM" Key="SOFTWARE\**NoValue**" Value="**NoValue**" Variable="InstallServerOnly" />
 
         <Chain DisableSystemRestore="yes">
             <PackageGroupRef Id="ClientPackageGroup"/>
             <PackageGroupRef Id="ServerPackageGroup"/>
-
-<!--            <MsiPackage
-                Id="ClientPackage"
-                Name="$(var.ClientMsiName)"
-                SourceFile="bin/strip/$(var.ClientMsiName)"
-                Vital="yes"
-                Cache="no"
-                Compressed="yes">
-                <MsiProperty Name="LICENSE_ALREADY_ACCEPTED" Value="1" />
-            </MsiPackage>
-
-            <MsiPackage
-                Id="ServerPackage"
-                Name="$(var.ServerMsiName)"
-                SourceFile="bin/strip/$(var.ServerMsiName)"
-                Vital="yes"
-                Cache="no"
-                Compressed="yes">
-                <MsiProperty Name="LICENSE_ALREADY_ACCEPTED" Value="1" />
-            </MsiPackage> -->
         </Chain>
     </Bundle>
 </Wix>

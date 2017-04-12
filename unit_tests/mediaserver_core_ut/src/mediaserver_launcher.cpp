@@ -1,26 +1,20 @@
-
 #include "mediaserver_launcher.h"
 
 #include <nx/network/http/httpclient.h>
 #include <nx/utils/random.h>
 
 #include <media_server_process.h>
+#include <nx/network/socket_global.h>
 
-
-MediaServerLauncher::MediaServerLauncher(const QString& tmpDir)
-    :
+MediaServerLauncher::MediaServerLauncher(const QString& tmpDir, DisabledFeatures disabledFeatures):
     m_workDirResource(tmpDir),
-    m_serverEndpoint(HostAddress::localhost, nx::utils::random::number<int>(45000, 50000))
+    m_serverEndpoint(HostAddress::localhost, 0),
+    m_firstStartup(true)
 {
-    m_configFilePath = *m_workDirResource.getDirName() + lit("/mserver.conf");
-    m_configFile.open(m_configFilePath.toUtf8().constData());
-
-    m_configFile << "serverGuid = " << QnUuid::createUuid().toString().toStdString() << std::endl;
-    m_configFile << "removeDbOnStartup = 1" << std::endl;
-    m_configFile << "dataDir = " << m_workDirResource.getDirName()->toStdString() << std::endl;
-    m_configFile << "varDir = " << m_workDirResource.getDirName()->toStdString() << std::endl;
-    m_configFile << "systemName = " << QnUuid::createUuid().toString().toStdString() << std::endl;
-    m_configFile << "port = " << m_serverEndpoint.port << std::endl;
+    if (disabledFeatures.testFlag(DisabledFeature::noResourceDiscovery))
+        addSetting(QnServer::kNoResourceDiscovery, "1");
+    if (disabledFeatures.testFlag(DisabledFeature::noMonitorStatistics))
+        addSetting(QnServer::kNoMonitorStatistics, "1");
 }
 
 MediaServerLauncher::~MediaServerLauncher()
@@ -30,49 +24,105 @@ MediaServerLauncher::~MediaServerLauncher()
 
 SocketAddress MediaServerLauncher::endpoint() const
 {
-    return m_serverEndpoint;
+    return SocketAddress(HostAddress::localhost, m_mediaServerProcess->getTcpPort());
 }
 
-void MediaServerLauncher::addSetting(const QString& name, const QString& value)
+int MediaServerLauncher::port() const
 {
-    m_configFile << name.toStdString() << " = " << value.toStdString() << std::endl;
+    return m_mediaServerProcess->getTcpPort();
 }
 
-bool MediaServerLauncher::start()
+void MediaServerLauncher::addSetting(const QString& name, const QVariant& value)
 {
+    m_customSettings.emplace_back(name, value.toString());
+}
+
+void MediaServerLauncher::prepareToStart()
+{
+    m_configFilePath = *m_workDirResource.getDirName() + lit("/mserver.conf");
+    m_configFile.open(m_configFilePath.toUtf8().constData());
+
+    m_configFile << "serverGuid = " << QnUuid::createUuid().toString().toStdString() << std::endl;
+    m_configFile << lit("removeDbOnStartup = %1").arg(m_firstStartup).toLocal8Bit().data() << std::endl;
+    m_configFile << "dataDir = " << m_workDirResource.getDirName()->toStdString() << std::endl;
+    m_configFile << "varDir = " << m_workDirResource.getDirName()->toStdString() << std::endl;
+    m_configFile << "systemName = " << QnUuid::createUuid().toString().toStdString() << std::endl;
+    m_configFile << "port = " << m_serverEndpoint.port << std::endl;
+
+    for (const auto& customSetting: m_customSettings)
+    {
+        m_configFile << customSetting.first.toStdString() << " = "
+            << customSetting.second.toStdString() << std::endl;
+    }
+
     QByteArray configFileOption = "--conf-file=" + m_configFilePath.toUtf8();
     char* argv[] = { "", "-e", configFileOption.data() };
     const int argc = 3;
 
     m_configFile.flush();
     m_configFile.close();
-    m_mediaServerProcessThread = nx::utils::thread(
-        [this, argc, argv = argv]() mutable
-        {
-            MediaServerProcess::main(argc, argv);
-        });
+
+    m_mediaServerProcess.reset();
+    m_mediaServerProcess.reset(new MediaServerProcess(argc, argv));
+    connect(m_mediaServerProcess.get(), &MediaServerProcess::started, this, &MediaServerLauncher::started);
+
+    m_firstStartup = false;
+}
+
+void MediaServerLauncher::run()
+{
+    prepareToStart();
+    m_mediaServerProcess->run();
+}
+
+bool MediaServerLauncher::start()
+{
+    prepareToStart();
+
+    nx::utils::promise<bool> processStartedPromise;
+    auto future = processStartedPromise.get_future();
+
+    connect(
+        m_mediaServerProcess.get(),
+        &MediaServerProcess::started,
+        this,
+        [&processStartedPromise]() { processStartedPromise.set_value(true); },
+        Qt::DirectConnection);
+    m_mediaServerProcess->start();
 
     //waiting for server to come up
     const auto startTime = std::chrono::steady_clock::now();
     constexpr const auto maxPeriodToWaitForMediaServerStart = std::chrono::seconds(150);
-    while (std::chrono::steady_clock::now() - startTime < maxPeriodToWaitForMediaServerStart)
-    {
-        nx_http::HttpClient httpClient;
-        if (httpClient.doGet(
-            lit("http://%1/api/moduleInformation").arg(m_serverEndpoint.toString())))
-            break;  //server is alive
-    }
+    auto result = future.wait_for(maxPeriodToWaitForMediaServerStart);
+    if (result != std::future_status::ready)
+        return false;
 
-    return std::chrono::steady_clock::now() - startTime < maxPeriodToWaitForMediaServerStart;
+    while (m_mediaServerProcess->getTcpPort() == 0)
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    return true;
+}
+
+bool MediaServerLauncher::startAsync()
+{
+    prepareToStart();
+    m_mediaServerProcess->start();
+    return true;
 }
 
 bool MediaServerLauncher::stop()
 {
-    nx_http::HttpClient httpClient;
-    httpClient.setUserName(lit("admin"));
-    httpClient.setUserPassword(lit("admin"));
-    if (!httpClient.doGet(lit("http://%1/api/restart").arg(m_serverEndpoint.toString())))
-        return false;
-    m_mediaServerProcessThread.join();
+    m_mediaServerProcess->stopSync();
     return true;
+}
+
+bool MediaServerLauncher::stopAsync()
+{
+    m_mediaServerProcess->stopAsync();
+    return true;
+}
+
+QUrl MediaServerLauncher::apiUrl() const
+{
+    return QUrl(lit("http://") + endpoint().toString());
 }

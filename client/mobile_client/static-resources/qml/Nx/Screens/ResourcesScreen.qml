@@ -34,6 +34,14 @@ Page
         }
     ]
 
+    Binding
+    {
+        target: resourcesScreen
+        property: "title"
+        value: connectionManager.systemName
+        when: connectionManager.online
+    }
+
     QtObject
     {
         id: d
@@ -96,9 +104,11 @@ Page
         keepStatuses: !resourcesScreen.warningVisible
             && connectionManager.connectionState !== QnConnectionManager.Ready
 
+        active: activePage
+
         ScrollIndicator.vertical: ScrollIndicator
         {
-            leftPadding: 6
+            leftPadding: 2
             width: 4
         }
     }
@@ -136,9 +146,9 @@ Page
                 id: camerasList
 
                 anchors.fill: parent
-                anchors.margins: 16
-                displayMarginBeginning: 16
-                displayMarginEnd: 16
+                anchors.margins: 8
+                displayMarginBeginning: 8
+                displayMarginEnd: 8
 
                 Connections
                 {
@@ -148,7 +158,7 @@ Page
 
                 ScrollIndicator.vertical: ScrollIndicator
                 {
-                    leftPadding: 10
+                    leftPadding: 4
                     width: 4
                 }
             }

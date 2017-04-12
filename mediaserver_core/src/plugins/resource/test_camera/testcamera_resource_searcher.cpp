@@ -80,20 +80,19 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
                 continue;
 
             int videoPort = params[1].toInt();
-            const QString resName(lit("TestCameraLive"));
             for (int j = 2; j < params.size(); ++j)
             {
                 QnTestCameraResourcePtr resource ( new QnTestCameraResource() );
-
-                QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), resName);
+                QString model = QLatin1String(QnTestCameraResource::kModel);
+                QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), model);
                 if (rt.isNull())
                     continue;
 
                 QLatin1String s(params[j]);
 
                 resource->setTypeId(rt);
-                resource->setName(resName);
-                resource->setModel(resName);
+                resource->setName(model);
+                resource->setModel(model);
                 QString mac(s);
                 if (processedMac.contains(mac))
                     continue;
@@ -147,7 +146,7 @@ QnResourcePtr QnTestCameraResourceSearcher::createResource(const QnUuid &resourc
 
 QString QnTestCameraResourceSearcher::manufacture() const
 {
-    return QnTestCameraResource::MANUFACTURE;
+    return QLatin1String(QnTestCameraResource::kManufacturer);
 }
 
 QList<QnResourcePtr> QnTestCameraResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)

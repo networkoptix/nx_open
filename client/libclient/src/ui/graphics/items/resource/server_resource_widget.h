@@ -58,7 +58,7 @@ protected:
 
     virtual void at_itemDataChanged(int role) override;
 
-    virtual void updateHud(bool animate = true) override;
+    virtual void updateHud(bool animate) override;
 
 private slots:
     void at_statistics_received();

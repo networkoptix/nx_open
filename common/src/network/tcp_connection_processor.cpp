@@ -236,7 +236,7 @@ QByteArray QnTCPConnectionProcessor::createResponse(int httpStatusCode, const QB
         //revealing Server name to authenticated entity only
         nx_http::insertOrReplaceHeader(
             &d->response.headers,
-            nx_http::HttpHeader("Server", nx_http::serverString() ) );
+            nx_http::HttpHeader(nx_http::header::Server::NAME, nx_http::serverString() ) );
     }
     nx_http::insertOrReplaceHeader(
         &d->response.headers,
@@ -319,7 +319,7 @@ void QnTCPConnectionProcessor::pleaseStop()
 {
     Q_D(QnTCPConnectionProcessor);
     if (d->socket)
-        d->socket->close();
+        d->socket->shutdown();
     QnLongRunnable::pleaseStop();
 }
 
@@ -472,6 +472,7 @@ void QnTCPConnectionProcessor::copyClientRequestTo(QnTCPConnectionProcessor& oth
     other.d_ptr->response = d->response;
     other.d_ptr->protocol = d->protocol;
     other.d_ptr->accessRights = d->accessRights;
+    other.d_ptr->authenticatedOnce = d->authenticatedOnce;
 }
 
 QUrl QnTCPConnectionProcessor::getDecodedUrl() const

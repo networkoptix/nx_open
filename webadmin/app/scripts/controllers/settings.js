@@ -4,6 +4,11 @@ angular.module('webadminApp')
     .controller('SettingsCtrl', function ($scope, $rootScope, $modal, $log, mediaserver, $poll,
                                           cloudAPI, $location, $timeout, dialogs, nativeClient) {
 
+        if(mediaserver.hasProxy()){
+            $location.path("/view");
+            return;
+        }
+        $scope.L = L;
 
         function updateActive(){
             $scope.active={
@@ -28,6 +33,11 @@ angular.module('webadminApp')
             });
         }
 
+        nativeClient.init().then(function(result){
+            $scope.mode={liteClient: result.lite};
+        });
+
+
         mediaserver.getModuleInformation().then(function (r) {
             var data = r.data.reply;
 
@@ -44,6 +54,12 @@ angular.module('webadminApp')
             if(data.flags.brokenSystem){
                 $poll(pingModule,1000);
                 return;
+            }
+            
+            if(data.flags.canSetupNetwork){
+                mediaserver.networkSettings().then(function(r){
+                    $scope.networkSettings = r.data.reply;
+                });
             }
             checkUserRights();
         });
@@ -86,7 +102,7 @@ angular.module('webadminApp')
 
         $scope.openJoinDialog = function () {
             $modal.open({
-                templateUrl: 'views/join.html',
+                templateUrl: Config.viewsDir + 'join.html',
                 controller: 'JoinCtrl',
                 resolve: {
                     items: function () {
@@ -123,7 +139,7 @@ angular.module('webadminApp')
 
         function restartServer(passPort){
             $modal.open({
-                templateUrl: 'views/restart.html',
+                templateUrl: Config.viewsDir + 'restart.html',
                 controller: 'RestartCtrl',
                 resolve:{
                     port:function(){
@@ -133,7 +149,10 @@ angular.module('webadminApp')
             });
         }
 
-        function errorHandler(){
+        function errorHandler(result){
+            if(result == 'cancel'){ // That's fine, dialog was cancelled
+                return false;
+            }
             dialogs.alert (L.settings.connnetionError);
             return false;
         }
@@ -154,22 +173,31 @@ angular.module('webadminApp')
                     restartServer(true);
                 });
             } else {
-                dialogs.alert(message || L.settings.settingsSaved);
-                if(!message) {
-                    if ($scope.settings.port !== window.location.port) {
-                        window.location.href = (window.location.protocol + '//' + window.location.hostname + ':' + $scope.settings.port + window.location.pathname + window.location.hash);
-                    } else {
-                        window.location.reload();
+                dialogs.alert(message || L.settings.settingsSaved).finally(function(){
+                    if(!message) {
+                        if ($scope.settings.port != window.location.port) {
+                            window.location.href =
+                                window.location.protocol + '//' +
+                                window.location.hostname + ':' +
+                                $scope.settings.port +
+                                window.location.pathname +
+                                window.location.hash + '?' +
+                                nativeClient.webSocketUrlPath();
+                        } else {
+                            window.location.reload();
+                        }
                     }
-                }
+                });
             }
         }
 
         $scope.save = function () {
-            if($scope.settingsForm.$valid) {
+            if($scope.settings.port <= 1024){
+                dialogs.confirm(L.settings.unsafePortConfirm).then(function(){
+                    mediaserver.changePort($scope.settings.port).then(resultHandler, errorHandler);
+                });
+            }else {
                 mediaserver.changePort($scope.settings.port).then(resultHandler, errorHandler);
-            }else{
-                dialogs.alert('form is not valid');
             }
         };
 
@@ -251,7 +279,7 @@ angular.module('webadminApp')
 
         function openCloudDialog(){
             $modal.open({
-                templateUrl: 'views/dialogs/cloudDialog.html',
+                templateUrl: Config.viewsDir + 'dialogs/cloudDialog.html',
                 controller: 'CloudDialogCtrl',
                 backdrop:'static',
                 size:'sm',
@@ -271,7 +299,7 @@ angular.module('webadminApp')
                     }
                 }
             }).result.then(function(){
-                dialogs.alert(L.settings.connectedSuccess).then(function(){
+                dialogs.alert(L.settings.connectedSuccess).finally(function(){
                     window.location.reload();
                 });
             },errorHandler);
@@ -297,7 +325,7 @@ angular.module('webadminApp')
             function doDisconnect(localLogin,localPassword){
                 // 2. Send request to the system only
                 return mediaserver.disconnectFromCloud(localLogin, localPassword).then(function(){
-                    dialogs.alert(L.settings.disconnectedSuccess).then(function(){
+                    dialogs.alert(L.settings.disconnectedSuccess).finally(function(){
                         window.location.reload();
                     });
                 }, function(error){
@@ -346,9 +374,6 @@ angular.module('webadminApp')
         $scope.connectToCloud = function() { // Connect to Cloud
             openCloudDialog(); //Open Connect Dialog
         };
-        mediaserver.networkSettings().then(function(r){
-            $scope.networkSettings = r.data.reply;
-        });
         $scope.saveNetworkSettings = function(){
             mediaserver.networkSettings($scope.networkSettings).then(restartServer, errorHandler);
         };
@@ -357,7 +382,26 @@ angular.module('webadminApp')
 
             var zones = reply.data.reply;
             zones = _.sortBy(zones,function(zone){
-                return zone.comment;
+
+                var offsetString = '(UTC)';
+                if(zone.offsetFromUtc != 0){
+                    offsetString = zone.offsetFromUtc > 0?'(UTC +':'(UTC -';
+
+                    var absOffset = Math.abs(zone.offsetFromUtc);
+                    var zoneHours = Math.floor(absOffset/3600);
+                    var zoneMinutes = Math.floor( (absOffset % 3600) / 60);
+
+                    if(zoneHours<10){
+                        zoneHours = '0' + zoneHours;
+                    }
+                    if(zoneMinutes<10){
+                        zoneMinutes = '0' + zoneMinutes;
+                    }
+                    offsetString += zoneHours  + ":" + zoneMinutes +")";
+                }
+
+                zone.name = offsetString +' ' + zone.id;
+                return zone.offsetFromUtc;
             });
             /*$scope.alltimeZones = _.indexBy(zones,function(zone){
                 return zone.id;
@@ -392,11 +436,5 @@ angular.module('webadminApp')
         $scope.saveDateTime = function(){
             mediaserver.timeSettings($scope.dateTimeSettings.dateTime.getTime(), $scope.dateTimeSettings.timeZone).
                 then(resultHandler,errorHandler);
-        };
-
-        $scope.openLink = function($event){
-            nativeClient.openUrlInBrowser($event.target.baseURI, $event.target.title, true);
-            $event.stopPropagation();
-            $event.preventDefault();
         };
     });

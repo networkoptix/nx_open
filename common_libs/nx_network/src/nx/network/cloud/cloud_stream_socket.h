@@ -29,7 +29,7 @@ class NX_NETWORK_API CloudStreamSocket:
     using BaseType = AbstractStreamSocketAttributesCache<AbstractStreamSocket>;
 
 public:
-    CloudStreamSocket(int ipVersion);
+    explicit CloudStreamSocket(int ipVersion = AF_INET);
     virtual ~CloudStreamSocket();
 
     virtual aio::AbstractAioThread* getAioThread() const override;
@@ -82,7 +82,7 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync(bool checkForLocks = true) override;
 
-    bool isInSelfAioThread() const;
+    virtual bool isInSelfAioThread() const override;
 
 private:
     typedef nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>>*

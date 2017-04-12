@@ -381,7 +381,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& _requestStr, bool recur
             {
                 return CL_HTTP_FORBIDDEN;
             }
-            else if( statusLine.statusCode == nx_http::StatusCode::moved )
+            else if( statusLine.statusCode == nx_http::StatusCode::found )
             {
                 return CL_HTTP_REDIRECT;
             }

@@ -65,7 +65,7 @@ static void printInLogNetResources(const QnResourceList& resources)
         if (!netRes)
             continue;
 
-        NX_LOG( lit("%1 %2").arg(netRes->getHostAddress()).arg(netRes->getName()), cl_logINFO);
+        NX_LOG( lit("Discovery----: %1 %2").arg(netRes->getHostAddress()).arg(netRes->getName()), cl_logINFO);
     }
 
 }
@@ -73,15 +73,6 @@ static void printInLogNetResources(const QnResourceList& resources)
 bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources, SearchType searchType)
 {
     // fill camera's ID
-
-    for (const auto& resource: resources)
-    {
-        QnSecurityCamResourcePtr cameraResource = resource.dynamicCast<QnSecurityCamResource>();
-        if (cameraResource) {
-            QString uniqueId = cameraResource->getUniqueId();
-            cameraResource->setId(cameraResource->uniqueIdToId(uniqueId));
-        }
-    }
 
     {
         QnMutexLocker lock(&m_discoveryMutex);
@@ -93,10 +84,10 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                 ++itr;
                 continue;
             }
-            QnSecurityCamResourcePtr existRes = qnResPool->getResourceById<QnSecurityCamResource>((*itr)->getId());
+            QnSecurityCamResourcePtr existRes = qnResPool->getResourceByUniqueId<QnSecurityCamResource>((*itr)->getUniqueId());
             if (existRes && existRes->hasFlags(Qn::foreigner) && !existRes->hasFlags(Qn::desktop_camera))
             {
-                m_tmpForeignResources.insert(camRes->getId(), camRes);
+                m_tmpForeignResources.insert(camRes->getUniqueId(), camRes);
                 itr = resources.erase(itr);
             }
             else {
@@ -166,33 +157,30 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
         QnResourcePtr rpResource = QnResourceDiscoveryManager::findSameResource(newNetRes);
         QnVirtualCameraResourcePtr newCamRes = newNetRes.dynamicCast<QnVirtualCameraResource>();
-        
-        if (!rpResource) 
-        {
-            if (newCamRes && newCamRes->needCheckIpConflicts())
-            {
-                // do not count 2--N channels of multichannel cameras as conflict
-                quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
-                if (ips)
-                    ipsList[ips].insert(newNetRes);
-            }
 
+        if (!rpResource)
+        {
             ++it; // keep new resource in a list
             continue;
         }
 
+		if (rpResource->hasFlags(Qn::foreigner))
+		{
+			if (!canTakeForeignCamera(rpResource.dynamicCast<QnSecurityCamResource>(), extraResources.size()))
+			{
+				it = resources.erase(it); // do not touch foreign resource
+				continue;
+			}
+		}
+
+		if (newCamRes && newCamRes->needCheckIpConflicts())
+		{
+			quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
+			if (ips)
+				ipsList[ips].insert(newNetRes);
+		}
+
         QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
-
-        // if such res in ResourcePool
-
-        if (rpResource->hasFlags(Qn::foreigner))
-        {
-            if (!canTakeForeignCamera(rpResource.dynamicCast<QnSecurityCamResource>(), extraResources.size()))
-            {
-                it = resources.erase(it); // do not touch foreign resource
-                continue;
-            }
-        }
 
         const bool isForeign = rpResource->hasFlags(Qn::foreigner);
         QnVirtualCameraResourcePtr existCamRes = rpNetRes.dynamicCast<QnVirtualCameraResource>();
@@ -205,7 +193,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     .arg(FL1(Q_FUNC_INFO))
                     .arg(NetResString(rpNetRes))
                     .arg(NetResString(newNetRes)));
-                    
+
             newNetRes->setPhysicalId(rpNetRes->getUniqueId());
             if (rpNetRes->mergeResourcesIfNeeded(newNetRes) || isForeign || updateTypeId)
             {
@@ -232,7 +220,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
                     const ec2::ErrorCode errorCode = connect->getCameraManager(Qn::kSystemAccess)->addCameraSync(apiCamera);
                     if( errorCode != ec2::ErrorCode::ok )
-                        NX_LOG( QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
+                        NX_LOG( QString::fromLatin1("Discovery----: Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
                     propertyDictionary->saveParams( existCamRes->getId() );
                 }
             }
@@ -258,10 +246,14 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             QStringList conflicts;
             for(const QnNetworkResourcePtr& camRes: itr.value())
             {
-                conflicts << camRes->getPhysicalId();
-                QnVirtualCameraResource* cam = dynamic_cast<QnVirtualCameraResource*>(camRes.data());
-                if (cam)
-                    cam->issueOccured();
+                // Human-readable value to help user identify a camera.
+                QString cameraId = camRes->getMAC().toString();
+                if (cameraId.isEmpty())
+                    cameraId = camRes->getId().toString();
+
+                conflicts << cameraId;
+                if (auto camera = camRes.dynamicCast<QnVirtualCameraResource>())
+                    camera->issueOccured();
             }
             emit CameraIPConflict(hostAddr, conflicts);
         }
@@ -288,7 +280,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
     if (resources.size())
     {
-        NX_LOG("Discovery---- Final result: ", cl_logINFO);
+        NX_LOG("Discovery----: Final result: ", cl_logINFO);
         printInLogNetResources(resources);
     }
     return true;

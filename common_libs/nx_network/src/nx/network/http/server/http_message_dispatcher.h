@@ -63,7 +63,7 @@ public:
         if (!handler)
             return false;
 
-        const auto handlerPtr = handler.release();
+        const auto handlerPtr = handler.get();
         return handlerPtr->processRequest(
             connection, std::move(message), std::move(authInfo),
             [handler = std::move(handler), completionFunc = std::move(completionFunc)](

@@ -22,7 +22,7 @@ namespace Qn {
 }
 
 /*!
-    \note Derived class MUST call \a initMediaResource() just after object instanciation
+    \note Derived class MUST call \a initMediaResource() just after object instantiation
 */
 class QnMediaResource
 {
@@ -65,6 +65,9 @@ public:
     static QString panicRecordingKey();
     static QString dynamicVideoLayoutKey();
     static QString motionStreamKey();
+
+    static QString primaryStreamValue();
+    static QString secondaryStreamValue();
 
     static QnConstResourceVideoLayoutPtr getDefaultVideoLayout();
 

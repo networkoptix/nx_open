@@ -85,28 +85,51 @@ QnCameraPool::~QnCameraPool()
     delete m_discoveryListener;
 }
 
-void QnCameraPool::addCameras(int count, QStringList primaryFileList, QStringList secondaryFileList, int offlineFreq)
+void QnCameraPool::addCameras(bool cameraForEachFile, int count, QStringList primaryFileList, QStringList secondaryFileList, int offlineFreq)
 {
     qDebug() << "Add" << count << "cameras from primary file(s)" << primaryFileList << " secondary file(s)" << secondaryFileList << "offlineFreq=" << offlineFreq;
     QMutexLocker lock(&m_mutex);
-    for (int i = 0; i < count; ++i)
+    if (!cameraForEachFile)
     {
-        QnTestCamera* camera = new QnTestCamera(++m_cameraNum);
-        camera->setPrimaryFileList(primaryFileList);
-        camera->setSecondaryFileList(secondaryFileList);
-        camera->setOfflineFreq(offlineFreq);
-        foreach(QString fileName, primaryFileList)
-            QnFileCache::instance()->getMediaData(fileName);
-        foreach(QString fileName, secondaryFileList)
-            QnFileCache::instance()->getMediaData(fileName);
-        m_cameras.insert(camera->getMac(), camera);
+        for (int i = 0; i < count; ++i)
+        {
+            QnTestCamera* camera = new QnTestCamera(++m_cameraNum);
+            camera->setPrimaryFileList(primaryFileList);
+            camera->setSecondaryFileList(secondaryFileList);
+            camera->setOfflineFreq(offlineFreq);
+            foreach(QString fileName, primaryFileList)
+                QnFileCache::instance()->getMediaData(fileName);
+            foreach(QString fileName, secondaryFileList)
+                QnFileCache::instance()->getMediaData(fileName);
+            m_cameras.insert(camera->getMac(), camera);
+        }
+    }
+    else 
+    { // Special case - we run one camera for each source
+        for (int i = 0; i < primaryFileList.length(); i++) 
+        {
+            QString primaryFile = primaryFileList[i];
+            QString secondaryFile = i < secondaryFileList.length() ? secondaryFileList[i] : ""; // secondary file is optional
+
+            QnTestCamera* camera = new QnTestCamera(++m_cameraNum);
+            camera->setPrimaryFileList(QStringList() << primaryFile);
+            camera->setSecondaryFileList(QStringList() << secondaryFile);
+            camera->setOfflineFreq(offlineFreq);
+
+            QnFileCache::instance()->getMediaData(primaryFile);
+            if (!secondaryFile.isEmpty()) // secondary file is optional
+            { 
+                QnFileCache::instance()->getMediaData(secondaryFile);
+            }
+            m_cameras.insert(camera->getMac(), camera);
+        }
     }
 }
 
 QnTCPConnectionProcessor* QnCameraPool::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket)
 {
     QMutexLocker lock(&m_mutex);
-    return new QnTestCameraProcessor(clientSocket, this);
+    return new QnTestCameraProcessor(clientSocket);
 }
 
 QByteArray QnCameraPool::getDiscoveryResponse()

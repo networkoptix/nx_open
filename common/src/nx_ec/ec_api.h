@@ -75,10 +75,11 @@ class ECConnectionNotificationManager;
         Q_OBJECT
     public:
     signals:
-        void statusChanged( const QnUuid& resourceId, Qn::ResourceStatus status );
+        void statusChanged( const QnUuid& resourceId, Qn::ResourceStatus status, ec2::NotificationSource source);
         void resourceParamChanged( const ApiResourceParamWithRefData& param );
         void resourceParamRemoved( const ApiResourceParamWithRefData& param );
-        void resourceRemoved( const QnUuid& resourceId );
+        void resourceRemoved(const QnUuid& resourceId);
+        void resourceStatusRemoved(const QnUuid& resourceId);
     };
 
     typedef std::shared_ptr<AbstractResourceNotificationManager> AbstractResourceNotificationManagerPtr;
@@ -172,6 +173,14 @@ class ECConnectionNotificationManager;
             );
         }
 
+        ErrorCode saveSync(const QnUuid& resourceId, const ec2::ApiResourceParamDataList& properties)
+        {
+            ApiResourceParamWithRefDataList kvPairs;
+            for (const auto& p: properties)
+                kvPairs.push_back(ApiResourceParamWithRefData(resourceId, p.name, p.value));
+            ApiResourceParamWithRefDataList dummy;
+            return saveSync(kvPairs, &dummy);
+        }
 
         //!Convenient method to remove resource of any type
         /*!
@@ -261,7 +270,7 @@ class ECConnectionNotificationManager;
         Q_OBJECT
     public:
     signals:
-        void addedOrUpdated( QnBusinessEventRulePtr businessRule, const QnUuid& peerId);
+        void addedOrUpdated( QnBusinessEventRulePtr businessRule, NotificationSource source);
         void removed( QnUuid id );
         void businessActionBroadcasted( const QnAbstractBusinessActionPtr& businessAction );
         void businessRuleReset( const ec2::ApiBusinessRuleDataList& rules );

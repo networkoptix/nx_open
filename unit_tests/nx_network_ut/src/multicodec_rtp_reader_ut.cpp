@@ -29,6 +29,7 @@
 #include <network/multicodec_rtp_reader.h>
 #include <nx/streaming/rtsp_client.h>
 #include <nx/network/http/httpclient.h>
+#include <nx/network/test_support/buffer_socket.h>
 
 #include "file_socket.h"
 
@@ -516,7 +517,7 @@ TEST( QnMulticodecRtpReader, DISABLED_rtpParsingPerformance )
     ASSERT_EQ( stat( testDataFilePath, &st ), 0 );
     testData.resize( st.st_size );
     testFile.read( const_cast<char*>(testData.data()), testData.size() );
-    ASSERT_EQ( testFile.gcount(), testData.size() );
+    ASSERT_EQ( (size_t)testFile.gcount(), testData.size() );
     testFile.close();
 
     QnNetworkResourcePtr resource( new QnNetworkResource() );

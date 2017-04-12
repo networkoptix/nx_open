@@ -81,13 +81,8 @@ void Ec2DirectConnectionFactory::pleaseStop()
 
 void Ec2DirectConnectionFactory::join()
 {
-    QnMutexLocker lk(&m_mutex);
-    while(m_runningRequests > 0)
-    {
-        lk.unlock();
-        QThread::msleep(1000);
-        lk.relock();
-    }
+    // Cancelling all ongoing requests.
+    m_remoteQueryProcessor.pleaseStopSync();
 }
 
 // Implementation of AbstractECConnectionFactory::testConnectionAsync
@@ -147,9 +142,9 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     /**%apidoc GET /ec2/getResourceTypes
      * Read all resource types. Resource type contains object type such as
      * "Server", "Camera", etc. Also, resource type contains additional information
-     * for cameras such as maximum fps, resolution, etc.
+     * for cameras such as maximum FPS, resolution, etc.
      * %param[default] format
-     * %return Return object in the requested format.
+     * %return Object in the requested format.
      * %// AbstractResourceManager::getResourceTypes
      */
     regGet<nullptr_t, ApiResourceTypeDataList>(p, ApiCommand::getResourceTypes);
@@ -162,7 +157,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * The list of parameters depends on the resource type.
      * %param[default] format
      * %param id Resource unique id.
-     * %return Return object in the requested format.
+     * %return Object in the requested format.
      * %// AbstractResourceManager::getKvPairs
      */
     regGet<QnUuid, ApiResourceParamWithRefDataList>(p, ApiCommand::getResourceParams);
@@ -185,12 +180,11 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     regUpdate<ApiIdData>(p, ApiCommand::removeResource);
 
     /**%apidoc GET /ec2/getStatusList
-     * Read current status values for cameras, servers and storages.
+     * Read current status of the resources: cameras, servers and storages.
      * %param[default] format
-     * %param[opt] id Object unique id.
-     * %return Return list of object statuses in the requested format.
-     * If "id" parameter is specified, the list will contain only one
-     * object with that id, or nothing, if there is no such object found.
+     * %param[opt] id Resource unique id. If omitted, return data for all resources.
+     * %return List of status objects in the requested format.
+     *     %// TODO: Describe ResourceStatus fields.
      */
     regGet<QnUuid, ApiResourceStatusDataList>(p, ApiCommand::getStatusList);
 
@@ -309,9 +303,9 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     regUpdate<ApiIdData>(p, ApiCommand::removeMediaServer);
 
     /**%apidoc GET /ec2/getMediaServersEx
-     * Return server list
+     * Return server list.
      * %param[default] format
-     * %return Return object in the requested format.
+     * %return Server object in the requested format.
      * %// AbstractMediaServerManager::getServersEx
      */
     regGet<QnUuid, ApiMediaServerDataExList>(p, ApiCommand::getMediaServersEx);
@@ -391,7 +385,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     schedule.
      *     %param scheduleTask.startTime Time of day when the backup starts (in seconds passed
      *         from 00:00:00).
-     *     %param scheduleTask.endTime: Time of day when the backup ends (in seconds passed
+     *     %param scheduleTask.endTime Time of day when the backup ends (in seconds passed
      *         from 00:00:00).
      *     %param scheduleTask.recordAudio Whether to record sound.
      *         %value false
@@ -432,7 +426,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value SSQualityHigh High quality second stream.
      *     %value SSQualityNotDefined Second stream quality is not defined.
      *     %value SSQualityDontUse Second stream is not used for the camera.
-     * %param controlEnabled Whether server manages the camera (changes resolution, fps, create
+     * %param controlEnabled Whether server manages the camera (changes resolution, FPS, create
      *     profiles, etc).
      *     %value false
      *     %value true
@@ -451,7 +445,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value FP_Low Low priority against other cameras.
      *     %value FP_Medium Medium priority against other cameras.
      *     %value FP_High High priority against other cameras.
-     * %param backupType Combination (via "|") of flags defining backup options.
+     * %param backupType Combination (via "|") of the flags defining backup options.
      *     %value CameraBackup_Disabled Backup is disabled.
      *     %value CameraBackup_HighQuality Backup is in high quality.
      *     %value CameraBackup_LowQuality Backup is in low quality.
@@ -535,7 +529,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value SSQualityHigh High quality second stream.
      *     %value SSQualityNotDefined Second stream quality is not defined.
      *     %value SSQualityDontUse Second stream is not used for the camera.
-     * %param controlEnabled Whether server manages the camera (changes resolution, fps, create
+     * %param controlEnabled Whether server manages the camera (changes resolution, FPS, create
      *     profiles, etc).
      *     %value false
      *     %value true
@@ -554,7 +548,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value FP_Low Low priority against other cameras.
      *     %value FP_Medium Medium priority against other cameras.
      *     %value FP_High High priority against other cameras.
-     * %param backupType Combination (via "|") of flags defining backup options.
+     * %param backupType Combination (via "|") of the flags defining backup options.
      *     %value CameraBackup_Disabled Backup is disabled.
      *     %value CameraBackup_HighQuality Backup is in high quality.
      *     %value CameraBackup_LowQuality Backup is in low quality.
@@ -595,7 +589,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         schedule.
      *         %param scheduleTask.startTime Time of day when the backup starts (in seconds passed
      *             from 00:00:00).
-     *         %param scheduleTask.endTime: Time of day when the backup ends (in seconds passed
+     *         %param scheduleTask.endTime Time of day when the backup ends (in seconds passed
      *             from 00:00:00).
      *         %param scheduleTask.recordAudio Whether to record sound.
      *             %value false
@@ -636,7 +630,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value SSQualityHigh High quality second stream.
      *         %value SSQualityNotDefined Second stream quality is not defined.
      *         %value SSQualityDontUse Second stream is not used for the camera.
-     *     %param controlEnabled Whether server manages the camera (changes resolution, fps, create
+     *     %param controlEnabled Whether server manages the camera (changes resolution, FPS, create
      *         profiles, etc).
      *         %value false
      *         %value true
@@ -655,7 +649,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value FP_Low Low priority against other cameras.
      *         %value FP_Medium Medium priority against other cameras.
      *         %value FP_High High priority against other cameras.
-     *     %param backupType Combination (via "|") of flags defining backup options.
+     *     %param backupType Combination (via "|") of the flags defining backup options.
      *         %value CameraBackup_Disabled Backup is disabled.
      *         %value CameraBackup_HighQuality Backup is in high quality.
      *         %value CameraBackup_LowQuality Backup is in low quality.
@@ -674,7 +668,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * This information is used for archive playback if camera has been moved from
      * one server to another.
      * %param[default] format
-     * %return Return object in the requested format.
+     * %return List of camera history items in the requested format.
      * %// AbstractCameraManager::getCameraHistoryItems
      */
     regGet<nullptr_t, ApiServerFootageDataList>(p, ApiCommand::getCameraHistoryItems);
@@ -682,6 +676,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     /**%apidoc GET /ec2/getCamerasEx
      * Read camera list.
      * %param[default] format
+     * %param[opt] id Camera unique id. If omitted, return data for all cameras.
      * %return List of camera information objects in the requested format.
      *     %// From struct ApiResourceData:
      *     %param id Camera unique id.
@@ -690,7 +685,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %param url Camera IP address, or a complete HTTP URL if the camera was added manually.
      *         Also, for multichannel encoders a complete URL is always used.
      *     %param typeId Unique id of the camera type. A camera type can describe predefined
-     *         information such as camera maximum resolution, fps, etc. Detailed type information
+     *         information such as camera maximum resolution, FPS, etc. Detailed type information
      *         can be obtained via GET /ec2/getResourceTypes request.
      *
      *     %// From struct ApiCameraData (inherited from ApiResourceData):
@@ -733,7 +728,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         schedule.
      *         %param scheduleTask.startTime Time of day when the backup starts (in seconds passed
      *             from 00:00:00).
-     *         %param scheduleTask.endTime: Time of day when the backup ends (in seconds passed
+     *         %param scheduleTask.endTime Time of day when the backup ends (in seconds passed
      *             from 00:00:00).
      *         %param scheduleTask.recordAudio Whether to record sound.
      *             %value false
@@ -774,7 +769,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value SSQualityHigh High quality second stream.
      *         %value SSQualityNotDefined Second stream quality is not defined.
      *         %value SSQualityDontUse Second stream is not used for the camera.
-     *     %param controlEnabled Whether server manages the camera (changes resolution, fps, create
+     *     %param controlEnabled Whether server manages the camera (changes resolution, FPS, create
      *         profiles, etc).
      *         %value false
      *         %value true
@@ -793,19 +788,21 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value FP_Low Low priority against other cameras.
      *         %value FP_Medium Medium priority against other cameras.
      *         %value FP_High High priority against other cameras.
-     *     %param backupType Combination (via "|") of flags defining backup options.
+     *     %param backupType Combination (via "|") of the flags defining backup options.
      *         %value CameraBackup_Disabled Backup is disabled.
      *         %value CameraBackup_HighQuality Backup is in high quality.
      *         %value CameraBackup_LowQuality Backup is in low quality.
      *         %value CameraBackup_Both
      *             Equivalent of "CameraBackup_HighQuality|CameraBackup_LowQuality".
      *         %value CameraBackup_Default A default value is used for backup options.
+     *
+     *     %// From ApiCameraDataEx:
      *     %param status Camera status.
      *         %value Offline
      *         %value Online
      *         %value Recording
-     *     %param addParams List of additional parameters for camera. This list can contain
-     *         such information as full ONVIF URL, camera maximum fps, etc.
+     *     %param addParams List of additional parameters for the camera. This list can contain
+     *         such information as full ONVIF URL, camera maximum FPS, etc.
      * %// AbstractCameraManager::getCamerasEx
      */
     regGet<QnUuid, ApiCameraDataExList>(p, ApiCommand::getCamerasEx);
@@ -813,13 +810,12 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     /**%apidoc GET /ec2/getStorages
      * Read the list of current storages.
      * %param[default] format
-     * %param[opt] id Server unique id. If omitted, return storages for all
-     *     servers.
+     * %param[opt] id Parent server unique id. If omitted, return storages for all servers.
      * %return List of storages.
      *     %param id Storage unique id.
-     *     %param parentId Is empty.
+     *     %param parentId Id of a server to which the storage belongs.
      *     %param name Storage name.
-     *     %param url Is empty.
+     *     %param url Storage URL.
      *     %param spaceLimit Storage space to leave free on the storage,
      *         in bytes.
      *     %param usedForWriting Whether writing to the storage is allowed.
@@ -829,13 +825,12 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value local
      *         %value smb
      *     %param addParams List of storage additional parameters.
-     *         Intended for internal use; leave empty when creating a new
-     *         storage.
+     *         Intended for internal use.
      *     %param isBackup Whether the storage is used for backup.
      *         %value false
      *         %value true
      */
-    regGet<QnUuid, ApiStorageDataList>(p, ApiCommand::getStorages);
+    regGet<ParentId, ApiStorageDataList>(p, ApiCommand::getStorages);
 
     // AbstractLicenseManager::addLicenses
     regUpdate<ApiLicenseDataList>(p, ApiCommand::addLicenses);
@@ -845,10 +840,9 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     /**%apidoc GET /ec2/getEventRules
      * Return all event rules.
      * %param[default] format
-     * %param[opt] id Object unique id.
-     * %return Return list of object statuses in the requested format.
-     *     If "id" parameter is specified, the list will contain only one
-     *     object with that id, or nothing, if there is no such object found.
+     * %param[opt] id Event rule unique id. If omitted, return data for all event rules.
+     * %return List of event rule objects in the requested format.
+     *     %// TODO: Describe ApiBusinessRuleData fields.
      * %// AbstractBusinessEventManager::getBusinessRules
      */
     regGet<QnUuid, ApiBusinessRuleDataList>(p, ApiCommand::getEventRules);
@@ -865,30 +859,28 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     regUpdate<ApiBusinessActionData>(p, ApiCommand::execAction);
 
     /**%apidoc GET /ec2/getUsers
-     * Return users registered in the system. User's password contain MD5
-     * hash data with salt
+     * Return users registered in the System. User's password contains MD5 hash data with the salt.
      * %param[default] format
-     * %param[opt] id Object unique id.
-     * %return Return object in the requested format. If "id" parameter is specified, the list will
-     *     contain only one object with that id, or nothing, if there is no such object found.
+     * %param[opt] id User unique id. If omitted, return data for all users.
+     * %return List of user data objects in the requested format.
      * %// AbstractUserManager::getUsers
      */
     regGet<QnUuid, ApiUserDataList>(p, ApiCommand::getUsers);
 
     /**%apidoc GET /ec2/getUserRoles
-     * Return user roles registered in the system.
+     * Return User roles registered in the System.
      * %param[default] format
-     * %param[opt] id Object unique id.
-     * %return Return object in the requested format. If "id" parameter is specified, the list will
-     *     contain only one object with that id, or nothing, if there is no such object found.
+     * %param[opt] id User role unique id. If omitted, return data for all user roles.
+     * %return List of user role objects in the requested format.
+     *     %// TODO: Describe ApiUserRole fields.
      * %// AbstractUserManager::getUserRoles
      */
     regGet<QnUuid, ApiUserRoleDataList>(p, ApiCommand::getUserRoles);
 
     /**%apidoc GET /ec2/getAccessRights
-     * Return list of accessible resources ids for each user in the system.
+     * Return list of ids of accessible resources for each user in the System.
      * %param[default] format
-     * %return Return object in the requested format.
+     * %return List of access rights data objects in the requested format.
      * %// AbstractUserManager::getAccessRights
      */
     regGet<nullptr_t, ApiAccessRightsDataList>(p, ApiCommand::getAccessRights);
@@ -943,7 +935,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     existing user, supply empty string. When creating a new user, calculate the value
      *     based on UTF-8 password as follows:
      *     <code>digest = md5(name + ":" + realm + ":" + password).toHex();</code>
-     * %param[opt] hash User password hash. When modifying an existing user, supply empty string.
+     * %param[opt] hash User's password hash. When modifying an existing user, supply empty string.
      *     When creating a new user, calculate the value based on UTF-8 password as follows:
      *     <code>salt = rand().toHex();
      *     hash = "md5$" + salt + "$" + md5(salt + password).toHex();</code>
@@ -1017,14 +1009,14 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     /**%apidoc GET /ec2/getPredefinedRoles
     * Return list of predefined user roles.
     * %param[default] format
-    * %return Return object in the requested format.
+    * %return List of predefined user role objects in the requested format.
     */
     regGet<nullptr_t, ApiPredefinedRoleDataList>(p, ApiCommand::getPredefinedRoles);
 
     /**%apidoc GET /ec2/getVideowalls
      * Return list of video walls
      * %param[default] format
-     * %return Return object in the requested format.
+     * %return List of video wall objects in the requested format.
      * %// AbstractVideowallManager::getVideowalls
      */
     regGet<QnUuid, ApiVideowallDataList>(p, ApiCommand::getVideowalls);
@@ -1042,9 +1034,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     /**%apidoc GET /ec2/getLayouts
      * Return list of user layout
      * %param[default] format
-     * %param[opt] id Layout unique id.
-     * %return Return object in the requested format. If "id" parameter is specified, the list will
-     *     contain only one object with that id, or nothing, if there is no such object found.
+     * %param[opt] id Layout unique id. If omitted, return data for all layouts.
+     * %return List of layout objects in the requested format.
      * %// AbstractLayoutManager::getLayouts
      */
     regGet<QnUuid, ApiLayoutDataList>(p, ApiCommand::getLayouts);
@@ -1203,7 +1194,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * to database.
      * %param[default] format
      * %param[opt] folder Folder name in a virtual FS
-     * %return Return object in the requested format.
+     * %return List of objects in the requested format.
+     *    %// TODO: Describe params.
      * %// AbstractStoredFileManager::listDirectory
      */
     regGet<ApiStoredFilePath, ApiStoredDirContents>(p, ApiCommand::listDirectory);
@@ -1212,10 +1204,11 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * Read file data from a virtual FS
      * %param[default] format
      * %param[opt] folder File name
-     * %return Return object in the requested format.
+     * %return Object in the requested format.
      * %// AbstractStoredFileManager::getStoredFile
      */
     regGet<ApiStoredFilePath, ApiStoredFileData>(p, ApiCommand::getStoredFile);
+
     // AbstractStoredFileManager::addStoredFile
     regUpdate<ApiStoredFileData>(p, ApiCommand::addStoredFile);
     // AbstractStoredFileManager::updateStoredFile
@@ -1253,8 +1246,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * Read current time.
      * %permissions Administrator.
      * %param[default] format
-     * %param[opt] folder File name
-     * %return Return object in the requested format.
+     * %return Object in the requested format.
      * %// AbstractTimeManager::getCurrentTimeImpl
      */
     regGet<nullptr_t, ApiTimeData>(p, ApiCommand::getCurrentTime);
@@ -1272,16 +1264,14 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     /**%apidoc GET /ec2/getFullInfo
      * Read all data such as all servers, cameras, users, etc.
      * %param[default] format
-     * %param[opt] folder File name
-     * %return Return object in the requested format.
+     * %return Object in the requested format.
      */
     regGet<nullptr_t, ApiFullInfoData>(p, ApiCommand::getFullInfo);
 
     /**%apidoc GET /ec2/getLicenses
      * Read license list
      * %param[default] format
-     * %param[opt] folder File name
-     * %return Return object in the requested format.
+     * %return List of license objects in the requested format.
      */
     regGet<nullptr_t, ApiLicenseDataList>(p, ApiCommand::getLicenses);
 
@@ -1295,10 +1285,9 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
         std::bind(&Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2, _3));
 
     /**%apidoc GET /ec2/getSettings
-     * Read general system settings such as email address, etc.
+     * Read general System settings such as email address, etc.
      * %param[default] format
-     * %param[opt] folder File name
-     * %return Return object in the requested format.
+     * %return List of objects in the requested format.
      */
     regFunctor<nullptr_t, ApiResourceParamDataList>(p, ApiCommand::getSettings,
         std::bind(&Ec2DirectConnectionFactory::getSettings, this, _1, _2, _3));
@@ -1518,6 +1507,10 @@ void Ec2DirectConnectionFactory::connectToOldEC(const QUrl& ecUrl, Handler compl
             completionFunc(ErrorCode::unauthorized, QnConnectionInfo());
             break;
 
+        case CL_HTTP_FORBIDDEN:
+            completionFunc(ErrorCode::forbidden, QnConnectionInfo());
+            break;
+
         default:
             completionFunc(ErrorCode::ioError, QnConnectionInfo());
             break;
@@ -1544,6 +1537,7 @@ void Ec2DirectConnectionFactory::remoteConnectionFinished(
     {
         case ec2::ErrorCode::ok:
         case ec2::ErrorCode::unauthorized:
+        case ec2::ErrorCode::forbidden:
         case ec2::ErrorCode::ldap_temporary_unauthorized:
         case ec2::ErrorCode::cloud_temporary_unauthorized:
             break;
@@ -1582,6 +1576,7 @@ void Ec2DirectConnectionFactory::remoteTestConnectionFinished(
 {
     if (errorCode == ErrorCode::ok
         || errorCode == ErrorCode::unauthorized
+        || errorCode == ErrorCode::forbidden
         || errorCode == ErrorCode::ldap_temporary_unauthorized
         || errorCode == ErrorCode::cloud_temporary_unauthorized)
     {
@@ -1629,40 +1624,42 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
             nx_http::getHeaderValue(response->headers, Qn::EFFECTIVE_USER_NAME_HEADER_NAME);
     }
 
-    if (!loginInfo.clientInfo.id.isNull())
-    {
-        auto clientInfo = loginInfo.clientInfo;
-        clientInfo.parentId = qnCommon->moduleGUID();
-
-        ApiClientInfoDataList infoList;
-        auto result = dbManager(Qn::kSystemAccess).doQuery(clientInfo.id, infoList);
-        if (result != ErrorCode::ok)
-            return result;
-
-        if (infoList.size() > 0
-            && QJson::serialized(clientInfo) == QJson::serialized(infoList.front()))
+    #ifdef ENABLE_EXTENDED_STATISTICS
+        if (!loginInfo.clientInfo.id.isNull())
         {
-            NX_LOG(lit("Ec2DirectConnectionFactory: New client had already been registered with the same params"),
-                cl_logDEBUG2);
-            return ErrorCode::ok;
-        }
+            auto clientInfo = loginInfo.clientInfo;
+            clientInfo.parentId = qnCommon->moduleGUID();
 
-        m_serverQueryProcessor.getAccess(Qn::kSystemAccess).processUpdateAsync(
-            ApiCommand::saveClientInfo, clientInfo,
-            [&](ErrorCode result)
+            ApiClientInfoDataList infoList;
+            auto result = dbManager(Qn::kSystemAccess).doQuery(clientInfo.id, infoList);
+            if (result != ErrorCode::ok)
+                return result;
+
+            if (infoList.size() > 0
+                && QJson::serialized(clientInfo) == QJson::serialized(infoList.front()))
             {
-                if (result == ErrorCode::ok)
+                NX_LOG(lit("Ec2DirectConnectionFactory: New client had already been registered with the same params"),
+                    cl_logDEBUG2);
+                return ErrorCode::ok;
+            }
+
+            m_serverQueryProcessor.getAccess(Qn::kSystemAccess).processUpdateAsync(
+                ApiCommand::saveClientInfo, clientInfo,
+                [&](ErrorCode result)
                 {
-                    NX_LOG(lit("Ec2DirectConnectionFactory: New client has been registered"),
-                        cl_logINFO);
-                }
-                else
-                {
-                    NX_LOG(lit("Ec2DirectConnectionFactory: New client transaction has failed %1")
-                        .arg(toString(result)), cl_logERROR);
-                }
-            });
-    }
+                    if (result == ErrorCode::ok)
+                    {
+                        NX_LOG(lit("Ec2DirectConnectionFactory: New client has been registered"),
+                            cl_logINFO);
+                    }
+                    else
+                    {
+                        NX_LOG(lit("Ec2DirectConnectionFactory: New client transaction has failed %1")
+                            .arg(toString(result)), cl_logERROR);
+                    }
+                });
+        }
+    #endif
 
     return ErrorCode::ok;
 }

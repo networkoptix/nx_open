@@ -58,6 +58,7 @@ public:
 
         auto mainLayout = new QVBoxLayout(q);
         mainLayout->addWidget(stackedWidget);
+        mainLayout->setContentsMargins(0, 0, 0, 0);
 
         connect(stackedWidget, &QStackedWidget::currentChanged, this,
             [this]()

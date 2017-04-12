@@ -2,6 +2,7 @@
 
 #include <nx/network/aio/pollable.h>
 #include <nx/utils/thread/mutex_lock_analyzer.h>
+#include <nx/utils/unused.h>
 
 ////////////////////////////////////////////////////////////
 //// class AbstractSocket
@@ -11,6 +12,13 @@ bool AbstractSocket::bind(const QString& localAddress, unsigned short localPort)
     return bind(SocketAddress(localAddress, localPort));
 }
 
+bool AbstractSocket::isInSelfAioThread() const
+{
+    // AbstractSocket does not provide const pollable() just to simplify implementation, so it is
+    // safe to perform a const_cast.
+    const nx::network::Pollable* p = const_cast<AbstractSocket*>(this)->pollable();
+    return p->isInSelfAioThread();
+}
 
 ////////////////////////////////////////////////////////////
 //// class AbstractCommunicatingSocket
@@ -79,6 +87,8 @@ void AbstractCommunicatingSocket::pleaseStopSync(bool checkForLocks)
             if (!pollablePtr || !pollablePtr->isInSelfAioThread())
                 MutexLockAnalyzer::instance()->expectNoLocks();
         }
+    #else
+        QN_UNUSED(checkForLocks);
     #endif
 
     cancelIOSync(nx::network::aio::EventType::etNone);
@@ -106,24 +116,34 @@ void AbstractCommunicatingSocket::readAsyncAtLeastImpl(
         });
 }
 
-KeepAliveOptions::KeepAliveOptions(int timeSec, int intervalSec, int probeCount):
-    timeSec(timeSec),
-    intervalSec(intervalSec),
+std::chrono::seconds KeepAliveOptions::maxDelay() const
+{
+    return time + interval * probeCount;
+}
+
+KeepAliveOptions::KeepAliveOptions(
+    std::chrono::seconds time, std::chrono::seconds interval, size_t probeCount)
+:
+    time(time),
+    interval(interval),
     probeCount(probeCount)
+{
+}
+
+KeepAliveOptions::KeepAliveOptions(size_t time, size_t interval, size_t count):
+    KeepAliveOptions(std::chrono::seconds(time), std::chrono::seconds(interval), count)
 {
 }
 
 bool KeepAliveOptions::operator==(const KeepAliveOptions& rhs) const
 {
-    return timeSec == rhs.timeSec
-        && intervalSec == rhs.intervalSec
-        && probeCount == rhs.probeCount;
+    return time == rhs.time && interval == rhs.interval && probeCount == rhs.probeCount;
 }
 
 QString KeepAliveOptions::toString() const
 {
     // TODO: Use JSON serrialization instead?
-    return lm("{ %1, %2, %3 }").arg(timeSec).arg(intervalSec).arg(probeCount);
+    return lm("{ %1, %2, %3 }").arg(time.count()).arg(interval.count()).arg(probeCount);
 }
 
 boost::optional<KeepAliveOptions> KeepAliveOptions::fromString(const QString& string)
@@ -137,9 +157,9 @@ boost::optional<KeepAliveOptions> KeepAliveOptions::fromString(const QString& st
         return boost::none;
 
     KeepAliveOptions options;
-    options.timeSec = split[0].trimmed().toInt();
-    options.intervalSec = split[1].trimmed().toInt();
-    options.probeCount = split[2].trimmed().toInt();
+    options.time = std::chrono::seconds((size_t) split[0].trimmed().toUInt());
+    options.interval = std::chrono::seconds((size_t) split[1].trimmed().toUInt());
+    options.probeCount = (size_t) split[2].trimmed().toUInt();
     return options;
 }
 

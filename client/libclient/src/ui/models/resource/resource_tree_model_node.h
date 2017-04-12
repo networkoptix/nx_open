@@ -48,9 +48,9 @@ public:
     /**
      * Constructor for item nodes.
      */
-    QnResourceTreeModelNode(QnResourceTreeModel* model, const QnUuid &uuid, Qn::NodeType nodeType = Qn::LayoutItemNode);
+    QnResourceTreeModelNode(QnResourceTreeModel* model, const QnUuid &uuid, Qn::NodeType nodeType);
 
-    ~QnResourceTreeModelNode();
+    virtual ~QnResourceTreeModelNode();
 
     virtual void setResource(const QnResourcePtr &resource);
     virtual void setParent(const QnResourceTreeModelNodePtr& parent);
@@ -89,6 +89,8 @@ public:
 
     void setModified(bool modified) ;
 
+    bool isPrimary() const;
+
 protected:
     QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type, const QnUuid& uuid);
 
@@ -99,7 +101,6 @@ protected:
 
     QnResourceTreeModel* model() const;
 
-    virtual void handlePermissionsChanged(const QnResourcePtr& resource);
     virtual QIcon calculateIcon() const;
 
     virtual void addChildInternal(const QnResourceTreeModelNodePtr& child);
@@ -107,6 +108,8 @@ protected:
     void changeInternal();
 
     void updateResourceStatus();
+
+    virtual QnResourceTreeModelNodeManager* manager() const;
 
 private:
     void setNameInternal(const QString& name);
@@ -127,9 +130,12 @@ private:
     void childCheckStateChanged(Qt::CheckState oldState, Qt::CheckState newState, bool forceUpdate = false);
     void propagateCheckStateRecursivelyDown();
 
+    void handlePermissionsChanged();
+
 private:
-    //TODO: #GDM #Common need complete recorder nodes structure refactor to get rid of this shit
+    //TODO: #GDM #vkutin need complete recorder nodes structure refactor to get rid of this shit
     friend class QnResourceTreeModel;
+    friend class QnResourceTreeModelNodeManager;
 
     /* Node state. */
     bool m_initialized;
@@ -195,6 +201,10 @@ private:
         bool value;
         bool checked;
     } m_editable;
+
+    /* Nodes of the same resource are organized into double-linked list: */
+    QnResourceTreeModelNodePtr m_prev;
+    QnResourceTreeModelNodePtr m_next;
 };
 
 QDebug operator<<(QDebug dbg, QnResourceTreeModelNode* node);

@@ -2,10 +2,10 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('InfoCtrl', function ($scope, mediaserver) {
-
+    .controller('InfoCtrl', function ($scope, mediaserver, nativeClient) {
 
         $scope.logUrl = mediaserver.logUrl();
+        $scope.L = L;
 
 
         mediaserver.getModuleInformation().then(function (r) {
@@ -44,5 +44,9 @@ angular.module('webadminApp')
             if (user.isAdmin) {
                 getStorages();
             }
+        });
+
+        nativeClient.init().then(function(result){
+            $scope.mode={liteClient: result.lite};
         });
     });

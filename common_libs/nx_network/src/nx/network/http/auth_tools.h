@@ -1,10 +1,8 @@
-#ifndef NX_AUTH_TOOLS_H
-#define NX_AUTH_TOOLS_H
+#pragma once
 
 #include <QString>
 
 #include "httptypes.h"
-
 
 //Helper functions for calculating Http digest (rfc2617)
 namespace nx_http {
@@ -99,5 +97,3 @@ BufferType NX_NETWORK_API calcResponseFromIntermediate(
     const BufferType& ha2);
 
 } // namespace nx_http
-
-#endif  //NX_AUTH_TOOLS_H

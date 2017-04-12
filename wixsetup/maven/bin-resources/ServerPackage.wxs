@@ -1,5 +1,7 @@
 <?xml version='1.0' encoding='windows-1252'?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
     <Fragment Id='FragmentServerPackage'>
         <PackageGroup Id="ServerPackageGroup">
             <MsiPackage
@@ -14,7 +16,7 @@
         </PackageGroup>
     </Fragment>
 
-    <Fragment Id='FragmentConditions'>
+    <Fragment Id='FragmentServerConditions'>
         <?include BuildVars.wxi ?>
 
         <util:RegistrySearch
@@ -43,11 +45,21 @@
             Result="state"
             Variable="ServerInstalled" />
 
+        <util:ProductSearch
+            Id="ServerMsiVersion"
+            UpgradeCode="$(var.serverUpgradeCode)"
+            Result="version"
+            Variable="InstalledServerVersion" />
+
         <?define CloudHostIsDifferent="(CloudHost <> "" AND CloudHost <> "$(var.cloudHost)")" ?>
 
         <!-- Exit if upgrading and cloud hosts differ -->
         <bal:Condition Message="!(loc.Product_CloudHostMismatch)">
             <![CDATA[ (NOT (ServerInstalled = 5 AND IsConnectedToCloud = "yes" AND $(var.CloudHostIsDifferent))) OR WixBundleAction = 3 ]]>
+        </bal:Condition>
+
+        <bal:Condition Message="!(loc.Product_ProductIsTooOld)">
+            <![CDATA[ InstalledServerVersion = "0.0.0.0" OR InstalledServerVersion >= "2.3" ]]>
         </bal:Condition>
     </Fragment>
 

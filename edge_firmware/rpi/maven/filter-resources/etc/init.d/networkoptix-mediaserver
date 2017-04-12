@@ -17,16 +17,16 @@ BIN_NAME="mediaserver"
 BIN_PATH="$PREFIX/bin/$BIN_NAME"
 LOGS_PATH="/opt/$CUSTOMIZATION/mediaserver/var/log"
 LOG_OUTPUT_FLAG="$LOGS_PATH/log_output.flag"
-RUN_ARGS="-e --disable-crash-handler"
+RUN_ARGS="-e"
 SECONDS_TO_WAIT_BEFORE_KILL_9=120
 
 export VMS_PLUGIN_DIR="$PREFIX/plugins"
 export SASL_PATH="$LIBS_PATH/sasl2"
 
-ulimit -n 8192
+ulimit -n $(cat /proc/sys/fs/file-max 2>/dev/null || echo 8192)
 ulimit -c unlimited
 
-process_core_dump() 
+process_core_dump()
 {
     if [ ! $(which gdb) ]; then
         return 0 # no gdb on the host
@@ -43,14 +43,14 @@ process_core_dump()
         REPORT="${BIN_NAME}_$("$BIN_PATH" --version)_$TIME.gdb-bt"
 
         echo "Generate crash report (in background) $REPORT"
-        echo "t apply all bt 25" |gdb "$BIN_PATH" "$CORE" 2>&1 >/tmp/$REPORT && \
-            mv "/tmp/$REPORT" "~/$REPORT" &
+        echo "t apply all bt 25" |gdb "$BIN_PATH" "$CORE" 2>&1 >"/tmp/$REPORT" && \
+            mv "/tmp/$REPORT" "/root/$REPORT" &
 
-        ls "$CORE_ORIG.*" |grep -v "$CORE" |xargs rm 2>/dev/null
+        ls "$CORE_ORIG".* |grep -v "$CORE" |xargs rm 2>/dev/null
     fi
 }
 
-start() 
+start()
 {
     SERVICE_PID=$(pidof "$BIN_NAME")
     if [ ! -z "$SERVICE_PID" ]; then
@@ -59,11 +59,16 @@ start()
     fi
 
     process_core_dump
+    
     DISK=$(fdisk -l |grep "Disk" |grep "dev/sd" |awk '{print substr($2, 0, length($2))}')
+    local HDPARM="hdparm"
+    if ! which hdparm; then
+        HDPARM="$PREFIX/bin/hdparm"
+    fi
     if [ ! -z "$DISK" ]; then
-        hdparm -I /dev/sd? |grep Model >/tmp/hddlist
-    fi    
-
+        "$HDPARM" -I /dev/sd? |grep Model >/tmp/hddlist
+    fi
+    
     if [ -f "$LOG_OUTPUT_FLAG" ]; then
         mkdir -p "$LOGS_PATH"
         REDIRECT_OUTPUT="$LOGS_PATH/mediaserver-out.log"
@@ -72,33 +77,28 @@ start()
     fi
 
     echo "Starting Media Server, outputting to $REDIRECT_OUTPUT, with command:"
-    set -x
+    echo "  $BIN_PATH" $RUN_ARGS
     "$BIN_PATH" $RUN_ARGS >>$REDIRECT_OUTPUT 2>&1 &
-    { set +x; } 2>/dev/null
 
-    PORT=$(cat "/opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf" |grep port= | awk -F "=" '{print $2}')
-    for i in $(seq 10); do 
-        WEBADMIN_BUILD=$(curl -s "http://127.0.0.1:$PORT/static/version.txt" |grep changeset |awk '{print $2}')
-        if [ ! -z "$WEBADMIN_BUILD" ]; then 
-            echo "Server started. Webadmin build is $WEBADMIN_BUILD" 
-            return 0
-        fi
-        sleep 1
-    done
-    echo "FAILED to start server"
+    sleep 1 #< See if server instantly crashes.
+    if [ $(pidof $BIN_NAME) ]; then
+        echo "OK"
+    else
+        echo "FAILED"
+    fi
 }
 
-startquiet() 
+startquiet()
 {
     start
 }
 
-stop() 
+stop()
 {
     echo -n "Stopping $BIN_NAME... "
     killall "$1" "$BIN_NAME" 1>/dev/null 2>&1
     local i=0
-    while [ $(pidof "$BIN_NAME") ]; do
+    while [ "$(pidof "$BIN_NAME")" ]; do
         sleep 1
         let i++
         if [ $i -gt $SECONDS_TO_WAIT_BEFORE_KILL_9 ]; then
@@ -109,7 +109,7 @@ stop()
     echo "OK"
 }
 
-start_watchdog() 
+start_watchdog()
 {
     WATCHDOG_PID=$(ps -eO command |grep mediaserver |grep run_watchdog |grep -v grep |cut -b 1-5 |sort -r |head -n 1)
     if [ "$WATCHDOG_PID" ]; then
@@ -120,9 +120,9 @@ start_watchdog()
     echo "$SERVICE_NAME watchdog has been started"
 }
 
-stop_watchdog() 
+stop_watchdog()
 {
-    WATCHDOG_PID=$(ps -eO command |grep run_watchdog |grep -v grep |cut -b 1-5 |sort -r |head -n 1)
+    WATCHDOG_PID=$(ps -eO command |grep mediaserver |grep run_watchdog |grep -v grep |cut -b 1-5 |sort -r |head -n 1)
     if [ ! "$WATCHDOG_PID" ]; then
         echo "$CUSTOMIZATION-mediaserver watchdog is not running"
         return 0
@@ -134,7 +134,7 @@ stop_watchdog()
     echo "OK"
 }
 
-run_watchdog() 
+run_watchdog()
 {
     while true; do
         start
@@ -142,11 +142,20 @@ run_watchdog()
     done
 }
 
+register_autostart_if_needed()
+{
+    if ! grep -- "$CUSTOMIZATION-mediaserver" /etc/init.d/.depend.stop 2>/dev/null; then
+        echo "Enabling mediaserver autostart via update-rc.d"
+        update-rc.d -f "$CUSTOMIZATION-mediaserver" defaults
+    fi
+}
+
 #--------------------------------------------------------------------------------------------------
 # main
 
 case "$1" in
     start)
+        register_autostart_if_needed    
         start
         start_watchdog
         ;;

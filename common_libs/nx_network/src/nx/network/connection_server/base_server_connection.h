@@ -62,7 +62,7 @@ public:
      */
     BaseServerConnection(
         StreamConnectionHolder<CustomConnectionType>* connectionManager,
-        std::unique_ptr<AbstractCommunicatingSocket> streamSocket)
+        std::unique_ptr<AbstractStreamSocket> streamSocket)
         :
         m_connectionManager(connectionManager),
         m_streamSocket(std::move(streamSocket)),
@@ -156,7 +156,7 @@ public:
         return false;
     }
 
-    const std::unique_ptr<AbstractCommunicatingSocket>& socket() const
+    const std::unique_ptr<AbstractStreamSocket>& socket() const
     {
         return m_streamSocket;
     }
@@ -165,7 +165,7 @@ public:
      * Moves socket to the caller.
      * BaseServerConnection instance MUST be deleted just after this call.
      */
-    std::unique_ptr<AbstractCommunicatingSocket> takeSocket()
+    std::unique_ptr<AbstractStreamSocket> takeSocket()
     {
         auto socket = std::move(m_streamSocket);
         socket->cancelIOSync(nx::network::aio::etNone);
@@ -178,7 +178,7 @@ public:
      */
     void setInactivityTimeout(boost::optional<std::chrono::milliseconds> value)
     {
-        NX_CRITICAL(m_streamSocket->pollable()->isInSelfAioThread());
+        NX_EXPECT(m_streamSocket->pollable()->isInSelfAioThread());
         m_inactivityTimeout = value;
 
         if (value)
@@ -200,7 +200,7 @@ protected:
 
 private:
     StreamConnectionHolder<CustomConnectionType>* m_connectionManager;
-    std::unique_ptr<AbstractCommunicatingSocket> m_streamSocket;
+    std::unique_ptr<AbstractStreamSocket> m_streamSocket;
     nx::Buffer m_readBuffer;
     size_t m_bytesToSend;
     std::forward_list<nx::utils::MoveOnlyFunc<void()>> m_connectionClosedHandlers;

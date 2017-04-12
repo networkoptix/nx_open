@@ -14,8 +14,7 @@ namespace controllers {
 WebAdminController::WebAdminController(QObject* parent):
     QObject(parent)
 {
-    m_credentials.user = qnSettings->startupParameters().url.userName();
-    m_credentials.password = qnSettings->startupParameters().url.password();
+    m_credentials = QnEncodedCredentials(qnSettings->startupParameters().url);
 }
 
 void WebAdminController::setUiController(QnMobileClientUiController* controller)
@@ -32,15 +31,14 @@ QString WebAdminController::getCredentials() const
 {
     QJsonObject json;
     json[lit("localLogin")] = m_credentials.user;
-    json[lit("localPassword")] = m_credentials.password;
+    json[lit("localPassword")] = m_credentials.password.value();
     return QString::fromUtf8(QJsonDocument(json).toJson(QJsonDocument::Compact));
 }
 
 void WebAdminController::updateCredentials(
     const QString& login, const QString& password, bool /*isCloud*/)
 {
-    m_credentials.user = login;
-    m_credentials.password = password;
+    m_credentials = QnEncodedCredentials(login, password);
 }
 
 void WebAdminController::cancel()

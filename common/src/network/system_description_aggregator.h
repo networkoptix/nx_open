@@ -39,11 +39,15 @@ public: // overrides
 
     bool isNewSystem() const override;
 
-    bool isOnline() const override;
+    bool isRunning() const override;
+
+    bool isReachable() const override;
+
+    bool isConnectable() const override;
 
     ServersList servers() const override;
 
-    bool isOnlineServer(const QnUuid& serverId) const override;
+    bool isReachableServer(const QnUuid& serverId) const override;
 
     bool containsServer(const QnUuid& serverId) const override;
 
@@ -52,8 +56,6 @@ public: // overrides
     QUrl getServerHost(const QnUuid& serverId) const override;
 
     qint64 getServerLastUpdatedMs(const QnUuid& serverId) const override;
-
-    bool hasInternet() const override;
 
     bool safeMode() const override;
 
@@ -68,7 +70,7 @@ private:
 
     void handleServerChanged(const QnUuid& serverId, QnServerFields fields);
 
-    bool invalidSystem() const;
+    bool isEmptyAggregator() const;
 
 private:
     typedef QMap<int, QnSystemDescriptionPtr> SystemsMap;

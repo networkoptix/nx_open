@@ -15,4 +15,6 @@ struct QnMobileClientAppInfo
     static QString oldIosClientLink();
 
     static QString oldAndroidAppId();
+
+    static QString liteDeviceName();
 };

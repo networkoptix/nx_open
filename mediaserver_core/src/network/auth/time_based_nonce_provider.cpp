@@ -1,12 +1,6 @@
-/**********************************************************
-* Oct 2, 2015
-* akolesnikov
-***********************************************************/
-
 #include "time_based_nonce_provider.h"
 
 #include <utils/common/synctime.h>
-
 
 static const qint64 NONCE_TIMEOUT = 1000000ll * 60 * 5;
 static const qint64 COOKIE_EXPIRATION_PERIOD = 3600;

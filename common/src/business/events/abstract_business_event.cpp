@@ -159,6 +159,7 @@ namespace QnBusiness
         case QnBusiness::StorageFailureEvent:
         case QnBusiness::BackupFinishedEvent:
         case QnBusiness::ServerFailureEvent:
+        case QnBusiness::ServerConflictEvent:
         case QnBusiness::ServerStartEvent:
             return true;
         default:

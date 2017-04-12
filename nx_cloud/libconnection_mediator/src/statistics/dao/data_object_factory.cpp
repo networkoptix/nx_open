@@ -13,7 +13,7 @@ std::unique_ptr<AbstractDataObject> DataObjectFactory::create()
 {
     if (customFactoryFunc)
         return customFactoryFunc();
-    return std::make_unique<rdb::RdbDataObject>();
+    return std::make_unique<rdb::DataObject>();
 }
 
 void DataObjectFactory::setFactoryFunc(

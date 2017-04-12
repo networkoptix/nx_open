@@ -1,8 +1,3 @@
-/**********************************************************
-* 19 dec 2013
-* a.kolesnikov
-***********************************************************/
-
 #include "message_serializer.h"
 
 #include <QtEndian>
@@ -26,103 +21,6 @@ void MessageSerializer::setMessage(const Message* message)
 {
     m_message = message;
     m_initialized = true;
-}
-
-class MessageSerializer::MessageSerializerBuffer {
-public:
-    MessageSerializerBuffer( nx::Buffer* buffer ) :
-        m_buffer(buffer),
-        m_headerLength(NULL){}
-
-    void* WriteUint16( std::uint16_t value );
-    void* WriteUint32( std::uint32_t value );
-    void* WriteIPV6Address( const std::uint16_t* value );
-    void* WriteByte( char byte );
-    void* WriteBytes( const char* bytes , std::size_t length );
-    void* Poke( std::size_t size );
-    std::size_t position() const {
-        return static_cast<std::size_t>(m_buffer->size());
-    }
-    std::size_t size() const {
-        return m_buffer->size();
-    }
-    // Use this function to set up the message length position 
-    std::uint16_t* WriteMessageLength() {
-        NX_ASSERT(m_headerLength == NULL);
-        void* ret = Poke(2);
-        if( ret == NULL ) return NULL;
-        m_headerLength = reinterpret_cast<std::uint16_t*>(ret);
-        return m_headerLength;
-    }
-    std::uint16_t* WriteMessageLength( std::uint16_t length ) {
-        NX_ASSERT(m_headerLength != NULL);
-        qToBigEndian(length,reinterpret_cast<uchar*>(m_headerLength));
-        return m_headerLength;
-    }
-    const nx::Buffer* buffer() const {
-        return m_buffer;
-    }
-private:
-    nx::Buffer* m_buffer;
-    std::uint16_t* m_headerLength;
-};
-
-void* MessageSerializer::MessageSerializerBuffer::Poke( std::size_t size ) {
-    if( size > static_cast< size_t >( m_buffer->capacity() - m_buffer->size() ) )
-        return NULL;
-
-    void* ret = m_buffer->data() + m_buffer->size();
-    m_buffer->resize( m_buffer->size() + static_cast< int >( size ) );
-    return ret;
-}
-// Write the uint16 value into the buffer with bytes order swap 
-void* MessageSerializer::MessageSerializerBuffer::WriteUint16( std::uint16_t value ) {
-    void* ret = Poke(sizeof(std::uint16_t));
-    if( ret == NULL ) {
-        return NULL;
-    } else {
-        qToBigEndian(value,reinterpret_cast<uchar*>(ret));
-        return ret;
-    }
-}
-
-void* MessageSerializer::MessageSerializerBuffer::WriteIPV6Address( const std::uint16_t* value ) {
-    void* buffer = Poke( 16 );
-    if( buffer == NULL ) return NULL;
-    for( std::size_t i = 0 ; i < 8 ; ++i ) {
-        qToBigEndian(value[i],reinterpret_cast<uchar*>(reinterpret_cast<std::uint16_t*>(buffer) + i));
-    }
-    return buffer;
-}
-
-void* MessageSerializer::MessageSerializerBuffer::WriteUint32( std::uint32_t value ) {
-    void* ret = Poke(sizeof(std::uint32_t));
-    if( ret == NULL ) {
-        return NULL;
-    } else {
-        qToBigEndian(value,reinterpret_cast<uchar*>(ret));
-        return ret;
-    }
-}
-// Write the byte into the specific position
-void* MessageSerializer::MessageSerializerBuffer::WriteByte( char byte ) {
-    void* ret = Poke(1);
-    if( ret == NULL ) {
-        return NULL;
-    } else {
-        *reinterpret_cast<char*>(ret) = byte;
-        return ret;
-    }
-}
-
-void* MessageSerializer::MessageSerializerBuffer::WriteBytes( const char* bytes , std::size_t length ) {
-    void* ret = Poke(length);
-    if( ret == NULL ) {
-        return NULL;
-    } else {
-        memcpy(ret,bytes,length);
-        return ret;
-    }
 }
 
 // Serialization class implementation
@@ -203,29 +101,45 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeTypeAndLength
     return nx_api::SerializerState::done;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue( MessageSerializerBuffer* buffer ,const attrs::Attribute* attribute , std::size_t* value ) {
-    switch( attribute->getType() ) {
-    case attrs::errorCode:
-        return serializeAttributeValue_ErrorCode( buffer , *static_cast<const ErrorDescription*>(attribute) ,value);
-    case attrs::fingerPrint:
-        return serializeAttributeValue_Fingerprint( buffer , *static_cast<const FingerPrint*>(attribute) ,value);
-    case attrs::xorMappedAddress:
-        return serializeAttributeValue_XORMappedAddress( buffer , *static_cast<const XorMappedAddress*>(attribute) ,value);
-    case attrs::messageIntegrity:
-        return serializeAttributeValue_Buffer( buffer , *static_cast<const MessageIntegrity*>(attribute) ,value);
-    case attrs::userName:
-        return serializeAttributeValue_Buffer( buffer , *static_cast<const UserName*>(attribute) ,value);
-    case attrs::nonce:
-        return serializeAttributeValue_Buffer( buffer , *static_cast<const Nonce*>(attribute) ,value);
-    default:
-        if( attribute->getType() > attrs::unknown )
-            return serializeAttributeValue_Buffer( buffer , *static_cast<const Unknown*>(attribute) ,value);
-        NX_ASSERT(0);
-        return nx_api::SerializerState::done;
+nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue(
+    MessageSerializerBuffer* buffer,
+    const attrs::Attribute* attribute,
+    std::size_t* bytesWritten)
+{
+    switch( attribute->getType() )
+    {
+        case attrs::errorCode:
+            return serializeAttributeValue_ErrorCode( buffer , *static_cast<const ErrorCode*>(attribute) , bytesWritten);
+        case attrs::fingerPrint:
+            return serializeAttributeValue_Fingerprint( buffer , *static_cast<const FingerPrint*>(attribute) , bytesWritten);
+        case attrs::xorMappedAddress:
+            return serializeAttributeValue_XORMappedAddress( buffer , *static_cast<const XorMappedAddress*>(attribute) , bytesWritten);
+        case attrs::messageIntegrity:
+            return serializeAttributeValue_Buffer( buffer , *static_cast<const MessageIntegrity*>(attribute) , bytesWritten);
+        case attrs::userName:
+            return serializeAttributeValue_Buffer( buffer , *static_cast<const UserName*>(attribute) , bytesWritten);
+        case attrs::nonce:
+            return serializeAttributeValue_Buffer( buffer , *static_cast<const Nonce*>(attribute) , bytesWritten);
+        default:
+        {
+            const SerializableAttribute* serializableAttribute =
+                dynamic_cast<const attrs::SerializableAttribute*>(attribute);
+            if (serializableAttribute)
+                return serializableAttribute->serialize(buffer, bytesWritten);
+
+            if( attribute->getType() > attrs::unknown )
+                return serializeAttributeValue_Buffer( buffer , *static_cast<const Unknown*>(attribute) , bytesWritten);
+            NX_ASSERT(0);
+            return nx_api::SerializerState::done;
+        }
     }
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_XORMappedAddress( MessageSerializerBuffer* buffer ,const attrs::XorMappedAddress& attribute , std::size_t* value ) {
+nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_XORMappedAddress(
+    MessageSerializerBuffer* buffer,
+    const attrs::XorMappedAddress& attribute,
+    std::size_t* bytesWritten)
+{
     NX_ASSERT( attribute.family == XorMappedAddress::IPV4 || attribute.family == XorMappedAddress::IPV6 );
     std::size_t cur_pos = buffer->position();
     if( buffer->WriteUint16(attribute.family) == NULL ) 
@@ -251,7 +165,7 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_XORMapp
         if( buffer->WriteIPV6Address(xor_addr) == NULL )
             return nx_api::SerializerState::needMoreBufferSpace;
     }
-    *value = buffer->position()-cur_pos;
+    *bytesWritten = buffer->position()-cur_pos;
     return nx_api::SerializerState::done;
 }
 
@@ -297,7 +211,7 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_Buffer(
     return nx_api::SerializerState::done;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_ErrorCode( MessageSerializerBuffer* buffer ,const attrs::ErrorDescription&  attribute , std::size_t* value ) {
+nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_ErrorCode( MessageSerializerBuffer* buffer ,const attrs::ErrorCode&  attribute , std::size_t* value ) {
     std::size_t cur_pos = buffer->position();
     std::uint32_t error_header = (attribute.getClass() << 8) | attribute.getNumber();
     if( buffer->WriteUint32(error_header) == NULL )
@@ -384,7 +298,7 @@ bool MessageSerializer::checkMessageIntegratiy() {
     const auto ib = m_message->attributes.find(attrs::errorCode);
     if( ib !=  m_message->attributes.end() ) {
         // Checking the error code message
-        ErrorDescription* error_code = static_cast<ErrorDescription*>(
+        ErrorCode* error_code = static_cast<ErrorCode*>(
             ib->second.get());
         if( error_code->getClass() < 3 || error_code->getClass() > 6 )
             return false;
@@ -439,5 +353,5 @@ nx::Buffer MessageSerializer::serialized(const Message& message)
     return serializedMessage;
 }
 
-} // namespase stun
-} // namespase nx
+} // namespace stun
+} // namespace nx

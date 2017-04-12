@@ -90,12 +90,20 @@ libnx_utils \
 libpostproc \
 libudt )
 
-#additional libs for nx1 client
-if [[ "${box}" == "bpi" ]]; then
+if [[ "${box}" == "bpi" || "${box}" == "bananapi" ]]; then
     LIBS_TO_COPY+=(
+    # Put non-raspberry pi (bananapi, nx1) specific server libs here    
         libGLESv2 \
         libMali \
-        libUMP )
+        libUMP    
+    )
+fi
+
+# Additional libs for nx1
+if [[ "${box}" == "bpi" ]]; then
+    LIBS_TO_COPY+=(
+    # Put nx1(bpi) specific server libs here
+    )
     if [[ ! -z "$WITH_CLIENT" ]]; then
         LIBS_TO_COPY+=( \
             ldpreloadhook \
@@ -248,7 +256,11 @@ if [[ "${box}" == "bpi" ]]; then
     do
       echo "Adding lib" ${var}
       cp $SYSROOT_PREFIX/${var}* $BUILD_DIR/$TARGET_LIB_DIR/ -av
-done
+    done
+elif [[ "${box}" == "bananapi" ]]; then
+    # Add files required for bananapi on Debian 8 "Jessie".
+    cp -r "$SYSROOT_PREFIX"/libglib* "$BUILD_DIR/$TARGET_LIB_DIR/"
+    cp -r "$PACKAGES_ROOT/sysroot/usr/bin/hdparm" "$BUILD_DIR/$PREFIX_DIR/mediaserver/bin/"
 fi
 
 #copying vox

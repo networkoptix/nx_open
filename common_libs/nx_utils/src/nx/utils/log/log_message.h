@@ -5,12 +5,13 @@
 
 #include <QtCore/QByteArray>
 #include <QtCore/QStringList>
+#include <QtCore/QUrl>
 
 #include <nx/utils/log/to_string.h>
 #include <nx/utils/uuid.h>
 
 /**
- * Adds some useful overloads to QString::arg
+ * Adds some useful overloads to QString::arg.
  */
 class NX_UTILS_API QnLogMessage
 {
@@ -27,6 +28,7 @@ public:
     QnLogMessage arg(const char* str, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
     QnLogMessage arg(const wchar_t* str, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
     QnLogMessage arg(const QnUuid& a, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
+    QnLogMessage arg(const QUrl& a, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
 
     QnLogMessage arg(std::chrono::seconds a, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
     QnLogMessage arg(std::chrono::milliseconds a, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
@@ -94,8 +96,7 @@ public:
     }
 
     operator QString() const;
-
-    std::string toStdString() const { return m_str.toStdString(); }
+    std::string toStdString() const;
 
 private:
     QString m_str;

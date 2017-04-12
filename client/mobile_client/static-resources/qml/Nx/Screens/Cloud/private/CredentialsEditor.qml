@@ -47,8 +47,13 @@ Item
                 width: parent.availableWidth
                 showError: d.invalidCredentials
                 activeFocusOnTab: true
-                inputMethodHints: Qt.ImhEmailCharactersOnly | Qt.ImhPreferLatin
+                inputMethodHints:
+                    Qt.ImhSensitiveData
+                        | Qt.ImhEmailCharactersOnly
+                        | Qt.ImhPreferLatin
+                        | Qt.ImhNoAutoUppercase
 
+                onAccepted: nextItemInFocusChain(true).forceActiveFocus()
                 onActiveFocusChanged:
                 {
                     if (activeFocus && d.invalidCredentials)
@@ -67,9 +72,9 @@ Item
                 width: parent.availableWidth
                 showError: d.invalidCredentials
                 activeFocusOnTab: true
-                onAccepted: login()
                 inputMethodHints: Qt.ImhSensitiveData | Qt.ImhPreferLatin
 
+                onAccepted: login()
                 onActiveFocusChanged:
                 {
                     if (activeFocus && d.invalidCredentials)
@@ -89,7 +94,7 @@ Item
         LoginButton
         {
             id: loginButton
-            text: "Log in"
+            text: qsTr("Log in")
             width: parent.width
             showProgress: d.connecting
             onClicked: login()
@@ -130,20 +135,20 @@ Item
 
         onErrorChanged:
         {
-            if (cloudStatusWatcher.error == QnCloudStatusWatcher.NoError)
+            if (error == QnCloudStatusWatcher.NoError)
                 return
 
-            setCloudCredentials(d.initialLogin, "")
             d.connecting = false
-            if (cloudStatusWatcher.error == QnCloudStatusWatcher.InvalidCredentials)
+            if (error == QnCloudStatusWatcher.InvalidCredentials)
             {
                 d.invalidCredentials = true
-                showWarning(qsTr("Invalid email or password"))
+                showWarning(qsTr("Incorrect Email or Password"))
             }
             else
             {
                 showWarning(qsTr("Cannot connect to %1").arg(applicationInfo.cloudName()))
             }
+            setCloudCredentials(d.initialLogin, "")
         }
 
         onStatusChanged:
@@ -189,5 +194,6 @@ Item
     {
         d.initialLogin = cloudStatusWatcher.effectiveUserName
         emailField.text = d.initialLogin
+        emailField.forceActiveFocus()
     }
 }

@@ -1,10 +1,4 @@
-/**********************************************************
-* Jul 10, 2015
-* a.kolesnikov@networkoptix.com
-***********************************************************/
-
-#ifndef HOST_SYSTEM_PASSWORD_SYNCHRONIZER_H
-#define HOST_SYSTEM_PASSWORD_SYNCHRONIZER_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -24,17 +18,20 @@ class HostSystemPasswordSynchronizer
     public Singleton<HostSystemPasswordSynchronizer>,
     public Qn::EnableSafeDirectConnection
 {
+    Q_OBJECT
 public:
     HostSystemPasswordSynchronizer();
     virtual ~HostSystemPasswordSynchronizer() override;
 
-    void syncLocalHostRootPasswordWithAdminIfNeeded( const QnUserResourcePtr& user );
+    void syncLocalHostRootPasswordWithAdminIfNeeded(const QnUserResourcePtr& user);
 
 private:
     QnMutex m_mutex;
 
-private slots:
-    void at_adminUserChanged( const QnResourcePtr& resource );
-};
+private:
+    void setAdmin(QnUserResourcePtr admin);
 
-#endif  //HOST_SYSTEM_PASSWORD_SYNCHRONIZER_H
+private slots:
+    void at_resourceFound(QnResourcePtr resource);
+    void at_adminHashChanged(QnResourcePtr resource);
+};

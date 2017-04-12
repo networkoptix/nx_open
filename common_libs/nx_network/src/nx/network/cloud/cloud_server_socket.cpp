@@ -9,7 +9,7 @@
 
 #define DEBUG_LOG(MESSAGE) do \
 { \
-    if (nx::network::SocketGlobals::debugConfiguration().cloudServerSocket) \
+    if (nx::network::SocketGlobals::debugConfig().cloudServerSocket) \
         NX_LOGX(MESSAGE, cl_logDEBUG1); \
 } while (0)
 
@@ -19,7 +19,7 @@ namespace cloud {
 
 namespace {
 const int kDefaultAcceptQueueSize = 128;
-const KeepAliveOptions kDefaultKeepAlive(60, 10, 5);
+const KeepAliveOptions kDefaultKeepAlive(std::chrono::minutes(1), std::chrono::seconds(10), 5);
 } // namespace
 
 static const std::vector<CloudServerSocket::AcceptorMaker> defaultAcceptorMakers()
@@ -80,7 +80,7 @@ CloudServerSocket::CloudServerSocket(
     m_acceptQueueLen(kDefaultAcceptQueueSize),
     m_state(State::init)
 {
-    NX_ASSERT(m_mediatorConnection);
+    bindToAioThread(getAioThread());
 
     // TODO: #mu default values for m_socketAttributes shall match default
     //           system vales: think how to implement this...
@@ -90,29 +90,11 @@ CloudServerSocket::CloudServerSocket(
 
 CloudServerSocket::~CloudServerSocket()
 {
-    if (*m_socketAttributes.nonBlockingMode == false)
-    {
-        // Unfortunatelly we have to block here, cloud server socket uses
-        // nonblocking operations even if user uses blocking mode.
-        pleaseStopSync(true);
-    }
-    else if (m_mediatorRegistrationRetryTimer.isInSelfAioThread())
-    {
-        // Will not block as all delegates are in the same AIO thread
-        stopWhileInAioThread();
-    }
-    else
-    {
-        // pleaseStop(...) is expected to be called externally
+    pleaseStopSync();
 
-        if (m_tunnelPool)
-        {
-            // It looks like IO has been canceled, but it's not enought for CloudServerSocket
-            // because of acceptAsync (and accept) optimization.
-            // It's better to block here, then end up with SIGSEGV isnt it?
-            pleaseStopSync(true);
-        }
-    }
+    // TODO: #ak This method should be implemented in a following way:
+    //if (isInSelfAioThread())
+    //    stopWhileInAioThread();
 }
 
 bool CloudServerSocket::bind(const SocketAddress& localAddress)
@@ -213,7 +195,7 @@ void CloudServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 
 void CloudServerSocket::pleaseStopSync(bool assertIfCalledUnderLock)
 {
-    if (m_mediatorRegistrationRetryTimer.isInSelfAioThread())
+    if (isInSelfAioThread())
     {
         stopWhileInAioThread();
     }
@@ -235,14 +217,12 @@ void CloudServerSocket::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
 
 aio::AbstractAioThread* CloudServerSocket::getAioThread() const
 {
-    const auto thread = m_mediatorRegistrationRetryTimer.getAioThread();
-    m_mediatorConnection->bindToAioThread(thread);
-    return thread;
+    return m_mediatorRegistrationRetryTimer.getAioThread();
 }
 
 void CloudServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    NX_ASSERT(!m_tunnelPool);
+    NX_ASSERT(!m_tunnelPool && m_acceptors.empty());
     m_mediatorRegistrationRetryTimer.bindToAioThread(aioThread);
     m_mediatorConnection->bindToAioThread(aioThread);
 }
@@ -308,6 +288,11 @@ void CloudServerSocket::cancelIOSync()
             cancelledPromise.set_value();
         });
     cancelledPromise.get_future().wait();
+}
+
+bool CloudServerSocket::isInSelfAioThread()
+{
+    return m_mediatorRegistrationRetryTimer.isInSelfAioThread();
 }
 
 void CloudServerSocket::registerOnMediator(
@@ -405,6 +390,7 @@ void CloudServerSocket::onListenRequestCompleted(
     NX_ASSERT(m_state == State::registeringOnMediator);
     if (resultCode == nx::hpm::api::ResultCode::ok)
     {
+        NX_LOGX(lm("Listen request completed successfully"), cl_logDEBUG1);
         m_state = State::listening;
 
         m_mediatorConnection->setOnReconnectedHandler(
@@ -412,10 +398,14 @@ void CloudServerSocket::onListenRequestCompleted(
 
         // This is important to know if connection is lost, so server will use some keep alive even
         // even if mediator does not ask it to use any.
-        m_mediatorConnection->client()->setKeepAliveOptions(
-            response.tcpConnectionKeepAlive ? *response.tcpConnectionKeepAlive : kDefaultKeepAlive);
+        const auto keepAliveOptions = response.tcpConnectionKeepAlive
+            ? *response.tcpConnectionKeepAlive : kDefaultKeepAlive;
 
-        NX_LOGX(lm("Listen request completed successfully"), cl_logDEBUG1);
+        if (response.cloudConnectOptions.testFlag(hpm::api::serverChecksConnectionState))
+            m_mediatorConnection->monitorListeningState(keepAliveOptions.maxDelay());
+        else
+            m_mediatorConnection->client()->setKeepAliveOptions(keepAliveOptions);
+
         auto acceptHandler = std::move(m_savedAcceptHandler);
         m_savedAcceptHandler = nullptr;
         if (acceptHandler)

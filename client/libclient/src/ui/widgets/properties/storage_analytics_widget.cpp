@@ -1,6 +1,8 @@
 #include "storage_analytics_widget.h"
 #include "ui_storage_analytics_widget.h"
 
+#include <chrono>
+
 #include <QtCore/QMimeData>
 #include <QtGui/QClipboard>
 #include <QtWidgets/QMenu>
@@ -28,6 +30,7 @@
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
 #include <ui/utils/table_export_helper.h>
+#include <ui/widgets/common/dropdown_button.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workaround/hidpi_workarounds.h>
@@ -39,90 +42,133 @@
 
 namespace {
 
-    const qint64 kSecondsPerHour = 3600;
-    const qint64 kSecondsPerDay = kSecondsPerHour * 24;
-    const qint64 kBytesInGB = 1024ll * 1024 * 1024;
-    const qint64 kBytesInTB = 1024ll * kBytesInGB;
-    const qint64 kFinalStepSeconds = 1000000000ll * 10;
+using std::chrono::milliseconds;
+using std::chrono::seconds;
+using std::chrono::minutes;
+using std::chrono::hours;
 
-    const int kTableRowHeight = 24;
-    const int kMinimumColumnWidth = 110;
+static constexpr int kHoursPerDay = 24;
+static constexpr int kDaysPerWeek = 7;
+static constexpr int kDaysPerMonth = 30;
 
-    //TODO: #rvasilenko refactor all algorithms working with kExtraDataBase to STL
-    const std::array<qint64, 5> kExtraDataBase =
-    {
-        10 * kBytesInGB,
-        1 * kBytesInTB,
-        10 * kBytesInTB,
-        100 * kBytesInTB,
-        1000 * kBytesInTB
-    };
-
-    const int kTicksPerInterval = 100;
-
-    class CustomHorizontalHeader: public QHeaderView
-    {
-        Q_DECLARE_TR_FUNCTIONS(CustomHorizontalHeader)
-        using base_type = QHeaderView;
-
-    private:
-        QComboBox* m_comboBox;
-
-    private:
-        void updateComboBox()
-        {
-            QRect rect(sectionViewportPosition(QnRecordingStatsModel::BitrateColumn), 0,
-                       sectionSize(QnRecordingStatsModel::BitrateColumn), height());
-
-            m_comboBox->setGeometry(QStyle::alignedRect(
-                Qt::LeftToRight, Qt::AlignRight | Qt::AlignVCenter, m_comboBox->minimumSizeHint(), rect));
-        }
-
-    public:
-        CustomHorizontalHeader(QWidget* parent = nullptr) :
-            base_type(Qt::Horizontal, parent)
-        {
-            m_comboBox = new QComboBox(this);
-            m_comboBox->addItem(tr("5 minutes"), 5 * 60);
-            m_comboBox->addItem(tr("Hour"),  60 * 60);
-            m_comboBox->addItem(tr("Day"),   3600 * 24);
-            m_comboBox->addItem(tr("Week"),  3600 * 24 * 7);
-            m_comboBox->addItem(tr("Month"), 3600 * 24 * 30);
-            m_comboBox->addItem(tr("All Data"), 0);
-            m_comboBox->setCurrentIndex(m_comboBox->count()-1);
-
-            connect(this, &QHeaderView::sectionResized, this, [this]() { updateComboBox(); }, Qt::DirectConnection);
-            connect(this, &QHeaderView::sectionResized, this, [this]() { updateComboBox(); }, Qt::QueuedConnection);
-        }
-
-        virtual void showEvent(QShowEvent *e) override
-        {
-            QHeaderView::showEvent(e);
-            updateComboBox();
-            m_comboBox->show();
-        }
-
-        QComboBox* comboBox() const
-        {
-            return m_comboBox;
-        }
-
-        int durationForBitrate() const
-        {
-            return m_comboBox->itemData(m_comboBox->currentIndex()).toInt();
-        }
-
-    protected:
-        virtual QSize sectionSizeFromContents(int logicalIndex) const override
-        {
-            QSize size = base_type::sectionSizeFromContents(logicalIndex);
-            if (logicalIndex == QnRecordingStatsModel::BitrateColumn)
-                size.rwidth() += m_comboBox->minimumSizeHint().width();
-
-            return size;
-        }
-    };
+auto days(int count)
+{
+    return hours(count * kHoursPerDay);
 }
+
+auto weeks(int count)
+{
+    return days(count * kDaysPerWeek);
+}
+
+//TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
+const qint64 kBytesInGB = 1024ll * 1024 * 1024;
+const qint64 kBytesInTB = 1024ll * kBytesInGB;
+const qint64 kFinalStepSeconds = 1000000000ll * 10;
+
+const int kTableRowHeight = 24;
+const int kMinimumColumnWidth = 110;
+
+//TODO: #rvasilenko refactor all algorithms working with kExtraDataBase to STL
+const std::array<qint64, 5> kExtraDataBase =
+{
+    10 * kBytesInGB,
+    1 * kBytesInTB,
+    10 * kBytesInTB,
+    100 * kBytesInTB,
+    1000 * kBytesInTB
+};
+
+const int kTicksPerInterval = 100;
+
+class CustomHorizontalHeader: public QHeaderView
+{
+    Q_DECLARE_TR_FUNCTIONS(CustomHorizontalHeader)
+    using base_type = QHeaderView;
+
+public:
+    CustomHorizontalHeader(QWidget* parent = nullptr) :
+        base_type(Qt::Horizontal, parent),
+        m_durationButton(new QnDropdownButton(this))
+    {
+        m_durationButton->setButtonTextRole(Qt::ToolTipRole);
+
+        auto addAction =
+            [this](const QString& text, const QString& buttonText, seconds duration)
+            {
+                auto menu = m_durationButton->menu();
+                auto action = menu->addAction(text);
+                action->setData(qint64(duration.count()));
+                action->setToolTip(buttonText);
+                return action;
+            };
+
+        addAction(tr("5 minutes"), tr("For the last 5 min"), minutes(5));
+        addAction(tr("Hour"),      tr("For the last hour"),  hours(1));
+        addAction(tr("Day"),       tr("For the last day"),   days(1));
+        addAction(tr("Week"),      tr("For the last week"),  weeks(1));
+        addAction(tr("Month"),     tr("For the last month"), days(kDaysPerMonth));
+        addAction(tr("All data"),  tr("For all data"),       seconds(0))->trigger(); //< default
+
+        m_durationButton->setFlat(true);
+
+        connect(this, &QHeaderView::sectionResized, this,
+            &CustomHorizontalHeader::updateButtonGeometry, Qt::DirectConnection);
+        connect(this, &QHeaderView::sectionResized, this,
+            &CustomHorizontalHeader::updateButtonGeometry, Qt::QueuedConnection);
+    }
+
+    virtual void showEvent(QShowEvent* e) override
+    {
+        QHeaderView::showEvent(e);
+        updateButtonGeometry();
+        m_durationButton->show();
+    }
+
+    seconds durationForBitrate() const
+    {
+        if (!m_durationButton)
+            return seconds(0);
+
+        const auto current = m_durationButton->currentAction();
+        if (!current)
+            return seconds(0);
+
+        return seconds(current->data().value<qint64>());
+    }
+
+    QnDropdownButton* durationButton() const
+    {
+        return m_durationButton;
+    }
+
+protected:
+    virtual QSize sectionSizeFromContents(int logicalIndex) const override
+    {
+        QSize size = base_type::sectionSizeFromContents(logicalIndex);
+        if (logicalIndex == QnRecordingStatsModel::BitrateColumn)
+            size.rwidth() += m_durationButton->minimumSizeHint().width();
+
+        return size;
+    }
+
+private:
+    void updateButtonGeometry()
+    {
+        QRect rect(sectionViewportPosition(QnRecordingStatsModel::BitrateColumn), 0,
+            sectionSize(QnRecordingStatsModel::BitrateColumn), height());
+
+        m_durationButton->setGeometry(QStyle::alignedRect(
+            Qt::LeftToRight, Qt::AlignRight | Qt::AlignVCenter,
+            m_durationButton->minimumSizeHint(), rect));
+    }
+
+private:
+    QnDropdownButton* m_durationButton;
+};
+
+} // namespace
+
 
 QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     base_type(parent),
@@ -179,6 +225,11 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
         this, [this]() { currentTable()->selectAll(); });
 
     setHelpTopic(this, Qn::ServerSettings_StorageAnalitycs_Help);
+
+    //TODO: #GDM move to std texts
+    ui->extraSizeSpinBox->setSuffix(L' ' + tr("TB", "TB - terabytes"));
+    ui->maxSizeLabel->setText(tr("%n TB", "TB - terabytes"
+        , qRound(ui->extraSizeSpinBox->maximum())));
 }
 
 QnStorageAnalyticsWidget::~QnStorageAnalyticsWidget()
@@ -199,7 +250,8 @@ void QnStorageAnalyticsWidget::setupTableView(QnTableView* table, QAbstractItemM
     table->setModel(sortModel);
     table->setItemDelegate(new QnRecordingStatsItemDelegate(this));
 
-    table->verticalHeader()->setDefaultSectionSize(kTableRowHeight);
+    table->verticalHeader()->setMinimumSectionSize(kTableRowHeight);
+    table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     CustomHorizontalHeader* header = new CustomHorizontalHeader(this);
     table->setHorizontalHeader(header);
@@ -228,13 +280,15 @@ void QnStorageAnalyticsWidget::setupTableView(QnTableView* table, QAbstractItemM
         ? ui->forecastTable
         : ui->statsTable;
 
-    connect(header->comboBox(), QnComboboxCurrentIndexChanged, this,
+    connect(header->durationButton(), &QnDropdownButton::currentChanged, this,
         [this, otherTable](int index)
         {
-            static_cast<CustomHorizontalHeader*>(otherTable->horizontalHeader())->comboBox()->setCurrentIndex(index);
+            static_cast<CustomHorizontalHeader*>(otherTable->horizontalHeader())->
+                durationButton()->setCurrentIndex(index);
+
             if (otherTable == ui->forecastTable)
                 updateData();
-        });
+        }, Qt::QueuedConnection);
 }
 
 QnMediaServerResourcePtr QnStorageAnalyticsWidget::server() const
@@ -276,8 +330,8 @@ void QnStorageAnalyticsWidget::updateData()
 
     m_updateDisabled = true;
 
-    qint64 durationForBitrate = static_cast<CustomHorizontalHeader*>(ui->statsTable->horizontalHeader())->durationForBitrate();
-    query(durationForBitrate * 1000ll);
+    query(milliseconds(static_cast<CustomHorizontalHeader*>(ui->statsTable->horizontalHeader())
+        ->durationForBitrate()).count());
 
     // update UI
 
@@ -448,8 +502,8 @@ qint64 QnStorageAnalyticsWidget::sliderPositionToBytes(int value) const
         return 0;
 
     int idx = value / kTicksPerInterval;
-    if (idx >= kExtraDataBase.size() - 1)
-        return kExtraDataBase.back();
+    if (idx >= (qint64) kExtraDataBase.size() - 1)
+        return (qint64) kExtraDataBase.back();
 
     qint64 k1 = kExtraDataBase[idx];
     qint64 k2 = kExtraDataBase[idx+1];
@@ -462,7 +516,7 @@ qint64 QnStorageAnalyticsWidget::sliderPositionToBytes(int value) const
 int QnStorageAnalyticsWidget::bytesToSliderPosition (qint64 value) const
 {
     int idx = 0;
-    for (; idx < kExtraDataBase.size() - 1; ++idx)
+    for (; idx < (qint64) kExtraDataBase.size() - 1; ++idx)
     {
         if (kExtraDataBase[idx+1] >= value)
             break;
@@ -570,34 +624,36 @@ QnRecordingStatsReply QnStorageAnalyticsWidget::getForecastData(qint64 extraSize
 
 QnRecordingStatsReply QnStorageAnalyticsWidget::doForecast(ForecastData forecastData)
 {
-    std::set<qint64> steps; // select possible values for minDays variable
+    std::set<seconds> steps; // select possible values for minDays variable
     for (const auto& camera: forecastData.cameras)
     {
         if (camera.minDays > 0)
-            steps.insert(camera.minDays * kSecondsPerDay);
+            steps.insert(days(camera.minDays));
     }
-    for (qint64 seconds : steps)
+    for (const auto& seconds: steps)
     {
-        spendData(forecastData, seconds, [seconds](const ForecastDataPerCamera& stats)
-        {
-            return stats.expand && stats.minDays * kSecondsPerDay >= seconds;
-        });
+        spendData(forecastData, seconds.count(),
+            [seconds](const ForecastDataPerCamera& stats)
+            {
+                return stats.expand && days(stats.minDays) >= seconds;
+            });
     }
 
     for (const auto& camera: forecastData.cameras)
     {
         if (camera.maxDays > 0)
-            steps.insert(camera.maxDays * kSecondsPerDay);
+            steps.insert(days(camera.maxDays));
     }
 
-    steps.insert(kFinalStepSeconds); // final step for all cameras
+    steps.insert(seconds(kFinalStepSeconds)); // final step for all cameras
 
-    for (qint64 seconds: steps)
+    for (const auto& seconds: steps)
     {
-        spendData(forecastData, seconds, [seconds](const ForecastDataPerCamera& stats)
-        {
-            return stats.expand && (stats.maxDays * kSecondsPerDay >= seconds || stats.maxDays == 0);
-        });
+        spendData(forecastData, seconds.count(),
+            [seconds](const ForecastDataPerCamera& stats)
+            {
+                return stats.expand && (days(stats.maxDays) >= seconds || stats.maxDays == 0);
+            });
     }
 
     QnRecordingStatsReply result;

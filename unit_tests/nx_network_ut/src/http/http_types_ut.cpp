@@ -42,24 +42,24 @@ TEST( HttpHeaderTest, RangeHeader_parse )
 {
     nx_http::header::Range range;
     range.parse( "650-" );
-    ASSERT_EQ( range.rangeSpecList.size(), 1 );
-    ASSERT_EQ( range.rangeSpecList[0].start, 650 );
+    ASSERT_EQ( range.rangeSpecList.size(), 1U );
+    ASSERT_EQ( range.rangeSpecList[0].start, 650U );
     ASSERT_FALSE( static_cast< bool >(range.rangeSpecList[0].end ) );
 
     range.rangeSpecList.clear();
     range.parse( "100,200-230" );
-    ASSERT_EQ( range.rangeSpecList.size(), 2 );
-    ASSERT_EQ( range.rangeSpecList[0].start, 100 );
+    ASSERT_EQ( range.rangeSpecList.size(), 2U );
+    ASSERT_EQ( range.rangeSpecList[0].start, 100U );
     ASSERT_TRUE( static_cast< bool >( range.rangeSpecList[0].end ) );
-    ASSERT_EQ( range.rangeSpecList[0].end.get(), 100 );
-    ASSERT_EQ( range.rangeSpecList[1].start, 200 );
-    ASSERT_EQ( range.rangeSpecList[1].end.get(), 230 );
+    ASSERT_EQ( range.rangeSpecList[0].end.get(), 100U );
+    ASSERT_EQ( range.rangeSpecList[1].start, 200U );
+    ASSERT_EQ( range.rangeSpecList[1].end.get(), 230U );
 
     range.rangeSpecList.clear();
     range.parse( "200-230" );
-    ASSERT_EQ( range.rangeSpecList.size(), 1 );
-    ASSERT_EQ( range.rangeSpecList[0].start, 200 );
-    ASSERT_EQ( range.rangeSpecList[0].end.get(), 230 );
+    ASSERT_EQ( range.rangeSpecList.size(), 1U );
+    ASSERT_EQ( range.rangeSpecList[0].start, 200U );
+    ASSERT_EQ( range.rangeSpecList[0].end.get(), 230U );
 }
 
 TEST( HttpHeaderTest, RangeHeader_validateByContentSize )
@@ -124,31 +124,31 @@ TEST( HttpHeaderTest, RangeHeader_totalRangeLength )
 {
     nx_http::header::Range range;
     range.parse( "650-" );
-    EXPECT_EQ( range.totalRangeLength(1000), 350 );
-    EXPECT_EQ( range.totalRangeLength(650), 0 );
-    EXPECT_EQ( range.totalRangeLength(651), 1 );
-    EXPECT_EQ( range.totalRangeLength(500), 0 );
+    EXPECT_EQ( range.totalRangeLength(1000), 350U );
+    EXPECT_EQ( range.totalRangeLength(650), 0U );
+    EXPECT_EQ( range.totalRangeLength(651), 1U );
+    EXPECT_EQ( range.totalRangeLength(500), 0U );
 
     range.rangeSpecList.clear();
     range.parse( "0-999" );
-    EXPECT_EQ( range.totalRangeLength(1000), 1000 );
-    EXPECT_EQ( range.totalRangeLength(10000), 1000 );
-    EXPECT_EQ( range.totalRangeLength(999), 999);
-    EXPECT_EQ( range.totalRangeLength(500), 500);
-    EXPECT_EQ( range.totalRangeLength(0), 0 );
+    EXPECT_EQ( range.totalRangeLength(1000), 1000U );
+    EXPECT_EQ( range.totalRangeLength(10000), 1000U );
+    EXPECT_EQ( range.totalRangeLength(999), 999U);
+    EXPECT_EQ( range.totalRangeLength(500), 500U);
+    EXPECT_EQ( range.totalRangeLength(0), 0U );
 
     range.rangeSpecList.clear();
     range.parse( "0,1-999" );
-    EXPECT_EQ( range.totalRangeLength(1000), 1000 );
-    EXPECT_EQ( range.totalRangeLength(10000), 1000 );
-    EXPECT_EQ( range.totalRangeLength(999), 999);
-    EXPECT_EQ( range.totalRangeLength(0), 0 );
+    EXPECT_EQ( range.totalRangeLength(1000), 1000U );
+    EXPECT_EQ( range.totalRangeLength(10000), 1000U );
+    EXPECT_EQ( range.totalRangeLength(999), 999U);
+    EXPECT_EQ( range.totalRangeLength(0), 0U );
 
     range.rangeSpecList.clear();
     range.parse( "0" );
-    EXPECT_EQ( range.totalRangeLength(1000), 1 );
-    EXPECT_EQ( range.totalRangeLength(1), 1 );
-    EXPECT_EQ( range.totalRangeLength(0), 0 );
+    EXPECT_EQ( range.totalRangeLength(1000), 1U );
+    EXPECT_EQ( range.totalRangeLength(1), 1U );
+    EXPECT_EQ( range.totalRangeLength(0), 0U );
 }
 
 
@@ -161,15 +161,15 @@ TEST( HttpHeaderTest, ContentRange_toString )
     {
         nx_http::header::ContentRange contentRange;
         EXPECT_EQ( contentRange.toString(), "bytes 0-0/*" );
-        EXPECT_EQ( contentRange.rangeLength(), 1 );
+        EXPECT_EQ( contentRange.rangeLength(), 1U );
 
         contentRange.instanceLength = 240;
         EXPECT_EQ( contentRange.toString(), "bytes 0-239/240" );
-        EXPECT_EQ( contentRange.rangeLength(), 240 );
+        EXPECT_EQ( contentRange.rangeLength(), 240U );
 
         contentRange.rangeSpec.start = 100;
         EXPECT_EQ( contentRange.toString(), "bytes 100-239/240" );
-        EXPECT_EQ( contentRange.rangeLength(), 140 );
+        EXPECT_EQ( contentRange.rangeLength(), 140U );
     }
 
     {
@@ -177,7 +177,7 @@ TEST( HttpHeaderTest, ContentRange_toString )
         contentRange.rangeSpec.start = 100;
         contentRange.rangeSpec.end = 249;
         EXPECT_EQ( contentRange.toString(), "bytes 100-249/*" );
-        EXPECT_EQ( contentRange.rangeLength(), 150 );
+        EXPECT_EQ( contentRange.rangeLength(), 150U );
     }
 
     {
@@ -186,14 +186,14 @@ TEST( HttpHeaderTest, ContentRange_toString )
         contentRange.rangeSpec.end = 249;
         contentRange.instanceLength = 500;
         EXPECT_EQ( contentRange.toString(), "bytes 100-249/500" );
-        EXPECT_EQ( contentRange.rangeLength(), 150 );
+        EXPECT_EQ( contentRange.rangeLength(), 150U );
     }
 
     {
         nx_http::header::ContentRange contentRange;
         contentRange.rangeSpec.start = 100;
         EXPECT_EQ( contentRange.toString(), "bytes 100-100/*" );
-        EXPECT_EQ( contentRange.rangeLength(), 1 );
+        EXPECT_EQ( contentRange.rangeLength(), 1U );
     }
 
     {
@@ -201,7 +201,7 @@ TEST( HttpHeaderTest, ContentRange_toString )
         contentRange.rangeSpec.start = 100;
         contentRange.rangeSpec.end = 100;
         EXPECT_EQ( contentRange.toString(), "bytes 100-100/*" );
-        EXPECT_EQ( contentRange.rangeLength(), 1 );
+        EXPECT_EQ( contentRange.rangeLength(), 1U );
     }
 }
 
@@ -214,7 +214,7 @@ TEST( HttpHeaderTest, Via_parse )
 {
     nx_http::header::Via via;
     EXPECT_TRUE( via.parse("1.0 fred, 1.1 nowhere.com (Apache/1.1)") );
-    EXPECT_EQ( via.entries.size(), 2 );
+    EXPECT_EQ( via.entries.size(), 2U );
     EXPECT_FALSE( via.entries[0].protoName );
     EXPECT_EQ( via.entries[0].protoVersion, QByteArray("1.0") );
     EXPECT_EQ( via.entries[0].receivedBy, QByteArray("fred") );
@@ -226,7 +226,7 @@ TEST( HttpHeaderTest, Via_parse )
 
     via.entries.clear();
     EXPECT_TRUE( via.parse("1.0 ricky, 1.1 ethel, 1.1 fred, 1.0 lucy") );
-    EXPECT_EQ( via.entries.size(), 4 );
+    EXPECT_EQ( via.entries.size(), 4U );
     EXPECT_FALSE( via.entries[0].protoName );
     EXPECT_EQ( via.entries[0].protoVersion, QByteArray("1.0") );
     EXPECT_EQ( via.entries[0].receivedBy, QByteArray("ricky") );
@@ -247,7 +247,7 @@ TEST( HttpHeaderTest, Via_parse )
 
     via.entries.clear();
     EXPECT_TRUE( via.parse("HTTP/1.0 ricky") );
-    EXPECT_EQ( via.entries.size(), 1 );
+    EXPECT_EQ( via.entries.size(), 1U );
     EXPECT_EQ( via.entries[0].protoName.get(), QByteArray("HTTP") );
     EXPECT_EQ( via.entries[0].protoVersion, QByteArray("1.0") );
     EXPECT_EQ( via.entries[0].receivedBy, QByteArray("ricky") );
@@ -267,7 +267,7 @@ TEST( HttpHeaderTest, Via_parse )
 
     via.entries.clear();
     EXPECT_TRUE( via.parse("h g") );
-    EXPECT_EQ( via.entries.size(), 1 );
+    EXPECT_EQ( via.entries.size(), 1U );
     EXPECT_FALSE( via.entries[0].protoName );
     EXPECT_EQ( via.entries[0].protoVersion, QByteArray("h") );
     EXPECT_EQ( via.entries[0].receivedBy, QByteArray("g") );
@@ -276,7 +276,7 @@ TEST( HttpHeaderTest, Via_parse )
 
     via.entries.clear();
     EXPECT_TRUE( via.parse("  h  g   ,    h   z   mm , p/v  ps") );
-    EXPECT_EQ( via.entries.size(), 3 );
+    EXPECT_EQ( via.entries.size(), 3U );
     EXPECT_FALSE( via.entries[0].protoName );
     EXPECT_EQ( via.entries[0].protoVersion, QByteArray("h") );
     EXPECT_EQ( via.entries[0].receivedBy, QByteArray("g") );
@@ -293,7 +293,7 @@ TEST( HttpHeaderTest, Via_parse )
 
     via.entries.clear();
     EXPECT_TRUE( via.parse("1.0 fred, 1.1 nowhere.com (Apache/1.1) Commanch Whooyanch") );
-    EXPECT_EQ( via.entries.size(), 2 );
+    EXPECT_EQ( via.entries.size(), 2U );
     EXPECT_FALSE( via.entries[0].protoName );
     EXPECT_EQ( via.entries[0].protoVersion, QByteArray("1.0") );
     EXPECT_EQ( via.entries[0].receivedBy, QByteArray("fred") );
@@ -306,7 +306,7 @@ TEST( HttpHeaderTest, Via_parse )
 
     via.entries.clear();
     EXPECT_TRUE( via.parse( "1.1 {47bf37a0-72a6-2890-b967-5da9c390d28a}" ) );
-    EXPECT_EQ( via.entries.size(), 1 );
+    EXPECT_EQ( via.entries.size(), 1U );
     EXPECT_FALSE( via.entries[0].protoName );
     EXPECT_EQ( via.entries[0].protoVersion, QByteArray( "1.1" ) );
     EXPECT_EQ( via.entries[0].receivedBy, QByteArray( "{47bf37a0-72a6-2890-b967-5da9c390d28a}" ) );
@@ -618,4 +618,119 @@ TEST(HttpHeaderTest, KeepAlive_parse)
         nx_http::header::KeepAlive keepAlive;
         ASSERT_FALSE(keepAlive.parse(testData));
     }
+}
+
+//-------------------------------------------------------------------------------------------------
+// Server
+
+class HttpHeaderServer:
+    public ::testing::Test
+{
+public:
+
+protected:
+    void test(
+        bool isValid,
+        const nx_http::header::Server& serverHeader,
+        nx_http::StringType serializedValue)
+    {
+        if (isValid)
+            testSerialization(serverHeader, serializedValue);
+
+        testParsing(isValid, serverHeader, serializedValue);
+    }
+
+    void testParsing(
+        bool isValid,
+        const nx_http::header::Server& serverHeader,
+        nx_http::StringType serializedValue)
+    {
+        using namespace nx_http::header;
+
+        Server headerToParse;
+        ASSERT_EQ(isValid, headerToParse.parse(serializedValue));
+        if (isValid)
+            ASSERT_EQ(serverHeader, headerToParse);
+    }
+
+    void testSerialization(
+        const nx_http::header::Server& serverHeader,
+        nx_http::StringType expectedSerializedValue)
+    {
+        const auto result = serverHeader.toString();
+        ASSERT_TRUE(result.startsWith(expectedSerializedValue));
+    }
+};
+
+TEST_F(HttpHeaderServer, single_product_without_comment)
+{
+    nx_http::header::Server serverHeader;
+    serverHeader.products.clear();
+    serverHeader.products.push_back(
+        nx_http::header::Server::Product{
+            "ProductName", nx::utils::SoftwareVersion("1.2.3.4"), ""});
+    test(true, serverHeader, "ProductName/1.2.3.4");
+}
+
+TEST_F(HttpHeaderServer, single_product_without_version)
+{
+    nx_http::header::Server serverHeader;
+    serverHeader.products.clear();
+    serverHeader.products.push_back(
+        nx_http::header::Server::Product{"ProductName", boost::none, ""});
+    test(true, serverHeader, "ProductName");
+}
+
+TEST_F(HttpHeaderServer, multile_products)
+{
+    nx_http::header::Server serverHeader;
+    serverHeader.products.clear();
+    serverHeader.products.push_back(
+        nx_http::header::Server::Product{
+        "Product1", nx::utils::SoftwareVersion("1.2.3.4"), "" });
+    serverHeader.products.push_back(
+        nx_http::header::Server::Product{
+        "Product2", nx::utils::SoftwareVersion("5.6.7.8"), "comment2" });
+    test(true, serverHeader, "Product1/1.2.3.4 Product2/5.6.7.8 (comment2)");
+}
+
+TEST_F(HttpHeaderServer, empty_string)
+{
+    nx_http::header::Server serverHeader;
+    serverHeader.products.clear();
+    test(false, serverHeader, "");
+}
+
+TEST_F(HttpHeaderServer, empty_product_first)
+{
+    nx_http::header::Server serverHeader;
+    test(false, serverHeader, "/1.2.3.4");
+}
+
+TEST_F(HttpHeaderServer, empty_product_not_first)
+{
+    nx_http::header::Server serverHeader;
+    test(false, serverHeader, "Product1/1.2.3.4 /5.6.7.8 (comment2)");
+}
+
+TEST(Http_readHeader, int_value)
+{
+    nx_http::HttpHeaders headers;
+    headers.emplace("Header1", "str");
+    headers.emplace("Header2", "777");
+
+    int value = 0;
+    
+    ASSERT_TRUE(nx_http::readHeader(headers, "Header2", &value));
+    ASSERT_EQ(777, value);
+
+    ASSERT_TRUE(nx_http::readHeader(headers, "Header1", &value));
+    ASSERT_EQ(0, value);
+}
+
+TEST(Http_readHeader, missing_header)
+{
+    nx_http::HttpHeaders headers;
+    int value = 0;
+    ASSERT_FALSE(nx_http::readHeader(headers, "Header3", &value));
 }

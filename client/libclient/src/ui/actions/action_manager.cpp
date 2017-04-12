@@ -22,6 +22,7 @@
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_layout.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
@@ -521,11 +522,17 @@ QnActionManager::QnActionManager(QObject *parent):
         icon(qnSkin->icon("events/filter.png")).
         text(tr("Filter..."));
 
+    factory(QnActions::PreferencesCloudTabAction).
+        flags(Qn::NoTarget).
+        requiredGlobalPermission(Qn::GlobalAdminPermission);
+
     factory(QnActions::ConnectAction).
         flags(Qn::NoTarget);
 
     factory(QnActions::ConnectToCloudSystemAction).
-        flags(Qn::NoTarget);
+        flags(Qn::Tree | Qn::NoTarget).
+        text(tr("Connect to System")).
+        condition(new QnTreeNodeTypeCondition(Qn::CloudSystemNode, this));
 
     factory(QnActions::ReconnectAction).
         flags(Qn::NoTarget);
@@ -986,6 +993,9 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Account Settings..."));
 
+    factory(QnActions::HideCloudPromoAction).
+        flags(Qn::NoTarget);
+
     factory(QnActions::OpenCloudRegisterUrl).
         flags(Qn::NoTarget).
         text(tr("Create Account..."));
@@ -1027,11 +1037,6 @@ QnActionManager::QnActionManager(QObject *parent):
     factory().
         flags(Qn::Main).
         separator();
-
-    factory(QnActions::ShowcaseAction).
-        flags(Qn::Main).
-        text(tr("How-to Videos and FAQ...")).
-        condition(new QnShowcaseActionCondition(this));
 
     factory(QnActions::AboutAction).
         flags(Qn::Main | Qn::GlobalHotkey).
@@ -1222,10 +1227,10 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnRunningVideowallActionCondition(this));
 
-    factory(QnActions::DetachFromVideoWallAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
+    factory(QnActions::ClearVideoWallScreen).
+        flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
         requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
-        text(tr("Detach Layout")).
+        text(tr("Clear Screen")).
         autoRepeat(false).
         condition(new QnDetachFromVideoWallActionCondition(this));
 
@@ -1600,7 +1605,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::ServerAddCameraManuallyAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Add Device(s)...")).   //intentionally hardcode devices here
+        text(tr("Add Device...")).   //intentionally hardcode devices here
         requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
@@ -1651,6 +1656,7 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
             new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
+            new QnNegativeActionCondition(new QnCloudServerActionCondition(Qn::Any, this), this),
             this));
 
     factory(QnActions::ServerSettingsAction).
@@ -1679,7 +1685,6 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnConjunctionActionCondition(
             new QnVideoWallReviewModeCondition(true, this),
             new QnLightModeCondition(Qn::LightModeSingleItem, this),
-            new QnItemsCountActionCondition(QnItemsCountActionCondition::MultipleItems, this),
             this));
 
     factory().
@@ -1691,33 +1696,37 @@ QnActionManager::QnActionManager(QObject *parent):
     {
         factory.beginGroup();
 
-        factory(QnActions::SetCurrentLayoutItemSpacing0Action).
+        factory(QnActions::SetCurrentLayoutItemSpacingNoneAction).
             flags(Qn::Scene | Qn::NoTarget).
             requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
             text(tr("None")).
             checkable().
-            checked(qnGlobals->defaultLayoutCellSpacing() == 0.0);
+            checked(qnGlobals->defaultLayoutCellSpacing()
+                == QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::None));
 
-        factory(QnActions::SetCurrentLayoutItemSpacing10Action).
+        factory(QnActions::SetCurrentLayoutItemSpacingSmallAction).
             flags(Qn::Scene | Qn::NoTarget).
             requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
             text(tr("Small")).
             checkable().
-            checked(qnGlobals->defaultLayoutCellSpacing() == 0.1);
+            checked(qnGlobals->defaultLayoutCellSpacing()
+                == QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Small));
 
-        factory(QnActions::SetCurrentLayoutItemSpacing20Action).
+        factory(QnActions::SetCurrentLayoutItemSpacingMediumAction).
             flags(Qn::Scene | Qn::NoTarget).
             requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
             text(tr("Medium")).
             checkable().
-            checked(qnGlobals->defaultLayoutCellSpacing() == 0.2);
+            checked(qnGlobals->defaultLayoutCellSpacing()
+                == QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Medium));
 
-        factory(QnActions::SetCurrentLayoutItemSpacing30Action).
+        factory(QnActions::SetCurrentLayoutItemSpacingLargeAction).
             flags(Qn::Scene | Qn::NoTarget).
             requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
             text(tr("Large")).
             checkable().
-            checked(qnGlobals->defaultLayoutCellSpacing() == 0.3);
+            checked(qnGlobals->defaultLayoutCellSpacing()
+                == QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Large));
         factory.endGroup();
 
     } factory.endSubMenu();
@@ -2001,6 +2010,22 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Notifications | Qn::NoTarget).
         text(tr("Pin Notifications")).
         toggledText(tr("Unpin Notifications"));
+
+    factory(QnActions::GoToNextItemAction)
+        .flags(Qn::NoTarget);
+
+    factory(QnActions::GoToPreviousItemAction)
+        .flags(Qn::NoTarget);
+
+    factory(QnActions::ToggleCurrentItemMaximizationStateAction)
+        .flags(Qn::NoTarget);
+
+    factory(QnActions::PtzContinuousMoveAction)
+        .flags(Qn::NoTarget);
+
+    factory(QnActions::PtzActivatePresetByIndexAction)
+        .flags(Qn::NoTarget);
+
 }
 
 QnActionManager::~QnActionManager()

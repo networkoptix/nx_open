@@ -3,14 +3,13 @@
 #include <QtQml/QtQml>
 #include <private/qqmlvaluetype_p.h>
 
+#include <nx/fusion/model_functions.h>
+
 #include <context/connection_manager.h>
 #include <ui/timeline/timeline.h>
 #include <ui/qml/quick_item_mouse_tracker.h>
 #include <ui/qml/text_input.h>
 #include <ui/models/systems_model.h>
-#include <ui/models/recent_local_connections_model.h>
-#include <ui/models/system_hosts_model.h>
-#include <ui/models/ordered_systems_model.h>
 #include <models/camera_list_model.h>
 #include <models/calendar_model.h>
 #include <models/layouts_model.h>
@@ -21,7 +20,7 @@
 #include <camera/camera_chunk_provider.h>
 #include <camera/active_camera_thumbnail_loader.h>
 #include <camera/thumbnail_cache_accessor.h>
-#include <nx/media/media_player.h>
+#include <nx/mobile_client/media/media_player.h>
 #include <watchers/cloud_status_watcher.h>
 #include <watchers/cloud_system_information_watcher.h>
 #include <watchers/user_watcher.h>
@@ -30,44 +29,60 @@
 #include <controllers/lite_client_controller.h>
 #include <helpers/lite_client_layout_helper.h>
 #include <helpers/cloud_url_helper.h>
+#include <utils/developer_settings_helper.h>
+#include <settings/qml_settings_adaptor.h>
+#include <nx/mobile_client/helpers/inter_client_message.h>
 
-void QnMobileClientMetaTypes::initialize() {
+using namespace nx::client::mobile;
+
+void QnMobileClientMetaTypes::initialize()
+{
     QnClientCoreMetaTypes::initialize();
 
     registerMetaTypes();
     registerQmlTypes();
 }
 
-void QnMobileClientMetaTypes::registerMetaTypes() {
+void QnMobileClientMetaTypes::registerMetaTypes()
+{
+    qRegisterMetaType<nx::media::PlayerStatistics>();
+    QnJsonSerializer::registerSerializer<InterClientMessage::Command>();
 }
 
 void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterUncreatableType<QnConnectionManager>("com.networkoptix.qml", 1, 0, "QnConnectionManager", lit("Cannot create an instance of QnConnectionManager."));
     qmlRegisterUncreatableType<QnMobileAppInfo>("com.networkoptix.qml", 1, 0, "QnMobileAppInfo", lit("Cannot create an instance of QnMobileAppInfo."));
     qmlRegisterUncreatableType<QnCloudUrlHelper>("com.networkoptix.qml", 1, 0, "QnCloudUrlHelper", lit("Cannot create an instance of QnCloudUrlHelper."));
-    qmlRegisterType<QnOrderedSystemsModel>("com.networkoptix.qml", 1, 0, "QnSystemsModel");
-    qmlRegisterType<QnRecentLocalConnectionsModel>("com.networkoptix.qml", 1, 0, "QnRecentLocalConnectionsModel");
-    qmlRegisterType<QnSystemHostsModel>("com.networkoptix.qml", 1, 0, "QnSystemHostsModel");
+    qmlRegisterUncreatableType<nx::client::mobile::QmlSettingsAdaptor>(
+        "Nx.Settings", 1, 0, "MobileSettings",
+        lit("Cannot create an instance of MobileSettings."));
+
     qmlRegisterType<QnCameraListModel>("com.networkoptix.qml", 1, 0, "QnCameraListModel");
     qmlRegisterType<QnCalendarModel>("com.networkoptix.qml", 1, 0, "QnCalendarModel");
     qmlRegisterType<QnLayoutsModel>("com.networkoptix.qml", 1, 0, "QnLayoutsModel");
-    qmlRegisterType<QnMediaResourceHelper>("com.networkoptix.qml", 1, 0, "QnMediaResourceHelper");
+    qmlRegisterType<QnMediaResourceHelper>("Nx.Core", 1, 0, "MediaResourceHelper");
     qmlRegisterType<QnCameraAccessRightsHelper>("com.networkoptix.qml", 1, 0, "QnCameraAccessRightsHelper");
     qmlRegisterType<QnTimeline>("com.networkoptix.qml", 1, 0, "QnTimelineView");
     qmlRegisterType<QnCameraChunkProvider>("com.networkoptix.qml", 1, 0, "QnCameraChunkProvider");
     qmlRegisterType<QnCloudStatusWatcher>("com.networkoptix.qml", 1, 0, "QnCloudStatusWatcher");
     qmlRegisterType<QnCloudSystemInformationWatcher>("com.networkoptix.qml", 1, 0, "QnCloudSystemInformationWatcher");
     qmlRegisterType<QnUserWatcher>("com.networkoptix.qml", 1, 0, "QnUserWatcher");
-    qmlRegisterType<nx::media::Player>("com.networkoptix.qml", 1, 0, "QnPlayer");
+    /* NxMediaPlayer should not be used.
+       It is here only to allow assignments of MediaPlyer to properties of this type. */
+    qmlRegisterType<nx::media::Player>("Nx.Media", 1, 0, "NxMediaPlayer");
+    qmlRegisterType<MediaPlayer>("Nx.Media", 1, 0, "MediaPlayer");
     qmlRegisterType<QnActiveCameraThumbnailLoader>("com.networkoptix.qml", 1, 0, "QnActiveCameraThumbnailLoader");
     qmlRegisterType<QnThumbnailCacheAccessor>("com.networkoptix.qml", 1, 0, "QnThumbnailCacheAccessor");
     qmlRegisterType<QnQuickItemMouseTracker>("com.networkoptix.qml", 1, 0, "ItemMouseTracker");
-    qmlRegisterType<QnQuickTextInput>("com.networkoptix.qml", 1, 0, "QnTextInput");
+    qmlRegisterType<QnQuickTextInput>("Nx.Controls", 1, 0, "TextInput");
     qmlRegisterType<QnMobileClientUiController>("com.networkoptix.qml", 1, 0, "QnMobileClientUiController");
     qmlRegisterType<QnLiteClientController>("com.networkoptix.qml", 1, 0, "QnLiteClientController");
     qmlRegisterType<QnLiteClientLayoutHelper>("com.networkoptix.qml", 1, 0, "QnLiteClientLayoutHelper");
+    qmlRegisterType<utils::DeveloperSettingsHelper>(
+        "com.networkoptix.qml", 1, 0, "DeveloperSettingsHelper");
 
-    qmlRegisterRevision<QQuickTextInput, 6>("com.networkoptix.qml", 1, 0);
+    qmlRegisterRevision<QQuickTextInput, 6>("Nx.Controls", 1, 0);
+    qmlRegisterRevision<QQuickItem, 1>("Nx.Controls", 1, 0);
     qmlRegisterRevision<QQuickItem, 1>("com.networkoptix.qml", 1, 0);
 
     qmlRegisterSingletonType(QUrl(lit("qrc:///qml/QnTheme.qml")), "com.networkoptix.qml", 1, 0, "QnTheme");

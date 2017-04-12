@@ -7,6 +7,7 @@
 
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
 #include "outgoing_tunnel_connection_watcher.h"
@@ -20,21 +21,6 @@ namespace cloud {
 using namespace nx::hpm;
 
 namespace {
-
-api::NatTraversalResultCode mediatorResultToHolePunchingResult(
-    api::ResultCode resultCode)
-{
-    switch (resultCode)
-    {
-        case api::ResultCode::ok:
-            return api::NatTraversalResultCode::ok;
-        case api::ResultCode::networkError:
-        case api::ResultCode::timedOut:
-            return api::NatTraversalResultCode::noResponseFromMediator;
-        default:
-            return api::NatTraversalResultCode::mediatorReportedError;
-    }
-}
 
 SystemError::ErrorCode mediatorResultToSysErrorCode(api::ResultCode resultCode)
 {
@@ -69,7 +55,7 @@ CrossNatConnector::CrossNatConnector(
 {
     m_mediatorUdpClient = 
         std::make_unique<api::MediatorClientUdpConnection>(m_mediatorAddress);
-    m_mediatorUdpClient->socket()->bindToAioThread(getAioThread());
+    m_mediatorUdpClient->bindToAioThread(getAioThread());
 
     m_timer = std::make_unique<aio::Timer>();
     m_timer->bindToAioThread(getAioThread());
@@ -83,7 +69,7 @@ CrossNatConnector::~CrossNatConnector()
 void CrossNatConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     AbstractCrossNatConnector::bindToAioThread(aioThread);
-    m_mediatorUdpClient->socket()->bindToAioThread(aioThread);
+    m_mediatorUdpClient->bindToAioThread(aioThread);
     m_timer->bindToAioThread(aioThread);
 }
 
@@ -106,7 +92,9 @@ void CrossNatConnector::connect(
             const auto hostName = m_targetPeerAddress.host.toString().toUtf8();
             if (auto holder = SocketGlobals::tcpReversePool().getConnectionSource(hostName))
             {
+                s_mediatorResponseCounter.addResult(hpm::api::ResultCode::notImplemented);
                 NX_LOGX(lm("Using TCP reverse connections from pool"), cl_logDEBUG1);
+
                 return handler(
                     SystemError::noError,
                     std::make_unique<tcp::OutgoingReverseTunnelConnection>(
@@ -127,6 +115,11 @@ void CrossNatConnector::replaceOriginatingHostAddress(const QString& address)
     m_originatingHostAddressReplacement = address;
 }
 
+utils::ResultCounter<nx::hpm::api::ResultCode>& CrossNatConnector::mediatorResponseCounter()
+{
+    return s_mediatorResponseCounter;
+}
+
 void CrossNatConnector::messageReceived(
     SocketAddress /*sourceAddress*/,
     stun::Message /*msg*/)
@@ -140,6 +133,9 @@ void CrossNatConnector::ioFailure(SystemError::ErrorCode /*errorCode*/)
     //  it will be reported to TunnelConnector::connectSessionReportSent too
     //  and we will handle error there
 }
+
+utils::ResultCounter<nx::hpm::api::ResultCode>
+    CrossNatConnector::s_mediatorResponseCounter(&nx::hpm::api::toString);
 
 void CrossNatConnector::issueConnectRequestToMediator(
     std::chrono::milliseconds timeout,
@@ -155,6 +151,7 @@ void CrossNatConnector::issueConnectRequestToMediator(
         post(
             [handler = move(handler), errorCode]() mutable
             {
+                s_mediatorResponseCounter.addResult(hpm::api::ResultCode::badTransport);
                 handler(errorCode, nullptr);
             });
         return;
@@ -183,15 +180,23 @@ void CrossNatConnector::issueConnectRequestToMediator(
     using namespace std::placeholders;
     m_mediatorUdpClient->connect(
         prepareConnectRequest(),
-        std::bind(&CrossNatConnector::onConnectResponse, this, _1, _2));
+        std::bind(&CrossNatConnector::onConnectResponse, this, _1, _2, _3));
 }
 
 void CrossNatConnector::onConnectResponse(
+    stun::TransportHeader stunTransportHeader,
     api::ResultCode resultCode,
     api::ConnectResponse response)
 {
+    s_mediatorResponseCounter.addResult(resultCode);
+    NX_LOGX(lm("cross-nat %1. Received %2 response from mediator")
+        .arg(m_connectSessionId).arg(QnLexical::serialized(resultCode)),
+        cl_logDEBUG2);
+
     if (m_done)
         return;
+
+    m_mediatorAddress = stunTransportHeader.locationEndpoint;
 
     m_timer->cancelSync();
 
@@ -208,6 +213,18 @@ void CrossNatConnector::onConnectResponse(
     const auto effectiveConnectTimeout = calculateTimeLeftForConnect();
     m_connectionParameters = response.params;
 
+    m_connectors = ConnectorFactory::createCloudConnectors(
+        m_targetPeerAddress,
+        m_connectSessionId,
+        response,
+        std::move(m_mediatorUdpClient->takeSocket()));
+    if (m_connectors.empty())
+    {
+        m_mediatorUdpClient.reset();
+        auto completionHandler = std::move(m_completionHandler);
+        return completionHandler(SystemError::hostUnreach, nullptr);
+    }
+
     startNatTraversing(
         effectiveConnectTimeout,
         std::move(response));
@@ -220,7 +237,9 @@ std::chrono::milliseconds CrossNatConnector::calculateTimeLeftForConnect()
     milliseconds effectiveConnectTimeout(0);
     if (m_connectTimeout)
     {
-        effectiveConnectTimeout = duration_cast<milliseconds>(m_timer->timeToEvent());
+        if (const auto timeToEvent = m_timer->timeToEvent())
+            effectiveConnectTimeout = duration_cast<milliseconds>(*timeToEvent);
+
         if (effectiveConnectTimeout == milliseconds::zero())
             effectiveConnectTimeout = milliseconds(1);   //< Zero timeout is infinity.
     }
@@ -232,14 +251,14 @@ void CrossNatConnector::startNatTraversing(
     std::chrono::milliseconds connectTimeout,
     api::ConnectResponse response)
 {
-    // Creating corresponding connectors.
-    m_connectors = ConnectorFactory::createCloudConnectors(
-        m_targetPeerAddress,
-        m_connectSessionId,
-        response,
-        std::move(m_mediatorUdpClient->takeSocket()));
+    NX_ASSERT(!m_connectors.empty());
     // TODO: #ak sorting connectors by priority
     m_mediatorUdpClient.reset();
+
+    NX_LOGX(lm("cross-nat %1. Starting %2 connectors")
+        .arg(m_connectSessionId).arg(m_connectors.size()),
+        cl_logDEBUG2);
+
     for (auto it = m_connectors.begin(); it != m_connectors.end(); ++it)
     {
         (*it)->bindToAioThread(getAioThread());
@@ -266,6 +285,11 @@ void CrossNatConnector::onConnectorFinished(
     SystemError::ErrorCode sysErrorCode,
     std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
 {
+    NX_LOGX(lm("cross-nat %1. Connector has finished with result: %2, %3")
+        .arg(m_connectSessionId).arg(QnLexical::serialized(resultCode))
+        .arg(SystemError::toString(sysErrorCode)),
+        cl_logDEBUG2);
+
     auto connector = std::move(*connectorIter);
     m_connectors.erase(connectorIter);
 
@@ -334,7 +358,7 @@ void CrossNatConnector::holePunchingDone(
     stun::Message connectResultReportMessage(
         stun::Header(
             stun::MessageClass::request,
-            stun::cc::methods::connectionResult));
+            stun::extension::methods::connectionResult));
     m_connectResultReport.serialize(&connectResultReportMessage);
     m_connectResultReportSender->sendMessage(
         m_mediatorAddress,

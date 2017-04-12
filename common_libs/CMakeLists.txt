@@ -1,18 +1,19 @@
-project(common_libs)
-set(PROJECT_SHORTNAME "common_libs")
-set(PROJECT_LONGNAME "${short.company.name} Common Libraries")
+add_subdirectory(nx_utils)
+add_subdirectory(nx_fusion)
+add_subdirectory(nx_streaming)
+add_subdirectory(nx_network)
+add_subdirectory(udt)
 
-add_definitions(-D_CONSOLE
-                )
+if(withDesktopClient OR withMobileClient)
+    add_subdirectory(nx_audio)
+    add_subdirectory(nx_media)
+    add_subdirectory(nx_vms_utils)
+endif()
 
-add_module(
-    NAMES
-        nx_audio
-        nx_email
-        nx_media
-        nx_network
-        nx_streaming
-        nx_utils
-        udt
-    STATUS_SHORT_NAMES
-)
+if(withMediaServer OR withDesktopClient)
+    add_subdirectory(nx_speech_synthesizer)
+endif()
+
+if(withMediaServer OR withClouds)
+    add_subdirectory(nx_email)
+endif()

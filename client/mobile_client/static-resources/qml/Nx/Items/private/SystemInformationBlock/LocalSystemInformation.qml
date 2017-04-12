@@ -9,7 +9,6 @@ Item
 
     property alias address: hostText.text
     property alias user: userText.text
-    property alias issue: issueLabel.text
 
     Column
     {
@@ -66,19 +65,6 @@ Item
 
             visible: user
         }
-    }
-
-    IssueLabel
-    {
-        id: issueLabel
-        anchors
-        {
-            bottom: parent.bottom
-            right: parent.right
-            rightMargin: -4
-        }
-        color: ColorTheme.red_main
-        visible: text
     }
 }
 

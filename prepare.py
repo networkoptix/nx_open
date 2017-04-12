@@ -52,6 +52,9 @@ def get_qmake_path(target, version):
     return path
 
 def create_qbs_wrapper(project_dir, profile):
+    if os.path.samefile(project_dir, os.getcwd()):
+        return
+
     file_name = "qbs.ini"
     config = ConfigParser.ConfigParser()
     if os.path.isfile(file_name):

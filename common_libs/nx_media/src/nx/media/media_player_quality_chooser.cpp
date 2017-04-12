@@ -107,7 +107,7 @@ static QSize transcodingResolution(
         NX_LOG(lit("[media_player] Custom resolution of %1p requested; "
             "desired resolution is %2 x %3:")
             .arg(videoQuality).arg(desiredResolution.width()).arg(desiredResolution.height()),
-            cl_logDEBUG2);
+            cl_logDEBUG1);
     }
     else
     {
@@ -115,7 +115,7 @@ static QSize transcodingResolution(
             "desired resolution is %2 x %3, limited to %4 x %5:")
             .arg(videoQuality).arg(desiredResolution.width()).arg(desiredResolution.height())
             .arg(result.width()).arg(result.height()),
-            cl_logDEBUG2);
+            cl_logDEBUG1);
     }
 
     return result;
@@ -150,7 +150,7 @@ static QSize applyTranscodingIfPossible(
     if (!isTranscodingSupported(liveMode, positionMs, camera))
     {
         NX_LOG(lit("[media_player] Transcoding not supported for the camera => Set low stream"),
-            cl_logDEBUG2);
+            cl_logDEBUG1);
         return QSize();
     }
 
@@ -160,12 +160,12 @@ static QSize applyTranscodingIfPossible(
         transcodingCodec, resolution))
     {
         NX_LOG(lit("[media_player] Transcoding to %1 x %2 not supported => Set low stream")
-            .arg(resolution.width()).arg(resolution.height()), cl_logDEBUG2);
+            .arg(resolution.width()).arg(resolution.height()), cl_logDEBUG1);
         return QSize();
     }
 
     NX_LOG(lit("[media_player] Set transcoding to %1 x %2")
-        .arg(resolution.width()).arg(resolution.height()), cl_logDEBUG2);
+        .arg(resolution.width()).arg(resolution.height()), cl_logDEBUG1);
     return resolution;
 }
 
@@ -197,7 +197,7 @@ QSize media_player_quality_chooser::chooseHighStreamIfPossible(
             NX_LOG(lit("[media_player] Panoramic camera: "
                 "High stream requested => Attempt transcoding to %2 x %3:")
                 .arg(resolution.width()).arg(resolution.height()),
-                cl_logDEBUG2);
+                cl_logDEBUG1);
 
             const QSize& quality = applyTranscodingIfPossible(
                 transcodingCodec, liveMode, positionMs, camera, resolution);
@@ -208,13 +208,13 @@ QSize media_player_quality_chooser::chooseHighStreamIfPossible(
             highCodec, highResolution))
         {
             NX_LOG(lit("[media_player] High stream requested => Set high stream"),
-                cl_logDEBUG2);
+                cl_logDEBUG1);
             return kQualityHigh;
         }
         else
         {
             NX_LOG(lit("[media_player] High stream requested but compatible decoder missing:"),
-                cl_logDEBUG2);
+                cl_logDEBUG1);
             const QSize& quality = applyTranscodingIfPossible(
                 transcodingCodec, liveMode, positionMs, camera, highResolution);
             if (quality.isValid())
@@ -224,7 +224,7 @@ QSize media_player_quality_chooser::chooseHighStreamIfPossible(
     else
     {
         NX_LOG(lit("[media_player] High stream requested but missing => Set low stream"),
-            cl_logDEBUG2);
+            cl_logDEBUG1);
     }
 
     return kQualityLow;
@@ -240,7 +240,7 @@ QSize media_player_quality_chooser::chooseVideoQuality(
     if (videoQuality == Player::LowIframesOnlyVideoQuality)
     {
         NX_LOG(lit("[media_player] Low stream I-frames only requested => Set low stream I-frames only"),
-            cl_logDEBUG2);
+            cl_logDEBUG1);
         return kQualityLowIframesOnly;
     }
 
@@ -268,7 +268,7 @@ QSize media_player_quality_chooser::chooseVideoQuality(
     }
     else if (lowStreamRequested)
     {
-        NX_LOG(lit("[media_player] Low stream requested => Set low stream"), cl_logDEBUG2);
+        NX_LOG(lit("[media_player] Low stream requested => Set low stream"), cl_logDEBUG1);
     }
     else if (videoQuality >= Player::CustomVideoQuality) //< Custom lines count requested.
     {
@@ -282,7 +282,7 @@ QSize media_player_quality_chooser::chooseVideoQuality(
     else
     {
         NX_LOG(lit("[media_player] Invalid video quality %1 => Set low stream")
-            .arg(videoQuality), cl_logDEBUG2);
+            .arg(videoQuality), cl_logDEBUG1);
     }
 
     return kQualityLow;

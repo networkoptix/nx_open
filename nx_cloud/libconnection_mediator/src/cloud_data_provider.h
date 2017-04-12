@@ -1,16 +1,21 @@
-#ifndef CLOUD_DATA_PROVIDER_H
-#define CLOUD_DATA_PROVIDER_H
+#pragma once
 
-#include <cdb/connection.h>
+#include <boost/optional.hpp>
+
+#include <QtCore/QUrl>
+
 #include <nx/utils/timer_manager.h>
 #include <nx/network/buffer.h>
 #include <nx/utils/thread/mutex.h>
 
+#include <cdb/connection.h>
 
 namespace nx {
 namespace hpm {
 
-//! Cloud DB data interface
+/**
+ * Cloud DB data interface.
+ */
 class AbstractCloudDataProvider
 {
 public:
@@ -32,19 +37,20 @@ public:
             bool mediatorEnabled_);
     };
 
-    virtual boost::optional< System > getSystem( const String& systemId ) const = 0;
+    virtual boost::optional< System > getSystem(const String& systemId) const = 0;
 };
 
 // for GMock only
-std::ostream& operator<<( std::ostream& os,
-                          const boost::optional< AbstractCloudDataProvider::System >& system );
+std::ostream& operator<<(
+    std::ostream& os,
+    const boost::optional< AbstractCloudDataProvider::System >& system);
 
 class AbstractCloudDataProviderFactory
 {
 public:
     typedef std::function<
         std::unique_ptr<AbstractCloudDataProvider>(
-            const std::string& address,
+            const boost::optional<QUrl>& cdbUrl,
             const std::string& user,
             const std::string& password,
             std::chrono::milliseconds updateInterval)> FactoryFunc;
@@ -52,28 +58,34 @@ public:
     virtual ~AbstractCloudDataProviderFactory() {}
 
     static std::unique_ptr<AbstractCloudDataProvider> create(
-        const std::string& address,
+        const boost::optional<QUrl>& cdbUrl,
         const std::string& user,
         const std::string& password,
         std::chrono::milliseconds updateInterval);
 
-    static void setFactoryFunc(FactoryFunc factoryFunc);
+    /**
+     * @return Initial factory func.
+     */
+    static FactoryFunc setFactoryFunc(FactoryFunc factoryFunc);
 };
 
-//! Cloud DB data interface over \class nx::cdb::api::ConnectionFactory
-class CloudDataProvider
-    : public AbstractCloudDataProvider
+/**
+ * Cloud DB data interface over nx::cdb::api::ConnectionFactory.
+ */
+class CloudDataProvider:
+    public AbstractCloudDataProvider
 {
 public:
     static const std::chrono::milliseconds DEFAULT_UPDATE_INTERVAL;
 
-    CloudDataProvider( const std::string& address,
-                       const std::string& user,
-                       const std::string& password,
-                       std::chrono::milliseconds updateInterval = DEFAULT_UPDATE_INTERVAL );
+    CloudDataProvider(
+        const boost::optional<QUrl>& cdbUrl,
+        const std::string& user,
+        const std::string& password,
+        std::chrono::milliseconds updateInterval = DEFAULT_UPDATE_INTERVAL);
     ~CloudDataProvider();
 
-    virtual boost::optional< System > getSystem( const String& systemId ) const override;
+    virtual boost::optional< System > getSystem(const String& systemId) const override;
 
 private:
     const std::chrono::milliseconds m_updateInterval;
@@ -92,5 +104,3 @@ private:
 
 } // namespace hpm
 } // namespace nx
-
-#endif // CLOUD_DATA_PROVIDER_H

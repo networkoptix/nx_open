@@ -21,8 +21,8 @@
 namespace nx {
 namespace utils {
 
-NX_UTILS_API void logError(const QnLogMessage& message);
-void NX_UTILS_API setErrorMonitor(std::function<void(const QnLogMessage&)> handler);
+NX_UTILS_API void logAssert(const QnLogMessage& message);
+void NX_UTILS_API setOnAssertHandler(std::function<void(const QnLogMessage&)> handler);
 
 template<typename Reason>
 QnLogMessage assertLog(const char* file, int line, const char* condition, const Reason& message)
@@ -35,7 +35,7 @@ QnLogMessage assertLog(const char* file, int line, const char* condition, const 
             .arg(file).arg(line).arg(condition).arg(message);
    #endif
 
-    logError(out);
+    logAssert(out);
     return out;
 }
 

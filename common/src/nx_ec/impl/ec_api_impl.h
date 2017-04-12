@@ -114,6 +114,12 @@ namespace ec2
 
     QString toString(ErrorCode errorCode);
 
+    enum class NotificationSource
+    {
+        Local,
+        Remote
+    };
+
     namespace impl
     {
         template<class Param1>

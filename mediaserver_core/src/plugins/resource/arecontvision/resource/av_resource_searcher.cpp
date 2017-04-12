@@ -41,21 +41,19 @@ QnPlArecontResourceSearcher::findResourceHelper(const MacArray &mac,
                                                 const SocketAddress &addr)
 {
     QnNetworkResourcePtr result;
-    auto rpRes = qnResPool->getResourceByUniqueId(QnMacAddress(mac.data()).toString());
+    QString macAddress = QnMacAddress(mac.data()).toString();
+    auto rpRes = qnResPool->getResourceByUniqueId<QnPlAreconVisionResource>(macAddress);
 
-    if (rpRes)  
+    if (rpRes)
+        result = QnNetworkResourcePtr(QnPlAreconVisionResource::createResourceByName(rpRes->getModel()));
+
+    if (result)
     {
-        result = QnNetworkResourcePtr(QnPlAreconVisionResource::createResourceByName(rpRes->getName()));
         result->setMAC(QnMacAddress(mac.data()));
         result->setHostAddress(addr.address.toString());
+        result.dynamicCast<QnPlAreconVisionResource>()->setModel(rpRes->getModel());
         result->setName(rpRes->getName());
-
-        auto rpAVres = rpRes.dynamicCast<QnPlAreconVisionResource>();
-        if (rpAVres)
-        {
-            (result.dynamicCast<QnPlAreconVisionResource>())->setModel(rpAVres->getModel());
-            result->setFlags(rpAVres->flags());
-        }
+        result->setFlags(rpRes->flags());
     }
     else 
     {

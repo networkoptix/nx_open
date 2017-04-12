@@ -16,8 +16,8 @@ class NX_NETWORK_API ConnectionAckRequest
     public StunRequestData
 {
 public:
-    constexpr static const stun::cc::methods::Value kMethod =
-        stun::cc::methods::connectionAck;
+    constexpr static const stun::extension::methods::Value kMethod =
+        stun::extension::methods::connectionAck;
 
     nx::String connectSessionId;
     ConnectionMethods connectionMethods;

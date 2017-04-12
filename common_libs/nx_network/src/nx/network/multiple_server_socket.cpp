@@ -10,7 +10,7 @@
 
 #define DEBUG_LOG(MESSAGE) do \
 { \
-    if (nx::network::SocketGlobals::debugConfiguration().multipleServerSocket) \
+    if (nx::network::SocketGlobals::debugConfig().multipleServerSocket) \
         NX_LOGX(MESSAGE, cl_logDEBUG1); \
 } while (0)
 
@@ -28,6 +28,9 @@ MultipleServerSocket::~MultipleServerSocket()
 {
     if (m_terminated)
         *m_terminated = true;
+
+    if (isInSelfAioThread())
+        stopWhileInAioThread();
 }
 
 // deliver option to every socket
@@ -48,8 +51,9 @@ MultipleServerSocket::~MultipleServerSocket()
 #define MultipleServerSocket_FORWARD_GET(NAME, TYPE)    \
     bool MultipleServerSocket::NAME(TYPE* value) const  \
     {                                                   \
-        boost::optional<TYPE> first;                    \
-        for (auto& socket : m_serverSockets)            \
+        TYPE firstValue;                                \
+        bool firstValueFilled = false;                  \
+        for (auto& socket: m_serverSockets)             \
         {                                               \
             if (!socket->NAME(value))                   \
             {                                           \
@@ -57,13 +61,16 @@ MultipleServerSocket::~MultipleServerSocket()
                 return false;                           \
             }                                           \
                                                         \
-            if (first)                                  \
-                NX_ASSERT(*first == *value,            \
-                    Q_FUNC_INFO, QString("%1 != %2")    \
-                        .arg(*first).arg(*value)        \
-                        .toStdString().c_str());        \
-            else                                        \
-                first = *value;                         \
+            if (!firstValueFilled)                      \
+            {                                           \
+                firstValue = *value;                    \
+                firstValueFilled = true;                \
+            }                                           \
+                                                        \
+            NX_ASSERT(firstValue == *value,             \
+                Q_FUNC_INFO, QString("%1 != %2")        \
+                    .arg(firstValue).arg(*value)        \
+                    .toStdString().c_str());            \
         }                                               \
                                                         \
         return true;                                    \
@@ -73,17 +80,14 @@ MultipleServerSocket_FORWARD_SET(bind, const SocketAddress&)
 
 SocketAddress MultipleServerSocket::getLocalAddress() const
 {
-    boost::optional<SocketAddress> first;
-    for (auto& socket : m_serverSockets)
+    for (auto& socket: m_serverSockets)
     {
-        const auto value = socket->getLocalAddress();
-        if (first)
-            NX_ASSERT(*first == value);
-        else
-            first = value;
+        const auto endpoint = socket->getLocalAddress();
+        if (endpoint.port > 0)
+            return endpoint;
     }
 
-    return *first;
+    return SocketAddress();
 }
 
 bool MultipleServerSocket::close()
@@ -162,14 +166,19 @@ AbstractSocket::SOCKET_HANDLE MultipleServerSocket::handle() const
 
 aio::AbstractAioThread* MultipleServerSocket::getAioThread() const
 {
-    return m_timerSocket.getAioThread();
+    return m_timer.getAioThread();
 }
 
 void MultipleServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    m_timerSocket.bindToAioThread(aioThread);
+    m_timer.bindToAioThread(aioThread);
     for (auto& socket : m_serverSockets)
         socket->bindToAioThread(aioThread);
+}
+
+bool MultipleServerSocket::isInSelfAioThread() const
+{
+    return m_timer.isInSelfAioThread();
 }
 
 MultipleServerSocket_FORWARD_SET(listen, int);
@@ -215,13 +224,20 @@ AbstractStreamSocket* MultipleServerSocket::accept()
 void MultipleServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     NX_LOGX(lm("Stopping..."), cl_logDEBUG2);
-    m_timerSocket.pleaseStop(
+    m_timer.pleaseStop(
         [this, handler = std::move(handler)]()
         {
-            NX_LOGX(lm("Stopped"), cl_logDEBUG1);
-            m_serverSockets.clear();
+            stopWhileInAioThread();
             handler();
         });
+}
+
+void MultipleServerSocket::pleaseStopSync(bool assertIfCalledUnderLock)
+{
+    if (m_timer.isInSelfAioThread())
+        stopWhileInAioThread();
+    else
+        QnStoppableAsync::pleaseStopSync(assertIfCalledUnderLock);
 }
 
 Pollable* MultipleServerSocket::pollable()
@@ -232,12 +248,12 @@ Pollable* MultipleServerSocket::pollable()
 
 void MultipleServerSocket::post(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    m_timerSocket.post(std::move(handler));
+    m_timer.post(std::move(handler));
 }
 
 void MultipleServerSocket::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    m_timerSocket.dispatch(std::move(handler));
+    m_timer.dispatch(std::move(handler));
 }
 
 void MultipleServerSocket::acceptAsync(
@@ -252,7 +268,7 @@ void MultipleServerSocket::acceptAsync(
 
         if (m_recvTmeout)
         {
-            m_timerSocket.start(
+            m_timer.start(
                 std::chrono::milliseconds(m_recvTmeout),
                 std::bind(
                     &MultipleServerSocket::accepted, this,
@@ -301,20 +317,21 @@ void MultipleServerSocket::cancelIOSync()
     ioCancelledPromise.get_future().wait();
 }
 
-MultipleServerSocket::ServerSocketHandle::ServerSocketHandle(
-        std::unique_ptr<AbstractStreamServerSocket> socket_)
-    : socket(std::move(socket_))
-    , isAccepting(false)
+MultipleServerSocket::ServerSocketContext::ServerSocketContext(
+    std::unique_ptr<AbstractStreamServerSocket> socket_)
+    :
+    socket(std::move(socket_)),
+    isAccepting(false)
 {
 }
 
 AbstractStreamServerSocket*
-    MultipleServerSocket::ServerSocketHandle::operator->() const
+    MultipleServerSocket::ServerSocketContext::operator->() const
 {
     return socket.get();
 }
 
-void MultipleServerSocket::ServerSocketHandle::stopAccepting()
+void MultipleServerSocket::ServerSocketContext::stopAccepting()
 {
     if (!isAccepting)
         return;
@@ -339,13 +356,13 @@ bool MultipleServerSocket::addSocket(
             // all internal sockets are used in non blocking mode while
             // interface allows both
 
-            socket->bindToAioThread(m_timerSocket.getAioThread());
-            m_serverSockets.push_back(ServerSocketHandle(std::move(socket)));
+            socket->bindToAioThread(m_timer.getAioThread());
+            m_serverSockets.push_back(ServerSocketContext(std::move(socket)));
             if (m_acceptHandler)
             {
-                ServerSocketHandle& source = m_serverSockets.back();
+                ServerSocketContext& source = m_serverSockets.back();
                 source.isAccepting = true;
-                DEBUG_LOG(lm("Accept on source(%1) when added").arg(&source));
+                NX_LOGX(lm("Accept on source(%1) when added").arg(&source), cl_logDEBUG1);
 
                 using namespace std::placeholders;
                 source->acceptAsync(std::bind(
@@ -366,8 +383,16 @@ void MultipleServerSocket::removeSocket(size_t pos)
     dispatch(
         [this, &socketRemovedPromise, pos]()
         {
-            auto serverSocketContext = std::move(m_serverSockets[pos]);
-            m_serverSockets.erase(m_serverSockets.begin()+pos);
+            if (pos >= m_serverSockets.size())
+            {
+                NX_ASSERT(false, lm("pos = %1, m_serverSockets.size() = %2")
+                    .arg(pos).arg(m_serverSockets.size()));
+                return;
+            }
+
+            auto itemToRemoveIter = std::next(m_serverSockets.begin(), pos);
+            auto serverSocketContext = std::move(*itemToRemoveIter);
+            m_serverSockets.erase(itemToRemoveIter);
             serverSocketContext.socket->pleaseStopSync();
 
             NX_LOGX(lm("Socket(%1) is removed").arg(serverSocketContext.socket), cl_logDEBUG1);
@@ -383,7 +408,7 @@ size_t MultipleServerSocket::count() const
 }
 
 void MultipleServerSocket::accepted(
-    ServerSocketHandle* source,
+    ServerSocketContext* source,
     SystemError::ErrorCode code,
     AbstractStreamSocket* rawSocket)
 {
@@ -393,8 +418,14 @@ void MultipleServerSocket::accepted(
 
     if (source)
     {
+        NX_CRITICAL(
+            std::find_if(
+                m_serverSockets.begin(), m_serverSockets.end(),
+                [source](ServerSocketContext& item) { return source == &item; }) != 
+            m_serverSockets.end());
+
         source->isAccepting = false;
-        m_timerSocket.cancelSync(); // will not block, we are in IO thread
+        m_timer.cancelSync(); // will not block, we are in IO thread
     }
 
     auto handler = std::move(m_acceptHandler);
@@ -417,9 +448,18 @@ void MultipleServerSocket::accepted(
 void MultipleServerSocket::cancelIoFromAioThread()
 {
     m_acceptHandler = nullptr;
-    m_timerSocket.cancelSync();
+    m_timer.cancelSync();
     for (auto& socketContext: m_serverSockets)
         socketContext.stopAccepting();
+}
+
+void MultipleServerSocket::stopWhileInAioThread()
+{
+    NX_LOGX(lm("Stopped"), cl_logDEBUG1);
+    m_serverSockets.clear();
+
+    NX_ASSERT(m_timer.isInSelfAioThread());
+    m_timer.pleaseStopSync(false);
 }
 
 } // namespace network

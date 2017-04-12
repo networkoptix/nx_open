@@ -13,7 +13,7 @@ namespace utils {
 namespace test {
 
 /**
- * Added to help create functional tests when each test want to start process from scratch.
+ * Added to help create functional tests when each test wants to start process from scratch.
  */
 template<typename ModuleProcessType>
 class ModuleLauncher

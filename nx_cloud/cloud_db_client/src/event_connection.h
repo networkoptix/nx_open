@@ -9,7 +9,7 @@
 
 #include <QtCore/QObject>
 
-#include <nx/network/cloud/cdb_endpoint_fetcher.h>
+#include <nx/network/cloud/cloud_module_url_fetcher.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/network/retry_timer.h>
@@ -21,24 +21,23 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-class CloudModuleEndPointFetcher;
+class CloudModuleUrlFetcher;
 
 }   //namespace cloud
 }   //namespace network
 
 namespace cdb {
-namespace cl {
+namespace client {
 
-class EventConnection
-:
+class EventConnection:
     public QObject,
     public api::EventConnection
 {
 public:
     EventConnection(
-        network::cloud::CloudModuleEndPointFetcher* const endPointFetcher);
-        virtual ~EventConnection();
-
+        network::cloud::CloudModuleUrlFetcher* const endPointFetcher);
+    virtual ~EventConnection();
+        
     virtual void start(
         api::SystemEventHandlers eventHandlers,
         std::function<void(api::ResultCode)> completionHandler) override;
@@ -53,7 +52,7 @@ private:
         failed
     };
 
-    std::unique_ptr<network::cloud::CloudModuleEndPointFetcher::ScopedOperation>
+    std::unique_ptr<network::cloud::CloudModuleUrlFetcher::ScopedOperation>
         m_cdbEndPointFetcher;
     nx_http::AuthInfo m_auth;
     nx_http::AsyncHttpClientPtr m_httpClient;
@@ -62,11 +61,11 @@ private:
     std::shared_ptr<nx_http::MultipartContentParser> m_multipartContentParser;
     network::RetryTimer m_reconnectTimer;
     State m_state;
-    SocketAddress m_cdbEndpoint;
+    QUrl m_cdbUrl;
 
     void cdbEndpointResolved(
         nx_http::StatusCode::Value resCode,
-        SocketAddress endpoint);
+        QUrl url);
     void initiateConnection();
     void connectionAttemptHasFailed(api::ResultCode result);
 
@@ -76,13 +75,13 @@ private:
         const std::string& proxyHost,
         std::uint16_t proxyPort) override;
 
-private slots:
+private:
     void onHttpResponseReceived(nx_http::AsyncHttpClientPtr);
     void onSomeMessageBodyAvailable(nx_http::AsyncHttpClientPtr);
     void onHttpClientDone(nx_http::AsyncHttpClientPtr);
     void onReceivingSerializedEvent(QByteArray serializedEvent);
 };
 
-}   //namespace cl
+}   //namespace client
 }   //namespace cdb
 }   //namespace nx

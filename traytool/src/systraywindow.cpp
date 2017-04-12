@@ -257,7 +257,7 @@ void QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE handle, DWORD status, 
         startAction->setEnabled(true);
 
         action = startAction;
-        suffix = tr(" (stopped)");
+        suffix = tr("stopped");
         break;
     case SERVICE_START_PENDING:
         stopAction->setVisible(false);
@@ -265,7 +265,7 @@ void QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE handle, DWORD status, 
         startAction->setEnabled(false);
 
         action = startAction;
-        suffix = tr(" (starting)");
+        suffix = tr("starting");
         break;
     case SERVICE_STOP_PENDING:
         stopAction->setVisible(true);
@@ -273,7 +273,7 @@ void QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE handle, DWORD status, 
         startAction->setVisible(false);
 
         action = stopAction;
-        suffix = tr(" (stopping)");
+        suffix = tr("stopping");
         break;
     case SERVICE_RUNNING:
         stopAction->setVisible(true);
@@ -281,7 +281,7 @@ void QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE handle, DWORD status, 
         startAction->setVisible(false);
 
         action = stopAction;
-        suffix = tr(" (started)");
+        suffix = tr("started");
         break;
     case SERVICE_CONTINUE_PENDING:
         stopAction->setVisible(true);
@@ -289,7 +289,7 @@ void QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE handle, DWORD status, 
         startAction->setVisible(false);
 
         action = stopAction;
-        suffix = tr(" (resuming)");
+        suffix = tr("resuming");
         break;
     case SERVICE_PAUSED:
         stopAction->setVisible(false);
@@ -297,7 +297,7 @@ void QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE handle, DWORD status, 
         startAction->setEnabled(true);
 
         action = startAction;
-        suffix = tr(" (paused)");
+        suffix = tr("paused");
         break;
     case SERVICE_PAUSE_PENDING:
         stopAction->setVisible(false);
@@ -305,7 +305,7 @@ void QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE handle, DWORD status, 
         startAction->setEnabled(false);
 
         action = startAction;
-        suffix = tr(" (pausing)");
+        suffix = tr("pausing");
         break;
     default:
         break;
@@ -321,7 +321,9 @@ void QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE handle, DWORD status, 
             action->setProperty(originalTitlePropertyName, title);
         }
 
-        action->setText(title + suffix);
+        if (!suffix.isEmpty())
+            title = lit("%1 (%2)").arg(title).arg(suffix);
+        action->setText(title);
     }
 }
 

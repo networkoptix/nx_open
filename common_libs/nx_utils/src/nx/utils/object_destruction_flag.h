@@ -1,40 +1,34 @@
-/**********************************************************
-* Apr 15, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
-
 
 namespace nx {
 namespace utils {
 
-/** \a ObjectDestructionFlag and \a ObjectDestructionFlag::Watcher are used to allow "this" destruction in some event handler.
-    Example:
-    \code{.cpp}
-        class SomeProtocolClient
-        {
-            //..
-        private:
-            //...
-            ObjectDestructionFlag m_destructionFlag;
-        }
+/**
+ * ObjectDestructionFlag and ObjectDestructionFlag::Watcher are used to allow 
+ * "this" destruction in some event handler.
+ * Example:
+ * @code{.cpp}
+ * class SomeProtocolClient
+ * {
+ *     //..
+ * private:
+ *     //...
+ *     ObjectDestructionFlag m_destructionFlag;
+ * }
 
-        void SomeProtocolClient::readFromSocket(...)
-        {
-            //...
-            ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
-            eventHandler(); //this handler can free this object
-            if (watcher.objectDestroyed())
-                return; //"this" has been destroyed, but watcher is still valid sine created on stack
-            //...
-        }
-    \endcode
-*/
+ * void SomeProtocolClient::readFromSocket(...)
+ * {
+ *     //...
+ *     ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+ *     eventHandler(); //this handler can free this object
+ *     if (watcher.objectDestroyed())
+ *         return; //"this" has been destroyed, but watcher is still valid sine created on stack
+ *     //...
+ * }
+ * @endcode
+ */
 class ObjectDestructionFlag
 {
-    friend class Watcher;
-
     enum class ControlledObjectState
     {
         alive = 0,
@@ -43,8 +37,7 @@ class ObjectDestructionFlag
     };
 
 public:
-    ObjectDestructionFlag()
-    :
+    ObjectDestructionFlag():
         m_valuePtr(nullptr)
     {
     }
@@ -64,15 +57,13 @@ public:
             *m_valuePtr = ControlledObjectState::markedForDeletion;
     }
 
-
     /**
-        \note Objects operating with same flag must not overlap
-    */
+     * @note Objects operating with same flag must not overlap
+     */
     class Watcher
     {
     public:
-        Watcher(ObjectDestructionFlag* const flag)
-        :
+        Watcher(ObjectDestructionFlag* const flag):
             m_localValue(ControlledObjectState::alive),
             m_objectDestructionFlag(flag)
         {
@@ -85,7 +76,7 @@ public:
         ~Watcher()
         {
             if (m_localValue == ControlledObjectState::deleted)
-                return; //object has been destroyed and m_objectDestructionFlag is invalid
+                return; //< Object has been destroyed and m_objectDestructionFlag is invalid.
             m_objectDestructionFlag->m_valuePtr = nullptr;
         }
 
@@ -103,5 +94,5 @@ private:
     ControlledObjectState* m_valuePtr;
 };
 
-}   // namespace nx
-}   // namespace utils
+} // namespace nx
+} // namespace utils

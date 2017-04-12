@@ -236,10 +236,10 @@ static const QString ENABLED        = lit("NewEnabled");
 static const QString DESCRIPTION    = lit("NewPortMappingDescription");
 static const QString DURATION       = lit("NewLeaseDuration");
 
-void AsyncClient::externalIp( const QUrl& url,
-                              std::function< void( const HostAddress& ) > callback )
+void AsyncClient::externalIp(
+    const QUrl& url, std::function< void( const HostAddress& ) > callback )
 {
-    AsyncClient::Message request = { GET_EXTERNAL_IP, WAN_IP };
+    AsyncClient::Message request = { GET_EXTERNAL_IP, WAN_IP, {} };
     doUpnp( url, request, [callback]( const Message& response ) {
         callback( response.getParam( EXTERNAL_IP ) );
     } );

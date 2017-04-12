@@ -12,34 +12,28 @@
             UpgradeCode="$(var.clientBundleUpgradeCode)"
             DisableModify="yes">
         <util:RegistrySearchRef Id='ArchRegistrySearch' />
+        <util:ProductSearchRef Id='ClientMsiVersion' />
+        <util:ProductSearchRef Id='ServerMsiVersion2' />
 
         <Variable Name="InstallClientOnly" Type="numeric" Value="1" />
 
         <BootstrapperApplicationRef Id="WixExtendedBootstrapperApplication.HyperlinkLicense">
             <Payload SourceFile="License.html" />
             <Payload SourceFile="installer_bg.png" />
-            <Payload SourceFile="logo_big.png" />
-            <Payload SourceFile="logo_small.png" />
+            <Payload SourceFile="logo-102x102.png" />
+            <Payload SourceFile="logo-64x64.png" />
 
             <bal:WixExtendedBootstrapperApplication
                 SuppressOptionsUI="yes"
                 LicenseUrl="License.html" 
                 ShowFilesInUse="yes"
-                LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"/>
-<!--            <bal:WixStandardBootstrapperApplication
-                LicenseUrl="License.html"
-                LogoFile="logo-64x64.png"
-        ThemeFile="ClassicTheme.xml"
-            LocalizationFile="ClassicTheme.wxl"
                 SuppressRepair="yes"
-                SuppressOptionsUI="no"
-                ShowFilesInUse="yes"
-                LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"
-            /> -->
+                LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"/>
         </BootstrapperApplicationRef>
 
+        <Variable Name="InstallerTitle" Value="!(loc.InstallerTitleClientOnly)" />
         <WixVariable Id="WixExtbaThemeXml" Value="OptixTheme.xml" />
-        <WixVariable Id="WixExtbaThemeWxl" Value="OptixTheme.wxl" />
+        <WixVariable Id="WixExtbaThemeWxl" Value="OptixTheme_$(var.installerLanguage).wxl" />
 
         <Chain DisableSystemRestore="yes">
             <PackageGroupRef Id="ClientPackageGroup"/>

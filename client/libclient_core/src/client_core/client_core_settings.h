@@ -5,6 +5,7 @@
 #include <client_core/local_connection_data.h>
 #include <client/forgotten_systems_manager.h>
 #include <watchers/cloud_status_watcher.h>
+#include <utils/common/encoded_credentials.h>
 
 class QSettings;
 
@@ -19,6 +20,7 @@ public:
     enum PropertyIdentifier
     {
         RecentLocalConnections,
+        SystemAuthenticationData,
         LocalSystemWeightsData,
         CdbEndpoint,
         CloudLogin,
@@ -31,6 +33,10 @@ public:
 
         PropertiesCount
     };
+
+    using SystemAuthenticationDataHash = QHash<QnUuid, QList<QnEncodedCredentials>>;
+    using RecentLocalConnectionsHash = QHash<QnUuid, nx::client::core::LocalConnectionData>;
+    using WeightDataList = QList<nx::client::core::WeightData>;
 
 public:
     QnClientCoreSettings(QObject* parent = nullptr);
@@ -51,12 +57,15 @@ public:
 
 private:
     QN_BEGIN_PROPERTY_STORAGE(PropertiesCount)
-        QN_DECLARE_RW_PROPERTY(QnLocalConnectionDataList,
-            recentLocalConnections, setRecentLocalConnections,
-            RecentLocalConnections, QnLocalConnectionDataList())
-        QN_DECLARE_RW_PROPERTY(QnWeightDataList,
+        QN_DECLARE_RW_PROPERTY(SystemAuthenticationDataHash,
+            systemAuthenticationData, setSystemAuthenticationData,
+            SystemAuthenticationData, SystemAuthenticationDataHash())
+        QN_DECLARE_RW_PROPERTY(RecentLocalConnectionsHash,
+           recentLocalConnections, setRecentLocalConnections,
+           RecentLocalConnections, RecentLocalConnectionsHash())
+        QN_DECLARE_RW_PROPERTY(WeightDataList,
             localSystemWeightsData, setLocalSystemWeightsData,
-            LocalSystemWeightsData, QnWeightDataList())
+            LocalSystemWeightsData, WeightDataList())
         QN_DECLARE_RW_PROPERTY(QString,
             cdbEndpoint, setCdbEndpoint,
             CdbEndpoint, QString())

@@ -1,5 +1,7 @@
 import QtQuick 2.6
 import Nx 1.0
+import Nx.Core 1.0
+import Nx.Media 1.0
 import Nx.Items 1.0
 import com.networkoptix.qml 1.0
 
@@ -12,9 +14,11 @@ Object
     readonly property bool serverOffline:
         connectionManager.connectionState === QnConnectionManager.Reconnecting
     readonly property bool cameraOffline:
-        mediaPlayer.liveMode && resourceHelper.resourceStatus == QnMediaResourceHelper.Offline
+        mediaPlayer.liveMode
+            && resourceHelper.resourceStatus === MediaResourceHelper.Offline
     readonly property bool cameraUnauthorized:
-        mediaPlayer.liveMode && resourceHelper.resourceStatus == QnMediaResourceHelper.Unauthorized
+        mediaPlayer.liveMode
+            && resourceHelper.resourceStatus === MediaResourceHelper.Unauthorized
     readonly property bool failed: mediaPlayer.failed
     readonly property bool offline: serverOffline || cameraOffline
 
@@ -36,14 +40,46 @@ Object
     property alias accessRightsHelper: accessRightsHelper
     property alias mediaPlayer: mediaPlayer
 
+    signal playerJump(real position)
+    signal gotFirstPosition(real position)
+
     QtObject
     {
         id: d
+
+        readonly property bool applicationActive: Qt.application.state === Qt.ApplicationActive
+
         property bool resumeOnActivate: false
-        property bool resumeAtLive: false
+        property bool resumeOnOnline: false
+        property real lastPosition: -1
+        property bool waitForLastPosition: false
+        property bool waitForFirstPosition: true
+
+        function savePosition()
+        {
+            lastPosition = mediaPlayer.liveMode ? -1 : mediaPlayer.position
+            waitForLastPosition = true
+        }
+
+        onApplicationActiveChanged:
+        {
+            if (!Utils.isMobile())
+                return
+
+            if (applicationActive)
+            {
+                if (d.resumeOnActivate)
+                    mediaPlayer.play()
+            }
+            else
+            {
+                d.resumeOnActivate = mediaPlayer.playing
+                mediaPlayer.pause()
+            }
+        }
     }
 
-    QnMediaResourceHelper
+    MediaResourceHelper
     {
         id: resourceHelper
     }
@@ -60,25 +96,19 @@ Object
         resourceId: resourceHelper.resourceId
         onPlayingChanged: setKeepScreenOn(playing)
         maxTextureSize: getMaxTextureSize()
-    }
-
-    Connections
-    {
-        target: Qt.application
-        onStateChanged:
+        onPositionChanged:
         {
-            if (!Utils.isMobile())
-                return
-
-            if (Qt.application.state == Qt.ApplicationActive)
+            if (d.waitForLastPosition)
             {
-                if (d.resumeOnActivate)
-                    mediaPlayer.play()
+                d.lastPosition = position
+                d.waitForLastPosition = false
             }
-            else
+
+            if (d.waitForFirstPosition)
             {
-                d.resumeOnActivate = mediaPlayer.playing
-                mediaPlayer.pause()
+                playerJump(mediaPlayer.position)
+                d.waitForFirstPosition = false
+                gotFirstPosition(mediaPlayer.position)
             }
         }
     }
@@ -86,15 +116,68 @@ Object
     onFailedChanged:
     {
         if (failed)
+        {
+            d.resumeOnOnline = offline
             mediaPlayer.stop()
+        }
+    }
+
+    onOfflineChanged:
+    {
+        if (!offline && d.resumeOnOnline)
+        {
+            d.resumeOnOnline = false
+            mediaPlayer.play()
+        }
+    }
+
+    onResourceIdChanged:
+    {
+        playerJump(d.lastPosition)
+        mediaPlayer.position = d.lastPosition
+        d.waitForFirstPosition = true
     }
 
     Component.onCompleted:
     {
-        if (cameraOffline || cameraUnauthorized || resourceId == "")
+        if (cameraOffline || cameraUnauthorized || resourceId === "")
             return
 
         mediaPlayer.playLive()
     }
     Component.onDestruction: setKeepScreenOn(false)
+
+    function play()
+    {
+        mediaPlayer.play()
+        d.savePosition()
+    }
+
+    function playLive()
+    {
+        mediaPlayer.position = -1
+        play()
+    }
+
+    function stop()
+    {
+        mediaPlayer.stop()
+    }
+
+    function pause()
+    {
+        mediaPlayer.pause()
+    }
+
+    function preview()
+    {
+        mediaPlayer.preview()
+    }
+
+    function setPosition(position, savePosition)
+    {
+        mediaPlayer.position = position
+        if (savePosition)
+            d.savePosition()
+    }
 }

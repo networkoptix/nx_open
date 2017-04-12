@@ -1,10 +1,4 @@
-/**********************************************************
-* 7 may 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef CDB_ACCOUNT_DATA_H
-#define CDB_ACCOUNT_DATA_H
+#pragma once
 
 #include <QtCore/QUrlQuery>
 
@@ -18,23 +12,30 @@
 #include <cloud_db_client/src/data/account_data.h>
 #include <plugins/videodecoder/stree/resourcecontainer.h>
 
-
 namespace nx {
 namespace cdb {
 namespace data {
 
-class AccountData
-:
+class AccountRegistrationData:
+    public api::AccountRegistrationData,
+    public stree::AbstractResourceReader
+{
+public:
+    virtual bool getAsVariant(int resID, QVariant* const value) const override;
+};
+
+class AccountData:
     public api::AccountData,
     public stree::AbstractResourceReader
 {
 public:
-    //!Implementation of \a stree::AbstractResourceReader::getAsVariant
+    AccountData() = default;
+    AccountData(AccountRegistrationData registrationData);
+
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
 };
 
-class AccountConfirmationCode
-:
+class AccountConfirmationCode:
     public api::AccountConfirmationCode,
     public stree::AbstractResourceReader
 {
@@ -42,8 +43,7 @@ public:
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
 };
 
-class AccountUpdateData
-:
+class AccountUpdateData:
     public api::AccountUpdateData,
     public stree::AbstractResourceReader
 {
@@ -51,8 +51,7 @@ public:
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
 };
 
-class AccountUpdateDataWithEmail
-:
+class AccountUpdateDataWithEmail:
     public AccountUpdateData
 {
 public:
@@ -62,8 +61,7 @@ public:
     AccountUpdateDataWithEmail(AccountUpdateData&& rhs);
 };
 
-class AccountEmail
-:
+class AccountEmail:
     public api::AccountEmail,
     public stree::AbstractResourceReader
 {
@@ -71,8 +69,7 @@ public:
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
 };
 
-class TemporaryCredentialsParams
-:
+class TemporaryCredentialsParams:
     public api::TemporaryCredentialsParams,
     public stree::AbstractResourceReader,
     public stree::AbstractResourceWriter
@@ -138,8 +135,6 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 //    (AccountUpdateDataWithEmail),
 //    (sql_record))
 
-}   //data
-}   //cdb
-}   //nx
-
-#endif  //CDB_ACCOUNT_DATA_H
+} // namespace data
+} // namespace cdb
+} // namespace nx

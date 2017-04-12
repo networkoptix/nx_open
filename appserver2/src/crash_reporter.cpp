@@ -91,6 +91,8 @@ CrashReporter::~CrashReporter()
         QnMutexLocker lock(&m_mutex);
         std::swap(httpClient, m_activeHttpClient);
     }
+    if (httpClient)
+        httpClient->pleaseStopSync();
 }
 
 bool CrashReporter::scanAndReport(QSettings* settings)
@@ -174,6 +176,12 @@ void CrashReporter::scanAndReportAsync(QSettings* settings)
 
 void CrashReporter::scanAndReportByTimer(QSettings* settings)
 {
+    if (nx::utils::AppInfo::applicationVersion().endsWith(lit(".0")))
+    {
+        NX_LOGX(lm("Sending is disabled for developer builds (buildNumber=0)"), cl_logINFO);
+        return;
+    }
+
     scanAndReportAsync(settings);
 
     QnMutexLocker lk(&m_mutex);

@@ -19,14 +19,15 @@ public:
 
     virtual ~QnSystemsFinder();
 
+    void addSystemsFinder(QnAbstractSystemsFinder *finder,
+        int priority);
+
 public: //overrides
     SystemDescriptionList systems() const override;
 
     QnSystemDescriptionPtr getSystem(const QString& id) const override;
 
 private:
-    void addSystemsFinder(QnAbstractSystemsFinder *finder,
-        int priority);
 
     void onBaseSystemDiscovered(const QnSystemDescriptionPtr& system,
         int priority);

@@ -12,6 +12,7 @@
 #include <utils/common/sync_call.h>
 
 #include <listening_peer_pool.h>
+#include <mediator_service.h>
 #include <test_support/mediaserver_emulator.h>
 
 #include "functional_tests/mediator_functional_test.h"
@@ -21,8 +22,7 @@ namespace nx {
 namespace hpm {
 namespace test {
 
-class ListeningPeer
-:
+class ListeningPeer:
     public MediatorFunctionalTest
 {
 };
@@ -46,7 +46,7 @@ TEST_F(ListeningPeer, connection_override)
     //TODO #ak checking that server2 connection has overridden server1 
         //since both servers have same server id
 
-    auto dataLocker = nx::hpm::ListeningPeerPool::instance()->
+    auto dataLocker = moduleInstance()->impl()->listeningPeerPool()->
         findAndLockPeerDataByHostName(server1->serverId()+"."+system1.id);
     ASSERT_TRUE(static_cast<bool>(dataLocker));
     auto strongConnectionRef = dataLocker->value().peerConnection.lock();
@@ -97,7 +97,7 @@ TEST_F(ListeningPeer, peer_disconnect)
     std::tie(statusCode, listeningPeers) = getListeningPeers();
     ASSERT_EQ(nx_http::StatusCode::ok, statusCode);
 
-    ASSERT_EQ(1, listeningPeers.systems.size());
+    ASSERT_EQ(1U, listeningPeers.systems.size());
 
     server1.reset();
 

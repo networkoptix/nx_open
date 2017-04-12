@@ -23,6 +23,7 @@ typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
 #include <client/client_globals.h>
 #include <client/client_color_types.h>
 #include <camera/resource_display.h> //< TODO: #Elric FWD!
+#include <ui/common/speed_range.h>
 #include <ui/customization/customized.h>
 #include <utils/license_usage_helper.h>
 #include <utils/color_space/image_correction.h>
@@ -126,6 +127,9 @@ public:
     void setZoomWindowCreationModeEnabled(bool enabled);
     void setMotionSearchModeEnabled(bool enabled);
 
+    QnSpeedRange speedRange() const;
+    static const QnSpeedRange& availableSpeedRange();
+
 signals:
     void motionSelectionChanged();
     void displayChanged();
@@ -148,6 +152,9 @@ protected:
     virtual QString calculateTitleText() const override;
     virtual int calculateButtonsVisibility() const override;
     virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const override;
+
+    virtual Qn::ResourceOverlayButton calculateOverlayButton(
+        Qn::ResourceStatusOverlay statusOverlay) const override;
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
@@ -180,6 +187,7 @@ protected:
     virtual void updateHud(bool animate);
 
     void ensureTwoWayAudioWidget();
+    bool animationAllowed() const;
 
 private slots:
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
@@ -215,7 +223,6 @@ private:
     Q_SLOT void updateDewarpingParams();
     Q_SLOT void updateCustomAspectRatio();
     Q_SLOT void updateIoModuleVisibility(bool animate);
-    Q_SLOT void updateOverlayButton(Qn::ResourceStatusOverlay statusOverlay);
 
     void updateCompositeOverlayMode();
 

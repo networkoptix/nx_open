@@ -24,47 +24,11 @@
     </message>
     <message>
         <source>UAC must be enabled to request privileges for non-admin users.</source>
-        <translation>Контроль учетных записей (UAC) должен быть включен для запроса привилегий пользователей.</translation>
+        <translation>Контроль учетных записей (UAC) должен быть включён для запроса привилегий пользователей.</translation>
     </message>
 </context>
 <context>
     <name>QnSystrayWindow</name>
-    <message>
-        <source>No %1 services installed</source>
-        <translation>Сервисы %1 не установлены</translation>
-    </message>
-    <message>
-        <source> (stopped)</source>
-        <translation> (остановлен)</translation>
-    </message>
-    <message>
-        <source> (starting)</source>
-        <translation> (запускается)</translation>
-    </message>
-    <message>
-        <source> (stopping)</source>
-        <translation> (заканчивает работу)</translation>
-    </message>
-    <message>
-        <source> (started)</source>
-        <translation> (запущен)</translation>
-    </message>
-    <message>
-        <source> (resuming)</source>
-        <translation> (возобновляется)</translation>
-    </message>
-    <message>
-        <source> (paused)</source>
-        <translation> (пауза)</translation>
-    </message>
-    <message>
-        <source> (pausing)</source>
-        <translation> (приостанавливается)</translation>
-    </message>
-    <message>
-        <source>&amp;Quit</source>
-        <translation>&amp;Выход</translation>
-    </message>
     <message>
         <source>Access denied.</source>
         <translation>В доступе отказано.</translation>
@@ -82,36 +46,72 @@
         <translation>Невозможно получить доступ к установленным сервисам</translation>
     </message>
     <message>
+        <source>No %1 services installed</source>
+        <translation>Сервисы %1 не установлены</translation>
+    </message>
+    <message>
+        <source>&amp;Quit</source>
+        <translation>&amp;Выход</translation>
+    </message>
+    <message>
         <source>An error has occurred while trying to access installed services:</source>
         <translation>Ошибка при попытке доступа к следующим сервисам:</translation>
     </message>
     <message>
         <source>Server has been stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер остановлен</translation>
     </message>
     <message>
         <source>Server has been started</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер запущен</translation>
     </message>
     <message>
         <source>Server will be stopped. Continue?</source>
-        <translation type="unfinished">Медиасервер будет остановлен. Продолжить?</translation>
+        <translation>Сервер будет остановлен. Продолжить?</translation>
     </message>
     <message>
         <source>Show Server Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать журнал сервера</translation>
     </message>
     <message>
         <source>Start Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Запустить сервер</translation>
     </message>
     <message>
         <source>Stop Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Остановить сервер</translation>
     </message>
     <message>
         <source>Server Web Page</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть web-страницу сервера</translation>
+    </message>
+    <message>
+        <source>stopped</source>
+        <translation>остановлен</translation>
+    </message>
+    <message>
+        <source>starting</source>
+        <translation>запускается</translation>
+    </message>
+    <message>
+        <source>stopping</source>
+        <translation>заканчивает работу</translation>
+    </message>
+    <message>
+        <source>started</source>
+        <translation>запущен</translation>
+    </message>
+    <message>
+        <source>resuming</source>
+        <translation>возобновляется</translation>
+    </message>
+    <message>
+        <source>paused</source>
+        <translation>приостановлен</translation>
+    </message>
+    <message>
+        <source>pausing</source>
+        <translation>приостанавливается</translation>
     </message>
 </context>
 </TS>

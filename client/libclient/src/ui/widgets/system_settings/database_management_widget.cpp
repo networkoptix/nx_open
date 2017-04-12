@@ -16,6 +16,7 @@
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_dialog.h>
+#include <ui/dialogs/common/file_messages.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <ui/dialogs/common/session_aware_dialog.h>
@@ -30,7 +31,7 @@ QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent):
     ui(new Ui::DatabaseManagementWidget())
 {
     ui->setupUi(this);
-    ui->labelWidget->setText(tr("You can create a backup for system configurations that can be restored in case of failure."));
+    ui->labelWidget->setText(tr("You can create a backup for System configurations that can be restored in case of failure."));
 
     setHelpTopic(this, Qn::SystemSettings_Server_Backup_Help);
 
@@ -70,10 +71,7 @@ void QnDatabaseManagementWidget::backupDb()
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly))
     {
-        QnMessageBox::critical(
-            this,
-            tr("Error"),
-            tr("Could not open file '%1' for writing.").arg(fileName));
+        QnFileMessages::overwriteFailed(this, fileName);
         return;
     }
 
@@ -103,20 +101,14 @@ void QnDatabaseManagementWidget::backupDb()
     if (errorCode != ec2::ErrorCode::ok)
     {
         NX_LOG(lit("Failed to dump Server database: %1").arg(ec2::toString(errorCode)), cl_logERROR);
-        QnMessageBox::information(
-            this,
-            tr("Information"),
-            tr("Failed to dump server database to %1.").arg(fileName));
+        QnMessageBox::critical(this, tr("Failed to back up database"));
         return;
     }
 
     file.write(databaseData);
     file.close();
 
-    QnMessageBox::information(
-        this,
-        tr("Information"),
-        tr("Database was successfully backed up into file '%1'.").arg(fileName));
+    QnMessageBox::success(this, tr("Database backed up to file"), fileName);
 }
 
 void QnDatabaseManagementWidget::restoreDb()
@@ -140,19 +132,17 @@ void QnDatabaseManagementWidget::restoreDb()
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly))
     {
-        QnMessageBox::critical(
-            this,
-            tr("Error"),
-            tr("Could not open file '%1' for reading.").arg(fileName));
+        QnMessageBox::critical(this, tr("Failed to open file"), fileName);
         return;
     }
 
-    if (QnMessageBox::warning(
-        this,
-        tr("Warning"),
-        tr("Are you sure you would like to restore the database? All existing data will be lost."),
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-        QDialogButtonBox::Ok) != QDialogButtonBox::Ok)
+    const auto button = QnMessageBox::question(this,
+        tr("Restore database?"),
+        tr("System configuration will be restored from backup,"
+           " Server application will be restarted."),
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel, QDialogButtonBox::Ok);
+
+    if (button != QDialogButtonBox::Ok)
     {
         file.close();
         return;
@@ -180,9 +170,7 @@ void QnDatabaseManagementWidget::restoreDb()
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
     if (!conn)
     {
-        QnMessageBox::information(this,
-            tr("Information"),
-            tr("You need to connect to a server prior to backup start."));
+        QnMessageBox::critical(this, tr("You need to connect to a server prior to backup start."));
         return;
     }
 
@@ -193,11 +181,9 @@ void QnDatabaseManagementWidget::restoreDb()
 
     if (errorCode == ec2::ErrorCode::ok)
     {
-        QnMessageBox::information(this,
-            tr("Information"),
-            tr("Database was successfully restored from file '%1'. Server will be restarted.")
-                .arg(fileName));
-        //menu()->trigger(QnActions::ReconnectAction); // we must be reconnected automatically
+        QnMessageBox::success(this,
+            tr("Database successfully restored"),
+            tr("Server application will restart shortly."));
     }
     else
     {
@@ -205,11 +191,8 @@ void QnDatabaseManagementWidget::restoreDb()
             .arg(fileName)
             .arg(ec2::toString(errorCode)),
             cl_logERROR);
-        QnMessageBox::critical(
-            this,
-            tr("Error"),
-            tr("An error has occurred while restoring the database from file '%1'.")
-                .arg(fileName));
+
+        QnMessageBox::critical(this, tr("Failed to restore database"));
     }
 }
 

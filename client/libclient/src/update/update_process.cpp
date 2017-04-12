@@ -70,13 +70,8 @@ void QnUpdateProcess::pleaseStop()
     if (!isRunning())
         return;
 
-    QEventLoop waiter;
-    connect(this, &QThread::finished, &waiter, &QEventLoop::quit);
-
     base_type::pleaseStop();
     quit();
-
-    waiter.exec();
 
     setAllPeersStage(QnPeerUpdateStage::Init);
     setStage(QnFullUpdateStage::Init);
@@ -478,8 +473,7 @@ void QnUpdateProcess::at_checkFreeSpaceTask_finished(
         if (!warning.ignore)
         {
             setAllPeersStage(QnPeerUpdateStage::Init);
-            m_failedPeerIds = failedPeers;
-            finishUpdate(QnUpdateResult::UploadingFailed_NoFreeSpace);
+            finishUpdate(QnUpdateResult::CancelledSilently);
             return;
         }
     }

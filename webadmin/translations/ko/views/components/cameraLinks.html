@@ -1,0 +1,38 @@
+<div>
+    카메라
+    <ul>
+        <li>이름: {{activeCamera.name}}</li>
+        <li>PhysicalID: {{activeCamera.physicalId}}</li>
+        <li>IP (URL): <a target="_blank" ng-href="{{activeCamera.url}}">{{activeCamera.url}}</a></li>
+        <li ng-repeat="stream in activeCamera.mediaStreams">
+            {{streamName(stream)}}:
+            <span ng-repeat="transport in stream.transports">
+                <a target="_blank" ng-href="{{formatLink(activeCamera,stream.encoderIndex,transport)}}">{{transport}}</a>&nbsp;
+            </span>
+
+        </li>
+
+        <li>
+            다운로드:
+<a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'download')}}">높은</a>&nbsp;
+<a target="_blank" ng-href="{{formatLink(activeCamera, 1, 'download')}}">낮은</a>&nbsp;
+<a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'preview')}}">미리 보기</a>
+        </li>
+
+    </ul>
+    링크 설정:
+    <ul>
+        <li>
+            <label><input type="checkbox" ng-model="useAuth">&nbsp;인증 키 사용</label>
+        </li>
+        <li>
+            <label title="다운로드에 대 한">지속기간 (초) <input type="text" class="input-sm" ng-model="duration"></label>
+        </li>
+        <li>
+            <label title="트랜스코딩">해상도: <input type="text" class="input-sm" ng-model="resolution"></label>
+        </li>
+        <li>
+            <label>재생 위치: {{liveMode?'live': position}}</label>
+        </li>
+    </ul>
+</div>

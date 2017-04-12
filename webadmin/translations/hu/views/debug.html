@@ -1,0 +1,259 @@
+<div class="container">
+    <h1>Stream linkek létrehozása</h1>
+    <form class="form-horizontal" novalidate ng-class="session.event.event_type">
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label">Rendszer host (IP:Port)</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control"
+                       ng-model="linkSettings.system">
+            </div>
+        </div>
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label">egyszer</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control"
+                       ng-model="linkSettings.nonce">
+            </div>
+        </div>
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label">realm</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control"
+                       ng-model="linkSettings.realm">
+            </div>
+        </div>
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label">metódus</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control"
+                       ng-model="linkSettings.method">
+            </div>
+        </div>
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label">felhasználónév</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control"
+                       ng-model="linkSettings.login">
+            </div>
+        </div>
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label">jelszó</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control"
+                       ng-model="linkSettings.password">
+            </div>
+        </div>
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label">link</label>
+            <div class="col-sm-9"><p ng-repeat="camId in linkSettings.cameraIds" class="form-control-static">{{formatLink(camId)}}</p>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="container">
+
+    <h1>Események létrehozása </h1>
+
+    <div class="row">
+        <div class="col-sm-6">
+
+            <form class="form-horizontal" novalidate ng-class="session.event.event_type">
+                <div class="form-group AnyEvent">
+                    <label class="col-sm-3 control-label">Esemény </label>
+                    <div class="col-sm-5">
+                        <select ng-model="session.event.event_type" ng-options="event.event as event.label for event in Config.debugEvents.events"
+                                class="form-control"></select>
+                    </div>
+                    <div class="col-sm-4">
+                        <p class="form-control-static">
+                            {{session.event.event_type}}
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group AnyEvent">
+                    <label class="col-sm-3 control-label">Időbélyeg</label>
+                    <div class="col-sm-5">
+                        <input type="text" ng-model="session.event.timestamp"
+                               class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group CameraMotionEvent CameraInputEvent CameraDisconnectEvent StorageFailureEvent
+        NetworkIssueEvent CameraIpConflictEvent ServerFailureEvent ServerConflictEvent ServerStartEvent
+        LicenseIssueEvent BackupFinishedEvent">
+                    <label class="col-sm-3 control-label">Forrás</label>
+                    <div class="col-sm-5">
+                        <input type="text" ng-model="session.eventResource"
+                               typeahead="resource as resource.name for resource in filterResources($viewValue) | limitTo:10"
+                               typeahead-focus-on-select="false"
+                               typeahead-min-length="0"
+                               typeahead-show-hint="true"
+                               typeahead-focus-first="false"
+                               typeahead-focus
+ class="form-control">
+                    </div>
+                    <div class="col-sm-4">
+                        <p class="form-control-static">
+                            {{session.eventResource.id}}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="form-group UserDefinedEvent">
+                    <label class="col-sm-3 control-label ">Forrás</label>
+                    <div class="col-sm-5">
+                        <input type="text" ng-model="session.event.source"
+                               class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group UserDefinedEvent CameraMotionEvent CameraInputEvent">
+                    <label class="col-sm-3 control-label">Állapot</label>
+                    <div class="col-sm-5">
+                        <select ng-model="session.event.state" ng-options="state for state in Config.debugEvents.states"
+                                class="form-control"></select>
+                    </div>
+                </div>
+
+                <div class="form-group StorageFailureEvent NetworkIssueEvent ServerFailureEvent LicenseIssueEvent BackupFinishedEvent">
+                    <label class="col-sm-3 control-label">Kiváltó ok</label>
+                    <div class="col-sm-5">
+                        <select ng-model="session.event.reasonCode" ng-options="reason for reason in Config.debugEvents.reasons"
+                                class="form-control"></select>
+                    </div>
+                </div>
+
+                <div class="form-group CameraInputEvent">
+                    <label class="col-sm-3 control-label">Bemenet port</label>
+                    <div class="col-sm-5">
+                        <input type="number" ng-model="session.event.inputPortId"
+                               class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group UserDefinedEvent CameraIpConflictEvent">
+                    <label class="col-sm-3 control-label">Felirat </label>
+                    <div class="col-sm-5">
+                        <input type="text" ng-model="session.event.caption"
+                               class="form-control">
+                    </div>
+                    <div class="col-sm-4">
+                        <p class="form-control-static">
+                            kamera IP ütközés - ütköző IP
+                        </p>
+                    </div>
+                </div>
+
+                <div class="form-group StorageFailureEvent
+                NetworkIssueEvent CameraIpConflictEvent ServerFailureEvent ServerConflictEvent
+                LicenseIssueEvent BackupFinishedEvent UserDefinedEvent">
+                    <label class="col-sm-3 control-label">Leírás</label>
+                    <div class="col-sm-5">
+                        <textarea ng-model="session.event.description"
+                                  class="form-control"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group UserDefinedEvent">
+                    <label class="col-sm-3 control-label">Metaadat - JSON</label>
+                    <div class="col-sm-5">
+                        <textarea ng-model="session.event.metadata"
+                                  class="form-control">{
+                            cameraRefs:['cameraUUID']
+                            }</textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-3 col-sm-5">
+                        <button type="submit" class="btn btn-primary" ng-click="generateEvent()">Esemény létrehozása</button>
+                    </div>
+                </div>
+
+
+            </form>
+        </div>
+        <div class="col-sm-6">
+            <button type="submit" class="btn btn-success" ng-click="startGeneratingEvents()" ng-if="!generatingEvents"><span class="glyphicon glyphicon-play-circle"></span> véletlenszerű események</button>
+            <button type="submit" class="btn btn-danger"  ng-click="stopGeneratingEvents()" ng-if="generatingEvents"><span class="glyphicon glyphicon-stop"></span> véletlenszerű események</button>
+
+            <button type="submit" class="btn btn-success" ng-click="startRepeatingEvent()" ng-if="!repeatingEvents"><span class="glyphicon glyphicon-play-circle"></span> legutóbbi esemény ismétlése</button>
+            <button type="submit" class="btn btn-danger"  ng-click="stopRepeatingEvent()" ng-if="repeatingEvents"><span class="glyphicon glyphicon-stop"></span> legutóbbi esemény ismétlése</button>
+
+            <p>Eseménynapló:</p>
+            <pre><div ng-repeat="event in eventsLog">{{event.event}} ({{event.source}}): {{event.result}}</div></pre>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <h1>Teszt api-hívások</h1>
+    <form class="form-horizontal" novalidate>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Metódus</label>
+            <div class="col-sm-10">
+                <select ng-model="session.method.method" class="form-control">
+                    <option>POST</option>
+                    <option>GET</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Funkció</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" ng-model="session.method.name" placeholder="/api/methodName">
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label"><b>GET</b>-params (json)</label>
+            <div class="col-sm-10">
+                <textarea class="form-control" rows="5"
+                          ng-model="session.method.params"></textarea>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label">URL lekérése</label>
+            <div class="col-sm-10">
+                <p class="form-control-static">{{getDebugUrl()}}</p>
+            </div>
+        </div>
+
+        <div class="form-group" ng-if="session.method.method=='POST'">
+            <label class="col-sm-2 control-label"><b>POST</b>-params (json)</label>
+            <div class="col-sm-10">
+                <textarea class="form-control" rows="10"
+                          ng-model="session.method.data"></textarea>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary" ng-click="testMethod()">Teszt metódus</button>
+                <a class="btn btn-default" ng-if="session.method.method=='GET'" ng-href="{{getDebugUrl()}}" target="_blank">Megnyitás új lapon</a>
+            </div>
+        </div>
+
+
+        <div class="form-group" ng-if="result.result">
+            <label class="col-sm-2 control-label">Állapot</label>
+            <div class="col-sm-10">
+                <p class="form-control-static">{{result.status}}</p>
+            </div>
+        </div>
+        <div class="form-group" ng-if="result.result">
+            <label class="col-sm-2 control-label">Eredmény</label>
+            <div class="col-sm-10">
+                <pre>{{result.result}}</pre>
+            </div>
+        </div>
+    </form>
+
+
+</div>

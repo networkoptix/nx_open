@@ -1,8 +1,3 @@
-/**********************************************************
-* Jul 25, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <nx/utils/object_destruction_flag.h>
@@ -27,6 +22,8 @@ public:
 
     virtual void stopWhileInAioThread() override;
 
+    virtual void start() override;
+
     virtual void establishNewConnection(
         std::chrono::milliseconds timeout,
         SocketAttributes socketAttributes,
@@ -44,7 +41,7 @@ private:
 
     const nx::String m_connectSessionId;
     const SocketAddress m_targetEndpoint;
-    std::unique_ptr<AbstractStreamSocket> m_tcpConnection;
+    std::unique_ptr<AbstractStreamSocket> m_controlConnection;
     std::list<ConnectionContext> m_connections;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_connectionClosedHandler;
     mutable QnMutex m_mutex;

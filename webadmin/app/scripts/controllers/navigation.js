@@ -8,8 +8,11 @@ angular.module('webadminApp')
         $scope.noPanel = true;
 
         nativeClient.init().then(function(result){
-            $scope.liteClient = result.lite;
+            $scope.settings.liteClient = result.lite;
+            $('body').addClass('lite-client-mode');
         });
+
+        $scope.hasProxy = mediaserver.hasProxy();
 
 
         mediaserver.getModuleInformation().then(function (r) {

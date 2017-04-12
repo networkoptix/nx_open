@@ -147,6 +147,7 @@ bool QnDbHelper::execSQLQuery(const QString& queryStr, QSqlDatabase& database, c
 
 bool QnDbHelper::execSQLQuery(QSqlQuery *query, const char* details)
 {
+    NX_EXPECT(validateParams(*query));
     if (!query->exec())
     {
         auto error = query->lastError();
@@ -201,6 +202,9 @@ bool QnDbHelper::execSQLFile(const QString& fileName, QSqlDatabase& database)
     if (!file.open(QFile::ReadOnly))
         return false;
     QByteArray data = file.readAll();
+    if (data.isEmpty())
+        return true;
+
     if( !execSQLScript( data, database ) )
     {
         NX_LOG(lit("Error while executing SQL file %1").arg(fileName), cl_logERROR);
@@ -271,6 +275,7 @@ bool QnDbHelper::applyUpdates(const QString &dirName) {
         QString fileName = entry.absoluteFilePath();
         if (!existUpdates.contains(fileName))
         {
+            NX_LOG(lit("Applying SQL update %1").arg(fileName), cl_logDEBUG1);
             if (!beforeInstallUpdate(fileName))
                 return false;
             if (!execSQLFile(fileName, m_sdb))
@@ -295,12 +300,24 @@ bool QnDbHelper::applyUpdates(const QString &dirName) {
     return true;
 }
 
-bool QnDbHelper::beforeInstallUpdate(const QString& updateName) {
+bool QnDbHelper::beforeInstallUpdate(const QString& updateName)
+{
     Q_UNUSED(updateName);
     return true;
 }
 
-bool QnDbHelper::afterInstallUpdate(const QString& updateName) {
+bool QnDbHelper::afterInstallUpdate(const QString& updateName)
+{
     Q_UNUSED(updateName);
+    return true;
+}
+
+bool QnDbHelper::validateParams(const QSqlQuery& query)
+{
+    for (const auto& value: query.boundValues().values())
+    {
+        if (!value.isValid())
+            return false;
+    }
     return true;
 }

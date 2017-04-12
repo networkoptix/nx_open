@@ -33,6 +33,8 @@ namespace ec2
         void addAuditRecord(ApiCommand::Value command,  const ApiCameraAttributesDataList& params, const QnAuthSession& authInfo);
         void addAuditRecord(ApiCommand::Value command,  const ApiMediaServerUserAttributesData& params, const QnAuthSession& authInfo);
         void addAuditRecord(ApiCommand::Value command,  const ApiMediaServerUserAttributesDataList& params, const QnAuthSession& authInfo);
+        void addAuditRecord(ApiCommand::Value command,  const ApiStorageData& params, const QnAuthSession& authInfo);
+        void addAuditRecord(ApiCommand::Value command,  const ApiStorageDataList& params, const QnAuthSession& authInfo);
         void addAuditRecord(ApiCommand::Value command,  const ApiUserData& params, const QnAuthSession& authInfo);
         void addAuditRecord(ApiCommand::Value command,  const ApiUserDataList& params, const QnAuthSession& authInfo);
         void addAuditRecord(ApiCommand::Value command,  const ApiBusinessRuleData& params, const QnAuthSession& authInfo);

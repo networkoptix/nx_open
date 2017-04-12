@@ -6,6 +6,7 @@
 #include <set>
 
 #include <nx/network/abstract_socket.h>
+#include <nx/network/aio/basic_pollable.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_factory.h>
 #include <nx/utils/log/log.h>
@@ -27,14 +28,13 @@ public:
 };
 
 template<class _ConnectionType>
-class StreamServerConnectionHolder
-    : public StreamConnectionHolder<_ConnectionType>
+class StreamServerConnectionHolder:
+    public StreamConnectionHolder<_ConnectionType>
 {
 public:
     typedef _ConnectionType ConnectionType;
 
-    StreamServerConnectionHolder()
-    :
+    StreamServerConnectionHolder():
         m_connectionsBeingClosedCount(0)
     {
     }
@@ -79,6 +79,12 @@ public:
         m_cond.wakeAll();
     }
 
+    std::size_t connectionCount() const
+    {
+        QnMutexLocker lk(&m_mutex);
+        return m_connections.size();
+    }
+
 protected:
     void saveConnection(std::shared_ptr<ConnectionType> connection)
     {
@@ -87,28 +93,29 @@ protected:
     }
 
 private:
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
     QnWaitCondition m_cond;
     int m_connectionsBeingClosedCount;
     //TODO #ak this map types seems strange. Replace with std::set?
     std::map<ConnectionType*, std::shared_ptr<ConnectionType>> m_connections;
 };
 
-//!Listens local tcp address, accepts incoming connections and forwards them to the specified handler
-/*!
-    \uses \a aio::AIOService
-*/
+// TODO #ak It seems to make sense to decouple 
+//   StreamSocketServer & StreamServerConnectionHolder responsibility.
+
+/**
+ * Listens local tcp address, accepts incoming connections and forwards them to the specified handler.
+ */
 template<class CustomServerType, class ConnectionType>
     class StreamSocketServer
 :
     public StreamServerConnectionHolder<ConnectionType>,
-    public QnStoppable
+    public nx::network::aio::BasicPollable
 {
     typedef StreamServerConnectionHolder<ConnectionType> BaseType;
     typedef StreamSocketServer<CustomServerType, ConnectionType> SelfType;
 
 public:
-    //!Initialization
     StreamSocketServer(
         bool sslRequired,
         nx::network::NatTraversalSupport natTraversalSupport)
@@ -117,37 +124,38 @@ public:
             sslRequired,
             natTraversalSupport))
     {
+        bindToAioThread(getAioThread());
     }
 
     ~StreamSocketServer()
     {
-        pleaseStop();
+        pleaseStopSync(false);
     }
 
-    virtual void pleaseStop()
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
     {
-        m_socket->pleaseStopSync(false);
+        nx::network::aio::BasicPollable::bindToAioThread(aioThread);
+        m_socket->bindToAioThread(aioThread);
     }
 
-    //!Binds to specified addresses
-    /*!
-        \return false on error. Use \a SystemError::getLastOSErrorCode() for error information
-    */
-    bool bind( const SocketAddress& socketAddress )
+    bool bind(const SocketAddress& socketAddress)
     {
-        return 
-            m_socket->setRecvTimeout( 0 ) &&
-            m_socket->setReuseAddrFlag( true ) &&
-            m_socket->bind( socketAddress );
+        return
+            m_socket->setRecvTimeout(0) &&
+            m_socket->setReuseAddrFlag(true) &&
+            m_socket->bind(socketAddress);
     }
 
-    //!Calls \a AbstractStreamServerSocket::listen
-    bool listen()
+    bool listen(int backlogSize = AbstractStreamServerSocket::kDefaultBacklogSize)
     {
-        if( !m_socket->listen() )
+        using namespace std::placeholders;
+
+        if (!m_socket->setNonBlockingMode(true) ||
+            !m_socket->listen(backlogSize))
+        {
             return false;
-        m_socket->acceptAsync(std::bind(&SelfType::newConnectionAccepted, this,
-                                        std::placeholders::_1, std::placeholders::_2));
+        }
+        m_socket->acceptAsync(std::bind(&SelfType::newConnectionAccepted, this, _1, _2));
         return true;
     }
 
@@ -182,16 +190,6 @@ public:
         this->saveConnection(std::move(connection));
     }
 
-    void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
-    {
-        m_socket->bindToAioThread(aioThread);
-    }
-
-    void post(nx::utils::MoveOnlyFunc<void()> handler)
-    {
-        m_socket->post(std::move(handler));
-    }
-
     void setConnectionInactivityTimeout(boost::optional<std::chrono::milliseconds> value)
     {
         m_connectionInactivityTimeout = value;
@@ -205,6 +203,11 @@ public:
 protected:
     virtual std::shared_ptr<ConnectionType> createConnection(
         std::unique_ptr<AbstractStreamSocket> _socket) = 0;
+
+    virtual void stopWhileInAioThread() override
+    {
+        m_socket.reset();
+    }
 
 private:
     std::unique_ptr<AbstractStreamServerSocket> m_socket;

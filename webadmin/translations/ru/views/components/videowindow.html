@@ -1,0 +1,49 @@
+<div class="videowindow">
+
+    <div class="camera-view-informer camera-loading" ng-if="loading">
+        <div class="camera-view-preloader camera-view-message-icon"></div>
+    </div>
+
+    <div class="camera-view-informer" ng-if="flashRequired">
+        Видео не может быть воспроизведено. <br>Возможно, требуется <a href="https://get.adobe.com/flashplayer/" target="_blank">установить Adobe Flash</a> для воспроизведения видео с серверов на базе ARM.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="flashOrWebmRequired">
+        Видео не может быть воспроизведено. <br>Возможно, требуется <a href="https://get.adobe.com/flashplayer/" target="_blank">установить Adobe Flash</a> или <a href="https://tools.google.com/dlpage/webmmf/" target="_blank">кодек WebM</a> для воспроизведения видео с серверов в Internet Explorer.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="noArmSupport">
+        Видео не можеь быть воспроизведено.
+ <br>Этот браузер или устройство не поддерживают воспроизведение видео с серверов на базе ARM.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="noFormat">
+        Видео не может быть воспроизведено.
+ <br>Этот браузер или устройство не поддерживают воспроизведение видео от этой камеры.<br>
+    </div>
+
+
+    <div class="camera-view-informer" ng-if="ieNoWebm">
+        Видео не может быть воспроизведено. <br>Возможно, требуется <a href="https://tools.google.com/dlpage/webmmf/" target="_blank">кодек WebM</a> для Internet Explorer.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="ieWin10">
+        Видео не может быть воспроизведено. <br>Пожалуйста, используйте обозреватели Microsoft Edge или Google Chrome.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="ubuntuNX">
+        Видео не можеь быть воспроизведено. <br>
+Этот обозреватель не поддерживает воспроизведение видео с серверов на базе ARM. Требуется обозреватель Chromium.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="errorLoading">
+        Видео не может быть воспроизведено. Произошла ошибка <br>.<br>
+    </div>
+
+
+    <div class="videoplayer" ng-if="flashls" ng-class="{'invisible':loading}" ng-include="Config.viewsDir + 'components/flashls.html'">
+    </div>
+
+    <div class="videoplayer" ng-hide="!native" ng-class="{'invisible': loading}">
+    </div>
+</div>

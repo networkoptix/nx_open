@@ -13,17 +13,19 @@ namespace api {
 
 constexpr static const std::chrono::seconds
     kRendezvousConnectTimeoutDefault = std::chrono::seconds(15);
+
 constexpr static const std::chrono::seconds
     kUdpTunnelKeepAliveIntervalDefault = std::chrono::seconds(15);
+
 constexpr static const size_t kUdpTunnelKeepAliveRetriesDefault = 3;
+
 constexpr static const std::chrono::seconds 
     kDefaultTunnelInactivityTimeout = std::chrono::minutes(8);
 
 /**
  * @note All fields are optional for backward compatibility.
  */
-class NX_NETWORK_API ConnectionParameters
-:
+class NX_NETWORK_API ConnectionParameters:
     public StunMessageAttributesData
 {
 public:
@@ -31,7 +33,7 @@ public:
     std::chrono::milliseconds udpTunnelKeepAliveInterval;
     /**
      * UDP tunnel should be considered inactive if no keep-alive messages have been 
-     * received during \a rendezvousConnectTimeout*udpTunnelKeepAliveRetries period.
+     *   received during rendezvousConnectTimeout*udpTunnelKeepAliveRetries period.
      */
     int udpTunnelKeepAliveRetries;
     std::chrono::seconds tunnelInactivityTimeout;

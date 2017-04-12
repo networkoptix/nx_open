@@ -7,6 +7,7 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/aio/pollset_wrapper.h>
 #include <nx/network/aio/pollset.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
@@ -17,8 +18,7 @@ namespace nx {
 namespace network {
 namespace aio {
 
-class DummyEventHandler
-:
+class DummyEventHandler:
     public AIOEventHandler<Pollable>
 {
 public:
@@ -74,22 +74,19 @@ TEST(aio, socketPolledNotification)
     aioThread.removeFromWatch(&socket, aio::etRead, true);
 }
 
-class TestPollSet
-:
-    public aio::PollSet
+class TestPollSet:
+    public PollSetWrapper<aio::PollSet>
 {
 public:
-    bool add(
+    virtual bool add(
         Pollable* const /*sock*/,
         aio::EventType /*eventType*/,
-        void* /*userData*/ = NULL)
+        void* /*userData*/) override
     {
         return false;
     }
 };
 
-#if 0
-//TODO #ak find a way to mock PollSet instance to AioThread
 TEST(aio, pollsetError)
 {
     nx::utils::promise<void> handlerCalledPromise;
@@ -100,14 +97,16 @@ TEST(aio, pollsetError)
     std::atomic<bool> socketAddedFlag(false);
 
     DummyEventHandler evHandler(
-        [&handlerCalledFlag, &socketAddedFlag, &handlerCalledPromise](Pollable*, aio::EventType et) {
+        [&handlerCalledFlag, &socketAddedFlag, &handlerCalledPromise](
+            Pollable*, aio::EventType et)
+        {
             ASSERT_EQ(aio::etError, et);
             ASSERT_TRUE(socketAddedFlag.load());
             handlerCalledFlag = true;
             handlerCalledPromise.set_value();
         });
 
-    aio::detail::AIOThread<Pollable, TestPollSet> aioThread;
+    aio::AIOThread aioThread(std::make_unique<TestPollSet>());
     aioThread.start();
 
     aioThread.watchSocket(
@@ -121,12 +120,10 @@ TEST(aio, pollsetError)
         });
 
     handlerCalledFuture.wait();
-    //handlerCalledFuture.wait_for(std::chrono::seconds(2));
     ASSERT_TRUE(socketAddedFlag);
     ASSERT_TRUE(handlerCalledFlag.load());
 }
-#endif
 
-}   //aio
-}   //network
-}   //nx
+} // namespace aio
+} // namespace network
+} // namespace nx

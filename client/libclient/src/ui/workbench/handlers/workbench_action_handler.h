@@ -99,6 +99,8 @@ protected:
 
     void setResolutionMode(Qn::ResolutionMode resolutionMode);
 
+    void setCurrentLayoutCellSpacing(Qn::CellSpacing spacing);
+
     QnBusinessRulesDialog *businessRulesDialog() const;
 
     QnEventLogDialog *businessEventsLogDialog() const;
@@ -143,7 +145,6 @@ protected:
     void at_dropResourcesIntoNewLayoutAction_triggered();
     void at_openFileAction_triggered();
     void at_openFolderAction_triggered();
-    void at_showcaseAction_triggered();
     void at_aboutAction_triggered();
     void at_businessEventsAction_triggered();
     void at_openBusinessRulesAction_triggered();
@@ -154,14 +155,6 @@ protected:
 
     void at_webAdminAction_triggered();
     void at_webClientAction_triggered();
-
-    void at_systemAdministrationAction_triggered();
-    void at_systemUpdateAction_triggered();
-    void at_userManagementAction_triggered();
-    void at_preferencesGeneralTabAction_triggered();
-    void at_preferencesLicensesTabAction_triggered();
-    void at_preferencesSmtpTabAction_triggered();
-    void at_preferencesNotificationTabAction_triggered();
 
     void at_mediaFileSettingsAction_triggered();
     void at_cameraIssuesAction_triggered();
@@ -181,11 +174,6 @@ protected:
 
     void at_adjustVideoAction_triggered();
     void at_beforeExitAction_triggered();
-
-    void at_setCurrentLayoutItemSpacing0Action_triggered();
-    void at_setCurrentLayoutItemSpacing10Action_triggered();
-    void at_setCurrentLayoutItemSpacing20Action_triggered();
-    void at_setCurrentLayoutItemSpacing30Action_triggered();
 
     void at_createZoomWindowAction_triggered();
 
@@ -218,6 +206,8 @@ private:
 
     void openFailoverPriorityDialog();
     void openBackupCamerasDialog();
+    void openSystemAdministrationDialog(int page);
+    void openLocalSettingsDialog(int page);
 
     QnAdjustVideoDialog* adjustVideoDialog();
 
@@ -232,8 +222,6 @@ private:
     void closeApplication(bool force = false);
 
     qint64 getFirstBookmarkTimeMs();
-
-    bool confirmResourcesDelete(const QnResourceList& resources);
 
     void openInBrowserDirectly(const QnMediaServerResourcePtr& server,
         const QString& path, const QString& fragment = QString());

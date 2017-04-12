@@ -10,6 +10,7 @@ Item
     id: control;
 
     property Item visualParent;
+    property Item view;
 
     property alias tileColor: tileArea.color;
     property bool isHovered: (hoverIndicator.containsMouse ||
@@ -27,12 +28,12 @@ Item
     property bool isExpanded: false;
     property bool isAvailable: false;
     property real expandedOpacity: shadow.opacity;
-    property bool isOnline: false;
+    property bool isConnectable: false;
     property bool isCloudTile: false;
     property string systemId;
     property string localId;
 
-    signal collapsedTileClicked();
+    signal collapsedTileClicked(int buttons, int x, int y);
 
     property bool forceImmediateAnimation: false;
 
@@ -44,8 +45,15 @@ Item
     function forceCollapsedState()
     {
         control.forceImmediateAnimation = true;
+        tileHolder.state = "expanded";
         tileHolder.state = "collapsed";
         control.forceImmediateAnimation = false;
+    }
+
+    function cancelAnimationOnCollapse()
+    {
+        if (transition.running && tileHolder.state == "collapsed")
+            control.forceCollapsedState();
     }
 
     function toggle()
@@ -56,6 +64,8 @@ Item
     implicitWidth: 280;
     implicitHeight: 96;
     z: (transition.running ? 100 : 0)
+
+    onSystemIdChanged: { forceCollapsedState(); }
 
     Connections
     {
@@ -68,16 +78,17 @@ Item
           */
         target: parent;
 
-        onXChanged:
-        {
-            if (transition.running && tileHolder.state == "collapsed")
-            {
-                tileHolder.state = "expanded"
-                tileHolder.state = "collapsed"
-            }
-        }
+        onXChanged: { control.cancelAnimationOnCollapse(); }
     }
 
+    Connections
+    {
+        target: view;
+        onXChanged: { control.cancelAnimationOnCollapse(); }
+        onYChanged: { control.cancelAnimationOnCollapse(); }
+        onWidthChanged: { control.cancelAnimationOnCollapse(); }
+        onHeightChanged: { control.cancelAnimationOnCollapse(); }
+    }
 
     Item
     {
@@ -112,7 +123,7 @@ Item
                 PropertyChanges
                 {
                     target: hideTileButton;
-                    opacity: (control.isOnline ? 0 : 1);
+                    opacity: (isConnectable ? 0 : 1);
                 }
 
                 PropertyChanges
@@ -289,14 +300,18 @@ Item
         {
             id: toggleMouseArea;
 
+            property int pressedButtons: 0;
+
             x: (control.isExpanded ? -parent.x : 0);
             y: (control.isExpanded ? -parent.y : 0);
             width: tileHolder.parent.width;
             height: tileHolder.parent.height;
 
+            acceptedButtons: (Qt.LeftButton | Qt.RightButton);
             hoverEnabled: true;
             onPressed:
             {
+                pressedButtons = mouse.buttons;
                 if (context.connectingToSystem.length)
                     return;
 
@@ -309,11 +324,11 @@ Item
 
             onReleased:
             {
-                if (context.connectingToSystem.length)
+                if (context.connectingToSystem.length || control.isExpanded)
                     return;
 
-                if (!control.isExpanded)
-                    control.collapsedTileClicked();
+                control.collapsedTileClicked(toggleMouseArea.pressedButtons,
+                    mouse.x, mouse.y);
             }
         }
 
@@ -355,7 +370,7 @@ Item
                             return collapseTileButton.left;
 
                         if (menuButtonControl.visible)
-                            menuButtonControl.left;
+                            return menuButtonControl.left;
 
                         return (hideTileButton.visible ? hideTileButton.left : parent.right);
                     }
@@ -443,19 +458,25 @@ Item
                 {
                     id: areaLoader;
 
+                    property bool visibleIndicators:
+                        ((primaryIndicator.visible && (primaryIndicator.opacity == 1.0))
+                         || (otherIndicator.visible && (otherIndicator.opacity == 1.0)));
                     anchors.left: parent.left;
-                    anchors.right: parent.right;
+                    anchors.right: (visibleIndicators
+                        ? indicatorsRow.left
+                        : parent.right);
                     anchors.top: systemNameLabel.bottom;
 
                     anchors.leftMargin: 12;
-                    anchors.rightMargin: 16;
+                    anchors.rightMargin: (visibleIndicators ? 0 : 16);
 
                     sourceComponent: control.centralAreaDelegate;
                 }
 
-
                 Row
                 {
+                    id: indicatorsRow;
+
                     anchors.right: parent.right;
                     anchors.top: parent.top;
                     anchors.rightMargin: 14;

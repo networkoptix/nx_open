@@ -3,6 +3,7 @@ import QtQuick.Layouts 1.1
 import Qt.labs.controls 1.0
 import Nx 1.0
 import Nx.Controls 1.0
+import Nx.Models 1.0
 import com.networkoptix.qml 1.0
 
 Pane
@@ -14,24 +15,52 @@ Pane
     property alias systemName: informationBlock.systemName
     property alias cloudSystem: informationBlock.cloud
     property alias online: informationBlock.online
-    property alias compatible: informationBlock.compatible
     property alias ownerDescription: informationBlock.ownerDescription
-    property alias invalidVersion: informationBlock.invalidVersion
+    property bool compatible: true
+    property string invalidVersion
+
+    readonly property string kMinimimVersion: "1.3.1"
 
     padding: 0
 
     implicitHeight: contentItem.implicitHeight + topPadding + bottomPadding
     implicitWidth: 200
 
-    QnSystemHostsModel
+    SystemHostsModel
     {
         id: hostsModel
         systemId: control.systemId
+        localSystemId: control.localId
     }
-    QnRecentLocalConnectionsModel
+    ModelDataAccessor
     {
-        id: connectionsModel
+        id: hostsModelAccessor
+        model: hostsModel
+
+        property string defaultAddress: ""
+
+        onDataChanged:
+        {
+            if (startRow === 0)
+                updateDefaultAddress()
+        }
+        onCountChanged: updateDefaultAddress()
+
+        function updateDefaultAddress()
+        {
+            defaultAddress = count > 0
+                ? Nx.url(getData(0, "url")).address()
+                : ""
+        }
+    }
+
+    AuthenticationDataModel
+    {
+        id: authenticationDataModel
         systemId: control.localId
+
+        readonly property bool hasData: !!defaultCredentials.user
+        readonly property bool hasStoredPassword: !!defaultCredentials.password
     }
 
     background: Rectangle
@@ -61,8 +90,8 @@ Pane
     {
         id: informationBlock
         enabled: compatible && online
-        address: Nx.url(hostsModel.firstHost).address()
-        user: connectionsModel.firstUser
+        address: hostsModelAccessor.defaultAddress
+        user: authenticationDataModel.defaultCredentials.user
     }
 
     IconButton
@@ -74,7 +103,7 @@ Pane
         z: 1
         anchors.right: parent.right
         icon: lp("/images/edit.png")
-        visible: connectionsModel.hasConnections && !cloudSystem
+        visible: !cloudSystem && authenticationDataModel.hasData
         onClicked:
         {
             Workflow.openSavedSession(
@@ -83,7 +112,31 @@ Pane
                 systemName,
                 informationBlock.address,
                 informationBlock.user,
-                connectionsModel.getData("password", 0))
+                authenticationDataModel.defaultCredentials.password)
+        }
+    }
+
+    IssueLabel
+    {
+        id: issueLabel
+        anchors
+        {
+            bottom: parent.bottom
+            bottomMargin: 12
+            right: parent.right
+            rightMargin: 12
+        }
+        color: cloudSystem ? ColorTheme.base14 : ColorTheme.red_main
+        visible: text !== ""
+        text:
+        {
+            if (cloudSystem)
+            {
+                return !online && cloudStatusWatcher.status === QnCloudStatusWatcher.Online
+                    ? qsTr("OFFLINE") : ""
+            }
+
+            return compatible ? "" : (invalidVersion || qsTr("INCOMPATIBLE"))
         }
     }
 
@@ -91,37 +144,54 @@ Pane
     {
         if (!compatible)
         {
+            if (Nx.softwareVersion(invalidVersion).isLessThan(Nx.softwareVersion(kMinimimVersion))
+                || applicationInfo.oldMobileClientUrl() == "")
+            {
+                Workflow.openStandardDialog("",
+                    qsTr("This server has too old version. "
+                        + "Please update it to the latest version."))
+                return
+            }
+
             Workflow.openOldClientDownloadSuggestion()
             return
         }
-
-        if (!contentItem.enabled)
-            return
 
         if (cloudSystem)
         {
             if (!hostsModel.isEmpty)
             {
-                connectionManager.connectToServer(
+                if (!connectionManager.connectToServer(
                     hostsModel.firstHost,
                     cloudStatusWatcher.credentials.user,
-                    cloudStatusWatcher.credentials.password)
+                    cloudStatusWatcher.credentials.password))
+                {
+                    sessionsScreen.openConnectionWarningDialog(systemName)
+                    return
+                }
+
                 Workflow.openResourcesScreen(systemName)
             }
         }
         else
         {
-            if (connectionsModel.hasConnections)
+            if (authenticationDataModel.hasStoredPassword)
             {
-                connectionManager.connectToServer(
+                if (!connectionManager.connectToServer(
                     hostsModel.firstHost,
-                    connectionsModel.firstUser,
-                    connectionsModel.getData("password", 0))
+                    authenticationDataModel.defaultCredentials.user,
+                    authenticationDataModel.defaultCredentials.password))
+                {
+                    sessionsScreen.openConnectionWarningDialog(systemName)
+                    return
+                }
+
                 Workflow.openResourcesScreen(systemName)
             }
             else
             {
-                Workflow.openDiscoveredSession(systemId, localId, systemName, informationBlock.address)
+                Workflow.openDiscoveredSession(
+                    systemId, localId, systemName, informationBlock.address)
             }
         }
     }

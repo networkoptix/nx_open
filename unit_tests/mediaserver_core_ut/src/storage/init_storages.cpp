@@ -1,11 +1,12 @@
 #include "media_server/settings.h"
-#include "mediaserver_helper/media_server_helper.h"
 #include "storage/storage_test_helper.h"
 #include "media_server_process.h"
+#include "media_server_process_aux.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/storage_resource.h"
 #include "media_server_process.h"
 #include "common/common_module.h"
+#include "mediaserver_launcher.h"
 
 #define GTEST_HAS_TR1_TUPLE     0
 #define GTEST_USE_OWN_TR1_TUPLE 1
@@ -16,18 +17,13 @@
 
 TEST(InitStoragesTest, main)
 {
-    nx::ut::utils::MediaServerTestFuncTypeList testList;
-    testList.push_back(
-        []() 
-        {
-            auto storages = qnResPool->getResources<QnStorageResource>();
-            ASSERT_TRUE(storages.isEmpty());
-        });
-    nx::ut::utils::MediaServerHelper helper(testList);
-    MSSettings::roSettings()->setValue(
+    MediaServerLauncher launcher;
+    launcher.addSetting(
         nx_ms_conf::MIN_STORAGE_SPACE,
         (qint64)std::numeric_limits<int64_t>::max());
-    helper.start();
+    ASSERT_TRUE(launcher.start());
+    auto storages = qnResPool->getResources<QnStorageResource>();
+    ASSERT_TRUE(storages.isEmpty());
 }
 
 TEST(SaveRestoreStoragesInfoFromConfig, main)
@@ -46,7 +42,7 @@ TEST(SaveRestoreStoragesInfoFromConfig, main)
     BeforeRestoreDbData restoreData;
     storageList << storage1 << storage2;
 
-    aux::saveStoragesInfoToBeforeRestoreData(&restoreData, storageList);
+    nx::mserver_aux::saveStoragesInfoToBeforeRestoreData(&restoreData, storageList);
 
     ASSERT_TRUE(restoreData.hasInfoForStorage(path1));
     ASSERT_TRUE(restoreData.hasInfoForStorage(path2));
@@ -55,39 +51,71 @@ TEST(SaveRestoreStoragesInfoFromConfig, main)
     ASSERT_EQ(restoreData.getSpaceLimitForStorage(path2), spaceLimit2);
 }
 
-class UnmountedStoragesFilterTest : public ::testing::Test
+class UnmountedLocalStoragesFilterTest : public ::testing::Test
 {
 protected:
-    UnmountedStoragesFilterTest() :
+    UnmountedLocalStoragesFilterTest() :
         mediaFolderName(lit("HD Witness Media")),
         unmountedFilter(mediaFolderName),
         spaceLimit(10 * 1024 * 1024 * 1024ll)
     {}
 
+    enum class PathFound
+    {
+        yes,
+        no
+    };
+
+    enum class MediaFolderSuffix
+    {
+        yes,
+        no
+    };
+
+    enum class StorageUnmounted
+    {
+        yes,
+        no
+    };
+
+    void when(PathFound isPathFound, MediaFolderSuffix isSuffix)
+    {
+        QString url = basePath;
+        if (isSuffix == MediaFolderSuffix::yes)
+            url += "/" + mediaFolderName;
+
+        unmountedStorages = unmountedFilter.getUnmountedStorages(
+              QnStorageResourceList() << storageTestHelper.createStorage(url, spaceLimit),
+              isPathFound == PathFound::yes ? QStringList() << url : QStringList());
+    }
+
+    void then(StorageUnmounted isUnmounted)
+    {
+        if (isUnmounted == StorageUnmounted::yes)
+            ASSERT_FALSE(unmountedStorages.isEmpty());
+        else
+            ASSERT_TRUE(unmountedStorages.isEmpty());
+    }
+
     nx::ut::utils::FileStorageTestHelper storageTestHelper;
+    QString basePath = "/some/path";
     QString mediaFolderName;
-    aux::UnmountedStoragesFilter unmountedFilter;
+    nx::mserver_aux::UnmountedLocalStoragesFilter unmountedFilter;
     qint64 spaceLimit;
+    QnStorageResourceList unmountedStorages;
 };
 
-TEST_F(UnmountedStoragesFilterTest , main)
+TEST_F(UnmountedLocalStoragesFilterTest , main)
 {
-    QString url1 = lit("/media/stor1/") + mediaFolderName;
-    QString url2 = lit("/opt/mediaserver/data");
+    when(PathFound::yes, MediaFolderSuffix::yes);
+    then(StorageUnmounted::no);
 
-    QnStorageResourceList storages;
-    storages.append(storageTestHelper.createStorage(url1, spaceLimit));
-    storages.append(storageTestHelper.createStorage(url2, spaceLimit));
+    when(PathFound::yes, MediaFolderSuffix::no);
+    then(StorageUnmounted::no);
 
-    QStringList paths;
-    paths << url2;
+    when(PathFound::no, MediaFolderSuffix::yes);
+    then(StorageUnmounted::yes);
 
-    auto unmountedStorages = unmountedFilter.getUnmountedStorages(storages, paths);
-    ASSERT_EQ(unmountedStorages.size(), 1);
-    ASSERT_TRUE(unmountedStorages[0]->getUrl() == url1);
-
-    paths << lit("/media/stor1");
-
-    unmountedStorages = unmountedFilter.getUnmountedStorages(storages, paths);
-    ASSERT_EQ(unmountedStorages.size(), 0);
+    when(PathFound::no, MediaFolderSuffix::no);
+    then(StorageUnmounted::yes);
 }

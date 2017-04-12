@@ -35,3 +35,5 @@ Config.allowDebugMode = false;
 //Config.webclientEnabled = false; // Uncomment this string to disable web client
 Config.productName = 'Cox Business Security Solutions';
 Config.cloud.productName = 'Cox Cloud';
+
+Config.supportedLanguages = ['en_US', 'en_GB', 'fr', 'de', 'ru', 'es', 'ja', 'ko', 'tr', 'zh_CN', 'zh_TW', 'hu', 'he'];

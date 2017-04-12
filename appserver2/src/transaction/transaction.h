@@ -289,7 +289,7 @@ APPLY(301, saveCamera, ApiCameraData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        CameraNotificationManagerHelper(), \
-                       ModifyResourceAccess(false), /* save permission checker */ \
+                       ModifyCameraDataAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -301,7 +301,7 @@ APPLY(302, saveCameras, ApiCameraDataList, \
                        InvalidGetHashHelper(), /* getHash*/ \
                        [] (const QnTransaction<ApiCameraDataList> &tran, const NotificationParams &notificationParams) \
                          { \
-                            notificationParams.cameraNotificationManager->triggerNotification(tran); \
+                            notificationParams.cameraNotificationManager->triggerNotification(tran, notificationParams.source); \
                          }, \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
@@ -743,7 +743,7 @@ APPLY(703, videowallControl, ApiVideowallControlMessageData, \
                        false, /* system*/ \
                        InvalidGetHashHelper(), \
                        VideowallNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       VideoWallControlAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -822,7 +822,7 @@ APPLY(904, removeStoredFile, ApiStoredFilePath, \
                        [] (const QnTransaction<ApiStoredFilePath> &tran, const NotificationParams &notificationParams) \
                         { \
                             NX_ASSERT(tran.command == ApiCommand::removeStoredFile); \
-                            notificationParams.storedFileNotificationManager->triggerNotification(tran); \
+                            notificationParams.storedFileNotificationManager->triggerNotification(tran, notificationParams.source); \
                         }, \
                        AllowForAllAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
@@ -1099,7 +1099,7 @@ APPLY(2004, changeSystemId, ApiSystemIdData, \
                        false, \
                        InvalidGetHashHelper(), \
                        [] (const QnTransaction<ApiSystemIdData> &tran, const NotificationParams &notificationParams) \
-                        { return notificationParams.miscNotificationManager->triggerNotification(tran); }, \
+                        { return notificationParams.miscNotificationManager->triggerNotification(tran, notificationParams.source); }, \
                        AdminOnlyAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \

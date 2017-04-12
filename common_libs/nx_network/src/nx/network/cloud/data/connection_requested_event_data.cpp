@@ -21,31 +21,31 @@ ConnectionRequestedEvent::ConnectionRequestedEvent()
 
 void ConnectionRequestedEvent::serializeAttributes(nx::stun::Message* const message)
 {
-    message->newAttribute<stun::cc::attrs::ConnectionId>(std::move(connectSessionId));
-    message->newAttribute<stun::cc::attrs::PeerId>(std::move(originatingPeerID));
-    message->newAttribute<stun::cc::attrs::UdtHpEndpointList>(std::move(udpEndpointList));
-    message->newAttribute<stun::cc::attrs::ConnectionMethods>(nx::String::number(connectionMethods));
+    message->newAttribute<stun::extension::attrs::ConnectionId>(std::move(connectSessionId));
+    message->newAttribute<stun::extension::attrs::PeerId>(std::move(originatingPeerID));
+    message->newAttribute<stun::extension::attrs::UdtHpEndpointList>(std::move(udpEndpointList));
+    message->newAttribute<stun::extension::attrs::ConnectionMethods>(nx::String::number(connectionMethods));
     params.serializeAttributes(message);
-    message->addAttribute(stun::cc::attrs::cloudConnectVersion, (int)cloudConnectVersion);
-    message->newAttribute<stun::cc::attrs::TcpReverseEndpointList>(std::move(tcpReverseEndpointList));
-    message->addAttribute(stun::cc::attrs::isPersistent, isPersistent);
+    message->addAttribute(stun::extension::attrs::cloudConnectVersion, (int)cloudConnectVersion);
+    message->newAttribute<stun::extension::attrs::TcpReverseEndpointList>(std::move(tcpReverseEndpointList));
+    message->addAttribute(stun::extension::attrs::isPersistent, isPersistent);
 }
 
 bool ConnectionRequestedEvent::parseAttributes(const nx::stun::Message& message)
 {
-    if (!readEnumAttributeValue(message, stun::cc::attrs::cloudConnectVersion, &cloudConnectVersion))
+    if (!readEnumAttributeValue(message, stun::extension::attrs::cloudConnectVersion, &cloudConnectVersion))
         cloudConnectVersion = kDefaultCloudConnectVersion;  //if not present - old version
 
     const auto ret =
-        readStringAttributeValue<stun::cc::attrs::ConnectionId>(message, &connectSessionId) &&
-        readStringAttributeValue<stun::cc::attrs::PeerId>(message, &originatingPeerID) &&
-        readAttributeValue<stun::cc::attrs::UdtHpEndpointList>(message, &udpEndpointList) &&
-        readIntAttributeValue<stun::cc::attrs::ConnectionMethods>(message, &connectionMethods) &&
+        readStringAttributeValue<stun::extension::attrs::ConnectionId>(message, &connectSessionId) &&
+        readStringAttributeValue<stun::extension::attrs::PeerId>(message, &originatingPeerID) &&
+        readAttributeValue<stun::extension::attrs::UdtHpEndpointList>(message, &udpEndpointList) &&
+        readIntAttributeValue<stun::extension::attrs::ConnectionMethods>(message, &connectionMethods) &&
         params.parseAttributes(message);
 
     // These do not appear in old versions:
-    readAttributeValue<stun::cc::attrs::TcpReverseEndpointList>(message, &tcpReverseEndpointList);
-    readAttributeValue(message, stun::cc::attrs::isPersistent, &isPersistent);
+    readAttributeValue<stun::extension::attrs::TcpReverseEndpointList>(message, &tcpReverseEndpointList);
+    readAttributeValue(message, stun::extension::attrs::isPersistent, &isPersistent);
 
     return ret;
 }

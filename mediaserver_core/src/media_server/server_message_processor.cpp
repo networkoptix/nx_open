@@ -28,6 +28,7 @@
 #include <utils/common/app_info.h>
 #include "core/resource/storage_resource.h"
 #include "http/custom_headers.h"
+#include "resource_status_watcher.h"
 
 QnServerMessageProcessor::QnServerMessageProcessor()
 :
@@ -36,9 +37,9 @@ QnServerMessageProcessor::QnServerMessageProcessor()
 {
 }
 
-void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource, const QnUuid& peerId)
+void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource, ec2::NotificationSource source)
 {
-    QnCommonMessageProcessor::updateResource(resource, peerId);
+    QnCommonMessageProcessor::updateResource(resource, source);
     QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceById<QnMediaServerResource>(serverGuid());
 
     if (resource.dynamicCast<QnVirtualCameraResource>())
@@ -58,7 +59,7 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource, con
             ec2::fromResourceToApi(ownMediaServer, ownData);
             ec2::fromResourceToApi(resource.staticCast<QnMediaServerResource>(), newData);
 
-            if (ownData != newData && peerId != qnCommon->moduleGUID())
+            if (ownData != newData && source == ec2::NotificationSource::Remote)
             {
                 // if remote peer send update for our server then ignore it and resend our own data
                 QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(Qn::kSystemAccess)->saveSync(ownData);
@@ -167,7 +168,10 @@ void QnServerMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
         moduleFinder->setModuleStatus(data.peer.id, Qn::Offline);
 }
 
-void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status)
+void QnServerMessageProcessor::onResourceStatusChanged(
+    const QnResourcePtr &resource,
+    Qn::ResourceStatus status,
+    ec2::NotificationSource source)
 {
     if (resource->getId() == qnCommon->moduleGUID() && status != Qn::Online)
     {
@@ -178,7 +182,19 @@ void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
         manager->setResourceStatusSync(resource->getId(), Qn::Online);
         resource->setStatus(Qn::Online, Qn::StatusChangeReason::GotFromRemotePeer);
     }
-    else {
+    else if (resource->getParentId() == qnCommon->moduleGUID() &&
+        resource.dynamicCast<QnStorageResource>())
+    {
+        NX_LOG(lit("%1 Received statusChanged signal for storage %2 from remote peer. This storage is our own resource. Ignoring.")
+            .arg(QString::fromLatin1(Q_FUNC_INFO))
+            .arg(resource->getId().toString()), cl_logDEBUG2);
+
+        // Rewrite resource status to DB and send to the foreign peer
+        if (resource->getStatus() != status)
+            QnResourceStatusWatcher::instance()->updateResourceStatus(resource);
+    }
+    else
+    {
         resource->setStatus(status, Qn::StatusChangeReason::GotFromRemotePeer);
     }
 }
@@ -214,7 +230,8 @@ void QnServerMessageProcessor::at_updateChunkReceived(const QString &updateId, c
 }
 
 void QnServerMessageProcessor::at_updateInstallationRequested(const QString &updateId) {
-    QnServerUpdateTool::instance()->installUpdateDelayed(updateId);
+    QnServerUpdateTool::instance()->installUpdate(
+        updateId, QnServerUpdateTool::UpdateType::Delayed);
 }
 
 void QnServerMessageProcessor::at_reverseConnectionRequested(const ec2::ApiReverseConnectionData &data) {
@@ -264,7 +281,6 @@ void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId)
         ec2::fromResourceToApi(mServer, apiServer);
         auto connection = QnAppServerConnectionFactory::getConnection2();
         connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer);
-        connection->getResourceManager(Qn::kSystemAccess)->setResourceStatusSync(apiServer.id, Qn::Online);
     }
     else if (isOwnStorage && !storage->isExternal() && storage->isWritable())
     {

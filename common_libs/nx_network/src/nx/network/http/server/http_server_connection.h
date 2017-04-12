@@ -18,120 +18,122 @@
 
 namespace stree
 {
-    class ResourceContainer;
+class ResourceContainer;
 }   //namespace stree
 
-namespace nx_http
-{
+namespace nx_http {
+
+namespace server {
     class AbstractAuthenticationManager;
-    class NX_NETWORK_API HttpServerConnection;
-    class MessageDispatcher;
+} // namespace server
 
-    /** Used to install handlers on some events on HTTP connection.
-        \warning There is no way to remove installed event handler.
-            Event handler implementation MUST ensure it does not crash
-    */
-    class ConnectionEvents
+class NX_NETWORK_API HttpServerConnection;
+class MessageDispatcher;
+
+/** Used to install handlers on some events on HTTP connection.
+    \warning There is no way to remove installed event handler.
+        Event handler implementation MUST ensure it does not crash
+*/
+class ConnectionEvents
+{
+public:
+    nx::utils::MoveOnlyFunc<void(HttpServerConnection*)> onResponseHasBeenSent;
+};
+
+struct ResponseMessageContext
+{
+    nx_http::Message msg;
+    std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody;
+    ConnectionEvents connectionEvents;
+
+    ResponseMessageContext(
+        nx_http::Message msg,
+        std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
+        ConnectionEvents connectionEvents)
+    :
+        msg(std::move(msg)),
+        responseMsgBody(std::move(responseMsgBody)),
+        connectionEvents(std::move(connectionEvents))
     {
-    public:
-        nx::utils::MoveOnlyFunc<void(HttpServerConnection*)> onResponseHasBeenSent;
-    };
+    }
+};
 
-    struct ResponseMessageContext
-    {
-        nx_http::Message msg;
-        std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody;
-        ConnectionEvents connectionEvents;
+typedef nx::utils::MoveOnlyFunc<void(
+    nx_http::Message,
+    std::unique_ptr<nx_http::AbstractMsgBodySource>,
+    ConnectionEvents)> ResponseIsReadyHandler;
 
-        ResponseMessageContext(
-            nx_http::Message msg,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
-            ConnectionEvents connectionEvents)
-        :
-            msg(std::move(msg)),
-            responseMsgBody(std::move(responseMsgBody)),
-            connectionEvents(std::move(connectionEvents))
-        {
-        }
-    };
-
-    typedef nx::utils::MoveOnlyFunc<void(
-        nx_http::Message,
-        std::unique_ptr<nx_http::AbstractMsgBodySource>,
-        ConnectionEvents)> ResponseIsReadyHandler;
-
-    template<typename ConnectionType> using BaseConnection = 
-        nx_api::BaseStreamProtocolConnection<
-            ConnectionType,
-            nx_http::Message,
-            nx_http::MessageParser,
-            nx_http::MessageSerializer>;
-
-    typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
+template<typename ConnectionType> using BaseConnection = 
+    nx_api::BaseStreamProtocolConnection<
+        ConnectionType,
         nx_http::Message,
         nx_http::MessageParser,
-        nx_http::MessageSerializer> AsyncMessagePipeline;
+        nx_http::MessageSerializer>;
 
-    class NX_NETWORK_API HttpServerConnection
-    :
-        public BaseConnection<HttpServerConnection>,
-        public std::enable_shared_from_this<HttpServerConnection>
-    {
-    public:
-        typedef BaseConnection<HttpServerConnection> BaseType;
+typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
+    nx_http::Message,
+    nx_http::MessageParser,
+    nx_http::MessageSerializer> AsyncMessagePipeline;
 
-        HttpServerConnection(
-            StreamConnectionHolder<HttpServerConnection>* socketServer,
-            std::unique_ptr<AbstractCommunicatingSocket> sock,
-            nx_http::AbstractAuthenticationManager* const authenticationManager,
-            nx_http::MessageDispatcher* const httpMessageDispatcher);
-        virtual ~HttpServerConnection();
+class NX_NETWORK_API HttpServerConnection:
+    public BaseConnection<HttpServerConnection>,
+    public std::enable_shared_from_this<HttpServerConnection>
+{
+public:
+    typedef BaseConnection<HttpServerConnection> BaseType;
 
-        virtual void pleaseStop(
-            nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+    HttpServerConnection(
+        StreamConnectionHolder<HttpServerConnection>* socketServer,
+        std::unique_ptr<AbstractStreamSocket> sock,
+        nx_http::server::AbstractAuthenticationManager* const authenticationManager,
+        nx_http::MessageDispatcher* const httpMessageDispatcher);
+    virtual ~HttpServerConnection();
 
-        void processMessage(nx_http::Message&& request);
+    virtual void pleaseStop(
+        nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+
+    void processMessage(nx_http::Message&& request);
 		
-        // used for test purpose
-        void setPersistentConnectionEnabled(bool value);
+    // used for test purpose
+    void setPersistentConnectionEnabled(bool value);
 
-    private:
-        nx_http::AbstractAuthenticationManager* const m_authenticationManager;
-        nx_http::MessageDispatcher* const m_httpMessageDispatcher;
-        std::unique_ptr<nx_http::AbstractMsgBodySource> m_currentMsgBody;
-        bool m_isPersistent;
-        bool m_persistentConnectionEnabled;
-        std::deque<ResponseMessageContext> m_responseQueue;
+private:
+    nx_http::server::AbstractAuthenticationManager* const m_authenticationManager;
+    nx_http::MessageDispatcher* const m_httpMessageDispatcher;
+    std::unique_ptr<nx_http::AbstractMsgBodySource> m_currentMsgBody;
+    bool m_isPersistent;
+    bool m_persistentConnectionEnabled;
+    std::deque<ResponseMessageContext> m_responseQueue;
 
-        void onAuthenticationDone(
-            bool authenticationResult,
-            stree::ResourceContainer authInfo,
-            nx_http::Message requestMessage,
-            boost::optional<header::WWWAuthenticate> wwwAuthenticate,
-            nx_http::HttpHeaders responseHeaders,
-            std::unique_ptr<AbstractMsgBodySource> msgBody);
-        void sendUnauthorizedResponse(
-            const nx_http::MimeProtoVersion& protoVersion,
-            boost::optional<header::WWWAuthenticate> wwwAuthenticate,
-            nx_http::HttpHeaders responseHeaders,
-            std::unique_ptr<AbstractMsgBodySource> msgBody);
-        void prepareAndSendResponse(
-            nx_http::MimeProtoVersion version,
-            nx_http::Message&& response,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
-            ConnectionEvents connectionEvents = ConnectionEvents());
-        void sendNextResponse();
-        void responseSent();
-        void someMsgBodyRead( SystemError::ErrorCode, BufferType buf );
-        void readMoreMessageBodyData();
-        void fullMessageHasBeenSent();
-        void checkForConnectionPersistency( const Message& request );
+    void onAuthenticationDone(
+        bool authenticationResult,
+        stree::ResourceContainer authInfo,
+        nx_http::Message requestMessage,
+        boost::optional<header::WWWAuthenticate> wwwAuthenticate,
+        nx_http::HttpHeaders responseHeaders,
+        std::unique_ptr<AbstractMsgBodySource> msgBody);
+    void sendUnauthorizedResponse(
+        const nx_http::MimeProtoVersion& protoVersion,
+        boost::optional<header::WWWAuthenticate> wwwAuthenticate,
+        nx_http::HttpHeaders responseHeaders,
+        std::unique_ptr<AbstractMsgBodySource> msgBody);
+    void prepareAndSendResponse(
+        nx_http::MimeProtoVersion version,
+        nx_http::Message&& response,
+        std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
+        ConnectionEvents connectionEvents = ConnectionEvents());
+    void sendNextResponse();
+    void responseSent();
+    void someMsgBodyRead( SystemError::ErrorCode, BufferType buf );
+    void readMoreMessageBodyData();
+    void fullMessageHasBeenSent();
+    void checkForConnectionPersistency( const Message& request );
 
-        HttpServerConnection( const HttpServerConnection& );
-        HttpServerConnection& operator=( const HttpServerConnection& );
-    };
+    HttpServerConnection( const HttpServerConnection& );
+    HttpServerConnection& operator=( const HttpServerConnection& );
+};
 
-    typedef std::weak_ptr<HttpServerConnection> HttpServerConnectionPtr;
+typedef std::weak_ptr<HttpServerConnection> HttpServerConnectionPtr;
 }   //namespace nx_http
 
 #endif  //HTTP_SERVER_CONNECTION_H

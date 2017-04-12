@@ -1,6 +1,6 @@
 import QtQuick 2.6;
 import QtQuick.Controls 1.2;
-import NetworkOptix.Qml 1.0;
+import Nx.Models 1.0;
 import com.networkoptix.qml 1.0;
 
 import "."
@@ -13,6 +13,13 @@ Rectangle
     height: context.pageSize.height;
 
     color: Style.colors.window;
+
+    Rectangle
+    {
+        width: parent.width;
+        height: 2;
+        color: Style.colors.custom.titleBar.shadow;
+    }
 
     Item
     {
@@ -39,13 +46,17 @@ Rectangle
             id: searchEdit;
 
             visible: grid.totalItemsCount > grid.itemsPerPage
-            visualParent: screenHolder
 
             anchors.bottom: gridHolder.top
-            anchors.bottomMargin: 8
+            anchors.bottomMargin: 16
             anchors.horizontalCenter: parent.horizontalCenter
 
-            onQueryChanged: { grid.model.setFilterWildcard(query); }
+            onQueryChanged:
+            {
+                if (grid.model)
+                    grid.model.setFilterWildcard(query);
+            }
+            z: (grid.watcher.isSomeoneActive ? 0 : 1000);
         }
 
         Item
@@ -87,7 +98,7 @@ Rectangle
                 readonly property int rowsCount: (grid.count < 3 ? 1 : 2)
                 readonly property int itemsPerPage: colsCount * rowsCount
                 readonly property int pagesCount: Math.ceil(grid.count / itemsPerPage)
-                readonly property int totalItemsCount: model.sourceRowsCount;
+                readonly property int totalItemsCount: (model ? model.sourceRowsCount : 0);
 
                 opacity: 0;
                 snapMode: GridView.SnapOneRow;
@@ -164,8 +175,17 @@ Rectangle
 
                     target: context;
 
+                    onSwitchPage: { pageSwitcher.setPage(pageIndex); }
+
                     onOpenTile:
                     {
+                        if (systemId.length == 0)
+                        {
+                            // Just try to collapse current tile;
+                            grid.watcher.resetCurrentItem();
+                            return;
+                        }
+
                         var foundItem = null;
                         var count = openTileHandler.items.length;
                         for (var i = 0; i != count; ++i)
@@ -186,10 +206,31 @@ Rectangle
                     }
                 }
 
-                model: QnFilteringSystemsModel
+                Loader
                 {
-                    filterCaseSensitivity: Qt.CaseInsensitive;
-                    filterRole: 257;    // Search text role
+                    id: modelLoader;
+
+                    active: (context.isVisible && screenHolder.visible);
+
+                    sourceComponent: Component
+                    {
+                        FilteringSystemsModel
+                        {
+                            filterCaseSensitivity: Qt.CaseInsensitive;
+                            filterRole: 257;    // Search text role
+                        }
+                    }
+
+                    onItemChanged:
+                    {
+                        if (grid.model)
+                        {
+                            grid.setPage(0);
+                            searchEdit.clear();
+                        }
+
+                        grid.model = item;
+                    }
                 }
 
                 delegate: Item
@@ -201,7 +242,7 @@ Rectangle
                     SystemTile
                     {
                         id: tile
-
+                        view: grid;
                         visualParent: screenHolder
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.verticalCenter: parent.verticalCenter
@@ -215,10 +256,16 @@ Rectangle
                         isCloudTile: model.isCloudSystem
                         safeMode: model.safeMode;
 
-                        wrongVersion: model.wrongVersion
-                        isCompatibleInternal: model.isCompatibleInternal
-                        compatibleVersion: model.compatibleVersion
-                        isOnline: model.isOnline;
+                        wrongVersion: (model.wrongVersion && !model.wrongVersion.isNull()
+                            && model.wrongVersion.toString()) || "";
+                        isCompatibleInternal: model.isCompatibleInternal;
+                        compatibleVersion:(model.compatibleVersion
+                            && !model.compatibleVersion.isNull()
+                            && model.compatibleVersion.toString()) || "";
+
+                        isRunning: model.isRunning;
+                        isReachable: model.isReachable;
+                        isConnectable: model.isConnectable;
 
                         Component.onCompleted:
                         {
@@ -235,6 +282,15 @@ Rectangle
 
                 function setPage(index, animate)
                 {
+                    /**
+                      * TODO: #ynikitenkov add items watcher, refactor
+                      * it to don'use openTileHandler's items
+                      */
+                    openTileHandler.items.forEach(function(item)
+                    {
+                        item.cancelAnimationOnCollapse();
+                    })
+
                     switchPageAnimation.stop();
                     if (animate || (opacity == 0)) //< Opacity is 0 on first show
                     {
@@ -268,7 +324,7 @@ Rectangle
                 visible: (pagesCount > 1);
                 anchors.horizontalCenter: gridHolder.horizontalCenter;
                 anchors.top: gridHolder.bottom;
-                anchors.topMargin: 8;
+                anchors.topMargin: 22;
 
                 pagesCount: Math.min(grid.pagesCount, 10); //< 10 pages maximum
 
@@ -286,7 +342,7 @@ Rectangle
 
             anchors.centerIn: parent;
             foundServersCount: grid.count;
-            visible: (grid.model.sourceRowsCount == 0);
+            visible: (!grid.model || (grid.model.sourceRowsCount == 0));
         }
 
         Item
@@ -318,15 +374,15 @@ Rectangle
             anchors.horizontalCenter: parent.horizontalCenter;
 
             text: grid.totalItemsCount > 0
-                ? qsTr("Connect to Another System")
-                : qsTr("Connect to System")
+                ? qsTr("Connect to Another Server...")
+                : qsTr("Connect to Server...")
 
             onClicked: context.connectToAnotherSystem();
         }
 
         NxBanner
         {
-            visible: !context.isCloudEnabled;
+            visible: !context.isCloudEnabled && context.isLoggedInToCloud;
 
             anchors.top: parent.top;
             anchors.topMargin: 16;
@@ -355,6 +411,7 @@ Rectangle
             color: Style.colors.mid;
             font: Style.fonts.preloader;
             anchors.horizontalCenter: parent.horizontalCenter;
+            anchors.horizontalCenterOffset: 4;
         }
     }
 
@@ -438,8 +495,6 @@ Rectangle
         {
             if (grid.watcher.currentItem)
                 grid.watcher.currentItem.forceCollapsedState();
-
-            pageSwitcher.setPage(0);
         }
     }
 }

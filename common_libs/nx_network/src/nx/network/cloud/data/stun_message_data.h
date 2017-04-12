@@ -3,7 +3,7 @@
 #include <nx/network/buffer.h>
 #include <nx/network/stun/message.h>
 #include <nx/utils/log/log_message.h>
-#include <nx/network/stun/cc/custom_stun.h>
+#include <nx/network/stun/extension/stun_extension_types.h>
 
 namespace nx {
 namespace hpm {
@@ -29,7 +29,7 @@ protected:
         if (!attribute)
         {
             setErrorText(nx::String("Missing required attribute ") +
-                stun::cc::attrs::toString(AttributeType::TYPE));
+                stun::extension::attrs::toString(AttributeType::TYPE));
             return false;
         }
         *value = attribute->get();
@@ -45,7 +45,7 @@ protected:
         if (!attribute)
         {
             setErrorText(nx::String("Missing required attribute ") +
-                stun::cc::attrs::toString(AttributeType::TYPE));
+                stun::extension::attrs::toString(AttributeType::TYPE));
             return false;
         }
         *value = attribute->getString();
@@ -61,7 +61,7 @@ protected:
         if (!attribute)
         {
             setErrorText(nx::String("Missing required attribute ") +
-                stun::cc::attrs::toString(AttributeType::TYPE));
+                stun::extension::attrs::toString(AttributeType::TYPE));
             return false;
         }
         //TODO #ak why getString???
@@ -78,7 +78,7 @@ protected:
         if (!attribute)
         {
             setErrorText(nx::String("Missing required attribute ") +
-                stun::cc::attrs::toString(static_cast<stun::cc::attrs::AttributeType>(type)));
+                stun::extension::attrs::toString(static_cast<stun::extension::attrs::AttributeType>(type)));
             return false;
         }
         *value = attribute->value();
@@ -94,7 +94,7 @@ protected:
         if (!attribute)
         {
             setErrorText(nx::String("Missing required attribute ") +
-                stun::cc::attrs::toString(static_cast<stun::cc::attrs::AttributeType>(type)));
+                stun::extension::attrs::toString(static_cast<stun::extension::attrs::AttributeType>(type)));
             return false;
         }
         *value = attribute->value() > 0;
@@ -114,7 +114,7 @@ protected:
         if (!attribute)
         {
             setErrorText(nx::String("Missing required attribute ") +
-                stun::cc::attrs::toString(static_cast<stun::cc::attrs::AttributeType>(type)));
+                stun::extension::attrs::toString(static_cast<stun::extension::attrs::AttributeType>(type)));
             return false;
         }
         *value = std::chrono::duration<Rep, Period>(attribute->value());
@@ -141,7 +141,7 @@ protected:
         if (!attribute)
         {
             setErrorText(nx::String("Missing required attribute ") +
-                stun::cc::attrs::toString(AttributeType::TYPE));
+                stun::extension::attrs::toString(AttributeType::TYPE));
             return false;
         }
         *value = static_cast<EnumType>(attribute->value());
@@ -158,7 +158,7 @@ protected:
         if (!attribute)
         {
             setErrorText(nx::String("Missing required attribute ") +
-                stun::cc::attrs::toString(static_cast<stun::cc::attrs::AttributeType>(type)));
+                stun::extension::attrs::toString(static_cast<stun::extension::attrs::AttributeType>(type)));
             return false;
         }
         *value = static_cast<EnumType>(attribute->value());
@@ -174,7 +174,7 @@ protected:
         if (!attribute)
         {
             setErrorText(nx::String("Missing required attribute ") +
-                stun::cc::attrs::toString(AttributeType::TYPE));
+                stun::extension::attrs::toString(AttributeType::TYPE));
             return false;
         }
         *value = QnUuid::fromStringSafe(attribute->getString());

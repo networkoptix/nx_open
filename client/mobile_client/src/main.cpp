@@ -4,6 +4,8 @@
 #include <QtQml/QtQml>
 #include <QtQml/QQmlFileSelector>
 #include <QtQuick/QQuickWindow>
+#include <QtGui/QCursor>
+#include <QtGui/QScreen>
 
 #include <qtsingleguiapplication.h>
 
@@ -38,6 +40,7 @@
 
 #include <nx/mobile_client/webchannel/web_channel_server.h>
 #include <nx/mobile_client/controllers/web_admin_controller.h>
+#include <nx/mobile_client/helpers/inter_client_message.h>
 
 #include "config.h"
 using mobile_client::conf;
@@ -105,7 +108,6 @@ int runUi(QtSingleGuiApplication* application)
     auto basePath = qnSettings->basePath();
     if (!basePath.startsWith(lit("qrc:")))
         basePath = lit("file://") + QDir(basePath).absolutePath() + lit("/");
-    context.setLocalPrefix(basePath);
     engine.setBaseUrl(QUrl(basePath + lit("qml/")));
     engine.addImportPath(basePath + lit("qml"));
     QQmlFileSelector qmlFileSelector(&engine);
@@ -130,6 +132,11 @@ int runUi(QtSingleGuiApplication* application)
             if (context.liteMode() && !conf.disableFullScreen)
             {
                 mainWindow->showFullScreen();
+                if (const auto screen = mainWindow->screen())
+                {
+                    const auto size = screen->size();
+                    QCursor::setPos(screen, size.width() / 2, size.height() / 2);
+                }
             }
             else
             {
@@ -176,22 +183,38 @@ int runUi(QtSingleGuiApplication* application)
         if (initialIntentData.isValid())
             QDesktopServices::openUrl(initialIntentData);
     #endif
-
+    
     QObject::connect(application, &QtSingleGuiApplication::messageReceived, mainWindow,
-        [&context, mainWindow](const QString& message)
+        [&context, mainWindow](const QString& serializedMessage)
         {
-            NX_LOG(lit("Processing application message BEGIN: %1").arg(message), cl_logDEBUG1);
-            if (message == lit("startCamerasMode"))
+            NX_LOG(lit("Processing application message BEGIN: %1")
+                .arg(serializedMessage), cl_logDEBUG1);
+
+            using nx::client::mobile::InterClientMessage;
+
+            auto message = InterClientMessage::fromString(serializedMessage);
+
+            switch (message.command)
             {
-                context.uiController()->openResourcesScreen();
-                context.uiController()->connectToSystem(qnSettings->startupParameters().url);
-                mainWindow->update();
+                case InterClientMessage::Command::startCamerasMode:
+                    context.uiController()->openResourcesScreen();
+                    context.uiController()->connectToSystem(qnSettings->startupParameters().url);
+                    mainWindow->update();
+                    break;
+                case InterClientMessage::Command::refresh:
+                    mainWindow->update();
+                    break;
+                case InterClientMessage::Command::updateUrl:
+                {
+                    QUrl url(message.parameters);
+                    if (url.isValid())
+                        qnSettings->startupParameters().url = QUrl(message.parameters);
+                    break;
+                }
             }
-            else if (message == lit("refresh"))
-            {
-                mainWindow->update();
-            }
-            NX_LOG(lit("Processing application message END: %1").arg(message), cl_logDEBUG1);
+
+            NX_LOG(lit("Processing application message END: %1")
+                .arg(serializedMessage), cl_logDEBUG1);
         });
 
     return application->exec();
@@ -225,14 +248,14 @@ void initLog(const QString& logLevel)
 
         QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
             logFileBaseName,
-            /*DEFAULT_MAX_LOG_FILE_SIZE*/ 10*1024*1024,
+            /*DEFAULT_MAX_LOG_FILE_SIZE*/ 10 * 1024 * 1024,
             /*DEFAULT_MSG_LOG_ARCHIVE_SIZE*/ 5,
             cl_logDEBUG2);
     }
 
     if (conf.enableLog)
     {
-        const auto logFileBaseName = 
+        const auto logFileBaseName =
             conf.logFile && conf.logFile[0]
                 ? QLatin1String(conf.logFile)
                 : QnAppInfo::isAndroid()
@@ -241,7 +264,7 @@ void initLog(const QString& logLevel)
 
         QnLog::instance(QnLog::MAIN_LOG_ID)->create(
             logFileBaseName,
-            /*DEFAULT_MAX_LOG_FILE_SIZE*/ 10*1024*1024,
+            /*DEFAULT_MAX_LOG_FILE_SIZE*/ 10 * 1024 * 1024,
             /*DEFAULT_MSG_LOG_ARCHIVE_SIZE*/ 5,
             cl_logDEBUG2);
     }
@@ -291,20 +314,32 @@ int main(int argc, char *argv[])
 
     QnMobileClientStartupParameters startupParams(application);
 
+    using nx::client::mobile::InterClientMessage;
+
+    auto sendApplicationMessage =
+        [&application](const InterClientMessage& message)
+        {
+            const auto serializedMessage = message.toString();
+
+            NX_LOG(lit("BEGIN Sending application message: %1")
+                .arg(serializedMessage), cl_logDEBUG1);
+
+            application.sendMessage(serializedMessage);
+
+            NX_LOG(lit("END Sending application message: %1")
+                .arg(serializedMessage), cl_logDEBUG1);
+        };
+
     if (application.isRunning())
     {
+        sendApplicationMessage(InterClientMessage(
+            InterClientMessage::Command::updateUrl, startupParams.url.toString()));
+
         if (startupParams.autoLoginMode == AutoLoginMode::Enabled)
-        {
-            NX_LOG(lit("BEGIN Sending application message: startCamerasMode"), cl_logDEBUG1);
-            application.sendMessage(lit("startCamerasMode"));
-            NX_LOG(lit("END Sending application message: startCamerasMode"), cl_logDEBUG1);
-        }
+            sendApplicationMessage(InterClientMessage::Command::startCamerasMode);
         else
-        {
-            NX_LOG(lit("END Sending application message: refresh"), cl_logDEBUG1);
-            application.sendMessage(lit("refresh"));
-            NX_LOG(lit("BEGIN Sending application message: refresh"), cl_logDEBUG1);
-        }
+            sendApplicationMessage(InterClientMessage::Command::refresh);
+
         return 0;
     }
 

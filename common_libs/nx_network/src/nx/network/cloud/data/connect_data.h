@@ -22,8 +22,8 @@ class NX_NETWORK_API ConnectRequest
     public StunRequestData
 {
 public:
-    constexpr static const stun::cc::methods::Value kMethod =
-        stun::cc::methods::connect;
+    constexpr static const stun::extension::methods::Value kMethod =
+        stun::extension::methods::connect;
 
     //TODO #ak destinationHostName MUST be unicode string (e.g., QString)
     nx::String destinationHostName;
@@ -48,8 +48,8 @@ class NX_NETWORK_API ConnectResponse
     public StunResponseData
 {
 public:
-    constexpr static const stun::cc::methods::Value kMethod =
-        stun::cc::methods::connect;
+    constexpr static const stun::extension::methods::Value kMethod =
+        stun::extension::methods::connect;
 
     std::list<SocketAddress> forwardedTcpEndpointList;
     std::list<SocketAddress> udpEndpointList;

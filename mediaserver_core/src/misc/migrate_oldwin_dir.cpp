@@ -1,7 +1,11 @@
 #ifdef Q_OS_WIN32
 
+#include <array>
 #include "migrate_oldwin_dir.h"
+#include <media_server/serverutil.h>
+#include <nx/utils/log/log.h>
 
+namespace nx {
 namespace misc {
 
 bool moveDir(const QDir& srcDir, const QDir& dstDir)
@@ -34,29 +38,116 @@ bool moveDir(const QDir& srcDir, const QDir& dstDir)
     return true;
 }
 
-void migrateFilesFromWindowsOldDir(const QString& currentDataDir)
+class MigrateOldWindowsDataHelper
+{
+public:
+    MigrateOldWindowsDataHelper(MigrateDataHandler* handler):
+        m_handler(handler),
+        m_currentDataDir(handler->currentDataDir().toLower()),
+        m_windowsDir(handler->windowsDir().toLower())
+    {
+        NX_LOG(lit("[Moving data] Current data dir: %1, windows dir: %2")
+                .arg(m_currentDataDir)
+                .arg(m_windowsDir), cl_logDEBUG2);
+    }
+
+    MigrateDataResult moveData()
+    {
+        if (m_windowsDir.isEmpty())
+            return MigrateDataResult::WinDirNotFound;
+
+        if (!m_currentDataDir.startsWith(m_windowsDir))
+            return MigrateDataResult::NoNeedToMigrate;
+
+        populateOldDataDirsCandidates();
+        for (const QString& candidate: m_oldDataDirCandidates)
+        {
+            auto result = tryToMoveFromCandidate(candidate);
+            if (result == MigrateDataResult::MoveDataFailed || result == MigrateDataResult::Ok)
+                return result;
+        }
+
+        return MigrateDataResult::NoNeedToMigrate;
+    }
+
+private:
+    void populateOldDataDirsCandidates()
+    {
+        const QString basePath = m_windowsDir.mid(0, m_windowsDir.lastIndexOf(lit("\\")) + 1);
+        const QString dataSubPath = m_currentDataDir.mid(m_windowsDir.size()); 
+
+        QString baseName = lit("windows");
+        std::array<QString, 2> suffixes = {lit(".old"), lit(".000")};
+
+        for (const auto& suffix : suffixes)
+        {
+            m_oldDataDirCandidates.append(basePath + baseName + suffix + dataSubPath);
+            m_oldDataDirCandidates.append(basePath + baseName + suffix + lit("\\") + baseName + dataSubPath);
+        }
+    }
+
+    MigrateDataResult tryToMoveFromCandidate(const QString& oldDataDirCandidate)
+    {
+        if (!m_handler->dirExists(oldDataDirCandidate))
+        {
+            NX_LOG(lit("[Moving data] candidate: %1 doesn't exist").arg(oldDataDirCandidate), cl_logDEBUG2);
+            return MigrateDataResult::NoNeedToMigrate;
+        }
+
+        if (!m_handler->makePath(m_currentDataDir) || !m_handler->moveDir(oldDataDirCandidate, m_currentDataDir))
+            return MigrateDataResult::MoveDataFailed;
+
+        m_handler->rmDir(oldDataDirCandidate); 
+        return MigrateDataResult::Ok;
+    }
+
+private:
+    MigrateDataHandler* m_handler;
+    QString m_currentDataDir;
+    QString m_windowsDir;
+    QStringList m_oldDataDirCandidates;
+};
+
+MigrateDataResult migrateFilesFromWindowsOldDir(MigrateDataHandler* handler)
+{
+    MigrateOldWindowsDataHelper helper(handler);
+    return helper.moveData();
+}
+
+QString ServerDataMigrateHandler::currentDataDir() const
+{
+    return QDir::toNativeSeparators(getDataDirectory());
+}
+
+QString ServerDataMigrateHandler::windowsDir() const
 {
     WCHAR lpBuffer[MAX_PATH];
     if (GetWindowsDirectory(lpBuffer, sizeof(lpBuffer)) == 0)
-        return; //< nothing to migrate
-    QString windowsDir = QString::fromUtf16((const ushort*)lpBuffer);
-    QString oldWindowsDir = windowsDir + QLatin1String(".old");
+        return QString(); //< nothing to migrate
+    return QString::fromUtf16((const ushort*)lpBuffer);
+}
 
-    if (!currentDataDir.startsWith(windowsDir))
-        return; //< nothing to migrate
+bool ServerDataMigrateHandler::dirExists(const QString& path) const 
+{
+    return QDir(path).exists();
+}
 
-    QString suffix = currentDataDir.mid(windowsDir.length());
-    QString oldDirName = oldWindowsDir + suffix;
+bool ServerDataMigrateHandler::makePath(const QString& path)
+{
+    return QDir().mkpath(path);
+}
 
-    QDir oldDir(oldDirName);
-    if (!oldDir.exists())
-        return;
-    QDir dstDir(currentDataDir);
-    if (!dstDir.mkpath(currentDataDir) || !moveDir(oldDir, dstDir))
-        qWarning() << "Found application data in" << oldWindowsDir << "folder but data moving is failed";
-    oldDir.rmdir(oldDirName); //< ignore old dir related error
+bool ServerDataMigrateHandler::moveDir(const QString& source, const QString& target) 
+{
+    return nx::misc::moveDir(QDir(source), QDir(target));
+}
+
+bool ServerDataMigrateHandler::rmDir(const QString& path)
+{
+    return QDir().rmdir(path);
 }
 
 } // namespace misc
+} // namespace nx
 
 #endif // Q_OS_WIN32

@@ -5,10 +5,10 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
 MaintenanceManager::MaintenanceManager(
-    network::cloud::CloudModuleEndPointFetcher* const cloudModuleEndpointFetcher)
+    network::cloud::CloudModuleUrlFetcher* const cloudModuleEndpointFetcher)
     :
     AsyncRequestsExecutor(cloudModuleEndpointFetcher)
 {
@@ -23,6 +23,15 @@ void MaintenanceManager::getConnectionsFromVms(
         std::bind(completionHandler, std::placeholders::_1, api::VmsConnectionDataList()));
 }
 
-} // namespace cl
+void MaintenanceManager::getStatistics(
+    std::function<void(api::ResultCode, api::Statistics)> completionHandler)
+{
+    executeRequest(
+        kMaintenanceGetStatistics,
+        completionHandler,
+        std::bind(completionHandler, std::placeholders::_1, api::Statistics()));
+}
+
+} // namespace client
 } // namespace cdb
 } // namespace nx

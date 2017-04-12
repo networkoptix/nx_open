@@ -61,7 +61,7 @@ Animations::Animations(QObject* parent):
     setup(Id::SceneZoomIn, QEasingCurve::InOutQuad, 500);
     setup(Id::SceneZoomOut, QEasingCurve::InOutQuad, 500);
 
-    setup(Id::ItemOverlayShow, QEasingCurve::InOutQuad, 200);
+    setup(Id::ItemOverlayShow, QEasingCurve::InOutQuad, 100);
     setup(Id::ItemOverlayHide, QEasingCurve::InOutQuad, 200);
 }
 

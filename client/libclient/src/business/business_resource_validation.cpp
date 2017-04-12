@@ -8,12 +8,16 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource_access/resource_access_manager.h>
-#include <core/resource/device_dependent_strings.h>
 
 #include <utils/email/email.h>
 
 namespace
 {
+
+QString braced(const QString& source)
+{
+    return L'<' + source + L'>';
+}
 
     QString getShortResourceName(const QnResourcePtr& resource)
     {
@@ -34,11 +38,12 @@ namespace
             ).arg(count);
         }
 
-        static QString anyCamera() {
-            return QnDeviceDependentStrings::getDefaultNameFromSet(
-                tr("<Any Device>"),
-                tr("<Any Camera>")
-                );
+        static QString anyCamera()
+        {
+            return braced(QnDeviceDependentStrings::getDefaultNameFromSet(
+                tr("Any Device"),
+                tr("Any Camera")
+                ));
         }
 
         static QString selectCamera() {
@@ -114,7 +119,7 @@ QString QnExecPtzPresetPolicy::getText(const QnResourceList &resources, const bo
 
     QnVirtualCameraResourcePtr camera = cameras.first();
     if (!isResourceValid(camera))
-        return tr("%1 has no ptz presets").arg(getShortResourceName(camera));
+        return tr("%1 has no PTZ presets").arg(getShortResourceName(camera));
 
     return getShortResourceName(camera);
 }
@@ -141,7 +146,7 @@ QString QnCameraAudioTransmitPolicy::getText(const QnResourceList &resources, co
             tr("Select device"),
             tr("Select camera"));
     else
-        return genericCameraText<QnCameraAudioTransmitPolicy>(cameras, detailed, tr("%1 doesn't support two-way audio", "", invalid), invalid);
+        return genericCameraText<QnCameraAudioTransmitPolicy>(cameras, detailed, tr("%1 does not support two-way audio", "", invalid), invalid);
 }
 
 bool QnCameraRecordingPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
@@ -172,10 +177,10 @@ bool QnSendEmailActionDelegate::validate(const QSet<QnUuid>& selected)
     if (!m_warningLabel)
         return true;
 
-    bool valid = isValidList(selected);
+    bool valid = isValidList(selected, QString());
     m_warningLabel->setVisible(!valid);
     if (!valid)
-        m_warningLabel->setText(getText(selected));
+        m_warningLabel->setText(getText(selected, true, QString()));
     return true;
 }
 
@@ -194,7 +199,11 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QStri
     using boost::algorithm::all_of;
 
     /* Return true if there are no invalid emails and there is at least one recipient. */
-    auto users = qnResPool->getResources<QnUserResource>(ids);
+    auto users = qnResPool->getResources<QnUserResource>(ids).filtered(
+        [](const QnUserResourcePtr& user)
+        {
+            return user->isEnabled();
+        });
 
     if (!all_of(users, &isValidUser))
         return false;
@@ -213,7 +222,11 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
     const QString& additionalList)
 {
     auto roles = qnUserRolesManager->userRoles(ids);
-    auto users = qnResPool->getResources<QnUserResource>(ids);
+    auto users = qnResPool->getResources<QnUserResource>(ids).filtered(
+        [](const QnUserResourcePtr& user)
+        {
+            return user->isEnabled();
+        });
     auto additional = parseAdditional(additionalList);
 
     if (users.isEmpty() && roles.empty() && additional.isEmpty())
@@ -236,8 +249,8 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
     if (detailed && invalid > 0)
     {
         if (users.size() == 1)
-            return tr("User %1 has invalid email address").arg(users.first()->getName());
-        return tr("%n of %1 users have invalid email address", "", invalid).arg(users.size());
+            return tr("User %1 has invalid Email address").arg(users.first()->getName());
+        return tr("%n of %1 users have invalid Email address", "", invalid).arg(users.size());
     }
 
     invalid = 0;
@@ -252,11 +265,11 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
     //
     if (detailed && invalid > 0)
         return (additional.size() == 1)
-        ? tr("Invalid email address %1").arg(additional.first())
-        : tr("%n of %1 additional email addresses are invalid", "", invalid).arg(additional.size());
+        ? tr("Invalid Email address %1").arg(additional.first())
+        : tr("%n of %1 additional Email addresses are invalid", "", invalid).arg(additional.size());
 
     if (detailed)
-        return tr("Send email to %1").arg(receivers.join(QLatin1String("; ")));
+        return tr("Send Email to %1").arg(receivers.join(QLatin1String("; ")));
 
 
     QStringList recipients;
@@ -286,5 +299,9 @@ QStringList QnSendEmailActionDelegate::parseAdditional(const QString& additional
 
 bool QnSendEmailActionDelegate::isValidUser(const QnUserResourcePtr& user)
 {
+    // Disabled users are just not displayed
+    if (!user->isEnabled())
+        return true;
+
     return nx::email::isValidAddress(user->getEmail());
 }

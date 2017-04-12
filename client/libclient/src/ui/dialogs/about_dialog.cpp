@@ -51,13 +51,6 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
 
     setHelpTopic(this, Qn::About_Help);
 
-    if(menu()->canTrigger(QnActions::ShowcaseAction)) {
-        QPushButton* showcaseButton = new QPushButton(this);
-        showcaseButton->setText(action(QnActions::ShowcaseAction)->text());
-        connect(showcaseButton, &QPushButton::clicked, action(QnActions::ShowcaseAction), &QAction::trigger);
-        ui->buttonBox->addButton(showcaseButton, QDialogButtonBox::HelpRole);
-    }
-
     m_copyButton = new QPushButton(this);
     ui->buttonBox->addButton(m_copyButton, QDialogButtonBox::HelpRole);
 
@@ -135,7 +128,7 @@ void QnAboutDialog::retranslateUi()
 
     QString servers = connectedServers();
     if (servers.isEmpty())
-        servers = tr("Client is not connected to any system");
+        servers = tr("Client is not connected to any System");
 
     QString appName = lit("<b>%1&trade; %2</b>")
         .arg(QnAppInfo::organizationName())
@@ -173,11 +166,14 @@ void QnAboutDialog::retranslateUi()
     QString supportAddress = QnGlobalSettings::instance()->emailSettings().supportEmail;
     QString supportLink = supportAddress;
     QnEmailAddress supportEmail(supportAddress);
+
+    // Check if email is provided
     if (supportEmail.isValid())
         supportLink = lit("<a href=mailto:%1>%1</a>").arg(supportEmail.value());
-    else if (!supportAddress.isEmpty())
+    // simple check if phone is provided
+    else if (!supportAddress.isEmpty() && !supportAddress.startsWith(lit("+")))
         supportLink = lit("<a href=%1>%1</a>").arg(supportAddress);
-    ui->supportEmailLabel->setText(lit("<b>%1</b>: %2").arg(tr("Support")).arg(supportLink));
+    ui->supportEmailLabel->setText(lit("<b>%1</b>: %2").arg(tr("Customer Support")).arg(supportLink));
 }
 
 // -------------------------------------------------------------------------- //

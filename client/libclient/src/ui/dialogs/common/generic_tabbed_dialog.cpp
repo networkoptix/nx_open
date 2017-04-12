@@ -88,7 +88,8 @@ void QnGenericTabbedDialog::accept()
     if (!canApplyChanges())
         return;
 
-    applyChanges();
+    if (hasChanges())
+        applyChanges();
     base_type::accept();
     emit dialogClosed();
 }
@@ -99,9 +100,9 @@ bool QnGenericTabbedDialog::forcefullyClose()
     if (!canDiscardChanges())
         return false;
 
+    hide();
     discardChanges();
     loadDataToUi();
-    hide();
     return true;
 }
 
@@ -127,7 +128,7 @@ void QnGenericTabbedDialog::retranslateUi()
 void QnGenericTabbedDialog::applyChanges()
 {
     for(const Page &page: m_pages)
-        if (page.enabled && page.visible)
+        if (page.enabled && page.visible && page.widget->hasChanges())
             page.widget->applyChanges();
     updateButtonBox();
 }
@@ -329,8 +330,11 @@ void QnGenericTabbedDialog::buttonBoxClicked(QDialogButtonBox::StandardButton bu
     switch (button)
     {
     case QDialogButtonBox::Apply:
-        if (canApplyChanges())
+        if (canApplyChanges() && hasChanges())
+        {
             applyChanges();
+            updateButtonBox();
+        }
         break;
     default:
         break;

@@ -66,7 +66,8 @@
         <traytool.guid>{e2bc6f17-8fc1-4aeb-b614-3fe2c74c41f6}</traytool.guid>
         <nxtool.guid>{d78c3988-0459-4dce-a1dc-e70df990fa54}</nxtool.guid>
         <ftpstorageplugin.guid>{f6c9f457-910c-4c0d-bb67-b4f752a8664e}</ftpstorageplugin.guid>
-        <storage_plugin_test_client.guid>{83e8bbad-6976-45da-bdd7-baf8f17fc71c}</storage_plugin_test_client.guid>
+        <teststorageplugin.guid>{3d6223e8-eca2-47e1-ad40-a24bd2e2a78f}</teststorageplugin.guid>
+        <!-- <storage_plugin_test_client.guid>{83e8bbad-6976-45da-bdd7-baf8f17fc71c}</storage_plugin_test_client.guid> -->
         <common_ut.guid>{2f2d9175-70c1-404d-82e3-5e797b92263c}</common_ut.guid>
         <cloud_connectivity_ut.guid>{f568398b-8ca3-44cc-9707-d1f63b2aa1c6}</cloud_connectivity_ut.guid>
         <nx_network_ut.guid>{f7dfa168-fa41-4d4a-b475-e785acb4ff45}</nx_network_ut.guid>
@@ -194,7 +195,7 @@
 
         <!-- Set parent (parent.customization) and child (customization) customizations here -->
         <customization>default</customization>
-        <cloud.group>dev</cloud.group>
+        <cloudGroup>test</cloudGroup>
         <static.customization.dir>${environment.dir}/customization/${customization}</static.customization.dir>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>
@@ -259,17 +260,19 @@
         <artifact.name.paxton_plugin>${artifact.name.prefix}-paxton_plugin-${artifact.name.suffix}</artifact.name.paxton_plugin>
         <artifact.name.cdb>${artifact.name.prefix}-cdb-${artifact.name.suffix}</artifact.name.cdb>
         <artifact.name.hpm>${artifact.name.prefix}-hpm-${artifact.name.suffix}</artifact.name.hpm>
-        <artifact.name.client_pdb>${artifact.name.prefix}-client_pdb-${artifact.name.suffix}</artifact.name.client_pdb>
-        <artifact.name.server_pdb>${artifact.name.prefix}-server_pdb-${artifact.name.suffix}</artifact.name.server_pdb>
-        <artifact.name.misc_pdb>${artifact.name.prefix}-misc_pdb-${artifact.name.suffix}</artifact.name.misc_pdb>
-        <artifact.name.libs_pdb>${artifact.name.prefix}-libs_pdb-${artifact.name.suffix}</artifact.name.libs_pdb>
-        <artifact.name.cloud_pdb>${artifact.name.prefix}-cloud_pdb-${artifact.name.suffix}</artifact.name.cloud_pdb>
+        <artifact.name.client_debug>${artifact.name.prefix}-client_debug-${artifact.name.suffix}</artifact.name.client_debug>
+        <artifact.name.server_debug>${artifact.name.prefix}-server_debug-${artifact.name.suffix}</artifact.name.server_debug>
+        <artifact.name.misc_debug>${artifact.name.prefix}-misc_debug-${artifact.name.suffix}</artifact.name.misc_debug>
+        <artifact.name.libs_debug>${artifact.name.prefix}-libs_debug-${artifact.name.suffix}</artifact.name.libs_debug>
+        <artifact.name.cloud_debug>${artifact.name.prefix}-cloud_debug-${artifact.name.suffix}</artifact.name.cloud_debug>
+        <artifact.name.testcamera>${artifact.name.prefix}-testcamera-${artifact.name.suffix}</artifact.name.testcamera>
 
+        <nxcloud.version>1.0.134</nxcloud.version>
     </properties>
 
     <build>
         <defaultGoal>package</defaultGoal>
-        <finalName>${artifactId}-${version}</finalName>
+        <finalName>${project.artifactId}-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -312,6 +315,19 @@
                                 <file>${root.dir}/.branch.properties</file>
                                 <!-- <file>${root.dir}/appserver/appserver-${arch}.properties</file> -->
                             </files>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>get-cloud-url-property</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>${root.dir}/.cloudHost.properties</file>
+                            </files>
+                            <quiet>true</quiet>
                         </configuration>
                     </execution>
                 </executions>
@@ -499,6 +515,7 @@
 
                 <!-- <module>plugins/axiscamplugin</module> -->
                 <!-- <module>storage_plugins/ftpstorageplugin</module> -->
+                <module>storage_plugins/teststorageplugin</module> 
 
                 <!-- <module>mediaproxy</module> -->
             </modules>
@@ -742,6 +759,7 @@
                 <applauncher.binary.name>applauncher-bin</applauncher.binary.name>
                 <installation.root>/Applications/</installation.root>
                 <artifact.name.platform>mac</artifact.name.platform>
+                <qt.version>5.6.2</qt.version>
             </properties>
             <modules>
                 <module>common_libs/nx_email</module>
@@ -749,6 +767,7 @@
                 <module>macsetup/client-dmg</module>
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
+                <module>client/mobile_client</module>
             </modules>
         </profile>
 
@@ -775,12 +794,17 @@
                 <module>testcamera</module>
                 <module>nx_cloud/libvms_gateway</module>
                 <module>nx_cloud/vms_gateway</module>
+                <module>nx_cloud/time_server</module>
                 <module>plugins/it930x_plugin</module>
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
+
+                <module>storage_plugins/teststorageplugin</module>
+                <!-- <module>storage_plugins/teststorageplugin/test</module> -->
             </modules>
             <properties>
                 <modification>ubuntu</modification>
+                <qt.version>5.6.2</qt.version>
             </properties>
         </profile>
 
@@ -855,7 +879,7 @@
                 <openssl.version>1.0.1f</openssl.version>
                 <quazip.version>0.7.2</quazip.version>
                 <gcc.version>4.9.3</gcc.version>
-                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
+                <additional.defines>DISABLE_ALL_VENDORS DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd_s2</modification>
                 <rdep.target>isd_s2</rdep.target>
                 <qt.spec/>
@@ -934,6 +958,7 @@
                 <module>client/libclient_core</module>
                 <module>client/mobile_client</module>
                 <module>nx_cloud/libconnection_mediator</module>
+                <module>nx_cloud/cloud_connect_test_util</module>
                 <module>media_db_util</module>
                 <!-- <module>nx_cloud/cloud_connect_test_util</module> -->
             </modules>
@@ -955,6 +980,7 @@
                 <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
                 <openssl.version>1.0.0j</openssl.version>
+                <ffmpeg.version>3.1.1-bananapi</ffmpeg.version>
                 <modification>bananapi</modification>
                 <rdep.target>bpi</rdep.target>
                 <gcc.version>4.8.3</gcc.version>
@@ -1208,37 +1234,16 @@
             </modules>
         </profile>
         <profile>
-            <id>get-cloud-url</id>
+            <id>artifacts_validator-id</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>cloud.group</name>
+                    <name>artifactsValidator</name>
                 </property>
             </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>properties-maven-plugin</artifactId>
-                        <version>1.0-alpha-2</version>
-                        <executions>
-                            <execution>
-                                <id>get-cloud-url-property</id>
-                                <phase>initialize</phase>
-                                <goals>
-                                    <goal>read-project-properties</goal>
-                                </goals>
-                                <configuration>
-                                    <files>
-                                        <file>${root.dir}/build_variables/target/cloud_instance.properties</file>
-                                    </files>
-                                    <quiet>true</quiet>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
+            <modules>
+                <module>artifacts_validator</module>
+            </modules>
         </profile>
 
         <!-- Artifact naming profiles -->
@@ -1260,12 +1265,12 @@
             <id>artifact-name-cloud</id>
             <activation>
                 <property>
-                    <name>cloud.group</name>
+                    <name>cloudGroup</name>
                     <value>!prod</value>
                 </property>
             </activation>
             <properties>
-                <artifact.name.cloud.suffix>-${cloud.group}</artifact.name.cloud.suffix>
+                <artifact.name.cloud.suffix>-${cloudGroup}</artifact.name.cloud.suffix>
             </properties>
         </profile>
 

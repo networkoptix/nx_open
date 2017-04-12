@@ -165,4 +165,20 @@ public class QnWindowUtils {
             }
         });
     }
+
+    public static void setScreenOrientation(final int screenOrientation)
+    {
+        final Activity activity = QtNative.activity();
+        activity.runOnUiThread(
+            new Runnable()
+            {
+                int mScreenOrientation = screenOrientation;
+                Activity mActivity = activity;
+
+                @Override public void run()
+                {
+                    mActivity.setRequestedOrientation(mScreenOrientation);
+                }
+            });
+    }
 }

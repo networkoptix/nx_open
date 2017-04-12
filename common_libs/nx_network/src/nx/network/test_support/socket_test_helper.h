@@ -1,10 +1,4 @@
-/**********************************************************
-* 9 jan 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef SOCKET_TEST_HELPER_H
-#define SOCKET_TEST_HELPER_H
+#pragma once
 
 #include <list>
 #include <memory>
@@ -17,7 +11,7 @@
 #include <nx/network/socket.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/thread/mutex.h>
-
+#include <nx/utils/result_counter.h>
 
 namespace nx {
 namespace network {
@@ -36,14 +30,14 @@ enum class TestTransmissionMode
     spam, // sends random data as fast as possible, receive always
     ping, // sends random data and verifies if it comes back
     pong, // reads 4K buffer, sends same buffer back, waits for futher data...
+    receiveOnly,
 };
 
 QString NX_NETWORK_API toString(TestTrafficLimitType type);
 QString NX_NETWORK_API toString(TestTransmissionMode type);
 
 //!Reads/writes random data to/from connection
-class NX_NETWORK_API TestConnection
-:
+class NX_NETWORK_API TestConnection:
     public QnStoppableAsync
 {
 public:
@@ -102,17 +96,32 @@ private:
     int m_id;
     boost::optional<SocketAddress> m_localAddress;
     const bool m_accepted;
+    uint64_t m_dataSequence;
+    uint64_t m_curStreamPos;
+    uint64_t m_lastSequenceReceived;
 
-    void onConnected( SystemError::ErrorCode code );
+    TestConnection(
+        std::unique_ptr<AbstractStreamSocket> socket,
+        const SocketAddress& remoteAddress,
+        TestTrafficLimitType limitType,
+        size_t trafficLimit,
+        TestTransmissionMode transmissionMode,
+        bool isConnected,
+        bool isAccepted);
+
+    void onConnected(SystemError::ErrorCode code);
     void startIO();
     void startSpamIO();
     void startEchoIO();
     void startEchoTestIO();
-    void onDataReceived( SystemError::ErrorCode errorCode, size_t bytesRead );
-    void onDataSent( SystemError::ErrorCode errorCode, size_t bytesWritten );
-    void readAllAsync( std::function<void()> handler );
-    void sendAllAsync( std::function<void()> handler );
-    void reportFinish( SystemError::ErrorCode code );
+    void startReceiveOnlyTestIO();
+    void onDataReceived(SystemError::ErrorCode errorCode, size_t bytesRead);
+    void onDataSent(SystemError::ErrorCode errorCode, size_t bytesWritten);
+    void readAllAsync(std::function<void()> handler);
+    void sendAllAsync(std::function<void()> handler);
+    void reportFinish(SystemError::ErrorCode code);
+    void prepareConsequentDataToSend(QByteArray* buf);
+    void verifyDataReceived(const QByteArray& buf, size_t bytesRead);
 
     TestConnection(const TestConnection&);
     TestConnection& operator=(const TestConnection&);
@@ -151,8 +160,7 @@ public:
 /*!
     \note This class is not thread-safe
 */
-class NX_NETWORK_API RandomDataTcpServer
-:
+class NX_NETWORK_API RandomDataTcpServer:
     public QnStoppableAsync,
     public ConnectionPool
 {
@@ -243,7 +251,7 @@ public:
     size_t totalBytesSent() const;
     size_t totalBytesReceived() const;
     size_t totalIncompleteTasks() const;
-    const std::map<SystemError::ErrorCode, size_t>& returnCodes() const;
+    const utils::ResultCounter<SystemError::ErrorCode>& results();
 
 private:
     const SocketAddress& nextAddress();
@@ -264,7 +272,7 @@ private:
     size_t m_totalBytesSent;
     size_t m_totalBytesReceived;
     size_t m_totalIncompleteTasks;
-    std::map<SystemError::ErrorCode, size_t> m_returnCodes;
+    utils::ResultCounter<SystemError::ErrorCode> m_results;
     size_t m_totalConnectionsEstablished;
     std::set<int> m_finishedConnectionsIDs;
     std::random_device m_randomDevice;
@@ -315,8 +323,7 @@ private:
 /**
  * A TCPSocket modification which randomly connects to different ports according to @p kShift.
  */
-class NX_NETWORK_API MultipleClientSocketTester
-:
+class NX_NETWORK_API MultipleClientSocketTester:
     public TCPSocket
 {
 public:
@@ -336,5 +343,3 @@ private:
 } // namespace test
 } // namespace network
 } // namespace nx
-
-#endif  //SOCKET_TEST_HELPER_H

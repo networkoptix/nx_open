@@ -1,4 +1,3 @@
-
 #include "applauncher_utils.h"
 
 #include <QtWidgets/QApplication>
@@ -16,10 +15,13 @@
 namespace applauncher
 {
     static const int MAX_MSG_LEN = 1024 * 64; //64K ought to be enough for anybody
+    static const int kDefaultTimeoutMs = 3000;
+    static const int kZipInstallationTimeoutMs = 30000;
 
     static api::ResultType::Value sendCommandToLauncher(
         const applauncher::api::BaseTask& commandToSend,
-        applauncher::api::Response* const response )
+        applauncher::api::Response* const response,
+        int timeoutMs = kDefaultTimeoutMs)
     {
         NamedPipeSocket sock;
         SystemError::ErrorCode resultCode = sock.connectToServerSync( launcherPipeName );
@@ -41,7 +43,7 @@ namespace applauncher
 
         char buf[MAX_MSG_LEN];
         unsigned int bytesRead = 0;
-        resultCode = sock.read( buf, sizeof(buf), &bytesRead );  //ignoring return code
+        resultCode = sock.read(buf, sizeof(buf), &bytesRead, timeoutMs);  //ignoring return code
         if( resultCode != SystemError::noError )
         {
             NX_LOG( lit("Failed to read response from local server %1. %2").arg(launcherPipeName).arg(SystemError::toString(resultCode)), cl_logWARNING );
@@ -76,7 +78,7 @@ namespace applauncher
     //    return QFile::exists(qApp->applicationDirPath() + QLatin1String("/../") + version.toString(QnSoftwareVersion::MinorFormat));
     //}
 
-    api::ResultType::Value restartClient(QnSoftwareVersion version, const QByteArray &auth) {
+    api::ResultType::Value restartClient(QnSoftwareVersion version, const QString &auth) {
         if (version.isNull())
             version = QnSoftwareVersion(qnCommon->engineVersion());
 
@@ -84,7 +86,7 @@ namespace applauncher
         arguments << QLatin1String("--no-single-application");
         if (!auth.isEmpty()) {
             arguments << QLatin1String("--auth");
-            arguments << QLatin1String(auth);
+            arguments << auth;
         }
         arguments << QnStartupParameters::kScreenKey;
         arguments << QString::number(qApp->desktop()->screenNumber(qApp->activeWindow()));
@@ -140,7 +142,7 @@ namespace applauncher
         request.version = version;
         request.zipFileName = zipFileName;
         api::Response response;
-        api::ResultType::Value result = sendCommandToLauncher(request, &response);
+        const auto result = sendCommandToLauncher(request, &response, kZipInstallationTimeoutMs);
         if (result != api::ResultType::ok)
             return result;
         if (response.result != api::ResultType::ok)

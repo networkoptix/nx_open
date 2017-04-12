@@ -5,10 +5,29 @@
 
 #include <client/client_settings.h>
 #include <client/client_app_info.h>
+#include <client/client_installations_manager.h>
 
 #include <core/resource/videowall_resource.h>
 
 #include <platform/platform_abstraction.h>
+
+namespace {
+
+//TODO: #GDM #3.1 think about common place for this code or simply move shortcut creating to handler
+QString binaryPath()
+{
+    const QFileInfo appLauncherFile = QnClientInstallationsManager::appLauncher();
+    if (appLauncherFile.exists())
+        return appLauncherFile.canonicalFilePath();
+
+    const QFileInfo miniLauncherFile = QnClientInstallationsManager::miniLauncher();
+    if (miniLauncherFile.exists())
+        return miniLauncherFile.canonicalFilePath();
+
+    return QString();
+}
+
+}
 
 QnVideowallSettingsDialog::QnVideowallSettingsDialog(QWidget *parent) :
     base_type(parent),
@@ -66,6 +85,10 @@ bool QnVideowallSettingsDialog::createShortcut(const QnVideoWallResourcePtr &vid
     if (destinationPath.isEmpty())
         return false;
 
+    QString appPath = binaryPath();
+    if (appPath.isEmpty())
+        return false;
+
     QStringList arguments;
     arguments << lit("--videowall");
     arguments << videowall->getId().toString();
@@ -77,7 +100,7 @@ bool QnVideowallSettingsDialog::createShortcut(const QnVideoWallResourcePtr &vid
     arguments << lit("--auth");
     arguments << QString::fromUtf8(url.toEncoded());
 
-    return qnPlatform->shortcuts()->createShortcut(qApp->applicationFilePath(), destinationPath, videowall->getName(), arguments, QnClientAppInfo::videoWallIconId());
+    return qnPlatform->shortcuts()->createShortcut(appPath, destinationPath, videowall->getName(), arguments, QnClientAppInfo::videoWallIconId());
 }
 
 bool QnVideowallSettingsDialog::deleteShortcut(const QnVideoWallResourcePtr &videowall) {

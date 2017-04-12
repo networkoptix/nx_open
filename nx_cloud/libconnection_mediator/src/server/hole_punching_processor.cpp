@@ -13,7 +13,9 @@
 namespace nx {
 namespace hpm {
 
-static QString logRequest(const ConnectionStrongRef& connection, const api::ConnectRequest& request)
+static QString logRequest(
+    const ConnectionStrongRef& connection,
+    const api::ConnectRequest& request)
 {
     return lm("from %1(%2) to %3, session id %4")
         .strs(request.originatingPeerId, connection->getSourceAddress(),
@@ -25,15 +27,17 @@ HolePunchingProcessor::HolePunchingProcessor(
     AbstractCloudDataProvider* cloudData,
     nx::stun::MessageDispatcher* dispatcher,
     ListeningPeerPool* listeningPeerPool,
-    stats::Collector* statisticsCollector)
+    stats::AbstractCollector* statisticsCollector)
 :
     RequestProcessor(cloudData),
     m_settings(settings),
     m_listeningPeerPool(listeningPeerPool),
     m_statisticsCollector(statisticsCollector)
 {
+    // TODO #ak: decouple STUN message handling and logic.
+
     dispatcher->registerRequestProcessor(
-        stun::cc::methods::connect,
+        stun::extension::methods::connect,
         [this](const ConnectionStrongRef& connection, stun::Message message)
         {
             processRequestWithOutput(
@@ -44,7 +48,7 @@ HolePunchingProcessor::HolePunchingProcessor(
         });
 
     dispatcher->registerRequestProcessor(
-        stun::cc::methods::connectionAck,
+        stun::extension::methods::connectionAck,
         [this](const ConnectionStrongRef& connection, stun::Message message)
         {
             processRequestWithNoOutput(
@@ -55,7 +59,7 @@ HolePunchingProcessor::HolePunchingProcessor(
         });
 
     dispatcher->registerRequestProcessor(
-        stun::cc::methods::connectionResult,
+        stun::extension::methods::connectionResult,
         [this](const ConnectionStrongRef& connection, stun::Message message)
         {
             processRequestWithNoOutput(
@@ -67,6 +71,11 @@ HolePunchingProcessor::HolePunchingProcessor(
 }
 
 HolePunchingProcessor::~HolePunchingProcessor()
+{
+    stop();
+}
+
+void HolePunchingProcessor::stop()
 {
     ConnectSessionsDictionary localSessions;
     {
@@ -81,7 +90,7 @@ HolePunchingProcessor::~HolePunchingProcessor()
     {
         nx::utils::BarrierHandler barrier(
             [&allSessionsStoppedPromise]() { allSessionsStoppedPromise.set_value(); });
-        for (const auto& connectSession: localSessions)
+        for (const auto& connectSession : localSessions)
             connectSession.second->pleaseStop(barrier.fork());
     }
 
@@ -112,26 +121,23 @@ void HolePunchingProcessor::connect(
     if (connectionFsmIterAndFlag.second)
     {
         NX_LOGX(lm("Connect request %1").str(logRequest(connection, request)), cl_logDEBUG2);
+
+        connectionFsmIterAndFlag.first->second =
+            std::make_unique<UDPHolePunchingConnectionInitiationFsm>(
+                request.connectSessionId,
+                targetPeerDataLocker->value(),
+                std::bind(
+                    &HolePunchingProcessor::connectSessionFinished,
+                    this,
+                    std::move(connectionFsmIterAndFlag.first),
+                    std::placeholders::_1),
+                m_settings);
     }
     else
     {
         NX_LOGX(lm("Connect request retransmit %1")
-            .str(logRequest(connection, request)), cl_logDEBUG1);
-
-        //ignoring request, response will be sent by fsm
-        return;
+            .str(logRequest(connection, request)), cl_logDEBUG2);
     }
-
-    connectionFsmIterAndFlag.first->second = 
-        std::make_unique<UDPHolePunchingConnectionInitiationFsm>(
-            request.connectSessionId,
-            targetPeerDataLocker.get(),
-            std::bind(
-                &HolePunchingProcessor::connectSessionFinished,
-                this,
-                std::move(connectionFsmIterAndFlag.first),
-                std::placeholders::_1),
-            m_settings);
 
     //launching connect FSM
     connectionFsmIterAndFlag.first->second->onConnectRequest(
@@ -250,7 +256,7 @@ std::tuple<api::ResultCode, boost::optional<ListeningPeerPool::ConstDataLocker>>
 
 void HolePunchingProcessor::connectSessionFinished(
     ConnectSessionsDictionary::iterator sessionIter,
-    api::ResultCode connectionResult)
+    api::NatTraversalResultCode connectionResult)
 {
     QnMutexLocker lk(&m_mutex);
 

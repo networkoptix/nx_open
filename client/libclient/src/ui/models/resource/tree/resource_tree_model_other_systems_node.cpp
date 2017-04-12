@@ -140,12 +140,15 @@ void QnResourceTreeModelOtherSystemsNode::updateFakeServerNode(
     }
 
     const auto info = server->getModuleInformation();
+    const QString systemName = helpers::isNewSystem(info)
+        ? tr("New System")
+        : info.systemName;
 
     const bool isCurrentSystemServer = helpers::serverBelongsToCurrentSystem(info);
 
     const auto parent = isCurrentSystemServer
         ? model()->rootNode(Qn::ServersNode)
-        : ensureLocalSystemNode(info.systemName);
+        : ensureLocalSystemNode(systemName);
 
     auto node = ensureFakeServerNode(server);
     const bool cleanupNeeded = (node->parent() && node->parent() != parent);

@@ -35,7 +35,7 @@ public:
 
     ~SocketServer()
     {
-        pleaseStop();
+        pleaseStopSync();
     }
 
 protected:

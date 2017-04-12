@@ -32,9 +32,16 @@ donotrebuild
 vms*.pro
 .idea
 .branch.properties
+.cloudHost.properties
 x86/*
 x64/*
 target/*
+target-bpi/*
+packages.config
+.vs
+.git
+TAGS
+*.kdev4
 
 .DS_Store
 Debug
@@ -58,80 +65,14 @@ Release
 */target-bpi/*
 */target-tx1/*
 
-build_environment/python/build_packages/*/build
-build_environment/python/packages/llutil/llutil.egg-info
-build_environment/python/build_packages/ecapi_pb2/ecapi_pb2.egg-info/PKG-INFO
-build_environment/python/build_packages/ecapi_pb2/ecapi_pb2.egg-info/SOURCES.txt
-build_environment/python/build_packages/ecapi_pb2/ecapi_pb2.egg-info/dependency_links.txt
-build_environment/python/build_packages/ecapi_pb2/ecapi_pb2.egg-info/top_level.txt
-build_environment/python/build_packages/ecapi_pb2/pb2.proto
+android-build
+
 build_environment/target
 build_environment/target/buildenv.timestamp
-build-jom
-build-vs
-build-ninja
 
-android-build/*
-app_process
 libc.so
 
 build_environment/maven/filter-resources/current_config
-
-appserver/scripts/ecl/ecproto
-appserver/scripts/ecl/ecl.egg-info
-appserver/scripts/ecl/build
-appserver/scripts/ecl/dist
-appserver/.idea
-appserver/env
-appserver/gen
-appserver/db/ecs.db
-appserver/setup/db/ecs.db
-appserver/proto/xml/gen
-appserver/proto/pb/gen
-appserver/test/executions
-appserver/static
-appserver/setup/static
-appserver/setup/stage-env
-appserver/entcontroller.conf
-appserver/setup/build
-appserver/version_maven.py
-appserver/version.py
-
-appserver2/arm
-
-applauncher/bin
-applauncher/build
-applauncher/src/Info.plist
-applauncher/src/client.pro
-applauncher/src/common.pro
-applauncher/src/ipch
-applauncher/src/client.vcproj
-applauncher/client.mak*
-
-build_environment/target-android
-
-client/bin
-client/build
-client/src/Info.plist
-client/src/client.pro
-client/src/common.pro
-client/src/version.h
-client/src/ipch
-client/src/client.vcproj
-client/client.mak*
-
-client/contrib/bespin/debug
-client/contrib/bespin/release
-client/contrib/bespin/Makefile*
-client/contrib/qtcolorpicker/Makefile*
-client/contrib/qtcolorpicker/buildlib
-client/contrib/qtcolorpicker/examples/Makefile*
-client/contrib/qtcolorpicker/examples/draw/Makefile*
-client/contrib/qtcolorpicker/examples/draw/debug
-client/contrib/qtcolorpicker/examples/simple/Makefile*
-client/contrib/qtcolorpicker/examples/simple/debug
-client/contrib/qtcolorpicker/lib/*.ilk
-client/src/*.vsp
 
 common/bin
 common/build
@@ -141,8 +82,6 @@ common/src/Makefile
 common/src/common.vcproj
 common/src/common.pri
 common/common.mak*
-
-nx_cloud/cloud_
 
 debsetup/mediaserver-deb/package
 debsetup/appserver-deb/package
@@ -183,33 +122,6 @@ wixsetup/bin
 My Amplifier XE Results*
 My Inspector XE Results*
 
-android-client/.metadata/*
-android-client/**/bin/**
-android-client/**/*.prefs
-android-client/**/gen/*
-
-ios-client/build
-ios-client/stage
-ios-client/dist
-ios-client/target
-ios-client/ihdwitness.xcworkspace/xcuserdata
-ios-client/HDWitness/HDWitness/HDWitness.xcconfig
-ios-client/deploy.plist
-ios-client/deploy_index.html
-
-ios-client/Settings.bundle/Root.plist
-ios-client/HDWitness/HDWitness/HDWitness-Info.plist
-ios-client/HDWitness/HDWitness/HDWCompatibilityItems.m
-ios-client/HDWitness/HDWitness/NxWitness.entitlements
-ios-client/Podfile
-ios-client/Pods
-ios-client/HDWitness/Settings.bundle/Root.plist
-ios-client/Podfile.lock
-ios-client/.ruby-version
-
-android-client/android-main/target/**
-android-client/protobuf-classes/target/**
-
 axiscamplugin/docs/
 appserver/hostedfiles/*
 
@@ -223,13 +135,6 @@ edge_firmware/isd/*.tar.gz
 .vagrant
 **/Makefile
 
-android-client/android-main/AndroidManifest.xml
-android-client/android-main/res/**
-
-android-client/android-main/libs/**
-android-client/android-main/res/**
-html
-
 webadmin/node_modules
 webadmin/dist
 webadmin/static
@@ -238,6 +143,7 @@ webadmin/external.dat
 webadmin/.tmp
 webadmin/.idea
 webadmin/.sass-cache
+webadmin/translation/language_pack
 app/bower_components
 
 plugins/acs/Paxton/packages
@@ -252,16 +158,20 @@ statserver/build
 statserver/dist
 
 *test-tmp.cfg
-func_tests/ssh.*.conf
+func_tests_old/ssh.*.conf
 
 statserver/statserver.egg-info
 
 common/src/plugins/resource/avi/filetypes.h
 
 *test-tmp.cfg
-func_tests/ssh.*.conf
 
+customization/*.html
+
+.sources_cache
+plugins/acs/paxton-plugin/packages/*
+plugins/acs/paxton-plugin/CustomProperties.cs
 syntax: regexp
 ^core$
 ^Makefile$
-
+^app_process$

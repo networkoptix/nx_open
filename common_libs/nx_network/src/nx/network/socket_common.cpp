@@ -4,30 +4,49 @@
 
 #include "socket_global.h"
 
+namespace nx {
+namespace network {
+
+bool socketCannotRecoverFromError(SystemError::ErrorCode sysErrorCode)
+{
+    return sysErrorCode != SystemError::noError
+        && sysErrorCode != SystemError::wouldBlock
+        && sysErrorCode != SystemError::again
+        && sysErrorCode != SystemError::timedOut
+        && sysErrorCode != SystemError::interrupted
+        && sysErrorCode != SystemError::inProgress;
+}
+
+} // namespace network
+} // namespace nx
+
+//-------------------------------------------------------------------------------------------------
+// HostAddress
+
 const HostAddress HostAddress::localhost(*ipV4from(lit("127.0.0.1")));
 const HostAddress HostAddress::anyHost(*ipV4from(lit("0.0.0.0")));
 
-HostAddress::HostAddress( const in_addr& addr )
-:
+HostAddress::HostAddress( const in_addr& addr ):
     m_ipV4( addr )
 {
 }
 
-HostAddress::HostAddress( const in6_addr& addr )
-:
+HostAddress::HostAddress( const in6_addr& addr ):
     m_ipV6( addr )
 {
 }
 
-HostAddress::HostAddress( const QString& addrStr )
-:
+HostAddress::HostAddress( const QString& addrStr ):
     m_string( addrStr )
 {
 }
 
-HostAddress::HostAddress( const char* addrStr )
-:
+HostAddress::HostAddress( const char* addrStr ):
     m_string( QLatin1String(addrStr) )
+{
+}
+
+HostAddress::~HostAddress()
 {
 }
 
@@ -220,6 +239,21 @@ in6_addr HostAddress::ipV6from(const in_addr& v4)
     return v6;
 }
 
+void HostAddress::swap(HostAddress& other)
+{
+    m_string.swap(other.m_string);
+    m_ipV4.swap(other.m_ipV4);
+    m_ipV6.swap(other.m_ipV6);
+}
+
+void swap(HostAddress& one, HostAddress& two)
+{
+    one.swap(two);
+}
+
+//-------------------------------------------------------------------------------------------------
+// SocketAddress
+
 SocketAddress::SocketAddress(const HostAddress& _address, quint16 _port):
     address(_address),
     port(_port)
@@ -254,9 +288,7 @@ SocketAddress::SocketAddress(const char* utf8Str):
 {
 }
 
-SocketAddress::SocketAddress(const QUrl& url):
-    address(url.host()),
-    port((quint16)url.port(0))
+SocketAddress::~SocketAddress()
 {
 }
 
@@ -288,6 +320,11 @@ QString SocketAddress::toString() const
         host = QString(QLatin1String("[%1]")).arg(host);
 
     return host + (port > 0 ? QString::fromLatin1(":%1").arg(port) : QString());
+}
+
+std::string SocketAddress::toStdString() const
+{
+    return toString().toStdString();
 }
 
 QUrl SocketAddress::toUrl(const QString& scheme) const

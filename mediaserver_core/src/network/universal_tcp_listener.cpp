@@ -70,7 +70,8 @@ void QnUniversalTcpListener::addProxySenderConnections(
     for (int i = 0; i < size; ++i)
     {
         auto connect = new QnProxySenderConnection(
-            proxyUrl, qnCommon->moduleGUID(), this);
+            proxyUrl, qnCommon->moduleGUID(), this, needAuth());
+
         connect->start();
         addOwnership(connect);
     }
@@ -182,13 +183,14 @@ void QnUniversalTcpListener::updateCloudConnectState(
     if (!m_multipleServerSocket)
         return;
 
+    NX_LOGX(lm("Update cloud connect state (boundToCloud=%1)").arg(m_boundToCloud), cl_logINFO);
     if (m_boundToCloud)
     {
         NX_ASSERT(m_multipleServerSocket->count() == kCloudSocketIndex);
 
         nx::network::RetryPolicy registrationOnMediatorRetryPolicy;
-        registrationOnMediatorRetryPolicy.setMaxRetryCount(
-            nx::network::RetryPolicy::kInfiniteRetries);
+        registrationOnMediatorRetryPolicy.maxRetryCount =
+            nx::network::RetryPolicy::kInfiniteRetries;
 
         auto cloudServerSocket =
             std::make_unique<nx::network::cloud::CloudServerSocket>(

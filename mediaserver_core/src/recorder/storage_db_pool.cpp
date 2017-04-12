@@ -27,7 +27,12 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
     if (!sdb) 
     {
         if (!(storage->getCapabilities() & QnAbstractStorageResource::cap::WriteFile))
+        {
+            NX_LOG(lit("%1 Storage %2 is not writable. Can't create storage DB file.")
+                    .arg(Q_FUNC_INFO)
+                    .arg(storage->getUrl()), cl_logWARNING);
             return sdb;
+        }
         QString simplifiedGUID = getLocalGuid();
         QString dbPath = storage->getUrl();
         QString fileName = closeDirPath(dbPath) + QString::fromLatin1("%1_media.nxdb").arg(simplifiedGUID);
@@ -37,7 +42,9 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
             m_chunksDB[storage->getUrl()] = sdb;
         }
         else {
-            qWarning()  << "can't initialize nx media database! File open failed: " << fileName;
+            NX_LOG(lit("%1 Storage DB file %2 open failed.")
+                    .arg(Q_FUNC_INFO)
+                    .arg(fileName), cl_logWARNING);
             return QnStorageDbPtr();
         }
     }

@@ -3,6 +3,7 @@
 #include <functional>
 
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/network/cloud/data/get_connection_state_data.h>
 #include <nx/network/cloud/data/client_bind_data.h>
 #include <nx/network/cloud/data/connection_requested_event_data.h>
 #include <nx/network/cloud/data/listen_data.h>
@@ -48,6 +49,12 @@ private:
         api::ListenRequest requestData,
         stun::Message requestMessage,
         std::function<void(api::ResultCode, api::ListenResponse)> completionHandler);
+
+    void checkOwnState(
+        const ConnectionStrongRef& connection,
+        api::GetConnectionStateRequest requestData,
+        stun::Message requestMessage,
+        std::function<void(api::ResultCode, api::GetConnectionStateResponse)> completionHandler);
 
     void resolveDomain(
         const ConnectionStrongRef& connection,

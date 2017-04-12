@@ -1,39 +1,37 @@
 #include "credentials.h"
+
 #include <nx/fusion/model_functions.h>
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCredentials, (eq)(json)(ubjson)(xml)(csv_record), QnCredentials_Fields)
+namespace nx {
+namespace common {
+namespace utils {
 
-QAuthenticator QnCredentials::toAuthenticator() const
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Credentials, (eq)(json), Credentials_Fields)
+
+Credentials::Credentials()
 {
-    QAuthenticator auth;
-    auth.setUser(user);
-    auth.setPassword(password);
-
-    return auth;
 }
 
-bool QnCredentials::isNull() const
+Credentials::Credentials(const QString& user, const QString& password):
+    user(user),
+    password(password)
 {
-    return user.isNull() && password.isNull();
 }
 
-bool QnCredentials::isEmpty() const
+Credentials::Credentials(const QAuthenticator& authenticator):
+    user(authenticator.user()),
+    password(authenticator.password())
 {
-    return user.isEmpty() && password.isEmpty();
 }
 
-bool QnCredentials::isValid(bool allowEmptyPassword) const
+QAuthenticator Credentials::toAuthenticator() const
 {
-    if (user.isEmpty())
-        return false;
-
-    return allowEmptyPassword || !password.isEmpty();
+    QAuthenticator authenticator;
+    authenticator.setUser(user);
+    authenticator.setPassword(password);
+    return authenticator;
 }
 
-bool QnCredentials::operator<(const QnCredentials &other) const
-{
-    if (user != other.user)
-        return user < other.user;
-
-    return password < other.password;
-}
+} // namespace utils
+} // namespace common
+} // namespace nx

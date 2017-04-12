@@ -14,6 +14,7 @@ struct EndpointAdditionalInfo
 {
     QString name;
     QString manufacturer;
+    QString location;
     QString mac;
     QString uniqId;
     QString discoveryIp;
@@ -23,10 +24,17 @@ struct EndpointAdditionalInfo
 
     EndpointAdditionalInfo() {}
 
-    EndpointAdditionalInfo(const QString& newName, const QString& newManufacturer, const QString& newMac, 
-            const QString& newUniqId, const QString& newDiscoveryIp):
+    EndpointAdditionalInfo(
+        const QString& newName,
+        const QString& newManufacturer,
+        const QString& newLocation,
+        const QString& newMac,
+        const QString& newUniqId,
+        const QString& newDiscoveryIp):
+
         name(newName),
         manufacturer(newManufacturer),
+        location(newLocation),
         mac(newMac),
         uniqId(newUniqId),
         discoveryIp(newDiscoveryIp)
@@ -37,12 +45,32 @@ struct EndpointAdditionalInfo
     EndpointAdditionalInfo(const EndpointAdditionalInfo& src) :
         name(src.name),
         manufacturer(src.manufacturer),
+        location(src.location),
         mac(src.mac),
         uniqId(src.uniqId),
         discoveryIp(src.discoveryIp)
     {
 
     }
+};
+
+class EndpointInfoHookChain
+{
+public:
+    void registerHook(std::function<void(EndpointAdditionalInfo*)> hook)
+    {
+        m_hookChain.push_back(hook);
+    };
+    void applyHooks(EndpointAdditionalInfo* outInfo) const
+    {
+        for (const auto& hook: m_hookChain)
+        {
+            hook(outInfo);
+        }
+    };
+
+private:
+    std::vector<std::function<void(EndpointAdditionalInfo*)>> m_hookChain;
 };
 
 typedef QHash<QString, EndpointAdditionalInfo> EndpointInfoHash;
@@ -75,6 +103,11 @@ private:
     QString fetchSerial(const DeviceInfoResp& response) const;
     static bool isAnalogOnvifResource(const QString& vendor, const QString& model);
     static bool isModelContainVendor(const QString& vendor, const QString& model);
+
+    static bool needIgnoreCamera(
+        const QString& host,
+        const QString& manufacturer,
+        const QString& model);
 private:
     static const char *ONVIF_RT;
     QnUuid onvifTypeId;
@@ -82,6 +115,7 @@ private:
     //PasswordHelper& passwordsData;
     NameHelper &camersNamesData;
     bool m_shouldStop;
+    EndpointInfoHookChain m_hookChain;
 };
 
 #endif //ENABLE_ONVIF

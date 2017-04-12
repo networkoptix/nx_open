@@ -49,7 +49,7 @@ private:
     {
         nx_http::StatusCode::Value status = nx_http::StatusCode::notImplemented;
         SocketAddress target;
-        conf::SslMode sslMode = conf::SslMode::undefined;
+        conf::SslMode sslMode = conf::SslMode::followIncomingConnection;
 
         TargetWithOptions(nx_http::StatusCode::Value status_, SocketAddress target_ = {});
     };

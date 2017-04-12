@@ -16,16 +16,13 @@ namespace api {
 
 namespace {
 
-static stun::AbstractAsyncClient::Settings s_stunClientSettings
-    = stun::AbstractAsyncClient::kDefaultSettings;
+static stun::AbstractAsyncClient::Settings s_stunClientSettings;
 
 } // namespace
 
-MediatorConnector::MediatorConnector()
-:
+MediatorConnector::MediatorConnector():
     m_stunClient(std::make_shared<stun::AsyncClient>(s_stunClientSettings)),
-    m_endpointFetcher(std::make_unique<nx::network::cloud::CloudModuleEndPointFetcher>(
-        lit("hpm"),
+    m_endpointFetcher(std::make_unique<nx::network::cloud::ConnectionMediatorUrlFetcher>(
         std::make_unique<nx::network::cloud::RandomEndpointSelector>())),
     m_fetchEndpointRetryTimer(
         std::make_unique<nx::network::RetryTimer>(
@@ -36,6 +33,10 @@ MediatorConnector::MediatorConnector()
                 kRetryIntervalMax)))
 {
     bindToAioThread(getAioThread());
+
+    NX_ASSERT(
+        s_stunClientSettings.reconnectPolicy.maxRetryCount ==
+        network::RetryPolicy::kInfiniteRetries);
 }
 
 MediatorConnector::~MediatorConnector()
@@ -156,7 +157,7 @@ static bool isReady(nx::utils::future<bool> const& f)
 void MediatorConnector::fetchEndpoint()
 {
     m_endpointFetcher->get(
-        [ this ]( nx_http::StatusCode::Value status, SocketAddress address )
+        [ this ]( nx_http::StatusCode::Value status, QUrl url )
     {
         if( status != nx_http::StatusCode::ok )
         {
@@ -171,16 +172,29 @@ void MediatorConnector::fetchEndpoint()
         }
         else
         {
-            NX_LOGX( lit( "Fetched mediator address: %1" )
-                     .arg( address.toString() ), cl_logDEBUG1 );
+            NX_LOGX(lm("Fetched mediator url: %1").str(url), cl_logDEBUG1);
+            m_stunClient->connect(
+                SocketAddress(url.host(), url.port()),
+                false /* SSL disabled */,
+                [this](SystemError::ErrorCode code)
+                {
+                    auto setEndpoint = 
+                        [this]()
+                        {
+                            QnMutexLocker lk(&m_mutex);
+                            m_mediatorAddress = m_stunClient->remoteAddress();
+                            NX_LOGX(lm("Connected to mediator by: %1")
+                                .str(m_mediatorAddress), cl_logDEBUG1);
+                        };
 
-            {
-                QnMutexLocker lk(&m_mutex);
-                m_mediatorAddress = address;
-            }
-            m_stunClient->connect( std::move( address ) );
-            if (!isReady(*m_future))
-                m_promise->set_value( true );
+                    if (code == SystemError::noError)
+                        setEndpoint();
+
+                    if (!isReady(*m_future))
+                        m_promise->set_value(code == SystemError::noError);
+
+                    m_stunClient->addOnReconnectedHandler(std::move(setEndpoint));
+                });
         }
     });
 }

@@ -30,6 +30,8 @@ protected:
     virtual void run() override;
 private:
     void terminatedSleep(int sleep);
+    QSharedPointer<AbstractStreamSocket> takeSocketFromHttpClient(
+        std::unique_ptr<nx_http::HttpClient>& httpClient);
 private:
     QnDesktopResource* m_owner;
     QnMediaServerResourcePtr m_server;
@@ -39,7 +41,7 @@ private:
     QnMutex m_mutex;
 };
 
-typedef QSharedPointer<QnDesktopCameraConnection> QnDesktopCameraConnectionPtr;
+using QnDesktopCameraConnectionPtr = std::unique_ptr<QnDesktopCameraConnection>;
 
 class QnDesktopCameraConnectionProcessor: public QnTCPConnectionProcessor
 {

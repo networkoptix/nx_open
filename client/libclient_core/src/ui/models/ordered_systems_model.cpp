@@ -20,27 +20,18 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
 
     connect(m_source, &QnSystemsModel::minimalVersionChanged,
         this, &QnOrderedSystemsModel::minimalVersionChanged);
-    setDynamicSortFilter(true);
-    sort(0);
 
     connect(qnSystemWeightsManager, &QnSystemsWeightsManager::weightsChanged,
         this, &QnOrderedSystemsModel::handleWeightsChanged);
 
+    // TODO: #ynikitenkov add triggering roles list here to optimize sorting/filtering model
+
     if (qnForgottenSystemsManager)
     {
-        const auto emitSystemDataChanged =
-            [this](const QString& systemId)
-            {
-                const auto row = m_source->getRowIndex(systemId);
-                const auto index = m_source->index(row);
-                if (index.isValid())
-                    emit m_source->dataChanged(index, index, QVector<int>());
-            };
-
         connect(qnForgottenSystemsManager, &QnForgottenSystemsManager::forgottenSystemRemoved,
-            this, emitSystemDataChanged);
+            this, &QnOrderedSystemsModel::forceUpdate);
         connect(qnForgottenSystemsManager, &QnForgottenSystemsManager::forgottenSystemAdded,
-            this, emitSystemDataChanged);
+            this, &QnOrderedSystemsModel::forceUpdate);
     }
 
     handleWeightsChanged();
@@ -100,7 +91,8 @@ qreal QnOrderedSystemsModel::getWeight(const QModelIndex& modelIndex) const
     return (getWeightFromData(modelIndex, result) ? result : m_unknownSystemsWeight);
 }
 
-bool QnOrderedSystemsModel::lessThan(const QModelIndex& left,
+bool QnOrderedSystemsModel::lessThan(
+    const QModelIndex& left,
     const QModelIndex& right) const
 {
     static const auto finalLess =
@@ -136,25 +128,26 @@ bool QnOrderedSystemsModel::lessThan(const QModelIndex& left,
 }
 
 bool QnOrderedSystemsModel::filterAcceptsRow(
-    int sourceRow, const QModelIndex &sourceParent) const
+    int sourceRow,
+    const QModelIndex& /* sourceParent */) const
 {
+    const auto dataIndex = sourceModel()->index(sourceRow, 0);
     // Filters out offline non-cloud systems with last connection more than N (defined) days ago
-    const auto index = sourceModel()->index(sourceRow, 0, sourceParent);
-    if (!index.isValid())
+    if (!dataIndex.isValid())
         return true;
 
-    if (index.data(QnSystemsModel::IsOnlineRoleId).toBool())
-        return true;    //< Skips every online system
+    if (dataIndex.data(QnSystemsModel::IsConnectableRoleId).toBool())
+        return true;    //< Skips every connectable system
 
-    const auto id = index.data(QnSystemsModel::SystemIdRoleId).toString();
+    const auto id = dataIndex.data(QnSystemsModel::SystemIdRoleId).toString();
     if (qnForgottenSystemsManager && qnForgottenSystemsManager->isForgotten(id))
         return false;
 
-    if (index.data(QnSystemsModel::IsCloudSystemRoleId).toBool())
+    if (dataIndex.data(QnSystemsModel::IsCloudSystemRoleId).toBool())
         return true;    //< Skips offline cloud systems
 
     qreal weight = 0.0;
-    if (!getWeightFromData(index, weight))
+    if (!getWeightFromData(dataIndex, weight))
         return true;
 
     static const auto kMinWeight = 0.00001;
@@ -173,20 +166,5 @@ void QnOrderedSystemsModel::handleWeightsChanged()
     m_unknownSystemsWeight = qnSystemWeightsManager->unknownSystemsWeight();
     m_weights = qnSystemWeightsManager->weights();
 
-    softInvalidate();
-}
-
-void QnOrderedSystemsModel::softInvalidate()
-{
-    const auto source = sourceModel();
-    if (!source)
-        return;
-
-    // Forces resort without tiles removal
-
-    const auto sourceRowCount = source->rowCount();
-    const auto start = source->index(0, 0);
-    const auto end = source->index(sourceRowCount - 1, 0);
-
-    emit source->dataChanged(start, end);
+    forceUpdate();
 }

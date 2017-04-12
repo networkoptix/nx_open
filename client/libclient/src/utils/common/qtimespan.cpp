@@ -2107,6 +2107,12 @@ QString QTimeSpan::toApproximateString(int suppresSecondUnitLimit, Qt::TimeSpanF
     if (format == Qt::NoUnit)
         return QString();
 
+    if (format & (Qt::Months | Qt::Years))
+    {
+        Q_ASSERT_X(hasValidReference(), Q_FUNC_INFO,
+            "Reference date is required to calculate correct months/years value");
+    }
+
     auto toUnitString = [this, suffixFormat](Qt::TimeSpanUnit unit, int num)
         {
             return d->unitString(unit, suffixFormat, num);

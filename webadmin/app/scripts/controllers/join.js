@@ -4,6 +4,7 @@ angular.module('webadminApp')
     .controller('JoinCtrl', function ($scope, $modalInstance, $interval, mediaserver,dialogs) {
         $scope.settings = {
             url :'',
+            login: Config.defaultLogin,
             password :'',
             currentPassword:'',
             keepMySystem:true
@@ -25,12 +26,31 @@ angular.module('webadminApp')
             mediaserver.discoveredPeers().then(function (r) {
                 var systems = _.map(r.data.reply, function(module)
                 {
-                    return {
-                        url: window.location.protocol + '//' + module.remoteAddresses[0] + ':' + module.port,
-                        systemName: module.systemName,
+                    var isNew = module.serverFlags.indexOf(Config.newServerFlag)>=0;
+                    var system = {
+                        url: module.remoteAddresses[0] + ':' + module.port,
+                        systemName: isNew ?  L.join.newSystemDisplayName : module.systemName,
                         ip: module.remoteAddresses[0],
-                        name: module.name
+                        name: module.name,
+                        isNew: isNew,
+                        compatibleProtocol: module.protoVersion == Config.protoVersion,
+                        compatibleCloudHost: module.cloudHost == Config.cloud.host,
+                        compatibleCloudState: !module.cloudSystemId || !Config.cloud.systemId
                     };
+                    system.visibleName = system.systemName + ' (' + system.url + ' - ' + system.name + ')';
+                    system.compatible = system.compatibleProtocol && system.compatibleCloudHost && system.compatibleCloudState;
+                    if(!system.compatible) {
+                        system.visibleName += ' - ' +
+                        (!system.compatibleProtocol ? L.join.incompatibleProtocol:
+                            !system.compatibleCloudHost ? L.join.incompatibleCloudHost:
+                                !system.compatibleCloudState ? L.join.incompatibleCloudState:
+                                    '');
+                    }
+                    return system;
+                });
+
+                systems = _.sortBy(systems,function(system){
+                   return (system.compatible?'0':'1') + system.visibleName;
                 });
 
                 $scope.systems.discoveredUrls = _.filter(systems, function(module){
@@ -83,14 +103,23 @@ angular.module('webadminApp')
             }
             return errorToShow;
         }
-
+        function normalizeUrl(url){
+            if(url.indexOf("//")<0){
+                url = "http://" + url;
+            }
+            if(url.indexOf(":")<0){
+                url = url + ":7001";
+            }
+            return url;
+        }
         $scope.test = function () {
 
             /*if (!$('#mergeSystemForm').valid()) {
                 return;
             }*/
 
-            mediaserver.pingSystem($scope.settings.url, $scope.settings.login, $scope.settings.password).then(function(r){
+            var remoteUrl = normalizeUrl($scope.settings.url);
+            mediaserver.pingSystem(remoteUrl, $scope.settings.login, $scope.settings.password || Config.defaultPassword).then(function(r){
                 if(r.data && r.data.error!=='0'){
                     var errorToShow = errorHandler(r.data.errorString);
                     if(errorToShow){
@@ -98,8 +127,26 @@ angular.module('webadminApp')
                         return;
                     }
                 }
+                if(r.data.reply.cloudSystemId && Config.cloud.systemId){
+                    dialogs.alert(L.join.cloudBothError);
+                    return;
+                }
+
+                if(r.data.reply.cloudSystemId){
+                    $scope.settings.keepMySystem = false;
+                }
+                if(Config.cloud.systemId){
+                    $scope.settings.keepMySystem = true;
+                }
+
                 $scope.systems.systemFound = true;
                 $scope.systems.joinSystemName = r.data.reply.systemName;
+                $scope.systems.remoteSystemIsNew = r.data.reply.serverFlags.indexOf(Config.newServerFlag)>=0;
+                if($scope.systems.remoteSystemIsNew){
+                    $scope.settings.keepMySystem = true;
+                    $scope.systems.joinSystemName = L.join.newSystemDisplayName;
+                }
+
             },function(r){
                 var errorToShow = L.join.unknownError;
                 if(r.data && r.data.error!=='0') {
@@ -116,8 +163,10 @@ angular.module('webadminApp')
             }*/
 
             // TODO: $scope.settings.currentPassword here
+
+            var remoteUrl = normalizeUrl($scope.settings.url);
             mediaserver.checkCurrentPassword($scope.settings.currentPassword).then(function() {
-                mediaserver.mergeSystems($scope.settings.url, $scope.settings.login, $scope.settings.password,
+                mediaserver.mergeSystems(remoteUrl, $scope.settings.login, $scope.settings.password || Config.defaultPassword,
                     $scope.settings.keepMySystem).then(function (r) {
                         if (r.data.error !== '0') {
                             var errorToShow = errorHandler(r.data.errorString);
@@ -137,6 +186,12 @@ angular.module('webadminApp')
 
         $scope.selectSystem = function (system){
             $scope.settings.url = system.url;
+            $scope.selectedSystem = system;
+            if(system.isNew){
+                $scope.settings.disablePassword = true;
+                $scope.settings.login = Config.defaultLogin;
+                $scope.settings.password = Config.defaultPassword;
+            }
         };
 
         $scope.cancel = function () {

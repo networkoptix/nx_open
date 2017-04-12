@@ -23,7 +23,11 @@ GenericProduct
 
     Depends { name: "openssl" }
     Depends { name: "ffmpeg" }
-    Depends { name: "quazip" }
+    Depends
+    {
+        name: "quazip"
+        condition: project.withDesktopClient || project.withMediaServer
+    }
     Depends { name: "boost" }
 
     Depends { name: "nx_fusion" }
@@ -85,15 +89,13 @@ GenericProduct
             "company.url": customization.companyUrl,
             "company.support.address": customization.supportEmail,
             "company.support.link": customization.supportUrl,
-            "showcase.url": customization.showcaseUrl,
-            "settings.url": customization.settingsUrl,
-            "helpUrl": customization.helpUrl,
             "update.generator.url": customization.updateGeneratorUrl,
             "cloudHost": customization.cloudHost,
             "cloudName": customization.cloudName,
             "freeLicenseCount": customization.freeLicenseCount,
             "freeLicenseKey": customization.freeLicenseKey,
-            "freeLicenseIsTrial": customization.freeLicenseIsTrial
+            "freeLicenseIsTrial": customization.freeLicenseIsTrial,
+            "defaultWebPages": customization.defaultWebPages
         })
     }
     Group
@@ -142,10 +144,20 @@ GenericProduct
         }
         Depends { name: "openssl" }
         Depends { name: "ffmpeg" }
-        Depends { name: "quazip" }
+        Depends
+        {
+            name: "quazip"
+            condition: project.withDesktopClient || project.withMediaServer
+        }
         Depends { name: "nx_fusion" }
 
         cpp.defines: ["NX_NETWORK_API=" + vms_cpp.apiImportMacro]
         cpp.includePaths: base.concat([project.sourceDirectory + "/common_libs/nx_network/src"])
+
+        Properties
+        {
+            condition: qbs.targetOS.contains("android")
+            cpp.dynamicLibraries: ["nx_streaming", "nx_network"]
+        }
     }
 }

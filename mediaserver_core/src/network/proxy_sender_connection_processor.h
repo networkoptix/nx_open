@@ -13,7 +13,7 @@ class QnProxySenderConnection: public QnUniversalRequestProcessor
 {
 public:
     QnProxySenderConnection(const SocketAddress& proxyServerUrl, const QnUuid& guid,
-                            QnUniversalTcpListener* owner);
+                            QnUniversalTcpListener* owner, bool needAuth);
 
     virtual ~QnProxySenderConnection();
 protected:

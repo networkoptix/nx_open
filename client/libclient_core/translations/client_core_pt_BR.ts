@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="pt_BR" sourcelanguage="pt_BR">
+<TS version="2.1" language="pt_BR" sourcelanguage="en_US">
 <context>
     <name>QnCloudResultInfo</name>
     <message>
@@ -24,31 +24,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Not found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Already exists.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Internal server error. Please contact support team.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Network operation failed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Requested feature is not implemented.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Unknown realm.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Bad username.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -60,10 +40,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Service is unavailable.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Credentials are no longer valid.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -72,23 +48,50 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please retry later.</source>
+        <source>Unknown error.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unknown error.</source>
+        <source>Unexpected network error. Please check your Internet connection and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid login.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Requested object is not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Object already exists.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Internal %1 error. Please contact support team.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnCloudSystemInformationWatcher</name>
     <message>
-        <source>Your system</source>
+        <source>Owner: %1</source>
+        <comment>%1 is a user name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Owner: %1</source>
-        <comment>%1 is a user name</comment>
+        <source>Your System</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -107,12 +110,12 @@
 <context>
     <name>QnSystemsModel</name>
     <message>
-        <source>Your system</source>
+        <source>Owner: %1</source>
+        <comment>%1 is a user name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Owner: %1</source>
-        <comment>%1 is a user name</comment>
+        <source>Your System</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

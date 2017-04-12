@@ -16,8 +16,13 @@ public:
         QByteArray& contentType, const QnRestConnectionProcessor* /*owner*/) override;
 
     static MultiServerPeriodDataList loadDataSync(
-        const QnChunksRequestData& request, const QnRestConnectionProcessor* owner);
+        const QnChunksRequestData& request,
+        const QnRestConnectionProcessor* owner);
 
 private:
-    static MultiServerPeriodDataList loadDataSync(const QnChunksRequestData& request, const QnRestConnectionProcessor* owner, int requestNum, QElapsedTimer& timer);
+    static MultiServerPeriodDataList loadDataSync(
+        const QnChunksRequestData& request,
+        const QnRestConnectionProcessor* owner,
+        int requestNum,
+        QElapsedTimer& timer);
 };

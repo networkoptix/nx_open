@@ -84,8 +84,6 @@ QnClientSettings::QnClientSettings(bool forceLocalSettings, QObject *parent):
 #ifdef Q_OS_DARWIN
     setAudioDownmixed(true); /* Mac version uses SPDIF by default for multichannel audio. */
 #endif
-    setShowcaseUrl(QUrl(QnAppInfo::showcaseUrl()));
-    setSettingsUrl(QUrl(QnAppInfo::settingsUrl()));
 
     /* Set names (compatibility with 1.0). */
     setName(MEDIA_FOLDER,           lit("mediaRoot"));
@@ -107,11 +105,6 @@ QnClientSettings::QnClientSettings(bool forceLocalSettings, QObject *parent):
 
     /* Load from settings. */
     load();
-
-    /* Update showcase url from external source. */
-    NX_ASSERT(!isShowcaseEnabled(), Q_FUNC_INFO, "Paxton dll crashes here, make sure showcase fucntionality is disabled");
-    if (isShowcaseEnabled())
-        loadFromWebsite();
 
     setThreadSafe(true);
 
@@ -161,13 +154,6 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
             if (baseValue.type() == QVariant::Int)  //compatibility mode
                 return qVariantFromValue(static_cast<Qn::LightModeFlags>(baseValue.toInt()));
             return baseValue;
-        }
-
-
-        case SHOW_ONCE_MESSAGES:
-        {
-            QVariant baseValue = base_type::readValueFromSettings(settings, id, defaultValue);
-            return qVariantFromValue(static_cast<Qn::ShowOnceMessages>(baseValue.toInt()));
         }
 
         case WORKBENCH_PANES:
@@ -264,11 +250,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
             break;
         }
 
-        case SHOW_ONCE_MESSAGES:
-            base_type::writeValueToSettings(settings, id, static_cast<int>(value.value<Qn::ShowOnceMessages>()));
-
         case UPDATE_FEED_URL:
-        case SETTINGS_URL:
         case GL_VSYNC:
         case LIGHT_MODE:
         case NO_CLIENT_UPDATE:
@@ -349,23 +331,4 @@ bool QnClientSettings::isWritable() const
 
 QSettings* QnClientSettings::rawSettings() {
     return m_settings;
-}
-
-void QnClientSettings::loadFromWebsite() {
-    QNetworkAccessManager *accessManager = new QNetworkAccessManager(this);
-    connect(accessManager, &QNetworkAccessManager::finished, this, [accessManager, this](QNetworkReply *reply) {
-        if(reply->error() != QNetworkReply::NoError) {
-            qnWarning("Could not download client settings from '%1': %2.", reply->url().toString(), reply->errorString());
-        } else {
-            QJsonObject jsonObject;
-            if(!QJson::deserialize(reply->readAll(), &jsonObject)) {
-                qnWarning("Could not parse client settings downloaded from '%1'.", reply->url().toString());
-            } else {
-                updateFromJson(jsonObject.value(lit("settings")).toObject());
-            }
-        }
-        reply->deleteLater();
-        accessManager->deleteLater();
-    });
-    accessManager->get(QNetworkRequest(settingsUrl()));
 }

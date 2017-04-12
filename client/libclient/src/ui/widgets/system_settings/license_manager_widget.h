@@ -37,6 +37,13 @@ public:
 protected:
     virtual void showEvent(QShowEvent *event) override;
 
+private:
+    enum class CopyToClipboardButton
+    {
+        Hide,
+        Show
+    };
+
 private slots:
     void updateLicenses();
     void updateButtons();
@@ -47,11 +54,19 @@ private slots:
 
     void licenseDetailsRequested(const QModelIndex& index);
 
-    void showMessage(const QString &title, const QString &message);
     void at_licenseRemoved(int reqID, ec2::ErrorCode errorCode, QnLicensePtr license);
 
-signals:
-    void showMessageLater(const QString &title, const QString &message);
+    void showMessage(
+        QnMessageBoxIcon icon,
+        const QString& text,
+        const QString& extras,
+        CopyToClipboardButton button);
+
+    void showMessageLater(
+        QnMessageBoxIcon icon,
+        const QString& text,
+        const QString& extras,
+        CopyToClipboardButton button);
 
 private:
     void updateFromServer(const QByteArray &licenseKey, bool infoMode, const QUrl &url);
@@ -64,6 +79,18 @@ private:
     void removeSelectedLicenses();
 
     void exportLicenses();
+
+    static QString networkErrorText();
+    static QString networkErrorExtras();
+    static QString getContactSupportMessage();
+    static QString getProblemPersistMessage();
+
+    void showFailedToActivateLicenseLater(const QString& extras);
+    void showIncompatibleLicenceMessageLater();
+    void showActivationMessageLater(const QJsonObject& errorMessage);
+    void showAlreadyActivatedLater(
+        const QString& hwid,
+        const QString& time = QString());
 
 private:
     Q_DISABLE_COPY(QnLicenseManagerWidget)

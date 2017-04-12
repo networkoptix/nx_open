@@ -70,6 +70,8 @@ private:
     bool m_resizing;
     bool m_updateResizerGeometryLater;
 
+    bool m_inSelection = false;
+
     QnResizerWidget* m_resizerWidget;
 
     /** Item that provides background for the tree. */

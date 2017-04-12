@@ -103,7 +103,7 @@ TEST( StunMessageSerialization, BindingError )
 {
     Message response( Header( MessageClass::errorResponse, MethodType::bindingMethod ) );
     response.header.transactionId = Buffer::fromHex( DEFAULT_TID );
-    response.newAttribute< attrs::ErrorDescription >( 401, "Unauthorized" );
+    response.newAttribute< attrs::ErrorCode >( 401, "Unauthorized" );
 
     size_t serializedSize;
     Buffer serializedMessage;
@@ -134,7 +134,7 @@ TEST( StunMessageSerialization, BindingError )
     ASSERT_EQ( parsed.header.transactionId.toHex().toUpper(), DEFAULT_TID );
     ASSERT_EQ( parsed.attributes.size(), (size_t)1 );
 
-    const auto error = parsed.getAttribute< attrs::ErrorDescription >();
+    const auto error = parsed.getAttribute< attrs::ErrorCode >();
     ASSERT_NE( error, nullptr );
     ASSERT_EQ( error->getClass(), 4 );
     ASSERT_EQ( error->getNumber(), 1 );
@@ -163,7 +163,7 @@ TEST( StunMessageSerialization, CustomIndication )
           + Buffer( "9001" "0006" ) + Buffer( "ua1val" ).toHex().toUpper() + Buffer( "0000" )
           + Buffer( "9002" "0006" ) + Buffer( "ua2val" ).toHex().toUpper() + Buffer( "0000" );
 
-    ASSERT_EQ( serializedMessage.size(), serializedSize );
+    ASSERT_EQ( (size_t)serializedMessage.size(), serializedSize );
     EXPECT_EQ( MESSAGE, serializedMessage.toHex().toUpper() );
 
     Message parsed;
@@ -171,11 +171,11 @@ TEST( StunMessageSerialization, CustomIndication )
     parser.setMessage( &parsed );
     partialParse( parser, serializedMessage, 4 ); // parse by 4 byte chanks
 
-    ASSERT_EQ( serializedMessage.size(), serializedSize );
+    ASSERT_EQ( (size_t)serializedMessage.size(), serializedSize );
     ASSERT_EQ( parsed.header.messageClass, MessageClass::indication );
     ASSERT_EQ( parsed.header.method, MethodType::userMethod + 1 );
     ASSERT_EQ( parsed.header.transactionId.toHex().toUpper(), DEFAULT_TID );
-    ASSERT_EQ( parsed.attributes.size(), 2 );
+    ASSERT_EQ( parsed.attributes.size(), 2U );
 
     const auto attr1 = parsed.getAttribute< attrs::Unknown >( 0x9001 );
     ASSERT_NE( attr1, nullptr );
@@ -193,9 +193,9 @@ TEST(StunMessageSerialization, serialization2)
     const nx::String userName("sdfno234sdf");
     const nx::String nonce("kdfgjn234df");
 
-    //message.newAttribute<stun::cc::attrs::SystemId>(userName);
+    //message.newAttribute<stun::extension::attrs::SystemId>(userName);
     const nx::Buffer testData("sdfr234dfg");
-    message.newAttribute<stun::cc::attrs::ServerId>(testData);
+    message.newAttribute<stun::extension::attrs::ServerId>(testData);
 
     //message.newAttribute< attrs::UserName >(userName);
     //message.newAttribute< attrs::Nonce >(nonce.toHex());
@@ -218,7 +218,7 @@ TEST(StunMessageSerialization, serialization2)
     Message checkMessage;
     parser.setMessage(&checkMessage);
     ASSERT_EQ(nx_api::ParserState::done, parser.parse(buffer, &bytesRead));
-    const auto attr = checkMessage.getAttribute<stun::cc::attrs::ServerId>();
+    const auto attr = checkMessage.getAttribute<stun::extension::attrs::ServerId>();
     ASSERT_EQ(testData, attr->getBuffer());
 
     Buffer buffer1;
@@ -237,7 +237,7 @@ TEST(StunMessageSerialization, serialization3)
         "abra-kadabra"));
 
     // TODO: verify with RFC
-    response.newAttribute< stun::attrs::ErrorDescription >(
+    response.newAttribute< stun::attrs::ErrorCode >(
         404, "Method is not supported");    //TODO #ak replace 404 with constant
 
     Buffer serializedMessage;
@@ -257,7 +257,7 @@ TEST(StunMessageSerialization, serialization3)
     ASSERT_EQ(
         nx_api::ParserState::done,
         parser.parse(serializedMessage, &bytesRead));
-    /*const auto attr =*/ checkMessage.getAttribute<stun::attrs::ErrorDescription>();
+    /*const auto attr =*/ checkMessage.getAttribute<stun::attrs::ErrorCode>();
     //ASSERT_EQ(testData, attr->getBuffer());
 }
 
@@ -267,7 +267,7 @@ TEST( StunMessageSerialization, Authentification )
 
     Message request( Header( MessageClass::request, MethodType::bindingMethod ) );
     //const nx::Buffer testData("sdfr234dfg");
-    //request.newAttribute<stun::cc::attrs::ServerId>(testData);
+    //request.newAttribute<stun::extension::attrs::ServerId>(testData);
     request.header.transactionId = Buffer::fromHex( DEFAULT_TID );
     request.insertIntegrity( user, key );
 
@@ -304,7 +304,7 @@ TEST( StunMessageSerialization, Authentification )
     ASSERT_EQ(parsed.header.messageClass, MessageClass::request);
     ASSERT_EQ(parsed.header.method, MethodType::bindingMethod);
     ASSERT_EQ(parsed.header.transactionId.toHex().toUpper(), DEFAULT_TID);
-    ASSERT_EQ(parsed.attributes.size(), 3);
+    ASSERT_EQ(parsed.attributes.size(), 3U);
 }
 
 // TODO: add some more test when we support some

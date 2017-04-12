@@ -19,11 +19,7 @@ public:
     QnPublicIPDiscovery():
         m_testHttpServer(std::make_unique<TestHttpServer>())
     {
-        m_testHttpServer->registerStaticProcessor("/test", kPublicIpAddress.toLatin1(), "text/plain");
-        NX_GTEST_ASSERT_TRUE(m_testHttpServer->bindAndListen());
-
-        m_publicAddressFinder = std::make_unique<::QnPublicIPDiscovery>(
-            QStringList() << serverUrl());
+        init();
     }
 
 protected:
@@ -87,6 +83,16 @@ private:
     nx::utils::promise<void> m_finderHasFinished;
     nx::utils::promise<void> m_eventHandlerHasBeenInvoked;
     boost::optional<QString> m_foundIpAddress;
+
+    void init()
+    {
+        m_testHttpServer->registerStaticProcessor("/test", kPublicIpAddress.toLatin1(), "text/plain");
+        ASSERT_TRUE(m_testHttpServer->bindAndListen())
+            << SystemError::getLastOSErrorText().toStdString();
+
+        m_publicAddressFinder = std::make_unique<::QnPublicIPDiscovery>(
+            QStringList() << serverUrl());
+    }
 };
 
 TEST_F(QnPublicIPDiscovery, finds_ip_address)

@@ -5,7 +5,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
-#include <nx/network/cloud/cdb_endpoint_fetcher.h>
+#include <nx/network/cloud/cloud_module_url_fetcher.h>
 
 /**
  * Monitor runtime flags RF_CloudSync. Only one server at once should has it
@@ -23,5 +23,7 @@ private slots:
 private:
     QUrl m_cloudUrl;
     QTimer m_timer;
-    std::unique_ptr<nx::network::cloud::CloudModuleEndPointFetcher> m_cdbEndPointFetcher;
+    std::unique_ptr<nx::network::cloud::CloudModuleUrlFetcher> m_cdbEndPointFetcher;
+
+    void addCloudPeer(QUrl url);
 };

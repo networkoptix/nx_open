@@ -1,5 +1,7 @@
 <?xml version='1.0' encoding='windows-1252'?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
     <Fragment Id='FragmentClientPackage'>
         <PackageGroup Id="ClientPackageGroup">
             <MsiPackage
@@ -12,5 +14,31 @@
                 <MsiProperty Name="LICENSE_ALREADY_ACCEPTED" Value="1" />
             </MsiPackage>
         </PackageGroup>
+    </Fragment>
+
+    <Fragment Id='FragmentClientConditions'>
+        <?include BuildVars.wxi ?>
+
+        <util:ProductSearch
+            Id="ClientMsiSearch"
+            UpgradeCode="$(var.clientUpgradeCode)"
+            Result="state"
+            Variable="ClientInstalled" />
+
+        <util:ProductSearch
+            Id="ClientMsiVersion"
+            UpgradeCode="$(var.clientUpgradeCode)"
+            Result="version"
+            Variable="InstalledClientVersion" />
+
+        <util:ProductSearch
+            Id="ServerMsiVersion2"
+            UpgradeCode="$(var.serverUpgradeCode)"
+            Result="version"
+            Variable="InstalledServerVersion" />
+
+        <bal:Condition Message="!(loc.Product_ProductIsTooOld)">
+            <![CDATA[ (InstalledClientVersion = "0.0.0.0" OR InstalledClientVersion >= "2.3") AND (InstalledServerVersion = "0.0.0.0" OR InstalledServerVersion >= "2.3")]]>
+        </bal:Condition>
     </Fragment>
 </Wix>

@@ -1,12 +1,6 @@
-/**********************************************************
-* Jan 12, 2016
-* akolesnikov
-***********************************************************/
-
 #include "listening_peer_pool.h"
 
 #include <nx/utils/log/log.h>
-
 
 namespace nx {
 namespace hpm {
@@ -23,9 +17,8 @@ QString ListeningPeerData::toString() const
     return lm("%1<%2>").arg(hostName).container(opts);
 }
 
-////////////////////////////////////////////////////////////
-//// class ConstDataLocker
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class ConstDataLocker
 
 ListeningPeerPool::ConstDataLocker::ConstDataLocker(
     QnMutexLockerBase locker,
@@ -66,9 +59,8 @@ const ListeningPeerData& ListeningPeerPool::ConstDataLocker::value() const
 }
 
 
-////////////////////////////////////////////////////////////
-//// class DataLocker
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class DataLocker
 
 ListeningPeerPool::DataLocker::DataLocker(
     QnMutexLockerBase locker,
@@ -81,8 +73,7 @@ ListeningPeerPool::DataLocker::DataLocker(
 {
 }
 
-ListeningPeerPool::DataLocker::DataLocker(ListeningPeerPool::DataLocker&& rhs)
-:
+ListeningPeerPool::DataLocker::DataLocker(ListeningPeerPool::DataLocker&& rhs):
     ConstDataLocker(std::move(rhs)),
     m_peerIter(std::move(rhs.m_peerIter))
 {
@@ -107,9 +98,8 @@ ListeningPeerData& ListeningPeerPool::DataLocker::value()
 }
 
 
-////////////////////////////////////////////////////////////
-//// class ListeningPeerPool
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class ListeningPeerPool
 
 ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
     const ConnectionStrongRef& connection,
@@ -237,5 +227,5 @@ std::vector<ConnectionWeakRef> ListeningPeerPool::getAllConnections() const
     return connections;
 }
 
-}   //hpm
-}   //nx
+} // namespace hpm
+} // namespace nx

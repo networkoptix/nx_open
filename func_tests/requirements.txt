@@ -1,0 +1,14 @@
+pytest
+pytest-timeout
+pytest-capturelog
+pytest-cpp
+pytz
+tzlocal
+requests>=2.12.5
+python-vagrant
+Jinja2
+netaddr
+hachoir-core
+hachoir-parser
+hachoir-metadata
+pytest-instafail

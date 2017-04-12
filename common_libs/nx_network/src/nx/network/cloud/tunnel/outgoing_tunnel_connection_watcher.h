@@ -26,6 +26,8 @@ public:
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
     virtual void stopWhileInAioThread() override;
 
+    virtual void start() override;
+
     virtual void establishNewConnection(
         std::chrono::milliseconds timeout,
         SocketAttributes socketAttributes,
@@ -33,8 +35,6 @@ public:
 
     virtual void setControlConnectionClosedHandler(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
-
-    void start();
 
 private:
     const nx::hpm::api::ConnectionParameters m_connectionParameters;

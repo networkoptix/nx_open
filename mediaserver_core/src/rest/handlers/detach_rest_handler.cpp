@@ -52,14 +52,27 @@ int QnDetachFromCloudRestHandler::execute(
 {
     using namespace nx::cdb;
 
+    NX_LOGX(lm("Detaching system from cloud. cloudSystemId %1")
+        .arg(qnGlobalSettings->cloudSystemId()), cl_logDEBUG2);
+
     if (QnPermissionsHelper::isSafeMode())
+    {
+        NX_LOGX(lm("Cannot detach from cloud while in safe mode. cloudSystemId %1")
+            .arg(qnGlobalSettings->cloudSystemId()), cl_logDEBUG1);
         return QnPermissionsHelper::safeModeError(result);
+    }
     if (!QnPermissionsHelper::hasOwnerPermissions(accessRights))
+    {
+        NX_LOGX(lm("Cannot detach from cloud. Owner permissions are required. cloudSystemId %1")
+            .arg(qnGlobalSettings->cloudSystemId()), cl_logDEBUG1);
         return QnPermissionsHelper::notOwnerError(result);
+    }
 
     QString errStr;
     if (!validatePasswordData(data, &errStr))
     {
+        NX_LOGX(lm("Cannot detach from cloud. Password check failed. cloudSystemId %1")
+            .arg(qnGlobalSettings->cloudSystemId()), cl_logDEBUG1);
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
         result.setReply(DetachFromCloudReply(
             DetachFromCloudReply::ResultCode::invalidPasswordData));
@@ -70,6 +83,8 @@ int QnDetachFromCloudRestHandler::execute(
     //      so that there is always a way to connect to the system
     if (!updateUserCredentials(data, QnOptionalBool(true), qnResPool->getAdministrator(), &errStr))
     {
+        NX_LOGX(lm("Cannot detach from cloud. Failed to re-enable local admin. cloudSystemId %1")
+            .arg(qnGlobalSettings->cloudSystemId()), cl_logDEBUG1);
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
         result.setReply(DetachFromCloudReply(
             DetachFromCloudReply::ResultCode::cannotUpdateUserCredentials));
@@ -94,22 +109,15 @@ int QnDetachFromCloudRestHandler::execute(
         NX_LOGX(lm("Received error response from %1: %2").arg(QnAppInfo::cloudName())
             .arg(api::toString(cdbResultCode)), cl_logWARNING);
 
-        // We've decided ignore cloud error in detach operation. So, it allows to do detach in offline mode
-#if 0
-        result.setError(
-            QnJsonRestResult::CantProcessRequest,
-            lit("Could not connect to %1: %2").arg(QnAppInfo::cloudName())
-                .arg(QString::fromStdString(api::toString(cdbResultCode))));
-        result.setReply(DetachFromCloudReply(
-            DetachFromCloudReply::ResultCode::errorFromCloudServer,
-            static_cast<int>(cdbResultCode)));
-        return nx_http::StatusCode::ok;
-#endif
+        // Ignoring cloud error in detach operation. 
+        // So, it is allowed to perform detach while offline.
     }
 
-    if (!m_cloudConnectionManager->cleanUpCloudDataInLocalDb())
+    if (!m_cloudConnectionManager->detachSystemFromCloud())
     {
-        NX_LOGX(lit("Error resetting cloud credentials in local DB"), cl_logWARNING);
+        NX_LOGX(lm("Cannot detach from cloud. Failed to reset cloud attributes. cloudSystemId %1")
+            .arg(qnGlobalSettings->cloudSystemId()), cl_logDEBUG1);
+
         result.setError(
             QnJsonRestResult::CantProcessRequest,
             lit("Failed to save cloud credentials to local DB"));
@@ -117,6 +125,9 @@ int QnDetachFromCloudRestHandler::execute(
             DetachFromCloudReply::ResultCode::cannotCleanUpCloudDataInLocalDb));
         return nx_http::StatusCode::internalServerError;
     }
+
+    NX_LOGX(lm("Successfully detached from cloud. cloudSystemId %1")
+        .arg(qnGlobalSettings->cloudSystemId()), cl_logDEBUG2);
 
     return nx_http::StatusCode::ok;
 }

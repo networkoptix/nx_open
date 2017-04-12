@@ -33,6 +33,19 @@ public:
     constexpr static const std::chrono::milliseconds kDefaultMaxDelay =
         std::chrono::minutes(1);
 
+    const static RetryPolicy kNoRetries;
+
+    unsigned int maxRetryCount;
+    std::chrono::milliseconds initialDelay;
+    /**
+     * Value of 0 means no multiplier (actually, same as 1).
+     */
+    unsigned int delayMultiplier;
+    /**
+     * std::chrono::milliseconds::zero is treated as no limit.
+     */
+    std::chrono::milliseconds maxDelay;
+
     RetryPolicy();
     RetryPolicy(
         unsigned int maxRetryCount,
@@ -41,52 +54,40 @@ public:
         std::chrono::milliseconds maxDelay);
 
     bool operator==(const RetryPolicy& rhs) const;
-
-    void setMaxRetryCount(unsigned int retryCount);
-    unsigned int maxRetryCount() const;
-
-    void setInitialDelay(std::chrono::milliseconds delay);
-    std::chrono::milliseconds initialDelay() const;
-
-    /** Value of 0 means no multiplier (actually, same as 1) */
-    void setDelayMultiplier(unsigned int multiplier);
-    unsigned int delayMultiplier() const;
-
-    /** \a std::chrono::milliseconds::zero is treated as no limit */
-    void setMaxDelay(std::chrono::milliseconds delay);
-    std::chrono::milliseconds maxDelay() const;
-
-// TODO: consider to make it a simple struct
-//private:
-    unsigned int m_maxRetryCount;
-    std::chrono::milliseconds m_initialDelay;
-    unsigned int m_delayMultiplier;
-    std::chrono::milliseconds m_maxDelay;
 };
 
-/** Implements request retry policy, specified in STUN rfc.
-    There are maximum N retries, delay between retries is increased by 
-        some multiplier with each unsuccessful try.
-    \note \a RetryTimer instance can be safely freed within \a doAnotherTryFunc
-    \note Class methods are not thread-safe
-*/
-class NX_NETWORK_API RetryTimer
-:
+/**
+ * Implements request retry policy, specified in STUN rfc.
+ * There are maximum N retries, delay between retries is increased by 
+ *   some multiplier with each unsuccessful try.
+ * @note RetryTimer instance can be safely freed within doAnotherTryFunc.
+ * @note Class methods are not thread-safe.
+ */
+class NX_NETWORK_API RetryTimer:
     public aio::BasicPollable
 {
 public:
-    RetryTimer(const RetryPolicy& policy);
+    RetryTimer(const RetryPolicy& policy, aio::AbstractAioThread* aioThread = nullptr);
     virtual ~RetryTimer();
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
-    /** Returns \a false, if maximum retries have been done */
+    /**
+     * Returns false, if maximum retries have been done.
+     */
     bool scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFunc);
 
+    unsigned int retriesLeft() const;
+    boost::optional<std::chrono::nanoseconds> timeToEvent() const;
     std::chrono::milliseconds currentDelay() const;
 
-    /** Resets internal state to default values */
+    /**
+     * Resets internal state to default values.
+     */
     void reset();
+
+    void cancelAsync(nx::utils::MoveOnlyFunc<void()> completionHandler);
+    void cancelSync();
 
 protected:
     virtual void stopWhileInAioThread() override;

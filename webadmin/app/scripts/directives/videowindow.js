@@ -27,7 +27,7 @@ angular.module('webadminApp')
                 vgPlayerReady:"&",
                 vgSrc:"="
             },
-            templateUrl: 'views/components/videowindow.html',// ???
+            templateUrl: Config.viewsDir + 'components/videowindow.html',// ???
 
             link: function (scope, element/*, attrs*/) {
 
@@ -39,6 +39,7 @@ angular.module('webadminApp')
                     'mp4': 'video/mp4'
                 };
 
+                scope.Config = Config;
                 scope.debugMode = Config.debug.video && Config.allowDebugMode;
                 scope.debugFormat = Config.allowDebugMode && Config.debug.videoFormat;
 
@@ -280,8 +281,6 @@ angular.module('webadminApp')
                         scope.flashSource = "components/flashlsChromeless_debug.swf";
                     }
 
-
-                    scope.flashParam = flashlsAPI.flashParams();
                     if(flashlsAPI.ready()){
                         flashlsAPI.kill();
                         scope.flashls = false; // Destroy it!
@@ -310,7 +309,7 @@ angular.module('webadminApp')
                             }, function (position, duration) {
                                 if (position != 0) {
                                     scope.loading = false;
-                                    scope.vgUpdateTime({$currentTime: position/1000, $duration: duration});
+                                    scope.vgUpdateTime({$currentTime: position, $duration: duration});
                                 }
                             });
                         });

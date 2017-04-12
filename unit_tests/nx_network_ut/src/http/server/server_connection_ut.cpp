@@ -237,12 +237,13 @@ TEST_F(HttpAsyncServerConnectionTest, multipleRequestsTest)
         "X-Nx-User-Name: df6a3827-56c7-4ff8-b38e-67993983d5d8\r\n"
         "Accept-Encoding: gzip\r\n";
 
-
     ASSERT_TRUE(m_testHttpServer->bindAndListen());
 
-    const auto socket = SocketFactory::createStreamSocket();
+    const auto socket = std::make_unique<nx::network::TCPSocket>(
+        SocketFactory::tcpServerIpVersion());
+
     ASSERT_TRUE(socket->connect(m_testHttpServer->serverAddress()));
-    ASSERT_EQ(sizeof(testData) - 1, socket->send(testData, sizeof(testData) - 1));
+    ASSERT_EQ((int)sizeof(testData) - 1, socket->send(testData, sizeof(testData) - 1));
 }
 
 TEST_F(HttpAsyncServerConnectionTest, inactivityTimeout)
@@ -257,7 +258,9 @@ TEST_F(HttpAsyncServerConnectionTest, inactivityTimeout)
     m_testHttpServer->server().setConnectionInactivityTimeout(kTimeout);
     ASSERT_TRUE(m_testHttpServer->bindAndListen());
 
-    const auto socket = SocketFactory::createStreamSocket();
+    const auto socket = std::make_unique<nx::network::TCPSocket>(
+        SocketFactory::tcpServerIpVersion());
+
     ASSERT_TRUE(socket->connect(m_testHttpServer->serverAddress()));
     ASSERT_EQ(kQuery.size(), socket->send(kQuery.data(), kQuery.size()));
 

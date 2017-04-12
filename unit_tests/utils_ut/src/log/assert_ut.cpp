@@ -7,19 +7,19 @@ namespace test {
 
 struct AssertFailureTest: ::testing::Test
 {
-    AssertFailureTest() { logError("Constructor"); }
-    ~AssertFailureTest() { logError("Destructor"); }
+    AssertFailureTest() { logAssert("Constructor"); }
+    ~AssertFailureTest() { logAssert("Destructor"); }
 
-    virtual void SetUp() override { logError("SetUp"); }
-    virtual void TearDown() override { logError("TearDown"); }
+    virtual void SetUp() override { logAssert("SetUp"); }
+    virtual void TearDown() override { logAssert("TearDown"); }
 
-    static void SetUpTestCase() { logError("SetUpTestCase"); }
-    static void TearDownTestCase() { logError("TearDownTestCase"); }
+    static void SetUpTestCase() { logAssert("SetUpTestCase"); }
+    static void TearDownTestCase() { logAssert("TearDownTestCase"); }
 };
 
 TEST_F(AssertFailureTest, DISABLED_Failure)
 {
-    logError("Internal");
+    logAssert("Internal");
 }
 
 // Current version of google test doesn't support crash tests on WIN32.

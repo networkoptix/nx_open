@@ -12,6 +12,8 @@ Item
     property int videoRotation: 0
     property size sourceSize
 
+    property real videoCenterHeightOffsetFactor: 0
+
     property real visibleVideoWidth: Utils.isRotated90(videoRotation) ? item.height : item.width
     property real visibleVideoHeight: Utils.isRotated90(videoRotation) ? item.width : item.height
 
@@ -27,6 +29,27 @@ Item
             ? (height - item.width) / 2
             : (height - item.height) / 2)
     }
+
+    readonly property size implicitSize:
+    {
+        if (sourceSize.width === 0.0 || sourceSize.height === 0.0)
+            return Qt.size(0, 0)
+
+        var videoAr = (customAspectRatio == 0
+            ? sourceSize.width / sourceSize.height
+            : customAspectRatio)
+
+        var width = sourceSize.width
+        var height = width / videoAr
+
+        if (Utils.isRotated90(videoRotation))
+            return Qt.size(width, height)
+        else
+            return Qt.size(height, width)
+    }
+
+    implicitWidth: implicitSize.width
+    implicitHeight: implicitSize.height
 
     onCustomAspectRatioChanged: updateSize()
     onVideoRotationChanged: updateSize()
@@ -56,11 +79,19 @@ Item
 
         item.parent = videoPositioner
         item.anchors.centerIn = videoPositioner
+        item.anchors.verticalCenterOffset =
+            Qt.binding(function()
+            {
+                return -(height - visibleVideoHeight) / 2 * videoCenterHeightOffsetFactor
+            })
         item.rotation = Qt.binding(function() { return videoRotation })
     }
 
     function boundedSize(width, height)
     {
+        if (height === 0.0 || sourceSize.height === 0.0)
+            return Qt.size(0, 0)
+
         var rotated90 = Utils.isRotated90(videoRotation)
         var boundAr = width / height
         var videoAr = (customAspectRatio == 0

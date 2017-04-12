@@ -58,7 +58,7 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
         return;
 
     QnNonModalDialogConstructor<QnCameraSettingsDialog> dialogConstructor(m_cameraSettingsDialog, mainWindow());
-    dialogConstructor.setDontFocus(true);
+    dialogConstructor.disableAutoFocus();
 
     if (!m_cameraSettingsDialog->setCameras(cameras))
         return;
@@ -93,7 +93,7 @@ void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
         return;
 
     QnNonModalDialogConstructor<QnServerSettingsDialog> dialogConstructor(m_serverSettingsDialog, mainWindow());
-    dialogConstructor.setDontFocus(true);
+    dialogConstructor.disableAutoFocus();
 
     m_serverSettingsDialog->setServer(server);
     if (params.hasArgument(Qn::FocusTabRole))
@@ -106,11 +106,14 @@ void QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered()
     user->setRawPermissions(Qn::GlobalLiveViewerPermissionSet);
     user->addFlags(Qn::local);
 
-    QnNonModalDialogConstructor<QnUserSettingsDialog> dialogConstructor(m_userSettingsDialog, mainWindow());
-   // dialogConstructor.setDontFocus(true);
+    // Shows New User dialog as modal because we can't pick anothr user from resources tree anyway.
+    if (!m_userSettingsDialog)
+        m_userSettingsDialog = new QnUserSettingsDialog(mainWindow());
+
     m_userSettingsDialog->setUser(user);
     m_userSettingsDialog->setCurrentPage(QnUserSettingsDialog::SettingsPage);
     m_userSettingsDialog->forcedUpdate();
+    m_userSettingsDialog->exec();
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
@@ -127,14 +130,16 @@ void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
 
     QnNonModalDialogConstructor<QnUserSettingsDialog> dialogConstructor(m_userSettingsDialog,
         mainWindow());
-    dialogConstructor.setDontFocus(true);
+
+    // Navigating resource tree, we should not take focus. From System Administration - we must.
+    bool force = params.argument(Qn::ForceRole, false);
+    if (!force)
+        dialogConstructor.disableAutoFocus();
 
     m_userSettingsDialog->setUser(user);
     if (params.hasArgument(Qn::FocusTabRole))
         m_userSettingsDialog->setCurrentPage(params.argument<int>(Qn::FocusTabRole), true);
     m_userSettingsDialog->forcedUpdate();
-
-    //dialog->setFocusedElement(params.argument<QString>(Qn::FocusElementRole));
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_userRolesAction_triggered()

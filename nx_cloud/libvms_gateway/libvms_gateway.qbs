@@ -4,6 +4,7 @@ GenericProduct
 {
     name: "libvms_gateway"
     targetName: "vms_gateway"
+    condition: project.withClouds
 
     Depends { name: "cloud_db_client" }
     Depends { name: "qtservice" }

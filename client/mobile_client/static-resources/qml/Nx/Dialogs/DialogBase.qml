@@ -17,8 +17,12 @@ Popup
     y: 0
     padding: 0
     modal: true
+    closePolicy: Popup.OnEscape | Popup.OnPressOutside | Popup.OnReleaseOutside
 
     background: null
+
+    // The dialog will try to keep this item visible (in the screen boundaries).
+    property Item activeItem: null
 
     contentItem: MouseArea
     {
@@ -52,15 +56,12 @@ Popup
 
                 color: ColorTheme.contrast3
             }
+
+            onWidthChanged: ensureActiveItemVisible()
+            onHeightChanged: ensureActiveItemVisible()
         }
 
         onClicked: close()
-
-        Keys.onPressed:
-        {
-            if (Utils.keyIsBack(event.key))
-                close()
-        }
     }
 
     readonly property int _animationDuration: 200
@@ -106,4 +107,12 @@ Popup
     }
 
     onOpened: contentItem.forceActiveFocus()
+
+    onActiveItemChanged: ensureActiveItemVisible()
+
+    function ensureActiveItemVisible()
+    {
+        if (activeItem)
+            Nx.ensureFlickableChildVisible(activeItem)
+    }
 }

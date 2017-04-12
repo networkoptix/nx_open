@@ -2,5 +2,5 @@
 
 int main(int argc, char** argv)
 {
-    return nx::utils::runTest(argc, argv);
+    return nx::utils::test::runTest(argc, argv);
 }

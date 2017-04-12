@@ -1,0 +1,17 @@
+<div class="modal-header">
+    <h3 class="modal-title">Sistem yeniden başlatılıyor...</h3>
+</div>
+
+<form class="form" role="form" id="restartDialog">
+    <div class="col-sm-12">
+        <p>Sistem yeniden başlatılması biraz zaman alabilir. Sayfa otomatik olarak yenilecektir.</p>
+        <progressbar class="progress-striped active" type="info" value="100" id="restartingProgress">{{state}}</progressbar>
+
+        <p>Eğer sayfa yenilenmezse, lütfen sayfayı kendiniz yenileyin</p>
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-primary pull-left" name="button" ng-click="refresh()" ng-disabled="form.$invalid">Yenile</button>
+    </div>
+
+</form>

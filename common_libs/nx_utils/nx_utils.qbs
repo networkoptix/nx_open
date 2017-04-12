@@ -12,6 +12,12 @@ GenericProduct
 
     Group
     {
+        condition: qbs.targetOS.contains("ios")
+        files: ["src/nx/utils/log/log_ios.mm"]
+    }
+
+    Group
+    {
         files: "maven/filter-resources/app_info_impl.cpp"
         fileTags: "configure.input"
         configure.outputTags: "cpp"
@@ -24,7 +30,10 @@ GenericProduct
             "parsedVersion.incrementalVersion": project.versionBugfix,
             "buildNumber": project.buildNumber,
             "changeSet": mercurialInfo.changeSet,
-            "customization": project.customization
+            "customization": project.customization,
+            "platform": vms.platform,
+            "arch": vms.arch,
+            "box": project.box || "none"
         })
     }
 

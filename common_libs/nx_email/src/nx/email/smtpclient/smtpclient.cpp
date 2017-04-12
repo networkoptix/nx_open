@@ -21,6 +21,7 @@
 #include <QFileInfo>
 #include <QByteArray>
 
+#include <nx/network/ssl_socket.h>
 #include <nx/utils/log/log.h>
 #include <utils/email/email.h>
 
@@ -98,9 +99,7 @@ void SmtpClient::setConnectionType(ConnectionType ct)
     this->connectionType = ct;
 
     m_lineSpliter.reset();
-    m_socket = SocketFactory::createStreamSocket(
-        connectionType == SslConnection ||
-        connectionType == TlsConnection);
+    m_socket = SocketFactory::createStreamSocket(connectionType == SslConnection);
 }
 
 const QString& SmtpClient::getHost() const
@@ -190,23 +189,8 @@ void SmtpClient::setSendMessageTimeout(int msec)
 
 SmtpOperationResult SmtpClient::connectToHost()
 {
-    switch (connectionType)
-    {
-        case SslConnection:
-        case TcpConnection:
-            if (!m_socket->connect(host, port, connectionTimeout))
-                return {SmtpError::ConnectionTimeoutError};
-
-            break;
-
-        case TlsConnection:
-            if (!static_cast<AbstractEncryptedStreamSocket*>(m_socket.get())
-                ->connectWithoutEncryption(host, port, connectionTimeout))
-            {
-                return {SmtpError::ConnectionTimeoutError};
-            }
-            break;
-    }
+    if (!m_socket->connect(host, port, connectionTimeout))
+        return {SmtpError::ConnectionTimeoutError};
 
     try
     {
@@ -241,18 +225,8 @@ SmtpOperationResult SmtpClient::connectToHost()
             if (responseCode != SmtpReplyCode::ServiceReady)
                 return {SmtpError::ServerError, responseCode};
 
-            if (!static_cast<AbstractEncryptedStreamSocket*>(m_socket.get())
-                ->enableClientEncryption())
-            {
-                return {SmtpError::ConnectionTimeoutError, SmtpReplyCode::NoReply};
-            }
-            //((QSslSocket*) socket)->startClientEncryption();
-
-            //if (!((QSslSocket*) socket)->waitForEncrypted(connectionTimeout)) {
-            //    qDebug() << ((QSslSocket*) socket)->errorString();
-            //    emit smtpError(ConnectionTimeoutError);
-            //    return false;
-            //}
+            m_socket = std::make_unique<nx::network::SslSocket>(
+                m_socket.release(), /*isServerSide*/ false);
 
             // Send ELHO one more time
             sendMessage(lit("EHLO ") + name);

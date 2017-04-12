@@ -19,7 +19,6 @@
 
 #include "../abstract_outgoing_tunnel_connection.h"
 
-
 namespace nx {
 namespace network {
 namespace cloud {
@@ -29,7 +28,7 @@ class Timeouts
 {
 public:
     std::chrono::seconds keepAlivePeriod;
-    /** Number of missing keep-alives before connection can be treated as closed */
+    /** Number of missing keep-alives before connection can be treated as closed. */
     int keepAliveProbeCount;
 
     Timeouts()
@@ -45,13 +44,13 @@ public:
     }
 };
 
-/** Creates connections (UDT) after UDP hole punching has been successfully done.
-    Also, makes some efforts to keep UDP hole opened
-    \note \a OutgoingTunnelConnection instance 
-        can be safely freed while in aio thread (e.g., in any handler)
-*/
-class NX_NETWORK_API OutgoingTunnelConnection
-:
+/**
+ * Creates connections (UDT) after UDP hole punching has been successfully done.
+ * Also, makes some efforts to keep UDP hole opened.
+ * @note OutgoingTunnelConnection instance 
+ *     can be safely freed while in aio thread (e.g., in any handler).
+ */
+class NX_NETWORK_API OutgoingTunnelConnection:
     public AbstractOutgoingTunnelConnection,
     public StreamConnectionHolder<
 		nx_api::BaseStreamProtocolConnectionEmbeddable<
@@ -61,9 +60,9 @@ class NX_NETWORK_API OutgoingTunnelConnection
 {
 public:
     /** 
-        \param connectionId unique id of connection established
-        \param udtConnection already established connection to the target host
-    */
+     * @param connectionId unique id of connection established.
+     * @param udtConnection already established connection to the target host.
+     */
     OutgoingTunnelConnection(
         aio::AbstractAioThread* aioThread,
         nx::String connectionId,
@@ -77,6 +76,8 @@ public:
 
     virtual void stopWhileInAioThread() override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+
+    virtual void start() override;
 
     virtual void establishNewConnection(
         std::chrono::milliseconds timeout,

@@ -30,7 +30,7 @@
 #endif
 
 QnCorePlatformAbstraction::QnCorePlatformAbstraction(QObject *parent):
-    QObject(parent) 
+    QObject(parent)
 {
     if(!qApp)
         qnWarning("QApplication instance must be created before a QnCorePlatformAbstraction.");
@@ -39,7 +39,8 @@ QnCorePlatformAbstraction::QnCorePlatformAbstraction(QObject *parent):
     m_process = new QnProcessImpl(NULL, this);
 }
 
-QnCorePlatformAbstraction::~QnCorePlatformAbstraction() {
+QnCorePlatformAbstraction::~QnCorePlatformAbstraction()
+{
     return;
 }
 

@@ -36,7 +36,7 @@ public:
     //!Returns true, if decoder CAN offer hardware acceleration. It does not mean it can decode every stream with hw acceleration
     /*!
         \note Actually, ability of hardware acceleration depends on stream parameters: resolution, bitrate, profile/level etc.
-            And can only be found out by instanciation of decoder and parsing media stream header
+            And can only be found out by instantiation of decoder and parsing media stream header
     */
     virtual bool isHardwareAccelerated() const = 0;
     //!Creates decoder object with operator \a new

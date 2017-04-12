@@ -48,6 +48,7 @@
 
 namespace {
 
+// TODO: Introduce constants for API methods registered in media_server_process.cpp.
 QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (StorageStatusObject, "storageStatus")
     (StorageSpaceObject, "storageSpace")
@@ -90,6 +91,7 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (BookmarkUpdateObject, "cameraBookmarks/update")
     (BookmarkDeleteObject, "cameraBookmarks/delete")
     (InstallUpdateObject, "installUpdate")
+    (InstallUpdateUnauthenticatedObject, "installUpdateUnauthenticated")
     (Restart, "restart")
     (ConfigureObject, "configure")
     (PingSystemObject, "pingSystem")
@@ -129,11 +131,11 @@ QByteArray extractXmlBody(const QByteArray& body, const QByteArray& tagName, int
 }
 #endif // 0
 
-    void trace(const QString& serverId, int handle, int obj, const QString& message = QString())
+void trace(const QString& serverId, int handle, int obj, const QString& message = QString())
 {
     RequestObject object = static_cast<RequestObject>(obj);
-        NX_LOG(lit("QnMediaServerConnection %1 <%2>: %3 %4")
-            .arg(serverId)
+    NX_LOG(lit("QnMediaServerConnection %1 <%2>: %3 %4")
+        .arg(serverId)
         .arg(handle)
         .arg(message)
         .arg(QnLexical::serialized(object)),
@@ -270,6 +272,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             processJsonReply<QnCameraBookmark>(this, response, handle);
             break;
         case InstallUpdateObject:
+        case InstallUpdateUnauthenticatedObject:
             processJsonReply<QnUploadUpdateReply>(this, response, handle);
             break;
         case Restart:
@@ -315,7 +318,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             processJsonReply(this, response, handle);
             break;
         default:
-            NX_ASSERT(false); /* We should never get here. */
+            NX_ASSERT(false);
             break;
     }
 
@@ -925,6 +928,17 @@ int QnMediaServerConnection::installUpdate(
         params, QN_STRINGIZE_TYPE(QnUploadUpdateReply), target, slot);
 }
 
+int QnMediaServerConnection::installUpdateUnauthenticated(
+    const QString& updateId, bool delayed, QObject* target, const char* slot)
+{
+    QnRequestParamList params;
+    params << QnRequestParam("updateId", updateId);
+    params << QnRequestParam("delayed", delayed);
+
+    return sendAsyncGetRequestLogged(InstallUpdateUnauthenticatedObject,
+        params, QN_STRINGIZE_TYPE(QnUploadUpdateReply), target, slot);
+}
+
 int QnMediaServerConnection::uploadUpdateChunk(
     const QString& updateId, const QByteArray& data, qint64 offset, QObject* target,
     const char* slot)
@@ -1038,8 +1052,14 @@ int QnMediaServerConnection::cameraHistory(
 int QnMediaServerConnection::recordedTimePeriods(
     const QnChunksRequestData& request, QObject* target, const char* slot)
 {
+    const auto connectionVersion = QnAppServerConnectionFactory::connectionInfo().version;
+
     QnChunksRequestData fixedFormatRequest(request);
     fixedFormatRequest.format = Qn::CompressedPeriodsFormat;
+
+    if (!connectionVersion.isNull() && connectionVersion < QnSoftwareVersion(3, 0))
+        fixedFormatRequest.requestVersion = QnChunksRequestData::RequestVersion::v2_6;
+
     return sendAsyncGetRequestLogged(ec2RecordedTimePeriodsObject,
         fixedFormatRequest.toParams(), QN_STRINGIZE_TYPE(MultiServerPeriodDataList), target, slot);
 }
@@ -1072,7 +1092,7 @@ int QnMediaServerConnection::getBookmarksAsync(
     const QnGetBookmarksRequestData& request, QObject* target, const char* slot)
 {
     return sendAsyncGetRequestLogged(ec2BookmarksObject,
-        request.toParams(), QN_STRINGIZE_TYPE(QnCameraBookmarkList) ,target, slot);
+        request.toParams(), QN_STRINGIZE_TYPE(QnCameraBookmarkList), target, slot);
 }
 
 int QnMediaServerConnection::getBookmarkTagsAsync(

@@ -46,13 +46,6 @@
     </message>
 </context>
 <context>
-    <name>CloudSystemInformation</name>
-    <message>
-        <source>OFFLINE</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>CredentialsEditor</name>
     <message>
         <source>Email</source>
@@ -75,10 +68,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid email or password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cannot connect to %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -86,16 +75,59 @@
         <source>Email and password cannot be empty</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Log in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incorrect Email or Password</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CustomConnectionScreen</name>
     <message>
-        <source>Connect to System</source>
+        <source>Delete</source>
+        <translation type="unfinished">מחיקה</translation>
+    </message>
+    <message>
+        <source>Connect to Server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Delete</source>
-        <translation type="unfinished">מחיקה</translation>
+        <source>Enter server address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete login &quot;%1&quot;?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete connection?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DeveloperSettingsScreen</name>
+    <message>
+        <source>Developer Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log Level</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -181,9 +213,33 @@
     </message>
 </context>
 <context>
-    <name>HostSelectionDialog</name>
+    <name>InformationLabel</name>
     <message>
-        <source>Hosts</source>
+        <source>Unknown</source>
+        <translation type="unfinished">לא ידוע</translation>
+    </message>
+    <message>
+        <source>%1 fps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Mbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hi-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lo-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keyfr + Lo-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom-Res</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -201,15 +257,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please make sure that display is connected to Nx1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cannot stop client</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Nx1 is offline</source>
+        <source>Please make sure that display is connected to %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 is offline</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -244,7 +300,7 @@
 <context>
     <name>OfflineDummy</name>
     <message>
-        <source>You are not connected to any system</source>
+        <source>You are not connected to any System</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -293,6 +349,14 @@
         <source>Nothing found</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Cannot connect to server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press %1 to exit</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SearchToolBar</name>
@@ -304,7 +368,7 @@
 <context>
     <name>ServerOfflineDummy</name>
     <message>
-        <source>Nx1 is offline</source>
+        <source>%1 is offline</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -322,6 +386,29 @@
         <source>Password</source>
         <translation type="unfinished">סיסמא</translation>
     </message>
+    <message>
+        <source>Hosts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SessionItem</name>
+    <message>
+        <source>This server has too old version. Please update it to the latest version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OFFLINE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>INCOMPATIBLE</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SessionsScreen</name>
@@ -334,31 +421,31 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connect to System</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connect to Another System</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No systems found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cannot connect to the system &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot connect to the server</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Check your network connection or contact a system administrator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to Server...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to Another Server...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Systems found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to System &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to Server</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -368,16 +455,20 @@
         <source>Settings</source>
         <translation type="unfinished">הגדרות</translation>
     </message>
+    <message>
+        <source>Live previews in the cameras list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save passwords for servers</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SideNavigation</name>
     <message>
         <source>New connection</source>
         <translation type="unfinished">חיבור חדש</translation>
-    </message>
-    <message>
-        <source>Disconnect from system</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Settings</source>
@@ -389,6 +480,10 @@
     </message>
     <message>
         <source>Stop test</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnect from Server</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -412,15 +507,30 @@
         <source>Unknown</source>
         <translation type="unfinished">לא ידוע</translation>
     </message>
-    <message>
-        <source>INCOMPATIBLE</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>TestSelectionDialog</name>
     <message>
         <source>Select Test</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TextField</name>
+    <message>
+        <source>Cut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select All</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -446,8 +556,8 @@
         <translation type="unfinished">המצלמה לא זמינה</translation>
     </message>
     <message>
-        <source>Can&apos;t load video</source>
-        <translation type="unfinished">לא ניתן לטעון וידאו</translation>
+        <source>Cannot load video</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -474,6 +584,14 @@
     </message>
     <message>
         <source>Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press Ctrl + Arrow or use mouse wheel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

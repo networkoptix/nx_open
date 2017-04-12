@@ -18,6 +18,9 @@ Button
 
     onDoubleClicked: copyToClipboard(versionText.text)
 
+    onPressed: developerSettingsTimer.restart()
+    onReleased: developerSettingsTimer.stop()
+
     label: Text
     {
         id: versionText
@@ -31,5 +34,11 @@ Button
         color: ColorTheme.base15
         text: control.text
     }
-}
 
+    Timer
+    {
+        id: developerSettingsTimer
+        interval: 10000
+        onTriggered: Workflow.openDeveloperSettingsScreen()
+    }
+}

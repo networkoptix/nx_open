@@ -12,46 +12,50 @@ ListenRequest::ListenRequest():
 
 void ListenRequest::serializeAttributes(nx::stun::Message* const message)
 {
-    message->newAttribute<stun::cc::attrs::SystemId>(systemId);
-    message->newAttribute<stun::cc::attrs::ServerId>(serverId);
-    message->addAttribute(stun::cc::attrs::cloudConnectVersion, (int)cloudConnectVersion);
+    message->newAttribute<stun::extension::attrs::SystemId>(systemId);
+    message->newAttribute<stun::extension::attrs::ServerId>(serverId);
+    message->addAttribute(stun::extension::attrs::cloudConnectVersion, (int)cloudConnectVersion);
 }
 
 bool ListenRequest::parseAttributes(const nx::stun::Message& message)
 {
-    if (!readEnumAttributeValue(message, stun::cc::attrs::cloudConnectVersion, &cloudConnectVersion))
+    if (!readEnumAttributeValue(message, stun::extension::attrs::cloudConnectVersion, &cloudConnectVersion))
         cloudConnectVersion = kDefaultCloudConnectVersion; //< If not present - old version.
 
     return
-        readStringAttributeValue<stun::cc::attrs::SystemId>(message, &systemId) &&
-        readStringAttributeValue<stun::cc::attrs::ServerId>(message, &serverId);
+        readStringAttributeValue<stun::extension::attrs::SystemId>(message, &systemId) &&
+        readStringAttributeValue<stun::extension::attrs::ServerId>(message, &serverId);
 }
 
 ListenResponse::ListenResponse():
-    StunResponseData(kMethod)
+    StunResponseData(kMethod),
+    cloudConnectOptions(emptyCloudConnectOptions)
 {
 }
 
-typedef stun::cc::attrs::StringAttribute<stun::cc::attrs::tcpConnectionKeepAlive> TcpKeepAlive;
+typedef stun::extension::attrs::StringAttribute<stun::extension::attrs::tcpConnectionKeepAlive> TcpKeepAlive;
 
 void ListenResponse::serializeAttributes(nx::stun::Message* const message)
 {
     if (tcpConnectionKeepAlive)
         message->newAttribute<TcpKeepAlive>(tcpConnectionKeepAlive->toString().toUtf8());
+
+    message->addAttribute(stun::extension::attrs::cloudConnectOptions, (int) cloudConnectOptions);
 }
 
 bool ListenResponse::parseAttributes(const nx::stun::Message& message)
 {
+    tcpConnectionKeepAlive = boost::none;
     nx::String keepAliveOptions;
     if (readStringAttributeValue<TcpKeepAlive>(message, &keepAliveOptions))
     {
         tcpConnectionKeepAlive = KeepAliveOptions::fromString(QString::fromUtf8(keepAliveOptions));
-        return (bool)tcpConnectionKeepAlive; //< Empty means parsing has failed.
+        if (!tcpConnectionKeepAlive)
+            return false; //< Empty means parsing has failed.
     }
-    else
-    {
-        tcpConnectionKeepAlive = boost::none;
-    }
+
+    if (!readEnumAttributeValue(message, stun::extension::attrs::cloudConnectOptions, &cloudConnectOptions))
+        cloudConnectOptions = emptyCloudConnectOptions;
 
     return true;
 }

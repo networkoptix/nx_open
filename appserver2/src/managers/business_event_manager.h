@@ -14,7 +14,7 @@ namespace ec2
     public:
         QnBusinessEventNotificationManager() {}
 
-        void triggerNotification( const QnTransaction<ApiBusinessActionData>& tran )
+        void triggerNotification( const QnTransaction<ApiBusinessActionData>& tran, NotificationSource /*source*/)
         {
             NX_ASSERT( tran.command == ApiCommand::broadcastAction || tran.command == ApiCommand::execAction);
             QnAbstractBusinessActionPtr businessAction;
@@ -26,21 +26,21 @@ namespace ec2
                 emit execBusinessAction( businessAction );
         }
 
-        void triggerNotification( const QnTransaction<ApiIdData>& tran )
+        void triggerNotification( const QnTransaction<ApiIdData>& tran, NotificationSource /*source*/)
         {
             NX_ASSERT( tran.command == ApiCommand::removeEventRule );
             emit removed( QnUuid(tran.params.id) );
         }
 
-        void triggerNotification( const QnTransaction<ApiBusinessRuleData>& tran )
+        void triggerNotification( const QnTransaction<ApiBusinessRuleData>& tran, NotificationSource source)
         {
             NX_ASSERT( tran.command == ApiCommand::saveEventRule);
             QnBusinessEventRulePtr businessRule( new QnBusinessEventRule() );
             fromApiToResource(tran.params, businessRule);
-            emit addedOrUpdated( businessRule, tran.peerID);
+            emit addedOrUpdated( businessRule, source);
         }
 
-        void triggerNotification( const QnTransaction<ApiResetBusinessRuleData>& tran )
+        void triggerNotification( const QnTransaction<ApiResetBusinessRuleData>& tran, NotificationSource /*source*/)
         {
             NX_ASSERT( tran.command == ApiCommand::resetEventRules);
             emit businessRuleReset(tran.params.defaultRules);

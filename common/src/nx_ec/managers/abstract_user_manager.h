@@ -14,7 +14,7 @@ class AbstractUserNotificationManager: public QObject
     Q_OBJECT
 
 signals:
-    void addedOrUpdated(const ApiUserData& user, const QnUuid& peerId);
+    void addedOrUpdated(const ApiUserData& user, NotificationSource source);
     void userRoleAddedOrUpdated(const ApiUserRoleData& userRole);
     void removed(const QnUuid& id);
     void userRoleRemoved(const QnUuid& id);

@@ -32,7 +32,7 @@
 
     <link rel="stylesheet" href="customization/styles.css">
 </head>
-<body ng-app="webadminApp">
+<body>
 <!--[if lt IE 7]>
 <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 <![endif]-->
@@ -62,7 +62,6 @@
 <script src="bower_components/screenfull/dist/screenfull.js"></script>
 <script src="bower_components/ngstorage/ngStorage.js"></script>
 <script src="bower_components/chartjs/Chart.js"></script>
-<script src="bower_components/typeahead-focus/typeahead-focus.js"></script>
 <script src="bower_components/jquery-timepicker-jt/jquery.timepicker.js"></script>
 <script src="bower_components/angular-jquery-timepicker/src/timepickerdirective.js"></script>
 <!-- endbower -->
@@ -71,6 +70,7 @@
 <script src="scripts/vendor/jquery-file-upload/jquery.iframe-transport.js"></script>
 <script src="scripts/vendor/jquery-file-upload/jquery.fileupload.js"></script>
 <script src="scripts/vendor/jquery-file-upload/jquery.fileupload-process.js"></script>
+<script src="scripts/vendor/typeahead-focus.js"></script>
 
 <script src="scripts/vendor/md5.js"></script>
 <script src="scripts/vendor/base64.js"></script>
@@ -78,14 +78,15 @@
 <!-- endbuild -->
 
 
-<script src="scripts/language.js"></script>
 <!-- build:js({.tmp,app}) scripts/scripts-login.js -->
+<script src="scripts/bootstrap.js"></script>
 
 <script src="scripts/config.js"></script>
 <script src="scripts/app-login.js"></script>
 
 <script src="scripts/services/mediaserver.js"></script>
 <script src="scripts/services/dialogs.js"></script>
+<script src="scripts/services/nativeClient.js"></script>
 
 <script src="scripts/directives/navbar.js"></script>
 <script src="scripts/controllers/navigation.js"></script>

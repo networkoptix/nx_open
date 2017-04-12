@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source> ms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Browse Logs</source>
         <translation type="unfinished">ค้นหา logs</translation>
     </message>
@@ -139,6 +134,34 @@
         <location/>
         <source>Instant</source>
         <translation>เร่งด่วน</translation>
+    </message>
+</context>
+<context>
+    <name>ApplauncherControlDialog</name>
+    <message>
+        <location filename="../src/nx/client/ui/dialogs/debug/applauncher_control_dialog.ui"/>
+        <source>Add External Storage...</source>
+        <translation type="unfinished">เพิ่มหน่วยความจำภายนอก...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Version:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Check</source>
+        <translation type="unfinished">ตรวจสอบ</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Not Checked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Get Installed Versions</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -210,11 +233,6 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline. Audit data is not available.</source>
-        <translation>เซิร์ฟเวอร์ทั้งหมดออฟไลน์ ข้อมูลการตรวจสอบจะไม่สามารถใช้ได้.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Clear Filter</source>
         <translation type="unfinished">ล้าง ตัวกรอง</translation>
     </message>
@@ -222,6 +240,11 @@
         <location/>
         <source>Email settings</source>
         <translation type="unfinished">การตั้งค่าอีเมล</translation>
+    </message>
+    <message>
+        <location/>
+        <source>All servers are offline. Audit data is not available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -238,16 +261,6 @@
     </message>
     <message>
         <location/>
-        <source>Finish:</source>
-        <translation>เสร็จสิ้น:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Start:</source>
-        <translation>เริ่มต้น:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Limit Bandwidth to:</source>
         <translation>จำกัด Bandwidth ไปที่:</translation>
     </message>
@@ -259,6 +272,16 @@
     <message>
         <location/>
         <source>Bitrate limitation could lead to backup failure.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Start</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -292,11 +315,6 @@
     <message>
         <location/>
         <source>Backup Archive From</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;Cameras...&gt; </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -375,11 +393,6 @@
     </message>
     <message>
         <location/>
-        <source>&lt; Any camera &gt;</source>
-        <translation>&lt;กล้องอื่นๆ&gt;</translation>
-    </message>
-    <message>
-        <location/>
         <source>All Servers are offline. Logs are not available.</source>
         <translation>เซิร์ฟเวอร์ทั้งหมดออฟไลน์ บันทึกจะไม่สามารถใช้ได้.</translation>
     </message>
@@ -446,22 +459,12 @@
     </message>
     <message>
         <location/>
-        <source>Event log</source>
-        <translation>log เหตุการณ์</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Advanced...</source>
-        <translation>ชั้นสูง...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>X</source>
-        <translation>x</translation>
-    </message>
-    <message>
-        <location/>
         <source>Event Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Event Log...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -534,18 +537,8 @@
     </message>
     <message>
         <location/>
-        <source>0.0.0.0</source>
-        <translation type="unfinished">0.0.0.0</translation>
-    </message>
-    <message>
-        <location/>
         <source>End IP</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>0.0.0.255</source>
-        <translation type="unfinished">0.0.0.255</translation>
     </message>
     <message>
         <location/>
@@ -600,11 +593,6 @@
     </message>
     <message>
         <location/>
-        <source>This camera has no advanced settings</source>
-        <translation>กล้องนี้ยังไม่มีการตั้งค่าขั้นสูง</translation>
-    </message>
-    <message>
-        <location/>
         <source>Advanced settings are unavailable</source>
         <translation type="unfinished"></translation>
     </message>
@@ -620,11 +608,6 @@
         <location/>
         <source>Camera Settings Control</source>
         <translation>การตั้งค่าของกล้อง</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Keep camera streams&apos; and profiles&apos; settings</source>
-        <translation>เก็บสัญญาณภาพและโปรไฟล์การตั้งค่าของกล้อง</translation>
     </message>
     <message>
         <location/>
@@ -703,16 +686,6 @@
     </message>
     <message>
         <location/>
-        <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
-        <translation>&quot;อนุญาตให้ระบบที่จะเพิ่มประสิทธิภาพการตั้งค่ากล้อง&quot; ถูกปิดใช้งานในระบบการบริหาร.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
-        <translation>คำนวณอัตราบิตต่อ GOP แทนบิตต่อวินาที (มันจะเพิ่มบิตสำหรับกล้อง)</translation>
-    </message>
-    <message>
-        <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
         <translation>คำเตือน! สิ่งนี้จะทำให้คุณภาพและอัตราเฟรม (FPS) การตั้งค่าในตารางเวลาการบันทึกที่ไม่เกี่ยวข้อง.</translation>
     </message>
@@ -728,8 +701,33 @@
     </message>
     <message>
         <location/>
-        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-        <translation>คำเตือน! อย่าเปลี่ยนการตั้งค่าเหล่านี้นอกจากคุณจะแน่ใจจริงๆ กับของผลกระทบที่อาจเกิดกับประสิทธิภาพของระบบ.</translation>
+        <source>Motion detection control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Force motion detection for stream:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Keep camera streams and profiles settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -738,6 +736,14 @@
         <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
         <source>Input ID:</source>
         <translation>หมายเลข ID:</translation>
+    </message>
+</context>
+<context>
+    <name>CameraListDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
+        <source>Add Device...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -762,11 +768,6 @@
     <name>CameraScheduleWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
-        <source>Panic Mode: </source>
-        <translation>โหมด Panic:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Schedule Settings</source>
         <translation>กำหนดการตั้งค่า</translation>
     </message>
@@ -812,12 +813,6 @@
     </message>
     <message>
         <location/>
-        <source> s</source>
-        <extracomment>Short for &quot;seconds&quot;</extracomment>
-        <translation>วินาที</translation>
-    </message>
-    <message>
-        <location/>
         <source>Post-Recording</source>
         <translation>โพสต์บันทึก</translation>
     </message>
@@ -825,11 +820,6 @@
         <location/>
         <source>Copy Schedule...</source>
         <translation>คัดคอกกำหนดการ...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion + Low-Res </source>
-        <translation>การเคลื่อนไหว + ความละเอียดต่ำ</translation>
     </message>
     <message>
         <location/>
@@ -876,6 +866,16 @@
         <source>Apply changes before copying schedule.</source>
         <translation type="unfinished">เปลี่ยนแปลงตารางการคัดลอก</translation>
     </message>
+    <message>
+        <location/>
+        <source>Panic Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion + Lo-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChangeUserPasswordDialog</name>
@@ -886,32 +886,15 @@
     </message>
 </context>
 <context>
-    <name>CloudManagementWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/system_settings/cloud_management_widget.ui"/>
-        <source>&lt;2. Connect system
-to the cloud&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>CloudUserPanelWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/properties/cloud_user_panel_widget.ui"/>
-        <source>Enabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>ConnectToCloudDialog</name>
     <message>
         <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
-        <source>Email or password is not recognized.</source>
+        <source>Stay logged in</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Stay logged in</source>
+        <source>Incorrect Email or Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -983,14 +966,6 @@ to the cloud&gt;</source>
     </message>
 </context>
 <context>
-    <name>DateRangeWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/common/date_range_widget.ui"/>
-        <source>-</source>
-        <translation type="unfinished">-</translation>
-    </message>
-</context>
-<context>
     <name>EventLogDialog</name>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
@@ -1014,12 +989,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>&lt; Any camera &gt;</source>
-        <translation type="unfinished">&lt;กล้องอื่นๆ&gt;</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Event Rules</source>
+        <source>Event Rules...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1029,11 +999,6 @@ to the cloud&gt;</source>
         <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
         <source>HTTP content</source>
         <translation>HTTP เนื้อหา</translation>
-    </message>
-    <message>
-        <location/>
-        <source>HTTP url</source>
-        <translation>HTTP url</translation>
     </message>
     <message>
         <location/>
@@ -1054,6 +1019,16 @@ to the cloud&gt;</source>
         <location/>
         <source>Password</source>
         <translation>รหัสผ่าน</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Content type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>HTTP URL</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1126,11 +1101,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>°</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Y Offset</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1154,16 +1124,6 @@ to the cloud&gt;</source>
     <name>GeneralPreferencesWidget</name>
     <message>
         <location filename="../src/ui/widgets/local_settings/general_preferences_widget.ui"/>
-        <source>Main Media Folder</source>
-        <translation>หน้าหลัก มีเดีย โฟลเดอร์</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Extra Media Folders</source>
-        <translation>ค้นหา มีเดีย เพิ่มเติม</translation>
-    </message>
-    <message>
-        <location/>
         <source>Misc</source>
         <translation>อื่น ๆ</translation>
     </message>
@@ -1184,11 +1144,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Browse...</source>
-        <translation type="unfinished">ค้นหา...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Add...</source>
         <translation type="unfinished">&amp;เพิ่ม...</translation>
     </message>
@@ -1199,8 +1154,33 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Run Application when PC Boots</source>
-        <translation type="unfinished">เปิดโปรแกรมอัตโนมัติหลังจากเปิดเครื่อง:</translation>
+        <source>Local Media Folders</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Audio Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>First Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>None</source>
+        <translation type="unfinished">ไม่มี</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Second Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Run Application when PC Boots up</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1243,13 +1223,13 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>&lt;No image&gt;</source>
-        <translation>ไม่มีภาพ</translation>
+        <source>Loading Image...Please Wait.</source>
+        <translation>กำลังโหลดภาพ..กรุณารอสักครู่.</translation>
     </message>
     <message>
         <location/>
-        <source>Loading Image...Please Wait.</source>
-        <translation>กำลังโหลดภาพ..กรุณารอสักครู่.</translation>
+        <source>No image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1283,16 +1263,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Clear</source>
         <translation>ล้าง</translation>
-    </message>
-    <message>
-        <location/>
-        <source> cells</source>
-        <translation>ตาราง</translation>
-    </message>
-    <message>
-        <location/>
-        <source>%</source>
-        <translation>%</translation>
     </message>
     <message>
         <location/>
@@ -1339,16 +1309,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Search Base:</source>
-        <translation>ฐานค้นหา:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Search Filter:</source>
-        <translation>ค้นหาตัวกรอง:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Optional</source>
         <translation>ตันฉบับ</translation>
     </message>
@@ -1364,18 +1324,28 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Server URL:</source>
-        <translation type="unfinished">URL เซิร์ฟเวอร์:</translation>
+        <source>Server URL</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Admin DN:</source>
-        <translation type="unfinished">Ad&amp;min DN:</translation>
+        <source>Admin DN</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Password:</source>
-        <translation type="unfinished">รหัสผ่าน:</translation>
+        <source>Password</source>
+        <translation type="unfinished">รหัสผ่าน</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Search Base</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Search Filter</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1387,16 +1357,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Select users to import</source>
-        <translation>เลือก ผู้ใช้ ที่จะนำเข้า</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Filter...</source>
-        <translation>ตัวกรอง ...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Loading...</source>
         <translation>กำลังโหลด ...</translation>
     </message>
@@ -1404,6 +1364,16 @@ to the cloud&gt;</source>
         <location/>
         <source>Connection error</source>
         <translation>การเชื่อมต่อผิดพลาด</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Role to assign to imported users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disable imported users</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1437,11 +1407,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Features</source>
         <translation>คุณสมบัติ</translation>
-    </message>
-    <message>
-        <location/>
-        <source>This license type requires a higher software version.</source>
-        <translation>ใบอนุญาตประเภทนี้ต้องใช้ซอฟต์แวร์รุ่นที่สูงขึ้น.</translation>
     </message>
 </context>
 <context>
@@ -1631,28 +1596,8 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Restart required.</source>
-        <translation>ต้องการเริ่มต้นใหม่.</translation>
-    </message>
-    <message>
-        <location/>
-        <source> seconds</source>
-        <translation>วินาที</translation>
-    </message>
-    <message>
-        <location/>
-        <source>%</source>
-        <translation>%</translation>
-    </message>
-    <message>
-        <location/>
         <source>Background Image</source>
         <translation>ภาพพื้นหลัง</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;No image&gt;</source>
-        <translation>&lt;No image&gt;</translation>
     </message>
     <message>
         <location/>
@@ -1671,16 +1616,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Show extra info in tree</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Tour sequence cycle time</source>
-        <translation type="unfinished">รอบเวลาในการทัวร์:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Image</source>
         <translation type="unfinished">ภาพ:</translation>
     </message>
@@ -1693,6 +1628,29 @@ to the cloud&gt;</source>
         <location/>
         <source>Intensity</source>
         <translation type="unfinished">ความเข้ม:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show additional info in tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Tour cycle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>seconds</source>
+        <translation type="unfinished">วินาที</translation>
+    </message>
+</context>
+<context>
+    <name>MessageBox</name>
+    <message>
+        <location filename="../src/ui/dialogs/common/message_box.ui"/>
+        <source>Do not show this message again</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1731,11 +1689,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Enable Audio</source>
         <translation>เปิดเสียง</translation>
-    </message>
-    <message>
-        <location/>
-        <source>TextLabel</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1925,6 +1878,11 @@ to the cloud&gt;</source>
         <source>Form</source>
         <translation>แบบฟอร์ม</translation>
     </message>
+    <message>
+        <location/>
+        <source>Enable tile interface</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLoginToCloudDialog</name>
@@ -1940,7 +1898,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Email or password is not recognized.</source>
+        <source>Incorrect Email or Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1971,11 +1929,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>The new system will have password and name from the system:</source>
-        <translation>ระบบใหม่จะมีรหัสผ่านและชื่อจากระบบ:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Check</source>
         <translation>ตรวจสอบ</translation>
     </message>
@@ -1991,7 +1944,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>admin</source>
+        <source>The new System will have password and name from System:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2045,13 +1998,13 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Removing this connection option could lead to system malfunction.</source>
-        <translation>การถอดตัวเลือกการเชื่อมต่อนี้จะนำไปสู่ความผิดปกติของระบบ.</translation>
+        <source>Add</source>
+        <translation type="unfinished">เพิ่ม</translation>
     </message>
     <message>
         <location/>
-        <source>Add</source>
-        <translation type="unfinished">เพิ่ม</translation>
+        <source>Removing this connection option could lead to System malfunction.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2073,22 +2026,22 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Applying system updates at the end of the week is not recommended.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Updating to...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Update System</source>
+        <source>Link copied</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Link copied</source>
+        <source>You have the latest version installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Applying System updates at the end of the week is not recommended.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2124,13 +2077,13 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Warning: file with same name already exists!</source>
-        <translation>คำเตือน: ไฟล์ที่มีชื่อเดียวกันอยู่แล้ว!</translation>
+        <source>Options</source>
+        <translation>ตัวเลือก</translation>
     </message>
     <message>
         <location/>
-        <source>Options</source>
-        <translation>ตัวเลือก</translation>
+        <source>Warning: file with the same name already exists!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2257,11 +2210,6 @@ to the cloud&gt;</source>
     <name>RecordingSettings</name>
     <message>
         <location filename="../src/ui/widgets/local_settings/recording_settings_widget.ui"/>
-        <source>Video Recording</source>
-        <translation>การบันทึกวีดีโอ</translation>
-    </message>
-    <message>
-        <location/>
         <source>Temporary Folder</source>
         <translation>โฟลเดอร์ชั่วคราว</translation>
     </message>
@@ -2302,61 +2250,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Native</source>
-        <translation>พื้นฐาน</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Quarter Native</source>
-        <translation>กลาง ๆ</translation>
-    </message>
-    <message>
-        <location/>
-        <source>1920x1080</source>
-        <translation>1920x1080</translation>
-    </message>
-    <message>
-        <location/>
-        <source>1280x720</source>
-        <translation>1280x720</translation>
-    </message>
-    <message>
-        <location/>
-        <source>640x480</source>
-        <translation>640x480</translation>
-    </message>
-    <message>
-        <location/>
-        <source>320x240</source>
-        <translation>320x240</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Best</source>
-        <translation>ดี</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Average</source>
-        <translation>เฉลี่ย</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Performance</source>
-        <translation>การปฏิบัติ</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Audio Grabber</source>
-        <translation>Grabber เสียง</translation>
-    </message>
-    <message>
-        <location/>
-        <source>None</source>
-        <translation>ไม่มี</translation>
-    </message>
-    <message>
-        <location/>
         <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
         <translation>คอมพิวเตอร์ที่มีประสิทธิภาพแนะนำสำหรับ &quot;ดีที่สุด&quot; ที่มีคุณภาพและความละเอียด.</translation>
     </message>
@@ -2374,16 +2267,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Recording Quality</source>
         <translation type="unfinished">กำลังบันทึกคุณภาพ:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Primary Device</source>
-        <translation type="unfinished">อุปกรณ์หลัก:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>External Device</source>
-        <translation type="unfinished">อุปกรณ์ภายนอก:</translation>
     </message>
 </context>
 <context>
@@ -2446,11 +2329,6 @@ to the cloud&gt;</source>
         <location filename="../src/ui/widgets/properties/server_settings_widget.ui"/>
         <source>Ping</source>
         <translation>Ping ทดสอบ</translation>
-    </message>
-    <message>
-        <location/>
-        <source>9000</source>
-        <translation>9000</translation>
     </message>
     <message>
         <location/>
@@ -2778,43 +2656,13 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>1 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>0 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>1000 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>100 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source> TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>10 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Additional storage:</source>
         <translation type="unfinished">เพิ่มเติมพื้นที่จัดเก็บข้อมูล:</translation>
     </message>
     <message>
         <location/>
-        <source>Servers is offline. Statistics is not available.</source>
-        <translation type="unfinished">เซิร์ฟเวอร์ออฟไลน์ สถิติจะไม่สามารถใช้ได้.</translation>
+        <source>Server is offline. Statistics are not available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2841,12 +2689,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Unchecking the storage will cause nothing but writing stop. It won&apos;t deny oldest footage removing from the drive.</source>
-        <translation type="unfinished">ยกเลิกการเลือก พื้นที่จัดเก็บ จะทำให้อะไร แต่การเขียนหยุด
-มันจะไม่ปฏิเสธการลบภาพที่เก่าแก่ที่สุดจากไดรฟ์.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Reindex Archive</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2863,6 +2705,11 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Backup Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2934,8 +2781,8 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>System time is synchronized with the Internet and is independent from server&apos;s local time.
-Selected server will be used as a time server if the system has no Internet access.</source>
+        <source>System time is synchronized with the Internet and is independent from server local time.
+Selected server will be used as a time server if System has no Internet access.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2988,17 +2835,17 @@ Click &quot;New role&quot; button to create one.</source>
     <name>UserSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
-        <source>Enabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>User Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Role</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Edit Roles...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

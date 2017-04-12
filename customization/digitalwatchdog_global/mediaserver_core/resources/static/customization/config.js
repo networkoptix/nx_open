@@ -2,7 +2,7 @@ Config.helpLinks.push({
     url: "http://digital-watchdog.com/support/contact-tech-support/",
     title: "Support",
     description:"Have a question about specific features of your VMS system?",
-    button:"Get support",
+    button:"get support",
     target: "new" // new|frame
 });
 
@@ -33,3 +33,7 @@ Config.helpLinks.push({
 
 Config.allowDebugMode = false;
 //Config.webclientEnabled = false; // Uncomment this string to disable web client
+Config.productName = 'DW Spectrum';
+Config.cloud.productName = 'DW Cloud';
+
+Config.supportedLanguages = ['en_US', 'en_GB', 'fr', 'de', 'ru', 'es', 'ja', 'ko', 'tr', 'zh_CN', 'zh_TW', 'hu', 'he'];

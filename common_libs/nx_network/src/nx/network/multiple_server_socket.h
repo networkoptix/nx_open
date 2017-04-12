@@ -1,6 +1,6 @@
-#ifndef NX_NETWORK_MULTIPLE_SERVER_SOCKET_H
-#define NX_NETWORK_MULTIPLE_SERVER_SOCKET_H
+#pragma once
 
+#include <list>
 #include <queue>
 
 #include <nx/utils/std/cpp14.h>
@@ -12,8 +12,8 @@
 namespace nx {
 namespace network {
 
-class NX_NETWORK_API MultipleServerSocket
-    : public AbstractStreamServerSocket
+class NX_NETWORK_API MultipleServerSocket:
+    public AbstractStreamServerSocket
 {
 public:
     MultipleServerSocket();
@@ -25,75 +25,77 @@ public:
     template<typename S1, typename S2>
     std::unique_ptr<AbstractStreamServerSocket> make();
 
-    //!Implementation of AbstractSocket::*
-    bool bind(const SocketAddress& localAddress) override;
-    SocketAddress getLocalAddress() const override;
-    bool close() override;
-    bool shutdown() override;
-    bool isClosed() const override;
-    bool setReuseAddrFlag(bool reuseAddr) override;
-    bool getReuseAddrFlag(bool* val) const override;
-    bool setNonBlockingMode(bool val) override;
-    bool getNonBlockingMode(bool* val) const override;
-    bool getMtu(unsigned int* mtuValue) const override;
-    bool setSendBufferSize(unsigned int buffSize) override;
-    bool getSendBufferSize(unsigned int* buffSize) const override;
-    bool setRecvBufferSize(unsigned int buffSize) override;
-    bool getRecvBufferSize(unsigned int* buffSize) const override;
-    bool setRecvTimeout(unsigned int millis) override;
-    bool getRecvTimeout(unsigned int* millis) const override;
-    bool setSendTimeout(unsigned int ms) override;
-    bool getSendTimeout(unsigned int* millis) const override;
-    bool getLastError(SystemError::ErrorCode* errorCode) const override;
-    AbstractSocket::SOCKET_HANDLE handle() const override;
-    aio::AbstractAioThread* getAioThread() const override;
-    void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+    //---------------------------------------------------------------------------------------------
+    // Implementation of AbstractSocket::*
+    virtual Pollable* pollable() override;
+    virtual void post(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual bool bind(const SocketAddress& localAddress) override;
+    virtual SocketAddress getLocalAddress() const override;
+    virtual bool close() override;
+    virtual bool shutdown() override;
+    virtual bool isClosed() const override;
+    virtual bool setReuseAddrFlag(bool reuseAddr) override;
+    virtual bool getReuseAddrFlag(bool* val) const override;
+    virtual bool setNonBlockingMode(bool val) override;
+    virtual bool getNonBlockingMode(bool* val) const override;
+    virtual bool getMtu(unsigned int* mtuValue) const override;
+    virtual bool setSendBufferSize(unsigned int buffSize) override;
+    virtual bool getSendBufferSize(unsigned int* buffSize) const override;
+    virtual bool setRecvBufferSize(unsigned int buffSize) override;
+    virtual bool getRecvBufferSize(unsigned int* buffSize) const override;
+    virtual bool setRecvTimeout(unsigned int millis) override;
+    virtual bool getRecvTimeout(unsigned int* millis) const override;
+    virtual bool setSendTimeout(unsigned int ms) override;
+    virtual bool getSendTimeout(unsigned int* millis) const override;
+    virtual bool getLastError(SystemError::ErrorCode* errorCode) const override;
+    virtual AbstractSocket::SOCKET_HANDLE handle() const override;
+    virtual aio::AbstractAioThread* getAioThread() const override;
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+    bool isInSelfAioThread() const;
 
-    //!Implementation of AbstractStreamServerSocket::*
-    bool listen(int queueLen) override;
-    AbstractStreamSocket* accept() override;
+    //---------------------------------------------------------------------------------------------
+    // Implementation of QnStoppable::*
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
 
-    //!Implementation of QnStoppable::pleaseStop
-    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
-
-    //!Implementation of AbstractSocket::*
-    Pollable* pollable() override;
-    void post(nx::utils::MoveOnlyFunc<void()> handler) override;
-    void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override;
-
-    //!Implementation of AbstractStreamServerSocket::acceptAsync
+    //---------------------------------------------------------------------------------------------
+    // Implementation of AbstractStreamServerSocket::*
+    virtual bool listen(int queueLen) override;
+    virtual AbstractStreamSocket* accept() override;
     virtual void acceptAsync(
         nx::utils::MoveOnlyFunc<void(
             SystemError::ErrorCode,
             AbstractStreamSocket*)> handler) override;
-    //!Implementation of AbstractStreamServerSocket::cancelIOAsync
     virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
-    //!Implementation of AbstractStreamServerSocket::cancelIOSync
     virtual void cancelIOSync() override;
 
-    /** These methods can be called concurrently with \a accept.
-        \note Blocks until completion
-    */
+    /**
+     * These methods can be called concurrently with MultipleServerSocket::accept.
+     * @note Blocks until completion.
+     */
     bool addSocket(std::unique_ptr<AbstractStreamServerSocket> socket);
     void removeSocket(size_t pos);
     size_t count() const;
 
 protected:
-    struct NX_NETWORK_API ServerSocketHandle
+    struct NX_NETWORK_API ServerSocketContext
     {
         std::unique_ptr<AbstractStreamServerSocket> socket;
         bool isAccepting;
 
-        ServerSocketHandle(std::unique_ptr<AbstractStreamServerSocket> socket_);
-        ServerSocketHandle(ServerSocketHandle&&) = default;
-        ServerSocketHandle& operator=(ServerSocketHandle&&) = default;
+        ServerSocketContext(std::unique_ptr<AbstractStreamServerSocket> socket_);
+        ServerSocketContext(ServerSocketContext&&) = default;
+        ServerSocketContext& operator=(ServerSocketContext&&) = default;
 
         AbstractStreamServerSocket* operator->() const;
         void stopAccepting();
     };
 
-    void accepted(ServerSocketHandle* source, SystemError::ErrorCode code,
-                  AbstractStreamSocket* socket);
+    void accepted(
+        ServerSocketContext* source,
+        SystemError::ErrorCode code,
+        AbstractStreamSocket* socket);
 
     void cancelIoFromAioThread();
 
@@ -102,11 +104,14 @@ protected:
     unsigned int m_recvTmeout;
     mutable SystemError::ErrorCode m_lastError;
     bool* m_terminated;
-    aio::Timer m_timerSocket;
-    std::vector<ServerSocketHandle> m_serverSockets;
+    aio::Timer m_timer;
+    std::list<ServerSocketContext> m_serverSockets;
     nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode,
         AbstractStreamSocket*)> m_acceptHandler;
+
+private:
+    void stopWhileInAioThread();
 };
 
 template<typename S1, typename S2/*, typename*/>
@@ -125,5 +130,3 @@ std::unique_ptr<AbstractStreamServerSocket> MultipleServerSocket::make()
 
 } // namespace network
 } // namespace nx
-
-#endif // NX_NETWORK_MULTIPLE_SERVER_SOCKET_H

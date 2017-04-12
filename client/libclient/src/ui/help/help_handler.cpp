@@ -9,9 +9,9 @@
 #include <QtWidgets/QWidget>
 
 #include "help_topic_accessor.h"
-#include "online_help_detector.h"
 
 namespace {
+
     const char *relativeUrlForTopic(int topic) {
         switch(topic) {
 #define QN_HELP_TOPIC(ID, URL)                                                  \
@@ -28,48 +28,19 @@ namespace {
     const QString relativeHelpRootPath = lit("/help/");
 #endif
 
-    /** If the help could not be loaded, try again in 30 seconds. */
-    const int defaultHelpRetryPeriodMSec = 30*1000;
-
-    /** Send requests at least once a hour. */
-    const int maximumHelpRetryPeriodMSec = 60*60*1000;
-
 } // anonymous namespace
 
 
-QnHelpHandler::QnHelpHandler(QObject *parent):
+QnHelpHandler::QnHelpHandler(QObject* parent):
     QObject(parent),
-    m_topic(Qn::Empty_Help),
-    m_helpRetryPeriodMSec(defaultHelpRetryPeriodMSec)
+    m_topic(Qn::Empty_Help)
 {
     m_helpSearchPaths.append(qApp->applicationDirPath() + relativeHelpRootPath);
     m_helpSearchPaths.append(qApp->applicationDirPath() + lit("/..") + relativeHelpRootPath);
-
-    QnOnlineHelpDetector *helpDetector = new QnOnlineHelpDetector(this);
-    connect(helpDetector,   &QnOnlineHelpDetector::urlFetched,  this,   [this, helpDetector](const QString &helpUrl) {
-        m_onlineHelpRoot = helpUrl;
-        helpDetector->deleteLater();
-    });
-
-    connect(helpDetector,   &QnOnlineHelpDetector::error,       this,  [this, helpDetector] {
-         QTimer::singleShot(m_helpRetryPeriodMSec, helpDetector, SLOT(fetchHelpUrl()));
-
-         /* Try again in the double time but at least once a maximumHelpRetryPeriodMSec. */
-         if (m_helpRetryPeriodMSec < maximumHelpRetryPeriodMSec)
-            m_helpRetryPeriodMSec = qMin(m_helpRetryPeriodMSec * 2, maximumHelpRetryPeriodMSec);
-    });
 }
 
-QnHelpHandler::~QnHelpHandler() {
-    return;
-}
-
-void QnHelpHandler::show() {
-    return;
-}
-
-void QnHelpHandler::hide() {
-    return;
+QnHelpHandler::~QnHelpHandler()
+{
 }
 
 void QnHelpHandler::setHelpTopic(int topic) {
@@ -78,21 +49,16 @@ void QnHelpHandler::setHelpTopic(int topic) {
     QDesktopServices::openUrl(urlForTopic(topic));
 }
 
-QUrl QnHelpHandler::urlForTopic(int topic) const {
+QUrl QnHelpHandler::urlForTopic(int topic) const
+{
     QString topicPath = QLatin1String(relativeUrlForTopic(topic));
 
-    for (const QString &helpRoot: m_helpSearchPaths) {
+    for (const QString& helpRoot: m_helpSearchPaths)
+    {
         QString filePath = helpRoot + topicPath;
         if (QFile::exists(filePath))
             return QUrl::fromLocalFile(filePath);
     }
-
-    if (!m_onlineHelpRoot.isEmpty())
-        return QUrl(m_onlineHelpRoot + lit("/") + topicPath);
-
-    QnMessageBox::warning(0,
-        tr("Error"),
-        tr("Help page for the given topic could not be found")); // TODO: #dklychkov place something more detailed in the future
 
     return QUrl();
 }
@@ -117,7 +83,6 @@ bool QnHelpHandler::eventFilter(QObject *watched, QEvent *event) {
             event->accept();
 
             setHelpTopic(topicId);
-            show();
 
             QWhatsThis::leaveWhatsThisMode();
             return true;

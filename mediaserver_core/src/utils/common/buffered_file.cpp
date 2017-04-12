@@ -13,7 +13,6 @@ extern "C"
 #include <utils/common/writer_pool.h>
 #include "recorder/storage_manager.h"
 #include <nx/streaming/config.h>
-#include <media_server/settings.h>
 #include "nx/utils/log/log.h"
 
 #ifdef Q_OS_WIN
@@ -39,6 +38,13 @@ QueueFileWriter::QueueFileWriter()
 QueueFileWriter::~QueueFileWriter()
 {
     stop();
+}
+
+void QueueFileWriter::pleaseStop()
+{
+    QnLongRunnable::pleaseStop();
+    QnMutexLocker lock(&m_dataMutex);
+    m_dataWaitCond.wakeAll();
 }
 
 qint64 QueueFileWriter::writeRanges(QBufferedFile* file, std::vector<QnMediaCyclicBuffer::Range> ranges)
@@ -179,7 +185,12 @@ void QueueFileWriter::run()
 
 // -------------- QBufferedFile -------------
 
-QBufferedFile::QBufferedFile(const std::shared_ptr<IQnFile>& fileImpl, int fileBlockSize, int minBufferSize, const QnUuid& writerPoolId):
+QBufferedFile::QBufferedFile(
+    const std::shared_ptr<IQnFile>& fileImpl,
+    int fileBlockSize,
+    int minBufferSize,
+    int maxBufferSize,
+    const QnUuid& writerPoolId):
     m_fileEngine(fileImpl),
     m_cycleBuffer(fileBlockSize+minBufferSize, SECTOR_SIZE),
     m_queueWriter(0),
@@ -190,6 +201,7 @@ QBufferedFile::QBufferedFile(const std::shared_ptr<IQnFile>& fileImpl, int fileB
 {
     m_systemDependentFlags = 0;
     m_minBufferSize = minBufferSize;
+    m_maxBufferSize = maxBufferSize;
     m_isDirectIO = false;
     m_bufferPos = 0;
     m_actualFileSize = 0;
@@ -300,12 +312,7 @@ bool QBufferedFile::updatePos()
                     .arg(newBufSize - m_minBufferSize),
                    cl_logDEBUG1);
 
-            int maxBufferSize =
-                MSSettings::roSettings()->value(
-                    nx_ms_conf::MAX_FFMPEG_BUFFER_SIZE,
-                    nx_ms_conf::DEFAULT_MAX_FFMPEG_BUFFER_SIZE).toInt();
-
-			if (newBufSize < maxBufferSize)
+			if (newBufSize < m_maxBufferSize)
             {
 				m_minBufferSize = newBufSize;
 				emit seekDetected(reinterpret_cast<uintptr_t>(this), newBufSize);

@@ -19,7 +19,9 @@
 namespace nx {
 namespace media {
 
-class ProxyVideoDecoderFlagConfig: public nx::utils::FlagConfig
+namespace proxy_video_decoder {
+
+class FlagConfig: public nx::utils::FlagConfig
 {
 public:
     using nx::utils::FlagConfig::FlagConfig;
@@ -51,7 +53,11 @@ public:
     NX_FLAG(0, useGlGuiRendering, "");
     NX_FLAG(1, useSharedGlContext, "");
 };
-extern ProxyVideoDecoderFlagConfig conf;
+extern FlagConfig conf;
+
+} // namespace proxy_video_decoder
+
+using proxy_video_decoder::conf;
 
 /**
  * @return Null if compressedVideoData is null.
@@ -70,10 +76,10 @@ class YuvBuffer
 {
 public:
     YuvBuffer(const QSize& frameSize)
-    :
+        :
         m_frameSize(frameSize),
         m_yBuffer(qMallocAligned(m_frameSize.width() * m_frameSize.height(), kMediaAlignment)),
-        m_uBuffer(qMallocAligned( m_frameSize.width() * m_frameSize.height() / 4, kMediaAlignment)),
+        m_uBuffer(qMallocAligned(m_frameSize.width() * m_frameSize.height() / 4, kMediaAlignment)),
         m_vBuffer(qMallocAligned(m_frameSize.width() * m_frameSize.height() / 4, kMediaAlignment))
     {
         assert(frameSize.width() % 2 == 0);

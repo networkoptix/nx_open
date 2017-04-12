@@ -235,6 +235,21 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>testcamera-package</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>${project.build.directory}/assembly-testcamera.xml</descriptor>
+                            </descriptors>
+                            <outputDirectory>${project.build.directory}/pack</outputDirectory>                           
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${artifact.name.testcamera}</finalName>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>server-update-package</id>
                         <phase>post-integration-test</phase>
                         <goals>
@@ -263,7 +278,7 @@
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
 
                             <appendAssemblyId>false</appendAssemblyId>
-                            <finalName>${artifact.name.client_pdb}</finalName>
+                            <finalName>${artifact.name.client_debug}</finalName>
                         </configuration>
                     </execution>
                     <execution>
@@ -279,7 +294,7 @@
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
 
                             <appendAssemblyId>false</appendAssemblyId>
-                            <finalName>${artifact.name.server_pdb}</finalName>
+                            <finalName>${artifact.name.server_debug}</finalName>
                         </configuration>
                     </execution>
                     <execution>
@@ -295,7 +310,7 @@
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
 
                             <appendAssemblyId>false</appendAssemblyId>
-                            <finalName>${artifact.name.misc_pdb}</finalName>
+                            <finalName>${artifact.name.misc_debug}</finalName>
                         </configuration>
                     </execution>
                     <execution>
@@ -311,7 +326,7 @@
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
 
                             <appendAssemblyId>false</appendAssemblyId>
-                            <finalName>${artifact.name.libs_pdb}</finalName>
+                            <finalName>${artifact.name.libs_debug}</finalName>
                         </configuration>
                     </execution>
                     <execution>
@@ -327,7 +342,7 @@
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
 
                             <appendAssemblyId>false</appendAssemblyId>
-                            <finalName>${artifact.name.cloud_pdb}</finalName>
+                            <finalName>${artifact.name.cloud_debug}</finalName>
                         </configuration>
                     </execution>
                 </executions>

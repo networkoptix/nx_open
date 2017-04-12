@@ -48,6 +48,11 @@ bool QnEncodedString::operator==(const QnEncodedString& value) const
     return m_value == value.m_value;
 }
 
+bool QnEncodedString::operator!=(const QnEncodedString& value) const
+{
+    return m_value != value.m_value;
+}
+
 void serialize(const QnEncodedString& value, QString* target)
 {
     *target = value.encoded();

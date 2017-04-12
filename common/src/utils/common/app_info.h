@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QtCore/QObject>
 #include <QtCore/QString>
 
 class QnAppInfo: public QObject
@@ -18,8 +19,8 @@ public:
 
     static Q_INVOKABLE QString applicationVersion();
     static Q_INVOKABLE QString applicationRevision();
-    static Q_INVOKABLE QString applicationPlatform();
 
+    static Q_INVOKABLE QString applicationPlatform();
     static Q_INVOKABLE QString applicationArch();
     static Q_INVOKABLE QString applicationPlatformModification();
     static Q_INVOKABLE QString applicationCompiler();
@@ -47,11 +48,8 @@ public:
     static Q_INVOKABLE QString companyUrl();
 
     static Q_INVOKABLE QString supportEmailAddress();
-    static Q_INVOKABLE QString supportLink();
-
-    static Q_INVOKABLE QString showcaseUrl();               //#GDM #FIXME will not work in 3.0
-    static Q_INVOKABLE QString settingsUrl();               //#GDM #FIXME will not work in 3.0
-    static Q_INVOKABLE QString helpUrl();                   //#GDM #FIXME will not work in 3.0
+    static Q_INVOKABLE QString supportUrl();
+    static Q_INVOKABLE QString supportPhone();
 
     static Q_INVOKABLE QString updateGeneratorUrl();
     static Q_INVOKABLE QString defaultCloudHost();

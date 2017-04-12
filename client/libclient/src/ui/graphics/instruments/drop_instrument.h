@@ -2,10 +2,11 @@
 #define QN_DROP_INSTRUMENT_H
 
 #include "instrument.h"
+#include "scene_event_filter.h"
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/videowall_item_index.h>
-#include "scene_event_filter.h"
+#include <ui/actions/action_manager.h>
 
 class QnWorkbenchContext;
 class DropSurfaceItem;
@@ -17,7 +18,7 @@ public:
     DropInstrument(bool intoNewLayout, QnWorkbenchContext *context, QObject *parent = NULL);
 
     /**
-     * \returns                         Graphics item that serves as a surface for 
+     * \returns                         Graphics item that serves as a surface for
      *                                  drag and drop. Is never NULL, unless explicitly deleted by user.
      */
     QGraphicsObject *surface() const;
@@ -41,9 +42,12 @@ protected:
     SceneEventFilterItem *filterItem() const;
 
 private:
+    bool delayedTriggerIfPossible(QnActions::IDType id, const QnActionParameters& parameters);
+
+private:
     QnResourceList m_resources;
     QnVideoWallItemIndexList m_videoWallItems;
-    
+
     QPointer<QnWorkbenchContext> m_context;
     QScopedPointer<SceneEventFilterItem> m_filterItem;
     QPointer<DestructionGuardItem> m_guard;

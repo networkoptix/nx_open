@@ -16,8 +16,8 @@ int QnFavIconRestHandler::executeGet(const QString& path, const QnRequestParamLi
     Q_UNUSED(path)
     Q_UNUSED(contentType)
 
-    QFile f(":/hdw_logo.ico");
-    if (f.open(QFile::ReadOnly)) 
+    QFile f(":/favicon.ico");
+    if (f.open(QFile::ReadOnly))
     {
         result = f.readAll();
         contentType = "image/vnd.microsoft.icon";

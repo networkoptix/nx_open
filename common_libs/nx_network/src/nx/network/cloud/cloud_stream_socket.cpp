@@ -131,7 +131,7 @@ bool CloudStreamSocket::connect(
     const SocketAddress& remoteAddress,
     unsigned int timeoutMillis)
 {
-    NX_ASSERT(!SocketGlobals::aioService().isInAnyAioThread());
+    NX_EXPECT(!SocketGlobals::aioService().isInAnyAioThread());
 
     unsigned int sendTimeoutBak = 0;
     if (!getSendTimeout(&sendTimeoutBak))
@@ -182,7 +182,7 @@ bool CloudStreamSocket::connect(
 
 int CloudStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
-    NX_ASSERT(!SocketGlobals::aioService().isInAnyAioThread());
+    NX_EXPECT(!SocketGlobals::aioService().isInAnyAioThread());
 
     if (!m_socketDelegate)
     {
@@ -195,7 +195,7 @@ int CloudStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 
 int CloudStreamSocket::send(const void* buffer, unsigned int bufferLen)
 {
-    NX_ASSERT(!SocketGlobals::aioService().isInAnyAioThread());
+    NX_EXPECT(!SocketGlobals::aioService().isInAnyAioThread());
 
     if (!m_socketDelegate)
     {
@@ -492,7 +492,11 @@ void CloudStreamSocket::onCloudConnectDone(
     NX_LOGX(lm("onCloudConnectDone. %1").str(errorCode), cl_logDEBUG2);
     
     if (errorCode == SystemError::noError)
+    {
         errorCode = applyRealNonBlockingMode(cloudConnection.get());
+        if (errorCode != SystemError::noError)
+            cloudConnection.reset();
+    }
 
     if (errorCode == SystemError::noError)
     {
@@ -540,8 +544,11 @@ void CloudStreamSocket::stopWhileInAioThread()
     m_timer.pleaseStopSync();
     m_readIoBinder.pleaseStopSync();
     m_writeIoBinder.pleaseStopSync();
-    m_socketDelegate.reset();
-    setDelegate(nullptr);
+    if (m_socketDelegate)
+    {
+        m_socketDelegate->pleaseStopSync();
+        setDelegate(nullptr);
+    }
 }
 
 } // namespace cloud

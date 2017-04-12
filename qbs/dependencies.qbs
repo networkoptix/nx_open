@@ -58,6 +58,15 @@ Project
     {
         id: quazip
         packageName: "quazip"
+        condition: withDesktopClient || withMediaServer
+    }
+
+    RdepProbe
+    {
+        id: openal
+        packageName: "openal"
+        condition: (withDesktopClient || withMobileClient)
+            && (qbs.targetOS.contains("windows") || qbs.targetOS.contains("android"))
     }
 
     RdepProbe
@@ -105,6 +114,7 @@ Project
 
         ffmpeg.found && result.push(ffmpeg.packagePath)
         quazip.found && result.push(quazip.packagePath)
+        openal.found && result.push(openal.packagePath)
 
         festival.found && result.push(festival.packagePath)
         festivalVox.found && result.push(festivalVox.packagePath)

@@ -15,6 +15,7 @@ struct QnCloudSystem
     std::string authKey;
     qreal weight;
     qint64 lastLoginTimeUtcMs;
+    bool online = false;
 
     bool operator==(const QnCloudSystem &other) const;
 

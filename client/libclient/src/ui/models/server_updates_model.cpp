@@ -71,6 +71,7 @@ QnServerUpdatesModel::QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObjec
             return;
         m_items[idx.row()]->m_stage = stage;
         emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
+        updateLowestInstalledVersion();
     });
 
     connect(m_updateTool,  &QnMediaServerUpdateTool::peerStageProgressChanged,  this, [this](const QnUuid &peerId, QnPeerUpdateStage stage, int progress) {
@@ -187,6 +188,7 @@ void QnServerUpdatesModel::resetResourses() {
     }
 
     endResetModel();
+    updateLowestInstalledVersion();
 }
 
 void QnServerUpdatesModel::updateVersionColumn() {
@@ -195,7 +197,37 @@ void QnServerUpdatesModel::updateVersionColumn() {
     emit dataChanged(index(0, VersionColumn), index(m_items.size() - 1, VersionColumn));
 }
 
-void QnServerUpdatesModel::at_resourceAdded(const QnResourcePtr &resource) {
+void QnServerUpdatesModel::updateLowestInstalledVersion()
+{
+    QnSoftwareVersion result;
+    for (const auto item: m_items)
+    {
+        const auto& server = item->server();
+        NX_ASSERT(server);
+        if (!server)
+            continue;
+
+        const auto status = server->getStatus();
+        if (status == Qn::Offline || status == Qn::Unauthorized)
+            continue;
+
+        const auto& version = server->getVersion();
+        if (version.isNull())
+            continue;
+
+        if (version < result || result.isNull())
+            result = version;
+    }
+
+    if (result == m_lowestInstalledVersion)
+        return;
+
+    m_lowestInstalledVersion = result;
+    emit lowestInstalledVersionChanged();
+}
+
+void QnServerUpdatesModel::at_resourceAdded(const QnResourcePtr &resource)
+{
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server)
         return;
@@ -210,6 +242,7 @@ void QnServerUpdatesModel::at_resourceAdded(const QnResourcePtr &resource) {
     beginInsertRows(QModelIndex(), row, row);
     m_items.append(new Item(server));
     endInsertRows();
+    updateLowestInstalledVersion();
 }
 
 void QnServerUpdatesModel::at_resourceRemoved(const QnResourcePtr &resource) {
@@ -224,6 +257,7 @@ void QnServerUpdatesModel::at_resourceRemoved(const QnResourcePtr &resource) {
     beginRemoveRows(QModelIndex(), idx.row(), idx.row());
     m_items.removeAt(idx.row());
     endRemoveRows();
+    updateLowestInstalledVersion();
 }
 
 void QnServerUpdatesModel::at_resourceChanged(const QnResourcePtr &resource) {
@@ -238,6 +272,7 @@ void QnServerUpdatesModel::at_resourceChanged(const QnResourcePtr &resource) {
 
     if (exists == isOurServer) {
         emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
+        updateLowestInstalledVersion();
         return;
     }
 
@@ -268,7 +303,13 @@ void QnServerUpdatesModel::setCheckResult(const QnCheckForUpdateResult &result) 
     updateVersionColumn();
 }
 
-QnServerUpdatesColors QnServerUpdatesModel::colors() const {
+QnSoftwareVersion QnServerUpdatesModel::lowestInstalledVersion() const
+{
+    return m_lowestInstalledVersion;
+}
+
+QnServerUpdatesColors QnServerUpdatesModel::colors() const
+{
     return m_colors;
 }
 

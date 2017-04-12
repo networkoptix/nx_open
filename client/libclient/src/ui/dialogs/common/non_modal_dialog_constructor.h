@@ -1,13 +1,12 @@
-#ifndef QN_NON_MODAL_DIALOG_CONSTRUCTOR_H
-#define QN_NON_MODAL_DIALOG_CONSTRUCTOR_H
+#pragma once
+
+#include <nx/utils/app_info.h>
 
 class QnShowDialogHelper {
 public:
     static void show(QWidget* dialog, const QRect &targetGeometry);
 
-    static void showNonModalDialog(QWidget *dialog
-        , const QRect &targetGeometry = QRect()
-        , bool dontFocus = false);
+    static void showNonModalDialog(QWidget* dialog, const QRect& targetGeometry, bool focus);
 
     static QPoint calculatePosition(QWidget* dialog);
 };
@@ -39,7 +38,8 @@ public:
     }
 
     /** Invalidate stored geometry so dialog will be displayed in the center of the screen. */
-    void resetGeometry() {
+    void resetGeometry()
+    {
         m_targetGeometry = QRect();
     }
 
@@ -57,34 +57,29 @@ class QnNonModalDialogConstructor: public QnShowDialogHelper
 
 public:
     typedef QPointer<T> DialogType;
-    typedef std::function<T* ()> DialogCreationFunc;
-    QnNonModalDialogConstructor(DialogType &dialog
-        , const DialogCreationFunc &creator);
+    typedef std::function<T*()> DialogCreationFunc;
+    QnNonModalDialogConstructor(DialogType& dialog, const DialogCreationFunc& creator);
 
-    QnNonModalDialogConstructor(DialogType &dialog
-        , QWidget *parent);
-
+    QnNonModalDialogConstructor(DialogType& dialog, QWidget* parent);
     ~QnNonModalDialogConstructor();
 
     /** Invalidate stored geometry so dialog will be displayed in the center of the screen. */
-    void resetGeometry();
+    void resetGeometry() { m_targetGeometry = QRect(); }
 
-    void setDontFocus(bool f);
-
+    void disableAutoFocus() { m_autoFocus = false; }
 private:
     /// should be used only from constructor!
-    DialogType createAndInitializeDialog(DialogType &output
-        , const DialogCreationFunc &creator);
+    DialogType createAndInitializeDialog(DialogType& output, const DialogCreationFunc& creator);
 
 private:
     QRect m_targetGeometry;
     DialogType m_dialog;
-    bool m_dontFocus;
+    bool m_autoFocus = true;
 };
 
 template<typename T>
-QPointer<T> QnNonModalDialogConstructor<T>::createAndInitializeDialog(DialogType &output
-    , const DialogCreationFunc &creator)
+QPointer<T> QnNonModalDialogConstructor<T>::createAndInitializeDialog(DialogType& output,
+    const DialogCreationFunc& creator)
 {
     if (!output)
     {
@@ -95,43 +90,31 @@ QPointer<T> QnNonModalDialogConstructor<T>::createAndInitializeDialog(DialogType
         /* Dialog's show() method will reset the geometry, saving it to restore afterwards. */
         m_targetGeometry = output->geometry();
     }
+
+    if (nx::utils::AppInfo::isMacOsX())
+    {
+        // Workaround for bug QTBUG-34767
+        output->setWindowFlags(output->windowFlags() | Qt::WindowStaysOnTopHint);
+    }
     return output;
 }
 
 template<typename T>
-QnNonModalDialogConstructor<T>::QnNonModalDialogConstructor(DialogType &dialog
-    , const DialogCreationFunc &creator)
-    : m_targetGeometry()
-    , m_dialog(createAndInitializeDialog(dialog, creator))
-    , m_dontFocus(true)
+QnNonModalDialogConstructor<T>::QnNonModalDialogConstructor(DialogType& dialog,
+    const DialogCreationFunc& creator)
+    :
+    m_dialog(createAndInitializeDialog(dialog, creator))
 {
 }
 
 template<typename T>
-QnNonModalDialogConstructor<T>::QnNonModalDialogConstructor(DialogType &dialog
-    , QWidget* parent)
-    : m_targetGeometry()
-    , m_dialog(createAndInitializeDialog(dialog, [parent](){ return (new T(parent));}))
-    , m_dontFocus(true)
+QnNonModalDialogConstructor<T>::QnNonModalDialogConstructor(DialogType& dialog, QWidget* parent):
+    m_dialog(createAndInitializeDialog(dialog, [parent](){ return (new T(parent));}))
 {
 }
 
 template<typename T>
 QnNonModalDialogConstructor<T>::~QnNonModalDialogConstructor()
 {
-        showNonModalDialog(m_dialog, m_targetGeometry, m_dontFocus);
+    showNonModalDialog(m_dialog, m_targetGeometry, m_autoFocus);
 }
-
-template<typename T>
-void QnNonModalDialogConstructor<T>::resetGeometry()
-{
-    m_targetGeometry = QRect();
-}
-
-template<typename T>
-void QnNonModalDialogConstructor<T>::setDontFocus(bool f)
-{
-    m_dontFocus = f;
-}
-
-#endif //QN_NON_MODAL_DIALOG_CONSTRUCTOR_H

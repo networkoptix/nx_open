@@ -365,7 +365,7 @@ int QnMergeSystemsRestHandler::execute(
 
 bool QnMergeSystemsRestHandler::applyCurrentSettings(
     const QUrl &remoteUrl,
-    const QString& getKey,
+    const QString& /*getKey*/,
     const QString& postKey,
     bool oneServer,
     const QnRestConnectionProcessor* owner)
@@ -440,8 +440,29 @@ bool QnMergeSystemsRestHandler::executeRemoteConfigure(
     if (!client.doPost(requestUrl, "application/json", serializedData) ||
         !isResponseOK(client))
     {
+        NX_LOG(lit("QnMergeSystemsRestHandler::executeRemoteConfigure api/configure failed. HTTP code %1.")
+            .arg(client.response() ? client.response()->statusLine.statusCode : 0), cl_logWARNING);
         return false;
     }
+
+    nx_http::BufferType response;
+    while (!client.eof())
+        response.append(client.fetchMessageBodyBuffer());
+
+    QnJsonRestResult jsonResult;
+    if (!QJson::deserialize(response, &jsonResult))
+    {
+        NX_LOG(lit("QnMergeSystemsRestHandler::executeRemoteConfigure api/configure failed."
+            "Invalid json response received."), cl_logWARNING);
+        return false;
+    }
+    if (jsonResult.error != QnRestResult::NoError)
+    {
+        NX_LOG(lit("QnMergeSystemsRestHandler::executeRemoteConfigure api/configure failed. Json error %1.")
+            .arg(jsonResult.error), cl_logWARNING);
+        return false;
+    }
+
     return true;
 }
 
@@ -524,10 +545,6 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
     data.wholeSystem = true;
     data.sysIdTime = pingReply.sysIdTime;
     data.tranLogTime = pingReply.tranLogTime;
-
-    //for (auto itr = settings.settings.begin(); itr != settings.settings.end(); ++itr)
-    //    data.foreignSettings.push_back(ec2::ApiResourceParamData(itr.key(), itr.value()));
-    data.foreignUsers = users;
 
     for (const auto& userData: users)
     {

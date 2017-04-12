@@ -25,11 +25,12 @@ public:
 
     // write all data in a row
     qint64 writeRanges (QBufferedFile* file, std::vector<QnMediaCyclicBuffer::Range> range);
-    
+
     /*
     * Returns storage usage in range [0..1]
     */
     float getAvarageUsage();
+    virtual void pleaseStop() override;
 protected:
     virtual void run();
 private:
@@ -75,7 +76,12 @@ public:
     * @param ioBlockSize - IO block size
     * @param minBufferSize - do not empty buffer(after IO operation) less then minBufferSize
     */
-    QBufferedFile(const std::shared_ptr<IQnFile>& fileImpl, int ioBlockSize, int minBufferSize, const QnUuid& writerPoolId);
+    QBufferedFile(
+        const std::shared_ptr<IQnFile>& fileImpl,
+        int ioBlockSize,
+        int minBufferSize,
+        int maxBufferSize,
+        const QnUuid& writerPoolId);
     virtual ~QBufferedFile();
 
     /*
@@ -96,7 +102,7 @@ public:
 signals:
     void seekDetected(uintptr_t obj, int bufferSizePow);
     void fileClosed(uintptr_t obj);
-    
+
 protected:
     qint64 writeUnbuffered(const char * data, qint64 len );
 private:
@@ -109,6 +115,7 @@ private:
 private:
     std::shared_ptr<IQnFile> m_fileEngine;
     int m_minBufferSize;
+    int m_maxBufferSize;
     QnMediaCyclicBuffer m_cycleBuffer;
     QueueFileWriter* m_queueWriter;
     unsigned int m_systemDependentFlags;

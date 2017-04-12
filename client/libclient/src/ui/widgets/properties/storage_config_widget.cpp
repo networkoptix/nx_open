@@ -43,7 +43,7 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
 #include <utils/common/qtimespan.h>
-#include <utils/common/unused.h>
+#include <nx/utils/unused.h>
 
 #include <utils/math/color_transformations.h>
 
@@ -124,19 +124,7 @@ namespace
 
             /* Set proper color for links: */
             if (index.column() == QnStorageListModel::RemoveActionColumn && !opt.text.isEmpty())
-            {
-                if (auto style = QnNxStyle::instance())
-                {
-                    QnPaletteColor color = style->findColor(QPalette().color(QPalette::Link));
-                    if (!hovered)
-                        color = color.darker(2);
-                    opt.palette.setColor(QPalette::Text, color);
-                }
-                else
-                {
-                    opt.palette.setColor(QPalette::Text, QPalette().color(QPalette::Link));
-                }
-            }
+                opt.palette.setColor(QPalette::Text, style::linkColor(opt.palette, hovered));
 
             /* Set warning color for inaccessible storages: */
             if (index.column() == QnStorageListModel::StoragePoolColumn && !storage.isOnline)
@@ -249,6 +237,8 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
 
     ui->backupSettingsButtonDuplicate->setText(ui->backupSettingsButton->text());
     connect(ui->backupSettingsButtonDuplicate, &QPushButton::clicked, ui->backupSettingsButton, &QPushButton::clicked);
+
+    setWarningStyle(ui->storagesWarningLabel);
 
     ui->progressBarBackup->setFormat(lit("%1\t%p%").arg(tr("Backup is in progress...")));
 
@@ -492,6 +482,7 @@ void QnStorageConfigWidget::loadDataToUi()
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
     loadStoragesFromResources();
     m_backupSchedule = m_server->getBackupSchedule();
+    m_camerasToBackup = getCurrentSelectedCameras();
 
     updateDisabledStoragesWarning(false);
 
@@ -547,8 +538,7 @@ void QnStorageConfigWidget::at_storageView_clicked(const QModelIndex& index)
         record.isBackup = isBackup;
         m_model->updateStorage(record);
     }
-    else
-    if (index.column() == QnStorageListModel::RemoveActionColumn)
+    else if (index.column() == QnStorageListModel::RemoveActionColumn)
     {
         if (m_model->canRemoveStorage(record))
             m_model->removeStorage(record);
@@ -690,6 +680,7 @@ void QnStorageConfigWidget::applyChanges()
             { server->setBackupSchedule(m_backupSchedule); });
     }
 
+    updateDisabledStoragesWarning(false);
     emit hasChangesChanged();
 }
 
@@ -704,14 +695,15 @@ void QnStorageConfigWidget::startRebuid(bool isMain)
     if (!m_server)
         return;
 
-    int warnResult = QnMessageBox::warning(
-        this,
-        tr("Warning!"),
-        tr("You are about to launch the archive re-synchronization routine.") + L'\n'
-        + tr("ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.") + L'\n'
-        + tr("This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without data loss.") + L'\n'
-        + tr("Are you sure you want to continue?"),
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    const auto extras =
+        tr("Depending on the total size of the archive, reindexing can take up to several hours.")
+        + L'\n' +tr("Reindexing is only necessary if your archive folders have been moved, renamed or deleted.")
+        + L'\n' +tr("You can cancel this operation at any moment without data loss.")
+        + L'\n' +tr("Continue anyway?");
+
+    const auto warnResult = QnMessageBox::warning(this,
+        tr("Hard disk load will increase significantly"), extras,
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel, QDialogButtonBox::Ok);
 
     if (warnResult != QDialogButtonBox::Ok)
         return;
@@ -798,16 +790,16 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data,
     if (hasChanges())
         return error(tr("Apply changes to start backup."));
 
-    if (m_backupSchedule.backupType == Qn::Backup_RealTime)
-        return true;
-
-    if (!selectedCamerasCount)
+    if (selectedCamerasCount == 0)
     {
         const auto text = QnDeviceDependentStrings::getDefaultNameFromSet(
-            tr("Select at least one device to start backup."),
-            tr("Select at least one camera to start backup."));
+            tr("Select at least one device in the Backup Settings to start backup."),
+            tr("Select at least one camera in the Backup Settings to start backup."));
         return error(text);
     }
+
+    if (m_backupSchedule.backupType == Qn::Backup_RealTime)
+        return true;
 
     const auto rebuildStatusState = [this](QnServerStoragesPool type)
     {
@@ -1108,11 +1100,11 @@ void QnStorageConfigWidget::at_serverRebuildArchiveFinished(const QnMediaServerR
 
     if (!storagePool.rebuildCancelled)
     {
-        QnMessageBox::information(this,
-            tr("Finished"),
-            isMain
-                ? tr("Rebuilding archive index is completed.")
-                : tr("Rebuilding backup index is completed."));
+        const auto text = (isMain
+            ? tr("Archive reindexing completed")
+            : tr("Backup reindexing completed"));
+
+        QnMessageBox::success(this, text);
     }
 
     storagePool.rebuildCancelled = false;
@@ -1132,9 +1124,7 @@ void QnStorageConfigWidget::at_serverBackupFinished(const QnMediaServerResourceP
         return;
     }
 
-    QnMessageBox::information(this,
-        tr("Finished"),
-        tr("Backup is finished"));
+    QnMessageBox::success(this, tr("Backup completed"));
 }
 
 void QnStorageConfigWidget::invokeBackupSettings()

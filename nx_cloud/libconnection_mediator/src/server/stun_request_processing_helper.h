@@ -30,7 +30,7 @@ void sendSuccessResponse(
             stun::MessageClass::successResponse,
             requestHeader.method,
             std::move(requestHeader.transactionId)));
-    response.newAttribute<stun::cc::attrs::ResultCode>(api::ResultCode::ok);
+    response.newAttribute<stun::extension::attrs::ResultCode>(api::ResultCode::ok);
 
     connection->sendMessage(std::move(response));
 }
@@ -50,8 +50,8 @@ void sendErrorResponse(
             requestHeader.method,
             std::move(requestHeader.transactionId)));
 
-    response.newAttribute<stun::cc::attrs::ResultCode>(resultCode);
-    response.newAttribute< stun::attrs::ErrorDescription >(
+    response.newAttribute<stun::extension::attrs::ResultCode>(resultCode);
+    response.newAttribute< stun::attrs::ErrorCode >(
         stunErrorCode,
         std::move(reason));
     connection->sendMessage(std::move(response));
@@ -97,7 +97,7 @@ void fillAndSendResponse(
             requestHeader.method,
             std::move(requestHeader.transactionId)));
     serialize(outputData, &response);
-    response.newAttribute<stun::cc::attrs::ResultCode>(resultCode);
+    response.newAttribute<stun::extension::attrs::ResultCode>(resultCode);
 
     connection->sendMessage(std::move(response));
 }

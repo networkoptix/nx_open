@@ -15,7 +15,8 @@
 #include <ui/help/help_topics.h>
 #include <ui/screen_recording/video_recorder_settings.h>
 #include <ui/workaround/widgets_signals_workaround.h>
-#include <ui/workbench/workbench_auto_starter.h>
+
+#include <nx/vms/utils/platform/autorun.h>
 
 namespace {
 const int kMsecsPerMinute = 60 * 1000;
@@ -31,7 +32,7 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(
 {
     ui->setupUi(this);
 
-    if (!QnWorkbenchAutoStarter::isSupported())
+    if (!nx::vms::utils::isAutoRunSupported())
         ui->autoStartCheckBox->hide();
 
     setHelpTopic(ui->mediaFoldersGroupBox, Qn::SystemSettings_General_MediaFolders_Help);
@@ -83,9 +84,7 @@ void QnGeneralPreferencesWidget::applyChanges()
     qnSettings->setMediaFolder(mainMediaFolder);
     qnSettings->setExtraMediaFolders(allMediaFolders);
     qnSettings->setUserIdleTimeoutMSecs(userIdleTimeoutMs());
-
-    if (QnWorkbenchAutoStarter::isSupported())
-        qnSettings->setAutoStart(autoStart());
+    qnSettings->setAutoStart(autoStart());
 
     bool recorderSettingsChanged = false;
     if (m_recorderSettings->primaryAudioDeviceName() != primaryAudioDeviceName())
@@ -113,6 +112,7 @@ void QnGeneralPreferencesWidget::loadDataToUi()
     setUserIdleTimeoutMs(qnSettings->userIdleTimeoutMSecs());
     setPrimaryAudioDeviceName(m_recorderSettings->primaryAudioDevice().fullName());
     setSecondaryAudioDeviceName(m_recorderSettings->secondaryAudioDevice().fullName());
+    setAutoStart(qnSettings->autoStart());
 }
 
 bool QnGeneralPreferencesWidget::hasChanges() const
@@ -135,7 +135,7 @@ bool QnGeneralPreferencesWidget::hasChanges() const
             return true;
     }
 
-    if (QnWorkbenchAutoStarter::isSupported())
+    if (nx::vms::utils::isAutoRunSupported())
     {
         if (qnSettings->autoStart() != autoStart())
             return true;
@@ -166,9 +166,11 @@ void QnGeneralPreferencesWidget::at_addMediaFolderButton_clicked()
     if (dirName.isEmpty())
         return;
 
+    dirName = QDir::toNativeSeparators(dirName);
+
     if (mediaFolders().contains(dirName))
     {
-        QnMessageBox::information(this, tr("Folder has already been added."), tr("This folder has already been added."), QDialogButtonBox::Ok);
+        QnMessageBox::information(this, tr("Folder already added"));
         return;
     }
 

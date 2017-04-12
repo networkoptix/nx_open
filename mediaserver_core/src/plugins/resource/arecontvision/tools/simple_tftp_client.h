@@ -17,7 +17,7 @@ class QnByteArray;
 class CLSimpleTFTPClient
 {
     // TODO: #Elric #enum
-    enum {all_ok,  time_out};
+    enum {all_ok, time_out, protocol_error};
     enum {blk_size=1450, double_blk_size=2904};
 
     // arecont vision cams supports 2 blk sizes.
@@ -45,6 +45,7 @@ public:
 private:
     int form_read_request(const QString& fn, char* buff);
     int form_ack(unsigned short blk, char* buff);
+    int parseBlockSize(const char* const responseBuffer, std::size_t responseLength);
 
 private:
 

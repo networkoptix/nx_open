@@ -14,7 +14,7 @@ angular.module('webadminApp')
             for (var i=0;i<params.length;i++) {
                 var pair = params[i].split('=');
                 if(pair[0] === 'proxy'){
-                    proxy = '/proxy/' + pair[1];
+                    proxy = '/web/proxy/' + pair[1];
                     if(pair[1] === 'demo'){
                         proxy = Config.demo;
                     }
@@ -28,15 +28,17 @@ angular.module('webadminApp')
             return $http.get(proxy + '/web/api/moduleInformation?showAddresses=true&salt=' + salt).then(function(r){
                 var data = r.data.reply;
                 if(!Config.cloud.portalUrl) {
+                    Config.cloud.host = data.cloudHost;
                     Config.cloud.portalUrl = 'https://' + data.cloudHost;
+                    Config.cloud.systemId = data.cloudSystemId;
+                    Config.protoVersion = data.protoVersion;
                 }
 
-                var ips = data.remoteAddresses;
+                var ips = _.filter(data.remoteAddresses,function(address){
+                    return address !== '127.0.0.1';
+                });
                 var wrongNetwork = true;
                 for (var ip in ips) {
-                    if (ips[ip] == '127.0.0.1') { // Localhost
-                        continue;
-                    }
                     if (ips[ip].indexOf('169.254.') == 0) { // No DHCP address
                         continue;
                     }
@@ -64,7 +66,7 @@ angular.module('webadminApp')
         function callLogin(){
             if (loginDialog === null) { //Dialog is not displayed
                 loginDialog = $modal.open({
-                    templateUrl: 'views/login.html',
+                    templateUrl: Config.viewsDir + 'login.html',
                     keyboard:false,
                     backdrop:'static'
                 });
@@ -111,7 +113,7 @@ angular.module('webadminApp')
             if(offlineDialog === null) { //Dialog is not displayed
                 getModuleInformation().catch(function (/*error*/) {
                     offlineDialog = $modal.open({
-                        templateUrl: 'offline_modal',
+                        templateUrl: Config.viewsDir + 'components/offline.html',
                         controller: 'OfflineCtrl',
                         keyboard:false,
                         backdrop:'static'
@@ -211,6 +213,7 @@ angular.module('webadminApp')
                         var nonce = data.data.reply.nonce;
 
                         var auth = self.digest(login, password, realm, nonce);
+                        var authRtsp = self.digest(login, password, realm, nonce, 'PLAY');
 
                         $log.log("Login2: nonce is " + nonce);
                         $log.log("Login2: auth is " + auth);
@@ -231,6 +234,7 @@ angular.module('webadminApp')
                             $localStorage.nonce = nonce;
                             $localStorage.realm = realm;
                             $localStorage.auth = auth;
+                            $localStorage.authRtsp = authRtsp;
 
                             $log.log("Login3: cookieLogin success!");
                             return data.data.reply;
@@ -255,7 +259,7 @@ angular.module('webadminApp')
                 return $localStorage.auth;
             },
             authForRtsp:function(){
-                return $localStorage.auth; // auth_rtsp
+                return $localStorage.authRtsp; // auth_rtsp
             },
 
             previewUrl:function(cameraPhysicalId,time,width,height){
@@ -274,20 +278,13 @@ angular.module('webadminApp')
                 return proxy !=='';
             },
             getUser:function(reload){
-                var self = this;
                 return this.getCurrentUser(reload).then(function(result){
-                    /*jshint bitwise: false*/
                     var hasEditServerPermission = result.data.reply.permissions.indexOf(Config.globalEditServersPermissions)>=0;
                     var hasAllResources = result.data.reply.permissions.indexOf(Config.globalAccessAllMediaPermission)>=0;
-                    /*jshint bitwise: true*/
-                    var isAdmin = result.data.reply.isAdmin || hasEditServerPermission;
 
+                    var isAdmin = result.data.reply.isAdmin || hasEditServerPermission;
                     var isOwner = result.data.reply.isAdmin ;
 
-                    if(self.hasProxy()){
-                        isAdmin = false;
-                        isOwner = false;
-                    }
                     return {
                         isAdmin:isAdmin,
                         isOwner:isOwner,
@@ -303,23 +300,20 @@ angular.module('webadminApp')
             execute:function(script,mode){
                 return $http.post('/web/api/execute/' + script + '?' + (mode||''));
             },
-            getModuleInformation: function(url) {
-                url = url || proxy;
-                if(url === true){//force reload cache
-                    cacheModuleInfo = null;
-                    url = proxy;
-                }
-                if(url === proxy){// Кешируем данные о сервере, чтобы не запрашивать 10 раз
-                    if(cacheModuleInfo === null){
-                        cacheModuleInfo = wrapRequest(getModuleInformation());
-                    }
-                    // on error - clear object to reload next time
-                    return cacheModuleInfo;
-                }
-                //Some another server
-                return $http.get(url + '/web/api/moduleInformation?showAddresses=true',{
+            pingServer:function(url){
+                return $http.get(url + '/web/api/moduleInformation',{
                     timeout: 3*1000
                 });
+            },
+            getModuleInformation: function(reload) {
+                if(reload === true){//force reload cache
+                    cacheModuleInfo = null;
+                }
+                if(cacheModuleInfo === null){
+                    cacheModuleInfo = wrapRequest(getModuleInformation());
+                }
+                // on error - clear object to reload next time
+                return cacheModuleInfo;
             },
             systemCloudInfo:function(){
                 return this.getSystemSettings().then(function(data){
@@ -397,9 +391,11 @@ angular.module('webadminApp')
 
             mergeSystems: function(url, remoteLogin, remotePassword, keepMySystem){
                 // 1. get remote nonce
-                // /proxy/http/{url}/api/getNonce
                 var self = this;
                 return self.getNonce(remoteLogin, url).then(function(data){
+                    if(data.data.error && data.data.error!="0"){
+                        return $q.reject(data);
+                    }
                     // 2. calculate digest
                     var realm = data.data.reply.realm;
                     var nonce = data.data.reply.nonce;
@@ -416,18 +412,15 @@ angular.module('webadminApp')
                         url: url,
                         takeRemoteSettings: !keepMySystem
                     });
-                },function(error){
-                    return $q.reject({
-                        data:{
-                            error:3,
-                            errorString:'INCOMPATIBLE'
-                        }
-                    });
                 });
             },
             pingSystem: function(url, remoteLogin, remotePassword){
                 var self = this;
                 return self.getNonce(remoteLogin, url).then(function(data) {
+
+                    if(data.data.error && data.data.error!="0"){
+                        return $q.reject(data);
+                    }
                     var realm = data.data.reply.realm;
                     var nonce = data.data.reply.nonce;
                     var getKey = self.digest(remoteLogin, remotePassword, realm, nonce, 'GET');
@@ -442,12 +435,7 @@ angular.module('webadminApp')
                         url: url
                     }));
                 },function(error){
-                    return $q.reject({
-                        data:{
-                            error:3,
-                            errorString:'INCOMPATIBLE'
-                        }
-                    });
+                    return $q.reject(error);
                 });
             },
             restart: function() { return wrapPost(proxy + '/web/api/restart'); },
@@ -479,7 +467,7 @@ angular.module('webadminApp')
                 return cacheCurrentUser;
             },
             getTime:function(){
-                return wrapGet(proxy + '/web/api/gettime');
+                return wrapGet(proxy + '/web/api/gettime?local');
             },
             getTimeZones:function(){
                 return wrapGet(proxy + '/web/api/getTimeZones');
@@ -541,7 +529,7 @@ angular.module('webadminApp')
                 }
 
                 if(serverUrl !== '/' && serverUrl !== '' && serverUrl !== null){
-                    serverUrl = '/proxy/'+ serverUrl + '/';
+                    serverUrl = '/web/proxy/'+ serverUrl + '/';
                 }
                 if( proxy === Config.demo){
                     serverUrl = proxy + '/';
@@ -583,7 +571,7 @@ angular.module('webadminApp')
                         $location.path('/setup');
                         return null;
                     }
-                    if((r.data.reply.flags.brokenSystem)){ // No drives - redirect to settings and hide everything else
+                    if(r.data.reply.flags.brokenSystem){ // No drives - redirect to settings and hide everything else
                         $location.path('/settings/system');
                         return null;
                     }
@@ -602,6 +590,13 @@ angular.module('webadminApp')
             getCommonPasswords:function(){
                 return wrapGet('commonPasswordsList.json');
             },
+            getLanguages:function(){
+                return wrapGet('languages.json').then(function(data){
+                    return _.filter(data.data,function(language){
+                        return Config.supportedLanguages.indexOf(language.language) >= 0;
+                    });
+                });
+            },
 
             networkSettings:function(settings){
                 if(!settings) {
@@ -612,7 +607,7 @@ angular.module('webadminApp')
 
             timeSettings:function(dateTime, timeZone){
                 if(!dateTime || !timeZone) {
-                    return wrapGet(proxy + '/web/api/gettime');
+                    return wrapGet(proxy + '/web/api/gettime?local');
                 }
                 return wrapPost(proxy + '/web/api/setTime', stringifyValues({
                     timeZoneId: timeZone,

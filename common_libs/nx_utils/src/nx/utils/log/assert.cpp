@@ -8,18 +8,18 @@ namespace utils {
 /** Change to see more or less records at the end of execution */
 static const size_t kShowTheMostCount(30);
 
-static std::function<void(const QnLogMessage&)> g_errorMonitorHandler;
+static std::function<void(const QnLogMessage&)> g_onAssertHandler;
 
-void logError(const QnLogMessage& message)
+void logAssert(const QnLogMessage& message)
 {
     NX_LOG(message, cl_logERROR);
-    if (g_errorMonitorHandler)
-        g_errorMonitorHandler(message);
+    if (g_onAssertHandler)
+        g_onAssertHandler(message);
 }
 
-void setErrorMonitor(std::function<void(const QnLogMessage&)> handler)
+void setOnAssertHandler(std::function<void(const QnLogMessage&)> handler)
 {
-    g_errorMonitorHandler = handler;
+    g_onAssertHandler = std::move(handler);
 }
 
 AssertTimer::TimeInfo::TimeInfo()

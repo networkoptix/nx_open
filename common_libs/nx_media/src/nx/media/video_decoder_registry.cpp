@@ -55,15 +55,6 @@ bool VideoDecoderRegistry::hasCompatibleDecoder(const AVCodecID codec, const QSi
     QMutexLocker lock(&mutex);
     for (const auto& plugin: m_plugins)
     {
-        QSize maxResolution = plugin.maxResolution(codec);
-        if (!maxResolution.isEmpty())
-        {
-            if (resolution.width() > maxResolution.width() ||
-                resolution.height() > maxResolution.height())
-            {
-                return false;
-            }
-        }
         if (plugin.isCompatible(codec, resolution) && plugin.useCount < plugin.maxUseCount)
             return true;
     }

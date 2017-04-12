@@ -16,9 +16,11 @@
 
 #include <client/client_settings.h>
 #include <client/client_message_processor.h>
+#include <client/client_app_info.h>
 
 #include <ui/common/palette.h>
 #include <ui/models/sorted_server_updates_model.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/file_dialog.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/build_number_dialog.h>
@@ -31,49 +33,52 @@
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/widgets/views/resource_list_view.h>
 
 #include <update/media_server_update_tool.h>
 #include <update/low_free_space_warning.h>
 
 #include <utils/applauncher_utils.h>
-#include <utils/common/app_info.h>
 #include <utils/common/scoped_value_rollback.h>
+#include <utils/connection_diagnostics_helper.h>
 
 namespace {
 
-    const int kLongInstallWarningTimeoutMs = 2 * 60 * 1000; // 2 minutes
-    // Time that is given to process to exit. After that, applauncher (if present) will try to terminate it.
-    const quint32 kProcessTerminateTimeoutMs = 15000;
+const int kLongInstallWarningTimeoutMs = 2 * 60 * 1000; // 2 minutes
+// Time that is given to process to exit. After that, applauncher (if present) will try to terminate it.
+const quint32 kProcessTerminateTimeoutMs = 15000;
 
-    const int kTooLateDayOfWeek = Qt::Thursday;
+const int kTooLateDayOfWeek = Qt::Thursday;
 
-    const int kAutoCheckIntervalMs = 60 * 60 * 1000;  // 1 hour
+const int kAutoCheckIntervalMs = 60 * 60 * 1000;  // 1 hour
 
-    const int kMaxLabelWidth = 400; // pixels
+const int kMaxLabelWidth = 400; // pixels
 
-    const int kVersionLabelFontSizePixels = 24;
+const int kVersionLabelFontSizePixels = 24;
+const int kVersionLabelFontWeight = QFont::DemiBold;
 
-    const int kVersionLabelFontWeight = QFont::DemiBold;
+constexpr auto kLatestVersionBannerLabelFontSizePixels = 22;
+constexpr auto kLatestVersionBannerLabelFontWeight = QFont::Light;
 
-    const int kLinkCopiedMessageTimeoutMs = 2000;
+const int kLinkCopiedMessageTimeoutMs = 2000;
 
-    /* N-dash 5 times: */
-    const QString kNoVersionNumberText = QString::fromWCharArray(L"\x2013\x2013\x2013\x2013\x2013");
+/* N-dash 5 times: */
+const QString kNoVersionNumberText = QString::fromWCharArray(L"\x2013\x2013\x2013\x2013\x2013");
 
-    QString elidedText(const QString& text, const QFontMetrics& fontMetrics)
+QString elidedText(const QString& text, const QFontMetrics& fontMetrics)
+{
+    QString result;
+
+    for (const auto& line : text.split(L'\n', QString::KeepEmptyParts))
     {
-        QString result;
+        if (result.isEmpty())
+            result += L'\n';
 
-        for (const auto& line: text.split(L'\n', QString::KeepEmptyParts))
-        {
-            if (result.isEmpty())
-                result += L'\n';
-
-            result += fontMetrics.elidedText(line, Qt::ElideMiddle, kMaxLabelWidth);
-        }
-
-        return result;
+        result += fontMetrics.elidedText(line, Qt::ElideMiddle, kMaxLabelWidth);
     }
+
+    return result;
+}
 
 } // anonymous namespace
 
@@ -85,12 +90,22 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
 {
     ui->setupUi(this);
 
-    QFont font;
-    font.setPixelSize(kVersionLabelFontSizePixels);
-    font.setWeight(kVersionLabelFontWeight);
-    ui->targetVersionLabel->setFont(font);
+    QFont versionLabelFont;
+    versionLabelFont.setPixelSize(kVersionLabelFontSizePixels);
+    versionLabelFont.setWeight(kVersionLabelFontWeight);
+    ui->targetVersionLabel->setFont(versionLabelFont);
     ui->targetVersionLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->targetVersionLabel->setForegroundRole(QPalette::Text);
+
+    QFont latestVersionBannerFont;
+    latestVersionBannerFont.setPixelSize(kLatestVersionBannerLabelFontSizePixels);
+    latestVersionBannerFont.setWeight(kLatestVersionBannerLabelFontWeight);
+    ui->latestVersionBannerLabel->setFont(latestVersionBannerFont);
+    ui->latestVersionBannerLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
+    ui->latestVersionBannerLabel->setForegroundRole(QPalette::Text);
+
+    ui->latestVersionIconLabel->setPixmap(qnSkin->pixmap("system_settings/update_checkmark.png",
+        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
 
     ui->linkCopiedIconLabel->setPixmap(qnSkin->pixmap("buttons/checkmark.png",
         QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
@@ -100,6 +115,8 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
 
     m_updateTool = new QnMediaServerUpdateTool(this);
     m_updatesModel = new QnServerUpdatesModel(m_updateTool, this);
+    connect(m_updatesModel, &QnServerUpdatesModel::lowestInstalledVersionChanged, this,
+        &QnServerUpdatesWidget::updateVersionPage);
 
     QnSortedServerUpdatesModel* sortedUpdatesModel = new QnSortedServerUpdatesModel(this);
     sortedUpdatesModel->setSourceModel(m_updatesModel);
@@ -190,6 +207,16 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
     updateButtonText();
     updateButtonAccent();
     updateDownloadButton();
+    updateVersionPage();
+}
+
+QnServerUpdatesWidget::~QnServerUpdatesWidget()
+{
+    /* When QnServerUpdatesWidget gets to QObject destructo it destroys m_updateTool.
+       QnMediaServerUpdateTool stops in destructor and emits state change signals
+       which cannot be handled in already destroyed QnServerUpdatesWidget.
+       Also there's no need to handle them, so just disconnect. */
+    m_updateTool->disconnect(this);
 }
 
 bool QnServerUpdatesWidget::tryClose(bool /*force*/)
@@ -213,6 +240,7 @@ void QnServerUpdatesWidget::setMode(Mode mode)
     updateButtonText();
     updateButtonAccent();
     updateDownloadButton();
+    updateVersionPage();
 }
 
 void QnServerUpdatesWidget::initDropdownActions()
@@ -334,27 +362,42 @@ void QnServerUpdatesWidget::updateButtonAccent()
     if (m_mode == Mode::LatestVersion && !ui->dayWarningBanner->isHidden())
         accented = false;
 
-    setAccentStyle(ui->updateButton, accented);
+    if (accented)
+        setAccentStyle(ui->updateButton);
+    else
+        resetButtonStyle(ui->updateButton);
 }
 
 void QnServerUpdatesWidget::updateDownloadButton()
 {
-    switch (m_mode)
-    {
-        case QnServerUpdatesWidget::Mode::LatestVersion:
-            ui->downloadButton->setText(tr("Download the Latest Version Update File"));
-            ui->downloadButton->show();
-            break;
-        case QnServerUpdatesWidget::Mode::SpecificBuild:
-            ui->downloadButton->setText(tr("Download Update File"));
-            ui->downloadButton->hide();
-            break;
-        case QnServerUpdatesWidget::Mode::LocalFile:
-            ui->downloadButton->hide();
-            break;
-        default:
-            break;
-    }
+    bool hasLatestVersion = m_mode == Mode::LatestVersion
+        && !m_latestVersion.isNull()
+        && m_updatesModel->lowestInstalledVersion() >= m_latestVersion;
+
+    bool showButton = m_mode != QnServerUpdatesWidget::Mode::LocalFile
+        && !hasLatestVersion;
+
+    ui->downloadButton->setVisible(showButton);
+    ui->downloadButton->setText(m_mode == Mode::LatestVersion
+        ? tr("Download the Latest Version Update File")
+        : tr("Download Update File"));
+}
+
+void QnServerUpdatesWidget::updateVersionPage()
+{
+    if (isUpdating())
+        return;
+
+    const bool hasLatestVersion = m_mode == Mode::LatestVersion
+        && !m_latestVersion.isNull()
+        && m_updatesModel->lowestInstalledVersion() >= m_latestVersion;
+
+    ui->versionStackedWidget->setCurrentWidget(hasLatestVersion
+        ? ui->latestVersionPage
+        : ui->versionPage);
+
+    if (hasLatestVersion)
+        ui->infoStackedWidget->setCurrentWidget(ui->emptyInfoPage);
 }
 
 bool QnServerUpdatesWidget::cancelUpdate()
@@ -404,23 +447,25 @@ void QnServerUpdatesWidget::discardChanges()
 
     if (canCancelUpdate())
     {
-        QnMessageBox messageBox(this);
-        messageBox.setIcon(QnMessageBox::Icon::Warning);
-        messageBox.setWindowTitle(tr("Cancel update?"));
-        messageBox.setText(tr("Cancel update?"));
-        messageBox.setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
-        messageBox.setDefaultButton(QDialogButtonBox::No);
-        if (messageBox.exec() == QDialogButtonBox::Yes)
+        QnMessageBox dialog(QnMessageBoxIcon::Information,
+            tr("System update in process"), QString(),
+            QDialogButtonBox::NoButton, QDialogButtonBox::NoButton,
+            this);
+
+        const auto cancelUpdateButton = dialog.addButton(
+            tr("Cancel Update"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+        dialog.addButton(
+            tr("Continue in Background"), QDialogButtonBox::RejectRole);
+
+        dialog.exec();
+        if (dialog.clickedButton() == cancelUpdateButton)
             cancelUpdate();
     }
     else
     {
-        QnMessageBox::critical(
-            this,
-            tr("Error"),
-            tr("Cannot cancel update at this state.")
-                + L'\n'
-                + tr("Please wait until update is finished"));
+        QnMessageBox::warning(this,
+            tr("Update cannot be canceled at this stage"),
+            tr("Please wait until it is finished."));
     }
 }
 
@@ -435,18 +480,13 @@ bool QnServerUpdatesWidget::hasChanges() const
 bool QnServerUpdatesWidget::canApplyChanges() const
 {
     //TODO: #GDM now this prevents other tabs from saving their changes
-    if (isUpdating())
-        return false;
-    return true;
+    return !isUpdating();
 }
 
 bool QnServerUpdatesWidget::canDiscardChanges() const
 {
     //TODO: #GDM now this prevents other tabs from discarding their changes
-    if (!canCancelUpdate())
-        return false;
-
-    return true;
+    return canCancelUpdate();
 }
 
 void QnServerUpdatesWidget::autoCheckForUpdates()
@@ -524,12 +564,13 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
         case QnCheckForUpdateResult::NoNewerVersion:
             setPaletteColor(ui->errorLabel, QPalette::WindowText, qnGlobals->successTextColor());
             detail = m_targetVersion.isNull()
-                ? tr("All components in your system are up to date.")
-                : tr("All components in your system are up to this version.");
+                ? tr("All components in your System are up to date.")
+                : tr("All components in your System are up to this version.");
             break;
 
         case QnCheckForUpdateResult::InternetProblem:
-            versionText = kNoVersionNumberText;
+            if (m_mode == Mode::LatestVersion)
+                versionText = kNoVersionNumberText;
             detail = tr("Unable to check updates on the Internet.");
             break;
 
@@ -562,7 +603,7 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
             break;
 
         case QnCheckForUpdateResult::IncompatibleCloudHost:
-            detail = tr("Incompatible %1 instance. To update disconnect system from %1 first.",
+            detail = tr("Incompatible %1 instance. To update disconnect System from %1 first.",
                 "%1 here will be substituted with cloud name e.g. 'Nx Cloud'.")
                 .arg(QnAppInfo::cloudName());
             break;
@@ -579,9 +620,9 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
 
     ui->targetVersionLabel->setText(versionText);
 
-    ui->versionStackedWidget->setCurrentWidget(ui->versionPage);
-
+    updateDownloadButton();
     updateButtonAccent();
+    updateVersionPage();
 }
 
 bool QnServerUpdatesWidget::restartClient(const QnSoftwareVersion& version)
@@ -754,24 +795,20 @@ void QnServerUpdatesWidget::at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning& l
 {
     const auto failedServers =
         qnResPool->getResources<QnMediaServerResource>(lowFreeSpaceWarning.failedPeers);
+    QnMessageBox dialog(QnMessageBoxIcon::Warning,
+        tr("Not enough free space at %n Servers:", "", failedServers.size()),
+        tr("Attempt to update may fail or cause Server malfunction."),
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
+        this);
 
-    QScopedPointer<QnMessageBox> dialog(new QnMessageBox(
-        QnMessageBox::Warning, -1, tr("Warning"),
-        tr("Not enough free space at %n servers:", "", failedServers.size())
-            + lit("\n") + serverNamesString(failedServers)
-            + lit("\n") + tr("Do you want to continue?"),
-        QDialogButtonBox::Cancel,
-        this));
+    dialog.addCustomWidget(new QnResourceListView(failedServers, false, &dialog));
+    dialog.addButton(tr("Force Update"), QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
 
-    dialog->addButton(tr("Force pushing updates"), QDialogButtonBox::AcceptRole);
-    dialog->setDefaultButton(QDialogButtonBox::Cancel);
-
-    const auto result = dialog->exec();
+    const auto result = dialog.exec();
+    if (result == QDialogButtonBox::Cancel)
+        return;
 
     lowFreeSpaceWarning.ignore = true;
-
-    if (result == QDialogButtonBox::Cancel)
-        m_updateTool->cancelUpdate();
 }
 
 void QnServerUpdatesWidget::at_tool_updatesCheckCanceled()
@@ -799,29 +836,36 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
     ui->updateProgess->setValue(100);
     ui->updateProgess->setFormat(tr("Update Finished...") + lit("\t100%"));
 
+    updateVersionPage();
+
     if (isVisible())
     {
         switch (result.result)
         {
             case QnUpdateResult::Successful:
             {
-                QString message = result.errorMessage();
-
-                bool clientUpdated = (result.targetVersion != qnCommon->engineVersion());
+                const bool clientUpdated = (result.targetVersion != qnCommon->engineVersion());
                 if (clientUpdated)
                 {
-                    message += lit("\n");
                     if (result.clientInstallerRequired)
                     {
-                        message += tr("Please update the client manually using an installation package.");
+                        QnMessageBox::success(this,
+                            tr("Server update completed"),
+                            tr("Please update %1 manually using an installation package.")
+                                .arg(QnClientAppInfo::applicationDisplayName()));
                     }
                     else
                     {
-                        message += tr("The client will be restarted to the updated version.");
+                        QnMessageBox::success(this,
+                            tr("Update completed"),
+                            tr("%1 will be restarted to the updated version.")
+                                .arg(QnClientAppInfo::applicationDisplayName()));
                     }
                 }
-
-                QnMessageBox::information(this, tr("Update Succeeded"), message);
+                else
+                {
+                    QnMessageBox::success(this, tr("Update completed"));
+                }
 
                 bool unholdConnection = !clientUpdated || result.clientInstallerRequired || result.protocolChanged;
                 if (clientUpdated && !result.clientInstallerRequired)
@@ -829,11 +873,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
                     if (!restartClient(result.targetVersion))
                     {
                         unholdConnection = true;
-                        QnMessageBox::critical(this,
-                            tr("Launcher process was not found."),
-                            tr("Cannot restart the client.")
-                                + L'\n'
-                                + tr("Please close the application and start it again using the shortcut in the start menu."));
+                        QnConnectionDiagnosticsHelper::failedRestartClientMessage(this);
                     }
                     else
                     {
@@ -852,11 +892,14 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
             }
 
             case QnUpdateResult::Cancelled:
-                QnMessageBox::information(this, tr("Update cancelled"), result.errorMessage());
+                QnMessageBox::information(this, tr("Update canceled"));
+                break;
+
+            case QnUpdateResult::CancelledSilently:
                 break;
 
             case QnUpdateResult::AlreadyUpdated:
-                QnMessageBox::information(this, tr("Update is not needed."), result.errorMessage());
+                QnMessageBox::information(this, tr("All Servers already updated"));
                 break;
 
             case QnUpdateResult::LockFailed:
@@ -870,7 +913,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
             case QnUpdateResult::ClientInstallationFailed:
             case QnUpdateResult::InstallationFailed:
             case QnUpdateResult::RestInstallationFailed:
-                QnMessageBox::critical(this, tr("Update unsuccessful."), result.errorMessage());
+                QnMessageBox::critical(this, tr("Update failed"), result.errorMessage());
                 break;
         }
     }

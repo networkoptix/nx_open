@@ -311,7 +311,7 @@ namespace ite
 
         try
         {
-            m_readThread = std::thread( DevReadThread(this, timeMS) );
+            m_readThread = nx::utils::thread( DevReadThread(this, timeMS) );
             m_hasThread = true;
         }
         catch (std::system_error& )

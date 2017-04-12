@@ -57,9 +57,17 @@
 #include <ui/workaround/mac_utils.h>
 #endif
 
+#ifndef DISABLE_FESTIVAL
+#include <nx_speech_synthesizer/text_to_wav.h>
+#include <nx/utils/file_system.h>
+#endif
+
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
 #include <utils/common/command_line_parser.h>
+#include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
+
+#include <plugins/io_device/joystick/joystick_manager.h>
 
 namespace
 {
@@ -134,14 +142,27 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     QScopedPointer<QnWorkbenchAccessController> accessController(new QnWorkbenchAccessController());
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(accessController.data()));
 
+    #if defined(Q_OS_LINUX)
+        qputenv("RESOURCE_NAME", QnAppInfo::productNameShort().toUtf8());
+    #endif
+
     /* Create main window. */
     Qt::WindowFlags flags = qnRuntime->isVideoWallMode()
         ? Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint
         : static_cast<Qt::WindowFlags>(0);
+
+    // todo: remove it. VMS-5837
+    using namespace nx::client::plugins::io_device;
+    std::unique_ptr<joystick::Manager> joystickManager(new joystick::Manager(context.data()));
+
     QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data(), NULL, flags));
     context->setMainWindow(mainWindow.data());
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
     application->setActivationWindow(mainWindow.data());
+
+    #if defined(Q_OS_LINUX)
+        qunsetenv("RESOURCE_NAME");
+    #endif
 
     QDesktopWidget *desktop = qApp->desktop();
     bool customScreen = startupParams.screen != QnStartupParameters::kInvalidScreen && startupParams.screen < desktop->screenCount();
@@ -163,6 +184,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
         }
     }
     mainWindow->show();
+    joystickManager->start();
     if (customScreen)
     {
         /* We must handle 'move' event _before_ we activate fullscreen. */
@@ -191,10 +213,14 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     qnSettings->setAudioVolume(nx::audio::AudioDevice::instance()->volume());
     qnSettings->save();
 
+    // Wait while deleteLater objects will be freed
+    WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(QThread::currentThread(), 3);
+    waitingForObjectsToBeFreed.join();
+
     return result;
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
 #ifdef Q_WS_X11
     XInitThreads();
@@ -205,12 +231,16 @@ int main(int argc, char **argv)
     win32_exception::installGlobalUnhandledExceptionHandler();
 #endif
 
-#ifdef Q_OS_LINUX
-    linux_exception::installCrashSignalHandler();
-#endif
-
 #ifdef Q_OS_MAC
     mac_setLimits();
+#endif
+
+#ifndef DISABLE_FESTIVAL
+    std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
+        nx::utils::file_system::applicationDirPath(argc, argv));
+
+    textToWaveServer->start();
+    textToWaveServer->waitForStarted();
 #endif
 
     /* These attributes must be set before application instance is created. */

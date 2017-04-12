@@ -2,6 +2,8 @@ import QtQuick 2.6
 import Qt.labs.controls 1.0
 import Nx 1.0
 import Nx.Controls 1.0
+import Nx.Dialogs 1.0
+import Nx.Models 1.0
 import com.networkoptix.qml 1.0
 
 import "private"
@@ -15,14 +17,17 @@ Pane
     background: null
 
     property alias hostsModel: hostSelectionDialog.model
-    property alias recentLocalConnectionsModel: userSelectionDialog.model;
+    property alias authenticationDataModel: userSelectionDialog.model
     property alias address: addressField.text
     property alias login: loginField.text
     property alias password: passwordField.text
 
     property bool displayAddressError: false
-    property bool displayUserCredentialsError: false
+    property bool displayLoginError: false
+    property bool displayPasswordError: false
     property alias addressErrorText: addressErrorPanel.text
+    property alias loginErrorText: loginErrorPanel.text
+    property alias passwordErrorText: passwordErrorPanel.text
 
     signal accepted()
     signal changed()
@@ -43,7 +48,7 @@ Pane
             selectionAllowed: false
             inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
             activeFocusOnTab: true
-            onAccepted: KeyNavigation.tab.forceActiveFocus()
+            onAccepted: nextItemInFocusChain(true).forceActiveFocus()
             rightPadding: chooseHostButton.visible ? chooseHostButton.width : 8
 
             IconButton
@@ -81,11 +86,12 @@ Pane
 
             width: parent.width
             placeholderText: qsTr("Login")
-            showError: displayUserCredentialsError
+            showError: displayLoginError
             onTextChanged: credentialsEditor.changed()
             selectionAllowed: false
             inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData
             activeFocusOnTab: true
+            rightPadding: chooseUserButton.visible ? chooseUserButton.width : 8
 
             IconButton
             {
@@ -94,15 +100,21 @@ Pane
                 anchors.verticalCenter: parent.verticalCenter
                 icon: lp("/images/expand.png")
                 onClicked: userSelectionDialog.open()
-                visible: recentLocalConnectionsModel.count > 1
+                visible: authenticationDataAccessor.count > 1
             }
 
-            onAccepted: KeyNavigation.tab.forceActiveFocus()
+            onAccepted: nextItemInFocusChain(true).forceActiveFocus()
             onActiveFocusChanged:
             {
                 if (activeFocus)
-                    displayUserCredentialsError = false
+                    displayLoginError = false
             }
+        }
+        FieldWarning
+        {
+            id: loginErrorPanel
+            width: parent.width
+            opened: displayLoginError && text
         }
 
         TextField
@@ -111,30 +123,25 @@ Pane
 
             width: parent.width
             placeholderText: qsTr("Password")
-            showError: displayUserCredentialsError
+            showError: displayPasswordError
             echoMode: TextInput.Password
             passwordMaskDelay: 1500
             onTextChanged: credentialsEditor.changed()
             selectionAllowed: false
-            inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData | Qt.ImhHiddenText
+            inputMethodHints: Qt.ImhSensitiveData | Qt.ImhPreferLatin
             activeFocusOnTab: true
             onAccepted: credentialsEditor.accepted()
-            Component.onCompleted:
-            {
-                if (Qt.platform.os == "android")
-                    passwordCharacter = "\u2022"
-            }
             onActiveFocusChanged:
             {
                 if (activeFocus)
-                    displayUserCredentialsError = false
+                    displayPasswordError = false
             }
         }
         FieldWarning
         {
-            text: LoginUtils.connectionErrorText(QnConnectionManager.UnauthorizedConnectionResult)
+            id: passwordErrorPanel
             width: parent.width
-            opened: displayUserCredentialsError
+            opened: displayPasswordError && text
         }
     }
 
@@ -142,21 +149,27 @@ Pane
     {
         id: hostSelectionDialog
         title: qsTr("Hosts")
-        activeItem: address
-        onActiveItemChanged: addressField.text = activeItem
+        currentItem: address
+        onCurrentItemChanged: addressField.text = currentItem
     }
 
     ItemSelectionDialog
     {
         id: userSelectionDialog
         title: qsTr("Users")
-        activeItem: login
-        onItemChanged:
+        currentItem: login
+        onItemActivated:
         {
-            loginField.text = activeItem
-            passwordField.text = model.getData("password", activeItemRow)
-            passwordField.forceActiveFocus()
+            loginField.text = currentItem
+            passwordField.text =
+                authenticationDataAccessor.getData(currentIndex, "credentials").password
         }
+    }
+
+    ModelDataAccessor
+    {
+        id: authenticationDataAccessor
+        model: authenticationDataModel
     }
 
     function focusAddressField()

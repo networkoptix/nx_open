@@ -44,6 +44,10 @@ void QnClientPtzControllerPool::registerResource(const QnResourcePtr &resource) 
         {
             updateController(camera);
             cacheCameraPresets(camera);
+
+            if (auto controller = this->controller(camera))
+                emit controller->changed(Qn::CapabilitiesPtzField);
+
         });
 
     cacheCameraPresets(camera);

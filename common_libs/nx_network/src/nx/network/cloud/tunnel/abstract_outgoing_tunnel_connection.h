@@ -40,6 +40,12 @@ public:
     virtual ~AbstractOutgoingTunnelConnection() {}
 
     /**
+     * Start monitoring connection.
+     * This method is needed to ensure that caller has subscribed to events before latter arrive.
+     */
+    virtual void start() = 0;
+
+    /**
      * @param timeout zero - no timeout
      * @note Actual implementation MUST support connect request pipelining but 
      * does not have to be neither thread-safe nor reenterable

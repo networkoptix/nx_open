@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QCommonStyle>
 #include <QtWidgets/QStyleOption>
-#include <private/qcommonstyle_p.h>
+#include <QtWidgets/private/qcommonstyle_p.h>
 
 #include <ui/common/geometry.h>
 

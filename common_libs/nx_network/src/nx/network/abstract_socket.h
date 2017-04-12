@@ -10,16 +10,16 @@
 #include <utils/common/systemerror.h>
 #include <utils/common/stoppable.h>
 
-#include "aio/pollset.h"
+#include "aio/event_type.h"
 #include "buffer.h"
 #include "nettools.h"
 #include "socket_common.h"
 
-//todo: #ak cancel asynchoronous operations
-
-// forward
 namespace nx {
 namespace network {
+
+class Pollable;
+
 namespace aio {
 
 class AbstractAioThread;
@@ -207,6 +207,9 @@ public:
               certaind thread type is not the same)
      */
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) = 0;
+
+    //!Returns true if this socket in own AIO thread
+    virtual bool isInSelfAioThread() const;
 };
 
 //!Interface for writing to/reading from socket
@@ -370,19 +373,30 @@ struct NX_NETWORK_API StreamSocketInfo
 
 struct NX_NETWORK_API KeepAliveOptions
 {
-    /** timeout, in seconds, with no activity until the first keep-alive
-     *  packet is sent */
-    int timeSec;
+    /** Timeout, in seconds, with no activity until the first keep-alive packet is sent. */
+    std::chrono::seconds time;
 
-    /** interval, in seconds, between when successive keep-alive packets
-     *  are sent if no acknowledgement is received */
-    int intervalSec;
+    /**
+     * Interval, in seconds, between when successive keep-alive packets are sent if no
+     * acknowledgement is received.
+     */
+    std::chrono::seconds interval;
 
-    /** the number of unacknowledged probes to send before considering
-     *  the connection dead and notifying the application layer */
-    int probeCount;
+    /**
+     * The number of unacknowledged probes to send before considering the connection dead and
+     * notifying the application layer.
+     */
+    size_t probeCount;
 
-    KeepAliveOptions(int timeSec = 0, int intervalSec = 0, int probeCount = 0);
+    /** Maximum time before lost connection can be acknowledged. */
+    std::chrono::seconds maxDelay() const;
+
+    KeepAliveOptions(
+        std::chrono::seconds time = std::chrono::seconds::zero(),
+        std::chrono::seconds interval = std::chrono::seconds::zero(),
+        size_t probeCount = 0);
+
+    KeepAliveOptions(size_t time, size_t interval, size_t count);
     bool operator==(const KeepAliveOptions& rhs) const;
 
     QString toString() const;
@@ -475,6 +489,8 @@ class NX_NETWORK_API AbstractStreamServerSocket
     public AbstractSocket
 {
 public:
+    static const int kDefaultBacklogSize = 128;
+
     //!Start listening for incoming connections
     /*!
         \note Method returns immediately
@@ -482,7 +498,7 @@ public:
             If queue is full and new connection arrives, it receives ECONNREFUSED error
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
-    virtual bool listen( int queueLen = 128 ) = 0;
+    virtual bool listen(int backlog = kDefaultBacklogSize) = 0;
     //!Accepts new connection
     /*!
         \return NULL in case of error (use \a SystemError::getLastOSErrorCode() to get error description)

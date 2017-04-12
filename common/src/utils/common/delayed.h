@@ -23,3 +23,5 @@ void executeDelayed(const Callback &callback
 QTimer *executeDelayedParented(const Callback &callback
     , int delayMs
     , QObject *parent);
+
+void executeInThread(QThread* thread, const Callback& callback);

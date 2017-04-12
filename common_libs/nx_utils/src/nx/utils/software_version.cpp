@@ -20,10 +20,10 @@ SoftwareVersion::SoftwareVersion(int major, int minor, int bugfix /* = 0*/, int 
 SoftwareVersion::SoftwareVersion(const QString &versionString) :
     SoftwareVersion()
 {
-    /* Implementation differs a little bit from QnLexical conventions.
-    * We try to set target to some sane value regardless of whether
-    * deserialization has failed or not. We also support OpenGL-style
-    * extended versions. */
+    // Implementation differs a little bit from QnLexical conventions.
+    // We try to set target to some sane value regardless of whether
+    // deserialization has failed or not. We also support OpenGL-style
+    // extended versions.
 
     QString s = versionString.trimmed();
     int index = s.indexOf(L' ');

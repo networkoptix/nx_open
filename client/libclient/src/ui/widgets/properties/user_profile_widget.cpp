@@ -8,8 +8,11 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-
 #include <core/resource/user_resource.h>
+
+#include <common/common_module.h>
+#include <network/system_helpers.h>
+#include <helpers/system_helpers.h>
 
 #include <ui/common/read_only.h>
 #include <ui/common/aligner.h>
@@ -31,7 +34,8 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
     QnWorkbenchContextAware(parent),
     ui(new Ui::UserProfileWidget()),
     m_model(model),
-    m_newPassword()
+    m_newPassword(),
+    m_aligner(new QnAligner(this))
 {
     ui->setupUi(this);
 
@@ -67,16 +71,19 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
         m_newPassword = dialog->newPassword();
     });
 
-    QnAligner* aligner = new QnAligner(this);
-    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    m_aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    m_aligner->registerTypeAccessor<QnCloudUserPanelWidget>(
+        QnCloudUserPanelWidget::createIconWidthAccessor());
+    m_aligner->setSkipInvisible(true);
 
-    aligner->addWidgets({
+    m_aligner->addWidgets({
         ui->loginInputField,
         ui->nameInputField,
         ui->groupInputField,
         ui->changePasswordSpacerLabel,
         ui->permissionsSpacerLabel,
-        ui->emailInputField
+        ui->emailInputField,
+        ui->cloudPanelWidget
     });
 
     autoResizePagesToContents(ui->stackedWidget,
@@ -123,14 +130,16 @@ void QnUserProfileWidget::loadDataToUi()
 
     ui->stackedWidget->setCurrentWidget(m_model->user()->isCloud()
         ? ui->cloudUserPage
-        : ui->localUserPage
-    );
+        : ui->localUserPage);
+
     ui->cloudPanelWidget->setEnabled(m_model->user()->isEnabled());
     ui->cloudPanelWidget->setEmail(m_model->user()->getEmail());
     ui->cloudPanelWidget->setFullName(m_model->user()->fullName());
 
     ui->cloudPanelWidget->setManageLinkShown(
         m_model->mode() == QnUserSettingsModel::OwnProfile);
+
+    m_aligner->align();
 }
 
 void QnUserProfileWidget::updatePermissionsLabel(const QString& text)
@@ -161,16 +170,12 @@ void QnUserProfileWidget::applyChanges()
             url.setPassword(m_newPassword);
             QnAppServerConnectionFactory::setUrl(url);
 
-            auto connections = qnClientCoreSettings->recentLocalConnections();
-            if (!connections.isEmpty() &&
-                !connections.first().password.isEmpty() &&
-                qnUrlEqual(connections.first().url, url))
-            {
-                auto current = connections.takeFirst();
-                current.password.setValue(m_newPassword);
-                connections.prepend(current);
-                qnClientCoreSettings->setRecentLocalConnections(connections);
-            }
+            using namespace nx::client::core::helpers;
+
+            const auto localSystemId = helpers::getLocalSystemId(qnCommon->moduleInformation());
+            if (getCredentials(localSystemId, url.userName()).isValid())
+                storeCredentials(localSystemId, QnEncodedCredentials(url));
+            qnClientCoreSettings->save();
 
             auto lastUsed = qnSettings->lastUsedConnection();
             if (!lastUsed.url.password().isEmpty() && qnUrlEqual(lastUsed.url, url))

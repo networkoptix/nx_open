@@ -62,14 +62,14 @@ void QnClientCoreCamera::setParentId(const QnUuid& parent) {
     if (oldValue != parent) {
         base_type::setParentId(parent);
         if (!oldValue.isNull())
-            emit statusChanged(toSharedPointer(this), Qn::StatusChangeReason::Default);
+            emit statusChanged(toSharedPointer(this), Qn::StatusChangeReason::Local);
     }
 }
 
 void QnClientCoreCamera::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
 {
     if (other->getParentId() != m_parentId)
-        notifiers << [r = toSharedPointer(this)]{emit r->statusChanged(r, Qn::StatusChangeReason::Default);};
+        notifiers << [r = toSharedPointer(this)]{emit r->statusChanged(r, Qn::StatusChangeReason::Local);};
     base_type::updateInternal(other, notifiers);
 }
 

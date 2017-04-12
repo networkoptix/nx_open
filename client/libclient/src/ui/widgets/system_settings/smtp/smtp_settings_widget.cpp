@@ -88,7 +88,8 @@ void QnSmtpSettingsWidget::applyChanges() {
     if (isReadOnly())
         return;
 
-    QnGlobalSettings::instance()->setEmailSettings(settings());
+    qnGlobalSettings->setEmailSettings(settings());
+    qnGlobalSettings->synchronizeNow();
 }
 
 void QnSmtpSettingsWidget::setReadOnlyInternal(bool readOnly) {

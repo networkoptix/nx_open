@@ -28,6 +28,10 @@ class Settings;
 
 } // namespace conf
 
+class BusinessLogicComposite;
+class ListeningPeerPool;
+class StunServer;
+
 class MediatorProcess:
     public QnStoppable
 {
@@ -44,14 +48,17 @@ public:
 
     int exec();
 
+    ListeningPeerPool* listeningPeerPool() const;
+
 private:
     std::unique_ptr<QSettings> m_settings;
     int m_argc;
     char** m_argv;
     nx::utils::MoveOnlyFunc<void(bool /*result*/)> m_startedEventHandler;
     std::vector<SocketAddress> m_httpEndpoints;
-    std::vector<SocketAddress> m_stunEndpoints;
     nx::utils::promise<void> m_processTerminationEvent;
+    BusinessLogicComposite* m_businessLogicComposite;
+    StunServer* m_stunServerComposite;
 
     QString getDataDirectory();
     int printHelp();

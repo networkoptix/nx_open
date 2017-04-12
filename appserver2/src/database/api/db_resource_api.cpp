@@ -78,6 +78,20 @@ bool insertOrReplaceResource(
     return true;
 }
 
+bool deleteResourceInternal(const QSqlDatabase& database, int internalId)
+{
+    const QString queryStr(R"sql(
+        DELETE FROM vms_resource where id = ?
+    )sql");
+
+    QSqlQuery query(database);
+    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return false;
+
+    query.addBindValue(internalId);
+    return QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO);
+}
+
 } // namespace api
 } // namespace database
 } // namespace ec2

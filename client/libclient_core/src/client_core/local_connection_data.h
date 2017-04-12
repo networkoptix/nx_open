@@ -5,56 +5,32 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
 
-#include <utils/crypt/encoded_string.h>
+namespace nx {
+namespace client {
+namespace core {
 
-class QSettings;
-
-struct QnLocalConnectionData
+struct LocalConnectionData
 {
-    QnLocalConnectionData();
-
-    QnLocalConnectionData(
-        const QString& systemName,
-        const QnUuid& localId,
-        const QUrl& url);
-
-    QUrl urlWithPassword() const;
-
-    bool isStoredPassword() const;
-
     QString systemName;
-    QnUuid localId;
-    QUrl url;
-    QnEncodedString password;
+    QList<QUrl> urls;
 };
+#define LocalConnectionData_Fields (systemName)(urls)
 
-#define QnLocalConnectionData_Fields (systemName)(localId)(url)(password)
-QN_FUSION_DECLARE_FUNCTIONS(QnLocalConnectionData, (datastream)(metatype)(eq)(json))
-
-typedef QList<QnLocalConnectionData> QnLocalConnectionDataList;
-Q_DECLARE_METATYPE(QnLocalConnectionDataList)
-
-struct QnWeightData
+struct WeightData
 {
     QnUuid localId;
     qreal weight;
     qint64 lastConnectedUtcMs;
-    bool realConnection;    //< Shows if it was real connection or just record for new system
+    bool realConnection; //< Shows if it was real connection or just record for new system
 };
+#define WeightData_Fields (localId)(weight)(lastConnectedUtcMs)(realConnection)
 
-#define QnWeightData_Fields (localId)(weight)(lastConnectedUtcMs)(realConnection)
-QN_FUSION_DECLARE_FUNCTIONS(QnWeightData, (datastream)(metatype)(eq)(json))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (LocalConnectionData)(WeightData), (eq)(json))
 
-typedef QList<QnWeightData> QnWeightDataList;
-Q_DECLARE_METATYPE(QnWeightDataList)
+} // namespace core
+} // namespace client
+} // namespace nx
 
-namespace helpers {
-
-QnLocalConnectionData storeLocalSystemConnection(
-    const QString& systemName,
-    const QnUuid& localSystemId,
-    const QUrl& url);
-
-void forgetLocalConnectionPassword(const QnUuid& localId, const QString& userName);
-
-}
+Q_DECLARE_METATYPE(nx::client::core::LocalConnectionData)
+Q_DECLARE_METATYPE(nx::client::core::WeightData)

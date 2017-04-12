@@ -59,7 +59,8 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     ui(new Ui::UserSettingsWidget()),
     m_model(model),
     m_rolesModel(new QnUserRolesModel(this, QnUserRolesModel::AllRoleFlags)),
-    m_aligner(new QnAligner(this))
+    m_aligner(new QnAligner(this)),
+    m_lastUserTypeIndex(kCloudIndex) //< actual only for cloud systems (when selector is visible)
 {
     ui->setupUi(this);
 
@@ -135,6 +136,8 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     setupInputFields();
 
     m_aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    m_aligner->registerTypeAccessor<QnCloudUserPanelWidget>(
+        QnCloudUserPanelWidget::createIconWidthAccessor());
     m_aligner->setSkipInvisible(false);
 }
 
@@ -171,21 +174,25 @@ bool QnUserSettingsWidget::hasChanges() const
 
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
     {
-        QnUuid userRoleId = selectedUserRoleId();
-        if (m_model->user()->userRoleId() != userRoleId)
-            return true;
-
-        if (userRoleId.isNull() && selectedRole() != m_model->user()->userRole())
+        const auto selectedRole = this->selectedRole();
+        const bool changed = selectedRole == Qn::UserRole::CustomUserRole
+            ? m_model->user()->userRoleId() != selectedUserRoleId()
+            : m_model->user()->userRole() != selectedRole;
+        if (changed)
             return true;
     }
 
     if (permissions.testFlag(Qn::WriteEmailPermission))
+    {
         if (m_model->user()->getEmail() != ui->emailInputField->text())
             return true;
+    }
 
     if (permissions.testFlag(Qn::WriteFullNamePermission))
+    {
         if (m_model->user()->fullName() != ui->nameInputField->text().trimmed())
             return true;
+    }
 
     return false;
 }
@@ -202,7 +209,7 @@ void QnUserSettingsWidget::loadDataToUi()
         bool localSystem = qnGlobalSettings->cloudSystemId().isEmpty();
         ui->userTypeWidget->setHidden(localSystem);
         ui->mainStackedWidget->setCurrentWidget(ui->localUserPage);
-        ui->userTypeComboBox->setCurrentIndex(localSystem ? kLocalIndex : kCloudIndex);
+        ui->userTypeComboBox->setCurrentIndex(localSystem ? kLocalIndex : m_lastUserTypeIndex);
     }
     else if (m_model->mode() == QnUserSettingsModel::OtherSettings)
     {
@@ -241,6 +248,8 @@ void QnUserSettingsWidget::loadDataToUi()
 
     if (m_model->mode() == QnUserSettingsModel::NewUser)
         m_aligner->addWidget(ui->userTypeLabel);
+    else if (m_model->user()->isCloud())
+        m_aligner->addWidget(ui->cloudPanelWidget);
 }
 
 QString QnUserSettingsWidget::passwordPlaceholder() const
@@ -258,7 +267,8 @@ QString QnUserSettingsWidget::passwordPlaceholder() const
 void QnUserSettingsWidget::updatePasswordPlaceholders()
 {
     const bool showPlaceholders = ui->passwordInputField->text().isEmpty()
-                               && ui->confirmPasswordInputField->text().isEmpty();
+        && ui->confirmPasswordInputField->text().isEmpty()
+        && !mustUpdatePassword();
 
     const QString placeholderText = showPlaceholders
             ? passwordPlaceholder()
@@ -320,9 +330,15 @@ void QnUserSettingsWidget::applyChanges()
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
     {
         m_model->user()->setUserRoleId(selectedUserRoleId());
-        if (selectedRole() != Qn::UserRole::CustomPermissions)
-            m_model->user()->setRawPermissions(QnUserRolesManager::userRolePermissions(selectedRole()));
+
+        // We must set special 'Custom' flag for the users to avoid collisions with built-in roles.
+        m_model->user()->setRawPermissions(selectedRole() == Qn::UserRole::CustomPermissions
+            ? Qn::GlobalCustomUserPermission
+            : QnUserRolesManager::userRolePermissions(selectedRole()));
     }
+
+    if (!ui->userTypeWidget->isHidden())
+        m_lastUserTypeIndex = ui->userTypeComboBox->currentIndex();
 }
 
 bool QnUserSettingsWidget::canApplyChanges() const
@@ -395,11 +411,11 @@ void QnUserSettingsWidget::setupInputFields()
             /* Check if we must update password for the other user. */
             if (m_model->mode() == QnUserSettingsModel::OtherSettings && m_model->user())
             {
-                bool mustUpdatePassword = ui->loginInputField->text() != m_model->user()->getName();
+                updatePasswordPlaceholders();
 
                 ui->passwordInputField->setValidator(
                     Qn::defaultPasswordValidator(
-                        !mustUpdatePassword,
+                        !mustUpdatePassword(),
                         tr("User has been renamed. Password must be updated.")),
                     false);
             }
@@ -413,7 +429,7 @@ void QnUserSettingsWidget::setupInputFields()
             {
                 bool passwordWasValid = ui->passwordInputField->lastValidationResult() != QValidator::Invalid;
                 if (ui->passwordInputField->isValid() != passwordWasValid)
-                    ui->passwordInputField->validate();
+                    ui->passwordInputField->updateDisplayStateDelayed();
             }
         });
 
@@ -442,7 +458,7 @@ void QnUserSettingsWidget::setupInputFields()
                 if (user->getEmail().toLower() != email)
                     continue;
 
-                return Qn::ValidationResult(tr("Cloud user with specified email already exists."));
+                return Qn::ValidationResult(tr("Cloud user with specified Email already exists."));
             }
 
             result = Qn::defaultEmailValidator()(text);
@@ -476,7 +492,7 @@ void QnUserSettingsWidget::setupInputFields()
         this, &QnUserSettingsWidget::updatePasswordPlaceholders);
 
     connect(ui->passwordInputField, &QnInputField::editingFinished,
-        ui->confirmPasswordInputField, &QnInputField::validate);
+        ui->confirmPasswordInputField, &QnInputField::updateDisplayStateDelayed);
 
     ui->confirmPasswordInputField->setTitle(tr("Confirm Password"));
     ui->confirmPasswordInputField->setEchoMode(QLineEdit::Password);
@@ -549,4 +565,9 @@ bool QnUserSettingsWidget::validMode() const
 {
     return m_model->mode() == QnUserSettingsModel::OtherSettings
         || m_model->mode() == QnUserSettingsModel::NewUser;
+}
+
+bool QnUserSettingsWidget::mustUpdatePassword() const
+{
+    return m_model->user() && ui->loginInputField->text() != m_model->user()->getName();
 }

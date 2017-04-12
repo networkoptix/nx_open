@@ -24,10 +24,13 @@
             
             <condition resName="request.path">
                 <set value="/cdb/account/resetPassword" resName="authenticated" resValue="true"/>
-                <condition value="/cdb/maintenance/getVmsConnections" resName="secureSource">
+                <condition value="/cdb/maintenance/vmsConnections" resName="secureSource">
                     <set value="true" resName="authenticated" resValue="true"/>
                 </condition>
-                <condition value="/cdb/maintenance/getTransactionLog" resName="secureSource">
+                <condition value="/cdb/maintenance/transactionLog" resName="secureSource">
+                    <set value="true" resName="authenticated" resValue="true"/>
+                </condition>
+                <condition value="/cdb/maintenance/statistics" resName="secureSource">
                     <set value="true" resName="authenticated" resValue="true"/>
                 </condition>
             </condition>
@@ -180,6 +183,13 @@
                             <set value="true" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>
+                    <sequence value="/cdb/system/healthHistory">
+                        <set resName="authorized" resValue="false"/>
+                        <condition resName="auth.accountRightsOnSystem">
+                            <set value="owner" resName="authorized" resValue="true"/>
+                        </condition>
+                    </sequence>
+
                     <sequence value="/cdb/auth/getAuthentication">
                         <set resName="authorized" resValue="false"/>
                         <condition resName="auth.systemId" matchType="presence">
@@ -222,13 +232,19 @@
                     <condition value="/cdb/account/createTemporaryCredentials" resName="auth.accountEmail" matchType="presence">
                         <set value="false" resName="authorized" resValue="false"/>
                     </condition>
-                    <sequence value="/cdb/maintenance/getVmsConnections">
+                    <sequence value="/cdb/maintenance/vmsConnections">
                         <set resName="authorized" resValue="false"/>
                         <condition resName="secureSource">
                             <set value="true" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>
-                    <sequence value="/cdb/maintenance/getTransactionLog">
+                    <sequence value="/cdb/maintenance/transactionLog">
+                        <set resName="authorized" resValue="false"/>
+                        <condition resName="secureSource">
+                            <set value="true" resName="authorized" resValue="true"/>
+                        </condition>
+                    </sequence>
+                    <sequence value="/cdb/maintenance/statistics">
                         <set resName="authorized" resValue="false"/>
                         <condition resName="secureSource">
                             <set value="true" resName="authorized" resValue="true"/>

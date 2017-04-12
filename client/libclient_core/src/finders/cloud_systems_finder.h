@@ -6,7 +6,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx_ec/impl/ec_api_impl.h>
 #include <utils/common/connective.h>
-#include <network/system_description.h>
+#include <network/cloud_system_description.h>
 #include <finders/abstract_systems_finder.h>
 #include <watchers/cloud_status_watcher.h>
 
@@ -38,9 +38,11 @@ private:
 
     void tryRemoveAlienServer(const QnModuleInformation &serverInfo);
 
+    void updateOnlineStateUnsafe(const QnCloudSystemList& targetSystems);
+
 private:
     typedef QScopedPointer<QTimer> QTimerPtr;
-    typedef QHash<QString, QnSystemDescription::PointerType> SystemsHash;
+    typedef QHash<QString, QnCloudSystemDescription::PointerType> SystemsHash;
     typedef QHash<int, QString> RequestIdToSystemHash;
 
     const QTimerPtr m_updateSystemsTimer;

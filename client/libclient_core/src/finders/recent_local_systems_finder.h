@@ -2,7 +2,7 @@
 #pragma once
 
 #include <finders/abstract_systems_finder.h>
-#include <network/system_description.h>
+#include <network/local_system_description.h>
 
 class QnRecentLocalSystemsFinder : public QnAbstractSystemsFinder
 {

@@ -26,12 +26,14 @@ int QnFusionRestHandler::executeGet(
     return nx_http::StatusCode::notImplemented;
 }
 
-int QnFusionRestHandler::genericError(
-    int errCode, const QString &error, QByteArray& result, QByteArray& contentType,
-    Qn::SerializationFormat format, bool extraFormatting )
+int QnFusionRestHandler::makeError(
+    int httpStatusCode, const QString &errorMessage, QByteArray* outBody,
+    QByteArray* outContentType, Qn::SerializationFormat format, bool extraFormatting,
+    QnRestResult::Error error)
 {
     QnRestResult restResult;
-    restResult.setError(QnRestResult::CantProcessRequest, error);
-    QnFusionRestHandlerDetail::serialize(restResult, result, contentType, format, extraFormatting);
-    return errCode;
+    restResult.setError(error, errorMessage);
+    QnFusionRestHandlerDetail::serialize(
+        restResult, *outBody, *outContentType, format, extraFormatting);
+    return httpStatusCode;
 }

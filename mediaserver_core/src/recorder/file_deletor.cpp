@@ -74,9 +74,12 @@ void QnFileDeletor::deleteFile(const QString& fileName, const QnUuid &storageId)
 {
     if (!internalDeleteFile(fileName))
     {
-        NX_LOG(lit("Can't delete file right now. Postpone deleting. Name=%1").arg(fileName), cl_logWARNING);
+        NX_LOG(lit("Cleanup. Can't delete file right now. Postpone deleting. Name=%1").arg(fileName), cl_logWARNING);
         postponeFile(fileName, storageId);
+        return;
     }
+
+    NX_LOG(lit("Cleanup. File %1 removed successfully.").arg(fileName), cl_logDEBUG1);
 }
 
 void QnFileDeletor::postponeFile(const QString& fileName, const QnUuid &storageId)

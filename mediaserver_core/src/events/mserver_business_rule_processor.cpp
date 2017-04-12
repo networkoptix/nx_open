@@ -10,6 +10,10 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
+#include <core/resource_management/user_roles_manager.h>
+
+#include <core/resource_access/resource_access_subjects_cache.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/media_server_resource.h>
@@ -69,6 +73,7 @@
 #include <common/common_module.h>
 #include <rest/handlers/multiserver_thumbnail_rest_handler.h>
 #include <api/helpers/thumbnail_request_data.h>
+#include <utils/common/util.h>
 
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
@@ -117,12 +122,11 @@ namespace {
     static const unsigned int MS_PER_SEC = 1000;
     static const unsigned int emailAggregationPeriodMS = 30 * MS_PER_SEC;
 
-    static const int kEmailSendDelay = 1000 * 3;
+    static const int kEmailSendDelay = 0;
 
     static const QChar kOldEmailDelimiter(L';');
     static const QChar kNewEmailDelimiter(L' ');
 
-    static const QByteArray kExecHttpActionContentType("text/plain");
 };
 
 struct QnEmailAttachmentData {
@@ -132,74 +136,61 @@ struct QnEmailAttachmentData {
         case QnBusiness::CameraMotionEvent:
             templatePath = lit(":/email_templates/camera_motion.mustache");
             imageName = lit("camera.png");
-            imagePath = lit(":/skin/email_attachments/camera.png");
             break;
         case QnBusiness::CameraInputEvent:
             templatePath = lit(":/email_templates/camera_input.mustache");
             imageName = lit("camera.png");
-            imagePath = lit(":/skin/email_attachments/camera.png");
             break;
         case QnBusiness::CameraDisconnectEvent:
             templatePath = lit(":/email_templates/camera_disconnect.mustache");
             imageName = lit("camera.png");
-            imagePath = lit(":/skin/email_attachments/camera.png");
             break;
         case QnBusiness::StorageFailureEvent:
             templatePath = lit(":/email_templates/storage_failure.mustache");
             imageName = lit("storage.png");
-            imagePath = lit(":/skin/email_attachments/storage.png");
             break;
         case QnBusiness::NetworkIssueEvent:
             templatePath = lit(":/email_templates/network_issue.mustache");
             imageName = lit("server.png");
-            imagePath = lit(":/skin/email_attachments/server.png");
             break;
         case QnBusiness::CameraIpConflictEvent:
             templatePath = lit(":/email_templates/camera_ip_conflict.mustache");
             imageName = lit("camera.png");
-            imagePath = lit(":/skin/email_attachments/camera.png");
             break;
         case QnBusiness::ServerFailureEvent:
             templatePath = lit(":/email_templates/mediaserver_failure.mustache");
             imageName = lit("server.png");
-            imagePath = lit(":/skin/email_attachments/server.png");
             break;
         case QnBusiness::ServerConflictEvent:
             templatePath = lit(":/email_templates/mediaserver_conflict.mustache");
             imageName = lit("server.png");
-            imagePath = lit(":/skin/email_attachments/server.png");
             break;
         case QnBusiness::ServerStartEvent:
             templatePath = lit(":/email_templates/mediaserver_started.mustache");
             imageName = lit("server.png");
-            imagePath = lit(":/skin/email_attachments/server.png");
             break;
         case QnBusiness::LicenseIssueEvent:
             templatePath = lit(":/email_templates/license_issue.mustache");
             imageName = lit("license.png");
-            imagePath = lit(":/skin/email_attachments/server.png");
             break;
         case QnBusiness::BackupFinishedEvent:
             templatePath = lit(":/email_templates/backup_finished.mustache");
             imageName = lit("server.png");
-            imagePath = lit(":/skin/email_attachments/server.png");
             break;
         case QnBusiness::UserDefinedEvent:
             templatePath = lit(":/email_templates/generic_event.mustache");
             imageName = lit("server.png");
-            imagePath = lit(":/skin/email_attachments/server.png");
             break;
         default:
             NX_ASSERT(false, Q_FUNC_INFO, "All cases must be implemented.");
             break;
         }
 
-        NX_ASSERT(!templatePath.isEmpty() && !imageName.isEmpty() && !imagePath.isEmpty(), Q_FUNC_INFO, "Template path must be filled");
+        NX_ASSERT(!templatePath.isEmpty() && !imageName.isEmpty(), Q_FUNC_INFO, "Template path must be filled");
     }
 
     QString templatePath;
     QString imageName;
-    QString imagePath;
 };
 
 QnMServerBusinessRuleProcessor::QnMServerBusinessRuleProcessor():
@@ -424,9 +415,13 @@ bool QnMServerBusinessRuleProcessor::executeHttpRequestAction(const QnAbstractBu
             }
         };
 
+        QByteArray contentType = action->getParams().contentType.toUtf8();
+        if (contentType.isEmpty())
+            contentType = autoDetectHttpContentType(action->getParams().text.toUtf8());
+
         nx_http::uploadDataAsync(url,
             action->getParams().text.toUtf8(),
-            kExecHttpActionContentType,
+            contentType,
             nx_http::HttpHeaders(),
             callback);
         return true;
@@ -505,7 +500,7 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
     bookmark.durationMs += recordBeforeMs + recordAfterMs;
     bookmark.cameraId = camera->getId();
     bookmark.name = QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl);
-    bookmark.description = QnBusinessStringsHelper::eventDetails(action->getRuntimeParams(), lit("\n"));
+    bookmark.description = QnBusinessStringsHelper::eventDetails(action->getRuntimeParams()).join(L'\n');
     bookmark.tags = action->getParams().tags.split(L',', QString::SkipEmptyParts).toSet();
 
     return qnServerDb->addBookmark(bookmark);
@@ -570,7 +565,7 @@ bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessA
 {
     NX_ASSERT( action );
 
-    QStringList recipients = getRecipients(action);
+    QStringList recipients = action->getParams().emailAddress.split(kNewEmailDelimiter);
 
     if( recipients.isEmpty() )
     {
@@ -599,7 +594,6 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
 
     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpSystemIcon, lit(":/skin/email_attachments/systemIcon.png"), tpImageMimeType)));
-//    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(attachmentData.imageName, attachmentData.imagePath, tpImageMimeType)));
     contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
     contextMap[tpSystemIcon] = lit("cid:") + tpSystemIcon;
     if (!cloudOwnerAccount.isEmpty())
@@ -661,8 +655,6 @@ bool QnMServerBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr&
 {
     //QnMutexLocker lk( &m_mutex );  m_mutex is locked down the stack
 
-	QStringList recipients = getRecipients(action);
-
     //aggregating by recipients and eventtype
     if( action->getRuntimeParams().eventType != QnBusiness::CameraDisconnectEvent &&
         action->getRuntimeParams().eventType != QnBusiness::NetworkIssueEvent )
@@ -670,7 +662,9 @@ bool QnMServerBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr&
         return sendMailInternal( action, 1 );  //currently, aggregating only cameraDisconnected and networkIssue events
     }
 
-    SendEmailAggregationKey aggregationKey( action->getRuntimeParams().eventType, recipients.join(';') );
+    SendEmailAggregationKey aggregationKey(action->getRuntimeParams().eventType,
+        action->getParams().emailAddress); // all recipients are already computed and packed here
+
     SendEmailAggregationData& aggregatedData = m_aggregatedEmails[aggregationKey];
 
     QnBusinessAggregationInfo aggregationInfo = aggregatedData.action
@@ -845,6 +839,7 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDetailsMap(
     switch (params.eventType) {
     case CameraDisconnectEvent: {
         detailsMap[tpSource] =  QnBusinessStringsHelper::getResoureNameFromParams(params, detailLevel);
+        detailsMap[tpSourceIP] = QnBusinessStringsHelper::getResoureIPFromParams(params);
         break;
     }
 
@@ -856,6 +851,7 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDetailsMap(
     case NetworkIssueEvent:
         {
             detailsMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(params, detailLevel);
+            detailsMap[tpSourceIP] = QnBusinessStringsHelper::getResoureIPFromParams(params);
             detailsMap[tpReason] = QnBusinessStringsHelper::eventReason(params);
             break;
         }
@@ -923,51 +919,53 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDetailsMap(
     return detailsMap;
 }
 
-QStringList QnMServerBusinessRuleProcessor::getRecipients(const QnSendMailBusinessActionPtr& action) const
-{
-    QString email = action->getParams().emailAddress;
-    if (email.isEmpty())
-        return QStringList();
-    return email.split(email.contains(kOldEmailDelimiter) ? kOldEmailDelimiter : kNewEmailDelimiter);
-}
-
+/*
+* This method is called once per action, calculates all recipients and packs them into
+* emailAddress action parameter with new delimiter.
+*/
 void QnMServerBusinessRuleProcessor::updateRecipientsList(
     const QnSendMailBusinessActionPtr& action) const
 {
-    QStringList unfiltered = getRecipients(action);
-    auto allUsers = qnResPool->getResources<QnUserResource>();
+    QStringList additional = action->getParams().emailAddress.split(kOldEmailDelimiter,
+        QString::SkipEmptyParts);
 
-    QMap<QnUuid, QnUserResourceList> userRoles;
-    for (const auto& user: allUsers)
-        userRoles[user->userRoleId()].push_back(user);
+    const auto ids = action->getResources();
+    const auto userRoles = qnUserRolesManager->userRoles(ids);
+    const auto users = qnResPool->getResources<QnUserResource>(ids);
 
-    auto addUserToList =
-        [&unfiltered](const QnUuid& id)
+    QStringList recipients;
+    auto addRecipient = [&recipients](const QString& email)
         {
-            if (auto user = qnResPool->getResourceById<QnUserResource>(id))
-            {
-                unfiltered << user->getEmail();
-                return true;
-            }
-            return false;
+            const QString simplified = email.trimmed().toLower();
+            if (simplified.isEmpty()) //fast check
+                return;
+
+            QnEmailAddress address(simplified);
+            if (address.isValid())
+                recipients.append(address.value());
         };
 
-    for (const QnUuid& id: action->getResources())
+
+    for (const auto& email: additional)
+        addRecipient(email);
+
+    for (const auto& user: users)
     {
-        if (!addUserToList(id)) //< Try to add the given user.
+        if (user->isEnabled())
+            addRecipient(user->getEmail());
+    }
+
+    for (const auto& userRole: userRoles)
+    {
+        for (const auto& subject: qnResourceAccessSubjectsCache->usersInRole(userRole.id))
         {
-            // Add all users with the given role.
-            for (const auto& nestedUser: userRoles.value(id))
-                addUserToList(nestedUser->getId());
+            const auto& user = subject.user();
+            NX_ASSERT(user);
+            if (user && user->isEnabled())
+                addRecipient(user->getEmail());
         }
     }
 
-    QStringList recipients;
-    for (const auto &addr: unfiltered)
-    {
-        QnEmailAddress email(addr);
-        if (email.isValid())
-            recipients << email.value();
-    }
+    recipients.removeDuplicates();
     action->getParams().emailAddress = recipients.join(kNewEmailDelimiter);
 }

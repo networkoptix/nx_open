@@ -11,15 +11,15 @@ ClientBindRequest::ClientBindRequest():
 
 void ClientBindRequest::serializeAttributes(nx::stun::Message* const message)
 {
-    message->newAttribute<stun::cc::attrs::PeerId>(std::move(originatingPeerID));
-    message->newAttribute<stun::cc::attrs::TcpReverseEndpointList>(std::move(tcpReverseEndpoints));
+    message->newAttribute<stun::extension::attrs::PeerId>(std::move(originatingPeerID));
+    message->newAttribute<stun::extension::attrs::TcpReverseEndpointList>(std::move(tcpReverseEndpoints));
 }
 
 bool ClientBindRequest::parseAttributes(const nx::stun::Message& message)
 {
     return
-        readStringAttributeValue<stun::cc::attrs::PeerId>(message, &originatingPeerID) &&
-        readAttributeValue<stun::cc::attrs::TcpReverseEndpointList>(message, &tcpReverseEndpoints);
+        readStringAttributeValue<stun::extension::attrs::PeerId>(message, &originatingPeerID) &&
+        readAttributeValue<stun::extension::attrs::TcpReverseEndpointList>(message, &tcpReverseEndpoints);
 
 }
 
@@ -28,7 +28,7 @@ ClientBindResponse::ClientBindResponse():
 {
 }
 
-typedef stun::cc::attrs::StringAttribute<stun::cc::attrs::tcpConnectionKeepAlive> TcpKeepAlive;
+typedef stun::extension::attrs::StringAttribute<stun::extension::attrs::tcpConnectionKeepAlive> TcpKeepAlive;
 
 void ClientBindResponse::serializeAttributes(nx::stun::Message* const message)
 {

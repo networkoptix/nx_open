@@ -19,6 +19,7 @@ int printStatsAndWaitForCompletion(
     nx::network::test::ConnectionPool* const connectionPool,
     nx::utils::MoveOnlyFunc<bool()> interruptCondition);
 
+String makeServerName(const QString& prefix, size_t number);
 void limitStringList(QStringList* list);
 
 } // namespace cctu

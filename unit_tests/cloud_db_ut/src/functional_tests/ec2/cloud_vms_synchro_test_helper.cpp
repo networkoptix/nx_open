@@ -10,6 +10,7 @@
 #include <transaction/transaction.h>
 
 #include <api/global_settings.h>
+#include <cloud_db_client/src/cdb_request_path.h>
 #include <utils/common/app_info.h>
 
 namespace nx {
@@ -95,9 +96,9 @@ api::ResultCode Ec2MserverCloudSynchronization::unbindSystem()
         return result;
 
     // Removing cloud users
-    ec2::ApiUserDataList users;
+    ::ec2::ApiUserDataList users;
     if (m_appserver2.moduleInstance()->ecConnection()->getUserManager(Qn::kSystemAccess)
-            ->getUsersSync(&users) != ec2::ErrorCode::ok)
+            ->getUsersSync(&users) != ::ec2::ErrorCode::ok)
     {
         return api::ResultCode::unknownError;
     }
@@ -107,7 +108,7 @@ api::ResultCode Ec2MserverCloudSynchronization::unbindSystem()
         if (!user.isCloud)
             continue;
         if (m_appserver2.moduleInstance()->ecConnection()->getUserManager(Qn::kSystemAccess)
-                ->removeSync(user.id) != ec2::ErrorCode::ok)
+                ->removeSync(user.id) != ::ec2::ErrorCode::ok)
         {
             return api::ResultCode::unknownError;
         }
@@ -117,18 +118,18 @@ api::ResultCode Ec2MserverCloudSynchronization::unbindSystem()
     if (!findAdminUserId(&adminUserId))
         return api::ResultCode::unknownError;
 
-    ec2::ApiResourceParamWithRefDataList params;
-    params.emplace_back(ec2::ApiResourceParamWithRefData(
+    ::ec2::ApiResourceParamWithRefDataList params;
+    params.emplace_back(::ec2::ApiResourceParamWithRefData(
         adminUserId,
         "cloudSystemID",
         QString()));
-    params.emplace_back(ec2::ApiResourceParamWithRefData(
+    params.emplace_back(::ec2::ApiResourceParamWithRefData(
         adminUserId,
         "cloudAuthKey",
         QString()));
-    ec2::ApiResourceParamWithRefDataList outParams;
+    ::ec2::ApiResourceParamWithRefDataList outParams;
     if (m_appserver2.moduleInstance()->ecConnection()->getResourceManager(Qn::kSystemAccess)
-            ->saveSync(params, &outParams) != ec2::ErrorCode::ok)
+            ->saveSync(params, &outParams) != ::ec2::ErrorCode::ok)
     {
         return api::ResultCode::unknownError;
     }
@@ -166,18 +167,18 @@ api::ResultCode Ec2MserverCloudSynchronization::saveCloudSystemCredentials(
     if (!findAdminUserId(&adminUserId))
         return api::ResultCode::unknownError;
 
-    ec2::ApiResourceParamWithRefDataList params;
-    params.emplace_back(ec2::ApiResourceParamWithRefData(
+    ::ec2::ApiResourceParamWithRefDataList params;
+    params.emplace_back(::ec2::ApiResourceParamWithRefData(
         adminUserId,
         "cloudSystemID",
         QString::fromStdString(m_system.id)));
-    params.emplace_back(ec2::ApiResourceParamWithRefData(
+    params.emplace_back(::ec2::ApiResourceParamWithRefData(
         adminUserId,
         "cloudAuthKey",
         QString::fromStdString(m_system.authKey)));
-    ec2::ApiResourceParamWithRefDataList outParams;
+    ::ec2::ApiResourceParamWithRefDataList outParams;
     if (m_appserver2.moduleInstance()->ecConnection()->getResourceManager(Qn::kSystemAccess)
-            ->saveSync(params, &outParams) != ec2::ErrorCode::ok)
+            ->saveSync(params, &outParams) != ::ec2::ErrorCode::ok)
     {
         return api::ResultCode::unknownError;
     }
@@ -328,7 +329,7 @@ void Ec2MserverCloudSynchronization::addCloudUserLocally(
     // TODO: randomize access rights
     accountVmsData->permissions = Qn::GlobalLiveViewerPermissionSet;
     ASSERT_EQ(
-        ec2::ErrorCode::ok,
+        ::ec2::ErrorCode::ok,
         appserver2()->moduleInstance()->ecConnection()
             ->getUserManager(Qn::kSystemAccess)->saveSync(*accountVmsData));
 }
@@ -418,15 +419,15 @@ void Ec2MserverCloudSynchronization::waitForUserToDisappearLocally(const QnUuid&
             std::chrono::steady_clock::now(),
             t0 + kMaxTimeToWaitForChangesToBePropagatedToCloud);
 
-        ec2::ApiUserDataList users;
+        ::ec2::ApiUserDataList users;
         ASSERT_EQ(
-            ec2::ErrorCode::ok,
+            ::ec2::ErrorCode::ok,
             appserver2()->moduleInstance()->ecConnection()
             ->getUserManager(Qn::kSystemAccess)->getUsersSync(&users));
 
         const auto userIter = std::find_if(
             users.cbegin(), users.cend(),
-            [userId](const ec2::ApiUserData& elem)
+            [userId](const ::ec2::ApiUserData& elem)
         {
             return elem.id == userId;
         });
@@ -447,15 +448,15 @@ void Ec2MserverCloudSynchronization::verifyCloudUserPresenceInLocalDb(
         *found = false;
 
     // Validating data.
-    ec2::ApiUserDataList users;
+    ::ec2::ApiUserDataList users;
     ASSERT_EQ(
-        ec2::ErrorCode::ok,
+        ::ec2::ErrorCode::ok,
         appserver2()->moduleInstance()->ecConnection()
             ->getUserManager(Qn::kSystemAccess)->getUsersSync(&users));
 
     const auto userIter = std::find_if(
         users.cbegin(), users.cend(),
-        [email = sharingData.accountEmail](const ec2::ApiUserData& elem)
+        [email = sharingData.accountEmail](const ::ec2::ApiUserData& elem)
         {
             return elem.email.toStdString() == email;
         });
@@ -467,7 +468,7 @@ void Ec2MserverCloudSynchronization::verifyCloudUserPresenceInLocalDb(
     if (userIter == users.cend())
         return;
 
-    const ec2::ApiUserData& userData = *userIter;
+    const ::ec2::ApiUserData& userData = *userIter;
 
     ASSERT_EQ(sharingData.accountEmail, userData.name.toStdString());
     //ASSERT_EQ(sharingData.accountFullName, userData.fullName.toStdString());
@@ -483,9 +484,9 @@ void Ec2MserverCloudSynchronization::verifyCloudUserPresenceInLocalDb(
     }
 
     // Verifying user full name.
-    ec2::ApiResourceParamWithRefDataList kvPairs;
+    ::ec2::ApiResourceParamWithRefDataList kvPairs;
     ASSERT_EQ(
-        ec2::ErrorCode::ok,
+        ::ec2::ErrorCode::ok,
         appserver2()->moduleInstance()->ecConnection()
             ->getResourceManager(Qn::kSystemAccess)->getKvPairsSync(userData.id, &kvPairs));
 
@@ -544,9 +545,9 @@ void Ec2MserverCloudSynchronization::verifyThatUsersMatchInCloudAndVms(
         *result = false;
 
     // Selecting local users.
-    ec2::ApiUserDataList vmsUsers;
+    ::ec2::ApiUserDataList vmsUsers;
     ASSERT_EQ(
-        ec2::ErrorCode::ok,
+        ::ec2::ErrorCode::ok,
         appserver2()->moduleInstance()->ecConnection()
             ->getUserManager(Qn::kSystemAccess)->getUsersSync(&vmsUsers));
 
@@ -563,7 +564,7 @@ void Ec2MserverCloudSynchronization::verifyThatUsersMatchInCloudAndVms(
     // Checking that number of cloud users in vms match that in cloud.
     const std::size_t numberOfCloudUsersInVms = std::count_if(
         vmsUsers.cbegin(), vmsUsers.cend(),
-        [](const ec2::ApiUserData& data) { return data.isCloud; });
+        [](const ::ec2::ApiUserData& data) { return data.isCloud; });
     if (assertOnFailure)
     {
         ASSERT_EQ(numberOfCloudUsersInVms, sharings.size());
@@ -605,9 +606,9 @@ void Ec2MserverCloudSynchronization::verifyThatSystemDataMatchInCloudAndVms(
     QnUuid adminUserId;
     ASSERT_TRUE(findAdminUserId(&adminUserId));
 
-    ec2::ApiResourceParamWithRefDataList systemSettings;
+    ::ec2::ApiResourceParamWithRefDataList systemSettings;
     ASSERT_EQ(
-        ec2::ErrorCode::ok,
+        ::ec2::ErrorCode::ok,
         appserver2()->moduleInstance()->ecConnection()
             ->getResourceManager(Qn::kSystemAccess)->getKvPairsSync(adminUserId, &systemSettings));
     for (const auto systemSetting: systemSettings)
@@ -705,8 +706,8 @@ void Ec2MserverCloudSynchronization::waitForCloudAndVmsToSyncSystemData(
 api::ResultCode Ec2MserverCloudSynchronization::fetchCloudTransactionLog(
     ::ec2::ApiTransactionDataList* const transactionList)
 {
-    const QUrl url(lm("http://%1/%2?systemId=%3")
-        .str(cdb()->endpoint()).arg("cdb/maintenance/getTransactionLog")
+    const QUrl url(lm("http://%1%2?systemId=%3")
+        .str(cdb()->endpoint()).arg(kMaintenanceGetTransactionLog)
         .arg(registeredSystemData().id));
     return fetchTransactionLog(url, transactionList);
 }
@@ -723,9 +724,9 @@ api::ResultCode Ec2MserverCloudSynchronization::fetchCloudTransactionLogFromMedi
 
 bool Ec2MserverCloudSynchronization::findAdminUserId(QnUuid* const id)
 {
-    ec2::ApiUserDataList users;
+    ::ec2::ApiUserDataList users;
     if (m_appserver2.moduleInstance()->ecConnection()->getUserManager(Qn::kSystemAccess)
-            ->getUsersSync(&users) != ec2::ErrorCode::ok)
+            ->getUsersSync(&users) != ::ec2::ErrorCode::ok)
     {
         return false;
     }

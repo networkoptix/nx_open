@@ -84,7 +84,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
     // Use direct connect for persistent transactions
 
-#define on_resourceUpdated(Type) static_cast<void (QnCommonMessageProcessor::*)(const Type&, const QnUuid&)>(&QnCommonMessageProcessor::updateResource)
+#define on_resourceUpdated(Type) static_cast<void (QnCommonMessageProcessor::*)(const Type&, ec2::NotificationSource)>(&QnCommonMessageProcessor::updateResource)
 
     connect(connection, &ec2::AbstractECConnection::remotePeerFound,                this, &QnCommonMessageProcessor::on_remotePeerFound);
     connect(connection, &ec2::AbstractECConnection::remotePeerLost,                 this, &QnCommonMessageProcessor::on_remotePeerLost);
@@ -96,6 +96,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceParamChanged,   this, &QnCommonMessageProcessor::on_resourceParamChanged, Qt::DirectConnection);
     connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceParamRemoved,   this, &QnCommonMessageProcessor::on_resourceParamRemoved, Qt::DirectConnection);
     connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceRemoved,        this, &QnCommonMessageProcessor::on_resourceRemoved, Qt::DirectConnection);
+    connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceStatusRemoved,  this, &QnCommonMessageProcessor::on_resourceStatusRemoved, Qt::DirectConnection);
 
     auto mediaServerManager = connection->getMediaServerNotificationManager();
     connect(mediaServerManager, &ec2::AbstractMediaServerNotificationManager::addedOrUpdated,   this, on_resourceUpdated(ec2::ApiMediaServerData), Qt::DirectConnection);
@@ -237,11 +238,17 @@ void QnCommonMessageProcessor::on_remotePeerLost(const ec2::ApiPeerAliveData &da
 }
 
 
-void QnCommonMessageProcessor::on_resourceStatusChanged( const QnUuid& resourceId, Qn::ResourceStatus status )
+void QnCommonMessageProcessor::on_resourceStatusChanged(
+    const QnUuid& resourceId,
+    Qn::ResourceStatus status,
+    ec2::NotificationSource source)
 {
+    if (source == ec2::NotificationSource::Local)
+        return; //< ignore local setStatus call. Data already in the resourcePool
+
     QnResourcePtr resource = qnResPool->getResourceById(resourceId);
     if (resource)
-        onResourceStatusChanged(resource, status);
+        onResourceStatusChanged(resource, status, source);
     else
         qnStatusDictionary->setValue(resourceId, status);
 }
@@ -278,6 +285,19 @@ void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
     }
     else
         removeResourceIgnored(resourceId);
+}
+
+void QnCommonMessageProcessor::on_resourceStatusRemoved(const QnUuid& resourceId)
+{
+    if (!canRemoveResource(resourceId))
+    {
+        auto res = qnResPool->getResourceById(resourceId);
+        if (res)
+        {
+            auto connection = QnAppServerConnectionFactory::getConnection2();
+            connection->getResourceManager(Qn::kSystemAccess)->setResourceStatusSync(resourceId, res->getStatus());
+        }
+    }
 }
 
 void QnCommonMessageProcessor::on_accessRightsChanged(const ec2::ApiAccessRightsData& accessRights)
@@ -433,7 +453,7 @@ void QnCommonMessageProcessor::updateResources(
 {
     for (const auto& resource: resList)
     {
-        updateResource(resource, qnCommon->remoteGUID());
+        updateResource(resource, ec2::NotificationSource::Remote);
         remoteResources.remove(resource.id);
     }
 }
@@ -595,11 +615,18 @@ void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataL
     qnStatusDictionary->clear();
     for(const QnUuid& id: keys) {
         if (QnResourcePtr resource = qnResPool->getResourceById(id))
-            emit resource->statusChanged(resource, Qn::StatusChangeReason::Default);
+        {
+            NX_LOG(lit("%1 Emit statusChanged signal for resource %2, %3, %4")
+                    .arg(QString::fromLatin1(Q_FUNC_INFO))
+                    .arg(resource->getId().toString())
+                    .arg(resource->getName())
+                    .arg(resource->getUrl()), cl_logDEBUG2);
+            emit resource->statusChanged(resource, Qn::StatusChangeReason::Local);
+        }
     }
 
     for(const ec2::ApiResourceStatusData& statusData: params)
-        on_resourceStatusChanged(statusData.id , statusData.status);
+        on_resourceStatusChanged(statusData.id, statusData.status, ec2::NotificationSource::Remote);
 }
 
 void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoData& fullData)
@@ -637,17 +664,17 @@ QMap<QnUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() c
     return m_rules;
 }
 
-void QnCommonMessageProcessor::updateResource(const QnResourcePtr&, const QnUuid& )
+void QnCommonMessageProcessor::updateResource(const QnResourcePtr&, ec2::NotificationSource /*source*/)
 {
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiUserData& user, const QnUuid& peerId)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiUserData& user, ec2::NotificationSource source)
 {
     QnUserResourcePtr qnUser(fromApiToResource(user));
-    updateResource(qnUser, peerId);
+    updateResource(qnUser, source);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiLayoutData& layout, const QnUuid& peerId)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiLayoutData& layout, ec2::NotificationSource source)
 {
     QnLayoutResourcePtr qnLayout(new QnLayoutResource());
     if (!layout.url.isEmpty())
@@ -661,24 +688,24 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiLayoutData& layout, 
     {
         fromApiToResource(layout, qnLayout);
     }
-    updateResource(qnLayout, peerId);
+    updateResource(qnLayout, source);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiVideowallData& videowall, const QnUuid& peerId)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiVideowallData& videowall, ec2::NotificationSource source)
 {
     QnVideoWallResourcePtr qnVideowall(new QnVideoWallResource());
     fromApiToResource(videowall, qnVideowall);
-    updateResource(qnVideowall, peerId);
+    updateResource(qnVideowall, source);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiWebPageData& webpage, const QnUuid& peerId)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiWebPageData& webpage, ec2::NotificationSource source)
 {
     QnWebPageResourcePtr qnWebpage(new QnWebPageResource());
     fromApiToResource(webpage, qnWebpage);
-    updateResource(qnWebpage, peerId);
+    updateResource(qnWebpage, source);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera, const QnUuid& peerId)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera, ec2::NotificationSource source)
 {
     QnVirtualCameraResourcePtr qnCamera = getResourceFactory()->createResource(camera.typeId,
             QnResourceParams(camera.id, camera.url, camera.vendor))
@@ -688,22 +715,22 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera, 
     if (qnCamera)
     {
         fromApiToResource(camera, qnCamera);
-        NX_ASSERT(camera.id == QnVirtualCameraResource::uniqueIdToId(qnCamera->getUniqueId()),
+        NX_ASSERT(camera.id == QnVirtualCameraResource::physicalIdToId(qnCamera->getUniqueId()),
             Q_FUNC_INFO,
             "You must fill camera ID as md5 hash of unique id");
 
-        updateResource(qnCamera, peerId);
+        updateResource(qnCamera, source);
     }
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiMediaServerData& server, const QnUuid& peerId)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiMediaServerData& server, ec2::NotificationSource source)
 {
     QnMediaServerResourcePtr qnServer(new QnMediaServerResource());
     fromApiToResource(server, qnServer);
-    updateResource(qnServer, peerId);
+    updateResource(qnServer, source);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiStorageData& storage, const QnUuid& peerId)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiStorageData& storage, ec2::NotificationSource source)
 {
     auto resTypeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kStorageTypeId);
     NX_ASSERT(!resTypeId.isNull(), Q_FUNC_INFO, "Invalid resource type pool state");
@@ -717,6 +744,6 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiStorageData& storage
     if (qnStorage)
     {
         fromApiToResource(storage, qnStorage);
-        updateResource(qnStorage, peerId);
+        updateResource(qnStorage, source);
     }
 }

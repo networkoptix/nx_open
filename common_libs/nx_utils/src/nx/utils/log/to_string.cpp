@@ -1,5 +1,10 @@
 #include "to_string.h"
 
+QString toString(const char* s)
+{
+    return QString::fromUtf8(s);
+}
+
 QString toString(void* p)
 {
     return QString::fromLatin1("0x%1").arg(reinterpret_cast<qulonglong>(p), 0, 16);
@@ -8,6 +13,11 @@ QString toString(void* p)
 QString toString(const QByteArray& t)
 {
     return QString::fromUtf8(t);
+}
+
+QString toString(const QUrl& url)
+{
+    return url.toString(QUrl::RemovePassword);
 }
 
 QString toString(const std::string& t)

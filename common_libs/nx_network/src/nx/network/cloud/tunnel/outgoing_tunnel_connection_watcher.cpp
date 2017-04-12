@@ -38,6 +38,12 @@ void OutgoingTunnelConnectionWatcher::stopWhileInAioThread()
     m_inactivityTimer.reset();
 }
 
+void OutgoingTunnelConnectionWatcher::start()
+{
+    launchInactivityTimer();
+    m_tunnelConnection->start();
+}
+
 void OutgoingTunnelConnectionWatcher::establishNewConnection(
     std::chrono::milliseconds timeout,
     SocketAttributes socketAttributes,
@@ -75,11 +81,6 @@ void OutgoingTunnelConnectionWatcher::setControlConnectionClosedHandler(
     m_onTunnelClosedHandler = std::move(handler);
     m_tunnelConnection->setControlConnectionClosedHandler(
         std::bind(&OutgoingTunnelConnectionWatcher::closeTunnel, this, _1));
-}
-
-void OutgoingTunnelConnectionWatcher::start()
-{
-    launchInactivityTimer();
 }
 
 void OutgoingTunnelConnectionWatcher::closeTunnel(SystemError::ErrorCode reason)

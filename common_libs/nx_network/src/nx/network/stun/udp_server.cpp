@@ -1,8 +1,3 @@
-/**********************************************************
-* Dec 28, 2015
-* akolesnikov
-***********************************************************/
-
 #include "udp_server.h"
 
 #include <memory>
@@ -13,37 +8,38 @@
 #include "message_dispatcher.h"
 #include "udp_message_response_sender.h"
 
-
 namespace nx {
 namespace stun {
 
 static const std::chrono::seconds kRetryReadAfterFailureTimeout(1);
 
-UDPServer::UDPServer(const MessageDispatcher* dispatcher)
-:
+UdpServer::UdpServer(const MessageDispatcher* dispatcher):
     m_messagePipeline(this),
     m_boundToLocalAddress(false),
     m_dispatcher(dispatcher)
 {
+    bindToAioThread(getAioThread());
 }
 
-UDPServer::~UDPServer()
+UdpServer::~UdpServer()
 {
     pleaseStopSync();
 }
 
-void UDPServer::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
+void UdpServer::bindToAioThread(network::aio::AbstractAioThread* aioThread)
 {
-    m_messagePipeline.pleaseStop(std::move(handler));
+    network::aio::BasicPollable::bindToAioThread(aioThread);
+
+    m_messagePipeline.bindToAioThread(aioThread);
 }
 
-bool UDPServer::bind(const SocketAddress& localAddress)
+bool UdpServer::bind(const SocketAddress& localAddress)
 {
     m_boundToLocalAddress = true;
     return m_messagePipeline.bind(localAddress);
 }
 
-bool UDPServer::listen()
+bool UdpServer::listen(int /*backlogSize*/)
 {
     if (!m_boundToLocalAddress)
     {
@@ -55,12 +51,17 @@ bool UDPServer::listen()
     return true;
 }
 
-SocketAddress UDPServer::address() const
+void UdpServer::stopReceivingMessagesSync()
+{
+    m_messagePipeline.stopReceivingMessagesSync();
+}
+
+SocketAddress UdpServer::address() const
 {
     return m_messagePipeline.address();
 }
 
-void UDPServer::sendMessage(
+void UdpServer::sendMessage(
     SocketAddress destinationEndpoint,
     const Message& message,
     utils::MoveOnlyFunc<void(SystemError::ErrorCode)> completionHandler)
@@ -75,22 +76,27 @@ void UDPServer::sendMessage(
         });
 }
 
-const std::unique_ptr<network::UDPSocket>& UDPServer::socket()
+const std::unique_ptr<network::UDPSocket>& UdpServer::socket()
 {
     return m_messagePipeline.socket();
 }
 
-void UDPServer::messageReceived(SocketAddress sourceAddress, Message mesage)
+void UdpServer::stopWhileInAioThread()
+{
+    m_messagePipeline.pleaseStopSync();
+}
+
+void UdpServer::messageReceived(SocketAddress sourceAddress, Message mesage)
 {
     m_dispatcher->dispatchRequest(
         std::make_shared<UDPMessageResponseSender>(this, std::move(sourceAddress)),
         std::move(mesage));
 }
 
-void UDPServer::ioFailure(SystemError::ErrorCode)
+void UdpServer::ioFailure(SystemError::ErrorCode)
 {
     //TODO #ak
 }
 
-}   //stun
-}   //nx
+} // namespace stun
+} // namespace nx

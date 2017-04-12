@@ -58,6 +58,9 @@ public:
 
     bool validate();
 
+    /* After a small delay calls validate if input is not being edited. */
+    void updateDisplayStateDelayed();
+
     bool isValid() const;
     QValidator::State lastValidationResult() const;
 

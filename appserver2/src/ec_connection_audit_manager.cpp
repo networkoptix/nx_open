@@ -53,6 +53,23 @@ namespace ec2
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
+    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command, const ApiStorageData& params, const QnAuthSession& authInfo)
+    {
+        Q_UNUSED(command);
+        QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
+        auditRecord.resources.push_back(params.parentId);
+        qnAuditManager->addAuditRecord(auditRecord);
+    }
+
+    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command, const ApiStorageDataList& params, const QnAuthSession& authInfo)
+    {
+        Q_UNUSED(command);
+        QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
+        for (const auto& value: params)
+            auditRecord.resources.push_back(value.parentId);
+        qnAuditManager->addAuditRecord(auditRecord);
+    }
+
     void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiUserDataList& params, const QnAuthSession& authInfo)
     {
         Q_UNUSED(command);

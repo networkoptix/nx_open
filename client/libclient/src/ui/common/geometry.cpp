@@ -188,11 +188,15 @@ QSize QnGeometry::sizeDelta(const QMargins &margins) {
     return QSize(margins.left() + margins.right(), margins.top() + margins.bottom());
 }
 
-qreal QnGeometry::aspectRatio(const QSizeF &size) {
+qreal QnGeometry::aspectRatio(const QSizeF &size)
+{
+    NX_ASSERT(!qFuzzyIsNull(size.height()));
     return size.width() / size.height();
 }
 
-qreal QnGeometry::aspectRatio(const QSize &size) {
+qreal QnGeometry::aspectRatio(const QSize &size)
+{
+    NX_ASSERT(size.height() != 0);
     return static_cast<qreal>(size.width()) / size.height();
 }
 

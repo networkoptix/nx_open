@@ -4,7 +4,7 @@
 
 #include <nx/utils/test_support/module_instance_launcher.h>
 
-#include "appserver2_process.h"
+#include <test_support/appserver2_process.h>
 #include "../test_setup.h"
 
 

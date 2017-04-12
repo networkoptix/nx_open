@@ -97,13 +97,10 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked()
         return;
 
     if (!context()->instance<QnAppServerNotificationCache>()->storeSound(
-        fileName,
-        cropSoundSecs * 1000,
-        title)
-        )
-        QnMessageBox::warning(this,
-            tr("Error"),
-            tr("File cannot be added."));
+        fileName, cropSoundSecs * 1000, title))
+    {
+        QnMessageBox::warning(this, tr("Failed to add file"));
+    }
 }
 
 void QnNotificationSoundManagerDialog::at_renameButton_clicked()
@@ -126,9 +123,7 @@ void QnNotificationSoundManagerDialog::at_renameButton_clicked()
         return;
 
     if (!context()->instance<QnAppServerNotificationCache>()->updateTitle(filename, newTitle))
-        QnMessageBox::warning(this,
-            tr("Error"),
-            tr("New title could not be set."));
+        QnMessageBox::warning(this, tr("Failed to set new title"));
 
 }
 
@@ -143,11 +138,12 @@ void QnNotificationSoundManagerDialog::at_deleteButton_clicked()
         return;
 
     QString title = m_model->titleByFilename(filename);
-    if (QnMessageBox::question(this,
-        tr("Confirm File Deletion"),
-        tr("Are you sure you want to delete '%1'?").arg(title),
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-        QDialogButtonBox::Cancel) == QDialogButtonBox::Cancel)
+
+    QnMessageBox dialog(QnMessageBoxIcon::Question, tr("Delete sound?"), title,
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, this);
+    dialog.addCustomButton(QnMessageBoxCustomButton::Delete,
+        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+    if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
     context()->instance<QnAppServerNotificationCache>()->deleteFile(filename);

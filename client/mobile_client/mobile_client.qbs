@@ -4,7 +4,7 @@ import qbs.FileInfo
 GenericProduct
 {
     name: "mobile_client"
-    type: "application"
+    type: qbs.targetOS.contains("android") ? "dynamiclibrary" : "application"
 
     condition: project.withMobileClient
 
@@ -19,7 +19,8 @@ GenericProduct
         "product.display.title": customization.productDisplayName + " Mobile Client",
         "liteMode": vms.box == "bpi",
         "android.oldPackageName": customization.androidOldPackageName,
-        "ios.old_app_appstore_id" : customization.iosOldAppstoreId
+        "ios.old_app_appstore_id" : customization.iosOldAppstoreId,
+        "liteDeviceName": customization.liteDeviceName
     })
 
     Group
@@ -32,5 +33,15 @@ GenericProduct
     ResourcesGroup
     {
         resources.resourceSourceBase: product.sourceDirectory + "/static-resources"
+    }
+    ResourcesGroup
+    {
+        resources.priority: 1
+        resources.resourceSourceBase: FileInfo.joinPaths(
+            project.sourceDirectory,
+            "customization",
+            project.customization,
+            "mobile_client",
+            "resources")
     }
 }

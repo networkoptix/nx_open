@@ -27,7 +27,7 @@
         <windows.defines>EC2_LIB_API=__declspec(dllimport) _VARIADIC_MAX=10 WIN32_LEAN_AND_MEAN</windows.defines>
 
         <path>${env.PATH}</path>
-        <rdep.packages>gtest openssl ffmpeg onvif quazip sigar festival</rdep.packages>
+        <rdep.packages>gtest gmock openssl ffmpeg onvif quazip sigar festival</rdep.packages>
         <rdep.linux.arm.packages>sasl2 openldap</rdep.linux.arm.packages>
         <guid>{ae551dde-06e7-4153-8871-f9ffabcf230e}</guid>
     </properties>
@@ -39,15 +39,6 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/mediaserver_core/pom.xml</systemPath>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>libcloud_db</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/nx_cloud/libcloud_db/pom.xml</systemPath>
         </dependency>
     </dependencies>
 

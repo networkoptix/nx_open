@@ -24,7 +24,6 @@
 #include <watchers/cloud_status_watcher.h>
 #include <watchers/server_address_watcher.h>
 #include <finders/systems_finder.h>
-#include <client/client_recent_connections_manager.h>
 #include <client/system_weights_manager.h>
 #include <utils/media/ffmpeg_initializer.h>
 
@@ -37,6 +36,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/mobile_client/settings/migration_helper.h>
 #include <nx/mobile_client/settings/settings_migration.h>
+#include <client_core/client_core_settings.h>
 
 using namespace nx::mobile_client;
 
@@ -47,7 +47,6 @@ QnMobileClientModule::QnMobileClientModule(
     QObject(parent)
 {
     Q_INIT_RESOURCE(appserver2);
-    Q_INIT_RESOURCE(libclient_core);
     Q_INIT_RESOURCE(mobile_client);
 
     QnMobileClientMetaTypes::initialize();
@@ -84,7 +83,6 @@ QnMobileClientModule::QnMobileClientModule(
     common->store(new QnCameraHistoryPool());
     common->store(new QnRuntimeInfoManager());
     common->store(new QnMobileClientCameraFactory());
-    common->store(new QnClientRecentConnectionsManager());
 
     common->store(new QnResourcesChangesManager());
 
@@ -116,7 +114,15 @@ QnMobileClientModule::QnMobileClientModule(
     moduleFinder->start();
 
     common->store(new QnRouter(moduleFinder));
-    common->store(new QnServerAddressWatcher());
+    
+    const auto getter = []() { return qnClientCoreSettings->knownServerUrls(); };
+    const auto setter =
+        [](const QnServerAddressWatcher::UrlsList& values)
+        {
+            qnClientCoreSettings->setKnownServerUrls(values);
+            qnClientCoreSettings->save();
+        };
+    common->store(new QnServerAddressWatcher(getter, setter));
 
     common->store(new QnSystemsFinder());
     common->store(new QnSystemsWeightsManager());

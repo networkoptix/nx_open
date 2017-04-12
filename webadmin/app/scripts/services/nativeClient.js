@@ -4,7 +4,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('nativeClient', function ($q, $log, $location, dialogs) {
+    .factory('nativeClient', function ($q, $log, $location, dialogs, $sessionStorage) {
         var nativeClientObject = typeof(setupDialog)=='undefined'?null:setupDialog; // Qt registered object
         var socketClientController = null;
 
@@ -18,9 +18,18 @@ angular.module('webadminApp')
             }
         }
 
-        var wsUri = $location.search().clientWebSocket || parseUrl('clientWebSocket');
+        var wsUri = $location.search().clientWebSocket || parseUrl('clientWebSocket') || $sessionStorage.clientWebSocket;
+        if(wsUri){
+            $sessionStorage.clientWebSocket = wsUri;
+        }
 
         return {
+            webSocketUrlPath:function(){
+                if($sessionStorage.clientWebSocket){
+                    return 'clientWebSocket=' + $sessionStorage.clientWebSocket;
+                }
+                return '';
+            },
             init:function(){
                 $log.log("try to init native client");
                 if(nativeClientObject){

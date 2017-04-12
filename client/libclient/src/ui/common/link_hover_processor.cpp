@@ -2,6 +2,7 @@
 
 #include <nx/utils/log/assert.h>
 
+#include <ui/style/helper.h>
 #include <ui/workaround/label_link_tabstop_workaround.h>
 
 #include <utils/common/delayed.h>
@@ -18,19 +19,21 @@ QnLinkHoverProcessor::QnLinkHoverProcessor(QLabel* parent) :
 
     m_label->setAttribute(Qt::WA_Hover);
     m_originalText = m_label->text();
+    m_alteredText = m_originalText;
 
-    installEventHandler(m_label, { QEvent::HoverEnter, QEvent::HoverLeave, QEvent::HoverMove }, this,
+    updateColors(UpdateTime::Now);
+
+    installEventHandler(m_label, { QEvent::UpdateRequest, QEvent::Show, QEvent::HoverLeave }, this,
         [this](QObject* object, QEvent* event)
         {
             Q_UNUSED(object);
             switch (event->type())
             {
-                case QEvent::HoverEnter:
-                case QEvent::HoverMove:
+                case QEvent::UpdateRequest:
+                case QEvent::Show:
                 {
-                    QString text = m_label->text();
-                    if (m_currentText != text)
-                        m_originalText = text;
+                    if (updateOriginalText())
+                        updateColors(UpdateTime::Now);
                     break;
                 }
 
@@ -60,54 +63,67 @@ QnLinkHoverProcessor::QnLinkHoverProcessor(QLabel* parent) :
     connect(m_label, &QLabel::linkHovered, this, &QnLinkHoverProcessor::linkHovered);
 }
 
-auto QnLinkHoverProcessor::labelChangeFunctor(const QString& text, bool hovered)
+bool QnLinkHoverProcessor::updateOriginalText()
 {
-    return [this, text, hovered]()
-    {
-        m_label->setText(text);
-        m_label->repaint();
+    const QString text = m_label->text();
+    if (m_alteredText == text)
+        return false;
 
-        m_currentText = text;
-
-        if (hovered)
-            m_label->setCursor(Qt::PointingHandCursor);
-        else
-            m_label->unsetCursor();
-    };
+    m_originalText = text;
+    return true;
 }
 
-QColor QnLinkHoverProcessor::hoveredColor() const
+void QnLinkHoverProcessor::changeLabelState(const QString& text, bool hovered)
 {
-    return m_label->palette().color(QPalette::Link);
+    m_alteredText = text;
+
+    m_label->setText(text);
+    m_label->repaint();
+
+    if (hovered)
+        m_label->setCursor(Qt::PointingHandCursor);
+    else
+        m_label->unsetCursor();
 }
 
 void QnLinkHoverProcessor::linkHovered(const QString& href)
 {
-    if (href.isEmpty())
-    {
-        /* If link was unhovered, restore unaltered label text: */
-        executeDelayedParented(labelChangeFunctor(m_originalText, false), 0, this);
-        return;
-    }
-
-    /* Find anchor position: */
-    int pos = m_originalText.toHtmlEscaped().indexOf(href.toHtmlEscaped());
-    if (pos == -1)
-        return;
-
-    /* Find href attribute position: */
-    pos = m_originalText.lastIndexOf(lit("href"), pos, Qt::CaseInsensitive);
-    if (pos == -1)
-        return;
-
-    //TODO: #common #vkutin Implement a better parsing for this to work if "style" attribute already exists
-
-    /* Insert color attribute before href attribute: */
-    QString alteredText = m_originalText;
-    QString colorString = hoveredColor().name(QColor::HexRgb);
-    alteredText.insert(pos, lit("style='color: %1' ").arg(colorString));
-
-    /* Apply altered label text: */
-    executeDelayedParented(labelChangeFunctor(alteredText, true), 0, this);
+    m_hoveredLink = href;
+    updateOriginalText();
+    updateColors(UpdateTime::Later);
 }
 
+void QnLinkHoverProcessor::updateColors(UpdateTime when)
+{
+    /* Find anchor position: */
+    const bool hovered = !m_hoveredLink.isEmpty();
+    const int linkPos = hovered ? m_originalText.indexOf(m_hoveredLink) : -1;
+    const int hoveredHrefPos = hovered
+        ? m_originalText.lastIndexOf(lit("href"), linkPos, Qt::CaseInsensitive)
+        : -1;
+
+    /* Insert color attribute before each href attribute: */
+    QString alteredText = m_originalText;
+    for (int pos = -1;;)
+    {
+        /* Find href attribute position: */
+        pos = alteredText.lastIndexOf(lit("href"), pos, Qt::CaseInsensitive);
+        if (pos == -1)
+            break;
+
+        //TODO: #common #vkutin Implement a better parsing for this to work if "style" attribute already exists
+        const QColor color = style::linkColor(m_label->palette(), pos == hoveredHrefPos);
+        alteredText.insert(pos, lit("style='color: %1' ").arg(color.name(QColor::HexRgb)));
+    }
+
+    /* Apply altered label text: */
+    if (when == UpdateTime::Now)
+    {
+        changeLabelState(alteredText, hovered);
+    }
+    else
+    {
+        auto changer = [this, alteredText, hovered]() { changeLabelState(alteredText, hovered); };
+        executeDelayedParented(changer, 0, this);
+    }
+}

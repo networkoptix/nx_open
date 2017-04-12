@@ -8,7 +8,7 @@ namespace stats {
 namespace dao {
 namespace rdb {
 
-class RdbDataObject:
+class DataObject:
     public AbstractDataObject
 {
 public:
