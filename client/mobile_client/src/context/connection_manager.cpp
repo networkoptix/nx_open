@@ -346,7 +346,16 @@ bool QnConnectionManagerPrivate::doConnect()
             QVariant infoParameter;
 
             if (status == Qn::IncompatibleVersionConnectionResult)
+            {
                 infoParameter = connectionInfo.version.toString(QnSoftwareVersion::BugfixFormat);
+            }
+            else if(status == Qn::IncompatibleCloudHostConnectionResult)
+            {
+                /* Ignore this kind of error because Mobile Client does not have
+                   compatibility versions mechanism. Thus without it beta testers will have to
+                   manually downgrade the app to connect to ther release systems. */
+                status = Qn::SuccessConnectionResult;
+            }
 
             Q_Q(QnConnectionManager);
 
