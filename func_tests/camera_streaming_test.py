@@ -61,8 +61,7 @@ def check_media_stream_transports(server):
 # https://networkoptix.atlassian.net/browse/TEST-178
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/77234376/Camera+history+test
 def test_camera_switching_should_be_represented_in_history(env, camera):
-    camera.stream_to(env.one)
-    camera.stream_to(env.two)
+    camera.start_streaming()
     camera.wait_until_discovered_by_server([env.one, env.two])
     camera.switch_to_server(env.one)
     env.one.start_recording_camera(camera)

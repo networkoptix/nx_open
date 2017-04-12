@@ -7,10 +7,6 @@ from test_utils.utils import log_list
 from test_utils.server import TimePeriod
 
 
-@pytest.fixture(params=['rtsp', 'webm', 'hls', 'direct-hls'])
-def stream_type(request):
-    return request.param
-
 @pytest.fixture
 def env(env_builder, server):
     server = server()

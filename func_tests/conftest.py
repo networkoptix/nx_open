@@ -7,7 +7,7 @@ import sys
 import os.path
 import logging
 import pytest
-from netaddr import IPNetwork
+from netaddr import IPAddress
 from test_utils.utils import SimpleNamespace
 from test_utils.session import TestSession
 from test_utils.customization import read_customization_company_name
@@ -64,10 +64,8 @@ def pytest_addoption(parser):
                      help='prefix for virtualenv machine names')
     parser.addoption('--vm-port-base', type=int, default=DEFAULT_REST_API_FORWARDED_PORT_BASE,
                      help='base REST API port forwarded to host')
-    parser.addoption('--vm-bind-network', required=True, type=IPNetwork,
-                     help='Format: 10.20.0/24. Network to bind to virtual machine NaT interfaces.'
-                      ' Different virtual mechines will be distinguished by camera discoverer'
-                      ' by binding them to different IP addresses from this network')
+    parser.addoption('--vm-address', type=IPAddress, required=True,
+                     help='IP address virtual machines bind to. Test camera discovery will answer only to this address.')
     parser.addoption('--vm-host',
                      help='hostname or IP address for host with virtualbox,'
                           ' used to start virtual machines (by default it is local host)')
@@ -101,7 +99,7 @@ def run_options(request):
         recreate_boxes=request.config.getoption('--recreate-boxes'),
         vm_name_prefix=request.config.getoption('--vm-name-prefix'),
         vm_port_base=request.config.getoption('--vm-port-base'),
-        vm_bind_network=request.config.getoption('--vm-bind-network'),
+        vm_address=request.config.getoption('--vm-address'),
         vm_ssh_host_config=vm_ssh_host_config,
         vm_host_work_dir=request.config.getoption('--vm-host-dir'),
         max_log_width=request.config.getoption('--max-log-width'),
@@ -114,6 +112,11 @@ def customization_company_name(run_options):
 
 @pytest.fixture(params=['http', 'https'])
 def http_schema(request):
+    return request.param
+
+
+@pytest.fixture(params=['rtsp', 'webm', 'hls', 'direct-hls'])
+def stream_type(request):
     return request.param
 
 
@@ -143,7 +146,7 @@ def cloud_host(run_options, cloud_host_host):
 def camera_factory(run_options):
     stream_path = os.path.abspath(os.path.join(run_options.bin_dir, run_options.media_stream_path))
     assert os.path.isfile(stream_path), '%s is expected at %s' % (os.path.basename(stream_path), os.path.dirname(stream_path))
-    factory = CameraFactory(stream_path)
+    factory = CameraFactory(run_options.vm_address, stream_path)
     yield factory
     factory.close()
 

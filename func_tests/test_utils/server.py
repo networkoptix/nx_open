@@ -168,7 +168,6 @@ class Server(object):
         self.settings = None
         self.local_system_id = None
         self.ecs_guid = None
-        self.external_ip_address = box.config.vm_bind_address if box else 'localhost'
         self.internal_ip_address = None
         self.storage = self._get_storage()
         self._is_started = None
@@ -281,7 +280,9 @@ class Server(object):
 
     def reset_config(self, **kw):
         self.host.run_command(['cp', self._config_path_initial, self._config_path])
-        self.change_config(**kw)
+        default_config = dict(removeDbOnStartup=1)
+        config = dict(default_config, **kw)
+        self.change_config(**config)
 
     def restart(self, timeout=30):
         t = time.time()

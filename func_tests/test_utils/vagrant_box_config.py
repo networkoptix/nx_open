@@ -3,7 +3,7 @@
 Functional tests define configuration required for them indirectly (via 'box' fixture) using BoxConfig class.
 '''
 
-from netaddr import IPNetwork
+from netaddr import IPNetwork, IPAddress
 from .utils import is_list_inst
 
 
@@ -65,9 +65,6 @@ def make_vm_provision_command(script, env=None):
         kwargs['env'] = '{%s}' % ', '.join('%s: %s' % (name, value) for name, value in env.items())
     return ConfigCommand('provision', [':shell'], kwargs)
 
-def make_vbox_nat_bind_command(ip_address):
-    return ConfigCommand(None, [':modifyvm', ':id', quote('--natbindip1'), quote(ip_address)])
-
 def make_vbox_host_time_disabled_command():
     return ConfigCommand(None, [':setextradata', ':id', quote('VBoxInternal/Devices/VMMDev/0/Config/GetHostTimeDisabled'), '1'])
 
@@ -111,13 +108,11 @@ class BoxConfig(object):
             idx=d['idx'],
             vm_name_prefix=d['vm_name_prefix'],
             vm_port_base=d['vm_port_base'],
-            vm_bind_network=IPNetwork(d['vm_bind_network']),
             )
 
     def __init__(self, name, ip_address_list, required_file_list, vm_commands, vbox_commands,
-                 idx=None, vm_name_prefix=None, vm_port_base=None, vm_bind_network=None):
+                 idx=None, vm_name_prefix=None, vm_port_base=None):
         assert is_list_inst(ip_address_list, IPNetwork), repr(ip_address_list)
-        assert vm_bind_network is None or isinstance(vm_bind_network, IPNetwork), repr(vm_bind_network)
         self.name = name
         self.ip_address_list = ip_address_list
         self.required_file_list = required_file_list
@@ -126,7 +121,6 @@ class BoxConfig(object):
         self.idx = idx
         self.vm_name_prefix = vm_name_prefix
         self.vm_port_base = vm_port_base
-        self.vm_bind_network = vm_bind_network
         self.must_be_recreated = False  # this test requires fresh box
         self.is_allocated = False
 
@@ -146,10 +140,9 @@ class BoxConfig(object):
             idx=self.idx,
             vm_name_prefix=self.vm_name_prefix,
             vm_port_base=self.vm_port_base,
-            vm_bind_network=str(self.vm_bind_network),
             )
 
-    def clone(self, idx, vm_name_prefix, vm_port_base, vm_bind_network):
+    def clone(self, idx, vm_name_prefix, vm_port_base):
         return BoxConfig(
             name=self.name,
             ip_address_list=self.ip_address_list,
@@ -159,7 +152,6 @@ class BoxConfig(object):
             idx=idx,
             vm_name_prefix=vm_name_prefix,
             vm_port_base=vm_port_base,
-            vm_bind_network=vm_bind_network,
             )
 
     def matches(self, other):
@@ -184,25 +176,19 @@ class BoxConfig(object):
         return self.vm_name_prefix + self.box_name
 
     @property
-    def vm_bind_address(self):
-        return self.vm_bind_network[self.idx]
-
-    @property
     def rest_api_forwarded_port(self):
         return self.vm_port_base + self.idx
 
     def expand(self, vbox_manage):
         network_vm_commands = [make_vm_config_internal_network_command(vbox_manage, ip_address)
                                for ip_address in self.ip_address_list]
-        nat_bind_vbox_command = make_vbox_nat_bind_command(self.vm_bind_address)
         return ExpandedBoxConfig(
             box_name=self.box_name,
             vm_box_name=self.vm_box_name,
-            vm_bind_address=self.vm_bind_address,
             rest_api_internal_port=MEDIASERVER_LISTEN_PORT,
             rest_api_forwarded_port=self.rest_api_forwarded_port,
             vm_commands=map(self._expand_vm_command, network_vm_commands + self.vm_commands),
-            vbox_commands=map(self._expand_vbox_command, [nat_bind_vbox_command] + self.vbox_commands),
+            vbox_commands=map(self._expand_vbox_command, self.vbox_commands),
             )
 
     def _expand_vm_command(self, command):
@@ -217,11 +203,10 @@ class BoxConfig(object):
 
 class ExpandedBoxConfig(object):
 
-    def __init__(self, box_name, vm_box_name, vm_bind_address,
-                 rest_api_internal_port, rest_api_forwarded_port, vm_commands, vbox_commands):
+    def __init__(self, box_name, vm_box_name, rest_api_internal_port, rest_api_forwarded_port,
+                 vm_commands, vbox_commands):
         self.box_name = box_name
         self.vm_box_name = vm_box_name
-        self.vm_bind_address = vm_bind_address
         self.rest_api_internal_port = rest_api_internal_port
         self.rest_api_forwarded_port = rest_api_forwarded_port
         self.vm_commands = vm_commands

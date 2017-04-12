@@ -43,14 +43,12 @@ class EnvironmentBuilder(object):
         self._recreate_boxes = options.recreate_boxes
         self._vm_name_prefix = options.vm_name_prefix
         self._vm_port_base = options.vm_port_base
-        self._vm_bind_network = options.vm_bind_network
         self._vm_is_local_host = options.vm_ssh_host_config is None
         self._vm_host = host_from_config(options.vm_ssh_host_config)
         self._vm_host_work_dir = options.vm_host_work_dir
         self._boxes_config = []
         self._boxes_config_is_loaded = False
         self._last_box_idx = 0
-        self._vm_host_ip_address_list = self._load_vm_host_ip_address_list()
 
     def _load_boxes_config_from_cache(self):
         try:
@@ -62,12 +60,6 @@ class EnvironmentBuilder(object):
 
     def _save_boxes_config_to_cache(self):
         self._cache.set(self.vagrant_boxes_cache_key, [config.to_dict() for config in self._boxes_config])
-
-    def _load_vm_host_ip_address_list(self):
-        output = self._vm_host.run_command(['ip', 'addr'], log_output=False)
-        address_list = re.findall(r'inet ([0-9.]+)/\d+', output, re.MULTILINE)
-        log.info('VM host has following addresses configured: %s' % ', '.join(address_list))
-        return map(netaddr.IPAddress, address_list)
 
     def _allocate_boxes(self, servers_config, boxes_config):
         assigned_configs = {server.box for server in servers_config}  # must be created with original server configs
@@ -92,12 +84,8 @@ class EnvironmentBuilder(object):
                 idx=self._last_box_idx,
                 vm_name_prefix=self._vm_name_prefix,
                 vm_port_base=self._vm_port_base,
-                vm_bind_network=self._vm_bind_network,
                 )
             self._boxes_config.append(config)
-        assert config.vm_bind_address in self._vm_host_ip_address_list, \
-          ('IP address %r is not configured on vm host, please configure it. Configured ones: %s'
-           % (config.vm_bind_address, ', '.join(map(str, self._vm_host_ip_address_list))))
         config.is_allocated = True
         log.info('BOX CONFIG %s: %s', config.box_name, config)
         return config
@@ -112,7 +100,7 @@ class EnvironmentBuilder(object):
 
     def _init_server(self, box_config_to_box, http_schema, config):
         box = box_config_to_box[config.box]
-        url = '%s://%s:%d/' % (http_schema, config.box.vm_bind_address, config.box.rest_api_forwarded_port)
+        url = '%s://%s:%d/' % (http_schema, self._vm_host.host, config.box.rest_api_forwarded_port)
         server = Server(self._company_name, config.name, box, url)
         if config.leave_initial_cloud_host:
             patch_set_cloud_host = None
