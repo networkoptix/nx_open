@@ -142,6 +142,9 @@ angular.module('webadminApp', [
                 unsubscribe = null;
             });
         }
+        if($location.search().debug){
+            Config.allowDebugMode = $location.search().debug;
+        }
         return original.apply($location, [path]);
     };
 }]);

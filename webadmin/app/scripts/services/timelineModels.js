@@ -390,6 +390,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
             self.cacheRequestedInterval(start,end,level);
 
             deferred.resolve(self.chunksTree);
+
         }, function (error) {
             deferred.reject(error);
         });
@@ -830,11 +831,12 @@ ShortCache.prototype.setPlayingPosition = function(position){
 
 
 
-function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS,initialWidth,stickToLiveMs,zoomAccuracy,lastMinuteInterval){
+function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initialWidth, stickToLiveMs, zoomAccuracyMs, lastMinuteInterval, minPixelsPerLevel){
     this.absMaxMsPerPixel = maxMsPerPixel;
     this.minMsPerPixel = minMsPerPixel;
     this.stickToLiveMs = stickToLiveMs;
-    this.zoomAccuracy = zoomAccuracy;
+    this.zoomAccuracyMs = zoomAccuracyMs;
+    this.minPixelsPerLevel = minPixelsPerLevel;
     this.lastMinuteInterval  = lastMinuteInterval;
 
     this.levels = {
@@ -857,7 +859,7 @@ function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS,initial
     this.anchorPoint = 1;
     this.anchorDate = this.end;
     this.updateCurrentInterval();
-};
+}
 
 ScaleManager.prototype.updateTotalInterval = function(){
     //Calculate maxmxPerPixel
@@ -874,7 +876,7 @@ ScaleManager.prototype.setStart = function(start){// Update the begining end of 
     this.updateTotalInterval();
 };
 ScaleManager.prototype.setEnd = function(end){ // Update right end of the timeline. Live mode must be supported here
-    var needZoomOut = !this.çheckZoomOut();
+    var needZoomOut = !this.checkZoomOut();
     this.end = end;
     this.updateTotalInterval();
     if(needZoomOut){
@@ -901,7 +903,7 @@ ScaleManager.prototype.updateCurrentInterval = function(){
     this.anchorDate = this.bound(this.start, Math.round(this.anchorDate), this.end);
 
 
-    this.visibleStart = Math.round(this.anchorDate - this.msPerPixel  * this.viewportWidth * this.anchorPoint);
+    this.visibleStart = Math.round(this.anchorDate - this.msPerPixel * this.viewportWidth * this.anchorPoint);
     this.visibleEnd = Math.round(this.anchorDate + this.msPerPixel  * this.viewportWidth * (1 - this.anchorPoint));
 
 
@@ -935,7 +937,7 @@ ScaleManager.prototype.releaseWatching = function(){
     this.wasForcedToStopWatchPlaying = false;
 };
 
-ScaleManager.prototype.watchPlaying = function(date){
+ScaleManager.prototype.watchPlaying = function(date, liveMode){
     this.watchPlayingPosition = true;
     this.wasForcedToStopWatchPlaying = false;
 
@@ -943,8 +945,11 @@ ScaleManager.prototype.watchPlaying = function(date){
         return;
     }
     var targetPoint = this.dateToScreenCoordinate(date) / this.viewportWidth;
-    if(targetPoint>1){
+    if(targetPoint > 1){
         targetPoint = 0.5;
+    }
+    if(liveMode){
+        targetPoint = 1;
     }
     this.setAnchorDateAndPoint(date, targetPoint);
 };
@@ -961,26 +966,29 @@ ScaleManager.prototype.checkWatchPlaying = function(date,liveMode){
     }
 
     if(liveMode && targetPoint > 1 && this.end - this.visibleEnd < this.stickToLiveMs ){
-        this.watchPlaying(date);
+        this.watchPlaying(date, liveMode);
     }
 };
 
-ScaleManager.prototype.tryToSetLiveDate = function(date,liveMode,end){
-    if(this.anchorDate == date){
+ScaleManager.prototype.tryToSetLiveDate = function(playing, liveMode, end){
+    this.playedPosition = playing;
+    this.liveMode = liveMode;
+
+    if(this.anchorDate == playing){
         return;
     }
 
-    if(date > this.end && liveMode){
-        this.setEnd(date);
-    }else if(end>this.end){
+    if(playing > this.end && liveMode){
+        this.setEnd(playing);
+    }else if(end > this.end){
         this.setEnd(end);
     }
 
     if(!this.wasForcedToStopWatchPlaying && !this.watchPlayingPosition){
-        this.checkWatchPlaying(date,liveMode);
+        this.checkWatchPlaying(playing,liveMode);
     }
     if(this.watchPlayingPosition){
-        this.setAnchorDateAndPoint(date, liveMode?1:this.anchorPoint);
+        this.setAnchorDateAndPoint(playing, liveMode ? 1:this.anchorPoint);
     }
 };
 
@@ -1058,7 +1066,8 @@ ScaleManager.prototype.calcLevels = function(msPerPixel) {
 
         levels.events = {index:i,level:level};
 
-        if (pixelsPerLevel <= 1) {
+        if (pixelsPerLevel <= this.minPixelsPerLevel) {
+            // minMsPerPixel
             break;
         }
     }
@@ -1081,11 +1090,19 @@ ScaleManager.prototype.alignStart = function(level){ // Align start by the grid 
 ScaleManager.prototype.alignEnd = function(level){ // Align end by the grid using level
     return level.interval.alignToFuture(this.visibleEnd);
 };
+
+ScaleManager.prototype.coordinateToDate = function(coordinate){
+    return Math.round(this.start + coordinate * this.msPerPixel);
+};
+ScaleManager.prototype.dateToCoordinate = function(date){
+    return  (date - this.start) / this.msPerPixel;
+};
+
 ScaleManager.prototype.dateToScreenCoordinate = function(date){
-    return Math.round(this.viewportWidth * (date - this.visibleStart) / (this.visibleEnd - this.visibleStart));
+    return this.dateToCoordinate(date) - this.dateToCoordinate(this.visibleStart);
 };
 ScaleManager.prototype.screenCoordinateToDate = function(coordinate){
-    return Math.round(this.visibleStart + coordinate / this.viewportWidth * (this.visibleEnd - this.visibleStart));
+    return this.coordinateToDate(coordinate + this.dateToCoordinate(this.visibleStart));
 };
 
 // Some function for scroll support
@@ -1098,7 +1115,7 @@ ScaleManager.prototype.getRelativeCenter = function(){
     return ((this.visibleStart + this.visibleEnd) / 2 - this.start) / (this.end - this.start);
 };
 ScaleManager.prototype.getRelativeWidth = function(){
-    return (this.visibleEnd - this.visibleStart) / (this.end - this.start);
+    return this.msPerPixel * this.viewportWidth / (this.end - this.start);
 };
 
 
@@ -1108,7 +1125,8 @@ ScaleManager.prototype.canScroll = function(left){
         return this.visibleStart != this.start;
     }
 
-    return this.visibleEnd != this.end;
+    return this.visibleEnd != this.end
+        && !(this.watchPlayingPosition && this.liveMode);
 };
 
 ScaleManager.prototype.scroll = function(value){
@@ -1124,12 +1142,12 @@ ScaleManager.prototype.scroll = function(value){
 };
 
 ScaleManager.prototype.getScrollByPixelsTarget = function(pixels){
-    return this.bound(0,this.scroll() +pixels / this.viewportWidth * this.getRelativeWidth(),1);
+    return this.bound(0,this.scroll() + pixels * this.getRelativeWidth() / this.viewportWidth,1);
 };
 
 ScaleManager.prototype.scrollByPixels = function(pixels){
     //scroll right or left by relative value - move anchor date
-    this.scroll(this.scroll() +  pixels / this.viewportWidth * this.getRelativeWidth() );
+    this.scroll(this.getScrollByPixelsTarget(pixels));
 };
 
 
@@ -1191,26 +1209,20 @@ ScaleManager.prototype.targetLevels = function(zoomTarget){
     return this.calcLevels(msPerPixel);
 };
 
-ScaleManager.prototype.çheckZoomOut = function(){
-    return this.zoom() < this.fullZoomOutValue() - this.zoomAccuracy;
+ScaleManager.prototype.checkZoomOut = function(){
+    var invisibleInterval = (this.end - this.start) - (this.visibleEnd-this.visibleStart);
+    return invisibleInterval > this.zoomAccuracyMs;
 };
-ScaleManager.prototype.çheckZoomIn = function(){
-    return this.zoom() > this.fullZoomInValue() + this.zoomAccuracy;
+ScaleManager.prototype.checkZoomIn = function(){
+    return this.zoom() > this.fullZoomInValue();
 };
+
 ScaleManager.prototype.zoom = function(zoomValue){ // Get or set zoom value (from 0 to 1)
     if(typeof(zoomValue)=="undefined"){
         return this.msToZoom(this.msPerPixel);
     }
+
     this.msPerPixel = this.zoomToMs(zoomValue);
-
-    /* Make it sticky */
-    if(zoomValue - this.fullZoomInValue() < this.zoomAccuracy){
-        this.msPerPixel = this.minMsPerPixel;
-    }
-
-    if(this.fullZoomOutValue()-zoomValue  < this.zoomAccuracy){
-        this.msPerPixel = this.maxMsPerPixel;
-    }
 
     this.updateCurrentInterval();
 };
