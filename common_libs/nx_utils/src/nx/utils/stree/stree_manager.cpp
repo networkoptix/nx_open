@@ -1,8 +1,3 @@
-/**********************************************************
-* May 17, 2016
-* a.kolesnikov
-***********************************************************/
-
 #include "stree_manager.h"
 
 #include <QtCore/QFile>
@@ -13,7 +8,6 @@
 #include <nx/utils/log/log.h>
 
 #include "streesaxhandler.h"
-
 
 namespace nx {
 namespace utils {

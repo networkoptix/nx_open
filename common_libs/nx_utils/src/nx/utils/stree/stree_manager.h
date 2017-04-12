@@ -1,8 +1,3 @@
-/**********************************************************
-* May 17, 2016
-* a.kolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <memory>
@@ -11,7 +6,6 @@
 #include "node.h"
 #include "resourcecontainer.h"
 #include "resourcenameset.h"
-
 
 namespace nx {
 namespace utils {
