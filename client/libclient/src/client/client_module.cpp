@@ -262,7 +262,6 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     const auto brand = startupParams.isDevMode() ? QString() : QnAppInfo::productNameShort();
     const auto customization = startupParams.isDevMode() ? QString() : QnAppInfo::customizationName();
 
-    //TODO: #GDM #3.1 move to client library
     m_staticCommon.reset(new QnStaticCommonModule(clientPeerType, brand, customization));
 
     /* Just to feel safe */
