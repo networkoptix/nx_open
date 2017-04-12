@@ -162,6 +162,12 @@ NX_UTILS_API void serializeNameValuePairs(
     const QMap<QByteArray, QByteArray>& params,
     QByteArray* const dstBuffer);
 
+/**
+ * Removes all ampersands that are not concatenated with others
+ * and not followed by whitespace.
+ */
+NX_UTILS_API QString removeMnemonics(QString text);
+
 //!Splits \a data by \a delimiter not closed within quotes
 /*!
     E.g.:

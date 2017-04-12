@@ -136,7 +136,7 @@ void QnPlAreconVisionResource::setHostAddress(const QString& hostAddr)
 
 bool QnPlAreconVisionResource::ping()
 {
-    nx::utils::concurrent::QnFuture<bool> result(1);
+    nx::utils::concurrent::Future<bool> result(1);
     checkIfOnlineAsync(
         [&result]( bool onlineOrNot ) {
             result.setResultAt(0, onlineOrNot);

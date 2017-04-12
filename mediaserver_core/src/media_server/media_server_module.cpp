@@ -51,19 +51,19 @@ void installTranslations()
 QnMediaServerModule::QnMediaServerModule(
     const QString& enforcedMediatorEndpoint,
     QObject* parent)
-:
-    m_staticCommon(new QnStaticCommonModule(
+{
+    m_staticCommon.reset(new QnStaticCommonModule(
         Qn::PT_Server,
         QnAppInfo::productNameShort(),
         QnAppInfo::customizationName(),
-        this)),
-    m_commonModule(new QnCommonModule(/*clientMode*/ false, this))
-{
-    instance<QnLongRunnablePool>();
+        this));
+
+    m_commonModule.reset(new QnCommonModule(/*clientMode*/ false, this));
 
     Q_INIT_RESOURCE(mediaserver_core);
     Q_INIT_RESOURCE(appserver2);
 
+    instance<QnLongRunnablePool>();
     instance<QnWriterPool>();
 #ifdef ENABLE_ONVIF
     store<PasswordHelper>(new PasswordHelper());
@@ -117,6 +117,7 @@ QnMediaServerModule::QnMediaServerModule(
 
 QnMediaServerModule::~QnMediaServerModule()
 {
+    clear();
 }
 
 StreamingChunkCache* QnMediaServerModule::streamingChunkCache() const
@@ -126,5 +127,5 @@ StreamingChunkCache* QnMediaServerModule::streamingChunkCache() const
 
 QnCommonModule* QnMediaServerModule::commonModule() const
 {
-    return m_commonModule;
+    return m_commonModule.get();
 }

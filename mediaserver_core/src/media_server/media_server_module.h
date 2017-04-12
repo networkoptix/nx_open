@@ -30,8 +30,8 @@ public:
     StreamingChunkCache* streamingChunkCache() const;
     QnCommonModule* commonModule() const;
 private:
-    QnStaticCommonModule* m_staticCommon = nullptr;
-    QnCommonModule* m_commonModule = nullptr;
+    std::shared_ptr<QnStaticCommonModule> m_staticCommon;
+    std::shared_ptr<QnCommonModule> m_commonModule;
 
     std::shared_ptr<StreamingChunkCache> m_streamingChunkCache;
 

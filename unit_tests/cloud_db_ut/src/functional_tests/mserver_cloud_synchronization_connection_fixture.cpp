@@ -1,7 +1,7 @@
 #include "mserver_cloud_synchronization_connection_fixture.h"
 
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/test_support/utils.h>
-#include <nx/utils/url_builder.h>
 
 #include <nx_ec/ec_proto_version.h>
 
@@ -91,7 +91,7 @@ void Ec2MserverCloudSynchronizationConnection::closeAllConnections()
 
 QUrl Ec2MserverCloudSynchronizationConnection::cdbSynchronizationUrl() const
 {
-    return utils::UrlBuilder().setScheme("http")
+    return network::url::Builder().setScheme("http")
         .setHost(endpoint().address.toString()).setPort(endpoint().port);
 }
 

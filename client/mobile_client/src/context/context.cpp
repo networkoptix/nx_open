@@ -22,7 +22,7 @@
 #include <helpers/system_helpers.h>
 #include <settings/last_connection.h>
 #include <settings/qml_settings_adaptor.h>
-#include <nx/utils/url_builder.h>
+#include <nx/network/url/url_builder.h>
 
 using namespace nx::vms::utils;
 
@@ -237,7 +237,7 @@ QUrl QnContext::getWebSocketUrl() const
     if (port == 0)
         return QUrl();
 
-    return nx::utils::UrlBuilder()
+    return nx::network::url::Builder()
         .setScheme(lit("ws"))
         .setHost(lit("localhost"))
         .setPort(port);

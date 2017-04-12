@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <qtcore/QElapsedTimer>
+#include <QtCore/QElapsedTimer>
 
 #include <nx/utils/test_support/module_instance_launcher.h>
 #include <test_support/appserver2_process.h>
