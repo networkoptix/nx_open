@@ -1504,13 +1504,13 @@
             }
         },
         {
-            "keys": ["Samsung*|SNF-8010"],
+            "keys": ["Samsung*|SNF-8010*"],
             "forcedOnvifParams": {
                 "profiles": ["SourceH264,MOBILE"]
             }
         },
         {
-            "keys": ["Samsung*|PNF-9010"],
+            "keys": ["Samsung*|PNF-9010*"],
             "forcedOnvifParams": {
                 "profiles": ["FisheyeView,MOBILE"]
             }
