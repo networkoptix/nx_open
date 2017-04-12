@@ -8,6 +8,8 @@
 
 #include <plugins/resource/acti/acti_resource_searcher.h>
 #include <plugins/resource/adam/adam_resource_searcher.h>
+#include <plugins/resource/flir/flir_onvif_resource_searcher.h>
+#include <plugins/resource/flir/flir_fc_resource_searcher.h>
 #include <plugins/resource/arecontvision/resource/av_resource_searcher.h>
 #include <plugins/resource/axis/axis_resource_searcher.h>
 #include <plugins/resource/d-link/dlink_resource_searcher.h>
@@ -23,6 +25,8 @@
 #include <plugins/storage/dts/vmax480/vmax480_resource_searcher.h>
 #include <common/common_module.h>
 
+using namespace nx::plugins;
+
 QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnCommonModule* commonModule):
     QObject(),
     QnCommonModuleAware(commonModule)
@@ -37,6 +41,7 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnCommonModule* c
     QnDesktopCameraDeleter* autoDeleter = new QnDesktopCameraDeleter(this);
     Q_UNUSED(autoDeleter); /* Class instance will be auto-deleted in our dtor. */
 #endif  //ENABLE_DESKTOP_CAMERA
+
 
 #ifndef EDGE_SERVER
     #ifdef ENABLE_ARECONT
@@ -67,7 +72,18 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnCommonModule* c
     #ifdef ENABLE_ADVANTECH
         m_searchers << new QnAdamResourceSearcher(commonModule);
     #endif
+    #ifdef ENABLE_FLIR
+        m_searchers << new flir::FcResourceSearcher(commonModule);
+        m_searchers << new QnFlirResourceSearcher(commonModule);
+        #ifdef ENABLE_ONVIF
+        bool enableSequentialFlirOnvifSearcher = QnCommonModuleAware::commonModule()
+            ->globalSettings()
+            ->sequentialFlirOnvifSearcherEnabled();
 
+        if (enableSequentialFlirOnvifSearcher)
+            m_searchers << new flir::OnvifResourceSearcher(commonModule);
+        #endif
+    #endif
     #if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
         m_searchers << new QnPlVmax480ResourceSearcher(commonModule);
     #endif
@@ -76,7 +92,6 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnCommonModule* c
 
         //Onvif searcher should be the last:
     #ifdef ENABLE_ONVIF
-        m_searchers << new QnFlirResourceSearcher(commonModule);
         m_searchers << new QnFlexWatchResourceSearcher(commonModule);
         m_searchers << new OnvifResourceSearcher(commonModule);
     #endif //ENABLE_ONVIF

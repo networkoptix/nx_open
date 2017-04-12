@@ -30,7 +30,9 @@ public:
      * @param liveMode Used to find a server to query transcoding capability.
      * @param positionMs Used when not liveMode, to find a server to query transcoding capability.
      * @return Either one of kQualityLow or kQialityHigh tokens, or a custom resolution which can
-     *     have width set to <=0 to indicate "auto" width.
+     *     have width set to <=0 to indicate "auto" width. ATTENTION: This method does not inspect
+     *     camera aspect ratio, thus, the returned custom size width should be treated as specified
+     *     in logical pixels.
      */
     static QSize chooseVideoQuality(
         AVCodecID transcodingCodec,

@@ -7,6 +7,7 @@ import sys
 import os.path
 import logging
 import pytest
+from netaddr import IPAddress
 from test_utils.utils import SimpleNamespace
 from test_utils.session import TestSession
 from test_utils.customization import read_customization_company_name
@@ -15,14 +16,13 @@ from test_utils.host import SshHostConfig
 from test_utils.vagrant_box_config import BoxConfigFactory
 from test_utils.cloud_host import resolve_cloud_host_from_registry, create_cloud_host
 from test_utils.server import ServerConfigFactory
-from test_utils.camera import SampleMediaFile, Camera
+from test_utils.camera import SampleMediaFile, CameraFactory
 
 
 DEFAULT_CLOUD_GROUP = 'test'
 DEFAULT_CUSTOMIZATION = 'default'
 
 DEFAULT_WORK_DIR = os.path.expanduser('/tmp/funtest')
-DEFAULT_BIN_DIR = os.path.expanduser('/tmp/binaries')
 
 DEFAULT_VM_NAME_PREFIX = 'funtest-'
 DEFAULT_REST_API_FORWARDED_PORT_BASE = 17000
@@ -33,6 +33,7 @@ DEFAULT_VM_HOST_DIR = '/tmp/jenkins-test'
 DEFAULT_MAX_LOG_WIDTH = 500
 
 MEDIA_SAMPLE_FPATH = 'sample.mkv'
+MEDIA_STREAM_FPATH = 'sample.testcam-stream.data'
 
 
 log = logging.getLogger(__name__)
@@ -47,11 +48,13 @@ def pytest_addoption(parser):
                           ' default is %r' % DEFAULT_CUSTOMIZATION)
     parser.addoption('--work-dir', default=DEFAULT_WORK_DIR,
                      help='working directory for tests: all generated files will be placed there')
-    parser.addoption('--bin-dir', default=DEFAULT_BIN_DIR,
+    parser.addoption('--bin-dir',
                      help='directory with binary files for tests:'
                           ' debian distributive and media sample are expected there')
     parser.addoption('--media-sample-path', default=MEDIA_SAMPLE_FPATH,
-                     help='media sample file path, default is %s in binany directory' % MEDIA_SAMPLE_FPATH)
+                     help='media sample file path, default is %s at binary directory' % MEDIA_SAMPLE_FPATH)
+    parser.addoption('--media-stream-path', default=MEDIA_STREAM_FPATH,
+                     help='media sample test camera stream file path, default is %s at binary directory' % MEDIA_STREAM_FPATH)
     parser.addoption('--no-servers-reset', action='store_true',
                      help='skip servers reset/cleanup on test setup')
     parser.addoption('--recreate-boxes', action='store_true',
@@ -60,6 +63,9 @@ def pytest_addoption(parser):
                      help='prefix for virtualenv machine names')
     parser.addoption('--vm-port-base', type=int, default=DEFAULT_REST_API_FORWARDED_PORT_BASE,
                      help='base REST API port forwarded to host')
+    parser.addoption('--vm-address', type=IPAddress,
+                     help='IP address virtual machines bind to.'
+                     ' Test camera discovery will answer only to this address if this option is specified.')
     parser.addoption('--vm-host',
                      help='hostname or IP address for host with virtualbox,'
                           ' used to start virtual machines (by default it is local host)')
@@ -82,16 +88,20 @@ def run_options(request):
             key_file_path=request.config.getoption('--vm-host-key'))
     else:
         vm_ssh_host_config = None
+    bin_dir = request.config.getoption('--bin-dir')
+    assert bin_dir, 'Argument --bin-dir is required'
     return SimpleNamespace(
         cloud_group=request.config.getoption('--cloud-group'),
         customization=request.config.getoption('--customization'),
         work_dir=request.config.getoption('--work-dir'),
         bin_dir=request.config.getoption('--bin-dir'),
         media_sample_path=request.config.getoption('--media-sample-path'),
+        media_stream_path=request.config.getoption('--media-stream-path'),
         reset_servers=not request.config.getoption('--no-servers-reset'),
         recreate_boxes=request.config.getoption('--recreate-boxes'),
         vm_name_prefix=request.config.getoption('--vm-name-prefix'),
         vm_port_base=request.config.getoption('--vm-port-base'),
+        vm_address=request.config.getoption('--vm-address'),
         vm_ssh_host_config=vm_ssh_host_config,
         vm_host_work_dir=request.config.getoption('--vm-host-dir'),
         max_log_width=request.config.getoption('--max-log-width'),
@@ -104,6 +114,11 @@ def customization_company_name(run_options):
 
 @pytest.fixture(params=['http', 'https'])
 def http_schema(request):
+    return request.param
+
+
+@pytest.fixture(params=['rtsp', 'webm', 'hls', 'direct-hls'])
+def stream_type(request):
     return request.param
 
 
@@ -130,8 +145,16 @@ def cloud_host(run_options, cloud_host_host):
 
 
 @pytest.fixture
-def camera():
-    return Camera()
+def camera_factory(run_options):
+    stream_path = os.path.abspath(os.path.join(run_options.bin_dir, run_options.media_stream_path))
+    assert os.path.isfile(stream_path), '%s is expected at %s' % (os.path.basename(stream_path), os.path.dirname(stream_path))
+    factory = CameraFactory(run_options.vm_address, stream_path)
+    yield factory
+    factory.close()
+
+@pytest.fixture
+def camera(camera_factory):
+    return camera_factory()
 
 
 @pytest.fixture

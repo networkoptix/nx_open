@@ -1,3 +1,5 @@
+#ifdef ENABLE_FLIR
+
 #include "flir_eip_resource.h"
 #include "common/common_module.h"
 #include <utils/common/synctime.h>
@@ -627,9 +629,58 @@ MessageRouterRequest QnFlirEIPResource::buildEIPOutputPortRequest(const QString 
 
 bool QnFlirEIPResource::setRelayOutputState(const QString &outputID, bool activate, unsigned int autoResetTimeoutMS)
 {
+    QnMutexLocker lock(&m_ioMutex);
     QString id = outputID.isEmpty() ?
         m_outputPorts[0].id :
         outputID;
+
+
+    if (!activate)
+    {
+        for (auto it = m_autoResetTimers.begin(); it != m_autoResetTimers.end(); ++it)
+        {
+            auto timerId = it->first;
+            auto portTimerEntry = it->second;
+            if (it->second.portId == outputID)
+            {
+                nx::utils::TimerManager::instance()->deleteTimer(timerId);
+                it = m_autoResetTimers.erase(it);
+                break;
+            }
+        }
+    }
+
+    if (activate && autoResetTimeoutMS)
+    {
+        auto autoResetTimer = nx::utils::TimerManager::instance()->addTimer(
+            [this](quint64  timerId)
+            {
+                boost::optional<PortTimerEntry> timerEntry(boost::none);
+
+                {
+                    QnMutexLocker lock(&m_ioMutex);
+                    if (m_autoResetTimers.count(timerId))
+                    {
+                        timerEntry = m_autoResetTimers[timerId];
+                        m_autoResetTimers.erase(timerId);
+                    }
+                }
+
+                if (timerEntry)
+                {
+                    setRelayOutputState(
+                        timerEntry->portId,
+                        timerEntry->state,
+                        0);
+                }
+            },
+            std::chrono::milliseconds(autoResetTimeoutMS));
+
+        PortTimerEntry portTimerEntry;
+        portTimerEntry.portId = outputID;
+        portTimerEntry.state = !activate;
+        m_autoResetTimers[autoResetTimer] = portTimerEntry;
+    }
 
     auto req = buildEIPOutputPortRequest(id, activate);
     return m_outputEipAsyncClient->doServiceRequestAsync(req);
@@ -830,3 +881,5 @@ quint8 QnFlirEIPResource::getOutputPortCIPAttributeById(const QString &portId) c
 {
     return static_cast<quint8>(portId.toUInt());
 }
+
+#endif
