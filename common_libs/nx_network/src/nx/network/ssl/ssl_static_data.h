@@ -16,7 +16,7 @@ namespace ssl {
  */
 void initOpenSSLGlobalLock();
 
-class SslStaticData
+class NX_NETWORK_API SslStaticData
 {
 public:
     std::unique_ptr<EVP_PKEY, decltype(&EVP_PKEY_free)> pkey;

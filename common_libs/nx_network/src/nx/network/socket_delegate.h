@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "abstract_socket.h"
 
 namespace nx {
@@ -248,51 +250,44 @@ public:
     }
 };
 
-class StreamSocketDelegate:
+/**
+ * Does not takes ownership.
+ */
+class NX_NETWORK_API StreamSocketDelegate:
     public CommunicatingSocketDelegate<AbstractStreamSocket>
 {
     using base_type = CommunicatingSocketDelegate<AbstractStreamSocket>;
 
 public:
-    StreamSocketDelegate(AbstractStreamSocket* target):
-        base_type(target)
-    {
-    }
+    StreamSocketDelegate(AbstractStreamSocket* target);
 
-    virtual bool reopen() override
-    {
-        return this->m_target->reopen();
-    }
+    virtual bool reopen() override;
+    virtual bool setNoDelay(bool value) override;
+    virtual bool getNoDelay(bool* value) const override;
+    virtual bool toggleStatisticsCollection(bool val) override;
+    virtual bool getConnectionStatistics(StreamSocketInfo* info) override;
+    virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override;
+    virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const override;
+};
 
-    virtual bool setNoDelay(bool value) override
-    {
-        return this->m_target->setNoDelay(value);
-    }
+class NX_NETWORK_API StreamServerSocketDelegate:
+    public SocketDelegate<AbstractStreamServerSocket>
+{
+    using base_type = SocketDelegate<AbstractStreamServerSocket>;
 
-    virtual bool getNoDelay(bool* value) const override
-    {
-        return this->m_target->getNoDelay(value);
-    }
+public:
+    StreamServerSocketDelegate(AbstractStreamServerSocket* target);
 
-    virtual bool toggleStatisticsCollection(bool val) override
-    {
-        return this->m_target->toggleStatisticsCollection(val);
-    }
-
-    virtual bool getConnectionStatistics(StreamSocketInfo* info) override
-    {
-        return this->m_target->getConnectionStatistics(info);
-    }
-
-    virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override
-    {
-        return this->m_target->setKeepAlive(info);
-    }
-
-    virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const override
-    {
-        return this->m_target->getKeepAlive(result);
-    }
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler);
+    virtual void pleaseStopSync(bool assertIfCalledUnderLock = true);
+    virtual bool listen(int backlog = kDefaultBacklogSize) override;
+    virtual AbstractStreamSocket* accept();
+    virtual void acceptAsync(
+        nx::utils::MoveOnlyFunc<void(
+            SystemError::ErrorCode,
+            AbstractStreamSocket*)> handler);
+    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler);
+    virtual void cancelIOSync();
 };
 
 } // namespace network

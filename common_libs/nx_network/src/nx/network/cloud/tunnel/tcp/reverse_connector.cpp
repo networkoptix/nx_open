@@ -2,6 +2,7 @@
 
 #include "reverse_headers.h"
 
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/log/log.h>
 
@@ -65,7 +66,7 @@ void ReverseConnector::connect(const SocketAddress& endpoint, ConnectHandler han
 
     QObject::connect(m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, onHttpDone);
     QObject::connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done, onHttpDone);
-    m_httpClient->doOptions(endpoint.toUrl());
+    m_httpClient->doOptions(url::Builder().setScheme("http").setEndpoint(endpoint).toUrl());
 }
 
 std::unique_ptr<BufferedStreamSocket> ReverseConnector::takeSocket()

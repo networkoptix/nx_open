@@ -7,7 +7,11 @@ win* {
 win* {
     PRECOMPILED_HEADER = StdAfx.h
     PRECOMPILED_SOURCE = StdAfx.cpp
-}    
+}
+
+linux {
+    QMAKE_CXXFLAGS += -Werror
+}
 
 SOURCES += ${project.build.directory}/app_info_impl.cpp
 
