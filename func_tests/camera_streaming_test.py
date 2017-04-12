@@ -60,6 +60,7 @@ def check_media_stream_transports(server):
 
 # https://networkoptix.atlassian.net/browse/TEST-178
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/77234376/Camera+history+test
+@pytest.mark.testcam
 def test_camera_switching_should_be_represented_in_history(env, camera):
     camera.start_streaming()
     camera.wait_until_discovered_by_server([env.one, env.two])
