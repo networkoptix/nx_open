@@ -1,8 +1,9 @@
-#ifndef UPDATE_UPLOADER_H
-#define UPDATE_UPLOADER_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QSet>
+
+#include <client_core/connection_context_aware.h>
 
 #include <nx/utils/uuid.h>
 #include <core/resource/resource_fwd.h>
@@ -12,7 +13,8 @@ class QFile;
 class QTimer;
 struct QnUploadUpdateReply;
 
-class QnUpdateUploader : public QObject {
+class QnUpdateUploader : public QObject, public QnConnectionContextAware
+{
     Q_OBJECT
 public:
     enum ErrorCode {
@@ -24,6 +26,7 @@ public:
     };
 
     QnUpdateUploader(QObject *parent = 0);
+    virtual ~QnUpdateUploader() override;
 
     bool uploadUpdate(const QString &updateId, const QString &fileName, const QSet<QnUuid> &peers);
 
@@ -63,5 +66,3 @@ private:
     QHash<QnUuid, int> m_progressById;
     QTimer *m_chunkTimer;
 };
-
-#endif // UPDATE_UPLOADER_H

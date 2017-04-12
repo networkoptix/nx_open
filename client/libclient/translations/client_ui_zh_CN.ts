@@ -5,6 +5,11 @@
     <name>AboutDialog</name>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui"/>
+        <source>About</source>
+        <translation>关于</translation>
+    </message>
+    <message>
+        <location/>
         <source>Information</source>
         <translation>信息</translation>
     </message>
@@ -25,13 +30,8 @@
     </message>
     <message>
         <location/>
-        <source>About</source>
-        <translation>关于</translation>
-    </message>
-    <message>
-        <location/>
         <source>System Servers</source>
-        <translation type="unfinished"></translation>
+        <translation>系统服务器</translation>
     </message>
 </context>
 <context>
@@ -39,13 +39,23 @@
     <message>
         <location filename="../src/ui/widgets/properties/accessible_resources_widget.ui"/>
         <source>Filter</source>
-        <translation type="unfinished">过滤器</translation>
+        <translation>过滤器</translation>
     </message>
 </context>
 <context>
     <name>AdjustVideoDialog</name>
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.ui"/>
+        <source>Image Enhancement</source>
+        <translation>图像增强</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Enable image enhancement</source>
+        <translation>启用图像增强</translation>
+    </message>
+    <message>
+        <location/>
         <source>Gamma</source>
         <translation>伽玛</translation>
     </message>
@@ -53,11 +63,6 @@
         <location/>
         <source>Auto</source>
         <translation>自动</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Image Enhancement</source>
-        <translation>图像增强</translation>
     </message>
     <message>
         <location/>
@@ -69,48 +74,43 @@
         <source>White level</source>
         <translation>白电平</translation>
     </message>
-    <message>
-        <location/>
-        <source>Enable image enhancement</source>
-        <translation>启用图像增强</translation>
-    </message>
 </context>
 <context>
     <name>AdvancedSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/local_settings/advanced_settings_widget.ui"/>
         <source>Downmix Audio from 5.1 to 2.1</source>
-        <translation type="unfinished">从5.1到2.1的混合音频</translation>
+        <translation>从5.1到2.1的混合音频</translation>
     </message>
     <message>
         <location/>
         <source>Double Buffering</source>
-        <translation type="unfinished"></translation>
+        <translation>双缓冲</translation>
     </message>
     <message>
         <location/>
         <source>Disable only if the client takes too much CPU</source>
-        <translation type="unfinished"></translation>
+        <translation>禁用客户端占用过多CPU</translation>
     </message>
     <message>
         <location/>
         <source>Maximum Live Buffer Length</source>
-        <translation type="unfinished"></translation>
+        <translation>最大的缓冲区长度</translation>
     </message>
     <message>
         <location/>
         <source>Browse Logs</source>
-        <translation type="unfinished">浏览记录</translation>
+        <translation>浏览记录</translation>
     </message>
     <message>
         <location/>
         <source>Clear Local Cache</source>
-        <translation type="unfinished">清除本地缓存</translation>
+        <translation>清除本地缓存</translation>
     </message>
     <message>
         <location/>
         <source>Reset All Warnings</source>
-        <translation type="unfinished"></translation>
+        <translation>重置所有警告</translation>
     </message>
 </context>
 <context>
@@ -141,27 +141,27 @@
     <message>
         <location filename="../src/nx/client/ui/dialogs/debug/applauncher_control_dialog.ui"/>
         <source>Add External Storage...</source>
-        <translation type="unfinished">增加外部存储...</translation>
+        <translation>增加外部存储...</translation>
     </message>
     <message>
         <location/>
         <source>Version:</source>
-        <translation type="unfinished"></translation>
+        <translation>版本：</translation>
     </message>
     <message>
         <location/>
         <source>Check</source>
-        <translation type="unfinished">检查</translation>
+        <translation>检查</translation>
     </message>
     <message>
         <location/>
         <source>Not Checked</source>
-        <translation type="unfinished"></translation>
+        <translation>未检查</translation>
     </message>
     <message>
         <location/>
         <source>Get Installed Versions</source>
-        <translation type="unfinished"></translation>
+        <translation>获取安装的版本</translation>
     </message>
 </context>
 <context>
@@ -234,17 +234,17 @@
     <message>
         <location/>
         <source>Clear Filter</source>
-        <translation type="unfinished">清除过滤器</translation>
+        <translation>清除过滤器</translation>
     </message>
     <message>
         <location/>
         <source>Email settings</source>
-        <translation type="unfinished">邮件设置</translation>
+        <translation>邮件设置</translation>
     </message>
     <message>
         <location/>
         <source>All servers are offline. Audit data is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>所有服务器离线，审查数据不可用。</translation>
     </message>
 </context>
 <context>
@@ -267,22 +267,22 @@
     <message>
         <location/>
         <source>Mbit/s</source>
-        <translation>Mbit/s</translation>
+        <translation>Mb/s</translation>
     </message>
     <message>
         <location/>
         <source>Bitrate limitation could lead to backup failure.</source>
-        <translation type="unfinished"></translation>
+        <translation>比特率限制可能导致备份失败。</translation>
     </message>
     <message>
         <location/>
         <source>Finish</source>
-        <translation type="unfinished"></translation>
+        <translation>结束</translation>
     </message>
     <message>
         <location/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>开始</translation>
     </message>
 </context>
 <context>
@@ -290,37 +290,37 @@
     <message>
         <location filename="../src/ui/dialogs/backup_settings_dialog.ui"/>
         <source>Backup Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>备份设置</translation>
     </message>
     <message>
         <location/>
         <source>Server Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>服务器设置</translation>
     </message>
     <message>
         <location/>
         <source>Set Schedule...</source>
-        <translation type="unfinished">设置计划表...</translation>
+        <translation>设置计划表...</translation>
     </message>
     <message>
         <location/>
         <source>Only further recording will be backed up. Backup process will ignore existing footage.</source>
-        <translation type="unfinished"></translation>
+        <translation>最近的录像会进行备份，备份进程将忽略已存在的录像</translation>
     </message>
     <message>
         <location/>
         <source>Execute Backup</source>
-        <translation type="unfinished">执行备份</translation>
+        <translation>执行备份</translation>
     </message>
     <message>
         <location/>
         <source>Backup Archive From</source>
-        <translation type="unfinished"></translation>
+        <translation>从备份存档中恢复</translation>
     </message>
     <message>
         <location/>
         <source>Backup Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>备份质量</translation>
     </message>
 </context>
 <context>
@@ -361,27 +361,27 @@
     <message>
         <location/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>名称</translation>
     </message>
     <message>
         <location/>
         <source>Description</source>
-        <translation type="unfinished">&amp;描述</translation>
+        <translation>&amp;描述</translation>
     </message>
     <message>
         <location/>
         <source>Timeout</source>
-        <translation type="unfinished">&amp;超时</translation>
+        <translation>&amp;超时</translation>
     </message>
     <message>
         <location/>
         <source>Tags</source>
-        <translation type="unfinished"></translation>
+        <translation>标签</translation>
     </message>
     <message>
         <location/>
         <source>List of tags divided by commas</source>
-        <translation type="unfinished"></translation>
+        <translation>被逗号分开的标记的列表</translation>
     </message>
 </context>
 <context>
@@ -404,7 +404,7 @@
     <message>
         <location/>
         <source>Clear Filter</source>
-        <translation type="unfinished">清除过滤器</translation>
+        <translation>清除过滤器</translation>
     </message>
 </context>
 <context>
@@ -460,25 +460,30 @@
     <message>
         <location/>
         <source>Event Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>事件规则</translation>
     </message>
     <message>
         <location/>
         <source>Event Log...</source>
-        <translation type="unfinished"></translation>
+        <translation>事件日志...</translation>
     </message>
 </context>
 <context>
     <name>CameraAdditionDialog</name>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui"/>
-        <source>Auto</source>
-        <translation>自动</translation>
+        <source>Server is offline</source>
+        <translation>服务器离线</translation>
     </message>
     <message>
         <location/>
-        <source>Scanning...</source>
-        <translation>搜索中...</translation>
+        <source>IP, hostname, RTSP link...</source>
+        <translation>IP，主机名，RTSP链接...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Auto</source>
+        <translation>自动</translation>
     </message>
     <message>
         <location/>
@@ -487,13 +492,8 @@
     </message>
     <message>
         <location/>
-        <source>Server is offline</source>
-        <translation>服务器离线</translation>
-    </message>
-    <message>
-        <location/>
-        <source>IP, hostname, RTSP link...</source>
-        <translation>IP，主机名，RTSP链接...</translation>
+        <source>Scanning...</source>
+        <translation>搜索中...</translation>
     </message>
     <message>
         <location/>
@@ -528,47 +528,47 @@
     <message>
         <location/>
         <source>Device Address</source>
-        <translation type="unfinished">设备地址:</translation>
+        <translation>设备地址:</translation>
     </message>
     <message>
         <location/>
         <source>Start IP</source>
-        <translation type="unfinished"></translation>
+        <translation>开始 IP</translation>
     </message>
     <message>
         <location/>
         <source>End IP</source>
-        <translation type="unfinished"></translation>
+        <translation>结束 IP</translation>
     </message>
     <message>
         <location/>
         <source>Subnet Scan</source>
-        <translation type="unfinished">&amp;子网搜索</translation>
+        <translation>&amp;子网搜索</translation>
     </message>
     <message>
         <location/>
         <source>Discovery Port</source>
-        <translation type="unfinished">&amp;发现端口:</translation>
+        <translation>&amp;发现端口:</translation>
     </message>
     <message>
         <location/>
         <source>Password</source>
-        <translation type="unfinished">密码</translation>
+        <translation>密码</translation>
     </message>
     <message>
         <location/>
         <source>Login</source>
-        <translation type="unfinished">登录</translation>
+        <translation>登录</translation>
     </message>
     <message>
         <location/>
         <source>Scan</source>
-        <translation type="unfinished"></translation>
+        <translation>搜索</translation>
     </message>
     <message>
         <location/>
         <source>Add selected</source>
-        <translation type="unfinished">&amp;添加选中</translation>
+        <translation>&amp;添加选中</translation>
     </message>
 </context>
 <context>
@@ -589,12 +589,12 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
         <source>about:blank</source>
-        <translation>空白页</translation>
+        <translation type="unfinished">about:blank</translation>
     </message>
     <message>
         <location/>
         <source>Advanced settings are unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>高级的设置都不可用</translation>
     </message>
 </context>
 <context>
@@ -611,6 +611,11 @@
     </message>
     <message>
         <location/>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
+        <translation>注意！当前视频质量和帧率将无法与录像计划中的录像设置同步.</translation>
+    </message>
+    <message>
+        <location/>
         <source>Secondary Stream Control</source>
         <translation>次码流控制</translation>
     </message>
@@ -618,6 +623,11 @@
         <location/>
         <source>Override secondary stream quality</source>
         <translation>次码流画质</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Do not use</source>
+        <translation>不使用</translation>
     </message>
     <message>
         <location/>
@@ -633,6 +643,11 @@
         <location/>
         <source>High quality</source>
         <translation>高画质</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
+        <translation>注意！选择高画质将会影响CPU和网络性能，可能会导致系统稳定性.</translation>
     </message>
     <message>
         <location/>
@@ -667,12 +682,12 @@
     <message>
         <location/>
         <source>TCP</source>
-        <translation></translation>
+        <translation>TCP</translation>
     </message>
     <message>
         <location/>
         <source>UDP</source>
-        <translation></translation>
+        <translation>UDP</translation>
     </message>
     <message>
         <location/>
@@ -686,48 +701,33 @@
     </message>
     <message>
         <location/>
-        <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
-        <translation>系统管理中禁用“允许系统更改摄像机配置”.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-        <translation>注意！当前视频质量和帧率将无法与录像计划中的录像设置同步.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Do not use</source>
-        <translation>不使用</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-        <translation>注意！选择高画质将会影响CPU和网络性能，可能会导致系统稳定性.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-        <translation>注意！请不要改变以下参数，可能会影响系统稳定性.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Motion detection control</source>
-        <translation type="unfinished"></translation>
+        <translation>移动侦测控制</translation>
     </message>
     <message>
         <location/>
         <source>Force motion detection for stream:</source>
-        <translation type="unfinished"></translation>
+        <translation>视频流中进行移动侦测</translation>
     </message>
     <message>
         <location/>
         <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
-        <translation type="unfinished"></translation>
+        <translation>通过计算GOP代替码流(将增加摄像机的码流)</translation>
     </message>
     <message>
         <location/>
         <source>Keep camera streams and profiles settings</source>
-        <translation type="unfinished"></translation>
+        <translation>保持相机溪流和配置文件设置</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
+        <translation>系统管理中禁用“允许系统更改摄像机配置”.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
+        <translation>注意！请不要改变以下参数，可能会影响系统稳定性.</translation>
     </message>
 </context>
 <context>
@@ -743,7 +743,7 @@
     <message>
         <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
         <source>Add Device...</source>
-        <translation type="unfinished"></translation>
+        <translation>添加设备...</translation>
     </message>
 </context>
 <context>
@@ -751,17 +751,17 @@
     <message>
         <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
         <source>Output ID:</source>
-        <translation type="unfinished">&amp;输出ID:</translation>
+        <translation>&amp;输出ID:</translation>
     </message>
     <message>
         <location/>
         <source>Fixed duration:</source>
-        <translation type="unfinished">默认持续时间:</translation>
+        <translation>默认持续时间:</translation>
     </message>
     <message>
         <location/>
         <source>seconds</source>
-        <translation type="unfinished">s</translation>
+        <translation>s</translation>
     </message>
 </context>
 <context>
@@ -793,6 +793,11 @@
     </message>
     <message>
         <location/>
+        <source>Do Not Record</source>
+        <translation>不录像</translation>
+    </message>
+    <message>
+        <location/>
         <source>Fixed Archive Length</source>
         <translation>固定的录像范围</translation>
     </message>
@@ -800,6 +805,16 @@
         <location/>
         <source>Auto</source>
         <translation>自动</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Min. Days</source>
+        <translation>最小天数</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max. Days</source>
+        <translation>最大天数</translation>
     </message>
     <message>
         <location/>
@@ -823,58 +838,43 @@
     </message>
     <message>
         <location/>
-        <source>Do Not Record</source>
-        <translation>不录像</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Min. Days</source>
-        <translation>最小天数</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Max. Days</source>
-        <translation>最大天数</translation>
-    </message>
-    <message>
-        <location/>
         <source>Recording</source>
-        <translation type="unfinished">录像</translation>
+        <translation>录像</translation>
     </message>
     <message>
         <location/>
         <source>Activate License...</source>
-        <translation type="unfinished"></translation>
+        <translation>激活授权...</translation>
     </message>
     <message>
         <location/>
         <source>Show Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>低分辨率</translation>
     </message>
     <message>
         <location/>
         <source>Show FPS</source>
-        <translation type="unfinished"></translation>
+        <translation>显示每秒帧数</translation>
     </message>
     <message>
         <location/>
         <source>Copying Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>复制日程安排</translation>
     </message>
     <message>
         <location/>
         <source>Apply changes before copying schedule.</source>
-        <translation type="unfinished">复制日程前执行修改</translation>
+        <translation>复制日程前执行修改</translation>
     </message>
     <message>
         <location/>
         <source>Panic Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>危机模式</translation>
     </message>
     <message>
         <location/>
         <source>Motion + Lo-Res</source>
-        <translation type="unfinished"></translation>
+        <translation>移动+低分辨率</translation>
     </message>
 </context>
 <context>
@@ -882,7 +882,7 @@
     <message>
         <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
         <source>Change password</source>
-        <translation type="unfinished"></translation>
+        <translation>更改密码</translation>
     </message>
 </context>
 <context>
@@ -890,12 +890,12 @@
     <message>
         <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
         <source>Stay logged in</source>
-        <translation type="unfinished"></translation>
+        <translation>保持登录状态</translation>
     </message>
     <message>
         <location/>
-        <source>Incorrect Email or password</source>
-        <translation type="unfinished"></translation>
+        <source>Incorrect Email or Password</source>
+        <translation>错误的邮箱或密码</translation>
     </message>
 </context>
 <context>
@@ -969,16 +969,6 @@
     <name>EventLogDialog</name>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
-        <source>Refresh</source>
-        <translation>刷新</translation>
-    </message>
-    <message>
-        <location/>
-        <source>All Servers are offline. Logs are not available.</source>
-        <translation>所有服务器离线，日志不可用。</translation>
-    </message>
-    <message>
-        <location/>
         <source>Event Log</source>
         <translation>事件日志</translation>
     </message>
@@ -989,8 +979,18 @@
     </message>
     <message>
         <location/>
+        <source>Refresh</source>
+        <translation>刷新</translation>
+    </message>
+    <message>
+        <location/>
+        <source>All Servers are offline. Logs are not available.</source>
+        <translation>所有服务器离线，日志不可用。</translation>
+    </message>
+    <message>
+        <location/>
         <source>Event Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>事件规则...</translation>
     </message>
 </context>
 <context>
@@ -1023,12 +1023,12 @@
     <message>
         <location/>
         <source>Content type</source>
-        <translation type="unfinished"></translation>
+        <translation>内容类型</translation>
     </message>
     <message>
         <location/>
         <source>HTTP URL</source>
-        <translation type="unfinished"></translation>
+        <translation>HTTPS URL 地址</translation>
     </message>
 </context>
 <context>
@@ -1036,7 +1036,7 @@
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
         <source>PTZ preset:</source>
-        <translation type="unfinished">&amp;PTZ预置位:</translation>
+        <translation>&amp;PTZ预置位:</translation>
     </message>
 </context>
 <context>
@@ -1087,37 +1087,37 @@
     <message>
         <location/>
         <source>Fisheye Dewarping</source>
-        <translation type="unfinished"></translation>
+        <translation>鱼眼</translation>
     </message>
     <message>
         <location/>
         <source>Auto Calibration</source>
-        <translation type="unfinished">自动校准</translation>
+        <translation>自动校准</translation>
     </message>
     <message>
         <location/>
         <source>Mount Angle Correction:</source>
-        <translation type="unfinished"></translation>
+        <translation>安装角度修正︰</translation>
     </message>
     <message>
         <location/>
         <source>Y Offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Y 偏移量</translation>
     </message>
     <message>
         <location/>
         <source>X Offset</source>
-        <translation type="unfinished"></translation>
+        <translation>X 偏移量</translation>
     </message>
     <message>
         <location/>
         <source>Size</source>
-        <translation type="unfinished"></translation>
+        <translation>大小</translation>
     </message>
     <message>
         <location/>
         <source>Ellipticity</source>
-        <translation type="unfinished"></translation>
+        <translation>椭圆</translation>
     </message>
 </context>
 <context>
@@ -1129,13 +1129,13 @@
     </message>
     <message>
         <location/>
-        <source>after</source>
-        <translation>在</translation>
+        <source>Auto Pause Video</source>
+        <translation>自动暂停视频</translation>
     </message>
     <message>
         <location/>
-        <source>Auto Pause Video</source>
-        <translation>自动暂停视频</translation>
+        <source>after</source>
+        <translation>在</translation>
     </message>
     <message>
         <location/>
@@ -1145,42 +1145,42 @@
     <message>
         <location/>
         <source>Add...</source>
-        <translation type="unfinished">&amp;添加...</translation>
+        <translation>&amp;添加...</translation>
     </message>
     <message>
         <location/>
         <source>Remove</source>
-        <translation type="unfinished">删除</translation>
+        <translation>删除</translation>
     </message>
     <message>
         <location/>
         <source>Local Media Folders</source>
-        <translation type="unfinished"></translation>
+        <translation>本地媒体文件夹</translation>
     </message>
     <message>
         <location/>
         <source>Audio Input</source>
-        <translation type="unfinished"></translation>
+        <translation>音频输入</translation>
     </message>
     <message>
         <location/>
         <source>First Source</source>
-        <translation type="unfinished"></translation>
+        <translation>第一个源</translation>
     </message>
     <message>
         <location/>
         <source>None</source>
-        <translation type="unfinished">无</translation>
+        <translation>无</translation>
     </message>
     <message>
         <location/>
         <source>Second Source</source>
-        <translation type="unfinished"></translation>
+        <translation>第二个来源</translation>
     </message>
     <message>
         <location/>
-        <source>Run application when PC Boots up</source>
-        <translation type="unfinished"></translation>
+        <source>Run Application when PC Boots up</source>
+        <translation>PC 启动时运行的应用程序</translation>
     </message>
 </context>
 <context>
@@ -1193,7 +1193,7 @@
     <message>
         <location/>
         <source>Backup and Restore</source>
-        <translation type="unfinished"></translation>
+        <translation>备份和恢复</translation>
     </message>
 </context>
 <context>
@@ -1206,12 +1206,12 @@
     <message>
         <location/>
         <source>Aspect Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>长宽比</translation>
     </message>
     <message>
         <location/>
         <source>Rotation</source>
-        <translation type="unfinished"></translation>
+        <translation>旋转</translation>
     </message>
 </context>
 <context>
@@ -1229,7 +1229,7 @@
     <message>
         <location/>
         <source>No image</source>
-        <translation type="unfinished"></translation>
+        <translation>无图像</translation>
     </message>
 </context>
 <context>
@@ -1243,6 +1243,11 @@
         <location/>
         <source>General Settings</source>
         <translation>一般设定</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Layout is Locked</source>
+        <translation>Layout被锁定</translation>
     </message>
     <message>
         <location/>
@@ -1266,11 +1271,6 @@
     </message>
     <message>
         <location/>
-        <source>Layout is Locked</source>
-        <translation>Layout被锁定</translation>
-    </message>
-    <message>
-        <location/>
         <source>Processing Image...Please Wait.</source>
         <translation>处理图像...请稍候.</translation>
     </message>
@@ -1282,22 +1282,22 @@
     <message>
         <location/>
         <source>Crop to monitor aspect ratio</source>
-        <translation type="unfinished">&amp;裁切至显示器宽高比</translation>
+        <translation>&amp;裁切至显示器宽高比</translation>
     </message>
     <message>
         <location/>
         <source>Width:</source>
-        <translation type="unfinished">&amp;宽:</translation>
+        <translation>&amp;宽:</translation>
     </message>
     <message>
         <location/>
         <source>Height:</source>
-        <translation type="unfinished">&amp;高:</translation>
+        <translation>&amp;高:</translation>
     </message>
     <message>
         <location/>
         <source>Opacity:</source>
-        <translation type="unfinished">&amp;不透明度:</translation>
+        <translation>&amp;不透明度:</translation>
     </message>
 </context>
 <context>
@@ -1305,7 +1305,7 @@
     <message>
         <location filename="../src/ui/dialogs/ldap_settings_dialog.ui"/>
         <source>ldap(s)://host:port</source>
-        <translation>ldap(s)://host:port</translation>
+        <translation>ldap(s):/ / 主机︰ 端口</translation>
     </message>
     <message>
         <location/>
@@ -1325,27 +1325,27 @@
     <message>
         <location/>
         <source>Server URL</source>
-        <translation type="unfinished"></translation>
+        <translation>服务器 URL</translation>
     </message>
     <message>
         <location/>
         <source>Admin DN</source>
-        <translation type="unfinished"></translation>
+        <translation>管理员 DN</translation>
     </message>
     <message>
         <location/>
         <source>Password</source>
-        <translation type="unfinished">密码</translation>
+        <translation>密码</translation>
     </message>
     <message>
         <location/>
         <source>Search Base</source>
-        <translation type="unfinished"></translation>
+        <translation>搜索库</translation>
     </message>
     <message>
         <location/>
         <source>Search Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>搜索过滤器</translation>
     </message>
 </context>
 <context>
@@ -1357,16 +1357,6 @@
     </message>
     <message>
         <location/>
-        <source>Select users to import</source>
-        <translation>选择需导入的用户</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Filter...</source>
-        <translation>过滤器...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Loading...</source>
         <translation>加载中...</translation>
     </message>
@@ -1374,6 +1364,16 @@
         <location/>
         <source>Connection error</source>
         <translation>连接错误</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Role to assign to imported users</source>
+        <translation>给导入用户配置角色</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disable imported users</source>
+        <translation>禁用导入的用户</translation>
     </message>
 </context>
 <context>
@@ -1413,6 +1413,11 @@
     <name>LicenseManagerWidget</name>
     <message>
         <location filename="../src/ui/widgets/system_settings/license_manager_widget.ui"/>
+        <source>Active Licenses</source>
+        <translation>激活许可</translation>
+    </message>
+    <message>
+        <location/>
         <source>Remove</source>
         <translation>删除</translation>
     </message>
@@ -1423,18 +1428,13 @@
     </message>
     <message>
         <location/>
-        <source>Active Licenses</source>
-        <translation>激活许可</translation>
-    </message>
-    <message>
-        <location/>
         <source>Details...</source>
-        <translation type="unfinished"></translation>
+        <translation>详细信息...</translation>
     </message>
     <message>
         <location/>
         <source>The software is licensed to</source>
-        <translation type="unfinished"></translation>
+        <translation>软件的授权为:</translation>
     </message>
 </context>
 <context>
@@ -1447,15 +1447,15 @@
     <message>
         <location/>
         <source>License issues:</source>
-        <translation type="unfinished"></translation>
+        <translation>授权问题：</translation>
     </message>
 </context>
 <context>
     <name>LicenseWidget</name>
     <message>
         <location filename="../src/ui/widgets/system_settings/license_widget.ui"/>
-        <source>Browse...</source>
-        <translation>浏览...</translation>
+        <source>Manual Activation</source>
+        <translation>手动激活</translation>
     </message>
     <message>
         <location/>
@@ -1466,6 +1466,16 @@
         <location/>
         <source>Copy to Clipboard</source>
         <translation>复制到剪贴板</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select License File...</source>
+        <translation>选择授权文件...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Browse...</source>
+        <translation>浏览...</translation>
     </message>
     <message>
         <location/>
@@ -1484,38 +1494,28 @@
     </message>
     <message>
         <location/>
-        <source>Manual Activation</source>
-        <translation>手动激活</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select License File...</source>
-        <translation>选择授权文件...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Internet Activation</source>
-        <translation type="unfinished"></translation>
+        <translation>互联网激活</translation>
     </message>
     <message>
         <location/>
         <source>License Key</source>
-        <translation type="unfinished">许可密钥:</translation>
+        <translation>许可密钥:</translation>
     </message>
     <message>
         <location/>
         <source>Invalid License Key</source>
-        <translation type="unfinished"></translation>
+        <translation>无效授权</translation>
     </message>
     <message>
         <location/>
         <source>Hardware ID</source>
-        <translation type="unfinished">硬件ID:</translation>
+        <translation>硬件ID:</translation>
     </message>
     <message>
         <location/>
         <source>Activation Key File</source>
-        <translation type="unfinished">激活密钥文件:</translation>
+        <translation>激活密钥文件:</translation>
     </message>
 </context>
 <context>
@@ -1528,7 +1528,7 @@
     <message>
         <location/>
         <source>Activate License...</source>
-        <translation type="unfinished"></translation>
+        <translation>激活授权...</translation>
     </message>
 </context>
 <context>
@@ -1536,7 +1536,7 @@
     <message>
         <location filename="../src/ui/dialogs/local_settings_dialog.ui"/>
         <source>Local Settings</source>
-        <translation type="unfinished">本地设置</translation>
+        <translation>本地设置</translation>
     </message>
 </context>
 <context>
@@ -1554,37 +1554,37 @@
     <message>
         <location/>
         <source>Connection Options:</source>
-        <translation type="unfinished">&amp;连接选项:</translation>
+        <translation>&amp;连接选项:</translation>
     </message>
     <message>
         <location/>
         <source>Host</source>
-        <translation type="unfinished"></translation>
+        <translation>主机</translation>
     </message>
     <message>
         <location/>
         <source>Port</source>
-        <translation type="unfinished"></translation>
+        <translation>端口</translation>
     </message>
     <message>
         <location/>
         <source>Login</source>
-        <translation type="unfinished">登录</translation>
+        <translation>登录</translation>
     </message>
     <message>
         <location/>
         <source>Password</source>
-        <translation type="unfinished">密码</translation>
+        <translation>密码</translation>
     </message>
     <message>
         <location/>
         <source>Test</source>
-        <translation type="unfinished">测试</translation>
+        <translation>测试</translation>
     </message>
     <message>
         <location/>
         <source>Auto-Login</source>
-        <translation type="unfinished">&amp;自动登录</translation>
+        <translation>&amp;自动登录</translation>
     </message>
 </context>
 <context>
@@ -1607,42 +1607,42 @@
     <message>
         <location/>
         <source>Language</source>
-        <translation type="unfinished">语言:</translation>
+        <translation>语言:</translation>
     </message>
     <message>
         <location/>
         <source>Time Mode</source>
-        <translation type="unfinished">时间模式:</translation>
+        <translation>时间模式:</translation>
     </message>
     <message>
         <location/>
         <source>Image</source>
-        <translation type="unfinished">图片:</translation>
+        <translation>图片:</translation>
     </message>
     <message>
         <location/>
         <source>Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>模式</translation>
     </message>
     <message>
         <location/>
         <source>Intensity</source>
-        <translation type="unfinished">对比度:</translation>
+        <translation>对比度:</translation>
     </message>
     <message>
         <location/>
         <source>Show additional info in tree</source>
-        <translation type="unfinished"></translation>
+        <translation>在树中显示附加信息</translation>
     </message>
     <message>
         <location/>
         <source>Tour cycle</source>
-        <translation type="unfinished"></translation>
+        <translation>轮巡周期</translation>
     </message>
     <message>
         <location/>
         <source>seconds</source>
-        <translation type="unfinished">s</translation>
+        <translation>s</translation>
     </message>
 </context>
 <context>
@@ -1650,7 +1650,7 @@
     <message>
         <location filename="../src/ui/dialogs/common/message_box.ui"/>
         <source>Do not show this message again</source>
-        <translation type="unfinished"></translation>
+        <translation>不再显示此消息</translation>
     </message>
 </context>
 <context>
@@ -1667,13 +1667,18 @@
     </message>
     <message>
         <location/>
+        <source>Password:</source>
+        <translation>密码:</translation>
+    </message>
+    <message>
+        <location/>
         <source>Login:</source>
         <translation>登录:</translation>
     </message>
     <message>
         <location/>
-        <source>Password:</source>
-        <translation>密码:</translation>
+        <source>Enable Audio</source>
+        <translation>启用音频</translation>
     </message>
     <message>
         <location/>
@@ -1684,11 +1689,6 @@
         <location/>
         <source>Expert</source>
         <translation>专家</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enable Audio</source>
-        <translation>启用音频</translation>
     </message>
 </context>
 <context>
@@ -1718,13 +1718,13 @@
     <name>PopupBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/popup_business_action_widget.ui"/>
-        <source>Global Notification Settings...</source>
-        <translation>全局通知设定...</translation>
+        <source>Show to administrators only</source>
+        <translation>仅显示给管理员</translation>
     </message>
     <message>
         <location/>
-        <source>Show to administrators only</source>
-        <translation>仅显示给管理员</translation>
+        <source>Global Notification Settings...</source>
+        <translation>全局通知设定...</translation>
     </message>
 </context>
 <context>
@@ -1742,7 +1742,7 @@
     <message>
         <location/>
         <source>Events</source>
-        <translation type="unfinished"></translation>
+        <translation>事件</translation>
     </message>
 </context>
 <context>
@@ -1779,6 +1779,11 @@
     </message>
     <message>
         <location/>
+        <source>No Tour Selected</source>
+        <translation>无轮巡选择</translation>
+    </message>
+    <message>
+        <location/>
         <source>Preview</source>
         <translation>预览</translation>
     </message>
@@ -1792,16 +1797,16 @@
         <source>Get Preview</source>
         <translation>进行预览</translation>
     </message>
-    <message>
-        <location/>
-        <source>No Tour Selected</source>
-        <translation>无轮巡选择</translation>
-    </message>
 </context>
 <context>
     <name>PtzPresetDialog</name>
     <message>
         <location filename="../src/ui/dialogs/ptz_preset_dialog.ui"/>
+        <source>Save Position</source>
+        <translation>保存预设位</translation>
+    </message>
+    <message>
+        <location/>
         <source>Name:</source>
         <translation>名称:</translation>
     </message>
@@ -1809,11 +1814,6 @@
         <location/>
         <source>Hotkey:</source>
         <translation>热键:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save Position</source>
-        <translation>保存预设位</translation>
     </message>
 </context>
 <context>
@@ -1834,7 +1834,7 @@
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.ui"/>
         <source>Choose a specific build</source>
-        <translation type="unfinished"></translation>
+        <translation>获取特殊版本</translation>
     </message>
 </context>
 <context>
@@ -1850,7 +1850,7 @@
     <message>
         <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.ui"/>
         <source>Installing Compatibility Version...</source>
-        <translation type="unfinished"></translation>
+        <translation>正在安装兼容的版本...</translation>
     </message>
 </context>
 <context>
@@ -1881,7 +1881,7 @@
     <message>
         <location/>
         <source>Enable tile interface</source>
-        <translation type="unfinished"></translation>
+        <translation>启用 Web 界面</translation>
     </message>
 </context>
 <context>
@@ -1889,17 +1889,17 @@
     <message>
         <location filename="../src/ui/dialogs/cloud/login_to_cloud_dialog.ui"/>
         <source>Log in</source>
-        <translation type="unfinished"></translation>
+        <translation>登录</translation>
     </message>
     <message>
         <location/>
         <source>Stay logged in</source>
-        <translation type="unfinished"></translation>
+        <translation>保持登录状态</translation>
     </message>
     <message>
         <location/>
-        <source>Incorrect Email or password</source>
-        <translation type="unfinished"></translation>
+        <source>Incorrect Email or Password</source>
+        <translation>错误的邮箱或密码</translation>
     </message>
 </context>
 <context>
@@ -1929,11 +1929,6 @@
     </message>
     <message>
         <location/>
-        <source>The new system will have password and name from the system:</source>
-        <translation>新系统需要新的用户名和密码:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Check</source>
         <translation>检查</translation>
     </message>
@@ -1945,7 +1940,12 @@
     <message>
         <location/>
         <source>Login:</source>
-        <translation type="unfinished">登录:</translation>
+        <translation>登录:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>The new System will have password and name from System:</source>
+        <translation>新系统需要新的用户名和密码:</translation>
     </message>
 </context>
 <context>
@@ -1958,22 +1958,22 @@
     <message>
         <location/>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>播放</translation>
     </message>
     <message>
         <location/>
         <source>Add...</source>
-        <translation type="unfinished">&amp;添加...</translation>
+        <translation>&amp;添加...</translation>
     </message>
     <message>
         <location/>
         <source>Rename...</source>
-        <translation type="unfinished">&amp;重命名...</translation>
+        <translation>&amp;重命名...</translation>
     </message>
     <message>
         <location/>
         <source>Delete...</source>
-        <translation type="unfinished">&amp;删除...</translation>
+        <translation>&amp;删除...</translation>
     </message>
 </context>
 <context>
@@ -1998,13 +1998,13 @@
     </message>
     <message>
         <location/>
-        <source>Removing this connection option could lead to system malfunction.</source>
-        <translation>删除此连接项可能导致系统故障。</translation>
+        <source>Add</source>
+        <translation>添加</translation>
     </message>
     <message>
         <location/>
-        <source>Add</source>
-        <translation type="unfinished">添加</translation>
+        <source>Removing this connection option could lead to System malfunction.</source>
+        <translation>删除此连接项可能导致系统故障。</translation>
     </message>
 </context>
 <context>
@@ -2026,23 +2026,23 @@
     </message>
     <message>
         <location/>
-        <source>Applying system updates at the end of the week is not recommended.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Updating to...</source>
-        <translation type="unfinished"></translation>
+        <translation>更新到...</translation>
     </message>
     <message>
         <location/>
         <source>Link copied</source>
-        <translation type="unfinished"></translation>
+        <translation>复制链接</translation>
     </message>
     <message>
         <location/>
         <source>You have the latest version installed</source>
-        <translation type="unfinished"></translation>
+        <translation>你有安装最新版本</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Applying System updates at the end of the week is not recommended.</source>
+        <translation>不建议在一周结束时应用系统更新。</translation>
     </message>
 </context>
 <context>
@@ -2077,13 +2077,13 @@
     </message>
     <message>
         <location/>
-        <source>Warning: file with same name already exists!</source>
-        <translation>注意: 已有相同名称已经存在!</translation>
+        <source>Options</source>
+        <translation>选项</translation>
     </message>
     <message>
         <location/>
-        <source>Options</source>
-        <translation>选项</translation>
+        <source>Warning: file with the same name already exists!</source>
+        <translation>警告︰ 具有相同名称的文件已经存在 ！</translation>
     </message>
 </context>
 <context>
@@ -2119,27 +2119,27 @@
     <message>
         <location/>
         <source>Search users</source>
-        <translation type="unfinished"></translation>
+        <translation>搜索用户</translation>
     </message>
     <message>
         <location/>
         <source>Enable</source>
-        <translation type="unfinished"></translation>
+        <translation>启用</translation>
     </message>
     <message>
         <location/>
         <source>Disable</source>
-        <translation type="unfinished"></translation>
+        <translation>停用</translation>
     </message>
     <message>
         <location/>
         <source>Delete...</source>
-        <translation type="unfinished">&amp;删除...</translation>
+        <translation>&amp;删除...</translation>
     </message>
     <message>
         <location/>
         <source>Edit Roles...</source>
-        <translation type="unfinished"></translation>
+        <translation>编辑角色</translation>
     </message>
 </context>
 <context>
@@ -2170,7 +2170,7 @@
     <message>
         <location/>
         <source>Please wait while the connection is being restored...</source>
-        <translation>正在恢复连接,请稍等...</translation>
+        <translation>正在恢复连接, 请稍等...</translation>
     </message>
 </context>
 <context>
@@ -2210,6 +2210,11 @@
     <name>RecordingSettings</name>
     <message>
         <location filename="../src/ui/widgets/local_settings/recording_settings_widget.ui"/>
+        <source>Temporary Folder</source>
+        <translation>临时文件夹</translation>
+    </message>
+    <message>
+        <location/>
         <source>Capture Mode</source>
         <translation>截取模式</translation>
     </message>
@@ -2225,13 +2230,13 @@
     </message>
     <message>
         <location/>
-        <source>Disable Aero</source>
-        <translation>禁用Aero</translation>
+        <source>Additional Options</source>
+        <translation>其他选项</translation>
     </message>
     <message>
         <location/>
-        <source>Quality</source>
-        <translation>质量</translation>
+        <source>Disable Aero</source>
+        <translation>禁用Aero</translation>
     </message>
     <message>
         <location/>
@@ -2240,13 +2245,8 @@
     </message>
     <message>
         <location/>
-        <source>Temporary Folder</source>
-        <translation>临时文件夹</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Additional Options</source>
-        <translation>其他选项</translation>
+        <source>Quality</source>
+        <translation>质量</translation>
     </message>
     <message>
         <location/>
@@ -2256,17 +2256,17 @@
     <message>
         <location/>
         <source>Browse...</source>
-        <translation type="unfinished">浏览...</translation>
+        <translation>浏览...</translation>
     </message>
     <message>
         <location/>
         <source>Resolution</source>
-        <translation type="unfinished">分辨率:</translation>
+        <translation>分辨率:</translation>
     </message>
     <message>
         <location/>
         <source>Recording Quality</source>
-        <translation type="unfinished">录像质量:</translation>
+        <translation>录像质量:</translation>
     </message>
 </context>
 <context>
@@ -2315,12 +2315,12 @@
     <message>
         <location filename="../src/ui/widgets/business/sendmail_business_action_widget.ui"/>
         <source>Additional Recipients:</source>
-        <translation type="unfinished">&amp;其它收件人:</translation>
+        <translation>&amp;其它收件人:</translation>
     </message>
     <message>
         <location/>
         <source>Global Email Settings...</source>
-        <translation type="unfinished">&amp;全局邮件设定...</translation>
+        <translation>&amp;全局邮件设定...</translation>
     </message>
 </context>
 <context>
@@ -2343,17 +2343,17 @@
     <message>
         <location/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>名称</translation>
     </message>
     <message>
         <location/>
         <source>IP Address</source>
-        <translation type="unfinished">IP地址:</translation>
+        <translation>IP地址:</translation>
     </message>
     <message>
         <location/>
         <source>Port</source>
-        <translation type="unfinished"></translation>
+        <translation>端口</translation>
     </message>
 </context>
 <context>
@@ -2434,6 +2434,11 @@
     </message>
     <message>
         <location/>
+        <source>Ping</source>
+        <translation>Ping</translation>
+    </message>
+    <message>
+        <location/>
         <source>Authentication</source>
         <translation>验证</translation>
     </message>
@@ -2451,11 +2456,6 @@
         <location/>
         <source>Advanced</source>
         <translation>高级设置</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ping</source>
-        <translation>Ping</translation>
     </message>
     <message>
         <location/>
@@ -2490,67 +2490,67 @@
     <message>
         <location/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>名称</translation>
     </message>
     <message>
         <location/>
         <source>Model</source>
-        <translation type="unfinished">型号</translation>
+        <translation>型号</translation>
     </message>
     <message>
         <location/>
         <source>Firmware</source>
-        <translation type="unfinished">版本:</translation>
+        <translation>版本:</translation>
     </message>
     <message>
         <location/>
         <source>Vendor</source>
-        <translation type="unfinished">厂商:</translation>
+        <translation>厂商:</translation>
     </message>
     <message>
         <location/>
         <source>Audio</source>
-        <translation type="unfinished"></translation>
+        <translation>音频</translation>
     </message>
     <message>
         <location/>
         <source>Login</source>
-        <translation type="unfinished">登录</translation>
+        <translation>登录</translation>
     </message>
     <message>
         <location/>
         <source>Password</source>
-        <translation type="unfinished">密码</translation>
+        <translation>密码</translation>
     </message>
     <message>
         <location/>
         <source>IP Address</source>
-        <translation type="unfinished">IP地址:</translation>
+        <translation>IP地址:</translation>
     </message>
     <message>
         <location/>
         <source>Web Page</source>
-        <translation type="unfinished">网页:</translation>
+        <translation>网页:</translation>
     </message>
     <message>
         <location/>
         <source>MAC Address</source>
-        <translation type="unfinished">MAC地址:</translation>
+        <translation>MAC地址:</translation>
     </message>
     <message>
         <location/>
         <source>Sensitivity</source>
-        <translation type="unfinished">敏感度:</translation>
+        <translation>敏感度:</translation>
     </message>
     <message>
         <location/>
         <source>Reset</source>
-        <translation type="unfinished"></translation>
+        <translation>重置</translation>
     </message>
     <message>
         <location/>
         <source>TextLabel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TextLabel</translation>
     </message>
 </context>
 <context>
@@ -2578,13 +2578,18 @@
     <message>
         <location/>
         <source>Port:</source>
-        <translation type="unfinished">端口:</translation>
+        <translation>端口:</translation>
     </message>
 </context>
 <context>
     <name>SmtpSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp/smtp_settings_widget.ui"/>
+        <source>Outgoing Email Settings</source>
+        <translation>邮件设置</translation>
+    </message>
+    <message>
+        <location/>
         <source>Advanced settings...</source>
         <translation>高级设置...</translation>
     </message>
@@ -2592,11 +2597,6 @@
         <location/>
         <source>Test</source>
         <translation>测试</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Outgoing Email Settings</source>
-        <translation>邮件设置</translation>
     </message>
 </context>
 <context>
@@ -2647,22 +2647,22 @@
     <message>
         <location filename="../src/ui/widgets/properties/storage_analytics_widget.ui"/>
         <source>Current Statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>当前统计信息</translation>
     </message>
     <message>
         <location/>
         <source>Forecast for Full Storage Usage</source>
-        <translation type="unfinished"></translation>
+        <translation>完整的存储使用情况预测</translation>
     </message>
     <message>
         <location/>
         <source>Additional storage:</source>
-        <translation type="unfinished">附加存储设备:</translation>
+        <translation>附加存储设备:</translation>
     </message>
     <message>
         <location/>
         <source>Server is offline. Statistics are not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>服务器离线, 统计不可用.</translation>
     </message>
 </context>
 <context>
@@ -2685,32 +2685,32 @@
     <message>
         <location/>
         <source>Storage Locations</source>
-        <translation type="unfinished"></translation>
+        <translation>存储位置</translation>
     </message>
     <message>
         <location/>
         <source>Reindex Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>重新建立索引的存档</translation>
     </message>
     <message>
         <location/>
         <source>Reindex Backup</source>
-        <translation type="unfinished"></translation>
+        <translation>重新建立索引备份</translation>
     </message>
     <message>
         <location/>
         <source>Backup Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>备份存档</translation>
     </message>
     <message>
         <location/>
         <source>Backup Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>备份设置</translation>
     </message>
     <message>
         <location/>
         <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-        <translation type="unfinished"></translation>
+        <translation>录像到禁用存储将停止。然而，从它删除过时的画面将继续。</translation>
     </message>
 </context>
 <context>
@@ -2736,7 +2736,7 @@
     <message>
         <location/>
         <source>URL:</source>
-        <translation>URL:</translation>
+        <translation>URL：</translation>
     </message>
     <message>
         <location/>
@@ -2777,13 +2777,13 @@
     <message>
         <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
         <source>System Time</source>
-        <translation type="unfinished"></translation>
+        <translation>系统时间</translation>
     </message>
     <message>
         <location/>
         <source>System time is synchronized with the Internet and is independent from server local time.
-Selected server will be used as a time server if the system has no Internet access.</source>
-        <translation type="unfinished"></translation>
+Selected server will be used as a time server if System has no Internet access.</source>
+        <translation>系统时间与互联网同步，独立于服务器的本地时间。但如果系统已不能联网，选定的服务器将用作时间服务器，</translation>
     </message>
 </context>
 <context>
@@ -2791,7 +2791,7 @@ Selected server will be used as a time server if the system has no Internet acce
     <message>
         <location filename="../src/ui/widgets/properties/user_profile_widget.ui"/>
         <source>Change Password...</source>
-        <translation type="unfinished"></translation>
+        <translation>更改密码...</translation>
     </message>
 </context>
 <context>
@@ -2799,17 +2799,17 @@ Selected server will be used as a time server if the system has no Internet acce
     <message>
         <location filename="../src/ui/widgets/properties/user_role_settings_widget.ui"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>名称</translation>
     </message>
     <message>
         <location/>
         <source>Users</source>
-        <translation type="unfinished"></translation>
+        <translation>用户</translation>
     </message>
     <message>
         <location/>
         <source>Delete Role</source>
-        <translation type="unfinished"></translation>
+        <translation>删除角色</translation>
     </message>
 </context>
 <context>
@@ -2817,18 +2817,18 @@ Selected server will be used as a time server if the system has no Internet acce
     <message>
         <location filename="../src/ui/dialogs/resource_properties/user_roles_dialog.ui"/>
         <source>User Roles</source>
-        <translation type="unfinished"></translation>
+        <translation>用户角色</translation>
     </message>
     <message>
         <location/>
         <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-        <translation type="unfinished"></translation>
+        <translation>目前还没有自定义用户角色。单击&quot;新角色&quot;按钮来创建一个。</translation>
     </message>
     <message>
         <location/>
         <source>New role</source>
-        <translation type="unfinished"></translation>
+        <translation>新建角色</translation>
     </message>
 </context>
 <context>
@@ -2836,17 +2836,17 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
         <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
         <source>User Type</source>
-        <translation type="unfinished"></translation>
+        <translation>用户类型</translation>
     </message>
     <message>
         <location/>
         <source>Role</source>
-        <translation type="unfinished"></translation>
+        <translation>角色</translation>
     </message>
     <message>
         <location/>
         <source>Edit Roles...</source>
-        <translation type="unfinished"></translation>
+        <translation>编辑角色</translation>
     </message>
 </context>
 <context>

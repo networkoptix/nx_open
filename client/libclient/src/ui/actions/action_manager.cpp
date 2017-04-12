@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <QtGui/QGuiApplication>
+
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QGraphicsItem>
@@ -479,6 +481,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::ResourceTarget | Qn::SingleTarget | Qn::MultiTarget).
         requiredTargetPermissions(Qn::RemovePermission).
         text(QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
             tr("Move Devices"),
             tr("Move Cameras")
         )).
@@ -744,6 +747,22 @@ QnActionManager::QnActionManager(QObject *parent):
             pulledText(tr("New Web Page...")).
             condition(new QnConjunctionActionCondition(
                 new QnTreeNodeTypeCondition(Qn::WebPagesNode, this),
+                new QnForbiddenInSafeModeCondition(this),
+                this)
+            ).
+            autoRepeat(false);
+
+        factory(QnActions::NewLayoutTourAction).
+            flags(Qn::Main | Qn::Tree | Qn::NoTarget).
+            requiredGlobalPermission(Qn::GlobalAdminPermission).
+            text(tr("Layout Tour...")).
+            pulledText(tr("New Layout Tour...")).
+            condition(new QnConjunctionActionCondition(
+                new QnDisjunctionActionCondition(
+                    new QnTreeNodeTypeCondition(Qn::LayoutsNode, this),
+                    new QnTreeNodeTypeCondition(Qn::LayoutToursNode, this),
+                    this
+                ),
                 new QnForbiddenInSafeModeCondition(this),
                 this)
             ).
@@ -1018,6 +1037,7 @@ QnActionManager::QnActionManager(QObject *parent):
         mode(QnActionTypes::DesktopMode).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
         text(QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
             tr("Devices List"),
             tr("Cameras List")
         )).
@@ -1482,6 +1502,17 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::Tree).
         separator();
 
+    factory(QnActions::WebPageSettingsAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
+        text(tr("Edit...")).
+        autoRepeat(false).
+        condition(new QnConjunctionActionCondition(
+            new QnResourceActionCondition(hasFlags(Qn::web_page), Qn::ExactlyOne, this),
+            new QnForbiddenInSafeModeCondition(this),
+            this)
+        );
+
     factory(QnActions::RenameResourceAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::IntentionallyAmbiguous).
         requiredTargetPermissions(Qn::WritePermission | Qn::WriteNamePermission).
@@ -1496,6 +1527,18 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Rename")).
         shortcut(lit("F2")).
         condition(new QnForbiddenInSafeModeCondition(this)).
+        autoRepeat(false);
+
+    //TODO: #GDM #3.1 #tbd
+    factory(QnActions::RenameLayoutTourAction).
+        flags(Qn::Tree | Qn::NoTarget | Qn::IntentionallyAmbiguous).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
+        text(tr("Rename")).
+        shortcut(lit("F2")).
+        condition(new QnConjunctionActionCondition(
+            new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this),
+            new QnForbiddenInSafeModeCondition(this),
+            this)).
         autoRepeat(false);
 
     factory().
@@ -1617,6 +1660,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::CameraListByServerAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
             tr("Devices List by Server..."),
             tr("Cameras List by Server...")
         )).
@@ -1735,14 +1779,41 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::NoTarget).
         separator();
 
-    factory(QnActions::ToggleTourModeAction).
+    factory(QnActions::OpenLayoutTourAction).
         flags(Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey).
+        mode(QnActionTypes::DesktopMode).
+        text(tr("Open Layouts Tour")).
+        shortcut(lit("Alt+L")).
+        autoRepeat(false);
+
+    factory(QnActions::ToggleLayoutTourModeAction).
+        flags(Qn::Scene | Qn::Tree | Qn::NoTarget | Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).
         text(tr("Start Tour")).
         toggledText(tr("Stop Tour")).
         shortcut(lit("Alt+T")).
         autoRepeat(false).
-        condition(new QnToggleTourActionCondition(this));
+        icon(qnSkin->icon("slider/navigation/play.png")).
+        condition(new QnConjunctionActionCondition(
+            new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this),
+            new QnVideoWallReviewModeCondition(true, this),
+     //       new QnToggleTourActionCondition(this), //TODO: #GDM #3.1 implement with review mode
+            this
+        ));
+
+    factory(QnActions::LayoutTourSettingsAction).
+        flags(Qn::Scene | Qn::Tree | Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
+        text(tr("Layout Tour Settings...")).
+        requiredGlobalPermission(Qn::GlobalAdminPermission). //TODO: #GDM #3.1 #tbd
+        condition(new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this));
+
+    factory(QnActions::RemoveLayoutTourAction).
+        flags(Qn::Scene | Qn::Tree | Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
+        text(tr("Delete Layout Tour")).
+        requiredGlobalPermission(Qn::GlobalAdminPermission). //TODO: #GDM #3.1 #tbd
+        condition(new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this));
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).

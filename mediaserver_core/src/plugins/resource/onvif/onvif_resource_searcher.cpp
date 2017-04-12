@@ -7,6 +7,7 @@
 #include <QtCore/QUrlQuery>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/network/http/httptypes.h>
 
 #include "core/resource/camera_resource.h"
@@ -18,13 +19,17 @@
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
+#include <common/static_common_module.h>
+#include "soap_wrapper.h"
+#include <onvif/soapStub.h>
+#include "gsoap_async_call_wrapper.h"
 
 namespace {
 
 /*
  *  Port list used for manual camera add
  */
-const static std::array<int, 5> kOnvifDeviceAltPorts =
+const static std::array<int, 4> kOnvifDeviceAltPorts =
 {
     8081, //FLIR default port
     8032, // DW default port
@@ -32,7 +37,7 @@ const static std::array<int, 5> kOnvifDeviceAltPorts =
     9988 // Dahui default port
 };
 static const int kDefaultOnvifPort = 80;
-static const std::chrono::milliseconds kManualDiscoveryConnectTimeout(3000);
+static const std::chrono::milliseconds kManualDiscoveryConnectTimeout(5000);
 
 } // namespace
 
@@ -57,7 +62,11 @@ bool hasRunningLiveProvider(QnNetworkResourcePtr netRes)
     return rez;
 }
 
-OnvifResourceSearcher::OnvifResourceSearcher()
+OnvifResourceSearcher::OnvifResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule),
+    m_informationFetcher(new OnvifResourceInformationFetcher(commonModule)),
+    m_wsddSearcher(new OnvifResourceSearcherWsdd(m_informationFetcher.get()))
 {
 }
 
@@ -78,7 +87,13 @@ QString OnvifResourceSearcher::manufacture() const
 
 int OnvifResourceSearcher::autoDetectDevicePort(const QUrl& url)
 {
-    std::vector<std::unique_ptr<AbstractStreamSocket>> socketList;
+    typedef GSoapAsyncCallWrapper <
+        DeviceSoapWrapper,
+        _onvifDevice__GetSystemDateAndTime,
+        _onvifDevice__GetSystemDateAndTimeResponse
+    > GSoapDeviceGetSystemDateAndTimeAsyncWrapper;
+
+    std::vector<std::unique_ptr<GSoapDeviceGetSystemDateAndTimeAsyncWrapper>> requestList;
     int result = -1;
 
     QnMutex mutex;
@@ -89,29 +104,36 @@ int OnvifResourceSearcher::autoDetectDevicePort(const QUrl& url)
     int workers = kOnvifDeviceAltPorts.size();
     for (auto port: kOnvifDeviceAltPorts)
     {
-        std::unique_ptr<AbstractStreamSocket> sock(SocketFactory::createStreamSocket());
-        sock->setNonBlockingMode(true);
-        sock->setSendTimeout(kManualDiscoveryConnectTimeout);
-        SocketAddress addr(url.host(), port);
-        sock->connectAsync(addr,
-            [&, port = addr.port](SystemError::ErrorCode errorCode)
-            {
-                QnMutexLocker lock(&mutex);
-                if (errorCode == SystemError::noError && result == -1)
-                    result = port;
-                --workers;
-                waitCond.wakeAll();
-            }
+        std::unique_ptr<DeviceSoapWrapper> soapWrapper(new DeviceSoapWrapper(
+            lit("http://%1:%2/onvif/device_service").arg(url.host()).arg(port).toStdString(),
+            /*login*/ QString(),
+            /*password*/ QString(),
+            /*timeDrift*/ 0));
+
+        auto asyncWrapper = std::make_unique<GSoapDeviceGetSystemDateAndTimeAsyncWrapper>(
+            std::move(soapWrapper),
+            &DeviceSoapWrapper::GetSystemDateAndTime);
+
+        _onvifDevice__GetSystemDateAndTime request;
+        asyncWrapper->callAsync(
+            request,
+            [&, port](int soapResultCode)
+        {
+            QnMutexLocker lock(&mutex);
+            if (soapResultCode == SOAP_OK && result == -1)
+                result = port;
+            --workers;
+            waitCond.wakeAll();
+        }
         );
-        socketList.push_back(std::move(sock));
+        requestList.push_back(std::move(asyncWrapper));
     }
 
     while (workers > 0 && result == -1)
         waitCond.wait(&mutex);
 
     lock.unlock();
-    for (const auto& socket: socketList)
-        socket->pleaseStopSync();
+    requestList.clear();
     return result > 0 ? result : kDefaultOnvifPort;
 }
 
@@ -144,7 +166,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
     QString onvifUrl(QLatin1String("onvif/device_service"));
 
     QString urlBase = urlStr.left(urlStr.indexOf(QLatin1String("?")));
-    QnPlOnvifResourcePtr rpResource = qnResPool->getResourceByUrl(urlBase).dynamicCast<QnPlOnvifResource>();
+    QnPlOnvifResourcePtr rpResource = resourcePool()->getResourceByUrl(urlBase).dynamicCast<QnPlOnvifResource>();
 
     QnPlOnvifResourcePtr resource = createResource(rpResource ? rpResource->getTypeId() : typePtr->getId(), QnResourceParams()).dynamicCast<QnPlOnvifResource>();
     resource->setDefaultAuth(auth);
@@ -170,7 +192,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         if (channel > 0)
             resource->updateToChannel(channel-1);
 
-        auto resData = qnCommon
+        auto resData = qnStaticCommon
             ->dataPool()
             ->data(rpResource->getVendor(), rpResource->getModel());
 
@@ -225,13 +247,12 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
             }
         }
 
-        OnvifResourceInformationFetcher fetcher;
-        auto resData = qnCommon->dataPool()->data(manufacturer, modelName);
+        auto resData = qnStaticCommon->dataPool()->data(manufacturer, modelName);
         auto manufacturerAlias = resData.value<QString>(Qn::ONVIF_VENDOR_SUBTYPE);
 
         manufacturer = manufacturerAlias.isEmpty() ? manufacturer : manufacturerAlias;
 
-        QnUuid rt = fetcher.getOnvifResourceType(manufacturer, modelName);
+        QnUuid rt = m_informationFetcher->getOnvifResourceType(manufacturer, modelName);
         resource->setVendor( manufacturer );
         if (!modelName.isEmpty())
             resource->setName( modelName );
@@ -288,7 +309,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
 void OnvifResourceSearcher::pleaseStop()
 {
     QnAbstractNetworkResourceSearcher::pleaseStop();
-    m_wsddSearcher.pleaseStop();
+    m_wsddSearcher->pleaseStop();
 }
 
 QnResourceList OnvifResourceSearcher::findResources()
@@ -301,7 +322,7 @@ QnResourceList OnvifResourceSearcher::findResources()
     if (shouldStop())
          return QnResourceList();
 
-    m_wsddSearcher.findResources( result, discoveryMode() );
+    m_wsddSearcher->findResources( result, discoveryMode() );
 
     return result;
 }
@@ -329,7 +350,7 @@ QnResourcePtr OnvifResourceSearcher::createResource(const QnUuid &resourceTypeId
     result = OnvifResourceInformationFetcher::createOnvifResourceByManufacture(
         resourceType->getName() == lit("ONVIF") && !params.vendor.isEmpty()
         ? params.vendor
-        : resourceType->getName() ); // use name instead of manufacture to instanciate child onvif resource
+        : resourceType->getName() ); // use name instead of manufacture to instantiate child onvif resource
     if (!result )
         return result; // not found
 
@@ -338,7 +359,7 @@ QnResourcePtr OnvifResourceSearcher::createResource(const QnUuid &resourceTypeId
     NX_LOG(lit("OnvifResourceSearcher::createResource: create ONVIF camera resource. TypeID: %1.").arg(resourceTypeId.toString()), cl_logDEBUG1);
 
     //result->deserialize(parameters);
-
+    result->setCommonModule(commonModule());
     return result;
 
 }

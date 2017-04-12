@@ -1,5 +1,11 @@
 #include "main_window_title_bar_widget.h"
 
+#include <QtWidgets/QBoxLayout>
+#include <QtWidgets/QGraphicsProxyWidget>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QMenu>
+
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/layout_resource.h>

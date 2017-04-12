@@ -1,11 +1,13 @@
 #pragma once
 
+#include <common/common_module_aware.h>
+
 #include <nx/utils/uuid.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/connective.h>
 
 class QnAvailableCamerasWatcherPrivate;
-class QnAvailableCamerasWatcher: public Connective<QObject>
+class QnAvailableCamerasWatcher: public Connective<QObject>, public QnCommonModuleAware
 {
     Q_OBJECT
 

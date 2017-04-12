@@ -1,5 +1,7 @@
 #include "pipeline.h"
 
+#include "random.h"
+
 namespace nx {
 namespace utils {
 namespace pipeline {
@@ -46,13 +48,21 @@ int ProxyPipeline::write(const void* data, size_t count)
 //-------------------------------------------------------------------------------------------------
 // ReflectingPipeline
 
-ReflectingPipeline::ReflectingPipeline():
-    m_totalBytesThrough(0)
+ReflectingPipeline::ReflectingPipeline(QByteArray initialData):
+    m_buffer(std::move(initialData)),
+    m_totalBytesThrough(0),
+    m_maxSize(0),
+    m_eof(false)
 {
 }
 
 int ReflectingPipeline::write(const void* data, size_t count)
 {
+    QnMutexLocker lock(&m_mutex);
+
+    if ((m_maxSize > 0) && ((std::size_t)m_buffer.size() >= m_maxSize))
+        return StreamIoError::wouldBlock;
+
     m_buffer.append(static_cast<const char*>(data), count);
     m_totalBytesThrough += count;
     return count;
@@ -60,8 +70,10 @@ int ReflectingPipeline::write(const void* data, size_t count)
 
 int ReflectingPipeline::read(void* data, size_t count)
 {
+    QnMutexLocker lock(&m_mutex);
+
     if (m_buffer.isEmpty())
-        return StreamIoError::wouldBlock;
+        return m_eof ? StreamIoError::osError : StreamIoError::wouldBlock;
 
     const auto bytesToRead = std::min<size_t>(count, m_buffer.size());
     memcpy(data, m_buffer.data(), bytesToRead);
@@ -70,14 +82,49 @@ int ReflectingPipeline::read(void* data, size_t count)
     return bytesToRead;
 }
 
+void ReflectingPipeline::setMaxBufferSize(std::size_t maxSize)
+{
+    m_maxSize = maxSize;
+}
+
 std::size_t ReflectingPipeline::totalBytesThrough() const
 {
+    QnMutexLocker lock(&m_mutex);
     return m_totalBytesThrough;
 }
 
-const QByteArray& ReflectingPipeline::internalBuffer() const
+QByteArray ReflectingPipeline::internalBuffer() const
 {
+    QnMutexLocker lock(&m_mutex);
     return m_buffer;
+}
+
+void ReflectingPipeline::writeEof()
+{
+    QnMutexLocker lock(&m_mutex);
+    m_eof = true;
+}
+
+//-------------------------------------------------------------------------------------------------
+// RandomDataSource
+
+constexpr std::size_t RandomDataSource::kDefaultMinReadSize;
+constexpr std::size_t RandomDataSource::kDefaultMaxReadSize;
+
+RandomDataSource::RandomDataSource():
+    m_readSizeRange(kDefaultMinReadSize, kDefaultMaxReadSize)
+{
+}
+
+int RandomDataSource::read(void* data, size_t count)
+{
+    const std::size_t bytesToRead =
+        std::min<std::size_t>(
+            count,
+            random::number<std::size_t>(m_readSizeRange.first, m_readSizeRange.second));
+    char* charData = static_cast<char*>(data);
+    std::generate(charData, charData + bytesToRead, rand);
+    return bytesToRead;
 }
 
 } // namespace pipeline

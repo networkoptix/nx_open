@@ -2,7 +2,7 @@
 
 #include <transaction/transaction_message_bus.h>
 #include <utils/common/scoped_thread_rollback.h>
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 
 #include "ec2_thread_pool.h"
 #include "fixed_url_client_query_processor.h"
@@ -60,13 +60,16 @@ namespace ec2 {
     {
         const int reqId = generateRequestID();
 
-        QnTransaction<ApiUpdateUploadData> transaction(ApiCommand::uploadUpdate);
-        transaction.params.updateId = updateId;
-        transaction.params.data = data;
-        transaction.params.offset = offset;
+        ApiUpdateUploadData params;
+        params.updateId = updateId;
+        params.data = data;
+        params.offset = offset;
 
-        QnTransactionMessageBus::instance()->sendTransaction(transaction, peers);
-        QnConcurrent::run( Ec2ThreadPool::instance(),[handler, reqId](){ handler->done(reqId, ErrorCode::ok); });
+        using namespace std::placeholders;
+        // todo: #singletone refactor peers param are lost
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::uploadUpdate, params,
+            [handler, reqId](ErrorCode errorCode) { handler->done(reqId, errorCode); });
 
         return reqId;
     }
@@ -93,11 +96,14 @@ namespace ec2 {
     int QnUpdatesManager<QueryProcessorType>::installUpdate(const QString &updateId, const QnPeerSet &peers, impl::SimpleHandlerPtr handler)
     {
         const int reqId = generateRequestID();
-        QnTransaction<ApiUpdateInstallData> transaction(ApiCommand::installUpdate);
-        transaction.params = updateId;
 
-        QnTransactionMessageBus::instance()->sendTransaction(transaction, peers);
-        QnConcurrent::run( Ec2ThreadPool::instance(),[handler, reqId](){ handler->done(reqId, ErrorCode::ok); });
+        ApiUpdateInstallData params;
+        params.updateId = updateId;
+
+        using namespace std::placeholders;
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::installUpdate, params,
+            [handler, reqId](ErrorCode errorCode) { handler->done(reqId, errorCode); });
 
         return reqId;
     }

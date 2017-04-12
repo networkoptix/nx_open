@@ -1,7 +1,6 @@
 #include "async_client.h"
 
-#include "common/common_globals.h"
-#include "utils/common/guard.h"
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/log/log.h>
 
 namespace nx {
@@ -351,7 +350,7 @@ void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
         .str(remoteAddress()).arg(SystemError::toString(code)), cl_logDEBUG2);
 
     ConnectHandler connectCompletionHandler;
-    const auto executeOnConnectedHandlerGuard = makeScopedGuard(
+    const auto executeOnConnectedHandlerGuard = makeScopeGuard(
         [&connectCompletionHandler, code]()
         {
             if (connectCompletionHandler)

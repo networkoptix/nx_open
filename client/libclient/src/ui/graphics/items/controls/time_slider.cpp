@@ -5,16 +5,17 @@
 #include <limits>
 #include <array>
 
-#include <boost/array.hpp>
-
 #include <client/client_runtime_settings.h>
 
 #include <QtCore/QDateTime>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
-#include <QtCore/qmath.h>
+#include <QtCore/QtMath>
+#include <QtCore/QScopedValueRollback>
 
 #include <QtGui/QPainter>
+
+#include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QGraphicsSceneWheelEvent>
 
 #include <camera/thumbnails_loader.h>
@@ -374,7 +375,7 @@ private:
         std::fill(m_weights.begin(), m_weights.end(), 0);
     }
 
-    QColor currentColor(const boost::array<QColor, Qn::TimePeriodContentCount + 1>& colors) const
+    QColor currentColor(const std::array<QColor, Qn::TimePeriodContentCount + 1>& colors) const
     {
         qreal rc = m_weights[Qn::RecordingContent];
         qreal mc = m_weights[Qn::MotionContent];
@@ -413,9 +414,9 @@ private:
     qint64 m_pendingLength;
     qint64 m_pendingPosition;
 
-    boost::array<qint64, Qn::TimePeriodContentCount + 1> m_weights;
-    boost::array<QColor, Qn::TimePeriodContentCount + 1> m_pastColor;
-    boost::array<QColor, Qn::TimePeriodContentCount + 1> m_futureColor;
+    std::array<qint64, Qn::TimePeriodContentCount + 1> m_weights;
+    std::array<QColor, Qn::TimePeriodContentCount + 1> m_pastColor;
+    std::array<QColor, Qn::TimePeriodContentCount + 1> m_futureColor;
 };
 
 
@@ -493,7 +494,8 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
     m_liveSupported(false),
     m_selectionInitiated(false),
     m_tooltipLine1(new GraphicsLabel(this)),
-    m_tooltipLine2(new GraphicsLabel(this))
+    m_tooltipLine2(new GraphicsLabel(this)),
+    m_updatingValue(false)
 {
     setAutoHideToolTip(false);
 
@@ -591,7 +593,7 @@ QnBookmarksViewer* QnTimeSlider::createBookmarksViewer()
         }
         else
         {
-            if (location < m_windowStart || location > m_windowEnd)
+            if (!windowContains(location))
                 return QnBookmarksViewer::PosAndBoundsPair();   /// Out of window
         }
 
@@ -621,19 +623,32 @@ QnTimeSlider::~QnTimeSlider()
 
 void QnTimeSlider::createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTimeStep>* relativeSteps)
 {
-    static const QString hmFormat           = lit("hh:mm");                 //< Format for displaying hours and minutes on timeline.
-    static const QString hmApFormat         = lit("hh:mm ap");              //< Format for displaying hours and minutes on timeline, with am/pm indicator.
-    static const QString hApFormat          = lit("h ap");                  //< Format for displaying hours on timeline, with am/pm indicator.
-    static const QString dFormat            = lit("dd");                    //< Format for displaying days on timeline.
-    static const QString moFormat           = lit("MMMM");                  //< Format for displaying months on timeline.
-    static const QString yFormat            = lit("yyyy");                  //< Format for displaying years on timeline
-    static const QString dateMinsFormat     = lit("dd MMMM yyyy hh:mm");    //< Format for displaying minute caption in timeline's header, without am/pm indicator.
-    static const QString dateMinsApFormat   = lit("dd MMMM yyyy hh:mm ap"); //< Format for displaying minute caption in timeline's header, with am/pm indicator.
-    static const QString dateHoursFormat    = lit("dd MMMM yyyy hh:mm");    //< Format for displaying hour caption in timeline's header, without am/pm indicator.
-    static const QString dateHoursApFormat  = lit("dd MMMM yyyy h ap");     //< Format for displaying hour caption in timeline's header, with am/pm indicator.
-    static const QString dateDaysFormat     = lit("dd MMMM yyyy");          //< Format for displaying day caption in timeline's header.
-    static const QString dateMonthsFormat   = lit("MMMM yyyy");             //< Format for displaying month caption in timeline's header.
-    static const QString dateYearsFormat    = lit("yyyy");                  //< Format for displaying year caption in timeline's header
+    static const QString hmFormat = tr("hh:mm",
+        "Format for displaying hours and minutes on timeline.");
+    static const QString hmApFormat = tr("hh:mm ap",
+        "Format for displaying hours and minutes on timeline, with am/pm indicator.");
+    static const QString hApFormat = tr("h ap",
+        "Format for displaying hours on timeline, with am/pm indicator.");
+    static const QString dFormat = tr("dd",
+        "Format for displaying days on timeline.");
+    static const QString moFormat = tr("MMMM",
+        "Format for displaying months on timeline.");
+    static const QString yFormat = tr("yyyy",
+        "Format for displaying years on timeline");
+    static const QString dateMinsFormat = tr("dd MMMM yyyy hh:mm",
+        "Format for displaying minute caption in timeline's header, without am/pm indicator.");
+    static const QString dateMinsApFormat = tr("dd MMMM yyyy hh:mm ap",
+        "Format for displaying minute caption in timeline's header, with am/pm indicator.");
+    static const QString dateHoursFormat = tr("dd MMMM yyyy hh:mm",
+        "Format for displaying hour caption in timeline's header, without am/pm indicator.");
+    static const QString dateHoursApFormat = tr("dd MMMM yyyy h ap",
+        "Format for displaying hour caption in timeline's header, with am/pm indicator.");
+    static const QString dateDaysFormat = tr("dd MMMM yyyy",
+        "Format for displaying day caption in timeline's header.");
+    static const QString dateMonthsFormat = tr("MMMM yyyy",
+        "Format for displaying month caption in timeline's header.");
+    static const QString dateYearsFormat = tr("yyyy",
+        "Format for displaying year caption in timeline's header");
 
     QString msSuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Milliseconds);
     QString sSuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds);
@@ -969,24 +984,24 @@ void QnTimeSlider::setSliderPosition(qint64 position, bool keepInWindow)
 
 void QnTimeSlider::setValue(qint64 value, bool keepInWindow)
 {
-    if (m_options.testFlag(StillPosition))
     {
+        /* To not change tooltip visibility in setValue or setWindow: */
+        QScopedValueRollback<bool> updateRollback(m_updatingValue, true);
+
         qint64 oldValue = this->value();
         setValue(value);
 
         if (keepInWindow && windowContains(oldValue))
-            shiftWindow(this->value() - oldValue);
+        {
+            if (m_options.testFlag(StillPosition))
+                shiftWindow(this->value() - oldValue);
+            else
+                ensureWindowContains(this->value());
+        }
     }
-    else
-    {
-        if (!keepInWindow)
-            return setValue(value);
 
-        bool inWindow = windowContains(this->value());
-        setValue(value);
-        if (inWindow)
-            ensureWindowContains(this->value());
-    }
+    /* Update tooltip visibility after both setValue and setWindow: */
+    updateToolTipVisibilityInternal(true);
 }
 
 qint64 QnTimeSlider::selectionStart() const
@@ -1569,9 +1584,10 @@ void QnTimeSlider::updateKineticProcessor()
 
 void QnTimeSlider::updateToolTipVisibilityInternal(bool animated)
 {
-    qint64 pos = sliderPosition();
-    bool canBeVisible = pos >= m_windowStart
-        && pos <= m_windowEnd
+    if (m_updatingValue)
+        return;
+
+    bool canBeVisible = windowContains(sliderPosition())
         && positionMarkerVisible()
         && isVisible();
 
@@ -2292,7 +2308,7 @@ void QnTimeSlider::drawSelection(QPainter* painter)
 
 void QnTimeSlider::drawMarker(QPainter* painter, qint64 pos, const QColor& color, qreal width)
 {
-    if (pos < m_windowStart || pos > m_windowEnd)
+    if (!windowContains(pos))
         return;
 
     QPen pen(color, width);

@@ -1,5 +1,4 @@
-#ifndef QN_PTZ_CONTROLLER_POOL_H
-#define QN_PTZ_CONTROLLER_POOL_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -8,23 +7,29 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/ptz/ptz_fwd.h>
+#include <common/common_module_aware.h>
 
 class QThread;
 class QThreadPool;
 
 class QnPtzControllerPoolPrivate;
 
-class QnPtzControllerPool: public Connective<QObject>, public Singleton<QnPtzControllerPool> {
+class QnPtzControllerPool:
+    public Connective<QObject>,
+    public QnCommonModuleAware,
+    public Singleton<QnPtzControllerPool>
+{
     Q_OBJECT
     typedef Connective<QObject> base_type;
 
 public:
-    enum ControllerConstructionMode {
+    enum ControllerConstructionMode
+    {
         NormalControllerConstruction,
         ThreadedControllerConstruction
     };
 
-    QnPtzControllerPool(QObject *parent = NULL);
+    QnPtzControllerPool(QObject* parent);
     virtual ~QnPtzControllerPool();
 
     QThread *executorThread() const;
@@ -61,6 +66,3 @@ private:
 };
 
 #define qnPtzPool (QnPtzControllerPool::instance())
-
-
-#endif // QN_PTZ_CONTROLLER_POOL_H

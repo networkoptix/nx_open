@@ -44,6 +44,19 @@ using boost::algorithm::any_of;
 
 namespace {
 
+void setLayoutEnabled(QLayout* layout, bool enabled)
+{
+    const auto count = layout->count();
+    for (int i = 0; i != count; ++i)
+    {
+        const auto layoutItem = layout->itemAt(i);
+        if (const auto widget = layoutItem->widget())
+            widget->setEnabled(enabled);
+        if (const auto childLayout = layoutItem->layout())
+            setLayoutEnabled(childLayout, enabled);
+    }
+}
+
 class QnExportScheduleResourceSelectionDialogDelegate: public QnResourceSelectionDialogDelegate
 {
     Q_DECLARE_TR_FUNCTIONS(QnExportScheduleResourceSelectionDialogDelegate);
@@ -103,9 +116,9 @@ public:
 
     virtual bool validate(const QSet<QnUuid>& selected) override
     {
-        auto cameras = qnResPool->getResources<QnVirtualCameraResource>(selected);
+        auto cameras = resourcePool()->getResources<QnVirtualCameraResource>(selected);
 
-        QnCamLicenseUsageHelper helper(cameras, m_recordingEnabled);
+        QnCamLicenseUsageHelper helper(cameras, m_recordingEnabled, commonModule());
 
         QPalette palette = m_parentPalette;
         bool licensesOk = helper.isValid();
@@ -210,7 +223,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
         &QnCameraScheduleWidget::updateColors);
     updateColors();
 
-    QnCamLicenseUsageHelper helper;
+    QnCamLicenseUsageHelper helper(commonModule());
     ui->licensesUsageWidget->init(&helper);
 
     QnCheckbox::autoCleanTristate(ui->enableRecordingCheckBox);
@@ -807,7 +820,7 @@ void QnCameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList& value)
 
 bool QnCameraScheduleWidget::canEnableRecording() const
 {
-    QnCamLicenseUsageHelper licenseHelper(m_cameras, true);
+    QnCamLicenseUsageHelper licenseHelper(m_cameras, true, commonModule());
     return all_of(m_cameras,
         [&licenseHelper](const QnVirtualCameraResourcePtr& camera)
         {
@@ -836,6 +849,21 @@ int QnCameraScheduleWidget::qualityToComboIndex(const Qn::StreamQuality& q)
     return 0;
 }
 
+void QnCameraScheduleWidget::updateScheduleTypeControls()
+{
+    const bool recordingEnabled = ui->enableRecordingCheckBox->isChecked();
+    const auto labels =
+        { ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord };
+    for (auto label: labels)
+    {
+        const auto button = qobject_cast<QAbstractButton*>(label->buddy());
+        const QPalette::ColorRole foreground = button && button->isChecked() && recordingEnabled
+            ? QPalette::Highlight
+            : QPalette::WindowText;
+        label->setForegroundRole(foreground);
+    }
+}
+
 void QnCameraScheduleWidget::updateGridParams(bool pickedFromGrid)
 {
     if (m_disableUpdateGridParams)
@@ -853,13 +881,7 @@ void QnCameraScheduleWidget::updateGridParams(bool pickedFromGrid)
     else
         qWarning() << "QnCameraScheduleWidget::No record type is selected!";
 
-    for (auto label : {ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord})
-    {
-        auto button = qobject_cast<QAbstractButton*>(label->buddy());
-        QPalette::ColorRole foreground = button && button->isChecked() ? QPalette::Highlight : QPalette::WindowText;
-        label->setForegroundRole(foreground);
-    }
-
+    updateScheduleTypeControls();
     bool enabled = !ui->noRecordButton->isChecked();
     ui->fpsSpinBox->setEnabled(enabled && m_recordingParamsAvailable);
     ui->qualityComboBox->setEnabled(enabled && m_recordingParamsAvailable);
@@ -924,13 +946,18 @@ void QnCameraScheduleWidget::updateArchiveRangeEnabledState()
 
 void QnCameraScheduleWidget::updateGridEnabledState()
 {
+    const bool recordingEnabled = ui->enableRecordingCheckBox->isChecked();
     ui->motionGroupBox->setEnabled(m_recordingParamsAvailable);
+    setLayoutEnabled(ui->recordingScheduleLayout, recordingEnabled);
+    setLayoutEnabled(ui->scheduleSettingsLayout, recordingEnabled);
+    setLayoutEnabled(ui->bottomParametersLayout, recordingEnabled);
+    updateScheduleTypeControls();
     updateArchiveRangeEnabledState();
 }
 
 void QnCameraScheduleWidget::updateLicensesLabelText()
 {
-    QnCamLicenseUsageHelper helper;
+    QnCamLicenseUsageHelper helper(commonModule());
 
     switch (ui->enableRecordingCheckBox->checkState())
     {
@@ -1173,37 +1200,34 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked()
         }
 
         camera->setScheduleDisabled(!recordingEnabled);
-        if (recordingEnabled)
+        int maxFps = camera->getMaxFps();
+
+        //TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
+        // or just use camera->reservedSecondStreamFps();
+
+        int decreaseAlways = 0;
+        if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing && camera->getMotionType() == Qn::MT_SoftwareGrid)
+            decreaseAlways = MIN_SECOND_STREAM_FPS;
+
+        int decreaseIfMotionPlusLQ = 0;
+        if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing)
+            decreaseIfMotionPlusLQ = MIN_SECOND_STREAM_FPS;
+
+        QnScheduleTaskList tasks;
+        for (auto task: scheduleTasks())
         {
-            int maxFps = camera->getMaxFps();
-
-            //TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
-            // or just use camera->reservedSecondStreamFps();
-
-            int decreaseAlways = 0;
-            if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing && camera->getMotionType() == Qn::MT_SoftwareGrid)
-                decreaseAlways = MIN_SECOND_STREAM_FPS;
-
-            int decreaseIfMotionPlusLQ = 0;
-            if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing)
-                decreaseIfMotionPlusLQ = MIN_SECOND_STREAM_FPS;
-
-            QnScheduleTaskList tasks;
-            for (auto task: scheduleTasks())
-            {
-                if (task.getRecordingType() == Qn::RT_MotionAndLowQuality)
-                    task.setFps(qMin(task.getFps(), maxFps - decreaseIfMotionPlusLQ));
-                else
-                    task.setFps(qMin(task.getFps(), maxFps - decreaseAlways));
-                tasks.append(task);
-            }
-            updateRecordThresholds(tasks);
-
-            camera->setScheduleTasks(tasks);
+            if (task.getRecordingType() == Qn::RT_MotionAndLowQuality)
+                task.setFps(qMin(task.getFps(), maxFps - decreaseIfMotionPlusLQ));
+            else
+                task.setFps(qMin(task.getFps(), maxFps - decreaseAlways));
+            tasks.append(task);
         }
+        updateRecordThresholds(tasks);
+
+        camera->setScheduleTasks(tasks);
     };
 
-    auto selectedCameras = qnResPool->getResources<QnVirtualCameraResource>(
+    auto selectedCameras = resourcePool()->getResources<QnVirtualCameraResource>(
         dialog->selectedResources());
     qnResourcesChangesManager->saveCameras(selectedCameras, applyChanges);
     updateLicensesLabelText();
@@ -1278,6 +1302,7 @@ void QnCameraScheduleWidget::validateArchiveLength()
     if (alertVisible)
     {
         alertText = QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
             tr("High minimum value can lead to archive length decrease on other devices."),
             tr("High minimum value can lead to archive length decrease on other cameras."));
     }

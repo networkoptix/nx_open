@@ -7,7 +7,7 @@
 #include <nx/utils/literal.h>
 #include <nx/utils/random.h>
 
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 #include <utils/common/long_runnable.h>
 #include <utils/common/sync_call.h>
 #include <utils/common/util.h>
@@ -49,7 +49,7 @@ protected:
             std::move(tcpSocket));
         httpMsgPipeline->startReadingConnection();
 
-        auto httpMsgPipelineGuard = makeScopedGuard(
+        auto httpMsgPipelineGuard = makeScopeGuard(
             [&httpMsgPipeline]() { httpMsgPipeline->pleaseStopSync(); });
 
         nx::utils::promise<nx_http::Message> responseReceivedPromise;

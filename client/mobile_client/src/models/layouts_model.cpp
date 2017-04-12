@@ -2,6 +2,8 @@
 
 #include <QtCore/QCoreApplication>
 
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -70,7 +72,7 @@ struct ModelItem
 
 } // anonymous namespace
 
-class QnLayoutsModelUnsorted : public Connective<QAbstractListModel>
+class QnLayoutsModelUnsorted: public Connective<QAbstractListModel>, public QnConnectionContextAware
 {
     Q_DECLARE_TR_FUNCTIONS(QnLayoutsModelUnsorted)
 
@@ -115,12 +117,12 @@ private:
 QnLayoutsModelUnsorted::QnLayoutsModelUnsorted(QObject* parent):
     base_type(parent)
 {
-    const auto userWatcher = qnCommon->instance<QnUserWatcher>();
+    const auto userWatcher = commonModule()->instance<QnUserWatcher>();
     connect(userWatcher, &QnUserWatcher::userChanged,
             this, &QnLayoutsModelUnsorted::at_userChanged);
     at_userChanged(userWatcher->user());
 
-    const auto camerasWatcher = qnCommon->instance<QnAvailableCamerasWatcher>();
+    const auto camerasWatcher = commonModule()->instance<QnAvailableCamerasWatcher>();
     auto updateCamerasCount = [this, camerasWatcher]()
     {
         m_allCamerasCount = camerasWatcher->availableCameras().size();
@@ -132,9 +134,9 @@ QnLayoutsModelUnsorted::QnLayoutsModelUnsorted(QObject* parent):
     connect(camerasWatcher, &QnAvailableCamerasWatcher::cameraRemoved,
             this, updateCamerasCount);
 
-    connect(qnResPool, &QnResourcePool::resourceAdded,
+    connect(resourcePool(), &QnResourcePool::resourceAdded,
             this, &QnLayoutsModelUnsorted::at_resourceAdded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved,
             this, &QnLayoutsModelUnsorted::at_resourceRemoved);
 }
 
@@ -228,7 +230,7 @@ void QnLayoutsModelUnsorted::resetModel()
 
     m_itemsList.append(ModelItem());
 
-    const auto layouts = qnResPool->getResources<QnLayoutResource>();
+    const auto layouts = resourcePool()->getResources<QnLayoutResource>();
     for (const auto& layout : layouts)
     {
         connect(layout, &QnLayoutResource::parentIdChanged,
@@ -240,9 +242,9 @@ void QnLayoutsModelUnsorted::resetModel()
         addLayout(layout);
     }
 
-    if (qnResourceAccessManager->hasGlobalPermission(m_user, Qn::GlobalControlVideoWallPermission))
+    if (resourceAccessManager()->hasGlobalPermission(m_user, Qn::GlobalControlVideoWallPermission))
     {
-        const auto servers = qnResPool->getResources<QnMediaServerResource>();
+        const auto servers = resourcePool()->getResources<QnMediaServerResource>();
         for (const auto& server : servers)
         {
             if (!isServerSuitable(server))
@@ -260,7 +262,7 @@ bool QnLayoutsModelUnsorted::isLayoutSuitable(const QnLayoutResourcePtr& layout)
     if (!m_user)
         return false;
 
-    return qnResourceAccessProvider->hasAccess(m_user, layout);
+    return resourceAccessProvider()->hasAccess(m_user, layout);
 }
 
 bool QnLayoutsModelUnsorted::isServerSuitable(const QnMediaServerResourcePtr& server) const

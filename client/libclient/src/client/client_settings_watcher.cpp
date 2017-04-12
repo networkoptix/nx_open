@@ -1,5 +1,7 @@
 #include "client_settings_watcher.h"
 
+#include <QtCore/QTimer>
+
 #include <client/client_settings.h>
 #include <client/client_instance_manager.h>
 #include <client/client_show_once_settings.h>

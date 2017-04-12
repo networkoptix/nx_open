@@ -10,16 +10,16 @@ QnWorkbenchServerSafemodeWatcher::QnWorkbenchServerSafemodeWatcher(QObject *pare
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
 {
-    connect(qnCommon, &QnCommonModule::remoteIdChanged, this, &QnWorkbenchServerSafemodeWatcher::updateCurrentServer);
-    connect(qnCommon, &QnCommonModule::readOnlyChanged, this, &QnWorkbenchServerSafemodeWatcher::updateServerFlags);
+    connect(commonModule(), &QnCommonModule::remoteIdChanged, this, &QnWorkbenchServerSafemodeWatcher::updateCurrentServer);
+    connect(commonModule(), &QnCommonModule::readOnlyChanged, this, &QnWorkbenchServerSafemodeWatcher::updateServerFlags);
 
-    connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::initialResourcesReceived, this, [this] {
+    connect(qnCommonMessageProcessor, &QnCommonMessageProcessor::initialResourcesReceived, this, [this] {
         updateCurrentServer();
         updateServerFlags();
     });
 
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, [this](const QnResourcePtr &resource) {
-        if (m_currentServer || qnCommon->moduleGUID().isNull() || resource->getId() != qnCommon->remoteGUID())
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this, [this](const QnResourcePtr &resource) {
+        if (m_currentServer || commonModule()->moduleGUID().isNull() || resource->getId() != commonModule()->remoteGUID())
             return;
 
         m_currentServer = resource.dynamicCast<QnMediaServerResource>();
@@ -27,7 +27,7 @@ QnWorkbenchServerSafemodeWatcher::QnWorkbenchServerSafemodeWatcher(QObject *pare
     });
 
 
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr &resource) {
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr &resource) {
         if (!m_currentServer || m_currentServer != resource)
             return;
         m_currentServer.reset();
@@ -38,14 +38,14 @@ QnWorkbenchServerSafemodeWatcher::QnWorkbenchServerSafemodeWatcher(QObject *pare
 }
 
 void QnWorkbenchServerSafemodeWatcher::updateCurrentServer() {
-    m_currentServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
+    m_currentServer = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->remoteGUID());
 }
 
 void QnWorkbenchServerSafemodeWatcher::updateServerFlags() {
     if (!m_currentServer)
         return;
 
-    if (qnCommon->isReadOnly())
+    if (commonModule()->isReadOnly())
         m_currentServer->addFlags(Qn::read_only);
     else
         m_currentServer->removeFlags(Qn::read_only);

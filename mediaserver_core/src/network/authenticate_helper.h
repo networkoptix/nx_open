@@ -23,7 +23,7 @@
 #include "network/auth/abstract_nonce_provider.h"
 #include "network/auth/abstract_user_data_provider.h"
 #include <core/resource_access/user_access_data.h>
-
+#include <common/common_module_aware.h>
 
 #define USE_USER_RESOURCE_PROVIDER
 
@@ -35,6 +35,7 @@ struct CloudManagerGroup;
 class QnAuthHelper
 :
     public QObject,
+    public QnCommonModuleAware,
     public Singleton<QnAuthHelper>
 {
     Q_OBJECT
@@ -43,6 +44,7 @@ public:
     static const unsigned int MAX_AUTHENTICATION_KEY_LIFE_TIME_MS;
 
     QnAuthHelper(
+        QnCommonModule* commonModule,
         TimeBasedNonceProvider* timeBasedNonceProvider,
         CloudManagerGroup* cloudManagerGroup);
     virtual ~QnAuthHelper();

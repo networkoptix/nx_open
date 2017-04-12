@@ -1,12 +1,19 @@
 #pragma once
 
+#include <QtCore/QAbstractListModel>
+
+#include <client_core/connection_context_aware.h>
+
 #include <nx_ec/data/api_user_role_data.h>
 
 #include <ui/models/abstract_permissions_model.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 /** Model for editing list of user roles */
-class QnUserRolesSettingsModel : public QAbstractListModel, public QnAbstractPermissionsModel
+class QnUserRolesSettingsModel:
+    public QAbstractListModel,
+    public QnAbstractPermissionsModel,
+    public QnConnectionContextAware
 {
     Q_OBJECT
 

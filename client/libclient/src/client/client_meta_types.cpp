@@ -24,12 +24,20 @@
 #include <utils/ping_utility.h>
 #include <utils/app_server_file_cache.h>
 
+#include <cdb/result_code.h>
+#include <cdb/system_data.h>
+#include <api/server_rest_connection.h>
+
 namespace {
     volatile bool qn_clientMetaTypes_initialized = false;
 
 }
 
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
+
+Q_DECLARE_METATYPE(nx::cdb::api::ResultCode)
+Q_DECLARE_METATYPE(nx::cdb::api::SystemData)
+Q_DECLARE_METATYPE(rest::QnConnectionPtr)
 
 void QnClientMetaTypes::initialize() {
     /* Note that running the code twice is perfectly OK,
@@ -84,7 +92,6 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnHistogramColors>();
     qRegisterMetaType<QnTwoWayAudioWidgetColors>();
     qRegisterMetaType<QnResourceWidgetFrameColors>();
-    qRegisterMetaType<QnCompositeTextOverlayColors>();
     qRegisterMetaType<QnPtzManageModelColors>();
     qRegisterMetaType<QnRoutingManagementColors>();
     qRegisterMetaType<QnAuditLogColors>();
@@ -104,6 +111,10 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnUpdateResult>();
     qRegisterMetaType<QnCheckForUpdateResult>();
 
+    qRegisterMetaType<nx::cdb::api::ResultCode>();
+    qRegisterMetaType<nx::cdb::api::SystemData>();
+    qRegisterMetaType<rest::QnConnectionPtr>();
+
     QMetaType::registerComparators<QnUuid>();
 
     QnJsonSerializer::registerSerializer<QnBookmarkColors>();
@@ -116,7 +127,6 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnHistogramColors>();
     QnJsonSerializer::registerSerializer<QnTwoWayAudioWidgetColors>();
     QnJsonSerializer::registerSerializer<QnResourceWidgetFrameColors>();
-    QnJsonSerializer::registerSerializer<QnCompositeTextOverlayColors>();
     QnJsonSerializer::registerSerializer<QnPtzManageModelColors>();
     QnJsonSerializer::registerSerializer<QnRoutingManagementColors>();
     QnJsonSerializer::registerSerializer<QnAuditLogColors>();

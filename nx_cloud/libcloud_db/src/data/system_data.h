@@ -55,6 +55,7 @@ class SystemData:
 public:
     /** Seconds since epoch (1970-01-01). */
     int expirationTimeUtc;
+    bool activationInDbNeeded;
 
     SystemData();
 

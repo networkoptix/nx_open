@@ -2,6 +2,8 @@
 
 #include <api/global_settings.h>
 
+#include <common/common_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/fake_media_server.h>
 #include <core/resource/user_resource.h>
@@ -36,9 +38,9 @@ void QnResourceTreeModelOtherSystemsNode::initialize()
     connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemLost,
         this, &QnResourceTreeModelOtherSystemsNode::handleSystemLost);
 
-    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         &QnResourceTreeModelOtherSystemsNode::handleResourceAdded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnResourceTreeModelOtherSystemsNode::handleResourceRemoved);
 
     connect(context(), &QnWorkbenchContext::userChanged, this,
@@ -55,7 +57,7 @@ void QnResourceTreeModelOtherSystemsNode::deinitialize()
 {
     qnGlobalSettings->disconnect(this);
     context()->disconnect(this);
-    qnResPool->disconnect(this);
+    resourcePool()->disconnect(this);
     qnSystemsFinder->disconnect(this);
 
     clean();
@@ -144,7 +146,7 @@ void QnResourceTreeModelOtherSystemsNode::updateFakeServerNode(
         ? tr("New System")
         : info.systemName;
 
-    const bool isCurrentSystemServer = helpers::serverBelongsToCurrentSystem(info);
+    const bool isCurrentSystemServer = helpers::serverBelongsToCurrentSystem(server);
 
     const auto parent = isCurrentSystemServer
         ? model()->rootNode(Qn::ServersNode)
@@ -234,7 +236,7 @@ void QnResourceTreeModelOtherSystemsNode::rebuild()
     if (!canSeeFakeServers())
         return;
 
-    for (const auto& resource: qnResPool->getAllIncompatibleResources())
+    for (const auto& resource: resourcePool()->getAllIncompatibleResources())
     {
         const auto server = resource.dynamicCast<QnFakeMediaServerResource>();
         NX_ASSERT(server);

@@ -31,7 +31,8 @@
 static const int NETSTATE_UPDATE_TIME = 1000 * 30;
 static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 2;
 
-QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager()
+QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(QnCommonModule* commonModule):
+    QnResourceDiscoveryManager(commonModule)
 {
     netStateTime.restart();
     connect(this, &QnMServerResourceDiscoveryManager::cameraDisconnected, qnBusinessRuleConnector, &QnBusinessEventConnector::at_cameraDisconnected);
@@ -84,7 +85,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                 ++itr;
                 continue;
             }
-            QnSecurityCamResourcePtr existRes = qnResPool->getResourceByUniqueId<QnSecurityCamResource>((*itr)->getUniqueId());
+            QnSecurityCamResourcePtr existRes = resourcePool()->getResourceByUniqueId<QnSecurityCamResource>((*itr)->getUniqueId());
             if (existRes && existRes->hasFlags(Qn::foreigner) && !existRes->hasFlags(Qn::desktop_camera))
             {
                 m_tmpForeignResources.insert(camRes->getUniqueId(), camRes);
@@ -100,7 +101,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
             // sort foreign resources to add more important cameras first: check if it is an own cameras, then check failOver priority order
             auto foreignResources = m_tmpForeignResources.values();
-            const QnUuid ownGuid = qnCommon->moduleGUID();
+            const QnUuid ownGuid = commonModule()->moduleGUID();
             std::sort(foreignResources.begin(), foreignResources.end(), [&ownGuid](const QnSecurityCamResourcePtr& leftCam, const QnSecurityCamResourcePtr& rightCam)
             {
                 bool leftOwnServer = leftCam->preferredServerId() == ownGuid;
@@ -160,30 +161,27 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
         if (!rpResource)
         {
-            if (newCamRes && newCamRes->needCheckIpConflicts())
-            {
-                // do not count 2--N channels of multichannel cameras as conflict
-                quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
-                if (ips)
-                    ipsList[ips].insert(newNetRes);
-            }
-
             ++it; // keep new resource in a list
             continue;
         }
 
+		if (rpResource->hasFlags(Qn::foreigner))
+		{
+			if (!canTakeForeignCamera(rpResource.dynamicCast<QnSecurityCamResource>(), extraResources.size()))
+			{
+				it = resources.erase(it); // do not touch foreign resource
+				continue;
+			}
+		}
+
+		if (newCamRes && newCamRes->needCheckIpConflicts())
+		{
+			quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
+			if (ips)
+				ipsList[ips].insert(newNetRes);
+		}
+
         QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
-
-        // if such res in ResourcePool
-
-        if (rpResource->hasFlags(Qn::foreigner))
-        {
-            if (!canTakeForeignCamera(rpResource.dynamicCast<QnSecurityCamResource>(), extraResources.size()))
-            {
-                it = resources.erase(it); // do not touch foreign resource
-                continue;
-            }
-        }
 
         const bool isForeign = rpResource->hasFlags(Qn::foreigner);
         QnVirtualCameraResourcePtr existCamRes = rpNetRes.dynamicCast<QnVirtualCameraResource>();
@@ -207,7 +205,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     newNetRes->update(existCamRes);
                     newCamRes->setManuallyAdded( isDiscoveredManually );
 
-                    newNetRes->setParentId(qnCommon->moduleGUID());
+                    newNetRes->setParentId(commonModule()->moduleGUID());
                     newNetRes->setFlags(existCamRes->flags() & ~Qn::foreigner);
                     newNetRes->setId(existCamRes->getId());
                     newNetRes->addFlags(Qn::parent_change);
@@ -220,11 +218,11 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     ec2::ApiCameraData apiCamera;
                     fromResourceToApi(existCamRes, apiCamera);
 
-                    ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
+                    ec2::AbstractECConnectionPtr connect = commonModule()->ec2Connection();
                     const ec2::ErrorCode errorCode = connect->getCameraManager(Qn::kSystemAccess)->addCameraSync(apiCamera);
                     if( errorCode != ec2::ErrorCode::ok )
                         NX_LOG( QString::fromLatin1("Discovery----: Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
-                    propertyDictionary->saveParams( existCamRes->getId() );
+                    existCamRes->saveParams();
                 }
             }
         }
@@ -249,10 +247,14 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             QStringList conflicts;
             for(const QnNetworkResourcePtr& camRes: itr.value())
             {
-                conflicts << camRes->getPhysicalId();
-                QnVirtualCameraResource* cam = dynamic_cast<QnVirtualCameraResource*>(camRes.data());
-                if (cam)
-                    cam->issueOccured();
+                // Human-readable value to help user identify a camera.
+                QString cameraId = camRes->getMAC().toString();
+                if (cameraId.isEmpty())
+                    cameraId = camRes->getId().toString();
+
+                conflicts << cameraId;
+                if (auto camera = camRes.dynamicCast<QnVirtualCameraResource>())
+                    camera->issueOccured();
             }
             emit CameraIPConflict(hostAddr, conflicts);
         }
@@ -287,7 +289,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
 void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& discoveredResources)
 {
-    const QnResourceList& resources = qnResPool->getResources();
+    const QnResourceList& resources = resourcePool()->getResources();
 
     for(const QnResourcePtr& res: resources)
     {

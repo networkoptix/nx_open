@@ -1,5 +1,6 @@
-
 #pragma once
+
+#include <QtCore/QAbstractItemModel>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark.h>

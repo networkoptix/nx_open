@@ -5,7 +5,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <transaction/transaction_transport_base.h>
-#include <utils/common/subscription.h>
+#include <nx/utils/subscription.h>
 
 #include "test_transaction_transport.h"
 
@@ -30,12 +30,25 @@ using OnConnectionFailureSubscription =
 class TransactionConnectionHelper
 {
 public:
+    struct ConnectionContext
+    {
+        ::ec2::ApiPeerData peerInfo;
+        /**
+         * Keeping separate instance with each connection to allow
+         * multiple connections to same peer be created.
+         */
+        std::unique_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState;
+        std::unique_ptr<test::TransactionTransport> connection;
+        std::unique_ptr<nx::network::aio::Timer> timer;
+    };
+
     using ConnectionId = int;
 
     TransactionConnectionHelper();
     ~TransactionConnectionHelper();
 
     void setRemoveConnectionAfterClosure(bool val);
+    void setMaxDelayBeforeConnect(std::chrono::milliseconds delay);
 
     /**
      * @return New connection id.
@@ -45,7 +58,8 @@ public:
         const std::string& login,
         const std::string& password,
         KeepAlivePolicy keepAlivePolicy,
-        int protocolVersion);
+        int protocolVersion,
+        const QnUuid& peerId = QnUuid());
     
     bool waitForState(
         const std::vector<::ec2::QnTransactionTransportBase::State> desiredStates,
@@ -62,43 +76,58 @@ public:
     {
         QnMutexLocker lk(&m_mutex);
         auto it = m_connections.find(connectionId);
-        func(it == m_connections.end() ? nullptr : it->second.connection.get());
+        func(it == m_connections.end() ? nullptr : &it->second);
+    }
+
+    template<typename Func>
+    void getAccessToConnectionByIndex(std::size_t index, Func func)
+    {
+        QnMutexLocker lk(&m_mutex);
+        auto it = std::next(m_connections.begin(), index);
+        func(it == m_connections.end() ? nullptr : &it->second);
     }
 
     void closeAllConnections();
 
     std::size_t activeConnectionCount() const;
+    std::size_t totalFailedConnections() const;
+    std::size_t connectedConnections() const;
 
     OnConnectionBecomesActiveSubscription& onConnectionBecomesActiveSubscription();
     OnConnectionFailureSubscription& onConnectionFailureSubscription();
 
 private:
-    struct ConnectionContext
-    {
-        /**
-         * Keeping separate instance with each connection to allow 
-         * multiple connections to same peer be created.
-         */
-        std::unique_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState;
-        std::unique_ptr<test::TransactionTransport> connection;
-    };
-
     QnUuid m_moduleGuid;
     QnUuid m_runningInstanceGuid;
     std::map<ConnectionId, ConnectionContext> m_connections;
+    std::set<ConnectionId> m_connectedConnections;
+    std::atomic<std::size_t> m_totalConnectionsFailed;
     mutable QnMutex m_mutex;
     QnWaitCondition m_condition;
     std::atomic<ConnectionId> m_transactionConnectionIdSequence;
     nx::network::aio::Timer m_aioTimer;
     bool m_removeConnectionAfterClosure;
+    std::chrono::milliseconds m_maxDelayBeforeConnect;
     OnConnectionBecomesActiveSubscription m_onConnectionBecomesActiveSubscription;
     OnConnectionFailureSubscription m_onConnectionFailureSubscription;
+
+    ConnectionContext prepareConnectionContext(
+        const std::string& login,
+        const std::string& password,
+        KeepAlivePolicy keepAlivePolicy,
+        int protocolVersion,
+        const QnUuid& peerId);
+    void startConnection(
+        ConnectionContext* connectionContext,
+        const QUrl& appserver2BaseUrl);
 
     ::ec2::ApiPeerData localPeer() const;
 
     void onTransactionConnectionStateChanged(
         ::ec2::QnTransactionTransportBase* /*connection*/,
         ::ec2::QnTransactionTransportBase::State /*newState*/);
+
+    QUrl prepareTargetUrl(const QUrl& appserver2BaseUrl, const QnUuid& localPeerId);
 
     void moveConnectionToReadyForStreamingState(
         ::ec2::QnTransactionTransportBase* connection);

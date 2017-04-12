@@ -2,11 +2,13 @@
 #define QN_ACTIVITY_PTZ_CONTROLLER_H
 
 #include "proxy_ptz_controller.h"
+#include <common/common_module_aware.h>
 
 template<class T>
 class QnResourcePropertyAdaptor;
 
-class QnActivityPtzController: public QnProxyPtzController {
+class QnActivityPtzController: public QnProxyPtzController, public QnCommonModuleAware
+{
     Q_OBJECT
     typedef QnProxyPtzController base_type;
 
@@ -17,7 +19,7 @@ public:
         Server
     };
 
-    QnActivityPtzController(Mode mode, const QnPtzControllerPtr &baseController);
+    QnActivityPtzController(QnCommonModule* commonModule, Mode mode, const QnPtzControllerPtr &baseController);
     virtual ~QnActivityPtzController();
 
     static bool extends(Qn::PtzCapabilities capabilities);

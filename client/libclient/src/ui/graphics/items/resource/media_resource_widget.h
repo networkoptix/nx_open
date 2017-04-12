@@ -1,6 +1,5 @@
 #pragma once
 
-#include <set>
 #include <array>
 
 #include "resource_widget.h"
@@ -9,6 +8,7 @@
 
 #include <camera/camera_bookmarks_manager_fwd.h>
 
+#include <business/business_fwd.h>
 #include <core/resource/resource_fwd.h>
 
 struct QnMetaDataV1;
@@ -34,8 +34,13 @@ class QnResourceDisplay;
 class QnResourceWidgetRenderer;
 class QnFisheyeHomePtzController;
 class QnIoModuleOverlayWidget;
-class QnCompositeTextOverlay;
+class QnScrollableItemsWidget;
+class QnScrollableTextItemsWidget;
+class QnGraphicsStackedWidget;
 class QnTwoWayAudioWidget;
+class QnSoftwareTriggerButton;
+
+struct QnHtmlTextItemOptions;
 
 class QnMediaResourceWidget: public Customized<QnResourceWidget>
 {
@@ -120,7 +125,11 @@ public:
     /** Check if the widget has video. It can be absent in I/O Module, for example. */
     bool hasVideo() const;
 
-    QnCompositeTextOverlay *compositeTextOverlay();
+    QnScrollableTextItemsWidget* bookmarksContainer();
+
+    void hideTextOverlay(const QnUuid& id);
+    void showTextOverlay(const QnUuid& id, const QString& text,
+        const QnHtmlTextItemOptions& options);
 
     QVector<QColor> motionSensitivityColors() const;
     void setMotionSensitivityColors(const QVector<QColor>& value);
@@ -185,12 +194,13 @@ protected:
     void suspendHomePtzController();
     void resumeHomePtzController();
 
-    virtual void updateHud(bool animate);
+    virtual void updateHud(bool animate) override;
 
     void ensureTwoWayAudioWidget();
     bool animationAllowed() const;
 
-    void resetSoftwareTriggerButtons();
+    void invokeTrigger(const QString& id,
+        QnBusiness::EventState toggleState = QnBusiness::UndefinedState);
 
 private slots:
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
@@ -210,6 +220,9 @@ private slots:
 
     void at_item_imageEnhancementChanged();
     void at_videoLayoutChanged();
+
+    void at_businessRuleChanged(const QnBusinessEventRulePtr& rule);
+    void at_businessRuleDeleted(const QnUuid& ruleId);
 
 private:
     void setDisplay(const QnResourceDisplayPtr &display);
@@ -234,6 +247,39 @@ private:
     qint64 getUtcCurrentTimeMs() const;
 
     void updateCurrentUtcPosMs();
+
+    void setupHud();
+
+    void setTextOverlayParameters(const QnUuid& id, bool visible,
+        const QString& text, const QnHtmlTextItemOptions& options);
+
+private:
+    struct SoftwareTriggerInfo
+    {
+        QString triggerId;
+        QString name;
+        QString icon;
+        bool prolonged;
+
+        bool operator == (const SoftwareTriggerInfo& other) const
+        {
+            return triggerId == other.triggerId
+                && name == other.name
+                && icon == other.icon
+                && prolonged == other.prolonged;
+        }
+    };
+
+    struct SoftwareTrigger
+    {
+        SoftwareTriggerInfo info;
+        QnUuid overlayItemId;
+    };
+
+    SoftwareTrigger* createTriggerIfRelevant(const QnBusinessEventRulePtr& rule);
+    bool isRelevantTriggerRule(const QnBusinessEventRulePtr& rule) const;
+    void configureTriggerButton(QnSoftwareTriggerButton* button, const SoftwareTriggerInfo& info);
+    void resetTriggers();
 
 private:
     struct ResourceStates
@@ -297,8 +343,6 @@ private:
 
     QnMediaDewarpingParams m_dewarpingParams;
 
-    QnCompositeTextOverlay *m_compositeTextOverlay;
-
     QnIoModuleOverlayWidget *m_ioModuleOverlayWidget;
     bool m_ioCouldBeShown;
 
@@ -309,10 +353,14 @@ private:
 
     QVector<QColor> m_motionSensitivityColors;
 
-    QnTwoWayAudioWidget* m_twoWayAudioWidget;
+    QnScrollableItemsWidget* m_triggersContainer = nullptr;
+    QnScrollableTextItemsWidget* m_bookmarksContainer = nullptr;
+    QnScrollableTextItemsWidget* m_textOverlayWidget = nullptr;
+    QnGraphicsStackedWidget* m_compositeOverlay = nullptr;
 
-    std::set<QString> m_softwareTriggers;
-    QList<QnUuid> m_softwareTriggerIds; // IDs of overlay items. Will be refactored ASAP.
+    QnTwoWayAudioWidget* m_twoWayAudioWidget = nullptr;
+
+    QHash<QnUuid, SoftwareTrigger> m_softwareTriggers; //< ruleId -> softwareTrigger
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

@@ -29,7 +29,7 @@ QnStatisticValuesHash QnUsersStatisticsModule::values() const
 
     QnStatisticValuesHash result;
 
-    const auto availableUsers = qnResPool->getResources<QnUserResource>();
+    const auto availableUsers = resourcePool()->getResources<QnUserResource>();
     //NX_ASSERT(!availableUsers.isEmpty(), Q_FUNC_INFO, "Can't gather metrics for empty users list");
     if (availableUsers.isEmpty())
         return result;
@@ -39,7 +39,7 @@ QnStatisticValuesHash QnUsersStatisticsModule::values() const
     PermissionCountHash permissionsCount;
     for (const auto &userResource: availableUsers)
     {
-        const auto permissions = qnResourceAccessManager->globalPermissions(userResource);
+        const auto permissions = resourceAccessManager()->globalPermissions(userResource);
 
         static const auto kDelimiter = L'|';
         const auto permissionsList = QnLexical::serialized(permissions)
@@ -63,7 +63,7 @@ QnStatisticValuesHash QnUsersStatisticsModule::values() const
     const auto accessController = context()->accessController();
     const auto currentUserPermissions = accessController
         ? accessController->globalPermissions()
-        : qnResourceAccessManager->globalPermissions(currentUser);
+        : resourceAccessManager()->globalPermissions(currentUser);
     const auto value = QnLexical::serialized(currentUserPermissions);
     result.insert(kPermissionsTag, value);
 

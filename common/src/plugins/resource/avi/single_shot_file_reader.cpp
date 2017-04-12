@@ -33,7 +33,8 @@ QnAbstractMediaDataPtr QnSingleShotFileStreamreader::getNextData()
         return QnAbstractMediaDataPtr();
 
     if (m_storage == 0)
-        m_storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(getResource()->getUrl()));
+        m_storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(
+            getResource()->commonModule(), getResource()->getUrl()));
     QIODevice* file = m_storage->open(getResource()->getUrl(), QIODevice::ReadOnly);
     if (file == 0)
         return QnAbstractMediaDataPtr();

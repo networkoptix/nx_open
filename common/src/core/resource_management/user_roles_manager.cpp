@@ -3,7 +3,8 @@
 #include <core/resource/user_resource.h>
 
 QnUserRolesManager::QnUserRolesManager(QObject* parent):
-    base_type(parent)
+    base_type(parent),
+    QnCommonModuleAware(parent)
 {
 }
 
@@ -201,7 +202,7 @@ QString QnUserRolesManager::userRoleName(const QnUserResourcePtr& user) const
         return QString();
     Qn::UserRole userRole = user->userRole();
     if (userRole == Qn::UserRole::CustomUserRole)
-        return qnUserRolesManager->userRole(user->userRoleId()).name;
+        return this->userRole(user->userRoleId()).name;
 
     return userRoleName(userRole);
 }

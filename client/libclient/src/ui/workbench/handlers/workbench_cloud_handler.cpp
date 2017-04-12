@@ -2,6 +2,8 @@
 
 #include <QtGui/QDesktopServices>
 
+#include <QtWidgets/QAction>
+
 #include <api/app_server_connection.h>
 
 #include <client/desktop_client_message_processor.h>
@@ -72,7 +74,7 @@ void QnWorkbenchCloudHandler::at_loginToCloudAction_triggered()
 void QnWorkbenchCloudHandler::at_logoutFromCloudAction_triggered()
 {
     qnClientCoreSettings->setCloudPassword(QString());
-
+    qnClientCoreSettings->save();
     /* Updating login if were logged under temporary credentials. */
     qnCloudStatusWatcher->setCredentials(QnEncodedCredentials(
         qnCloudStatusWatcher->effectiveUserName(), QString()));

@@ -1,9 +1,11 @@
 #include "self_updater.h"
 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
 #include <QtCore/QLockFile>
+#include <QtCore/QProcess>
 #include <QtCore/QStandardPaths>
-#include <QtCore/QCoreApplication>
+#include <QtCore/QThread>
 
 #include <api/applauncher_api.h>
 
@@ -19,6 +21,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/file_system.h>
 #include <nx/utils/raii_guard.h>
+#include <nx/utils/app_info.h>
 #include <utils/common/app_info.h>
 #include <utils/applauncher_utils.h>
 
@@ -50,14 +53,18 @@ SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
         m_clientVersion = nx::utils::SoftwareVersion(startupParams.engineVersion);
 
     QMap<Operation, Result> results;
+    // TODO: #3.1 #gdm #dklychkov Move function calls inside osCheck() method.
     results[Operation::RegisterUriHandler] = osCheck(Operation::RegisterUriHandler, registerUriHandler());
     results[Operation::UpdateApplauncher] = osCheck(Operation::UpdateApplauncher, updateApplauncher());
-    #if defined(Q_OS_LINUX)
+    if (nx::utils::AppInfo::isLinux() || nx::utils::AppInfo::isMacOsX())
+    {
         results[Operation::UpdateMinilauncher] = Result::Success;
-    #else
+    }
+    else
+    {
         results[Operation::UpdateMinilauncher] =
             osCheck(Operation::UpdateMinilauncher, updateMinilauncher());
-    #endif
+    }
 
     /* If we are already in self-update mode, just exit in any case. */
     if (startupParams.selfUpdateMode)
@@ -567,7 +574,7 @@ bool SelfUpdater::updateApplauncherDesktopIcon()
         auto iconName = AppInfo::iconFileName();
 
         const auto iconPath =
-            QDir(QApplication::applicationDirPath()).absoluteFilePath(
+            QDir(QCoreApplication::applicationDirPath()).absoluteFilePath(
                 lit("../share/icons/%1").arg(iconName));
 
         if (QFile::exists(iconPath))

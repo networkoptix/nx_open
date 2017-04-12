@@ -2,6 +2,7 @@
 
 #include "reverse_headers.h"
 
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/log/log.h>
 
@@ -22,6 +23,11 @@ ReverseConnector::ReverseConnector(
     m_httpClient->addAdditionalHeader(kConnection, kUpgrade);
     m_httpClient->addAdditionalHeader(kUpgrade, kNxRc);
     m_httpClient->addAdditionalHeader(kNxRcHostName, selfHostName);
+}
+
+ReverseConnector::~ReverseConnector()
+{
+    m_httpClient->pleaseStopSync();
 }
 
 void ReverseConnector::setHttpTimeouts(nx_http::AsyncHttpClient::Timeouts timeouts)
@@ -48,7 +54,7 @@ void ReverseConnector::connect(const SocketAddress& endpoint, ConnectHandler han
 
             if (m_httpClient->response()->statusLine.statusCode != 101)
             {
-                NX_LOG(lm("Upexpected status: (%1) %2")
+                NX_LOG(lm("Unexpected status: (%1) %2")
                     .arg(m_httpClient->response()->statusLine.statusCode)
                     .arg(m_httpClient->response()->statusLine.reasonPhrase), cl_logDEBUG1);
 
@@ -60,7 +66,7 @@ void ReverseConnector::connect(const SocketAddress& endpoint, ConnectHandler han
 
     QObject::connect(m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, onHttpDone);
     QObject::connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done, onHttpDone);
-    m_httpClient->doOptions(endpoint.toUrl());
+    m_httpClient->doOptions(url::Builder().setScheme("http").setEndpoint(endpoint).toUrl());
 }
 
 std::unique_ptr<BufferedStreamSocket> ReverseConnector::takeSocket()

@@ -1,6 +1,8 @@
 #include "smtp_simple_settings_widget.h"
 #include "ui_smtp_simple_settings_widget.h"
 
+#include <QtCore/QScopedValueRollback>
+
 #include <ui/common/read_only.h>
 #include <ui/common/aligner.h>
 #include <ui/utils/validators.h>

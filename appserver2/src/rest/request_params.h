@@ -39,4 +39,8 @@ bool parseHttpRequestParams(
     const QString& command, const QnRequestParamList& params, nullptr_t*);
 void toUrlParams(const nullptr_t&, QUrlQuery* query);
 
+bool parseHttpRequestParams(
+    const QString& command, const QnRequestParamList &params, QByteArray *value);
+void toUrlParams(
+    const QByteArray &filter, QUrlQuery *query);
 } // namespace ec2

@@ -7,11 +7,12 @@
 #include <api/media_server_connection.h>
 #include <core/resource/resource_fwd.h>
 #include <api/model/statistics_reply.h>
+#include <common/common_module_aware.h>
 
 /**
   * Class that receives, parses and stores statistics data from one server.
   */
-class QnMediaServerStatisticsStorage: public QObject
+class QnMediaServerStatisticsStorage: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
 public:
@@ -21,7 +22,7 @@ public:
      * \param serverId          Id of server resource to use.
      * \param parent            Parent object.
      */
-    QnMediaServerStatisticsStorage(const QnUuid &serverId, int pointsLimit, QObject *parent = nullptr);
+    QnMediaServerStatisticsStorage(const QnUuid &serverId, int pointsLimit, QObject* parent);
 
     /**
      *  Register the consumer object.

@@ -28,10 +28,10 @@ QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
         &QnWorkbenchUserWatcher::forcedUpdate);
 
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved);
 
-    connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
+    connect(globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged,
         this,
         [this](const QnResourceAccessSubject& subject, Qn::GlobalPermissions /*value*/)
         {
@@ -124,7 +124,7 @@ void QnWorkbenchUserWatcher::setReconnectOnPasswordChange(bool value)
 
 QnUserResourcePtr QnWorkbenchUserWatcher::calculateCurrentUser() const
 {
-    for (const QnUserResourcePtr &user : qnResPool->getResources<QnUserResource>())
+    for (const QnUserResourcePtr &user : resourcePool()->getResources<QnUserResource>())
     {
         if (user->getName().toLower() != m_userName.toLower())
             continue;
@@ -140,7 +140,7 @@ void QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr
         return;
 
     setCurrentUser(QnUserResourcePtr());
-    if (!qnCommon->remoteGUID().isNull())
+    if (!commonModule()->remoteGUID().isNull())
     {
         menu()->trigger(QnActions::DisconnectAction, QnActionParameters()
             .withArgument(Qn::ForceRole, true));

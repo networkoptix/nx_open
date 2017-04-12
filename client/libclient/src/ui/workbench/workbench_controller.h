@@ -1,5 +1,6 @@
-#ifndef QN_WORKBENCH_CONTROLLER_H
-#define QN_WORKBENCH_CONTROLLER_H
+#pragma once
+
+#include <array>
 
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
@@ -127,7 +128,6 @@ protected slots:
     void at_zoomTargetChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect, QnMediaResourceWidget *zoomTargetWidget);
 
     void at_motionSelectionProcessStarted(QGraphicsView *view, QnMediaResourceWidget *widget);
-    void at_motionSelectionStarted(QGraphicsView *view, QnMediaResourceWidget *widget);
     void at_motionRegionCleared(QGraphicsView *view, QnMediaResourceWidget *widget);
     void at_motionRegionSelected(QGraphicsView *view, QnMediaResourceWidget *widget, const QRect &region);
 
@@ -168,7 +168,6 @@ protected slots:
     void at_toggleInfoAction_triggered();
     void at_maximizeItemAction_triggered();
     void at_unmaximizeItemAction_triggered();
-    void at_toggleTourModeAction_triggered(bool checked);
     void at_fitInViewAction_triggered();
     void at_checkFileSignatureAction_triggered();
     void at_nextItemAction_triggered();
@@ -178,13 +177,11 @@ protected slots:
     void at_zoomedToggle_activated();
     void at_zoomedToggle_deactivated();
 
-    void at_tourModeLabel_finished();
-
     void updateLayoutInstruments(const QnLayoutResourcePtr &layout);
 
     void at_ptzProcessStarted(QnMediaResourceWidget *widget);
 
-private: 
+private:
     void toggleCurrentItemMaximizationState();
 
 private:
@@ -194,7 +191,7 @@ private:
     InstrumentManager *m_manager;
 
     /** Widgets by role. */
-    QnResourceWidget *m_widgetByRole[Qn::ItemRoleCount];
+    std::array<QnResourceWidget*, Qn::ItemRoleCount> m_widgetByRole{};
 
     /** Zoomed state toggle. */
     QnToggle *m_zoomedToggle;
@@ -283,9 +280,5 @@ private:
     /** Target geometries for concatenation of dragged and replaced item lists. */
     QList<QRect> m_dragGeometries;
 
-    QnGraphicsMessageBox *m_tourModeHintLabel;
-
     bool m_menuEnabled;
 };
-
-#endif // QN_WORKBENCH_CONTROLLER_H

@@ -6,9 +6,6 @@ import hachoir_parser
 import hachoir_metadata
         
 
-# currently expected in current directory:
-MEDIA_SAMPLE_FPATH = u'sample.mkv'
-
 CAMERA_MAC_ADDR = '11:22:33:44:55:66'
 
 
@@ -48,29 +45,32 @@ def make_camera_info(parent_id, name, mac_addr):
 
 class Camera(object):
 
-    def __init__(self):
-        self.mac_addr = CAMERA_MAC_ADDR
+    def __init__(self, name='funtest-camera', mac_addr=CAMERA_MAC_ADDR):
+        self.name = name
+        self.mac_addr = mac_addr
 
     def __repr__(self):
         return 'Camera(%s)' % self.mac_addr
 
     def get_info(self, parent_id):
-        return make_camera_info(parent_id, 'funtest-camera', self.mac_addr)
+        return make_camera_info(parent_id, self.name, self.mac_addr)
 
 
 class SampleMediaFile(object):
 
     def __init__(self, fpath):
-        assert isinstance(fpath, unicode), repr(fpath)  # hachoir requirement
         metadata = self._read_metadata(fpath)
         self.fpath = fpath
         self.duration = metadata.get('duration')  # datetime.timedelta
+        video_group = metadata['video[1]']
+        self.width = video_group.get('width')
+        self.height = video_group.get('height')
 
     def __repr__(self):
         return 'SampleMediaPath(%r, duration=%s)' % (self.fpath, self.duration)
 
     def _read_metadata(self, fpath):
-        parser = hachoir_parser.createParser(fpath)
+        parser = hachoir_parser.createParser(unicode(fpath))
         return hachoir_metadata.extractMetadata(parser)
 
     def get_contents(self):

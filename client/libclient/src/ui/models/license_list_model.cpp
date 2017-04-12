@@ -8,6 +8,8 @@
 
 #include <client/client_settings.h>
 
+#include <licensing/license_validator.h>
+
 #include <ui/style/globals.h>
 #include <ui/style/resource_icon_cache.h>
 
@@ -120,14 +122,14 @@ QVariant QnLicenseListModel::textData(const QModelIndex& index, bool fullText) c
         {
             bool fullStatus = fullText || m_extendedStatus;
 
-            QnLicense::ErrorCode code;
-            if (qnLicensePool->isLicenseValid(license, &code))
+            QnLicenseErrorCode code = licensePool()->validateLicense(license);
+            if (code == QnLicenseErrorCode::NoError)
                 return expirationInfo(license, fullStatus).second;
 
             if (fullStatus)
-                return license->errorMessage(code);
+                return QnLicenseValidator::errorMessage(code);
 
-            return code == QnLicense::Expired
+            return code == QnLicenseErrorCode::Expired
                 ? tr("Expired")
                 : tr("Error");
         }
@@ -164,11 +166,11 @@ QVariant QnLicenseListModel::foregroundData(const QModelIndex& index) const
         case QnLicenseListModel::ExpirationDateColumn:
         case QnLicenseListModel::LicenseStatusColumn:
         {
-            QnLicense::ErrorCode code;
-            if (!qnLicensePool->isLicenseValid(license, &code))
+            QnLicenseErrorCode code = licensePool()->validateLicense(license);
+            if (code != QnLicenseErrorCode::NoError)
             {
                 if (index.column() != QnLicenseListModel::ExpirationDateColumn
-                    || code == QnLicense::Expired)
+                    || code == QnLicenseErrorCode::Expired)
                 {
                     return QBrush(qnGlobals->errorTextColor());
                 }
@@ -328,9 +330,10 @@ QPair<QnLicenseListModel::ExpirationState, QString> QnLicenseListModel::expirati
     return{ SoonExpires, message };
 }
 
-QnMediaServerResourcePtr QnLicenseListModel::serverByLicense(const QnLicensePtr& license)
+QnMediaServerResourcePtr QnLicenseListModel::serverByLicense(const QnLicensePtr& license) const
 {
-    return qnResPool->getResourceById<QnMediaServerResource>(license->serverId());
+    auto serverId = licensePool()->validator()->serverId(license);
+    return resourcePool()->getResourceById<QnMediaServerResource>(serverId);
 }
 
 bool QnLicenseListModel::extendedStatus() const

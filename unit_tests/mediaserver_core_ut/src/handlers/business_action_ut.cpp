@@ -21,30 +21,34 @@ TEST(ExecActionAccessRightsTest, main)
     MediaServerLauncher launcher;
     ASSERT_TRUE(launcher.start());
 
-    auto createUser = [](const QString& name, Qn::GlobalPermission permissions)
+    auto createUser = [&launcher](const QString& name, Qn::GlobalPermission permissions)
     {
         QnUserResourcePtr user(new QnUserResource(QnUserType::Local));
         user->setId(QnUuid::createUuid());
         user->setName(name);
         user->setRawPermissions(permissions);
-        qnResPool->addResource(user);
+        launcher.commonModule()->resourcePool()->addResource(user);
     };
 
-    auto findUserByName = [](const QString& name)
+    auto findUserByName = [&launcher](const QString& name)
     {
-        for (const auto& user : qnResPool->getResources<QnUserResource>())
+        for (const auto& user: launcher.commonModule()->resourcePool()->getResources<QnUserResource>())
             if (user->getName() == name)
                 return user;
         return QnUserResourcePtr();
     };
 
-    auto executeTransaction = [](const Qn::UserAccessData& userAccess)
+    auto executeTransaction = [&launcher](const Qn::UserAccessData& userAccess)
     {
-        ec2::QnTransaction<ec2::ApiBusinessActionData> actionTran(ec2::ApiCommand::execAction);
+        ec2::QnTransaction<ec2::ApiBusinessActionData> actionTran(
+            ec2::ApiCommand::execAction,
+            launcher.commonModule()->moduleGUID());
         nx::utils::promise<ec2::ErrorCode> resultPromise;
         nx::utils::future<ec2::ErrorCode> resultFuture = resultPromise.get_future();
 
-        ec2::ServerQueryProcessorAccess().getAccess(userAccess).processUpdateAsync(
+        ec2::QnTransactionMessageBus messageBus(nullptr/*QnDbManager*/, Qn::PT_Server, launcher.commonModule());
+        ec2::ServerQueryProcessorAccess(nullptr/*QnDbManager*/, &messageBus)
+            .getAccess(userAccess).processUpdateAsync(
             actionTran,
             [&resultPromise](ec2::ErrorCode ecode)
             {

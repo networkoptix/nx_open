@@ -21,7 +21,7 @@
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 #include "network/universal_tcp_listener.h"
 #include "api/app_server_connection.h"
@@ -46,14 +46,16 @@ static const int kReadBufferSize = 1024 * 128; /* ~ 1 gbit/s */
 // ----------------------------- QnProxyConnectionProcessor ----------------------------
 
 QnProxyConnectionProcessor::QnProxyConnectionProcessor(
+    ec2::QnTransactionMessageBus* messageBus,
     QSharedPointer<AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
-    QnTCPConnectionProcessor(new QnProxyConnectionProcessorPrivate, std::move(socket))
+    QnTCPConnectionProcessor(new QnProxyConnectionProcessorPrivate, std::move(socket), owner->commonModule())
 {
     Q_D(QnProxyConnectionProcessor);
     d->owner = static_cast<QnUniversalTcpListener*>(owner);
-    d->connectTimeout = QnGlobalSettings::instance()->proxyConnectTimeout();
+    d->connectTimeout = qnGlobalSettings->proxyConnectTimeout();
+    d->messageBus = messageBus;
 }
 
 QnProxyConnectionProcessor::QnProxyConnectionProcessor(
@@ -61,11 +63,11 @@ QnProxyConnectionProcessor::QnProxyConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
-    QnTCPConnectionProcessor(priv, std::move(socket))
+    QnTCPConnectionProcessor(priv, std::move(socket), owner->commonModule())
 {
     Q_D(QnProxyConnectionProcessor);
     d->owner = static_cast<QnUniversalTcpListener*>(owner);
-    d->connectTimeout = QnGlobalSettings::instance()->proxyConnectTimeout();
+    d->connectTimeout = qnGlobalSettings->proxyConnectTimeout();
 }
 
 
@@ -142,10 +144,12 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
             d->connectTimeout.count(),
             [&](int socketCount)
             {
-                ec2::QnTransaction<ec2::ApiReverseConnectionData> tran(ec2::ApiCommand::openReverseConnection);
-                tran.params.targetServer = qnCommon->moduleGUID();
+                ec2::QnTransaction<ec2::ApiReverseConnectionData> tran(
+                    ec2::ApiCommand::openReverseConnection,
+                    commonModule()->moduleGUID());
+                tran.params.targetServer = commonModule()->moduleGUID();
                 tran.params.socketCount = socketCount;
-                qnTransactionBus->sendTransaction(tran, target);
+                d->messageBus->sendTransaction(tran, target);
             });
     } else {
         d->dstSocket.clear();
@@ -209,12 +213,12 @@ bool QnProxyConnectionProcessor::replaceAuthHeader()
     nx_http::header::DigestAuthorization originalAuthHeader;
     if (!originalAuthHeader.parse(nx_http::getHeaderValue(d->request.headers, authHeaderName)))
         return false;
-    if (QnUniversalRequestProcessor::needStandardProxy(d->request))
+    if (QnUniversalRequestProcessor::needStandardProxy(commonModule(), d->request))
     {
         return true; //< no need to update, it is non server proxy request
     }
 
-    if (auto ownServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID()))
+    if (auto ownServer = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID()))
     {
         // it's already authorized request.
         // Update authorization using local system user related to current server
@@ -248,11 +252,23 @@ bool QnProxyConnectionProcessor::replaceAuthHeader()
     return true;
 }
 
+void QnProxyConnectionProcessor::cleanupProxyInfo(nx_http::Request* request)
+{
+    static const char* kProxyHeadersPrefix = "Proxy-";
+
+    auto itr = request->headers.lower_bound(kProxyHeadersPrefix);
+    while (itr != request->headers.end() && itr->first.startsWith(kProxyHeadersPrefix))
+        itr = request->headers.erase(itr);
+
+    request->requestLine.url = request->requestLine.url.toString(
+        QUrl::RemoveScheme | QUrl::RemovePort | QUrl::RemoveAuthority);
+}
+
 bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstRoute)
 {
     Q_D(QnProxyConnectionProcessor);
 
-    if (QnUniversalRequestProcessor::needStandardProxy(d->request))
+    if (QnUniversalRequestProcessor::needStandardProxy(commonModule(), d->request))
     {
         dstUrl = d->request.requestLine.url;
     }
@@ -306,12 +322,14 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
 
         if (urlPath.isEmpty())
             urlPath = "/";
-        QString query = url.query();
-        if (!query.isEmpty()) {
-            urlPath += lit("?");
-            urlPath += query;
-        }
-        d->request.requestLine.url = urlPath;
+
+        auto updatedUrl = urlPath;
+        if (!url.query().isEmpty())
+            updatedUrl += lit("?") + url.query();
+        if (!url.fragment().isEmpty())
+            updatedUrl += lit("#") + url.fragment();
+
+        d->request.requestLine.url = updatedUrl;
     }
 
     nx_http::HttpHeaders::const_iterator xCameraGuidIter = d->request.headers.find( Qn::CAMERA_GUID_HEADER_NAME );
@@ -321,23 +339,25 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
     else
         cameraGuid = QnUuid::fromStringSafe(d->request.getCookieValue(Qn::CAMERA_GUID_HEADER_NAME));
     if (!cameraGuid.isNull()) {
-        if (QnResourcePtr camera = qnResPool->getResourceById(cameraGuid))
+        if (QnResourcePtr camera = resourcePool()->getResourceById(cameraGuid))
             dstRoute.id = camera->getParentId();
     }
 
-    nx_http::HttpHeaders::const_iterator itr = d->request.headers.find( Qn::SERVER_GUID_HEADER_NAME );
+    const auto itr = d->request.headers.find(Qn::SERVER_GUID_HEADER_NAME);
     if (itr != d->request.headers.end())
         dstRoute.id = QnUuid::fromStringSafe(itr->second);
+    else if (!dstRoute.id.isNull())
+        d->request.headers.emplace(Qn::SERVER_GUID_HEADER_NAME, dstRoute.id.toByteArray());
 
-    if (dstRoute.id == qnCommon->moduleGUID())
+    if (dstRoute.id == commonModule()->moduleGUID())
     {
         if (!cameraGuid.isNull())
         {
             // TODO: destination device is a camera. Remove proxy headers here as well.
-            if (QnNetworkResourcePtr camera = qnResPool->getResourceById<QnNetworkResource>(cameraGuid))
+            if (QnNetworkResourcePtr camera = resourcePool()->getResourceById<QnNetworkResource>(cameraGuid))
                 dstRoute.addr = SocketAddress(camera->getHostAddress(), camera->httpPort());
         }
-        else if (QnUniversalRequestProcessor::needStandardProxy(d->request))
+        else if (QnUniversalRequestProcessor::needStandardProxy(commonModule(), d->request))
         {
             QUrl url = d->request.requestLine.url;
             int defaultPort = getDefaultPortByProtocol(url.scheme());
@@ -351,7 +371,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
     }
     else if (!dstRoute.id.isNull())
     {
-        dstRoute = QnRouter::instance()->routeTo(dstRoute.id);
+        dstRoute = commonModule()->router()->routeTo(dstRoute.id);
     }
     else
     {
@@ -359,14 +379,10 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
 
         // No dst route Id means proxy to external resource.
         // All proxy hops have already been passed. Remove proxy-auth header.
-        // TODO: HTTP RFC declares some other proxy headers which should not be passed to a target
-        // server.We probably should remove all headers starting with 'Proxy-'
-        auto itr = d->request.headers.find("Proxy-Authorization");
-        if (itr != d->request.headers.end())
-            d->request.headers.erase(itr);
+        cleanupProxyInfo(&d->request);
     }
 
-    if (!dstRoute.id.isNull() && dstRoute.id != qnCommon->moduleGUID())
+    if (!dstRoute.id.isNull() && dstRoute.id != commonModule()->moduleGUID())
     {
         if (!replaceAuthHeader())
             return false;
@@ -390,15 +406,6 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
             nx_http::StringType existAuthSession = nx_http::getHeaderValue(d->request.headers, Qn::AUTH_SESSION_HEADER_NAME);
             if (existAuthSession.isEmpty())
                 nx_http::insertOrReplaceHeader(&d->request.headers, nx_http::HttpHeader(Qn::AUTH_SESSION_HEADER_NAME, authSession().toByteArray()));
-
-            QString path = d->request.requestLine.url.path();
-            if (!path.startsWith(QLatin1Char('/')))
-                path.prepend(QLatin1Char('/'));
-            if (dstRoute.id.isNull())
-                path.prepend(QString(lit("/proxy/%1/%2:%3")).arg(dstUrl.scheme()).arg(dstUrl.host()).arg(dstUrl.port()));
-            else
-                path.prepend(QString(lit("/proxy/%1/%2")).arg(dstUrl.scheme()).arg(dstRoute.id.toString()));
-            d->request.requestLine.url = path;
         }
         dstUrl.setHost(dstRoute.addr.address.toString());
         dstUrl.setPort(dstRoute.addr.port);
@@ -411,7 +418,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
 
         nx_http::header::Via::ProxyEntry proxyEntry;
         proxyEntry.protoVersion = d->request.requestLine.version.version;
-        proxyEntry.receivedBy = qnCommon->moduleGUID().toByteArray();
+        proxyEntry.receivedBy = commonModule()->moduleGUID().toByteArray();
         via.entries.push_back( proxyEntry );
         nx_http::insertOrReplaceHeader(
             &d->request.headers,

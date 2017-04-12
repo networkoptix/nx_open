@@ -197,7 +197,7 @@ void setScreenRecursive(QGraphicsItem* target, QScreen* screen)
 
 } // namespace
 
-using namespace nx::client::ui::workbench;
+using namespace nx::client::desktop::ui::workbench;
 
 QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     base_type(parent),
@@ -294,9 +294,10 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
 
     /* Create viewport animator. */
     m_viewportAnimator = new ViewportAnimator(this); // ANIMATION: viewport.
+    static constexpr qreal kDefaultScalingSpeed = 1.01; // cannot be 1.0
     m_viewportAnimator->setAbsoluteMovementSpeed(0.0); /* Viewport movement speed in scene coordinates. */
     m_viewportAnimator->setRelativeMovementSpeed(1.0); /* Viewport movement speed in viewports per second. */
-    m_viewportAnimator->setScalingSpeed(1.0); /* Viewport scaling speed, scale factor per second. */
+    m_viewportAnimator->setScalingSpeed(kDefaultScalingSpeed); /* Viewport scaling speed, scale factor per second. */
     m_viewportAnimator->setTimer(animationTimer);
     connect(m_viewportAnimator, SIGNAL(started()), this, SIGNAL(viewportGrabbed()));
     connect(m_viewportAnimator, SIGNAL(started()), m_boundingInstrument, SLOT(recursiveDisable()));
@@ -307,7 +308,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     /* Connect to context. */
     connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
         &QnWorkbenchDisplay::at_context_permissionsChanged);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnWorkbenchDisplay::at_resourcePool_resourceRemoved);
 
     connect(context()->instance<QnWorkbenchNotificationsHandler>(), &QnWorkbenchNotificationsHandler::notificationAdded,
@@ -591,6 +592,7 @@ void QnWorkbenchDisplay::initSceneView()
 
     if (canShowLayoutBackground())
     {
+        //
         m_gridBackgroundItem = new QnGridBackgroundItem(NULL, context());
         m_scene->addItem(gridBackgroundItem());
         setLayer(gridBackgroundItem(), Qn::EMappingLayer);
@@ -1079,7 +1081,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         return false;
     }
 
-    QnResourcePtr resource = qnResPool->getResourceByUniqueId(item->resourceUid());
+    QnResourcePtr resource = resourcePool()->getResourceByUniqueId(item->resourceUid());
     if (!resource)
     {
         NX_LOG(lit("QnWorkbenchDisplay::addItemInternal: invalid resource id %1")
@@ -2006,8 +2008,6 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged()
 
     foreach(QnWorkbenchItem *item, layout->items())
         at_layout_itemRemoved(item);
-    if (gridBackgroundItem())
-        gridBackgroundItem()->setOpacity(0.0);
 
     m_inChangeLayout = false;
 }
@@ -2028,7 +2028,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
             m_loader->pleaseStop();
         }
 
-        if (QnMediaResourcePtr resource = qnResPool->getResourceByUniqueId((**layout->items().begin()).resourceUid()).dynamicCast<QnMediaResource>())
+        if (QnMediaResourcePtr resource = resourcePool()->getResourceByUniqueId((**layout->items().begin()).resourceUid()).dynamicCast<QnMediaResource>())
         {
             m_loader = new QnThumbnailsLoader(resource, QnThumbnailsLoader::Mode::Strict);
 
@@ -2414,7 +2414,7 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbs
     QnBusiness::ActionType actionType = businessAction->actionType();
     if (actionType == QnBusiness::ShowOnAlarmLayoutAction)
     {
-        if (QnResourcePtr resource = qnResPool->getResourceById(businessAction->getParams().actionResourceId))
+        if (QnResourcePtr resource = resourcePool()->getResourceById(businessAction->getParams().actionResourceId))
             targetResources.insert(resource);
     }
     else
@@ -2422,10 +2422,10 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbs
         Q_ASSERT_X(actionType == QnBusiness::ShowPopupAction || actionType == QnBusiness::PlaySoundAction,
             Q_FUNC_INFO, "Invalid action type");
         QnBusinessEventParameters eventParams = businessAction->getRuntimeParams();
-        if (QnResourcePtr resource = qnResPool->getResourceById(eventParams.eventResourceId))
+        if (QnResourcePtr resource = resourcePool()->getResourceById(eventParams.eventResourceId))
             targetResources.insert(resource);
         if (eventParams.eventType >= QnBusiness::UserDefinedEvent)
-            targetResources.unite(qnResPool->getResources<QnResource>(eventParams.metadata.cameraRefs).toSet());
+            targetResources.unite(resourcePool()->getResources<QnResource>(eventParams.metadata.cameraRefs).toSet());
     }
 
     for (const QnResourcePtr &resource : targetResources)

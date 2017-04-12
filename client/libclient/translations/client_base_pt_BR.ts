@@ -33,8 +33,7 @@
     <message>
         <source>Zoom timeline
 to view more bookmarks</source>
-        <comment>Use &apos;
-&apos; to split message in two lines (required)</comment>
+        <comment>It is highly recommended to split message in two lines</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -268,33 +267,6 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-        <source>Zoom In</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Zoom Out</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Focus Far</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Focus Near</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Auto Focus</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Change Dewarping Mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QObject</name>
     <message>
         <source>None</source>
@@ -347,11 +319,11 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Client is not connected to any system</source>
+        <source>Customer Support</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Customer Support</source>
+        <source>Client is not connected to any System</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -811,10 +783,6 @@ to view more bookmarks</source>
     <message>
         <source>Preview Search...</source>
         <translation>Prévia deProcura...</translation>
-    </message>
-    <message>
-        <source>How-to Videos and FAQ...</source>
-        <translation>Como fazer Vídeos e FAQ...</translation>
     </message>
     <message>
         <source>Open Web Client...</source>
@@ -1687,13 +1655,13 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>affect all servers in the system</source>
-        <comment>Relates to &apos;Global Settings&apos; subject</comment>
+        <source>Lo-Res Streams</source>
+        <comment>Cameras Backup</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Lo-Res Streams</source>
-        <comment>Cameras Backup</comment>
+        <source>affect all servers in System</source>
+        <comment>Relates to &apos;Global Settings&apos; subject</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2232,10 +2200,6 @@ to view more bookmarks</source>
         <translation type="unfinished">Conferindo fluxo de mídia para erros</translation>
     </message>
     <message>
-        <source>Diagnostics complete!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Diagnostics for device %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2281,6 +2245,10 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Confirming target I/O module provides media stream.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Diagnostics complete</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2823,10 +2791,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connection to the Server could not be established.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Connection details that you have entered are incorrect, please try again.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2868,10 +2832,6 @@ to %1</source>
     </message>
     <message>
         <source>Incorrect username or password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Check Server internet connection or try again later.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2949,11 +2909,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connection to %1 is not established.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Client version: %1.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2966,7 +2921,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connection to %1 is not ready yet. Check server internet connection or try again later.</source>
+        <source>Connection to Server could not be established.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
@@ -3014,10 +2973,6 @@ to %1</source>
     <message>
         <source>Open Database Backup...</source>
         <translation>Abrir Backup do Banco de Dados...</translation>
-    </message>
-    <message>
-        <source>You can create a backup for system configurations that can be restored in case of failure.</source>
-        <translation type="unfinished">Você pode criar um backup das configurações do sistema para restauração em caso de falha.</translation>
     </message>
     <message>
         <source>Save Database Backup...</source>
@@ -3075,6 +3030,10 @@ to %1</source>
         <source>System configuration will be restored from backup, Server application will be restarted.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>You can create a backup for System configurations that can be restored in case of failure.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
@@ -3118,15 +3077,15 @@ to %1</source>
         <translation type="unfinished">Tamanho da tela deve ser múltipo de 8.</translation>
     </message>
     <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &quot;none&quot; value in screen recording settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Could not find audio encoder &quot;%1&quot;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Could not initialize audio device &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device. Please select other audio device or &quot;none&quot; in the Screen Recording settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3137,15 +3096,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Internal system error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Enter password to continue.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You will be disconnected from this system and able to login again through local network with local account</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3185,17 +3136,21 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You will not be able to connect to this system with your %1 account after you disconnect this system from %1.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Failed to disconnect System from %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Disconnect System from %1?</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You will be disconnected from this System and able to login again through local network with local account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
@@ -3520,13 +3475,6 @@ to %1</source>
     </message>
 </context>
 <context>
-    <name>QnHelpHandler</name>
-    <message>
-        <source>Help page not found</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnHistogramWidget</name>
     <message>
         <source>Gamma %1</source>
@@ -3747,16 +3695,16 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Full Name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Email</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>DN</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished">Nome</translation>
     </message>
 </context>
 <context>
@@ -3774,10 +3722,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Import users</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Error while loading users.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3788,6 +3732,10 @@ to %1</source>
     <message>
         <source>Timed Out</source>
         <translation type="unfinished">Vencido</translation>
+    </message>
+    <message>
+        <source>Import Selected</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4051,15 +3999,15 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please send Email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please send the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Hardware ID copied to clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please send Email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4330,10 +4278,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You are about to merge the current system %1 with the system</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>%1 (current)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4342,19 +4286,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This is the current system URL.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Merge with %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Success!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The servers from the remote system should appear in your system soon.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4383,6 +4319,18 @@ to %1</source>
     </message>
     <message>
         <source>URL is invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The servers from the remote System should appear in your System soon.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to merge the current System %1 with System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the current System URL.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5064,6 +5012,13 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>QnResourceTreeModelOtherSystemsNode</name>
+    <message>
+        <source>New System</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnResourceWidget</name>
     <message>
         <source>Close</source>
@@ -5408,10 +5363,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>All components in your system are up to date.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cannot update from this file.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5448,10 +5399,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>All components in your system are up to this version.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Unable to check updates on the Internet.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5473,11 +5420,6 @@ to %1</source>
     </message>
     <message>
         <source>Unable to extract update file. No free space left on the disk.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Incompatible %1 instance. To update disconnect system from %1 first.</source>
-        <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5581,6 +5523,19 @@ to %1</source>
     </message>
     <message>
         <source>Please wait until it is finished.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All components in your System are up to date.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All components in your System are up to this version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
+        <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5735,11 +5690,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enter a short system description here.</source>
+        <source>Support Signature</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Support Signature</source>
+        <source>Enter a short System description here.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5766,15 +5721,15 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enter a short system description here.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Support Signature</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No preset found. Use &quot;Advanced&quot; option.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter a short System description here.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5825,11 +5780,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No Servers connected to internet</source>
+        <source>Cannot perform the test.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cannot perform the test.</source>
+        <source>No Servers connected to Internet</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6265,11 +6220,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Check out &lt;b&gt;%1&lt;/b&gt; Beta &amp;mdash; connect to your servers from anywhere</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Some users have not set their Email addresses</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6278,19 +6228,24 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You cannot receive system notifications via Email.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Some users have not set their Email addresses.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>They cannot receive system notifications via Email.</source>
+        <source>System is running in safe mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>System is running in safe mode.</source>
+        <source>Check out %1 &amp;mdash; connect to your servers from anywhere</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You cannot receive System notifications by Email.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>They cannot receive System notifications by Email.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6305,11 +6260,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Allow system to optimize device settings</source>
+        <source>Allow System to optimize device settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Allow system to optimize camera settings</source>
+        <source>Allow System to optimize camera settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6370,6 +6325,71 @@ to %1</source>
     </message>
     <message>
         <source>No thumbnails available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>hh:mm</source>
+        <comment>Format for displaying hours and minutes on timeline.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>hh:mm ap</source>
+        <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>h ap</source>
+        <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd</source>
+        <comment>Format for displaying days on timeline.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MMMM</source>
+        <comment>Format for displaying months on timeline.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>yyyy</source>
+        <comment>Format for displaying years on timeline</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy hh:mm</source>
+        <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy hh:mm ap</source>
+        <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy hh:mm</source>
+        <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy h ap</source>
+        <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy</source>
+        <comment>Format for displaying day caption in timeline&apos;s header.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MMMM yyyy</source>
+        <comment>Format for displaying month caption in timeline&apos;s header.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>yyyy</source>
+        <comment>Format for displaying year caption in timeline&apos;s header</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6611,7 +6631,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>Please select the action to perform to %n users with this role</source>
+        <source>Please select an action to perform on %n users with this role</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -7086,14 +7106,6 @@ to %1</source>
         <translation>Exportando Layout</translation>
     </message>
     <message>
-        <source>AVI (*.avi)</source>
-        <translation>AVI (*.avi)</translation>
-    </message>
-    <message>
-        <source>Matroska (*.mkv)</source>
-        <translation>Matroska (*.mkv)</translation>
-    </message>
-    <message>
         <source>Export Video As...</source>
         <translation>Exportar Vídeo como...</translation>
     </message>
@@ -7261,10 +7273,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Password cannot be empty!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Connecting to the current system...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7291,6 +7299,14 @@ to %1</source>
     <message>
         <source>Server connected to System</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cloud Systems cannot be merged</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password cannot be empty.</source>
+        <translation type="unfinished">Campo senha não pode estar vazio.</translation>
     </message>
 </context>
 <context>
@@ -7352,7 +7368,7 @@ to %1</source>
         </translation>
     </message>
     <message>
-        <source>System is in the Safe Mode. It is not allowed to make any changes except license activation.</source>
+        <source>System is in Safe Mode. It is not allowed to make any changes except license activation.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7483,10 +7499,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enter the name of the Video Wall to create:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>New Matrix %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7496,10 +7508,6 @@ to %1</source>
     </message>
     <message>
         <source>To enable this feature, please activate a Video Wall license.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Activate one more license to start the Video Wall control session.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7516,10 +7524,6 @@ to %1</source>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Activate one more license to start the Video Wall.</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Stop Video Wall?</source>
@@ -7556,6 +7560,18 @@ to %1</source>
         <source>Screen is being controlled by another user</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Activate one more license to start Video Wall control session.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter the name of Video Wall to create:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activate one more license to start Video Wall.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchWebPageHandler</name>
@@ -7568,7 +7584,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enter URL of the Web Page to add:</source>
+        <source>Enter URL of Web Page to add:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7754,11 +7770,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>To display local files on the Video Wall, please attach them using computer where Video Wall is hosted.</source>
+        <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
+        <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

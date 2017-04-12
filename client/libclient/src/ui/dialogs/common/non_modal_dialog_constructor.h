@@ -1,5 +1,11 @@
 #pragma once
 
+#include <QtCore/QObject>
+#include <QtCore/QPointer>
+#include <nx/utils/app_info.h>
+class QWidget;
+class QEvent;
+
 class QnShowDialogHelper {
 public:
     static void show(QWidget* dialog, const QRect &targetGeometry);
@@ -13,27 +19,9 @@ public:
 class QnDelayedShowHelper: public QObject, public QnShowDialogHelper {
     Q_OBJECT
 public:
-    QnDelayedShowHelper(QWidget* targetWidget, const QRect &targetGeometry, int sourceCount, QObject *parent = NULL):
-        QObject(parent),
-        m_targetWidget(targetWidget),
-        m_targetGeometry(targetGeometry),
-        m_sourceCount(sourceCount)
-    {}
+    QnDelayedShowHelper(QWidget* targetWidget, const QRect &targetGeometry, int sourceCount, QObject *parent = NULL);
 
-    virtual bool eventFilter(QObject *watched, QEvent *event) override {
-        if (m_targetWidget && event->type() == QEvent::Hide) {
-            watched->removeEventFilter(this);   //avoid double call
-            m_sourceCount--;
-
-            if (m_sourceCount <= 0) {
-                show(m_targetWidget.data(), m_targetGeometry);
-                deleteLater();
-            }
-
-        }
-
-        return QObject::eventFilter(watched, event);
-    }
+    virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
     /** Invalidate stored geometry so dialog will be displayed in the center of the screen. */
     void resetGeometry()
@@ -87,6 +75,12 @@ QPointer<T> QnNonModalDialogConstructor<T>::createAndInitializeDialog(DialogType
     {
         /* Dialog's show() method will reset the geometry, saving it to restore afterwards. */
         m_targetGeometry = output->geometry();
+    }
+
+    if (nx::utils::AppInfo::isMacOsX())
+    {
+        // Workaround for bug QTBUG-34767
+        output->setWindowFlags(output->windowFlags() | Qt::WindowStaysOnTopHint);
     }
     return output;
 }

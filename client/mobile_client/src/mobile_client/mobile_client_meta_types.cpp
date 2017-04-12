@@ -3,6 +3,8 @@
 #include <QtQml/QtQml>
 #include <private/qqmlvaluetype_p.h>
 
+#include <nx/fusion/model_functions.h>
+
 #include <context/connection_manager.h>
 #include <ui/timeline/timeline.h>
 #include <ui/qml/quick_item_mouse_tracker.h>
@@ -29,6 +31,7 @@
 #include <helpers/cloud_url_helper.h>
 #include <utils/developer_settings_helper.h>
 #include <settings/qml_settings_adaptor.h>
+#include <nx/mobile_client/helpers/inter_client_message.h>
 
 using namespace nx::client::mobile;
 
@@ -43,6 +46,7 @@ void QnMobileClientMetaTypes::initialize()
 void QnMobileClientMetaTypes::registerMetaTypes()
 {
     qRegisterMetaType<nx::media::PlayerStatistics>();
+    QnJsonSerializer::registerSerializer<InterClientMessage::Command>();
 }
 
 void QnMobileClientMetaTypes::registerQmlTypes() {
@@ -64,9 +68,9 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnCloudSystemInformationWatcher>("com.networkoptix.qml", 1, 0, "QnCloudSystemInformationWatcher");
     qmlRegisterType<QnUserWatcher>("com.networkoptix.qml", 1, 0, "QnUserWatcher");
     /* NxMediaPlayer should not be used.
-       It is here only to allow assignments of MediaPlyer to properties of this type. */
-    qmlRegisterType<nx::media::Player>("Nx.Media", 1, 0, "NxMediaPlayer");
+       It is here only to allow assignments of MediaPlayer to properties of this type. */
     qmlRegisterType<MediaPlayer>("Nx.Media", 1, 0, "MediaPlayer");
+    qmlRegisterUncreatableType<nx::media::Player>("Nx.Media", 1, 0, "NxMediaPlayer", lit("Cannot create an instance of abstract class."));
     qmlRegisterType<QnActiveCameraThumbnailLoader>("com.networkoptix.qml", 1, 0, "QnActiveCameraThumbnailLoader");
     qmlRegisterType<QnThumbnailCacheAccessor>("com.networkoptix.qml", 1, 0, "QnThumbnailCacheAccessor");
     qmlRegisterType<QnQuickItemMouseTracker>("com.networkoptix.qml", 1, 0, "ItemMouseTracker");

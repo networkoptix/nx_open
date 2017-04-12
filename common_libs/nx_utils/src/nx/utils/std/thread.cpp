@@ -10,21 +10,7 @@ namespace {
 
 static const std::chrono::seconds kDetachedThreadsCleanupPeriod(10);
 
-class DetachedThreads
-{
-    DetachedThreads();
-    ~DetachedThreads();
-
-public:
-    void addThread(std::unique_ptr<detail::thread> thread);
-    static DetachedThreads* instance();
-
-private:
-    utils::promise<void> m_stopPromise;
-    std::mutex m_mutex;
-    std::list<std::unique_ptr<detail::thread>> m_garbage;
-    thread m_collector;
-};
+} // namespace
 
 DetachedThreads::DetachedThreads():
     m_collector(
@@ -59,13 +45,7 @@ void DetachedThreads::addThread(std::unique_ptr<detail::thread> thread)
     m_garbage.push_back(std::move(thread));
 }
 
-DetachedThreads* DetachedThreads::instance()
-{
-    static DetachedThreads object;
-    return &object;
-}
 
-} // namespace
 
 namespace detail {
 

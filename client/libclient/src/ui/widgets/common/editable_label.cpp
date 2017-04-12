@@ -2,6 +2,8 @@
 
 #include <QtCore/QSignalBlocker>
 
+#include <QtGui/QMouseEvent>
+
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QStackedWidget>

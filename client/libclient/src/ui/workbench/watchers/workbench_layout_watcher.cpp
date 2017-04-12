@@ -1,5 +1,7 @@
 #include "workbench_layout_watcher.h"
 
+#include <QtCore/QDir>
+
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -9,10 +11,10 @@ QnWorkbenchLayoutWatcher::QnWorkbenchLayoutWatcher(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         &QnWorkbenchLayoutWatcher::at_resourcePool_resourceAdded);
 
-    for (const auto& resource: qnResPool->getResources())
+    for (const auto& resource: resourcePool()->getResources())
         at_resourcePool_resourceAdded(resource);
 }
 
@@ -34,7 +36,7 @@ void QnWorkbenchLayoutWatcher::at_resourcePool_resourceAdded(const QnResourcePtr
 
     for (QnLayoutItemData data : layout->getItems())
     {
-        QnResourcePtr resource = qnResPool->getResourceByDescriptor(data.resource);
+        QnResourcePtr resource = resourcePool()->getResourceByDescriptor(data.resource);
 
         if (!resource && !data.resource.uniqueId.isEmpty())
         {
@@ -42,7 +44,7 @@ void QnWorkbenchLayoutWatcher::at_resourcePool_resourceAdded(const QnResourcePtr
             {
                 /* Try to load local resource. */
                 resource = QnResourcePtr(new QnAviResource(data.resource.uniqueId));
-                qnResPool->addResource(resource);
+                resourcePool()->addResource(resource);
             }
         }
 

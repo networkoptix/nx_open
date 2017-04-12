@@ -3,6 +3,8 @@
 #include <QtCore/QFile>
 #include <QtCore/QTimer>
 
+#include <common/common_module.h>
+
 #include <api/app_server_connection.h>
 #include "api/model/upload_update_reply.h"
 #include <nx_ec/dummy_handler.h>
@@ -20,10 +22,6 @@ namespace {
        This process can take long time on slow devices like ISD.
        So we have to specify a longer timeout for the last chunk. */
     const int lastChunkTimeout = 20 * 60 * 1000;
-
-    ec2::AbstractECConnectionPtr connection2() {
-        return QnAppServerConnectionFactory::getConnection2();
-    }
 
     QString getPeersString(const QSet<QnUuid> &peers) {
         QString result;
@@ -45,7 +43,12 @@ QnUpdateUploader::QnUpdateUploader(QObject *parent) :
     connect(m_chunkTimer, &QTimer::timeout, this, &QnUpdateUploader::at_chunkTimer_timeout);
 }
 
-QString QnUpdateUploader::updateId() const {
+QnUpdateUploader::~QnUpdateUploader()
+{
+}
+
+QString QnUpdateUploader::updateId() const
+{
     return m_updateId;
 }
 
@@ -65,7 +68,7 @@ void QnUpdateUploader::sendPreambule() {
 
     if (!m_peers.isEmpty()) {
         NX_LOG(lit("Update: QnUpdateUploader: Send preambule transaction [%1].").arg(getPeersString(m_peers)), cl_logDEBUG2);
-        connection2()->getUpdatesManager(Qn::kSystemAccess)->sendUpdatePackageChunk(m_updateId, md5.toLatin1(), -1, m_peers, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        commonModule()->ec2Connection()->getUpdatesManager(Qn::kSystemAccess)->sendUpdatePackageChunk(m_updateId, md5.toLatin1(), -1, m_peers, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     }
 
     for (const QnMediaServerResourcePtr &server: m_restTargets) {
@@ -95,7 +98,7 @@ bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &file
 
     m_progressById.clear();
     foreach (const QnUuid &peerId, peers) {
-        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(peerId, true).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = resourcePool()->getIncompatibleResourceById(peerId, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             return false;
 
@@ -113,7 +116,7 @@ bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &file
     }
 
     if (!m_peers.isEmpty())
-        connect(connection2()->getUpdatesNotificationManager().get(),   &ec2::AbstractUpdatesNotificationManager::updateUploadProgress,   this,   &QnUpdateUploader::at_updateManager_updateUploadProgress);
+        connect(commonModule()->ec2Connection()->getUpdatesNotificationManager().get(),   &ec2::AbstractUpdatesNotificationManager::updateUploadProgress,   this,   &QnUpdateUploader::at_updateManager_updateUploadProgress);
 
     sendPreambule();
     return true;
@@ -141,7 +144,7 @@ void QnUpdateUploader::sendNextChunk() {
     if (!m_peers.isEmpty()) {
         NX_LOG(lit("Update: QnUpdateUploader: Send chunk transaction [%1, %2, %3, %4].")
                .arg(m_updateId).arg(offset).arg(data.size()).arg(getPeersString(m_pendingPeers)), cl_logDEBUG2);
-        connection2()->getUpdatesManager(Qn::kSystemAccess)->sendUpdatePackageChunk(m_updateId, data, offset, m_pendingPeers, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        commonModule()->ec2Connection()->getUpdatesManager(Qn::kSystemAccess)->sendUpdatePackageChunk(m_updateId, data, offset, m_pendingPeers, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
         m_chunkTimer->start(data.isEmpty() ? lastChunkTimeout : chunkTimeout);
     }
 
@@ -251,5 +254,5 @@ void QnUpdateUploader::cleanUp() {
     m_updateFile.reset();
     m_updateId.clear();
     m_chunkTimer->stop();
-    connection2()->getUpdatesNotificationManager()->disconnect(this);
+    commonModule()->ec2Connection()->getUpdatesNotificationManager()->disconnect(this);
 }

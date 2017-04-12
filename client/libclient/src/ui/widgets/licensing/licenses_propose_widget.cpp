@@ -1,6 +1,8 @@
 #include "licenses_propose_widget.h"
 #include "ui_licenses_propose_widget.h"
 
+#include <boost/range/algorithm/count_if.hpp>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 
@@ -38,7 +40,7 @@ QnLicensesProposeWidget::QnLicensesProposeWidget(QWidget *parent):
             updateLicenseText();
         };
 
-    QnCamLicenseUsageHelper helper;
+    QnCamLicenseUsageHelper helper(commonModule());
     ui->licensesUsageWidget->init(&helper);
 
     QnCamLicenseUsageWatcher* camerasUsageWatcher = new QnCamLicenseUsageWatcher(this);
@@ -63,7 +65,7 @@ void QnLicensesProposeWidget::updateLicenseText()
     if (isUpdating())
         return;
 
-    QnCamLicenseUsageHelper helper;
+    QnCamLicenseUsageHelper helper(commonModule());
 
     switch (ui->useLicenseCheckBox->checkState())
     {
@@ -122,6 +124,7 @@ void QnLicensesProposeWidget::updateFromResources()
     else
     {
         title = QnDeviceDependentStrings::getNameFromSet(
+            resourcePool(),
             QnCameraDeviceStringSet(
                 tr("Use licenses for selected %n devices", "", m_cameras.size()),
                 tr("Use licenses for selected %n cameras", "", m_cameras.size()),

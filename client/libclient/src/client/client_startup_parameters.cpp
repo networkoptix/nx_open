@@ -3,6 +3,7 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
+#include <utils/common/cryptographic_hash.h>
 #include <utils/crypt/encoded_string.h>
 
 #include <nx/vms/utils/app_info.h>
@@ -145,6 +146,13 @@ QUrl QnStartupParameters::parseAuthenticationString(QString string)
 QUrl QnStartupParameters::parseAuthenticationString() const
 {
     return parseAuthenticationString(authenticationString);
+}
+
+bool QnStartupParameters::isDevMode() const
+{
+    /* MD5("razrazraz") */
+    return QnCryptographicHash::hash(devModeKey.toLatin1(), QnCryptographicHash::Md5)
+        == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f");
 }
 
 QnStartupParameters::QnStartupParameters():

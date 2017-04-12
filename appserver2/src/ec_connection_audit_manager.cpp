@@ -10,13 +10,15 @@
 #include "nx_ec/data/api_conversion_functions.h"
 #include "business/business_event_rule.h"
 #include <api/global_settings.h>
+#include <common/common_module.h>
+#include "nx_ec/ec_api.h"
 
 namespace ec2
 {
 
-    ECConnectionAuditManager::ECConnectionAuditManager(AbstractECConnection* ecConnection)
+    ECConnectionAuditManager::ECConnectionAuditManager(AbstractECConnection* ecConnection):
+        m_connection(ecConnection)
     {
-        Q_UNUSED(ecConnection)
     }
 
     void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiCameraAttributesDataList& params, const QnAuthSession& authInfo)
@@ -94,7 +96,8 @@ namespace ec2
         auditRecord.resources.push_back(params.id);
         QnBusinessEventRulePtr bRule(new QnBusinessEventRule());
         fromApiToResource(params, bRule);
-        auditRecord.addParam("description", QnBusinessStringsHelper::bruleDescriptionText(bRule).toUtf8());
+        QnBusinessStringsHelper helper(m_connection->commonModule());
+        auditRecord.addParam("description", helper.bruleDescriptionText(bRule).toUtf8());
 
         qnAuditManager->addAuditRecord(auditRecord);
     }
@@ -111,7 +114,7 @@ namespace ec2
     void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiResourceParamWithRefData& param, const QnAuthSession& authInfo)
     {
         Q_UNUSED(command);
-        if (qnGlobalSettings->isGlobalSetting(param))
+        if (QnGlobalSettings::isGlobalSetting(param))
             qnAuditManager->notifySettingsChanged(authInfo, param.name);
     }
 
@@ -124,6 +127,7 @@ namespace ec2
 
     void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiIdData& params, const QnAuthSession& authInfo)
     {
+        const auto& resPool = m_connection->commonModule()->resourcePool();
         Qn::AuditRecordType eventType = Qn::AR_NotDefined;
         QString description;
         switch(command)
@@ -134,7 +138,7 @@ namespace ec2
             case ApiCommand::removeMediaServer:
             case ApiCommand::removeUser:
             {
-                if (QnResourcePtr res = qnResPool->getResourceById(params.id))
+                if (QnResourcePtr res = resPool->getResourceById(params.id))
                 {
                     description = res->getName();
                     if (res.dynamicCast<QnUserResource>())
@@ -152,11 +156,14 @@ namespace ec2
             case ApiCommand::removeEventRule:
             {
                 eventType = Qn::AR_BEventRemove;
-                auto msgProc = QnCommonMessageProcessor::instance();
+                auto msgProc = m_connection->commonModule()->messageProcessor();
                 if (msgProc) {
                     QnBusinessEventRulePtr bRule = msgProc->businessRules().value(params.id);
                     if (bRule)
-                        description = QnBusinessStringsHelper::bruleDescriptionText(bRule);
+                    {
+                        QnBusinessStringsHelper helper(m_connection->commonModule());
+                        description = helper.bruleDescriptionText(bRule);
+                    }
                 }
                 break;
             }
@@ -193,5 +200,10 @@ namespace ec2
         Q_UNUSED(command);
         Q_UNUSED(params);
         qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(authInfo, Qn::AR_DatabaseRestore));
+    }
+
+    AbstractECConnection* ECConnectionAuditManager::ec2Connection() const
+    {
+        return m_connection;
     }
 }

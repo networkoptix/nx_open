@@ -1,7 +1,11 @@
 #include "html_text_item.h"
 
+#include <QtGui/QAbstractTextDocumentLayout>
+#include <QtGui/QTextDocument>
 #include <QtGui/QPainter>
 #include <QtGui/QFontMetrics>
+
+#include <QtWidgets/QApplication>
 
 #include <core/resource/camera_bookmark.h>
 
@@ -10,6 +14,7 @@
 #include <nx/utils/string.h>
 #include <nx/fusion/model_functions.h>
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/event_processors.h>
 
 namespace
 {
@@ -76,6 +81,12 @@ QnHtmlTextItemPrivate::QnHtmlTextItemPrivate(const QnHtmlTextItemOptions &option
     , html()
     , pixmap()
 {
+    installEventHandler(parent, QEvent::PaletteChange, parent,
+        [this]()
+        {
+            if (!this->options.backgroundColor.isValid())
+                updatePixmap();
+        });
 }
 
 void QnHtmlTextItemPrivate::updatePixmap() {
@@ -112,8 +123,12 @@ void QnHtmlTextItemPrivate::updatePixmap() {
     pixmap.setDevicePixelRatio(ratio);
     pixmap.fill(Qt::transparent);
 
+    const auto backgroundColor = options.backgroundColor.isValid()
+        ? options.backgroundColor
+        : q->palette().color(QPalette::Window);
+
     QPainter painter(&pixmap);
-    painter.setBrush(options.backgroundColor);
+    painter.setBrush(backgroundColor);
     painter.setPen(Qt::NoPen);
 
     {
@@ -123,7 +138,8 @@ void QnHtmlTextItemPrivate::updatePixmap() {
 
     painter.translate(options.horPadding, options.vertPadding);
     td.drawContents(&painter);
-    q->resize(baseSize);
+    q->setMinimumSize(baseSize);
+    q->setMaximumSize(baseSize);
     q->update();
 }
 

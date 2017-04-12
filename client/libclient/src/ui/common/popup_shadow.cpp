@@ -1,5 +1,10 @@
 #include "popup_shadow.h"
 
+#include <QtCore/QEvent>
+#include <QtCore/QPointer>
+
+#include <QtWidgets/QLabel>
+
 #include <functional>
 #include <utils/common/delayed.h>
 #include <utils/common/scoped_painter_rollback.h>

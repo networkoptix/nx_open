@@ -15,13 +15,14 @@ class QnUniversalTcpListener
 {
 public:
     QnUniversalTcpListener(
+        QnCommonModule* commonModule,
         const CloudConnectionManager& cloudConnectionManager,
         const QHostAddress& address,
         int port,
         int maxConnections,
         bool useSsl);
     ~QnUniversalTcpListener();
-        
+
     void addProxySenderConnections(const SocketAddress& proxyUrl, int size);
 
 protected:
@@ -31,7 +32,7 @@ protected:
         bool sslNeeded,
         const SocketAddress& localAddress) override;
     virtual void destroyServerSocket(AbstractStreamServerSocket* serverSocket) override;
-    
+
 private:
     const CloudConnectionManager& m_cloudConnectionManager;
     nx::network::MultipleServerSocket* m_multipleServerSocket;

@@ -199,11 +199,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_cursorPos(invalidCursorPos()),
     m_resizedWidget(NULL),
     m_dragDelta(invalidDragDelta()),
-    m_tourModeHintLabel(NULL),
     m_menuEnabled(true)
 {
-    ::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
-
     QEvent::Type mouseEventTypeArray[] = {
         QEvent::GraphicsSceneMousePress,
         QEvent::GraphicsSceneMouseMove,
@@ -328,7 +325,6 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_rotationInstrument,       SIGNAL(rotationStarted(QGraphicsView *, QGraphicsWidget *)),                                this,                           SLOT(at_rotationStarted(QGraphicsView *, QGraphicsWidget *)));
     connect(m_rotationInstrument,       SIGNAL(rotationFinished(QGraphicsView *, QGraphicsWidget *)),                               this,                           SLOT(at_rotationFinished(QGraphicsView *, QGraphicsWidget *)));
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)),                 this,                           SLOT(at_motionSelectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)));
-    connect(m_motionSelectionInstrument, SIGNAL(selectionStarted(QGraphicsView *, QnMediaResourceWidget *)),                        this,                           SLOT(at_motionSelectionStarted(QGraphicsView *, QnMediaResourceWidget *)));
     connect(m_motionSelectionInstrument, SIGNAL(motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *, const QRect &)),     this,                           SLOT(at_motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *, const QRect &)));
     connect(m_motionSelectionInstrument, SIGNAL(motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *)),                     this,                           SLOT(at_motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *)));
     connect(sceneKeySignalingInstrument, SIGNAL(activated(QGraphicsScene *, QEvent *)),                                             this,                           SLOT(at_scene_keyPressed(QGraphicsScene *, QEvent *)));
@@ -467,10 +463,10 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(action(QnActions::MaximizeItemAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_maximizeItemAction_triggered()));
     connect(action(QnActions::UnmaximizeItemAction), SIGNAL(triggered()),                                                                  this,                           SLOT(at_unmaximizeItemAction_triggered()));
     connect(action(QnActions::FitInViewAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_fitInViewAction_triggered()));
-    connect(action(QnActions::ToggleTourModeAction), SIGNAL(triggered(bool)),                                                              this,                           SLOT(at_toggleTourModeAction_triggered(bool)));
+
     connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
         &QnWorkbenchController::at_accessController_permissionsChanged);
-		
+
     connect(
         action(QnActions::GoToNextItemAction), &QAction::triggered,
         this, &QnWorkbenchController::at_nextItemAction_triggered);
@@ -482,7 +478,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(
         action(QnActions::ToggleCurrentItemMaximizationStateAction), &QnAction::triggered,
         this, &QnWorkbenchController::at_toggleCurrentItemMaximizationState_triggered);
-		
+
 }
 
 QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
@@ -1101,19 +1097,25 @@ void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, Qn
     widget->setOption(QnResourceWidget::DisplayMotion, true);
 }
 
-void QnWorkbenchController::at_motionSelectionStarted(QGraphicsView *, QnMediaResourceWidget *widget) {
-    foreach(QnResourceWidget *otherWidget, display()->widgets())
-        if(otherWidget != widget)
-            if(QnMediaResourceWidget *otherMediaWidget = dynamic_cast<QnMediaResourceWidget *>(otherWidget))
-                otherMediaWidget->clearMotionSelection();
-}
-
 void QnWorkbenchController::at_motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *widget) {
     widget->clearMotionSelection();
 }
 
-void QnWorkbenchController::at_motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *widget, const QRect &region) {
+void QnWorkbenchController::at_motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *widget, const QRect &region)
+{
+    if (region.isEmpty())
+        return;
+
     widget->addToMotionSelection(region);
+
+    for (auto otherWidget: display()->widgets())
+    {
+        if (otherWidget != widget)
+        {
+            if (auto otherMediaWidget = dynamic_cast<QnMediaResourceWidget*>(otherWidget))
+                otherMediaWidget->clearMotionSelection();
+        }
+    }
 }
 
 void QnWorkbenchController::at_item_leftPressed(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info)
@@ -1221,28 +1223,41 @@ void QnWorkbenchController::at_item_doubleClicked(QnMediaResourceWidget *widget)
     at_item_doubleClicked(static_cast<QnResourceWidget *>(widget));
 }
 
-void QnWorkbenchController::at_item_doubleClicked(QnResourceWidget *widget) {
+void QnWorkbenchController::at_item_doubleClicked(QnResourceWidget *widget)
+{
     display()->scene()->clearSelection();
     widget->setSelected(true);
 
     QnWorkbenchItem *workbenchItem = widget->item();
     QnWorkbenchItem *zoomedItem = workbench()->item(Qn::ZoomedRole);
-    if(zoomedItem == workbenchItem) {
-        if (action(QnActions::ToggleTourModeAction)->isChecked()){
-            action(QnActions::ToggleTourModeAction)->toggle();
+    if (zoomedItem == workbenchItem)
+    {
+        // Stop layout tour if it is running.
+        if (action(QnActions::ToggleLayoutTourModeAction)->isChecked())
+        {
+            menu()->trigger(QnActions::ToggleLayoutTourModeAction);
             return;
         }
 
         QRectF viewportGeometry = display()->viewportGeometry();
         QRectF zoomedItemGeometry = display()->itemGeometry(zoomedItem);
 
-        if(viewportGeometry.width() < zoomedItemGeometry.width() * 0.975 || viewportGeometry.height() < zoomedItemGeometry.height() * 0.975) {
-            workbench()->setItem(Qn::ZoomedRole, NULL);
+        // Magic const from v1.0
+        static const qreal kOversizeCoeff{0.975};
+
+        if (viewportGeometry.width() < zoomedItemGeometry.width() * kOversizeCoeff
+            || viewportGeometry.height() < zoomedItemGeometry.height() *kOversizeCoeff)
+        {
+            workbench()->setItem(Qn::ZoomedRole, nullptr);
             workbench()->setItem(Qn::ZoomedRole, workbenchItem);
-        } else {
-            workbench()->setItem(Qn::ZoomedRole, NULL);
         }
-    } else {
+        else
+        {
+            workbench()->setItem(Qn::ZoomedRole, nullptr);
+        }
+    }
+    else
+    {
         workbench()->setItem(Qn::ZoomedRole, workbenchItem);
     }
 }
@@ -1462,24 +1477,6 @@ void QnWorkbenchController::at_maximizeItemAction_triggered() {
 
 void QnWorkbenchController::at_unmaximizeItemAction_triggered() {
     workbench()->setItem(Qn::ZoomedRole, NULL);
-}
-
-void QnWorkbenchController::at_toggleTourModeAction_triggered(bool checked) {
-    if (!checked) {
-        if (m_tourModeHintLabel) {
-            disconnect(m_tourModeHintLabel, NULL, this, NULL);
-            m_tourModeHintLabel->hideImmideately();
-            m_tourModeHintLabel = NULL;
-        }
-        return;
-    }
-    m_tourModeHintLabel = QnGraphicsMessageBox::information(tr("Press any key to stop the tour."));
-    connect(m_tourModeHintLabel, SIGNAL(finished()), this, SLOT(at_tourModeLabel_finished()));
-}
-
-void QnWorkbenchController::at_tourModeLabel_finished() {
-    if (m_tourModeHintLabel)
-       m_tourModeHintLabel = NULL;
 }
 
 void QnWorkbenchController::at_fitInViewAction_triggered() {

@@ -99,8 +99,8 @@ class QnFileConnectionProcessorPrivate : public QnTCPConnectionProcessorPrivate
 public:
 };
 
-QnFileConnectionProcessor::QnFileConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* /*_owner*/) :
-    QnTCPConnectionProcessor(new QnTCPConnectionProcessorPrivate, socket)
+QnFileConnectionProcessor::QnFileConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner) :
+    QnTCPConnectionProcessor(new QnTCPConnectionProcessorPrivate, socket, owner->commonModule())
 {
 }
 
@@ -137,7 +137,7 @@ bool QnFileConnectionProcessor::loadFile(
         return false;
 
     *outData = file->readAll();
-    *outLastModified = qnCommon->startupTime(); //staticFileLastModified(file);
+    *outLastModified = commonModule()->startupTime(); //staticFileLastModified(file);
     if (outData->size() < cachedFiles.maxCost())
         cachedFiles.insert(path, new CacheEntry(*outData, *outLastModified), outData->size());
     return true;
@@ -186,7 +186,7 @@ void QnFileConnectionProcessor::run()
         return;
     }
 
-    nx_http::HttpHeader modifiedHeader("Last-Modified", dateTimeToHTTPFormat(lastModified));
+    nx_http::HttpHeader modifiedHeader("Last-Modified", nx_http::formatDateTime(lastModified));
     d->response.headers.insert(modifiedHeader);
     QString modifiedSinceStr = nx_http::getHeaderValue(d->request.headers, "If-Modified-Since");
     if (!modifiedSinceStr.isEmpty())

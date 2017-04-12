@@ -13,8 +13,8 @@
 #include <QString>
 
 #include <api/applauncher_api.h>
-#include <utils/common/stoppable.h>
-#include <utils/common/joinable.h>
+#include <nx/utils/thread/stoppable.h>
+#include <nx/utils/thread/joinable.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <plugins/videodecoder/stree/node.h>
 #include <plugins/videodecoder/stree/resourcenameset.h>

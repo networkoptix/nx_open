@@ -37,7 +37,7 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <nx/utils/uuid.h>
-#include <utils/common/counter.h>
+#include <nx/utils/counter.h>
 #include <nx/utils/string.h>
 #include <utils/common/variant.h>
 #include <utils/common/event_processors.h>
@@ -186,12 +186,14 @@ bool QnServerSettingsWidget::hasChanges() const
 void QnServerSettingsWidget::retranslateUi()
 {
     QString failoverText = QnDeviceDependentStrings::getDefaultNameFromSet(
+        resourcePool(),
         tr("server will take devices automatically from offline servers"),
         tr("server will take cameras automatically from offline servers"));
 
     ui->failoverGroupBox->setTitle(tr("Failover") + lit("\t(%1)").arg(failoverText));
 
     ui->maxCamerasLabel->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
+        resourcePool(),
         tr("Max devices on this server:"),
         tr("Max cameras on this server:")
     ));
@@ -269,17 +271,19 @@ void QnServerSettingsWidget::updateFailoverLabel()
         if (!m_server)
             return QString();
 
-        if (qnResPool->getResources<QnMediaServerResource>().size() < 2)
+        if (resourcePool()->getResources<QnMediaServerResource>().size() < 2)
             return tr("At least two servers are required for this feature.");
 
-        if (qnResPool->getAllCameras(m_server, true).size() > ui->maxCamerasSpinBox->value())
+        if (resourcePool()->getAllCameras(m_server, true).size() > ui->maxCamerasSpinBox->value())
             return QnDeviceDependentStrings::getDefaultNameFromSet(
+                resourcePool(),
                 tr("This server already has more than max devices"),
                 tr("This server already has more than max cameras")
             );
 
         if (!m_server->isRedundancy() && !m_maxCamerasAdjusted)
             return QnDeviceDependentStrings::getDefaultNameFromSet(
+                resourcePool(),
                 tr("To avoid issues adjust max number of devices"),
                 tr("To avoid issues adjust max number of cameras")
             );

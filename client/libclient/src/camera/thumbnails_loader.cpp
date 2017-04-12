@@ -416,7 +416,7 @@ void QnThumbnailsLoader::process() {
     QnAviResourcePtr aviFile = qSharedPointerDynamicCast<QnAviResource>(m_resource);
 
     if (camera) {
-        QnMediaServerResourceList servers = qnCameraHistoryPool->getCameraFootageData(camera, period);
+        QnMediaServerResourceList servers = cameraHistoryPool()->getCameraFootageData(camera, period);
         for(const QnMediaServerResourcePtr &server: servers)
         {
             if (server->getStatus() != Qn::Online)

@@ -47,7 +47,7 @@ public:
         //!Transcoding can be stopped only just before GOP
         fStopTranscodingAtGOPBoundary = 0x01,
         /*!
-            Try to include begin of range in resulting chunk, i.e., start transcoding with GOP, including supplyed start timestamp. 
+            Try to include begin of range in resulting chunk, i.e., start transcoding with GOP, including supplyed start timestamp.
             Otherwise, transcoding is started with first GOP following start timestamp
         */
         fBeginOfRangeInclusive = 0x02,
@@ -61,7 +61,7 @@ public:
     /*!
         \param flags Combination of input flags
     */
-    StreamingChunkTranscoder( Flags flags );
+    StreamingChunkTranscoder(QnResourcePool* resPool, Flags flags );
     ~StreamingChunkTranscoder();
 
     //!Starts transcoding of resource \a transcodeParams.srcResourceUniqueID
@@ -91,16 +91,17 @@ private:
         TranscodeContext();
     };
 
-    bool m_terminated;
+    bool m_terminated{false};
     Flags m_flags;
     QnMutex m_mutex;
     //!map<transcoding id, data>
     std::map<int, TranscodeContext> m_scheduledTranscodings;
     //!map<task id, transcoding id>
     std::map<quint64, int> m_taskIDToTranscode;
-    QAtomicInt m_transcodeIDSeq;
+    QAtomicInt m_transcodeIDSeq{1};
     std::vector<StreamingChunkTranscoderThread*> m_transcodeThreads;
     DataSourceCache m_dataSourceCache;
+    QnResourcePool* m_resPool{nullptr};
 
     bool startTranscoding(
         int transcodingID,

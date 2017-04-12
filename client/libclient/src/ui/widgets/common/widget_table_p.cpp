@@ -4,6 +4,10 @@
 #include <QtCore/QVarLengthArray>
 #include <QtCore/private/qabstractitemmodel_p.h>
 
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QTreeView>
+#include <QtWidgets/QHeaderView>
+
 #include <utils/common/event_processors.h>
 
 namespace {

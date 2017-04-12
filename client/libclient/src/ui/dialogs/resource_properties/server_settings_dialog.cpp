@@ -1,6 +1,9 @@
 #include "server_settings_dialog.h"
 #include "ui_server_settings_dialog.h"
 
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QPushButton>
+
 #include <core/resource/media_server_resource.h>
 
 #include <network/cloud_url_validator.h>

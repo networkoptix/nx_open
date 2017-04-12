@@ -2,12 +2,14 @@
 #include "ui_business_rules_dialog.h"
 
 #include <QtCore/QEvent>
+#include <QtCore/QSortFilterProxyModel>
+
+#include <QtGui/QPainter>
+#include <QtGui/QKeyEvent>
 
 #include <QtWidgets/QStyledItemDelegate>
 #include <QtWidgets/QItemEditorFactory>
 #include <QtWidgets/QComboBox>
-#include <QtGui/QPainter>
-#include <QtGui/QKeyEvent>
 
 #include <api/app_server_connection.h>
 
@@ -43,12 +45,15 @@
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 
 #include <utils/common/event_processors.h>
+#include <utils/common/delayed.h>
 
 using boost::algorithm::any_of;
 
 namespace {
 
-    class SortRulesProxyModel: public QSortFilterProxyModel {
+    class SortRulesProxyModel: public QSortFilterProxyModel,
+        public QnConnectionContextAware
+    {
     public:
         explicit SortRulesProxyModel(QObject *parent = 0)
             : QSortFilterProxyModel(parent)
@@ -115,15 +120,15 @@ namespace {
             auto passText =
                 [this, resourcePassText](const QnUuid& id)
                 {
-                    auto resource = qnResPool->getResourceById(id);
+                    auto resource = resourcePool()->getResourceById(id);
                     if (resource)
                         return resourcePassText(resource);
-                    auto role = qnUserRolesManager->userRole(id);
+                    auto role = userRolesManager()->userRole(id);
                     return role.name.contains(m_filterText, Qt::CaseInsensitive);
                 };
 
 
-            bool anyCameraPassFilter = any_of(qnResPool->getAllCameras(QnResourcePtr(), true), resourcePassText);
+            bool anyCameraPassFilter = any_of(resourcePool()->getAllCameras(QnResourcePtr(), true), resourcePassText);
             QnBusiness::EventType eventType = idx.data(Qn::EventTypeRole).value<QnBusiness::EventType>();
             if (QnBusiness::requiresCameraResource(eventType)) {
                 auto eventResources = idx.data(Qn::EventResourcesRole).value<QSet<QnUuid>>();
@@ -176,6 +181,10 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 {
     ui->setupUi(this);
     retranslateUi();
+
+    setWindowFlags(windowFlags()
+        | Qt::WindowMaximizeButtonHint
+        | Qt::MaximizeUsingFullscreenGeometryHint);
 
     QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
     ui->tableView->setVerticalScrollBar(scrollBar->proxyScrollBar());
@@ -358,6 +367,9 @@ void QnBusinessRulesDialog::showEvent( QShowEvent *event )
     base_type::showEvent(event);
     if (SortRulesProxyModel* sortModel = dynamic_cast<SortRulesProxyModel*>(ui->tableView->model()))
         sortModel->sort(ui->tableView->horizontalHeader()->sortIndicatorSection(), ui->tableView->horizontalHeader()->sortIndicatorOrder());
+
+    ui->tableView->setCurrentIndex(QModelIndex());
+    ui->filterLineEdit->setFocus();
 }
 
 
@@ -405,7 +417,7 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked()
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
-    QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager(Qn::kSystemAccess)->resetBusinessRules(
+    commonModule()->ec2Connection()->getBusinessEventManager(Qn::kSystemAccess)->resetBusinessRules(
         ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone );
 }
 
@@ -448,13 +460,25 @@ void QnBusinessRulesDialog::at_resources_deleted( int handle, ec2::ErrorCode err
     updateControlButtons();
 }
 
-void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous) {
-    Q_UNUSED(previous)
-
+void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &current,
+    const QModelIndex& /*previous*/)
+{
     QnBusinessRuleViewModelPtr ruleModel = m_rulesViewModel->rule(current);
-    m_currentDetailsWidget->setModel(ruleModel);
+    QnUuid id = ruleModel ? ruleModel->id() : QnUuid();
 
-    updateControlButtons();
+    const auto handleRowChanged =
+        [this, id]()
+        {
+            auto rule = m_rulesViewModel->ruleModelById(id);
+            m_currentDetailsWidget->setModel(rule);
+            updateControlButtons();
+        };
+
+    /**
+     * Fixes QT bug when we able to select multiple rows even if we set single selection mode.
+     * See VMS-5799.
+     */
+    executeDelayedParented(handleRowChanged, 0, this);
 }
 
 void QnBusinessRulesDialog::at_tableViewport_resizeEvent() {
@@ -523,7 +547,7 @@ bool QnBusinessRulesDialog::saveAll()
 
     //TODO: #GDM #Business replace with QnAppServerReplyProcessor
     foreach (const QnUuid& id, m_pendingDeleteRules) {
-        int handle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager(Qn::kSystemAccess)->deleteRule(
+        int handle = commonModule()->ec2Connection()->getBusinessEventManager(Qn::kSystemAccess)->deleteRule(
             id, this, &QnBusinessRulesDialog::at_resources_deleted );
         m_deleting[handle] = id;
     }
@@ -540,7 +564,7 @@ void QnBusinessRulesDialog::deleteRule(const QnBusinessRuleViewModelPtr &ruleMod
 
 void QnBusinessRulesDialog::updateControlButtons() {
     bool hasRights = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission)
-        && !qnCommon->isReadOnly();
+        && !commonModule()->isReadOnly();
 
     bool hasChanges = hasRights && (
                 !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
@@ -573,7 +597,9 @@ void QnBusinessRulesDialog::retranslateUi()
 {
     ui->retranslateUi(this);
 
-    ui->filterLineEdit->lineEdit()->setPlaceholderText(QnDeviceDependentStrings::getDefaultNameFromSet(
+    ui->filterLineEdit->lineEdit()->setPlaceholderText(
+        QnDeviceDependentStrings::getDefaultNameFromSet(
+        resourcePool(),
         tr("Filter by devices..."),
         tr("Filter by cameras...")
     ));
@@ -587,7 +613,7 @@ bool QnBusinessRulesDialog::tryClose(bool force) {
         return true;
     }
 
-    bool hasRights = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission) && !qnCommon->isReadOnly();
+    bool hasRights = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission) && !commonModule()->isReadOnly();
     bool hasChanges = hasRights && (
         !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
         || !m_pendingDeleteRules.isEmpty()

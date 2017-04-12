@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QPointer>
+
 class AbstractAccessor;
 
 /** Helper class to make several widgets always have the same width (yet). */
@@ -17,6 +19,9 @@ public:
 
     /** Add several widgets to align. Does not retain ownership. */
     void addWidgets(std::initializer_list<QWidget*> widgets);
+
+    /** Add linked aligner to align with. Does not retain ownership. */
+    void addAligner(QnAligner* aligner);
 
     /** Use custom accessor for the given widgets type. Takes ownership of an accessor. */
     void registerTypeAccessor(const QLatin1String& className, AbstractAccessor* accessor);
@@ -36,16 +41,24 @@ public:
     bool skipInvisible() const;
     void setSkipInvisible(bool value);
 
-    int minimumSize() const;
-    void setMinimumSize(int value);
+    int minimumWidth() const;
+    void setMinimumWidth(int value);
+
+    /** Maximum width of all widgets. */
+    int maxWidth() const;
+
+    /** Set width of all widgets. */
+    void enforceWidth(int width);
 
 private:
     AbstractAccessor* accessor(QWidget* widget) const;
 
 private:
     QList<QWidget*> m_widgets;
+    QList<QnAligner*> m_aligners;
     QHash<QLatin1String, AbstractAccessor *> m_accessorByClassName;
     QScopedPointer<AbstractAccessor> m_defaultAccessor;
+    QPointer<QnAligner> m_masterAligner;
     bool m_skipInvisible;
-    int m_minimumSize;
+    int m_minimumWidth;
 };

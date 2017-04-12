@@ -15,14 +15,15 @@
 
 #include <stdint.h>
 
-#include <QString>
-#include <QUrl>
+#include <QtCore/QObject>
+#include <QtCore/QHash>
+#include <QtCore/QString>
 
 #ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
 #endif
-#include <utils/common/hash.h>
-#include <utils/common/systemerror.h>
+
+#include <nx/utils/system_error.h>
 
 namespace nx {
 namespace network {
@@ -147,7 +148,6 @@ public:
 
     QString toString() const;
     std::string toStdString() const;
-    QUrl toUrl(const QString& scheme = QString()) const;
     bool isNull() const;
 
     static const SocketAddress anyAddress;

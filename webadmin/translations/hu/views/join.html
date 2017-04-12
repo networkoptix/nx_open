@@ -57,7 +57,7 @@
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
             <p>A jelenlegi rendszer <b>{{systems.systemName}}</b> összevonásra kerül <b>{{systems.joinSystemName}}</b> rendszerrel</p>
             <p>
-                Az új rendszer a(z) <br/> rendszer felhasználóit és jelszavait fogja használni.
+                Az új rendszer <br/> rendszer felhasználóit és jelszavait fogja használni.
                 <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/> {{systems.systemName}} (jelenlegi)</label> <br/>
                 <label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/> {{systems.joinSystemName}}</label>
             </p>

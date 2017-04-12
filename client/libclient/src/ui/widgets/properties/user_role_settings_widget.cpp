@@ -1,6 +1,13 @@
 #include "user_role_settings_widget.h"
 #include "ui_user_role_settings_widget.h"
 
+#include <QtGui/QStandardItemModel>
+
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QRadioButton>
+
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 
@@ -14,7 +21,7 @@
 #include <ui/style/helper.h>
 #include <ui/style/resource_icon_cache.h>
 
-class QnUserRoleSettingsWidgetPrivate: public Connective<QObject>
+class QnUserRoleSettingsWidgetPrivate: public Connective<QObject>, public QnConnectionContextAware
 {
     using base_type = Connective<QObject>;
 
@@ -33,10 +40,10 @@ public:
         changeRadioButton(nullptr),
         replacementComboBox(nullptr)
     {
-        for (const auto& user: qnResPool->getResources<QnUserResource>())
+        for (const auto& user: resourcePool()->getResources<QnUserResource>())
             connectUserSignals(user);
 
-        connect(qnResPool, &QnResourcePool::resourceAdded, this,
+        connect(resourcePool(), &QnResourcePool::resourceAdded, this,
             [this](const QnResourcePtr& resource)
             {
                 QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
@@ -49,7 +56,7 @@ public:
                     userAddedOrUpdated(user);
             });
 
-        connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+        connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
             [this](const QnResourcePtr& resource)
             {
                 QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
@@ -327,11 +334,11 @@ QnUserRoleSettingsWidget::QnUserRoleSettingsWidget(
                 return Qn::ValidationResult(tr("Role with same name already exists."));
             }
 
-            auto predefined = qnUserRolesManager->predefinedRoles();
+            auto predefined = userRolesManager()->predefinedRoles();
             predefined << Qn::UserRole::CustomPermissions << Qn::UserRole::CustomUserRole;
             for (auto role: predefined)
             {
-                if (qnUserRolesManager->userRoleName(role).trimmed().toLower() != name)
+                if (userRolesManager()->userRoleName(role).trimmed().toLower() != name)
                     continue;
 
                 return Qn::ValidationResult(tr("Role with same name already exists."));

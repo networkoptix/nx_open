@@ -18,8 +18,8 @@
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <platform/process/current_process.h>
 #include <utils/common/command_line_parser.h>
-#include <utils/common/guard.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/scope_guard.h>
+#include <nx/utils/system_error.h>
 #include <utils/common/app_info.h>
 
 #include "business_logic_composite.h"
@@ -64,7 +64,7 @@ const std::vector<SocketAddress>& MediatorProcess::stunEndpoints() const
 int MediatorProcess::exec()
 {
     bool processStartResult = false;
-    auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
+    auto triggerOnStartedEventHandlerGuard = makeScopeGuard(
         [this, &processStartResult]
         {
             if (m_startedEventHandler)

@@ -86,6 +86,7 @@ public:
      * @param key               Custom key.
      */
     static void setKey(const QnResourcePtr& resource, Key key);
+    static void clearKey(const QnResourcePtr& resource);
 
     static QnResourceIconCache* instance();
 

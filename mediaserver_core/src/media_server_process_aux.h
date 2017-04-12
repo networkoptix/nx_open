@@ -54,7 +54,7 @@ public:
 };
 
 using SettingsProxyPtr = std::unique_ptr<SettingsProxy>;
-SettingsProxyPtr createServerSettingsProxy();
+SettingsProxyPtr createServerSettingsProxy(QnCommonModule* commonModule);
 
 
 class LocalSystemIndentityHelper
@@ -84,7 +84,7 @@ private:
 bool needToResetSystem(bool isNewServerInstance, const SettingsProxy* settings);
 
 bool isNewServerInstance(
-    const BeforeRestoreDbData& restoreData, 
+    const BeforeRestoreDbData& restoreData,
     bool foundOwnServerInDb,
     bool noSetupWizardFlag);
 

@@ -3,7 +3,7 @@
 #include <nx/utils/string.h>
 
 #include <utils/common/app_info.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 #include "../auth_tools.h"
 

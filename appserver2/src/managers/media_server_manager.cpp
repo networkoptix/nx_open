@@ -80,6 +80,19 @@ namespace ec2
     }
 
     template<class T>
+    int QnMediaServerManager<T>::getServersEx(impl::GetServersExHandlerPtr handler)
+    {
+        const int reqID = generateRequestID();
+
+        auto queryDoneHandler = [reqID, handler, this](ErrorCode errorCode, const ec2::ApiMediaServerDataExList& servers) {
+            handler->done(reqID, errorCode, servers);
+        };
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiMediaServerDataExList, decltype(queryDoneHandler)>(
+            ApiCommand::getMediaServersEx, QnUuid(), queryDoneHandler);
+        return reqID;
+    }
+
+    template<class T>
     int QnMediaServerManager<T>::save(const ec2::ApiMediaServerData& server, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();

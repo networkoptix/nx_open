@@ -33,10 +33,10 @@ public:
 
 /**
  * Instrument event dispatcher can be installed as an event filter for any
- * number of objects of the given type T. It will then forward filtered 
+ * number of objects of the given type T. It will then forward filtered
  * events to instruments registered with it.
  *
- * Note that it is possible to install an event dispatcher as an event 
+ * Note that it is possible to install an event dispatcher as an event
  * filter for object of any type, not only of T. Type mismatches are checked
  * only in debug mode, so the user must pay attention.
  *
@@ -54,7 +54,7 @@ public:
 
     /**
      * Constructor.
-     * 
+     *
      * \param parent                   Parent object for this instrument event dispatcher.
      */
     InstrumentEventDispatcher(QObject *parent = NULL);
@@ -73,7 +73,7 @@ public:
      * \param target                   Target to register. Must not be NULL.
      */
     void registerTarget(T *target);
-    
+
     /**
      * \param target                   Target to unregister. Must not be NULL.
      */

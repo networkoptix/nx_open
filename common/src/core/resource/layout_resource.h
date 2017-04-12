@@ -9,7 +9,7 @@
 #include <core/resource/layout_item_data.h>
 
 #include <utils/common/threadsafe_item_storage.h>
-
+#include <common/common_globals.h>
 
 /**
  * QnLayoutResource class describes the set of resources together with their view options.
@@ -27,7 +27,7 @@ class QnLayoutResource: public QnResource,
     typedef QnResource base_type;
 
 public:
-    QnLayoutResource();
+    QnLayoutResource(QnCommonModule* commonModule = nullptr);
 
     virtual QString getUniqueId() const override;
     virtual Qn::ResourceStatus getStatus() const override;
@@ -50,6 +50,9 @@ public:
 
     void removeItem(const QnUuid &itemUuid);
 
+    /**
+     * @note Resource replacement is not supported for item.
+     */
     void updateItem(const QnLayoutItemData &item);
 
     float cellAspectRatio() const;
@@ -65,6 +68,8 @@ public:
     void setData(const QHash<int, QVariant> &dataByRole);
 
     void setData(int role, const QVariant &value);
+
+    QVariant data(int role) const; // TODO: #ynikitenkov Possibly move to QnResourceRuntimeDataManager
 
     QHash<int, QVariant> data() const;
 
@@ -104,7 +109,7 @@ public:
     QSet<QnResourcePtr> layoutResources() const;
 
     /** Get all resources placed on the layout. WARNING: method is SLOW! */
-    static QSet<QnResourcePtr> layoutResources(const QnLayoutItemDataMap& items);
+    static QSet<QnResourcePtr> layoutResources(QnResourcePool* resourcePool, const QnLayoutItemDataMap& items);
 
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
@@ -119,6 +124,8 @@ signals:
     void backgroundImageChanged(const QnLayoutResourcePtr &resource);
     void backgroundOpacityChanged(const QnLayoutResourcePtr &resource);
     void lockedChanged(const QnLayoutResourcePtr &resource);
+
+    void dataChanged(int role);
 
 protected:
     virtual Qn::Notifier storedItemAdded(const QnLayoutItemData& item) override;

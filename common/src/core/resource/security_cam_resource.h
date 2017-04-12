@@ -28,15 +28,15 @@ static const int PRIMARY_ENCODER_INDEX = 0;
 static const int SECONDARY_ENCODER_INDEX = 1;
 
 
-class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource {
+class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource
+{
     typedef QnNetworkResource base_type;
     Q_OBJECT
-
 public:
     static QnUuid makeCameraIdFromUniqueId(const QString& uniqueId);
 
 public:
-    QnSecurityCamResource();
+    QnSecurityCamResource(QnCommonModule* commonModule = nullptr);
     virtual ~QnSecurityCamResource();
 
     QnMediaServerResourcePtr getParentServer() const;
@@ -64,7 +64,8 @@ public:
 
     virtual int reservedSecondStreamFps() const;
 
-    virtual void setIframeDistance(int frames, int timems) = 0; // sets the distance between I frames
+    /** sets the distance between I frames */
+    virtual void setIframeDistance(int /*frames*/, int /*timems*/) {}
 
     void setDataProviderFactory(QnDataProviderFactory* dpFactory);
 

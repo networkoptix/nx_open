@@ -4,6 +4,8 @@
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
 
+#include <common/common_module.h>
+
 #include <client/client_globals.h>
 
 #include <api/global_settings.h>
@@ -13,6 +15,7 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
+#include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/common/checkbox_utils.h>
 #include <ui/help/help_topic_accessor.h>
@@ -25,6 +28,11 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     m_qualityEditable(false)
 {
     ui->setupUi(this);
+
+    NX_ASSERT(parent);
+    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(window());
+    ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
+    scrollBar->setUseMaximumSpace(true);
 
     QnCheckbox::autoCleanTristate(ui->checkBoxForceMotionDetection);
 
@@ -40,11 +48,12 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     // if "I have read manual" is set, all controls should be enabled
     connect(ui->assureCheckBox, SIGNAL(toggled(bool)), ui->assureCheckBox, SLOT(setDisabled(bool)));
     connect(ui->assureCheckBox, SIGNAL(toggled(bool)), ui->assureWidget, SLOT(setEnabled(bool)));
+    connect(ui->assureCheckBox, SIGNAL(toggled(bool)), ui->scrollArea, SLOT(setEnabled(bool)));
     ui->assureWidget->setEnabled(false);
 
     connect(ui->settingsDisableControlCheckBox, &QCheckBox::toggled, ui->qualityGroupBox, &QGroupBox::setDisabled);
     connect(ui->settingsDisableControlCheckBox, &QCheckBox::toggled, this, &QnCameraExpertSettingsWidget::updateControlBlock);
-    connect(QnGlobalSettings::instance(), &QnGlobalSettings::cameraSettingsOptimizationChanged, this, &QnCameraExpertSettingsWidget::updateControlBlock);
+    connect(qnGlobalSettings, &QnGlobalSettings::cameraSettingsOptimizationChanged, this, &QnCameraExpertSettingsWidget::updateControlBlock);
     updateControlBlock();
 
     connect(ui->qualityOverrideCheckBox, SIGNAL(toggled(bool)), ui->qualitySlider, SLOT(setVisible(bool)));
@@ -284,13 +293,14 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     bool defaultValues = ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked
             && sliderPosToQuality(ui->qualitySlider->value()) == Qn::SSQualityMedium
             && ui->checkBoxPrimaryRecorder->checkState() == Qt::Unchecked
-            && (ui->checkBoxBitratePerGOP->checkState() == Qt::Unchecked || !ui->checkBoxBitratePerGOP->isEnabled())
+            && (ui->checkBoxBitratePerGOP->checkState() == Qt::Unchecked || !enableBitratePerGop)
             && ui->checkBoxSecondaryRecorder->checkState() == Qt::Unchecked
             && ui->comboBoxTransport->currentIndex() == 0
             && ui->checkBoxForceMotionDetection->checkState() == Qt::Unchecked;
 
     ui->assureCheckBox->setEnabled(!cameras.isEmpty() && defaultValues);
     ui->assureCheckBox->setChecked(!defaultValues);
+    ui->scrollArea->setEnabled(ui->assureCheckBox->isChecked());
 }
 
 void QnCameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResourceList &cameras) {
@@ -299,7 +309,7 @@ void QnCameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResour
 
     bool disableControls = ui->settingsDisableControlCheckBox->checkState() == Qt::Checked;
     bool enableControls = ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked;
-    bool globalControlEnabled = QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled();
+    bool globalControlEnabled = qnGlobalSettings->isCameraSettingsOptimizationEnabled();
 
     Qn::SecondStreamQuality quality = (Qn::SecondStreamQuality) sliderPosToQuality(ui->qualitySlider->value());
 
@@ -390,7 +400,7 @@ void QnCameraExpertSettingsWidget::at_qualitySlider_valueChanged(int value) {
 }
 
 void QnCameraExpertSettingsWidget::updateControlBlock() {
-    bool globalControlEnabled = QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled();
+    bool globalControlEnabled = qnGlobalSettings->isCameraSettingsOptimizationEnabled();
     ui->settingsDisableControlCheckBox->setEnabled(globalControlEnabled);
     ui->settingsDisabledWarningLabel->setVisible(!globalControlEnabled);
     ui->settingsWarningLabel->setVisible(globalControlEnabled && !ui->settingsDisableControlCheckBox->isChecked());

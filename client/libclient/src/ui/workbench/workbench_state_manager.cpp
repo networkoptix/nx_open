@@ -34,17 +34,18 @@ bool QnWorkbenchStateManager::tryClose(bool force)
     *  We can detect it by `workbench()->currentLayoutIndex() == -1` check.
     */
     bool canSaveState =
-        !qnCommon->remoteGUID().isNull()
+        !commonModule()->remoteGUID().isNull()
         && qnRuntime->isDesktopMode()
         && context()->user()
-        && !helpers::currentSystemIsNew()
+        && !helpers::currentSystemIsNew(commonModule())
         && workbench()->currentLayoutIndex() != -1
         && !force;
 
     if (canSaveState)
     {
         saveState();
-        qnStatisticsManager->saveCurrentStatistics();
+        if (auto statisticsManager = commonModule()->instance<QnStatisticsManager>())
+            statisticsManager->saveCurrentStatistics();
     }
 
     /* Order should be backward, so more recently opened dialogs will ask first. */
@@ -59,7 +60,7 @@ bool QnWorkbenchStateManager::tryClose(bool force)
 
 void QnWorkbenchStateManager::saveState()
 {
-    const auto localSystemId = helpers::currentSystemLocalId();
+    const auto localSystemId = helpers::currentSystemLocalId(commonModule());
     const auto userId = context()->user()->getId();
     if (localSystemId.isNull() || userId.isNull())
     {
@@ -96,7 +97,7 @@ void QnWorkbenchStateManager::restoreState()
 
     auto states = qnSettings->workbenchStates();
     auto iter = std::find_if(states.cbegin(), states.cend(),
-        [userId = user->getId(), localId = helpers::currentSystemLocalId()]
+        [userId = user->getId(), localId = helpers::currentSystemLocalId(commonModule())]
         (const QnWorkbenchState& state)
         {
             return state.localSystemId == localId && state.userId == userId;

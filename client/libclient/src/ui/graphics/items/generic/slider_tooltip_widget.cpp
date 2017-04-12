@@ -1,5 +1,7 @@
 #include "slider_tooltip_widget.h"
 
+#include <QtWidgets/QApplication>
+
 QnSliderTooltipWidget::QnSliderTooltipWidget(QGraphicsItem* parent):
     base_type(parent)
 {

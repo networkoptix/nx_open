@@ -1,5 +1,6 @@
-
 #include "direct_systems_finder.h"
+
+#include <common/common_module.h>
 
 #include <network/module_finder.h>
 #include <network/system_helpers.h>
@@ -7,6 +8,7 @@
 
 #include <nx/network/socket_global.h>
 #include <nx/network/socket_common.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
 
 namespace {
@@ -214,7 +216,9 @@ void QnDirectSystemsFinder::updatePrimaryAddress(const QnModuleInformation &modu
 
 
     const auto systemDescription = systemIt.value();
-    const auto url = address.toUrl(moduleInformation.sslAllowed ? lit("https") : QString());
+    const auto url = nx::network::url::Builder()
+        .setScheme(moduleInformation.sslAllowed ? lit("https") : QString())
+        .setEndpoint(address).toUrl();
     systemDescription->setServerHost(moduleInformation.id, url);
 
     // Workaround for systems with version less than 2.3.

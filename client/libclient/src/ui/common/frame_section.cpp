@@ -370,32 +370,6 @@ QPointF Qn::calculatePinPoint(const QRectF &rect, Qt::WindowFrameSection section
     return calculatePinPointInternal<QPointF, QRectF>(rect, section);
 }
 
-Qn::Corner Qn::calculatePinPoint(Qt::WindowFrameSection section) {
-    switch(section) {
-    case Qt::LeftSection:
-        return Qn::TopRightCorner;
-    case Qt::TopLeftSection:
-        return Qn::BottomRightCorner;
-    case Qt::TopSection:
-        return Qn::BottomLeftCorner;
-    case Qt::TopRightSection:
-        return Qn::BottomLeftCorner;
-    case Qt::RightSection:
-        return Qn::TopLeftCorner;
-    case Qt::BottomRightSection:
-        return Qn::TopLeftCorner;
-    case Qt::BottomSection:
-        return Qn::TopLeftCorner;
-    case Qt::BottomLeftSection:
-        return Qn::TopRightCorner;
-    case Qt::TitleBarArea:
-        return Qn::NoCorner;
-    default:
-        qnWarning("Invalid window frame section '%1'.", section);
-        return Qn::NoCorner;
-    }
-}
-
 QPoint Qn::calculatePinPoint(const QRect &rect, Qt::WindowFrameSection section) {
     return calculatePinPointInternal<QPoint, QRect>(rect, section);
 }

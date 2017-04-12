@@ -96,8 +96,8 @@ public:
         camera->copyLastGop(
             /*primaryLiveStream*/ true,
             /*skipTime*/ 0,
-            tmpQueue, 
-            /*cseq*/ 0, 
+            tmpQueue,
+            /*cseq*/ 0,
             /*iFramesOnly*/ false);
 
         auto randomAccess = tmpQueue.lock();
@@ -378,7 +378,7 @@ static const QLatin1String CONTINUOUS_TIMESTAMPS_PARAM_NAME( "ct" );
 static const int MS_PER_SEC = 1000;
 
 QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnProgressiveDownloadingConsumerPrivate, socket)
+    QnTCPConnectionProcessor(new QnProgressiveDownloadingConsumerPrivate, socket, _owner->commonModule())
 {
     Q_UNUSED(_owner)
     Q_D(QnProgressiveDownloadingConsumer);
@@ -473,7 +473,7 @@ void QnProgressiveDownloadingConsumer::run()
     Q_D(QnProgressiveDownloadingConsumer);
     initSystemThreadId();
 
-    if (qnCommon->isTranscodeDisabled())
+    if (commonModule()->isTranscodeDisabled())
     {
         d->response.messageBody = QByteArray("Video transcoding is disabled in the server settings. Feature unavailable.");
         sendResponse(CODE_NOT_IMPLEMETED, "text/plain");
@@ -544,13 +544,13 @@ void QnProgressiveDownloadingConsumer::run()
         QnResourcePtr resource;
         const QnUuid uuid = QnUuid::fromStringSafe(resId);
         if (!uuid.isNull())
-            resource = qnResPool->getResourceById(uuid);
+            resource = resourcePool()->getResourceById(uuid);
         if (!resource)
-            resource = qnResPool->getResourceByUniqueId(resId);
+            resource = resourcePool()->getResourceByUniqueId(resId);
         if (!resource)
-            resource = qnResPool->getResourceByMacAddress(resId);
+            resource = resourcePool()->getResourceByMacAddress(resId);
         if (!resource)
-            resource = qnResPool->getResourceByUrl(resId);
+            resource = resourcePool()->getResourceByUrl(resId);
         if (!resource)
         {
             d->response.messageBody = QByteArray("Resource with id ") + QByteArray(resId.toLatin1()) + QByteArray(" not found ");
@@ -558,7 +558,7 @@ void QnProgressiveDownloadingConsumer::run()
             return;
         }
 
-        if (!qnResourceAccessManager->hasPermission(d->accessRights, resource, Qn::ReadPermission))
+        if (!resourceAccessManager()->hasPermission(d->accessRights, resource, Qn::ReadPermission))
         {
             sendUnauthorizedResponse(nx_http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
             return;
@@ -650,6 +650,14 @@ void QnProgressiveDownloadingConsumer::run()
         auto camera = qnCameraPool->getVideoCamera(resource);
 
         bool isLive = position.isEmpty() || position == "now";
+
+        if (!isLive &&
+            !commonModule()->resourceAccessManager()->hasGlobalPermission(d->accessRights, Qn::GlobalViewArchivePermission))
+        {
+            sendUnauthorizedResponse(nx_http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
+            return;
+        }
+
 
         QnProgressiveDownloadingDataConsumer dataConsumer(
             this,

@@ -4,60 +4,56 @@
 #include <utils/db/types.h>
 #include <utils/db/query_context.h>
 
-#include "data/system_data.h"
+#include "../abstract_system_data_object.h"
 
 namespace nx {
 namespace cdb {
-namespace conf {
-
-class Settings;
-
-} // namespace conf
-
 namespace dao {
 namespace rdb {
 
-class SystemDataObject
+class SystemDataObject:
+    public AbstractSystemDataObject
 {
 public:
     SystemDataObject(const conf::Settings& settings);
 
-    nx::db::DBResult insert(
+    virtual nx::db::DBResult insert(
         nx::db::QueryContext* const queryContext,
         const data::SystemData& system,
-        const std::string& accountId);
+        const std::string& accountId) override;
 
-    nx::db::DBResult selectSystemSequence(
+    virtual nx::db::DBResult selectSystemSequence(
         nx::db::QueryContext* const queryContext,
         const std::string& systemId,
-        std::uint64_t* const sequence);
+        std::uint64_t* const sequence) override;
 
-    nx::db::DBResult markSystemAsDeleted(
+    virtual nx::db::DBResult markSystemAsDeleted(
         nx::db::QueryContext* const queryContext,
-        const std::string& systemId);
+        const std::string& systemId) override;
 
-    nx::db::DBResult deleteSystem(
+    virtual nx::db::DBResult deleteSystem(
         nx::db::QueryContext* const queryContext,
-        const std::string& systemId);
+        const std::string& systemId) override;
 
-    nx::db::DBResult execSystemNameUpdate(
+    virtual nx::db::DBResult execSystemNameUpdate(
         nx::db::QueryContext* const queryContext,
-        const data::SystemAttributesUpdate& data);
+        const data::SystemAttributesUpdate& data) override;
 
-    nx::db::DBResult execSystemOpaqueUpdate(
+    virtual nx::db::DBResult execSystemOpaqueUpdate(
         nx::db::QueryContext* const queryContext,
-        const data::SystemAttributesUpdate& data);
+        const data::SystemAttributesUpdate& data) override;
 
-    nx::db::DBResult activateSystem(
+    virtual nx::db::DBResult activateSystem(
         nx::db::QueryContext* const queryContext,
-        const std::string& systemId);
+        const std::string& systemId) override;
 
-    nx::db::DBResult fetchSystems(
+    virtual nx::db::DBResult fetchSystems(
         nx::db::QueryContext* queryContext,
         const nx::db::InnerJoinFilterFields& filterFields,
-        std::vector<data::SystemData>* const systems);
+        std::vector<data::SystemData>* const systems) override;
 
-    nx::db::DBResult deleteExpiredSystems(nx::db::QueryContext* queryContext);
+    virtual nx::db::DBResult deleteExpiredSystems(
+        nx::db::QueryContext* queryContext) override;
 
 private:
     const conf::Settings& m_settings;

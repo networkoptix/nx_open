@@ -11,12 +11,12 @@ QnWorkbenchUserEmailWatcher::QnWorkbenchUserEmailWatcher(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         &QnWorkbenchUserEmailWatcher::at_resourcePool_resourceAdded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnWorkbenchUserEmailWatcher::at_resourcePool_resourceRemoved);
 
-    for (const auto& user : qnResPool->getResources<QnUserResource>())
+    for (const auto& user : resourcePool()->getResources<QnUserResource>())
         at_resourcePool_resourceAdded(user);
 
     connect(context(), &QnWorkbenchContext::userChanged, this,

@@ -6,7 +6,7 @@
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui"/>
         <source>About</source>
-        <translation>Nx Witnessについて</translation>
+        <translation>について</translation>
     </message>
     <message>
         <location/>
@@ -589,7 +589,7 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
         <source>about:blank</source>
-        <translation>ブランク</translation>
+        <translation type="unfinished">about:blank</translation>
     </message>
     <message>
         <location/>
@@ -1135,7 +1135,7 @@
     <message>
         <location/>
         <source>after</source>
-        <translation>　</translation>
+        <translation>後</translation>
     </message>
     <message>
         <location/>
@@ -1368,12 +1368,12 @@
     <message>
         <location/>
         <source>Role to assign to imported users</source>
-        <translation type="unfinished">Role to assign to imported users</translation>
+        <translation>インポートされたユーザーに割り当てる役割</translation>
     </message>
     <message>
         <location/>
         <source>Disable imported users</source>
-        <translation type="unfinished">Disable imported users</translation>
+        <translation>インポートしたユーザーを無効</translation>
     </message>
 </context>
 <context>
@@ -2320,7 +2320,7 @@
     <message>
         <location/>
         <source>Global Email Settings...</source>
-        <translation>グローバルE-Mail設定(&amp;G)...</translation>
+        <translation>グローバルEmail設定(&amp;G)...</translation>
     </message>
 </context>
 <context>

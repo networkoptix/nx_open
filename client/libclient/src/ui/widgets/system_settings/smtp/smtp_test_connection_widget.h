@@ -1,5 +1,7 @@
 #pragma once
 
+#include <client_core/connection_context_aware.h>
+
 #include <utils/email/email_fwd.h>
 
 namespace Ui {
@@ -8,7 +10,8 @@ namespace Ui {
 
 struct QnTestEmailSettingsReply;
 
-class QnSmtpTestConnectionWidget: public QWidget {
+class QnSmtpTestConnectionWidget: public QWidget, public QnConnectionContextAware
+{
     Q_OBJECT
 
 public:

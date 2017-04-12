@@ -1,6 +1,7 @@
 
 #include "socket_global.h"
 
+#include <nx/utils/thread/barrier_handler.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 

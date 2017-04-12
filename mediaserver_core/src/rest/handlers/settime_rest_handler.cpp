@@ -8,6 +8,7 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+#include <rest/server/rest_connection_processor.h>
 
 struct SetTimeData
 {
@@ -55,11 +56,11 @@ int QnSetTimeRestHandler::executePost(
 
 int QnSetTimeRestHandler::execute(
     const SetTimeData& data,
-    const QnRestConnectionProcessor* /*owner*/,
+    const QnRestConnectionProcessor* owner,
     QnJsonRestResult& result)
 {
-    QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(
-        qnCommon->moduleGUID());
+    QnMediaServerResourcePtr mServer = owner->resourcePool()->getResourceById<QnMediaServerResource>(
+        owner->commonModule()->moduleGUID());
     if (!mServer)
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error"));
@@ -105,7 +106,7 @@ int QnSetTimeRestHandler::execute(
         return CODE_OK;
     }
 
-    //ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+    //ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
     //ec2Connection->getTimeManager()->forceTimeResync();
 
     return CODE_OK;

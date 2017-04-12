@@ -1,6 +1,11 @@
 #include "workbench_debug_handler.h"
 
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QLineEdit>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QToolButton>
+
 #include <QtWebKitWidgets/QWebView>
 
 #include <common/common_module.h>
@@ -80,7 +85,7 @@ public:
         base_type(parent),
         QnWorkbenchContextAware(parent)
     {
-        using namespace nx::client::ui::dialogs;
+        using namespace nx::client::desktop::ui::dialogs;
 
         QVBoxLayout *layout = new QVBoxLayout(this);
         layout->addWidget(newActionButton(QnActions::DebugDecrementCounterAction));
@@ -109,15 +114,17 @@ public:
             {
                 QnPaletteWidget *w = new QnPaletteWidget(this);
                 w->setPalette(qApp->palette());
-                auto messageBox = new QnMessageBox(mainWindow(), Qt::Window);
+                auto messageBox = new QnMessageBox(mainWindow());
+                messageBox->setWindowFlags(Qt::Window);
                 messageBox->addCustomWidget(w);
                 messageBox->show();
             });
 
         addButton(lit("Resource Pool"), [this]
             {
-                auto messageBox = new QnMessageBox(mainWindow(), Qt::Window);
-                messageBox->addCustomWidget(new QnResourceListView(qnResPool->getResources(), messageBox));
+                auto messageBox = new QnMessageBox(mainWindow());
+                messageBox->setWindowFlags(Qt::Window);
+                messageBox->addCustomWidget(new QnResourceListView(resourcePool()->getResources(), messageBox));
                 messageBox->show();
             });
 

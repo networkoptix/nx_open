@@ -1,8 +1,13 @@
 #include "videowall_item_widget.h"
 
 #include <QtCore/QMimeData>
+
 #include <QtGui/QDrag>
+
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QStyleOptionGraphicsItem>
 
 #include <common/common_globals.h>
 
@@ -330,7 +335,7 @@ void QnVideowallItemWidget::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
     m_dragged.resources << layouts;
     m_dragged.resources << servers;
 
-    m_dragged.videoWallItems = qnResPool->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData));
+    m_dragged.videoWallItems = resourcePool()->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData));
 
     if (m_dragged.resources.empty() && m_dragged.videoWallItems.empty())
         return;
@@ -450,7 +455,7 @@ void QnVideowallItemWidget::at_doubleClicked(Qt::MouseButton button)
 void QnVideowallItemWidget::updateLayout()
 {
     QnVideoWallItem item = m_videowall->items()->getItem(m_itemUuid);
-    auto layout = qnResPool->getResourceById<QnLayoutResource>(item.layout);
+    auto layout = resourcePool()->getResourceById<QnLayoutResource>(item.layout);
     if (m_layout == layout)
         return;
 
@@ -508,7 +513,7 @@ void QnVideowallItemWidget::updateHud(bool animate)
 
 bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data)
 {
-    QnResourcePtr resource = qnResPool->getResourceByDescriptor(data.resource);
+    QnResourcePtr resource = resourcePool()->getResourceByDescriptor(data.resource);
     if (!resource)
         return true; // Absent resources must not display "Loading..." overlay
 

@@ -199,7 +199,7 @@ private:
         QTimer* cacheTimer;
     } m_controlMode;
 
-    QScopedPointer<QnVideoWallLicenseUsageHelper> m_licensesHelper;
+    QnVideoWallLicenseUsageHelper* m_licensesHelper;
     QScopedPointer<QnUuidPool> m_uuidPool;
 };
 

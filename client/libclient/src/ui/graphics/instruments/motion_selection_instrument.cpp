@@ -20,7 +20,8 @@
 
 namespace {
 
-auto motionSelectionEnabled = [](QnMediaResourceWidget* widget)
+auto motionSelectionEnabled =
+    [](QnMediaResourceWidget* widget)
     {
         NX_ASSERT(widget);
         if (!widget)
@@ -32,7 +33,8 @@ auto motionSelectionEnabled = [](QnMediaResourceWidget* widget)
     };
 
 // This way we detect widget that can possibly have DisplayMotion enabled
-auto widgetWithMotion = [](QGraphicsItem* item)
+auto widgetWithMotion =
+    [](QGraphicsItem* item)
     {
         if (auto widget = dynamic_cast<QnMediaResourceWidget*>(item))
             return widget->resource()->toResource()->hasFlags(Qn::motion);
@@ -133,6 +135,14 @@ void MotionSelectionInstrument::ensureSelectionItem() {
         scene()->addItem(selectionItem());
 }
 
+void MotionSelectionInstrument::updateWidgetUnderCursor(QWidget *viewport, QMouseEvent* event)
+{
+    auto view = this->view(viewport);
+    auto widget = dynamic_cast<QnMediaResourceWidget*>(
+        this->item(view, event->pos(), widgetWithMotion));
+    setWidget(widget);
+}
+
 void MotionSelectionInstrument::updateCursor()
 {
     if (!m_itemUnderMouse)
@@ -155,12 +165,15 @@ void MotionSelectionInstrument::setWidget(QnMediaResourceWidget* widget)
     m_widget = widget;
 
     if (m_widget)
+    {
         connect(m_widget, &QnResourceWidget::optionsChanged, this, &MotionSelectionInstrument::updateCursor);
+        connect(m_widget, &QObject::destroyed, this, &MotionSelectionInstrument::updateCursor);
+    }
 
     updateCursor();
 }
 
-void MotionSelectionInstrument::setItemUnderMouse(QGraphicsItem* item)
+void MotionSelectionInstrument::setItemUnderMouse(QGraphicsWidget* item)
 {
     if (m_itemUnderMouse == item)
         return;
@@ -186,6 +199,9 @@ bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *
     if (event->button() != Qt::LeftButton)
         return false;
 
+    // Handle situation when we stopped drag over another widget
+    updateWidgetUnderCursor(viewport, event);
+
     if (!m_widget)
         return false;
 
@@ -203,18 +219,29 @@ bool MotionSelectionInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* e
 {
     auto view = this->view(viewport);
 
-    auto widget = dynamic_cast<QnMediaResourceWidget*>(
-        this->item(view, event->pos(), widgetWithMotion));
-    setWidget(widget);
+    // Really UiElementsWidget always getting here for main scene, resource widget for motion tab.
+    auto item = dynamic_cast<QGraphicsWidget*>(
+        this->item(view, event->pos(), [](QGraphicsItem* item){ return item->isWidget(); }));
+    setItemUnderMouse(item);
 
-    // Really UiElementsWidget always getting here
-    setItemUnderMouse(this->item(view, event->pos()));
+    // Make sure selection will not stop while we are dragging over widget.
+    const bool isDrag = dragProcessor()->isRunning() && event->buttons().testFlag(Qt::LeftButton);
+    if (!isDrag)
+        updateWidgetUnderCursor(viewport, event);
 
     event->accept();
     return false;
 }
 
-bool MotionSelectionInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
+bool MotionSelectionInstrument::mouseReleaseEvent(QWidget* viewport, QMouseEvent* event)
+{
+    const auto result = base_type::mouseReleaseEvent(viewport, event);
+    updateWidgetUnderCursor(viewport, event);
+    return result;
+}
+
+bool MotionSelectionInstrument::paintEvent(QWidget *viewport, QPaintEvent *event)
+{
     if(target() == NULL) {
         dragProcessor()->reset();
         return false;

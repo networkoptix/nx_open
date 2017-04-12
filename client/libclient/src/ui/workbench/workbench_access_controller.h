@@ -3,7 +3,11 @@
 #include <QtCore/QObject>
 #include <QtCore/QList>
 
+#include <common/common_globals.h>
+
 #include <core/resource/resource_fwd.h>
+
+#include <client_core/connection_context_aware.h>
 
 #include <client/client_globals.h>
 
@@ -30,7 +34,7 @@ private:
 /**
  * This class implements access control.
  */
-class QnWorkbenchAccessController: public Connective<QObject>
+class QnWorkbenchAccessController: public Connective<QObject>, public QnConnectionContextAware
 {
     Q_OBJECT
 

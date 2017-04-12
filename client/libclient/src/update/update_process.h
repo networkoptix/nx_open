@@ -1,5 +1,8 @@
-#ifndef QN_UPDATE_PROCESS_H
-#define QN_UPDATE_PROCESS_H
+#pragma once
+
+#include <QtCore/QPointer>
+
+#include <client_core/connection_context_aware.h>
 
 #include <core/resource/resource_fwd.h>
 
@@ -41,7 +44,8 @@ class QnCheckForUpdatesPeerTask;
 struct QnPeerRuntimeInfo;
 struct QnLowFreeSpaceWarning;
 
-class QnUpdateProcess: public QnLongRunnable {
+class QnUpdateProcess: public QnLongRunnable, public QnConnectionContextAware
+{
     Q_OBJECT
 
     typedef QnLongRunnable base_type;
@@ -116,6 +120,3 @@ private:
     bool m_protocolChanged;
     QSet<QnUuid> m_failedPeerIds;
 };
-
-
-#endif //QN_UPDATE_PROCESS_H

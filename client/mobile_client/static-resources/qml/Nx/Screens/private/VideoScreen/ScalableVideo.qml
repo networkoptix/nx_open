@@ -13,6 +13,7 @@ ZoomableFlickable
     property alias resourceHelper: video.resourceHelper
 
     property real maxZoomFactor: 4
+    property alias videoCenterHeightOffsetFactor: content.videoCenterHeightOffsetFactor
 
     minContentWidth: width
     minContentHeight: height

@@ -1,6 +1,10 @@
 #include "user_settings_dialog.h"
 #include "ui_user_settings_dialog.h"
 
+#include <QtWidgets/QPushButton>
+
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/user_roles_manager.h>
@@ -28,7 +32,7 @@
 
 namespace {
 
-class PermissionsInfoTable
+class PermissionsInfoTable: public QnConnectionContextAware
 {
     Q_DECLARE_TR_FUNCTIONS(PermissionsInfoTable)
 public:
@@ -38,7 +42,7 @@ public:
 
     void addPermissionsRow(const QnResourceAccessSubject& subject)
     {
-        auto permissions = qnResourceAccessManager->globalPermissions(subject);
+        auto permissions = resourceAccessManager()->globalPermissions(subject);
         addRow(makePermissionsRow(permissions));
     }
 
@@ -50,9 +54,9 @@ public:
     void addResourceAccessRow(QnResourceAccessFilter::Filter filter,
             const QnResourceAccessSubject& subject, bool currentUserIsAdmin)
     {
-        auto allResources = qnResPool->getResources();
-        auto accessibleResources = qnSharedResourcesManager->sharedResources(subject);
-        auto permissions = qnResourceAccessManager->globalPermissions(subject);
+        auto allResources = resourcePool()->getResources();
+        auto accessibleResources = sharedResourcesManager()->sharedResources(subject);
+        auto permissions = resourceAccessManager()->globalPermissions(subject);
 
         int count = 0;
         int total = currentUserIsAdmin ? 0 : -1;
@@ -207,7 +211,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     addPage(CamerasPage, m_camerasPage, tr("Cameras && Resources"));
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
 
-    connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsChanged, this,
+    connect(resourceAccessManager(), &QnResourceAccessManager::permissionsChanged, this,
         [this](const QnResourceAccessSubject& subject)
         {
             if (m_user && subject.user() == m_user)
@@ -255,7 +259,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
             setUser(users.first());
     });
 
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& resource)
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& resource)
     {
         if (resource != m_user)
         {
@@ -336,7 +340,7 @@ void QnUserSettingsDialog::updatePermissions()
         {
             /* Handle custom user role: */
             QnUuid roleId = m_settingsPage->selectedUserRoleId();
-            QnResourceAccessSubject subject(qnUserRolesManager->userRole(roleId));
+            QnResourceAccessSubject subject(userRolesManager()->userRole(roleId));
 
             helper.addPermissionsRow(subject);
             helper.addResourceAccessRow(QnResourceAccessFilter::MediaFilter, subject, true);
@@ -471,7 +475,7 @@ void QnUserSettingsDialog::applyChanges()
     {
         auto accessibleResources = m_model->accessibleResources();
 
-        QnLayoutResourceList layoutsToShare = qnResPool->getResources(accessibleResources)
+        QnLayoutResourceList layoutsToShare = resourcePool()->getResources(accessibleResources)
             .filtered<QnLayoutResource>(
                 [](const QnLayoutResourcePtr& layout)
             {

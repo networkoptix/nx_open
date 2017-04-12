@@ -157,6 +157,7 @@ namespace aux
 } //namespace aux
 
 QnStorageResource* QnThirdPartyStorageResource::instance(
+    QnCommonModule* commonModule,
     const QString               &url,
     const StorageFactoryPtrType &sf
 )
@@ -164,6 +165,7 @@ QnStorageResource* QnThirdPartyStorageResource::instance(
     try
     {
         return new QnThirdPartyStorageResource(
+            commonModule,
             sf,
             url
         );
@@ -175,9 +177,12 @@ QnStorageResource* QnThirdPartyStorageResource::instance(
 }
 
 QnThirdPartyStorageResource::QnThirdPartyStorageResource(
+        QnCommonModule* commonModule,
         const StorageFactoryPtrType &sf,
-        const QString               &storageUrl
-) : m_valid(true)
+        const QString               &storageUrl)
+:
+    base_type(commonModule),
+    m_valid(true)
 {
     openStorage(
         storageUrl.toLatin1().constData(),
@@ -185,8 +190,9 @@ QnThirdPartyStorageResource::QnThirdPartyStorageResource(
     );
 }
 
-QnThirdPartyStorageResource::QnThirdPartyStorageResource()
-    : m_valid(false)
+QnThirdPartyStorageResource::QnThirdPartyStorageResource():
+    base_type(nullptr),
+    m_valid(false)
 {}
 
 QnThirdPartyStorageResource::~QnThirdPartyStorageResource()
@@ -200,7 +206,7 @@ void QnThirdPartyStorageResource::openStorage(
     QnMutexLocker lock(&m_mutex);
 
     int ecode;
-    nx_spl::Storage* spRaw = sf->createStorage(storageUrl, &ecode);
+    nx_spl::Storage* spRaw = sf->createStorage(commonModule(), storageUrl, &ecode);
 
     if (ecode != nx_spl::error::NoError)
     {
@@ -468,9 +474,13 @@ QnThirdPartyStorageResource::getFileList(const QString& dirName)
             if (fi == nullptr || ecode != nx_spl::error::NoError)
                 break;
 
+            QString urlString = QString::fromLatin1(fi->url);
+            if (!urlString.contains("://"))
+                urlString = QUrl(dirName).toString(QUrl::RemovePath) + QString::fromLatin1(fi->url);
+
             ret.append(
                 QnAbstractStorageResource::FileInfo(
-                    QUrl(dirName).toString(QUrl::RemovePath) + QString::fromLatin1(fi->url),
+                    urlString,
                     fi->size,
                     (fi->type & nx_spl::isDir) ? true : false
                 )

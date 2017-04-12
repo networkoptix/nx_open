@@ -32,7 +32,7 @@ QnWorkbenchBookmarksWatcher::QnWorkbenchBookmarksWatcher(QObject *parent)
     , m_minBookmarkTimeQuery(createBookmarkQuery(kOneBookmarkLimit))
     , m_firstBookmarkUtcTimeMs(kMaxBookmarkTime)
 {
-    connect(qnResPool, &QnResourcePool::resourceAdded, this
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this
         , [this](const QnResourcePtr &resource)
     {
         const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
@@ -44,7 +44,7 @@ QnWorkbenchBookmarksWatcher::QnWorkbenchBookmarksWatcher(QObject *parent)
         m_minBookmarkTimeQuery->setCameras(currentCameras);
     });
 
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this
         , [this](const QnResourcePtr &resource)
     {
         const auto camera = resource.dynamicCast<QnVirtualCameraResource>();

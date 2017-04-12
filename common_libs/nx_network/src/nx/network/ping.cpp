@@ -19,7 +19,7 @@
 #include <QtCore/QProcess>
 
 #include <nx/utils/log/log.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 
 CLPing::CLPing()

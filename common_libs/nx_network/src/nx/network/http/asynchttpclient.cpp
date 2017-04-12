@@ -13,8 +13,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <utils/crypt/linux_passwd_crypt.h>
-#include <utils/common/systemerror.h>
-#include <utils/common/util.h>
+#include <nx/utils/system_error.h>
 
 #include "auth_tools.h"
 
@@ -546,8 +545,14 @@ void AsyncHttpClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t byt
     m_responseBuffer.resize(0);
     if (!m_socket->setRecvTimeout(m_responseReadTimeoutMs))
     {
-        NX_LOGX(lm("Error reading (1) http response from %1. %2")
-            .arg(m_contentLocationUrl).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1);
+        if (reconnectIfAppropriate())
+            return;
+
+        const auto sysErrorCode = SystemError::getLastOSErrorCode();
+        NX_LOGX(lm("Url %1. Error setting receive timeout to %2 ms. %3")
+            .arg(m_contentLocationUrl).arg(m_responseReadTimeoutMs)
+            .arg(SystemError::toString(sysErrorCode)),
+            cl_logDEBUG1);
         m_state = sFailed;
         const auto requestSequenceBak = m_requestSequence;
         emit done(sharedThis);
@@ -1056,7 +1061,7 @@ void AsyncHttpClient::composeRequest(const nx_http::StringType& httpMethod)
 
     nx_http::insertOrReplaceHeader(
         &m_request.headers,
-        HttpHeader("Date", dateTimeToHTTPFormat(QDateTime::currentDateTime())));
+        HttpHeader("Date", nx_http::formatDateTime(QDateTime::currentDateTime())));
     m_request.headers.emplace(
         "User-Agent",
         m_userAgent.isEmpty() ? nx_http::userAgentString() : m_userAgent.toLatin1());

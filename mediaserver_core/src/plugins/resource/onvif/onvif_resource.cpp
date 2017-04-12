@@ -30,7 +30,7 @@
 #include <nx/network/http/httptypes.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/timer_manager.h>
-#include "utils/common/systemerror.h"
+#include <nx/utils/system_error.h>
 #include "api/app_server_connection.h"
 #include "soap/soapserver.h"
 #include "onvif_ptz_controller.h"
@@ -51,6 +51,7 @@
 
 #include <plugins/utils/multisensor_data_provider.h>
 #include <core/resource_management/resource_properties.h>
+#include <common/static_common_module.h>
 
 //!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)
 #define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
@@ -254,8 +255,8 @@ QnPlOnvifResource::RelayOutputInfo::RelayOutputInfo(
 {
 }
 
-QnPlOnvifResource::QnPlOnvifResource()
-:
+QnPlOnvifResource::QnPlOnvifResource(QnCommonModule* commonModule):
+    base_type(commonModule),
     m_iframeDistance(-1),
     m_minQuality(0),
     m_maxQuality(0),
@@ -499,7 +500,7 @@ void QnPlOnvifResource::setAudioCodec(QnPlOnvifResource::AUDIO_CODECS c)
 
 QnAbstractStreamDataProvider* QnPlOnvifResource::createLiveDataProvider()
 {
-    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     bool shouldAppearAsSingleChannel = resData.value<bool>(
         Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
 
@@ -622,7 +623,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 
     fetchRelayInputInfo( capabilitiesResponse );
 
-    const QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    const QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     if (resourceData.contains(QString("relayInputCountForced")))
     {
         setCameraCapability(
@@ -731,7 +732,7 @@ int QnPlOnvifResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resol
 
 int QnPlOnvifResource::strictBitrate(int bitrate, Qn::ConnectionRole role) const
 {
-    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
 
     QString availableBitratesParamName;
     QString bitrateBoundsParamName;
@@ -787,7 +788,7 @@ void QnPlOnvifResource::checkPrimaryResolution(QSize& primaryResolution)
 
 QSize QnPlOnvifResource::findSecondaryResolution(const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff)
 {
-    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
 
     auto forcedSecondaryResolution = resData.value<QString>(
         Qn::FORCED_SECONDARY_STREAM_RESOLUTION_PARAM_NAME);
@@ -1539,13 +1540,6 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
         result = true;
     }
 
-    QString localParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(this->toSharedPointer());
-    QString sourceParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(source);
-    if (localParams != sourceParams) {
-        QnCameraAdvancedParamsReader::setEncodedParamsToResource(this->toSharedPointer(), sourceParams);
-        result = true;
-    }
-
     return result;
 }
 
@@ -1596,7 +1590,7 @@ bool QnPlOnvifResource::fetchRelayInputInfo( const CapabilitiesResp& capabilitie
         setCameraCapability( Qn::RelayInputCapability, true );
     }
 
-    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     m_portAliases = resData.value<std::vector<QString>>(Qn::ONVIF_INPUT_PORT_ALIASES_PARAM_NAME);
 
     if (!m_portAliases.empty())
@@ -1660,7 +1654,7 @@ bool QnPlOnvifResource::setRelayOutputState(
 
 int QnPlOnvifResource::getH264StreamProfile(const VideoOptionsLocal& videoOptionsLocal)
 {
-    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
 
     auto desiredH264Profile = resData.value<QString>(Qn::DESIRED_H264_PROFILE_PARAM_NAME);
 
@@ -1883,7 +1877,7 @@ CameraDiagnostics::Result QnPlOnvifResource::updateVEncoderUsage(QList<VideoOpti
 
 bool QnPlOnvifResource::trustMaxFPS()
 {
-    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     bool result = resourceData.value<bool>(QString("trustMaxFPS"), false);
     return result;
 }
@@ -1963,7 +1957,7 @@ QString QnPlOnvifResource::getInputPortNumberFromString(const QString& portName)
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper)
 {
 
-    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     QnOnvifConfigDataPtr forcedParams = resourceData.value<QnOnvifConfigDataPtr>(QString("forcedOnvifParams"));
     QStringList videoEncodersTokens;
     VideoConfigsResp confResponse;
@@ -2104,7 +2098,7 @@ bool QnPlOnvifResource::fetchAndSetDualStreaming(MediaSoapWrapper& /*soapWrapper
 {
     QnMutexLocker lock( &m_mutex );
 
-    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
 
     bool forceSingleStream = resData.value<bool>(Qn::FORCE_SINGLE_STREAM_PARAM_NAME, false);
 
@@ -2301,7 +2295,7 @@ CameraDiagnostics::Result QnPlOnvifResource::updateResourceCapabilities()
 {
     QnMutexLocker lock( &m_mutex );
 
-    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
 
     if (!m_videoSourceSize.isValid())
         return CameraDiagnostics::NoErrorResult();
@@ -3371,7 +3365,7 @@ bool QnPlOnvifResource::createPullPointSubscription()
     if( !m_inputMonitored )
         return true;
 
-    if( qnCommon->dataPool()->data(toSharedPointer(this)).value<bool>(lit("renewOnvifPullPointSubscriptionRequired"), true) )
+    if( qnStaticCommon->dataPool()->data(toSharedPointer(this)).value<bool>(lit("renewOnvifPullPointSubscriptionRequired"), true) )
     {
         //NOTE: renewing session does not work on vista
         using namespace std::placeholders;
@@ -3505,7 +3499,7 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     }
     _onvifEvents__PullMessagesResponse response;
 
-    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     const bool useHttpReader = resData.value<bool>(
         Qn::PARSE_ONVIF_NOTIFICATIONS_WITH_HTTP_READER,
         false);
@@ -3733,7 +3727,7 @@ QnConstResourceVideoLayoutPtr QnPlOnvifResource::getVideoLayout(
     if (m_videoLayout)
         return m_videoLayout;
 
-    auto resData = qnCommon->dataPool()->data(getVendor(), getModel());
+    auto resData = qnStaticCommon->dataPool()->data(getVendor(), getModel());
     auto layoutStr = resData.value<QString>(Qn::VIDEO_LAYOUT_PARAM_NAME2);
 
     if (!layoutStr.isEmpty())
@@ -3751,7 +3745,7 @@ QnConstResourceVideoLayoutPtr QnPlOnvifResource::getVideoLayout(
 
     auto nonConstThis = const_cast<QnPlOnvifResource*>(this);
     nonConstThis->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, m_videoLayout->toString());
-    propertyDictionary->saveParams(resourceId);
+    nonConstThis->saveParams();
 
     return m_videoLayout;
 }
@@ -3881,7 +3875,7 @@ void QnPlOnvifResource::afterConfigureStream()
 
 double QnPlOnvifResource::getClosestAvailableFps(double desiredFps)
 {
-    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     bool useEncodingInterval = resData.value<bool>(
         Qn::CONTROL_FPS_VIA_ENCODING_INTERVAL_PARAM_NAME);
 
@@ -4023,20 +4017,20 @@ void QnPlOnvifResource::fillFullUrlInfo( const CapabilitiesResp& response )
  */
 bool QnPlOnvifResource::isCameraForcedToOnvif(const QString& manufacturer, const QString& model)
 {
-    QnResourceData resourceData = qnCommon->dataPool()->data(manufacturer, model);
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacturer, model);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return true;
 
     QString shortModel = model;
     shortModel.replace(QString(lit(" ")), QString());
     shortModel.replace(QString(lit("-")), QString());
-    resourceData = qnCommon->dataPool()->data(manufacturer, shortModel);
+    resourceData = qnStaticCommon->dataPool()->data(manufacturer, shortModel);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return true;
 
     if (shortModel.startsWith(manufacturer))
         shortModel = shortModel.mid(manufacturer.length()).trimmed();
-    resourceData = qnCommon->dataPool()->data(manufacturer, shortModel);
+    resourceData = qnStaticCommon->dataPool()->data(manufacturer, shortModel);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return true;
 

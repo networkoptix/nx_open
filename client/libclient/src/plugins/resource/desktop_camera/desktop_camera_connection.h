@@ -1,7 +1,9 @@
-#ifndef __DESKTOP_CAMERA_CONNECTION_H__
-#define __DESKTOP_CAMERA_CONNECTION_H__
+#pragma once
 
-#include <QSharedPointer>
+#include <QtCore/QSharedPointer>
+
+#include <client_core/connection_context_aware.h>
+
 #include "utils/common/long_runnable.h"
 #include "core/resource/resource_fwd.h"
 #include <nx/network/simple_http_client.h>
@@ -17,7 +19,7 @@ class QnDesktopCameraConnectionProcessor;
 *   This class used for connection from desktop camera to server
 */
 
-class QnDesktopCameraConnection: public QnLongRunnable
+class QnDesktopCameraConnection: public QnLongRunnable, public QnConnectionContextAware
 {
 public:
     typedef QnLongRunnable base_type;
@@ -63,6 +65,3 @@ private:
 private:
     Q_DECLARE_PRIVATE(QnDesktopCameraConnectionProcessor);
 };
-
-
-#endif // __DESKTOP_CAMERA_CONNECTION_H__

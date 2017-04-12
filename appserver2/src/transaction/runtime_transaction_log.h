@@ -2,7 +2,6 @@
 #define __RUNTIME_TRANSACTION_LOG_H_
 
 #include <QtCore/QSet>
-#include <QtCore/QElapsedTimer>
 #include <nx/utils/thread/mutex.h>
 
 #include "transaction.h"
@@ -11,15 +10,16 @@
 #include "ubjson_transaction_serializer.h"
 #include "nx_ec/data/api_tran_state_data.h"
 #include "api/runtime_info_manager.h"
+#include <common/common_module_aware.h>
 
 namespace ec2
 {
-    class QnRuntimeTransactionLog: public QObject
+    class QnRuntimeTransactionLog: public QObject, public QnCommonModuleAware
     {
         Q_OBJECT
     public:
 
-        QnRuntimeTransactionLog(QObject* parent = NULL);
+        QnRuntimeTransactionLog(QnCommonModule* commonModule);
 		~QnRuntimeTransactionLog();
 
         void clearOldRuntimeData(const QnTranStateKey& key);

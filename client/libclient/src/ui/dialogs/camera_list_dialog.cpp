@@ -36,6 +36,10 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
 {
     ui->setupUi(this);
 
+    setWindowFlags(windowFlags()
+        | Qt::WindowMaximizeButtonHint
+        | Qt::MaximizeUsingFullscreenGeometryHint);
+
     QnSnappedScrollBar* verticalScrollBar = new QnSnappedScrollBar(Qt::Vertical, this);
     ui->camerasView->setVerticalScrollBar(verticalScrollBar->proxyScrollBar());
     QnSnappedScrollBar* horizontalScrollBar = new QnSnappedScrollBar(Qt::Horizontal, this);
@@ -59,7 +63,7 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     connect(ui->addDeviceButton, &QPushButton::clicked, this,
         [this]
         {
-            menu()->trigger(QnActions::ServerAddCameraManuallyAction, qnCommon->currentServer());
+            menu()->trigger(QnActions::ServerAddCameraManuallyAction, commonModule()->currentServer());
         });
 
 
@@ -121,6 +125,7 @@ void QnCameraListDialog::updateWindowTitle() {
 
     const QString titleServerPart = m_model->server()
         ? QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
                 //: Devices List for Server (192.168.0.1)
                 tr("Devices List for %1"),
 
@@ -128,12 +133,14 @@ void QnCameraListDialog::updateWindowTitle() {
                 tr("Cameras List for %1")
             ).arg(QnResourceDisplayInfo(m_model->server()).toString(Qn::RI_WithUrl))
         : QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
             tr("Devices List"),
             tr("Cameras List")
             );
 
 
     const QString titleCamerasPart = QnDeviceDependentStrings::getNameFromSet(
+        resourcePool(),
         QnCameraDeviceStringSet(
             tr("%n devices found",      "", cameras.size()),
             tr("%n cameras found",      "", cameras.size()),
@@ -208,10 +215,12 @@ void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint 
 }
 
 void QnCameraListDialog::at_exportAction_triggered() {
-    QnTableExportHelper::exportToFile(ui->camerasView, true, this, QnDeviceDependentStrings::getDefaultNameFromSet(
-        tr("Export selected devices to a file."),
-        tr("Export selected cameras to a file.")
-        ));
+    QnTableExportHelper::exportToFile(ui->camerasView, true, this,
+        QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
+            tr("Export selected devices to a file."),
+            tr("Export selected cameras to a file.")
+            ));
 }
 
 void QnCameraListDialog::at_clipboardAction_triggered() {

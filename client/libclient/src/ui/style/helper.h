@@ -82,6 +82,7 @@ namespace style
         static const char* kPushButtonMargin;       /**< Name of a property to hold custom push button margin (int). Buttons with custom margin are left-aligned. */
         static const char* kMenuNoMouseReplayRect;  /**< Name of a property to hold rectangle in global logical coordinates (QRect).
                                                             If menu is closed by click in this rectangle it won't replay mouse event. */
+        static const char* kComboBoxPopupWidth;     /**< Name of a property to hold width of combo box popup. */
     };
 
     /** Flags of additional slider features */

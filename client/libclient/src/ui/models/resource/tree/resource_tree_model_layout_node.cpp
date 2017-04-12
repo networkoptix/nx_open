@@ -83,7 +83,7 @@ QnResourceAccessSubject QnResourceTreeModelLayoutNode::getOwner() const
                 return owner->resource().dynamicCast<QnUserResource>();
 
             case Qn::RoleNode:
-                return qnUserRolesManager->userRole(owner->uuid());
+                return userRolesManager()->userRole(owner->uuid());
 
             default:
                 NX_ASSERT(false);
@@ -128,7 +128,7 @@ void QnResourceTreeModelLayoutNode::itemAdded(const QnLayoutItemData& item)
 
     m_items.insert(item.uuid, node);
 
-    const auto resource = qnResPool->getResourceByDescriptor(item.resource);
+    const auto resource = resourcePool()->getResourceByDescriptor(item.resource);
     if (!resource)
         return;
 
@@ -142,8 +142,9 @@ void QnResourceTreeModelLayoutNode::itemRemoved(const QnLayoutItemData& item)
 {
     if (auto node = m_items.take(item.uuid))
     {
+        if (node->resource())
+            --m_loadedItems;
         node->deinitialize();
-        --m_loadedItems;
         updateLoadedState();
     }
 }

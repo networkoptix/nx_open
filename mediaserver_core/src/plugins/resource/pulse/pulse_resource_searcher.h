@@ -1,18 +1,15 @@
-#ifndef pulse_resource_searcher_h
-#define pulse_resource_searcher_h
+#pragma once
 
 #ifdef ENABLE_PULSE_CAMERA
 
 #include "core/resource_management/resource_searcher.h"
 
 
-class QnPlPulseSearcher : public QnAbstractNetworkResourceSearcher
+class QnPlPulseSearcher: public QnAbstractNetworkResourceSearcher
 {
-    QnPlPulseSearcher();
+    QnPlPulseSearcher(QnCommonModule* commonModule);
 
 public:
-    static QnPlPulseSearcher& instance();
-
     QnResourceList findResources(void);
 
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
@@ -24,10 +21,9 @@ protected:
     virtual QString manufacture() const;
 
 private:
-    
+
     QnNetworkResourcePtr createResource(const QString& manufacture, const QString& name);
-    
+
 };
 
 #endif // #ifdef ENABLE_PULSE_CAMERA
-#endif // pulse

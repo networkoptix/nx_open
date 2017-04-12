@@ -1,7 +1,7 @@
 #include "videowall_resource.h"
 
-QnVideoWallResource::QnVideoWallResource():
-    base_type(),
+QnVideoWallResource::QnVideoWallResource(QnCommonModule* commonModule):
+    base_type(commonModule),
     m_autorun(false),
     m_items(new QnThreadsafeItemStorage<QnVideoWallItem>(&m_mutex, this)),
     m_pcs(new QnThreadsafeItemStorage<QnVideoWallPcData>(&m_mutex, this)),

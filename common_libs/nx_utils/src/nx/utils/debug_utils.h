@@ -116,7 +116,7 @@ private:
 NX_UTILS_API uint8_t* debugUnalignPtr(void* data);
 
 /** Debug tool - dump binary data using PRINT. */
-void debugPrintBin(const char* bytes, int size, const char* tag, const char* outputPrefix);
+NX_UTILS_API void debugPrintBin(const char* bytes, int size, const char* tag, const char* outputPrefix);
 #define NX_PRINT_BIN(BYTES, SIZE, TAG) nx::utils::debugPrintBin((BYTES), (SIZE), (TAG), (OUTPUT_PREFIX))
 
 } // namespace utils

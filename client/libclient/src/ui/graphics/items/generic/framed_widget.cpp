@@ -15,7 +15,7 @@ FramedBase::FramedBase():
     m_roundingRadius(0.0),
     m_frameStyle(Qt::SolidLine),
     m_frameShape(Qn::RectangularFrame),
-    m_frameBorders(Qn::AllBorders)
+    m_frameBorders(Qt::LeftEdge | Qt::RightEdge | Qt::BottomEdge | Qt::TopEdge)
 {
 }
 

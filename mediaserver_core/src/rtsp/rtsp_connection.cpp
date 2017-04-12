@@ -256,9 +256,8 @@ public:
 static const AVCodecID DEFAULT_VIDEO_CODEC = AV_CODEC_ID_H263P;
 
 QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket)
+    QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket, _owner->commonModule())
 {
-    Q_UNUSED(_owner)
 }
 
 QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
@@ -302,19 +301,19 @@ void QnRtspConnectionProcessor::parseRequest()
         QnResourcePtr resource;
         const QnUuid uuid = QnUuid::fromStringSafe(resId);
         if (!uuid.isNull())
-            resource = qnResPool->getResourceById(uuid);
+            resource = resourcePool()->getResourceById(uuid);
         if (!resource)
-            resource = qnResPool->getResourceByUniqueId(resId);
+            resource = resourcePool()->getResourceByUniqueId(resId);
         if (!resource)
-            resource = qnResPool->getResourceByMacAddress(resId);
+            resource = resourcePool()->getResourceByMacAddress(resId);
         if (!resource)
-            resource = qnResPool->getResourceByUrl(resId);
+            resource = resourcePool()->getResourceByUrl(resId);
         if (!resource)
             return;
 
         d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
 
-        d->peerHasAccess = qnResourceAccessManager->hasPermission(d->accessRights, resource, Qn::ReadPermission);
+        d->peerHasAccess = resourceAccessManager()->hasPermission(d->accessRights, resource, Qn::ReadPermission);
         if (!d->peerHasAccess)
             return;
     }
@@ -344,7 +343,7 @@ void QnRtspConnectionProcessor::parseRequest()
         d->startTime = nx::utils::parseDateTime( pos ); //pos.toLongLong();
 
     if (getStreamingMode() != Mode_Live)
-        d->peerHasAccess = qnResourceAccessManager->hasGlobalPermission(d->accessRights, Qn::GlobalViewArchivePermission);
+        d->peerHasAccess = resourceAccessManager()->hasGlobalPermission(d->accessRights, Qn::GlobalViewArchivePermission);
 
     if (!d->peerHasAccess)
         return;
@@ -459,7 +458,7 @@ void QnRtspConnectionProcessor::sendResponse(int httpStatusCode, const QByteArra
         nx_http::HttpHeader(nx_http::header::Server::NAME, nx_http::serverString()));
     nx_http::insertOrReplaceHeader(
         &d->response.headers,
-        nx_http::HttpHeader("Date", dateTimeToHTTPFormat(QDateTime::currentDateTime())));
+        nx_http::HttpHeader("Date", nx_http::formatDateTime(QDateTime::currentDateTime())));
 
     if (!contentType.isEmpty())
         nx_http::insertOrReplaceHeader(
@@ -673,7 +672,12 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
         case AV_CODEC_ID_VP8:
         case AV_CODEC_ID_ADPCM_G722:
         case AV_CODEC_ID_ADPCM_G726:
-            universalEncoder = QSharedPointer<QnUniversalRtpEncoder>(new QnUniversalRtpEncoder(media, dstCodec, resolution, extraTranscodeParams)); // transcode src codec to MPEG4/AAC
+            universalEncoder = QSharedPointer<QnUniversalRtpEncoder>(new QnUniversalRtpEncoder(
+                commonModule(),
+                media,
+                dstCodec,
+                resolution,
+                extraTranscodeParams)); // transcode src codec to MPEG4/AAC
             if (MSSettings::roSettings()->value(StreamingParams::FFMPEG_REALTIME_OPTIMIZATION, true).toBool())
                 universalEncoder->setUseRealTimeOptimization(true);
             if (universalEncoder->isOpened())
@@ -1681,7 +1685,7 @@ void QnRtspConnectionProcessor::run()
 void QnRtspConnectionProcessor::resetTrackTiming()
 {
     Q_D(QnRtspConnectionProcessor);
-    for (ServerTrackInfoMap::iterator itr = d->trackInfo.begin(); itr != d->trackInfo.end(); ++itr)
+    for (ServerTrackInfoMap::const_iterator itr = d->trackInfo.constBegin(); itr != d->trackInfo.constEnd(); ++itr)
     {
         RtspServerTrackInfoPtr track = itr.value();
         track->sequence = 0;

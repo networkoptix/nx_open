@@ -9,14 +9,17 @@ namespace plugins {
 namespace utils {
 
 /**
- * Isolated resource does not put its properties to the database. 
- * It can be safely used in places where creation of temporary/proxy resources is needed. 
+ * Isolated resource does not put its properties to the database.
+ * It can be safely used in places where creation of temporary/proxy resources is needed.
  */
 
 class IsolatedStreamReaderResource: public QnPlOnvifResource
 {
 
 public:
+
+    IsolatedStreamReaderResource(QnCommonModule* commonModule);
+
     virtual bool hasProperty(const QString &key) const override;
     virtual QString getProperty(const QString &key) const override;
 

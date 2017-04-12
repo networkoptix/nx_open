@@ -55,6 +55,7 @@ namespace {
             , m_warningLabel(new QLabel(parent))
         {
             m_backupNewCamerasCheckBox->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
+                resourcePool(),
                 tr("Backup newly added devices"),
                 tr("Backup newly added cameras")
                 ));
@@ -81,14 +82,16 @@ namespace {
         virtual bool validate(const QSet<QnUuid>& selectedResources) override
         {
             static const auto kBackupInProgressWarning = QnDeviceDependentStrings::getDefaultNameFromSet(
+                resourcePool(),
                 tr("Cannot add new devices while backup process is running."),
                 tr("Cannot add new cameras while backup process is running."));
 
             static const auto kDtsWarning = QnDeviceDependentStrings::getDefaultNameFromSet(
+                resourcePool(),
                 tr("Cannot add new devices because they store archive on external storage."),
                 tr("Cannot add new cameras because they store archive on external storage."));
 
-            auto cameras = qnResPool->getResources<QnVirtualCameraResource>(selectedResources);
+            auto cameras = resourcePool()->getResources<QnVirtualCameraResource>(selectedResources);
             if (boost::algorithm::any_of(cameras, isDtsCamera))
             {
                 // If has dts-based cameras then change massage accordingly
@@ -112,7 +115,7 @@ namespace {
 
         virtual bool isValid(const QnUuid& resourceId) const override
         {
-            auto resource = qnResPool->getResourceById(resourceId);
+            auto resource = resourcePool()->getResourceById(resourceId);
             if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
                 return isValidServer(server);
 
@@ -152,6 +155,7 @@ QnBackupCamerasDialog::QnBackupCamerasDialog(QWidget* parent) :
     base_type(QnResourceSelectionDialog::Filter::cameras, parent)
 {
     const QString title = QnDeviceDependentStrings::getDefaultNameFromSet(
+        resourcePool(),
         tr("Select Devices to Backup..."),
         tr("Select Cameras to Backup..."));
 

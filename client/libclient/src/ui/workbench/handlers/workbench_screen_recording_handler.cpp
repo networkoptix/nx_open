@@ -1,5 +1,6 @@
 #include "workbench_screen_recording_handler.h"
 
+#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 
@@ -22,6 +23,8 @@
 #include <recording/stream_recorder.h>
 #include <core/resource/file_processor.h>
 #include <core/resource_management/resource_pool.h>
+
+#include <utils/common/delayed.h>
 
 namespace {
 
@@ -93,7 +96,10 @@ void QnWorkbenchScreenRecordingHandler::timerEvent(QTimerEvent* event)
         return;
 
     stopRecordingCountdown();
-    startRecordingInternal();
+
+    // Give some time to render at least one frame  to make sure messagebox is not recorded.
+    static const int kStartRecordingDelayMs = 50;
+    executeDelayedParented([this]{startRecordingInternal();}, kStartRecordingDelayMs, this);
 }
 
 bool QnWorkbenchScreenRecordingHandler::isRecording() const
@@ -108,7 +114,7 @@ void QnWorkbenchScreenRecordingHandler::startRecordingCountdown()
     if (!screenRecordingAction)
         return;
 
-    const auto desktop = qnResPool->getResourceById<QnDesktopResource>(
+    const auto desktop = resourcePool()->getResourceById<QnDesktopResource>(
         QnDesktopResource::getDesktopResourceUuid());
     if (!desktop)
     {
@@ -198,7 +204,7 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
     }
 
     const QnDesktopResourcePtr res =
-        qnResPool->getResourceById<QnDesktopResource>(QnDesktopResource::getDesktopResourceUuid());
+        resourcePool()->getResourceById<QnDesktopResource>(QnDesktopResource::getDesktopResourceUuid());
 
     if (!res)
     {

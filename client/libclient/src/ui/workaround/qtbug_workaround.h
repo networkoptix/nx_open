@@ -1,15 +1,15 @@
-#ifndef QN_QTBUG_WORKAROUND_H
-#define QN_QTBUG_WORKAROUND_H
+#pragma once
 
+#include <QtCore/QAbstractNativeEventFilter>
+#include <QtCore/QEvent>
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
-#include <QtCore/QAbstractNativeEventFilter>
 
 class QnQtbugWorkaroundPrivate;
 
 /**
  * Workaround for some Qt bugs.
- * 
+ *
  * Windows bugs:
  * https://bugreports.qt-project.org/browse/QTBUG-28513
  * https://bugreports.qt-project.org/browse/QTBUG-806
@@ -35,6 +35,3 @@ namespace QnEvent {
     /** Windows-specific event type for system menu, activated via Alt-Space. */
     static const QEvent::Type WinSystemMenu = static_cast<QEvent::Type>(QEvent::User + 0x5481);
 }
-
-
-#endif // QN_QTBUG_WORKAROUND_H

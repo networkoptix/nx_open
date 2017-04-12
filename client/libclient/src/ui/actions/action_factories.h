@@ -1,5 +1,4 @@
-#ifndef QN_ACTION_FACTORIES_H
-#define QN_ACTION_FACTORIES_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -8,6 +7,8 @@
 #include "action_parameters.h"
 
 class QAction;
+class QWidget;
+class QMenu;
 
 class QnActionFactory: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -24,11 +25,9 @@ public:
         return QList<QAction *>();
     }
 
-    virtual QMenu* newMenu(const QnActionParameters &parameters, QWidget *parentWidget) {
-        Q_UNUSED(parameters);
-        Q_UNUSED(parentWidget);
-
-        return NULL;
+    virtual QMenu* newMenu(const QnActionParameters& /*parameters*/, QWidget* /*parentWidget*/)
+    {
+        return nullptr;
     }
 };
 
@@ -67,5 +66,3 @@ public:
 private slots:
     void at_action_triggered(QAction *action);
 };
-
-#endif // QN_ACTION_FACTORIES_H

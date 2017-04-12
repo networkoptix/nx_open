@@ -8,8 +8,7 @@ namespace api {
 
 using namespace stun::extension;
 
-ConnectionResultRequest::ConnectionResultRequest()
-:
+ConnectionResultRequest::ConnectionResultRequest():
     StunRequestData(kMethod),
     resultCode(NatTraversalResultCode::ok),
     sysErrorCode(SystemError::noError)
@@ -49,4 +48,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::hpm::api, NatTraversalResultCode,
     (nx::hpm::api::NatTraversalResultCode::udtConnectFailed, "udtConnectFailed")
     (nx::hpm::api::NatTraversalResultCode::udtConnectFailed, "tcpConnectFailed")
     (nx::hpm::api::NatTraversalResultCode::udtConnectFailed, "endpointVerificationFailure")
+    (nx::hpm::api::NatTraversalResultCode::errorConnectingToRelay, "errorConnectingToRelay")
+    (nx::hpm::api::NatTraversalResultCode::notFoundOnRelay, "notFoundOnRelay")
 )

@@ -9,6 +9,7 @@
 #include <ui/models/resource/tree/resource_tree_model_user_resources_node.h>
 #include <ui/models/resource/tree/resource_tree_model_other_systems_node.h>
 #include <ui/models/resource/tree/resource_tree_model_cloud_system_node.h>
+#include <ui/models/resource/tree/resource_tree_model_layout_tours_node.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -26,10 +27,13 @@ QnResourceTreeModelNodePtr QnResourceTreeModelNodeFactory::createNode(
             break;
 
         case Qn::OtherSystemsNode:
-            if (!model->scope() == QnResourceTreeModel::FullScope)
-                return QnResourceTreeModelNodePtr();
+            if (model->scope() == QnResourceTreeModel::FullScope)
+                result.reset(new QnResourceTreeModelOtherSystemsNode(model));
+            break;
 
-            result.reset(new QnResourceTreeModelOtherSystemsNode(model));
+        case Qn::LayoutToursNode:
+            if (model->scope() == QnResourceTreeModel::FullScope)
+                result.reset(new QnResourceTreeModelLayoutToursNode(model));
             break;
 
         default:
@@ -37,6 +41,18 @@ QnResourceTreeModelNodePtr QnResourceTreeModelNodeFactory::createNode(
             break;
     }
     if (result && initialize)
+        result->initialize();
+    return result;
+}
+
+QnResourceTreeModelNodePtr QnResourceTreeModelNodeFactory::createNode(
+    Qn::NodeType nodeType,
+    const QnUuid& id,
+    QnResourceTreeModel* model,
+    bool initialize)
+{
+    QnResourceTreeModelNodePtr result(new QnResourceTreeModelNode(model, id, nodeType));
+    if (initialize)
         result->initialize();
     return result;
 }

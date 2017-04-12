@@ -1,7 +1,7 @@
 #pragma once
 
 #include "utils/media/frame_info.h"
-#include "utils/common/stoppable.h"
+#include "nx/utils/thread/stoppable.h"
 
 
 class CLVideoDecoderOutput;

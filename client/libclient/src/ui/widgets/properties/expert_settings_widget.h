@@ -1,7 +1,10 @@
-#ifndef QN_ADVANCED_SETTINGS_WIDGET_H
-#define QN_ADVANCED_SETTINGS_WIDGET_H
+#pragma once
 
 #include <QtWidgets/QWidget>
+
+#include <client_core/connection_context_aware.h>
+
+#include <common/common_globals.h>
 
 #include <core/resource/resource_fwd.h>
 
@@ -9,7 +12,8 @@ namespace Ui {
     class CameraExpertSettingsWidget;
 }
 
-class QnCameraExpertSettingsWidget : public QWidget {
+class QnCameraExpertSettingsWidget : public QWidget, public QnConnectionContextAware
+{
     Q_OBJECT
 public:
     QnCameraExpertSettingsWidget(QWidget* parent = 0);
@@ -44,5 +48,3 @@ private:
     /* Flag if we can edit the quality settings (for isSecondStreamEnabled() function).  */
     bool m_qualityEditable;
 };
-
-#endif // QN_ADVANCED_SETTINGS_WIDGET_H

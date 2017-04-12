@@ -14,13 +14,13 @@ extern "C"
 * QnQtFileStorageResource uses Qt based IO access
 */
 
-class QnQtFileStorageResource
-    : public QnStorageResource
+class QnQtFileStorageResource: public QnStorageResource
 {
+    using base_type = QnStorageResource;
 public:
-    QnQtFileStorageResource();
+    QnQtFileStorageResource(QnCommonModule* commonModule);
 
-    static QnStorageResource* instance(const QString&);
+    static QnStorageResource* instance(QnCommonModule* commonModule, const QString&);
 
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
 

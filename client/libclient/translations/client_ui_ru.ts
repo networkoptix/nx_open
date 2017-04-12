@@ -366,12 +366,12 @@
     <message>
         <location/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation>&amp;Описание</translation>
     </message>
     <message>
         <location/>
         <source>Timeout</source>
-        <translation>Таймаут</translation>
+        <translation>&amp;Таймаут</translation>
     </message>
     <message>
         <location/>
@@ -543,7 +543,7 @@
     <message>
         <location/>
         <source>Subnet Scan</source>
-        <translation>Сканировать Сеть</translation>
+        <translation>&amp;Сканировать Сеть</translation>
     </message>
     <message>
         <location/>
@@ -568,7 +568,7 @@
     <message>
         <location/>
         <source>Add selected</source>
-        <translation>Добавить выбранные</translation>
+        <translation>&amp;Добавить выбранные</translation>
     </message>
 </context>
 <context>
@@ -589,7 +589,7 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
         <source>about:blank</source>
-        <translation>about:blank</translation>
+        <translation type="unfinished">about:blank</translation>
     </message>
     <message>
         <location/>
@@ -691,11 +691,6 @@
     </message>
     <message>
         <location/>
-        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-        <translation>Внимание! Не изменяйте эти настройки, если вы не уверены, что это не отразится на производительности вашей системы.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Restore Defaults</source>
         <translation>По умолчанию</translation>
     </message>
@@ -703,11 +698,6 @@
         <location/>
         <source>Warning! Low quality may result in low resolution image.</source>
         <translation>Внимание! Низкое качество может привести к низкому разрешению изображения.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
-        <translation>Настройка &quot;Разрешить системе оптимизировать настройки камер&quot; отключена в диалоге &quot;Администрирование системы&quot;.</translation>
     </message>
     <message>
         <location/>
@@ -728,6 +718,16 @@
         <location/>
         <source>Keep camera streams and profiles settings</source>
         <translation>Не менять настройки потоков и профилей камеры</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
+        <translation>Настройка &quot;Разрешить системе оптимизировать настройки камер&quot; отключена в диалоге &quot;Администрирование системы&quot;.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
+        <translation>Внимание! Не изменяйте эти настройки, если вы не уверены, что это не отразится на производительности вашей системы.</translation>
     </message>
 </context>
 <context>
@@ -751,7 +751,7 @@
     <message>
         <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
         <source>Output ID:</source>
-        <translation>ID тревожного выхода:</translation>
+        <translation>ID тревожного в&amp;ыхода:</translation>
     </message>
     <message>
         <location/>
@@ -1036,7 +1036,7 @@
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
         <source>PTZ preset:</source>
-        <translation>PTZ позиция:</translation>
+        <translation>&amp;PTZ позиция:</translation>
     </message>
 </context>
 <context>
@@ -1145,7 +1145,7 @@
     <message>
         <location/>
         <source>Add...</source>
-        <translation>Добавить...</translation>
+        <translation>&amp;Добавить...</translation>
     </message>
     <message>
         <location/>
@@ -1282,22 +1282,22 @@
     <message>
         <location/>
         <source>Crop to monitor aspect ratio</source>
-        <translation>Обрезать по соотношению сторон монитора</translation>
+        <translation>&amp;Обрезать по соотношению сторон монитора</translation>
     </message>
     <message>
         <location/>
         <source>Width:</source>
-        <translation>Ширина:</translation>
+        <translation>&amp;Ширина:</translation>
     </message>
     <message>
         <location/>
         <source>Height:</source>
-        <translation>Высота:</translation>
+        <translation>&amp;Высота:</translation>
     </message>
     <message>
         <location/>
         <source>Opacity:</source>
-        <translation>Прозрачность:</translation>
+        <translation>&amp;Прозрачность:</translation>
     </message>
 </context>
 <context>
@@ -1357,16 +1357,6 @@
     </message>
     <message>
         <location/>
-        <source>Select users to import</source>
-        <translation>Выберите пользователей для импорта</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Filter...</source>
-        <translation>Фильтр...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Loading...</source>
         <translation>Загрузка...</translation>
     </message>
@@ -1374,6 +1364,16 @@
         <location/>
         <source>Connection error</source>
         <translation>Ошибка подключения</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Role to assign to imported users</source>
+        <translation>Роль для назначения для импортируемых пользователей</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disable imported users</source>
+        <translation>Отключить импортированных пользователей</translation>
     </message>
 </context>
 <context>
@@ -1554,7 +1554,7 @@
     <message>
         <location/>
         <source>Connection Options:</source>
-        <translation>Параметры подключения:</translation>
+        <translation>П&amp;араметры подключения:</translation>
     </message>
     <message>
         <location/>
@@ -1584,7 +1584,7 @@
     <message>
         <location/>
         <source>Auto-Login</source>
-        <translation>Запомнить пароль</translation>
+        <translation>&amp;Запомнить пароль</translation>
     </message>
 </context>
 <context>
@@ -1881,7 +1881,7 @@
     <message>
         <location/>
         <source>Enable tile interface</source>
-        <translation>Включите интерфейс &quot;плитка&quot;</translation>
+        <translation>Плиточный интерфейс</translation>
     </message>
 </context>
 <context>
@@ -1929,11 +1929,6 @@
     </message>
     <message>
         <location/>
-        <source>The new system will have password and name from the system:</source>
-        <translation>Новая система будет иметь пароль и имя системы:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Check</source>
         <translation>Проверить</translation>
     </message>
@@ -1946,6 +1941,11 @@
         <location/>
         <source>Login:</source>
         <translation>Логин:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>The new System will have password and name from System:</source>
+        <translation>Новая система будет иметь пароль и имя системы:</translation>
     </message>
 </context>
 <context>
@@ -1963,12 +1963,12 @@
     <message>
         <location/>
         <source>Add...</source>
-        <translation>Добавить...</translation>
+        <translation>&amp;Добавить...</translation>
     </message>
     <message>
         <location/>
         <source>Rename...</source>
-        <translation>Переименовать...</translation>
+        <translation>&amp;Переименовать...</translation>
     </message>
     <message>
         <location/>
@@ -1998,13 +1998,13 @@
     </message>
     <message>
         <location/>
-        <source>Removing this connection option could lead to system malfunction.</source>
-        <translation>Удаление данного подключения может привести к сбоям системы.</translation>
+        <source>Add</source>
+        <translation>Добавить</translation>
     </message>
     <message>
         <location/>
-        <source>Add</source>
-        <translation>Добавить</translation>
+        <source>Removing this connection option could lead to System malfunction.</source>
+        <translation>Удаление данного подключения может привести к сбоям системы.</translation>
     </message>
 </context>
 <context>
@@ -2026,11 +2026,6 @@
     </message>
     <message>
         <location/>
-        <source>Applying system updates at the end of the week is not recommended.</source>
-        <translation>Не рекомендуется обновлять систему в конце недели.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Updating to...</source>
         <translation>Обновляется на...</translation>
     </message>
@@ -2043,6 +2038,11 @@
         <location/>
         <source>You have the latest version installed</source>
         <translation>Установлена последняя версия</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Applying System updates at the end of the week is not recommended.</source>
+        <translation>Не рекомендуется обновлять систему в конце недели.</translation>
     </message>
 </context>
 <context>
@@ -2134,7 +2134,7 @@
     <message>
         <location/>
         <source>Delete...</source>
-        <translation>Удалить...</translation>
+        <translation>&amp;Удалить...</translation>
     </message>
     <message>
         <location/>
@@ -2315,7 +2315,7 @@
     <message>
         <location filename="../src/ui/widgets/business/sendmail_business_action_widget.ui"/>
         <source>Additional Recipients:</source>
-        <translation>Дополнительные получатели:</translation>
+        <translation>&amp;Дополнительные получатели:</translation>
     </message>
     <message>
         <location/>
@@ -2389,7 +2389,7 @@
     <message>
         <location/>
         <source>Use custom text:</source>
-        <translation>Использовать текст:</translation>
+        <translation>Использовать особый текст:</translation>
     </message>
     <message>
         <location/>
@@ -2784,7 +2784,7 @@
         <source>System time is synchronized with the Internet and is independent from server local time.
 Selected server will be used as a time server if System has no Internet access.</source>
         <translation>Системное время синхронизируется с Интернетом и не зависит от местного времени сервера. 
-Выбранный сервер будет использоваться как сервер времени, если у системе нет доступа в сеть Интернет.</translation>
+Выбранный сервер будет использоваться как сервер времени, если у системы нет доступа в сеть Интернет.</translation>
     </message>
 </context>
 <context>
@@ -2824,7 +2824,7 @@ Selected server will be used as a time server if System has no Internet access.<
         <location/>
         <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-        <translation>В системе ещё не созданы пользовательские роли. 
+        <translation>В системе ещё не созданы особые роли. 
 Для создания используйте кнопку &quot;Новая роль&quot;.</translation>
     </message>
     <message>

@@ -1,5 +1,7 @@
 #include "business_rule_item_delegate.h"
 
+#include <QtGui/QPainter>
+
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QComboBox>
@@ -18,6 +20,7 @@
 #include <ui/models/business_rules_view_model.h>
 #include <ui/models/notification_sound_model.h>
 #include <ui/style/globals.h>
+#include <ui/style/helper.h>
 #include <ui/widgets/business/aggregation_widget.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -109,30 +112,21 @@ QnBusinessRuleItemDelegate::~QnBusinessRuleItemDelegate()
 
 int QnBusinessRuleItemDelegate::optimalWidth(int column, const QFontMetrics &metrics)
 {
-    const int dropDownSpacer = 40;  /* Leave some space for the drop-down indicator. */
+    const int kExtraSpace =
+        style::Metrics::kStandardPadding //< dropdown text indent
+      + style::Metrics::kButtonHeight; //< dropdown arrow
+
     switch (column)
     {
         case QnBusiness::EventColumn:
         {
-            auto eventWidth = [metrics](QnBusiness::EventType eventType)
-            {
-                return metrics.width(QnBusinessStringsHelper::eventName(eventType));
-            };
-            int result = -1;
-            for (QnBusiness::EventType eventType : QnBusiness::allEvents())
-                result = qMax(result, eventWidth(eventType));
-            return dropDownSpacer + result;
+            //TODO: #GDM #3.1 #refactor table
+            return kExtraSpace + 100;
         }
         case QnBusiness::ActionColumn:
         {
-            auto actionWidth = [metrics](QnBusiness::ActionType actionType)
-            {
-                return metrics.width(QnBusinessStringsHelper::actionName(actionType));
-            };
-            int result = -1;
-            for (QnBusiness::ActionType actionType : QnBusiness::allActions())
-                result = qMax(result, actionWidth(actionType));
-            return dropDownSpacer + result;
+            //TODO: #GDM #3.1 #refactor table
+            return kExtraSpace + 100;
         }
         case QnBusiness::AggregationColumn:
         {
@@ -249,8 +243,9 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         {
             QComboBox* comboBox = new QComboBox(parent);
             comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
-            for (QnBusiness::EventType eventType : m_lexComparator->lexSortedEvents())
-                comboBox->addItem(QnBusinessStringsHelper::eventName(eventType), eventType);
+            //TODO: #GDM #3.1 #refactor table
+//             for (QnBusiness::EventType eventType : m_lexComparator->lexSortedEvents())
+//                 comboBox->addItem(QnBusinessStringsHelper::eventName(eventType), eventType);
             return comboBox;
         }
         case QnBusiness::ActionColumn:
@@ -262,7 +257,8 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
             {
                 if (instantOnly && !QnBusiness::canBeInstant(actionType))
                     continue;
-                comboBox->addItem(QnBusinessStringsHelper::actionName(actionType), actionType);
+                //TODO: #GDM #3.1 #refactor table
+//                comboBox->addItem(QnBusinessStringsHelper::actionName(actionType), actionType);
             }
             return comboBox;
         }
@@ -420,4 +416,19 @@ void QnBusinessRuleItemDelegate::at_editor_commit()
 {
     if (QWidget* w = dynamic_cast<QWidget*> (sender()))
         emit commitData(w);
+}
+
+void QnBusinessRuleItemDelegate::updateEditorGeometry(QWidget* editor,
+    const QStyleOptionViewItem& option, const QModelIndex& index) const
+{
+    switch (index.column())
+    {
+        case QnBusiness::EventColumn:
+        case QnBusiness::ActionColumn:
+            editor->setGeometry(option.rect);
+            break;
+
+        default:
+            base_type::updateEditorGeometry(editor, option, index);
+    }
 }

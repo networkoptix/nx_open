@@ -2,6 +2,7 @@
 #include "ui_look_and_feel_preferences_widget.h"
 
 #include <QtCore/QDir>
+#include <QtGui/QImageReader>
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -280,7 +281,7 @@ Qn::ImageBehaviour QnLookAndFeelPreferencesWidget::selectedImageMode() const
 void QnLookAndFeelPreferencesWidget::setupLanguageUi()
 {
     auto model = new QnTranslationListModel(this);
-    model->setTranslations(qnCommon->instance<QnClientTranslationManager>()->loadTranslations());
+    model->setTranslations(commonModule()->instance<QnClientTranslationManager>()->loadTranslations());
     ui->languageComboBox->setModel(model);
 
     connect(ui->languageComboBox, QnComboboxCurrentIndexChanged, this,

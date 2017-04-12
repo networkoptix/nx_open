@@ -13,12 +13,17 @@
 
 #include <nx/utils/log/log.h>
 #include <api/app_server_connection.h>
-#include <nx_ec/ec2_lib.h>
+
 #include <common/common_module.h>
+#include <common/static_common_module.h>
+
+#include <client_core/client_core_module.h>
+
 #include <utils/common/app_info.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <context/context.h>
+
 #include <mobile_client/mobile_client_module.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <mobile_client/mobile_client_uri_handler.h>
@@ -40,6 +45,7 @@
 
 #include <nx/mobile_client/webchannel/web_channel_server.h>
 #include <nx/mobile_client/controllers/web_admin_controller.h>
+#include <nx/mobile_client/helpers/inter_client_message.h>
 
 #include "config.h"
 using mobile_client::conf;
@@ -74,18 +80,20 @@ int runUi(QtSingleGuiApplication* application)
 
     if (qnSettings->isLiteClientModeEnabled())
     {
+        auto commonModule = qnClientCoreModule->commonModule();
+
         auto preparingWebChannel = std::make_unique<webchannel::WebChannelServer>(
             qnSettings->webSocketPort());
 
         if (preparingWebChannel->isValid())
         {
-            auto webChannel = qnCommon->store(preparingWebChannel.release());
+            auto webChannel = commonModule->store(preparingWebChannel.release());
             qnSettings->setWebSocketPort(webChannel->serverPort());
 
-            auto liteClientHandler = qnCommon->store(new QnLiteClientHandler());
+            auto liteClientHandler = commonModule->store(new QnLiteClientHandler());
             liteClientHandler->setUiController(context.uiController());
 
-            auto webAdminController = qnCommon->store(new controllers::WebAdminController());
+            auto webAdminController = commonModule->store(new controllers::WebAdminController());
             webAdminController->setUiController(context.uiController());
 
             webChannel->registerObject(lit("liteClientController"), webAdminController);
@@ -184,20 +192,36 @@ int runUi(QtSingleGuiApplication* application)
     #endif
     
     QObject::connect(application, &QtSingleGuiApplication::messageReceived, mainWindow,
-        [&context, mainWindow](const QString& message)
+        [&context, mainWindow](const QString& serializedMessage)
         {
-            NX_LOG(lit("Processing application message BEGIN: %1").arg(message), cl_logDEBUG1);
-            if (message == lit("startCamerasMode"))
+            NX_LOG(lit("Processing application message BEGIN: %1")
+                .arg(serializedMessage), cl_logDEBUG1);
+
+            using nx::client::mobile::InterClientMessage;
+
+            auto message = InterClientMessage::fromString(serializedMessage);
+
+            switch (message.command)
             {
-                context.uiController()->openResourcesScreen();
-                context.uiController()->connectToSystem(qnSettings->startupParameters().url);
-                mainWindow->update();
+                case InterClientMessage::Command::startCamerasMode:
+                    context.uiController()->openResourcesScreen();
+                    context.uiController()->connectToSystem(qnSettings->startupParameters().url);
+                    mainWindow->update();
+                    break;
+                case InterClientMessage::Command::refresh:
+                    mainWindow->update();
+                    break;
+                case InterClientMessage::Command::updateUrl:
+                {
+                    QUrl url(message.parameters);
+                    if (url.isValid())
+                        qnSettings->startupParameters().url = QUrl(message.parameters);
+                    break;
+                }
             }
-            else if (message == lit("refresh"))
-            {
-                mainWindow->update();
-            }
-            NX_LOG(lit("Processing application message END: %1").arg(message), cl_logDEBUG1);
+
+            NX_LOG(lit("Processing application message END: %1")
+                .arg(serializedMessage), cl_logDEBUG1);
         });
 
     return application->exec();
@@ -205,17 +229,8 @@ int runUi(QtSingleGuiApplication* application)
 
 int runApplication(QtSingleGuiApplication* application)
 {
-    NX_ASSERT(nx::utils::TimerManager::instance());
-    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
-        getConnectionFactory(Qn::PT_MobileClient, nx::utils::TimerManager::instance()));
-
-    QnAppServerConnectionFactory::setEC2ConnectionFactory(ec2ConnectionFactory.get());
-
     int result = runUi(application);
-
     QnAppServerConnectionFactory::setEc2Connection(ec2::AbstractECConnectionPtr());
-    QnAppServerConnectionFactory::setUrl(QUrl());
-
     return result;
 }
 
@@ -297,25 +312,41 @@ int main(int argc, char *argv[])
 
     QnMobileClientStartupParameters startupParams(application);
 
+    using nx::client::mobile::InterClientMessage;
+
+    auto sendApplicationMessage =
+        [&application](const InterClientMessage& message)
+        {
+            const auto serializedMessage = message.toString();
+
+            NX_LOG(lit("BEGIN Sending application message: %1")
+                .arg(serializedMessage), cl_logDEBUG1);
+
+            application.sendMessage(serializedMessage);
+
+            NX_LOG(lit("END Sending application message: %1")
+                .arg(serializedMessage), cl_logDEBUG1);
+        };
+
     if (application.isRunning())
     {
+        sendApplicationMessage(InterClientMessage(
+            InterClientMessage::Command::updateUrl, startupParams.url.toString()));
+
         if (startupParams.autoLoginMode == AutoLoginMode::Enabled)
-        {
-            NX_LOG(lit("BEGIN Sending application message: startCamerasMode"), cl_logDEBUG1);
-            application.sendMessage(lit("startCamerasMode"));
-            NX_LOG(lit("END Sending application message: startCamerasMode"), cl_logDEBUG1);
-        }
+            sendApplicationMessage(InterClientMessage::Command::startCamerasMode);
         else
-        {
-            NX_LOG(lit("END Sending application message: refresh"), cl_logDEBUG1);
-            application.sendMessage(lit("refresh"));
-            NX_LOG(lit("BEGIN Sending application message: refresh"), cl_logDEBUG1);
-        }
+            sendApplicationMessage(InterClientMessage::Command::refresh);
+
         return 0;
     }
 
     conf.reload();
     initLog(startupParams.logLevel);
+
+    QnStaticCommonModule staticModule(Qn::PT_MobileClient, QnAppInfo::brand(),
+        QnAppInfo::customizationName());
+    Q_UNUSED(staticModule);
 
     QnMobileClientModule mobile_client(startupParams);
     Q_UNUSED(mobile_client);

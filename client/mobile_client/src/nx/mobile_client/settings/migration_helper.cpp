@@ -2,6 +2,8 @@
 
 #include <functional>
 
+#include <common/common_module.h>
+
 #include <nx/network/url/url_parse_helper.h>
 
 #include <network/module_finder.h>
@@ -23,7 +25,7 @@ static QnUuid savedSessionId(const QVariant& sessionVariant)
     return QnLoginSession::fromVariant(sessionVariant.toMap()).id;
 }
 
-class SessionsMigrationHelperPrivate: public QObject
+class SessionsMigrationHelperPrivate: public QObject, public QnConnectionContextAware
 {
 public:
     void at_moduleFinder_moduleAddressFound(

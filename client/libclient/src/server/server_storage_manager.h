@@ -4,6 +4,10 @@
 
 #include <api/model/api_model_fwd.h>
 
+#include <client_core/connection_context_aware.h>
+
+#include <common/common_globals.h>
+
 #include <core/resource/resource_fwd.h>
 
 #include <nx_ec/data/api_fwd.h>
@@ -14,7 +18,11 @@
 #include <utils/common/connective.h>
 
 /** Client-side class to monitor server-related storages state: rebuild and backup process. */
-class QnServerStorageManager: public Connective<QObject>, public Singleton<QnServerStorageManager> {
+class QnServerStorageManager:
+    public Connective<QObject>,
+    public Singleton<QnServerStorageManager>,
+    public QnConnectionContextAware
+{
     Q_OBJECT
 
     typedef Connective<QObject> base_type;

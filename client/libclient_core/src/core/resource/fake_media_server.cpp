@@ -1,7 +1,9 @@
 #include "fake_media_server.h"
 
-QnFakeMediaServerResource::QnFakeMediaServerResource():
-    QnMediaServerResource()
+#include <nx/network/url/url_builder.h>
+
+QnFakeMediaServerResource::QnFakeMediaServerResource(QnCommonModule* commonModule):
+    QnMediaServerResource(commonModule)
 {
     setId(QnUuid::createUuid());
     addFlags(Qn::fake_server);
@@ -15,14 +17,17 @@ QnUuid QnFakeMediaServerResource::getOriginalGuid() const
 
 void QnFakeMediaServerResource::setFakeServerModuleInformation(const ec2::ApiDiscoveredServerData& serverData)
 {
+    ec2::ApiDiscoveredServerData oldData;
     {
         QnMutexLocker lock(&m_mutex);
         if (m_serverData == serverData)
             return;
+        oldData = m_serverData;
         m_serverData = serverData;
     }
 
-    setStatus(serverData.status, Qn::StatusChangeReason::Local);
+    if (serverData.status != oldData.status)
+        emit statusChanged(toSharedPointer(this), Qn::StatusChangeReason::Local);
 
     QList<SocketAddress> addressList;
     for (const QString &address : serverData.remoteAddresses)
@@ -31,12 +36,16 @@ void QnFakeMediaServerResource::setFakeServerModuleInformation(const ec2::ApiDis
 
     if (!addressList.isEmpty())
     {
-        const SocketAddress address(addressList.first().toString(), serverData.port);
-        const auto url = address.toUrl(apiUrlScheme(serverData.sslAllowed)).toString();
-        setUrl(url);
+        const SocketAddress endpoint(addressList.first().toString(), serverData.port);
+        const auto url = nx::network::url::Builder()
+            .setScheme(apiUrlScheme(serverData.sslAllowed))
+            .setEndpoint(endpoint);
+        setUrl(url.toString());
     }
-    if (!serverData.name.isEmpty())
-        setName(serverData.name);
+
+    if (!serverData.name.isEmpty() && serverData.name != oldData.name)
+        emit nameChanged(toSharedPointer(this));
+
     setVersion(serverData.version);
     setSystemInfo(serverData.systemInformation);
     setSslAllowed(serverData.sslAllowed);
@@ -55,11 +64,16 @@ QnModuleInformation QnFakeMediaServerResource::getModuleInformation() const
     return m_serverData;
 }
 
-void QnFakeMediaServerResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
+QString QnFakeMediaServerResource::getName() const
 {
-    NX_ASSERT(newStatus == Qn::Incompatible || newStatus == Qn::Unauthorized,
-        "Incompatible servers should not take any status but incompatible or unauthorized");
-    base_type::setStatus(newStatus, reason);
+    QnMutexLocker lock(&m_mutex);
+    return m_serverData.name;
+}
+
+Qn::ResourceStatus QnFakeMediaServerResource::getStatus() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_serverData.status;
 }
 
 QUrl QnFakeMediaServerResource::getApiUrl() const

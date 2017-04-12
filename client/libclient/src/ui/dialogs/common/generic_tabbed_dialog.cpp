@@ -1,6 +1,7 @@
 #include "generic_tabbed_dialog.h"
 
 #include <QtWidgets/QTabWidget>
+#include <QtWidgets/QPushButton>
 
 #include <boost/algorithm/cxx11/any_of.hpp>
 
@@ -331,7 +332,10 @@ void QnGenericTabbedDialog::buttonBoxClicked(QDialogButtonBox::StandardButton bu
     {
     case QDialogButtonBox::Apply:
         if (canApplyChanges() && hasChanges())
+        {
             applyChanges();
+            updateButtonBox();
+        }
         break;
     default:
         break;

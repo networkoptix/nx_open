@@ -12,9 +12,5 @@
     </array>
     <key>beta-reports-active</key>
     <true/>
-    <key>com.apple.developer.associated-domains</key>
-    <array>
-        <string>applinks:invalid-domain-do-not-merge-me-to30-ask-denis-klychkov.com</string>
-    </array>
 </dict>
 </plist>

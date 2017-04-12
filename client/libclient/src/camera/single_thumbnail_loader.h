@@ -2,12 +2,14 @@
 
 #include <QtCore/QObject>
 
+#include <client_core/connection_context_aware.h>
+
 #include <api/helpers/thumbnail_request_data.h>
 
 #include <core/resource/resource_fwd.h>
 #include <utils/image_provider.h>
 
-class QnSingleThumbnailLoader: public QnImageProvider
+class QnSingleThumbnailLoader: public QnImageProvider, public QnConnectionContextAware
 {
     Q_OBJECT
 

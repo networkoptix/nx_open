@@ -1,5 +1,4 @@
-#ifndef BUSINESS_RULE_ITEM_DELEGATE_H
-#define BUSINESS_RULE_ITEM_DELEGATE_H
+#pragma once
 
 #include <QtWidgets/QStyledItemDelegate>
 #include <QtWidgets/QPushButton>
@@ -52,6 +51,10 @@ public:
     ~QnBusinessRuleItemDelegate();
 
     static int optimalWidth(int column, const QFontMetrics &metrics);
+
+    virtual void updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option,
+        const QModelIndex& index) const override;
+
 protected:
     virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override;
@@ -66,5 +69,3 @@ private slots:
 private:
     QScopedPointer<QnBusinessTypesComparator> m_lexComparator;
 };
-
-#endif // BUSINESS_RULE_ITEM_DELEGATE_H

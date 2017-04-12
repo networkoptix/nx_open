@@ -1,11 +1,13 @@
-#ifndef QN_RECONNECT_HELPER_H
-#define QN_RECONNECT_HELPER_H
+#pragma once
+
+#include <client_core/connection_context_aware.h>
 
 #include <core/resource/resource_fwd.h>
 
 #include <nx/utils/uuid.h>
 
-class QnReconnectHelper: public QObject {
+class QnReconnectHelper: public QObject, public QnConnectionContextAware
+{
     Q_OBJECT
 public:
     QnReconnectHelper(QObject *parent = NULL);
@@ -41,5 +43,3 @@ private:
     QString m_password;
     QHash<QnUuid, QList<InterfaceInfo>> m_interfacesByServer;
 };
-
-#endif //QN_RECONNECT_HELPER_H

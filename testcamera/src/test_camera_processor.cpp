@@ -15,8 +15,10 @@ public:
       }
 };
 
-QnTestCameraProcessor::QnTestCameraProcessor(const QSharedPointer<AbstractStreamSocket>& socket):
-    QnTCPConnectionProcessor(socket)
+QnTestCameraProcessor::QnTestCameraProcessor(const QSharedPointer<AbstractStreamSocket>& socket,
+    QnCommonModule* commonModule)
+    :
+    QnTCPConnectionProcessor(socket, commonModule)
 {
 }
 

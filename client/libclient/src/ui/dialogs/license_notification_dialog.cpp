@@ -1,6 +1,10 @@
 #include "license_notification_dialog.h"
 #include "ui_license_notification_dialog.h"
 
+#include <QtCore/QSortFilterProxyModel>
+
+#include <licensing/license_validator.h>
+
 #include <ui/delegates/license_list_item_delegate.h>
 #include <ui/models/license_list_model.h>
 #include <ui/style/helper.h>
@@ -14,29 +18,30 @@ static const int kLabelFontPixelSize = 15;
 static const int kLabelFontWeight = QFont::Bold;
 
 auto licenseSortPriority =
-    [](const QnLicensePtr& license) -> int
+    [](QnLicenseValidator* validator, const QnLicensePtr& license) -> int
     {
-        QnLicense::ErrorCode code;
-        license->isValid(&code);
-
+        auto code = validator->validate(license);
         switch (code)
         {
-            case QnLicense::NoError:
+            case QnLicenseErrorCode::NoError:
                 return 2; /* Active licenses at the end. */
-            case QnLicense::Expired:
+            case QnLicenseErrorCode::Expired:
                 return 1; /* Expired licenses in the middle. */
             default:
                 return 0; /* Erroneous licenses at the beginning. */
         }
     };
 
-class QnLicenseNotificationSortProxyModel : public QSortFilterProxyModel
+class QnLicenseNotificationSortProxyModel:
+    public QSortFilterProxyModel,
+    public QnConnectionContextAware
 {
     using base_type = QSortFilterProxyModel;
 
 public:
     QnLicenseNotificationSortProxyModel(QObject* parent = nullptr) :
-        base_type(parent)
+        base_type(parent),
+        validator(new QnLicenseValidator(this))
     {
     }
 
@@ -49,14 +54,17 @@ protected:
         if (!left || !right)
             return left < right;
 
-        auto leftPriority = licenseSortPriority(left);
-        auto rightPriority = licenseSortPriority(right);
+        auto leftPriority = licenseSortPriority(validator, left);
+        auto rightPriority = licenseSortPriority(validator, right);
 
         if (leftPriority != rightPriority)
             return leftPriority < rightPriority;
 
         return left->expirationTime() < right->expirationTime();
     }
+
+private:
+    QnLicenseValidator* validator;
 };
 
 } // namespace

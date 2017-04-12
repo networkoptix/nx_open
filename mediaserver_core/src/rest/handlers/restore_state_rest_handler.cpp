@@ -15,7 +15,7 @@ int QnRestoreStateRestHandler::executeGet(
     const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path);
-    return execute(std::move(PasswordData(params)), owner->accessRights(), result);
+    return execute(std::move(PasswordData(params)), owner, result);
 }
 
 int QnRestoreStateRestHandler::executePost(
@@ -29,17 +29,19 @@ int QnRestoreStateRestHandler::executePost(
     Q_UNUSED(params);
 
     PasswordData passwordData = QJson::deserialized<PasswordData>(body);
-    return execute(std::move(passwordData), owner->accessRights(), result);
+    return execute(std::move(passwordData), owner, result);
 }
 
 int QnRestoreStateRestHandler::execute(
     PasswordData passwordData,
-    const Qn::UserAccessData& accessRights,
+    const QnRestConnectionProcessor* owner,
     QnJsonRestResult &result)
 {
+    const Qn::UserAccessData& accessRights = owner->accessRights();
+
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
-    if (!QnPermissionsHelper::hasOwnerPermissions(accessRights))
+    if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), accessRights))
         return QnPermissionsHelper::notOwnerError(result);
 
     QString errStr;

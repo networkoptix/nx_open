@@ -1,5 +1,6 @@
-
 #include "preview_search_duration_metric.h"
+
+#include <QtCore/QPointer>
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>

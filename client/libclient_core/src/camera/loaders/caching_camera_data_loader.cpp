@@ -25,10 +25,13 @@ namespace {
     }
 }
 
-QnCachingCameraDataLoader::QnCachingCameraDataLoader(const QnMediaResourcePtr &resource, QObject *parent):
+QnCachingCameraDataLoader::QnCachingCameraDataLoader(const QnMediaResourcePtr &resource,
+    const QnMediaServerResourcePtr& server,
+    QObject* parent)
+    :
     base_type(parent),
-    m_enabled(false),
-    m_resource(resource)
+    m_resource(resource),
+    m_server(server)
 {
     NX_ASSERT(supportedResource(resource), Q_FUNC_INFO, "Loaders must not be created for unsupported resources");
     init();
@@ -72,7 +75,7 @@ void QnCachingCameraDataLoader::initLoaders() {
         QnAbstractCameraDataLoader* loader = NULL;
 
         if (camera)
-            loader = new QnFlatCameraDataLoader(camera, dataType);
+            loader = new QnFlatCameraDataLoader(camera, m_server, dataType);
         else if (aviFile)
             loader = new QnLayoutFileCameraDataLoader(aviFile, dataType);
 
@@ -119,7 +122,22 @@ bool QnCachingCameraDataLoader::enabled() const {
     return m_enabled;
 }
 
-QnMediaResourcePtr QnCachingCameraDataLoader::resource() const {
+void QnCachingCameraDataLoader::updateServer(const QnMediaServerResourcePtr& server)
+{
+    if (m_server == server)
+        return;
+
+    m_server = server;
+
+    for (auto loader: m_loaders)
+    {
+        if (auto remoteLoader = dynamic_cast<QnFlatCameraDataLoader*>(loader.data()))
+            remoteLoader->updateServer(server);
+    }
+}
+
+QnMediaResourcePtr QnCachingCameraDataLoader::resource() const
+{
     return m_resource;
 }
 

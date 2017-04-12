@@ -19,7 +19,7 @@ class QnVideoWallResource: public QnResource,
     typedef QnResource base_type;
 
 public:
-    QnVideoWallResource();
+    QnVideoWallResource(QnCommonModule* commonModule = nullptr);
 
     QnThreadsafeItemStorage<QnVideoWallItem> *items() const;
     QnThreadsafeItemStorage<QnVideoWallPcData> *pcs() const;

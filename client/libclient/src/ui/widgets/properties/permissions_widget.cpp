@@ -1,6 +1,8 @@
 #include "permissions_widget.h"
 #include "ui_permissions_widget.h"
 
+#include <QtWidgets/QLabel>
+
 #include <core/resource_access/global_permissions_manager.h>
 
 #include <ui/models/abstract_permissions_model.h>

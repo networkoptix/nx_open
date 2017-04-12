@@ -18,7 +18,8 @@ bool isCloudServer(const QnMediaServerResourcePtr& server)
     if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
         return true;
 
-    const QNetworkProxy &proxy = QnNetworkProxyFactory::instance()->proxyToResource(server);
+    QnNetworkProxyFactory proxyFactory(server->commonModule());
+    const QNetworkProxy &proxy = proxyFactory.proxyToResource(server);
     if (proxy.type() == QNetworkProxy::HttpProxy)
         return nx::network::SocketGlobals::addressResolver().isCloudHostName(proxy.hostName());
 

@@ -17,14 +17,15 @@
 
 #include <numeric>
 
-QnScheduleSync::QnScheduleSync()
-    : m_syncing(false),
-      m_forced(false),
-      m_interrupted(false),
-      m_failReported(false),
-      m_curDow(ec2::backup::Never),
-      m_syncTimePoint(0),
-      m_syncEndTimePoint(0)
+QnScheduleSync::QnScheduleSync(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule),
+    m_syncing(false),
+    m_forced(false),
+    m_interrupted(false),
+    m_failReported(false),
+    m_curDow(ec2::backup::Never),
+    m_syncTimePoint(0),
+    m_syncEndTimePoint(0)
 {
 }
 
@@ -115,7 +116,7 @@ QnScheduleSync::getOldestChunk(qint64 fromTimeMs) const
     ChunkKeyVector ret;
     int64_t minTime = std::numeric_limits<int64_t>::max();
 
-    for (const QnVirtualCameraResourcePtr &camera : qnResPool->getAllCameras(QnResourcePtr(), true))
+    for (const QnVirtualCameraResourcePtr &camera : resourcePool()->getAllCameras(QnResourcePtr(), true))
     {
         Qn::CameraBackupQualities cameraBackupQualities = camera->getActualBackupQualities();
 
@@ -355,7 +356,7 @@ void QnScheduleSync::addSyncDataKey(
 void QnScheduleSync::initSyncData()
 {
     for (const QnVirtualCameraResourcePtr &camera :
-         qnResPool->getAllCameras(QnResourcePtr(), true))
+         resourcePool()->getAllCameras(QnResourcePtr(), true))
     {
         Qn::CameraBackupQualities cameraBackupQualities =
             camera->getActualBackupQualities();
@@ -521,7 +522,7 @@ QnBackupStatusData QnScheduleSync::getStatus() const
 
 void QnScheduleSync::renewSchedule()
 {
-    auto server = qnCommon->currentServer();
+    auto server = commonModule()->currentServer();
     NX_ASSERT(server);
 
     auto oldSchedule = m_schedule;

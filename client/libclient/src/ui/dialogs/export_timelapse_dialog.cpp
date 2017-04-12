@@ -1,6 +1,8 @@
 #include "export_timelapse_dialog.h"
 #include "ui_export_timelapse_dialog.h"
 
+#include <QtGui/QStandardItemModel>
+
 #include <text/time_strings.h>
 
 #include <ui/workaround/widgets_signals_workaround.h>
@@ -104,6 +106,7 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
         setExpectedLengthMsInternal(m_sourcePeriodLengthMs / absoluteValue);
     });
 
+    // TODO: Refactor this in 3.1
     auto resultLengthChangedInternal =
         [this](double value)
         {
@@ -141,7 +144,7 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
             // Here we must adjust time value to keep speed as near to previous as possible
             qreal valueInUnits = expectedLength / expectedLengthMeasureUnit(value);
             ui->resultLengthSpinBox->setValue(valueInUnits);
-            //resultLengthChangedInternal(ui->resultLengthSpinBox->value());
+            resultLengthChangedInternal(ui->resultLengthSpinBox->value());
         });
 
     initControls();

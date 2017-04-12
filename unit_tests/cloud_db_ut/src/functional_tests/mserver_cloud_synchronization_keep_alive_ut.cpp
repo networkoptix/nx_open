@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/utils/url_builder.h>
+#include <nx/network/url/url_builder.h>
 
 #include <nx_ec/ec_proto_version.h>
 #include <test_support/transaction_connection_helper.h>
@@ -64,7 +64,7 @@ void Ec2MserverCloudSynchronizationKeepAlive::testTransactionConnectionKeepAlive
 
     m_connectionId =
         m_transactionConnectionHelper.establishTransactionConnection(
-            utils::UrlBuilder().setScheme("http")
+            network::url::Builder().setScheme("http")
                 .setHost(cdb()->endpoint().address.toString()).setPort(cdb()->endpoint().port),
             registeredSystemData().id,
             registeredSystemData().authKey,
@@ -73,11 +73,11 @@ void Ec2MserverCloudSynchronizationKeepAlive::testTransactionConnectionKeepAlive
 
     m_transactionConnectionHelper.getAccessToConnectionById(
         m_connectionId,
-        [this](test::TransactionTransport* const connection)
+        [this](test::TransactionConnectionHelper::ConnectionContext* connectionContext)
         {
             m_connectionInactivityTimeout =
-                connection->connectionKeepAliveTimeout() *
-                connection->keepAliveProbeCount();
+                connectionContext->connection->connectionKeepAliveTimeout() *
+                connectionContext->connection->keepAliveProbeCount();
         });
 
     ASSERT_TRUE(

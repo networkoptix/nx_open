@@ -24,18 +24,18 @@ QnWorkbenchServerTimeWatcher::QnWorkbenchServerTimeWatcher(QObject *parent)
     : base_type(parent)
     , m_timer(new QTimer(this))
 {
-    connect(qnResPool, &QnResourcePool::resourceAdded,   this,   &QnWorkbenchServerTimeWatcher::at_resourcePool_resourceAdded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,   &QnWorkbenchServerTimeWatcher::at_resourcePool_resourceRemoved);
+    connect(resourcePool(), &QnResourcePool::resourceAdded,   this,   &QnWorkbenchServerTimeWatcher::at_resourcePool_resourceAdded);
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,   &QnWorkbenchServerTimeWatcher::at_resourcePool_resourceRemoved);
 
     /* We need to process only servers. */
-    for(const QnResourcePtr &resource: qnResPool->getAllServers(Qn::AnyStatus))
+    for(const QnResourcePtr &resource: resourcePool()->getAllServers(Qn::AnyStatus))
         at_resourcePool_resourceAdded(resource);
 
     m_timer->setInterval(serverTimeUpdatePeriodMs);
     m_timer->setSingleShot(false);
     connect(m_timer, &QTimer::timeout, this, [this]
     {
-        const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+        const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
         for (const QnMediaServerResourcePtr &server: onlineServers)
             sendRequest(server);
     });
@@ -65,7 +65,7 @@ qint64 QnWorkbenchServerTimeWatcher::utcOffset(const QnMediaResourcePtr &resourc
             : result;
     }
 
-    if (QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(resource->toResource()->getParentId())) {
+    if (QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(resource->toResource()->getParentId())) {
         NX_ASSERT(resource->toResourcePtr()->hasFlags(Qn::utc), Q_FUNC_INFO, "Only utc resources should have offset.");
         return utcOffset(server, defaultValue);
     }
@@ -101,7 +101,7 @@ QDateTime QnWorkbenchServerTimeWatcher::displayTime(qint64 msecsSinceEpoch) cons
     if (qnSettings->timeMode() == Qn::ClientTimeMode)
         return QDateTime::fromMSecsSinceEpoch(msecsSinceEpoch);
 
-    return serverTime(qnCommon->currentServer(), msecsSinceEpoch);
+    return serverTime(commonModule()->currentServer(), msecsSinceEpoch);
 }
 
 

@@ -1,10 +1,10 @@
-#ifndef QN_WORKBENCH_ACTION_HANDLER_H
-#define QN_WORKBENCH_ACTION_HANDLER_H
+#pragma once
 
 #include <atomic>
 
 #include <QtCore/QBuffer>
 #include <QtCore/QObject>
+#include <QtCore/QQueue>
 
 #include <QtWidgets/QDialogButtonBox>
 
@@ -39,7 +39,7 @@ class QnWorkbench;
 class QnWorkbenchContext;
 class QnWorkbenchSynchronizer;
 class QnWorkbenchLayoutSnapshotManager;
-class QnWorkbenchActionHandler;
+class ActionHandler;
 class QnActionManager;
 class QnAction;
 class QnBusinessRulesDialog;
@@ -50,15 +50,21 @@ class QnAdjustVideoDialog;
 class QnSystemAdministrationDialog;
 class QnGraphicsMessageBox;
 
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+namespace workbench {
+
 // TODO: #Elric split this class into several handlers, group actions by handler. E.g. screen recording should definitely be spun off.
 /**
 * This class implements logic for client actions.
 */
-class QnWorkbenchActionHandler : public QObject, public QnWorkbenchContextAware {
+class ActionHandler : public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
 public:
-    QnWorkbenchActionHandler(QObject *parent = NULL);
-    virtual ~QnWorkbenchActionHandler();
+    ActionHandler(QObject *parent = NULL);
+    virtual ~ActionHandler();
 
 protected:
     struct AddToLayoutParams {
@@ -111,14 +117,11 @@ protected:
 
     QnSystemAdministrationDialog *systemAdministrationDialog() const;
 
-    QnWorkbenchNotificationsHandler* notificationsHandler() const;
-
-    protected slots:
+protected slots:
 
     void submitDelayedDrops();
     void submitInstantDrop();
 
-    protected slots:
     void at_context_userChanged(const QnUserResourcePtr &user);
 
     void at_workbench_cellSpacingChanged();
@@ -184,8 +187,6 @@ protected:
     void at_scheduleWatcher_scheduleEnabledChanged();
     void at_togglePanicModeAction_toggled(bool checked);
 
-    void at_toggleTourAction_toggled(bool checked);
-    void at_tourTimer_timeout();
     void at_workbench_itemChanged(Qn::ItemRole role);
 
     void at_whatsThisAction_triggered();
@@ -251,7 +252,6 @@ private:
     QnLayoutResourcePtr m_exportLayout;
     QnStorageResourcePtr m_exportStorage;
 
-    QTimer *m_tourTimer;
     struct CameraMovingInfo
     {
         CameraMovingInfo() {}
@@ -270,4 +270,8 @@ private:
     std::multimap<QUrl, ServerRequest> m_serverRequests;
 };
 
-#endif // QN_WORKBENCH_ACTION_HANDLER_H
+} // namespace workbench
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx
