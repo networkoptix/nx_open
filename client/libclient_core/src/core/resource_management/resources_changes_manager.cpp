@@ -91,12 +91,14 @@ void QnResourcesChangesManager::deleteResources(
 
     connection->getResourceManager(Qn::kSystemAccess)->remove(idToDelete, this,
         [this, safeCallback, resources, sessionGuid,
-            thread = QPointer<QThread>(QThread::currentThread())]
+         thread = QPointer<QThread>(QThread::currentThread())]
             (int /* reqID */ , ec2::ErrorCode errorCode)
         {
-            // Check if all OK or we have already changed session or attributes pool was recreated.
-            const bool success = errorCode == ec2::ErrorCode::ok
-                || qnCommon->runningInstanceGUID() != sessionGuid;
+            /* Check if we have already changed session: */
+            if (qnCommon->runningInstanceGUID() != sessionGuid)
+                return;
+
+            const bool success = errorCode == ec2::ErrorCode::ok;
 
             if (thread)
                 executeInThread(thread, [safeCallback, success]() { safeCallback(success); });
@@ -362,9 +364,11 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
         {
             Q_UNUSED(reqID);
 
-            // Check if all OK or we have already changed session or attributes pool was recreated.
-            const bool success = errorCode == ec2::ErrorCode::ok
-                || qnCommon->runningInstanceGUID() != sessionGuid;
+            /* Check if we have already changed session: */
+            if (qnCommon->runningInstanceGUID() != sessionGuid)
+                return;
+
+            const bool success = errorCode == ec2::ErrorCode::ok;
 
             if (thread)
                 executeInThread(thread, [safeCallback, success]() { safeCallback(success); });
