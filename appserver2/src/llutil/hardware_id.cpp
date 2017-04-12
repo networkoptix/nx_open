@@ -148,7 +148,7 @@ namespace LLUtil {
         }
         catch (const LLUtil::HardwareIdError& err)
         {
-            NX_LOG(QnLog::HWID_LOG, QLatin1String("getHardwareId(): %1").arg(err.what()), cl_logERROR);
+            NX_LOG(QnLog::HWID_LOG, QString(lit("getHardwareId(): %1")).arg(err.what()), cl_logERROR);
         }
     }
 
@@ -159,7 +159,7 @@ namespace LLUtil {
     {
         if (version < 0 || version > LATEST_HWID_VERSION)
         {
-            NX_LOG(QnLog::HWID_LOG, QLatin1String("getHardwareId(): requested hwid of invalid version: $1").arg(version) , cl_logERROR)
+            NX_LOG(QnLog::HWID_LOG, QString(lit("getHardwareId(): requested hwid of invalid version: $1")).arg(version) , cl_logERROR)
             return QStringList();
         }
 
