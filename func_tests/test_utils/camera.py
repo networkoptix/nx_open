@@ -85,7 +85,7 @@ def make_schedule_task(day_of_week):
 class Camera(object):
 
     def __init__(self, vm_address, discovery_listener, name, mac_addr):
-        self._vm_address = vm_address
+        self._vm_address = vm_address  # IPAddress or None
         self._discovery_listener = discovery_listener
         self.name = name
         self.mac_addr = mac_addr
@@ -166,7 +166,7 @@ class DiscoveryUdpListener(object):
         assert not self._stream_to_camera  # Already streaming to a camera
         log.info('Test camera %s: will stream to %s', camera.name, ip_address)
         self._stream_to_camera = camera
-        self._stream_to_address_list.append(str(ip_address))
+        self._stream_to_address_list.append(str(ip_address) if ip_address else None)
         if not self._thread:
             self._start()
 
@@ -187,7 +187,7 @@ class DiscoveryUdpListener(object):
             #log.debug('Received discovery message from %s:%d: %r', addr[0], addr[1], data)
             if data != TEST_CAMERA_FIND_MSG:
                 continue
-            if addr[0] not in self._stream_to_address_list:
+            if None not in self._stream_to_address_list and addr[0] not in self._stream_to_address_list:
                 continue  # request came not from our server
             listener = MediaListener(self._media_stream_path)
             response = '%s;%d;%s' % (TEST_CAMERA_ID_MSG, listener.port, self._stream_to_camera.mac_addr)

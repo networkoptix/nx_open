@@ -23,7 +23,6 @@ DEFAULT_CLOUD_GROUP = 'test'
 DEFAULT_CUSTOMIZATION = 'default'
 
 DEFAULT_WORK_DIR = os.path.expanduser('/tmp/funtest')
-DEFAULT_BIN_DIR = os.path.expanduser('/tmp/binaries')
 
 DEFAULT_VM_NAME_PREFIX = 'funtest-'
 DEFAULT_REST_API_FORWARDED_PORT_BASE = 17000
@@ -49,7 +48,7 @@ def pytest_addoption(parser):
                           ' default is %r' % DEFAULT_CUSTOMIZATION)
     parser.addoption('--work-dir', default=DEFAULT_WORK_DIR,
                      help='working directory for tests: all generated files will be placed there')
-    parser.addoption('--bin-dir', default=DEFAULT_BIN_DIR,
+    parser.addoption('--bin-dir',
                      help='directory with binary files for tests:'
                           ' debian distributive and media sample are expected there')
     parser.addoption('--media-sample-path', default=MEDIA_SAMPLE_FPATH,
@@ -64,8 +63,9 @@ def pytest_addoption(parser):
                      help='prefix for virtualenv machine names')
     parser.addoption('--vm-port-base', type=int, default=DEFAULT_REST_API_FORWARDED_PORT_BASE,
                      help='base REST API port forwarded to host')
-    parser.addoption('--vm-address', type=IPAddress, required=True,
-                     help='IP address virtual machines bind to. Test camera discovery will answer only to this address.')
+    parser.addoption('--vm-address', type=IPAddress,
+                     help='IP address virtual machines bind to.'
+                     ' Test camera discovery will answer only to this address if this option is specified.')
     parser.addoption('--vm-host',
                      help='hostname or IP address for host with virtualbox,'
                           ' used to start virtual machines (by default it is local host)')
@@ -88,6 +88,8 @@ def run_options(request):
             key_file_path=request.config.getoption('--vm-host-key'))
     else:
         vm_ssh_host_config = None
+    bin_dir = request.config.getoption('--bin-dir')
+    assert bin_dir, 'Argument --bin-dir is required'
     return SimpleNamespace(
         cloud_group=request.config.getoption('--cloud-group'),
         customization=request.config.getoption('--customization'),
