@@ -15,6 +15,8 @@ describe('Smoke test:', function () {
     });
 
     fit("check needed user exists of create one", function () {
+        helper.createUserIfMissing(null, null, helper.userEmailOwner);
+        helper.createUserIfMissing(null, null, helper.userEmailSmoke);
         helper.createUserIfMissing(null, null, helper.userEmailCustom);
     });
 
@@ -29,7 +31,7 @@ describe('Smoke test:', function () {
         expect(browser.getCurrentUrl()).toContain('systems');
         expect(helper.htmlBody.getText()).toContain('Systems');
         expect(systemsList.first().isDisplayed()).toBe(true);
-        expect(element(by.cssContainingText('h2', helper.systemName)).isDisplayed()).toBe(true);
+        expect(element(by.cssContainingText('h2', 'katya_korneevas')).isDisplayed()).toBe(true);
     });
 
     fit("can view system page", function () {
@@ -37,9 +39,9 @@ describe('Smoke test:', function () {
 
         helper.login();
         expect(browser.getCurrentUrl()).toContain('systems');
-        expect(element(by.cssContainingText('h2', helper.systemName)).isDisplayed()).toBe(true);
+        expect(element(by.cssContainingText('h2', 'katya_korneevas_property')).isDisplayed()).toBe(true);
 
-        element.all(by.cssContainingText('h2', helper.systemName)).first().click();
+        element.all(by.cssContainingText('h2', 'katya_korneevas_property')).first().click();
         expect(userList.isDisplayed()).toBe(true);
     });
 
