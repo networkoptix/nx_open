@@ -7,7 +7,7 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QMenu>
 
-#include <nx/client/ui/workbench/workbench_animations.h>
+#include <nx/client/desktop/ui/workbench/workbench_animations.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/animation/animator_group.h>

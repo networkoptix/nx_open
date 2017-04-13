@@ -9,7 +9,6 @@ namespace nx {
 namespace client {
 namespace desktop {
 namespace ui {
-namespace dialogs {
 
 QnApplauncherControlDialog::QnApplauncherControlDialog(QWidget* parent):
     base_type(parent, Qt::Window),
@@ -56,7 +55,6 @@ QnApplauncherControlDialog::QnApplauncherControlDialog(QWidget* parent):
 
 }
 
-} // namespace dialogs
 } // namespace ui
 } // namespace desktop
 } // namespace client

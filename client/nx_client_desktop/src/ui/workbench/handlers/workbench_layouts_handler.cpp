@@ -44,7 +44,7 @@
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/extensions/workbench_layout_change_validator.h>
 
-#include <nx/client/messages/resources_messages.h>
+#include <nx/client/desktop/messages/resources_messages.h>
 
 #include <nx/utils/string.h>
 
@@ -52,7 +52,7 @@
 #include <utils/common/delete_later.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
-#include <nx/client/ui/workbench/layouts/layout_factory.h>
+#include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
 
 using boost::algorithm::any_of;
 using boost::algorithm::all_of;

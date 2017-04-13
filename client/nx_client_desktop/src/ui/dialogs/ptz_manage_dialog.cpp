@@ -16,7 +16,7 @@
 
 #include <client/client_settings.h>
 
-#include <nx/client/messages/ptz_messages.h>
+#include <nx/client/desktop/messages/ptz_messages.h>
 
 #include <nx/utils/string.h>
 

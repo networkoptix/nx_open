@@ -33,7 +33,7 @@
 #include <ui/style/skin.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/custom_style.h>
-#include <nx/client/ui/workbench/layouts/layout_factory.h>
+#include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
 
 #include <nx/utils/uuid.h>
 

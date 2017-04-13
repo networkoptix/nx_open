@@ -18,8 +18,8 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/util.h>
 
-#include <nx/client/ui/workbench/layouts/layout_factory.h>
-#include <nx/client/ui/workbench/layouts/special_layout.h>
+#include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
+#include <nx/client/desktop/ui/workbench/layouts/special_layout.h>
 
 #include <common/common_module.h>
 

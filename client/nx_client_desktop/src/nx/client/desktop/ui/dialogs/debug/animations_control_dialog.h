@@ -6,7 +6,6 @@ namespace nx {
 namespace client {
 namespace desktop {
 namespace ui {
-namespace dialogs {
 
 class AnimationsControlDialog: public QnDialog
 {
@@ -16,7 +15,6 @@ public:
 
 };
 
-} // namespace dialogs
 } // namespace ui
 } // namespace desktop
 } // namespace client

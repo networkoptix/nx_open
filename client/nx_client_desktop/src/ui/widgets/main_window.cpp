@@ -38,7 +38,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-#include <nx/client/ui/workbench/workbench_animations.h>
+#include <nx/client/desktop/ui/workbench/workbench_animations.h>
 
 #include <ui/workbench/workbench_welcome_screen.h>
 #include <ui/workbench/handlers/workbench_action_handler.h>
@@ -96,7 +96,7 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/screen_manager.h>
 
-#include <nx/client/ui/workbench/handlers/layout_tours_handler.h>
+#include <nx/client/desktop/ui/workbench/handlers/layout_tours_handler.h>
 #include <nx/utils/app_info.h>
 
 #include "resource_browser_widget.h"

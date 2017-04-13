@@ -40,7 +40,7 @@
 
 #include <nx/streaming/archive_stream_reader.h>
 #include <utils/common/delayed.h>
-#include <nx/client/ui/workbench/layouts/layout_factory.h>
+#include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
 
 namespace {
     class QnAlarmLayoutResource: public QnLayoutResource {

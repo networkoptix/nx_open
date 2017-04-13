@@ -34,7 +34,7 @@
 #include <ui/workbench/panels/buttons.h>
 #include <ui/workbench/panels/calendar_workbench_panel.h>
 
-#include <nx/client/ui/workbench/workbench_animations.h>
+#include <nx/client/desktop/ui/workbench/workbench_animations.h>
 
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>

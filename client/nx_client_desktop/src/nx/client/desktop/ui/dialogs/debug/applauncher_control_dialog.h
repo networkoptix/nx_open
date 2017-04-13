@@ -10,7 +10,6 @@ namespace nx {
 namespace client {
 namespace desktop {
 namespace ui {
-namespace dialogs {
 
 class QnApplauncherControlDialog: public QnDialog
 {
@@ -22,7 +21,6 @@ private:
     QScopedPointer<Ui::ApplauncherControlDialog> ui;
 };
 
-} // namespace dialogs
 } // namespace ui
 } // namespace desktop
 } // namespace client

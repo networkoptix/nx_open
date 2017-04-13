@@ -16,7 +16,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 
-#include <nx/client/messages/resources_messages.h>
+#include <nx/client/desktop/messages/resources_messages.h>
 
 #include <ui/common/palette.h>
 #include <ui/actions/action_manager.h>

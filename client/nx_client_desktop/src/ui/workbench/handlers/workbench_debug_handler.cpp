@@ -22,8 +22,8 @@
 #include <ui/widgets/common/web_page.h>
 #include <ui/widgets/views/resource_list_view.h>
 
-#include <nx/client/ui/dialogs/debug/animations_control_dialog.h>
-#include <nx/client/ui/dialogs/debug/applauncher_control_dialog.h>
+#include <nx/client/desktop/ui/dialogs/debug/animations_control_dialog.h>
+#include <nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.h>
 #include <finders/test_systems_finder.h>
 #include <finders/system_tiles_test_case.h>
 #include <finders/systems_finder.h>
@@ -85,7 +85,7 @@ public:
         base_type(parent),
         QnWorkbenchContextAware(parent)
     {
-        using namespace nx::client::desktop::ui::dialogs;
+        using namespace nx::client::desktop::ui;
 
         QVBoxLayout *layout = new QVBoxLayout(this);
         layout->addWidget(newActionButton(QnActions::DebugDecrementCounterAction));

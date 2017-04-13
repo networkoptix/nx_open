@@ -14,7 +14,7 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
-#include <nx/client/ui/workbench/layouts/layout_factory.h>
+#include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
 
 #include <ui/actions/action_manager.h>
 

@@ -5,7 +5,7 @@
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QBoxLayout>
 
-#include <nx/client/ui/workbench/workbench_animations.h>
+#include <nx/client/desktop/ui/workbench/workbench_animations.h>
 
 #include <ui/workaround/widgets_signals_workaround.h>
 
@@ -13,7 +13,6 @@ namespace nx {
 namespace client {
 namespace desktop {
 namespace ui {
-namespace dialogs {
 
 using namespace workbench;
 
@@ -158,7 +157,6 @@ AnimationsControlDialog::AnimationsControlDialog(QWidget* parent):
     setMinimumHeight(500);
 }
 
-} // namespace dialogs
 } // namespace ui
 } // namespace desktop
 } // namespace client

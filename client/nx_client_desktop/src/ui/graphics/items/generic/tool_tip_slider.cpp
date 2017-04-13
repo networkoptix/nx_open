@@ -6,7 +6,7 @@
 
 #include <utils/common/checked_cast.h>
 
-#include <nx/client/ui/workbench/workbench_animations.h>
+#include <nx/client/desktop/ui/workbench/workbench_animations.h>
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/generic/styled_tooltip_widget.h>

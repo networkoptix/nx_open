@@ -65,7 +65,7 @@
 #include <ui/workbench/panels/title_workbench_panel.h>
 
 #include <nx/fusion/model_functions.h>
-#include <nx/client/ui/workbench/panels/special_layout_panel.h>
+#include <nx/client/desktop/ui/workbench/panels/special_layout_panel.h>
 
 #include <utils/common/event_processors.h>
 

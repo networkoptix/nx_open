@@ -10,7 +10,6 @@
 class VariantAnimator;
 class WidgetAnimator;
 
-
 namespace nx {
 namespace client {
 namespace desktop {

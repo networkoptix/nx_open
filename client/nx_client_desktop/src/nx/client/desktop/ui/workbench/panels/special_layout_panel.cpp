@@ -3,7 +3,7 @@
 #include <QtWidgets/QGraphicsWidget>
 
 #include <ui/workbench/workbench.h>
-#include <nx/client/ui/workbench/layouts/special_layout.h>
+#include <nx/client/desktop/ui/workbench/layouts/special_layout.h>
 #include <utils/common/connective.h>
 
 namespace nx {

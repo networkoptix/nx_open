@@ -25,7 +25,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/globals.h>
-#include <nx/client/ui/workbench/layouts/layout_factory.h>
+#include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
 
 QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(QWidget *parent):
     base_type(parent),

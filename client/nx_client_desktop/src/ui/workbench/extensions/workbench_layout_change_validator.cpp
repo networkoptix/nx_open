@@ -8,7 +8,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <nx/client/messages/resources_messages.h>
+#include <nx/client/desktop/messages/resources_messages.h>
 
 QnWorkbenchLayoutsChangeValidator::QnWorkbenchLayoutsChangeValidator(QnWorkbenchContext* context):
     QnWorkbenchContextAware(context)

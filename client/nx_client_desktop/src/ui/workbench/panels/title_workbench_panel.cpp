@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QAction>
 
-#include <nx/client/ui/workbench/workbench_animations.h>
+#include <nx/client/desktop/ui/workbench/workbench_animations.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>

@@ -59,8 +59,8 @@
 
 #include <nx_ec/dummy_handler.h>
 
-#include <nx/client/messages/resources_messages.h>
-#include <nx/client/messages/videowall_messages.h>
+#include <nx/client/desktop/messages/resources_messages.h>
+#include <nx/client/desktop/messages/videowall_messages.h>
 
 #include <nx/network/http/httptypes.h>
 #include <nx/network/socket_global.h>
@@ -159,7 +159,7 @@
 #include <vms_gateway_embeddable.h>
 #include <utils/unity_launcher_workaround.h>
 #include <utils/connection_diagnostics_helper.h>
-#include <nx/client/ui/workbench/layouts/layout_factory.h>
+#include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
 
 #ifdef Q_OS_MACX
 #include <utils/mac_utils.h>

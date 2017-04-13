@@ -89,7 +89,7 @@
 #include <utils/color_space/image_correction.h>
 #include <utils/common/checked_cast.h>
 
-#include <nx/client/messages/videowall_messages.h>
+#include <nx/client/desktop/messages/videowall_messages.h>
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/json_functions.h>
@@ -104,7 +104,7 @@
 #include <utils/unity_launcher_workaround.h>
 
 #include <nx/vms/utils/platform/autorun.h>
-#include <nx/client/ui/workbench/layouts/layout_factory.h>
+#include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
 
 //#define SENDER_DEBUG
 //#define RECEIVER_DEBUG

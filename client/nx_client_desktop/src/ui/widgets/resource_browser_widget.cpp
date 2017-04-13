@@ -37,7 +37,7 @@
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_matrix_index.h>
 
-#include <nx/client/ui/workbench/workbench_animations.h>
+#include <nx/client/desktop/ui/workbench/workbench_animations.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
