@@ -10,7 +10,7 @@
 #include <nx/network/http/asynchttpclient.h>
 
 #include <rest/server/json_rest_result.h>
-#include <utils/common/safe_direct_connection.h>
+#include <nx/utils/safe_direct_connection.h>
 #include <api/http_client_pool.h>
 #include <business/business_fwd.h>
 #include <core/resource/resource_fwd.h>

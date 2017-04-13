@@ -20,7 +20,7 @@
 #include <nx/network/http/httptypes.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
-#include <utils/common/safe_direct_connection.h>
+#include <nx/utils/safe_direct_connection.h>
 
 #include "abstract_nonce_provider.h"
 
