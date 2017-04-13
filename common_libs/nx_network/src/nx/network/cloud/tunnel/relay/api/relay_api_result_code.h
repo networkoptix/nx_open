@@ -2,6 +2,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/cloud/data/connection_result_data.h>
+#include <nx/network/http/httptypes.h>
 
 namespace nx {
 namespace cloud {
@@ -14,9 +15,11 @@ enum class ResultCode
     notFound,
     timedOut,
     networkError,
+    preemptiveConnectionCountAtMaximum,
 };
 
 NX_NETWORK_API hpm::api::NatTraversalResultCode toNatTraversalResultCode(ResultCode);
+NX_NETWORK_API nx_http::StatusCode::Value toHttpStatusCode(ResultCode);
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResultCode)
 
