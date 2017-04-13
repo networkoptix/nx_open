@@ -2097,8 +2097,6 @@ void ActionHandler::at_queueAppRestartAction_triggered()
     auto tryToRestartClient = []
         {
             using namespace applauncher;
-            if (!checkOnline())
-                return false;
 
             /* Try to run applauncher if it is not running. */
             if (!checkOnline())

@@ -161,7 +161,7 @@ template<typename InterfaceToImplement>
 SocketAddress UdtSocket<InterfaceToImplement>::getLocalAddress() const
 {
     SystemSocketAddress addr(m_ipVersion);
-    if (UDT::getsockname(m_impl->udtHandle, addr.ptr.get(), &addr.size) != 0)
+    if (UDT::getsockname(m_impl->udtHandle, addr.ptr.get(), reinterpret_cast<int*>(&addr.size)) != 0)
     {
         SystemError::setLastErrorCode(
             detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
@@ -638,7 +638,7 @@ int UdtStreamSocket::send( const void* buffer, unsigned int bufferLen )
 SocketAddress UdtStreamSocket::getForeignAddress() const
 {
     SystemSocketAddress addr(m_ipVersion);
-    if (UDT::getpeername(m_impl->udtHandle, addr.ptr.get(), &addr.size) != 0)
+    if (UDT::getpeername(m_impl->udtHandle, addr.ptr.get(), reinterpret_cast<int*>(&addr.size)) != 0)
     {
         SystemError::setLastErrorCode(
             detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
