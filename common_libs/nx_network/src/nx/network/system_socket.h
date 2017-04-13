@@ -21,6 +21,7 @@
 #include "aio/pollable.h"
 #include "nettools.h"
 #include "socket_factory.h"
+#include "system_socket_address.h"
 
 namespace nx {
 namespace network {
@@ -33,16 +34,6 @@ template<class SocketType> class AsyncSocketImplHelper;
 #ifdef _WIN32
 typedef int socklen_t;
 #endif
-
-struct NX_NETWORK_API SystemSocketAddress
-{
-    std::shared_ptr<const sockaddr> ptr;
-    socklen_t size;
-
-    SystemSocketAddress();
-    SystemSocketAddress(SocketAddress address, int ipVersion);
-    operator SocketAddress() const;
-};
 
 /**
  * Base class representing basic communication endpoint.
