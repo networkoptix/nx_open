@@ -17,14 +17,15 @@
 namespace nx {
 namespace client {
 namespace desktop {
-namespace messages {
+namespace ui {
+namespace videowall {
 
-void VideoWall::anotherVideoWall(QWidget* parent)
+void anotherVideoWall(QWidget* parent)
 {
     QnMessageBox::warning(parent, tr("There is another video wall with the same name"));
 }
 
-bool VideoWall::switchToVideoWallMode(QWidget* parent, bool* closeCurrentInstanse)
+bool switchToVideoWallMode(QWidget* parent, bool* closeCurrentInstanse)
 {
     QnMessageBox dialog(QnMessageBoxIcon::Question,
         tr("Close %1 before starting Video Wall?").arg(QnClientAppInfo::applicationDisplayName()),
@@ -44,7 +45,7 @@ bool VideoWall::switchToVideoWallMode(QWidget* parent, bool* closeCurrentInstans
     return result != QDialogButtonBox::Cancel;
 }
 
-bool VideoWall::checkLocalFiles(QWidget* parent,
+bool checkLocalFiles(QWidget* parent,
     const QnVideoWallItemIndex& index,
     const QnResourceList& resources,
     bool displayDelayed)
@@ -78,7 +79,8 @@ bool VideoWall::checkLocalFiles(QWidget* parent,
     return false;
 }
 
-} // namespace messages
+} // namespace videowall
+} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

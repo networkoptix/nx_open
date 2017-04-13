@@ -13,9 +13,10 @@ static const QString kPtzPresetShowOnceKey(lit("PtzPresetInUse"));
 namespace nx {
 namespace client {
 namespace desktop {
-namespace messages {
+namespace ui {
+namespace ptz {
 
-void Ptz::failedToGetPosition(QWidget* parent, const QString& cameraName)
+void failedToGetPosition(QWidget* parent, const QString& cameraName)
 {
     const auto extras =
         tr("Cannot get the current position from camera \"%1\"").arg(cameraName)
@@ -23,7 +24,7 @@ void Ptz::failedToGetPosition(QWidget* parent, const QString& cameraName)
     QnMessageBox::critical(parent, tr("Failed to get current position"), extras);
 }
 
-void Ptz::failedToSetPosition(QWidget* parent, const QString& cameraName)
+void failedToSetPosition(QWidget* parent, const QString& cameraName)
 {
     const auto extras =
         tr("Cannot set the current position for camera \"%1\"").arg(cameraName)
@@ -31,7 +32,7 @@ void Ptz::failedToSetPosition(QWidget* parent, const QString& cameraName)
     QnMessageBox::critical(parent, tr("Failed to set current position"), extras);
 }
 
-bool Ptz::deletePresetInUse(QWidget* parent)
+bool deletePresetInUse(QWidget* parent)
 {
     if (qnClientShowOnce->testFlag(kPtzPresetShowOnceKey))
         return true;
@@ -52,7 +53,8 @@ bool Ptz::deletePresetInUse(QWidget* parent)
     return result;
 }
 
-} // namespace messages
+} // namespace ptz
+} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

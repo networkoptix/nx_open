@@ -44,7 +44,7 @@
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/extensions/workbench_layout_change_validator.h>
 
-#include <nx/client/desktop/messages/resources_messages.h>
+#include <nx/client/desktop/ui/messages/resources_messages.h>
 
 #include <nx/utils/string.h>
 
@@ -180,13 +180,13 @@ void LayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, const QStri
         newName, layout->getParentId(), layout);
     if (!canRemoveLayouts(existing))
     {
-        messages::Resources::layoutAlreadyExists(mainWindow());
+        ui::resources::layoutAlreadyExists(mainWindow());
         return;
     }
 
     if (!existing.isEmpty())
     {
-        if (!messages::Resources::overrideLayout(mainWindow()))
+        if (!ui::resources::overrideLayout(mainWindow()))
             return;
         removeLayouts(existing);
     }
@@ -305,7 +305,7 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
                     return;
                 }
 
-                if (!messages::Resources::overrideLayout(mainWindow()))
+                if (!ui::resources::overrideLayout(mainWindow()))
                     return;
 
                 saveLayout(layout);
@@ -316,14 +316,14 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
             QnLayoutResourceList existing = alreadyExistingLayouts(resourcePool(), name, user->getId(), excludingSelfLayout);
             if (!canRemoveLayouts(existing))
             {
-                messages::Resources::layoutAlreadyExists(mainWindow());
+                ui::resources::layoutAlreadyExists(mainWindow());
                 dialog->setName(proposedName);
                 continue;
             }
 
             if (!existing.isEmpty())
             {
-                if (!messages::Resources::overrideLayout(mainWindow()))
+                if (!ui::resources::overrideLayout(mainWindow()))
                     return;
 
                 removeLayouts(existing);
@@ -337,13 +337,13 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
         QnLayoutResourceList existing = alreadyExistingLayouts(resourcePool(), name, user->getId(), layout);
         if (!canRemoveLayouts(existing))
         {
-            messages::Resources::layoutAlreadyExists(mainWindow());
+            ui::resources::layoutAlreadyExists(mainWindow());
             return;
         }
 
         if (!existing.isEmpty())
         {
-            if (!messages::Resources::overrideLayout(mainWindow()))
+            if (!ui::resources::overrideLayout(mainWindow()))
                 return;
             removeLayouts(existing);
         }
@@ -406,7 +406,7 @@ void LayoutsHandler::removeLayoutItems(const QnLayoutItemIndexList& items, bool 
 {
     if (items.size() > 1)
     {
-        const bool confirm = messages::Resources::removeItemsFromLayout(mainWindow(),
+        const bool confirm = ui::resources::removeItemsFromLayout(mainWindow(),
             QnActionParameterTypes::resources(items));
 
         if (!confirm)
@@ -548,7 +548,7 @@ bool LayoutsHandler::confirmChangeSharedLayout(const LayoutChange& change)
     if (!accessibleToCustomUsers)
         return true;
 
-    return messages::Resources::sharedLayoutEdit(mainWindow());
+    return ui::resources::sharedLayoutEdit(mainWindow());
 }
 
 bool LayoutsHandler::confirmDeleteSharedLayouts(const QnLayoutResourceList& layouts)
@@ -570,7 +570,7 @@ bool LayoutsHandler::confirmDeleteSharedLayouts(const QnLayoutResourceList& layo
     if (!accessibleToCustomUsers)
         return true;
 
-    return messages::Resources::deleteSharedLayouts(mainWindow(), layouts);
+    return ui::resources::deleteSharedLayouts(mainWindow(), layouts);
 }
 
 bool LayoutsHandler::confirmChangeLocalLayout(const QnUserResourcePtr& user,
@@ -584,12 +584,12 @@ bool LayoutsHandler::confirmChangeLocalLayout(const QnUserResourcePtr& user,
     switch (user->userRole())
     {
         case Qn::UserRole::CustomPermissions:
-            return messages::Resources::changeUserLocalLayout(mainWindow(), change.removed);
+            return ui::resources::changeUserLocalLayout(mainWindow(), change.removed);
         case Qn::UserRole::CustomUserRole:
-            return messages::Resources::addToRoleLocalLayout(
+            return ui::resources::addToRoleLocalLayout(
                     mainWindow(),
                     calculateResourcesToShare(change.added, user))
-                && messages::Resources::removeFromRoleLocalLayout(
+                && ui::resources::removeFromRoleLocalLayout(
                     mainWindow(),
                     change.removed);
         default:
@@ -629,7 +629,7 @@ bool LayoutsHandler::confirmDeleteLocalLayouts(const QnUserResourcePtr& user,
             stillAccessible << resource;
     }
 
-    return messages::Resources::deleteLocalLayouts(mainWindow(), stillAccessible);
+    return ui::resources::deleteLocalLayouts(mainWindow(), stillAccessible);
 }
 
 bool LayoutsHandler::confirmStopSharingLayouts(const QnResourceAccessSubject& subject,
@@ -669,7 +669,7 @@ bool LayoutsHandler::confirmStopSharingLayouts(const QnResourceAccessSubject& su
             resourcesBecomeUnaccessible << resource;
     }
 
-    return messages::Resources::stopSharingLayouts(mainWindow(),
+    return ui::resources::stopSharingLayouts(mainWindow(),
         resourcesBecomeUnaccessible, subject);
 }
 
@@ -817,7 +817,7 @@ void LayoutsHandler::at_newUserLayoutAction_triggered()
     QnLayoutResourceList existing = alreadyExistingLayouts(resourcePool(), dialog->name(), user->getId());
     if (!canRemoveLayouts(existing))
     {
-        messages::Resources::layoutAlreadyExists(mainWindow());
+        ui::resources::layoutAlreadyExists(mainWindow());
         return;
     }
 
@@ -829,7 +829,7 @@ void LayoutsHandler::at_newUserLayoutAction_triggered()
                 return layout->hasFlags(Qn::local);
             });
 
-        if (!allAreLocal && !messages::Resources::overrideLayout(mainWindow()))
+        if (!allAreLocal && !ui::resources::overrideLayout(mainWindow()))
             return;
 
         removeLayouts(existing);

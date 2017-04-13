@@ -16,7 +16,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 
-#include <nx/client/desktop/messages/resources_messages.h>
+#include <nx/client/desktop/ui/messages/resources_messages.h>
 
 #include <ui/common/palette.h>
 #include <ui/actions/action_manager.h>
@@ -341,7 +341,7 @@ void QnUserManagementWidget::applyChanges()
     }
 
     /* User still can press cancel on 'Confirm Remove' dialog. */
-    if (nx::client::desktop::messages::Resources::deleteResources(this, usersToDelete))
+    if (nx::client::desktop::ui::resources::deleteResources(this, usersToDelete))
     {
         setEnabled(false);
         qnResourcesChangesManager->deleteResources(usersToDelete,

@@ -89,7 +89,7 @@
 #include <utils/color_space/image_correction.h>
 #include <utils/common/checked_cast.h>
 
-#include <nx/client/desktop/messages/videowall_messages.h>
+#include <nx/client/desktop/ui/messages/videowall_messages.h>
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/json_functions.h>
@@ -695,7 +695,7 @@ void QnWorkbenchVideoWallHandler::switchToVideoWallMode(const QnVideoWallResourc
         return;
 
     bool closeCurrentInstance = false;
-    if (!nx::client::desktop::messages::VideoWall::switchToVideoWallMode(mainWindow(), &closeCurrentInstance))
+    if (!nx::client::desktop::ui::videowall::switchToVideoWallMode(mainWindow(), &closeCurrentInstance))
         return;
 
     if (closeCurrentInstance)
@@ -1496,7 +1496,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
 
         if (usedNames.contains(proposedName.toLower()))
         {
-            nx::client::desktop::messages::VideoWall::anotherVideoWall(mainWindow());
+            nx::client::desktop::ui::videowall::anotherVideoWall(mainWindow());
             continue;
         }
 
@@ -3054,7 +3054,7 @@ bool QnWorkbenchVideoWallHandler::checkLocalFiles(const QnVideoWallItemIndex& in
     if (!layout)
         return true;
 
-    return nx::client::desktop::messages::VideoWall::checkLocalFiles(mainWindow(), index,
+    return nx::client::desktop::ui::videowall::checkLocalFiles(mainWindow(), index,
         layout->layoutResources().toList());
 }
 

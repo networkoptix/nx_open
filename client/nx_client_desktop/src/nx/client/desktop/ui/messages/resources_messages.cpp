@@ -79,16 +79,17 @@ bool showCompositeDialog(
 namespace nx {
 namespace client {
 namespace desktop {
-namespace messages {
+namespace ui {
+namespace resources {
 
-void Resources::layoutAlreadyExists(QWidget* parent)
+void layoutAlreadyExists(QWidget* parent)
 {
     QnSessionAwareMessageBox::warning(parent,
         tr("There is another layout with the same name"),
         tr("You do not have permission to overwrite it."));
 }
 
-bool Resources::overrideLayout(QWidget* parent)
+bool overrideLayout(QWidget* parent)
 {
     QnSessionAwareMessageBox messageBox(parent);
     messageBox.setIcon(QnMessageBoxIcon::Question);
@@ -100,7 +101,7 @@ bool Resources::overrideLayout(QWidget* parent)
     return messageBox.exec() != QDialogButtonBox::Cancel;
 }
 
-bool Resources::changeUserLocalLayout(QWidget* parent,
+bool changeUserLocalLayout(QWidget* parent,
     const QnResourceList& stillAccessible)
 {
     return showCompositeDialog(parent, kChangeUserLocalLayoutShowOnceKey,
@@ -109,7 +110,7 @@ bool Resources::changeUserLocalLayout(QWidget* parent,
         stillAccessible);
 }
 
-bool Resources::addToRoleLocalLayout(QWidget* parent, const QnResourceList& toShare)
+bool addToRoleLocalLayout(QWidget* parent, const QnResourceList& toShare)
 {
     return showCompositeDialog(parent, kAddToRoleLocalLayoutShowOnceKey,
         tr("All users with this role will get access to %n resources:", "", toShare.size()),
@@ -117,7 +118,7 @@ bool Resources::addToRoleLocalLayout(QWidget* parent, const QnResourceList& toSh
         toShare);
 }
 
-bool Resources::removeFromRoleLocalLayout(QWidget* parent,
+bool removeFromRoleLocalLayout(QWidget* parent,
     const QnResourceList& stillAccessible)
 {
     return showCompositeDialog(parent, kRemoveFromRoleLocalLayoutOnceKey,
@@ -127,7 +128,7 @@ bool Resources::removeFromRoleLocalLayout(QWidget* parent,
         stillAccessible);
 }
 
-bool Resources::sharedLayoutEdit(QWidget* parent)
+bool sharedLayoutEdit(QWidget* parent)
 {
     static const bool kOmitResources = false;
     return showCompositeDialog(parent, kSharedLayoutEditShowOnceKey,
@@ -136,7 +137,7 @@ bool Resources::sharedLayoutEdit(QWidget* parent)
         QnResourceList(), kOmitResources);
 }
 
-bool Resources::stopSharingLayouts(QWidget* parent,
+bool stopSharingLayouts(QWidget* parent,
     const QnResourceList& resources, const QnResourceAccessSubject& subject)
 {
     const QString text = (subject.user()
@@ -146,7 +147,7 @@ bool Resources::stopSharingLayouts(QWidget* parent,
     return showCompositeDialog(parent, QString(), text, QString(), resources);
 }
 
-bool Resources::deleteSharedLayouts(QWidget* parent, const QnResourceList& layouts)
+bool deleteSharedLayouts(QWidget* parent, const QnResourceList& layouts)
 {
     QnSessionAwareMessageBox messageBox(parent);
     messageBox.setIcon(QnMessageBoxIcon::Question);
@@ -162,7 +163,7 @@ bool Resources::deleteSharedLayouts(QWidget* parent, const QnResourceList& layou
     return (messageBox.exec() != QDialogButtonBox::Cancel);
 }
 
-bool Resources::deleteLocalLayouts(QWidget* parent,
+bool deleteLocalLayouts(QWidget* parent,
     const QnResourceList& stillAccessible)
 {
     return showCompositeDialog(parent, kDeleteLocalLayoutsShowOnceKey,
@@ -171,7 +172,7 @@ bool Resources::deleteLocalLayouts(QWidget* parent,
         stillAccessible);
 }
 
-bool Resources::removeItemsFromLayout(QWidget* parent,
+bool removeItemsFromLayout(QWidget* parent,
     const QnResourceList& resources)
 {
     /* Check if user have already silenced this warning. */
@@ -192,7 +193,7 @@ bool Resources::removeItemsFromLayout(QWidget* parent,
     return result != QDialogButtonBox::Cancel;
 }
 
-bool Resources::changeVideoWallLayout(QWidget* parent,
+bool changeVideoWallLayout(QWidget* parent,
     const QnResourceList& inaccessible)
 {
     const auto extras = tr("You are going to delete some resources to which you have "
@@ -204,7 +205,7 @@ bool Resources::changeVideoWallLayout(QWidget* parent,
         extras, inaccessible);
 }
 
-bool Resources::deleteResources(QWidget* parent, const QnResourceList& resources)
+bool deleteResources(QWidget* parent, const QnResourceList& resources)
 {
     /* Check if user have already silenced this warning. */
     if (qnClientShowOnce->testFlag(kDeleteResourcesShowOnceKey))
@@ -283,7 +284,8 @@ bool Resources::deleteResources(QWidget* parent, const QnResourceList& resources
     return result != QDialogButtonBox::Cancel;
 }
 
-} // namespace messages
+} // namespace resources
+} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

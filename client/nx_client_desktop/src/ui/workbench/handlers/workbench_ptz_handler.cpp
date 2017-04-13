@@ -20,7 +20,7 @@
 
 #include <client/client_settings.h>
 
-#include <nx/client/desktop/messages/ptz_messages.h>
+#include <nx/client/desktop/ui/messages/ptz_messages.h>
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>

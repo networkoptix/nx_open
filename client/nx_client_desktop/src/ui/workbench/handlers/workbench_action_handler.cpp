@@ -59,8 +59,8 @@
 
 #include <nx_ec/dummy_handler.h>
 
-#include <nx/client/desktop/messages/resources_messages.h>
-#include <nx/client/desktop/messages/videowall_messages.h>
+#include <nx/client/desktop/ui/messages/resources_messages.h>
+#include <nx/client/desktop/ui/messages/videowall_messages.h>
 
 #include <nx/network/http/httptypes.h>
 #include <nx/network/socket_global.h>
@@ -796,7 +796,7 @@ void ActionHandler::at_openInCurrentLayoutAction_triggered()
         const auto resources = parameters.resources();
 
         // Displaying message delayed to avoid waiting cursor (see drop_instrument.cpp:245)
-        if (!messages::VideoWall::checkLocalFiles(mainWindow(), index, resources, true))
+        if (!ui::videowall::checkLocalFiles(mainWindow(), index, resources, true))
             return;
     }
 
@@ -1612,7 +1612,7 @@ bool ActionHandler::validateResourceName(const QnResourcePtr &resource, const QS
         if (checkedFlags == Qn::user)
             QnMessageBox::warning(mainWindow(), tr("There is another user with the same name"));
         else
-            messages::VideoWall::anotherVideoWall(mainWindow());
+            ui::videowall::anotherVideoWall(mainWindow());
 
         return false;
     }
@@ -1728,7 +1728,7 @@ void ActionHandler::at_removeFromServerAction_triggered()
                 && !resource->hasFlags(Qn::layout);
         });
 
-    if (messages::Resources::deleteResources(mainWindow(), resources))
+    if (ui::resources::deleteResources(mainWindow(), resources))
         qnResourcesChangesManager->deleteResources(resources);
 }
 
