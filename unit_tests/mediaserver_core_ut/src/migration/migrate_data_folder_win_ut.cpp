@@ -102,10 +102,8 @@ TEST(MigrateWinData, VariousOldDirs)
 {
     MigrateDataTestHandler handler;
 
-    std::array<QString, 4> oldDataDirPaths = {
-        lit("c:\\windows.OLD\\data"),
+    std::array<QString, 2> oldDataDirPaths = {
         lit("c:\\windows.old\\data"),
-        lit("c:\\Windows.OLD\\data"),
         lit("c:\\windows.000\\data")
     };
 
@@ -121,7 +119,7 @@ TEST(MigrateWinData, VariousOldDirs)
 TEST(MigrateWinData, MoveDataFailed)
 {
     MigrateDataTestHandler handler;
-    whenEverythingAlmostOk(handler, MoveData::Failed, lit("c:\\WINDOWS.000\\data"));
+    whenEverythingAlmostOk(handler, MoveData::Failed, lit("c:\\windows.000\\data"));
 
     ASSERT_EQ(nx::misc::migrateFilesFromWindowsOldDir(&handler), 
               nx::misc::MigrateDataResult::MoveDataFailed);

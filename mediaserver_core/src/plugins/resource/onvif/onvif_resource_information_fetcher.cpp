@@ -25,7 +25,9 @@
 #include <plugins/resource/hikvision/hikvision_onvif_resource.h>
 #include <nx/utils/log/log.h>
 #include <common/static_common_module.h>
+#include <plugins/resource/flir/flir_onvif_resource.h>
 
+using namespace nx::plugins;
 using namespace nx::plugins::onvif;
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
@@ -429,7 +431,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
     else if (manufacture.toLower().contains(QLatin1String("hikvision")))
         resource = QnPlOnvifResourcePtr(new QnHikvisionOnvifResource());
     else if (manufacture.toLower().contains(QLatin1String("flir")))
-        resource = QnPlOnvifResourcePtr(new QnFlirOnvifResource());
+        resource = QnPlOnvifResourcePtr(new nx::plugins::flir::OnvifResource());
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
 

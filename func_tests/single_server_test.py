@@ -14,7 +14,7 @@ def env(env_builder, server):
 
 # https://networkoptix.atlassian.net/browse/VMS-3911
 def test_server_should_pick_archive_file_with_time_after_db_time(env, camera, sample_media_file):
-    camera_id = env.server.add_camera(camera)
+    env.server.add_camera(camera)
     storage = env.server.storage
     sample = sample_media_file
 
@@ -40,7 +40,7 @@ def test_server_should_pick_archive_file_with_time_after_db_time(env, camera, sa
     for st in start_times_1:
         storage.save_media_sample(camera, st, sample)
     env.server.rebuild_archive()
-    assert expected_periods_1 == env.server.get_recorded_time_periods(camera_id)
+    assert expected_periods_1 == env.server.get_recorded_time_periods(camera)
 
     # stop service and add more media files to archive:
     env.server.stop_service()
@@ -50,6 +50,6 @@ def test_server_should_pick_archive_file_with_time_after_db_time(env, camera, sa
 
     time.sleep(10)  # servers still need some time to settle down; hope this time will be enough
     # after restart new periods must be picked:
-    recorded_periods = env.server.get_recorded_time_periods(camera_id)
+    recorded_periods = env.server.get_recorded_time_periods(camera)
     assert recorded_periods != expected_periods_1, 'Server did not pick up new media archive files'
     assert expected_periods_1 + expected_periods_2 == recorded_periods

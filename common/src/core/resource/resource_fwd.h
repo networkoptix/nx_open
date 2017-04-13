@@ -194,5 +194,22 @@ class QnFlirEIPResource;
 typedef QnSharedResourcePointer<QnFlirEIPResource> QnFlirEIPResourcePtr;
 typedef QnSharedResourcePointerList<QnFlirEIPResource> QnFlirEIPResourceList;
 
+namespace nx {
+namespace plugins {
+namespace flir {
+
+class FcResource;
+class OnvifResource;
+
+} // namespace flir
+} // namespace plugins
+} // namespace nx
+
+typedef QnSharedResourcePointer<nx::plugins::flir::FcResource> QnFlirFcResourcePtr;
+typedef QnSharedResourcePointerList<nx::plugins::flir::FcResource> QnFlirFcResourceList;
+
+typedef QnSharedResourcePointer<nx::plugins::flir::OnvifResource> QnFlirOnvifResourcePtr;
+typedef QnSharedResourcePointerList<nx::plugins::flir::OnvifResource> QnFlirOnvifResourceList;
+
 class QnAdamResource;
 typedef QnSharedResourcePointer<QnAdamResource> QnAdamResourcePtr;
