@@ -147,6 +147,7 @@ void QnSearchTask::doSearch()
 
         for (const auto& res: seqResults)
         {
+            res->setCommonModule(checker->commonModule());
             QnSecurityCamResourcePtr camRes = res.dynamicCast<QnSecurityCamResource>();
             Q_ASSERT(camRes);
             // Checking, if found resource is reserved by some other searcher

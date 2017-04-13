@@ -33,7 +33,7 @@ int QnStatisticsRestHandler::executeGet(
     }
 
     QnStatisticsReply reply;
-    reply.updatePeriod = m_monitor->updatePeriod();
+    reply.updatePeriod = m_monitor->updatePeriodMs();
     reply.uptimeMs = m_monitor->upTimeMs();
 
     QnStatisticsDataList cpuInfo;

@@ -19,6 +19,7 @@
 #include <media_server/settings.h>
 #include "common/common_module.h"
 #include <api/global_settings.h>
+#include "media_server/media_server_module.h"
 
 
 using nx::network::UDPSocket;
@@ -30,7 +31,7 @@ static const QByteArray guidStr("{756E732D-0FB1-4f91-8CE0-381D1A3F84E8}");
 
 QByteArray localAppServerHost()
 {
-    QByteArray result = MSSettings::roSettings()->value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString().toUtf8();
+    QByteArray result = qnServerModule->roSettings()->value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString().toUtf8();
     if (isLocalAppServer(result)) {
         QList<QnInterfaceAndAddr> interfaces = getAllIPv4Interfaces();
         if (!interfaces.isEmpty())

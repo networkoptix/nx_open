@@ -466,7 +466,6 @@ void reopenDbFile(QFile *dbFile, const QString& fileName)
 
 TEST(MediaDbTest, SimpleFileWriteTest)
 {
-    MSSettings::initializeROSettings();
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
 
@@ -569,7 +568,6 @@ TEST(MediaDbTest, BitsTwiddling)
 
 TEST(MediaDbTest, ReadWrite_Simple)
 {
-    MSSettings::initializeROSettings();
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
 
@@ -624,7 +622,6 @@ TEST(MediaDbTest, ReadWrite_Simple)
 
 TEST(MediaDbTest, DbFileTruncate)
 {
-    MSSettings::initializeROSettings();
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
 
@@ -695,7 +692,6 @@ TEST(MediaDbTest, DbFileTruncate)
 
 TEST(MediaDbTest, ReadWrite_MT)
 {
-    MSSettings::initializeROSettings();
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
 
@@ -813,7 +809,6 @@ TEST(MediaDbTest, ReadWrite_MT)
 
 TEST(MediaDbTest, StorageDB)
 {
-    MSSettings::initializeROSettings();
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
 
@@ -822,7 +817,7 @@ TEST(MediaDbTest, StorageDB)
     QnWriterPool writerPool;
     std::unique_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule());
     serverModule->commonModule()->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
-    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction(0));
+    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
 
     bool result;
     QnFileStorageResourcePtr storage(new QnFileStorageResource(serverModule->commonModule()));
@@ -946,11 +941,9 @@ TEST(MediaDbTest, StorageDB)
 
 TEST(MediaDbTest, Migration_from_sqlite)
 {
-    MSSettings::initializeROSettings();
-
     std::unique_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule());
     serverModule->commonModule()->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
-    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction(0));
+    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
 
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());

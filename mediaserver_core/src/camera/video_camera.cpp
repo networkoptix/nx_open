@@ -21,6 +21,7 @@
 #include <streaming/hls/hls_types.h>
 #include <api/global_settings.h>
 #include <common/common_module.h>
+#include <media_server/media_server_module.h>
 
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
 static const qint64 KEEP_IFRAMES_INTERVAL = 1000000ll * 80;
@@ -352,10 +353,10 @@ QnVideoCamera::QnVideoCamera(const QnResourcePtr& resource)
     m_resource(resource),
     m_primaryGopKeeper(nullptr),
     m_secondaryGopKeeper(nullptr),
-    m_loStreamHlsInactivityPeriodMS( MSSettings::roSettings()->value(
+    m_loStreamHlsInactivityPeriodMS( qnServerModule->roSettings()->value(
         nx_ms_conf::HLS_INACTIVITY_PERIOD,
         nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC ),
-    m_hiStreamHlsInactivityPeriodMS( MSSettings::roSettings()->value(
+    m_hiStreamHlsInactivityPeriodMS( qnServerModule->roSettings()->value(
         nx_ms_conf::HLS_INACTIVITY_PERIOD,
         nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC )
 {
@@ -484,7 +485,7 @@ void QnVideoCamera::startLiveCacheIfNeeded()
             ensureLiveCacheStarted(
                 MEDIA_Quality_Low,
                 m_secondaryReader,
-                MSSettings::roSettings()->value(
+                qnServerModule->roSettings()->value(
                     nx_ms_conf::HLS_TARGET_DURATION_MS,
                     nx_ms_conf::DEFAULT_TARGET_DURATION_MS).toUInt() * USEC_PER_MSEC);
     }
@@ -497,7 +498,7 @@ void QnVideoCamera::startLiveCacheIfNeeded()
             ensureLiveCacheStarted(
                 MEDIA_Quality_High,
                 m_primaryReader,
-                MSSettings::roSettings()->value(
+                qnServerModule->roSettings()->value(
                     nx_ms_conf::HLS_TARGET_DURATION_MS,
                     nx_ms_conf::DEFAULT_TARGET_DURATION_MS).toUInt() * USEC_PER_MSEC);
         }
@@ -792,7 +793,7 @@ bool QnVideoCamera::ensureLiveCacheStarted(
             MEDIA_CACHE_SIZE_MILLIS,
             MEDIA_CACHE_SIZE_MILLIS*10) );  //hls spec requires 7 last chunks to be in memory, adding extra 3 just for case
 
-        int removedChunksToKeepCount = MSSettings::roSettings()->value(
+        int removedChunksToKeepCount = qnServerModule->roSettings()->value(
             nx_ms_conf::HLS_REMOVED_LIVE_CHUNKS_TO_KEEP,
             nx_ms_conf::DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP).toInt();
 

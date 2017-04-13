@@ -29,6 +29,7 @@
 #include <rest/helpers/permissions_helper.h>
 #include <api/global_settings.h>
 #include <api/resource_property_adaptor.h>
+#include <media_server/media_server_module.h>
 
 namespace
 {
@@ -185,7 +186,7 @@ int QnConfigureRestHandler::changePort(const QnRestConnectionProcessor* owner, i
 {
     const Qn::UserAccessData& accessRights = owner->accessRights();
 
-    int sPort = MSSettings::roSettings()->value(
+    int sPort = qnServerModule->roSettings()->value(
         nx_ms_conf::SERVER_PORT,
         nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
     if (port == 0 || port == sPort)
@@ -222,7 +223,7 @@ int QnConfigureRestHandler::changePort(const QnRestConnectionProcessor* owner, i
     if (errCode != ec2::ErrorCode::ok)
         return ResultFail;
 
-    MSSettings::roSettings()->setValue(nx_ms_conf::SERVER_PORT, port);
+    qnServerModule->roSettings()->setValue(nx_ms_conf::SERVER_PORT, port);
 
     return ResultOk;
 }

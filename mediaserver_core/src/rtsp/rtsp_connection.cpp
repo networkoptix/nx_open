@@ -56,6 +56,7 @@ extern "C"
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/fusion/serialization/lexical_enum.h>
+#include <media_server/media_server_module.h>
 
 class QnTcpListener;
 
@@ -678,7 +679,7 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
                 dstCodec,
                 resolution,
                 extraTranscodeParams)); // transcode src codec to MPEG4/AAC
-            if (MSSettings::roSettings()->value(StreamingParams::FFMPEG_REALTIME_OPTIMIZATION, true).toBool())
+            if (qnServerModule->roSettings()->value(StreamingParams::FFMPEG_REALTIME_OPTIMIZATION, true).toBool())
                 universalEncoder->setUseRealTimeOptimization(true);
             if (universalEncoder->isOpened())
                 return universalEncoder;
@@ -801,7 +802,7 @@ int QnRtspConnectionProcessor::composeDescribe()
 #if 0
     QUrl sessionControlUrl = d->request.requestLine.url;
     if( sessionControlUrl.port() == -1 )
-        sessionControlUrl.setPort( MSSettings::roSettings()->value( nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt() );
+        sessionControlUrl.setPort( qnServerModule->roSettings()->value( nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt() );
     sdp << "a=control:" << sessionControlUrl.toString() << ENDL;
 #endif
     int i = 0;

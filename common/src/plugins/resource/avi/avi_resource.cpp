@@ -29,6 +29,7 @@ QnAspectRatio getAspectRatioFromImage(const QString& fileName)
 }
 
 } // namespace
+
 QnAviResource::QnAviResource(const QString& file)
 {
     //setUrl(QDir::cleanPath(file));
@@ -131,4 +132,22 @@ void QnAviResource::setTimeZoneOffset(qint64 value)
 qint64 QnAviResource::timeZoneOffset() const
 {
     return m_timeZoneOffset;
+}
+
+void QnAviResource::setAviMetadata(const QnAviArchiveMetadata& value)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_aviMetadata.reset(value);
+}
+
+QnMediaDewarpingParams QnAviResource::getDewarpingParams() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_aviMetadata ? m_aviMetadata->dewarpingParams : base_type::getDewarpingParams();
+}
+
+qreal QnAviResource::customAspectRatio() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_aviMetadata ? m_aviMetadata->overridenAr : base_type::customAspectRatio();
 }

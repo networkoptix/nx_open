@@ -37,6 +37,7 @@
 #include "cached_output_stream.h"
 #include "common/common_module.h"
 #include "audit/audit_manager.h"
+#include <media_server/media_server_module.h>
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;
@@ -393,7 +394,7 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointe
         arg(d->foreignAddress).arg(d->foreignPort).
         arg(QnProgressiveDownloadingConsumer_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );
 
-    const int sessionLiveTimeoutSec = MSSettings::roSettings()->value(
+    const int sessionLiveTimeoutSec = qnServerModule->roSettings()->value(
         nx_ms_conf::PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME,
         nx_ms_conf::DEFAULT_PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME ).toUInt();
     if( sessionLiveTimeoutSec > 0 )
@@ -640,7 +641,7 @@ void QnProgressiveDownloadingConsumer::run()
         const bool standFrameDuration = decodedUrlQuery.hasQueryItem(STAND_FRAME_DURATION_PARAM_NAME);
 
         const bool rtOptimization = decodedUrlQuery.hasQueryItem(RT_OPTIMIZATION_PARAM_NAME);
-        if (rtOptimization && MSSettings::roSettings()->value(StreamingParams::FFMPEG_REALTIME_OPTIMIZATION, true).toBool())
+        if (rtOptimization && qnServerModule->roSettings()->value(StreamingParams::FFMPEG_REALTIME_OPTIMIZATION, true).toBool())
             d->transcoder.setUseRealTimeOptimization(true);
 
 

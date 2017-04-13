@@ -375,6 +375,7 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
         for (const QnResourcePtr &resource: foundResources) {
             if (const QnSecurityCamResourcePtr &camera = resource.dynamicCast<QnSecurityCamResource>())
                 camera->setManuallyAdded(true);
+            resource->setCommonModule(commonModule());
             resources << resource;
         }
     }
@@ -529,10 +530,6 @@ QnNetworkResourcePtr QnResourceDiscoveryManager::findSameResource(const QnNetwor
 {
     auto camRes = netRes.dynamicCast<QnVirtualCameraResource>();
     if (!camRes)
-        return QnNetworkResourcePtr();
-
-    //TODO: #rvasilenko Always crashing here
-    if (!netRes->commonModule())
         return QnNetworkResourcePtr();
 
     const auto& resPool = netRes->commonModule()->resourcePool();
