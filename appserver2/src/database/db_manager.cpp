@@ -2250,7 +2250,7 @@ ErrorCode QnDbManager::saveLayout(const ApiLayoutData& params)
 
 ec2::ErrorCode QnDbManager::removeLayoutTour(const QnUuid& id)
 {
-    if (!database::api::removeLayoutTour(m_sdb, params))
+    if (!database::api::removeLayoutTour(m_sdb, id))
         return ErrorCode::dbError;
     return ErrorCode::ok;
 }
