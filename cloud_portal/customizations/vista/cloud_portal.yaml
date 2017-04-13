@@ -18,9 +18,9 @@ cloud_portal:
 cloud_gateway:
     url: 'http://$VMS_GATEWAY_HOST:$VMS_GATEWAY_PORT'
 
-mail_from: 'Qloud <service@networkoptix.com>'
+mail_from: 'Qcloud <support@vista-cctv.com>'
 
-mail_prefix: '[Qloud]'
+mail_prefix: '[Qcloud]'
 
 smtp:
     host: 'email-smtp.us-east-1.amazonaws.com'

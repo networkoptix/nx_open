@@ -152,7 +152,7 @@ LOGGING = {
             'formatter': 'verbose'
         },
         'mail_admins': {
-            'level': 'ERROR',
+            'level': 'CRITICAL',
             'class': 'cloud.logger.LimitAdminEmailHandler',
             'formatter': 'simple'
         },
@@ -213,6 +213,8 @@ BROKER_TRANSPORT_OPTIONS = {
 }
 RESULT_PERSISTENT = True
 CELERY_RESULT_BACKEND = 'django-db'
+CELERY_SEND_EVENTS = False
+WORKER_PREFETCH_MULTIPLIER = 1
 
 # / End of Celery settings section
 

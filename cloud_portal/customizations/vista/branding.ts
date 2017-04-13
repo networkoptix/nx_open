@@ -4,7 +4,7 @@
     <name>global</name>
     <message>
       <source>{{PRODUCT_NAME}}</source>
-      <translation>Qloud</translation>
+      <translation>Qcloud</translation>
     </message>
     <message>
       <source>{{CLIENT_PROTOCOL}}</source>
@@ -20,11 +20,11 @@
     </message>
     <message>
       <source>{{supportLink}}</source>
-      <translation>http://vista-cctv.com/technical-support/contact/</translation>
+      <translation>mailto:support@vista-cctv.com</translation>
     </message>
     <message>
       <source>{{supportLinkText}}</source>
-      <translation>vista-cctv.com/technical-support/contact</translation>
+      <translation>support@vista-cctv.com</translation>
     </message>
     <message>
       <source>{{companyUrl}}</source>

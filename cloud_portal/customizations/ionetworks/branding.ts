@@ -20,7 +20,7 @@
     </message>
     <message>
       <source>{{supportLink}}</source>
-      <translation>support@ioezio.com</translation>
+      <translation>mailto:support@ioezio.com</translation>
     </message>
     <message>
       <source>{{supportLinkText}}</source>
