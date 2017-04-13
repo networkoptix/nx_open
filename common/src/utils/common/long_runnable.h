@@ -3,13 +3,12 @@
 
 #include <atomic>
 
-#include <QtCore/QThread>
 #include <QtCore/QSharedPointer>
+#include <QtCore/QThread>
 
-#include <nx/utils/compiler_options.h>
+#include <nx/utils/safe_direct_connection.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/semaphore.h>
-#include <nx/utils/safe_direct_connection.h>
 #include <nx/utils/thread/stoppable.h>
 
 class QnLongRunnablePoolPrivate;
