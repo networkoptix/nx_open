@@ -187,6 +187,7 @@ namespace ec2
             void onGetBusinessRulesDone         (int reqID, const ec2::ErrorCode, const QnBusinessEventRuleList&);
             void onGetLicensesDone              (int reqID, const ec2::ErrorCode, const QnLicenseList&);
             void onGetLayoutsDone               (int reqID, const ec2::ErrorCode, const ec2::ApiLayoutDataList&);
+            void onGetLayoutToursDone           (int reqID, const ec2::ErrorCode, const ec2::ApiLayoutTourDataList&);
             void onGetStoredFileDone            (int reqID, const ec2::ErrorCode, const QByteArray&);
             void onListDirectoryDone            (int reqID, const ec2::ErrorCode, const QStringList&);
             void onCurrentTimeDone              (int reqID, const ec2::ErrorCode, const qint64&);
@@ -242,6 +243,9 @@ namespace ec2
         ///////// Handlers for AbstractLayoutManager
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER(GetLayouts,                  ec2::ErrorCode, ec2::ApiLayoutDataList)
+
+        // Handlers for AbstractLayoutTourManager.
+        DEFINE_TWO_ARG_HANDLER(GetLayoutTours, ec2::ErrorCode, ec2::ApiLayoutTourDataList)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractVideowallManager

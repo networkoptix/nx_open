@@ -30,8 +30,15 @@ void ConnectSessionManager::beginListening(
 
     NX_LOGX(lm("beginListening. peerName %1").arg(request.peerName), cl_logDEBUG2);
 
-     // TODO: #ak Check if there are already too many connections from that peer.
-     //   m_settings.listeningPeer().maxPreemptiveConnectionCount;
+    if (m_listeningPeerPool->getConnectionCountByPeerName(request.peerName) >=
+        (std::size_t)m_settings.listeningPeer().maxPreemptiveConnectionCount)
+    {
+        completionHandler(
+            api::ResultCode::preemptiveConnectionCountAtMaximum,
+            api::BeginListeningResponse(),
+            nx_http::ConnectionEvents());
+        return;
+    }
 
     api::BeginListeningResponse response;
     response.preemptiveConnectionCount =

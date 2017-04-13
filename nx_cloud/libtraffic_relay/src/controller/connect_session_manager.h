@@ -22,11 +22,6 @@ namespace controller {
 class ConnectSessionManager
 {
 public:
-    ConnectSessionManager(
-        const conf::Settings& settings,
-        model::ClientSessionPool* clientSessionPool,
-        model::ListeningPeerPool* listeningPeerPool);
-
     //---------------------------------------------------------------------------------------------
     // Completion handler types.
 
@@ -41,7 +36,12 @@ public:
         nx::utils::MoveOnlyFunc<void(api::ResultCode, nx_http::ConnectionEvents)>;
 
     //---------------------------------------------------------------------------------------------
-    // Api methods.
+    // Methods.
+
+    ConnectSessionManager(
+        const conf::Settings& settings,
+        model::ClientSessionPool* clientSessionPool,
+        model::ListeningPeerPool* listeningPeerPool);
 
     void beginListening(
         const api::BeginListeningRequest& request,

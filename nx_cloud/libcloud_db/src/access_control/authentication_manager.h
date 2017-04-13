@@ -60,8 +60,8 @@ private:
     api::ResultCode authenticateInDataManagers(
         const nx_http::StringType& username,
         std::function<bool(const nx::Buffer&)> validateHa1Func,
-        const stree::AbstractResourceReader& authSearchInputData,
-        stree::ResourceContainer* const authProperties);
+        const nx::utils::stree::AbstractResourceReader& authSearchInputData,
+        nx::utils::stree::ResourceContainer* const authProperties);
     void addWWWAuthenticateHeader(
         boost::optional<nx_http::header::WWWAuthenticate>* const wwwAuthenticate );
     nx::Buffer generateNonce();

@@ -38,8 +38,9 @@ void QnStreamMixer::addDataSource(QnAbstractStreamDataProviderPtr& source)
     {
         QnProviderChannelInfo info;
         info.provider = source;
-
         m_sourceMap[sourceId] = info;
+
+        lock.unlock();
         source->addDataProcessor(this);
     }
     
@@ -52,8 +53,10 @@ void QnStreamMixer::removeDataSource(QnAbstractStreamDataProvider* source)
     
     if (m_sourceMap.contains(sourceId))
     {
-        m_sourceMap[sourceId].provider->removeDataProcessor(this);
         m_sourceMap.remove(sourceId);
+
+        lock.unlock();
+        source->removeDataProcessor(this);
     }
 
 }
@@ -182,9 +185,13 @@ void QnStreamMixer::proxyOpenStream(
     bool /*isCameraControlRequired*/,
     const QnLiveStreamParams& /*params*/)
 {
-    QnMutexLocker lock(&m_mutex);
+    decltype(m_sourceMap) sourceMap;
+    {
+        QnMutexLocker lock(&m_mutex);
+        sourceMap = m_sourceMap;
+    }
 
-    for (auto& source: m_sourceMap)
+    for (auto& source: sourceMap)
     {
         if (source.provider)
         {
@@ -204,9 +211,13 @@ void QnStreamMixer::proxyOpenStream(
 
 void QnStreamMixer::proxyCloseStream()
 {
-    QnMutexLocker lock(&m_mutex);
+    decltype(m_sourceMap) sourceMap;
+    {
+        QnMutexLocker lock(&m_mutex);
+        sourceMap = m_sourceMap;
+    }
 
-    for (auto& source: m_sourceMap)
+    for (auto& source: sourceMap)
     {
         if (source.provider)
             source.provider->pleaseStop();
@@ -234,9 +245,13 @@ QnAbstractMediaDataPtr QnStreamMixer::retrieveData()
 
 bool QnStreamMixer::isStreamOpened() const
 {
-    QnMutexLocker lock(&m_mutex);
+    decltype(m_sourceMap) sourceMap;
+    {
+        QnMutexLocker lock(&m_mutex);
+        sourceMap = m_sourceMap;
+    }
 
-    for (const auto& source: m_sourceMap)
+    for (const auto& source: sourceMap)
     {
         if (!source.provider)
         {

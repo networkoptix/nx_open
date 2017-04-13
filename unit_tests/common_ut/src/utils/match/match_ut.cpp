@@ -5,7 +5,7 @@
 
 #include <gtest/gtest.h>
 
-#include <utils/match/wildcard.h>
+#include <nx/utils/match/wildcard.h>
 
 
 TEST( MatchFunctions, wildcardMatch )

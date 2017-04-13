@@ -6,13 +6,14 @@
 
 #include <boost/optional.hpp>
 
-#include <QtCore/QUrl> 
+#include <QtCore/QUrl>
 
 #include <nx/network/cloud/cloud_connect_options.h>
 #include <nx/network/cloud/data/connection_parameters.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_settings.h>
+#include <nx/utils/abstract_service_settings.h>
 #include <nx/utils/settings.h>
 
 #include <utils/common/command_line_parser.h>
@@ -83,27 +84,29 @@ struct ConnectionParameters:
 /**
  * @note Values specified via command-line have priority over conf file (or win32 registry) values.
  */
-class Settings
+class Settings:
+    public nx::utils::AbstractServiceSettings
 {
 public:
     Settings();
 
-    bool showHelp() const;
+    /**
+     * Loads settings from both command line and conf file (or win32 registry).
+     */
+    virtual void load(int argc, const char **argv) override;
+    virtual bool isShowHelpRequested() const override;
+    virtual void printCmdLineArgsHelp() override;
+
+    virtual QString dataDir() const override;
+    virtual nx::utils::log::Settings logging() const override;
 
     const General& general() const;
-    const nx::utils::log::Settings& logging() const;
     const CloudDB& cloudDB() const;
     const Stun& stun() const;
     const Http& http() const;
     const ConnectionParameters& connectionParameters() const;
     const nx::db::ConnectionOptions& dbConnectionOptions() const;
     const Statistics& statistics() const;
-
-    /**
-     * Loads settings from both command line and conf file (or win32 registry).
-     */
-    void load(int argc, const char **argv);
-    void printCmdLineArgsHelp();
 
 private:
     QnCommandLineParser m_commandLineParser;

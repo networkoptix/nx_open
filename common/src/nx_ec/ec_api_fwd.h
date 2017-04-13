@@ -1,51 +1,52 @@
-#ifndef QN_EC_API_FWD_H
-#define QN_EC_API_FWD_H
+#pragma once
 
 #include <memory> /* For std::shared_ptr. */
 
-namespace ec2
-{
-    enum class ErrorCode;
-    struct QnPeerTimeInfo;
-    typedef QList<QnPeerTimeInfo> QnPeerTimeInfoList;
+namespace ec2 {
 
-    class AbstractResourceManager;
-    typedef std::shared_ptr<AbstractResourceManager> AbstractResourceManagerPtr;
+enum class ErrorCode;
+struct QnPeerTimeInfo;
+typedef QList<QnPeerTimeInfo> QnPeerTimeInfoList;
 
-    class AbstractMediaServerManager;
-    typedef std::shared_ptr<AbstractMediaServerManager> AbstractMediaServerManagerPtr;
+class AbstractResourceManager;
+typedef std::shared_ptr<AbstractResourceManager> AbstractResourceManagerPtr;
 
-    class AbstractCameraManager;
-    typedef std::shared_ptr<AbstractCameraManager> AbstractCameraManagerPtr;
+class AbstractMediaServerManager;
+typedef std::shared_ptr<AbstractMediaServerManager> AbstractMediaServerManagerPtr;
 
-    class AbstractLicenseManager;
-    typedef std::shared_ptr<AbstractLicenseManager> AbstractLicenseManagerPtr;
+class AbstractCameraManager;
+typedef std::shared_ptr<AbstractCameraManager> AbstractCameraManagerPtr;
 
-    class AbstractBusinessEventManager;
-    typedef std::shared_ptr<AbstractBusinessEventManager> AbstractBusinessEventManagerPtr;
+class AbstractLicenseManager;
+typedef std::shared_ptr<AbstractLicenseManager> AbstractLicenseManagerPtr;
 
-    class AbstractUserManager;
-    typedef std::shared_ptr<AbstractUserManager> AbstractUserManagerPtr;
+class AbstractBusinessEventManager;
+typedef std::shared_ptr<AbstractBusinessEventManager> AbstractBusinessEventManagerPtr;
 
-    class AbstractLayoutManager;
-    typedef std::shared_ptr<AbstractLayoutManager> AbstractLayoutManagerPtr;
+class AbstractUserManager;
+typedef std::shared_ptr<AbstractUserManager> AbstractUserManagerPtr;
 
-    class AbstractVideowallManager;
-    typedef std::shared_ptr<AbstractVideowallManager> AbstractVideowallManagerPtr;
+class AbstractLayoutManager;
+typedef std::shared_ptr<AbstractLayoutManager> AbstractLayoutManagerPtr;
 
-    class AbstractWebPageManager;
-    typedef std::shared_ptr<AbstractWebPageManager> AbstractWebPageManagerPtr;
+class AbstractLayoutTourManager;
+using AbstractLayoutTourManagerPtr = std::shared_ptr<AbstractLayoutTourManager>;
 
-    class AbstractStoredFileManager;
-    typedef std::shared_ptr<AbstractStoredFileManager> AbstractStoredFileManagerPtr;
+class AbstractVideowallManager;
+typedef std::shared_ptr<AbstractVideowallManager> AbstractVideowallManagerPtr;
 
-    class AbstractUpdatesManager;
-    typedef std::shared_ptr<AbstractUpdatesManager> AbstractUpdatesManagerPtr;
+class AbstractWebPageManager;
+typedef std::shared_ptr<AbstractWebPageManager> AbstractWebPageManagerPtr;
 
-    class AbstractECConnection;
-    typedef std::shared_ptr<AbstractECConnection> AbstractECConnectionPtr;
+class AbstractStoredFileManager;
+typedef std::shared_ptr<AbstractStoredFileManager> AbstractStoredFileManagerPtr;
 
-    class AbstractECConnectionFactory;
-}
+class AbstractUpdatesManager;
+typedef std::shared_ptr<AbstractUpdatesManager> AbstractUpdatesManagerPtr;
 
-#endif // QN_EC_API_FWD_H
+class AbstractECConnection;
+typedef std::shared_ptr<AbstractECConnection> AbstractECConnectionPtr;
+
+class AbstractECConnectionFactory;
+
+} // namespace ec2

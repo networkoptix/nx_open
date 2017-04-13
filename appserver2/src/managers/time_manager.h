@@ -14,7 +14,7 @@
 #include <utils/common/id.h>
 #include <nx/utils/thread/stoppable.h>
 #include <nx/utils/timer_manager.h>
-#include <utils/common/safe_direct_connection.h>
+#include <nx/utils/safe_direct_connection.h>
 #include <nx/utils/singleton.h>
 #include <nx/network/time/abstract_accurate_time_fetcher.h>
 #include <nx/network/http/httptypes.h>

@@ -3,6 +3,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/safe_direct_connection.h>
 
 #include <motion/motion_detection.h>
 
@@ -11,7 +12,6 @@
 #include "utils/media/h264_utils.h"
 #include "utils/media/jpeg_utils.h"
 #include "utils/media/nalUnits.h"
-#include "utils/common/safe_direct_connection.h"
 #include "utils/common/synctime.h"
 
 #include <utils/media/av_codec_helper.h>

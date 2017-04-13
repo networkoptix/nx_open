@@ -6,7 +6,8 @@
 QnRtpStreamReader::QnRtpStreamReader(const QnResourcePtr& res, const QString& request):
     CLServerPushStreamReader(res),
     m_rtpReader(res),
-    m_request(request)
+    m_request(request),
+    m_rtpTransport(RtpTransport::_auto)
 {
 
 }
@@ -14,6 +15,11 @@ QnRtpStreamReader::QnRtpStreamReader(const QnResourcePtr& res, const QString& re
 QnRtpStreamReader::~QnRtpStreamReader()
 {
     stop();
+}
+
+void QnRtpStreamReader::setRtpTransport(const RtpTransport::Value& transport)
+{
+    m_rtpTransport = transport;
 }
 
 void QnRtpStreamReader::setRequest(const QString& request)
@@ -46,6 +52,7 @@ CameraDiagnostics::Result QnRtpStreamReader::openStreamInternal(bool isCameraCon
 
     m_rtpReader.setRole(getRole());
     m_rtpReader.setRequest(m_request);
+    m_rtpReader.setRtpTransport(m_rtpTransport);
 
 	auto virtRes = m_resource.dynamicCast<QnVirtualCameraResource>();
 

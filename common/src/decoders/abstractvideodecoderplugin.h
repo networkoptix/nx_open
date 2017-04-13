@@ -17,7 +17,7 @@ extern "C"
 
 #include "abstractclientplugin.h"
 #include <nx/streaming/video_data_packet.h>
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 
 
 class QGLContext;
@@ -52,7 +52,7 @@ public:
             const QnCompressedVideoDataPtr& data,
             const QGLContext* const glContext,
             int currentSWDecoderCount ) const = 0;
-    virtual bool isStreamSupported( const stree::AbstractResourceReader& newStreamParams ) const = 0;
+    virtual bool isStreamSupported( const nx::utils::stree::AbstractResourceReader& newStreamParams ) const = 0;
 };
 
 Q_DECLARE_INTERFACE( QnAbstractVideoDecoderPlugin, "com.networkoptix.plugin.videodecoder/0.1" );

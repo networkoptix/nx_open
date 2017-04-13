@@ -127,5 +127,13 @@ void moveAndCallOptional(Function& function, Args&& ... args)
     moveAndCall(function, std::forward<Args>(args) ...);
 }
 
+template<typename Function, typename ... Args>
+void swapAndCall(Function& function, Args&& ... args)
+{
+    Function functionLocal;
+    function.swap(functionLocal);
+    functionLocal(std::forward<Args>(args) ...);
+}
+
 } // namespace utils
 } // namespace nx

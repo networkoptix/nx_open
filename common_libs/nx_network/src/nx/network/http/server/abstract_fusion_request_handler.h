@@ -38,7 +38,7 @@ public:
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
-        stree::ResourceContainer authInfo,
+        nx::utils::stree::ResourceContainer authInfo,
         Input inputData ) = 0;
 
     //!Call this method when processed request. \a outputData argument is missing when \a Output is \a void
@@ -66,13 +66,13 @@ public:
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
-        stree::ResourceContainer authInfo ) = 0;
+        nx::utils::stree::ResourceContainer authInfo ) = 0;
 
 private:
     //!Implementation of \a AbstractHttpRequestHandler::processRequest
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,
-        stree::ResourceContainer authInfo,
+        nx::utils::stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const /*response*/,
         nx_http::RequestProcessedHandler completionHandler ) override
