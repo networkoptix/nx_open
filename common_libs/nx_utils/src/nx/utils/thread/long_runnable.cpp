@@ -2,7 +2,8 @@
 
 #include <nx/utils/crash_dump/systemexcept.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/thread/thread_util.h>
+
+#include "thread_util.h"
 
 // -------------------------------------------------------------------------- //
 // QnLongRunnablePoolPrivate

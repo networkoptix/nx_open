@@ -11,7 +11,7 @@
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/std/future.h>
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 #include <utils/common/threadqueue.h>
 #include <utils/media/audioformat.h>
 

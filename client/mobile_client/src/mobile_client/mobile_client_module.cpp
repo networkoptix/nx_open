@@ -18,7 +18,7 @@
 #include <api/global_settings.h>
 #include <api/runtime_info_manager.h>
 #include <api/simple_network_proxy_factory.h>
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 #include <utils/common/app_info.h>
 #include <network/module_finder.h>
 #include <network/multicast_module_finder.h>

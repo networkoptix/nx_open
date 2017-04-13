@@ -11,7 +11,7 @@
 #include <QtCore/QStringList>
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
-#include "utils/common/long_runnable.h"
+#include "nx/utils/thread/long_runnable.h"
 #include <common/common_module_aware.h>
 
 class QnFileDeletor: public QnLongRunnable, public QnCommonModuleAware

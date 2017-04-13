@@ -2,7 +2,7 @@
 #define QNCOMPATIBILITYVERSIONINSTALLATIONTOOL_H
 
 #include <QtCore/QObject>
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 #include <utils/common/software_version.h>
 
 class QnCompatibilityVersionInstallationTool : public QnLongRunnable {
