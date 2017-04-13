@@ -28,7 +28,7 @@ namespace Qn
     /*!
         \warning Implementation MUST call \a EnableSafeDirectConnection::directDisconnectAll before object destruction
     */
-    class EnableSafeDirectConnection
+    class NX_UTILS_API EnableSafeDirectConnection
     {
     public:
 #ifdef __arm__
@@ -55,7 +55,7 @@ namespace Qn
         All signals, connected with \a Qn::safe_direct_connect, are delivered 
         through global instance of this class
     */
-    class SafeDirectConnectionGlobalHelper
+    class NX_UTILS_API SafeDirectConnectionGlobalHelper
     :
         public QObject/*,
         public Singleton<SafeDirectConnectionGlobalHelper>*/
@@ -176,7 +176,7 @@ namespace Qn
     /*!
         \note Blocks till currently executed slots return
     */
-    void directDisconnectAll( const EnableSafeDirectConnection* receiver );
+    void NX_UTILS_API directDisconnectAll( const EnableSafeDirectConnection* receiver );
 
     //!Waits for currently running slots to exit
     /*!
