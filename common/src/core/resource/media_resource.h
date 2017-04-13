@@ -48,11 +48,11 @@ public:
     virtual const QnResourcePtr toResourcePtr() const = 0;
     virtual QnResourcePtr toResourcePtr() = 0;
 
-    QnMediaDewarpingParams getDewarpingParams() const;
+    virtual QnMediaDewarpingParams getDewarpingParams() const;
     void setDewarpingParams(const QnMediaDewarpingParams& params);
 
     //TODO: #dklychkov change to QnAspectRatio in 2.4
-    qreal customAspectRatio() const;
+    virtual qreal customAspectRatio() const;
     void setCustomAspectRatio(qreal value);
     void clearCustomAspectRatio();
 
