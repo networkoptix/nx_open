@@ -31,7 +31,7 @@ void ConnectSessionManager::beginListening(
     NX_LOGX(lm("beginListening. peerName %1").arg(request.peerName), cl_logDEBUG2);
 
     if (m_listeningPeerPool->getConnectionCountByPeerName(request.peerName) >=
-        m_settings.listeningPeer().maxPreemptiveConnectionCount)
+        (std::size_t)m_settings.listeningPeer().maxPreemptiveConnectionCount)
     {
         completionHandler(
             api::ResultCode::preemptiveConnectionCountAtMaximum,
