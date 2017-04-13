@@ -6,7 +6,7 @@ Project
 
     references: [
         "libclient_core",
-        "libclient",
+        "nx_client_desktop",
         "desktop_client",
         "applauncher",
         "mobile_client"

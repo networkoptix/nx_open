@@ -24,13 +24,13 @@ endif()
 
 file(GLOB_RECURSE QML_FILES static-resources/src/qml/*.qml static-resources/src/qml/*.js)
 
-nx_add_target(libclient LIBRARY
+nx_add_target(nx_client_desktop LIBRARY
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/client_app_info_impl.cpp"
         ${UIC_FILES}
         ${mac_sources}
     ADDITIONAL_RESOURCES
-        "${customization_dir}/libclient/resources"
+        "${customization_dir}/nx_client_desktop/resources"
         "${CMAKE_CURRENT_BINARY_DIR}/globals.json"
     OTHER_SOURCES
         ${QML_FILES}
@@ -39,18 +39,18 @@ nx_add_target(libclient LIBRARY
         Qt5::Qml Qt5::QuickWidgets
         libclient_core nx_speech_synthesizer nx_audio libvms_gateway)
 
-set_target_properties(libclient PROPERTIES PREFIX "")
+set_target_properties(nx_client_desktop PROPERTIES PREFIX "")
 
-target_include_directories(libclient
+target_include_directories(nx_client_desktop
     PRIVATE
         ${Qt5Gui_PRIVATE_INCLUDE_DIRS}
         ${Qt5Widgets_PRIVATE_INCLUDE_DIRS})
 
 if(LINUX)
-    target_link_libraries(libclient PRIVATE Qt5::X11Extras Xss Xfixes X11)
+    target_link_libraries(nx_client_desktop PRIVATE Qt5::X11Extras Xss Xfixes X11)
 endif()
 
 if(WIN32)
     nx_rdep_add_package(directx)
-    target_link_libraries(libclient PRIVATE d3d9 Winmm)
+    target_link_libraries(nx_client_desktop PRIVATE d3d9 Winmm)
 endif()

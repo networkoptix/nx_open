@@ -3,7 +3,7 @@ import qbs.FileInfo
 
 GenericProduct
 {
-    name: "libclient"
+    name: "nx_client_desktop"
     targetName: "client"
 
     condition: project.withDesktopClient
@@ -112,7 +112,7 @@ GenericProduct
             project.sourceDirectory,
             "customization",
             project.customization,
-            "libclient",
+            "nx_client_desktop",
             "resources")
     }
 

@@ -9,7 +9,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "activex_client-x86", "${roo
 		${common.guid} = ${common.guid}
 		${nx_streaming.guid} = ${nx_streaming.guid}
 		${nx_audio.guid} = ${nx_audio.guid}
-		${libclient.guid} = ${libclient.guid}
+		${nx_client_desktop.guid} = ${nx_client_desktop.guid}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "desktop_client-x86", "${root.dir}\client\desktop_client\src\desktop_client-x86.vcxproj", "${desktop_client.guid}"
@@ -18,10 +18,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "desktop_client-x86", "${roo
 		${common.guid} = ${common.guid}
 		${nx_streaming.guid} = ${nx_streaming.guid}
 		${nx_audio.guid} = ${nx_audio.guid}
-		${libclient.guid} = ${libclient.guid}
+		${nx_client_desktop.guid} = ${nx_client_desktop.guid}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libclient-x86", "${root.dir}\client\libclient\src\libclient-x86.vcxproj", "${libclient.guid}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_client_desktop-x86", "${root.dir}\client\nx_client_desktop\src\nx_client_desktop-x86.vcxproj", "${nx_client_desktop.guid}"
 	ProjectSection(ProjectDependencies) = postProject
 		${appserver2.guid} = ${appserver2.guid}
 		${common.guid} = ${common.guid}
@@ -121,10 +121,10 @@ Global
 		${desktop_client.guid}.Debug|Win32.Build.0 = Debug|Win32
 		${desktop_client.guid}.Release|Win32.ActiveCfg = Release|Win32
 		${desktop_client.guid}.Release|Win32.Build.0 = Release|Win32
-		${libclient.guid}.Debug|Win32.ActiveCfg = Debug|Win32
-		${libclient.guid}.Debug|Win32.Build.0 = Debug|Win32
-		${libclient.guid}.Release|Win32.ActiveCfg = Release|Win32
-		${libclient.guid}.Release|Win32.Build.0 = Release|Win32
+		${nx_client_desktop.guid}.Debug|Win32.ActiveCfg = Debug|Win32
+		${nx_client_desktop.guid}.Debug|Win32.Build.0 = Debug|Win32
+		${nx_client_desktop.guid}.Release|Win32.ActiveCfg = Release|Win32
+		${nx_client_desktop.guid}.Release|Win32.Build.0 = Release|Win32
 		${libclient_core.guid}.Debug|Win32.ActiveCfg = Debug|Win32
 		${libclient_core.guid}.Debug|Win32.Build.0 = Debug|Win32
 		${libclient_core.guid}.Release|Win32.ActiveCfg = Release|Win32

@@ -20,7 +20,7 @@ Project
         name: "desktop_client"
         type: "application"
 
-        Depends { name: "libclient" }
+        Depends { name: "nx_client_desktop" }
         Depends { name: "qtsingleapplication" }
 
         Depends { name: "festival" }
@@ -31,7 +31,7 @@ Project
 
         Export
         {
-            Depends { name: "libclient" }
+            Depends { name: "nx_client_desktop" }
             Depends { name: "festival" }
             Depends { name: "festival-vox" }
             Depends { name: "roboto-ttf" }

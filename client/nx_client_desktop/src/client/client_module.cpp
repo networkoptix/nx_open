@@ -250,7 +250,7 @@ QnNetworkProxyFactory* QnClientModule::networkProxyFactory() const
 
 void QnClientModule::initMetaInfo()
 {
-    Q_INIT_RESOURCE(libclient);
+    Q_INIT_RESOURCE(nx_client_desktop);
     QnClientMetaTypes::initialize();
 }
 
