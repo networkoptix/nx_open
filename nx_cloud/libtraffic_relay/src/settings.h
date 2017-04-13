@@ -2,7 +2,7 @@
 
 #include <nx/network/socket_common.h>
 #include <nx/utils/settings.h>
-#include <nx/utils/log/log_settings.h>
+#include <nx/utils/abstract_service_settings.h>
 
 #include <utils/common/command_line_parser.h>
 
@@ -30,7 +30,8 @@ struct ListeningPeer
     ListeningPeer();
 };
 
-class Settings
+class Settings:
+    public nx::utils::AbstractServiceSettings
 {
 public:
     Settings();
@@ -38,14 +39,13 @@ public:
     Settings(const Settings&) = delete;
     Settings& operator=(const Settings&) = delete;
 
-    bool isShowHelpRequested() const;
+    virtual void load(int argc, const char **argv) override;
+    virtual bool isShowHelpRequested() const override;
+    virtual void printCmdLineArgsHelp() override;
 
-    void load(int argc, char **argv);
-    void printCmdLineArgsHelp();
+    virtual QString dataDir() const override;
+    virtual utils::log::Settings logging() const override;
 
-    QString dataDir() const;
-
-    const utils::log::Settings& logging() const;
     const ListeningPeer& listeningPeer() const;
     const Http& http() const;
 

@@ -10,7 +10,7 @@
 
 #include <nx/utils/thread/mutex.h>
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 #include <nx/utils/counter.h>
 #include <utils/db/async_sql_query_executor.h>
 
@@ -66,8 +66,8 @@ public:
     virtual void authenticateByName(
         const nx_http::StringType& username,
         std::function<bool(const nx::Buffer&)> validateHa1Func,
-        const stree::AbstractResourceReader& authSearchInputData,
-        stree::ResourceContainer* const authProperties,
+        const nx::utils::stree::AbstractResourceReader& authSearchInputData,
+        nx::utils::stree::ResourceContainer* const authProperties,
         nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
     void registerTemporaryCredentials(

@@ -92,6 +92,7 @@
 #include <nx_ec/data/api_resource_type_data.h>
 #include <nx_ec/data/api_license_data.h>
 #include <nx_ec/data/api_layout_data.h>
+#include <nx_ec/data/api_layout_tour_data.h>
 #include <nx_ec/data/api_camera_data.h>
 #include <nx_ec/data/api_business_rule_data.h>
 #include <nx_ec/data/api_access_rights_data.h>

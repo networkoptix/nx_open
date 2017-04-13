@@ -76,7 +76,7 @@ size_t PluginUsageWatcher::currentSessionCount() const
     return m_currentSessions.size();
 }
 
-stree::ResourceContainer PluginUsageWatcher::currentTotalUsage() const
+nx::utils::stree::ResourceContainer PluginUsageWatcher::currentTotalUsage() const
 {
     QnMutexLocker lk( &m_mutex );
 
@@ -106,7 +106,7 @@ stree::ResourceContainer PluginUsageWatcher::currentTotalUsage() const
         simultaneousStreamCount += m_totalUsageArray.records[i].simultaneousStreamCount;
     }
 
-    stree::ResourceContainer rc;
+    nx::utils::stree::ResourceContainer rc;
     rc.put( DecoderParameter::framePictureSize, totalFramePictureSize );
     rc.put( DecoderParameter::fps, totalFPS );
     rc.put( DecoderParameter::pixelsPerSecond, totalPixelsPerSecond );
@@ -115,14 +115,14 @@ stree::ResourceContainer PluginUsageWatcher::currentTotalUsage() const
     return rc;
 }
 
-void PluginUsageWatcher::decoderCreated( stree::AbstractResourceReader* const decoder )
+void PluginUsageWatcher::decoderCreated( nx::utils::stree::AbstractResourceReader* const decoder )
 {
     QnMutexLocker lk( &m_mutex );
 
     m_currentSessions.insert( decoder );
 }
 
-void PluginUsageWatcher::decoderIsAboutToBeDestroyed( stree::AbstractResourceReader* const decoder )
+void PluginUsageWatcher::decoderIsAboutToBeDestroyed( nx::utils::stree::AbstractResourceReader* const decoder )
 {
     QnMutexLocker lk( &m_mutex );
 
@@ -225,7 +225,7 @@ bool PluginUsageWatcher::readExternalUsage( UsageRecordArray* const recArray ) c
 UsageRecord PluginUsageWatcher::currentUsage() const
 {
     UsageRecord rec;
-    for( std::set<stree::AbstractResourceReader*>::const_iterator
+    for( std::set<nx::utils::stree::AbstractResourceReader*>::const_iterator
         it = m_currentSessions.begin();
         it != m_currentSessions.end();
         ++it )

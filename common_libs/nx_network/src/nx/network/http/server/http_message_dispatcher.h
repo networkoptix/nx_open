@@ -52,7 +52,7 @@ public:
     bool dispatchRequest(
         HttpServerConnection* const connection,
         nx_http::Message message,
-        stree::ResourceContainer authInfo,
+        nx::utils::stree::ResourceContainer authInfo,
         CompletionFuncRefType completionFunc) const
     {
         NX_ASSERT(message.type == nx_http::MessageType::request);

@@ -98,6 +98,7 @@
 #include <plugins/native_sdk/common_plugin_container.h>
 #include <plugins/plugin_manager.h>
 #include <plugins/resource/avi/avi_resource.h>
+#include <plugins/resource/flir/flir_io_executor.h>
 
 #include <plugins/resource/desktop_camera/desktop_camera_registrator.h>
 
@@ -2700,6 +2701,7 @@ void MediaServerProcess::run()
     QnMediaServerResourceSearchers searchers(commonModule());
 
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool(commonModule()));
+    auto flirExecutor = std::make_unique<nx::plugins::flir::IoExecutor>();
 
     auto upnpPortMapper = initializeUpnpPortMapper();
 

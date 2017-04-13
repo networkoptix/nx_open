@@ -67,7 +67,8 @@ public:
     void saveServersBatch(const QnMediaServerResourceList &servers, BatchChangesFunction applyChanges, RollbackFunction rollback = []{});
 
     /** Apply changes to the given user. */
-    void saveUser(const QnUserResourcePtr &user, UserChangesFunction applyChanges);
+    void saveUser(const QnUserResourcePtr &user, UserChangesFunction applyChanges,
+        const ActionResultCallback& callback = ActionResultCallback());
 
     /** Save accessible resources for the given user */
     void saveAccessibleResources(const QnResourceAccessSubject& subject,

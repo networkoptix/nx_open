@@ -18,7 +18,7 @@
 
 #include <api/global_settings.h>
 #include <platform/process/current_process.h>
-#include <plugins/videodecoder/stree/stree_manager.h>
+#include <nx/utils/stree/stree_manager.h>
 #include <utils/common/app_info.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/scope_guard.h>
@@ -143,7 +143,7 @@ int VmsGatewayProcess::exec()
         timerManager.start();
 
         CdbAttrNameSet attrNameSet;
-        stree::StreeManager streeManager(
+        nx::utils::stree::StreeManager streeManager(
             attrNameSet,
             settings.auth().rulesXmlPath);
 

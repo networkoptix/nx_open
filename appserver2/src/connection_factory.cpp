@@ -1211,6 +1211,45 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      */
     regUpdate<ApiIdData>(p, ApiCommand::removeLayout);
 
+    /**%apidoc GET /ec2/getLayoutTours
+    * Return list of layout tours
+    * %param[default] format
+    * %return List of layout tour objects in the requested format.
+    * %// AbstractLayoutManager::getLayoutTours
+    */
+    regGet<nullptr_t, ApiLayoutTourDataList>(p, ApiCommand::getLayoutTours);
+
+    /**%apidoc POST /ec2/saveLayoutTour
+    * Save layout tour.
+    * <p>
+    * Parameters should be passed as a JSON object in POST message body with
+    * content type "application/json". Example of such object can be seen in
+    * the result of the corresponding GET function.
+    * </p>
+    * %permissions Administrator
+    * %param[opt] id Layout tour unique id. Can be omitted when creating a new object. If such object
+    *     exists, omitted fields will not be changed.
+    * %param name Tour name.
+    * %param items List of the layout tour items.
+    * %param item.layoutId Layout unique id.
+    * %param item.delayMs Delay between layouts switching in milliseconds.
+    * %// AbstractLayoutTourManager::save
+    */
+    regUpdate<ApiLayoutTourData>(p, ApiCommand::saveLayoutTour);
+
+    /**%apidoc POST /ec2/removeLayoutTour
+    * Delete the specified layout tour.
+    * <p>
+    * Parameters should be passed as a JSON object in POST message body with
+    * content type "application/json". Example of such object can be seen in
+    * the result of the corresponding GET function.
+    * </p>
+    * %permissions Administrator
+    * %param id Unique id of the layout tour to be deleted.
+    * %// AbstractLayoutTourManager::remove
+    */
+    regUpdate<ApiIdData>(p, ApiCommand::removeLayoutTour);
+
     /**%apidoc GET /ec2/listDirectory
      * Return list of folders and files in a virtual FS stored inside
      * database. This function is used to add files (such audio for notifications)

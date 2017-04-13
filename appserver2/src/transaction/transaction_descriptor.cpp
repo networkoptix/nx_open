@@ -20,6 +20,7 @@
 #include "managers/camera_manager.h"
 #include "managers/discovery_manager.h"
 #include "managers/layout_manager.h"
+#include <managers/layout_tour_manager.h>
 #include "managers/license_manager.h"
 #include "managers/media_server_manager.h"
 #include "managers/misc_manager.h"
@@ -257,6 +258,8 @@ void apiIdDataTriggerNotificationHelper(const QnTransaction<ApiIdData> &tran, co
             return notificationParams.businessEventNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::removeLayout:
             return notificationParams.layoutNotificationManager->triggerNotification(tran, notificationParams.source);
+        case ApiCommand::removeLayoutTour:
+            return notificationParams.layoutTourNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::removeVideowall:
             return notificationParams.videowallNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::removeWebPage:
@@ -349,6 +352,15 @@ struct LayoutNotificationManagerHelper
     void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
     {
         notificationParams.layoutNotificationManager->triggerNotification(tran, notificationParams.source);
+    }
+};
+
+struct LayoutTourNotificationManagerHelper
+{
+    template<typename Param>
+    void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
+    {
+        notificationParams.layoutTourNotificationManager->triggerNotification(tran, notificationParams.source);
     }
 };
 

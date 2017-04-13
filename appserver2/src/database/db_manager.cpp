@@ -21,6 +21,7 @@
 
 #include <database/api/db_resource_api.h>
 #include <database/api/db_layout_api.h>
+#include <database/api/db_layout_tour_api.h>
 #include <database/api/db_webpage_api.h>
 
 #include <database/migrations/business_rules_db_migration.h>
@@ -768,6 +769,9 @@ bool QnDbManager::resyncTransactionLog()
         return false;
 
     if (!fillTransactionLogInternal<QnUuid, ApiWebPageData, ApiWebPageDataList>(ApiCommand::saveWebPage))
+        return false;
+
+    if (!fillTransactionLogInternal<nullptr_t, ApiLayoutTourData, ApiLayoutTourDataList>(ApiCommand::saveLayoutTour))
         return false;
 
     return true;
@@ -2237,7 +2241,6 @@ ErrorCode QnDbManager::removeBusinessRule( const QnUuid& guid )
     return ErrorCode::ok;
 }
 
-
 ErrorCode QnDbManager::saveLayout(const ApiLayoutData& params)
 {
     if (!database::api::saveLayout(m_sdb, params))
@@ -2245,10 +2248,23 @@ ErrorCode QnDbManager::saveLayout(const ApiLayoutData& params)
     return ErrorCode::ok;
 }
 
+ec2::ErrorCode QnDbManager::removeLayoutTour(const QnUuid& id)
+{
+    if (!database::api::removeLayoutTour(m_sdb, id))
+        return ErrorCode::dbError;
+    return ErrorCode::ok;
+}
+
+ec2::ErrorCode QnDbManager::saveLayoutTour(const ApiLayoutTourData& params)
+{
+    if (!database::api::saveLayoutTour(m_sdb, params))
+        return ErrorCode::dbError;
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLayoutData>& tran)
 {
-    ErrorCode result = saveLayout(tran.params);
-    return result;
+    return saveLayout(tran.params);
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLayoutDataList>& tran)
@@ -2260,6 +2276,11 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLayoutD
             return err;
     }
     return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLayoutTourData>& tran)
+{
+    return saveLayoutTour(tran.params);
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiVideowallData>& tran) {
@@ -2900,6 +2921,8 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiIdData>
         return removeMediaServerUserAttributes(tran.params.id);
     case ApiCommand::removeLayout:
         return removeLayout(tran.params.id);
+    case ApiCommand::removeLayoutTour:
+        return removeLayoutTour(tran.params.id);
     case ApiCommand::removeEventRule:
         return removeBusinessRule(tran.params.id);
     case ApiCommand::removeUser:
@@ -3165,6 +3188,12 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resId, ApiResourceStatusDataL
 
     QnSql::fetch_many(query, &statusList);
 
+    return ErrorCode::ok;
+}
+
+ec2::ErrorCode QnDbManager::doQueryNoLock(const QnUuid& /*id*/, ApiUpdateUploadResponceDataList& data)
+{
+    data.clear();
     return ErrorCode::ok;
 }
 
@@ -3975,6 +4004,7 @@ ErrorCode QnDbManager::readApiFullInfoDataComplete(ApiFullInfoData* data)
     DB_LOAD(QnUuid(), data->storages);
     DB_LOAD(QnUuid(), data->resStatusList);
     DB_LOAD(nullptr, data->accessRights);
+    DB_LOAD(nullptr, data->layoutTours);
 
     return ErrorCode::ok;
 }
@@ -4225,6 +4255,16 @@ ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFil
         return ErrorCode::dbError;
     }
     QnSql::fetch_many(query, &data);
+    return ErrorCode::ok;
+}
+
+/**
+* /ec2/getLayouts
+*/
+ec2::ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutTourDataList& data)
+{
+    if (!database::api::fetchLayoutTours(m_sdb, data))
+        return ErrorCode::dbError;
     return ErrorCode::ok;
 }
 

@@ -57,7 +57,7 @@ class QuickSyncVideoDecoder
 :
     public QnAbstractVideoDecoder
 #ifndef XVBA_TEST
-    ,public stree::AbstractResourceReader
+    ,public nx::utils::stree::AbstractResourceReader
 #endif
 {
 public:
@@ -120,7 +120,7 @@ public:
 #endif
 
 #ifndef XVBA_TEST
-    //!Implementation of stree::AbstractResourceReader::get
+    //!Implementation of nx::utils::stree::AbstractResourceReader::get
     /*!
         Following parameters are supported:\n
             - framePictureWidth

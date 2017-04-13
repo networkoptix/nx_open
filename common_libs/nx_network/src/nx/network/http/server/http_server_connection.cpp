@@ -59,7 +59,7 @@ void HttpServerConnection::processMessage( nx_http::Message&& requestMessage )
     {
         onAuthenticationDone(
             true,
-            stree::ResourceContainer(),
+            nx::utils::stree::ResourceContainer(),
             std::move(requestMessage),
             boost::none,
             nx_http::HttpHeaders(),
@@ -76,7 +76,7 @@ void HttpServerConnection::processMessage( nx_http::Message&& requestMessage )
         [this, weakThis = std::move(weakThis),
             requestMessage = std::move(requestMessage)](
                 bool authenticationResult,
-                stree::ResourceContainer authInfo,
+                nx::utils::stree::ResourceContainer authInfo,
                 boost::optional<header::WWWAuthenticate> wwwAuthenticate,
                 nx_http::HttpHeaders responseHeaders,
                 std::unique_ptr<AbstractMsgBodySource> msgBody) mutable
@@ -113,7 +113,7 @@ void HttpServerConnection::processMessage( nx_http::Message&& requestMessage )
 
 void HttpServerConnection::onAuthenticationDone(
     bool authenticationResult,
-    stree::ResourceContainer authInfo,
+    nx::utils::stree::ResourceContainer authInfo,
     nx_http::Message requestMessage,
     boost::optional<header::WWWAuthenticate> wwwAuthenticate,
     nx_http::HttpHeaders responseHeaders,

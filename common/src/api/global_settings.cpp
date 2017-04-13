@@ -45,6 +45,8 @@ namespace
 
     const QString kArecontRtspEnabled(lit("arecontRtspEnabled"));
     const bool kArecontRtspEnabledDefault = false;
+    const QString kSequentialFlirOnvifSearcherEnabled(lit("sequentialFlirOnvifSearcherEnabled"));
+    const bool kSequentialFlirOnvifSearcherEnabledDefault = false;
     const QString kProxyConnectTimeout(lit("proxyConnectTimeoutSec"));
     const int kProxyConnectTimeoutDefault = 5;
 
@@ -328,6 +330,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kArecontRtspEnabledDefault,
         this);
 
+    m_sequentialFlirOnvifSearcherEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        kSequentialFlirOnvifSearcherEnabled,
+        kSequentialFlirOnvifSearcherEnabledDefault,
+        this);
+
     m_maxRecorderQueueSizeBytes = new QnLexicalResourcePropertyAdaptor<int>(
         kMaxRecorderQueueSizeBytesName,
         kMaxRecorderQueueSizeBytesDefault,
@@ -377,6 +384,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_upnpPortMappingEnabledAdaptor
         << m_cloudHostAdaptor
         << m_arecontRtspEnabledAdaptor
+        << m_sequentialFlirOnvifSearcherEnabledAdaptor
         << m_maxRecorderQueueSizeBytes
         << m_maxRecorderQueueSizePackets
         << m_rtpFrameTimeoutMs
@@ -892,6 +900,16 @@ int QnGlobalSettings::maxRtpRetryCount() const
 void QnGlobalSettings::setMaxRtpRetryCount(int newVal)
 {
     m_maxRtpRetryCount->setValue(newVal);
+}
+
+bool QnGlobalSettings::sequentialFlirOnvifSearcherEnabled() const
+{
+    return m_sequentialFlirOnvifSearcherEnabledAdaptor->value();
+}
+
+void QnGlobalSettings::setSequentialFlirOnvifSearcherEnabled(bool newVal)
+{
+    m_sequentialFlirOnvifSearcherEnabledAdaptor->setValue(newVal);
 }
 
 int QnGlobalSettings::rtpFrameTimeoutMs() const

@@ -19,11 +19,13 @@ bool IsolatedStreamReaderResource::hasProperty(const QString &key) const
 
 QString IsolatedStreamReaderResource::getProperty(const QString &key) const
 {
-    QnMutexLocker lock(&m_propertyMutex);
-    auto propertyValue = m_properties.find(key);
+    {
+        QnMutexLocker lock(&m_propertyMutex);
+        auto propertyValue = m_properties.find(key);
 
-    if (propertyValue != m_properties.end())
-        return propertyValue->second;
+        if (propertyValue != m_properties.end())
+            return propertyValue->second;
+    }
 
     auto resType = qnResTypePool->getResourceType(getTypeId());
     if (resType)

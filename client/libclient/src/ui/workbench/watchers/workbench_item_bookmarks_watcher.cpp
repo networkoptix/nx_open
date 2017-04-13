@@ -184,10 +184,13 @@ void QnWorkbenchItemBookmarksWatcher::WidgetData::updatePos(qint64 posMs)
     if (m_posMs == posMs)
         return; /* Really should never get here. */
 
-    bool updateRequired = (m_posMs == DATETIME_INVALID) || (qAbs(m_posMs - posMs) >= kMinPositionChangeMs);
-    m_posMs = posMs;
+    const bool updateRequired = (m_posMs == DATETIME_INVALID)
+        || (qAbs(m_posMs - posMs) >= kMinPositionChangeMs);
+
     if (!updateRequired)
         return;
+
+    m_posMs = posMs;
 
     updateBookmarksAtPosition();
     updateQueryFilter();

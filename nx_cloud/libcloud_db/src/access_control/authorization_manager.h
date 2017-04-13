@@ -6,7 +6,7 @@
 #ifndef cloud_db_authorization_manager_h
 #define cloud_db_authorization_manager_h
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 
 #include "managers/managers_types.h"
 #include "auth_types.h"
@@ -38,11 +38,11 @@ public:
         \note This method cannot block
     */
     bool authorize(
-        const stree::AbstractResourceReader& authenticationProperties,
-        const stree::AbstractResourceReader& dataToAuthorize,
+        const nx::utils::stree::AbstractResourceReader& authenticationProperties,
+        const nx::utils::stree::AbstractResourceReader& dataToAuthorize,
         EntityType requestedEntity,
         DataActionType requestedAction,
-        stree::AbstractResourceWriter* const authzInfo ) const;
+        nx::utils::stree::AbstractResourceWriter* const authzInfo ) const;
 
 private:
     const StreeManager& m_stree;

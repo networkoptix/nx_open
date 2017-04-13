@@ -1,10 +1,4 @@
-/**********************************************************
-* 21 jan 2014
-* a.kolesnikov
-***********************************************************/
-
-#ifndef BASE_EC2_CONNECTION_H
-#define BASE_EC2_CONNECTION_H
+#pragma once
 
 #include <memory>
 
@@ -19,6 +13,7 @@
 #include "managers/business_event_manager.h"
 #include "managers/camera_manager.h"
 #include "managers/layout_manager.h"
+#include <managers/layout_tour_manager.h>
 #include "managers/license_manager.h"
 #include "managers/stored_file_manager.h"
 #include "managers/media_server_manager.h"
@@ -56,6 +51,7 @@ namespace ec2
         virtual AbstractBusinessEventManagerPtr getBusinessEventManager(const Qn::UserAccessData &userAccessData) override;
         virtual AbstractUserManagerPtr getUserManager(const Qn::UserAccessData &userAccessData) override;
         virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserAccessData &userAccessData) override;
+        virtual AbstractLayoutTourManagerPtr getLayoutTourManager(const Qn::UserAccessData& userAccessData) override;
         virtual AbstractVideowallManagerPtr getVideowallManager(const Qn::UserAccessData &userAccessData) override;
         virtual AbstractWebPageManagerPtr getWebPageManager(const Qn::UserAccessData &userAccessData) override;
         virtual AbstractStoredFileManagerPtr getStoredFileManager(const Qn::UserAccessData &userAccessData) override;
@@ -72,6 +68,7 @@ namespace ec2
         virtual AbstractBusinessEventNotificationManagerPtr getBusinessEventNotificationManager() override;
         virtual AbstractUserNotificationManagerPtr getUserNotificationManager() override;
         virtual AbstractLayoutNotificationManagerPtr getLayoutNotificationManager() override;
+        virtual AbstractLayoutTourNotificationManagerPtr getLayoutTourNotificationManager() override;
         virtual AbstractWebPageNotificationManagerPtr getWebPageNotificationManager() override;
         virtual AbstractDiscoveryNotificationManagerPtr getDiscoveryNotificationManager() override;
         virtual AbstractMiscNotificationManagerPtr getMiscNotificationManager() override;
@@ -92,8 +89,7 @@ namespace ec2
         virtual void deleteRemotePeer(const QUrl& url) override;
 
         QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
-        virtual ECConnectionNotificationManager* notificationManager() override
-        { return m_notificationManager.get(); }
+        virtual ECConnectionNotificationManager* notificationManager() override;
         ECConnectionAuditManager* auditManager() { return m_auditManager.get(); }
 
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
@@ -109,6 +105,7 @@ namespace ec2
         QnUserNotificationManagerPtr m_userNotificationManager;
         QnBusinessEventNotificationManagerPtr m_businessEventNotificationManager;
         QnLayoutNotificationManagerPtr m_layoutNotificationManager;
+        QnLayoutTourNotificationManagerPtr m_layoutTourNotificationManager;
         QnVideowallNotificationManagerPtr m_videowallNotificationManager;
         QnWebPageNotificationManagerPtr m_webPageNotificationManager;
         QnStoredFileNotificationManagerPtr m_storedFileNotificationManager;
@@ -120,5 +117,3 @@ namespace ec2
         std::unique_ptr<ECConnectionAuditManager> m_auditManager;
     };
 }
-
-#endif  //BASE_EC2_CONNECTION_H

@@ -63,7 +63,7 @@ class Vagrant(object):
 
     def destroy_all_boxes(self, boxes_config=None):
         if boxes_config is not None:
-            log.info('Destroying old boxes: %s', ', '.join(config.vm_box_name() for config in boxes_config))
+            log.info('Destroying old boxes: %s', ', '.join(config.vm_box_name for config in boxes_config))
             self._write_vagrantfile(boxes_config)
             self._vagrant.destroy()
         else:
@@ -81,10 +81,10 @@ class Vagrant(object):
         for config in boxes_config:
             if not config.is_allocated:
                 continue
-            status = box2status[config.box_name()]
+            status = box2status[config.box_name]
             self._copy_required_files_to_vagrant_dir(config)
             if config.must_be_recreated and status != 'not created':
-                self._vagrant.destroy(config.box_name())
+                self._vagrant.destroy(config.box_name)
                 status = 'not created'
             if status != 'running':
                 self._start_box(config)
@@ -100,12 +100,12 @@ class Vagrant(object):
             self._vm_host.put_file(file_path, self._vagrant_dir)
 
     def _init_box(self, config):
-        self.boxes[config.box_name()] = VagrantBox(self, config)
+        self.boxes[config.box_name] = VagrantBox(self, config)
 
     def _start_box(self, config):
-        box_name = config.box_name()
-        log.info('Starting/creating box: %r, vm %r...', box_name, config.vm_box_name())
-        self._cleanup_vms(config.vm_box_name())
+        box_name = config.box_name
+        log.info('Starting/creating box: %r, vm %r...', box_name, config.vm_box_name)
+        self._cleanup_vms(config.vm_box_name)
         self._vagrant.up(vm_name=box_name)
         self._write_box_ssh_config(box_name)
         self.box_host(box_name, 'vagrant').run_command(['sudo', 'cp', '-r', '/home/vagrant/.ssh', '/root/'])
@@ -151,7 +151,7 @@ class VagrantBox(object):
     def __init__(self, vagrant, config):
         self._vagrant = vagrant
         self.config = config
-        self.name = config.box_name()
+        self.name = config.box_name
         self.timezone = None
         self.servers = []
         self.host = self._vagrant.box_host(self.name, 'root')

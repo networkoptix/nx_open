@@ -6,7 +6,7 @@
 #ifndef CDB_AUTH_DATA_H
 #define CDB_AUTH_DATA_H
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 
 #include <cloud_db_client/src/data/auth_data.h>
 
@@ -18,10 +18,10 @@ namespace data {
 class AuthRequest
 :
     public api::AuthRequest,
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
-    //!Implementation of \a stree::AbstractResourceReader::getAsVariant
+    //!Implementation of \a nx::utils::stree::AbstractResourceReader::getAsVariant
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
 };
 

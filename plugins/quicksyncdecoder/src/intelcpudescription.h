@@ -19,7 +19,7 @@
 */
 class IntelCPUDescription
 :
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
     IntelCPUDescription();
