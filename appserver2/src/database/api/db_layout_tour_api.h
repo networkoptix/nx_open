@@ -17,20 +17,20 @@ namespace api {
 bool fetchLayoutTours(const QSqlDatabase& database, ApiLayoutTourDataList& tours);
 
 /**
-* Add or update layout.
+* Add or update layout tour.
 * @param in database Target database.
-* @param in layout Layout api data.
+* @param in layout Tour api data.
 * @returns True if operation was successful, false otherwise.
 */
-//bool saveLayout(const QSqlDatabase& database, const ApiLayoutData& layout);
+bool saveLayoutTour(const QSqlDatabase& database, const ApiLayoutTourData& tour);
 
 /**
 * Remove layout.
 * @param in database Target database.
-* @param in guid Layout id.
+* @param in guid Tour id.
 * @returns True if operation was successful, false otherwise.
 */
-//bool removeLayout(const QSqlDatabase& database, const QnUuid& id);
+bool removeLayoutTour(const QSqlDatabase& database, const QnUuid& id);
 
 } // namespace api
 } // namespace database

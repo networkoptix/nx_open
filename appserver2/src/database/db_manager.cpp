@@ -2250,12 +2250,16 @@ ErrorCode QnDbManager::saveLayout(const ApiLayoutData& params)
 
 ec2::ErrorCode QnDbManager::removeLayoutTour(const QnUuid& id)
 {
-    return ErrorCode::notImplemented;
+    if (!database::api::removeLayoutTour(m_sdb, params))
+        return ErrorCode::dbError;
+    return ErrorCode::ok;
 }
 
 ec2::ErrorCode QnDbManager::saveLayoutTour(const ApiLayoutTourData& params)
 {
-    return ErrorCode::notImplemented;
+    if (!database::api::saveLayoutTour(m_sdb, params))
+        return ErrorCode::dbError;
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLayoutData>& tran)

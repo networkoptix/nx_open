@@ -12,12 +12,106 @@ namespace ec2 {
 
 struct ApiLayoutTourItemWithRefData: ApiLayoutTourItemData
 {
+    ApiLayoutTourItemWithRefData(){}
+
+    ApiLayoutTourItemWithRefData(const ApiLayoutTourItemData& item, const QnUuid& tourId):
+        ApiLayoutTourItemData(item),
+        tourId(tourId)
+    {
+    }
+
     QnUuid tourId;
 };
 #define ApiLayoutTourItemWithRefData_Fields ApiLayoutTourItemData_Fields (tourId)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ApiLayoutTourItemWithRefData, (sql_record),
     ApiLayoutTourItemWithRefData_Fields)
+
+namespace {
+
+bool insertOrReplaceTour(const QSqlDatabase& database, const ApiLayoutTourData& tour)
+{
+    QSqlQuery query(database);
+    const QString queryStr(R"sql(
+        INSERT OR REPLACE
+        INTO vms_layout_tours
+        (
+            id,
+            name
+        ) VALUES (
+            :id,
+            :name
+        )
+    )sql");
+
+    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return false;
+
+    QnSql::bind(tour, &query);
+    return QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO);
+}
+
+bool removeTourInternal(const QSqlDatabase& database, const QnUuid& tourId)
+{
+    const QString queryStr(R"sql(
+        DELETE FROM vms_layout_tours WHERE id = ?
+    )sql");
+
+    QSqlQuery query(database);
+    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return false;
+
+    query.addBindValue(tourId.toRfc4122());
+    return QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO);
+}
+
+bool removeItems(const QSqlDatabase& database, const QnUuid& tourId)
+{
+    const QString queryStr(R"sql(
+        DELETE FROM vms_layout_tour_items WHERE tourId = ?
+    )sql");
+
+    QSqlQuery query(database);
+    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return false;
+
+    query.addBindValue(tourId.toRfc4122());
+    return QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO);
+}
+
+bool updateItems(const QSqlDatabase& database, const ApiLayoutTourData& tour)
+{
+    if (!removeItems(database, tour.id))
+        return false;
+
+    QSqlQuery query(database);
+    const QString queryStr(R"sql(
+        INSERT INTO vms_layout_tour_items (
+            tourId,
+            layoutId,
+            delayMs
+        ) VALUES (
+            :tourId,
+            :layoutId,
+            :delayMs
+        )
+    )sql");
+
+    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return false;
+
+    for (const ApiLayoutTourItemData& item: tour.items)
+    {
+        ApiLayoutTourItemWithRefData ref(item, tour.id);
+        QnSql::bind(ref, &query);
+        if (!QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO))
+            return false;
+    }
+
+    return true;
+}
+
+} // namespace
 
 namespace database {
 namespace api {
@@ -65,9 +159,25 @@ bool fetchLayoutTours(const QSqlDatabase& database, ApiLayoutTourDataList& tours
         tours,
         items,
         &ApiLayoutTourData::items,
-        &ApiLayoutTourItemWithRefData::layoutId);
+        &ApiLayoutTourItemWithRefData::tourId);
 
     return true;
+}
+
+bool saveLayoutTour(const QSqlDatabase& database, const ApiLayoutTourData& tour)
+{
+    if (!insertOrReplaceTour(database, tour))
+        return false;
+
+    return updateItems(database, tour);
+}
+
+bool removeLayoutTour(const QSqlDatabase& database, const QnUuid& id)
+{
+    if (!removeItems(database, id))
+        return false;
+
+    return removeTourInternal(database, id);
 }
 
 } // namespace api
