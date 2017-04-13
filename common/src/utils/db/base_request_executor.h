@@ -6,7 +6,7 @@
 #include <nx/utils/thread/sync_queue_with_item_stay_timeout.h>
 
 #include <nx/utils/thread/joinable.h>
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/stoppable.h>
 #include <utils/common/threadqueue.h>
 

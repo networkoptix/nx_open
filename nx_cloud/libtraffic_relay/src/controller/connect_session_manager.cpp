@@ -1,6 +1,7 @@
 #include "connect_session_manager.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/uuid.h>
 
 #include "../model/client_session_pool.h"
 #include "../model/listening_peer_pool.h"
@@ -30,8 +31,15 @@ void ConnectSessionManager::beginListening(
 
     NX_LOGX(lm("beginListening. peerName %1").arg(request.peerName), cl_logDEBUG2);
 
-     // TODO: #ak Check if there are already too many connections from that peer.
-     //   m_settings.listeningPeer().maxPreemptiveConnectionCount;
+    if (m_listeningPeerPool->getConnectionCountByPeerName(request.peerName) >=
+        (std::size_t)m_settings.listeningPeer().maxPreemptiveConnectionCount)
+    {
+        completionHandler(
+            api::ResultCode::preemptiveConnectionCountAtMaximum,
+            api::BeginListeningResponse(),
+            nx_http::ConnectionEvents());
+        return;
+    }
 
     api::BeginListeningResponse response;
     response.preemptiveConnectionCount =
@@ -49,10 +57,14 @@ void ConnectSessionManager::beginListening(
 }
 
 void ConnectSessionManager::createClientSession(
-    const api::CreateClientSessionRequest& /*request*/,
-    CreateClientSessionHandler /*completionHandler*/)
+    const api::CreateClientSessionRequest& request,
+    CreateClientSessionHandler completionHandler)
 {
-    // TODO
+    api::CreateClientSessionResponse response;
+    response.sessionTimeout = m_settings.connectingPeer().connectSessionIdleTimeout;
+    response.sessionId = m_clientSessionPool->addSession(
+        request.desiredSessionId, request.targetPeerName);
+    completionHandler(api::ResultCode::ok, std::move(response));
 }
 
 void ConnectSessionManager::connectToPeer(

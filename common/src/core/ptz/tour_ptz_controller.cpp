@@ -4,7 +4,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <nx/fusion/serialization/json_functions.h>
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 
 #include <api/resource_property_adaptor.h>
 

@@ -2,6 +2,8 @@
 
 #include <QtCore/QStandardPaths>
 
+#include <nx/utils/timer_manager.h>
+
 #include <utils/common/app_info.h>
 
 #include "libtraffic_relay_app_info.h"
@@ -36,6 +38,14 @@ const QLatin1String kMaxPreemptiveConnectionCount(
 constexpr int kDefaultMaxPreemptiveConnectionCount = 
     kDefaultRecommendedPreemptiveConnectionCount * 2;
 
+//-------------------------------------------------------------------------------------------------
+// ConnectingPeer
+
+const QLatin1String kConnectSessionIdleTimeout(
+    "connectingPeer/connectSessionIdleTimeout");
+constexpr std::chrono::seconds kDefaultConnectSessionIdleTimeout = 
+    std::chrono::minutes(10);
+
 } // namespace
 
 static const QString kModuleName = lit("traffic_relay");
@@ -49,6 +59,11 @@ Http::Http():
 ListeningPeer::ListeningPeer():
     recommendedPreemptiveConnectionCount(kDefaultRecommendedPreemptiveConnectionCount),
     maxPreemptiveConnectionCount(kDefaultMaxPreemptiveConnectionCount)
+{
+}
+
+ConnectingPeer::ConnectingPeer():
+    connectSessionIdleTimeout(kDefaultConnectSessionIdleTimeout)
 {
 }
 
@@ -110,6 +125,11 @@ const ListeningPeer& Settings::listeningPeer() const
     return m_listeningPeer;
 }
 
+const ConnectingPeer& Settings::connectingPeer() const
+{
+    return m_connectingPeer;
+}
+
 const Http& Settings::http() const
 {
     return m_http;
@@ -120,6 +140,7 @@ void Settings::loadSettings()
     m_logging.load(m_settings, QLatin1String("log"));
     loadHttp();
     loadListeningPeer();
+    loadConnectingPeer();
 }
 
 void Settings::loadHttp()
@@ -150,6 +171,14 @@ void Settings::loadListeningPeer()
     m_listeningPeer.maxPreemptiveConnectionCount = m_settings.value(
         kMaxPreemptiveConnectionCount,
         kDefaultMaxPreemptiveConnectionCount).toInt();
+}
+
+void Settings::loadConnectingPeer()
+{
+    m_connectingPeer.connectSessionIdleTimeout = 
+        nx::utils::parseTimerDurationTyped(
+            m_settings.value(kConnectSessionIdleTimeout).toString(),
+            kDefaultConnectSessionIdleTimeout);
 }
 
 } // namespace conf

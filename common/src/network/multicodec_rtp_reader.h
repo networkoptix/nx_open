@@ -13,7 +13,7 @@
 #include <nx/streaming/media_data_packet.h>
 #include <utils/camera/camera_diagnostics.h>
 #include <nx/utils/thread/stoppable.h>
-#include <utils/common/safe_direct_connection.h>
+#include <nx/utils/safe_direct_connection.h>
 
 #include <nx/streaming/rtsp_client.h>
 

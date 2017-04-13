@@ -30,6 +30,13 @@ struct ListeningPeer
     ListeningPeer();
 };
 
+struct ConnectingPeer
+{
+    std::chrono::seconds connectSessionIdleTimeout;
+
+    ConnectingPeer();
+};
+
 class Settings:
     public nx::utils::AbstractServiceSettings
 {
@@ -47,6 +54,7 @@ public:
     virtual utils::log::Settings logging() const override;
 
     const ListeningPeer& listeningPeer() const;
+    const ConnectingPeer& connectingPeer() const;
     const Http& http() const;
 
 private:
@@ -54,12 +62,14 @@ private:
     QnSettings m_settings;
     bool m_showHelpRequested;
     utils::log::Settings m_logging;
-    ListeningPeer m_listeningPeer;
     Http m_http;
+    ListeningPeer m_listeningPeer;
+    ConnectingPeer m_connectingPeer;
 
     void loadSettings();
     void loadHttp();
     void loadListeningPeer();
+    void loadConnectingPeer();
 };
 
 } // namespace conf

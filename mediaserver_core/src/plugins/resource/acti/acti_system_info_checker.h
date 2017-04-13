@@ -2,7 +2,7 @@
 
 #include "acti_resource.h"
 
-#include <utils/common/safe_direct_connection.h>
+#include <nx/utils/safe_direct_connection.h>
 #include <utils/common/hash.h>
 
 #ifdef ENABLE_ACTI

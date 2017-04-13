@@ -1,7 +1,7 @@
 #include "multicast_http_ut.h"
 #include "media_server_process.h"
 #include "platform/platform_abstraction.h"
-#include "utils/common/long_runnable.h"
+#include "nx/utils/thread/long_runnable.h"
 #include "media_server/media_server_module.h"
 #include "core/multicast/multicast_http_client.h"
 #include "nx/network/socket_global.h"

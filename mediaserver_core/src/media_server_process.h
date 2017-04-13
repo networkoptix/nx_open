@@ -17,7 +17,7 @@
 #include "platform/monitoring/global_monitor.h"
 #include <platform/platform_abstraction.h>
 
-#include "utils/common/long_runnable.h"
+#include "nx/utils/thread/long_runnable.h"
 #include "nx_ec/impl/ec_api_impl.h"
 #include "utils/common/public_ip_discovery.h"
 #include <nx/network/http/http_mod_manager.h>

@@ -13,7 +13,7 @@
 #include <nx/network/http/httptypes.h>
 #include <nx/network/rtsp/rtsp_types.h>
 #include "resource_consumer.h"
-#include "utils/common/long_runnable.h"
+#include "nx/utils/thread/long_runnable.h"
 #include <utils/crypt/symmetrical.h>
 
 #include <recording/time_period_list.h>

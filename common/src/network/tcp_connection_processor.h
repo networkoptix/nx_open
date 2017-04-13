@@ -4,7 +4,7 @@
 
 #include <common/common_module_aware.h>
 
-#include "utils/common/long_runnable.h"
+#include "nx/utils/thread/long_runnable.h"
 #include <nx/network/socket.h>
 #include "utils/common/byte_array.h"
 #include "api/model/audit/auth_session.h"

@@ -5,7 +5,7 @@
 
 #include <QtNetwork/QNetworkInterface>
 
-#include "utils/common/long_runnable.h"
+#include "nx/utils/thread/long_runnable.h"
 
 #include <nx/network/http/httptypes.h>
 #include <nx/network/abstract_socket.h>

@@ -8,7 +8,8 @@
 
 #include "file.h"
 
-#include "../common/long_runnable.h"
+#include <nx/utils/thread/long_runnable.h>
+
 #include "../common/threadqueue.h"
 
 
@@ -18,8 +19,7 @@ class WriteFileTask;
 class CloseFileTask;
 class AsyncStatTask;
 
-class AsyncFileProcessor
-:
+class AsyncFileProcessor:
     public QnLongRunnable
 {
 public:

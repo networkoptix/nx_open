@@ -6,7 +6,7 @@
 #include <random>
 #include <unordered_map>
 
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 #include <utils/common/writer_pool.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource_management/resource_pool.h>

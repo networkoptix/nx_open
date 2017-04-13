@@ -2,8 +2,9 @@
 
 #include <map>
 
+#include <nx/utils/thread/long_runnable.h>
+
 #include <utils/common/event_loop.h>
-#include "long_runnable.h"
 
 /**
  * This helper class stops threads asynchronously.
