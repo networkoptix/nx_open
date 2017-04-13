@@ -25,7 +25,7 @@
 */
 class D3DGraphicsAdapterDescription
 :
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
     /*!

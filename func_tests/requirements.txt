@@ -11,3 +11,4 @@ netaddr
 hachoir-core
 hachoir-parser
 hachoir-metadata
+pytest-instafail

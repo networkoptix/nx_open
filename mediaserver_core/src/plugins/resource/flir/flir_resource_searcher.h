@@ -1,7 +1,6 @@
-#ifndef FLIR_RESOURCE_SERACHER_H
-#define FLIR_RESOURCE_SERACHER_H
+#pragma once
 
-#ifdef ENABLE_ONVIF
+#ifdef ENABLE_FLIR
 
 #include "../mdns/mdns_resource_searcher.h"
 #include "flir_eip_data.h"
@@ -50,5 +49,4 @@ private:
 
 };
 
-#endif // #ifdef ENABLE_ONVIF
-#endif // FLIR_RESOURCE_SERACHER_H
+#endif // #ifdef ENABLE_FLIR

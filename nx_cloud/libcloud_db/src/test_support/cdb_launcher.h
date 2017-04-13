@@ -15,7 +15,7 @@
 #include <utils/db/test_support/test_with_db_helper.h>
 #include <utils/db/types.h>
 
-#include "cloud_db_process_public.h"
+#include "cloud_db_service_public.h"
 #include "managers/email_manager.h"
 
 namespace nx {
@@ -29,7 +29,7 @@ public:
 };
 
 class CdbLauncher:
-    public utils::test::ModuleLauncher<CloudDBProcessPublic>,
+    public utils::test::ModuleLauncher<CloudDbServicePublic>,
     public db::test::TestWithDbHelper
 {
 public:

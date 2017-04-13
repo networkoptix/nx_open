@@ -141,9 +141,32 @@ Settings::Settings():
     initializeWithDefaultValues();
 }
 
-bool Settings::showHelp() const
+void Settings::load(int argc, const char **argv)
+{
+    m_commandLineParser.parse(argc, argv, stderr);
+    m_settings.parseArgs(argc, argv);
+
+    loadConfiguration();
+}
+
+bool Settings::isShowHelpRequested() const
 {
     return m_showHelp;
+}
+
+void Settings::printCmdLineArgsHelp()
+{
+    //TODO #ak
+}
+
+QString Settings::dataDir() const
+{
+    return m_general.dataDir;
+}
+
+nx::utils::log::Settings Settings::logging() const
+{
+    return m_logging;
 }
 
 const General& Settings::general() const
@@ -171,11 +194,6 @@ const ConnectionParameters& Settings::connectionParameters() const
     return m_connectionParameters;
 }
 
-const nx::utils::log::Settings& Settings::logging() const
-{
-    return m_logging;
-}
-
 const nx::db::ConnectionOptions& Settings::dbConnectionOptions() const
 {
     return m_dbConnectionOptions;
@@ -184,19 +202,6 @@ const nx::db::ConnectionOptions& Settings::dbConnectionOptions() const
 const Statistics& Settings::statistics() const
 {
     return m_statistics;
-}
-
-void Settings::load(int argc, const char **argv)
-{
-    m_commandLineParser.parse(argc, argv, stderr);
-    m_settings.parseArgs(argc, argv);
-
-    loadConfiguration();
-}
-
-void Settings::printCmdLineArgsHelp()
-{
-    //TODO #ak
 }
 
 void Settings::fillSupportedCmdParameters()

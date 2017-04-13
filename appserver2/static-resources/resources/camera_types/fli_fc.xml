@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<resources>
+    <oem name = "FLIR_FC">
+    <resource name="FLIR_FC_COMMON" id="dd016c15-99da-4707-8658-23e136ae7622" type="Camera"/>
+    <resource name = "FLIR_FC" public="FLIR_FC_COMMON">
+        <params>
+            <param name = "MaxFPS" default_value="30"/>
+            <param name = "supportedMotion" default_value="softwaregrid"/>
+        </params>
+    </resource>
+    </oem>
+</resources>

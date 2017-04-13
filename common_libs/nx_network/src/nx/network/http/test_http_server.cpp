@@ -29,7 +29,7 @@ void TestAuthenticationManager::authenticate(
     else
     {
         completionHandler(
-            true, stree::ResourceContainer(), boost::none, nx_http::HttpHeaders(), nullptr);
+            true, nx::utils::stree::ResourceContainer(), boost::none, nx_http::HttpHeaders(), nullptr);
     }
 }
 

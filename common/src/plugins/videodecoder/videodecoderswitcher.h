@@ -72,7 +72,7 @@ public:
     //!Implementation of AbstractDecoderEventReceiver::streamParamsChanged
     virtual DecoderBehaviour streamParamsChanged(
         QnAbstractVideoDecoder* decoder,
-        const stree::AbstractResourceReader& newStreamParams ) override;
+        const nx::utils::stree::AbstractResourceReader& newStreamParams ) override;
 
     /*!
         Takes ownership of \a hwDecoder

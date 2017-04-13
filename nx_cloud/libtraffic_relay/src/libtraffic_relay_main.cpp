@@ -8,9 +8,9 @@
     #include <signal.h>
 #endif
 
-#include "relay_process.h"
+#include "relay_service.h"
 
-static nx::cloud::relay::RelayProcess* serviceInstance = NULL;
+static nx::utils::Service* serviceInstance = NULL;
 
 void stopServer(int /*signal*/)
 {
@@ -38,7 +38,7 @@ int trafficRelayMain(int argc, char* argv[])
     signal(SIGTERM, stopServer);
 #endif
 
-    nx::cloud::relay::RelayProcess service(argc, argv);
+    nx::cloud::relay::RelayService service(argc, argv);
     serviceInstance = &service;
     const int result = service.exec();
 

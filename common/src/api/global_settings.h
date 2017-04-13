@@ -228,6 +228,9 @@ public:
     int maxRtpRetryCount() const;
     void setMaxRtpRetryCount(int newVal);
 
+    bool sequentialFlirOnvifSearcherEnabled() const;
+    void setSequentialFlirOnvifSearcherEnabled(bool newVal);
+
     int rtpFrameTimeoutMs() const;
     void setRtpFrameTimeoutMs(int newValue);
 
@@ -343,6 +346,7 @@ private:
     // misc adaptors
     QnResourcePropertyAdaptor<QString>* m_systemNameAdaptor;
     QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabledAdaptor;
+    QnResourcePropertyAdaptor<bool>* m_sequentialFlirOnvifSearcherEnabledAdaptor;
     QnResourcePropertyAdaptor<QString>* m_cloudHostAdaptor;
 
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizeBytes;

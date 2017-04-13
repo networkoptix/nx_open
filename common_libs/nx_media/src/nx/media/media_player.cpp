@@ -657,9 +657,10 @@ void PlayerPrivate::applyVideoQuality()
     }
     else
     {
+        // Use "auto" width for correct aspect ratio, because quality.width() is in logical pixels.
         NX_ASSERT(quality.isValid());
         archiveReader->setQuality(MEDIA_Quality_CustomResolution, /*fastSwitch*/ true,
-            QSize(/*width*/ 0, quality.height())); //< Use "auto" width.
+            QSize(/*width*/ 0, quality.height()));
     }
     at_hurryUp(); //< skip waiting for current frame
 }

@@ -7,8 +7,8 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/software_version.h>
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
-#include <plugins/videodecoder/stree/stree_manager.h>
+#include <nx/utils/stree/resourcecontainer.h>
+#include <nx/utils/stree/stree_manager.h>
 #include <utils/common/app_info.h>
 
 #include "cloud_modules_xml_sax_handler.h"
@@ -53,7 +53,7 @@ CloudModuleUrlFetcher::CloudModuleUrlFetcher(
     m_modulesXmlUrl(QnAppInfo::defaultCloudModulesXmlUrl())
 {
     NX_ASSERT(
-        m_moduleAttrName != stree::INVALID_RES_ID,
+        m_moduleAttrName != nx::utils::stree::INVALID_RES_ID,
         Q_FUNC_INFO,
         lit("Given bad cloud module name %1").arg(moduleName));
 
@@ -166,8 +166,8 @@ void CloudModuleUrlFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr client)
 
     QByteArray xmlData = client->fetchMessageBodyBuffer();
     QBuffer xmlDataSource(&xmlData);
-    std::unique_ptr<stree::AbstractNode> stree =
-        stree::StreeManager::loadStree(&xmlDataSource, m_nameset);
+    std::unique_ptr<nx::utils::stree::AbstractNode> stree =
+        nx::utils::stree::StreeManager::loadStree(&xmlDataSource, m_nameset);
     if (!stree)
     {
         return signalWaitingHandlers(
@@ -190,11 +190,11 @@ void CloudModuleUrlFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr client)
 }
 
 bool CloudModuleUrlFetcher::findModuleUrl(
-    const stree::AbstractNode& treeRoot,
+    const nx::utils::stree::AbstractNode& treeRoot,
     const int moduleAttrName,
     QUrl* const moduleUrl)
 {
-    stree::ResourceContainer inputData;
+    nx::utils::stree::ResourceContainer inputData;
     const nx::utils::SoftwareVersion productVersion(QnAppInfo::applicationVersion());
     inputData.put(
         CloudInstanceSelectionAttributeNameset::vmsVersionMajor,
@@ -218,8 +218,8 @@ bool CloudModuleUrlFetcher::findModuleUrl(
         CloudInstanceSelectionAttributeNameset::vmsCustomization,
         QnAppInfo::customizationName());
 
-    stree::ResourceContainer outputData;
-    treeRoot.get(stree::MultiSourceResourceReader(inputData, outputData), &outputData);
+    nx::utils::stree::ResourceContainer outputData;
+    treeRoot.get(nx::utils::stree::MultiSourceResourceReader(inputData, outputData), &outputData);
 
     QString foundEndpointStr;
     if (outputData.get(moduleAttrName, &foundEndpointStr))
