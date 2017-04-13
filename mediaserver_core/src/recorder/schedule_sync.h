@@ -14,7 +14,7 @@
 #include <recorder/storage_manager.h>
 #include <core/resource/server_backup_schedule.h>
 #include <nx_ec/data/api_media_server_data.h>
-#include "utils/common/long_runnable.h"
+#include "nx/utils/thread/long_runnable.h"
 #include <common/common_module_aware.h>
 
 class QnScheduleSync: public QnLongRunnable, public QnCommonModuleAware

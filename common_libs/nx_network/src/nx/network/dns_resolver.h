@@ -11,7 +11,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/system_error.h>
 
 #include "resolve/predefined_host_resolver.h"

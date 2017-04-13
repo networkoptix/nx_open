@@ -5,7 +5,7 @@
 
 #include "decoders/video/abstract_video_decoder.h"
 #include "utils/math/math.h"
-#include "utils/common/long_runnable.h"
+#include "nx/utils/thread/long_runnable.h"
 #include "utils/common/adaptive_sleep.h"
 #include <nx/utils/log/log.h>
 

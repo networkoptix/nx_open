@@ -3,19 +3,19 @@
 
 #include <atomic>
 
-#include <QtCore/QThread>
 #include <QtCore/QSharedPointer>
+#include <QtCore/QThread>
 
-#include <nx/utils/compiler_options.h>
-#include <nx/utils/singleton.h>
-#include <nx/utils/thread/semaphore.h>
 #include <nx/utils/safe_direct_connection.h>
-#include <nx/utils/thread/stoppable.h>
+#include <nx/utils/singleton.h>
+
+#include "semaphore.h"
+#include "stoppable.h"
+#include "../compiler_options.h"
 
 class QnLongRunnablePoolPrivate;
 
-class QN_EXPORT QnLongRunnable
-:
+class NX_UTILS_API QnLongRunnable:
     public QThread,
     public QnStoppable,  //QnLongRunnable::pleaseStop moved to separate interface QnStoppable since not only threads need to be stopped
     public Qn::EnableSafeDirectConnection
@@ -67,7 +67,10 @@ protected:
 };
 
 
-class QnLongRunnablePool: public QObject, public Singleton<QnLongRunnablePool> {
+class NX_UTILS_API QnLongRunnablePool:
+    public QObject,
+    public Singleton<QnLongRunnablePool>
+{
     Q_OBJECT
 public:
     QnLongRunnablePool(QObject *parent = NULL);

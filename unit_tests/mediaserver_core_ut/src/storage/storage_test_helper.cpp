@@ -1,7 +1,7 @@
 #include "storage_test_helper.h"
 
 #include "platform/platform_abstraction.h"
-#include "utils/common/long_runnable.h"
+#include "nx/utils/thread/long_runnable.h"
 #include "core/resource_management/resource_pool.h"
 #include <plugins/storage/file_storage/file_storage_resource.h>
 #include <common/common_module.h>

@@ -8,7 +8,7 @@
 #include <nx/utils/random.h>
 
 #include <nx/utils/scope_guard.h>
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 #include <utils/common/sync_call.h>
 #include <utils/common/util.h>
 

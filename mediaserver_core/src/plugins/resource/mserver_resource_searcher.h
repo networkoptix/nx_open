@@ -9,7 +9,7 @@
 #include <QtCore/QTime>
 
 #include "core/resource_management/resource_searcher.h"
-#include "utils/common/long_runnable.h"
+#include "nx/utils/thread/long_runnable.h"
 #include <nx/network/socket.h>
 #include "common/common_module_aware.h"
 

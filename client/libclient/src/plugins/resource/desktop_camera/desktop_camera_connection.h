@@ -4,7 +4,7 @@
 
 #include <client_core/connection_context_aware.h>
 
-#include "utils/common/long_runnable.h"
+#include <nx/utils/thread/long_runnable.h>
 #include "core/resource/resource_fwd.h"
 #include <nx/network/simple_http_client.h>
 #include "network/tcp_connection_processor.h"
