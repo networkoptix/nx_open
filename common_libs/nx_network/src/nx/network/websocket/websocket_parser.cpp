@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cstdint>
 #include <nx/network/websocket/websocket_parser.h>
 
 namespace nx {
@@ -16,12 +17,12 @@ Parser::Parser(Role role, ParserHandler* handler):
 {
 }
 
-Parser::BufferedState Parser::bufferDataIfNeeded(const char* data, int64_t len, int64_t neededLen)
+Parser::BufferedState Parser::bufferDataIfNeeded(const char* data, int len, int neededLen)
 {
-    if (neededLen < len - m_pos && m_buf.isEmpty())
+    if (neededLen < len && m_buf.isEmpty())
         return BufferedState::notNeeded;
 
-    auto appendLen = std::min(neededLen - (int64_t)m_buf.size(), len - m_pos);
+    auto appendLen = std::min(neededLen - (int)m_buf.size(), len);
     m_buf.append(data, appendLen);
     m_pos += appendLen;
 
@@ -31,12 +32,12 @@ Parser::BufferedState Parser::bufferDataIfNeeded(const char* data, int64_t len, 
     return BufferedState::enough;
 }
 
-void Parser::processPayload(char* data, int64_t len)
+void Parser::processPayload(char* data, int len)
 {
-    int64_t outLen = std::min(len - m_pos, m_payloadLen);
+    int outLen = std::min(len, m_payloadLen);
     if (m_masked) 
     {
-        for (int i = m_pos; i < m_pos + outLen; i++)
+        for (int i = 0; i < outLen; i++)
             data[i] = data[i] ^ ((unsigned char*)(&m_mask))[i % 4];
     }
     m_handler->framePayload(data, outLen);
@@ -53,8 +54,8 @@ void Parser::processPayload(char* data, int64_t len)
 
 void Parser::processPart(
     char* data, 
-    int64_t len, 
-    int64_t neededLen,
+    int len, 
+    int neededLen,
     ParseState nextState,
     void (Parser::*processFunc)(char* data))
 {
@@ -75,7 +76,7 @@ void Parser::processPart(
     }
 }
 
-void Parser::parse(char* data, int64_t len)
+void Parser::parse(char* data, int len)
 {
     switch (m_state)
     {
@@ -101,11 +102,11 @@ void Parser::parse(char* data, int64_t len)
     }
 }
 
-void Parser::consume(char* data, int64_t len)
+void Parser::consume(char* data, int len)
 {
     m_pos = 0;
     while (m_pos < len)
-        parse(data + m_pos, len);
+        parse(data + m_pos, len - m_pos);
 }
 
 void Parser::setRole(Role role)

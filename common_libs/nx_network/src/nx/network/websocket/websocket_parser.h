@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstdint>
 #include <nx/network/buffer.h>
 #include <nx/network/websocket/websocket_common_types.h>
 
@@ -12,7 +11,7 @@ class ParserHandler
 {
 public:
     virtual void frameStarted(FrameType type, bool fin) = 0;
-    virtual void framePayload(const char* data, int64_t len) = 0;
+    virtual void framePayload(const char* data, int len) = 0;
     virtual void frameEnded() = 0;
     virtual void messageEnded() = 0;
     virtual void handleError(Error err) = 0;
@@ -37,29 +36,29 @@ class NX_NETWORK_API Parser
     const int kFixedHeaderLen = 2;
 public:
     Parser(Role role, ParserHandler* handler);
-    void consume(char* data, int64_t len);
+    void consume(char* data, int len);
     void setRole(Role role);
 
 private:
-    void parse(char* data, int64_t len);
+    void parse(char* data, int len);
     void processPart(
         char* data, 
-        int64_t len, 
-        int64_t neededLen, 
+        int len, 
+        int neededLen, 
         ParseState nextState,
         void (Parser::*processFunc)(char* data));
-    void processPayload(char* data, int64_t len);
+    void processPayload(char* data, int len);
     void reset();
     void readHeaderFixed(char* data);
     void readHeaderExtension(char* data);
-    BufferedState bufferDataIfNeeded(const char* data, int64_t len, int64_t neededLen);
+    BufferedState bufferDataIfNeeded(const char* data, int len, int neededLen);
 
 private:
     ParserHandler* m_handler;
     nx::Buffer m_buf;
     ParseState m_state = ParseState::readingHeaderFixedPart;
-    int64_t m_pos = 0;
-    int64_t m_payloadLen = 0;
+    int m_pos = 0;
+    int m_payloadLen = 0;
     Role m_role = Role::undefined;
 
     int m_headerExtLen;
