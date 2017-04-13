@@ -28,6 +28,7 @@ BaseEc2Connection<QueryProcessorType>::BaseEc2Connection(
     m_userNotificationManager(new QnUserNotificationManager),
     m_businessEventNotificationManager(new QnBusinessEventNotificationManager),
     m_layoutNotificationManager(new QnLayoutNotificationManager),
+    m_layoutTourNotificationManager(new QnLayoutTourNotificationManager),
     m_videowallNotificationManager(new QnVideowallNotificationManager),
     m_webPageNotificationManager(new QnWebPageNotificationManager),
     m_storedFileNotificationManager(new QnStoredFileNotificationManager),
