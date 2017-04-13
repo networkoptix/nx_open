@@ -409,12 +409,16 @@ QnConstResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
             m_videoLayout->setChannels(m_metadata.videoLayoutChannels);
         }
 
-        if (QnMediaResourcePtr mediaRes = m_resource.dynamicCast<QnMediaResource>())
+        //TODO: #rvasilenko why do we create resource and read all metadata when simply reading chunks?
+        if (m_resource->commonModule())
         {
-            if (m_metadata.dewarpingParams != QnMediaDewarpingParams())
-                mediaRes->setDewarpingParams(m_metadata.dewarpingParams);
-            if (!qFuzzyIsNull(m_metadata.overridenAr))
-                mediaRes->setCustomAspectRatio(m_metadata.overridenAr);
+            if (QnMediaResourcePtr mediaRes = m_resource.dynamicCast<QnMediaResource>())
+            {
+                if (m_metadata.dewarpingParams != QnMediaDewarpingParams())
+                    mediaRes->setDewarpingParams(m_metadata.dewarpingParams);
+                if (!qFuzzyIsNull(m_metadata.overridenAr))
+                    mediaRes->setCustomAspectRatio(m_metadata.overridenAr);
+            }
         }
 
         if (m_useAbsolutePos)
