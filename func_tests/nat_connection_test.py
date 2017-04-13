@@ -1,6 +1,8 @@
 import logging
 import pytest
-import datetime
+from datetime import datetime
+from test_utils.server import TimePeriod
+import pytz
 
 
 log = logging.getLogger(__name__)
@@ -56,19 +58,32 @@ def test_merged_servers_should_return_same_results_to_certain_api_calls(env):
         assert result_one == result_two
 
 
+def assert_both_servers_are_online(env):
+    server_guids = [env.one.ecs_guid, env.two.ecs_guid]
+    for server in [env.one, env.two]:
+        online_servers = [s for s in server.rest_api.ec2.getMediaServersEx.GET()
+                          if s['status'] == 'Online' and s['id'] in server_guids]
+        assert len(online_servers) == 2, "'%r' has only %d online servers" % (
+            server.box, len(online_servers))
+
+
 @pytest.mark.parametrize('http_schema', ['http'])
 @pytest.mark.parametrize('nat_schema', ['nat'])
 def test_proxy_requests(env):
+    assert_both_servers_are_online(env)
     direct_response_one = env.one.rest_api.api.moduleInformation.GET()
     direct_response_two = env.two.rest_api.api.moduleInformation.GET()
-    proxy_response_one = env.two.rest_api.api.moduleInformation.GET(headers={'X-server-guid': env.one.ecs_guid})
-    proxy_response_two = env.one.rest_api.api.moduleInformation.GET(headers={'X-server-guid': env.two.ecs_guid})
+    proxy_response_one = env.two.rest_api.api.moduleInformation.GET(
+        headers={'X-server-guid': env.one.ecs_guid})
+    proxy_response_two = env.one.rest_api.api.moduleInformation.GET(
+        headers={'X-server-guid': env.two.ecs_guid})
     assert direct_response_one == proxy_response_one
     assert direct_response_two == proxy_response_two
-    assert proxy_response_one == proxy_response_two
+    assert direct_response_one != direct_response_two
 
 
-def assert_server_stream(server, camera, sample_media_file, stream_type, artifact_path_prefix):
+def assert_server_stream(server, camera, sample_media_file, stream_type, artifact_path_prefix, start_time):
+    assert TimePeriod(start_time, sample_media_file.duration) in server.get_recorded_time_periods(camera)
     stream = server.get_media_stream(stream_type, camera)
     metadata_list = stream.load_archive_stream_metadata(
         '%s-stream-media-%s' % (artifact_path_prefix, stream_type),
@@ -78,15 +93,21 @@ def assert_server_stream(server, camera, sample_media_file, stream_type, artifac
         assert metadata.height == sample_media_file.height
 
 
-@pytest.mark.skip(reason="Not ready")
 @pytest.mark.parametrize('http_schema', ['http'])
 @pytest.mark.parametrize('nat_schema', ['nat'])
 def test_get_streams(env, camera, sample_media_file, stream_type):
-    # prepare media archive
-    env.one.add_camera(camera)
-    start_time = datetime(2017, 1, 27, tzinfo=pytz.utc)
-    env.one.storage.save_media_sample(camera, start_time, sample_media_file)
+    env.two.add_camera(camera)
+    start_time_1 = datetime(2017, 1, 27, tzinfo=pytz.utc)
+    env.one.storage.save_media_sample(camera, start_time_1, sample_media_file)
     env.one.rebuild_archive()
-    assert [TimePeriod(start_time, sample_media_file.duration)] == env.server.get_recorded_time_periods(camera)
-    assert_server_stream(env.one, stream, camera, sample_media_file, stream_type, env.artifact_path_prefix)
-    assert_server_stream(env.two, stream, camera, sample_media_file, stream_type, env.artifact_path_prefix)
+    start_time_2 = datetime(2017, 2, 27, tzinfo=pytz.utc)
+    env.two.storage.save_media_sample(camera, start_time_2, sample_media_file)
+    env.two.rebuild_archive()
+    assert_server_stream(
+        env.two, camera, sample_media_file, stream_type, env.artifact_path_prefix, start_time_1)
+    assert_server_stream(
+        env.one, camera, sample_media_file, stream_type, env.artifact_path_prefix, start_time_1)
+    assert_server_stream(
+        env.two, camera, sample_media_file, stream_type, env.artifact_path_prefix, start_time_2)
+    assert_server_stream(
+        env.one, camera, sample_media_file, stream_type, env.artifact_path_prefix, start_time_2)
