@@ -1,5 +1,7 @@
 customization: vmsdemoorange
 
+host: '$CLOUD_PORTAL_HOST'
+
 cloud_database:
     host: '$DB_HOST'
     port: '$DB_PORT'
@@ -41,13 +43,10 @@ languages:
     - es
     - ja
     - ko
-    - th
+    - tr
     - zh_CN
     - zh_TW
-    - vi_VN
     - hu
-    - he
-    - pt_PT
 
 queue_name: '$INSTANCE_NAME'
 

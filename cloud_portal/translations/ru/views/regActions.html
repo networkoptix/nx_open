@@ -1,7 +1,7 @@
 <ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
 <div class="auth-hidden">
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
-        Учетная запись зарегистрирована. Подтверждение отправлено на ваш Email
+        Учетная запись зарегистрирована. Подтверждение отправлено на Email <br>{{account.email}}
     </h1>
 
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && activated">
@@ -53,10 +53,10 @@
 
                 <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Пожалуйста, введите действительный адрес электронной почты.</span>
 
-                <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Этот Email уже зарегистрирован в PRODUCT_NAME.</span>
+                <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Этот Email уже зарегистрирован в {{PRODUCT_NAME}}.</span>
             </div>
         </div>
-        <password-input ng-model="account.password" id="'registerPassword'" label="'Password'"></password-input>
+        <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
         <div class="form-group" >
             <div class="col-sm-offset-4 col-sm-8">
                 <div class="checkbox">
@@ -69,7 +69,7 @@
                 <process-button process="register"
                                 form="registerForm"
                                 class="pull-left"
-                                button-text="'Create Account'"></process-button>
+                                button-text="$root.L.regActions.createAccount"></process-button>
                 <small class="conditions-note">Нажимая на кнопку "Зарегистрироваться", вы соглашаетесь <br>с <a href="/content/eula" target="_blank">условиями использования</a></small>
             </div>
         </div>

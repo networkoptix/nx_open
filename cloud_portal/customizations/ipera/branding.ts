@@ -20,7 +20,7 @@
     </message>
     <message>
       <source>{{supportLink}}</source>
-      <translation>support@flyvi.ru</translation>
+      <translation>mailto:support@flyvi.ru</translation>
     </message>
     <message>
       <source>{{supportLinkText}}</source>

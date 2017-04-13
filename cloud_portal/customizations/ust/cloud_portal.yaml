@@ -1,5 +1,7 @@
 customization: '$CUSTOMIZATION'
 
+host: '$CLOUD_PORTAL_HOST'
+
 cloud_database:
     host: '$DB_HOST'
     port: '$DB_PORT'
@@ -16,9 +18,9 @@ cloud_portal:
 cloud_gateway:
     url: 'http://$VMS_GATEWAY_HOST:$VMS_GATEWAY_PORT'
 
-mail_from: 'service@networkoptix.com'
+mail_from: 'service@ubiquitysmart.com'
 
-mail_prefix: '[DTV Cloud]'
+mail_prefix: '[VMS Cloud]'
 
 smtp:
     host: 'email-smtp.us-east-1.amazonaws.com'
@@ -41,13 +43,10 @@ languages:
     - es
     - ja
     - ko
-    - th
+    - tr
     - zh_CN
     - zh_TW
-    - vi_VN
     - hu
-    - he
-    - pt_PT 
 
 queue_name: '$INSTANCE_NAME'
 

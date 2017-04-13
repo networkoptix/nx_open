@@ -579,6 +579,11 @@ module.exports = function (grunt) {
                 options: {
                     args: {specs: ['test/e2e/customize/*spec.js']}
                 }
+            },
+            smoke: {
+                options: {
+                    args: {specs: ['test/e2e/smoke/*spec.js']}
+                }
             }
         },
         protractor_webdriver: {
@@ -641,7 +646,6 @@ module.exports = function (grunt) {
     grunt.registerTask('setbranding', function (branding) {
         var config = {customization: branding};
         grunt.file.write('config.json', JSON.stringify(config, null, 2) + '\n');
-        grunt.task.run(['build']);
     });
 
     grunt.registerTask('testallportals', function (specsuit) {
@@ -664,6 +668,7 @@ module.exports = function (grunt) {
         }
     });
 
+    // Example: grunt testportal:login:default
     grunt.registerTask('testportal', function (specsuit, brand) {
         var specsuit = specsuit || 'all';
         var customizationsArr = JSON.parse(grunt.file.read('./test-customizations.json'));

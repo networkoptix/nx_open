@@ -32,9 +32,9 @@ CUSTOMIZATION = conf['customization']
 SECRET_KEY = '03-b9bxxpjxsga(qln0@3szw3+xnu%6ph_l*sz-xr_4^xxrj!_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -71,8 +71,8 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': (
-            '/app/www/customization/{}'.format(CUSTOMIZATION), # Looks like static files used as templates
-            '/app/www/customization/{}/templates'.format(CUSTOMIZATION),
+            '/app/app/static/{}'.format(CUSTOMIZATION), # Looks like static files used as templates
+            '/app/app/static/{}/templates'.format(CUSTOMIZATION),
         ),
         'APP_DIRS': True,
         'OPTIONS': {
@@ -139,22 +139,22 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+            'format': '[%(levelname)s] %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
         },
         'simple': {
-            'format': '%(levelname)s %(message)s'
+            'format': '[%(levelname)s] %(message)s'
         },
     },
     'handlers': {
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter': 'simple'
+            'formatter': 'verbose'
         },
         'mail_admins': {
-            'level': 'ERROR',
+            'level': 'CRITICAL',
             'class': 'cloud.logger.LimitAdminEmailHandler',
-            'formatter': 'verbose'
+            'formatter': 'simple'
         },
     },
     'loggers': {
@@ -267,7 +267,7 @@ LINKS_LIVE_TIMEOUT = 300  # Five minutes
 PASSWORD_REQUIREMENTS = {
     'minLength': 8,
     'requiredRegex': re.compile("^[\x21-\x7E]|[\x21-\x7E][\x20-\x7E]*[\x21-\x7E]$"),
-    'commonList': 'static/scripts/commonPasswordsList.json'
+    'commonList': 'static/{}/static/scripts/commonPasswordsList.json'.format(CUSTOMIZATION)
 }
 
 common_list_file = PASSWORD_REQUIREMENTS['commonList']
