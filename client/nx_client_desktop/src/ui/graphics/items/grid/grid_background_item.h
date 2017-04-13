@@ -14,7 +14,7 @@
 
 class QnWorkbenchGridMapper;
 class QnGridBackgroundItemPrivate;
-class QnAppServerImageCache;
+class ServerImageCache;
 
 class QnGridBackgroundItem: public QGraphicsObject, public QnWorkbenchContextAware
 {
@@ -59,7 +59,7 @@ private slots:
     void setImage(const QImage& image);
 
 private:
-    QnAppServerImageCache* cache();
+    ServerImageCache* cache();
     void updateConnectedState();
 
     Q_DECLARE_PRIVATE(QnGridBackgroundItem)

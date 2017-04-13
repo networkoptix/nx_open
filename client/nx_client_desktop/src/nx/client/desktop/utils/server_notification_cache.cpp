@@ -1,4 +1,4 @@
-#include "app_server_notification_cache.h"
+#include "server_notification_cache.h"
 
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
@@ -15,35 +15,41 @@
 #include <utils/media/audio_player.h>
 
 namespace {
-    const QLatin1String folder("notifications");
-    const QLatin1String targetContainter("mp3");
-    const QLatin1String titleTag("Title");  //TODO: #GDM replace with database field
+
+const QLatin1String folder("notifications");
+const QLatin1String targetContainter("mp3");
+const QLatin1String titleTag("Title");  //TODO: #GDM replace with database field
+
 }
 
-QnAppServerNotificationCache::QnAppServerNotificationCache(QObject *parent) :
+namespace nx {
+namespace client {
+namespace desktop {
+
+ServerNotificationCache::ServerNotificationCache(QObject *parent) :
     base_type(folder, parent),
     m_model(new QnNotificationSoundModel(this))
 {
-    connect(qnClientMessageProcessor,   &QnClientMessageProcessor::fileAdded,                   this,   &QnAppServerNotificationCache::at_fileAddedEvent);
-    connect(qnClientMessageProcessor,   &QnClientMessageProcessor::fileUpdated,                 this,   &QnAppServerNotificationCache::at_fileUpdatedEvent);
-    connect(qnClientMessageProcessor,   &QnClientMessageProcessor::fileRemoved,                 this,   &QnAppServerNotificationCache::at_fileRemovedEvent);
-    connect(qnClientMessageProcessor,   &QnClientMessageProcessor::initialResourcesReceived,    this,   &QnAppServerNotificationCache::getFileList);
+    connect(qnClientMessageProcessor,   &QnClientMessageProcessor::fileAdded,                   this,   &ServerNotificationCache::at_fileAddedEvent);
+    connect(qnClientMessageProcessor,   &QnClientMessageProcessor::fileUpdated,                 this,   &ServerNotificationCache::at_fileUpdatedEvent);
+    connect(qnClientMessageProcessor,   &QnClientMessageProcessor::fileRemoved,                 this,   &ServerNotificationCache::at_fileRemovedEvent);
+    connect(qnClientMessageProcessor,   &QnClientMessageProcessor::initialResourcesReceived,    this,   &ServerNotificationCache::getFileList);
 
-    connect(this, &QnAppServerFileCache::fileListReceived,  this,   &QnAppServerNotificationCache::at_fileListReceived);
-    connect(this, &QnAppServerFileCache::fileDownloaded,    this,   &QnAppServerNotificationCache::at_fileAdded);
-    connect(this, &QnAppServerFileCache::fileUploaded,      this,   &QnAppServerNotificationCache::at_fileAdded);
-    connect(this, &QnAppServerFileCache::fileDeleted,       this,   &QnAppServerNotificationCache::at_fileRemoved);
+    connect(this, &ServerFileCache::fileListReceived,  this,   &ServerNotificationCache::at_fileListReceived);
+    connect(this, &ServerFileCache::fileDownloaded,    this,   &ServerNotificationCache::at_fileAdded);
+    connect(this, &ServerFileCache::fileUploaded,      this,   &ServerNotificationCache::at_fileAdded);
+    connect(this, &ServerFileCache::fileDeleted,       this,   &ServerNotificationCache::at_fileRemoved);
 }
 
-QnAppServerNotificationCache::~QnAppServerNotificationCache() {
+ServerNotificationCache::~ServerNotificationCache() {
 
 }
 
-QnNotificationSoundModel* QnAppServerNotificationCache::persistentGuiModel() const {
+QnNotificationSoundModel* ServerNotificationCache::persistentGuiModel() const {
     return m_model;
 }
 
-bool QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLengthMSecs, const QString &customTitle) {
+bool ServerNotificationCache::storeSound(const QString &filePath, int maxLengthMSecs, const QString &customTitle) {
     if (!isConnectedToServer())
         return false;
 
@@ -74,7 +80,7 @@ bool QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLe
     return transcoder->startAsync();
 }
 
-bool QnAppServerNotificationCache::updateTitle(const QString &filename, const QString &title) {
+bool ServerNotificationCache::updateTitle(const QString &filename, const QString &title) {
     if (!isConnectedToServer())
         return false;
 
@@ -90,12 +96,12 @@ bool QnAppServerNotificationCache::updateTitle(const QString &filename, const QS
     return result;
 }
 
-void QnAppServerNotificationCache::clear() {
+void ServerNotificationCache::clear() {
     base_type::clear();
     m_model->init();
 }
 
-void QnAppServerNotificationCache::at_fileAddedEvent(const QString &filename) {
+void ServerNotificationCache::at_fileAddedEvent(const QString &filename) {
     if (!isConnectedToServer())
         return;
 
@@ -112,7 +118,7 @@ void QnAppServerNotificationCache::at_fileAddedEvent(const QString &filename) {
     downloadFile(localFilename);
 }
 
-void QnAppServerNotificationCache::at_fileUpdatedEvent(const QString &filename) {
+void ServerNotificationCache::at_fileUpdatedEvent(const QString &filename) {
     if (!isConnectedToServer())
         return;
 
@@ -131,7 +137,7 @@ void QnAppServerNotificationCache::at_fileUpdatedEvent(const QString &filename) 
     downloadFile(localFilename);
 }
 
-void QnAppServerNotificationCache::at_fileRemovedEvent(const QString &filename) {
+void ServerNotificationCache::at_fileRemovedEvent(const QString &filename) {
     if (!isConnectedToServer())
         return;
 
@@ -147,7 +153,7 @@ void QnAppServerNotificationCache::at_fileRemovedEvent(const QString &filename) 
         m_model->removeRow(row);
 }
 
-void QnAppServerNotificationCache::at_soundConverted(const QString &filePath) {
+void ServerNotificationCache::at_soundConverted(const QString &filePath) {
     if (!isConnectedToServer())
         return;
 
@@ -156,7 +162,7 @@ void QnAppServerNotificationCache::at_soundConverted(const QString &filePath) {
     uploadFile(filename);
 }
 
-void QnAppServerNotificationCache::at_fileListReceived(const QStringList &filenames, OperationResult status) {
+void ServerNotificationCache::at_fileListReceived(const QStringList &filenames, OperationResult status) {
     if (status != OperationResult::ok || !isConnectedToServer())
         return;
 
@@ -166,7 +172,7 @@ void QnAppServerNotificationCache::at_fileListReceived(const QStringList &filena
     }
 }
 
-void QnAppServerNotificationCache::at_fileAdded(const QString &filename, OperationResult status) {
+void ServerNotificationCache::at_fileAdded(const QString &filename, OperationResult status) {
     if (status != OperationResult::ok || !isConnectedToServer())
         return;
 
@@ -176,7 +182,7 @@ void QnAppServerNotificationCache::at_fileAdded(const QString &filename, Operati
         m_model->updateTitle(filename, title);
 }
 
-void QnAppServerNotificationCache::at_fileRemoved(const QString &filename, OperationResult status) {
+void ServerNotificationCache::at_fileRemoved(const QString &filename, OperationResult status) {
     if (status != OperationResult::ok || !isConnectedToServer())
         return;
 
@@ -184,3 +190,7 @@ void QnAppServerNotificationCache::at_fileRemoved(const QString &filename, Opera
     if (row > 0)
         m_model->removeRow(row);
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

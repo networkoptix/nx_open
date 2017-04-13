@@ -28,8 +28,8 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/threaded_image_loader.h>
-#include <utils/app_server_image_cache.h>
-#include <utils/local_file_cache.h>
+#include <nx/client/desktop/utils/server_image_cache.h>
+#include <nx/client/desktop/utils/local_file_cache.h>
 #include <utils/common/scoped_value_rollback.h>
 
 namespace {
@@ -205,15 +205,15 @@ void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout)
     Q_D(QnLayoutSettingsDialog);
 
     m_cache = layout->isFile()
-            ? new QnLocalFileCache(this)
-            : new QnAppServerImageCache(this);
+            ? new LocalFileCache(this)
+            : new ServerImageCache(this);
 
-    connect(m_cache, &QnAppServerFileCache::fileDownloaded, this, [this](const QString &filename, QnAppServerFileCache::OperationResult status) {
-        at_imageLoaded(filename, status == QnAppServerFileCache::OperationResult::ok);
+    connect(m_cache, &ServerFileCache::fileDownloaded, this, [this](const QString &filename, ServerFileCache::OperationResult status) {
+        at_imageLoaded(filename, status == ServerFileCache::OperationResult::ok);
     });
 
-    connect(m_cache, &QnAppServerFileCache::fileUploaded, this,[this](const QString &filename, QnAppServerFileCache::OperationResult status) {
-        at_imageStored(filename, status == QnAppServerFileCache::OperationResult::ok);
+    connect(m_cache, &ServerFileCache::fileUploaded, this,[this](const QString &filename, ServerFileCache::OperationResult status) {
+        at_imageStored(filename, status == ServerFileCache::OperationResult::ok);
     });
 
     d->clear();
@@ -553,12 +553,12 @@ void QnLayoutSettingsDialog::selectFile() {
         return;
     }
 
-    if (fileInfo.size() > QnAppServerFileCache::maximumFileSize()) {
+    if (fileInfo.size() > ServerFileCache::maximumFileSize()) {
         d->state = Error;
         //TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
         //Important: maximumFileSize() is hardcoded in 1024-base
         d->errorText = braced(tr("Picture is too big. Maximum size is %1 MB")
-            .arg(QnAppServerFileCache::maximumFileSize() / (1024*1024)));
+            .arg(ServerFileCache::maximumFileSize() / (1024*1024)));
         updateControls();
         return;
     }

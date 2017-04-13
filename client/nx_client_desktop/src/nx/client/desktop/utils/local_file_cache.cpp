@@ -4,30 +4,35 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QStandardPaths>
 
-QnLocalFileCache::QnLocalFileCache(QObject *parent) :
+namespace nx {
+namespace client {
+namespace desktop {
+
+LocalFileCache::LocalFileCache(QObject* parent):
     base_type(parent)
 {
 }
 
-QnLocalFileCache::~QnLocalFileCache() {
-
+LocalFileCache::~LocalFileCache()
+{
 }
 
-QString QnLocalFileCache::getFullPath(const QString &filename) const
+QString LocalFileCache::getFullPath(const QString& filename) const
 {
     QString cachedName = filename;
     if (QDir::isAbsolutePath(filename))
-        cachedName = QnAppServerImageCache::cachedImageFilename(filename);
+        cachedName = ServerImageCache::cachedImageFilename(filename);
 
     QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     return QDir::toNativeSeparators(QString(lit("%1/cache/local/%2/%3"))
-                                    .arg(path)
-                                    .arg(folderName())
-                                    .arg(cachedName)
-                                    );
+        .arg(path)
+        .arg(folderName())
+        .arg(cachedName)
+    );
 }
 
-void QnLocalFileCache::storeImageData(const QString &fileName, const QByteArray &imageData) {
+void LocalFileCache::storeImageData(const QString& fileName, const QByteArray& imageData)
+{
     ensureCacheFolder();
     QString fullPath = getFullPath(fileName);
     if (QFileInfo(fullPath).exists())
@@ -39,7 +44,8 @@ void QnLocalFileCache::storeImageData(const QString &fileName, const QByteArray 
     file.close();
 }
 
-void QnLocalFileCache::storeImageData(const QString &fileName, const QImage &image) {
+void LocalFileCache::storeImageData(const QString& fileName, const QImage& image)
+{
     ensureCacheFolder();
     QString fullPath = getFullPath(fileName);
     if (QFileInfo(fullPath).exists())
@@ -48,7 +54,7 @@ void QnLocalFileCache::storeImageData(const QString &fileName, const QImage &ima
     image.save(fullPath);
 }
 
-void QnLocalFileCache::downloadFile(const QString &filename)
+void LocalFileCache::downloadFile(const QString& filename)
 {
     if (filename.isEmpty())
     {
@@ -68,14 +74,21 @@ void QnLocalFileCache::downloadFile(const QString &filename)
             return;
         }
 
-        cachedName = QnAppServerImageCache::cachedImageFilename(filename);
+        cachedName = ServerImageCache::cachedImageFilename(filename);
         storeImageData(cachedName, source);
     }
 
     QFileInfo info(getFullPath(cachedName));
-    emit fileDownloaded(filename, info.exists() ? OperationResult::ok : OperationResult::fileSystemError);
+    emit fileDownloaded(filename, info.exists()
+        ? OperationResult::ok
+        : OperationResult::fileSystemError);
 }
 
-void QnLocalFileCache::uploadFile(const QString &filename) {
+void LocalFileCache::uploadFile(const QString& filename)
+{
     emit fileUploaded(filename, OperationResult::ok);
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

@@ -24,7 +24,7 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/scoped_value_rollback.h>
-#include <utils/local_file_cache.h>
+#include <nx/client/desktop/utils/local_file_cache.h>
 
 namespace {
 
@@ -207,7 +207,7 @@ void QnLookAndFeelPreferencesWidget::selectBackgroundImage()
 
     qnSettings->setBackgroundsFolder(QFileInfo(originalFileName).absolutePath());
 
-    QString cachedName = QnAppServerImageCache::cachedImageFilename(originalFileName);
+    QString cachedName = ServerImageCache::cachedImageFilename(originalFileName);
     if (previousCachedName == cachedName ||
         QDir::toNativeSeparators(previousCachedName).toLower() ==
         QDir::toNativeSeparators(originalFileName).toLower())
@@ -219,8 +219,8 @@ void QnLookAndFeelPreferencesWidget::selectBackgroundImage()
     progressDialog->setInfiniteProgress();
     progressDialog->setModal(true);
 
-    auto imgCache = new QnLocalFileCache(this);
-    connect(imgCache, &QnAppServerFileCache::fileUploaded, this,
+    auto imgCache = new LocalFileCache(this);
+    connect(imgCache, &ServerFileCache::fileUploaded, this,
         [this, imgCache, progressDialog, originalFileName](const QString &storedFileName)
         {
             if (!progressDialog->wasCanceled())

@@ -30,7 +30,7 @@ QnPlaySoundBusinessActionWidget::QnPlaySoundBusinessActionWidget(QWidget *parent
 
     ui->volumeSlider->setValue(qRound(nx::audio::AudioDevice::instance()->volume() * 100));
 
-    QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
+    QnNotificationSoundModel* soundModel = context()->instance<ServerNotificationCache>()->persistentGuiModel();
     ui->pathComboBox->setModel(soundModel);
 
     connect(soundModel, SIGNAL(listLoaded()), this, SLOT(updateCurrentIndex()));
@@ -66,7 +66,7 @@ void QnPlaySoundBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *a
 void QnPlaySoundBusinessActionWidget::updateCurrentIndex() {
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
+    QnNotificationSoundModel* soundModel = context()->instance<ServerNotificationCache>()->persistentGuiModel();
     ui->pathComboBox->setCurrentIndex(soundModel->rowByFilename(m_filename));
 }
 
@@ -79,7 +79,7 @@ void QnPlaySoundBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fi
     auto params = model()->actionParams();
     if (fields & QnBusiness::ActionParamsField) {
         m_filename = params.url;
-        QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
+        QnNotificationSoundModel* soundModel = context()->instance<ServerNotificationCache>()->persistentGuiModel();
         ui->pathComboBox->setCurrentIndex(soundModel->rowByFilename(m_filename));
         ui->playToClient->setChecked(params.playToClient);
     }
@@ -89,7 +89,7 @@ void QnPlaySoundBusinessActionWidget::paramsChanged() {
     if (!model() || m_updating)
         return;
 
-    QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
+    QnNotificationSoundModel* soundModel = context()->instance<ServerNotificationCache>()->persistentGuiModel();
     if (!soundModel->loaded())
         return;
 
@@ -104,7 +104,7 @@ void QnPlaySoundBusinessActionWidget::enableTestButton() {
 }
 
 void QnPlaySoundBusinessActionWidget::at_testButton_clicked() {
-    QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
+    QnNotificationSoundModel* soundModel = context()->instance<ServerNotificationCache>()->persistentGuiModel();
     if (!soundModel->loaded())
         return;
 
@@ -113,7 +113,7 @@ void QnPlaySoundBusinessActionWidget::at_testButton_clicked() {
     if (soundUrl.isEmpty())
         return;
 
-    QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(soundUrl);
+    QString filePath = context()->instance<ServerNotificationCache>()->getFullPath(soundUrl);
     if (!QFileInfo(filePath).exists())
         return;
 

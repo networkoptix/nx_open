@@ -7,12 +7,16 @@
 
 #include <nx_ec/ec_api.h>
 
-class QnAppServerFileCache : public QObject, public QnConnectionContextAware
+namespace nx {
+namespace client {
+namespace desktop {
+
+class ServerFileCache : public QObject, public QnConnectionContextAware
 {
     Q_OBJECT
 public:
-    explicit QnAppServerFileCache(const QString &folderName, QObject *parent = 0);
-    virtual ~QnAppServerFileCache();
+    explicit ServerFileCache(const QString &folderName, QObject *parent = 0);
+    virtual ~ServerFileCache();
 
     /** Get full path to cached file with fixed filename */
     virtual QString getFullPath(const QString &filename) const;
@@ -80,4 +84,8 @@ private:
     QHash<int, QString> m_deleting;
 };
 
-Q_DECLARE_METATYPE(QnAppServerFileCache::OperationResult)
+Q_DECLARE_METATYPE(ServerFileCache::OperationResult)
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

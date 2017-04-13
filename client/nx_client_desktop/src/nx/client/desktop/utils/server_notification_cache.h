@@ -1,5 +1,4 @@
-#ifndef APP_SERVER_NOTIFICATION_CACHE_H
-#define APP_SERVER_NOTIFICATION_CACHE_H
+#pragma once
 
 #include <QtGui/QStandardItemModel>
 
@@ -7,14 +6,18 @@
 
 class QnNotificationSoundModel;
 
-class QnAppServerNotificationCache : public QnAppServerFileCache
+namespace nx {
+namespace client {
+namespace desktop {
+
+class ServerNotificationCache : public ServerFileCache
 {
     Q_OBJECT
 
-    typedef QnAppServerFileCache base_type;
+    typedef ServerFileCache base_type;
 public:
-    explicit QnAppServerNotificationCache(QObject *parent = 0);
-    ~QnAppServerNotificationCache();
+    explicit ServerNotificationCache(QObject *parent = 0);
+    ~ServerNotificationCache();
 
     bool storeSound(const QString &filePath, int maxLengthMSecs = -1, const QString &customTitle = QString());
     bool updateTitle(const QString &filename, const QString &title);
@@ -36,4 +39,6 @@ private:
     QHash<QString, int> m_updatingFiles;
 };
 
-#endif // APP_SERVER_NOTIFICATION_CACHE_H
+} // namespace desktop
+} // namespace client
+} // namespace nx

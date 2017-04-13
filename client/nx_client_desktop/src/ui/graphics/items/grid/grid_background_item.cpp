@@ -7,8 +7,8 @@
 #include <utils/math/math.h>
 #include <utils/color_space/yuvconvert.h>
 #include <utils/threaded_image_loader.h>
-#include <utils/local_file_cache.h>
-#include <utils/app_server_image_cache.h>
+#include <nx/client/desktop/utils/local_file_cache.h>
+#include <nx/client/desktop/utils/server_image_cache.h>
 
 #include <client/client_settings.h>
 
@@ -188,16 +188,16 @@ QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem* parent, QnWorkbenchCon
     setAcceptedMouseButtons(Qt::NoButton);
 
     const auto imageLoaded =
-        [this](const QString& filename, QnAppServerFileCache::OperationResult status)
+        [this](const QString& filename, ServerFileCache::OperationResult status)
         {
-            at_imageLoaded(filename, status == QnAppServerFileCache::OperationResult::ok);
+            at_imageLoaded(filename, status == ServerFileCache::OperationResult::ok);
         };
 
-    const auto localFilesCache = context->instance<QnLocalFileCache>();
-    connect(localFilesCache, &QnAppServerFileCache::fileDownloaded, this, imageLoaded);
+    const auto localFilesCache = context->instance<LocalFileCache>();
+    connect(localFilesCache, &ServerFileCache::fileDownloaded, this, imageLoaded);
 
-    const auto appServerImageCache = context->instance<QnAppServerImageCache>();
-    connect(appServerImageCache, &QnAppServerFileCache::fileDownloaded, this, imageLoaded);
+    const auto appServerImageCache = context->instance<ServerImageCache>();
+    connect(appServerImageCache, &ServerFileCache::fileDownloaded, this, imageLoaded);
 
     connect(commonModule(), &QnCommonModule::remoteIdChanged,
         this, &QnGridBackgroundItem::updateConnectedState);
@@ -445,13 +445,13 @@ void QnGridBackgroundItem::at_imageLoaded(const QString& filename, bool ok)
     loader->start();
 }
 
-QnAppServerImageCache* QnGridBackgroundItem::cache()
+ServerImageCache* QnGridBackgroundItem::cache()
 {
     Q_D(const QnGridBackgroundItem);
 
     return d->imageData.isLocal
-        ? context()->instance<QnLocalFileCache>()
-        : context()->instance<QnAppServerImageCache>();
+        ? context()->instance<LocalFileCache>()
+        : context()->instance<ServerImageCache>();
 }
 
 void QnGridBackgroundItem::setImage(const QImage& image)

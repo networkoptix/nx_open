@@ -134,10 +134,10 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
     connect(handler,    &QnWorkbenchNotificationsHandler::systemHealthEventRemoved, this,   &QnNotificationsCollectionWidget::hideSystemHealthMessage);
     connect(handler,    &QnWorkbenchNotificationsHandler::cleared,                  this,   &QnNotificationsCollectionWidget::hideAll);
 
-    connect(this->context()->instance<QnAppServerNotificationCache>(), &QnAppServerNotificationCache::fileDownloaded,
-        this, [this](const QString& filename, QnAppServerFileCache::OperationResult status)
+    connect(this->context()->instance<ServerNotificationCache>(), &ServerNotificationCache::fileDownloaded,
+        this, [this](const QString& filename, ServerFileCache::OperationResult status)
         {
-            if (status != QnAppServerFileCache::OperationResult::ok)
+            if (status != ServerFileCache::OperationResult::ok)
                 return;
             at_notificationCache_fileDownloaded(filename);
         });
@@ -314,7 +314,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     {
         QString soundUrl = businessAction->getParams().url;
         m_itemsByLoadingSound.insert(soundUrl, item);
-        context()->instance<QnAppServerNotificationCache>()->downloadFile(soundUrl);
+        context()->instance<ServerNotificationCache>()->downloadFile(soundUrl);
     }
 
     QIcon icon = iconForAction(businessAction);
@@ -748,7 +748,7 @@ void QnNotificationsCollectionWidget::at_item_actionTriggered(QnActions::IDType 
 
 void QnNotificationsCollectionWidget::at_notificationCache_fileDownloaded(const QString& filename)
 {
-    QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(filename);
+    QString filePath = context()->instance<ServerNotificationCache>()->getFullPath(filename);
     for (QnNotificationWidget* item : m_itemsByLoadingSound.values(filename))
         item->setSound(filePath, true);
 

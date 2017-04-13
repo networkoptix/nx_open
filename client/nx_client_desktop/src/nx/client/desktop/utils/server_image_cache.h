@@ -1,27 +1,33 @@
-#ifndef APP_SERVER_IMAGE_CACHE_H
-#define APP_SERVER_IMAGE_CACHE_H
+#pragma once
 
 #include <utils/app_server_file_cache.h>
 
 #include <QtGui/QImage>
 
-class QnAppServerImageCache : public QnAppServerFileCache
+namespace nx {
+namespace client {
+namespace desktop {
+
+class ServerImageCache : public ServerFileCache
 {
     Q_OBJECT
 
-    typedef QnAppServerFileCache base_type;
+    typedef ServerFileCache base_type;
 public:
-    explicit QnAppServerImageCache(QObject *parent = 0);
-    virtual ~QnAppServerImageCache();
+    explicit ServerImageCache(QObject *parent = 0);
+    virtual ~ServerImageCache();
 
     QSize getMaxImageSize() const;
 
     static QString cachedImageFilename(const QString &sourcePath);
 
     void storeImage(const QString &filePath, const qreal targetAspectRatio = 0.0);
+
 private slots:
     void at_imageConverted(const QString &filePath);
 
 };
 
-#endif // APP_SERVER_IMAGE_CACHE_H
+} // namespace desktop
+} // namespace client
+} // namespace nx

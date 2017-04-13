@@ -80,7 +80,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<WeakGraphicsItemPointerList>();
     qRegisterMetaType<QnCustomization>();
     qRegisterMetaType<QnPingUtility::PingResponce>();
-    qRegisterMetaType<QnAppServerFileCache::OperationResult>();
+    qRegisterMetaType<ServerFileCache::OperationResult>();
 
     qRegisterMetaType<QnTimeSliderColors>();
     qRegisterMetaType<QnBackgroundColors>();

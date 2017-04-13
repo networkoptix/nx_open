@@ -373,7 +373,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
             }
         });
 
-    context()->instance<QnAppServerNotificationCache>();
+    context()->instance<ServerNotificationCache>();
 
     const auto resourceModeAction = action(QnActions::ResourcesModeAction);
     connect(resourceModeAction, &QAction::toggled, this,

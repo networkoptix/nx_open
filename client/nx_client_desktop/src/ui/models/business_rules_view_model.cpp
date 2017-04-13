@@ -23,7 +23,7 @@ QnBusinessRulesViewModel::QnBusinessRulesViewModel(QObject *parent) :
     m_fieldsByColumn[QnBusiness::ActionColumn] = QnBusiness::ActionTypeField;
     m_fieldsByColumn[QnBusiness::TargetColumn] = QnBusiness::ActionTypeField | QnBusiness::ActionParamsField | QnBusiness::ActionResourcesField;
 
-    QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
+    QnNotificationSoundModel* soundModel = context()->instance<ServerNotificationCache>()->persistentGuiModel();
     connect(soundModel, SIGNAL(listLoaded()), this, SLOT(at_soundModel_listChanged()));
     connect(soundModel, SIGNAL(listUnloaded()), this, SLOT(at_soundModel_listChanged()));
     connect(soundModel, SIGNAL(itemChanged(QString)), this, SLOT(at_soundModel_itemChanged(QString)));

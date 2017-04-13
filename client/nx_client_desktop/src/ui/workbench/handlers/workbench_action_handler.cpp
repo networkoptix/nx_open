@@ -140,10 +140,10 @@
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/watchers/workbench_bookmarks_watcher.h>
 
-#include <utils/app_server_image_cache.h>
+#include <nx/client/desktop/utils/server_image_cache.h>
 
 #include <utils/applauncher_utils.h>
-#include <utils/local_file_cache.h>
+#include <nx/client/desktop/utils/local_file_cache.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/mime_data.h>
 #include <utils/common/event_processors.h>
@@ -1808,26 +1808,26 @@ void ActionHandler::at_setAsBackgroundAction_triggered() {
 
     QnActionParameters parameters = menu()->currentParameters(sender());
 
-    QnAppServerImageCache *cache = new QnAppServerImageCache(this);
+    ServerImageCache *cache = new ServerImageCache(this);
     cache->setProperty(uploadingImageARPropertyName, parameters.widget()->aspectRatio());
-    connect(cache, &QnAppServerImageCache::fileUploaded, progressDialog, &QObject::deleteLater);
-    connect(cache, &QnAppServerImageCache::fileUploaded, cache, &QObject::deleteLater);
-    connect(cache, &QnAppServerImageCache::fileUploaded, this, [this, checkCondition](const QString &filename, QnAppServerFileCache::OperationResult status) {
+    connect(cache, &ServerImageCache::fileUploaded, progressDialog, &QObject::deleteLater);
+    connect(cache, &ServerImageCache::fileUploaded, cache, &QObject::deleteLater);
+    connect(cache, &ServerImageCache::fileUploaded, this, [this, checkCondition](const QString &filename, ServerFileCache::OperationResult status) {
         if (!checkCondition())
             return;
 
-        if (status == QnAppServerFileCache::OperationResult::sizeLimitExceeded)
+        if (status == ServerFileCache::OperationResult::sizeLimitExceeded)
         {
             //TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
             //Important: maximumFileSize() is hardcoded in 1024-base
-            const auto maxFileSize = QnAppServerFileCache::maximumFileSize() / (1024 * 1024);
+            const auto maxFileSize = ServerFileCache::maximumFileSize() / (1024 * 1024);
             QnMessageBox::warning(mainWindow(),
                 tr("Image too big"),
                 tr("Maximum size is %1 MB.").arg(maxFileSize));
             return;
         }
 
-        if (status != QnAppServerFileCache::OperationResult::ok)
+        if (status != ServerFileCache::OperationResult::ok)
         {
             QnMessageBox::critical(mainWindow(), tr("Failed to upload image"));
             return;

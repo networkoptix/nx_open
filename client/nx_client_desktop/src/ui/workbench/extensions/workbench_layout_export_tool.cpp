@@ -29,8 +29,8 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
 #include <nx/fusion/model_functions.h>
-#include <utils/app_server_image_cache.h>
-#include <utils/local_file_cache.h>
+#include <nx/client/desktop/utils/server_image_cache.h>
+#include <nx/client/desktop/utils/local_file_cache.h>
 #include <client_core/client_core_module.h>
 
 #ifdef Q_OS_WIN
@@ -243,11 +243,11 @@ bool QnLayoutExportTool::exportMetadata(const QnLayoutExportTool::ItemInfoList &
     if (!m_layout->backgroundImageFilename().isEmpty())
     {
         bool exportedLayout = m_layout->isFile();  // we have changed background to an exported layout
-        QScopedPointer<QnAppServerImageCache> cache;
+        QScopedPointer<ServerImageCache> cache;
         if (exportedLayout)
-            cache.reset(new QnLocalFileCache(this));
+            cache.reset(new LocalFileCache(this));
         else
-            cache.reset(new QnAppServerImageCache(this));
+            cache.reset(new ServerImageCache(this));
 
         QImage background(cache->getFullPath(m_layout->backgroundImageFilename()));
         if (!background.isNull()) {
@@ -261,7 +261,7 @@ bool QnLayoutExportTool::exportMetadata(const QnLayoutExportTool::ItemInfoList &
             } ))
                 return false;
 
-            QnLocalFileCache localCache;
+            LocalFileCache localCache;
             localCache.storeImageData(m_layout->backgroundImageFilename(), background);
         }
     }

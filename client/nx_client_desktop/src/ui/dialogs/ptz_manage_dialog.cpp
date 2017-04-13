@@ -23,7 +23,7 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/resource_property_adaptors.h>
-#include <utils/local_file_cache.h>
+#include <nx/client/desktop/utils/local_file_cache.h>
 #include <utils/threaded_image_loader.h>
 
 #include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
@@ -85,7 +85,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
     ui(new Ui::PtzManageDialog),
     m_model(new QnPtzManageModel(this)),
     m_hotkeysDelegate(nullptr),
-    m_cache(new QnLocalFileCache(this)),
+    m_cache(new LocalFileCache(this)),
     m_submitting(false)
 {
     ui->setupUi(this);
@@ -120,9 +120,9 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
     connect(m_model, &QnPtzManageModel::modelReset, this, &QnPtzManageDialog::at_model_modelReset);
     connect(this, &QnAbstractPtzDialog::synchronized, m_model, &QnPtzManageModel::setSynchronized);
     connect(ui->tourEditWidget, SIGNAL(tourSpotsChanged(QnPtzTourSpotList)), this, SLOT(at_tourSpotsChanged(QnPtzTourSpotList)));
-    connect(m_cache, &QnLocalFileCache::fileDownloaded, this, [this](const QString &filename, QnAppServerFileCache::OperationResult status)
+    connect(m_cache, &LocalFileCache::fileDownloaded, this, [this](const QString &filename, ServerFileCache::OperationResult status)
     {
-        if (status != QnAppServerFileCache::OperationResult::ok)
+        if (status != ServerFileCache::OperationResult::ok)
             return;
         at_cache_imageLoaded(filename);
     });

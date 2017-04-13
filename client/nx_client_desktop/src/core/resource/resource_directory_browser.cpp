@@ -12,7 +12,7 @@
 #include <nx/fusion/serialization/proto_message.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/warnings.h>
-#include <utils/local_file_cache.h>
+#include <nx/client/desktop/utils/local_file_cache.h>
 
 #include "nx/fusion/serialization/binary_functions.h"
 
@@ -216,7 +216,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
         if (backgroundFile)
         {
             QByteArray data = backgroundFile->readAll();
-            QnLocalFileCache cache;
+            LocalFileCache cache;
             cache.storeImageData(layout->backgroundImageFilename(), data);
 
             backgroundFile.reset();

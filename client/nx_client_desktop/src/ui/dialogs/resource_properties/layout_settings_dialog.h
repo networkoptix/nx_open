@@ -12,7 +12,7 @@ namespace Ui {
     class LayoutSettingsDialog;
 }
 
-class QnAppServerImageCache;
+class ServerImageCache;
 class QnLayoutSettingsDialogPrivate;
 
 class QnLayoutSettingsDialog : public QnSessionAwareButtonBoxDialog
@@ -76,7 +76,7 @@ private:
     QScopedPointer<Ui::LayoutSettingsDialog> ui;
     QnLayoutSettingsDialogPrivate *const d_ptr;
 
-    QnAppServerImageCache *m_cache;
+    ServerImageCache *m_cache;
 
     bool m_isUpdating;
 };

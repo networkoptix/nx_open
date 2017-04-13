@@ -1,4 +1,4 @@
-#include "app_server_file_cache.h"
+#include "server_file_cache.h"
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
@@ -17,36 +17,40 @@
 #include <network/system_helpers.h>
 
 namespace {
-    /** Maximum allowed file size is 15 Mb, hard limit of Jaguar or S2 cameras. */
-    const qint64 maximumFileSize = 15*1024*1024;
+/** Maximum allowed file size is 15 Mb, hard limit of Jaguar or S2 cameras. */
+const qint64 maximumFileSize = 15 * 1024 * 1024;
 }
 
-QnAppServerFileCache::QnAppServerFileCache(const QString &folderName, QObject *parent) :
+namespace nx {
+namespace client {
+namespace desktop {
+
+ServerFileCache::ServerFileCache(const QString &folderName, QObject *parent) :
     QObject(parent),
     m_folderName(folderName)
 {
-    connect(this, &QnAppServerFileCache::delayedFileDownloaded,     this,   [this](const QString &filename, OperationResult status) {
+    connect(this, &ServerFileCache::delayedFileDownloaded,     this,   [this](const QString &filename, OperationResult status) {
         if (isConnectedToServer())
             emit fileDownloaded(filename, status);
         else
             emit fileDownloaded(filename, OperationResult::disconnected);
     }, Qt::QueuedConnection);
 
-    connect(this, &QnAppServerFileCache::delayedFileUploaded,       this,   [this](const QString &filename, OperationResult status) {
+    connect(this, &ServerFileCache::delayedFileUploaded,       this,   [this](const QString &filename, OperationResult status) {
         if (isConnectedToServer())
             emit fileUploaded(filename, status);
         else
             emit fileUploaded(filename, OperationResult::disconnected);
     }, Qt::QueuedConnection);
 
-    connect(this, &QnAppServerFileCache::delayedFileDeleted,        this,   [this](const QString &filename, OperationResult status) {
+    connect(this, &ServerFileCache::delayedFileDeleted,        this,   [this](const QString &filename, OperationResult status) {
         if (isConnectedToServer())
             emit fileDeleted(filename, status);
         else
             emit fileDeleted(filename, OperationResult::disconnected);
     }, Qt::QueuedConnection);
 
-    connect(this, &QnAppServerFileCache::delayedFileListReceived,   this,   [this](const QStringList &files, OperationResult status) {
+    connect(this, &ServerFileCache::delayedFileListReceived,   this,   [this](const QStringList &files, OperationResult status) {
         if (isConnectedToServer())
             emit fileListReceived(files, status);
         else
@@ -54,12 +58,12 @@ QnAppServerFileCache::QnAppServerFileCache(const QString &folderName, QObject *p
     }, Qt::QueuedConnection);
 }
 
-QnAppServerFileCache::~QnAppServerFileCache() {
+ServerFileCache::~ServerFileCache() {
 }
 
 // -------------- Utility methods ----------------
 
-QString QnAppServerFileCache::getFullPath(const QString &filename) const {
+QString ServerFileCache::getFullPath(const QString &filename) const {
     /* Avoid empty folder name and collisions with our folders such as 'log'. */
     QString systemName = L'_' + nx::utils::replaceNonFileNameCharacters(
         helpers::currentSystemLocalId(commonModule()).toString(), L'_');
@@ -73,33 +77,33 @@ QString QnAppServerFileCache::getFullPath(const QString &filename) const {
                                     );
 }
 
-void QnAppServerFileCache::ensureCacheFolder() {
+void ServerFileCache::ensureCacheFolder() {
     QString folderPath = getFullPath(QString());
     QDir().mkpath(folderPath);
 }
 
-QString QnAppServerFileCache::folderName() const {
+QString ServerFileCache::folderName() const {
     return m_folderName;
 }
 
-void QnAppServerFileCache::clearLocalCache() {
+void ServerFileCache::clearLocalCache() {
     QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     QString dir = QDir::toNativeSeparators(QString(lit("%1/cache/")).arg(path));
     removeDir(dir);
 }
 
-bool QnAppServerFileCache::isConnectedToServer() const {
+bool ServerFileCache::isConnectedToServer() const {
     return commonModule()->ec2Connection() != NULL;
 }
 
-qint64 QnAppServerFileCache::maximumFileSize() {
+qint64 ServerFileCache::maximumFileSize() {
     return ::maximumFileSize;
 }
 
 
 // -------------- File List loading methods -----
 
-void QnAppServerFileCache::getFileList() {
+void ServerFileCache::getFileList() {
     if (!isConnectedToServer()) {
         emit delayedFileListReceived(QStringList(), OperationResult::disconnected);
         return;
@@ -115,7 +119,7 @@ void QnAppServerFileCache::getFileList() {
 
 // -------------- Download File methods ----------
 
-void QnAppServerFileCache::downloadFile(const QString &filename) {
+void ServerFileCache::downloadFile(const QString &filename) {
     if (!isConnectedToServer()) {
         emit delayedFileDownloaded(filename, OperationResult::disconnected);
         return;
@@ -144,11 +148,11 @@ void QnAppServerFileCache::downloadFile(const QString &filename) {
     int handle = connection->getStoredFileManager(Qn::kSystemAccess)->getStoredFile(
                 m_folderName + QLatin1Char('/') + filename,
                 this,
-                &QnAppServerFileCache::at_fileLoaded );
+                &ServerFileCache::at_fileLoaded );
     m_loading.insert(handle, filename);
 }
 
-void QnAppServerFileCache::at_fileLoaded( int handle, ec2::ErrorCode errorCode, const QByteArray& data ) {
+void ServerFileCache::at_fileLoaded( int handle, ec2::ErrorCode errorCode, const QByteArray& data ) {
     if (!m_loading.contains(handle))
         return;
 
@@ -187,7 +191,7 @@ void QnAppServerFileCache::at_fileLoaded( int handle, ec2::ErrorCode errorCode, 
 // -------------- Uploading methods ----------------
 
 
-void QnAppServerFileCache::uploadFile(const QString &filename) {
+void ServerFileCache::uploadFile(const QString &filename) {
     if (!isConnectedToServer()) {
         emit delayedFileUploaded(filename, OperationResult::disconnected);
         return;
@@ -215,12 +219,12 @@ void QnAppServerFileCache::uploadFile(const QString &filename) {
                 m_folderName + QLatin1Char('/') +filename,
                 data,
                 this,
-                &QnAppServerFileCache::at_fileUploaded );
+                &ServerFileCache::at_fileUploaded );
     m_uploading.insert(handle, filename);
 }
 
 
-void QnAppServerFileCache::at_fileUploaded( int handle, ec2::ErrorCode errorCode ) {
+void ServerFileCache::at_fileUploaded( int handle, ec2::ErrorCode errorCode ) {
     if (!m_uploading.contains(handle))
         return;
 
@@ -240,7 +244,7 @@ void QnAppServerFileCache::at_fileUploaded( int handle, ec2::ErrorCode errorCode
 
 // -------------- Deleting methods ----------------
 
-void QnAppServerFileCache::deleteFile(const QString &filename) {
+void ServerFileCache::deleteFile(const QString &filename) {
     if (!isConnectedToServer()) {
         emit delayedFileDeleted(filename, OperationResult::disconnected);
         return;
@@ -268,12 +272,12 @@ void QnAppServerFileCache::deleteFile(const QString &filename) {
     int handle = connection->getStoredFileManager(Qn::kSystemAccess)->deleteStoredFile(
                     m_folderName + QLatin1Char('/') +filename,
                     this,
-                    &QnAppServerFileCache::at_fileDeleted );
+                    &ServerFileCache::at_fileDeleted );
 
     m_deleting.insert(handle, filename);
 }
 
-void QnAppServerFileCache::at_fileDeleted( int handle, ec2::ErrorCode errorCode ) {
+void ServerFileCache::at_fileDeleted( int handle, ec2::ErrorCode errorCode ) {
     if (!m_deleting.contains(handle))
         return;
 
@@ -291,8 +295,12 @@ void QnAppServerFileCache::at_fileDeleted( int handle, ec2::ErrorCode errorCode 
     emit fileDeleted(filename, ok ? OperationResult::ok : OperationResult::serverError);
 }
 
-void QnAppServerFileCache::clear() {
+void ServerFileCache::clear() {
     m_loading.clear();
     m_uploading.clear();
     m_deleting.clear();
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

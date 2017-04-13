@@ -19,7 +19,7 @@
 QnNotificationSoundManagerDialog::QnNotificationSoundManagerDialog(QWidget *parent):
     base_type(parent),
     ui(new Ui::QnNotificationSoundManagerDialog),
-    m_model(context()->instance<QnAppServerNotificationCache>()->persistentGuiModel())
+    m_model(context()->instance<ServerNotificationCache>()->persistentGuiModel())
 {
     ui->setupUi(this);
 
@@ -55,7 +55,7 @@ void QnNotificationSoundManagerDialog::at_playButton_clicked()
     if (filename.isEmpty())
         return;
 
-    QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(filename);
+    QString filePath = context()->instance<ServerNotificationCache>()->getFullPath(filename);
     if (!QFileInfo(filePath).exists())
         return;
 
@@ -96,7 +96,7 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked()
     if (fileName.isEmpty())
         return;
 
-    if (!context()->instance<QnAppServerNotificationCache>()->storeSound(
+    if (!context()->instance<ServerNotificationCache>()->storeSound(
         fileName, cropSoundSecs * 1000, title))
     {
         QnMessageBox::warning(this, tr("Failed to add file"));
@@ -122,7 +122,7 @@ void QnNotificationSoundManagerDialog::at_renameButton_clicked()
     if (newTitle.isEmpty())
         return;
 
-    if (!context()->instance<QnAppServerNotificationCache>()->updateTitle(filename, newTitle))
+    if (!context()->instance<ServerNotificationCache>()->updateTitle(filename, newTitle))
         QnMessageBox::warning(this, tr("Failed to set new title"));
 
 }
@@ -146,5 +146,5 @@ void QnNotificationSoundManagerDialog::at_deleteButton_clicked()
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
-    context()->instance<QnAppServerNotificationCache>()->deleteFile(filename);
+    context()->instance<ServerNotificationCache>()->deleteFile(filename);
 }

@@ -1,4 +1,4 @@
-#include "app_server_image_cache.h"
+#include "server_image_cache.h"
 
 #include <QtCore/QFileInfo>
 
@@ -9,25 +9,29 @@
 #include <utils/threaded_image_loader.h>
 
 namespace {
-    const QLatin1String folder("wallpapers");
+const QLatin1String folder("wallpapers");
 }
 
-QnAppServerImageCache::QnAppServerImageCache(QObject *parent) :
+namespace nx {
+namespace client {
+namespace desktop {
+
+ServerImageCache::ServerImageCache(QObject *parent) :
     base_type(folder, parent)
 {
 }
 
-QnAppServerImageCache::~QnAppServerImageCache() {
+ServerImageCache::~ServerImageCache() {
 }
 
 
-QSize QnAppServerImageCache::getMaxImageSize() const {
+QSize ServerImageCache::getMaxImageSize() const {
     int value = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
     return QSize(value, value);
 }
 
 
-QString QnAppServerImageCache::cachedImageFilename(const QString &sourcePath) {
+QString ServerImageCache::cachedImageFilename(const QString &sourcePath) {
     QString ext = QFileInfo(sourcePath).suffix();
     if (ext.isEmpty())
         ext = lit("png");
@@ -36,7 +40,7 @@ QString QnAppServerImageCache::cachedImageFilename(const QString &sourcePath) {
     return uuid.mid(1, uuid.size() - 2) + L'.' + ext;
 }
 
-void QnAppServerImageCache::storeImage(const QString &filePath, const qreal targetAspectRatio) {
+void ServerImageCache::storeImage(const QString &filePath, const qreal targetAspectRatio) {
     QString newFilename = cachedImageFilename(filePath);
 
     ensureCacheFolder();
@@ -51,6 +55,10 @@ void QnAppServerImageCache::storeImage(const QString &filePath, const qreal targ
     loader->start();
 }
 
-void QnAppServerImageCache::at_imageConverted(const QString &filePath) {
+void ServerImageCache::at_imageConverted(const QString &filePath) {
     uploadFile(QFileInfo(filePath).fileName());
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

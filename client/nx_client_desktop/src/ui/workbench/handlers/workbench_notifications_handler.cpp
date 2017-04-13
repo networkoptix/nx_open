@@ -411,7 +411,7 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbs
         case QnBusiness::PlaySoundOnceAction:
         {
             QString filename = businessAction->getParams().url;
-            QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(filename);
+            QString filePath = context()->instance<ServerNotificationCache>()->getFullPath(filename);
             // if file is not exists then it is already deleted or just not downloaded yet
             // I think it should not be played when downloaded
             AudioPlayer::playFileAsync(filePath);

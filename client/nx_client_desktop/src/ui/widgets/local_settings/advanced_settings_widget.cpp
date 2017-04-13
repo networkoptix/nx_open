@@ -26,7 +26,7 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/common/scoped_value_rollback.h>
-#include <utils/local_file_cache.h>
+#include <nx/client/desktop/utils/local_file_cache.h>
 
 QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
     base_type(parent),
@@ -130,16 +130,16 @@ void QnAdvancedSettingsWidget::at_clearCacheButton_clicked()
     /* Lock background image so it will not be deleted. */
     if (!backgroundImage.isEmpty())
     {
-        QnLocalFileCache cache;
+        LocalFileCache cache;
         QString path = cache.getFullPath(backgroundImage);
         QFile lock(path);
         lock.open(QFile::ReadWrite);
-        QnAppServerFileCache::clearLocalCache();
+        ServerFileCache::clearLocalCache();
         lock.close();
     }
     else
     {
-        QnAppServerFileCache::clearLocalCache();
+        ServerFileCache::clearLocalCache();
     }
 }
 

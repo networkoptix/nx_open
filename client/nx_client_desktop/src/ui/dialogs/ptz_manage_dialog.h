@@ -14,7 +14,7 @@ namespace Ui {
 
 class QnPtzManageModel;
 class QnPtzHotkeysResourcePropertyAdaptor;
-class QnLocalFileCache;
+class LocalFileCache;
 class QnAbstractPtzHotkeyDelegate;
 
 // TODO: #GDM #PTZ remove singleton
@@ -85,7 +85,7 @@ private:
 	QnAbstractPtzHotkeyDelegate* m_hotkeysDelegate;
     QnResourcePtr m_resource;
 
-    QnLocalFileCache *m_cache;
+    LocalFileCache *m_cache;
     QSet<QString> m_pendingPreviews;
 
     QnPtzManageModel::RowData m_lastRowData;
