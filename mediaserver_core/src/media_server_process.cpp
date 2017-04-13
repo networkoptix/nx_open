@@ -1017,8 +1017,7 @@ QUrl appServerConnectionUrl(QSettings &settings)
     return appServerUrl;
 }
 
-
-MediaServerProcess::MediaServerProcess(int argc, char* argv[])
+MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
 :
     m_argc(argc),
     m_argv(argv),
@@ -1026,7 +1025,8 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[])
     m_firstRunningTime(0),
     m_universalTcpListener(0),
     m_dumpSystemResourceUsageTaskID(0),
-    m_stopping(false)
+    m_stopping(false),
+    m_serviceMode(serviceMode)
 {
     serviceMainInstance = this;
 
@@ -1034,6 +1034,37 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[])
 
     m_platform.reset(new QnPlatformAbstraction());
 }
+
+void MediaServerProcess::initTransactionLog(const QString& logDir, QnLogLevel level)
+{
+    //on "always" log level only server start messages are logged, so using it instead of disabled
+    QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
+        logDir + lit("ec2_tran"),
+        qnServerModule->roSettings()->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toULongLong(),
+        qnServerModule->roSettings()->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toULongLong(),
+        level);
+    NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
+    NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
+    NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
+    NX_LOG(QnLog::EC2_TRAN_LOG, lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS);
+    NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
+    NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
+    NX_LOG(QnLog::EC2_TRAN_LOG, lit("binary path: %1").arg(QFile::decodeName(m_argv[0])), cl_logALWAYS);
+}
+
+void MediaServerProcess::initPermissionsLog(const QString& logDir, QnLogLevel level)
+{
+    QnLog::instance(QnLog::PERMISSIONS_LOG)->create(
+        logDir + lit("permissions"),
+        qnServerModule->roSettings()->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toULongLong(),
+        qnServerModule->roSettings()->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toULongLong(),
+        level);
+    NX_LOG(QnLog::PERMISSIONS_LOG, lit("================================================================================="), cl_logALWAYS);
+    NX_LOG(QnLog::PERMISSIONS_LOG, lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS);
+    NX_LOG(QnLog::PERMISSIONS_LOG, lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
+    NX_LOG(QnLog::PERMISSIONS_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
+}
+
 
 void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
 {
@@ -2130,6 +2161,114 @@ void MediaServerProcess::updateAllowedInterfaces()
     setInterfaceListFilter(allowedInterfaces);
 }
 
+QString MediaServerProcess::hardwareIdAsGuid()
+{
+    auto hwId = LLUtil::getLatestHardwareId();
+    auto hwIdString = QnUuid::fromHardwareId(hwId).toString();
+    std::cout << "Got hwID \"" << hwIdString.toStdString() << "\"" << std::endl;
+    return hwIdString;
+}
+
+void MediaServerProcess::updateGuidIfNeeded()
+{
+    QString guidIsHWID = qnServerModule->roSettings()->value(GUID_IS_HWID).toString();
+    QString serverGuid = qnServerModule->roSettings()->value(SERVER_GUID).toString();
+    QString serverGuid2 = qnServerModule->roSettings()->value(SERVER_GUID2).toString();
+    QString pendingSwitchToClusterMode = qnServerModule->roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString();
+
+    QString hwidGuid = hardwareIdAsGuid();
+
+    if (guidIsHWID == YES) {
+        if (serverGuid.isEmpty())
+            qnServerModule->roSettings()->setValue(SERVER_GUID, hwidGuid);
+        else if (serverGuid != hwidGuid)
+            qnServerModule->roSettings()->setValue(GUID_IS_HWID, NO);
+
+        qnServerModule->roSettings()->remove(SERVER_GUID2);
+    }
+    else if (guidIsHWID == NO) {
+        if (serverGuid.isEmpty()) {
+            // serverGuid remove from settings manually?
+            qnServerModule->roSettings()->setValue(SERVER_GUID, hwidGuid);
+            qnServerModule->roSettings()->setValue(GUID_IS_HWID, YES);
+        }
+
+        qnServerModule->roSettings()->remove(SERVER_GUID2);
+    }
+    else if (guidIsHWID.isEmpty()) {
+        if (!serverGuid2.isEmpty()) {
+            qnServerModule->roSettings()->setValue(SERVER_GUID, serverGuid2);
+            qnServerModule->roSettings()->setValue(GUID_IS_HWID, NO);
+            qnServerModule->roSettings()->remove(SERVER_GUID2);
+        }
+        else {
+            // Don't reset serverGuid if we're in pending switch to cluster mode state.
+            // As it's stored in the remote database.
+            if (pendingSwitchToClusterMode == YES)
+                return;
+
+            qnServerModule->roSettings()->setValue(SERVER_GUID, hwidGuid);
+            qnServerModule->roSettings()->setValue(GUID_IS_HWID, YES);
+
+            if (!serverGuid.isEmpty()) {
+                qnServerModule->roSettings()->setValue(OBSOLETE_SERVER_GUID, serverGuid);
+            }
+        }
+    }
+
+    QnUuid obsoleteGuid = QnUuid(qnServerModule->roSettings()->value(OBSOLETE_SERVER_GUID).toString());
+    if (!obsoleteGuid.isNull())
+        setObsoleteGuid(obsoleteGuid);
+}
+
+void MediaServerProcess::serviceModePreInit()
+{
+    const QString& dataLocation = getDataDirectory();
+    const QString& logDir = qnServerModule->roSettings()->value("logDir", dataLocation + QLatin1String("/log/")).toString();
+
+
+    qnServerModule->runTimeSettings()->remove("rebuild");
+
+    initLog(cmdLineArguments().logLevel);
+
+    QnLog::instance(QnLog::HTTP_LOG_INDEX)->create(
+        logDir + QLatin1String("/http_log"),
+        qnServerModule->roSettings()->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toULongLong(),
+        qnServerModule->roSettings()->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toULongLong(),
+        QnLog::logLevelFromString(cmdLineArguments().msgLogLevel));
+
+    //preparing transaction log
+    initTransactionLog(logDir, QnLog::logLevelFromString(cmdLineArguments().ec2TranLogLevel));
+
+    QnLog::instance(QnLog::HWID_LOG)->create(
+        logDir + QLatin1String("/hw_log"),
+        qnServerModule->roSettings()->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toULongLong(),
+        qnServerModule->roSettings()->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toULongLong(),
+        QnLogLevel::cl_logINFO);
+
+    initPermissionsLog(logDir, QnLog::logLevelFromString(cmdLineArguments().permissionsLogLevel));
+
+    NX_LOG(lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS);
+    NX_LOG(lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
+    NX_LOG(lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
+    NX_LOG(lit("binary path: %1").arg(QFile::decodeName(m_argv[0])), cl_logALWAYS);
+
+    defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
+
+    LLUtil::initHardwareId(qnServerModule->roSettings());
+    updateGuidIfNeeded();
+    setHardwareGuidList(LLUtil::getAllHardwareIds().toVector());
+
+    QnUuid guid = serverGuid();
+    if (guid.isNull())
+    {
+        qDebug() << "Can't save guid. Run once as administrator.";
+        NX_LOG("Can't save guid. Run once as administrator.", cl_logERROR);
+        qApp->quit();
+        return;
+    }
+}
+
 void MediaServerProcess::run()
 {
     std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(
@@ -2138,6 +2277,9 @@ void MediaServerProcess::run()
         m_cmdLineArguments.rwConfigFilePath));
 
     addCommandLineParametersFromConfig();
+
+    if (m_serviceMode)
+        serviceModePreInit();
 
     const bool isStatisticsDisabled =
         qnServerModule->roSettings()->value(QnServer::kNoMonitorStatistics, false).toBool();
@@ -3020,7 +3162,7 @@ public:
 protected:
     virtual int executeApplication() override
     {
-        m_main.reset(new MediaServerProcess(m_argc, m_argv));
+        m_main.reset(new MediaServerProcess(m_argc, m_argv, true));
 
         const auto cmdParams = m_main->cmdLineArguments();
         if (cmdParams.showHelp || cmdParams.showVersion)
@@ -3063,65 +3205,13 @@ protected:
         signal(SIGINT, stopServer);
         signal(SIGTERM, stopServer);
 
-    //    av_log_set_callback(decoderLogCallback);
-
-
-
-        const QString& dataLocation = getDataDirectory();
-        const QString& logDir = qnServerModule->roSettings()->value( "logDir", dataLocation + QLatin1String("/log/") ).toString();
-
         QDir::setCurrent(qApp->applicationDirPath());
-
-        qnServerModule->runTimeSettings()->remove("rebuild");
-
-        const auto cmdLineArguments = m_main->cmdLineArguments();
-
-        initLog(cmdLineArguments.logLevel);
-
-        QnLog::instance(QnLog::HTTP_LOG_INDEX)->create(
-            logDir + QLatin1String("/http_log"),
-            qnServerModule->roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
-            qnServerModule->roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
-            QnLog::logLevelFromString(cmdLineArguments.msgLogLevel));
-
-        //preparing transaction log
-        initTransactionLog(logDir, QnLog::logLevelFromString(cmdLineArguments.ec2TranLogLevel));
-
-        QnLog::instance(QnLog::HWID_LOG)->create(
-            logDir + QLatin1String("/hw_log"),
-            qnServerModule->roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
-            qnServerModule->roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
-            QnLogLevel::cl_logINFO );
-
-        initPermissionsLog(logDir, QnLog::logLevelFromString(cmdLineArguments.permissionsLogLevel));
-
-        NX_LOG(lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS);
-        NX_LOG(lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
-        NX_LOG(lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
-        NX_LOG(lit("binary path: %1").arg(QFile::decodeName(m_argv[0])), cl_logALWAYS);
-
-        defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
-
         qnPlatform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
-
-        LLUtil::initHardwareId(qnServerModule->roSettings());
-        updateGuidIfNeeded();
-        m_main->setHardwareGuidList(LLUtil::getAllHardwareIds().toVector());
-
-        QnUuid guid = serverGuid();
-        if (guid.isNull())
-        {
-            qDebug() << "Can't save guid. Run once as administrator.";
-            NX_LOG("Can't save guid. Run once as administrator.", cl_logERROR);
-            qApp->quit();
-            return;
-        }
 
     // ------------------------------------------
 #ifdef TEST_RTSP_SERVER
         addTestData();
 #endif
-
         m_main->start();
     }
 
@@ -3129,93 +3219,6 @@ protected:
     {
         if (serviceMainInstance)
             serviceMainInstance->stopSync();
-    }
-
-private:
-    QString hardwareIdAsGuid() {
-        auto hwId = LLUtil::getLatestHardwareId();
-        auto hwIdString = QnUuid::fromHardwareId(hwId).toString();
-        std::cout << "Got hwID \"" << hwIdString.toStdString() << "\"" << std::endl;
-        return hwIdString;
-    }
-
-    void updateGuidIfNeeded() {
-        QString guidIsHWID = qnServerModule->roSettings()->value(GUID_IS_HWID).toString();
-        QString serverGuid = qnServerModule->roSettings()->value(SERVER_GUID).toString();
-        QString serverGuid2 = qnServerModule->roSettings()->value(SERVER_GUID2).toString();
-        QString pendingSwitchToClusterMode = qnServerModule->roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString();
-
-        QString hwidGuid = hardwareIdAsGuid();
-
-        if (guidIsHWID == YES) {
-            if (serverGuid.isEmpty())
-                qnServerModule->roSettings()->setValue(SERVER_GUID, hwidGuid);
-            else if (serverGuid != hwidGuid)
-                qnServerModule->roSettings()->setValue(GUID_IS_HWID, NO);
-
-            qnServerModule->roSettings()->remove(SERVER_GUID2);
-        } else if (guidIsHWID == NO) {
-            if (serverGuid.isEmpty()) {
-                // serverGuid remove from settings manually?
-                qnServerModule->roSettings()->setValue(SERVER_GUID, hwidGuid);
-                qnServerModule->roSettings()->setValue(GUID_IS_HWID, YES);
-            }
-
-            qnServerModule->roSettings()->remove(SERVER_GUID2);
-        } else if (guidIsHWID.isEmpty()) {
-            if (!serverGuid2.isEmpty()) {
-                qnServerModule->roSettings()->setValue(SERVER_GUID, serverGuid2);
-                qnServerModule->roSettings()->setValue(GUID_IS_HWID, NO);
-                qnServerModule->roSettings()->remove(SERVER_GUID2);
-            } else {
-                // Don't reset serverGuid if we're in pending switch to cluster mode state.
-                // As it's stored in the remote database.
-                if (pendingSwitchToClusterMode == YES)
-                    return;
-
-                qnServerModule->roSettings()->setValue(SERVER_GUID, hwidGuid);
-                qnServerModule->roSettings()->setValue(GUID_IS_HWID, YES);
-
-                if (!serverGuid.isEmpty()) {
-                    qnServerModule->roSettings()->setValue(OBSOLETE_SERVER_GUID, serverGuid);
-                }
-            }
-        }
-
-        QnUuid obsoleteGuid = QnUuid(qnServerModule->roSettings()->value(OBSOLETE_SERVER_GUID).toString());
-        if (!obsoleteGuid.isNull()) {
-            m_main->setObsoleteGuid(obsoleteGuid);
-        }
-    }
-
-    void initTransactionLog(const QString& logDir, QnLogLevel level)
-    {
-        //on "always" log level only server start messages are logged, so using it instead of disabled
-        QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
-            logDir + lit("ec2_tran"),
-            qnServerModule->roSettings()->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toULongLong(),
-            qnServerModule->roSettings()->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toULongLong(),
-            level);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("binary path: %1").arg(QFile::decodeName(m_argv[0])), cl_logALWAYS);
-    }
-
-    void initPermissionsLog(const QString& logDir, QnLogLevel level)
-    {
-        QnLog::instance(QnLog::PERMISSIONS_LOG)->create(
-            logDir + lit("permissions"),
-            qnServerModule->roSettings()->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toULongLong(),
-            qnServerModule->roSettings()->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toULongLong(),
-            level);
-        NX_LOG(QnLog::PERMISSIONS_LOG, lit("================================================================================="), cl_logALWAYS);
-        NX_LOG(QnLog::PERMISSIONS_LOG, lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS);
-        NX_LOG(QnLog::PERMISSIONS_LOG, lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
-        NX_LOG(QnLog::PERMISSIONS_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
     }
 
 private:
