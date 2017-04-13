@@ -1,8 +1,7 @@
 #include "system_socket_address.h"
 
 #include <nx/utils/log/log.h>
-
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 #include "socket_global.h"
 
