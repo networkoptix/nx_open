@@ -167,6 +167,16 @@ void QnUniversalRequestProcessor::run()
             t.restart();
             parseRequest();
 
+            const auto redirect = QnRestProcessorPool::instance()->getRedirectRule(
+                d->request.requestLine.url.path());
+            if (redirect)
+            {
+                QByteArray contentType;
+                int rez = redirectTo(redirect->toUtf8(), contentType);
+                sendResponse(rez, contentType);
+                continue;
+            }
+
             auto handler = d->owner->findHandler(d->protocol, d->request);
             bool noAuth = false;
             if (handler && !authenticate(&d->accessRights, &noAuth))
@@ -180,7 +190,7 @@ void QnUniversalRequestProcessor::run()
             if (!processRequest(noAuth))
             {
                 QByteArray contentType;
-                int rez = redirectTo(QnTcpListener::defaultPage(), contentType);
+                int rez = notFound(contentType);
                 sendResponse(rez, contentType);
             }
         }

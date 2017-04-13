@@ -1760,6 +1760,12 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
 void MediaServerProcess::registerRestHandlers(
     CloudManagerGroup* cloudManagerGroup)
 {
+    const auto welcomePage = lit("/static/index.html");
+    QnRestProcessorPool::instance()->registerRedirectRule(lit(""), welcomePage);
+    QnRestProcessorPool::instance()->registerRedirectRule(lit("/"), welcomePage);
+    QnRestProcessorPool::instance()->registerRedirectRule(lit("/static"), welcomePage);
+    QnRestProcessorPool::instance()->registerRedirectRule(lit("/static/"), welcomePage);
+
     auto reg =
         [](const QString& path, QnRestRequestHandler* handler,
             Qn::GlobalPermission permissions = Qn::NoGlobalPermissions)
