@@ -22,14 +22,9 @@ struct ApiLayoutTourItemData: ApiData
 
 #define ApiLayoutTourItemData_Fields (layoutId)(delayMs)
 
-// struct ApiLayoutTourItemWithRefData: ApiLayoutTourItemData
-// {
-//     QnUuid tourId;
-// };
-// #define ApiLayoutTourItemWithRefData_Fields ApiLayoutTourItemData_Fields (tourId)
-
-struct ApiLayoutTourData: ApiIdData
+struct ApiLayoutTourData: ApiData
 {
+    QnUuid id;
     QString name;
     ApiLayoutTourItemDataList items;
 
@@ -38,6 +33,6 @@ struct ApiLayoutTourData: ApiIdData
     bool operator==(const ApiLayoutTourData& rhs) const;
 };
 
-#define ApiLayoutTourData_Fields ApiIdData_Fields (name)(items)
+#define ApiLayoutTourData_Fields (id)(name)(items)
 
 } // namespace ec2

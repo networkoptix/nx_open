@@ -65,6 +65,11 @@ namespace ec2
         return AbstractLayoutManagerPtr();
     }
 
+    AbstractLayoutTourManagerPtr OldEcConnection::getLayoutTourManager(const Qn::UserAccessData& userAccessData)
+    {
+        return AbstractLayoutTourManagerPtr();
+    }
+
     AbstractVideowallManagerPtr OldEcConnection::getVideowallManager(const Qn::UserAccessData &)
     {
         return AbstractVideowallManagerPtr();
@@ -138,6 +143,11 @@ namespace ec2
     AbstractLayoutNotificationManagerPtr OldEcConnection::getLayoutNotificationManager()
     {
         return AbstractLayoutNotificationManagerPtr();
+    }
+
+    AbstractLayoutTourNotificationManagerPtr OldEcConnection::getLayoutTourNotificationManager()
+    {
+        return AbstractLayoutTourNotificationManagerPtr();
     }
 
     AbstractWebPageNotificationManagerPtr OldEcConnection::getWebPageNotificationManager()

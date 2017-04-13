@@ -1,8 +1,12 @@
 #include "layout_tour_manager.h"
 
+#include <common/common_module.h>
+
 #include <core/resource_management/resource_pool.h>
 
 #include <core/resource/layout_resource.h>
+
+#include <nx_ec/ec_api.h>
 
 #include <nx/utils/log/assert.h>
 
@@ -63,10 +67,11 @@ void QnLayoutTourManager::saveTour(const ec2::ApiLayoutTourData& tour)
 {
     NX_EXPECT(this->tour(tour.id).isValid());
 
-//     const auto connection = QnAppServerConnectionFactory::getConnection2();
-//     if (!connection)
-//         return;
-//     connection->getLayoutTourManager(Qn::kSystemAccess)->save(tour, this, nullptr);
+    const auto connection = commonModule()->ec2Connection();
+    if (!connection)
+        return;
+    connection->getLayoutTourManager(Qn::kSystemAccess)->save(tour, this, 
+        [](int /*reqId*/, ec2::ErrorCode /*errorCode*/) {});
 }
 
 void QnLayoutTourManager::removeTour(const ec2::ApiLayoutTourData& tour)
@@ -81,8 +86,17 @@ void QnLayoutTourManager::removeTour(const ec2::ApiLayoutTourData& tour)
     if (iter == m_tours.end())
         return;
 
+    const QnUuid tourId = iter->id;
+    NX_EXPECT(!tourId.isNull());
+
     m_tours.erase(iter);
     lock.unlock();
+
+    const auto connection = commonModule()->ec2Connection();
+    if (!connection)
+        return;
+    connection->getLayoutTourManager(Qn::kSystemAccess)->remove(tourId, this, 
+        [](int /*reqId*/, ec2::ErrorCode /*errorCode*/) {});
 
     emit tourRemoved(tour);
 }

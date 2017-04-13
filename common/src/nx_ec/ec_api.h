@@ -39,6 +39,7 @@
 #include "nx_ec/managers/abstract_camera_manager.h"
 #include "nx_ec/managers/abstract_user_manager.h"
 #include "nx_ec/managers/abstract_layout_manager.h"
+#include <nx_ec/managers/abstract_layout_tour_manager.h>
 #include "nx_ec/managers/abstract_webpage_manager.h"
 #include "nx_ec/managers/abstract_videowall_manager.h"
 
@@ -714,6 +715,7 @@ namespace ec2
         virtual AbstractBusinessEventManagerPtr getBusinessEventManager(const Qn::UserAccessData &userAccessData) = 0;
         virtual AbstractUserManagerPtr getUserManager(const Qn::UserAccessData &userAccessData) = 0;
         virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserAccessData &userAccessData) = 0;
+        virtual AbstractLayoutTourManagerPtr getLayoutTourManager(const Qn::UserAccessData& userAccessData) = 0;
         virtual AbstractVideowallManagerPtr getVideowallManager(const Qn::UserAccessData &userAccessData) = 0;
         virtual AbstractStoredFileManagerPtr getStoredFileManager(const Qn::UserAccessData &userAccessData) = 0;
         virtual AbstractUpdatesManagerPtr getUpdatesManager(const Qn::UserAccessData &userAccessData) = 0;
@@ -730,6 +732,7 @@ namespace ec2
         virtual AbstractBusinessEventNotificationManagerPtr getBusinessEventNotificationManager() = 0;
         virtual AbstractUserNotificationManagerPtr getUserNotificationManager() = 0;
         virtual AbstractLayoutNotificationManagerPtr getLayoutNotificationManager() = 0;
+        virtual AbstractLayoutTourNotificationManagerPtr getLayoutTourNotificationManager() = 0;
         virtual AbstractWebPageNotificationManagerPtr getWebPageNotificationManager() = 0;
         virtual AbstractDiscoveryNotificationManagerPtr getDiscoveryNotificationManager() = 0;
         virtual AbstractMiscNotificationManagerPtr getMiscNotificationManager() = 0;

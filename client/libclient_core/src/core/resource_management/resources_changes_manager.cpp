@@ -30,6 +30,21 @@
 
 #include <utils/common/delayed.h>
 
+namespace {
+
+//TODO: #vkutin #common Move this function to some common helpers file
+template<class... Args>
+auto safeProcedure(std::function<void(Args...)> proc)
+{
+    return [proc](Args... args)
+        {
+            if (proc)
+                proc(args...);
+        };
+}
+
+} // namespace
+
 QnResourcesChangesManager::QnResourcesChangesManager(QObject* parent):
     base_type(parent)
 {}
@@ -45,12 +60,7 @@ void QnResourcesChangesManager::deleteResources(
     const QnResourceList& resources,
     const ActionResultCallback& callback)
 {
-    const auto safeCallback =
-        [callback](bool success)
-        {
-            if (callback)
-                callback(success);
-        };
+    const auto safeCallback = safeProcedure(callback);
 
     if (resources.isEmpty())
     {
@@ -81,12 +91,14 @@ void QnResourcesChangesManager::deleteResources(
 
     connection->getResourceManager(Qn::kSystemAccess)->remove(idToDelete, this,
         [this, safeCallback, resources, sessionGuid,
-            thread = QPointer<QThread>(QThread::currentThread())]
+         thread = QPointer<QThread>(QThread::currentThread())]
             (int /* reqID */ , ec2::ErrorCode errorCode)
         {
-            // Check if all OK or we have already changed session or attributes pool was recreated.
-            const bool success = errorCode == ec2::ErrorCode::ok
-                || commonModule()->runningInstanceGUID() != sessionGuid;
+            /* Check if we have already changed session: */
+            if (commonModule()->runningInstanceGUID() != sessionGuid)
+                return;
+
+            const bool success = errorCode == ec2::ErrorCode::ok;
 
             if (thread)
                 executeInThread(thread, [safeCallback, success]() { safeCallback(success); });
@@ -335,10 +347,15 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
 /************************************************************************/
 
 void QnResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
-    UserChangesFunction applyChanges)
+    UserChangesFunction applyChanges, const ActionResultCallback& callback)
 {
+    const auto safeCallback = safeProcedure(callback);
+
     if (!applyChanges)
+    {
+        safeCallback(false);
         return;
+    }
 
     NX_ASSERT(user);
     if (!user)
@@ -346,7 +363,10 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
 
     auto connection = commonModule()->ec2Connection();
     if (!connection)
+    {
+        safeCallback(false);
         return;
+    }
 
     auto sessionGuid = commonModule()->runningInstanceGUID();
 
@@ -362,15 +382,20 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
     fromResourceToApi(user, apiUser);
 
     connection->getUserManager(Qn::kSystemAccess)->save(apiUser, user->getPassword(), this,
-        [this, user, userId, sessionGuid, backup]
-        ( int /*reqID*/, ec2::ErrorCode errorCode )
+        [this, user, userId, sessionGuid, backup, safeCallback,
+         thread = QPointer<QThread>(QThread::currentThread())]
+            (int /*reqID*/, ec2::ErrorCode errorCode)
         {
-            /* Check if all OK */
-            if (errorCode == ec2::ErrorCode::ok)
+            /* Check if we have already changed session: */
+            if (commonModule()->runningInstanceGUID() != sessionGuid)
                 return;
 
-            /* Check if we have already changed session or attributes pool was recreated. */
-            if (commonModule()->runningInstanceGUID() != sessionGuid)
+            const bool success = errorCode == ec2::ErrorCode::ok;
+
+            if (thread)
+                executeInThread(thread, [safeCallback, success]() { safeCallback(success); });
+
+            if (success)
                 return;
 
             QnUserResourcePtr existingUser = resourcePool()->getResourceById<QnUserResource>(userId);
@@ -378,7 +403,7 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr& user,
                 ec2::fromApiToResource(backup, existingUser);
 
             emit saveChangesFailed(QnResourceList() << user);
-        } );
+        });
 }
 
 void QnResourcesChangesManager::saveAccessibleResources(const QnResourceAccessSubject& subject,

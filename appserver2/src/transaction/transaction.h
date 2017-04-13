@@ -704,6 +704,39 @@ APPLY(603, removeLayout, ApiIdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
+APPLY(604, getLayoutTours, ApiLayoutTourDataList, \
+                       false, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper(), /* trigger notification*/ \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
+APPLY(605, saveLayoutTour, ApiLayoutTourData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       CreateHashByIdHelper(), /* getHash*/ \
+                       LayoutTourNotificationManagerHelper(), /* trigger notification*/ \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
+APPLY(606, removeLayoutTour, ApiIdData, \
+                       true, \
+                       false, \
+                       CreateHashByIdHelper(), \
+                       &apiIdDataTriggerNotificationHelper, \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(700, getVideowalls, ApiVideowallDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
