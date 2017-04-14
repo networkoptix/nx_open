@@ -39,7 +39,7 @@ public:
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
 private:
-    std::unique_ptr<aio::StreamTransformingAsyncChannel> m_trasformingChannel;
+    std::unique_ptr<aio::StreamTransformingAsyncChannel> m_asyncTransformingChannel;
     std::unique_ptr<AbstractStreamSocket> m_delegatee;
 
     void stopWhileInAioThread();

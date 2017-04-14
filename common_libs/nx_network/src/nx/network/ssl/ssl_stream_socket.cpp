@@ -19,7 +19,7 @@ StreamSocket::StreamSocket(
     else
         sslPipeline = std::make_unique<ssl::ConnectingPipeline>();
 
-    m_trasformingChannel = std::make_unique<aio::StreamTransformingAsyncChannel>(
+    m_asyncTransformingChannel = std::make_unique<aio::StreamTransformingAsyncChannel>(
         aio::makeAsyncChannelAdapter(m_delegatee.get()),
         std::move(sslPipeline));
 
@@ -35,7 +35,7 @@ StreamSocket::~StreamSocket()
 void StreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
-    m_trasformingChannel->bindToAioThread(aioThread);
+    m_asyncTransformingChannel->bindToAioThread(aioThread);
     m_delegatee->bindToAioThread(aioThread);
 }
 
@@ -43,14 +43,14 @@ void StreamSocket::readSomeAsync(
     nx::Buffer* const buffer,
     std::function<void(SystemError::ErrorCode, size_t)> handler)
 {
-    m_trasformingChannel->readSomeAsync(buffer, std::move(handler));
+    m_asyncTransformingChannel->readSomeAsync(buffer, std::move(handler));
 }
 
 void StreamSocket::sendAsync(
     const nx::Buffer& buffer,
     std::function<void(SystemError::ErrorCode, size_t)> handler)
 {
-    m_trasformingChannel->sendAsync(buffer, std::move(handler));
+    m_asyncTransformingChannel->sendAsync(buffer, std::move(handler));
 }
 
 void StreamSocket::cancelIOAsync(
@@ -67,12 +67,12 @@ void StreamSocket::cancelIOAsync(
 
 void StreamSocket::cancelIOSync(nx::network::aio::EventType eventType)
 {
-    m_trasformingChannel->cancelIOSync(eventType);
+    m_asyncTransformingChannel->cancelIOSync(eventType);
 }
 
 void StreamSocket::stopWhileInAioThread()
 {
-    m_trasformingChannel.reset();
+    m_asyncTransformingChannel.reset();
     m_delegatee.reset();
 }
 
