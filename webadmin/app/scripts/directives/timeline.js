@@ -86,6 +86,8 @@ angular.module('webadminApp')
                         allowDebug:Config.allowDebugMode
                     });
 
+                var timelineActions = new TimelineActions(timelineConfig, scope.positionProvider, scope.scaleManager, animationState,
+                    animateScope, scope);
                 // !!! Initialization functions
                 function updateTimelineHeight(){
                     canvas.height = element.find('.viewport').height();
@@ -105,52 +107,9 @@ angular.module('webadminApp')
                 }
 
                 // !!! Render everything: updating function
-                scope.lastPlayedPosition = 0;
-                var nextPlayedPosition = 0;
-
-                function stopAnimatingMove(){
-                    var animation = animateScope.animating(scope, 'lastPlayedPosition');
-                    if(animation){
-                        animation.breakAnimation();
-                    }
-                }
-                function updatePosition(){
-                    if(scope.positionProvider) {
-
-                        if(nextPlayedPosition ){
-                            stopAnimatingMove();
-
-                            if(scope.positionProvider.liveMode || nextPlayedPosition == scope.positionProvider.playedPosition){
-                                scope.lastPlayedPosition = nextPlayedPosition;
-                                nextPlayedPosition = 0;
-                            }
-                            return; // ignore changes until played position wasn't changed
-                        }
-
-                        var intervalMs = Math.abs(scope.lastPlayedPosition - scope.positionProvider.playedPosition);
-                        var duration = Math.min(timelineConfig.animationDuration, intervalMs);
-                        var largeJump = intervalMs > 2 * timelineConfig.animationDuration;
-
-                        if(intervalMs == 0){
-                            return;
-                        }
-                        if (!largeJump || !animateScope.animating(scope, 'lastPlayedPosition')) { // Large jump
-                            animateScope.animate(scope, 'lastPlayedPosition', scope.positionProvider.playedPosition, largeJump ? 'smooth' : 'linear', duration).then(
-                                function () {},
-                                function () {},
-                                function (value) {
-                                    if(nextPlayedPosition){
-                                        console.log("problem with playing position",value,nextPlayedPosition);
-                                        return;
-                                    }
-                                    scope.scaleManager.tryToSetLiveDate(value, scope.positionProvider.liveMode, (new Date()).getTime());
-                                });
-                        }
-                    }
-                }
                 function render(){
 
-                    updatePosition();
+                    timelineActions.updatePosition();
 
                     if(scope.recordsProvider) {
                         scope.recordsProvider.updateLastMinute(timelineConfig.lastMinuteDuration, scope.scaleManager.levels.events.index);
@@ -164,7 +123,6 @@ angular.module('webadminApp')
 
 
                 /**
-                 *
                  * Events model for timeline:
                  *
                  * Slider:
@@ -194,42 +152,21 @@ angular.module('webadminApp')
                  *      + Hold - Constant zooming
                  */
 
-
-
                 function goToLive(force){
-                    var moveDate = scope.scaleManager.screenCoordinateToDate(1);
-                    animateScope.progress(scope, 'goingToLive' ).then(
-                        function(){
-                            var activeDate = (new Date()).getTime();
-                            scope.scaleManager.setAnchorDateAndPoint(activeDate,1);
-                            scope.scaleManager.watchPlaying(activeDate, true);
-                        },
-                        function(){},
-                        function(val){
-                            var activeDate = moveDate + val * ((new Date()).getTime() - moveDate);
-                            scope.scaleManager.setAnchorDateAndPoint(activeDate,1);
-                        });
-
+                    timelineActions.goToLive(force);
                     if(!scope.positionProvider.liveMode || force) {
                         scope.positionHandler(false);
                     }
                 }
 
                 function playPause(){
-                    if(!scope.positionProvider.playing){
-                        scope.scaleManager.watchPlaying();
-                    }
-
+                    timelineActions.playPause();
                     scope.playHandler(!scope.positionProvider.playing);
                 }
 
                 function timelineClick(mouseX){
-                    delayWatchingPlayingPosition();
-                    stopAnimatingMove();
+                    var date = timelineActions.setAnchorCoordinate(mouseX);
 
-                    var date = scope.scaleManager.screenCoordinateToDate(mouseX);
-                    scope.scaleManager.setAnchorCoordinate(mouseX);// Set position to keep
-                    nextPlayedPosition = date;
                     var lastMinute = scope.scaleManager.lastMinute();
                     if(date > lastMinute){
                         goToLive ();
@@ -238,83 +175,32 @@ angular.module('webadminApp')
                     }
                 }
 
-                // Disable watching for playing position during any animations
-                var stopDelay = null;
-                function delayWatchingPlayingPosition(){
-                    if(!stopDelay) {
-                        scope.scaleManager.stopWatching();
-                    }else{
-                        clearTimeout(stopDelay);
-                    }
-                    stopDelay = setTimeout(function(){
-                        scope.scaleManager.releaseWatching();
-                        stopDelay = null;
-                    },timelineConfig.animationDuration);
-                }
 
 
                 /**
                  * Scrolling functions
                  */
 
-                // linear is for holding function
-                function animateScroll(targetPosition,linear){
-                    delayWatchingPlayingPosition();
-                    scope.scrollTarget = scope.scaleManager.scroll();
-                    animateScope.animate(scope, 'scrollTarget', targetPosition, linear?'linear':false).
-                        then(
-                        function(){
-                            scrollingNow = false;
-                        },
-                        function(){},
-                        function(value){
-                            scope.scaleManager.scroll(value);
-                        }
-                    );
-                }
 
-                // Constant scrolling process
-                var scrollingNow = false;
-                var scrollingLeft = false;
-                var scrollingSpeed = 0;
-                function scrollingRenew(stoping){
-                    if(scrollingNow) {
-                        var moveScroll = (scrollingLeft ? -1 : 1) * scrollingSpeed * scope.viewportWidth;
-                        var scrollTarget = scope.scaleManager.getScrollByPixelsTarget(moveScroll);
-                        animateScroll(scrollTarget,stoping);
-                    }
-                }
-                function scrollingStart(left,speed){
-                    scrollingLeft = left;
-                    scrollingNow = true;
-                    scrollingSpeed = speed;
-                    scrollingRenew ();
-                }
-                function scrollingStop(){
-                    if(scrollingNow) {
-                        scrollingRenew(true); // Smooth slowdown for scrolling
-                        scrollingNow = false;
-                    }
-                }
 
                 // High-level Handlers
                 function scrollbarClickOrHold(left){
-                    scrollingStart(left,timelineConfig.scrollSpeed);
+                    timelineActions.scrollingStart(left,timelineConfig.scrollSpeed);
                 }
                 function scrollbarDblClick(mouseX){
-                    animateScroll(mouseX / scope.viewportWidth);
+                    timelineActions.animateScroll(mouseX / scope.viewportWidth);
                 }
 
                 function scrollButtonClickOrHold(left){
-                    scrollingStart(left,timelineConfig.scrollButtonSpeed);
+                    timelineActions.scrollingStart(left,timelineConfig.scrollButtonSpeed);
                 }
                 function scrollButtonDblClick(left){
-                    animateScroll(left ? 0 : 1);
+                    timelineActions.animateScroll(left ? 0 : 1);
                 }
 
                 function scrollByWheel(pixels){
                     scope.scaleManager.scrollByPixels(pixels);
-                    delayWatchingPlayingPosition();
+                    timelineActions.delayWatchingPlayingPosition();
                 }
 
                 var catchScrollBar = false;
@@ -427,7 +313,7 @@ angular.module('webadminApp')
                             scope.scaleManager.zoom(value);
                         }
                         $timeout(checkZoomButtons);
-                        delayWatchingPlayingPosition();
+                        timelineActions.delayWatchingPlayingPosition();
                     }
 
 
@@ -436,7 +322,7 @@ angular.module('webadminApp')
                             scope.zoomTarget = scope.scaleManager.zoom();
                         }
 
-                        delayWatchingPlayingPosition();
+                        timelineActions.delayWatchingPlayingPosition();
                         animateScope.animate(scope, 'zoomTarget', zoomTarget, linear?'linear':'dryResistance').then(
                             function () {},
                             function () {},
@@ -673,7 +559,7 @@ angular.module('webadminApp')
 
                 function viewportMouseUp(){
                     updateMouseCoordinate(null);
-                    scrollingStop(false);
+                    timelineActions.scrollingStop(false);
                 }
                 function viewportMouseMove(event){
                     updateMouseCoordinate(event);
@@ -729,6 +615,9 @@ angular.module('webadminApp')
 
 
 
+                scope.$watch('positionProvider',function(){
+                    timelineActions.setPositionProvider(scope.positionProvider);
+                });
 
                 // !!! Subscribe for different events which affect timeline
                 scope.$watch('positionProvider.liveMode',function(){
