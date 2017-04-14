@@ -26,7 +26,7 @@
 
 #include <nx/network/nettools.h>
 
-#include <utils/crypt/linux_passwd_crypt.h>
+#include <nx/utils/crypt/linux_passwd_crypt.h>
 #include <core/resource/user_resource.h>
 #include <server/host_system_password_synchronizer.h>
 #include <core/resource_management/resource_properties.h>
