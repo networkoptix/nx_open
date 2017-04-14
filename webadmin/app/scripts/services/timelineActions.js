@@ -116,9 +116,9 @@ TimelineActions.prototype.setAnchorCoordinate = function(mouseX){
 // linear is for holding function
 TimelineActions.prototype.animateScroll = function(targetPosition, linear){
     var self = this;
-    this.delayWatchingPlayingPosition();
-    this.scope.scrollTarget = this.scaleManager.scroll();
-    this.animateScope.animate(this.scope, 'scrollTarget', targetPosition, linear?'linear':false).
+    self.delayWatchingPlayingPosition();
+    self.scope.scrollTarget = self.scaleManager.scroll();
+    self.animateScope.animate(self.scope, 'scrollTarget', targetPosition, linear?'linear':false).
         then(
         function(){
             self.scrollingNow = false;
@@ -133,9 +133,9 @@ TimelineActions.prototype.animateScroll = function(targetPosition, linear){
 // Constant scrolling process
 TimelineActions.prototype.scrollingRenew = function(stoping){
     if(this.scrollingNow) {
-        var moveScroll = (this.scrollingLeft ? -1 : 1) * this.scrollingSpeed * scope.viewportWidth;
+        var moveScroll = (this.scrollingLeft ? -1 : 1) * this.scrollingSpeed;
         var scrollTarget = this.scaleManager.getScrollByPixelsTarget(moveScroll);
-        timelineActions.animateScroll(scrollTarget,stoping);
+        this.animateScroll(scrollTarget,stoping);
     }
 };
 TimelineActions.prototype.scrollingStart = function(left,speed){

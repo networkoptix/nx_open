@@ -116,7 +116,7 @@ angular.module('webadminApp')
                     }
 
                     zoomingRenew();
-                    scrollingRenew();
+                    timelineActions.scrollingRenew();
 
                     timelineRender.Draw( mouseXOverTimeline, mouseYOverTimeline, catchScrollBar);
                 }
@@ -185,14 +185,14 @@ angular.module('webadminApp')
 
                 // High-level Handlers
                 function scrollbarClickOrHold(left){
-                    timelineActions.scrollingStart(left,timelineConfig.scrollSpeed);
+                    timelineActions.scrollingStart(left, timelineConfig.scrollSpeed * scope.viewportWidth);
                 }
                 function scrollbarDblClick(mouseX){
                     timelineActions.animateScroll(mouseX / scope.viewportWidth);
                 }
 
                 function scrollButtonClickOrHold(left){
-                    timelineActions.scrollingStart(left,timelineConfig.scrollButtonSpeed);
+                    timelineActions.scrollingStart(left, timelineConfig.scrollButtonSpeed * scope.viewportWidth);
                 }
                 function scrollButtonDblClick(left){
                     timelineActions.animateScroll(left ? 0 : 1);
