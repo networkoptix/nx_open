@@ -14,7 +14,7 @@ from requests.auth import HTTPDigestAuth
 log = logging.getLogger(__name__)
 
 
-UNEXISTEN_USER_ROLE_GUIID = '44e4161e-158e-2201-e000-000000000001'
+UNEXISTENT_USER_ROLE_GUIID = '44e4161e-158e-2201-e000-000000000001'
 
 
 @pytest.fixture
@@ -73,13 +73,13 @@ def assert_server_has_resource(env, method, **kw):
     resources = [r for r in env.server.rest_api.get_api_fn('GET', 'ec2', method)()
                  if is_subset(kw, r)]
     assert len(resources) != 0, "'%r' doesn't have resource '%s'" % (
-        env.server.box, kw)
+        env.server, kw)
 
 
 def assert_server_does_not_have_resource(env, method, resource_id):
     resources = env.server.rest_api.get_api_fn('GET', 'ec2', method)(id=resource_id)
     assert len(resources) == 0, "'%r' has unexpected resource '%s'" % (
-        env.server.box, resource_id)
+        env.server, resource_id)
 
 
 def assert_post_forbidden(env, method, **kw):
@@ -106,20 +106,20 @@ def test_create_and_remove_user_with_resource(env):
 
 
 # https://networkoptix.atlassian.net/browse/VMS-3052
-def test_not_existing_user_role(env):
+def test_missing_user_role(env):
     user_1 = generator.generate_user_data(user_id=1, name="user1", email="user1@example.com")
     user_2 = generator.generate_user_data(user_id=2, name="user2", email="user2@example.com",
-                                          userRoleId=UNEXISTEN_USER_ROLE_GUIID)
-    # Try link exists user to unexisting role
+                                          userRoleId=UNEXISTENT_USER_ROLE_GUIID)
+    # Try link existing user to a missing role
     env.server.rest_api.ec2.saveUser.POST(**user_1)
     assert_server_has_resource(env, 'getUsers', id=user_1['id'])
-    user_1_with_unexpected_role = dict(user_1, userRoleId=UNEXISTEN_USER_ROLE_GUIID)
+    user_1_with_unexpected_role = dict(user_1, userRoleId=UNEXISTENT_USER_ROLE_GUIID)
     assert_post_forbidden(env, 'saveUser', **user_1_with_unexpected_role)
 
     # Try create new user to unexisting role
     assert_post_forbidden(env, 'saveUser', **user_2)
 
-    assert_server_has_resource(env, 'getUsers', id=user_1['id'])
+    assert_server_has_resource(env, 'getUsers', id=user_1['id'], userRoleId=user_1['userRoleId'])
     assert_server_does_not_have_resource(env, 'getUsers', user_2['id'])
 
 
@@ -156,11 +156,11 @@ def test_http_header_server(env):
     response = requests.get(url, auth=HTTPDigestAuth(env.server.user, env.server.password))
     log.debug('%r headers: %s', env.server, response.headers)
     assert response.status_code == 200
-    assert 'Server' in response.headers.keys(), "HTTP header 'Server' expected"
+    assert 'Server' in response.headers.keys(), "HTTP header 'Server' is expected"
     response = requests.get(url, auth=HTTPDigestAuth('invalid', 'invalid'))
     log.debug('%r headers: %s', env.server, response.headers)
     assert response.status_code == 401
-    assert 'WWW-Authenticate' in response.headers.keys(), "HTTP header 'WWW-Authenticate' expected"
+    assert 'WWW-Authenticate' in response.headers.keys(), "HTTP header 'WWW-Authenticate' is expected"
     assert 'Server' not in response.headers.keys(), "Unexpected HTTP header 'Server'"
 
 
