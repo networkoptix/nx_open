@@ -59,9 +59,9 @@ void QnResourceTreeModelLayoutToursNode::handleTourChanged(const ec2::ApiLayoutT
     ensureLayoutTourNode(tour)->update();
 }
 
-void QnResourceTreeModelLayoutToursNode::handleTourRemoved(const ec2::ApiLayoutTourData& tour)
+void QnResourceTreeModelLayoutToursNode::handleTourRemoved(const QnUuid& tourId)
 {
-    removeNode(m_nodes.value(tour.id));
+    removeNode(m_nodes.value(tourId));
 }
 
 QnResourceTreeModelNodePtr QnResourceTreeModelLayoutToursNode::ensureLayoutTourNode(

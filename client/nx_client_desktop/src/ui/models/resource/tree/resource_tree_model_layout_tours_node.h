@@ -25,7 +25,7 @@ protected:
 private:
     void handleTourAdded(const ec2::ApiLayoutTourData& tour);
     void handleTourChanged(const ec2::ApiLayoutTourData& tour);
-    void handleTourRemoved(const ec2::ApiLayoutTourData& tour);
+    void handleTourRemoved(const QnUuid& tourId);
 
     QnResourceTreeModelNodePtr ensureLayoutTourNode(const ec2::ApiLayoutTourData& tour);
 

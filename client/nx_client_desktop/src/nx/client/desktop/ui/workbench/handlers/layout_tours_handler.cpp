@@ -2,10 +2,14 @@
 
 #include <QtWidgets/QAction>
 
+#include <common/common_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/layout_tour_manager.h>
 
 #include <core/resource/layout_resource.h>
+
+#include <nx_ec/ec_api.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/dialogs/layout_tour_dialog.h>
@@ -30,9 +34,9 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
         &LayoutTourController::updateTour);
 
     connect(qnLayoutTourManager, &QnLayoutTourManager::tourRemoved, this,
-        [this](const ec2::ApiLayoutTourData& tour)
+        [this](const QnUuid& tourId)
         {
-            m_controller->stopTour(tour.id);
+            m_controller->stopTour(tourId);
         });
 
     connect(action(QnActions::NewLayoutTourAction), &QAction::triggered, this,
@@ -47,6 +51,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             tour.name = nx::utils::generateUniqueString(
                 usedNames, tr("Layout Tour"), tr("Layout Tour %1"));
             qnLayoutTourManager->addOrUpdateTour(tour);
+            saveTourToServer(tour);
         });
 
     connect(action(QnActions::RenameLayoutTourAction), &QAction::triggered, this,
@@ -59,7 +64,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
                 return;
             tour.name = parameters.argument<QString>(Qn::ResourceNameRole);
             qnLayoutTourManager->addOrUpdateTour(tour);
-            qnLayoutTourManager->saveTour(tour);
+            saveTourToServer(tour);
         });
 
     connect(action(QnActions::RemoveLayoutTourAction), &QAction::triggered, this,
@@ -67,10 +72,8 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
         {
             QnActionParameters parameters = menu()->currentParameters(sender());
             auto id = parameters.argument<QnUuid>(Qn::UuidRole);
-            auto tour = qnLayoutTourManager->tour(id);
-            if (!tour.isValid())
-                return;
-            qnLayoutTourManager->removeTour(tour);
+            qnLayoutTourManager->removeTour(id);
+            removeTourFromServer(id);
         });
 
     connect(action(QnActions::LayoutTourSettingsAction), &QAction::triggered, this,
@@ -89,7 +92,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
 
             dialog->submitData(&tour);
             qnLayoutTourManager->addOrUpdateTour(tour);
-            qnLayoutTourManager->saveTour(tour);
+            saveTourToServer(tour);
         });
 
     connect(action(QnActions::ToggleLayoutTourModeAction), &QAction::triggered, this,
@@ -155,6 +158,25 @@ void LayoutToursHandler::openToursLayout()
     resource->setId(QnUuid::createUuid());
     resourcePool()->addResource(resource);
     menu()->trigger(QnActions::OpenSingleLayoutAction, resource);
+}
+
+void LayoutToursHandler::saveTourToServer(const ec2::ApiLayoutTourData& tour)
+{
+    NX_EXPECT(qnLayoutTourManager->tour(tour.id).isValid());
+    if (const auto connection = commonModule()->ec2Connection())
+    {
+        connection->getLayoutTourManager(Qn::kSystemAccess)->save(tour, this,
+            [](int /*reqId*/, ec2::ErrorCode /*errorCode*/) {});
+    };
+}
+
+void LayoutToursHandler::removeTourFromServer(const QnUuid& tourId)
+{
+    if (const auto connection = commonModule()->ec2Connection())
+    {
+        connection->getLayoutTourManager(Qn::kSystemAccess)->remove(tourId, this,
+            [](int /*reqId*/, ec2::ErrorCode /*errorCode*/) {});
+    }
 }
 
 } // namespace workbench

@@ -2,6 +2,8 @@
 
 #include <QtCore/QObject>
 
+#include <nx_ec/data/api_fwd.h>
+
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace nx {
@@ -23,6 +25,8 @@ public:
 
 private:
     void openToursLayout();
+    void saveTourToServer(const ec2::ApiLayoutTourData& tour);
+    void removeTourFromServer(const QnUuid& tourId);
 
 private:
     LayoutTourController* m_controller;

@@ -1809,10 +1809,12 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this));
 
     factory(QnActions::RemoveLayoutTourAction).
-        flags(Qn::Scene | Qn::Tree | Qn::NoTarget).
+        flags(Qn::Scene | Qn::Tree | Qn::NoTarget | Qn::IntentionallyAmbiguous).
         mode(QnActionTypes::DesktopMode).
         text(tr("Delete Layout Tour")).
         requiredGlobalPermission(Qn::GlobalAdminPermission). //TODO: #GDM #3.1 #tbd
+        shortcut(lit("Del")).
+        shortcut(Qt::Key_Backspace, QnActionBuilder::Mac, true).
         condition(new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this));
 
     factory().

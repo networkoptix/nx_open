@@ -650,7 +650,6 @@ void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataL
 
 void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoData& fullData)
 {
-
     resourceAccessManager()->beginUpdate();
     resourceAccessProvider()->beginUpdate();
 

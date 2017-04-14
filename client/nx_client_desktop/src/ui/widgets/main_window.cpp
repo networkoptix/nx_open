@@ -300,6 +300,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     addAction(action(QnActions::StopSharingLayoutAction));
     addAction(action(QnActions::DeleteVideoWallItemAction));
     addAction(action(QnActions::DeleteVideowallMatrixAction));
+    addAction(action(QnActions::RemoveLayoutTourAction));
     addAction(action(QnActions::SelectAllAction));
     addAction(action(QnActions::CheckFileSignatureAction));
     addAction(action(QnActions::TakeScreenshotAction));

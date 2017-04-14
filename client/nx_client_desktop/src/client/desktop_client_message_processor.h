@@ -18,8 +18,7 @@ public:
 protected:
     virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection) override;
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) override;
-
-protected:
+    virtual void onGotInitialNotification(const ec2::ApiFullInfoData& fullData) override;
     virtual QnResourceFactory* getResourceFactory() const override;
 
 private slots:
