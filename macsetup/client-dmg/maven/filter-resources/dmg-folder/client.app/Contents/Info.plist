@@ -29,7 +29,7 @@
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.business</string>
 	<key>LSUIElement</key>
-	<true/>
+	<false/>
 	<key>NSHumanReadableCopyright</key>
 	<string>© 2011-2014 ${company.name}</string>
 </dict>

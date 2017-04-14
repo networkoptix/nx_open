@@ -48,11 +48,3 @@ void mac_openInFinder(const QString &path) {
     NSURL *fileUrl = [NSURL fileURLWithPath:fromQString(path)];
     [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs:[NSArray arrayWithObjects:fileUrl, nil]];
 }
-
-void setAppVisibleInDock(bool visible)
-{
-    if (visible)
-        [NSApp setActivationPolicy: NSApplicationActivationPolicyRegular];
-    else
-        [NSApp setActivationPolicy: NSApplicationActivationPolicyProhibited];
-}
