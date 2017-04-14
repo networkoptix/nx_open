@@ -22,7 +22,7 @@
     <modules>
         <module>applauncher</module>
         <module>desktop_client</module>
-        <module>libclient</module>
+        <module>nx_client_desktop</module>
         <module>libclient_core</module>
         <module>minilauncher</module>
         <module>mobile_client</module>

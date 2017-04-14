@@ -88,10 +88,6 @@ Global
         ${mobile_client.guid}.Debug|x64.Build.0 = Debug|x64
         ${mobile_client.guid}.Release|x64.ActiveCfg = Release|x64
         ${mobile_client.guid}.Release|x64.Build.0 = Release|x64
-        ${libclient.guid}.Debug|x64.ActiveCfg = Debug|x64
-        ${libclient.guid}.Debug|x64.Build.0 = Debug|x64
-        ${libclient.guid}.Release|x64.ActiveCfg = Release|x64
-        ${libclient.guid}.Release|x64.Build.0 = Release|x64
         ${libclient_core.guid}.Debug|x64.ActiveCfg = Debug|x64
         ${libclient_core.guid}.Debug|x64.Build.0 = Debug|x64
         ${libclient_core.guid}.Release|x64.ActiveCfg = Release|x64
