@@ -164,7 +164,6 @@ protected:
 protected slots:
     void updateCentralWidget();
     void updateCurrentWidget();
-    void updateSliderFromReader(bool keepInWindow = true);
     void updateSliderOptions();
     void updateScrollBarFromSlider();
     void updateSliderFromScrollBar();
@@ -228,6 +227,14 @@ protected slots:
     void at_dayTimeWidget_timeClicked(const QTime &time);
 
 private:
+    enum class UpdateSliderMode
+    {
+        KeepInWindow,
+        ForcedUpdate
+    };
+
+    void updateSliderFromReader(UpdateSliderMode mode = UpdateSliderMode::KeepInWindow);
+
     QnCachingCameraDataLoaderPtr loaderByWidget(const QnMediaResourceWidget* widget, bool createIfNotExists = true);
 
     bool hasWidgetWithCamera(const QnSecurityCamResourcePtr &camera) const;
