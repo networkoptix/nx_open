@@ -13,17 +13,18 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
-#include <nx/utils/thread/long_runnable.h>
 #include <nx/network/async_stoppable.h>
-
-#include <nx/utils/async_operation_guard.h>
-#include <nx/utils/timer_manager.h>
 #include <nx/network/aio/aio_event_handler.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/nettools.h>
 #include <nx/network/socket.h>
+#include <nx/utils/async_operation_guard.h>
 #include <nx/utils/atomic_unique_ptr.h>
+#include <nx/utils/thread/long_runnable.h>
+#include <nx/utils/timer_manager.h>
+
+class QnGlobalSettings;
 
 namespace nx_upnp {
 

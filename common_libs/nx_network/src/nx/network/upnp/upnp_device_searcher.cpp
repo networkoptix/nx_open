@@ -8,9 +8,10 @@
 
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
-
 #include <nx/utils/app_info.h>
 #include <nx/utils/concurrent.h>
+
+#include <api/global_settings.h>
 
 using namespace std;
 using namespace nx::network;
