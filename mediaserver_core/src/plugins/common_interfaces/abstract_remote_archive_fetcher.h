@@ -8,6 +8,7 @@
 #include <QtCore/QByteArray>
 
 namespace nx {
+namespace mediaserver_core {
 namespace plugins {
 
 using BufferType = QByteArray;
@@ -58,4 +59,5 @@ public:
 };
 
 } // namespace plugins
+} // namespace mediaserver_core
 } // namespace nx
