@@ -185,9 +185,9 @@ bool SelfUpdater::updateApplauncher()
     }
 
     const QDir targetDir(companyDataDir.absoluteFilePath(kApplauncherDirectory)
-        + L'/' + QnAppInfo::customizationName());
+        + L'/' + QnAppInfo::customizationName() + lit(".app"));
     const QDir backupDir(companyDataDir.absoluteFilePath(kApplauncherBackupDirectory)
-        + L'-' + QnAppInfo::customizationName());
+        + L'-' + QnAppInfo::customizationName() + lit(".app"));
 
     const auto lockFilePath = companyDataDir.absoluteFilePath(lit("applauncher-update.lock"));
 
