@@ -23,7 +23,7 @@ unsigned char kShortTextMessageFinNoMask[] = { 0x81, 0x5, 'h', 'e', 'l', 'l', 'o
 using ::testing::_;
 using ::testing::AtLeast;
 
-std::vector<char> payload;
+std::vector<char> kDefaultPayload;
 std::once_flag payloadInitOnceFlag;
 
 std::vector<char> prepareMessage(const std::vector<char>& payload, int frameCount, FrameType type, bool masked, int mask)
@@ -60,16 +60,22 @@ protected:
     {
         std::call_once(payloadInitOnceFlag, []()
             {
-                payload.resize(1000);
+                kDefaultPayload.resize(1000);
                 for (int i = 0; i < 1000; i += 5)
-                    memcpy(payload.data() + i, "hello", 5);
+                    memcpy(kDefaultPayload.data() + i, "hello", 5);
             });
     }
 
-    void testWebsocketParserAndSerializer(int readSize, int frameCount, FrameType type, bool masked, unsigned int mask)
+    void testWebsocketParserAndSerializer(
+        int readSize, 
+        int frameCount, 
+        FrameType type, 
+        bool masked, 
+        unsigned int mask, 
+        const std::vector<char>& payload = kDefaultPayload)
     {
         EXPECT_CALL(ph, frameStarted(type, frameCount == 1 ? true : false)).Times(1);
-        EXPECT_CALL(ph, frameStarted(FrameType::continuation, true)).Times(AtLeast(frameCount == 1 ? 0 : 1));
+        EXPECT_CALL(ph, frameStarted(FrameType::continuation, _)).Times(AtLeast(frameCount == 1 ? 0 : 1));
         EXPECT_CALL(ph, framePayload(_, _)).Times(AtLeast(1));
         EXPECT_CALL(ph, frameEnded()).Times(frameCount);
         EXPECT_CALL(ph, messageEnded()).Times(1);
@@ -124,7 +130,14 @@ TEST_F(WebsocketParserTest, BinaryMessage_2Frames_LengthShort_NoMask)
     testWebsocketParserAndSerializer(13, 2, FrameType::binary, false, 0);
 }
 
-TEST_F(WebsocketParserTest, TextMessage_5Frames_LengthShort_Mask)
+TEST_F(WebsocketParserTest, MultipleFrames_LengthShort_Mask)
 {
-    testWebsocketParserAndSerializer(1, 5, FrameType::text, false, 0xd903);
+    testWebsocketParserAndSerializer(10, 5, FrameType::text, true, 0xd903);
+    testWebsocketParserAndSerializer(1, 7, FrameType::binary, true, 0xfa121423);
+    testWebsocketParserAndSerializer(13, 33, FrameType::binary, true, 0xfa121a23);
+}
+
+TEST_F(WebsocketParserTest, MultipleFrames_Length64_Mask)
+{
+
 }

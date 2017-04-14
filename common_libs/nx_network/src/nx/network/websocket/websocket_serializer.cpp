@@ -18,27 +18,34 @@ int calcHeaderSize(bool masked, int payloadLenType)
 
 int fillHeader(char* data, bool fin, int opCode, int payloadLenType, int payloadLen, bool masked, unsigned int mask)
 {
-    data[0] |= (int)fin << 7;
-    data[0] |= opCode & 0xf;
-    data[1] |= (int)masked << 7;
-    data[1] |= payloadLenType & 0x7f;
+    char * pdata = data;
 
-    int maskOffset = 2;
+    *pdata |= (int)fin << 7;
+    *pdata |= opCode & 0xf;
+    pdata++;
+
+    *pdata |= (int)masked << 7;
+    *pdata |= payloadLenType & 0x7f;
+    pdata++;
+
     if (payloadLenType == 126)
     {
-        *reinterpret_cast<unsigned short*>(data + 2) = htons(payloadLen);
-        maskOffset = 4;
+        *reinterpret_cast<unsigned short*>(pdata) = htons(payloadLen);
+        pdata += 2;
     }
-    else
+    else if (payloadLenType == 127)
     {
-        *reinterpret_cast<uint64_t*>(data + 2) = htonll(payloadLen);
-        maskOffset = 10;
+        *reinterpret_cast<uint64_t*>(pdata) = htonll(payloadLen);
+        pdata += 8;
     }
 
     if (masked)
-        *reinterpret_cast<unsigned int*>(data + maskOffset) = mask;
+    {
+        *reinterpret_cast<unsigned int*>(pdata) = mask;
+        pdata += 4;
+    }
 
-    return maskOffset;
+    return pdata - data;
 }
 
 int payloadLenTypeByLen(int64_t len)
@@ -66,7 +73,7 @@ int prepareFrame(const char* payload, int payloadLen, FrameType type,
 
     if (masked)
     {
-        for (int i = 0; i < outLen; i++)
+        for (int i = 0; i < payloadLen; i++)
             out[i + headerOffset] = out[i + headerOffset] ^ ((unsigned char*)(&mask))[i % 4];
     }
 

@@ -38,7 +38,10 @@ void Parser::processPayload(char* data, int len)
     if (m_masked) 
     {
         for (int i = 0; i < outLen; i++)
-            data[i] = data[i] ^ ((unsigned char*)(&m_mask))[i % 4];
+        {
+            data[i] = data[i] ^ ((unsigned char*)(&m_mask))[m_maskPos % 4];
+            m_maskPos++;
+        }
     }
     m_handler->framePayload(data, outLen);
     m_payloadLen -= outLen;
@@ -116,44 +119,45 @@ void Parser::setRole(Role role)
 
 void Parser::readHeaderFixed(char* data)
 {
-    m_opCode = (FrameType)(data[0] & 0x0F);
-    m_fin = (data[0] >> 7) & 0x01;
-    m_masked = (data[1] >> 7) & 0x01;
+    m_opCode = (FrameType)(*data & 0x0F);
+    m_fin = (*data >> 7) & 0x01;
+    data++;
+
+    m_masked = (*data >> 7) & 0x01;
     if (!m_masked && m_role == Role::server)
         m_handler->handleError(Error::noMaskBit);
 
-    m_lengthTypeField = data[1] & (~0x80);
-    m_headerExtLen = (m_lengthTypeField <= 125 ? 0 : m_lengthTypeField == 126 ? 2 : 8) + (m_masked ? 4 : 0);
+    m_payloadLen = (unsigned char)(*data & (~0x80));
+    m_headerExtLen = (m_payloadLen <= 125 ? 0 : m_payloadLen == 126 ? 2 : 8) + (m_masked ? 4 : 0);
     m_handler->frameStarted(m_opCode, m_fin);
 }
 
 void Parser::readHeaderExtension(char* data)
 {
-    if (m_lengthTypeField <= 125)
-    {
-        m_payloadLen = m_lengthTypeField;
-    }
-    else if (m_lengthTypeField == 126)
+    if (m_payloadLen == 126)
     {
         m_payloadLen = ntohs(*reinterpret_cast<const unsigned short*>(data));
         data += 2;
     }
-    else if (m_lengthTypeField == 127)
+    else if (m_payloadLen == 127)
     {
         m_payloadLen = ntohll(*reinterpret_cast<const uint64_t*>(data));
         data += 8;
     }
 
     if (m_masked)
+    {
         m_mask = *((unsigned int*)(data));
+        m_maskPos = 0;
+    }
 }
 
 void Parser::reset()
 {
     m_buf.clear();
     m_state = ParseState::readingHeaderFixedPart;
-    m_pos = 0;
     m_payloadLen = 0;
+    m_pos = 0;
 }
 
 }

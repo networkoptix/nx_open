@@ -66,10 +66,8 @@ private:
     bool m_fin = false;
     bool m_masked = false;
 
-    int m_lengthTypeField = 0;
     unsigned int m_mask = 0;
-    int m_headerPos = 0;
-
+    int m_maskPos;
 };
 
 }
