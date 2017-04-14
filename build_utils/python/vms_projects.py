@@ -34,7 +34,7 @@ translatableProjects = [
     TranslatableProject("traytool"),
     TranslatableProject("client_base", "client/nx_client_desktop"),
     TranslatableProject("client_ui", "client/nx_client_desktop").ui(),
-    TranslatableProject("client_core", "client/libclient_core"),
+    TranslatableProject("client_core", "client/nx_client_core"),
     TranslatableProject("client_qml", "client/nx_client_desktop").qml(),
     TranslatableProject("mobile_client_base", "client/mobile_client"),
     TranslatableProject("mobile_client_qml", "client/mobile_client").qml()

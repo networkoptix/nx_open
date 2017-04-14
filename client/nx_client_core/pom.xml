@@ -9,13 +9,13 @@
     <groupId>com.networkoptix.hdwitness</groupId>
     <version>3.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>libclient_core</artifactId>
+    <artifactId>nx_client_core</artifactId>
     <packaging>pom</packaging>
     <name>Nx Witness Client Core Library</name>
 
     <properties>
         <root.dir>${basedir}/../..</root.dir>
-        <guid>${libclient_core.guid}</guid>
+        <guid>${nx_client_core.guid}</guid>
         <product.title>${client.name} Core</product.title>
         <product.display.title>${client.display.name} Core</product.display.title>
         <template>lib</template>
