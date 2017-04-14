@@ -237,7 +237,7 @@ angular.module('webadminApp')
                     if(vertical) { // Zoom or scroll - not both
                         timelineActions.zoomByWheel(event.deltaY, mouseOverElements, mouseXOverTimeline);
                     } else {
-                        timelineActions.scrollByPixels(pixels);
+                        timelineActions.scrollByPixels(event.deltaX);
                     }
                     scope.$apply();
                 }
