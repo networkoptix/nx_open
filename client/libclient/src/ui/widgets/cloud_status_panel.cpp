@@ -3,6 +3,8 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMenu>
 
+#include <nx/network/app_info.h>
+
 #include <ui/common/palette.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/helper.h>

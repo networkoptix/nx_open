@@ -2,9 +2,10 @@
 
 #include "business/actions/abstract_business_action.h"
 
-#include <utils/common/app_info.h>
-
+#include <nx/network/app_info.h>
 #include <nx/utils/string.h>
+
+#include <utils/common/app_info.h>
 
 QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType messageType)
 {

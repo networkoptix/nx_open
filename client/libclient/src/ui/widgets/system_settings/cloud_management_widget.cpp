@@ -3,6 +3,8 @@
 
 #include <QtGui/QDesktopServices>
 
+#include <nx/network/app_info.h>
+
 #include <api/global_settings.h>
 
 #include <core/resource/user_resource.h>

@@ -8,6 +8,8 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QGraphicsItem>
 
+#include <nx/network/app_info.h>
+
 #include "action.h"
 #include "action_factories.h"
 #include "action_text_factories.h"

@@ -3,6 +3,8 @@
 
 #include <QtWidgets/QPushButton>
 
+#include <nx/network/app_info.h>
+
 #include <common/common_module.h>
 
 #include <ui/widgets/system_settings/license_manager_widget.h>

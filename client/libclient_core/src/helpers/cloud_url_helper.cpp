@@ -1,6 +1,8 @@
 #include "cloud_url_helper.h"
 
+#include <nx/network/app_info.h>
 #include <nx/vms/utils/system_uri.h>
+
 #include <api/global_settings.h>
 #include <utils/common/app_info.h>
 #include <watchers/cloud_status_watcher.h>
@@ -50,7 +52,7 @@ QUrl QnCloudUrlHelper::faqUrl() const
 
 QUrl QnCloudUrlHelper::makeUrl(const QString& path, bool auth) const
 {
-    SystemUri uri(QnAppInfo::defaultCloudPortalUrl());
+    SystemUri uri(nx::network::AppInfo::defaultCloudPortalUrl());
 
     if (auth)
     {

@@ -4,6 +4,8 @@
 #include <QtWidgets/QGraphicsOpacityEffect>
 #include <QtWidgets/QLineEdit>
 
+#include <nx/network/app_info.h>
+
 #include <client_core/client_core_settings.h>
 
 #include <helpers/cloud_url_helper.h>
