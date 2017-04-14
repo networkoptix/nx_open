@@ -4,7 +4,7 @@
     <name>global</name>
     <message>
       <source>{{PRODUCT_NAME}}</source>
-      <translation>DW Cloud</translation>
+      <translation>DW Spectrum Web Portal</translation>
     </message>
     <message>
       <source>{{CLIENT_PROTOCOL}}</source>

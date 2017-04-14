@@ -20,11 +20,11 @@
     </message>
     <message>
       <source>{{supportLink}}</source>
-      <translation>mailto:info@senturiansolutions.com</translation>
+      <translation>mailto:admin@senturiansolutions.com</translation>
     </message>
     <message>
       <source>{{supportLinkText}}</source>
-      <translation>info@senturiansolutions.com</translation>
+      <translation>admin@senturiansolutions.com</translation>
     </message>
     <message>
       <source>{{companyUrl}}</source>

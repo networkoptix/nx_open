@@ -4,7 +4,7 @@
     <name>global</name>
     <message>
       <source>{{PRODUCT_NAME}}</source>
-      <translation>NTN Cloud</translation>
+      <translation>NTN Web Portal</translation>
     </message>
     <message>
       <source>{{CLIENT_PROTOCOL}}</source>
