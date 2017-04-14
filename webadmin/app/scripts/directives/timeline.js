@@ -117,16 +117,11 @@ angular.module('webadminApp')
 
                 // !!! Render everything: updating function
                 function render(){
-
-                    timelineActions.updatePosition();
-
                     if(scope.recordsProvider) {
                         scope.recordsProvider.updateLastMinute(timelineConfig.lastMinuteDuration, scope.scaleManager.levels.events.index);
                     }
 
-                    timelineActions.zoomingRenew();
-                    timelineActions.scrollingRenew();
-
+                    timelineActions.updateState();
                     timelineRender.Draw( mouseXOverTimeline, mouseYOverTimeline, catchScrollBar);
                 }
 
@@ -190,8 +185,6 @@ angular.module('webadminApp')
                  * Scrolling functions
                  */
 
-
-
                 // High-level Handlers
                 function scrollbarClickOrHold(left){
                     timelineActions.scrollingStart(left, timelineConfig.scrollSpeed * scope.viewportWidth);
@@ -205,10 +198,6 @@ angular.module('webadminApp')
                 }
                 function scrollButtonDblClick(left){
                     timelineActions.animateScroll(left ? 0 : 1);
-                }
-
-                function scrollByWheel(pixels){
-                    timelineActions.scrollByPixels(pixels);
                 }
 
                 var catchScrollBar = false;
@@ -252,46 +241,10 @@ angular.module('webadminApp')
                     }
                 }
 
-                /**
-                 * Zooming functions
-                 */
-
-
-
-
-                var zoomByWheelTarget = 0;
-                function zoomByWheel(pixels){
-
-                    var zoom = scope.scaleManager.zoom();
-
-                    if(window.jscd.touch ) {
-                        zoomByWheelTarget = zoom - pixels / timelineConfig.maxVerticalScrollForZoomWithTouch;
-                    }else{
-                        // We need to smooth zoom here
-                        // Collect zoom changing in zoomTarget
-                        if(!zoomByWheelTarget) {
-                            zoomByWheelTarget = zoom;
-                        }
-                        zoomByWheelTarget -= pixels / timelineConfig.maxVerticalScrollForZoom;
-                        zoomByWheelTarget = scope.scaleManager.boundZoom(zoomByWheelTarget);
-                    }
-
-                    var zoomDate = scope.scaleManager.screenCoordinateToDate(mouseXOverTimeline);
-                    if(mouseOverElements.rightBorder && !mouseOverElements.rightButton){
-                        zoomDate = scope.scaleManager.end;
-                    }
-                    if(mouseOverElements.leftBorder && !mouseOverElements.leftButton){
-                        zoomDate = scope.scaleManager.start;
-                    }
-
-                    timelineActions.zoomTo(zoomByWheelTarget, zoomDate, window.jscd.touch);
-                }
-
 
                 /**
                  * Actual browser events handling
                  */
-
 
                 // !!! Mouse events
                 var mouseXOverTimeline = 0;
@@ -323,9 +276,9 @@ angular.module('webadminApp')
                     var vertical = Math.abs(event.deltaY) > Math.abs(event.deltaX);
 
                     if(vertical) { // Zoom or scroll - not both
-                        zoomByWheel(event.deltaY);
+                        timelineActions.zoomByWheel(event.deltaY, mouseOverElements, mouseXOverTimeline);
                     } else {
-                        scrollByWheel(event.deltaX);
+                        timelineActions.scrollByPixels(pixels);
                     }
                     scope.$apply();
                 }

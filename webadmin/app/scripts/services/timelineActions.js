@@ -12,14 +12,14 @@ function TimelineActions(timelineConfig, positionProvider, scaleManager, animati
     this.nextPlayedPosition = 0;
     this.scope.lastPlayedPosition = 0;
 
-
     this.scrollingNow = false;
     this.scrollingLeft = false;
     this.scrollingSpeed = 0;
 
-
     this.zoomingNow = false;
     this.zoomingIn = false;
+
+    this.zoomByWheelTarget = 0;
 }
 TimelineActions.prototype.setPositionProvider = function (positionProvider){
     this.positionProvider = positionProvider;
@@ -284,4 +284,37 @@ TimelineActions.prototype.zoomingStart = function(zoomIn) {
 TimelineActions.prototype.fullZoomOut = function(){
     this.zoomingStop();
     this.zoomTo(1);
+};
+
+TimelineActions.prototype.zoomByWheel = function(clicks, mouseOverElements, mouseXOverTimeline){
+
+    var zoom = this.scaleManager.zoom();
+
+    if(window.jscd.touch ) {
+        this.zoomByWheelTarget = zoom - clicks / this.timelineConfig.maxVerticalScrollForZoomWithTouch;
+    }else{
+        // We need to smooth zoom here
+        // Collect zoom changing in zoomTarget
+        if(!this.zoomByWheelTarget) {
+            this.zoomByWheelTarget = zoom;
+        }
+        this.zoomByWheelTarget -= clicks / timelineConfig.maxVerticalScrollForZoom;
+        this.zoomByWheelTarget = this.scaleManager.boundZoom(this.zoomByWheelTarget);
+    }
+
+    var zoomDate = this.scaleManager.screenCoordinateToDate(mouseXOverTimeline);
+    if(mouseOverElements.rightBorder && !mouseOverElements.rightButton){
+        zoomDate = this.scaleManager.end;
+    }
+    if(mouseOverElements.leftBorder && !mouseOverElements.leftButton){
+        zoomDate = this.scaleManager.start;
+    }
+
+    this.zoomTo(this.zoomByWheelTarget, zoomDate, window.jscd.touch);
+};
+
+TimelineActions.prototype.updateState = function(){
+    this.updatePosition();
+    this.zoomingRenew();
+    this.scrollingRenew();
 };
