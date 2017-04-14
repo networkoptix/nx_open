@@ -20,7 +20,7 @@ describe('Smoke test:', function () {
         helper.createUserIfMissing(null, null, helper.userEmailCustom);
     });
 
-    fit("can login and logout", function () {
+    it("can login and logout", function () {
         helper.login();
     });
 
@@ -34,7 +34,7 @@ describe('Smoke test:', function () {
         expect(element(by.cssContainingText('h2', 'katya_korneevas')).isDisplayed()).toBe(true);
     });
 
-    fit("can view system page", function () {
+    it("can view system page", function () {
         var userList = helper.getParentOf(element.all(by.repeater('user in system.users')).first());
 
         helper.login();
@@ -81,7 +81,7 @@ describe('Smoke test:', function () {
         expect(helper.loginSysPageSuccessElement.isPresent()).toBe(true);
     });
 
-    fit("can restore password", function () {
+    it("can restore password", function () {
         helper.restorePassword(helper.userEmailSmoke, 'qweasd1234');
         helper.login(helper.userEmailSmoke, 'qweasd1234');
         // expect(helper.loginNoSysSuccessElement.isPresent()).toBe(true);
