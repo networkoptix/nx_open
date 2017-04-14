@@ -477,7 +477,7 @@ TEST_F(AsyncHttpClientCustom, ConnectionBreak)
         {
             EXPECT_TRUE(client->failed());
             EXPECT_EQ(QByteArray("not enough content"), client->fetchMessageBodyBuffer());
-            EXPECT_EQ(SystemError::connectionReset, client->lastSysErrorCode());
+            EXPECT_NE(SystemError::noError, client->lastSysErrorCode());
         });
 }
 
