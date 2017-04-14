@@ -7,20 +7,20 @@
 #include <QtCore/QTimer>
 #include <QtCore/QUrlQuery>
 
-#include <cdb/ec2_request_paths.h>
-#include <nx_ec/ec_proto_version.h>
 #include <nx/network/http/base64_decoder_filter.h>
 #include <nx/network/socket_factory.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/bsf/sized_data_decoder.h>
+#include <nx/utils/gzip/gzip_compressor.h>
+#include <nx/utils/gzip/gzip_uncompressor.h>
+#include <nx/utils/system_error.h>
 
-#include <utils/bsf/sized_data_decoder.h>
-#include <utils/gzip/gzip_compressor.h>
-#include <utils/gzip/gzip_uncompressor.h>
+#include <cdb/ec2_request_paths.h>
+#include <nx_ec/ec_proto_version.h>
 #include <utils/media/custom_output_stream.h>
 #include <utils/common/util.h>
-#include <nx/utils/system_error.h>
 #include <http/custom_headers.h>
 #include <api/global_settings.h>
 #include <common/common_module.h>
@@ -1045,7 +1045,7 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
             if( m_compressResponseMsgBody )
             {
                 //encoding outgoing message body
-                dataCtx.encodedSourceData = GZipCompressor::compressData( dataCtx.encodedSourceData );
+                dataCtx.encodedSourceData = nx::utils::bsf::gzip::Compressor::compressData( dataCtx.encodedSourceData );
             }
         }
         else    //m_peerRole == prOriginating
@@ -1326,7 +1326,7 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
         if( contentEncodingIter->second == "gzip" )
         {
             //enabling decompression of received transactions
-            auto ungzip = std::make_shared<GZipUncompressor>();
+            auto ungzip = std::make_shared<nx::utils::bsf::gzip::Uncompressor>();
             ungzip->setNextFilter( std::move(m_incomingTransactionStreamParser) );
             m_incomingTransactionStreamParser = std::move(ungzip);
         }

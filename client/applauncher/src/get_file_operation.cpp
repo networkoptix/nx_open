@@ -292,7 +292,7 @@ namespace detail
                 auto func = std::bind( &QnFile::writeAsync, m_outFile, _1, this );
                 m_fileDataProcessor = std::make_shared<CustomOutputStream<decltype(func)>>( func );
                 if( entryPath.endsWith(".gz") )
-                    m_fileDataProcessor = std::make_shared<GZipUncompressor>(m_fileDataProcessor);
+                    m_fileDataProcessor = std::make_shared<nx::utils::bsf::gzip::Uncompressor>(m_fileDataProcessor);
                 break;
             }
 
