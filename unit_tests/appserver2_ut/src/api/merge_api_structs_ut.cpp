@@ -13,6 +13,7 @@
 #include <network/tcp_listener.h>
 #include "network/http_connection_listener.h"
 #include <rest/server/rest_connection_processor.h>
+#include <common/static_common_module.h>
 
 namespace ec2 {
 namespace test {
@@ -320,6 +321,7 @@ private:
         }
     )};
 
+    QnStaticCommonModule m_staticCommonModule;
     QnCommonModule m_commonModule{/*clientMode*/ false};
     MockQnHttpConnectionListener listener{&m_commonModule};
     QnRestConnectionProcessor m_restConnectionProcessor{m_socket, /*owner*/ &listener };
@@ -337,32 +339,10 @@ private:
 
 } // namespace
 
-class RestApiTest: public ::testing::Test
-{
-protected:
-    static void SetUpTestCase()
-    {
-        // Init singletons.
-        m_common = new QnCommonModule(false);
-        m_common->setModuleGUID(QnUuid::createUuid());
-    }
-
-    static void TearDownTestCase()
-    {
-        delete m_common;
-        m_common = nullptr;
-    }
-
-private:
-    static QnCommonModule* m_common;
-    StructMergingTest* m_test;
-};
-QnCommonModule* RestApiTest::m_common = nullptr;
-
 //-------------------------------------------------------------------------------------------------
 // Test cases.
 
-TEST_F(RestApiTest, StructMerging)
+TEST(RestApiTest, StructMerging)
 {
     StructMergingTest test;
 

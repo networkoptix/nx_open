@@ -61,6 +61,8 @@ void createData(const Appserver2Ptr& server)
 
 TEST(SympleSyncTest, main)
 {
+    QnStaticCommonModule staticCommon;
+
     static const int kInstanceCount = 3;
     static const int kMaxSyncTimeoutMs = 1000 * 5;
 

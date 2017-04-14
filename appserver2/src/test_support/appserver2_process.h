@@ -72,7 +72,6 @@ public:
 
 private:
     Appserver2Process* m_impl;
-    static QnStaticCommonModule staticCommon;
 };
 
 }   // namespace ec2
