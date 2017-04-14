@@ -234,7 +234,6 @@ int main(int argc, char** argv)
 
 #if defined(Q_OS_MAC)
     mac_setLimits();
-    setAppVisibleInDock(true);
 #endif
 
 #ifndef DISABLE_FESTIVAL

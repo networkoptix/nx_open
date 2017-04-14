@@ -139,8 +139,10 @@ bool copyApplauncherInstance(const QDir& sourceDir, const QDir& targetDir)
     {
         if (QnAppInfo::applicationPlatform() == lit("macosx"))
         {
-            const auto sourcePath = sourceBinDir.absoluteFilePath(lit("applauncher-bin.plist"));
-            const auto targetPath = targetDir.absoluteFilePath(lit("Contents/Info.plist"));
+            const auto sourcePath = sourceBinDir.absoluteFilePath(
+                QnClientAppInfo::applauncherBinaryName() + lit(".plist"));
+            const auto targetPath = targetDir.absoluteFilePath(
+                QnClientAppInfo::contentsDirSuffix() + lit("/Info.plist"));
             if (!checkedCopy(sourcePath, targetPath))
                 return false;
         }

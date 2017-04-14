@@ -33,4 +33,6 @@ struct QnClientAppInfo
     static QString binDirSuffix();
     /** lib directory location relative to client package root. */
     static QString libDirSuffix();
+
+    static QString contentsDirSuffix();
 };

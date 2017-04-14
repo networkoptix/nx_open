@@ -76,3 +76,8 @@ QString QnClientAppInfo::libDirSuffix()
         return QString();
     #endif
 }
+
+QString QnClientAppInfo::contentsDirSuffix()
+{
+    return QStringLiteral("Contents");
+}
