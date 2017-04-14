@@ -84,8 +84,8 @@ private:
     QHash<int, QString> m_deleting;
 };
 
-Q_DECLARE_METATYPE(ServerFileCache::OperationResult)
-
 } // namespace desktop
 } // namespace client
 } // namespace nx
+
+Q_DECLARE_METATYPE(nx::client::desktop::ServerFileCache::OperationResult)
