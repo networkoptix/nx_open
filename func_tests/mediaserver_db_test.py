@@ -31,13 +31,13 @@ MEDIASERVER_DATABASE_PATH = 'var/ecs.sqlite'
 
 
 @pytest.fixture(params=['current', '2.4'])
-def mediaserver_version(request):
+def db_version(request):
     return request.param
 
 
 @pytest.fixture
-def env(env_builder, server, run_options, mediaserver_version):
-    if mediaserver_version == '2.4':
+def env(env_builder, server, run_options, db_version):
+    if db_version == '2.4':
         built_env = env_2_4_version(env_builder, server, run_options)
     else:
         built_env = env_current_version(env_builder, server)
@@ -48,7 +48,7 @@ def env(env_builder, server, run_options, mediaserver_version):
     built_env.two.setup_local_system(systemSettings=system_settings)
     built_env.one.set_system_settings(statisticsAllowed=False)
     built_env.two.set_system_settings(statisticsAllowed=False)
-    if mediaserver_version == '2.4':
+    if db_version == '2.4':
         check_camera(built_env.one, BOX_1_CAMERA_GUID)
         check_camera(built_env.two, BOX_2_CAMERA_GUID)
     return built_env
@@ -102,10 +102,10 @@ def assert_jsons_are_equal(json_one, json_two, json_name):
 
 def store_json_data(filepath, json_data):
     with open(filepath, 'wb') as f:
-        f.write(json.dumps(json_data, sort_keys=True, indent=4, separators=(',', ': ')))
+        json.dump(json_data, f, sort_keys=True, indent=4, separators=(',', ': '))
 
 
-def wait_for_merge_and_get_full_info(env):
+def wait_until_servers_have_same_full_info(env):
     start = time.time()
     while True:
         full_info_one = env.one.rest_api.ec2.getFullInfo.GET()
@@ -117,38 +117,36 @@ def wait_for_merge_and_get_full_info(env):
         time.sleep(MEDIASERVER_MERGE_TIMEOUT_SEC / 10.)
 
 
-def wait_camera_disappearance_after_backup(server, camera_guid):
+def wait_for_camera_disappearance_after_backup(server, camera_guid):
     start = time.time()
     while True:
         cameras = [c for c in server.rest_api.ec2.getCameras.GET()
                    if c['id'] == camera_guid]
-        if len(cameras) == 0:
+        if not cameras:
             return
         if time.time() - start >= MEDIASERVER_MERGE_TIMEOUT_SEC:
-            assert len(cameras) == 0, "'%r' unexpected camera '%s' after backup" % (
-                server, camera_guid)
+            pytest.fail('Camera %s did not disappear in %s seconds after backup' % (
+                camera_guid, MEDIASERVER_MERGE_TIMEOUT_SEC))
         time.sleep(MEDIASERVER_MERGE_TIMEOUT_SEC / 10.)
 
 
 def test_backup_restore(env, camera):
     env.two.merge_systems(env.one)
-    full_info_initial = wait_for_merge_and_get_full_info(env)
-    store_json_data('full_info_initial', full_info_initial)
+    full_info_initial = wait_until_servers_have_same_full_info(env)
     backup = env.one.rest_api.ec2.dumpDatabase.GET()
     camera_guid = env.two.add_camera(camera)
-    full_info_with_new_camera = wait_for_merge_and_get_full_info(env)
+    full_info_with_new_camera = wait_until_servers_have_same_full_info(env)
     assert full_info_with_new_camera != full_info_initial, (
         "ec2/getFullInfo data before and after saveCamera are the same")
     env.one.rest_api.ec2.restoreDatabase.POST(data=backup['data'])
-    wait_camera_disappearance_after_backup(env.one, camera_guid)
-    full_info_after_backup_restore = wait_for_merge_and_get_full_info(env)
-    store_json_data('full_info_after_backup_restore', full_info_after_backup_restore)
+    wait_for_camera_disappearance_after_backup(env.one, camera_guid)
+    full_info_after_backup_restore = wait_until_servers_have_same_full_info(env)
     assert full_info_after_backup_restore == full_info_initial
 
 
 # To detect VMS-5969
 @pytest.mark.skip(reason="VMS-5969")
-@pytest.mark.parametrize('mediaserver_version', ['current'])
+@pytest.mark.parametrize('db_version', ['current'])
 def test_server_guids_changed(env):
     env.one.stop_service()
     env.two.stop_service()
@@ -160,4 +158,4 @@ def test_server_guids_changed(env):
     env.one.setup_local_system()
     env.two.setup_local_system()
     env.two.merge_systems(env.one)
-    wait_for_merge_and_get_full_info(env)
+    wait_until_servers_have_same_full_info(env)
