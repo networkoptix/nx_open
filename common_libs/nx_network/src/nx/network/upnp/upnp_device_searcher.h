@@ -97,9 +97,9 @@ public:
         \param handlerToUse If NULL, all handlers are used, otherwise packets are passed to \a handlerToUse only
     */
     void processDiscoveredDevices( SearchHandler* handlerToUse = NULL );
+    int cacheTimeout() const;
 
     static DeviceSearcher* instance();
-    int cacheTimeout();
 
 private:
     class DiscoveredDeviceInfo

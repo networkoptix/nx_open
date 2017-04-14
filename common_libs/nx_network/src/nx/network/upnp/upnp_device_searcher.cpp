@@ -203,6 +203,11 @@ void DeviceSearcher::processDiscoveredDevices( SearchHandler* handlerToUse )
     }
 }
 
+int DeviceSearcher::cacheTimeout() const
+{
+    return m_settings.cacheTimeout();
+}
+
 DeviceSearcher* DeviceSearcher::instance()
 {
     return UPNPDeviceSearcherInstance;
