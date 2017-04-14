@@ -13,13 +13,15 @@
 #include <ui/models/notification_sound_model.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <utils/app_server_notification_cache.h>
+#include <nx/client/desktop/utils/server_notification_cache.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/media/audio_player.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <core/resource_management/resource_pool.h>
+
+using namespace nx::client::desktop;
 
 QnPlaySoundBusinessActionWidget::QnPlaySoundBusinessActionWidget(QWidget *parent) :
     base_type(parent),

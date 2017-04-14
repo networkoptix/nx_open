@@ -130,16 +130,16 @@ void QnAdvancedSettingsWidget::at_clearCacheButton_clicked()
     /* Lock background image so it will not be deleted. */
     if (!backgroundImage.isEmpty())
     {
-        LocalFileCache cache;
+        nx::client::desktop::LocalFileCache cache;
         QString path = cache.getFullPath(backgroundImage);
         QFile lock(path);
         lock.open(QFile::ReadWrite);
-        ServerFileCache::clearLocalCache();
+        nx::client::desktop::ServerFileCache::clearLocalCache();
         lock.close();
     }
     else
     {
-        ServerFileCache::clearLocalCache();
+        nx::client::desktop::ServerFileCache::clearLocalCache();
     }
 }
 

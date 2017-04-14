@@ -54,10 +54,12 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/util.h> /* For random. */
 #include <utils/math/color_transformations.h>
-#include <utils/app_server_notification_cache.h>
+#include <nx/client/desktop/utils/server_notification_cache.h>
 #include <utils/multi_image_provider.h>
 
 #include <nx/fusion/model_functions.h>
+
+using namespace nx::client::desktop;
 
 namespace {
 
@@ -134,8 +136,10 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
     connect(handler,    &QnWorkbenchNotificationsHandler::systemHealthEventRemoved, this,   &QnNotificationsCollectionWidget::hideSystemHealthMessage);
     connect(handler,    &QnWorkbenchNotificationsHandler::cleared,                  this,   &QnNotificationsCollectionWidget::hideAll);
 
-    connect(this->context()->instance<ServerNotificationCache>(), &ServerNotificationCache::fileDownloaded,
-        this, [this](const QString& filename, ServerFileCache::OperationResult status)
+    connect(this->context()->instance<ServerNotificationCache>(),
+        &ServerNotificationCache::fileDownloaded,
+        this,
+        [this](const QString& filename, ServerFileCache::OperationResult status)
         {
             if (status != ServerFileCache::OperationResult::ok)
                 return;

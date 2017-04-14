@@ -12,7 +12,16 @@ namespace Ui {
     class LayoutSettingsDialog;
 }
 
+namespace nx {
+namespace client {
+namespace desktop {
+
 class ServerImageCache;
+
+} // namespace desktop
+} // namespace client
+} // namespace nx
+
 class QnLayoutSettingsDialogPrivate;
 
 class QnLayoutSettingsDialog : public QnSessionAwareButtonBoxDialog
@@ -54,13 +63,13 @@ private:
     /** Aspect ratio of the current screen. */
     qreal screenAspectRatio() const;
 
-    /** 
+    /**
      * Aspect ratio that is optimal for cells to best fit the current image.
      * Returns negative value if image is not available.
      */
     qreal bestAspectRatioForCells() const;
 
-    /** 
+    /**
      * Returns true if width and height in cells are already set to values
      * corresponding to bestAspectRatioForCells()
      */
@@ -76,7 +85,7 @@ private:
     QScopedPointer<Ui::LayoutSettingsDialog> ui;
     QnLayoutSettingsDialogPrivate *const d_ptr;
 
-    ServerImageCache *m_cache;
+    nx::client::desktop::ServerImageCache *m_cache;
 
     bool m_isUpdating;
 };

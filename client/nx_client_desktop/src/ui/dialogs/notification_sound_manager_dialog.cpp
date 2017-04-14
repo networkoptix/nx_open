@@ -13,8 +13,10 @@
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 
-#include <utils/app_server_notification_cache.h>
+#include <nx/client/desktop/utils/server_notification_cache.h>
 #include <utils/media/audio_player.h>
+
+using namespace nx::client::desktop;
 
 QnNotificationSoundManagerDialog::QnNotificationSoundManagerDialog(QWidget *parent):
     base_type(parent),

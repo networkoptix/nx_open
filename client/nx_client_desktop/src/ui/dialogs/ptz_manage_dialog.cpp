@@ -36,6 +36,8 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 
+using namespace nx::client::desktop;
+
 class QnPtzToursDialogItemDelegate: public QStyledItemDelegate
 {
     typedef QStyledItemDelegate base_type;
@@ -120,12 +122,13 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
     connect(m_model, &QnPtzManageModel::modelReset, this, &QnPtzManageDialog::at_model_modelReset);
     connect(this, &QnAbstractPtzDialog::synchronized, m_model, &QnPtzManageModel::setSynchronized);
     connect(ui->tourEditWidget, SIGNAL(tourSpotsChanged(QnPtzTourSpotList)), this, SLOT(at_tourSpotsChanged(QnPtzTourSpotList)));
-    connect(m_cache, &LocalFileCache::fileDownloaded, this, [this](const QString &filename, ServerFileCache::OperationResult status)
-    {
-        if (status != ServerFileCache::OperationResult::ok)
-            return;
-        at_cache_imageLoaded(filename);
-    });
+    connect(m_cache, &ServerFileCache::fileDownloaded, this,
+        [this](const QString &filename, ServerFileCache::OperationResult status)
+        {
+            if (status != ServerFileCache::OperationResult::ok)
+                return;
+            at_cache_imageLoaded(filename);
+        });
 
     //connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, &QnPtzManageDialog::updateHotkeys);
 
@@ -445,7 +448,7 @@ void QnPtzManageDialog::at_savePositionButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        nx::client::desktop::ui::ptz::failedToGetPosition(this, m_resource->getName());
+        ui::ptz::failedToGetPosition(this, m_resource->getName());
         return;
     }
 
@@ -464,7 +467,7 @@ void QnPtzManageDialog::at_goToPositionButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        nx::client::desktop::ui::ptz::failedToSetPosition(this, m_resource->getName());
+        ui::ptz::failedToSetPosition(this, m_resource->getName());
         return;
     }
 
@@ -505,7 +508,7 @@ void QnPtzManageDialog::at_startTourButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        nx::client::desktop::ui::ptz::failedToSetPosition(this, m_resource->getName());
+        ui::ptz::failedToSetPosition(this, m_resource->getName());
         return;
     }
 
@@ -560,7 +563,7 @@ void QnPtzManageDialog::at_deleteButton_clicked()
                     break;
             }
 
-            if (presetIsInUse && !nx::client::desktop::ui::ptz::deletePresetInUse(this))
+            if (presetIsInUse && !ui::ptz::deletePresetInUse(this))
                 break;
 
             m_model->removePreset(data.presetModel.preset.id);

@@ -12,11 +12,11 @@ namespace ptz {
 
 QN_DECLARE_TR_FUNCTIONS(ptz)
 
-static bool deletePresetInUse(QWidget* parent);
+bool deletePresetInUse(QWidget* parent);
 
-static void failedToGetPosition(QWidget* parent, const QString& cameraName);
+void failedToGetPosition(QWidget* parent, const QString& cameraName);
 
-static void failedToSetPosition(QWidget* parent, const QString& cameraName);
+void failedToSetPosition(QWidget* parent, const QString& cameraName);
 
 } // namespace ptz
 } // namespace ui

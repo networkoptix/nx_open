@@ -14,16 +14,16 @@ namespace videowall {
 
 QN_DECLARE_TR_FUNCTIONS(videowall)
 
-static void anotherVideoWall(QWidget* parent);
+void anotherVideoWall(QWidget* parent);
 
-static bool switchToVideoWallMode(QWidget* parent, bool* closeCurrentInstanse);
+bool switchToVideoWallMode(QWidget* parent, bool* closeCurrentInstanse);
 
 /**
  * Check if resources list contains local files, which cannot be placed on the given screen.
  * Displays an error message if there are local files, and screen belongs to other pc.
  * @return true if resource placing is possible, false otherwise.
  */
-static bool checkLocalFiles(QWidget* parent,
+bool checkLocalFiles(QWidget* parent,
     const QnVideoWallItemIndex& index,
     const QnResourceList& resources,
     bool displayDelayed = false);

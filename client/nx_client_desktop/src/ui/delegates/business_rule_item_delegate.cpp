@@ -24,7 +24,7 @@
 #include <ui/widgets/business/aggregation_widget.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <utils/app_server_notification_cache.h>
+#include <nx/client/desktop/utils/server_notification_cache.h>
 #include <utils/math/color_transformations.h>
 
 namespace {

@@ -2,7 +2,7 @@
 
 #include <QtGui/QStandardItemModel>
 
-#include <utils/app_server_file_cache.h>
+#include <nx/client/desktop/utils/server_file_cache.h>
 
 class QnNotificationSoundModel;
 

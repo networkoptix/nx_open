@@ -12,9 +12,19 @@ namespace Ui {
     class PtzManageDialog;
 }
 
+namespace nx {
+namespace client {
+namespace desktop {
+
+class LocalFileCache;
+
+} // namespace desktop
+} // namespace client
+} // namespace nx
+
+
 class QnPtzManageModel;
 class QnPtzHotkeysResourcePropertyAdaptor;
-class LocalFileCache;
 class QnAbstractPtzHotkeyDelegate;
 
 // TODO: #GDM #PTZ remove singleton
@@ -85,7 +95,7 @@ private:
 	QnAbstractPtzHotkeyDelegate* m_hotkeysDelegate;
     QnResourcePtr m_resource;
 
-    LocalFileCache *m_cache;
+    nx::client::desktop::LocalFileCache *m_cache;
     QSet<QString> m_pendingPreviews;
 
     QnPtzManageModel::RowData m_lastRowData;

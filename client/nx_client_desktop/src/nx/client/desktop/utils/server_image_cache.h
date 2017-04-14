@@ -1,6 +1,6 @@
 #pragma once
 
-#include <utils/app_server_file_cache.h>
+#include <nx/client/desktop/utils/server_file_cache.h>
 
 #include <QtGui/QImage>
 
@@ -8,7 +8,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class ServerImageCache : public ServerFileCache
+class ServerImageCache: public ServerFileCache
 {
     Q_OBJECT
 

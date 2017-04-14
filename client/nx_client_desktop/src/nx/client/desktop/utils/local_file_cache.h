@@ -7,7 +7,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class LocalFileCache : public ServerImageCache
+class LocalFileCache: public ServerImageCache
 {
     Q_OBJECT
     using base_type = ServerImageCache;

@@ -26,6 +26,8 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <nx/client/desktop/utils/local_file_cache.h>
 
+using namespace nx::client::desktop;
+
 namespace {
 
 qreal opacityFromPercent(int percent)

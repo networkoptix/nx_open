@@ -32,6 +32,8 @@
 #include <nx/client/desktop/utils/local_file_cache.h>
 #include <utils/common/scoped_value_rollback.h>
 
+using namespace nx::client::desktop;
+
 namespace {
 
 QString braced(const QString& source)
@@ -208,13 +210,17 @@ void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout)
             ? new LocalFileCache(this)
             : new ServerImageCache(this);
 
-    connect(m_cache, &ServerFileCache::fileDownloaded, this, [this](const QString &filename, ServerFileCache::OperationResult status) {
-        at_imageLoaded(filename, status == ServerFileCache::OperationResult::ok);
-    });
+    connect(m_cache, &ServerFileCache::fileDownloaded, this,
+        [this](const QString &filename, ServerFileCache::OperationResult status)
+        {
+            at_imageLoaded(filename, status == ServerFileCache::OperationResult::ok);
+        });
 
-    connect(m_cache, &ServerFileCache::fileUploaded, this,[this](const QString &filename, ServerFileCache::OperationResult status) {
-        at_imageStored(filename, status == ServerFileCache::OperationResult::ok);
-    });
+    connect(m_cache, &ServerFileCache::fileUploaded, this,
+        [this](const QString &filename, ServerFileCache::OperationResult status)
+        {
+            at_imageStored(filename, status == ServerFileCache::OperationResult::ok);
+        });
 
     d->clear();
     d->imageFilename = layout->backgroundImageFilename();

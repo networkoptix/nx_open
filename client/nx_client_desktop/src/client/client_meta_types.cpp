@@ -22,7 +22,7 @@
 #include <utils/color_space/image_correction.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <utils/ping_utility.h>
-#include <utils/app_server_file_cache.h>
+#include <nx/client/desktop/utils/server_file_cache.h>
 
 #include <cdb/result_code.h>
 #include <cdb/system_data.h>
@@ -80,7 +80,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<WeakGraphicsItemPointerList>();
     qRegisterMetaType<QnCustomization>();
     qRegisterMetaType<QnPingUtility::PingResponce>();
-    qRegisterMetaType<ServerFileCache::OperationResult>();
+    qRegisterMetaType<nx::client::desktop::ServerFileCache::OperationResult>();
 
     qRegisterMetaType<QnTimeSliderColors>();
     qRegisterMetaType<QnBackgroundColors>();

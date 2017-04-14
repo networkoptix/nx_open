@@ -68,7 +68,7 @@
 #include <ui/workbench/watchers/workbench_user_watcher.h>
 
 #include <utils/applauncher_utils.h>
-#include <utils/app_server_notification_cache.h>
+#include <nx/client/desktop/utils/server_notification_cache.h>
 #include <utils/connection_diagnostics_helper.h>
 #include <utils/common/app_info.h>
 
@@ -88,6 +88,8 @@
 
 #include <watchers/cloud_status_watcher.h>
 #include <nx_ec/dummy_handler.h>
+
+using namespace nx::client::desktop;
 
 namespace {
 

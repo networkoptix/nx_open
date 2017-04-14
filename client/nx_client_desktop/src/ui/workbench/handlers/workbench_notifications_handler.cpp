@@ -26,12 +26,14 @@
 #include <ui/workbench/workbench_state_manager.h>
 
 #include <utils/resource_property_adaptors.h>
-#include <utils/app_server_notification_cache.h>
+#include <nx/client/desktop/utils/server_notification_cache.h>
 #include <utils/common/warnings.h>
 #include <utils/email/email.h>
 #include <utils/media/audio_player.h>
 
 #include <watchers/cloud_status_watcher.h>
+
+using namespace nx::client::desktop;
 
 namespace {
 

@@ -37,6 +37,8 @@
 #   include <launcher/nov_launcher_win.h>
 #endif
 
+using namespace nx::client::desktop;
+
 namespace {
     const int retryTimes = 3;
     const int retryDelayMs = 500;

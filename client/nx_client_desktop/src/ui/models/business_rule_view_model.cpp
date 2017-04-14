@@ -34,7 +34,7 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <utils/app_server_notification_cache.h>
+#include <nx/client/desktop/utils/server_notification_cache.h>
 #include <utils/common/qtimespan.h>
 #include <utils/email/email.h>
 #include <utils/media/audio_player.h>

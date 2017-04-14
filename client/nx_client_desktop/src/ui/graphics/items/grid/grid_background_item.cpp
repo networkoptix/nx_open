@@ -35,6 +35,7 @@
     #endif
 #endif
 
+using namespace nx::client::desktop;
 
 namespace {
 

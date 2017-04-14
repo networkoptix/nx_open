@@ -29,33 +29,41 @@ ServerFileCache::ServerFileCache(const QString &folderName, QObject *parent) :
     QObject(parent),
     m_folderName(folderName)
 {
-    connect(this, &ServerFileCache::delayedFileDownloaded,     this,   [this](const QString &filename, OperationResult status) {
-        if (isConnectedToServer())
-            emit fileDownloaded(filename, status);
-        else
-            emit fileDownloaded(filename, OperationResult::disconnected);
-    }, Qt::QueuedConnection);
+    connect(this, &ServerFileCache::delayedFileDownloaded, this,
+        [this](const QString &filename, OperationResult status)
+        {
+            if (isConnectedToServer())
+                emit fileDownloaded(filename, status);
+            else
+                emit fileDownloaded(filename, OperationResult::disconnected);
+        }, Qt::QueuedConnection);
 
-    connect(this, &ServerFileCache::delayedFileUploaded,       this,   [this](const QString &filename, OperationResult status) {
-        if (isConnectedToServer())
-            emit fileUploaded(filename, status);
-        else
-            emit fileUploaded(filename, OperationResult::disconnected);
-    }, Qt::QueuedConnection);
+    connect(this, &ServerFileCache::delayedFileUploaded, this,
+        [this](const QString &filename, OperationResult status)
+        {
+            if (isConnectedToServer())
+                emit fileUploaded(filename, status);
+            else
+                emit fileUploaded(filename, OperationResult::disconnected);
+        }, Qt::QueuedConnection);
 
-    connect(this, &ServerFileCache::delayedFileDeleted,        this,   [this](const QString &filename, OperationResult status) {
-        if (isConnectedToServer())
-            emit fileDeleted(filename, status);
-        else
-            emit fileDeleted(filename, OperationResult::disconnected);
-    }, Qt::QueuedConnection);
+    connect(this, &ServerFileCache::delayedFileDeleted, this,
+        [this](const QString &filename, OperationResult status)
+        {
+            if (isConnectedToServer())
+                emit fileDeleted(filename, status);
+            else
+                emit fileDeleted(filename, OperationResult::disconnected);
+        }, Qt::QueuedConnection);
 
-    connect(this, &ServerFileCache::delayedFileListReceived,   this,   [this](const QStringList &files, OperationResult status) {
-        if (isConnectedToServer())
-            emit fileListReceived(files, status);
-        else
-            emit fileListReceived(files, OperationResult::disconnected);
-    }, Qt::QueuedConnection);
+    connect(this, &ServerFileCache::delayedFileListReceived, this,
+        [this](const QStringList &files, OperationResult status)
+        {
+            if (isConnectedToServer())
+                emit fileListReceived(files, status);
+            else
+                emit fileListReceived(files, OperationResult::disconnected);
+        }, Qt::QueuedConnection);
 }
 
 ServerFileCache::~ServerFileCache() {

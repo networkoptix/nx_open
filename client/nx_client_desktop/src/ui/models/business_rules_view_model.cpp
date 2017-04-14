@@ -7,9 +7,10 @@
 #include <ui/models/notification_sound_model.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <utils/app_server_notification_cache.h>
+#include <nx/client/desktop/utils/server_notification_cache.h>
 #include <utils/math/math.h>
 
+using namespace nx::client::desktop;
 
 QnBusinessRulesViewModel::QnBusinessRulesViewModel(QObject *parent) :
     base_type(parent),
