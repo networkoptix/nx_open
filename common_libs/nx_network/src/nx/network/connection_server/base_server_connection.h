@@ -27,9 +27,9 @@ struct BaseServerConnectionAccess
     }
 
     template<typename Derived, typename Base>
-    static void readyToSendData(Base* base)
+    static void readyToSendData(Base* base, size_t count)
     {
-        static_cast<Derived*>(base)->readyToSendData();
+        static_cast<Derived*>(base)->readyToSendData(count);
     }
 };
 
@@ -103,8 +103,6 @@ public:
 
     /**
      * Start receiving data from connection
-     * @return false, if could not start asynchronous operation
-     * (this can happen due to lack of resources on host machine).
      */
     void startReadingConnection(
         boost::optional<std::chrono::milliseconds> inactivityTimeout = boost::none)
@@ -275,7 +273,7 @@ private:
         static_cast<void>(count);
         NX_ASSERT(count == m_bytesToSend);
 
-        BaseServerConnectionAccess::readyToSendData<CustomConnectionType>(this);
+        BaseServerConnectionAccess::readyToSendData<CustomConnectionType>(this, count);
     }
 
     void handleSocketError(SystemError::ErrorCode errorCode)
@@ -330,7 +328,7 @@ class BaseServerConnectionHandler
 {
 public:
     virtual void bytesReceived(const nx::Buffer& buffer) = 0;
-    virtual void readyToSendData() = 0;
+    virtual void readyToSendData(size_t count) = 0;
 };
 
 class BaseServerConnectionWrapper : 

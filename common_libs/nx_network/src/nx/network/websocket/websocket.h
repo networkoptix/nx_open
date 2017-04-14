@@ -12,7 +12,9 @@ namespace websocket {
 
 class Websocket : 
     public aio::AbstractAsyncChannel,
-    public nx_api::BaseServerConnectionHandler
+    private nx_api::BaseServerConnectionHandler,
+    private ParserHandler,
+    private StreamConnectionHolder<nx_api::BaseServerConnectionWrapper>
 {
     friend struct BaseServerConnectionAccess;
 public:
@@ -35,6 +37,16 @@ public:
         const nx::Buffer& requestData,
         Role role = Role::undefined); /**< if role is undefined, payload won't be masked (unmasked) */
 
+    virtual void readSomeAsync(
+        nx::Buffer* const buffer,
+        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+
+    virtual void sendAsync(
+        const nx::Buffer& buffer,
+        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+
+    virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
+
     void setSendMode(SendMode mode);
     SendMode sendMode() const;
 
@@ -56,11 +68,23 @@ public:
 
 private:
     virtual void bytesReceived(const nx::Buffer& buffer) override;
-    virtual void readyToSendData() override;
+    virtual void readyToSendData(size_t count) override;
+    virtual void closeConnection(
+        SystemError::ErrorCode closeReason,
+        ConnectionType* connection ) override;
 
 private:
     std::chrono::milliseconds m_keepAliveTimeout;
     nx_api::BaseServerConnectionWrapper m_baseConnection;
+    Parser m_parser;
+    SendMode m_sendMode;
+    ReceiveMode m_receiveMode;
+    bool m_isLastFrame;
+    PayloadType m_payloadType;
+    PayloadType m_receivedPayloadType;
+    std::function<void(SystemError::ErrorCode, size_t)> m_readHandler;
+    std::function<void(SystemError::ErrorCode, size_t)> m_writeHandler;
+    nx::Buffer* m_readBuffer;
 };
 
 }
