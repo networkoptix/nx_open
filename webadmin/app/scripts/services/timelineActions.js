@@ -150,3 +150,97 @@ TimelineActions.prototype.scrollingStop = function(){
         this.scrollingNow = false;
     }
 };
+
+
+TimelineActions.prototype.scrollByPixels = function(pixels){
+    this.scaleManager.scrollByPixels(pixels);
+    this.delayWatchingPlayingPosition();   
+};
+
+//Absolute zoom - to target level from 0 to 1
+TimelineActions.prototype.zoomTo = function(zoomTarget, zoomDate, instant, linear){
+    var self = this;
+    zoomTarget = this.scaleManager.boundZoom(zoomTarget);
+
+    var zoom = self.scaleManager.zoom();
+    if(zoom == zoomTarget){
+        return;
+    }
+
+    function levelsChanged(newLevels,oldLevels){
+        if(newLevels && (!oldLevels || !oldLevels.labels)){
+            return true;
+        }
+
+        if(newLevels.labels.index != oldLevels.labels.index) {
+            return true;
+        }
+
+        if(newLevels.middle.index != oldLevels.middle.index) {
+            return true;
+        }
+
+        if(newLevels.small.index != oldLevels.small.index) {
+            return true;
+        }
+
+        if(newLevels.marks.index != oldLevels.marks.index) {
+            return true;
+        }
+
+        return false;
+    }
+
+    //Find final levels for this zoom and run animation:
+    var newTargetLevels = self.scaleManager.targetLevels(zoomTarget);
+    if(levelsChanged(newTargetLevels, self.animationState.targetLevels)){
+        self.animationState.targetLevels = newTargetLevels;
+
+        if( self.animationState.zooming == 1){ // We need to run animation again
+            self.animationState.zooming = 0;
+        }
+
+        // This allows us to continue (and slowdown, mb) animation every time
+        self.zooming = self.animationState.zooming;
+        self.animateScope.animate(self.scope,'zooming',1,'dryResistance').then(function(){
+            self.animationState.currentLevels = self.scaleManager.levels;
+        },function(){
+            // ignore animation re-run
+        },function(value){
+            self.animationState.zooming = value;
+        });
+    }
+
+
+    function setZoom(value){
+        if (zoomDate) {
+            self.scaleManager.zoomAroundDate(
+                value,
+                zoomDate
+            );
+        } else {
+            self.scaleManager.zoom(value);
+        }
+        self.scaleManager.checkZoomAsync().then(function(){
+            // TODO: here we need to apply the change to scope - call digest if anything changed
+            self.scope.$digest();
+        });
+        self.delayWatchingPlayingPosition();
+    }
+
+
+    if(!instant) {
+        if(!self.zoomTarget) {
+            self.zoomTarget = self.scaleManager.zoom();
+        }
+
+        self.delayWatchingPlayingPosition();
+        self.animateScope.animate(self.scope, 'zoomTarget', zoomTarget, linear?'linear':'dryResistance').then(
+            function () {},
+            function () {},
+            setZoom);
+    }else{
+        setZoom(zoomTarget);
+        self.zoomTarget = self.scaleManager.zoom();
+    }
+};

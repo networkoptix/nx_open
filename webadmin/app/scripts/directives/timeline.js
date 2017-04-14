@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .directive('timeline', ['$interval','$timeout','animateScope', function ($interval,$timeout,animateScope) {
+    .directive('timeline', ['$interval', '$timeout', 'animateScope', '$q', function ($interval, $timeout, animateScope, $q) {
         return {
             restrict: 'E',
             scope: {
@@ -68,7 +68,8 @@ angular.module('webadminApp')
                     timelineConfig.stickToLiveMs,
                     timelineConfig.zoomAccuracyMs,
                     timelineConfig.lastMinuteDuration,
-                    timelineConfig.minPixelsPerLevel); //Init boundariesProvider
+                    timelineConfig.minPixelsPerLevel,
+                    $q); //Init boundariesProvider
 
                 var animationState = {
                     targetLevels : scope.scaleManager.levels,
@@ -86,8 +87,14 @@ angular.module('webadminApp')
                         allowDebug:Config.allowDebugMode
                     });
 
-                var timelineActions = new TimelineActions(timelineConfig, scope.positionProvider, scope.scaleManager, animationState,
-                    animateScope, scope);
+                var timelineActions = new TimelineActions(
+                    timelineConfig,
+                    scope.positionProvider,
+                    scope.scaleManager,
+                    animationState,
+                    animateScope,
+                    scope);
+
                 // !!! Initialization functions
                 function updateTimelineHeight(){
                     canvas.height = element.find('.viewport').height();
@@ -96,7 +103,9 @@ angular.module('webadminApp')
                     scope.viewportWidth = element.find('.viewport').width();
                     canvas.width  = scope.viewportWidth;
                     scope.scaleManager.setViewportWidth(scope.viewportWidth);
-                    $timeout(checkZoomButtons);
+                    $timeout(function(){
+                        scope.scaleManager.checkZoom();
+                    });
                 }
                 function initTimeline(){
                     var now = (new Date()).getTime();
@@ -199,8 +208,7 @@ angular.module('webadminApp')
                 }
 
                 function scrollByWheel(pixels){
-                    scope.scaleManager.scrollByPixels(pixels);
-                    timelineActions.delayWatchingPlayingPosition();
+                    timelineActions.scrollByPixels(pixels);
                 }
 
                 var catchScrollBar = false;
@@ -248,95 +256,12 @@ angular.module('webadminApp')
                  * Zooming functions
                  */
 
-                //Absolute zoom - to target level from 0 to 1
-                function zoomTo(zoomTarget, zoomDate, instant, linear){
-                    var oldZT = zoomTarget;
-                    zoomTarget = scope.scaleManager.boundZoom(zoomTarget);
 
-                    var zoom = scope.scaleManager.zoom();
-                    if(zoom == zoomTarget){
-                        return;
-                    }
-
-                    function levelsChanged(newLevels,oldLevels){
-                        if(newLevels && (!oldLevels || !oldLevels.labels)){
-                            return true;
-                        }
-
-                        if(newLevels.labels.index != oldLevels.labels.index) {
-                            return true;
-                        }
-
-                        if(newLevels.middle.index != oldLevels.middle.index) {
-                            return true;
-                        }
-
-                        if(newLevels.small.index != oldLevels.small.index) {
-                            return true;
-                        }
-
-                        if(newLevels.marks.index != oldLevels.marks.index) {
-                            return true;
-                        }
-
-                        return false;
-                    }
-
-                    //Find final levels for this zoom and run animation:
-                    var newTargetLevels = scope.scaleManager.targetLevels(zoomTarget);
-                    if(levelsChanged(newTargetLevels, animationState.targetLevels)){
-                        animationState.targetLevels = newTargetLevels;
-
-                        if( animationState.zooming == 1){ // We need to run animation again
-                            animationState.zooming = 0;
-                        }
-
-                        // This allows us to continue (and slowdown, mb) animation every time
-                        scope.zooming = animationState.zooming;
-                        animateScope.animate(scope,'zooming',1,'dryResistance').then(function(){
-                            animationState.currentLevels = scope.scaleManager.levels;
-                        },function(){
-                            // ignore animation re-run
-                        },function(value){
-                            animationState.zooming = value;
-                        });
-                    }
-
-
-                    function setZoom(value){
-                        if (zoomDate) {
-                            scope.scaleManager.zoomAroundDate(
-                                value,
-                                zoomDate
-                            );
-                        } else {
-                            scope.scaleManager.zoom(value);
-                        }
-                        $timeout(checkZoomButtons);
-                        timelineActions.delayWatchingPlayingPosition();
-                    }
-
-
-                    if(!instant) {
-                        if(!scope.zoomTarget) {
-                            scope.zoomTarget = scope.scaleManager.zoom();
-                        }
-
-                        timelineActions.delayWatchingPlayingPosition();
-                        animateScope.animate(scope, 'zoomTarget', zoomTarget, linear?'linear':'dryResistance').then(
-                            function () {},
-                            function () {},
-                            setZoom);
-                    }else{
-                        setZoom(zoomTarget);
-                        scope.zoomTarget = scope.scaleManager.zoom();
-                    }
-                }
 
                 //Relative zoom (step)
                 function zoom(zoomIn,slow,linear, zoomDate){
                     var zoomTarget = scope.scaleManager.zoom() - (zoomIn ? 1 : -1) * (slow?timelineConfig.slowZoomSpeed:timelineConfig.zoomSpeed);
-                    zoomTo(zoomTarget, zoomDate, false, linear);
+                    timelineActions.zoomTo(zoomTarget, zoomDate, false, linear);
                 }
 
                 var zoomingNow = false;
@@ -353,7 +278,7 @@ angular.module('webadminApp')
                     }
                 }
                 function zoomingStart(zoomIn) {
-                    if(scope.disableZoomOut&&!zoomIn || scope.disableZoomIn&&zoomIn){
+                    if(scope.scaleManager.disableZoomOut&&!zoomIn || scope.scaleManager.disableZoomIn&&zoomIn){
                         return;
                     }
 
@@ -363,13 +288,9 @@ angular.module('webadminApp')
                     zoomingRenew();
                 }
 
-                function checkZoomButtons(){
-                    scope.disableZoomOut = !scope.scaleManager.checkZoomOut();
-                    scope.disableZoomIn =  !scope.scaleManager.checkZoomIn();
-                }
 
                 function fullZoomOut(){
-                    zoomTo(1);
+                    timelineActions.zoomTo(1);
                 }
 
                 function timelineDblClick(mouseX){
@@ -415,7 +336,7 @@ angular.module('webadminApp')
                         zoomDate = scope.scaleManager.start;
                     }
 
-                    zoomTo(zoomByWheelTarget, zoomDate, window.jscd.touch);
+                    timelineActions.zoomTo(zoomByWheelTarget, zoomDate, window.jscd.touch);
                 }
 
 

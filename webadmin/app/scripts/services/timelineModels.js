@@ -831,13 +831,14 @@ ShortCache.prototype.setPlayingPosition = function(position){
 
 
 
-function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initialWidth, stickToLiveMs, zoomAccuracyMs, lastMinuteInterval, minPixelsPerLevel){
+function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initialWidth, stickToLiveMs, zoomAccuracyMs, lastMinuteInterval, minPixelsPerLevel, $q){
     this.absMaxMsPerPixel = maxMsPerPixel;
     this.minMsPerPixel = minMsPerPixel;
     this.stickToLiveMs = stickToLiveMs;
     this.zoomAccuracyMs = zoomAccuracyMs;
     this.minPixelsPerLevel = minPixelsPerLevel;
     this.lastMinuteInterval  = lastMinuteInterval;
+    this.$q = $q;
 
     this.levels = {
         top:  {index:0,level:RulerModel.levels[0]},
@@ -1211,12 +1212,35 @@ ScaleManager.prototype.targetLevels = function(zoomTarget){
 
 ScaleManager.prototype.checkZoomOut = function(){
     var invisibleInterval = (this.end - this.start) - (this.visibleEnd-this.visibleStart);
-    return invisibleInterval > this.zoomAccuracyMs;
+    this.disableZoomOut = invisibleInterval <= this.zoomAccuracyMs;
+    return !this.disableZoomOut;
+
 };
 ScaleManager.prototype.checkZoomIn = function(){
-    return this.zoom() > this.fullZoomInValue();
+    this.disableZoomIn = this.zoom() <= this.fullZoomInValue();
 };
+ScaleManager.prototype.checkZoom = function(){
+    this.checkZoomOut();
+    this.checkZoomIn();
+};
+ScaleManager.prototype.checkZoomAsync = function(){
+    var self = this;
+    var result = self.$q.defer();
+    setTimeout(function(){
+        var oldDisableZoomOut = self.disableZoomOut;
+        var oldDisableZoomIn = self.disableZoomIn;
 
+        self.checkZoom();
+
+        if(oldDisableZoomOut != self.disableZoomOut ||
+            oldDisableZoomIn != self.disableZoomIn){
+            result.resolve();
+        }else{
+            result.reject();
+        }
+    });
+    return result.promise;
+};
 ScaleManager.prototype.zoom = function(zoomValue){ // Get or set zoom value (from 0 to 1)
     if(typeof(zoomValue)=="undefined"){
         return this.msToZoom(this.msPerPixel);
