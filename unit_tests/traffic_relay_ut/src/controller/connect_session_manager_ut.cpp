@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/http/server/http_server_connection.h>
+#include <nx/network/socket_delegate.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
@@ -15,6 +16,31 @@ namespace cloud {
 namespace relay {
 namespace controller {
 namespace test {
+
+namespace {
+
+class StreamSocketStub:
+    public nx::network::StreamSocketDelegate
+{
+    using base_type = nx::network::StreamSocketDelegate;
+
+public:
+    StreamSocketStub():
+        base_type(&m_delegatee)
+    {
+    }
+
+    virtual void readSomeAsync(
+        nx::Buffer* const /*buffer*/,
+        std::function<void(SystemError::ErrorCode, size_t)> /*handler*/) override
+    {
+    }
+
+private:
+    nx::network::TCPSocket m_delegatee;
+};
+
+} // namespace
 
 static constexpr int kMaxPreemptiveConnectionCount = 7;
 static constexpr int kRecommendedPreemptiveConnectionCount = 4;
@@ -106,8 +132,7 @@ private:
     {
         if (connectionEvents.onResponseHasBeenSent)
         {
-            auto tcpConnection = std::make_unique<nx::network::TCPSocket>(AF_INET);
-            ASSERT_TRUE(tcpConnection->setNonBlockingMode(true));
+            auto tcpConnection = std::make_unique<StreamSocketStub>();
             auto httpConnection = std::make_unique<nx_http::HttpServerConnection>(
                 nullptr,
                 std::move(tcpConnection),
