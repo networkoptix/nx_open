@@ -3,10 +3,17 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
 
+#include "../settings.h"
+
 namespace nx {
 namespace cloud {
 namespace relay {
 namespace model {
+
+ClientSessionPool::ClientSessionPool(const conf::Settings& settings):
+    m_settings(settings)
+{
+}
 
 std::string ClientSessionPool::addSession(
     const std::string& desiredSessionId,
@@ -21,12 +28,12 @@ std::string ClientSessionPool::addSession(
 
     if (!desiredSessionId.empty())
     {
-        if (m_sessionById.emplace(desiredSessionId, std::move(sessionContext)).second)
+        if (m_sessionById.emplace(desiredSessionId, sessionContext).second)
             return desiredSessionId;
     }
 
     // desiredSessionId is already used, using another one.
-    const auto sessionId = QnUuid::createUuid().toStdString();
+    const auto sessionId = QnUuid::createUuid().toSimpleString().toStdString();
     m_sessionById.emplace(sessionId, std::move(sessionContext));
     return sessionId;
 }

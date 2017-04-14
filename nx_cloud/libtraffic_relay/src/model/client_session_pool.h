@@ -7,11 +7,16 @@
 namespace nx {
 namespace cloud {
 namespace relay {
+
+namespace conf { class Settings; }
+
 namespace model {
 
 class ClientSessionPool
 {
 public:
+    ClientSessionPool(const conf::Settings& settings);
+
     /**
      * @return Actual session id.
      */
@@ -29,6 +34,7 @@ private:
         std::string listeningPeerName;
     };
 
+    const conf::Settings& m_settings;
     mutable QnMutex m_mutex;
     std::map<std::string, SessionContext> m_sessionById;
 };
