@@ -10,7 +10,7 @@
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/utils/random.h>
 
-#include <utils/media/custom_output_stream.h>
+#include <nx/utils/custom_output_stream.h>
 
 TEST( HttpMultipartContentParser, genericTest )
 {

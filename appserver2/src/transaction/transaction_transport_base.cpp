@@ -19,7 +19,7 @@
 
 #include <cdb/ec2_request_paths.h>
 #include <nx_ec/ec_proto_version.h>
-#include <utils/media/custom_output_stream.h>
+#include <nx/utils/custom_output_stream.h>
 #include <utils/common/util.h>
 #include <http/custom_headers.h>
 #include <api/global_settings.h>
@@ -194,13 +194,13 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     std::weak_ptr<nx_http::HttpMessageStreamParser> incomingTransactionsRequestsParserWeak(
         incomingTransactionsRequestsParser );
 
-    auto extensionHeadersProcessor = makeFilterWithFunc( //this filter receives single HTTP message
+    auto extensionHeadersProcessor = nx::utils::bsf::makeFilterWithFunc( //this filter receives single HTTP message
         [this, incomingTransactionsRequestsParserWeak]() {
             if( auto incomingTransactionsRequestsParserStrong = incomingTransactionsRequestsParserWeak.lock() )
                 processChunkExtensions( incomingTransactionsRequestsParserStrong->currentMessage().headers() );
         } );
 
-    extensionHeadersProcessor->setNextFilter( makeCustomOutputStream(
+    extensionHeadersProcessor->setNextFilter( nx::utils::bsf::makeCustomOutputStream(
         std::bind(
             &QnTransactionTransportBase::receivedTransactionNonSafe,
             this,
@@ -246,12 +246,12 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     //creating parser sequence: multipart_parser -> ext_headers_processor -> transaction handler
     m_multipartContentParser = std::make_shared<nx_http::MultipartContentParser>();
     std::weak_ptr<nx_http::MultipartContentParser> multipartContentParserWeak( m_multipartContentParser );
-    auto extensionHeadersProcessor = makeFilterWithFunc( //this filter receives single multipart message
+    auto extensionHeadersProcessor = nx::utils::bsf::makeFilterWithFunc( //this filter receives single multipart message
         [this, multipartContentParserWeak]() {
             if( auto multipartContentParser = multipartContentParserWeak.lock() )
                 processChunkExtensions( multipartContentParser->prevFrameHeaders() );
         } );
-    extensionHeadersProcessor->setNextFilter( makeCustomOutputStream(
+    extensionHeadersProcessor->setNextFilter( nx::utils::bsf::makeCustomOutputStream(
         std::bind(
             &QnTransactionTransportBase::receivedTransactionNonSafe,
             this,
@@ -777,7 +777,7 @@ void QnTransactionTransportBase::receivedTransaction(
         if( !m_sizedDecoder )
         {
             m_sizedDecoder = std::make_shared<nx_bsf::SizedDataDecodingFilter>();
-            m_sizedDecoder->setNextFilter( makeCustomOutputStream(
+            m_sizedDecoder->setNextFilter( nx::utils::bsf::makeCustomOutputStream(
                 std::bind(
                     &QnTransactionTransportBase::receivedTransactionNonSafe,
                     this,

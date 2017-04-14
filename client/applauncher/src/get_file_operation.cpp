@@ -14,7 +14,7 @@
 #include <nx/utils/log/log.h>
 #include <utils/gzip/gzip_uncompressor.h>
 #include <utils/fs/async_file_processor.h>
-#include <utils/media/custom_output_stream.h>
+#include <nx/utils/custom_output_stream.h>
 
 #include <applauncher_app_info.h>
 #include "applauncher_process.h"

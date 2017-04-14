@@ -29,7 +29,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
-#include <utils/media/custom_output_stream.h>
+#include <nx/utils/custom_output_stream.h>
 
 #include "ilp_empty_packet.h"
 #include "motion_data_picture.h"
