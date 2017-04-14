@@ -122,7 +122,7 @@ angular.module('webadminApp')
                     }
 
                     timelineActions.updateState();
-                    timelineRender.Draw( mouseXOverTimeline, mouseYOverTimeline, catchScrollBar);
+                    timelineRender.Draw( mouseXOverTimeline, mouseYOverTimeline, timelineActions.catchScrollBar);
                 }
 
 
@@ -200,47 +200,6 @@ angular.module('webadminApp')
                     timelineActions.animateScroll(left ? 0 : 1);
                 }
 
-                var catchScrollBar = false;
-                function scrollbarSliderDragStart(mouseX){
-                    scope.scaleManager.stopWatching();
-                    catchScrollBar = mouseX;
-                }
-                function scrollbarSliderDrag(mouseX){
-                    if(catchScrollBar) {
-                        var moveScroll = mouseX - catchScrollBar;
-                        scope.scaleManager.scroll(scope.scaleManager.scroll() + moveScroll / scope.viewportWidth);
-                        catchScrollBar = mouseX;
-                        return moveScroll !== 0;
-                    }
-                    return false;
-                }
-                function scrollbarSliderDragEnd(){
-                    if(catchScrollBar) {
-                        scope.scaleManager.releaseWatching();
-                        catchScrollBar = false;
-                    }
-                }
-
-                var catchTimeline = false;
-                function timelineDragStart(mouseX){
-                    scope.scaleManager.stopWatching();
-                    catchTimeline = mouseX;
-                }
-                function timelineDrag(mouseX){
-                    if(catchTimeline) {
-                        var moveScroll = catchTimeline - mouseX;
-                        scope.scaleManager.scrollByPixels(moveScroll);
-                        catchTimeline = mouseX;
-                        return (moveScroll !== 0 );
-                    }
-                }
-                function timelineDragEnd(){
-                    if(catchTimeline) {
-                        scope.scaleManager.releaseWatching();
-                        catchTimeline = false;
-                    }
-                }
-
 
                 /**
                  * Actual browser events handling
@@ -303,23 +262,23 @@ angular.module('webadminApp')
                      }*/
 
                     if(mouseOverElements.scrollbarSlider){
-                        scrollbarSliderDragStart(mouseXOverTimeline);
+                        timelineActions.scrollbarSliderDragStart(mouseXOverTimeline);
                     }
                     if(mouseOverElements.timeline){
-                        timelineDragStart(mouseXOverTimeline)
+                        timelineActions.timelineDragStart(mouseXOverTimeline)
                     }
                 }
                 function canvasDrag(event){
                     updateMouseCoordinate(event);
-                    dragged = scrollbarSliderDrag(mouseXOverTimeline) ||
-                        timelineDrag (mouseXOverTimeline);
+                    dragged = timelineActions.scrollbarSliderDrag(mouseXOverTimeline) ||
+                              timelineActions.timelineDrag (mouseXOverTimeline);
                 }
 
                 var preventClick = false;
                 function canvasDragEnd(){
                     updateMouseCoordinate(null);
-                    scrollbarSliderDragEnd();
-                    timelineDragEnd();
+                    timelineActions.scrollbarSliderDragEnd();
+                    timelineActions.timelineDragEnd();
 
                     if(dragged){
                         preventClick = true;
@@ -343,7 +302,7 @@ angular.module('webadminApp')
                         return;
                     }
                     if(mouseOverElements.timeline){
-                        timelineActions.zoom(true,false,false, scope.scaleManager.setAnchorCoordinate(mouseX));
+                        timelineActions.zoomInToPoint(mouseX);
                         return;
                     }
 

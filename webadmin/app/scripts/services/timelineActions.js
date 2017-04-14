@@ -20,6 +20,10 @@ function TimelineActions(timelineConfig, positionProvider, scaleManager, animati
     this.zoomingIn = false;
 
     this.zoomByWheelTarget = 0;
+
+    this.catchScrollBar = false;
+
+    this.catchTimeline = false;
 }
 TimelineActions.prototype.setPositionProvider = function (positionProvider){
     this.positionProvider = positionProvider;
@@ -318,3 +322,51 @@ TimelineActions.prototype.updateState = function(){
     this.zoomingRenew();
     this.scrollingRenew();
 };
+
+
+TimelineActions.prototype.zoomInToPoint = function(mouseX) {
+    this.zoom(true, false, false, this.scaleManager.setAnchorCoordinate(mouseX));
+};
+
+
+
+TimelineActions.prototype.scrollbarSliderDragStart = function(mouseX){
+    this.scaleManager.stopWatching();
+    this.catchScrollBar = mouseX;
+};
+TimelineActions.prototype.scrollbarSliderDrag = function(mouseX){
+    if(this.catchScrollBar) {
+        var moveScroll = mouseX - this.catchScrollBar;
+        this.scaleManager.scroll(this.scaleManager.scroll() + moveScroll / this.scaleManager.viewportWidth);
+        this.catchScrollBar = mouseX;
+        return moveScroll !== 0;
+    }
+    return false;
+};
+
+TimelineActions.prototype.scrollbarSliderDragEnd = function(){
+    if(this.catchScrollBar) {
+        this.scaleManager.releaseWatching();
+        this.catchScrollBar = false;
+    }
+};
+
+TimelineActions.prototype.timelineDragStart = function(mouseX){
+    this.scaleManager.stopWatching();
+    this.catchTimeline = mouseX;
+};
+TimelineActions.prototype.timelineDrag = function(mouseX){
+    if(this.catchTimeline) {
+        var moveScroll = this.catchTimeline - mouseX;
+        this.scaleManager.scrollByPixels(moveScroll);
+        this.catchTimeline = mouseX;
+        return (moveScroll !== 0 );
+    }
+};
+TimelineActions.prototype.timelineDragEnd = function(){
+    if(this.catchTimeline) {
+        this.scaleManager.releaseWatching();
+        this.catchTimeline = false;
+    }
+};
+
