@@ -7,7 +7,7 @@
     "okButton":"Ok",
     "cancelButton":"キャンセル",
     "loginTitle":"{{PRODUCT_NAME}} にログイン",
-    "loginButton":"Log in",
+    "loginButton":"ログイン",
     "logoutAuthorisedText":"",
     "logoutAuthorisedTitle":"すでにログインしています",
     "logoutAuthorisedContinueButton":"続行",
@@ -151,15 +151,15 @@
     "confirmUnshareTitle":"ユーザーを削除しますか？",
     "confirmUnshareAction":"削除",
     "successDisconnected":"システムが正常に {{PRODUCT_NAME}} から切断されました",
-    "successDeleted":"System {{systemName}} is successfully deleted from your account",
-    "permissionsRemoved":"Permissions were removed from {{email}}"
+    "successDeleted":"システム {{systemName}} はあなたのアカウントから正常に削除されました",
+    "permissionsRemoved":"{{email}} からアクセス権限が削除されました"
   },
   "account":{
     "accountSavedSuccess":"あなたのアカウントは正常に保存されました",
     "passwordChangedSuccess":"あなたのアカウントは正常に保存されました",
-    "changePassword":"Change Password",
-    "newPasswordLabel":"New password",
-    "saveChanges":"Save"
+    "changePassword":"パスワードを変更",
+    "newPasswordLabel":"新規パスワード",
+    "saveChanges":"保存"
   },
   "downloads":{
     "noClientDetectedTitle":"システムを表示するには {{VMS_NAME}} をインストールします",
@@ -203,13 +203,13 @@
     }
   },
   "activeActions":{
-    "sendConfirm":"Send",
-    "resetPassword":"Reset Password",
-    "setNewPassword":"Save password",
-    "setNewPasswordLabel":"New password"
+    "sendConfirm":"送信",
+    "resetPassword":"パスワードリセット",
+    "setNewPassword":"パスワードを保存",
+    "setNewPasswordLabel":"新規パスワード"
   },
   "regActions":{
-    "passwordLabel":"Password",
-    "createAccount":"Create Account"
+    "passwordLabel":"パスワード",
+    "createAccount":"アカウント作成"
   }
 }
