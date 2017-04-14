@@ -225,7 +225,7 @@ def get_resource_id(resource):
     return resource
 
 
-def generate_resource_params_data(resource, **kw):
+def generate_resource_params_data(resource):
     resource_id = get_resource_id(resource)
     return [dict(
         name='Resource_%s' % resource_id,

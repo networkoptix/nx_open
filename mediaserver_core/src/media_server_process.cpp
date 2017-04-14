@@ -1428,8 +1428,16 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
             if (camera.manuallyAdded)
             {
                 QnResourceTypePtr resType = qnResTypePool->getResourceType(camera.typeId);
-                manualCameras.insert(camera.url,
-                    QnManualCameraInfo(QUrl(camera.url), QnNetworkResource::getResourceAuth(camera.id, camera.typeId), resType->getName()));
+                if (resType)
+                {
+                    const auto auth = QnNetworkResource::getResourceAuth(camera.id, camera.typeId);
+                    manualCameras.insert(camera.url,
+                        QnManualCameraInfo(QUrl(camera.url), auth, resType->getName()));
+                }
+                else
+                {
+                    NX_ASSERT(false, lm("No resourse type in the pool %1").str(camera.typeId));
+                }
             }
         }
         QnResourceDiscoveryManager::instance()->registerManualCameras(manualCameras);
