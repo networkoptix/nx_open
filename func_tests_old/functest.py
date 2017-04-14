@@ -1317,11 +1317,7 @@ BoxTestKeys = OrderedDict([
     ('--ts-inet', TimeSyncWithInetTest),
     ('--stream', StreamingTest),
     ('--hlso', HlsOnlyTest),
-    ('--dbup', DBTest),
-    ('--camera', VirtualCameraTest),
     ('--htstress', HTTPStressTest),
-    ('--natcon', NatConnectionTest),
-    ('--instance', InstanceTest),
     ('--boxtests', None),
 ])
 KeysSkipList = ('--boxtests', '--ts-noinet', '--ts-inet', '--hlso')

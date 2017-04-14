@@ -31,6 +31,7 @@ struct ApiLayoutTourData: ApiData
     bool isValid() const;
 
     bool operator==(const ApiLayoutTourData& rhs) const;
+    bool operator!=(const ApiLayoutTourData& rhs) const;
 };
 
 #define ApiLayoutTourData_Fields (id)(name)(items)

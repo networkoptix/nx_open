@@ -15,11 +15,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mobile_client-x64", "${root
         ${nx_network.guid} = ${nx_network.guid}
         ${nx_fusion.guid} = ${nx_fusion.guid}
         ${nx_vms_utils.guid} = ${nx_vms_utils.guid}
-        ${libclient_core.guid} = ${libclient_core.guid}
+        ${nx_client_core.guid} = ${nx_client_core.guid}
         ${cloud_db_client.guid} = ${cloud_db_client.guid}
     EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libclient_core-x64", "${root.dir}\client\libclient_core\src\libclient_core-x64.vcxproj", "${libclient_core.guid}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_client_core-x64", "${root.dir}\client\nx_client_core\src\nx_client_core-x64.vcxproj", "${nx_client_core.guid}"
     ProjectSection(ProjectDependencies) = postProject
         ${appserver2.guid} = ${appserver2.guid}
         ${common.guid} = ${common.guid}
@@ -88,14 +88,10 @@ Global
         ${mobile_client.guid}.Debug|x64.Build.0 = Debug|x64
         ${mobile_client.guid}.Release|x64.ActiveCfg = Release|x64
         ${mobile_client.guid}.Release|x64.Build.0 = Release|x64
-        ${libclient.guid}.Debug|x64.ActiveCfg = Debug|x64
-        ${libclient.guid}.Debug|x64.Build.0 = Debug|x64
-        ${libclient.guid}.Release|x64.ActiveCfg = Release|x64
-        ${libclient.guid}.Release|x64.Build.0 = Release|x64
-        ${libclient_core.guid}.Debug|x64.ActiveCfg = Debug|x64
-        ${libclient_core.guid}.Debug|x64.Build.0 = Debug|x64
-        ${libclient_core.guid}.Release|x64.ActiveCfg = Release|x64
-        ${libclient_core.guid}.Release|x64.Build.0 = Release|x64
+        ${nx_client_core.guid}.Debug|x64.ActiveCfg = Debug|x64
+        ${nx_client_core.guid}.Debug|x64.Build.0 = Debug|x64
+        ${nx_client_core.guid}.Release|x64.ActiveCfg = Release|x64
+        ${nx_client_core.guid}.Release|x64.Build.0 = Release|x64
         ${common.guid}.Debug|x64.ActiveCfg = Debug|x64
         ${common.guid}.Debug|x64.Build.0 = Debug|x64
         ${common.guid}.Release|x64.ActiveCfg = Release|x64

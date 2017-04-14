@@ -109,7 +109,7 @@ if [[ "${box}" == "bpi" ]]; then
             ldpreloadhook \
             libcedrus \
             libnx_vms_utils \
-            libclient_core \
+            nx_client_core \
             libnx_audio \
             libnx_media \
             libopenal \
