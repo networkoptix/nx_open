@@ -7,6 +7,6 @@ QString mac_getMoviesDir();
 bool mac_startDetached(const QString &path, const QStringList &arguments);
 void mac_openInFinder(const QString &path);
 
-void removeAppFromMacDock();
+void setAppVisibleInDock(bool visible);
 
 #endif // MAC_UTILS_H

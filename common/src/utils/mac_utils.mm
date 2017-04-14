@@ -49,7 +49,10 @@ void mac_openInFinder(const QString &path) {
     [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs:[NSArray arrayWithObjects:fileUrl, nil]];
 }
 
-void removeAppFromMacDock()
+void setAppVisibleInDock(bool visible)
 {
-    [NSApp setActivationPolicy: NSApplicationActivationPolicyProhibited];
+    if (visible)
+        [NSApp setActivationPolicy: NSApplicationActivationPolicyRegular];
+    else
+        [NSApp setActivationPolicy: NSApplicationActivationPolicyProhibited];
 }

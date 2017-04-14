@@ -53,8 +53,9 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-#ifdef Q_OS_MAC
+#if defined(Q_OS_MAC)
 #include <ui/workaround/mac_utils.h>
+#include <utils/mac_utils.h>
 #endif
 
 #ifndef DISABLE_FESTIVAL
@@ -231,8 +232,9 @@ int main(int argc, char** argv)
     win32_exception::installGlobalUnhandledExceptionHandler();
 #endif
 
-#ifdef Q_OS_MAC
+#if defined(Q_OS_MAC)
     mac_setLimits();
+    setAppVisibleInDock(true);
 #endif
 
 #ifndef DISABLE_FESTIVAL

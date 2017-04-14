@@ -83,7 +83,7 @@ int downloadFile(const QString& url, const QString& destFilePath);
 int main(int argc, char* argv[])
 {
 #if defined(Q_OS_MACX)
-    removeAppFromMacDock();
+    setAppVisibleInDock(false);
 #endif
 
     nx::network::SocketGlobals::init();
