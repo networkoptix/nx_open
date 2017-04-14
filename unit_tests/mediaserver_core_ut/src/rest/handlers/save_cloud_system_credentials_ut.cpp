@@ -21,9 +21,6 @@ public:
     MediaServerRestHandlerTestBase():
         m_commonModule(false)
     {
-        MSSettings::initializeROSettings();
-        MSSettings::initializeRunTimeSettings();
-
         m_commonModule.setModuleGUID(QnUuid::createUuid());
 
         insertSelfServerResource();

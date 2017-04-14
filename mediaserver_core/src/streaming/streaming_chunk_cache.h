@@ -15,10 +15,11 @@
 /*!
     Cache cost is measured in seconds
 */
-class StreamingChunkCache
-:
+class StreamingChunkCache:
+    public QObject,
     public ItemCache<StreamingChunkCacheKey, StreamingChunkPtr, StreamingChunkProvider>
 {
+    Q_OBJECT
 public:
     StreamingChunkCache(QnCommonModule* commonModule);
 };

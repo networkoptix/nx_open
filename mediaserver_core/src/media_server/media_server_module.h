@@ -11,6 +11,7 @@ class StreamingChunkCache;
 class QnStorageManager;
 class QnStaticCommonModule;
 class QnStorageDbPool;
+class MSSettings;
 
 class QnMediaServerModule:
     public QObject,
@@ -21,6 +22,8 @@ class QnMediaServerModule:
 public:
     QnMediaServerModule(
         const QString& enforcedMediatorEndpoint = QString(),
+        const QString& roSettingsPath = QString(),
+        const QString& rwSettingsPath = QString(),
         QObject *parent = nullptr);
     virtual ~QnMediaServerModule();
 
@@ -29,14 +32,21 @@ public:
 
     StreamingChunkCache* streamingChunkCache() const;
     QnCommonModule* commonModule() const;
+
+    QSettings* roSettings() const;
+    QSettings* runTimeSettings() const;
 private:
-    std::shared_ptr<QnStaticCommonModule> m_staticCommon;
-    std::shared_ptr<QnCommonModule> m_commonModule;
+    QnCommonModule* m_commonModule;
+    MSSettings* m_settings;
+    StreamingChunkCache* m_streamingChunkCache;
 
-    std::shared_ptr<StreamingChunkCache> m_streamingChunkCache;
+    struct UniquePtrContext
+    {
+        std::shared_ptr<QnStorageManager> normalStorageManager;
+        std::shared_ptr<QnStorageManager> backupStorageManager;
+    };
+    std::unique_ptr<UniquePtrContext> m_context;
 
-    std::shared_ptr<QnStorageManager> m_normalStorageManager;
-    std::shared_ptr<QnStorageManager> m_backupStorageManager;
 };
 
 #define qnServerModule QnMediaServerModule::instance()

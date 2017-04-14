@@ -27,6 +27,7 @@
 
 #include "health/system_health.h"
 #include "platform/platform_abstraction.h"
+#include <nx/utils/log/log.h>
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -89,7 +90,7 @@ class MediaServerProcess: public QnLongRunnable
     Q_OBJECT
 
 public:
-    MediaServerProcess(int argc, char* argv[]);
+    MediaServerProcess(int argc, char* argv[], bool serviceMode = false);
     ~MediaServerProcess();
 
     void stopObjects();
@@ -163,6 +164,12 @@ private:
     void updateAllowedInterfaces();
     void addCommandLineParametersFromConfig();
     void saveServerInfo(const QnMediaServerResourcePtr& server);
+
+    void serviceModePreInit();
+    void initTransactionLog(const QString& logDir, QnLogLevel level);
+    void initPermissionsLog(const QString& logDir, QnLogLevel level);
+    QString hardwareIdAsGuid();
+    void updateGuidIfNeeded();
 private:
     int m_argc;
     char** m_argv;
@@ -189,6 +196,7 @@ private:
     QnUuid m_obsoleteGuid;
     std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
     std::weak_ptr<QnMediaServerModule> m_serverModule;
+    bool m_serviceMode;
 };
 
 #endif // MEDIA_SERVER_PROCESS_H

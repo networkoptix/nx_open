@@ -18,6 +18,7 @@
 #include "media_server/serverutil.h"
 #include <core/resource/media_server_resource.h>
 #include <server/server_globals.h>
+#include <media_server/media_server_module.h>
 
 namespace {
 constexpr const auto kMaxEventConnectionStartRetryPeriod = std::chrono::minutes(1);
@@ -27,7 +28,7 @@ CloudConnectionManager::CloudConnectionManager(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule),
     m_cdbConnectionFactory(createConnectionFactory(), destroyConnectionFactory)
 {
-    const auto cdbEndpoint = MSSettings::roSettings()->value(
+    const auto cdbEndpoint = qnServerModule->roSettings()->value(
         nx_ms_conf::CDB_ENDPOINT,
         "").toString();
     if (!cdbEndpoint.isEmpty())
@@ -93,13 +94,13 @@ void CloudConnectionManager::setCloudCredentials(
         nx::network::SocketGlobals::mediatorConnector()
             .setSystemCredentials(std::move(credentials));
 
-        MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "yes");
+        qnServerModule->roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "yes");
     }
     else
     {
         nx::network::SocketGlobals::mediatorConnector()
             .setSystemCredentials(boost::none);
-        MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "no");
+        qnServerModule->roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "no");
         makeSystemLocal();
     }
 
@@ -215,7 +216,7 @@ bool CloudConnectionManager::resetCloudData()
         }
     }
 
-    MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "no");
+    qnServerModule->roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "no");
 
     return true;
 }

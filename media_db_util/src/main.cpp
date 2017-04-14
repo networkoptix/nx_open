@@ -149,7 +149,7 @@ int main(int argc, char** argv)
 //     std::unique_ptr<QnResourcePropertyDictionary> propDictionary = std::unique_ptr<QnResourcePropertyDictionary>(new QnResourcePropertyDictionary);
     std::unique_ptr<QnStorageDbPool> dbPool = std::unique_ptr<QnStorageDbPool>(
         new QnStorageDbPool(commonModule.get()));
-    MSSettings::initializeROSettings();
+    //MSSettings::initializeROSettings();
     QnWriterPool writerPool;
 
 
