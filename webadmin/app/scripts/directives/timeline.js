@@ -112,7 +112,7 @@ angular.module('webadminApp')
                     scope.scaleManager.setStart(scope.recordsProvider && scope.recordsProvider.chunksTree ? scope.recordsProvider.chunksTree.start : (now - timelineConfig.initialInterval));
                     scope.scaleManager.setEnd(now);
 
-                    fullZoomOut(); // Animate full zoom out
+                    timelineActions.fullZoomOut(); // Animate full zoom out
                 }
 
                 // !!! Render everything: updating function
@@ -124,7 +124,7 @@ angular.module('webadminApp')
                         scope.recordsProvider.updateLastMinute(timelineConfig.lastMinuteDuration, scope.scaleManager.levels.events.index);
                     }
 
-                    zoomingRenew();
+                    timelineActions.zoomingRenew();
                     timelineActions.scrollingRenew();
 
                     timelineRender.Draw( mouseXOverTimeline, mouseYOverTimeline, catchScrollBar);
@@ -258,58 +258,6 @@ angular.module('webadminApp')
 
 
 
-                //Relative zoom (step)
-                function zoom(zoomIn,slow,linear, zoomDate){
-                    var zoomTarget = scope.scaleManager.zoom() - (zoomIn ? 1 : -1) * (slow?timelineConfig.slowZoomSpeed:timelineConfig.zoomSpeed);
-                    timelineActions.zoomTo(zoomTarget, zoomDate, false, linear);
-                }
-
-                var zoomingNow = false;
-                var zoomingIn = false;
-                function zoomingRenew(){ // renew zooming
-                    if(zoomingNow) {
-                        zoom(zoomingIn, true, false);
-                    }
-                }
-                function zoomingStop() {
-                    if(zoomingNow) {
-                        zoomingNow = false;
-                        zoom(zoomingIn, true, true);
-                    }
-                }
-                function zoomingStart(zoomIn) {
-                    if(scope.scaleManager.disableZoomOut&&!zoomIn || scope.scaleManager.disableZoomIn&&zoomIn){
-                        return;
-                    }
-
-                    zoomingNow = true;
-                    zoomingIn = zoomIn;
-
-                    zoomingRenew();
-                }
-
-
-                function fullZoomOut(){
-                    timelineActions.zoomTo(1);
-                }
-
-                function timelineDblClick(mouseX){
-                    zoom(true,false,false, scope.scaleManager.setAnchorCoordinate(mouseX));
-                }
-
-                function zoomInClickOrHold(){
-                    zoomingStart(true);
-                }
-
-                function zoomOutClickOrHold(){
-                    zoomingStart(false);
-                }
-
-                function zoomOutDblClick(){
-                    zoomingStop();
-                    fullZoomOut();
-                }
-
 
                 var zoomByWheelTarget = 0;
                 function zoomByWheel(pixels){
@@ -442,7 +390,7 @@ angular.module('webadminApp')
                         return;
                     }
                     if(mouseOverElements.timeline){
-                        timelineDblClick(mouseXOverTimeline);
+                        timelineActions.zoom(true,false,false, scope.scaleManager.setAnchorCoordinate(mouseX));
                         return;
                     }
 
@@ -499,14 +447,28 @@ angular.module('webadminApp')
 
                 // 1. Visual buttons
 
-                element.on('mouseup',      '.zoomOutButton', zoomingStop);
-                element.on('mouseleave',   '.zoomOutButton', zoomingStop);
-                element.on('mousedown',    '.zoomOutButton', zoomOutClickOrHold);
-                element.on('dblclick',     '.zoomOutButton', zoomOutDblClick);
+                element.on('mouseup',      '.zoomOutButton', function(){
+                    timelineActions.zoomingStop();
+                });
+                element.on('mouseleave',   '.zoomOutButton', function(){
+                    timelineActions.zoomingStop();
+                });
+                element.on('mousedown',    '.zoomOutButton', function(){
+                    timelineActions.zoomingStart(false);
+                });
+                element.on('dblclick',     '.zoomOutButton', function(){
+                    timelineActions.fullZoomOut();
+                });
 
-                element.on('mouseup',      '.zoomInButton',  zoomingStop);
-                element.on('mouseleave',   '.zoomInButton',  zoomingStop);
-                element.on('mousedown',    '.zoomInButton',  zoomInClickOrHold);
+                element.on('mouseup',      '.zoomInButton', function(){
+                    timelineActions.zoomingStop();
+                });
+                element.on('mouseleave',   '.zoomInButton', function(){
+                    timelineActions.zoomingStop();
+                });
+                element.on('mousedown',    '.zoomInButton',  function(){
+                    timelineActions.zoomingStart(true);
+                });
 
                 //2. Canvas events
                 $( window ).resize(updateTimelineWidth);    // Adjust width after window was resized

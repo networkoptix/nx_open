@@ -16,6 +16,10 @@ function TimelineActions(timelineConfig, positionProvider, scaleManager, animati
     this.scrollingNow = false;
     this.scrollingLeft = false;
     this.scrollingSpeed = 0;
+
+
+    this.zoomingNow = false;
+    this.zoomingIn = false;
 }
 TimelineActions.prototype.setPositionProvider = function (positionProvider){
     this.positionProvider = positionProvider;
@@ -243,4 +247,41 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomDate, instant, linea
         setZoom(zoomTarget);
         self.zoomTarget = self.scaleManager.zoom();
     }
+};
+
+//Relative zoom (step)
+TimelineActions.prototype.zoom = function(zoomIn,slow,linear, zoomDate){
+    var zoomTarget = this.scaleManager.zoom() - (zoomIn ? 1 : -1) * (slow?this.timelineConfig.slowZoomSpeed:this.timelineConfig.zoomSpeed);
+    this.zoomTo(zoomTarget, zoomDate, false, linear);
+};
+
+
+
+TimelineActions.prototype.zoomingRenew = function(){ // renew zooming
+    if(this.zoomingNow) {
+        this.zoom(this.zoomingIn, true, false);
+    }
+};
+
+TimelineActions.prototype.zoomingStop = function() {
+    if( this.zoomingNow) {
+        this.zoomingNow = false;
+        this.zoom( this.zoomingIn, true, true);
+    }
+};
+
+TimelineActions.prototype.zoomingStart = function(zoomIn) {
+    if(this.scaleManager.disableZoomOut&&!zoomIn || this.scaleManager.disableZoomIn&&zoomIn){
+        return;
+    }
+
+    this.zoomingNow = true;
+    this.zoomingIn = zoomIn;
+
+    this.zoomingRenew();
+};
+
+TimelineActions.prototype.fullZoomOut = function(){
+    this.zoomingStop();
+    this.zoomTo(1);
 };
