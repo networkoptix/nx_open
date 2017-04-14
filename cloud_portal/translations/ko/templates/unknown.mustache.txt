@@ -1,6 +1,6 @@
-New message
+새 메시지
 
-Type: {{message.type}}
-Data: {{{message.data}}}
+유형: {{message.type}}
+데이터: {{{message.data}}}
 
-There is no specific template for this type of message
+이 유형의 메시지에 대한 특정 템플릿이 없습니다.
