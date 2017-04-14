@@ -70,7 +70,7 @@ void QnRestoreStateRestHandler::afterExecute(
     QnJsonRestResult reply;
     if (QJson::deserialize(body, &reply) && reply.error == QnJsonRestResult::NoError)
     {
-        MSSettings::roSettings()->setValue(QnServer::kRemoveDbParamName, "1");
+        qnServerModule->roSettings()->setValue(QnServer::kRemoveDbParamName, "1");
         restartServer(0);
     }
 }

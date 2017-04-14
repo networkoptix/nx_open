@@ -29,10 +29,11 @@
 #include "core/resource/storage_resource.h"
 #include "http/custom_headers.h"
 #include "resource_status_watcher.h"
+#include <media_server/media_server_module.h>
 
 QnServerMessageProcessor::QnServerMessageProcessor(QnCommonModule* commonModule):
     base_type(commonModule),
-    m_serverPort( MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt() )
+    m_serverPort( qnServerModule->roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt() )
 {
 }
 

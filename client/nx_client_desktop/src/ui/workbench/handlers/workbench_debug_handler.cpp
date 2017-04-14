@@ -31,9 +31,9 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_welcome_screen.h>
 
-//#ifdef _DEBUG
+#ifdef _DEBUG
 #define DEBUG_ACTIONS
-//#endif
+#endif
 
 namespace {
 

@@ -57,6 +57,8 @@ int QnResourcePropertyDictionary::saveData(const ec2::ApiResourceParamWithRefDat
     if (data.empty())
         return -1; // nothing to save
     ec2::AbstractECConnectionPtr conn = commonModule()->ec2Connection();
+    if (!conn)
+        return -1; // not connected to ec2
     QnMutexLocker lock( &m_requestMutex );
     //TODO #ak m_requestInProgress is redundant here, data can be saved to
         //functor to use instead of \a QnResourcePropertyDictionary::onRequestDone

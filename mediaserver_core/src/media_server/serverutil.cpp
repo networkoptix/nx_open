@@ -47,6 +47,7 @@
 
 #include "server_connector.h"
 #include "server/server_globals.h"
+#include <media_server/media_server_module.h>
 
 namespace
 {
@@ -66,7 +67,7 @@ QnUuid serverGuid()
     if (!guid.isNull())
         return guid;
 
-    guid = QnUuid(MSSettings::roSettings()->value(lit("serverGuid")).toString());
+    guid = QnUuid(qnServerModule->roSettings()->value(lit("serverGuid")).toString());
 
     return guid;
 }
@@ -77,13 +78,13 @@ bool isLocalAppServer(const QString &host) {
 
 QString getDataDirectory()
 {
-    const QString& dataDirFromSettings = MSSettings::roSettings()->value( "dataDir" ).toString();
+    const QString& dataDirFromSettings = qnServerModule->roSettings()->value( "dataDir" ).toString();
     if( !dataDirFromSettings.isEmpty() )
         return dataDirFromSettings;
 
 #ifdef Q_OS_LINUX
     QString defVarDirName = QString("/opt/%1/mediaserver/var").arg(QnAppInfo::linuxOrganizationName());
-    QString varDirName = MSSettings::roSettings()->value("varDir", defVarDirName).toString();
+    QString varDirName = qnServerModule->roSettings()->value("varDir", defVarDirName).toString();
     return varDirName;
 #else
     const QStringList& dataDirList = QStandardPaths::standardLocations(QStandardPaths::DataLocation);
@@ -322,12 +323,12 @@ bool resetSystemToStateNew(QnCommonModule* commonModule)
 
 qint64 nx::ServerSetting::getSysIdTime()
 {
-    return MSSettings::roSettings()->value(SYSTEM_IDENTITY_TIME).toLongLong();
+    return qnServerModule->roSettings()->value(SYSTEM_IDENTITY_TIME).toLongLong();
 }
 
 void nx::ServerSetting::setSysIdTime(qint64 value)
 {
-    auto settings = MSSettings::roSettings();
+    auto settings = qnServerModule->roSettings();
     settings->setValue(SYSTEM_IDENTITY_TIME, value);
 }
 
@@ -347,8 +348,8 @@ QByteArray nx::ServerSetting::decodeAuthKey(const QByteArray& authKey)
 
 QByteArray nx::ServerSetting::getAuthKey()
 {
-    QByteArray authKey = MSSettings::roSettings()->value(AUTH_KEY).toByteArray();
-    QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
+    QByteArray authKey = qnServerModule->roSettings()->value(AUTH_KEY).toByteArray();
+    QString appserverHostString = qnServerModule->roSettings()->value("appserverHost").toString();
     if (!authKey.isEmpty())
     {
         // convert from v2.2 format and encode value
@@ -366,7 +367,7 @@ void nx::ServerSetting::setAuthKey(const QByteArray& authKey)
     QByteArray prefix("SK_");
     QByteArray authKeyBin = QnUuid(authKey).toRfc4122();
     QByteArray authKeyEncoded = QnAuthHelper::symmetricalEncode(authKeyBin).toHex();
-    MSSettings::roSettings()->setValue(AUTH_KEY, prefix + authKeyEncoded); // encode and update in settings
+    qnServerModule->roSettings()->setValue(AUTH_KEY, prefix + authKeyEncoded); // encode and update in settings
 }
 
 
@@ -402,7 +403,7 @@ bool nx::SystemName::saveToConfig()
 {
     const auto prevValueBak = m_prevValue;
     m_prevValue = m_value;
-    auto settings = MSSettings::roSettings();
+    auto settings = qnServerModule->roSettings();
     if (!settings->isWritable())
     {
         m_prevValue = prevValueBak;
@@ -415,7 +416,7 @@ bool nx::SystemName::saveToConfig()
 
 void nx::SystemName::loadFromConfig()
 {
-    auto settings = MSSettings::roSettings();
+    auto settings = qnServerModule->roSettings();
     m_value = settings->value(SYSTEM_NAME_KEY).toString();
     m_prevValue = settings->value(PREV_SYSTEM_NAME_KEY).toString();
 }

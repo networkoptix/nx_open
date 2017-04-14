@@ -2,7 +2,7 @@
 #define __FISHEYE_CALIBRATOR_H_
 
 #include "utils/media/frame_info.h"
-#include "utils/common/long_runnable.h"
+#include "nx/utils/thread/long_runnable.h"
 
 /**
  * This class determine fisheye elipse center and radius

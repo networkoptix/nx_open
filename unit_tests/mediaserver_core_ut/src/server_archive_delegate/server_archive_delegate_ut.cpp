@@ -299,7 +299,7 @@ private:
             pathString = lit("%2/%1/%3").arg(cameraFolder).arg(quality).arg(pathString);
             auto fullDirPath = QDir(root).absoluteFilePath(pathString);
             decltype(curStartTime + curDuration) error = -1;
-            
+
             if (!QDir().mkpath(fullDirPath))
             {
                 qDebug() << "Create directory" << fullDirPath << "failed";
@@ -457,16 +457,15 @@ TEST(ServerArchiveDelegate_playback_test, Main)
 
     std::unique_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule());
     serverModule->commonModule()->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
-    MSSettings::initializeROSettings();
 
     qnNormalStorageMan->stopAsyncTasks();
 
     qnBackupStorageMan->stopAsyncTasks();
 
-    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction(0));
+    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
 
-    MSSettings::roSettings()->remove(lit("NORMAL_SCAN_ARCHIVE_FROM"));
-    MSSettings::roSettings()->remove(lit("BACKUP_SCAN_ARCHIVE_FROM"));
+    serverModule->roSettings()->remove(lit("NORMAL_SCAN_ARCHIVE_FROM"));
+    serverModule->roSettings()->remove(lit("BACKUP_SCAN_ARCHIVE_FROM"));
 #if defined (__arm__)
     TestHelper testHelper(serverModule->commonModule(), std::move(QStringList() << storageUrl_1 << storageUrl_2), 5);
 #else

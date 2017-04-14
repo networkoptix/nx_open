@@ -1,19 +1,9 @@
-
 #include "long_runnable.h"
 
-#include <cassert>
-#include <cstdlib>
-#include <typeinfo>
-
-#include <QtCore/QSet>
-
 #include <nx/utils/crash_dump/systemexcept.h>
-#include <nx/utils/thread/mutex.h>
-#include <nx/utils/thread/wait_condition.h>
-#include <nx/utils/thread/thread_util.h>
+#include <nx/utils/log/log.h>
 
-#include <utils/common/warnings.h>
-
+#include "thread_util.h"
 
 // -------------------------------------------------------------------------- //
 // QnLongRunnablePoolPrivate
@@ -111,33 +101,39 @@ static const size_t DEFAULT_THREAD_STACK_SIZE = 128*1024;
 // -------------------------------------------------------------------------- //
 // QnLongRunnable
 // -------------------------------------------------------------------------- //
-QnLongRunnable::QnLongRunnable( bool isTrackedByPool ):
+QnLongRunnable::QnLongRunnable(bool isTrackedByPool):
     m_needStop(false),
     m_onPause(false),
     m_systemThreadId(0)
 {
     DEBUG_CODE(m_type = NULL);
 
-    if(isTrackedByPool) {
-        if(QnLongRunnablePool *pool = QnLongRunnablePool::instance()) {
+    if (isTrackedByPool)
+    {
+        if (QnLongRunnablePool* pool = QnLongRunnablePool::instance())
+        {
             m_pool = pool->d;
             m_pool->createdNotify(this);
-        //} else {
-        //    qnWarning("QnLongRunnablePool instance does not exist, lifetime of this runnable will not be tracked.");
+        }
+        else
+        {
+            NX_LOGX("QnLongRunnablePool instance does not exist, lifetime of this runnable will not be tracked.", cl_logWARNING);
         }
     }
 
-    connect(this, SIGNAL(started()),    this, SLOT(at_started()), Qt::DirectConnection);
-    connect(this, SIGNAL(finished()),   this, SLOT(at_finished()), Qt::DirectConnection);
+    connect(this, SIGNAL(started()), this, SLOT(at_started()), Qt::DirectConnection);
+    connect(this, SIGNAL(finished()), this, SLOT(at_finished()), Qt::DirectConnection);
 
 #ifndef Q_OS_ANDROID // not supported on Android
-    setStackSize( DEFAULT_THREAD_STACK_SIZE );
+    setStackSize(DEFAULT_THREAD_STACK_SIZE);
 #endif
 }
 
 QnLongRunnable::~QnLongRunnable() {
-    if(isRunning())
-        qnCritical("Runnable instance was destroyed without a call to stop().");
+    if (isRunning())
+    {
+        NX_ASSERT(false, "Runnable instance was destroyed without a call to stop().");
+    }
 
     if(m_pool)
         m_pool->destroyedNotify(this);

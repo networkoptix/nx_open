@@ -8,6 +8,7 @@
 #include <core/resource/storage_resource.h>
 #include <core/resource/user_resource.h>
 #include <common/common_module_aware.h>
+#include <media_server/media_server_module.h>
 
 namespace nx {
 namespace mserver_aux {
@@ -202,7 +203,7 @@ public:
 
     virtual bool isSystemIdFromSystemName() const override
     {
-        return MSSettings::roSettings()->value("systemIdFromSystemName").toInt() > 0;
+        return qnServerModule->roSettings()->value("systemIdFromSystemName").toInt() > 0;
     }
 
     virtual QString getMaxServerKey() const override

@@ -21,7 +21,7 @@ extern "C"
 
 #include <plugins/resource/avi/avi_archive_delegate.h>
 #include <transcoding/ffmpeg_transcoder.h>
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 
 
 class QnAviArchiveDelegate;

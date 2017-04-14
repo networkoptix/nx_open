@@ -4,6 +4,7 @@
 #include "media_server/settings.h"
 #include "utils/common/buffered_file.h"
 #include "utils/fs/file.h"
+#include <media_server/media_server_module.h>
 
 namespace aux
 {
@@ -291,18 +292,18 @@ QIODevice *QnThirdPartyStorageResource::open(
         int ffmpegBufferSize = 0;
 
         int ffmpegMaxBufferSize =
-            MSSettings::roSettings()->value(
+            qnServerModule->roSettings()->value(
                 nx_ms_conf::MAX_FFMPEG_BUFFER_SIZE,
                 nx_ms_conf::DEFAULT_MAX_FFMPEG_BUFFER_SIZE).toInt();
 
         if (openMode & QIODevice::WriteOnly)
         {
-            ioBlockSize = MSSettings::roSettings()->value(
+            ioBlockSize = qnServerModule->roSettings()->value(
                 nx_ms_conf::IO_BLOCK_SIZE,
                 nx_ms_conf::DEFAULT_IO_BLOCK_SIZE
             ).toInt();
 
-            ffmpegBufferSize = MSSettings::roSettings()->value(
+            ffmpegBufferSize = qnServerModule->roSettings()->value(
                 nx_ms_conf::FFMPEG_BUFFER_SIZE,
                 nx_ms_conf::DEFAULT_FFMPEG_BUFFER_SIZE
             ).toInt();

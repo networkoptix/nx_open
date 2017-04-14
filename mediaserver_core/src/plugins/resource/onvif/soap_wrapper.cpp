@@ -28,6 +28,7 @@
 #include "common/common_module.h"
 #include "media_server/settings.h"
 #include <common/static_common_module.h>
+#include <media_server/media_server_module.h>
 
 using nx::common::utils::Credentials;
 
@@ -192,7 +193,7 @@ struct SoapTimeouts
 
 SoapTimeouts getSoapTimeouts()
 {
-    auto serializedTimeouts = MSSettings::roSettings()
+    auto serializedTimeouts = qnServerModule->roSettings()
         ->value( nx_ms_conf::ONVIF_TIMEOUTS, QString()).toString();
 
     return SoapTimeouts(serializedTimeouts);

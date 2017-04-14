@@ -3,7 +3,7 @@
 #include <QtCore/QIODevice>
 #include <QtMultimedia/QAudioInput>
 
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 
 #include <nx/streaming/audio_data_packet.h>
 #include <core/dataprovider/live_stream_provider.h>

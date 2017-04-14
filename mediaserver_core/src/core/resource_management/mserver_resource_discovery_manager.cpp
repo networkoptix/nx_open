@@ -27,6 +27,7 @@
 
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
+#include <media_server/media_server_module.h>
 
 static const int NETSTATE_UPDATE_TIME = 1000 * 30;
 static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 2;
@@ -36,7 +37,7 @@ QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(QnCommonMod
 {
     netStateTime.restart();
     connect(this, &QnMServerResourceDiscoveryManager::cameraDisconnected, qnBusinessRuleConnector, &QnBusinessEventConnector::at_cameraDisconnected);
-    m_serverOfflineTimeout = MSSettings::roSettings()->value("redundancyTimeout", m_serverOfflineTimeout/1000).toInt() * 1000;
+    m_serverOfflineTimeout = qnServerModule->roSettings()->value("redundancyTimeout", m_serverOfflineTimeout/1000).toInt() * 1000;
     m_serverOfflineTimeout = qMax(1000, m_serverOfflineTimeout);
     m_foreignResourcesRetryCount = 0;
 }

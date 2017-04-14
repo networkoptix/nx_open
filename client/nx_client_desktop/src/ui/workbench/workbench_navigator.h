@@ -21,7 +21,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/connective.h>
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 #include <utils/threaded_chunks_merge_tool.h>
 #include <camera/thumbnails_loader.h>
 

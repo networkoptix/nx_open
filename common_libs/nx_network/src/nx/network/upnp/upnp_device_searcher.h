@@ -14,7 +14,7 @@
 #include <QtCore/QString>
 
 #include <api/global_settings.h>
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 #include <nx/network/async_stoppable.h>
 
 #include <nx/utils/async_operation_guard.h>

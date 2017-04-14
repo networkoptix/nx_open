@@ -10,7 +10,7 @@
 
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 
 struct QnPeerUpdateInformation {
 //     enum State {
