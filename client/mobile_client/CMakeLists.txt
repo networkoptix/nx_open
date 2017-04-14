@@ -19,7 +19,7 @@ set(target_args
     PUBLIC_LIBS
         Qt5::WebChannel Qt5::WebSockets
         qtsingleguiapplication
-        libclient_core)
+        nx_client_core)
 
 if(ANDROID)
     nx_add_target(mobile_client LIBRARY LIBRARY_TYPE SHARED ${target_args})

@@ -15,7 +15,6 @@ function upload() {
     mkdir -p "$PACKAGE_DIR"/bin
     cp -f ${basedir}/external.dat "$PACKAGE_DIR"/bin
     cp -f ${basedir}/server-external.cmake "$PACKAGE_DIR"
-    cp -f ${basedir}/qbs/server-external.qbs "$PACKAGE_DIR"
     ${root.dir}/build_utils/python/rdep.py -u -f -t any $PACKAGE --root $ROOT
 }
 
