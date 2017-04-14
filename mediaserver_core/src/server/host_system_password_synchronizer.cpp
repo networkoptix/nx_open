@@ -13,7 +13,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <utils/common/app_info.h>
-#include <utils/crypt/linux_passwd_crypt.h>
+#include <nx/utils/crypt/linux_passwd_crypt.h>
 
 #include "platform/platform_abstraction.h"
 #include "platform/monitoring/platform_monitor.h"

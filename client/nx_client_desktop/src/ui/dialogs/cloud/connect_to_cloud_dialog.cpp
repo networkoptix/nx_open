@@ -93,7 +93,7 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
 {
     ui->setupUi(this);
     setWindowTitle(tr("Connect to %1",
-        "%1 is the cloud name (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
+        "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
 
     Q_D(QnConnectToCloudDialog);
 
@@ -117,7 +117,7 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
     ui->enterCloudAccountLabel->setFont(font);
     ui->enterCloudAccountLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->enterCloudAccountLabel->setText(tr("Enter %1 Account",
-        "%1 is the cloud name (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
+        "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
     ui->enterCloudAccountLabel->setForegroundRole(QPalette::Light);
 
     ui->loginInputField->setTitle(tr("Email"));
@@ -272,7 +272,7 @@ void QnConnectToCloudDialogPrivate::showSuccess(const QString& /*cloudLogin*/)
 
     QnMessageBox::success(q->parentWidget(),
         tr("System connected to %1", "%1 is the cloud name (like 'Nx Cloud')")
-            .arg(QnAppInfo::cloudName()));
+            .arg(nx::network::AppInfo::cloudName()));
 
     // Since we have QTBUG-40585 event loops of dialogs shouldn't be intersected.
     q->accept();
@@ -284,7 +284,7 @@ void QnConnectToCloudDialogPrivate::showFailure(const QString &message)
 
     QnMessageBox::critical(q,
         tr("Failed to connect System to %1", "%1 is the cloud name (like 'Nx Cloud')")
-            .arg(QnAppInfo::cloudName()),
+            .arg(nx::network::AppInfo::cloudName()),
         message);
 
     lockUi(false);

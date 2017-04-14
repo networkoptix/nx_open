@@ -214,7 +214,7 @@ bool QnSaveCloudSystemCredentialsHandler::insertCloudOwner(
     userData.permissions = Qn::GlobalAdminPermissionSet;
     userData.isAdmin = true;
     userData.isEnabled = true;
-    userData.realm = QnAppInfo::realm();
+    userData.realm = nx::network::AppInfo::realm();
     userData.hash = ec2::ApiUserData::kCloudPasswordStub;
     userData.digest = ec2::ApiUserData::kCloudPasswordStub;
 

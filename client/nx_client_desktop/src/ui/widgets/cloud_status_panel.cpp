@@ -3,6 +3,8 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMenu>
 
+#include <nx/network/app_info.h>
+
 #include <ui/common/palette.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/helper.h>
@@ -124,7 +126,7 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent)
 
     auto offlineAction = new QAction(this);
     offlineAction->setText(QnCloudStatusPanel::tr("Cannot connect to %1",
-        "%1 is the cloud name (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
+        "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
     offlineAction->setEnabled(false);
 
     offlineMenu->setWindowFlags(offlineMenu->windowFlags());

@@ -193,7 +193,7 @@ public:
     virtual bool isCloudInstanceChanged() const override
     {
         return !qnGlobalSettings->cloudHost().isEmpty() &&
-                qnGlobalSettings->cloudHost() != QnAppInfo::defaultCloudHost();
+                qnGlobalSettings->cloudHost() != nx::network::AppInfo::defaultCloudHost();
     }
 
     virtual bool isConnectedToCloud() const override

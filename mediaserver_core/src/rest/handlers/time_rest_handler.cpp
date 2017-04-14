@@ -26,7 +26,7 @@ int QnTimeRestHandler::executeGet(
 
     reply.timezoneId = nx::utils::getCurrentTimeZoneId();
 
-    reply.realm = QnAppInfo::realm();
+    reply.realm = nx::network::AppInfo::realm();
 
     result.setReply(reply);
     return CODE_OK;

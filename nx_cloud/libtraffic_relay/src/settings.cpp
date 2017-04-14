@@ -176,7 +176,7 @@ void Settings::loadListeningPeer()
 void Settings::loadConnectingPeer()
 {
     m_connectingPeer.connectSessionIdleTimeout = 
-        nx::utils::parseTimerDurationTyped(
+        nx::utils::parseTimerDuration(
             m_settings.value(kConnectSessionIdleTimeout).toString(),
             kDefaultConnectSessionIdleTimeout);
 }

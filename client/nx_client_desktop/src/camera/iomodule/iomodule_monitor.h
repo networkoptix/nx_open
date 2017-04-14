@@ -9,8 +9,6 @@
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/utils/thread/mutex.h>
 
-class AbstractByteStreamFilter;
-
 class QnIOModuleMonitor: public QObject, public QnConnectionContextAware
 {
     Q_OBJECT

@@ -4,6 +4,8 @@
 #include <QtWidgets/QGraphicsOpacityEffect>
 #include <QtWidgets/QLineEdit>
 
+#include <nx/network/app_info.h>
+
 #include <client_core/client_core_settings.h>
 
 #include <helpers/cloud_url_helper.h>
@@ -56,7 +58,7 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     Q_D(QnLoginToCloudDialog);
 
     setWindowTitle(tr("Log in to %1", "%1 is the cloud name (like 'Nx Cloud')")
-        .arg(QnAppInfo::cloudName()));
+        .arg(nx::network::AppInfo::cloudName()));
 
     ui->loginInputField->setTitle(tr("Email"));
     ui->loginInputField->setValidator(Qn::defaultEmailValidator(false));
@@ -81,7 +83,7 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     ui->learnMoreLabel->setText(makeHref(tr("Learn more about"), urlHelper.aboutUrl()));
 
     ui->cloudWelcomeLabel->setText(tr("Welcome to %1!", "%1 is the cloud name (like 'Nx Cloud')")
-        .arg(QnAppInfo::cloudName()));
+        .arg(nx::network::AppInfo::cloudName()));
     ui->cloudImageLabel->setPixmap(qnSkin->pixmap("cloud/cloud_64.png",
         QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
 
@@ -238,7 +240,7 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
             Q_Q(QnLoginToCloudDialog);
 
             QnMessageBox::critical(q, tr("Failed to login to %1",
-                "%1 is the cloud name (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
+                "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
             break;
         }
     }

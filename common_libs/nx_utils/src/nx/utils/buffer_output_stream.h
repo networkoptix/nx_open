@@ -1,18 +1,17 @@
-/**********************************************************
-* May 12, 2016
-* a.kolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <QtCore/QByteArray>
 
 #include "abstract_byte_stream_filter.h"
 
+namespace nx {
+namespace utils {
+namespace bsf {
 
-/** Saves all incoming data to internal buffer */
-class BufferOutputStream
-:
+/**
+ * Saves all incoming data to internal buffer.
+ */
+class NX_UTILS_API BufferOutputStream:
     public AbstractByteStreamFilter
 {
 public:
@@ -25,3 +24,7 @@ public:
 private:
     QByteArray m_buffer;
 };
+
+} // namespace bsf
+} // namespace utils
+} // namespace nx

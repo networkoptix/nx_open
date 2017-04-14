@@ -72,7 +72,7 @@ Qn::AuthResult GenericUserDataProvider::authorize(
         }
         else if (auto server = res.dynamicCast<QnMediaServerResource>())
         {
-            const QString ha1Data = lit("%1:%2:%3").arg(server->getId().toString()).arg(QnAppInfo::realm()).arg(server->getAuthKey());
+            const QString ha1Data = lit("%1:%2:%3").arg(server->getId().toString()).arg(nx::network::AppInfo::realm()).arg(server->getAuthKey());
             ha1 = QCryptographicHash::hash(ha1Data.toUtf8(), QCryptographicHash::Md5).toHex();
         }
 

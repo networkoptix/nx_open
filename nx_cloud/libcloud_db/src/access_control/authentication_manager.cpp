@@ -194,7 +194,7 @@ void AuthenticationManager::authenticate(
 
 nx::String AuthenticationManager::realm()
 {
-    return QnAppInfo::realm().toUtf8();
+    return nx::network::AppInfo::realm().toUtf8();
 }
 
 bool AuthenticationManager::validateNonce(const nx_http::StringType& nonce)

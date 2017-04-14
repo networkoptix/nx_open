@@ -10,6 +10,7 @@
 
 #include <boost/optional.hpp>
 
+#include <nx/network/app_info.h>
 #include <nx/network/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/buffer_source.h>
@@ -161,7 +162,7 @@ void AuthenticationManager::authenticate(
 
 nx::String AuthenticationManager::realm()
 {
-    return QnAppInfo::realm().toUtf8();
+    return nx::network::AppInfo::realm().toUtf8();
 }
 
 bool AuthenticationManager::validateNonce(const nx_http::StringType& nonce)

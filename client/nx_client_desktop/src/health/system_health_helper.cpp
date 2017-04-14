@@ -2,9 +2,10 @@
 
 #include "business/actions/abstract_business_action.h"
 
-#include <utils/common/app_info.h>
-
+#include <nx/network/app_info.h>
 #include <nx/utils/string.h>
+
+#include <utils/common/app_info.h>
 
 QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType messageType)
 {
@@ -57,7 +58,7 @@ QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType mes
         case QnSystemHealth::CloudPromo:
         {
             const QString kLearnMoreText = tr("Learn more");
-            const QString kCloudBeta = lit("<b>%1</b> Beta").arg(QnAppInfo::cloudName());
+            const QString kCloudBeta = lit("<b>%1</b> Beta").arg(nx::network::AppInfo::cloudName());
 
             const QString kMessage = tr("Check out %1 &mdash; connect to your servers from anywhere",
                 "%1 is the cloud name (like 'Nx Cloud')").arg(kCloudBeta);

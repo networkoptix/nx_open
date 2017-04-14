@@ -25,7 +25,7 @@
 #include <common/common_globals.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/thread/long_runnable.h>
-#include <utils/media/custom_output_stream.h>
+#include <nx/utils/custom_output_stream.h>
 
 #include "repeating_buffer_sender.h"
 
@@ -255,7 +255,7 @@ TEST_F(AsyncHttpClient, motionJpegRetrieval)
     for (ClientContext& clientCtx : clients)
     {
         clientCtx.client = nx_http::AsyncHttpClient::create();
-        clientCtx.multipartParser.setNextFilter(makeCustomOutputStream(checkReceivedContentFunc));
+        clientCtx.multipartParser.setNextFilter(nx::utils::bsf::makeCustomOutputStream(checkReceivedContentFunc));
         QObject::connect(
             clientCtx.client.get(), &nx_http::AsyncHttpClient::responseReceived,
             clientCtx.client.get(),

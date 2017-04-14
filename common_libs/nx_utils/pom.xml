@@ -20,7 +20,7 @@
         <buildLib>sharedLib</buildLib>
         <qt.libs>core xml</qt.libs>
         <global.libs></global.libs>
-        <windows.oslibs>DbgHelp.lib -lIphlpapi -lOle32 -lSecur32 -lwinmm</windows.oslibs>
+        <windows.oslibs>-lws2_32 DbgHelp.lib -lIphlpapi -lOle32 -lSecur32 -lwinmm</windows.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreFoundation</mac.oslibs>
 
         <windows.defines>_USING_V110_SDK71_</windows.defines>

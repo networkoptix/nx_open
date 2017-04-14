@@ -11,6 +11,8 @@
 #endif
 
 #include <QCryptographicHash>
+#include <QtCore/QFile>
+
 #include <nx/utils/log/assert.h>
 #include <nx/utils/random.h>
 
