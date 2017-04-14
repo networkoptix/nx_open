@@ -45,7 +45,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent)
     addPage(UserManagement,         new QnUserManagementWidget(this),       tr("Users"));
     addPage(RoutingManagement,      routingWidget,                          tr("Routing Management"));
     addPage(TimeServerSelection,    new QnTimeServerSelectionWidget(this),  tr("Time Synchronization"));
-    addPage(CloudManagement,        new QnCloudManagementWidget(this),      QnAppInfo::cloudName());
+    addPage(CloudManagement,        new QnCloudManagementWidget(this),      nx::network::AppInfo::cloudName());
 
     loadDataToUi();
     autoResizePagesToContents(ui->tabWidget,  { QSizePolicy::Preferred, QSizePolicy::Preferred }, false);

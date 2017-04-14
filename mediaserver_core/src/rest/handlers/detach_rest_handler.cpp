@@ -111,7 +111,7 @@ int QnDetachFromCloudRestHandler::execute(
     {
         // TODO: #ak: Rollback "admin" user modification?
 
-        NX_LOGX(lm("Received error response from %1: %2").arg(QnAppInfo::cloudName())
+        NX_LOGX(lm("Received error response from %1: %2").arg(nx::network::AppInfo::cloudName())
             .arg(api::toString(cdbResultCode)), cl_logWARNING);
 
         // Ignoring cloud error in detach operation.

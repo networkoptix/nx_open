@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nx/network/app_info.h>
+
 #include "api_globals.h"
 #include "api_resource_data.h"
 #include <core/resource/resource_type.h>
@@ -14,7 +16,7 @@ struct ApiUserData: ApiResourceData
     ApiUserData():
         isAdmin(false),
         permissions(Qn::NoGlobalPermissions),
-        realm(QnAppInfo::realm()),
+        realm(nx::network::AppInfo::realm()),
         isLdap(false),
         isEnabled(true),
         isCloud(false),

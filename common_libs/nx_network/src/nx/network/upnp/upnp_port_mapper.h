@@ -5,8 +5,6 @@
 
 #include <nx/utils/scope_guard.h>
 
-#include <utils/common/app_info.h>
-
 #include "upnp_async_client.h"
 #include "upnp_device_searcher.h"
 
@@ -19,7 +17,7 @@ class NX_NETWORK_API PortMapper
 public:
     PortMapper( bool isEnabled = true,
                 quint64 checkMappingsInterval = DEFAULT_CHECK_MAPPINGS_INTERVAL,
-                const QString& description = QnAppInfo::organizationName(),
+                const QString& description = QString(),
                 const QString& device = AsyncClient::INTERNAL_GATEWAY );
     ~PortMapper();
 

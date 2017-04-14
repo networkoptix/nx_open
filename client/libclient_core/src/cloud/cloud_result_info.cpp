@@ -1,4 +1,7 @@
 #include "cloud_result_info.h"
+
+#include <nx/network/app_info.h>
+
 #include <utils/common/app_info.h>
 
 using namespace nx::cdb::api;
@@ -36,7 +39,7 @@ QString QnCloudResultInfo::toString(ResultCode code)
         case ResultCode::dbError:
             return tr("Internal %1 error. Please contact support team.",
                 "%1 is the cloud name (like 'Nx Cloud')")
-                .arg(QnAppInfo::cloudName());
+                .arg(nx::network::AppInfo::cloudName());
 
         case ResultCode::networkError:
             return tr("Unexpected network error. Please check your Internet connection and try again.");
@@ -47,7 +50,7 @@ QString QnCloudResultInfo::toString(ResultCode code)
         case ResultCode::serviceUnavailable:
             return tr("Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.",
                 "%1 is the cloud name (like 'Nx Cloud')")
-                .arg(QnAppInfo::cloudName());
+                .arg(nx::network::AppInfo::cloudName());
 
         case ResultCode::credentialsRemovedPermanently:
             return tr("Credentials are no longer valid.");
@@ -55,7 +58,7 @@ QString QnCloudResultInfo::toString(ResultCode code)
         case ResultCode::retryLater:
             return tr("Sorry, %1 Service could not process your request. Please try again in a few moments.",
                 "%1 is the cloud name (like 'Nx Cloud')")
-                .arg(QnAppInfo::cloudName());
+                .arg(nx::network::AppInfo::cloudName());
 
         /* Internal result codes: */
 

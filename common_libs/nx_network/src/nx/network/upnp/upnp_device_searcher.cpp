@@ -3,16 +3,14 @@
 #include <algorithm>
 #include <memory>
 
+#include <QtCore/QDateTime>
 #include <QtXml/QXmlDefaultHandler>
 
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 
-#include <utils/common/app_info.h>
+#include <nx/utils/app_info.h>
 #include <nx/utils/concurrent.h>
-
-#include <QDateTime>
-
 
 using namespace std;
 using namespace nx::network;
@@ -29,7 +27,7 @@ namespace nx_upnp {
 static DeviceSearcher* UPNPDeviceSearcherInstance = nullptr;
 
 const QString DeviceSearcher::DEFAULT_DEVICE_TYPE = lit("%1 Server")
-        .arg(QnAppInfo::organizationName());
+        .arg(nx::utils::AppInfo::organizationName());
 
 DeviceSearcher::DeviceSearcher(
     QnGlobalSettings* globalSettings, unsigned int discoverTryTimeoutMS )

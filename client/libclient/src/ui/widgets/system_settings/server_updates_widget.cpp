@@ -610,7 +610,7 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
         case QnCheckForUpdateResult::IncompatibleCloudHost:
             detail = tr("Incompatible %1 instance. To update disconnect System from %1 first.",
                 "%1 here will be substituted with cloud name e.g. 'Nx Cloud'.")
-                .arg(QnAppInfo::cloudName());
+                .arg(nx::network::AppInfo::cloudName());
             break;
 
         default:

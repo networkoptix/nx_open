@@ -257,7 +257,7 @@ bool QnUniversalRequestProcessor::needStandardProxy(QnCommonModule* commonModule
 
 bool QnUniversalRequestProcessor::isCloudRequest(const nx_http::Request& request)
 {
-    return request.requestLine.url.host() == QnAppInfo::defaultCloudHost() ||
+    return request.requestLine.url.host() == nx::network::AppInfo::defaultCloudHost() ||
            request.requestLine.url.path().startsWith("/cdb") ||
            request.requestLine.url.path().startsWith("/nxcloud");
 }

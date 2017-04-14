@@ -1965,7 +1965,10 @@ bool MediaServerProcess::initTcpListener(
 
 std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMapper()
 {
-    auto mapper = std::make_unique<nx_upnp::PortMapper>(/*isEnabled*/ false);
+    auto mapper = std::make_unique<nx_upnp::PortMapper>(
+        /*isEnabled*/ false,
+        nx_upnp::PortMapper::DEFAULT_CHECK_MAPPINGS_INTERVAL,
+        QnAppInfo::organizationName());
     auto updateEnabled =
         [mapper = mapper.get(), this]()
         {
@@ -2895,7 +2898,7 @@ void MediaServerProcess::run()
         {
             if (settingsProxy->isCloudInstanceChanged())
                 qWarning() << "Cloud instance changed from" << globalSettings->cloudHost() <<
-                    "to" << QnAppInfo::defaultCloudHost() << ". Server goes to the new state";
+                    "to" << nx::network::AppInfo::defaultCloudHost() << ". Server goes to the new state";
 
             resetSystemState(cloudManagerGroup.connectionManager);
         }
@@ -2919,7 +2922,7 @@ void MediaServerProcess::run()
 
             } while (errCode != ec2::ErrorCode::ok && !m_needStop);
         }
-        globalSettings->setCloudHost(QnAppInfo::defaultCloudHost());
+        globalSettings->setCloudHost(nx::network::AppInfo::defaultCloudHost());
         globalSettings->synchronizeNow();
     }
 

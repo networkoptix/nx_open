@@ -28,7 +28,7 @@ QString QnMobileAppInfo::version() const
 
 QString QnMobileAppInfo::cloudName() const
 {
-    return QnAppInfo::cloudName();
+    return nx::network::AppInfo::cloudName();
 }
 
 QString QnMobileAppInfo::liteDeviceName() const

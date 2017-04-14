@@ -1,6 +1,7 @@
 #include "password_data.h"
 
 #include <nx/fusion/model_functions.h>
+#include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/random.h>
 
@@ -26,7 +27,7 @@ PasswordData::PasswordData(const QnRequestParams &params)
 PasswordData PasswordData::calculateHashes(const QString& username, const QString& password)
 {
     PasswordData result;
-    result.realm = QnAppInfo::realm();
+    result.realm = nx::network::AppInfo::realm();
 
     QByteArray salt = QByteArray::number(nx::utils::random::number(), 16);
     QCryptographicHash md5(QCryptographicHash::Md5);

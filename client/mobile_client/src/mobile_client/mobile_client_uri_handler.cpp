@@ -59,7 +59,7 @@ void QnMobileClientUriHandler::handleUrl(const QUrl& url)
     }
 
     if (uri.protocol() != SystemUri::Protocol::Native
-        && uri.domain() != QnAppInfo::defaultCloudHost())
+        && uri.domain() != nx::network::AppInfo::defaultCloudHost())
     {
         if (uri.scope() == SystemUri::Scope::Generic)
         {
