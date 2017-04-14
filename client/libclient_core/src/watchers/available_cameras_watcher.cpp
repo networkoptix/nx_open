@@ -105,10 +105,11 @@ void QnAvailableCamerasWatcherPrivate::updateWatcher()
 
     if (watcher)
     {
-        for (const auto& camera: watcher->cameras())
-            emit q->cameraRemoved(camera);
-
+        const auto cameras = watcher->cameras();
         watcher.reset();
+
+        for (const auto& camera: cameras)
+            emit q->cameraRemoved(camera);
     }
 
     if (!user)

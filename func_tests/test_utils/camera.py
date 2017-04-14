@@ -183,6 +183,9 @@ class DiscoveryUdpListener(object):
     def _thread_main(self, listen_socket):
         log.info('Test camera UDP discovery listener thread is started.')
         while not self._stop_flag:
+            read, write, error = select.select([listen_socket], [], [listen_socket], 0.1)
+            if not read and not error:
+                continue
             data, addr = listen_socket.recvfrom(1024)
             #log.debug('Received discovery message from %s:%d: %r', addr[0], addr[1], data)
             if data != TEST_CAMERA_FIND_MSG:

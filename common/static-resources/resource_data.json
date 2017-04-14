@@ -266,7 +266,7 @@
         },
         {
             "keys": [
-                "Network Optix|Nx-Fisheye-05925"
+               "Network Optix|Nx-Fisheye-05925"
             ],
             "advancedParametersTemplate": "nx-fisheye.xml"
         },
@@ -309,12 +309,6 @@
                 "ACTI|ACM3411", "ACTI|ACM3401"
             ],
             "desiredTransport":"UDP"
-        },
-        {
-            "keys": [
-                "Camera"
-            ],
-            "forceONVIF": false
         },
         {
             "keys": [
@@ -627,7 +621,7 @@
         },
     {
             "keys": [
-                "Win4NET Co., Ltd.|Clebo-FD20"
+                "DW|DWC-MD421D","Win4NET Co., Ltd.|Clebo-FD20"
             ],
             "ptzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability"
         },
@@ -1504,15 +1498,21 @@
             ]
         },
         {
-            "keys": ["Samsung Techwin|SNP-6320RH"],
+            "keys": ["Samsung*|SNP-6320RH", "Samsung*|SNO-7084R"], 
             "forcedOnvifParams": {
                 "profiles": ["H.264,MOBILE"]
             }
         },
         {
-            "keys": ["Samsung Techwin|SNF-8010"],
+            "keys": ["Samsung*|SNF-8010*"],
             "forcedOnvifParams": {
                 "profiles": ["SourceH264,MOBILE"]
+            }
+        },
+        {
+            "keys": ["Samsung*|PNF-9010*"],
+            "forcedOnvifParams": {
+                "profiles": ["FisheyeView,MOBILE"]
             }
         },
         {
