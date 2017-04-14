@@ -49,7 +49,7 @@ protected:
         }
 
         ASSERT_EQ(
-            kMaxPreemptiveConnectionCount,
+            (std::size_t)kMaxPreemptiveConnectionCount,
             m_listeningPeerPool.getConnectionCountByPeerName(m_peerName));
     }
 
@@ -68,7 +68,7 @@ protected:
     void thenTcpConnectionHasBeenSavedToThePool()
     {
         ASSERT_EQ(api::ResultCode::ok, m_beginListeningResults.pop());
-        ASSERT_EQ(1, m_listeningPeerPool.getConnectionCountByPeerName(m_peerName));
+        ASSERT_EQ(1U, m_listeningPeerPool.getConnectionCountByPeerName(m_peerName));
     }
 
     void thenRequestHasFailed()
