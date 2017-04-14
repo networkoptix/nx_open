@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <string>
 
 #include <nx/utils/thread/mutex.h>
@@ -32,11 +33,17 @@ private:
     struct SessionContext
     {
         std::string listeningPeerName;
+        std::chrono::steady_clock::time_point prevAccessTime;
+
+        SessionContext();
     };
 
     const conf::Settings& m_settings;
     mutable QnMutex m_mutex;
     std::map<std::string, SessionContext> m_sessionById;
+
+    void dropExpiredSessions(const QnMutexLockerBase& lock);
+    bool isSessionExpired(const SessionContext& sessionContext) const;
 };
 
 } // namespace model

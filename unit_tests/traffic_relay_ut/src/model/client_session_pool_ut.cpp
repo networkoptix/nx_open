@@ -47,11 +47,15 @@ protected:
 
     void setSessionExpirationTimeout(std::chrono::milliseconds timeout)
     {
+        std::ostringstream stringStream;
+        stringStream << "--connectingPeer/connectSessionIdleTimeout="<<timeout.count()<<"ms";
+        const auto timeoutStr = stringStream.str();
+
         std::array<const char*, 1> argv{
-            "--connectingPeer/connectSessionIdleTimeout=1ms"
+            timeoutStr.c_str()
         };
 
-        m_settings.load(argv.size(), argv.data());
+        m_settings.load(static_cast<int>(argv.size()), argv.data());
     }
 
 private:
@@ -66,7 +70,7 @@ TEST_F(ClientSessionPool, adding_session)
     assertSessionHasBeenAdded();
 }
 
-TEST_F(ClientSessionPool, DISABLED_session_expiration)
+TEST_F(ClientSessionPool, session_expiration)
 {
     setSessionExpirationTimeout(std::chrono::milliseconds(1));
 
