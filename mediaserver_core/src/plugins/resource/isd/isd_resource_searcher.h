@@ -6,7 +6,7 @@
 #include <core/resource_management/resource_searcher.h>
 #include <plugins/resource/upnp/upnp_resource_searcher.h>
 #include <plugins/resource/mdns/mdns_listener.h>
-#include <nx/network/upnp/upnp_device_searcher.h>
+#include <nx/network/upnp/upnp_search_handler.h>
 
 class QnPlISDResourceSearcher:
 	public QnAbstractNetworkResourceSearcher,
