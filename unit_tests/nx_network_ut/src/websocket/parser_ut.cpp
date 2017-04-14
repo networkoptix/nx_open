@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <iterator>
 #include <thread>
+#include <cstring>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <nx/network/websocket/websocket_parser.h>
@@ -53,17 +54,30 @@ std::vector<char> prepareMessage(const std::vector<char>& payload, int frameCoun
     return result;
 }
 
+void fillDummyPayload(std::vector<char>* payload, int size)
+{
+    static const char* const kPattern = "hello";
+    static const int kPatternSize = std::strlen(kPattern);
+    char* pdata;
+
+    payload->resize((size_t)size);
+    pdata = payload->data();
+
+    while (size > 0)
+    {
+        int copySize = std::min(kPatternSize, size);
+        memcpy(pdata, kPattern, copySize);
+        size -= copySize;
+        pdata += copySize;
+    }
+}
+
 class WebsocketParserTest : public ::testing::Test
 {
 protected:
     WebsocketParserTest(): p(Role::client, &ph) 
     {
-        std::call_once(payloadInitOnceFlag, []()
-            {
-                kDefaultPayload.resize(1000);
-                for (int i = 0; i < 1000; i += 5)
-                    memcpy(kDefaultPayload.data() + i, "hello", 5);
-            });
+        std::call_once(payloadInitOnceFlag, []() { fillDummyPayload(&kDefaultPayload, 1000); });
     }
 
     void testWebsocketParserAndSerializer(
@@ -137,7 +151,12 @@ TEST_F(WebsocketParserTest, MultipleFrames_LengthShort_Mask)
     testWebsocketParserAndSerializer(13, 33, FrameType::binary, true, 0xfa121a23);
 }
 
-TEST_F(WebsocketParserTest, MultipleFrames_Length64_Mask)
+TEST_F(WebsocketParserTest, MultipleFrames_Length64)
 {
+    std::vector<char> largePayload;
+    fillDummyPayload(&largePayload, 100 * 1024);
 
+    testWebsocketParserAndSerializer(10, 5, FrameType::text, true, 0xd903, largePayload);
+    testWebsocketParserAndSerializer(1, 7, FrameType::binary, true, 0xfa121423, largePayload);
+    testWebsocketParserAndSerializer(13, 33, FrameType::binary, true, 0xfa121a23, largePayload);
 }
