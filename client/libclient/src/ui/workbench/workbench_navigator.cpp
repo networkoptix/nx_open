@@ -436,7 +436,8 @@ void QnWorkbenchNavigator::initialize()
     connect(display(), SIGNAL(widgetChanged(Qn::ItemRole)), this, SLOT(at_display_widgetChanged(Qn::ItemRole)));
     connect(display(), SIGNAL(widgetAdded(QnResourceWidget *)), this, SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(display(), SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)), this, SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
-    connect(display()->beforePaintInstrument(), SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(updateSliderFromReader()));
+    connect(display()->beforePaintInstrument(), QnSignalingInstrumentActivated, this,
+        [this](){ updateSliderFromReader(); });
 
     connect(m_timeSlider, SIGNAL(valueChanged(qint64)), this, SLOT(at_timeSlider_valueChanged(qint64)));
     connect(m_timeSlider, SIGNAL(sliderPressed()), this, SLOT(at_timeSlider_sliderPressed()));
@@ -948,7 +949,7 @@ void QnWorkbenchNavigator::jumpBackward()
     }
 
     reader->jumpTo(pos, pos);
-    updateSliderFromReader(true);
+    updateSliderFromReader();
     emit positionChanged();
 }
 
@@ -1003,7 +1004,7 @@ void QnWorkbenchNavigator::jumpForward()
     }
 
     reader->jumpTo(pos, pos);
-    updateSliderFromReader(true);
+    updateSliderFromReader();
     emit positionChanged();
 }
 
@@ -1030,7 +1031,7 @@ void QnWorkbenchNavigator::stepBackward()
             m_currentMediaWidget->display()->camDisplay()->playAudio(false); // TODO: #Elric wtf?
 
         reader->previousFrame(currentTime);
-        updateSliderFromReader(true);
+        updateSliderFromReader();
     }
 
     emit positionChanged();
@@ -1048,7 +1049,7 @@ void QnWorkbenchNavigator::stepForward()
     m_pausedOverride = false;
 
     reader->nextFrame();
-    updateSliderFromReader(true);
+    updateSliderFromReader();
 
     emit positionChanged();
 }
@@ -1152,7 +1153,7 @@ void QnWorkbenchNavigator::updateCurrentWidget()
             != previousWidgetFlags.testFlag(WidgetUsesUTC));
     }
 
-    updateSliderFromReader(false);
+    updateSliderFromReader(UpdateSliderMode::ForcedUpdate);
     if (m_timeSlider)
         m_timeSlider->finishAnimations();
 
@@ -1344,7 +1345,7 @@ bool QnWorkbenchNavigator::isCurrentWidgetSynced() const
     return m_streamSynchronizer->isRunning() && m_currentWidgetFlags.testFlag(WidgetSupportsSync);
 }
 
-void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
+void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
 {
     if (!m_timeSlider)
         return;
@@ -1360,11 +1361,13 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
         return;
 #ifdef Q_OS_MAC
     // todo: MAC  got stuck in full screen mode if update slider to often! #elric: refactor it!
-    if (m_updateSliderTimer.elapsed() < 33)
+    // TODO: #ynikitenkov #high WTF? Get rid of timer and check in 3.1 if everything is Ok.
+    if (mode != UpdateSliderMode::ForcedUpdate && m_updateSliderTimer.elapsed() < 33)
         return;
     m_updateSliderTimer.restart();
 #endif
 
+    const bool keepInWindow = mode == UpdateSliderMode::KeepInWindow;
     QN_SCOPED_VALUE_ROLLBACK(&m_updatingSliderFromReader, true);
 
     QnThumbnailsSearchState searchState = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
