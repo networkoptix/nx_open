@@ -776,7 +776,7 @@ void QnTransactionTransportBase::receivedTransaction(
         //decodedTranData can contain multiple transactions
         if( !m_sizedDecoder )
         {
-            m_sizedDecoder = std::make_shared<nx_bsf::SizedDataDecodingFilter>();
+            m_sizedDecoder = std::make_shared<nx::utils::bsf::SizedDataDecodingFilter>();
             m_sizedDecoder->setNextFilter( nx::utils::bsf::makeCustomOutputStream(
                 std::bind(
                     &QnTransactionTransportBase::receivedTransactionNonSafe,
@@ -1364,17 +1364,17 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
                 Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true" )
         {
             //inserting base64 decoder before the last filter
-            m_incomingTransactionStreamParser = nx_bsf::insert(
+            m_incomingTransactionStreamParser = nx::utils::bsf::insert(
                 m_incomingTransactionStreamParser,
-                nx_bsf::last( m_incomingTransactionStreamParser ),
+                nx::utils::bsf::last( m_incomingTransactionStreamParser ),
                 std::make_shared<Base64DecoderFilter>() );
 
             //base64-encoded data contains multiple transactions so
             //    inserting sized data decoder after base64 decoder
-            m_incomingTransactionStreamParser = nx_bsf::insert(
+            m_incomingTransactionStreamParser = nx::utils::bsf::insert(
                 m_incomingTransactionStreamParser,
-                nx_bsf::last( m_incomingTransactionStreamParser ),
-                std::make_shared<nx_bsf::SizedDataDecodingFilter>() );
+                nx::utils::bsf::last( m_incomingTransactionStreamParser ),
+                std::make_shared<nx::utils::bsf::SizedDataDecodingFilter>() );
         }
 
         auto keepAliveHeaderIter = m_httpClient->response()->headers.find(Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME);

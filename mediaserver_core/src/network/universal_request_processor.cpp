@@ -12,7 +12,7 @@
 #include "universal_request_processor_p.h"
 #include <nx/fusion/model_functions.h>
 #include "utils/common/synctime.h"
-#include "utils/gzip/gzip_compressor.h"
+#include <nx/utils/gzip/gzip_compressor.h>
 #include <nx/network/flash_socket/types.h>
 #include <rest/server/rest_connection_processor.h>
 #include <utils/common/app_info.h>

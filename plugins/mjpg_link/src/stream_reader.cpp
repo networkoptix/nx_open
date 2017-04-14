@@ -127,7 +127,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         m_multipartContentParser = std::make_unique<nx_http::MultipartContentParser>();
         auto jpgFrameHandleFunc = std::bind(&StreamReader::gotJpegFrame, this, _1);
         m_multipartContentParser->setNextFilter(
-            std::make_shared<CustomOutputStream<decltype(jpgFrameHandleFunc)>>(
+            std::make_shared<nx::utils::bsf::CustomOutputStream<decltype(jpgFrameHandleFunc)>>(
                 jpgFrameHandleFunc));
 
         const int result = doRequest( localHttpClientPtr.get() );

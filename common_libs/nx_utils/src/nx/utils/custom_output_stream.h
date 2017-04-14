@@ -33,9 +33,9 @@ private:
 };
 
 template<class Func>
-std::shared_ptr<CustomOutputStream<Func> > nx::utils::bsf::makeCustomOutputStream(Func func)
+std::shared_ptr<CustomOutputStream<Func>> makeCustomOutputStream(Func func)
 {
-    return std::make_shared<CustomOutputStream<Func> >(std::move(func));
+    return std::make_shared<CustomOutputStream<Func>>(std::move(func));
 }
 
 /**
@@ -67,9 +67,9 @@ private:
 };
 
 template<class Func>
-std::shared_ptr<FilterWithFunc<Func> > nx::utils::bsf::makeFilterWithFunc(Func func)
+std::shared_ptr<FilterWithFunc<Func>> makeFilterWithFunc(Func func)
 {
-    return std::make_shared<FilterWithFunc<Func> >(std::move(func));
+    return std::make_shared<FilterWithFunc<Func>>(std::move(func));
 }
 
 } // namespace bsf

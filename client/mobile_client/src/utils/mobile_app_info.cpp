@@ -1,5 +1,7 @@
 #include "mobile_app_info.h"
 
+#include <nx/network/app_info.h>
+
 #include <utils/common/app_info.h>
 #include <mobile_client/mobile_client_app_info.h>
 
