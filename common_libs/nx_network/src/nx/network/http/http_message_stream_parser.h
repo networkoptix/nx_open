@@ -1,6 +1,6 @@
 #pragma once 
 
-#include <utils/media/abstract_byte_stream_filter.h>
+#include <nx/utils/abstract_byte_stream_filter.h>
 
 #include "httptypes.h"
 #include "httpstreamreader.h"

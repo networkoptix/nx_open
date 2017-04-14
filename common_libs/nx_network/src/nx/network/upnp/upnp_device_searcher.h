@@ -13,7 +13,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
-#include <api/global_settings.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/network/async_stoppable.h>
 

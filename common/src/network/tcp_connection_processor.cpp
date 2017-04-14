@@ -2,12 +2,14 @@
 
 #include <QtCore/QTime>
 
-#include <nx/utils/log/log.h>
-#include <utils/common/util.h>
-
+#include <nx/network/aio/unified_pollset.h>
 #include <nx/network/flash_socket/types.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/network/http/http_mod_manager.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/gzip/gzip_compressor.h>
+
+#include <utils/common/util.h>
 
 #include "tcp_listener.h"
 #include "tcp_connection_priv.h"
@@ -18,8 +20,6 @@
 #include "core/resource_management/resource_pool.h"
 #include "http/custom_headers.h"
 #include "common/common_module.h"
-#include "utils/gzip/gzip_compressor.h"
-#include "nx/network/aio/unified_pollset.h"
 
 // we need enough size for updates
 #ifdef __arm__
@@ -605,7 +605,7 @@ void QnTCPConnectionProcessor::sendUnauthorizedResponse(nx_http::StatusCode::Val
         {
             contentEncoding = "gzip";
             if( !d->response.messageBody.isEmpty() )
-                d->response.messageBody = GZipCompressor::compressData(d->response.messageBody);
+                d->response.messageBody = nx::utils::bsf::gzip::Compressor::compressData(d->response.messageBody);
         }
         else
         {
