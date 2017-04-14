@@ -351,9 +351,9 @@ private:
         m_handler->bytesReceived(buf);
     }
 
-    void readyToSendData()
+    void readyToSendData(size_t count)
     {
-        m_handler->readyToSendData();
+        m_handler->readyToSendData(count);
     }
 
 private:

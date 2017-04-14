@@ -60,8 +60,9 @@ void Websocket::bytesReceived(const nx::Buffer& buffer)
     m_readHandler(SystemError::noError, buffer.size());
 }
 
-void Websocket::readyToSendData(size_t count )
+void Websocket::readyToSendData(size_t count)
 {
+    m_writeHandler(SystemError::noError, count);
 }
 
 void Websocket::readSomeAsync(
