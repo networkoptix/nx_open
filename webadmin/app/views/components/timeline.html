@@ -33,7 +33,7 @@
                       ng-mouseup="stopZoom(true)"
                       ng-mouseleave="stopZoom(true)"
                       ng-mousedown="startZoom(true)"
-                      ng-class="{disabled:disableZoomIn || liveOnly}">
+                      ng-class="{disabled:scaleManager.disableZoomIn || liveOnly}">
                     <span class="glyphicon glyphicon-plus"></span>
                 </span>
                 <span class="webclient-button glyphicon-pm"
@@ -41,7 +41,7 @@
                       ng-mouseleave="stopZoom(false)"
                       ng-mousedown="startZoom(false)"
                       ng-dblclick="zoomOut()"
-                      ng-class="{disabled:disableZoomOut || liveOnly}">
+                      ng-class="{disabled:scaleManager.disableZoomOut || liveOnly}">
                     <span class="glyphicon glyphicon-minus"></span>
                 </span>
             </div>
