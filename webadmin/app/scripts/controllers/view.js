@@ -711,7 +711,9 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
         });
 
-        $scope.$watch('player', updateVideoSource);
+        $scope.$watch('player', function(){
+            updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition)
+        },true);
 
         $scope.$watch('volumeLevel', function(){
             if($scope.playerAPI)

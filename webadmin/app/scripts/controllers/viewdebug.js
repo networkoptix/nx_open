@@ -67,6 +67,8 @@ angular.module('webadminApp').controller('ViewdebugCtrl',
         ];
 
         $scope.settings = {id: ''};
+        $scope.volumeLevel = typeof($scope.storage.volumeLevel) === 'number' ? $scope.storage.volumeLevel : 50;
+
 
         mediaserver.getModuleInformation().then(function (r) {
             $scope.settings = {
@@ -242,6 +244,7 @@ angular.module('webadminApp').controller('ViewdebugCtrl',
             console.log("Players");
             if(API) {
                 $scope.switchPlaying(true);
+                $scope.playerAPI.volume($scope.volumeLevel);
             }
         };
         function updateVideoSource(playing) {
@@ -729,7 +732,16 @@ angular.module('webadminApp').controller('ViewdebugCtrl',
             }
         });
 
-        $scope.$watch('player', updateVideoSource);
+        $scope.$watch('player', function(){
+            updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition)
+        },true);
+
+        $scope.$watch('volumeLevel', function(){
+            var currentPlayer = $scope.players[selectedPlayer].playerAPI;
+            if(currentPlayer)
+                currentPlayer.volume($scope.volumeLevel);
+            $scope.storage.volumeLevel = $scope.volumeLevel;
+        });
 
         mediaserver.getTime().then(function(result){
             var serverTime = parseInt(result.data.reply.utcTime);

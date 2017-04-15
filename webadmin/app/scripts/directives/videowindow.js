@@ -43,6 +43,9 @@ angular.module('webadminApp')
                 scope.Config = Config;
                 scope.debugMode = Config.debug.video && Config.allowDebugMode;
                 scope.debugFormat = Config.allowDebugMode && Config.debug.videoFormat;
+                scope.jshlsHideError = Config.debug.jshlsHideError && Config.allowDebugMode;
+                scope.jshlsDebugMode = Config.debug.jshlsDebug && Config.allowDebugMode;
+                
                 function getFormatSrc(mediaformat) {
                     var src = _.find(scope.vgSrc,function(src){return src.type == mimeTypes[mediaformat];});
                     if( scope.debugMode){
@@ -297,13 +300,22 @@ angular.module('webadminApp')
                     scope.jsHls = true;
 
                     var hlsAPI = new JsHlsAPI();
-                    hlsAPI.init( element.find(".videoplayer"), function (api) {
+                    hlsAPI.init( element.find(".videoplayer"), scope.jshlsHideError, scope.jshlsDebugMode, function (api) {
                         scope.vgApi = api;
                         if (scope.vgSrc) {
                             $timeout(function(){
                                 scope.loading = false;
                             });
                             scope.vgApi.load(getFormatSrc('hls'));
+                            scope.vgApi.addEventListener("timeupdate", function (event) {
+                                var video = event.srcElement || event.originalTarget;
+                                scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
+                                if (scope.loading) {
+                                    $timeout(function () {
+                                        scope.loading = false;
+                                    });
+                                }
+                            });
                         }
                         scope.vgPlayerReady({$API:api});
                     },  function (api) {

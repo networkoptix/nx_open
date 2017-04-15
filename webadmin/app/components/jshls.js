@@ -2,6 +2,8 @@
 
 function JsHlsAPI(){
     var events, stats, fmp4Data,
+    hideError, //Hiding errors mostlikey caused by proxy in local env
+    debugMode, //Create the jshls player in debug mode
     enableWorker = true,
     //levelCapping = -1,
     defaultAudioCodec = undefined,
@@ -202,6 +204,7 @@ function JsHlsAPI(){
                 }
                 stats.manualLevelLast = level;
             }
+
             this.levelLastAuto = autoLevel;
         });
         hls.on(Hls.Events.FRAG_LOAD_EMERGENCY_ABORTED,function(event,data) {
@@ -225,7 +228,11 @@ function JsHlsAPI(){
             stats.fragAvgDecryptTime = this.totalDecryptTime / stats.fragDecrypted;
         });
         hls.on(Hls.Events.ERROR, function(event,data) {
+            if(hideError){
+                return;
+            }
             console.warn(data);
+
             switch(data.details) {
                 case Hls.ErrorDetails.MANIFEST_LOAD_ERROR:
                     try {
@@ -343,8 +350,11 @@ function JsHlsAPI(){
         });
     };
 
-    this.init = function(element, readyHandler, errorHandler){
+    this.init = function(element, jshlsHideError, jshlsDebugMode, readyHandler, errorHandler){
         this.video = element[0];
+        
+        hideError = jshlsHideError;
+        debugMode = jshlsDebugMode;
         if(Hls.isSupported()) {
             if(this.hls) {
                 this.hls.destroy();
@@ -359,7 +369,7 @@ function JsHlsAPI(){
         recoverDecodingErrorDate = recoverSwapAudioCodecDate = null;
         fmp4Data = { 'audio': [], 'video': [] };
 
-        this.hls = new Hls({debug:false, enableWorker : enableWorker, defaultAudioCodec : defaultAudioCodec});
+        this.hls = new Hls({debug:debugMode, enableWorker : enableWorker, defaultAudioCodec : defaultAudioCodec});
 
         this.initHlsEvents(this.hls);        
         this.initVideoHandlers();
@@ -469,7 +479,7 @@ JsHlsAPI.prototype.pause = function(){
 
 JsHlsAPI.prototype.volume = function(volumeLevel){
     this.video.volume = volumeLevel/100;
-}
+};
 
 JsHlsAPI.prototype.load = function(url){
     this.hls.loadSource(url);
@@ -491,4 +501,10 @@ JsHlsAPI.prototype.initVideoHandlers = function(){
     this.video.addEventListener('loadedmetadata', this.handleVideoEvent);
     this.video.addEventListener('loadeddata', this.handleVideoEvent);
     this.video.addEventListener('durationchange', this.handleVideoEvent);
+};
+
+JsHlsAPI.prototype.addEventListener = function(event, handler){
+    if(this.video){
+        this.video.addEventListener(event,handler);
+    }
 };
