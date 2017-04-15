@@ -319,8 +319,9 @@ angular.module('webadminApp')
                         }
                         scope.vgPlayerReady({$API:api});
                     },  function (api) {
+                            scope.errorLoading = true;
+                            scope.jsHls = false;
                             console.log(api);
-                            console.error("some error");
                     });
                 }
 
