@@ -218,7 +218,7 @@ public:
     // -- Misc settings
 
     bool isNewSystem() const { return localSystemId().isNull(); }
-    /** Media server put cloud host here from QnAppInfo::defaultCloudHost */
+    /** Media server put cloud host here from nx::network::AppInfo::defaultCloudHost */
     QString cloudHost() const;
     void setCloudHost(const QString& value);
 

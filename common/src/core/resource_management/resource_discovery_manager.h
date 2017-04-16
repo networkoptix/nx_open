@@ -8,7 +8,7 @@
 #include <QtCore/QTimer>
 #include <QtNetwork/QAuthenticator>
 
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/singleton.h>
 #include <nx/network/netstate.h>
 #include <nx/network/nettools.h>

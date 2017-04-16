@@ -75,7 +75,7 @@ void BeforeRestoreDbData::loadFromSettings(const QSettings* settings)
     hash = settings->value(kAdminPasswordHash).toByteArray();
     digest = settings->value(kAdminPasswordDigest).toByteArray();
     cryptSha512Hash = settings->value(kAdminPasswordCrypt512).toByteArray();
-    realm = settings->value(kAdminPasswordRealm, QnAppInfo::realm()).toByteArray();
+    realm = settings->value(kAdminPasswordRealm, nx::network::AppInfo::realm()).toByteArray();
     localSystemId = settings->value(kLocalSystemId).toByteArray();
     localSystemName = settings->value(kLocalSystemName).toByteArray();
     serverName = settings->value(kServerName).toByteArray();

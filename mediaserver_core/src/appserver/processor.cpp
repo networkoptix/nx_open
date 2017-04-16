@@ -29,6 +29,7 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <common/static_common_module.h>
 #include <common/common_module.h>
+#include <media_server/media_server_module.h>
 
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(
     QnCommonModule* commonModule,
@@ -137,7 +138,7 @@ void QnAppserverResourceProcessor::at_mutexLocked()
 
 void QnAppserverResourceProcessor::readDefaultUserAttrs()
 {
-    QString dir = MSSettings::roSettings()->value("staticDataDir", getDataDirectory()).toString();
+    QString dir = qnServerModule->roSettings()->value("staticDataDir", getDataDirectory()).toString();
     QFile f(closeDirPath(dir) + lit("default_rec.json"));
     if (!f.open(QFile::ReadOnly))
         return;

@@ -29,6 +29,7 @@
 #include <recorder/recording_manager.h>
 #include <utils/common/buffered_file.h>
 #include <utils/media/ffmpeg_helper.h>
+#include <media_server/media_server_module.h>
 
 namespace {
 static const int kMotionPrebufferSize = 8;
@@ -675,7 +676,7 @@ void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataPr
 
         if (normalStorage || backupStorage)
             setTruncateInterval(
-                MSSettings::roSettings()->value(
+                qnServerModule->roSettings()->value(
                     nx_ms_conf::MEDIA_FILE_DURATION_SECONDS,
                     nx_ms_conf::DEFAULT_MEDIA_FILE_DURATION_SECONDS).toInt());
 

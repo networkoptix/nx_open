@@ -5,7 +5,7 @@
 #endif
 
 #include <nx/utils/thread/mutex.h>
-#include <utils/media/abstract_byte_stream_filter.h>
+#include <nx/utils/abstract_byte_stream_filter.h>
 
 #include "httptypes.h"
 #include "linesplitter.h"
@@ -128,7 +128,7 @@ private:
     size_t m_currentChunkBytesRead;
     BufferType::value_type m_prevChar;
     BufferType m_codedMessageBodyBuffer;
-    std::unique_ptr<AbstractByteStreamFilter> m_contentDecoder;
+    std::unique_ptr<nx::utils::bsf::AbstractByteStreamFilter> m_contentDecoder;
     int m_lineEndingOffset;
     bool m_decodeChunked;
     int m_currentMessageNumber;
@@ -164,7 +164,7 @@ private:
     /**
      * Returns nullptr if encodingName is unknown.
      */
-    AbstractByteStreamFilter* createContentDecoder( const nx_http::StringType& encodingName );
+    nx::utils::bsf::AbstractByteStreamFilter* createContentDecoder( const nx_http::StringType& encodingName );
     void resetStateInternal();
 };
 

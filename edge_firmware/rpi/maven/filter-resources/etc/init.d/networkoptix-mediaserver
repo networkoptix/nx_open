@@ -62,7 +62,7 @@ start()
     
     DISK=$(fdisk -l |grep "Disk" |grep "dev/sd" |awk '{print substr($2, 0, length($2))}')
     local HDPARM="hdparm"
-    if ! which hdparm; then
+    if ! which hdparm >/dev/null; then
         HDPARM="$PREFIX/bin/hdparm"
     fi
     if [ ! -z "$DISK" ]; then
@@ -144,7 +144,7 @@ run_watchdog()
 
 register_autostart_if_needed()
 {
-    if ! grep -- "$CUSTOMIZATION-mediaserver" /etc/init.d/.depend.stop 2>/dev/null; then
+    if ! grep -- "$CUSTOMIZATION-mediaserver" /etc/init.d/.depend.stop >/dev/null 2>&1; then
         echo "Enabling mediaserver autostart via update-rc.d"
         update-rc.d -f "$CUSTOMIZATION-mediaserver" defaults
     fi

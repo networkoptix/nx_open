@@ -89,7 +89,7 @@ class Vagrant(object):
             if status != 'running':
                 self._start_box(config)
             self._init_box(config)
-        self._write_ssh_config(self.boxes.keys())  # write ssh config for all boxes, with new addresses
+        self._write_ssh_config()
         for box in self.boxes.values():
             self._load_box_timezone(box)
 
@@ -137,10 +137,9 @@ class Vagrant(object):
         with open(self._ssh_config_path, 'w') as f:
             f.write(self._vagrant.ssh_config(box_name))
 
-    def _write_ssh_config(self, box_name_list):
+    def _write_ssh_config(self):
         with open(self._ssh_config_path, 'w') as f:
-            for box_name in box_name_list:
-                f.write(self._vagrant.ssh_config(box_name))
+            f.write(self._vagrant.ssh_config())
 
     def box_host(self, box_name, user):
         return RemoteSshHost(box_name, user, self._vagrant_private_key_path, self._ssh_config_path, proxy_host=self._vm_host)

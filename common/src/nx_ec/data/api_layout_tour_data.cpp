@@ -20,6 +20,11 @@ bool ApiLayoutTourData::isValid() const
     return !id.isNull();
 }
 
+bool ApiLayoutTourData::operator!=(const ApiLayoutTourData& rhs) const
+{
+    return !((*this) == rhs);
+}
+
 bool ApiLayoutTourData::operator==(const ApiLayoutTourData& rhs) const
 {
     return id == rhs.id

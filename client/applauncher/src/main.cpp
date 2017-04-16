@@ -21,10 +21,6 @@
 #include "rdir_syncher.h"
 #include "process_utils.h"
 
-#if defined(Q_OS_MACX)
-#include <utils/mac_utils.h>
-#endif
-
 #ifdef _WIN32
 #include <windows.h>
 
@@ -82,10 +78,6 @@ int downloadFile(const QString& url, const QString& destFilePath);
 
 int main(int argc, char* argv[])
 {
-#if defined(Q_OS_MACX)
-    removeAppFromMacDock();
-#endif
-
     nx::network::SocketGlobals::init();
 
     QnLongRunnablePool runnablePool;

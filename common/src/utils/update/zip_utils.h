@@ -4,7 +4,7 @@
 #include <QtCore/QIODevice>
 #include <QtCore/QDir>
 
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 
 class QuaZip;
 

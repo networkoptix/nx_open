@@ -1,6 +1,7 @@
 #include "connect_session_manager.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/uuid.h>
 
 #include "../model/client_session_pool.h"
 #include "../model/listening_peer_pool.h"
@@ -56,10 +57,16 @@ void ConnectSessionManager::beginListening(
 }
 
 void ConnectSessionManager::createClientSession(
-    const api::CreateClientSessionRequest& /*request*/,
-    CreateClientSessionHandler /*completionHandler*/)
+    const api::CreateClientSessionRequest& request,
+    CreateClientSessionHandler completionHandler)
 {
-    // TODO
+    api::CreateClientSessionResponse response;
+    response.sessionTimeout = 
+        std::chrono::duration_cast<std::chrono::seconds>(
+            m_settings.connectingPeer().connectSessionIdleTimeout);
+    response.sessionId = m_clientSessionPool->addSession(
+        request.desiredSessionId, request.targetPeerName);
+    completionHandler(api::ResultCode::ok, std::move(response));
 }
 
 void ConnectSessionManager::connectToPeer(

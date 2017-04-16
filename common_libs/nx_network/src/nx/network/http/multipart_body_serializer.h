@@ -1,6 +1,6 @@
 #pragma once
 
-#include <utils/media/abstract_byte_stream_filter.h>
+#include <nx/utils/abstract_byte_stream_filter.h>
 
 #include "httptypes.h"
 
@@ -14,7 +14,7 @@ public:
     */
     MultipartBodySerializer(
         StringType boundary,
-        std::shared_ptr<AbstractByteStreamFilter> outputStream);
+        std::shared_ptr<nx::utils::bsf::AbstractByteStreamFilter> outputStream);
     virtual ~MultipartBodySerializer();
 
     StringType contentType() const;
@@ -44,7 +44,7 @@ public:
 private:
     const StringType m_boundary;
     const StringType m_delimiter;
-    std::shared_ptr<AbstractByteStreamFilter> m_outputStream;
+    std::shared_ptr<nx::utils::bsf::AbstractByteStreamFilter> m_outputStream;
     bool m_bodyPartStarted;
     bool m_epilogueWritten;
 

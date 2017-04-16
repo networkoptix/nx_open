@@ -1443,7 +1443,7 @@ int Ec2DirectConnectionFactory::establishConnectionToRemoteServer(
     ApiLoginData loginInfo;
     loginInfo.login = addr.userName();
     loginInfo.passwordHash = nx_http::calcHa1(
-        loginInfo.login.toLower(), QnAppInfo::realm(), addr.password());
+        loginInfo.login.toLower(), nx::network::AppInfo::realm(), addr.password());
     loginInfo.clientInfo = clientInfo;
 
     {
@@ -1768,7 +1768,7 @@ int Ec2DirectConnectionFactory::testRemoteConnection(
     ApiLoginData loginInfo;
     loginInfo.login = addr.userName();
     loginInfo.passwordHash = nx_http::calcHa1(
-        loginInfo.login.toLower(), QnAppInfo::realm(), addr.password());
+        loginInfo.login.toLower(), nx::network::AppInfo::realm(), addr.password());
     auto func =
         [this, reqId, addr, handler](ErrorCode errorCode, const QnConnectionInfo& connectionInfo)
         {

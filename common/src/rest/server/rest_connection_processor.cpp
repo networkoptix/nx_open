@@ -3,11 +3,13 @@
 #include <QtCore/QUrlQuery>
 #include <QtCore/QRegExp>
 
+#include <nx/utils/gzip/gzip_compressor.h>
+#include <nx/utils/gzip/gzip_uncompressor.h>
+
 #include "rest_connection_processor.h"
 #include "network/tcp_connection_priv.h"
 #include "network/tcp_listener.h"
 #include "request_handler.h"
-#include "utils/gzip/gzip_compressor.h"
 #include "core/resource_management/resource_pool.h"
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
@@ -150,7 +152,7 @@ void QnRestConnectionProcessor::run()
     if ( nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->response.messageBody.isEmpty() && rez == CODE_OK)
     {
         if (!contentType.contains("image")) {
-            d->response.messageBody = GZipCompressor::compressData(d->response.messageBody);
+            d->response.messageBody = nx::utils::bsf::gzip::Compressor::compressData(d->response.messageBody);
             contentEncoding = "gzip";
         }
     }

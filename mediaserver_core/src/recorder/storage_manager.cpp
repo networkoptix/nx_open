@@ -49,6 +49,7 @@
 #include <map>
 #include "database/server_db.h"
 #include "common/common_globals.h"
+#include <media_server/media_server_module.h>
 
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -110,12 +111,12 @@ public:
         serializedData = serializedData.arg(m_storagePath)
                                        .arg(QnLexical::serialized(m_catalog))
                                        .arg(m_cameraUniqueId);
-        MSSettings::roSettings()->setValue(settingName(m_role), serializedData);
-        MSSettings::roSettings()->sync();
+        qnServerModule->roSettings()->setValue(settingName(m_role), serializedData);
+        qnServerModule->roSettings()->sync();
     }
 
     void load() {
-        QString serializedData = MSSettings::roSettings()->value(settingName(m_role)).toString();
+        QString serializedData = qnServerModule->roSettings()->value(settingName(m_role)).toString();
         QStringList data = serializedData.split(";;");
         if (data.size() == 3) {
             m_storagePath = data[0];
@@ -132,8 +133,8 @@ public:
     }
 
     static void reset(QnServer::StoragePool role) {
-        MSSettings::roSettings()->setValue(settingName(role), QString());
-        MSSettings::roSettings()->sync();
+        qnServerModule->roSettings()->setValue(settingName(role), QString());
+        qnServerModule->roSettings()->sync();
     }
 
     bool isEmpty() const { return m_cameraUniqueId.isEmpty(); }
@@ -428,7 +429,7 @@ QnStorageManager::QnStorageManager(
     m_rebuildCancelled(false),
     m_rebuildArchiveThread(0),
     m_firstStoragesTestDone(false),
-    m_isRenameDisabled(MSSettings::roSettings()->value("disableRename").toInt()),
+    m_isRenameDisabled(qnServerModule->roSettings()->value("disableRename").toInt()),
     m_camInfoWriterHandler(this, commonModule->resourcePool()),
     m_camInfoWriter(&m_camInfoWriterHandler)
 {

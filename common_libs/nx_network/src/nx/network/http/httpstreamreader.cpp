@@ -2,10 +2,9 @@
 
 #include <algorithm>
 
+#include <nx/utils/custom_output_stream.h>
+#include <nx/utils/gzip/gzip_uncompressor.h>
 #include <nx/utils/log/assert.h>
-
-#include "utils/gzip/gzip_uncompressor.h"
-#include "utils/media/custom_output_stream.h"
 
 namespace nx_http {
 
@@ -352,7 +351,8 @@ bool HttpStreamReader::prepareToReadMessageBody()
     if( contentEncodingIter != m_httpMessage.headers().end() &&
         contentEncodingIter->second != "identity" )
     {
-        AbstractByteStreamFilter* contentDecoder = createContentDecoder( contentEncodingIter->second );
+        nx::utils::bsf::AbstractByteStreamFilter* contentDecoder = 
+            createContentDecoder( contentEncodingIter->second );
         if( contentDecoder == nullptr )
             return false;   //cannot decode message body
         //all operations with m_msgBodyBuffer MUST be done with m_mutex locked
@@ -361,7 +361,9 @@ bool HttpStreamReader::prepareToReadMessageBody()
             QnMutexLocker lk(&m_mutex);
             m_msgBodyBuffer.append( data.constData(), data.size() );
         };
-        contentDecoder->setNextFilter( std::make_shared<CustomOutputStream<decltype(safeAppendToBufferLambda)>>( safeAppendToBufferLambda ) );
+        contentDecoder->setNextFilter(
+            std::make_shared<nx::utils::bsf::CustomOutputStream<decltype(safeAppendToBufferLambda)>>(
+                safeAppendToBufferLambda ) );
         m_contentDecoder.reset( contentDecoder );
     }
         
@@ -556,10 +558,11 @@ unsigned int HttpStreamReader::hexCharToInt( BufferType::value_type ch )
     return 0;
 }
 
-AbstractByteStreamFilter* HttpStreamReader::createContentDecoder( const nx_http::StringType& encodingName )
+nx::utils::bsf::AbstractByteStreamFilter* HttpStreamReader::createContentDecoder(
+    const nx_http::StringType& encodingName )
 {
     if( encodingName == "gzip" )
-        return new GZipUncompressor();
+        return new nx::utils::bsf::gzip::Uncompressor();
     return nullptr;
 }
 

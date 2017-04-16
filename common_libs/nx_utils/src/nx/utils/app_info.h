@@ -15,6 +15,10 @@ public:
     static QString applicationArch();
     static QString armBox();
 
+    static QString productNameShort();
+    static QString productNameLong();
+    static QString organizationName();
+
     static bool isArm() { return applicationArch() == lit("arm"); }
     static bool isBpi() { return armBox() == lit("bpi"); }
     static bool isNx1() { return armBox() == lit("nx1"); }

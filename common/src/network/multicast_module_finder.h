@@ -5,7 +5,7 @@
 
 #include <QCache>
 
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 #include <nx/network/aio/pollset.h>
 #include <nx/utils/thread/mutex.h>
 

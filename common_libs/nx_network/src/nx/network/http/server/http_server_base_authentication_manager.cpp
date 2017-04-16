@@ -1,9 +1,8 @@
 #include "http_server_base_authentication_manager.h"
 
-#include <nx/utils/string.h>
-
-#include <utils/common/app_info.h>
+#include <nx/network/app_info.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/string.h>
 
 #include "../auth_tools.h"
 
@@ -128,7 +127,7 @@ nx::String BaseAuthenticationManager::generateNonce()
 
 nx::String BaseAuthenticationManager::realm()
 {
-    return QnAppInfo::realm().toUtf8();
+    return nx::network::AppInfo::realm().toUtf8();
 }
 
 bool BaseAuthenticationManager::validateNonce(const nx::String& /*nonce*/)

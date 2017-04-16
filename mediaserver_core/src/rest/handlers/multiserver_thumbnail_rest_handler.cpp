@@ -106,13 +106,9 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailReque
     CLVideoDecoderOutputPtr outFrame = QnGetImageHelper::getImage(request.camera, timeUSec, request.size, request.roundMethod, request.rotation);
     if (!outFrame)
     {
-        return makeError(
-            nx_http::StatusCode::noContent
-            , lit("No image found for the given request")
-            , &result
-            , &contentType
-            , request.format
-            , request.extraFormatting);
+        result = QByteArray();
+        contentType = QByteArray();
+        return nx_http::StatusCode::noContent;
     }
 
     QByteArray imageFormat = QnLexical::serialized<QnThumbnailRequestData::ThumbnailFormat>(request.imageFormat).toUtf8();

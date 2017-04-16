@@ -575,7 +575,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
         if (!defaultAdminPassword.isEmpty())
         {
             if (!userResource->checkLocalUserPassword(defaultAdminPassword) ||
-                userResource->getRealm() != QnAppInfo::realm() ||
+                userResource->getRealm() != nx::network::AppInfo::realm() ||
                 !userResource->isEnabled())
             {
                 userResource->setPassword(defaultAdminPassword);

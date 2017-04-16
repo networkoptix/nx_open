@@ -14,10 +14,11 @@
 #include <nx/network/http/httptypes.h>
 #include <nx/utils/log/log.h>
 #include "core/resource_access/user_access_data.h"
+#include <media_server/media_server_module.h>
 
 bool QnPermissionsHelper::isSafeMode()
 {
-    return MSSettings::roSettings()->value(nx_ms_conf::EC_DB_READ_ONLY).toInt()
+    return qnServerModule->roSettings()->value(nx_ms_conf::EC_DB_READ_ONLY).toInt()
         || ec2::Settings::instance()->dbReadOnly();
 }
 

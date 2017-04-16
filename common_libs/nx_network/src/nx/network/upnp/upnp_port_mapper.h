@@ -4,11 +4,10 @@
 #include <QWaitCondition>
 
 #include <nx/utils/scope_guard.h>
-
-#include <utils/common/app_info.h>
+#include <nx/utils/timer_manager.h>
 
 #include "upnp_async_client.h"
-#include "upnp_device_searcher.h"
+#include "upnp_search_handler.h"
 
 namespace nx_upnp {
 
@@ -19,7 +18,7 @@ class NX_NETWORK_API PortMapper
 public:
     PortMapper( bool isEnabled = true,
                 quint64 checkMappingsInterval = DEFAULT_CHECK_MAPPINGS_INTERVAL,
-                const QString& description = QnAppInfo::organizationName(),
+                const QString& description = QString(),
                 const QString& device = AsyncClient::INTERNAL_GATEWAY );
     ~PortMapper();
 

@@ -271,7 +271,7 @@ int QnMergeSystemsRestHandler::execute(
             "Local customization %1, cloud host %2, "
             "remote customization %3, cloud host %4, version %5")
             .arg(QnAppInfo::customizationName())
-            .arg(QnAppInfo::defaultCloudHost())
+            .arg(nx::network::AppInfo::defaultCloudHost())
             .arg(remoteModuleInformation.customization)
             .arg(remoteModuleInformation.cloudHost)
             .arg(remoteModuleInformation.version.toString()),

@@ -24,8 +24,8 @@
 
 #include <common/common_globals.h>
 #include <nx/utils/scope_guard.h>
-#include <utils/common/long_runnable.h>
-#include <utils/media/custom_output_stream.h>
+#include <nx/utils/thread/long_runnable.h>
+#include <nx/utils/custom_output_stream.h>
 
 #include "repeating_buffer_sender.h"
 
@@ -255,7 +255,7 @@ TEST_F(AsyncHttpClient, motionJpegRetrieval)
     for (ClientContext& clientCtx : clients)
     {
         clientCtx.client = nx_http::AsyncHttpClient::create();
-        clientCtx.multipartParser.setNextFilter(makeCustomOutputStream(checkReceivedContentFunc));
+        clientCtx.multipartParser.setNextFilter(nx::utils::bsf::makeCustomOutputStream(checkReceivedContentFunc));
         QObject::connect(
             clientCtx.client.get(), &nx_http::AsyncHttpClient::responseReceived,
             clientCtx.client.get(),
@@ -392,55 +392,136 @@ TEST_F(AsyncHttpClientTestMultiRequest, server_supports_persistent_connections)
     doMultipleRequestsReusingHttpClient();
 }
 
-TEST_F(AsyncHttpClient, ConnectionBreak)
+class AsyncHttpClientCustom: public ::testing::Test
+{
+protected:
+    void start(const QByteArray& response, bool breakAfterResponse = false)
+    {
+        nx::utils::promise<SocketAddress> address;
+        serverThread = nx::utils::thread(
+            [response, breakAfterResponse, &address]()
+            {
+                const auto server = std::make_unique<nx::network::TCPServerSocket>(
+                    SocketFactory::tcpClientIpVersion());
+
+                ASSERT_TRUE(server->bind(SocketAddress::anyAddress));
+                ASSERT_TRUE(server->listen());
+                address.set_value(server->getLocalAddress());
+
+                std::unique_ptr<AbstractStreamSocket> client(server->accept());
+                ASSERT_TRUE((bool)client);
+
+                do
+                {
+                    QByteArray buffer(1024, Qt::Uninitialized);
+                    int size = 0;
+                    while (!buffer.left(size).contains("\r\n\r\n"))
+                    {
+                        auto recv = client->recv(buffer.data() + size, buffer.size() - size);
+                        if (recv == 0 && !breakAfterResponse)
+                            return;
+
+                        ASSERT_GT(recv, 0);
+                        size += recv;
+                    }
+
+                    buffer.resize(size);
+                    ASSERT_EQ(response.size(), client->send(response.data(), response.size()));
+                }
+                while (!breakAfterResponse);
+            });
+
+        serverAddress = address.get_future().get();
+    }
+
+    void testGet(const nx_http::AsyncHttpClientPtr& client, const QByteArray& query,
+        std::function<void(const nx_http::AsyncHttpClientPtr&)> expectations,
+        nx_http::HttpHeaders headers = {})
+    {
+        client->setAdditionalHeaders(headers);
+
+        nx::utils::promise<void> clientDone;
+        client->doGet(
+            lit("http://%1/%2").arg(serverAddress.toString()).arg(QString::fromLatin1(query)),
+            [&](nx_http::AsyncHttpClientPtr client)
+            {
+              expectations(client);
+              clientDone.set_value();
+            });
+
+        clientDone.get_future().wait();
+    }
+
+    ~AsyncHttpClientCustom()
+    {
+        serverThread.join();
+    }
+
+    nx::utils::thread serverThread;
+    SocketAddress serverAddress;
+};
+
+TEST_F(AsyncHttpClientCustom, ConnectionBreak)
 {
     static const QByteArray kResponse(
         "HTTP/1.1 200 OK\r\n"
         "Content-Length: 100\r\n\r\n"
         "not enough content");
 
-    nx::utils::promise<int> serverPort;
-    nx::utils::thread serverThread(
-        [&]()
-        {
-            const auto server = std::make_unique<nx::network::TCPServerSocket>(
-                SocketFactory::tcpClientIpVersion());
-
-            ASSERT_TRUE(server->bind(SocketAddress::anyAddress));
-            ASSERT_TRUE(server->listen());
-            serverPort.set_value(server->getLocalAddress().port);
-
-            std::unique_ptr<AbstractStreamSocket> client(server->accept());
-            ASSERT_TRUE((bool)client);
-
-            QByteArray buffer(1024, Qt::Uninitialized);
-            int size = 0;
-            while (!buffer.left(size).contains("\r\n\r\n"))
-            {
-                auto recv = client->recv(buffer.data() + size, buffer.size() - size);
-                ASSERT_GT(recv, 0);
-                size += recv;
-            }
-
-            buffer.resize(size);
-            ASSERT_EQ(kResponse.size(), client->send(kResponse.data(), kResponse.size()));
-    });
-
+    start(kResponse, true);
     auto client = nx_http::AsyncHttpClient::create();
-    nx::utils::promise<void> clientDone;
-    QObject::connect(
-        client.get(), &nx_http::AsyncHttpClient::done,
-        [&](nx_http::AsyncHttpClientPtr client)
+    testGet(client, "test",
+        [](const nx_http::AsyncHttpClientPtr& client)
         {
             EXPECT_TRUE(client->failed());
             EXPECT_EQ(QByteArray("not enough content"), client->fetchMessageBodyBuffer());
             EXPECT_EQ(SystemError::connectionReset, client->lastSysErrorCode());
-            clientDone.set_value();
         });
+}
 
-    client->doGet(lit("http://127.0.0.1:%1/test").arg(serverPort.get_future().get()));
-    serverThread.join();
-    clientDone.get_future().wait();
+TEST_F(AsyncHttpClientCustom, DISABLED_cameraThumbnail)
+{
+    static const QByteArray kResponseHeader =
+        "HTTP/1.1 204 No Content\r\n"
+        "Date: Wed, 12 Apr 2017 15:14:43 +0000\r\n"
+        "Pragma: no-cache\r\n"
+        "Server: Nx Witness/3.0.0.14559 (Network Optix) Apache/2.4.16 (Unix)\r\n"
+        "Connection: Keep-Alive\r\n"
+        "Keep-Alive: timeout=5\r\n"
+        "Content-Type: application/ubjson\r\n"
+        "Cache-Control: post-check=0, pre-check=0\r\n"
+        "Cache-Control: no-store, no-cache, must-revalidate, max-age=0\r\n"
+        "Content-Length: 46\r\n"
+        "Access-Control-Allow-Origin: *\r\n\r\n";
+
+    static const QByteArray kResponseBody = QByteArray::fromHex(
+        "5b6c000000035355244e6f20696d61676520666f756e6420666f722074686520676976656e20726571756573745d");
+
+    static const QByteArray kRequestQuery =
+        "ec2/cameraThumbnail?format=ubjson&cameraId=%7B38c5e727-b304-d188-0733-8619d09baae5%7D"
+            "&time=latest&rotate=-1&height=184&widht=0&imageFormat=jpeg&method=after";
+
+    static const nx_http::HttpHeaders kRequestHeaders =
+    {
+        {"X-server-guid", "{d16e21d4-0899-0a68-18c5-7e1058f229c4}"},
+        {"X-Nx-User-Name", "admin"},
+        {"X-runtime-guid", "{48c828fc-a821-462d-8015-49ae20b9936e}"},
+        {"Accept-Encoding", "gzip"},
+    };
+
+    start(kResponseHeader + kResponseBody, false);
+    auto client = nx_http::AsyncHttpClient::create();
+    for (size_t i = 0; i < 5; ++i)
+    {
+        testGet(client, kRequestQuery,
+            [&](const nx_http::AsyncHttpClientPtr& client)
+            {
+                // Response is invalid, it has a message body with code "204 No Content" what is
+                // forbidden by HTTP RFC.
+                EXPECT_TRUE(client->failed());
+            },
+            kRequestHeaders);
+    }
 }
 
 namespace {
