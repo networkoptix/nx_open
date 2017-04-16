@@ -2,6 +2,7 @@
 
 #include <nx/network/connection_server/base_server_connection.h>
 #include <nx/network/websocket/websocket_parser.h>
+#include <nx/network/buffer.h>
 #include <nx/network/websocket/websocket_serializer.h>
 #include <nx/network/aio/abstract_async_channel.h>
 #include <nx/network/websocket/websocket_common_types.h>
@@ -84,6 +85,8 @@ private:
     virtual void messageEnded() override;
     virtual void handleError(Error err) override;
 
+    /** Own helper functions*/
+
 private:
     std::chrono::milliseconds m_keepAliveTimeout;
     nx_api::BaseServerConnectionWrapper m_baseConnection;
@@ -96,6 +99,8 @@ private:
     std::function<void(SystemError::ErrorCode, size_t)> m_readHandler;
     std::function<void(SystemError::ErrorCode, size_t)> m_writeHandler;
     nx::Buffer* m_readBuffer;
+    nx::Buffer m_buffer;
+    nx::Buffer m_requestData;
 };
 
 }
