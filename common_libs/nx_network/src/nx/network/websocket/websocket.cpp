@@ -54,10 +54,9 @@ PayloadType Websocket::prevFramePayloadType() const
     return m_receivedPayloadType;
 }
 
-void Websocket::bytesReceived(const nx::Buffer& buffer)
+void Websocket::bytesReceived(nx::Buffer& buffer)
 {
-    m_baseConnection.stopReading();
-    m_readHandler(SystemError::noError, buffer.size());
+    m_parser.consume(buffer.data(), buffer.size());
 }
 
 void Websocket::readyToSendData(size_t count)
@@ -88,6 +87,32 @@ void Websocket::cancelIOSync(nx::network::aio::EventType eventType)
 }
 
 void Websocket::closeConnection(SystemError::ErrorCode closeReason, ConnectionType* connection)
+{
+
+}
+
+
+void Websocket::frameStarted(FrameType type, bool fin)
+{
+
+}
+
+void Websocket::framePayload(const char* data, int len)
+{
+
+}
+
+void Websocket::frameEnded()
+{
+
+}
+
+void Websocket::messageEnded()
+{
+
+}
+
+void Websocket::handleError(Error err)
 {
 
 }

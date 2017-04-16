@@ -327,7 +327,7 @@ private:
 class BaseServerConnectionHandler
 {
 public:
-    virtual void bytesReceived(const nx::Buffer& buffer) = 0;
+    virtual void bytesReceived(nx::Buffer& buffer) = 0;
     virtual void readyToSendData(size_t count) = 0;
 };
 
@@ -346,7 +346,7 @@ public:
     {}
 
 private:
-    void bytesReceived(const nx::Buffer& buf)
+    void bytesReceived(nx::Buffer& buf)
     {
         m_handler->bytesReceived(buf);
     }

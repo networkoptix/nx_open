@@ -67,11 +67,22 @@ public:
     }
 
 private:
-    virtual void bytesReceived(const nx::Buffer& buffer) override;
+    /**  BaseServerConnectionHandler implementation */
+    virtual void bytesReceived(nx::Buffer& buffer) override;
     virtual void readyToSendData(size_t count) override;
+
+    /** StreamConnectionHolder implementation */
     virtual void closeConnection(
         SystemError::ErrorCode closeReason,
         ConnectionType* connection ) override;
+
+
+    /** Parser handler implementation */
+    virtual void frameStarted(FrameType type, bool fin) override;
+    virtual void framePayload(const char* data, int len) override;
+    virtual void frameEnded() override;
+    virtual void messageEnded() override;
+    virtual void handleError(Error err) override;
 
 private:
     std::chrono::milliseconds m_keepAliveTimeout;
