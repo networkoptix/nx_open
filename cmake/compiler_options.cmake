@@ -56,7 +56,8 @@ if(enableAllVendors)
         -DENABLE_STARDOT
         -DENABLE_IQE
         -DENABLE_ISD
-        -DENABLE_PULSE_CAMERA)
+        -DENABLE_PULSE_CAMERA
+        -DENABLE_FLIR)
 endif()
 
 if(WIN32)
