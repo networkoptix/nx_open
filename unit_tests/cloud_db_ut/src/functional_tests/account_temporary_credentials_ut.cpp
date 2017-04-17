@@ -11,6 +11,7 @@
 #include <cdb/cloud_nonce.h>
 #include <data/account_data.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/httpclient.h>
@@ -213,7 +214,7 @@ TEST_F(AccountTemporaryCredentials, temporary_credentials_login_to_system)
 
     api::AuthRequest authRequest;
     authRequest.nonce = api::generateCloudNonceBase(system.id);
-    authRequest.realm = QnAppInfo::realm().toStdString();
+    authRequest.realm = nx::network::AppInfo::realm().toStdString();
     authRequest.username = temporaryCredentials.login;
 
     api::ResultCode resultCode = api::ResultCode::ok;

@@ -100,7 +100,7 @@ QString QnPlAxisResource::portIndexToReqParam(int number) const
     return QString::number(number + 1);
 }
 
-class AxisIOMessageBodyParser: public AbstractByteStreamFilter
+class AxisIOMessageBodyParser: public nx::utils::bsf::AbstractByteStreamFilter
 {
 public:
     AxisIOMessageBodyParser(QnPlAxisResource* owner): m_owner(owner) {}

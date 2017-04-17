@@ -7,3 +7,5 @@ win* {
 linux {
     QMAKE_CXXFLAGS += -Werror
 }
+
+SOURCES += ${project.build.directory}/app_info_impl.cpp

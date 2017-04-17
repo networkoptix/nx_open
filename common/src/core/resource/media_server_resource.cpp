@@ -616,7 +616,7 @@ void QnMediaServerResource::setAuthKey(const QString& authKey)
 
 QString QnMediaServerResource::realm() const
 {
-    return QnAppInfo::realm();
+    return nx::network::AppInfo::realm();
 }
 
 void QnMediaServerResource::setResourcePool(QnResourcePool *resourcePool)

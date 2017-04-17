@@ -191,7 +191,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
                 userResource = findUserByName(nxUserName);
                 if (userResource)
                 {
-                    QString desiredRealm = QnAppInfo::realm();
+                    QString desiredRealm = nx::network::AppInfo::realm();
                     if (userResource->isLdap()) {
                         auto errCode = QnLdapManager::instance()->realm(&desiredRealm);
                         if (errCode != Qn::Auth_OK)
@@ -236,7 +236,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
         //TODO #ak better call m_userDataProvider->authorize here
         QnUserResourcePtr userResource = findUserByName(authorizationHeader.userid());
 
-        QString desiredRealm = QnAppInfo::realm();
+        QString desiredRealm = nx::network::AppInfo::realm();
         if (userResource && userResource->isLdap()) {
             Qn::AuthResult authResult = QnLdapManager::instance()->realm(&desiredRealm);
             if (authResult != Qn::Auth_OK)
@@ -466,7 +466,7 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
         {
             if (server->getId().toString().toUtf8().toLower() == userName)
             {
-                QString ha1Data = lit("%1:%2:%3").arg(server->getId().toString()).arg(QnAppInfo::realm()).arg(server->getAuthKey());
+                QString ha1Data = lit("%1:%2:%3").arg(server->getId().toString()).arg(nx::network::AppInfo::realm()).arg(server->getAuthKey());
                 QCryptographicHash ha1(QCryptographicHash::Md5);
                 ha1.addData(ha1Data.toUtf8());
 
@@ -486,12 +486,12 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
     }
 
     if (userResource &&
-        userResource->getRealm() != QnAppInfo::realm())
+        userResource->getRealm() != nx::network::AppInfo::realm())
     {
         //requesting client to re-calculate user's HA1 digest
         nx_http::insertOrReplaceHeader(
             &responseHeaders.headers,
-            nx_http::HttpHeader(Qn::REALM_HEADER_NAME, QnAppInfo::realm().toLatin1()));
+            nx_http::HttpHeader(Qn::REALM_HEADER_NAME, nx::network::AppInfo::realm().toLatin1()));
     }
     addAuthHeader(
         responseHeaders,
@@ -648,7 +648,7 @@ void QnAuthHelper::addAuthHeader(
     }
     else
     {
-        realm = QnAppInfo::realm();
+        realm = nx::network::AppInfo::realm();
     }
 
     const QString auth =
@@ -715,7 +715,7 @@ Qn::AuthResult QnAuthHelper::authenticateByUrl(
     authorization.digest->userid = authFields[0];
     authorization.digest->params["response"] = authFields[2];
     authorization.digest->params["nonce"] = authFields[1];
-    authorization.digest->params["realm"] = QnAppInfo::realm().toUtf8();
+    authorization.digest->params["realm"] = nx::network::AppInfo::realm().toUtf8();
     //digestAuthParams.params["uri"];   uri is empty
 
     if (!m_nonceProvider->isNonceValid(authorization.digest->params["nonce"]))

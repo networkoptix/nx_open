@@ -58,7 +58,7 @@ int QnGetNonceRestHandler::executeGet(
 
     QnGetNonceReply reply;
     reply.nonce = QnAuthHelper::instance()->generateNonce();
-    reply.realm = QnAppInfo::realm();
+    reply.realm = nx::network::AppInfo::realm();
 
     QString userName = params.value("userName");
     if (!userName.isEmpty())

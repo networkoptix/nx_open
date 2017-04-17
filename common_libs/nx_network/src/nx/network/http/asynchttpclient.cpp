@@ -12,7 +12,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 
-#include <utils/crypt/linux_passwd_crypt.h>
+#include <nx/utils/crypt/linux_passwd_crypt.h>
 #include <nx/utils/system_error.h>
 
 #include "auth_tools.h"

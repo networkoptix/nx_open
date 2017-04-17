@@ -3,14 +3,14 @@
 #include <QtCore/QBuffer>
 
 #include <nx/network/url/url_parse_helper.h>
+#include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/software_version.h>
-
 #include <nx/utils/stree/resourcecontainer.h>
 #include <nx/utils/stree/stree_manager.h>
-#include <utils/common/app_info.h>
 
+#include "nx/network/app_info.h"
 #include "cloud_modules_xml_sax_handler.h"
 
 namespace nx {
@@ -50,7 +50,7 @@ CloudModuleUrlFetcher::CloudModuleUrlFetcher(
     m_moduleAttrName(m_nameset.findResourceByName(moduleName).id),
     m_endpointSelector(std::move(endpointSelector)),
     m_requestIsRunning(false),
-    m_modulesXmlUrl(QnAppInfo::defaultCloudModulesXmlUrl())
+    m_modulesXmlUrl(AppInfo::defaultCloudModulesXmlUrl())
 {
     NX_ASSERT(
         m_moduleAttrName != nx::utils::stree::INVALID_RES_ID,
@@ -195,7 +195,7 @@ bool CloudModuleUrlFetcher::findModuleUrl(
     QUrl* const moduleUrl)
 {
     nx::utils::stree::ResourceContainer inputData;
-    const nx::utils::SoftwareVersion productVersion(QnAppInfo::applicationVersion());
+    const nx::utils::SoftwareVersion productVersion(nx::utils::AppInfo::applicationVersion());
     inputData.put(
         CloudInstanceSelectionAttributeNameset::vmsVersionMajor,
         productVersion.major());
@@ -210,13 +210,13 @@ bool CloudModuleUrlFetcher::findModuleUrl(
         productVersion.build());
     inputData.put(
         CloudInstanceSelectionAttributeNameset::vmsVersionFull,
-        QnAppInfo::applicationVersion());
+        nx::utils::AppInfo::applicationVersion());
     inputData.put(
         CloudInstanceSelectionAttributeNameset::vmsBeta,
-        QnAppInfo::beta() ? "true" : "false");
+        nx::utils::AppInfo::beta() ? "true" : "false");
     inputData.put(
         CloudInstanceSelectionAttributeNameset::vmsCustomization,
-        QnAppInfo::customizationName());
+        nx::utils::AppInfo::customizationName());
 
     nx::utils::stree::ResourceContainer outputData;
     treeRoot.get(nx::utils::stree::MultiSourceResourceReader(inputData, outputData), &outputData);

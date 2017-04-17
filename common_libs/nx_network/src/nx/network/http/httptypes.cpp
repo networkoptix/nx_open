@@ -6,8 +6,8 @@
 
 #include <QtCore/QString>
 
+#include <nx/utils/app_info.h>
 #include <nx/utils/string.h>
-#include <utils/common/app_info.h>
 
 #ifdef _WIN32
 static int strcasecmp(const char * str1, const char * str2) { return strcmpi(str1, str2); }
@@ -1523,9 +1523,9 @@ bool Server::Product::operator==(const Server::Product& right) const
 Server::Server()
 {
     products.push_back(Product{
-        QnAppInfo::productNameShort().toUtf8(),
-        nx::utils::SoftwareVersion(QnAppInfo::applicationVersion()),
-        QnAppInfo::organizationName().toUtf8()});
+        nx::utils::AppInfo::productNameShort().toUtf8(),
+        nx::utils::SoftwareVersion(nx::utils::AppInfo::applicationVersion()),
+        nx::utils::AppInfo::organizationName().toUtf8()});
 }
 
 bool Server::operator==(const Server& right) const
@@ -1765,7 +1765,11 @@ int ChunkHeader::serialize( BufferType* const /*dstBuffer*/ ) const
 
 
 static const StringType defaultUserAgentString = lit("%1%2/%3 (%4) %5").arg(
-    QnAppInfo::productNameLong(), PRODUCT_NAME_SUFFIX, QnAppInfo::applicationVersion(), QnAppInfo::organizationName(), COMMON_USER_AGENT
+    nx::utils::AppInfo::productNameLong(),
+    PRODUCT_NAME_SUFFIX,
+    nx::utils::AppInfo::applicationVersion(),
+    nx::utils::AppInfo::organizationName(),
+    COMMON_USER_AGENT
     ).toUtf8();
 
 StringType userAgentString()
@@ -1774,7 +1778,7 @@ StringType userAgentString()
 }
 
 static const StringType defaultServerString = lit("%1/%2 (%3) %4").arg(
-    QnAppInfo::productNameLong(), QnAppInfo::applicationVersion(), QnAppInfo::organizationName(), COMPATIBILITY_SERVER_STRING
+    nx::utils::AppInfo::productNameLong(), nx::utils::AppInfo::applicationVersion(), nx::utils::AppInfo::organizationName(), COMPATIBILITY_SERVER_STRING
     ).toUtf8();
 
 StringType serverString()

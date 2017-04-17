@@ -18,7 +18,7 @@ const QnUuid QnUserResource::kAdminGuid("99cbc715-539b-4bfe-856f-799b45b69b1e");
 
 QnUserResource::QnUserResource(QnUserType userType):
     m_userType(userType),
-    m_realm(QnAppInfo::realm()),
+    m_realm(nx::network::AppInfo::realm()),
     m_permissions(0),
     m_userRoleId(),
     m_isOwner(false),

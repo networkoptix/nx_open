@@ -61,7 +61,9 @@ void ConnectSessionManager::createClientSession(
     CreateClientSessionHandler completionHandler)
 {
     api::CreateClientSessionResponse response;
-    response.sessionTimeout = m_settings.connectingPeer().connectSessionIdleTimeout;
+    response.sessionTimeout = 
+        std::chrono::duration_cast<std::chrono::seconds>(
+            m_settings.connectingPeer().connectSessionIdleTimeout);
     response.sessionId = m_clientSessionPool->addSession(
         request.desiredSessionId, request.targetPeerName);
     completionHandler(api::ResultCode::ok, std::move(response));

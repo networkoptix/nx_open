@@ -15,7 +15,7 @@ namespace {
     int HTTP_READ_TIMEOUT = 1000 * 10;
 }
 
-class QnMessageBodyParser: public AbstractByteStreamFilter
+class QnMessageBodyParser: public nx::utils::bsf::AbstractByteStreamFilter
 {
 public:
     QnMessageBodyParser(QnIOModuleMonitor* owner): m_owner(owner) {}

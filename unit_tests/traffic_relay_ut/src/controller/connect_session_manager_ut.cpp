@@ -26,6 +26,7 @@ class ConnectSessionManager:
 {
 public:
     ConnectSessionManager():
+        m_clientSessionPool(m_settings),
         m_connectSessionManager(m_settings, &m_clientSessionPool, &m_listeningPeerPool),
         m_peerName(nx::utils::generateRandomName(17).toStdString())
     {
@@ -160,8 +161,18 @@ protected:
     
     void whenIssuedCreateSessionWithoutPredefinedId()
     {
-        m_expectedSessionId = QnUuid::createUuid().toStdString();
+        m_expectedSessionId = QnUuid::createUuid().toSimpleString().toStdString();
         issueCreateSession(m_expectedSessionId);
+    }
+
+    void whenIssuedCreateSessionWithAlreadyUsedId()
+    {
+        whenIssuedCreateSessionWithoutPredefinedId();
+        thenSessionHasBeenCreated();
+
+        std::string sessionId;
+        m_expectedSessionId.swap(sessionId);
+        issueCreateSession(sessionId);
     }
 
     void thenSessionHasBeenCreated()
@@ -231,7 +242,12 @@ TEST_F(ConnectSessionManagerConnectingPeer, create_client_session_desired_sessio
     thenSessionHasBeenCreated();
 }
 
-//TEST_F(ConnectSessionManagerConnectingPeer, create_client_session_id_is_already_used)
+TEST_F(ConnectSessionManagerConnectingPeer, create_client_session_id_is_already_used)
+{
+    whenIssuedCreateSessionWithAlreadyUsedId();
+    thenSessionHasBeenCreated();
+}
+
 //TEST_F(ConnectSessionManagerConnectingPeer, client_session_expiration)
 
 //TEST_F(ConnectSessionManagerConnectingPeer, connect_to_listening_peer)
