@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <nx/utils/random.h>
 #include "websocket_serializer.h"
 
 namespace nx {
@@ -80,8 +81,7 @@ static int prepareFrame(const char* payload, int payloadLen, FrameType type,
 
 } // namespace <anonymous>
 
-Serializer::Serializer(bool masked, unsigned mask):
-    m_gen(m_rd())
+Serializer::Serializer(bool masked, unsigned mask)
 {
     setMasked(masked, mask);
 }
@@ -114,16 +114,7 @@ void Serializer::setMasked(bool masked, unsigned mask)
     m_mask = mask;
 
     if (m_masked && m_mask == 0)
-    {
-        try
-        {
-            m_mask = std::uniform_int_distribution<unsigned>()(m_gen);
-        }
-        catch (const std::exception&)
-        {
-            m_mask = 1234567890;
-        }
-    }
+        m_mask = nx::utils::random::number<unsigned>(1, std::numeric_limits<unsigned>::max());
 }
 
 } // namespace websocket

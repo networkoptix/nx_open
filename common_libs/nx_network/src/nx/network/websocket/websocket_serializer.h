@@ -1,6 +1,5 @@
 #pragma once
 
-#include <random>
 #include <nx/network/websocket/websocket_common_types.h>
 #include <nx/network/buffer.h>
 
@@ -28,8 +27,6 @@ public:
 private:
     bool m_masked;
     unsigned m_mask;
-    std::random_device m_rd;
-    std::mt19937 m_gen;
 };
 
 
