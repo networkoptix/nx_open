@@ -7,7 +7,7 @@ namespace websocket {
 
 namespace {
 
-int calcHeaderSize(bool masked, int payloadLenType)
+static int calcHeaderSize(bool masked, int payloadLenType)
 {
     int result = 2;
     result += masked ? 4 : 0;
@@ -16,7 +16,7 @@ int calcHeaderSize(bool masked, int payloadLenType)
     return result;
 }
 
-int fillHeader(char* data, bool fin, int opCode, int payloadLenType, int payloadLen, bool masked, unsigned int mask)
+static int fillHeader(char* data, bool fin, int opCode, int payloadLenType, int payloadLen, bool masked, unsigned int mask)
 {
     char * pdata = data;
 
@@ -48,7 +48,7 @@ int fillHeader(char* data, bool fin, int opCode, int payloadLenType, int payload
     return pdata - data;
 }
 
-int payloadLenTypeByLen(int64_t len)
+static int payloadLenTypeByLen(int64_t len)
 {
     if (len <= 125)
         return len;
@@ -58,7 +58,7 @@ int payloadLenTypeByLen(int64_t len)
         return 127;
 }
 
-int prepareFrame(const char* payload, int payloadLen, FrameType type,
+static int prepareFrame(const char* payload, int payloadLen, FrameType type,
     bool fin, bool masked, unsigned int mask, char* out, int outLen)
 {
     int payloadLenType = payloadLenTypeByLen(payloadLen);
@@ -78,6 +78,12 @@ int prepareFrame(const char* payload, int payloadLen, FrameType type,
     return neededOutLen;
 }
 
+} // namespace <anonymous>
+
+Serializer::Serializer(bool masked, unsigned mask):
+    m_gen(m_rd())
+{
+    setMasked(masked, mask);
 }
 
 int Serializer::prepareFrame(
@@ -106,6 +112,18 @@ void Serializer::setMasked(bool masked, unsigned mask)
 {
     m_masked = masked;
     m_mask = mask;
+
+    if (m_masked && m_mask == 0)
+    {
+        try
+        {
+            m_mask = std::uniform_int_distribution<unsigned>()(m_gen);
+        }
+        catch (const std::exception&)
+        {
+            m_mask = 1234567890;
+        }
+    }
 }
 
 } // namespace websocket

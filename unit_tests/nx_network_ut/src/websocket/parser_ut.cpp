@@ -26,10 +26,10 @@ unsigned char kShortTextMessageFinNoMask[] = { 0x81, 0x5, 'h', 'e', 'l', 'l', 'o
 using ::testing::_;
 using ::testing::AtLeast;
 
-std::vector<char> kDefaultPayload;
-std::once_flag payloadInitOnceFlag;
+static std::vector<char> kDefaultPayload;
+static std::once_flag payloadInitOnceFlag;
 
-std::vector<char> prepareMessage(const std::vector<char>& payload, int frameCount, FrameType type, bool masked, int mask)
+static std::vector<char> prepareMessage(const std::vector<char>& payload, int frameCount, FrameType type, bool masked, int mask)
 {
     std::vector<char> result;
     Serializer serializer(masked, mask);
@@ -59,7 +59,7 @@ std::vector<char> prepareMessage(const std::vector<char>& payload, int frameCoun
     return result;
 }
 
-void fillDummyPayload(std::vector<char>* payload, int size)
+static void fillDummyPayload(std::vector<char>* payload, int size)
 {
     static const char* const kPattern = "hello";
     static const int kPatternSize = (int)std::strlen(kPattern);
