@@ -51,8 +51,10 @@ public:
     void setSendMode(SendMode mode);
     SendMode sendMode() const;
 
-    /** Makes sense only in multiFrameMessage mode. 
-        Indicates that the next sendAsync will close current message */
+    /** 
+     * Makes sense only in multiFrameMessage mode. 
+     * Indicates that the next sendAsync will close current message 
+     */
     void setIsLastFrame();
 
     void setReceiveMode(ReceiveMode mode);
