@@ -1,6 +1,6 @@
 #include <algorithm>
 #include <cstdint>
-#include <nx/network/websocket/websocket_parser.h>
+#include "websocket_parser.h"
 
 namespace nx {
 namespace network {

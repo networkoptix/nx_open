@@ -1,4 +1,4 @@
-#include <nx/network/websocket/websocket.h>
+#include "websocket.h"
 #include <nx/utils/log/log.h>
 
 namespace nx {

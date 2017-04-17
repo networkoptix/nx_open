@@ -32,10 +32,13 @@ std::once_flag payloadInitOnceFlag;
 std::vector<char> prepareMessage(const std::vector<char>& payload, int frameCount, FrameType type, bool masked, int mask)
 {
     std::vector<char> result;
-    int payloadSize = payload.size();
+    Serializer serializer(masked, mask);
+
+    int payloadSize = (int)payload.size();
     int frameLen = payloadSize / frameCount;
-    int resultSize = frameCount * prepareFrame(nullptr, frameLen, type, true, masked, mask, nullptr, 0);
+    int resultSize = frameCount * serializer.prepareFrame(nullptr, frameLen, type, true, nullptr, 0);
     int frameTailSize = payloadSize % frameCount;
+
     resultSize += frameTailSize;
     result.assign(resultSize, 0);
 
@@ -47,9 +50,9 @@ std::vector<char> prepareMessage(const std::vector<char>& payload, int frameCoun
         if (i > 0)
             opCode = FrameType::continuation;
         int currentFrameLen = i == 0 ? frameLen + frameTailSize : frameLen;
-        currentPos += prepareFrame(payload.data() + currentPayloadPos,
+        currentPos += serializer.prepareFrame(payload.data() + currentPayloadPos,
             currentFrameLen, (FrameType)opCode, i == frameCount - 1,
-            masked, mask, result.data() + currentPos, result.size() - currentPos);
+            result.data() + currentPos, (int)result.size() - currentPos);
         currentPayloadPos += currentFrameLen;
     }
 
@@ -59,7 +62,7 @@ std::vector<char> prepareMessage(const std::vector<char>& payload, int frameCoun
 void fillDummyPayload(std::vector<char>* payload, int size)
 {
     static const char* const kPattern = "hello";
-    static const int kPatternSize = std::strlen(kPattern);
+    static const int kPatternSize = (int)std::strlen(kPattern);
 
     payload->resize((size_t)size);
     char* pdata = payload->data();

@@ -1,5 +1,5 @@
 #include <cstdint>
-#include <nx/network/websocket/websocket_serializer.h>
+#include "websocket_serializer.h"
 
 namespace nx {
 namespace network {
@@ -58,8 +58,6 @@ int payloadLenTypeByLen(int64_t len)
         return 127;
 }
 
-}
-
 int prepareFrame(const char* payload, int payloadLen, FrameType type,
     bool fin, bool masked, unsigned int mask, char* out, int outLen)
 {
@@ -78,6 +76,36 @@ int prepareFrame(const char* payload, int payloadLen, FrameType type,
     }
 
     return neededOutLen;
+}
+
+}
+
+int Serializer::prepareFrame(
+    const char* payload, int payloadLen, 
+    FrameType type, bool fin, char* out, int outLen)
+{
+    return websocket::prepareFrame(payload, payloadLen, type, fin, m_masked, m_mask, out, outLen);
+}
+
+void Serializer::prepareFrame(
+    const nx::Buffer& payload, 
+    FrameType type, 
+    bool fin, 
+    nx::Buffer* outBuffer)
+{
+    outBuffer->resize(
+        websocket::prepareFrame(
+            nullptr, 0, type, fin, m_masked, m_mask, nullptr, 0));
+    prepareFrame(
+        payload.constData(), 
+        payload.size(), type, fin, 
+        outBuffer->data(), outBuffer->size());
+}
+
+void Serializer::setMasked(bool masked, unsigned mask)
+{
+    m_masked = masked;
+    m_mask = mask;
 }
 
 } // namespace websocket
