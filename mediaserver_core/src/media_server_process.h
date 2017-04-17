@@ -152,7 +152,7 @@ private:
     void saveServerInfo(const QnMediaServerResourcePtr& server);
 
     bool initHardwareId();
-    QString hardwareIdAsGuid();
+    QString hardwareIdAsGuid() const;
     void updateGuidIfNeeded();
 private:
     int m_argc;

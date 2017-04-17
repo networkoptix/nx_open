@@ -3169,7 +3169,7 @@ private:
 
 void MediaServerProcess::setNeedInitHardwareId(bool value)
 {
-    m_needInitHardwareId = true;
+    m_needInitHardwareId = value;
 }
 
 bool MediaServerProcess::initHardwareId()
@@ -3189,7 +3189,7 @@ bool MediaServerProcess::initHardwareId()
     return true;
 }
 
-QString MediaServerProcess::hardwareIdAsGuid()
+QString MediaServerProcess::hardwareIdAsGuid() const
 {
     auto hwId = LLUtil::getLatestHardwareId();
     auto hwIdString = QnUuid::fromHardwareId(hwId).toString();
