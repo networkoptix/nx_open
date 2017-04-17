@@ -32,7 +32,7 @@ enum class Error
     maskIsZero,
 };
 
-}
-}
-}
+} // namespace websocket
+} // namespace network
+} // namespace nx
 

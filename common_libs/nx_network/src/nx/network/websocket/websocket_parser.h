@@ -72,6 +72,6 @@ private:
     int m_maskPos;
 };
 
-}
-}
-}
+} // namespace websocket
+} // namespace network
+} // namespace nx

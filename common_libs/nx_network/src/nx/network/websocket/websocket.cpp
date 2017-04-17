@@ -211,6 +211,6 @@ void Websocket::handleError(Error err)
     closeConnection(SystemError::invalidData, nullptr);
 }
 
-}
-}
-}
+} // namespace websocket
+} // namespace network
+} // namespace nx

@@ -13,6 +13,6 @@ namespace websocket {
 int NX_NETWORK_API prepareFrame(const char* payload, int payloadLen, FrameType type, 
     bool fin, bool masked, unsigned int mask, char* out, int outLen);
 
-}
-}
-}
+} // namespace websocket
+} // namespace network
+} // namespace nx

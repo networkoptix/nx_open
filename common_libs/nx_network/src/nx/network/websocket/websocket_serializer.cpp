@@ -80,6 +80,6 @@ int prepareFrame(const char* payload, int payloadLen, FrameType type,
     return neededOutLen;
 }
 
-}
-}
-}
+} // namespace websocket
+} // namespace network
+} // namespace nx

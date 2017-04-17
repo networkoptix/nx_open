@@ -160,6 +160,6 @@ void Parser::reset()
     m_pos = 0;
 }
 
-}
-}
-}
+} // namespace websocket
+} // namespace network
+} // namespace nx

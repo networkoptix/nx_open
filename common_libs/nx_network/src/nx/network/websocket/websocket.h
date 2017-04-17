@@ -103,7 +103,6 @@ private:
     nx::Buffer m_requestData;
 };
 
-}
-
-}
-}
+} // namespace websocket
+} // namespace network
+} // namespace nx
