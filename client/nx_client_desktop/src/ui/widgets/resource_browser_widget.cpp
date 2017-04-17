@@ -948,6 +948,13 @@ void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool
         return;
     }
 
+    if (nodeType == Qn::LayoutTourNode)
+    {
+        menu()->triggerIfPossible(QnActions::ReviewLayoutTourAction, QnActionParameters()
+            .withArgument(Qn::UuidRole, index.data(Qn::UuidRole).value<QnUuid>()));
+        return;
+    }
+
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     /* Do not open users or fake servers. */
     if (!resource || resource->hasFlags(Qn::user) || resource->hasFlags(Qn::fake))

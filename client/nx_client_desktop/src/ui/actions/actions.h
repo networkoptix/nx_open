@@ -928,7 +928,7 @@ enum IDType
     NewLayoutTourAction,
     LayoutTourSettingsAction,
     RenameLayoutTourAction,
-    OpenLayoutTourAction,
+    ReviewLayoutTourAction,
     RemoveLayoutTourAction,
 
     /* Timeline actions. */

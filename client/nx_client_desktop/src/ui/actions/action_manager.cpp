@@ -1781,11 +1781,11 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::NoTarget).
         separator();
 
-    factory(QnActions::OpenLayoutTourAction).
-        flags(Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey).
+    factory(QnActions::ReviewLayoutTourAction).
+        flags(Qn::Tree | Qn::NoTarget).
         mode(QnActionTypes::DesktopMode).
-        text(tr("Open Layouts Tour")).
-        shortcut(lit("Alt+L")).
+        text(tr("Review Layout Tour")).
+        condition(new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this)).
         autoRepeat(false);
 
     factory(QnActions::ToggleLayoutTourModeAction).

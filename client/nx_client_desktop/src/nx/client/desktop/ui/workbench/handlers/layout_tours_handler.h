@@ -24,7 +24,7 @@ public:
     virtual ~LayoutToursHandler() override;
 
 private:
-    void openToursLayout();
+    void reviewLayoutTour(const ec2::ApiLayoutTourData& tour);
     void saveTourToServer(const ec2::ApiLayoutTourData& tour);
     void removeTourFromServer(const QnUuid& tourId);
 

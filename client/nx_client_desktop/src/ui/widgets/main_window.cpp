@@ -307,7 +307,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     addAction(action(QnActions::AdjustVideoAction));
     addAction(action(QnActions::TogglePanicModeAction));
     addAction(action(QnActions::ToggleLayoutTourModeAction));
-    addAction(action(QnActions::OpenLayoutTourAction));
+    addAction(action(QnActions::ReviewLayoutTourAction));
     addAction(action(QnActions::DebugIncrementCounterAction));
     addAction(action(QnActions::DebugDecrementCounterAction));
     addAction(action(QnActions::DebugControlPanelAction));

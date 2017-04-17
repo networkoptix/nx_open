@@ -113,8 +113,13 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
                 m_controller->startSingleLayoutTour();
         });
 
-    connect(action(QnActions::OpenLayoutTourAction), &QAction::triggered, this,
-        &LayoutToursHandler::openToursLayout);
+    connect(action(QnActions::ReviewLayoutTourAction), &QAction::triggered, this,
+        [this]()
+        {
+            QnActionParameters parameters = menu()->currentParameters(sender());
+            auto id = parameters.argument<QnUuid>(Qn::UuidRole);
+            reviewLayoutTour(qnLayoutTourManager->tour(id));
+        });
 
     connect(action(QnActions::EscapeHotkeyAction), &QAction::triggered, m_controller,
         &LayoutTourController::stopCurrentTour);
@@ -124,39 +129,25 @@ LayoutToursHandler::~LayoutToursHandler()
 {
 }
 
-void LayoutToursHandler::openToursLayout()
+void LayoutToursHandler::reviewLayoutTour(const ec2::ApiLayoutTourData& tour)
 {
+    if (!tour.isValid())
+        return;
+
     const QList<QnActions::IDType> actions{
         QnActions::ToggleLayoutTourModeAction,
         QnActions::RemoveLayoutTourAction
     };
 
     const auto resource = QnLayoutResourcePtr(new QnLayoutResource());
+    resource->setId(QnUuid::createUuid());
+    resource->setName(tour.name);
     resource->setData(Qn::IsSpecialLayoutRole, true);
     resource->setData(Qn::LayoutIconRole, qnSkin->icon(lit("tree/videowall.png")));
     resource->setData(Qn::CustomPanelActionsRoleRole, QVariant::fromValue(actions));
+    resource->setData(Qn::CustomPanelTitleRole, tour.name);
+    resource->setData(Qn::CustomPanelDescriptionRole, QString());
 
-    const auto startLayoutTourAction = action(QnActions::ToggleLayoutTourModeAction);
-    const auto removeLayoutTourAction = action(QnActions::RemoveLayoutTourAction);
-
-    const auto updateState =
-        [startLayoutTourAction, removeLayoutTourAction, resource]()
-        {
-            const bool started = startLayoutTourAction->isChecked();
-            removeLayoutTourAction->setEnabled(!started);
-
-            static const auto kStarted = tr(" (STARTED)");
-            resource->setData(Qn::CustomPanelTitleRole, tr("Super Duper Tours Layout Panel")
-                + (started ? kStarted : QString()));
-            resource->setData(Qn::CustomPanelDescriptionRole, tr("Description Of Tour")
-                + (started ? kStarted : QString()));
-            resource->setName(lit("Test Layout Tours") + (started ? kStarted : QString()));
-        };
-
-    updateState();
-    connect(startLayoutTourAction, &QAction::toggled, this, updateState);
-
-    resource->setId(QnUuid::createUuid());
     resourcePool()->addResource(resource);
     menu()->trigger(QnActions::OpenSingleLayoutAction, resource);
 }
