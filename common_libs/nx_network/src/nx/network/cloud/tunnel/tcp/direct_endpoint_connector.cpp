@@ -46,8 +46,6 @@ void DirectEndpointConnector::connect(
 {
     using namespace std::placeholders;
 
-    SystemError::ErrorCode sysErrorCode = SystemError::noError;
-
     NX_ASSERT(!response.forwardedTcpEndpointList.empty());
     if (!s_needVerification)
     {
@@ -60,42 +58,10 @@ void DirectEndpointConnector::connect(
             });
     }
 
-    // Performing /api/moduleInformation HTTP requests since
-    //  currently only mediaserver can be on remote side
-    for (const SocketAddress& endpoint: response.forwardedTcpEndpointList)
-    {
-        NX_LOGX(lm("cross-nat %1. Starting connection to %2")
-            .arg(m_connectSessionId).str(endpoint), cl_logDEBUG2);
-
-        auto httpClient = nx_http::AsyncHttpClient::create();
-        httpClient->bindToAioThread(getAioThread());
-        httpClient->setSendTimeoutMs(timeout.count());
-        httpClient->setResponseReadTimeoutMs(timeout.count());
-        httpClient->setMessageBodyReadTimeoutMs(timeout.count());
-        m_connections.push_back(ConnectionContext{endpoint, std::move(httpClient)});
-    }
-
-    post(
-        [this, sysErrorCode, handler = std::move(handler)]() mutable
-        {
-            if (m_connections.empty())
-            {
-                //reporting error
-                handler(
-                    nx::hpm::api::NatTraversalResultCode::tcpConnectFailed,
-                    sysErrorCode,
-                    nullptr);
-                return;
-            }
-
-            m_completionHandler = std::move(handler);
-            for (auto it = m_connections.begin(); it != m_connections.end(); ++it)
-            {
-                it->httpClient->doGet(
-                    QUrl(lit("http://%1/api/moduleInformation").arg(it->endpoint.toString())),
-                    std::bind(&DirectEndpointConnector::onHttpRequestDone, this, _1, it));
-            }
-    });
+    performEndpointVerification(
+        response.forwardedTcpEndpointList,
+        timeout,
+        std::move(handler));
 }
 
 const AddressEntry& DirectEndpointConnector::targetPeerAddress() const
@@ -109,6 +75,51 @@ void DirectEndpointConnector::setVerificationRequirement(bool value)
 }
 
 bool DirectEndpointConnector::s_needVerification(true);
+
+void DirectEndpointConnector::performEndpointVerification(
+    const std::list<SocketAddress>& endpoints,
+    std::chrono::milliseconds timeout,
+    ConnectCompletionHandler handler)
+{
+    using namespace std::placeholders;
+
+    // Performing /api/moduleInformation HTTP requests since
+    //  currently only mediaserver can be on remote side
+    for (const SocketAddress& endpoint: endpoints)
+    {
+        NX_LOGX(lm("cross-nat %1. Starting connection to %2")
+            .arg(m_connectSessionId).str(endpoint), cl_logDEBUG2);
+
+        auto httpClient = nx_http::AsyncHttpClient::create();
+        httpClient->bindToAioThread(getAioThread());
+        httpClient->setSendTimeoutMs(timeout.count());
+        httpClient->setResponseReadTimeoutMs(timeout.count());
+        httpClient->setMessageBodyReadTimeoutMs(timeout.count());
+        m_connections.push_back(ConnectionContext{ endpoint, std::move(httpClient) });
+    }
+
+    post(
+        [this, handler = std::move(handler)]() mutable
+        {
+            if (m_connections.empty())
+            {
+                //reporting error
+                handler(
+                    nx::hpm::api::NatTraversalResultCode::tcpConnectFailed,
+                    SystemError::connectionReset,
+                    nullptr);
+                return;
+            }
+
+            m_completionHandler = std::move(handler);
+            for (auto it = m_connections.begin(); it != m_connections.end(); ++it)
+            {
+                it->httpClient->doGet(
+                    QUrl(lit("http://%1/api/moduleInformation").arg(it->endpoint.toString())),
+                    std::bind(&DirectEndpointConnector::onHttpRequestDone, this, _1, it));
+            }
+        });
+}
 
 void DirectEndpointConnector::onHttpRequestDone(
     nx_http::AsyncHttpClientPtr httpClient,
