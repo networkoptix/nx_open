@@ -113,8 +113,8 @@ void Websocket::sendAsync(
             m_isLastFrame = false;
     }
 
-    m_baseConnection.sendBufAsync(buffer);
     m_writeHandler = std::move(handler);
+    m_baseConnection.sendBufAsync(buffer);
 }
 
 void Websocket::cancelIOSync(nx::network::aio::EventType /*eventType*/)
