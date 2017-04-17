@@ -104,6 +104,7 @@ private:
     std::function<void(SystemError::ErrorCode, size_t)> m_writeHandler;
     nx::Buffer* m_readBuffer;
     nx::Buffer m_buffer;
+    nx::Buffer m_writeBuffer;
     nx::Buffer m_requestData;
 };
 

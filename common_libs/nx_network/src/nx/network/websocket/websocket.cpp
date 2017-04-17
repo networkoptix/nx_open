@@ -64,6 +64,7 @@ void Websocket::bytesReceived(nx::Buffer& buffer)
 
 void Websocket::readyToSendData(size_t count)
 {
+    m_writeBuffer.clear();
     m_writeHandler(SystemError::noError, count);
 }
 
@@ -76,23 +77,27 @@ void Websocket::readSomeAsync(
 
     if (!m_requestData.isEmpty())
     {
-        m_parser.consume(m_requestData.data(), m_requestData.size());
-        m_requestData.clear();
+        m_baseConnection.dispatch(
+            [this]()
+            {
+                m_parser.consume(m_requestData.data(), m_requestData.size());
+                m_requestData.clear();
+            });
     }
-
-    m_baseConnection.startReadingConnection();
+    else
+    {
+        m_baseConnection.startReadingConnection();
+    }
 }
 
 void Websocket::sendAsync(
     const nx::Buffer& buffer,
     std::function<void(SystemError::ErrorCode, size_t)> handler)
 {
-    nx::Buffer writeBuffer;
-
     if (m_sendMode == SendMode::singleMessage)
     {
         FrameType type = m_payloadType == PayloadType::binary ? FrameType::binary : FrameType::text;
-        m_serializer.prepareFrame(buffer, type, true, &writeBuffer);
+        m_serializer.prepareFrame(buffer, type, true, &m_writeBuffer);
     }
     else
     {
@@ -102,7 +107,7 @@ void Websocket::sendAsync(
                 ? FrameType::binary 
                 : FrameType::text;
 
-        m_serializer.prepareFrame(buffer, type, m_isLastFrame, &writeBuffer);
+        m_serializer.prepareFrame(buffer, type, m_isLastFrame, &m_writeBuffer);
         m_isFirstFrame = m_isLastFrame;
         if (m_isLastFrame)
             m_isLastFrame = false;
