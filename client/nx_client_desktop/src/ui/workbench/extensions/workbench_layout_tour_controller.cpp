@@ -115,7 +115,7 @@ void LayoutTourController::stopCurrentTour()
         case Mode::SingleLayout:
         {
             stopTimer();
-            workbench()->setItem(Qn::ZoomedRole, NULL);
+            workbench()->setItem(Qn::ZoomedRole, nullptr);
 
             break;
         }
@@ -154,7 +154,7 @@ void LayoutTourController::processTourStep()
 
             auto items = workbench()->currentLayout()->items().toList();
             std::sort(items.begin(), items.end(),
-                [](QnWorkbenchItem *l, QnWorkbenchItem *r)
+                [](QnWorkbenchItem* l, QnWorkbenchItem* r)
                 {
                     QRect lg = l->geometry();
                     QRect rg = r->geometry();
@@ -178,7 +178,7 @@ void LayoutTourController::processTourStep()
         case Mode::MultipleLayouts:
         {
             NX_EXPECT(!m_tour.id.isNull());
-            const bool hasItems = m_tour.items.size() > 0;
+            const bool hasItems = !m_tour.items.empty();
             NX_EXPECT(hasItems);
             if (!hasItems)
             {
