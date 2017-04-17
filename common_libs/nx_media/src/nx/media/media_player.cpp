@@ -893,6 +893,7 @@ void Player::stop()
     d->updateCurrentResolution(QSize());
 
     d->setState(State::Stopped);
+    d->setMediaStatus(MediaStatus::NoMedia);
     d->log(lit("stop() END"));
 }
 
