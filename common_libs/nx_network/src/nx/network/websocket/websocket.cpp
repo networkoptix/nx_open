@@ -12,9 +12,11 @@ Websocket::Websocket(
     :
     m_baseConnection(this, std::move(streamSocket), this),
     m_parser(role, this),
+    m_serializer(role == Role::client),
     m_sendMode(SendMode::singleMessage),
     m_receiveMode(ReceiveMode::message),
     m_isLastFrame(false),
+    m_isFirstFrame(true),
     m_payloadType(PayloadType::binary),
     m_readBuffer(nullptr),
     m_requestData(requestData)
@@ -86,32 +88,11 @@ void Websocket::sendAsync(
     std::function<void(SystemError::ErrorCode, size_t)> handler)
 {
     nx::Buffer writeBuffer;
-    bool masked = m_parser.role() == Role::client;
-    unsigned mask = masked ? generateMask() : 0;
 
     if (m_sendMode == SendMode::singleMessage)
     {
         FrameType type = m_payloadType == PayloadType::binary ? FrameType::binary : FrameType::text;
-
-        writeBuffer.resize(
-            prepareFrame(
-                nullptr, 
-                buffer.size(), 
-                type,
-                true,
-                masked,
-                mask,
-                nullptr,
-                0));
-        prepareFrame(
-            buffer.constData(), 
-            buffer.size(), 
-            type, 
-            true, 
-            masked, 
-            mask, 
-            writeBuffer.data(), 
-            writeBuffer.size());
+        m_serializer.prepareFrame(buffer, type, true, &writeBuffer);
     }
     else
     {
@@ -121,43 +102,29 @@ void Websocket::sendAsync(
                 ? FrameType::binary 
                 : FrameType::text;
 
-        writeBuffer.resize(
-            prepareFrame(
-                nullptr, 
-                buffer.size(), 
-                type,
-                true,
-                masked,
-                mask,
-                nullptr,
-                0));
-        prepareFrame(
-            buffer.constData(), 
-            buffer.size(), 
-            type, 
-            true, 
-            masked, 
-            mask, 
-            writeBuffer.data(), 
-            writeBuffer.size());
+        m_serializer.prepareFrame(buffer, type, m_isLastFrame, &writeBuffer);
+        m_isFirstFrame = m_isLastFrame;
+        if (m_isLastFrame)
+            m_isLastFrame = false;
     }
+
     m_baseConnection.sendBufAsync(buffer);
     m_writeHandler = handler;
 }
 
-void Websocket::cancelIOSync(nx::network::aio::EventType eventType)
+void Websocket::cancelIOSync(nx::network::aio::EventType /*eventType*/)
 {
     m_baseConnection.pleaseStopSync();
 }
 
-void Websocket::closeConnection(SystemError::ErrorCode closeReason, ConnectionType* connection)
+void Websocket::closeConnection(SystemError::ErrorCode closeReason, ConnectionType* /*connection*/)
 {
     m_readHandler(closeReason, 0);
     m_baseConnection.pleaseStopSync();
 }
 
 
-void Websocket::frameStarted(FrameType type, bool fin)
+void Websocket::frameStarted(FrameType /*type*/, bool /*fin*/)
 {
     NX_LOG(lit("[Websocket] frame started. type: %1, size from header: %2")
            .arg(m_parser.frameType())

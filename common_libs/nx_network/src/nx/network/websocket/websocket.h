@@ -93,9 +93,11 @@ private:
     std::chrono::milliseconds m_keepAliveTimeout;
     nx_api::BaseServerConnectionWrapper m_baseConnection;
     Parser m_parser;
+    Serializer m_serializer;
     SendMode m_sendMode;
     ReceiveMode m_receiveMode;
     bool m_isLastFrame;
+    bool m_isFirstFrame;
     PayloadType m_payloadType;
     PayloadType m_receivedPayloadType;
     std::function<void(SystemError::ErrorCode, size_t)> m_readHandler;

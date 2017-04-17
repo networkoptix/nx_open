@@ -40,6 +40,8 @@ public:
     Parser(Role role, ParserHandler* handler);
     void consume(char* data, int len);
     void setRole(Role role);
+    FrameType frameType() const;
+    int frameSize() const;
 
 private:
     void parse(char* data, int len);

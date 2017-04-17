@@ -160,6 +160,16 @@ void Parser::reset()
     m_pos = 0;
 }
 
+FrameType Parser::frameType() const
+{
+    return m_opCode;
+}
+
+int Parser::frameSize() const
+{
+    return m_payloadLen;
+}
+
 } // namespace websocket
 } // namespace network
 } // namespace nx
