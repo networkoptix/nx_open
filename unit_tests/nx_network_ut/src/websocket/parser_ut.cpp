@@ -20,6 +20,8 @@ public:
     MOCK_METHOD1(handleError, void(Error err));
 };
 
+namespace {
+
 unsigned char kShortTextMessageFinNoMask[] = { 0x81, 0x5, 'h', 'e', 'l', 'l', 'o' };
 using ::testing::_;
 using ::testing::AtLeast;
@@ -58,10 +60,9 @@ void fillDummyPayload(std::vector<char>* payload, int size)
 {
     static const char* const kPattern = "hello";
     static const int kPatternSize = std::strlen(kPattern);
-    char* pdata;
 
     payload->resize((size_t)size);
-    pdata = payload->data();
+    char* pdata = payload->data();
 
     while (size > 0)
     {
@@ -70,6 +71,8 @@ void fillDummyPayload(std::vector<char>* payload, int size)
         size -= copySize;
         pdata += copySize;
     }
+}
+
 }
 
 class WebsocketParserTest : public ::testing::Test

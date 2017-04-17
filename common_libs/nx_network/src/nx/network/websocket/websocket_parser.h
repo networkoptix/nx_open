@@ -15,6 +15,8 @@ public:
     virtual void frameEnded() = 0;
     virtual void messageEnded() = 0;
     virtual void handleError(Error err) = 0;
+
+    virtual ~ParserHandler() {}
 };
 
 class NX_NETWORK_API Parser

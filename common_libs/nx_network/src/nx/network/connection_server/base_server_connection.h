@@ -112,11 +112,11 @@ public:
         m_streamSocket->dispatch(
             [this, inactivityTimeout]()
             {
-                m_receiving = true;
                 setInactivityTimeout(inactivityTimeout);
                 if (!m_streamSocket->setNonBlockingMode(true))
                     return onBytesRead(SystemError::getLastOSErrorCode(), (size_t)-1);
 
+                m_receiving = true;
                 m_streamSocket->readSomeAsync(
                     &m_readBuffer,
                     std::bind(&SelfType::onBytesRead, this, _1, _2));
@@ -329,6 +329,8 @@ class BaseServerConnectionHandler
 public:
     virtual void bytesReceived(nx::Buffer& buffer) = 0;
     virtual void readyToSendData(size_t count) = 0;
+
+    virtual ~BaseServerConnectionHandler() {}
 };
 
 class BaseServerConnectionWrapper : 
