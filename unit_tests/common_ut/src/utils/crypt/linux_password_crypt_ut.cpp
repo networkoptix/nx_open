@@ -5,7 +5,7 @@
 
 #include <gtest/gtest.h>
 
-#include <utils/crypt/linux_passwd_crypt.h>
+#include <nx/utils/crypt/linux_passwd_crypt.h>
 
 
 TEST(linuxCrypt, generateSalt)

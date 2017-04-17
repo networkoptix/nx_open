@@ -323,7 +323,7 @@ void Ec2MserverCloudSynchronization::addCloudUserLocally(
     accountVmsData->email = QString::fromStdString(accountEmail);
     accountVmsData->name = QString::fromStdString(accountEmail);
     accountVmsData->userRoleId = QnUuid::createUuid();
-    accountVmsData->realm = QnAppInfo::realm();
+    accountVmsData->realm = nx::network::AppInfo::realm();
     accountVmsData->hash = "password_is_in_cloud";
     accountVmsData->digest = "password_is_in_cloud";
     // TODO: randomize access rights

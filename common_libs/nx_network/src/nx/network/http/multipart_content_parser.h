@@ -1,6 +1,6 @@
 #pragma once 
 
-#include "utils/media/abstract_byte_stream_filter.h"
+#include "nx/utils/abstract_byte_stream_filter.h"
 #include "linesplitter.h"
 
 namespace nx_http {
@@ -10,15 +10,13 @@ namespace nx_http {
  * Output: separate content frames.
  */
 class NX_NETWORK_API MultipartContentParser:
-    public AbstractByteStreamFilter
+    public nx::utils::bsf::AbstractByteStreamFilter
 {
 public:
     MultipartContentParser();
     virtual ~MultipartContentParser();
 
-    /** Implementation of AbstractByteStreamFilter::processData */
     virtual bool processData( const QnByteArrayConstRef& data ) override;
-    /** Implementation of AbstractByteStreamFilter::flush */
     virtual size_t flush() override;
 
     /**

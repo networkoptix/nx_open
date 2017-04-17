@@ -288,7 +288,7 @@ void CloudUserAuthenticator::fetchAuthorizationFromCloud(
 
     nx::cdb::api::AuthRequest authRequest;
     authRequest.nonce = std::string(cloudNonce.constData(), cloudNonce.size());
-    authRequest.realm = QnAppInfo::realm().toStdString();
+    authRequest.realm = nx::network::AppInfo::realm().toStdString();
     authRequest.username = std::string(userid.data(), userid.size());
 
     //marking that request is in progress

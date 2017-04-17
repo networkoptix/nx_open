@@ -94,6 +94,7 @@
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <nx_ec/managers/abstract_server_manager.h>
 #include <nx/network/socket.h>
+#include <nx/network/upnp/upnp_device_searcher.h>
 
 #include <plugins/native_sdk/common_plugin_container.h>
 #include <plugins/plugin_manager.h>
@@ -104,6 +105,7 @@
 
 #include <plugins/resource/mserver_resource_searcher.h>
 #include <plugins/resource/mdns/mdns_listener.h>
+#include <plugins/resource/upnp/global_settings_to_device_searcher_settings_adapter.h>
 
 #include <plugins/storage/file_storage/file_storage_resource.h>
 #include <plugins/storage/file_storage/db_storage_resource.h>
@@ -1974,7 +1976,10 @@ bool MediaServerProcess::initTcpListener(
 
 std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMapper()
 {
-    auto mapper = std::make_unique<nx_upnp::PortMapper>(/*isEnabled*/ false);
+    auto mapper = std::make_unique<nx_upnp::PortMapper>(
+        /*isEnabled*/ false,
+        nx_upnp::PortMapper::DEFAULT_CHECK_MAPPINGS_INTERVAL,
+        QnAppInfo::organizationName());
     auto updateEnabled =
         [mapper = mapper.get(), this]()
         {
@@ -2826,7 +2831,8 @@ void MediaServerProcess::run()
     QnResource::initAsyncPoolInstance();
 
     // ============================
-    std::unique_ptr<nx_upnp::DeviceSearcher> upnpDeviceSearcher(new nx_upnp::DeviceSearcher(globalSettings));
+    GlobalSettingsToDeviceSearcherSettingsAdapter upnpDeviceSearcherSettings(globalSettings);
+    auto upnpDeviceSearcher = std::make_unique<nx_upnp::DeviceSearcher>(upnpDeviceSearcherSettings);
     std::unique_ptr<QnMdnsListener> mdnsListener(new QnMdnsListener());
 
     std::unique_ptr<QnAppserverResourceProcessor> serverResourceProcessor( new QnAppserverResourceProcessor(
@@ -2895,7 +2901,7 @@ void MediaServerProcess::run()
         {
             if (settingsProxy->isCloudInstanceChanged())
                 qWarning() << "Cloud instance changed from" << globalSettings->cloudHost() <<
-                    "to" << QnAppInfo::defaultCloudHost() << ". Server goes to the new state";
+                    "to" << nx::network::AppInfo::defaultCloudHost() << ". Server goes to the new state";
 
             resetSystemState(cloudManagerGroup.connectionManager);
         }
@@ -2919,7 +2925,7 @@ void MediaServerProcess::run()
 
             } while (errCode != ec2::ErrorCode::ok && !m_needStop);
         }
-        globalSettings->setCloudHost(QnAppInfo::defaultCloudHost());
+        globalSettings->setCloudHost(nx::network::AppInfo::defaultCloudHost());
         globalSettings->synchronizeNow();
     }
 

@@ -6,8 +6,12 @@
 #include <QtZlib/zlib.h>
 #endif
 
+namespace nx {
+namespace utils {
+namespace bsf {
+namespace gzip {
 
-QByteArray GZipCompressor::compressData(const QByteArray& data)
+QByteArray Compressor::compressData(const QByteArray& data)
 {
     QByteArray result;
 
@@ -24,8 +28,6 @@ QByteArray GZipCompressor::compressData(const QByteArray& data)
         , 255           // unknown OS
     };
 
-
-
     QByteArray compressedData = qCompress(data);
     QByteArray cleanData = QByteArray::fromRawData(compressedData.data() + QT_HEADER_SIZE + ZLIB_HEADER_SIZE, 
         compressedData.size() - (QT_HEADER_SIZE + ZLIB_HEADER_SIZE + ZLIB_SUFFIX_SIZE));
@@ -38,3 +40,8 @@ QByteArray GZipCompressor::compressData(const QByteArray& data)
     result.append((const char*) &tmp, sizeof(quint32));
     return result;
 }
+
+} // namespace gzip
+} // namespace bsf
+} // namespace utils
+} // namespace nx

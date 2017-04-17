@@ -18,7 +18,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
 #include <utils/common/sync_call.h>
-#include <utils/crypt/linux_passwd_crypt.h>
+#include <nx/utils/crypt/linux_passwd_crypt.h>
 
 #include "http/get_listening_peer_list_handler.h"
 #include "local_cloud_data_provider.h"

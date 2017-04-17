@@ -227,7 +227,7 @@ void QnDisconnectFromCloudDialogPrivate::showFailure(const QString &message)
 
     QnMessageBox::critical(q,
         tr("Failed to disconnect System from %1", "%1 is the cloud name (like 'Nx Cloud')")
-            .arg(QnAppInfo::cloudName()),
+            .arg(nx::network::AppInfo::cloudName()),
         message);
 
     lockUi(false);
@@ -322,7 +322,7 @@ bool QnDisconnectFromCloudDialogPrivate::validateAuth()
 QString QnDisconnectFromCloudDialogPrivate::disconnectQuestionMessage() const
 {
     return tr("Disconnect System from %1?",
-        "%1 is the cloud name (like 'Nx Cloud')").arg(QnAppInfo::cloudName());
+        "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName());
 }
 
 QString QnDisconnectFromCloudDialogPrivate::allUsersDisabledMessage() const
@@ -397,7 +397,7 @@ void QnDisconnectFromCloudDialogPrivate::setupResetPasswordPage()
     q->setInformativeText(
         tr("You will not be able to connect to this System with your %1 account after you disconnect this System from %1.",
             "%1 is the cloud name (like 'Nx Cloud')")
-            .arg(QnAppInfo::cloudName()));
+            .arg(nx::network::AppInfo::cloudName()));
 
     authorizeWidget->hide(); /*< we are still parent of this widget to make sure it won't leak */
     q->removeCustomWidget(authorizeWidget);

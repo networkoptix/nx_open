@@ -44,7 +44,8 @@ public:
 TEST( UpnpDeviceSearcher, DISABLED_General )
 {
     nx::utils::TimerManager timerManager;
-    DeviceSearcher deviceSearcher(nullptr);
+    DeviceSearcherDefaultSettings deviceSearcherSettings;
+    DeviceSearcher deviceSearcher(deviceSearcherSettings);
     TestSearchHandler testSearcher;
     QThread::sleep( 5 );
 }

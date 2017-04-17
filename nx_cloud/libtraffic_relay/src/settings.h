@@ -32,7 +32,7 @@ struct ListeningPeer
 
 struct ConnectingPeer
 {
-    std::chrono::seconds connectSessionIdleTimeout;
+    std::chrono::milliseconds connectSessionIdleTimeout;
 
     ConnectingPeer();
 };

@@ -4,7 +4,8 @@ namespace nx {
 namespace cloud {
 namespace relay {
 
-Model::Model(const conf::Settings& /*settings*/)
+Model::Model(const conf::Settings& settings):
+    m_clientSessionPool(settings)
 {
 }
 

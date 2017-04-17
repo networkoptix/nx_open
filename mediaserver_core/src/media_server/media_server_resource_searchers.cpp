@@ -1,5 +1,6 @@
 #include "media_server_resource_searchers.h"
 
+#include <api/global_settings.h>
 #include <core/resource_management/resource_discovery_manager.h>
 
 #include <plugins/resource/desktop_camera/desktop_camera_resource_searcher.h>
