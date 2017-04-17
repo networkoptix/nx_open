@@ -162,10 +162,10 @@ private:
     void performActionsOnExit();
     void parseCommandLineParameters(int argc, char* argv[]);
     void updateAllowedInterfaces();
-    void addCommandLineParametersFromConfig();
+    void addCommandLineParametersFromConfig(MSSettings* settings);
     void saveServerInfo(const QnMediaServerResourcePtr& server);
 
-    void serviceModePreInit();
+    void serviceModeInit();
     void initTransactionLog(const QString& logDir, QnLogLevel level);
     void initPermissionsLog(const QString& logDir, QnLogLevel level);
     QString hardwareIdAsGuid();

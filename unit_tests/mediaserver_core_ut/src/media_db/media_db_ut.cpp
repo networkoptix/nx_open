@@ -815,9 +815,9 @@ TEST(MediaDbTest, StorageDB)
     const QString workDirPath = *workDirResource.getDirName();
 
     QnWriterPool writerPool;
+    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
     std::unique_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule());
     serverModule->commonModule()->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
-    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
 
     bool result;
     QnFileStorageResourcePtr storage(new QnFileStorageResource(serverModule->commonModule()));
@@ -941,9 +941,9 @@ TEST(MediaDbTest, StorageDB)
 
 TEST(MediaDbTest, Migration_from_sqlite)
 {
+    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
     std::unique_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule());
     serverModule->commonModule()->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
-    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
 
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
