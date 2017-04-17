@@ -72,7 +72,7 @@ void Websocket::readSomeAsync(
     nx::Buffer* const buffer,
     std::function<void(SystemError::ErrorCode, size_t)> handler)
 {
-    m_readHandler = handler;
+    m_readHandler = std::move(handler);
     m_readBuffer = buffer;
 
     if (!m_requestData.isEmpty())
@@ -114,7 +114,7 @@ void Websocket::sendAsync(
     }
 
     m_baseConnection.sendBufAsync(buffer);
-    m_writeHandler = handler;
+    m_writeHandler = std::move(handler);
 }
 
 void Websocket::cancelIOSync(nx::network::aio::EventType /*eventType*/)
