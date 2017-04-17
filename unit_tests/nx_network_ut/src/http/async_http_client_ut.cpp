@@ -401,13 +401,14 @@ protected:
     {
         nx::utils::promise<SocketAddress> address;
         serverThread = nx::utils::thread(
-            [response, breakAfterResponse, &address]()
+            [this, response, breakAfterResponse, &address]()
             {
                 const auto server = std::make_unique<nx::network::TCPServerSocket>(
                     SocketFactory::tcpClientIpVersion());
 
-                ASSERT_TRUE(server->bind(SocketAddress::anyAddress));
+                ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
                 ASSERT_TRUE(server->listen());
+                NX_LOGX(lm("Server address: %1").str(server->getLocalAddress()), cl_logINFO);
                 address.set_value(server->getLocalAddress());
 
                 std::unique_ptr<AbstractStreamSocket> client(server->accept());
@@ -476,6 +477,7 @@ TEST_F(AsyncHttpClientCustom, ConnectionBreak)
         [](const nx_http::AsyncHttpClientPtr& client)
         {
             EXPECT_TRUE(client->failed());
+            EXPECT_EQ(client->fetchMessageBodyBuffer(), QByteArray("not enough content"));
             EXPECT_NE(SystemError::noError, client->lastSysErrorCode());
         });
 }
