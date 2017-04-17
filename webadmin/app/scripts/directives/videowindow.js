@@ -51,6 +51,8 @@ angular.module('webadminApp')
                     if( scope.debugMode){
                         console.log("playing",src?src.src:null);
                     }
+                    //return "http://sample.vodobox.net/skate_phantom_flex_4k/skate_phantom_flex_4k.m3u8";
+                    //return "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8";
                     //return "http://184.72.239.149/vod/smil:BigBuckBunny.smil/playlist.m3u8";
                     return src?src.src:null;
                 }

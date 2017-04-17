@@ -11,7 +11,8 @@ angular.module('webadminApp')
                 liveOnly: '=',
                 canPlayLive: '=',
                 ngClick: '&',
-                positionHandler: '='
+                positionHandler: '=',
+                volumeLevel: '='
             },
             templateUrl: 'views/components/timeline.html',
             link: function (scope, element/*, attrs*/) {
