@@ -1,10 +1,11 @@
 #pragma once
 
-#include <nx/utils/move_only_func.h>
+#include <memory>
 
 #include <nx/network/cloud/tunnel/relay/api/relay_api_data_types.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_result_code.h>
 #include <nx/network/http/server/http_server_connection.h>
+#include <nx/utils/move_only_func.h>
 
 namespace nx {
 namespace cloud {
@@ -18,6 +19,8 @@ class ListeningPeerPool;
 } // namespace model
 
 namespace controller {
+
+class AbstractTrafficRelay;
 
 class ConnectSessionManager
 {
@@ -41,7 +44,9 @@ public:
     ConnectSessionManager(
         const conf::Settings& settings,
         model::ClientSessionPool* clientSessionPool,
-        model::ListeningPeerPool* listeningPeerPool);
+        model::ListeningPeerPool* listeningPeerPool,
+        controller::AbstractTrafficRelay* trafficRelay);
+    ~ConnectSessionManager();
 
     void beginListening(
         const api::BeginListeningRequest& request,
@@ -59,9 +64,22 @@ private:
     const conf::Settings& m_settings;
     model::ClientSessionPool* m_clientSessionPool;
     model::ListeningPeerPool* m_listeningPeerPool;
+    controller::AbstractTrafficRelay* m_trafficRelay;
 
     void saveServerConnection(
         const std::string& peerName,
+        nx_http::HttpServerConnection* httpConnection);
+
+    void onAcquiredListeningPeerConnection(
+        const std::string& connectSessionId,
+        const std::string& listeningPeerName,
+        ConnectSessionManager::ConnectToPeerHandler completionHandler,
+        api::ResultCode resultCode,
+        std::unique_ptr<AbstractStreamSocket> listeningPeerConnection);
+    void startRelaying(
+        const std::string& clientSessionId,
+        const std::string& listeningPeerName,
+        std::unique_ptr<AbstractStreamSocket> listeningPeerConnection,
         nx_http::HttpServerConnection* httpConnection);
 };
 
