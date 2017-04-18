@@ -15,45 +15,240 @@ namespace network {
 namespace ssl {
 namespace test {
 
+namespace {
+
+class AbstractReflectorPool
+{
+public:
+    virtual ~AbstractReflectorPool() = default;
+
+    virtual void add(std::unique_ptr<AbstractStreamSocket> streamSocket) = 0;
+    virtual std::size_t count() const = 0;
+    virtual std::unique_ptr<AbstractStreamSocket> takeSocket() = 0;
+};
+
+class SynchronousReflector
+{
+public:
+    SynchronousReflector(std::unique_ptr<AbstractStreamSocket> streamSocket):
+        m_streamSocket(std::move(streamSocket)),
+        m_terminated(false)
+    {
+    }
+
+    ~SynchronousReflector()
+    {
+        stop();
+    }
+
+    void stop()
+    {
+        if (!m_terminated)
+        {
+            m_terminated = true;
+            m_ioThread.join();
+        }
+    }
+
+    void start()
+    {
+        m_ioThread = nx::utils::thread(
+            std::bind(&SynchronousReflector::ioThreadMain, this));
+    }
+
+    std::unique_ptr<AbstractStreamSocket> takeSocket()
+    {
+        stop();
+
+        decltype(m_streamSocket) result;
+        result.swap(m_streamSocket);
+        return result;
+    }
+
+private:
+    nx::utils::thread m_ioThread;
+    std::unique_ptr<AbstractStreamSocket> m_streamSocket;
+    std::atomic<bool> m_terminated;
+
+    void ioThreadMain()
+    {
+        if (!m_streamSocket->setRecvTimeout(std::chrono::milliseconds(1)) ||
+            !m_streamSocket->setSendTimeout(std::chrono::milliseconds(1)))
+        {
+            return;
+        }
+
+        while (!m_terminated)
+        {
+            std::array<char, 4 * 1024> readBuf;
+
+            int bytesRead = m_streamSocket->recv(readBuf.data(), (int)readBuf.size());
+            if (bytesRead <= 0)
+            {
+                if (SystemError::getLastOSErrorCode() == SystemError::timedOut)
+                    continue;
+                break;
+            }
+
+            int bytesWritten = m_streamSocket->send(readBuf.data(), bytesRead);
+            if (bytesWritten != bytesRead)
+            {
+                if (SystemError::getLastOSErrorCode() == SystemError::timedOut)
+                    continue;
+                break;
+            }
+        }
+    }
+};
+
+class SynchronousReflectorPool:
+    public AbstractReflectorPool
+{
+public:
+    virtual ~SynchronousReflectorPool()
+    {
+        for (auto& syncReflector: m_reflectors)
+            syncReflector.reset();
+    }
+
+    virtual void add(std::unique_ptr<AbstractStreamSocket> streamSocket) override
+    {
+        ASSERT_TRUE(streamSocket->setNonBlockingMode(false));
+        auto syncReflector = std::make_unique<SynchronousReflector>(std::move(streamSocket));
+        syncReflector->start();
+        m_reflectors.push_back(std::move(syncReflector));
+    }
+
+    virtual std::size_t count() const override
+    {
+        return m_reflectors.size();
+    }
+
+    virtual std::unique_ptr<AbstractStreamSocket> takeSocket() override
+    {
+        auto result = m_reflectors.front()->takeSocket();
+        m_reflectors.pop_front();
+        return result;
+    }
+
+private:
+    std::deque<std::unique_ptr<SynchronousReflector>> m_reflectors;
+};
+
+using AbstractStreamSocketAsyncReflector = aio::AsyncChannelReflector<AbstractStreamSocket>;
+
+class AsynchronousReflectorPool:
+    public AbstractReflectorPool
+{
+public:
+    AsynchronousReflectorPool():
+        m_terminated(false)
+    {
+    }
+
+    virtual ~AsynchronousReflectorPool()
+    {
+        decltype (m_reflectors) acceptedConnections;
+        {
+            QnMutexLocker lock(&m_mutex);
+            m_terminated = true;
+            acceptedConnections.swap(m_reflectors);
+        }
+
+        for (auto& connection: acceptedConnections)
+            connection->pleaseStopSync();
+    }
+
+    virtual void add(std::unique_ptr<AbstractStreamSocket> streamSocket) override
+    {
+        using namespace std::placeholders;
+
+        ASSERT_TRUE(streamSocket->setNonBlockingMode(true));
+
+        QnMutexLocker lock(&m_mutex);
+        m_reflectors.push_back(nullptr);
+        auto asyncReflector =
+            std::make_unique<AbstractStreamSocketAsyncReflector>(
+                std::move(streamSocket));
+        asyncReflector->start(
+            std::bind(&AsynchronousReflectorPool::onReflectorDone, this,
+                --m_reflectors.end(), _1));
+        m_reflectors.back() = std::move(asyncReflector);
+    }
+
+    virtual std::size_t count() const override
+    {
+        return m_reflectors.size();
+    }
+
+    virtual std::unique_ptr<AbstractStreamSocket> takeSocket() override
+    {
+        auto result = m_reflectors.front()->takeChannel();
+        m_reflectors.pop_front();
+        return result;
+    }
+
+private:
+    std::list<std::unique_ptr<AbstractStreamSocketAsyncReflector>> m_reflectors;
+    bool m_terminated;
+    QnMutex m_mutex;
+
+    void onReflectorDone(
+        std::list<std::unique_ptr<AbstractStreamSocketAsyncReflector>>::iterator reflectorIter,
+        SystemError::ErrorCode /*sysErrorCode*/)
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (!m_terminated)
+            m_reflectors.erase(reflectorIter);
+    }
+};
+
+} // namespace
+
 //-------------------------------------------------------------------------------------------------
 // Test fixture
 
 /**
  * These tests use SyncSslSocket on one side to guarantee that ssl is actually implied in test.
  */
-class SslSocketServerSide:
+class SslSocketVerifySslIsActuallyUsed:
     public ::testing::Test
 {
 public:
-    SslSocketServerSide():
+    SslSocketVerifySslIsActuallyUsed():
         m_clientSocket(std::make_unique<TCPSocket>(AF_INET)),
-        m_terminated(false)
+        m_reflectorPoolInUse(nullptr)
     {
+        switchToSynchronousMode();
+
         startAcceptor();
     }
 
-    ~SslSocketServerSide()
+    ~SslSocketVerifySslIsActuallyUsed()
     {
-        if (m_acceptor)
-            m_acceptor->pleaseStopSync();
+        stopAcceptor();
+    }
 
-        decltype (m_acceptedConnections) acceptedConnections;
-        {
-            QnMutexLocker lock(&m_mutex);
-            m_terminated = true;
-            acceptedConnections.swap(m_acceptedConnections);
-        }
+    void switchToSynchronousMode()
+    {
+        m_reflectorPoolInUse = &m_synchronousReflectorPool;
+    }
 
-        for (auto& connection: acceptedConnections)
-            connection.reflector->pleaseStopSync();
+    void switchToAsynchronousMode()
+    {
+        m_reflectorPoolInUse = &m_asynchronousReflectorPool;
     }
 
 protected:
+    void givenEstablishedConnection()
+    {
+        ASSERT_TRUE(m_clientSocket.connect(m_acceptor->getLocalAddress()));
+    }
+
     void whenSentRandomData()
     {
         prepareTestData();
 
-        ASSERT_TRUE(m_clientSocket.connect(m_acceptor->getLocalAddress()));
         ASSERT_EQ(
             m_testData.size(),
             m_clientSocket.send(m_testData.constData(), m_testData.size()));
@@ -70,25 +265,31 @@ protected:
         ASSERT_EQ(m_testData, response);
     }
 
-private:
-    struct AcceptedConnectionContext
+    void stopAcceptor()
     {
-        std::unique_ptr<aio::BasicPollable> reflector;
-    };
+        if (m_acceptor)
+            m_acceptor->pleaseStopSync();
+    }
 
-    //struct AcceptResult
-    //{
-    //    SystemError::ErrorCode sysErrorCode = SystemError::noError;
-    //    std::unique_ptr<AbstractStreamSocket> streamSocket;
-    //};
+    AbstractReflectorPool* reflectorPoolInUse()
+    {
+        return m_reflectorPoolInUse;
+    }
 
+    AbstractReflectorPool* unusedReflectorPool()
+    {
+        return m_reflectorPoolInUse == &m_asynchronousReflectorPool
+            ? static_cast<AbstractReflectorPool*>(&m_synchronousReflectorPool)
+            : static_cast<AbstractReflectorPool*>(&m_asynchronousReflectorPool);
+    }
+
+private:
     std::unique_ptr<ssl::StreamServerSocket> m_acceptor;
-    std::list<AcceptedConnectionContext> m_acceptedConnections;
-    //utils::SyncQueue<AcceptResult> m_acceptResults;
     ClientSyncSslSocket m_clientSocket;
     nx::Buffer m_testData;
-    mutable QnMutex m_mutex;
-    bool m_terminated;
+    AsynchronousReflectorPool m_asynchronousReflectorPool;
+    SynchronousReflectorPool m_synchronousReflectorPool;
+    AbstractReflectorPool* m_reflectorPoolInUse;
 
     void startAcceptor()
     {
@@ -102,7 +303,7 @@ private:
         ASSERT_TRUE(m_acceptor->bind(SocketAddress::anyPrivateAddress));
         ASSERT_TRUE(m_acceptor->listen());
         m_acceptor->acceptAsync(
-            std::bind(&SslSocketServerSide::onAcceptCompletion, this, _1, _2));
+            std::bind(&SslSocketVerifySslIsActuallyUsed::onAcceptCompletion, this, _1, _2));
     }
 
     void onAcceptCompletion(
@@ -115,25 +316,9 @@ private:
         ASSERT_TRUE(streamSocket->setNonBlockingMode(true));
 
         m_acceptor->acceptAsync(
-            std::bind(&SslSocketServerSide::onAcceptCompletion, this, _1, _2));
+            std::bind(&SslSocketVerifySslIsActuallyUsed::onAcceptCompletion, this, _1, _2));
 
-        QnMutexLocker lock(&m_mutex);
-        m_acceptedConnections.push_back(AcceptedConnectionContext());
-        auto reflector = aio::makeAsyncChannelReflector(
-            std::unique_ptr<AbstractStreamSocket>(streamSocket));
-        reflector->start(
-            std::bind(&SslSocketServerSide::onReflectorDone, this,
-                --m_acceptedConnections.end(), _1));
-        m_acceptedConnections.back().reflector = std::move(reflector);
-    }
-
-    void onReflectorDone(
-        std::list<AcceptedConnectionContext>::iterator reflectorIter,
-        SystemError::ErrorCode /*sysErrorCode*/)
-    {
-        QnMutexLocker lock(&m_mutex);
-        if (!m_terminated)
-            m_acceptedConnections.erase(reflectorIter);
+        m_reflectorPoolInUse->add(std::unique_ptr<AbstractStreamSocket>(streamSocket));
     }
 
     void prepareTestData()
@@ -144,12 +329,90 @@ private:
 };
 
 //-------------------------------------------------------------------------------------------------
-// Test cases
+// Asynchronous I/O
 
-TEST_F(SslSocketServerSide, send_receive_data)
+class SslSocketVerifySslIsActuallyUsedByAsyncIo:
+    public SslSocketVerifySslIsActuallyUsed
 {
+public:
+    SslSocketVerifySslIsActuallyUsedByAsyncIo()
+    {
+        switchToAsynchronousMode();
+    }
+};
+
+TEST_F(SslSocketVerifySslIsActuallyUsedByAsyncIo, read_write)
+{
+    givenEstablishedConnection();
     whenSentRandomData();
     thenSameDataHasBeenReceivedInResponse();
+}
+
+//-------------------------------------------------------------------------------------------------
+// Synchronous I/O
+
+class SslSocketVerifySslIsActuallyUsedBySyncIo:
+    public SslSocketVerifySslIsActuallyUsed
+{
+public:
+    SslSocketVerifySslIsActuallyUsedBySyncIo()
+    {
+        switchToSynchronousMode();
+    }
+};
+
+TEST_F(SslSocketVerifySslIsActuallyUsedBySyncIo, read_write)
+{
+    givenEstablishedConnection();
+    whenSentRandomData();
+    thenSameDataHasBeenReceivedInResponse();
+}
+
+//-------------------------------------------------------------------------------------------------
+// Mixing sync & async mode.
+
+class SslSocketSwitchIoMode:
+    public SslSocketVerifySslIsActuallyUsed
+{
+protected:
+    void exchangeDataInSyncMode()
+    {
+        switchToSynchronousMode();
+        whenSentRandomData();
+        thenSameDataHasBeenReceivedInResponse();
+    }
+
+    void changeSocketIoMode()
+    {
+        ASSERT_EQ(1, reflectorPoolInUse()->count());
+        auto socket = reflectorPoolInUse()->takeSocket();
+        unusedReflectorPool()->add(std::move(socket));
+    }
+
+    void exchangeDataInAsyncMode()
+    {
+        switchToAsynchronousMode();
+        whenSentRandomData();
+        thenSameDataHasBeenReceivedInResponse();
+    }
+};
+
+TEST_F(SslSocketSwitchIoMode, from_async_to_sync)
+{
+    givenEstablishedConnection();
+
+    exchangeDataInAsyncMode();
+    changeSocketIoMode();
+    exchangeDataInSyncMode();
+}
+
+TEST_F(SslSocketSwitchIoMode, from_sync_to_async)
+{
+    givenEstablishedConnection();
+    
+    exchangeDataInSyncMode();
+    changeSocketIoMode();
+    exchangeDataInAsyncMode();
 }
 
 //-------------------------------------------------------------------------------------------------
