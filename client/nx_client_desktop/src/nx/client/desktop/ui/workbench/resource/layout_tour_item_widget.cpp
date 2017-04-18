@@ -3,11 +3,14 @@
 #include <QtGui/QGuiApplication>
 
 #include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QSpinBox>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
 #include <camera/camera_thumbnail_manager.h>
 
 #include <core/resource/layout_resource.h>
+
+#include <text/time_strings.h>
 
 #include <ui/common/palette.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
@@ -17,6 +20,7 @@
 #include <nx/client/desktop/ui/graphics/painters/layout_preview_painter.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 
@@ -34,6 +38,7 @@ public:
     LayoutPreviewWidget(QSharedPointer<LayoutPreviewPainter> previewPainter):
         m_previewPainter(previewPainter)
     {
+        setAcceptedMouseButtons(0);
     }
 
     virtual void paint(QPainter* painter,
@@ -63,8 +68,8 @@ LayoutTourItemWidget::LayoutTourItemWidget(
 
     NX_EXPECT(m_layout, "LayoutTourItemWidget was created with a non-layout resource.");
     m_previewPainter->setLayout(m_layout);
-    m_previewPainter->setFrameColor(Qt::black);
-    m_previewPainter->setBackgroundColor(QColor("#222B2F"));
+    m_previewPainter->setFrameColor(Qt::black);                 //TODO: #GDM #3.1 customize
+    m_previewPainter->setBackgroundColor(QColor("#222B2F"));    //TODO: #GDM #3.1 customize
 
     setAcceptDrops(true);
 
@@ -75,9 +80,23 @@ LayoutTourItemWidget::~LayoutTourItemWidget()
 {
 }
 
+int LayoutTourItemWidget::order() const
+{
+    return m_order;
+}
+
+void LayoutTourItemWidget::setOrder(int value)
+{
+    if (m_order == value)
+        return;
+    m_order = value;
+    emit orderChanged(value);
+}
+
 void LayoutTourItemWidget::initOverlay()
 {
     auto icon = new GraphicsPixmap();
+    icon->setAcceptedMouseButtons(0);
 
     auto updateIcon = [this, icon]
         {
@@ -114,14 +133,40 @@ void LayoutTourItemWidget::initOverlay()
     headerLayout->addStretch();
     headerLayout->addItem(closeButton);
 
-    auto delayLabel = new GraphicsLabel();
-    delayLabel->setAcceptedMouseButtons(0);
-    delayLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
-    delayLabel->setText(QString::number(item()->data(Qn::LayoutTourItemDelayMsRole).toInt()));
+    auto orderLabel = new GraphicsLabel();
+    orderLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
+    orderLabel->setAcceptedMouseButtons(0);
+    auto updateOrder = [orderLabel](int order)
+        {
+            orderLabel->setText(QString::number(order));
+        };
+    updateOrder(m_order);
+    connect(this, &LayoutTourItemWidget::orderChanged, this, updateOrder);
+
+    auto delayHintLabel = new GraphicsLabel(tr("Display for"));
+    delayHintLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
+    delayHintLabel->setAcceptedMouseButtons(0);
+
+    auto delayEdit = new QSpinBox();
+    delayEdit->setSuffix(QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
+    delayEdit->setMinimum(1);
+    delayEdit->setMaximum(99);
+    const auto delayMs = item()->data(Qn::LayoutTourItemDelayMsRole).toInt();
+    delayEdit->setValue(delayMs / 1000);
+    connect(delayEdit, QnSpinboxIntValueChanged, this,
+        [this](int value)
+        {
+            item()->setData(Qn::LayoutTourItemDelayMsRole, value * 1000);
+        });
+
+    auto delayWidget = new QGraphicsProxyWidget();
+    delayWidget->setWidget(delayEdit);
 
     auto footerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    footerLayout->addItem(orderLabel);
     footerLayout->addStretch();
-    footerLayout->addItem(delayLabel);
+    footerLayout->addItem(delayHintLabel);
+    footerLayout->addItem(delayWidget);
 
     auto contentWidget = new LayoutPreviewWidget(m_previewPainter);
 

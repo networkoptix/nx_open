@@ -70,15 +70,17 @@ void LayoutPreviewPainter::paint(QPainter* painter, const QRect& paintRect)
     if (paintRect.isEmpty())
         return;
 
-    QnNxStyle::paintCosmeticFrame(painter, paintRect, m_frameColor, kFrameWidth, 0);
-
     if (!m_layout)
+    {
+        QnNxStyle::paintCosmeticFrame(painter, paintRect, m_frameColor, kFrameWidth, 0);
         return;
+    }
 
     QRect rect(paintRect);
 
     rect.adjust(kFrameWidth, kFrameWidth, -kFrameWidth, -kFrameWidth);
     painter->fillRect(paintRect, m_backgroundColor);
+    QnNxStyle::paintCosmeticFrame(painter, paintRect, m_frameColor, kFrameWidth, 0);
 
     //TODO: #GDM #3.1 paint layout background and calculate its size in bounding geometry
     QRectF bounding;

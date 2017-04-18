@@ -23,12 +23,19 @@ public:
         QGraphicsItem* parent = nullptr);
     virtual ~LayoutTourItemWidget() override;
 
+    int order() const;
+    void setOrder(int value);
+
+signals:
+    void orderChanged(int value);
+
 private:
     void initOverlay();
 
 private:
     QnLayoutResourcePtr m_layout;
     QSharedPointer<LayoutPreviewPainter> m_previewPainter;
+    int m_order{0};
 };
 
 } // namespace workbench

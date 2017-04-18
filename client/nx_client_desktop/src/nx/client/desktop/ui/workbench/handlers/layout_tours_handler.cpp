@@ -16,6 +16,7 @@
 #include <ui/dialogs/layout_tour_dialog.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/extensions/workbench_layout_tour_controller.h>
 
@@ -142,7 +143,29 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
                 .value<QnUuid>();
             auto tour = qnLayoutTourManager->tour(id);
             NX_EXPECT(tour.isValid());
-            qDebug() << "Here we will save review layout";
+
+            auto items = workbench()->currentLayout()->items().toList();
+            std::sort(items.begin(), items.end(),
+                [](QnWorkbenchItem* l, QnWorkbenchItem* r)
+                {
+                    QRect lg = l->geometry();
+                    QRect rg = r->geometry();
+                    return lg.y() < rg.y() || (lg.y() == rg.y() && lg.x() < rg.x());
+                });
+            tour.items.clear();
+            for (auto item: items)
+            {
+                const auto layout = resourcePool()->getResourceByUniqueId(item->resourceUid());
+                NX_EXPECT(layout);
+                if (!layout)
+                    continue;
+
+                const auto delayMs = item->data(Qn::LayoutTourItemDelayMsRole).toInt();
+                tour.items.emplace_back(layout->getId(), delayMs);
+            }
+
+            qnLayoutTourManager->addOrUpdateTour(tour);
+            saveTourToServer(tour);
         });
 
     connect(action(QnActions::ReviewLayoutTourAction), &QAction::triggered, this,
