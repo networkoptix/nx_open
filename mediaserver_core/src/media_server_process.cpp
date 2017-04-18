@@ -1034,7 +1034,19 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
 
     parseCommandLineParameters(argc, argv);
 
+    MSSettings settings(
+        m_cmdLineArguments.configFilePath,
+        m_cmdLineArguments.rwConfigFilePath);
+
+    addCommandLineParametersFromConfig(&settings);
+
+    const bool isStatisticsDisabled =
+        settings.roSettings()->value(QnServer::kNoMonitorStatistics, false).toBool();
+
     m_platform.reset(new QnPlatformAbstraction());
+    m_platform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
+    m_platform->setUpdatePeriodMs(
+        isStatisticsDisabled ? 0 : QnGlobalMonitor::kDefaultUpdatePeridMs);
 }
 
 void MediaServerProcess::initTransactionLog(const QString& logDir, QnLogLevel level)
@@ -1127,20 +1139,20 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
         std::cout << nx::utils::AppInfo::applicationFullVersion().toStdString() << std::endl;
 }
 
-void MediaServerProcess::addCommandLineParametersFromConfig()
+void MediaServerProcess::addCommandLineParametersFromConfig(MSSettings* settings)
 {
     // move arguments from conf file / registry
 
     if (m_cmdLineArguments.rebuildArchive.isEmpty())
-        m_cmdLineArguments.rebuildArchive = qnServerModule->runTimeSettings()->value("rebuild").toString();
+        m_cmdLineArguments.rebuildArchive = settings->runTimeSettings()->value("rebuild").toString();
 
     if (m_cmdLineArguments.msgLogLevel.isEmpty())
-        m_cmdLineArguments.msgLogLevel = qnServerModule->roSettings()->value(
+        m_cmdLineArguments.msgLogLevel = settings->roSettings()->value(
             nx_ms_conf::HTTP_MSG_LOG_LEVEL,
             nx_ms_conf::DEFAULT_HTTP_MSG_LOG_LEVEL).toString();
 
     if (m_cmdLineArguments.ec2TranLogLevel.isEmpty())
-        m_cmdLineArguments.ec2TranLogLevel = qnServerModule->roSettings()->value(
+        m_cmdLineArguments.ec2TranLogLevel = settings->roSettings()->value(
             nx_ms_conf::EC2_TRAN_LOG_LEVEL,
             nx_ms_conf::DEFAULT_EC2_TRAN_LOG_LEVEL).toString();
 }
@@ -1149,9 +1161,6 @@ MediaServerProcess::~MediaServerProcess()
 {
     quit();
     stop();
-
-    if( defaultMsgHandler )
-        qInstallMessageHandler( defaultMsgHandler );
 }
 
 bool MediaServerProcess::isStopping() const
@@ -2173,7 +2182,7 @@ void MediaServerProcess::updateAllowedInterfaces()
     setInterfaceListFilter(allowedInterfaces);
 }
 
-QString MediaServerProcess::hardwareIdAsGuid()
+QString MediaServerProcess::hardwareIdAsGuid() const
 {
     auto hwId = LLUtil::getLatestHardwareId();
     auto hwIdString = QnUuid::fromHardwareId(hwId).toString();
@@ -2233,13 +2242,10 @@ void MediaServerProcess::updateGuidIfNeeded()
         setObsoleteGuid(obsoleteGuid);
 }
 
-void MediaServerProcess::serviceModePreInit()
+void MediaServerProcess::serviceModeInit()
 {
     const QString& dataLocation = getDataDirectory();
     const QString& logDir = qnServerModule->roSettings()->value("logDir", dataLocation + QLatin1String("/log/")).toString();
-
-
-    qnServerModule->runTimeSettings()->remove("rebuild");
 
     initLog(cmdLineArguments().logLevel);
 
@@ -2283,22 +2289,16 @@ void MediaServerProcess::serviceModePreInit()
 
 void MediaServerProcess::run()
 {
+
     std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(
         m_cmdLineArguments.enforcedMediatorEndpoint,
         m_cmdLineArguments.configFilePath,
         m_cmdLineArguments.rwConfigFilePath));
 
-    addCommandLineParametersFromConfig();
+    qnServerModule->runTimeSettings()->remove("rebuild");
 
     if (m_serviceMode)
-        serviceModePreInit();
-
-    const bool isStatisticsDisabled =
-        qnServerModule->roSettings()->value(QnServer::kNoMonitorStatistics, false).toBool();
-
-    m_platform->setUpdatePeriodMs(
-        isStatisticsDisabled ? 0 : QnGlobalMonitor::kDefaultUpdatePeridMs);
-
+        serviceModeInit();
     updateAllowedInterfaces();
 
     if (!m_cmdLineArguments.enforceSocketType.isEmpty())
@@ -3016,8 +3016,10 @@ void MediaServerProcess::run()
     disconnect(runtimeManager, 0, this, 0);
     disconnect(ec2Connection->getTimeNotificationManager().get(), 0, this, 0);
     disconnect(ec2Connection.get(), 0, this, 0);
-    if (m_updatePiblicIpTimer)
+    if (m_updatePiblicIpTimer) {
         disconnect(m_updatePiblicIpTimer.get(), 0, this, 0);
+        m_updatePiblicIpTimer.reset();
+    }
     disconnect(m_ipDiscovery.get(), 0, this, 0);
     disconnect(commonModule()->moduleFinder(), 0, this, 0);
 
@@ -3109,6 +3111,12 @@ void MediaServerProcess::run()
     performActionsOnExit();
 
     nx::network::SocketGlobals::outgoingTunnelPool().clearOwnPeerId();
+
+    m_autoRequestForwarder.reset();
+    m_httpModManager.reset();
+
+    if (defaultMsgHandler)
+        qInstallMessageHandler(defaultMsgHandler);
 }
 
 void MediaServerProcess::at_appStarted()
@@ -3219,7 +3227,6 @@ protected:
         signal(SIGTERM, stopServer);
 
         QDir::setCurrent(qApp->applicationDirPath());
-        qnPlatform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
 
     // ------------------------------------------
 #ifdef TEST_RTSP_SERVER

@@ -326,7 +326,10 @@ class Server(object):
             return False
 
     def get_log_file(self):
-        return self.host.read_file(self._log_path)
+        if self.host.file_exists(self._log_path):
+            return self.host.read_file(self._log_path)
+        else:
+            return None
 
     def change_config(self, **kw):
         old_config = self.host.read_file(self._config_path)

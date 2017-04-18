@@ -70,10 +70,12 @@ bool ConnectResponse::parseAttributes(const nx::stun::Message& message)
     if (!readEnumAttributeValue(message, attrs::cloudConnectVersion, &cloudConnectVersion))
         cloudConnectVersion = kDefaultCloudConnectVersion;  //if not present - old version
 
+    // Optional for backward compatibility.
+    readAttributeValue<attrs::TrafficRelayEndpointList>(message, &trafficRelayEndpointList);
+
     return 
         readAttributeValue<attrs::PublicEndpointList>(message, &forwardedTcpEndpointList) &&
         readAttributeValue<attrs::UdtHpEndpointList>(message, &udpEndpointList) &&
-        readAttributeValue<attrs::TrafficRelayEndpointList>(message, &trafficRelayEndpointList) &&
         params.parseAttributes(message);
 }
 

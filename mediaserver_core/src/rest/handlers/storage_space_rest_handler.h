@@ -27,7 +27,4 @@ private:
     *   can be created on the local (or mounted) partitions.
     */
     QnStorageSpaceDataList getOptionalStorages(QnCommonModule* commonModule) const;
-
-private:
-    QnPlatformMonitor *m_monitor;
 };
