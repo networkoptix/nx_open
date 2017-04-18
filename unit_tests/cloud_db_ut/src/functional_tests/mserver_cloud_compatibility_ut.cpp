@@ -10,7 +10,7 @@ namespace nx {
 namespace cdb {
 namespace test {
 
-class Ec2MserverCloudCompability:
+class Ec2MserverCloudCompatibility:
     public Ec2MserverCloudSynchronizationConnection
 {
 protected:
@@ -66,12 +66,12 @@ private:
     }
 };
 
-TEST_F(Ec2MserverCloudCompability, compatible_protocol_range_is_meaningful)
+TEST_F(Ec2MserverCloudCompatibility, compatible_protocol_range_is_meaningful)
 {
     ASSERT_LE(ec2::kMinSupportedProtocolVersion, ec2::kMaxSupportedProtocolVersion);
 }
 
-TEST_F(Ec2MserverCloudCompability, any_compatible_proto_version_is_accepted_by_cloud)
+TEST_F(Ec2MserverCloudCompatibility, any_compatible_proto_version_is_accepted_by_cloud)
 {
     for (int
         version = ec2::kMinSupportedProtocolVersion;
@@ -82,12 +82,12 @@ TEST_F(Ec2MserverCloudCompability, any_compatible_proto_version_is_accepted_by_c
     }
 }
 
-TEST_F(Ec2MserverCloudCompability, version_left_of_compatibility_range_is_rejected)
+TEST_F(Ec2MserverCloudCompatibility, version_left_of_compatibility_range_is_rejected)
 {
     assertCdbDoesNotAcceptConnectionOfVersion(ec2::kMinSupportedProtocolVersion - 1);
 }
 
-TEST_F(Ec2MserverCloudCompability, version_right_of_compatibility_range_is_rejected)
+TEST_F(Ec2MserverCloudCompatibility, version_right_of_compatibility_range_is_rejected)
 {
     assertCdbDoesNotAcceptConnectionOfVersion(ec2::kMaxSupportedProtocolVersion + 1);
 }
