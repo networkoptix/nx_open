@@ -194,5 +194,26 @@ private:
     Q_DISABLE_COPY(UdtStreamServerSocket)
 };
 
+class NX_NETWORK_API UdtStatistics
+{
+public:
+    typedef void* UserId;
+    typedef utils::MoveOnlyFunc<void(UdtStreamSocket* socket, int bytes)> TrafficHandler;
+
+    void addSendHandler(UserId user, TrafficHandler handler);
+    void addRecvHandler(UserId user, TrafficHandler handler);
+    void removeHandlers(UserId user);
+
+    void onSend(UdtStreamSocket* socket, uint64_t bytes);
+    void onRecv(UdtStreamSocket* socket, uint64_t bytes);
+
+    static UdtStatistics& instance();
+
+private:
+    QnMutex m_mutex;
+    std::map<UserId, TrafficHandler> m_sendHandlers;
+    std::map<UserId, TrafficHandler> m_recvHandlers;
+};
+
 } // namespace network
 } // namespace nx

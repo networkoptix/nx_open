@@ -647,6 +647,11 @@ int UdtStreamSocket::send( const void* buffer, unsigned int bufferLen )
         //connection has been closed
         m_state = detail::SocketState::open;
     }
+    else
+    {
+        UdtStatistics::instance().onSend(this, sz);
+    }
+
     return sz;
 }
 
@@ -876,6 +881,10 @@ int UdtStreamSocket::handleRecvResult(int recvResult)
         //connection has been closed
         m_state = detail::SocketState::open;
     }
+    else
+    {
+        UdtStatistics::instance().onRecv(this, recvResult);
+    }
 
     return recvResult;
 }
@@ -1056,6 +1065,46 @@ AbstractStreamSocket* UdtStreamServerSocket::systemAccept()
 void UdtStreamServerSocket::stopWhileInAioThread()
 {
     m_aioHelper->stopPolling();
+}
+
+void UdtStatistics::addSendHandler(UserId user, TrafficHandler handler)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_sendHandlers[user] = std::move(handler);
+}
+
+void UdtStatistics::addRecvHandler(UserId user, TrafficHandler handler)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_recvHandlers[user] = std::move(handler);
+}
+
+void UdtStatistics::removeHandlers(UserId user)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_sendHandlers.erase(user);
+    m_recvHandlers.erase(user);
+}
+
+void UdtStatistics::onSend(UdtStreamSocket* socket, uint64_t bytes)
+{
+    QnMutexLocker lock(&m_mutex);
+    for (const auto& handler: m_sendHandlers)
+        handler.second(socket, bytes);
+
+}
+
+void UdtStatistics::onRecv(UdtStreamSocket* socket, uint64_t bytes)
+{
+    QnMutexLocker lock(&m_mutex);
+    for (const auto& handler: m_recvHandlers)
+        handler.second(socket, bytes);
+}
+
+UdtStatistics& UdtStatistics::instance()
+{
+    static UdtStatistics statistics;
+    return statistics;
 }
 
 } // namespace network

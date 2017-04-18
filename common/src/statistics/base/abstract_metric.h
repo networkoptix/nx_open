@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <QtCore/QString>
+
 // @brief Represents abstract class for single metric
 class QnAbstractMetric
 {
