@@ -14,6 +14,8 @@ namespace relay {
 namespace model {
 namespace test {
 
+namespace {
+
 class StreamSocketStub:
     public nx::network::StreamSocketDelegate
 {
@@ -47,6 +49,8 @@ private:
     std::function<void(SystemError::ErrorCode, size_t)> m_readHandler;
     nx::network::TCPSocket m_delegatee;
 };
+
+} // namespace
 
 //-------------------------------------------------------------------------------------------------
 // Test fixture.
