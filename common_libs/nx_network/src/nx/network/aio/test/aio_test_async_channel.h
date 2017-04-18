@@ -55,6 +55,9 @@ public:
     void setSendErrorState(boost::optional<SystemError::ErrorCode> sendErrorCode);
     void setReadErrorState(boost::optional<SystemError::ErrorCode> sendErrorCode);
 
+    void waitForAnotherReadErrorReported();
+    void waitForAnotherSendErrorReported();
+
     bool isReadScheduled() const;
     bool isWriteScheduled() const;
 
@@ -80,6 +83,8 @@ private:
     BasicPollable m_writer;
     bool m_readScheduled;
     std::atomic<int> m_readSequence;
+    std::atomic<int> m_readErrorsReported;
+    std::atomic<int> m_sendErrorsReported;
 
     virtual void stopWhileInAioThread() override;
 

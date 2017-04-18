@@ -19,7 +19,9 @@ AsyncChannel::AsyncChannel(
     m_sendPaused(false),
     m_sendBuffer(nullptr),
     m_readScheduled(false),
-    m_readSequence(0)
+    m_readSequence(0),
+    m_readErrorsReported(0),
+    m_sendErrorsReported(0)
 {
     bindToAioThread(getAioThread());
 }
@@ -156,6 +158,20 @@ void AsyncChannel::setReadErrorState(
     m_readErrorState = sendErrorCode;
 }
 
+void AsyncChannel::waitForAnotherReadErrorReported()
+{
+    const auto readErrorsReported = m_readErrorsReported.load();
+    while (m_readErrorsReported == readErrorsReported)
+        std::this_thread::yield();
+}
+
+void AsyncChannel::waitForAnotherSendErrorReported()
+{
+    const auto sendErrorsReported = m_sendErrorsReported.load();
+    while (m_sendErrorsReported == sendErrorsReported)
+        std::this_thread::yield();
+}
+
 bool AsyncChannel::isReadScheduled() const
 {
     return m_readScheduled;
@@ -207,7 +223,11 @@ void AsyncChannel::performAsyncRead(const QnMutexLockerBase& /*lock*/)
             }
 
             if (readErrorState)
-                return reportIoCompletion(&m_readHandler, *readErrorState, (size_t)-1);
+            {
+                reportIoCompletion(&m_readHandler, *readErrorState, (size_t)-1);
+                ++m_readErrorsReported;
+                return;
+            }
 
             int bytesRead = m_input->read(
                 m_readBuffer->data() + m_readBuffer->size(),
@@ -270,6 +290,7 @@ void AsyncChannel::performAsyncSend(const QnMutexLockerBase&)
             if (sendErrorState)
             {
                 handler(*sendErrorState, (size_t)-1);
+                ++m_sendErrorsReported;
                 return;
             }
 

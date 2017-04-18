@@ -403,8 +403,7 @@ protected:
 
     void thenSendTimedoutHasBeenRaisedByUnderlyingChannel()
     {
-        // TODO: #ak Add corresponding functionality to test async channel.
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        rawDataChannel()->waitForAnotherSendErrorReported();
     }
 };
 

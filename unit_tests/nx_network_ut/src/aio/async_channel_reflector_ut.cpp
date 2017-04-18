@@ -80,9 +80,14 @@ protected:
         ASSERT_NE(SystemError::noError, m_reflectorDone.get_future().get());
     }
 
-    void thenTimedoutHasBeenRaised()
+    void thenSendTimedoutHasBeenRaisedOnUnderlyingChannel()
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        m_channelToReflect->waitForAnotherSendErrorReported();
+    }
+
+    void thenRecvTimedoutHasBeenRaisedOnUnderlyingChannel()
+    {
+        m_channelToReflect->waitForAnotherReadErrorReported();
     }
 
 private:
@@ -123,7 +128,7 @@ TEST_F(AsyncChannelReflector, properly_handles_send_timedout)
     emulateSendTimeoutOnUnderlyingChannel();
 
     whenSentSomeData();
-    thenTimedoutHasBeenRaised();
+    thenSendTimedoutHasBeenRaisedOnUnderlyingChannel();
 
     whenUnderlyingChannelIsFullyFunctionalAgain();
     thenSameDataHasBeenReflected();
@@ -134,7 +139,7 @@ TEST_F(AsyncChannelReflector, properly_handles_recv_timedout)
     emulateRecvTimeoutOnUnderlyingChannel();
 
     whenSentSomeData();
-    thenTimedoutHasBeenRaised();
+    thenRecvTimedoutHasBeenRaisedOnUnderlyingChannel();
 
     whenUnderlyingChannelIsFullyFunctionalAgain();
     thenSameDataHasBeenReflected();
