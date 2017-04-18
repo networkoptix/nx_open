@@ -318,7 +318,7 @@ bool QnWorkbenchUi::calculateTimelineVisible(QnResourceWidget* widget) const
     const auto flags = resource->flags();
 
     /* Any of the flags is sufficient. */
-    if (flags & (Qn::still_image | Qn::server | Qn::videowall))
+    if (flags & (Qn::still_image | Qn::server | Qn::videowall | Qn::layout))
         return false;
 
     /* Qn::web_page is as flag combination. */

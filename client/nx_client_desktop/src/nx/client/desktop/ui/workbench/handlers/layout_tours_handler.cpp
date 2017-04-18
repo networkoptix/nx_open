@@ -15,6 +15,8 @@
 #include <ui/actions/action_manager.h>
 #include <ui/dialogs/layout_tour_dialog.h>
 #include <ui/style/skin.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/extensions/workbench_layout_tour_controller.h>
 
 #include <nx/utils/string.h>
@@ -117,11 +119,30 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
 
             QnActionParameters parameters = menu()->currentParameters(sender());
             auto id = parameters.argument<QnUuid>(Qn::UuidRole);
-            auto tour = qnLayoutTourManager->tour(id);
-            if (tour.isValid())
-                m_controller->startTour(tour);
-            else
+            if (id.isNull())
                 m_controller->startSingleLayoutTour();
+            else
+                m_controller->startTour(qnLayoutTourManager->tour(id));
+        });
+
+    connect(action(QnActions::StartCurrentLayoutTourAction), &QAction::triggered, this,
+        [this]
+        {
+            const auto id = workbench()->currentLayout()->data(Qn::LayoutTourUuidRole)
+                .value<QnUuid>();
+            auto tour = qnLayoutTourManager->tour(id);
+            NX_EXPECT(tour.isValid());
+            m_controller->startTour(tour);
+        });
+
+    connect(action(QnActions::SaveCurrentLayoutTourAction), &QAction::triggered, this,
+        [this]
+        {
+            const auto id = workbench()->currentLayout()->data(Qn::LayoutTourUuidRole)
+                .value<QnUuid>();
+            auto tour = qnLayoutTourManager->tour(id);
+            NX_EXPECT(tour.isValid());
+            qDebug() << "Here we will save review layout";
         });
 
     connect(action(QnActions::ReviewLayoutTourAction), &QAction::triggered, this,
@@ -130,6 +151,16 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             QnActionParameters parameters = menu()->currentParameters(sender());
             auto id = parameters.argument<QnUuid>(Qn::UuidRole);
             reviewLayoutTour(qnLayoutTourManager->tour(id));
+        });
+
+    connect(action(QnActions::RemoveCurrentLayoutTourAction), &QAction::triggered, this,
+        [this]()
+        {
+            const auto id = workbench()->currentLayout()->data(Qn::LayoutTourUuidRole)
+                .value<QnUuid>();
+            NX_EXPECT(!id.isNull());
+            qnLayoutTourManager->removeTour(id);
+            removeTourFromServer(id);
         });
 
     connect(action(QnActions::EscapeHotkeyAction), &QAction::triggered, m_controller,

@@ -1828,21 +1828,21 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Start Tour")).
         accent(Qn::ButtonAccent::Standard).
         icon(qnSkin->icon("slider/navigation/play.png")).
-        condition(new QnLayoutTourReviewModeCondition(true, this)).
+        condition(new QnLayoutTourReviewModeCondition(this)).
         autoRepeat(false);
 
     factory(QnActions::SaveCurrentLayoutTourAction).
         flags(Qn::Scene | Qn::NoTarget).
         mode(QnActionTypes::DesktopMode).
         text(tr("Save Changes")).
-        condition(new QnLayoutTourReviewModeCondition(true, this)).
+        condition(new QnLayoutTourReviewModeCondition(this)).
         autoRepeat(false);
 
     factory(QnActions::RemoveCurrentLayoutTourAction).
-        flags(Qn::Scene | Qn::NoTarget).
+        flags(Qn::NoTarget).
         mode(QnActionTypes::DesktopMode).
         icon(qnSkin->icon("slider/navigation/play.png")).
-        condition(new QnLayoutTourReviewModeCondition(true, this)).
+        condition(new QnLayoutTourReviewModeCondition(this)).
         autoRepeat(false);
 
     factory().
