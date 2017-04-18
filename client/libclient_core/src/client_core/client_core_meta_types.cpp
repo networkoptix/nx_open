@@ -2,6 +2,7 @@
 
 #include <QtQml/QtQml>
 
+#include <core/ptz/media_dewarping_params.h>
 #include <test/qml_test_helper.h>
 #include <ui/helpers/scene_position_listener.h>
 #include <ui/video/video_output.h>
@@ -38,4 +39,7 @@ void QnClientCoreMetaTypes::initialize()
         "Nx", 1, 0, "UrlHelper", lit("Cannot create an instance of UrlHelper."));
     qmlRegisterUncreatableType<QnSoftwareVersion>(
         "Nx", 1, 0, "SoftwareVersion", lit("Cannot create an instance of SoftwareVersion."));
+
+    qmlRegisterUncreatableType<QnMediaDewarpingParams>("Nx.Core", 1, 0, "MediaDewarpingParams",
+        lit("Cannot create an instance of QnMediaDewarpingParams."));
 }

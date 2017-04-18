@@ -179,7 +179,7 @@ PageBase
         }
     }
 
-    ScalableVideo
+    Loader
     {
         id: video
 
@@ -190,12 +190,40 @@ PageBase
         visible: dummyLoader.status != Loader.Ready && !screenshot.visible
         opacity: d.cameraUiOpacity
 
-        mediaPlayer: videoScreenController.mediaPlayer
-        resourceHelper: videoScreenController.resourceHelper
+        sourceComponent:
+            videoScreenController.resourceHelper.fisheye.enabled
+                ? fisheyeVideo
+                : scalableVideo
 
-        videoCenterHeightOffsetFactor: 1 / 3
+        function clear()
+        {
+            if (item)
+                item.clear()
+        }
+    }
 
-        onClicked: toggleUi()
+    Component
+    {
+        id: scalableVideo
+        ScalableVideo 
+        {
+            mediaPlayer: videoScreenController.mediaPlayer
+            resourceHelper: videoScreenController.resourceHelper
+            videoCenterHeightOffsetFactor: 1 / 3
+            onClicked: toggleUi()
+        }
+    }
+
+    Component
+    {
+        id: fisheyeVideo
+        FisheyeVideo 
+        {
+            mediaPlayer: videoScreenController.mediaPlayer
+            resourceHelper: videoScreenController.resourceHelper
+            videoCenterHeightOffsetFactor: 1 / 3
+            onClicked: toggleUi()
+        }
     }
 
     Image

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <core/ptz/media_dewarping_params.h>
 #include <utils/common/connective.h>
 
 class QnMediaResourceHelperPrivate;
@@ -15,6 +16,7 @@ class QnMediaResourceHelper : public Connective<QObject>
     Q_PROPERTY(int customRotation READ customRotation NOTIFY customRotationChanged)
     Q_PROPERTY(int channelCount READ channelCount NOTIFY videoLayoutChanged)
     Q_PROPERTY(QSize layoutSize READ layoutSize NOTIFY videoLayoutChanged)
+    Q_PROPERTY(QnMediaDewarpingParams fisheye READ fisheye NOTIFY fisheyeChanged)
 
     Q_ENUMS(Qn::ResourceStatus)
 
@@ -34,6 +36,7 @@ public:
     int customRotation() const;
     int channelCount() const;
     QSize layoutSize() const;
+    QnMediaDewarpingParams fisheye() const;
     Q_INVOKABLE QPoint channelPosition(int channel) const;
 
 signals:
@@ -44,6 +47,7 @@ signals:
     void customAspectRatioChanged();
     void customRotationChanged();
     void videoLayoutChanged();
+    void fisheyeChanged();
 
 private:
     QScopedPointer<QnMediaResourceHelperPrivate> d_ptr;
