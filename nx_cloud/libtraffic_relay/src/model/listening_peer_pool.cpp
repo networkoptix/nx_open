@@ -12,6 +12,10 @@ ListeningPeerPool::ListeningPeerPool():
 
 ListeningPeerPool::~ListeningPeerPool()
 {
+    // TODO: Waiting for API methods completion.
+
+    m_unsuccessfulResultReporter.pleaseStopSync();
+
     {
         QnMutexLocker lock(&m_mutex);
         m_terminated = true;
@@ -38,6 +42,52 @@ std::size_t ListeningPeerPool::getConnectionCountByPeerName(
 {
     QnMutexLocker lock(&m_mutex);
     return m_peerNameToConnection.count(peerName);
+}
+
+bool ListeningPeerPool::isPeerListening(const std::string& peerName) const
+{
+    return getConnectionCountByPeerName(peerName) > 0;
+}
+
+void ListeningPeerPool::takeIdleConnection(
+    const std::string& peerName,
+    ListeningPeerPool::TakeIdleConnection completionHandler)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    auto peerConnectionIter = m_peerNameToConnection.find(peerName);
+    if (peerConnectionIter == m_peerNameToConnection.end())
+    {
+        m_unsuccessfulResultReporter.post(
+            [completionHandler = std::move(completionHandler)]()
+            {
+                completionHandler(api::ResultCode::notFound, nullptr);
+            });
+        return;
+    }
+
+    auto connectionContext = std::move(peerConnectionIter->second);
+    m_peerNameToConnection.erase(peerConnectionIter);
+
+    auto connectionPtr = connectionContext.connection.get();
+    connectionPtr->post(
+        [this, connectionContext = std::move(connectionContext),
+            completionHandler = std::move(completionHandler)]() mutable
+        {
+            giveAwayConnection(
+                std::move(connectionContext),
+                std::move(completionHandler));
+        });
+}
+
+void ListeningPeerPool::giveAwayConnection(
+    ListeningPeerPool::ConnectionContext connectionContext,
+    ListeningPeerPool::TakeIdleConnection completionHandler)
+{
+    connectionContext.connection->cancelIOSync(network::aio::etNone);
+    completionHandler(
+        api::ResultCode::ok,
+        std::move(connectionContext.connection));
 }
 
 void ListeningPeerPool::monitoringConnectionForClosure(
