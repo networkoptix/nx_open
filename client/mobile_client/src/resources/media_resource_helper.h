@@ -4,7 +4,7 @@
 #include <utils/common/connective.h>
 
 class QnMediaResourceHelperPrivate;
-class QnMediaResourceHelper : public Connective<QObject>
+class QnMediaResourceHelper: public Connective<QObject>
 {
     Q_OBJECT
 
@@ -16,7 +16,7 @@ class QnMediaResourceHelper : public Connective<QObject>
     Q_PROPERTY(int customRotation READ customRotation NOTIFY customRotationChanged)
     Q_PROPERTY(int channelCount READ channelCount NOTIFY videoLayoutChanged)
     Q_PROPERTY(QSize layoutSize READ layoutSize NOTIFY videoLayoutChanged)
-    Q_PROPERTY(QnMediaDewarpingParams fisheye READ fisheye NOTIFY fisheyeChanged)
+    Q_PROPERTY(QnMediaDewarpingParams fisheyeParams READ fisheyeParams NOTIFY fisheyeParamsChanged)
 
     Q_ENUMS(Qn::ResourceStatus)
 
@@ -24,7 +24,7 @@ class QnMediaResourceHelper : public Connective<QObject>
 
 public:
     explicit QnMediaResourceHelper(QObject* parent = nullptr);
-    ~QnMediaResourceHelper();
+    virtual ~QnMediaResourceHelper();
 
     QString resourceId() const;
     void setResourceId(const QString& id);
@@ -36,7 +36,7 @@ public:
     int customRotation() const;
     int channelCount() const;
     QSize layoutSize() const;
-    QnMediaDewarpingParams fisheye() const;
+    QnMediaDewarpingParams fisheyeParams() const;
     Q_INVOKABLE QPoint channelPosition(int channel) const;
 
 signals:
@@ -47,7 +47,7 @@ signals:
     void customAspectRatioChanged();
     void customRotationChanged();
     void videoLayoutChanged();
-    void fisheyeChanged();
+    void fisheyeParamsChanged();
 
 private:
     QScopedPointer<QnMediaResourceHelperPrivate> d_ptr;

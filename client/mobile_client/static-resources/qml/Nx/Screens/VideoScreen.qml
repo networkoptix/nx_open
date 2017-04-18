@@ -191,7 +191,7 @@ PageBase
         opacity: d.cameraUiOpacity
 
         sourceComponent:
-            videoScreenController.resourceHelper.fisheye.enabled
+            videoScreenController.resourceHelper.fisheyeParams.enabled
                 ? fisheyeVideo
                 : scalableVideo
 
