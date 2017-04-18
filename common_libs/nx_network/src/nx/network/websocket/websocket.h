@@ -1,11 +1,12 @@
 #pragma once
 
-#include <nx/network/connection_server/base_server_connection.h>
-#include <nx/network/websocket/websocket_parser.h>
-#include <nx/network/buffer.h>
-#include <nx/network/websocket/websocket_serializer.h>
 #include <nx/network/aio/abstract_async_channel.h>
-#include <nx/network/websocket/websocket_common_types.h>
+#include <nx/network/connection_server/base_server_connection.h>
+#include <nx/network/buffer.h>
+#include "websocket_parser.h"
+#include "websocket_serializer.h"
+#include "websocket_common_types.h"
+#include "websocket_multibuffer.h"
 
 namespace nx {
 namespace network {
@@ -21,21 +22,29 @@ class Websocket :
 public:
     enum class SendMode
     {
-        singleMessage,
-        multiFrameMessage
+        /** Wrap buffer passed to sendAsync() in a complete websocket message */
+        singleMessage,  
+
+        /** 
+         * Wrap buffer passed to sendAsync() in a complete websocket message.
+         * @note Call setIsLastFrame() to mark final frame in the message.
+         */
+        multiFrameMessage   
     };
 
     enum class ReceiveMode
     {
-        frame,
-        message,
-        stream
+        frame,      /**< Read handler will be called only when complete frame has been read from socket */
+        message,    /**< Read handler will be called only when complete message has been read from socket*/ 
+        stream      /**< Read handler will be called only when any data has been read from socket */ 
     };
 
 public:
     Websocket(
         std::unique_ptr<AbstractStreamSocket> streamSocket,
         const nx::Buffer& requestData,
+        SendMode sendMode = SendMode::singleMessage,
+        ReceiveMode receiveMode = ReceiveMode::message,
         Role role = Role::undefined); /**< if role is undefined, payload won't be masked (unmasked) */
 
     virtual void readSomeAsync(
@@ -48,21 +57,11 @@ public:
 
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
-    void setSendMode(SendMode mode);
-    SendMode sendMode() const;
-
     /** 
      * Makes sense only in multiFrameMessage mode. 
      * Indicates that the next sendAsync will close current message 
      */
     void setIsLastFrame();
-
-    void setReceiveMode(ReceiveMode mode);
-    ReceiveMode receiveMode() const;
-
-    void setPayloadType(PayloadType type);
-    PayloadType prevFramePayloadType() const;
-
     void sendPing();
 
 private:
@@ -84,6 +83,7 @@ private:
     virtual void handleError(Error err) override;
 
     /** Own helper functions*/
+    void handleRead();
 
 private:
     nx_api::BaseServerConnectionWrapper m_baseConnection;
@@ -97,7 +97,7 @@ private:
     std::function<void(SystemError::ErrorCode, size_t)> m_writeHandler;
     nx::Buffer* m_readBuffer;
     nx::Buffer m_writeBuffer;
-    nx::Buffer m_buffer;
+    MultiBuffer m_buffer;
 };
 
 } // namespace websocket

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/network/buffer.h>
-#include <nx/network/websocket/websocket_common_types.h>
+#include "websocket_common_types.h"
 
 namespace nx {
 namespace network {
@@ -39,6 +39,7 @@ class NX_NETWORK_API Parser
 public:
     Parser(Role role, ParserHandler* handler);
     void consume(char* data, int len);
+    void consume(nx::Buffer& buf);
     void setRole(Role role);
     FrameType frameType() const;
     int frameSize() const;

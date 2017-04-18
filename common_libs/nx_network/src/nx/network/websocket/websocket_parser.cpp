@@ -112,6 +112,11 @@ void Parser::consume(char* data, int len)
         parse(data + m_pos, len - m_pos);
 }
 
+void Parser::consume(nx::Buffer& buf)
+{
+    consume(buf.data(), buf.size());
+}
+
 void Parser::setRole(Role role)
 {
     m_role = role;
