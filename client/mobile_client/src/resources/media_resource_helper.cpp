@@ -73,6 +73,7 @@ void QnMediaResourceHelper::setResourceId(const QString& id)
     emit customRotationChanged();
     emit resourceStatusChanged();
     emit videoLayoutChanged();
+    emit ptzSupportChanged();
 }
 
 Qn::ResourceStatus QnMediaResourceHelper::resourceStatus() const
@@ -115,6 +116,15 @@ QSize QnMediaResourceHelper::layoutSize() const
 {
     Q_D(const QnMediaResourceHelper);
     return d->camera ? d->camera->getVideoLayout()->size() : QSize(1, 1);
+}
+
+bool QnMediaResourceHelper::supportsPTZ() const
+{
+    Q_D(const QnMediaResourceHelper);
+    // TODO: move check to helpers file
+    return d->camera
+        && d->camera->hasAnyOfPtzCapabilities(Qn::ContinuousPtzCapabilities)
+        && !d->camera->hasAnyOfPtzCapabilities(Qn::VirtualPtzCapability);
 }
 
 QPoint QnMediaResourceHelper::channelPosition(int channel) const

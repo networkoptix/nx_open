@@ -257,7 +257,6 @@ PageBase
 
         PtzController
         {
-            resourceId: videoScreenController.resourceHelper.resourceId;
         }
 
         Rectangle

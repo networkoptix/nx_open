@@ -32,6 +32,7 @@
 #include <utils/developer_settings_helper.h>
 #include <settings/qml_settings_adaptor.h>
 #include <nx/mobile_client/helpers/inter_client_message.h>
+#include <nx/mobile_client/controllers/ptz_controller.h>
 
 using namespace nx::client::mobile;
 
@@ -80,6 +81,8 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnLiteClientLayoutHelper>("com.networkoptix.qml", 1, 0, "QnLiteClientLayoutHelper");
     qmlRegisterType<utils::DeveloperSettingsHelper>(
         "com.networkoptix.qml", 1, 0, "DeveloperSettingsHelper");
+    qmlRegisterType<nx::client::mobile::PtzController>(
+        "com.networkoptix.qml", 1, 0, "PtzController");
 
     qmlRegisterRevision<QQuickTextInput, 6>("Nx.Controls", 1, 0);
     qmlRegisterRevision<QQuickItem, 1>("Nx.Controls", 1, 0);
