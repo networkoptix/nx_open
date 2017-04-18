@@ -89,6 +89,9 @@ public:
 
     void setFlags(Qn::ActionFlags flags);
 
+    Qn::ButtonAccent accent() const;
+    void setAccent(Qn::ButtonAccent value);
+
     /**
      * \returns                         Default text of this action.
      */
@@ -191,6 +194,7 @@ private:
 private:
     const QnActions::IDType m_id;
     Qn::ActionFlags m_flags;
+    Qn::ButtonAccent m_accent{Qn::ButtonAccent::NoAccent};
     QnActionTypes::ClientModes m_mode;
     QHash<int, Qn::Permissions> m_targetPermissions;
     Qn::GlobalPermission m_globalPermission;

@@ -204,7 +204,7 @@ namespace Qn
         LayoutIconRole,
         CustomPanelTitleRole,
         CustomPanelDescriptionRole,
-        CustomPanelActionsRoleRole,
+        CustomPanelActionsRole,
 
         /* Arguments. */
         ActionIdRole,
@@ -469,6 +469,14 @@ namespace Qn
         NoData,
         Refreshing
     };
+
+    enum class ButtonAccent
+    {
+        NoAccent,
+        Standard,
+        Warning
+    };
+
 
 } // namespace Qn
 

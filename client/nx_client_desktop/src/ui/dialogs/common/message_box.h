@@ -4,8 +4,9 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDialogButtonBox>
 
-#include <ui/dialogs/common/dialog.h>
+#include <client/client_globals.h>
 
+#include <ui/dialogs/common/dialog.h>
 
 namespace Ui {
 class MessageBox;
@@ -31,19 +32,12 @@ enum class QnButtonDetection
 Q_DECLARE_FLAGS(QnButtonDetections, QnButtonDetection)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnButtonDetections)
 
-enum class QnButtonAccent
-{
-    NoAccent,
-    Standard,
-    Warning
-};
-
 enum class QnMessageBoxCustomButton
 {
-    Overwrite,                  //< QDialogButtonBox::AcceptRole / QnButtonAccent::Warning
-    Delete,                     //< QDialogButtonBox::AcceptRole / QnButtonAccent::Warning
-    Reset,                      //< QDialogButtonBox::AcceptRole / QnButtonAccent::Warning
-    Skip,                       //< QDialogButtonBox::RejectRole / QnButtonAccent::NoAccent
+    Overwrite,                  //< QDialogButtonBox::AcceptRole / Qn::ButtonAccent::Warning
+    Delete,                     //< QDialogButtonBox::AcceptRole / Qn::ButtonAccent::Warning
+    Reset,                      //< QDialogButtonBox::AcceptRole / Qn::ButtonAccent::Warning
+    Skip,                       //< QDialogButtonBox::RejectRole / Qn::ButtonAccent::NoAccent
 };
 
 class QnMessageBox: public QnDialog
@@ -111,13 +105,13 @@ public:
     QPushButton* addCustomButton(
         QnMessageBoxCustomButton button,
         QDialogButtonBox::ButtonRole role,
-        QnButtonAccent accent = QnButtonAccent::NoAccent);
+        Qn::ButtonAccent accent = Qn::ButtonAccent::NoAccent);
 
     void addButton(QAbstractButton *button, QDialogButtonBox::ButtonRole role);
     QPushButton* addButton(
         const QString &text,
         QDialogButtonBox::ButtonRole role,
-        QnButtonAccent accent = QnButtonAccent::NoAccent);
+        Qn::ButtonAccent accent = Qn::ButtonAccent::NoAccent);
     QPushButton* addButton(QDialogButtonBox::StandardButton button);
     void removeButton(QAbstractButton *button);
 
@@ -132,11 +126,11 @@ public:
     QAbstractButton *defaultButton() const;
     void setDefaultButton(
         QAbstractButton *button,
-        QnButtonAccent accent = QnButtonAccent::Standard);
+        Qn::ButtonAccent accent = Qn::ButtonAccent::Standard);
 
     void setDefaultButton(
         QDialogButtonBox::StandardButton button,
-        QnButtonAccent accent = QnButtonAccent::Standard);
+        Qn::ButtonAccent accent = Qn::ButtonAccent::Standard);
 
     QAbstractButton *escapeButton() const;
     void setEscapeButton(QAbstractButton *button);

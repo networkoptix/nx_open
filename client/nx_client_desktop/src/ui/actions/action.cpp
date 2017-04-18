@@ -90,6 +90,16 @@ void QnAction::setFlags(Qn::ActionFlags flags)
     m_flags = flags;
 }
 
+Qn::ButtonAccent QnAction::accent() const
+{
+    return m_accent;
+}
+
+void QnAction::setAccent(Qn::ButtonAccent value)
+{
+    m_accent = value;
+}
+
 const QString & QnAction::normalText() const
 {
     return m_normalText;

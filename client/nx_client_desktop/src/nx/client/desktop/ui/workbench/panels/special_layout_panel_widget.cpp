@@ -3,10 +3,14 @@
 
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QToolButton>
+#include <QtWidgets/QPushButton>
 
 #include <client/client_globals.h>
+
+#include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
+#include <ui/common/palette.h>
+#include <ui/style/custom_style.h>
 
 namespace {
 
@@ -29,7 +33,6 @@ SpecialLayoutPanelWidget::SpecialLayoutPanelWidget(
     :
     base_type(),
     QnWorkbenchContextAware(parent),
-
     ui(new Ui::SpecialLayoutPanelWidget()),
     m_layoutResource(layoutResource)
 {
@@ -37,6 +40,14 @@ SpecialLayoutPanelWidget::SpecialLayoutPanelWidget(
 
     const auto body = new QWidget();
     ui->setupUi(body);
+
+    auto titleFont = ui->captionLabel->font();
+    titleFont.setWeight(QFont::Light);
+    ui->captionLabel->setFont(titleFont);
+
+    setPaletteColor(this, QPalette::Window, QColor("#1d2327"));
+    setAutoFillBackground(true);
+
     setWidget(body);
 
     connect(m_layoutResource, &QnLayoutResource::dataChanged,
@@ -44,7 +55,7 @@ SpecialLayoutPanelWidget::SpecialLayoutPanelWidget(
 
     handleResourceDataChanged(Qn::CustomPanelTitleRole);
     handleResourceDataChanged(Qn::CustomPanelDescriptionRole);
-    handleResourceDataChanged(Qn::CustomPanelActionsRoleRole);
+    handleResourceDataChanged(Qn::CustomPanelActionsRole);
 }
 
 SpecialLayoutPanelWidget::~SpecialLayoutPanelWidget()
@@ -56,14 +67,22 @@ void SpecialLayoutPanelWidget::handleResourceDataChanged(int role)
     switch(role)
     {
         case Qn::CustomPanelTitleRole:
+        {
             ui->captionLabel->setText(getString(Qn::CustomPanelTitleRole, m_layoutResource));
             break;
+        }
         case Qn::CustomPanelDescriptionRole:
-            ui->descriptionLabel->setText(getString(Qn::CustomPanelDescriptionRole, m_layoutResource));
+        {
+            const auto description = getString(Qn::CustomPanelDescriptionRole, m_layoutResource);
+            ui->descriptionLabel->setText(description);
+            ui->descriptionLabel->setVisible(!description.isEmpty());
             break;
-        case Qn::CustomPanelActionsRoleRole:
+        }
+        case Qn::CustomPanelActionsRole:
+        {
             updateButtons();
             break;
+        }
         default:
             break;
     }
@@ -73,14 +92,34 @@ void SpecialLayoutPanelWidget::updateButtons()
 {
     m_actionButtons.clear();
 
-    const auto actions = m_layoutResource->data(Qn::CustomPanelActionsRoleRole)
+    const auto actions = m_layoutResource->data(Qn::CustomPanelActionsRole)
         .value<QList<QnActions::IDType>>();
 
     for (const auto& actionId: actions)
     {
-        const auto button = new QToolButton();
+        const auto action = dynamic_cast<QnAction*>(this->action(actionId));
+        NX_EXPECT(action);
+        if (!action)
+            continue;
+
+        const auto button = new QPushButton();
+        button->setText(action->text());
+        button->setIcon(action->icon());
+        switch (action->accent())
+        {
+            case Qn::ButtonAccent::Standard:
+                setAccentStyle(button);
+                break;
+            case Qn::ButtonAccent::Warning:
+                setWarningButtonStyle(button);
+                break;
+            default:
+                break;
+        }
+
+        connect(button, &QPushButton::clicked, action, &QAction::trigger);
+
         m_actionButtons.append(ButtonPtr(button));
-        button->setDefaultAction(action(actionId));
         ui->buttonsLayout->addWidget(button, 0, Qt::AlignRight);
     }
 }

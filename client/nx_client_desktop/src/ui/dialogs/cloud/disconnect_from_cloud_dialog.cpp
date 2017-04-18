@@ -237,8 +237,8 @@ void QnDisconnectFromCloudDialogPrivate::setVisibleButton(VisibleButton button)
 {
     const bool okButtonVisible = (button == VisibleButton::Ok);
     const auto style = okButtonVisible
-        ? QnButtonAccent::Warning
-        : QnButtonAccent::Standard;
+        ? Qn::ButtonAccent::Warning
+        : Qn::ButtonAccent::Standard;
     const auto defaultButton = (okButtonVisible ? okButton : nextButton);
 
     okButton->setVisible(okButtonVisible);
@@ -307,7 +307,7 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
             q->setIcon(QnMessageBoxIcon::Warning);
             q->setText(lit("Internal system error"));
             q->setStandardButtons(QDialogButtonBox::NoButton);
-            q->setDefaultButton(okButton, QnButtonAccent::Warning);
+            q->setDefaultButton(okButton, Qn::ButtonAccent::Warning);
             break;
     }
 

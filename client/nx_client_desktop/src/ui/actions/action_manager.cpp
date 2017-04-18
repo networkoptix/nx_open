@@ -292,6 +292,12 @@ public:
         return *this;
     }
 
+    QnActionBuilder accent(Qn::ButtonAccent value)
+    {
+        m_action->setAccent(value);
+        return *this;
+    }
+
     QnActionBuilder condition(QnActionCondition *condition)
     {
         NX_ASSERT(m_action->condition() == NULL);
@@ -1789,35 +1795,55 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false);
 
     factory(QnActions::ToggleLayoutTourModeAction).
-        flags(Qn::Scene | Qn::Tree | Qn::NoTarget | Qn::GlobalHotkey).
+        flags(Qn::Tree | Qn::NoTarget | Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).
         text(tr("Start Tour")).
-        toggledText(tr("Stop Tour")).
         shortcut(lit("Alt+T")).
         autoRepeat(false).
-        icon(qnSkin->icon("slider/navigation/play.png")).
         condition(new QnConjunctionActionCondition(
             new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this),
-            new QnVideoWallReviewModeCondition(true, this),
-     //       new QnToggleTourActionCondition(this), //TODO: #GDM #3.1 implement with review mode
+            new QnToggleTourActionCondition(this),
             this
         ));
 
     factory(QnActions::LayoutTourSettingsAction).
-        flags(Qn::Scene | Qn::Tree | Qn::NoTarget).
+        flags(Qn::Tree | Qn::NoTarget).
         mode(QnActionTypes::DesktopMode).
         text(tr("Layout Tour Settings...")).
         requiredGlobalPermission(Qn::GlobalAdminPermission). //TODO: #GDM #3.1 #tbd
         condition(new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this));
 
     factory(QnActions::RemoveLayoutTourAction).
-        flags(Qn::Scene | Qn::Tree | Qn::NoTarget | Qn::IntentionallyAmbiguous).
+        flags(Qn::Tree | Qn::NoTarget | Qn::IntentionallyAmbiguous).
         mode(QnActionTypes::DesktopMode).
         text(tr("Delete Layout Tour")).
         requiredGlobalPermission(Qn::GlobalAdminPermission). //TODO: #GDM #3.1 #tbd
         shortcut(lit("Del")).
         shortcut(Qt::Key_Backspace, QnActionBuilder::Mac, true).
         condition(new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this));
+
+    factory(QnActions::StartCurrentLayoutTourAction).
+        flags(Qn::Scene | Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
+        text(tr("Start Tour")).
+        accent(Qn::ButtonAccent::Standard).
+        icon(qnSkin->icon("slider/navigation/play.png")).
+        condition(new QnLayoutTourReviewModeCondition(true, this)).
+        autoRepeat(false);
+
+    factory(QnActions::SaveCurrentLayoutTourAction).
+        flags(Qn::Scene | Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
+        text(tr("Save Changes")).
+        condition(new QnLayoutTourReviewModeCondition(true, this)).
+        autoRepeat(false);
+
+    factory(QnActions::RemoveCurrentLayoutTourAction).
+        flags(Qn::Scene | Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
+        icon(qnSkin->icon("slider/navigation/play.png")).
+        condition(new QnLayoutTourReviewModeCondition(true, this)).
+        autoRepeat(false);
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).

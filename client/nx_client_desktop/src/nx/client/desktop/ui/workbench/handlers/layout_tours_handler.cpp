@@ -34,11 +34,10 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
         [this](const ec2::ApiLayoutTourData& tour)
         {
             m_controller->updateTour(tour);
-            if (auto reviewLayout = m_reviewLayouts.value(tour.id))
+            if (auto reviewLayout = m_reviewLayouts.take(tour.id))
             {
-                //TODO: #GDM #3.1 dynamically change
-                resourcePool()->removeResource(reviewLayout);
-                reviewLayoutTour(tour);
+                //TODO: #GDM #3.1 dynamically change items
+                reviewLayout->setData(Qn::CustomPanelTitleRole, tour.name);
             }
         });
 
@@ -153,8 +152,9 @@ void LayoutToursHandler::reviewLayoutTour(const ec2::ApiLayoutTourData& tour)
     }
 
     const QList<QnActions::IDType> actions{
-        QnActions::ToggleLayoutTourModeAction,
-        QnActions::RemoveLayoutTourAction
+        QnActions::StartCurrentLayoutTourAction,
+        QnActions::SaveCurrentLayoutTourAction,
+        QnActions::RemoveCurrentLayoutTourAction
     };
 
     static const float kCellAspectRatio{4.0f / 3.0f};
@@ -164,7 +164,7 @@ void LayoutToursHandler::reviewLayoutTour(const ec2::ApiLayoutTourData& tour)
     layout->setName(tour.name);
     layout->setData(Qn::IsSpecialLayoutRole, true);
     layout->setData(Qn::LayoutIconRole, qnSkin->icon(lit("tree/videowall.png")));
-    layout->setData(Qn::CustomPanelActionsRoleRole, qVariantFromValue(actions));
+    layout->setData(Qn::CustomPanelActionsRole, qVariantFromValue(actions));
     layout->setData(Qn::CustomPanelTitleRole, tour.name);
     layout->setData(Qn::CustomPanelDescriptionRole, QString());
     layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadWriteSavePermission));

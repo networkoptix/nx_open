@@ -13,7 +13,7 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/providers/resource_access_provider.h>
-
+#include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
@@ -125,6 +125,15 @@ Qn::ActionVisibility QnVideoWallReviewModeCondition::check(const QnActionParamet
     return Qn::EnabledAction;
 }
 
+Qn::ActionVisibility QnLayoutTourReviewModeCondition::check(const QnActionParameters& /*parameters*/)
+{
+    const bool isLayoutTourReviewMode = context()->workbench()->currentLayout()->data()
+        .contains(Qn::LayoutTourUuidRole);
+
+    return isLayoutTourReviewMode
+        ? Qn::EnabledAction
+        : Qn::InvisibleAction;
+}
 
 bool QnPreviewSearchModeCondition::isPreviewSearchMode(const QnActionParameters &parameters) const {
     return
@@ -696,10 +705,23 @@ Qn::ActionVisibility QnPanicActionCondition::check(const QnActionParameters &) {
 
 Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters &parameters)
 {
-    //TODO: #GDM #3.1 on tour review layout skip this check if needed
-    return context()->workbench()->currentLayout()->items().size() <= 1
-        ? Qn::DisabledAction
-        : Qn::EnabledAction;
+//     if (action(QnActions::ToggleLayoutTourModeAction)->isChecked())
+//         return Qn::EnabledAction;
+
+    const auto tourId = parameters.argument(Qn::UuidRole).value<QnUuid>();
+    if (tourId.isNull())
+    {
+        if (context()->workbench()->currentLayout()->items().size() > 1)
+            return Qn::EnabledAction;
+    }
+    else
+    {
+        auto tour = qnLayoutTourManager->tour(tourId);
+        if (tour.isValid() && tour.items.size() > 0)
+            return Qn::EnabledAction;
+    }
+
+    return Qn::DisabledAction;
 }
 
 Qn::ActionVisibility QnArchiveActionCondition::check(const QnResourceList &resources)

@@ -106,6 +106,20 @@ private:
     bool m_hide;
 };
 
+/**
+ * Condition class for actions that should be visible in layout tour review mode
+ * and hidden in all other cases.
+ */
+class QnLayoutTourReviewModeCondition: public QnActionCondition
+{
+public:
+    QnLayoutTourReviewModeCondition(QObject* parent):
+        QnActionCondition(parent)
+    {}
+protected:
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
 /** Base condition class for actions that should be hidden in preview search mode
  *  and visible in all other cases - or vise versa. */
 class QnPreviewSearchModeCondition: public QnActionCondition

@@ -845,7 +845,7 @@ bool QnWorkbenchExportHandler::confirmExport(
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         mainWindow());
 
-    dialog.addButton(tr("Export"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+    dialog.addButton(tr("Export"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
     return (dialog.exec() != QDialogButtonBox::Cancel);
 }
 
