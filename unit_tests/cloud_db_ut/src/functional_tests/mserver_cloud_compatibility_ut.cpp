@@ -39,6 +39,12 @@ private:
                 connectionStateChangeQueue.push(true);
             },
             &onConnectionBecomesActiveSubscriptionId);
+        auto onConnectionBecomesActiveSubscriptionGuard = makeScopeGuard(
+            [this, onConnectionBecomesActiveSubscriptionId]()
+            {
+                onConnectionBecomesActiveSubscription().removeSubscription(
+                    onConnectionBecomesActiveSubscriptionId);
+            });
 
         nx::utils::SubscriptionId onConnectionFailureSubscriptionId = -1;
         onConnectionFailureSubscription().subscribe(
@@ -48,14 +54,15 @@ private:
                 connectionStateChangeQueue.push(false);
             },
             &onConnectionFailureSubscriptionId);
+        auto onConnectionFailureSubscriptionGuard = makeScopeGuard(
+            [this, onConnectionFailureSubscriptionId]()
+            {
+                onConnectionFailureSubscription().removeSubscription(
+                    onConnectionFailureSubscriptionId);
+            });
 
         openTransactionConnectionsOfSpecifiedVersion(1, version);
         ASSERT_EQ(isActive, connectionStateChangeQueue.pop());
-
-        onConnectionBecomesActiveSubscription().removeSubscription(
-            onConnectionBecomesActiveSubscriptionId);
-        onConnectionFailureSubscription().removeSubscription(
-            onConnectionFailureSubscriptionId);
     }
 };
 
