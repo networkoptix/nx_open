@@ -95,12 +95,23 @@ void LayoutTourItemWidget::setOrder(int value)
 
 void LayoutTourItemWidget::initOverlay()
 {
+    auto font = this->font();
+    font.setPixelSize(14);
+    setFont(font);
+    setPaletteColor(this, QPalette::WindowText, QColor("#a5b7c0")); //TODO: #GDM #3.1 customize
+
+    auto titleFont(font);
+    titleFont.setWeight(QFont::DemiBold);
+
+    auto orderFont(font);
+    orderFont.setPixelSize(18);
+
     auto icon = new GraphicsPixmap();
     icon->setAcceptedMouseButtons(0);
 
     auto updateIcon = [this, icon]
         {
-            const auto pixmap =  qnResIconCache->icon(m_layout)
+            const auto pixmap = qnResIconCache->icon(m_layout)
                 .pixmap(1024, 1024, QIcon::Normal, QIcon::On);
             icon->setPixmap(pixmap);
         };
@@ -110,9 +121,8 @@ void LayoutTourItemWidget::initOverlay()
     auto title = new GraphicsLabel();
     title->setAcceptedMouseButtons(0);
     title->setPerformanceHint(GraphicsLabel::PixmapCaching);
-    auto font = title->font();
-    font.setWeight(QFont::DemiBold);
-    title->setFont(font);
+    title->setFont(titleFont);
+    title->setAlignment(Qt::AlignVCenter);
 
     auto updateTitle = [this, title]
         {
@@ -132,10 +142,13 @@ void LayoutTourItemWidget::initOverlay()
     headerLayout->addItem(title);
     headerLayout->addStretch();
     headerLayout->addItem(closeButton);
+    headerLayout->setSpacing(4.0);
 
     auto orderLabel = new GraphicsLabel();
     orderLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
     orderLabel->setAcceptedMouseButtons(0);
+    orderLabel->setAlignment(Qt::AlignVCenter);
+    orderLabel->setFont(orderFont);
     auto updateOrder = [orderLabel](int order)
         {
             orderLabel->setText(QString::number(order));
@@ -146,6 +159,9 @@ void LayoutTourItemWidget::initOverlay()
     auto delayHintLabel = new GraphicsLabel(tr("Display for"));
     delayHintLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
     delayHintLabel->setAcceptedMouseButtons(0);
+    delayHintLabel->setAlignment(Qt::AlignVCenter);
+    delayHintLabel->setFont(font);
+    setPaletteColor(delayHintLabel, QPalette::WindowText, QColor("#53707f")); //TODO: #GDM #3.1 customize
 
     auto delayEdit = new QSpinBox();
     delayEdit->setSuffix(QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
