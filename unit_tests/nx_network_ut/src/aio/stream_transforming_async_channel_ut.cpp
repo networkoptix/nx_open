@@ -145,7 +145,6 @@ class StreamTransformingAsyncChannel:
 public:
     StreamTransformingAsyncChannel():
         m_rawDataChannel(nullptr),
-        m_converter(nullptr),
         m_readCallSequence(0)
     {
     }
@@ -206,11 +205,12 @@ protected:
     void whenTransferringFiniteData()
     {
         prepareRandomInputData();
-        transferData();
+        sendTestData();
     }
 
     void assertDataReadMatchesDataWritten()
     {
+        readTestData();
         ASSERT_EQ(m_expectedOutputData, m_outputData);
     }
 
@@ -244,10 +244,20 @@ protected:
         assertDataReadMatchesDataWritten();
     }
 
+    AsyncChannel* rawDataChannel()
+    {
+        return m_rawDataChannel;
+    }
+
+    const std::unique_ptr<aio::StreamTransformingAsyncChannel>& channel() const
+    {
+        return m_channel;
+    }
+
 private:
     std::unique_ptr<aio::StreamTransformingAsyncChannel> m_channel;
     AsyncChannel* m_rawDataChannel;
-    Converter* m_converter;
+    std::unique_ptr<Converter> m_converter;
     utils::pipeline::ReflectingPipeline m_reflectingPipeline;
     nx::Buffer m_inputData;
     nx::Buffer m_expectedOutputData;
@@ -263,24 +273,25 @@ private:
             AsyncChannel::InputDepletionPolicy::retry);
         m_rawDataChannel = rawDataChannel.get();
 
-        auto converter = std::make_unique<Converter>();
-        m_converter = converter.get();
-
+        m_converter = std::make_unique<Converter>();
         m_channel = std::make_unique<aio::StreamTransformingAsyncChannel>(
             std::move(rawDataChannel),
-            std::move(converter));
+            m_converter.get());
     }
 
-    void transferData()
+    void sendTestData()
     {
         ChannelWriter writer(m_channel.get());
-        ChannelReader reader(m_channel.get());
-        reader.start();
 
         ASSERT_EQ(SystemError::noError, writer.writeSync(m_inputData));
-        reader.waitForSomeData();
         m_reflectingPipeline.writeEof();
+    }
 
+    void readTestData()
+    {
+        ChannelReader reader(m_channel.get());
+        reader.start();
+        reader.waitForSomeData();
         reader.waitEof();
         m_outputData = reader.dataRead();
     }
@@ -346,6 +357,57 @@ TEST_F(StreamTransformingAsyncChannel, cancel_write)
     assertIoHasBeenProperlyCancelled();
 }
 
+//-------------------------------------------------------------------------------------------------
+
+class StreamTransformingAsyncChannelIoErrors:
+    public StreamTransformingAsyncChannel
+{
+public:
+    StreamTransformingAsyncChannelIoErrors()
+    {
+        givenReflectingRawChannel();
+    }
+
+protected:
+    void emulateReadTimeoutOnUnderlyingChannel()
+    {
+        rawDataChannel()->setReadErrorState(SystemError::timedOut);
+    }
+
+    void emulateSendTimeoutOnUnderlyingChannel()
+    {
+        rawDataChannel()->setSendErrorState(SystemError::timedOut);
+    }
+
+    void whenUnderlyingChannelIsFullyFunctionalAgain()
+    {
+        rawDataChannel()->setReadErrorState(boost::none);
+        rawDataChannel()->setSendErrorState(boost::none);
+    }
+
+    void thenReadTimedoutHasBeenRaised()
+    {
+        nx::Buffer readBuffer;
+        readBuffer.reserve(4*1024);
+
+        nx::utils::promise<SystemError::ErrorCode> ioCompleted;
+        channel()->readSomeAsync(
+            &readBuffer,
+            [&ioCompleted](
+                SystemError::ErrorCode sysErrorCode, std::size_t /*bytesRead*/)
+            {
+                ioCompleted.set_value(sysErrorCode);
+            });
+        ASSERT_EQ(SystemError::timedOut, ioCompleted.get_future().get());
+    }
+
+    void thenSendTimedoutHasBeenRaisedByUnderlyingChannel()
+    {
+        // TODO: #ak Add corresponding functionality to test async channel.
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+};
+
 //TEST_F(StreamTransformingAsyncChannel, cancel_read_does_not_cancel_operations_required_by_write)
 
 //TEST_F(StreamTransformingAsyncChannel, read_error)
@@ -354,8 +416,31 @@ TEST_F(StreamTransformingAsyncChannel, cancel_write)
 //TEST_F(StreamTransformingAsyncChannel, read_thirst)
 //TEST_F(StreamTransformingAsyncChannel, write_thirst)
 //TEST_F(StreamTransformingAsyncChannel, all_data_is_read_in_case_of_write_error)
-//TEST_F(StreamTransformingAsyncChannel, read_timeout)
-//TEST_F(StreamTransformingAsyncChannel, write_timeout)
+
+TEST_F(StreamTransformingAsyncChannelIoErrors, read_timeout)
+{
+    emulateReadTimeoutOnUnderlyingChannel();
+    thenReadTimedoutHasBeenRaised();
+
+    whenUnderlyingChannelIsFullyFunctionalAgain();
+
+    whenTransferringFiniteData();
+    assertDataReadMatchesDataWritten();
+}
+
+TEST_F(StreamTransformingAsyncChannelIoErrors, send_timeout_on_underlying_channel)
+{
+    emulateSendTimeoutOnUnderlyingChannel();
+
+    whenTransferringFiniteData();
+    thenSendTimedoutHasBeenRaisedByUnderlyingChannel();
+
+    whenUnderlyingChannelIsFullyFunctionalAgain();
+    assertDataReadMatchesDataWritten();
+}
+
+//TEST_F(StreamTransformingAsyncChannelIoErrors, send_timeout_on_converted_data_send_queue_overflow)
+
 //TEST_F(StreamTransformingAsyncChannel, removing_in_completion_handler)
 //TEST_F(StreamTransformingAsyncChannel, raw_channel_io_method_calls_handler_within_method_call)
 

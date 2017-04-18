@@ -6,10 +6,10 @@ namespace aio {
 
 StreamTransformingAsyncChannel::StreamTransformingAsyncChannel(
     std::unique_ptr<AbstractAsyncChannel> rawDataChannel,
-    std::unique_ptr<nx::utils::pipeline::Converter> converter)
+    nx::utils::pipeline::Converter* converter)
     :
     m_rawDataChannel(std::move(rawDataChannel)),
-    m_converter(std::move(converter)),
+    m_converter(converter),
     m_userReadBuffer(nullptr),
     m_bytesEncodedOnPreviousStep(0),
     m_asyncReadInProgress(false)
@@ -80,75 +80,6 @@ void StreamTransformingAsyncChannel::stopWhileInAioThread()
     m_rawDataChannel.reset();
 }
 
-int StreamTransformingAsyncChannel::readRawBytes(void* data, size_t count)
-{
-    using namespace std::placeholders;
-
-    NX_ASSERT(isInSelfAioThread());
-
-    if (!m_readRawData.empty())
-        return readRawDataFromCache(data, count);
-
-    if (!m_asyncReadInProgress)
-        readRawChannelAsync();
-
-    return utils::pipeline::StreamIoError::wouldBlock;
-}
-
-int StreamTransformingAsyncChannel::writeRawBytes(const void* data, size_t count)
-{
-    using namespace std::placeholders;
-
-    NX_ASSERT(isInSelfAioThread());
-
-    // TODO: #ak Put a limit on send queue size.
-
-    m_rawWriteQueue.push_back(nx::Buffer((const char*)data, (int)count));
-    if (m_rawWriteQueue.size() == 1)
-    {
-        m_rawDataChannel->sendAsync(
-            m_rawWriteQueue.front(),
-            std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this, _1, _2));
-    }
-
-    return (int)count;
-}
-
-int StreamTransformingAsyncChannel::readRawDataFromCache(void* data, size_t count)
-{
-    uint8_t* dataBytes = static_cast<uint8_t*>(data);
-    std::size_t bytesRead = 0;
-
-    while (!m_readRawData.empty() && count > 0)
-    {
-        nx::Buffer& rawData = m_readRawData.front();
-        auto bytesToCopy = std::min<std::size_t>(rawData.size(), count);
-        memcpy(dataBytes, rawData.constData(), bytesToCopy);
-        dataBytes += bytesToCopy;
-        count -= bytesToCopy;
-        rawData.remove(0, (int)bytesToCopy);
-        if (m_readRawData.front().isEmpty())
-            m_readRawData.pop_front();
-        bytesRead += bytesToCopy;
-    }
-
-    return (int)bytesRead;
-}
-
-void StreamTransformingAsyncChannel::readRawChannelAsync()
-{
-    using namespace std::placeholders;
-
-    constexpr static std::size_t kRawReadBufferSize = 16 * 1024;
-
-    m_rawDataReadBuffer.clear();
-    m_rawDataReadBuffer.reserve(kRawReadBufferSize);
-    m_rawDataChannel->readSomeAsync(
-        &m_rawDataReadBuffer,
-        std::bind(&StreamTransformingAsyncChannel::onSomeRawDataRead, this, _1, _2));
-    m_asyncReadInProgress = true;
-}
-
 void StreamTransformingAsyncChannel::tryToCompleteUserTasks()
 {
     std::vector<UserTask*> tasksToProcess;
@@ -192,7 +123,7 @@ void StreamTransformingAsyncChannel::processReadTask(ReadTask* task)
     SystemError::ErrorCode sysErrorCode = SystemError::noError;
     int bytesRead = 0;
     std::tie(sysErrorCode, bytesRead) = invokeConverter(
-        std::bind(&utils::pipeline::Converter::read, m_converter.get(),
+        std::bind(&utils::pipeline::Converter::read, m_converter,
             task->buffer->data() + task->buffer->size(),
             task->buffer->capacity() - task->buffer->size()));
     if (sysErrorCode == SystemError::wouldBlock)
@@ -210,7 +141,7 @@ void StreamTransformingAsyncChannel::processWriteTask(WriteTask* task)
     SystemError::ErrorCode sysErrorCode = SystemError::noError;
     int bytesWritten = 0;
     std::tie(sysErrorCode, bytesWritten) = invokeConverter(
-        std::bind(&utils::pipeline::Converter::write, m_converter.get(),
+        std::bind(&utils::pipeline::Converter::write, m_converter,
             task->buffer.data(),
             task->buffer.size()));
     if (sysErrorCode == SystemError::wouldBlock)
@@ -247,16 +178,54 @@ std::tuple<SystemError::ErrorCode, int /*bytesTransferred*/>
     return std::make_tuple(SystemError::wouldBlock, -1);
 }
 
-void StreamTransformingAsyncChannel::removeUserTask(UserTask* taskToRemove)
+int StreamTransformingAsyncChannel::readRawBytes(void* data, size_t count)
 {
-    for (auto it = m_userTaskQueue.begin(); it != m_userTaskQueue.end(); ++it)
+    using namespace std::placeholders;
+
+    NX_ASSERT(isInSelfAioThread());
+
+    if (!m_readRawData.empty())
+        return readRawDataFromCache(data, count);
+
+    if (!m_asyncReadInProgress)
+        readRawChannelAsync();
+
+    return utils::pipeline::StreamIoError::wouldBlock;
+}
+
+int StreamTransformingAsyncChannel::readRawDataFromCache(void* data, size_t count)
+{
+    uint8_t* dataBytes = static_cast<uint8_t*>(data);
+    std::size_t bytesRead = 0;
+
+    while (!m_readRawData.empty() && count > 0)
     {
-        if (it->get() == taskToRemove)
-        {
-            m_userTaskQueue.erase(it);
-            break;
-        }
+        nx::Buffer& rawData = m_readRawData.front();
+        auto bytesToCopy = std::min<std::size_t>(rawData.size(), count);
+        memcpy(dataBytes, rawData.constData(), bytesToCopy);
+        dataBytes += bytesToCopy;
+        count -= bytesToCopy;
+        rawData.remove(0, (int)bytesToCopy);
+        if (m_readRawData.front().isEmpty())
+            m_readRawData.pop_front();
+        bytesRead += bytesToCopy;
     }
+
+    return (int)bytesRead;
+}
+
+void StreamTransformingAsyncChannel::readRawChannelAsync()
+{
+    using namespace std::placeholders;
+
+    constexpr static std::size_t kRawReadBufferSize = 16 * 1024;
+
+    m_rawDataReadBuffer.clear();
+    m_rawDataReadBuffer.reserve(kRawReadBufferSize);
+    m_rawDataChannel->readSomeAsync(
+        &m_rawDataReadBuffer,
+        std::bind(&StreamTransformingAsyncChannel::onSomeRawDataRead, this, _1, _2));
+    m_asyncReadInProgress = true;
 }
 
 void StreamTransformingAsyncChannel::onSomeRawDataRead(
@@ -277,24 +246,52 @@ void StreamTransformingAsyncChannel::onSomeRawDataRead(
     handleIoError(sysErrorCode);
 }
 
-void StreamTransformingAsyncChannel::onRawDataWritten(
-    SystemError::ErrorCode sysErrorCode,
-    std::size_t /*bytesTransferred*/)
+int StreamTransformingAsyncChannel::writeRawBytes(const void* data, size_t count)
 {
     using namespace std::placeholders;
 
-    m_rawWriteQueue.pop_front();
-    if (!m_rawWriteQueue.empty())
+    NX_ASSERT(isInSelfAioThread());
+
+    // TODO: #ak Put a limit on send queue size.
+
+    m_rawWriteQueue.push_back(nx::Buffer((const char*)data, (int)count));
+    if (m_rawWriteQueue.size() == 1)
     {
         m_rawDataChannel->sendAsync(
             m_rawWriteQueue.front(),
             std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this, _1, _2));
     }
 
-    if (sysErrorCode == SystemError::noError)
-        return tryToCompleteUserTasks();
+    return (int)count;
+}
 
-    handleIoError(sysErrorCode);
+void StreamTransformingAsyncChannel::onRawDataWritten(
+    SystemError::ErrorCode sysErrorCode,
+    std::size_t bytesTransferred)
+{
+    using namespace std::placeholders;
+
+    if (sysErrorCode == SystemError::noError)
+    {
+        NX_ASSERT(bytesTransferred == m_rawWriteQueue.front().size());
+        m_rawWriteQueue.pop_front();
+        if (!m_rawWriteQueue.empty())
+        {
+            m_rawDataChannel->sendAsync(
+                m_rawWriteQueue.front(),
+                std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this, _1, _2));
+        }
+
+        return tryToCompleteUserTasks();
+    }
+
+    if (nx::network::socketCannotRecoverFromError(sysErrorCode))
+        return handleIoError(sysErrorCode);
+
+    // Retrying I/O.
+    m_rawDataChannel->sendAsync(
+        m_rawWriteQueue.front(),
+        std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this, _1, _2));
 }
 
 void StreamTransformingAsyncChannel::handleIoError(SystemError::ErrorCode sysErrorCode)
@@ -319,6 +316,18 @@ void StreamTransformingAsyncChannel::handleIoError(SystemError::ErrorCode sysErr
         }
         if (thisDestructionWatcher.objectDestroyed())
             return;
+    }
+}
+
+void StreamTransformingAsyncChannel::removeUserTask(UserTask* taskToRemove)
+{
+    for (auto it = m_userTaskQueue.begin(); it != m_userTaskQueue.end(); ++it)
+    {
+        if (it->get() == taskToRemove)
+        {
+            m_userTaskQueue.erase(it);
+            break;
+        }
     }
 }
 
