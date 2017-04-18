@@ -56,11 +56,9 @@
 #include <ui/graphics/instruments/widget_layout_instrument.h>
 
 #include <ui/graphics/items/resource/button_ids.h>
+#include <nx/client/desktop/ui/workbench/resource/resource_widget_factory.h>
 #include <ui/graphics/items/resource/resource_widget.h>
-#include <ui/graphics/items/resource/server_resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/graphics/items/resource/videowall_screen_widget.h>
-#include <ui/graphics/items/resource/web_resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h>
 #include <ui/graphics/items/grid/curtain_item.h>
@@ -1073,56 +1071,9 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         return false;
     }
 
-    /* Invalid items may lead to very strange behavior bugs. */
-    if (item->uuid().isNull())
-    {
-	    NX_LOG(lit("QnWorkbenchDisplay::addItemInternal: null item uuid"), cl_logDEBUG1);
-        qnDeleteLater(item);
-        return false;
-    }
-
-    QnResourcePtr resource = resourcePool()->getResourceByUniqueId(item->resourceUid());
-    if (!resource)
-    {
-        NX_LOG(lit("QnWorkbenchDisplay::addItemInternal: invalid resource id %1")
-            .arg(item->resourceUid()), cl_logDEBUG1);
-        qnDeleteLater(item);
-        return false;
-    }
-
-    const auto requiredPermission = QnResourceAccessFilter::isShareableMedia(resource)
-        ? Qn::ViewContentPermission
-        : Qn::ReadPermission;
-
-    if (!accessController()->hasPermissions(resource, requiredPermission))
-    {
-	    NX_LOG(lit("QnWorkbenchDisplay::addItemInternal: insufficient permissions"), cl_logDEBUG1);
-        qnDeleteLater(item);
-        return false;
-    }
-
-    QnResourceWidget *widget = nullptr;
-    if (resource->hasFlags(Qn::server))
-    {
-        widget = new QnServerResourceWidget(context(), item);
-    }
-    else if (resource->hasFlags(Qn::videowall))
-    {
-        widget = new QnVideowallScreenWidget(context(), item);
-    }
-    else if (resource->hasFlags(Qn::media))
-    {
-        widget = new QnMediaResourceWidget(context(), item);
-    }
-    else if (resource->hasFlags(Qn::web_page))
-    {
-        widget = new QnWebResourceWidget(context(), item);
-    }
-
+    auto widget = ResourceWidgetFactory::createWidget(context(), item);
     if (!widget)
     {
-        NX_LOG(lit("QnWorkbenchDisplay::addItemInternal: unsupported resource type %1")
-            .arg(resource->flags()), cl_logDEBUG1);
         qnDeleteLater(item);
         return false;
     }

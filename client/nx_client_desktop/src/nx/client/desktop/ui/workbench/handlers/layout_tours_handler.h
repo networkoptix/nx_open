@@ -2,6 +2,8 @@
 
 #include <QtCore/QObject>
 
+#include <core/resource/resource_fwd.h>
+
 #include <nx_ec/data/api_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
@@ -27,9 +29,12 @@ private:
     void reviewLayoutTour(const ec2::ApiLayoutTourData& tour);
     void saveTourToServer(const ec2::ApiLayoutTourData& tour);
     void removeTourFromServer(const QnUuid& tourId);
+    void addItemToReviewLayout(const QnLayoutResourcePtr& layout,
+        const ec2::ApiLayoutTourItemData& item);
 
 private:
     LayoutTourController* m_controller;
+    QHash<QnUuid, QnLayoutResourcePtr> m_reviewLayouts;
 };
 
 } // namespace workbench
