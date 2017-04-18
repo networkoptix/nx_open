@@ -62,7 +62,7 @@ public:
      * Indicates that the next sendAsync will close current message 
      */
     void setIsLastFrame();
-    void sendPing();
+    void sendPingAsync();
 
 private:
     /**  BaseServerConnectionHandler implementation */
