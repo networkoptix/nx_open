@@ -451,7 +451,7 @@
     
     "QnGridBackgroundItem": {
         "_": "Scene background color for custom layouts.",
-        "panelColor": "dark8"
+        "panelColor": "#1d2327"
     },    
 
     "QnControlBackgroundWidget": {

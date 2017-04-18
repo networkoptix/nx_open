@@ -22,7 +22,9 @@ LayoutPreviewPainter::LayoutPreviewPainter(
     QObject* parent)
     :
     base_type(parent),
-    m_thumbnailManager(thumbnailManager)
+    m_thumbnailManager(thumbnailManager),
+    m_frameColor(Qt::black),
+    m_backgroundColor(Qt::darkGray)
 {
     NX_EXPECT(thumbnailManager);
 }
@@ -41,16 +43,34 @@ void LayoutPreviewPainter::setLayout(const QnLayoutResourcePtr& layout)
     m_layout = layout;
 }
 
+QColor LayoutPreviewPainter::frameColor() const
+{
+    return m_frameColor;
+}
+
+void LayoutPreviewPainter::setFrameColor(const QColor& value)
+{
+    m_frameColor = value;
+}
+
+QColor LayoutPreviewPainter::backgroundColor() const
+{
+    return m_backgroundColor;
+}
+
+void LayoutPreviewPainter::setBackgroundColor(const QColor& value)
+{
+    m_backgroundColor = value;
+}
+
 void LayoutPreviewPainter::paint(QPainter* painter, const QRect& paintRect)
 {
-    static const QColor frameColor(Qt::black);
-    static const QColor bgColor(Qt::darkGray);
     static const int kFrameWidth = 1;
 
     if (paintRect.isEmpty())
         return;
 
-    QnNxStyle::paintCosmeticFrame(painter, paintRect, frameColor, kFrameWidth, 0);
+    QnNxStyle::paintCosmeticFrame(painter, paintRect, m_frameColor, kFrameWidth, 0);
 
     if (!m_layout)
         return;
@@ -58,7 +78,7 @@ void LayoutPreviewPainter::paint(QPainter* painter, const QRect& paintRect)
     QRect rect(paintRect);
 
     rect.adjust(kFrameWidth, kFrameWidth, -kFrameWidth, -kFrameWidth);
-    painter->fillRect(paintRect, bgColor);
+    painter->fillRect(paintRect, m_backgroundColor);
 
     //TODO: #GDM #3.1 paint layout background and calculate its size in bounding geometry
     QRectF bounding;
@@ -116,7 +136,7 @@ void LayoutPreviewPainter::paint(QPainter* painter, const QRect& paintRect)
         qreal h1 = (cellRect.height() - space * 2) * yscale;
 
         QRectF itemRect(x1, y1, w1, h1);
-        QnNxStyle::paintCosmeticFrame(painter, itemRect, frameColor, -kFrameWidth, 0);
+        QnNxStyle::paintCosmeticFrame(painter, itemRect, m_frameColor, kFrameWidth, 0);
         if (!paintItem(painter, itemRect, data))
             allItemsAreLoaded = false;
     }
