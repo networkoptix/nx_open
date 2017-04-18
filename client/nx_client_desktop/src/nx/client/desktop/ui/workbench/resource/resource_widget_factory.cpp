@@ -38,7 +38,7 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchContext* contex
         return nullptr;
     }
 
-    QnResourcePtr resource = context->resourcePool()->getResourceByUniqueId(item->resourceUid());
+    const auto resource = context->resourcePool()->getResourceByUniqueId(item->resourceUid());
     if (!resource)
     {
         NX_LOG(lit("ResourceWidgetFactory: invalid resource id %1")
@@ -72,13 +72,13 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchContext* contex
     if (resource->hasFlags(Qn::layout))
     {
         auto layout = item->layout();
-        NX_EXPECT(layout);
         const bool isLayoutTourReview = layout
             && !layout->data(Qn::LayoutTourUuidRole).value<QnUuid>().isNull();
+
+        NX_EXPECT(isLayoutTourReview);
         if (isLayoutTourReview)
             return new LayoutTourItemWidget(context, item);
     }
-
 
     NX_EXPECT(false, lit("ResourceWidgetFactory: unsupported resource type %1")
         .arg(resource->flags()));

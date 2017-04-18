@@ -15,8 +15,11 @@ class LayoutTourItemWidget: public QnResourceWidget
 {
     Q_OBJECT
     using base_type = QnResourceWidget;
+
 public:
-    LayoutTourItemWidget(QnWorkbenchContext* context, QnWorkbenchItem* item,
+    LayoutTourItemWidget(
+        QnWorkbenchContext* context,
+        QnWorkbenchItem* item,
         QGraphicsItem* parent = nullptr);
     virtual ~LayoutTourItemWidget() override;
 
@@ -26,7 +29,6 @@ private:
 private:
     QnLayoutResourcePtr m_layout;
     QSharedPointer<LayoutPreviewPainter> m_previewPainter;
-
 };
 
 } // namespace workbench

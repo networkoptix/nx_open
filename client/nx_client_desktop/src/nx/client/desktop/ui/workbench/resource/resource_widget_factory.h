@@ -14,7 +14,6 @@ class ResourceWidgetFactory
 {
 public:
     static QnResourceWidget* createWidget(QnWorkbenchContext* context, QnWorkbenchItem* item);
-
 };
 
 } // namespace workbench
