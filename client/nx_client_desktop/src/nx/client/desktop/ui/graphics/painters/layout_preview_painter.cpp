@@ -75,12 +75,7 @@ void LayoutPreviewPainter::paint(QPainter* painter, const QRect& paintRect)
         QnNxStyle::paintCosmeticFrame(painter, paintRect, m_frameColor, kFrameWidth, 0);
         return;
     }
-
-    QRect rect(paintRect);
-
-    rect.adjust(kFrameWidth, kFrameWidth, -kFrameWidth, -kFrameWidth);
     painter->fillRect(paintRect, m_backgroundColor);
-    QnNxStyle::paintCosmeticFrame(painter, paintRect, m_frameColor, kFrameWidth, 0);
 
     //TODO: #GDM #3.1 paint layout background and calculate its size in bounding geometry
     QRectF bounding;
@@ -104,28 +99,30 @@ void LayoutPreviewPainter::paint(QPainter* painter, const QRect& paintRect)
     qreal xscale, yscale, xoffset, yoffset;
     qreal sourceAr = cellAspectRatio * bounding.width() / bounding.height();
 
-    qreal targetAr = paintRect.width() / paintRect.height();
+    QRect contentsRect(paintRect);
+    contentsRect.adjust(kFrameWidth * 2, kFrameWidth * 2, -kFrameWidth * 2, -kFrameWidth * 2);
+    qreal targetAr = QnGeometry::aspectRatio(contentsRect);
     if (sourceAr > targetAr)
     {
-        xscale = paintRect.width() / bounding.width();
+        xscale = contentsRect.width() / bounding.width();
         yscale = xscale / cellAspectRatio;
-        xoffset = paintRect.left();
+        xoffset = contentsRect.left();
 
         qreal h = bounding.height() * yscale;
-        yoffset = (paintRect.height() - h) * 0.5 + paintRect.top();
+        yoffset = (contentsRect.height() - h) * 0.5 + contentsRect.top();
     }
     else
     {
-        yscale = paintRect.height() / bounding.height();
+        yscale = contentsRect.height() / bounding.height();
         xscale = yscale * cellAspectRatio;
-        yoffset = paintRect.top();
+        yoffset = contentsRect.top();
 
         qreal w = bounding.width() * xscale;
-        xoffset = (paintRect.width() - w) * 0.5 + paintRect.left();
+        xoffset = (contentsRect.width() - w) * 0.5 + contentsRect.left();
     }
 
     bool allItemsAreLoaded = true;
-    foreach(const QnLayoutItemData &data, m_layout->getItems())
+    for (const auto& data: m_layout->getItems())
     {
         QRectF cellRect = data.combinedGeometry;
         if (!cellRect.isValid())
@@ -142,6 +139,8 @@ void LayoutPreviewPainter::paint(QPainter* painter, const QRect& paintRect)
         if (!paintItem(painter, itemRect, data))
             allItemsAreLoaded = false;
     }
+
+    QnNxStyle::paintCosmeticFrame(painter, paintRect, m_frameColor, kFrameWidth, 0);
 
 //     const auto overlay = allItemsAreLoaded ? Qn::EmptyOverlay : Qn::LoadingOverlay;
 //     m_statusOverlayController->setStatusOverlay(overlay, true);
