@@ -302,7 +302,7 @@ TimelineActions.prototype.zoomByWheel = function(clicks, mouseOverElements, mous
         if(!this.zoomByWheelTarget) {
             this.zoomByWheelTarget = zoom;
         }
-        this.zoomByWheelTarget -= clicks / timelineConfig.maxVerticalScrollForZoom;
+        this.zoomByWheelTarget -= clicks / this.timelineConfig.maxVerticalScrollForZoom;
         this.zoomByWheelTarget = this.scaleManager.boundZoom(this.zoomByWheelTarget);
     }
 

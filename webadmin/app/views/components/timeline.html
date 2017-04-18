@@ -29,18 +29,11 @@
                 </span>
             </div>
             <div class="inline-block zoom-level pull-right">
-                <span class="webclient-button glyphicon-pm"
-                      ng-mouseup="stopZoom(true)"
-                      ng-mouseleave="stopZoom(true)"
-                      ng-mousedown="startZoom(true)"
+                <span class="webclient-button glyphicon-pm zoomInButton"
                       ng-class="{disabled:scaleManager.disableZoomIn || liveOnly}">
                     <span class="glyphicon glyphicon-plus"></span>
                 </span>
-                <span class="webclient-button glyphicon-pm"
-                      ng-mouseup="stopZoom(false)"
-                      ng-mouseleave="stopZoom(false)"
-                      ng-mousedown="startZoom(false)"
-                      ng-dblclick="zoomOut()"
+                <span class="webclient-button glyphicon-pm zoomOutButton"
                       ng-class="{disabled:scaleManager.disableZoomOut || liveOnly}">
                     <span class="glyphicon glyphicon-minus"></span>
                 </span>
