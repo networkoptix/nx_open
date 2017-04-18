@@ -13,6 +13,33 @@ namespace test {
 class Ec2MserverCloudCompatibility:
     public Ec2MserverCloudSynchronizationConnection
 {
+public:
+    Ec2MserverCloudCompatibility()
+    {
+        onConnectionBecomesActiveSubscription().subscribe(
+            [this](int connectionId, ::ec2::QnTransactionTransportBase::State /*state*/)
+            {
+                m_connectionStateChangeQueue.push({ connectionId, true });
+            },
+            &m_onConnectionBecomesActiveSubscriptionId);
+
+        onConnectionFailureSubscription().subscribe(
+            [this](int connectionId, ::ec2::QnTransactionTransportBase::State /*state*/)
+            {
+                m_connectionStateChangeQueue.push({ connectionId, false });
+            },
+            &m_onConnectionFailureSubscriptionId);
+    }
+
+    ~Ec2MserverCloudCompatibility()
+    {
+        onConnectionBecomesActiveSubscription().removeSubscription(
+            m_onConnectionBecomesActiveSubscriptionId);
+
+        onConnectionFailureSubscription().removeSubscription(
+            m_onConnectionFailureSubscriptionId);
+    }
+
 protected:
     void assertCdbAcceptsConnectionOfVersion(int version)
     {
@@ -27,42 +54,31 @@ protected:
     }
 
 private:
+    struct ConnectionStateChangeContext
+    {
+        int connectionId;
+        bool isActive;
+
+        ConnectionStateChangeContext() = delete;
+    };
+
+    nx::utils::SyncQueue<ConnectionStateChangeContext> m_connectionStateChangeQueue;
+    nx::utils::SubscriptionId m_onConnectionBecomesActiveSubscriptionId = -1;
+    nx::utils::SubscriptionId m_onConnectionFailureSubscriptionId = -1;
+
     void openConnectionAndWaitForItToMoveToState(int version, bool isActive)
     {
-        nx::utils::SyncQueue<bool> connectionStateChangeQueue;
-
-        nx::utils::SubscriptionId onConnectionBecomesActiveSubscriptionId = -1;
-        onConnectionBecomesActiveSubscription().subscribe(
-            [this, &connectionStateChangeQueue](
-                ::ec2::QnTransactionTransportBase::State /*state*/)
-            {
-                connectionStateChangeQueue.push(true);
-            },
-            &onConnectionBecomesActiveSubscriptionId);
-        auto onConnectionBecomesActiveSubscriptionGuard = makeScopeGuard(
-            [this, onConnectionBecomesActiveSubscriptionId]()
-            {
-                onConnectionBecomesActiveSubscription().removeSubscription(
-                    onConnectionBecomesActiveSubscriptionId);
-            });
-
-        nx::utils::SubscriptionId onConnectionFailureSubscriptionId = -1;
-        onConnectionFailureSubscription().subscribe(
-            [this, &connectionStateChangeQueue](
-                ::ec2::QnTransactionTransportBase::State /*state*/)
-            {
-                connectionStateChangeQueue.push(false);
-            },
-            &onConnectionFailureSubscriptionId);
-        auto onConnectionFailureSubscriptionGuard = makeScopeGuard(
-            [this, onConnectionFailureSubscriptionId]()
-            {
-                onConnectionFailureSubscription().removeSubscription(
-                    onConnectionFailureSubscriptionId);
-            });
-
-        openTransactionConnectionsOfSpecifiedVersion(1, version);
-        ASSERT_EQ(isActive, connectionStateChangeQueue.pop());
+        std::vector<int> createdConnectionIds =
+            openTransactionConnectionsOfSpecifiedVersion(1, version);
+        const auto connectionId = createdConnectionIds[0];
+        for (;;)
+        {
+            const auto connectionStateChangeContext = m_connectionStateChangeQueue.pop();
+            if (connectionStateChangeContext.connectionId != connectionId)
+                continue;
+            ASSERT_EQ(isActive, connectionStateChangeContext.isActive);
+            break;
+        }
     }
 };
 
@@ -79,6 +95,7 @@ TEST_F(Ec2MserverCloudCompatibility, any_compatible_proto_version_is_accepted_by
         ++version)
     {
         assertCdbAcceptsConnectionOfVersion(version);
+        useAnotherSystem();
     }
 }
 
