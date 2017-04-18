@@ -58,8 +58,6 @@ private:
     {
         int connectionId;
         bool isActive;
-
-        ConnectionStateChangeContext() = delete;
     };
 
     nx::utils::SyncQueue<ConnectionStateChangeContext> m_connectionStateChangeQueue;
