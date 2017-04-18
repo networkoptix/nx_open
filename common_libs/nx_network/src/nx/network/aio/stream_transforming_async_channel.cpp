@@ -273,7 +273,7 @@ void StreamTransformingAsyncChannel::onRawDataWritten(
 
     if (sysErrorCode == SystemError::noError)
     {
-        NX_ASSERT(bytesTransferred == m_rawWriteQueue.front().size());
+        NX_ASSERT(bytesTransferred == static_cast<std::size_t>(m_rawWriteQueue.front().size()));
         m_rawWriteQueue.pop_front();
         if (!m_rawWriteQueue.empty())
         {
