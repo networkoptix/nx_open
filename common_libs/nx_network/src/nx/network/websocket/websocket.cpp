@@ -38,7 +38,10 @@ void Websocket::bytesReceived(nx::Buffer& buffer)
 void Websocket::readyToSendData(size_t count)
 {
     m_writeBuffer.clear();
-    m_writeHandler(SystemError::noError, count);
+    auto writeHandlerCopy = std::move(m_writeHandler);
+    m_writeHandler = nullptr;
+    if (writeHandlerCopy)
+        writeHandlerCopy(SystemError::noError, count);
 }
 
 void Websocket::handleRead()
