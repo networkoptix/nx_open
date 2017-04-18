@@ -45,7 +45,7 @@ void toUrlParams(const ApiStoredFilePath& name, QUrlQuery* query)
 }
 
 bool parseHttpRequestParams(
-    const QString& command,
+    const QString& /*command*/,
     const QnRequestParamList& params,
     QByteArray* value)
 {

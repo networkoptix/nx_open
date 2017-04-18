@@ -384,7 +384,7 @@ protected:
 
     void changeSocketIoMode()
     {
-        ASSERT_EQ(1, reflectorPoolInUse()->count());
+        ASSERT_EQ(1U, reflectorPoolInUse()->count());
         auto socket = reflectorPoolInUse()->takeSocket();
         unusedReflectorPool()->add(std::move(socket));
     }
