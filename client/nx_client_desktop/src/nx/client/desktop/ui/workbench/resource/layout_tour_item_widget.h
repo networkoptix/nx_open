@@ -6,6 +6,9 @@ namespace nx {
 namespace client {
 namespace desktop {
 namespace ui {
+
+class LayoutPreviewPainter;
+
 namespace workbench {
 
 class LayoutTourItemWidget: public QnResourceWidget
@@ -15,12 +18,14 @@ class LayoutTourItemWidget: public QnResourceWidget
 public:
     LayoutTourItemWidget(QnWorkbenchContext* context, QnWorkbenchItem* item,
         QGraphicsItem* parent = nullptr);
+    virtual ~LayoutTourItemWidget() override;
 
 private:
     void initOverlay();
 
 private:
     QnLayoutResourcePtr m_layout;
+    QSharedPointer<LayoutPreviewPainter> m_previewPainter;
 
 };
 
