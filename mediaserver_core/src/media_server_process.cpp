@@ -3247,6 +3247,90 @@ private:
     QScopedPointer<MediaServerProcess> m_main;
 };
 
+void MediaServerProcess::setNeedInitHardwareId(bool value)
+{
+    m_needInitHardwareId = value;
+}
+
+bool MediaServerProcess::initHardwareId()
+{
+    LLUtil::initHardwareId(MSSettings::roSettings());
+    updateGuidIfNeeded();
+    setHardwareGuidList(LLUtil::getAllHardwareIds().toVector());
+
+    QnUuid guid = serverGuid();
+    if (guid.isNull())
+    {
+        qDebug() << "Can't save guid. Run once as administrator.";
+        NX_LOG("Can't save guid. Run once as administrator.", cl_logERROR);
+        qApp->quit();
+        return false;
+    }
+    return true;
+}
+
+QString MediaServerProcess::hardwareIdAsGuid() const
+{
+    auto hwId = LLUtil::getLatestHardwareId();
+    auto hwIdString = QnUuid::fromHardwareId(hwId).toString();
+    std::cout << "Got hwID \"" << hwIdString.toStdString() << "\"" << std::endl;
+    return hwIdString;
+}
+
+void MediaServerProcess::updateGuidIfNeeded()
+{
+    QString guidIsHWID = MSSettings::roSettings()->value(GUID_IS_HWID).toString();
+    QString serverGuid = MSSettings::roSettings()->value(SERVER_GUID).toString();
+    QString serverGuid2 = MSSettings::roSettings()->value(SERVER_GUID2).toString();
+    QString pendingSwitchToClusterMode = MSSettings::roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString();
+
+    QString hwidGuid = hardwareIdAsGuid();
+
+    if (guidIsHWID == YES) {
+        if (serverGuid.isEmpty())
+            MSSettings::roSettings()->setValue(SERVER_GUID, hwidGuid);
+        else if (serverGuid != hwidGuid)
+            MSSettings::roSettings()->setValue(GUID_IS_HWID, NO);
+
+        MSSettings::roSettings()->remove(SERVER_GUID2);
+    }
+    else if (guidIsHWID == NO) {
+        if (serverGuid.isEmpty()) {
+            // serverGuid remove from settings manually?
+            MSSettings::roSettings()->setValue(SERVER_GUID, hwidGuid);
+            MSSettings::roSettings()->setValue(GUID_IS_HWID, YES);
+        }
+
+        MSSettings::roSettings()->remove(SERVER_GUID2);
+    }
+    else if (guidIsHWID.isEmpty()) {
+        if (!serverGuid2.isEmpty()) {
+            MSSettings::roSettings()->setValue(SERVER_GUID, serverGuid2);
+            MSSettings::roSettings()->setValue(GUID_IS_HWID, NO);
+            MSSettings::roSettings()->remove(SERVER_GUID2);
+        }
+        else {
+            // Don't reset serverGuid if we're in pending switch to cluster mode state.
+            // As it's stored in the remote database.
+            if (pendingSwitchToClusterMode == YES)
+                return;
+
+            MSSettings::roSettings()->setValue(SERVER_GUID, hwidGuid);
+            MSSettings::roSettings()->setValue(GUID_IS_HWID, YES);
+
+            if (!serverGuid.isEmpty()) {
+                MSSettings::roSettings()->setValue(OBSOLETE_SERVER_GUID, serverGuid);
+            }
+        }
+    }
+
+    QnUuid obsoleteGuid = QnUuid(MSSettings::roSettings()->value(OBSOLETE_SERVER_GUID).toString());
+    if (!obsoleteGuid.isNull())
+    {
+        setObsoleteGuid(obsoleteGuid);
+    }
+}
+
 void stopServer(int /*signal*/)
 {
     restartFlag = false;

@@ -211,10 +211,12 @@ class Environment(object):
         log.info('FINALIZER for %s', self.artifact_path_prefix)
         for name, server in self.servers.items():
             path_prefix = '%s-server-%s' % (self.artifact_path_prefix, name)
-            log_path = '%s.log' % path_prefix
-            with open(log_path, 'wb') as f:
-                f.write(server.get_log_file())
-            log.debug('log file for server %s, %s is stored to %s', name.upper(), server, log_path)
+            log_contents = server.get_log_file()
+            if log_contents:
+                log_path = '%s.log' % path_prefix
+                with open(log_path, 'wb') as f:
+                    f.write(log_contents)
+                log.debug('log file for server %s, %s is stored to %s', name.upper(), server, log_path)
             for remote_core_path in server.list_core_files():
                 local_core_path = '%s.%s' % (path_prefix, os.path.basename(remote_core_path))
                 server.host.get_file(remote_core_path, local_core_path)
