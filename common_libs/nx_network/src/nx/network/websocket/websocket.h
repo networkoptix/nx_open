@@ -63,11 +63,7 @@ public:
     void setPayloadType(PayloadType type);
     PayloadType prevFramePayloadType() const;
 
-    template<typename Rep, typename Period>
-    void setKeepAliveTimeout(std::chrono::duration<Rep, Period> timeout)
-    {
-        m_keepAliveTimeout = timeout;
-    }
+    void sendPing();
 
 private:
     /**  BaseServerConnectionHandler implementation */
@@ -90,7 +86,6 @@ private:
     /** Own helper functions*/
 
 private:
-    std::chrono::milliseconds m_keepAliveTimeout;
     nx_api::BaseServerConnectionWrapper m_baseConnection;
     Parser m_parser;
     Serializer m_serializer;
@@ -98,14 +93,11 @@ private:
     ReceiveMode m_receiveMode;
     bool m_isLastFrame;
     bool m_isFirstFrame;
-    PayloadType m_payloadType;
-    PayloadType m_receivedPayloadType;
     std::function<void(SystemError::ErrorCode, size_t)> m_readHandler;
     std::function<void(SystemError::ErrorCode, size_t)> m_writeHandler;
     nx::Buffer* m_readBuffer;
-    nx::Buffer m_buffer;
     nx::Buffer m_writeBuffer;
-    nx::Buffer m_requestData;
+    nx::Buffer m_buffer;
 };
 
 } // namespace websocket

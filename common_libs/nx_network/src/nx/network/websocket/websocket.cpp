@@ -19,7 +19,7 @@ Websocket::Websocket(
     m_isFirstFrame(true),
     m_payloadType(PayloadType::binary),
     m_readBuffer(nullptr),
-    m_requestData(requestData)
+    m_buffer(requestData)
 {}
 
 void Websocket::setSendMode(SendMode mode)
@@ -75,13 +75,13 @@ void Websocket::readSomeAsync(
     m_readHandler = std::move(handler);
     m_readBuffer = buffer;
 
-    if (!m_requestData.isEmpty())
+    if (!m_buffer.isEmpty())
     {
         m_baseConnection.dispatch(
             [this]()
             {
-                m_parser.consume(m_requestData.data(), m_requestData.size());
-                m_requestData.clear();
+                m_parser.consume(m_buffer.data(), m_buffer.size());
+                m_buffer.clear();
             });
     }
     else
@@ -150,7 +150,7 @@ void Websocket::framePayload(const char* data, int len)
 
 void Websocket::frameEnded()
 {
-    NX_LOG(lit("[Websocket] frame ended. type: %1, size from header: %2, actual size: %3")
+    NX_LOG(lit("[Websocket] frame ended. type: %1, size from header: %2, read buffer size: %3")
            .arg(m_parser.frameType())
            .arg(m_parser.frameSize())
            .arg(m_buffer.size()), cl_logDEBUG2);
@@ -160,13 +160,11 @@ void Websocket::frameEnded()
 
     m_readBuffer->append(m_buffer);
     m_readHandler(SystemError::noError, m_buffer.size());
-    m_buffer.clear();
 }
 
 void Websocket::messageEnded()
 {
-    NX_LOG(lit("[Websocket] message ended. type: %1, total message size: %2")
-           .arg(m_parser.frameType())
+    NX_LOG(lit("[Websocket] message ended. read buffer size: %2")
            .arg(m_buffer.size()), cl_logDEBUG2);
 
     if (m_receiveMode != ReceiveMode::message)
@@ -174,7 +172,7 @@ void Websocket::messageEnded()
 
     m_readBuffer->append(m_buffer);
     m_readHandler(SystemError::noError, m_buffer.size());
-    m_buffer.clear();
+    m_baseConnection.stopReading();
 }
 
 void Websocket::handleError(Error err)
