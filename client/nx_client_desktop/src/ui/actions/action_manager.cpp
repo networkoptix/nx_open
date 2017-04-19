@@ -1819,13 +1819,6 @@ QnActionManager::QnActionManager(QObject *parent):
             new QnToggleTourActionCondition(this)})
         );
 
-    factory(QnActions::LayoutTourSettingsAction).
-        flags(Qn::Tree | Qn::NoTarget).
-        mode(QnActionTypes::DesktopMode).
-        text(tr("Layout Tour Settings...")).
-        requiredGlobalPermission(Qn::GlobalAdminPermission). //TODO: #GDM #3.1 #tbd
-        condition(new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this));
-
     factory(QnActions::RemoveLayoutTourAction).
         flags(Qn::Tree | Qn::NoTarget | Qn::IntentionallyAmbiguous).
         mode(QnActionTypes::DesktopMode).
