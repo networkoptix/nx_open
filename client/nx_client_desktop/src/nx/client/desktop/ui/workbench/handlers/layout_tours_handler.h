@@ -27,16 +27,12 @@ public:
     virtual ~LayoutToursHandler() override;
 
 private:
-    void reviewLayoutTour(const ec2::ApiLayoutTourData& tour);
     void saveTourToServer(const ec2::ApiLayoutTourData& tour);
     void removeTourFromServer(const QnUuid& tourId);
-    void addItemToReviewLayout(const QnLayoutResourcePtr& layout,
-        const ec2::ApiLayoutTourItemData& item);
 
 private:
     LayoutTourExecutor* m_tourExecutor;
     LayoutTourReviewController* m_reviewController;
-    QHash<QnUuid, QnLayoutResourcePtr> m_reviewLayouts;
 };
 
 } // namespace workbench

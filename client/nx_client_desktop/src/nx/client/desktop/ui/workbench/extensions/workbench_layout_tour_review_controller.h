@@ -2,6 +2,10 @@
 
 #include <QtCore/QObject>
 
+#include <nx_ec/data/api_fwd.h>
+
+#include <core/resource/resource_fwd.h>
+
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/connective.h>
@@ -28,6 +32,8 @@ public:
     virtual ~LayoutTourReviewController() override;
 
 private:
+    void reviewLayoutTour(const ec2::ApiLayoutTourData& tour);
+
     QnUuid currentTourId() const;
     bool isLayoutTourReviewMode() const;
 
@@ -36,8 +42,11 @@ private:
 
     void updateOrder();
 
+    void addItemToReviewLayout(const QnLayoutResourcePtr& layout,
+        const ec2::ApiLayoutTourItemData& item);
 private:
     QnDisconnectHelperPtr m_connections;
+    QHash<QnUuid, QnLayoutResourcePtr> m_reviewLayouts;
 };
 
 } // namespace workbench
