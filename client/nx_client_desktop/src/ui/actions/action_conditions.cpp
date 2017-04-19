@@ -725,13 +725,25 @@ Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters
     }
     else
     {
-        auto tour = qnLayoutTourManager->tour(tourId);
+        const auto tour = qnLayoutTourManager->tour(tourId);
         if (tour.isValid() && tour.items.size() > 0)
             return Qn::EnabledAction;
     }
 
     return Qn::DisabledAction;
 }
+
+Qn::ActionVisibility QnStartCurrentLayoutTourActionCondition::check(
+    const QnActionParameters& /*parameters*/)
+{
+    const auto tourId = context()->workbench()->currentLayout()->data()
+        .value(Qn::LayoutTourUuidRole).value<QnUuid>();
+    const auto tour = qnLayoutTourManager->tour(tourId);
+    if (tour.isValid() && tour.items.size() > 0)
+        return Qn::EnabledAction;
+    return Qn::DisabledAction;
+}
+
 
 Qn::ActionVisibility QnArchiveActionCondition::check(const QnResourceList &resources)
 {

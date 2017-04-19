@@ -34,6 +34,7 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
                 reviewLayout->setItems(QnLayoutItemDataList());
                 for (auto item: tour.items)
                     addItemToReviewLayout(reviewLayout, item);
+                updateButtons(reviewLayout);
             }
         });
 
@@ -119,6 +120,7 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
             m_connections.reset(new QnDisconnectHelper());
             connectToLayout(workbench()->currentLayout());
             updateOrder();
+            updateButtons(workbench()->currentLayout()->resource());
         });
 
 }
@@ -186,16 +188,18 @@ void LayoutTourReviewController::connectToLayout(QnWorkbenchLayout* layout)
        return;
 
     *m_connections << connect(layout, &QnWorkbenchLayout::itemAdded, this,
-        [this](QnWorkbenchItem* item)
+        [this, layout](QnWorkbenchItem* item)
         {
             connectToItem(item);
             updateOrder();
+            updateButtons(layout->resource());
         });
     *m_connections << connect(layout, &QnWorkbenchLayout::itemRemoved, this,
-        [this](QnWorkbenchItem* item)
+        [this, layout](QnWorkbenchItem* item)
         {
             item->disconnect(this);
             updateOrder();
+            updateButtons(layout->resource());
         });
     for (auto item: layout->items())
         connectToItem(item);
@@ -218,6 +222,21 @@ void LayoutTourReviewController::updateOrder()
     for (auto item: items)
         item->setData(Qn::LayoutTourItemOrderRole, ++index);
 
+}
+
+void LayoutTourReviewController::updateButtons(const QnLayoutResourcePtr& layout)
+{
+    NX_EXPECT(layout);
+    if (!layout)
+        return;
+
+    // Using he fact that dataChanged will be sent even if action list was not changed
+    const QList<QnActions::IDType> actions{
+        QnActions::StartCurrentLayoutTourAction,
+        QnActions::SaveCurrentLayoutTourAction,
+        QnActions::RemoveCurrentLayoutTourAction
+    };
+    layout->setData(Qn::CustomPanelActionsRole, qVariantFromValue(actions));
 }
 
 void LayoutTourReviewController::addItemToReviewLayout(const QnLayoutResourcePtr& layout,

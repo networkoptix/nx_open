@@ -159,7 +159,7 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
             if (auto layout = QnWorkbenchLayout::instance(layoutResource))
             {
                 workbench()->removeLayout(layout);
-                delete layout;
+                layout->deleteLater();
             }
 
             if (qnClientMessageProcessor->connectionStatus()->state() == QnConnectionState::Ready

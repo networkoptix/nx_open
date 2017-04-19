@@ -521,7 +521,13 @@ class QnToggleTourActionCondition: public QnActionCondition
 {
 public:
     QnToggleTourActionCondition(QObject *parent): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
 
+class QnStartCurrentLayoutTourActionCondition: public QnActionCondition
+{
+public:
+    QnStartCurrentLayoutTourActionCondition(QObject *parent): QnActionCondition(parent) {}
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 

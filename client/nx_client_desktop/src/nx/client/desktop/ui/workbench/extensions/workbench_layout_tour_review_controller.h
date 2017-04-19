@@ -41,6 +41,7 @@ private:
     void connectToItem(QnWorkbenchItem* item);
 
     void updateOrder();
+    void updateButtons(const QnLayoutResourcePtr& layout);
 
     void addItemToReviewLayout(const QnLayoutResourcePtr& layout,
         const ec2::ApiLayoutTourItemData& item);

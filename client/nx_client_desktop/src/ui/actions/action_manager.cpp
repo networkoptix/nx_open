@@ -1841,7 +1841,10 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Start Tour")).
         accent(Qn::ButtonAccent::Standard).
         icon(qnSkin->icon("buttons/play.png")).
-        condition(new QnLayoutTourReviewModeCondition(this)).
+        condition(and({
+            new QnLayoutTourReviewModeCondition(this),
+            new QnStartCurrentLayoutTourActionCondition(this)
+        })).
         autoRepeat(false);
 
     factory(QnActions::SaveLayoutTourAction).

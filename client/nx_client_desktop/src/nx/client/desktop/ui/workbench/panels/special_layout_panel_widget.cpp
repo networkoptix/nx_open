@@ -90,8 +90,6 @@ void SpecialLayoutPanelWidget::handleResourceDataChanged(int role)
 
 void SpecialLayoutPanelWidget::updateButtons()
 {
-    m_actionButtons.clear();
-
     const auto actions = m_layoutResource->data(Qn::CustomPanelActionsRole)
         .value<QList<QnActions::IDType>>();
 
@@ -102,9 +100,18 @@ void SpecialLayoutPanelWidget::updateButtons()
         if (!action)
             continue;
 
-        const auto button = new QPushButton();
+        auto button = m_actionButtons.value(actionId);
+        if (!button)
+        {
+            button = new QPushButton(this->widget());
+            m_actionButtons.insert(actionId, button);
+            connect(button, &QPushButton::clicked, action, &QAction::trigger);
+            ui->buttonsLayout->addWidget(button, 0, Qt::AlignRight);
+        }
+
         button->setText(action->text());
         button->setIcon(action->icon());
+        button->setEnabled(menu()->canTrigger(action->id()));
         switch (action->accent())
         {
             case Qn::ButtonAccent::Standard:
@@ -116,11 +123,6 @@ void SpecialLayoutPanelWidget::updateButtons()
             default:
                 break;
         }
-
-        connect(button, &QPushButton::clicked, action, &QAction::trigger);
-
-        m_actionButtons.append(ButtonPtr(button));
-        ui->buttonsLayout->addWidget(button, 0, Qt::AlignRight);
     }
 }
 
