@@ -8,6 +8,10 @@
 
 namespace ec2 {
 
+    namespace detail {
+        class QnDbManager;
+    }
+
     enum class MessageType
     {
         resolvePeerNumberRequest,
@@ -78,12 +82,12 @@ namespace ec2 {
         void removeClosedConnections();
         void createOutgoingConnections();
         void sendAlivePeersMessage();
-        QByteArray serializeAlivePeersMessage(const AlivePeersMap& peers);
+        QByteArray serializePeersMessage();
         void deserializeAlivePeersMessage(
             const P2pConnectionPtr& connection,
             const QByteArray& data);
 
-        PeerNumberType toShortPeerNumber(const QnUuid& owner, const ApiPeerData& peer);
+        PeerNumberType toShortPeerNumber(const QnUuid& owner, const ApiPeerIdData& peer);
         QnUuid fromShortPeerNumber(const PeerNumberType& id);
     private:
         QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list
@@ -92,12 +96,15 @@ namespace ec2 {
 
         struct PeerNumberInfo
         {
-            PeerNumberType insert(const ApiPeerData& peer);
+            PeerNumberType insert(const ApiPeerIdData& peer);
 
             QMap<ApiPeerIdData, PeerNumberType> fullIdToShortId;
             QMap<PeerNumberType, ApiPeerIdData> shortIdToFullId;
         };
 
-        QMap<QnUuid, PeerNumberInfo> m_shortPeersMap; //< key -
+        detail::QnDbManager* m_db = nullptr;
+
+        // key - got via peer, value - short numbers
+        QMap<QnUuid, PeerNumberInfo> m_shortPeersMap;
     };
 } // ec2

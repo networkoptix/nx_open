@@ -3,6 +3,7 @@
 #include <utils/media/bitStream.h>
 #include <utils/media/nalUnits.h>
 #include <utils/common/synctime.h>
+#include <database/db_manager.h>
 
 namespace ec2 {
 
@@ -108,7 +109,7 @@ void P2pMessageBus::createOutgoingConnections()
     }
 }
 
-PeerNumberType P2pMessageBus::toShortPeerNumber(const QnUuid& owner, const ApiPeerData& peer)
+PeerNumberType P2pMessageBus::toShortPeerNumber(const QnUuid& owner, const ApiPeerIdData& peer)
 {
     PeerNumberInfo& info = m_shortPeersMap[owner];
     auto itr = info.fullIdToShortId.find(peer);
@@ -157,15 +158,27 @@ PeerNumberType deserializeCompressPeerNumber(BitStreamReader& reader)
     return peerNumber;
 }
 
-QByteArray P2pMessageBus::serializeAlivePeersMessage(const AlivePeersMap& peers)
+QByteArray P2pMessageBus::serializePeersMessage()
 {
     QByteArray result;
-    result.resize(peers.size() * 4);
+    QMap<ApiPeerIdData, qint32> offlinePeers;
+
+    if (m_db)
+    {
+        auto state = m_db->transactionLog()->getTransactionsState().values;
+        for (auto itr = state.begin(); itr != state.end();)
+        {
+            auto alivePeersItr = m_alivePeers.find(itr.key().peerID);
+        }
+    }
+
+    result.resize(m_alivePeers.size()*4 + offlinePeers.size() * 6);
     BitStreamWriter writer;
     writer.setBuffer((quint8*) result.data(), result.size());
     try
     {
-        for (const auto& peer: peers.values())
+
+        for (const auto& peer: m_alivePeers.values())
         {
             int minDistance = std::numeric_limits<int>::max();
             for (const RoutingRecord& rec : peer.routingInfo)
@@ -176,6 +189,9 @@ QByteArray P2pMessageBus::serializeAlivePeersMessage(const AlivePeersMap& peers)
             serializeCompressPeerNumber(writer, peerNumber);
             NALUnit::writeUEGolombCode(writer, minDistance); // todo: move function to another place
         }
+
+
+
         writer.flushBits();
         result.truncate(writer.getBytesCount());
         return result;
@@ -210,7 +226,7 @@ void P2pMessageBus::deserializeAlivePeersMessage(
 
 void P2pMessageBus::sendAlivePeersMessage()
 {
-    QByteArray data = serializeAlivePeersMessage(m_alivePeers);
+    QByteArray data = serializePeersMessage();
     for (const auto& connection: m_connections)
         connection->sendMessage(MessageType::alivePeers, data);
 }
