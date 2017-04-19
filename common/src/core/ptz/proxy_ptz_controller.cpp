@@ -18,6 +18,8 @@ void QnProxyPtzController::setBaseController(const QnPtzControllerPtr& controlle
         m_controller->disconnect(this);
 
     m_controller = controller;
+    emit baseControllerChanged();
+
     if (!m_controller)
         return;
 
@@ -26,7 +28,6 @@ void QnProxyPtzController::setBaseController(const QnPtzControllerPtr& controlle
     connect(m_controller, &QnAbstractPtzController::changed,
         this, &QnProxyPtzController::baseChanged);
 
-    emit baseControllerChanged();
 }
 
 QnPtzControllerPtr QnProxyPtzController::baseController() const
