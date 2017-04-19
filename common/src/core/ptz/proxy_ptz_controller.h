@@ -51,11 +51,14 @@ public: // Overrides section
 
     virtual bool getData(Qn::PtzDataFields query, QnPtzData* data) override;
 
+signals:
+   void finishedLater(Qn::PtzCommand command, const QVariant& data);
+   void baseControllerChanged();
+
 protected:
     virtual void baseFinished(Qn::PtzCommand command, const QVariant& data)                                     { emit finished(command, data); }
     virtual void baseChanged(Qn::PtzDataFields fields)                                                          { emit changed(fields); }
 
-    Q_SIGNAL void finishedLater(Qn::PtzCommand command, const QVariant& data);
 
 private:
     QnPtzControllerPtr m_controller;

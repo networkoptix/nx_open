@@ -12,6 +12,7 @@ class ResourcePtzController: public QnProxyPtzController
     using base_type = QnProxyPtzController;
 
     Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
+    Q_PROPERTY(bool available READ available NOTIFY availableChanged)
 
 public:
     ResourcePtzController(QObject* parent = nullptr);
@@ -19,8 +20,11 @@ public:
     QString resourceId() const;
     void setResourceId(const QString& value);
 
+    bool available() const;
+
 signals:
     void resourceIdChanged();
+    void availableChanged();
 
 private:
     QString m_resourceId;

@@ -25,6 +25,8 @@ void QnProxyPtzController::setBaseController(const QnPtzControllerPtr& controlle
         this, &QnProxyPtzController::baseFinished);
     connect(m_controller, &QnAbstractPtzController::changed,
         this, &QnProxyPtzController::baseChanged);
+
+    emit baseControllerChanged();
 }
 
 QnPtzControllerPtr QnProxyPtzController::baseController() const

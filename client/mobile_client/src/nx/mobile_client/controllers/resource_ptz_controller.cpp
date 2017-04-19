@@ -20,6 +20,8 @@ ResourcePtzController::ResourcePtzController(QObject* parent):
                 setBaseController(controller);
         });
 
+    connect(this, &base_type::baseControllerChanged,
+        this, &ResourcePtzController::availableChanged);
     setParent(parent);
 }
 
@@ -35,6 +37,11 @@ void ResourcePtzController::setResourceId(const QString& value)
 
     m_resourceId = value;
     emit resourceIdChanged();
+}
+
+bool ResourcePtzController::available() const
+{
+    return baseController();
 }
 
 } // namespace mobile

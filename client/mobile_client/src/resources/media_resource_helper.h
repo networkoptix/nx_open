@@ -15,7 +15,6 @@ class QnMediaResourceHelper : public Connective<QObject>
     Q_PROPERTY(int customRotation READ customRotation NOTIFY customRotationChanged)
     Q_PROPERTY(int channelCount READ channelCount NOTIFY videoLayoutChanged)
     Q_PROPERTY(QSize layoutSize READ layoutSize NOTIFY videoLayoutChanged)
-    Q_PROPERTY(bool supportsPTZ READ supportsPTZ NOTIFY ptzSupportChanged)
 
     Q_ENUMS(Qn::ResourceStatus)
 
@@ -37,8 +36,6 @@ public:
     QSize layoutSize() const;
     Q_INVOKABLE QPoint channelPosition(int channel) const;
 
-    bool supportsPTZ() const;
-
 signals:
     void resourceIdChanged();
     void resourceStatusChanged();
@@ -47,7 +44,6 @@ signals:
     void customAspectRatioChanged();
     void customRotationChanged();
     void videoLayoutChanged();
-    void ptzSupportChanged();
 
 private:
     QScopedPointer<QnMediaResourceHelperPrivate> d_ptr;

@@ -257,6 +257,7 @@ PageBase
 
         PtzController
         {
+            id: ptzController;
             resourceId: videoScreenController.resourceHelper.resourceId;
         }
 
@@ -268,7 +269,7 @@ PageBase
             width: parent.width;
             height: 100;
 
-            visible: videoScreenController.resourceHelper.supportsPTZ;
+            visible: ptzController.available;
             color: "red";
 
             Column
