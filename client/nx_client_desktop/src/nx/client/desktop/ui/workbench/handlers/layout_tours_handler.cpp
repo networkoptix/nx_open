@@ -89,25 +89,6 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             removeTourFromServer(id);
         });
 
-    connect(action(QnActions::LayoutTourSettingsAction), &QAction::triggered, this,
-        [this]()
-        {
-            QnActionParameters parameters = menu()->currentParameters(sender());
-            auto id = parameters.argument<QnUuid>(Qn::UuidRole);
-            auto tour = qnLayoutTourManager->tour(id);
-            if (!tour.isValid())
-                return;
-
-            QScopedPointer<QnLayoutTourDialog> dialog(new QnLayoutTourDialog(mainWindow()));
-            dialog->loadData(tour);
-            if (!dialog->exec())
-                return;
-
-            dialog->submitData(&tour);
-            qnLayoutTourManager->addOrUpdateTour(tour);
-            saveTourToServer(tour);
-        });
-
     connect(action(QnActions::ToggleLayoutTourModeAction), &QAction::toggled, this,
         [this](bool toggled)
         {
