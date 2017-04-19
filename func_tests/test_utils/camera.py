@@ -56,7 +56,7 @@ def make_camera_info(parent_id, name, mac_addr):
         name=name,
         parentId=parent_id,
         physicalId=mac_addr,
-        preferedServerId='{00000000-0000-0000-0000-000000000000}',
+        preferredServerId='{00000000-0000-0000-0000-000000000000}',
         scheduleEnabled=False,
         scheduleTasks=[],
         secondaryStreamQuality='SSQualityLow',
@@ -147,7 +147,7 @@ class DiscoveryUdpListener(object):
 
     def __init__(self, media_stream_path):
         self._media_stream_path = media_stream_path
-        self._stream_to_camera = None  # Camera or None
+        self._stream_to_camera_list = []  # Camera list
         self._stream_to_address_list = []  # string list
         self._thread = None
         self._stop_flag = False
@@ -163,15 +163,15 @@ class DiscoveryUdpListener(object):
         log.info('Test camera UDP discovery listener is stopped.')
 
     def stream_to(self, camera, ip_address):
-        assert not self._stream_to_camera  # Already streaming to a camera
         log.info('Test camera %s: will stream to %s', camera.name, ip_address)
-        self._stream_to_camera = camera
+        self._stream_to_camera_list.append(camera)
         self._stream_to_address_list.append(str(ip_address) if ip_address else None)
         if not self._thread:
             self._start()
 
     def _start(self):
         listen_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        listen_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         host = '0.0.0.0'
         port = TEST_CAMERA_DISCOVERY_PORT
         listen_socket.bind((host, port))
@@ -187,16 +187,17 @@ class DiscoveryUdpListener(object):
             if not read and not error:
                 continue
             data, addr = listen_socket.recvfrom(1024)
-            #log.debug('Received discovery message from %s:%d: %r', addr[0], addr[1], data)
+            # log.debug('Received discovery message from %s:%d: %r', addr[0], addr[1], data)
             if data != TEST_CAMERA_FIND_MSG:
                 continue
             if None not in self._stream_to_address_list and addr[0] not in self._stream_to_address_list:
                 continue  # request came not from our server
-            listener = MediaListener(self._media_stream_path)
-            response = '%s;%d;%s' % (TEST_CAMERA_ID_MSG, listener.port, self._stream_to_camera.mac_addr)
-            log.info('Responding to %s:%d: %r', addr[0], addr[1], response)
-            listen_socket.sendto(response, addr)
-            self._media_listeners.append(listener)
+            for camera in self._stream_to_camera_list:
+                listener = MediaListener(self._media_stream_path)
+                response = '%s;%d;%s' % (TEST_CAMERA_ID_MSG, listener.port, camera.mac_addr)
+                log.info('Responding to %s:%d: %r', addr[0], addr[1], response)
+                listen_socket.sendto(response, addr)
+                self._media_listeners.append(listener)
         listen_socket.close()
         log.debug('Test camera UDP discovery listener thread is finished.')
 
@@ -209,7 +210,6 @@ class MediaListener(object):
         self._streamers = []
         listen_host = '0.0.0.0'
         listen_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        listen_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         listen_socket.bind((listen_host, 0))
         listen_socket.listen(5)
         self.host, self.port = listen_socket.getsockname()
