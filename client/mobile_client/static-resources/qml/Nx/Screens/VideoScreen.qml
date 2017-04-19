@@ -254,6 +254,37 @@ PageBase
             }
         }
 
+
+        PtzController
+        {
+            resourceId: videoScreenController.resourceHelper.resourceId;
+        }
+
+        Rectangle
+        {
+            id: ptzPanel
+
+            anchors.bottom: parent.bottom;
+            width: parent.width;
+            height: 100;
+
+            visible: videoScreenController.resourceHelper.supportsPTZ;
+            color: "red";
+
+            Column
+            {
+                Button
+                {
+                    text: "+";
+                }
+
+                Button
+                {
+                    text: "-";
+                }
+            }
+        }
+
         Loader
         {
             id: navigationLoader
@@ -261,7 +292,7 @@ PageBase
             anchors.bottom: parent.bottom
             width: parent.width
 
-            visible: opacity > 0
+            visible: opacity > 0 && false
             opacity: Math.min(d.uiOpacity, d.navigationOpacity)
 
             sourceComponent:
