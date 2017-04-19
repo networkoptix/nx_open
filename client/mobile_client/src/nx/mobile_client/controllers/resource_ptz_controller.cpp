@@ -1,4 +1,4 @@
-#include "ptz_controller.h"
+#include "resource_ptz_controller.h"
 
 #include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource_management/resource_pool.h>
