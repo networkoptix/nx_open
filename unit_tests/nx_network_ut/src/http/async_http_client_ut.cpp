@@ -475,7 +475,7 @@ TEST_F(AsyncHttpClientCustom, ConnectionBreak)
         [](const nx_http::AsyncHttpClientPtr& client)
         {
             EXPECT_TRUE(client->failed());
-            EXPECT_EQ(client->fetchMessageBodyBuffer(), QByteArray("not enough content"));
+            EXPECT_EQ(QByteArray("not enough content"), client->fetchMessageBodyBuffer());
             EXPECT_NE(SystemError::noError, client->lastSysErrorCode());
         });
 }
