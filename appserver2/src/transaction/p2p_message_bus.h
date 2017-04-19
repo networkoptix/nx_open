@@ -40,6 +40,7 @@ namespace ec2 {
     };
     using SubscribeForDataUpdatesMessageType = std::vector<SubscribeForDataUpdateRecord>;
 
+    static const quint32 kMaxDistance = std::numeric_limits<quint32>::max();
 
     class P2pConnection
     {
@@ -60,6 +61,12 @@ namespace ec2 {
         /** Remote peer id */
         QnUuid remoteId() const;
 
+        /** Remote peer id */
+        ApiPeerIdData remotePeerId();
+
+        void unsubscribeFrom(const ApiPeerIdData& idList);
+        void subscribeTo(const std::vector<ApiPeerIdData>& idList);
+
         State state() const;
 
         void sendMessage(MessageType messageType, const QByteArray& data);
@@ -76,6 +83,9 @@ namespace ec2 {
 
         void addOutgoingConnectionToPeer(QnUuid& id, const QUrl& url);
         void removeOutgoingConnectionFromPeer(QnUuid& id);
+
+        // Self peer information
+        ApiPeerIdData modulePeer();
     private:
         void doPeriodicTasks();
         void processTemporaryOutgoingConnections();
@@ -88,9 +98,10 @@ namespace ec2 {
             const QByteArray& data);
 
         PeerNumberType toShortPeerNumber(const QnUuid& owner, const ApiPeerIdData& peer);
-        QnUuid fromShortPeerNumber(const PeerNumberType& id);
+        ApiPeerIdData fromShortPeerNumber(const QnUuid& owner, const PeerNumberType& id);
 
-        QMap<ApiPeerIdData, qint32> getOfflinePeers();
+        void addOfflinePeersFromDb();
+        void doSubscribe();
     private:
         QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list
         QMap<QnUuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections
@@ -108,5 +119,22 @@ namespace ec2 {
 
         // key - got via peer, value - short numbers
         QMap<QnUuid, PeerNumberInfo> m_shortPeersMap;
+
+        typedef QMap<ApiPeerIdData, RoutingRecord> RoutingInfo;
+        struct PeerInfo
+        {
+            PeerInfo() {}
+
+            quint32 distanceVia(const ApiPeerIdData& via) const;
+            quint32 minDistance(std::vector<ApiPeerIdData>* outViaList) const;
+
+            bool isOnline = false;
+            RoutingInfo routingInfo; // key: route throw, value - distance in hops
+        };
+        typedef QMap<ApiPeerIdData, PeerInfo> PeersMap;
+
+        PeersMap m_allPeers; //< all peers in a system
+
+        QMap<ApiPeerIdData, P2pConnectionPtr> m_subscriptionList;
     };
 } // ec2

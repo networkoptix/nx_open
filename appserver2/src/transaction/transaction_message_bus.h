@@ -110,6 +110,17 @@ public:
         dstPeerId.isNull() ? sendTransaction(tran) : sendTransaction(tran, QnPeerSet() << dstPeerId);
     }
 
+    typedef QMap<QnUuid, RoutingRecord> RoutingInfo;
+    struct AlivePeerInfo
+    {
+        AlivePeerInfo() : peer(QnUuid(), QnUuid(), Qn::PT_Server) {}
+        AlivePeerInfo(const ApiPeerData &peer) : peer(peer) {}
+        ApiPeerData peer;
+
+        RoutingInfo routingInfo; // key: route throw, value - distance in hops
+    };
+    typedef QMap<QnUuid, AlivePeerInfo> AlivePeersMap;
+
     /*
     * Return all alive peers
     */
@@ -141,6 +152,15 @@ signals:
     void dropConnections();
     void reconnectAllPeers();
 
+    /*
+    * Return routing information: how to access to a dstPeer.
+    * if peer can be access directly then return same value as input.
+    * If can't find route info then return null value.
+    * Otherwise return route gateway.
+    */
+    QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const;
+
+    int distanceToPeer(const QnUuid& dstPeer) const;
 private:
     friend class QnTransactionTransport;
     friend struct GotTransactionFuction;
@@ -251,6 +271,7 @@ private slots:
     void onEc2ConnectionSettingsChanged(const QString& key);
 
 private:
+
     detail::QnDbManager* m_db = nullptr;
     TimeSynchronizationManager* m_timeSyncManager = nullptr;
 
@@ -294,6 +315,8 @@ private:
     QElapsedTimer m_relativeTimer;
 
     ConnectionGuardSharedState m_connectionGuardSharedState;
+    AlivePeersMap m_alivePeers; //< alive peers in a system
+
 };
 
 } //namespace ec2

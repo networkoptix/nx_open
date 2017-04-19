@@ -16,33 +16,11 @@ namespace ec2
             RoutingRecord(): distance(0), lastRecvTime(0) {}
             RoutingRecord(int distance, qint64 lastRecvTime): distance(distance), lastRecvTime(lastRecvTime) {}
 
-            int distance;
+            quint32 distance;
             qint64 lastRecvTime;
         };
 
-        typedef QMap<QnUuid, RoutingRecord> RoutingInfo;
-        struct AlivePeerInfo
-        {
-            AlivePeerInfo() : peer(QnUuid(), QnUuid(), Qn::PT_Server) {}
-            AlivePeerInfo(const ApiPeerData &peer) : peer(peer) {}
-            ApiPeerData peer;
-
-            RoutingInfo routingInfo; // key: route throw, value - distance in hops
-        };
-        typedef QMap<QnUuid, AlivePeerInfo> AlivePeersMap;
-
-    public:
-        /*
-         * Return routing information: how to access to a dstPeer.
-         * if peer can be access directly then return same value as input.
-         * If can't find route info then return null value.
-         * Otherwise return route gateway.
-         */
-        QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const;
-
-        int distanceToPeer(const QnUuid& dstPeer) const;
     protected:
         mutable QnMutex m_mutex;
-        AlivePeersMap m_alivePeers; //< all peers in a system
     };
 };
