@@ -9,10 +9,5 @@ public:
     virtual bool isSignificant() const override;
     virtual QString value() const override;
     virtual void reset() override;
-
-private:
-    mutable QnMutex m_mutex;
-    uint64_t m_readBytes = 0;
-    uint64_t m_writeBytes = 0;
 };
 
