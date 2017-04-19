@@ -7,9 +7,10 @@ namespace nx {
 namespace network {
 namespace websocket {
 
-Error validateHandshake(const nx_http::Request& request, nx_http::Response* response);
-Error addRequestParams(nx_http::Request* request);
-};
+Error validateRequest(const nx_http::Request& request, nx_http::Response* response);
+void addClientHeaders(nx_http::Request* request, const nx::Buffer& protocolName);
+
+Error validateResponse(const nx_http::Request& request, const nx_http::Response& response);
 
 } // namespace websocket
 } // namespace network

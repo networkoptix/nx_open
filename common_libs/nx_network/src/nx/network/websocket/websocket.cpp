@@ -23,6 +23,7 @@ Websocket::Websocket(
 {
     nx::Buffer tmpBuf(requestData);
     m_parser.consume(tmpBuf);
+    handleRead();
 }
 
 void Websocket::setIsLastFrame()
@@ -33,6 +34,7 @@ void Websocket::setIsLastFrame()
 void Websocket::bytesReceived(nx::Buffer& buffer)
 {
     m_parser.consume(buffer.data(), buffer.size());
+    handleRead();
 }
 
 void Websocket::readyToSendData(size_t count)
@@ -46,7 +48,6 @@ void Websocket::readyToSendData(size_t count)
 
 void Websocket::handleRead()
 {
-    m_buffer.lock();
     if (!m_readHandler)
         return;
 
@@ -126,7 +127,7 @@ void Websocket::framePayload(const char* data, int len)
     m_buffer.append(data, len);
 
     if (m_receiveMode == ReceiveMode::stream)
-        handleRead();
+        m_buffer.lock();
 }
 
 void Websocket::frameEnded()
@@ -138,7 +139,7 @@ void Websocket::frameEnded()
     if (m_receiveMode != ReceiveMode::frame)
         return;
 
-    handleRead();
+    m_buffer.lock();
 }
 
 void Websocket::messageEnded()
@@ -148,7 +149,7 @@ void Websocket::messageEnded()
     if (m_receiveMode != ReceiveMode::message)
         return;
 
-    handleRead();
+    m_buffer.lock();
 }
 
 void Websocket::handleError(Error err)

@@ -28,8 +28,10 @@ enum FrameType
 
 enum class Error
 {
+    noError,
     noMaskBit,
     maskIsZero,
+    handshakeError,
 };
 
 } // namespace websocket
