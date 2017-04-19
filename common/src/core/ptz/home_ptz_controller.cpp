@@ -17,7 +17,7 @@ QnHomePtzController::QnHomePtzController(const QnPtzControllerPtr &baseControlle
     m_executor(new QnHomePtzExecutor(baseController))
 {
     NX_ASSERT(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
-    NX_ASSERT(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
+    NX_ASSERT(!baseController->hasCapabilities(Ptz::Capability::AsynchronousPtzCapability)); // TODO: #Elric
 
     m_adaptor->setResource(baseController->resource());
     m_executor->moveToThread(qnPtzPool->executorThread());
@@ -32,15 +32,15 @@ QnHomePtzController::~QnHomePtzController() {
     m_executor->deleteLater();
 }
 
-bool QnHomePtzController::extends(Qn::PtzCapabilities capabilities) {
+bool QnHomePtzController::extends(Ptz::Capabilities capabilities) {
     return 
-        (capabilities & (Qn::PresetsPtzCapability | Qn::ToursPtzCapability)) &&
-        !(capabilities & Qn::HomePtzCapability);
+        (capabilities & (Ptz::Capability::PresetsPtzCapability | Ptz::Capability::ToursPtzCapability)) &&
+        !(capabilities & Ptz::Capability::HomePtzCapability);
 }
 
-Qn::PtzCapabilities QnHomePtzController::getCapabilities() {
-    Qn::PtzCapabilities capabilities = base_type::getCapabilities();
-    return extends(capabilities) ? (capabilities | Qn::HomePtzCapability) : capabilities;
+Ptz::Capabilities QnHomePtzController::getCapabilities() {
+    Ptz::Capabilities capabilities = base_type::getCapabilities();
+    return extends(capabilities) ? (capabilities | Ptz::Capability::HomePtzCapability) : capabilities;
 }
 
 bool QnHomePtzController::continuousMove(const QVector3D &speed) {
@@ -84,10 +84,10 @@ bool QnHomePtzController::activateTour(const QString &tourId) {
 }
 
 bool QnHomePtzController::updateHomeObject(const QnPtzObject &homeObject) {
-    Qn::PtzCapabilities capabilities = getCapabilities();
-    if(homeObject.type == Qn::PresetPtzObject && !(capabilities & Qn::PresetsPtzCapability))
+    Ptz::Capabilities capabilities = getCapabilities();
+    if(homeObject.type == Qn::PresetPtzObject && !(capabilities & Ptz::Capability::PresetsPtzCapability))
         return false;
-    if(homeObject.type == Qn::TourPtzObject && !(capabilities & Qn::ToursPtzCapability))
+    if(homeObject.type == Qn::TourPtzObject && !(capabilities & Ptz::Capability::ToursPtzCapability))
         return false;
 
     m_adaptor->setValue(homeObject);

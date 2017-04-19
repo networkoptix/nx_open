@@ -29,7 +29,7 @@ QnFallbackPtzController::~QnFallbackPtzController() {
 
 void QnFallbackPtzController::baseChanged(Qn::PtzDataFields fields) {
     if(fields & Qn::CapabilitiesPtzField)
-        m_mainIsValid = m_mainController->getCapabilities() != Qn::NoPtzCapabilities;
+        m_mainIsValid = m_mainController->getCapabilities() != Ptz::Capability::NoPtzCapabilities;
 
     emit changed(fields);
 }

@@ -27,9 +27,9 @@ QnTourPtzController::QnTourPtzController(const QnPtzControllerPtr &baseControlle
     m_executor(new QnTourPtzExecutor(baseController))
 {
     NX_ASSERT(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
-    NX_ASSERT(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
+    NX_ASSERT(!baseController->hasCapabilities(Ptz::Capability::AsynchronousPtzCapability)); // TODO: #Elric
 
-    if(!baseController->hasCapabilities(Qn::VirtualPtzCapability)) // TODO: #Elric implement it in a saner way
+    if(!baseController->hasCapabilities(Ptz::Capability::VirtualPtzCapability)) // TODO: #Elric implement it in a saner way
         m_executor->moveToThread(qnPtzPool->executorThread());
 
     m_adaptor->setResource(baseController->resource());
@@ -40,17 +40,17 @@ QnTourPtzController::~QnTourPtzController() {
     m_executor->deleteLater();
 }
 
-bool QnTourPtzController::extends(Qn::PtzCapabilities capabilities) {
+bool QnTourPtzController::extends(Ptz::Capabilities capabilities) {
     return
-        (capabilities & Qn::PresetsPtzCapability) &&
-        //((capabilities & Qn::AbsolutePtzCapabilities) == Qn::AbsolutePtzCapabilities) &&
-        //(capabilities & (Qn::DevicePositioningPtzCapability | Qn::LogicalPositioningPtzCapability)) &&
-        !(capabilities & Qn::ToursPtzCapability);
+        (capabilities & Ptz::Capability::PresetsPtzCapability) &&
+        //((capabilities & Ptz::Capability::AbsolutePtzCapabilities) == Ptz::Capability::AbsolutePtzCapabilities) &&
+        //(capabilities & (Ptz::Capability::DevicePositioningPtzCapability | Ptz::Capability::LogicalPositioningPtzCapability)) &&
+        !(capabilities & Ptz::Capability::ToursPtzCapability);
 }
 
-Qn::PtzCapabilities QnTourPtzController::getCapabilities() {
-    Qn::PtzCapabilities capabilities = base_type::getCapabilities();
-    return extends(capabilities) ? (capabilities | Qn::ToursPtzCapability) : capabilities;
+Ptz::Capabilities QnTourPtzController::getCapabilities() {
+    Ptz::Capabilities capabilities = base_type::getCapabilities();
+    return extends(capabilities) ? (capabilities | Ptz::Capability::ToursPtzCapability) : capabilities;
 }
 
 bool QnTourPtzController::continuousMove(const QVector3D &speed) {

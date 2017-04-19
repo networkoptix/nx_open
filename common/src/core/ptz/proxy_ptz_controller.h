@@ -17,7 +17,7 @@ public:
     QnPtzControllerPtr baseController() const;
 
 public: // Overrides section
-    virtual Qn::PtzCapabilities getCapabilities() override;
+    virtual Ptz::Capabilities getCapabilities() override;
 
     virtual bool continuousMove(const QVector3D& speed) override;
     virtual bool continuousFocus(qreal speed) override;

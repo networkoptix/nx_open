@@ -3,6 +3,7 @@
 #include <cassert>
 #include <api/model/api_ioport_data.h>
 #include <core/ptz/ptz_mapper.h>
+#include <core/ptz/ptz_constants.h>
 #include <core/onvif/onvif_config_data.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <utils/common/credentials.h>
@@ -17,7 +18,7 @@ public:
     {
         registerKey<QnPtzMapperPtr>(lit("ptzMapper"));
         registerKey<QnOnvifConfigDataPtr>(lit("forcedOnvifParams"));
-        registerKey<Qn::PtzCapabilities>(Qn::PTZ_CAPABILITIES_PARAM_NAME);
+        registerKey<Ptz::Capabilities>(Qn::PTZ_CAPABILITIES_PARAM_NAME);
         registerKey<Qn::PtzTraits>(lit("ptzTraits"));
         registerKey<QStringList>(lit("vistaFocusDevices"));
         registerKey<QnIOPortDataList>(lit("ioSettings"));

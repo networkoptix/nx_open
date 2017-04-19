@@ -245,7 +245,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<Qn::PtzDataFields>();
     qRegisterMetaType<Qn::PtzCommand>();
     qRegisterMetaType<Qn::PtzTraits>();
-    qRegisterMetaType<Qn::PtzCapabilities>();
+    qRegisterMetaType<Ptz::Capabilities>();
 
     qRegisterMetaType<QnOnvifConfigDataPtr>();
 
@@ -358,7 +358,7 @@ void QnCommonMetaTypes::initialize() {
 
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
     QnJsonSerializer::registerSerializer<Qn::PtzTraits>();
-    QnJsonSerializer::registerSerializer<Qn::PtzCapabilities>();
+    QnJsonSerializer::registerSerializer<Ptz::Capabilities>();
     QnJsonSerializer::registerSerializer<QList<QMap<QString, QString>>>();
 
     QnJsonSerializer::registerSerializer<QnOnvifConfigDataPtr>();

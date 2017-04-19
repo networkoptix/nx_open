@@ -25,7 +25,7 @@ public:
     QnFisheyePtzController(const QnMediaResourcePtr& mediaRes);
     virtual ~QnFisheyePtzController();
 
-    virtual Qn::PtzCapabilities getCapabilities() override;
+    virtual Ptz::Capabilities getCapabilities() override;
 
     virtual bool continuousMove(const QVector3D &speed) override;
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;
@@ -63,7 +63,7 @@ private:
 
     QPointer<QnMediaResourceWidget> m_widget;
     QPointer<QnResourceWidgetRenderer> m_renderer;
-    Qn::PtzCapabilities m_capabilities;
+    Ptz::Capabilities m_capabilities;
     QVector3D m_unitSpeed;
 
     QnPtzLimits m_limits;

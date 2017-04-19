@@ -14,7 +14,7 @@ public:
     QnPtzControllerPtr mainController() const                                                                   { return m_mainController; }
     QnPtzControllerPtr fallbackController() const                                                               { return m_fallbackController; }
 
-    virtual Qn::PtzCapabilities getCapabilities() override                                                      { return baseController()->getCapabilities(); }
+    virtual Ptz::Capabilities getCapabilities() override                                                      { return baseController()->getCapabilities(); }
 
     virtual bool continuousMove(const QVector3D &speed) override                                                { return baseController()->continuousMove(speed); }
     virtual bool continuousFocus(qreal speed) override                                                          { return baseController()->continuousFocus(speed); }

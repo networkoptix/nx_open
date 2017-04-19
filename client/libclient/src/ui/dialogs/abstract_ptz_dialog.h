@@ -50,7 +50,7 @@ protected:
 
     bool updateHomePosition(const QnPtzObject &homePosition);
 
-    Qn::PtzCapabilities capabilities();
+    Ptz::Capabilities capabilities();
 
 signals:
     void synchronizeLater(const QString &title);

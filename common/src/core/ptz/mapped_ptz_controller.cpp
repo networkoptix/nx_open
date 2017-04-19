@@ -7,16 +7,16 @@ QnMappedPtzController::QnMappedPtzController(const QnPtzMapperPtr &mapper, const
     // TODO: #Elric proper finished handling.
 }
 
-bool QnMappedPtzController::extends(Qn::PtzCapabilities capabilities) {
+bool QnMappedPtzController::extends(Ptz::Capabilities capabilities) {
     return 
-        (capabilities & Qn::AbsolutePtzCapabilities) &&
-        (capabilities & Qn::DevicePositioningPtzCapability) &&
-        !(capabilities & Qn::LogicalPositioningPtzCapability);
+        (capabilities & Ptz::Capability::AbsolutePtzCapabilities) &&
+        (capabilities & Ptz::Capability::DevicePositioningPtzCapability) &&
+        !(capabilities & Ptz::Capability::LogicalPositioningPtzCapability);
 }
 
-Qn::PtzCapabilities QnMappedPtzController::getCapabilities() {
-    Qn::PtzCapabilities capabilities = base_type::getCapabilities();
-    return extends(capabilities) ? (capabilities | Qn::LogicalPositioningPtzCapability) : capabilities;
+Ptz::Capabilities QnMappedPtzController::getCapabilities() {
+    Ptz::Capabilities capabilities = base_type::getCapabilities();
+    return extends(capabilities) ? (capabilities | Ptz::Capability::LogicalPositioningPtzCapability) : capabilities;
 }
 
 bool QnMappedPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {

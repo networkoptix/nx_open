@@ -35,55 +35,55 @@ bool QnAbstractPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) 
 }
 
 bool QnAbstractPtzController::supports(Qn::PtzCommand command) {
-    Qn::PtzCapabilities capabilities = getCapabilities();
+    Ptz::Capabilities capabilities = getCapabilities();
 
     switch (command) {
     case Qn::ContinuousMovePtzCommand:
-        return (capabilities & Qn::ContinuousPtzCapabilities);
+        return (capabilities & Ptz::Capability::ContinuousPtzCapabilities);
 
     case Qn::ContinuousFocusPtzCommand:
-        return (capabilities & Qn::ContinuousFocusCapability);
+        return (capabilities & Ptz::Capability::ContinuousFocusCapability);
 
     case Qn::GetDevicePositionPtzCommand:
     case Qn::AbsoluteDeviceMovePtzCommand:
-        return (capabilities & Qn::AbsolutePtzCapabilities) && (capabilities & Qn::DevicePositioningPtzCapability);
+        return (capabilities & Ptz::Capability::AbsolutePtzCapabilities) && (capabilities & Ptz::Capability::DevicePositioningPtzCapability);
 
     case Qn::GetLogicalPositionPtzCommand:
     case Qn::AbsoluteLogicalMovePtzCommand:
-        return (capabilities & Qn::AbsolutePtzCapabilities) && (capabilities & Qn::LogicalPositioningPtzCapability);
+        return (capabilities & Ptz::Capability::AbsolutePtzCapabilities) && (capabilities & Ptz::Capability::LogicalPositioningPtzCapability);
 
     case Qn::ViewportMovePtzCommand:
-        return (capabilities & Qn::ViewportPtzCapability);
+        return (capabilities & Ptz::Capability::ViewportPtzCapability);
 
     case Qn::GetDeviceLimitsPtzCommand:
-        return (capabilities & Qn::LimitsPtzCapability) && (capabilities & Qn::DevicePositioningPtzCapability);
+        return (capabilities & Ptz::Capability::LimitsPtzCapability) && (capabilities & Ptz::Capability::DevicePositioningPtzCapability);
 
     case Qn::GetLogicalLimitsPtzCommand:
-        return (capabilities & Qn::LimitsPtzCapability) && (capabilities & Qn::LogicalPositioningPtzCapability);
+        return (capabilities & Ptz::Capability::LimitsPtzCapability) && (capabilities & Ptz::Capability::LogicalPositioningPtzCapability);
 
     case Qn::GetFlipPtzCommand:
-        return (capabilities & Qn::FlipPtzCapability);
+        return (capabilities & Ptz::Capability::FlipPtzCapability);
 
     case Qn::CreatePresetPtzCommand:
     case Qn::UpdatePresetPtzCommand:
     case Qn::RemovePresetPtzCommand:
     case Qn::ActivatePresetPtzCommand:
     case Qn::GetPresetsPtzCommand:
-        return (capabilities & Qn::PresetsPtzCapability);
+        return (capabilities & Ptz::Capability::PresetsPtzCapability);
 
     case Qn::CreateTourPtzCommand:
     case Qn::RemoveTourPtzCommand:
     case Qn::ActivateTourPtzCommand:
     case Qn::GetToursPtzCommand:
-        return (capabilities & Qn::ToursPtzCapability);
+        return (capabilities & Ptz::Capability::ToursPtzCapability);
 
     case Qn::UpdateHomeObjectPtzCommand:
     case Qn::GetHomeObjectPtzCommand:
-        return (capabilities & Qn::HomePtzCapability);
+        return (capabilities & Ptz::Capability::HomePtzCapability);
 
     case Qn::GetAuxilaryTraitsPtzCommand:
     case Qn::RunAuxilaryCommandPtzCommand:
-        return (capabilities & Qn::AuxilaryPtzCapability);
+        return (capabilities & Ptz::Capability::AuxilaryPtzCapability);
 
     case Qn::GetDataPtzCommand:
         return true;

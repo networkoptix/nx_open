@@ -16,7 +16,7 @@ public:
     QnRemotePtzController(const QnNetworkResourcePtr &resource);
     virtual ~QnRemotePtzController();
 
-    virtual Qn::PtzCapabilities getCapabilities() override;
+    virtual Ptz::Capabilities getCapabilities() override;
 
     virtual bool continuousMove(const QVector3D &speed) override;
     virtual bool continuousFocus(qreal speed) override;

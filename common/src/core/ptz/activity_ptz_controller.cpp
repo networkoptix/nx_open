@@ -32,15 +32,15 @@ QnActivityPtzController::~QnActivityPtzController() {
     return;
 }
 
-bool QnActivityPtzController::extends(Qn::PtzCapabilities capabilities) {
+bool QnActivityPtzController::extends(Ptz::Capabilities capabilities) {
     return
-        (capabilities & (Qn::PresetsPtzCapability | Qn::ToursPtzCapability)) &&
-        !(capabilities & Qn::ActivityPtzCapability);
+        (capabilities & (Ptz::Capability::PresetsPtzCapability | Ptz::Capability::ToursPtzCapability)) &&
+        !(capabilities & Ptz::Capability::ActivityPtzCapability);
 }
 
-Qn::PtzCapabilities QnActivityPtzController::getCapabilities() {
-    Qn::PtzCapabilities capabilities = base_type::getCapabilities();
-    return extends(capabilities) ? (capabilities | Qn::ActivityPtzCapability) : capabilities;
+Ptz::Capabilities QnActivityPtzController::getCapabilities() {
+    Ptz::Capabilities capabilities = base_type::getCapabilities();
+    return extends(capabilities) ? (capabilities | Ptz::Capability::ActivityPtzCapability) : capabilities;
 }
 
 bool QnActivityPtzController::continuousMove(const QVector3D &speed) {
@@ -112,7 +112,7 @@ bool QnActivityPtzController::getActiveObject(QnPtzObject *activeObject) {
 
 bool QnActivityPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) {
     // TODO: #Elric #PTZ this is a hack. Need to do it better.
-    if(baseController()->hasCapabilities(Qn::AsynchronousPtzCapability)) {
+    if(baseController()->hasCapabilities(Ptz::Capability::AsynchronousPtzCapability)) {
         return baseController()->getData(query, data);
     } else {
         return base_type::getData(query, data);

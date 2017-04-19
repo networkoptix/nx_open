@@ -41,13 +41,13 @@ public:
     /**
      * \returns                         PTZ capabilities that this controller implements.
      */
-    virtual Qn::PtzCapabilities getCapabilities() = 0;
+    virtual Ptz::Capabilities getCapabilities() = 0;
 
     /**
      * \param capabilities              Capabilities to check.
      * \returns                         Whether this controller implements the given capabilities.
      */
-    bool hasCapabilities(Qn::PtzCapabilities capabilities) { return (getCapabilities() & capabilities) == capabilities; }
+    bool hasCapabilities(Ptz::Capabilities capabilities) { return (getCapabilities() & capabilities) == capabilities; }
 
     /**
      * \param command                   Ptz command to check.
@@ -65,7 +65,7 @@ public:
      * Passing zero in speed should stop PTZ movement.
      *
      * This function is expected to be implemented if this controller has
-     * at least one of the <tt>Qn::ContinuousPtzCapabilities</tt>.
+     * at least one of the <tt>Ptz::Capability::ContinuousPtzCapabilities</tt>.
      *
      * \param speed                     Movement speed.
      * \returns                         Whether the operation was successful.
@@ -81,7 +81,7 @@ public:
      * Passing zero should stop focus movement.
      *
      * This function is expected to be implemented if this controller has
-     * <tt>Qn::ContinuousFocusCapability</tt>.
+     * <tt>Ptz::Capability::ContinuousFocusCapability</tt>.
      *
      * \param speed                     Focus speed.
      * \returns                         Whether the operation was successful.
@@ -93,11 +93,11 @@ public:
      *
      * Note that for the function to succeed, this controller must have a
      * capability corresponding to the provided coordinate space,
-     * that is <tt>Qn::DevicePositioningPtzCapability</tt> or
-     * <tt>Qn::LogicalPositioningPtzCapability</tt>.
+     * that is <tt>Ptz::Capability::DevicePositioningPtzCapability</tt> or
+     * <tt>Ptz::Capability::LogicalPositioningPtzCapability</tt>.
      *
      * This function is expected to be implemented if this controller has
-     * at least one of the <tt>Qn::AbsolutePtzCapabilities</tt>.
+     * at least one of the <tt>Ptz::Capability::AbsolutePtzCapabilities</tt>.
      *
      * \param space                     Coordinate space of the provided position.
      * \param position                  Position to move to.
@@ -112,7 +112,7 @@ public:
      * is a square with side 1 with top-left at <tt>(0, 0)</tt>.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Qn::ViewportPtzCapability</tt>.
+     * <tt>Ptz::Capability::ViewportPtzCapability</tt>.
      *
      * \param aspectRatio               Actual aspect ratio of the current viewport.
      * \param viewport                  New viewport position.
@@ -125,7 +125,7 @@ public:
      * Gets PTZ position from camera in the given coordinate space.
      *
      * This function is expected to be implemented if this controller has
-     * at least one of the <tt>Qn::AbsolutePtzCapabilities</tt>.
+     * at least one of the <tt>Ptz::Capability::AbsolutePtzCapabilities</tt>.
      *
      * \param space                     Coordinate space to get position in.
      * \param[out] position             Current ptz position.
@@ -138,7 +138,7 @@ public:
      * Gets PTZ limits of the camera.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Qn::LimitsPtzCapability<tt>.
+     * <tt>Ptz::Capability::LimitsPtzCapability<tt>.
      *
      * \param space                     Coordinate space to get limits in.
      * \param[out] limits               Ptz limits.
@@ -151,7 +151,7 @@ public:
      * implementing emulated viewport movement.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Qn::FlipPtzCapability</tt>.
+     * <tt>Ptz::Capability::FlipPtzCapability</tt>.
      *
      * \param[out] flip                 Flipped state of the camera's video stream.
      * \returns                         Whether the operation was successful.
@@ -167,7 +167,7 @@ public:
      * <tt>QnUuid::createUuid().toString()</tt>.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Qn::PresetsPtzCapability<tt>.
+     * <tt>Ptz::Capability::PresetsPtzCapability<tt>.
      *
      * \param preset                    Preset to create.
      * \returns                         Whether the operation was successful.
@@ -179,7 +179,7 @@ public:
      * Currently this function can only be used to change preset name.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Qn::PresetsPtzCapability<tt>.
+     * <tt>Ptz::Capability::PresetsPtzCapability<tt>.
      *
      * \param preset                    Preset to update.
      * \returns                         Whether the operation was successful.
@@ -190,7 +190,7 @@ public:
      * Removes the given preset.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Qn::PresetsPtzCapability<tt>.
+     * <tt>Ptz::Capability::PresetsPtzCapability<tt>.
      *
      * \param presetId                  Id of the preset to remove.
      * \returns                         Whether the operation was successful.
@@ -201,7 +201,7 @@ public:
      * Activates the given preset.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Qn::PresetsPtzCapability<tt>.
+     * <tt>Ptz::Capability::PresetsPtzCapability<tt>.
      *
      * \param presetId                  Id of the preset to activate.
      * \param speed                     Movement speed, in range [0, 1].
@@ -213,7 +213,7 @@ public:
      * Gets a list of all PTZ presets for the camera.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Qn::PresetsPtzCapability<tt>.
+     * <tt>Ptz::Capability::PresetsPtzCapability<tt>.
      *
      * \param[out] presets              PTZ presets.
      * \returns                         Whether the operation was successful.
@@ -228,7 +228,7 @@ public:
      * <tt>QnUuid::createUuid().toString()</tt>.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Qn::ToursPtzCapability<tt>.
+     * <tt>Ptz::Capability::ToursPtzCapability<tt>.
      *
      * \param tour                      Tour to create.
      * \returns                         Whether the operation was successful.
@@ -239,7 +239,7 @@ public:
      * Removes the given tour.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Qn::ToursPtzCapability<tt>.
+     * <tt>Ptz::Capability::ToursPtzCapability<tt>.
      *
      * \param tourId                    Id of the tour to remove.
      * \returns                         Whether the operation was successful.
@@ -253,7 +253,7 @@ public:
      * to the controller will stop that tour.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Qn::ToursPtzCapability<tt>.
+     * <tt>Ptz::Capability::ToursPtzCapability<tt>.
      *
      * \param tourId                    Id of the tour to activate.
      * \returns                         Whether the operation was successful.
@@ -264,7 +264,7 @@ public:
      * Gets a list of all PTZ tours for the camera.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Qn::ToursPtzCapability<tt>.
+     * <tt>Ptz::Capability::ToursPtzCapability<tt>.
      *
      * \param[out] tours                PTZ tours.
      * \returns                         Whether the operation was successful.
@@ -277,7 +277,7 @@ public:
      * Updates PTZ home position for the camera.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Qn::HomePtzCapability<tt>.
+     * <tt>Ptz::Capability::HomePtzCapability<tt>.
      *
      * \param homeObject                PTZ home object.
      * \returns                         Whether the operation was successful.
@@ -288,7 +288,7 @@ public:
      * Gets PTZ home position that is currently assigned for the camera.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Qn::HomePtzCapability<tt>.
+     * <tt>Ptz::Capability::HomePtzCapability<tt>.
      *
      * \param[out] homePosition         PTZ home object.
      * \returns                         Whether the operation was successful.

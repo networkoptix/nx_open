@@ -20,9 +20,9 @@ public:
     QnActivityPtzController(Mode mode, const QnPtzControllerPtr &baseController);
     virtual ~QnActivityPtzController();
 
-    static bool extends(Qn::PtzCapabilities capabilities);
+    static bool extends(Ptz::Capabilities capabilities);
 
-    virtual Qn::PtzCapabilities getCapabilities() override;
+    virtual Ptz::Capabilities getCapabilities() override;
 
     virtual bool continuousMove(const QVector3D &speed) override;
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;

@@ -10,7 +10,7 @@ class QnBasicPtzController: public QnAbstractPtzController {
 public:
     QnBasicPtzController(const QnResourcePtr &resource): base_type(resource) {}
 
-    virtual Qn::PtzCapabilities getCapabilities() override                                  { return Qn::NoPtzCapabilities; }
+    virtual Ptz::Capabilities getCapabilities() override                                  { return Ptz::Capability::NoPtzCapabilities; }
 
     virtual bool continuousMove(const QVector3D &) override                                 { return false; }
     virtual bool continuousFocus(qreal) override                                            { return false; }

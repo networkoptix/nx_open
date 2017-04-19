@@ -52,7 +52,7 @@ QnPresetPtzController::QnPresetPtzController(const QnPtzControllerPtr &baseContr
     m_camera(resource().dynamicCast<QnVirtualCameraResource>()),
     m_propertyHandler(new QnJsonResourcePropertyHandler<QnPtzPresetRecordHash>())
 {
-    NX_ASSERT(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
+    NX_ASSERT(!baseController->hasCapabilities(Ptz::Capability::AsynchronousPtzCapability)); // TODO: #Elric
 }
 
 QnPresetPtzController::~QnPresetPtzController()
@@ -60,19 +60,19 @@ QnPresetPtzController::~QnPresetPtzController()
     return;
 }
 
-bool QnPresetPtzController::extends(Qn::PtzCapabilities capabilities)
+bool QnPresetPtzController::extends(Ptz::Capabilities capabilities)
 {
     return
-        ((capabilities & Qn::AbsolutePtzCapabilities) == Qn::AbsolutePtzCapabilities) &&
-        (capabilities & (Qn::DevicePositioningPtzCapability | Qn::LogicalPositioningPtzCapability)) &&
-        !(capabilities & Qn::PresetsPtzCapability);
+        ((capabilities & Ptz::Capability::AbsolutePtzCapabilities) == Ptz::Capability::AbsolutePtzCapabilities) &&
+        (capabilities & (Ptz::Capability::DevicePositioningPtzCapability | Ptz::Capability::LogicalPositioningPtzCapability)) &&
+        !(capabilities & Ptz::Capability::PresetsPtzCapability);
 }
 
-Qn::PtzCapabilities QnPresetPtzController::getCapabilities()
+Ptz::Capabilities QnPresetPtzController::getCapabilities()
 {
-    /* Note that this controller preserves both Qn::AsynchronousPtzCapability and Qn::SynchronizedPtzCapability. */
-    Qn::PtzCapabilities capabilities = base_type::getCapabilities();
-    return extends(capabilities) ? (capabilities | Qn::PresetsPtzCapability) : capabilities;
+    /* Note that this controller preserves both Ptz::Capability::AsynchronousPtzCapability and Ptz::Capability::SynchronizedPtzCapability. */
+    Ptz::Capabilities capabilities = base_type::getCapabilities();
+    return extends(capabilities) ? (capabilities | Ptz::Capability::PresetsPtzCapability) : capabilities;
 }
 
 bool QnPresetPtzController::createPreset(const QnPtzPreset &preset)
@@ -83,7 +83,7 @@ bool QnPresetPtzController::createPreset(const QnPtzPreset &preset)
     auto createPresetActionFunc = [this](QnPtzPresetRecordHash& records, QnPtzPreset preset)
     {
         QnPtzPresetData data;
-        data.space = hasCapabilities(Qn::LogicalPositioningPtzCapability) ?
+        data.space = hasCapabilities(Ptz::Capability::LogicalPositioningPtzCapability) ?
             Qn::LogicalPtzCoordinateSpace :
             Qn::DevicePtzCoordinateSpace;
 

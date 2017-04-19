@@ -16,7 +16,7 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
     m_flip(0),
     m_traits(Qn::NoPtzTraits),
     m_overrideCapabilities(false),
-    m_capabilities(Qn::NoPtzCapabilities)
+    m_capabilities(Ptz::Capability::NoPtzCapabilities)
 {
     QnVirtualCameraResourcePtr camera = resource().dynamicCast<QnVirtualCameraResource>();
     if(!camera)
@@ -37,7 +37,7 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
         m_overrideCapabilities = true;
 }
 
-Qn::PtzCapabilities QnWorkaroundPtzController::getCapabilities() {
+Ptz::Capabilities QnWorkaroundPtzController::getCapabilities() {
     return m_overrideCapabilities ? m_capabilities : base_type::getCapabilities();
 }
 
@@ -70,7 +70,7 @@ bool QnWorkaroundPtzController::continuousMove(const QVector3D &speed) {
     return base_type::continuousMove(localSpeed);
 }
 
-bool QnWorkaroundPtzController::extends(Qn::PtzCapabilities) {
+bool QnWorkaroundPtzController::extends(Ptz::Capabilities) {
     return true; // TODO: #Elric if no workaround is needed for a camera, we don't really have to extend.
 }
 

@@ -118,16 +118,16 @@ void QnFisheyePtzController::updateLimits() {
         m_limits.maxTilt = 90.0;
     }
 
-    if (m_capabilities != Qn::NoPtzCapabilities)
+    if (m_capabilities != Ptz::Capability::NoPtzCapabilities)
         absoluteMoveInternal(boundedPosition(getPositionInternal()));
 }
 
 void QnFisheyePtzController::updateCapabilities() {
-    Qn::PtzCapabilities capabilities;
+    Ptz::Capabilities capabilities;
     if(m_mediaDewarpingParams.enabled) {
-        capabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::LogicalPositioningPtzCapability | Qn::VirtualPtzCapability;
+        capabilities = Ptz::Capability::ContinuousPtzCapabilities | Ptz::Capability::AbsolutePtzCapabilities | Ptz::Capability::LogicalPositioningPtzCapability | Ptz::Capability::VirtualPtzCapability;
     } else {
-        capabilities = Qn::NoPtzCapabilities;
+        capabilities = Ptz::Capability::NoPtzCapabilities;
     }
 
     if(capabilities == m_capabilities)
@@ -225,7 +225,7 @@ void QnFisheyePtzController::tick(int deltaMSecs) {
 // -------------------------------------------------------------------------- //
 // QnAbstractPtzController implementation
 // -------------------------------------------------------------------------- //
-Qn::PtzCapabilities QnFisheyePtzController::getCapabilities() {
+Ptz::Capabilities QnFisheyePtzController::getCapabilities() {
     return m_capabilities;
 }
 

@@ -19,16 +19,16 @@ QnRemotePtzController::~QnRemotePtzController() {
     return;
 }
 
-Qn::PtzCapabilities QnRemotePtzController::getCapabilities() {
-    Qn::PtzCapabilities result = m_resource->getPtzCapabilities();
-    if(result == Qn::NoPtzCapabilities)
-        return Qn::NoPtzCapabilities;
+Ptz::Capabilities QnRemotePtzController::getCapabilities() {
+    Ptz::Capabilities result = m_resource->getPtzCapabilities();
+    if(result == Ptz::Capability::NoPtzCapabilities)
+        return Ptz::Capability::NoPtzCapabilities;
 
-    if(result & Qn::VirtualPtzCapability)
-        return Qn::NoPtzCapabilities; /* Can't have remote virtual PTZ. */
+    if(result & Ptz::Capability::VirtualPtzCapability)
+        return Ptz::Capability::NoPtzCapabilities; /* Can't have remote virtual PTZ. */
 
-    result |= Qn::AsynchronousPtzCapability;
-    result &= ~(Qn::FlipPtzCapability | Qn::LimitsPtzCapability);
+    result |= Ptz::Capability::AsynchronousPtzCapability;
+    result &= ~(Ptz::Capability::FlipPtzCapability | Ptz::Capability::LimitsPtzCapability);
     return result;
 }
 

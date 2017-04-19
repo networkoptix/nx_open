@@ -90,9 +90,9 @@ QnThreadedPtzController::~QnThreadedPtzController() {
     return;
 }
 
-bool QnThreadedPtzController::extends(Qn::PtzCapabilities capabilities) {
+bool QnThreadedPtzController::extends(Ptz::Capabilities capabilities) {
     return 
-        !(capabilities & Qn::AsynchronousPtzCapability);
+        !(capabilities & Ptz::Capability::AsynchronousPtzCapability);
 }
 
 template<class Functor>
@@ -104,9 +104,9 @@ void QnThreadedPtzController::runCommand(Qn::PtzCommand command, const Functor &
     m_threadPool->start(runnable);
 }
 
-Qn::PtzCapabilities QnThreadedPtzController::getCapabilities() {
-    Qn::PtzCapabilities capabilities = base_type::getCapabilities();
-    return extends(capabilities) ? (capabilities | Qn::AsynchronousPtzCapability) : capabilities;
+Ptz::Capabilities QnThreadedPtzController::getCapabilities() {
+    Ptz::Capabilities capabilities = base_type::getCapabilities();
+    return extends(capabilities) ? (capabilities | Ptz::Capability::AsynchronousPtzCapability) : capabilities;
 }
 
 bool QnThreadedPtzController::continuousMove(const QVector3D &speed) {

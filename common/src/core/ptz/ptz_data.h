@@ -5,6 +5,7 @@
 #include <QtGui/QVector3D>
 
 #include <common/common_globals.h>
+#include <core/ptz/ptz_constants.h>
 
 #include "ptz_fwd.h"
 #include "ptz_limits.h"
@@ -19,7 +20,7 @@ struct QnPtzData {
 
     Qn::PtzDataFields query;    /**< Fields that were queried from the underlying PTZ controller to fill this data object. */
     Qn::PtzDataFields fields;   /**< Fields that are valid in this data object. */
-    Qn::PtzCapabilities capabilities;
+    Ptz::Capabilities capabilities;
     QVector3D logicalPosition;
     QVector3D devicePosition;
     QnPtzLimits logicalLimits;

@@ -164,46 +164,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         InvalidPtzObject = -1
     };
 
-    enum PtzCapability {
-        NoPtzCapabilities                   = 0x00000000,
 
-        ContinuousPanCapability             = 0x00000001,
-        ContinuousTiltCapability            = 0x00000002,
-        ContinuousZoomCapability            = 0x00000004,
-        ContinuousFocusCapability           = 0x00000008,
-
-        AbsolutePanCapability               = 0x00000010,
-        AbsoluteTiltCapability              = 0x00000020,
-        AbsoluteZoomCapability              = 0x00000040,
-
-        ViewportPtzCapability               = 0x00000080,
-
-        FlipPtzCapability                   = 0x00000100,
-        LimitsPtzCapability                 = 0x00000200,
-
-        DevicePositioningPtzCapability      = 0x00001000,
-        LogicalPositioningPtzCapability     = 0x00002000,
-
-        PresetsPtzCapability                = 0x00010000,
-        ToursPtzCapability                  = 0x00020000,
-        ActivityPtzCapability               = 0x00040000,
-        HomePtzCapability                   = 0x00080000,
-
-        AsynchronousPtzCapability           = 0x00100000,
-        SynchronizedPtzCapability           = 0x00200000,
-        VirtualPtzCapability                = 0x00400000,
-
-        AuxilaryPtzCapability               = 0x01000000,
-
-        /* Shortcuts */
-        ContinuousPanTiltCapabilities       = ContinuousPanCapability | ContinuousTiltCapability,
-        ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
-        AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PtzCapability)
-
-    Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities)
 
 
     enum Projection {
@@ -915,7 +876,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzCapabilities)(Qn::ServerFlags)(Qn::CameraBackupQualities)(Qn::TimeFlags)(Qn::CameraStatusFlags)
+    (Qn::ServerFlags)(Qn::CameraBackupQualities)(Qn::TimeFlags)(Qn::CameraStatusFlags)
     (Qn::Permission)(Qn::GlobalPermission)(Qn::Permissions)(Qn::GlobalPermissions)(Qn::IOPortTypes)
     ,
     (metatype)(numeric)(lexical)

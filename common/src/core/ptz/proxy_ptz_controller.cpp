@@ -35,11 +35,11 @@ QnPtzControllerPtr QnProxyPtzController::baseController() const
     return m_controller;
 }
 
-Qn::PtzCapabilities QnProxyPtzController::getCapabilities()
+Ptz::Capabilities QnProxyPtzController::getCapabilities()
 {
     return m_controller
         ? m_controller->getCapabilities()
-        : Qn::NoPtzCapabilities;
+        : Ptz::Capability::NoPtzCapabilities;
 }
 
 bool QnProxyPtzController::continuousMove(const QVector3D& speed)

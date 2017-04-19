@@ -12,23 +12,23 @@ QnViewportPtzController::QnViewportPtzController(const QnPtzControllerPtr &baseC
     // TODO: #Elric handle finished properly
 
 #ifdef PTZ_DEBUG
-    if(!baseController->hasCapabilities(Qn::FlipPtzCapability))
-        qnWarning("Base controller doesn't have a Qn::FlipPtzCapability. Flip will not be taken into account by advanced PTZ.");
-    if(!baseController->hasCapabilities(Qn::LimitsPtzCapability))
-        qnWarning("Base controller doesn't have a Qn::LimitsPtzCapability. Position caching may not work for advanced PTZ.");
+    if(!baseController->hasCapabilities(Ptz::Capability::FlipPtzCapability))
+        qnWarning("Base controller doesn't have a Ptz::Capability::FlipPtzCapability. Flip will not be taken into account by advanced PTZ.");
+    if(!baseController->hasCapabilities(Ptz::Capability::LimitsPtzCapability))
+        qnWarning("Base controller doesn't have a Ptz::Capability::LimitsPtzCapability. Position caching may not work for advanced PTZ.");
 #endif
 }
 
-bool QnViewportPtzController::extends(Qn::PtzCapabilities capabilities) {
+bool QnViewportPtzController::extends(Ptz::Capabilities capabilities) {
     return 
-        ((capabilities & Qn::AbsolutePtzCapabilities) == Qn::AbsolutePtzCapabilities) &&
-        (capabilities & Qn::LogicalPositioningPtzCapability) &&
-        !(capabilities & Qn::ViewportPtzCapability);
+        ((capabilities & Ptz::Capability::AbsolutePtzCapabilities) == Ptz::Capability::AbsolutePtzCapabilities) &&
+        (capabilities & Ptz::Capability::LogicalPositioningPtzCapability) &&
+        !(capabilities & Ptz::Capability::ViewportPtzCapability);
 }
 
-Qn::PtzCapabilities QnViewportPtzController::getCapabilities() {
-    Qn::PtzCapabilities capabilities = base_type::getCapabilities();
-    return extends(capabilities) ? (capabilities | Qn::ViewportPtzCapability) : capabilities;
+Ptz::Capabilities QnViewportPtzController::getCapabilities() {
+    Ptz::Capabilities capabilities = base_type::getCapabilities();
+    return extends(capabilities) ? (capabilities | Ptz::Capability::ViewportPtzCapability) : capabilities;
 }
 
 bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) {
