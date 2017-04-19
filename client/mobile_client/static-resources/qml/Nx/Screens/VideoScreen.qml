@@ -287,7 +287,7 @@ PageBase
                     {
                         text: "set autofocus"
                         onClicked: ptzController.setAutoFocus()
-                        enabled: ptzController.capabilities & Ptz.AutoFocus;
+                        enabled: ptzController.capabilities & Ptz.ManualAutoFocusCapability;
                     }
 
                     Button

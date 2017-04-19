@@ -185,7 +185,7 @@ bool QnThreadedPtzController::getHomeObject(QnPtzObject *) {
     RUN_COMMAND(Qn::GetHomeObjectPtzCommand, QnPtzObject, result, getHomeObject, &result);
 }
 
-bool QnThreadedPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList* ) const
+bool QnThreadedPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList*) const
 {
     RUN_COMMAND(Qn::GetAuxilaryTraitsPtzCommand, QnPtzAuxilaryTraitList, result, getAuxilaryTraits, &result);
 }

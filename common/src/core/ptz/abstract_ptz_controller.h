@@ -295,7 +295,7 @@ public:
      */
     virtual bool getHomeObject(QnPtzObject *homeObject) = 0;
 
-    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits) const = 0;
+    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList* auxilaryTraits) const = 0;
 
     virtual bool runAuxilaryCommand(const QnPtzAuxilaryTrait &trait, const QString &data) = 0;
 

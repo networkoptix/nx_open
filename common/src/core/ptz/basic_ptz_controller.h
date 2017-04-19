@@ -36,7 +36,7 @@ public:
     virtual bool updateHomeObject(const QnPtzObject &) override                             { return false; }
     virtual bool getHomeObject(QnPtzObject *) override                                      { return false; }
 
-    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList *) const override                 { return false; }
+    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList*) const override                  { return false; }
     virtual bool runAuxilaryCommand(const QnPtzAuxilaryTrait &, const QString &)            { return false; }
 };
 
