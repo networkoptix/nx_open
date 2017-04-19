@@ -973,7 +973,15 @@ void ActionHandler::at_moveCameraAction_triggered() {
     }
 }
 
-void ActionHandler::at_dropResourcesAction_triggered() {
+void ActionHandler::at_dropResourcesAction_triggered()
+{
+    const bool isLayoutTourReviewMode = context()->workbench()->currentLayout()->data()
+        .contains(Qn::LayoutTourUuidRole);
+
+    // Layout Tour Handler will process this action itself
+    if (isLayoutTourReviewMode)
+        return;
+
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnResourceList resources = parameters.resources();

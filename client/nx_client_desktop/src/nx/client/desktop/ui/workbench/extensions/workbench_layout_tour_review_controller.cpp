@@ -53,6 +53,22 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
             reviewLayoutTour(qnLayoutTourManager->tour(id));
         });
 
+    connect(action(QnActions::DropResourcesAction), &QAction::triggered, this,
+        [this]()
+        {
+            if (!isLayoutTourReviewMode())
+                return;
+
+            QnActionParameters parameters = menu()->currentParameters(sender());
+            auto tour = qnLayoutTourManager->tour(currentTourId());
+            for (const auto& layout: parameters.resources().filtered<QnLayoutResource>())
+            {
+                tour.items.emplace_back(layout->getId(), 5000);
+            }
+            qnLayoutTourManager->addOrUpdateTour(tour);
+
+        });
+
     connect(action(QnActions::StartCurrentLayoutTourAction), &QAction::triggered, this,
         [this]
         {
