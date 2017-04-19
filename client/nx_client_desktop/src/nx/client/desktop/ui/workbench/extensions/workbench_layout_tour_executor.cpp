@@ -153,20 +153,13 @@ void LayoutTourExecutor::processTourStep()
                 return;
 
             auto items = workbench()->currentLayout()->items().toList();
-            std::sort(items.begin(), items.end(),
-                [](QnWorkbenchItem* l, QnWorkbenchItem* r)
-                {
-                    QRect lg = l->geometry();
-                    QRect rg = r->geometry();
-                    return lg.y() < rg.y() || (lg.y() == rg.y() && lg.x() < rg.x());
-                });
-
             if (items.empty())
             {
                 stopCurrentTour();
                 return;
             }
 
+            QnWorkbenchItem::sortByGeometry(&items);
             if (item)
                 item = items[(items.indexOf(item) + 1) % items.size()];
             else

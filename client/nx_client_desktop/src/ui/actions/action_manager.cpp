@@ -1831,6 +1831,11 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnLayoutTourReviewModeCondition(this)).
         autoRepeat(false);
 
+    factory(QnActions::SaveLayoutTourAction).
+        flags(Qn::NoTarget).
+        text(lit("Save layout tour (internal)")).
+        mode(QnActionTypes::DesktopMode);
+
     factory(QnActions::SaveCurrentLayoutTourAction).
         flags(Qn::Scene | Qn::NoTarget).
         mode(QnActionTypes::DesktopMode).
@@ -2461,7 +2466,7 @@ void QnActionManager::redirectAction(QMenu *menu, QnActions::IDType sourceId, QA
 
 bool QnActionManager::isMenuVisible() const
 {
-    for (auto menu: m_parametersByMenu.keys())
+    for (auto menu : m_parametersByMenu.keys())
     {
         if (menu && menu->isVisible())
             return true;

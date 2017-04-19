@@ -15,6 +15,7 @@ namespace ui {
 namespace workbench {
 
 class LayoutTourExecutor;
+class LayoutTourReviewController;
 
 class LayoutToursHandler: public QObject, public QnWorkbenchContextAware
 {
@@ -34,6 +35,7 @@ private:
 
 private:
     LayoutTourExecutor* m_tourExecutor;
+    LayoutTourReviewController* m_reviewController;
     QHash<QnUuid, QnLayoutResourcePtr> m_reviewLayouts;
 };
 

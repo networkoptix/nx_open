@@ -19,6 +19,7 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <nx/client/desktop/ui/workbench/extensions/workbench_layout_tour_executor.h>
+#include <nx/client/desktop/ui/workbench/extensions/workbench_layout_tour_review_controller.h>
 
 #include <nx/utils/string.h>
 
@@ -31,7 +32,8 @@ namespace workbench {
 LayoutToursHandler::LayoutToursHandler(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_tourExecutor(new LayoutTourExecutor(this))
+    m_tourExecutor(new LayoutTourExecutor(this)),
+    m_reviewController(new LayoutTourReviewController(this))
 {
     connect(qnLayoutTourManager, &QnLayoutTourManager::tourChanged, this,
         [this](const ec2::ApiLayoutTourData& tour)
@@ -86,6 +88,22 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
         {
             QnActionParameters parameters = menu()->currentParameters(sender());
             auto id = parameters.argument<QnUuid>(Qn::UuidRole);
+            NX_EXPECT(!id.isNull());
+
+            const auto tour = qnLayoutTourManager->tour(id);
+            if (!tour.name.isEmpty())
+            {
+                //TODO: #GDM #3.1 add to table, fix text and buttons
+                if (QnMessageBox::warning(
+                    mainWindow(),
+                    tr("Are you sure you want to delete %1?").arg(tour.name),
+                    QString(),
+                    QDialogButtonBox::Ok | QDialogButtonBox::Cancel) != QDialogButtonBox::Ok)
+                {
+                    return;
+                }
+            }
+
             qnLayoutTourManager->removeTour(id);
             removeTourFromServer(id);
         });
@@ -136,35 +154,14 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             m_tourExecutor->startTour(tour);
         });
 
-    connect(action(QnActions::SaveCurrentLayoutTourAction), &QAction::triggered, this,
+    connect(action(QnActions::SaveLayoutTourAction), &QAction::triggered, this,
         [this]
         {
-            const auto id = workbench()->currentLayout()->data(Qn::LayoutTourUuidRole)
-                .value<QnUuid>();
+            QnActionParameters parameters = menu()->currentParameters(sender());
+            auto id = parameters.argument<QnUuid>(Qn::UuidRole);
             auto tour = qnLayoutTourManager->tour(id);
-            NX_EXPECT(tour.isValid());
-
-            auto items = workbench()->currentLayout()->items().toList();
-            std::sort(items.begin(), items.end(),
-                [](QnWorkbenchItem* l, QnWorkbenchItem* r)
-                {
-                    QRect lg = l->geometry();
-                    QRect rg = r->geometry();
-                    return lg.y() < rg.y() || (lg.y() == rg.y() && lg.x() < rg.x());
-                });
-            tour.items.clear();
-            for (auto item: items)
-            {
-                const auto layout = resourcePool()->getResourceByUniqueId(item->resourceUid());
-                NX_EXPECT(layout);
-                if (!layout)
-                    continue;
-
-                const auto delayMs = item->data(Qn::LayoutTourItemDelayMsRole).toInt();
-                tour.items.emplace_back(layout->getId(), delayMs);
-            }
-
-            qnLayoutTourManager->addOrUpdateTour(tour);
+            if (!tour.isValid())
+                return;
             saveTourToServer(tour);
         });
 
@@ -174,31 +171,6 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             QnActionParameters parameters = menu()->currentParameters(sender());
             auto id = parameters.argument<QnUuid>(Qn::UuidRole);
             reviewLayoutTour(qnLayoutTourManager->tour(id));
-        });
-
-    connect(action(QnActions::RemoveCurrentLayoutTourAction), &QAction::triggered, this,
-        [this]()
-        {
-            const auto id = workbench()->currentLayout()->data(Qn::LayoutTourUuidRole)
-                .value<QnUuid>();
-            NX_EXPECT(!id.isNull());
-
-            const auto tour = qnLayoutTourManager->tour(id);
-            if (!tour.name.isEmpty())
-            {
-                //TODO: #GDM #3.1 add to table, fix text and buttons
-                if (QnMessageBox::warning(
-                    mainWindow(),
-                    tr("Are you sure you want to delete %1?").arg(tour.name),
-                    QString(),
-                    QDialogButtonBox::Ok | QDialogButtonBox::Cancel) != QDialogButtonBox::Ok)
-                {
-                    return;
-                }
-            }
-
-            qnLayoutTourManager->removeTour(id);
-            removeTourFromServer(id);
         });
 
     connect(action(QnActions::EscapeHotkeyAction), &QAction::triggered, m_tourExecutor,
