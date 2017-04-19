@@ -77,14 +77,29 @@ static Error validateRequestHeaders(const nx_http::HttpHeaders& headers)
     return Error::noError;
 }
 
-static Error validateResponseHeaders(const nx_http::HttpHeaders& headers, const nx::Buffer& requestKey)
+static Error validateResponseHeaders(const nx_http::HttpHeaders& headers, const nx_http::Request& request)
 {
     if (validateHeaders(headers) != Error::noError)
         return Error::handshakeError;
 
     nx_http::HttpHeaders::const_iterator headersIt;
-    if ((headersIt = headers.find(kAccept)) == headers.cend() || makeAcceptKey(requestKey) != headersIt->second)
+    if ((headersIt = headers.find(kAccept)) == headers.cend()
+        || makeAcceptKey(request.headers.find(kKey)->second) != headersIt->second)
+    {
         return Error::handshakeError;
+    }
+
+    auto requestProtocolIt = request.headers.find(kProtocol);
+    auto responseProtocolIt = headers.find(kProtocol);
+
+    if (requestProtocolIt != request.headers.cend())
+    {
+        if (responseProtocolIt == headers.cend())
+            return Error::handshakeError;
+
+        if (responseProtocolIt->second != requestProtocolIt->second)
+            return Error::handshakeError;
+    }
 
     return Error::noError;
 }
@@ -128,7 +143,7 @@ Error validateResponse(const nx_http::Request& request, const nx_http::Response&
     if (response.statusLine.statusCode != nx_http::StatusCode::upgrade)
         return Error::handshakeError;
 
-    if (validateResponseHeaders(response.headers, request.headers.find(kKey)->second) != Error::noError)
+    if (validateResponseHeaders(response.headers, request) != Error::noError)
         return Error::handshakeError;
 
     return Error::noError;
