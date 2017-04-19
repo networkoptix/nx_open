@@ -13,7 +13,8 @@ Controller::Controller(
     m_connectSessionManager(
         settings,
         &model->clientSessionPool(),
-        &model->listeningPeerPool())
+        &model->listeningPeerPool(),
+        &m_trafficRelay)
 {
 }
 

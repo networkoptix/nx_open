@@ -7,9 +7,12 @@
 #include <nx/utils/thread/sync_queue.h>
 
 #include <controller/connect_session_manager.h>
+#include <controller/traffic_relay.h>
 #include <model/client_session_pool.h>
 #include <model/listening_peer_pool.h>
 #include <settings.h>
+
+#include "../stream_socket_stub.h"
 
 namespace nx {
 namespace cloud {
@@ -19,25 +22,44 @@ namespace test {
 
 namespace {
 
-class StreamSocketStub:
-    public nx::network::StreamSocketDelegate
+class TrafficRelayStub:
+    public controller::AbstractTrafficRelay
 {
-    using base_type = nx::network::StreamSocketDelegate;
-
 public:
-    StreamSocketStub():
-        base_type(&m_delegatee)
+    virtual void startRelaying(
+        RelayConnectionData clientConnection,
+        RelayConnectionData serverConnection) override
     {
+        m_relaySessions.push_back(
+            {std::move(clientConnection), std::move(serverConnection)});
     }
 
-    virtual void readSomeAsync(
-        nx::Buffer* const /*buffer*/,
-        std::function<void(SystemError::ErrorCode, size_t)> /*handler*/) override
+    bool hasRelaySession(
+        AbstractStreamSocket* clientConnection,
+        AbstractStreamSocket* serverConnection,
+        const std::string& listeningPeerName) const
     {
+        for (const auto& relaySession: m_relaySessions)
+        {
+            if (relaySession.clientConnection.connection.get() == clientConnection &&
+                relaySession.serverConnection.connection.get() == serverConnection &&
+                relaySession.serverConnection.peerId == listeningPeerName)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 private:
-    nx::network::TCPSocket m_delegatee;
+    struct RelaySessionContext
+    {
+        RelayConnectionData clientConnection;
+        RelayConnectionData serverConnection;
+    };
+
+    std::deque<RelaySessionContext> m_relaySessions;
 };
 
 } // namespace
@@ -53,7 +75,11 @@ class ConnectSessionManager:
 public:
     ConnectSessionManager():
         m_clientSessionPool(m_settings),
-        m_connectSessionManager(m_settings, &m_clientSessionPool, &m_listeningPeerPool),
+        m_connectSessionManager(
+            m_settings,
+            &m_clientSessionPool,
+            &m_listeningPeerPool,
+            &m_trafficRelayStub),
         m_peerName(nx::utils::generateRandomName(17).toStdString())
     {
         std::array<const char*, 3> argv{
@@ -62,7 +88,7 @@ public:
             "--connectingPeer/connectSessionIdleTimeout=11s"
         };
 
-        m_settings.load(argv.size(), argv.data());
+        m_settings.load(static_cast<int>(argv.size()), argv.data());
     }
 
 protected:
@@ -83,12 +109,7 @@ protected:
     {
         using namespace std::placeholders;
 
-        api::BeginListeningRequest request;
-        request.peerName = m_peerName;
-
-        m_connectSessionManager.beginListening(
-            request,
-            std::bind(&ConnectSessionManager::onBeginListeningCompletion, this, _1, _2, _3));
+        addListeningPeerConnection();
     }
 
     void thenTcpConnectionHasBeenSavedToThePool()
@@ -107,6 +128,11 @@ protected:
         return m_clientSessionPool;
     }
 
+    TrafficRelayStub& trafficRelayStub()
+    {
+        return m_trafficRelayStub;
+    }
+
     controller::ConnectSessionManager& connectSessionManager()
     {
         return m_connectSessionManager;
@@ -117,13 +143,32 @@ protected:
         return m_peerName;
     }
 
+    void addListeningPeerConnection()
+    {
+        using namespace std::placeholders;
+
+        api::BeginListeningRequest request;
+        request.peerName = m_peerName;
+
+        m_connectSessionManager.beginListening(
+            request,
+            std::bind(&ConnectSessionManager::onBeginListeningCompletion, this, _1, _2, _3));
+    }
+
+    StreamSocketStub* lastListeningPeerConnection()
+    {
+        return m_lastListeningPeerConnection;
+    }
+
 private:
     conf::Settings m_settings;
     model::ClientSessionPool m_clientSessionPool;
     model::ListeningPeerPool m_listeningPeerPool;
+    TrafficRelayStub m_trafficRelayStub;
     controller::ConnectSessionManager m_connectSessionManager;
     std::string m_peerName;
     nx::utils::SyncQueue<api::ResultCode> m_beginListeningResults;
+    StreamSocketStub* m_lastListeningPeerConnection = nullptr;
 
     void onBeginListeningCompletion(
         api::ResultCode resultCode,
@@ -133,6 +178,7 @@ private:
         if (connectionEvents.onResponseHasBeenSent)
         {
             auto tcpConnection = std::make_unique<StreamSocketStub>();
+            m_lastListeningPeerConnection = tcpConnection.get();
             auto httpConnection = std::make_unique<nx_http::HttpServerConnection>(
                 nullptr,
                 std::move(tcpConnection),
@@ -176,15 +222,24 @@ public:
     ConnectSessionManagerConnectingPeer()
     {
         registerListeningPeer();
+        m_listeningPeerName = listeningPeerName();
     }
 
 protected:
+    void givenClientSessionToListeningPeerWithIdleConnections()
+    {
+        addListeningPeerConnection();
+        
+        whenIssuedCreateSessionWithPredefinedId();
+        thenSessionHasBeenCreated();
+    }
+
     void whenIssuedCreateSessionWithoutId()
     {
         issueCreateSession(std::string());
     }
     
-    void whenIssuedCreateSessionWithoutPredefinedId()
+    void whenIssuedCreateSessionWithPredefinedId()
     {
         m_expectedSessionId = QnUuid::createUuid().toSimpleString().toStdString();
         issueCreateSession(m_expectedSessionId);
@@ -192,12 +247,35 @@ protected:
 
     void whenIssuedCreateSessionWithAlreadyUsedId()
     {
-        whenIssuedCreateSessionWithoutPredefinedId();
+        whenIssuedCreateSessionWithPredefinedId();
         thenSessionHasBeenCreated();
 
         std::string sessionId;
         m_expectedSessionId.swap(sessionId);
         issueCreateSession(sessionId);
+    }
+
+    void whenIssuedCreateSessionWithUnknownPeerName()
+    {
+        m_listeningPeerName = "unknown peer";
+        whenIssuedCreateSessionWithPredefinedId();
+    }
+
+    void whenRequestedConnectionToPeer()
+    {
+        using namespace std::placeholders;
+
+        api::ConnectToPeerRequest request;
+        request.sessionId = m_expectedSessionId;
+        connectSessionManager().connectToPeer(
+            request,
+            std::bind(&ConnectSessionManagerConnectingPeer::onConnectCompletion, this, _1, _2));
+    }
+
+    void whenIssuedConnectUsingUnknownSessionId()
+    {
+        m_expectedSessionId = "abra kadabra";
+        whenRequestedConnectionToPeer();
     }
 
     void thenSessionHasBeenCreated()
@@ -214,6 +292,30 @@ protected:
             clientSessionPool().getPeerNameBySessionId(result.response.sessionId));
     }
 
+    void thenCreateSessionReportedNotFound()
+    {
+        ASSERT_EQ(api::ResultCode::notFound, m_createClientSessionResults.pop().code);
+    }
+
+    void thenConnectRequestSucceeded()
+    {
+        ASSERT_EQ(api::ResultCode::ok, m_connectResults.pop().code);
+    }
+
+    void thenProxyingHasBeenStarted()
+    {
+        ASSERT_TRUE(
+            trafficRelayStub().hasRelaySession(
+                m_lastClientConnection,
+                lastListeningPeerConnection(),
+                m_listeningPeerName));
+    }
+
+    void thenConnectHasReportedNotFound()
+    {
+        ASSERT_EQ(api::ResultCode::notFound, m_connectResults.pop().code);
+    }
+
 private:
     struct CreateClientSessionResult
     {
@@ -221,8 +323,16 @@ private:
         api::CreateClientSessionResponse response;
     };
 
+    struct ConnectResult
+    {
+        api::ResultCode code = api::ResultCode::ok;
+    };
+
     nx::utils::SyncQueue<CreateClientSessionResult> m_createClientSessionResults;
+    nx::utils::SyncQueue<ConnectResult> m_connectResults;
     std::string m_expectedSessionId;
+    std::string m_listeningPeerName;
+    StreamSocketStub* m_lastClientConnection = nullptr;
 
     void registerListeningPeer()
     {
@@ -235,7 +345,7 @@ private:
         using namespace std::placeholders;
 
         api::CreateClientSessionRequest request;
-        request.targetPeerName = listeningPeerName();
+        request.targetPeerName = m_listeningPeerName;
         if (!sessionId.empty())
             request.desiredSessionId = sessionId;
         connectSessionManager().createClientSession(
@@ -253,6 +363,27 @@ private:
         result.response = std::move(response);
         m_createClientSessionResults.push(std::move(result));
     }
+
+    void onConnectCompletion(
+        api::ResultCode resultCode,
+        nx_http::ConnectionEvents connectionEvents)
+    {
+        if (connectionEvents.onResponseHasBeenSent)
+        {
+            auto tcpConnection = std::make_unique<StreamSocketStub>();
+            m_lastClientConnection = tcpConnection.get();
+            auto httpConnection = std::make_unique<nx_http::HttpServerConnection>(
+                nullptr,
+                std::move(tcpConnection),
+                nullptr,
+                nullptr);
+            connectionEvents.onResponseHasBeenSent(httpConnection.get());
+        }
+
+        ConnectResult result;
+        result.code = resultCode;
+        m_connectResults.push(result);
+    }
 };
 
 TEST_F(ConnectSessionManagerConnectingPeer, create_client_session_auto_generate_id)
@@ -263,7 +394,7 @@ TEST_F(ConnectSessionManagerConnectingPeer, create_client_session_auto_generate_
 
 TEST_F(ConnectSessionManagerConnectingPeer, create_client_session_desired_session_id)
 {
-    whenIssuedCreateSessionWithoutPredefinedId();
+    whenIssuedCreateSessionWithPredefinedId();
     thenSessionHasBeenCreated();
 }
 
@@ -273,12 +404,41 @@ TEST_F(ConnectSessionManagerConnectingPeer, create_client_session_id_is_already_
     thenSessionHasBeenCreated();
 }
 
-//TEST_F(ConnectSessionManagerConnectingPeer, client_session_expiration)
+TEST_F(ConnectSessionManagerConnectingPeer, create_client_session_to_unknown_peer)
+{
+    whenIssuedCreateSessionWithUnknownPeerName();
+    thenCreateSessionReportedNotFound();
+}
 
-//TEST_F(ConnectSessionManagerConnectingPeer, connect_to_listening_peer)
-//TEST_F(ConnectSessionManagerConnectingPeer, connect_to_unknown_peer)
-//TEST_F(ConnectSessionManagerConnectingPeer, connect_with_unknown_session_id)
+TEST_F(ConnectSessionManagerConnectingPeer, connect_with_unknown_session_id)
+{
+    whenIssuedConnectUsingUnknownSessionId();
+    thenConnectHasReportedNotFound();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class ConnectSessionManagerConnectingPeerConnectTo:
+    public ConnectSessionManagerConnectingPeer
+{
+public:
+    ConnectSessionManagerConnectingPeerConnectTo()
+    {
+        whenIssuedCreateSessionWithPredefinedId();
+        thenSessionHasBeenCreated();
+    }
+};
+
+TEST_F(ConnectSessionManagerConnectingPeerConnectTo, connect_to_listening_peer)
+{
+    whenRequestedConnectionToPeer();
+
+    thenConnectRequestSucceeded();
+    thenProxyingHasBeenStarted();
+}
+
 //TEST_F(ConnectSessionManagerConnectingPeer, connect_to_listening_peer_with_no_idle_connections)
+//TEST_F(ConnectSessionManagerConnectingPeer, all_client_sessions_are_closed_when_listening_peer_disappears)
 
 } // namespace test
 } // namespace controller

@@ -5,6 +5,9 @@
 #include <string>
 
 #include <nx/network/abstract_socket.h>
+#include <nx/network/aio/basic_pollable.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_result_code.h>
+#include <nx/utils/counter.h>
 #include <nx/utils/thread/mutex.h>
 
 namespace nx {
@@ -15,6 +18,9 @@ namespace model {
 class ListeningPeerPool
 {
 public:
+    using TakeIdleConnection = 
+        nx::utils::MoveOnlyFunc<void(api::ResultCode, std::unique_ptr<AbstractStreamSocket>)>;
+
     ListeningPeerPool();
     ~ListeningPeerPool();
 
@@ -23,6 +29,12 @@ public:
         std::unique_ptr<AbstractStreamSocket> connection);
 
     std::size_t getConnectionCountByPeerName(const std::string& peerName) const;
+
+    bool isPeerListening(const std::string& peerName) const;
+
+    void takeIdleConnection(
+        const std::string& peerName,
+        TakeIdleConnection completionHandler);
 
 private:
     struct ConnectionContext
@@ -36,16 +48,26 @@ private:
     PeerConnections m_peerNameToConnection;
     mutable QnMutex m_mutex;
     bool m_terminated;
+    network::aio::BasicPollable m_unsuccessfulResultReporter;
+    utils::Counter m_apiCallCounter;
 
-    void monitoringConnectionForClosure(PeerConnections::iterator);
+    void giveAwayConnection(
+        ListeningPeerPool::ConnectionContext connectionContext,
+        ListeningPeerPool::TakeIdleConnection completionHandler);
+
+    void monitoringConnectionForClosure(
+        const std::string& peerName,
+        ConnectionContext* connectionContext);
 
     void onConnectionReadCompletion(
-        ListeningPeerPool::PeerConnections::iterator connectionIter,
+        const std::string& peerName,
+        ConnectionContext* connectionContext,
         SystemError::ErrorCode sysErrorCode,
         std::size_t bytesRead);
 
     void closeConnection(
-        ListeningPeerPool::PeerConnections::iterator connectionIter,
+        const std::string& peerName,
+        ConnectionContext* connectionContext,
         SystemError::ErrorCode sysErrorCode);
 };
 
