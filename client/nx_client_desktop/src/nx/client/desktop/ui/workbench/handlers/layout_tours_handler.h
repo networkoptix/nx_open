@@ -33,7 +33,7 @@ private:
         const ec2::ApiLayoutTourItemData& item);
 
 private:
-    LayoutTourController* m_controller;
+    LayoutTourController* m_tourController;
     QHash<QnUuid, QnLayoutResourcePtr> m_reviewLayouts;
 };
 

@@ -14,6 +14,7 @@
 
 #include <ui/common/palette.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/items/standard/graphics_pixmap.h>
@@ -80,19 +81,6 @@ LayoutTourItemWidget::~LayoutTourItemWidget()
 {
 }
 
-int LayoutTourItemWidget::order() const
-{
-    return m_order;
-}
-
-void LayoutTourItemWidget::setOrder(int value)
-{
-    if (m_order == value)
-        return;
-    m_order = value;
-    emit orderChanged(value);
-}
-
 void LayoutTourItemWidget::initOverlay()
 {
     auto font = this->font();
@@ -149,12 +137,16 @@ void LayoutTourItemWidget::initOverlay()
     orderLabel->setAcceptedMouseButtons(0);
     orderLabel->setAlignment(Qt::AlignVCenter);
     orderLabel->setFont(orderFont);
-    auto updateOrder = [orderLabel](int order)
+    auto updateOrder = [this, orderLabel](Qn::ItemDataRole role)
         {
+            if (role != Qn::LayoutTourItemOrderRole)
+                return;
+
+            const int order = item()->data(role).toInt();
             orderLabel->setText(QString::number(order));
         };
-    updateOrder(m_order);
-    connect(this, &LayoutTourItemWidget::orderChanged, this, updateOrder);
+    updateOrder(Qn::LayoutTourItemOrderRole);
+    connect(item(), &QnWorkbenchItem::dataChanged, this, updateOrder);
 
     auto delayHintLabel = new GraphicsLabel(tr("Display for"));
     delayHintLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
@@ -164,7 +156,7 @@ void LayoutTourItemWidget::initOverlay()
     setPaletteColor(delayHintLabel, QPalette::WindowText, QColor("#53707f")); //TODO: #GDM #3.1 customize
 
     auto delayEdit = new QSpinBox();
-    delayEdit->setSuffix(QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
+    delayEdit->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
     delayEdit->setMinimum(1);
     delayEdit->setMaximum(99);
     const auto delayMs = item()->data(Qn::LayoutTourItemDelayMsRole).toInt();
@@ -175,7 +167,7 @@ void LayoutTourItemWidget::initOverlay()
             item()->setData(Qn::LayoutTourItemDelayMsRole, value * 1000);
         });
 
-    auto delayWidget = new QGraphicsProxyWidget();
+    auto delayWidget = new QnMaskedProxyWidget();
     delayWidget->setWidget(delayEdit);
 
     auto footerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
