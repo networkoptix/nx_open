@@ -7,7 +7,7 @@ class Ptz: public QObject
     Q_OBJECT
 
 public:
-    enum class Capability
+    enum Capability
     {
         NoPtzCapabilities                   = 0x00000000,
 
@@ -38,6 +38,8 @@ public:
         VirtualPtzCapability                = 0x00400000,
 
         AuxilaryPtzCapability               = 0x01000000,
+
+        ManualAutoFocusCapability           = 0x02000000,
 
         /* Shortcuts */
         ContinuousPanTiltCapabilities       =

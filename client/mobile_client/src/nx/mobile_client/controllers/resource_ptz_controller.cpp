@@ -73,16 +73,17 @@ Ptz::Capabilities ResourcePtzController::capabilities() const
     QnPtzAuxilaryTraitList traits;
 
     if (!getAuxilaryTraits(&traits) || !containsTrait(traits, Qn::ManualAutoFocusPtzTrait))
-        return Ptz::Capability::Empty;
+        return Ptz::Capability::NoPtzCapabilities;
 
     NX_ASSERT(false);
-    return Ptz::Capability::AutoFocus;
+    return Ptz::Capability::ManualAutoFocusCapability;
 }
 
 bool ResourcePtzController::setAutoFocus()
 {
-    return capabilities().testFlag(Ptz::Capability::AutoFocus);
-    return runAuxilaryCommand(Qn::ManualAutoFocusPtzTrait, QString());
+    return capabilities().testFlag(Ptz::Capability::ManualAutoFocusCapability)
+        ? runAuxilaryCommand(Qn::ManualAutoFocusPtzTrait, QString())
+        : false;
 }
 } // namespace mobile
 } // namespace client

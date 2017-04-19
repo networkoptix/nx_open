@@ -47,10 +47,10 @@ Qt::Orientations capabilitiesToMode(Ptz::Capabilities capabilities)
     if (isFisheye)
         return result;
 
-    if (capabilities.testFlag(Qn::ContinuousPanCapability))
+    if (capabilities.testFlag(Ptz::Capability::ContinuousPanCapability))
         result |= Qt::Horizontal;
 
-    if (capabilities.testFlag(Qn::ContinuousTiltCapability))
+    if (capabilities.testFlag(Ptz::Capability::ContinuousTiltCapability))
         result |= Qt::Vertical;
 
     return result;
@@ -207,9 +207,9 @@ bool PtzInstrument::processMousePress(QGraphicsItem* item, QGraphicsSceneMouseEv
         m_movement = ContinuousMovement;
 
         m_movementOrientations = 0;
-        if (data.hasCapabilities(Qn::ContinuousPanCapability))
+        if (data.hasCapabilities(Ptz::Capability::ContinuousPanCapability))
             m_movementOrientations |= Qt::Horizontal;
-        if (data.hasCapabilities(Qn::ContinuousTiltCapability))
+        if (data.hasCapabilities(Ptz::Capability::ContinuousTiltCapability))
             m_movementOrientations |= Qt::Vertical;
     }
     else
@@ -300,9 +300,9 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
         const bool isFisheye = data.hasCapabilities(Ptz::Capability::VirtualPtzCapability);
         const bool isFisheyeEnabled = widget->dewarpingParams().enabled;
 
-        const bool canMove = data.hasCapabilities(Qn::ContinuousPanCapability)
-            || data.hasCapabilities(Qn::ContinuousTiltCapability);
-        const bool hasZoom = data.hasCapabilities(Qn::ContinuousZoomCapability);
+        const bool canMove = data.hasCapabilities(Ptz::Capability::ContinuousPanCapability)
+            || data.hasCapabilities(Ptz::Capability::ContinuousTiltCapability);
+        const bool hasZoom = data.hasCapabilities(Ptz::Capability::ContinuousZoomCapability);
         const bool hasFocus = data.hasCapabilities(Ptz::Capability::ContinuousFocusCapability);
         const bool hasAutoFocus = data.traits.contains(Qn::ManualAutoFocusPtzTrait);
 

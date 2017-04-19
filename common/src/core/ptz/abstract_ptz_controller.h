@@ -33,7 +33,7 @@ public:
     QnAbstractPtzController(const QnResourcePtr &resource);
     virtual ~QnAbstractPtzController();
 
-    /**i
+    /**
      * \returns                         Resource that this PTZ controller belongs to.
      */
     const QnResourcePtr &resource() const { return m_resource; }

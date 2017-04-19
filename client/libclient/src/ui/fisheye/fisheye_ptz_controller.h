@@ -10,6 +10,7 @@
 
 #include <core/ptz/item_dewarping_params.h>
 #include <core/ptz/media_dewarping_params.h>
+#include <core/ptz/ptz_constants.h>
 
 #include <ui/animation/animation_timer_listener.h>
 
