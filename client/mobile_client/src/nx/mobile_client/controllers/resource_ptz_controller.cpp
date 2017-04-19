@@ -24,14 +24,21 @@ namespace mobile {
 ResourcePtzController::ResourcePtzController(QObject* parent):
     base_type()
 {
-    connect(this, &ResourcePtzController::resourceIdChanged, this,
+
+    connect(this, &ResourcePtzController::uniqueResourceIdChanged, this,
         [this]()
         {
-            const auto resourceUuid = QnUuid::fromStringSafe(m_resourceId);
-            const auto resource = qnResPool->getResourceById(resourceUuid);
+            const auto resource = qnResPool->getResourceById(m_uniqueResourceId);
             const auto controller = qnClientPtzPool->controller(resource);
             if (baseController() != controller)
                 setBaseController(controller);
+        });
+
+    connect(this, &base_type::changed, this,
+        [this](Qn::PtzDataFields fields)
+        {
+            if (fields.testFlag(Qn::CapabilitiesPtzField))
+                emit capabilitiesChanged();
         });
 
     connect(this, &base_type::baseControllerChanged,
@@ -42,18 +49,18 @@ ResourcePtzController::ResourcePtzController(QObject* parent):
     setParent(parent);
 }
 
-QString ResourcePtzController::resourceId() const
+QUuid ResourcePtzController::uniqueResourceId() const
 {
-    return m_resourceId;
+    return m_uniqueResourceId.toString();
 }
 
-void ResourcePtzController::setResourceId(const QString& value)
+void ResourcePtzController::setUniqueResourceId(const QUuid& value)
 {
-    if (value == m_resourceId)
+    if (value == m_uniqueResourceId)
         return;
 
-    m_resourceId = value;
-    emit resourceIdChanged();
+    m_uniqueResourceId = value;
+    emit uniqueResourceIdChanged();
 }
 
 bool ResourcePtzController::available() const

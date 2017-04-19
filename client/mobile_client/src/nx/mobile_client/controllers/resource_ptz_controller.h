@@ -12,7 +12,8 @@ class ResourcePtzController: public QnProxyPtzController
     Q_OBJECT
     using base_type = QnProxyPtzController;
 
-    Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
+    Q_PROPERTY(QUuid uniqueResourceId READ uniqueResourceId
+        WRITE setUniqueResourceId NOTIFY uniqueResourceIdChanged)
     Q_PROPERTY(bool available READ available NOTIFY availableChanged)
 
     Q_PROPERTY(Ptz::Capabilities capabilities READ capabilities NOTIFY capabilitiesChanged)
@@ -21,8 +22,8 @@ public:
     ResourcePtzController(QObject* parent = nullptr);
 
 public: // Properties section
-    QString resourceId() const;
-    void setResourceId(const QString& value);
+    QUuid uniqueResourceId() const;
+    void setUniqueResourceId(const QUuid& value);
 
     bool available() const;
 
@@ -32,13 +33,13 @@ public:
     Q_INVOKABLE bool setAutoFocus();
 
 signals:
-    void resourceIdChanged();
+    void uniqueResourceIdChanged();
     void availableChanged();
 
     void capabilitiesChanged();
 
 private:
-    QString m_resourceId;
+    QUuid m_uniqueResourceId;
 };
 
 } // namespace mobile

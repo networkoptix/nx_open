@@ -258,7 +258,7 @@ PageBase
         PtzController
         {
             id: ptzController
-            resourceId: videoScreenController.resourceHelper.resourceId
+            uniqueResourceId: videoScreenController.resourceHelper.resourceId
         }
 
         Column
@@ -288,8 +288,6 @@ PageBase
                         text: "set autofocus"
                         onClicked: ptzController.setAutoFocus()
                         enabled: ptzController.capabilities & Ptz.AutoFocus;
-
-                        Component.onCompleted: console.log(Ptz.AutoFocus, "------------------------------------")
                     }
 
                     Button
