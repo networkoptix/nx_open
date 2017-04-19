@@ -6,7 +6,39 @@
 
 namespace ec2 {
 
-struct ApiPeerData: ApiIdData
+struct ApiPeerIdData: ApiIdData
+{
+    ApiPeerIdData(): ApiIdData() {}
+
+    ApiPeerIdData(
+        const QnUuid& id,
+        const QnUuid& instanceId,
+        const QnUuid& persistentId)
+    :
+        ApiIdData(id),
+        instanceId(instanceId),
+        persistentId(persistentId)
+    {}
+
+    bool operator<(const ApiPeerIdData& other) const
+    {
+        if (id != other.id)
+            return id < other.id;
+        if (persistentId != other.persistentId)
+            return persistentId < other.persistentId;
+        return instanceId < other.instanceId;
+    }
+
+    /** Unique persistent Db ID of the peer. Empty for clients */
+    QnUuid persistentId;
+
+    /** Unique running instance ID of the peer. */
+    QnUuid instanceId;
+
+};
+#define ApiPeerIdData_Fields ApiIdData_Fields (persistentId)(instanceId)
+
+struct ApiPeerData: ApiPeerIdData
 {
     ApiPeerData():
         dataFormat(Qn::UbjsonFormat)
@@ -17,9 +49,8 @@ struct ApiPeerData: ApiIdData
         const QnUuid& instanceId,
         Qn::PeerType peerType,
         Qn::SerializationFormat dataFormat = Qn::UbjsonFormat)
-        :
-        ApiIdData(id),
-        instanceId(instanceId),
+    :
+        ApiPeerIdData(id, instanceId, QnUuid()),
         peerType(peerType),
         dataFormat(dataFormat)
     {}
@@ -28,6 +59,7 @@ struct ApiPeerData: ApiIdData
     {
         return id == other.id
             && instanceId == other.instanceId
+            && persistentId == other.persistentId
             && peerType == other.peerType
             && dataFormat == other.dataFormat;
     }
@@ -64,9 +96,6 @@ struct ApiPeerData: ApiIdData
             peerType == Qn::PT_MobileClient;
     }
 
-    /** Unique running instance ID of the peer. */
-    QnUuid instanceId;
-
     /** Type of the peer. */
     Qn::PeerType peerType;
 
@@ -75,6 +104,6 @@ struct ApiPeerData: ApiIdData
 };
 typedef QSet<QnUuid> QnPeerSet;
 
-#define ApiPeerData_Fields ApiIdData_Fields (instanceId)(peerType)(dataFormat)
+#define ApiPeerData_Fields ApiPeerIdData_Fields (peerType)(dataFormat)
 
 } // namespace ec2

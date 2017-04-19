@@ -8,8 +8,8 @@
 namespace ec2
 {
 
-
-struct QnTranStateKey {
+struct QnTranStateKey
+{
     QnTranStateKey() {}
     QnTranStateKey(QnUuid peerID, QnUuid dbID): peerID(peerID), dbID(dbID) {}
     QnUuid peerID;

@@ -62,7 +62,8 @@ protected:
     static unsigned m_masks[INT_BIT + 1];
 };
 
-class BitStreamReader: public BitStream {
+class BitStreamReader: public BitStream
+{
 private:
     inline unsigned getCurVal(unsigned* buff)
     {
@@ -133,7 +134,8 @@ public:
         }
         return (prevVal + (curVal >> bitLeft)) & m_masks[num];
     }
-    inline unsigned getBit() {
+    inline unsigned getBit()
+    {
         if (m_totalBits < 1)
             THROW_BITSTREAM_ERR;
         if (m_bitLeft > 0)
@@ -146,7 +148,8 @@ public:
         m_totalBits--;
         return (m_curVal >> m_bitLeft) & 1;
     }
-    inline void skipBits(unsigned num) {
+    inline void skipBits(unsigned num)
+    {
         if (m_totalBits < num)
             THROW_BITSTREAM_ERR;
         NX_ASSERT(num <= INT_BIT);
@@ -159,7 +162,8 @@ public:
         }
         m_totalBits -= num;
     }
-    inline void skipBit() {
+    inline void skipBit()
+    {
         if (m_totalBits < 1)
             THROW_BITSTREAM_ERR;
         if (m_bitLeft > 0)
@@ -172,6 +176,7 @@ public:
         m_totalBits--;
     }
     inline unsigned getBitsCount() const  {return (unsigned)(m_buffer - m_initBuffer) * INT_BIT + INT_BIT - m_bitLeft;}
+    inline bool hasMoreBits() const { return m_bitLeft > 0; }
 private:
     unsigned m_curVal;
     unsigned m_bitLeft;
@@ -243,6 +248,10 @@ public:
     }
     inline unsigned getBitsCount() {
         return (unsigned) (m_buffer - m_initBuffer) * INT_BIT + m_bitWrited;
+    }
+    inline int getBytesCount()
+    {
+        return (getBitsCount() + 7) / 8;
     }
 private:
     unsigned m_curVal;

@@ -206,15 +206,14 @@ bool handleTransaction(
 QnTransactionMessageBus::QnTransactionMessageBus(detail::QnDbManager* db,
     Qn::PeerType peerType,
     QnCommonModule* commonModule)
-    :
-    QnCommonModuleAware(commonModule),
+:
+    QnTransactionMessageBusBase(commonModule),
     m_db(db),
     m_localPeerType(peerType),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
     m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
     m_handler(nullptr),
     m_timer(nullptr),
-    m_mutex(QnMutex::Recursive),
     m_thread(nullptr),
     m_runtimeTransactionLog(new QnRuntimeTransactionLog(commonModule)),
     m_restartPending(false)
@@ -1927,43 +1926,9 @@ void QnTransactionMessageBus::removeHandler(ECConnectionNotificationManager* han
         m_handler = nullptr;
 }
 
-QnUuid QnTransactionMessageBus::routeToPeerVia(const QnUuid& dstPeer, int* peerDistance) const
-{
-    QnMutexLocker lock(&m_mutex);
-    *peerDistance = INT_MAX;
-    const auto itr = m_alivePeers.find(dstPeer);
-    if (itr == m_alivePeers.cend())
-        return QnUuid(); // route info not found
-    const AlivePeerInfo& peerInfo = itr.value();
-    int minDistance = INT_MAX;
-    QnUuid result;
-    for (auto itr2 = peerInfo.routingInfo.cbegin(); itr2 != peerInfo.routingInfo.cend(); ++itr2)
-    {
-        int distance = itr2.value().distance;
-        if (distance < minDistance)
-        {
-            minDistance = distance;
-            result = itr2.key();
-        }
-    }
-    *peerDistance = minDistance;
-    return result;
-}
-
 ConnectionGuardSharedState* QnTransactionMessageBus::connectionGuardSharedState()
 {
     return &m_connectionGuardSharedState;
-}
-
-int QnTransactionMessageBus::distanceToPeer(const QnUuid& dstPeer) const
-{
-    if (dstPeer == commonModule()->moduleGUID())
-        return 0;
-
-    int minDistance = INT_MAX;
-    for (const RoutingRecord& rec : m_alivePeers.value(dstPeer).routingInfo)
-        minDistance = qMin(minDistance, rec.distance);
-    return minDistance;
 }
 
 void QnTransactionMessageBus::setTimeSyncManager(TimeSynchronizationManager* timeSyncManager)
