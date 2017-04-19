@@ -39,10 +39,13 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
         [this](const ec2::ApiLayoutTourData& tour)
         {
             m_tourExecutor->updateTour(tour);
-            if (auto reviewLayout = m_reviewLayouts.take(tour.id))
+            if (auto reviewLayout = m_reviewLayouts.value(tour.id))
             {
                 //TODO: #GDM #3.1 dynamically change items
                 reviewLayout->setData(Qn::CustomPanelTitleRole, tour.name);
+                reviewLayout->setItems(QnLayoutItemDataList());
+                for (auto item: tour.items)
+                    addItemToReviewLayout(reviewLayout, item);
             }
         });
 
@@ -208,7 +211,8 @@ void LayoutToursHandler::reviewLayoutTour(const ec2::ApiLayoutTourData& tour)
     layout->setData(Qn::CustomPanelActionsRole, qVariantFromValue(actions));
     layout->setData(Qn::CustomPanelTitleRole, tour.name);
     layout->setData(Qn::CustomPanelDescriptionRole, QString());
-    layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadWriteSavePermission));
+    layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadWriteSavePermission
+        | Qn::AddRemoveItemsPermission));
     layout->setData(Qn::LayoutTourUuidRole, qVariantFromValue(tour.id));
     layout->setCellAspectRatio(kCellAspectRatio);
 

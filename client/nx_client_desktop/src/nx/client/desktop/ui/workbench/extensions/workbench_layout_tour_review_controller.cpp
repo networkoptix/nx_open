@@ -97,11 +97,16 @@ void LayoutTourReviewController::connectToLayout(QnWorkbenchLayout* layout)
        return;
 
     *m_connections << connect(layout, &QnWorkbenchLayout::itemAdded, this,
-        &LayoutTourReviewController::connectToItem);
+        [this](QnWorkbenchItem* item)
+        {
+            connectToItem(item);
+            updateOrder();
+        });
     *m_connections << connect(layout, &QnWorkbenchLayout::itemRemoved, this,
         [this](QnWorkbenchItem* item)
         {
             item->disconnect(this);
+            updateOrder();
         });
     for (auto item: layout->items())
         connectToItem(item);
