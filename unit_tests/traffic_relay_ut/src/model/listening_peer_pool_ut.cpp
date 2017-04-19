@@ -26,9 +26,9 @@ class ListeningPeerPool:
 {
 public:
     ListeningPeerPool():
+        m_poolHasBeenDestroyed(false),
         m_peerName(nx::utils::generateRandomName(17).toStdString()),
-        m_peerConnection(nullptr),
-        m_poolHasBeenDestroyed(false)
+        m_peerConnection(nullptr)
     {
         m_pool = std::make_unique<model::ListeningPeerPool>();
     }
