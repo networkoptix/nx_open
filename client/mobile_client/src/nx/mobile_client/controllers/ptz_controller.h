@@ -1,23 +1,20 @@
 #pragma once
 
-#include <core/ptz/basic_ptz_controller.h> // TODO: replace with abstract controller
+#include <core/ptz/proxy_ptz_controller.h>
 
 namespace nx {
 namespace client {
 namespace mobile {
 
-class PtzControllerPrivate;
-class PtzController: public QnBasicPtzController // TODO: replace with abstract controller
+class ResourcePtzController: public QnProxyPtzController
 {
     Q_OBJECT
-    using base_type = QnBasicPtzController;
+    using base_type = QnProxyPtzController;
 
     Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
 
 public:
-    PtzController(QObject* parent = nullptr);
-
-    virtual ~PtzController();
+    ResourcePtzController(QObject* parent = nullptr);
 
     QString resourceId() const;
     void setResourceId(const QString& value);
@@ -26,8 +23,7 @@ signals:
     void resourceIdChanged();
 
 private:
-    Q_DECLARE_PRIVATE(PtzController)
-    const QScopedPointer<PtzControllerPrivate> d_ptr;
+    QString m_resourceId;
 };
 
 } // namespace mobile

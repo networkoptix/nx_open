@@ -81,7 +81,7 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnLiteClientLayoutHelper>("com.networkoptix.qml", 1, 0, "QnLiteClientLayoutHelper");
     qmlRegisterType<utils::DeveloperSettingsHelper>(
         "com.networkoptix.qml", 1, 0, "DeveloperSettingsHelper");
-    qmlRegisterType<nx::client::mobile::PtzController>(
+    qmlRegisterType<nx::client::mobile::ResourcePtzController>(
         "com.networkoptix.qml", 1, 0, "PtzController");
 
     qmlRegisterRevision<QQuickTextInput, 6>("Nx.Controls", 1, 0);
