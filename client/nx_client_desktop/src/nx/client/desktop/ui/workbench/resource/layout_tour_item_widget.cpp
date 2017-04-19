@@ -124,6 +124,7 @@ void LayoutTourItemWidget::initOverlay()
     const auto closeButtonSize = QnSkin::maximumSize(closeButtonIcon);
     closeButton->setIcon(closeButtonIcon);
     closeButton->setFixedSize(closeButtonSize);
+    connect(closeButton, &QnImageButtonWidget::clicked, this, &QnResourceWidget::close);
 
     auto headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     headerLayout->addItem(icon);

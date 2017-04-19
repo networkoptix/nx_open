@@ -109,21 +109,22 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             saveTourToServer(tour);
         });
 
-    connect(action(QnActions::ToggleLayoutTourModeAction), &QAction::triggered, this,
+    connect(action(QnActions::ToggleLayoutTourModeAction), &QAction::toggled, this,
         [this](bool toggled)
         {
-            if (!toggled)
-            {
-                m_tourExecutor->stopCurrentTour();
-                return;
-            }
-
             QnActionParameters parameters = menu()->currentParameters(sender());
             auto id = parameters.argument<QnUuid>(Qn::UuidRole);
             if (id.isNull())
-                m_tourExecutor->startSingleLayoutTour();
+            {
+                if (toggled)
+                    m_tourExecutor->startSingleLayoutTour();
+                else
+                    m_tourExecutor->stopCurrentTour();
+            }
             else
+            {
                 m_tourExecutor->startTour(qnLayoutTourManager->tour(id));
+            }
         });
 
     connect(action(QnActions::SaveLayoutTourAction), &QAction::triggered, this,
@@ -137,8 +138,12 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             saveTourToServer(tour);
         });
 
-    connect(action(QnActions::EscapeHotkeyAction), &QAction::triggered, m_tourExecutor,
-        &LayoutTourExecutor::stopCurrentTour);
+    connect(action(QnActions::EscapeHotkeyAction), &QAction::triggered, this,
+        [this]
+        {
+            if (action(QnActions::ToggleLayoutTourModeAction)->isChecked())
+                action(QnActions::ToggleLayoutTourModeAction)->toggle();
+        });
 }
 
 LayoutToursHandler::~LayoutToursHandler()

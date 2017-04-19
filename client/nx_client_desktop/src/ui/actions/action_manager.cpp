@@ -443,7 +443,20 @@ QnActionManager::QnActionManager(QObject *parent):
 
     using namespace QnResourceCriterionExpressions;
 
+    auto not = [this](QnActionCondition* condition) -> QnActionCondition*
+        {
+            return new QnNegativeActionCondition(condition, this);
+        };
 
+    auto and = [this](QList<QnActionCondition*> conditions) -> QnActionCondition*
+        {
+            return new QnConjunctionActionCondition(conditions, this);
+        };
+
+    auto or = [this](QList<QnActionCondition*> conditions) -> QnActionCondition*
+        {
+            return new QnDisjunctionActionCondition(conditions, this);
+        };
 
     /* Actions that are not assigned to any menu. */
 
@@ -1795,16 +1808,16 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false);
 
     factory(QnActions::ToggleLayoutTourModeAction).
-        flags(Qn::Tree | Qn::NoTarget | Qn::GlobalHotkey).
+        flags(Qn::Scene | Qn::Tree | Qn::NoTarget | Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).
         text(tr("Start Tour")).
         shortcut(lit("Alt+T")).
+        checkable().
         autoRepeat(false).
-        condition(new QnConjunctionActionCondition(
+        condition(and({
             new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this),
-            new QnToggleTourActionCondition(this),
-            this
-        ));
+            new QnToggleTourActionCondition(this)})
+        );
 
     factory(QnActions::LayoutTourSettingsAction).
         flags(Qn::Tree | Qn::NoTarget).

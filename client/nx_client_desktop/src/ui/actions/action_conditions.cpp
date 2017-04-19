@@ -164,33 +164,45 @@ Qn::ActionVisibility QnRequiresOwnerCondition::check(const QnActionParameters &p
 }
 
 QnConjunctionActionCondition::QnConjunctionActionCondition(const QList<QnActionCondition *> conditions, QObject *parent) :
-    QnActionCondition(parent),
-    m_conditions(conditions)
-{}
-
-QnConjunctionActionCondition::QnConjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QObject *parent) :
     QnActionCondition(parent)
 {
-    m_conditions.append(condition1);
-    m_conditions.append(condition2);
+    for (auto condition: conditions)
+    {
+        if (condition)
+            m_conditions.push_back(condition);
+    }
 }
 
-QnConjunctionActionCondition::QnConjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QnActionCondition *condition3, QObject *parent) :
-    QnActionCondition(parent)
+QnConjunctionActionCondition::QnConjunctionActionCondition(
+    QnActionCondition *condition1,
+    QnActionCondition *condition2,
+    QObject *parent)
+    :
+    QnConjunctionActionCondition({condition1, condition2}, parent)
 {
-    m_conditions.append(condition1);
-    m_conditions.append(condition2);
-    m_conditions.append(condition3);
 }
 
-QnConjunctionActionCondition::QnConjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QnActionCondition *condition3, QnActionCondition *condition4, QObject *parent):
-    QnActionCondition(parent)
+QnConjunctionActionCondition::QnConjunctionActionCondition(
+    QnActionCondition *condition1,
+    QnActionCondition *condition2,
+    QnActionCondition *condition3,
+    QObject *parent)
+    :
+    QnConjunctionActionCondition({condition1, condition2, condition3}, parent)
 {
-    m_conditions.append(condition1);
-    m_conditions.append(condition2);
-    m_conditions.append(condition3);
-    m_conditions.append(condition4);
 }
+
+QnConjunctionActionCondition::QnConjunctionActionCondition(
+    QnActionCondition *condition1,
+    QnActionCondition *condition2,
+    QnActionCondition *condition3,
+    QnActionCondition *condition4,
+    QObject *parent)
+    :
+    QnConjunctionActionCondition({condition1, condition2, condition3, condition4}, parent)
+{
+}
+
 
 Qn::ActionVisibility QnConjunctionActionCondition::check(const QnActionParameters &parameters) {
     Qn::ActionVisibility result = Qn::EnabledAction;
@@ -705,9 +717,6 @@ Qn::ActionVisibility QnPanicActionCondition::check(const QnActionParameters &) {
 
 Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters &parameters)
 {
-//     if (action(QnActions::ToggleLayoutTourModeAction)->isChecked())
-//         return Qn::EnabledAction;
-
     const auto tourId = parameters.argument(Qn::UuidRole).value<QnUuid>();
     if (tourId.isNull())
     {
@@ -1289,24 +1298,32 @@ Qn::ActionVisibility QnAutoStartAllowedActionCodition::check(const QnActionParam
 
 
 QnDisjunctionActionCondition::QnDisjunctionActionCondition(const QList<QnActionCondition *> conditions, QObject *parent) :
-    QnActionCondition(parent),
-    m_conditions(conditions)
+    QnActionCondition(parent)
+{
+    for (auto condition: conditions)
+    {
+        if (condition)
+            m_conditions.push_back(condition);
+    }
+}
+
+QnDisjunctionActionCondition::QnDisjunctionActionCondition(
+    QnActionCondition* condition1,
+    QnActionCondition* condition2,
+    QObject* parent)
+    :
+    QnDisjunctionActionCondition({condition1, condition2}, parent)
 {
 }
 
-QnDisjunctionActionCondition::QnDisjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QObject *parent) :
-    QnActionCondition(parent)
+QnDisjunctionActionCondition::QnDisjunctionActionCondition(
+    QnActionCondition* condition1,
+    QnActionCondition* condition2,
+    QnActionCondition* condition3,
+    QObject* parent)
+    :
+    QnDisjunctionActionCondition({condition1, condition2, condition3}, parent)
 {
-    m_conditions.append(condition1);
-    m_conditions.append(condition2);
-}
-
-QnDisjunctionActionCondition::QnDisjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QnActionCondition *condition3, QObject *parent) :
-    QnActionCondition(parent)
-{
-    m_conditions.append(condition1);
-    m_conditions.append(condition2);
-    m_conditions.append(condition3);
 }
 
 Qn::ActionVisibility QnDisjunctionActionCondition::check(const QnActionParameters &parameters) {
