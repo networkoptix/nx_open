@@ -157,7 +157,8 @@ private:
     int handleRecvResult(int recvResult);
 
     std::unique_ptr<aio::AsyncSocketImplHelper<UdtStreamSocket>> m_aioHelper;
-    bool m_noDelay;
+    bool m_noDelay = false;
+    bool m_isInternetConnection = false;
 
 private:
     Q_DISABLE_COPY(UdtStreamSocket)
@@ -197,22 +198,9 @@ private:
 class NX_NETWORK_API UdtStatistics
 {
 public:
-    typedef void* UserId;
-    typedef utils::MoveOnlyFunc<void(UdtStreamSocket* socket, int bytes)> TrafficHandler;
+    std::atomic<size_t> internetBytesTransfered{0};
 
-    void addSendHandler(UserId user, TrafficHandler handler);
-    void addRecvHandler(UserId user, TrafficHandler handler);
-    void removeHandlers(UserId user);
-
-    void onSend(UdtStreamSocket* socket, uint64_t bytes);
-    void onRecv(UdtStreamSocket* socket, uint64_t bytes);
-
-    static UdtStatistics& instance();
-
-private:
-    QnMutex m_mutex;
-    std::map<UserId, TrafficHandler> m_sendHandlers;
-    std::map<UserId, TrafficHandler> m_recvHandlers;
+    static UdtStatistics global;
 };
 
 } // namespace network

@@ -6,9 +6,6 @@
 class UdtInternetTrafficMetric: public QnAbstractMetric
 {
 public:
-    UdtInternetTrafficMetric();
-    virtual ~UdtInternetTrafficMetric() override;
-
     virtual bool isSignificant() const override;
     virtual QString value() const override;
     virtual void reset() override;

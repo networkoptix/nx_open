@@ -183,46 +183,6 @@ NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     [](){ return std::make_unique<UdtStreamServerSocket>(AF_INET); },
     [](){ return std::make_unique<UdtStreamSocket>(AF_INET); })
 
-class UdtTransferInspector
-{
-public:
-    UdtTransferInspector(
-        size_t minBytesExpected = 1,
-        size_t maxBytesExpected = std::numeric_limits<size_t>::max())
-    :
-        m_minBytesExpected(minBytesExpected),
-        m_maxBytesExpected(maxBytesExpected)
-    {
-        UdtStatistics::instance().addSendHandler(
-            this, [this](UdtStreamSocket*, int bytes) { m_sendBytes += (size_t) bytes; });
-
-        UdtStatistics::instance().addRecvHandler(
-            this, [this](UdtStreamSocket*, int bytes) { m_recvBytes += (size_t) bytes; });
-    }
-
-    ~UdtTransferInspector()
-    {
-        UdtStatistics::instance().removeHandlers(this);
-        const auto sendBytes = m_sendBytes.load();
-        const auto recvBytes = m_recvBytes.load();
-
-        NX_LOGX(lm("Send=%1b, Recv=%2b").strs(sendBytes, recvBytes), cl_logINFO);
-        EXPECT_GE(sendBytes, m_minBytesExpected);
-        EXPECT_LE(sendBytes, m_maxBytesExpected);
-        EXPECT_GE(recvBytes, m_minBytesExpected);
-        EXPECT_LE(recvBytes, m_maxBytesExpected);
-    }
-
-    size_t sendBytes() { return m_sendBytes; }
-    size_t recvBytes() { return m_recvBytes; }
-
-private:
-    const size_t m_minBytesExpected;
-    const size_t m_maxBytesExpected;
-    std::atomic<size_t> m_sendBytes;
-    std::atomic<size_t> m_recvBytes;
-};
-
 static std::unique_ptr<UdtStreamSocket> rendezvousUdtSocket(
     std::chrono::milliseconds connectTimeout)
 {   
@@ -240,7 +200,6 @@ TEST_F(SocketUdt, rendezvousConnect)
     const size_t kBytesToSendThroughConnection(128 * 1024);
     const int kMaxSimultaneousConnections(25);
     const std::chrono::seconds kTestDuration(3);
-    UdtTransferInspector transferInspector(kBytesToSendThroughConnection);
 
     //creating two sockets, performing randezvous connect
     const auto connectorSocket = rendezvousUdtSocket(kConnectTimeout);

@@ -545,8 +545,7 @@ template class UdtSocket<AbstractStreamServerSocket>;
 // =====================================================================
 UdtStreamSocket::UdtStreamSocket(int ipVersion)
 :
-    m_aioHelper(new aio::AsyncSocketImplHelper<UdtStreamSocket>(this, AF_INET)),
-    m_noDelay(false)
+    m_aioHelper(new aio::AsyncSocketImplHelper<UdtStreamSocket>(this, AF_INET))
 {
     open();
 
@@ -557,9 +556,10 @@ UdtStreamSocket::UdtStreamSocket(int ipVersion)
 UdtStreamSocket::UdtStreamSocket(detail::UdtSocketImpl* impl, detail::SocketState state)
 :
     UdtSocket(impl, state),
-    m_aioHelper(new aio::AsyncSocketImplHelper<UdtStreamSocket>(this, AF_INET)),
-    m_noDelay(false)
+    m_aioHelper(new aio::AsyncSocketImplHelper<UdtStreamSocket>(this, AF_INET))
 {
+    if (state == detail::SocketState::connected)
+        m_isInternetConnection = !getForeignAddress().address.isLocal();
 }
 
 UdtStreamSocket::~UdtStreamSocket()
@@ -631,8 +631,8 @@ int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 
 int UdtStreamSocket::send( const void* buffer, unsigned int bufferLen )
 {
-    int sz = UDT::send(m_impl->udtHandle, reinterpret_cast<const char*>(buffer), bufferLen, 0);
-    if (sz == UDT::ERROR)
+    int sendResult = UDT::send(m_impl->udtHandle, reinterpret_cast<const char*>(buffer), bufferLen, 0);
+    if (sendResult == UDT::ERROR)
     {
         const auto sysErrorCode =
             detail::convertToSystemError(UDT::getlasterror().getErrorCode());
@@ -642,17 +642,18 @@ int UdtStreamSocket::send( const void* buffer, unsigned int bufferLen )
 
         SystemError::setLastErrorCode(sysErrorCode);
     }
-    else if (sz == 0)
+    else if (sendResult == 0)
     {
         //connection has been closed
         m_state = detail::SocketState::open;
     }
-    else
+    else if (sendResult > 0)
     {
-        UdtStatistics::instance().onSend(this, sz);
+        if (m_isInternetConnection)
+            UdtStatistics::global.internetBytesTransfered += (size_t) sendResult;
     }
 
-    return sz;
+    return sendResult;
 }
 
 SocketAddress UdtStreamSocket::getForeignAddress() const {
@@ -802,6 +803,7 @@ bool UdtStreamSocket::connectToIp(
         return false;
     }
     m_state = detail::SocketState::connected;
+    m_isInternetConnection = !getForeignAddress().address.isLocal();
     return true;
 }
 
@@ -881,9 +883,10 @@ int UdtStreamSocket::handleRecvResult(int recvResult)
         //connection has been closed
         m_state = detail::SocketState::open;
     }
-    else
+    else if (recvResult > 0)
     {
-        UdtStatistics::instance().onRecv(this, recvResult);
+        if (m_isInternetConnection)
+            UdtStatistics::global.internetBytesTransfered += (size_t) recvResult;
     }
 
     return recvResult;
@@ -1067,45 +1070,7 @@ void UdtStreamServerSocket::stopWhileInAioThread()
     m_aioHelper->stopPolling();
 }
 
-void UdtStatistics::addSendHandler(UserId user, TrafficHandler handler)
-{
-    QnMutexLocker lock(&m_mutex);
-    m_sendHandlers[user] = std::move(handler);
-}
-
-void UdtStatistics::addRecvHandler(UserId user, TrafficHandler handler)
-{
-    QnMutexLocker lock(&m_mutex);
-    m_recvHandlers[user] = std::move(handler);
-}
-
-void UdtStatistics::removeHandlers(UserId user)
-{
-    QnMutexLocker lock(&m_mutex);
-    m_sendHandlers.erase(user);
-    m_recvHandlers.erase(user);
-}
-
-void UdtStatistics::onSend(UdtStreamSocket* socket, uint64_t bytes)
-{
-    QnMutexLocker lock(&m_mutex);
-    for (const auto& handler: m_sendHandlers)
-        handler.second(socket, bytes);
-
-}
-
-void UdtStatistics::onRecv(UdtStreamSocket* socket, uint64_t bytes)
-{
-    QnMutexLocker lock(&m_mutex);
-    for (const auto& handler: m_recvHandlers)
-        handler.second(socket, bytes);
-}
-
-UdtStatistics& UdtStatistics::instance()
-{
-    static UdtStatistics statistics;
-    return statistics;
-}
+UdtStatistics UdtStatistics::global;
 
 } // namespace network
 } // namespace nx
