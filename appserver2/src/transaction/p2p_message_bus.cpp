@@ -158,26 +158,45 @@ PeerNumberType deserializeCompressPeerNumber(BitStreamReader& reader)
     return peerNumber;
 }
 
+QMap<ApiPeerIdData, qint32> P2pMessageBus::getOfflinePeers()
+{
+    QMap<ApiPeerIdData, qint32> offlinePeers;
+    if (m_db)
+    {
+        auto persistentState = m_db->transactionLog()->getTransactionsState().values;
+
+        auto addItemsCondition = [this](const QnTranStateKey& tranState)
+        {
+            auto alivePeersItr = m_alivePeers.find(tranState.peerID);
+            if (alivePeersItr == m_alivePeers.end())
+                return true;
+            auto peer = alivePeersItr.value().peer;
+            return peer.persistentId != tranState.dbID;
+        };
+        for (auto itr = persistentState.begin(); itr != persistentState.end(); ++itr)
+        {
+            if (addItemsCondition(itr.key()))
+            {
+                ApiPeerIdData peer;
+                peer.id = itr.key().peerID;
+                peer.persistentId = itr.key().dbID;
+                offlinePeers.insert(peer, std::numeric_limits<quint32>::max() - itr.value());
+            }
+        }
+    }
+    return offlinePeers;
+}
+
 QByteArray P2pMessageBus::serializePeersMessage()
 {
     QByteArray result;
-    QMap<ApiPeerIdData, qint32> offlinePeers;
-
-    if (m_db)
-    {
-        auto state = m_db->transactionLog()->getTransactionsState().values;
-        for (auto itr = state.begin(); itr != state.end();)
-        {
-            auto alivePeersItr = m_alivePeers.find(itr.key().peerID);
-        }
-    }
-
+    QMap<ApiPeerIdData, qint32> offlinePeers = getOfflinePeers();
     result.resize(m_alivePeers.size()*4 + offlinePeers.size() * 6);
     BitStreamWriter writer;
     writer.setBuffer((quint8*) result.data(), result.size());
     try
     {
-
+        // serialize online peers
         for (const auto& peer: m_alivePeers.values())
         {
             int minDistance = std::numeric_limits<int>::max();
@@ -187,9 +206,18 @@ QByteArray P2pMessageBus::serializePeersMessage()
                 continue;
             qint16 peerNumber = toShortPeerNumber(commonModule()->moduleGUID(), peer.peer);
             serializeCompressPeerNumber(writer, peerNumber);
+            writer.putBit(1); //< online peer mark
             NALUnit::writeUEGolombCode(writer, minDistance); // todo: move function to another place
         }
 
+        // serialize offline peers
+        for (auto itr = offlinePeers.begin(); itr != offlinePeers.end(); ++itr)
+        {
+            qint16 peerNumber = toShortPeerNumber(commonModule()->moduleGUID(), itr.key());
+            serializeCompressPeerNumber(writer, peerNumber);
+            writer.putBit(0); //< offline peer mark
+            writer.putBits(32, itr.value()); //< distance
+        }
 
 
         writer.flushBits();

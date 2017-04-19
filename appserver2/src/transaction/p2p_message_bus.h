@@ -89,6 +89,8 @@ namespace ec2 {
 
         PeerNumberType toShortPeerNumber(const QnUuid& owner, const ApiPeerIdData& peer);
         QnUuid fromShortPeerNumber(const PeerNumberType& id);
+
+        QMap<ApiPeerIdData, qint32> getOfflinePeers();
     private:
         QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list
         QMap<QnUuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections
