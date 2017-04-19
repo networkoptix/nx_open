@@ -18,7 +18,7 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/extensions/workbench_layout_tour_controller.h>
+#include <nx/client/desktop/ui/workbench/extensions/workbench_layout_tour_executor.h>
 
 #include <nx/utils/string.h>
 
@@ -31,12 +31,12 @@ namespace workbench {
 LayoutToursHandler::LayoutToursHandler(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_tourController(new LayoutTourController(this))
+    m_tourExecutor(new LayoutTourExecutor(this))
 {
     connect(qnLayoutTourManager, &QnLayoutTourManager::tourChanged, this,
         [this](const ec2::ApiLayoutTourData& tour)
         {
-            m_tourController->updateTour(tour);
+            m_tourExecutor->updateTour(tour);
             if (auto reviewLayout = m_reviewLayouts.take(tour.id))
             {
                 //TODO: #GDM #3.1 dynamically change items
@@ -47,7 +47,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
     connect(qnLayoutTourManager, &QnLayoutTourManager::tourRemoved, this,
         [this](const QnUuid& tourId)
         {
-            m_tourController->stopTour(tourId);
+            m_tourExecutor->stopTour(tourId);
             if (auto reviewLayout = m_reviewLayouts.take(tourId))
                 resourcePool()->removeResource(reviewLayout);
         });
@@ -114,16 +114,16 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
         {
             if (!toggled)
             {
-                m_tourController->stopCurrentTour();
+                m_tourExecutor->stopCurrentTour();
                 return;
             }
 
             QnActionParameters parameters = menu()->currentParameters(sender());
             auto id = parameters.argument<QnUuid>(Qn::UuidRole);
             if (id.isNull())
-                m_tourController->startSingleLayoutTour();
+                m_tourExecutor->startSingleLayoutTour();
             else
-                m_tourController->startTour(qnLayoutTourManager->tour(id));
+                m_tourExecutor->startTour(qnLayoutTourManager->tour(id));
         });
 
     connect(action(QnActions::StartCurrentLayoutTourAction), &QAction::triggered, this,
@@ -133,7 +133,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
                 .value<QnUuid>();
             auto tour = qnLayoutTourManager->tour(id);
             NX_EXPECT(tour.isValid());
-            m_tourController->startTour(tour);
+            m_tourExecutor->startTour(tour);
         });
 
     connect(action(QnActions::SaveCurrentLayoutTourAction), &QAction::triggered, this,
@@ -201,8 +201,8 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             removeTourFromServer(id);
         });
 
-    connect(action(QnActions::EscapeHotkeyAction), &QAction::triggered, m_tourController,
-        &LayoutTourController::stopCurrentTour);
+    connect(action(QnActions::EscapeHotkeyAction), &QAction::triggered, m_tourExecutor,
+        &LayoutTourExecutor::stopCurrentTour);
 }
 
 LayoutToursHandler::~LayoutToursHandler()

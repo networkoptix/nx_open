@@ -14,7 +14,7 @@ namespace desktop {
 namespace ui {
 namespace workbench {
 
-class LayoutTourController;
+class LayoutTourExecutor;
 
 class LayoutToursHandler: public QObject, public QnWorkbenchContextAware
 {
@@ -33,7 +33,7 @@ private:
         const ec2::ApiLayoutTourItemData& item);
 
 private:
-    LayoutTourController* m_tourController;
+    LayoutTourExecutor* m_tourExecutor;
     QHash<QnUuid, QnLayoutResourcePtr> m_reviewLayouts;
 };
 

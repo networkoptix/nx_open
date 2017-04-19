@@ -1,4 +1,4 @@
-#include "workbench_layout_tour_controller.h"
+#include "workbench_layout_tour_executor.h"
 
 #include <QtCore/QTimerEvent>
 
@@ -32,17 +32,17 @@ namespace desktop {
 namespace ui {
 namespace workbench {
 
-LayoutTourController::LayoutTourController(QObject* parent):
+LayoutTourExecutor::LayoutTourExecutor(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
 }
 
-LayoutTourController::~LayoutTourController()
+LayoutTourExecutor::~LayoutTourExecutor()
 {
 }
 
-void LayoutTourController::startTour(const ec2::ApiLayoutTourData& tour)
+void LayoutTourExecutor::startTour(const ec2::ApiLayoutTourData& tour)
 {
     if (m_mode != Mode::Stopped)
         stopCurrentTour();
@@ -66,7 +66,7 @@ void LayoutTourController::startTour(const ec2::ApiLayoutTourData& tour)
     menu()->trigger(QnActions::FreespaceAction);
 }
 
-void LayoutTourController::updateTour(const ec2::ApiLayoutTourData& tour)
+void LayoutTourExecutor::updateTour(const ec2::ApiLayoutTourData& tour)
 {
     if (m_mode != Mode::MultipleLayouts)
         return;
@@ -82,33 +82,33 @@ void LayoutTourController::updateTour(const ec2::ApiLayoutTourData& tour)
         m_tour.currentIndex = 0;
 }
 
-void LayoutTourController::stopTour(const QnUuid& id)
+void LayoutTourExecutor::stopTour(const QnUuid& id)
 {
     if (m_mode == Mode::MultipleLayouts && m_tour.id == id)
         stopCurrentTour();
 }
 
-void LayoutTourController::startSingleLayoutTour()
+void LayoutTourExecutor::startSingleLayoutTour()
 {
     m_mode = Mode::SingleLayout;
     startTourInternal();
 }
 
-QnUuid LayoutTourController::runningTour() const
+QnUuid LayoutTourExecutor::runningTour() const
 {
     if (m_mode == Mode::MultipleLayouts)
         return m_tour.id;
     return QnUuid();
 }
 
-void LayoutTourController::timerEvent(QTimerEvent* event)
+void LayoutTourExecutor::timerEvent(QTimerEvent* event)
 {
     if (event->timerId() == m_tour.timerId)
         processTourStep();
     base_type::timerEvent(event);
 }
 
-void LayoutTourController::stopCurrentTour()
+void LayoutTourExecutor::stopCurrentTour()
 {
     switch (m_mode)
     {
@@ -141,7 +141,7 @@ void LayoutTourController::stopCurrentTour()
     m_mode = Mode::Stopped;
 }
 
-void LayoutTourController::processTourStep()
+void LayoutTourExecutor::processTourStep()
 {
     NX_EXPECT(m_tour.elapsed.isValid());
     switch (m_mode)
@@ -227,14 +227,14 @@ void LayoutTourController::processTourStep()
     }
 }
 
-void LayoutTourController::clearWorkbenchState()
+void LayoutTourExecutor::clearWorkbenchState()
 {
     m_lastState = QnWorkbenchState();
     workbench()->submit(m_lastState);
     workbench()->clear();
 }
 
-void LayoutTourController::restoreWorkbenchState()
+void LayoutTourExecutor::restoreWorkbenchState()
 {
     workbench()->clear();
     workbench()->update(m_lastState);
@@ -243,7 +243,7 @@ void LayoutTourController::restoreWorkbenchState()
         menu()->trigger(QnActions::OpenNewTabAction);
 }
 
-void LayoutTourController::setHintVisible(bool visible)
+void LayoutTourExecutor::setHintVisible(bool visible)
 {
     if (visible)
     {
@@ -257,7 +257,7 @@ void LayoutTourController::setHintVisible(bool visible)
     }
 }
 
-void LayoutTourController::startTimer()
+void LayoutTourExecutor::startTimer()
 {
     NX_EXPECT(m_tour.timerId == 0);
     if (m_tour.timerId == 0)
@@ -266,7 +266,7 @@ void LayoutTourController::startTimer()
     m_tour.elapsed.start();
 }
 
-void LayoutTourController::stopTimer()
+void LayoutTourExecutor::stopTimer()
 {
     NX_EXPECT(m_tour.timerId != 0);
     killTimer(m_tour.timerId);
@@ -275,7 +275,7 @@ void LayoutTourController::stopTimer()
     m_tour.elapsed.invalidate();
 }
 
-void LayoutTourController::startTourInternal()
+void LayoutTourExecutor::startTourInternal()
 {
     setHintVisible(true);
     startTimer();
