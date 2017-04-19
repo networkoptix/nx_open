@@ -7,6 +7,7 @@
 #include <nx/network/abstract_socket.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_result_code.h>
+#include <nx/utils/counter.h>
 #include <nx/utils/thread/mutex.h>
 
 namespace nx {
@@ -48,20 +49,25 @@ private:
     mutable QnMutex m_mutex;
     bool m_terminated;
     network::aio::BasicPollable m_unsuccessfulResultReporter;
+    utils::Counter m_apiCallCounter;
 
     void giveAwayConnection(
         ListeningPeerPool::ConnectionContext connectionContext,
         ListeningPeerPool::TakeIdleConnection completionHandler);
 
-    void monitoringConnectionForClosure(PeerConnections::iterator);
+    void monitoringConnectionForClosure(
+        const std::string& peerName,
+        ConnectionContext* connectionContext);
 
     void onConnectionReadCompletion(
-        ListeningPeerPool::PeerConnections::iterator connectionIter,
+        const std::string& peerName,
+        ConnectionContext* connectionContext,
         SystemError::ErrorCode sysErrorCode,
         std::size_t bytesRead);
 
     void closeConnection(
-        ListeningPeerPool::PeerConnections::iterator connectionIter,
+        const std::string& peerName,
+        ConnectionContext* connectionContext,
         SystemError::ErrorCode sysErrorCode);
 };
 

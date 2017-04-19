@@ -12,7 +12,7 @@ ListeningPeerPool::ListeningPeerPool():
 
 ListeningPeerPool::~ListeningPeerPool()
 {
-    // TODO: Waiting for API methods completion.
+    m_apiCallCounter.wait();
 
     m_unsuccessfulResultReporter.pleaseStopSync();
 
@@ -34,7 +34,7 @@ void ListeningPeerPool::addConnection(
     connectionContext.connection = std::move(connection);
     auto it = m_peerNameToConnection.emplace(
         std::move(peerName), std::move(connectionContext));
-    monitoringConnectionForClosure(it);
+    monitoringConnectionForClosure(it->first, &it->second);
 }
 
 std::size_t ListeningPeerPool::getConnectionCountByPeerName(
@@ -72,7 +72,8 @@ void ListeningPeerPool::takeIdleConnection(
     auto connectionPtr = connectionContext.connection.get();
     connectionPtr->post(
         [this, connectionContext = std::move(connectionContext),
-            completionHandler = std::move(completionHandler)]() mutable
+            completionHandler = std::move(completionHandler),
+            scopedCallGuard = m_apiCallCounter.getScopedIncrement()]() mutable
         {
             giveAwayConnection(
                 std::move(connectionContext),
@@ -91,21 +92,24 @@ void ListeningPeerPool::giveAwayConnection(
 }
 
 void ListeningPeerPool::monitoringConnectionForClosure(
-    ListeningPeerPool::PeerConnections::iterator it)
+    const std::string& peerName,
+    ConnectionContext* connectionContext)
 {
     using namespace std::placeholders;
 
     constexpr int readBufferSize = 1; //< We need only detect connection closure.
 
-    it->second.readBuffer.clear();
-    it->second.readBuffer.reserve(readBufferSize);
-    it->second.connection->readSomeAsync(
-        &it->second.readBuffer,
-        std::bind(&ListeningPeerPool::onConnectionReadCompletion, this, it, _1, _2));
+    connectionContext->readBuffer.clear();
+    connectionContext->readBuffer.reserve(readBufferSize);
+    connectionContext->connection->readSomeAsync(
+        &connectionContext->readBuffer,
+        std::bind(&ListeningPeerPool::onConnectionReadCompletion, this,
+            peerName, connectionContext, _1, _2));
 }
 
 void ListeningPeerPool::onConnectionReadCompletion(
-    ListeningPeerPool::PeerConnections::iterator connectionIter,
+    const std::string& peerName,
+    ConnectionContext* connectionContext,
     SystemError::ErrorCode sysErrorCode,
     std::size_t bytesRead)
 {
@@ -116,22 +120,35 @@ void ListeningPeerPool::onConnectionReadCompletion(
         (sysErrorCode != SystemError::noError && 
          nx::network::socketCannotRecoverFromError(sysErrorCode)))
     {
-        return closeConnection(connectionIter, sysErrorCode);
+        return closeConnection(peerName, connectionContext, sysErrorCode);
     }
 
     // TODO: What to do if some data has been received?
 
-    monitoringConnectionForClosure(connectionIter);
+    monitoringConnectionForClosure(peerName, connectionContext);
 }
 
 void ListeningPeerPool::closeConnection(
-    ListeningPeerPool::PeerConnections::iterator connectionIter,
+    const std::string& peerName,
+    ConnectionContext* connectionContext,
     SystemError::ErrorCode /*sysErrorCode*/)
 {
     QnMutexLocker lock(&m_mutex);
+
     if (m_terminated)
         return;
-    m_peerNameToConnection.erase(connectionIter);
+
+    auto peerConnectionRange = m_peerNameToConnection.equal_range(peerName);
+    for (auto connectionIter = peerConnectionRange.first;
+        connectionIter != peerConnectionRange.second;
+        ++connectionIter)
+    {
+        if (connectionContext == &connectionIter->second)
+        {
+            m_peerNameToConnection.erase(connectionIter);
+            break;
+        }
+    }
 }
 
 } // namespace model

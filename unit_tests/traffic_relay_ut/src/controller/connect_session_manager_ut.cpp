@@ -12,6 +12,8 @@
 #include <model/listening_peer_pool.h>
 #include <settings.h>
 
+#include "../stream_socket_stub.h"
+
 namespace nx {
 namespace cloud {
 namespace relay {
@@ -19,27 +21,6 @@ namespace controller {
 namespace test {
 
 namespace {
-
-class StreamSocketStub:
-    public nx::network::StreamSocketDelegate
-{
-    using base_type = nx::network::StreamSocketDelegate;
-
-public:
-    StreamSocketStub():
-        base_type(&m_delegatee)
-    {
-    }
-
-    virtual void readSomeAsync(
-        nx::Buffer* const /*buffer*/,
-        std::function<void(SystemError::ErrorCode, size_t)> /*handler*/) override
-    {
-    }
-
-private:
-    nx::network::TCPSocket m_delegatee;
-};
 
 class TrafficRelayStub:
     public controller::AbstractTrafficRelay
@@ -454,11 +435,6 @@ TEST_F(ConnectSessionManagerConnectingPeerConnectTo, connect_to_listening_peer)
 
     thenConnectRequestSucceeded();
     thenProxyingHasBeenStarted();
-}
-
-TEST_F(ConnectSessionManagerConnectingPeerConnectTo, connection_closes_simultaneously_with_take_connection_request)
-{
-    // TODO
 }
 
 //TEST_F(ConnectSessionManagerConnectingPeer, connect_to_listening_peer_with_no_idle_connections)
