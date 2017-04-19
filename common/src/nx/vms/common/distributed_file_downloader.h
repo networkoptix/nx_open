@@ -20,14 +20,19 @@ public:
         ioError,
         fileDoesNotExist,
         fileAlreadyExists,
-        invalidChecksum
+        invalidChecksum,
+        invalidFileSize,
+        invalidChunkIndex,
+        invalidChunkSize,
+        noFreeSpace
     };
 
     enum class FileStatus
     {
         notFound,
         downloading,
-        downloaded
+        downloaded,
+        corrupted
     };
 
     struct FileInformation
@@ -36,7 +41,7 @@ public:
         FileInformation(const QString& fileName);
 
         QString name;
-        qint64 size = 0;
+        qint64 size = -1;
         QByteArray md5;
         QUrl url;
         qint64 chunkSize = 0;
@@ -61,11 +66,15 @@ public:
     ErrorCode writeFileChunk(
         const QString& fileName,
         int chunkIndex,
-        const QByteArray& data);
+        const QByteArray& buffer);
 
     ErrorCode deleteFile(const QString& fileName, bool deleteData = true);
 
     ErrorCode findDownloads(const QString& path);
+
+    static QByteArray calculateMd5(const QString& fileName);
+    static qint64 calculateFileSize(const QString& fileName);
+    static int calculateChunkCount(qint64 fileSize, qint64 chunkSize);
 
 private:
     QScopedPointer<DistributedFileDownloaderPrivate> const d_ptr;
