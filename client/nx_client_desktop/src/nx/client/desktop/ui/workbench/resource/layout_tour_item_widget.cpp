@@ -120,7 +120,7 @@ void LayoutTourItemWidget::initOverlay()
     connect(m_layout, &QnResource::nameChanged, this, updateTitle);
 
     auto closeButton = new QnImageButtonWidget();
-    const auto closeButtonIcon = qnSkin->icon(lit("events/notification_close.png"));
+    const auto closeButtonIcon = qnSkin->icon(lit("buttons/clear.png"));
     const auto closeButtonSize = QnSkin::maximumSize(closeButtonIcon);
     closeButton->setIcon(closeButtonIcon);
     closeButton->setFixedSize(closeButtonSize);

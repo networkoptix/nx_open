@@ -55,6 +55,7 @@ namespace style
     const int Metrics::kTextButtonIconMargin = 2;
 
     const int Metrics::kPushButtonIconMargin = 6;
+    const int Metrics::kPushButtonIconOnlyMargin = 5;
 
     const QSize Metrics::kMinimumDialogSize(400, 64);
 

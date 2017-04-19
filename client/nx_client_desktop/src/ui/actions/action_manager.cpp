@@ -1827,7 +1827,7 @@ QnActionManager::QnActionManager(QObject *parent):
         mode(QnActionTypes::DesktopMode).
         text(tr("Start Tour")).
         accent(Qn::ButtonAccent::Standard).
-        icon(qnSkin->icon("slider/navigation/play.png")).
+        icon(qnSkin->icon("buttons/play.png")).
         condition(new QnLayoutTourReviewModeCondition(this)).
         autoRepeat(false);
 
@@ -1846,7 +1846,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::RemoveCurrentLayoutTourAction).
         flags(Qn::NoTarget).
         mode(QnActionTypes::DesktopMode).
-        icon(qnSkin->icon("slider/navigation/play.png")).
+        icon(qnSkin->icon("buttons/delete.png")).
         condition(new QnLayoutTourReviewModeCondition(this)).
         autoRepeat(false);
 
