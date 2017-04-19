@@ -3,6 +3,20 @@
 #include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource_management/resource_pool.h>
 
+namespace {
+
+bool containsTrait(const QnPtzAuxilaryTraitList& list, Qn::PtzTrait trait)
+{
+    const auto it = std::find_if(list.begin(), list.end(),
+        [trait](const QnPtzAuxilaryTrait& value)
+        {
+            return value.standardTrait() == trait;
+        });
+    return it != list.end();
+}
+
+}
+
 namespace nx {
 namespace client {
 namespace mobile {
@@ -22,6 +36,9 @@ ResourcePtzController::ResourcePtzController(QObject* parent):
 
     connect(this, &base_type::baseControllerChanged,
         this, &ResourcePtzController::availableChanged);
+    connect(this, &base_type::baseControllerChanged,
+        this, &ResourcePtzController::capabilitiesChanged);
+
     setParent(parent);
 }
 
@@ -44,6 +61,22 @@ bool ResourcePtzController::available() const
     return baseController();
 }
 
+Ptz::Capabilities ResourcePtzController::capabilities() const
+{
+    QnPtzAuxilaryTraitList traits;
+
+    if (!getAuxilaryTraits(&traits) || !containsTrait(traits, Qn::ManualAutoFocusPtzTrait))
+        return Ptz::Capability::Empty;
+
+    NX_ASSERT(false);
+    return Ptz::Capability::AutoFocus;
+}
+
+bool ResourcePtzController::setAutoFocus()
+{
+    return capabilities().testFlag(Ptz::Capability::AutoFocus);
+    return runAuxilaryCommand(Qn::ManualAutoFocusPtzTrait, QString());
+}
 } // namespace mobile
 } // namespace client
 } // namespace nx

@@ -186,7 +186,7 @@ bool QnProxyPtzController::getHomeObject(QnPtzObject* homeObject)
         : false;
 }
 
-bool QnProxyPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList* auxilaryTraits)
+bool QnProxyPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList* auxilaryTraits) const
 {
     return m_controller
         ? m_controller->getAuxilaryTraits(auxilaryTraits)

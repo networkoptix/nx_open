@@ -54,18 +54,22 @@ int QnRemotePtzController::nextSequenceNumber() {
 // TODO: #Elric get rid of this macro hell
 #define RUN_COMMAND(COMMAND, RETURN_VALUE, FUNCTION, ... /* PARAMS */)          \
     {                                                                           \
+        const auto nonConstThis = const_cast<QnRemotePtzController*>(this);     \
         Qn::PtzCommand command = COMMAND;                                       \
-        if(isPointless(command))                                                \
+        if(nonConstThis->isPointless(command))                                  \
             return false;                                                       \
                                                                                 \
         auto server = getMediaServer();                                         \
         if (!server)                                                            \
             return false;                                                       \
                                                                                 \
-        int handle = server->apiConnection()->FUNCTION(m_resource, ##__VA_ARGS__, this, SLOT(at_replyReceived(int, const QVariant &, int))); \
+        int handle = server->apiConnection()->FUNCTION(                         \
+            m_resource, ##__VA_ARGS__, nonConstThis,                            \
+                SLOT(at_replyReceived(int, const QVariant &, int)));            \
                                                                                 \
         QnMutexLocker locker( &m_mutex );                                       \
-        m_dataByHandle[handle] = PtzCommandData(command, QVariant::fromValue(RETURN_VALUE)); \
+        nonConstThis->m_dataByHandle[handle] =                                  \
+            PtzCommandData(command, QVariant::fromValue(RETURN_VALUE));         \
         return true;                                                            \
     }
 
@@ -146,7 +150,8 @@ bool QnRemotePtzController::getHomeObject(QnPtzObject *) {
     RUN_COMMAND(Qn::GetHomeObjectPtzCommand, QVariant(), ptzGetHomeObjectAsync);
 }
 
-bool QnRemotePtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits) {
+bool QnRemotePtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList* auxilaryTraits) const
+{
     Q_UNUSED(auxilaryTraits)
     RUN_COMMAND(Qn::GetAuxilaryTraitsPtzCommand, QVariant(), ptzGetAuxilaryTraitsAsync);
 }

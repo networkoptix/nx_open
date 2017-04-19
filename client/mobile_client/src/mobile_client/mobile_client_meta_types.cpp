@@ -47,6 +47,7 @@ void QnMobileClientMetaTypes::initialize()
 void QnMobileClientMetaTypes::registerMetaTypes()
 {
     qRegisterMetaType<nx::media::PlayerStatistics>();
+    qRegisterMetaType<Ptz::Capabilities>();
     QnJsonSerializer::registerSerializer<InterClientMessage::Command>();
 }
 
@@ -54,6 +55,8 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterUncreatableType<QnConnectionManager>("com.networkoptix.qml", 1, 0, "QnConnectionManager", lit("Cannot create an instance of QnConnectionManager."));
     qmlRegisterUncreatableType<QnMobileAppInfo>("com.networkoptix.qml", 1, 0, "QnMobileAppInfo", lit("Cannot create an instance of QnMobileAppInfo."));
     qmlRegisterUncreatableType<QnCloudUrlHelper>("com.networkoptix.qml", 1, 0, "QnCloudUrlHelper", lit("Cannot create an instance of QnCloudUrlHelper."));
+    qmlRegisterUncreatableType<Ptz>("com.networkoptix.qml", 1, 0, "Ptz",
+        lit("Cannot create an instance of Ptz class"));
     qmlRegisterUncreatableType<nx::client::mobile::QmlSettingsAdaptor>(
         "Nx.Settings", 1, 0, "MobileSettings",
         lit("Cannot create an instance of MobileSettings."));

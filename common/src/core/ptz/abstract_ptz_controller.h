@@ -33,7 +33,7 @@ public:
     QnAbstractPtzController(const QnResourcePtr &resource);
     virtual ~QnAbstractPtzController();
 
-    /**
+    /**i
      * \returns                         Resource that this PTZ controller belongs to.
      */
     const QnResourcePtr &resource() const { return m_resource; }
@@ -295,7 +295,7 @@ public:
      */
     virtual bool getHomeObject(QnPtzObject *homeObject) = 0;
 
-    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits) = 0;
+    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits) const = 0;
 
     virtual bool runAuxilaryCommand(const QnPtzAuxilaryTrait &trait, const QString &data) = 0;
 

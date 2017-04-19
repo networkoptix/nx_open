@@ -33,3 +33,13 @@ void QnFallbackPtzController::baseChanged(Qn::PtzDataFields fields) {
 
     emit changed(fields);
 }
+
+const QnPtzControllerPtr &QnFallbackPtzController::baseController() const
+{
+    return m_mainIsValid ? m_mainController : m_fallbackController;
+}
+
+bool QnFallbackPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList* auxilaryTraits) const
+{
+    return baseController()->getAuxilaryTraits(auxilaryTraits);
+}

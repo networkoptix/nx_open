@@ -189,7 +189,8 @@ bool QnCachingPtzController::getHomeObject(QnPtzObject *homeObject) {
     }
 }
 
-bool QnCachingPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits) {
+bool QnCachingPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList* auxilaryTraits) const
+{
     if(!base_type::getAuxilaryTraits(auxilaryTraits))
         return false;
 

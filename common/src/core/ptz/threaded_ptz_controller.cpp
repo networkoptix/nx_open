@@ -60,8 +60,9 @@ private:
 // TODO: #Elric get rid of this macro hell
 #define RUN_COMMAND(COMMAND, RESULT_TYPE, RETURN_VALUE, FUNCTION, ... /* PARAMS */) \
     {                                                                           \
+        const auto nonConstThis = const_cast<QnThreadedPtzController*>(this);   \
         Qn::PtzCommand command = COMMAND;                                       \
-        if(!supports(command))                                                  \
+        if(!nonConstThis->supports(command))                                    \
             return false;                                                       \
                                                                                 \
         runCommand(                                                             \
@@ -184,7 +185,8 @@ bool QnThreadedPtzController::getHomeObject(QnPtzObject *) {
     RUN_COMMAND(Qn::GetHomeObjectPtzCommand, QnPtzObject, result, getHomeObject, &result);
 }
 
-bool QnThreadedPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList *) {
+bool QnThreadedPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList* ) const
+{
     RUN_COMMAND(Qn::GetAuxilaryTraitsPtzCommand, QnPtzAuxilaryTraitList, result, getAuxilaryTraits, &result);
 }
 

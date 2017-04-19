@@ -257,31 +257,50 @@ PageBase
 
         PtzController
         {
-            id: ptzController;
-            resourceId: videoScreenController.resourceHelper.resourceId;
+            id: ptzController
+            resourceId: videoScreenController.resourceHelper.resourceId
         }
 
-        Rectangle
+        Column
         {
             id: ptzPanel
 
-            anchors.bottom: parent.bottom;
-            width: parent.width;
-            height: 100;
+            anchors.bottom: parent.bottom
+            width: parent.width
 
-            visible: ptzController.available;
-            color: "red";
+            visible: ptzController.available
 
-            Column
+            Row
             {
-                Button
+                Column
                 {
-                    text: "+";
+                    anchors.verticalCenter: parent.verticalCenter;
+
+                    spacing: 0
+
+                    Button
+                    {
+                        text: "focus +"
+                    }
+
+                    Button
+                    {
+                        text: "set autofocus"
+                        onClicked: ptzController.setAutoFocus()
+                        enabled: ptzController.capabilities & Ptz.AutoFocus;
+
+                        Component.onCompleted: console.log(Ptz.AutoFocus, "------------------------------------")
+                    }
+
+                    Button
+                    {
+                        text: "focus -"
+                    }
                 }
 
-                Button
+                Joystick
                 {
-                    text: "-";
+                    anchors.verticalCenter: parent.verticalCenter;
                 }
             }
         }
@@ -293,7 +312,7 @@ PageBase
             anchors.bottom: parent.bottom
             width: parent.width
 
-            visible: opacity > 0 && false
+            visible: opacity > 0 && !ptzController.available
             opacity: Math.min(d.uiOpacity, d.navigationOpacity)
 
             sourceComponent:
