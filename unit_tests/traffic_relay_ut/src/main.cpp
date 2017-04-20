@@ -21,7 +21,7 @@ int main(int argc, char** argv)
         [](const nx::utils::ArgumentParser& args)
         {
             if (const auto value = args.get("tmp"))
-                nx::cloud::relay::test::RelayTestSetup::setTemporaryDirectoryPath(*value);
+                nx::utils::TestOptions::setTemporaryDirectoryPath(*value);
 
             return nx::utils::test::DeinitFunctions();
         },
