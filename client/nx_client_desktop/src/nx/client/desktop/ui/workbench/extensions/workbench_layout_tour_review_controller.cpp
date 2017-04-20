@@ -14,6 +14,12 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 
+namespace {
+
+static const int kDefaultDelayMs = 5000;
+
+} // namespace
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -59,14 +65,16 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
             if (!isLayoutTourReviewMode())
                 return;
 
-            QnActionParameters parameters = menu()->currentParameters(sender());
-            auto tour = qnLayoutTourManager->tour(currentTourId());
-            for (const auto& layout: parameters.resources().filtered<QnLayoutResource>())
-            {
-                tour.items.emplace_back(layout->getId(), 5000);
-            }
-            qnLayoutTourManager->addOrUpdateTour(tour);
+            auto reviewLayout = m_reviewLayouts.value(currentTourId());
+            NX_EXPECT(reviewLayout);
+            if (!reviewLayout)
+                return;
 
+            QnActionParameters parameters = menu()->currentParameters(sender());
+            QPointF position = parameters.argument<QPointF>(Qn::ItemPositionRole);
+
+            for (const auto& layout: parameters.resources().filtered<QnLayoutResource>())
+                addItemToReviewLayout(reviewLayout, {layout->getId(), kDefaultDelayMs}, position);
         });
 
     connect(action(QnActions::StartCurrentLayoutTourAction), &QAction::triggered, this,
@@ -255,16 +263,27 @@ void LayoutTourReviewController::updateButtons(const QnLayoutResourcePtr& layout
     layout->setData(Qn::CustomPanelActionsRole, qVariantFromValue(actions));
 }
 
-void LayoutTourReviewController::addItemToReviewLayout(const QnLayoutResourcePtr& layout,
-    const ec2::ApiLayoutTourItemData& item)
+void LayoutTourReviewController::addItemToReviewLayout(
+    const QnLayoutResourcePtr& layout,
+    const ec2::ApiLayoutTourItemData& item,
+    const QPointF& position)
 {
     static const int kMatrixWidth = 3;
     const int index = layout->getItems().size();
 
     QnLayoutItemData itemData;
     itemData.uuid = QnUuid::createUuid();
-    itemData.combinedGeometry = QRect(index % kMatrixWidth, index / kMatrixWidth, 1, 1);
-    itemData.flags = Qn::Pinned;
+
+    if (!position.isNull())
+    {
+        itemData.combinedGeometry = QRectF(position, position);
+    }
+    else
+    {
+        QPointF bestPos(index % kMatrixWidth, index / kMatrixWidth);
+        itemData.combinedGeometry = QRectF(bestPos, bestPos);
+    }
+    itemData.flags = Qn::PendingGeometryAdjustment;
     itemData.resource.id = item.layoutId;
     qnResourceRuntimeDataManager->setLayoutItemData(itemData.uuid,
         Qn::LayoutTourItemDelayMsRole, item.delayMs);

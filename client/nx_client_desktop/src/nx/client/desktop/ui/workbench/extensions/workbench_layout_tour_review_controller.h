@@ -43,8 +43,10 @@ private:
     void updateOrder();
     void updateButtons(const QnLayoutResourcePtr& layout);
 
-    void addItemToReviewLayout(const QnLayoutResourcePtr& layout,
-        const ec2::ApiLayoutTourItemData& item);
+    void addItemToReviewLayout(
+        const QnLayoutResourcePtr& layout,
+        const ec2::ApiLayoutTourItemData& item,
+        const QPointF& position = QPointF());
 private:
     QnDisconnectHelperPtr m_connections;
     QHash<QnUuid, QnLayoutResourcePtr> m_reviewLayouts;
