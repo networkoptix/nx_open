@@ -14,9 +14,11 @@ class ResourcePtzController: public QnProxyPtzController
 
     Q_PROPERTY(QUuid uniqueResourceId READ uniqueResourceId
         WRITE setUniqueResourceId NOTIFY uniqueResourceIdChanged)
+
     Q_PROPERTY(bool available READ available NOTIFY availableChanged)
 
-    Q_PROPERTY(Ptz::Capabilities capabilities READ capabilities NOTIFY capabilitiesChanged)
+    Q_PROPERTY(Ptz::Capabilities capabilities READ getCapabilities NOTIFY capabilitiesChanged)
+    Q_PROPERTY(bool auxTraits READ auxTraits NOTIFY auxTraitsChanged)
 
 public:
     ResourcePtzController(QObject* parent = nullptr);
@@ -27,7 +29,7 @@ public: // Properties section
 
     bool available() const;
 
-    Ptz::Capabilities capabilities() const;
+    Ptz::Traits auxTraits() const;
 
 public:
     Q_INVOKABLE bool setAutoFocus();
@@ -37,6 +39,7 @@ signals:
     void availableChanged();
 
     void capabilitiesChanged();
+    void auxTraitsChanged();
 
 private:
     QUuid m_uniqueResourceId;

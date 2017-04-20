@@ -3,20 +3,6 @@
 #include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource_management/resource_pool.h>
 
-namespace {
-
-bool containsTrait(const QnPtzAuxilaryTraitList& list, Qn::PtzTrait trait)
-{
-    const auto it = std::find_if(list.begin(), list.end(),
-        [trait](const QnPtzAuxilaryTrait& value)
-        {
-            return value.standardTrait() == trait;
-        });
-    return it != list.end();
-}
-
-}
-
 namespace nx {
 namespace client {
 namespace mobile {
@@ -24,7 +10,6 @@ namespace mobile {
 ResourcePtzController::ResourcePtzController(QObject* parent):
     base_type()
 {
-
     connect(this, &ResourcePtzController::uniqueResourceIdChanged, this,
         [this]()
         {
@@ -39,12 +24,15 @@ ResourcePtzController::ResourcePtzController(QObject* parent):
         {
             if (fields.testFlag(Qn::CapabilitiesPtzField))
                 emit capabilitiesChanged();
+            if (fields.testFlag(Qn::AuxilaryTraitsPtzField))
+                emit auxTraitsChanged();
         });
+
+    connect(this, &base_type::baseControllerChanged, this,
+        [this]() { emit changed(Qn::AllPtzFields); });
 
     connect(this, &base_type::baseControllerChanged,
         this, &ResourcePtzController::availableChanged);
-    connect(this, &base_type::baseControllerChanged,
-        this, &ResourcePtzController::capabilitiesChanged);
 
     setParent(parent);
 }
@@ -68,23 +56,25 @@ bool ResourcePtzController::available() const
     return baseController();
 }
 
-Ptz::Capabilities ResourcePtzController::capabilities() const
+Ptz::Traits ResourcePtzController::auxTraits() const
 {
     QnPtzAuxilaryTraitList traits;
+    if (!getAuxilaryTraits(&traits))
+        return Ptz::NoPtzTraits;
 
-    if (!getAuxilaryTraits(&traits) || !containsTrait(traits, Qn::ManualAutoFocusPtzTrait))
-        return Ptz::Capability::NoPtzCapabilities;
+    Ptz::Traits result = Ptz::NoPtzTraits;
+    for (const auto& trait: traits)
+        result |= trait.standardTrait();
 
-    NX_ASSERT(false);
-    return Ptz::Capability::ManualAutoFocusCapability;
+    return result;
 }
 
 bool ResourcePtzController::setAutoFocus()
 {
-    return capabilities().testFlag(Ptz::Capability::ManualAutoFocusCapability)
-        ? runAuxilaryCommand(Qn::ManualAutoFocusPtzTrait, QString())
-        : false;
+    return auxTraits().testFlag(Ptz::ManualAutoFocusPtzTrait)
+        && runAuxilaryCommand(Ptz::ManualAutoFocusPtzTrait, QString());
 }
+
 } // namespace mobile
 } // namespace client
 } // namespace nx

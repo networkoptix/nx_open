@@ -258,6 +258,7 @@ PageBase
         PtzController
         {
             id: ptzController
+
             uniqueResourceId: videoScreenController.resourceHelper.resourceId
         }
 
@@ -274,7 +275,7 @@ PageBase
             {
                 Column
                 {
-                    anchors.verticalCenter: parent.verticalCenter;
+                    anchors.verticalCenter: parent.verticalCenter
 
                     spacing: 0
 
@@ -287,7 +288,7 @@ PageBase
                     {
                         text: "set autofocus"
                         onClicked: ptzController.setAutoFocus()
-                        enabled: ptzController.capabilities & Ptz.ManualAutoFocusCapability;
+                        enabled: ptzController.auxTraits & Ptz.ManualAutoFocusPtzTrait
                     }
 
                     Button
