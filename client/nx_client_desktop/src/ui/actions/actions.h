@@ -6,6 +6,8 @@
 
 #include <client/client_globals.h>
 
+#include <text/tr_functions.h>
+
 #include <nx/fusion/model_functions_fwd.h>
 
 #ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
@@ -1143,6 +1145,9 @@ enum IDType
 
     NoAction = -1
 };
+
+QN_DECLARE_TR_FUNCTIONS("QnActions")
+void initialize(QnActionManager* manager, QnAction* root);
 
 } //namespace QnActions
 
