@@ -36,16 +36,21 @@ public:
 protected:
     void addConnection()
     {
+        addConnection(m_peerName);
+    }
+
+    void addConnection(const std::string& peerName)
+    {
         auto connection = std::make_unique<StreamSocketStub>();
         connection->bindToAioThread(
             network::SocketGlobals::aioService().getRandomAioThread());
         m_peerConnection = connection.get();
-        m_pool->addConnection(m_peerName, std::move(connection));
+        m_pool->addConnection(peerName, std::move(connection));
     }
 
     void givenConnectionFromPeer()
     {
-        addConnection();
+        addConnection(m_peerName);
     }
 
     void whenConnectionIsClosed()
@@ -112,6 +117,16 @@ protected:
     void thenConnectRequestHasCompleted()
     {
         m_takeIdleConnectionResults.pop();
+    }
+
+    const model::ListeningPeerPool& pool() const
+    {
+        return *m_pool;
+    }
+
+    void setPeerName(const std::string& peerName)
+    {
+        m_peerName = peerName;
     }
 
 private:
@@ -188,6 +203,69 @@ TEST_F(
         whenRequestedConnection();
         thenConnectRequestHasCompleted();
     }
+}
+
+//TEST_F(
+//    ListeningPeerPool,
+//    get_idle_connection_waits_for_connection_to_appear_if_peer_is_listening)
+//{
+//}
+
+//-------------------------------------------------------------------------------------------------
+
+class ListeningPeerPoolFindPeerByParentDomainName:
+    public ListeningPeerPool
+{
+public:
+    ListeningPeerPoolFindPeerByParentDomainName():
+        m_domainName(nx::utils::generateRandomName(17).toStdString())
+    {
+        m_peerNames.resize(7);
+        for (auto& peerName: m_peerNames)
+            peerName = nx::utils::generateRandomName(11).toStdString() + "." + m_domainName;
+
+        setPeerName(m_domainName);
+    }
+
+protected:
+    void givenMultipleConnectionsFromPeersOfTheSameDomain()
+    {
+        for (const auto& peerName: m_peerNames)
+            addConnection(peerName);
+    }
+
+    void assertConnectionCountPerDomainIncludesAllPeers()
+    {
+        ASSERT_EQ(m_peerNames.size(), pool().getConnectionCountByPeerName(m_domainName));
+    }
+
+    const std::string& domainName() const
+    {
+        return m_domainName;
+    }
+
+private:
+    std::string m_domainName;
+    std::vector<std::string> m_peerNames;
+};
+
+TEST_F(ListeningPeerPoolFindPeerByParentDomainName, getConnectionCountByPeerName)
+{
+    givenMultipleConnectionsFromPeersOfTheSameDomain();
+    assertConnectionCountPerDomainIncludesAllPeers();
+}
+
+TEST_F(ListeningPeerPoolFindPeerByParentDomainName, isPeerListening)
+{
+    givenMultipleConnectionsFromPeersOfTheSameDomain();
+    ASSERT_TRUE(pool().isPeerListening(domainName()));
+}
+
+TEST_F(ListeningPeerPoolFindPeerByParentDomainName, takeIdleConnection)
+{
+    givenMultipleConnectionsFromPeersOfTheSameDomain();
+    whenRequestedConnection();
+    thenConnectionHasBeenProvided();
 }
 
 } // namespace test

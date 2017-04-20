@@ -1,4 +1,8 @@
 #include <algorithm>
+#include <map>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 namespace nx {
 namespace utils {
@@ -43,6 +47,78 @@ InputIt move_if(InputIt first, InputIt last, OutputIt outFirst, UnaryPredicate p
         *outFirst++ = std::move(*it);
 
     return newRangeEndIt;
+}
+
+template<typename AssociativeContainer>
+std::size_t countByPrefix(
+    const AssociativeContainer& associativeContainer,
+    const typename AssociativeContainer::key_type& prefix)
+{
+    std::size_t result = 0;
+    for (auto it = associativeContainer.lower_bound(prefix);
+        it != associativeContainer.end();
+        ++it)
+    {
+        if (!boost::starts_with(it->first, prefix))
+            break;
+        ++result;
+    }
+
+    return result;
+}
+
+template<typename AssociativeContainer>
+typename AssociativeContainer::iterator findAnyByPrefix(
+    AssociativeContainer& associativeContainer,
+    const typename AssociativeContainer::key_type& prefix)
+{
+    auto it = associativeContainer.lower_bound(prefix);
+    if (it == associativeContainer.end() || !boost::starts_with(it->first, prefix))
+        return associativeContainer.end();
+    return it;
+}
+
+template<typename AssociativeContainer>
+typename std::pair<
+    typename AssociativeContainer::iterator,
+    typename AssociativeContainer::iterator
+>
+    equalRangeByPrefix(
+        AssociativeContainer& associativeContainer,
+        const typename AssociativeContainer::key_type& prefix)
+{
+    typename std::pair<
+        typename AssociativeContainer::iterator,
+        typename AssociativeContainer::iterator
+    > result;
+
+    result.first = associativeContainer.lower_bound(prefix);
+    result.second = result.first;
+    for (auto it = result.first; it != associativeContainer.end(); ++it)
+    {
+        if (!boost::starts_with(it->first, prefix))
+            break;
+        result.second = it;
+        ++result.second;
+    }
+
+    return result;
+}
+
+/**
+ * E.g., given inbox.google.com returns com.google.inbox
+ */
+template<typename RandomAccessContainer, typename Separator>
+RandomAccessContainer reverseWords(
+    const RandomAccessContainer& str,
+    const Separator& separator)
+{
+    std::vector<RandomAccessContainer> splitVec;
+    boost::split(splitVec, str, boost::algorithm::is_any_of(separator));
+
+    return boost::join(
+        boost::make_iterator_range(splitVec.rbegin(), splitVec.rend()),
+        separator);
 }
 
 } // namespace utils
