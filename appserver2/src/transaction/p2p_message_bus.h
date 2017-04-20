@@ -1,4 +1,7 @@
 #pragma once
+
+#include <QtCore/QTimer>
+
 #include <memory>
 #include <nx/utils/uuid.h>
 #include <common/common_module_aware.h>
@@ -33,7 +36,9 @@ namespace ec2 {
     };
     using SubscribeForDataUpdatesMessageType = std::vector<SubscribeForDataUpdateRecord>;
 
-    class P2pMessageBus: public QnTransactionMessageBusBase
+    class P2pMessageBus:
+        public QObject,
+        public QnTransactionMessageBusBase
     {
     public:
         P2pMessageBus(
@@ -49,6 +54,8 @@ namespace ec2 {
 
         // Self peer information
         ApiPeerIdData localPeer() const;
+
+        void start();
     private:
         void doPeriodicTasks();
         void processTemporaryOutgoingConnections();
@@ -98,5 +105,7 @@ namespace ec2 {
         ApiPeerIdData m_localPeer;
 
         QMap<ApiPeerIdData, P2pConnectionPtr> m_subscriptionList;
+        QThread* m_thread = nullptr;
+        QTimer* m_timer = nullptr;
     };
 } // ec2

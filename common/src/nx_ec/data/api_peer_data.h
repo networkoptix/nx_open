@@ -41,6 +41,7 @@ struct ApiPeerIdData: ApiIdData
 struct ApiPeerData: ApiPeerIdData
 {
     ApiPeerData():
+        peerType(Qn::PT_NotDefined),
         dataFormat(Qn::UbjsonFormat)
     {}
 

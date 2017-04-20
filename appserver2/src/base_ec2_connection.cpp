@@ -73,6 +73,7 @@ void BaseEc2Connection<QueryProcessorType>::startReceivingNotifications()
     connect(m_connectionFactory->messageBus(), &QnTransactionMessageBus::remotePeerUnauthorized,
         this, &BaseEc2Connection<QueryProcessorType>::remotePeerUnauthorized, Qt::DirectConnection);
     m_connectionFactory->messageBus()->start();
+    m_connectionFactory->p2pMessageBus()->start();
 }
 
 template<class QueryProcessorType>

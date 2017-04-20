@@ -52,10 +52,32 @@ P2pMessageBus::P2pMessageBus(
     m_localPeer.id = commonModule->moduleGUID();
     m_localPeer.instanceId = commonModule->runningInstanceGUID();
     m_localPeer.persistentId = commonModule->dbId();
+
+    m_thread = new QThread();
+    m_thread->setObjectName("P2pMessageBus");
+    moveToThread(m_thread);
+    m_timer = new QTimer();
+    connect(m_timer, &QTimer::timeout, this, &P2pMessageBus::doPeriodicTasks);
+    m_timer->start(500);
 }
 
 P2pMessageBus::~P2pMessageBus()
 {
+    if (m_thread)
+    {
+        m_thread->exit();
+        m_thread->wait();
+    }
+
+    delete m_thread;
+    delete m_timer;
+}
+
+void P2pMessageBus::start()
+{
+    NX_ASSERT(!m_thread->isRunning());
+    if (!m_thread->isRunning())
+        m_thread->start();
 }
 
 // P2pMessageBus
