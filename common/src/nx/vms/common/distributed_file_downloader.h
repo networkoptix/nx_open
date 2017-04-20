@@ -34,6 +34,7 @@ public:
         downloaded,
         corrupted
     };
+    Q_ENUM(FileStatus)
 
     struct FileInformation
     {

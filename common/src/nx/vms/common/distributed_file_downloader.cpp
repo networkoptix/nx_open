@@ -2,7 +2,11 @@
 
 #include <QtCore/QHash>
 #include <QtCore/QFile>
+#include <QtCore/QFileInfo>
 #include <QtCore/QCryptographicHash>
+
+#include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/json.h>
 
 namespace {
 
@@ -14,6 +18,33 @@ static const QString kMetadataSuffix = lit(".vmsdownload");
 namespace nx {
 namespace vms {
 namespace common {
+
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(DistributedFileDownloader, FileStatus)
+
+namespace detail {
+
+struct FileInformation: DistributedFileDownloader::FileInformation
+{
+    /* Fusion does not support nested classes, so making an external alias for
+       QN_FUSION_ADAPT_STRUCT_FUNCTIONS. */
+
+    FileInformation()
+    {
+    }
+
+    FileInformation(const DistributedFileDownloader::FileInformation& fileInformation):
+        DistributedFileDownloader::FileInformation(fileInformation)
+    {
+    }
+};
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(FileInformation,
+    (json),
+    (name)(size)(md5)(url)(chunkSize)(status)(downloadedChunks))
+
+} // namespace detail
+
+//-------------------------------------------------------------------------------------------------
 
 DistributedFileDownloader::FileInformation::FileInformation()
 {
@@ -38,6 +69,7 @@ public:
     DistributedFileDownloader::FileInformation loadMetadata(const QString& fileName);
     bool reserveSpace(const QString& fileName, const qint64 size);
     void checkDownloadCompleted(DistributedFileDownloader::FileInformation& fileInformation);
+    DistributedFileDownloader::ErrorCode loadDownload(const QString& fileName);
 
     static QString metadataFileName(const QString& fileName);
     static qint64 chunkSize(qint64 fileSize, int chunkIndex, qint64 chunkSize);
@@ -61,7 +93,13 @@ bool DistributedFileDownloaderPrivate::saveMetadata(
     if (!file.open(QFile::WriteOnly))
         return false;
 
-    // TODO: serialize and write
+    QByteArray buffer = QJson::serialized(detail::FileInformation(fileInformation));
+    if (file.write(buffer) != buffer.size())
+    {
+        file.close();
+        file.remove();
+        return false;
+    }
 
     return true;
 }
@@ -73,13 +111,25 @@ DistributedFileDownloader::FileInformation DistributedFileDownloaderPrivate::loa
     if (!metadataFileName.endsWith(kMetadataSuffix))
         metadataFileName = this->metadataFileName(fileName);
 
-    DistributedFileDownloader::FileInformation fileInformation;
+    detail::FileInformation fileInformation;
 
     QFile file(metadataFileName);
     if (!file.open(QFile::ReadOnly))
         return fileInformation;
 
-    // TODO: read and deserialize
+    constexpr int kMaxMetadataFileSize = 1024 * 16;
+
+    if (file.size() > kMaxMetadataFileSize)
+        return fileInformation;
+
+    const auto data = file.readAll();
+    QJson::deserialize(data, &fileInformation);
+
+    const auto previousStatus = fileInformation.status;
+    checkDownloadCompleted(fileInformation);
+
+    if (previousStatus != fileInformation.status)
+        saveMetadata(fileInformation);
 
     return fileInformation;
 }
@@ -100,6 +150,21 @@ bool DistributedFileDownloaderPrivate::reserveSpace(const QString& fileName, con
 void DistributedFileDownloaderPrivate::checkDownloadCompleted(
     DistributedFileDownloader::FileInformation& fileInformation)
 {
+    if (fileInformation.size < 0 || fileInformation.chunkSize <= 0)
+    {
+        fileInformation.status = DistributedFileDownloader::FileStatus::downloading;
+        return;
+    }
+
+    const int chunkCount = DistributedFileDownloader::calculateChunkCount(
+        fileInformation.size, fileInformation.chunkSize);
+
+    if (chunkCount != fileInformation.downloadedChunks.size())
+    {
+        fileInformation.status = DistributedFileDownloader::FileStatus::corrupted;
+        return;
+    }
+
     for (int i = 0; i < fileInformation.downloadedChunks.size(); ++i)
     {
         if (!fileInformation.downloadedChunks.testBit(i))
@@ -334,6 +399,32 @@ DistributedFileDownloader::ErrorCode DistributedFileDownloader::deleteFile(
 DistributedFileDownloader::ErrorCode DistributedFileDownloader::findDownloads(
     const QString& path)
 {
+    Q_D(DistributedFileDownloader);
+
+    QFileInfo fileInfo(path);
+
+    if (!fileInfo.exists())
+        return ErrorCode::fileDoesNotExist;
+
+    if (fileInfo.isFile())
+        return d->loadDownload(path);
+
+    if (!fileInfo.isDir())
+        return ErrorCode::noError;
+
+    for (const auto& entry: QDir(path).entryInfoList({lit("*") + kMetadataSuffix}, QDir::Files))
+    {
+        auto fileName = entry.absoluteFilePath();
+        fileName.truncate(fileName.size() - kMetadataSuffix.size());
+
+        if (QFileInfo(fileName).isFile())
+        {
+            const auto errorCode = d->loadDownload(fileName);
+            if (errorCode != ErrorCode::noError)
+                return errorCode;
+        }
+    }
+
     return ErrorCode::noError;
 }
 
@@ -363,6 +454,18 @@ int DistributedFileDownloader::calculateChunkCount(qint64 fileSize, qint64 chunk
         return -1;
 
     return (fileSize + chunkSize - 1) / chunkSize;
+}
+
+DistributedFileDownloader::ErrorCode DistributedFileDownloaderPrivate::loadDownload(
+    const QString& fileName)
+{
+    auto fileInfo = loadMetadata(fileName);
+
+    if (fileInfo.name.isEmpty())
+        return DistributedFileDownloader::ErrorCode::fileDoesNotExist;
+
+    Q_Q(DistributedFileDownloader);
+    return q->addFile(fileInfo);
 }
 
 } // namespace common
