@@ -6,7 +6,7 @@
 
 #include <nx_ec/data/api_fwd.h>
 
-#include <ui/workbench/workbench_context_aware.h>
+#include <ui/workbench/workbench_state_manager.h>
 
 namespace nx {
 namespace client {
@@ -17,7 +17,7 @@ namespace workbench {
 class LayoutTourExecutor;
 class LayoutTourReviewController;
 
-class LayoutToursHandler: public QObject, public QnWorkbenchContextAware
+class LayoutToursHandler: public QObject, public QnSessionAwareDelegate
 {
     Q_OBJECT
     using base_type = QObject;
@@ -25,6 +25,11 @@ class LayoutToursHandler: public QObject, public QnWorkbenchContextAware
 public:
     LayoutToursHandler(QObject* parent = nullptr);
     virtual ~LayoutToursHandler() override;
+
+    virtual bool tryClose(bool force) override;
+    virtual void forcedUpdate() override;
+    virtual void loadState(const QnWorkbenchState& state) override;
+    virtual void submitState(QnWorkbenchState* state) override;
 
 private:
     void saveTourToServer(const ec2::ApiLayoutTourData& tour);

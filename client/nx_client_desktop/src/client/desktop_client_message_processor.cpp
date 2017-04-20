@@ -59,9 +59,9 @@ void QnDesktopClientMessageProcessor::disconnectFromConnection(const ec2::Abstra
 
 void QnDesktopClientMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoData& fullData)
 {
-    //TODO: #GDM #3.1 logic is not perfect, we've got tours after initialResourcesReceived. Also: who will clean them on disconnect?
-    base_type::onGotInitialNotification(fullData);
+    //TODO: #GDM #3.1 logic is not perfect, who will clean them on disconnect?
     qnLayoutTourManager->resetTours(fullData.layoutTours);
+    base_type::onGotInitialNotification(fullData);
 }
 
 QnResourceFactory* QnDesktopClientMessageProcessor::getResourceFactory() const

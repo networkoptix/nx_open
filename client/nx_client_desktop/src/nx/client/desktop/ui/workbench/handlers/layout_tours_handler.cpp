@@ -24,7 +24,7 @@ namespace workbench {
 
 LayoutToursHandler::LayoutToursHandler(QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
+    QnSessionAwareDelegate(parent),
     m_tourExecutor(new LayoutTourExecutor(this)),
     m_reviewController(new LayoutTourReviewController(this))
 {
@@ -94,15 +94,21 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
         {
             QnActionParameters parameters = menu()->currentParameters(sender());
             auto id = parameters.argument<QnUuid>(Qn::UuidRole);
+
+            if (!toggled)
+            {
+                NX_EXPECT(id.isNull());
+                m_tourExecutor->stopCurrentTour();
+            }
+
             if (id.isNull())
             {
                 if (toggled)
                     m_tourExecutor->startSingleLayoutTour();
-                else
-                    m_tourExecutor->stopCurrentTour();
             }
             else
             {
+                NX_EXPECT(toggled);
                 m_tourExecutor->startTour(qnLayoutTourManager->tour(id));
             }
         });
@@ -123,11 +129,41 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
         {
             if (action(QnActions::ToggleLayoutTourModeAction)->isChecked())
                 action(QnActions::ToggleLayoutTourModeAction)->toggle();
+
+            // Just for safety
+            NX_EXPECT(m_tourExecutor->runningTour().isNull());
+            m_tourExecutor->stopCurrentTour();
         });
 }
 
 LayoutToursHandler::~LayoutToursHandler()
 {
+}
+
+bool LayoutToursHandler::tryClose(bool /*force*/)
+{
+    m_tourExecutor->stopCurrentTour();
+    return true;
+}
+
+void LayoutToursHandler::forcedUpdate()
+{
+    // Do nothing
+}
+
+void LayoutToursHandler::loadState(const QnWorkbenchState& state)
+{
+    if (!state.runningTourId.isNull())
+    {
+        menu()->trigger(QnActions::ToggleLayoutTourModeAction, QnActionParameters()
+            .withArgument(Qn::UuidRole, state.runningTourId));
+    }
+}
+
+void LayoutToursHandler::submitState(QnWorkbenchState* state)
+{
+    if (state)
+        state->runningTourId = m_tourExecutor->runningTour();
 }
 
 void LayoutToursHandler::saveTourToServer(const ec2::ApiLayoutTourData& tour)
