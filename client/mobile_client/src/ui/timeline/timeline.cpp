@@ -633,6 +633,7 @@ void QnTimeline::finishZoom(qreal scale)
 
 void QnTimeline::startDrag(int x)
 {
+    d->targetPosition = -1;
     d->zoomKineticHelper.stop();
     d->stickyTime = d->pixelPosToTime(x);
     d->stickyPointKineticHelper.start(x);
@@ -640,12 +641,14 @@ void QnTimeline::startDrag(int x)
 
 void QnTimeline::updateDrag(int x)
 {
+    d->targetPosition = -1;
     d->stickyPointKineticHelper.move(x);
     update();
 }
 
 void QnTimeline::finishDrag(int x)
 {
+    d->targetPosition = -1;
     d->stickyPointKineticHelper.finish(x);
     if (d->stickyPointKineticHelper.isStopped())
         emit moveFinished();

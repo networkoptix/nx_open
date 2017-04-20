@@ -86,7 +86,7 @@ Control
                     if (d.offline)
                         return thumbnailDummyComponent
 
-                    if (!d.videoAllowed || !settings.liveVideoPreviews)
+                    if (!cameraItem.active || !d.videoAllowed || !settings.liveVideoPreviews)
                     {
                         if (!cameraItem.thumbnail)
                             return thumbnailPreloaderComponent
@@ -247,25 +247,9 @@ Control
                 id: mediaPlayer
 
                 resourceId: cameraItem.resourceId
-                Component.onCompleted:
-                {
-                    if (cameraItem.active)
-                        playLive()
-                }
+                Component.onCompleted: playLive()
                 videoQuality: MediaPlayer.LowIframesOnlyVideoQuality
                 audioEnabled: false
-            }
-
-            Connections
-            {
-                target: cameraItem
-                onActiveChanged:
-                {
-                    if (cameraItem.active)
-                        mediaPlayer.playLive()
-                    else
-                        mediaPlayer.stop()
-                }
             }
         }
     }

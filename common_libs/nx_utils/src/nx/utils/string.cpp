@@ -3,6 +3,8 @@
 #include <array>
 #include <cmath>
 
+#include <QtCore/QRegularExpression>
+
 #include <nx/utils/log/assert.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/random.h>
@@ -586,6 +588,15 @@ void serializeNameValuePairs(
         dstBuffer->append(it.value());
         dstBuffer->append("\"");
     }
+}
+
+QString removeMnemonics(QString text)
+{
+    /**
+     * Regular expression is:
+     * (not match '&') match '&' (not match whitespace or '&')
+     */
+    return text.remove(QRegularExpression(lit("(?<!&)&(?!([\\s&]|$))")));
 }
 
 } // namespace utils

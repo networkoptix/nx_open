@@ -30,14 +30,6 @@
 <context>
     <name>QnSystrayWindow</name>
     <message>
-        <source>No %1 services installed</source>
-        <translation>没有安装 %1 服务</translation>
-    </message>
-    <message>
-        <source>&amp;Quit</source>
-        <translation>&amp;退出</translation>
-    </message>
-    <message>
         <source>Access denied.</source>
         <translation>访问被拒绝.</translation>
     </message>
@@ -54,64 +46,72 @@
         <translation>无法访问已安装的服务</translation>
     </message>
     <message>
+        <source>No %1 services installed</source>
+        <translation>没有安装 %1 服务</translation>
+    </message>
+    <message>
+        <source>&amp;Quit</source>
+        <translation>&amp;退出</translation>
+    </message>
+    <message>
         <source>An error has occurred while trying to access installed services:</source>
         <translation>访问已安装服务时，发生错误.</translation>
     </message>
     <message>
         <source>Server has been stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>服务器已停止。</translation>
     </message>
     <message>
         <source>Server has been started</source>
-        <translation type="unfinished"></translation>
+        <translation>启动服务器</translation>
     </message>
     <message>
         <source>Server will be stopped. Continue?</source>
-        <translation type="unfinished">媒体服务器将停止，是否继续？</translation>
+        <translation>媒体服务器将停止，是否继续？</translation>
     </message>
     <message>
         <source>Show Server Log</source>
-        <translation type="unfinished"></translation>
+        <translation>显示服务器日志</translation>
     </message>
     <message>
         <source>Start Server</source>
-        <translation type="unfinished"></translation>
+        <translation>启动服务器</translation>
     </message>
     <message>
         <source>Stop Server</source>
-        <translation type="unfinished"></translation>
+        <translation>停止服务器</translation>
     </message>
     <message>
         <source>Server Web Page</source>
-        <translation type="unfinished"></translation>
+        <translation>服务器 Web 页</translation>
     </message>
     <message>
         <source>stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>已停止</translation>
     </message>
     <message>
         <source>starting</source>
-        <translation type="unfinished"></translation>
+        <translation>开始</translation>
     </message>
     <message>
         <source>stopping</source>
-        <translation type="unfinished"></translation>
+        <translation>停止</translation>
     </message>
     <message>
         <source>started</source>
-        <translation type="unfinished"></translation>
+        <translation>开始</translation>
     </message>
     <message>
         <source>resuming</source>
-        <translation type="unfinished"></translation>
+        <translation>恢复</translation>
     </message>
     <message>
         <source>paused</source>
-        <translation type="unfinished"></translation>
+        <translation>已暂停</translation>
     </message>
     <message>
         <source>pausing</source>
-        <translation type="unfinished"></translation>
+        <translation>暂停</translation>
     </message>
 </context>
 </TS>
