@@ -56,6 +56,18 @@ bool ListeningPeerPool::isPeerListening(const std::string& peerNameOriginal) con
     return getConnectionCountByPeerName(peerNameOriginal) > 0;
 }
 
+std::string ListeningPeerPool::findListeningPeerByDomain(
+    const std::string& domainName) const
+{
+    auto domainNameReversed = utils::reverseWords(domainName, ".");
+
+    QnMutexLocker lock(&m_mutex);
+    auto it = utils::findAnyByPrefix(m_peerNameToConnection, domainNameReversed);
+    if (it == m_peerNameToConnection.end())
+        return std::string();
+    return utils::reverseWords(it->first, ".");
+}
+
 void ListeningPeerPool::takeIdleConnection(
     const std::string& peerNameOriginal,
     ListeningPeerPool::TakeIdleConnection completionHandler)

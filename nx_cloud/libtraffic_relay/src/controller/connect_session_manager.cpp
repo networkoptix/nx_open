@@ -28,7 +28,8 @@ ConnectSessionManager::ConnectSessionManager(
 
 ConnectSessionManager::~ConnectSessionManager()
 {
-    // TODO: Waiting scheduled async operations completion.
+    // Waiting scheduled async operations completion.
+    m_apiCallCounter.wait();
 }
 
 void ConnectSessionManager::beginListening(
@@ -80,7 +81,9 @@ void ConnectSessionManager::createClientSession(
         std::chrono::duration_cast<std::chrono::seconds>(
             m_settings.connectingPeer().connectSessionIdleTimeout);
 
-    if (!m_listeningPeerPool->isPeerListening(request.targetPeerName))
+    const auto peerName = 
+        m_listeningPeerPool->findListeningPeerByDomain(request.targetPeerName);
+    if (peerName.empty())
     {
         NX_LOGX(lm("Received createClientSession request with unknown listening peer id %1")
             .str(request.targetPeerName), cl_logDEBUG2);
@@ -90,7 +93,7 @@ void ConnectSessionManager::createClientSession(
     }
 
     response.sessionId = m_clientSessionPool->addSession(
-        request.desiredSessionId, request.targetPeerName);
+        request.desiredSessionId, peerName);
     completionHandler(api::ResultCode::ok, std::move(response));
 }
 
@@ -110,10 +113,10 @@ void ConnectSessionManager::connectToPeer(
             nx_http::ConnectionEvents());
     }
 
-    // TODO: Have to wait until this request completion on server stop.
     m_listeningPeerPool->takeIdleConnection(
         peerName,
         [this, clientSessionId = request.sessionId, peerName,
+            scopedCallGuard = m_apiCallCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)](
                 api::ResultCode resultCode,
                 std::unique_ptr<AbstractStreamSocket> serverConnection) mutable
