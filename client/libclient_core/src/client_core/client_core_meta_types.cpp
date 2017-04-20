@@ -40,6 +40,6 @@ void QnClientCoreMetaTypes::initialize()
     qmlRegisterUncreatableType<QnSoftwareVersion>(
         "Nx", 1, 0, "SoftwareVersion", lit("Cannot create an instance of SoftwareVersion."));
 
-    qmlRegisterUncreatableType<QnMediaDewarpingParams>("Nx.Core", 1, 0, "MediaDewarpingParams",
+    qmlRegisterUncreatableType<QnMediaDewarpingParams>("Nx.Media", 1, 0, "MediaDewarpingParams",
         lit("Cannot create an instance of QnMediaDewarpingParams."));
 }

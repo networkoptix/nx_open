@@ -192,8 +192,8 @@ PageBase
 
         sourceComponent:
             videoScreenController.resourceHelper.fisheyeParams.enabled
-                ? fisheyeVideo
-                : scalableVideo
+                ? fisheyeVideoComponent
+                : scalableVideoComponent
 
         function clear()
         {
@@ -204,7 +204,7 @@ PageBase
 
     Component
     {
-        id: scalableVideo
+        id: scalableVideoComponent
         ScalableVideo 
         {
             mediaPlayer: videoScreenController.mediaPlayer
@@ -216,12 +216,11 @@ PageBase
 
     Component
     {
-        id: fisheyeVideo
+        id: fisheyeVideoComponent
         FisheyeVideo 
         {
             mediaPlayer: videoScreenController.mediaPlayer
             resourceHelper: videoScreenController.resourceHelper
-            videoCenterHeightOffsetFactor: 1 / 3
             onClicked: toggleUi()
         }
     }
