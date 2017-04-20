@@ -12,7 +12,7 @@ namespace desktop {
 namespace ui {
 namespace videowall {
 
-QN_DECLARE_TR_FUNCTIONS(videowall)
+QN_DECLARE_TR_FUNCTIONS("nx::client::desktop::ui::videowall")
 
 void anotherVideoWall(QWidget* parent);
 
