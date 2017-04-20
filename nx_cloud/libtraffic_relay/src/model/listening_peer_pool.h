@@ -25,7 +25,7 @@ public:
     ~ListeningPeerPool();
 
     void addConnection(
-        std::string peerName,
+        const std::string& peerName,
         std::unique_ptr<AbstractStreamSocket> connection);
 
     std::size_t getConnectionCountByPeerName(const std::string& peerName) const;
