@@ -21,14 +21,14 @@ Q_OBJECT
 #endif
 QN_DECLARE_METAOBJECT_HEADER(Qn,
     Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
-    PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent
+    StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent
     ConnectionRole ResourceStatus BitratePerGopType
     StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
     ServerFlag BackupType StorageInitResult CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
     RebuildAction BackupAction FailoverPriority
     Permission GlobalPermission UserRole ConnectionResult
     ,
-    Borders Corners ResourceFlags CameraCapabilities PtzDataFields PtzCapabilities PtzTraits
+    Borders Corners ResourceFlags CameraCapabilities PtzDataFields PtzTraits
     MotionTypes TimePeriodTypes
     ServerFlags CameraBackupQualities TimeFlags CameraStatusFlags IOPortTypes
     Permissions GlobalPermissions

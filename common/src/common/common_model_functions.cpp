@@ -4,7 +4,6 @@
 
 #include <nx/fusion/model_functions.h>
 
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Ptz, Capabilities) //< TODO: move to distinct file
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzCommand)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzCoordinateSpace)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzObjectType)

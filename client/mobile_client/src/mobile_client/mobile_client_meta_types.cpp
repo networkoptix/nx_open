@@ -47,7 +47,6 @@ void QnMobileClientMetaTypes::initialize()
 void QnMobileClientMetaTypes::registerMetaTypes()
 {
     qRegisterMetaType<nx::media::PlayerStatistics>();
-    qRegisterMetaType<Ptz::Capabilities>();
     QnJsonSerializer::registerSerializer<InterClientMessage::Command>();
 }
 
