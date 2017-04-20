@@ -10,7 +10,7 @@ namespace desktop {
 namespace ui {
 namespace ptz {
 
-QN_DECLARE_TR_FUNCTIONS(ptz)
+QN_DECLARE_TR_FUNCTIONS("nx::client::desktop::ui::ptz")
 
 bool deletePresetInUse(QWidget* parent);
 

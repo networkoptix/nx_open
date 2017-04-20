@@ -126,9 +126,10 @@ LayoutToursHandler::~LayoutToursHandler()
 
 void LayoutToursHandler::openToursLayout()
 {
-    const auto actions = QList<QnActions::IDType>()
-        << QnActions::ToggleLayoutTourModeAction
-        << QnActions::RemoveLayoutTourAction;
+    const QList<QnActions::IDType> actions{
+        QnActions::ToggleLayoutTourModeAction,
+        QnActions::RemoveLayoutTourAction
+    };
 
     const auto resource = QnLayoutResourcePtr(new QnLayoutResource());
     resource->setData(Qn::IsSpecialLayoutRole, true);

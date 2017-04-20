@@ -2,6 +2,8 @@
 #include "flir_fc_resource_searcher.h"
 #include "flir_parsing_utils.h"
 
+#if defined(ENABLE_FLIR)
+
 #include <core/resource/resource_fwd.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/system_socket.h>
@@ -345,4 +347,4 @@ void FcResourceSearcher::handleDeviceInfoResponseUnsafe(
 } // namespace plugins
 } // namespace nx 
 
-
+#endif // defined(ENABLE_FLIR)

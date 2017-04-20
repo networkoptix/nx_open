@@ -208,13 +208,12 @@ void QnRtspClientArchiveDelegate::checkGlobalTimeAsync(const QnSecurityCamResour
 
 void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnSecurityCamResourcePtr &camera)
 {
-    if (!camera && !camera->resourcePool())
+    if (!camera || !camera->resourcePool())
     {
         m_globalMinArchiveTime = qint64(AV_NOPTS_VALUE);
         return;
     }
 
-    auto currentServer = camera->resourcePool()->getResourceById(camera->getParentId());
     QnMediaServerResourceList mediaServerList = camera->commonModule()->cameraHistoryPool()->getCameraFootageData(camera, true);
 
     /* Check if no archive available on any server. */

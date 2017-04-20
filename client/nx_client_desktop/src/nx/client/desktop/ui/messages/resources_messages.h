@@ -12,7 +12,7 @@ namespace desktop {
 namespace ui {
 namespace resources {
 
-QN_DECLARE_TR_FUNCTIONS(resources)
+QN_DECLARE_TR_FUNCTIONS("nx::client::desktop::ui::resources")
 
 void layoutAlreadyExists(QWidget* parent);
 
