@@ -14,10 +14,10 @@ ShaderEffect
 
     /* Fisheye parameters: */
 
-    property real radius: Math.min(sourceSize.width, sourceSize.height) / sourceSize.width
-    property vector2d offset: Qt.vector2d(0.0, 0.0)
-    property real horizontalStretch: 1.0
-    property real rotation: 0.0 //TODO: #vkutin Use it
+    property real fieldRadius: Math.min(sourceSize.width, sourceSize.height) / sourceSize.width
+    property vector2d fieldOffset: Qt.vector2d(0.0, 0.0)
+    property real fieldStretch: 1.0
+    property real fieldRotation: 0.0 //TODO: #vkutin Use it
 
 //TODO: #vkutin This will be used in actual dewarping
 //  property real viewFov
@@ -30,15 +30,15 @@ ShaderEffect
         var sourceAspectRatio = sourceSize.width / sourceSize.height;
         var targetAspectRatio = targetSize.width / targetSize.height;
 
-        var diameter = radius * 2.0;
-        var mapFromEllipse = Qt.vector2d(1.0 / diameter, horizontalStretch / (diameter * sourceAspectRatio))
+        var diameter = fieldRadius * 2.0;
+        var mapFromEllipse = Qt.vector2d(1.0 / diameter, fieldStretch / (diameter * sourceAspectRatio))
  
         return targetAspectRatio < 1.0
             ? Qt.vector2d(1.0, targetAspectRatio).times(mapFromEllipse)
             : Qt.vector2d(1.0 / targetAspectRatio, 1.0).times(mapFromEllipse)
     }
 
-    readonly property vector2d texCoordCenter: Qt.vector2d(0.5, 0.5).plus(offset)
+    readonly property vector2d texCoordCenter: Qt.vector2d(0.5, 0.5).plus(fieldOffset)
 
     /* Vertex shader code: */
 
