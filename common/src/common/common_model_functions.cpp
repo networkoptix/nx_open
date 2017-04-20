@@ -47,12 +47,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, FailoverPriority,
 (Qn::FP_High,       "High")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzTraits,
-    (Qn::FourWayPtzTrait,          "FourWayPtz")
-    (Qn::EightWayPtzTrait,         "EightWayPtz")
-    (Qn::ManualAutoFocusPtzTrait,  "ManualAutoFocus")
-)
-
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, BackupType,
     (Qn::Backup_Manual,            "BackupManual")
     (Qn::Backup_RealTime,          "BackupRealTime")
@@ -80,14 +74,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, CameraBackupQuality,
     (Qn::CameraBackup_LowQuality,        "CameraBackupLowQuality")
     (Qn::CameraBackup_Both,              "CameraBackupBoth")
     (Qn::CameraBackup_Default,           "CameraBackupDefault")
-)
-
-
-// TODO: #Elric #2.3 code duplication ^v
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzTrait,
-    (Qn::FourWayPtzTrait,          "FourWayPtz")
-    (Qn::EightWayPtzTrait,         "EightWayPtz")
-    (Qn::ManualAutoFocusPtzTrait,  "ManualAutoFocus")
 )
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, RecordingType)

@@ -21,7 +21,7 @@ QnRemotePtzController::~QnRemotePtzController() {
 
 Ptz::Capabilities QnRemotePtzController::getCapabilities() {
     Ptz::Capabilities result = m_resource->getPtzCapabilities();
-    if(result == Ptz::Capability::NoPtzCapabilities)
+    if(!result)
         return Ptz::Capability::NoPtzCapabilities;
 
     if(result & Ptz::Capability::VirtualPtzCapability)

@@ -62,10 +62,10 @@ QnPresetPtzController::~QnPresetPtzController()
 
 bool QnPresetPtzController::extends(Ptz::Capabilities capabilities)
 {
-    return
-        ((capabilities & Ptz::Capability::AbsolutePtzCapabilities) == Ptz::Capability::AbsolutePtzCapabilities) &&
-        (capabilities & (Ptz::Capability::DevicePositioningPtzCapability | Ptz::Capability::LogicalPositioningPtzCapability)) &&
-        !(capabilities & Ptz::Capability::PresetsPtzCapability);
+    return capabilities.testFlag(Ptz::Capability::AbsolutePtzCapabilities)
+        && !capabilities.testFlag(Ptz::Capability::PresetsPtzCapability)
+        && (capabilities.testFlag(Ptz::Capability::DevicePositioningPtzCapability)
+            || capabilities.testFlag(Ptz::Capability::LogicalPositioningPtzCapability));
 }
 
 Ptz::Capabilities QnPresetPtzController::getCapabilities()

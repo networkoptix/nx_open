@@ -14,7 +14,7 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
     base_type(baseController),
     m_overrideContinuousMove(false),
     m_flip(0),
-    m_traits(Qn::NoPtzTraits),
+    m_traits(Ptz::NoPtzTraits),
     m_overrideCapabilities(false),
     m_capabilities(Ptz::Capability::NoPtzCapabilities)
 {
@@ -31,7 +31,7 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
     if(resourceData.value<bool>(lit("tiltFlipped"), false))
         m_flip |= Qt::Vertical;
 
-    m_overrideContinuousMove = m_flip != 0 || (m_traits & (Qn::FourWayPtzTrait | Qn::EightWayPtzTrait));
+    m_overrideContinuousMove = m_flip != 0 || (m_traits & (Ptz::FourWayPtzTrait | Ptz::EightWayPtzTrait));
 
     if(resourceData.value(Qn::PTZ_CAPABILITIES_PARAM_NAME, &m_capabilities))
         m_overrideCapabilities = true;
@@ -51,8 +51,8 @@ bool QnWorkaroundPtzController::continuousMove(const QVector3D &speed) {
     if(m_flip & Qt::Vertical)
         localSpeed.setY(localSpeed.y() * -1);
 
-    if(m_traits & (Qn::EightWayPtzTrait | Qn::FourWayPtzTrait)) {
-        float rounding = (m_traits & Qn::EightWayPtzTrait) ? M_PI / 4.0 : M_PI / 2.0; /* 45 or 90 degrees. */
+    if(m_traits & (Ptz::EightWayPtzTrait | Ptz::FourWayPtzTrait)) {
+        float rounding = (m_traits & Ptz::EightWayPtzTrait) ? M_PI / 4.0 : M_PI / 2.0; /* 45 or 90 degrees. */
 
         QVector2D cartesianSpeed(localSpeed);
         QnPolarPoint<float> polarSpeed = cartesianToPolar(cartesianSpeed);

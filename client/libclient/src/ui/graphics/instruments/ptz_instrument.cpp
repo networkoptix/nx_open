@@ -304,7 +304,7 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
             || data.hasCapabilities(Ptz::Capability::ContinuousTiltCapability);
         const bool hasZoom = data.hasCapabilities(Ptz::Capability::ContinuousZoomCapability);
         const bool hasFocus = data.hasCapabilities(Ptz::Capability::ContinuousFocusCapability);
-        const bool hasAutoFocus = data.traits.contains(Qn::ManualAutoFocusPtzTrait);
+        const bool hasAutoFocus = data.traits.contains(Ptz::ManualAutoFocusPtzTrait);
 
         overlayWidget->manipulatorWidget()->setVisible(canMove);
         overlayWidget->zoomInButton()->setVisible(hasZoom);
@@ -404,7 +404,7 @@ void PtzInstrument::focusMove(QnMediaResourceWidget* widget, qreal speed)
 
 void PtzInstrument::focusAuto(QnMediaResourceWidget* widget)
 {
-    widget->ptzController()->runAuxilaryCommand(Qn::ManualAutoFocusPtzTrait, QString());
+    widget->ptzController()->runAuxilaryCommand(Ptz::ManualAutoFocusPtzTrait, QString());
 }
 
 void PtzInstrument::processPtzClick(const QPointF& pos)

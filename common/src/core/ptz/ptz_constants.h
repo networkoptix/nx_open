@@ -8,7 +8,10 @@ struct Ptz
 {
     Q_GADGET
     Q_ENUMS(Capability)
+    Q_ENUMS(Trait)
+
     Q_FLAGS(Capabilities)
+    Q_FLAGS(Traits)
 
 public:
     enum Capability
@@ -43,8 +46,6 @@ public:
 
         AuxilaryPtzCapability = 0x01000000,
 
-        ManualAutoFocusCapability = 0x02000000,
-
         /* Shortcuts */
         ContinuousPanTiltCapabilities =
             ContinuousPanCapability | ContinuousTiltCapability,
@@ -56,11 +57,25 @@ public:
             AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
     };
     Q_DECLARE_FLAGS(Capabilities, Capability)
+
+    enum Trait
+    {
+        NoPtzTraits = 0x00,
+        FourWayPtzTrait = 0x01,
+        EightWayPtzTrait = 0x02,
+        ManualAutoFocusPtzTrait = 0x04,
+    };
+    Q_DECLARE_FLAGS(Traits, Trait)
 };
 
+Q_DECLARE_OPERATORS_FOR_FLAGS(Ptz::Traits)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Ptz::Capabilities)
 
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Ptz::Trait)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Ptz::Capability)
+
+QN_FUSION_DECLARE_FUNCTIONS(Ptz::Trait, (metatype)(numeric)(lexical))
+QN_FUSION_DECLARE_FUNCTIONS(Ptz::Traits, (metatype)(numeric)(lexical))
 QN_FUSION_DECLARE_FUNCTIONS(Ptz::Capabilities, (metatype)(numeric)(lexical))
 
 

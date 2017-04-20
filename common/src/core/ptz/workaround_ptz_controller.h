@@ -18,7 +18,7 @@ public:
 private:
     bool m_overrideContinuousMove;
     Qt::Orientations m_flip;
-    Qn::PtzTraits m_traits;
+    Ptz::Traits m_traits;
 
     bool m_overrideCapabilities;
     Ptz::Capabilities m_capabilities;

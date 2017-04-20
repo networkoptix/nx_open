@@ -28,7 +28,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     RebuildAction BackupAction FailoverPriority
     Permission GlobalPermission UserRole ConnectionResult
     ,
-    Borders Corners ResourceFlags CameraCapabilities PtzDataFields PtzTraits
+    Borders Corners ResourceFlags CameraCapabilities PtzDataFields
     MotionTypes TimePeriodTypes
     ServerFlags CameraBackupQualities TimeFlags CameraStatusFlags IOPortTypes
     Permissions GlobalPermissions
@@ -164,24 +164,10 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         InvalidPtzObject = -1
     };
 
-
-
-
     enum Projection {
         RectilinearProjection,
         EquirectangularProjection
     };
-
-
-    enum PtzTrait {
-        NoPtzTraits             = 0x00,
-        FourWayPtzTrait         = 0x01,
-        EightWayPtzTrait        = 0x02,
-        ManualAutoFocusPtzTrait = 0x04,
-    };
-    Q_DECLARE_FLAGS(PtzTraits, PtzTrait);
-    Q_DECLARE_OPERATORS_FOR_FLAGS(PtzTraits);
-
 
     enum StreamFpsSharingMethod {
         /** If second stream is running whatever fps it has, first stream can get maximumFps - secondstreamFps. */
@@ -861,7 +847,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzTrait)(Qn::PtzTraits)(Qn::PtzCoordinateSpace)(Qn::MotionType)
+    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::MotionType)
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)
         (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)(Qn::StorageInitResult)
         (Qn::PanicMode)(Qn::RecordingType)

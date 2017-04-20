@@ -118,7 +118,7 @@ void QnFisheyePtzController::updateLimits() {
         m_limits.maxTilt = 90.0;
     }
 
-    if (m_capabilities != Ptz::Capability::NoPtzCapabilities)
+    if (m_capabilities)
         absoluteMoveInternal(boundedPosition(getPositionInternal()));
 }
 

@@ -20,10 +20,9 @@ QnViewportPtzController::QnViewportPtzController(const QnPtzControllerPtr &baseC
 }
 
 bool QnViewportPtzController::extends(Ptz::Capabilities capabilities) {
-    return 
-        ((capabilities & Ptz::Capability::AbsolutePtzCapabilities) == Ptz::Capability::AbsolutePtzCapabilities) &&
-        (capabilities & Ptz::Capability::LogicalPositioningPtzCapability) &&
-        !(capabilities & Ptz::Capability::ViewportPtzCapability);
+    return capabilities.testFlag(Ptz::Capability::AbsolutePtzCapabilities)
+        && capabilities.testFlag(Ptz::Capability::LogicalPositioningPtzCapability)
+        && !capabilities.testFlag(Ptz::Capability::ViewportPtzCapability);
 }
 
 Ptz::Capabilities QnViewportPtzController::getCapabilities() {
