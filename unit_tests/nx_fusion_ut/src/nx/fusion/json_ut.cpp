@@ -67,6 +67,23 @@ TEST_F(QnFusionTestFixture, flagsNumeric)
     ASSERT_EQ(nx::Flag1|nx::Flag2, flags);
 }
 
+TEST_F(QnFusionTestFixture, bitArray)
+{
+    QBitArray value(17);
+    value.setBit(1);
+    value.setBit(5);
+    value.setBit(6);
+    value.setBit(9);
+    value.setBit(11);
+    value.setBit(16);
+
+    const auto data = QJson::serialized(value);
+
+    QBitArray target;
+    ASSERT_TRUE(QJson::deserialize(data, &target));
+    ASSERT_EQ(value, target);
+}
+
 namespace {
 
 struct MockData

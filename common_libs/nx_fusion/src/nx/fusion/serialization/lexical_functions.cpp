@@ -186,3 +186,61 @@ bool deserialize(const QString &value, QColor *target)
     }
 }
 
+
+bool serialize(const QBitArray& value, QString* target)
+{
+    if (value.isEmpty())
+    {
+        *target = QByteArray();
+        return true;
+    }
+
+    const int size = value.size();
+
+    QByteArray byteArray((size + 7) / 8 + 1, '\0');
+
+    for (int i = 0; i < size; ++i)
+    {
+        QByteRef byte = byteArray[i / 8];
+        byte = static_cast<char>(byte | (value.testBit(i) ? 1 : 0) << (i % 8));
+    }
+
+    const int lastByteSize = size - (byteArray.size() - 2) * 8;
+    byteArray[byteArray.size() - 1] = static_cast<char>(lastByteSize);
+
+    serialize(byteArray, target);
+    return true;
+}
+
+bool deserialize(const QString& value, QBitArray* target)
+{
+    QByteArray byteArray;
+
+    if (!deserialize(value, &byteArray))
+        return false;
+
+    if (byteArray.isEmpty())
+    {
+        *target = QBitArray();
+        return true;
+    }
+
+    const int lastByteSize = byteArray[byteArray.size() - 1];
+
+    if (byteArray.size() == 1)
+    {
+        if (lastByteSize != 0)
+            return false;
+
+        *target = QBitArray();
+        return true;
+    }
+
+    const int size = (byteArray.size() - 2) * 8 + lastByteSize;
+    target->resize(size);
+
+    for (int i = 0; i < size; ++i)
+        target->setBit(i, byteArray[i / 8] & (1 << (i % 8)));
+
+    return true;
+}

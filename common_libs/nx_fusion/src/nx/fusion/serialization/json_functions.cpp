@@ -13,7 +13,7 @@
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qt, BrushStyle, static)
 
 QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
-    (QnLatin1Array)(QColor)(QUrl),
+    (QnLatin1Array)(QBitArray)(QColor)(QUrl),
     (json_lexical)
 )
 
