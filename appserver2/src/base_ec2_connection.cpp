@@ -404,6 +404,12 @@ QnTransactionMessageBus* BaseEc2Connection<QueryProcessorType>::messageBus() con
     return m_connectionFactory->messageBus();
 }
 
+template<class QueryProcessorType>
+P2pMessageBus* BaseEc2Connection<QueryProcessorType>::p2pMessageBus() const
+{
+    return m_connectionFactory->p2pMessageBus();
+}
+
 template class BaseEc2Connection<FixedUrlClientQueryProcessor>;
 template class BaseEc2Connection<ServerQueryProcessorAccess>;
 

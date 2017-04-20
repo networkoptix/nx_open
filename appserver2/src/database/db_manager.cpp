@@ -690,7 +690,7 @@ bool QnDbManager::syncLicensesBetweenDB()
         if (saveLicense(license, m_sdbStatic) != ErrorCode::ok)
             return false;
     }
-
+    commonModule()->setDbId(m_dbInstanceId);
     return true;
 }
 

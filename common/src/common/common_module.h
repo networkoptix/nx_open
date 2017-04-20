@@ -165,6 +165,9 @@ public:
     void setObsoleteServerGuid(const QnUuid& guid) { m_obsoleteUuid = guid; }
     QnUuid obsoleteServerGuid() const{ return m_obsoleteUuid; }
 
+    QnUuid dbId() const;
+    void setDbId(const QnUuid& uuid);
+
     /*
     * This timestamp is using for database backup/restore operation.
     * Server has got systemIdentity time after DB restore operation
@@ -253,6 +256,7 @@ private:
     QString m_defaultAdminPassword;
     QnUuid m_uuid;
     QnUuid m_runUuid;
+    QnUuid m_dbId;
     QnUuid m_obsoleteUuid;
     QnUuid m_remoteUuid;
     bool m_cloudMode;

@@ -3,8 +3,14 @@
 
 namespace ec2 {
 
-QnTransactionMessageBusBase::QnTransactionMessageBusBase(QnCommonModule* commonModule):
+QnTransactionMessageBusBase::QnTransactionMessageBusBase(
+    detail::QnDbManager* db,
+    Qn::PeerType peerType,
+    QnCommonModule* commonModule)
+:
     QnCommonModuleAware(commonModule),
+    m_db(db),
+    m_localPeerType(peerType),
     m_mutex(QnMutex::Recursive)
 {
 }

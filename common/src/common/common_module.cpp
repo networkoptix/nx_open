@@ -364,6 +364,18 @@ void QnCommonModule::updateRunningInstanceGuid()
     emit runningInstanceGUIDChanged();
 }
 
+QnUuid QnCommonModule::dbId() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_dbId;
+}
+
+void QnCommonModule::setDbId(const QnUuid& uuid)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_dbId = uuid;
+}
+
 QDateTime QnCommonModule::startupTime() const
 {
     return m_startupTime;

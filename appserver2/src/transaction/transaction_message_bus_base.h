@@ -6,10 +6,17 @@
 
 namespace ec2
 {
+    namespace detail {
+        class QnDbManager;
+    }
+
     class QnTransactionMessageBusBase: public QnCommonModuleAware
     {
     public:
-        QnTransactionMessageBusBase(QnCommonModule* commonModule);
+        QnTransactionMessageBusBase(
+            detail::QnDbManager* db,
+            Qn::PeerType peerType,
+            QnCommonModule* commonModule);
 
         struct RoutingRecord
         {
@@ -21,6 +28,10 @@ namespace ec2
         };
 
     protected:
+        detail::QnDbManager* m_db = nullptr;
+        /** Info about us. */
+        Qn::PeerType m_localPeerType = Qn::PT_NotDefined;
+
         mutable QnMutex m_mutex;
     };
 };

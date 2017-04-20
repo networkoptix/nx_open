@@ -7,6 +7,16 @@
 
 namespace ec2 {
 
+// PeerNumberInfo
+
+PeerNumberType P2pMessageBus::PeerNumberInfo::insert(const ApiPeerIdData& peer)
+{
+    PeerNumberType result = fullIdToShortId.size();
+    fullIdToShortId.insert(peer, result);
+    shortIdToFullId.insert(result, peer);
+    return result;
+}
+
 // PeerInfo
 
 quint32 P2pMessageBus::PeerInfo::distanceVia(const ApiPeerIdData& via) const
@@ -32,9 +42,19 @@ quint32 P2pMessageBus::PeerInfo::minDistance(std::vector<ApiPeerIdData>* outViaL
     return minDistance;
 }
 
+P2pMessageBus::P2pMessageBus(
+    detail::QnDbManager* db,
+    Qn::PeerType peerType,
+    QnCommonModule* commonModule)
+:
+    QnTransactionMessageBusBase(db, peerType, commonModule)
+{
+    m_localPeer.id = commonModule->moduleGUID();
+    m_localPeer.instanceId = commonModule->runningInstanceGUID();
+    m_localPeer.persistentId = commonModule->dbId();
+}
 
-P2pMessageBus::P2pMessageBus(QnCommonModule* commonModule):
-    QnTransactionMessageBusBase(commonModule)
+P2pMessageBus::~P2pMessageBus()
 {
 }
 
@@ -53,7 +73,7 @@ void P2pMessageBus::removeOutgoingConnectionFromPeer(QnUuid& id)
     m_remoteUrls.remove(id);
     m_outgoingConnections.remove(id);
     auto itr = m_connections.find(id);
-    if (itr != m_connections.end() && itr.value()->originatorId() == commonModule()->moduleGUID())
+    if (itr != m_connections.end() && itr.value()->direction() == P2pConnection::Direction::outgoing)
         m_connections.erase(itr);
 }
 
@@ -61,7 +81,7 @@ void P2pMessageBus::gotConnectionFromRemotePeer(P2pConnectionPtr connection)
 {
     QnMutexLocker lock(&m_mutex);
 
-    const auto remoteId = connection->remoteId();
+    const auto remoteId = connection->remotePeer().id;
     const auto localId = commonModule()->moduleGUID();
     auto itr = m_connections.find(remoteId);
     if (itr == m_connections.end())
@@ -97,7 +117,7 @@ void P2pMessageBus::processTemporaryOutgoingConnections()
         if (connection->state() == P2pConnection::State::Connected)
         {
             // move connection to main list
-            m_connections[connection->remoteId()] = connection;
+            m_connections[connection->remotePeer().id] = connection;
             itr = m_outgoingConnections.erase(itr);
         }
         else if (connection->state() == P2pConnection::State::Error)
@@ -132,7 +152,8 @@ void P2pMessageBus::createOutgoingConnections()
         const QUrl url = itr.value();
         if (!m_connections.contains(remoteId) && !m_outgoingConnections.contains(remoteId))
         {
-            m_connections.insert(remoteId, P2pConnectionPtr(new P2pConnection(remoteId, url)));
+            m_connections.insert(remoteId, P2pConnectionPtr(
+                new P2pConnection(commonModule(), remoteId, url)));
         }
     }
 }
@@ -202,7 +223,7 @@ void P2pMessageBus::addOfflinePeersFromDb()
         if (!peerData.isOnline)
         {
             quint32 sequence = itr.value();
-            peerData.routingInfo.insert(modulePeer(), RoutingRecord(sequence, qnSyncTime->currentMSecsSinceEpoch()));
+            peerData.routingInfo.insert(localPeer(), RoutingRecord(sequence, qnSyncTime->currentMSecsSinceEpoch()));
         }
     }
 }
@@ -254,7 +275,7 @@ void P2pMessageBus::deserializeAlivePeersMessage(
         while (reader.hasMoreBits())
         {
             PeerNumberType peerNumber = deserializeCompressPeerNumber(reader);
-            ApiPeerIdData peerId = fromShortPeerNumber(connection->remoteId(), peerNumber);
+            ApiPeerIdData peerId = fromShortPeerNumber(connection->remotePeer().id, peerNumber);
             bool isOnline = reader.getBit();
             quint32 receivedDistance = 0;
             if (isOnline)
@@ -265,7 +286,7 @@ void P2pMessageBus::deserializeAlivePeersMessage(
             if (peerInfo.isOnline && !isOnline)
                 continue; //< ignore incoming offline record because we have online data
 
-            RoutingRecord& record = peerInfo.routingInfo[connection->remotePeerId()];
+            RoutingRecord& record = peerInfo.routingInfo[connection->remotePeer()];
             record.distance = std::min(receivedDistance, record.distance);
             record.lastRecvTime = qnSyncTime->currentMSecsSinceEpoch();
         }
@@ -289,14 +310,14 @@ void P2pMessageBus::doSubscribe()
     {
         const ApiPeerIdData& peer = itr.key();
         const PeerInfo& info = itr.value();
-        quint32 directDistance = info.distanceVia(modulePeer());
+        quint32 directDistance = info.distanceVia(localPeer());
         std::vector<ApiPeerIdData> viaList;
         quint32 minDistance = info.minDistance(&viaList);
         if (minDistance < directDistance)
         {
             if (P2pConnectionPtr subscribedVia = m_subscriptionList.value(peer))
             {
-                quint32 subscribedDistance = info.distanceVia(subscribedVia->remotePeerId());
+                quint32 subscribedDistance = info.distanceVia(subscribedVia->remotePeer());
                 if (minDistance < subscribedDistance)
                     subscribedVia->unsubscribeFrom(peer);
                 else
@@ -335,6 +356,11 @@ void P2pMessageBus::doPeriodicTasks()
     sendAlivePeersMessage();
 
     doSubscribe();
+}
+
+ApiPeerIdData P2pMessageBus::localPeer() const
+{
+    return m_localPeer;
 }
 
 } // ec2

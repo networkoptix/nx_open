@@ -32,6 +32,7 @@
 #include "http/ec2_transaction_tcp_listener.h"
 #include "http/http_transaction_receiver.h"
 #include "mutex/distributed_mutex_manager.h"
+#include <http/p2p_connection_listener.h>
 
 namespace ec2 {
 
@@ -54,6 +55,8 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
         : nullptr),
     m_transactionMessageBus(
         new QnTransactionMessageBus(m_dbManager.get(), peerType, commonModule)),
+    m_p2pMessageBus(
+        new P2pMessageBus(m_dbManager.get(), peerType, commonModule)),
     m_timeSynchronizationManager(
         new TimeSynchronizationManager(peerType, timerManager, m_transactionMessageBus.get())),
     m_serverQueryProcessor(
@@ -154,6 +157,9 @@ void Ec2DirectConnectionFactory::registerTransactionListener(
         "HTTP", "ec2/events", m_transactionMessageBus.get());
     httpConnectionListener->addHandler<QnHttpTransactionReceiver, QnTransactionMessageBus>(
         "HTTP", kIncomingTransactionsPath, m_transactionMessageBus.get());
+
+    httpConnectionListener->addHandler<P2pConnectionProcessor, P2pMessageBus>(
+        "HTTP", "ec2/messageBus", m_p2pMessageBus.get());
 
     m_sslEnabled = httpConnectionListener->isSslEnabled();
 }
@@ -1858,6 +1864,11 @@ void Ec2DirectConnectionFactory::regFunctorWithResponse(
 QnTransactionMessageBus* Ec2DirectConnectionFactory::messageBus() const
 {
     return m_transactionMessageBus.get();
+}
+
+P2pMessageBus* Ec2DirectConnectionFactory::p2pMessageBus() const
+{
+    return m_p2pMessageBus.get();
 }
 
 QnDistributedMutexManager* Ec2DirectConnectionFactory::distributedMutex() const

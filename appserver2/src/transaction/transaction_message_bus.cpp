@@ -207,9 +207,7 @@ QnTransactionMessageBus::QnTransactionMessageBus(detail::QnDbManager* db,
     Qn::PeerType peerType,
     QnCommonModule* commonModule)
 :
-    QnTransactionMessageBusBase(commonModule),
-    m_db(db),
-    m_localPeerType(peerType),
+    QnTransactionMessageBusBase(db, peerType, commonModule),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
     m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
     m_handler(nullptr),
@@ -1967,7 +1965,7 @@ int QnTransactionMessageBus::distanceToPeer(const QnUuid& dstPeer) const
 
     int minDistance = INT_MAX;
     for (const RoutingRecord& rec : m_alivePeers.value(dstPeer).routingInfo)
-        minDistance = qMin(minDistance, rec.distance);
+        minDistance = std::min(minDistance, (int) rec.distance);
     return minDistance;
 }
 

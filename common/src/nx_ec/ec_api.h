@@ -60,6 +60,7 @@ namespace ec2
 {
     class ECConnectionNotificationManager;
     class QnTransactionMessageBus;
+    class P2pMessageBus;
     class QnDistributedMutexManager;
     class TimeSynchronizationManager;
 
@@ -744,6 +745,7 @@ namespace ec2
 
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const = 0;
         virtual QnTransactionMessageBus* messageBus() const = 0;
+        virtual P2pMessageBus* p2pMessageBus() const = 0;
 
         virtual ECConnectionNotificationManager* notificationManager()
         {
@@ -849,6 +851,7 @@ namespace ec2
         virtual void registerTransactionListener(QnHttpConnectionListener* httpConnectionListener) = 0;
         virtual void setConfParams( std::map<QString, QVariant> confParams ) = 0;
         virtual QnTransactionMessageBus* messageBus() const = 0;
+        virtual P2pMessageBus* p2pMessageBus() const = 0;
         virtual QnDistributedMutexManager* distributedMutex() const = 0;
         virtual TimeSynchronizationManager* timeSyncManager() const = 0;
     protected:

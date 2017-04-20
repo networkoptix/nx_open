@@ -40,7 +40,8 @@ class QnTransactionMessageBus
 {
     Q_OBJECT
 public:
-    QnTransactionMessageBus(detail::QnDbManager* db,
+    QnTransactionMessageBus(
+        detail::QnDbManager* db,
         Qn::PeerType peerType,
         QnCommonModule* commonModule);
 
@@ -272,11 +273,7 @@ private slots:
 
 private:
 
-    detail::QnDbManager* m_db = nullptr;
     TimeSynchronizationManager* m_timeSyncManager = nullptr;
-
-    /** Info about us. */
-    Qn::PeerType m_localPeerType;
 
     QScopedPointer<QnJsonTransactionSerializer> m_jsonTranSerializer;
     QScopedPointer<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;

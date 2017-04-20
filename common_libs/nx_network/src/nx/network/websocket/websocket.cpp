@@ -11,7 +11,7 @@ Websocket::Websocket(
     SendMode sendMode,
     ReceiveMode receiveMode,
     Role role)
-    :
+:
     m_baseConnection(this, std::move(streamSocket), this),
     m_parser(role, this),
     m_serializer(role == Role::client),

@@ -12,7 +12,7 @@ namespace nx {
 namespace network {
 namespace websocket {
 
-class Websocket : 
+class NX_NETWORK_API Websocket:
     public aio::AbstractAsyncChannel,
     private nx_api::BaseServerConnectionHandler,
     private ParserHandler,
@@ -23,20 +23,20 @@ public:
     enum class SendMode
     {
         /** Wrap buffer passed to sendAsync() in a complete websocket message */
-        singleMessage,  
+        singleMessage,
 
-        /** 
+        /**
          * Wrap buffer passed to sendAsync() in a complete websocket message.
          * @note Call setIsLastFrame() to mark final frame in the message.
          */
-        multiFrameMessage   
+        multiFrameMessage
     };
 
     enum class ReceiveMode
     {
         frame,      /**< Read handler will be called only when complete frame has been read from socket */
-        message,    /**< Read handler will be called only when complete message has been read from socket*/ 
-        stream      /**< Read handler will be called only when any data has been read from socket */ 
+        message,    /**< Read handler will be called only when complete message has been read from socket*/
+        stream      /**< Read handler will be called only when any data has been read from socket */
     };
 
 public:
@@ -57,9 +57,9 @@ public:
 
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
-    /** 
-     * Makes sense only in multiFrameMessage mode. 
-     * Indicates that the next sendAsync will close current message 
+    /**
+     * Makes sense only in multiFrameMessage mode.
+     * Indicates that the next sendAsync will close current message
      */
     void setIsLastFrame();
 
@@ -107,3 +107,5 @@ private:
 } // namespace websocket
 } // namespace network
 } // namespace nx
+
+using WebSocketPtr = std::shared_ptr<nx::network::websocket::Websocket>;
