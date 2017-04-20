@@ -18,8 +18,8 @@ public:
         Model* model);
 
 private:
-    controller::ConnectSessionManager m_connectSessionManager;
     controller::TrafficRelay m_trafficRelay;
+    controller::ConnectSessionManager m_connectSessionManager;
 };
 
 } // namespace relay

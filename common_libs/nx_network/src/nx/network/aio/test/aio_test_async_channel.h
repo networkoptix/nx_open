@@ -3,6 +3,8 @@
 #include <atomic>
 #include <memory>
 
+#include <boost/optional.hpp>
+
 #include <nx/network/aio/abstract_async_channel.h>
 #include <nx/utils/pipeline.h>
 #include <nx/utils/thread/mutex.h>
@@ -50,6 +52,11 @@ public:
     void waitForReadSequenceToBreak();
     QByteArray dataRead() const;
     void setErrorState();
+    void setSendErrorState(boost::optional<SystemError::ErrorCode> sendErrorCode);
+    void setReadErrorState(boost::optional<SystemError::ErrorCode> sendErrorCode);
+
+    void waitForAnotherReadErrorReported();
+    void waitForAnotherSendErrorReported();
 
     bool isReadScheduled() const;
     bool isWriteScheduled() const;
@@ -58,7 +65,8 @@ private:
     utils::pipeline::AbstractInput* m_input;
     utils::pipeline::AbstractOutput* m_output;
     InputDepletionPolicy m_inputDepletionPolicy;
-    std::atomic<bool> m_errorState;
+    boost::optional<SystemError::ErrorCode> m_readErrorState;
+    boost::optional<SystemError::ErrorCode> m_sendErrorState;
     std::atomic<std::size_t> m_totalBytesRead;
     mutable QnMutex m_mutex;
     QByteArray m_totalDataRead;
@@ -75,6 +83,8 @@ private:
     BasicPollable m_writer;
     bool m_readScheduled;
     std::atomic<int> m_readSequence;
+    std::atomic<int> m_readErrorsReported;
+    std::atomic<int> m_sendErrorsReported;
 
     virtual void stopWhileInAioThread() override;
 

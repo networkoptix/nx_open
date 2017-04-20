@@ -99,16 +99,7 @@ TEST_F(CloudModuleUrlProvider, host_inserted_correctly)
 
 TEST_F(CloudModuleUrlProvider, not_found_template_file_causes_error)
 {
-    try
-    {
-        tryToLoadInvalidFile();
-    }
-    catch (std::exception)
-    {
-        return;
-    }
-    
-    FAIL();
+    ASSERT_ANY_THROW(tryToLoadInvalidFile());
 }
 
 //-------------------------------------------------------------------------------------------------

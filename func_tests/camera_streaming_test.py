@@ -7,7 +7,7 @@ log = logging.getLogger(__name__)
 
 
 EXPECTED_TRANSPORT_LIST = set(['rtsp', 'hls', 'mjpeg', 'webm'])
-HISTORY_WAIT_TIMEOUT_SEC = 60
+HISTORY_WAIT_TIMEOUT_SEC = 2*60
 
 
 @pytest.fixture

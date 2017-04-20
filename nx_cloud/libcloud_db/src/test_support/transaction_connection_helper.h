@@ -20,9 +20,9 @@ enum class KeepAlivePolicy
 };
 
 using OnConnectionBecomesActiveSubscription =
-    utils::Subscription<::ec2::QnTransactionTransportBase::State>;
+    utils::Subscription<int /*connectionId*/, ::ec2::QnTransactionTransportBase::State>;
 using OnConnectionFailureSubscription =
-    utils::Subscription<::ec2::QnTransactionTransportBase::State>;
+    utils::Subscription<int /*connectionId*/, ::ec2::QnTransactionTransportBase::State>;
 
 /**
  * Helps to establish transaction connection to appserver2 peer and monitor its state.

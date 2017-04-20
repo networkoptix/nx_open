@@ -194,7 +194,8 @@ namespace LLUtil {
     QString getLatestHardwareId()
     {
         NX_ASSERT(g_hardwareIdInitialized);
-
+        if (LATEST_HWID_VERSION >= g_hardwareId.size())
+            return QString();
         const auto& macHwidsList = g_hardwareId[LATEST_HWID_VERSION];
         for (const auto& macHwids : macHwidsList)
         {

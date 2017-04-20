@@ -18,6 +18,21 @@ namespace nx_api {
 
 static constexpr size_t READ_BUFFER_CAPACITY = 16 * 1024;
 
+struct BaseServerConnectionAccess
+{
+    template<typename Derived, typename Base>
+    static void bytesReceived(Base* base, nx::Buffer& buffer)
+    {
+        static_cast<Derived*>(base)->bytesReceived(buffer);
+    }
+
+    template<typename Derived, typename Base>
+    static void readyToSendData(Base* base, size_t count)
+    {
+        static_cast<Derived*>(base)->readyToSendData(count);
+    }
+};
+
 /**
  * Contains common logic for server-side connection created by StreamSocketServer.
  * CustomConnectionType MUST implement following methods:
@@ -88,8 +103,6 @@ public:
 
     /**
      * Start receiving data from connection
-     * @return false, if could not start asynchronous operation
-     * (this can happen due to lack of resources on host machine).
      */
     void startReadingConnection(
         boost::optional<std::chrono::milliseconds> inactivityTimeout = boost::none)
@@ -103,10 +116,17 @@ public:
                 if (!m_streamSocket->setNonBlockingMode(true))
                     return onBytesRead(SystemError::getLastOSErrorCode(), (size_t)-1);
 
+                m_receiving = true;
                 m_streamSocket->readSomeAsync(
                     &m_readBuffer,
                     std::bind(&SelfType::onBytesRead, this, _1, _2));
             });
+    }
+
+    void stopReading()
+    {
+        NX_ASSERT(isInSelfAioThread());
+        m_receiving = false;
     }
 
     /**
@@ -208,6 +228,7 @@ private:
 
     boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
     bool m_isSendingData;
+    bool m_receiving = false;
 
     virtual void stopWhileInAioThread() override
     {
@@ -227,8 +248,8 @@ private:
 
         {
             nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
-            static_cast<CustomConnectionType*>(this)->bytesReceived(m_readBuffer);
-            if (watcher.objectDestroyed())
+            BaseServerConnectionAccess::bytesReceived<CustomConnectionType>(this, m_readBuffer);
+            if (watcher.objectDestroyed() || !m_receiving)
                 return; //< Connection has been removed by handler.
         }
 
@@ -252,7 +273,7 @@ private:
         static_cast<void>(count);
         NX_ASSERT(count == m_bytesToSend);
 
-        static_cast<CustomConnectionType*>(this)->readyToSendData();
+        BaseServerConnectionAccess::readyToSendData<CustomConnectionType>(this, count);
     }
 
     void handleSocketError(SystemError::ErrorCode errorCode)
@@ -297,6 +318,48 @@ private:
     {
         m_streamSocket->cancelIOSync(nx::network::aio::etTimedOut);
     }
+};
+
+
+/**
+ * These two classes enable BaseServerConnection alternative usage without inheritance.
+ */
+class BaseServerConnectionHandler
+{
+public:
+    virtual void bytesReceived(nx::Buffer& buffer) = 0;
+    virtual void readyToSendData(size_t count) = 0;
+
+    virtual ~BaseServerConnectionHandler() {}
+};
+
+class BaseServerConnectionWrapper : 
+    public BaseServerConnection<BaseServerConnectionWrapper> 
+{
+    friend struct BaseServerConnectionAccess;
+public:
+    BaseServerConnectionWrapper(
+        StreamConnectionHolder<BaseServerConnectionWrapper>* connectionManager,
+        std::unique_ptr<AbstractStreamSocket> streamSocket,
+        BaseServerConnectionHandler* handler) 
+        : 
+        BaseServerConnection<BaseServerConnectionWrapper>(connectionManager, std::move(streamSocket)),
+        m_handler(handler) 
+    {}
+
+private:
+    void bytesReceived(nx::Buffer& buf)
+    {
+        m_handler->bytesReceived(buf);
+    }
+
+    void readyToSendData(size_t count)
+    {
+        m_handler->readyToSendData(count);
+    }
+
+private:
+    BaseServerConnectionHandler* m_handler;
 };
 
 } // namespace nx_api

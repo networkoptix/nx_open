@@ -87,7 +87,7 @@ public:
         }
     }
 
-    void readyToSendData()
+    void readyToSendData(int count)
     {
         // Using clear will clear the reserved buffer in QByteArray --dpeng
         m_writeBuffer.resize(0);
@@ -287,7 +287,7 @@ private:
         //serializing message
         m_serializer.setMessage( &msg );
         m_serializerState = SerializerState::needMoreBufferSpace;
-        readyToSendData();
+        readyToSendData(0);
     }
 
     void addNewTaskToQueue( std::shared_ptr<SendTask> newTask )

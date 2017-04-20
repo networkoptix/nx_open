@@ -4,6 +4,7 @@
 #include <string>
 
 #include <nx/network/abstract_socket.h>
+#include <nx/utils/move_only_func.h>
 
 namespace nx {
 namespace cloud {
@@ -16,12 +17,23 @@ struct RelayConnectionData
     std::string peerId;
 };
 
-class TrafficRelay
+class AbstractTrafficRelay
 {
 public:
-    void startRelaying(
+    virtual ~AbstractTrafficRelay() = default;
+
+    virtual void startRelaying(
         RelayConnectionData clientConnection,
-        RelayConnectionData serverConnection);
+        RelayConnectionData serverConnection) = 0;
+};
+
+class TrafficRelay:
+    public AbstractTrafficRelay
+{
+public:
+    virtual void startRelaying(
+        RelayConnectionData clientConnection,
+        RelayConnectionData serverConnection) override;
 
     void terminateAllConnectionsByPeerId(const std::string& peerId);
 };

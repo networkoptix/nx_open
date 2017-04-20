@@ -54,7 +54,7 @@ function(_rdep_try_package package)
     set(package_dir "${PACKAGES_DIR}/${package}")
 
     if(rdepSync)
-        rdep_sync_package(${package} RESULT_VARIABLE result)
+        nx_rdep_sync_package(${package} RESULT_VARIABLE result)
     else()
         set(result 0)
         message(STATUS "Looking for the existing package ${package}")
