@@ -10,8 +10,8 @@
 #include <core/resource_management/resource_pool.h>
 
 
-QnStatisticsRestHandler::QnStatisticsRestHandler(): QnJsonRestHandler() {
-    m_monitor = qnPlatform->monitor();
+QnStatisticsRestHandler::QnStatisticsRestHandler(): QnJsonRestHandler()
+{
 }
 
 QnStatisticsRestHandler::~QnStatisticsRestHandler() {
@@ -33,26 +33,27 @@ int QnStatisticsRestHandler::executeGet(
     }
 
     QnStatisticsReply reply;
-    reply.updatePeriod = m_monitor->updatePeriodMs();
-    reply.uptimeMs = m_monitor->upTimeMs();
+    auto monitor = qnPlatform->monitor();
+    reply.updatePeriod = monitor->updatePeriodMs();
+    reply.uptimeMs = monitor->upTimeMs();
 
     QnStatisticsDataList cpuInfo;
-    cpuInfo.append(QnStatisticsDataItem(lit("CPU"), m_monitor->totalCpuUsage(), Qn::StatisticsCPU));
+    cpuInfo.append(QnStatisticsDataItem(lit("CPU"), monitor->totalCpuUsage(), Qn::StatisticsCPU));
     //cpuInfo.append(QnStatisticsDataItem(lit("CPU-CORES"), QThread::idealThreadCount(), Qn::StatisticsCPU));
     reply.statistics << cpuInfo;
 
     QnStatisticsDataList memory;
-    memory.append(QnStatisticsDataItem(lit("RAM"), m_monitor->totalRamUsage(), Qn::StatisticsRAM));
+    memory.append(QnStatisticsDataItem(lit("RAM"), monitor->totalRamUsage(), Qn::StatisticsRAM));
     reply.statistics << memory;
 
     QnStatisticsDataList storages;
-    for(const QnPlatformMonitor::HddLoad &hddLoad: m_monitor->totalHddLoad()) {
+    for(const QnPlatformMonitor::HddLoad &hddLoad: monitor->totalHddLoad()) {
         storages.append(QnStatisticsDataItem(hddLoad.hdd.partitions, hddLoad.load, Qn::StatisticsHDD));
     }
     reply.statistics << storages;
 
     QnStatisticsDataList network;
-    for(const QnPlatformMonitor::NetworkLoad &networkLoad: m_monitor->totalNetworkLoad())
+    for(const QnPlatformMonitor::NetworkLoad &networkLoad: monitor->totalNetworkLoad())
     {
         qint64 bytesIn = networkLoad.bytesPerSecIn;
         qint64 bytesOut = networkLoad.bytesPerSecOut;

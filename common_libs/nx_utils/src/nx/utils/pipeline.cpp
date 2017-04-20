@@ -46,6 +46,57 @@ int ProxyPipeline::write(const void* data, size_t count)
 }
 
 //-------------------------------------------------------------------------------------------------
+// ProxyConverter
+
+ProxyConverter::ProxyConverter(Converter* delegatee):
+    m_delegatee(nullptr)
+{
+    setDelegatee(delegatee);
+}
+
+int ProxyConverter::read(void* data, size_t count)
+{
+    return m_delegatee->read(data, count);
+}
+
+int ProxyConverter::write(const void* data, size_t count)
+{
+    return m_delegatee->write(data, count);
+}
+
+void ProxyConverter::setInput(AbstractInput* input)
+{
+    base_type::setInput(input);
+    m_delegatee->setInput(input);
+}
+
+void ProxyConverter::setOutput(AbstractOutput* output)
+{
+    base_type::setOutput(output);
+    m_delegatee->setOutput(output);
+}
+
+bool ProxyConverter::eof() const
+{
+    return m_delegatee->eof();
+}
+
+bool ProxyConverter::failed() const
+{
+    return m_delegatee->failed();
+}
+
+void ProxyConverter::setDelegatee(Converter* delegatee)
+{
+    m_delegatee = delegatee;
+    if (m_delegatee)
+    {
+        m_delegatee->setInput(m_inputStream);
+        m_delegatee->setOutput(m_outputStream);
+    }
+}
+
+//-------------------------------------------------------------------------------------------------
 // ReflectingPipeline
 
 ReflectingPipeline::ReflectingPipeline(QByteArray initialData):

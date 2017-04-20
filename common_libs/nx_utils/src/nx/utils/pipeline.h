@@ -87,6 +87,32 @@ public:
 };
 
 //-------------------------------------------------------------------------------------------------
+// ProxyConverter
+
+class NX_UTILS_API ProxyConverter:
+    public Converter
+{
+    using base_type = Converter;
+
+public:
+    ProxyConverter(Converter* delegatee);
+
+    virtual int read(void* data, size_t count) override;
+    virtual int write(const void* data, size_t count) override;
+
+    virtual void setInput(AbstractInput*) override;
+    virtual void setOutput(AbstractOutput*) override;
+
+    virtual bool eof() const override;
+    virtual bool failed() const override;
+
+    void setDelegatee(Converter* delegatee);
+
+private:
+    Converter* m_delegatee;
+};
+
+//-------------------------------------------------------------------------------------------------
 // ReflectingPipeline
 
 class NX_UTILS_API ReflectingPipeline:
