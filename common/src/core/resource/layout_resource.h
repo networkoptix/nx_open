@@ -102,6 +102,15 @@ public:
     /** Check if layout is shared. */
     bool isShared() const;
 
+    /**
+     * Auto-generated service layout. Such layouts are used for:
+     * * videowalls (videowall as a parent)
+     * * videowall reviews (videowall as a parent)
+     * * lite client control (server as a parent)
+     * * layout tours review (tour id as a parent id)
+     */
+    bool isServiceLayout() const;
+
     /** Get all resources ids placed on the layout. */
     QSet<QnUuid> layoutResourceIds() const;
 
