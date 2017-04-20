@@ -52,7 +52,7 @@ InputIt move_if(InputIt first, InputIt last, OutputIt outFirst, UnaryPredicate p
 template<typename AssociativeContainer>
 std::size_t countByPrefix(
     const AssociativeContainer& associativeContainer,
-    typename const AssociativeContainer::key_type& prefix)
+    const typename AssociativeContainer::key_type& prefix)
 {
     std::size_t result = 0;
     for (auto it = associativeContainer.lower_bound(prefix);
@@ -70,7 +70,7 @@ std::size_t countByPrefix(
 template<typename AssociativeContainer>
 typename AssociativeContainer::iterator findAnyByPrefix(
     AssociativeContainer& associativeContainer,
-    typename const AssociativeContainer::key_type& prefix)
+    const typename AssociativeContainer::key_type& prefix)
 {
     auto it = associativeContainer.lower_bound(prefix);
     if (it == associativeContainer.end() || !boost::starts_with(it->first, prefix))
@@ -85,7 +85,7 @@ typename std::pair<
 >
     equalRangeByPrefix(
         AssociativeContainer& associativeContainer,
-        typename const AssociativeContainer::key_type& prefix)
+        const typename AssociativeContainer::key_type& prefix)
 {
     typename std::pair<
         typename AssociativeContainer::iterator,
