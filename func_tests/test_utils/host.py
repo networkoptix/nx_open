@@ -11,6 +11,7 @@ import threading
 import subprocess
 import errno
 import shutil
+from .utils import quote
 
 
 log = logging.getLogger(__name__)
@@ -255,13 +256,13 @@ class RemoteSshHost(Host):
 
     def put_file(self, from_local_path, to_remote_path):
         #assert not self._proxy_host, repr(self._proxy_host)  # Can not proxy this... Or can we?
-        cmd = ['rsync', '-aL', '-e', ' '.join(self._make_ssh_cmd()),
+        cmd = ['rsync', '-aL', '-e', ' '.join(self._make_ssh_cmd(must_quote=True)),
                from_local_path,
                '{user}@{host}:{path}'.format(user=self._user, host=self._host, path=to_remote_path)]
         self._local_host.run_command(cmd)
 
     def get_file(self, from_remote_path, to_local_path):
-        cmd = ['rsync', '-aL', '-e', subprocess.list2cmdline(self._make_ssh_cmd()),
+        cmd = ['rsync', '-aL', '-e', subprocess.list2cmdline(self._make_ssh_cmd(must_quote=True)),
                '{user}@{host}:{path}'.format(user=self._user, host=self._host, path=from_remote_path),
                to_local_path]
         self._local_host.run_command(cmd)
@@ -285,8 +286,8 @@ class RemoteSshHost(Host):
                 + ['{user}@{host}'.format(user=self._user, host=self._host),
                    'nc', '-q0', '%h', '%p'])
 
-    def _make_ssh_cmd(self):
-        return ['ssh'] + self._make_identity_args() + self._make_config_args() + self._make_proxy_args()
+    def _make_ssh_cmd(self, must_quote=False):
+        return ['ssh'] + self._make_identity_args() + self._make_config_args() + self._make_proxy_args(must_quote)
 
     def _make_identity_args(self):
         if self._key_file_path:
@@ -300,9 +301,12 @@ class RemoteSshHost(Host):
         else:
             return []
 
-    def _make_proxy_args(self):
+    def _make_proxy_args(self, must_quote):
         proxy_command = self._proxy_host.make_proxy_command()
         if proxy_command:
-            return ['-o', 'ProxyCommand=%s' % ' '.join(proxy_command)]
+            cmd = 'ProxyCommand=%s' % ' '.join(proxy_command)
+            if must_quote:
+                cmd = quote(cmd, "'")
+            return ['-o', cmd]
         else:
             return []

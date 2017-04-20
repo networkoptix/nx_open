@@ -174,11 +174,17 @@ void QnStreamMixer::putData(const QnAbstractDataPacketPtr &data)
 
 bool QnStreamMixer::needConfigureProvider() const
 {
-    QnMutexLocker lock(&m_mutex);
-    if (!m_user)
-        return false;
+    decltype(m_user) user;
 
-    return m_user->needConfigureProvider();
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (!m_user)
+            return false;
+
+        user = m_user;
+    }
+
+    return user->needConfigureProvider();
 }
 
 void QnStreamMixer::proxyOpenStream(
@@ -276,8 +282,14 @@ bool QnStreamMixer::isStreamOpened() const
 
 void QnStreamMixer::resetSources()
 {
-    QnMutexLocker lock(&m_mutex);
-    m_sourceMap.clear();
+    decltype(m_sourceMap) sourceMap;
+    {
+        QnMutexLocker lock(&m_mutex);
+        sourceMap.swap(m_sourceMap);
+    }
+
+    for (auto& source : sourceMap)
+        source.provider->removeDataProcessor(this);
 }
 
 void QnStreamMixer::handlePacket(QnAbstractMediaDataPtr& data)

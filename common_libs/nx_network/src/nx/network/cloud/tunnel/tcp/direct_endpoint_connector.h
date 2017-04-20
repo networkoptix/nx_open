@@ -1,8 +1,3 @@
-/**********************************************************
-* Jul 7, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <list>
@@ -17,11 +12,10 @@ namespace cloud {
 namespace tcp {
 
 /**
-    Currently, this class tests that tcp-connection can be established to reported endpoint.
-    No remote peer validation is performed!
-*/
-class NX_NETWORK_API DirectEndpointConnector
-    :
+ * Currently, this class tests that tcp-connection can be established to reported endpoint.
+ * No remote peer validation is performed!
+ */
+class NX_NETWORK_API DirectEndpointConnector:
     public AbstractTunnelConnector
 {
 public:
@@ -39,7 +33,9 @@ public:
         ConnectCompletionHandler handler) override;
     virtual const AddressEntry& targetPeerAddress() const override;
 
-    /** Disables verification for test purposes. */
+    /**
+     * Disables verification for test purposes.
+     */
     static void setVerificationRequirement(bool value);
 
 private:
@@ -54,6 +50,11 @@ private:
     ConnectCompletionHandler m_completionHandler;
     std::list<ConnectionContext> m_connections;
     static bool s_needVerification;
+
+    void performEndpointVerification(
+        const std::list<SocketAddress>& endpoints,
+        std::chrono::milliseconds timeout,
+        ConnectCompletionHandler handler);
 
     void onHttpRequestDone(
         nx_http::AsyncHttpClientPtr httpClient,

@@ -455,14 +455,13 @@ TEST(ServerArchiveDelegate_playback_test, Main)
     auto storageUrl_1 = *storageWorkDir1.getDirName();
     auto storageUrl_2 = *storageWorkDir2.getDirName();
 
+    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
     std::unique_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule());
     serverModule->commonModule()->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
 
     qnNormalStorageMan->stopAsyncTasks();
 
     qnBackupStorageMan->stopAsyncTasks();
-
-    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
 
     serverModule->roSettings()->remove(lit("NORMAL_SCAN_ARCHIVE_FROM"));
     serverModule->roSettings()->remove(lit("BACKUP_SCAN_ARCHIVE_FROM"));

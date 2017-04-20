@@ -1,7 +1,9 @@
+import time
 import logging
 import pytest
 from datetime import datetime
 from test_utils.server import TimePeriod
+from test_utils.server import MEDIASERVER_MERGE_TIMEOUT_SEC
 import pytz
 
 
@@ -43,6 +45,19 @@ def nat_env(env_builder, box, server, http_schema):
     return env_builder(http_schema, merge_servers=[behind, in_front], boxes=[router], in_front=in_front, behind=behind)
 
 
+def wait_for_servers_return_same_results_to_api_call(env, method, api_object, api_method):
+    log.info('TEST for %s %s.%s:', method, api_object, api_method)
+    start = time.time()
+    while True:
+        result_in_front = env.in_front.rest_api.get_api_fn(method, api_object, api_method)()
+        result_behind = env.behind.rest_api.get_api_fn(method, api_object, api_method)()
+        if result_in_front == result_behind:
+            return
+        if time.time() - start >= MEDIASERVER_MERGE_TIMEOUT_SEC:
+            assert result_in_front == result_behind
+        time.sleep(MEDIASERVER_MERGE_TIMEOUT_SEC / 10.0)
+
+
 def test_merged_servers_should_return_same_results_to_certain_api_calls(env):
     test_api_calls = [
         ('GET', 'ec2', 'getStorages'),
@@ -52,10 +67,7 @@ def test_merged_servers_should_return_same_results_to_certain_api_calls(env):
         ('GET', 'ec2', 'getUsers'),
         ]
     for method, api_object, api_method in test_api_calls:
-        log.info('TEST for %s %s.%s:', method, api_object, api_method)
-        result_in_front = env.in_front.rest_api.get_api_fn(method, api_object, api_method)()
-        result_behind = env.behind.rest_api.get_api_fn(method, api_object, api_method)()
-        assert result_in_front == result_behind
+        wait_for_servers_return_same_results_to_api_call(env, method, api_object, api_method)
 
 
 def assert_both_servers_are_online(env):

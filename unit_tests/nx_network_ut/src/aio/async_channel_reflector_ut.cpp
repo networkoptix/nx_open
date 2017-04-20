@@ -43,6 +43,16 @@ protected:
         thenSameDataHasBeenReflected();
     }
 
+    void emulateSendTimeoutOnUnderlyingChannel()
+    {
+        m_channelToReflect->setSendErrorState(SystemError::timedOut);
+    }
+
+    void emulateRecvTimeoutOnUnderlyingChannel()
+    {
+        m_channelToReflect->setReadErrorState(SystemError::timedOut);
+    }
+
     void whenSentSomeData()
     {
         prepareTestData();
@@ -54,6 +64,12 @@ protected:
         m_channelToReflect->setErrorState();
     }
 
+    void whenUnderlyingChannelIsFullyFunctionalAgain()
+    {
+        m_channelToReflect->setSendErrorState(boost::none);
+        m_channelToReflect->setReadErrorState(boost::none);
+    }
+
     void thenSameDataHasBeenReflected()
     {
         m_output.waitForReceivedDataToMatch(m_testData);
@@ -62,6 +78,16 @@ protected:
     void thenReflectorReportsError()
     {
         ASSERT_NE(SystemError::noError, m_reflectorDone.get_future().get());
+    }
+
+    void thenSendTimedoutHasBeenRaisedOnUnderlyingChannel()
+    {
+        m_channelToReflect->waitForAnotherSendErrorReported();
+    }
+
+    void thenRecvTimedoutHasBeenRaisedOnUnderlyingChannel()
+    {
+        m_channelToReflect->waitForAnotherReadErrorReported();
     }
 
 private:
@@ -95,6 +121,28 @@ TEST_F(AsyncChannelReflector, reports_underlying_channel_io_error)
     sendThroughSomeData();
     whenEmulateIoErrorOnInput();
     thenReflectorReportsError();
+}
+
+TEST_F(AsyncChannelReflector, properly_handles_send_timedout)
+{
+    emulateSendTimeoutOnUnderlyingChannel();
+
+    whenSentSomeData();
+    thenSendTimedoutHasBeenRaisedOnUnderlyingChannel();
+
+    whenUnderlyingChannelIsFullyFunctionalAgain();
+    thenSameDataHasBeenReflected();
+}
+
+TEST_F(AsyncChannelReflector, properly_handles_recv_timedout)
+{
+    emulateRecvTimeoutOnUnderlyingChannel();
+
+    whenSentSomeData();
+    thenRecvTimedoutHasBeenRaisedOnUnderlyingChannel();
+
+    whenUnderlyingChannelIsFullyFunctionalAgain();
+    thenSameDataHasBeenReflected();
 }
 
 } // namespace test
