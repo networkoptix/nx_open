@@ -7,6 +7,8 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/thread/sync_queue.h>
+#include <nx/utils/test_support/test_options.h>
+
 #include <transaction/transaction.h>
 
 #include <api/global_settings.h>
@@ -21,9 +23,9 @@ constexpr static const auto kMaxTimeToWaitForChangesToBePropagatedToCloud = std:
 Ec2MserverCloudSynchronization::Ec2MserverCloudSynchronization()
 {
     const auto tmpDir =
-        (CdbLauncher::temporaryDirectoryPath().isEmpty()
+        (nx::utils::TestOptions::temporaryDirectoryPath().isEmpty()
             ? QDir::homePath()
-            : CdbLauncher::temporaryDirectoryPath()) + "/ec2_cloud_sync_ut.data";
+            : nx::utils::TestOptions::temporaryDirectoryPath()) + "/ec2_cloud_sync_ut.data";
     QDir(tmpDir).removeRecursively();
 
     const QString dbFileArg = lit("--dbFile=%1").arg(tmpDir);
