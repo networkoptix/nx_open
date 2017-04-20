@@ -658,7 +658,7 @@ void QnLoginDialog::at_saveButton_clicked()
             QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, this);
 
         dialog.addCustomButton(QnMessageBoxCustomButton::Overwrite,
-            QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+            QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
         if (dialog.exec() == QDialogButtonBox::Cancel)
             return;
 
@@ -715,7 +715,7 @@ void QnLoginDialog::at_deleteButton_clicked()
         this);
 
     dialog.addCustomButton(QnMessageBoxCustomButton::Delete,
-        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+        QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 

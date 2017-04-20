@@ -926,10 +926,14 @@ enum IDType
     ToggleLayoutTourModeAction,
 
     NewLayoutTourAction,
-    LayoutTourSettingsAction,
     RenameLayoutTourAction,
-    OpenLayoutTourAction,
+    SaveLayoutTourAction,
+    ReviewLayoutTourAction,
     RemoveLayoutTourAction,
+
+    StartCurrentLayoutTourAction,
+    SaveCurrentLayoutTourAction,
+    RemoveCurrentLayoutTourAction,
 
     /* Timeline actions. */
 

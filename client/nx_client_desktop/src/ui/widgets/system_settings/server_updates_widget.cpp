@@ -458,7 +458,7 @@ void QnServerUpdatesWidget::discardChanges()
             this);
 
         const auto cancelUpdateButton = dialog.addButton(
-            tr("Cancel Update"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+            tr("Cancel Update"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
         dialog.addButton(
             tr("Continue in Background"), QDialogButtonBox::RejectRole);
 
@@ -807,7 +807,7 @@ void QnServerUpdatesWidget::at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning& l
         this);
 
     dialog.addCustomWidget(new QnResourceListView(failedServers, false, &dialog));
-    dialog.addButton(tr("Force Update"), QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+    dialog.addButton(tr("Force Update"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
 
     const auto result = dialog.exec();
     if (result == QDialogButtonBox::Cancel)

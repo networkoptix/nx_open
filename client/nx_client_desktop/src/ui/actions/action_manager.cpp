@@ -292,6 +292,12 @@ public:
         return *this;
     }
 
+    QnActionBuilder accent(Qn::ButtonAccent value)
+    {
+        m_action->setAccent(value);
+        return *this;
+    }
+
     QnActionBuilder condition(QnActionCondition *condition)
     {
         NX_ASSERT(m_action->condition() == NULL);
@@ -437,7 +443,20 @@ QnActionManager::QnActionManager(QObject *parent):
 
     using namespace QnResourceCriterionExpressions;
 
+    auto not = [this](QnActionCondition* condition) -> QnActionCondition*
+        {
+            return new QnNegativeActionCondition(condition, this);
+        };
 
+    auto and = [this](QList<QnActionCondition*> conditions) -> QnActionCondition*
+        {
+            return new QnConjunctionActionCondition(conditions, this);
+        };
+
+    auto or = [this](QList<QnActionCondition*> conditions) -> QnActionCondition*
+        {
+            return new QnDisjunctionActionCondition(conditions, this);
+        };
 
     /* Actions that are not assigned to any menu. */
 
@@ -1781,43 +1800,64 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::NoTarget).
         separator();
 
-    factory(QnActions::OpenLayoutTourAction).
-        flags(Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey).
+    factory(QnActions::ReviewLayoutTourAction).
+        flags(Qn::Tree | Qn::NoTarget).
         mode(QnActionTypes::DesktopMode).
-        text(tr("Open Layouts Tour")).
-        shortcut(lit("Alt+L")).
+        text(tr("Review Layout Tour")).
+        condition(new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this)).
         autoRepeat(false);
 
     factory(QnActions::ToggleLayoutTourModeAction).
         flags(Qn::Scene | Qn::Tree | Qn::NoTarget | Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).
         text(tr("Start Tour")).
-        toggledText(tr("Stop Tour")).
         shortcut(lit("Alt+T")).
+        checkable().
         autoRepeat(false).
-        icon(qnSkin->icon("slider/navigation/play.png")).
-        condition(new QnConjunctionActionCondition(
+        condition(and({
             new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this),
-            new QnVideoWallReviewModeCondition(true, this),
-     //       new QnToggleTourActionCondition(this), //TODO: #GDM #3.1 implement with review mode
-            this
-        ));
-
-    factory(QnActions::LayoutTourSettingsAction).
-        flags(Qn::Scene | Qn::Tree | Qn::NoTarget).
-        mode(QnActionTypes::DesktopMode).
-        text(tr("Layout Tour Settings...")).
-        requiredGlobalPermission(Qn::GlobalAdminPermission). //TODO: #GDM #3.1 #tbd
-        condition(new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this));
+            new QnToggleTourActionCondition(this)})
+        );
 
     factory(QnActions::RemoveLayoutTourAction).
-        flags(Qn::Scene | Qn::Tree | Qn::NoTarget | Qn::IntentionallyAmbiguous).
+        flags(Qn::Tree | Qn::NoTarget | Qn::IntentionallyAmbiguous).
         mode(QnActionTypes::DesktopMode).
         text(tr("Delete Layout Tour")).
         requiredGlobalPermission(Qn::GlobalAdminPermission). //TODO: #GDM #3.1 #tbd
         shortcut(lit("Del")).
         shortcut(Qt::Key_Backspace, QnActionBuilder::Mac, true).
         condition(new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this));
+
+    factory(QnActions::StartCurrentLayoutTourAction).
+        flags(Qn::Scene | Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
+        text(tr("Start Tour")).
+        accent(Qn::ButtonAccent::Standard).
+        icon(qnSkin->icon("buttons/play.png")).
+        condition(and({
+            new QnLayoutTourReviewModeCondition(this),
+            new QnStartCurrentLayoutTourActionCondition(this)
+        })).
+        autoRepeat(false);
+
+    factory(QnActions::SaveLayoutTourAction).
+        flags(Qn::NoTarget).
+        text(lit("Save layout tour (internal)")).
+        mode(QnActionTypes::DesktopMode);
+
+    factory(QnActions::SaveCurrentLayoutTourAction).
+        flags(Qn::Scene | Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
+        text(tr("Save Changes")).
+        condition(new QnLayoutTourReviewModeCondition(this)).
+        autoRepeat(false);
+
+    factory(QnActions::RemoveCurrentLayoutTourAction).
+        flags(Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
+        icon(qnSkin->icon("buttons/delete.png")).
+        condition(new QnLayoutTourReviewModeCondition(this)).
+        autoRepeat(false);
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).
@@ -2435,7 +2475,7 @@ void QnActionManager::redirectAction(QMenu *menu, QnActions::IDType sourceId, QA
 
 bool QnActionManager::isMenuVisible() const
 {
-    for (auto menu: m_parametersByMenu.keys())
+    for (auto menu : m_parametersByMenu.keys())
     {
         if (menu && menu->isVisible())
             return true;

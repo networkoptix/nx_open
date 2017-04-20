@@ -1,5 +1,4 @@
-#ifndef GRID_BACKGROUND_ITEM_H
-#define GRID_BACKGROUND_ITEM_H
+#pragma once
 
 #include <memory>
 
@@ -9,6 +8,7 @@
 #include <camera/gl_renderer.h>
 #include <core/resource/resource_fwd.h>
 
+#include <ui/customization/customized.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -26,12 +26,13 @@ class ServerImageCache;
 } // namespace nx
 
 
-class QnGridBackgroundItem: public QGraphicsObject, public QnWorkbenchContextAware
+class QnGridBackgroundItem: public Customized<QGraphicsObject>, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = QGraphicsObject;
+    using base_type = Customized<QGraphicsObject>;
 
     Q_PROPERTY(QRectF viewportRect READ viewportRect WRITE setViewportRect)
+    Q_PROPERTY(QColor panelColor READ panelColor WRITE setPanelColor)
 
 public:
     explicit QnGridBackgroundItem(
@@ -51,6 +52,9 @@ public:
     void update(const QnLayoutResourcePtr& layout);
 
     QRect sceneBoundingRect() const;
+
+    QColor panelColor() const;
+    void setPanelColor(const QColor& color);
 
 protected:
     virtual void paint(
@@ -77,7 +81,5 @@ private:
     QScopedPointer<DecodedPictureToOpenGLUploader> m_imgUploader;
     QScopedPointer<QnGLRenderer> m_renderer;
     QSharedPointer<CLVideoDecoderOutput> m_imgAsFrame;
+    QColor m_panelColor;
 };
-
-
-#endif // GRID_BACKGROUND_ITEM_H

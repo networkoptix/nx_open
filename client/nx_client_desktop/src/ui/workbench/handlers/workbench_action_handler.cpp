@@ -920,7 +920,7 @@ void ActionHandler::at_cameraListChecked(int status, const QnCameraListReply& re
             QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
             mainWindow());
 
-        messageBox.addButton(tr("Move"), QDialogButtonBox::YesRole, QnButtonAccent::Standard);
+        messageBox.addButton(tr("Move"), QDialogButtonBox::YesRole, Qn::ButtonAccent::Standard);
         const auto skipButton = messageBox.addCustomButton(QnMessageBoxCustomButton::Skip,
             QDialogButtonBox::NoRole);
         messageBox.addCustomWidget(new QnResourceListView(errorResources, &messageBox));
@@ -973,7 +973,15 @@ void ActionHandler::at_moveCameraAction_triggered() {
     }
 }
 
-void ActionHandler::at_dropResourcesAction_triggered() {
+void ActionHandler::at_dropResourcesAction_triggered()
+{
+    const bool isLayoutTourReviewMode = context()->workbench()->currentLayout()->data()
+        .contains(Qn::LayoutTourUuidRole);
+
+    // Layout Tour Handler will process this action itself
+    if (isLayoutTourReviewMode)
+        return;
+
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnResourceList resources = parameters.resources();
@@ -2026,7 +2034,7 @@ void ActionHandler::at_versionMismatchMessageAction_triggered()
     messageBox->setCheckBoxEnabled();
 
     const auto updateButton = messageBox->addButton(
-        tr("Update..."), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+        tr("Update..."), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
     messageBox->addButton(
         tr("Skip"), QDialogButtonBox::RejectRole);
 

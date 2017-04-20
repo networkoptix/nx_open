@@ -222,7 +222,7 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered()
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         mainWindow());
     dialog.addCustomButton(QnMessageBoxCustomButton::Delete,
-        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+        QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
 
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
@@ -243,7 +243,7 @@ void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         mainWindow());
     dialog.addCustomButton(QnMessageBoxCustomButton::Delete,
-        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+        QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
 
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;

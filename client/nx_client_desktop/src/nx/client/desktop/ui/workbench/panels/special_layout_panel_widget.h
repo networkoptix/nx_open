@@ -42,8 +42,8 @@ private:
     QScopedPointer<Ui::SpecialLayoutPanelWidget> ui;
     QnLayoutResourcePtr m_layoutResource;
 
-    using ButtonPtr = QSharedPointer<QAbstractButton>;
-    QList<ButtonPtr> m_actionButtons;
+    using ButtonPtr = QAbstractButton*;
+    QHash<QnActions::IDType, ButtonPtr> m_actionButtons;
 };
 
 } // namespace workbench
