@@ -234,6 +234,17 @@ protected:
         thenSessionHasBeenCreated();
     }
 
+    void givenMultipleClientSessions()
+    {
+        m_connectSessionIds.resize(3);
+        for (auto& sessionId: m_connectSessionIds)
+        {
+            sessionId = nx::utils::generateRandomName(11).toStdString();
+            issueCreateSession(sessionId);
+            thenSessionHasBeenCreated();
+        }
+    }
+
     void whenIssuedCreateSessionWithoutId()
     {
         issueCreateSession(std::string());
@@ -278,6 +289,11 @@ protected:
         whenRequestedConnectionToPeer();
     }
 
+    void whenListeningPeerDisconnects()
+    {
+        lastListeningPeerConnection()->setConnectionToClosedState();
+    }
+
     void thenSessionHasBeenCreated()
     {
         const auto result = m_createClientSessionResults.pop();
@@ -316,6 +332,30 @@ protected:
         ASSERT_EQ(api::ResultCode::notFound, m_connectResults.pop().code);
     }
 
+    void thenClientSessionsAreClosed()
+    {
+        for (const auto& sessionId: m_connectSessionIds)
+        {
+            for (;;)
+            {
+                api::ConnectToPeerRequest request;
+                request.sessionId = sessionId;
+                nx::utils::promise<api::ResultCode> completed;
+                connectSessionManager().connectToPeer(
+                    request,
+                    [&completed](api::ResultCode resultCode, nx_http::ConnectionEvents)
+                    {
+                        completed.set_value(resultCode);
+                    });
+                const auto resultCode = completed.get_future().get();
+                if (resultCode == api::ResultCode::ok)
+                    continue;
+                ASSERT_EQ(api::ResultCode::notFound, resultCode);
+                break;
+            }
+        }
+    }
+
 private:
     struct CreateClientSessionResult
     {
@@ -333,6 +373,7 @@ private:
     std::string m_expectedSessionId;
     std::string m_listeningPeerName;
     StreamSocketStub* m_lastClientConnection = nullptr;
+    std::vector<std::string> m_connectSessionIds;
 
     void registerListeningPeer()
     {
@@ -416,6 +457,15 @@ TEST_F(ConnectSessionManagerConnectingPeer, connect_with_unknown_session_id)
     thenConnectHasReportedNotFound();
 }
 
+TEST_F(
+    ConnectSessionManagerConnectingPeer,
+    all_client_sessions_are_closed_when_listening_peer_disappears)
+{
+    givenMultipleClientSessions();
+    whenListeningPeerDisconnects();
+    thenClientSessionsAreClosed();
+}
+
 //-------------------------------------------------------------------------------------------------
 
 class ConnectSessionManagerConnectingPeerConnectTo:
@@ -436,9 +486,6 @@ TEST_F(ConnectSessionManagerConnectingPeerConnectTo, connect_to_listening_peer)
     thenConnectRequestSucceeded();
     thenProxyingHasBeenStarted();
 }
-
-//TEST_F(ConnectSessionManagerConnectingPeer, connect_to_listening_peer_with_no_idle_connections)
-//TEST_F(ConnectSessionManagerConnectingPeer, all_client_sessions_are_closed_when_listening_peer_disappears)
 
 } // namespace test
 } // namespace controller
