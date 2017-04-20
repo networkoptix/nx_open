@@ -7,3 +7,4 @@ files:
       - /crowdin.yaml
       - /views/debug.html
       - /views/static/eula.html
+      - /views/static/landing.html

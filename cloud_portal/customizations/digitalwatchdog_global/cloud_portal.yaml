@@ -19,9 +19,9 @@ cloud_gateway:
     url: 'http://$VMS_GATEWAY_HOST:$VMS_GATEWAY_PORT'
 
 
-mail_from: 'service@networkoptix.com'
+mail_from: 'DW Spectrum Web Portal <dw-tech@dwcc.tv>'
 
-mail_prefix: '[DW Cloud]'
+mail_prefix: '[DW Spectrum Web Portal]'
 
 smtp:
     host: 'email-smtp.us-east-1.amazonaws.com'
@@ -44,13 +44,10 @@ languages:
     - es
     - ja
     - ko
-    - th
+    - tr
     - zh_CN
     - zh_TW
-    - vi_VN
     - hu
-    - he
-    - pt_PT 
 
 queue_name: '$INSTANCE_NAME'
 
