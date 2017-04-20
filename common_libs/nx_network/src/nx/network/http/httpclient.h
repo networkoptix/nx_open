@@ -86,6 +86,8 @@ public:
     void setAuthType(AsyncHttpClient::AuthType value);
     void setProxyVia(const SocketAddress& proxyEndpoint);
 
+    void setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody);
+
     const std::unique_ptr<AbstractStreamSocket>& socket();
     /** Returns socket in blocking mode */
     std::unique_ptr<AbstractStreamSocket> takeSocket();
@@ -110,6 +112,8 @@ private:
     std::size_t m_maxInternalBufferSize;
     boost::optional<SocketAddress> m_proxyEndpoint;
     boost::optional<AsyncHttpClient::AuthType> m_authType;
+
+    bool m_expectOnlyBody;
 
     void instanciateHttpClient();
     template<typename AsyncClientFunc>

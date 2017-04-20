@@ -81,7 +81,8 @@ AsyncHttpClient::AsyncHttpClient():
     m_requestSequence(0),
     m_forcedEof(false),
     m_precalculatedAuthorizationDisabled(false),
-    m_numberOfRedirectsTried(0)
+    m_numberOfRedirectsTried(0),
+    m_expectOnlyBody(false)
 {
     m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
 }
@@ -542,7 +543,7 @@ void AsyncHttpClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t byt
         return;
     }
 
-    m_state = sReceivingResponse;
+    m_state = m_expectOnlyBody ? sReadingMessageBody : sReceivingResponse;
     m_responseBuffer.resize(0);
     if (!m_socket->setRecvTimeout(m_responseReadTimeoutMs))
     {
@@ -739,6 +740,10 @@ size_t AsyncHttpClient::parseReceivedBytes(size_t bytesRead)
 
     // m_httpStreamReader is allowed to process not all bytes from m_responseBuffer.
     std::size_t bytesProcessed = 0;
+
+    if (m_expectOnlyBody)
+        m_httpStreamReader.setState(HttpStreamReader::ReadState::readingMessageBody);
+
     if (!m_httpStreamReader.parseBytes(m_responseBuffer, bytesRead, &bytesProcessed))
     {
         NX_LOGX(lm("Error parsing http response from %1. %2")
@@ -1370,6 +1375,11 @@ void AsyncHttpClient::forceEndOfMsgBody()
 {
     m_forcedEof = true;
     m_httpStreamReader.forceEndOfMsgBody();
+}
+
+void AsyncHttpClient::setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody)
+{
+    m_expectOnlyBody = expectOnlyBody;
 }
 
 //-------------------------------------------------------------------------------------------------
