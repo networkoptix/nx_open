@@ -106,7 +106,7 @@
   "cameraLinks":{
     "highStream":"Выс. кач-во",
     "lowStream":"Низ. кач-во",
-    "transcoding":"Транскодирование",
+    "transcoding":"Перекодирование",
     "unknown":"Неизвестный"
   },
   "advanced":{

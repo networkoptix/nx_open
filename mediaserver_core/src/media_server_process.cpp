@@ -174,6 +174,7 @@
 #include <rest/handlers/system_settings_handler.h>
 #include <rest/handlers/audio_transmission_rest_handler.h>
 #include <rest/handlers/start_lite_client_rest_handler.h>
+#include <rest/handlers/runtime_info_rest_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -509,11 +510,12 @@ static int freeGB(QString drive)
 }
 #endif
 
-static QStringList listRecordFolders()
+static QStringList listRecordFolders(bool includeNetwork = false)
 {
     QStringList folderPaths;
 
 #ifdef Q_OS_WIN
+    (void)includeNetwork;
     for (const WinDriveInfo& drive: getWinDrivesInfo())
     {
         if (!(drive.access | WinDriveInfo::Writable) || drive.type != DRIVE_FIXED)
@@ -525,9 +527,11 @@ static QStringList listRecordFolders()
 #endif
 
 #ifdef Q_OS_LINUX
-    QList<QnPlatformMonitor::PartitionSpace> partitions =
-        qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
-            QnPlatformMonitor::LocalDiskPartition);
+    QnPlatformMonitor::PartitionTypes searchFlags = QnPlatformMonitor::LocalDiskPartition;
+    if (includeNetwork)
+        searchFlags |= QnPlatformMonitor::NetworkPartition;
+
+    auto partitions = qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(searchFlags);
 
     //always adding storage in data dir
     const QString& dataDirStorage = QDir::cleanPath(getDataDirectory() + "/data");
@@ -694,8 +698,11 @@ QnStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
 
 void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProcessor)
 {
+    m_initStoragesAsyncPromise.reset(new nx::utils::promise<void>());
     QtConcurrent::run([messageProcessor, this]
     {
+        const auto setPromiseGuardFunc = makeScopedGuard([&]() { m_initStoragesAsyncPromise->set_value(); });
+
         //read server's storages
         ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
         ec2::ErrorCode rez;
@@ -731,7 +738,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
                     return result;
                 }(),
-                listRecordFolders());
+                listRecordFolders(true));
 
         storagesToRemove.append(unMountedStorages);
 
@@ -1762,7 +1769,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/setCameraParam", new QnCameraSettingsRestHandler());
     reg("api/manualCamera", new QnManualCameraAdditionRestHandler());
     reg("api/ptz", new QnPtzRestHandler());
-    reg("api/image", new QnImageRestHandler());
+    reg("api/image", new QnImageRestHandler()); //< deprecated
     reg("api/createEvent", new QnExternalBusinessEventRestHandler());
     reg("api/gettime", new QnTimeRestHandler());
     reg("api/getTimeZones", new QnGetTimeZonesRestHandler());
@@ -1831,13 +1838,16 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler(cloudManagerGroup));
 
     reg("favicon.ico", new QnFavIconRestHandler());
-    reg("api/dev-mode-key", new QnCrashServerHandler());
+    reg("api/dev-mode-key", new QnCrashServerHandler(), kAdmin);
 
     reg("api/startLiteClient", new QnStartLiteClientRestHandler());
 
     #ifdef _DEBUG
         reg("api/debugEvent", new QnDebugEventsRestHandler());
     #endif
+
+    reg("ec2/runtimeInfo", new QnRuntimeInfoRestHandler());
+
 }
 
 bool MediaServerProcess::initTcpListener(
@@ -2176,6 +2186,11 @@ void MediaServerProcess::run()
         nx_ms_conf::ALLOWED_SSL_VERSIONS, QString()).toString();
     if (!allowedSslVersions.isEmpty())
         nx::network::SslEngine::setAllowedServerVersions(allowedSslVersions.toUtf8());
+
+    const auto allowedSslCiphers = MSSettings::roSettings()->value(
+        nx_ms_conf::ALLOWED_SSL_CIPHERS, QString()).toString();
+    if (!allowedSslCiphers.isEmpty())
+        nx::network::SslEngine::setAllowedServerCiphers(allowedSslCiphers.toUtf8());
 
     nx::network::SslEngine::useOrCreateCertificate(
         MSSettings::roSettings()->value(
@@ -2867,6 +2882,8 @@ void MediaServerProcess::run()
     stopObjects();
 
     QnResource::stopCommandProc();
+    if (m_initStoragesAsyncPromise)
+        m_initStoragesAsyncPromise->get_future().wait();
     // todo: #rvasilenko some undeleted resources left in the QnMain event loop. I stopped TimerManager as temporary solution for it.
     nx::utils::TimerManager::instance()->stop();
 

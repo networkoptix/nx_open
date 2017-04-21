@@ -155,7 +155,7 @@ bool OnvifResourceInformationFetcher::needIgnoreCamera(
     if (forceOnvif)
         return false;
 
-    auto normilizedModel = QString(model).replace(manufacturer, QString());
+    auto normilizedModel = QString(model).replace(manufacturer, QString()).trimmed();
     if (NameHelper::instance().isManufacturerSupported(manufacturer) &&
         NameHelper::instance().isSupported(normilizedModel))
     {
@@ -166,7 +166,7 @@ bool OnvifResourceInformationFetcher::needIgnoreCamera(
             cl_logDEBUG1);
         return true;
     }
-    if (ignoreCamera(manufacturer, model))
+    if (ignoreCamera(manufacturer, normilizedModel))
     {
         NX_LOG(lit("Discovery----:  ignore ONVIF camera %1 (%2-%3) because it is in the special blocking list").
             arg(host).

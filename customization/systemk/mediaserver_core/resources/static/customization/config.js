@@ -24,7 +24,7 @@ Config.helpLinks.push({
 });
 
 Config.allowDebugMode = false;
-Config.productName = 'Nx Witness';
-Config.cloud.productName = 'Nx Cloud';
+Config.productName = 'SK_VMS';
+Config.cloud.productName = 'SK Cloud';
 
-Config.supportedLanguages = ['en_US', 'ja'];
+Config.supportedLanguages = ['ja'];

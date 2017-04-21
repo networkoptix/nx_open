@@ -686,11 +686,6 @@
     </message>
     <message>
         <location/>
-        <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
-        <translation>&quot;อนุญาตให้ระบบที่จะเพิ่มประสิทธิภาพการตั้งค่ากล้อง&quot; ถูกปิดใช้งานในระบบการบริหาร.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
         <translation>คำเตือน! สิ่งนี้จะทำให้คุณภาพและอัตราเฟรม (FPS) การตั้งค่าในตารางเวลาการบันทึกที่ไม่เกี่ยวข้อง.</translation>
     </message>
@@ -703,11 +698,6 @@
         <location/>
         <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
         <translation>คำเตือน! การเลือกคุณภาพที่สูงอาจส่งผลกระทบ CPU ของคุณและประสิทธิภาพการทำงานของเครือข่ายและอาจก่อให้เกิดปัญหาอื่น ๆ.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-        <translation>คำเตือน! อย่าเปลี่ยนการตั้งค่าเหล่านี้นอกจากคุณจะแน่ใจจริงๆ กับของผลกระทบที่อาจเกิดกับประสิทธิภาพของระบบ.</translation>
     </message>
     <message>
         <location/>
@@ -727,6 +717,16 @@
     <message>
         <location/>
         <source>Keep camera streams and profiles settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -894,7 +894,7 @@
     </message>
     <message>
         <location/>
-        <source>Incorrect Email or password</source>
+        <source>Incorrect Email or Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1179,7 +1179,7 @@
     </message>
     <message>
         <location/>
-        <source>Run application when PC Boots up</source>
+        <source>Run Application when PC Boots up</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1357,16 +1357,6 @@
     </message>
     <message>
         <location/>
-        <source>Select users to import</source>
-        <translation>เลือก ผู้ใช้ ที่จะนำเข้า</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Filter...</source>
-        <translation>ตัวกรอง ...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Loading...</source>
         <translation>กำลังโหลด ...</translation>
     </message>
@@ -1374,6 +1364,16 @@
         <location/>
         <source>Connection error</source>
         <translation>การเชื่อมต่อผิดพลาด</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Role to assign to imported users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disable imported users</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1898,7 +1898,7 @@
     </message>
     <message>
         <location/>
-        <source>Incorrect Email or password</source>
+        <source>Incorrect Email or Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1929,11 +1929,6 @@
     </message>
     <message>
         <location/>
-        <source>The new system will have password and name from the system:</source>
-        <translation>ระบบใหม่จะมีรหัสผ่านและชื่อจากระบบ:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Check</source>
         <translation>ตรวจสอบ</translation>
     </message>
@@ -1945,6 +1940,11 @@
     <message>
         <location/>
         <source>Login:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>The new System will have password and name from System:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1998,13 +1998,13 @@
     </message>
     <message>
         <location/>
-        <source>Removing this connection option could lead to system malfunction.</source>
-        <translation>การถอดตัวเลือกการเชื่อมต่อนี้จะนำไปสู่ความผิดปกติของระบบ.</translation>
+        <source>Add</source>
+        <translation type="unfinished">เพิ่ม</translation>
     </message>
     <message>
         <location/>
-        <source>Add</source>
-        <translation type="unfinished">เพิ่ม</translation>
+        <source>Removing this connection option could lead to System malfunction.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2026,11 +2026,6 @@
     </message>
     <message>
         <location/>
-        <source>Applying system updates at the end of the week is not recommended.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Updating to...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2042,6 +2037,11 @@
     <message>
         <location/>
         <source>You have the latest version installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Applying System updates at the end of the week is not recommended.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2077,13 +2077,13 @@
     </message>
     <message>
         <location/>
-        <source>Warning: file with same name already exists!</source>
-        <translation>คำเตือน: ไฟล์ที่มีชื่อเดียวกันอยู่แล้ว!</translation>
+        <source>Options</source>
+        <translation>ตัวเลือก</translation>
     </message>
     <message>
         <location/>
-        <source>Options</source>
-        <translation>ตัวเลือก</translation>
+        <source>Warning: file with the same name already exists!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2782,7 +2782,7 @@
     <message>
         <location/>
         <source>System time is synchronized with the Internet and is independent from server local time.
-Selected server will be used as a time server if the system has no Internet access.</source>
+Selected server will be used as a time server if System has no Internet access.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

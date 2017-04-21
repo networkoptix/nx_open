@@ -14,6 +14,9 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
+/* On some Linux systems "major" and "minor" are pre-defined macros in sys/types.h */
+#undef major
+#undef minor
 
 class QnSoftwareVersion:
     public boost::equality_comparable1<

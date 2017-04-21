@@ -67,6 +67,10 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
 {
     ui->setupUi(this);
 
+    setWindowFlags(windowFlags()
+        | Qt::WindowMaximizeButtonHint
+        | Qt::MaximizeUsingFullscreenGeometryHint);
+
     setWarningStyle(ui->warningLabel);
 
     setHelpTopic(this, Qn::MainWindow_Notifications_EventLog_Help);

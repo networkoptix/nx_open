@@ -12,6 +12,7 @@
 
 #include <utils/image_provider.h>
 #include <utils/color_space/image_correction.h>
+#include <utils/common/connective.h>
 
 class QPainter;
 class QnProgressDialog;
@@ -66,8 +67,13 @@ private:
 /**
  * @brief The QnWorkbenchScreenshotHandler class            Handler for the screenshots related actions.
  */
-class QnWorkbenchScreenshotHandler: public QObject, public QnWorkbenchContextAware {
+class QnWorkbenchScreenshotHandler:
+    public Connective<QObject>,
+    public QnWorkbenchContextAware
+{
     Q_OBJECT
+    using base_type = Connective<QObject>;
+
 public:
     QnWorkbenchScreenshotHandler(QObject *parent = NULL);
 

@@ -160,30 +160,27 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
         if (!rpResource)
         {
-            if (newCamRes && newCamRes->needCheckIpConflicts())
-            {
-                // do not count 2--N channels of multichannel cameras as conflict
-                quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
-                if (ips)
-                    ipsList[ips].insert(newNetRes);
-            }
-
             ++it; // keep new resource in a list
             continue;
         }
 
+		if (rpResource->hasFlags(Qn::foreigner))
+		{
+			if (!canTakeForeignCamera(rpResource.dynamicCast<QnSecurityCamResource>(), extraResources.size()))
+			{
+				it = resources.erase(it); // do not touch foreign resource
+				continue;
+			}
+		}
+
+		if (newCamRes && newCamRes->needCheckIpConflicts())
+		{
+			quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
+			if (ips)
+				ipsList[ips].insert(newNetRes);
+		}
+
         QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
-
-        // if such res in ResourcePool
-
-        if (rpResource->hasFlags(Qn::foreigner))
-        {
-            if (!canTakeForeignCamera(rpResource.dynamicCast<QnSecurityCamResource>(), extraResources.size()))
-            {
-                it = resources.erase(it); // do not touch foreign resource
-                continue;
-            }
-        }
 
         const bool isForeign = rpResource->hasFlags(Qn::foreigner);
         QnVirtualCameraResourcePtr existCamRes = rpNetRes.dynamicCast<QnVirtualCameraResource>();
@@ -249,10 +246,14 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             QStringList conflicts;
             for(const QnNetworkResourcePtr& camRes: itr.value())
             {
-                conflicts << camRes->getPhysicalId();
-                QnVirtualCameraResource* cam = dynamic_cast<QnVirtualCameraResource*>(camRes.data());
-                if (cam)
-                    cam->issueOccured();
+                // Human-readable value to help user identify a camera.
+                QString cameraId = camRes->getMAC().toString();
+                if (cameraId.isEmpty())
+                    cameraId = camRes->getId().toString();
+
+                conflicts << cameraId;
+                if (auto camera = camRes.dynamicCast<QnVirtualCameraResource>())
+                    camera->issueOccured();
             }
             emit CameraIPConflict(hostAddr, conflicts);
         }

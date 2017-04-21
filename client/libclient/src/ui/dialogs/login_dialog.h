@@ -80,6 +80,13 @@ private:
 
     QModelIndex getModelIndexForName(const QString& name);
 
+    static QString defaultLastUsedConnectionName();
+
+    /**
+     * @brief Returns name of last used connection for versions less than 3.0
+     */
+    static QString deprecatedLastUsedConnectionName();
+
 private:
     QScopedPointer<Ui::LoginDialog> ui;
     QStandardItemModel *m_connectionsModel;

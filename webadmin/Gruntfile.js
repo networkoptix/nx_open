@@ -501,11 +501,11 @@ module.exports = function (grunt) {
                 command: 'cd ~/networkoptix/develop/' + package_dir + '; python ~/networkoptix/develop/netoptix_vms/build_utils/python/rdep.py -u -t=any;'
             },
             merge: {
-                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r prod_3.0.0;python ../../devtools/util/merge_dev.py -t prod_3.0.0;hg push;'
+                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r vms_3.1;python ../../devtools/util/merge_dev.py -t vms_3.1;hg push;'
             },
 
             pull: {
-                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r prod_3.0.0;'
+                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r vms_3.1;'
             },
             merge_release: {
                 command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r release_3.0;python ../../devtools/util/merge_dev.py -t release_3.0;hg push;'
@@ -807,7 +807,7 @@ module.exports = function (grunt) {
         'usemin',
         'htmlmin',
         'shell:version',
-        'shell:generate_translation',
+        //'shell:generate_translation',
         'shell:localize'
     ]);
 

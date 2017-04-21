@@ -270,27 +270,27 @@ to view more bookmarks</source>
     <name>PtzOverlayWidget</name>
     <message>
         <source>Zoom In</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Zoom Out</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Focus Far</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Focus Near</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Auto Focus</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Change Dewarping Mode</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6352,6 +6352,71 @@ to %1</source>
     </message>
     <message>
         <source>No thumbnails available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>hh:mm</source>
+        <comment>Format for displaying hours and minutes on timeline.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>hh:mm ap</source>
+        <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>h ap</source>
+        <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd</source>
+        <comment>Format for displaying days on timeline.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MMMM</source>
+        <comment>Format for displaying months on timeline.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>yyyy</source>
+        <comment>Format for displaying years on timeline</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy hh:mm</source>
+        <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy hh:mm ap</source>
+        <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy hh:mm</source>
+        <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy h ap</source>
+        <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy</source>
+        <comment>Format for displaying day caption in timeline&apos;s header.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MMMM yyyy</source>
+        <comment>Format for displaying month caption in timeline&apos;s header.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>yyyy</source>
+        <comment>Format for displaying year caption in timeline&apos;s header</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

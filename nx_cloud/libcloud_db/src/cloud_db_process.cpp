@@ -162,14 +162,14 @@ int CloudDBProcess::exec()
 
         TemporaryAccountPasswordManager tempPasswordManager(
             settings,
-            dbInstanceController.queryExecutor().get());
+            &dbInstanceController.queryExecutor());
         m_tempPasswordManager = &tempPasswordManager;
 
         AccountManager accountManager(
             settings,
             streeManager,
             &tempPasswordManager,
-            dbInstanceController.queryExecutor().get(),
+            &dbInstanceController.queryExecutor(),
             emailManager.get());
         m_accountManager = &accountManager;
 
@@ -179,18 +179,18 @@ int CloudDBProcess::exec()
         ec2::SyncronizationEngine ec2SyncronizationEngine(
             kCdbGuid,
             settings.p2pDb(),
-            dbInstanceController.queryExecutor().get());
+            &dbInstanceController.queryExecutor());
 
         SystemHealthInfoProvider systemHealthInfoProvider(
             &ec2SyncronizationEngine.connectionManager(),
-            dbInstanceController.queryExecutor().get());
+            &dbInstanceController.queryExecutor());
 
         SystemManager systemManager(
             settings,
             &timerManager,
             &accountManager,
             systemHealthInfoProvider,
-            dbInstanceController.queryExecutor().get(),
+            &dbInstanceController.queryExecutor(),
             emailManager.get(),
             &ec2SyncronizationEngine);
         m_systemManager = &systemManager;
@@ -230,7 +230,8 @@ int CloudDBProcess::exec()
 
         MaintenanceManager maintenanceManager(
             kCdbGuid,
-            &ec2SyncronizationEngine);
+            &ec2SyncronizationEngine,
+            dbInstanceController);
 
         CloudModuleUrlProvider cloudModuleUrlProvider(
             settings.moduleFinder().cloudModulesXmlTemplatePath);
@@ -274,16 +275,16 @@ int CloudDBProcess::exec()
         // process privilege reduction
         CurrentProcess::changeUser(settings.changeUser());
 
-        if (!multiAddressHttpServer.listen())
+        if (!multiAddressHttpServer.listen(settings.http().tcpBacklogSize))
             return 5;
         m_httpEndpoints = multiAddressHttpServer.endpoints();
+        NX_LOGX(lm("Listening on %1").container(m_httpEndpoints), cl_logINFO);
 
         if (m_terminated)
             return 0;
 
-        NX_LOG(lit("%1 has been started")
-                .arg(QnLibCloudDbAppInfo::applicationDisplayName()),
-               cl_logALWAYS);
+        NX_LOG(lm("%1 has been started")
+            .arg(QnLibCloudDbAppInfo::applicationDisplayName()), cl_logALWAYS);
 
         processStartResult = true;
         triggerOnStartedEventHandlerGuard.fire();
@@ -291,9 +292,13 @@ int CloudDBProcess::exec()
         // This is actually the main loop.
         m_processTerminationEvent.get_future().wait();
 
+        NX_LOGX(lm("Stopping..."), cl_logALWAYS);
+
         // First of all, cancelling accepting new requests.
         multiAddressHttpServer.forEachListener(
             [](nx_http::HttpStreamSocketServer* listener) { listener->pleaseStopSync(); });
+
+        NX_LOGX(lm("Http server stopped"), cl_logDEBUG1);
 
         ec2SyncronizationEngine.unsubscribeFromSystemDeletedNotification(
             systemManager.systemMarkedAsDeletedSubscription());

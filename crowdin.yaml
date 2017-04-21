@@ -1,0 +1,18 @@
+project_identifier: nx-witness
+api_key: 42f3cd326fea96b19ad3bf2eb9009b45
+base_path: .
+
+files:
+  -
+    source: '/common/translations/common_en_US.ts'
+    translation: '/common/translations/common_%two_letters_code%.ts'
+    languages_mapping:
+      two_letters_code:
+        # crowdin_language_code: local_name
+        zh-CN: zh_CN
+        zh-TW: zh_TW
+        vi: vi_VN
+        en-GB: en_GB
+        nl: nl_BE
+        pt-PT: pt_PT
+        pt-BR: pt_BR

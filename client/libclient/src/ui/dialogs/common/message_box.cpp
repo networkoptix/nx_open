@@ -12,6 +12,12 @@
 
 #include <ui/workaround/cancel_drag.h>
 
+namespace {
+
+static constexpr int kMinimumWidth = 400;
+
+} // namespace
+
 class QnMessageBoxPrivate : public QObject
 {
     QnMessageBox* q_ptr;
@@ -177,8 +183,8 @@ int QnMessageBoxPrivate::execReturnCode(QAbstractButton* button) const
     return ret;
 }
 
-QnMessageBox::QnMessageBox(QWidget* parent, Qt::WindowFlags flags):
-    base_type(parent, flags),
+QnMessageBox::QnMessageBox(QWidget* parent):
+    base_type(parent, Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint),
     ui(new Ui::MessageBox),
     d_ptr(new QnMessageBoxPrivate(this))
 {
@@ -194,12 +200,8 @@ QnMessageBox::QnMessageBox(
     QDialogButtonBox::StandardButton defaultButton,
     QWidget* parent)
     :
-    base_type(parent, Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint),
-    ui(new Ui::MessageBox),
-    d_ptr(new QnMessageBoxPrivate(this))
+    QnMessageBox(parent)
 {
-    initialize();
-
     if (!text.isEmpty())
         setText(text);
     setStandardButtons(buttons);
@@ -754,13 +756,11 @@ void QnMessageBox::showEvent(QShowEvent* event)
 
 void QnMessageBox::afterLayout()
 {
+    auto size = sizeHint();
+
+    size.setWidth(std::max({ kMinimumWidth, size.width(), minimumSizeHint().width() }));
     if (hasHeightForWidth())
-    {
-        setFixedHeight(heightForWidth(width()));
-    }
-    else
-    {
-        /* This dialog must have height-for-width, but just in case handle otherwise: */
-        setFixedHeight(sizeHint().height());
-    }
+        size.setHeight(heightForWidth(size.width()));
+
+    setFixedSize(size);
 }

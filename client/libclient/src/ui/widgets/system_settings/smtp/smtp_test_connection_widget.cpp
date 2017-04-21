@@ -8,6 +8,7 @@
 #include <core/resource/media_server_resource.h>
 
 #include <utils/email/email.h>
+#include <common/common_module.h>
 
 namespace {
     const int testSmtpTimeoutMSec = 20 * 1000;
@@ -102,6 +103,13 @@ bool QnSmtpTestConnectionWidget::testSettings(const QnEmailSettings &value)
 
     if (!serverConnection)
     {
+        if (auto server = qnCommon->currentServer())
+            serverConnection = server->apiConnection();
+    }
+
+    if (!serverConnection)
+    {
+        // todo: invalid error message. It could be a local email server.
         QnMessageBox::warning(this,
             tr("No Servers connected to Internet"), tr("Cannot perform the test."));
         return false;

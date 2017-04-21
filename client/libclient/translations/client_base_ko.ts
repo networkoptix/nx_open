@@ -267,33 +267,6 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-        <source>Zoom In</source>
-        <translation>줌 인</translation>
-    </message>
-    <message>
-        <source>Zoom Out</source>
-        <translation>줌 아웃</translation>
-    </message>
-    <message>
-        <source>Focus Far</source>
-        <translation>원거리 초첨</translation>
-    </message>
-    <message>
-        <source>Focus Near</source>
-        <translation>근거리 초점</translation>
-    </message>
-    <message>
-        <source>Auto Focus</source>
-        <translation>자동 초점</translation>
-    </message>
-    <message>
-        <source>Change Dewarping Mode</source>
-        <translation>디와핑 모드 변경</translation>
-    </message>
-</context>
-<context>
     <name>QObject</name>
     <message>
         <source>Parameter 1 is null.</source>
@@ -1072,7 +1045,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Failover Priority...</source>
-        <translation>failover우선순위...</translation>
+        <translation>Failover우선순위...</translation>
     </message>
     <message>
         <source>Move Devices</source>
@@ -1749,13 +1722,13 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>%1 of %n devices</source>
         <translation>
-            <numerusform>%n 개중  %1 장치</numerusform>
+            <numerusform>%n 개중 %1 장치</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%1 of %n cameras</source>
         <translation>
-            <numerusform>%n 개중  %1 카메라</numerusform>
+            <numerusform>%n 개중 %1 카메라</numerusform>
         </translation>
     </message>
     <message>
@@ -1912,15 +1885,15 @@ to view more bookmarks</source>
     <name>QnBusinessRulesDialog</name>
     <message>
         <source>&amp;New...</source>
-        <translation>신규(&amp;N)...</translation>
+        <translation>신규...</translation>
     </message>
     <message>
         <source>&amp;Delete</source>
-        <translation>삭제(&amp;D)</translation>
+        <translation>삭제</translation>
     </message>
     <message>
         <source>&amp;Schedule...</source>
-        <translation>일정(&amp;S)...</translation>
+        <translation>일정...</translation>
     </message>
     <message>
         <source>Restore All Rules to Default</source>
@@ -2285,7 +2258,7 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>%1 have no input ports</source>
         <translation>
-            <numerusform>%1 입력 포트가 없음%%n</numerusform>
+            <numerusform>%1 입력 포트가 없음%n</numerusform>
         </translation>
     </message>
 </context>
@@ -2419,7 +2392,7 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>Recording or motion detection is disabled for %1</source>
         <translation>
-            <numerusform>%1의 녹화와 움직임 검출이 비활성화됩니다.%n</numerusform>
+            <numerusform>%1의 녹화와 움직임 검출이 비활성화됩니다.</numerusform>
         </translation>
     </message>
 </context>
@@ -2435,7 +2408,7 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>%1 have no output relays</source>
         <translation>
-            <numerusform>%1의 출력 알람이 없음.%n</numerusform>
+            <numerusform>%1의 출력 알람이 없음.</numerusform>
         </translation>
     </message>
 </context>
@@ -2444,7 +2417,7 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>Recording is disabled for %1</source>
         <translation>
-            <numerusform>%1의 저장이 비활성화 됩니다.%n</numerusform>
+            <numerusform>%1의 저장이 비활성화 됩니다.</numerusform>
         </translation>
     </message>
 </context>
@@ -2635,7 +2608,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Invalid current password.</source>
-        <translation> 현재 비밀번호는 유효하지 않습니다.</translation>
+        <translation>현재 비밀번호는 유효하지 않습니다.</translation>
     </message>
 </context>
 <context>
@@ -3806,7 +3779,7 @@ to %1</source>
     </message>
     <message>
         <source>Server not found</source>
-        <translation>&lt;서버를 찾을 수 없음&gt;</translation>
+        <translation>서버를 찾을 수 없음</translation>
     </message>
     <message>
         <source>Expires</source>
@@ -4006,25 +3979,25 @@ to %1</source>
     <message numerus="yes">
         <source>Use analog licenses to view these %n cameras</source>
         <translation>
-            <numerusform>%n 개의 카메라에  아날로그 라이센스 사용</numerusform>
+            <numerusform>%n 개의 카메라에 아날로그 라이센스 사용</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Use licenses for selected %n devices</source>
         <translation>
-            <numerusform>%n 개의 장치에  라이센스 사용</numerusform>
+            <numerusform>%n 개의 장치에 라이센스 사용</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Use licenses for selected %n cameras</source>
         <translation>
-            <numerusform>%n 개의 카메라에  라이센스 사용</numerusform>
+            <numerusform>%n 개의 카메라에 라이센스 사용</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Use licenses for selected %n I/O modules</source>
         <translation>
-            <numerusform>%n 개의 I/O모듈  라이센스 사용</numerusform>
+            <numerusform>%n 개의 I/O모듈 라이센스 사용</numerusform>
         </translation>
     </message>
 </context>
@@ -4483,7 +4456,7 @@ to %1</source>
     <name>QnNotificationsCollectionWidget</name>
     <message>
         <source>Alarm: %1</source>
-        <translation>알람 : %1</translation>
+        <translation>알람: %1</translation>
     </message>
 </context>
 <context>
@@ -6036,7 +6009,7 @@ to %1</source>
     <name>QnStorageUrlDialog</name>
     <message>
         <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-        <translation>\\&lt;Computer 이름 &gt; \ &lt; 폴더 &gt;</translation>
+        <translation>\\&lt;Computer Name&gt;\&lt;Folder&gt;</translation>
     </message>
     <message>
         <source>Network Shared Resource</source>
@@ -6122,11 +6095,11 @@ to %1</source>
     </message>
     <message>
         <source>System is in safe mode</source>
-        <translation>시스템  안전모드 상태 입니다</translation>
+        <translation>시스템 안전모드 상태 입니다</translation>
     </message>
     <message>
         <source>Storage is full</source>
-        <translation>저장장치  공간이 다 찼습니다.</translation>
+        <translation>저장장치 공간이 다 찼습니다.</translation>
     </message>
     <message>
         <source>Storage is not configured</source>
@@ -6295,6 +6268,71 @@ to %1</source>
     <message>
         <source>No thumbnails available</source>
         <translation>썸내일 서피 사용불가</translation>
+    </message>
+    <message>
+        <source>hh:mm</source>
+        <comment>Format for displaying hours and minutes on timeline.</comment>
+        <translation type="unfinished">hh:mm</translation>
+    </message>
+    <message>
+        <source>hh:mm ap</source>
+        <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
+        <translation type="unfinished">hh:mm ap</translation>
+    </message>
+    <message>
+        <source>h ap</source>
+        <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
+        <translation type="unfinished">h ap</translation>
+    </message>
+    <message>
+        <source>dd</source>
+        <comment>Format for displaying days on timeline.</comment>
+        <translation type="unfinished">dd</translation>
+    </message>
+    <message>
+        <source>MMMM</source>
+        <comment>Format for displaying months on timeline.</comment>
+        <translation type="unfinished">MMMM</translation>
+    </message>
+    <message>
+        <source>yyyy</source>
+        <comment>Format for displaying years on timeline</comment>
+        <translation type="unfinished">yyyy</translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy hh:mm</source>
+        <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy hh:mm ap</source>
+        <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <translation type="unfinished">dd MMMM yyyy hh:mm ap</translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy hh:mm</source>
+        <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy h ap</source>
+        <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <translation type="unfinished">dd MMMM yyyy h ap</translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy</source>
+        <comment>Format for displaying day caption in timeline&apos;s header.</comment>
+        <translation type="unfinished">dd MMMM yyyy</translation>
+    </message>
+    <message>
+        <source>MMMM yyyy</source>
+        <comment>Format for displaying month caption in timeline&apos;s header.</comment>
+        <translation type="unfinished">MMMM yyyy</translation>
+    </message>
+    <message>
+        <source>yyyy</source>
+        <comment>Format for displaying year caption in timeline&apos;s header</comment>
+        <translation type="unfinished">yyyy</translation>
     </message>
 </context>
 <context>
@@ -6775,7 +6813,7 @@ to %1</source>
     </message>
     <message>
         <source>Enter new name for the selected item:</source>
-        <translation>선택된 항목에 대한 새 이름 설정: </translation>
+        <translation>선택된 항목에 대한 새 이름 설정:</translation>
     </message>
     <message>
         <source>Update...</source>
@@ -7020,7 +7058,7 @@ to %1</source>
     </message>
     <message>
         <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-        <translation>검색조건 적용:방향 변경, De-Warping,이미지 수정, 사용자 화면 비율지정(Transcoding 요구됨)</translation>
+        <translation>검색조건 적용: 방향 변경, De-Warping, 이미지 수정, 사용자 화면 비율지정(Transcoding 요구됨)</translation>
     </message>
     <message>
         <source>exported</source>
@@ -7262,7 +7300,7 @@ to %1</source>
     <name>QnWorkbenchSafeModeWatcher</name>
     <message>
         <source>System is in safe mode</source>
-        <translation>시스템  안전모드 상태 입니다</translation>
+        <translation>시스템 안전모드 상태 입니다</translation>
     </message>
 </context>
 <context>

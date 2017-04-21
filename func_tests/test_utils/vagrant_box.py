@@ -12,7 +12,7 @@ import vagrant
 import vagrant.compat
 from .host import RemoteSshHost
 from .vbox_manage import VBoxManage
-from .vagrant_box_config import DEFAULT_NATNET1, DEFAULT_HOSTNET
+from .vagrant_box_config import DEFAULT_NATNET1
 
 
 TEST_UTILS_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -48,26 +48,33 @@ class RemotableVagrant(vagrant.Vagrant):
 
 class Vagrant(object):
 
-    def __init__(self, test_dir, vm_host, bin_dir, vagrant_dir, vagrant_private_key_path, ssh_config_path):
+    def __init__(self, test_dir, vm_name_prefix, vm_host, bin_dir, vagrant_dir, vagrant_private_key_path, ssh_config_path):
         self._test_dir = test_dir
         self._vm_host = vm_host
-        self._vbox_manage = VBoxManage(vm_host)
+        self._vbox_manage = VBoxManage(vm_name_prefix, vm_host)
         self._bin_dir = bin_dir
         self._vagrant_dir = vagrant_dir  # on vm_host
+        self._vagrant_file_path = os.path.join(self._vagrant_dir, 'Vagrantfile')
         self._vagrant_private_key_path = vagrant_private_key_path  # may be None
         self._ssh_config_path = ssh_config_path
         self._vagrant = RemotableVagrant(
             self._vm_host, root=self._vagrant_dir, quiet_stdout=False, quiet_stderr=False)
         self.boxes = {}  # box name -> VagrantBox
 
-    def destroy_all_boxes(self, boxes_config):
-        log.info('destroying old boxes: %s', ', '.join(config.vm_box_name() for config in boxes_config))
-        self._write_vagrantfile(boxes_config)
-        self._destroy_all_boxes()
+    def destroy_all_boxes(self, boxes_config=None):
+        if boxes_config is not None:
+            log.info('Destroying old boxes: %s', ', '.join(config.vm_box_name() for config in boxes_config))
+            self._write_vagrantfile(boxes_config)
+            self._vagrant.destroy()
+        else:
+            if os.path.exists(self._vagrant_file_path):
+                log.info('Destroying old boxes using old Vagrantfile')
+                self._vagrant.destroy()
+            else:
+                log.info('Old Vagrantfile "%s" is missing - will not destroy old boxes' % self._vagrant_file_path)
         if os.path.exists(self._ssh_config_path):
             os.remove(self._ssh_config_path)
 
-    # updates boxes_config: set ip_address and timezone
     def init(self, boxes_config):
         self._write_vagrantfile(boxes_config)
         box2status = {status.name: status.state for status in self._vagrant.status()}
@@ -82,13 +89,9 @@ class Vagrant(object):
             if status != 'running':
                 self._start_box(config)
             self._init_box(config)
-        self._write_vagrantfile(boxes_config)  # now ip_address is known for just-started boxes - write it
         self._write_ssh_config(self.boxes.keys())  # write ssh config for all boxes, with new addresses
         for box in self.boxes.values():
             self._load_box_timezone(box)
-
-    def _destroy_all_boxes(self):
-        self._vagrant.destroy()
 
     def _copy_required_files_to_vagrant_dir(self, box_config):
         for file_path_format in box_config.required_file_list:
@@ -97,9 +100,6 @@ class Vagrant(object):
             self._vm_host.put_file(file_path, self._vagrant_dir)
 
     def _init_box(self, config):
-        config.ip_address = self._load_box_ip_address(config)
-        config.port = 22  # now we can connect directly, not thru port forwarded by vagrant
-        log.info('IP address for %s: %s', config.box_name(), config.ip_address)
         self.boxes[config.box_name()] = VagrantBox(self, config)
 
     def _start_box(self, config):
@@ -116,39 +116,21 @@ class Vagrant(object):
             self._vbox_manage.poweroff_vms(vms_name)
         self._vbox_manage.delete_vms(vms_name)
 
-    def _load_box_ip_address(self, config):
-        self._vm_host.run_command(['VBoxManage', '--nologo', 'list', 'vms'])
-        self._vm_host.run_command(['VBoxManage', '--nologo', 'list', 'hostonlyifs'])
-        self._vm_host.run_command(['VBoxManage', '--nologo', 'list', 'natnets'])
-        self._vm_host.run_command(['VBoxManage', '--nologo', 'list', 'intnets'])
-        self._vm_host.run_command(['VBoxManage', '--nologo', 'list', 'bridgedifs'])
-        self._vm_host.run_command(['VBoxManage', '--nologo', 'list', 'dhcpservers'])
-        self._vm_host.run_command(['/sbin/ifconfig'])
-        adapter_idx = 1  # use ip address from first host network
-        cmd = ['VBoxManage', '--nologo', 'guestproperty', 'get',
-               config.vm_box_name(), '/VirtualBox/GuestInfo/Net/%d/V4/IP' % adapter_idx]
-        # temporary: vbox returns invalid address sometimes; try load ip address several times with delay to see what happens
-        for i in range(10):
-            output = self._vm_host.run_command(cmd)
-            time.sleep(0.5)
-        l = output.strip().split()
-        assert l[0] == 'Value:', repr(output)  # Does interface exist?
-        return l[1]
-
     def _load_box_timezone(self, box):
         tzname = self.box_host(box.name, 'root').run_command(['date', '+%Z'])
         timezone = pytz.timezone(tzname.rstrip())
-        box.timezone = box.config.timezone = timezone
+        box.timezone = timezone
 
     def _write_vagrantfile(self, boxes_config):
+        expanded_boxes_config_list = [config.expand(self._vbox_manage) for config in boxes_config]
         template_file_path = os.path.join(TEST_UTILS_DIR, 'Vagrantfile.jinja2')
         with open(template_file_path) as f:
             template = jinja2.Template(f.read())
         vagrantfile = template.render(
             natnet1=DEFAULT_NATNET1,
             template_file_path=template_file_path,
-            boxes=boxes_config)
-        self._vm_host.write_file(os.path.join(self._vagrant_dir, 'Vagrantfile'), vagrantfile)
+            boxes=expanded_boxes_config_list)
+        self._vm_host.write_file(self._vagrant_file_path, vagrantfile)
 
     # write ssh config with single box in it
     def _write_box_ssh_config(self, box_name):
@@ -170,20 +152,12 @@ class VagrantBox(object):
         self._vagrant = vagrant
         self.config = config
         self.name = config.box_name()
-        self.ip_address = config.ip_address  # str
         self.timezone = None
         self.servers = []
         self.host = self._vagrant.box_host(self.name, 'root')
 
     def __str__(self):
-        return '%s@%s/%s' % (self.name, self.ip_address, self.timezone)
+        return self.name
 
     def __repr__(self):
-        return 'Box%s' % self
-
-    def change_host_name(self, host_name):
-        self.host.run_command(['hostnamectl', 'set-hostname', host_name])
-        file = self.host.read_file('/etc/hosts')
-        lines = [line for line in file.splitlines() if not line.startswith('127.')]
-        lines = ['127.0.0.1\tlocalhost %s' % host_name] + lines
-        self.host.write_file('/etc/hosts', '\n'.join(lines) + '\n')
+        return 'Box(%s, timezone=%s)' % (self, self.timezone)

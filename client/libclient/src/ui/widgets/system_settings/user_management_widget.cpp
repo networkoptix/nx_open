@@ -340,9 +340,21 @@ void QnUserManagementWidget::applyChanges()
 
     /* User still can press cancel on 'Confirm Remove' dialog. */
     if (nx::client::messages::Resources::deleteResources(this, usersToDelete))
-        qnResourcesChangesManager->deleteResources(usersToDelete);
+    {
+        setEnabled(false);
+        qnResourcesChangesManager->deleteResources(usersToDelete,
+            [this, guard = QPointer<QnUserManagementWidget>(this)](bool /* success */)
+            {
+                if (guard)
+                    setEnabled(true);
+
+                emit hasChangesChanged();
+            });
+    }
     else
+    {
         m_usersModel->resetUsers(qnResPool->getResources<QnUserResource>());
+    }
 }
 
 bool QnUserManagementWidget::hasChanges() const

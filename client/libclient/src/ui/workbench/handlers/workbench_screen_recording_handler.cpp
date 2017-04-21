@@ -23,6 +23,8 @@
 #include <core/resource/file_processor.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <utils/common/delayed.h>
+
 namespace {
 
 /** Countdown value before screen recording starts. */
@@ -93,7 +95,10 @@ void QnWorkbenchScreenRecordingHandler::timerEvent(QTimerEvent* event)
         return;
 
     stopRecordingCountdown();
-    startRecordingInternal();
+
+    // Give some time to render at least one frame  to make sure messagebox is not recorded.
+    static const int kStartRecordingDelayMs = 50;
+    executeDelayedParented([this]{startRecordingInternal();}, kStartRecordingDelayMs, this);
 }
 
 bool QnWorkbenchScreenRecordingHandler::isRecording() const

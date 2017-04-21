@@ -13,6 +13,7 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
+#include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/common/checkbox_utils.h>
 #include <ui/help/help_topic_accessor.h>
@@ -25,6 +26,11 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     m_qualityEditable(false)
 {
     ui->setupUi(this);
+
+    NX_ASSERT(parent);
+    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(window());
+    ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
+    scrollBar->setUseMaximumSpace(true);
 
     QnCheckbox::autoCleanTristate(ui->checkBoxForceMotionDetection);
 
@@ -40,6 +46,7 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     // if "I have read manual" is set, all controls should be enabled
     connect(ui->assureCheckBox, SIGNAL(toggled(bool)), ui->assureCheckBox, SLOT(setDisabled(bool)));
     connect(ui->assureCheckBox, SIGNAL(toggled(bool)), ui->assureWidget, SLOT(setEnabled(bool)));
+    connect(ui->assureCheckBox, SIGNAL(toggled(bool)), ui->scrollArea, SLOT(setEnabled(bool)));
     ui->assureWidget->setEnabled(false);
 
     connect(ui->settingsDisableControlCheckBox, &QCheckBox::toggled, ui->qualityGroupBox, &QGroupBox::setDisabled);
@@ -284,13 +291,14 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     bool defaultValues = ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked
             && sliderPosToQuality(ui->qualitySlider->value()) == Qn::SSQualityMedium
             && ui->checkBoxPrimaryRecorder->checkState() == Qt::Unchecked
-            && (ui->checkBoxBitratePerGOP->checkState() == Qt::Unchecked || !ui->checkBoxBitratePerGOP->isEnabled())
+            && (ui->checkBoxBitratePerGOP->checkState() == Qt::Unchecked || !enableBitratePerGop)
             && ui->checkBoxSecondaryRecorder->checkState() == Qt::Unchecked
             && ui->comboBoxTransport->currentIndex() == 0
             && ui->checkBoxForceMotionDetection->checkState() == Qt::Unchecked;
 
     ui->assureCheckBox->setEnabled(!cameras.isEmpty() && defaultValues);
     ui->assureCheckBox->setChecked(!defaultValues);
+    ui->scrollArea->setEnabled(ui->assureCheckBox->isChecked());
 }
 
 void QnCameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResourceList &cameras) {
