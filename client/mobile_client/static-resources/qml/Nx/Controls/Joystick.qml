@@ -12,6 +12,8 @@ Grid
     property bool supportSingleShot: false;
 
     signal singleShot(point direction)
+    signal buttonPressed(point direction)
+    signal buttonReleased()
 
     columns: 3
     rows: 3
@@ -28,6 +30,8 @@ Grid
 
             text: _private.kTempTexts[index]
             onClicked: { singleShot(_private.kStaticDirections[index]) }
+            onPressed: { buttonPressed(_private.kStaticDirections[index]) }
+            onReleased: { buttonReleased() }
         }
     }
 

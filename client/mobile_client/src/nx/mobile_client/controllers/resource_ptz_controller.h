@@ -18,7 +18,7 @@ class ResourcePtzController: public QnProxyPtzController
     Q_PROPERTY(bool available READ available NOTIFY availableChanged)
 
     Q_PROPERTY(Ptz::Capabilities capabilities READ getCapabilities NOTIFY capabilitiesChanged)
-    Q_PROPERTY(bool auxTraits READ auxTraits NOTIFY auxTraitsChanged)
+    Q_PROPERTY(Ptz::Traits auxTraits READ auxTraits NOTIFY auxTraitsChanged)
     Q_PROPERTY(int presetsCount READ presetsCount NOTIFY presetsCountChanged)
 
 public:

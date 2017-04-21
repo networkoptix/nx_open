@@ -90,12 +90,8 @@ bool ResourcePtzController::setPreset(int index)
     }
 
     QnPtzPresetList presets;
-   //return getPresets(&presets) && activatePreset(presets.at(index).id, kDefaultSpeed);
-    if (!getPresets(&presets))
-        return false;
-    const auto preset = presets.at(index);
-    qDebug() << "_____________ " << preset.id << preset.name;
-    return activatePreset(preset.id, QnAbstractPtzController::MaxPtzSpeed);
+    return getPresets(&presets) && activatePreset(presets.at(index).id,
+        QnAbstractPtzController::MaxPtzSpeed);
 }
 
 bool ResourcePtzController::setAutoFocus()

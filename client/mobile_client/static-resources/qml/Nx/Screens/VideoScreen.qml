@@ -275,6 +275,15 @@ PageBase
             {
                 Column
                 {
+                    id: focusPanel
+
+                    property bool continuousFocusEnabled:
+                        ptzController.capabilities & Ptz.ContinuousFocusCapability
+
+                    property bool autoFocusEnabled:
+                        ptzController.auxTraits & Ptz.ManualAutoFocusPtzTrait
+
+                    visible: continuousFocusEnabled || autoFocusEnabled
                     anchors.verticalCenter: parent.verticalCenter
 
                     spacing: 0
@@ -288,9 +297,10 @@ PageBase
 
                     Button
                     {
+                        id: autofocusButton
                         text: "set autofocus"
                         onClicked: ptzController.setAutoFocus()
-                        enabled: ptzController.auxTraits & Ptz.ManualAutoFocusPtzTrait
+                        enabled: focusPanel.autoFocusEnabled
                     }
 
                     Button
@@ -336,8 +346,18 @@ PageBase
                     anchors.verticalCenter: parent.verticalCenter
                     onSingleShot:
                     {
-                        console.log("-------------- moving:", direction)
+                        console.log("---------------------------")
                         ptzController.continuousMove(Qt.vector3d(direction.x, direction.y, 0))
+                        ptzController.continuousMove(Qt.vector3d(0, 0, 0))
+                    }
+                    onButtonPressed:
+                    {
+                        console.log(">>>>>>>>>>>")
+                        ptzController.continuousMove(Qt.vector3d(direction.x, direction.y, 0))
+                    }
+                    onButtonReleased:
+                    {
+                        console.log("<<<<<<<<<<<")
                         ptzController.continuousMove(Qt.vector3d(0, 0, 0))
                     }
                 }
