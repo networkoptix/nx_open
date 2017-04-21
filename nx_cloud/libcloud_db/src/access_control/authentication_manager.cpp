@@ -83,12 +83,12 @@ void AuthenticationManager::authenticate(
             }
 
             completionHandler(
-                nx_http::server::AuthenticationResult{
+                nx_http::server::AuthenticationResult(
                     authResult == api::ResultCode::ok,
                     std::move(authProperties),
                     std::move(wwwAuthenticate),
                     std::move(responseHeaders),
-                    std::move(msgBody)});
+                    std::move(msgBody)));
         });
 
     //TODO #ak use QnAuthHelper class to enable all that authentication types

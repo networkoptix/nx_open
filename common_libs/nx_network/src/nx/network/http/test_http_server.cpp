@@ -28,12 +28,12 @@ void TestAuthenticationManager::authenticate(
     }
     else
     {
-        completionHandler(nx_http::server::AuthenticationResult{
+        completionHandler(nx_http::server::AuthenticationResult(
             true,
             nx::utils::stree::ResourceContainer(),
             boost::none,
             nx_http::HttpHeaders(),
-            nullptr});
+            nullptr));
     }
 }
 
