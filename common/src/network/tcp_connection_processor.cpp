@@ -510,6 +510,14 @@ int QnTCPConnectionProcessor::redirectTo(const QByteArray& page, QByteArray& con
     return CODE_MOVED_PERMANENTLY;
 }
 
+int QnTCPConnectionProcessor::notFound(QByteArray& contentType)
+{
+    Q_D(QnTCPConnectionProcessor);
+    contentType = "text/html; charset=utf-8";
+    d->response.messageBody = "<html><head><title>Not Found</title></head><body><h1>Not Found</h1></html>";
+    return CODE_NOT_FOUND;
+}
+
 bool QnTCPConnectionProcessor::isConnectionCanBePersistent() const
 {
     Q_D(const QnTCPConnectionProcessor);
