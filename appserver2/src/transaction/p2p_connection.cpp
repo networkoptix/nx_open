@@ -6,6 +6,8 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <http/custom_headers.h>
+#include <nx/fusion/serialization/lexical.h>
+#include <api/global_settings.h>
 
 namespace {
 
@@ -32,14 +34,17 @@ const char* toString(P2pConnection::State value)
 
 P2pConnection::P2pConnection(
     QnCommonModule* commonModule,
-    const QnUuid& id,
-    const QUrl& url)
+    const QnUuid& remoteId,
+    const ApiPeerData& localPeer,
+    const QUrl& _remotePeerUrl)
 :
     QnCommonModuleAware(commonModule),
     m_httpClient(nx_http::AsyncHttpClient::create()),
+    m_localPeer(localPeer),
     m_direction(Direction::outgoing)
 {
-    m_remotePeer.id = id;
+    QUrl remotePeerUrl = _remotePeerUrl;
+    m_remotePeer.id = remoteId;
 
     connect(
         m_httpClient.get(),
@@ -55,19 +60,70 @@ P2pConnection::P2pConnection(
         &P2pConnection::onHttpClientDone,
         Qt::DirectConnection);
 
+    if (remotePeerUrl.userName().isEmpty())
+    {
+        fillAuthInfo(m_httpClient, m_credentialsSource == CredentialsSource::serverKey);
+    }
+    else
+    {
+        m_credentialsSource = CredentialsSource::remoteUrl;
+        m_httpClient->setUserName(remotePeerUrl.userName());
+        m_httpClient->setUserPassword(remotePeerUrl.password());
+    }
+
+    if (m_localPeer.isServer())
+        m_httpClient->addAdditionalHeader(
+            Qn::EC2_SYSTEM_ID_HEADER_NAME,
+            commonModule->globalSettings()->localSystemId().toByteArray());
+
+    // add headers
+    m_httpClient->addAdditionalHeader(
+        Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME,
+        nx_http::header::KeepAlive(
+            std::chrono::duration_cast<std::chrono::seconds>(
+                commonModule->globalSettings()->connectionKeepAliveTimeout())).toString());
+
+    m_httpClient->addAdditionalHeader(
+        Qn::EC2_GUID_HEADER_NAME,
+        m_localPeer.id.toByteArray());
+    m_httpClient->addAdditionalHeader(
+        Qn::EC2_RUNTIME_GUID_HEADER_NAME,
+        m_localPeer.instanceId.toByteArray());
+    m_httpClient->addAdditionalHeader(
+        Qn::EC2_DB_GUID_HEADER_NAME,
+        m_localPeer.persistentId.toByteArray());
+    m_httpClient->addAdditionalHeader(
+        Qn::EC2_PROTO_VERSION_HEADER_NAME,
+        QByteArray::number(m_localPeerProtocolVersion));
+
     nx_http::Request request;
     nx::network::websocket::addClientHeaders(&request, kP2pProtoName);
     m_httpClient->addRequestHeaders(request.headers);
-    m_httpClient->doGet(url);
+
+    QUrlQuery q(remotePeerUrl.query());
+
+#ifdef USE_JSON
+    q.addQueryItem("format", QnLexical::serialized(Qn::JsonFormat));
+#else
+    if (m_localPeer.isMobileClient())
+        q.addQueryItem("format", QnLexical::serialized(Qn::JsonFormat));
+#endif
+    q.addQueryItem("peerType", QnLexical::serialized(m_localPeer.peerType));
+
+    remotePeerUrl.setQuery(q);
+
+    m_httpClient->doGet(remotePeerUrl);
 }
 
 P2pConnection::P2pConnection(
     QnCommonModule* commonModule,
     const ApiPeerData& remotePeer,
+    const ApiPeerData& localPeer,
     const WebSocketPtr& webSocket)
 :
     QnCommonModuleAware(commonModule),
     m_remotePeer(remotePeer),
+    m_localPeer(localPeer),
     m_webSocket(webSocket),
     m_direction(Direction::incoming)
 {
@@ -275,12 +331,12 @@ qint64 P2pConnection::remoteIdentityTime() const
 
 ApiPeerData P2pConnection::localPeer() const
 {
-    return m_remotePeer;
+    return m_localPeer;
 }
 
 ApiPeerData P2pConnection::remotePeer() const
 {
-    return m_localPeer;
+    return m_remotePeer;
 }
 
 P2pConnection::Direction P2pConnection::direction() const

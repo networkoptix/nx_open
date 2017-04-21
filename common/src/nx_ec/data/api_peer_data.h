@@ -56,6 +56,18 @@ struct ApiPeerData: ApiPeerIdData
         dataFormat(dataFormat)
     {}
 
+    ApiPeerData(
+        const QnUuid& id,
+        const QnUuid& instanceId,
+        const QnUuid& persistentId,
+        Qn::PeerType peerType,
+        Qn::SerializationFormat dataFormat = Qn::UbjsonFormat)
+    :
+        ApiPeerIdData(id, instanceId, persistentId),
+        peerType(peerType),
+        dataFormat(dataFormat)
+    {}
+
     bool operator==(const ApiPeerData& other) const
     {
         return id == other.id

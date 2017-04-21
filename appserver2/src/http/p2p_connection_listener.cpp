@@ -95,11 +95,12 @@ void P2pConnectionProcessor::run()
 
     QUrlQuery query = QUrlQuery(d->request.requestLine.url.query());
 
-    QnUuid remoteGuid = QnUuid(query.queryItemValue("guid"));
+    QnUuid remoteGuid = nx_http::getHeaderValue(d->request.headers, Qn::EC2_GUID_HEADER_NAME);
     if (remoteGuid.isNull())
         remoteGuid = QnUuid::createUuid();
-    QnUuid remoteRuntimeGuid = QnUuid(query.queryItemValue("runtime-guid"));
-    qint64 remoteSystemIdentityTime = query.queryItemValue("system-identity-time").toLongLong();
+    QnUuid remoteRuntimeGuid = nx_http::getHeaderValue(d->request.headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+    QnUuid remoteDbGuid = nx_http::getHeaderValue(d->request.headers, Qn::EC2_DB_GUID_HEADER_NAME);
+    qint64 remoteSystemIdentityTime = nx_http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_IDENTITY_HEADER_NAME).toLongLong();
 
     bool deserialized = false;
     Qn::PeerType peerType = QnLexical::deserialized<Qn::PeerType>(
@@ -169,7 +170,7 @@ void P2pConnectionProcessor::run()
         Qn::EC2_SYSTEM_ID_HEADER_NAME,
         commonModule->globalSettings()->localSystemId().toByteArray()));
 
-    sendResponse(nx_http::StatusCode::ok, nx_http::StringType());
+    sendResponse(nx_http::StatusCode::upgrade, nx_http::StringType());
 
     std::unique_ptr<ShareSocketDelegate> socket(new ShareSocketDelegate(std::move(d->socket)));
 
@@ -180,6 +181,7 @@ void P2pConnectionProcessor::run()
     P2pConnectionPtr connection(new P2pConnection(
         commonModule,
         remotePeer,
+        d->messageBus->localPeer(),
         std::move(webSocket)));
     d->messageBus->gotConnectionFromRemotePeer(connection);
 

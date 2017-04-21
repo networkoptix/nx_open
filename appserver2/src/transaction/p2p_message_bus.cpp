@@ -49,10 +49,6 @@ P2pMessageBus::P2pMessageBus(
 :
     QnTransactionMessageBusBase(db, peerType, commonModule)
 {
-    m_localPeer.id = commonModule->moduleGUID();
-    m_localPeer.instanceId = commonModule->runningInstanceGUID();
-    m_localPeer.persistentId = commonModule->dbId();
-
     m_thread = new QThread();
     m_thread->setObjectName("P2pMessageBus");
     moveToThread(m_thread);
@@ -106,24 +102,37 @@ void P2pMessageBus::gotConnectionFromRemotePeer(P2pConnectionPtr connection)
     const auto remoteId = connection->remotePeer().id;
     const auto localId = commonModule()->moduleGUID();
     auto itr = m_connections.find(remoteId);
+
     if (itr == m_connections.end())
     {
         // Got incoming connection. No outgoing connection was done yet
         m_connections.insert(remoteId, connection);
+        return;
+    }
+
+    const auto& existConnection = itr.value();
+    if (existConnection->direction() == P2pConnection::Direction::incoming)
+    {
+        // Replace incoming connection
+        itr.value() = connection;
     }
     else if (remoteId > localId)
     {
-        // Outgoing connection is present, but incoming connection has bigger priority.
-        // Replace it.
+        // Outgoing connection is present, but incoming connection has bigger priority. Replace it.
         itr.value() = connection;
     }
-    else if (itr.value()->state() != P2pConnection::State::Connected)
+    else if (existConnection->state() == P2pConnection::State::Connecting)
     {
         // Incoming connection has lower priority, but outgoing connection is not done yet
         // If outgoing connection will success it'll replace incoming connection later
         m_outgoingConnections.insert(remoteId, itr.value());
         itr.value() = connection; //< start using incoming connection unless outgoing will OK.
     }
+    else if (existConnection->state() == P2pConnection::State::Error)
+    {
+        itr.value() = connection;
+    }
+    else
     {
         // ignore incoming connection because we have active outgoing connection with bigger priority
     }
@@ -175,7 +184,7 @@ void P2pMessageBus::createOutgoingConnections()
         if (!m_connections.contains(remoteId) && !m_outgoingConnections.contains(remoteId))
         {
             m_connections.insert(remoteId, P2pConnectionPtr(
-                new P2pConnection(commonModule(), remoteId, url)));
+                new P2pConnection(commonModule(), remoteId, localPeer(), url)));
         }
     }
 }
@@ -227,6 +236,21 @@ PeerNumberType deserializeCompressPeerNumber(BitStreamReader& reader)
             break;
     }
     return peerNumber;
+}
+
+void P2pMessageBus::addOwnfInfoToPeerList()
+{
+    if (m_allPeers.isEmpty())
+    {
+        ApiPeerIdData peer(
+            localPeer().id,
+            QnUuid(), //< runtime id
+            localPeer().persistentId);  //< persistent id
+
+        auto& peerData = m_allPeers[peer];
+        peerData.isOnline = true;
+        peerData.routingInfo.insert(localPeer(), RoutingRecord(0, 0));
+    }
 }
 
 void P2pMessageBus::addOfflinePeersFromDb()
@@ -327,12 +351,14 @@ void P2pMessageBus::sendAlivePeersMessage()
 
 void P2pMessageBus::doSubscribe()
 {
+    const auto localPeer = this->localPeer();
+
     QMap<ApiPeerIdData, std::vector<ApiPeerIdData>> candidatesToSubscribe; //< key: who, value: where
     for (auto itr = m_allPeers.begin(); itr != m_allPeers.end(); ++itr)
     {
         const ApiPeerIdData& peer = itr.key();
         const PeerInfo& info = itr.value();
-        quint32 directDistance = info.distanceVia(localPeer());
+        quint32 directDistance = info.distanceVia(localPeer);
         std::vector<ApiPeerIdData> viaList;
         quint32 minDistance = info.minDistance(&viaList);
         if (minDistance < directDistance)
@@ -374,15 +400,20 @@ void P2pMessageBus::doPeriodicTasks()
     removeClosedConnections(); //< remove closed connections
     createOutgoingConnections(); //< open new connections
 
+    addOwnfInfoToPeerList();
     addOfflinePeersFromDb();
     sendAlivePeersMessage();
 
     doSubscribe();
 }
 
-ApiPeerIdData P2pMessageBus::localPeer() const
+ApiPeerData P2pMessageBus::localPeer() const
 {
-    return m_localPeer;
+    return ApiPeerData(
+        commonModule()->moduleGUID(),
+        commonModule()->runningInstanceGUID(),
+        commonModule()->dbId(),
+        m_localPeerType);
 }
 
 } // ec2

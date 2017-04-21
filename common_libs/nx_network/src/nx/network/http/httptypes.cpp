@@ -291,7 +291,8 @@ namespace StatusCode
 
     bool isSuccessCode(int statusCode)
     {
-        return statusCode >= ok && statusCode <= lastSuccessCode;
+        return (statusCode >= ok && statusCode <= lastSuccessCode) ||
+                statusCode == upgrade;
     }
 
     bool isMessageBodyAllowed(int statusCode)

@@ -53,7 +53,7 @@ namespace ec2 {
         void removeOutgoingConnectionFromPeer(QnUuid& id);
 
         // Self peer information
-        ApiPeerIdData localPeer() const;
+        ApiPeerData localPeer() const;
 
         void start();
     private:
@@ -70,6 +70,7 @@ namespace ec2 {
         PeerNumberType toShortPeerNumber(const QnUuid& owner, const ApiPeerIdData& peer);
         ApiPeerIdData fromShortPeerNumber(const QnUuid& owner, const PeerNumberType& id);
 
+        void addOwnfInfoToPeerList();
         void addOfflinePeersFromDb();
         void doSubscribe();
     private:
@@ -102,7 +103,6 @@ namespace ec2 {
         typedef QMap<ApiPeerIdData, PeerInfo> PeersMap;
 
         PeersMap m_allPeers; //< all peers in a system
-        ApiPeerIdData m_localPeer;
 
         QMap<ApiPeerIdData, P2pConnectionPtr> m_subscriptionList;
         QThread* m_thread = nullptr;
