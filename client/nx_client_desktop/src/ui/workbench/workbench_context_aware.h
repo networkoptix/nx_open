@@ -1,14 +1,11 @@
 #pragma once
 
 #include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/action_fwd.h>
 
 #include <client_core/connection_context_aware.h>
 
-class QAction;
-class QObject;
-
 class QnWorkbenchContext;
-class QnActionManager;
 class QnWorkbench;
 class QnWorkbenchLayoutSnapshotManager;
 class QnWorkbenchAccessController;
@@ -65,7 +62,7 @@ protected:
 
     QAction *action(const QnActions::IDType id) const;
 
-    QnActionManager *menu() const;
+    nx::client::desktop::ui::action::Manager* menu() const;
 
     QnWorkbench *workbench() const;
 

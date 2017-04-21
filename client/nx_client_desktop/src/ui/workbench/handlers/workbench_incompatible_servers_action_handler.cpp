@@ -11,7 +11,7 @@
 #include <licensing/license.h>
 #include <licensing/remote_licenses.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/actions/action.h>
 #include <ui/dialogs/merge_systems_dialog.h>
 #include <ui/dialogs/common/message_box.h>

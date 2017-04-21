@@ -18,7 +18,7 @@
 #include <ui/widgets/cloud_status_panel.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/common/tool_button.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workaround/hidpi_workarounds.h>

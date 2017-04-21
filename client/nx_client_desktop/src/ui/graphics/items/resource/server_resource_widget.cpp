@@ -14,7 +14,7 @@
 
 #include <api/media_server_statistics_manager.h>
 #include <ui/actions/action_parameters.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/help/help_topics.h>

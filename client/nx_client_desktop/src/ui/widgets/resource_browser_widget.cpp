@@ -39,7 +39,7 @@
 
 #include <nx/client/desktop/ui/workbench/workbench_animations.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/actions/action.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
@@ -313,7 +313,7 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint& pos, bool ignoreSe
     if (qnRuntime->isVideoWallMode())
         return;
 
-    QnActionManager* manager = context()->menu();
+    auto manager = context()->menu();
 
     using namespace nx::client::desktop::ui::action;
     QScopedPointer<QMenu> menu(manager->newMenu(TreeScope, nullptr, ignoreSelection

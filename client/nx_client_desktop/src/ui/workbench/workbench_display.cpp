@@ -31,7 +31,7 @@
 #include <camera/client_video_camera.h>
 #include <redass/redass_controller.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/action_target_provider.h>
 
 #include <ui/common/notification_levels.h>

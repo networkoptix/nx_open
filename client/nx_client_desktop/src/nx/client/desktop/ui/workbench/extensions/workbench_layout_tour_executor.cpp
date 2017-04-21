@@ -16,7 +16,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <utils/math/math.h>
 

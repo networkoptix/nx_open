@@ -6,7 +6,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>

@@ -21,7 +21,7 @@
 #include <recording/time_period.h>
 
 #include <ui/actions/actions.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
 #include <ui/dialogs/camera_bookmark_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>

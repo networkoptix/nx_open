@@ -9,7 +9,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/layout_resource.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
 #include <ui/common/indents.h>
 #include <ui/models/resource_properties/user_roles_settings_model.h>

@@ -26,7 +26,7 @@
 #include <nx_ec/managers/abstract_layout_manager.h>
 
 #include <ui/actions/actions.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_parameter_types.h>
 #include <ui/dialogs/layout_name_dialog.h>

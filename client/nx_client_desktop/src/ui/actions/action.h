@@ -17,8 +17,6 @@
 class QGraphicsItem;
 
 class QnWorkbenchContext;
-class QnActionManager;
-class QnActionParameters;
 
 /**
  * Action class that hooks into actions infrastructure to correctly check

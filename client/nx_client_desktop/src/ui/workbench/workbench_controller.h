@@ -44,7 +44,6 @@ class ZoomWindowInstrument;
 class GridAdjustmentInstrument;
 
 class QnToggle;
-class QnActionManager;
 class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
 class QnWorkbench;

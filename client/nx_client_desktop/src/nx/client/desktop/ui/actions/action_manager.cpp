@@ -3,7 +3,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
 
-#include "action.h"
+#include <ui/actions/action.h>
 
 #include <nx/client/desktop/ui/actions/menu_factory.h>
 #include <nx/client/desktop/ui/actions/action_builder.h>
@@ -16,7 +16,11 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
-using namespace nx::client::desktop::ui::action;
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+namespace action {
 
 namespace {
 const char *sourceActionPropertyName = "_qn_sourceAction";
@@ -68,7 +72,7 @@ bool checkType(const QVariant &items)
 } // namespace
 
 
-QnActionManager::QnActionManager(QObject *parent):
+Manager::Manager(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),
     m_root(NULL),
@@ -81,16 +85,16 @@ QnActionManager::QnActionManager(QObject *parent):
     m_idByAction[m_root] = QnActions::NoAction;
 
     connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged, this,
-        &QnActionManager::hideAllMenus);
+        &Manager::hideAllMenus);
     QnActions::initialize(this, m_root);
 }
 
-QnActionManager::~QnActionManager()
+Manager::~Manager()
 {
     qDeleteAll(m_idByAction.keys());
 }
 
-void QnActionManager::setTargetProvider(TargetProvider *targetProvider)
+void Manager::setTargetProvider(TargetProvider *targetProvider)
 {
     m_targetProvider = targetProvider;
     m_targetProviderGuard = dynamic_cast<QObject *>(targetProvider);
@@ -98,7 +102,7 @@ void QnActionManager::setTargetProvider(TargetProvider *targetProvider)
         m_targetProviderGuard = this;
 }
 
-void QnActionManager::registerAction(QnAction *action)
+void Manager::registerAction(QnAction *action)
 {
     NX_EXPECT(action);
     if (!action)
@@ -122,7 +126,7 @@ void QnActionManager::registerAction(QnAction *action)
     emit actionRegistered(action->id());
 }
 
-void QnActionManager::registerAlias(QnActions::IDType id, QnActions::IDType targetId)
+void Manager::registerAlias(QnActions::IDType id, QnActions::IDType targetId)
 {
     if (id == targetId)
     {
@@ -150,17 +154,17 @@ void QnActionManager::registerAlias(QnActions::IDType id, QnActions::IDType targ
     m_actionById[id] = targetAction;
 }
 
-QnAction *QnActionManager::action(QnActions::IDType id) const
+QnAction *Manager::action(QnActions::IDType id) const
 {
     return m_actionById.value(id, NULL);
 }
 
-QList<QnAction *> QnActionManager::actions() const
+QList<QnAction *> Manager::actions() const
 {
     return m_idByAction.keys();
 }
 
-bool QnActionManager::canTrigger(QnActions::IDType id, const QnActionParameters &parameters)
+bool Manager::canTrigger(QnActions::IDType id, const QnActionParameters &parameters)
 {
     QnAction *action = m_actionById.value(id);
     if (!action)
@@ -169,7 +173,7 @@ bool QnActionManager::canTrigger(QnActions::IDType id, const QnActionParameters 
     return action->checkCondition(action->scope(), parameters) == EnabledAction;
 }
 
-void QnActionManager::trigger(QnActions::IDType id, const QnActionParameters &parameters)
+void Manager::trigger(QnActions::IDType id, const QnActionParameters &parameters)
 {
     if (triggerIfPossible(id, parameters))
         return;
@@ -180,7 +184,7 @@ void QnActionManager::trigger(QnActions::IDType id, const QnActionParameters &pa
         << id << text;
 }
 
-bool QnActionManager::triggerIfPossible(QnActions::IDType id, const QnActionParameters &parameters)
+bool Manager::triggerIfPossible(QnActions::IDType id, const QnActionParameters &parameters)
 {
     QnAction *action = m_actionById.value(id);
     NX_EXPECT(action);
@@ -196,7 +200,7 @@ bool QnActionManager::triggerIfPossible(QnActions::IDType id, const QnActionPara
     return true;
 }
 
-QMenu* QnActionManager::integrateMenu(QMenu *menu, const QnActionParameters &parameters)
+QMenu* Manager::integrateMenu(QMenu *menu, const QnActionParameters &parameters)
 {
     if (!menu)
         return NULL;
@@ -207,13 +211,13 @@ QMenu* QnActionManager::integrateMenu(QMenu *menu, const QnActionParameters &par
 
     connect(menu, &QMenu::aboutToShow, this, [this, menu] { emit menuAboutToShow(menu); });
     connect(menu, &QMenu::aboutToHide, this, [this, menu] { emit menuAboutToHide(menu); });
-    connect(menu, &QObject::destroyed, this, &QnActionManager::at_menu_destroyed);
+    connect(menu, &QObject::destroyed, this, &Manager::at_menu_destroyed);
 
     return menu;
 }
 
 
-QMenu *QnActionManager::newMenu(nx::client::desktop::ui::action::ActionScope scope, QWidget *parent, const QnActionParameters &parameters, CreationOptions options)
+QMenu *Manager::newMenu(ActionScope scope, QWidget *parent, const QnActionParameters &parameters, CreationOptions options)
 {
     /*
      * This method is called when we are opening a brand new context menu.
@@ -224,9 +228,9 @@ QMenu *QnActionManager::newMenu(nx::client::desktop::ui::action::ActionScope sco
     return newMenu(QnActions::NoAction, scope, parent, parameters, options);
 }
 
-QMenu* QnActionManager::newMenu(
+QMenu* Manager::newMenu(
     QnActions::IDType rootId,
-    nx::client::desktop::ui::action::ActionScope scope,
+    ActionScope scope,
     QWidget* parent,
     const QnActionParameters& parameters,
     CreationOptions options)
@@ -242,12 +246,12 @@ QMenu* QnActionManager::newMenu(
     return result;
 }
 
-TargetProvider* QnActionManager::targetProvider() const
+TargetProvider* Manager::targetProvider() const
 {
     return m_targetProviderGuard ? m_targetProvider : NULL;
 }
 
-void QnActionManager::copyAction(QAction *dst, QnAction *src, bool forwardSignals)
+void Manager::copyAction(QAction *dst, QnAction *src, bool forwardSignals)
 {
     dst->setText(src->text());
     dst->setIcon(src->icon());
@@ -269,7 +273,7 @@ void QnActionManager::copyAction(QAction *dst, QnAction *src, bool forwardSignal
     }
 }
 
-QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, nx::client::desktop::ui::action::ActionScope scope, const QnActionParameters &parameters, QWidget *parentWidget, CreationOptions options)
+QMenu *Manager::newMenuRecursive(const QnAction *parent, ActionScope scope, const QnActionParameters &parameters, QWidget *parentWidget, CreationOptions options)
 {
     if (parent->childFactory())
     {
@@ -379,7 +383,7 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, nx::client::des
     return integrateMenu(result, parameters);
 }
 
-QnActionParameters QnActionManager::currentParameters(QnAction *action) const
+QnActionParameters Manager::currentParameters(QnAction *action) const
 {
     if (m_shortcutAction == action)
         return m_parametersByMenu.value(NULL);
@@ -393,19 +397,19 @@ QnActionParameters QnActionManager::currentParameters(QnAction *action) const
     return m_parametersByMenu.value(m_lastClickedMenu);
 }
 
-QnActionParameters QnActionManager::currentParameters(QObject *sender) const
+QnActionParameters Manager::currentParameters(QObject *sender) const
 {
     if (QnAction *action = checkSender(sender))
         return currentParameters(action);
     return QnActionParameters();
 }
 
-void QnActionManager::redirectAction(QMenu *menu, QnActions::IDType sourceId, QAction *targetAction)
+void Manager::redirectAction(QMenu *menu, QnActions::IDType sourceId, QAction *targetAction)
 {
     redirectActionRecursive(menu, sourceId, targetAction);
 }
 
-bool QnActionManager::isMenuVisible() const
+bool Manager::isMenuVisible() const
 {
     for (auto menu: m_parametersByMenu.keys())
     {
@@ -415,7 +419,7 @@ bool QnActionManager::isMenuVisible() const
     return false;
 }
 
-bool QnActionManager::redirectActionRecursive(QMenu *menu, QnActions::IDType sourceId, QAction *targetAction)
+bool Manager::redirectActionRecursive(QMenu *menu, QnActions::IDType sourceId, QAction *targetAction)
 {
     QList<QAction *> actions = menu->actions();
 
@@ -453,7 +457,7 @@ bool QnActionManager::redirectActionRecursive(QMenu *menu, QnActions::IDType sou
     return false;
 }
 
-void QnActionManager::at_menu_destroyed(QObject* menuObj)
+void Manager::at_menu_destroyed(QObject* menuObj)
 {
     auto menu = static_cast<QMenu*>(menuObj);
     m_parametersByMenu.remove(menu);
@@ -461,7 +465,7 @@ void QnActionManager::at_menu_destroyed(QObject* menuObj)
         m_lastClickedMenu = NULL;
 }
 
-bool QnActionManager::eventFilter(QObject *watched, QEvent *event)
+bool Manager::eventFilter(QObject *watched, QEvent *event)
 {
     switch (event->type())
     {
@@ -480,7 +484,7 @@ bool QnActionManager::eventFilter(QObject *watched, QEvent *event)
     return false;
 }
 
-void QnActionManager::hideAllMenus()
+void Manager::hideAllMenus()
 {
     for (auto menuObject : m_parametersByMenu.keys())
     {
@@ -490,3 +494,9 @@ void QnActionManager::hideAllMenus()
             menu->hide();
     }
 }
+
+} // namespace action
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx

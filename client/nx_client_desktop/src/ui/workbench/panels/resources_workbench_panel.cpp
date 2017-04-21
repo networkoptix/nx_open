@@ -9,7 +9,7 @@
 
 #include <nx/client/desktop/ui/workbench/workbench_animations.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
@@ -146,7 +146,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     m_hidingProcessor->addTargetItem(m_resizerWidget);
     m_hidingProcessor->setHoverLeaveDelay(NxUi::kClosePanelTimeoutMs);
     m_hidingProcessor->setFocusLeaveDelay(NxUi::kClosePanelTimeoutMs);
-    connect(menu(), &QnActionManager::menuAboutToHide, m_hidingProcessor,
+    connect(menu(), &nx::client::desktop::ui::action::Manager::menuAboutToHide, m_hidingProcessor,
         &HoverFocusProcessor::forceFocusLeave);
     connect(m_hidingProcessor, &HoverFocusProcessor::hoverFocusLeft, this,
         [this]

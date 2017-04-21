@@ -20,7 +20,7 @@
 #include <utils/common/app_info.h>
 #include <utils/connection_diagnostics_helper.h>
 #include <ui/actions/actions.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/nx_style.h>
 #include <ui/dialogs/login_dialog.h>

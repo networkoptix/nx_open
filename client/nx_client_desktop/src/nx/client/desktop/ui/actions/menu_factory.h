@@ -1,11 +1,8 @@
 #pragma once
 
+#include <nx/client/desktop/ui/actions/action_fwd.h>
 #include <ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_builder.h>
-
-class QActionGroup;
-class QnAction;
-class QnActionManager;
 
 namespace nx {
 namespace client {
@@ -16,7 +13,7 @@ namespace action {
 class MenuFactory
 {
 public:
-    MenuFactory(QnActionManager* menu, QnAction* parent);
+    MenuFactory(Manager* menu, QnAction* parent);
 
     void beginSubMenu();
     void endSubMenu();
@@ -28,7 +25,7 @@ public:
     Builder operator()();
 
 private:
-    QnActionManager *m_manager;
+    Manager* m_manager;
     int m_lastFreeActionId;
     QnAction *m_lastAction;
     QList<QnAction *> m_actionStack;

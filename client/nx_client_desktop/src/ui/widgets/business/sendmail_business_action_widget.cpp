@@ -3,7 +3,7 @@
 
 #include <business/business_action_parameters.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/workbench/workbench_context.h>
 

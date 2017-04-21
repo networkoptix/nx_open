@@ -15,6 +15,7 @@
 #include <nx/client/desktop/ui/actions/action_conditions.h>
 #include <nx/client/desktop/ui/actions/action_target_provider.h>
 #include <nx/client/desktop/ui/actions/action_parameter_types.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
@@ -24,8 +25,6 @@
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
-
-#include "action_manager.h"
 
 using namespace nx::client::desktop::ui::action;
 

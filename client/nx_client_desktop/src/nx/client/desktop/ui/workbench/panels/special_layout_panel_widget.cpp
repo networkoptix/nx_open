@@ -8,7 +8,7 @@
 #include <client/client_globals.h>
 
 #include <ui/actions/action.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/palette.h>
 #include <ui/style/custom_style.h>
 

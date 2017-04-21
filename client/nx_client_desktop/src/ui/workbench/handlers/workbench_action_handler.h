@@ -40,8 +40,6 @@ class QnWorkbenchContext;
 class QnWorkbenchSynchronizer;
 class QnWorkbenchLayoutSnapshotManager;
 class ActionHandler;
-class QnActionManager;
-class QnAction;
 class QnBusinessRulesDialog;
 class QnCameraAdditionDialog;
 class QnPopupCollectionWidget;

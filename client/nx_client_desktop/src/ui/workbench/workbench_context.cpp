@@ -7,7 +7,7 @@
 #include <client/client_runtime_settings.h>
 #include <client/client_message_processor.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/actions/action.h>
 
 #include <ui/workbench/workbench.h>
@@ -70,7 +70,7 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
     /* Create dependent objects. */
     m_synchronizer.reset(new QnWorkbenchSynchronizer(this));
 
-    m_menu.reset(new QnActionManager(this));
+    m_menu.reset(new nx::client::desktop::ui::action::Manager(this));
     m_display.reset(new QnWorkbenchDisplay(this));
     m_navigator.reset(new QnWorkbenchNavigator(this));
 
@@ -82,7 +82,7 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
     auto statisticsManager = commonModule()->instance<QnStatisticsManager>();
 
     const auto actionsStatModule = instance<QnActionsStatisticsModule>();
-    actionsStatModule->setActionManager(m_menu.data()); // TODO: #ynikitenkov refactor QnActionManager to singleton
+    actionsStatModule->setActionManager(m_menu.data());
     statisticsManager->registerStatisticsModule(lit("actions"), actionsStatModule);
 
     const auto userStatModule = instance<QnUsersStatisticsModule>();
@@ -137,7 +137,7 @@ QnWorkbenchLayoutSnapshotManager* QnWorkbenchContext::snapshotManager() const
     return m_snapshotManager.data();
 }
 
-QnActionManager* QnWorkbenchContext::menu() const
+nx::client::desktop::ui::action::Manager* QnWorkbenchContext::menu() const
 {
     return m_menu.data();
 }

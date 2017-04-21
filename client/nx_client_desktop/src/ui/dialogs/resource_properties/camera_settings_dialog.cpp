@@ -15,7 +15,7 @@
 #include <core/resource_management/resources_changes_manager.h>
 
 #include <ui/actions/action_parameters.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <ui/help/help_topics.h>
 #include <ui/widgets/properties/camera_settings_widget.h>

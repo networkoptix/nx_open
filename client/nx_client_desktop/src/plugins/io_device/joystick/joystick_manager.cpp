@@ -15,7 +15,7 @@
 #include <plugins/io_device/joystick/drivers/joystick_event_filter_win.h>
 #endif
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_display.h>
 
 namespace {

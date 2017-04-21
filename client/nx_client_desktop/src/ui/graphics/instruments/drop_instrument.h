@@ -7,7 +7,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/videowall_item_index.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 
 class QnWorkbenchContext;
 class DropSurfaceItem;

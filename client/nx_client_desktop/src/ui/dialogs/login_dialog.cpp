@@ -40,7 +40,7 @@
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <plugins/resource/avi/filetypesupport.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/dialogs/connection_name_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h>

@@ -8,7 +8,7 @@
 
 #include <client/client_runtime_settings.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
@@ -172,7 +172,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
             if (!isPinned() && isOpened() && !menu()->isMenuVisible())
                 setOpened(false); //TODO: #GDM #high process handlers
         });
-    connect(menu(), &QnActionManager::menuAboutToHide, m_hidingProcessor,
+    connect(menu(), &nx::client::desktop::ui::action::Manager::menuAboutToHide, m_hidingProcessor,
         &HoverFocusProcessor::forceFocusLeave);
 
     connect(action(QnActions::ToggleThumbnailsAction), &QAction::toggled, this,

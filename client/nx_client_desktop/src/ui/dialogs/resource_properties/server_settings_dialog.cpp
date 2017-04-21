@@ -11,7 +11,7 @@
 #include <nx/network/http/httptypes.h>
 
 #include <ui/actions/action.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/widgets/properties/server_settings_widget.h>

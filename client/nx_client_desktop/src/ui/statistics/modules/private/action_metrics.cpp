@@ -3,11 +3,13 @@
 
 #include <ui/actions/action.h>
 #include <ui/actions/actions.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <statistics/base/metrics_container.h>
 #include <statistics/base/time_duration_metric.h>
 
 #include <nx/fusion/model_functions.h>
+
+using namespace nx::client::desktop::ui::action;
 
 namespace
 {
@@ -91,7 +93,7 @@ namespace
 
 //
 
-AbstractActionsMetrics::AbstractActionsMetrics(QnActionManager *actionManager)
+AbstractActionsMetrics::AbstractActionsMetrics(const ManagerPtr& actionManager)
     : base_type()
     , QnStatisticsValuesProvider()
 {
@@ -111,7 +113,7 @@ AbstractActionsMetrics::AbstractActionsMetrics(QnActionManager *actionManager)
         addActionMetric(action);
     };
 
-    connect(actionManager, &QnActionManager::actionRegistered, this, addAction);
+    connect(actionManager, &Manager::actionRegistered, this, addAction);
 }
 
 AbstractActionsMetrics::~AbstractActionsMetrics()
@@ -119,7 +121,7 @@ AbstractActionsMetrics::~AbstractActionsMetrics()
 
 //
 
-ActionsTriggeredCountMetrics::ActionsTriggeredCountMetrics(QnActionManager *actionManager)
+ActionsTriggeredCountMetrics::ActionsTriggeredCountMetrics(const ManagerPtr& actionManager)
     : base_type(actionManager)
     , m_values()
 {
@@ -180,7 +182,7 @@ void ActionsTriggeredCountMetrics::reset()
 
 //
 
-ActionCheckedTimeMetric::ActionCheckedTimeMetric(QnActionManager *actionManager)
+ActionCheckedTimeMetric::ActionCheckedTimeMetric(const ManagerPtr& actionManager)
     : base_type(actionManager)
     , m_metrics(new QnMetricsContainer())
 {

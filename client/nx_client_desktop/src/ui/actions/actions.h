@@ -1148,7 +1148,7 @@ enum IDType
 
 QN_DECLARE_TR_FUNCTIONS("QnActions")
 
-void initialize(QnActionManager* manager, QnAction* root);
+void initialize(nx::client::desktop::ui::action::Manager* manager, QnAction* root);
 
 } //namespace QnActions
 

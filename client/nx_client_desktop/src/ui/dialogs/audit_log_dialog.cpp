@@ -20,7 +20,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/actions/actions.h>
 
 #include <ui/utils/table_export_helper.h>
@@ -917,7 +917,7 @@ void QnAuditLogDialog::at_customContextMenuRequested(const QPoint&)
     if (idx.isValid())
     {
         QnResourcePtr resource = gridMaster->model()->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
-        QnActionManager *manager = context()->menu();
+        auto manager = context()->menu();
 
         if (resource)
         {

@@ -14,7 +14,7 @@
 
 #include <ui/models/camera_list_model.h>
 #include <ui/models/resource_search_proxy_model.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/utils/table_export_helper.h>
 
 #include <ui/help/help_topic_accessor.h>
@@ -193,7 +193,7 @@ void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint 
         using namespace nx::client::desktop::ui::action;
         // We'll be changing hotkeys, so we cannot reuse global actions.
         menu.reset(context()->menu()->newMenu(TreeScope, nullptr,
-            parameters, QnActionManager::DontReuseActions));
+            parameters, Manager::DontReuseActions));
 
         foreach(QAction *action, menu->actions())
             action->setShortcut(QKeySequence());

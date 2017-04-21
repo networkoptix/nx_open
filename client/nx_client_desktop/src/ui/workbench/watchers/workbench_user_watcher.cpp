@@ -11,7 +11,7 @@
 
 #include <core/resource/user_resource.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>

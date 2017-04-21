@@ -3,7 +3,7 @@
 #include <QtWidgets/QActionGroup>
 
 #include <ui/actions/action.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 
 namespace nx {
 namespace client {
@@ -11,7 +11,7 @@ namespace desktop {
 namespace ui {
 namespace action {
 
-MenuFactory::MenuFactory(QnActionManager* menu, QnAction* parent):
+MenuFactory::MenuFactory(Manager* menu, QnAction* parent):
     m_manager(menu),
     m_lastFreeActionId(QnActions::ActionCount),
     m_currentGroup(0)

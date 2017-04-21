@@ -47,7 +47,7 @@ extern "C"
 
 #include <server/server_storage_manager.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -1989,7 +1989,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     if (qnRuntime->isVideoWallMode())
         return;
 
-    QnActionManager *manager = context()->menu();
+    auto manager = context()->menu();
 
     QnTimePeriod selection;
     if (m_timeSlider->isSelectionValid())

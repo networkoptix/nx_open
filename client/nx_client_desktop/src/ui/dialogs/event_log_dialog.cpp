@@ -20,7 +20,7 @@
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/actions/actions.h>
 #include <ui/common/item_view_hover_tracker.h>
 #include <ui/utils/table_export_helper.h>
@@ -459,7 +459,7 @@ void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
     if (idx.isValid())
     {
         QnResourcePtr resource = m_model->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
-        QnActionManager *manager = context()->menu();
+        auto manager = context()->menu();
         if (resource)
         {
             QnActionParameters parameters(resource);

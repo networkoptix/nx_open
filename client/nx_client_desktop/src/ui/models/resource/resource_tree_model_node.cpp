@@ -24,7 +24,7 @@
 
 #include <api/global_settings.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/models/resource/tree/resource_tree_model_node_manager.h>

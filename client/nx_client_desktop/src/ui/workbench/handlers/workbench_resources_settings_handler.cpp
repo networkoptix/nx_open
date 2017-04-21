@@ -1,6 +1,6 @@
 #include "workbench_resources_settings_handler.h"
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/actions/action.h>
 
 #include <core/resource/camera_resource.h>

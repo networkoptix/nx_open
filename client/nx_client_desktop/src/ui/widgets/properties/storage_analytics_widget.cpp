@@ -17,7 +17,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/actions/actions.h>
 #include <ui/common/widget_anchor.h>
 #include <ui/customization/customized.h>
@@ -449,7 +449,7 @@ void QnStorageAnalyticsWidget::at_eventsGrid_customContextMenuRequested(const QP
     if (idx.isValid())
     {
         QnResourcePtr resource = table->model()->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
-        QnActionManager *manager = context()->menu();
+        auto manager = context()->menu();
 
         if (resource)
         {

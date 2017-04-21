@@ -1,23 +1,20 @@
-
 #pragma once
 
+#include <nx/client/desktop/ui/actions/action_fwd.h>
 
 #include <statistics/base/base_fwd.h>
 #include <statistics/base/statistics_values_provider.h>
 
-class QnAction;
-class QnActionManager;
 class TimeDurationMetric;
 
-class AbstractActionsMetrics : public QObject
-    , public QnStatisticsValuesProvider
+class AbstractActionsMetrics : public QObject, public QnStatisticsValuesProvider
 {
     Q_OBJECT
 
     typedef QObject base_type;
 
 public:
-    AbstractActionsMetrics (QnActionManager *actionManager);
+    AbstractActionsMetrics(const nx::client::desktop::ui::action::ManagerPtr& actionManager);
 
     virtual ~AbstractActionsMetrics();
 
@@ -34,7 +31,7 @@ class ActionsTriggeredCountMetrics : public AbstractActionsMetrics
     typedef AbstractActionsMetrics base_type;
 
 public:
-    ActionsTriggeredCountMetrics(QnActionManager *actionManager);
+    ActionsTriggeredCountMetrics(const nx::client::desktop::ui::action::ManagerPtr& actionManager);
 
     QnStatisticValuesHash values() const override;
 
@@ -58,7 +55,7 @@ class ActionCheckedTimeMetric : public AbstractActionsMetrics
     typedef AbstractActionsMetrics base_type;
 
 public:
-    ActionCheckedTimeMetric(QnActionManager *actionManager);
+    ActionCheckedTimeMetric(const nx::client::desktop::ui::action::ManagerPtr& actionManager);
 
     virtual ~ActionCheckedTimeMetric();
 

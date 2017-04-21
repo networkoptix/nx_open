@@ -9,7 +9,7 @@
 #include <nx/client/desktop/ui/actions/action_conditions.h>
 #include <nx/client/desktop/ui/actions/action_factories.h>
 #include <nx/client/desktop/ui/actions/action_text_factories.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_layout.h>
@@ -22,9 +22,10 @@
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(QnActions, IDType)
 
-void QnActions::initialize(QnActionManager* manager, QnAction* root)
+using namespace nx::client::desktop::ui::action;
+
+void QnActions::initialize(Manager* manager, QnAction* root)
 {
-    using namespace nx::client::desktop::ui::action;
 
     MenuFactory factory(manager, root);
 

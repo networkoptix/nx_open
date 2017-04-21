@@ -1,31 +1,30 @@
 #pragma once
 
 #include <QtCore/QObject>
-#include <QHash>
+#include <QtCore/QHash>
 #include <QtCore/QSet>
 #include <QtCore/QVariant>
 #include <QtCore/QPointer>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_index.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include "actions.h"
-#include "action_parameters.h"
+#include <ui/actions/actions.h>
+#include <ui/actions/action_parameters.h>
 
 #include <nx/client/desktop/ui/actions/action_fwd.h>
 
-class QAction;
-class QMenu;
-class QGraphicsItem;
-
-class QnMenuFactory;
-class QnActionBuilder;
-class QnWorkbenchContext;
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+namespace action {
 
 /**
  * Action manager stores application's actions and presents an interface for
  * creating context menus given current action scope and parameters.
  */
-class QnActionManager: public QObject, public QnWorkbenchContextAware
+class Manager: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT;
 public:
@@ -40,12 +39,12 @@ public:
      *
      * \param parent                    Context-aware parent of this action manager.
      */
-    QnActionManager(QObject *parent = NULL);
+    Manager(QObject *parent = NULL);
 
     /**
      * Virtual destructor.
      */
-    virtual ~QnActionManager();
+    virtual ~Manager();
 
     /**
      * \param action                    New action to register with this action manager.
@@ -105,20 +104,20 @@ public:
      *                                  Ownership of the created menu is passed to
      *                                  the caller.
      */
-    QMenu *newMenu(nx::client::desktop::ui::action::ActionScope scope, QWidget *parent = NULL, const QnActionParameters &parameters = QnActionParameters(), CreationOptions options = 0);
+    QMenu *newMenu(ActionScope scope, QWidget *parent = NULL, const QnActionParameters &parameters = QnActionParameters(), CreationOptions options = 0);
 
-    QMenu *newMenu(QnActions::IDType rootId, nx::client::desktop::ui::action::ActionScope scope, QWidget *parent = NULL, const QnActionParameters &parameters = QnActionParameters(), CreationOptions options = 0);
+    QMenu *newMenu(QnActions::IDType rootId, ActionScope scope, QWidget *parent = NULL, const QnActionParameters &parameters = QnActionParameters(), CreationOptions options = 0);
 
     /**
      * \returns                         Action target provider that is assigned to this
      *                                  action manager.
      */
-    nx::client::desktop::ui::action::TargetProvider *targetProvider() const;
+    TargetProvider *targetProvider() const;
 
     /**
      * \param targetProvider            New target provider for this action manager.
      */
-    void setTargetProvider(nx::client::desktop::ui::action::TargetProvider *targetProvider);
+    void setTargetProvider(TargetProvider *targetProvider);
 
     /**
      * \param action                    Action that has just been activated.
@@ -161,7 +160,7 @@ protected:
 
     void copyAction(QAction *dst, QnAction *src, bool forwardSignals = true);
 
-    QMenu *newMenuRecursive(const QnAction *parent, nx::client::desktop::ui::action::ActionScope scope, const QnActionParameters &parameters, QWidget *parentWidget, CreationOptions options);
+    QMenu *newMenuRecursive(const QnAction *parent, ActionScope scope, const QnActionParameters &parameters, QWidget *parentWidget, CreationOptions options);
 
     bool redirectActionRecursive(QMenu *menu, QnActions::IDType targetId, QAction *targetAction);
 
@@ -189,7 +188,7 @@ private:
     QHash<QMenu*, QnActionParameters> m_parametersByMenu;
 
     /** Target provider for actions. */
-    nx::client::desktop::ui::action::TargetProvider* m_targetProvider;
+    TargetProvider* m_targetProvider;
 
     /** Guard for target provider. */
     QPointer<QObject> m_targetProviderGuard;
@@ -201,4 +200,10 @@ private:
     QMenu* m_lastClickedMenu;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnActionManager::CreationOptions)
+Q_DECLARE_OPERATORS_FOR_FLAGS(Manager::CreationOptions)
+
+} // namespace action
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx

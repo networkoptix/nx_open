@@ -31,7 +31,7 @@
 
 #include <ui/common/palette.h>
 #include <ui/common/frame_section.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/graphics/view/graphics_view.h>
 #include <ui/graphics/view/graphics_scene.h>
 #include <ui/graphics/instruments/instrument_manager.h>

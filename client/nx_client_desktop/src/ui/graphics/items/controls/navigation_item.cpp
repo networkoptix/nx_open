@@ -14,7 +14,7 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/synctime.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <ui/common/palette.h>
 #include <ui/style/skin.h>

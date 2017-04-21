@@ -84,7 +84,7 @@
 
 #include <ui/help/help_handler.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/action_target_provider.h>
 
 #include <ui/workaround/hidpi_workarounds.h>

@@ -17,7 +17,7 @@
 
 #include <recording/time_period.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
 #include <ui/common/read_only.h>
 #include <ui/delegates/customizable_item_delegate.h>

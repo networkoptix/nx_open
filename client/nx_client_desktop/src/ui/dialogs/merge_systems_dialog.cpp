@@ -18,7 +18,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/watchers/workbench_user_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/merge_systems_tool.h>

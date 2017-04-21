@@ -16,7 +16,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <ui/actions/action.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/widgets/palette_widget.h>
 #include <ui/dialogs/common/dialog.h>
 #include <ui/widgets/common/web_page.h>

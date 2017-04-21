@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QAction>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/action_target_provider.h>
 
 #include <utils/common/delayed.h>

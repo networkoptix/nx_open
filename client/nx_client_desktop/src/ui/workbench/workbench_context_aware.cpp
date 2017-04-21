@@ -113,7 +113,7 @@ QAction *QnWorkbenchContextAware::action(const QnActions::IDType id) const
     return context()->action(id);
 }
 
-QnActionManager *QnWorkbenchContextAware::menu() const
+nx::client::desktop::ui::action::Manager* QnWorkbenchContextAware::menu() const
 {
     NX_ASSERT(m_initialized, Q_FUNC_INFO, "Initialization failed");
     return context()->menu();

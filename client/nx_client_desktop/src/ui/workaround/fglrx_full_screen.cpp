@@ -3,7 +3,7 @@
 #include <QtWidgets/QAction>
 #include <QtOpenGL/QGLWidget>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/opengl/gl_functions.h>

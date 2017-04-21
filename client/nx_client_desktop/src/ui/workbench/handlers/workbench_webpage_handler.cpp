@@ -9,7 +9,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <ui/actions/action.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <ui/dialogs/webpage_dialog.h>
 

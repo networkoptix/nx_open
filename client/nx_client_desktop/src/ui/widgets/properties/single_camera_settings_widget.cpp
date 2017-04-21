@@ -22,7 +22,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <ui/actions/action_parameters.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/aligner.h>
 #include <ui/common/read_only.h>
 
