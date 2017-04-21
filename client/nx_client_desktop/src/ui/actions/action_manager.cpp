@@ -9,6 +9,8 @@
 #include "action_parameter_types.h"
 #include <nx/client/desktop/ui/actions/menu_factory.h>
 #include <nx/client/desktop/ui/actions/action_builder.h>
+#include <nx/client/desktop/ui/actions/action_factories.h>
+#include <nx/client/desktop/ui/actions/action_text_factories.h>
 
 #include <ui/workbench/workbench.h>
 

@@ -37,7 +37,7 @@ public:
     Builder role(QAction::MenuRole role);
     Builder autoRepeat(bool autoRepeat);
     Builder text(const QString& text);
-    Builder dynamicText(QnActionTextFactory* factory);
+    Builder dynamicText(const TextFactoryPtr& factory);
     Builder toggledText(const QString& text);
     Builder pulledText(const QString& text);
     Builder toolTip(const QString& toolTip);
@@ -57,7 +57,7 @@ public:
     Builder accent(Qn::ButtonAccent value);
     Builder condition(const ConditionPtr& condition);
     Builder condition(const QnResourceCriterion& criterion, MatchMode matchMode = All);
-    Builder childFactory(QnActionFactory* childFactory);
+    Builder childFactory(const FactoryPtr& childFactory);
 
 private:
     QnAction* m_action;

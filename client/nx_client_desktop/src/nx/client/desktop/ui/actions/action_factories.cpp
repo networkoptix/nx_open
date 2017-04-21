@@ -26,18 +26,43 @@
 #include <ui/workbench/workbench.h>
 #include <ui/style/globals.h>
 
-QnOpenCurrentUserLayoutActionFactory::QnOpenCurrentUserLayoutActionFactory(QObject *parent):
-    QnActionFactory(parent)
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+namespace action {
+
+Factory::Factory(QObject* parent):
+    QObject(parent),
+    QnWorkbenchContextAware(parent)
 {
 }
 
-QList<QAction *> QnOpenCurrentUserLayoutActionFactory::newActions(const QnActionParameters &, QObject *parent)
+QList<QAction*> Factory::newActions(const QnActionParameters& /*parameters*/, QObject* /*parent*/)
+{
+    return QList<QAction*>();
+}
+
+QMenu* Factory::newMenu(const QnActionParameters& /*parameters*/, QWidget* /*parentWidget*/)
+{
+    return nullptr;
+}
+
+OpenCurrentUserLayoutFactory::OpenCurrentUserLayoutFactory(QObject* parent):
+    Factory(parent)
+{
+}
+
+QList<QAction*> OpenCurrentUserLayoutFactory::newActions(const QnActionParameters& /*parameters*/,
+    QObject* parent)
 {
     /* Multi-videos and shared layouts will go here. */
     auto layouts = resourcePool()->getResourcesWithParentId(QnUuid()).filtered<QnLayoutResource>();
     if (context()->user())
+    {
         layouts.append(resourcePool()->getResourcesWithParentId(context()->user()->getId())
             .filtered<QnLayoutResource>());
+    }
 
     std::sort(layouts.begin(), layouts.end(),
         [](const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r)
@@ -45,10 +70,10 @@ QList<QAction *> QnOpenCurrentUserLayoutActionFactory::newActions(const QnAction
             return nx::utils::naturalStringLess(l->getName(), r->getName());
         });
 
-    auto currentLayout = context()->workbench()->currentLayout()->resource();
+    auto currentLayout = workbench()->currentLayout()->resource();
 
-    QList<QAction *> result;
-    for (const auto &layout : layouts)
+    QList<QAction*> result;
+    for (const auto &layout: layouts)
     {
         if (layout->isFile())
         {
@@ -62,9 +87,8 @@ QList<QAction *> QnOpenCurrentUserLayoutActionFactory::newActions(const QnAction
         if (!accessController()->hasPermissions(layout, Qn::ReadPermission))
             continue;
 
-        QAction *action = new QAction(parent);
+        auto action = new QAction(parent);
         action->setText(layout->getName());
-        action->setData(QVariant::fromValue<QnLayoutResourcePtr>(layout));
         action->setCheckable(true);
         action->setChecked(layout == currentLayout);
         connect(action, &QAction::triggered, this,
@@ -77,10 +101,17 @@ QList<QAction *> QnOpenCurrentUserLayoutActionFactory::newActions(const QnAction
     return result;
 }
 
-QList<QAction *> QnPtzPresetsToursActionFactory::newActions(const QnActionParameters &parameters, QObject *parent) {
-    QList<QAction *> result;
+PtzPresetsToursFactory::PtzPresetsToursFactory(QObject* parent):
+    Factory(parent)
+{
+}
 
-    QnMediaResourceWidget* widget = parameters.widget<QnMediaResourceWidget>();
+QList<QAction *> PtzPresetsToursFactory::newActions(const QnActionParameters& parameters,
+    QObject* parent)
+{
+    QList<QAction*> result;
+
+    auto widget = parameters.widget<QnMediaResourceWidget>();
     if (!widget)
         return result;
 
@@ -91,66 +122,72 @@ QList<QAction *> QnPtzPresetsToursActionFactory::newActions(const QnActionParame
     widget->ptzController()->getTours(&tours);
     widget->ptzController()->getActiveObject(&activeObject);
 
-    std::sort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
-        return nx::utils::naturalStringLess(l.name, r.name);
-    });
-    std::sort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
-        return nx::utils::naturalStringLess(l.name, r.name);
-    });
+    std::sort(presets.begin(), presets.end(),
+        [](const QnPtzPreset &l, const QnPtzPreset &r)
+        {
+            return nx::utils::naturalStringLess(l.name, r.name);
+        });
+
+    std::sort(tours.begin(), tours.end(),
+        [](const QnPtzTour &l, const QnPtzTour &r)
+        {
+            return nx::utils::naturalStringLess(l.name, r.name);
+        });
 
     QnPtzHotkeysResourcePropertyAdaptor adaptor;
     adaptor.setResource(widget->resource()->toResourcePtr());
     QnPtzHotkeyHash idByHotkey = adaptor.value();
 
-    foreach(const QnPtzPreset &preset, presets) {
-        QAction *action = new QAction(parent);
-        if(activeObject.type == Qn::PresetPtzObject && activeObject.id == preset.id) {
+    for (const auto& preset: presets)
+    {
+        auto action = new QAction(parent);
+        if (activeObject.type == Qn::PresetPtzObject && activeObject.id == preset.id)
             action->setText(tr("%1 (active)", "Template for active PTZ preset").arg(preset.name));
-        } else {
+        else
             action->setText(preset.name);
-        }
 
         int hotkey = idByHotkey.key(preset.id, QnPtzHotkey::NoHotkey);
-        if(hotkey != QnPtzHotkey::NoHotkey)
+        if (hotkey != QnPtzHotkey::NoHotkey)
             action->setShortcut(Qt::Key_0 + hotkey);
 
-        action->setData(QVariant::fromValue(
-            QnActionParameters(parameters)
-                .withArgument(Qn::PtzObjectIdRole, preset.id)
-                .withArgument(Qn::ActionIdRole, static_cast<int>(QnActions::PtzActivatePresetAction))
-        ));
-        connect(action, &QAction::triggered, this, &QnPtzPresetsToursActionFactory::at_action_triggered);
+        connect(action, &QAction::triggered, this,
+            [this, id = preset.id, parameters]
+            {
+                menu()->trigger(QnActions::PtzActivatePresetAction,
+                    QnActionParameters(parameters).withArgument(Qn::PtzObjectIdRole, id));
+            });
 
         result.push_back(action);
     }
 
-    if(!result.isEmpty()) {
-        QAction *separator = new QAction(parent);
+    if (!result.isEmpty())
+    {
+        auto separator = new QAction(parent);
         separator->setSeparator(true);
         result.push_back(separator);
     }
 
-    foreach(const QnPtzTour &tour, tours) {
+    for (const auto& tour: tours)
+    {
         if (!tour.isValid(presets))
             continue;
 
-        QAction *action = new QAction(parent);
-        if(activeObject.type == Qn::TourPtzObject && activeObject.id == tour.id) {
+        auto action = new QAction(parent);
+        if (activeObject.type == Qn::TourPtzObject && activeObject.id == tour.id)
             action->setText(tr("%1 (active)", "Template for active PTZ tour").arg(tour.name));
-        } else {
+        else
             action->setText(tour.name);
-        }
 
         int hotkey = idByHotkey.key(tour.id, QnPtzHotkey::NoHotkey);
-        if(hotkey != QnPtzHotkey::NoHotkey)
+        if (hotkey != QnPtzHotkey::NoHotkey)
             action->setShortcut(Qt::Key_0 + hotkey);
 
-        action->setData(QVariant::fromValue(
-            QnActionParameters(parameters)
-                .withArgument(Qn::PtzObjectIdRole, tour.id)
-                .withArgument(Qn::ActionIdRole, static_cast<int>(QnActions::PtzActivateTourAction))
-        ));
-        connect(action, &QAction::triggered, this, &QnPtzPresetsToursActionFactory::at_action_triggered);
+        connect(action, &QAction::triggered, this,
+            [this, id = tour.id, parameters]
+            {
+                menu()->trigger(QnActions::PtzActivateTourAction,
+                    QnActionParameters(parameters).withArgument(Qn::PtzObjectIdRole, id));
+            });
 
         result.push_back(action);
     }
@@ -158,59 +195,44 @@ QList<QAction *> QnPtzPresetsToursActionFactory::newActions(const QnActionParame
     return result;
 }
 
-void QnPtzPresetsToursActionFactory::at_action_triggered() {
-    QAction *action = dynamic_cast<QAction *>(sender());
-    if(!action)
-        return;
-
-    QnActionParameters parameters = action->data().value<QnActionParameters>();
-    QnActions::IDType actionId = static_cast<QnActions::IDType>(
-        parameters.argument<int>(Qn::ActionIdRole, QnActions::NoAction));
-
-    context()->menu()->trigger(actionId, parameters);
-}
-
-
-QMenu* QnEdgeNodeActionFactory::newMenu(const QnActionParameters &parameters, QWidget *parentWidget) {
-    QnVirtualCameraResourcePtr edgeCamera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
+QMenu* EdgeNodeFactory::newMenu(const QnActionParameters& parameters, QWidget* parentWidget)
+{
+    auto edgeCamera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
     if (!edgeCamera || !QnMediaServerResource::isHiddenServer(edgeCamera->getParentResource()))
-        return NULL;
+        return nullptr;
 
-    using namespace nx::client::desktop::ui::action;
     return menu()->newMenu(QnActions::NoAction, TreeScope, parentWidget,
         QnActionParameters(edgeCamera->getParentResource()));
 }
 
-QList<QAction *> QnAspectRatioActionFactory::newActions(const QnActionParameters &parameters, QObject *parent) {
-    QActionGroup *actionGroup = new QActionGroup(parent);
-
-    QnWorkbenchLayout *currentLayout = workbench()->currentLayout();
-
-    float current = currentLayout->cellAspectRatio();
+QList<QAction*> AspectRatioFactory::newActions(const QnActionParameters& /*parameters*/,
+    QObject* parent)
+{
+    float current = workbench()->currentLayout()->cellAspectRatio();
     if (current <= 0)
         current = qnGlobals->defaultLayoutCellAspectRatio();
     QnAspectRatio currentAspectRatio = QnAspectRatio::closestStandardRatio(current);
 
-
-    for (const QnAspectRatio &aspectRatio: QnAspectRatio::standardRatios()) {
+    auto actionGroup = new QActionGroup(parent);
+    for (const auto& aspectRatio: QnAspectRatio::standardRatios())
+    {
         QAction *action = new QAction(parent);
         action->setText(aspectRatio.toString());
-        action->setData(QVariant::fromValue(
-            QnActionParameters(parameters).withArgument(Qn::LayoutCellAspectRatioRole, aspectRatio.toFloat())
-        ));
         action->setCheckable(true);
         action->setChecked(aspectRatio == currentAspectRatio);
+        connect(action, &QAction::triggered, this,
+            [this, ar = aspectRatio.toFloat()]
+            {
+                workbench()->currentLayout()->setCellAspectRatio(ar);
+            });
         actionGroup->addAction(action);
     }
-
-    connect(actionGroup, &QActionGroup::triggered, this, &QnAspectRatioActionFactory::at_action_triggered);
-
     return actionGroup->actions();
 }
 
-void QnAspectRatioActionFactory::at_action_triggered(QAction *action) {
-    QnWorkbenchLayout *currentLayout = workbench()->currentLayout();
 
-    float aspectRatio = action->data().value<QnActionParameters>().argument(Qn::LayoutCellAspectRatioRole).toFloat();
-    currentLayout->setCellAspectRatio(aspectRatio);
-}
+} // namespace action
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx

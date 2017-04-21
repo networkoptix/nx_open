@@ -12,15 +12,12 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <client/client_globals.h>
 
-#include "action_factories.h"
-#include "action_text_factories.h"
 #include "action_fwd.h"
 #include "actions.h"
 
 class QGraphicsItem;
 
 class QnWorkbenchContext;
-class QnActionFactory;
 class QnActionManager;
 class QnActionParameters;
 
@@ -135,13 +132,11 @@ public:
      */
     void setCondition(const nx::client::desktop::ui::action::ConditionPtr& condition);
 
-    QnActionFactory *childFactory() const;
+    nx::client::desktop::ui::action::FactoryPtr childFactory() const;
+    void setChildFactory(const nx::client::desktop::ui::action::FactoryPtr& childFactory);
 
-    void setChildFactory(QnActionFactory *childFactory);
-
-    QnActionTextFactory *textFactory() const;
-
-    void setTextFactory(QnActionTextFactory *textFactory);
+    nx::client::desktop::ui::action::TextFactoryPtr textFactory() const;
+    void setTextFactory(const nx::client::desktop::ui::action::TextFactoryPtr& textFactory);
 
     /**
      * \returns                         Child actions. These action will appear
@@ -203,8 +198,8 @@ private:
     QString m_normalText, m_toggledText, m_pulledText;
     QString m_toolTipFormat, m_toolTipMarker;
     nx::client::desktop::ui::action::ConditionPtr m_condition;
-    QPointer<QnActionFactory> m_childFactory;
-    QPointer<QnActionTextFactory> m_textFactory;
+    nx::client::desktop::ui::action::FactoryPtr m_childFactory;
+    nx::client::desktop::ui::action::TextFactoryPtr m_textFactory;
 
     QList<QnAction *> m_children;
 

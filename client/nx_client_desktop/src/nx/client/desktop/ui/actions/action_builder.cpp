@@ -101,7 +101,7 @@ Builder Builder::text(const QString& text)
     return *this;
 }
 
-Builder Builder::dynamicText(QnActionTextFactory* factory)
+Builder Builder::dynamicText(const TextFactoryPtr& factory)
 {
     m_action->setTextFactory(factory);
     return *this;
@@ -225,7 +225,7 @@ Builder Builder::condition(const QnResourceCriterion& criterion, MatchMode match
     return *this;
 }
 
-Builder Builder::childFactory(QnActionFactory *childFactory)
+Builder Builder::childFactory(const FactoryPtr& childFactory)
 {
     m_action->setChildFactory(childFactory);
     m_action->setFlags(m_action->flags() | RequiresChildren);

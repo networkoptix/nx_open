@@ -7,9 +7,9 @@
 
 #include <nx/client/desktop/ui/actions/menu_factory.h>
 #include <nx/client/desktop/ui/actions/action_conditions.h>
+#include <nx/client/desktop/ui/actions/action_factories.h>
+#include <nx/client/desktop/ui/actions/action_text_factories.h>
 #include <ui/actions/action_manager.h>
-#include <ui/actions/action_factories.h>
-#include <ui/actions/action_text_factories.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_layout.h>
@@ -146,7 +146,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
     factory(QnActions::CameraDiagnosticsAction).
         mode(DesktopMode).
         flags(ResourceTarget | SingleTarget).
-        dynamicText(new QnDevicesNameActionTextFactory(
+        dynamicText(new DevicesNameTextFactory(
             QnCameraDeviceStringSet(
                 tr("Device Diagnostics..."),
                 tr("Camera Diagnostics..."),
@@ -369,7 +369,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
     factory(QnActions::OpenCurrentUserLayoutMenu).
         flags(TitleBar | SingleTarget | NoTarget).
         text(tr("Open Layout...")).
-        childFactory(new QnOpenCurrentUserLayoutActionFactory(manager)).
+        childFactory(new OpenCurrentUserLayoutFactory(manager)).
         icon(qnSkin->icon("titlebar/dropdown.png"));
 
     factory().
@@ -669,7 +669,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
 
     factory().
         flags(Tree | SingleTarget | ResourceTarget).
-        childFactory(new QnEdgeNodeActionFactory(manager)).
+        childFactory(new EdgeNodeFactory(manager)).
         text(tr("Server...")).
         condition(new TreeNodeTypeCondition(Qn::EdgeNode, manager));
 
@@ -923,7 +923,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
 
     factory().
         flags(Scene | SingleTarget).
-        childFactory(new QnPtzPresetsToursActionFactory(manager)).
+        childFactory(new PtzPresetsToursFactory(manager)).
         text(tr("PTZ...")).
         requiredTargetPermissions(Qn::WritePtzPermission).
         condition(new PtzCondition(Qn::PresetsPtzCapability, false, manager));
@@ -1160,7 +1160,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
     factory(QnActions::CameraIssuesAction).
         mode(DesktopMode).
         flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget).
-        dynamicText(new QnDevicesNameActionTextFactory(
+        dynamicText(new DevicesNameTextFactory(
             QnCameraDeviceStringSet(
                 tr("Check Device Issues..."), tr("Check Devices Issues..."),
                 tr("Check Camera Issues..."), tr("Check Cameras Issues..."),
@@ -1175,7 +1175,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
     factory(QnActions::CameraBusinessRulesAction).
         mode(DesktopMode).
         flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget).
-        dynamicText(new QnDevicesNameActionTextFactory(
+        dynamicText(new DevicesNameTextFactory(
             QnCameraDeviceStringSet(
                 tr("Device Rules..."), tr("Devices Rules..."),
                 tr("Camera Rules..."), tr("Cameras Rules..."),
@@ -1190,7 +1190,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
     factory(QnActions::CameraSettingsAction).
         mode(DesktopMode).
         flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget).
-        dynamicText(new QnDevicesNameActionTextFactory(
+        dynamicText(new DevicesNameTextFactory(
             QnCameraDeviceStringSet(
                 tr("Device Settings..."), tr("Devices Settings..."),
                 tr("Camera Settings..."), tr("Cameras Settings..."),
@@ -1302,7 +1302,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
 
     factory().
         flags(Scene | NoTarget).
-        childFactory(new QnAspectRatioActionFactory(manager)).
+        childFactory(new AspectRatioFactory(manager)).
         text(tr("Change Cell Aspect Ratio...")).
         condition(
             !ConditionPtr(new VideoWallReviewModeCondition(manager))

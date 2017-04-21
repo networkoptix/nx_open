@@ -25,7 +25,6 @@
 
 #include "action_manager.h"
 #include "action_target_provider.h"
-#include "action_factories.h"
 #include "action_parameter_types.h"
 
 using namespace nx::client::desktop::ui::action;
@@ -167,22 +166,22 @@ void QnAction::setCondition(const ConditionPtr& condition)
     m_condition = condition;
 }
 
-QnActionFactory* QnAction::childFactory() const
+FactoryPtr QnAction::childFactory() const
 {
-    return m_childFactory.data();
+    return m_childFactory;
 }
 
-void QnAction::setChildFactory(QnActionFactory* childFactory)
+void QnAction::setChildFactory(const FactoryPtr& childFactory)
 {
     m_childFactory = childFactory;
 }
 
-QnActionTextFactory* QnAction::textFactory() const
+TextFactoryPtr QnAction::textFactory() const
 {
-    return m_textFactory.data();
+    return m_textFactory;
 }
 
-void QnAction::setTextFactory(QnActionTextFactory* textFactory)
+void QnAction::setTextFactory(const TextFactoryPtr& textFactory)
 {
     m_textFactory = textFactory;
 }
