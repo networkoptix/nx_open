@@ -123,7 +123,7 @@ angular.module('webadminApp')
                     }
 
                     timelineActions.updateState();
-                    timelineRender.Draw( mouseXOverTimeline, mouseYOverTimeline, timelineActions.catchScrollBar);
+                    timelineRender.Draw( mouseXOverTimeline, mouseYOverTimeline, timelineActions.scrollingNow, timelineActions.catchScrollBar);
                 }
 
 
@@ -325,7 +325,11 @@ angular.module('webadminApp')
                     }
 
                     if(mouseOverElements.scrollbar && !mouseOverElements.scrollbarSlider){
-                        scrollbarClickOrHold(mouseXOverTimeline);
+                        var scrollLeft = true;
+                        //checking if mouse is to the left or right of the scrollbar
+                        if(scope.scaleManager.getRelativeCenter() * canvas.width < mouseXOverTimeline)
+                            scrollLeft = false;
+                        scrollbarClickOrHold(scrollLeft);
                     }
                 }
                 function viewportClick(event){

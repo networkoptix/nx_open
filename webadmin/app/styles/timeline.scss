@@ -1,3 +1,4 @@
+@import 'native-theme/_theme_palette';
 
 .viewport{
   width:100%;
@@ -28,6 +29,10 @@
   padding:2px;
   width:60px;
   font-size:70%;
+}
+
+canvas{
+  background-color: $light1;
 }
 
 
