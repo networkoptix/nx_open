@@ -1,14 +1,14 @@
 import QtQuick 2.6
+import Nx 1.0
 
 ShaderEffect
 {
+    /* Source parameters: */
     property alias sourceItem: shaderSource.sourceItem
 
     readonly property size sourceSize: sourceItem 
         ? Qt.size(sourceItem.width, sourceItem.height)
         : Qt.size(0.0, 0.0)
-
-    readonly property size targetSize: Qt.size(width, height)
 
     blending: false
 
@@ -17,48 +17,19 @@ ShaderEffect
     property real fieldRadius: Math.min(sourceSize.width, sourceSize.height) / sourceSize.width
     property vector2d fieldOffset: Qt.vector2d(0.0, 0.0)
     property real fieldStretch: 1.0
-    property real fieldRotation: 0.0 //TODO: #vkutin Use it
+    property real fieldRotation: 0.0
+                           
+    /* Camera parameters: */
 
-//TODO: #vkutin This will be used in actual dewarping
-//  property real viewFov
-//  property point viewCenter
+    property real viewScale: 1.0
+    property matrix4x4 viewRotationMatrix
+    property vector2d viewShift
 
-    /* Vertex shader uniforms - fisheye field ellipse mapping: */
+    /* Feedback parameters (to be queried from outside): */
 
-    readonly property vector2d texCoordScale:
-    {
-        var sourceAspectRatio = sourceSize.width / sourceSize.height;
-        var targetAspectRatio = targetSize.width / targetSize.height;
+    readonly property real angleScaleFactor: 0.5 / Math.atan(viewScale * 0.5)
 
-        var diameter = fieldRadius * 2.0;
-        var mapFromEllipse = Qt.vector2d(1.0 / diameter, fieldStretch / (diameter * sourceAspectRatio))
- 
-        return targetAspectRatio < 1.0
-            ? Qt.vector2d(1.0, targetAspectRatio).times(mapFromEllipse)
-            : Qt.vector2d(1.0 / targetAspectRatio, 1.0).times(mapFromEllipse)
-    }
-
-    readonly property vector2d texCoordCenter: Qt.vector2d(0.5, 0.5).plus(fieldOffset)
-
-    /* Vertex shader code: */
-
-    vertexShader: "
-        uniform mat4 qt_Matrix;
-        uniform vec2 texCoordScale;
-        uniform vec2 texCoordCenter; // ellipse center
-
-        attribute vec4 qt_Vertex;
-        attribute vec2 qt_MultiTexCoord0;
-
-        varying vec2 textureCoord;
-
-        void main()
-        {
-            textureCoord = vec2(0.5, 0.5) + (qt_MultiTexCoord0 - texCoordCenter) / texCoordScale;
-            gl_Position = qt_Matrix * qt_Vertex;
-        }"
-
-    /* Fragment shader uniforms: */
+    /* Shader uniforms: */
 
     ShaderEffectSource
     {
@@ -70,26 +41,79 @@ ShaderEffect
 
     readonly property var sourceTexture: shaderSource
 
+    readonly property vector2d projectionCoordsScale:
+    {
+        var targetAspectRatio = width / height
+        return (targetAspectRatio < 1.0
+            ? Qt.vector2d(1.0, targetAspectRatio)
+            : Qt.vector2d(1.0 / targetAspectRatio, 1.0)).times(viewScale)
+    }
+
+    readonly property matrix4x4 textureMatrix: // maps hemispere projection coords into texture coords
+    {
+        var sourceAspectRatio = sourceSize.width / sourceSize.height
+        var textureCoordsScale = Qt.vector2d(1.0, fieldStretch / sourceAspectRatio).times(1.0 / fieldRadius)
+        var textureCoordsCenter = Qt.vector2d(0.5, 0.5).minus(fieldOffset)
+
+        return Utils3D.translation(textureCoordsCenter.x, textureCoordsCenter.y, 0.0).times(
+               Utils3D.scaling(1.0 / textureCoordsScale.x, 1.0 / textureCoordsScale.y, 1.0)).times(
+               Utils3D.rotationZ(Utils3D.radians(-fieldRotation)))
+    }
+
+    readonly property vector2d viewCenter: Qt.vector2d(0.5, 0.5).plus(viewShift)
+
+    /* Vertex shader code: */
+
+    vertexShader: "
+        uniform vec2 projectionCoordsScale;
+        uniform vec2 viewCenter;
+        uniform float viewScale;
+        uniform mat4 qt_Matrix;
+
+        attribute vec4 qt_Vertex;
+        attribute vec2 qt_MultiTexCoord0;
+
+        varying vec2 projectionCoords; // carthesian coords local to hemispere projection unit circle
+
+        void main()
+        {
+            projectionCoords = ((qt_MultiTexCoord0 - viewCenter) / projectionCoordsScale) * 2.0;
+            gl_Position = qt_Matrix * qt_Vertex;
+        }"
+
     /* Fragment shader code: */
 
     fragmentShader: "
-        varying vec2 textureCoord;
+        varying vec2 projectionCoords;
 
+        uniform mat4 textureMatrix;
+        uniform mat4 viewRotationMatrix;
         uniform sampler2D sourceTexture;
         uniform float qt_Opacity;
 
         vec4 texture2DBlackBorder(sampler2D sampler, vec2 coord)
         {
-             bool isInside = coord.x >= 0.0 && coord.x <= 1.0 
-                          && coord.y >= 0.0 && coord.y <= 1.0;
-
              /* Turn outside areas to black without conditional operator: */
+             bool isInside = all(bvec4(coord.x >= 0.0, coord.x <= 1.0, coord.y >= 0.0, coord.y <= 1.0));
              return texture2D(sampler, coord) * vec4(vec3(float(isInside)), 1.0);
         }
 
-        //TODO: #FIXME #vkutin Stub: plain texture lookup
+        vec2 stereographicProject(vec3 coords)
+        {
+             return coords.xy / (1.0 - coords.z);
+        }
+
+        vec3 stereographicUnproject(vec2 coords)
+        {
+             float r2 = dot(coords, coords);
+             return vec3(coords * 2.0, r2 - 1.0) / (r2 + 1.0);
+        }
+
         void main() 
         {
-             gl_FragColor = texture2DBlackBorder(sourceTexture, textureCoord);
+             vec4 pointOnSphere = vec4(stereographicUnproject(projectionCoords), 1.0);
+             vec2 transformedProjectionCoords = stereographicProject(viewRotationMatrix * pointOnSphere);
+             vec2 textureCoords = (textureMatrix * vec4(transformedProjectionCoords, 0.0, 1.0)).xy;
+             gl_FragColor = texture2DBlackBorder(sourceTexture, textureCoords);
         }"
 }
