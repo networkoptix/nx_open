@@ -18,6 +18,7 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/server/fusion_request_result.h>
+#include <nx/network/http/server/http_server_connection.h>
 #include <nx/utils/time.h>
 
 #include <common/common_globals.h> //for Qn::SerializationFormat
@@ -82,11 +83,12 @@ void AuthenticationManager::authenticate(
             }
 
             completionHandler(
-                authResult == api::ResultCode::ok,
-                std::move(authProperties),
-                std::move(wwwAuthenticate),
-                std::move(responseHeaders),
-                std::move(msgBody));
+                nx_http::server::AuthenticationResult{
+                    authResult == api::ResultCode::ok,
+                    std::move(authProperties),
+                    std::move(wwwAuthenticate),
+                    std::move(responseHeaders),
+                    std::move(msgBody)});
         });
 
     //TODO #ak use QnAuthHelper class to enable all that authentication types

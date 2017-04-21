@@ -1,7 +1,5 @@
 #pragma once
 
-#include "http_server_connection.h"
-
 #include <memory>
 
 #include <boost/optional.hpp>
@@ -12,15 +10,33 @@
 #include "../abstract_msg_body_source.h"
 
 namespace nx_http {
+
+class HttpServerConnection;
+
 namespace server {
 
+struct AuthenticationResult
+{
+    bool isSucceeded;
+    nx::utils::stree::ResourceContainer authInfo;
+    boost::optional<nx_http::header::WWWAuthenticate> wwwAuthenticate;
+    nx_http::HttpHeaders responseHeaders;
+    std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody;
+
+    AuthenticationResult() = delete;
+};
+
+struct SuccessfulAuthenticationResult:
+    AuthenticationResult
+{
+    SuccessfulAuthenticationResult():
+        AuthenticationResult{true}
+    {
+    }
+};
+
 using AuthenticationCompletionHandler =
-    nx::utils::MoveOnlyFunc<void(
-        bool authenticationResult,
-        nx::utils::stree::ResourceContainer authInfo,
-        boost::optional<nx_http::header::WWWAuthenticate> wwwAuthenticate,
-        nx_http::HttpHeaders responseHeaders,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody)>;
+    nx::utils::MoveOnlyFunc<void(AuthenticationResult)>;
 
 class NX_NETWORK_API AbstractAuthenticationManager
 {
