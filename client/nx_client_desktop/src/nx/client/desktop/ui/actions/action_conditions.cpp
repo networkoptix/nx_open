@@ -149,6 +149,29 @@ private:
     ConditionPtr m_condition;
 };
 
+class CustomBoolCondition: public Condition
+{
+public:
+    using CheckDelegate = std::function<bool(
+        QnWorkbenchContext* context, const QnActionParameters& parameters)>;
+
+    CustomBoolCondition(CheckDelegate delegate, QObject* parent = nullptr):
+        Condition(parent),
+        m_delegate(delegate)
+    {
+    }
+
+    virtual ActionVisibility check(const QnActionParameters& parameters) override
+    {
+        return m_delegate(context(), parameters)
+            ? EnabledAction
+            : InvisibleAction;
+    }
+
+private:
+    CheckDelegate m_delegate;
+};
+
 class CustomCondition: public Condition
 {
 public:
@@ -1569,23 +1592,21 @@ namespace condition
 
 ConditionPtr isPreviewSearchMode(QObject* parent)
 {
-    return new CustomCondition(
+    return new CustomBoolCondition(
         [](QnWorkbenchContext* context, const QnActionParameters& parameters)
         {
-            const bool isPreviewSearchMode = (parameters.scope() == SceneScope
-                && context->workbench()->currentLayout()->isSearchLayout());
-            return isPreviewSearchMode ? EnabledAction : InvisibleAction;
+            return parameters.scope() == SceneScope
+                && context->workbench()->currentLayout()->isSearchLayout();
         },
         parent);
 }
 
 ConditionPtr isSafeMode(QObject* parent)
 {
-    return new CustomCondition(
+    return new CustomBoolCondition(
         [](QnWorkbenchContext* context, const QnActionParameters& /*parameters*/)
         {
-            const bool isSafeMode = context->commonModule()->isReadOnly();
-            return isPreviewSearchMode ? EnabledAction : InvisibleAction;
+            return context->commonModule()->isReadOnly();
         },
         parent);
 }
