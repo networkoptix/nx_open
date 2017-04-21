@@ -13,7 +13,7 @@
 #include <nx/utils/stree/stree_manager.h>
 
 
-class QnAuthMethodRestrictionList;
+class nx_http::AuthMethodRestrictionList;
 
 namespace nx {
 namespace cloud {
@@ -32,7 +32,7 @@ class AuthenticationManager:
 {
 public:
     AuthenticationManager(
-        const QnAuthMethodRestrictionList& authRestrictionList,
+        const nx_http::AuthMethodRestrictionList& authRestrictionList,
         const nx::utils::stree::StreeManager& stree);
 
     virtual void authenticate(
@@ -43,7 +43,7 @@ public:
     static nx::String realm(); 
 
 private:
-    const QnAuthMethodRestrictionList& m_authRestrictionList;
+    const nx_http::AuthMethodRestrictionList& m_authRestrictionList;
     const nx::utils::stree::StreeManager& m_stree;
     std::random_device m_rd;
     std::uniform_int_distribution<size_t> m_dist;

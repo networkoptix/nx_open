@@ -9,7 +9,7 @@
 #include <QtCore/QDir>
 #include <QtSql/QSqlQuery>
 
-#include <nx/network/auth_restriction_list.h>
+#include <nx/network/http/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/socket_global.h>
@@ -150,7 +150,7 @@ int VmsGatewayProcess::exec()
         nx_http::MessageDispatcher httpMessageDispatcher;
 
         //TODO #ak move following to stree xml
-        QnAuthMethodRestrictionList authRestrictionList;
+        nx_http::AuthMethodRestrictionList authRestrictionList;
 
         AuthenticationManager authenticationManager(
             authRestrictionList,

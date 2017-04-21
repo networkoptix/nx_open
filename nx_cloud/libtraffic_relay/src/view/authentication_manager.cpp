@@ -6,7 +6,7 @@ namespace relay {
 namespace view {
 
 AuthenticationManager::AuthenticationManager(
-    const QnAuthMethodRestrictionList& authRestrictionList)
+    const nx_http::AuthMethodRestrictionList& authRestrictionList)
     :
     m_authRestrictionList(authRestrictionList)
 {

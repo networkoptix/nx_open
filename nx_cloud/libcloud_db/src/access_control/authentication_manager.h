@@ -16,7 +16,7 @@
 #include "auth_types.h"
 
 
-class QnAuthMethodRestrictionList;
+class nx_http::AuthMethodRestrictionList;
 
 namespace nx {
 namespace cdb {
@@ -39,7 +39,7 @@ class AuthenticationManager:
 public:
     AuthenticationManager(
         std::vector<AbstractAuthenticationDataProvider*> authDataProviders,
-        const QnAuthMethodRestrictionList& authRestrictionList,
+        const nx_http::AuthMethodRestrictionList& authRestrictionList,
         const StreeManager& stree);
 
     virtual void authenticate(
@@ -50,7 +50,7 @@ public:
     static nx::String realm(); 
 
 private:
-    const QnAuthMethodRestrictionList& m_authRestrictionList;
+    const nx_http::AuthMethodRestrictionList& m_authRestrictionList;
     const StreeManager& m_stree;
     std::random_device m_rd;
     std::uniform_int_distribution<size_t> m_dist;

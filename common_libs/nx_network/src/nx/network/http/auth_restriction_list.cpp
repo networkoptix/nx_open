@@ -2,13 +2,9 @@
 
 #include <nx/utils/match/wildcard.h>
 
-#include <network/tcp_listener.h>
+namespace nx_http {
 
-QnAuthMethodRestrictionList::QnAuthMethodRestrictionList()
-{
-}
-
-unsigned int QnAuthMethodRestrictionList::getAllowedAuthMethods(
+unsigned int AuthMethodRestrictionList::getAllowedAuthMethods(
     const nx_http::Request& request) const
 {
     QString path = request.requestLine.url.path();
@@ -38,16 +34,18 @@ unsigned int QnAuthMethodRestrictionList::getAllowedAuthMethods(
     return allowed;
 }
 
-void QnAuthMethodRestrictionList::allow(
+void AuthMethodRestrictionList::allow(
     const QString& pathMask,
     AuthMethod::Value method)
 {
     m_allowed[pathMask] = method;
 }
 
-void QnAuthMethodRestrictionList::deny(
+void AuthMethodRestrictionList::deny(
     const QString& pathMask,
     AuthMethod::Value method)
 {
     m_denied[pathMask] = method;
 }
+
+} // namespace nx_http

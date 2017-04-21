@@ -9,7 +9,7 @@
 
 #include <QtCore/QDir>
 
-#include <nx/network/auth_restriction_list.h>
+#include <nx/network/http/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/socket_global.h>
@@ -163,7 +163,7 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
         systemManager.systemMarkedAsDeletedSubscription());
 
     //TODO #ak move following to stree xml
-    QnAuthMethodRestrictionList authRestrictionList;
+    nx_http::AuthMethodRestrictionList authRestrictionList;
     authRestrictionList.allow(http_handler::GetCloudModulesXml::kHandlerPath, AuthMethod::noAuth);
     authRestrictionList.allow(http_handler::Ping::kHandlerPath, AuthMethod::noAuth);
     authRestrictionList.allow(kAccountRegisterPath, AuthMethod::noAuth);

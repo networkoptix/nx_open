@@ -14,7 +14,7 @@
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
-#include <nx/network/auth_restriction_list.h>
+#include <nx/network/http/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/server/fusion_request_result.h>
@@ -42,7 +42,7 @@ using namespace nx_http;
 
 AuthenticationManager::AuthenticationManager(
     std::vector<AbstractAuthenticationDataProvider*> authDataProviders,
-    const QnAuthMethodRestrictionList& authRestrictionList,
+    const nx_http::AuthMethodRestrictionList& authRestrictionList,
     const StreeManager& stree)
 :
     m_authRestrictionList(authRestrictionList),

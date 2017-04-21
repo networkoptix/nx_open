@@ -11,7 +11,7 @@
 #include <boost/optional.hpp>
 
 #include <nx/network/app_info.h>
-#include <nx/network/auth_restriction_list.h>
+#include <nx/network/http/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/server/fusion_request_result.h>
@@ -35,7 +35,7 @@ namespace gateway {
 using namespace nx_http;
 
 AuthenticationManager::AuthenticationManager(
-    const QnAuthMethodRestrictionList& authRestrictionList,
+    const nx_http::AuthMethodRestrictionList& authRestrictionList,
     const nx::utils::stree::StreeManager& stree)
 :
     m_authRestrictionList(authRestrictionList),

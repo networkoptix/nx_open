@@ -325,7 +325,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
     return Qn::Auth_Forbidden;   //failed to authorise request with any method
 }
 
-QnAuthMethodRestrictionList* QnAuthHelper::restrictionList()
+nx_http::AuthMethodRestrictionList* QnAuthHelper::restrictionList()
 {
     return &m_authMethodRestrictionList;
 }

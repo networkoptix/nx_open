@@ -6,6 +6,8 @@
 
 #include <nx/network/http/httptypes.h>
 
+namespace nx_http {
+
 namespace AuthMethod {
 
 enum Value
@@ -45,11 +47,9 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Values);
  * @note By default, AuthMethod::http, AuthMethod::cookie and AuthMethod::videowall 
  * authorization methods are allowed fo every url.
  */
-class NX_NETWORK_API QnAuthMethodRestrictionList
+class NX_NETWORK_API AuthMethodRestrictionList
 {
 public:
-    QnAuthMethodRestrictionList();
-
     /**
      * @return bit mask of auth methods (AuthMethod::Value enumeration).
      */
@@ -70,3 +70,5 @@ private:
     /** map<path mask, denied auth bitmask>. */
     std::map<QString, unsigned int> m_denied;
 };
+
+} // namespace nx_http
