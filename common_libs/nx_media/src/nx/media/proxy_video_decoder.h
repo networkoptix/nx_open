@@ -11,7 +11,7 @@
 namespace nx {
 namespace media {
 
-class ProxyVideoDecoderPrivate;
+class ProxyVideoDecoderImpl;
 
 /**
  * Implements video decoder which delegates actual decoding to an external lib 'proxydecoder',
@@ -35,8 +35,8 @@ public:
         QVideoFramePtr* outDecodedFrame) override;
 
 private:
-    std::shared_ptr<ProxyVideoDecoderPrivate> d;
-    friend class ProxyVideoDecoderPrivate;
+    std::shared_ptr<ProxyVideoDecoderImpl> d;
+    friend class ProxyVideoDecoderImpl;
 };
 
 } // namespace media

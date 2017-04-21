@@ -27,6 +27,7 @@ namespace QnBusiness
         case CameraDisconnectEvent:
         case NetworkIssueEvent:
         case CameraIpConflictEvent:
+        case SoftwareTriggerEvent:
             return AnyCameraEvent;
 
         case StorageFailureEvent:
@@ -52,7 +53,7 @@ namespace QnBusiness
 
         switch (eventType) {
         case AnyCameraEvent:
-            result << CameraDisconnectEvent << NetworkIssueEvent << CameraIpConflictEvent;
+            result << CameraDisconnectEvent << NetworkIssueEvent << CameraIpConflictEvent << SoftwareTriggerEvent;
             break;
         case AnyServerEvent:
             result << StorageFailureEvent << ServerFailureEvent << ServerConflictEvent << ServerStartEvent << LicenseIssueEvent << BackupFinishedEvent;
@@ -60,7 +61,7 @@ namespace QnBusiness
         case AnyBusinessEvent:
             result << CameraMotionEvent << CameraInputEvent <<
                       AnyCameraEvent << AnyServerEvent <<
-                      UserDefinedEvent;
+                      UserDefinedEvent << SoftwareTriggerEvent;
             break;
         default:
             break;
@@ -83,6 +84,7 @@ namespace QnBusiness
             << ServerStartEvent
             << LicenseIssueEvent
             << BackupFinishedEvent
+            << SoftwareTriggerEvent
             << UserDefinedEvent;
         return result;
     }
@@ -120,6 +122,7 @@ namespace QnBusiness
         case CameraMotionEvent:
         case CameraInputEvent:
         case CameraDisconnectEvent:
+        case SoftwareTriggerEvent:
             return true;
         default:
             return false;
@@ -141,10 +144,10 @@ namespace QnBusiness
     {
         switch (eventType)
         {
-        case QnBusiness::CameraMotionEvent:
-        case QnBusiness::CameraInputEvent:
-        case QnBusiness::CameraDisconnectEvent:
-        case QnBusiness::NetworkIssueEvent:
+        case CameraMotionEvent:
+        case CameraInputEvent:
+        case CameraDisconnectEvent:
+        case NetworkIssueEvent:
             return true;
         default:
             break;
@@ -156,11 +159,11 @@ namespace QnBusiness
     {
         switch (eventType)
         {
-        case QnBusiness::StorageFailureEvent:
-        case QnBusiness::BackupFinishedEvent:
-        case QnBusiness::ServerFailureEvent:
-        case QnBusiness::ServerConflictEvent:
-        case QnBusiness::ServerStartEvent:
+        case StorageFailureEvent:
+        case BackupFinishedEvent:
+        case ServerFailureEvent:
+        case ServerConflictEvent:
+        case ServerStartEvent:
             return true;
         default:
             break;

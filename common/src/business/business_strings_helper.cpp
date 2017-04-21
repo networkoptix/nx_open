@@ -100,6 +100,9 @@ QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value, int coun
 
     case AnyServerEvent:        return tr("Any Server Issue");
     case AnyBusinessEvent:      return tr("Any Event");
+
+    case SoftwareTriggerEvent:  return tr("Software Trigger");
+
     default:
         return QString();
     }
@@ -162,6 +165,8 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
         return (!params.caption.isEmpty() ? params.caption
             : (params.resourceName.isEmpty() ? tr("Generic Event")
                 : tr("Generic Event at %1").arg(params.resourceName)));
+    case SoftwareTriggerEvent:
+        return tr("Software Trigger at %1").arg(resourceName);
     default:
         break;
     }
@@ -280,6 +285,9 @@ QStringList QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameter
     case UserDefinedEvent:
         if (!params.description.isEmpty())
             result << params.description;
+        break;
+    case SoftwareTriggerEvent:
+        result << tr("Trigger: %1").arg(getSoftwareTriggerName(params));
         break;
     default:
         break;
@@ -567,9 +575,25 @@ QString QnBusinessStringsHelper::eventTypeString(
         return tr("On %1 %2").arg(typeStr).arg(toggleStateToString(eventState));
 }
 
-
 QString QnBusinessStringsHelper::bruleDescriptionText(const QnBusinessEventRulePtr& bRule)
 {
     QString eventString = eventTypeString(bRule->eventType(), bRule->eventState(), bRule->actionType(), bRule->actionParams());
     return lit("%1 --> %2").arg(eventString).arg(actionName(bRule->actionType()));
+}
+
+QString QnBusinessStringsHelper::defaultSoftwareTriggerName()
+{
+    return tr("Default Trigger");
+}
+
+QString QnBusinessStringsHelper::getSoftwareTriggerName(const QString& id)
+{
+    const auto triggerId = id.trimmed();
+    return triggerId.isEmpty() ? defaultSoftwareTriggerName() : triggerId;
+}
+
+QString QnBusinessStringsHelper::getSoftwareTriggerName(const QnBusinessEventParameters& params)
+{
+    NX_ASSERT(params.eventType == QnBusiness::SoftwareTriggerEvent);
+    return getSoftwareTriggerName(params.inputPortId);
 }

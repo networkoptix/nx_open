@@ -84,3 +84,21 @@ QSizeF QnScrollableOverlayWidget::contentSize() const
     Q_D(const QnScrollableOverlayWidget);
     return d->contentSize();
 }
+
+int QnScrollableOverlayWidget::itemSpacing() const
+{
+    Q_D(const QnScrollableOverlayWidget);
+    return d->m_itemSpacing;
+}
+
+void QnScrollableOverlayWidget::setItemSpacing(int spacing)
+{
+    Q_D(QnScrollableOverlayWidget);
+    if (d->m_itemSpacing == spacing)
+        return;
+
+    d->m_itemSpacing = spacing;
+    d->updatePositions();
+
+    emit contentSizeChanged();
+}

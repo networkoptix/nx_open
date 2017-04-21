@@ -4,7 +4,6 @@
 
 #include <core/resource/media_resource.h>
 #include <nx/streaming/archive_stream_reader.h>
-#include <nx/utils/debug_utils.h>
 #include <nx/utils/log/log.h>
 
 #include "seamless_video_decoder.h"

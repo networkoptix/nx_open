@@ -163,8 +163,6 @@ TEST_F(AsyncHttpClient, ServerModRewrite)
     testResult(lit("/suffix/somePath1/longerPath"), "someData1");
 }
 
-//TODO #ak introduce built-in http server to automate AsyncHttpClient tests
-
 namespace {
 static void testHttpClientForFastRemove(const QUrl& url)
 {
@@ -504,6 +502,83 @@ TEST_F(AsyncHttpClient, ConnectionBreakAfterReceivingSecondRequest)
     ASSERT_EQ(SystemError::noError, httpClient.lastSysErrorCode());
     ASSERT_FALSE(httpClient.doGet(testUrl));
     ASSERT_NE(SystemError::noError, httpClient.lastSysErrorCode());
+}
+
+//-------------------------------------------------------------------------------------------------
+// AsyncHttpClientCorrectUrlTransferring
+
+class AsyncHttpClientCorrectUrlTransferring:
+    public AsyncHttpClientTest
+{
+public:
+    AsyncHttpClientCorrectUrlTransferring()
+    {
+        init();
+    }
+
+protected:
+    QString testPath() const
+    {
+        return "/validateUrl";
+    }
+
+    void whenIssuedRequestWithEncodedSequenceInQueryAndFragment()
+    {
+        const auto query = QUrl::toPercentEncoding("test#%20#");
+        const auto fragment = QUrl::toPercentEncoding("#frag%20ment");
+
+        m_testUrl = QUrl(lit("http://%1%2?%3#%4")
+            .arg(testHttpServer()->serverAddress().toString())
+            .arg(testPath()).arg(QLatin1String(query)).arg(QLatin1String(fragment)));
+
+        ASSERT_TRUE(m_httpClient.doGet(m_testUrl));
+    }
+
+    void assertServerHasReceivedCorrectUrl()
+    {
+        auto url = m_urlsFromReceivedRequests.pop();
+        url.setHost(m_testUrl.host());
+        url.setPort(m_testUrl.port());
+        url.setScheme(m_testUrl.scheme());
+        ASSERT_EQ(m_testUrl, url);
+    }
+
+private:
+    nx::utils::SyncQueue<QUrl> m_urlsFromReceivedRequests;
+    nx_http::HttpClient m_httpClient;
+    QUrl m_testUrl;
+
+    void init()
+    {
+        using namespace std::placeholders;
+
+        ASSERT_TRUE(
+            testHttpServer()->registerRequestProcessor(
+                testPath(),
+                std::bind(&AsyncHttpClientCorrectUrlTransferring::onRequestReceived, this,
+                    _1, _2, _3, _4, _5)));
+
+        ASSERT_TRUE(testHttpServer()->bindAndListen());
+    }
+
+    void onRequestReceived(
+        nx_http::HttpServerConnection* const /*connection*/,
+        stree::ResourceContainer /*authInfo*/,
+        nx_http::Request request,
+        nx_http::Response* const /*response*/,
+        nx_http::RequestProcessedHandler completionHandler)
+    {
+        m_urlsFromReceivedRequests.push(request.requestLine.url);
+        completionHandler(nx_http::StatusCode::ok);
+    }
+};
+
+TEST_F(
+    AsyncHttpClientCorrectUrlTransferring,
+    encoded_sequence_in_query_param_is_not_decoded)
+{
+    whenIssuedRequestWithEncodedSequenceInQueryAndFragment();
+    assertServerHasReceivedCorrectUrl();
 }
 
 //-------------------------------------------------------------------------------------------------

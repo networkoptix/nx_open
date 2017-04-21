@@ -332,13 +332,15 @@ protected:
 protected:
     struct OverlayWidgets
 	{
-	    QnButtonsOverlay *buttonsOverlay;
+	    QnButtonsOverlay* buttonsOverlay; /**< Overlay containing item title buttons. */
 
-	    QnScrollableOverlayWidget *detailsOverlay;     /**< Overlay containing info item. */
-	    QnHtmlTextItem *detailsItem;        /**< Detailed camera info (resolution, stream, etc). */
+	    QnScrollableOverlayWidget* detailsOverlay; /**< Overlay containing info item. */
+	    QnHtmlTextItem* detailsItem; /**< Detailed camera info (resolution, stream, etc). */
 
-	    QnScrollableOverlayWidget *positionOverlay;    /**< Overlay containing position item. */
-	    QnHtmlTextItem *positionItem;       /**< Current camera position. */
+	    QnScrollableOverlayWidget* positionOverlay; /**< Overlay containing position item. */
+	    QnHtmlTextItem* positionItem; /**< Current camera position. */
+
+        QnScrollableOverlayWidget* triggersOverlay; /**< Overlay containing software trigger buttons. */
 
 	    OverlayWidgets();
 	};
@@ -353,7 +355,7 @@ private:
 
     void setTitleTextInternal(const QString &titleText);
 
-    void addInfoOverlay();
+    void addHudOverlays();
     void addMainOverlay();
 
     /*

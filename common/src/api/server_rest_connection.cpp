@@ -21,6 +21,7 @@
 #include <http/custom_headers.h>
 #include <nx/network/http/httptypes.h>
 #include <utils/common/delayed.h>
+#include <utils/common/synctime.h>
 #include <nx/utils/log/log.h>
 
 namespace {
@@ -76,6 +77,17 @@ rest::Handle ServerConnection::twoWayAudioCommand(const QnUuid& cameraId, bool s
     params.insert(lit("resourceId"),    cameraId.toString());
     params.insert(lit("action"),        start ? lit("start") : lit("stop"));
     return executeGet(lit("/api/transmitAudio"), params, callback, targetThread);
+}
+
+rest::Handle ServerConnection::softwareTriggerCommand(const QnUuid& cameraId, const QString& triggerId,
+    GetCallback callback, QThread* targetThread)
+{
+    QnRequestParamList params;
+    params.insert(lit("timestamp"), lit("%1").arg(qnSyncTime->currentMSecsSinceEpoch()));
+    params.insert(lit("event_type"), QnLexical::serialized(QnBusiness::SoftwareTriggerEvent));
+    params.insert(lit("inputPortId"), triggerId);
+    params.insert(lit("eventResourceId"), cameraId.toString());
+    return executeGet(lit("/api/createEvent"), params, callback, targetThread);
 }
 
 QnMediaServerResourcePtr ServerConnection::getServerWithInternetAccess() const
@@ -233,8 +245,8 @@ QUrl ServerConnection::prepareUrl(const QString& path, const QnRequestParamList&
     result.setPath(path);
     QUrlQuery q;
     for (const auto& param: params)
-        q.addQueryItem(param.first, param.second);
-    result.setQuery(q.toString());
+        q.addQueryItem(param.first, QString::fromUtf8(QUrl::toPercentEncoding(param.second)));
+    result.setQuery(q);
     return result;
 }
 

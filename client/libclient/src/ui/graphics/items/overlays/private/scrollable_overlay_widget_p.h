@@ -52,4 +52,6 @@ private:
     bool m_updating;
 
     QSizeF m_maxFillCoeff;
+
+    int m_itemSpacing;
 };
