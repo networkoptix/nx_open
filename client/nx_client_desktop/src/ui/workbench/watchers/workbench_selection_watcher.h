@@ -2,6 +2,8 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <nx/client/desktop/ui/actions/action_types.h>
+
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
 

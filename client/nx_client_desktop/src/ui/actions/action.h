@@ -12,7 +12,6 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <client/client_globals.h>
 
-#include "action_fwd.h"
 #include "actions.h"
 
 class QGraphicsItem;

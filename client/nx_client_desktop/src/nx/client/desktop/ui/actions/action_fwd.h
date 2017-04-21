@@ -3,6 +3,8 @@
 #include <QtCore/QPointer>
 
 class QnAction;
+class QnActionManager;
+class QnActionParameters;
 class QnResourceCriterion;
 
 namespace nx {

@@ -8,7 +8,6 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_index.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include "action_fwd.h"
 #include "actions.h"
 #include "action_parameters.h"
 

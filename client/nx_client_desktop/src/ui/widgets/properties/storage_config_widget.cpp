@@ -18,6 +18,7 @@
 #include <core/resource/client_storage_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_history.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource_management/resources_changes_manager.h>

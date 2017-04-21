@@ -1,12 +1,11 @@
-#ifndef QN_ACTION_PARAMETERS_H
-#define QN_ACTION_PARAMETERS_H
+#pragma once
 
 #include <QtCore/QVariant>
 #include <QtCore/QMetaType>
 
 #include <core/resource/resource_fwd.h>
 
-#include "action_fwd.h"
+#include <ui/actions/action_parameter_types.h>
 #include "actions.h"
 
 class QGraphicsItem;
@@ -146,5 +145,3 @@ private:
 };
 
 Q_DECLARE_METATYPE(QnActionParameters)
-
-#endif // QN_ACTION_PARAMETERS_H

@@ -7,6 +7,7 @@
 
 class QnTimePeriod;
 class QnAbstractStreamDataProvider;
+class QnMediaResourceWidget;
 
 /**
  * @brief The QnWorkbenchExportHandler class            Handler for video and layout export related actions.

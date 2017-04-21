@@ -327,7 +327,7 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, nx::client::des
                 connect(result, &QObject::destroyed, menu, &QObject::deleteLater);
 
             if (action->textFactory())
-                replacedText = action->textFactory()->text(parameters);
+                replacedText = action->textFactory()->text(parameters, context());
 
             if (action->hasConditionalTexts())
                 replacedText = action->checkConditionalText(parameters);

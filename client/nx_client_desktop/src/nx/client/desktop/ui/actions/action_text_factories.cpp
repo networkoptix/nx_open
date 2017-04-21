@@ -1,12 +1,10 @@
 #include "action_text_factories.h"
 
-#include <ui/actions/action_parameter_types.h>
 #include <ui/actions/action_parameters.h>
 
 #include <core/resource/camera_resource.h>
-#include <core/resource/layout_item_index.h>
 
-#include <utils/common/warnings.h>
+#include <ui/workbench/workbench_context.h>
 
 namespace nx {
 namespace client {
@@ -15,12 +13,12 @@ namespace ui {
 namespace action {
 
 TextFactory::TextFactory(QObject* parent):
-    QObject(parent),
-    QnWorkbenchContextAware(parent)
+    QObject(parent)
 {
 }
 
-QString TextFactory::text(const QnActionParameters& /*parameters*/) const
+QString TextFactory::text(const QnActionParameters& /*parameters*/,
+    QnWorkbenchContext* /*context*/) const
 {
     return QString();
 }
@@ -35,11 +33,12 @@ DevicesNameTextFactory::DevicesNameTextFactory(
 
 }
 
-QString DevicesNameTextFactory::text(const QnActionParameters& parameters) const
+QString DevicesNameTextFactory::text(const QnActionParameters& parameters,
+    QnWorkbenchContext* context) const
 {
     const auto resources = parameters.resources();
     return QnDeviceDependentStrings::getNameFromSet(
-        resourcePool(),
+        context->resourcePool(),
         m_stringSet,
         resources.filtered<QnVirtualCameraResource>());
 }

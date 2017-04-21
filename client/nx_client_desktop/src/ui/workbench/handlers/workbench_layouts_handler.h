@@ -7,6 +7,9 @@
 
 #include <ui/workbench/workbench_state_manager.h>
 
+class QnWorkbenchLayout;
+typedef QList<QnWorkbenchLayout *> QnWorkbenchLayoutList;
+
 namespace nx {
 namespace client {
 namespace desktop {

@@ -1,17 +1,28 @@
-#ifndef QN_ACTION_TARGET_TYPES_H
-#define QN_ACTION_TARGET_TYPES_H
+#pragma once
 
-#include "action_fwd.h"
-
-#include <nx/utils/uuid.h>
 #include <QtCore/QSet>
-
-#include <core/resource/resource_fwd.h>
-
-#include "actions.h"
+#include <QtCore/QList>
 
 class QVariant;
 class QGraphicsItem;
+
+#include <nx/client/desktop/ui/actions/action_types.h>
+
+#include <core/resource/resource_fwd.h>
+#include <nx/utils/uuid.h>
+
+class QnAction;
+class QnActionManager;
+class QnActionTargetProvider;
+class QnActionParameters;
+class QnResourceWidget;
+class QnMediaResourceWidget;
+class QnServerResourceWidget;
+class QnWorkbenchLayout;
+class QnWorkbenchContext;
+
+typedef QList<QnResourceWidget*> QnResourceWidgetList;
+typedef QList<QnWorkbenchLayout*> QnWorkbenchLayoutList;
 
 /**
  * Helper class that implements <tt>QVariant</tt>-based overloading for
@@ -59,5 +70,3 @@ public:
 
     static QnResourceWidgetList widgets(const QList<QGraphicsItem *> items);
 };
-
-#endif // QN_ACTION_TARGET_TYPES_H

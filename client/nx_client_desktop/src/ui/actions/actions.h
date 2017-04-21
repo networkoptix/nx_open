@@ -2,9 +2,7 @@
 
 #include <QMetaType>
 
-#include "action_fwd.h"
-
-#include <nx/client/desktop/ui/actions/action_types.h>
+#include <nx/client/desktop/ui/actions/action_fwd.h>
 
 #include <client/client_globals.h>
 
@@ -1149,6 +1147,7 @@ enum IDType
 };
 
 QN_DECLARE_TR_FUNCTIONS("QnActions")
+
 void initialize(QnActionManager* manager, QnAction* root);
 
 } //namespace QnActions
