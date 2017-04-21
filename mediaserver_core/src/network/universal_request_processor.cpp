@@ -174,24 +174,24 @@ void QnUniversalRequestProcessor::run()
                 QByteArray contentType;
                 int rez = redirectTo(redirect->toUtf8(), contentType);
                 sendResponse(rez, contentType);
-                continue;
             }
-
-            auto handler = d->owner->findHandler(d->protocol, d->request);
-            bool noAuth = false;
-            if (handler && !authenticate(&d->accessRights, &noAuth))
-                return;
-
-            isKeepAlive = isConnectionCanBePersistent();
-
-
-            // getting a new handler inside is necessary due to possibility of
-            // changing request during authentication
-            if (!processRequest(noAuth))
+            else
             {
-                QByteArray contentType;
-                int rez = notFound(contentType);
-                sendResponse(rez, contentType);
+                auto handler = d->owner->findHandler(d->protocol, d->request);
+                bool noAuth = false;
+                if (handler && !authenticate(&d->accessRights, &noAuth))
+                    return;
+
+                isKeepAlive = isConnectionCanBePersistent();
+
+                // getting a new handler inside is necessary due to possibility of
+                // changing request during authentication
+                if (!processRequest(noAuth))
+                {
+                    QByteArray contentType;
+                    int rez = notFound(contentType);
+                    sendResponse(rez, contentType);
+                }
             }
         }
 
