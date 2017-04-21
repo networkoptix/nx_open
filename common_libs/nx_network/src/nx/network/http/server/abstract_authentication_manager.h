@@ -23,15 +23,33 @@ struct AuthenticationResult
     nx_http::HttpHeaders responseHeaders;
     std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody;
 
-    AuthenticationResult() = delete;
+    AuthenticationResult():
+        isSucceeded(false)
+    {
+    }
+
+    AuthenticationResult(
+        bool isSucceeded,
+        nx::utils::stree::ResourceContainer authInfo,
+        boost::optional<nx_http::header::WWWAuthenticate> wwwAuthenticate,
+        nx_http::HttpHeaders responseHeaders,
+        std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody)
+        :
+        isSucceeded(isSucceeded),
+        authInfo(std::move(authInfo)),
+        wwwAuthenticate(std::move(wwwAuthenticate)),
+        responseHeaders(std::move(responseHeaders)),
+        msgBody(std::move(msgBody))
+    {
+    }
 };
 
 struct SuccessfulAuthenticationResult:
     AuthenticationResult
 {
-    SuccessfulAuthenticationResult():
-        AuthenticationResult{true}
+    SuccessfulAuthenticationResult()
     {
+        isSucceeded = true;
     }
 };
 

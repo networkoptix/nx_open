@@ -49,13 +49,7 @@ void AuthenticationManager::authenticate(
     const nx_http::Request& request,
     nx_http::server::AuthenticationCompletionHandler completionHandler)
 {
-    nx_http::server::AuthenticationResult authenticationResult{false};
-
-    //bool authenticationResult = false;
-    //nx::utils::stree::ResourceContainer authInfo;
-    //boost::optional<nx_http::header::WWWAuthenticate> wwwAuthenticate;
-    //nx_http::HttpHeaders responseHeaders;
-    //std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody;
+    nx_http::server::AuthenticationResult authenticationResult;
     auto scopedGuard = makeScopeGuard(
         [&authenticationResult, &completionHandler]() mutable
         {
