@@ -187,7 +187,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Control Video Wall")).
         condition(
             ConditionPtr(new StartVideoWallControlCondition(manager))
-            && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            && !condition::isSafeMode(manager)
         );
 
     factory(QnActions::PushMyScreenToVideowallAction).
@@ -196,7 +196,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Push my screen")).
         condition(
             ConditionPtr(new DesktopCameraCondition(manager))
-            && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            && !condition::isSafeMode(manager)
         );
 
     factory(QnActions::QueueAppRestartAction).
@@ -318,7 +318,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
             pulledText(tr("New User...")).
             condition(
                 ConditionPtr(new TreeNodeTypeCondition(Qn::UsersNode, manager))
-                && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+                && !condition::isSafeMode(manager)
             ).
             autoRepeat(false);
 
@@ -327,7 +327,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
             requiredGlobalPermission(Qn::GlobalAdminPermission).
             text(tr("Video Wall...")).
             pulledText(tr("New Video Wall...")).
-            condition(new ForbiddenInSafeModeCondition(manager)).
+            condition(!condition::isSafeMode(manager)).
             autoRepeat(false);
 
         factory(QnActions::NewWebPageAction).
@@ -337,7 +337,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
             pulledText(tr("New Web Page...")).
             condition(
                 ConditionPtr(new TreeNodeTypeCondition(Qn::WebPagesNode, manager))
-                && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+                && !condition::isSafeMode(manager)
             ).
             autoRepeat(false);
 
@@ -351,7 +351,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
                 ConditionPtr(new TreeNodeTypeCondition(Qn::LayoutsNode, manager))
                 || ConditionPtr(new TreeNodeTypeCondition(Qn::LayoutToursNode, manager))
                 )
-                && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+                && !condition::isSafeMode(manager)
             ).
             autoRepeat(false);
 
@@ -363,7 +363,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("New Layout...")).
         condition(
             ConditionPtr(new NewUserLayoutCondition(manager))
-            && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            && !condition::isSafeMode(manager)
         );
 
     factory(QnActions::OpenCurrentUserLayoutMenu).
@@ -438,7 +438,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(lit("Share_Layout_with")).
         autoRepeat(false).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
-        condition(new ForbiddenInSafeModeCondition(manager));
+        condition(!condition::isSafeMode(manager));
 
     factory(QnActions::SaveCurrentVideoWallReviewAction).
         flags(Main | Scene | NoTarget | GlobalHotkey | IntentionallyAmbiguous).
@@ -448,7 +448,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         autoRepeat(false).
         requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         condition(
-            ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            !condition::isSafeMode(manager)
             && ConditionPtr(new SaveVideowallReviewCondition(true, manager))
         );
 
@@ -456,7 +456,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         flags(ResourceTarget | LayoutItemTarget | LayoutTarget | VideoWallItemTarget | SingleTarget | MultiTarget).
         text(tr("Drop Resources")).
         requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
-        condition(new ForbiddenInSafeModeCondition(manager));
+        condition(!condition::isSafeMode(manager));
 
     factory().
         flags(Main).
@@ -629,7 +629,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Merge Systems...")).
         condition(
             ConditionPtr(new TreeNodeTypeCondition({Qn::CurrentSystemNode, Qn::ServersNode}, manager))
-            && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            && !condition::isSafeMode(manager)
             && ConditionPtr(new RequiresOwnerCondition(manager))
         );
 
@@ -768,7 +768,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Attach to Video Wall...")).
         autoRepeat(false).
         condition(
-            ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            !condition::isSafeMode(manager)
             && condition::hasFlags(Qn::videowall, Any, manager)
         );
 
@@ -787,7 +787,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         autoRepeat(false).
         condition(
             ConditionPtr(new SaveVideowallReviewCondition(false, manager))
-            && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            && !condition::isSafeMode(manager)
         );
 
     factory(QnActions::SaveVideowallMatrixAction).
@@ -797,13 +797,13 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         autoRepeat(false).
         condition(
             ConditionPtr(new NonEmptyVideowallCondition(manager))
-            && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            && !condition::isSafeMode(manager)
         );
 
     factory(QnActions::LoadVideowallMatrixAction).
         flags(Tree | SingleTarget | VideoWallMatrixTarget).
         requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
-        condition(new ForbiddenInSafeModeCondition(manager)).
+        condition(!condition::isSafeMode(manager)).
         text(tr("Load Matrix"));
 
     factory(QnActions::DeleteVideowallMatrixAction).
@@ -812,7 +812,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Delete")).
         shortcut(lit("Del")).
         shortcut(Qt::Key_Backspace, Builder::Mac, true).
-        condition(new ForbiddenInSafeModeCondition(manager)).
+        condition(!condition::isSafeMode(manager)).
         autoRepeat(false);
 
     factory().
@@ -858,7 +858,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         flags(Tree | SingleTarget | MultiTarget | VideoWallItemTarget | IntentionallyAmbiguous).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
         text(tr("Delete")).
-        condition(new ForbiddenInSafeModeCondition(manager)).
+        condition(!condition::isSafeMode(manager)).
         autoRepeat(false);
 
     factory(QnActions::MaximizeItemAction).
@@ -1088,7 +1088,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         autoRepeat(false).
         condition(
             condition::hasFlags(Qn::web_page, ExactlyOne, manager)
-            && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            && !condition::isSafeMode(manager)
         );
 
     factory(QnActions::RenameResourceAction).
@@ -1104,7 +1104,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         text(tr("Rename")).
         shortcut(lit("F2")).
-        condition(new ForbiddenInSafeModeCondition(manager)).
+        condition(!condition::isSafeMode(manager)).
         autoRepeat(false);
 
     //TODO: #GDM #3.1 #tbd
@@ -1115,7 +1115,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         shortcut(lit("F2")).
         condition(
             ConditionPtr(new TreeNodeTypeCondition(Qn::LayoutTourNode, manager))
-            && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            && !condition::isSafeMode(manager)
         ).
         autoRepeat(false);
 
@@ -1138,7 +1138,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         condition(
             ConditionPtr(new SetAsBackgroundCondition(manager))
             && ConditionPtr(new LightModeCondition(Qn::LightModeNoLayoutBackground, manager))
-            && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            && !condition::isSafeMode(manager)
         );
 
     factory(QnActions::UserSettingsAction).
@@ -1221,7 +1221,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         condition(
             condition::hasFlags(Qn::videowall, ExactlyOne, manager)
             && ConditionPtr(new AutoStartAllowedCondition(manager))
-            && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            && !condition::isSafeMode(manager)
         );
 
     factory(QnActions::ServerAddCameraManuallyAction).
@@ -1232,7 +1232,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
             condition::hasFlags(Qn::remote_server, ExactlyOne, manager)
             && ConditionPtr(new EdgeServerCondition(false, manager))
             && !ConditionPtr(new FakeServerCondition(true, manager))
-            && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            && !condition::isSafeMode(manager)
         );
 
     factory(QnActions::CameraListByServerAction).
@@ -1295,7 +1295,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Merge to Currently Connected System...")).
         condition(
             ConditionPtr(new TreeNodeTypeCondition(Qn::ResourceNode, manager))
-            && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            && !condition::isSafeMode(manager)
             && ConditionPtr(new MergeToCurrentSystemCondition(manager))
             && ConditionPtr(new RequiresOwnerCondition(manager))
         );
@@ -1474,7 +1474,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Add Bookmark...")).
         requiredGlobalPermission(Qn::GlobalManageBookmarksPermission).
         condition(
-            ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            !condition::isSafeMode(manager)
             && ConditionPtr(new AddBookmarkCondition(manager))
         );
 
@@ -1483,7 +1483,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Edit Bookmark...")).
         requiredGlobalPermission(Qn::GlobalManageBookmarksPermission).
         condition(
-            ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            !condition::isSafeMode(manager)
             && ConditionPtr(new ModifyBookmarkCondition(manager))
         );
 
@@ -1492,7 +1492,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Remove Bookmark...")).
         requiredGlobalPermission(Qn::GlobalManageBookmarksPermission).
         condition(
-            ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            !condition::isSafeMode(manager)
             && ConditionPtr(new ModifyBookmarkCondition(manager))
         );
 
@@ -1501,7 +1501,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Remove Bookmarks...")).
         requiredGlobalPermission(Qn::GlobalManageBookmarksPermission).
         condition(
-            ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            !condition::isSafeMode(manager)
             && ConditionPtr(new RemoveBookmarksCondition(manager))
         );
 

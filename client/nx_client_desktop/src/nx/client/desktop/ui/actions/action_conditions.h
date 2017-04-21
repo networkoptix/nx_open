@@ -107,17 +107,6 @@ public:
     virtual ActionVisibility check(const QnActionParameters& parameters) override;
 };
 
-/** Condition class for actions, that are forbidden in safe mode. */
-class ForbiddenInSafeModeCondition: public Condition
-{
-public:
-    ForbiddenInSafeModeCondition(QObject* parent):
-        Condition(parent)
-    {
-    }
-    virtual ActionVisibility check(const QnActionParameters& parameters) override;
-};
-
 /** Condition class for actions, that require owner privileges. */
 class RequiresOwnerCondition: public Condition
 {
@@ -809,6 +798,9 @@ namespace condition {
 
 /** Visible in preview search mode only. */
 ConditionPtr isPreviewSearchMode(QObject* parent);
+
+/** Visible in safe mode only. */
+ConditionPtr isSafeMode(QObject* parent);
 
 /** Allowed only for resource parameters with corresponding flags. */
 ConditionPtr hasFlags(Qn::ResourceFlags flags, MatchMode matchMode, QObject* parent);

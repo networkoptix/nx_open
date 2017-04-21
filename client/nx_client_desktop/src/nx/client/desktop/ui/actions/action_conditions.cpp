@@ -283,13 +283,6 @@ ActionVisibility LayoutTourReviewModeCondition::check(const QnActionParameters& 
         : InvisibleAction;
 }
 
-ActionVisibility ForbiddenInSafeModeCondition::check(const QnActionParameters& /*parameters*/)
-{
-    if (commonModule()->isReadOnly())
-        return InvisibleAction;
-    return EnabledAction;
-}
-
 ActionVisibility RequiresOwnerCondition::check(const QnActionParameters& /*parameters*/)
 {
     if (context()->user() && context()->user()->isOwner())
@@ -1581,6 +1574,17 @@ ConditionPtr isPreviewSearchMode(QObject* parent)
         {
             const bool isPreviewSearchMode = (parameters.scope() == SceneScope
                 && context->workbench()->currentLayout()->isSearchLayout());
+            return isPreviewSearchMode ? EnabledAction : InvisibleAction;
+        },
+        parent);
+}
+
+ConditionPtr isSafeMode(QObject* parent)
+{
+    return new CustomCondition(
+        [](QnWorkbenchContext* context, const QnActionParameters& /*parameters*/)
+        {
+            const bool isSafeMode = context->commonModule()->isReadOnly();
             return isPreviewSearchMode ? EnabledAction : InvisibleAction;
         },
         parent);
