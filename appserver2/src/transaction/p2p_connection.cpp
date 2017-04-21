@@ -127,6 +127,10 @@ P2pConnection::P2pConnection(
     m_webSocket(webSocket),
     m_direction(Direction::incoming)
 {
+    using namespace std::placeholders;
+    m_webSocket->readSomeAsync(
+        &m_readBuffer,
+        std::bind(&P2pConnection::onNewMessageRead, this, _1, _2));
 }
 
 void P2pConnection::fillAuthInfo(const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey)
@@ -281,6 +285,8 @@ void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client
 
 void P2pConnection::onHttpClientDone(const nx_http::AsyncHttpClientPtr& client)
 {
+    QnMutexLocker lock(&m_mutex);
+
     using namespace nx::network;
 
     NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::at_httpClientDone. state = %1").
@@ -307,6 +313,11 @@ void P2pConnection::onHttpClientDone(const nx_http::AsyncHttpClientPtr& client)
         msgBuffer));
     m_httpClient.reset();
     setState(State::Connected);
+
+    using namespace std::placeholders;
+    m_webSocket->readSomeAsync(
+        &m_readBuffer,
+        std::bind(&P2pConnection::onNewMessageRead, this, _1, _2));
 }
 
 P2pConnection::State P2pConnection::state() const
@@ -344,19 +355,48 @@ P2pConnection::Direction P2pConnection::direction() const
     return m_direction;
 }
 
-void P2pConnection::unsubscribeFrom(const ApiPeerIdData& idList)
+void P2pConnection::unsubscribeFrom(const ApiPersistentIdData& idList)
 {
     // todo: implement me
 }
 
-void P2pConnection::subscribeTo(const std::vector<ApiPeerIdData>& idList)
+void P2pConnection::subscribeTo(const std::vector<ApiPersistentIdData>& idList)
 {
     // todo: implement me
 }
 
-void P2pConnection::sendMessage(MessageType messageType, const QByteArray& data)
+void P2pConnection::sendMessage(const nx::Buffer& data)
 {
-    // todo: implement me
+    using namespace std::placeholders;
+
+    QnMutexLocker lock(&m_mutex);
+    m_dataToSend.push_back(data);
+    if (m_dataToSend.size() == 1)
+        m_webSocket->sendAsync(
+            data,
+            std::bind(&P2pConnection::onMessageSent, this, _1, _2));
+}
+
+void P2pConnection::onMessageSent(SystemError::ErrorCode errorCode, size_t bytesSent)
+{
+    using namespace std::placeholders;
+
+    QnMutexLocker lock(&m_mutex);
+    m_dataToSend.pop_front();
+    if (!m_dataToSend.empty())
+        m_webSocket->sendAsync(
+            m_dataToSend.front(),
+            std::bind(&P2pConnection::onMessageSent, this, _1, _2));
+}
+
+void P2pConnection::onNewMessageRead(SystemError::ErrorCode errorCode, size_t bytesRead)
+{
+    using namespace std::placeholders;
+
+    QnMutexLocker lock(&m_mutex);
+    m_webSocket->readSomeAsync(
+        &m_readBuffer,
+        std::bind(&P2pConnection::onNewMessageRead, this, _1, _2));
 }
 
 } // namespace ec2

@@ -9,7 +9,7 @@ namespace ec2 {
 
 // PeerNumberInfo
 
-PeerNumberType P2pMessageBus::PeerNumberInfo::insert(const ApiPeerIdData& peer)
+PeerNumberType P2pMessageBus::PeerNumberInfo::insert(const ApiPersistentIdData& peer)
 {
     PeerNumberType result = fullIdToShortId.size();
     fullIdToShortId.insert(peer, result);
@@ -19,14 +19,14 @@ PeerNumberType P2pMessageBus::PeerNumberInfo::insert(const ApiPeerIdData& peer)
 
 // PeerInfo
 
-quint32 P2pMessageBus::PeerInfo::distanceVia(const ApiPeerIdData& via) const
+quint32 P2pMessageBus::PeerInfo::distanceVia(const ApiPersistentIdData& via) const
 {
     quint32 result = std::numeric_limits<quint32>::max();
     auto itr = routingInfo.find(via);
     return itr != routingInfo.end() ? itr.value().distance : kMaxDistance;
 }
 
-quint32 P2pMessageBus::PeerInfo::minDistance(std::vector<ApiPeerIdData>* outViaList) const
+quint32 P2pMessageBus::PeerInfo::minDistance(std::vector<ApiPersistentIdData>* outViaList) const
 {
     quint32 minDistance = kMaxDistance;
     for (auto itr = routingInfo.begin(); itr != routingInfo.end(); ++itr)
@@ -189,7 +189,7 @@ void P2pMessageBus::createOutgoingConnections()
     }
 }
 
-PeerNumberType P2pMessageBus::toShortPeerNumber(const QnUuid& owner, const ApiPeerIdData& peer)
+PeerNumberType P2pMessageBus::toShortPeerNumber(const QnUuid& owner, const ApiPersistentIdData& peer)
 {
     PeerNumberInfo& info = m_shortPeersMap[owner];
     auto itr = info.fullIdToShortId.find(peer);
@@ -200,9 +200,9 @@ PeerNumberType P2pMessageBus::toShortPeerNumber(const QnUuid& owner, const ApiPe
     return kUnknownPeerNumnber;
 }
 
-ApiPeerIdData P2pMessageBus::fromShortPeerNumber(const QnUuid& owner, const PeerNumberType& id)
+ApiPersistentIdData P2pMessageBus::fromShortPeerNumber(const QnUuid& owner, const PeerNumberType& id)
 {
-    return ApiPeerIdData(); // implement me
+    return ApiPersistentIdData(); // implement me
 }
 
 void serializeCompressPeerNumber(BitStreamWriter& writer, PeerNumberType peerNumber)
@@ -242,12 +242,7 @@ void P2pMessageBus::addOwnfInfoToPeerList()
 {
     if (m_allPeers.isEmpty())
     {
-        ApiPeerIdData peer(
-            localPeer().id,
-            QnUuid(), //< runtime id
-            localPeer().persistentId);  //< persistent id
-
-        auto& peerData = m_allPeers[peer];
+        auto& peerData = m_allPeers[localPeer()];
         peerData.isOnline = true;
         peerData.routingInfo.insert(localPeer(), RoutingRecord(0, 0));
     }
@@ -261,9 +256,8 @@ void P2pMessageBus::addOfflinePeersFromDb()
     auto persistentState = m_db->transactionLog()->getTransactionsState().values;
     for (auto itr = persistentState.begin(); itr != persistentState.end(); ++itr)
     {
-        ApiPeerIdData peer(
+        ApiPersistentIdData peer(
             itr.key().peerID,
-            QnUuid(), //< runtime id
             itr.key().dbID);  //< persistent id
         auto& peerData = m_allPeers[peer];
         if (!peerData.isOnline)
@@ -277,11 +271,13 @@ void P2pMessageBus::addOfflinePeersFromDb()
 QByteArray P2pMessageBus::serializePeersMessage()
 {
     QByteArray result;
-    result.resize(m_allPeers.size() * 6);
+    result.resize(m_allPeers.size() * 6 + 1);
     BitStreamWriter writer;
     writer.setBuffer((quint8*) result.data(), result.size());
     try
     {
+        writer.putBits(8, (int) MessageType::alivePeers);
+
         // serialize online peers
         for (auto itr = m_allPeers.begin(); itr != m_allPeers.end(); ++itr)
         {
@@ -321,7 +317,7 @@ void P2pMessageBus::deserializeAlivePeersMessage(
         while (reader.hasMoreBits())
         {
             PeerNumberType peerNumber = deserializeCompressPeerNumber(reader);
-            ApiPeerIdData peerId = fromShortPeerNumber(connection->remotePeer().id, peerNumber);
+            ApiPersistentIdData peerId = fromShortPeerNumber(connection->remotePeer().id, peerNumber);
             bool isOnline = reader.getBit();
             quint32 receivedDistance = 0;
             if (isOnline)
@@ -345,21 +341,24 @@ void P2pMessageBus::deserializeAlivePeersMessage(
 void P2pMessageBus::sendAlivePeersMessage()
 {
     QByteArray data = serializePeersMessage();
-    for (const auto& connection: m_connections)
-        connection->sendMessage(MessageType::alivePeers, data);
+    for (const auto& connection : m_connections)
+    {
+        if (connection->state() == P2pConnection::State::Connected)
+            connection->sendMessage(data);
+    }
 }
 
 void P2pMessageBus::doSubscribe()
 {
     const auto localPeer = this->localPeer();
 
-    QMap<ApiPeerIdData, std::vector<ApiPeerIdData>> candidatesToSubscribe; //< key: who, value: where
+    QMap<ApiPersistentIdData, std::vector<ApiPersistentIdData>> candidatesToSubscribe; //< key: who, value: where
     for (auto itr = m_allPeers.begin(); itr != m_allPeers.end(); ++itr)
     {
-        const ApiPeerIdData& peer = itr.key();
+        const ApiPersistentIdData& peer = itr.key();
         const PeerInfo& info = itr.value();
         quint32 directDistance = info.distanceVia(localPeer);
-        std::vector<ApiPeerIdData> viaList;
+        std::vector<ApiPersistentIdData> viaList;
         quint32 minDistance = info.minDistance(&viaList);
         if (minDistance < directDistance)
         {
@@ -372,7 +371,7 @@ void P2pMessageBus::doSubscribe()
                     continue; //< already subscribed
             }
             int maxSubscription = 0;
-            ApiPeerIdData peerWithMaxSubscription;
+            ApiPersistentIdData peerWithMaxSubscription;
             for (int i = 0; i < viaList.size(); ++i)
             {
                 int subscription = candidatesToSubscribe.value(viaList[i]).size();

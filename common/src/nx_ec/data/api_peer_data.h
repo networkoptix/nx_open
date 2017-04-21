@@ -6,39 +6,32 @@
 
 namespace ec2 {
 
-struct ApiPeerIdData: ApiIdData
+struct ApiPersistentIdData: ApiIdData
 {
-    ApiPeerIdData(): ApiIdData() {}
+    ApiPersistentIdData(): ApiIdData() {}
 
-    ApiPeerIdData(
+    ApiPersistentIdData(
         const QnUuid& id,
-        const QnUuid& instanceId,
         const QnUuid& persistentId)
     :
         ApiIdData(id),
-        instanceId(instanceId),
         persistentId(persistentId)
     {}
 
-    bool operator<(const ApiPeerIdData& other) const
+    bool operator<(const ApiPersistentIdData& other) const
     {
         if (id != other.id)
             return id < other.id;
-        if (persistentId != other.persistentId)
-            return persistentId < other.persistentId;
-        return instanceId < other.instanceId;
+        return persistentId < other.persistentId;
     }
 
     /** Unique persistent Db ID of the peer. Empty for clients */
     QnUuid persistentId;
 
-    /** Unique running instance ID of the peer. */
-    QnUuid instanceId;
-
 };
-#define ApiPeerIdData_Fields ApiIdData_Fields (persistentId)(instanceId)
+#define ApiPersistentIdData_Fields ApiIdData_Fields (persistentId)
 
-struct ApiPeerData: ApiPeerIdData
+struct ApiPeerData: ApiPersistentIdData
 {
     ApiPeerData():
         peerType(Qn::PT_NotDefined),
@@ -51,7 +44,8 @@ struct ApiPeerData: ApiPeerIdData
         Qn::PeerType peerType,
         Qn::SerializationFormat dataFormat = Qn::UbjsonFormat)
     :
-        ApiPeerIdData(id, instanceId, QnUuid()),
+        ApiPersistentIdData(id, QnUuid()),
+        instanceId(instanceId),
         peerType(peerType),
         dataFormat(dataFormat)
     {}
@@ -63,7 +57,8 @@ struct ApiPeerData: ApiPeerIdData
         Qn::PeerType peerType,
         Qn::SerializationFormat dataFormat = Qn::UbjsonFormat)
     :
-        ApiPeerIdData(id, instanceId, persistentId),
+        ApiPersistentIdData(id, persistentId),
+        instanceId(instanceId),
         peerType(peerType),
         dataFormat(dataFormat)
     {}
@@ -109,6 +104,9 @@ struct ApiPeerData: ApiPeerIdData
             peerType == Qn::PT_MobileClient;
     }
 
+    /** Unique running instance ID of the peer. */
+    QnUuid instanceId;
+
     /** Type of the peer. */
     Qn::PeerType peerType;
 
@@ -117,6 +115,6 @@ struct ApiPeerData: ApiPeerIdData
 };
 typedef QSet<QnUuid> QnPeerSet;
 
-#define ApiPeerData_Fields ApiPeerIdData_Fields (peerType)(dataFormat)
+#define ApiPeerData_Fields ApiPersistentIdData_Fields (instanceId)(peerType)(dataFormat)
 
 } // namespace ec2

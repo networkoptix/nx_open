@@ -67,8 +67,8 @@ namespace ec2 {
             const P2pConnectionPtr& connection,
             const QByteArray& data);
 
-        PeerNumberType toShortPeerNumber(const QnUuid& owner, const ApiPeerIdData& peer);
-        ApiPeerIdData fromShortPeerNumber(const QnUuid& owner, const PeerNumberType& id);
+        PeerNumberType toShortPeerNumber(const QnUuid& owner, const ApiPersistentIdData& peer);
+        ApiPersistentIdData fromShortPeerNumber(const QnUuid& owner, const PeerNumberType& id);
 
         void addOwnfInfoToPeerList();
         void addOfflinePeersFromDb();
@@ -80,31 +80,31 @@ namespace ec2 {
 
         struct PeerNumberInfo
         {
-            PeerNumberType insert(const ApiPeerIdData& peer);
+            PeerNumberType insert(const ApiPersistentIdData& peer);
 
-            QMap<ApiPeerIdData, PeerNumberType> fullIdToShortId;
-            QMap<PeerNumberType, ApiPeerIdData> shortIdToFullId;
+            QMap<ApiPersistentIdData, PeerNumberType> fullIdToShortId;
+            QMap<PeerNumberType, ApiPersistentIdData> shortIdToFullId;
         };
 
         // key - got via peer, value - short numbers
         QMap<QnUuid, PeerNumberInfo> m_shortPeersMap;
 
-        typedef QMap<ApiPeerIdData, RoutingRecord> RoutingInfo;
+        typedef QMap<ApiPersistentIdData, RoutingRecord> RoutingInfo;
         struct PeerInfo
         {
             PeerInfo() {}
 
-            quint32 distanceVia(const ApiPeerIdData& via) const;
-            quint32 minDistance(std::vector<ApiPeerIdData>* outViaList) const;
+            quint32 distanceVia(const ApiPersistentIdData& via) const;
+            quint32 minDistance(std::vector<ApiPersistentIdData>* outViaList) const;
 
             bool isOnline = false;
             RoutingInfo routingInfo; // key: route throw, value - distance in hops
         };
-        typedef QMap<ApiPeerIdData, PeerInfo> PeersMap;
+        typedef QMap<ApiPersistentIdData, PeerInfo> PeersMap;
 
         PeersMap m_allPeers; //< all peers in a system
 
-        QMap<ApiPeerIdData, P2pConnectionPtr> m_subscriptionList;
+        QMap<ApiPersistentIdData, P2pConnectionPtr> m_subscriptionList;
         QThread* m_thread = nullptr;
         QTimer* m_timer = nullptr;
     };
