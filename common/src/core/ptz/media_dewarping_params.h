@@ -60,7 +60,7 @@ public:
     /** Camera mounting mode. */
     ViewMode viewMode;
 
-    /** View correction angle, in radians. */
+    /** View correction angle, in degrees. */
     qreal fovRot;
 
     /** Normalized position of the circle*/
