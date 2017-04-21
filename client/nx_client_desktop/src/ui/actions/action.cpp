@@ -159,10 +159,10 @@ void QnAction::setPulledText(const QString& pulledText)
 
 ConditionPtr QnAction::condition() const
 {
-    return m_condition.data();
+    return m_condition;
 }
 
-void QnAction::setCondition(ConditionPtr condition)
+void QnAction::setCondition(const ConditionPtr& condition)
 {
     m_condition = condition;
 }

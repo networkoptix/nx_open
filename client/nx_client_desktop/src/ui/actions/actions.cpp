@@ -126,7 +126,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
     factory(QnActions::ConnectToCloudSystemAction).
         flags(Tree | NoTarget).
         text(tr("Connect to System")).
-        condition(new QnTreeNodeTypeCondition(Qn::CloudSystemNode, manager));
+        condition(new TreeNodeTypeCondition(Qn::CloudSystemNode, manager));
 
     factory(QnActions::ReconnectAction).
         flags(NoTarget);
@@ -152,7 +152,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
                 tr("Camera Diagnostics..."),
                 tr("I/O Module Diagnostics...")
             ), manager)).
-        condition(new QnResourceActionCondition(hasFlags(Qn::live_cam), Any, manager));
+        condition(condition::hasFlags(Qn::live_cam, Any, manager));
 
     factory(QnActions::OpenBusinessLogAction).
         flags(NoTarget | SingleTarget | MultiTarget | ResourceTarget
@@ -186,8 +186,8 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         text(tr("Control Video Wall")).
         condition(
-            ConditionPtr(new QnStartVideoWallControlActionCondition(manager))
-            && ConditionPtr(new QnForbiddenInSafeModeCondition(manager))
+            ConditionPtr(new StartVideoWallControlCondition(manager))
+            && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
         );
 
     factory(QnActions::PushMyScreenToVideowallAction).
@@ -195,8 +195,8 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         text(tr("Push my screen")).
         condition(
-            ConditionPtr(new QnDesktopCameraActionCondition(manager))
-            && ConditionPtr(new QnForbiddenInSafeModeCondition(manager))
+            ConditionPtr(new DesktopCameraCondition(manager))
+            && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
         );
 
     factory(QnActions::QueueAppRestartAction).
@@ -212,13 +212,13 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         flags(SingleTarget | WidgetTarget).
         text(tr("Go To Saved Position")).
         requiredTargetPermissions(Qn::WritePtzPermission).
-        condition(new QnPtzActionCondition(Qn::PresetsPtzCapability, false, manager));
+        condition(new PtzCondition(Qn::PresetsPtzCapability, false, manager));
 
     factory(QnActions::PtzActivateTourAction).
         flags(SingleTarget | WidgetTarget).
         text(tr("Activate PTZ Tour")).
         requiredTargetPermissions(Qn::WritePtzPermission).
-        condition(new QnPtzActionCondition(Qn::ToursPtzCapability, false, manager));
+        condition(new PtzCondition(Qn::ToursPtzCapability, false, manager));
 
     factory(QnActions::PtzActivateObjectAction).
         flags(SingleTarget | WidgetTarget).
@@ -256,14 +256,14 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Disconnect from Server")).
         autoRepeat(false).
         shortcut(lit("Ctrl+Shift+D")).
-        condition(new QnLoggedInCondition(manager));
+        condition(new LoggedInCondition(manager));
 
     factory(QnActions::ResourcesModeAction).
         flags(Main).
         mode(DesktopMode).
         text(tr("Browse Local Files")).
         toggledText(tr("Show Welcome Screen")).
-        condition(new QnBrowseLocalFilesCondition(manager));
+        condition(new BrowseLocalFilesCondition(manager));
 
     factory().
         flags(Main).
@@ -277,7 +277,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         autoRepeat(false).
         shortcut(lit("Ctrl+P")).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
-        condition(new QnPanicActionCondition(manager));
+        condition(new PanicCondition(manager));
 
     factory().
         flags(Main | Tree).
@@ -305,7 +305,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
             pulledText(tr("New Window")).
             shortcut(lit("Ctrl+N")).
             autoRepeat(false).
-            condition(new QnLightModeCondition(Qn::LightModeNoNewWindow, manager));
+            condition(new LightModeCondition(Qn::LightModeNoNewWindow, manager));
 
         factory().
             flags(Main).
@@ -317,8 +317,8 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
             text(tr("User...")).
             pulledText(tr("New User...")).
             condition(
-                ConditionPtr(new QnTreeNodeTypeCondition(Qn::UsersNode, manager))
-                && ConditionPtr(new QnForbiddenInSafeModeCondition(manager))
+                ConditionPtr(new TreeNodeTypeCondition(Qn::UsersNode, manager))
+                && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
             ).
             autoRepeat(false);
 
@@ -327,7 +327,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
             requiredGlobalPermission(Qn::GlobalAdminPermission).
             text(tr("Video Wall...")).
             pulledText(tr("New Video Wall...")).
-            condition(new QnForbiddenInSafeModeCondition(manager)).
+            condition(new ForbiddenInSafeModeCondition(manager)).
             autoRepeat(false);
 
         factory(QnActions::NewWebPageAction).
@@ -336,8 +336,8 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
             text(tr("Web Page...")).
             pulledText(tr("New Web Page...")).
             condition(
-                ConditionPtr(new QnTreeNodeTypeCondition(Qn::WebPagesNode, manager))
-                && ConditionPtr(new QnForbiddenInSafeModeCondition(manager))
+                ConditionPtr(new TreeNodeTypeCondition(Qn::WebPagesNode, manager))
+                && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
             ).
             autoRepeat(false);
 
@@ -348,10 +348,10 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
             pulledText(tr("New Layout Tour...")).
             condition(
             (
-                ConditionPtr(new QnTreeNodeTypeCondition(Qn::LayoutsNode, manager))
-                || ConditionPtr(new QnTreeNodeTypeCondition(Qn::LayoutToursNode, manager))
+                ConditionPtr(new TreeNodeTypeCondition(Qn::LayoutsNode, manager))
+                || ConditionPtr(new TreeNodeTypeCondition(Qn::LayoutToursNode, manager))
                 )
-                && ConditionPtr(new QnForbiddenInSafeModeCondition(manager))
+                && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
             ).
             autoRepeat(false);
 
@@ -362,8 +362,8 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         flags(Tree | SingleTarget | ResourceTarget | NoTarget).
         text(tr("New Layout...")).
         condition(
-            ConditionPtr(new QnNewUserLayoutActionCondition(manager))
-            && ConditionPtr(new QnForbiddenInSafeModeCondition(manager))
+            ConditionPtr(new NewUserLayoutCondition(manager))
+            && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
         );
 
     factory(QnActions::OpenCurrentUserLayoutMenu).
@@ -405,8 +405,8 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
             pulledText(tr("Open Web Client...")).
             autoRepeat(false).
             condition(
-                ConditionPtr(new QnLoggedInCondition(manager))
-                && ConditionPtr(new QnTreeNodeTypeCondition({Qn::CurrentSystemNode, Qn::ServersNode}, manager))
+                ConditionPtr(new LoggedInCondition(manager))
+                && ConditionPtr(new TreeNodeTypeCondition({Qn::CurrentSystemNode, Qn::ServersNode}, manager))
             );
 
     } factory.endSubMenu();
@@ -418,7 +418,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Save Current Layout")).
         shortcut(lit("Ctrl+S")).
         autoRepeat(false). /* There is no point in saving the same layout many times in a row. */
-        condition(new QnSaveLayoutActionCondition(true, manager));
+        condition(new SaveLayoutCondition(true, manager));
 
     factory(QnActions::SaveCurrentLayoutAsAction).
         mode(DesktopMode).
@@ -428,8 +428,8 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         shortcut(lit("Ctrl+Alt+S"), Builder::Windows, true).
         autoRepeat(false).
         condition(
-            ConditionPtr(new QnLoggedInCondition(manager))
-            && ConditionPtr(new QnSaveLayoutAsActionCondition(true, manager))
+            ConditionPtr(new LoggedInCondition(manager))
+            && ConditionPtr(new SaveLayoutAsCondition(true, manager))
         );
 
     factory(QnActions::ShareLayoutAction).
@@ -438,7 +438,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(lit("Share_Layout_with")).
         autoRepeat(false).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
-        condition(new QnForbiddenInSafeModeCondition(manager));
+        condition(new ForbiddenInSafeModeCondition(manager));
 
     factory(QnActions::SaveCurrentVideoWallReviewAction).
         flags(Main | Scene | NoTarget | GlobalHotkey | IntentionallyAmbiguous).
@@ -448,15 +448,15 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         autoRepeat(false).
         requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         condition(
-            ConditionPtr(new QnForbiddenInSafeModeCondition(manager))
-            && ConditionPtr(new QnSaveVideowallReviewActionCondition(true, manager))
+            ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            && ConditionPtr(new SaveVideowallReviewCondition(true, manager))
         );
 
     factory(QnActions::DropOnVideoWallItemAction).
         flags(ResourceTarget | LayoutItemTarget | LayoutTarget | VideoWallItemTarget | SingleTarget | MultiTarget).
         text(tr("Drop Resources")).
         requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
-        condition(new QnForbiddenInSafeModeCondition(manager));
+        condition(new ForbiddenInSafeModeCondition(manager));
 
     factory().
         flags(Main).
@@ -544,7 +544,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("System Administration...")).
         shortcut(lit("Ctrl+Alt+A")).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
-        condition(new QnTreeNodeTypeCondition({Qn::CurrentSystemNode, Qn::ServersNode}, manager));
+        condition(new TreeNodeTypeCondition({Qn::CurrentSystemNode, Qn::ServersNode}, manager));
 
     factory(QnActions::SystemUpdateAction).
         flags(NoTarget).
@@ -555,7 +555,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         flags(Main | Tree).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
         text(tr("User Management...")).
-        condition(new QnTreeNodeTypeCondition(Qn::UsersNode, manager));
+        condition(new TreeNodeTypeCondition(Qn::UsersNode, manager));
 
     factory(QnActions::PreferencesGeneralTabAction).
         flags(Main).
@@ -628,9 +628,9 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         flags(Main | Tree).
         text(tr("Merge Systems...")).
         condition(
-            ConditionPtr(new QnTreeNodeTypeCondition({Qn::CurrentSystemNode, Qn::ServersNode}, manager))
-            && ConditionPtr(new QnForbiddenInSafeModeCondition(manager))
-            && ConditionPtr(new QnRequiresOwnerCondition(manager))
+            ConditionPtr(new TreeNodeTypeCondition({Qn::CurrentSystemNode, Qn::ServersNode}, manager))
+            && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            && ConditionPtr(new RequiresOwnerCondition(manager))
         );
 
     factory().
@@ -671,33 +671,33 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         flags(Tree | SingleTarget | ResourceTarget).
         childFactory(new QnEdgeNodeActionFactory(manager)).
         text(tr("Server...")).
-        condition(new QnTreeNodeTypeCondition(Qn::EdgeNode, manager));
+        condition(new TreeNodeTypeCondition(Qn::EdgeNode, manager));
 
     factory().
         flags(Tree | SingleTarget | ResourceTarget).
         separator().
-        condition(new QnTreeNodeTypeCondition(Qn::EdgeNode, manager));
+        condition(new TreeNodeTypeCondition(Qn::EdgeNode, manager));
 
     /* Resource actions. */
     factory(QnActions::OpenInLayoutAction)
         .flags(SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget | WidgetTarget)
         .requiredTargetPermissions(Qn::LayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
         .text(tr("Open in Layout"))
-        .condition(new QnOpenInLayoutActionCondition(manager));
+        .condition(new OpenInLayoutCondition(manager));
 
     factory(QnActions::OpenInCurrentLayoutAction).
         flags(Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget | WidgetTarget).
         requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission).
         text(tr("Open")).
         conditionalText(tr("Monitor"), hasFlags(Qn::server), All).
-        condition(new QnOpenInCurrentLayoutActionCondition(manager));
+        condition(new OpenInCurrentLayoutCondition(manager));
 
     factory(QnActions::OpenInNewLayoutAction).
         mode(DesktopMode).
         flags(Tree | Scene | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget | WidgetTarget).
         text(tr("Open in New Tab")).
         conditionalText(tr("Monitor in New Tab"), hasFlags(Qn::server), All).
-        condition(new QnOpenInNewEntityActionCondition(manager));
+        condition(new OpenInNewEntityCondition(manager));
 
     factory(QnActions::OpenInAlarmLayoutAction).
         mode(DesktopMode).
@@ -710,8 +710,8 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Open in New Window")).
         conditionalText(tr("Monitor in New Window"), hasFlags(Qn::server), All).
         condition(
-            ConditionPtr(new QnOpenInNewEntityActionCondition(manager))
-            && ConditionPtr(new QnLightModeCondition(Qn::LightModeNoNewWindow, manager))
+            ConditionPtr(new OpenInNewEntityCondition(manager))
+            && ConditionPtr(new LightModeCondition(Qn::LightModeNoNewWindow, manager))
         );
 
     factory(QnActions::OpenSingleLayoutAction).
@@ -728,14 +728,14 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         flags(Tree | SingleTarget | MultiTarget | ResourceTarget).
         text(tr("Open Layout(s) in New Window")). // TODO: #Elric split into sinle- & multi- action
         condition(
-            ConditionPtr(new QnResourceActionCondition(hasFlags(Qn::layout), All, manager))
-            && ConditionPtr(new QnLightModeCondition(Qn::LightModeNoNewWindow, manager))
+            condition::hasFlags(Qn::layout, All, manager)
+            && ConditionPtr(new LightModeCondition(Qn::LightModeNoNewWindow, manager))
         );
 
     factory(QnActions::OpenCurrentLayoutInNewWindowAction).
         flags(NoTarget).
         text(tr("Open Current Layout in New Window")).
-        condition(new QnLightModeCondition(Qn::LightModeNoNewWindow, manager));
+        condition(new LightModeCondition(Qn::LightModeNoNewWindow, manager));
 
     factory(QnActions::OpenAnyNumberOfLayoutsAction).
         flags(SingleTarget | MultiTarget | ResourceTarget).
@@ -753,14 +753,14 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         shortcut(lit("Ctrl+Enter")).
         shortcut(lit("Ctrl+Return")).
         autoRepeat(false).
-        condition(new QnOpenInFolderActionCondition(manager));
+        condition(new OpenInFolderCondition(manager));
 
     factory(QnActions::IdentifyVideoWallAction).
         flags(Tree | Scene | SingleTarget | MultiTarget | ResourceTarget | VideoWallItemTarget).
         requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         text(tr("Identify")).
         autoRepeat(false).
-        condition(new QnIdentifyVideoWallActionCondition(manager));
+        condition(new IdentifyVideoWallCondition(manager));
 
     factory(QnActions::AttachToVideoWallAction).
         flags(Tree | SingleTarget | ResourceTarget).
@@ -768,8 +768,8 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Attach to Video Wall...")).
         autoRepeat(false).
         condition(
-            ConditionPtr(new QnForbiddenInSafeModeCondition(manager))
-            && ConditionPtr(new QnResourceActionCondition(hasFlags(Qn::videowall), Any, manager))
+            ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            && condition::hasFlags(Qn::videowall, Any, manager)
         );
 
     factory(QnActions::StartVideoWallAction).
@@ -777,7 +777,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         text(tr("Switch to Video Wall mode...")).
         autoRepeat(false).
-        condition(new QnStartVideowallActionCondition(manager));
+        condition(new StartVideowallCondition(manager));
 
     factory(QnActions::SaveVideoWallReviewAction).
         flags(Tree | SingleTarget | ResourceTarget).
@@ -786,8 +786,8 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         autoRepeat(false).
         condition(
-            ConditionPtr(new QnSaveVideowallReviewActionCondition(false, manager))
-            && ConditionPtr(new QnForbiddenInSafeModeCondition(manager))
+            ConditionPtr(new SaveVideowallReviewCondition(false, manager))
+            && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
         );
 
     factory(QnActions::SaveVideowallMatrixAction).
@@ -796,14 +796,14 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Save Current Matrix")).
         autoRepeat(false).
         condition(
-            ConditionPtr(new QnNonEmptyVideowallActionCondition(manager))
-            && ConditionPtr(new QnForbiddenInSafeModeCondition(manager))
+            ConditionPtr(new NonEmptyVideowallCondition(manager))
+            && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
         );
 
     factory(QnActions::LoadVideowallMatrixAction).
         flags(Tree | SingleTarget | VideoWallMatrixTarget).
         requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
-        condition(new QnForbiddenInSafeModeCondition(manager)).
+        condition(new ForbiddenInSafeModeCondition(manager)).
         text(tr("Load Matrix"));
 
     factory(QnActions::DeleteVideowallMatrixAction).
@@ -812,7 +812,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Delete")).
         shortcut(lit("Del")).
         shortcut(Qt::Key_Backspace, Builder::Mac, true).
-        condition(new QnForbiddenInSafeModeCondition(manager)).
+        condition(new ForbiddenInSafeModeCondition(manager)).
         autoRepeat(false);
 
     factory().
@@ -824,31 +824,31 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         text(tr("Stop Video Wall")).
         autoRepeat(false).
-        condition(new QnRunningVideowallActionCondition(manager));
+        condition(new RunningVideowallCondition(manager));
 
     factory(QnActions::ClearVideoWallScreen).
         flags(Tree | VideoWallReviewScene | SingleTarget | MultiTarget | VideoWallItemTarget).
         requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         text(tr("Clear Screen")).
         autoRepeat(false).
-        condition(new QnDetachFromVideoWallActionCondition(manager));
+        condition(new DetachFromVideoWallCondition(manager));
 
     factory(QnActions::SaveLayoutAction).
         flags(TitleBar | Tree | SingleTarget | ResourceTarget).
         requiredTargetPermissions(Qn::SavePermission).
         text(tr("Save Layout")).
-        condition(new QnSaveLayoutActionCondition(false, manager));
+        condition(new SaveLayoutCondition(false, manager));
 
     factory(QnActions::SaveLayoutAsAction).
         flags(SingleTarget | ResourceTarget).
         requiredTargetPermissions(Qn::UserResourceRole, Qn::SavePermission).    //TODO: #GDM #access check canCreateResource permission
         text(lit("If you see this string, notify me. #GDM")).
-        condition(new QnSaveLayoutAsActionCondition(false, manager));
+        condition(new SaveLayoutAsCondition(false, manager));
 
     factory(QnActions::SaveLayoutForCurrentUserAsAction).
         flags(TitleBar | Tree | SingleTarget | ResourceTarget).
         text(tr("Save Layout As...")).
-        condition(new QnSaveLayoutAsActionCondition(false, manager));
+        condition(new SaveLayoutAsCondition(false, manager));
 
     factory().
         flags(Scene | Tree).
@@ -858,7 +858,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         flags(Tree | SingleTarget | MultiTarget | VideoWallItemTarget | IntentionallyAmbiguous).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
         text(tr("Delete")).
-        condition(new QnForbiddenInSafeModeCondition(manager)).
+        condition(new ForbiddenInSafeModeCondition(manager)).
         autoRepeat(false);
 
     factory(QnActions::MaximizeItemAction).
@@ -867,7 +867,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         shortcut(lit("Enter")).
         shortcut(lit("Return")).
         autoRepeat(false).
-        condition(new QnItemZoomedActionCondition(false, manager));
+        condition(new ItemZoomedCondition(false, manager));
 
     factory(QnActions::UnmaximizeItemAction).
         flags(Scene | SingleTarget).
@@ -875,30 +875,30 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         shortcut(lit("Enter")).
         shortcut(lit("Return")).
         autoRepeat(false).
-        condition(new QnItemZoomedActionCondition(true, manager));
+        condition(new ItemZoomedCondition(true, manager));
 
     factory(QnActions::ShowInfoAction).
         flags(Scene | SingleTarget | MultiTarget).
         text(tr("Show Info")).
         shortcut(lit("Alt+I")).
-        condition(new QnDisplayInfoActionCondition(false, manager));
+        condition(new DisplayInfoCondition(false, manager));
 
     factory(QnActions::HideInfoAction).
         flags(Scene | SingleTarget | MultiTarget).
         text(tr("Hide Info")).
         shortcut(lit("Alt+I")).
-        condition(new QnDisplayInfoActionCondition(true, manager));
+        condition(new DisplayInfoCondition(true, manager));
 
     factory(QnActions::ToggleInfoAction).
         flags(Scene | SingleTarget | MultiTarget | HotkeyOnly).
         text(tr("Toggle Info")).
         shortcut(lit("Alt+I")).
-        condition(new QnDisplayInfoActionCondition(manager));
+        condition(new DisplayInfoCondition(manager));
 
     factory().
         flags(Scene | NoTarget).
         text(tr("Change Resolution...")).
-        condition(new QnChangeResolutionActionCondition(manager));
+        condition(new ChangeResolutionCondition(manager));
 
     factory.beginSubMenu();
     {
@@ -926,7 +926,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         childFactory(new QnPtzPresetsToursActionFactory(manager)).
         text(tr("PTZ...")).
         requiredTargetPermissions(Qn::WritePtzPermission).
-        condition(new QnPtzActionCondition(Qn::PresetsPtzCapability, false, manager));
+        condition(new PtzCondition(Qn::PresetsPtzCapability, false, manager));
 
     factory.beginSubMenu();
     {
@@ -936,81 +936,81 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
             flags(Scene | SingleTarget).
             text(tr("Save Current Position...")).
             requiredTargetPermissions(Qn::WritePtzPermission | Qn::SavePermission).
-            condition(new QnPtzActionCondition(Qn::PresetsPtzCapability, true, manager));
+            condition(new PtzCondition(Qn::PresetsPtzCapability, true, manager));
 
         factory(QnActions::PtzManageAction).
             mode(DesktopMode).
             flags(Scene | SingleTarget).
             text(tr("Manage...")).
             requiredTargetPermissions(Qn::WritePtzPermission | Qn::SavePermission).
-            condition(new QnPtzActionCondition(Qn::ToursPtzCapability, false, manager));
+            condition(new PtzCondition(Qn::ToursPtzCapability, false, manager));
 
     } factory.endSubMenu();
 
     factory(QnActions::PtzCalibrateFisheyeAction).
         flags(SingleTarget | WidgetTarget).
         text(tr("Calibrate Fisheye")).
-        condition(new QnPtzActionCondition(Qn::VirtualPtzCapability, false, manager));
+        condition(new PtzCondition(Qn::VirtualPtzCapability, false, manager));
 
 #if 0
     factory(QnActions::ToggleRadassAction).
         flags(Scene | SingleTarget | MultiTarget | HotkeyOnly).
         text(tr("Toggle Resolution Mode")).
         shortcut(lit("Alt+I")).
-        condition(new QnDisplayInfoActionCondition(manager));
+        condition(new DisplayInfoCondition(manager));
 #endif
 
     factory(QnActions::StartSmartSearchAction).
         flags(Scene | SingleTarget | MultiTarget).
         text(tr("Show Motion/Smart Search")).
-        conditionalText(tr("Show Motion"), new QnNoArchiveActionCondition(manager)).
+        conditionalText(tr("Show Motion"), new NoArchiveCondition(manager)).
         shortcut(lit("Alt+G")).
-        condition(new QnSmartSearchActionCondition(false, manager));
+        condition(new SmartSearchCondition(false, manager));
 
     // TODO: #ynikitenkov remove this action, use StartSmartSearchAction with checked state!
     factory(QnActions::StopSmartSearchAction).
         flags(Scene | SingleTarget | MultiTarget).
         text(tr("Hide Motion/Smart Search")).
-        conditionalText(tr("Hide Motion"), new QnNoArchiveActionCondition(manager)).
+        conditionalText(tr("Hide Motion"), new NoArchiveCondition(manager)).
         shortcut(lit("Alt+G")).
-        condition(new QnSmartSearchActionCondition(true, manager));
+        condition(new SmartSearchCondition(true, manager));
 
     factory(QnActions::ClearMotionSelectionAction).
         flags(Scene | SingleTarget | MultiTarget).
         text(tr("Clear Motion Selection")).
-        condition(new QnClearMotionSelectionActionCondition(manager));
+        condition(new ClearMotionSelectionCondition(manager));
 
     factory(QnActions::ToggleSmartSearchAction).
         flags(Scene | SingleTarget | MultiTarget | HotkeyOnly).
         text(tr("Toggle Smart Search")).
         shortcut(lit("Alt+G")).
-        condition(new QnSmartSearchActionCondition(manager));
+        condition(new SmartSearchCondition(manager));
 
     factory(QnActions::CheckFileSignatureAction).
         flags(Scene | SingleTarget).
         text(tr("Check File Watermark")).
         shortcut(lit("Alt+C")).
         autoRepeat(false).
-        condition(new QnCheckFileSignatureActionCondition(manager));
+        condition(new CheckFileSignatureCondition(manager));
 
     factory(QnActions::TakeScreenshotAction).
         flags(Scene | SingleTarget | HotkeyOnly).
         text(tr("Take Screenshot")).
         shortcut(lit("Alt+S")).
         autoRepeat(false).
-        condition(new QnTakeScreenshotActionCondition(manager));
+        condition(new TakeScreenshotCondition(manager));
 
     factory(QnActions::AdjustVideoAction).
         flags(Scene | SingleTarget).
         text(tr("Image Enhancement...")).
         shortcut(lit("Alt+J")).
         autoRepeat(false).
-        condition(new QnAdjustVideoActionCondition(manager));
+        condition(new AdjustVideoCondition(manager));
 
     factory(QnActions::CreateZoomWindowAction).
         flags(SingleTarget | WidgetTarget).
         text(tr("Create Zoom Window")).
-        condition(new QnCreateZoomWindowActionCondition(manager));
+        condition(new CreateZoomWindowCondition(manager));
 
     factory().
         flags(Scene | SingleTarget | MultiTarget).
@@ -1021,22 +1021,22 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         factory(QnActions::Rotate0Action).
             flags(Scene | SingleTarget | MultiTarget).
             text(tr("0 degrees")).
-            condition(new QnRotateItemCondition(manager));
+            condition(new RotateItemCondition(manager));
 
         factory(QnActions::Rotate90Action).
             flags(Scene | SingleTarget | MultiTarget).
             text(tr("90 degrees")).
-            condition(new QnRotateItemCondition(manager));
+            condition(new RotateItemCondition(manager));
 
         factory(QnActions::Rotate180Action).
             flags(Scene | SingleTarget | MultiTarget).
             text(tr("180 degrees")).
-            condition(new QnRotateItemCondition(manager));
+            condition(new RotateItemCondition(manager));
 
         factory(QnActions::Rotate270Action).
             flags(Scene | SingleTarget | MultiTarget).
             text(tr("270 degrees")).
-            condition(new QnRotateItemCondition(manager));
+            condition(new RotateItemCondition(manager));
     } factory.endSubMenu();
 
     factory().
@@ -1049,7 +1049,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         shortcut(lit("Del")).
         shortcut(Qt::Key_Backspace, Builder::Mac, true).
         autoRepeat(false).
-        condition(new QnLayoutItemRemovalActionCondition(manager));
+        condition(new LayoutItemRemovalCondition(manager));
 
     factory(QnActions::RemoveLayoutItemFromSceneAction).
         flags(Scene | SingleTarget | MultiTarget | LayoutItemTarget | IntentionallyAmbiguous).
@@ -1057,7 +1057,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         shortcut(lit("Del")).
         shortcut(Qt::Key_Backspace, Builder::Mac, true).
         autoRepeat(false).
-        condition(new QnLayoutItemRemovalActionCondition(manager));
+        condition(new LayoutItemRemovalCondition(manager));
 
     factory(QnActions::RemoveFromServerAction).
         flags(Tree | SingleTarget | MultiTarget | ResourceTarget | IntentionallyAmbiguous).
@@ -1066,7 +1066,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         shortcut(lit("Del")).
         shortcut(Qt::Key_Backspace, Builder::Mac, true).
         autoRepeat(false).
-        condition(new QnResourceRemovalActionCondition(manager));
+        condition(new ResourceRemovalCondition(manager));
 
     factory(QnActions::StopSharingLayoutAction).
         flags(Tree | SingleTarget | MultiTarget | ResourceTarget | IntentionallyAmbiguous).
@@ -1075,7 +1075,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         shortcut(lit("Del")).
         shortcut(Qt::Key_Backspace, Builder::Mac, true).
         autoRepeat(false).
-        condition(new QnStopSharingActionCondition(manager));
+        condition(new StopSharingCondition(manager));
 
     factory().
         flags(Scene | Tree).
@@ -1087,8 +1087,8 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Edit...")).
         autoRepeat(false).
         condition(
-            ConditionPtr(new QnResourceActionCondition(hasFlags(Qn::web_page), ExactlyOne, manager))
-            && ConditionPtr(new QnForbiddenInSafeModeCondition(manager))
+            condition::hasFlags(Qn::web_page, ExactlyOne, manager)
+            && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
         );
 
     factory(QnActions::RenameResourceAction).
@@ -1097,14 +1097,14 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Rename")).
         shortcut(lit("F2")).
         autoRepeat(false).
-        condition(new QnRenameResourceActionCondition(manager));
+        condition(new RenameResourceCondition(manager));
 
     factory(QnActions::RenameVideowallEntityAction).
         flags(Tree | SingleTarget | VideoWallItemTarget | VideoWallMatrixTarget | IntentionallyAmbiguous).
         requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         text(tr("Rename")).
         shortcut(lit("F2")).
-        condition(new QnForbiddenInSafeModeCondition(manager)).
+        condition(new ForbiddenInSafeModeCondition(manager)).
         autoRepeat(false);
 
     //TODO: #GDM #3.1 #tbd
@@ -1114,8 +1114,8 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Rename")).
         shortcut(lit("F2")).
         condition(
-            ConditionPtr(new QnTreeNodeTypeCondition(Qn::LayoutTourNode, manager))
-            && ConditionPtr(new QnForbiddenInSafeModeCondition(manager))
+            ConditionPtr(new TreeNodeTypeCondition(Qn::LayoutTourNode, manager))
+            && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
         ).
         autoRepeat(false);
 
@@ -1136,9 +1136,9 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Set as Layout Background")).
         autoRepeat(false).
         condition(
-            ConditionPtr(new QnSetAsBackgroundActionCondition(manager))
-            && ConditionPtr(new QnLightModeCondition(Qn::LightModeNoLayoutBackground, manager))
-            && ConditionPtr(new QnForbiddenInSafeModeCondition(manager))
+            ConditionPtr(new SetAsBackgroundCondition(manager))
+            && ConditionPtr(new LightModeCondition(Qn::LightModeNoLayoutBackground, manager))
+            && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
         );
 
     factory(QnActions::UserSettingsAction).
@@ -1150,11 +1150,11 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
     factory(QnActions::UserRolesAction).
         flags(Tree | NoTarget).
         text(tr("User Roles...")).
-        conditionalText(tr("Role Settings..."), new QnTreeNodeTypeCondition(Qn::RoleNode, manager)).
+        conditionalText(tr("Role Settings..."), new TreeNodeTypeCondition(Qn::RoleNode, manager)).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(
-            ConditionPtr(new QnTreeNodeTypeCondition(Qn::UsersNode, manager))
-            || ConditionPtr(new QnTreeNodeTypeCondition(Qn::RoleNode, manager))
+            ConditionPtr(new TreeNodeTypeCondition(Qn::UsersNode, manager))
+            || ConditionPtr(new TreeNodeTypeCondition(Qn::RoleNode, manager))
         );
 
     factory(QnActions::CameraIssuesAction).
@@ -1168,8 +1168,8 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
             ), manager)).
         requiredGlobalPermission(Qn::GlobalViewLogsPermission).
         condition(
-            ConditionPtr(new QnResourceActionCondition(hasFlags(Qn::live_cam), Any, manager))
-            && ConditionPtr(new QnPreviewSearchModeCondition(true, manager))
+            condition::hasFlags(Qn::live_cam, Any, manager)
+            && !condition::isPreviewSearchMode(manager)
         );
 
     factory(QnActions::CameraBusinessRulesAction).
@@ -1183,8 +1183,8 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
             ), manager)).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(
-            ConditionPtr(new QnResourceActionCondition(hasFlags(Qn::live_cam), ExactlyOne, manager))
-            && ConditionPtr(new QnPreviewSearchModeCondition(true, manager))
+            condition::hasFlags(Qn::live_cam, ExactlyOne, manager)
+            && !condition::isPreviewSearchMode(manager)
         );
 
     factory(QnActions::CameraSettingsAction).
@@ -1198,30 +1198,30 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
             ), manager)).
         requiredGlobalPermission(Qn::GlobalEditCamerasPermission).
         condition(
-            ConditionPtr(new QnResourceActionCondition(hasFlags(Qn::live_cam), Any, manager))
-            && ConditionPtr(new QnPreviewSearchModeCondition(true, manager))
+            condition::hasFlags(Qn::live_cam, Any, manager)
+            && !condition::isPreviewSearchMode(manager)
         );
 
     factory(QnActions::MediaFileSettingsAction).
         mode(DesktopMode).
         flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget).
         text(tr("File Settings...")).
-        condition(new QnResourceActionCondition(hasFlags(Qn::local_media), Any, manager));
+        condition(condition::hasFlags(Qn::local_media, Any, manager));
 
     factory(QnActions::LayoutSettingsAction).
         mode(DesktopMode).
         flags(Tree | SingleTarget | ResourceTarget).
         text(tr("Layout Settings...")).
         requiredTargetPermissions(Qn::EditLayoutSettingsPermission).
-        condition(new QnLightModeCondition(Qn::LightModeNoLayoutBackground, manager));
+        condition(new LightModeCondition(Qn::LightModeNoLayoutBackground, manager));
 
     factory(QnActions::VideowallSettingsAction).
         flags(Tree | SingleTarget | ResourceTarget).
         text(tr("Video Wall Settings...")).
         condition(
-            ConditionPtr(new QnResourceActionCondition(hasFlags(Qn::videowall), ExactlyOne, manager))
-            && ConditionPtr(new QnAutoStartAllowedActionCodition(manager))
-            && ConditionPtr(new QnForbiddenInSafeModeCondition(manager))
+            condition::hasFlags(Qn::videowall, ExactlyOne, manager)
+            && ConditionPtr(new AutoStartAllowedCondition(manager))
+            && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
         );
 
     factory(QnActions::ServerAddCameraManuallyAction).
@@ -1229,10 +1229,10 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Add Device...")).   //intentionally hardcode devices here
         requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(
-            ConditionPtr(new QnResourceActionCondition(hasFlags(Qn::remote_server), ExactlyOne, manager))
-            && ConditionPtr(new QnEdgeServerCondition(false, manager))
-            && ~ConditionPtr(new QnFakeServerActionCondition(true, manager))
-            && ConditionPtr(new QnForbiddenInSafeModeCondition(manager))
+            condition::hasFlags(Qn::remote_server, ExactlyOne, manager)
+            && ConditionPtr(new EdgeServerCondition(false, manager))
+            && !ConditionPtr(new FakeServerCondition(true, manager))
+            && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
         );
 
     factory(QnActions::CameraListByServerAction).
@@ -1244,9 +1244,9 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         )).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(
-            ConditionPtr(new QnResourceActionCondition(hasFlags(Qn::remote_server), ExactlyOne, manager))
-            && ConditionPtr(new QnEdgeServerCondition(false, manager))
-            && ~ConditionPtr(new QnFakeServerActionCondition(true, manager))
+            condition::hasFlags(Qn::remote_server, ExactlyOne, manager)
+            && ConditionPtr(new EdgeServerCondition(false, manager))
+            && !ConditionPtr(new FakeServerCondition(true, manager))
         );
 
     factory(QnActions::PingAction).
@@ -1258,8 +1258,8 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Server Logs...")).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(
-            ConditionPtr(new QnResourceActionCondition(hasFlags(Qn::remote_server), ExactlyOne, manager))
-            && ~ConditionPtr(new QnFakeServerActionCondition(true, manager))
+            condition::hasFlags(Qn::remote_server, ExactlyOne, manager)
+            && !ConditionPtr(new FakeServerCondition(true, manager))
         );
 
     factory(QnActions::ServerIssuesAction).
@@ -1267,8 +1267,8 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Server Diagnostics...")).
         requiredGlobalPermission(Qn::GlobalViewLogsPermission).
         condition(
-            ConditionPtr(new QnResourceActionCondition(hasFlags(Qn::remote_server), ExactlyOne, manager))
-            && ~ConditionPtr(new QnFakeServerActionCondition(true, manager))
+            condition::hasFlags(Qn::remote_server, ExactlyOne, manager)
+            && !ConditionPtr(new FakeServerCondition(true, manager))
         );
 
     factory(QnActions::WebAdminAction).
@@ -1276,9 +1276,9 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Server Web Page...")).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(
-            ConditionPtr(new QnResourceActionCondition(hasFlags(Qn::remote_server), ExactlyOne, manager))
-            && ~ConditionPtr(new QnFakeServerActionCondition(true, manager))
-            && ~ConditionPtr(new QnCloudServerActionCondition(Any, manager))
+            condition::hasFlags(Qn::remote_server, ExactlyOne, manager)
+            && !ConditionPtr(new FakeServerCondition(true, manager))
+            && !ConditionPtr(new CloudServerCondition(Any, manager))
         );
 
     factory(QnActions::ServerSettingsAction).
@@ -1286,18 +1286,18 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Server Settings...")).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(
-            ConditionPtr(new QnResourceActionCondition(hasFlags(Qn::remote_server), ExactlyOne, manager))
-            && ~ConditionPtr(new QnFakeServerActionCondition(true, manager))
+            condition::hasFlags(Qn::remote_server, ExactlyOne, manager)
+            && !ConditionPtr(new FakeServerCondition(true, manager))
         );
 
     factory(QnActions::ConnectToCurrentSystem).
         flags(Tree | SingleTarget | MultiTarget | ResourceTarget).
         text(tr("Merge to Currently Connected System...")).
         condition(
-            ConditionPtr(new QnTreeNodeTypeCondition(Qn::ResourceNode, manager))
-            && ConditionPtr(new QnForbiddenInSafeModeCondition(manager))
-            && ConditionPtr(new QnMergeToCurrentSystemActionCondition(manager))
-            && ConditionPtr(new QnRequiresOwnerCondition(manager))
+            ConditionPtr(new TreeNodeTypeCondition(Qn::ResourceNode, manager))
+            && ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            && ConditionPtr(new MergeToCurrentSystemCondition(manager))
+            && ConditionPtr(new RequiresOwnerCondition(manager))
         );
 
     factory().
@@ -1305,14 +1305,14 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         childFactory(new QnAspectRatioActionFactory(manager)).
         text(tr("Change Cell Aspect Ratio...")).
         condition(
-            ~ConditionPtr(new QnVideoWallReviewModeCondition(manager))
-            && ConditionPtr(new QnLightModeCondition(Qn::LightModeSingleItem, manager))
+            !ConditionPtr(new VideoWallReviewModeCondition(manager))
+            && ConditionPtr(new LightModeCondition(Qn::LightModeSingleItem, manager))
         );
 
     factory().
         flags(Scene | NoTarget).
         text(tr("Change Cell Spacing...")).
-        condition(new QnLightModeCondition(Qn::LightModeSingleItem, manager));
+        condition(new LightModeCondition(Qn::LightModeSingleItem, manager));
 
     factory.beginSubMenu();
     {
@@ -1361,7 +1361,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         flags(Tree | NoTarget).
         mode(DesktopMode).
         text(tr("Review Layout Tour")).
-        condition(new QnTreeNodeTypeCondition(Qn::LayoutTourNode, manager)).
+        condition(new TreeNodeTypeCondition(Qn::LayoutTourNode, manager)).
         autoRepeat(false);
 
     factory(QnActions::ToggleLayoutTourModeAction).
@@ -1372,8 +1372,8 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         checkable().
         autoRepeat(false).
         condition(
-            ConditionPtr(new QnTreeNodeTypeCondition(Qn::LayoutTourNode, manager))
-            && ConditionPtr(new QnToggleTourActionCondition(manager))
+            ConditionPtr(new TreeNodeTypeCondition(Qn::LayoutTourNode, manager))
+            && ConditionPtr(new ToggleTourCondition(manager))
         );
 
     factory(QnActions::RemoveLayoutTourAction).
@@ -1383,7 +1383,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         requiredGlobalPermission(Qn::GlobalAdminPermission). //TODO: #GDM #3.1 #tbd
         shortcut(lit("Del")).
         shortcut(Qt::Key_Backspace, Builder::Mac, true).
-        condition(new QnTreeNodeTypeCondition(Qn::LayoutTourNode, manager));
+        condition(new TreeNodeTypeCondition(Qn::LayoutTourNode, manager));
 
     factory(QnActions::StartCurrentLayoutTourAction).
         flags(Scene | NoTarget).
@@ -1392,8 +1392,8 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         accent(Qn::ButtonAccent::Standard).
         icon(qnSkin->icon("buttons/play.png")).
         condition(
-            ConditionPtr(new QnLayoutTourReviewModeCondition(manager))
-            && ConditionPtr(new QnStartCurrentLayoutTourActionCondition(manager))
+            ConditionPtr(new LayoutTourReviewModeCondition(manager))
+            && ConditionPtr(new StartCurrentLayoutTourCondition(manager))
         ).
         autoRepeat(false);
 
@@ -1406,14 +1406,14 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         flags(Scene | NoTarget).
         mode(DesktopMode).
         text(tr("Save Changes")).
-        condition(new QnLayoutTourReviewModeCondition(manager)).
+        condition(new LayoutTourReviewModeCondition(manager)).
         autoRepeat(false);
 
     factory(QnActions::RemoveCurrentLayoutTourAction).
         flags(NoTarget).
         mode(DesktopMode).
         icon(qnSkin->icon("buttons/delete.png")).
-        condition(new QnLayoutTourReviewModeCondition(manager)).
+        condition(new LayoutTourReviewModeCondition(manager)).
         autoRepeat(false);
 
     factory().
@@ -1424,7 +1424,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         flags(Scene | NoTarget).
         requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::EditLayoutSettingsPermission).
         text(tr("Layout Settings...")).
-        condition(new QnLightModeCondition(Qn::LightModeNoLayoutBackground, manager));
+        condition(new LightModeCondition(Qn::LightModeNoLayoutBackground, manager));
 
     /* Tab bar actions. */
     factory().
@@ -1442,7 +1442,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         flags(TitleBar | SingleTarget).
         mode(DesktopMode).
         text(tr("Close All But This")).
-        condition(new QnLayoutCountActionCondition(2, manager));
+        condition(new LayoutCountCondition(2, manager));
 
     /* Slider actions. */
     factory(QnActions::StartTimeSelectionAction).
@@ -1450,32 +1450,32 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Mark Selection Start")).
         shortcut(lit("[")).
         shortcutContext(Qt::WidgetShortcut).
-        condition(new QnTimePeriodActionCondition(NullTimePeriod, InvisibleAction, manager));
+        condition(new TimePeriodCondition(NullTimePeriod, InvisibleAction, manager));
 
     factory(QnActions::EndTimeSelectionAction).
         flags(Slider | SingleTarget).
         text(tr("Mark Selection End")).
         shortcut(lit("]")).
         shortcutContext(Qt::WidgetShortcut).
-        condition(new QnTimePeriodActionCondition(EmptyTimePeriod, InvisibleAction, manager));
+        condition(new TimePeriodCondition(EmptyTimePeriod, InvisibleAction, manager));
 
     factory(QnActions::ClearTimeSelectionAction).
         flags(Slider | SingleTarget).
         text(tr("Clear Selection")).
-        condition(new QnTimePeriodActionCondition(EmptyTimePeriod | NormalTimePeriod, InvisibleAction, manager));
+        condition(new TimePeriodCondition(EmptyTimePeriod | NormalTimePeriod, InvisibleAction, manager));
 
     factory(QnActions::ZoomToTimeSelectionAction).
         flags(Slider | SingleTarget).
         text(tr("Zoom to Selection")).
-        condition(new QnTimePeriodActionCondition(NormalTimePeriod, InvisibleAction, manager));
+        condition(new TimePeriodCondition(NormalTimePeriod, InvisibleAction, manager));
 
     factory(QnActions::AddCameraBookmarkAction).
         flags(Slider | SingleTarget).
         text(tr("Add Bookmark...")).
         requiredGlobalPermission(Qn::GlobalManageBookmarksPermission).
         condition(
-            ConditionPtr(new QnForbiddenInSafeModeCondition(manager))
-            && ConditionPtr(new QnAddBookmarkActionCondition(manager))
+            ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            && ConditionPtr(new AddBookmarkCondition(manager))
         );
 
     factory(QnActions::EditCameraBookmarkAction).
@@ -1483,8 +1483,8 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Edit Bookmark...")).
         requiredGlobalPermission(Qn::GlobalManageBookmarksPermission).
         condition(
-            ConditionPtr(new QnForbiddenInSafeModeCondition(manager))
-            && ConditionPtr(new QnModifyBookmarkActionCondition(manager))
+            ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            && ConditionPtr(new ModifyBookmarkCondition(manager))
         );
 
     factory(QnActions::RemoveCameraBookmarkAction).
@@ -1492,8 +1492,8 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Remove Bookmark...")).
         requiredGlobalPermission(Qn::GlobalManageBookmarksPermission).
         condition(
-            ConditionPtr(new QnForbiddenInSafeModeCondition(manager))
-            && ConditionPtr(new QnModifyBookmarkActionCondition(manager))
+            ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            && ConditionPtr(new ModifyBookmarkCondition(manager))
         );
 
     factory(QnActions::RemoveBookmarksAction).
@@ -1501,8 +1501,8 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         text(tr("Remove Bookmarks...")).
         requiredGlobalPermission(Qn::GlobalManageBookmarksPermission).
         condition(
-            ConditionPtr(new QnForbiddenInSafeModeCondition(manager))
-            && ConditionPtr(new QnRemoveBookmarksActionCondition(manager))
+            ConditionPtr(new ForbiddenInSafeModeCondition(manager))
+            && ConditionPtr(new RemoveBookmarksCondition(manager))
         );
 
     factory().
@@ -1513,25 +1513,25 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         flags(Slider | SingleTarget | ResourceTarget).
         text(tr("Export Selected Area...")).
         requiredTargetPermissions(Qn::ExportPermission).
-        condition(new QnExportActionCondition(true, manager));
+        condition(new ExportCondition(true, manager));
 
     factory(QnActions::ExportLayoutAction).
         flags(Slider | SingleTarget | MultiTarget | NoTarget).
         text(tr("Export Multi-Video...")).
         requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission).
-        condition(new QnExportActionCondition(false, manager));
+        condition(new ExportCondition(false, manager));
 
     factory(QnActions::ExportTimelapseAction).
         flags(Slider | SingleTarget | MultiTarget | NoTarget).
         text(tr("Export Rapid Review...")).
         requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission).
-        condition(new QnExportActionCondition(true, manager));
+        condition(new ExportCondition(true, manager));
 
     factory(QnActions::ThumbnailsSearchAction).
         flags(Slider | Scene | SingleTarget).
         mode(DesktopMode).
         text(tr("Preview Search...")).
-        condition(new QnPreviewActionCondition(manager));
+        condition(new PreviewCondition(manager));
 
 
     factory(QnActions::DebugIncrementCounterAction).
@@ -1562,64 +1562,64 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         shortcut(lit("Space")).
         text(tr("Play")).
         toggledText(tr("Pause")).
-        condition(new QnArchiveActionCondition(manager));
+        condition(new ArchiveCondition(manager));
 
     factory(QnActions::PreviousFrameAction).
         flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget).
         shortcut(lit("Ctrl+Left")).
         text(tr("Previous Frame")).
-        condition(new QnArchiveActionCondition(manager));
+        condition(new ArchiveCondition(manager));
 
     factory(QnActions::NextFrameAction).
         flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget).
         shortcut(lit("Ctrl+Right")).
         text(tr("Next Frame")).
-        condition(new QnArchiveActionCondition(manager));
+        condition(new ArchiveCondition(manager));
 
     factory(QnActions::JumpToStartAction).
         flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget).
         shortcut(lit("Z")).
         text(tr("To Start")).
-        condition(new QnArchiveActionCondition(manager));
+        condition(new ArchiveCondition(manager));
 
     factory(QnActions::JumpToEndAction).
         flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget).
         shortcut(lit("X")).
         text(tr("To End")).
-        condition(new QnArchiveActionCondition(manager));
+        condition(new ArchiveCondition(manager));
 
     factory(QnActions::VolumeUpAction).
         flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget).
         shortcut(lit("Ctrl+Up")).
         text(tr("Volume Down")).
-        condition(new QnTimelineVisibleActionCondition(manager));
+        condition(new TimelineVisibleCondition(manager));
 
     factory(QnActions::VolumeDownAction).
         flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget).
         shortcut(lit("Ctrl+Down")).
         text(tr("Volume Up")).
-        condition(new QnTimelineVisibleActionCondition(manager));
+        condition(new TimelineVisibleCondition(manager));
 
     factory(QnActions::ToggleMuteAction).
         flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget).
         shortcut(lit("M")).
         text(tr("Toggle Mute")).
         checkable().
-        condition(new QnTimelineVisibleActionCondition(manager));
+        condition(new TimelineVisibleCondition(manager));
 
     factory(QnActions::JumpToLiveAction).
         flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget).
         shortcut(lit("L")).
         text(tr("Jump to Live")).
         checkable().
-        condition(new QnArchiveActionCondition(manager));
+        condition(new ArchiveCondition(manager));
 
     factory(QnActions::ToggleSyncAction).
         flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget).
         shortcut(lit("S")).
         text(tr("Synchronize Streams")).
         toggledText(tr("Disable Stream Synchronization")).
-        condition(new QnArchiveActionCondition(manager));
+        condition(new ArchiveCondition(manager));
 
 
     factory().
@@ -1646,13 +1646,13 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         flags(NoTarget).
         text(tr("Show Title Bar")).
         toggledText(tr("Hide Title Bar")).
-        condition(new QnToggleTitleBarActionCondition(manager));
+        condition(new ToggleTitleBarCondition(manager));
 
     factory(QnActions::PinTreeAction).
         flags(Tree | NoTarget).
         text(tr("Pin Tree")).
         toggledText(tr("Unpin Tree")).
-        condition(new QnTreeNodeTypeCondition(Qn::RootNode, manager));
+        condition(new TreeNodeTypeCondition(Qn::RootNode, manager));
 
     factory(QnActions::PinCalendarAction).
         text(tr("Pin Calendar")).
@@ -1666,7 +1666,7 @@ void QnActions::initialize(QnActionManager* manager, QnAction* root)
         flags(NoTarget).
         text(tr("Show Tree")).
         toggledText(tr("Hide Tree")).
-        condition(new QnTreeNodeTypeCondition(Qn::RootNode, manager));
+        condition(new TreeNodeTypeCondition(Qn::RootNode, manager));
 
     factory(QnActions::ToggleTimelineAction).
         flags(NoTarget).

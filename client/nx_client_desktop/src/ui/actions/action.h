@@ -133,7 +133,7 @@ public:
     /**
      * \param condition                 New condition for this action.
      */
-    void setCondition(nx::client::desktop::ui::action::ConditionPtr condition);
+    void setCondition(const nx::client::desktop::ui::action::ConditionPtr& condition);
 
     QnActionFactory *childFactory() const;
 

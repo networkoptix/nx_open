@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QPointer>
+
 class QnAction;
 class QnActionFactory;
 class QnActionTextFactory;

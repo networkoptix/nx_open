@@ -183,7 +183,7 @@ Builder Builder::conditionalText(const QString& text, const ConditionPtr& condit
 Builder Builder::conditionalText(const QString& text, const QnResourceCriterion& criterion,
     MatchMode matchMode)
 {
-    m_action->addConditionalText(new QnResourceActionCondition(criterion, matchMode, m_action), text);
+    m_action->addConditionalText(new ResourceCondition(criterion, matchMode, m_action), text);
     return *this;
 }
 
@@ -213,15 +213,15 @@ Builder Builder::accent(Qn::ButtonAccent value)
 
 Builder Builder::condition(const ConditionPtr& condition)
 {
-    NX_ASSERT(m_action->condition() == NULL);
+    NX_ASSERT(m_action->condition().isNull());
     m_action->setCondition(condition.data());
     return *this;
 }
 
 Builder Builder::condition(const QnResourceCriterion& criterion, MatchMode matchMode)
 {
-    NX_ASSERT(m_action->condition() == NULL);
-    m_action->setCondition(new QnResourceActionCondition(criterion, matchMode, m_action));
+    NX_ASSERT(m_action->condition().isNull());
+    m_action->setCondition(new ResourceCondition(criterion, matchMode, m_action));
     return *this;
 }
 
