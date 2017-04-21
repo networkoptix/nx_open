@@ -12,6 +12,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <nx/client/desktop/ui/actions/action_conditions.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
@@ -24,16 +25,17 @@
 
 #include "action_manager.h"
 #include "action_target_provider.h"
-#include "action_conditions.h"
 #include "action_factories.h"
 #include "action_parameter_types.h"
+
+using namespace nx::client::desktop::ui::action;
 
 QnAction::QnAction(QnActions::IDType id, QObject* parent) :
     QAction(parent),
     QnWorkbenchContextAware(parent),
     m_id(id),
     m_flags(0),
-    m_mode(QnActionTypes::AnyMode),
+    m_mode(AnyMode),
     m_globalPermission(Qn::NoGlobalPermissions),
     m_toolTipMarker(lit("<b></b>"))
 {
@@ -50,14 +52,14 @@ QnActions::IDType QnAction::id() const
     return m_id;
 }
 
-Qn::ActionScopes QnAction::scope() const
+ActionScopes QnAction::scope() const
 {
-    return static_cast<Qn::ActionScopes>(static_cast<int>(m_flags) & Qn::ScopeMask);
+    return static_cast<ActionScopes>(static_cast<int>(m_flags) & ScopeMask);
 }
 
-Qn::ActionParameterTypes QnAction::defaultParameterTypes() const
+ActionParameterTypes QnAction::defaultParameterTypes() const
 {
-    return static_cast<Qn::ActionParameterTypes>(static_cast<int>(m_flags) & Qn::TargetTypeMask);
+    return static_cast<ActionParameterTypes>(static_cast<int>(m_flags) & TargetTypeMask);
 }
 
 Qn::Permissions QnAction::requiredTargetPermissions(int target /* = -1*/) const
@@ -80,12 +82,12 @@ void QnAction::setRequiredGlobalPermission(Qn::GlobalPermission requiredPermissi
     m_globalPermission = requiredPermission;
 }
 
-QnActionTypes::ClientModes QnAction::mode() const
+ClientModes QnAction::mode() const
 {
     return m_mode;
 }
 
-void QnAction::setFlags(Qn::ActionFlags flags)
+void QnAction::setFlags(ActionFlags flags)
 {
     m_flags = flags;
 }
@@ -105,12 +107,12 @@ const QString & QnAction::normalText() const
     return m_normalText;
 }
 
-void QnAction::setMode(QnActionTypes::ClientModes mode)
+void QnAction::setMode(ClientModes mode)
 {
     m_mode = mode;
 }
 
-Qn::ActionFlags QnAction::flags() const
+ActionFlags QnAction::flags() const
 {
     return m_flags;
 }
@@ -155,12 +157,12 @@ void QnAction::setPulledText(const QString& pulledText)
     m_pulledText = pulledText;
 }
 
-QnActionCondition* QnAction::condition() const
+ConditionPtr QnAction::condition() const
 {
     return m_condition.data();
 }
 
-void QnAction::setCondition(QnActionCondition* condition)
+void QnAction::setCondition(ConditionPtr condition)
 {
     m_condition = condition;
 }
@@ -227,43 +229,43 @@ void QnAction::setToolTipFormat(const QString& toolTipFormat)
     updateToolTip(true);
 }
 
-Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnActionParameters& parameters) const
+ActionVisibility QnAction::checkCondition(ActionScopes scope, const QnActionParameters& parameters) const
 {
     if (!isVisible())
-        return Qn::InvisibleAction; // TODO: #Elric cheat!
+        return InvisibleAction; // TODO: #Elric cheat!
 
     if (!(this->scope() & scope) && this->scope() != scope)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
-    if (m_flags.testFlag(Qn::DevMode) && !qnRuntime->isDevMode())
-        return Qn::InvisibleAction;
+    if (m_flags.testFlag(DevMode) && !qnRuntime->isDevMode())
+        return InvisibleAction;
 
     if (m_globalPermission != Qn::NoGlobalPermissions &&
         !accessController()->hasGlobalPermission(m_globalPermission))
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     if (qnRuntime->isVideoWallMode() &&
-        !m_mode.testFlag(QnActionTypes::VideoWallMode))
-        return Qn::InvisibleAction;
+        !m_mode.testFlag(VideoWallMode))
+        return InvisibleAction;
 
     if (qnRuntime->isActiveXMode() &&
-        !m_mode.testFlag(QnActionTypes::ActiveXMode))
-        return Qn::InvisibleAction;
+        !m_mode.testFlag(ActiveXMode))
+        return InvisibleAction;
 
     int size = parameters.size();
 
-    if (size == 0 && !m_flags.testFlag(Qn::NoTarget))
-        return Qn::InvisibleAction;
+    if (size == 0 && !m_flags.testFlag(NoTarget))
+        return InvisibleAction;
 
-    if (size == 1 && !m_flags.testFlag(Qn::SingleTarget))
-        return Qn::InvisibleAction;
+    if (size == 1 && !m_flags.testFlag(SingleTarget))
+        return InvisibleAction;
 
-    if (size > 1 && !m_flags.testFlag(Qn::MultiTarget))
-        return Qn::InvisibleAction;
+    if (size > 1 && !m_flags.testFlag(MultiTarget))
+        return InvisibleAction;
 
-    Qn::ActionParameterType type = parameters.type();
+    ActionParameterType type = parameters.type();
     if (!defaultParameterTypes().testFlag(type) && size != 0)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     if (!m_targetPermissions.empty())
     {
@@ -293,16 +295,16 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
             }
 
             if (resources.isEmpty() && required > 0)
-                return Qn::InvisibleAction;
+                return InvisibleAction;
 
             if ((accessController()->combinedPermissions(resources) & required) != required)
-                return Qn::InvisibleAction;
+                return InvisibleAction;
         }
     }
 
     if (m_condition)
     {
-        if (parameters.scope() == Qn::InvalidScope)
+        if (parameters.scope() == InvalidScope)
         {
             QnActionParameters scopedParameters(parameters);
             scopedParameters.setScope(scope);
@@ -311,7 +313,7 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
         return m_condition->check(parameters);
     }
 
-    return Qn::EnabledAction;
+    return EnabledAction;
 }
 
 bool QnAction::event(QEvent* event)
@@ -324,7 +326,8 @@ bool QnAction::event(QEvent* event)
 
     if (e->isAmbiguous())
     {
-        NX_ASSERT(m_flags.testFlag(Qn::IntentionallyAmbiguous), lit("Ambiguous shortcut overload: %1.").arg(e->key().toString()));
+        NX_ASSERT(m_flags.testFlag(IntentionallyAmbiguous),
+            lit("Ambiguous shortcut overload: %1.").arg(e->key().toString()));
 
         QSet<QAction*> actions;
         for (QWidget* widget : associatedWidgets())
@@ -356,18 +359,18 @@ bool QnAction::event(QEvent* event)
     }
 
     QnActionParameters parameters;
-    Qn::ActionScope scope = static_cast<Qn::ActionScope>(static_cast<int>(this->scope()));
+    ActionScope scope = static_cast<ActionScope>(static_cast<int>(this->scope()));
 
     if (QnActionTargetProvider* targetProvider = QnWorkbenchContextAware::menu()->targetProvider())
     {
-        if (!flags().testFlag(Qn::ScopelessHotkey))
+        if (!flags().testFlag(ScopelessHotkey))
             scope = targetProvider->currentScope();
 
-        if (!flags().testFlag(Qn::TargetlessHotkey))
+        if (!flags().testFlag(TargetlessHotkey))
             parameters = targetProvider->currentParameters(scope);
     }
 
-    if (checkCondition(scope, parameters) == Qn::EnabledAction)
+    if (checkCondition(scope, parameters) == EnabledAction)
         QnWorkbenchContextAware::menu()->trigger(id(), parameters);
 
     /* Skip shortcut to be handled as usual key event. */
@@ -414,7 +417,7 @@ void QnAction::updateToolTipSilent()
     updateToolTip(false);
 }
 
-void QnAction::addConditionalText(QnActionCondition* condition, const QString& text)
+void QnAction::addConditionalText(ConditionPtr condition, const QString& text)
 {
     m_conditionalTexts << ConditionalText(condition, text);
 }

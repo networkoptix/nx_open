@@ -21,7 +21,7 @@ class QnActionParameterTypes {
 public:
     static int size(const QVariant &items);
 
-    static Qn::ActionParameterType type(const QVariant &items);
+    static nx::client::desktop::ui::action::ActionParameterType type(const QVariant &items);
 
     static QnResourceList resources(const QVariant &items);
 

@@ -151,11 +151,13 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     connect(action(QnActions::MainMenuAction), &QAction::triggered, this,
         [this]()
         {
+            using namespace nx::client::desktop::ui::action;
+
             Q_D(QnMainWindowTitleBarWidget);
             if (!isWidgetVisible(d->mainMenuButton))
                 return;
             static const QPoint kVerticalOffset(0, 2);
-            d->mainMenuHolder.reset(menu()->newMenu(Qn::MainScope, nullptr));
+            d->mainMenuHolder.reset(menu()->newMenu(MainScope, nullptr));
             d->mainMenuButton->setDown(true);
             executeButtonMenu(d->mainMenuButton, d->mainMenuHolder.data(), kVerticalOffset);
         });
@@ -197,9 +199,10 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     connect(d->currentLayoutsButton, &QnToolButton::justPressed, this,
         [this]()
         {
+            using namespace nx::client::desktop::ui::action;
             QScopedPointer<QMenu> layoutsMenu(menu()->newMenu(
                 QnActions::OpenCurrentUserLayoutMenu,
-                Qn::TitleBarScope));
+                TitleBarScope));
 
             Q_D(const QnMainWindowTitleBarWidget);
             executeButtonMenu(d->currentLayoutsButton, layoutsMenu.data());

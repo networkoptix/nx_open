@@ -190,8 +190,9 @@ void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint 
         QnActionParameters parameters(resources);
         parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
 
+        using namespace nx::client::desktop::ui::action;
         // We'll be changing hotkeys, so we cannot reuse global actions.
-        menu.reset(context()->menu()->newMenu(Qn::TreeScope, nullptr,
+        menu.reset(context()->menu()->newMenu(TreeScope, nullptr,
             parameters, QnActionManager::DontReuseActions));
 
         foreach(QAction *action, menu->actions())

@@ -329,35 +329,39 @@ bool QnWorkbenchUi::calculateTimelineVisible(QnResourceWidget* widget) const
         || !flags.testFlag(Qn::live);   /*< Show slider for local files. */
 }
 
-Qn::ActionScope QnWorkbenchUi::currentScope() const
+nx::client::desktop::ui::action::ActionScope QnWorkbenchUi::currentScope() const
 {
+    using namespace nx::client::desktop::ui::action;
+
     QGraphicsItem *focusItem = display()->scene()->focusItem();
     if (m_tree && focusItem == m_tree->item)
-        return Qn::TreeScope;
+        return TreeScope;
 
     if (focusItem == m_timeline->item)
-        return Qn::TimelineScope;
+        return TimelineScope;
 
     if (!focusItem || dynamic_cast<QnResourceWidget*>(focusItem))
-        return Qn::SceneScope;
+        return SceneScope;
 
     /* We should not handle any button as an action while the item was focused. */
     if (dynamic_cast<QnGraphicsWebView*>(focusItem))
-        return Qn::InvalidScope;
+        return InvalidScope;
 
-    return Qn::MainScope;
+    return MainScope;
 }
 
-QnActionParameters QnWorkbenchUi::currentParameters(Qn::ActionScope scope) const
+QnActionParameters QnWorkbenchUi::currentParameters(nx::client::desktop::ui::action::ActionScope scope) const
 {
+    using namespace nx::client::desktop::ui::action;
+
     /* Get items. */
     switch (scope)
     {
-        case Qn::TreeScope:
+        case TreeScope:
             return m_tree ? m_tree->widget->currentParameters(scope) : QnActionParameters();
-        case Qn::TimelineScope:
+        case TimelineScope:
             return QnActionParameters(navigator()->currentWidget());
-        case Qn::SceneScope:
+        case SceneScope:
             return QnActionParameters(QnActionParameterTypes::widgets(display()->scene()->selectedItems()));
         default:
             break;

@@ -4,10 +4,14 @@
 
 #include <QtWidgets/QAction>
 
+#include <common/common_globals.h>
+
+#include <nx/client/desktop/ui/actions/action_fwd.h>
+#include <nx/client/desktop/ui/actions/action_types.h>
+
 #include <ui/workbench/workbench_context_aware.h>
 #include <client/client_globals.h>
 
-#include "action_conditions.h"
 #include "action_factories.h"
 #include "action_text_factories.h"
 #include "action_fwd.h"
@@ -16,7 +20,6 @@
 class QGraphicsItem;
 
 class QnWorkbenchContext;
-class QnActionCondition;
 class QnActionFactory;
 class QnActionManager;
 class QnActionParameters;
@@ -51,12 +54,12 @@ public:
     /**
      * \returns                         Scope of this action.
      */
-    Qn::ActionScopes scope() const;
+    nx::client::desktop::ui::action::ActionScopes scope() const;
 
     /**
      * \returns                         Possible types of this action's default parameter.
      */
-    Qn::ActionParameterTypes defaultParameterTypes() const;
+    nx::client::desktop::ui::action::ActionParameterTypes defaultParameterTypes() const;
 
     /**
      * \param target                    Action parameter key.
@@ -80,14 +83,11 @@ public:
     */
     void setRequiredGlobalPermission(Qn::GlobalPermission requiredPermissions);
 
+    nx::client::desktop::ui::action::ClientModes mode() const;
+    void setMode(nx::client::desktop::ui::action::ClientModes mode);
 
-    QnActionTypes::ClientModes mode() const;
-
-    void setMode(QnActionTypes::ClientModes mode);
-
-    Qn::ActionFlags flags() const;
-
-    void setFlags(Qn::ActionFlags flags);
+    nx::client::desktop::ui::action::ActionFlags flags() const;
+    void setFlags(nx::client::desktop::ui::action::ActionFlags flags);
 
     Qn::ButtonAccent accent() const;
     void setAccent(Qn::ButtonAccent value);
@@ -128,12 +128,12 @@ public:
     /**
      * \returns                         Condition associated with this action, of NULL if none.
      */
-    QnActionCondition *condition() const;
+    nx::client::desktop::ui::action::ConditionPtr condition() const;
 
     /**
      * \param condition                 New condition for this action.
      */
-    void setCondition(QnActionCondition *condition);
+    void setCondition(nx::client::desktop::ui::action::ConditionPtr condition);
 
     QnActionFactory *childFactory() const;
 
@@ -164,9 +164,11 @@ public:
      *                                  action can be executed and how it will
      *                                  appear in context menu.
      */
-    Qn::ActionVisibility checkCondition(Qn::ActionScopes scope, const QnActionParameters &parameters) const;
+    nx::client::desktop::ui::action::ActionVisibility checkCondition(
+        nx::client::desktop::ui::action::ActionScopes scope,
+        const QnActionParameters &parameters) const;
 
-    void addConditionalText(QnActionCondition *condition, const QString &text);
+    void addConditionalText(nx::client::desktop::ui::action::ConditionPtr condition, const QString &text);
 
     /**
      * \returns true if there is at least one conditional text
@@ -193,14 +195,14 @@ private:
 
 private:
     const QnActions::IDType m_id;
-    Qn::ActionFlags m_flags;
+    nx::client::desktop::ui::action::ActionFlags m_flags;
     Qn::ButtonAccent m_accent{Qn::ButtonAccent::NoAccent};
-    QnActionTypes::ClientModes m_mode;
+    nx::client::desktop::ui::action::ClientModes m_mode;
     QHash<int, Qn::Permissions> m_targetPermissions;
     Qn::GlobalPermission m_globalPermission;
     QString m_normalText, m_toggledText, m_pulledText;
     QString m_toolTipFormat, m_toolTipMarker;
-    QPointer<QnActionCondition> m_condition;
+    nx::client::desktop::ui::action::ConditionPtr m_condition;
     QPointer<QnActionFactory> m_childFactory;
     QPointer<QnActionTextFactory> m_textFactory;
 
@@ -208,10 +210,10 @@ private:
 
     struct ConditionalText
     {
-        QnActionCondition * condition;
+        nx::client::desktop::ui::action::ConditionPtr condition;
         QString text;
         ConditionalText(){}
-        ConditionalText(QnActionCondition * condition, const QString &text):
+        ConditionalText(nx::client::desktop::ui::action::ConditionPtr condition, const QString &text):
             condition(condition), text(text) {}
     };
     QList<ConditionalText> m_conditionalTexts;

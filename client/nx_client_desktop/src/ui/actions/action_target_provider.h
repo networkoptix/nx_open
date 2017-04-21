@@ -15,7 +15,7 @@ class QnActionTargetProvider
 public:
     virtual ~QnActionTargetProvider() {}
 
-    virtual Qn::ActionScope currentScope() const = 0;
+    virtual nx::client::desktop::ui::action::ActionScope currentScope() const = 0;
 
-    virtual QnActionParameters currentParameters(Qn::ActionScope scope) const = 0;
+    virtual QnActionParameters currentParameters(nx::client::desktop::ui::action::ActionScope scope) const = 0;
 };

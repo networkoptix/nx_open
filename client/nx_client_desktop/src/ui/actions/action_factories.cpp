@@ -176,9 +176,10 @@ QMenu* QnEdgeNodeActionFactory::newMenu(const QnActionParameters &parameters, QW
     if (!edgeCamera || !QnMediaServerResource::isHiddenServer(edgeCamera->getParentResource()))
         return NULL;
 
-    return menu()->newMenu(QnActions::NoAction, Qn::TreeScope, parentWidget, QnActionParameters(edgeCamera->getParentResource()));
+    using namespace nx::client::desktop::ui::action;
+    return menu()->newMenu(QnActions::NoAction, TreeScope, parentWidget,
+        QnActionParameters(edgeCamera->getParentResource()));
 }
-
 
 QList<QAction *> QnAspectRatioActionFactory::newActions(const QnActionParameters &parameters, QObject *parent) {
     QActionGroup *actionGroup = new QActionGroup(parent);

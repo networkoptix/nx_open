@@ -13,10 +13,12 @@
 
 #include "action_parameter_types.h"
 
+using namespace nx::client::desktop::ui::action;
+
 namespace {
     bool checkType(const QVariant &items) {
-        Qn::ActionParameterType type = QnActionParameterTypes::type(items);
-        if(type == Qn::OtherType) {
+        ActionParameterType type = QnActionParameterTypes::type(items);
+        if(type == OtherType) {
             qnWarning("Unrecognized action parameter type '%1'.", items.typeName());
             return false;
         }
@@ -83,7 +85,7 @@ void QnActionParameters::setResources(const QnResourceList &resources) {
     setItems(QVariant::fromValue<QnResourceList>(resources));
 }
 
-Qn::ActionParameterType QnActionParameters::type(int key) const {
+ActionParameterType QnActionParameters::type(int key) const {
     return QnActionParameterTypes::type(argument(key));
 }
 
@@ -133,16 +135,16 @@ QnResourceWidgetList QnActionParameters::widgets(int key) const {
     return QnActionParameterTypes::widgets(argument(key));
 }
 
-Qn::ActionScopes QnActionParameters::scope() const {
+nx::client::desktop::ui::action::ActionScopes QnActionParameters::scope() const {
     return m_scope;
 }
 
-void QnActionParameters::setScope(Qn::ActionScopes scope) {
+void QnActionParameters::setScope(nx::client::desktop::ui::action::ActionScopes scope) {
     m_scope = scope;
 }
 
 void QnActionParameters::init(const QVariant &items, const ArgumentHash &arguments) {
-    setScope(Qn::InvalidScope);
+    setScope(InvalidScope);
     setArguments(arguments);
     setItems(items);
 }

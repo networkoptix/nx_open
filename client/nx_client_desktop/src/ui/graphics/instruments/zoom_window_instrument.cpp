@@ -894,8 +894,9 @@ void ZoomWindowInstrument::at_resizing(QGraphicsView *view, QGraphicsWidget *, R
     if(!newTargetWidget || newTargetWidget == windowTarget()->overlay()->target())
         return;
 
+    using namespace nx::client::desktop::ui::action;
     QnAction *action = menu()->action(QnActions::CreateZoomWindowAction);
-    if(!action || action->checkCondition(action->scope(), QnActionParameters(newTargetWidget)) != Qn::EnabledAction)
+    if(!action || action->checkCondition(action->scope(), QnActionParameters(newTargetWidget)) != EnabledAction)
         return;
 
     QnMediaResourceWidget *widget = windowTarget()->zoomWidget();

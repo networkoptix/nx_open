@@ -7,12 +7,8 @@
 #include <common/common_globals.h>
 
 #include <ui/actions/actions.h>
-#include <ui/actions/action_conditions.h>
-
-class QnAction;
-class QnActionFactory;
-class QnActionTextFactory;
-class QnResourceCriterion;
+#include <nx/client/desktop/ui/actions/action_fwd.h>
+#include <nx/client/desktop/ui/actions/action_types.h>
 
 namespace nx {
 namespace client {
@@ -46,21 +42,21 @@ public:
     Builder pulledText(const QString& text);
     Builder toolTip(const QString& toolTip);
     Builder toolTipFormat(const QString& toolTipFormat);
-    Builder flags(Qn::ActionFlags flags);
-    Builder mode(QnActionTypes::ClientModes mode);
+    Builder flags(ActionFlags flags);
+    Builder mode(ClientModes mode);
     Builder requiredGlobalPermission(Qn::GlobalPermission permission);
     Builder requiredTargetPermissions(int key, Qn::Permissions permissions);
     Builder requiredTargetPermissions(Qn::Permissions permissions);
     Builder separator(bool isSeparator = true);
-    Builder conditionalText(const QString &text, QnActionCondition* condition);
+    Builder conditionalText(const QString &text, const ConditionPtr& condition);
     Builder conditionalText(const QString &text, const QnResourceCriterion& criterion,
-        Qn::MatchMode matchMode = Qn::All);
+        MatchMode matchMode = All);
     Builder checkable(bool isCheckable = true);
     Builder checked(bool isChecked = true);
     Builder showCheckBoxInMenu(bool show);
     Builder accent(Qn::ButtonAccent value);
-    Builder condition(const QnActionConditionPtr& condition);
-    Builder condition(const QnResourceCriterion& criterion, Qn::MatchMode matchMode = Qn::All);
+    Builder condition(const ConditionPtr& condition);
+    Builder condition(const QnResourceCriterion& criterion, MatchMode matchMode = All);
     Builder childFactory(QnActionFactory* childFactory);
 
 private:

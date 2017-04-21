@@ -315,9 +315,10 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint& pos, bool ignoreSe
 
     QnActionManager* manager = context()->menu();
 
-    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, nullptr, ignoreSelection
+    using namespace nx::client::desktop::ui::action;
+    QScopedPointer<QMenu> menu(manager->newMenu(TreeScope, nullptr, ignoreSelection
         ? QnActionParameters().withArgument(Qn::NodeTypeRole, Qn::RootNode)
-        : currentParameters(Qn::TreeScope)));
+        : currentParameters(TreeScope)));
 
     if (currentTreeWidget() == ui->searchTreeWidget)
     {
@@ -463,9 +464,10 @@ QnVideoWallMatrixIndexList QnResourceBrowserWidget::selectedVideoWallMatrices() 
     return result;
 }
 
-Qn::ActionScope QnResourceBrowserWidget::currentScope() const
+nx::client::desktop::ui::action::ActionScope QnResourceBrowserWidget::currentScope() const
 {
-    return Qn::TreeScope;
+    using namespace nx::client::desktop::ui::action;
+    return TreeScope;
 }
 
 QString QnResourceBrowserWidget::toolTipAt(const QPointF& pos) const
@@ -563,9 +565,10 @@ bool QnResourceBrowserWidget::isScrollBarVisible() const
     return currentTreeWidget()->treeView()->verticalScrollBar()->isVisible();
 }
 
-QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope scope) const
+QnActionParameters QnResourceBrowserWidget::currentParameters(nx::client::desktop::ui::action::ActionScope scope) const
 {
-    if (scope != Qn::TreeScope)
+    using namespace nx::client::desktop::ui::action;
+    if (scope != TreeScope)
         return QnActionParameters();
 
     QItemSelectionModel* selectionModel = currentSelectionModel();

@@ -497,14 +497,16 @@ void QnWorkbenchNavigator::deinitialize()
     m_currentWidgetFlags = 0;
 }
 
-Qn::ActionScope QnWorkbenchNavigator::currentScope() const
+nx::client::desktop::ui::action::ActionScope QnWorkbenchNavigator::currentScope() const
 {
-    return Qn::TimelineScope;
+    using namespace nx::client::desktop::ui::action;
+    return TimelineScope;
 }
 
-QnActionParameters QnWorkbenchNavigator::currentParameters(Qn::ActionScope scope) const
+QnActionParameters QnWorkbenchNavigator::currentParameters(nx::client::desktop::ui::action::ActionScope scope) const
 {
-    if (scope != Qn::TimelineScope)
+    using namespace nx::client::desktop::ui::action;
+    if (scope != TimelineScope)
         return QnActionParameters();
 
     QnResourceWidgetList result;
@@ -1977,6 +1979,7 @@ bool QnWorkbenchNavigator::eventFilter(QObject *watched, QEvent *event)
 void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPointF &pos, const QPoint &screenPos)
 {
     Q_UNUSED(screenPos);
+    using namespace nx::client::desktop::ui::action;
 
     if (!context() || !context()->menu())
     {
@@ -1995,7 +1998,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
 
     qint64 position = m_timeSlider->valueFromPosition(pos);
 
-    QnActionParameters parameters = currentParameters(Qn::TimelineScope);
+    QnActionParameters parameters = currentParameters(TimelineScope);
     parameters.setArgument(Qn::TimePeriodRole, selection);
     parameters.setArgument(Qn::TimePeriodsRole, m_timeSlider->timePeriods(CurrentLine, Qn::RecordingContent)); // TODO: #Elric move this out into global scope!
     parameters.setArgument(Qn::MergedTimePeriodsRole, m_timeSlider->timePeriods(SyncedLine, Qn::RecordingContent));
@@ -2005,8 +2008,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     if (!bookmarks.isEmpty())
         parameters.setArgument(Qn::CameraBookmarkRole, bookmarks.first()); // TODO: #dklychkov Implement sub-menus for the case when there're more than 1 bookmark at the position
 
-
-    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TimelineScope, nullptr, parameters));
+    QScopedPointer<QMenu> menu(manager->newMenu(TimelineScope, nullptr, parameters));
     if (menu->isEmpty())
         return;
 

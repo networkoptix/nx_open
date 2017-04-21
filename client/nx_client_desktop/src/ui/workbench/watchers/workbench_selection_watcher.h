@@ -13,8 +13,8 @@ public:
     QnWorkbenchSelectionWatcher(QObject *parent = nullptr);
     virtual ~QnWorkbenchSelectionWatcher();
 
-    Qn::ActionScopes scope() const;
-    void setScope(Qn::ActionScopes value);
+    nx::client::desktop::ui::action::ActionScopes scope() const;
+    void setScope(nx::client::desktop::ui::action::ActionScopes value);
 
 private:
     void updateFromSelection();
@@ -23,11 +23,11 @@ signals:
     void selectionChanged(const QnResourceList &resources);
 
 private:
-    Qn::ActionScopes m_scope;
+    nx::client::desktop::ui::action::ActionScopes m_scope;
 
     /** Whether the set of selected resources were changed. */
     bool m_selectionUpdatePending;
 
     /** Scope of the last selection change. */
-    Qn::ActionScope m_lastScope;
+    nx::client::desktop::ui::action::ActionScope m_lastScope;
 };

@@ -70,11 +70,11 @@ public:
 
     QnVideoWallMatrixIndexList selectedVideoWallMatrices() const;
 
-    virtual Qn::ActionScope currentScope() const override;
+    virtual nx::client::desktop::ui::action::ActionScope currentScope() const override;
 
     QComboBox* typeComboBox() const;
 
-    virtual QnActionParameters currentParameters(Qn::ActionScope scope) const override;
+    virtual QnActionParameters currentParameters(nx::client::desktop::ui::action::ActionScope scope) const override;
 
     void setToolTipParent(QGraphicsWidget* widget);
 

@@ -4,7 +4,6 @@
 #include <QtCore/QList>
 
 class QnAction;
-class QnActionCondition;
 class QnActionManager;
 class QnActionTargetProvider;
 class QnActionParameters;

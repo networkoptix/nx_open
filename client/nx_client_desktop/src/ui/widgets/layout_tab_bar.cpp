@@ -97,14 +97,16 @@ void QnLayoutTabBar::checkInvariants() const
     }
 }
 
-Qn::ActionScope QnLayoutTabBar::currentScope() const
+nx::client::desktop::ui::action::ActionScope QnLayoutTabBar::currentScope() const
 {
-    return Qn::TitleBarScope;
+    using namespace nx::client::desktop::ui::action;
+    return TitleBarScope;
 }
 
-QnActionParameters QnLayoutTabBar::currentParameters(Qn::ActionScope scope) const
+QnActionParameters QnLayoutTabBar::currentParameters(nx::client::desktop::ui::action::ActionScope scope) const
 {
-    if (scope != Qn::TitleBarScope)
+    using namespace nx::client::desktop::ui::action;
+    if (scope != TitleBarScope)
         return QnActionParameters();
 
     QnWorkbenchLayoutList result;
@@ -282,7 +284,8 @@ void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event)
     if (index >= 0 && index < m_layouts.size())
         target.push_back(m_layouts[index]);
 
-    QScopedPointer<QMenu> menu(context()->menu()->newMenu(Qn::TitleBarScope, nullptr, target));
+    using namespace nx::client::desktop::ui::action;
+    QScopedPointer<QMenu> menu(context()->menu()->newMenu(TitleBarScope, nullptr, target));
     if (menu->isEmpty())
         return;
 

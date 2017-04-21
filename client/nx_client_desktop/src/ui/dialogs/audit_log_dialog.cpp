@@ -924,7 +924,8 @@ void QnAuditLogDialog::at_customContextMenuRequested(const QPoint&)
             QnActionParameters parameters(resource);
             parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
 
-            menu.reset(manager->newMenu(Qn::TreeScope, nullptr, parameters));
+            using namespace nx::client::desktop::ui::action;
+            menu.reset(manager->newMenu(TreeScope, nullptr, parameters));
             foreach(QAction* action, menu->actions())
                 action->setShortcut(QKeySequence());
         }

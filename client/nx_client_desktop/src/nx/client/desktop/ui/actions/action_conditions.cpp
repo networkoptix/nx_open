@@ -17,7 +17,7 @@
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-
+#include <core/resource/fake_media_server.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
@@ -40,6 +40,8 @@
 
 #include <recording/time_period.h>
 
+#include <ui/actions/action_parameter_types.h>
+#include <ui/actions/action_manager.h>
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -55,179 +57,181 @@
 
 #include <nx/vms/utils/platform/autorun.h>
 
-#include "action_parameter_types.h"
-#include "action_manager.h"
-#include <core/resource/fake_media_server.h>
-
 using boost::algorithm::any_of;
 using boost::algorithm::all_of;
 
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+namespace action {
+
 namespace {
-
-Qn::TimePeriodType periodType(const QnTimePeriod& period)
-{
-    if (period.isNull())
-        return Qn::NullTimePeriod;
-
-    if (period.isEmpty())
-        return Qn::EmptyTimePeriod;
-
-    return Qn::NormalTimePeriod;
-}
 
 /**
 * Condition wich is a conjunction of two conditions.
 * It acts like logical AND, e.g. an action is enabled if the all conditions in the conjunction is true.
-* But the result (Qn::ActionVisibility) may have 3 values: [Invisible, Disabled, Enabled], so this action condition chooses
+* But the result (ActionVisibility) may have 3 values: [Invisible, Disabled, Enabled], so this action condition chooses
 * the minimal value from its conjuncts.
 */
-class ConjunctionActionCondition: public QnActionCondition
+class ConjunctionActionCondition: public Condition
 {
 public:
     ConjunctionActionCondition(
-        const QnActionConditionPtr& l,
-        const QnActionConditionPtr& r,
+        const ConditionPtr& l,
+        const ConditionPtr& r,
         QObject *parent = nullptr)
         :
-        QnActionCondition(parent),
+        Condition(parent),
         l(l),
         r(r)
     {
     }
 
-    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override
+    virtual ActionVisibility check(const QnActionParameters &parameters) override
     {
         return qMin(l->check(parameters), r->check(parameters));
     }
 
 private:
-    QnActionConditionPtr l;
-    QnActionConditionPtr r;
+    ConditionPtr l;
+    ConditionPtr r;
 };
 
 /**
 * Condition wich is a disjunction of two conditions.
 * It acts like logical OR, e.g. an action is enabled if one of conditions in the conjunction is true.
-* But the result (Qn::ActionVisibility) may have 3 values: [Invisible, Disabled, Enabled], so this action condition chooses
+* But the result (ActionVisibility) may have 3 values: [Invisible, Disabled, Enabled], so this action condition chooses
 * the maximal value from its conjuncts.
 */
-class DisjunctionActionCondition: public QnActionCondition
+class DisjunctionActionCondition: public Condition
 {
 public:
     DisjunctionActionCondition(
-        const QnActionConditionPtr& l,
-        const QnActionConditionPtr& r,
+        const ConditionPtr& l,
+        const ConditionPtr& r,
         QObject *parent = nullptr)
         :
-        QnActionCondition(parent),
+        Condition(parent),
         l(l),
         r(r)
     {
     }
 
-    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override
+    virtual ActionVisibility check(const QnActionParameters &parameters) override
     {
         return qMax(l->check(parameters), r->check(parameters));
     }
 
 private:
-    QnActionConditionPtr l;
-    QnActionConditionPtr r;
+    ConditionPtr l;
+    ConditionPtr r;
 };
 
-class NegativeActionCondition: public QnActionCondition
+class NegativeActionCondition: public Condition
 {
 public:
-    NegativeActionCondition(const QnActionConditionPtr& condition, QObject* parent = nullptr):
-        QnActionCondition(parent),
+    NegativeActionCondition(const ConditionPtr& condition, QObject* parent = nullptr):
+        Condition(parent),
         m_condition(condition)
     {
     }
 
-    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override
+    virtual ActionVisibility check(const QnActionParameters &parameters) override
     {
-        Qn::ActionVisibility result = m_condition->check(parameters);
-        if (result == Qn::InvisibleAction)
-            return Qn::EnabledAction;
-        return Qn::InvisibleAction;
+        ActionVisibility result = m_condition->check(parameters);
+        if (result == InvisibleAction)
+            return EnabledAction;
+        return InvisibleAction;
     }
 
 private:
-    QnActionConditionPtr m_condition;
+    ConditionPtr m_condition;
 };
+
+TimePeriodType periodType(const QnTimePeriod& period)
+{
+    if (period.isNull())
+        return NullTimePeriod;
+
+    if (period.isEmpty())
+        return EmptyTimePeriod;
+
+    return NormalTimePeriod;
+}
 
 } // namespace
 
-QnActionCondition::QnActionCondition(QObject *parent):
+Condition::Condition(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent)
 {
 }
 
-Qn::ActionVisibility QnActionCondition::check(const QnResourceList &)
+ActionVisibility Condition::check(const QnResourceList &)
 {
-    return Qn::InvisibleAction;
+    return InvisibleAction;
 }
 
-Qn::ActionVisibility QnActionCondition::check(const QnLayoutItemIndexList &layoutItems)
+ActionVisibility Condition::check(const QnLayoutItemIndexList &layoutItems)
 {
     return check(QnActionParameterTypes::resources(layoutItems));
 }
 
-Qn::ActionVisibility QnActionCondition::check(const QnResourceWidgetList &widgets)
+ActionVisibility Condition::check(const QnResourceWidgetList &widgets)
 {
     return check(QnActionParameterTypes::layoutItems(widgets));
 }
 
-Qn::ActionVisibility QnActionCondition::check(const QnWorkbenchLayoutList &layouts)
+ActionVisibility Condition::check(const QnWorkbenchLayoutList &layouts)
 {
     return check(QnActionParameterTypes::resources(layouts));
 }
 
-Qn::ActionVisibility QnActionCondition::check(const QnActionParameters& parameters)
+ActionVisibility Condition::check(const QnActionParameters& parameters)
 {
     switch (parameters.type())
     {
-        case Qn::ResourceType:
+        case ResourceType:
             return check(parameters.resources());
-        case Qn::WidgetType:
+        case WidgetType:
             return check(parameters.widgets());
-        case Qn::LayoutType:
+        case LayoutType:
             return check(parameters.layouts());
-        case Qn::LayoutItemType:
+        case LayoutItemType:
             return check(parameters.layoutItems());
         default:
             qnWarning("Invalid action condition parameter type '%1'.", parameters.items().typeName());
-            return Qn::InvisibleAction;
+            return InvisibleAction;
     }
 }
 
-QnActionConditionPtr operator&&(const QnActionConditionPtr& l, const QnActionConditionPtr& r)
+ConditionPtr operator&&(const ConditionPtr& l, const ConditionPtr& r)
 {
     NX_EXPECT(l && l->parent() && r);
     if (!l || !r || !l->parent())
-        return QnActionConditionPtr();
+        return ConditionPtr();
     return new ConjunctionActionCondition(l, r, l->parent());
 }
 
-QnActionConditionPtr operator||(const QnActionConditionPtr& l, const QnActionConditionPtr& r)
+ConditionPtr operator||(const ConditionPtr& l, const ConditionPtr& r)
 {
     NX_EXPECT(l && l->parent() && r);
     if (!l || !r || !l->parent())
-        return QnActionConditionPtr();
+        return ConditionPtr();
     return new DisjunctionActionCondition(l, r, l->parent());
 }
 
-QnActionConditionPtr operator~(const QnActionConditionPtr& l)
+ConditionPtr operator~(const ConditionPtr& l)
 {
     NX_EXPECT(l && l->parent());
     if (!l || !l->parent())
-        return QnActionConditionPtr();
+        return ConditionPtr();
     return new NegativeActionCondition(l, l->parent());
 }
 
 QnVideoWallReviewModeCondition::QnVideoWallReviewModeCondition(QObject* parent):
-    QnActionCondition(parent)
+    Condition(parent)
 {
 }
 
@@ -236,67 +240,67 @@ bool QnVideoWallReviewModeCondition::isVideoWallReviewMode() const
     return context()->workbench()->currentLayout()->data().contains(Qn::VideoWallResourceRole);
 }
 
-Qn::ActionVisibility QnVideoWallReviewModeCondition::check(const QnActionParameters& /*parameters*/)
+ActionVisibility QnVideoWallReviewModeCondition::check(const QnActionParameters& /*parameters*/)
 {
     if (isVideoWallReviewMode())
-        return Qn::EnabledAction;
-    return Qn::InvisibleAction;
+        return EnabledAction;
+    return InvisibleAction;
 }
 
 QnLayoutTourReviewModeCondition::QnLayoutTourReviewModeCondition(QObject* parent):
-    QnActionCondition(parent)
+    Condition(parent)
 {
 }
 
-Qn::ActionVisibility QnLayoutTourReviewModeCondition::check(const QnActionParameters& /*parameters*/)
+ActionVisibility QnLayoutTourReviewModeCondition::check(const QnActionParameters& /*parameters*/)
 {
     const bool isLayoutTourReviewMode = context()->workbench()->currentLayout()->data()
         .contains(Qn::LayoutTourUuidRole);
 
     return isLayoutTourReviewMode
-        ? Qn::EnabledAction
-        : Qn::InvisibleAction;
+        ? EnabledAction
+        : InvisibleAction;
 }
 
 bool QnPreviewSearchModeCondition::isPreviewSearchMode(const QnActionParameters& parameters) const
 {
-    return parameters.scope() == Qn::SceneScope
+    return parameters.scope() == SceneScope
         && context()->workbench()->currentLayout()->isSearchLayout();
 }
 
-Qn::ActionVisibility QnPreviewSearchModeCondition::check(const QnActionParameters& parameters)
+ActionVisibility QnPreviewSearchModeCondition::check(const QnActionParameters& parameters)
 {
     if (m_hide == isPreviewSearchMode(parameters))
-        return Qn::InvisibleAction;
-    return Qn::EnabledAction;
+        return InvisibleAction;
+    return EnabledAction;
 }
 
-Qn::ActionVisibility QnForbiddenInSafeModeCondition::check(const QnActionParameters& /*parameters*/)
+ActionVisibility QnForbiddenInSafeModeCondition::check(const QnActionParameters& /*parameters*/)
 {
     if (commonModule()->isReadOnly())
-        return Qn::InvisibleAction;
-    return Qn::EnabledAction;
+        return InvisibleAction;
+    return EnabledAction;
 }
 
-Qn::ActionVisibility QnRequiresOwnerCondition::check(const QnActionParameters& /*parameters*/)
+ActionVisibility QnRequiresOwnerCondition::check(const QnActionParameters& /*parameters*/)
 {
     if (context()->user() && context()->user()->isOwner())
-        return Qn::EnabledAction;
-    return Qn::InvisibleAction;
+        return EnabledAction;
+    return InvisibleAction;
 }
 
-Qn::ActionVisibility QnItemZoomedActionCondition::check(const QnResourceWidgetList &widgets)
+ActionVisibility QnItemZoomedActionCondition::check(const QnResourceWidgetList &widgets)
 {
     if (widgets.size() != 1 || !widgets[0])
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     if (widgets[0]->resource()->flags() & Qn::videowall)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
-    return ((widgets[0]->item() == workbench()->item(Qn::ZoomedRole)) == m_requiredZoomedState) ? Qn::EnabledAction : Qn::InvisibleAction;
+    return ((widgets[0]->item() == workbench()->item(Qn::ZoomedRole)) == m_requiredZoomedState) ? EnabledAction : InvisibleAction;
 }
 
-Qn::ActionVisibility QnSmartSearchActionCondition::check(const QnResourceWidgetList &widgets)
+ActionVisibility QnSmartSearchActionCondition::check(const QnResourceWidgetList &widgets)
 {
     auto pureIoModule = [](const QnResourcePtr& resource)
         {
@@ -324,18 +328,18 @@ Qn::ActionVisibility QnSmartSearchActionCondition::check(const QnResourceWidgetL
         if (m_hasRequiredGridDisplayValue)
         {
             if (static_cast<bool>(widget->options() & QnResourceWidget::DisplayMotion) == m_requiredGridDisplayValue)
-                return Qn::EnabledAction;
+                return EnabledAction;
         }
         else
         {
-            return Qn::EnabledAction;
+            return EnabledAction;
         }
     }
 
-    return Qn::InvisibleAction;
+    return InvisibleAction;
 }
 
-Qn::ActionVisibility QnDisplayInfoActionCondition::check(const QnResourceWidgetList &widgets)
+ActionVisibility QnDisplayInfoActionCondition::check(const QnResourceWidgetList &widgets)
 {
     foreach(QnResourceWidget *widget, widgets)
     {
@@ -348,18 +352,18 @@ Qn::ActionVisibility QnDisplayInfoActionCondition::check(const QnResourceWidgetL
         if (m_hasRequiredDisplayInfoValue)
         {
             if (static_cast<bool>(widget->options() & QnResourceWidget::DisplayInfo) == m_requiredDisplayInfoValue)
-                return Qn::EnabledAction;
+                return EnabledAction;
         }
         else
         {
-            return Qn::EnabledAction;
+            return EnabledAction;
         }
     }
 
-    return Qn::InvisibleAction;
+    return InvisibleAction;
 }
 
-Qn::ActionVisibility QnClearMotionSelectionActionCondition::check(const QnResourceWidgetList &widgets)
+ActionVisibility QnClearMotionSelectionActionCondition::check(const QnResourceWidgetList &widgets)
 {
     bool hasDisplayedGrid = false;
 
@@ -375,26 +379,29 @@ Qn::ActionVisibility QnClearMotionSelectionActionCondition::check(const QnResour
             if (QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
                 foreach(const QRegion &region, mediaWidget->motionSelection())
                 if (!region.isEmpty())
-                    return Qn::EnabledAction;
+                    return EnabledAction;
         }
     }
 
-    return hasDisplayedGrid ? Qn::DisabledAction : Qn::InvisibleAction;
+    return hasDisplayedGrid ? DisabledAction : InvisibleAction;
 }
 
-Qn::ActionVisibility QnCheckFileSignatureActionCondition::check(const QnResourceWidgetList &widgets)
+ActionVisibility QnCheckFileSignatureActionCondition::check(const QnResourceWidgetList &widgets)
 {
     NX_ASSERT(widgets.size() == 1);
     for (auto widget : widgets)
     {
         if (!widget->resource()->hasFlags(Qn::exported_media))
-            return Qn::InvisibleAction;
+            return InvisibleAction;
     }
-    return Qn::EnabledAction;
+    return EnabledAction;
 }
 
-QnResourceActionCondition::QnResourceActionCondition(const QnResourceCriterion &criterion, Qn::MatchMode matchMode, QObject *parent):
-    QnActionCondition(parent),
+QnResourceActionCondition::QnResourceActionCondition(const QnResourceCriterion &criterion,
+    MatchMode matchMode,
+    QObject* parent)
+    :
+    Condition(parent),
     m_criterion(criterion),
     m_matchMode(matchMode)
 {
@@ -405,14 +412,14 @@ QnResourceActionCondition::~QnResourceActionCondition()
     return;
 }
 
-Qn::ActionVisibility QnResourceActionCondition::check(const QnResourceList &resources)
+ActionVisibility QnResourceActionCondition::check(const QnResourceList &resources)
 {
-    return checkInternal<QnResourcePtr>(resources) ? Qn::EnabledAction : Qn::InvisibleAction;
+    return checkInternal<QnResourcePtr>(resources) ? EnabledAction : InvisibleAction;
 }
 
-Qn::ActionVisibility QnResourceActionCondition::check(const QnResourceWidgetList &widgets)
+ActionVisibility QnResourceActionCondition::check(const QnResourceWidgetList &widgets)
 {
-    return checkInternal<QnResourceWidget *>(widgets) ? Qn::EnabledAction : Qn::InvisibleAction;
+    return checkInternal<QnResourceWidget *>(widgets) ? EnabledAction : InvisibleAction;
 }
 
 template<class Item, class ItemSequence>
@@ -420,37 +427,31 @@ bool QnResourceActionCondition::checkInternal(const ItemSequence &sequence)
 {
     int count = 0;
 
-    foreach(const Item &item, sequence)
+    for (const Item& item: sequence)
     {
         bool matches = checkOne(item);
 
-        if (matches && m_matchMode == Qn::Any)
+        if (matches && m_matchMode == Any)
             return true;
 
-        if (!matches && m_matchMode == Qn::All)
+        if (!matches && m_matchMode == All)
             return false;
 
         if (matches)
             count++;
     }
 
-    if (m_matchMode == Qn::Any)
-    {
+    if (m_matchMode == Any)
         return false;
-    }
-    else if (m_matchMode == Qn::All)
-    {
+
+    if (m_matchMode == All)
         return true;
-    }
-    else if (m_matchMode == Qn::ExactlyOne)
-    {
+
+    if (m_matchMode == ExactlyOne)
         return count == 1;
-    }
-    else
-    {
-        qnWarning("Invalid match mode '%1'.", static_cast<int>(m_matchMode));
-        return false;
-    }
+
+    NX_EXPECT(false, lm("Invalid match mode '%1'.").arg(static_cast<int>(m_matchMode)));
+    return false;
 }
 
 bool QnResourceActionCondition::checkOne(const QnResourcePtr &resource)
@@ -464,11 +465,11 @@ bool QnResourceActionCondition::checkOne(QnResourceWidget *widget)
     return resource ? checkOne(resource) : false;
 }
 
-Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnActionParameters& parameters)
+ActionVisibility QnResourceRemovalActionCondition::check(const QnActionParameters& parameters)
 {
     Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
     if (nodeType == Qn::SharedLayoutNode || nodeType == Qn::SharedResourceNode)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     QnUserResourcePtr owner = parameters.argument<QnUserResourcePtr>(Qn::UserResourceRole);
     bool ownResources = owner && owner == context()->user();
@@ -507,42 +508,42 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnActionParam
         };
 
     return any_of(parameters.resources(), canBeDeleted)
-        ? Qn::EnabledAction
-        : Qn::InvisibleAction;
+        ? EnabledAction
+        : InvisibleAction;
 }
 
-Qn::ActionVisibility QnStopSharingActionCondition::check(const QnActionParameters& parameters)
+ActionVisibility QnStopSharingActionCondition::check(const QnActionParameters& parameters)
 {
     if (commonModule()->isReadOnly())
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
     if (nodeType != Qn::SharedLayoutNode)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     auto user = parameters.argument<QnUserResourcePtr>(Qn::UserResourceRole);
     auto roleId = parameters.argument<QnUuid>(Qn::UuidRole);
     NX_ASSERT(user || !roleId.isNull());
     if (!user && roleId.isNull())
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     QnResourceAccessSubject subject = user
         ? QnResourceAccessSubject(user)
         : QnResourceAccessSubject(userRolesManager()->userRole(roleId));
     if (!subject.isValid())
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     for (auto resource : parameters.resources())
     {
         if (resourceAccessProvider()->accessibleVia(subject, resource) == QnAbstractResourceAccessProvider::Source::shared)
-            return Qn::EnabledAction;
+            return EnabledAction;
     }
 
-    return Qn::DisabledAction;
+    return DisabledAction;
 }
 
 
-Qn::ActionVisibility QnRenameResourceActionCondition::check(const QnActionParameters& parameters)
+ActionVisibility QnRenameResourceActionCondition::check(const QnActionParameters& parameters)
 {
     Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
 
@@ -553,46 +554,46 @@ Qn::ActionVisibility QnRenameResourceActionCondition::check(const QnActionParame
         case Qn::SharedResourceNode:
         {
             if (parameters.resources().size() != 1)
-                return Qn::InvisibleAction;
+                return InvisibleAction;
 
             QnResourcePtr target = parameters.resource();
             if (!target)
-                return Qn::InvisibleAction;
+                return InvisibleAction;
 
             /* Renaming users directly from resource tree is disabled due do digest re-generation need. */
             if (target->hasFlags(Qn::user))
-                return Qn::InvisibleAction;
+                return InvisibleAction;
 
             /* Edge servers renaming is forbidden. */
             if (QnMediaServerResource::isEdgeServer(target))
-                return Qn::InvisibleAction;
+                return InvisibleAction;
 
             /* Incompatible resources cannot be renamed */
             if (target.dynamicCast<QnFakeMediaServerResource>())
-                return Qn::InvisibleAction;
+                return InvisibleAction;
 
-            return Qn::EnabledAction;
+            return EnabledAction;
         }
         case Qn::EdgeNode:
         case Qn::RecorderNode:
-            return Qn::EnabledAction;
+            return EnabledAction;
         default:
             break;
     }
 
-    return Qn::InvisibleAction;
+    return InvisibleAction;
 }
 
-Qn::ActionVisibility QnLayoutItemRemovalActionCondition::check(const QnLayoutItemIndexList &layoutItems)
+ActionVisibility QnLayoutItemRemovalActionCondition::check(const QnLayoutItemIndexList &layoutItems)
 {
     foreach(const QnLayoutItemIndex &item, layoutItems)
         if (!accessController()->hasPermissions(item.layout(), Qn::WritePermission | Qn::AddRemoveItemsPermission))
-            return Qn::InvisibleAction;
+            return InvisibleAction;
 
-    return Qn::EnabledAction;
+    return EnabledAction;
 }
 
-Qn::ActionVisibility QnSaveLayoutActionCondition::check(const QnResourceList &resources)
+ActionVisibility QnSaveLayoutActionCondition::check(const QnResourceList &resources)
 {
     QnLayoutResourcePtr layout;
 
@@ -603,31 +604,31 @@ Qn::ActionVisibility QnSaveLayoutActionCondition::check(const QnResourceList &re
     else
     {
         if (resources.size() != 1)
-            return Qn::InvisibleAction;
+            return InvisibleAction;
 
         layout = resources[0].dynamicCast<QnLayoutResource>();
     }
 
     if (!layout)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     if (layout->data().contains(Qn::VideoWallResourceRole))
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     if (snapshotManager()->isSaveable(layout))
     {
-        return Qn::EnabledAction;
+        return EnabledAction;
     }
     else
     {
-        return Qn::DisabledAction;
+        return DisabledAction;
     }
 }
 
-Qn::ActionVisibility QnSaveLayoutAsActionCondition::check(const QnResourceList& resources)
+ActionVisibility QnSaveLayoutAsActionCondition::check(const QnResourceList& resources)
 {
     if (!context()->user())
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     QnLayoutResourcePtr layout;
     if (m_current)
@@ -637,97 +638,97 @@ Qn::ActionVisibility QnSaveLayoutAsActionCondition::check(const QnResourceList& 
     else
     {
         if (resources.size() != 1)
-            return Qn::InvisibleAction;
+            return InvisibleAction;
 
         layout = resources[0].dynamicCast<QnLayoutResource>();
     }
 
     if (!layout)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     if (layout->isServiceLayout())
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     if (layout->data().contains(Qn::VideoWallResourceRole))
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     /* Save as.. for exported layouts works very strange, disabling it for now. */
     if (layout->isFile())
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
-    return Qn::EnabledAction;
+    return EnabledAction;
 }
 
-Qn::ActionVisibility QnLayoutCountActionCondition::check(const QnWorkbenchLayoutList &)
+ActionVisibility QnLayoutCountActionCondition::check(const QnWorkbenchLayoutList &)
 {
     if (workbench()->layouts().size() < m_minimalRequiredCount)
-        return Qn::DisabledAction;
+        return DisabledAction;
 
-    return Qn::EnabledAction;
+    return EnabledAction;
 }
 
 
-Qn::ActionVisibility QnTakeScreenshotActionCondition::check(const QnResourceWidgetList &widgets)
+ActionVisibility QnTakeScreenshotActionCondition::check(const QnResourceWidgetList &widgets)
 {
     if (widgets.size() != 1)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     QnResourceWidget *widget = widgets[0];
     if (widget->resource()->flags() & (Qn::still_image | Qn::server))
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     Qn::RenderStatus renderStatus = widget->renderStatus();
     if (renderStatus == Qn::NothingRendered || renderStatus == Qn::CannotRender)
-        return Qn::DisabledAction;
+        return DisabledAction;
 
-    return Qn::EnabledAction;
+    return EnabledAction;
 }
 
-Qn::ActionVisibility QnAdjustVideoActionCondition::check(const QnResourceWidgetList &widgets)
+ActionVisibility QnAdjustVideoActionCondition::check(const QnResourceWidgetList &widgets)
 {
     if (widgets.size() != 1)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     QnResourceWidget *widget = widgets[0];
     if ((widget->resource()->flags() & (Qn::server | Qn::videowall))
         || (widget->resource()->flags().testFlag(Qn::web_page)))
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     QString url = widget->resource()->getUrl().toLower();
     if ((widget->resource()->flags() & Qn::still_image) && !url.endsWith(lit(".jpg")) && !url.endsWith(lit(".jpeg")))
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     QnMediaResourcePtr mediaResource = widget->resource().dynamicCast<QnMediaResource>();
     if (mediaResource && !mediaResource->hasVideo(0))
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     Qn::RenderStatus renderStatus = widget->renderStatus();
     if (renderStatus == Qn::NothingRendered || renderStatus == Qn::CannotRender)
-        return Qn::DisabledAction;
+        return DisabledAction;
 
-    return Qn::EnabledAction;
+    return EnabledAction;
 }
 
-Qn::ActionVisibility QnTimePeriodActionCondition::check(const QnActionParameters& parameters)
+ActionVisibility QnTimePeriodActionCondition::check(const QnActionParameters& parameters)
 {
     if (!parameters.hasArgument(Qn::TimePeriodRole))
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
     if (m_periodTypes.testFlag(periodType(period)))
-        return Qn::EnabledAction;
+        return EnabledAction;
 
     return m_nonMatchingVisibility;
 }
 
-Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters& parameters)
+ActionVisibility QnExportActionCondition::check(const QnActionParameters& parameters)
 {
     if (!parameters.hasArgument(Qn::TimePeriodRole))
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
-    if (periodType(period) != Qn::NormalTimePeriod)
-        return Qn::DisabledAction;
+    if (periodType(period) != NormalTimePeriod)
+        return DisabledAction;
 
     // Export selection
     if (m_centralItemRequired)
@@ -737,14 +738,14 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters& pa
 
         /// If parameters contain periods it means we need current selected item
         if (containsAvailablePeriods && !context()->workbench()->item(Qn::CentralRole))
-            return Qn::DisabledAction;
+            return DisabledAction;
 
         QnResourcePtr resource = parameters.resource();
         if (containsAvailablePeriods && resource && resource->flags().testFlag(Qn::sync))
         {
             QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
             if (!periods.intersects(period))
-                return Qn::DisabledAction;
+                return DisabledAction;
         }
     }
     // Export layout
@@ -752,171 +753,171 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters& pa
     {
         QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::MergedTimePeriodsRole);
         if (!periods.intersects(period))
-            return Qn::DisabledAction;
+            return DisabledAction;
     }
-    return Qn::EnabledAction;
+    return EnabledAction;
 }
 
-Qn::ActionVisibility QnAddBookmarkActionCondition::check(const QnActionParameters& parameters)
+ActionVisibility QnAddBookmarkActionCondition::check(const QnActionParameters& parameters)
 {
     if (!parameters.hasArgument(Qn::TimePeriodRole))
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
-    if (periodType(period) != Qn::NormalTimePeriod)
-        return Qn::DisabledAction;
+    if (periodType(period) != NormalTimePeriod)
+        return DisabledAction;
 
     if (!context()->workbench()->item(Qn::CentralRole))
-        return Qn::DisabledAction;
+        return DisabledAction;
 
     QnResourcePtr resource = parameters.resource();
     if (!resource->flags().testFlag(Qn::live))
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     if (resource->flags().testFlag(Qn::sync))
     {
         QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
         if (!periods.intersects(period))
-            return Qn::DisabledAction;
+            return DisabledAction;
     }
 
-    return Qn::EnabledAction;
+    return EnabledAction;
 }
 
-Qn::ActionVisibility QnModifyBookmarkActionCondition::check(const QnActionParameters& parameters)
+ActionVisibility QnModifyBookmarkActionCondition::check(const QnActionParameters& parameters)
 {
     if (!parameters.hasArgument(Qn::CameraBookmarkRole))
-        return Qn::InvisibleAction;
-    return Qn::EnabledAction;
+        return InvisibleAction;
+    return EnabledAction;
 }
 
-Qn::ActionVisibility QnRemoveBookmarksActionCondition::check(const QnActionParameters& parameters)
+ActionVisibility QnRemoveBookmarksActionCondition::check(const QnActionParameters& parameters)
 {
     if (!parameters.hasArgument(Qn::CameraBookmarkListRole))
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     if (parameters.argument(Qn::CameraBookmarkListRole).value<QnCameraBookmarkList>().isEmpty())
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
-    return Qn::EnabledAction;
+    return EnabledAction;
 }
 
-Qn::ActionVisibility QnPreviewActionCondition::check(const QnActionParameters& parameters)
+ActionVisibility QnPreviewActionCondition::check(const QnActionParameters& parameters)
 {
     QnMediaResourcePtr media = parameters.resource().dynamicCast<QnMediaResource>();
     if (!media)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     bool isImage = media->toResource()->flags() & Qn::still_image;
     if (isImage)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     bool isPanoramic = media->getVideoLayout(0)->channelCount() > 1;
     if (isPanoramic)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     if (context()->workbench()->currentLayout()->isSearchLayout())
-        return Qn::EnabledAction;
+        return EnabledAction;
 
 #if 0
     if (camera->isGroupPlayOnly())
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 #endif
     return QnExportActionCondition::check(parameters);
 }
 
-Qn::ActionVisibility QnPanicActionCondition::check(const QnActionParameters &)
+ActionVisibility QnPanicActionCondition::check(const QnActionParameters &)
 {
-    return context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() ? Qn::EnabledAction : Qn::DisabledAction;
+    return context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() ? EnabledAction : DisabledAction;
 }
 
-Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters& parameters)
+ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters& parameters)
 {
     const auto tourId = parameters.argument(Qn::UuidRole).value<QnUuid>();
     if (tourId.isNull())
     {
         if (context()->workbench()->currentLayout()->items().size() > 1)
-            return Qn::EnabledAction;
+            return EnabledAction;
     }
     else
     {
         const auto tour = qnLayoutTourManager->tour(tourId);
         if (tour.isValid() && tour.items.size() > 0)
-            return Qn::EnabledAction;
+            return EnabledAction;
     }
 
-    return Qn::DisabledAction;
+    return DisabledAction;
 }
 
-Qn::ActionVisibility QnStartCurrentLayoutTourActionCondition::check(
+ActionVisibility QnStartCurrentLayoutTourActionCondition::check(
     const QnActionParameters& /*parameters*/)
 {
     const auto tourId = context()->workbench()->currentLayout()->data()
         .value(Qn::LayoutTourUuidRole).value<QnUuid>();
     const auto tour = qnLayoutTourManager->tour(tourId);
     if (tour.isValid() && tour.items.size() > 0)
-        return Qn::EnabledAction;
-    return Qn::DisabledAction;
+        return EnabledAction;
+    return DisabledAction;
 }
 
 
-Qn::ActionVisibility QnArchiveActionCondition::check(const QnResourceList &resources)
+ActionVisibility QnArchiveActionCondition::check(const QnResourceList &resources)
 {
     if (resources.size() != 1)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     bool hasFootage = resources[0]->flags().testFlag(Qn::video);
     return hasFootage
-        ? Qn::EnabledAction
-        : Qn::InvisibleAction;
+        ? EnabledAction
+        : InvisibleAction;
 }
 
-Qn::ActionVisibility QnTimelineVisibleActionCondition::check(const QnActionParameters& /*parameters*/)
+ActionVisibility QnTimelineVisibleActionCondition::check(const QnActionParameters& /*parameters*/)
 {
     return context()->navigator()->isPlayingSupported()
-        ? Qn::EnabledAction
-        : Qn::InvisibleAction;
+        ? EnabledAction
+        : InvisibleAction;
 }
 
-Qn::ActionVisibility QnToggleTitleBarActionCondition::check(const QnActionParameters &)
+ActionVisibility QnToggleTitleBarActionCondition::check(const QnActionParameters &)
 {
-    return action(QnActions::EffectiveMaximizeAction)->isChecked() ? Qn::EnabledAction : Qn::InvisibleAction;
+    return action(QnActions::EffectiveMaximizeAction)->isChecked() ? EnabledAction : InvisibleAction;
 }
 
-Qn::ActionVisibility QnNoArchiveActionCondition::check(const QnActionParameters &)
+ActionVisibility QnNoArchiveActionCondition::check(const QnActionParameters &)
 {
-    return accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission) ? Qn::InvisibleAction : Qn::EnabledAction;
+    return accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission) ? InvisibleAction : EnabledAction;
 }
 
-Qn::ActionVisibility QnOpenInFolderActionCondition::check(const QnResourceList &resources)
+ActionVisibility QnOpenInFolderActionCondition::check(const QnResourceList &resources)
 {
     if (resources.size() != 1)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     QnResourcePtr resource = resources[0];
     bool isLocalResource = resource->hasFlags(Qn::local_media)
         && !resource->hasFlags(Qn::exported);
     bool isExportedLayout = resource->hasFlags(Qn::exported_layout);
 
-    return isLocalResource || isExportedLayout ? Qn::EnabledAction : Qn::InvisibleAction;
+    return isLocalResource || isExportedLayout ? EnabledAction : InvisibleAction;
 }
 
-Qn::ActionVisibility QnOpenInFolderActionCondition::check(const QnLayoutItemIndexList &layoutItems)
+ActionVisibility QnOpenInFolderActionCondition::check(const QnLayoutItemIndexList &layoutItems)
 {
     foreach(const QnLayoutItemIndex &index, layoutItems)
     {
         QnLayoutItemData itemData = index.layout()->getItem(index.uuid());
         if (itemData.zoomRect.isNull())
-            return QnActionCondition::check(layoutItems);
+            return Condition::check(layoutItems);
     }
 
-    return Qn::InvisibleAction;
+    return InvisibleAction;
 }
 
-Qn::ActionVisibility QnLayoutSettingsActionCondition::check(const QnResourceList &resources)
+ActionVisibility QnLayoutSettingsActionCondition::check(const QnResourceList &resources)
 {
     if (resources.size() > 1)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     QnResourcePtr resource;
     if (resources.size() > 0)
@@ -925,90 +926,90 @@ Qn::ActionVisibility QnLayoutSettingsActionCondition::check(const QnResourceList
         resource = context()->workbench()->currentLayout()->resource();
 
     if (!resource)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     if (!accessController()->hasPermissions(resource, Qn::EditLayoutSettingsPermission))
-        return Qn::InvisibleAction;
-    return Qn::EnabledAction;
+        return InvisibleAction;
+    return EnabledAction;
 }
 
-Qn::ActionVisibility QnCreateZoomWindowActionCondition::check(const QnResourceWidgetList &widgets)
+ActionVisibility QnCreateZoomWindowActionCondition::check(const QnResourceWidgetList &widgets)
 {
     if (widgets.size() != 1)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     // TODO: #Elric there probably exists a better way to check it all.
 
     QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[0]);
     if (!widget)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     if (display()->zoomTargetWidget(widget))
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     /*if(widget->display()->videoLayout() && widget->display()->videoLayout()->channelCount() > 1)
-        return Qn::InvisibleAction;*/
+        return InvisibleAction;*/
 
-    return Qn::EnabledAction;
+    return EnabledAction;
 }
 
 QnTreeNodeTypeCondition::QnTreeNodeTypeCondition(Qn::NodeType nodeType, QObject *parent):
-    QnActionCondition(parent),
+    Condition(parent),
     m_nodeTypes({nodeType})
 {
 }
 
 QnTreeNodeTypeCondition::QnTreeNodeTypeCondition(QList<Qn::NodeType> nodeTypes, QObject *parent):
-    QnActionCondition(parent),
+    Condition(parent),
     m_nodeTypes(nodeTypes.toSet())
 {
 }
 
-Qn::ActionVisibility QnTreeNodeTypeCondition::check(const QnActionParameters& parameters)
+ActionVisibility QnTreeNodeTypeCondition::check(const QnActionParameters& parameters)
 {
     if (parameters.hasArgument(Qn::NodeTypeRole))
     {
         Qn::NodeType nodeType = parameters.argument(Qn::NodeTypeRole).value<Qn::NodeType>();
         return m_nodeTypes.contains(nodeType)
-            ? Qn::EnabledAction
-            : Qn::InvisibleAction;
+            ? EnabledAction
+            : InvisibleAction;
     }
-    return Qn::EnabledAction;
+    return EnabledAction;
 }
 
-Qn::ActionVisibility QnNewUserLayoutActionCondition::check(const QnActionParameters& parameters)
+ActionVisibility QnNewUserLayoutActionCondition::check(const QnActionParameters& parameters)
 {
     if (!parameters.hasArgument(Qn::NodeTypeRole))
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     Qn::NodeType nodeType = parameters.argument(Qn::NodeTypeRole).value<Qn::NodeType>();
 
     /* Create layout for self. */
     if (nodeType == Qn::LayoutsNode)
-        return Qn::EnabledAction;
+        return EnabledAction;
 
     /* Create layout for other user. */
     if (nodeType != Qn::ResourceNode)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
     QnUserResourcePtr user = parameters.resource().dynamicCast<QnUserResource>();
     if (!user || user == context()->user())
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     return accessController()->canCreateLayout(user->getId())
-        ? Qn::EnabledAction
-        : Qn::InvisibleAction;
+        ? EnabledAction
+        : InvisibleAction;
 }
 
 
-Qn::ActionVisibility QnOpenInLayoutActionCondition::check(const QnActionParameters& parameters)
+ActionVisibility QnOpenInLayoutActionCondition::check(const QnActionParameters& parameters)
 {
     auto layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole);
     if (!layout)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     return canOpen(parameters.resources(), layout)
-        ? Qn::EnabledAction
-        : Qn::InvisibleAction;
+        ? EnabledAction
+        : InvisibleAction;
 }
 
 bool QnOpenInLayoutActionCondition::canOpen(const QnResourceList &resources,
@@ -1046,95 +1047,95 @@ bool QnOpenInLayoutActionCondition::canOpen(const QnResourceList &resources,
 }
 
 
-Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourceList &resources)
+ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourceList &resources)
 {
     QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource();
 
     if (!layout)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     return canOpen(resources, layout)
-        ? Qn::EnabledAction
-        : Qn::InvisibleAction;
+        ? EnabledAction
+        : InvisibleAction;
 }
 
-Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnActionParameters& parameters)
+ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnActionParameters& parameters)
 {
     /* Make sure we will get to specialized implementation */
-    return QnActionCondition::check(parameters);
+    return Condition::check(parameters);
 }
 
-Qn::ActionVisibility QnOpenInNewEntityActionCondition::check(const QnResourceList& resources)
+ActionVisibility QnOpenInNewEntityActionCondition::check(const QnResourceList& resources)
 {
     return canOpen(resources, QnLayoutResourcePtr())
-        ? Qn::EnabledAction
-        : Qn::InvisibleAction;
+        ? EnabledAction
+        : InvisibleAction;
 
 }
 
-Qn::ActionVisibility QnOpenInNewEntityActionCondition::check(const QnLayoutItemIndexList &layoutItems)
+ActionVisibility QnOpenInNewEntityActionCondition::check(const QnLayoutItemIndexList &layoutItems)
 {
     foreach(const QnLayoutItemIndex &index, layoutItems)
     {
         QnLayoutItemData itemData = index.layout()->getItem(index.uuid());
         if (itemData.zoomRect.isNull())
-            return QnActionCondition::check(layoutItems);
+            return Condition::check(layoutItems);
     }
 
-    return Qn::InvisibleAction;
+    return InvisibleAction;
 }
 
-Qn::ActionVisibility QnOpenInNewEntityActionCondition::check(const QnActionParameters& parameters)
+ActionVisibility QnOpenInNewEntityActionCondition::check(const QnActionParameters& parameters)
 {
     /* Make sure we will get to specialized implementation */
-    return QnActionCondition::check(parameters);
+    return Condition::check(parameters);
 }
 
-Qn::ActionVisibility QnSetAsBackgroundActionCondition::check(const QnResourceList &resources)
+ActionVisibility QnSetAsBackgroundActionCondition::check(const QnResourceList &resources)
 {
     if (resources.size() != 1)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
     QnResourcePtr resource = resources[0];
     if (!resource->hasFlags(Qn::url | Qn::local | Qn::still_image))
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource();
     if (!layout)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     if (layout->locked())
-        return Qn::DisabledAction;
-    return Qn::EnabledAction;
+        return DisabledAction;
+    return EnabledAction;
 }
 
-Qn::ActionVisibility QnSetAsBackgroundActionCondition::check(const QnLayoutItemIndexList &layoutItems)
+ActionVisibility QnSetAsBackgroundActionCondition::check(const QnLayoutItemIndexList &layoutItems)
 {
     foreach(const QnLayoutItemIndex &index, layoutItems)
     {
         QnLayoutItemData itemData = index.layout()->getItem(index.uuid());
         if (itemData.zoomRect.isNull())
-            return QnActionCondition::check(layoutItems);
+            return Condition::check(layoutItems);
     }
 
-    return Qn::InvisibleAction;
+    return InvisibleAction;
 }
 
-Qn::ActionVisibility QnLoggedInCondition::check(const QnActionParameters& /*parameters*/)
+ActionVisibility QnLoggedInCondition::check(const QnActionParameters& /*parameters*/)
 {
     return commonModule()->remoteGUID().isNull()
-        ? Qn::InvisibleAction
-        : Qn::EnabledAction;
+        ? InvisibleAction
+        : EnabledAction;
 }
 
 QnBrowseLocalFilesCondition::QnBrowseLocalFilesCondition(QObject* parent):
-    QnActionCondition(parent)
+    Condition(parent)
 {
 }
 
-Qn::ActionVisibility QnBrowseLocalFilesCondition::check(const QnActionParameters& /*parameters*/)
+ActionVisibility QnBrowseLocalFilesCondition::check(const QnActionParameters& /*parameters*/)
 {
     const bool connected = !commonModule()->remoteGUID().isNull();
-    return (connected ? Qn::InvisibleAction : Qn::EnabledAction);
+    return (connected ? InvisibleAction : EnabledAction);
 }
 
 QnChangeResolutionActionCondition::QnChangeResolutionActionCondition(QObject* parent):
@@ -1142,65 +1143,65 @@ QnChangeResolutionActionCondition::QnChangeResolutionActionCondition(QObject* pa
 {
 }
 
-Qn::ActionVisibility QnChangeResolutionActionCondition::check(const QnActionParameters &)
+ActionVisibility QnChangeResolutionActionCondition::check(const QnActionParameters &)
 {
     if (isVideoWallReviewMode())
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     if (!context()->user())
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource();
     if (!layout)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     if (layout->isFile())
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
-    return Qn::EnabledAction;
+    return EnabledAction;
 }
 
-Qn::ActionVisibility QnPtzActionCondition::check(const QnActionParameters& parameters)
+ActionVisibility QnPtzActionCondition::check(const QnActionParameters& parameters)
 {
     bool isPreviewSearchMode =
-        parameters.scope() == Qn::SceneScope &&
+        parameters.scope() == SceneScope &&
         context()->workbench()->currentLayout()->isSearchLayout();
     if (isPreviewSearchMode)
-        return Qn::InvisibleAction;
-    return QnActionCondition::check(parameters);
+        return InvisibleAction;
+    return Condition::check(parameters);
 }
 
-Qn::ActionVisibility QnPtzActionCondition::check(const QnResourceList &resources)
+ActionVisibility QnPtzActionCondition::check(const QnResourceList &resources)
 {
     foreach(const QnResourcePtr &resource, resources)
         if (!check(qnPtzPool->controller(resource)))
-            return Qn::InvisibleAction;
+            return InvisibleAction;
 
     if (m_disableIfPtzDialogVisible && QnPtzManageDialog::instance() && QnPtzManageDialog::instance()->isVisible())
-        return Qn::DisabledAction;
+        return DisabledAction;
 
-    return Qn::EnabledAction;
+    return EnabledAction;
 }
 
-Qn::ActionVisibility QnPtzActionCondition::check(const QnResourceWidgetList &widgets)
+ActionVisibility QnPtzActionCondition::check(const QnResourceWidgetList &widgets)
 {
     foreach(QnResourceWidget *widget, widgets)
     {
         QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
         if (!mediaWidget)
-            return Qn::InvisibleAction;
+            return InvisibleAction;
 
         if (!check(mediaWidget->ptzController()))
-            return Qn::InvisibleAction;
+            return InvisibleAction;
 
         if (!mediaWidget->zoomRect().isNull())
-            return Qn::InvisibleAction;
+            return InvisibleAction;
     }
 
     if (m_disableIfPtzDialogVisible && QnPtzManageDialog::instance() && QnPtzManageDialog::instance()->isVisible())
-        return Qn::DisabledAction;
+        return DisabledAction;
 
-    return Qn::EnabledAction;
+    return EnabledAction;
 }
 
 bool QnPtzActionCondition::check(const QnPtzControllerPtr &controller)
@@ -1208,7 +1209,7 @@ bool QnPtzActionCondition::check(const QnPtzControllerPtr &controller)
     return controller && controller->hasCapabilities(m_capabilities);
 }
 
-Qn::ActionVisibility QnNonEmptyVideowallActionCondition::check(const QnResourceList &resources)
+ActionVisibility QnNonEmptyVideowallActionCondition::check(const QnResourceList &resources)
 {
     foreach(const QnResourcePtr &resource, resources)
     {
@@ -1222,12 +1223,12 @@ Qn::ActionVisibility QnNonEmptyVideowallActionCondition::check(const QnResourceL
         if (videowall->items()->getItems().isEmpty())
             continue;
 
-        return Qn::EnabledAction;
+        return EnabledAction;
     }
-    return Qn::InvisibleAction;
+    return InvisibleAction;
 }
 
-Qn::ActionVisibility QnSaveVideowallReviewActionCondition::check(const QnResourceList &resources)
+ActionVisibility QnSaveVideowallReviewActionCondition::check(const QnResourceList &resources)
 {
     QnLayoutResourceList layouts;
 
@@ -1235,7 +1236,7 @@ Qn::ActionVisibility QnSaveVideowallReviewActionCondition::check(const QnResourc
     {
         auto layout = workbench()->currentLayout()->resource();
         if (!layout)
-            return Qn::InvisibleAction;
+            return InvisibleAction;
 
         if (workbench()->currentLayout()->data().contains(Qn::VideoWallResourceRole))
             layouts << layout;
@@ -1259,16 +1260,16 @@ Qn::ActionVisibility QnSaveVideowallReviewActionCondition::check(const QnResourc
     }
 
     if (layouts.isEmpty())
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     foreach(const QnLayoutResourcePtr &layout, layouts)
         if (snapshotManager()->isModified(layout))
-            return Qn::EnabledAction;
+            return EnabledAction;
 
-    return Qn::DisabledAction;
+    return DisabledAction;
 }
 
-Qn::ActionVisibility QnRunningVideowallActionCondition::check(const QnResourceList &resources)
+ActionVisibility QnRunningVideowallActionCondition::check(const QnResourceList &resources)
 {
     bool hasNonEmptyVideowall = false;
     foreach(const QnResourcePtr &resource, resources)
@@ -1287,20 +1288,20 @@ Qn::ActionVisibility QnRunningVideowallActionCondition::check(const QnResourceLi
         if (videowall->onlineItems().isEmpty())
             continue;
 
-        return Qn::EnabledAction;
+        return EnabledAction;
     }
 
     return hasNonEmptyVideowall
-        ? Qn::DisabledAction
-        : Qn::InvisibleAction;
+        ? DisabledAction
+        : InvisibleAction;
 }
 
 
-Qn::ActionVisibility QnStartVideowallActionCondition::check(const QnResourceList &resources)
+ActionVisibility QnStartVideowallActionCondition::check(const QnResourceList &resources)
 {
     QnUuid pcUuid = qnSettings->pcUuid();
     if (pcUuid.isNull())
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     bool hasAttachedItems = false;
     foreach(const QnResourcePtr &resource, resources)
@@ -1321,19 +1322,19 @@ Qn::ActionVisibility QnStartVideowallActionCondition::check(const QnResourceList
                 continue;
 
             if (!item.runtimeStatus.online)
-                return Qn::EnabledAction;
+                return EnabledAction;
 
             hasAttachedItems = true;
         }
     }
 
     return hasAttachedItems
-        ? Qn::DisabledAction
-        : Qn::InvisibleAction;
+        ? DisabledAction
+        : InvisibleAction;
 }
 
 
-Qn::ActionVisibility QnIdentifyVideoWallActionCondition::check(const QnActionParameters& parameters)
+ActionVisibility QnIdentifyVideoWallActionCondition::check(const QnActionParameters& parameters)
 {
     if (parameters.videoWallItems().size() > 0)
     {
@@ -1343,25 +1344,25 @@ Qn::ActionVisibility QnIdentifyVideoWallActionCondition::check(const QnActionPar
             if (!index.isValid())
                 continue;
             if (index.item().runtimeStatus.online)
-                return Qn::EnabledAction;
+                return EnabledAction;
         }
-        return Qn::InvisibleAction;
+        return InvisibleAction;
     }
 
     /* 'Identify' action should not be displayed as disabled anyway. */
-    Qn::ActionVisibility baseResult = QnActionCondition::check(parameters);
-    if (baseResult != Qn::EnabledAction)
-        return Qn::InvisibleAction;
-    return Qn::EnabledAction;
+    ActionVisibility baseResult = Condition::check(parameters);
+    if (baseResult != EnabledAction)
+        return InvisibleAction;
+    return EnabledAction;
 }
 
-Qn::ActionVisibility QnDetachFromVideoWallActionCondition::check(const QnActionParameters& parameters)
+ActionVisibility QnDetachFromVideoWallActionCondition::check(const QnActionParameters& parameters)
 {
     if (!context()->user() || parameters.videoWallItems().isEmpty())
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     if (commonModule()->isReadOnly())
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     foreach(const QnVideoWallItemIndex &index, parameters.videoWallItems())
     {
@@ -1371,55 +1372,55 @@ Qn::ActionVisibility QnDetachFromVideoWallActionCondition::check(const QnActionP
             continue;
         if (index.videowall()->items()->getItem(index.uuid()).layout.isNull())
             continue;
-        return Qn::EnabledAction;
+        return EnabledAction;
     }
-    return Qn::InvisibleAction;
+    return InvisibleAction;
 }
 
-Qn::ActionVisibility QnStartVideoWallControlActionCondition::check(const QnActionParameters& parameters)
+ActionVisibility QnStartVideoWallControlActionCondition::check(const QnActionParameters& parameters)
 {
     if (!context()->user() || parameters.videoWallItems().isEmpty())
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     foreach(const QnVideoWallItemIndex &index, parameters.videoWallItems())
     {
         if (!index.isValid())
             continue;
 
-        return Qn::EnabledAction;
+        return EnabledAction;
     }
-    return Qn::InvisibleAction;
+    return InvisibleAction;
 }
 
 
-Qn::ActionVisibility QnRotateItemCondition::check(const QnResourceWidgetList &widgets)
+ActionVisibility QnRotateItemCondition::check(const QnResourceWidgetList &widgets)
 {
     foreach(QnResourceWidget *widget, widgets)
     {
         if (widget->options() & QnResourceWidget::WindowRotationForbidden)
-            return Qn::InvisibleAction;
+            return InvisibleAction;
     }
-    return Qn::EnabledAction;
+    return EnabledAction;
 }
 
-Qn::ActionVisibility QnLightModeCondition::check(const QnActionParameters& /*parameters*/)
+ActionVisibility QnLightModeCondition::check(const QnActionParameters& /*parameters*/)
 {
 
     if (qnSettings->lightMode() & m_lightModeFlags)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
-    return Qn::EnabledAction;
+    return EnabledAction;
 }
 
-Qn::ActionVisibility QnEdgeServerCondition::check(const QnResourceList &resources)
+ActionVisibility QnEdgeServerCondition::check(const QnResourceList &resources)
 {
     foreach(const QnResourcePtr &resource, resources)
         if (m_isEdgeServer ^ QnMediaServerResource::isEdgeServer(resource))
-            return Qn::InvisibleAction;
-    return Qn::EnabledAction;
+            return InvisibleAction;
+    return EnabledAction;
 }
 
-Qn::ActionVisibility QnResourceStatusActionCondition::check(const QnResourceList &resources)
+ActionVisibility QnResourceStatusActionCondition::check(const QnResourceList &resources)
 {
     bool found = false;
     foreach(const QnResourcePtr &resource, resources)
@@ -1427,24 +1428,24 @@ Qn::ActionVisibility QnResourceStatusActionCondition::check(const QnResourceList
         if (!m_statuses.contains(resource->getStatus()))
         {
             if (m_all)
-                return Qn::InvisibleAction;
+                return InvisibleAction;
         }
         else
         {
             found = true;
         }
     }
-    return found ? Qn::EnabledAction : Qn::InvisibleAction;
+    return found ? EnabledAction : InvisibleAction;
 }
 
-Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParameters& /*parameters*/)
+ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParameters& /*parameters*/)
 {
     const auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction);
     if (screenRecordingAction)
     {
 
         if (!context()->user())
-            return Qn::InvisibleAction;
+            return InvisibleAction;
 
         /* Do not check real pointer type to speed up check. */
         QnResourcePtr desktopCamera = resourcePool()->getResourceByUniqueId(commonModule()->moduleGUID().toString());
@@ -1454,31 +1455,31 @@ Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParamet
             "Desktop camera must have correct flags and parent (if exists)");
 #endif
         if (desktopCamera && desktopCamera->hasFlags(Qn::desktop_camera))
-            return Qn::EnabledAction;
+            return EnabledAction;
 
-        return Qn::DisabledAction;
+        return DisabledAction;
     }
 
     // Screen recording is not supported
-    return Qn::InvisibleAction;
+    return InvisibleAction;
 }
 
-Qn::ActionVisibility QnAutoStartAllowedActionCodition::check(const QnActionParameters& /*parameters*/)
+ActionVisibility QnAutoStartAllowedActionCodition::check(const QnActionParameters& /*parameters*/)
 {
     if (!nx::vms::utils::isAutoRunSupported())
-        return Qn::InvisibleAction;
-    return Qn::EnabledAction;
+        return InvisibleAction;
+    return EnabledAction;
 }
 
 
-Qn::ActionVisibility QnItemsCountActionCondition::check(const QnActionParameters& /*parameters*/)
+ActionVisibility QnItemsCountActionCondition::check(const QnActionParameters& /*parameters*/)
 {
     int count = workbench()->currentLayout()->items().size();
 
-    return (m_count == MultipleItems && count > 1) || (m_count == count) ? Qn::EnabledAction : Qn::InvisibleAction;
+    return (m_count == MultipleItems && count > 1) || (m_count == count) ? EnabledAction : InvisibleAction;
 }
 
-Qn::ActionVisibility QnIoModuleActionCondition::check(const QnResourceList &resources)
+ActionVisibility QnIoModuleActionCondition::check(const QnResourceList &resources)
 {
     bool pureIoModules = boost::algorithm::all_of(resources,
         [](const QnResourcePtr& resource)
@@ -1490,30 +1491,30 @@ Qn::ActionVisibility QnIoModuleActionCondition::check(const QnResourceList &reso
             return mediaResource && !mediaResource->hasVideo(0);
         });
 
-    return pureIoModules ? Qn::EnabledAction : Qn::InvisibleAction;
+    return pureIoModules ? EnabledAction : InvisibleAction;
 }
 
-Qn::ActionVisibility QnMergeToCurrentSystemActionCondition::check(const QnResourceList &resources)
+ActionVisibility QnMergeToCurrentSystemActionCondition::check(const QnResourceList &resources)
 {
     if (resources.size() != 1)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     QnMediaServerResourcePtr server = resources.first().dynamicCast<QnMediaServerResource>();
     if (!server)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     Qn::ResourceStatus status = server->getStatus();
     if (status != Qn::Incompatible && status != Qn::Unauthorized)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     if (server->getModuleInformation().ecDbReadOnly)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
-    return Qn::EnabledAction;
+    return EnabledAction;
 }
 
 
-Qn::ActionVisibility QnFakeServerActionCondition::check(const QnResourceList &resources)
+ActionVisibility QnFakeServerActionCondition::check(const QnResourceList &resources)
 {
     bool found = false;
     foreach(const QnResourcePtr &resource, resources)
@@ -1525,18 +1526,18 @@ Qn::ActionVisibility QnFakeServerActionCondition::check(const QnResourceList &re
         if (server.dynamicCast<QnFakeMediaServerResource>())
             found = true;
         else if (m_all)
-            return Qn::InvisibleAction;
+            return InvisibleAction;
     }
-    return found ? Qn::EnabledAction : Qn::InvisibleAction;
+    return found ? EnabledAction : InvisibleAction;
 }
 
-QnCloudServerActionCondition::QnCloudServerActionCondition(Qn::MatchMode matchMode, QObject* parent):
-    QnActionCondition(parent),
+QnCloudServerActionCondition::QnCloudServerActionCondition(MatchMode matchMode, QObject* parent):
+    Condition(parent),
     m_matchMode(matchMode)
 {
 }
 
-Qn::ActionVisibility QnCloudServerActionCondition::check(const QnResourceList& resources)
+ActionVisibility QnCloudServerActionCondition::check(const QnResourceList& resources)
 {
     auto isCloudServer = [](const QnResourcePtr& resource)
         {
@@ -1546,18 +1547,24 @@ Qn::ActionVisibility QnCloudServerActionCondition::check(const QnResourceList& r
     bool success = false;
     switch (m_matchMode)
     {
-        case Qn::Any:
+        case Any:
             success = any_of(resources, isCloudServer);
             break;
-        case Qn::All:
+        case All:
             success = all_of(resources, isCloudServer);
             break;
-        case Qn::ExactlyOne:
+        case ExactlyOne:
             success = (boost::count_if(resources, isCloudServer) == 1);
             break;
         default:
             break;
     }
 
-    return success ? Qn::EnabledAction : Qn::InvisibleAction;
+    return success ? EnabledAction : InvisibleAction;
 }
+
+} // namespace action
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx

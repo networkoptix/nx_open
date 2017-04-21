@@ -641,8 +641,11 @@ void QnWorkbenchController::showContextMenuAt(const QPoint &pos){
                               Q_ARG(QPoint, pos), Q_ARG(WeakGraphicsItemPointerList, display()->scene()->selectedItems()));
 }
 
-void QnWorkbenchController::showContextMenuAtInternal(const QPoint &pos, const WeakGraphicsItemPointerList &selectedItems) {
-    QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, nullptr, selectedItems.materialized()));
+void QnWorkbenchController::showContextMenuAtInternal(const QPoint &pos,
+    const WeakGraphicsItemPointerList &selectedItems)
+{
+    using namespace nx::client::desktop::ui::action;
+    QScopedPointer<QMenu> menu(this->menu()->newMenu(SceneScope, nullptr, selectedItems.materialized()));
     if(menu->isEmpty())
         return;
 
@@ -1374,8 +1377,9 @@ void QnWorkbenchController::at_selectAllAction_triggered() {
     foreach(QnResourceWidget *widget, display()->widgets())
         widget->setSelected(true);
 
+    using namespace nx::client::desktop::ui::action;
     /* Move focus to scene if it's not there. */
-    if(menu()->targetProvider() && menu()->targetProvider()->currentScope() != Qn::SceneScope)
+    if(menu()->targetProvider() && menu()->targetProvider()->currentScope() != SceneScope)
         display()->scene()->setFocusItem(NULL);
 }
 

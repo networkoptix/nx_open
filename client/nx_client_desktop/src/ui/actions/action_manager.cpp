@@ -1,35 +1,20 @@
 #include "action_manager.h"
 
-//#include <cassert>
-
-//#include <QtGui/QGuiApplication>
-
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
-//#include <QtWidgets/QGraphicsItem>
 
 #include "action.h"
 
-//#include "action_conditions.h"
 #include "action_target_provider.h"
 #include "action_parameter_types.h"
 #include <nx/client/desktop/ui/actions/menu_factory.h>
 #include <nx/client/desktop/ui/actions/action_builder.h>
 
-// #include <client/client_settings.h>
-// 
-//
-// #include <core/resource/resource.h>
-//
-// #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench.h>
 
-// #include <ui/style/noptix_style.h>
-
-// #include <utils/common/warnings.h>
-// #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_value_rollback.h>
-// #include <utils/common/app_info.h>
+
+using namespace nx::client::desktop::ui::action;
 
 namespace {
 const char *sourceActionPropertyName = "_qn_sourceAction";
@@ -68,7 +53,7 @@ QnAction *checkSender(QObject *sender)
 
 bool checkType(const QVariant &items)
 {
-    Qn::ActionParameterType type = QnActionParameterTypes::type(items);
+    ActionParameterType type = QnActionParameterTypes::type(items);
     if (type == 0)
     {
         NX_EXPECT(false, lm("Unrecognized action target type '%1'.").arg(items.typeName()));
@@ -80,7 +65,6 @@ bool checkType(const QVariant &items)
 
 } // namespace
 
-using namespace nx::client::desktop::ui::action;
 
 QnActionManager::QnActionManager(QObject *parent):
     QObject(parent),
@@ -180,7 +164,7 @@ bool QnActionManager::canTrigger(QnActions::IDType id, const QnActionParameters 
     if (!action)
         return false;
 
-    return action->checkCondition(action->scope(), parameters) == Qn::EnabledAction;
+    return action->checkCondition(action->scope(), parameters) == EnabledAction;
 }
 
 void QnActionManager::trigger(QnActions::IDType id, const QnActionParameters &parameters)
@@ -201,7 +185,7 @@ bool QnActionManager::triggerIfPossible(QnActions::IDType id, const QnActionPara
     if (!action)
         return false;
 
-    if (action->checkCondition(action->scope(), parameters) != Qn::EnabledAction)
+    if (action->checkCondition(action->scope(), parameters) != EnabledAction)
         return false;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_parametersByMenu[NULL], parameters);
@@ -227,7 +211,7 @@ QMenu* QnActionManager::integrateMenu(QMenu *menu, const QnActionParameters &par
 }
 
 
-QMenu *QnActionManager::newMenu(Qn::ActionScope scope, QWidget *parent, const QnActionParameters &parameters, CreationOptions options)
+QMenu *QnActionManager::newMenu(nx::client::desktop::ui::action::ActionScope scope, QWidget *parent, const QnActionParameters &parameters, CreationOptions options)
 {
     /*
      * This method is called when we are opening a brand new context menu.
@@ -240,7 +224,7 @@ QMenu *QnActionManager::newMenu(Qn::ActionScope scope, QWidget *parent, const Qn
 
 QMenu* QnActionManager::newMenu(
     QnActions::IDType rootId,
-    Qn::ActionScope scope,
+    nx::client::desktop::ui::action::ActionScope scope,
     QWidget* parent,
     const QnActionParameters& parameters,
     CreationOptions options)
@@ -283,7 +267,7 @@ void QnActionManager::copyAction(QAction *dst, QnAction *src, bool forwardSignal
     }
 }
 
-QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QnActionParameters &parameters, QWidget *parentWidget, CreationOptions options)
+QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, nx::client::desktop::ui::action::ActionScope scope, const QnActionParameters &parameters, QWidget *parentWidget, CreationOptions options)
 {
     if (parent->childFactory())
     {
@@ -306,27 +290,27 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
     {
         foreach(QnAction *action, parent->children())
         {
-            Qn::ActionVisibility visibility;
-            if (action->flags() & Qn::HotkeyOnly)
+            ActionVisibility visibility;
+            if (action->flags() & HotkeyOnly)
             {
-                visibility = Qn::InvisibleAction;
+                visibility = InvisibleAction;
             }
             else
             {
                 visibility = action->checkCondition(scope, parameters);
             }
-            if (visibility == Qn::InvisibleAction)
+            if (visibility == InvisibleAction)
                 continue;
 
             QMenu *menu = newMenuRecursive(action, scope, parameters, parentWidget, options);
-            if ((!menu || menu->isEmpty()) && (action->flags() & Qn::RequiresChildren))
+            if ((!menu || menu->isEmpty()) && (action->flags() & RequiresChildren))
                 continue;
 
             QString replacedText;
             if (menu && menu->actions().size() == 1)
             {
                 QnAction *menuAction = qnAction(menu->actions()[0]);
-                if (menuAction && (menuAction->flags() & Qn::Pullable))
+                if (menuAction && (menuAction->flags() & Pullable))
                 {
                     delete menu;
                     menu = NULL;
@@ -347,13 +331,13 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
                 replacedText = action->checkConditionalText(parameters);
 
             QAction *newAction = NULL;
-            if (!replacedText.isEmpty() || visibility == Qn::DisabledAction || menu != NULL || (options & DontReuseActions))
+            if (!replacedText.isEmpty() || visibility == DisabledAction || menu != NULL || (options & DontReuseActions))
             {
                 newAction = new QAction(result);
                 copyAction(newAction, action);
 
                 newAction->setMenu(menu);
-                newAction->setDisabled(visibility == Qn::DisabledAction);
+                newAction->setDisabled(visibility == DisabledAction);
                 if (!replacedText.isEmpty())
                     newAction->setText(replacedText);
             }
@@ -362,7 +346,7 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
                 newAction = action;
             }
 
-            if (visibility != Qn::InvisibleAction)
+            if (visibility != InvisibleAction)
                 result->addAction(newAction);
         }
     }

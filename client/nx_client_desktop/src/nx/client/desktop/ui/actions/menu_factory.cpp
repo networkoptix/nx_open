@@ -51,7 +51,7 @@ Builder MenuFactory::operator()(QnActions::IDType id)
 
     QnAction *parentAction = m_actionStack.back();
     parentAction->addChild(action);
-    parentAction->setFlags(parentAction->flags() | Qn::RequiresChildren);
+    parentAction->setFlags(parentAction->flags() | RequiresChildren);
 
     m_lastAction = action;
     if (m_currentGroup)

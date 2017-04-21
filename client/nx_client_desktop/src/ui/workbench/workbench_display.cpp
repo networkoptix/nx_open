@@ -928,8 +928,9 @@ void QnWorkbenchDisplay::updateSelectionFromTree()
     if (!provider)
         return;
 
-    Qn::ActionScope scope = provider->currentScope();
-    if (scope != Qn::TreeScope)
+    nx::client::desktop::ui::action::ActionScope scope = provider->currentScope();
+    using namespace nx::client::desktop::ui::action;
+    if (scope != TreeScope)
         return;
 
     /* Just deselect all items for now. See #4480. */

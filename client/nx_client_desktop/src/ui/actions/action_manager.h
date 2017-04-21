@@ -104,9 +104,9 @@ public:
      *                                  Ownership of the created menu is passed to
      *                                  the caller.
      */
-    QMenu *newMenu(Qn::ActionScope scope, QWidget *parent = NULL, const QnActionParameters &parameters = QnActionParameters(), CreationOptions options = 0);
+    QMenu *newMenu(nx::client::desktop::ui::action::ActionScope scope, QWidget *parent = NULL, const QnActionParameters &parameters = QnActionParameters(), CreationOptions options = 0);
 
-    QMenu *newMenu(QnActions::IDType rootId, Qn::ActionScope scope, QWidget *parent = NULL, const QnActionParameters &parameters = QnActionParameters(), CreationOptions options = 0);
+    QMenu *newMenu(QnActions::IDType rootId, nx::client::desktop::ui::action::ActionScope scope, QWidget *parent = NULL, const QnActionParameters &parameters = QnActionParameters(), CreationOptions options = 0);
 
     /**
      * \returns                         Action target provider that is assigned to this
@@ -160,7 +160,7 @@ protected:
 
     void copyAction(QAction *dst, QnAction *src, bool forwardSignals = true);
 
-    QMenu *newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QnActionParameters &parameters, QWidget *parentWidget, CreationOptions options);
+    QMenu *newMenuRecursive(const QnAction *parent, nx::client::desktop::ui::action::ActionScope scope, const QnActionParameters &parameters, QWidget *parentWidget, CreationOptions options);
 
     bool redirectActionRecursive(QMenu *menu, QnActions::IDType targetId, QAction *targetAction);
 

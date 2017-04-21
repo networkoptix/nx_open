@@ -17,6 +17,8 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 
+using namespace nx::client::desktop::ui::action;
+
 namespace ParameterMetaType {
     enum Type {
         ResourcePtr,
@@ -130,7 +132,7 @@ int QnActionParameterTypes::size(const QVariant &items) {
     }
 }
 
-Qn::ActionParameterType QnActionParameterTypes::type(const QVariant &items) {
+ActionParameterType QnActionParameterTypes::type(const QVariant &items) {
     using namespace ParameterMetaType;
 
     switch(qn_actionMetaTypeMap()->value(items.userType())) {
@@ -139,21 +141,21 @@ Qn::ActionParameterType QnActionParameterTypes::type(const QVariant &items) {
     case LayoutResourcePtr:
     case MediaServerResourcePtr:
     case ResourceList:
-        return Qn::ResourceType;
+        return ResourceType;
     case ResourceWidget:
     case ResourceWidgetList:
-        return Qn::WidgetType;
+        return WidgetType;
     case LayoutItemIndexList:
-        return Qn::LayoutItemType;
+        return LayoutItemType;
     case VideoWallItemIndexList:
-        return Qn::VideoWallItemType;
+        return VideoWallItemType;
     case VideoWallMatrixIndexList:
-        return Qn::VideoWallMatrixType;
+        return VideoWallMatrixType;
     case WorkbenchLayout:
     case WorkbenchLayoutList:
-        return Qn::LayoutType;
+        return LayoutType;
     default:
-        return Qn::OtherType;
+        return OtherType;
     }
 }
 

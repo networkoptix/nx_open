@@ -104,8 +104,8 @@ public:
 
     virtual ~QnWorkbenchUi();
 
-    virtual Qn::ActionScope currentScope() const override;
-    virtual QnActionParameters currentParameters(Qn::ActionScope scope) const override;
+    virtual nx::client::desktop::ui::action::ActionScope currentScope() const override;
+    virtual QnActionParameters currentParameters(nx::client::desktop::ui::action::ActionScope scope) const override;
 
     Flags flags() const;
 

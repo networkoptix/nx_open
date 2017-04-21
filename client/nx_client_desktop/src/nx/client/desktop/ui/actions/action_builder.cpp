@@ -3,6 +3,9 @@
 #include <QtGui/QKeySequence>
 #include <QtGui/QGuiApplication>
 
+#include <core/resource_management/resource_criterion.h>
+
+#include <nx/client/desktop/ui/actions/action_conditions.h>
 #include <ui/actions/action.h>
 #include <ui/style/noptix_style.h>
 
@@ -115,7 +118,7 @@ Builder Builder::toggledText(const QString& text)
 Builder Builder::pulledText(const QString& text)
 {
     m_action->setPulledText(text);
-    m_action->setFlags(m_action->flags() | Qn::Pullable);
+    m_action->setFlags(m_action->flags() | Pullable);
     return *this;
 }
 
@@ -131,14 +134,14 @@ Builder Builder::toolTipFormat(const QString& toolTipFormat)
     return *this;
 }
 
-Builder Builder::flags(Qn::ActionFlags flags)
+Builder Builder::flags(ActionFlags flags)
 {
     m_action->setFlags(m_action->flags() | flags);
 
     return *this;
 }
 
-Builder Builder::mode(QnActionTypes::ClientModes mode)
+Builder Builder::mode(ClientModes mode)
 {
     m_action->setMode(mode);
     return *this;
@@ -166,20 +169,19 @@ Builder Builder::requiredTargetPermissions(Qn::Permissions permissions)
 Builder Builder::separator(bool isSeparator)
 {
     m_action->setSeparator(isSeparator);
-    m_action->setFlags(m_action->flags() | Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget
-        | Qn::WidgetTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::VideoWallItemTarget);
+    m_action->setFlags(m_action->flags() | Separator);
 
     return *this;
 }
 
-Builder Builder::conditionalText(const QString& text, QnActionCondition *condition)
+Builder Builder::conditionalText(const QString& text, const ConditionPtr& condition)
 {
     m_action->addConditionalText(condition, text);
     return *this;
 }
 
 Builder Builder::conditionalText(const QString& text, const QnResourceCriterion& criterion,
-    Qn::MatchMode matchMode)
+    MatchMode matchMode)
 {
     m_action->addConditionalText(new QnResourceActionCondition(criterion, matchMode, m_action), text);
     return *this;
@@ -209,14 +211,14 @@ Builder Builder::accent(Qn::ButtonAccent value)
     return *this;
 }
 
-Builder Builder::condition(const QnActionConditionPtr& condition)
+Builder Builder::condition(const ConditionPtr& condition)
 {
     NX_ASSERT(m_action->condition() == NULL);
     m_action->setCondition(condition.data());
     return *this;
 }
 
-Builder Builder::condition(const QnResourceCriterion& criterion, Qn::MatchMode matchMode)
+Builder Builder::condition(const QnResourceCriterion& criterion, MatchMode matchMode)
 {
     NX_ASSERT(m_action->condition() == NULL);
     m_action->setCondition(new QnResourceActionCondition(criterion, matchMode, m_action));
@@ -226,7 +228,7 @@ Builder Builder::condition(const QnResourceCriterion& criterion, Qn::MatchMode m
 Builder Builder::childFactory(QnActionFactory *childFactory)
 {
     m_action->setChildFactory(childFactory);
-    m_action->setFlags(m_action->flags() | Qn::RequiresChildren);
+    m_action->setFlags(m_action->flags() | RequiresChildren);
     return *this;
 }
 

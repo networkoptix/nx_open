@@ -13,13 +13,14 @@ namespace {
     const int selectionUpdateTimeoutMs = 50;
 }
 
+using namespace nx::client::desktop::ui::action;
 
 QnWorkbenchSelectionWatcher::QnWorkbenchSelectionWatcher(QObject *parent /*= nullptr*/):
     base_type(parent),
-    QnWorkbenchContextAware(parent)
-    , m_scope(Qn::TreeScope | Qn::SceneScope)
-    , m_selectionUpdatePending(false)
-    , m_lastScope(Qn::InvalidScope)
+    QnWorkbenchContextAware(parent),
+    m_scope(TreeScope | SceneScope),
+    m_selectionUpdatePending(false),
+    m_lastScope(InvalidScope)
 {
     connect(action(QnActions::SelectionChangeAction), &QAction::triggered, this,
         [this]()
@@ -38,11 +39,11 @@ QnWorkbenchSelectionWatcher::~QnWorkbenchSelectionWatcher() {
 }
 
 
-Qn::ActionScopes QnWorkbenchSelectionWatcher::scope() const {
+nx::client::desktop::ui::action::ActionScopes QnWorkbenchSelectionWatcher::scope() const {
     return m_scope;
 }
 
-void QnWorkbenchSelectionWatcher::setScope(Qn::ActionScopes value) {
+void QnWorkbenchSelectionWatcher::setScope(nx::client::desktop::ui::action::ActionScopes value) {
     m_scope = value;
 }
 
@@ -56,13 +57,13 @@ void QnWorkbenchSelectionWatcher::updateFromSelection() {
     if(!provider)
         return;
 
-    Qn::ActionScope currentScope = provider->currentScope();
+    nx::client::desktop::ui::action::ActionScope currentScope = provider->currentScope();
     if (!m_scope.testFlag(currentScope))
         currentScope = m_lastScope;
     else
         m_lastScope = currentScope;
 
-    if (currentScope == Qn::InvalidScope)
+    if (currentScope == InvalidScope)
         return;
 
     auto resources = provider->currentParameters(currentScope).resources();

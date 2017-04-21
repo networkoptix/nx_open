@@ -358,7 +358,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
 
     // Initialize system-wide menu
     if (nx::utils::AppInfo::isMacOsX())
-        menu()->newMenu(Qn::MainScope);
+        menu()->newMenu(action::MainScope);
 
     /* VSync workaround must always be enabled to limit fps usage in following cases:
      * * VSync is not supported by drivers

@@ -422,7 +422,9 @@ void QnVideowallItemWidget::clickedNotify(QGraphicsSceneMouseEvent *event)
     if (event->button() != Qt::RightButton)
         return;
 
-    QScopedPointer<QMenu> popupMenu(menu()->newMenu(Qn::SceneScope, nullptr,
+    using namespace nx::client::desktop::ui::action;
+
+    QScopedPointer<QMenu> popupMenu(menu()->newMenu(SceneScope, nullptr,
         QnActionParameters(m_indices)));
 
     if (popupMenu->isEmpty())

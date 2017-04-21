@@ -20,8 +20,8 @@ public:
 
     virtual ~QnLayoutTabBar();
 
-    virtual Qn::ActionScope currentScope() const override;
-    virtual QnActionParameters currentParameters(Qn::ActionScope scope) const override;
+    virtual nx::client::desktop::ui::action::ActionScope currentScope() const override;
+    virtual QnActionParameters currentParameters(nx::client::desktop::ui::action::ActionScope scope) const override;
 
 signals:
     void closeRequested(QnWorkbenchLayout *layout);

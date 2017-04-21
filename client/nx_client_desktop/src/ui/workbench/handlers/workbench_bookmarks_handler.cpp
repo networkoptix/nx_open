@@ -71,7 +71,8 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
     const auto getActionParamsFunc =
         [this](const QnCameraBookmark &bookmark) -> QnActionParameters
         {
-            QnActionParameters bookmarkParams(navigator()->currentParameters(Qn::TimelineScope));
+            using namespace nx::client::desktop::ui::action;
+            QnActionParameters bookmarkParams(navigator()->currentParameters(TimelineScope));
             bookmarkParams.setArgument(Qn::CameraBookmarkRole, bookmark);
             return bookmarkParams;
         };

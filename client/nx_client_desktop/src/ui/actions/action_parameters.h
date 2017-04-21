@@ -61,7 +61,7 @@ public:
 
     void setResources(const QnResourceList &resources);
 
-    Qn::ActionParameterType type(int key = -1) const;
+    nx::client::desktop::ui::action::ActionParameterType type(int key = -1) const;
 
     int size(int key = -1) const;
 
@@ -134,15 +134,15 @@ public:
         return *this;
     }
 
-    Qn::ActionScopes scope() const;
-    void setScope(Qn::ActionScopes scope);
+    nx::client::desktop::ui::action::ActionScopes scope() const;
+    void setScope(nx::client::desktop::ui::action::ActionScopes scope);
 
 private:
     void init(const QVariant &items, const ArgumentHash &arguments);
 
 private:
     ArgumentHash m_arguments;
-    Qn::ActionScopes m_scope;
+    nx::client::desktop::ui::action::ActionScopes m_scope;
 };
 
 Q_DECLARE_METATYPE(QnActionParameters)
