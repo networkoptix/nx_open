@@ -70,12 +70,14 @@ public:
     bool reserveSpace(const QString& fileName, const qint64 size);
     void checkDownloadCompleted(detail::FileMetadata& fileInformation);
     DistributedFileDownloader::ErrorCode loadDownload(const QString& fileName);
+    void findDownloads();
 
     static QString metadataFileName(const QString& fileName);
     static qint64 chunkSize(qint64 fileSize, int chunkIndex, qint64 chunkSize);
     static QVector<QByteArray> calculateChecksums(const QString& fileName, qint64 chunkSize);
 
 private:
+    QDir downloadsDir;
     QHash<QString, detail::FileMetadata> fileInformationByName;
 };
 
@@ -200,6 +202,21 @@ DistributedFileDownloader::ErrorCode DistributedFileDownloaderPrivate::loadDownl
     return q->addFile(fileInfo);
 }
 
+void DistributedFileDownloaderPrivate::findDownloads()
+{
+    if (!downloadsDir.exists())
+        return;
+
+    for (const auto& entry: downloadsDir.entryInfoList({lit("*") + kMetadataSuffix}, QDir::Files))
+    {
+        auto fileName = entry.absoluteFilePath();
+        fileName.truncate(fileName.size() - kMetadataSuffix.size());
+
+        if (QFileInfo(fileName).isFile())
+            loadDownload(fileName);
+    }
+}
+
 QString DistributedFileDownloaderPrivate::metadataFileName(const QString& fileName)
 {
     if (fileName.isEmpty())
@@ -251,10 +268,16 @@ QVector<QByteArray> DistributedFileDownloaderPrivate::calculateChecksums(
 
 //-------------------------------------------------------------------------------------------------
 
-DistributedFileDownloader::DistributedFileDownloader(QObject* parent):
+DistributedFileDownloader::DistributedFileDownloader(
+    const QDir& downloadsDirectory,
+    QObject* parent)
+    :
     QObject(parent),
     d_ptr(new DistributedFileDownloaderPrivate(this))
 {
+    Q_D(DistributedFileDownloader);
+    d->downloadsDir = downloadsDirectory;
+    d->findDownloads();
 }
 
 DistributedFileDownloader::~DistributedFileDownloader()
@@ -457,38 +480,6 @@ DistributedFileDownloader::ErrorCode DistributedFileDownloader::deleteFile(
     }
 
     d->fileInformationByName.erase(it);
-
-    return ErrorCode::noError;
-}
-
-DistributedFileDownloader::ErrorCode DistributedFileDownloader::findDownloads(
-    const QString& path)
-{
-    Q_D(DistributedFileDownloader);
-
-    QFileInfo fileInfo(path);
-
-    if (!fileInfo.exists())
-        return ErrorCode::fileDoesNotExist;
-
-    if (fileInfo.isFile())
-        return d->loadDownload(path);
-
-    if (!fileInfo.isDir())
-        return ErrorCode::noError;
-
-    for (const auto& entry: QDir(path).entryInfoList({lit("*") + kMetadataSuffix}, QDir::Files))
-    {
-        auto fileName = entry.absoluteFilePath();
-        fileName.truncate(fileName.size() - kMetadataSuffix.size());
-
-        if (QFileInfo(fileName).isFile())
-        {
-            const auto errorCode = d->loadDownload(fileName);
-            if (errorCode != ErrorCode::noError)
-                return errorCode;
-        }
-    }
 
     return ErrorCode::noError;
 }

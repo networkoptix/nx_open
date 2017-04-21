@@ -4,6 +4,7 @@
 #include <QtCore/QUrl>
 #include <QtCore/QBitArray>
 #include <QtCore/QVector>
+#include <QtCore/QDir>
 
 namespace nx {
 namespace vms {
@@ -51,7 +52,7 @@ public:
         QBitArray downloadedChunks;
     };
 
-    DistributedFileDownloader(QObject* parent = nullptr);
+    DistributedFileDownloader(const QDir& downloadsDirectory, QObject* parent = nullptr);
     ~DistributedFileDownloader();
 
     QStringList files() const;
@@ -71,8 +72,6 @@ public:
         const QByteArray& buffer);
 
     ErrorCode deleteFile(const QString& fileName, bool deleteData = true);
-
-    ErrorCode findDownloads(const QString& path);
 
     QVector<QByteArray> getChunkChecksums(const QString& fileName);
 

@@ -28,7 +28,7 @@ protected:
 
         testFileName = workingDirectory.absoluteFilePath(kTestFileName);
 
-        downloader.reset(new DistributedFileDownloader());
+        downloader.reset(new DistributedFileDownloader(workingDirectory));
     }
 
     virtual void TearDown() override
@@ -183,7 +183,7 @@ TEST_F(DistributedFileDownloaderTest, addFileWithWrongChecksum)
 
 TEST_F(DistributedFileDownloaderTest, fileDuplicate)
 {
-    DistributedFileDownloader downloader;
+    DistributedFileDownloader downloader(workingDirectory);
 
     ASSERT_EQ(downloader.addFile(testFileName),
         DistributedFileDownloader::ErrorCode::noError);
@@ -219,19 +219,16 @@ TEST_F(DistributedFileDownloaderTest, findDownloadsForDownloadedFiles)
     ASSERT_TRUE(createDefaultTestFile());
 
     {
-        // Use temporary downloader to create download metadata.
-        DistributedFileDownloader downloader;
-
         DistributedFileDownloader::FileInformation fileInfo(testFileName);
         fileInfo.status = DistributedFileDownloader::FileStatus::downloaded;
 
-        ASSERT_EQ(downloader.addFile(fileInfo), DistributedFileDownloader::ErrorCode::noError);
+        ASSERT_EQ(this->downloader->addFile(fileInfo),
+            DistributedFileDownloader::ErrorCode::noError);
     }
 
-    ASSERT_EQ(downloader->findDownloads(workingDirectory.absolutePath()),
-        DistributedFileDownloader::ErrorCode::noError);
+    DistributedFileDownloader downloader(workingDirectory);
 
-    const auto& fileInfo = downloader->fileInformation(testFileName);
+    const auto& fileInfo = downloader.fileInformation(testFileName);
     ASSERT_EQ(fileInfo.status, DistributedFileDownloader::FileStatus::downloaded);
     ASSERT_EQ(fileInfo.size, kTestFileSize);
     ASSERT_TRUE(fileInfo.md5 == testFileMd5);
@@ -242,16 +239,12 @@ TEST_F(DistributedFileDownloaderTest, findDownloadsForDownloadedFiles)
 
 TEST_F(DistributedFileDownloaderTest, findDownloadsForNewFiles)
 {
-    {
-        DistributedFileDownloader downloader;
-
-        ASSERT_EQ(downloader.addFile(testFileName), DistributedFileDownloader::ErrorCode::noError);
-    }
-
-    ASSERT_EQ(downloader->findDownloads(workingDirectory.absolutePath()),
+    ASSERT_EQ(this->downloader->addFile(testFileName),
         DistributedFileDownloader::ErrorCode::noError);
 
-    const auto& fileInfo = downloader->fileInformation(testFileName);
+    DistributedFileDownloader downloader(workingDirectory);
+
+    const auto& fileInfo = downloader.fileInformation(testFileName);
     ASSERT_EQ(fileInfo.status, DistributedFileDownloader::FileStatus::downloading);
 }
 
@@ -259,15 +252,14 @@ TEST_F(DistributedFileDownloaderTest, findFileAfterDeletion)
 {
     ASSERT_TRUE(createTestFile(testFileName, 0));
 
-    ASSERT_EQ(downloader->addFile(testFileName),
+    ASSERT_EQ(this->downloader->addFile(testFileName),
         DistributedFileDownloader::ErrorCode::noError);
-    ASSERT_EQ(downloader->deleteFile(testFileName),
-        DistributedFileDownloader::ErrorCode::noError);
-
-    ASSERT_EQ(downloader->findDownloads(workingDirectory.absolutePath()),
+    ASSERT_EQ(this->downloader->deleteFile(testFileName),
         DistributedFileDownloader::ErrorCode::noError);
 
-    const auto& fileInfo = downloader->fileInformation(testFileName);
+    DistributedFileDownloader downloader(workingDirectory);
+
+    const auto& fileInfo = downloader.fileInformation(testFileName);
     ASSERT_EQ(fileInfo.status, DistributedFileDownloader::FileStatus::notFound);
 }
 
