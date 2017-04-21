@@ -17,6 +17,8 @@ public:
         const conf::Settings& settings,
         Model* model);
 
+    controller::ConnectSessionManager& connectSessionManager();
+
 private:
     controller::TrafficRelay m_trafficRelay;
     controller::ConnectSessionManager m_connectSessionManager;

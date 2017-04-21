@@ -77,6 +77,11 @@ nx_http::Response* AbstractHttpRequestHandler::response()
     return m_responseMsg.response;
 }
 
+const std::vector<std::string>& AbstractHttpRequestHandler::requestPathParams() const
+{
+    return m_requestPathParams;
+}
+
 void AbstractHttpRequestHandler::requestDone(RequestResult requestResult)
 {
     m_responseMsg.response->statusLine.statusCode =

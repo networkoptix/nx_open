@@ -3,6 +3,8 @@
 #include <atomic>
 #include <memory>
 #include <mutex>
+#include <string>
+#include <vector>
 
 #include <nx/utils/stree/resourcecontainer.h>
 
@@ -65,9 +67,19 @@ protected:
 
     nx_http::Response* response();
 
+    /**
+     * Parameters parsed from URL path. 
+     * E.g., given http handler registered on path /account/%1/systems.
+     * When receiving request with path /account/cartman/systems.
+     * Then this method will return {cartman}.
+     * Works only when using RestMessageDispatcher.
+     */
+    const std::vector<std::string>& requestPathParams() const;
+
 private:
     nx_http::Message m_responseMsg;
     ResponseIsReadyHandler m_completionHandler;
+    std::vector<std::string> m_requestPathParams;
 
     void requestDone(RequestResult requestResult);
 };

@@ -4,6 +4,8 @@
 
 #include <type_traits>
 
+#include <boost/optional.hpp>
+
 #include <QtCore/QUrlQuery>
 
 #include <nx/fusion/serialization_format.h>
@@ -16,6 +18,16 @@
 
 namespace nx_http {
 namespace detail {
+
+/**
+ * This is a dummy implementation for types that 
+ * do not implement deserialization from url query.
+ */
+template<typename Data>
+bool loadFromUrlQuery(const QUrlQuery& /*query*/, Data* /*target*/)
+{
+    return false;
+}
 
 class BaseFusionRequestHandler:
     public AbstractHttpRequestHandler
@@ -52,10 +64,12 @@ protected:
         std::unique_ptr<nx_http::AbstractMsgBodySource>())
     {
         auto completionHandler = std::move(m_completionHandler);
-        completionHandler(
-            nx_http::RequestResult(
-                statusCode,
-                std::move(outputMsgBody)));
+        nx_http::RequestResult requestResult(
+            statusCode,
+            std::move(outputMsgBody));
+        if (m_connectionEvents)
+            requestResult.connectionEvents = std::move(*m_connectionEvents);
+        completionHandler(std::move(requestResult));
     }
 
     bool getDataFormat(
@@ -70,7 +84,7 @@ protected:
         {
             if (inputDataFormat)
             {
-                //TODO #ak fetching format from Accept header
+                // TODO #ak fetching format from Accept header.
                 *inputDataFormat = Qn::UrlQueryFormat;
             }
         }
@@ -94,9 +108,10 @@ protected:
                 FusionRequestErrorClass::badRequest,
                 QnLexical::serialized(FusionRequestErrorDetail::notAcceptable),
                 FusionRequestErrorDetail::notAcceptable,
-                lit("Input format %1 not supported. Input data attributes can be specified in url or by %2 POST message body").
-                arg(Qn::serializationFormatToHttpContentType(*inputDataFormat)).
-                arg(Qn::serializationFormatToHttpContentType(Qn::JsonFormat)));
+                lm("Input format %1 not supported. Input data attributes "
+                    "can be specified in url or by %2 POST message body")
+                    .arg(Qn::serializationFormatToHttpContentType(*inputDataFormat))
+                    .arg(Qn::serializationFormatToHttpContentType(Qn::JsonFormat)));
             requestCompleted(std::move(result));
             return false;
         }
@@ -107,9 +122,9 @@ protected:
                 FusionRequestErrorClass::badRequest,
                 QnLexical::serialized(FusionRequestErrorDetail::notAcceptable),
                 FusionRequestErrorDetail::notAcceptable,
-                lit("Output format %1 not supported. Only %2 is supported").
-                arg(Qn::serializationFormatToHttpContentType(m_outputDataFormat)).
-                arg(Qn::serializationFormatToHttpContentType(Qn::JsonFormat)));
+                lm("Output format %1 not supported. Only %2 is supported")
+                    .arg(Qn::serializationFormatToHttpContentType(m_outputDataFormat))
+                    .arg(Qn::serializationFormatToHttpContentType(Qn::JsonFormat)));
             requestCompleted(std::move(result));
             return false;
         }
@@ -130,7 +145,6 @@ protected:
                 return loadFromUrlQuery(
                     QUrlQuery(QUrl::fromPercentEncoding(data)),
                     target);
-                return true;
 
             case Qn::JsonFormat:
                 *target = QJson::deserialized<T>(data, T(), &success);
@@ -174,6 +188,14 @@ protected:
     {
         return dataFormat == Qn::JsonFormat || dataFormat == Qn::UrlQueryFormat;
     }
+
+    void setConnectionEvents(nx_http::ConnectionEvents connectionEvents)
+    {
+        m_connectionEvents = std::move(connectionEvents);
+    }
+
+private:
+    boost::optional<nx_http::ConnectionEvents> m_connectionEvents;
 };
 
 

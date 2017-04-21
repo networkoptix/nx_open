@@ -18,6 +18,11 @@ Controller::Controller(
 {
 }
 
+controller::ConnectSessionManager& Controller::connectSessionManager()
+{
+    return m_connectSessionManager;
+}
+
 } // namespace relay
 } // namespace cloud
 } // namespace nx

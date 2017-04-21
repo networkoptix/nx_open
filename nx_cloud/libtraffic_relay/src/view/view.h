@@ -33,10 +33,13 @@ public:
 
 private:
     const conf::Settings& m_settings;
+    Controller* m_controller;
     nx_http::MessageDispatcher m_httpMessageDispatcher;
     nx_http::AuthMethodRestrictionList m_authRestrictionList;
     view::AuthenticationManager m_authenticationManager;
     std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>> m_multiAddressHttpServer;
+
+    void registerApiHandlers();
 };
 
 } // namespace relay

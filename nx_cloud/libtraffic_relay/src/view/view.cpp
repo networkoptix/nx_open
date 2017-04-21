@@ -2,10 +2,14 @@
 
 #include <stdexcept>
 
+#include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
+#include "http_handlers.h"
+#include "../controller/connect_session_manager.h"
+#include "../controller/controller.h"
 #include "../settings.h"
 
 namespace nx {
@@ -15,9 +19,10 @@ namespace relay {
 View::View(
     const conf::Settings& settings,
     const Model& /*model*/,
-    Controller* /*controller*/)
+    Controller* controller)
     :
     m_settings(settings),
+    m_controller(controller),
     m_authenticationManager(m_authRestrictionList)
 {
     const auto& httpEndpoints = settings.http().endpoints;
@@ -27,7 +32,7 @@ View::View(
         throw std::runtime_error("No HTTP address to listen");
     }
 
-    //registerApiHandlers(&m_httpMessageDispatcher);
+    registerApiHandlers();
 
     //m_authRestrictionList.allow(http_handler::GetCloudModulesXml::kHandlerPath, AuthMethod::noAuth);
 
@@ -68,6 +73,19 @@ void View::start()
 std::vector<SocketAddress> View::httpEndpoints() const
 {
     return m_multiAddressHttpServer->endpoints();
+}
+
+void View::registerApiHandlers()
+{
+    m_httpMessageDispatcher.registerRequestProcessor<BeginListeningHandler>(
+        api::path::kServerIncomingConnections,
+        [this]() -> std::unique_ptr<BeginListeningHandler>
+        {
+            return std::make_unique<BeginListeningHandler>(
+                &m_controller->connectSessionManager());
+        });
+
+    // TODO
 }
 
 } // namespace relay
