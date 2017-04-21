@@ -67,8 +67,27 @@ std::size_t countByPrefix(
     return result;
 }
 
+namespace detail {
+
+template<typename Container>
+struct GetIteratorType
+{
+    /**
+     * Container::const_iterator if container is const. Otherwise, Container::iterator.
+     */
+    using type = typename Container::iterator;
+};
+
+template<typename Container>
+struct GetIteratorType<const Container>
+{
+    using type = typename Container::const_iterator;
+};
+
+} // namespace detail
+
 template<typename AssociativeContainer>
-typename AssociativeContainer::iterator findAnyByPrefix(
+typename detail::GetIteratorType<AssociativeContainer>::type findAnyByPrefix(
     AssociativeContainer& associativeContainer,
     const typename AssociativeContainer::key_type& prefix)
 {
@@ -80,16 +99,16 @@ typename AssociativeContainer::iterator findAnyByPrefix(
 
 template<typename AssociativeContainer>
 typename std::pair<
-    typename AssociativeContainer::iterator,
-    typename AssociativeContainer::iterator
+    typename detail::GetIteratorType<AssociativeContainer>::type,
+    typename detail::GetIteratorType<AssociativeContainer>::type
 >
     equalRangeByPrefix(
         AssociativeContainer& associativeContainer,
         const typename AssociativeContainer::key_type& prefix)
 {
     typename std::pair<
-        typename AssociativeContainer::iterator,
-        typename AssociativeContainer::iterator
+        typename detail::GetIteratorType<AssociativeContainer>::type,
+        typename detail::GetIteratorType<AssociativeContainer>::type
     > result;
 
     result.first = associativeContainer.lower_bound(prefix);

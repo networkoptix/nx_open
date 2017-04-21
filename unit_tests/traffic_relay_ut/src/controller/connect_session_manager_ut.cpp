@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <boost/algorithm/string/predicate.hpp>
+
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/network/socket_delegate.h>
 #include <nx/network/system_socket.h>
@@ -76,10 +78,11 @@ public:
     ConnectSessionManager():
         m_clientSessionPool(m_settings),
         m_connectSessionManager(
-            m_settings,
-            &m_clientSessionPool,
-            &m_listeningPeerPool,
-            &m_trafficRelayStub),
+            std::make_unique<controller::ConnectSessionManager>(
+                m_settings,
+                &m_clientSessionPool,
+                &m_listeningPeerPool,
+                &m_trafficRelayStub)),
         m_peerName(nx::utils::generateRandomName(17).toStdString())
     {
         std::array<const char*, 3> argv{
@@ -107,9 +110,12 @@ protected:
 
     void whenInvokedBeginListening()
     {
-        using namespace std::placeholders;
-
         addListeningPeerConnection();
+    }
+
+    void whenFreedConnectionManager()
+    {
+        m_connectSessionManager.reset();
     }
 
     void thenTcpConnectionHasBeenSavedToThePool()
@@ -135,7 +141,7 @@ protected:
 
     controller::ConnectSessionManager& connectSessionManager()
     {
-        return m_connectSessionManager;
+        return *m_connectSessionManager;
     }
 
     std::string listeningPeerName() const
@@ -143,14 +149,24 @@ protected:
         return m_peerName;
     }
 
+    void setListeningPeerName(std::string listeningPeerName)
+    {
+        m_peerName = std::move(listeningPeerName);
+    }
+
     void addListeningPeerConnection()
+    {
+        addListeningPeerConnection(m_peerName);
+    }
+
+    void addListeningPeerConnection(std::string peerName)
     {
         using namespace std::placeholders;
 
         api::BeginListeningRequest request;
-        request.peerName = m_peerName;
+        request.peerName = std::move(peerName);
 
-        m_connectSessionManager.beginListening(
+        m_connectSessionManager->beginListening(
             request,
             std::bind(&ConnectSessionManager::onBeginListeningCompletion, this, _1, _2, _3));
     }
@@ -165,7 +181,7 @@ private:
     model::ClientSessionPool m_clientSessionPool;
     model::ListeningPeerPool m_listeningPeerPool;
     TrafficRelayStub m_trafficRelayStub;
-    controller::ConnectSessionManager m_connectSessionManager;
+    std::unique_ptr<controller::ConnectSessionManager> m_connectSessionManager;
     std::string m_peerName;
     nx::utils::SyncQueue<api::ResultCode> m_beginListeningResults;
     StreamSocketStub* m_lastListeningPeerConnection = nullptr;
@@ -222,7 +238,6 @@ public:
     ConnectSessionManagerConnectingPeer()
     {
         registerListeningPeer();
-        m_listeningPeerName = listeningPeerName();
     }
 
 protected:
@@ -268,7 +283,7 @@ protected:
 
     void whenIssuedCreateSessionWithUnknownPeerName()
     {
-        m_listeningPeerName = "unknown peer";
+        setListeningPeerName("unknown peer");
         whenIssuedCreateSessionWithPredefinedId();
     }
 
@@ -303,9 +318,9 @@ protected:
         if (!m_expectedSessionId.empty())
             ASSERT_EQ(m_expectedSessionId, result.response.sessionId);
         ASSERT_EQ(kConnectSessionIdleTimeout, result.response.sessionTimeout);
-        ASSERT_EQ(
-            listeningPeerName(),
-            clientSessionPool().getPeerNameBySessionId(result.response.sessionId));
+        ASSERT_TRUE(boost::ends_with(
+            clientSessionPool().getPeerNameBySessionId(result.response.sessionId),
+            listeningPeerName()));
     }
 
     void thenCreateSessionReportedNotFound()
@@ -324,7 +339,7 @@ protected:
             trafficRelayStub().hasRelaySession(
                 m_lastClientConnection,
                 lastListeningPeerConnection(),
-                m_listeningPeerName));
+                listeningPeerName()));
     }
 
     void thenConnectHasReportedNotFound()
@@ -371,7 +386,6 @@ private:
     nx::utils::SyncQueue<CreateClientSessionResult> m_createClientSessionResults;
     nx::utils::SyncQueue<ConnectResult> m_connectResults;
     std::string m_expectedSessionId;
-    std::string m_listeningPeerName;
     StreamSocketStub* m_lastClientConnection = nullptr;
     std::vector<std::string> m_connectSessionIds;
 
@@ -386,7 +400,7 @@ private:
         using namespace std::placeholders;
 
         api::CreateClientSessionRequest request;
-        request.targetPeerName = m_listeningPeerName;
+        request.targetPeerName = listeningPeerName();
         if (!sessionId.empty())
             request.desiredSessionId = sessionId;
         connectSessionManager().createClientSession(
@@ -468,6 +482,97 @@ TEST_F(
 
 //-------------------------------------------------------------------------------------------------
 
+class ConnectSessionManagerConnectingByDomainName:
+    public ConnectSessionManagerConnectingPeer
+{
+public:
+    ConnectSessionManagerConnectingByDomainName()
+    {
+        m_domainName = utils::generateRandomName(11).toStdString();
+        setListeningPeerName(m_domainName);
+    }
+
+protected:
+    void givenMultipleListeningPeersWithOneConnectionEach()
+    {
+        m_peerCount = 7;
+        m_connectionsPerPeer = 1;
+        createConnections();
+    }
+
+    void givenMultipleListeningPeersWithMultipleConnectionsEach()
+    {
+        m_peerCount = 7;
+        m_connectionsPerPeer = 7;
+        createConnections();
+    }
+
+    void whenRequestedConnectionByDomainName()
+    {
+        whenRequestedMultipleConnectionsByDomainName();
+    }
+
+    void whenRequestedMultipleConnectionsByDomainName()
+    {
+        whenIssuedCreateSessionWithPredefinedId();
+        thenSessionHasBeenCreated();
+
+        for (int i = 0; i < m_connectionsPerPeer; ++i)
+            whenRequestedConnectionToPeer();
+    }
+
+    void thenAllConnectionsBelongToTheSamePeer()
+    {
+        for (int i = 0; i < m_connectionsPerPeer; ++i)
+            thenConnectRequestSucceeded();
+        // TODO
+    }
+
+    void thenNoConnectionCouldBeRetrievedWithinSameSession()
+    {
+        whenRequestedConnectionToPeer();
+        thenConnectHasReportedNotFound();
+    }
+
+private:
+    std::string m_domainName;
+    std::vector<std::string> m_listeningPeersNames;
+    int m_peerCount = 0;
+    int m_connectionsPerPeer = 0;
+
+    void createConnections()
+    {
+        m_listeningPeersNames.resize(m_peerCount);
+        for (auto& peerName: m_listeningPeersNames)
+        {
+            peerName = utils::generateRandomName(11).toStdString();
+            for (int i = 0; i < m_connectionsPerPeer; ++i)
+                addListeningPeerConnection(peerName + "." + m_domainName);
+        }
+    }
+};
+
+TEST_F(
+    ConnectSessionManagerConnectingByDomainName,
+    all_connections_within_session_go_to_the_same_peer)
+{
+    givenMultipleListeningPeersWithOneConnectionEach();
+    whenRequestedConnectionByDomainName();
+    thenConnectRequestSucceeded();
+    thenNoConnectionCouldBeRetrievedWithinSameSession();
+}
+
+TEST_F(
+    ConnectSessionManagerConnectingByDomainName,
+    all_connections_within_session_go_to_the_same_peer2)
+{
+    givenMultipleListeningPeersWithMultipleConnectionsEach();
+    whenRequestedMultipleConnectionsByDomainName();
+    thenAllConnectionsBelongToTheSamePeer();
+}
+
+//-------------------------------------------------------------------------------------------------
+
 class ConnectSessionManagerConnectingPeerConnectTo:
     public ConnectSessionManagerConnectingPeer
 {
@@ -477,6 +582,12 @@ public:
         whenIssuedCreateSessionWithPredefinedId();
         thenSessionHasBeenCreated();
     }
+
+protected:
+    void givenOngoingConnectToPeerRequest()
+    {
+        whenRequestedConnectionToPeer();
+    }
 };
 
 TEST_F(ConnectSessionManagerConnectingPeerConnectTo, connect_to_listening_peer)
@@ -485,6 +596,13 @@ TEST_F(ConnectSessionManagerConnectingPeerConnectTo, connect_to_listening_peer)
 
     thenConnectRequestSucceeded();
     thenProxyingHasBeenStarted();
+}
+
+TEST_F(ConnectSessionManagerConnectingPeerConnectTo, waits_for_request_completion)
+{
+    givenOngoingConnectToPeerRequest();
+    whenFreedConnectionManager();
+    thenConnectRequestSucceeded();
 }
 
 } // namespace test

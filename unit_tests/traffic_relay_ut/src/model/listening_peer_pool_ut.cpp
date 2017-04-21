@@ -239,6 +239,22 @@ protected:
         ASSERT_EQ(m_peerNames.size(), pool().getConnectionCountByPeerName(m_domainName));
     }
 
+    void assertPeerIsFoundByDomainNamePrefix()
+    {
+        const auto foundPeerName = pool().findListeningPeerByDomain(m_domainName);
+        ASSERT_FALSE(foundPeerName.empty());
+        ASSERT_NE(
+            m_peerNames.end(),
+            std::find(m_peerNames.begin(), m_peerNames.end(), foundPeerName));
+    }
+
+    void assertPeerIsFoundByFullName()
+    {
+        ASSERT_EQ(
+            m_peerNames[0],
+            pool().findListeningPeerByDomain(m_peerNames[0]));
+    }
+
     const std::string& domainName() const
     {
         return m_domainName;
@@ -266,6 +282,13 @@ TEST_F(ListeningPeerPoolFindPeerByParentDomainName, takeIdleConnection)
     givenMultipleConnectionsFromPeersOfTheSameDomain();
     whenRequestedConnection();
     thenConnectionHasBeenProvided();
+}
+
+TEST_F(ListeningPeerPoolFindPeerByParentDomainName, findListeningPeerByPrefix)
+{
+    givenMultipleConnectionsFromPeersOfTheSameDomain();
+    assertPeerIsFoundByDomainNamePrefix();
+    assertPeerIsFoundByFullName();
 }
 
 } // namespace test

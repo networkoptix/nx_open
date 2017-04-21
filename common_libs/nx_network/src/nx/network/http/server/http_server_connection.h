@@ -15,6 +15,7 @@
 #include <nx/network/http/http_parser.h>
 #include <nx/network/http/http_serializer.h>
 
+#include "abstract_authentication_manager.h"
 
 namespace nx {
 namespace utils {
@@ -111,12 +112,8 @@ private:
     std::deque<ResponseMessageContext> m_responseQueue;
 
     void onAuthenticationDone(
-        bool authenticationResult,
-        nx::utils::stree::ResourceContainer authInfo,
-        nx_http::Message requestMessage,
-        boost::optional<header::WWWAuthenticate> wwwAuthenticate,
-        nx_http::HttpHeaders responseHeaders,
-        std::unique_ptr<AbstractMsgBodySource> msgBody);
+        nx_http::server::AuthenticationResult authenticationResult,
+        nx_http::Message requestMessage);
     void sendUnauthorizedResponse(
         const nx_http::MimeProtoVersion& protoVersion,
         boost::optional<header::WWWAuthenticate> wwwAuthenticate,

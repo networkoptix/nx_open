@@ -4,8 +4,6 @@
 #include <nx/utils/settings.h>
 #include <nx/utils/abstract_service_settings.h>
 
-#include <utils/common/command_line_parser.h>
-
 namespace nx {
 namespace cloud {
 namespace relay {
@@ -13,7 +11,7 @@ namespace conf {
 
 struct Http
 {
-    std::list<SocketAddress> endpointsToListen;
+    std::list<SocketAddress> endpoints;
     /**
      * Backlog value to pass to tcpServerSocket->listen call.
      */
@@ -58,7 +56,6 @@ public:
     const Http& http() const;
 
 private:
-    QnCommandLineParser m_commandLineParser;
     QnSettings m_settings;
     bool m_showHelpRequested;
     utils::log::Settings m_logging;

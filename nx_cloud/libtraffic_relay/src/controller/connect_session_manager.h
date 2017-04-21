@@ -5,6 +5,7 @@
 #include <nx/network/cloud/tunnel/relay/api/relay_api_data_types.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_result_code.h>
 #include <nx/network/http/server/http_server_connection.h>
+#include <nx/utils/counter.h>
 #include <nx/utils/move_only_func.h>
 
 namespace nx {
@@ -65,6 +66,7 @@ private:
     model::ClientSessionPool* m_clientSessionPool;
     model::ListeningPeerPool* m_listeningPeerPool;
     controller::AbstractTrafficRelay* m_trafficRelay;
+    utils::Counter m_apiCallCounter;
 
     void saveServerConnection(
         const std::string& peerName,

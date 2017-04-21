@@ -17,7 +17,7 @@
 #include <nx/utils/singleton.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/network/auth_restriction_list.h>
+#include <nx/network/http/auth_restriction_list.h>
 
 #include "ldap/ldap_manager.h"
 #include "network/auth/abstract_nonce_provider.h"
@@ -55,9 +55,9 @@ public:
         nx_http::Response& response,
         bool isProxy = false,
         Qn::UserAccessData* accessRights = 0,
-        AuthMethod::Value* usedAuthMethod = 0);
+        nx_http::AuthMethod::Value* usedAuthMethod = 0);
 
-    QnAuthMethodRestrictionList* restrictionList();
+    nx_http::AuthMethodRestrictionList* restrictionList();
 
     //!Creates query item for \a path which does not require authentication
     /*!
@@ -163,7 +163,7 @@ private:
     QMap<QnUuid, QnUserResourcePtr> m_users;
     QMap<QnUuid, QnMediaServerResourcePtr> m_servers;
 #endif
-    QnAuthMethodRestrictionList m_authMethodRestrictionList;
+    nx_http::AuthMethodRestrictionList m_authMethodRestrictionList;
     std::map<QString, TempAuthenticationKeyCtx> m_authenticatedPaths;
     AbstractNonceProvider* m_timeBasedNonceProvider;
     AbstractNonceProvider* m_nonceProvider;

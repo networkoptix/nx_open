@@ -133,9 +133,18 @@ void ReverseConnectionHolder::monitorSocket(
             if (code == SystemError::timedOut)
                 return monitorSocket(it);
 
-            NX_LOGX(lm("Unexpected event on socket(%1), size=%2: %3 (%4 sockets left)")
-                .strs(*it, size, SystemError::toString(code), m_socketCount.load() - 1),
-                    (size ? cl_logERROR : cl_logDEBUG1));
+            if (code != SystemError::noError || size == 0)
+            {
+                NX_LOGX(lm("Connection(%1) has been closed: %2 (%3 sockets left)")
+                    .strs(*it, SystemError::toString(code), m_socketCount.load() - 1),
+                    cl_logDEBUG1);
+            }
+            else
+            {
+                NX_LOGX(lm("Unexpected read on socket(%1), size=%2. Closing socket (%3 sockets left)")
+                    .strs(*it, size, m_socketCount.load() - 1),
+                    cl_logERROR);
+            }
 
             (void)buffer; //< This buffer might be helpful for debug is case smth goes wrong!
             --m_socketCount;
