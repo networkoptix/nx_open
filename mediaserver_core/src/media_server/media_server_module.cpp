@@ -35,6 +35,8 @@
 #include <common/static_common_module.h>
 #include <utils/common/app_info.h>
 
+#include <nx/vms/common/distributed_file_downloader.h>
+
 namespace {
 
 void installTranslations()
@@ -44,6 +46,19 @@ void installTranslations()
     QnTranslationManager translationManager;
     QnTranslation defaultTranslation = translationManager.loadTranslation(kDefaultPath);
     QnTranslationManager::installTranslation(defaultTranslation);
+}
+
+QDir downloadsDirectory()
+{
+    const QString varDir = qnServerModule->roSettings()->value("varDir").toString();
+    if (varDir.isEmpty())
+        return QDir();
+
+    const QDir dir(varDir + lit("/downloads"));
+    if (!dir.exists())
+        QDir().mkpath(dir.absolutePath());
+
+    return dir;
 }
 
 } // namespace
@@ -119,6 +134,8 @@ QnMediaServerModule::QnMediaServerModule(
         ));
 
     store(new QnFileDeletor(commonModule()));
+
+    store(new nx::vms::common::DistributedFileDownloader(downloadsDirectory()));
 
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
