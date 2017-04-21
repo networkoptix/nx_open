@@ -14,22 +14,23 @@ import server_api_data_generators as generator
 FAILOVER_SWITCHING_PERIOD_SEC = 4*60
 
 
-class SeedCounter(object):
+class Counter(object):
 
-    _seed = 0
+    def __init__(self):
+        self._value = 0
 
     def next(self):
-        self._seed += 1
-        return self._seed
+        self._value += 1
+        return self._value
 
 
 @pytest.fixture
-def seed():
-    return SeedCounter()
+def counter():
+    return Counter()
 
 
 @pytest.fixture
-def env(env_builder, server, camera_factory, seed):
+def env(env_builder, server, camera_factory, counter):
     one = server()
     two = server()
     three = server()
@@ -37,13 +38,13 @@ def env(env_builder, server, camera_factory, seed):
                             one=one, two=two, three=three)
     # Create cameras
     for srv in built_env.servers.values():
-        add_cameras_to_env(srv, camera_factory, seed, 2)
+        add_cameras_to_server(srv, camera_factory, counter, 2)
     return built_env
 
 
-def add_cameras_to_env(server, camera_factory, seed, count):
+def add_cameras_to_server(server, camera_factory, counter, count):
     for i in range(count):
-        camera_id = seed.next()
+        camera_id = counter.next()
         camera_mac = generator.generate_mac(camera_id)
         camera_name = 'Camera_%d' % camera_id
         camera = camera_factory(camera_name, camera_mac)
@@ -54,11 +55,11 @@ def add_cameras_to_env(server, camera_factory, seed, count):
 
 
 def wait_for_expected_online_cameras_on_server(server, expected_cameras):
-    server_cameras = wait_for_server_online_cameras(server, len(expected_cameras))
+    server_cameras = wait_for_server_cameras_become_online(server, len(expected_cameras))
     assert server_cameras == expected_cameras
 
 
-def wait_for_server_online_cameras(server, expected_cameras_count):
+def wait_for_server_cameras_become_online(server, expected_cameras_count):
     start = time.time()
     while True:
         server_cameras = sorted(
@@ -73,14 +74,14 @@ def wait_for_server_online_cameras(server, expected_cameras_count):
         time.sleep(FAILOVER_SWITCHING_PERIOD_SEC / 10.)
 
 
-def get_server_cameras(server):
+def get_server_camera_ids(server):
     return sorted([c['id'] for c in server.rest_api.ec2.getCameras.GET()
                    if c['parentId'] == server.ecs_guid])
 
 
 def test_enable_failover_on_one_server(env):
-    cameras_one_initial = get_server_cameras(env.one)
-    cameras_two_initial = get_server_cameras(env.two)
+    cameras_one_initial = get_server_camera_ids(env.one)
+    cameras_two_initial = get_server_camera_ids(env.two)
     env.two.rest_api.ec2.saveMediaServerUserAttributes.POST(
         serverId=env.two.ecs_guid,
         maxCameras=4,
@@ -95,9 +96,9 @@ def test_enable_failover_on_one_server(env):
 
 
 def test_enable_failover_on_two_servers(env):
-    cameras_one_initial = get_server_cameras(env.one)
-    cameras_two_initial = get_server_cameras(env.two)
-    cameras_three_initial = get_server_cameras(env.three)
+    cameras_one_initial = get_server_camera_ids(env.one)
+    cameras_two_initial = get_server_camera_ids(env.two)
+    cameras_three_initial = get_server_camera_ids(env.three)
     env.one.rest_api.ec2.saveMediaServerUserAttributes.POST(
         serverId=env.one.ecs_guid,
         maxCameras=3,
@@ -107,8 +108,8 @@ def test_enable_failover_on_two_servers(env):
         maxCameras=3,
         allowAutoRedundancy=True)
     env.two.stop_service()
-    cameras_one_failover = wait_for_server_online_cameras(env.one, 3)
-    cameras_three_failover = wait_for_server_online_cameras(env.three, 3)
+    cameras_one_failover = wait_for_server_cameras_become_online(env.one, 3)
+    cameras_three_failover = wait_for_server_cameras_become_online(env.three, 3)
     assert (sorted(cameras_one_failover + cameras_three_failover) ==
             sorted(cameras_one_initial + cameras_two_initial + cameras_three_initial))
     env.two.start_service()
