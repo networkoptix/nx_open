@@ -40,7 +40,6 @@
 
 #include <recording/time_period.h>
 
-#include <ui/actions/action_parameter_types.h>
 #include <ui/actions/action_manager.h>
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -219,17 +218,17 @@ ActionVisibility Condition::check(const QnResourceList &)
 
 ActionVisibility Condition::check(const QnLayoutItemIndexList& layoutItems)
 {
-    return check(QnActionParameterTypes::resources(layoutItems));
+    return check(ParameterTypes::resources(layoutItems));
 }
 
 ActionVisibility Condition::check(const QnResourceWidgetList& widgets)
 {
-    return check(QnActionParameterTypes::layoutItems(widgets));
+    return check(ParameterTypes::layoutItems(widgets));
 }
 
 ActionVisibility Condition::check(const QnWorkbenchLayoutList& layouts)
 {
-    return check(QnActionParameterTypes::resources(layouts));
+    return check(ParameterTypes::resources(layouts));
 }
 
 ActionVisibility Condition::check(const QnActionParameters& parameters)
@@ -540,7 +539,7 @@ bool ResourceCondition::checkOne(const QnResourcePtr &resource)
 
 bool ResourceCondition::checkOne(QnResourceWidget *widget)
 {
-    QnResourcePtr resource = QnActionParameterTypes::resource(widget);
+    QnResourcePtr resource = ParameterTypes::resource(widget);
     return resource ? checkOne(resource) : false;
 }
 

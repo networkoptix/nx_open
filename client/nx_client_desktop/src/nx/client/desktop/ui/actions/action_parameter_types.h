@@ -19,11 +19,17 @@ class QnWorkbenchLayout;
 typedef QList<QnResourceWidget*> QnResourceWidgetList;
 typedef QList<QnWorkbenchLayout*> QnWorkbenchLayoutList;
 
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+namespace action {
+
 /**
  * Helper class that implements <tt>QVariant</tt>-based overloading for
  * the types supported by default action parameter.
  */
-class QnActionParameterTypes
+class ParameterTypes
 {
 public:
     static int size(const QVariant &items);
@@ -64,3 +70,9 @@ public:
 
     static QnResourceWidgetList widgets(const QList<QGraphicsItem *> items);
 };
+
+} // namespace action
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx

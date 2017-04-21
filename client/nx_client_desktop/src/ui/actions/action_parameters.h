@@ -5,7 +5,8 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/actions/action_parameter_types.h>
+#include <nx/client/desktop/ui/actions/action_parameter_types.h>
+
 #include "actions.h"
 
 class QGraphicsItem;

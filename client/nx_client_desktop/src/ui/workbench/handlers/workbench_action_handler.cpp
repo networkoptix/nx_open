@@ -81,7 +81,6 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
-#include <ui/actions/action_parameter_types.h>
 
 #include <ui/dialogs/about_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>

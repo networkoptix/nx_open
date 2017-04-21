@@ -11,13 +11,11 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
-#include "action_parameter_types.h"
-
 using namespace nx::client::desktop::ui::action;
 
 namespace {
     bool checkType(const QVariant &items) {
-        ActionParameterType type = QnActionParameterTypes::type(items);
+        ActionParameterType type = ParameterTypes::type(items);
         if(type == OtherType) {
             qnWarning("Unrecognized action parameter type '%1'.", items.typeName());
             return false;
@@ -37,7 +35,7 @@ QnActionParameters::QnActionParameters(const QVariant &items, const ArgumentHash
 }
 
 QnActionParameters::QnActionParameters(const QList<QGraphicsItem *> &items, const ArgumentHash &arguments) {
-    init(QVariant::fromValue<QnResourceWidgetList>(QnActionParameterTypes::widgets(items)), arguments);
+    init(QVariant::fromValue<QnResourceWidgetList>(ParameterTypes::widgets(items)), arguments);
 }
 
 QnActionParameters::QnActionParameters(QnResourceWidget *widget, const ArgumentHash &arguments) {
@@ -86,15 +84,15 @@ void QnActionParameters::setResources(const QnResourceList &resources) {
 }
 
 ActionParameterType QnActionParameters::type(int key) const {
-    return QnActionParameterTypes::type(argument(key));
+    return ParameterTypes::type(argument(key));
 }
 
 int QnActionParameters::size(int key) const {
-    return QnActionParameterTypes::size(argument(key));
+    return ParameterTypes::size(argument(key));
 }
 
 QnResourceList QnActionParameters::resources(int key) const {
-    return QnActionParameterTypes::resources(argument(key));
+    return ParameterTypes::resources(argument(key));
 }
 
 QnResourcePtr QnActionParameters::resource(int key) const {
@@ -107,19 +105,19 @@ QnResourcePtr QnActionParameters::resource(int key) const {
 }
 
 QnLayoutItemIndexList QnActionParameters::layoutItems(int key) const {
-    return QnActionParameterTypes::layoutItems(argument(key));
+    return ParameterTypes::layoutItems(argument(key));
 }
 
 QnVideoWallItemIndexList QnActionParameters::videoWallItems(int key) const {
-    return QnActionParameterTypes::videoWallItems(argument(key));
+    return ParameterTypes::videoWallItems(argument(key));
 }
 
 QnVideoWallMatrixIndexList QnActionParameters::videoWallMatrices(int key) const {
-    return QnActionParameterTypes::videoWallMatrices(argument(key));
+    return ParameterTypes::videoWallMatrices(argument(key));
 }
 
 QnWorkbenchLayoutList QnActionParameters::layouts(int key) const {
-    return QnActionParameterTypes::layouts(argument(key));
+    return ParameterTypes::layouts(argument(key));
 }
 
 QnResourceWidget *QnActionParameters::widget(int key) const {
@@ -132,7 +130,7 @@ QnResourceWidget *QnActionParameters::widget(int key) const {
 }
 
 QnResourceWidgetList QnActionParameters::widgets(int key) const {
-    return QnActionParameterTypes::widgets(argument(key));
+    return ParameterTypes::widgets(argument(key));
 }
 
 nx::client::desktop::ui::action::ActionScopes QnActionParameters::scope() const {

@@ -5,10 +5,10 @@
 
 #include "action.h"
 
-#include "action_parameter_types.h"
 #include <nx/client/desktop/ui/actions/menu_factory.h>
 #include <nx/client/desktop/ui/actions/action_builder.h>
 #include <nx/client/desktop/ui/actions/action_factories.h>
+#include <nx/client/desktop/ui/actions/action_parameter_types.h>
 #include <nx/client/desktop/ui/actions/action_target_provider.h>
 #include <nx/client/desktop/ui/actions/action_text_factories.h>
 
@@ -55,7 +55,7 @@ QnAction *checkSender(QObject *sender)
 
 bool checkType(const QVariant &items)
 {
-    ActionParameterType type = QnActionParameterTypes::type(items);
+    ActionParameterType type = ParameterTypes::type(items);
     if (type == 0)
     {
         NX_EXPECT(false, lm("Unrecognized action target type '%1'.").arg(items.typeName()));

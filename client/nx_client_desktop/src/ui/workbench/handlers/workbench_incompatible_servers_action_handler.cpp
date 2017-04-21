@@ -13,7 +13,6 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
-#include <ui/actions/action_parameter_types.h>
 #include <ui/dialogs/merge_systems_dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/progress_dialog.h>

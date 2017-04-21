@@ -12,12 +12,10 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <ui/actions/action_parameter_types.h>
-
 #include <nx/client/desktop/ui/actions/action_fwd.h>
 #include <nx/client/desktop/ui/actions/action_types.h>
+#include <nx/client/desktop/ui/actions/action_parameter_types.h>
 
-class QnActionParameters;
 class QnWorkbenchContext;
 
 namespace nx {

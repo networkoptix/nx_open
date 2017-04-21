@@ -28,7 +28,7 @@
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
-#include <ui/actions/action_parameter_types.h>
+#include <nx/client/desktop/ui/actions/action_parameter_types.h>
 #include <ui/dialogs/layout_name_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -407,7 +407,7 @@ void LayoutsHandler::removeLayoutItems(const QnLayoutItemIndexList& items, bool 
     if (items.size() > 1)
     {
         const bool confirm = ui::resources::removeItemsFromLayout(mainWindow(),
-            QnActionParameterTypes::resources(items));
+            action::ParameterTypes::resources(items));
 
         if (!confirm)
             return;

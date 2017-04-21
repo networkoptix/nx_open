@@ -48,7 +48,6 @@ extern "C"
 #include <server/server_storage_manager.h>
 
 #include <ui/actions/action_manager.h>
-#include <ui/actions/action_parameter_types.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>

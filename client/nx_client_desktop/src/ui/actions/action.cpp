@@ -14,6 +14,7 @@
 
 #include <nx/client/desktop/ui/actions/action_conditions.h>
 #include <nx/client/desktop/ui/actions/action_target_provider.h>
+#include <nx/client/desktop/ui/actions/action_parameter_types.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
@@ -25,7 +26,6 @@
 #include <client/client_runtime_settings.h>
 
 #include "action_manager.h"
-#include "action_parameter_types.h"
 
 using namespace nx::client::desktop::ui::action;
 
@@ -276,7 +276,7 @@ ActionVisibility QnAction::checkCondition(ActionScopes scope, const QnActionPara
             QnResourceList resources;
             if (parameters.hasArgument(key))
             {
-                resources = QnActionParameterTypes::resources(parameters.argument(key));
+                resources = ParameterTypes::resources(parameters.argument(key));
             }
             else if (key == Qn::CurrentLayoutResourceRole)
             {
@@ -285,7 +285,7 @@ ActionVisibility QnAction::checkCondition(ActionScopes scope, const QnActionPara
             }
             else if (key == Qn::CurrentLayoutMediaItemsRole)
             {
-                const QnResourceList& resList = QnActionParameterTypes::resources(context()->display()->widgets());
+                const QnResourceList& resList = ParameterTypes::resources(context()->display()->widgets());
                 for (const QnResourcePtr& res : resList)
                 {
                     if (res.dynamicCast<QnMediaResource>())

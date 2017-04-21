@@ -11,7 +11,7 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
-#include <ui/actions/action_parameter_types.h>
+#include <nx/client/desktop/ui/actions/action_parameter_types.h>
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
@@ -362,7 +362,7 @@ QnActionParameters QnWorkbenchUi::currentParameters(nx::client::desktop::ui::act
         case TimelineScope:
             return QnActionParameters(navigator()->currentWidget());
         case SceneScope:
-            return QnActionParameters(QnActionParameterTypes::widgets(display()->scene()->selectedItems()));
+            return QnActionParameters(ParameterTypes::widgets(display()->scene()->selectedItems()));
         default:
             break;
     }
