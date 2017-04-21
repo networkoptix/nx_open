@@ -20,11 +20,10 @@ namespace nx_http {
 namespace detail {
 
 /**
- * This is a dummy implementation for types that 
+ * This is a dummy implementation for types that
  * do not implement deserialization from url query.
  */
-template<typename Data>
-bool loadFromUrlQuery(const QUrlQuery& /*query*/, Data* /*target*/)
+inline bool loadFromUrlQuery(...)
 {
     return false;
 }
