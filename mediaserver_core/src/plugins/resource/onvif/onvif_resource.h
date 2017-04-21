@@ -105,6 +105,12 @@ public:
             bool _activeByDefault );
     };
 
+    struct RelayInputState
+    {
+        bool value = false;
+        qint64 timestamp = 0;
+    };
+
     enum CODECS
     {
         H264,
@@ -244,6 +250,7 @@ public:
     void notificationReceived(
         const oasisWsnB2__NotificationMessageHolderType& notification,
         time_t minNotificationTime = (time_t)-1 );
+    void onRelayInputStateChange(const QString& name, const RelayInputState& state);
     QString fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort = true);
 
     int getMaxChannels() const;
@@ -496,11 +503,12 @@ private:
     mutable QElapsedTimer m_timeDriftTimer;
     mutable QTimeZone m_cameraTimeZone;
     std::vector<RelayOutputInfo> m_relayOutputInfo;
-    std::map<QString, bool> m_relayInputStates;
+    std::map<QString, RelayInputState> m_relayInputStates;
     std::string m_deviceIOUrl;
     QString m_onvifNotificationSubscriptionID;
     mutable QnMutex m_ioPortMutex;
     bool m_inputMonitored;
+    qint64 m_clearInputsTimeoutUSec;
     EventMonitorType m_eventMonitorType;
     quint64 m_nextPullMessagesTimerID;
     quint64 m_renewSubscriptionTimerID;

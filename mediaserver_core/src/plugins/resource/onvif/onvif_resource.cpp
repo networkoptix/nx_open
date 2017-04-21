@@ -307,6 +307,7 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_audioSamplerate(0),
     m_timeDrift(0),
     m_inputMonitored(false),
+    m_clearInputsTimeoutUSec(0),
     m_eventMonitorType(emtNone),
     m_nextPullMessagesTimerID(0),
     m_renewSubscriptionTimerID(0),
@@ -672,6 +673,13 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
             Qn::RelayOutputCapability,
             resourceData.value<int>(QString("relayOutputCountForced"), 0) > 0);
     }
+    if (resourceData.contains(QString("clearInputsTimeoutSec")))
+    {
+        m_clearInputsTimeoutUSec = resourceData.value<int>(
+            QString("clearInputsTimeoutSec"), 0) * 1000 * 1000;
+    }
+
+    qWarning() << "QnPlOnvifResource::initInternal() m_clearInputsTimeoutUSec =" << m_clearInputsTimeoutUSec;
 
     QnIOPortDataList allPorts = getRelayOutputList();
 
@@ -1077,11 +1085,24 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation(const QString
     return CameraDiagnostics::NoErrorResult();
 }
 
-
 void QnPlOnvifResource::notificationReceived(
     const oasisWsnB2__NotificationMessageHolderType& notification,
     time_t minNotificationTime )
 {
+    const auto now = qnSyncTime->currentUSecsSinceEpoch();
+    if( m_clearInputsTimeoutUSec > 0 )
+    {
+        for( auto& state: m_relayInputStates )
+        {
+            if( state.second.value && state.second.timestamp + m_clearInputsTimeoutUSec < now)
+            {
+                state.second.value = false;
+                state.second.timestamp = now;
+                onRelayInputStateChange( state.first, state.second );
+            }
+        }
+    }
+
     if( !notification.Message.__any )
     {
         NX_LOG( lit("Received notification with empty message. Ignoring..."), cl_logDEBUG2 );
@@ -1189,43 +1210,52 @@ void QnPlOnvifResource::notificationReceived(
     }
 
     //saving port state
-    const bool newPortState = (handler.data.value == lit("true")) || (handler.data.value == lit("active")) || (handler.data.value.toInt() > 0);
-    bool& currentPortState = m_relayInputStates[portSourceIter->value];
-    if( currentPortState != newPortState )
+    const bool newValue = (handler.data.value == lit("true")) || (handler.data.value == lit("active")) || (handler.data.value.toInt() > 0);
+    auto& state = m_relayInputStates[portSourceIter->value];
+    state.timestamp = now;
+    if( state.value != newValue )
     {
-        QString portId = portSourceIter->value;
+        state.value = newValue;
+        onRelayInputStateChange( portSourceIter->value, state );
+    }
+}
+
+void QnPlOnvifResource::onRelayInputStateChange(const QString& name, const RelayInputState& state)
+{
+    QString portId = name;
+    {
         bool success = false;
         int intPortId = portId.toInt(&success);
         // Onvif device enumerates ports from 1. see 'allPorts' filling code.
         if (success)
             portId = QString::number(intPortId + 1);
-        size_t aliasesCount = m_portAliases.size();
-        if (aliasesCount && aliasesCount == m_inputPortCount)
+    }
+
+    size_t aliasesCount = m_portAliases.size();
+    if (aliasesCount && aliasesCount == m_inputPortCount)
+    {
+        for (size_t i = 0; i < aliasesCount; i++)
         {
-            for (size_t i = 0; i < aliasesCount; i++)
+            if (m_portAliases[i] == name)
             {
-                if (m_portAliases[i] == portSourceIter->value)
-                {
-                    portId = lit("%1").arg(i + 1);
-                    break;
-                }
+                portId = lit("%1").arg(i + 1);
+                break;
             }
         }
-        else
-        {
-            auto portIndex = getInputPortNumberFromString(portSourceIter->value);
-
-            if (!portIndex.isEmpty())
-                portId = portIndex;
-        }
-
-        currentPortState = newPortState;
-        emit cameraInput(
-            toSharedPointer(),
-            portId,
-            newPortState,
-            qnSyncTime->currentUSecsSinceEpoch() );   //it is not absolutely correct, but better than de-synchronized timestamp from camera
     }
+    else
+    {
+        auto portIndex = getInputPortNumberFromString(name);
+
+        if (!portIndex.isEmpty())
+            portId = portIndex;
+    }
+
+    emit cameraInput(
+        toSharedPointer(),
+        portId,
+        state.value,
+        state.timestamp);
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetResourceOptions()
