@@ -6,7 +6,7 @@ namespace relay {
 namespace api {
 namespace path {
 
-extern const char* const kServerIncomingConnections;
+NX_NETWORK_API extern const char* const kServerIncomingConnections;
 
 } // namespace path
 } // namespace api
