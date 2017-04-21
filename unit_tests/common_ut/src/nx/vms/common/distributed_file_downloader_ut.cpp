@@ -378,6 +378,54 @@ TEST_F(DistributedFileDownloaderTest, fileCorruptionDuringDownload)
     ASSERT_EQ(fileInformation.status, DistributedFileDownloader::FileStatus::corrupted);
 }
 
+TEST_F(DistributedFileDownloaderTest, getChecksums)
+{
+    ASSERT_TRUE(createDefaultTestFile());
+
+    DistributedFileDownloader::FileInformation fileInformation(testFileName);
+    fileInformation.status = DistributedFileDownloader::FileStatus::downloaded;
+
+    ASSERT_EQ(downloader->addFile(fileInformation),
+        DistributedFileDownloader::ErrorCode::noError);
+
+    const auto& fileInfo = downloader->fileInformation(testFileName);
+
+    const auto checksums = downloader->getChunkChecksums(testFileName);
+    const auto chunkCount = DistributedFileDownloader::calculateChunkCount(
+        fileInfo.size, fileInfo.chunkSize);
+    ASSERT_EQ(checksums.size(), chunkCount);
+}
+
+TEST_F(DistributedFileDownloaderTest, getChecksumsAfterDownload)
+{
+    ASSERT_TRUE(createTestFile(testFileName, 1024));
+
+    DistributedFileDownloader::FileInformation fileInfo(testFileName);
+    fileInfo.status = DistributedFileDownloader::FileStatus::downloaded;
+
+    ASSERT_EQ(downloader->addFile(fileInfo),
+        DistributedFileDownloader::ErrorCode::noError);
+
+    fileInfo = downloader->fileInformation(testFileName);
+
+    QByteArray data;
+    ASSERT_EQ(downloader->readFileChunk(testFileName, 0, data),
+        DistributedFileDownloader::ErrorCode::noError);
+
+    DistributedFileDownloader::FileInformation targetFileInfo(testFileName + ".new");
+    targetFileInfo.size = fileInfo.size;
+    targetFileInfo.md5 = fileInfo.md5;
+    ASSERT_EQ(downloader->addFile(targetFileInfo),
+        DistributedFileDownloader::ErrorCode::noError);
+
+    ASSERT_EQ(downloader->writeFileChunk(targetFileInfo.name, 0, data),
+        DistributedFileDownloader::ErrorCode::noError);
+
+    const auto checksums = downloader->getChunkChecksums(targetFileInfo.name);
+    ASSERT_EQ(checksums.size(), 1);
+    ASSERT_FALSE(checksums[0].isEmpty());
+}
+
 } // namespace test
 } // namespace common
 } // namespace vms

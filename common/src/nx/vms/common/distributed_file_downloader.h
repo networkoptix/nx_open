@@ -3,6 +3,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtCore/QBitArray>
+#include <QtCore/QVector>
 
 namespace nx {
 namespace vms {
@@ -72,6 +73,8 @@ public:
     ErrorCode deleteFile(const QString& fileName, bool deleteData = true);
 
     ErrorCode findDownloads(const QString& path);
+
+    QVector<QByteArray> getChunkChecksums(const QString& fileName);
 
     static QByteArray calculateMd5(const QString& fileName);
     static qint64 calculateFileSize(const QString& fileName);
