@@ -82,24 +82,9 @@ Item
         //TODO: #vkutin This also can be improved for floor & ceiling mounts.
         function updateRotation(aroundX, aroundY) // angle deltas since start, in degrees
         {
-            if (!resourceHelper || resourceHelper.fisheyeParams.viewMode == MediaDewarpingParams.Horizontal)
-            {
-                currentRotation = Qt.vector2d(
-                    Math.max(-90, Math.min(90, previousRotation.x + aroundX * rotationFactor)),
-                    Math.max(-90, Math.min(90, previousRotation.y + aroundY * rotationFactor)));
-            }
-            else if (resourceHelper.fisheyeParams.viewMode == MediaDewarpingParams.VerticalUp)
-            {
-                currentRotation = Qt.vector2d(
-                    previousRotation.x + aroundX * rotationFactor,
-                    Math.max(0, Math.min(90, previousRotation.y + aroundY * rotationFactor)));
-            }
-            else
-            {
-                currentRotation = Qt.vector2d(
-                    previousRotation.x + aroundX * rotationFactor,
-                    Math.max(-90, Math.min(0, previousRotation.y + aroundY * rotationFactor)));
-            }
+            currentRotation = Qt.vector2d(
+                Math.max(-90, Math.min(90, previousRotation.x + aroundX * rotationFactor)),
+                Math.max(-90, Math.min(90, previousRotation.y + aroundY * rotationFactor)));
         }
 
         function scaleBy(delta)
