@@ -31,7 +31,6 @@
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
-#include <ui/actions/action_target_provider.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_messages.h>
 #include <ui/dialogs/common/progress_dialog.h>

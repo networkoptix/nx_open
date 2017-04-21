@@ -25,7 +25,6 @@
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
-#include <ui/actions/action_target_provider.h>
 #include <ui/dialogs/ptz_preset_dialog.h>
 #include <ui/dialogs/ptz_manage_dialog.h>
 

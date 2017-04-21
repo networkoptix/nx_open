@@ -32,7 +32,7 @@
 #include <redass/redass_controller.h>
 
 #include <ui/actions/action_manager.h>
-#include <ui/actions/action_target_provider.h>
+#include <nx/client/desktop/ui/actions/action_target_provider.h>
 
 #include <ui/common/notification_levels.h>
 
@@ -924,12 +924,12 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout)
 
 void QnWorkbenchDisplay::updateSelectionFromTree()
 {
-    QnActionTargetProvider *provider = menu()->targetProvider();
+    using namespace nx::client::desktop::ui::action;
+    auto provider = menu()->targetProvider();
     if (!provider)
         return;
 
-    nx::client::desktop::ui::action::ActionScope scope = provider->currentScope();
-    using namespace nx::client::desktop::ui::action;
+    auto scope = provider->currentScope();
     if (scope != TreeScope)
         return;
 

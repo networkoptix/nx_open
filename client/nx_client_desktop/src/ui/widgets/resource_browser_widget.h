@@ -6,7 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_index.h>
-#include <ui/actions/action_target_provider.h>
+#include <nx/client/desktop/ui/actions/action_target_provider.h>
 #include <ui/common/tool_tip_queryable.h>
 #include <ui/graphics/items/generic/styled_tooltip_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -44,7 +44,12 @@ namespace Ui {
     class ResourceBrowserWidget;
 }
 
-class QnResourceBrowserWidget: public QWidget, public QnWorkbenchContextAware, public QnActionTargetProvider, public ToolTipQueryable {
+class QnResourceBrowserWidget:
+    public QWidget,
+    public QnWorkbenchContextAware,
+    public nx::client::desktop::ui::action::TargetProvider,
+    public ToolTipQueryable
+{
     Q_OBJECT
 
 public:

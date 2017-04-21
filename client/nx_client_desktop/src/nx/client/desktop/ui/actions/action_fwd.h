@@ -22,6 +22,8 @@ using TextFactoryPtr = QPointer<TextFactory>;
 class Condition;
 using ConditionPtr = QPointer<Condition>;
 
+class TargetProvider;
+
 } // namespace action
 } // namespace ui
 } // namespace desktop

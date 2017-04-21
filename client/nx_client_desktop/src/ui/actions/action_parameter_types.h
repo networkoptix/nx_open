@@ -11,15 +11,10 @@ class QGraphicsItem;
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
 
-class QnAction;
-class QnActionManager;
-class QnActionTargetProvider;
-class QnActionParameters;
 class QnResourceWidget;
 class QnMediaResourceWidget;
 class QnServerResourceWidget;
 class QnWorkbenchLayout;
-class QnWorkbenchContext;
 
 typedef QList<QnResourceWidget*> QnResourceWidgetList;
 typedef QList<QnWorkbenchLayout*> QnWorkbenchLayoutList;
@@ -28,7 +23,8 @@ typedef QList<QnWorkbenchLayout*> QnWorkbenchLayoutList;
  * Helper class that implements <tt>QVariant</tt>-based overloading for
  * the types supported by default action parameter.
  */
-class QnActionParameterTypes {
+class QnActionParameterTypes
+{
 public:
     static int size(const QVariant &items);
 
@@ -45,8 +41,6 @@ public:
     static QnWorkbenchLayoutList layouts(const QVariant &items);
 
     static QnResourceWidgetList widgets(const QVariant &items);
-
-
 
     static QnResourcePtr resource(QnResourceWidget *widget);
 

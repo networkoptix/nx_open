@@ -23,7 +23,6 @@
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
-#include <ui/actions/action_target_provider.h>
 #include <ui/dialogs/camera_bookmark_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>

@@ -11,6 +11,8 @@
 #include "actions.h"
 #include "action_parameters.h"
 
+#include <nx/client/desktop/ui/actions/action_fwd.h>
+
 class QAction;
 class QMenu;
 class QGraphicsItem;
@@ -111,12 +113,12 @@ public:
      * \returns                         Action target provider that is assigned to this
      *                                  action manager.
      */
-    QnActionTargetProvider *targetProvider() const;
+    nx::client::desktop::ui::action::TargetProvider *targetProvider() const;
 
     /**
      * \param targetProvider            New target provider for this action manager.
      */
-    void setTargetProvider(QnActionTargetProvider *targetProvider);
+    void setTargetProvider(nx::client::desktop::ui::action::TargetProvider *targetProvider);
 
     /**
      * \param action                    Action that has just been activated.
@@ -187,7 +189,7 @@ private:
     QHash<QMenu*, QnActionParameters> m_parametersByMenu;
 
     /** Target provider for actions. */
-    QnActionTargetProvider *m_targetProvider;
+    nx::client::desktop::ui::action::TargetProvider* m_targetProvider;
 
     /** Guard for target provider. */
     QPointer<QObject> m_targetProviderGuard;

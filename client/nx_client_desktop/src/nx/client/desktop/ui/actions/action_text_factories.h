@@ -2,7 +2,9 @@
 
 #include <core/resource/device_dependent_strings.h>
 
-#include <ui/actions/action_parameter_types.h>
+#include <nx/client/desktop/ui/actions/action_fwd.h>
+
+class QnWorkbenchContext;
 
 namespace nx {
 namespace client {

@@ -5,11 +5,11 @@
 
 #include "action.h"
 
-#include "action_target_provider.h"
 #include "action_parameter_types.h"
 #include <nx/client/desktop/ui/actions/menu_factory.h>
 #include <nx/client/desktop/ui/actions/action_builder.h>
 #include <nx/client/desktop/ui/actions/action_factories.h>
+#include <nx/client/desktop/ui/actions/action_target_provider.h>
 #include <nx/client/desktop/ui/actions/action_text_factories.h>
 
 #include <ui/workbench/workbench.h>
@@ -90,7 +90,7 @@ QnActionManager::~QnActionManager()
     qDeleteAll(m_idByAction.keys());
 }
 
-void QnActionManager::setTargetProvider(QnActionTargetProvider *targetProvider)
+void QnActionManager::setTargetProvider(TargetProvider *targetProvider)
 {
     m_targetProvider = targetProvider;
     m_targetProviderGuard = dynamic_cast<QObject *>(targetProvider);
@@ -242,7 +242,7 @@ QMenu* QnActionManager::newMenu(
     return result;
 }
 
-QnActionTargetProvider* QnActionManager::targetProvider() const
+TargetProvider* QnActionManager::targetProvider() const
 {
     return m_targetProviderGuard ? m_targetProvider : NULL;
 }

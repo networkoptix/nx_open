@@ -3,7 +3,7 @@
 #include <QtWidgets/QAction>
 
 #include <ui/actions/action_manager.h>
-#include <ui/actions/action_target_provider.h>
+#include <nx/client/desktop/ui/actions/action_target_provider.h>
 
 #include <utils/common/delayed.h>
 
@@ -53,11 +53,11 @@ void QnWorkbenchSelectionWatcher::updateFromSelection() {
 
     m_selectionUpdatePending = false;
 
-    QnActionTargetProvider *provider = menu()->targetProvider();
+    auto provider = menu()->targetProvider();
     if(!provider)
         return;
 
-    nx::client::desktop::ui::action::ActionScope currentScope = provider->currentScope();
+    auto currentScope = provider->currentScope();
     if (!m_scope.testFlag(currentScope))
         currentScope = m_lastScope;
     else
