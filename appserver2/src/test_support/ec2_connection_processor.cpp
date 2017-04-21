@@ -64,28 +64,22 @@ void Ec2ConnectionProcessor::run()
     bool ready = true;
     bool isKeepAlive = false;
 
-    while (1)
+    int authenticateTries = 0;
+    while (authenticateTries < 3)
     {
         if (ready)
         {
             t.restart();
             parseRequest();
 
-            bool authenticated = false;
-            for (int i = 0; i < 3; ++i)
+            if (!authenticate())
             {
-                if (authenticate())
-                {
-                    authenticated = true;
-                    break;
-                }
-                else
-                {
-                    sendUnauthorizedResponse(nx_http::StatusCode::unauthorized, STATIC_UNAUTHORIZED_HTML);
-                }
+                sendUnauthorizedResponse(nx_http::StatusCode::unauthorized, STATIC_UNAUTHORIZED_HTML);
+                ready = readRequest();
+                ++authenticateTries;
+                continue;
             }
-            if (!authenticated)
-                break;
+            authenticateTries = 0;
 
             isKeepAlive = isConnectionCanBePersistent();
 

@@ -39,6 +39,7 @@ public:
         const ApiPeerData& remotePeer,
         const ApiPeerData& localPeer,
         const WebSocketPtr& webSocket);
+    ~P2pConnection();
 
     /** Peer that opens this connection */
     Direction direction() const;

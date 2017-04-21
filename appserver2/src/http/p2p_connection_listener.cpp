@@ -30,6 +30,10 @@ public:
         m_socket(std::move(socket))
     {
     }
+    ~ShareSocketDelegate()
+    {
+
+    }
 private:
     QSharedPointer<AbstractStreamSocket> m_socket;
 };
@@ -142,10 +146,11 @@ void P2pConnectionProcessor::run()
         return;
     }
 
+    auto keepAliveTimeout = commonModule->globalSettings()->connectionKeepAliveTimeout();
     d->response.headers.emplace(
         Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME,
         nx_http::header::KeepAlive(
-            commonModule->globalSettings()->connectionKeepAliveTimeout()).toString());
+            keepAliveTimeout).toString());
 
     d->response.headers.insert(nx_http::HttpHeader(
         Qn::EC2_GUID_HEADER_NAME,
@@ -173,6 +178,8 @@ void P2pConnectionProcessor::run()
     sendResponse(nx_http::StatusCode::upgrade, nx_http::StringType());
 
     std::unique_ptr<ShareSocketDelegate> socket(new ShareSocketDelegate(std::move(d->socket)));
+    socket->setRecvTimeout(std::chrono::milliseconds(keepAliveTimeout * 2).count());
+    socket->setSendTimeout(std::chrono::milliseconds(keepAliveTimeout * 2).count());
 
     WebSocketPtr webSocket(new websocket::Websocket(
         std::move(socket),

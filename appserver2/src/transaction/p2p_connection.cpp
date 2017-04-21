@@ -46,6 +46,7 @@ P2pConnection::P2pConnection(
     QUrl remotePeerUrl = _remotePeerUrl;
     m_remotePeer.id = remoteId;
 
+
     connect(
         m_httpClient.get(),
         &nx_http::AsyncHttpClient::responseReceived,
@@ -128,9 +129,18 @@ P2pConnection::P2pConnection(
     m_direction(Direction::incoming)
 {
     using namespace std::placeholders;
+
     m_webSocket->readSomeAsync(
         &m_readBuffer,
         std::bind(&P2pConnection::onNewMessageRead, this, _1, _2));
+}
+
+P2pConnection::~P2pConnection()
+{
+    if (m_webSocket)
+        m_webSocket->pleaseStopSync();
+    if (m_httpClient)
+        m_httpClient->pleaseStopSync();
 }
 
 void P2pConnection::fillAuthInfo(const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey)
@@ -202,6 +212,13 @@ void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client
         {
             cancelConnecting();
         }
+        return;
+    }
+
+    if (!client->response())
+    {
+        cancelConnecting();
+        return;
     }
 
     nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find(Qn::EC2_GUID_HEADER_NAME);
@@ -308,8 +325,14 @@ void P2pConnection::onHttpClientDone(const nx_http::AsyncHttpClientPtr& client)
     }
 
     auto msgBuffer = client->fetchMessageBodyBuffer();
+
+    auto socket = m_httpClient->takeSocket();
+    auto keepAliveTimeout = commonModule()->globalSettings()->connectionKeepAliveTimeout();
+    socket->setRecvTimeout(std::chrono::milliseconds(keepAliveTimeout * 2).count());
+    socket->setSendTimeout(std::chrono::milliseconds(keepAliveTimeout * 2).count());
+
     m_webSocket.reset(new nx::network::websocket::Websocket(
-        m_httpClient->takeSocket(),
+        std::move(socket),
         msgBuffer));
     m_httpClient.reset();
     setState(State::Connected);
@@ -379,9 +402,12 @@ void P2pConnection::sendMessage(const nx::Buffer& data)
 
 void P2pConnection::onMessageSent(SystemError::ErrorCode errorCode, size_t bytesSent)
 {
-    using namespace std::placeholders;
-
     QnMutexLocker lock(&m_mutex);
+
+    if (errorCode != SystemError::noError)
+        setState(State::Error);
+
+    using namespace std::placeholders;
     m_dataToSend.pop_front();
     if (!m_dataToSend.empty())
         m_webSocket->sendAsync(
@@ -391,9 +417,12 @@ void P2pConnection::onMessageSent(SystemError::ErrorCode errorCode, size_t bytes
 
 void P2pConnection::onNewMessageRead(SystemError::ErrorCode errorCode, size_t bytesRead)
 {
-    using namespace std::placeholders;
-
     QnMutexLocker lock(&m_mutex);
+
+    if (errorCode != SystemError::noError)
+        setState(State::Error);
+
+    using namespace std::placeholders;
     m_webSocket->readSomeAsync(
         &m_readBuffer,
         std::bind(&P2pConnection::onNewMessageRead, this, _1, _2));
