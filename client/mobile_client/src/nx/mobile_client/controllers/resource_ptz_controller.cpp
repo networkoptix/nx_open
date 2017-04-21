@@ -26,6 +26,8 @@ ResourcePtzController::ResourcePtzController(QObject* parent):
                 emit capabilitiesChanged();
             if (fields.testFlag(Qn::AuxilaryTraitsPtzField))
                 emit auxTraitsChanged();
+            if (fields.testFlag(Qn::PresetsPtzField))
+                emit presetsCountChanged();
         });
 
     connect(this, &base_type::baseControllerChanged, this,
@@ -67,6 +69,33 @@ Ptz::Traits ResourcePtzController::auxTraits() const
         result |= trait.standardTrait();
 
     return result;
+}
+
+int ResourcePtzController::presetsCount() const
+{
+    if (!getCapabilities().testFlag(Ptz::PresetsPtzCapability))
+        return 0;
+
+    QnPtzPresetList presets;
+    return getPresets(&presets) ? presets.size() : 0;
+}
+
+
+bool ResourcePtzController::setPreset(int index)
+{
+    if (!getCapabilities().testFlag(Ptz::PresetsPtzCapability)
+        || !qBetween(0, index, presetsCount()))
+    {
+        return false;
+    }
+
+    QnPtzPresetList presets;
+   //return getPresets(&presets) && activatePreset(presets.at(index).id, kDefaultSpeed);
+    if (!getPresets(&presets))
+        return false;
+    const auto preset = presets.at(index);
+    qDebug() << "_____________ " << preset.id << preset.name;
+    return activatePreset(preset.id, QnAbstractPtzController::MaxPtzSpeed);
 }
 
 bool ResourcePtzController::setAutoFocus()

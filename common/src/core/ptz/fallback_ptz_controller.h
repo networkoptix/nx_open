@@ -14,7 +14,7 @@ public:
     QnPtzControllerPtr mainController() const                                                                   { return m_mainController; }
     QnPtzControllerPtr fallbackController() const                                                               { return m_fallbackController; }
 
-    virtual Ptz::Capabilities getCapabilities() override                                                      { return baseController()->getCapabilities(); }
+    virtual Ptz::Capabilities getCapabilities() const override                                                      { return baseController()->getCapabilities(); }
 
     virtual bool continuousMove(const QVector3D &speed) override                                                { return baseController()->continuousMove(speed); }
     virtual bool continuousFocus(qreal speed) override                                                          { return baseController()->continuousFocus(speed); }
@@ -29,7 +29,7 @@ public:
     virtual bool updatePreset(const QnPtzPreset &preset) override                                               { return baseController()->updatePreset(preset); }
     virtual bool removePreset(const QString &presetId) override                                                 { return baseController()->removePreset(presetId); }
     virtual bool activatePreset(const QString &presetId, qreal speed) override                                  { return baseController()->activatePreset(presetId, speed); }
-    virtual bool getPresets(QnPtzPresetList *presets) override                                                  { return baseController()->getPresets(presets); }
+    virtual bool getPresets(QnPtzPresetList *presets) const override                                                  { return baseController()->getPresets(presets); }
 
     virtual bool createTour(const QnPtzTour &tour) override                                                     { return baseController()->createTour(tour); }
     virtual bool removeTour(const QString &tourId) override                                                     { return baseController()->removeTour(tourId); }

@@ -1,53 +1,53 @@
-#ifndef QN_ABSTRACT_PTZ_CONTROLLER_H
-#define QN_ABSTRACT_PTZ_CONTROLLER_H
+#pragma once
 
 #include <QtCore/QObject>
 
 #include <common/common_globals.h>
 
-#include <utils/common/connective.h>
-
+#include <core/ptz/ptz_fwd.h>
+#include <core/ptz/ptz_limits.h>
+#include <core/ptz/ptz_preset.h>
+#include <core/ptz/ptz_tour.h>
+#include <core/ptz/ptz_data.h>
+#include <core/ptz/ptz_math.h>
+#include <core/ptz/ptz_object.h>
+#include <core/ptz/ptz_auxilary_trait.h>
 #include <core/resource/resource_fwd.h>
-
-#include "ptz_fwd.h"
-#include "ptz_limits.h"
-#include "ptz_preset.h"
-#include "ptz_tour.h"
-#include "ptz_data.h"
-#include "ptz_math.h"
-#include "ptz_object.h"
-#include "ptz_auxilary_trait.h"
+#include <utils/common/connective.h>
 
 /**
  * A thread-safe blocking interface for accessing camera's PTZ functions.
  */
-class QnAbstractPtzController: public Connective<QObject> {
+class QnAbstractPtzController: public Connective<QObject>
+{
     Q_OBJECT
-public:
+    using base_type = Connective<QObject>;
 
+public:
     static const qreal MaxPtzSpeed;
 
     /**
-     * \param resource                  Resource that this PTZ controller belongs to.
+     * \param resource Resource that this PTZ controller belongs to.
      */
-    QnAbstractPtzController(const QnResourcePtr &resource);
+    QnAbstractPtzController(const QnResourcePtr& resource);
     virtual ~QnAbstractPtzController();
 
     /**
      * \returns                         Resource that this PTZ controller belongs to.
      */
-    const QnResourcePtr &resource() const { return m_resource; }
-
-    /**
-     * \returns                         PTZ capabilities that this controller implements.
-     */
-    virtual Ptz::Capabilities getCapabilities() = 0;
+    QnResourcePtr resource() const;
 
     /**
      * \param capabilities              Capabilities to check.
      * \returns                         Whether this controller implements the given capabilities.
      */
-    bool hasCapabilities(Ptz::Capabilities capabilities) { return (getCapabilities() & capabilities) == capabilities; }
+    bool hasCapabilities(Ptz::Capabilities capabilities);
+
+public slots:
+    /**
+     * \returns                         PTZ capabilities that this controller implements.
+     */
+    virtual Ptz::Capabilities getCapabilities() const = 0;
 
     /**
      * \param command                   Ptz command to check.
@@ -218,7 +218,7 @@ public:
      * \param[out] presets              PTZ presets.
      * \returns                         Whether the operation was successful.
      */
-    virtual bool getPresets(QnPtzPresetList *presets) = 0;
+    virtual bool getPresets(QnPtzPresetList *presets) const = 0;
 
     /**
      * Saves the given tour either as a new one, or replacing an existing one.
@@ -321,5 +321,3 @@ private:
 };
 
 bool deserialize(const QString &value, QnPtzObject *target);
-
-#endif // QN_ABSTRACT_PTZ_CONTROLLER_H

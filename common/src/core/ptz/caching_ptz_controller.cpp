@@ -44,7 +44,8 @@ bool QnCachingPtzController::extends(Ptz::Capabilities capabilities) {
         !(capabilities & Ptz::Capability::SynchronizedPtzCapability);
 }
 
-Ptz::Capabilities QnCachingPtzController::getCapabilities() {
+Ptz::Capabilities QnCachingPtzController::getCapabilities() const
+{
     Ptz::Capabilities capabilities = base_type::getCapabilities();
     return extends(capabilities) ? (capabilities | Ptz::Capability::SynchronizedPtzCapability) : capabilities;
 }
@@ -121,7 +122,8 @@ bool QnCachingPtzController::activatePreset(const QString &presetId, qreal speed
     return base_type::activatePreset(presetId, speed);
 }
 
-bool QnCachingPtzController::getPresets(QnPtzPresetList *presets) {
+bool QnCachingPtzController::getPresets(QnPtzPresetList *presets) const
+{
     if(!base_type::getPresets(presets))
         return false;
 

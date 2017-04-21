@@ -48,7 +48,8 @@ bool QnTourPtzController::extends(Ptz::Capabilities capabilities) {
         !(capabilities & Ptz::Capability::ToursPtzCapability);
 }
 
-Ptz::Capabilities QnTourPtzController::getCapabilities() {
+Ptz::Capabilities QnTourPtzController::getCapabilities() const
+{
     Ptz::Capabilities capabilities = base_type::getCapabilities();
     return extends(capabilities) ? (capabilities | Ptz::Capability::ToursPtzCapability) : capabilities;
 }

@@ -19,7 +19,8 @@ QnRemotePtzController::~QnRemotePtzController() {
     return;
 }
 
-Ptz::Capabilities QnRemotePtzController::getCapabilities() {
+Ptz::Capabilities QnRemotePtzController::getCapabilities() const
+{
     Ptz::Capabilities result = m_resource->getPtzCapabilities();
     if(!result)
         return Ptz::Capability::NoPtzCapabilities;
@@ -118,7 +119,8 @@ bool QnRemotePtzController::activatePreset(const QString &presetId, qreal speed)
     RUN_COMMAND(Qn::ActivatePresetPtzCommand, presetId, ptzActivatePresetAsync, presetId, speed);
 }
 
-bool QnRemotePtzController::getPresets(QnPtzPresetList *) {
+bool QnRemotePtzController::getPresets(QnPtzPresetList *) const
+{
     RUN_COMMAND(Qn::GetPresetsPtzCommand, QVariant(), ptzGetPresetsAsync);
 }
 

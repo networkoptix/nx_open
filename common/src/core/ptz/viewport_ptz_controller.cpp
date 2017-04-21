@@ -25,7 +25,8 @@ bool QnViewportPtzController::extends(Ptz::Capabilities capabilities) {
         && !capabilities.testFlag(Ptz::Capability::ViewportPtzCapability);
 }
 
-Ptz::Capabilities QnViewportPtzController::getCapabilities() {
+Ptz::Capabilities QnViewportPtzController::getCapabilities() const
+{
     Ptz::Capabilities capabilities = base_type::getCapabilities();
     return extends(capabilities) ? (capabilities | Ptz::Capability::ViewportPtzCapability) : capabilities;
 }

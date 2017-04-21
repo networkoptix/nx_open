@@ -2,6 +2,16 @@ import QtQuick 2.6
 
 Grid
 {
+    id: control
+
+    /**
+     * "direction" property specifies blah blah TODO: write comment
+     */
+    property point direction;
+    property bool supportDrag: false;
+    property bool supportSingleShot: false;
+
+    signal singleShot(point direction)
 
     columns: 3
     rows: 3
@@ -16,43 +26,23 @@ Grid
             width: 50
             height: 50
 
-            text:
-            {
-                switch(index)
-                {
-                    case 1:
-                        return "^"
-                    case 3:
-                        return "<"
-                    case 5:
-                        return ">"
-                    case 7:
-                        return "v"
-                }
-                return "";
-            }
-
-            onClicked:
-            {
-                switch(index)
-                {
-                    case 1:
-                        console.log("-- move up");
-                        break;
-                    case 3:
-                        console.log("-- move left");
-                        break;
-                    case 4:
-                        console.log("-- stop");
-                        break;
-                    case 5:
-                        console.log("-- move right")
-                        break;
-                    case 7:
-                        console.log("-- move down")
-                        break;
-                }
-            }
+            text: _private.kTempTexts[index]
+            onClicked: { singleShot(_private.kStaticDirections[index]) }
         }
+    }
+
+    QtObject
+    {
+        id: _private;
+
+        readonly property var kStaticDirections: [
+            Qt.point(-1, 1), Qt.point(0, 1), Qt.point(1, 1),
+            Qt.point(-1, 0), Qt.point(0, 0), Qt.point(1, 0),
+            Qt.point(-1, -1), Qt.point(0, -1), Qt.point(1, -1)];
+
+        readonly property var kTempTexts: [
+            "", "^", "",
+            "<", "o", ">",
+            "", "v", ""];
     }
 }

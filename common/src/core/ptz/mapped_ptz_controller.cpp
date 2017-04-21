@@ -14,7 +14,8 @@ bool QnMappedPtzController::extends(Ptz::Capabilities capabilities) {
         !(capabilities & Ptz::Capability::LogicalPositioningPtzCapability);
 }
 
-Ptz::Capabilities QnMappedPtzController::getCapabilities() {
+Ptz::Capabilities QnMappedPtzController::getCapabilities() const
+{
     Ptz::Capabilities capabilities = base_type::getCapabilities();
     return extends(capabilities) ? (capabilities | Ptz::Capability::LogicalPositioningPtzCapability) : capabilities;
 }

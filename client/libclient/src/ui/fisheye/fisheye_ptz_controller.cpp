@@ -225,7 +225,8 @@ void QnFisheyePtzController::tick(int deltaMSecs) {
 // -------------------------------------------------------------------------- //
 // QnAbstractPtzController implementation
 // -------------------------------------------------------------------------- //
-Ptz::Capabilities QnFisheyePtzController::getCapabilities() {
+Ptz::Capabilities QnFisheyePtzController::getCapabilities() const
+{
     return m_capabilities;
 }
 

@@ -16,7 +16,7 @@ public:
     QnRemotePtzController(const QnNetworkResourcePtr &resource);
     virtual ~QnRemotePtzController();
 
-    virtual Ptz::Capabilities getCapabilities() override;
+    virtual Ptz::Capabilities getCapabilities() const override;
 
     virtual bool continuousMove(const QVector3D &speed) override;
     virtual bool continuousFocus(qreal speed) override;
@@ -31,7 +31,7 @@ public:
     virtual bool updatePreset(const QnPtzPreset &preset) override;
     virtual bool removePreset(const QString &presetId) override;
     virtual bool activatePreset(const QString &presetId, qreal speed) override;
-    virtual bool getPresets(QnPtzPresetList *presets) override;
+    virtual bool getPresets(QnPtzPresetList *presets) const override;
 
     virtual bool createTour(const QnPtzTour &tour) override;
     virtual bool removeTour(const QString &tourId) override;

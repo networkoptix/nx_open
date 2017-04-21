@@ -21,7 +21,7 @@ public:
 
     static bool extends(Ptz::Capabilities capabilities);
 
-    virtual Ptz::Capabilities getCapabilities() override;
+    virtual Ptz::Capabilities getCapabilities() const override;
 
     virtual bool continuousMove(const QVector3D &speed) override;
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;

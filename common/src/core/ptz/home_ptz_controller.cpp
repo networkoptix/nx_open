@@ -38,7 +38,8 @@ bool QnHomePtzController::extends(Ptz::Capabilities capabilities) {
         !(capabilities & Ptz::Capability::HomePtzCapability);
 }
 
-Ptz::Capabilities QnHomePtzController::getCapabilities() {
+Ptz::Capabilities QnHomePtzController::getCapabilities() const
+{
     Ptz::Capabilities capabilities = base_type::getCapabilities();
     return extends(capabilities) ? (capabilities | Ptz::Capability::HomePtzCapability) : capabilities;
 }

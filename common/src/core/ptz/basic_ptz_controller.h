@@ -10,7 +10,7 @@ class QnBasicPtzController: public QnAbstractPtzController {
 public:
     QnBasicPtzController(const QnResourcePtr &resource): base_type(resource) {}
 
-    virtual Ptz::Capabilities getCapabilities() override                                  { return Ptz::Capability::NoPtzCapabilities; }
+    virtual Ptz::Capabilities getCapabilities() const override                                  { return Ptz::Capability::NoPtzCapabilities; }
 
     virtual bool continuousMove(const QVector3D &) override                                 { return false; }
     virtual bool continuousFocus(qreal) override                                            { return false; }
@@ -25,7 +25,7 @@ public:
     virtual bool updatePreset(const QnPtzPreset &) override                                 { return false; }
     virtual bool removePreset(const QString &) override                                     { return false; }
     virtual bool activatePreset(const QString &, qreal) override                            { return false; }
-    virtual bool getPresets(QnPtzPresetList *) override                                     { return false; }
+    virtual bool getPresets(QnPtzPresetList *) const override                                     { return false; }
 
     virtual bool createTour(const QnPtzTour &) override                                     { return false; }
     virtual bool removeTour(const QString &) override                                       { return false; }

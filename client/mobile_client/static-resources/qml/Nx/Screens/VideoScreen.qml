@@ -282,6 +282,8 @@ PageBase
                     Button
                     {
                         text: "focus +"
+                        onPressed: ptzController.continuousFocus(0.1)
+                        onReleased: ptzController.continuousFocus(0.0)
                     }
 
                     Button
@@ -294,12 +296,68 @@ PageBase
                     Button
                     {
                         text: "focus -"
+                        onPressed: ptzController.continuousFocus(-0.1)
+                        onReleased: ptzController.continuousFocus(0.0)
+                    }
+                }
+
+                Column
+                {
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 0
+
+                    Button
+                    {
+                        text: "zoom in"
+                        onPressed: ptzController.continuousMove(Qt.vector3d(0, 0, 0.1))
+                        onReleased: ptzController.continuousMove(Qt.vector3d(0, 0, 0))
+                    }
+
+                    Button
+                    {
+                        text: "zoom out"
+                        onPressed: ptzController.continuousMove(Qt.vector3d(0, 0, -0.1))
+                        onReleased: ptzController.continuousMove(Qt.vector3d(0, 0, 0))
                     }
                 }
 
                 Joystick
                 {
-                    anchors.verticalCenter: parent.verticalCenter;
+                    supportSingleShot: supportDrag;
+                    supportDrag:
+                    {
+                        var ptzCaps = ptzController.capabilities & Ptz.ContinuousPtzCapabilities
+                        return ptzCaps == Ptz.ContinuousPtzCapabilities
+                    }
+
+                    visible: enabled;
+                    enabled: supportDrag || supportSingleShot;
+
+                    anchors.verticalCenter: parent.verticalCenter
+                    onSingleShot:
+                    {
+                        console.log("-------------- moving:", direction)
+                        ptzController.continuousMove(Qt.vector3d(direction.x, direction.y, 0))
+                        ptzController.continuousMove(Qt.vector3d(0, 0, 0))
+                    }
+                }
+            }
+
+            PtzPresetsItem
+            {
+                id: presetsItem
+
+                visible: ptzController.presetsCount
+                presetsCount: ptzController.presetsCount
+
+                onCurrentPresetIndexChanged:
+                {
+                    console.log("--------------- set preset: ", currentPresetIndex)
+                    if (currentPresetIndex == -1)
+                        return;
+
+                    if (!ptzController.setPreset(currentPresetIndex))
+                        console.log("+++++++++++ can't set preset: ", currentPresetIndex);
                 }
             }
         }

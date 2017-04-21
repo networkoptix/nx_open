@@ -35,7 +35,7 @@ QnPtzControllerPtr QnProxyPtzController::baseController() const
     return m_controller;
 }
 
-Ptz::Capabilities QnProxyPtzController::getCapabilities()
+Ptz::Capabilities QnProxyPtzController::getCapabilities() const
 {
     return m_controller
         ? m_controller->getCapabilities()
@@ -129,7 +129,7 @@ bool QnProxyPtzController::activatePreset(const QString& presetId, qreal speed)
         : false;
 }
 
-bool QnProxyPtzController::QnProxyPtzController::getPresets(QnPtzPresetList* presets)
+bool QnProxyPtzController::QnProxyPtzController::getPresets(QnPtzPresetList* presets) const
 {
     return m_controller
         ? m_controller->getPresets(presets)

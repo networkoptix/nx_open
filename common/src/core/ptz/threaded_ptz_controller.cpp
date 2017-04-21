@@ -104,7 +104,8 @@ void QnThreadedPtzController::runCommand(Qn::PtzCommand command, const Functor &
     m_threadPool->start(runnable);
 }
 
-Ptz::Capabilities QnThreadedPtzController::getCapabilities() {
+Ptz::Capabilities QnThreadedPtzController::getCapabilities() const
+{
     Ptz::Capabilities capabilities = base_type::getCapabilities();
     return extends(capabilities) ? (capabilities | Ptz::Capability::AsynchronousPtzCapability) : capabilities;
 }
@@ -153,7 +154,8 @@ bool QnThreadedPtzController::activatePreset(const QString &presetId, qreal spee
     RUN_COMMAND(Qn::ActivatePresetPtzCommand, void *, presetId, activatePreset, presetId, speed);
 }
 
-bool QnThreadedPtzController::getPresets(QnPtzPresetList *) {
+bool QnThreadedPtzController::getPresets(QnPtzPresetList *) const
+{
     RUN_COMMAND(Qn::GetPresetsPtzCommand, QnPtzPresetList, result, getPresets, &result);
 }
 

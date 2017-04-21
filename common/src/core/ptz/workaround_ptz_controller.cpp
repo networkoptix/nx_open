@@ -37,7 +37,8 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
         m_overrideCapabilities = true;
 }
 
-Ptz::Capabilities QnWorkaroundPtzController::getCapabilities() {
+Ptz::Capabilities QnWorkaroundPtzController::getCapabilities() const
+{
     return m_overrideCapabilities ? m_capabilities : base_type::getCapabilities();
 }
 

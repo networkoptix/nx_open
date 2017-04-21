@@ -68,7 +68,7 @@ bool QnPresetPtzController::extends(Ptz::Capabilities capabilities)
             || capabilities.testFlag(Ptz::Capability::LogicalPositioningPtzCapability));
 }
 
-Ptz::Capabilities QnPresetPtzController::getCapabilities()
+Ptz::Capabilities QnPresetPtzController::getCapabilities() const
 {
     /* Note that this controller preserves both Ptz::Capability::AsynchronousPtzCapability and Ptz::Capability::SynchronizedPtzCapability. */
     Ptz::Capabilities capabilities = base_type::getCapabilities();
@@ -185,9 +185,10 @@ bool QnPresetPtzController::activatePreset(const QString &presetId, qreal speed)
     return doPresetsAction(activatePresetActionFunc, QnPtzPreset(presetId, QString()));
 }
 
-bool QnPresetPtzController::getPresets(QnPtzPresetList *presets)
+bool QnPresetPtzController::getPresets(QnPtzPresetList *presets) const
 {
-    auto activatePresetActionFunc =
+    NX_EXPECT(presets);
+    auto getPresetActionFunc =
         [this, presets](QnPtzPresetRecordHash& records, QnPtzPreset /*preset*/)
         {
             presets->clear();
@@ -199,9 +200,9 @@ bool QnPresetPtzController::getPresets(QnPtzPresetList *presets)
 
     {
         QnMutexLocker lock(&m_mutex);
-        return doPresetsAction(activatePresetActionFunc, QnPtzPreset());
+        const auto nonConstThis = const_cast<QnPresetPtzController*>(this);
+        return nonConstThis->doPresetsAction(getPresetActionFunc, QnPtzPreset());
     }
-
 }
 
 QString QnPresetPtzController::serializePresets(const QnPtzPresetRecordHash& presets)

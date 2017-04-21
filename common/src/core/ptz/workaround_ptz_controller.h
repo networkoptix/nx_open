@@ -12,7 +12,7 @@ public:
 
     static bool extends(Ptz::Capabilities capabilities);
 
-    virtual Ptz::Capabilities getCapabilities() override;
+    virtual Ptz::Capabilities getCapabilities() const override;
     virtual bool continuousMove(const QVector3D &speed) override;
 
 private:

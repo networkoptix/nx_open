@@ -1,20 +1,31 @@
 #include "abstract_ptz_controller.h"
 
-#include <cassert>
-
 #include <core/resource/resource.h>
 
 const qreal QnAbstractPtzController::MaxPtzSpeed = 1.0;
 
-QnAbstractPtzController::QnAbstractPtzController(const QnResourcePtr &resource):
+QnAbstractPtzController::QnAbstractPtzController(const QnResourcePtr& resource):
     m_resource(resource)
-{}
+{
+}
 
-QnAbstractPtzController::~QnAbstractPtzController() {
+QnAbstractPtzController::~QnAbstractPtzController()
+{
     return;
 }
 
-bool QnAbstractPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) {
+QnResourcePtr QnAbstractPtzController::resource() const
+{
+    return m_resource;
+}
+
+bool QnAbstractPtzController::hasCapabilities(Ptz::Capabilities capabilities)
+{
+    return (getCapabilities() & capabilities) == capabilities;
+}
+
+bool QnAbstractPtzController::getData(Qn::PtzDataFields query, QnPtzData *data)
+{
     data->query = query;
     data->fields = Qn::NoPtzFields;
     data->capabilities = getCapabilities();
