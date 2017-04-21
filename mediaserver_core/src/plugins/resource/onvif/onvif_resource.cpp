@@ -3321,11 +3321,10 @@ bool QnPlOnvifResource::NotificationMessageParseHandler::startElement(
                 return false;   //missing required attribute
 
             utcTime = QDateTime::fromString( atts.value(utcTimeIndex), Qt::ISODate );
-            if( utcTime.timeSpec() != Qt::UTC )
-            {
+            if( utcTime.timeSpec() == Qt::LocalTime )
                 utcTime.setTimeZone( timeZone );
+            if( utcTime.timeSpec() != Qt::UTC )
                 utcTime = utcTime.toUTC();
-            }
 
             propertyOperation = atts.value( lit("PropertyOperation") );
             m_parseStateStack.push( readingMessage );
