@@ -164,11 +164,11 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
 
     //TODO #ak move following to stree xml
     nx_http::AuthMethodRestrictionList authRestrictionList;
-    authRestrictionList.allow(http_handler::GetCloudModulesXml::kHandlerPath, AuthMethod::noAuth);
-    authRestrictionList.allow(http_handler::Ping::kHandlerPath, AuthMethod::noAuth);
-    authRestrictionList.allow(kAccountRegisterPath, AuthMethod::noAuth);
-    authRestrictionList.allow(kAccountActivatePath, AuthMethod::noAuth);
-    authRestrictionList.allow(kAccountReactivatePath, AuthMethod::noAuth);
+    authRestrictionList.allow(http_handler::GetCloudModulesXml::kHandlerPath, nx_http::AuthMethod::noAuth);
+    authRestrictionList.allow(http_handler::Ping::kHandlerPath, nx_http::AuthMethod::noAuth);
+    authRestrictionList.allow(kAccountRegisterPath, nx_http::AuthMethod::noAuth);
+    authRestrictionList.allow(kAccountActivatePath, nx_http::AuthMethod::noAuth);
+    authRestrictionList.allow(kAccountReactivatePath, nx_http::AuthMethod::noAuth);
 
     std::vector<AbstractAuthenticationDataProvider*> authDataProviders;
     authDataProviders.push_back(&accountManager);

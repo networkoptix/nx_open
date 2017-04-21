@@ -55,7 +55,7 @@ public:
         nx_http::Response& response,
         bool isProxy = false,
         Qn::UserAccessData* accessRights = 0,
-        AuthMethod::Value* usedAuthMethod = 0);
+        nx_http::AuthMethod::Value* usedAuthMethod = 0);
 
     nx_http::AuthMethodRestrictionList* restrictionList();
 

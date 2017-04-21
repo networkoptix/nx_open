@@ -15,8 +15,9 @@
 
 #include "auth_types.h"
 
-
-class nx_http::AuthMethodRestrictionList;
+namespace nx_http {
+class AuthMethodRestrictionList;
+} // namespace nx_http
 
 namespace nx {
 namespace cdb {

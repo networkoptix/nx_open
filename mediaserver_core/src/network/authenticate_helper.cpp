@@ -89,12 +89,12 @@ Qn::AuthResult QnAuthHelper::authenticate(
     nx_http::Response& response,
     bool isProxy,
     Qn::UserAccessData* accessRights,
-    AuthMethod::Value* usedAuthMethod)
+    nx_http::AuthMethod::Value* usedAuthMethod)
 {
     if (accessRights)
         *accessRights = Qn::UserAccessData();
     if (usedAuthMethod)
-        *usedAuthMethod = AuthMethod::noAuth;
+        *usedAuthMethod = nx_http::AuthMethod::noAuth;
 
     const QUrlQuery urlQuery(request.requestLine.url.query());
 
@@ -102,7 +102,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
     if (allowedAuthMethods == 0)
         return Qn::Auth_Forbidden;   //NOTE assert?
 
-    if (allowedAuthMethods & AuthMethod::noAuth)
+    if (allowedAuthMethods & nx_http::AuthMethod::noAuth)
         return Qn::Auth_OK;
 
     {
@@ -114,7 +114,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
                 it->second.path == request.requestLine.url.path())
             {
                 if (usedAuthMethod)
-                    *usedAuthMethod = AuthMethod::tempUrlQueryParam;
+                    *usedAuthMethod = nx_http::AuthMethod::tempUrlQueryParam;
                 if (accessRights)
                     *accessRights = it->second.accessRights;
                 return Qn::Auth_OK;
@@ -122,12 +122,12 @@ Qn::AuthResult QnAuthHelper::authenticate(
         }
     }
 
-    if (allowedAuthMethods & AuthMethod::videowall)
+    if (allowedAuthMethods & nx_http::AuthMethod::videowall)
     {
         const nx_http::StringType& videoWall_auth = nx_http::getHeaderValue(request.headers, Qn::VIDEOWALL_GUID_HEADER_NAME);
         if (!videoWall_auth.isEmpty()) {
             if (usedAuthMethod)
-                *usedAuthMethod = AuthMethod::videowall;
+                *usedAuthMethod = nx_http::AuthMethod::videowall;
             if (resourcePool()->getResourceById<QnVideoWallResource>(QnUuid(videoWall_auth)).isNull())
                 return Qn::Auth_Forbidden;
             else
@@ -139,7 +139,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
         }
     }
 
-    if (allowedAuthMethods & AuthMethod::urlQueryParam)
+    if (allowedAuthMethods & nx_http::AuthMethod::urlQueryParam)
     {
         const QByteArray& authQueryParam = urlQuery.queryItemValue(
             isProxy ? lit("proxy_auth") : QString::fromLatin1(Qn::URL_QUERY_AUTH_KEY_NAME)).toLatin1();
@@ -156,24 +156,24 @@ Qn::AuthResult QnAuthHelper::authenticate(
             if (authResult == Qn::Auth_OK)
             {
                 if (usedAuthMethod)
-                    *usedAuthMethod = AuthMethod::urlQueryParam;
+                    *usedAuthMethod = nx_http::AuthMethod::urlQueryParam;
                 return Qn::Auth_OK;
             }
         }
     }
 
-    if (allowedAuthMethods & AuthMethod::cookie)
+    if (allowedAuthMethods & nx_http::AuthMethod::cookie)
     {
         const QString& cookie = QLatin1String(nx_http::getHeaderValue(request.headers, "Cookie"));
         int customAuthInfoPos = cookie.indexOf(Qn::URL_QUERY_AUTH_KEY_NAME);
         if (customAuthInfoPos >= 0) {
             if (usedAuthMethod)
-                *usedAuthMethod = AuthMethod::cookie;
+                *usedAuthMethod = nx_http::AuthMethod::cookie;
             return doCookieAuthorization("GET", cookie.toUtf8(), response, accessRights);
         }
     }
 
-    if (allowedAuthMethods & AuthMethod::http)
+    if (allowedAuthMethods & nx_http::AuthMethod::http)
     {
         const nx_http::StringType& authorization = isProxy
             ? nx_http::getHeaderValue(request.headers, "Proxy-Authorization")
@@ -184,7 +184,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
         {
             Qn::AuthResult authResult = Qn::Auth_WrongDigest;
             if (usedAuthMethod)
-                *usedAuthMethod = AuthMethod::httpDigest;
+                *usedAuthMethod = nx_http::AuthMethod::httpDigest;
             QnUserResourcePtr userResource;
             if (!nxUserName.isEmpty())
             {
@@ -268,7 +268,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
         if (authorizationHeader.authScheme == nx_http::header::AuthScheme::digest)
         {
             if (usedAuthMethod)
-                *usedAuthMethod = AuthMethod::httpDigest;
+                *usedAuthMethod = nx_http::AuthMethod::httpDigest;
 
             authResult = doDigestAuth(
                 request.requestLine.method, authorizationHeader, response, isProxy, accessRights);
@@ -276,12 +276,12 @@ Qn::AuthResult QnAuthHelper::authenticate(
         else if (authorizationHeader.authScheme == nx_http::header::AuthScheme::basic)
         {
             if (usedAuthMethod)
-                *usedAuthMethod = AuthMethod::httpBasic;
+                *usedAuthMethod = nx_http::AuthMethod::httpBasic;
             authResult = doBasicAuth(request.requestLine.method, authorizationHeader, response, accessRights);
         }
         else {
             if (usedAuthMethod)
-                *usedAuthMethod = AuthMethod::httpBasic;
+                *usedAuthMethod = nx_http::AuthMethod::httpBasic;
             authResult = Qn::Auth_Forbidden;
         }
 
