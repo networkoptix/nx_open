@@ -38,7 +38,7 @@ QVariant QnLayoutTourItemsModel::data(const QModelIndex& index, int role) const
     if (index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
-    const bool hasItem = qBetween(0, index.row(), (int)m_items.size());
+    const bool hasItem = qBetween(0, index.row(), (int) m_items.size());
     NX_EXPECT(hasItem);
     if (!hasItem)
         return QVariant();
@@ -173,7 +173,7 @@ bool QnLayoutTourItemsModel::setData(const QModelIndex &index, const QVariant &v
     if (value.toInt() <= 0)
         return false;
 
-    const bool hasItem = qBetween(0, index.row(), (int)m_items.size());
+    const bool hasItem = qBetween(0, index.row(), (int) m_items.size());
     NX_EXPECT(hasItem);
     if (!hasItem)
         return false;
@@ -191,7 +191,7 @@ void QnLayoutTourItemsModel::reset(const QnLayoutTourItemList& items)
 
 void QnLayoutTourItemsModel::addItem(const QnLayoutTourItem& item)
 {
-    const int count = (int)m_items.size();
+    const int count = (int) m_items.size();
     ScopedInsertRows guard(this, QModelIndex(), count, count);
     m_items.push_back(item);
 }

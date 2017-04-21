@@ -1,5 +1,8 @@
 #include "listening_peer_pool.h"
 
+#include <nx/network/socket_common.h>
+#include <nx/utils/std/algorithm.h>
+
 namespace nx {
 namespace cloud {
 namespace relay {
@@ -26,9 +29,11 @@ ListeningPeerPool::~ListeningPeerPool()
 }
 
 void ListeningPeerPool::addConnection(
-    std::string peerName,
+    const std::string& peerNameOriginal,
     std::unique_ptr<AbstractStreamSocket> connection)
 {
+    auto peerName = utils::reverseWords(peerNameOriginal, ".");
+
     QnMutexLocker lock(&m_mutex);
     ConnectionContext connectionContext;
     connectionContext.connection = std::move(connection);
@@ -38,24 +43,40 @@ void ListeningPeerPool::addConnection(
 }
 
 std::size_t ListeningPeerPool::getConnectionCountByPeerName(
-    const std::string& peerName) const
+    const std::string& peerNameOriginal) const
 {
+    auto peerName = utils::reverseWords(peerNameOriginal, ".");
+
     QnMutexLocker lock(&m_mutex);
-    return m_peerNameToConnection.count(peerName);
+    return utils::countByPrefix(m_peerNameToConnection, peerName);
 }
 
-bool ListeningPeerPool::isPeerListening(const std::string& peerName) const
+bool ListeningPeerPool::isPeerListening(const std::string& peerNameOriginal) const
 {
-    return getConnectionCountByPeerName(peerName) > 0;
+    return getConnectionCountByPeerName(peerNameOriginal) > 0;
+}
+
+std::string ListeningPeerPool::findListeningPeerByDomain(
+    const std::string& domainName) const
+{
+    auto domainNameReversed = utils::reverseWords(domainName, ".");
+
+    QnMutexLocker lock(&m_mutex);
+    auto it = utils::findAnyByPrefix(m_peerNameToConnection, domainNameReversed);
+    if (it == m_peerNameToConnection.end())
+        return std::string();
+    return utils::reverseWords(it->first, ".");
 }
 
 void ListeningPeerPool::takeIdleConnection(
-    const std::string& peerName,
+    const std::string& peerNameOriginal,
     ListeningPeerPool::TakeIdleConnection completionHandler)
 {
     QnMutexLocker lock(&m_mutex);
 
-    auto peerConnectionIter = m_peerNameToConnection.find(peerName);
+    auto peerName = utils::reverseWords(peerNameOriginal, ".");
+
+    auto peerConnectionIter = utils::findAnyByPrefix(m_peerNameToConnection, peerName);
     if (peerConnectionIter == m_peerNameToConnection.end())
     {
         m_unsuccessfulResultReporter.post(
@@ -123,7 +144,7 @@ void ListeningPeerPool::onConnectionReadCompletion(
         return closeConnection(peerName, connectionContext, sysErrorCode);
     }
 
-    // TODO: What to do if some data has been received?
+    // TODO: What if some data has been received?
 
     monitoringConnectionForClosure(peerName, connectionContext);
 }
@@ -138,7 +159,7 @@ void ListeningPeerPool::closeConnection(
     if (m_terminated)
         return;
 
-    auto peerConnectionRange = m_peerNameToConnection.equal_range(peerName);
+    auto peerConnectionRange = utils::equalRangeByPrefix(m_peerNameToConnection, peerName);
     for (auto connectionIter = peerConnectionRange.first;
         connectionIter != peerConnectionRange.second;
         ++connectionIter)

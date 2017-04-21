@@ -541,6 +541,12 @@ void QnCameraScheduleWidget::submitToResources()
         if (minDays != kRecordedDaysDontChange)
             camera->setMinDays(minDays);
 
+        if (canChangeRecording)
+        {
+            camera->setLicenseUsed(enableRecording);
+            camera->setScheduleDisabled(!enableRecording);
+        }
+
         if (camera->isDtsBased())
             continue;
 
@@ -551,12 +557,6 @@ void QnCameraScheduleWidget::submitToResources()
             updateRecordThresholds(scheduleTasks);
         }
         camera->setScheduleTasks(scheduleTasks);
-
-        if (canChangeRecording)
-        {
-            camera->setLicenseUsed(enableRecording);
-            camera->setScheduleDisabled(!enableRecording);
-        }
     }
 
     if (!canChangeRecording)

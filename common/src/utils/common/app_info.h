@@ -55,6 +55,9 @@ public:
     static Q_INVOKABLE QString supportUrl();
     static Q_INVOKABLE QString supportPhone();
 
+    /** Proxy for QML usage. */
+    static Q_INVOKABLE QString cloudName();
+
     static Q_INVOKABLE QString updateGeneratorUrl();
 
     static Q_INVOKABLE int freeLicenseCount();

@@ -22,7 +22,7 @@ int main(int argc, char** argv)
         [](const nx::utils::ArgumentParser& args)
         {
             if (const auto value = args.get("tmp"))
-                nx::cdb::CdbFunctionalTest::setTemporaryDirectoryPath(*value);
+                nx::utils::TestOptions::setTemporaryDirectoryPath(*value);
 
             nx::db::ConnectionOptions connectionOptions;
             QString driverName;

@@ -1,5 +1,6 @@
 #include "app_info.h"
 
+#include <nx/network/app_info.h>
 #include <nx/utils/app_info.h>
 
 QnAppInfo::QnAppInfo(QObject* parent):
@@ -29,6 +30,11 @@ QString QnAppInfo::applicationPlatform()
 QString QnAppInfo::applicationArch()
 {
     return nx::utils::AppInfo::applicationArch();
+}
+
+QString QnAppInfo::cloudName()
+{
+    return nx::network::AppInfo::cloudName();
 }
 
 bool QnAppInfo::isArm()
