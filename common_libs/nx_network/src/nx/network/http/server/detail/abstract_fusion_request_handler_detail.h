@@ -1,10 +1,4 @@
-/**********************************************************
-* Aug 13, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_ABSTRACT_FUSION_REQUEST_HANDLER_DETAIL_H
-#define NX_ABSTRACT_FUSION_REQUEST_HANDLER_DETAIL_H
+#pragma once
 
 #include "../abstract_http_request_handler.h"
 
@@ -20,18 +14,15 @@
 #include "../fusion_request_result.h"
 #include "../../buffer_source.h"
 
-
 namespace nx_http {
 namespace detail {
 
-class BaseFusionRequestHandler
-:
+class BaseFusionRequestHandler:
     public AbstractHttpRequestHandler
 {
 public:
-    BaseFusionRequestHandler()
-    :
-        m_outputDataFormat( Qn::JsonFormat )  //by default, using json
+    BaseFusionRequestHandler():
+        m_outputDataFormat(Qn::JsonFormat)
     {
     }
 
@@ -52,13 +43,15 @@ protected:
             std::move(outputMsgBody));
     }
 
-    //!Call this method after request has been processed
+    /**
+     * Call this method after request has been processed.
+     */
     void requestCompleted(
         nx_http::StatusCode::Value statusCode,
         std::unique_ptr<nx_http::AbstractMsgBodySource> outputMsgBody =
-            std::unique_ptr<nx_http::AbstractMsgBodySource>() )
+        std::unique_ptr<nx_http::AbstractMsgBodySource>())
     {
-        auto completionHandler = std::move( m_completionHandler );
+        auto completionHandler = std::move(m_completionHandler);
         completionHandler(
             nx_http::RequestResult(
                 statusCode,
@@ -67,15 +60,15 @@ protected:
 
     bool getDataFormat(
         const nx_http::Request& request,
-        Qn::SerializationFormat* const inputDataFormat = nullptr )
+        Qn::SerializationFormat* const inputDataFormat = nullptr)
     {
-        //input/output formats can differ. E.g., GET request can specify input data in url query only
-        //TODO #ak fetching m_outputDataFormat from url query
+        // input/output formats can differ. E.g., GET request can specify input data in url query only.
+        // TODO #ak: Fetching m_outputDataFormat from url query.
         //if( no format in query )
         //{
-        if( request.requestLine.method == nx_http::Method::GET )
+        if (request.requestLine.method == nx_http::Method::GET)
         {
-            if( inputDataFormat )
+            if (inputDataFormat)
             {
                 //TODO #ak fetching format from Accept header
                 *inputDataFormat = Qn::UrlQueryFormat;
@@ -83,14 +76,14 @@ protected:
         }
         else    //POST, PUT
         {
-            const auto contentTypeIter = request.headers.find( "Content-Type" );
-            if( contentTypeIter != request.headers.cend() )
+            const auto contentTypeIter = request.headers.find("Content-Type");
+            if (contentTypeIter != request.headers.cend())
             {
-                //TODO #ak add Content-Type header parser to nx_http
-                const QByteArray dataFormatStr = contentTypeIter->second.split( ';' )[0];
-                m_outputDataFormat = Qn::serializationFormatFromHttpContentType( dataFormatStr );
+                // TODO: #ak add Content-Type header parser to nx_http.
+                const QByteArray dataFormatStr = contentTypeIter->second.split(';')[0];
+                m_outputDataFormat = Qn::serializationFormatFromHttpContentType(dataFormatStr);
             }
-            if( inputDataFormat )
+            if (inputDataFormat)
                 *inputDataFormat = m_outputDataFormat;
         }
         //}
@@ -102,8 +95,8 @@ protected:
                 QnLexical::serialized(FusionRequestErrorDetail::notAcceptable),
                 FusionRequestErrorDetail::notAcceptable,
                 lit("Input format %1 not supported. Input data attributes can be specified in url or by %2 POST message body").
-                    arg(Qn::serializationFormatToHttpContentType(*inputDataFormat)).
-                    arg(Qn::serializationFormatToHttpContentType(Qn::JsonFormat)));
+                arg(Qn::serializationFormatToHttpContentType(*inputDataFormat)).
+                arg(Qn::serializationFormatToHttpContentType(Qn::JsonFormat)));
             requestCompleted(std::move(result));
             return false;
         }
@@ -115,8 +108,8 @@ protected:
                 QnLexical::serialized(FusionRequestErrorDetail::notAcceptable),
                 FusionRequestErrorDetail::notAcceptable,
                 lit("Output format %1 not supported. Only %2 is supported").
-                    arg(Qn::serializationFormatToHttpContentType(m_outputDataFormat)).
-                    arg(Qn::serializationFormatToHttpContentType(Qn::JsonFormat)));
+                arg(Qn::serializationFormatToHttpContentType(m_outputDataFormat)).
+                arg(Qn::serializationFormatToHttpContentType(Qn::JsonFormat)));
             requestCompleted(std::move(result));
             return false;
         }
@@ -128,19 +121,19 @@ protected:
     bool parseAnyFusionFormat(
         Qn::SerializationFormat dataFormat,
         const nx::Buffer& data,
-        T* const target )
+        T* const target)
     {
         bool success = false;
-        switch( dataFormat )
+        switch (dataFormat)
         {
             case Qn::UrlQueryFormat:
                 return loadFromUrlQuery(
                     QUrlQuery(QUrl::fromPercentEncoding(data)),
-                    target );
+                    target);
                 return true;
 
             case Qn::JsonFormat:
-                *target = QJson::deserialized<T>( data, T(), &success );
+                *target = QJson::deserialized<T>(data, T(), &success);
                 return success;
 
                 //case Qn::UbjsonFormat:
@@ -156,16 +149,16 @@ protected:
     bool serializeToAnyFusionFormat(
         const T& data,
         Qn::SerializationFormat dataFormat,
-        nx::Buffer* const output )
+        nx::Buffer* const output)
     {
-        switch( dataFormat )
+        switch (dataFormat)
         {
             case Qn::UrlQueryFormat:
-                NX_ASSERT( false );
+                NX_ASSERT(false);
                 return true;
 
             case Qn::JsonFormat:
-                *output = QJson::serialized( data );
+                *output = QJson::serialized(data);
                 return true;
 
                 //case Qn::UbjsonFormat:
@@ -177,7 +170,7 @@ protected:
         }
     }
 
-    bool isFormatSupported( Qn::SerializationFormat dataFormat ) const
+    bool isFormatSupported(Qn::SerializationFormat dataFormat) const
     {
         return dataFormat == Qn::JsonFormat || dataFormat == Qn::UrlQueryFormat;
     }
@@ -185,24 +178,23 @@ protected:
 
 
 template<typename Output>
-class BaseFusionRequestHandlerWithOutput
-:
+class BaseFusionRequestHandlerWithOutput:
     public BaseFusionRequestHandler
 {
 public:
-    //!Call this method after request has been processed
-    /*!
-        \note This overload is for requests returning something
-    */
+    /**
+     * Call this method after request has been processed.
+     * @note This overload is for requests returning something.
+     */
     void requestCompleted(
         FusionRequestResult result,
-        Output outputData = Output() )
+        Output outputData = Output())
     {
         std::unique_ptr<nx_http::AbstractMsgBodySource> outputMsgBody;
 
         if (result.errorClass == FusionRequestErrorClass::noError)
         {
-            //serializing outputData
+            // Serializing outputData.
             nx::Buffer serializedData;
             if (serializeToAnyFusionFormat(outputData, m_outputDataFormat, &serializedData))
             {
@@ -219,9 +211,11 @@ public:
         }
 
         if (result.errorClass != FusionRequestErrorClass::noError)
+        {
             outputMsgBody = std::make_unique<nx_http::BufferSource>(
                 Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
                 QJson::serialized(result));
+        }
 
         BaseFusionRequestHandler::requestCompleted(
             result.httpStatusCode(),
@@ -231,52 +225,49 @@ public:
 
 
 template<>
-class BaseFusionRequestHandlerWithOutput<void>
-:
+class BaseFusionRequestHandlerWithOutput<void>:
     public BaseFusionRequestHandler
 {
 public:
 };
 
-/*!
-    \note for requests that set Input to non-void
-*/
+/**
+ * @note for requests that set Input to non-void.
+ */
 template<typename Input, typename Output, typename Descendant>
-class BaseFusionRequestHandlerWithInput
-:
+class BaseFusionRequestHandlerWithInput:
     public BaseFusionRequestHandlerWithOutput<Output>
 {
 private:
-    //!Implementation of \a AbstractHttpRequestHandler::processRequest
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const /*response*/,
-        RequestProcessedHandler completionHandler ) override
+        RequestProcessedHandler completionHandler) override
     {
-        this->m_completionHandler = std::move( completionHandler );
+        this->m_completionHandler = std::move(completionHandler);
         this->m_requestMethod = request.requestLine.method;
 
         Qn::SerializationFormat inputDataFormat = this->m_outputDataFormat;
-        if( !this->getDataFormat( request, &inputDataFormat ) )
+        if (!this->getDataFormat(request, &inputDataFormat))
             return;
 
-        //parse request message body using fusion
+        // Parsing request message body using fusion.
         Input inputData;
-        if( !this->template parseAnyFusionFormat<Input>(
+        if (!this->template parseAnyFusionFormat<Input>(
                 inputDataFormat,
                 request.requestLine.method == nx_http::Method::GET
                     ? request.requestLine.url.query().toUtf8()
                     : request.messageBody,
-                &inputData ) )
+                &inputData))
         {
             FusionRequestResult result(
                 FusionRequestErrorClass::badRequest,
                 QnLexical::serialized(FusionRequestErrorDetail::deserializationError),
                 FusionRequestErrorDetail::deserializationError,
                 lit("Error deserializing input of type %1").
-                    arg(Qn::serializationFormatToHttpContentType(inputDataFormat)));
+                arg(Qn::serializationFormatToHttpContentType(inputDataFormat)));
             this->requestCompleted(std::move(result));
             return;
         }
@@ -284,12 +275,10 @@ private:
         static_cast<Descendant*>(this)->processRequest(
             connection,
             request,
-            std::move( authInfo ),
-            std::move( inputData ) );
+            std::move(authInfo),
+            std::move(inputData));
     }
 };
 
-}   //detail
-}   //nx_http
-
-#endif //NX_ABSTRACT_FUSION_REQUEST_HANDLER_DETAIL_H
+} // namespace detail
+} // namespace nx_http
