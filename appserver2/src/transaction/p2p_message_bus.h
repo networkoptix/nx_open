@@ -57,6 +57,7 @@ public:
 private:
     QByteArray serializePeersMessage();
     QByteArray serializeResolvePeerNumberRequest(std::vector<PeerNumberType> peers);
+    QByteArray serializeResolvePeerNumberResponse(std::vector<PeerNumberType> peers);
 private:
     void doPeriodicTasks();
     void processTemporaryOutgoingConnections();
@@ -67,6 +68,9 @@ private:
     void deserializeAlivePeersMessage(
         const P2pConnectionPtr& connection,
         const QByteArray& data);
+    void deserializeResolvePeerNumberResponse(
+        const P2pConnectionPtr& connection,
+        const QByteArray& response);
 
     ApiPersistentIdData fromShortPeerNumber(const QnUuid& owner, const PeerNumberType& id);
 

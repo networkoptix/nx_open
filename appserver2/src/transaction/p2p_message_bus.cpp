@@ -7,6 +7,16 @@
 
 namespace ec2 {
 
+void putBytes(BitStreamWriter& writer, const QByteArray& data)
+{
+    writer.putBytes(data.size(), data.data());
+}
+
+void getBytes(BitStreamReader& reader, const QByteArray& data)
+{
+    reader.getBytes(data.size(), data.data());
+}
+
 // PeerInfo
 
 quint32 P2pMessageBus::PeerInfo::distanceVia(const ApiPersistentIdData& via) const
@@ -199,7 +209,7 @@ void serializeCompressPeerNumber(BitStreamWriter& writer, PeerNumberType peerNum
     peerNumber &= mask;
     for (const auto& bits: bitsGroups)
     {
-        writer.putBits(peerNumber, bits);
+        writer.putBits(bits, peerNumber);
         peerNumber >>= bits;
         if (peerNumber == 0)
         {
@@ -300,7 +310,7 @@ void P2pMessageBus::deserializeAlivePeersMessage(
     BitStreamReader reader((const quint8*) data.data(), data.size());
     try
     {
-        while (reader.hasMoreBits())
+        while (reader.bitsLeft() >= 8)
         {
             PeerNumberType peerNumber = deserializeCompressPeerNumber(reader);
             ApiPersistentIdData peerId = fromShortPeerNumber(connection->remotePeer().id, peerNumber);
@@ -433,6 +443,18 @@ void P2pMessageBus::at_gotMessage(const QSharedPointer<P2pConnection>& connectio
 
 bool P2pMessageBus::handleResolvePeerNumberRequest(const P2pConnectionPtr& connection, const QByteArray& data)
 {
+    std::vector<PeerNumberType> request;
+    BitStreamReader reader((const quint8*)data.data(), data.size());
+    try
+    {
+        while (reader.bitsLeft() >= 8)
+            request.push_back(deserializeCompressPeerNumber(reader));
+    }
+    catch (...)
+    {
+        return false; //< invalid message
+    }
+    connection->sendMessage(serializeResolvePeerNumberResponse(request));
     return true;
 }
 
@@ -449,8 +471,54 @@ QByteArray P2pMessageBus::serializeResolvePeerNumberRequest(std::vector<PeerNumb
     writer.setBuffer((quint8*) result.data(), result.size());
     writer.putBits(8, (int) MessageType::resolvePeerNumberRequest);
     for (const auto& peer: peers)
-        writer.putBits(16, peer);
+        serializeCompressPeerNumber(writer, peer);
+    writer.flushBits();
+    result.truncate(writer.getBytesCount());
     return result;
+}
+
+QByteArray P2pMessageBus::serializeResolvePeerNumberResponse(std::vector<PeerNumberType> peers)
+{
+    QByteArray result;
+    result.resize(peers.size() * (16 * 2 + 2) + 1); // two guid + uncompressed PeerNumber per record
+    BitStreamWriter writer;
+    writer.setBuffer((quint8*)result.data(), result.size());
+    writer.putBits(8, (int)MessageType::resolvePeerNumberResponse);
+    for (const auto& peer : peers)
+    {
+        writer.putBits(16, peer);
+        ApiPersistentIdData fullId = m_localShortPeerInfo.decode(peer);
+        putBytes(writer, fullId.id.toRfc4122());
+        putBytes(writer, fullId.persistentId.toRfc4122());
+    }
+    writer.flushBits();
+    result.truncate(writer.getBytesCount());
+    return result;
+}
+
+ void P2pMessageBus::deserializeResolvePeerNumberResponse(
+     const P2pConnectionPtr& connection,
+     const QByteArray& response)
+{
+     BitStreamReader reader((const quint8*) response.data(), response.size());
+     try
+     {
+         while (reader.bitsLeft() > 0)
+         {
+             QByteArray tmpBuffer(16);
+             PeerNumberType shortPeerNumber = reader.getBits(16);
+             ApiPersistentIdData fullId;
+             getBytes(reader, tmpBuffer);
+             fullId.id = QnUuid::fromRfc4122(tmpBuffer);
+             getBytes(reader, tmpBuffer);
+             fullId.persistentId = QnUuid::fromRfc4122(tmpBuffer);
+
+             connection->encode(fullId, shortPeerNumber);
+         }
+     }
+     catch (...)
+     {
+     }
 }
 
 bool P2pMessageBus::handleAlivePeers(const P2pConnectionPtr& connection, const QByteArray& data)
@@ -459,7 +527,7 @@ bool P2pMessageBus::handleAlivePeers(const P2pConnectionPtr& connection, const Q
     BitStreamReader reader((const quint8*)data.data(), data.size());
     try
     {
-        while (reader.hasMoreBits())
+        while (reader.bitsLeft() >= 8)
         {
             PeerNumberType peerNumber = deserializeCompressPeerNumber(reader);
             bool isOnline = reader.getBit();

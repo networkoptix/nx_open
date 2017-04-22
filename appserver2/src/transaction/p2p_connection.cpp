@@ -331,7 +331,7 @@ void P2pConnection::onHttpClientDone(const nx_http::AsyncHttpClientPtr& client)
     auto msgBuffer = client->fetchMessageBodyBuffer();
 
     auto socket = m_httpClient->takeSocket();
-    auto keepAliveTimeout = commonModule()->globalSettings()->connectionKeepAliveTimeout();
+    auto keepAliveTimeout = commonModule()->globalSettings()->connectionKeepAliveTimeout() * 1000;
     socket->setRecvTimeout(std::chrono::milliseconds(keepAliveTimeout * 2).count());
     socket->setSendTimeout(std::chrono::milliseconds(keepAliveTimeout * 2).count());
 
@@ -401,7 +401,7 @@ void P2pConnection::sendMessage(const nx::Buffer& data)
     m_dataToSend.push_back(data);
     if (m_dataToSend.size() == 1)
         m_webSocket->sendAsync(
-            data,
+            m_dataToSend.front(),
             std::bind(&P2pConnection::onMessageSent, this, _1, _2));
 }
 
@@ -432,6 +432,7 @@ void P2pConnection::onNewMessageRead(SystemError::ErrorCode errorCode, size_t by
     }
 
     using namespace std::placeholders;
+    m_readBuffer.resize(0);
     m_webSocket->readSomeAsync(
         &m_readBuffer,
         std::bind(&P2pConnection::onNewMessageRead, this, _1, _2));
@@ -453,6 +454,13 @@ P2pConnection::MiscData& P2pConnection::miscData()
 ApiPersistentIdData P2pConnection::decode(PeerNumberType shortPeerNumber) const
 {
     return m_shortPeerInfo.decode(shortPeerNumber);
+}
+
+void P2pConnection::encode(
+    const ApiPersistentIdData& fullId,
+    PeerNumberType shortPeerNumber)
+{
+    m_shortPeerInfo.encode(fullId, shortPeerNumber);
 }
 
 } // namespace ec2

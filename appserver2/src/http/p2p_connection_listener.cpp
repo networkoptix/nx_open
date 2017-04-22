@@ -146,7 +146,7 @@ void P2pConnectionProcessor::run()
         return;
     }
 
-    auto keepAliveTimeout = commonModule->globalSettings()->connectionKeepAliveTimeout();
+    auto keepAliveTimeout = commonModule->globalSettings()->connectionKeepAliveTimeout() * 1000;
     d->response.headers.emplace(
         Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME,
         nx_http::header::KeepAlive(

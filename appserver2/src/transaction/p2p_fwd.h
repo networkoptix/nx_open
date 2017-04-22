@@ -18,7 +18,7 @@ const static PeerNumberType kUnknownPeerNumnber = 0xffff;
 struct PeerNumberInfo
 {
     ApiPersistentIdData decode(PeerNumberType number) const;
-    PeerNumberType encode(const ApiPersistentIdData& peer);
+    PeerNumberType encode(const ApiPersistentIdData& peer, PeerNumberType shortNumber = kUnknownPeerNumnber);
 private:
     QMap<ApiPersistentIdData, PeerNumberType> m_fullIdToShortId;
     QMap<PeerNumberType, ApiPersistentIdData> m_shortIdToFullId;

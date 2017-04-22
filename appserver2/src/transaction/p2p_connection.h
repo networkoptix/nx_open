@@ -8,11 +8,13 @@
 #include <common/common_module_aware.h>
 #include <nx_ec/ec_proto_version.h>
 #include <utils/common/from_this_to_shared.h>
+#include <core/resource/shared_resource_pointer.h>
 
 namespace ec2 {
 
 class P2pConnection;
-using P2pConnectionPtr = QSharedPointer<P2pConnection>;
+//using P2pConnectionPtr = QSharedPointer<P2pConnection>;
+using P2pConnectionPtr = QnSharedResourcePointer<P2pConnection>;
 
 class P2pConnection:
     public QObject,
@@ -64,6 +66,7 @@ public:
     qint64 remoteIdentityTime() const;
 
     ApiPersistentIdData decode(PeerNumberType shortPeerNumber) const;
+    void encode(const ApiPersistentIdData& fullId, PeerNumberType shortPeerNumber);
 
     struct MiscData
     {
