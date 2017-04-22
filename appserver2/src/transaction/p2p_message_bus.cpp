@@ -39,7 +39,7 @@ P2pMessageBus::P2pMessageBus(
     QnTransactionMessageBusBase(db, peerType, commonModule)
 {
     qRegisterMetaType<MessageType>();
-    qRegisterMetaType<QSharedPointer<QObject>>();
+    qRegisterMetaType<P2pConnectionPtr>("P2pConnectionPtr");
 
     m_thread = new QThread();
     m_thread->setObjectName("P2pMessageBus");
@@ -401,7 +401,7 @@ ApiPeerData P2pMessageBus::localPeer() const
         m_localPeerType);
 }
 
-void P2pMessageBus::at_gotMessage(const QSharedPointer<QObject>& _connection, MessageType messageType, const nx::Buffer& payload)
+void P2pMessageBus::at_gotMessage(const QSharedPointer<P2pConnection>& connection, MessageType messageType, const nx::Buffer& payload)
 {
     P2pConnectionPtr connection = _connection.dynamicCast<P2pConnection>();
 
