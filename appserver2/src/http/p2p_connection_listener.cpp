@@ -178,18 +178,20 @@ void P2pConnectionProcessor::run()
     sendResponse(nx_http::StatusCode::upgrade, nx_http::StringType());
 
     std::unique_ptr<ShareSocketDelegate> socket(new ShareSocketDelegate(std::move(d->socket)));
+    socket->setNonBlockingMode(true);
     socket->setRecvTimeout(std::chrono::milliseconds(keepAliveTimeout * 2).count());
     socket->setSendTimeout(std::chrono::milliseconds(keepAliveTimeout * 2).count());
 
+    /*
     WebSocketPtr webSocket(new websocket::Websocket(
         std::move(socket),
         d->request.messageBody));
-
+    */
     P2pConnectionPtr connection(new P2pConnection(
         commonModule,
         remotePeer,
         d->messageBus->localPeer(),
-        std::move(webSocket)));
+        std::move(socket)));
     d->messageBus->gotConnectionFromRemotePeer(connection);
 
 }

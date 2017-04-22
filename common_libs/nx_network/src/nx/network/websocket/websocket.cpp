@@ -100,7 +100,7 @@ void Websocket::sendAsync(
     }
 
     m_writeHandler = std::move(handler);
-    m_baseConnection.sendBufAsync(buffer);
+    m_baseConnection.sendBufAsync(m_writeBuffer);
 }
 
 void Websocket::cancelIOSync(nx::network::aio::EventType /*eventType*/)

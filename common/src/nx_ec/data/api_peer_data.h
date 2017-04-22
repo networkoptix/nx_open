@@ -25,6 +25,8 @@ struct ApiPersistentIdData: ApiIdData
         return persistentId < other.persistentId;
     }
 
+    bool isNull() const { return id.isNull();  }
+
     /** Unique persistent Db ID of the peer. Empty for clients */
     QnUuid persistentId;
 

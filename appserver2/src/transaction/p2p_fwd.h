@@ -1,4 +1,5 @@
 #pragma once
+#include <nx_ec/data/api_peer_data.h>
 
 namespace ec2 {
 
@@ -9,6 +10,18 @@ enum class MessageType
     alivePeers,
     subscribeForDataUpdates,
     pushTransactionData
+};
+
+using PeerNumberType = quint16;
+const static PeerNumberType kUnknownPeerNumnber = 0xffff;
+
+struct PeerNumberInfo
+{
+    ApiPersistentIdData decode(PeerNumberType number) const;
+    PeerNumberType encode(const ApiPersistentIdData& peer);
+private:
+    QMap<ApiPersistentIdData, PeerNumberType> m_fullIdToShortId;
+    QMap<PeerNumberType, ApiPersistentIdData> m_shortIdToFullId;
 };
 
 static const quint32 kMaxDistance = std::numeric_limits<quint32>::max();

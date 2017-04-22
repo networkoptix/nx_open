@@ -7,13 +7,19 @@
 #include <nx/network/http/asynchttpclient.h>
 #include <common/common_module_aware.h>
 #include <nx_ec/ec_proto_version.h>
+#include <utils/common/from_this_to_shared.h>
 
 namespace ec2 {
 
+class P2pConnection;
+using P2pConnectionPtr = QSharedPointer<P2pConnection>;
+
 class P2pConnection:
     public QObject,
-    public QnCommonModuleAware
+    public QnCommonModuleAware,
+    public QnFromThisToShared<P2pConnection>
 {
+    Q_OBJECT
 public:
 
     enum class State
@@ -51,21 +57,35 @@ public:
     void subscribeTo(const std::vector<ApiPersistentIdData>& idList);
 
     State state() const;
+    void setState(State state);
+
     void sendMessage(const nx::Buffer& data);
 
     qint64 remoteIdentityTime() const;
+
+    ApiPersistentIdData decode(PeerNumberType shortPeerNumber) const;
+
+    struct MiscData
+    {
+        QByteArray lastAliveMessage;
+    };
+
+    MiscData& miscData();
+signals:
+    void gotMessage(const P2pConnectionPtr& connection, MessageType messageType, const nx::Buffer& payload);
 private:
     void cancelConnecting();
 
     void onResponseReceived(const nx_http::AsyncHttpClientPtr& client);
     void onHttpClientDone(const nx_http::AsyncHttpClientPtr& httpClient);
 
-    void setState(State state);
     void fillAuthInfo(const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey);
     void setRemoteIdentityTime(qint64 time);
 
     void onMessageSent(SystemError::ErrorCode errorCode, size_t bytesSent);
     void onNewMessageRead(SystemError::ErrorCode errorCode, size_t bytesRead);
+
+    bool handleMessage(const nx::Buffer& message);
 private:
     enum class CredentialsSource
     {
@@ -89,12 +109,14 @@ private:
     ApiPeerData m_localPeer;
     ApiPeerData m_remotePeer;
     Direction m_direction;
-
+    MiscData m_miscData;
     qint64 m_remoteIdentityTime = 0;
+
+    PeerNumberInfo m_shortPeerInfo;
+
     int m_remotePeerEcProtoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION;
     int m_localPeerProtocolVersion = nx_ec::EC2_PROTO_VERSION;
 
 };
-using P2pConnectionPtr = std::shared_ptr<P2pConnection>;
 
 } // namespace ec2

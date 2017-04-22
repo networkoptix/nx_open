@@ -13,99 +13,98 @@
 
 namespace ec2 {
 
-    namespace detail {
-        class QnDbManager;
-    }
+namespace detail {
+    class QnDbManager;
+}
 
-    using PeerNumberType = quint16;
-    const static PeerNumberType kUnknownPeerNumnber = 0xffff;
+using ResolvePeerNumberMessageType = std::vector<PeerNumberType>;
 
-    using ResolvePeerNumberMessageType = std::vector<PeerNumberType>;
+struct AlivePeersRecord
+{
+    PeerNumberType peerNumber = 0;
+    quint16 distance = 0;
+};
+using AlivePeersMessagType = std::vector<AlivePeersRecord>;
 
-    struct AlivePeersRecord
+struct SubscribeForDataUpdateRecord
+{
+    PeerNumberType peerNumber = 0;
+    int sequence = 0;
+};
+using SubscribeForDataUpdatesMessageType = std::vector<SubscribeForDataUpdateRecord>;
+
+class P2pMessageBus:
+    public QObject,
+    public QnTransactionMessageBusBase
+{
+    Q_OBJECT
+public:
+    P2pMessageBus(
+        detail::QnDbManager* db,
+        Qn::PeerType peerType,
+        QnCommonModule* commonModule);
+    virtual ~P2pMessageBus();
+
+    void gotConnectionFromRemotePeer(P2pConnectionPtr connection);
+
+    void addOutgoingConnectionToPeer(QnUuid& id, const QUrl& url);
+    void removeOutgoingConnectionFromPeer(QnUuid& id);
+
+    // Self peer information
+    ApiPeerData localPeer() const;
+
+    void start();
+private:
+    QByteArray serializePeersMessage();
+    QByteArray serializeResolvePeerNumberRequest(std::vector<PeerNumberType> peers);
+private:
+    void doPeriodicTasks();
+    void processTemporaryOutgoingConnections();
+    void removeClosedConnections();
+    void createOutgoingConnections();
+    void sendAlivePeersMessage();
+
+    void deserializeAlivePeersMessage(
+        const P2pConnectionPtr& connection,
+        const QByteArray& data);
+
+    ApiPersistentIdData fromShortPeerNumber(const QnUuid& owner, const PeerNumberType& id);
+
+    void addOwnfInfoToPeerList();
+    void addOfflinePeersFromDb();
+    void doSubscribe();
+
+    bool handleResolvePeerNumberRequest(const P2pConnectionPtr& connection, const QByteArray& data);
+    bool handleResolvePeerNumberResponse(const P2pConnectionPtr& connection, const QByteArray& data);
+    bool handleAlivePeers(const P2pConnectionPtr& connection, const QByteArray& data);
+    bool handleSubscribeForDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data);
+    bool handlePushTransactionData(const P2pConnectionPtr& connection, const QByteArray& data);
+private slots:
+    void at_gotMessage(const P2pConnectionPtr& connection, MessageType messageType, const nx::Buffer& payload);
+private:
+    QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list
+    QMap<QnUuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections
+    QMap<QnUuid, QUrl> m_remoteUrls; //< Url list for outgoing connections
+    PeerNumberInfo m_localShortPeerInfo;
+
+    typedef QMap<ApiPersistentIdData, RoutingRecord> RoutingInfo;
+    struct PeerInfo
     {
-        PeerNumberType peerNumber = 0;
-        quint16 distance = 0;
+        PeerInfo() {}
+
+        quint32 distanceVia(const ApiPersistentIdData& via) const;
+        quint32 minDistance(std::vector<ApiPersistentIdData>* outViaList) const;
+
+        bool isOnline = false;
+        RoutingInfo routingInfo; // key: route throw, value - distance in hops
     };
-    using AlivePeersMessagType = std::vector<AlivePeersRecord>;
+    typedef QMap<ApiPersistentIdData, PeerInfo> PeersMap;
 
-    struct SubscribeForDataUpdateRecord
-    {
-        PeerNumberType peerNumber = 0;
-        int sequence = 0;
-    };
-    using SubscribeForDataUpdatesMessageType = std::vector<SubscribeForDataUpdateRecord>;
+    PeersMap m_allPeers; //< all peers in a system
 
-    class P2pMessageBus:
-        public QObject,
-        public QnTransactionMessageBusBase
-    {
-    public:
-        P2pMessageBus(
-            detail::QnDbManager* db,
-            Qn::PeerType peerType,
-            QnCommonModule* commonModule);
-        virtual ~P2pMessageBus();
+    QMap<ApiPersistentIdData, P2pConnectionPtr> m_subscriptionList;
+    QThread* m_thread = nullptr;
+    QTimer* m_timer = nullptr;
+};
 
-        void gotConnectionFromRemotePeer(P2pConnectionPtr connection);
-
-        void addOutgoingConnectionToPeer(QnUuid& id, const QUrl& url);
-        void removeOutgoingConnectionFromPeer(QnUuid& id);
-
-        // Self peer information
-        ApiPeerData localPeer() const;
-
-        void start();
-    private:
-        void doPeriodicTasks();
-        void processTemporaryOutgoingConnections();
-        void removeClosedConnections();
-        void createOutgoingConnections();
-        void sendAlivePeersMessage();
-        QByteArray serializePeersMessage();
-        void deserializeAlivePeersMessage(
-            const P2pConnectionPtr& connection,
-            const QByteArray& data);
-
-        PeerNumberType toShortPeerNumber(const QnUuid& owner, const ApiPersistentIdData& peer);
-        ApiPersistentIdData fromShortPeerNumber(const QnUuid& owner, const PeerNumberType& id);
-
-        void addOwnfInfoToPeerList();
-        void addOfflinePeersFromDb();
-        void doSubscribe();
-    private:
-        QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list
-        QMap<QnUuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections
-        QMap<QnUuid, QUrl> m_remoteUrls; //< Url list for outgoing connections
-
-        struct PeerNumberInfo
-        {
-            PeerNumberType insert(const ApiPersistentIdData& peer);
-
-            QMap<ApiPersistentIdData, PeerNumberType> fullIdToShortId;
-            QMap<PeerNumberType, ApiPersistentIdData> shortIdToFullId;
-        };
-
-        // key - got via peer, value - short numbers
-        QMap<QnUuid, PeerNumberInfo> m_shortPeersMap;
-
-        typedef QMap<ApiPersistentIdData, RoutingRecord> RoutingInfo;
-        struct PeerInfo
-        {
-            PeerInfo() {}
-
-            quint32 distanceVia(const ApiPersistentIdData& via) const;
-            quint32 minDistance(std::vector<ApiPersistentIdData>* outViaList) const;
-
-            bool isOnline = false;
-            RoutingInfo routingInfo; // key: route throw, value - distance in hops
-        };
-        typedef QMap<ApiPersistentIdData, PeerInfo> PeersMap;
-
-        PeersMap m_allPeers; //< all peers in a system
-
-        QMap<ApiPersistentIdData, P2pConnectionPtr> m_subscriptionList;
-        QThread* m_thread = nullptr;
-        QTimer* m_timer = nullptr;
-    };
 } // ec2

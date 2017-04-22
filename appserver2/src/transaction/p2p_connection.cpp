@@ -43,6 +43,8 @@ P2pConnection::P2pConnection(
     m_localPeer(localPeer),
     m_direction(Direction::outgoing)
 {
+    m_readBuffer.reserve(1024 * 1024);
+
     QUrl remotePeerUrl = _remotePeerUrl;
     m_remotePeer.id = remoteId;
 
@@ -128,6 +130,8 @@ P2pConnection::P2pConnection(
     m_webSocket(webSocket),
     m_direction(Direction::incoming)
 {
+    m_readBuffer.reserve(1024 * 1024);
+
     using namespace std::placeholders;
 
     m_webSocket->readSomeAsync(
@@ -331,9 +335,10 @@ void P2pConnection::onHttpClientDone(const nx_http::AsyncHttpClientPtr& client)
     socket->setRecvTimeout(std::chrono::milliseconds(keepAliveTimeout * 2).count());
     socket->setSendTimeout(std::chrono::milliseconds(keepAliveTimeout * 2).count());
 
-    m_webSocket.reset(new nx::network::websocket::Websocket(
-        std::move(socket),
-        msgBuffer));
+    //m_webSocket.reset(new Websocket( std::move(socket), msgBuffer));
+    m_webSocket = std::move(socket);
+    NX_ASSERT(msgBuffer.isEmpty());
+
     m_httpClient.reset();
     setState(State::Connected);
 
@@ -419,13 +424,35 @@ void P2pConnection::onNewMessageRead(SystemError::ErrorCode errorCode, size_t by
 {
     QnMutexLocker lock(&m_mutex);
 
-    if (errorCode != SystemError::noError)
+    if (errorCode != SystemError::noError ||
+        !handleMessage(m_readBuffer))
+    {
         setState(State::Error);
+        return;
+    }
 
     using namespace std::placeholders;
     m_webSocket->readSomeAsync(
         &m_readBuffer,
         std::bind(&P2pConnection::onNewMessageRead, this, _1, _2));
+}
+
+bool P2pConnection::handleMessage(const nx::Buffer& message)
+{
+    NX_ASSERT(message.size() > 1);
+    MessageType messageType = (MessageType) message[0];
+    emit gotMessage(toSharedPointer(), messageType, message.mid(1));
+    return true;
+}
+
+P2pConnection::MiscData& P2pConnection::miscData()
+{
+    return m_miscData;
+}
+
+ApiPersistentIdData P2pConnection::decode(PeerNumberType shortPeerNumber) const
+{
+    return m_shortPeerInfo.decode(shortPeerNumber);
 }
 
 } // namespace ec2

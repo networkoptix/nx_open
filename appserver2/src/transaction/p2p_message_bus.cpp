@@ -7,16 +7,6 @@
 
 namespace ec2 {
 
-// PeerNumberInfo
-
-PeerNumberType P2pMessageBus::PeerNumberInfo::insert(const ApiPersistentIdData& peer)
-{
-    PeerNumberType result = fullIdToShortId.size();
-    fullIdToShortId.insert(peer, result);
-    shortIdToFullId.insert(result, peer);
-    return result;
-}
-
 // PeerInfo
 
 quint32 P2pMessageBus::PeerInfo::distanceVia(const ApiPersistentIdData& via) const
@@ -25,7 +15,6 @@ quint32 P2pMessageBus::PeerInfo::distanceVia(const ApiPersistentIdData& via) con
     auto itr = routingInfo.find(via);
     return itr != routingInfo.end() ? itr.value().distance : kMaxDistance;
 }
-
 quint32 P2pMessageBus::PeerInfo::minDistance(std::vector<ApiPersistentIdData>* outViaList) const
 {
     quint32 minDistance = kMaxDistance;
@@ -189,17 +178,6 @@ void P2pMessageBus::createOutgoingConnections()
     }
 }
 
-PeerNumberType P2pMessageBus::toShortPeerNumber(const QnUuid& owner, const ApiPersistentIdData& peer)
-{
-    PeerNumberInfo& info = m_shortPeersMap[owner];
-    auto itr = info.fullIdToShortId.find(peer);
-    if (itr != info.fullIdToShortId.end())
-        return itr.value();
-    if (owner == commonModule()->moduleGUID())
-        return info.insert(peer);
-    return kUnknownPeerNumnber;
-}
-
 ApiPersistentIdData P2pMessageBus::fromShortPeerNumber(const QnUuid& owner, const PeerNumberType& id)
 {
     return ApiPersistentIdData(); // implement me
@@ -288,7 +266,7 @@ QByteArray P2pMessageBus::serializePeersMessage()
                 minDistance = std::min(minDistance, rec.distance);
             if (minDistance == kMaxDistance)
                 continue;
-            qint16 peerNumber = toShortPeerNumber(commonModule()->moduleGUID(), itr.key());
+            qint16 peerNumber = m_localShortPeerInfo.encode(itr.key());
             serializeCompressPeerNumber(writer, peerNumber);
             writer.putBit(peer.isOnline);
             if (peer.isOnline)
@@ -413,6 +391,99 @@ ApiPeerData P2pMessageBus::localPeer() const
         commonModule()->runningInstanceGUID(),
         commonModule()->dbId(),
         m_localPeerType);
+}
+
+void P2pMessageBus::at_gotMessage(const P2pConnectionPtr& connection, MessageType messageType, const nx::Buffer& payload)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    bool result = false;
+    switch (messageType)
+    {
+    case MessageType::resolvePeerNumberRequest:
+        result = handleResolvePeerNumberRequest(connection, payload);
+        break;
+    case MessageType::resolvePeerNumberResponse:
+        result = handleResolvePeerNumberResponse(connection, payload);
+        break;
+    case MessageType::alivePeers:
+        result = handleAlivePeers(connection, payload);
+        break;
+    case MessageType::subscribeForDataUpdates:
+        result = handleSubscribeForDataUpdates(connection, payload);
+        break;
+    case MessageType::pushTransactionData:
+        result = handlePushTransactionData(connection, payload);
+        break;
+    default:
+        NX_ASSERT(0, lm("Unknown message type").arg((int)messageType));
+        break;
+    }
+    if (!result)
+        connection->setState(P2pConnection::State::Error);
+}
+
+bool P2pMessageBus::handleResolvePeerNumberRequest(const P2pConnectionPtr& connection, const QByteArray& data)
+{
+    return true;
+}
+
+bool P2pMessageBus::handleResolvePeerNumberResponse(const P2pConnectionPtr& connection, const QByteArray& data)
+{
+    return true;
+}
+
+QByteArray P2pMessageBus::serializeResolvePeerNumberRequest(std::vector<PeerNumberType> peers)
+{
+    QByteArray result;
+    result.resize(peers.size() * 2 + 1);
+    BitStreamWriter writer;
+    writer.setBuffer((quint8*) result.data(), result.size());
+    writer.putBits(8, (int) MessageType::resolvePeerNumberRequest);
+    for (const auto& peer: peers)
+        writer.putBits(16, peer);
+    return result;
+}
+
+bool P2pMessageBus::handleAlivePeers(const P2pConnectionPtr& connection, const QByteArray& data)
+{
+    std::vector<PeerNumberType> numbersToResolve;
+    BitStreamReader reader((const quint8*)data.data(), data.size());
+    try
+    {
+        while (reader.hasMoreBits())
+        {
+            PeerNumberType peerNumber = deserializeCompressPeerNumber(reader);
+            bool isOnline = reader.getBit();
+            quint32 distance = isOnline
+                ? NALUnit::extractUEGolombCode(reader)
+                : reader.getBits(32);
+            if (connection->decode(peerNumber).isNull())
+                numbersToResolve.push_back(peerNumber);
+        }
+    }
+    catch (...)
+    {
+        return false; //< invalid message
+    }
+    if (numbersToResolve.empty())
+    {
+        deserializeAlivePeersMessage(connection, data);
+        return true;
+    }
+    connection->sendMessage(serializeResolvePeerNumberRequest(numbersToResolve));
+    connection->miscData().lastAliveMessage = data;
+    return true;
+}
+
+bool P2pMessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data)
+{
+    return true;
+}
+
+bool P2pMessageBus::handlePushTransactionData(const P2pConnectionPtr& connection, const QByteArray& data)
+{
+    return true;
 }
 
 } // ec2

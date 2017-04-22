@@ -108,4 +108,6 @@ private:
 } // namespace network
 } // namespace nx
 
-using WebSocketPtr = std::shared_ptr<nx::network::websocket::Websocket>;
+//using WebSocket = nx::network::websocket::Websocket;
+using WebSocket = AbstractStreamSocket;
+using WebSocketPtr = std::shared_ptr<WebSocket>;

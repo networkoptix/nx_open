@@ -101,7 +101,7 @@ void Serializer::prepareFrame(
 {
     outBuffer->resize(
         websocket::prepareFrame(
-            nullptr, 0, type, fin, m_masked, m_mask, nullptr, 0));
+            nullptr, 0, type, fin, m_masked, m_mask, nullptr, 0) + payload.size());
     prepareFrame(
         payload.constData(), 
         payload.size(), type, fin, 
