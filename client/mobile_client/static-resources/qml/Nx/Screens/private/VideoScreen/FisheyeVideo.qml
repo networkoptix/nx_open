@@ -12,6 +12,10 @@ Item
 
     property real videoCenterHeightOffsetFactor: 0.0
 
+    readonly property var viewMode: resourceHelper
+        ? resourceHelper.fisheyeParams.viewMode
+        : MediaDewarpingParams.Horizontal
+
     signal clicked()
 
     function clear()
@@ -43,15 +47,7 @@ Item
             ? (resourceHelper.fisheyeParams.fovRot + resourceHelper.customRotation)
             : 0.0
 
-        viewRotationMatrix: 
-        {
-            var rotX = Utils3D.rotationX(Utils3D.radians(interactor.currentRotation.x));
-            var rotY = Utils3D.rotationY(Utils3D.radians(interactor.currentRotation.y));
-
-            return resourceHelper && resourceHelper.fisheyeParams.viewMode != MediaDewarpingParams.Horizontal
-                ? rotX.times(rotY)
-                : rotY.times(rotX); 
-        }
+        viewRotationMatrix: interactor.currentRotationMatrix
 
         viewScale: interactor.currentScale
 
@@ -64,29 +60,85 @@ Item
     {
         id: interactor
 
-        property real currentScale: 1.0
+        readonly property real currentScale: Math.pow(2.0, scalePower)
 
-        property vector2d currentRotation: Qt.vector2d(0.0, 0.0)
+        readonly property matrix4x4 currentRotationMatrix:
+        {
+            switch (viewMode)
+            {
+                case MediaDewarpingParams.VerticalUp:
+                    return Utils3D.rotationZ(Utils3D.radians(currentRotation.y)).times(
+                           Utils3D.rotationX(Utils3D.radians(currentRotation.x)))
+
+                case MediaDewarpingParams.VerticalDown:
+                    return Utils3D.rotationZ(-Utils3D.radians(currentRotation.y)).times(
+                           Utils3D.rotationX(Utils3D.radians(currentRotation.x)))
+
+                default:
+                    return Utils3D.rotationY(Utils3D.radians(currentRotation.y)).times(
+                           Utils3D.rotationX(Utils3D.radians(currentRotation.x)))
+            }
+        }
+
+        /* Interactor implementation: */
+
+        property vector2d currentRotation:
+        {
+            var limitByEdge = (180.0 - fisheyeShader.fov) / 2.0
+            var limitByCenter = Math.min(fisheyeShader.fov / 2.0, limitByEdge)
+
+            switch (viewMode)
+            {
+                case MediaDewarpingParams.VerticalUp:
+                    return Qt.vector2d(Math.max(-limitByEdge, Math.min(-limitByCenter, unboundRotation.x)),
+                                       normalizedAngle(unboundRotation.y))
+
+                case MediaDewarpingParams.VerticalDown:
+                    return Qt.vector2d(Math.max(limitByCenter, Math.min(limitByEdge, unboundRotation.x)),
+                                       normalizedAngle(unboundRotation.y))
+
+                default:
+                    return Qt.vector2d(Math.max(-limitByEdge, Math.min(limitByEdge, unboundRotation.x)),
+                                       Math.max(-limitByEdge, Math.min(limitByEdge, unboundRotation.y)))
+            }
+        }
+
+        property vector2d unboundRotation: Qt.vector2d(0.0, 0.0)
 
         property vector2d previousRotation
- 
+
+        property real scalePower: 0.0 //TODO: #vkutin Animate?
+
         function startRotation()
         {
             previousRotation = currentRotation
         }
 
-        //TODO: #vkutin This must be improved for floor & ceiling mounts.
         function updateRotation(aroundX, aroundY) // angle deltas since start, in degrees
         {
             var rotationFactor = fisheyeShader.fov / 180.0
-            currentRotation = Qt.vector2d(
-                Math.max(-90, Math.min(90, previousRotation.x + aroundX * rotationFactor)),
-                Math.max(-90, Math.min(90, previousRotation.y + aroundY * rotationFactor)));
+
+            unboundRotation = previousRotation.plus(Qt.vector2d(
+                aroundX * rotationFactor,
+                aroundY * rotationFactor))
         }
 
         function scaleBy(delta)
         {
-            currentScale = Math.min(10.0, Math.max(1.0, currentScale * Math.exp(delta / 1000.0)))
+            const kSensitivity = 100.0
+            var deltaPower = delta * kSensitivity / 1.0e5
+            scalePower = Math.min(4.0, Math.max(0.0, scalePower + deltaPower))
+        }
+
+        function normalizedAngle(degrees) // brings angle to [-180, 180] range
+        {
+            var angle = degrees % 360
+            if (angle < -180)
+                return angle + 360
+            else if (angle > 180)
+                return angle - 360
+            else
+                return angle
         }
     }
 
@@ -101,6 +153,9 @@ Item
         property bool draggingStarted
         property int startX
         property int startY
+
+        readonly property real pixelRadius: Math.min(width, height) / 2.0
+        readonly property vector2d pixelCenter: Qt.vector2d(width, height).times(0.5)
 
         onPressed: 
         { 
@@ -150,7 +205,7 @@ Item
         function updateDrag(dx, dy)
         {                  
             const kSensitivity = 100.0
-            var normalization = kSensitivity / Math.min(content.width, content.height)
+            var normalization = kSensitivity / pixelRadius
             interactor.updateRotation(dy * normalization, 
                                       dx * normalization)
         }
