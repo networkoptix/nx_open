@@ -27,7 +27,7 @@ ShaderEffect
 
     /* Feedback parameters (to be queried from outside): */
 
-    readonly property real angleScaleFactor: 0.5 / Math.atan(viewScale * 0.5)
+    readonly property real fov: 45.0 * Math.PI / Math.atan(viewScale) // field of view in degrees
 
     /* Shader uniforms: */
 

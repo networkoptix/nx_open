@@ -64,13 +64,9 @@ Item
     {
         id: interactor
 
-        property real currentScale: 1.0;
+        property real currentScale: 1.0
 
         property vector2d currentRotation: Qt.vector2d(0.0, 0.0)
-
-        //TODO: #vkutin This can definitely be improved.
-        readonly property real rotationFactor: 300 * fisheyeShader.angleScaleFactor 
-            / (Math.min(content.width, content.height))
 
         property vector2d previousRotation
  
@@ -79,9 +75,10 @@ Item
             previousRotation = currentRotation
         }
 
-        //TODO: #vkutin This also can be improved for floor & ceiling mounts.
+        //TODO: #vkutin This must be improved for floor & ceiling mounts.
         function updateRotation(aroundX, aroundY) // angle deltas since start, in degrees
         {
+            var rotationFactor = fisheyeShader.fov / 180.0
             currentRotation = Qt.vector2d(
                 Math.max(-90, Math.min(90, previousRotation.x + aroundX * rotationFactor)),
                 Math.max(-90, Math.min(90, previousRotation.y + aroundY * rotationFactor)));
@@ -151,9 +148,11 @@ Item
         }
 
         function updateDrag(dx, dy)
-        {
-            interactor.updateRotation(dy * interactor.rotationFactor, 
-                                      dx * interactor.rotationFactor)
+        {                  
+            const kSensitivity = 100.0
+            var normalization = kSensitivity / Math.min(content.width, content.height)
+            interactor.updateRotation(dy * normalization, 
+                                      dx * normalization)
         }
     }
 }
