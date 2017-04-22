@@ -118,19 +118,6 @@ public:
         m_totalBits -= num;
         return (prevVal + (m_curVal >> m_bitLeft)) & m_masks[num];
     }
-    inline void readBytes(int num, quint8* data)
-    {
-        if (m_totalBits < num * 8)
-            THROW_BITSTREAM_ERR;
-        if (m_bitLeft % 8 != 0)
-            THROW_BITSTREAM_ERR; //< not implemented
-        for (; m_bitLeft && num > 0; --num, ++data)
-            *data = getBits(8);
-        memcpy(data, m_buffer, num);
-        m_buffer += num;
-        m_totalBits -= num * 8;
-    }
-
     inline unsigned showBits(unsigned num)
     {
         NX_ASSERT(num <= INT_BIT);
@@ -239,19 +226,6 @@ public:
             m_curVal = value & m_masks[m_bitWrited];
         }
         m_totalBits -= num;
-    }
-    inline void putBytes(unsigned num, const char* data)
-    {
-        if (m_totalBits < num * 8)
-            THROW_BITSTREAM_ERR;
-        if (m_bitWrited % 8 != 0)
-            THROW_BITSTREAM_ERR; //< not implemented
-
-        for (; m_bitWrited && num > 0; ++data, --num)
-            putBits(8, *data);
-        memcpy(m_buffer, data, num);
-        m_buffer += num;
-        m_totalBits -= num * 8;
     }
 
     inline void putBit(unsigned value)

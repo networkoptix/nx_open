@@ -1,4 +1,7 @@
 #include "p2p_message_bus.h"
+
+#include <QtCore/QBuffer>
+
 #include <common/common_module.h>
 #include <utils/media/bitStream.h>
 #include <utils/media/nalUnits.h>
@@ -6,16 +9,6 @@
 #include <database/db_manager.h>
 
 namespace ec2 {
-
-void putBytes(BitStreamWriter& writer, const QByteArray& data)
-{
-    writer.putBytes(data.size(), data.data());
-}
-
-void getBytes(BitStreamReader& reader, const QByteArray& data)
-{
-    reader.getBytes(data.size(), data.data());
-}
 
 // PeerInfo
 
@@ -196,11 +189,6 @@ void P2pMessageBus::createOutgoingConnections()
     }
 }
 
-ApiPersistentIdData P2pMessageBus::fromShortPeerNumber(const QnUuid& owner, const PeerNumberType& id)
-{
-    return ApiPersistentIdData(); // implement me
-}
-
 void serializeCompressPeerNumber(BitStreamWriter& writer, PeerNumberType peerNumber)
 {
     const static std::array<int, 3> bitsGroups = { 7, 3, 4 };
@@ -313,7 +301,7 @@ void P2pMessageBus::deserializeAlivePeersMessage(
         while (reader.bitsLeft() >= 8)
         {
             PeerNumberType peerNumber = deserializeCompressPeerNumber(reader);
-            ApiPersistentIdData peerId = fromShortPeerNumber(connection->remotePeer().id, peerNumber);
+            ApiPersistentIdData peerId = connection->decode(peerNumber);
             bool isOnline = reader.getBit();
             quint32 receivedDistance = 0;
             if (isOnline)
@@ -458,8 +446,34 @@ bool P2pMessageBus::handleResolvePeerNumberRequest(const P2pConnectionPtr& conne
     return true;
 }
 
+void P2pMessageBus::deserializeResolvePeerNumberResponse(const P2pConnectionPtr& connection, const QByteArray& data)
+{
+    QByteArray response(data);
+    QBuffer buffer(&response);
+    buffer.open(QIODevice::ReadOnly);
+    QDataStream in(&buffer);
+    QByteArray tmpBuffer;
+    tmpBuffer.resize(16);
+    PeerNumberType shortPeerNumber;
+    ApiPersistentIdData fullId;
+
+    while (!in.atEnd())
+    {
+        in >> shortPeerNumber;
+        in.readRawData(tmpBuffer.data(), tmpBuffer.size());
+        fullId.id = QnUuid::fromRfc4122(tmpBuffer);
+        in.readRawData(tmpBuffer.data(), tmpBuffer.size());
+        fullId.persistentId = QnUuid::fromRfc4122(tmpBuffer);
+        connection->encode(fullId, shortPeerNumber);
+    }
+}
+
 bool P2pMessageBus::handleResolvePeerNumberResponse(const P2pConnectionPtr& connection, const QByteArray& data)
 {
+    deserializeResolvePeerNumberResponse(connection, data);
+    const QByteArray msg = connection->miscData().lastAliveMessage;
+    if (!msg.isEmpty())
+        handleAlivePeers(connection, msg);
     return true;
 }
 
@@ -480,45 +494,22 @@ QByteArray P2pMessageBus::serializeResolvePeerNumberRequest(std::vector<PeerNumb
 QByteArray P2pMessageBus::serializeResolvePeerNumberResponse(std::vector<PeerNumberType> peers)
 {
     QByteArray result;
-    result.resize(peers.size() * (16 * 2 + 2) + 1); // two guid + uncompressed PeerNumber per record
-    BitStreamWriter writer;
-    writer.setBuffer((quint8*)result.data(), result.size());
-    writer.putBits(8, (int)MessageType::resolvePeerNumberResponse);
-    for (const auto& peer : peers)
+    result.reserve(peers.size() * (16 * 2 + 2) + 1); // two guid + uncompressed PeerNumber per record
     {
-        writer.putBits(16, peer);
-        ApiPersistentIdData fullId = m_localShortPeerInfo.decode(peer);
-        putBytes(writer, fullId.id.toRfc4122());
-        putBytes(writer, fullId.persistentId.toRfc4122());
+        QBuffer buffer(&result);
+        buffer.open(QIODevice::WriteOnly);
+        QDataStream out(&buffer);
+
+        out << (quint8)(MessageType::resolvePeerNumberResponse);
+        for (const auto& peer : peers)
+        {
+            out << peer;
+            ApiPersistentIdData fullId = m_localShortPeerInfo.decode(peer);
+            out.writeRawData(fullId.id.toRfc4122().data(), 16);
+            out.writeRawData(fullId.persistentId.toRfc4122().data(), 16);
+        }
     }
-    writer.flushBits();
-    result.truncate(writer.getBytesCount());
     return result;
-}
-
- void P2pMessageBus::deserializeResolvePeerNumberResponse(
-     const P2pConnectionPtr& connection,
-     const QByteArray& response)
-{
-     BitStreamReader reader((const quint8*) response.data(), response.size());
-     try
-     {
-         while (reader.bitsLeft() > 0)
-         {
-             QByteArray tmpBuffer(16);
-             PeerNumberType shortPeerNumber = reader.getBits(16);
-             ApiPersistentIdData fullId;
-             getBytes(reader, tmpBuffer);
-             fullId.id = QnUuid::fromRfc4122(tmpBuffer);
-             getBytes(reader, tmpBuffer);
-             fullId.persistentId = QnUuid::fromRfc4122(tmpBuffer);
-
-             connection->encode(fullId, shortPeerNumber);
-         }
-     }
-     catch (...)
-     {
-     }
 }
 
 bool P2pMessageBus::handleAlivePeers(const P2pConnectionPtr& connection, const QByteArray& data)

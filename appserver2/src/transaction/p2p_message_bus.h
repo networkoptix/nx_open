@@ -72,8 +72,6 @@ private:
         const P2pConnectionPtr& connection,
         const QByteArray& response);
 
-    ApiPersistentIdData fromShortPeerNumber(const QnUuid& owner, const PeerNumberType& id);
-
     void addOwnfInfoToPeerList();
     void addOfflinePeersFromDb();
     void doSubscribe();
