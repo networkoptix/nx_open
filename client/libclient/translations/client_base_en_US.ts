@@ -1417,36 +1417,36 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>These devices are removed from System</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>This device is removed from System</numerusform>
+            <numerusform>These devices are removed from System</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These cameras are removed from System</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>This camera is removed from System</numerusform>
+            <numerusform>These cameras are removed from System</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These servers are removed from System</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>This server is removed from System</numerusform>
+            <numerusform>These servers are removed from System</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These users are removed from System</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>This user is removed from System</numerusform>
+            <numerusform>These users are removed from System</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These resources are removed from System</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>This resource is removed from System</numerusform>
+            <numerusform>These resources are removed from System</numerusform>
         </translation>
     </message>
 </context>
@@ -2172,8 +2172,8 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>%1 does not support two-way audio</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%1 does not support two-way audio</numerusform>
+            <numerusform>%1 do not support two-way audio</numerusform>
         </translation>
     </message>
 </context>

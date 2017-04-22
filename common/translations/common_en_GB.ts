@@ -429,50 +429,50 @@
     <message numerus="yes">
         <source>Motion on Cameras</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Motion on Cameras</numerusform>
+            <numerusform>Motion on Camera</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Input Signal on Devices</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Input Signal on Device</numerusform>
+            <numerusform>Input Signal on Devices</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Input Signal on Cameras</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Input Signal on Cameras</numerusform>
+            <numerusform>Input Signal on Camera</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Devices Disconnected</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Device Disconnected</numerusform>
+            <numerusform>Devices Disconnected</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cameras Disconnected</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Camera Disconnected</numerusform>
+            <numerusform>Cameras Disconnected</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Devices IP Conflict</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Device IP Conflict</numerusform>
+            <numerusform>Devices IP Conflict</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cameras IP Conflict</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Camera IP Conflict</numerusform>
+            <numerusform>Cameras IP Conflict</numerusform>
         </translation>
     </message>
     <message>
@@ -1307,64 +1307,64 @@
         <source>milliseconds</source>
         <comment>Full suffix for displaying milliseconds</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>millisecond</numerusform>
+            <numerusform>milliseconds</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>seconds</source>
         <comment>Full suffix for displaying seconds</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>second</numerusform>
+            <numerusform>seconds</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>minutes</source>
         <comment>Full suffix for displaying minutes</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>minute</numerusform>
+            <numerusform>minutes</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>hours</source>
         <comment>Full suffix for displaying hours</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>hour</numerusform>
+            <numerusform>hours</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>days</source>
         <comment>Full suffix for displaying days</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>day</numerusform>
+            <numerusform>days</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>weeks</source>
         <comment>Full suffix for displaying weeks</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>week</numerusform>
+            <numerusform>weeks</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>months</source>
         <comment>Full suffix for displaying months</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>month</numerusform>
+            <numerusform>months</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>years</source>
         <comment>Full suffix for displaying years</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>year</numerusform>
+            <numerusform>years</numerusform>
         </translation>
     </message>
 </context>
