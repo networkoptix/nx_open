@@ -403,8 +403,6 @@ ApiPeerData P2pMessageBus::localPeer() const
 
 void P2pMessageBus::at_gotMessage(const QSharedPointer<P2pConnection>& connection, MessageType messageType, const nx::Buffer& payload)
 {
-    P2pConnectionPtr connection = _connection.dynamicCast<P2pConnection>();
-
     QnMutexLocker lock(&m_mutex);
 
     bool result = false;
