@@ -1,7 +1,7 @@
 <div>
-    Camera:
+    摄像头：
     <ul>
-        <li>Name: {{activeCamera.name}}</li>
+        <li>名称︰ {{activeCamera.name}}</li>
         <li>PhysicalID: {{activeCamera.physicalId}}</li>
         <li>IP (URL): <a target="_blank" ng-href="{{activeCamera.url}}">{{activeCamera.url}}</a></li>
         <li ng-repeat="stream in activeCamera.mediaStreams">
@@ -13,26 +13,26 @@
         </li>
 
         <li>
-            Download:
-            <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'download')}}">high</a>&nbsp;
-            <a target="_blank" ng-href="{{formatLink(activeCamera, 1, 'download')}}">low</a>&nbsp;
-            <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'preview')}}">preview</a>
+            下载︰ 
+            <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'download')}}">高</a>&nbsp; 
+            <a target="_blank" ng-href="{{formatLink(activeCamera, 1, 'download')}}">低</a> &nbsp;
+            <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'preview')}}">预览</a>
         </li>
 
     </ul>
-    Link settings:
+    链接设置︰
     <ul>
         <li>
-            <label><input type="checkbox" ng-model="useAuth">&nbsp;Use auth key</label>
+            <label><input type="checkbox" ng-model="useAuth">&nbsp;使用身份验证密钥</label>
         </li>
         <li>
-            <label title="for downloading">Duration (sec): <input type="text" class="input-sm" ng-model="duration"></label>
+            <label title="下载">持续时间 (秒): <input type="text" class="input-sm" ng-model="duration"></label>
         </li>
         <li>
-            <label title="for transcoding">Resolution: <input type="text" class="input-sm" ng-model="resolution"></label>
+            <label title="转码">分辨率: <input type="text" class="input-sm" ng-model="resolution"></label>
         </li>
         <li>
-            <label>Playing position: {{liveMode?'live': position}}</label>
+            <label>播放位置︰ {{liveMode?'live': position}}</label>
         </li>
     </ul>
 </div>
