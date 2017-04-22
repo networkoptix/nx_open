@@ -27,4 +27,6 @@ private:
 static const quint32 kMaxDistance = std::numeric_limits<quint32>::max();
 static const char* kP2pProtoName = "p2p";
 
+Q_DECLARE_METATYPE(MessageType)
+
 } // namespace ec2

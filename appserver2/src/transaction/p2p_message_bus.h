@@ -80,7 +80,7 @@ private:
     bool handleSubscribeForDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handlePushTransactionData(const P2pConnectionPtr& connection, const QByteArray& data);
 private slots:
-    void at_gotMessage(const P2pConnectionPtr& connection, MessageType messageType, const nx::Buffer& payload);
+    void at_gotMessage(const QSharedPointer<QObject>& connection, MessageType messageType, const QByteArray& payload);
 private:
     QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list
     QMap<QnUuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections

@@ -11,9 +11,6 @@
 
 namespace ec2 {
 
-class P2pConnection;
-using P2pConnectionPtr = QSharedPointer<P2pConnection>;
-
 class P2pConnection:
     public QObject,
     public QnCommonModuleAware,
@@ -45,7 +42,7 @@ public:
         const ApiPeerData& remotePeer,
         const ApiPeerData& localPeer,
         const WebSocketPtr& webSocket);
-    ~P2pConnection();
+    virtual ~P2pConnection();
 
     /** Peer that opens this connection */
     Direction direction() const;
@@ -72,7 +69,7 @@ public:
 
     MiscData& miscData();
 signals:
-    void gotMessage(const P2pConnectionPtr& connection, MessageType messageType, const nx::Buffer& payload);
+    void gotMessage(QSharedPointer<QObject> connection, MessageType messageType, const QByteArray& payload);
 private:
     void cancelConnecting();
 
@@ -118,5 +115,8 @@ private:
     int m_localPeerProtocolVersion = nx_ec::EC2_PROTO_VERSION;
 
 };
+using P2pConnectionPtr = QSharedPointer<P2pConnection>;
 
 } // namespace ec2
+
+Q_DECLARE_METATYPE(ec2::P2pConnectionPtr)

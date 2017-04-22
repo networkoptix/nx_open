@@ -38,6 +38,9 @@ P2pMessageBus::P2pMessageBus(
 :
     QnTransactionMessageBusBase(db, peerType, commonModule)
 {
+    qRegisterMetaType<MessageType>();
+    qRegisterMetaType<QSharedPointer<QObject>>();
+
     m_thread = new QThread();
     m_thread->setObjectName("P2pMessageBus");
     moveToThread(m_thread);
@@ -96,35 +99,38 @@ void P2pMessageBus::gotConnectionFromRemotePeer(P2pConnectionPtr connection)
     {
         // Got incoming connection. No outgoing connection was done yet
         m_connections.insert(remoteId, connection);
-        return;
-    }
-
-    const auto& existConnection = itr.value();
-    if (existConnection->direction() == P2pConnection::Direction::incoming)
-    {
-        // Replace incoming connection
-        itr.value() = connection;
-    }
-    else if (remoteId > localId)
-    {
-        // Outgoing connection is present, but incoming connection has bigger priority. Replace it.
-        itr.value() = connection;
-    }
-    else if (existConnection->state() == P2pConnection::State::Connecting)
-    {
-        // Incoming connection has lower priority, but outgoing connection is not done yet
-        // If outgoing connection will success it'll replace incoming connection later
-        m_outgoingConnections.insert(remoteId, itr.value());
-        itr.value() = connection; //< start using incoming connection unless outgoing will OK.
-    }
-    else if (existConnection->state() == P2pConnection::State::Error)
-    {
-        itr.value() = connection;
     }
     else
     {
-        // ignore incoming connection because we have active outgoing connection with bigger priority
+        const auto& existConnection = itr.value();
+        if (existConnection->direction() == P2pConnection::Direction::incoming)
+        {
+            // Replace incoming connection
+            itr.value() = connection;
+        }
+        else if (remoteId > localId)
+        {
+            // Outgoing connection is present, but incoming connection has bigger priority. Replace it.
+            itr.value() = connection;
+        }
+        else if (existConnection->state() == P2pConnection::State::Connecting)
+        {
+            // Incoming connection has lower priority, but outgoing connection is not done yet
+            // If outgoing connection will success it'll replace incoming connection later
+            m_outgoingConnections.insert(remoteId, itr.value());
+            itr.value() = connection; //< start using incoming connection unless outgoing will OK.
+        }
+        else if (existConnection->state() == P2pConnection::State::Error)
+        {
+            itr.value() = connection;
+        }
+        else
+        {
+            // ignore incoming connection because we have active outgoing connection with bigger priority
+            return;
+        }
     }
+    connect(connection.data(), &P2pConnection::gotMessage, this, &P2pMessageBus::at_gotMessage);
 }
 
 // Temporary outgoing connection list is used to resolve two-connections conflict in case of
@@ -172,8 +178,10 @@ void P2pMessageBus::createOutgoingConnections()
         const QUrl url = itr.value();
         if (!m_connections.contains(remoteId) && !m_outgoingConnections.contains(remoteId))
         {
-            m_connections.insert(remoteId, P2pConnectionPtr(
-                new P2pConnection(commonModule(), remoteId, localPeer(), url)));
+            P2pConnectionPtr connection(
+                new P2pConnection(commonModule(), remoteId, localPeer(), url));
+            connect(connection.data(), &P2pConnection::gotMessage, this, &P2pMessageBus::at_gotMessage);
+            m_connections.insert(remoteId, connection);
         }
     }
 }
@@ -393,8 +401,10 @@ ApiPeerData P2pMessageBus::localPeer() const
         m_localPeerType);
 }
 
-void P2pMessageBus::at_gotMessage(const P2pConnectionPtr& connection, MessageType messageType, const nx::Buffer& payload)
+void P2pMessageBus::at_gotMessage(const QSharedPointer<QObject>& _connection, MessageType messageType, const nx::Buffer& payload)
 {
+    P2pConnectionPtr connection = _connection.dynamicCast<P2pConnection>();
+
     QnMutexLocker lock(&m_mutex);
 
     bool result = false;
