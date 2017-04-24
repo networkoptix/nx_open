@@ -61,15 +61,20 @@ private:
 
     std::regex convertToRegex(const std::string& pathTemplate)
     {
-        const std::regex replaceRestParams("\\{[\\w\\d]+\\}");
+        const std::regex replaceRestParams("{[0-9a-zA-Z]*}", std::regex_constants::basic);
+        const std::string replacement("\\([0-9a-zA-Z-_.]*\\)");
 
         std::string restPathMatchRegex;
         restPathMatchRegex += "^";
-        restPathMatchRegex +=
-            std::regex_replace(pathTemplate, replaceRestParams, std::string("([\\w\\d\\-_.]+)"));
+        restPathMatchRegex += std::regex_replace(
+            pathTemplate,
+            replaceRestParams,
+            replacement);
         restPathMatchRegex += "$";
 
-        return std::regex(std::move(restPathMatchRegex), std::regex::icase);
+        return std::regex(
+            std::move(restPathMatchRegex),
+            std::regex::icase | std::regex_constants::basic);
     }
 };
 
