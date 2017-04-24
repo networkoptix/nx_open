@@ -10,7 +10,7 @@ namespace nx_http {
 namespace server {
 namespace test {
 
-namespace {
+namespace detail {
 
 class DummyHandler:
     public nx_http::AbstractHttpRequestHandler
@@ -31,7 +31,7 @@ using OnRequestProcessedHandler = std::function<void(
     std::unique_ptr<nx_http::AbstractMsgBodySource> bodySource,
     ConnectionEvents connectionEvents)>;
 
-} // namespace
+} // namespace detail
 
 template<typename MessageDispatcherType>
 class HttpServerBasicMessageDispatcher:
@@ -40,7 +40,7 @@ class HttpServerBasicMessageDispatcher:
 protected:
     void registerHandler(const std::string& path, nx_http::StringType method = kAnyMethod)
     {
-        m_messageDispatcher.registerRequestProcessor<DummyHandler>(
+        m_messageDispatcher.template registerRequestProcessor<detail::DummyHandler>(
             QString::fromStdString(path),
             std::bind(&HttpServerBasicMessageDispatcher::handlerFactoryFunc, this, path),
             method);
@@ -48,7 +48,7 @@ protected:
 
     void registerDefaultHandler()
     {
-        m_messageDispatcher.registerRequestProcessor<DummyHandler>(
+        m_messageDispatcher.template registerRequestProcessor<detail::DummyHandler>(
             nx_http::kAnyPath,
             std::bind(&HttpServerBasicMessageDispatcher::handlerFactoryFunc, this, "default"));
     }
@@ -62,7 +62,7 @@ protected:
                 nullptr,
                 prepareDummyMessage(method, path),
                 nx::utils::stree::ResourceContainer(),
-                OnRequestProcessedHandler()));
+                detail::OnRequestProcessedHandler()));
         ASSERT_EQ(path, m_dispatchedPathQueue.front());
         m_dispatchedPathQueue.pop_front();
     }
@@ -76,7 +76,7 @@ protected:
                 nullptr,
                 prepareDummyMessage(method, path),
                 nx::utils::stree::ResourceContainer(),
-                OnRequestProcessedHandler()));
+                detail::OnRequestProcessedHandler()));
     }
 
     void assertDefaultHandlerFound(
@@ -88,7 +88,7 @@ protected:
                 nullptr,
                 prepareDummyMessage(method, path),
                 nx::utils::stree::ResourceContainer(),
-                OnRequestProcessedHandler()));
+                detail::OnRequestProcessedHandler()));
         ASSERT_EQ("default", m_dispatchedPathQueue.front());
         m_dispatchedPathQueue.pop_front();
     }
@@ -97,10 +97,10 @@ private:
     MessageDispatcherType m_messageDispatcher;
     std::deque<std::string> m_dispatchedPathQueue;
 
-    std::unique_ptr<DummyHandler> handlerFactoryFunc(const std::string& path)
+    std::unique_ptr<detail::DummyHandler> handlerFactoryFunc(const std::string& path)
     {
         m_dispatchedPathQueue.push_back(path);
-        return std::make_unique<DummyHandler>();
+        return std::make_unique<detail::DummyHandler>();
     }
 
     nx_http::Message prepareDummyMessage(
