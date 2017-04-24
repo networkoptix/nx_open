@@ -694,8 +694,8 @@ struct SendTransactionToTransportFastFuction
         const QByteArray& serializedTran,
         const P2pConnectionPtr& connection) const
     {
+        connection->sendMessage(MessageType::pushTransactionData, serializedTran);
         return true;
-        return connection->sendMessage(MessageType::pushTransactionData, serializedTran);
     }
 };
 
