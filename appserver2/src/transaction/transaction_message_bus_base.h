@@ -25,7 +25,7 @@ namespace ec2
             RoutingRecord(): distance(0), lastRecvTime(0) {}
             RoutingRecord(int distance, qint64 lastRecvTime): distance(distance), lastRecvTime(lastRecvTime) {}
 
-            quint32 distance;
+            qint32 distance;
             qint64 lastRecvTime;
         };
         virtual ~QnTransactionMessageBusBase();

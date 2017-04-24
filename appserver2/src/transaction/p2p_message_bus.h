@@ -18,21 +18,21 @@ namespace detail {
     class QnDbManager;
 }
 
-using ResolvePeerNumberMessageType = std::vector<PeerNumberType>;
+using ResolvePeerNumberMessageType = QVector<PeerNumberType>;
 
 struct AlivePeersRecord
 {
     PeerNumberType peerNumber = 0;
     quint16 distance = 0;
 };
-using AlivePeersMessagType = std::vector<AlivePeersRecord>;
+using AlivePeersMessagType = QVector<AlivePeersRecord>;
 
 struct SubscribeForDataUpdateRecord
 {
     PeerNumberType peerNumber = 0;
     int sequence = 0;
 };
-using SubscribeForDataUpdatesMessageType = std::vector<SubscribeForDataUpdateRecord>;
+using SubscribeForDataUpdatesMessageType = QVector<SubscribeForDataUpdateRecord>;
 
 class P2pMessageBus: public QnTransactionMessageBusBase
 {
@@ -55,12 +55,12 @@ public:
     void start();
 private:
     QByteArray serializePeersMessage();
-    QByteArray serializeCompressedPeers(MessageType messageType, const std::vector<PeerNumberType>& peers);
-    QByteArray serializeResolvePeerNumberRequest(const std::vector<PeerNumberType>& peers);
-    QByteArray serializeResolvePeerNumberResponse(const std::vector<PeerNumberType>& peers);
+    QByteArray serializeCompressedPeers(MessageType messageType, const QVector<PeerNumberType>& peers);
+    QByteArray serializeResolvePeerNumberRequest(const QVector<PeerNumberType>& peers);
+    QByteArray serializeResolvePeerNumberResponse(const QVector<PeerNumberType>& peers);
     QByteArray serializeSubscribeRequest(
-        const std::vector<PeerNumberType>& shortValues,
-        const std::vector<quint32>& sequences);
+        const QVector<PeerNumberType>& shortValues,
+        const QVector<qint32>& sequences);
 private:
     void doPeriodicTasks();
     void processTemporaryOutgoingConnections();
@@ -68,7 +68,7 @@ private:
     void createOutgoingConnections();
     void sendAlivePeersMessage();
 
-    std::vector<PeerNumberType> deserializeCompressedPeers(const QByteArray& data, bool* success);
+    QVector<PeerNumberType> deserializeCompressedPeers(const QByteArray& data, bool* success);
     void deserializeAlivePeersMessage(
         const P2pConnectionPtr& connection,
         const QByteArray& data);
@@ -90,7 +90,7 @@ private:
     bool handleSubscribeForDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handlePushTransactionData(const P2pConnectionPtr& connection, const QByteArray& data);
 
-    std::vector<quint32> getDbSequences(const std::vector<ApiPersistentIdData>& peers);
+    QVector<qint32> getDbSequences(const QVector<ApiPersistentIdData>& peers);
 
     friend struct GotTransactionFuction;
 
@@ -109,8 +109,8 @@ private:
     {
         PeerInfo() {}
 
-        quint32 distanceVia(const ApiPersistentIdData& via) const;
-        quint32 minDistance(std::vector<ApiPersistentIdData>* outViaList) const;
+        qint32 distanceVia(const ApiPersistentIdData& via) const;
+        qint32 minDistance(QVector<ApiPersistentIdData>* outViaList) const;
 
         bool isOnline = false;
         RoutingInfo routingInfo; // key: route throw, value - distance in hops

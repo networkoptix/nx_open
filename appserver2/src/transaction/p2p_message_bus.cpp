@@ -15,15 +15,15 @@ namespace ec2 {
 
 // PeerInfo
 
-quint32 P2pMessageBus::PeerInfo::distanceVia(const ApiPersistentIdData& via) const
+qint32 P2pMessageBus::PeerInfo::distanceVia(const ApiPersistentIdData& via) const
 {
-    quint32 result = std::numeric_limits<quint32>::max();
+    qint32 result = std::numeric_limits<qint32>::max();
     auto itr = routingInfo.find(via);
     return itr != routingInfo.end() ? itr.value().distance : kMaxDistance;
 }
-quint32 P2pMessageBus::PeerInfo::minDistance(std::vector<ApiPersistentIdData>* outViaList) const
+qint32 P2pMessageBus::PeerInfo::minDistance(QVector<ApiPersistentIdData>* outViaList) const
 {
-    quint32 minDistance = kMaxDistance;
+    qint32 minDistance = kMaxDistance;
     for (auto itr = routingInfo.begin(); itr != routingInfo.end(); ++itr)
         minDistance = std::min(minDistance, itr.value().distance);
     if (outViaList)
@@ -236,12 +236,12 @@ void P2pMessageBus::addOfflinePeersFromDb()
     for (auto itr = persistentState.begin(); itr != persistentState.end(); ++itr)
     {
         ApiPersistentIdData peer(
-            itr.key().peerID,
-            itr.key().dbID);  //< persistent id
+            itr.key().id,
+            itr.key().persistentId);  //< persistent id
         auto& peerData = m_allPeers[peer];
         if (!peerData.isOnline)
         {
-            quint32 sequence = itr.value();
+            qint32 sequence = itr.value();
             peerData.routingInfo.insert(localPeer(), RoutingRecord(sequence, qnSyncTime->currentMSecsSinceEpoch()));
         }
     }
@@ -262,7 +262,7 @@ QByteArray P2pMessageBus::serializePeersMessage()
         {
             const auto& peer = itr.value();
 
-            quint32 minDistance = kMaxDistance;
+            qint32 minDistance = kMaxDistance;
             for (const RoutingRecord& rec : peer.routingInfo)
                 minDistance = std::min(minDistance, rec.distance);
             if (minDistance == kMaxDistance)
@@ -298,7 +298,7 @@ void P2pMessageBus::deserializeAlivePeersMessage(
             PeerNumberType peerNumber = deserializeCompressPeerNumber(reader);
             ApiPersistentIdData peerId = connection->decode(peerNumber);
             bool isOnline = reader.getBit();
-            quint32 receivedDistance = 0;
+            qint32 receivedDistance = 0;
             if (isOnline)
                 receivedDistance = NALUnit::extractUEGolombCode(reader); // todo: move function to another place
             else
@@ -338,19 +338,18 @@ QMap<ApiPersistentIdData, P2pConnectionPtr> P2pMessageBus::getCurrentSubscriptio
     return result;
 }
 
-std::vector<quint32> P2pMessageBus::getDbSequences(const std::vector<ApiPersistentIdData>& peers)
+QVector<qint32> P2pMessageBus::getDbSequences(const QVector<ApiPersistentIdData>& peers)
 {
     NX_ASSERT(m_db);
     if (!m_db)
-        return std::vector<quint32>();
-    //m_db->transactionLog()->getTransactionsState(peers);
-    return std::vector<quint32>();
+        return QVector<qint32>();
+    return m_db->transactionLog()->getTransactionsState(peers).values.values().toVector();
 }
 
 void P2pMessageBus::resubscribePeers(
     QMap<ApiPersistentIdData, P2pConnectionPtr> newSubscription)
 {
-    QMap<P2pConnectionPtr, std::vector<ApiPersistentIdData>> updatedSubscription;
+    QMap<P2pConnectionPtr, QVector<ApiPersistentIdData>> updatedSubscription;
     for (auto itr = newSubscription.begin(); itr != newSubscription.end(); ++itr)
         updatedSubscription[itr.value()].push_back(itr.key());
     for (auto& value: updatedSubscription)
@@ -362,10 +361,10 @@ void P2pMessageBus::resubscribePeers(
         if (miscData.localSubscription != newValue)
         {
             miscData.localSubscription = newValue;
-            std::vector<PeerNumberType> shortValues;
+            QVector<PeerNumberType> shortValues;
             for (const auto& id: newValue)
                 shortValues.push_back(connection->encode(id));
-            std::vector<quint32> sequenceList = getDbSequences(newValue);
+            QVector<qint32> sequenceList = getDbSequences(newValue);
             connection->sendMessage(serializeSubscribeRequest(shortValues, sequenceList));
         }
     }
@@ -389,12 +388,12 @@ void P2pMessageBus::doSubscribe()
         const ApiPersistentIdData& peer = itr.key();
         const PeerInfo& info = itr.value();
         auto subscribedVia = currentSubscription.value(peer);
-        quint32 subscribedDistance = kMaxDistance;
+        qint32 subscribedDistance = kMaxDistance;
         if (subscribedVia)
             subscribedDistance = info.distanceVia(subscribedVia->remotePeer());
 
-        std::vector<ApiPersistentIdData> viaList;
-        quint32 minDistance = info.minDistance(&viaList);
+        QVector<ApiPersistentIdData> viaList;
+        qint32 minDistance = info.minDistance(&viaList);
         NX_ASSERT(!viaList.empty());
         if (minDistance < subscribedDistance)
         {
@@ -415,19 +414,19 @@ void P2pMessageBus::doSubscribe()
 {
     const auto localPeer = this->localPeer();
 
-    QMap<ApiPersistentIdData, std::vector<ApiPersistentIdData>> candidatesToSubscribe; //< key: who, value: where
+    QMap<ApiPersistentIdData, QVector<ApiPersistentIdData>> candidatesToSubscribe; //< key: who, value: where
     for (auto itr = m_allPeers.begin(); itr != m_allPeers.end(); ++itr)
     {
         const ApiPersistentIdData& peer = itr.key();
         const PeerInfo& info = itr.value();
-        quint32 directDistance = info.distanceVia(localPeer);
-        std::vector<ApiPersistentIdData> viaList;
-        quint32 minDistance = info.minDistance(&viaList);
+        qint32 directDistance = info.distanceVia(localPeer);
+        QVector<ApiPersistentIdData> viaList;
+        qint32 minDistance = info.minDistance(&viaList);
         if (minDistance < directDistance)
         {
             if (P2pConnectionPtr subscribedVia = m_subscriptionList.value(peer))
             {
-                quint32 subscribedDistance = info.distanceVia(subscribedVia->remotePeer());
+                qint32 subscribedDistance = info.distanceVia(subscribedVia->remotePeer());
                 if (minDistance < subscribedDistance)
                     subscribedVia->unsubscribeFrom(peer);
                 else
@@ -509,9 +508,9 @@ void P2pMessageBus::at_gotMessage(const QSharedPointer<P2pConnection>& connectio
         connection->setState(P2pConnection::State::Error);
 }
 
-std::vector<PeerNumberType> P2pMessageBus::deserializeCompressedPeers(const QByteArray& data,  bool* success)
+QVector<PeerNumberType> P2pMessageBus::deserializeCompressedPeers(const QByteArray& data,  bool* success)
 {
-    std::vector<PeerNumberType> result;
+    QVector<PeerNumberType> result;
     BitStreamReader reader((const quint8*) data.data(), data.size());
     *success = true;
     try
@@ -529,7 +528,7 @@ std::vector<PeerNumberType> P2pMessageBus::deserializeCompressedPeers(const QByt
 bool P2pMessageBus::handleResolvePeerNumberRequest(const P2pConnectionPtr& connection, const QByteArray& data)
 {
     bool success = false;
-    std::vector<PeerNumberType> request = deserializeCompressedPeers(data, &success);
+    QVector<PeerNumberType> request = deserializeCompressedPeers(data, &success);
     if (!success)
         return false;
     connection->sendMessage(serializeResolvePeerNumberResponse(request));
@@ -567,7 +566,7 @@ bool P2pMessageBus::handleResolvePeerNumberResponse(const P2pConnectionPtr& conn
     return true;
 }
 
-QByteArray P2pMessageBus::serializeCompressedPeers(MessageType messageType, const std::vector<PeerNumberType>& peers)
+QByteArray P2pMessageBus::serializeCompressedPeers(MessageType messageType, const QVector<PeerNumberType>& peers)
 {
     QByteArray result;
     result.resize(peers.size() * 2 + 1);
@@ -582,14 +581,14 @@ QByteArray P2pMessageBus::serializeCompressedPeers(MessageType messageType, cons
 }
 
 
-QByteArray P2pMessageBus::serializeResolvePeerNumberRequest(const std::vector<PeerNumberType>& peers)
+QByteArray P2pMessageBus::serializeResolvePeerNumberRequest(const QVector<PeerNumberType>& peers)
 {
     return serializeCompressedPeers(MessageType::resolvePeerNumberRequest, peers);
 }
 
 QByteArray P2pMessageBus::serializeSubscribeRequest(
-    const std::vector<PeerNumberType>& peers,
-    const std::vector<quint32>& sequences)
+    const QVector<PeerNumberType>& peers,
+    const QVector<qint32>& sequences)
 {
     NX_ASSERT(peers.size() == sequences.size());
 
@@ -611,7 +610,7 @@ QByteArray P2pMessageBus::serializeSubscribeRequest(
     return serializeCompressedPeers(MessageType::subscribeForDataUpdates, peers);
 }
 
-QByteArray P2pMessageBus::serializeResolvePeerNumberResponse(const std::vector<PeerNumberType>& peers)
+QByteArray P2pMessageBus::serializeResolvePeerNumberResponse(const QVector<PeerNumberType>& peers)
 {
     QByteArray result;
     result.reserve(peers.size() * (16 * 2 + 2) + 1); // two guid + uncompressed PeerNumber per record
@@ -634,7 +633,7 @@ QByteArray P2pMessageBus::serializeResolvePeerNumberResponse(const std::vector<P
 
 bool P2pMessageBus::handleAlivePeers(const P2pConnectionPtr& connection, const QByteArray& data)
 {
-    std::vector<PeerNumberType> numbersToResolve;
+    QVector<PeerNumberType> numbersToResolve;
     BitStreamReader reader((const quint8*)data.data(), data.size());
     try
     {
@@ -642,7 +641,7 @@ bool P2pMessageBus::handleAlivePeers(const P2pConnectionPtr& connection, const Q
         {
             PeerNumberType peerNumber = deserializeCompressPeerNumber(reader);
             bool isOnline = reader.getBit();
-            quint32 distance = isOnline
+            qint32 distance = isOnline
                 ? NALUnit::extractUEGolombCode(reader)
                 : reader.getBits(32);
             if (connection->decode(peerNumber).isNull())
@@ -666,15 +665,15 @@ bool P2pMessageBus::handleAlivePeers(const P2pConnectionPtr& connection, const Q
 bool P2pMessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data)
 {
     bool success = false;
-    std::vector<PeerNumberType> request = deserializeCompressedPeers(data, &success);
+    QVector<PeerNumberType> request = deserializeCompressedPeers(data, &success);
     if (!success)
         return false;
-    std::vector<ApiPersistentIdData> subscription;
+    QVector<ApiPersistentIdData> subscription;
     for (const auto& shortPeer: request)
         subscription.push_back(m_localShortPeerInfo.decode(shortPeer));
     std::sort(subscription.begin(), subscription.end());
     auto& oldSubscription = connection->miscData().remoteSubscription;
-    std::vector<ApiPersistentIdData> diff;
+    QVector<ApiPersistentIdData> diff;
     std::set_difference(
         subscription.begin(), subscription.end(),
         oldSubscription.begin(), oldSubscription.end(),

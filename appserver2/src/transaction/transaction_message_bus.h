@@ -283,7 +283,7 @@ private:
 
     QVector<QnTransactionTransport*> m_connectingConnections;
 
-    QMap<QnTranStateKey, int> m_lastTransportSeq;
+    QMap<ApiPersistentIdData, int> m_lastTransportSeq;
 
     // alive control
     QElapsedTimer m_aliveSendTimer;

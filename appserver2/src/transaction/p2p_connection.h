@@ -71,8 +71,8 @@ public:
     struct MiscData
     {
         QByteArray lastAliveMessage;
-        std::vector<ApiPersistentIdData> localSubscription; //< local -> remote subscription
-        std::vector<ApiPersistentIdData> remoteSubscription; //< remote -> local subscription
+        QVector<ApiPersistentIdData> localSubscription; //< local -> remote subscription
+        QVector<ApiPersistentIdData> remoteSubscription; //< remote -> local subscription
     };
 
     MiscData& miscData();

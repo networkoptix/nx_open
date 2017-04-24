@@ -43,7 +43,7 @@ namespace ec2 {
     struct ApiResourceTypeData;
     struct ApiScheduleTaskData;
     struct ApiScheduleTaskWithRefData;
-    struct QnTranStateKey;
+    struct ApiPersistentIdData;
     struct QnTranState;
     struct QnTranStateResponse;
     struct ApiSyncRequestData;
@@ -177,7 +177,7 @@ namespace ec2 {
     (ApiResourceTypeData)\
     (ApiScheduleTaskData)\
     (ApiScheduleTaskWithRefData)\
-    (QnTranStateKey)\
+    (ApiPersistentIdData)\
     (QnTranState)\
     (ApiSyncRequestData)\
     (QnTranStateResponse)\

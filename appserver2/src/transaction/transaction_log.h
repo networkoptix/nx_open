@@ -40,6 +40,9 @@ namespace ec2
             QList<QByteArray>& result);
         QnTranState getTransactionsState();
 
+        // filter should contains sorted data
+        QnTranState getTransactionsState(const QVector<ApiPersistentIdData>& filter);
+
         bool contains(const QnTranState& state) const;
 
         template <typename T>
@@ -69,7 +72,7 @@ namespace ec2
         bool init();
         bool clear();
 
-        int getLatestSequence(const QnTranStateKey& key) const;
+        int getLatestSequence(const ApiPersistentIdData& key) const;
         static QnUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray());
         static QnUuid makeHash(const QByteArray &extraData, const ApiDiscoveryData &data);
 
@@ -100,8 +103,8 @@ namespace ec2
         struct UpdateHistoryData
         {
             UpdateHistoryData(): timestamp(Timestamp::fromInteger(0)) {}
-            UpdateHistoryData(const QnTranStateKey& updatedBy, const Timestamp& timestamp): updatedBy(updatedBy), timestamp(timestamp) {}
-            QnTranStateKey updatedBy;
+            UpdateHistoryData(const ApiPersistentIdData& updatedBy, const Timestamp& timestamp): updatedBy(updatedBy), timestamp(timestamp) {}
+            ApiPersistentIdData updatedBy;
             Timestamp timestamp;
         };
         struct CommitData

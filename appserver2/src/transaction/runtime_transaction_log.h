@@ -22,7 +22,7 @@ namespace ec2
         QnRuntimeTransactionLog(QnCommonModule* commonModule);
 		~QnRuntimeTransactionLog();
 
-        void clearOldRuntimeData(const QnTranStateKey& key);
+        void clearOldRuntimeData(const ApiPersistentIdData& key);
         void clearRuntimeData(const QnUuid& id);
         bool contains(const QnTranState& state) const;
         bool contains(const QnTransaction<ApiRuntimeData>& tran) const;
@@ -39,12 +39,12 @@ signals:
         */
         void runtimeDataUpdated(const QnTransaction<ApiRuntimeData>& data);
 private:
-        void clearOldRuntimeDataUnsafe(QnMutexLockerBase& lock, const QnTranStateKey& key);
+        void clearOldRuntimeDataUnsafe(QnMutexLockerBase& lock, const ApiPersistentIdData& key);
 private slots:
         void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
     private:
         QnTranState m_state;
-        QMap<QnTranStateKey, ApiRuntimeData> m_data;
+        QMap<ApiPersistentIdData, ApiRuntimeData> m_data;
         mutable QnMutex m_mutex;
     };
 };

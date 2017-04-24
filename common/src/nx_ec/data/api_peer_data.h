@@ -24,6 +24,10 @@ struct ApiPersistentIdData: ApiIdData
             return id < other.id;
         return persistentId < other.persistentId;
     }
+    bool operator>(const ApiPersistentIdData& other) const
+    {
+        return other < (*this);
+    }
 
     bool isNull() const { return id.isNull();  }
 

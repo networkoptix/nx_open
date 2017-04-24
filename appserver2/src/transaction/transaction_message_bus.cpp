@@ -155,9 +155,9 @@ void QnTransactionMessageBus::removeTTSequenceForPeer(const QnUuid& id)
 {
     NX_LOG(QnLog::EC2_TRAN_LOG, lit("Clear transportSequence for peer %1").arg(id.toString()), cl_logDEBUG1);
 
-    QnTranStateKey key(id, QnUuid());
+    ApiPersistentIdData key(id, QnUuid());
     auto itr = m_lastTransportSeq.lowerBound(key);
-    while (itr != m_lastTransportSeq.end() && itr.key().peerID == id)
+    while (itr != m_lastTransportSeq.end() && itr.key().id == id)
         itr = m_lastTransportSeq.erase(itr);
 }
 
@@ -313,7 +313,7 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
 
     if (aliveData.isAlive)
     {
-        m_runtimeTransactionLog->clearOldRuntimeData(QnTranStateKey(aliveData.peer.id, aliveData.peer.instanceId));
+        m_runtimeTransactionLog->clearOldRuntimeData(ApiPersistentIdData(aliveData.peer.id, aliveData.peer.instanceId));
     }
 
     if (transport && transport->isSyncDone() && aliveData.isAlive)
@@ -475,7 +475,7 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
         return true; // old version, nothing to check
 
     // 1. check transport sequence
-    QnTranStateKey ttSenderKey(transportHeader.sender, transportHeader.senderRuntimeID);
+    ApiPersistentIdData ttSenderKey(transportHeader.sender, transportHeader.senderRuntimeID);
     int transportSeq = m_lastTransportSeq[ttSenderKey];
     if (transportSeq >= transportHeader.sequence)
     {
@@ -489,7 +489,7 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
     if (tran.persistentInfo.isNull() || !m_db)
         return true; // nothing to check
 
-    QnTranStateKey persistentKey(tran.peerID, tran.persistentInfo.dbID);
+    ApiPersistentIdData persistentKey(tran.peerID, tran.persistentInfo.dbID);
     int persistentSeq =  m_db->transactionLog()->getLatestSequence(persistentKey);
 
     if (QnLog::instance(QnLog::EC2_TRAN_LOG)->logLevel() >= cl_logWARNING)
@@ -575,7 +575,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
     QnTransactionTransport* directConnection = m_connections.value(transportHeader.sender);
     if (directConnection && directConnection->getState() == QnTransactionTransport::ReadyForStreaming && directConnection->isReadSync(ApiCommand::NotDefined))
     {
-        QnTranStateKey ttSenderKey(transportHeader.sender, transportHeader.senderRuntimeID);
+        ApiPersistentIdData ttSenderKey(transportHeader.sender, transportHeader.senderRuntimeID);
         const int currentTransportSeq = m_lastTransportSeq.value(ttSenderKey);
         bool cond;
         if (sender != directConnection)
@@ -787,7 +787,7 @@ void QnTransactionMessageBus::printTranState(const QnTranState& tranState)
 
     for (auto itr = tranState.values.constBegin(); itr != tranState.values.constEnd(); ++itr)
     {
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("key=%1 (dbID=%2) need after=%3").arg(itr.key().peerID.toString()).arg(itr.key().dbID.toString()).arg(itr.value()), cl_logDEBUG1);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("key=%1 (dbID=%2) need after=%3").arg(itr.key().id.toString()).arg(itr.key().persistentId.toString()).arg(itr.value()), cl_logDEBUG1);
     }
 }
 
@@ -1186,7 +1186,7 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State)
             transport->processExtraData();
             transport->startListening();
 
-            m_runtimeTransactionLog->clearOldRuntimeData(QnTranStateKey(transport->remotePeer().id, transport->remotePeer().instanceId));
+            m_runtimeTransactionLog->clearOldRuntimeData(ApiPersistentIdData(transport->remotePeer().id, transport->remotePeer().instanceId));
             if (sendInitialData(transport))
             {
                 connectToPeerEstablished(transport->remotePeer());

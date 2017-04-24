@@ -5,7 +5,7 @@
 namespace ec2 {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (QnTranStateKey)(QnTranState)(QnTranStateResponse)(ApiTranSyncDoneData)(ApiSyncRequestData),
+    (QnTranState)(QnTranStateResponse)(ApiTranSyncDoneData)(ApiSyncRequestData),
     (ubjson)(xml)(json)(sql_record)(csv_record),
     _Fields)
 
@@ -15,8 +15,8 @@ bool operator<(const QnTranState& left, const QnTranState& right)
     //  - right has record that is missing in left
     //  - right has greater sequence than left in corresponding record
 
-    QMap<QnTranStateKey, qint32>::const_iterator leftIter = left.values.cbegin();
-    QMap<QnTranStateKey, qint32>::const_iterator rightIter = right.values.cbegin();
+    auto leftIter = left.values.cbegin();
+    auto rightIter = right.values.cbegin();
 
     for (;;)
     {

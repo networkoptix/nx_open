@@ -76,7 +76,7 @@ bool QnTransactionLog::init()
         while (query.next())
         {
             seqFound = true;
-            QnTranStateKey key(QnUuid::fromRfc4122(query.value(0).toByteArray()), QnUuid::fromRfc4122(query.value(1).toByteArray()));
+            ApiPersistentIdData key(QnUuid::fromRfc4122(query.value(0).toByteArray()), QnUuid::fromRfc4122(query.value(1).toByteArray()));
             m_state.values.insert(key, query.value(2).toInt());
         }
     }
@@ -96,7 +96,7 @@ bool QnTransactionLog::init()
                 QnUuid peerID = QnUuid::fromRfc4122(query.value(0).toByteArray());
                 QnUuid dbID = QnUuid::fromRfc4122(query.value(1).toByteArray());
                 int sequence = query.value(2).toInt();
-                QnTranStateKey key(peerID, dbID);
+                ApiPersistentIdData key(peerID, dbID);
                 updateSequenceNoLock(peerID, dbID, sequence);
             }
         }
@@ -117,7 +117,7 @@ bool QnTransactionLog::init()
             timestamp.ticks = query2.value("timestamp").toLongLong();
             QnUuid peerID = QnUuid::fromRfc4122(query2.value("peer_guid").toByteArray());
             QnUuid dbID = QnUuid::fromRfc4122(query2.value("db_guid").toByteArray());
-            m_updateHistory.insert(hash, UpdateHistoryData(QnTranStateKey(peerID, dbID), timestamp));
+            m_updateHistory.insert(hash, UpdateHistoryData(ApiPersistentIdData(peerID, dbID), timestamp));
         }
     }
     else
@@ -184,7 +184,7 @@ Timestamp QnTransactionLog::getTimeStamp()
 
 int QnTransactionLog::currentSequenceNoLock() const
 {
-    QnTranStateKey key (m_dbManager->commonModule()->moduleGUID(), m_dbManager->getID());
+    ApiPersistentIdData key (m_dbManager->commonModule()->moduleGUID(), m_dbManager->getID());
     return qMax(m_state.values.value(key), m_commitData.state.values.value(key));
 }
 
@@ -225,7 +225,7 @@ ErrorCode QnTransactionLog::updateSequence(const ApiUpdateSequenceData& data)
 
 ErrorCode QnTransactionLog::updateSequenceNoLock(const QnUuid& peerID, const QnUuid& dbID, int sequence)
 {
-    QnTranStateKey key(peerID, dbID);
+    ApiPersistentIdData key(peerID, dbID);
     if (m_state.values.value(key) >= sequence)
         return ErrorCode::ok;
 
@@ -281,7 +281,7 @@ ErrorCode QnTransactionLog::saveToDB(
         qDebug() << "add record to transaction log. Transaction=" << toString(tran.command) << "timestamp=" << tran.timestamp << "producedOnCurrentPeer=" << (tran.peerID == commonModule()->moduleGUID());
     #endif
 
-    QnTranStateKey key(tran.peerID, tran.persistentInfo.dbID);
+    ApiPersistentIdData key(tran.peerID, tran.persistentInfo.dbID);
     ErrorCode code = updateSequenceNoLock(tran.peerID, tran.persistentInfo.dbID, tran.persistentInfo.sequence);
     if (code != ErrorCode::ok)
         return code;
@@ -331,7 +331,13 @@ QnTranState QnTransactionLog::getTransactionsState()
     return m_state;
 }
 
-int QnTransactionLog::getLatestSequence(const QnTranStateKey& key) const
+QnTranState QnTransactionLog::getTransactionsState(const QVector<ApiPersistentIdData>& filter)
+{
+    QnReadLocker lock(&m_dbManager->getMutex());
+    return m_state;
+}
+
+int QnTransactionLog::getLatestSequence(const ApiPersistentIdData& key) const
 {
     QnReadLocker lock(&m_dbManager->getMutex());
     return m_state.values.value(key);
@@ -340,7 +346,7 @@ int QnTransactionLog::getLatestSequence(const QnTranStateKey& key) const
 QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTransaction& tran, const QnUuid& hash) const
 {
 
-    QnTranStateKey key (tran.peerID, tran.persistentInfo.dbID);
+    ApiPersistentIdData key (tran.peerID, tran.persistentInfo.dbID);
     NX_ASSERT(tran.persistentInfo.sequence != 0);
     if (m_state.values.value(key) >= tran.persistentInfo.sequence) {
         NX_LOG( QnLog::EC2_TRAN_LOG,
@@ -388,17 +394,17 @@ ErrorCode QnTransactionLog::getTransactionsAfter(
         extraFilter = lit("AND tran_type = %1").arg(TransactionType::Cloud);
 
     QnReadLocker lock(&m_dbManager->getMutex());
-    QMap <QnTranStateKey, int> tranLogSequence;
+    QMap <ApiPersistentIdData, int> tranLogSequence;
     for(auto itr = m_state.values.begin(); itr != m_state.values.end(); ++itr)
     {
-        const QnTranStateKey& key = itr.key();
+        const ApiPersistentIdData& key = itr.key();
         QSqlQuery query(m_dbManager->getDB());
         query.setForwardOnly(true);
         query.prepare(lit("SELECT tran_data, sequence FROM transaction_log WHERE peer_guid = ? \
             AND db_guid = ? AND sequence > ? \
             %1 ORDER BY sequence").arg(extraFilter));
-        query.addBindValue(key.peerID.toRfc4122());
-        query.addBindValue(key.dbID.toRfc4122());
+        query.addBindValue(key.id.toRfc4122());
+        query.addBindValue(key.persistentId.toRfc4122());
         query.addBindValue(state.values.value(key));
         if (!query.exec())
             return ErrorCode::failure;
@@ -421,7 +427,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(
         m_dbManager->commonModule()->moduleGUID());
     while (query.next())
     {
-        QnTranStateKey key(
+        ApiPersistentIdData key(
 			QnUuid::fromRfc4122(query.value(0).toByteArray()),
 			QnUuid::fromRfc4122(query.value(1).toByteArray())
 		);
@@ -429,8 +435,8 @@ ErrorCode QnTransactionLog::getTransactionsAfter(
         if (latestSequence > tranLogSequence[key]) {
             // add filler transaction with latest sequence
             ApiSyncMarkerRecord record;
-            record.peerID = key.peerID;
-            record.dbID = key.dbID;
+            record.peerID = key.id;
+            record.dbID = key.persistentId;
             record.sequence = latestSequence;
             syncMarkersTran.params.markers.push_back(record);
         }
