@@ -64,6 +64,7 @@ public:
     void releaseSocket();
 
     int redirectTo(const QByteArray& page, QByteArray& contentType);
+    int notFound(QByteArray& contentType);
     QnAuthSession authSession() const;
 
 protected:

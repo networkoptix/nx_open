@@ -75,7 +75,9 @@ void QnResourceTreeModelLayoutNodeManager::handleResourceAdded(const QnResourceP
     auto id = resource->getId();
     auto uniqueId = resource->getUniqueId();
 
-    for (auto node: m_loadingLayouts)
+    // Make a copy to avoid collision when modified inside of ::updateItemResource
+    const auto loading = m_loadingLayouts;
+    for (auto node: loading)
     {
         NX_EXPECT(!node->itemsLoaded());
 

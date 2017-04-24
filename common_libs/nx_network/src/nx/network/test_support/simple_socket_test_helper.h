@@ -630,14 +630,13 @@ void socketTransferFragmentation(
     const ClientSocketMaker& clientMaker,
     boost::optional<SocketAddress> endpointToConnectTo = boost::none)
 {
-    // On localhost TCP connection small packets usually tranfered entirely, so that we expect the
-    // same behavior for all out stream sockets.
+    // On localhost TCP connection small packets usually transferred entirely, 
+    // so that we expect the same behavior for all our stream sockets.
     static const Buffer kMessage = utils::random::generate(100);
     static const size_t kTestRuns = utils::TestOptions::applyLoadMode<size_t>(5);
 
     auto server = serverMaker();
     ASSERT_TRUE(server->setReuseAddrFlag(true));
-    ASSERT_TRUE(server->setRecvTimeout(100));
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << lastError();
     ASSERT_TRUE(server->listen(testClientCount())) << lastError();
 
@@ -646,17 +645,13 @@ void socketTransferFragmentation(
     if (!endpointToConnectTo)
         endpointToConnectTo = std::move(serverAddress);
 
-    ASSERT_FALSE((bool) server->accept()) << lastError();
-
     auto client = clientMaker();
-    ASSERT_TRUE(client->setSendTimeout(kTestTimeout.count()));
-    ASSERT_TRUE(client->setRecvTimeout(kTestTimeout.count()));
     ASSERT_TRUE(client->connect(*endpointToConnectTo, kTestTimeout.count()));
     ASSERT_TRUE(client->setNonBlockingMode(true));
     const auto clientGuard = makeScopeGuard([&](){ client->pleaseStopSync(); });
 
     std::unique_ptr<AbstractStreamSocket> accepted(server->accept());
-    ASSERT_TRUE((bool) accepted);
+    ASSERT_NE(nullptr, accepted);
 
     for (size_t runNumber = 0; runNumber <= kTestRuns; ++runNumber)
     {
@@ -666,14 +661,14 @@ void socketTransferFragmentation(
             kMessage,
             [&](SystemError::ErrorCode code, size_t size)
             {
-                EXPECT_EQ(SystemError::noError, code) << SystemError::toString(code).toStdString();
-                EXPECT_EQ((size_t)kMessage.size(), size);
+                ASSERT_EQ(SystemError::noError, code) << SystemError::toString(code).toStdString();
+                ASSERT_EQ((size_t)kMessage.size(), size);
                 promise.set_value();
             });
 
         Buffer buffer(kMessage.size(), Qt::Uninitialized);
-        EXPECT_EQ(buffer.size(), accepted->recv(buffer.data(), buffer.size())) << lastError();
-        EXPECT_EQ(buffer, kMessage);
+        ASSERT_EQ(buffer.size(), accepted->recv(buffer.data(), buffer.size())) << lastError();
+        ASSERT_EQ(buffer, kMessage);
         promise.get_future().wait();
     }
 }

@@ -69,11 +69,12 @@ void BaseAuthenticationManager::reportAuthenticationFailure(
     AuthenticationCompletionHandler completionHandler)
 {
     completionHandler(
-        false,
-        nx::utils::stree::ResourceContainer(),
-        generateWwwAuthenticateHeader(),
-        nx_http::HttpHeaders(),
-        nullptr);
+        nx_http::server::AuthenticationResult(
+            false,
+            nx::utils::stree::ResourceContainer(),
+            generateWwwAuthenticateHeader(),
+            nx_http::HttpHeaders(),
+            nullptr));
 }
 
 header::WWWAuthenticate BaseAuthenticationManager::generateWwwAuthenticateHeader()
@@ -112,11 +113,12 @@ void BaseAuthenticationManager::reportSuccess(
     AuthenticationCompletionHandler completionHandler)
 {
     completionHandler(
-        true,
-        nx::utils::stree::ResourceContainer(),
-        header::WWWAuthenticate(),
-        nx_http::HttpHeaders(),
-        nullptr);
+        nx_http::server::AuthenticationResult(
+            true,
+            nx::utils::stree::ResourceContainer(),
+            header::WWWAuthenticate(),
+            nx_http::HttpHeaders(),
+            nullptr));
 }
 
 nx::String BaseAuthenticationManager::generateNonce()

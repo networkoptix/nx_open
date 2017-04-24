@@ -25,12 +25,19 @@ public:
     ~ListeningPeerPool();
 
     void addConnection(
-        std::string peerName,
+        const std::string& peerName,
         std::unique_ptr<AbstractStreamSocket> connection);
 
     std::size_t getConnectionCountByPeerName(const std::string& peerName) const;
 
     bool isPeerListening(const std::string& peerName) const;
+    /**
+     * E.g., if we have peers server1.nx.com and server2.nx.com then 
+     * findListeningPeerByPrefix("nx.com") will return any of that peers.
+     * At the same time findListeningPeerByPrefix("server1.nx.com") will return server1.nx.com.
+     * @return Empty string if nothing found.
+     */
+    std::string findListeningPeerByDomain(const std::string& domainName) const;
 
     void takeIdleConnection(
         const std::string& peerName,
@@ -43,6 +50,7 @@ private:
         nx::Buffer readBuffer;
     };
     
+    /** multimap<full peer name, connection context> */
     using PeerConnections = std::multimap<std::string, ConnectionContext>;
 
     PeerConnections m_peerNameToConnection;

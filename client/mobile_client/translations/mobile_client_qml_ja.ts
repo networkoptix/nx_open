@@ -484,7 +484,7 @@
     </message>
     <message>
         <source>Disconnect from Server</source>
-        <translation>サーバーから切断します</translation>
+        <translation>接続サーバーから切断</translation>
     </message>
 </context>
 <context>
@@ -573,7 +573,7 @@
     <message>
         <source>d MMMM yyyy</source>
         <comment>DO NOT TRANSLATE THIS STRING!</comment>
-        <translation type="unfinished">d MMMM yyyy</translation>
+        <translation>yyyy/MMMM/d</translation>
     </message>
 </context>
 <context>

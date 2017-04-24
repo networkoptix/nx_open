@@ -100,14 +100,20 @@ namespace
     const auto kSessionIdMetricTag = lit("id");
     const auto kClientMachineIdMetricTag = lit("clientId");
     const auto kSystemNameMetricTag = lit("systemName");
+    const auto kCloudSystemIdMetricTag = lit("cloudSystemId");
 
     void appendMandatoryFilters(QnStringsSet *filters)
     {
         if (!filters)
             return;
 
-        static const QString kKeyfilters[] = { kSessionIdMetricTag
-            , kClientMachineIdMetricTag, kSystemNameMetricTag };
+        static const QString kKeyfilters[] =
+        {
+            kSessionIdMetricTag,
+            kClientMachineIdMetricTag,
+            kSystemNameMetricTag,
+            kCloudSystemIdMetricTag,
+        };
 
         for (auto keyFilter: kKeyfilters)
             filters->insert(keyFilter);
@@ -331,9 +337,12 @@ void QnStatisticsManager::saveCurrentStatistics()
 
     const auto sessionId = QnUuid::createUuid();
     const auto systemName = qnGlobalSettings->systemName();
+    const auto cloudSystemId = qnGlobalSettings->cloudSystemId();
     metrics.insert(kSessionIdMetricTag, sessionId.toString());
     metrics.insert(kClientMachineIdMetricTag, m_clientId.toString());
     metrics.insert(kSystemNameMetricTag, systemName);
+    if (!cloudSystemId.isEmpty())
+        metrics.insert(kCloudSystemIdMetricTag, cloudSystemId);
 
     m_storage->storeMetrics(metrics);
 }
