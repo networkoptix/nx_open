@@ -202,7 +202,7 @@ private:
     FactoryPtr m_childFactory;
     TextFactoryPtr m_textFactory;
 
-    QList<Action *> m_children;
+    QList<Action*> m_children;
 
     struct ConditionalText
     {
@@ -214,8 +214,6 @@ private:
     };
     QList<ConditionalText> m_conditionalTexts;
 };
-
-Q_DECLARE_METATYPE(Action *)
 
 } // namespace action
 } // namespace ui
