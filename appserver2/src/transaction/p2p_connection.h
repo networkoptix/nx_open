@@ -9,6 +9,7 @@
 #include <nx_ec/ec_proto_version.h>
 #include <utils/common/from_this_to_shared.h>
 #include <core/resource/shared_resource_pointer.h>
+#include <core/resource_access/user_access_data.h>
 
 namespace ec2 {
 
@@ -74,6 +75,8 @@ public:
     };
 
     MiscData& miscData();
+
+    const Qn::UserAccessData& getUserAccessData() const { return m_userAccessData; }
 signals:
     void gotMessage(P2pConnectionPtr connection, MessageType messageType, const QByteArray& payload);
 private:
@@ -114,8 +117,12 @@ private:
     Direction m_direction;
     MiscData m_miscData;
     qint64 m_remoteIdentityTime = 0;
+    const Qn::UserAccessData m_userAccessData = Qn::kSystemAccess;
 
     PeerNumberInfo m_shortPeerInfo;
+
+    std::vector<ApiPersistentIdData, P2pConnectionPtr> m_currentSubscriptions;
+
 
     int m_remotePeerEcProtoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION;
     int m_localPeerProtocolVersion = nx_ec::EC2_PROTO_VERSION;

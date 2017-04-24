@@ -7,6 +7,8 @@
 #include <utils/media/nalUnits.h>
 #include <utils/common/synctime.h>
 #include <database/db_manager.h>
+#include "ec_connection_notification_manager.h"
+#include "transaction_message_bus_priv.h"
 
 namespace ec2 {
 
@@ -44,9 +46,7 @@ P2pMessageBus::P2pMessageBus(
     qRegisterMetaType<MessageType>();
     qRegisterMetaType<P2pConnectionPtr>("P2pConnectionPtr");
 
-    m_thread = new QThread();
     m_thread->setObjectName("P2pMessageBus");
-    moveToThread(m_thread);
     m_timer = new QTimer();
     connect(m_timer, &QTimer::timeout, this, &P2pMessageBus::doPeriodicTasks);
     m_timer->start(500);
@@ -54,13 +54,7 @@ P2pMessageBus::P2pMessageBus(
 
 P2pMessageBus::~P2pMessageBus()
 {
-    if (m_thread)
-    {
-        m_thread->exit();
-        m_thread->wait();
-    }
-
-    delete m_thread;
+    stop();
     delete m_timer;
 }
 
@@ -252,7 +246,7 @@ void P2pMessageBus::addOfflinePeersFromDb()
     }
 }
 
-QByteArray P2pMessageBus::serializePeersMessage()
+QByteArray
 {
     QByteArray result;
     result.resize(m_allPeers.size() * 6 + 1);
