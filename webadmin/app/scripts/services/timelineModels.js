@@ -656,6 +656,7 @@ ShortCache.prototype.init = function(start){
 
     this.lastPlayedPosition = 0; // Save the boundaries of uploaded cache
     this.lastPlayedDate = 0;
+    this.playing = true;
 
     this.update();
 };
@@ -823,7 +824,7 @@ ShortCache.prototype.setPlayingPosition = function(position){
     if(oldPosition > this.playedPosition && Config.allowDebugMode){
         console.error("Position jumped back! ms:" , oldPosition - this.playedPosition);
     }
-
+    
     return this.playedPosition;
 };
 

@@ -69,6 +69,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         $scope.settings = {id: ''};
         $scope.volumeLevel = typeof($scope.storage.volumeLevel) === 'number' ? $scope.storage.volumeLevel : 50;
+        $scope.isPlaying = true;
 
         mediaserver.getModuleInformation().then(function (r) {
             $scope.settings = {
@@ -225,7 +226,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.playerReady = function(API){
             $scope.playerAPI = API;
             if(API) {
-                $scope.switchPlaying(true);
+                $scope.switchPlaying($scope.isPlaying);
                 $scope.playerAPI.volume($scope.volumeLevel);
             }
         };
@@ -355,7 +356,6 @@ angular.module('webadminApp').controller('ViewCtrl',
         };
 
         $scope.switchPosition = function( val ){
-
             //var playing = $scope.positionProvider.checkPlayingDate(val);
 
             //if(playing === false) {
@@ -719,6 +719,10 @@ angular.module('webadminApp').controller('ViewCtrl',
             if($scope.playerAPI)
                 $scope.playerAPI.volume($scope.volumeLevel);
             $scope.storage.volumeLevel = $scope.volumeLevel;
+        });
+
+        $scope.$watch('activeCamera.physicalId', function(){
+            $scope.isPlaying = true;
         });
 
         mediaserver.getTime().then(function(result){

@@ -12,7 +12,8 @@ angular.module('webadminApp')
                 canPlayLive: '=',
                 ngClick: '&',
                 positionHandler: '=',
-                volumeLevel: '='
+                volumeLevel: '=',
+                isPlaying: '='
             },
             templateUrl: 'views/components/timeline.html',
             link: function (scope, element/*, attrs*/) {
@@ -176,6 +177,7 @@ angular.module('webadminApp')
                     if(date > lastMinute){
                         goToLive ();
                     }else {
+                        scope.isPlaying = typeof(scope.positionProvider.playing) !== 'undefined' ?  scope.positionProvider.playing : true;
                         scope.positionHandler(date);
                     }
                 }
