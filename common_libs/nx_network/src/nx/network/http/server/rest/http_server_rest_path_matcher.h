@@ -12,6 +12,7 @@ namespace rest {
  * Given registered path: "/account/{accountId}/systems".
  * When matching path "/account/vpupkin/systems".
  * Then "/account/{accountId}/systems" is found and pathParams contains "vpupkin".
+ * Parameter cannot be empty. In that case path is not matched.
  */
 template<typename Mapped>
 class RestPathMatcher

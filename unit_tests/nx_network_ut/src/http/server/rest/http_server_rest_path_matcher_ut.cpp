@@ -71,6 +71,8 @@ TEST_F(RestPathMatcher, no_suitable_handler)
     assertPathNotMatched("/account/vpupkin/info");
     assertPathNotMatched("/account/vpupkin/systems/");
     assertPathNotMatched("account/vpupkin/systems/");
+    assertPathNotMatched("/account//systems");
+    assertPathNotMatched("/account/systems");
 }
 
 TEST_F(RestPathMatcher, registering_conflicting_handler)
