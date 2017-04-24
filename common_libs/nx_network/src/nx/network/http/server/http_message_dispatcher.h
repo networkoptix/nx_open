@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include <boost/optional.hpp>
+
 #include <nx/network/connection_server/message_dispatcher.h>
 #include <nx/utils/std/cpp14.h>
 
@@ -13,12 +15,54 @@ namespace nx_http {
 static const nx_http::StringType kAnyMethod;
 static const QString kAnyPath;
 
-// TODO: #ak This class MUST search processor by max string prefix.
-class NX_NETWORK_API MessageDispatcher
+template<typename Value>
+const std::pair<const QString, Value>* findByMaxPrefix(
+    const std::map<QString, Value>& map, const QString& key)
+{
+    auto it = map.upper_bound(key);
+    if (it == map.begin())
+        return nullptr;
+
+    --it;
+    if (!key.startsWith(it->first))
+        return nullptr;
+
+    return &(*it);
+}
+
+template<typename Mapped>
+class ExactPathMatcher
 {
 public:
-    virtual ~MessageDispatcher() = default;
+    bool add(const std::string& path, Mapped mapped)
+    {
+        return m_pathToMapped.emplace(path, std::move(mapped)).second;
+    }
 
+    boost::optional<const Mapped&> match(
+        const std::string& path,
+        std::vector<std::string>* /*pathParams*/) const
+    {
+        auto it = m_pathToMapped.find(path);
+        if (it == m_pathToMapped.end())
+            return boost::none;
+
+        return boost::optional<const Mapped&>(it->second);
+    }
+
+private:
+    std::map<std::string, Mapped> m_pathToMapped;
+};
+
+template<template<typename> typename PathMatcher>
+class BasicMessageDispatcher
+{
+public:
+    virtual ~BasicMessageDispatcher() = default;
+
+    /**
+     * @return false if some handler is already registered for path.
+     */
     template<typename RequestHandlerType>
     bool registerRequestProcessor(
         const QString& path,
@@ -26,7 +70,16 @@ public:
         const nx_http::StringType& method = kAnyMethod)
     {
         NX_ASSERT(factoryFunc);
-        return m_factories[method].emplace(path, std::move(factoryFunc)).second;
+        PathMatchContext& pathMatchContext = m_factories[method];
+        if (path == kAnyPath)
+        {
+            if (pathMatchContext.defaultFactory)
+                return false;
+            pathMatchContext.defaultFactory = std::move(factoryFunc);
+            return true;
+        }
+        
+        return pathMatchContext.pathToFactory.add(path.toStdString(), std::move(factoryFunc));
     }
 
     template<typename RequestHandlerType>
@@ -39,7 +92,11 @@ public:
             method);
     }
 
-    void addModRewriteRule(QString oldPrefix, QString newPrefix);
+    void addModRewriteRule(QString oldPrefix, QString newPrefix)
+    {
+        NX_LOGX(lm("New rewrite rule '%1*' to '%2*'").strs(oldPrefix, newPrefix), cl_logDEBUG1);
+        m_rewritePrefixes.emplace(std::move(oldPrefix), std::move(newPrefix));
+    }
 
     /**
      * Pass message to corresponding processor.
@@ -81,14 +138,66 @@ public:
     }
 
 private:
-    void applyModRewrite(QUrl* url) const;
-    std::unique_ptr<AbstractHttpRequestHandler> makeHandler(
-        const StringType& method, const QString& path) const;
+    using FactoryFunc = std::function<std::unique_ptr<AbstractHttpRequestHandler>()>;
+
+    struct PathMatchContext
+    {
+        FactoryFunc defaultFactory;
+        typename PathMatcher<FactoryFunc> pathToFactory;
+    };
 
     std::map<QString, QString> m_rewritePrefixes;
-    std::map<nx_http::StringType /*method*/, std::map<
-        QString /*path*/, std::function<std::unique_ptr<AbstractHttpRequestHandler>()>
-    >> m_factories;
+    std::map<nx_http::StringType /*method*/, PathMatchContext> m_factories;
+
+    void applyModRewrite(QUrl* url) const
+    {
+        if (const auto it = findByMaxPrefix(m_rewritePrefixes, url->path()))
+        {
+            const auto newPath = url->path().replace(it->first, it->second);
+            NX_LOGX(lm("Rewride url '%1' to '%2'").strs(url->path(), newPath), cl_logDEBUG2);
+            url->setPath(newPath);
+        }
+    }
+
+    std::unique_ptr<AbstractHttpRequestHandler> makeHandler(
+        const StringType& method,
+        const QString& path) const
+    {
+        auto methodFactory = m_factories.find(method);
+        if (methodFactory != m_factories.end())
+        {
+            auto handler = matchPath(methodFactory->second, path);
+            if (handler)
+                return handler;
+        }
+
+        auto anyMethodFactory = m_factories.find(kAnyMethod);
+        if (anyMethodFactory != m_factories.end())
+            return matchPath(anyMethodFactory->second, path);
+
+        return nullptr;
+    }
+
+    std::unique_ptr<AbstractHttpRequestHandler> matchPath(
+        const PathMatchContext& pathMatchContext,
+        const QString& path) const
+    {
+        std::vector<std::string> pathParams;
+        boost::optional<const FactoryFunc&> factory =
+            pathMatchContext.pathToFactory.match(path.toStdString(), &pathParams);
+        if (factory)
+            return (*factory)();
+
+        if (pathMatchContext.defaultFactory)
+            return pathMatchContext.defaultFactory();
+
+        return nullptr;
+    }
+};
+
+class MessageDispatcher:
+    public BasicMessageDispatcher<ExactPathMatcher>
+{
 };
 
 } // namespace nx_http
