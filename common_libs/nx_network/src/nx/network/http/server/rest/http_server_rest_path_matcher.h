@@ -66,7 +66,7 @@ private:
         std::string restPathMatchRegex;
         restPathMatchRegex += "^";
         restPathMatchRegex +=
-            std::regex_replace(pathTemplate, replaceRestParams, "([\\w\\d\\-_.]+)");
+            std::regex_replace(pathTemplate, replaceRestParams, std::string("([\\w\\d\\-_.]+)"));
         restPathMatchRegex += "$";
 
         return std::regex(std::move(restPathMatchRegex), std::regex::icase);
