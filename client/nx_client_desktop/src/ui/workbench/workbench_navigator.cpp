@@ -504,8 +504,7 @@ action::ActionScope QnWorkbenchNavigator::currentScope() const
 
 action::Parameters QnWorkbenchNavigator::currentParameters(action::ActionScope scope) const
 {
-    using namespace nx::client::desktop::ui::action;
-    if (scope != TimelineScope)
+    if (scope != action::TimelineScope)
         return action::Parameters();
 
     QnResourceWidgetList result;
