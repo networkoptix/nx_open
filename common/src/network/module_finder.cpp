@@ -76,6 +76,17 @@ namespace
     }
 }
 
+static QnMulticastModuleFinder::Options multicastOptions(bool clientMode)
+{
+    QnMulticastModuleFinder::Options options;
+    options.multicastCount = QnMulticastModuleFinder::Options::kUnlimited;
+
+    if (!clientMode)
+        options.listenAndRespond = true;
+
+    return options;
+}
+
 QnModuleFinder::QnModuleFinder(QObject* parent, bool clientMode):
     QObject(parent),
     QnCommonModuleAware(parent),
@@ -83,7 +94,7 @@ QnModuleFinder::QnModuleFinder(QObject* parent, bool clientMode):
     m_elapsedTimer(),
     m_timer(new QTimer(this)),
     m_clientMode(clientMode),
-    m_multicastModuleFinder(new QnMulticastModuleFinder(this, clientMode)),
+    m_multicastModuleFinder(new QnMulticastModuleFinder(this, multicastOptions(clientMode))),
     m_directModuleFinder(new QnDirectModuleFinder(this)),
     m_helper(new QnDirectModuleFinderHelper(this, clientMode))
 {

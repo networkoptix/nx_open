@@ -49,9 +49,11 @@ const quint16 defaultModuleRevealMulticastGroupPort = 5007;
 
 using namespace nx::network;
 
+const size_t QnMulticastModuleFinder::Options::kUnlimited = std::numeric_limits<size_t>::max();
+
 QnMulticastModuleFinder::QnMulticastModuleFinder(
     QObject* parent,
-    bool clientOnly,
+    Options options,
     const QHostAddress &multicastGroupAddress,
     const quint16 multicastGroupPort,
     const unsigned int pingTimeoutMillis,
@@ -59,7 +61,7 @@ QnMulticastModuleFinder::QnMulticastModuleFinder(
     :
     QnLongRunnable(parent),
     QnCommonModuleAware(parent),
-    m_clientMode(clientOnly),
+    m_options(options),
     m_serverSocket(nullptr),
     m_pingTimeoutMillis(pingTimeoutMillis == 0 ? defaultPingTimeoutMs : pingTimeoutMillis),
     m_keepAliveMultiply(keepAliveMultiply == 0 ? defaultKeepAliveMultiply : keepAliveMultiply),
@@ -322,7 +324,7 @@ void QnMulticastModuleFinder::run()
         commonModule()->moduleGUID(),
         qnStaticCommon->localPeerType()).serialize();
 
-    if (!m_clientMode)
+    if (m_options.listenAndRespond)
     {
         QnMutexLocker lk(&m_mutex);
         m_serverSocket.reset(new UDPSocket(AF_INET));
@@ -336,8 +338,16 @@ void QnMulticastModuleFinder::run()
 
     while (!needToStop())
     {
-        quint64 currentClock = QDateTime::currentMSecsSinceEpoch();
+        {
+            QnMutexLocker lk(&m_mutex);
+            if (m_options.listenAndRespond == false && m_options.multicastCount == 0)
+            {
+                NX_LOGX("All work is finished", cl_logDEBUG1);
+                return;
+            }
+        }
 
+        quint64 currentClock = (quint64) QDateTime::currentMSecsSinceEpoch();
         if (currentClock - m_lastInterfacesCheckMs >= m_checkInterfacesTimeoutMs)
         {
             updateInterfaces();
@@ -349,9 +359,12 @@ void QnMulticastModuleFinder::run()
 
         if (currentClock - m_prevPingClock >= m_pingTimeoutMillis)
         {
-            if (m_clientMode || settings->isAutoDiscoveryEnabled())
+            QnMutexLocker lk(&m_mutex);
+            if (m_options.multicastCount != 0)
             {
-                QnMutexLocker lk(&m_mutex);
+                if (m_options.multicastCount != Options::kUnlimited)
+                    --m_options.multicastCount;
+
                 for (UDPSocket *socket : m_clientSockets)
                 {
                     if (!socket->send(revealRequest.data(), revealRequest.size()))

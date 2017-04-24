@@ -38,6 +38,14 @@ class QnMulticastModuleFinder: public QnLongRunnable, public QnCommonModuleAware
     Q_OBJECT
 
 public:
+    struct Options
+    {
+        bool listenAndRespond = false;
+        size_t multicastCount = 0;
+
+        static const size_t kUnlimited;
+    };
+
     //!Creates socket and binds it to random unused udp port
     /*!
         One must call \a isValid after object instantiation to check whether it has been initialized successfully
@@ -49,7 +57,7 @@ public:
     */
     QnMulticastModuleFinder(
         QObject* parent,
-        bool clientOnly,
+        Options options,
         const QHostAddress &multicastGroupAddress = QHostAddress(),
         const quint16 multicastGroupPort = 0,
         const unsigned int pingTimeoutMillis = 0,
@@ -88,7 +96,7 @@ private:
 
 private:
     mutable QnMutex m_mutex;
-    bool m_clientMode;
+    Options m_options;
     nx::network::aio::PollSet m_pollSet;
     QHash<QHostAddress, nx::network::UDPSocket*> m_clientSockets;
     std::unique_ptr<nx::network::UDPSocket> m_serverSocket;
