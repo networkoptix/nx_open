@@ -267,6 +267,33 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+        <source>Zoom In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Focus Far</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Focus Near</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Focus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Dewarping Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>Parameter 1 is null.</source>
@@ -1416,35 +1443,35 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
         <source>These devices are removed from System</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>This device is removed from System</numerusform>
             <numerusform>These devices are removed from System</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These cameras are removed from System</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>This camera is removed from System</numerusform>
             <numerusform>These cameras are removed from System</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These servers are removed from System</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>This server is removed from System</numerusform>
             <numerusform>These servers are removed from System</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These users are removed from System</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>This user is removed from System</numerusform>
             <numerusform>These users are removed from System</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These resources are removed from System</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>This resource is removed from System</numerusform>
             <numerusform>These resources are removed from System</numerusform>
         </translation>
