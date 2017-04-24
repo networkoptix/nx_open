@@ -87,24 +87,25 @@ Serializer::Serializer(bool masked, unsigned mask)
 }
 
 int Serializer::prepareFrame(
-    const char* payload, int payloadLen, 
+    const char* payload, int payloadLen,
     FrameType type, bool fin, char* out, int outLen)
 {
     return websocket::prepareFrame(payload, payloadLen, type, fin, m_masked, m_mask, out, outLen);
 }
 
 void Serializer::prepareFrame(
-    const nx::Buffer& payload, 
-    FrameType type, 
-    bool fin, 
+    const nx::Buffer& payload,
+    FrameType type,
+    bool fin,
     nx::Buffer* outBuffer)
 {
     outBuffer->resize(
         websocket::prepareFrame(
-            nullptr, 0, type, fin, m_masked, m_mask, nullptr, 0));
+            nullptr, payload.size(), type, fin, m_masked, m_mask, nullptr, 0));
+    outBuffer->fill(0);
     prepareFrame(
-        payload.constData(), 
-        payload.size(), type, fin, 
+        payload.constData(),
+        payload.size(), type, fin,
         outBuffer->data(), outBuffer->size());
 }
 
