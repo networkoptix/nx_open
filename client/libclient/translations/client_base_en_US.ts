@@ -1416,35 +1416,35 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
         <source>These devices are removed from System</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>This device is removed from System</numerusform>
             <numerusform>These devices are removed from System</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These cameras are removed from System</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>This camera is removed from System</numerusform>
             <numerusform>These cameras are removed from System</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These servers are removed from System</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>This server is removed from System</numerusform>
             <numerusform>These servers are removed from System</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These users are removed from System</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>This user is removed from System</numerusform>
             <numerusform>These users are removed from System</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These resources are removed from System</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>This resource is removed from System</numerusform>
             <numerusform>These resources are removed from System</numerusform>
         </translation>
