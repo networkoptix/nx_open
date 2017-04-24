@@ -38,10 +38,19 @@ namespace ec2
             const QnTranState& state,
             bool onlyCloudData,
             QList<QByteArray>& result);
+
+        /**
+         * This function is similar to previous one but returns transactions included in state parameter only
+         */
+        ErrorCode getExactTransactionsAfter(
+            const QnTranState& state,
+            bool onlyCloudData,
+            QList<QByteArray>& result);
+
         QnTranState getTransactionsState();
 
         // filter should contains sorted data
-        QnTranState getTransactionsState(const QVector<ApiPersistentIdData>& filter);
+        QVector<qint32> getTransactionsState(const QVector<ApiPersistentIdData>& filter);
 
         bool contains(const QnTranState& state) const;
 
@@ -99,6 +108,12 @@ namespace ec2
         int currentSequenceNoLock() const;
 
         ErrorCode updateSequenceNoLock(const QnUuid& peerID, const QnUuid& dbID, int sequence);
+
+        ErrorCode getTransactionsAfterInternal(
+            const QnTranState& stateToIterate,
+            const QnTranState& filterState,
+            bool onlyCloudData,
+            QList<QByteArray>& result);
     private:
         struct UpdateHistoryData
         {

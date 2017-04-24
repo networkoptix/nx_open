@@ -69,12 +69,15 @@ private:
     void sendAlivePeersMessage();
 
     QVector<PeerNumberType> deserializeCompressedPeers(const QByteArray& data, bool* success);
-    void deserializeAlivePeersMessage(
+    void deserializeAlivePeersMessageRequest(
         const P2pConnectionPtr& connection,
         const QByteArray& data);
     void deserializeResolvePeerNumberResponse(
         const P2pConnectionPtr& connection,
         const QByteArray& response);
+    QVector<SubscribeRecord> deserializeSubscribeForDataUpdatesRequest(
+        const QByteArray& data,
+        bool* success);
 
     void addOwnfInfoToPeerList();
     void addOfflinePeersFromDb();
@@ -89,8 +92,6 @@ private:
     bool handleAlivePeers(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handleSubscribeForDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handlePushTransactionData(const P2pConnectionPtr& connection, const QByteArray& data);
-
-    QVector<qint32> getDbSequences(const QVector<ApiPersistentIdData>& peers);
 
     friend struct GotTransactionFuction;
 

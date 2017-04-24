@@ -331,10 +331,25 @@ QnTranState QnTransactionLog::getTransactionsState()
     return m_state;
 }
 
-QnTranState QnTransactionLog::getTransactionsState(const QVector<ApiPersistentIdData>& filter)
+QVector<qint32> QnTransactionLog::getTransactionsState(const QVector<ApiPersistentIdData>& filter)
 {
     QnReadLocker lock(&m_dbManager->getMutex());
-    return m_state;
+
+    QVector<qint32> result;
+    const auto& values = m_state.values;
+
+    auto itrMap = values.begin();
+    for (auto itrFilter = filter.begin(); itrFilter != filter.end(); ++itrFilter)
+    {
+        while (itrMap != values.end() && itrMap.key() < *itrFilter)
+            ++itrMap;
+        if (itrMap != values.end() && itrMap.key() == *itrFilter)
+            result.push_back(itrMap.value());
+        else
+            result.push_back(0);
+    }
+
+    return result;
 }
 
 int QnTransactionLog::getLatestSequence(const ApiPersistentIdData& key) const
@@ -385,15 +400,34 @@ bool QnTransactionLog::contains(const QnTranState& state) const
 }
 
 ErrorCode QnTransactionLog::getTransactionsAfter(
-	const QnTranState& state,
+    const QnTranState& state,
     bool onlyCloudData,
-	QList<QByteArray>& result)
+    QList<QByteArray>& result)
 {
+    QnReadLocker lock(&m_dbManager->getMutex());
+    return getTransactionsAfterInternal(m_state, state, onlyCloudData, result);
+}
+
+ErrorCode QnTransactionLog::getExactTransactionsAfter(
+    const QnTranState& state,
+    bool onlyCloudData,
+    QList<QByteArray>& result)
+{
+    QnReadLocker lock(&m_dbManager->getMutex());
+    return getTransactionsAfterInternal(state, state, onlyCloudData, result);
+}
+
+ErrorCode QnTransactionLog::getTransactionsAfterInternal(
+    const QnTranState& stateToIterate,
+    const QnTranState& filterState,
+    bool onlyCloudData,
+    QList<QByteArray>& result)
+{
+
     QString extraFilter;
     if (onlyCloudData)
         extraFilter = lit("AND tran_type = %1").arg(TransactionType::Cloud);
 
-    QnReadLocker lock(&m_dbManager->getMutex());
     QMap <ApiPersistentIdData, int> tranLogSequence;
     for(auto itr = m_state.values.begin(); itr != m_state.values.end(); ++itr)
     {
@@ -405,7 +439,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(
             %1 ORDER BY sequence").arg(extraFilter));
         query.addBindValue(key.id.toRfc4122());
         query.addBindValue(key.persistentId.toRfc4122());
-        query.addBindValue(state.values.value(key));
+        query.addBindValue(filterState.values.value(key));
         if (!query.exec())
             return ErrorCode::failure;
 

@@ -286,7 +286,7 @@ QByteArray P2pMessageBus::serializePeersMessage()
     }
 }
 
-void P2pMessageBus::deserializeAlivePeersMessage(
+void P2pMessageBus::deserializeAlivePeersMessageRequest(
     const P2pConnectionPtr& connection,
     const QByteArray& data)
 {
@@ -338,14 +338,6 @@ QMap<ApiPersistentIdData, P2pConnectionPtr> P2pMessageBus::getCurrentSubscriptio
     return result;
 }
 
-QVector<qint32> P2pMessageBus::getDbSequences(const QVector<ApiPersistentIdData>& peers)
-{
-    NX_ASSERT(m_db);
-    if (!m_db)
-        return QVector<qint32>();
-    return m_db->transactionLog()->getTransactionsState(peers).values.values().toVector();
-}
-
 void P2pMessageBus::resubscribePeers(
     QMap<ApiPersistentIdData, P2pConnectionPtr> newSubscription)
 {
@@ -364,8 +356,9 @@ void P2pMessageBus::resubscribePeers(
             QVector<PeerNumberType> shortValues;
             for (const auto& id: newValue)
                 shortValues.push_back(connection->encode(id));
-            QVector<qint32> sequenceList = getDbSequences(newValue);
-            connection->sendMessage(serializeSubscribeRequest(shortValues, sequenceList));
+            connection->sendMessage(serializeSubscribeRequest(
+                shortValues,
+                m_db->transactionLog()->getTransactionsState(newValue)));
         }
     }
 }
@@ -593,7 +586,7 @@ QByteArray P2pMessageBus::serializeSubscribeRequest(
     NX_ASSERT(peers.size() == sequences.size());
 
     QByteArray result;
-    result.resize(peers.size() * 2 + 1);
+    result.resize(peers.size() * 6 + 1);
     BitStreamWriter writer;
     writer.setBuffer((quint8*)result.data(), result.size());
     writer.putBits(8, (int)MessageType::subscribeForDataUpdates);
@@ -654,7 +647,7 @@ bool P2pMessageBus::handleAlivePeers(const P2pConnectionPtr& connection, const Q
     }
     if (numbersToResolve.empty())
     {
-        deserializeAlivePeersMessage(connection, data);
+        deserializeAlivePeersMessageRequest(connection, data);
         return true;
     }
     connection->sendMessage(serializeResolvePeerNumberRequest(numbersToResolve));
@@ -662,28 +655,108 @@ bool P2pMessageBus::handleAlivePeers(const P2pConnectionPtr& connection, const Q
     return true;
 }
 
+QVector<SubscribeRecord> P2pMessageBus::deserializeSubscribeForDataUpdatesRequest(const QByteArray& data, bool* success)
+{
+    QVector<SubscribeRecord> result;
+    BitStreamReader reader((quint8*) data.data(), data.size());
+    try {
+        while (reader.bitsLeft() > 0)
+            result.push_back(SubscribeRecord(reader.getBits(16), reader.getBits(32)));
+        *success = true;
+    }
+    catch (...)
+    {
+        *success = false;
+    }
+    return result;
+}
+
+struct SendTransactionToTransportFuction
+{
+    typedef void result_type;
+
+    template<class T>
+    void operator()(
+        P2pMessageBus* /*bus*/,
+        const QnTransaction<T> &transaction,
+        const P2pConnectionPtr& connection) const
+    {
+        //connection->sendTransaction(transaction);
+    }
+};
+
+struct SendTransactionToTransportFastFuction
+{
+    bool operator()(
+        P2pMessageBus* /*bus*/,
+        Qn::SerializationFormat srcFormat,
+        const QByteArray& serializedTran,
+        const P2pConnectionPtr& connection) const
+    {
+        return true;
+        //return connection->sendSerializedTransaction(srcFormat, serializedTran);
+    }
+};
+
+
 bool P2pMessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data)
 {
     bool success = false;
-    QVector<PeerNumberType> request = deserializeCompressedPeers(data, &success);
+    QVector<SubscribeRecord> request = deserializeSubscribeForDataUpdatesRequest(data, &success);
     if (!success)
         return false;
-    QVector<ApiPersistentIdData> subscription;
-    for (const auto& shortPeer: request)
-        subscription.push_back(m_localShortPeerInfo.decode(shortPeer));
-    std::sort(subscription.begin(), subscription.end());
+    QnTranState tranState;
+    auto& selectRequest = tranState.values;
+    for (const auto& shortPeer : request)
+    {
+        const auto& id = m_localShortPeerInfo.decode(shortPeer.peer);
+        selectRequest.insert(id, shortPeer.sequence);
+    }
+    auto newSubscription = selectRequest.keys();
     auto& oldSubscription = connection->miscData().remoteSubscription;
-    QVector<ApiPersistentIdData> diff;
-    std::set_difference(
-        subscription.begin(), subscription.end(),
-        oldSubscription.begin(), oldSubscription.end(),
-        std::inserter(diff, diff.begin()));
 
+    // remove already subscribed records
+    auto itrFilter = oldSubscription.begin();
+    for (auto itr = selectRequest.begin(); itr != selectRequest.end();)
+    {
+        while (itrFilter != oldSubscription.end() && *itrFilter < itr.key())
+            ++itrFilter;
+        if (itrFilter != oldSubscription.end() && *itrFilter == itr.key())
+            itr = selectRequest.erase(itr); //< filter record
+        else
+            ++itr;
+    }
+    connection->miscData().remoteSubscription = newSubscription.toVector();
 
+    QList<QByteArray> serializedTransactions;
+    const ErrorCode errorCode = m_db->transactionLog()->getExactTransactionsAfter(
+        tranState,
+        connection->remotePeer().peerType == Qn::PeerType::PT_CloudServer,
+        serializedTransactions);
+    if (errorCode != ErrorCode::ok)
+    {
+        NX_LOG(
+            QnLog::EC2_TRAN_LOG,
+            lit("P2P message bus failure. Can't select transaction list from database"),
+            cl_logWARNING);
+        return false;
+    }
 
-    connection->miscData().remoteSubscription = subscription;
-
-
+    using namespace std::placeholders;
+    for (const auto& serializedTran : serializedTransactions)
+    {
+        if (!handleTransaction(connection->remotePeer().dataFormat,
+            serializedTran,
+            std::bind(
+                SendTransactionToTransportFuction(),
+                this, _1, connection),
+            std::bind(
+                SendTransactionToTransportFastFuction(),
+                this, _1, _2, connection)))
+        {
+            connection->setState(P2pConnection::State::Error);
+        }
+    }
     return true;
 }
 

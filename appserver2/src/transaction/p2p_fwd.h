@@ -24,6 +24,15 @@ private:
     QMap<PeerNumberType, ApiPersistentIdData> m_shortIdToFullId;
 };
 
+struct SubscribeRecord
+{
+    SubscribeRecord() {}
+    SubscribeRecord(PeerNumberType peer, qint32 sequence): peer(peer), sequence(sequence) {}
+
+    PeerNumberType peer = 0;
+    qint32 sequence = 0;
+};
+
 static const quint32 kMaxDistance = std::numeric_limits<quint32>::max();
 static const char* kP2pProtoName = "p2p";
 
