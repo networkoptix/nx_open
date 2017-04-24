@@ -58,6 +58,8 @@ public:
             const QWidget* widget = nullptr) const;
 
     static bool isCheckableButton(const QStyleOption* option);
+
+    /** TextButton is a PushButton which looks like a simple text (without bevel). */
     static bool isTextButton(const QStyleOption* option);
 
     /* Insert horizontal separator line into QInputDialog above its button box. */

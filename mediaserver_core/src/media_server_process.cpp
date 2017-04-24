@@ -1808,7 +1808,7 @@ void MediaServerProcess::registerRestHandlers(
     processorPool->registerRedirectRule(lit("/"), welcomePage);
     processorPool->registerRedirectRule(lit("/static"), welcomePage);
     processorPool->registerRedirectRule(lit("/static/"), welcomePage);
-    
+
     auto reg =
         [processorPool](const QString& path, QnRestRequestHandler* handler,
             Qn::GlobalPermission permissions = Qn::NoGlobalPermissions)
@@ -2993,14 +2993,14 @@ void MediaServerProcess::run()
 
     QTimer udtInternetTrafficTimer;
     connect(&udtInternetTrafficTimer, &QTimer::timeout,
-        []()
+        [common = commonModule()]()
         {
-            QnResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID());
+            QnResourcePtr server = common->resourcePool()->getResourceById(common->moduleGUID());
             const auto old = server->getProperty(Qn::UDT_INTERNET_TRFFIC).toULongLong();
             const auto current = nx::network::UdtStatistics::global.internetBytesTransfered.load();
             const auto update = old + (qulonglong) current;
             if (server->setProperty(Qn::UDT_INTERNET_TRFFIC, QString::number(update))
-                && propertyDictionary->saveParams(server->getId()))
+                && common->propertyDictionary()->saveParams(server->getId()))
             {
                 NX_LOG(lm("%1 is updated to %2").strs(Qn::UDT_INTERNET_TRFFIC, update), cl_logDEBUG1);
                 nx::network::UdtStatistics::global.internetBytesTransfered -= current;

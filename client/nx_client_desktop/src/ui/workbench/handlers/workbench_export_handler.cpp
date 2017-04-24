@@ -28,10 +28,9 @@
 
 #include <recording/time_period.h>
 
-#include <ui/actions/actions.h>
-#include <ui/actions/action_manager.h>
-#include <ui/actions/action_parameters.h>
-#include <ui/actions/action_target_provider.h>
+#include <nx/client/desktop/ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_messages.h>
 #include <ui/dialogs/common/progress_dialog.h>
@@ -54,6 +53,8 @@
 #include <nx/utils/string.h>
 
 #include <utils/common/app_info.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -129,9 +130,9 @@ QnWorkbenchExportHandler::QnWorkbenchExportHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(action(QnActions::ExportTimeSelectionAction), &QAction::triggered, this, &QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered);
-    connect(action(QnActions::ExportLayoutAction), &QAction::triggered, this, &QnWorkbenchExportHandler::at_exportLayoutAction_triggered);
-    connect(action(QnActions::ExportTimelapseAction), &QAction::triggered, this, &QnWorkbenchExportHandler::at_exportTimelapseAction_triggered);
+    connect(action(action::ExportTimeSelectionAction), &QAction::triggered, this, &QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered);
+    connect(action(action::ExportLayoutAction), &QAction::triggered, this, &QnWorkbenchExportHandler::at_exportLayoutAction_triggered);
+    connect(action(action::ExportTimelapseAction), &QAction::triggered, this, &QnWorkbenchExportHandler::at_exportTimelapseAction_triggered);
 }
 
 QString QnWorkbenchExportHandler::binaryFilterName() const
@@ -230,7 +231,7 @@ bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &
     return tool->start();
 }
 
-QnMediaResourceWidget *QnWorkbenchExportHandler::extractMediaWidget(const QnActionParameters &parameters)
+QnMediaResourceWidget* QnWorkbenchExportHandler::extractMediaWidget(const action::Parameters& parameters)
 {
     if (parameters.size() == 1)
         return dynamic_cast<QnMediaResourceWidget *>(parameters.widget());
@@ -600,9 +601,10 @@ bool QnWorkbenchExportHandler::confirmExportTooBigExeFile() const
             + L'\n' + tr("Export to EXE anyway?"));
 }
 
-void QnWorkbenchExportHandler::exportTimeSelection(const QnActionParameters& parameters, qint64 timelapseFrameStepMs)
+void QnWorkbenchExportHandler::exportTimeSelection(const action::Parameters& parameters,
+    qint64 timelapseFrameStepMs)
 {
-    QnMediaResourceWidget *widget = extractMediaWidget(parameters);
+    const auto widget = extractMediaWidget(parameters);
     QnMediaResourcePtr mediaResource = parameters.resource().dynamicCast<QnMediaResource>();
 
     /* Either resource or widget must be provided */
@@ -845,13 +847,13 @@ bool QnWorkbenchExportHandler::confirmExport(
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         mainWindow());
 
-    dialog.addButton(tr("Export"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+    dialog.addButton(tr("Export"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
     return (dialog.exec() != QDialogButtonBox::Cancel);
 }
 
 void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
 
     bool wasLoggedIn = !context()->user().isNull();
 
@@ -883,7 +885,7 @@ void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
 
 void QnWorkbenchExportHandler::at_exportTimelapseAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
 
     qint64 durationMs = period.durationMs;

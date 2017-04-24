@@ -15,7 +15,7 @@
 #include <plugins/io_device/joystick/drivers/joystick_event_filter_win.h>
 #endif
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_display.h>
 
 namespace {
@@ -155,18 +155,18 @@ EventHandler Manager::makeEventHandler(const config::Rule& rule, controls::Contr
     return handler;
 }
 
-QnActionParameters Manager::createActionParameters(
+nx::client::desktop::ui::action::Parameters Manager::createActionParameters(
     const config::Rule& rule,
     const controls::ControlPtr& control,
     const EventParameters& eventParameters)
 {
-    QnActionParameters actionParameters;
+    nx::client::desktop::ui::action::Parameters actionParameters;
     if (rule.eventType == EventType::stickMove)
     {
         auto stick = std::dynamic_pointer_cast<controls::Stick>(control);
 
         if (!stick)
-            return QnActionParameters();
+            return actionParameters;
 
         auto xRange = stick->outputXRange();
         auto yRange = stick->outputYRange();

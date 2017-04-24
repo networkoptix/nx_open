@@ -48,7 +48,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/collection.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/recording_status_helper.h>
 #include <ui/common/text_pixmap_cache.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
@@ -99,6 +99,8 @@
 #include <business/actions/abstract_business_action.h>
 #include <utils/media/sse_helper.h>
 #include <plugins/resource/avi/avi_resource.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -559,7 +561,7 @@ void QnMediaResourceWidget::createButtons()
         connect(debugScreenshotButton, &QnImageButtonWidget::clicked, this,
             [this]
             {
-                menu()->trigger(QnActions::TakeScreenshotAction, QnActionParameters(this)
+                menu()->trigger(action::TakeScreenshotAction, action::Parameters(this)
                     .withArgument<QString>(Qn::FileNameRole, lit("_DEBUG_SCREENSHOT_KEY_")));
             });
         titleBar()->rightButtonsBar()->addButton(Qn::DbgScreenshotButton, debugScreenshotButton);
@@ -1443,7 +1445,7 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const
             return (m_ioModuleOverlayWidget && overlayWidgetVisibility(m_ioModuleOverlayWidget) == OverlayVisibility::Visible);
         };
 
-    if (action(QnActions::ToggleLayoutTourModeAction)->isChecked())
+    if (action(action::ToggleLayoutTourModeAction)->isChecked())
         return Qn::MainWindow_Scene_TourInProgress_Help;
 
     const Qn::ResourceStatusOverlay statusOverlay = statusOverlayController()->statusOverlay();
@@ -1841,7 +1843,7 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
 
         case Qn::OfflineOverlay:
         {
-            return menu()->canTrigger(QnActions::CameraDiagnosticsAction, m_camera)
+            return menu()->canTrigger(action::CameraDiagnosticsAction, m_camera)
                 ? Qn::ResourceOverlayButton::Diagnostics
                 : Qn::ResourceOverlayButton::Empty;
         }
@@ -1915,7 +1917,7 @@ void QnMediaResourceWidget::at_camDisplay_liveChanged()
 
 void QnMediaResourceWidget::at_screenshotButton_clicked()
 {
-    menu()->trigger(QnActions::TakeScreenshotAction, this);
+    menu()->trigger(action::TakeScreenshotAction, this);
 }
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked)
@@ -1928,7 +1930,7 @@ void QnMediaResourceWidget::at_ptzButton_toggled(bool checked)
     if (checked)
     {
         titleBar()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton | Qn::ZoomWindowButton, false);
-        action(QnActions::JumpToLiveAction)->trigger(); // TODO: #Elric evil hack! Won't work if SYNC is off and this item is not selected?
+        action(action::JumpToLiveAction)->trigger(); // TODO: #Elric evil hack! Won't work if SYNC is off and this item is not selected?
     }
 }
 
@@ -2095,7 +2097,7 @@ void QnMediaResourceWidget::processDiagnosticsRequest()
     context()->statisticsModule()->registerClick(lit("resource_status_overlay_diagnostics"));
 
     if (m_camera)
-        menu()->trigger(QnActions::CameraDiagnosticsAction, m_camera);
+        menu()->trigger(action::CameraDiagnosticsAction, m_camera);
 }
 
 void QnMediaResourceWidget::processIoEnableRequest()
@@ -2129,7 +2131,7 @@ void QnMediaResourceWidget::processSettingsRequest()
         return;
 
     int selectedTab = Qn::GeneralSettingsTab;
-    menu()->trigger(QnActions::CameraSettingsAction, QnActionParameters(m_camera)
+    menu()->trigger(action::CameraSettingsAction, action::Parameters(m_camera)
         .withArgument(Qn::FocusTabRole, selectedTab));
 }
 
@@ -2137,7 +2139,7 @@ void QnMediaResourceWidget::processMoreLicensesRequest()
 {
     context()->statisticsModule()->registerClick(lit("resource_status_overlay_more_licenses"));
 
-    menu()->trigger(QnActions::PreferencesLicensesTabAction);
+    menu()->trigger(action::PreferencesLicensesTabAction);
 }
 
 void QnMediaResourceWidget::at_item_imageEnhancementChanged()

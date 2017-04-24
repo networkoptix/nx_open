@@ -2,10 +2,12 @@
 
 #include <QtWidgets/QAction>
 
-#include <ui/actions/action_manager.h>
-#include <ui/actions/action_target_provider.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_target_provider.h>
 
 #include <utils/common/delayed.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -13,15 +15,14 @@ namespace {
     const int selectionUpdateTimeoutMs = 50;
 }
 
-
 QnWorkbenchSelectionWatcher::QnWorkbenchSelectionWatcher(QObject *parent /*= nullptr*/):
     base_type(parent),
-    QnWorkbenchContextAware(parent)
-    , m_scope(Qn::TreeScope | Qn::SceneScope)
-    , m_selectionUpdatePending(false)
-    , m_lastScope(Qn::InvalidScope)
+    QnWorkbenchContextAware(parent),
+    m_scope(action::TreeScope | action::SceneScope),
+    m_selectionUpdatePending(false),
+    m_lastScope(action::InvalidScope)
 {
-    connect(action(QnActions::SelectionChangeAction), &QAction::triggered, this,
+    connect(action(action::SelectionChangeAction), &QAction::triggered, this,
         [this]()
         {
             if (m_selectionUpdatePending)
@@ -38,11 +39,11 @@ QnWorkbenchSelectionWatcher::~QnWorkbenchSelectionWatcher() {
 }
 
 
-Qn::ActionScopes QnWorkbenchSelectionWatcher::scope() const {
+action::ActionScopes QnWorkbenchSelectionWatcher::scope() const {
     return m_scope;
 }
 
-void QnWorkbenchSelectionWatcher::setScope(Qn::ActionScopes value) {
+void QnWorkbenchSelectionWatcher::setScope(action::ActionScopes value) {
     m_scope = value;
 }
 
@@ -52,17 +53,17 @@ void QnWorkbenchSelectionWatcher::updateFromSelection() {
 
     m_selectionUpdatePending = false;
 
-    QnActionTargetProvider *provider = menu()->targetProvider();
+    auto provider = menu()->targetProvider();
     if(!provider)
         return;
 
-    Qn::ActionScope currentScope = provider->currentScope();
+    auto currentScope = provider->currentScope();
     if (!m_scope.testFlag(currentScope))
         currentScope = m_lastScope;
     else
         m_lastScope = currentScope;
 
-    if (currentScope == Qn::InvalidScope)
+    if (currentScope == action::InvalidScope)
         return;
 
     auto resources = provider->currentParameters(currentScope).resources();

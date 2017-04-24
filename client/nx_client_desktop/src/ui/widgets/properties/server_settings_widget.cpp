@@ -25,8 +25,7 @@
 
 #include <network/cloud_url_validator.h>
 
-#include <ui/actions/action.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
@@ -43,6 +42,8 @@
 #include <utils/common/event_processors.h>
 #include <utils/math/interpolator.h>
 #include <utils/math/color_transformations.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 static const int PC_SERVER_MAX_CAMERAS = 128;
@@ -93,7 +94,7 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/) :
         emit hasChangesChanged();
     });
 
-    connect(ui->failoverPriorityButton, &QPushButton::clicked, action(QnActions::OpenFailoverPriorityAction), &QAction::trigger);
+    connect(ui->failoverPriorityButton, &QPushButton::clicked, action(action::OpenFailoverPriorityAction), &QAction::trigger);
 
     retranslateUi();
 }
@@ -306,6 +307,5 @@ void QnServerSettingsWidget::at_pingButton_clicked()
         return;
 
     /* We must always ping the same address that is displayed in the visible field. */
-    menu()->trigger(QnActions::PingAction, QnActionParameters()
-        .withArgument(Qn::TextRole, ui->ipAddressLineEdit->text()));
+    menu()->trigger(action::PingAction, {Qn::TextRole, ui->ipAddressLineEdit->text()});
 }

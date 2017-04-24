@@ -11,7 +11,7 @@ bool QnFileMessages::confirmOverwrite(
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, parent);
 
     dialog.addCustomButton(QnMessageBoxCustomButton::Overwrite,
-        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+        QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
     return (dialog.exec() != QDialogButtonBox::Cancel);
 }
 

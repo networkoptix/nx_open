@@ -6,7 +6,6 @@
 #include <core/resource/camera_bookmark_fwd.h>
 #include <ui/common/help_topic_queryable.h>
 
-class QnActionParameters;
 class HoverFocusProcessor;
 
 /// @class QnBookmarksViewer

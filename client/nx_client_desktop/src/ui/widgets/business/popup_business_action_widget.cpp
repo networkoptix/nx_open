@@ -3,10 +3,12 @@
 
 #include <business/business_action_parameters.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/common/scoped_value_rollback.h>
+
+using namespace nx::client::desktop::ui;
 
 QnPopupBusinessActionWidget::QnPopupBusinessActionWidget(QWidget *parent) :
     base_type(parent),
@@ -51,5 +53,5 @@ void QnPopupBusinessActionWidget::paramsChanged() {
 }
 
 void QnPopupBusinessActionWidget::at_settingsButton_clicked() {
-    menu()->trigger(QnActions::PreferencesNotificationTabAction);
+    menu()->trigger(action::PreferencesNotificationTabAction);
 }
