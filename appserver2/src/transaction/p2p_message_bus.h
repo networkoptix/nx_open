@@ -55,8 +55,9 @@ public:
     void start();
 private:
     QByteArray serializePeersMessage();
-    QByteArray serializeResolvePeerNumberRequest(std::vector<PeerNumberType> peers);
-    QByteArray serializeResolvePeerNumberResponse(std::vector<PeerNumberType> peers);
+    QByteArray serializeResolvePeerNumberRequest(const std::vector<PeerNumberType>& peers);
+    QByteArray serializeResolvePeerNumberResponse(const std::vector<PeerNumberType>& peers);
+    QByteArray serializeSubscribeRequest(const std::vector<PeerNumberType>& peers);
 private:
     void doPeriodicTasks();
     void processTemporaryOutgoingConnections();
@@ -73,7 +74,11 @@ private:
 
     void addOwnfInfoToPeerList();
     void addOfflinePeersFromDb();
+
+    QMap<ApiPersistentIdData, P2pConnectionPtr> getCurrentSubscription() const;
+    void resubscribePeers(QMap<ApiPersistentIdData, P2pConnectionPtr> newSubscription);
     void doSubscribe();
+    P2pConnectionPtr findConnectionById(const ApiPersistentIdData& id) const;
 
     bool handleResolvePeerNumberRequest(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handleResolvePeerNumberResponse(const P2pConnectionPtr& connection, const QByteArray& data);

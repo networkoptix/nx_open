@@ -456,11 +456,9 @@ ApiPersistentIdData P2pConnection::decode(PeerNumberType shortPeerNumber) const
     return m_shortPeerInfo.decode(shortPeerNumber);
 }
 
-void P2pConnection::encode(
-    const ApiPersistentIdData& fullId,
-    PeerNumberType shortPeerNumber)
+PeerNumberType P2pConnection::encode(const ApiPersistentIdData& fullId, PeerNumberType shortPeerNumber)
 {
-    m_shortPeerInfo.encode(fullId, shortPeerNumber);
+    return m_shortPeerInfo.encode(fullId, shortPeerNumber);
 }
 
 } // namespace ec2

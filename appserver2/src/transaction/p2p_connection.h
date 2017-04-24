@@ -67,11 +67,15 @@ public:
     qint64 remoteIdentityTime() const;
 
     ApiPersistentIdData decode(PeerNumberType shortPeerNumber) const;
-    void encode(const ApiPersistentIdData& fullId, PeerNumberType shortPeerNumber);
+    PeerNumberType encode(const ApiPersistentIdData& fullId, PeerNumberType shortPeerNumber = kUnknownPeerNumnber);
 
+
+    /** MiscData contains members that managed by P2pMessageBus. P2pConnection doesn't touch it */
     struct MiscData
     {
         QByteArray lastAliveMessage;
+        std::vector<ApiPersistentIdData> localSubscription; //< local -> remote subscription
+        std::vector<ApiPersistentIdData> remoteSubscription; //< remote -> local subscription
     };
 
     MiscData& miscData();
@@ -120,9 +124,6 @@ private:
     const Qn::UserAccessData m_userAccessData = Qn::kSystemAccess;
 
     PeerNumberInfo m_shortPeerInfo;
-
-    std::vector<ApiPersistentIdData> m_currentSubscriptions;
-
 
     int m_remotePeerEcProtoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION;
     int m_localPeerProtocolVersion = nx_ec::EC2_PROTO_VERSION;
