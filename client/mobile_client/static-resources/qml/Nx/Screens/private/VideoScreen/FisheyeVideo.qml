@@ -90,20 +90,20 @@ Item
             switch (viewMode)
             {
                 case MediaDewarpingParams.VerticalUp:
-                    return Qt.vector2d(Math.max(-limitByEdge, Math.min(-limitByCenter, unboundRotation.x)),
-                                       normalizedAngle(unboundRotation.y))
+                    return Qt.vector2d(Math.max(-limitByEdge, Math.min(-limitByCenter, unboundedRotation.x)),
+                                       normalizedAngle(unboundedRotation.y))
 
                 case MediaDewarpingParams.VerticalDown:
-                    return Qt.vector2d(Math.max(limitByCenter, Math.min(limitByEdge, unboundRotation.x)),
-                                       normalizedAngle(unboundRotation.y))
+                    return Qt.vector2d(Math.max(limitByCenter, Math.min(limitByEdge, unboundedRotation.x)),
+                                       normalizedAngle(unboundedRotation.y))
 
                 default:
-                    return Qt.vector2d(Math.max(-limitByEdge, Math.min(limitByEdge, unboundRotation.x)),
-                                       Math.max(-limitByEdge, Math.min(limitByEdge, unboundRotation.y)))
+                    return Qt.vector2d(Math.max(-limitByEdge, Math.min(limitByEdge, unboundedRotation.x)),
+                                       Math.max(-limitByEdge, Math.min(limitByEdge, unboundedRotation.y)))
             }
         }
 
-        property vector2d unboundRotation: Qt.vector2d(0.0, 0.0)
+        property vector2d unboundedRotation: Qt.vector2d(0.0, 0.0)
 
         property vector2d previousRotation
 
@@ -121,7 +121,7 @@ Item
         {
             var rotationFactor = fisheyeShader.fov / 180.0
 
-            unboundRotation = previousRotation.plus(Qt.vector2d(
+            unboundedRotation = previousRotation.plus(Qt.vector2d(
                 aroundX * rotationFactor,
                 aroundY * rotationFactor))
         }
@@ -129,6 +129,7 @@ Item
         function scaleBy(deltaPower)
         {
             scalePower = Math.min(4.0, Math.max(0.0, scalePower + deltaPower))
+            unboundedRotation = currentRotation
         }
 
         function normalizedAngle(degrees) // brings angle to [-180, 180] range
@@ -200,8 +201,18 @@ Item
 
         onWheel:
         {
+            if (draggingStarted)
+            {
+                updateDrag(mouseX - startX, mouseY - startY)
+                startX = mouseX
+                startY = mouseY
+            }
+
             const kSensitivity = 100.0
             interactor.scaleBy(wheel.angleDelta.y * kSensitivity / 1.0e5)
+
+            if (draggingStarted)
+                interactor.startRotation()
         }
 
         function updateDrag(dx, dy)
