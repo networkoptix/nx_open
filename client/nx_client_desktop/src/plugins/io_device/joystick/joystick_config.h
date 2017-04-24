@@ -2,7 +2,7 @@
 
 #include <set>
 
-#include <ui/actions/action.h>
+#include <ui/actions/actions.h>
 #include <plugins/io_device/joystick/joystick_common.h>
 #include <nx/fusion/model_functions_fwd.h>
 

@@ -24,7 +24,7 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(QnActions, IDType)
 
 using namespace nx::client::desktop::ui::action;
 
-void QnActions::initialize(Manager* manager, QnAction* root)
+void QnActions::initialize(Manager* manager, Action* root)
 {
 
     MenuFactory factory(manager, root);

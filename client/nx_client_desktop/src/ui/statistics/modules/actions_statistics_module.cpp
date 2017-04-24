@@ -1,7 +1,6 @@
 
 #include "actions_statistics_module.h"
 
-#include <ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/statistics/modules/private/action_metrics.h>
 

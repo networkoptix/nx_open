@@ -3,6 +3,7 @@
 #include <cmath> /* For std::floor. */
 
 #include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QAction>
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -10,7 +11,6 @@
 #include <core/resource/resource.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_parameter_types.h>
 
 #include <ui/animation/viewport_animator.h>

@@ -19,7 +19,7 @@ public:
     virtual ~AbstractActionsMetrics();
 
 protected:
-    virtual void addActionMetric(QnAction *action) = 0;
+    virtual void addActionMetric(nx::client::desktop::ui::action::Action* action) = 0;
 };
 
 //
@@ -38,7 +38,7 @@ public:
     void reset() override;
 
 protected:
-    void addActionMetric(QnAction *action) override;
+    void addActionMetric(nx::client::desktop::ui::action::Action* action) override;
 
 private:
     typedef QHash<QString, int> TiggeredCountByParamsHash;
@@ -64,7 +64,7 @@ public:
     void reset() override;
 
 protected:
-    void addActionMetric(QnAction *action) override;
+    void addActionMetric(nx::client::desktop::ui::action::Action* action) override;
 
 private:
     QnMetricsContainerPtr m_metrics;

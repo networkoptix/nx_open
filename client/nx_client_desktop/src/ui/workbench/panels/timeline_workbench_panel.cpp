@@ -77,7 +77,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_updateResizerGeometryLater(false),
     m_autoHideHeight(0),
     m_showButton(NxUi::newShowHideButton(parentWidget, context(),
-        action(QnActions::ToggleTimelineAction))),
+        QnActions::ToggleTimelineAction)),
     m_resizerWidget(new QnResizerWidget(Qt::Vertical, parentWidget)),
     m_showWidget(new GraphicsWidget(parentWidget)),
     m_zoomButtonsWidget(new GraphicsWidget(parentWidget)),

@@ -12,18 +12,22 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <client/client_globals.h>
 
-#include "actions.h"
+#include <ui/actions/actions.h>
 
 class QGraphicsItem;
 
-class QnWorkbenchContext;
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+namespace action {
 
 /**
  * Action class that hooks into actions infrastructure to correctly check
  * conditions and provide proper action parameters even if it was triggered with a
  * hotkey.
  */
-class QnAction: public QAction, public QnWorkbenchContextAware
+class Action: public QAction, public QnWorkbenchContextAware
 {
     Q_OBJECT
 public:
@@ -33,12 +37,12 @@ public:
      * \param id                        Identifier of this action.
      * \param parent                    Context-aware parent of this action.
      */
-    QnAction(QnActions::IDType id, QObject *parent = NULL);
+    Action(QnActions::IDType id, QObject *parent = NULL);
 
     /**
      * Virtual destructor.
      */
-    virtual ~QnAction();
+    virtual ~Action();
 
     /**
      * \returns                         Identifier of this action.
@@ -48,12 +52,12 @@ public:
     /**
      * \returns                         Scope of this action.
      */
-    nx::client::desktop::ui::action::ActionScopes scope() const;
+    ActionScopes scope() const;
 
     /**
      * \returns                         Possible types of this action's default parameter.
      */
-    nx::client::desktop::ui::action::ActionParameterTypes defaultParameterTypes() const;
+    ActionParameterTypes defaultParameterTypes() const;
 
     /**
      * \param target                    Action parameter key.
@@ -77,11 +81,11 @@ public:
     */
     void setRequiredGlobalPermission(Qn::GlobalPermission requiredPermissions);
 
-    nx::client::desktop::ui::action::ClientModes mode() const;
-    void setMode(nx::client::desktop::ui::action::ClientModes mode);
+    ClientModes mode() const;
+    void setMode(ClientModes mode);
 
-    nx::client::desktop::ui::action::ActionFlags flags() const;
-    void setFlags(nx::client::desktop::ui::action::ActionFlags flags);
+    ActionFlags flags() const;
+    void setFlags(ActionFlags flags);
 
     Qn::ButtonAccent accent() const;
     void setAccent(Qn::ButtonAccent value);
@@ -122,28 +126,28 @@ public:
     /**
      * \returns                         Condition associated with this action, of NULL if none.
      */
-    nx::client::desktop::ui::action::ConditionPtr condition() const;
+    ConditionPtr condition() const;
 
     /**
      * \param condition                 New condition for this action.
      */
-    void setCondition(const nx::client::desktop::ui::action::ConditionPtr& condition);
+    void setCondition(const ConditionPtr& condition);
 
-    nx::client::desktop::ui::action::FactoryPtr childFactory() const;
-    void setChildFactory(const nx::client::desktop::ui::action::FactoryPtr& childFactory);
+    FactoryPtr childFactory() const;
+    void setChildFactory(const FactoryPtr& childFactory);
 
-    nx::client::desktop::ui::action::TextFactoryPtr textFactory() const;
-    void setTextFactory(const nx::client::desktop::ui::action::TextFactoryPtr& textFactory);
+    TextFactoryPtr textFactory() const;
+    void setTextFactory(const TextFactoryPtr& textFactory);
 
     /**
      * \returns                         Child actions. These action will appear
      *                                  in a submenu for this action.
      */
-    const QList<QnAction *> &children() const;
+    const QList<Action *> &children() const;
 
-    void addChild(QnAction *action);
+    void addChild(Action *action);
 
-    void removeChild(QnAction *action);
+    void removeChild(Action *action);
 
     QString toolTipFormat() const;
     void setToolTipFormat(const QString &toolTipFormat);
@@ -156,11 +160,11 @@ public:
      *                                  action can be executed and how it will
      *                                  appear in context menu.
      */
-    nx::client::desktop::ui::action::ActionVisibility checkCondition(
-        nx::client::desktop::ui::action::ActionScopes scope,
-        const nx::client::desktop::ui::action::Parameters &parameters) const;
+    ActionVisibility checkCondition(
+        ActionScopes scope,
+        const Parameters &parameters) const;
 
-    void addConditionalText(nx::client::desktop::ui::action::ConditionPtr condition, const QString &text);
+    void addConditionalText(ConditionPtr condition, const QString &text);
 
     /**
      * \returns true if there is at least one conditional text
@@ -172,7 +176,7 @@ public:
      * \returns                         New text if condition is executed;
      *                                  empty string otherwise.
      */
-    QString checkConditionalText(const nx::client::desktop::ui::action::Parameters &parameters) const;
+    QString checkConditionalText(const Parameters &parameters) const;
 
 protected:
     virtual bool event(QEvent *event) override;
@@ -187,29 +191,34 @@ private:
 
 private:
     const QnActions::IDType m_id;
-    nx::client::desktop::ui::action::ActionFlags m_flags;
+    ActionFlags m_flags;
     Qn::ButtonAccent m_accent{Qn::ButtonAccent::NoAccent};
-    nx::client::desktop::ui::action::ClientModes m_mode;
+    ClientModes m_mode;
     QHash<int, Qn::Permissions> m_targetPermissions;
     Qn::GlobalPermission m_globalPermission;
     QString m_normalText, m_toggledText, m_pulledText;
     QString m_toolTipFormat, m_toolTipMarker;
-    nx::client::desktop::ui::action::ConditionPtr m_condition;
-    nx::client::desktop::ui::action::FactoryPtr m_childFactory;
-    nx::client::desktop::ui::action::TextFactoryPtr m_textFactory;
+    ConditionPtr m_condition;
+    FactoryPtr m_childFactory;
+    TextFactoryPtr m_textFactory;
 
-    QList<QnAction *> m_children;
+    QList<Action *> m_children;
 
     struct ConditionalText
     {
-        nx::client::desktop::ui::action::ConditionPtr condition;
+        ConditionPtr condition;
         QString text;
         ConditionalText(){}
-        ConditionalText(nx::client::desktop::ui::action::ConditionPtr condition, const QString &text):
+        ConditionalText(ConditionPtr condition, const QString &text):
             condition(condition), text(text) {}
     };
     QList<ConditionalText> m_conditionalTexts;
 };
 
-Q_DECLARE_METATYPE(QnAction *)
+Q_DECLARE_METATYPE(Action *)
 
+} // namespace action
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx

@@ -1,7 +1,9 @@
 #include "workbench_incompatible_servers_action_handler.h"
 
-#include <QtWidgets/QInputDialog>
 #include <QtCore/QUrl>
+
+#include <QtWidgets/QAction>
+#include <QtWidgets/QInputDialog>
 
 #include <core/resource/resource.h>
 #include <core/resource/fake_media_server.h>
@@ -12,7 +14,6 @@
 #include <licensing/remote_licenses.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/actions/action.h>
 #include <ui/dialogs/merge_systems_dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/progress_dialog.h>

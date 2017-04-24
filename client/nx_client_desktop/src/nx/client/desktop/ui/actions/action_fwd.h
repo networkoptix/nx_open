@@ -6,7 +6,6 @@ class QAction;
 class QActionGroup;
 class QMenu;
 
-class QnAction;
 class QnResourceCriterion;
 
 namespace nx {
@@ -15,6 +14,7 @@ namespace desktop {
 namespace ui {
 namespace action {
 
+class Action;
 class Parameters;
 
 class Manager;

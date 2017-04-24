@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QActionGroup>
 
-#include <ui/actions/action.h>
+#include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 
 namespace nx {
@@ -11,7 +11,7 @@ namespace desktop {
 namespace ui {
 namespace action {
 
-MenuFactory::MenuFactory(Manager* menu, QnAction* parent):
+MenuFactory::MenuFactory(Manager* menu, Action* parent):
     m_manager(menu),
     m_lastFreeActionId(QnActions::ActionCount),
     m_currentGroup(0)
@@ -42,14 +42,14 @@ void MenuFactory::endGroup()
 
 Builder MenuFactory::operator()(QnActions::IDType id)
 {
-    QnAction *action = m_manager->action(id);
-    if (action == NULL)
+    auto action = m_manager->action(id);
+    if (!action)
     {
-        action = new QnAction(id, m_manager);
+        action = new Action(id, m_manager);
         m_manager->registerAction(action);
     }
 
-    QnAction *parentAction = m_actionStack.back();
+    auto parentAction = m_actionStack.back();
     parentAction->addChild(action);
     parentAction->setFlags(parentAction->flags() | RequiresChildren);
 

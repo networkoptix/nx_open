@@ -26,9 +26,13 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
-using namespace nx::client::desktop::ui::action;
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+namespace action {
 
-QnAction::QnAction(QnActions::IDType id, QObject* parent) :
+Action::Action(QnActions::IDType id, QObject* parent) :
     QAction(parent),
     QnWorkbenchContextAware(parent),
     m_id(id),
@@ -39,83 +43,83 @@ QnAction::QnAction(QnActions::IDType id, QObject* parent) :
 {
     setToolTip(m_toolTipMarker);
 
-    connect(this, &QAction::changed, this, &QnAction::updateToolTipSilent);
+    connect(this, &QAction::changed, this, &Action::updateToolTipSilent);
 }
 
-QnAction::~QnAction()
+Action::~Action()
 {}
 
-QnActions::IDType QnAction::id() const
+QnActions::IDType Action::id() const
 {
     return m_id;
 }
 
-ActionScopes QnAction::scope() const
+ActionScopes Action::scope() const
 {
     return static_cast<ActionScopes>(static_cast<int>(m_flags) & ScopeMask);
 }
 
-ActionParameterTypes QnAction::defaultParameterTypes() const
+ActionParameterTypes Action::defaultParameterTypes() const
 {
     return static_cast<ActionParameterTypes>(static_cast<int>(m_flags) & TargetTypeMask);
 }
 
-Qn::Permissions QnAction::requiredTargetPermissions(int target /* = -1*/) const
+Qn::Permissions Action::requiredTargetPermissions(int target /* = -1*/) const
 {
     return m_targetPermissions.value(target);
 }
 
-void QnAction::setRequiredTargetPermissions(Qn::Permissions requiredPermissions)
+void Action::setRequiredTargetPermissions(Qn::Permissions requiredPermissions)
 {
     setRequiredTargetPermissions(-1, requiredPermissions);
 }
 
-void QnAction::setRequiredTargetPermissions(int target, Qn::Permissions requiredPermissions)
+void Action::setRequiredTargetPermissions(int target, Qn::Permissions requiredPermissions)
 {
     m_targetPermissions[target] = requiredPermissions;
 }
 
-void QnAction::setRequiredGlobalPermission(Qn::GlobalPermission requiredPermission)
+void Action::setRequiredGlobalPermission(Qn::GlobalPermission requiredPermission)
 {
     m_globalPermission = requiredPermission;
 }
 
-ClientModes QnAction::mode() const
+ClientModes Action::mode() const
 {
     return m_mode;
 }
 
-void QnAction::setFlags(ActionFlags flags)
+void Action::setFlags(ActionFlags flags)
 {
     m_flags = flags;
 }
 
-Qn::ButtonAccent QnAction::accent() const
+Qn::ButtonAccent Action::accent() const
 {
     return m_accent;
 }
 
-void QnAction::setAccent(Qn::ButtonAccent value)
+void Action::setAccent(Qn::ButtonAccent value)
 {
     m_accent = value;
 }
 
-const QString & QnAction::normalText() const
+const QString & Action::normalText() const
 {
     return m_normalText;
 }
 
-void QnAction::setMode(ClientModes mode)
+void Action::setMode(ClientModes mode)
 {
     m_mode = mode;
 }
 
-ActionFlags QnAction::flags() const
+ActionFlags Action::flags() const
 {
     return m_flags;
 }
 
-void QnAction::setNormalText(const QString& normalText)
+void Action::setNormalText(const QString& normalText)
 {
     if (m_normalText == normalText)
         return;
@@ -125,12 +129,12 @@ void QnAction::setNormalText(const QString& normalText)
     updateText();
 }
 
-const QString & QnAction::toggledText() const
+const QString & Action::toggledText() const
 {
     return m_toggledText.isEmpty() ? m_normalText : m_toggledText;
 }
 
-void QnAction::setToggledText(const QString& toggledText)
+void Action::setToggledText(const QString& toggledText)
 {
     if (m_toggledText == toggledText)
         return;
@@ -138,69 +142,69 @@ void QnAction::setToggledText(const QString& toggledText)
     m_toggledText = toggledText;
 
     if (m_toggledText.isEmpty())
-        disconnect(this, &QAction::toggled, this, &QnAction::updateText);
+        disconnect(this, &QAction::toggled, this, &Action::updateText);
     else
-        connect(this, &QAction::toggled, this, &QnAction::updateText, Qt::UniqueConnection);
+        connect(this, &QAction::toggled, this, &Action::updateText, Qt::UniqueConnection);
 
     updateText();
 }
 
-const QString& QnAction::pulledText() const
+const QString& Action::pulledText() const
 {
     return m_pulledText.isEmpty() ? m_normalText : m_pulledText;
 }
 
-void QnAction::setPulledText(const QString& pulledText)
+void Action::setPulledText(const QString& pulledText)
 {
     m_pulledText = pulledText;
 }
 
-ConditionPtr QnAction::condition() const
+ConditionPtr Action::condition() const
 {
     return m_condition;
 }
 
-void QnAction::setCondition(const ConditionPtr& condition)
+void Action::setCondition(const ConditionPtr& condition)
 {
     m_condition = condition;
 }
 
-FactoryPtr QnAction::childFactory() const
+FactoryPtr Action::childFactory() const
 {
     return m_childFactory;
 }
 
-void QnAction::setChildFactory(const FactoryPtr& childFactory)
+void Action::setChildFactory(const FactoryPtr& childFactory)
 {
     m_childFactory = childFactory;
 }
 
-TextFactoryPtr QnAction::textFactory() const
+TextFactoryPtr Action::textFactory() const
 {
     return m_textFactory;
 }
 
-void QnAction::setTextFactory(const TextFactoryPtr& textFactory)
+void Action::setTextFactory(const TextFactoryPtr& textFactory)
 {
     m_textFactory = textFactory;
 }
 
-const QList<QnAction*>& QnAction::children() const
+const QList<Action*>& Action::children() const
 {
     return m_children;
 }
 
-void QnAction::addChild(QnAction* action)
+void Action::addChild(Action* action)
 {
     m_children.push_back(action);
 }
 
-void QnAction::removeChild(QnAction* action)
+void Action::removeChild(Action* action)
 {
     m_children.removeOne(action);
 }
 
-QString QnAction::defaultToolTipFormat() const
+QString Action::defaultToolTipFormat() const
 {
     if (shortcuts().empty())
     {
@@ -212,12 +216,12 @@ QString QnAction::defaultToolTipFormat() const
     }
 }
 
-QString QnAction::toolTipFormat() const
+QString Action::toolTipFormat() const
 {
     return m_toolTipFormat.isEmpty() ? defaultToolTipFormat() : m_toolTipFormat;
 }
 
-void QnAction::setToolTipFormat(const QString& toolTipFormat)
+void Action::setToolTipFormat(const QString& toolTipFormat)
 {
     if (m_toolTipFormat == toolTipFormat)
         return;
@@ -227,7 +231,7 @@ void QnAction::setToolTipFormat(const QString& toolTipFormat)
     updateToolTip(true);
 }
 
-ActionVisibility QnAction::checkCondition(ActionScopes scope, const Parameters& parameters) const
+ActionVisibility Action::checkCondition(ActionScopes scope, const Parameters& parameters) const
 {
     if (!isVisible())
         return InvisibleAction; // TODO: #Elric cheat!
@@ -314,7 +318,7 @@ ActionVisibility QnAction::checkCondition(ActionScopes scope, const Parameters& 
     return EnabledAction;
 }
 
-bool QnAction::event(QEvent* event)
+bool Action::event(QEvent* event)
 {
     if (event->type() != QEvent::Shortcut)
         return QObject::event(event);
@@ -375,12 +379,12 @@ bool QnAction::event(QEvent* event)
     return false;
 }
 
-void QnAction::updateText()
+void Action::updateText()
 {
     setText(isChecked() ? toggledText() : normalText());
 }
 
-void QnAction::updateToolTip(bool notify)
+void Action::updateToolTip(bool notify)
 {
     if (!toolTip().endsWith(m_toolTipMarker))
         return; /* We have an explicitly set tooltip. */
@@ -410,22 +414,22 @@ void QnAction::updateToolTip(bool notify)
         blockSignals(signalsBlocked);
 }
 
-void QnAction::updateToolTipSilent()
+void Action::updateToolTipSilent()
 {
     updateToolTip(false);
 }
 
-void QnAction::addConditionalText(ConditionPtr condition, const QString& text)
+void Action::addConditionalText(ConditionPtr condition, const QString& text)
 {
     m_conditionalTexts << ConditionalText(condition, text);
 }
 
-bool QnAction::hasConditionalTexts()
+bool Action::hasConditionalTexts()
 {
     return !m_conditionalTexts.isEmpty();
 }
 
-QString QnAction::checkConditionalText(const Parameters& parameters) const
+QString Action::checkConditionalText(const Parameters& parameters) const
 {
     for (const ConditionalText& conditionalText : m_conditionalTexts)
     {
@@ -434,3 +438,9 @@ QString QnAction::checkConditionalText(const Parameters& parameters) const
     }
     return normalText();
 }
+
+} // namespace action
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx

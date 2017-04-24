@@ -7,9 +7,8 @@
 #include <client/client_runtime_settings.h>
 #include <client/client_message_processor.h>
 
+#include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/actions/action.h>
-
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_synchronizer.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>

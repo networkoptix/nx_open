@@ -35,7 +35,7 @@ TitleWorkbenchPanel::TitleWorkbenchPanel(
     base_type(settings, parentWidget, parent),
     item(new QnMaskedProxyWidget(parentWidget)),
     m_showButton(NxUi::newShowHideButton(parentWidget, context(),
-        action(QnActions::ToggleTitleBarAction))),
+        QnActions::ToggleTitleBarAction)),
     m_opacityAnimatorGroup(new AnimatorGroup(this)),
     m_yAnimator(new VariantAnimator(this)),
     m_opacityProcessor(new HoverFocusProcessor(parentWidget))

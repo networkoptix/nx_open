@@ -3,6 +3,8 @@
 
 #include <QtNetwork/QHostInfo>
 
+#include <QtWidgets/QAction>
+
 #include <api/abstract_connection.h>
 #include <api/app_server_connection.h>
 #include <api/runtime_info_manager.h>
@@ -42,7 +44,6 @@
 
 #include <platform/hardware_information.h>
 
-#include <ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <ui/dialogs/login_dialog.h>

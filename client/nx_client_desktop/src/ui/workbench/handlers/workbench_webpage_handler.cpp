@@ -1,5 +1,7 @@
 #include "workbench_webpage_handler.h"
 
+#include <QtWidgets/QAction>
+
 #include <common/common_module.h>
 
 #include <client/client_message_processor.h>
@@ -8,7 +10,6 @@
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <ui/dialogs/webpage_dialog.h>

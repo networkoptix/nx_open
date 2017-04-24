@@ -8,7 +8,7 @@
 #include <utils/common/hash.h>
 #include <nx/utils/random.h>
 
-#include <ui/actions/action.h>
+#include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/constrained_geometrically.h>
@@ -896,7 +896,7 @@ void ZoomWindowInstrument::at_resizing(QGraphicsView *view, QGraphicsWidget *, R
     if(!newTargetWidget || newTargetWidget == windowTarget()->overlay()->target())
         return;
 
-    QnAction *action = menu()->action(QnActions::CreateZoomWindowAction);
+    auto action = menu()->action(QnActions::CreateZoomWindowAction);
     if (!action || action->checkCondition(action->scope(), newTargetWidget) != action::EnabledAction)
         return;
 

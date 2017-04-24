@@ -13,7 +13,7 @@ namespace action {
 class MenuFactory
 {
 public:
-    MenuFactory(Manager* menu, QnAction* parent);
+    MenuFactory(Manager* menu, Action* parent);
 
     void beginSubMenu();
     void endSubMenu();
@@ -27,8 +27,8 @@ public:
 private:
     Manager* m_manager;
     int m_lastFreeActionId;
-    QnAction *m_lastAction;
-    QList<QnAction *> m_actionStack;
+    Action* m_lastAction;
+    QList<Action*> m_actionStack;
     QActionGroup* m_currentGroup;
 };
 

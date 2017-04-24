@@ -27,7 +27,7 @@ public:
         Mac
     };
 
-    Builder(QnAction* action);
+    Builder(Action* action);
 
     Builder shortcut(const QKeySequence& keySequence, ActionPlatform platform, bool replaceExisting);
     Builder shortcut(const QKeySequence& keySequence);
@@ -60,7 +60,7 @@ public:
     Builder childFactory(const FactoryPtr& childFactory);
 
 private:
-    QnAction* m_action;
+    Action* m_action;
 };
 
 } // namespace action

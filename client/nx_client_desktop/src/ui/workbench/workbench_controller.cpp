@@ -478,7 +478,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
         this, &QnWorkbenchController::at_previousItemAction_triggered);
 
     connect(
-        action(QnActions::ToggleCurrentItemMaximizationStateAction), &QnAction::triggered,
+        action(QnActions::ToggleCurrentItemMaximizationStateAction), &QAction::triggered,
         this, &QnWorkbenchController::at_toggleCurrentItemMaximizationState_triggered);
 
 }

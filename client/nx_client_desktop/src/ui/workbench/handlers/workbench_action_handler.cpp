@@ -80,7 +80,6 @@
 #include <redass/redass_controller.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/actions/action.h>
 
 #include <ui/dialogs/about_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>

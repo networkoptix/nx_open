@@ -6,7 +6,7 @@
 #include <core/resource_management/resource_criterion.h>
 
 #include <nx/client/desktop/ui/actions/action_conditions.h>
-#include <ui/actions/action.h>
+#include <nx/client/desktop/ui/actions/action.h>
 #include <ui/style/noptix_style.h>
 
 #include <nx/utils/log/assert.h>
@@ -18,7 +18,7 @@ namespace desktop {
 namespace ui {
 namespace action {
 
-Builder::Builder(QnAction* action):
+Builder::Builder(Action* action):
     m_action(action)
 {
     action->setShortcutContext(Qt::WindowShortcut);

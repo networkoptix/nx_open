@@ -25,7 +25,6 @@
 
 #include <network/cloud_url_validator.h>
 
-#include <ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>

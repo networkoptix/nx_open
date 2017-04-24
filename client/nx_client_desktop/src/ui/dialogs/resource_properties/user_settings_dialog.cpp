@@ -13,7 +13,6 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/layout_resource.h>
 
-#include <ui/actions/action.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>

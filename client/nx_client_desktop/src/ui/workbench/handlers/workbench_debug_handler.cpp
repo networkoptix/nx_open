@@ -5,6 +5,7 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QToolButton>
+#include <QtWidgets/QAction>
 
 #include <QtWebKitWidgets/QWebView>
 
@@ -15,7 +16,6 @@
 
 #include <core/resource_management/resource_pool.h>
 
-#include <ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/widgets/palette_widget.h>
 #include <ui/dialogs/common/dialog.h>
@@ -141,7 +141,7 @@ private:
     QToolButton *newActionButton(QnActions::IDType actionId, QWidget *parent = NULL)
     {
         QToolButton *button = new QToolButton(parent);
-        button->setDefaultAction(menu()->action(actionId));
+        button->setDefaultAction(action(actionId));
         button->setToolButtonStyle(Qt::ToolButtonTextOnly);
         return button;
     }

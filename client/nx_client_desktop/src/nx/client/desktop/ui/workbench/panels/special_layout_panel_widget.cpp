@@ -7,7 +7,7 @@
 
 #include <client/client_globals.h>
 
-#include <ui/actions/action.h>
+#include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/palette.h>
 #include <ui/style/custom_style.h>
@@ -95,7 +95,7 @@ void SpecialLayoutPanelWidget::updateButtons()
 
     for (const auto& actionId: actions)
     {
-        const auto action = dynamic_cast<QnAction*>(this->action(actionId));
+        const auto action = menu()->action(actionId);
         NX_EXPECT(action);
         if (!action)
             continue;

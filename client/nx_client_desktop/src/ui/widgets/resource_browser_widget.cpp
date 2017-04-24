@@ -40,7 +40,6 @@
 #include <nx/client/desktop/ui/workbench/workbench_animations.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/actions/action.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
 #include <ui/delegates/resource_item_delegate.h>

@@ -1,8 +1,8 @@
 
 #include "action_metrics.h"
 
-#include <ui/actions/action.h>
 #include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <statistics/base/metrics_container.h>
 #include <statistics/base/time_duration_metric.h>
@@ -56,13 +56,13 @@ namespace
     {
         typedef QnTimeDurationMetric base_type;
     public:
-        ActionDurationMetric(QnAction *action);
+        ActionDurationMetric(action::Action* action);
 
         virtual ~ActionDurationMetric();
     private:
     };
 
-    ActionDurationMetric::ActionDurationMetric(QnAction *action)
+    ActionDurationMetric::ActionDurationMetric(action::Action* action)
         : base_type()
         , QObject()
     {
@@ -132,7 +132,7 @@ ActionsTriggeredCountMetrics::ActionsTriggeredCountMetrics(const action::Manager
         addActionMetric(action);
 }
 
-void ActionsTriggeredCountMetrics::addActionMetric(QnAction *action)
+void ActionsTriggeredCountMetrics::addActionMetric(action::Action *action)
 {
     const auto id = action->id();
     const auto guard = makePointer(this);
@@ -196,7 +196,7 @@ ActionCheckedTimeMetric::ActionCheckedTimeMetric(const action::ManagerPtr& actio
 ActionCheckedTimeMetric::~ActionCheckedTimeMetric()
 {}
 
-void ActionCheckedTimeMetric::addActionMetric(QnAction *action)
+void ActionCheckedTimeMetric::addActionMetric(action::Action *action)
 {
     if (!action)
         return;

@@ -49,7 +49,7 @@ public:
     /**
      * \param action                    New action to register with this action manager.
      */
-    void registerAction(QnAction *action);
+    void registerAction(Action* action);
 
     /**
      * Registers action id as an alias for another action id.
@@ -63,12 +63,12 @@ public:
      * \param id                        Id of the action to get.
      * \returns                         Action for the given id, or NULL if no such action exists.
      */
-    QnAction *action(QnActions::IDType id) const;
+    Action* action(QnActions::IDType id) const;
 
     /**
      * \returns                         List of all actions of this action manager.
      */
-    QList<QnAction *> actions() const;
+    QList<Action*> actions() const;
 
     /**
      * \param id                        Id of the action to check.
@@ -124,7 +124,7 @@ public:
      * \returns                         Parameters with which the given action
      *                                  was triggered.
      */
-    Parameters currentParameters(QnAction *action) const;
+    Parameters currentParameters(Action *action) const;
 
     /**
      * This is a convenience overload to be used inside handlers of <tt>QAction</tt>'s
@@ -154,14 +154,14 @@ signals:
     void actionRegistered(QnActions::IDType id);
 
 protected:
-    friend class QnAction;
+    friend class Action;
 
     virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
-    void copyAction(QAction* dst, QnAction* src, bool forwardSignals = true);
+    void copyAction(QAction* dst, Action* src, bool forwardSignals = true);
 
     QMenu *newMenuRecursive(
-        const QnAction* parent,
+        const Action* parent,
         ActionScope scope,
         const Parameters& parameters,
         QWidget* parentWidget,
@@ -180,13 +180,13 @@ private slots:
 
 private:
     /** Root action. Also contained in the maps. */
-    QnAction* m_root;
+    Action* m_root;
 
     /** Mapping from action id to action instance. */
-    QHash<QnActions::IDType, QnAction*> m_actionById;
+    QHash<QnActions::IDType, Action*> m_actionById;
 
     /** Mapping from action to action id. */
-    QHash<QnAction*, QnActions::IDType> m_idByAction;
+    QHash<Action*, QnActions::IDType> m_idByAction;
 
     /** Mapping from a menu created by this manager to the parameters that were
      * passed to it at construction time. NULL key is used for shortcut actions. */
@@ -199,7 +199,7 @@ private:
     QPointer<QObject> m_targetProviderGuard;
 
     /** Currently active action that was activated via a shortcut. */
-    QnAction* m_shortcutAction;
+    Action* m_shortcutAction;
 
     /** Last menu that was clicked by the user. */
     QMenu* m_lastClickedMenu;
