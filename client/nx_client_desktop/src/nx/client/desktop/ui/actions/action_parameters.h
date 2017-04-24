@@ -178,10 +178,10 @@ private:
     ActionScopes m_scope { InvalidScope } ;
 };
 
-Q_DECLARE_METATYPE(Parameters)
-
 } // namespace action
 } // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx
+
+Q_DECLARE_METATYPE(nx::client::desktop::ui::action::Parameters)
