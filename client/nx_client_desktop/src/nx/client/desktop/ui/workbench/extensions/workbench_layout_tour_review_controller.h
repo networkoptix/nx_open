@@ -47,6 +47,10 @@ private:
         const QnLayoutResourcePtr& layout,
         const ec2::ApiLayoutTourItemData& item,
         const QPointF& position = QPointF());
+
+    /** Calculate items from the review layout. */
+    bool fillTourItems(ec2::ApiLayoutTourItemDataList* items);
+
 private:
     QnDisconnectHelperPtr m_connections;
     QHash<QnUuid, QnLayoutResourcePtr> m_reviewLayouts;

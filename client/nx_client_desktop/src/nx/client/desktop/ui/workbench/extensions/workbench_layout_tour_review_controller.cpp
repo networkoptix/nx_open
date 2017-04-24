@@ -35,8 +35,12 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
         {
             if (auto reviewLayout = m_reviewLayouts.value(tour.id))
             {
-                //TODO: #GDM #3.1 dynamically change items
                 reviewLayout->setData(Qn::CustomPanelTitleRole, tour.name);
+
+                ec2::ApiLayoutTourItemDataList currentItems;
+                if (fillTourItems(&currentItems) && currentItems == tour.items)
+                    return;
+
                 reviewLayout->setItems(QnLayoutItemDataList());
                 for (auto item: tour.items)
                     addItemToReviewLayout(reviewLayout, item);
@@ -99,20 +103,8 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
             auto tour = qnLayoutTourManager->tour(id);
             NX_EXPECT(tour.isValid());
 
-            auto items = workbench()->currentLayout()->items().toList();
-            QnWorkbenchItem::sortByGeometry(&items);
             tour.items.clear();
-            for (auto item: items)
-            {
-                const auto layout = resourcePool()->getResourceByUniqueId(item->resourceUid());
-                NX_EXPECT(layout);
-                if (!layout)
-                    continue;
-
-                const auto delayMs = item->data(Qn::LayoutTourItemDelayMsRole).toInt();
-                tour.items.emplace_back(layout->getId(), delayMs);
-            }
-
+            fillTourItems(&tour.items);
             qnLayoutTourManager->addOrUpdateTour(tour);
             menu()->trigger(action::SaveLayoutTourAction, {Qn::UuidRole, id});
         });
@@ -285,6 +277,28 @@ void LayoutTourReviewController::addItemToReviewLayout(
         Qn::LayoutTourItemDelayMsRole, item.delayMs);
 
     layout->addItem(itemData);
+}
+
+bool LayoutTourReviewController::fillTourItems(ec2::ApiLayoutTourItemDataList* items)
+{
+    NX_EXPECT(items);
+    if (!items)
+        return false;
+
+    auto layoutItems = workbench()->currentLayout()->items().toList();
+    QnWorkbenchItem::sortByGeometry(&layoutItems);
+    for (auto item: layoutItems)
+    {
+        const auto layout = resourcePool()->getResourceByUniqueId(item->resourceUid());
+        NX_EXPECT(layout);
+        if (!layout)
+            continue;
+
+        const auto delayMs = item->data(Qn::LayoutTourItemDelayMsRole).toInt();
+        items->emplace_back(layout->getId(), delayMs);
+    }
+
+    return true;
 }
 
 } // namespace workbench
