@@ -44,12 +44,6 @@ public:
     template<class T>
     T* findInstance()
     {
-        if (!m_thisInitialized)
-        {
-            m_this = dynamic_cast<QObject*>(this);
-            m_thisInitialized = true;
-        }
-
         return static_cast<T*>(m_instanceByMetaObject.value(&T::staticMetaObject));
     }
 
