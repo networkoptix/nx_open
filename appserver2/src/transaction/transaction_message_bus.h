@@ -32,13 +32,12 @@ namespace ec2 {
 class ECConnectionNotificationManager;
 class TimeSynchronizationManager;
 
-class QnTransactionMessageBus
-    :
-    public QObject,
-    public EnableMultiThreadDirectConnection<QnTransactionMessageBus>,
-    public QnTransactionMessageBusBase
+class QnTransactionMessageBus:
+    public QnTransactionMessageBusBase,
+    public EnableMultiThreadDirectConnection<QnTransactionMessageBus>
 {
-    Q_OBJECT
+    Q_OBJECT;
+    using base_type = QnTransactionMessageBusBase;
 public:
     QnTransactionMessageBus(
         detail::QnDbManager* db,
@@ -83,15 +82,7 @@ public:
 
     ApiPeerData localPeer() const;
 
-    void start();
-    void stop();
-
-    /*!
-        \param handler Control of life-time of this object is out of scope of this class
-    */
-    void setHandler(ECConnectionNotificationManager* handler);
-
-    void removeHandler(ECConnectionNotificationManager* handler);
+    virtual void stop() override;
 
     template<class T>
     void sendTransaction(const QnTransaction<T>& tran, const QnPeerSet& dstPeers = QnPeerSet())
@@ -287,9 +278,7 @@ private:
     };
 
     QMap<QUrl, RemoteUrlConnectInfo> m_remoteUrls;
-    ECConnectionNotificationManager* m_handler;
     QTimer* m_timer;
-    QThread *m_thread;
     QnConnectionMap m_connections;
 
     QVector<QnTransactionTransport*> m_connectingConnections;

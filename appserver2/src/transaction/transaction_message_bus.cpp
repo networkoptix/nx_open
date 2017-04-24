@@ -34,10 +34,9 @@
 #include "utils/common/synctime.h"
 #include <nx/utils/system_error.h>
 #include "utils/common/warnings.h"
-#include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/random.h>
-
+#include "transaction_message_bus_priv.h"
 
 namespace ec2 {
 
@@ -86,120 +85,6 @@ struct SendTransactionToTransportFastFuction
     }
 };
 
-typedef std::function<bool(Qn::SerializationFormat, const QByteArray&)> FastFunctionType;
-
-//Overload for ubjson transactions
-template<typename Function, typename Param>
-bool handleTransactionParams(const QByteArray &serializedTransaction, QnUbjsonReader<QByteArray> *stream, const QnAbstractTransaction &abstractTransaction,
-    Function function, FastFunctionType fastFunction)
-{
-    if (fastFunction(Qn::UbjsonFormat, serializedTransaction))
-    {
-        return true; // process transaction directly without deserialize
-    }
-
-    auto transaction = QnTransaction<Param>(abstractTransaction);
-    if (!QnUbjson::deserialize(stream, &transaction.params))
-    {
-        qWarning() << "Can't deserialize transaction " << toString(abstractTransaction.command);
-        return false;
-    }
-    if (!abstractTransaction.persistentInfo.isNull())
-        QnUbjsonTransactionSerializer::instance()->addToCache(abstractTransaction.persistentInfo, abstractTransaction.command, serializedTransaction);
-    function(transaction);
-    return true;
-}
-
-//Overload for json transactions
-template<typename Function, typename Param>
-bool handleTransactionParams(const QByteArray &serializedTransaction, const QJsonObject& jsonData, const QnAbstractTransaction &abstractTransaction,
-    Function function, FastFunctionType fastFunction)
-{
-    if (fastFunction(Qn::JsonFormat, serializedTransaction))
-    {
-        return true; // process transaction directly without deserialize
-    }
-    auto transaction = QnTransaction<Param>(abstractTransaction);
-    if (!QJson::deserialize(jsonData["params"], &transaction.params))
-    {
-        qWarning() << "Can't deserialize transaction " << toString(abstractTransaction.command);
-        return false;
-    }
-    function(transaction);
-    return true;
-}
-
-#define HANDLE_TRANSACTION_PARAMS_APPLY(_, value, param, ...) \
-    case ApiCommand::value : \
-        return handleTransactionParams<Function, param>(serializedTransaction, serializationSupport, transaction, function, fastFunction);
-
-template<typename SerializationSupport, typename Function>
-bool handleTransaction2(
-    const QnAbstractTransaction& transaction,
-    const SerializationSupport& serializationSupport,
-    const QByteArray& serializedTransaction,
-    const Function& function,
-    FastFunctionType fastFunction)
-{
-    switch (transaction.command)
-    {
-        TRANSACTION_DESCRIPTOR_LIST(HANDLE_TRANSACTION_PARAMS_APPLY)
-        default:
-            NX_ASSERT(0, "Unknown transaction command");
-    }
-    return false;
-}
-
-#undef HANDLE_TRANSACTION_PARAMS_APPLY
-
-template<class Function>
-bool handleTransaction(
-    Qn::SerializationFormat tranFormat,
-    const QByteArray &serializedTransaction,
-    const Function &function,
-    FastFunctionType fastFunction)
-{
-    if (tranFormat == Qn::UbjsonFormat)
-    {
-        QnAbstractTransaction transaction;
-        QnUbjsonReader<QByteArray> stream(&serializedTransaction);
-        if (!QnUbjson::deserialize(&stream, &transaction))
-        {
-            qnWarning("Ignore bad transaction data. size=%1.", serializedTransaction.size());
-            return false;
-        }
-
-        return handleTransaction2(
-            transaction,
-            &stream,
-            serializedTransaction,
-            function,
-            fastFunction);
-    }
-    else if (tranFormat == Qn::JsonFormat)
-    {
-        QnAbstractTransaction transaction;
-        QJsonObject tranObject;
-        //TODO #ak take tranObject from cache
-        if (!QJson::deserialize(serializedTransaction, &tranObject))
-            return false;
-        if (!QJson::deserialize(tranObject["tran"], &transaction))
-            return false;
-
-        return handleTransaction2(
-            transaction,
-            tranObject["tran"].toObject(),
-            serializedTransaction,
-            function,
-            fastFunction);
-    }
-    else
-    {
-        return false;
-    }
-}
-
-
 
 // --------------------------------- QnTransactionMessageBus ------------------------------
 
@@ -210,17 +95,11 @@ QnTransactionMessageBus::QnTransactionMessageBus(detail::QnDbManager* db,
     QnTransactionMessageBusBase(db, peerType, commonModule),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
     m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
-    m_handler(nullptr),
     m_timer(nullptr),
-    m_thread(nullptr),
     m_runtimeTransactionLog(new QnRuntimeTransactionLog(commonModule)),
     m_restartPending(false)
 {
-    if (m_thread)
-        return;
-    m_thread = new QThread();
     m_thread->setObjectName("QnTransactionMessageBusThread");
-    moveToThread(m_thread);
     qRegisterMetaType<QnTransactionTransport::State>(); // TODO: #Elric #EC2 registration
     qRegisterMetaType<QnAbstractTransaction>("QnAbstractTransaction");
     qRegisterMetaType<QnTransaction<ApiRuntimeData> >("QnTransaction<ApiRuntimeData>");
@@ -238,27 +117,10 @@ QnTransactionMessageBus::QnTransactionMessageBus(detail::QnDbManager* db,
         this, &QnTransactionMessageBus::onEc2ConnectionSettingsChanged);
 }
 
-void QnTransactionMessageBus::start()
-{
-    NX_ASSERT(!m_thread->isRunning());
-    if (!m_thread->isRunning())
-        m_thread->start();
-}
-
 void QnTransactionMessageBus::stop()
 {
     dropConnections();
-
-    if (m_thread->isRunning())
-    {
-        /* Connections in the 'Error' state will be closed via queued connection and after that removed via deleteLater() */
-        WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(m_thread, 7);
-        waitingForObjectsToBeFreed.join();
-
-        m_thread->exit();
-        m_thread->wait();
-    }
-
+    base_type::stop();
     m_aliveSendTimer.invalidate();
 }
 
@@ -1905,23 +1767,6 @@ void QnTransactionMessageBus::onEc2ConnectionSettingsChanged(const QString& key)
                 transport->setState(ec2::QnTransactionTransport::Error);
         }
     }
-}
-
-void QnTransactionMessageBus::setHandler(ECConnectionNotificationManager* handler)
-{
-    QnMutexLocker lock(&m_mutex);
-    NX_ASSERT(!m_thread->isRunning());
-    NX_ASSERT(m_handler == NULL, Q_FUNC_INFO, "Previous handler must be removed at this time");
-    m_handler = handler;
-}
-
-void QnTransactionMessageBus::removeHandler(ECConnectionNotificationManager* handler)
-{
-    QnMutexLocker lock(&m_mutex);
-    NX_ASSERT(!m_thread->isRunning());
-    NX_ASSERT(m_handler == handler, Q_FUNC_INFO, "We must remove only current handler");
-    if (m_handler == handler)
-        m_handler = nullptr;
 }
 
 ConnectionGuardSharedState* QnTransactionMessageBus::connectionGuardSharedState()

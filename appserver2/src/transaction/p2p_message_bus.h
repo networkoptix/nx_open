@@ -10,6 +10,7 @@
 #include <nx_ec/data/api_tran_state_data.h>
 #include "p2p_connection.h"
 #include "p2p_fwd.h"
+#include "transaction.h"
 
 namespace ec2 {
 
@@ -33,9 +34,7 @@ struct SubscribeForDataUpdateRecord
 };
 using SubscribeForDataUpdatesMessageType = std::vector<SubscribeForDataUpdateRecord>;
 
-class P2pMessageBus:
-    public QObject,
-    public QnTransactionMessageBusBase
+class P2pMessageBus: public QnTransactionMessageBusBase
 {
     Q_OBJECT
 public:
@@ -81,6 +80,11 @@ private:
     bool handleAlivePeers(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handleSubscribeForDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handlePushTransactionData(const P2pConnectionPtr& connection, const QByteArray& data);
+
+    friend struct GotTransactionFuction;
+
+    template <class T>
+    void gotTransaction(const QnTransaction<T> &tran,const P2pConnectionPtr& connection);
 private slots:
     void at_gotMessage(const QSharedPointer<P2pConnection>& connection, MessageType messageType, const QByteArray& payload);
 private:
@@ -105,7 +109,6 @@ private:
     PeersMap m_allPeers; //< all peers in a system
 
     QMap<ApiPersistentIdData, P2pConnectionPtr> m_subscriptionList;
-    QThread* m_thread = nullptr;
     QTimer* m_timer = nullptr;
 };
 

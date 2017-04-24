@@ -246,7 +246,7 @@ void P2pMessageBus::addOfflinePeersFromDb()
     }
 }
 
-QByteArray
+QByteArray P2pMessageBus::serializePeersMessage()
 {
     QByteArray result;
     result.resize(m_allPeers.size() * 6 + 1);
@@ -542,9 +542,64 @@ bool P2pMessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connec
     return true;
 }
 
-bool P2pMessageBus::handlePushTransactionData(const P2pConnectionPtr& connection, const QByteArray& data)
+struct GotTransactionFuction
 {
-    return true;
+    typedef void result_type;
+
+    template<class T>
+    void operator()(
+        P2pMessageBus *bus,
+        const QnTransaction<T> &transaction,
+        const P2pConnectionPtr& connection) const
+    {
+        bus->gotTransaction(transaction, connection);
+    }
+};
+
+
+bool P2pMessageBus::handlePushTransactionData(const P2pConnectionPtr& connection, const QByteArray& serializedTran)
+{
+    using namespace std::placeholders;
+    return handleTransaction(
+        connection->remotePeer().dataFormat,
+        std::move(serializedTran),
+        std::bind(GotTransactionFuction(), this, _1, connection),
+        [](Qn::SerializationFormat, const QByteArray&) { return false; });
+}
+
+template <class T>
+void QnTransactionMessageBus::gotTransaction(
+    const QnTransaction<T> &tran,
+    const P2pConnectionPtr& connection)
+{
+    if (!tran.persistentInfo.isNull() && m_db)
+    {
+        QByteArray serializedTran =
+            QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
+        ErrorCode errorCode = dbManager(m_db, sender->getUserAccessData())
+            .executeTransaction(tran, serializedTran);
+        switch (errorCode)
+        {
+            case ErrorCode::ok:
+                break;
+            case ErrorCode::containsBecauseTimestamp:
+                //proxyFillerTransaction(tran, transportHeader);
+            case ErrorCode::containsBecauseSequence:
+                return; // do not proxy if transaction already exists
+            default:
+                NX_LOG(
+                    QnLog::EC2_TRAN_LOG,
+                    lit("Can't handle transaction %1: %2. Reopening connection...")
+                    .arg(ApiCommand::toString(tran.command))
+                    .arg(ec2::toString(errorCode)),
+                    cl_logWARNING);
+                connection->setState(P2pConnection::state::Error);
+                return;
+        }
+    }
+
+    if (m_handler)
+        m_handler->triggerNotification(tran, NotificationSource::Remote);
 }
 
 } // ec2
