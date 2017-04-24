@@ -10,6 +10,8 @@
 #include "ec_connection_notification_manager.h"
 #include "transaction_message_bus_priv.h"
 #include <nx/utils/random.h>
+#include "ubjson_transaction_serializer.h"
+#include "json_transaction_serializer.h"
 
 namespace ec2 {
 
@@ -681,8 +683,20 @@ struct SendTransactionToTransportFuction
         const QnTransaction<T> &transaction,
         const P2pConnectionPtr& connection) const
     {
-        // todo: implement me
-        //connection->sendTransaction(transaction);
+        switch (connection->remotePeer().dataFormat)
+        {
+            case Qn::JsonFormat:
+                connection->sendMessage(MessageType::pushTransactionData,
+                    QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(transaction) + QByteArray("\r\n"));
+                break;
+            case Qn::UbjsonFormat:
+                connection->sendMessage(MessageType::pushTransactionData,
+                    QnUbjsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(transaction));
+                break;
+            default:
+                qWarning() << "Client has requested data in an unsupported format" << connection->remotePeer().dataFormat;
+                break;
+        }
     }
 };
 

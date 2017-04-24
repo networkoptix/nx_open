@@ -142,7 +142,7 @@ bool QnTransactionTransport::sendSerializedTransaction(
     switch (remotePeer().dataFormat)
     {
         case Qn::JsonFormat:
-            addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(serializedTran, header) + QByteArray("\r\n"));
+            addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(serializedTran) + QByteArray("\r\n"));
             break;
             //case Qn::BnsFormat:
             //    addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));

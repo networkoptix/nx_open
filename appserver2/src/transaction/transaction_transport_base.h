@@ -247,7 +247,7 @@ protected:
         {
             case Qn::JsonFormat:
                 if (m_remotePeer.peerType == Qn::PT_OldMobileClient)
-                    addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(transaction, header) + QByteArray("\r\n"));
+                    addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(transaction) + QByteArray("\r\n"));
                 else
                     addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
                 break;

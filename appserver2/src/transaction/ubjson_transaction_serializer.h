@@ -19,7 +19,7 @@ namespace ec2
     class QnUbjsonTransactionSerializer: public Singleton<QnUbjsonTransactionSerializer>
     {
     public:
-        struct CacheKey 
+        struct CacheKey
         {
             CacheKey() {}
             CacheKey(const QnAbstractTransaction::PersistentInfo& persistentInfo, const ApiCommand::Value& command): persistentInfo(persistentInfo), command(command) {}
@@ -68,11 +68,19 @@ namespace ec2
         }
 
         template<class T>
-        QByteArray serializedTransactionWithHeader(const QnTransaction<T> &tran, const QnTransactionTransportHeader &header) {
+        QByteArray serializedTransactionWithHeader(const QnTransaction<T> &tran, const QnTransactionTransportHeader &header)
+        {
             return serializedTransactionWithHeader(serializedTransaction(tran), header);
         }
 
-        QByteArray serializedTransactionWithHeader(const QByteArray &serializedTran, const QnTransactionTransportHeader &header) {
+        template<class T>
+        QByteArray serializedTransactionWithoutHeader(const QnTransaction<T> &tran)
+        {
+            return serializedTransaction(tran);
+        }
+
+        QByteArray serializedTransactionWithHeader(const QByteArray &serializedTran, const QnTransactionTransportHeader &header)
+        {
             QByteArray result;
             QnUbjsonWriter<QByteArray> stream(&result);
             QnUbjson::serialize(header, &stream);
