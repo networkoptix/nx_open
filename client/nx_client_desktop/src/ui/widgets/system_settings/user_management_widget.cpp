@@ -438,12 +438,12 @@ void QnUserManagementWidget::openLdapSettings()
 
 void QnUserManagementWidget::editRoles()
 {
-    menu()->triggerIfPossible(QnActions::UserRolesAction); //TODO: #vkutin #GDM correctly set parent widget
+    menu()->triggerIfPossible(action::UserRolesAction); //TODO: #vkutin #GDM correctly set parent widget
 }
 
 void QnUserManagementWidget::createUser()
 {
-    menu()->triggerIfPossible(QnActions::NewUserAction); //TODO: #GDM correctly set parent widget
+    menu()->triggerIfPossible(action::NewUserAction); //TODO: #GDM correctly set parent widget
 }
 
 void QnUserManagementWidget::fetchUsers()
@@ -495,7 +495,7 @@ void QnUserManagementWidget::at_usersTable_clicked(const QModelIndex& index)
             break;
 
         default:
-            menu()->trigger(QnActions::UserSettingsAction, action::Parameters(user)
+            menu()->trigger(action::UserSettingsAction, action::Parameters(user)
                 .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage)
                 .withArgument(Qn::ForceRole, true)
             );

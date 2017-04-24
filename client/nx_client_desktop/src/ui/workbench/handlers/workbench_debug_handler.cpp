@@ -35,6 +35,8 @@
 #define DEBUG_ACTIONS
 #endif
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 
 
@@ -88,8 +90,8 @@ public:
         using namespace nx::client::desktop::ui;
 
         QVBoxLayout *layout = new QVBoxLayout(this);
-        layout->addWidget(newActionButton(QnActions::DebugDecrementCounterAction));
-        layout->addWidget(newActionButton(QnActions::DebugIncrementCounterAction));
+        layout->addWidget(newActionButton(action::DebugDecrementCounterAction));
+        layout->addWidget(newActionButton(action::DebugIncrementCounterAction));
 
         auto addButton = [this, parent, layout]
             (const QString& name, std::function<void(void)> handler)
@@ -138,7 +140,7 @@ public:
     }
 
 private:
-    QToolButton *newActionButton(QnActions::IDType actionId, QWidget *parent = NULL)
+    QToolButton *newActionButton(action::IDType actionId, QWidget *parent = NULL)
     {
         QToolButton *button = new QToolButton(parent);
         button->setDefaultAction(action(actionId));
@@ -169,14 +171,14 @@ private:
             connect(m_tilesTests, &QnSystemTilesTestCase::restoreApp, this,
                 [this]()
                 {
-                    const auto maximizeAction = action(QnActions::FullscreenAction);
+                    const auto maximizeAction = action(action::FullscreenAction);
                     if (maximizeAction->isChecked())
                         maximizeAction->toggle();
                 });
             connect(m_tilesTests, &QnSystemTilesTestCase::makeFullscreen, this,
                 [this]()
                 {
-                    const auto maximizeAction = action(QnActions::FullscreenAction);
+                    const auto maximizeAction = action(action::FullscreenAction);
                     if (!maximizeAction->isChecked())
                         maximizeAction->toggle();
                 });
@@ -204,11 +206,11 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
 #ifdef DEBUG_ACTIONS
     //TODO: #GDM #High remove before release
     qDebug() << "------------- Debug actions ARE ACTIVE -------------";
-    connect(action(QnActions::DebugControlPanelAction), &QAction::triggered, this,
+    connect(action(action::DebugControlPanelAction), &QAction::triggered, this,
         &QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered);
-    connect(action(QnActions::DebugIncrementCounterAction), &QAction::triggered, this,
+    connect(action(action::DebugIncrementCounterAction), &QAction::triggered, this,
         &QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered);
-    connect(action(QnActions::DebugDecrementCounterAction), &QAction::triggered, this,
+    connect(action(action::DebugDecrementCounterAction), &QAction::triggered, this,
         &QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered);
 #endif
 }

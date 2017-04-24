@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_fwd.h>
 
 #include <client_core/connection_context_aware.h>
@@ -60,7 +60,7 @@ public:
 protected:
     virtual void afterContextInitialized();
 
-    QAction *action(const QnActions::IDType id) const;
+    QAction *action(const nx::client::desktop::ui::action::IDType id) const;
 
     nx::client::desktop::ui::action::Manager* menu() const;
 

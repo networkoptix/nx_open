@@ -64,7 +64,7 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     connect(ui->addDeviceButton, &QPushButton::clicked, this,
         [this]
         {
-            menu()->trigger(QnActions::ServerAddCameraManuallyAction, commonModule()->currentServer());
+            menu()->trigger(action::ServerAddCameraManuallyAction, commonModule()->currentServer());
         });
 
 
@@ -176,7 +176,7 @@ void QnCameraListDialog::at_camerasView_doubleClicked(const QModelIndex &index) 
 
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     if (resource)
-        context()->menu()->trigger(QnActions::CameraSettingsAction, resource);
+        context()->menu()->trigger(action::CameraSettingsAction, resource);
 }
 
 void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint &) {

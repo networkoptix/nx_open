@@ -21,7 +21,7 @@
 #include <client/client_settings.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <ui/common/item_view_hover_tracker.h>
 #include <ui/utils/table_export_helper.h>
 #include <ui/help/help_topic_accessor.h>
@@ -163,7 +163,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     connect(ui->eventComboBox,      QnComboboxCurrentIndexChanged,      this,   &QnEventLogDialog::updateData);
     connect(ui->actionComboBox,     QnComboboxCurrentIndexChanged,      this,   &QnEventLogDialog::updateData);
     connect(ui->refreshButton,      &QAbstractButton::clicked,          this,   &QnEventLogDialog::updateData);
-    connect(ui->eventRulesButton,   &QAbstractButton::clicked,          context()->action(QnActions::BusinessEventsAction), &QAction::trigger);
+    connect(ui->eventRulesButton,   &QAbstractButton::clicked,          context()->action(action::BusinessEventsAction), &QAction::trigger);
 
     connect(ui->cameraButton,       &QAbstractButton::clicked,          this,   &QnEventLogDialog::at_cameraButton_clicked);
     connect(ui->gridEvents,         &QTableView::clicked,               this,   &QnEventLogDialog::at_eventsGrid_clicked);
@@ -323,7 +323,7 @@ void QnEventLogDialog::retranslateUi()
         item->setText(actionName);
     }
 
-    ui->eventRulesButton->setVisible(menu()->canTrigger(QnActions::BusinessEventsAction));
+    ui->eventRulesButton->setVisible(menu()->canTrigger(action::BusinessEventsAction));
 }
 
 void QnEventLogDialog::at_gotEvents(int httpStatus, const QnBusinessActionDataListPtr& events, int requestNum)
@@ -387,7 +387,7 @@ void QnEventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
             params.setArgument(Qn::ItemTimeRole, pos);
         }
 
-        context()->menu()->trigger(QnActions::OpenInNewLayoutAction, params);
+        context()->menu()->trigger(action::OpenInNewLayoutAction, params);
 
         if (isMaximized())
             showNormal();

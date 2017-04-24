@@ -12,7 +12,7 @@
 #include <utils/common/instance_storage.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/client/desktop/ui/actions/action_fwd.h>
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/vms/utils/system_uri.h>
 
 struct QnStartupParameters;
@@ -53,7 +53,7 @@ public:
     QWidget* mainWindow() const;
     void setMainWindow(QWidget* mainWindow);
 
-    QAction *action(const QnActions::IDType id) const;
+    QAction *action(const nx::client::desktop::ui::action::IDType id) const;
 
     QnUserResourcePtr user() const;
     void setUserName(const QString &userName);

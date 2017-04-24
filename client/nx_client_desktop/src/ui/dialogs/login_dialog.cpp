@@ -334,13 +334,13 @@ void QnLoginDialog::accept()
                     params.setArgument(Qn::AutoLoginRole, autoLogin);
                     params.setArgument(Qn::StorePasswordRole, storePassword);
                     params.setArgument(Qn::ForceRole, true);
-                    menu()->trigger(QnActions::ConnectAction, params);
+                    menu()->trigger(action::ConnectAction, params);
 
                     break;
                 }
                 case Qn::IncompatibleProtocolConnectionResult:
                 case Qn::IncompatibleCloudHostConnectionResult:
-                    menu()->trigger(QnActions::DelayedForcedExitAction);
+                    menu()->trigger(action::DelayedForcedExitAction);
                     break; // to avoid cycle
                 default:    //error
                     return;

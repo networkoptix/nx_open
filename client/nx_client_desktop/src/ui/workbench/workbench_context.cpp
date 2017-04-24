@@ -183,7 +183,7 @@ void QnWorkbenchContext::setMainWindow(QWidget *mainWindow)
 }
 
 
-QAction *QnWorkbenchContext::action(const QnActions::IDType id) const {
+QAction *QnWorkbenchContext::action(const action::IDType id) const {
     return m_menu->action(id);
 }
 
@@ -251,7 +251,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
 
             auto parameters = action::Parameters().withArgument(Qn::UrlRole, systemUrl);
             parameters.setArgument(Qn::ForceRole, true);
-            menu()->trigger(QnActions::ConnectAction, parameters);
+            menu()->trigger(action::ConnectAction, parameters);
             return true;
 
         }
@@ -286,7 +286,7 @@ bool QnWorkbenchContext::connectUsingCommandLineAuth(const QnStartupParameters& 
         params.setArgument(Qn::AutoLoginRole, true);
         params.setArgument(Qn::StorePasswordRole, true);
     }
-    menu()->trigger(QnActions::ConnectAction, params);
+    menu()->trigger(action::ConnectAction, params);
     return true;
 }
 
@@ -327,7 +327,7 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
 
     if (!startupParams.videoWallGuid.isNull())
     {
-        menu()->trigger(QnActions::DelayedOpenVideoWallItemAction, action::Parameters()
+        menu()->trigger(action::DelayedOpenVideoWallItemAction, action::Parameters()
                                  .withArgument(Qn::VideoWallGuidRole, startupParams.videoWallGuid)
                                  .withArgument(Qn::VideoWallItemGuidRole, startupParams.videoWallItemGuid));
     }
@@ -336,12 +336,12 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
         NX_ASSERT(startupParams.instantDrop.isEmpty());
 
         QByteArray data = QByteArray::fromBase64(startupParams.delayedDrop.toLatin1());
-        menu()->trigger(QnActions::DelayedDropResourcesAction, {Qn::SerializedDataRole, data});
+        menu()->trigger(action::DelayedDropResourcesAction, {Qn::SerializedDataRole, data});
     }
     else if (!startupParams.instantDrop.isEmpty())
     {
         QByteArray data = QByteArray::fromBase64(startupParams.instantDrop.toLatin1());
-        menu()->trigger(QnActions::InstantDropResourcesAction, {Qn::SerializedDataRole, data});
+        menu()->trigger(action::InstantDropResourcesAction, {Qn::SerializedDataRole, data});
     }
 
     /* Show beta version warning message for the main instance only */
@@ -352,11 +352,11 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
         && startupParams.customUri.isNull();
 
     if (showBetaWarning)
-        action(QnActions::BetaVersionMessageAction)->trigger();
+        action(action::BetaVersionMessageAction)->trigger();
 
 #ifdef _DEBUG
     /* Show FPS in debug. */
-    menu()->trigger(QnActions::ShowFpsAction);
+    menu()->trigger(action::ShowFpsAction);
 #endif
 
     return true;
@@ -366,7 +366,7 @@ void QnWorkbenchContext::initWorkarounds()
 {
     instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
 
-    QnActions::IDType effectiveMaximizeActionId = QnActions::FullscreenAction;
+    action::IDType effectiveMaximizeActionId = action::FullscreenAction;
 #ifdef Q_OS_LINUX
     /* In Ubuntu its launcher is configured to be shown when a non-fullscreen window has appeared.
     * In our case it means that launcher overlaps our fullscreen window when the user opens any dialogs.
@@ -377,8 +377,8 @@ void QnWorkbenchContext::initWorkarounds()
     * we just disable fullscreen for unity-3d desktop session.
     */
     if (QnX11LauncherWorkaround::isUnity3DSession())
-        effectiveMaximizeActionId = QnActions::MaximizeAction;
+        effectiveMaximizeActionId = action::MaximizeAction;
 #endif
-    menu()->registerAlias(QnActions::EffectiveMaximizeAction, effectiveMaximizeActionId);
+    menu()->registerAlias(action::EffectiveMaximizeAction, effectiveMaximizeActionId);
 }
 

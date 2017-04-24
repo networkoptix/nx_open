@@ -51,7 +51,7 @@ QnWorkbenchServerPortWatcher::QnWorkbenchServerPortWatcher(QObject *parent)
                        //TODO: #GDM #FIXME #3.1 Restore functionality
     //                 url.setPort(currentServer->getPort());
     //                 QnAppServerConnectionFactory::setUrl(url);
-    //                 menu()->trigger(QnActions::ReconnectAction);
+    //                 menu()->trigger(action::ReconnectAction);
                 });
         });
 }

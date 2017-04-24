@@ -42,6 +42,8 @@
 #include <utils/common/delayed.h>
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
     class QnAlarmLayoutResource: public QnLayoutResource {
         Q_DECLARE_TR_FUNCTIONS(QnAlarmLayoutResource)
@@ -70,7 +72,7 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(action(QnActions::OpenInAlarmLayoutAction), &QAction::triggered, this,
+    connect(action(action::OpenInAlarmLayoutAction), &QAction::triggered, this,
         [this]
         {
             const auto parameters = menu()->currentParameters(sender());

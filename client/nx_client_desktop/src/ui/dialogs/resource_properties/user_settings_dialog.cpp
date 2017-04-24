@@ -484,7 +484,7 @@ void QnUserSettingsDialog::applyChanges()
 
         for (const auto& layout : layoutsToShare)
         {
-            menu()->trigger(QnActions::ShareLayoutAction,
+            menu()->trigger(action::ShareLayoutAction,
                 action::Parameters(layout).withArgument(Qn::UserResourceRole, m_user));
         }
 

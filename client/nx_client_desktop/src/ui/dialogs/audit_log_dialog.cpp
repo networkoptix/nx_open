@@ -21,7 +21,7 @@
 #include <core/resource_management/resource_runtime_data.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 
 #include <ui/utils/table_export_helper.h>
 #include <ui/common/item_view_hover_tracker.h>
@@ -706,11 +706,11 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     layout->setLocalRange(period);
 
     resourcePool()->addResource(layout);
-    menu()->trigger(QnActions::OpenSingleLayoutAction, layout);
+    menu()->trigger(action::OpenSingleLayoutAction, layout);
 
 }
 
-void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::IDType actionId,
+void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, action::IDType actionId,
     int selectedPage)
 {
     const QnResourceList resList = resourcePool()->getResources(record->resources);
@@ -719,17 +719,17 @@ void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::IDT
         const auto count = static_cast<int>(record->resources.size());
         switch (actionId)
         {
-            case QnActions::CameraSettingsAction:
+            case action::CameraSettingsAction:
                 QnMessageBox::warning(this, QnDeviceDependentStrings::getDefaultNameFromSet(
                     resourcePool(),
                     tr("These devices are removed from System", "", count),
                     tr("These cameras are removed from System", "", count)));
                 break;
-            case QnActions::ServerSettingsAction:
+            case action::ServerSettingsAction:
                 QnMessageBox::warning(this, tr("These servers are removed from System",
                     "", count));
                 break;
-            case QnActions::UserSettingsAction:
+            case action::UserSettingsAction:
                 QnMessageBox::warning(this, tr("These users are removed from System",
                     "", count));
                 break;
@@ -760,15 +760,15 @@ void QnAuditLogDialog::at_itemButtonClicked(const QModelIndex& index)
         processPlaybackAction(record);
     else if (record->eventType == Qn::AR_UserUpdate)
         triggerAction(record,
-            QnActions::UserSettingsAction,
+            action::UserSettingsAction,
             QnUserSettingsDialog::SettingsPage);
     else if (record->eventType == Qn::AR_ServerUpdate)
         triggerAction(record,
-            QnActions::ServerSettingsAction,
+            action::ServerSettingsAction,
             QnServerSettingsDialog::SettingsPage);
     else if (record->eventType == Qn::AR_CameraUpdate || record->eventType == Qn::AR_CameraInsert)
         triggerAction(record,
-            QnActions::CameraSettingsAction,
+            action::CameraSettingsAction,
             Qn::GeneralSettingsTab);
 
     if (isMaximized())

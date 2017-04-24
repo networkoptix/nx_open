@@ -29,6 +29,8 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace NxUi {
 
 NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
@@ -40,13 +42,13 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     backgroundItem(new QnControlBackgroundWidget(Qt::RightEdge, parentWidget)),
     item(new QnNotificationsCollectionWidget(parentWidget, 0, context())),
     pinButton(NxUi::newPinButton(parentWidget, context(),
-        QnActions::PinNotificationsAction)),
+        action::PinNotificationsAction)),
     xAnimator(new VariantAnimator(this)),
 
     m_ignoreClickEvent(false),
     m_visible(false),
     m_showButton(NxUi::newBlinkingShowHideButton(parentWidget, context(),
-        QnActions::ToggleNotificationsAction)),
+        action::ToggleNotificationsAction)),
     m_hidingProcessor(new HoverFocusProcessor(parentWidget)),
     m_showingProcessor(new HoverFocusProcessor(parentWidget)),
     m_opacityProcessor(new HoverFocusProcessor(parentWidget)),
@@ -62,10 +64,10 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     connect(item, &QGraphicsWidget::geometryChanged, this,
         &NotificationsWorkbenchPanel::updateControlsGeometry);
 
-    action(QnActions::PinNotificationsAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
+    action(action::PinNotificationsAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
     pinButton->setFocusProxy(item);
     pinButton->setZValue(ControlItemZOrder);
-    connect(action(QnActions::PinNotificationsAction), &QAction::toggled, this,
+    connect(action(action::PinNotificationsAction), &QAction::toggled, this,
         [this](bool checked)
         {
             if (checked)
@@ -73,13 +75,13 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
             emit geometryChanged();
         });
 
-    action(QnActions::ToggleNotificationsAction)->setChecked(settings.state == Qn::PaneState::Opened);
+    action(action::ToggleNotificationsAction)->setChecked(settings.state == Qn::PaneState::Opened);
     m_showButton->setTransform(QTransform::fromScale(-1, 1));
     m_showButton->setFocusProxy(item);
     m_showButton->setZValue(BackgroundItemZOrder); /*< To make it paint under the tooltip. */
     setHelpTopic(m_showButton, Qn::MainWindow_Pin_Help);
     item->setBlinker(m_showButton);
-    connect(action(QnActions::ToggleNotificationsAction), &QAction::toggled, this,
+    connect(action(action::ToggleNotificationsAction), &QAction::toggled, this,
         [this](bool checked)
         {
             if (!m_ignoreClickEvent)
@@ -128,12 +130,12 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
 
 bool NotificationsWorkbenchPanel::isPinned() const
 {
-    return action(QnActions::PinNotificationsAction)->isChecked();
+    return action(action::PinNotificationsAction)->isChecked();
 }
 
 bool NotificationsWorkbenchPanel::isOpened() const
 {
-    return action(QnActions::ToggleNotificationsAction)->isChecked();
+    return action(action::ToggleNotificationsAction)->isChecked();
 }
 
 void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
@@ -145,7 +147,7 @@ void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
     m_showingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
     QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
-    action(QnActions::ToggleNotificationsAction)->setChecked(opened);
+    action(action::ToggleNotificationsAction)->setChecked(opened);
 
     xAnimator->stop();
     qnWorkbenchAnimations->setupAnimator(xAnimator, opened

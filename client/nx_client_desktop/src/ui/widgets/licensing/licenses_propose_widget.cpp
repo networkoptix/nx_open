@@ -13,6 +13,8 @@
 
 #include <utils/license_usage_helper.h>
 
+using namespace nx::client::desktop::ui;
+
 QnLicensesProposeWidget::QnLicensesProposeWidget(QWidget *parent):
     QWidget(parent),
     QnWorkbenchContextAware(parent, true),
@@ -56,7 +58,7 @@ void QnLicensesProposeWidget::afterContextInitialized()
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &QnLicensesProposeWidget::updateLicensesButtonVisible);
     connect(ui->moreLicensesButton, &QPushButton::clicked, this,
-        [this] { menu()->trigger(QnActions::PreferencesLicensesTabAction); });
+        [this] { menu()->trigger(action::PreferencesLicensesTabAction); });
     updateLicensesButtonVisible();
 }
 

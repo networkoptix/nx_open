@@ -42,6 +42,8 @@
 using boost::algorithm::all_of;
 using boost::algorithm::any_of;
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 
 void setLayoutEnabled(QLayout* layout, bool enabled)
@@ -1119,7 +1121,7 @@ void QnCameraScheduleWidget::at_displayFpsCheckBox_stateChanged(int state)
 
 void QnCameraScheduleWidget::at_licensesButton_clicked()
 {
-    menu()->trigger(QnActions::PreferencesLicensesTabAction);
+    menu()->trigger(action::PreferencesLicensesTabAction);
 }
 
 void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target)

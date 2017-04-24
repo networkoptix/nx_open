@@ -52,10 +52,10 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
 
     , m_allCamerasChoosen(true)
 
-    , m_openInNewTabAction      (new QAction(action(QnActions::OpenInNewLayoutAction)->text(), this))
-    , m_editBookmarkAction      (new QAction(action(QnActions::EditCameraBookmarkAction)->text(), this))
+    , m_openInNewTabAction      (new QAction(action(action::OpenInNewLayoutAction)->text(), this))
+    , m_editBookmarkAction      (new QAction(action(action::EditCameraBookmarkAction)->text(), this))
     , m_exportBookmarkAction    (new QAction(tr("Export Bookmark..."), this))
-    , m_removeBookmarksAction   (new QAction(action(QnActions::RemoveBookmarksAction)->text(), this))
+    , m_removeBookmarksAction   (new QAction(action(action::RemoveBookmarksAction)->text(), this))
     , m_updatingNow(false)
 
     , utcRangeStartMs(utcStartTimeMs)
@@ -117,7 +117,7 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
         if (!fillActionParameters(params, window))
             return;
 
-        if (!menu()->canTrigger(QnActions::OpenInNewLayoutAction, params))
+        if (!menu()->canTrigger(action::OpenInNewLayoutAction, params))
             return;
 
         openInNewLayout(params, window);
@@ -274,7 +274,7 @@ void QnSearchBookmarksDialogPrivate::openInNewLayout(const action::Parameters &p
         item->setData(role, window);
     };
 
-    menu()->trigger(QnActions::OpenInNewLayoutAction, params);
+    menu()->trigger(action::OpenInNewLayoutAction, params);
 
     static const qint64 kMinOffset = 30 * 1000;
     const auto offset = std::max(window.durationMs, kMinOffset);
@@ -283,7 +283,7 @@ void QnSearchBookmarksDialogPrivate::openInNewLayout(const action::Parameters &p
         , window.durationMs + offset * 2);
     setFirstLayoutItemPeriod(extendedWindow, Qn::ItemSliderWindowRole);
 
-    menu()->trigger(QnActions::BookmarksModeAction);
+    menu()->trigger(action::BookmarksModeAction);
 }
 
 void QnSearchBookmarksDialogPrivate::refresh()
@@ -378,16 +378,16 @@ void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
     auto newMenu = new QMenu();
 
     /* Add suitable actions: */
-    const auto addActionToMenu = [this, newMenu, params](QnActions::IDType id, QAction *action)
+    const auto addActionToMenu = [this, newMenu, params](action::IDType id, QAction *action)
     {
         if (menu()->canTrigger(id, params))
             newMenu->addAction(action);
     };
 
-    addActionToMenu(QnActions::OpenInNewLayoutAction, m_openInNewTabAction);
-    addActionToMenu(QnActions::EditCameraBookmarkAction, m_editBookmarkAction);
-    addActionToMenu(QnActions::ExportTimeSelectionAction, m_exportBookmarkAction);
-    addActionToMenu(QnActions::RemoveBookmarksAction, m_removeBookmarksAction);
+    addActionToMenu(action::OpenInNewLayoutAction, m_openInNewTabAction);
+    addActionToMenu(action::EditCameraBookmarkAction, m_editBookmarkAction);
+    addActionToMenu(action::ExportTimeSelectionAction, m_exportBookmarkAction);
+    addActionToMenu(action::RemoveBookmarksAction, m_removeBookmarksAction);
 
     /* Connect action signal handlers: */
     connect(m_openInNewTabAction, &QAction::triggered, this, [this, params, window]
@@ -397,17 +397,17 @@ void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
 
     connect(m_editBookmarkAction, &QAction::triggered, this, [this, params]
     {
-        menu()->triggerIfPossible(QnActions::EditCameraBookmarkAction, params);
+        menu()->triggerIfPossible(action::EditCameraBookmarkAction, params);
     });
 
     connect(m_removeBookmarksAction, &QAction::triggered, this, [this, params]
     {
-        menu()->triggerIfPossible(QnActions::RemoveBookmarksAction, params);
+        menu()->triggerIfPossible(action::RemoveBookmarksAction, params);
     });
 
     connect(m_exportBookmarkAction, &QAction::triggered, this, [this, params]
     {
-        menu()->triggerIfPossible(QnActions::ExportTimeSelectionAction, params);
+        menu()->triggerIfPossible(action::ExportTimeSelectionAction, params);
     });
 
     /* Execute popup menu: */

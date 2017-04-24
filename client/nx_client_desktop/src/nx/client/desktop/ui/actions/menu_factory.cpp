@@ -13,7 +13,7 @@ namespace action {
 
 MenuFactory::MenuFactory(Manager* menu, Action* parent):
     m_manager(menu),
-    m_lastFreeActionId(QnActions::ActionCount),
+    m_lastFreeActionId(ActionCount),
     m_currentGroup(0)
 {
     m_actionStack.push_back(parent);
@@ -40,7 +40,7 @@ void MenuFactory::endGroup()
     m_currentGroup = nullptr;
 }
 
-Builder MenuFactory::operator()(QnActions::IDType id)
+Builder MenuFactory::operator()(IDType id)
 {
     auto action = m_manager->action(id);
     if (!action)
@@ -62,7 +62,7 @@ Builder MenuFactory::operator()(QnActions::IDType id)
 
 Builder MenuFactory::operator()()
 {
-    return operator()(static_cast<QnActions::IDType>(m_lastFreeActionId++));
+    return operator()(static_cast<IDType>(m_lastFreeActionId++));
 }
 
 } // namespace action

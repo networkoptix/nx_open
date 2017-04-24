@@ -4,7 +4,7 @@
 #include <QtWidgets/QMainWindow>
 #include <QtCore/QScopedPointer>
 #include <core/resource/resource_fwd.h>
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/graphics/view/graphics_scene.h>
 

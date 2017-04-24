@@ -47,6 +47,8 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/connection_diagnostics_helper.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 
 const int kLongInstallWarningTimeoutMs = 2 * 60 * 1000; // 2 minutes
@@ -891,7 +893,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
                     qnClientMessageProcessor->setHoldConnection(false);
 
                 if (result.protocolChanged)
-                    menu()->trigger(QnActions::DisconnectAction, {Qn::ForceRole, true});
+                    menu()->trigger(action::DisconnectAction, {Qn::ForceRole, true});
 
                 break;
             }

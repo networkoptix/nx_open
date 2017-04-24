@@ -20,7 +20,7 @@
 
 #include <recording/time_period.h>
 
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <ui/dialogs/camera_bookmark_dialog.h>
@@ -55,15 +55,15 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
     QnWorkbenchContextAware(parent),
     m_hintDisplayed(false)
 {
-    connect(action(QnActions::AddCameraBookmarkAction),     &QAction::triggered, this,
+    connect(action(action::AddCameraBookmarkAction),     &QAction::triggered, this,
         &QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered);
-    connect(action(QnActions::EditCameraBookmarkAction),    &QAction::triggered, this,
+    connect(action(action::EditCameraBookmarkAction),    &QAction::triggered, this,
         &QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered);
-    connect(action(QnActions::RemoveCameraBookmarkAction),  &QAction::triggered, this,
+    connect(action(action::RemoveCameraBookmarkAction),  &QAction::triggered, this,
         &QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered);
-    connect(action(QnActions::RemoveBookmarksAction),       &QAction::triggered, this,
+    connect(action(action::RemoveBookmarksAction),       &QAction::triggered, this,
         &QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered);
-    connect(action(QnActions::BookmarksModeAction),         &QAction::toggled,   this,
+    connect(action(action::BookmarksModeAction),         &QAction::toggled,   this,
         &QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered);
 
     /* Reset hint flag for each user. */
@@ -96,7 +96,7 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
         [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
         {
             context()->statisticsModule()->registerClick(lit("bookmark_tooltip_edit"));
-            menu()->triggerIfPossible(QnActions::EditCameraBookmarkAction,
+            menu()->triggerIfPossible(action::EditCameraBookmarkAction,
                 getActionParamsFunc(bookmark));
         });
 
@@ -104,7 +104,7 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
         [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
         {
             context()->statisticsModule()->registerClick(lit("bookmark_tooltip_delete"));
-            menu()->triggerIfPossible(QnActions::RemoveCameraBookmarkAction,
+            menu()->triggerIfPossible(action::RemoveCameraBookmarkAction,
                 getActionParamsFunc(bookmark));
         });
 
@@ -122,7 +122,7 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
         [this, bookmarksViewer](const QString &tag)
         {
             context()->statisticsModule()->registerClick(lit("bookmark_tooltip_tag"));
-            menu()->triggerIfPossible(QnActions::OpenBookmarksSearchAction,
+            menu()->triggerIfPossible(action::OpenBookmarksSearchAction,
                 {Qn::BookmarkTagRole, tag});
         });
 }
@@ -173,7 +173,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
 
     qnCameraBookmarksManager->addCameraBookmark(bookmark);
 
-    action(QnActions::BookmarksModeAction)->setChecked(true);
+    action(action::BookmarksModeAction)->setChecked(true);
 }
 
 void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered()
@@ -252,7 +252,7 @@ void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
 
 void QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered()
 {
-    const auto bookmarkModeAction = action(QnActions::BookmarksModeAction);
+    const auto bookmarkModeAction = action(action::BookmarksModeAction);
     const bool checked = bookmarkModeAction->isChecked();
     const bool enabled = bookmarkModeAction->isEnabled();
 
@@ -268,12 +268,12 @@ void QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered()
         workbench()->currentLayout()->setData(Qn::LayoutBookmarksModeRole, checked);
 
     if (checked)
-        menu()->trigger(QnActions::StopSmartSearchAction, display()->widgets());
+        menu()->trigger(action::StopSmartSearchAction, display()->widgets());
 
     if (!m_hintDisplayed && enabled && checked && !navigator()->bookmarksModeEnabled())
     {
         QnGraphicsMessageBox::information(
-            tr("Press %1 to search bookmarks").arg(action(QnActions::OpenBookmarksSearchAction)->shortcut().toString())
+            tr("Press %1 to search bookmarks").arg(action(action::OpenBookmarksSearchAction)->shortcut().toString())
             , kHintTimeoutMs
         );
         m_hintDisplayed = true;

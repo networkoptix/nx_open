@@ -1,7 +1,7 @@
 
 #include "action_metrics.h"
 
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <statistics/base/metrics_container.h>
@@ -19,7 +19,7 @@ namespace
         return QPointer<Type>(value);
     }
 
-    QString aliasByActionId(QnActions::IDType id)
+    QString aliasByActionId(action::IDType id)
     {
         return QnLexical::serialized(id);
     }
@@ -101,7 +101,7 @@ AbstractActionsMetrics::AbstractActionsMetrics(const action::ManagerPtr& actionM
         return;
 
     const auto guard = makePointer(this);
-    const auto addAction = [this, guard, actionManager](QnActions::IDType id)
+    const auto addAction = [this, guard, actionManager](action::IDType id)
     {
         if (!guard)
             return;
@@ -159,7 +159,7 @@ QnStatisticValuesHash ActionsTriggeredCountMetrics::values() const
     QnStatisticValuesHash result;
     for (auto it = m_values.cbegin(); it != m_values.end(); ++it)
     {
-        const auto actionId = static_cast<QnActions::IDType>(it.key());
+        const auto actionId = static_cast<action::IDType>(it.key());
         const auto alias = aliasByActionId(actionId);
 
         const auto &countByParams = it.value();

@@ -28,7 +28,7 @@
 
 #include <recording/time_period.h>
 
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -130,9 +130,9 @@ QnWorkbenchExportHandler::QnWorkbenchExportHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(action(QnActions::ExportTimeSelectionAction), &QAction::triggered, this, &QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered);
-    connect(action(QnActions::ExportLayoutAction), &QAction::triggered, this, &QnWorkbenchExportHandler::at_exportLayoutAction_triggered);
-    connect(action(QnActions::ExportTimelapseAction), &QAction::triggered, this, &QnWorkbenchExportHandler::at_exportTimelapseAction_triggered);
+    connect(action(action::ExportTimeSelectionAction), &QAction::triggered, this, &QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered);
+    connect(action(action::ExportLayoutAction), &QAction::triggered, this, &QnWorkbenchExportHandler::at_exportLayoutAction_triggered);
+    connect(action(action::ExportTimelapseAction), &QAction::triggered, this, &QnWorkbenchExportHandler::at_exportTimelapseAction_triggered);
 }
 
 QString QnWorkbenchExportHandler::binaryFilterName() const

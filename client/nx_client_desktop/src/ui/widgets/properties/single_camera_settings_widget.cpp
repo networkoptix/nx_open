@@ -51,6 +51,8 @@
 
 #include "client/client_settings.h"
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 
 const QSize kFisheyeThumbnailSize(0, 0); //unlimited size for better calibration
@@ -157,7 +159,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
         {
             /* We must always ping the same address that is displayed in the visible field. */
             auto host = ui->ipAddressEdit->text();
-            menu()->trigger(QnActions::PingAction, {Qn::TextRole, host});
+            menu()->trigger(action::PingAction, {Qn::TextRole, host});
         });
 
     connect(ui->licensingWidget, &QnLicensesProposeWidget::changed,

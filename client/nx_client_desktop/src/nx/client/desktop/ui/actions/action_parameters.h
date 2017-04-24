@@ -7,7 +7,7 @@
 
 #include <nx/client/desktop/ui/actions/action_parameter_types.h>
 
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 
 class QGraphicsItem;
 

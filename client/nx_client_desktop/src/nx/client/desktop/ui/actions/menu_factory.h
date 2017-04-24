@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/client/desktop/ui/actions/action_fwd.h>
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_builder.h>
 
 namespace nx {
@@ -21,7 +21,7 @@ public:
     void beginGroup();
     void endGroup();
 
-    Builder operator()(QnActions::IDType id);
+    Builder operator()(IDType id);
     Builder operator()();
 
 private:

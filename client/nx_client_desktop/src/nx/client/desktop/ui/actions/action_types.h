@@ -154,14 +154,14 @@ enum MatchMode
     ExactlyOne      /**< Match only if exactly one resource satisfies condition. */
 };
 
+Q_DECLARE_OPERATORS_FOR_FLAGS(ActionScopes);
+Q_DECLARE_OPERATORS_FOR_FLAGS(ClientModes);
+Q_DECLARE_OPERATORS_FOR_FLAGS(ActionFlags);
+Q_DECLARE_OPERATORS_FOR_FLAGS(ActionParameterTypes);
+
 } // namespace action
 } // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx
 
-// Operators must be declared out of namespace or flags from separate enums will not compile
-Q_DECLARE_OPERATORS_FOR_FLAGS(nx::client::desktop::ui::action::ActionScopes);
-Q_DECLARE_OPERATORS_FOR_FLAGS(nx::client::desktop::ui::action::ClientModes);
-Q_DECLARE_OPERATORS_FOR_FLAGS(nx::client::desktop::ui::action::ActionFlags);
-Q_DECLARE_OPERATORS_FOR_FLAGS(nx::client::desktop::ui::action::ActionParameterTypes);

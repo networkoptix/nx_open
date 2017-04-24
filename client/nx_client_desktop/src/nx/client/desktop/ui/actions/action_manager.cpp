@@ -79,13 +79,13 @@ Manager::Manager(QObject *parent):
     m_shortcutAction(NULL),
     m_lastClickedMenu(NULL)
 {
-    m_root = new Action(QnActions::NoAction, this);
-    m_actionById[QnActions::NoAction] = m_root;
-    m_idByAction[m_root] = QnActions::NoAction;
+    m_root = new Action(NoAction, this);
+    m_actionById[NoAction] = m_root;
+    m_idByAction[m_root] = NoAction;
 
     connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged, this,
         &Manager::hideAllMenus);
-    QnActions::initialize(this, m_root);
+    initialize(this, m_root);
 }
 
 Manager::~Manager()
@@ -125,7 +125,7 @@ void Manager::registerAction(Action *action)
     emit actionRegistered(action->id());
 }
 
-void Manager::registerAlias(QnActions::IDType id, QnActions::IDType targetId)
+void Manager::registerAlias(IDType id, IDType targetId)
 {
     if (id == targetId)
     {
@@ -153,7 +153,7 @@ void Manager::registerAlias(QnActions::IDType id, QnActions::IDType targetId)
     m_actionById[id] = targetAction;
 }
 
-Action *Manager::action(QnActions::IDType id) const
+Action *Manager::action(IDType id) const
 {
     return m_actionById.value(id, NULL);
 }
@@ -163,7 +163,7 @@ QList<Action *> Manager::actions() const
     return m_idByAction.keys();
 }
 
-bool Manager::canTrigger(QnActions::IDType id, const Parameters& parameters)
+bool Manager::canTrigger(IDType id, const Parameters& parameters)
 {
     Action *action = m_actionById.value(id);
     if (!action)
@@ -172,7 +172,7 @@ bool Manager::canTrigger(QnActions::IDType id, const Parameters& parameters)
     return action->checkCondition(action->scope(), parameters) == EnabledAction;
 }
 
-void Manager::trigger(QnActions::IDType id, const Parameters& parameters)
+void Manager::trigger(IDType id, const Parameters& parameters)
 {
     if (triggerIfPossible(id, parameters))
         return;
@@ -183,7 +183,7 @@ void Manager::trigger(QnActions::IDType id, const Parameters& parameters)
         << id << text;
 }
 
-bool Manager::triggerIfPossible(QnActions::IDType id, const Parameters& parameters)
+bool Manager::triggerIfPossible(IDType id, const Parameters& parameters)
 {
     Action *action = m_actionById.value(id);
     NX_EXPECT(action);
@@ -224,17 +224,17 @@ QMenu *Manager::newMenu(ActionScope scope, QWidget *parent, const Parameters& pa
      */
     hideAllMenus();
 
-    return newMenu(QnActions::NoAction, scope, parent, parameters, options);
+    return newMenu(NoAction, scope, parent, parameters, options);
 }
 
 QMenu* Manager::newMenu(
-    QnActions::IDType rootId,
+    IDType rootId,
     ActionScope scope,
     QWidget* parent,
     const Parameters& parameters,
     CreationOptions options)
 {
-    Action *rootAction = rootId == QnActions::NoAction ? m_root : action(rootId);
+    Action *rootAction = rootId == NoAction ? m_root : action(rootId);
     NX_EXPECT(rootAction);
     if (!rootAction)
         return nullptr;
@@ -403,7 +403,7 @@ Parameters Manager::currentParameters(QObject *sender) const
     return Parameters();
 }
 
-void Manager::redirectAction(QMenu *menu, QnActions::IDType sourceId, QAction *targetAction)
+void Manager::redirectAction(QMenu *menu, IDType sourceId, QAction *targetAction)
 {
     redirectActionRecursive(menu, sourceId, targetAction);
 }
@@ -418,7 +418,7 @@ bool Manager::isMenuVisible() const
     return false;
 }
 
-bool Manager::redirectActionRecursive(QMenu *menu, QnActions::IDType sourceId, QAction *targetAction)
+bool Manager::redirectActionRecursive(QMenu *menu, IDType sourceId, QAction *targetAction)
 {
     QList<QAction *> actions = menu->actions();
 

@@ -94,7 +94,7 @@ QList<QAction*> OpenCurrentUserLayoutFactory::newActions(const Parameters& /*par
         connect(action, &QAction::triggered, this,
             [this, layout]()
             {
-                menu()->trigger(QnActions::OpenSingleLayoutAction, layout);
+                menu()->trigger(action::OpenSingleLayoutAction, layout);
             });
         result.push_back(action);
     }
@@ -153,7 +153,7 @@ QList<QAction *> PtzPresetsToursFactory::newActions(const Parameters& parameters
         connect(action, &QAction::triggered, this,
             [this, id = preset.id, parameters]
             {
-                menu()->trigger(QnActions::PtzActivatePresetAction,
+                menu()->trigger(action::PtzActivatePresetAction,
                     Parameters(parameters).withArgument(Qn::PtzObjectIdRole, id));
             });
 
@@ -185,7 +185,7 @@ QList<QAction *> PtzPresetsToursFactory::newActions(const Parameters& parameters
         connect(action, &QAction::triggered, this,
             [this, id = tour.id, parameters]
             {
-                menu()->trigger(QnActions::PtzActivateTourAction,
+                menu()->trigger(action::PtzActivateTourAction,
                     Parameters(parameters).withArgument(Qn::PtzObjectIdRole, id));
             });
 
@@ -201,7 +201,7 @@ QMenu* EdgeNodeFactory::newMenu(const Parameters& parameters, QWidget* parentWid
     if (!edgeCamera || !QnMediaServerResource::isHiddenServer(edgeCamera->getParentResource()))
         return nullptr;
 
-    return menu()->newMenu(QnActions::NoAction, TreeScope, parentWidget,
+    return menu()->newMenu(action::NoAction, TreeScope, parentWidget,
         Parameters(edgeCamera->getParentResource()));
 }
 

@@ -9,7 +9,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_index.h>
 
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_fwd.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -57,13 +57,13 @@ public:
      * \param sourceId                  Alias id.
      * \param targetId                  Id of the target action.
      */
-    void registerAlias(QnActions::IDType id, QnActions::IDType targetId);
+    void registerAlias(IDType id, IDType targetId);
 
     /**
      * \param id                        Id of the action to get.
      * \returns                         Action for the given id, or NULL if no such action exists.
      */
-    Action* action(QnActions::IDType id) const;
+    Action* action(IDType id) const;
 
     /**
      * \returns                         List of all actions of this action manager.
@@ -76,7 +76,7 @@ public:
      * \returns                         Whether the action with the given id can
      *                                  be triggered with supplied parameters.
      */
-    bool canTrigger(QnActions::IDType id, const Parameters& parameters = Parameters());
+    bool canTrigger(IDType id, const Parameters& parameters = Parameters());
 
     /**
      * Triggers the action with the given id.
@@ -84,7 +84,7 @@ public:
      * \param id                        Id of the action to trigger.
      * \param parameters                Parameters to pass to action handler.
      */
-    void trigger(QnActions::IDType id, const Parameters& parameters = Parameters());
+    void trigger(IDType id, const Parameters& parameters = Parameters());
 
 
     /**
@@ -94,7 +94,7 @@ public:
      * \param parameters                Parameters to pass to action handler.
      * \returns                         Was action triggered or not.
      */
-    bool triggerIfPossible(QnActions::IDType id, const Parameters& parameters = Parameters());
+    bool triggerIfPossible(IDType id, const Parameters& parameters = Parameters());
 
     /**
      * \param scope                     Scope of the menu to create.
@@ -106,7 +106,7 @@ public:
      */
     QMenu *newMenu(ActionScope scope, QWidget *parent = NULL, const Parameters& parameters = Parameters(), CreationOptions options = 0);
 
-    QMenu *newMenu(QnActions::IDType rootId, ActionScope scope, QWidget *parent = NULL, const Parameters& parameters = Parameters(), CreationOptions options = 0);
+    QMenu *newMenu(IDType rootId, ActionScope scope, QWidget *parent = NULL, const Parameters& parameters = Parameters(), CreationOptions options = 0);
 
     /**
      * \returns                         Action target provider that is assigned to this
@@ -143,7 +143,7 @@ public:
      * \param targetId                  Id of the action to be replaced.
      * \param targetAction              Replacement action.
      */
-    void redirectAction(QMenu *menu, QnActions::IDType sourceId, QAction *targetAction);
+    void redirectAction(QMenu *menu, IDType sourceId, QAction *targetAction);
 
     /** Check if any menu is visible right now */
     bool isMenuVisible() const;
@@ -151,7 +151,7 @@ signals:
     void menuAboutToShow(QMenu* menu);
     void menuAboutToHide(QMenu* menu);
 
-    void actionRegistered(QnActions::IDType id);
+    void actionRegistered(IDType id);
 
 protected:
     friend class Action;
@@ -167,7 +167,7 @@ protected:
         QWidget* parentWidget,
         CreationOptions options);
 
-    bool redirectActionRecursive(QMenu* menu, QnActions::IDType targetId, QAction* targetAction);
+    bool redirectActionRecursive(QMenu* menu, IDType targetId, QAction* targetAction);
 
     /** Setup proper connections between menu and the manager. */
     QMenu* integrateMenu(QMenu* menu, const Parameters& parameters);
@@ -183,10 +183,10 @@ private:
     Action* m_root;
 
     /** Mapping from action id to action instance. */
-    QHash<QnActions::IDType, Action*> m_actionById;
+    QHash<IDType, Action*> m_actionById;
 
     /** Mapping from action to action id. */
-    QHash<Action*, QnActions::IDType> m_idByAction;
+    QHash<Action*, IDType> m_idByAction;
 
     /** Mapping from a menu created by this manager to the parameters that were
      * passed to it at construction time. NULL key is used for shortcut actions. */

@@ -8,7 +8,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <ui/common/geometry.h>
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 
 #include <client/client_globals.h>
 

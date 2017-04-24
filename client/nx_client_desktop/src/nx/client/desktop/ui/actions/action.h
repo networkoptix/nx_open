@@ -12,7 +12,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <client/client_globals.h>
 
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 
 class QGraphicsItem;
 
@@ -37,7 +37,7 @@ public:
      * \param id                        Identifier of this action.
      * \param parent                    Context-aware parent of this action.
      */
-    Action(QnActions::IDType id, QObject *parent = NULL);
+    Action(IDType id, QObject *parent = NULL);
 
     /**
      * Virtual destructor.
@@ -47,7 +47,7 @@ public:
     /**
      * \returns                         Identifier of this action.
      */
-    QnActions::IDType id() const;
+    IDType id() const;
 
     /**
      * \returns                         Scope of this action.
@@ -190,7 +190,7 @@ private:
     QString defaultToolTipFormat() const;
 
 private:
-    const QnActions::IDType m_id;
+    const IDType m_id;
     ActionFlags m_flags;
     Qn::ButtonAccent m_accent{Qn::ButtonAccent::NoAccent};
     ClientModes m_mode;

@@ -29,6 +29,8 @@
 #include <nx/utils/string.h>
 #include <network/system_helpers.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 
 static const int kMaxSystemNameLength = 20;
@@ -108,7 +110,7 @@ void QnMergeSystemsDialog::done(int result)
 //         url.setPassword(m_remoteOwnerCredentials.password());
 //         QnAppServerConnectionFactory::setUrl(url);
 
-        menu()->trigger(QnActions::ReconnectAction);
+        menu()->trigger(action::ReconnectAction);
         context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
     }
 }

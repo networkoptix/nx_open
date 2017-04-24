@@ -91,7 +91,7 @@ void SpecialLayoutPanelWidget::handleResourceDataChanged(int role)
 void SpecialLayoutPanelWidget::updateButtons()
 {
     const auto actions = m_layoutResource->data(Qn::CustomPanelActionsRole)
-        .value<QList<QnActions::IDType>>();
+        .value<QList<action::IDType>>();
 
     for (const auto& actionId: actions)
     {

@@ -4,7 +4,7 @@
 
 #include <nx/client/desktop/ui/actions/action_types.h>
 
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnWorkbenchSelectionWatcher: public QObject, public QnWorkbenchContextAware {

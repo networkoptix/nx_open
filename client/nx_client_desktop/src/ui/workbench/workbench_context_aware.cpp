@@ -8,6 +8,8 @@
 
 #include "workbench_context.h"
 
+using namespace nx::client::desktop::ui;
+
 QnWorkbenchContextAware::QnWorkbenchContextAware(QObject* parent, bool lazyInitialization):
     m_context(nullptr),
     m_initialized(false)
@@ -107,13 +109,13 @@ void QnWorkbenchContextAware::afterContextInitialized()
     //do nothing
 }
 
-QAction *QnWorkbenchContextAware::action(const QnActions::IDType id) const
+QAction *QnWorkbenchContextAware::action(const action::IDType id) const
 {
     NX_ASSERT(m_initialized, Q_FUNC_INFO, "Initialization failed");
     return context()->action(id);
 }
 
-nx::client::desktop::ui::action::Manager* QnWorkbenchContextAware::menu() const
+action::Manager* QnWorkbenchContextAware::menu() const
 {
     NX_ASSERT(m_initialized, Q_FUNC_INFO, "Initialization failed");
     return context()->menu();

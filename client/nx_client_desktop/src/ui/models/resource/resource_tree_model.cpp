@@ -801,7 +801,7 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
             parameters = sourceResources;
         }
         parameters.setArgument(Qn::VideoWallItemGuidRole, node->uuid());
-        menu()->trigger(QnActions::DropOnVideoWallItemAction, parameters);
+        menu()->trigger(action::DropOnVideoWallItemAction, parameters);
     }
     else if (node->type() == Qn::RoleNode)
     {
@@ -816,7 +816,7 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
             TRACE("Sharing layout " << layout->getName() << " with role "
                 << node->m_displayName);
             menu()->trigger(
-                QnActions::ShareLayoutAction,
+                action::ShareLayoutAction,
                 action::Parameters(layout)
                     .withArgument(Qn::UuidRole, roleId)
             );
@@ -996,9 +996,9 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
 
         if (!droppable.isEmpty())
         {
-            menu()->trigger(QnActions::OpenInLayoutAction,  action::Parameters(droppable)
+            menu()->trigger(action::OpenInLayoutAction,  action::Parameters(droppable)
                 .withArgument(Qn::LayoutResourceRole, layout));
-            menu()->trigger(QnActions::SaveLayoutAction, layout);
+            menu()->trigger(action::SaveLayoutAction, layout);
         }
     }
 
@@ -1016,7 +1016,7 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
                 continue;
 
             TRACE("Sharing layout " << sourceLayout->getName() << " with " << targetUser->getName())
-            menu()->trigger(QnActions::ShareLayoutAction, action::Parameters(sourceLayout)
+            menu()->trigger(action::ShareLayoutAction, action::Parameters(sourceLayout)
                 .withArgument(Qn::UserResourceRole, targetUser)
             );
         }
@@ -1035,7 +1035,7 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
         QnVirtualCameraResourceList cameras = sourceResources.filtered<QnVirtualCameraResource>();
         if (!cameras.empty())
         {
-            menu()->trigger(QnActions::MoveCameraAction, action::Parameters(cameras)
+            menu()->trigger(action::MoveCameraAction, action::Parameters(cameras)
                 .withArgument(Qn::MediaServerResourceRole, server)
             );
         }

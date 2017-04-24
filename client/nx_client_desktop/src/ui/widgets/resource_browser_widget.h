@@ -155,7 +155,7 @@ private:
     QnGraphicsToolTipWidget* m_tooltipWidget;
     HoverFocusProcessor* m_hoverProcessor;
 
-    QMap<QnActions::IDType, QAction*> m_renameActions;
+    QMap<nx::client::desktop::ui::action::IDType, QAction*> m_renameActions;
     QnDisconnectHelperPtr m_disconnectHelper;
 
     QScopedPointer<QnCameraThumbnailManager> m_thumbnailManager;

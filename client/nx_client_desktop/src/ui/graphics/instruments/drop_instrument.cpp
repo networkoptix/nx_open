@@ -206,7 +206,7 @@ bool DropInstrument::dropEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *eve
         return false;
 
     // try to drop videowall items first
-    if (delayedTriggerIfPossible(QnActions::StartVideoWallControlAction, m_videoWallItems))
+    if (delayedTriggerIfPossible(action::StartVideoWallControlAction, m_videoWallItems))
     {
 
     }
@@ -214,14 +214,14 @@ bool DropInstrument::dropEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *eve
         if (!m_intoNewLayout)
         {
             delayedTriggerIfPossible(
-                QnActions::DropResourcesAction,
+                action::DropResourcesAction,
                 action::Parameters(m_resources).withArgument(Qn::ItemPositionRole,
                     context->workbench()->mapper()->mapToGridF(event->scenePos()))
             );
         }
         else
         {
-            delayedTriggerIfPossible(QnActions::DropResourcesIntoNewLayoutAction, m_resources);
+            delayedTriggerIfPossible(action::DropResourcesIntoNewLayoutAction, m_resources);
         }
 
     event->acceptProposedAction();
@@ -236,7 +236,7 @@ SceneEventFilterItem *DropInstrument::filterItem() const {
     return m_filterItem.data();
 }
 
-bool DropInstrument::delayedTriggerIfPossible(QnActions::IDType id, const action::Parameters& parameters)
+bool DropInstrument::delayedTriggerIfPossible(action::IDType id, const action::Parameters& parameters)
 {
     if (!m_context || !m_context->menu()->canTrigger(id, parameters))
         return false;

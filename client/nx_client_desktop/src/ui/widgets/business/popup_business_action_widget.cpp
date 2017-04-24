@@ -8,6 +8,8 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
+using namespace nx::client::desktop::ui;
+
 QnPopupBusinessActionWidget::QnPopupBusinessActionWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -51,5 +53,5 @@ void QnPopupBusinessActionWidget::paramsChanged() {
 }
 
 void QnPopupBusinessActionWidget::at_settingsButton_clicked() {
-    menu()->trigger(QnActions::PreferencesNotificationTabAction);
+    menu()->trigger(action::PreferencesNotificationTabAction);
 }

@@ -9,6 +9,8 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
+using namespace nx::client::desktop::ui;
+
 QnSendmailBusinessActionWidget::QnSendmailBusinessActionWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -17,7 +19,7 @@ QnSendmailBusinessActionWidget::QnSendmailBusinessActionWidget(QWidget *parent) 
     ui->setupUi(this);
 
     connect(ui->emailLineEdit, SIGNAL(textChanged(QString)), this, SLOT(paramsChanged()));
-    connect(ui->settingsButton, &QPushButton::clicked, action(QnActions::PreferencesSmtpTabAction), &QAction::trigger);
+    connect(ui->settingsButton, &QPushButton::clicked, action(action::PreferencesSmtpTabAction), &QAction::trigger);
 }
 
 QnSendmailBusinessActionWidget::~QnSendmailBusinessActionWidget()

@@ -39,6 +39,8 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 
 static const int kDefaultThumbnailsHeight = 48;
@@ -77,7 +79,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_updateResizerGeometryLater(false),
     m_autoHideHeight(0),
     m_showButton(NxUi::newShowHideButton(parentWidget, context(),
-        QnActions::ToggleTimelineAction)),
+        action::ToggleTimelineAction)),
     m_resizerWidget(new QnResizerWidget(Qt::Vertical, parentWidget)),
     m_showWidget(new GraphicsWidget(parentWidget)),
     m_zoomButtonsWidget(new GraphicsWidget(parentWidget)),
@@ -100,7 +102,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     connect(item->timeSlider(), &QGraphicsWidget::geometryChanged, this,
         &TimelineWorkbenchPanel::updateControlsGeometry);
 
-    action(QnActions::ToggleTimelineAction)->setChecked(settings.state == Qn::PaneState::Opened);
+    action(action::ToggleTimelineAction)->setChecked(settings.state == Qn::PaneState::Opened);
     {
         QTransform transform;
         transform.rotate(-90);
@@ -108,7 +110,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     }
     m_showButton->setFocusProxy(item);
     m_showButton->setZValue(ControlItemZOrder);
-    connect(action(QnActions::ToggleTimelineAction), &QAction::toggled, this,
+    connect(action(action::ToggleTimelineAction), &QAction::toggled, this,
         [this](bool checked)
         {
             if (!m_ignoreClickEvent)
@@ -175,7 +177,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     connect(menu(), &nx::client::desktop::ui::action::Manager::menuAboutToHide, m_hidingProcessor,
         &HoverFocusProcessor::forceFocusLeave);
 
-    connect(action(QnActions::ToggleThumbnailsAction), &QAction::toggled, this,
+    connect(action(action::ToggleThumbnailsAction), &QAction::toggled, this,
         [this](bool checked)
         {
             setThumbnailsVisible(checked);
@@ -350,7 +352,7 @@ bool TimelineWorkbenchPanel::isPinned() const
 
 bool TimelineWorkbenchPanel::isOpened() const
 {
-    return action(QnActions::ToggleTimelineAction)->isChecked();
+    return action(action::ToggleTimelineAction)->isChecked();
 }
 
 void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
@@ -363,7 +365,7 @@ void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
     m_showingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
     QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
-    action(QnActions::ToggleTimelineAction)->setChecked(opened);
+    action(action::ToggleTimelineAction)->setChecked(opened);
 
     m_yAnimator->stop();
     qnWorkbenchAnimations->setupAnimator(m_yAnimator, opened
@@ -675,7 +677,7 @@ void TimelineWorkbenchPanel::at_resizerWidget_geometryChanged()
     }
 
     updateResizerGeometry();
-    action(QnActions::ToggleThumbnailsAction)->setChecked(isThumbnailsVisible());
+    action(action::ToggleThumbnailsAction)->setChecked(isThumbnailsVisible());
 }
 
 void TimelineWorkbenchPanel::at_sliderResizerWidget_wheelEvent(QObject* /*target*/, QEvent* event)

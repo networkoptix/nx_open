@@ -1063,7 +1063,7 @@ ToggleTitleBarCondition::ToggleTitleBarCondition(QObject* parent): Condition(par
 
 ActionVisibility ToggleTitleBarCondition::check(const Parameters &)
 {
-    return action(QnActions::EffectiveMaximizeAction)->isChecked() ? EnabledAction : InvisibleAction;
+    return action(action::EffectiveMaximizeAction)->isChecked() ? EnabledAction : InvisibleAction;
 }
 
 NoArchiveCondition::NoArchiveCondition(QObject* parent): Condition(parent)
@@ -1751,7 +1751,7 @@ DesktopCameraCondition::DesktopCameraCondition(QObject* parent): Condition(paren
 
 ActionVisibility DesktopCameraCondition::check(const Parameters& /*parameters*/)
 {
-    const auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction);
+    const auto screenRecordingAction = action(action::ToggleScreenRecordingAction);
     if (screenRecordingAction)
     {
 

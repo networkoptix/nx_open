@@ -9,7 +9,7 @@
 #include <camera/thumbnail.h>
 #include <camera/data/abstract_camera_data.h>
 
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <ui/common/weak_graphics_item_pointer.h>
 #include <ui/customization/customization.h>
@@ -70,7 +70,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnBackgroundImage>();
     qRegisterMetaType<Qn::ImageBehaviour>();
     qRegisterMetaType<ImageCorrectionParams>();
-    qRegisterMetaType<QnActions::IDType>();
+    qRegisterMetaType<ui::action::IDType>();
     qRegisterMetaType<ui::action::Parameters>();
     qRegisterMetaType<QnUpdateInfo>();
     qRegisterMetaTypeStreamOperators<QnUpdateInfo>();

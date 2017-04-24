@@ -10,10 +10,17 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+
 #ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
 Q_OBJECT
 #endif
-QN_DECLARE_METAOBJECT_HEADER(QnActions, IDType, )
+QN_DECLARE_METAOBJECT_HEADER(action, IDType, )
+
+QN_DECLARE_TR_FUNCTIONS("action")
 
 /**
  * Enum of all menu actions.
@@ -1146,14 +1153,15 @@ enum IDType
     NoAction = -1
 };
 
-QN_DECLARE_TR_FUNCTIONS("QnActions")
+void initialize(Manager* manager, Action* root);
 
-void initialize(nx::client::desktop::ui::action::Manager* manager,
-    nx::client::desktop::ui::action::Action* root);
+} // namespace action
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx
 
-} //namespace QnActions
-
-QN_FUSION_DECLARE_FUNCTIONS(QnActions::IDType, (lexical)(metatype))
+QN_FUSION_DECLARE_FUNCTIONS(nx::client::desktop::ui::action::IDType, (lexical)(metatype))
 
 
 

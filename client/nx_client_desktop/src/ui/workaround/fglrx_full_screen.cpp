@@ -9,6 +9,8 @@
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/workbench/workbench_display.h>
 
+using namespace nx::client::desktop::ui;
+
 QnFglrxFullScreen::QnFglrxFullScreen(QObject *parent):
     Instrument(Viewport, makeSet(), parent),
     QnWorkbenchContextAware(parent),
@@ -36,7 +38,7 @@ void QnFglrxFullScreen::updateFglrxMode(bool force) {
     m_fglrxMode = fglrxMode;
 
     if (m_fglrxMode)
-        menu()->registerAlias(QnActions::EffectiveMaximizeAction, QnActions::MaximizeAction);
+        menu()->registerAlias(action::EffectiveMaximizeAction, action::MaximizeAction);
 }
 
 bool QnFglrxFullScreen::registeredNotify(QWidget *) {

@@ -10,7 +10,7 @@
 #include "client/client_settings.h"
 #include "api/app_server_connection.h"
 
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <ui/help/help_topic_accessor.h>

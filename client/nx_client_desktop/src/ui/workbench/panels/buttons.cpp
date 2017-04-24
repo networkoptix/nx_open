@@ -29,7 +29,7 @@ namespace NxUi {
 QnImageButtonWidget* newActionButton(
     QGraphicsItem *parent,
     QnWorkbenchContext* context,
-    QnActions::IDType actionId,
+    action::IDType actionId,
     int helpTopicId)
 {
     NX_EXPECT(context);
@@ -52,7 +52,7 @@ template<class T>
 T* newCustomShowHideButton(
     QGraphicsItem* parent,
     QnWorkbenchContext* context,
-    QnActions::IDType actionId)
+    action::IDType actionId)
 {
     NX_EXPECT(context);
     const auto action = context->menu()->action(actionId);
@@ -77,7 +77,7 @@ T* newCustomShowHideButton(
 QnImageButtonWidget* newShowHideButton(
     QGraphicsItem* parent,
     QnWorkbenchContext* context,
-    QnActions::IDType actionId)
+    action::IDType actionId)
 {
     return newCustomShowHideButton<QnImageButtonWidget>(parent, context, actionId);
 }
@@ -85,7 +85,7 @@ QnImageButtonWidget* newShowHideButton(
 QnBlinkingImageButtonWidget* newBlinkingShowHideButton(
     QGraphicsItem* parent,
     QnWorkbenchContext* context,
-    QnActions::IDType actionId)
+    action::IDType actionId)
 {
     return newCustomShowHideButton<QnBlinkingImageButtonWidget>(parent, context, actionId);
 }
@@ -93,7 +93,7 @@ QnBlinkingImageButtonWidget* newBlinkingShowHideButton(
 QnImageButtonWidget* newPinButton(
     QGraphicsItem* parent,
     QnWorkbenchContext* context,
-    QnActions::IDType actionId,
+    action::IDType actionId,
     bool smallIcon)
 {
     NX_EXPECT(context);

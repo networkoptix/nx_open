@@ -696,14 +696,14 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
         case Qn::SharedResourceNode:
         case Qn::ResourceNode:
         case Qn::EdgeNode:
-            m_editable.value = menu()->canTrigger(QnActions::RenameResourceAction, m_resource);
+            m_editable.value = menu()->canTrigger(action::RenameResourceAction, m_resource);
             break;
         case Qn::VideoWallItemNode:
         case Qn::VideoWallMatrixNode:
             m_editable.value = accessController()->hasGlobalPermission(Qn::GlobalControlVideoWallPermission);
             break;
         case Qn::LayoutTourNode:
-            m_editable.value = menu()->canTrigger(QnActions::RenameLayoutTourAction);
+            m_editable.value = menu()->canTrigger(action::RenameLayoutTourAction);
             break;
         case Qn::RecorderNode:
             m_editable.value = true;
@@ -933,11 +933,11 @@ bool QnResourceTreeModelNode::setData(const QVariant& value, int role, int colum
     parameters.setArgument(Qn::UuidRole, m_uuid);
 
     if (m_type == Qn::LayoutTourNode)
-        menu()->trigger(QnActions::RenameLayoutTourAction, parameters);
+        menu()->trigger(action::RenameLayoutTourAction, parameters);
     else if (isVideoWallEntity)
-        menu()->trigger(QnActions::RenameVideowallEntityAction, parameters);
+        menu()->trigger(action::RenameVideowallEntityAction, parameters);
     else
-        menu()->trigger(QnActions::RenameResourceAction, parameters);
+        menu()->trigger(action::RenameResourceAction, parameters);
     return true;
 }
 

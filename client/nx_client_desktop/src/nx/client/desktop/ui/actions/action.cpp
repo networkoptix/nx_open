@@ -32,7 +32,7 @@ namespace desktop {
 namespace ui {
 namespace action {
 
-Action::Action(QnActions::IDType id, QObject* parent) :
+Action::Action(IDType id, QObject* parent) :
     QAction(parent),
     QnWorkbenchContextAware(parent),
     m_id(id),
@@ -49,7 +49,7 @@ Action::Action(QnActions::IDType id, QObject* parent) :
 Action::~Action()
 {}
 
-QnActions::IDType Action::id() const
+IDType Action::id() const
 {
     return m_id;
 }

@@ -36,6 +36,8 @@
 #include <nx/utils/string.h>
 #include <utils/common/qtimespan.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 
     class QnNetworkSpeedStrings {
@@ -494,7 +496,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     showLogButton->setToolTip(tr("Show Log"));
     setHelpTopic(showLogButton, Qn::MainWindow_MonitoringItem_Log_Help);
     connect(showLogButton, &QnImageButtonWidget::clicked, this,
-        [this] {menu()->trigger(QnActions::ServerLogsAction, m_resource);});
+        [this] {menu()->trigger(action::ServerLogsAction, m_resource);});
     titleBar()->rightButtonsBar()->addButton(Qn::ShowLogButton, showLogButton);
 
     auto checkIssuesButton = createStatisticAwareButton(lit("server_widget_check_issues"));
@@ -502,7 +504,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     checkIssuesButton->setCheckable(false);
     checkIssuesButton->setToolTip(tr("Check Issues"));
     connect(checkIssuesButton, &QnImageButtonWidget::clicked, this,
-        [this] { menu()->trigger(QnActions::ServerIssuesAction, m_resource); });
+        [this] { menu()->trigger(action::ServerIssuesAction, m_resource); });
     titleBar()->rightButtonsBar()->addButton(Qn::CheckIssuesButton, checkIssuesButton);
 
     /* Run handlers. */
@@ -769,10 +771,10 @@ int QnServerResourceWidget::calculateButtonsVisibility() const
     result &= (Qn::CloseButton | Qn::RotateButton | Qn::InfoButton);
     if (qnRuntime->isDesktopMode())
     {
-        if (menu()->canTrigger(QnActions::ServerLogsAction, m_resource))
+        if (menu()->canTrigger(action::ServerLogsAction, m_resource))
             result |= Qn::ShowLogButton;
 
-        if (menu()->canTrigger(QnActions::ServerIssuesAction, m_resource))
+        if (menu()->canTrigger(action::ServerIssuesAction, m_resource))
             result |= Qn::CheckIssuesButton;
     }
     return result;

@@ -7,7 +7,7 @@
 #include <core/resource_management/resource_runtime_data.h>
 #include <core/resource/layout_resource.h>
 
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench.h>
@@ -51,7 +51,7 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
                 resourcePool()->removeResource(reviewLayout);
         });
 
-    connect(action(QnActions::ReviewLayoutTourAction), &QAction::triggered, this,
+    connect(action(action::ReviewLayoutTourAction), &QAction::triggered, this,
         [this]()
         {
             const auto parameters = menu()->currentParameters(sender());
@@ -59,7 +59,7 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
             reviewLayoutTour(qnLayoutTourManager->tour(id));
         });
 
-    connect(action(QnActions::DropResourcesAction), &QAction::triggered, this,
+    connect(action(action::DropResourcesAction), &QAction::triggered, this,
         [this]()
         {
             if (!isLayoutTourReviewMode())
@@ -77,21 +77,21 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
                 addItemToReviewLayout(reviewLayout, {layout->getId(), kDefaultDelayMs}, position);
         });
 
-    connect(action(QnActions::StartCurrentLayoutTourAction), &QAction::triggered, this,
+    connect(action(action::StartCurrentLayoutTourAction), &QAction::triggered, this,
         [this]
         {
             NX_EXPECT(isLayoutTourReviewMode());
             const auto tour = qnLayoutTourManager->tour(currentTourId());
             NX_EXPECT(tour.isValid());
-            const auto startTourAction = action(QnActions::ToggleLayoutTourModeAction);
+            const auto startTourAction = action(action::ToggleLayoutTourModeAction);
             NX_EXPECT(!startTourAction->isChecked());
             if (!startTourAction->isChecked())
             {
-                menu()->trigger(QnActions::ToggleLayoutTourModeAction, {Qn::UuidRole, tour.id});
+                menu()->trigger(action::ToggleLayoutTourModeAction, {Qn::UuidRole, tour.id});
             }
         });
 
-    connect(action(QnActions::SaveCurrentLayoutTourAction), &QAction::triggered, this,
+    connect(action(action::SaveCurrentLayoutTourAction), &QAction::triggered, this,
         [this]
         {
             NX_EXPECT(isLayoutTourReviewMode());
@@ -114,14 +114,14 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
             }
 
             qnLayoutTourManager->addOrUpdateTour(tour);
-            menu()->trigger(QnActions::SaveLayoutTourAction, {Qn::UuidRole, id});
+            menu()->trigger(action::SaveLayoutTourAction, {Qn::UuidRole, id});
         });
 
-    connect(action(QnActions::RemoveCurrentLayoutTourAction), &QAction::triggered, this,
+    connect(action(action::RemoveCurrentLayoutTourAction), &QAction::triggered, this,
         [this]()
         {
             NX_EXPECT(isLayoutTourReviewMode());
-            menu()->trigger(QnActions::RemoveLayoutTourAction, {Qn::UuidRole, currentTourId()});
+            menu()->trigger(action::RemoveLayoutTourAction, {Qn::UuidRole, currentTourId()});
         });
 
     connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged, this,
@@ -156,14 +156,14 @@ void LayoutTourReviewController::reviewLayoutTour(const ec2::ApiLayoutTourData& 
 
     if (auto layout = m_reviewLayouts.value(tour.id))
     {
-        menu()->trigger(QnActions::OpenSingleLayoutAction, layout);
+        menu()->trigger(action::OpenSingleLayoutAction, layout);
         return;
     }
 
-    const QList<QnActions::IDType> actions{
-        QnActions::StartCurrentLayoutTourAction,
-        QnActions::SaveCurrentLayoutTourAction,
-        QnActions::RemoveCurrentLayoutTourAction
+    const QList<action::IDType> actions{
+        action::StartCurrentLayoutTourAction,
+        action::SaveCurrentLayoutTourAction,
+        action::RemoveCurrentLayoutTourAction
     };
 
     static const float kCellAspectRatio{4.0f / 3.0f};
@@ -189,7 +189,7 @@ void LayoutTourReviewController::reviewLayoutTour(const ec2::ApiLayoutTourData& 
 
     m_reviewLayouts.insert(tour.id, layout);
 
-    menu()->trigger(QnActions::OpenSingleLayoutAction, layout);
+    menu()->trigger(action::OpenSingleLayoutAction, layout);
 }
 
 QnUuid LayoutTourReviewController::currentTourId() const
@@ -251,10 +251,10 @@ void LayoutTourReviewController::updateButtons(const QnLayoutResourcePtr& layout
         return;
 
     // Using he fact that dataChanged will be sent even if action list was not changed
-    const QList<QnActions::IDType> actions{
-        QnActions::StartCurrentLayoutTourAction,
-        QnActions::SaveCurrentLayoutTourAction,
-        QnActions::RemoveCurrentLayoutTourAction
+    const QList<action::IDType> actions{
+        action::StartCurrentLayoutTourAction,
+        action::SaveCurrentLayoutTourAction,
+        action::RemoveCurrentLayoutTourAction
     };
     layout->setData(Qn::CustomPanelActionsRole, qVariantFromValue(actions));
 }

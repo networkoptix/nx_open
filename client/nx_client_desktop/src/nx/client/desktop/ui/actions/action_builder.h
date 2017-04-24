@@ -6,7 +6,7 @@
 
 #include <common/common_globals.h>
 
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_fwd.h>
 #include <nx/client/desktop/ui/actions/action_types.h>
 

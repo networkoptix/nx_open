@@ -30,6 +30,8 @@
 #include <utils/common/app_info.h>
 #include <utils/email/email.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 
 const int kCloudUserFontSizePixels = 18;
@@ -126,7 +128,7 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     connect(ui->editRolesButton, &QPushButton::clicked, this,
         [this]
         {
-            menu()->trigger(QnActions::UserRolesAction, {Qn::UuidRole, selectedUserRoleId()});
+            menu()->trigger(action::UserRolesAction, {Qn::UuidRole, selectedUserRoleId()});
         });
 
     autoResizePagesToContents(ui->mainStackedWidget,

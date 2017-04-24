@@ -18,7 +18,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/indents.h>
 #include <ui/delegates/resource_item_delegate.h>

@@ -205,7 +205,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     const bool instantlyMaximize = !startupParams.fullScreenDisabled && qnRuntime->isDesktopMode();
 
     if (instantlyMaximize)
-        context->action(QnActions::EffectiveMaximizeAction)->trigger();
+        context->action(ui::action::EffectiveMaximizeAction)->trigger();
     else
         mainWindow->updateDecorationsState();
 

@@ -2,7 +2,7 @@
 
 #include <set>
 
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <plugins/io_device/joystick/joystick_common.h>
 #include <nx/fusion/model_functions_fwd.h>
 
@@ -19,7 +19,7 @@ struct Rule
     Rule(
         QString id,
         EventType evtType,
-        QnActions::IDType actType,
+        desktop::ui::action::IDType actType,
         std::map<QString, QString> actParameters):
 
         ruleId(id),
@@ -30,7 +30,7 @@ struct Rule
 
     QString ruleId;
     EventType eventType;
-    QnActions::IDType actionType;
+    desktop::ui::action::IDType actionType;
     std::map<QString, QString> actionParameters;
 };
 

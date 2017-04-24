@@ -47,6 +47,8 @@
 #include "transcoding/filters/filter_helper.h"
 #include "transcoding/filters/abstract_image_filter.h"
 
+using namespace nx::client::desktop::ui;
+
 namespace {
     const int showProgressDelay = 1500; // 1.5 sec
     const int minProgressDisplayTime = 1000; // 1 sec
@@ -163,7 +165,7 @@ QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent):
     m_progressShowTime(0),
     m_canceled(false)
 {
-    connect(action(QnActions::TakeScreenshotAction), &QAction::triggered, this, &QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered);
+    connect(action(action::TakeScreenshotAction), &QAction::triggered, this, &QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered);
 }
 
 QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters, bool forced) const {

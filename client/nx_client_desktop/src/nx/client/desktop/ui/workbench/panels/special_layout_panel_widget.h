@@ -43,7 +43,7 @@ private:
     QnLayoutResourcePtr m_layoutResource;
 
     using ButtonPtr = QAbstractButton*;
-    QHash<QnActions::IDType, ButtonPtr> m_actionButtons;
+    QHash<nx::client::desktop::ui::action::IDType, ButtonPtr> m_actionButtons;
 };
 
 } // namespace workbench

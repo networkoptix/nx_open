@@ -43,6 +43,8 @@
 #include <utils/math/interpolator.h>
 #include <utils/math/color_transformations.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 static const int PC_SERVER_MAX_CAMERAS = 128;
 static const int ARM_SERVER_MAX_CAMERAS = 12;
@@ -92,7 +94,7 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/) :
         emit hasChangesChanged();
     });
 
-    connect(ui->failoverPriorityButton, &QPushButton::clicked, action(QnActions::OpenFailoverPriorityAction), &QAction::trigger);
+    connect(ui->failoverPriorityButton, &QPushButton::clicked, action(action::OpenFailoverPriorityAction), &QAction::trigger);
 
     retranslateUi();
 }
@@ -305,5 +307,5 @@ void QnServerSettingsWidget::at_pingButton_clicked()
         return;
 
     /* We must always ping the same address that is displayed in the visible field. */
-    menu()->trigger(QnActions::PingAction, {Qn::TextRole, ui->ipAddressLineEdit->text()});
+    menu()->trigger(action::PingAction, {Qn::TextRole, ui->ipAddressLineEdit->text()});
 }

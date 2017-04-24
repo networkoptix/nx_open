@@ -25,6 +25,8 @@
 #include <core/resource/fake_media_server.h>
 #include <utils/common/html.h>
 
+using namespace nx::client::desktop::ui;
+
 QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
     base_type(parent),
     ui(new Ui::ServerSettingsDialog),
@@ -89,7 +91,7 @@ void QnServerSettingsDialog::setupShowWebServerLink()
     buttonsLayout->insertWidget(0, m_webPageLink);
     setHelpTopic(m_webPageLink, Qn::ServerSettings_WebClient_Help);
     connect(m_webPageLink, &QLabel::linkActivated, this,
-        [this] { menu()->trigger(QnActions::WebAdminAction, m_server); });
+        [this] { menu()->trigger(action::WebAdminAction, m_server); });
 }
 
 

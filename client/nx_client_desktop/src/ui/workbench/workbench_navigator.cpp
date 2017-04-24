@@ -1954,7 +1954,7 @@ void QnWorkbenchNavigator::setAutoPaused(bool autoPaused)
     }
 
     m_autoPaused = autoPaused;
-    action(QnActions::PlayPauseAction)->setEnabled(!m_autoPaused); /* Prevent special UI reaction on space key*/
+    action(action::PlayPauseAction)->setEnabled(!m_autoPaused); /* Prevent special UI reaction on space key*/
 }
 
 // -------------------------------------------------------------------------- //
@@ -2011,9 +2011,9 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
 
     /* Add slider-local actions to the menu. */
     bool selectionEditable = m_timeSlider->options().testFlag(QnTimeSlider::SelectionEditable);
-    manager->redirectAction(menu.data(), QnActions::StartTimeSelectionAction, selectionEditable ? m_startSelectionAction : NULL);
-    manager->redirectAction(menu.data(), QnActions::EndTimeSelectionAction, selectionEditable ? m_endSelectionAction : NULL);
-    manager->redirectAction(menu.data(), QnActions::ClearTimeSelectionAction, selectionEditable ? m_clearSelectionAction : NULL);
+    manager->redirectAction(menu.data(), action::StartTimeSelectionAction, selectionEditable ? m_startSelectionAction : NULL);
+    manager->redirectAction(menu.data(), action::EndTimeSelectionAction, selectionEditable ? m_endSelectionAction : NULL);
+    manager->redirectAction(menu.data(), action::ClearTimeSelectionAction, selectionEditable ? m_clearSelectionAction : NULL);
 
     /* Run menu. */
     QAction *action = QnHiDpiWorkarounds::showMenu(menu.data(), QCursor::pos());
@@ -2033,7 +2033,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     {
         m_timeSlider->setSelectionValid(false);
     }
-    else if (action == context()->action(QnActions::ZoomToTimeSelectionAction))
+    else if (action == context()->action(action::ZoomToTimeSelectionAction))
     {
         if (!m_timeSlider->isSelectionValid())
             return;

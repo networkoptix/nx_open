@@ -25,6 +25,8 @@
 #include <utils/merge_systems_common.h>
 #include <network/system_helpers.h>
 
+using namespace nx::client::desktop::ui;
+
 QnWorkbenchIncompatibleServersActionHandler::QnWorkbenchIncompatibleServersActionHandler(
     QObject* parent)
     :
@@ -33,9 +35,9 @@ QnWorkbenchIncompatibleServersActionHandler::QnWorkbenchIncompatibleServersActio
     m_connectTool(nullptr),
     m_mergeDialog(nullptr)
 {
-    connect(action(QnActions::ConnectToCurrentSystem), &QAction::triggered, this,
+    connect(action(action::ConnectToCurrentSystem), &QAction::triggered, this,
         &QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemAction_triggered);
-    connect(action(QnActions::MergeSystems), &QAction::triggered, this,
+    connect(action(action::MergeSystems), &QAction::triggered, this,
         &QnWorkbenchIncompatibleServersActionHandler::at_mergeSystemsAction_triggered);
 }
 

@@ -30,6 +30,8 @@
 #include <utils/common/util.h>
 #include <nx/utils/random.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
     const int kUpdatePeriodMSec = 60 * 60 * 1000; /* 1 hour. */
 
@@ -87,7 +89,7 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &in
         return;
 
     /* We have no access rights. */
-    if (!menu()->canTrigger(QnActions::SystemUpdateAction))
+    if (!menu()->canTrigger(action::SystemUpdateAction))
         return;
 
     /* User was already notified about this release. */
@@ -167,5 +169,5 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
     }
 
     if (result != QDialogButtonBox::Cancel)
-        action(QnActions::SystemUpdateAction)->trigger();
+        action(action::SystemUpdateAction)->trigger();
 }

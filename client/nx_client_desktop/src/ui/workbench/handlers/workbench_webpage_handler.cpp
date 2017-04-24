@@ -14,6 +14,8 @@
 
 #include <ui/dialogs/webpage_dialog.h>
 
+using namespace nx::client::desktop::ui;
+
 QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject* parent /*= nullptr*/):
     base_type(parent),
     QnWorkbenchContextAware(parent)
@@ -27,10 +29,10 @@ QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject* parent /*= nullptr
                 webPage->setStatus(Qn::Online);
         });
 
-    connect(action(QnActions::NewWebPageAction), &QAction::triggered,
+    connect(action(action::NewWebPageAction), &QAction::triggered,
         this, &QnWorkbenchWebPageHandler::at_newWebPageAction_triggered);
 
-    connect(action(QnActions::WebPageSettingsAction), &QAction::triggered,
+    connect(action(action::WebPageSettingsAction), &QAction::triggered,
         this, &QnWorkbenchWebPageHandler::at_editWebPageAction_triggered);
 }
 

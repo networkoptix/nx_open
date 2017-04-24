@@ -195,7 +195,7 @@ void QnUserRolesDialog::applyChanges()
 
         for (const auto& layout: layoutsToShare)
         {
-            menu()->trigger(QnActions::ShareLayoutAction,
+            menu()->trigger(action::ShareLayoutAction,
                 action::Parameters(layout).withArgument(Qn::UuidRole, userRole.id));
         }
 

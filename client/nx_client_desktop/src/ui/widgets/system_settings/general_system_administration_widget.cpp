@@ -13,7 +13,7 @@
 
 #include <nx_ec/data/api_runtime_data.h>
 
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/custom_painted.h>
@@ -29,6 +29,8 @@
 #include <nx/utils/string.h>
 
 #include <utils/common/event_processors.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -122,22 +124,22 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     setHelpTopic(m_buttons[kBookmarksButton    ], Qn::Bookmarks_Usage_Help);
 
     connect(m_buttons[kBusinessRulesButton], &QPushButton::clicked, this,
-        [this] { menu()->trigger(QnActions::OpenBusinessRulesAction); });
+        [this] { menu()->trigger(action::OpenBusinessRulesAction); });
 
     connect(m_buttons[kCameraListButton], &QPushButton::clicked, this,
-        [this] { menu()->trigger(QnActions::CameraListAction); });
+        [this] { menu()->trigger(action::CameraListAction); });
 
     connect(m_buttons[kAuditLogButton], &QPushButton::clicked, this,
-        [this] { menu()->trigger(QnActions::OpenAuditLogAction); });
+        [this] { menu()->trigger(action::OpenAuditLogAction); });
 
     connect(m_buttons[kEventLogButton], &QPushButton::clicked, this,
-        [this] { menu()->trigger(QnActions::OpenBusinessLogAction); });
+        [this] { menu()->trigger(action::OpenBusinessLogAction); });
 
     connect(m_buttons[kHealthMonitorButton], &QPushButton::clicked, this,
-        [this] { menu()->trigger(QnActions::OpenInNewLayoutAction, resourcePool()->getResourcesWithFlag(Qn::server)); });
+        [this] { menu()->trigger(action::OpenInNewLayoutAction, resourcePool()->getResourcesWithFlag(Qn::server)); });
 
     connect(m_buttons[kBookmarksButton], &QPushButton::clicked, this,
-        [this] { menu()->trigger(QnActions::OpenBookmarksSearchAction); });
+        [this] { menu()->trigger(action::OpenBookmarksSearchAction); });
 
     connect(ui->systemSettingsWidget, &QnAbstractPreferencesWidget::hasChangesChanged,
         this, &QnAbstractPreferencesWidget::hasChangesChanged);
@@ -176,7 +178,7 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
     m_buttons[kCameraListButton   ]->setText(
         QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(), tr("Device List"), tr("Camera List")));
 
-    auto shortcutString = [this](const QnActions::IDType actionId, const QString &baseString) -> QString
+    auto shortcutString = [this](const action::IDType actionId, const QString &baseString) -> QString
     {
         auto shortcut = action(actionId)->shortcut();
         if (shortcut.isEmpty())
@@ -186,22 +188,22 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
             .arg(shortcut.toString(QKeySequence::NativeText));
     };
 
-    m_buttons[kBusinessRulesButton]->setToolTip(shortcutString(QnActions::BusinessEventsAction,
+    m_buttons[kBusinessRulesButton]->setToolTip(shortcutString(action::BusinessEventsAction,
         tr("Open Event Rules Management")));
 
-    m_buttons[kEventLogButton]->setToolTip(shortcutString(QnActions::OpenBusinessLogAction,
+    m_buttons[kEventLogButton]->setToolTip(shortcutString(action::OpenBusinessLogAction,
         tr("Open Event Log")));
 
-    m_buttons[kAuditLogButton]->setToolTip(shortcutString(QnActions::OpenAuditLogAction,
+    m_buttons[kAuditLogButton]->setToolTip(shortcutString(action::OpenAuditLogAction,
         tr("Open Audit Trail Log")));
 
-    m_buttons[kBookmarksButton]->setToolTip(shortcutString(QnActions::OpenBookmarksSearchAction,
+    m_buttons[kBookmarksButton]->setToolTip(shortcutString(action::OpenBookmarksSearchAction,
         tr("Open Bookmarks List")));
 
     m_buttons[kHealthMonitorButton]->setToolTip(
         tr("Monitor All Servers on a Single Layout"));
 
-    m_buttons[kCameraListButton]->setToolTip(shortcutString(QnActions::CameraListAction,
+    m_buttons[kCameraListButton]->setToolTip(shortcutString(action::CameraListAction,
         QnDeviceDependentStrings::getDefaultNameFromSet(
             resourcePool(),
             tr("Open Device List"),

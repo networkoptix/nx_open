@@ -27,6 +27,8 @@
 
 #include <utils/license_usage_helper.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 
 static const int kMinimumWidth = 900; //< do not set minimum height
@@ -216,12 +218,12 @@ void QnCameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton b
 
 void QnCameraSettingsDialog::at_diagnoseButton_clicked()
 {
-    menu()->trigger(QnActions::CameraIssuesAction, m_settingsWidget->cameras());
+    menu()->trigger(action::CameraIssuesAction, m_settingsWidget->cameras());
 }
 
 void QnCameraSettingsDialog::at_rulesButton_clicked()
 {
-    menu()->trigger(QnActions::CameraBusinessRulesAction, m_settingsWidget->cameras());
+    menu()->trigger(action::CameraBusinessRulesAction, m_settingsWidget->cameras());
 }
 
 void QnCameraSettingsDialog::updateReadOnly()
@@ -351,7 +353,7 @@ void QnCameraSettingsDialog::saveCameras(const QnVirtualCameraResourceList &came
 void QnCameraSettingsDialog::at_openButton_clicked()
 {
     QnVirtualCameraResourceList cameras = m_settingsWidget->cameras();
-    menu()->trigger(QnActions::OpenInNewLayoutAction, cameras);
+    menu()->trigger(action::OpenInNewLayoutAction, cameras);
     m_settingsWidget->setCameras(cameras);
     retranslateUi();
 }

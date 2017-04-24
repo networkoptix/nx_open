@@ -9,7 +9,7 @@
 #include <ui/graphics/items/generic/styled_tooltip_widget.h>
 #include <ui/graphics/items/generic/graphics_tooltip_widget.h>
 
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 
 class QnProxyLabel;
@@ -51,7 +51,7 @@ public:
 
     void addActionButton(
         const QIcon& icon,
-        QnActions::IDType actionId = QnActions::NoAction,
+        nx::client::desktop::ui::action::IDType actionId = nx::client::desktop::ui::action::NoAction,
         const nx::client::desktop::ui::action::Parameters& parameters = nx::client::desktop::ui::action::Parameters(),
         bool defaultAction = false);
 
@@ -78,7 +78,7 @@ public:
 signals:
     void notificationLevelChanged();
     void closeTriggered();
-    void actionTriggered(QnActions::IDType actionId,
+    void actionTriggered(nx::client::desktop::ui::action::IDType actionId,
         const nx::client::desktop::ui::action::Parameters& parameters);
     void buttonClicked(const QString& alias);
     void linkActivated(const QString& link);
@@ -102,10 +102,10 @@ private slots:
 private:
     struct ActionData
     {
-        ActionData(): action(QnActions::NoAction) {}
-        ActionData(QnActions::IDType action) : action(action) {}
+        ActionData(): action(nx::client::desktop::ui::action::NoAction) {}
+        ActionData(nx::client::desktop::ui::action::IDType action) : action(action) {}
         ActionData(
-            QnActions::IDType action,
+            nx::client::desktop::ui::action::IDType action,
             const nx::client::desktop::ui::action::Parameters& params)
             :
             action(action),
@@ -113,7 +113,7 @@ private:
         {
         }
 
-        QnActions::IDType action;
+        nx::client::desktop::ui::action::IDType action;
         nx::client::desktop::ui::action::Parameters params;
     };
 

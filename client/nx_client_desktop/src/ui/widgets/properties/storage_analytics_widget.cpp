@@ -18,7 +18,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <ui/common/widget_anchor.h>
 #include <ui/customization/customized.h>
 #include <ui/delegates/recording_stats_item_delegate.h>

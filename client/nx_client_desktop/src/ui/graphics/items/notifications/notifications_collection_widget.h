@@ -64,7 +64,7 @@ private:
     void updateBlinker();
 
     void at_list_itemRemoved(QnNotificationWidget *item);
-    void at_item_actionTriggered(QnActions::IDType actionId,
+    void at_item_actionTriggered(nx::client::desktop::ui::action::IDType actionId,
         const nx::client::desktop::ui::action::Parameters& parameters);
     void at_notificationCache_fileDownloaded(const QString& filename);
 
