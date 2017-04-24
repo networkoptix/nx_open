@@ -383,16 +383,6 @@ P2pConnection::Direction P2pConnection::direction() const
     return m_direction;
 }
 
-void P2pConnection::unsubscribeFrom(const ApiPersistentIdData& idList)
-{
-    // todo: implement me
-}
-
-void P2pConnection::subscribeTo(const std::vector<ApiPersistentIdData>& idList)
-{
-    // todo: implement me
-}
-
 void P2pConnection::sendMessage(const nx::Buffer& data)
 {
     using namespace std::placeholders;

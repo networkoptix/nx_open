@@ -372,6 +372,7 @@ void P2pMessageBus::doSubscribe()
     QMap<ApiPersistentIdData, P2pConnectionPtr> currentSubscription = getCurrentSubscription();
     QMap<ApiPersistentIdData, P2pConnectionPtr> newSubscription = currentSubscription;
     const auto localPeer = this->localPeer();
+    bool isUpdated = false;
 
     for (auto itr = m_allPeers.begin(); itr != m_allPeers.end(); ++itr)
     {
@@ -392,10 +393,11 @@ void P2pMessageBus::doSubscribe()
             auto connection = findConnectionById(viaList[rndValue]);
             NX_ASSERT(connection);
             newSubscription[peer] = connection;
+            isUpdated = true;
         }
     }
-
-    resubscribePeers(newSubscription);
+    if (isUpdated)
+        resubscribePeers(newSubscription);
 }
 
 #if 0

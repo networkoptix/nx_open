@@ -56,9 +56,6 @@ public:
     ApiPeerData localPeer() const;
     ApiPeerData remotePeer() const;
 
-    void unsubscribeFrom(const ApiPersistentIdData& idList);
-    void subscribeTo(const std::vector<ApiPersistentIdData>& idList);
-
     State state() const;
     void setState(State state);
 
