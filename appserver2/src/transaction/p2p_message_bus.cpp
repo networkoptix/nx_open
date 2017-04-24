@@ -338,6 +338,15 @@ QMap<ApiPersistentIdData, P2pConnectionPtr> P2pMessageBus::getCurrentSubscriptio
     return result;
 }
 
+std::vector<quint32> P2pMessageBus::getDbSequences(const std::vector<ApiPersistentIdData>& peers)
+{
+    NX_ASSERT(m_db);
+    if (!m_db)
+        return std::vector<quint32>();
+    //m_db->transactionLog()->getTransactionsState(peers);
+    return std::vector<quint32>();
+}
+
 void P2pMessageBus::resubscribePeers(
     QMap<ApiPersistentIdData, P2pConnectionPtr> newSubscription)
 {
@@ -356,7 +365,8 @@ void P2pMessageBus::resubscribePeers(
             std::vector<PeerNumberType> shortValues;
             for (const auto& id: newValue)
                 shortValues.push_back(connection->encode(id));
-            connection->sendMessage(serializeSubscribeRequest(shortValues));
+            std::vector<quint32> sequenceList = getDbSequences(newValue);
+            connection->sendMessage(serializeSubscribeRequest(shortValues, sequenceList));
         }
     }
 }
@@ -499,19 +509,29 @@ void P2pMessageBus::at_gotMessage(const QSharedPointer<P2pConnection>& connectio
         connection->setState(P2pConnection::State::Error);
 }
 
-bool P2pMessageBus::handleResolvePeerNumberRequest(const P2pConnectionPtr& connection, const QByteArray& data)
+std::vector<PeerNumberType> P2pMessageBus::deserializeCompressedPeers(const QByteArray& data,  bool* success)
 {
-    std::vector<PeerNumberType> request;
-    BitStreamReader reader((const quint8*)data.data(), data.size());
+    std::vector<PeerNumberType> result;
+    BitStreamReader reader((const quint8*) data.data(), data.size());
+    *success = true;
     try
     {
         while (reader.bitsLeft() >= 8)
-            request.push_back(deserializeCompressPeerNumber(reader));
+            result.push_back(deserializeCompressPeerNumber(reader));
     }
     catch (...)
     {
-        return false; //< invalid message
+        *success = false;
     }
+    return result;
+}
+
+bool P2pMessageBus::handleResolvePeerNumberRequest(const P2pConnectionPtr& connection, const QByteArray& data)
+{
+    bool success = false;
+    std::vector<PeerNumberType> request = deserializeCompressedPeers(data, &success);
+    if (!success)
+        return false;
     connection->sendMessage(serializeResolvePeerNumberResponse(request));
     return true;
 }
@@ -547,32 +567,48 @@ bool P2pMessageBus::handleResolvePeerNumberResponse(const P2pConnectionPtr& conn
     return true;
 }
 
-QByteArray P2pMessageBus::serializeResolvePeerNumberRequest(const std::vector<PeerNumberType>& peers)
+QByteArray P2pMessageBus::serializeCompressedPeers(MessageType messageType, const std::vector<PeerNumberType>& peers)
 {
     QByteArray result;
     result.resize(peers.size() * 2 + 1);
     BitStreamWriter writer;
-    writer.setBuffer((quint8*) result.data(), result.size());
-    writer.putBits(8, (int) MessageType::resolvePeerNumberRequest);
-    for (const auto& peer: peers)
+    writer.setBuffer((quint8*)result.data(), result.size());
+    writer.putBits(8, (int)messageType);
+    for (const auto& peer : peers)
         serializeCompressPeerNumber(writer, peer);
     writer.flushBits();
     result.truncate(writer.getBytesCount());
     return result;
 }
 
-QByteArray P2pMessageBus::serializeSubscribeRequest(const std::vector<PeerNumberType>& peers)
+
+QByteArray P2pMessageBus::serializeResolvePeerNumberRequest(const std::vector<PeerNumberType>& peers)
 {
+    return serializeCompressedPeers(MessageType::resolvePeerNumberRequest, peers);
+}
+
+QByteArray P2pMessageBus::serializeSubscribeRequest(
+    const std::vector<PeerNumberType>& peers,
+    const std::vector<quint32>& sequences)
+{
+    NX_ASSERT(peers.size() == sequences.size());
+
     QByteArray result;
     result.resize(peers.size() * 2 + 1);
     BitStreamWriter writer;
     writer.setBuffer((quint8*)result.data(), result.size());
     writer.putBits(8, (int)MessageType::subscribeForDataUpdates);
-    for (const auto& peer: peers)
-        serializeCompressPeerNumber(writer, peer);
+    for (int i = 0; i < peers.size(); ++i)
+    {
+        writer.putBits(16, peers[i]);
+        writer.putBits(32, sequences[i]);
+    }
     writer.flushBits();
     result.truncate(writer.getBytesCount());
     return result;
+
+
+    return serializeCompressedPeers(MessageType::subscribeForDataUpdates, peers);
 }
 
 QByteArray P2pMessageBus::serializeResolvePeerNumberResponse(const std::vector<PeerNumberType>& peers)
@@ -629,6 +665,26 @@ bool P2pMessageBus::handleAlivePeers(const P2pConnectionPtr& connection, const Q
 
 bool P2pMessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data)
 {
+    bool success = false;
+    std::vector<PeerNumberType> request = deserializeCompressedPeers(data, &success);
+    if (!success)
+        return false;
+    std::vector<ApiPersistentIdData> subscription;
+    for (const auto& shortPeer: request)
+        subscription.push_back(m_localShortPeerInfo.decode(shortPeer));
+    std::sort(subscription.begin(), subscription.end());
+    auto& oldSubscription = connection->miscData().remoteSubscription;
+    std::vector<ApiPersistentIdData> diff;
+    std::set_difference(
+        subscription.begin(), subscription.end(),
+        oldSubscription.begin(), oldSubscription.end(),
+        std::inserter(diff, diff.begin()));
+
+
+
+    connection->miscData().remoteSubscription = subscription;
+
+
     return true;
 }
 

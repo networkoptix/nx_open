@@ -55,9 +55,12 @@ public:
     void start();
 private:
     QByteArray serializePeersMessage();
+    QByteArray serializeCompressedPeers(MessageType messageType, const std::vector<PeerNumberType>& peers);
     QByteArray serializeResolvePeerNumberRequest(const std::vector<PeerNumberType>& peers);
     QByteArray serializeResolvePeerNumberResponse(const std::vector<PeerNumberType>& peers);
-    QByteArray serializeSubscribeRequest(const std::vector<PeerNumberType>& peers);
+    QByteArray serializeSubscribeRequest(
+        const std::vector<PeerNumberType>& shortValues,
+        const std::vector<quint32>& sequences);
 private:
     void doPeriodicTasks();
     void processTemporaryOutgoingConnections();
@@ -65,6 +68,7 @@ private:
     void createOutgoingConnections();
     void sendAlivePeersMessage();
 
+    std::vector<PeerNumberType> deserializeCompressedPeers(const QByteArray& data, bool* success);
     void deserializeAlivePeersMessage(
         const P2pConnectionPtr& connection,
         const QByteArray& data);
@@ -85,6 +89,8 @@ private:
     bool handleAlivePeers(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handleSubscribeForDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handlePushTransactionData(const P2pConnectionPtr& connection, const QByteArray& data);
+
+    std::vector<quint32> getDbSequences(const std::vector<ApiPersistentIdData>& peers);
 
     friend struct GotTransactionFuction;
 
