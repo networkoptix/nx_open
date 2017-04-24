@@ -167,7 +167,7 @@ void QnUniversalRequestProcessor::run()
             t.restart();
             parseRequest();
 
-            const auto redirect = QnRestProcessorPool::instance()->getRedirectRule(
+            const auto redirect = d->owner->processorPool()->getRedirectRule(
                 d->request.requestLine.url.path());
             if (redirect)
             {
