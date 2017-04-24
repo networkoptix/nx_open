@@ -9,7 +9,7 @@ enum class MessageType
     resolvePeerNumberResponse,
     alivePeers,
     subscribeForDataUpdates,
-    pushTransactionData
+    pushTransactionData,
 };
 
 using PeerNumberType = quint16;

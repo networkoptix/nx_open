@@ -59,6 +59,7 @@ public:
     State state() const;
     void setState(State state);
 
+    void sendMessage(MessageType messageType, const nx::Buffer& data);
     void sendMessage(const nx::Buffer& data);
 
     qint64 remoteIdentityTime() const;

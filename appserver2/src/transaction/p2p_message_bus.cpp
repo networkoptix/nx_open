@@ -681,6 +681,7 @@ struct SendTransactionToTransportFuction
         const QnTransaction<T> &transaction,
         const P2pConnectionPtr& connection) const
     {
+        // todo: implement me
         //connection->sendTransaction(transaction);
     }
 };
@@ -689,12 +690,12 @@ struct SendTransactionToTransportFastFuction
 {
     bool operator()(
         P2pMessageBus* /*bus*/,
-        Qn::SerializationFormat srcFormat,
+        Qn::SerializationFormat /* srcFormat */,
         const QByteArray& serializedTran,
         const P2pConnectionPtr& connection) const
     {
         return true;
-        //return connection->sendSerializedTransaction(srcFormat, serializedTran);
+        return connection->sendMessage(MessageType::pushTransactionData, serializedTran);
     }
 };
 

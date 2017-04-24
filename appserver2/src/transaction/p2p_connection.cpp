@@ -383,6 +383,15 @@ P2pConnection::Direction P2pConnection::direction() const
     return m_direction;
 }
 
+void P2pConnection::sendMessage(MessageType messageType, const nx::Buffer& data)
+{
+    nx::Buffer buffer;
+    buffer.reserve(data.size() + 1);
+    buffer.append((char) messageType);
+    buffer.append(data);
+    sendMessage(buffer);
+}
+
 void P2pConnection::sendMessage(const nx::Buffer& data)
 {
     using namespace std::placeholders;
