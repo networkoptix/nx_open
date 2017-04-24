@@ -11,22 +11,24 @@ static const std::chrono::milliseconds kReconnectInterval = std::chrono::minutes
 static const auto kUrl = lit("http://%1/api/moduleInformation?showAddresses=false");
 static const KeepAliveOptions kKeepAliveOptions(60, 10, 3);
 
-ModuleConnector::ModuleConnector(
-    ConnectedHandler connectedHandler,
-    DisconnectedHandler disconnectedHandler)
-:
-    m_connectedHandler(std::move(connectedHandler)),
-    m_disconnectedHandler(std::move(disconnectedHandler))
+ModuleConnector::ModuleConnector(network::aio::AbstractAioThread* thread):
+    network::aio::BasicPollable(thread)
 {
 }
 
-void ModuleConnector::newEndpoint(const QnUuid& uuid, const SocketAddress& endpoint)
+void ModuleConnector::setConnectHandler(ConnectedHandler handler)
 {
-    const auto it = m_modules.emplace(uuid, std::unique_ptr<Module>());
-    if (it.second)
-        it.first->second = std::make_unique<Module>(this, uuid);
+    m_connectedHandler = std::move(handler);
+}
 
-    it.first->second->addEndpoint(endpoint);
+void ModuleConnector::setDisconnectHandler(DisconnectedHandler handler)
+{
+    m_disconnectedHandler = std::move(handler);
+}
+
+void ModuleConnector::newEndpoint(const SocketAddress& endpoint, const QnUuid& id)
+{
+    getModule(id)->addEndpoint(endpoint);
 }
 
 void ModuleConnector::stopWhileInAioThread()
@@ -34,11 +36,12 @@ void ModuleConnector::stopWhileInAioThread()
     m_modules.clear();
 }
 
-ModuleConnector::Module::Module(ModuleConnector* parent, const QnUuid& uuid):
+ModuleConnector::Module::Module(ModuleConnector* parent, const QnUuid& id):
     m_parent(parent),
-    m_uuid(uuid)
+    m_id(id)
 {
     m_timer.bindToAioThread(parent->getAioThread());
+    NX_LOGX(lm("New %1").strs(id), cl_logDEBUG1);
 }
 
 ModuleConnector::Module::~Module()
@@ -67,7 +70,7 @@ void ModuleConnector::Module::connect(Endpoints::iterator endpointsGroup)
     if (endpointsGroup == m_endpoints.end())
     {
         NX_LOGX(lm("No more endpoints, retry in %1").strs(kReconnectInterval), cl_logDEBUG2);
-        m_parent->m_disconnectedHandler(m_uuid);
+        m_parent->m_disconnectedHandler(m_id);
         m_timer.start(kReconnectInterval, [this](){ connect(m_endpoints.begin()); });
         return;
     }
@@ -78,7 +81,7 @@ void ModuleConnector::Module::connect(Endpoints::iterator endpointsGroup)
     m_timer.cancelSync();
     for (const auto& endpoint: endpointsGroup->second)
     {
-        NX_LOGX(lm("Attempt to connect to %1 by %2").strs(m_uuid, endpoint), cl_logDEBUG2);
+        NX_LOGX(lm("Attempt to connect to %1 by %2").strs(m_id, endpoint), cl_logDEBUG2);
         const auto client = nx_http::AsyncHttpClient::create();
         m_httpClients.insert(client);
         client->bindToAioThread(m_timer.getAioThread());
@@ -89,12 +92,13 @@ void ModuleConnector::Module::connect(Endpoints::iterator endpointsGroup)
                 const auto moduleInformation = getInformation(client);
                 if (moduleInformation)
                 {
-                    for (const auto& client: m_httpClients)
-                        client->pleaseStopSync();
-                    m_httpClients.clear();
+                    if (moduleInformation->id == m_id)
+                        return saveConnection(endpoint, std::move(client), *moduleInformation);
 
-                    m_parent->m_connectedHandler(moduleInformation.get(), endpoint);
-                    return monitorConnection(std::move(client));
+                    // Transfer this connection to a different module.
+                    endpointsGroup->second.erase(endpoint);
+                    m_parent->getModule(moduleInformation->id)
+                        ->saveConnection(endpoint, std::move(client), *moduleInformation);
                 }
 
                 if (!m_httpClients.empty())
@@ -129,19 +133,28 @@ boost::optional<QnModuleInformation> ModuleConnector::Module::getInformation(
 
     QnModuleInformation moduleInformation;
     if (!QJson::deserialize<QnModuleInformation>(restResult.reply, &moduleInformation)
-        || moduleInformation.id != m_uuid)
+        || moduleInformation.id.isNull())
     {
-        NX_LOGX(lm("Connected to a wrong server (%2) instead of %3")
-            .strs(moduleInformation.id, m_uuid), cl_logDEBUG2);
+        NX_LOGX(lm("Can not desserialize rsponse from %1")
+            .strs(moduleInformation.id), cl_logDEBUG2);
         return boost::none;
     }
 
     return moduleInformation;
 }
 
-void ModuleConnector::Module::monitorConnection(nx_http::AsyncHttpClientPtr client)
+void ModuleConnector::Module::saveConnection(
+   SocketAddress endpoint, nx_http::AsyncHttpClientPtr client, const QnModuleInformation& information)
 {
-    NX_LOGX(lm("Connected to %1").strs(m_uuid), cl_logDEBUG1);
+    if (m_socket)
+        return;
+
+    for (const auto& client: m_httpClients)
+        client->pleaseStopSync();
+    m_httpClients.clear();
+
+    NX_LOGX(lm("Connected to %1").strs(m_id), cl_logDEBUG1);
+    m_parent->m_connectedHandler(information, std::move(endpoint));
 
     // TODO: It is better to reask for moduleInformation instead of connection failure wait,
     // but is easier for now.
@@ -158,6 +171,15 @@ void ModuleConnector::Module::monitorConnection(nx_http::AsyncHttpClientPtr clie
             m_socket.reset();
             connect(m_endpoints.begin()); //< Reconnect attempt.
         });
+}
+
+ModuleConnector::Module* ModuleConnector::getModule(const QnUuid& id)
+{
+    const auto it = m_modules.emplace(id, std::unique_ptr<Module>());
+    if (it.second)
+        it.first->second = std::make_unique<Module>(this, id);
+
+    return it.first->second.get();
 }
 
 } // namespace discovery

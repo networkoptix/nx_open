@@ -17,8 +17,10 @@ public:
     typedef utils::MoveOnlyFunc<void(QnModuleInformation, SocketAddress)> ConnectedHandler;
     typedef utils::MoveOnlyFunc<void(QnUuid)> DisconnectedHandler;
 
-    ModuleConnector(ConnectedHandler connectedHandler, DisconnectedHandler disconnectedHandler);
-    void newEndpoint(const QnUuid& uuid, const SocketAddress& endpoint);
+    ModuleConnector(network::aio::AbstractAioThread* thread = nullptr);
+    void setConnectHandler(ConnectedHandler handler);
+    void setDisconnectHandler(DisconnectedHandler handler);
+    void newEndpoint(const SocketAddress& endpoint, const QnUuid& id = QnUuid());
 
 protected:
     virtual void stopWhileInAioThread() override;
@@ -27,7 +29,7 @@ private:
     class Module
     {
     public:
-        Module(ModuleConnector* parent, const QnUuid& uuid);
+        Module(ModuleConnector* parent, const QnUuid& id);
         ~Module();
         void addEndpoint(const SocketAddress& endpoint);
 
@@ -37,20 +39,23 @@ private:
 
         void connect(Endpoints::iterator endpointsGroup);
         boost::optional<QnModuleInformation> getInformation(nx_http::AsyncHttpClientPtr client);
-        void monitorConnection(nx_http::AsyncHttpClientPtr client);
+        void saveConnection(SocketAddress endpoint, nx_http::AsyncHttpClientPtr client,
+            const QnModuleInformation& information);
 
     private:
         ModuleConnector* const m_parent;
-        const QnUuid m_uuid;
+        const QnUuid m_id;
         Endpoints m_endpoints;
         network::aio::Timer m_timer;
         std::set<nx_http::AsyncHttpClientPtr> m_httpClients;
         std::unique_ptr<AbstractStreamSocket> m_socket;
     };
 
+    Module* getModule(const QnUuid& id);
+
 private:
-    const ConnectedHandler m_connectedHandler;
-    const DisconnectedHandler m_disconnectedHandler;
+    ConnectedHandler m_connectedHandler;
+    DisconnectedHandler m_disconnectedHandler;
     std::map<QnUuid, std::unique_ptr<Module>> m_modules;
 };
 
