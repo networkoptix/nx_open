@@ -54,7 +54,7 @@ private:
     std::map<std::string, Mapped> m_pathToMapped;
 };
 
-template<template<typename> typename PathMatcher>
+template<template<typename> class PathMatcher>
 class BasicMessageDispatcher
 {
 public:
@@ -143,7 +143,7 @@ private:
     struct PathMatchContext
     {
         FactoryFunc defaultFactory;
-        typename PathMatcher<FactoryFunc> pathToFactory;
+        PathMatcher<FactoryFunc> pathToFactory;
     };
 
     std::map<QString, QString> m_rewritePrefixes;
