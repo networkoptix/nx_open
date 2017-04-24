@@ -113,7 +113,7 @@ AbstractActionsMetrics::AbstractActionsMetrics(const action::ManagerPtr& actionM
         addActionMetric(action);
     };
 
-    connect(actionManager, &action::Manager::actionRegistered, this, addAction);
+    connect(actionManager.data(), &action::Manager::actionRegistered, this, addAction);
 }
 
 AbstractActionsMetrics::~AbstractActionsMetrics()
