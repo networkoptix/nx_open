@@ -1,10 +1,11 @@
 #pragma once
 
 #include <map>
-#include <regex>
-#include <string>
 
 #include <boost/optional.hpp>
+
+#include <QtCore/QRegExp>
+#include <QtCore/QString>
 
 namespace nx_http {
 namespace server {
@@ -23,7 +24,7 @@ public:
     bool add(const std::string& pathTemplate, Mapped mapped)
     {
         MatchContext matchContext;
-        matchContext.regex = convertToRegex(pathTemplate);
+        matchContext.regex = convertToRegex(QString::fromStdString(pathTemplate));
         matchContext.mapped = std::move(mapped);
 
         return m_restPathToMatchContext.emplace(
@@ -35,15 +36,21 @@ public:
         const std::string& path,
         std::vector<std::string>* pathParams) const
     {
-        for (const auto& matchContext: m_restPathToMatchContext)
+        for (auto& matchContext: m_restPathToMatchContext)
         {
-            std::smatch matchResult;
-            if (std::regex_search(path, matchResult, matchContext.second.regex))
+            auto str = QString::fromStdString(path);
+
+            int pos = 0;
+            while ((pos = matchContext.second.regex.indexIn(str, pos)) != -1)
             {
-                for (size_t i = 1; i < matchResult.size(); ++i)
-                    pathParams->push_back(matchResult[i]);
-                return boost::optional<const Mapped&>(matchContext.second.mapped);
+                pathParams->push_back(matchContext.second.regex.cap(1).toStdString());
+                pos += matchContext.second.regex.matchedLength();
             }
+
+            if (pathParams->empty())
+                continue;
+
+            return boost::optional<const Mapped&>(matchContext.second.mapped);
         }
 
         return boost::none;
@@ -52,29 +59,25 @@ public:
 private:
     struct MatchContext
     {
-        std::regex regex;
+        QRegExp regex;
         Mapped mapped;
     };
 
     /** REST path template, context */
     std::map<std::string, MatchContext> m_restPathToMatchContext;
 
-    std::regex convertToRegex(const std::string& pathTemplate)
+    QRegExp convertToRegex(const QString& pathTemplate)
     {
-        const std::regex replaceRestParams("{[0-9a-zA-Z]*}", std::regex_constants::basic);
-        const std::string replacement("\\([0-9a-zA-Z_.-]*\\)");
+        const QRegExp replaceRestParams("\\{[0-9a-zA-Z]+\\}", Qt::CaseInsensitive);
+        const QString replacement("([0-9a-zA-Z_.-]+)");
 
-        std::string restPathMatchRegex;
+        QString restPathMatchRegex;
         restPathMatchRegex += "^";
-        restPathMatchRegex += std::regex_replace(
-            pathTemplate,
-            replaceRestParams,
-            replacement);
+        restPathMatchRegex += pathTemplate;
         restPathMatchRegex += "$";
+        restPathMatchRegex.replace(replaceRestParams, replacement);
 
-        return std::regex(
-            std::move(restPathMatchRegex),
-            std::regex::icase | std::regex_constants::basic);
+        return QRegExp(std::move(restPathMatchRegex), Qt::CaseInsensitive);
     }
 };
 

@@ -74,7 +74,7 @@ TEST_F(RestPathMatcher, no_suitable_handler)
     assertPathNotMatched("/account/systems");
 }
 
-TEST_F(RestPathMatcher, DISABLED_empty_parameter_value_is_not_accepted)
+TEST_F(RestPathMatcher, empty_parameter_value_is_not_accepted)
 {
     assertPathRegistered("/account/{accountId}/systems", 1);
     assertPathNotMatched("/account//systems");
