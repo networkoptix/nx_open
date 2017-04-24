@@ -121,7 +121,7 @@ private:
 
     PeerNumberInfo m_shortPeerInfo;
 
-    std::vector<ApiPersistentIdData, P2pConnectionPtr> m_currentSubscriptions;
+    std::vector<ApiPersistentIdData> m_currentSubscriptions;
 
 
     int m_remotePeerEcProtoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION;

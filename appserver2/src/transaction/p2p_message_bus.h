@@ -84,7 +84,7 @@ private:
     friend struct GotTransactionFuction;
 
     template <class T>
-    void gotTransaction(const QnTransaction<T> &tran,const P2pConnectionPtr& connection);
+    void gotTransaction(const QnTransaction<T>& tran,const P2pConnectionPtr& connection);
 private slots:
     void at_gotMessage(const QSharedPointer<P2pConnection>& connection, MessageType messageType, const QByteArray& payload);
 private:

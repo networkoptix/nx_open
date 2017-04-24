@@ -542,6 +542,41 @@ bool P2pMessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connec
     return true;
 }
 
+template <class T>
+void P2pMessageBus::gotTransaction(
+    const QnTransaction<T> &tran,
+    const P2pConnectionPtr& connection)
+{
+    if (!tran.persistentInfo.isNull() && m_db)
+    {
+        QByteArray serializedTran =
+            QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
+        ErrorCode errorCode = dbManager(m_db, connection->getUserAccessData())
+            .executeTransaction(tran, serializedTran);
+        switch (errorCode)
+        {
+        case ErrorCode::ok:
+            break;
+        case ErrorCode::containsBecauseTimestamp:
+            //proxyFillerTransaction(tran, transportHeader);
+        case ErrorCode::containsBecauseSequence:
+            return; // do not proxy if transaction already exists
+        default:
+            NX_LOG(
+                QnLog::EC2_TRAN_LOG,
+                lit("Can't handle transaction %1: %2. Reopening connection...")
+                .arg(ApiCommand::toString(tran.command))
+                .arg(ec2::toString(errorCode)),
+                cl_logWARNING);
+            connection->setState(P2pConnection::State::Error);
+            return;
+        }
+    }
+
+    if (m_handler)
+        m_handler->triggerNotification(tran, NotificationSource::Remote);
+}
+
 struct GotTransactionFuction
 {
     typedef void result_type;
@@ -567,39 +602,5 @@ bool P2pMessageBus::handlePushTransactionData(const P2pConnectionPtr& connection
         [](Qn::SerializationFormat, const QByteArray&) { return false; });
 }
 
-template <class T>
-void QnTransactionMessageBus::gotTransaction(
-    const QnTransaction<T> &tran,
-    const P2pConnectionPtr& connection)
-{
-    if (!tran.persistentInfo.isNull() && m_db)
-    {
-        QByteArray serializedTran =
-            QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
-        ErrorCode errorCode = dbManager(m_db, sender->getUserAccessData())
-            .executeTransaction(tran, serializedTran);
-        switch (errorCode)
-        {
-            case ErrorCode::ok:
-                break;
-            case ErrorCode::containsBecauseTimestamp:
-                //proxyFillerTransaction(tran, transportHeader);
-            case ErrorCode::containsBecauseSequence:
-                return; // do not proxy if transaction already exists
-            default:
-                NX_LOG(
-                    QnLog::EC2_TRAN_LOG,
-                    lit("Can't handle transaction %1: %2. Reopening connection...")
-                    .arg(ApiCommand::toString(tran.command))
-                    .arg(ec2::toString(errorCode)),
-                    cl_logWARNING);
-                connection->setState(P2pConnection::state::Error);
-                return;
-        }
-    }
-
-    if (m_handler)
-        m_handler->triggerNotification(tran, NotificationSource::Remote);
-}
 
 } // ec2
