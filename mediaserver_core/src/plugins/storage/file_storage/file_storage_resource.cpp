@@ -1036,10 +1036,8 @@ bool QnFileStorageResource::isStorageDirMounted() const
         return findPathInTabFile(m_localPath, lit("/proc/mounts"), &mountPoint, true);
     else if (findPathInTabFile(getPath(), lit("/etc/fstab"), &mountPoint, false))
         return findPathInTabFile(mountPoint, lit("/etc/mtab"), &mountPoint, true);
-    else
-        return findPathInTabFile(getPath(), lit("/etc/mtab"), &mountPoint, false);
 
-    return false;
+    return findPathInTabFile(getPath(), lit("/etc/mtab"), &mountPoint, false);
 }
 #endif    // _WIN32
 
