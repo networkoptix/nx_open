@@ -50,6 +50,23 @@ protected:
         //clientSocket2->pleaseStopSync();
     }
 
+    void prepareTestData(nx::Buffer* payload, int size)
+    {
+        static const char* const kPattern = "hello";
+        static const int kPatternSize = (int)std::strlen(kPattern);
+
+        payload->resize((size_t)size);
+        char* pdata = payload->data();
+
+        while (size > 0)
+        {
+            int copySize = std::min(kPatternSize, size);
+            memcpy(pdata, kPattern, copySize);
+            size -= copySize;
+            pdata += copySize;
+        }
+    }
+
     std::unique_ptr<AbstractStreamServerSocket> m_acceptor;
     std::unique_ptr<AbstractStreamSocket> clientSocket1;
     std::unique_ptr<AbstractStreamSocket> clientSocket2;
@@ -66,14 +83,18 @@ protected:
     nx::Buffer readBuffer;
 };
 
-TEST_F(Websocket, connect)
+TEST_F(Websocket, SingleMessage_singleTransfer)
 {
     startFuture.wait();
 
+    nx::Buffer sendBuf;
+    prepareTestData(&sendBuf, 1024 * 1024 * 10);
+
     clientWebsocket->sendAsync(
-        "hello",
+        sendBuf,
         [this](SystemError::ErrorCode ecode, size_t transferred)
         {
+            ASSERT_EQ(ecode, SystemError::noError);
         });
 
     serverWebsocket->readSomeAsync(
@@ -83,7 +104,13 @@ TEST_F(Websocket, connect)
             auto i = transferred;
             readyPromise.set_value();
         });
+
     readyFuture.wait();
+    ASSERT_EQ(readBuffer, sendBuf);
+}
+
+TEST_F(Websocket, SingleMessage_singleTransfer)
+{
 }
 
 }
