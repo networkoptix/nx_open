@@ -126,9 +126,8 @@ Item
                 aroundY * rotationFactor))
         }
 
-        function scaleBy(delta)
+        function scaleBy(deltaPower)
         {
-            var deltaPower = delta / 1.0e5
             scalePower = Math.min(4.0, Math.max(0.0, scalePower + deltaPower))
         }
 
@@ -202,7 +201,7 @@ Item
         onWheel:
         {
             const kSensitivity = 100.0
-            interactor.scaleBy(wheel.angleDelta.y * kSensitivity)
+            interactor.scaleBy(wheel.angleDelta.y * kSensitivity / 1.0e5)
         }
 
         function updateDrag(dx, dy)
@@ -212,5 +211,29 @@ Item
             interactor.updateRotation(dy * normalization, 
                                       dx * normalization)
         }
+    }
+
+    PinchArea
+    {
+        id: pinchArea
+
+        anchors.fill: parent
+
+        property real startScalePower
+
+        onPinchStarted:
+        {
+            startScalePower = interactor.scalePower
+        }
+
+        onPinchUpdated: updateScale(pinch.scale)
+
+        onPinchFinished: updateScale(pinch.scale)
+
+        function updateScale(scale)
+        {
+            interactor.scalePower = startScalePower
+            interactor.scaleBy(Math.log2(pinchEvent.scale))
+        }                
     }
 }
