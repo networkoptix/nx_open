@@ -142,8 +142,7 @@ void QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr
     setCurrentUser(QnUserResourcePtr());
     if (!commonModule()->remoteGUID().isNull())
     {
-        menu()->trigger(QnActions::DisconnectAction, QnActionParameters()
-            .withArgument(Qn::ForceRole, true));
+        menu()->trigger(QnActions::DisconnectAction, {Qn::ForceRole, true});
     }
 }
 

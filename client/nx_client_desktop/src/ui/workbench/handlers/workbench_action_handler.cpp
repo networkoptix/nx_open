@@ -175,6 +175,8 @@
 #include "network/authutil.h"
 #include <core/resource/fake_media_server.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 
 /* Beta version message. */
@@ -370,7 +372,7 @@ void ActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResou
         return;
 
 
-    if (!menu()->canTrigger(QnActions::OpenInLayoutAction, QnActionParameters(resource)
+    if (!menu()->canTrigger(QnActions::OpenInLayoutAction, action::Parameters(resource)
         .withArgument(Qn::LayoutResourceRole, layout)))
     {
         return;
@@ -668,7 +670,7 @@ void ActionHandler::at_previousLayoutAction_triggered() {
 
 void ActionHandler::at_openInLayoutAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
 
     QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole);
     NX_ASSERT(layout, "No layout provided.");
@@ -783,7 +785,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
 
 void ActionHandler::at_openInCurrentLayoutAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    auto parameters = menu()->currentParameters(sender());
     const auto currentLayout = workbench()->currentLayout();
 
     // Check if we are in videowall control mode
@@ -809,7 +811,7 @@ void ActionHandler::at_openInNewLayoutAction_triggered() {
 
 void ActionHandler::at_openInNewWindowAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
 
     QnResourceList filtered;
     for (const auto& resource: parameters.resources())
@@ -947,7 +949,7 @@ void ActionHandler::at_cameraListChecked(int status, const QnCameraListReply& re
 }
 
 void ActionHandler::at_moveCameraAction_triggered() {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
 
     QnResourceList resources = parameters.resources();
     QnMediaServerResourcePtr server = parameters.argument<QnMediaServerResourcePtr>(Qn::MediaServerResourceRole);
@@ -980,7 +982,7 @@ void ActionHandler::at_dropResourcesAction_triggered()
     if (isLayoutTourReviewMode)
         return;
 
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    auto parameters = menu()->currentParameters(sender());
 
     QnResourceList resources = parameters.resources();
     QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
@@ -1020,7 +1022,7 @@ void ActionHandler::at_dropResourcesAction_triggered()
 }
 
 void ActionHandler::at_dropResourcesIntoNewLayoutAction_triggered() {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
 
     QnLayoutResourceList layouts = parameters.resources().filtered<QnLayoutResource>();
     QnVideoWallResourceList videowalls = parameters.resources().filtered<QnVideoWallResource>();
@@ -1126,7 +1128,7 @@ void ActionHandler::at_openBusinessRulesAction_triggered()
     QnNonModalDialogConstructor<QnBusinessRulesDialog> dialogConstructor(m_businessRulesDialog, mainWindow());
 
     QStringList filter;
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     QnVirtualCameraResourceList cameras = parameters.resources().filtered<QnVirtualCameraResource>();
     if (!cameras.isEmpty())
     {
@@ -1213,7 +1215,7 @@ void ActionHandler::at_openBookmarksSearchAction_triggered()
 void ActionHandler::at_openBusinessLogAction_triggered() {
     QnNonModalDialogConstructor<QnEventLogDialog> dialogConstructor(m_businessEventsLogDialog, mainWindow());
 
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
 
     QnBusiness::EventType eventType = parameters.argument(Qn::EventTypeRole, QnBusiness::AnyBusinessEvent);
     auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
@@ -1236,12 +1238,12 @@ void ActionHandler::at_openBusinessLogAction_triggered() {
 
 void ActionHandler::at_openAuditLogAction_triggered() {
     QnNonModalDialogConstructor<QnAuditLogDialog> dialogConstructor(m_auditLogDialog, mainWindow());
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
 }
 
 void ActionHandler::at_cameraListAction_triggered() {
     QnNonModalDialogConstructor<QnCameraListDialog> dialogConstructor(m_cameraListDialog, mainWindow());
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     QnMediaServerResourcePtr server;
     if (!parameters.resources().isEmpty())
         server = parameters.resource().dynamicCast<QnMediaServerResource>();
@@ -1250,7 +1252,7 @@ void ActionHandler::at_cameraListAction_triggered() {
 
 void ActionHandler::at_thumbnailsSearchAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
 
     QnResourcePtr resource = parameters.resource();
     if (!resource)
@@ -1540,9 +1542,10 @@ void ActionHandler::at_serverLogsAction_triggered()
     openInBrowser(server, lit("/api/showLog?lines=1000"));
 }
 
-void ActionHandler::at_serverIssuesAction_triggered() {
+void ActionHandler::at_serverIssuesAction_triggered()
+{
     menu()->trigger(QnActions::OpenBusinessLogAction,
-        QnActionParameters().withArgument(Qn::EventTypeRole, QnBusiness::AnyServerEvent));
+        {Qn::EventTypeRole, QnBusiness::AnyServerEvent});
 }
 
 void ActionHandler::at_pingAction_triggered()
@@ -1628,7 +1631,7 @@ bool ActionHandler::validateResourceName(const QnResourcePtr &resource, const QS
 
 void ActionHandler::at_renameAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
 
     QnResourcePtr resource;
 
@@ -1769,7 +1772,7 @@ void ActionHandler::at_adjustVideoAction_triggered()
 }
 
 void ActionHandler::at_createZoomWindowAction_triggered() {
-    QnActionParameters params = menu()->currentParameters(sender());
+    const auto params = menu()->currentParameters(sender());
 
     QnMediaResourceWidget *widget = params.widget<QnMediaResourceWidget>();
     if (!widget)
@@ -1812,7 +1815,7 @@ void ActionHandler::at_setAsBackgroundAction_triggered() {
     progressDialog->setCancelButton(NULL);
     connect(progressDialog, &QnProgressDialog::canceled, progressDialog, &QObject::deleteLater);
 
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
 
     ServerImageCache *cache = new ServerImageCache(this);
     cache->setProperty(uploadingImageARPropertyName, parameters.widget()->aspectRatio());

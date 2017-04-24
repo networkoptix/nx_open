@@ -7,20 +7,20 @@
 
 #include <utils/common/delayed.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 
     /* Update selection no more often than once in 50 ms */
     const int selectionUpdateTimeoutMs = 50;
 }
 
-using namespace nx::client::desktop::ui::action;
-
 QnWorkbenchSelectionWatcher::QnWorkbenchSelectionWatcher(QObject *parent /*= nullptr*/):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_scope(TreeScope | SceneScope),
+    m_scope(action::TreeScope | action::SceneScope),
     m_selectionUpdatePending(false),
-    m_lastScope(InvalidScope)
+    m_lastScope(action::InvalidScope)
 {
     connect(action(QnActions::SelectionChangeAction), &QAction::triggered, this,
         [this]()
@@ -39,11 +39,11 @@ QnWorkbenchSelectionWatcher::~QnWorkbenchSelectionWatcher() {
 }
 
 
-nx::client::desktop::ui::action::ActionScopes QnWorkbenchSelectionWatcher::scope() const {
+action::ActionScopes QnWorkbenchSelectionWatcher::scope() const {
     return m_scope;
 }
 
-void QnWorkbenchSelectionWatcher::setScope(nx::client::desktop::ui::action::ActionScopes value) {
+void QnWorkbenchSelectionWatcher::setScope(action::ActionScopes value) {
     m_scope = value;
 }
 
@@ -63,7 +63,7 @@ void QnWorkbenchSelectionWatcher::updateFromSelection() {
     else
         m_lastScope = currentScope;
 
-    if (currentScope == InvalidScope)
+    if (currentScope == action::InvalidScope)
         return;
 
     auto resources = provider->currentParameters(currentScope).resources();

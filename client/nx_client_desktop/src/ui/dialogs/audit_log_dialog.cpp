@@ -57,6 +57,8 @@
 
 #include <ui/workaround/hidpi_workarounds.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace
 {
     enum MasterGridTabIndex
@@ -632,7 +634,6 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
             resList << res;
     }
 
-    QnActionParameters params(resList);
     if (resList.isEmpty())
     {
         QnMessageBox::warning(this, tr("No archive for this position"));
@@ -643,6 +644,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     period.startTimeMs = record->rangeStartSec * 1000ll;
     period.durationMs = (record->rangeEndSec - record->rangeStartSec) * 1000ll;
 
+    action::Parameters params(resList);
     params.setArgument(Qn::ItemTimeRole, period.startTimeMs);
     if (period.durationMs > 0)
         params.setArgument(Qn::TimePeriodRole, period);
@@ -740,7 +742,7 @@ void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::IDT
         return;
     }
 
-    QnActionParameters params(resList);
+    action::Parameters params(resList);
     params.setArgument(Qn::ItemTimeRole, record->rangeStartSec * 1000ll);
     params.setArgument(Qn::FocusTabRole, selectedPage);
     context()->menu()->trigger(actionId, params);
@@ -921,11 +923,10 @@ void QnAuditLogDialog::at_customContextMenuRequested(const QPoint&)
 
         if (resource)
         {
-            QnActionParameters parameters(resource);
+            action::Parameters parameters(resource);
             parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
 
-            using namespace nx::client::desktop::ui::action;
-            menu.reset(manager->newMenu(TreeScope, nullptr, parameters));
+            menu.reset(manager->newMenu(action::TreeScope, nullptr, parameters));
             foreach(QAction* action, menu->actions())
                 action->setShortcut(QKeySequence());
         }

@@ -62,18 +62,18 @@ public:
         insert(qMetaTypeId<QnLayoutResourcePtr>(), LayoutResourcePtr);
         insert(qMetaTypeId<QnMediaServerResourcePtr>(), MediaServerResourcePtr);
         insert(qMetaTypeId<QnResourceList>(), ResourceList);
-        insert(qMetaTypeId<QnResourceWidget *>(), ResourceWidget);
+        insert(qMetaTypeId<QnResourceWidget*>(), ResourceWidget);
         insert(qMetaTypeId<QnResourceWidgetList>(), ResourceWidgetList);
         insert(qMetaTypeId<QnLayoutItemIndexList>(), LayoutItemIndexList);
         insert(qMetaTypeId<QnVideoWallItemIndexList>(), VideoWallItemIndexList);
         insert(qMetaTypeId<QnVideoWallMatrixIndexList>(), VideoWallMatrixIndexList);
-        insert(qMetaTypeId<QnWorkbenchLayout *>(), WorkbenchLayout);
+        insert(qMetaTypeId<QnWorkbenchLayout*>(), WorkbenchLayout);
         insert(qMetaTypeId<QnWorkbenchLayoutList>(), WorkbenchLayoutList);
     }
 };
 Q_GLOBAL_STATIC(QnActionMetaTypeMap, qn_actionMetaTypeMap);
 
-QnResourcePtr singleResource(const QVariant &items)
+QnResourcePtr singleResource(const QVariant& items)
 {
     using namespace ParameterMetaType;
 
@@ -94,18 +94,18 @@ QnResourcePtr singleResource(const QVariant &items)
 
 
 template<class T>
-bool isValid(const T &value)
+bool isValid(const T& value)
 {
     return value;
 }
 
-bool isValid(const QnLayoutItemIndex &value)
+bool isValid(const QnLayoutItemIndex& value)
 {
     return !value.isNull();
 }
 
 template<class List, class T>
-List makeList(const T &value)
+List makeList(const T& value)
 {
     List result;
     if (isValid(value))
@@ -115,7 +115,7 @@ List makeList(const T &value)
 
 } // anonymous namespace
 
-int ParameterTypes::size(const QVariant &items)
+int ParameterTypes::size(const QVariant& items)
 {
     using namespace ParameterMetaType;
 
@@ -129,7 +129,7 @@ int ParameterTypes::size(const QVariant &items)
         case ResourceList:
             return items.value<QnResourceList>().size();
         case ResourceWidget:
-            return items.value<QnResourceWidget *>() ? 1 : 0;
+            return items.value<QnResourceWidget*>() ? 1 : 0;
         case ResourceWidgetList:
             return items.value<QnResourceWidgetList>().size();
         case LayoutItemIndexList:
@@ -139,7 +139,7 @@ int ParameterTypes::size(const QVariant &items)
         case VideoWallMatrixIndexList:
             return items.value<QnVideoWallMatrixIndexList>().size();
         case WorkbenchLayout:
-            return items.value<QnWorkbenchLayout *>() ? 1 : 0;
+            return items.value<QnWorkbenchLayout*>() ? 1 : 0;
         case WorkbenchLayoutList:
             return items.value<QnWorkbenchLayoutList>().size();
         default:
@@ -147,7 +147,7 @@ int ParameterTypes::size(const QVariant &items)
     }
 }
 
-ActionParameterType ParameterTypes::type(const QVariant &items)
+ActionParameterType ParameterTypes::type(const QVariant& items)
 {
     using namespace ParameterMetaType;
 
@@ -176,7 +176,7 @@ ActionParameterType ParameterTypes::type(const QVariant &items)
     }
 }
 
-QnResourcePtr ParameterTypes::resource(QnResourceWidget *widget)
+QnResourcePtr ParameterTypes::resource(QnResourceWidget* widget)
 {
     if (widget == NULL)
         return QnResourcePtr();
@@ -184,16 +184,16 @@ QnResourcePtr ParameterTypes::resource(QnResourceWidget *widget)
     return widget->resource();
 }
 
-QnResourceList ParameterTypes::resources(QnResourceWidget *widget)
+QnResourceList ParameterTypes::resources(QnResourceWidget* widget)
 {
     return makeList<QnResourceList>(resource(widget));
 }
 
-QnResourceList ParameterTypes::resources(const QnResourceWidgetList &widgets)
+QnResourceList ParameterTypes::resources(const QnResourceWidgetList& widgets)
 {
     QnResourceList result;
 
-    foreach(QnResourceWidget *widget, widgets)
+    for (auto widget: widgets)
     {
         QnResourcePtr resource = ParameterTypes::resource(widget);
         if (!resource)
@@ -205,11 +205,11 @@ QnResourceList ParameterTypes::resources(const QnResourceWidgetList &widgets)
     return result;
 }
 
-QnResourceList ParameterTypes::resources(const QnLayoutItemIndexList &layoutItems)
+QnResourceList ParameterTypes::resources(const QnLayoutItemIndexList& layoutItems)
 {
     QnResourceList result;
 
-    foreach(const QnLayoutItemIndex &index, layoutItems)
+    for (const auto& index: layoutItems)
     {
         if (index.isNull())
             continue;
@@ -225,7 +225,7 @@ QnResourceList ParameterTypes::resources(const QnLayoutItemIndexList &layoutItem
     return result;
 }
 
-QnResourcePtr ParameterTypes::resource(QnWorkbenchLayout *layout)
+QnResourcePtr ParameterTypes::resource(QnWorkbenchLayout* layout)
 {
     if (layout == NULL)
         return QnResourcePtr();
@@ -233,16 +233,16 @@ QnResourcePtr ParameterTypes::resource(QnWorkbenchLayout *layout)
     return layout->resource();
 }
 
-QnResourceList ParameterTypes::resources(QnWorkbenchLayout *layout)
+QnResourceList ParameterTypes::resources(QnWorkbenchLayout* layout)
 {
     return makeList<QnResourceList>(resource(layout));
 }
 
-QnResourceList ParameterTypes::resources(const QnWorkbenchLayoutList &layouts)
+QnResourceList ParameterTypes::resources(const QnWorkbenchLayoutList& layouts)
 {
     QnResourceList result;
 
-    foreach(QnWorkbenchLayout *layout, layouts)
+    for (auto layout: layouts)
     {
         QnResourcePtr resource = ParameterTypes::resource(layout);
         if (!resource)
@@ -254,7 +254,7 @@ QnResourceList ParameterTypes::resources(const QnWorkbenchLayoutList &layouts)
     return result;
 }
 
-QnResourceList ParameterTypes::resources(const QVariant &items)
+QnResourceList ParameterTypes::resources(const QVariant& items)
 {
     using namespace ParameterMetaType;
 
@@ -268,13 +268,13 @@ QnResourceList ParameterTypes::resources(const QVariant &items)
         case ResourceList:
             return items.value<QnResourceList>();
         case ResourceWidget:
-            return resources(items.value<QnResourceWidget *>());
+            return resources(items.value<QnResourceWidget*>());
         case ResourceWidgetList:
             return resources(items.value<QnResourceWidgetList>());
         case LayoutItemIndexList:
             return resources(items.value<QnLayoutItemIndexList>());
         case WorkbenchLayout:
-            return resources(items.value<QnWorkbenchLayout *>());
+            return resources(items.value<QnWorkbenchLayout*>());
         case WorkbenchLayoutList:
             return resources(items.value<QnWorkbenchLayoutList>());
         default:
@@ -282,9 +282,9 @@ QnResourceList ParameterTypes::resources(const QVariant &items)
     }
 }
 
-QnLayoutItemIndex ParameterTypes::layoutItem(QnResourceWidget *widget)
+QnLayoutItemIndex ParameterTypes::layoutItem(QnResourceWidget* widget)
 {
-    QnWorkbenchLayout *layout = widget->item()->layout();
+    QnWorkbenchLayout* layout = widget->item()->layout();
     if (layout == NULL)
         return QnLayoutItemIndex();
 
@@ -298,11 +298,11 @@ QnLayoutItemIndex ParameterTypes::layoutItem(QnResourceWidget *widget)
     return QnLayoutItemIndex(resource, widget->item()->uuid());
 }
 
-QnLayoutItemIndexList ParameterTypes::layoutItems(const QnResourceWidgetList &widgets)
+QnLayoutItemIndexList ParameterTypes::layoutItems(const QnResourceWidgetList& widgets)
 {
     QnLayoutItemIndexList result;
 
-    foreach(QnResourceWidget *widget, widgets)
+    for (auto widget: widgets)
     {
         QnLayoutItemIndex layoutItem = ParameterTypes::layoutItem(widget);
         if (!layoutItem.isNull())
@@ -312,19 +312,19 @@ QnLayoutItemIndexList ParameterTypes::layoutItems(const QnResourceWidgetList &wi
     return result;
 }
 
-QnLayoutItemIndexList ParameterTypes::layoutItems(QnResourceWidget *widget)
+QnLayoutItemIndexList ParameterTypes::layoutItems(QnResourceWidget* widget)
 {
     return makeList<QnLayoutItemIndexList>(ParameterTypes::layoutItem(widget));
 }
 
-QnLayoutItemIndexList ParameterTypes::layoutItems(const QVariant &items)
+QnLayoutItemIndexList ParameterTypes::layoutItems(const QVariant& items)
 {
     using namespace ParameterMetaType;
 
     switch (qn_actionMetaTypeMap()->value(items.userType()))
     {
         case ResourceWidget:
-            return layoutItems(items.value<QnResourceWidget *>());
+            return layoutItems(items.value<QnResourceWidget*>());
         case ResourceWidgetList:
             return layoutItems(items.value<QnResourceWidgetList>());
         case LayoutItemIndexList:
@@ -334,7 +334,7 @@ QnLayoutItemIndexList ParameterTypes::layoutItems(const QVariant &items)
     }
 }
 
-QnVideoWallItemIndexList ParameterTypes::videoWallItems(const QVariant &items)
+QnVideoWallItemIndexList ParameterTypes::videoWallItems(const QVariant& items)
 {
     using namespace ParameterMetaType;
 
@@ -347,7 +347,7 @@ QnVideoWallItemIndexList ParameterTypes::videoWallItems(const QVariant &items)
     }
 }
 
-QnVideoWallMatrixIndexList ParameterTypes::videoWallMatrices(const QVariant &items)
+QnVideoWallMatrixIndexList ParameterTypes::videoWallMatrices(const QVariant& items)
 {
     using namespace ParameterMetaType;
 
@@ -360,14 +360,14 @@ QnVideoWallMatrixIndexList ParameterTypes::videoWallMatrices(const QVariant &ite
     }
 }
 
-QnWorkbenchLayoutList ParameterTypes::layouts(const QVariant &items)
+QnWorkbenchLayoutList ParameterTypes::layouts(const QVariant& items)
 {
     using namespace ParameterMetaType;
 
     switch (qn_actionMetaTypeMap()->value(items.userType()))
     {
         case WorkbenchLayout:
-            return makeList<QnWorkbenchLayoutList>(items.value<QnWorkbenchLayout *>());
+            return makeList<QnWorkbenchLayoutList>(items.value<QnWorkbenchLayout*>());
         case WorkbenchLayoutList:
             return items.value<QnWorkbenchLayoutList>();
         default:
@@ -375,14 +375,14 @@ QnWorkbenchLayoutList ParameterTypes::layouts(const QVariant &items)
     }
 }
 
-QnResourceWidgetList ParameterTypes::widgets(const QVariant &items)
+QnResourceWidgetList ParameterTypes::widgets(const QVariant& items)
 {
     using namespace ParameterMetaType;
 
     switch (qn_actionMetaTypeMap()->value(items.userType()))
     {
         case ResourceWidget:
-            return makeList<QnResourceWidgetList>(items.value<QnResourceWidget *>());
+            return makeList<QnResourceWidgetList>(items.value<QnResourceWidget*>());
         case ResourceWidgetList:
             return items.value<QnResourceWidgetList>();
         default:
@@ -390,14 +390,17 @@ QnResourceWidgetList ParameterTypes::widgets(const QVariant &items)
     }
 }
 
-QnResourceWidgetList ParameterTypes::widgets(const QList<QGraphicsItem *> items)
+QnResourceWidgetList ParameterTypes::widgets(const QList<QGraphicsItem*>& items)
 {
     QnResourceWidgetList result;
 
-    foreach(QGraphicsItem *item, items)
+    for (auto item: items)
     {
-        QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-        if (widget == NULL)
+        const auto widget = item->isWidget()
+            ? qobject_cast<QnResourceWidget*>(item->toGraphicsObject())
+            : nullptr;
+
+        if (!widget)
             continue;
 
         result.push_back(widget);

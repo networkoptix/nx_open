@@ -100,6 +100,8 @@
 #include <utils/media/sse_helper.h>
 #include <plugins/resource/avi/avi_resource.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 
 static constexpr int kMicroInMilliSeconds = 1000;
@@ -559,7 +561,7 @@ void QnMediaResourceWidget::createButtons()
         connect(debugScreenshotButton, &QnImageButtonWidget::clicked, this,
             [this]
             {
-                menu()->trigger(QnActions::TakeScreenshotAction, QnActionParameters(this)
+                menu()->trigger(QnActions::TakeScreenshotAction, action::Parameters(this)
                     .withArgument<QString>(Qn::FileNameRole, lit("_DEBUG_SCREENSHOT_KEY_")));
             });
         titleBar()->rightButtonsBar()->addButton(Qn::DbgScreenshotButton, debugScreenshotButton);
@@ -2129,7 +2131,7 @@ void QnMediaResourceWidget::processSettingsRequest()
         return;
 
     int selectedTab = Qn::GeneralSettingsTab;
-    menu()->trigger(QnActions::CameraSettingsAction, QnActionParameters(m_camera)
+    menu()->trigger(QnActions::CameraSettingsAction, action::Parameters(m_camera)
         .withArgument(Qn::FocusTabRole, selectedTab));
 }
 

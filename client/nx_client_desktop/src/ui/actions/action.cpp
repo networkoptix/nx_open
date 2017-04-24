@@ -227,7 +227,7 @@ void QnAction::setToolTipFormat(const QString& toolTipFormat)
     updateToolTip(true);
 }
 
-ActionVisibility QnAction::checkCondition(ActionScopes scope, const QnActionParameters& parameters) const
+ActionVisibility QnAction::checkCondition(ActionScopes scope, const Parameters& parameters) const
 {
     if (!isVisible())
         return InvisibleAction; // TODO: #Elric cheat!
@@ -304,7 +304,7 @@ ActionVisibility QnAction::checkCondition(ActionScopes scope, const QnActionPara
     {
         if (parameters.scope() == InvalidScope)
         {
-            QnActionParameters scopedParameters(parameters);
+            Parameters scopedParameters(parameters);
             scopedParameters.setScope(scope);
             return m_condition->check(scopedParameters);
         }
@@ -356,7 +356,7 @@ bool QnAction::event(QEvent* event)
         }
     }
 
-    QnActionParameters parameters;
+    Parameters parameters;
     ActionScope scope = static_cast<ActionScope>(static_cast<int>(this->scope()));
 
     if (auto targetProvider = QnWorkbenchContextAware::menu()->targetProvider())
@@ -425,7 +425,7 @@ bool QnAction::hasConditionalTexts()
     return !m_conditionalTexts.isEmpty();
 }
 
-QString QnAction::checkConditionalText(const QnActionParameters& parameters) const
+QString QnAction::checkConditionalText(const Parameters& parameters) const
 {
     for (const ConditionalText& conditionalText : m_conditionalTexts)
     {

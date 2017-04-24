@@ -60,6 +60,7 @@
 #include <nx/fusion/model_functions.h>
 
 using namespace nx::client::desktop;
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -136,6 +137,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
     connect(handler,    &QnWorkbenchNotificationsHandler::systemHealthEventRemoved, this,   &QnNotificationsCollectionWidget::hideSystemHealthMessage);
     connect(handler,    &QnWorkbenchNotificationsHandler::cleared,                  this,   &QnNotificationsCollectionWidget::hideAll);
 
+    using namespace nx::client::desktop;
     connect(this->context()->instance<ServerNotificationCache>(),
         &ServerNotificationCache::fileDownloaded,
         this,
@@ -328,7 +330,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         item->addActionButton(
             icon,
             QnActions::OpenInAlarmLayoutAction,
-            QnActionParameters(alarmCameras));
+            alarmCameras);
 
         loadThumbnailForItem(item, alarmCameras.mid(0, kMaxThumbnailCount));
     }
@@ -342,7 +344,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                 item->addActionButton(
                     icon,
                     QnActions::OpenInNewLayoutAction,
-                    QnActionParameters(camera).withArgument(Qn::ItemTimeRole, timestampMs));
+                    action::Parameters(camera).withArgument(Qn::ItemTimeRole, timestampMs));
 
                 loadThumbnailForItem(item, camera, timestampMs);
                 break;
@@ -353,7 +355,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                 item->addActionButton(
                     icon,
                     QnActions::OpenInNewLayoutAction,
-                    QnActionParameters(camera));
+                    camera);
 
                 loadThumbnailForItem(item, camera);
                 break;
@@ -365,7 +367,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                 item->addActionButton(
                     icon,
                     QnActions::CameraSettingsAction,
-                    QnActionParameters(camera));
+                    camera);
 
                 loadThumbnailForItem(item, camera);
                 break;
@@ -379,7 +381,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                 item->addActionButton(
                     icon,
                     QnActions::ServerSettingsAction,
-                    QnActionParameters(server));
+                    server);
                 break;
             }
 
@@ -389,7 +391,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                 item->addActionButton(
                     icon,
                     QnActions::BrowseUrlAction,
-                    QnActionParameters().withArgument(Qn::UrlRole, webPageAddress));
+                    {Qn::UrlRole, webPageAddress});
                 break;
             }
 
@@ -416,7 +418,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                     item->addActionButton(
                         icon,
                         QnActions::OpenInNewLayoutAction,
-                        QnActionParameters(sourceCameras).withArgument(Qn::ItemTimeRole, timestampMs));
+                        action::Parameters(sourceCameras).withArgument(Qn::ItemTimeRole, timestampMs));
 
                     loadThumbnailForItem(item, sourceCameras.mid(0, kMaxThumbnailCount), timestampMs);
                 }
@@ -580,9 +582,9 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
 
     item = new QnNotificationWidget(m_list);
 
-    QnActionParameters actionParams;
-    if (params.canConvert<QnActionParameters>())
-        actionParams = params.value<QnActionParameters>();
+    action::Parameters actionParams;
+    if (params.canConvert<action::Parameters>())
+        actionParams = params.value<action::Parameters>();
 
     switch (message)
     {
@@ -590,7 +592,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             item->addActionButton(
                 qnSkin->icon("events/email.png"),
                 QnActions::UserSettingsAction,
-                QnActionParameters(context()->user())
+                action::Parameters(context()->user())
                     .withArgument(Qn::FocusElementRole, lit("email"))
                     .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage)
             );
@@ -612,7 +614,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             item->addActionButton(
                 qnSkin->icon("events/email.png"),
                 QnActions::UserSettingsAction,
-                QnActionParameters(resource)
+                action::Parameters(resource)
                     .withArgument(Qn::FocusElementRole, lit("email"))
                     .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage)
                 );
@@ -647,8 +649,8 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             item->addActionButton(
                 qnSkin->icon("events/storage.png"),
                 QnActions::ServerSettingsAction,
-                QnActionParameters(resource)
-                .withArgument(Qn::FocusTabRole, QnServerSettingsDialog::StorageManagmentPage)
+                action::Parameters(resource)
+                    .withArgument(Qn::FocusTabRole, QnServerSettingsDialog::StorageManagmentPage)
             );
             break;
 
@@ -745,7 +747,8 @@ void QnNotificationsCollectionWidget::at_list_itemRemoved(QnNotificationWidget* 
     qnDeleteLater(item);
 }
 
-void QnNotificationsCollectionWidget::at_item_actionTriggered(QnActions::IDType actionId, const QnActionParameters& parameters)
+void QnNotificationsCollectionWidget::at_item_actionTriggered(QnActions::IDType actionId,
+    const action::Parameters& parameters)
 {
     menu()->trigger(actionId, parameters);
 }

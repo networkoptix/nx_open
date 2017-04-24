@@ -164,7 +164,7 @@ QList<QnAction *> Manager::actions() const
     return m_idByAction.keys();
 }
 
-bool Manager::canTrigger(QnActions::IDType id, const QnActionParameters &parameters)
+bool Manager::canTrigger(QnActions::IDType id, const Parameters& parameters)
 {
     QnAction *action = m_actionById.value(id);
     if (!action)
@@ -173,7 +173,7 @@ bool Manager::canTrigger(QnActions::IDType id, const QnActionParameters &paramet
     return action->checkCondition(action->scope(), parameters) == EnabledAction;
 }
 
-void Manager::trigger(QnActions::IDType id, const QnActionParameters &parameters)
+void Manager::trigger(QnActions::IDType id, const Parameters& parameters)
 {
     if (triggerIfPossible(id, parameters))
         return;
@@ -184,7 +184,7 @@ void Manager::trigger(QnActions::IDType id, const QnActionParameters &parameters
         << id << text;
 }
 
-bool Manager::triggerIfPossible(QnActions::IDType id, const QnActionParameters &parameters)
+bool Manager::triggerIfPossible(QnActions::IDType id, const Parameters& parameters)
 {
     QnAction *action = m_actionById.value(id);
     NX_EXPECT(action);
@@ -200,7 +200,7 @@ bool Manager::triggerIfPossible(QnActions::IDType id, const QnActionParameters &
     return true;
 }
 
-QMenu* Manager::integrateMenu(QMenu *menu, const QnActionParameters &parameters)
+QMenu* Manager::integrateMenu(QMenu *menu, const Parameters& parameters)
 {
     if (!menu)
         return NULL;
@@ -217,7 +217,7 @@ QMenu* Manager::integrateMenu(QMenu *menu, const QnActionParameters &parameters)
 }
 
 
-QMenu *Manager::newMenu(ActionScope scope, QWidget *parent, const QnActionParameters &parameters, CreationOptions options)
+QMenu *Manager::newMenu(ActionScope scope, QWidget *parent, const Parameters& parameters, CreationOptions options)
 {
     /*
      * This method is called when we are opening a brand new context menu.
@@ -232,7 +232,7 @@ QMenu* Manager::newMenu(
     QnActions::IDType rootId,
     ActionScope scope,
     QWidget* parent,
-    const QnActionParameters& parameters,
+    const Parameters& parameters,
     CreationOptions options)
 {
     QnAction *rootAction = rootId == QnActions::NoAction ? m_root : action(rootId);
@@ -273,7 +273,7 @@ void Manager::copyAction(QAction *dst, QnAction *src, bool forwardSignals)
     }
 }
 
-QMenu *Manager::newMenuRecursive(const QnAction *parent, ActionScope scope, const QnActionParameters &parameters, QWidget *parentWidget, CreationOptions options)
+QMenu *Manager::newMenuRecursive(const QnAction *parent, ActionScope scope, const Parameters& parameters, QWidget *parentWidget, CreationOptions options)
 {
     if (parent->childFactory())
     {
@@ -383,7 +383,7 @@ QMenu *Manager::newMenuRecursive(const QnAction *parent, ActionScope scope, cons
     return integrateMenu(result, parameters);
 }
 
-QnActionParameters Manager::currentParameters(QnAction *action) const
+Parameters Manager::currentParameters(QnAction *action) const
 {
     if (m_shortcutAction == action)
         return m_parametersByMenu.value(NULL);
@@ -391,17 +391,17 @@ QnActionParameters Manager::currentParameters(QnAction *action) const
     if (!m_parametersByMenu.contains(m_lastClickedMenu))
     {
         NX_EXPECT(false, "No active menu, no target exists.");
-        return QnActionParameters();
+        return Parameters();
     }
 
     return m_parametersByMenu.value(m_lastClickedMenu);
 }
 
-QnActionParameters Manager::currentParameters(QObject *sender) const
+Parameters Manager::currentParameters(QObject *sender) const
 {
     if (QnAction *action = checkSender(sender))
         return currentParameters(action);
-    return QnActionParameters();
+    return Parameters();
 }
 
 void Manager::redirectAction(QMenu *menu, QnActions::IDType sourceId, QAction *targetAction)

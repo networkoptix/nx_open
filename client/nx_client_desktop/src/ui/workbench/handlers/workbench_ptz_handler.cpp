@@ -24,7 +24,7 @@
 
 #include <ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <ui/dialogs/ptz_preset_dialog.h>
 #include <ui/dialogs/ptz_manage_dialog.h>
 
@@ -33,6 +33,8 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace
 {
@@ -181,7 +183,7 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered()
 
 void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
     QString id = parameters.argument<QString>(Qn::PtzObjectIdRole);
 
@@ -215,7 +217,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered()
 
 void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
     if (!widget || !widget->ptzController())
         return;
@@ -264,7 +266,7 @@ void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered()
 
 void QnWorkbenchPtzHandler::at_ptzActivateObjectAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
     if (!widget || !widget->ptzController())
         return;
@@ -291,7 +293,7 @@ void QnWorkbenchPtzHandler::at_ptzActivateObjectAction_triggered()
 
 void QnWorkbenchPtzHandler::at_ptzManageAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
 
     if (!widget || !widget->ptzController())
@@ -345,7 +347,7 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered()
         getDevicePosition(controller, &cameraPosition);
         qDebug() << "SENT POSITION" << position << "GOT POSITION" << cameraPosition;
 
-        menu()->trigger(QnActions::TakeScreenshotAction, QnActionParameters(widget)
+        menu()->trigger(QnActions::TakeScreenshotAction, action::Parameters(widget)
             .withArgument(Qn::FileNameRole, lit("PTZ_CALIBRATION_%1.jpg").arg(position.z(), 0, 'f', 4)));
     }
 }
@@ -424,10 +426,8 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetByIndexAction_triggered()
     {
         menu()->trigger(
             QnActions::PtzActivateObjectAction,
-            QnActionParameters(widget)
-                .withArgument(
-                    Qn::PtzObjectIdRole,
-                    presetList[presetIndex].id));
+            action::Parameters(widget)
+                .withArgument(Qn::PtzObjectIdRole, presetList[presetIndex].id));
     }
 }
 

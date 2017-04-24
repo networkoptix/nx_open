@@ -54,7 +54,7 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
     connect(action(QnActions::ReviewLayoutTourAction), &QAction::triggered, this,
         [this]()
         {
-            QnActionParameters parameters = menu()->currentParameters(sender());
+            const auto parameters = menu()->currentParameters(sender());
             auto id = parameters.argument<QnUuid>(Qn::UuidRole);
             reviewLayoutTour(qnLayoutTourManager->tour(id));
         });
@@ -70,7 +70,7 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
             if (!reviewLayout)
                 return;
 
-            QnActionParameters parameters = menu()->currentParameters(sender());
+            const auto parameters = menu()->currentParameters(sender());
             QPointF position = parameters.argument<QPointF>(Qn::ItemPositionRole);
 
             for (const auto& layout: parameters.resources().filtered<QnLayoutResource>())
@@ -87,8 +87,7 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
             NX_EXPECT(!startTourAction->isChecked());
             if (!startTourAction->isChecked())
             {
-                menu()->trigger(QnActions::ToggleLayoutTourModeAction, QnActionParameters()
-                    .withArgument(Qn::UuidRole, tour.id));
+                menu()->trigger(QnActions::ToggleLayoutTourModeAction, {Qn::UuidRole, tour.id});
             }
         });
 
@@ -115,17 +114,14 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
             }
 
             qnLayoutTourManager->addOrUpdateTour(tour);
-            menu()->trigger(QnActions::SaveLayoutTourAction, QnActionParameters()
-                .withArgument(Qn::UuidRole, id));
+            menu()->trigger(QnActions::SaveLayoutTourAction, {Qn::UuidRole, id});
         });
 
     connect(action(QnActions::RemoveCurrentLayoutTourAction), &QAction::triggered, this,
         [this]()
         {
             NX_EXPECT(isLayoutTourReviewMode());
-
-            menu()->trigger(QnActions::RemoveLayoutTourAction, QnActionParameters()
-                .withArgument(Qn::UuidRole, currentTourId()));
+            menu()->trigger(QnActions::RemoveLayoutTourAction, {Qn::UuidRole, currentTourId()});
         });
 
     connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged, this,

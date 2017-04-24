@@ -73,6 +73,7 @@
 //#define QN_DEBUG_WIDGET
 #endif
 
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -329,44 +330,40 @@ bool QnWorkbenchUi::calculateTimelineVisible(QnResourceWidget* widget) const
         || !flags.testFlag(Qn::live);   /*< Show slider for local files. */
 }
 
-nx::client::desktop::ui::action::ActionScope QnWorkbenchUi::currentScope() const
+action::ActionScope QnWorkbenchUi::currentScope() const
 {
-    using namespace nx::client::desktop::ui::action;
-
     QGraphicsItem *focusItem = display()->scene()->focusItem();
     if (m_tree && focusItem == m_tree->item)
-        return TreeScope;
+        return action::TreeScope;
 
     if (focusItem == m_timeline->item)
-        return TimelineScope;
+        return action::TimelineScope;
 
     if (!focusItem || dynamic_cast<QnResourceWidget*>(focusItem))
-        return SceneScope;
+        return action::SceneScope;
 
     /* We should not handle any button as an action while the item was focused. */
     if (dynamic_cast<QnGraphicsWebView*>(focusItem))
-        return InvalidScope;
+        return action::InvalidScope;
 
-    return MainScope;
+    return action::MainScope;
 }
 
-QnActionParameters QnWorkbenchUi::currentParameters(nx::client::desktop::ui::action::ActionScope scope) const
+action::Parameters QnWorkbenchUi::currentParameters(action::ActionScope scope) const
 {
-    using namespace nx::client::desktop::ui::action;
-
     /* Get items. */
     switch (scope)
     {
-        case TreeScope:
-            return m_tree ? m_tree->widget->currentParameters(scope) : QnActionParameters();
-        case TimelineScope:
-            return QnActionParameters(navigator()->currentWidget());
-        case SceneScope:
-            return QnActionParameters(ParameterTypes::widgets(display()->scene()->selectedItems()));
+        case action::TreeScope:
+            return m_tree ? m_tree->widget->currentParameters(scope) : action::Parameters();
+        case action::TimelineScope:
+            return navigator()->currentWidget();
+        case action::SceneScope:
+            return action::ParameterTypes::widgets(display()->scene()->selectedItems());
         default:
             break;
     }
-    return QnActionParameters();
+    return action::Parameters();
 }
 
 

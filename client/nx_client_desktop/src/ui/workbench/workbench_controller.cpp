@@ -100,6 +100,8 @@
 
 #include <plugins/io_device/joystick/joystick_manager.h>
 
+using namespace nx::client::desktop::ui;
+
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
 #ifdef QN_WORKBENCH_CONTROLLER_DEBUG
 #   define TRACE(...) qDebug() << __VA_ARGS__;
@@ -644,8 +646,8 @@ void QnWorkbenchController::showContextMenuAt(const QPoint &pos){
 void QnWorkbenchController::showContextMenuAtInternal(const QPoint &pos,
     const WeakGraphicsItemPointerList &selectedItems)
 {
-    using namespace nx::client::desktop::ui::action;
-    QScopedPointer<QMenu> menu(this->menu()->newMenu(SceneScope, nullptr, selectedItems.materialized()));
+    QScopedPointer<QMenu> menu(this->menu()->newMenu(action::SceneScope, nullptr,
+        selectedItems.materialized()));
     if(menu->isEmpty())
         return;
 
@@ -744,7 +746,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
         if (objectId.isEmpty())
             break;
 
-        menu()->trigger(QnActions::PtzActivateObjectAction, QnActionParameters(widget).withArgument(Qn::PtzObjectIdRole, objectId));
+        menu()->trigger(QnActions::PtzActivateObjectAction, action::Parameters(widget).withArgument(Qn::PtzObjectIdRole, objectId));
         break;
     }
     default:
@@ -1066,7 +1068,9 @@ void QnWorkbenchController::at_zoomRectChanged(QnMediaResourceWidget *widget, co
 }
 
 void QnWorkbenchController::at_zoomRectCreated(QnMediaResourceWidget *widget, const QColor &color, const QRectF &zoomRect) {
-    menu()->trigger(QnActions::CreateZoomWindowAction, QnActionParameters(widget).withArgument(Qn::ItemZoomRectRole, zoomRect).withArgument(Qn::ItemFrameDistinctionColorRole, color));
+    menu()->trigger(QnActions::CreateZoomWindowAction, action::Parameters(widget)
+        .withArgument(Qn::ItemZoomRectRole, zoomRect)
+        .withArgument(Qn::ItemFrameDistinctionColorRole, color));
     widget->setCheckedButtons(widget->checkedButtons() & ~Qn::ZoomWindowButton);
 }
 
@@ -1377,9 +1381,8 @@ void QnWorkbenchController::at_selectAllAction_triggered() {
     foreach(QnResourceWidget *widget, display()->widgets())
         widget->setSelected(true);
 
-    using namespace nx::client::desktop::ui::action;
     /* Move focus to scene if it's not there. */
-    if(menu()->targetProvider() && menu()->targetProvider()->currentScope() != SceneScope)
+    if (menu()->targetProvider() && menu()->targetProvider()->currentScope() != action::SceneScope)
         display()->scene()->setFocusItem(NULL);
 }
 

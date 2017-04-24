@@ -158,7 +158,7 @@ public:
      */
     nx::client::desktop::ui::action::ActionVisibility checkCondition(
         nx::client::desktop::ui::action::ActionScopes scope,
-        const QnActionParameters &parameters) const;
+        const nx::client::desktop::ui::action::Parameters &parameters) const;
 
     void addConditionalText(nx::client::desktop::ui::action::ConditionPtr condition, const QString &text);
 
@@ -172,7 +172,7 @@ public:
      * \returns                         New text if condition is executed;
      *                                  empty string otherwise.
      */
-    QString checkConditionalText(const QnActionParameters &parameters) const;
+    QString checkConditionalText(const nx::client::desktop::ui::action::Parameters &parameters) const;
 
 protected:
     virtual bool event(QEvent *event) override;

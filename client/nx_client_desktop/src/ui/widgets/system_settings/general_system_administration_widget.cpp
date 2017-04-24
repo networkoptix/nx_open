@@ -14,7 +14,7 @@
 #include <nx_ec/data/api_runtime_data.h>
 
 #include <ui/actions/actions.h>
-#include <ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/custom_painted.h>
 #include <ui/common/read_only.h>

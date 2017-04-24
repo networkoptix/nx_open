@@ -35,6 +35,8 @@
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace
 {
 typedef QPointer<QnWorkbenchWelcomeScreen> GuardType;
@@ -381,7 +383,7 @@ void QnWorkbenchWelcomeScreen::makeDrop(const QList<QUrl>& urls)
     if (resources.isEmpty())
         return;
 
-    if (menu()->triggerIfPossible(QnActions::DropResourcesAction, QnActionParameters(resources)))
+    if (menu()->triggerIfPossible(QnActions::DropResourcesAction, resources))
         action(QnActions::ResourcesModeAction)->setChecked(true);
 }
 
@@ -447,7 +449,7 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
             if (!credentials.user.isEmpty())
                 url.setUserName(credentials.user);
 
-            QnActionParameters params;
+            action::Parameters params;
             params.setArgument(Qn::UrlRole, url);
             params.setArgument(Qn::StorePasswordRole, storePassword);
             params.setArgument(Qn::AutoLoginRole, autoLogin);

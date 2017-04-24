@@ -36,6 +36,8 @@
 
 #include <nx/utils/uuid.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 static const int kMinimumTabSizeWidth = 50;
 }
@@ -96,25 +98,22 @@ void QnLayoutTabBar::checkInvariants() const
     }
 }
 
-nx::client::desktop::ui::action::ActionScope QnLayoutTabBar::currentScope() const
+action::ActionScope QnLayoutTabBar::currentScope() const
 {
-    using namespace nx::client::desktop::ui::action;
-    return TitleBarScope;
+    return action::TitleBarScope;
 }
 
-QnActionParameters QnLayoutTabBar::currentParameters(nx::client::desktop::ui::action::ActionScope scope) const
+action::Parameters QnLayoutTabBar::currentParameters(action::ActionScope scope) const
 {
-    using namespace nx::client::desktop::ui::action;
-    if (scope != TitleBarScope)
-        return QnActionParameters();
+    if (scope != action::TitleBarScope)
+        return action::Parameters();
 
     QnWorkbenchLayoutList result;
-
     int currentIndex = this->currentIndex();
     if (currentIndex >= 0 && currentIndex < m_layouts.size())
         result.push_back(m_layouts[currentIndex]);
 
-    return QnActionParameters(result);
+    return result;
 }
 
 void QnLayoutTabBar::submitCurrentLayout()
@@ -283,8 +282,7 @@ void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event)
     if (index >= 0 && index < m_layouts.size())
         target.push_back(m_layouts[index]);
 
-    using namespace nx::client::desktop::ui::action;
-    QScopedPointer<QMenu> menu(context()->menu()->newMenu(TitleBarScope, nullptr, target));
+    QScopedPointer<QMenu> menu(context()->menu()->newMenu(action::TitleBarScope, nullptr, target));
     if (menu->isEmpty())
         return;
 

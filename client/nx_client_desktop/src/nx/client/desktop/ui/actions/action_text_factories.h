@@ -26,7 +26,7 @@ public:
      * \param parameters                Action parameters.
      * \returns                         Actual text for the given action.
      */
-    virtual QString text(const QnActionParameters& parameters, QnWorkbenchContext* context) const;
+    virtual QString text(const Parameters& parameters, QnWorkbenchContext* context) const;
 };
 
 class DevicesNameTextFactory: public TextFactory
@@ -34,7 +34,7 @@ class DevicesNameTextFactory: public TextFactory
 public:
     DevicesNameTextFactory(const QnCameraDeviceStringSet& stringSet,
         QObject *parent = nullptr);
-    virtual QString text(const QnActionParameters& parameters, QnWorkbenchContext* context) const override;
+    virtual QString text(const Parameters& parameters, QnWorkbenchContext* context) const override;
 private:
     const QnCameraDeviceStringSet m_stringSet;
 };

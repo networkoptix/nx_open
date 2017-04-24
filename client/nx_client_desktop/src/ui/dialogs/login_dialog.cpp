@@ -55,6 +55,8 @@
 #include <ui/workbench/workbench_context.h>
 #include <helpers/system_helpers.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 
 static const QnUuid kCustomConnectionLocalId;
@@ -325,7 +327,7 @@ void QnLoginDialog::accept()
                     qnSettings->save();
 
                     const bool autoLogin = ui->autoLoginCheckBox->isChecked();
-                    QnActionParameters params;
+                    action::Parameters params;
                     const bool storePassword =
                         (haveToStorePassword(connectionInfo.localSystemId, url) || autoLogin);
                     params.setArgument(Qn::UrlRole, url);

@@ -43,6 +43,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
 
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -494,7 +495,7 @@ void QnUserManagementWidget::at_usersTable_clicked(const QModelIndex& index)
             break;
 
         default:
-            menu()->trigger(QnActions::UserSettingsAction, QnActionParameters(user)
+            menu()->trigger(QnActions::UserSettingsAction, action::Parameters(user)
                 .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage)
                 .withArgument(Qn::ForceRole, true)
             );

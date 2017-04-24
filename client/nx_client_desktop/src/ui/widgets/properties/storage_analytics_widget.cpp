@@ -40,6 +40,8 @@
 #include <utils/common/synctime.h>
 #include <set>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 
 using std::chrono::milliseconds;
@@ -453,11 +455,10 @@ void QnStorageAnalyticsWidget::at_eventsGrid_customContextMenuRequested(const QP
 
         if (resource)
         {
-            QnActionParameters parameters(resource);
+            action::Parameters parameters(resource);
             parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
 
-            using namespace nx::client::desktop::ui::action;
-            menu.reset(manager->newMenu(TreeScope, nullptr, parameters));
+            menu.reset(manager->newMenu(action::TreeScope, nullptr, parameters));
             foreach(QAction* action, menu->actions())
                 action->setShortcut(QKeySequence());
         }

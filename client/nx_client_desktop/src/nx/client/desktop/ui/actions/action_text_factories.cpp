@@ -1,6 +1,6 @@
 #include "action_text_factories.h"
 
-#include <ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 
 #include <core/resource/camera_resource.h>
 
@@ -17,7 +17,7 @@ TextFactory::TextFactory(QObject* parent):
 {
 }
 
-QString TextFactory::text(const QnActionParameters& /*parameters*/,
+QString TextFactory::text(const Parameters& /*parameters*/,
     QnWorkbenchContext* /*context*/) const
 {
     return QString();
@@ -33,7 +33,7 @@ DevicesNameTextFactory::DevicesNameTextFactory(
 
 }
 
-QString DevicesNameTextFactory::text(const QnActionParameters& parameters,
+QString DevicesNameTextFactory::text(const Parameters& parameters,
     QnWorkbenchContext* context) const
 {
     const auto resources = parameters.resources();

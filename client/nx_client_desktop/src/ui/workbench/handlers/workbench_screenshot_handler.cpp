@@ -348,7 +348,7 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
 
 
 void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
-    QnActionParameters actionParameters = menu()->currentParameters(sender());
+    const auto actionParameters = menu()->currentParameters(sender());
     QString filename = actionParameters.argument<QString>(Qn::FileNameRole);
 
     QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(actionParameters.widget());

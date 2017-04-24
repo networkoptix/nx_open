@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/client/desktop/ui/actions/action_types.h>
-#include <ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 
 namespace nx {
 namespace client {
@@ -18,7 +18,7 @@ class TargetProvider
 public:
     virtual ~TargetProvider() {}
     virtual ActionScope currentScope() const = 0;
-    virtual QnActionParameters currentParameters(ActionScope scope) const = 0;
+    virtual Parameters currentParameters(ActionScope scope) const = 0;
 };
 
 } // namespace action

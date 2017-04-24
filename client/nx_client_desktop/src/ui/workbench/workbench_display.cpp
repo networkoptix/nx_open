@@ -95,6 +95,8 @@
 
 #include <nx/utils/log/log.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 
 void calculateExpansionValues(qreal start, qreal end, qreal center, qreal newLength, qreal *deltaStart, qreal *deltaEnd)
@@ -924,13 +926,12 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout)
 
 void QnWorkbenchDisplay::updateSelectionFromTree()
 {
-    using namespace nx::client::desktop::ui::action;
     auto provider = menu()->targetProvider();
     if (!provider)
         return;
 
     auto scope = provider->currentScope();
-    if (scope != TreeScope)
+    if (scope != action::TreeScope)
         return;
 
     /* Just deselect all items for now. See #4480. */

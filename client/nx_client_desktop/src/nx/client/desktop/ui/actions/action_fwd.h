@@ -7,7 +7,6 @@ class QActionGroup;
 class QMenu;
 
 class QnAction;
-class QnActionParameters;
 class QnResourceCriterion;
 
 namespace nx {
@@ -15,6 +14,8 @@ namespace client {
 namespace desktop {
 namespace ui {
 namespace action {
+
+class Parameters;
 
 class Manager;
 using ManagerPtr = QPointer<Manager>;

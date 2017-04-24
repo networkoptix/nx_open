@@ -9,7 +9,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-using namespace nx::client::desktop::ui::action;
+using namespace nx::client::desktop::ui;
 
 namespace
 {
@@ -93,7 +93,7 @@ namespace
 
 //
 
-AbstractActionsMetrics::AbstractActionsMetrics(const ManagerPtr& actionManager)
+AbstractActionsMetrics::AbstractActionsMetrics(const action::ManagerPtr& actionManager)
     : base_type()
     , QnStatisticsValuesProvider()
 {
@@ -113,7 +113,7 @@ AbstractActionsMetrics::AbstractActionsMetrics(const ManagerPtr& actionManager)
         addActionMetric(action);
     };
 
-    connect(actionManager, &Manager::actionRegistered, this, addAction);
+    connect(actionManager, &action::Manager::actionRegistered, this, addAction);
 }
 
 AbstractActionsMetrics::~AbstractActionsMetrics()
@@ -121,7 +121,7 @@ AbstractActionsMetrics::~AbstractActionsMetrics()
 
 //
 
-ActionsTriggeredCountMetrics::ActionsTriggeredCountMetrics(const ManagerPtr& actionManager)
+ActionsTriggeredCountMetrics::ActionsTriggeredCountMetrics(const action::ManagerPtr& actionManager)
     : base_type(actionManager)
     , m_values()
 {
@@ -182,7 +182,7 @@ void ActionsTriggeredCountMetrics::reset()
 
 //
 
-ActionCheckedTimeMetric::ActionCheckedTimeMetric(const ManagerPtr& actionManager)
+ActionCheckedTimeMetric::ActionCheckedTimeMetric(const action::ManagerPtr& actionManager)
     : base_type(actionManager)
     , m_metrics(new QnMetricsContainer())
 {

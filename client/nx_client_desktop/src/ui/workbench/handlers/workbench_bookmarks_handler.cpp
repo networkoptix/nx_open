@@ -22,7 +22,7 @@
 
 #include <ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <ui/dialogs/camera_bookmark_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
@@ -40,6 +40,8 @@
 #include <ui/workbench/watchers/workbench_bookmark_tags_watcher.h>
 
 #include <utils/common/app_info.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -68,12 +70,10 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
     connect(context(), &QnWorkbenchContext::userChanged, this, [this]() { m_hintDisplayed = false; });
 
     const auto getActionParamsFunc =
-        [this](const QnCameraBookmark &bookmark) -> QnActionParameters
+        [this](const QnCameraBookmark &bookmark) -> action::Parameters
         {
-            using namespace nx::client::desktop::ui::action;
-            QnActionParameters bookmarkParams(navigator()->currentParameters(TimelineScope));
-            bookmarkParams.setArgument(Qn::CameraBookmarkRole, bookmark);
-            return bookmarkParams;
+            return navigator()->currentParameters(action::TimelineScope)
+                .withArgument(Qn::CameraBookmarkRole, bookmark);
         };
 
     const auto bookmarksViewer = navigator()->timeSlider()->bookmarksViewer();
@@ -122,16 +122,14 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
         [this, bookmarksViewer](const QString &tag)
         {
             context()->statisticsModule()->registerClick(lit("bookmark_tooltip_tag"));
-
-            QnActionParameters params;
-            params.setArgument(Qn::BookmarkTagRole, tag);
-            menu()->triggerIfPossible(QnActions::OpenBookmarksSearchAction, params);
+            menu()->triggerIfPossible(QnActions::OpenBookmarksSearchAction,
+                {Qn::BookmarkTagRole, tag});
         });
 }
 
 void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     auto camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
     //TODO: #GDM #Bookmarks will we support these actions for exported layouts?
     if (!camera)
@@ -180,7 +178,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
 
 void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
     //TODO: #GDM #Bookmarks will we support these actions for exported layouts?
     if (!camera)
@@ -209,7 +207,7 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered()
 
 void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
     //TODO: #GDM #Bookmarks will we support these actions for exported layouts?
     if (!camera)
@@ -232,7 +230,7 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered()
 
 void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
 
     QnCameraBookmarkList bookmarks = parameters.argument<QnCameraBookmarkList>(Qn::CameraBookmarkListRole);
     if (bookmarks.isEmpty())
@@ -270,7 +268,7 @@ void QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered()
         workbench()->currentLayout()->setData(Qn::LayoutBookmarksModeRole, checked);
 
     if (checked)
-        menu()->trigger(QnActions::StopSmartSearchAction, QnActionParameters(display()->widgets()));
+        menu()->trigger(QnActions::StopSmartSearchAction, display()->widgets());
 
     if (!m_hintDisplayed && enabled && checked && !navigator()->bookmarksModeEnabled())
     {

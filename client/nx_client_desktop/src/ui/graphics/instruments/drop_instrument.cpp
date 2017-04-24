@@ -34,6 +34,8 @@
 
 #include "destruction_guard_item.h"
 
+using namespace nx::client::desktop::ui;
+
 class DropSurfaceItem: public QGraphicsObject {
 public:
     DropSurfaceItem(QGraphicsItem *parent = NULL):
@@ -193,9 +195,10 @@ bool DropInstrument::dragLeaveEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent
     return true;
 }
 
-bool DropInstrument::dropEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *event) {
+bool DropInstrument::dropEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *event)
+{
     QnWorkbenchContext *context = m_context.data();
-    if(context == NULL)
+    if (context == NULL)
         return true;
 
     const QMimeData *mimeData = event->mimeData();
@@ -203,23 +206,23 @@ bool DropInstrument::dropEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *eve
         return false;
 
     // try to drop videowall items first
-    if (delayedTriggerIfPossible(
-        QnActions::StartVideoWallControlAction,
-        QnActionParameters(m_videoWallItems))) {
+    if (delayedTriggerIfPossible(QnActions::StartVideoWallControlAction, m_videoWallItems))
+    {
 
     }
     else
-    if(!m_intoNewLayout) {
-        delayedTriggerIfPossible(
-            QnActions::DropResourcesAction,
-            QnActionParameters(m_resources).withArgument(Qn::ItemPositionRole, context->workbench()->mapper()->mapToGridF(event->scenePos()))
-        );
-    } else {
-        delayedTriggerIfPossible(
-            QnActions::DropResourcesIntoNewLayoutAction,
-            QnActionParameters(m_resources)
-        );
-    }
+        if (!m_intoNewLayout)
+        {
+            delayedTriggerIfPossible(
+                QnActions::DropResourcesAction,
+                action::Parameters(m_resources).withArgument(Qn::ItemPositionRole,
+                    context->workbench()->mapper()->mapToGridF(event->scenePos()))
+            );
+        }
+        else
+        {
+            delayedTriggerIfPossible(QnActions::DropResourcesIntoNewLayoutAction, m_resources);
+        }
 
     event->acceptProposedAction();
     return true;
@@ -233,7 +236,7 @@ SceneEventFilterItem *DropInstrument::filterItem() const {
     return m_filterItem.data();
 }
 
-bool DropInstrument::delayedTriggerIfPossible(QnActions::IDType id, const QnActionParameters& parameters)
+bool DropInstrument::delayedTriggerIfPossible(QnActions::IDType id, const action::Parameters& parameters)
 {
     if (!m_context || !m_context->menu()->canTrigger(id, parameters))
         return false;

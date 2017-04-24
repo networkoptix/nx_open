@@ -43,9 +43,11 @@ private:
 
     bool isBinaryExportSupported() const;
 
-    QnMediaResourceWidget *extractMediaWidget(const QnActionParameters &parameters);
+    QnMediaResourceWidget* extractMediaWidget(
+        const nx::client::desktop::ui::action::Parameters& parameters);
 
-    void exportTimeSelection(const QnActionParameters& parameters, qint64 timelapseFrameStepMs = 0);
+    void exportTimeSelection(const nx::client::desktop::ui::action::Parameters& parameters,
+        qint64 timelapseFrameStepMs = 0);
 
     void exportTimeSelectionInternal(
         const QnMediaResourcePtr &mediaResource,

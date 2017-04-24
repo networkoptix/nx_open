@@ -110,6 +110,7 @@
 //#define RECEIVER_DEBUG
 
 using nx::client::desktop::utils::UnityLauncherWorkaround;
+using namespace nx::client::desktop::ui;
 
 namespace {
 #define PARAM_KEY(KEY) const QLatin1String KEY##Key(BOOST_PP_STRINGIZE(KEY));
@@ -1523,7 +1524,7 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered()
     if (!context()->user())
         return;
 
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     QnVideoWallResourcePtr videoWall = parameters.resource().dynamicCast<QnVideoWallResource>();
     if (videoWall.isNull())
         return;
@@ -1539,8 +1540,7 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered()
     });
 
 
-    menu()->trigger(QnActions::OpenVideoWallsReviewAction, QnActionParameters(videoWall));
-    //saveVideowallAndReviewLayout(videoWall);
+    menu()->trigger(QnActions::OpenVideoWallsReviewAction, videoWall);
 }
 
 void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered()
@@ -1573,7 +1573,7 @@ void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered()
 
 void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     QnVideoWallItemIndexList items = parameters.videoWallItems();
 
     QnResourceList resources;
@@ -1666,7 +1666,7 @@ void QnWorkbenchVideoWallHandler::at_delayedOpenVideoWallItemAction_triggered()
 
 void QnWorkbenchVideoWallHandler::at_renameAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
 
     Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
     QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
@@ -1737,7 +1737,7 @@ void QnWorkbenchVideoWallHandler::at_renameAction_triggered()
 
 void QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
 
     QnVideoWallItemIndexList indices = parameters.videoWallItems();
     if (indices.isEmpty())
@@ -1768,7 +1768,7 @@ void QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered()
 
 void QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
 
     QnWorkbenchLayout *layout = NULL;
 
@@ -1809,7 +1809,7 @@ void QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered()
 
 void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     foreach(const QnVideoWallResourcePtr &videoWall, parameters.resources().filtered<QnVideoWallResource>())
     {
 
@@ -1859,7 +1859,7 @@ void QnWorkbenchVideoWallHandler::at_saveCurrentVideoWallReviewAction_triggered(
 
 void QnWorkbenchVideoWallHandler::at_saveVideoWallReviewAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     QnVideoWallResourcePtr videowall = parameters.resource().dynamicCast<QnVideoWallResource>();
     if (!videowall)
         return;
@@ -1868,7 +1868,7 @@ void QnWorkbenchVideoWallHandler::at_saveVideoWallReviewAction_triggered()
 
 void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     QnUuid targetUuid = parameters.argument(Qn::VideoWallItemGuidRole).value<QnUuid>();
     QnVideoWallItemIndex targetIndex = resourcePool()->getVideoWallItemByUuid(targetUuid);
     if (targetIndex.isNull())
@@ -1999,18 +1999,18 @@ void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered()
     if (!context()->user())
         return;
 
-    QnVirtualCameraResourcePtr desktopCamera = resourcePool()->getResourceByUniqueId<QnVirtualCameraResource>(commonModule()->moduleGUID().toString());
+    const auto desktopCamera = resourcePool()->getResourceByUniqueId<QnVirtualCameraResource>(
+        commonModule()->moduleGUID().toString());
     if (!desktopCamera || !desktopCamera->hasFlags(Qn::desktop_camera))
         return;
 
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     QnVideoWallItemIndexList videoWallItems = parameters.videoWallItems();
 
-    foreach(const QnVideoWallItemIndex &index, videoWallItems)
+    for (const auto& index: videoWallItems)
     {
-        parameters = QnActionParameters(desktopCamera);
-        parameters.setArgument(Qn::VideoWallItemGuidRole, index.uuid());
-        menu()->trigger(QnActions::DropOnVideoWallItemAction, parameters);
+        menu()->trigger(QnActions::DropOnVideoWallItemAction, action::Parameters(desktopCamera)
+            .withArgument(Qn::VideoWallItemGuidRole, index.uuid()));
     }
 }
 
@@ -2060,7 +2060,7 @@ void QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered()
 
 void QnWorkbenchVideoWallHandler::at_loadVideowallMatrixAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
 
     QnVideoWallMatrixIndexList matrices = parameters.videoWallMatrices();
     if (matrices.size() != 1)
@@ -2104,7 +2104,7 @@ void QnWorkbenchVideoWallHandler::at_loadVideowallMatrixAction_triggered()
 
 void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     QnVideoWallMatrixIndexList matrices = parameters.videoWallMatrices();
 
     QnResourceList resources;

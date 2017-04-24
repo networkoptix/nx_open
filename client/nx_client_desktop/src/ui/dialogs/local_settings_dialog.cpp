@@ -9,7 +9,7 @@
 
 #include <ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 
 #include <ui/screen_recording/video_recorder_settings.h>
 #include <ui/style/custom_style.h>

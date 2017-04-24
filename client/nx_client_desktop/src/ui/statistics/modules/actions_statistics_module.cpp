@@ -5,12 +5,12 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/statistics/modules/private/action_metrics.h>
 
-using namespace nx::client::desktop::ui::action;
+using namespace nx::client::desktop::ui;
 
 namespace
 {
     template<typename MetricsType>
-    QSharedPointer<MetricsType> createMetrics(ManagerPtr manager)
+    QSharedPointer<MetricsType> createMetrics(action::ManagerPtr manager)
     {
         return QSharedPointer<MetricsType>(new MetricsType(manager));
     }
@@ -28,7 +28,7 @@ QnActionsStatisticsModule::~QnActionsStatisticsModule()
 }
 
 void QnActionsStatisticsModule::setActionManager(
-    const ManagerPtr& manager)
+    const action::ManagerPtr& manager)
 {
     if (m_actionManager == manager)
         return;

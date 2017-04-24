@@ -860,7 +860,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
 
     commonModule()->updateRunningInstanceGuid();
 
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     QUrl url = parameters.argument(Qn::UrlRole, QUrl());
 
     if (directConnection)
@@ -901,7 +901,7 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
         return;
     }
 
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     QString id = parameters.argument(Qn::CloudSystemIdRole).toString();
 
     auto system = qnSystemsFinder->getSystem(id);
@@ -923,7 +923,7 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
     url.setUserName(credentials.user);
     url.setPassword(credentials.password.value());
 
-    menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url));
+    menu()->trigger(QnActions::ConnectAction, {Qn::UrlRole, url});
 }
 
 void QnWorkbenchConnectHandler::at_reconnectAction_triggered()
@@ -942,7 +942,7 @@ void QnWorkbenchConnectHandler::at_reconnectAction_triggered()
 
 void QnWorkbenchConnectHandler::at_disconnectAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     const DisconnectFlags flags = static_cast<DisconnectFlags>(
         parameters.hasArgument(Qn::ForceRole) && parameters.argument(Qn::ForceRole).toBool()
             ? DisconnectFlag::Force | DisconnectFlag::ClearAutoLogin

@@ -164,7 +164,8 @@ void QnAxClientWindow::addResourcesToLayout(const QList<QnUuid> &uniqueIds, qint
     m_context->workbench()->addLayout(wlayout);
     m_context->workbench()->setCurrentLayout(wlayout);
 
-    m_context->menu()->trigger(QnActions::OpenInCurrentLayoutAction, QnActionParameters(resources).withArgument(Qn::ItemTimeRole, timeStampMs));
+    m_context->menu()->trigger(QnActions::OpenInCurrentLayoutAction,
+        action::Parameters(resources).withArgument(Qn::ItemTimeRole, timeStampMs));
 
     for (QnWorkbenchItem *item: wlayout->items())
         item->setData(Qn::ItemSliderWindowRole, qVariantFromValue(period));
@@ -191,7 +192,7 @@ void QnAxClientWindow::removeFromCurrentLayout(const QnUuid& uniqueId)
 
 void QnAxClientWindow::reconnect(const QString &url) {
     if (m_context)
-        m_context->menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url) );
+        m_context->menu()->trigger(QnActions::ConnectAction, {Qn::UrlRole, url});
 }
 
 void QnAxClientWindow::maximizeItem(const QString &uniqueId) {

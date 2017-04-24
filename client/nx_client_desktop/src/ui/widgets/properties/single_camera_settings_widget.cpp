@@ -21,7 +21,7 @@
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/aligner.h>
 #include <ui/common/read_only.h>
@@ -157,8 +157,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
         {
             /* We must always ping the same address that is displayed in the visible field. */
             auto host = ui->ipAddressEdit->text();
-            menu()->trigger(QnActions::PingAction, QnActionParameters()
-                .withArgument(Qn::TextRole,host));
+            menu()->trigger(QnActions::PingAction, {Qn::TextRole, host});
         });
 
     connect(ui->licensingWidget, &QnLicensesProposeWidget::changed,

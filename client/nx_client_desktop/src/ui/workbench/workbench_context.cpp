@@ -42,6 +42,8 @@
 
 #include <nx/utils/log/log.h>
 
+using namespace nx::client::desktop::ui;
+
 QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessController, QObject* parent):
     QObject(parent),
     m_accessController(accessController),
@@ -248,7 +250,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
                 NX_LOG(lit("Custom URI: System is cloud, connecting to cloud first"), cl_logDEBUG1);
             }
 
-            auto parameters = QnActionParameters().withArgument(Qn::UrlRole, systemUrl);
+            auto parameters = action::Parameters().withArgument(Qn::UrlRole, systemUrl);
             parameters.setArgument(Qn::ForceRole, true);
             menu()->trigger(QnActions::ConnectAction, parameters);
             return true;
@@ -278,7 +280,7 @@ bool QnWorkbenchContext::connectUsingCommandLineAuth(const QnStartupParameters& 
         appServerUrl.setUserName(startupParams.videoWallGuid.toString());
     }
 
-    auto params = QnActionParameters().withArgument(Qn::UrlRole, appServerUrl);
+    auto params = action::Parameters().withArgument(Qn::UrlRole, appServerUrl);
     params.setArgument(Qn::ForceRole, true);
     if (qnSettings->autoLogin())
     {
@@ -326,7 +328,7 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
 
     if (!startupParams.videoWallGuid.isNull())
     {
-        menu()->trigger(QnActions::DelayedOpenVideoWallItemAction, QnActionParameters()
+        menu()->trigger(QnActions::DelayedOpenVideoWallItemAction, action::Parameters()
                                  .withArgument(Qn::VideoWallGuidRole, startupParams.videoWallGuid)
                                  .withArgument(Qn::VideoWallItemGuidRole, startupParams.videoWallItemGuid));
     }
@@ -335,12 +337,12 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
         NX_ASSERT(startupParams.instantDrop.isEmpty());
 
         QByteArray data = QByteArray::fromBase64(startupParams.delayedDrop.toLatin1());
-        menu()->trigger(QnActions::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
+        menu()->trigger(QnActions::DelayedDropResourcesAction, {Qn::SerializedDataRole, data});
     }
     else if (!startupParams.instantDrop.isEmpty())
     {
         QByteArray data = QByteArray::fromBase64(startupParams.instantDrop.toLatin1());
-        menu()->trigger(QnActions::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
+        menu()->trigger(QnActions::InstantDropResourcesAction, {Qn::SerializedDataRole, data});
     }
 
     /* Show beta version warning message for the main instance only */

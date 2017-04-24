@@ -28,6 +28,8 @@
 #include "resizing_instrument.h"
 #include "selection_item.h"
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 
     constexpr qreal kZoomWindowMinSize = 0.1;
@@ -894,9 +896,8 @@ void ZoomWindowInstrument::at_resizing(QGraphicsView *view, QGraphicsWidget *, R
     if(!newTargetWidget || newTargetWidget == windowTarget()->overlay()->target())
         return;
 
-    using namespace nx::client::desktop::ui::action;
     QnAction *action = menu()->action(QnActions::CreateZoomWindowAction);
-    if(!action || action->checkCondition(action->scope(), QnActionParameters(newTargetWidget)) != EnabledAction)
+    if (!action || action->checkCondition(action->scope(), newTargetWidget) != action::EnabledAction)
         return;
 
     QnMediaResourceWidget *widget = windowTarget()->zoomWidget();

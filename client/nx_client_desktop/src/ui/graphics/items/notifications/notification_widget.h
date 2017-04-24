@@ -10,7 +10,7 @@
 #include <ui/graphics/items/generic/graphics_tooltip_widget.h>
 
 #include <ui/actions/actions.h>
-#include <ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 
 class QnProxyLabel;
 class HoverFocusProcessor;
@@ -49,10 +49,11 @@ public:
 
     QString text() const;
 
-    void addActionButton(const QIcon& icon,
-                         QnActions::IDType actionId = QnActions::NoAction,
-                         const QnActionParameters& parameters = QnActionParameters(),
-                         bool defaultAction = false);
+    void addActionButton(
+        const QIcon& icon,
+        QnActions::IDType actionId = QnActions::NoAction,
+        const nx::client::desktop::ui::action::Parameters& parameters = nx::client::desktop::ui::action::Parameters(),
+        bool defaultAction = false);
 
     QnNotificationLevel::Value notificationLevel() const;
     void setNotificationLevel(QnNotificationLevel::Value notificationLevel);
@@ -77,7 +78,8 @@ public:
 signals:
     void notificationLevelChanged();
     void closeTriggered();
-    void actionTriggered(QnActions::IDType actionId, const QnActionParameters& parameters);
+    void actionTriggered(QnActions::IDType actionId,
+        const nx::client::desktop::ui::action::Parameters& parameters);
     void buttonClicked(const QString& alias);
     void linkActivated(const QString& link);
 
@@ -102,10 +104,17 @@ private:
     {
         ActionData(): action(QnActions::NoAction) {}
         ActionData(QnActions::IDType action) : action(action) {}
-        ActionData(QnActions::IDType action, const QnActionParameters& params): action(action), params(params) {}
+        ActionData(
+            QnActions::IDType action,
+            const nx::client::desktop::ui::action::Parameters& params)
+            :
+            action(action),
+            params(params)
+        {
+        }
 
         QnActions::IDType action;
-        QnActionParameters params;
+        nx::client::desktop::ui::action::Parameters params;
     };
 
     QList<ActionData> m_actions;

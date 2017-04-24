@@ -30,7 +30,7 @@
 
 #include <ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_messages.h>
 #include <ui/dialogs/common/progress_dialog.h>
@@ -53,6 +53,8 @@
 #include <nx/utils/string.h>
 
 #include <utils/common/app_info.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -229,7 +231,7 @@ bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &
     return tool->start();
 }
 
-QnMediaResourceWidget *QnWorkbenchExportHandler::extractMediaWidget(const QnActionParameters &parameters)
+QnMediaResourceWidget* QnWorkbenchExportHandler::extractMediaWidget(const action::Parameters& parameters)
 {
     if (parameters.size() == 1)
         return dynamic_cast<QnMediaResourceWidget *>(parameters.widget());
@@ -599,9 +601,10 @@ bool QnWorkbenchExportHandler::confirmExportTooBigExeFile() const
             + L'\n' + tr("Export to EXE anyway?"));
 }
 
-void QnWorkbenchExportHandler::exportTimeSelection(const QnActionParameters& parameters, qint64 timelapseFrameStepMs)
+void QnWorkbenchExportHandler::exportTimeSelection(const action::Parameters& parameters,
+    qint64 timelapseFrameStepMs)
 {
-    QnMediaResourceWidget *widget = extractMediaWidget(parameters);
+    const auto widget = extractMediaWidget(parameters);
     QnMediaResourcePtr mediaResource = parameters.resource().dynamicCast<QnMediaResource>();
 
     /* Either resource or widget must be provided */
@@ -850,7 +853,7 @@ bool QnWorkbenchExportHandler::confirmExport(
 
 void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
 
     bool wasLoggedIn = !context()->user().isNull();
 
@@ -882,7 +885,7 @@ void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
 
 void QnWorkbenchExportHandler::at_exportTimelapseAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
 
     qint64 durationMs = period.durationMs;

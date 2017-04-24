@@ -21,8 +21,8 @@ class Factory: public QObject, public QnWorkbenchContextAware
     Q_OBJECT
 public:
     Factory(QObject* parent = nullptr);
-    virtual QList<QAction *> newActions(const QnActionParameters& parameters, QObject* parent = nullptr);
-    virtual QMenu* newMenu(const QnActionParameters& /*parameters*/, QWidget* /*parentWidget*/);
+    virtual QList<QAction *> newActions(const Parameters& parameters, QObject* parent = nullptr);
+    virtual QMenu* newMenu(const Parameters& /*parameters*/, QWidget* /*parentWidget*/);
 };
 
 
@@ -31,7 +31,7 @@ class OpenCurrentUserLayoutFactory: public Factory
     Q_OBJECT
 public:
     OpenCurrentUserLayoutFactory(QObject* parent = NULL);
-    virtual QList<QAction *> newActions(const QnActionParameters& parameters, QObject* parent) override;
+    virtual QList<QAction *> newActions(const Parameters& parameters, QObject* parent) override;
 };
 
 
@@ -40,7 +40,7 @@ class PtzPresetsToursFactory: public Factory
     Q_OBJECT
 public:
     PtzPresetsToursFactory(QObject* parent = NULL);
-    virtual QList<QAction *> newActions(const QnActionParameters& parameters, QObject* parent) override;
+    virtual QList<QAction *> newActions(const Parameters& parameters, QObject* parent) override;
 };
 
 class EdgeNodeFactory: public Factory
@@ -48,7 +48,7 @@ class EdgeNodeFactory: public Factory
     Q_OBJECT
 public:
     EdgeNodeFactory(QObject* parent = NULL): Factory(parent) {}
-    virtual QMenu* newMenu(const QnActionParameters& parameters, QWidget *parentWidget) override;
+    virtual QMenu* newMenu(const Parameters& parameters, QWidget *parentWidget) override;
 };
 
 class AspectRatioFactory: public Factory
@@ -56,7 +56,7 @@ class AspectRatioFactory: public Factory
     Q_OBJECT
 public:
     AspectRatioFactory(QObject* parent = NULL): Factory(parent) {}
-    virtual QList<QAction*> newActions(const QnActionParameters& parameters, QObject* parent) override;
+    virtual QList<QAction*> newActions(const Parameters& parameters, QObject* parent) override;
 };
 
 } // namespace action

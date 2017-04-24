@@ -74,7 +74,7 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
 
 void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
 {
-    QnActionParameters params = menu()->currentParameters(sender());
+    const auto params = menu()->currentParameters(sender());
     QnMediaServerResourceList servers = params.resources().filtered<QnMediaServerResource>(
         [](const QnMediaServerResourcePtr &server)
         {
@@ -118,7 +118,7 @@ void QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered()
 
 void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
 {
-    QnActionParameters params = menu()->currentParameters(sender());
+    const auto params = menu()->currentParameters(sender());
     QnUserResourcePtr user = params.resource().dynamicCast<QnUserResource>();
     if (!user)
         return;
@@ -144,7 +144,7 @@ void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
 
 void QnWorkbenchResourcesSettingsHandler::at_userRolesAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     QnUuid userRoleId = parameters.argument(Qn::UuidRole).value<QnUuid>();
 
     QScopedPointer<QnUserRolesDialog> dialog(new QnUserRolesDialog(mainWindow()));
@@ -156,7 +156,7 @@ void QnWorkbenchResourcesSettingsHandler::at_userRolesAction_triggered()
 
 void QnWorkbenchResourcesSettingsHandler::at_layoutSettingsAction_triggered()
 {
-    QnActionParameters params = menu()->currentParameters(sender());
+    const auto params = menu()->currentParameters(sender());
     openLayoutSettingsDialog(params.resource().dynamicCast<QnLayoutResource>());
 }
 

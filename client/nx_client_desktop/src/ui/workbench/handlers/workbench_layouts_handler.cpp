@@ -27,7 +27,7 @@
 
 #include <ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_parameter_types.h>
 #include <ui/dialogs/layout_name_dialog.h>
 #include <ui/help/help_topic_accessor.h>
@@ -844,7 +844,7 @@ void LayoutsHandler::at_newUserLayoutAction_triggered()
 
     snapshotManager()->save(layout);
 
-    menu()->trigger(QnActions::OpenSingleLayoutAction, QnActionParameters(layout));
+    menu()->trigger(QnActions::OpenSingleLayoutAction, layout);
 }
 
 void LayoutsHandler::at_saveLayoutAction_triggered()
@@ -867,7 +867,7 @@ void LayoutsHandler::at_saveLayoutForCurrentUserAsAction_triggered()
 
 void LayoutsHandler::at_saveLayoutAsAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
 
     saveLayoutAs(
         parameters.resource().dynamicCast<QnLayoutResource>(),

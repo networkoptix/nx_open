@@ -8,11 +8,11 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_index.h>
-#include <ui/workbench/workbench_context_aware.h>
-#include <ui/actions/actions.h>
-#include <ui/actions/action_parameters.h>
 
+#include <ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_fwd.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 namespace nx {
 namespace client {
@@ -76,7 +76,7 @@ public:
      * \returns                         Whether the action with the given id can
      *                                  be triggered with supplied parameters.
      */
-    bool canTrigger(QnActions::IDType id, const QnActionParameters &parameters = QnActionParameters());
+    bool canTrigger(QnActions::IDType id, const Parameters& parameters = Parameters());
 
     /**
      * Triggers the action with the given id.
@@ -84,7 +84,7 @@ public:
      * \param id                        Id of the action to trigger.
      * \param parameters                Parameters to pass to action handler.
      */
-    void trigger(QnActions::IDType id, const QnActionParameters &parameters = QnActionParameters());
+    void trigger(QnActions::IDType id, const Parameters& parameters = Parameters());
 
 
     /**
@@ -94,7 +94,7 @@ public:
      * \param parameters                Parameters to pass to action handler.
      * \returns                         Was action triggered or not.
      */
-    bool triggerIfPossible(QnActions::IDType id, const QnActionParameters &parameters = QnActionParameters());
+    bool triggerIfPossible(QnActions::IDType id, const Parameters& parameters = Parameters());
 
     /**
      * \param scope                     Scope of the menu to create.
@@ -104,9 +104,9 @@ public:
      *                                  Ownership of the created menu is passed to
      *                                  the caller.
      */
-    QMenu *newMenu(ActionScope scope, QWidget *parent = NULL, const QnActionParameters &parameters = QnActionParameters(), CreationOptions options = 0);
+    QMenu *newMenu(ActionScope scope, QWidget *parent = NULL, const Parameters& parameters = Parameters(), CreationOptions options = 0);
 
-    QMenu *newMenu(QnActions::IDType rootId, ActionScope scope, QWidget *parent = NULL, const QnActionParameters &parameters = QnActionParameters(), CreationOptions options = 0);
+    QMenu *newMenu(QnActions::IDType rootId, ActionScope scope, QWidget *parent = NULL, const Parameters& parameters = Parameters(), CreationOptions options = 0);
 
     /**
      * \returns                         Action target provider that is assigned to this
@@ -124,7 +124,7 @@ public:
      * \returns                         Parameters with which the given action
      *                                  was triggered.
      */
-    QnActionParameters currentParameters(QnAction *action) const;
+    Parameters currentParameters(QnAction *action) const;
 
     /**
      * This is a convenience overload to be used inside handlers of <tt>QAction</tt>'s
@@ -134,7 +134,7 @@ public:
      * \returns                         Parameters with which the given action
      *                                  was triggered.
      */
-    QnActionParameters currentParameters(QObject *sender) const;
+    Parameters currentParameters(QObject *sender) const;
 
     /**
      * This function replaces one action in the given menu with another one.
@@ -156,16 +156,21 @@ signals:
 protected:
     friend class QnAction;
 
-    virtual bool eventFilter(QObject *watched, QEvent *event) override;
+    virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
-    void copyAction(QAction *dst, QnAction *src, bool forwardSignals = true);
+    void copyAction(QAction* dst, QnAction* src, bool forwardSignals = true);
 
-    QMenu *newMenuRecursive(const QnAction *parent, ActionScope scope, const QnActionParameters &parameters, QWidget *parentWidget, CreationOptions options);
+    QMenu *newMenuRecursive(
+        const QnAction* parent,
+        ActionScope scope,
+        const Parameters& parameters,
+        QWidget* parentWidget,
+        CreationOptions options);
 
-    bool redirectActionRecursive(QMenu *menu, QnActions::IDType targetId, QAction *targetAction);
+    bool redirectActionRecursive(QMenu* menu, QnActions::IDType targetId, QAction* targetAction);
 
     /** Setup proper connections between menu and the manager. */
-    QMenu* integrateMenu(QMenu *menu, const QnActionParameters &parameters);
+    QMenu* integrateMenu(QMenu* menu, const Parameters& parameters);
 
     /** Hide all menus that are currently opened. */
     void hideAllMenus();
@@ -175,17 +180,17 @@ private slots:
 
 private:
     /** Root action. Also contained in the maps. */
-    QnAction *m_root;
+    QnAction* m_root;
 
     /** Mapping from action id to action instance. */
-    QHash<QnActions::IDType, QnAction *> m_actionById;
+    QHash<QnActions::IDType, QnAction*> m_actionById;
 
     /** Mapping from action to action id. */
-    QHash<QnAction *, QnActions::IDType> m_idByAction;
+    QHash<QnAction*, QnActions::IDType> m_idByAction;
 
     /** Mapping from a menu created by this manager to the parameters that were
      * passed to it at construction time. NULL key is used for shortcut actions. */
-    QHash<QMenu*, QnActionParameters> m_parametersByMenu;
+    QHash<QMenu*, Parameters> m_parametersByMenu;
 
     /** Target provider for actions. */
     TargetProvider* m_targetProvider;
@@ -194,7 +199,7 @@ private:
     QPointer<QObject> m_targetProviderGuard;
 
     /** Currently active action that was activated via a shortcut. */
-    QnAction *m_shortcutAction;
+    QnAction* m_shortcutAction;
 
     /** Last menu that was clicked by the user. */
     QMenu* m_lastClickedMenu;

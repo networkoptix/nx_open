@@ -52,6 +52,8 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
+using namespace nx::client::desktop::ui;
+
 #define DEBUG_RESOURCE_TREE_MODEL
 #ifdef DEBUG_RESOURCE_TREE_MODEL
 #define TRACE(...) qDebug() << "QnResourceTreeModel: " << __VA_ARGS__;
@@ -788,12 +790,16 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
     /* Drop on videowall is handled in videowall. */
     if (node->type() == Qn::VideoWallItemNode)
     {
-        QnActionParameters parameters;
+        action::Parameters parameters;
         if (mimeData->hasFormat(QnVideoWallItem::mimeType()))
-            parameters = QnActionParameters(
-                resourcePool()->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData)));
+        {
+            parameters = resourcePool()->getVideoWallItemsByUuid(
+                QnVideoWallItem::deserializeUuids(mimeData));
+        }
         else
-            parameters = QnActionParameters(sourceResources);
+        {
+            parameters = sourceResources;
+        }
         parameters.setArgument(Qn::VideoWallItemGuidRole, node->uuid());
         menu()->trigger(QnActions::DropOnVideoWallItemAction, parameters);
     }
@@ -811,8 +817,8 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
                 << node->m_displayName);
             menu()->trigger(
                 QnActions::ShareLayoutAction,
-                QnActionParameters(layout).
-                withArgument(Qn::UuidRole, roleId)
+                action::Parameters(layout)
+                    .withArgument(Qn::UuidRole, roleId)
             );
         }
     }
@@ -990,16 +996,9 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
 
         if (!droppable.isEmpty())
         {
-            menu()->trigger(
-                QnActions::OpenInLayoutAction,
-                QnActionParameters(droppable).
-                withArgument(Qn::LayoutResourceRole, layout)
-            );
-
-            menu()->trigger(
-                QnActions::SaveLayoutAction,
-                QnActionParameters(layout)
-            );
+            menu()->trigger(QnActions::OpenInLayoutAction,  action::Parameters(droppable)
+                .withArgument(Qn::LayoutResourceRole, layout));
+            menu()->trigger(QnActions::SaveLayoutAction, layout);
         }
     }
 
@@ -1017,10 +1016,8 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
                 continue;
 
             TRACE("Sharing layout " << sourceLayout->getName() << " with " << targetUser->getName())
-            menu()->trigger(
-                QnActions::ShareLayoutAction,
-                QnActionParameters(sourceLayout).
-                withArgument(Qn::UserResourceRole, targetUser)
+            menu()->trigger(QnActions::ShareLayoutAction, action::Parameters(sourceLayout)
+                .withArgument(Qn::UserResourceRole, targetUser)
             );
         }
     }
@@ -1037,11 +1034,11 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
 
         QnVirtualCameraResourceList cameras = sourceResources.filtered<QnVirtualCameraResource>();
         if (!cameras.empty())
-            menu()->trigger(
-                QnActions::MoveCameraAction,
-                QnActionParameters(cameras).
-                withArgument(Qn::MediaServerResourceRole, server)
+        {
+            menu()->trigger(QnActions::MoveCameraAction, action::Parameters(cameras)
+                .withArgument(Qn::MediaServerResourceRole, server)
             );
+        }
     }
 }
 

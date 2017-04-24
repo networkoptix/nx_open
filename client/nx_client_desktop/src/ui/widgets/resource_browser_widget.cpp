@@ -74,6 +74,8 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 
 const char* kSearchModelPropertyName = "_qn_searchModel";
@@ -315,10 +317,9 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint& pos, bool ignoreSe
 
     auto manager = context()->menu();
 
-    using namespace nx::client::desktop::ui::action;
-    QScopedPointer<QMenu> menu(manager->newMenu(TreeScope, nullptr, ignoreSelection
-        ? QnActionParameters().withArgument(Qn::NodeTypeRole, Qn::RootNode)
-        : currentParameters(TreeScope)));
+    QScopedPointer<QMenu> menu(manager->newMenu(action::TreeScope, nullptr, ignoreSelection
+        ? action::Parameters{Qn::NodeTypeRole, Qn::RootNode}
+        : currentParameters(action::TreeScope)));
 
     if (currentTreeWidget() == ui->searchTreeWidget)
     {
@@ -464,10 +465,9 @@ QnVideoWallMatrixIndexList QnResourceBrowserWidget::selectedVideoWallMatrices() 
     return result;
 }
 
-nx::client::desktop::ui::action::ActionScope QnResourceBrowserWidget::currentScope() const
+action::ActionScope QnResourceBrowserWidget::currentScope() const
 {
-    using namespace nx::client::desktop::ui::action;
-    return TreeScope;
+    return action::TreeScope;
 }
 
 QString QnResourceBrowserWidget::toolTipAt(const QPointF& pos) const
@@ -565,18 +565,19 @@ bool QnResourceBrowserWidget::isScrollBarVisible() const
     return currentTreeWidget()->treeView()->verticalScrollBar()->isVisible();
 }
 
-QnActionParameters QnResourceBrowserWidget::currentParameters(nx::client::desktop::ui::action::ActionScope scope) const
+action::Parameters QnResourceBrowserWidget::currentParameters(action::ActionScope scope) const
 {
-    using namespace nx::client::desktop::ui::action;
-    if (scope != TreeScope)
-        return QnActionParameters();
+    if (scope != action::TreeScope)
+        return action::Parameters();
+
+    //TODO: #GDM #3.1 refactor to a simple switch by node type
 
     QItemSelectionModel* selectionModel = currentSelectionModel();
     QModelIndex index = selectionModel->currentIndex();
 
     Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
 
-    auto withNodeType = [nodeType](QnActionParameters parameters)
+    auto withNodeType = [nodeType](action::Parameters parameters)
         {
             return parameters.withArgument(Qn::NodeTypeRole, nodeType);
         };
@@ -589,8 +590,8 @@ QnActionParameters QnResourceBrowserWidget::currentParameters(nx::client::deskto
             return withNodeType(selectedVideoWallMatrices());
         case Qn::CloudSystemNode:
         {
-            QnActionParameters result;
-            result.setArgument(Qn::CloudSystemIdRole, index.data(Qn::CloudSystemIdRole).toString());
+            action::Parameters result{Qn::CloudSystemIdRole,
+                index.data(Qn::CloudSystemIdRole).toString()};
             return withNodeType(result);
         }
         case Qn::LayoutItemNode:
@@ -600,7 +601,7 @@ QnActionParameters QnResourceBrowserWidget::currentParameters(nx::client::deskto
             break;
     }
 
-    QnActionParameters result(selectedResources());
+    action::Parameters result(selectedResources());
 
     /* For working with shared layout links we must know owning user resource. */
     QModelIndex parentIndex = index.parent();
@@ -938,8 +939,8 @@ void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool
 
     if (nodeType == Qn::CloudSystemNode)
     {
-        menu()->trigger(QnActions::ConnectToCloudSystemAction, QnActionParameters()
-            .withArgument(Qn::CloudSystemIdRole, index.data(Qn::CloudSystemIdRole).toString()));
+        menu()->trigger(QnActions::ConnectToCloudSystemAction,
+            {Qn::CloudSystemIdRole, index.data(Qn::CloudSystemIdRole).toString()});
         return;
     }
 
@@ -953,8 +954,8 @@ void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool
 
     if (nodeType == Qn::LayoutTourNode)
     {
-        menu()->triggerIfPossible(QnActions::ReviewLayoutTourAction, QnActionParameters()
-            .withArgument(Qn::UuidRole, index.data(Qn::UuidRole).value<QnUuid>()));
+        menu()->triggerIfPossible(QnActions::ReviewLayoutTourAction,
+            {Qn::UuidRole, index.data(Qn::UuidRole).value<QnUuid>()});
         return;
     }
 

@@ -45,6 +45,8 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/linear_combination.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 
 /** Background color for overlay panels. */
@@ -360,11 +362,11 @@ void QnVideowallItemWidget::dragLeaveEvent(QGraphicsSceneDragDropEvent *event)
 
 void QnVideowallItemWidget::dropEvent(QGraphicsSceneDragDropEvent *event)
 {
-    QnActionParameters parameters;
+    action::Parameters parameters;
     if (!m_dragged.videoWallItems.isEmpty())
-        parameters = QnActionParameters(m_dragged.videoWallItems);
+        parameters = m_dragged.videoWallItems;
     else
-        parameters = QnActionParameters(m_dragged.resources);
+        parameters = m_dragged.resources;
     parameters.setArgument(Qn::VideoWallItemGuidRole, m_itemUuid);
     parameters.setArgument(Qn::KeyboardModifiersRole, event->modifiers());
 
@@ -422,10 +424,7 @@ void QnVideowallItemWidget::clickedNotify(QGraphicsSceneMouseEvent *event)
     if (event->button() != Qt::RightButton)
         return;
 
-    using namespace nx::client::desktop::ui::action;
-
-    QScopedPointer<QMenu> popupMenu(menu()->newMenu(SceneScope, nullptr,
-        QnActionParameters(m_indices)));
+    QScopedPointer<QMenu> popupMenu(menu()->newMenu(action::SceneScope, nullptr, m_indices));
 
     if (popupMenu->isEmpty())
         return;
@@ -448,10 +447,7 @@ void QnVideowallItemWidget::at_doubleClicked(Qt::MouseButton button)
     if (button != Qt::LeftButton)
         return;
 
-    menu()->triggerIfPossible(
-        QnActions::StartVideoWallControlAction,
-        QnActionParameters(m_indices)
-    );
+    menu()->triggerIfPossible(QnActions::StartVideoWallControlAction, m_indices);
 }
 
 void QnVideowallItemWidget::updateLayout()

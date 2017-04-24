@@ -38,12 +38,12 @@ Factory::Factory(QObject* parent):
 {
 }
 
-QList<QAction*> Factory::newActions(const QnActionParameters& /*parameters*/, QObject* /*parent*/)
+QList<QAction*> Factory::newActions(const Parameters& /*parameters*/, QObject* /*parent*/)
 {
     return QList<QAction*>();
 }
 
-QMenu* Factory::newMenu(const QnActionParameters& /*parameters*/, QWidget* /*parentWidget*/)
+QMenu* Factory::newMenu(const Parameters& /*parameters*/, QWidget* /*parentWidget*/)
 {
     return nullptr;
 }
@@ -53,7 +53,7 @@ OpenCurrentUserLayoutFactory::OpenCurrentUserLayoutFactory(QObject* parent):
 {
 }
 
-QList<QAction*> OpenCurrentUserLayoutFactory::newActions(const QnActionParameters& /*parameters*/,
+QList<QAction*> OpenCurrentUserLayoutFactory::newActions(const Parameters& /*parameters*/,
     QObject* parent)
 {
     /* Multi-videos and shared layouts will go here. */
@@ -106,7 +106,7 @@ PtzPresetsToursFactory::PtzPresetsToursFactory(QObject* parent):
 {
 }
 
-QList<QAction *> PtzPresetsToursFactory::newActions(const QnActionParameters& parameters,
+QList<QAction *> PtzPresetsToursFactory::newActions(const Parameters& parameters,
     QObject* parent)
 {
     QList<QAction*> result;
@@ -154,7 +154,7 @@ QList<QAction *> PtzPresetsToursFactory::newActions(const QnActionParameters& pa
             [this, id = preset.id, parameters]
             {
                 menu()->trigger(QnActions::PtzActivatePresetAction,
-                    QnActionParameters(parameters).withArgument(Qn::PtzObjectIdRole, id));
+                    Parameters(parameters).withArgument(Qn::PtzObjectIdRole, id));
             });
 
         result.push_back(action);
@@ -186,7 +186,7 @@ QList<QAction *> PtzPresetsToursFactory::newActions(const QnActionParameters& pa
             [this, id = tour.id, parameters]
             {
                 menu()->trigger(QnActions::PtzActivateTourAction,
-                    QnActionParameters(parameters).withArgument(Qn::PtzObjectIdRole, id));
+                    Parameters(parameters).withArgument(Qn::PtzObjectIdRole, id));
             });
 
         result.push_back(action);
@@ -195,17 +195,17 @@ QList<QAction *> PtzPresetsToursFactory::newActions(const QnActionParameters& pa
     return result;
 }
 
-QMenu* EdgeNodeFactory::newMenu(const QnActionParameters& parameters, QWidget* parentWidget)
+QMenu* EdgeNodeFactory::newMenu(const Parameters& parameters, QWidget* parentWidget)
 {
     auto edgeCamera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
     if (!edgeCamera || !QnMediaServerResource::isHiddenServer(edgeCamera->getParentResource()))
         return nullptr;
 
     return menu()->newMenu(QnActions::NoAction, TreeScope, parentWidget,
-        QnActionParameters(edgeCamera->getParentResource()));
+        Parameters(edgeCamera->getParentResource()));
 }
 
-QList<QAction*> AspectRatioFactory::newActions(const QnActionParameters& /*parameters*/,
+QList<QAction*> AspectRatioFactory::newActions(const Parameters& /*parameters*/,
     QObject* parent)
 {
     float current = workbench()->currentLayout()->cellAspectRatio();

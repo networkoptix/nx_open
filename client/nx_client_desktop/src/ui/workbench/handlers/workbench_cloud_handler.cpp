@@ -17,7 +17,7 @@
 #include <helpers/cloud_url_helper.h>
 
 #include <ui/actions/actions.h>
-#include <ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/dialogs/cloud/login_to_cloud_dialog.h>
 #include <ui/workbench/workbench_context.h>

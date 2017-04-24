@@ -32,6 +32,8 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 
 /* Set of node types, that are require children to be visible. */
@@ -694,14 +696,14 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
         case Qn::SharedResourceNode:
         case Qn::ResourceNode:
         case Qn::EdgeNode:
-            m_editable.value = menu()->canTrigger(QnActions::RenameResourceAction, QnActionParameters(m_resource));
+            m_editable.value = menu()->canTrigger(QnActions::RenameResourceAction, m_resource);
             break;
         case Qn::VideoWallItemNode:
         case Qn::VideoWallMatrixNode:
             m_editable.value = accessController()->hasGlobalPermission(Qn::GlobalControlVideoWallPermission);
             break;
         case Qn::LayoutTourNode:
-            m_editable.value = menu()->canTrigger(QnActions::RenameLayoutTourAction, QnActionParameters());
+            m_editable.value = menu()->canTrigger(QnActions::RenameLayoutTourAction);
             break;
         case Qn::RecorderNode:
             m_editable.value = true;
@@ -892,7 +894,7 @@ bool QnResourceTreeModelNode::setData(const QVariant& value, int role, int colum
     if (value.toString().isEmpty())
         return false;
 
-    QnActionParameters parameters;
+    action::Parameters parameters;
     bool isVideoWallEntity = false;
     if (m_type == Qn::VideoWallItemNode)
     {
@@ -900,7 +902,7 @@ bool QnResourceTreeModelNode::setData(const QVariant& value, int role, int colum
         QnVideoWallItemIndex index = resourcePool()->getVideoWallItemByUuid(m_uuid);
         if (index.isNull())
             return false;
-        parameters = QnActionParameters(QnVideoWallItemIndexList() << index);
+        parameters = (QnVideoWallItemIndexList() << index);
         isVideoWallEntity = true;
     }
     else if (m_type == Qn::VideoWallMatrixNode)
@@ -908,7 +910,7 @@ bool QnResourceTreeModelNode::setData(const QVariant& value, int role, int colum
         QnVideoWallMatrixIndex index = resourcePool()->getVideoWallMatrixByUuid(m_uuid);
         if (index.isNull())
             return false;
-        parameters = QnActionParameters(QnVideoWallMatrixIndexList() << index);
+        parameters = (QnVideoWallMatrixIndexList() << index);
         isVideoWallEntity = true;
     }
     else if (m_type == Qn::RecorderNode)
@@ -920,11 +922,11 @@ bool QnResourceTreeModelNode::setData(const QVariant& value, int role, int colum
         auto child = this->child(0);
         if (!child->resource())
             return false;
-        parameters = QnActionParameters(child->resource());
+        parameters = child->resource();
     }
     else
     {
-        parameters = QnActionParameters(m_resource);
+        parameters = m_resource;
     }
     parameters.setArgument(Qn::ResourceNameRole, value.toString());
     parameters.setArgument(Qn::NodeTypeRole, m_type);

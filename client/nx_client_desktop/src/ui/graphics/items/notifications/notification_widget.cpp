@@ -23,6 +23,8 @@
 
 #include <nx/fusion/model_functions.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 
 QString getFullAlias(const QString& postfix)
@@ -250,7 +252,7 @@ void QnNotificationWidget::setGeometry(const QRectF& geometry)
 
 void QnNotificationWidget::addActionButton(
     const QIcon& icon, QnActions::IDType actionId,
-    const QnActionParameters& parameters, bool defaultAction)
+    const action::Parameters& parameters, bool defaultAction)
 {
     QnImageButtonWidget* button = new QnImageButtonWidget(this);
     button->setAcceptHoverEvents(false);

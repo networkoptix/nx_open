@@ -10,7 +10,7 @@
 #include <core/resource/layout_resource.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <ui/common/indents.h>
 #include <ui/models/resource_properties/user_roles_settings_model.h>
 #include <ui/style/helper.h>
@@ -24,6 +24,7 @@
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/string.h>
 
+using namespace nx::client::desktop::ui;
 
 QnUserRolesDialog::QnUserRolesDialog(QWidget* parent):
     base_type(parent),
@@ -195,7 +196,7 @@ void QnUserRolesDialog::applyChanges()
         for (const auto& layout: layoutsToShare)
         {
             menu()->trigger(QnActions::ShareLayoutAction,
-                QnActionParameters(layout).withArgument(Qn::UuidRole, userRole.id));
+                action::Parameters(layout).withArgument(Qn::UuidRole, userRole.id));
         }
 
         qnResourcesChangesManager->saveAccessibleResources(userRole, resources);

@@ -22,7 +22,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 
@@ -73,7 +73,7 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
     connect(action(QnActions::OpenInAlarmLayoutAction), &QAction::triggered, this,
         [this]
         {
-            QnActionParameters parameters = menu()->currentParameters(sender());
+            const auto parameters = menu()->currentParameters(sender());
             auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
             cameras = accessController()->filtered(cameras, Qn::ViewContentPermission);
             openCamerasInAlarmLayout(cameras, true);

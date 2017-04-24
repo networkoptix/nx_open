@@ -26,6 +26,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workaround/hidpi_workarounds.h>
 
+using namespace nx::client::desktop::ui;
 
 QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     base_type(parent),
@@ -175,7 +176,7 @@ void QnCameraListDialog::at_camerasView_doubleClicked(const QModelIndex &index) 
 
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     if (resource)
-        context()->menu()->trigger(QnActions::CameraSettingsAction, QnActionParameters(resource));
+        context()->menu()->trigger(QnActions::CameraSettingsAction, resource);
 }
 
 void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint &) {
@@ -187,13 +188,12 @@ void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint 
 
     QScopedPointer<QMenu> menu;
     if (!resources.isEmpty()) {
-        QnActionParameters parameters(resources);
+        action::Parameters parameters(resources);
         parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
 
-        using namespace nx::client::desktop::ui::action;
         // We'll be changing hotkeys, so we cannot reuse global actions.
-        menu.reset(context()->menu()->newMenu(TreeScope, nullptr,
-            parameters, Manager::DontReuseActions));
+        menu.reset(context()->menu()->newMenu(action::TreeScope, nullptr,
+            parameters, action::Manager::DontReuseActions));
 
         foreach(QAction *action, menu->actions())
             action->setShortcut(QKeySequence());

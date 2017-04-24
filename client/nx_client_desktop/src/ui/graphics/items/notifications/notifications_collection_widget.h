@@ -12,7 +12,7 @@
 
 #include <health/system_health.h>
 
-#include <ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <ui/common/notification_levels.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -64,7 +64,8 @@ private:
     void updateBlinker();
 
     void at_list_itemRemoved(QnNotificationWidget *item);
-    void at_item_actionTriggered(QnActions::IDType actionId, const QnActionParameters &parameters);
+    void at_item_actionTriggered(QnActions::IDType actionId,
+        const nx::client::desktop::ui::action::Parameters& parameters);
     void at_notificationCache_fileDownloaded(const QString& filename);
 
 private:

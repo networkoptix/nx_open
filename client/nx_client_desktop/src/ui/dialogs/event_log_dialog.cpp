@@ -44,6 +44,8 @@
 
 #include <nx/utils/log/log.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
 
@@ -376,7 +378,7 @@ void QnEventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
 
     if (!resources.isEmpty())
     {
-        QnActionParameters params(resources);
+        action::Parameters params(resources);
 
         const auto timePos = m_model->eventTimestamp(idx.row());
         if (timePos != AV_NOPTS_VALUE)
@@ -462,11 +464,10 @@ void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
         auto manager = context()->menu();
         if (resource)
         {
-            QnActionParameters parameters(resource);
+            action::Parameters parameters(resource);
             parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
 
-            using namespace nx::client::desktop::ui::action;
-            menu.reset(manager->newMenu(TreeScope, nullptr, parameters));
+            menu.reset(manager->newMenu(action::TreeScope, nullptr, parameters));
             foreach(QAction* action, menu->actions())
                 action->setShortcut(QKeySequence());
         }

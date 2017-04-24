@@ -18,7 +18,7 @@
 #include <recording/time_period.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <ui/common/read_only.h>
 #include <ui/delegates/customizable_item_delegate.h>
 #include <ui/dialogs/resource_selection_dialog.h>
@@ -37,6 +37,7 @@
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
 
+using namespace nx::client::desktop::ui;
 
 QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &filterText
     , qint64 utcStartTimeMs
@@ -111,7 +112,7 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
 
     connect(m_ui->gridBookmarks, &QTableView::doubleClicked, this, [this](const QModelIndex & /* index */)
     {
-        QnActionParameters params;
+        action::Parameters params;
         QnTimePeriod window;
         if (!fillActionParameters(params, window))
             return;
@@ -181,7 +182,7 @@ void QnSearchBookmarksDialogPrivate::setParameters(const QString &filterText
     refresh();
 }
 
-bool QnSearchBookmarksDialogPrivate::fillActionParameters(QnActionParameters &params, QnTimePeriod &window)
+bool QnSearchBookmarksDialogPrivate::fillActionParameters(action::Parameters &params, QnTimePeriod &window)
 {
     auto bookmarkFromIndex = [this](const QModelIndex &index) -> QnCameraBookmark
     {
@@ -199,7 +200,7 @@ bool QnSearchBookmarksDialogPrivate::fillActionParameters(QnActionParameters &pa
     };
 
 
-    params = QnActionParameters();
+    params = action::Parameters();
 
     QModelIndexList selection = m_ui->gridBookmarks->selectionModel()->selectedRows();
     QSet<int> selectedRows;
@@ -259,7 +260,7 @@ bool QnSearchBookmarksDialogPrivate::fillActionParameters(QnActionParameters &pa
     return true;
 }
 
-void QnSearchBookmarksDialogPrivate::openInNewLayout(const QnActionParameters &params, const QnTimePeriod &window)
+void QnSearchBookmarksDialogPrivate::openInNewLayout(const action::Parameters &params, const QnTimePeriod &window)
 {
     const auto setFirstLayoutItemPeriod = [this](const QnTimePeriod &window
         , Qn::ItemDataRole role)
@@ -368,7 +369,7 @@ bool QnSearchBookmarksDialogPrivate::currentUserHasAllCameras()
 void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
 {
     /* Fill action parameters: */
-    QnActionParameters params;
+    action::Parameters params;
     QnTimePeriod window;
     if (!fillActionParameters(params, window))
         return;

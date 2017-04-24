@@ -306,6 +306,5 @@ void QnServerSettingsWidget::at_pingButton_clicked()
         return;
 
     /* We must always ping the same address that is displayed in the visible field. */
-    menu()->trigger(QnActions::PingAction, QnActionParameters()
-        .withArgument(Qn::TextRole, ui->ipAddressLineEdit->text()));
+    menu()->trigger(QnActions::PingAction, {Qn::TextRole, ui->ipAddressLineEdit->text()});
 }

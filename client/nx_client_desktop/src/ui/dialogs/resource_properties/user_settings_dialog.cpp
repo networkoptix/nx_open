@@ -29,6 +29,7 @@
 
 #include <utils/common/html.h>
 
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -485,7 +486,7 @@ void QnUserSettingsDialog::applyChanges()
         for (const auto& layout : layoutsToShare)
         {
             menu()->trigger(QnActions::ShareLayoutAction,
-                QnActionParameters(layout).withArgument(Qn::UserResourceRole, m_user));
+                action::Parameters(layout).withArgument(Qn::UserResourceRole, m_user));
         }
 
         qnResourcesChangesManager->saveAccessibleResources(m_user, accessibleResources);

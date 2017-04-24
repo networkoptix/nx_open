@@ -44,7 +44,7 @@ protected:
     SceneEventFilterItem *filterItem() const;
 
 private:
-    bool delayedTriggerIfPossible(QnActions::IDType id, const QnActionParameters& parameters);
+    bool delayedTriggerIfPossible(QnActions::IDType id, const nx::client::desktop::ui::action::Parameters& parameters);
 
 private:
     QnResourceList m_resources;
