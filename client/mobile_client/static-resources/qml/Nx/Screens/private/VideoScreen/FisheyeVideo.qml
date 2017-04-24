@@ -60,7 +60,7 @@ Item
     {
         id: interactor
 
-        readonly property real currentScale: Math.pow(2.0, scalePower)
+        readonly property real currentScale: Math.pow(2.0, animatedScalePower)
 
         readonly property matrix4x4 currentRotationMatrix:
         {
@@ -107,7 +107,10 @@ Item
 
         property vector2d previousRotation
 
-        property real scalePower: 0.0 //TODO: #vkutin Animate?
+        property real scalePower: 0.0
+        property real animatedScalePower: scalePower
+
+        Behavior on animatedScalePower { NumberAnimation { duration: 150 }}
 
         function startRotation()
         {
