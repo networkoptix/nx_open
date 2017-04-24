@@ -94,6 +94,7 @@
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <nx_ec/managers/abstract_server_manager.h>
 #include <nx/network/socket.h>
+#include <nx/network/udt/udt_socket.h>
 #include <nx/network/upnp/upnp_device_searcher.h>
 
 #include <plugins/native_sdk/common_plugin_container.h>
@@ -273,6 +274,7 @@ static const QByteArray NO_SETUP_WIZARD("noSetupWizard");
 static QString SERVICE_NAME = lit("%1 Server").arg(QnAppInfo::organizationName());
 static const quint64 DEFAULT_MAX_LOG_FILE_SIZE = 10*1024*1024;
 static const quint64 DEFAULT_LOG_ARCHIVE_SIZE = 25;
+static const int UDT_INTERNET_TRAFIC_TIMER = 24 * 60 * 60 * 1000; //< Once a day;
 //static const quint64 DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 static const QByteArray APPSERVER_PASSWORD("appserverPassword");
@@ -1800,7 +1802,13 @@ void MediaServerProcess::registerRestHandlers(
     QnUniversalTcpListener* tcpListener,
     ec2::QnTransactionMessageBus* messageBus)
 {
-    auto processorPool = tcpListener->processorPool();
+	auto processorPool = tcpListener->processorPool();
+    const auto welcomePage = lit("/static/index.html");
+    processorPool->registerRedirectRule(lit(""), welcomePage);
+    processorPool->registerRedirectRule(lit("/"), welcomePage);
+    processorPool->registerRedirectRule(lit("/static"), welcomePage);
+    processorPool->registerRedirectRule(lit("/static/"), welcomePage);
+    
     auto reg =
         [processorPool](const QString& path, QnRestRequestHandler* handler,
             Qn::GlobalPermission permissions = Qn::NoGlobalPermissions)
@@ -2982,6 +2990,23 @@ void MediaServerProcess::run()
     connect(&timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
     timer.start(QnVirtualCameraResource::issuesTimeoutMs());
     at_timer();
+
+    QTimer udtInternetTrafficTimer;
+    connect(&udtInternetTrafficTimer, &QTimer::timeout,
+        []()
+        {
+            QnResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID());
+            const auto old = server->getProperty(Qn::UDT_INTERNET_TRFFIC).toULongLong();
+            const auto current = nx::network::UdtStatistics::global.internetBytesTransfered.load();
+            const auto update = old + (qulonglong) current;
+            if (server->setProperty(Qn::UDT_INTERNET_TRFFIC, QString::number(update))
+                && propertyDictionary->saveParams(server->getId()))
+            {
+                NX_LOG(lm("%1 is updated to %2").strs(Qn::UDT_INTERNET_TRFFIC, update), cl_logDEBUG1);
+                nx::network::UdtStatistics::global.internetBytesTransfered -= current;
+            }
+        });
+    udtInternetTrafficTimer.start(UDT_INTERNET_TRAFIC_TIMER);
 
     QTimer::singleShot(3000, this, SLOT(at_connectionOpened()));
     QTimer::singleShot(0, this, SLOT(at_appStarted()));

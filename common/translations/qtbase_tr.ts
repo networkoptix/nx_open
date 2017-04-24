@@ -1,1172 +1,1172 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS language="tr" sourcelanguage="en_US" version="2.1">
-<context>
+<TS version="2.1" language="tr" sourcelanguage="en">
+  <context>
     <name>CloseButton</name>
     <message>
-        <source>Close Tab</source>
-        <translation>Sekmeyi Kapat</translation>
+      <source>Close Tab</source>
+      <translation>Sekmeyi Kapat</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>MAC_APPLICATION_MENU</name>
     <message>
-        <source>Services</source>
-        <translation>Servisler</translation>
+      <source>Services</source>
+      <translation>Servisler</translation>
     </message>
     <message>
-        <source>Hide %1</source>
-        <translation type="unfinished" />
+      <source>Hide %1</source>
+      <translation>%1 Gizle</translation>
     </message>
     <message>
-        <source>Hide Others</source>
-        <translation>Diğerlerini Gizle</translation>
+      <source>Hide Others</source>
+      <translation>Diğerlerini Gizle</translation>
     </message>
     <message>
-        <source>Show All</source>
-        <translation>Tümünü Göster</translation>
+      <source>Show All</source>
+      <translation>Tümünü Göster</translation>
     </message>
     <message>
-        <source>Preferences...</source>
-        <translation>Tercihler...</translation>
+      <source>Preferences...</source>
+      <translation>Tercihler...</translation>
     </message>
     <message>
-        <source>Quit %1</source>
-        <translation type="unfinished" />
+      <source>Quit %1</source>
+      <translation>Çık %1</translation>
     </message>
     <message>
-        <source>About %1</source>
-        <translation type="unfinished" />
+      <source>About %1</source>
+      <translation>%1 Hakkında</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QAbstractSpinBox</name>
     <message>
-        <source>&amp;Select All</source>
-        <translation>&amp;Tümünü Seç</translation>
+      <source>&amp;Select All</source>
+      <translation>&amp;Tümünü Seç</translation>
     </message>
     <message>
-        <source>&amp;Step up</source>
-        <translation>&amp;Arttır</translation>
+      <source>&amp;Step up</source>
+      <translation>&amp;Arttır</translation>
     </message>
     <message>
-        <source>Step &amp;down</source>
-        <translation>&amp;Düşür</translation>
+      <source>Step &amp;down</source>
+      <translation>&amp;Düşür</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QAccessibleActionInterface</name>
     <message>
-        <source>Press</source>
-        <translation>Bas</translation>
+      <source>Press</source>
+      <translation>Bas</translation>
     </message>
     <message>
-        <source>Increase</source>
-        <translation>Arttır</translation>
+      <source>Increase</source>
+      <translation>Arttır</translation>
     </message>
     <message>
-        <source>Decrease</source>
-        <translation>Azalt</translation>
+      <source>Decrease</source>
+      <translation>Azalt</translation>
     </message>
     <message>
-        <source>ShowMenu</source>
-        <translation>Menüyü Göster</translation>
+      <source>ShowMenu</source>
+      <translation>Menüyü Göster</translation>
     </message>
     <message>
-        <source>SetFocus</source>
-        <translation>Odaklamayı Ayarla</translation>
+      <source>SetFocus</source>
+      <translation>Odaklamayı Ayarla</translation>
     </message>
     <message>
-        <source>Toggle</source>
-        <translation>Değiştir</translation>
+      <source>Toggle</source>
+      <translation>Değiştir</translation>
     </message>
     <message>
-        <source>Scroll Left</source>
-        <translation>Sola Kaydır</translation>
+      <source>Scroll Left</source>
+      <translation>Sola Kaydır</translation>
     </message>
     <message>
-        <source>Scroll Right</source>
-        <translation>Sağa Kaydır</translation>
+      <source>Scroll Right</source>
+      <translation>Sağa Kaydır</translation>
     </message>
     <message>
-        <source>Scroll Up</source>
-        <translation type="unfinished" />
+      <source>Scroll Up</source>
+      <translation>Yukarı Kaydır</translation>
     </message>
     <message>
-        <source>Scroll Down</source>
-        <translation type="unfinished" />
+      <source>Scroll Down</source>
+      <translation>Aşağı Kaydır</translation>
     </message>
     <message>
-        <source>Previous Page</source>
-        <translation type="unfinished" />
+      <source>Previous Page</source>
+      <translation>Önceki Sayfa</translation>
     </message>
     <message>
-        <source>Next Page</source>
-        <translation type="unfinished" />
+      <source>Next Page</source>
+      <translation>Sonraki Sayfa</translation>
     </message>
     <message>
-        <source>Triggers the action</source>
-        <translation>Eylemi Harekete Geçirir</translation>
+      <source>Triggers the action</source>
+      <translation>Eylemi Harekete Geçirir</translation>
     </message>
     <message>
-        <source>Increase the value</source>
-        <translation>Değeri Arttır</translation>
+      <source>Increase the value</source>
+      <translation>Değeri Arttır</translation>
     </message>
     <message>
-        <source>Decrease the value</source>
-        <translation>Değeri Azalt</translation>
+      <source>Decrease the value</source>
+      <translation>Değeri Azalt</translation>
     </message>
     <message>
-        <source>Shows the menu</source>
-        <translation>Menüyü Gösterir</translation>
+      <source>Shows the menu</source>
+      <translation>Menüyü Gösterir</translation>
     </message>
     <message>
-        <source>Sets the focus</source>
-        <translation>Odaklamayı Ayarlar</translation>
+      <source>Sets the focus</source>
+      <translation>Odaklamayı Ayarlar</translation>
     </message>
     <message>
-        <source>Toggles the state</source>
-        <translation>Durumu Değiştirir</translation>
+      <source>Toggles the state</source>
+      <translation>Durumu Değiştirir</translation>
     </message>
     <message>
-        <source>Scrolls to the left</source>
-        <translation type="unfinished" />
+      <source>Scrolls to the left</source>
+      <translation>Sola kaydırır</translation>
     </message>
     <message>
-        <source>Scrolls to the right</source>
-        <translation type="unfinished" />
+      <source>Scrolls to the right</source>
+      <translation>Sağa kaydırır</translation>
     </message>
     <message>
-        <source>Scrolls up</source>
-        <translation type="unfinished" />
+      <source>Scrolls up</source>
+      <translation>Yukarı Kaydır</translation>
     </message>
     <message>
-        <source>Scrolls down</source>
-        <translation type="unfinished" />
+      <source>Scrolls down</source>
+      <translation>Aşağı Kaydır</translation>
     </message>
     <message>
-        <source>Goes back a page</source>
-        <translation type="unfinished" />
+      <source>Goes back a page</source>
+      <translation>Bir sayfa geri gider</translation>
     </message>
     <message>
-        <source>Goes to the next page</source>
-        <translation type="unfinished" />
+      <source>Goes to the next page</source>
+      <translation>Sonraki sayfaya git</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QAndroidPlatformTheme</name>
     <message>
-        <source>Yes</source>
-        <translation type="unfinished" />
+      <source>Yes</source>
+      <translation>Evet</translation>
     </message>
     <message>
-        <source>Yes to All</source>
-        <translation type="unfinished" />
+      <source>Yes to All</source>
+      <translation>Tümüne Evet</translation>
     </message>
     <message>
-        <source>No</source>
-        <translation type="unfinished" />
+      <source>No</source>
+      <translation>Hayır</translation>
     </message>
     <message>
-        <source>No to All</source>
-        <translation type="unfinished" />
+      <source>No to All</source>
+      <translation>Tümüne Hayır</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QCocoaMenuItem</name>
     <message>
-        <source>About Qt</source>
-        <translation>Qt Hakkında</translation>
+      <source>About Qt</source>
+      <translation>Qt Hakkında</translation>
     </message>
     <message>
-        <source>About</source>
-        <translation>Hakkında</translation>
+      <source>About</source>
+      <translation>Hakkında</translation>
     </message>
     <message>
-        <source>Config</source>
-        <translation>Yapılandır</translation>
+      <source>Config</source>
+      <translation>Yapılandır</translation>
     </message>
     <message>
-        <source>Preference</source>
-        <translation>Tercihler</translation>
+      <source>Preference</source>
+      <translation>Tercihler</translation>
     </message>
     <message>
-        <source>Options</source>
-        <translation>Seçenekler</translation>
+      <source>Options</source>
+      <translation>Seçenekler</translation>
     </message>
     <message>
-        <source>Setting</source>
-        <translation>Ayarlar</translation>
+      <source>Setting</source>
+      <translation>Ayarlar</translation>
     </message>
     <message>
-        <source>Setup</source>
-        <translation>Kurulum</translation>
+      <source>Setup</source>
+      <translation>Kurulum</translation>
     </message>
     <message>
-        <source>Quit</source>
-        <translation>İptal Et</translation>
+      <source>Quit</source>
+      <translation>İptal Et</translation>
     </message>
     <message>
-        <source>Exit</source>
-        <translation>Çıkış</translation>
+      <source>Exit</source>
+      <translation>Çıkış</translation>
     </message>
     <message>
-        <source>Cut</source>
-        <translation type="unfinished" />
+      <source>Cut</source>
+      <translation>Kes</translation>
     </message>
     <message>
-        <source>Copy</source>
-        <translation type="unfinished" />
+      <source>Copy</source>
+      <translation>Kopyala</translation>
     </message>
     <message>
-        <source>Paste</source>
-        <translation type="unfinished" />
+      <source>Paste</source>
+      <translation>Yapıştır</translation>
     </message>
     <message>
-        <source>Select All</source>
-        <translation>Tümünü Seç</translation>
+      <source>Select All</source>
+      <translation>Tümünü Seç</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QCocoaTheme</name>
     <message>
-        <source>Don't Save</source>
-        <translation>Kaydetme</translation>
+      <source>Don&apos;t Save</source>
+      <translation>Kaydetme&apos;</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QColorDialog</name>
     <message>
-        <source>Hu&amp;e:</source>
-        <translation>&amp;Renk Tonu:</translation>
+      <source>Hu&amp;e:</source>
+      <translation>&amp;Renk Tonu:</translation>
     </message>
     <message>
-        <source>&amp;Sat:</source>
-        <translation type="unfinished" />
+      <source>&amp;Sat:</source>
+      <translation>&amp;Sat:</translation>
     </message>
     <message>
-        <source>&amp;Val:</source>
-        <translation type="unfinished" />
+      <source>&amp;Val:</source>
+      <translation>&amp;Val:</translation>
     </message>
     <message>
-        <source>&amp;Red:</source>
-        <translation>&amp;Kırmızı:</translation>
+      <source>&amp;Red:</source>
+      <translation>&amp;Kırmızı:</translation>
     </message>
     <message>
-        <source>&amp;Green:</source>
-        <translation>&amp;Yeşil:</translation>
+      <source>&amp;Green:</source>
+      <translation>&amp;Yeşil:</translation>
     </message>
     <message>
-        <source>Bl&amp;ue:</source>
-        <translation>&amp;Mavi:</translation>
+      <source>Bl&amp;ue:</source>
+      <translation>&amp;Mavi:</translation>
     </message>
     <message>
-        <source>A&amp;lpha channel:</source>
-        <translation>&amp;Alfa Kanalı:</translation>
+      <source>A&amp;lpha channel:</source>
+      <translation>&amp;Alfa Kanalı:</translation>
     </message>
     <message>
-        <source>&amp;HTML:</source>
-        <translation type="unfinished" />
+      <source>&amp;HTML:</source>
+      <translation type="unfinished">&amp;HTML:</translation>
     </message>
     <message>
-        <source>Cursor at %1, %2
+      <source>Cursor at %1, %2
 Press ESC to cancel</source>
-        <translation type="unfinished" />
+      <translation>İmleç %1, %2 konumunda iptal etmek için ESC tuşuna basın</translation>
     </message>
     <message>
-        <source>&amp;Pick Screen Color</source>
-        <translation type="unfinished" />
+      <source>&amp;Pick Screen Color</source>
+      <translation>ekran rengini $seç</translation>
     </message>
     <message>
-        <source>Select Color</source>
-        <translation>Renk Seç</translation>
+      <source>Select Color</source>
+      <translation>Renk Seç</translation>
     </message>
     <message>
-        <source>&amp;Basic colors</source>
-        <translation>&amp;Temel Renkler</translation>
+      <source>&amp;Basic colors</source>
+      <translation>&amp;Temel Renkler</translation>
     </message>
     <message>
-        <source>&amp;Custom colors</source>
-        <translation>&amp;Özel Renkler</translation>
+      <source>&amp;Custom colors</source>
+      <translation>&amp;Özel Renkler</translation>
     </message>
     <message>
-        <source>&amp;Add to Custom Colors</source>
-        <translation>&amp;Özel Renklere Ekle</translation>
+      <source>&amp;Add to Custom Colors</source>
+      <translation>&amp;Özel Renklere Ekle</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QComboBox</name>
     <message>
-        <source>False</source>
-        <translation>Yanlış</translation>
+      <source>False</source>
+      <translation>Yanlış</translation>
     </message>
     <message>
-        <source>True</source>
-        <translation>Doğru</translation>
+      <source>True</source>
+      <translation>Doğru</translation>
     </message>
     <message>
-        <source>Open the combo box selection popup</source>
-        <translation>Combo Box Seçim Penceresini Aç</translation>
+      <source>Open the combo box selection popup</source>
+      <translation>Combo Box Seçim Penceresini Aç</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QDateTimeParser</name>
     <message>
-        <source>AM</source>
-        <translation>AM</translation>
+      <source>AM</source>
+      <translation>ÖÖ</translation>
     </message>
     <message>
-        <source>am</source>
-        <translation>am</translation>
+      <source>am</source>
+      <translation>öö</translation>
     </message>
     <message>
-        <source>PM</source>
-        <translation>PM</translation>
+      <source>PM</source>
+      <translation>ÖS</translation>
     </message>
     <message>
-        <source>pm</source>
-        <translation>pm</translation>
+      <source>pm</source>
+      <translation>ös</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QDialog</name>
     <message>
-        <source>What's This?</source>
-        <translation>Bu Nedir?</translation>
+      <source>What&apos;s This?</source>
+      <translation>Bu nedir&apos;</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QDialogButtonBox</name>
     <message>
-        <source>OK</source>
-        <translation>Tamam</translation>
+      <source>OK</source>
+      <translation>Tamam</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QDirModel</name>
     <message>
-        <source>Name</source>
-        <translation>İsim</translation>
+      <source>Name</source>
+      <translation>İsim</translation>
     </message>
     <message>
-        <source>Size</source>
-        <translation>Boyut</translation>
+      <source>Size</source>
+      <translation>Boyut</translation>
     </message>
     <message>
-        <source>Kind</source>
-        <comment>Match OS X Finder</comment>
-        <translation>Çeşit</translation>
+      <source>Kind</source>
+      <comment>Match OS X Finder</comment>
+      <translation>Çeşit</translation>
     </message>
     <message>
-        <source>Type</source>
-        <comment>All other platforms</comment>
-        <translation>Tür</translation>
+      <source>Type</source>
+      <comment>All other platforms</comment>
+      <translation>Tür</translation>
     </message>
     <message>
-        <source>Date Modified</source>
-        <translation>Değiştirilme Tarihi</translation>
+      <source>Date Modified</source>
+      <translation>Değiştirilme Tarihi</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QFile</name>
     <message>
-        <source>Destination file is the same file.</source>
-        <translation>Hedef Dosyayla Aynı.</translation>
+      <source>Destination file is the same file.</source>
+      <translation>Hedef Dosyayla Aynı.</translation>
     </message>
     <message>
-        <source>Source file does not exist.</source>
-        <translation>Kaynak Dosya  Bulunamıyor.</translation>
+      <source>Source file does not exist.</source>
+      <translation>Kaynak Dosya Bulunamıyor.</translation>
     </message>
     <message>
-        <source>Destination file exists</source>
-        <translation>Hedef Dosya Bulunuyor</translation>
+      <source>Destination file exists</source>
+      <translation>Hedef Dosya Bulunuyor</translation>
     </message>
     <message>
-        <source>Error while renaming.</source>
-        <translation>Adı Değiştirirken Hata Oluştu.</translation>
+      <source>Error while renaming.</source>
+      <translation>Adı Değiştirirken Hata Oluştu.</translation>
     </message>
     <message>
-        <source>Unable to restore from %1: %2</source>
-        <translation type="unfinished" />
+      <source>Unable to restore from %1: %2</source>
+      <translation>%1 geri yüklenemiyor: %2</translation>
     </message>
     <message>
-        <source>Will not rename sequential file using block copy</source>
-        <translation>Öbek Kopyası Kullanılarak Ardışık Dosya Yeniden Adlandırılamıyor</translation>
+      <source>Will not rename sequential file using block copy</source>
+      <translation>Öbek Kopyası Kullanılarak Ardışık Dosya Yeniden Adlandırılamıyor</translation>
     </message>
     <message>
-        <source>Cannot remove source file</source>
-        <translation>Kaynak Dosya Kaldırılamıyor</translation>
+      <source>Cannot remove source file</source>
+      <translation>Kaynak Dosya Kaldırılamıyor</translation>
     </message>
     <message>
-        <source>Cannot open %1 for input</source>
-        <translation type="unfinished" />
+      <source>Cannot open %1 for input</source>
+      <translation>%1 giriş için açılamıyor</translation>
     </message>
     <message>
-        <source>Cannot open for output</source>
-        <translation>Çıkış İçin Açılamıyor</translation>
+      <source>Cannot open for output</source>
+      <translation>Çıkış İçin Açılamıyor</translation>
     </message>
     <message>
-        <source>Failure to write block</source>
-        <translation>Öbek Yazma Başarısız</translation>
+      <source>Failure to write block</source>
+      <translation>Öbek Yazma Başarısız</translation>
     </message>
     <message>
-        <source>Cannot create %1 for output</source>
-        <translation type="unfinished" />
+      <source>Cannot create %1 for output</source>
+      <translation>Çıktı için %1 oluşturulamıyor</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QFileDialog</name>
     <message>
-        <source>Look in:</source>
-        <translation>Aranacak Yer:</translation>
+      <source>Look in:</source>
+      <translation>Aranacak Yer:</translation>
     </message>
     <message>
-        <source>Back</source>
-        <translation>Geri</translation>
+      <source>Back</source>
+      <translation>Geri</translation>
     </message>
     <message>
-        <source>Go back</source>
-        <translation>Geri Git</translation>
+      <source>Go back</source>
+      <translation>Geri Git</translation>
     </message>
     <message>
-        <source>Forward</source>
-        <translation>İleri</translation>
+      <source>Forward</source>
+      <translation>İleri</translation>
     </message>
     <message>
-        <source>Go forward</source>
-        <translation>İleri Git</translation>
+      <source>Go forward</source>
+      <translation>İleri Git</translation>
     </message>
     <message>
-        <source>Parent Directory</source>
-        <translation>Üst Dizin</translation>
+      <source>Parent Directory</source>
+      <translation>Üst Dizin</translation>
     </message>
     <message>
-        <source>Go to the parent directory</source>
-        <translation>Üst Dizine Git</translation>
+      <source>Go to the parent directory</source>
+      <translation>Üst Dizine Git</translation>
     </message>
     <message>
-        <source>Create New Folder</source>
-        <translation>Yeni Klasör Yarat</translation>
+      <source>Create New Folder</source>
+      <translation>Yeni Klasör Yarat</translation>
     </message>
     <message>
-        <source>Create a New Folder</source>
-        <translation>Yeni Bir Klasör Yarat</translation>
+      <source>Create a New Folder</source>
+      <translation>Yeni Bir Klasör Yarat</translation>
     </message>
     <message>
-        <source>List View</source>
-        <translation>Liste Görünümü</translation>
+      <source>List View</source>
+      <translation>Liste Görünümü</translation>
     </message>
     <message>
-        <source>Change to list view mode</source>
-        <translation>Liste Görünümü Moduna Geç</translation>
+      <source>Change to list view mode</source>
+      <translation>Liste Görünümü Moduna Geç</translation>
     </message>
     <message>
-        <source>Detail View</source>
-        <translation>Detaylı Görünüm</translation>
+      <source>Detail View</source>
+      <translation>Detaylı Görünüm</translation>
     </message>
     <message>
-        <source>Change to detail view mode</source>
-        <translation>Detaylı Görünüm Moduna Geç</translation>
+      <source>Change to detail view mode</source>
+      <translation>Detaylı Görünüm Moduna Geç</translation>
     </message>
     <message>
-        <source>Files of type:</source>
-        <translation type="unfinished" />
+      <source>Files of type:</source>
+      <translation>Dosya türü:</translation>
     </message>
     <message>
-        <source>Find Directory</source>
-        <translation>Dizin Bul</translation>
+      <source>Find Directory</source>
+      <translation>Dizin Bul</translation>
     </message>
     <message>
-        <source>Open</source>
-        <translation>Aç</translation>
+      <source>Open</source>
+      <translation>Aç</translation>
     </message>
     <message>
-        <source>Save As</source>
-        <translation>Olarak Kaydet</translation>
+      <source>Save As</source>
+      <translation>Olarak Kaydet</translation>
     </message>
     <message>
-        <source>Directory:</source>
-        <translation>Dizin:</translation>
+      <source>Directory:</source>
+      <translation>Dizin:</translation>
     </message>
     <message>
-        <source>File &amp;name:</source>
-        <translation>Dosya &amp;Adı:</translation>
+      <source>File &amp;name:</source>
+      <translation>Dosya &amp;Adı:</translation>
     </message>
     <message>
-        <source>&amp;Open</source>
-        <translation>&amp;Aç</translation>
+      <source>&amp;Open</source>
+      <translation>&amp;Aç</translation>
     </message>
     <message>
-        <source>&amp;Choose</source>
-        <translation>&amp;Seç</translation>
+      <source>&amp;Choose</source>
+      <translation>&amp;Seç</translation>
     </message>
     <message>
-        <source>&amp;Save</source>
-        <translation>&amp;Kaydet</translation>
+      <source>&amp;Save</source>
+      <translation>&amp;Kaydet</translation>
     </message>
     <message>
-        <source>All Files (*)</source>
-        <translation>Tüm Dosyalar (*)</translation>
+      <source>All Files (*)</source>
+      <translation>Tüm Dosyalar (*)</translation>
     </message>
     <message>
-        <source>Show </source>
-        <translation>Göster</translation>
+      <source>Show </source>
+      <translation>Göster </translation>
     </message>
     <message>
-        <source>&amp;Rename</source>
-        <translation>&amp;Yeniden Adlandır</translation>
+      <source>&amp;Rename</source>
+      <translation>&amp;Yeniden Adlandır</translation>
     </message>
     <message>
-        <source>&amp;Delete</source>
-        <translation>&amp;Sil</translation>
+      <source>&amp;Delete</source>
+      <translation>&amp;Sil</translation>
     </message>
     <message>
-        <source>Show &amp;hidden files</source>
-        <translation>&amp;Gizlenmiş Dosyaları Göster</translation>
+      <source>Show &amp;hidden files</source>
+      <translation>&amp;Gizlenmiş Dosyaları Göster</translation>
     </message>
     <message>
-        <source>&amp;New Folder</source>
-        <translation>&amp;Yeni Klasör</translation>
+      <source>&amp;New Folder</source>
+      <translation>&amp;Yeni Klasör</translation>
     </message>
     <message>
-        <source>All files (*)</source>
-        <translation type="unfinished" />
+      <source>All files (*)</source>
+      <translation>Tüm Dosyalar (*)</translation>
     </message>
     <message>
-        <source>Directories</source>
-        <translation>Dizinler</translation>
+      <source>Directories</source>
+      <translation>Dizinler</translation>
     </message>
     <message>
-        <source>%1
+      <source>%1
 Directory not found.
 Please verify the correct directory name was given.</source>
-        <translation type="unfinished" />
+      <translation>%1 dizin bulunamadı. Lütfen doğru dizin adı verildiğinden emin olun.</translation>
     </message>
     <message>
-        <source>%1 already exists.
+      <source>%1 already exists.
 Do you want to replace it?</source>
-        <translation type="unfinished" />
+      <translation>%s zaten mevcut; var olan dosyayı değiştirmek istiyor musunuz?</translation>
     </message>
     <message>
-        <source>%1
+      <source>%1
 File not found.
 Please verify the correct file name was given.</source>
-        <translation type="unfinished" />
+      <translation>%1 dizin bulunamadı. Lütfen doğru dizin adı verildiğinden emin olun.</translation>
     </message>
     <message>
-        <source>New Folder</source>
-        <translation>Yeni Klasör</translation>
+      <source>New Folder</source>
+      <translation>Yeni Klasör</translation>
     </message>
     <message>
-        <source>Delete</source>
-        <translation>Sil</translation>
+      <source>Delete</source>
+      <translation>Sil</translation>
     </message>
     <message>
-        <source>'%1' is write protected.
+      <source>&apos;%1&apos; is write protected.
 Do you want to delete it anyway?</source>
-        <translation type="unfinished" />
+      <translation>&apos;'%1' &apos; yazmaya karşı koruması var. Yine de silmek istiyor musunuz?</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete '%1'?</source>
-        <translation type="unfinished" />
+      <source>Are you sure you want to delete &apos;%1&apos;?</source>
+      <translation>Bu &apos;%1&apos; 'i silmek istediğinizden emin misiniz;?</translation>
     </message>
     <message>
-        <source>Could not delete directory.</source>
-        <translation>Dizin Silinemedi.</translation>
+      <source>Could not delete directory.</source>
+      <translation>Dizin Silinemedi.</translation>
     </message>
     <message>
-        <source>Recent Places</source>
-        <translation>Son Gidilen Yerler</translation>
+      <source>Recent Places</source>
+      <translation>Son Gidilen Yerler</translation>
     </message>
     <message>
-        <source>Remove</source>
-        <translation>Kaldır</translation>
+      <source>Remove</source>
+      <translation>Kaldır</translation>
     </message>
     <message>
-        <source>My Computer</source>
-        <translation>Bilgisayarım</translation>
+      <source>My Computer</source>
+      <translation>Bilgisayarım</translation>
     </message>
     <message>
-        <source>Drive</source>
-        <translation>Sürücü</translation>
+      <source>Drive</source>
+      <translation>Sürücü</translation>
     </message>
     <message>
-        <source>%1 File</source>
-        <extracomment>%1 is a file name suffix, for example txt</extracomment>
-        <translation type="unfinished" />
+      <source>%1 File</source>
+      <extracomment>%1 is a file name suffix, for example txt</extracomment>
+      <translation>%1 dosya</translation>
     </message>
     <message>
-        <source>File</source>
-        <translation>Dosya</translation>
+      <source>File</source>
+      <translation>Dosya</translation>
     </message>
     <message>
-        <source>File Folder</source>
-        <comment>Match Windows Explorer</comment>
-        <translation>Dosya Klasörü</translation>
+      <source>File Folder</source>
+      <comment>Match Windows Explorer</comment>
+      <translation>Dosya Klasörü</translation>
     </message>
     <message>
-        <source>Folder</source>
-        <comment>All other platforms</comment>
-        <translation>Klasör</translation>
+      <source>Folder</source>
+      <comment>All other platforms</comment>
+      <translation>Klasör</translation>
     </message>
     <message>
-        <source>Alias</source>
-        <comment>OS X Finder</comment>
-        <translation>Diğer Ad</translation>
+      <source>Alias</source>
+      <comment>OS X Finder</comment>
+      <translation>Diğer Ad</translation>
     </message>
     <message>
-        <source>Shortcut</source>
-        <comment>All other platforms</comment>
-        <translation>Kısayol</translation>
+      <source>Shortcut</source>
+      <comment>All other platforms</comment>
+      <translation>Kısayol</translation>
     </message>
     <message>
-        <source>Unknown</source>
-        <translation>Bilinmeyen</translation>
+      <source>Unknown</source>
+      <translation>Bilinmeyen</translation>
     </message>
     <message>
-        <source>Sidebar</source>
-        <translation>Kenar Çubuğu</translation>
+      <source>Sidebar</source>
+      <translation>Kenar Çubuğu</translation>
     </message>
     <message>
-        <source>List of places and bookmarks</source>
-        <translation>Yerlerin ve Yer İmlerinin Listesi</translation>
+      <source>List of places and bookmarks</source>
+      <translation>Yerlerin ve Yer İmlerinin Listesi</translation>
     </message>
     <message>
-        <source>Files</source>
-        <translation>Dosyalar</translation>
+      <source>Files</source>
+      <translation>Dosyalar</translation>
     </message>
     <message>
-        <source>Alt+Left</source>
-        <translation>Alt+Sol</translation>
+      <source>Alt+Left</source>
+      <translation>Alt+Sol</translation>
     </message>
     <message>
-        <source>Alt+Right</source>
-        <translation>Alt+Sağ</translation>
+      <source>Alt+Right</source>
+      <translation>Alt+Sağ</translation>
     </message>
     <message>
-        <source>Alt+Up</source>
-        <translation>Alt+Yukarı</translation>
+      <source>Alt+Up</source>
+      <translation>Alt+Yukarı</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QFileSystemModel</name>
     <message>
-        <source>%1 TB</source>
-        <translation type="unfinished" />
+      <source>%1 TB</source>
+      <translation>%1 TB</translation>
     </message>
     <message>
-        <source>%1 GB</source>
-        <translation type="unfinished" />
+      <source>%1 GB</source>
+      <translation>%1 GB</translation>
     </message>
     <message>
-        <source>%1 MB</source>
-        <translation type="unfinished" />
+      <source>%1 MB</source>
+      <translation>%1 MB</translation>
     </message>
     <message>
-        <source>%1 KB</source>
-        <translation type="unfinished" />
+      <source>%1 KB</source>
+      <translation>%1 KB</translation>
     </message>
     <message>
-        <source>%1 bytes</source>
-        <translation type="unfinished" />
+      <source>%1 bytes</source>
+      <translation>%1 bayt</translation>
     </message>
     <message>
-        <source>Invalid filename</source>
-        <translation>Geçersiz Dosya Adı</translation>
+      <source>Invalid filename</source>
+      <translation>Geçersiz Dosya Adı</translation>
     </message>
     <message>
-        <source>&lt;b&gt;The name "%1" can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
-        <translation type="unfinished" />
+      <source>&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
+      <translation>&lt;b&gt;isim &quot;%1&quot;kullanılamaz.&lt;/b&gt;&lt;p&gt;</translation>
     </message>
     <message>
-        <source>Name</source>
-        <translation>İsim</translation>
+      <source>Name</source>
+      <translation>İsim</translation>
     </message>
     <message>
-        <source>Size</source>
-        <translation>Boyut</translation>
+      <source>Size</source>
+      <translation>Boyut</translation>
     </message>
     <message>
-        <source>Kind</source>
-        <comment>Match OS X Finder</comment>
-        <translation>Çeşit</translation>
+      <source>Kind</source>
+      <comment>Match OS X Finder</comment>
+      <translation>Çeşit</translation>
     </message>
     <message>
-        <source>Type</source>
-        <comment>All other platforms</comment>
-        <translation>Tür</translation>
+      <source>Type</source>
+      <comment>All other platforms</comment>
+      <translation>Tür</translation>
     </message>
     <message>
-        <source>Date Modified</source>
-        <translation>Değiştirilme Tarihi</translation>
+      <source>Date Modified</source>
+      <translation>Değiştirilme Tarihi</translation>
     </message>
     <message>
-        <source>My Computer</source>
-        <translation>Bilgisayarım</translation>
+      <source>My Computer</source>
+      <translation>Bilgisayarım</translation>
     </message>
     <message>
-        <source>Computer</source>
-        <translation>Bilgisayar</translation>
+      <source>Computer</source>
+      <translation>Bilgisayar</translation>
     </message>
     <message>
-        <source>%1 byte(s)</source>
-        <translation type="unfinished" />
+      <source>%1 byte(s)</source>
+      <translation>%1 bayt</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QGnomeTheme</name>
     <message>
-        <source>&amp;OK</source>
-        <translation>&amp;TAMAM</translation>
+      <source>&amp;OK</source>
+      <translation>&amp;TAMAM</translation>
     </message>
     <message>
-        <source>&amp;Save</source>
-        <translation>&amp;Kaydet</translation>
+      <source>&amp;Save</source>
+      <translation>&amp;Kaydet</translation>
     </message>
     <message>
-        <source>&amp;Cancel</source>
-        <translation>&amp;İptal</translation>
+      <source>&amp;Cancel</source>
+      <translation>&amp;İptal</translation>
     </message>
     <message>
-        <source>&amp;Close</source>
-        <translation>&amp;Kapat</translation>
+      <source>&amp;Close</source>
+      <translation>&amp;Kapat</translation>
     </message>
     <message>
-        <source>Close without Saving</source>
-        <translation>Kaydetmeden Kapat</translation>
+      <source>Close without Saving</source>
+      <translation>Kaydetmeden Kapat</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QGuiApplication</name>
     <message>
-        <source>QT_LAYOUT_DIRECTION</source>
-        <comment>Translate this string to the string 'LTR' in left-to-right languages or to 'RTL' in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
-        <translation>QT_DÜZEN_YÖNÜ</translation>
+      <source>QT_LAYOUT_DIRECTION</source>
+      <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
+      <translation type="unfinished">QT_LAYOUT_DIRECTION</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QIODevice</name>
     <message>
-        <source>Permission denied</source>
-        <translation>Erişim İzni Reddedildi</translation>
+      <source>Permission denied</source>
+      <translation>Erişim İzni Reddedildi</translation>
     </message>
     <message>
-        <source>Too many open files</source>
-        <translation>Çok Fazla Açık Dosya Var</translation>
+      <source>Too many open files</source>
+      <translation>Çok Fazla Açık Dosya Var</translation>
     </message>
     <message>
-        <source>No such file or directory</source>
-        <translation>Böye Bir Dosya veya Dizin Bulunmuyor</translation>
+      <source>No such file or directory</source>
+      <translation>Böye Bir Dosya veya Dizin Bulunmuyor</translation>
     </message>
     <message>
-        <source>No space left on device</source>
-        <translation>Aygıtta Boş Alan Yok</translation>
+      <source>No space left on device</source>
+      <translation>Aygıtta Boş Alan Yok</translation>
     </message>
     <message>
-        <source>Unknown error</source>
-        <translation>Bilinmeyen Hata</translation>
+      <source>Unknown error</source>
+      <translation>Bilinmeyen Hata</translation>
     </message>
     <message>
-        <source>file to open is a directory</source>
-        <translation type="unfinished" />
+      <source>file to open is a directory</source>
+      <translation>dosya bir dizin olarak açılacak</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QImageReader</name>
     <message>
-        <source>Invalid device</source>
-        <translation type="unfinished" />
+      <source>Invalid device</source>
+      <translation>Geçersiz aygıt</translation>
     </message>
     <message>
-        <source>File not found</source>
-        <translation type="unfinished" />
+      <source>File not found</source>
+      <translation>Dosya bulunamadı</translation>
     </message>
     <message>
-        <source>Unsupported image format</source>
-        <translation type="unfinished" />
+      <source>Unsupported image format</source>
+      <translation>Desteklenmeyen resim biçimi</translation>
     </message>
     <message>
-        <source>Unable to read image data</source>
-        <translation type="unfinished" />
+      <source>Unable to read image data</source>
+      <translation>Görüntü verileri okunamıyor</translation>
     </message>
     <message>
-        <source>Unknown error</source>
-        <translation>Bilinmeyen Hata</translation>
+      <source>Unknown error</source>
+      <translation>Bilinmeyen Hata</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QImageWriter</name>
     <message>
-        <source>Unknown error</source>
-        <translation>Bilinmeyen Hata</translation>
+      <source>Unknown error</source>
+      <translation>Bilinmeyen Hata</translation>
     </message>
     <message>
-        <source>Device is not set</source>
-        <translation type="unfinished" />
+      <source>Device is not set</source>
+      <translation>Aygıt ayarlı değil</translation>
     </message>
     <message>
-        <source>Device not writable</source>
-        <translation type="unfinished" />
+      <source>Device not writable</source>
+      <translation>Aygıt yazılabilir değil</translation>
     </message>
     <message>
-        <source>Unsupported image format</source>
-        <translation type="unfinished" />
+      <source>Unsupported image format</source>
+      <translation>Desteklenmeyen resim biçimi</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QInputDialog</name>
     <message>
-        <source>Enter a value:</source>
-        <translation>Bir Değer Girin:</translation>
+      <source>Enter a value:</source>
+      <translation>Bir Değer Girin:</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QKeySequenceEdit</name>
     <message>
-        <source>Press shortcut</source>
-        <translation type="unfinished" />
+      <source>Press shortcut</source>
+      <translation>Kısayoluna basın</translation>
     </message>
     <message>
-        <source>%1, ...</source>
-        <extracomment>This text is an "unfinished" shortcut, expands like "Ctrl+A, ..."</extracomment>
-        <translation type="unfinished" />
+      <source>%1, ...</source>
+      <extracomment>This text is an &quot;unfinished&quot; shortcut, expands like &quot;Ctrl+A, ...&quot;</extracomment>
+      <translation type="unfinished">%1, ...</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QLineEdit</name>
     <message>
-        <source>&amp;Undo</source>
-        <translation>&amp;Geri Al</translation>
+      <source>&amp;Undo</source>
+      <translation>&amp;Geri Al</translation>
     </message>
     <message>
-        <source>&amp;Redo</source>
-        <translation>&amp;Yenile</translation>
+      <source>&amp;Redo</source>
+      <translation>&amp;Yenile</translation>
     </message>
     <message>
-        <source>Cu&amp;t</source>
-        <translation>&amp;Kes</translation>
+      <source>Cu&amp;t</source>
+      <translation>&amp;Kes</translation>
     </message>
     <message>
-        <source>&amp;Copy</source>
-        <translation>&amp;Kopyala</translation>
+      <source>&amp;Copy</source>
+      <translation>&amp;Kopyala</translation>
     </message>
     <message>
-        <source>&amp;Paste</source>
-        <translation>&amp;Yapıştır</translation>
+      <source>&amp;Paste</source>
+      <translation>&amp;Yapıştır</translation>
     </message>
     <message>
-        <source>Delete</source>
-        <translation>Sil</translation>
+      <source>Delete</source>
+      <translation>Sil</translation>
     </message>
     <message>
-        <source>Select All</source>
-        <translation>Tümünü Seç</translation>
+      <source>Select All</source>
+      <translation>Tümünü Seç</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QMessageBox</name>
     <message>
-        <source>Show Details...</source>
-        <translation>Detayları Göster...</translation>
+      <source>Show Details...</source>
+      <translation>Detayları Göster...</translation>
     </message>
     <message>
-        <source>Hide Details...</source>
-        <translation>Detayları Gizle...</translation>
+      <source>Hide Details...</source>
+      <translation>Detayları Gizle...</translation>
     </message>
     <message>
-        <source>OK</source>
-        <translation>Tamam</translation>
+      <source>OK</source>
+      <translation>Tamam</translation>
     </message>
     <message>
-        <source>Help</source>
-        <translation>Yardım</translation>
+      <source>Help</source>
+      <translation>Yardım</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QPlatformTheme</name>
     <message>
-        <source>OK</source>
-        <translation>Tamam</translation>
+      <source>OK</source>
+      <translation>Tamam</translation>
     </message>
     <message>
-        <source>Save</source>
-        <translation>Kaydet</translation>
+      <source>Save</source>
+      <translation>Kaydet</translation>
     </message>
     <message>
-        <source>Save All</source>
-        <translation>Tümünü Kaydet</translation>
+      <source>Save All</source>
+      <translation>Tümünü Kaydet</translation>
     </message>
     <message>
-        <source>Open</source>
-        <translation>Aç</translation>
+      <source>Open</source>
+      <translation>Aç</translation>
     </message>
     <message>
-        <source>&amp;Yes</source>
-        <translation>&amp;Evet</translation>
+      <source>&amp;Yes</source>
+      <translation>&amp;Evet</translation>
     </message>
     <message>
-        <source>Yes to &amp;All</source>
-        <translation>Tümüne &amp;Evet</translation>
+      <source>Yes to &amp;All</source>
+      <translation>Tümüne &amp;Evet</translation>
     </message>
     <message>
-        <source>&amp;No</source>
-        <translation>&amp;Hayır</translation>
+      <source>&amp;No</source>
+      <translation>&amp;Hayır</translation>
     </message>
     <message>
-        <source>N&amp;o to All</source>
-        <translation>Tümüne &amp;Hayır</translation>
+      <source>N&amp;o to All</source>
+      <translation>Tümüne &amp;Hayır</translation>
     </message>
     <message>
-        <source>Abort</source>
-        <translation>Durdur</translation>
+      <source>Abort</source>
+      <translation>Durdur</translation>
     </message>
     <message>
-        <source>Retry</source>
-        <translation>Tekrar Dene</translation>
+      <source>Retry</source>
+      <translation>Tekrar Dene</translation>
     </message>
     <message>
-        <source>Ignore</source>
-        <translation>Yoksay</translation>
+      <source>Ignore</source>
+      <translation>Yoksay</translation>
     </message>
     <message>
-        <source>Close</source>
-        <translation>Kapat</translation>
+      <source>Close</source>
+      <translation>Kapat</translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation>İptal</translation>
+      <source>Cancel</source>
+      <translation>İptal</translation>
     </message>
     <message>
-        <source>Discard</source>
-        <translation>Çıkar</translation>
+      <source>Discard</source>
+      <translation>Çıkar</translation>
     </message>
     <message>
-        <source>Help</source>
-        <translation>Yardım</translation>
+      <source>Help</source>
+      <translation>Yardım</translation>
     </message>
     <message>
-        <source>Apply</source>
-        <translation>Uygula</translation>
+      <source>Apply</source>
+      <translation>Uygula</translation>
     </message>
     <message>
-        <source>Reset</source>
-        <translation>Sıfırla</translation>
+      <source>Reset</source>
+      <translation>Sıfırla</translation>
     </message>
     <message>
-        <source>Restore Defaults</source>
-        <translation>Varsayılanları Geri Yükle</translation>
+      <source>Restore Defaults</source>
+      <translation>Varsayılanları Geri Yükle</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QProgressDialog</name>
     <message>
-        <source>Cancel</source>
-        <translation>İptal</translation>
+      <source>Cancel</source>
+      <translation>İptal</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QQnxFileDialogHelper</name>
     <message>
-        <source>All files (*.*)</source>
-        <translation type="unfinished" />
+      <source>All files (*.*)</source>
+      <translation>Tüm Dosyalar (*.*)</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QSaveFile</name>
     <message>
-        <source>Existing file %1 is not writable</source>
-        <translation type="unfinished" />
+      <source>Existing file %1 is not writable</source>
+      <translation>Varolan dosya %1 yazılabilir değil</translation>
     </message>
     <message>
-        <source>Filename refers to a directory</source>
-        <translation type="unfinished" />
+      <source>Filename refers to a directory</source>
+      <translation>Dosya adı bir dizini gösterir</translation>
     </message>
     <message>
-        <source>Writing canceled by application</source>
-        <translation>Yazma İşlemi Uygulama Tarafından İptal Edildi</translation>
+      <source>Writing canceled by application</source>
+      <translation>Yazma İşlemi Uygulama Tarafından İptal Edildi</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QScrollBar</name>
     <message>
-        <source>Scroll here</source>
-        <translation>Buraya Kaydır</translation>
+      <source>Scroll here</source>
+      <translation>Buraya Kaydır</translation>
     </message>
     <message>
-        <source>Left edge</source>
-        <translation>Sol Köşe</translation>
+      <source>Left edge</source>
+      <translation>Sol Köşe</translation>
     </message>
     <message>
-        <source>Top</source>
-        <translation>En Üst</translation>
+      <source>Top</source>
+      <translation>En Üst</translation>
     </message>
     <message>
-        <source>Right edge</source>
-        <translation>Sağ Köşe</translation>
+      <source>Right edge</source>
+      <translation>Sağ Köşe</translation>
     </message>
     <message>
-        <source>Bottom</source>
-        <translation>En Alt</translation>
+      <source>Bottom</source>
+      <translation>En Alt</translation>
     </message>
     <message>
-        <source>Page left</source>
-        <translation>Sayfanın Solu</translation>
+      <source>Page left</source>
+      <translation>Sayfanın Solu</translation>
     </message>
     <message>
-        <source>Page up</source>
-        <translation>Önceki Sayfa</translation>
+      <source>Page up</source>
+      <translation>Önceki Sayfa</translation>
     </message>
     <message>
-        <source>Page right</source>
-        <translation>Sayfanın Sağı</translation>
+      <source>Page right</source>
+      <translation>Sayfanın Sağı</translation>
     </message>
     <message>
-        <source>Page down</source>
-        <translation>Sonraki Sayfa</translation>
+      <source>Page down</source>
+      <translation>Sonraki Sayfa</translation>
     </message>
     <message>
-        <source>Scroll left</source>
-        <translation>Sola Kaydır</translation>
+      <source>Scroll left</source>
+      <translation>Sola Kaydır</translation>
     </message>
     <message>
-        <source>Scroll up</source>
-        <translation>Yukarı Kaydır</translation>
+      <source>Scroll up</source>
+      <translation>Yukarı Kaydır</translation>
     </message>
     <message>
-        <source>Scroll right</source>
-        <translation>Sağa Kaydır</translation>
+      <source>Scroll right</source>
+      <translation>Sağa Kaydır</translation>
     </message>
     <message>
-        <source>Scroll down</source>
-        <translation>Aşağı Kaydır</translation>
+      <source>Scroll down</source>
+      <translation>Aşağı Kaydır</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QStandardPaths</name>
     <message>
-        <source>Desktop</source>
-        <translation>Masaüstü</translation>
+      <source>Desktop</source>
+      <translation>Masaüstü</translation>
     </message>
     <message>
-        <source>Documents</source>
-        <translation>Belgeler</translation>
+      <source>Documents</source>
+      <translation>Belgeler</translation>
     </message>
     <message>
-        <source>Fonts</source>
-        <translation>Kaynaklar</translation>
+      <source>Fonts</source>
+      <translation>Kaynaklar</translation>
     </message>
     <message>
-        <source>Applications</source>
-        <translation>Uygulamalar</translation>
+      <source>Applications</source>
+      <translation>Uygulamalar</translation>
     </message>
     <message>
-        <source>Music</source>
-        <translation>Müzikler</translation>
+      <source>Music</source>
+      <translation>Müzikler</translation>
     </message>
     <message>
-        <source>Movies</source>
-        <translation>Filmler</translation>
+      <source>Movies</source>
+      <translation>Filmler</translation>
     </message>
     <message>
-        <source>Pictures</source>
-        <translation>Resimler</translation>
+      <source>Pictures</source>
+      <translation>Resimler</translation>
     </message>
     <message>
-        <source>Temporary Directory</source>
-        <translation>Geçici Dizin</translation>
+      <source>Temporary Directory</source>
+      <translation>Geçici Dizin</translation>
     </message>
     <message>
-        <source>Home</source>
-        <translation>Ana Sayfa</translation>
+      <source>Home</source>
+      <translation>Ana Sayfa</translation>
     </message>
     <message>
-        <source>Application Data</source>
-        <translation>Uygulama Verileri</translation>
+      <source>Application Data</source>
+      <translation>Uygulama Verileri</translation>
     </message>
     <message>
-        <source>Application Configuration</source>
-        <translation type="unfinished" />
+      <source>Application Configuration</source>
+      <translation>Uygulama Yapılandırması</translation>
     </message>
     <message>
-        <source>Cache</source>
-        <translation>Önbellek</translation>
+      <source>Cache</source>
+      <translation>Önbellek</translation>
     </message>
     <message>
-        <source>Shared Data</source>
-        <translation>Paylaşılan Veriler</translation>
+      <source>Shared Data</source>
+      <translation>Paylaşılan Veriler</translation>
     </message>
     <message>
-        <source>Runtime</source>
-        <translation>Çalışma Zamanı</translation>
+      <source>Runtime</source>
+      <translation>Çalışma Zamanı</translation>
     </message>
     <message>
-        <source>Configuration</source>
-        <translation>Yapılandırma</translation>
+      <source>Configuration</source>
+      <translation>Yapılandırma</translation>
     </message>
     <message>
-        <source>Shared Configuration</source>
-        <translation type="unfinished" />
+      <source>Shared Configuration</source>
+      <translation>Paylaşılan Yapılandırma</translation>
     </message>
     <message>
-        <source>Shared Cache</source>
-        <translation>Paylaşılan Önbellek</translation>
+      <source>Shared Cache</source>
+      <translation>Paylaşılan Önbellek</translation>
     </message>
     <message>
-        <source>Download</source>
-        <translation>Karşıdan Yükle</translation>
+      <source>Download</source>
+      <translation>Karşıdan Yükle</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QTabBar</name>
     <message>
-        <source>Scroll Left</source>
-        <translation>Sola Kaydır</translation>
+      <source>Scroll Left</source>
+      <translation>Sola Kaydır</translation>
     </message>
     <message>
-        <source>Scroll Right</source>
-        <translation>Sağa Kaydır</translation>
+      <source>Scroll Right</source>
+      <translation>Sağa Kaydır</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QWhatsThisAction</name>
     <message>
-        <source>What's This?</source>
-        <translation>Bu Nedir?</translation>
+      <source>What&apos;s This?</source>
+      <translation>Bu nedir&apos;?</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QWidgetTextControl</name>
     <message>
-        <source>&amp;Undo</source>
-        <translation>&amp;Geri Al</translation>
+      <source>&amp;Undo</source>
+      <translation>&amp;Geri Al</translation>
     </message>
     <message>
-        <source>&amp;Redo</source>
-        <translation>&amp;Tekrarla</translation>
+      <source>&amp;Redo</source>
+      <translation>&amp;Tekrarla</translation>
     </message>
     <message>
-        <source>Cu&amp;t</source>
-        <translation>&amp;Kes</translation>
+      <source>Cu&amp;t</source>
+      <translation>&amp;Kes</translation>
     </message>
     <message>
-        <source>&amp;Copy</source>
-        <translation>&amp;Kopyala</translation>
+      <source>&amp;Copy</source>
+      <translation>&amp;Kopyala</translation>
     </message>
     <message>
-        <source>Copy &amp;Link Location</source>
-        <translation>Konumu Kopyala&amp;Birleştir</translation>
+      <source>Copy &amp;Link Location</source>
+      <translation>Konumu Kopyala&amp;Birleştir</translation>
     </message>
     <message>
-        <source>&amp;Paste</source>
-        <translation>&amp;Yapıştır</translation>
+      <source>&amp;Paste</source>
+      <translation>&amp;Yapıştır</translation>
     </message>
     <message>
-        <source>Delete</source>
-        <translation>Sil</translation>
+      <source>Delete</source>
+      <translation>Sil</translation>
     </message>
     <message>
-        <source>Select All</source>
-        <translation>Tümünü Seç</translation>
+      <source>Select All</source>
+      <translation>Tümünü Seç</translation>
     </message>
-</context>
+  </context>
 </TS>

@@ -6,7 +6,7 @@
     <message>
         <source>Language Name</source>
         <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-        <translation>Dil adı</translation>
+        <translation>Turkish</translation>
     </message>
     <message>
         <source>Locale Code</source>
@@ -189,10 +189,6 @@
     <message>
         <source>Source: %1</source>
         <translation>Kaynak: %1</translation>
-    </message>
-    <message>
-        <source>Url: %1</source>
-        <translation>Url: %1</translation>
     </message>
     <message>
         <source>Reason: %1</source>

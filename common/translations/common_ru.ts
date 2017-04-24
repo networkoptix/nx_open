@@ -191,10 +191,6 @@
         <translation>Источник: %1</translation>
     </message>
     <message>
-        <source>Url: %1</source>
-        <translation>Адрес: %1</translation>
-    </message>
-    <message>
         <source>Reason: %1</source>
         <translation>Причина: %1</translation>
     </message>
@@ -243,11 +239,11 @@
     </message>
     <message>
         <source>start</source>
-        <translation>начать</translation>
+        <translation>начинается</translation>
     </message>
     <message>
         <source>stop</source>
-        <translation>остановить</translation>
+        <translation>заканчивается</translation>
     </message>
     <message>
         <source>While %1</source>
@@ -255,7 +251,7 @@
     </message>
     <message>
         <source>On %1 %2</source>
-        <translation>При %2: %1</translation>
+        <translation>Когда %2 %1</translation>
     </message>
     <message>
         <source>An unknown event has occurred</source>

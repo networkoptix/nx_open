@@ -5,11 +5,11 @@
     <name>EmptyTilesPlaceholder</name>
     <message>
         <source>Searching servers in your local network...</source>
-        <translation>로컬 네트워크에서 서버를 검색...</translation>
+        <translation>로컬 네트워크에서 서버를 검색 중...</translation>
     </message>
     <message>
         <source>No servers found</source>
-        <translation>서버를 찾을 수 없음</translation>
+        <translation>서버를 찾지 못 했습니다</translation>
     </message>
     <message>
         <source>Check your network connection or press &quot;Connect to Server&quot; button to enter known server address</source>

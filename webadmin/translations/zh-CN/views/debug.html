@@ -1,8 +1,8 @@
 <div class="container">
-    <h1>Generate stream links</h1>
+    <h1>生成流链接</h1>
     <form class="form-horizontal" novalidate ng-class="session.event.event_type">
         <div class="form-group AnyEvent">
-            <label class="col-sm-3 control-label">System host (IP:port)</label>
+            <label class="col-sm-3 control-label">系统主机 (IP:端口)</label>
             <div class="col-sm-9">
                 <input type="text" class="form-control"
                        ng-model="linkSettings.system">
@@ -23,28 +23,28 @@
             </div>
         </div>
         <div class="form-group AnyEvent">
-            <label class="col-sm-3 control-label">method</label>
+            <label class="col-sm-3 control-label">方法</label>
             <div class="col-sm-9">
                 <input type="text" class="form-control"
                        ng-model="linkSettings.method">
             </div>
         </div>
         <div class="form-group AnyEvent">
-            <label class="col-sm-3 control-label">login</label>
+            <label class="col-sm-3 control-label">登录</label>
             <div class="col-sm-9">
                 <input type="text" class="form-control"
                        ng-model="linkSettings.login">
             </div>
         </div>
         <div class="form-group AnyEvent">
-            <label class="col-sm-3 control-label">password</label>
+            <label class="col-sm-3 control-label">密码</label>
             <div class="col-sm-9">
                 <input type="text" class="form-control"
                        ng-model="linkSettings.password">
             </div>
         </div>
         <div class="form-group AnyEvent">
-            <label class="col-sm-3 control-label">link</label>
+            <label class="col-sm-3 control-label">連結</label>
             <div class="col-sm-9"><p ng-repeat="camId in linkSettings.cameraIds" class="form-control-static">{{formatLink(camId)}}</p>
             </div>
         </div>
@@ -53,7 +53,7 @@
 
 <div class="container">
 
-    <h1>Generate events </h1>
+    <h1>生成事件 </h1>
 
     <div class="row">
         <div class="col-sm-6">
@@ -72,7 +72,7 @@
                     </div>
                 </div>
                 <div class="form-group AnyEvent">
-                    <label class="col-sm-3 control-label">Timestamp</label>
+                    <label class="col-sm-3 control-label">时间戳記</label>
                     <div class="col-sm-5">
                         <input type="text" ng-model="session.event.timestamp"
                                class="form-control">
@@ -82,7 +82,7 @@
                 <div class="form-group CameraMotionEvent CameraInputEvent CameraDisconnectEvent StorageFailureEvent
         NetworkIssueEvent CameraIpConflictEvent ServerFailureEvent ServerConflictEvent ServerStartEvent
         LicenseIssueEvent BackupFinishedEvent">
-                    <label class="col-sm-3 control-label">Resource</label>
+                    <label class="col-sm-3 control-label">资源</label>
                     <div class="col-sm-5">
                         <input type="text" ng-model="session.eventResource"
                                typeahead="resource as resource.name for resource in filterResources($viewValue) | limitTo:10"
@@ -101,7 +101,7 @@
                 </div>
 
                 <div class="form-group UserDefinedEvent">
-                    <label class="col-sm-3 control-label ">Source</label>
+                    <label class="col-sm-3 control-label ">来源</label>
                     <div class="col-sm-5">
                         <input type="text" ng-model="session.event.source"
                                class="form-control">
@@ -109,7 +109,7 @@
                 </div>
 
                 <div class="form-group UserDefinedEvent CameraMotionEvent CameraInputEvent">
-                    <label class="col-sm-3 control-label">State</label>
+                    <label class="col-sm-3 control-label">状态</label>
                     <div class="col-sm-5">
                         <select ng-model="session.event.state" ng-options="state for state in Config.debugEvents.states"
                                 class="form-control"></select>
@@ -117,7 +117,7 @@
                 </div>
 
                 <div class="form-group StorageFailureEvent NetworkIssueEvent ServerFailureEvent LicenseIssueEvent BackupFinishedEvent">
-                    <label class="col-sm-3 control-label">Reason</label>
+                    <label class="col-sm-3 control-label">原因</label>
                     <div class="col-sm-5">
                         <select ng-model="session.event.reasonCode" ng-options="reason for reason in Config.debugEvents.reasons"
                                 class="form-control"></select>
@@ -125,7 +125,7 @@
                 </div>
 
                 <div class="form-group CameraInputEvent">
-                    <label class="col-sm-3 control-label">Input Port</label>
+                    <label class="col-sm-3 control-label">输入端口</label>
                     <div class="col-sm-5">
                         <input type="number" ng-model="session.event.inputPortId"
                                class="form-control">
@@ -133,14 +133,14 @@
                 </div>
 
                 <div class="form-group UserDefinedEvent CameraIpConflictEvent">
-                    <label class="col-sm-3 control-label">Caption </label>
+                    <label class="col-sm-3 control-label">说明 </label>
                     <div class="col-sm-5">
                         <input type="text" ng-model="session.event.caption"
                                class="form-control">
                     </div>
                     <div class="col-sm-4">
                         <p class="form-control-static">
-                            for camera ip conflict - conflicting IP
+                            摄像机 ip 冲突-冲突 IP
                         </p>
                     </div>
                 </div>
@@ -148,7 +148,7 @@
                 <div class="form-group StorageFailureEvent
                 NetworkIssueEvent CameraIpConflictEvent ServerFailureEvent ServerConflictEvent
                 LicenseIssueEvent BackupFinishedEvent UserDefinedEvent">
-                    <label class="col-sm-3 control-label">Description</label>
+                    <label class="col-sm-3 control-label">描述</label>
                     <div class="col-sm-5">
                         <textarea ng-model="session.event.description"
                                   class="form-control"></textarea>
@@ -156,7 +156,7 @@
                 </div>
 
                 <div class="form-group UserDefinedEvent">
-                    <label class="col-sm-3 control-label">Metadata - JSON</label>
+                    <label class="col-sm-3 control-label">元数据-JSON</label>
                     <div class="col-sm-5">
                         <textarea ng-model="session.event.metadata"
                                   class="form-control">{
@@ -167,7 +167,7 @@
 
                 <div class="form-group">
                     <div class="col-sm-offset-3 col-sm-5">
-                        <button type="submit" class="btn btn-primary" ng-click="generateEvent()">Generate event</button>
+                        <button type="submit" class="btn btn-primary" ng-click="generateEvent()">生成事件</button>
                     </div>
                 </div>
 
@@ -175,23 +175,23 @@
             </form>
         </div>
         <div class="col-sm-6">
-            <button type="submit" class="btn btn-success" ng-click="startGeneratingEvents()" ng-if="!generatingEvents"><span class="glyphicon glyphicon-play-circle"></span> random events</button>
-            <button type="submit" class="btn btn-danger"  ng-click="stopGeneratingEvents()" ng-if="generatingEvents"><span class="glyphicon glyphicon-stop"></span> random events</button>
+            <button type="submit" class="btn btn-success" ng-click="startGeneratingEvents()" ng-if="!generatingEvents"><span class="glyphicon glyphicon-play-circle"></span> 随机事件</button>
+            <button type="submit" class="btn btn-danger"  ng-click="stopGeneratingEvents()" ng-if="generatingEvents"><span class="glyphicon glyphicon-stop"></span> 随机事件</button>
 
-            <button type="submit" class="btn btn-success" ng-click="startRepeatingEvent()" ng-if="!repeatingEvents"><span class="glyphicon glyphicon-play-circle"></span> repeat last event</button>
-            <button type="submit" class="btn btn-danger"  ng-click="stopRepeatingEvent()" ng-if="repeatingEvents"><span class="glyphicon glyphicon-stop"></span> repeat last event</button>
+            <button type="submit" class="btn btn-success" ng-click="startRepeatingEvent()" ng-if="!repeatingEvents"><span class="glyphicon glyphicon-play-circle"></span> 重复最后一个事件</button>
+            <button type="submit" class="btn btn-danger"  ng-click="stopRepeatingEvent()" ng-if="repeatingEvents"><span class="glyphicon glyphicon-stop"></span> 重复最后一个事件</button>
 
-            <p>Events Log:</p>
+            <p>事件日志︰</p>
             <pre><div ng-repeat="event in eventsLog">{{event.event}} ({{event.source}}): {{event.result}}</div></pre>
         </div>
     </div>
 </div>
 
 <div class="container">
-    <h1>Test api calls</h1>
+    <h1>测试 api 调用</h1>
     <form class="form-horizontal" novalidate>
         <div class="form-group">
-            <label class="col-sm-2 control-label">Method</label>
+            <label class="col-sm-2 control-label">方式</label>
             <div class="col-sm-10">
                 <select ng-model="session.method.method" class="form-control">
                     <option>POST</option>
@@ -201,7 +201,7 @@
         </div>
 
         <div class="form-group">
-            <label class="col-sm-2 control-label">Function</label>
+            <label class="col-sm-2 control-label">功能</label>
             <div class="col-sm-10">
                 <input type="text" class="form-control" ng-model="session.method.name" placeholder="/api/methodName">
             </div>
@@ -218,7 +218,7 @@
 
 
         <div class="form-group">
-            <label class="col-sm-2 control-label">Requesting URL</label>
+            <label class="col-sm-2 control-label">请求的 URL</label>
             <div class="col-sm-10">
                 <p class="form-control-static">{{getDebugUrl()}}</p>
             </div>
@@ -235,20 +235,20 @@
 
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-                <button type="submit" class="btn btn-primary" ng-click="testMethod()">Test method</button>
-                <a class="btn btn-default" ng-if="session.method.method=='GET'" ng-href="{{getDebugUrl()}}" target="_blank">Open in a new tab</a>
+                <button type="submit" class="btn btn-primary" ng-click="testMethod()">测试方法</button>
+                <a class="btn btn-default" ng-if="session.method.method=='GET'" ng-href="{{getDebugUrl()}}" target="_blank">在新选项卡中打开</a>
             </div>
         </div>
 
 
         <div class="form-group" ng-if="result.result">
-            <label class="col-sm-2 control-label">授权状态</label>
+            <label class="col-sm-2 control-label">状态</label>
             <div class="col-sm-10">
                 <p class="form-control-static">{{result.status}}</p>
             </div>
         </div>
         <div class="form-group" ng-if="result.result">
-            <label class="col-sm-2 control-label">Result</label>
+            <label class="col-sm-2 control-label">结果</label>
             <div class="col-sm-10">
                 <pre>{{result.result}}</pre>
             </div>

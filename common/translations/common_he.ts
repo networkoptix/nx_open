@@ -195,10 +195,6 @@
         <translation>מקור: %1</translation>
     </message>
     <message>
-        <source>Url: %1</source>
-        <translation>כתובת: %1</translation>
-    </message>
-    <message>
         <source>Reason: %1</source>
         <translation>סיבה: %1</translation>
     </message>

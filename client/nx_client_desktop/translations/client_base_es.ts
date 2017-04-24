@@ -4746,7 +4746,7 @@ a %1</translation>
     <name>QnRecordingSettingsWidget</name>
     <message>
         <source>Screen %1 - %2x%3</source>
-        <translation>Pantalla %1 - %2x %3</translation>
+        <translation>Pantalla %1 - %2x%3</translation>
     </message>
     <message>
         <source>%1 (Primary)</source>
