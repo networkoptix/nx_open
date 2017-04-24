@@ -333,6 +333,7 @@ PageBase
 
                 Joystick
                 {
+
                     supportSingleShot: supportDrag;
                     supportDrag:
                     {
