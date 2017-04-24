@@ -1,4 +1,4 @@
-#include "udp_multicast_module_finder.h"
+#include "udp_multicast_finder.h"
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/log/log.h>
@@ -7,30 +7,33 @@ namespace nx {
 namespace vms {
 namespace discovery {
 
+static const int kMaxDatagramSize(1500); // ~MTU
 static const SocketAddress kMulticastEndpoint("239.255.11.11:5008");
 static const std::chrono::milliseconds kUpdateInterval = std::chrono::minutes(1);
 static const std::chrono::milliseconds kSendInterval = std::chrono::seconds(10);
 
-
-UdpMulticastModuleFinder::UdpMulticastModuleFinder()
+UdpMulticastFinder::UdpMulticastFinder(network::aio::AbstractAioThread* thread)
+    : network::aio::BasicPollable(thread)
 {
     m_updateTimer.bindToAioThread(getAioThread());
     m_updateTimer.post([this] { updateInterfaces(); });
 }
 
 /** Sets moduleInformation to multicast, starts multicast process if not running yet. */
-void UdpMulticastModuleFinder::multicastInformation(
+void UdpMulticastFinder::multicastInformation(
     const QnModuleInformationWithAddresses& information)
 {
     m_updateTimer.post(
         [this, information = QJson::serialized(information)]() mutable
         {
             m_ownModuleInformation = std::move(information);
+            for (const auto& i: m_interfaces)
+                i.second->updateData(&m_ownModuleInformation);
         });
 }
 
 /** Listens to module information multicasts, executes handler on each message recieved. */
-void UdpMulticastModuleFinder::listen(
+void UdpMulticastFinder::listen(
     utils::MoveOnlyFunc<void(const QnModuleInformationWithAddresses& module)> handler)
 {
     m_updateTimer.post(
@@ -40,13 +43,13 @@ void UdpMulticastModuleFinder::listen(
         });
 }
 
-void UdpMulticastModuleFinder::stopWhileInAioThread()
+void UdpMulticastFinder::stopWhileInAioThread()
 {
     m_updateTimer.pleaseStopSync();
     m_interfaces.clear();
 }
 
-void UdpMulticastModuleFinder::updateInterfaces()
+void UdpMulticastFinder::updateInterfaces()
 {
     std::set<HostAddress> localIpList;
     for (const auto& ip: getLocalIpV4AddressList())
@@ -67,7 +70,7 @@ void UdpMulticastModuleFinder::updateInterfaces()
     }
 }
 
-void UdpMulticastModuleFinder::makeInterface(const HostAddress& ip)
+void UdpMulticastFinder::makeInterface(const HostAddress& ip)
 {
     const auto iterator = m_interfaces.emplace(ip, std::unique_ptr<Interface>()).first;
     auto& interface = iterator->second;
@@ -87,7 +90,7 @@ void UdpMulticastModuleFinder::makeInterface(const HostAddress& ip)
         });
 }
 
-UdpMulticastModuleFinder::Interface::Interface(
+UdpMulticastFinder::Interface::Interface(
     network::aio::AbstractAioThread* thread,
     const HostAddress& localIp,
     utils::MoveOnlyFunc<void()> errorHandler)
@@ -105,20 +108,21 @@ UdpMulticastModuleFinder::Interface::Interface(
     NX_LOGX(lm("New socket %1").str(m_socket.getLocalAddress()), cl_logINFO);
 }
 
-void UdpMulticastModuleFinder::Interface::updateData(const Buffer* data)
+void UdpMulticastFinder::Interface::updateData(const Buffer* data)
 {
     m_outData = data;
     sendData();
 }
 
-void UdpMulticastModuleFinder::Interface::readForever(utils::MoveOnlyFunc<void(const Buffer&)> handler)
+void UdpMulticastFinder::Interface::readForever(utils::MoveOnlyFunc<void(const Buffer&)> handler)
 {
     m_newDataHandler = std::move(handler);
     readData();
 }
 
-void UdpMulticastModuleFinder::Interface::sendData()
+void UdpMulticastFinder::Interface::sendData()
 {
+    m_socket.cancelIOSync(network::aio::etTimedOut);
     if (m_outData->isEmpty())
     {
         NX_LOGX("No data to send, waiting...", cl_logDEBUG1);
@@ -137,9 +141,9 @@ void UdpMulticastModuleFinder::Interface::sendData()
         });
 }
 
-void UdpMulticastModuleFinder::Interface::readData()
+void UdpMulticastFinder::Interface::readData()
 {
-    m_inData.reserve(1500); // ~ MTU
+    m_inData.reserve(kMaxDatagramSize); // ~ MTU
     m_inData.resize(0);
     m_socket.recvFromAsync(&m_inData,
         [this](SystemError::ErrorCode code, SocketAddress endpoint, size_t size)
@@ -153,7 +157,7 @@ void UdpMulticastModuleFinder::Interface::readData()
         });
 }
 
-void UdpMulticastModuleFinder::Interface::handleError(
+void UdpMulticastFinder::Interface::handleError(
     const char* stage, SystemError::ErrorCode code)
 {
     NX_LOGX(lm("Error on %1: %2").strs(stage, SystemError::toString(code)), cl_logWARNING);

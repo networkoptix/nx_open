@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/vms/discovery/udp_multicast_module_finder.h>
+#include <nx/vms/discovery/udp_multicast_finder.h>
 #include <nx/utils/log/log.h>
 
 namespace nx {
@@ -18,7 +18,7 @@ public:
     }
 
 protected:
-    discovery::UdpMulticastModuleFinder moduleFinder;
+    discovery::UdpMulticastFinder moduleFinder;
 };
 
 // Only makes sense to use across real network.

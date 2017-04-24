@@ -11,11 +11,11 @@ namespace discovery {
 /**
  * Multicasts module information and listen for such multicasts to discover VMS modules.
  */
-class UdpMulticastModuleFinder:
+class UdpMulticastFinder:
     public network::aio::BasicPollable
 {
 public:
-    UdpMulticastModuleFinder();
+    UdpMulticastFinder(network::aio::AbstractAioThread* thread = nullptr);
 
     /** Sets moduleInformation to multicast, starts multicast process if not running yet. */
     void multicastInformation(const QnModuleInformationWithAddresses& information);
