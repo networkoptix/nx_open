@@ -125,8 +125,7 @@ Item
 
         function scaleBy(delta)
         {
-            const kSensitivity = 100.0
-            var deltaPower = delta * kSensitivity / 1.0e5
+            var deltaPower = delta / 1.0e5
             scalePower = Math.min(4.0, Math.max(0.0, scalePower + deltaPower))
         }
 
@@ -199,7 +198,8 @@ Item
 
         onWheel:
         {
-            interactor.scaleBy(wheel.angleDelta.y)
+            const kSensitivity = 100.0
+            interactor.scaleBy(wheel.angleDelta.y * kSensitivity)
         }
 
         function updateDrag(dx, dy)
