@@ -2303,7 +2303,7 @@ to view more bookmarks</source>
     <name>QnCameraListDialog</name>
     <message>
         <source>Copy Selection to Clipboard</source>
-        <translation>Скопировать в буфер</translation>
+        <translation>Скопировать в буфер обмена</translation>
     </message>
     <message>
         <source>Export Selection to File...</source>
@@ -5934,7 +5934,7 @@ to %1</source>
     </message>
     <message>
         <source>Copy Selection to Clipboard</source>
-        <translation>Копировать выделение в буфер обмена</translation>
+        <translation>Скопировать в буфер обмена</translation>
     </message>
     <message>
         <source>Refresh</source>
@@ -6807,7 +6807,7 @@ to %1</source>
     </message>
     <message>
         <source>User has been renamed. Password must be updated.</source>
-        <translation>Имя пользоавтеля изменено. Пароль должен быть обновлён.</translation>
+        <translation>Имя пользователя изменено. Пароль должен быть обновлён.</translation>
     </message>
     <message>
         <source>Name</source>
@@ -7746,7 +7746,7 @@ to %1</source>
     <message numerus="yes">
         <source>Delete %n shared layouts?</source>
         <translation>
-            <numerusform>Delete %n shared layout?</numerusform>
+            <numerusform>Удалить %n общую раскладку?</numerusform>
             <numerusform>Удалить %n общие раскладки?</numerusform>
             <numerusform>Удалить %n общих раскладок?</numerusform>
         </translation>

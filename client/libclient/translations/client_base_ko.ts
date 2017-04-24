@@ -5,11 +5,11 @@
     <name>BackupCamerasDialogDelegate</name>
     <message>
         <source>Backup newly added devices</source>
-        <translation>백업 신규 장비 추가</translation>
+        <translation>추가된 신규 장비 백업</translation>
     </message>
     <message>
         <source>Backup newly added cameras</source>
-        <translation>백업 신규 카메라 추가</translation>
+        <translation>추가된 신규 카메라 백업</translation>
     </message>
     <message>
         <source>Cannot add new devices while backup process is running.</source>
@@ -1999,7 +1999,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
-        <translation>장치주소에 정확한 URL. IP,RTSP 주소 입력 필요.</translation>
+        <translation>장치주소에 정확한 URL. IP, RTSP 주소 입력 필요.</translation>
     </message>
     <message>
         <source>No devices selected.</source>
@@ -2317,7 +2317,7 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>%n I/O modules found</source>
         <translation>
-            <numerusform>%nI/O모듈 검색됨</numerusform>
+            <numerusform>%n I/O모듈 검색됨</numerusform>
         </translation>
     </message>
     <message>
@@ -5150,7 +5150,7 @@ to %1</source>
     <message numerus="yes">
         <source>%n additional</source>
         <translation>
-            <numerusform>부가적인</numerusform>
+            <numerusform>%n부가적인</numerusform>
         </translation>
     </message>
     <message>
@@ -5876,7 +5876,7 @@ to %1</source>
     </message>
     <message>
         <source>%1 before now</source>
-        <translation>(%1 before now)</translation>
+        <translation>%1 before now</translation>
     </message>
     <message>
         <source>Realtime backup is active...</source>
@@ -7579,7 +7579,7 @@ to %1</source>
     <message numerus="yes">
         <source>These %n layouts are shared with other users, so you delete it for them too.</source>
         <translation>
-            <numerusform>이 레이아웃은 다른 사용자와 공유되고 있으며, 변경시 다른 사용자에게 영향을 미칩니다.</numerusform>
+            <numerusform>%n이 레이아웃은 다른 사용자와 공유되고 있으며, 변경시 다른 사용자에게 영향을 미칩니다.</numerusform>
         </translation>
     </message>
     <message numerus="yes">

@@ -1,6 +1,6 @@
 {
-  "language":"CÓDIGO_DE_LA_LENGUA",
-  "language_name":"NOMBRE_DE_LENGUA",
+  "language":"es",
+  "language_name":"Español",
   "dialogs":{
     "okButton":"Ok",
     "openLink":"Visita este enlace",
@@ -13,10 +13,10 @@
   },
   "passwordRequirements":{
     "minLengthMessage":"La contraseña debe tener al menos 8 caracteres",
-    "requiredMessage":"Utilice sólo caracteres alfanuméricos y símbolos del teclado, evita espacios iniciales y finales.",
-    "weakMessage":"Utilice letras mayúsculas y minúsculas y símbolos especiales para hacer más fuerte de la contraseña",
+    "requiredMessage":"Se permiten sólo letras, números y símbolos de teclado",
+    "weakMessage":"La contraseña debe tener diferentes tipos de símbolos",
     "strongMessage":"¡Contraseña segura!",
-    "commonMessage":"Esta contraseña se encuentra en la parte superior más populares de contraseñas en el mundo"
+    "commonMessage":"Esta contraseña está en la lista de las contraseñas más populares"
   },
   "settings":{
     "tabs":{

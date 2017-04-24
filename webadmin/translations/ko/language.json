@@ -12,11 +12,11 @@
     "errorNoNetwork":"이 장치에 네트워크 연결이 필요 합니다. <br>로컬 네트워크 or 인터넷에 연결하세요"
   },
   "passwordRequirements":{
-    "minLengthMessage":"비밀번호는 최소 8자 이상 포함되어야 합니다.",
-    "requiredMessage":"공백 삭제 후 영문자 및 키보드 기호만 사용하세요",
-    "weakMessage":"대소문자 및 특수 기호를 사용 하 여 강력한 암호 만들기",
+    "minLengthMessage":"비밀번호는 8자 이상이어야 합니다",
+    "requiredMessage":"라틴 문자, 숫자 및 키보드 기호만 사용할 수 있습니다.",
+    "weakMessage":"암호는 다양한 유형의 기호를 포함 해야 합니다.",
     "strongMessage":"강력한 암호!",
-    "commonMessage":"현재 암호는 가능 많이 사용되는 암호입니다."
+    "commonMessage":"이 비밀번호는 매우 흔한 비밀번호입니다."
   },
   "settings":{
     "tabs":{
