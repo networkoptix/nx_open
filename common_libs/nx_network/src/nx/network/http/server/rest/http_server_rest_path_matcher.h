@@ -4,6 +4,8 @@
 #include <regex>
 #include <string>
 
+#include <boost/optional.hpp>
+
 namespace nx_http {
 namespace server {
 namespace rest {
