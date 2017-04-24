@@ -62,7 +62,7 @@ private:
     std::regex convertToRegex(const std::string& pathTemplate)
     {
         const std::regex replaceRestParams("{[0-9a-zA-Z]*}", std::regex_constants::basic);
-        const std::string replacement("\\([0-9a-zA-Z-_.]*\\)");
+        const std::string replacement("\\([0-9a-zA-Z_.-]*\\)");
 
         std::string restPathMatchRegex;
         restPathMatchRegex += "^";
