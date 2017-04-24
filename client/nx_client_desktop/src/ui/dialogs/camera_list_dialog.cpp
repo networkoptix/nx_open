@@ -14,7 +14,7 @@
 
 #include <ui/models/camera_list_model.h>
 #include <ui/models/resource_search_proxy_model.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/utils/table_export_helper.h>
 
 #include <ui/help/help_topic_accessor.h>
@@ -26,6 +26,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workaround/hidpi_workarounds.h>
 
+using namespace nx::client::desktop::ui;
 
 QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     base_type(parent),
@@ -63,7 +64,7 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     connect(ui->addDeviceButton, &QPushButton::clicked, this,
         [this]
         {
-            menu()->trigger(QnActions::ServerAddCameraManuallyAction, commonModule()->currentServer());
+            menu()->trigger(action::ServerAddCameraManuallyAction, commonModule()->currentServer());
         });
 
 
@@ -175,7 +176,7 @@ void QnCameraListDialog::at_camerasView_doubleClicked(const QModelIndex &index) 
 
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     if (resource)
-        context()->menu()->trigger(QnActions::CameraSettingsAction, QnActionParameters(resource));
+        context()->menu()->trigger(action::CameraSettingsAction, resource);
 }
 
 void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint &) {
@@ -187,12 +188,12 @@ void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint 
 
     QScopedPointer<QMenu> menu;
     if (!resources.isEmpty()) {
-        QnActionParameters parameters(resources);
+        action::Parameters parameters(resources);
         parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
 
         // We'll be changing hotkeys, so we cannot reuse global actions.
-        menu.reset(context()->menu()->newMenu(Qn::TreeScope, nullptr,
-            parameters, QnActionManager::DontReuseActions));
+        menu.reset(context()->menu()->newMenu(action::TreeScope, nullptr,
+            parameters, action::Manager::DontReuseActions));
 
         foreach(QAction *action, menu->actions())
             action->setShortcut(QKeySequence());

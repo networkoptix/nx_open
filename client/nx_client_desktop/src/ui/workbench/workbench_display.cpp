@@ -31,8 +31,8 @@
 #include <camera/client_video_camera.h>
 #include <redass/redass_controller.h>
 
-#include <ui/actions/action_manager.h>
-#include <ui/actions/action_target_provider.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_target_provider.h>
 
 #include <ui/common/notification_levels.h>
 
@@ -94,6 +94,8 @@
 #include "watchers/workbench_server_time_watcher.h"
 
 #include <nx/utils/log/log.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -268,19 +270,19 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
         bool isWebView = scene() && dynamic_cast<QnGraphicsWebView*>(scene()->focusItem());
 
         for (auto actionId : {
-            QnActions::JumpToLiveAction, //< L
-            QnActions::ToggleMuteAction, //< M
-            QnActions::ToggleSyncAction, //< S
-            QnActions::JumpToEndAction,  //< X
-            QnActions::JumpToStartAction,//< Z
-            QnActions::PlayPauseAction,  //< Space
+            action::JumpToLiveAction, //< L
+            action::ToggleMuteAction, //< M
+            action::ToggleSyncAction, //< S
+            action::JumpToEndAction,  //< X
+            action::JumpToStartAction,//< Z
+            action::PlayPauseAction,  //< Space
 
             /* "Delete" button */
-            QnActions::DeleteVideowallMatrixAction,
-            QnActions::RemoveLayoutItemAction,
-            QnActions::RemoveLayoutItemFromSceneAction,
-            QnActions::RemoveFromServerAction,
-            QnActions::StopSharingLayoutAction
+            action::DeleteVideowallMatrixAction,
+            action::RemoveLayoutItemAction,
+            action::RemoveLayoutItemFromSceneAction,
+            action::RemoveFromServerAction,
+            action::StopSharingLayoutAction
         })
             action(actionId)->setEnabled(!isWebView);
     });
@@ -432,8 +434,8 @@ void QnWorkbenchDisplay::deinitSceneView()
     m_instrumentManager->unregisterScene(m_scene);
 
     disconnect(m_scene, NULL, this, NULL);
-    disconnect(m_scene, NULL, context()->action(QnActions::SelectionChangeAction), NULL);
-    disconnect(action(QnActions::SelectionChangeAction), NULL, this, NULL);
+    disconnect(m_scene, NULL, context()->action(action::SelectionChangeAction), NULL);
+    disconnect(action(action::SelectionChangeAction), NULL, this, NULL);
 
     /* Clear curtain. */
     if (!m_curtainItem.isNull())
@@ -500,11 +502,11 @@ void QnWorkbenchDisplay::initSceneView()
 
     /* Note that selection often changes there and back, and we don't want such changes to
      * affect our logic, so we use queued connections here. */ // TODO: #Elric I don't see queued connections
-    connect(m_scene, SIGNAL(selectionChanged()), context()->action(QnActions::SelectionChangeAction), SLOT(trigger()));
+    connect(m_scene, SIGNAL(selectionChanged()), context()->action(action::SelectionChangeAction), SLOT(trigger()));
     connect(m_scene, SIGNAL(selectionChanged()), this, SLOT(at_scene_selectionChanged()));
     connect(m_scene, SIGNAL(destroyed()), this, SLOT(at_scene_destroyed()));
 
-    connect(action(QnActions::SelectionChangeAction), &QAction::triggered, this, &QnWorkbenchDisplay::updateSelectionFromTree);
+    connect(action(action::SelectionChangeAction), &QAction::triggered, this, &QnWorkbenchDisplay::updateSelectionFromTree);
 
     /* Scene indexing will only slow everything down. */
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
@@ -924,12 +926,12 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout)
 
 void QnWorkbenchDisplay::updateSelectionFromTree()
 {
-    QnActionTargetProvider *provider = menu()->targetProvider();
+    auto provider = menu()->targetProvider();
     if (!provider)
         return;
 
-    Qn::ActionScope scope = provider->currentScope();
-    if (scope != Qn::TreeScope)
+    auto scope = provider->currentScope();
+    if (scope != action::TreeScope)
         return;
 
     /* Just deselect all items for now. See #4480. */
@@ -1995,7 +1997,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
         }
     }
 
-    action(QnActions::BookmarksModeAction)->setChecked(layout->data(Qn::LayoutBookmarksModeRole).toBool());
+    action(action::BookmarksModeAction)->setChecked(layout->data(Qn::LayoutBookmarksModeRole).toBool());
 
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
     streamSynchronizer->setState(layout->data(Qn::LayoutSyncStateRole).value<QnStreamSynchronizationState>());

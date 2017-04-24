@@ -9,7 +9,7 @@
 
 #include <nx_ec/ec_api.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/style/skin.h>
 #include <nx/client/desktop/ui/workbench/extensions/workbench_layout_tour_executor.h>
 #include <nx/client/desktop/ui/workbench/extensions/workbench_layout_tour_review_controller.h>
@@ -34,7 +34,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
     connect(qnLayoutTourManager, &QnLayoutTourManager::tourRemoved, m_tourExecutor,
         &LayoutTourExecutor::stopTour);
 
-    connect(action(QnActions::NewLayoutTourAction), &QAction::triggered, this,
+    connect(action(action::NewLayoutTourAction), &QAction::triggered, this,
         [this]()
         {
             QStringList usedNames;
@@ -47,14 +47,13 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
                 usedNames, tr("Layout Tour"), tr("Layout Tour %1"));
             qnLayoutTourManager->addOrUpdateTour(tour);
             saveTourToServer(tour);
-            menu()->trigger(QnActions::ReviewLayoutTourAction, QnActionParameters()
-                .withArgument(Qn::UuidRole, tour.id));
+            menu()->trigger(action::ReviewLayoutTourAction, {Qn::UuidRole, tour.id});
         });
 
-    connect(action(QnActions::RenameLayoutTourAction), &QAction::triggered, this,
+    connect(action(action::RenameLayoutTourAction), &QAction::triggered, this,
         [this]()
         {
-            QnActionParameters parameters = menu()->currentParameters(sender());
+            const auto parameters = menu()->currentParameters(sender());
             auto id = parameters.argument<QnUuid>(Qn::UuidRole);
             auto tour = qnLayoutTourManager->tour(id);
             if (!tour.isValid())
@@ -64,10 +63,10 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             saveTourToServer(tour);
         });
 
-    connect(action(QnActions::RemoveLayoutTourAction), &QAction::triggered, this,
+    connect(action(action::RemoveLayoutTourAction), &QAction::triggered, this,
         [this]()
         {
-            QnActionParameters parameters = menu()->currentParameters(sender());
+            const auto parameters = menu()->currentParameters(sender());
             auto id = parameters.argument<QnUuid>(Qn::UuidRole);
             NX_EXPECT(!id.isNull());
 
@@ -89,10 +88,10 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             removeTourFromServer(id);
         });
 
-    connect(action(QnActions::ToggleLayoutTourModeAction), &QAction::toggled, this,
+    connect(action(action::ToggleLayoutTourModeAction), &QAction::toggled, this,
         [this](bool toggled)
         {
-            QnActionParameters parameters = menu()->currentParameters(sender());
+            const auto parameters = menu()->currentParameters(sender());
             auto id = parameters.argument<QnUuid>(Qn::UuidRole);
 
             if (!toggled)
@@ -113,10 +112,10 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             }
         });
 
-    connect(action(QnActions::SaveLayoutTourAction), &QAction::triggered, this,
+    connect(action(action::SaveLayoutTourAction), &QAction::triggered, this,
         [this]
         {
-            QnActionParameters parameters = menu()->currentParameters(sender());
+            const auto parameters = menu()->currentParameters(sender());
             auto id = parameters.argument<QnUuid>(Qn::UuidRole);
             auto tour = qnLayoutTourManager->tour(id);
             if (!tour.isValid())
@@ -124,11 +123,11 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             saveTourToServer(tour);
         });
 
-    connect(action(QnActions::EscapeHotkeyAction), &QAction::triggered, this,
+    connect(action(action::EscapeHotkeyAction), &QAction::triggered, this,
         [this]
         {
-            if (action(QnActions::ToggleLayoutTourModeAction)->isChecked())
-                action(QnActions::ToggleLayoutTourModeAction)->toggle();
+            if (action(action::ToggleLayoutTourModeAction)->isChecked())
+                action(action::ToggleLayoutTourModeAction)->toggle();
 
             // Just for safety
             NX_EXPECT(m_tourExecutor->runningTour().isNull());
@@ -155,8 +154,7 @@ void LayoutToursHandler::loadState(const QnWorkbenchState& state)
 {
     if (!state.runningTourId.isNull())
     {
-        menu()->trigger(QnActions::ToggleLayoutTourModeAction, QnActionParameters()
-            .withArgument(Qn::UuidRole, state.runningTourId));
+        menu()->trigger(action::ToggleLayoutTourModeAction, {Qn::UuidRole, state.runningTourId});
     }
 }
 

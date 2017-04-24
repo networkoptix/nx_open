@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QTabBar>
 #include <core/resource/resource_fwd.h>
-#include <ui/actions/action_target_provider.h>
+#include <nx/client/desktop/ui/actions/action_target_provider.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnWorkbenchLayoutSnapshotManager;
@@ -10,7 +10,10 @@ class QnWorkbenchContext;
 class QnWorkbenchLayout;
 class QnWorkbench;
 
-class QnLayoutTabBar: public QTabBar, public QnWorkbenchContextAware, public QnActionTargetProvider
+class QnLayoutTabBar:
+    public QTabBar,
+    public QnWorkbenchContextAware,
+    public nx::client::desktop::ui::action::TargetProvider
 {
     Q_OBJECT
     typedef QTabBar base_type;
@@ -20,8 +23,9 @@ public:
 
     virtual ~QnLayoutTabBar();
 
-    virtual Qn::ActionScope currentScope() const override;
-    virtual QnActionParameters currentParameters(Qn::ActionScope scope) const override;
+    virtual nx::client::desktop::ui::action::ActionScope currentScope() const override;
+    virtual nx::client::desktop::ui::action::Parameters currentParameters(
+        nx::client::desktop::ui::action::ActionScope scope) const override;
 
 signals:
     void closeRequested(QnWorkbenchLayout *layout);

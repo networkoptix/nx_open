@@ -25,10 +25,10 @@
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
 
-#include <ui/actions/actions.h>
-#include <ui/actions/action_manager.h>
-#include <ui/actions/action_parameters.h>
-#include <ui/actions/action_parameter_types.h>
+#include <nx/client/desktop/ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/action_parameter_types.h>
 #include <ui/dialogs/layout_name_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -128,22 +128,22 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
     QObject(parent),
     QnSessionAwareDelegate(parent)
 {
-    connect(action(QnActions::NewUserLayoutAction),                 &QAction::triggered, this, &LayoutsHandler::at_newUserLayoutAction_triggered);
-    connect(action(QnActions::SaveLayoutAction),                    &QAction::triggered, this, &LayoutsHandler::at_saveLayoutAction_triggered);
-    connect(action(QnActions::SaveLayoutAsAction),                  &QAction::triggered, this, &LayoutsHandler::at_saveLayoutAsAction_triggered);
-    connect(action(QnActions::SaveLayoutForCurrentUserAsAction),    &QAction::triggered, this, &LayoutsHandler::at_saveLayoutForCurrentUserAsAction_triggered);
-    connect(action(QnActions::SaveCurrentLayoutAction),             &QAction::triggered, this, &LayoutsHandler::at_saveCurrentLayoutAction_triggered);
-    connect(action(QnActions::SaveCurrentLayoutAsAction),           &QAction::triggered, this, &LayoutsHandler::at_saveCurrentLayoutAsAction_triggered);
-    connect(action(QnActions::CloseLayoutAction),                   &QAction::triggered, this, &LayoutsHandler::at_closeLayoutAction_triggered);
-    connect(action(QnActions::CloseAllButThisLayoutAction),         &QAction::triggered, this, &LayoutsHandler::at_closeAllButThisLayoutAction_triggered);
-    connect(action(QnActions::RemoveFromServerAction),              &QAction::triggered, this, &LayoutsHandler::at_removeFromServerAction_triggered);
-    connect(action(QnActions::ShareLayoutAction),                   &QAction::triggered, this, &LayoutsHandler::at_shareLayoutAction_triggered);
-    connect(action(QnActions::StopSharingLayoutAction),             &QAction::triggered, this, &LayoutsHandler::at_stopSharingLayoutAction_triggered);
-    connect(action(QnActions::OpenNewTabAction),                    &QAction::triggered, this, &LayoutsHandler::at_openNewTabAction_triggered);
+    connect(action(action::NewUserLayoutAction),                 &QAction::triggered, this, &LayoutsHandler::at_newUserLayoutAction_triggered);
+    connect(action(action::SaveLayoutAction),                    &QAction::triggered, this, &LayoutsHandler::at_saveLayoutAction_triggered);
+    connect(action(action::SaveLayoutAsAction),                  &QAction::triggered, this, &LayoutsHandler::at_saveLayoutAsAction_triggered);
+    connect(action(action::SaveLayoutForCurrentUserAsAction),    &QAction::triggered, this, &LayoutsHandler::at_saveLayoutForCurrentUserAsAction_triggered);
+    connect(action(action::SaveCurrentLayoutAction),             &QAction::triggered, this, &LayoutsHandler::at_saveCurrentLayoutAction_triggered);
+    connect(action(action::SaveCurrentLayoutAsAction),           &QAction::triggered, this, &LayoutsHandler::at_saveCurrentLayoutAsAction_triggered);
+    connect(action(action::CloseLayoutAction),                   &QAction::triggered, this, &LayoutsHandler::at_closeLayoutAction_triggered);
+    connect(action(action::CloseAllButThisLayoutAction),         &QAction::triggered, this, &LayoutsHandler::at_closeAllButThisLayoutAction_triggered);
+    connect(action(action::RemoveFromServerAction),              &QAction::triggered, this, &LayoutsHandler::at_removeFromServerAction_triggered);
+    connect(action(action::ShareLayoutAction),                   &QAction::triggered, this, &LayoutsHandler::at_shareLayoutAction_triggered);
+    connect(action(action::StopSharingLayoutAction),             &QAction::triggered, this, &LayoutsHandler::at_stopSharingLayoutAction_triggered);
+    connect(action(action::OpenNewTabAction),                    &QAction::triggered, this, &LayoutsHandler::at_openNewTabAction_triggered);
 
-    connect(action(QnActions::RemoveLayoutItemAction), &QAction::triggered, this,
+    connect(action(action::RemoveLayoutItemAction), &QAction::triggered, this,
         &LayoutsHandler::at_removeLayoutItemAction_triggered);
-    connect(action(QnActions::RemoveLayoutItemFromSceneAction), &QAction::triggered, this,
+    connect(action(action::RemoveLayoutItemFromSceneAction), &QAction::triggered, this,
         &LayoutsHandler::at_removeLayoutItemFromSceneAction_triggered);
 
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
@@ -165,7 +165,7 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
             if (qnClientMessageProcessor->connectionStatus()->state() == QnConnectionState::Ready
                 && workbench()->layouts().empty())
             {
-                action(QnActions::OpenNewTabAction)->trigger();
+                action(action::OpenNewTabAction)->trigger();
             }
         });
 }
@@ -407,7 +407,7 @@ void LayoutsHandler::removeLayoutItems(const QnLayoutItemIndexList& items, bool 
     if (items.size() > 1)
     {
         const bool confirm = ui::resources::removeItemsFromLayout(mainWindow(),
-            QnActionParameterTypes::resources(items));
+            action::ParameterTypes::resources(items));
 
         if (!confirm)
             return;
@@ -452,7 +452,7 @@ void LayoutsHandler::removeLayoutItems(const QnLayoutItemIndexList& items, bool 
     if (autoSave)
     {
         for (const auto& layout : layouts)
-            menu()->trigger(QnActions::SaveLayoutAction, layout);
+            menu()->trigger(action::SaveLayoutAction, layout);
     }
 }
 
@@ -784,7 +784,7 @@ void LayoutsHandler::closeLayoutsInternal(
     }
 
     if (workbench()->layouts().empty())
-        action(QnActions::OpenNewTabAction)->trigger();
+        action(action::OpenNewTabAction)->trigger();
 }
 
 bool LayoutsHandler::closeAllLayouts(bool force)
@@ -844,7 +844,7 @@ void LayoutsHandler::at_newUserLayoutAction_triggered()
 
     snapshotManager()->save(layout);
 
-    menu()->trigger(QnActions::OpenSingleLayoutAction, QnActionParameters(layout));
+    menu()->trigger(action::OpenSingleLayoutAction, layout);
 }
 
 void LayoutsHandler::at_saveLayoutAction_triggered()
@@ -867,7 +867,7 @@ void LayoutsHandler::at_saveLayoutForCurrentUserAsAction_triggered()
 
 void LayoutsHandler::at_saveLayoutAsAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
 
     saveLayoutAs(
         parameters.resource().dynamicCast<QnLayoutResource>(),

@@ -3,15 +3,15 @@
 #include <cmath> /* For std::floor. */
 
 #include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QAction>
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
 #include <core/resource/resource.h>
 
-#include <ui/actions/action_manager.h>
-#include <ui/actions/action.h>
-#include <ui/actions/action_parameter_types.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_parameter_types.h>
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
@@ -73,6 +73,7 @@
 //#define QN_DEBUG_WIDGET
 #endif
 
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -176,7 +177,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     initGraphicsMessageBoxHolder();
 
     /* Connect to display. */
-    display()->view()->addAction(action(QnActions::FreespaceAction));
+    display()->view()->addAction(action(action::FreespaceAction));
     connect(display(), &QnWorkbenchDisplay::widgetChanged, this,
         &QnWorkbenchUi::at_display_widgetChanged);
 
@@ -184,15 +185,15 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(display(), &QnWorkbenchDisplay::widgetAboutToBeRemoved, this,
         &QnWorkbenchUi::updateViewportMarginsAnimated, Qt::QueuedConnection);
 
-    connect(action(QnActions::FreespaceAction), &QAction::triggered, this, &QnWorkbenchUi::at_freespaceAction_triggered);
-    connect(action(QnActions::EffectiveMaximizeAction), &QAction::triggered, this,
+    connect(action(action::FreespaceAction), &QAction::triggered, this, &QnWorkbenchUi::at_freespaceAction_triggered);
+    connect(action(action::EffectiveMaximizeAction), &QAction::triggered, this,
         [this, windowedTitleShadow]()
         {
             if (m_inFreespace)
                 at_freespaceAction_triggered();
 
             windowedTitleShadow->setVisible(
-                !action(QnActions::EffectiveMaximizeAction)->isChecked());
+                !action(action::EffectiveMaximizeAction)->isChecked());
         });
 
     /* Init fields. */
@@ -213,7 +214,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_timeline->lastThumbnailsHeight = settings[Qn::WorkbenchPane::Thumbnails].span;
     m_timeline->setThumbnailsVisible(settings[Qn::WorkbenchPane::Thumbnails].state == Qn::PaneState::Opened);
 
-    connect(action(QnActions::BeforeExitAction), &QAction::triggered, this,
+    connect(action(action::BeforeExitAction), &QAction::triggered, this,
         [this]
         {
             if (!m_inFreespace)
@@ -329,40 +330,40 @@ bool QnWorkbenchUi::calculateTimelineVisible(QnResourceWidget* widget) const
         || !flags.testFlag(Qn::live);   /*< Show slider for local files. */
 }
 
-Qn::ActionScope QnWorkbenchUi::currentScope() const
+action::ActionScope QnWorkbenchUi::currentScope() const
 {
     QGraphicsItem *focusItem = display()->scene()->focusItem();
     if (m_tree && focusItem == m_tree->item)
-        return Qn::TreeScope;
+        return action::TreeScope;
 
     if (focusItem == m_timeline->item)
-        return Qn::TimelineScope;
+        return action::TimelineScope;
 
     if (!focusItem || dynamic_cast<QnResourceWidget*>(focusItem))
-        return Qn::SceneScope;
+        return action::SceneScope;
 
     /* We should not handle any button as an action while the item was focused. */
     if (dynamic_cast<QnGraphicsWebView*>(focusItem))
-        return Qn::InvalidScope;
+        return action::InvalidScope;
 
-    return Qn::MainScope;
+    return action::MainScope;
 }
 
-QnActionParameters QnWorkbenchUi::currentParameters(Qn::ActionScope scope) const
+action::Parameters QnWorkbenchUi::currentParameters(action::ActionScope scope) const
 {
     /* Get items. */
     switch (scope)
     {
-        case Qn::TreeScope:
-            return m_tree ? m_tree->widget->currentParameters(scope) : QnActionParameters();
-        case Qn::TimelineScope:
-            return QnActionParameters(navigator()->currentWidget());
-        case Qn::SceneScope:
-            return QnActionParameters(QnActionParameterTypes::widgets(display()->scene()->selectedItems()));
+        case action::TreeScope:
+            return m_tree ? m_tree->widget->currentParameters(scope) : action::Parameters();
+        case action::TimelineScope:
+            return navigator()->currentWidget();
+        case action::SceneScope:
+            return action::ParameterTypes::widgets(display()->scene()->selectedItems());
         default:
             break;
     }
-    return QnActionParameters();
+    return action::Parameters();
 }
 
 
@@ -382,7 +383,7 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate)
     const bool timelineVisible =
         (allowedByLayout && calculateTimelineVisible(navigator()->currentWidget()));
 
-    if (action(QnActions::ToggleLayoutTourModeAction)->isChecked())
+    if (action(action::ToggleLayoutTourModeAction)->isChecked())
     {
         setTimelineVisible(false, animate);
         setTreeVisible(false, animate);
@@ -614,7 +615,7 @@ void QnWorkbenchUi::at_freespaceAction_triggered()
     if (qnRuntime->isActiveXMode())
         return;
 
-    QAction *fullScreenAction = action(QnActions::EffectiveMaximizeAction);
+    QAction *fullScreenAction = action(action::EffectiveMaximizeAction);
 
     bool isFullscreen = fullScreenAction->isChecked();
 
@@ -1312,7 +1313,7 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
-    connect(action(QnActions::ToggleLayoutTourModeAction), &QAction::toggled, this,
+    connect(action(action::ToggleLayoutTourModeAction), &QAction::toggled, this,
         [this](bool toggled)
         {
             /// If tour mode is going to be turned on, focus should be forced to main window
@@ -1321,7 +1322,7 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
                 mainWindow()->setFocus();
         });
 
-    connect(action(QnActions::ToggleLayoutTourModeAction), &QAction::toggled, this,
+    connect(action(action::ToggleLayoutTourModeAction), &QAction::toggled, this,
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
 }
 
@@ -1350,8 +1351,8 @@ void QnWorkbenchUi::createDebugWidget()
     debugLabel = m_debugOverlayLabel;
     previousMsgHandler = qInstallMessageHandler(uiMsgHandler);
 
-    display()->view()->addAction(action(QnActions::ShowDebugOverlayAction));
-    connect(action(QnActions::ShowDebugOverlayAction), &QAction::toggled, this, [&](bool toggled) { m_debugOverlayLabel->setVisible(toggled); });
+    display()->view()->addAction(action(action::ShowDebugOverlayAction));
+    connect(action(action::ShowDebugOverlayAction), &QAction::toggled, this, [&](bool toggled) { m_debugOverlayLabel->setVisible(toggled); });
 }
 #endif
 
@@ -1379,7 +1380,7 @@ void QnWorkbenchUi::setFpsVisible(bool fpsVisible)
 
     m_fpsItem->setText(QString());
 
-    action(QnActions::ShowFpsAction)->setChecked(fpsVisible);
+    action(action::ShowFpsAction)->setChecked(fpsVisible);
 }
 
 void QnWorkbenchUi::updateFpsGeometry()
@@ -1410,8 +1411,8 @@ void QnWorkbenchUi::createFpsWidget()
     setPaletteColor(m_fpsItem, QPalette::Window, Qt::transparent);
     setPaletteColor(m_fpsItem, QPalette::WindowText, QColor(63, 159, 216));
 
-    display()->view()->addAction(action(QnActions::ShowFpsAction));
-    connect(action(QnActions::ShowFpsAction), &QAction::toggled, this, &QnWorkbenchUi::setFpsVisible);
+    display()->view()->addAction(action(action::ShowFpsAction));
+    connect(action(action::ShowFpsAction), &QAction::toggled, this, &QnWorkbenchUi::setFpsVisible);
     connect(m_fpsItem, &QGraphicsWidget::geometryChanged, this, &QnWorkbenchUi::updateFpsGeometry);
     setFpsVisible(false);
 }

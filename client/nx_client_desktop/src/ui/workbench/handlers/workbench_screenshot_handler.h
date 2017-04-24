@@ -18,6 +18,7 @@
 
 class QPainter;
 class QnProgressDialog;
+class QnMediaResourceWidget;
 
 struct QnScreenshotParameters
 {

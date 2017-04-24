@@ -25,8 +25,8 @@
 #include <client/client_runtime_settings.h>
 
 #include <ui/animation/opacity_animator.h>
-#include <ui/actions/actions.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/geometry.h>
 #include <ui/common/notification_levels.h>
 
@@ -60,6 +60,7 @@
 #include <nx/fusion/model_functions.h>
 
 using namespace nx::client::desktop;
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -84,7 +85,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
     m_helper(new QnBusinessStringsHelper(commonModule()))
 {
     int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
-    auto newButton = [this, maxIconSize](QnActions::IDType actionId, int helpTopicId)
+    auto newButton = [this, maxIconSize](action::IDType actionId, int helpTopicId)
     {
         QnImageButtonWidget* button = new QnImageButtonWidget(m_headerWidget);
         button->setDefaultAction(action(actionId));
@@ -110,9 +111,9 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
     controlsLayout->setContentsMargins(2.0, 1.0, 2.0, 0.0);
     controlsLayout->addStretch();
 
-    controlsLayout->addItem(newButton(QnActions::OpenBusinessLogAction, Qn::MainWindow_Notifications_EventLog_Help));
-    controlsLayout->addItem(newButton(QnActions::BusinessEventsAction, -1));
-    controlsLayout->addItem(newButton(QnActions::PreferencesNotificationTabAction, -1));
+    controlsLayout->addItem(newButton(action::OpenBusinessLogAction, Qn::MainWindow_Notifications_EventLog_Help));
+    controlsLayout->addItem(newButton(action::BusinessEventsAction, -1));
+    controlsLayout->addItem(newButton(action::PreferencesNotificationTabAction, -1));
     m_headerWidget->setLayout(controlsLayout);
 
     QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Vertical);
@@ -136,6 +137,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
     connect(handler,    &QnWorkbenchNotificationsHandler::systemHealthEventRemoved, this,   &QnNotificationsCollectionWidget::hideSystemHealthMessage);
     connect(handler,    &QnWorkbenchNotificationsHandler::cleared,                  this,   &QnNotificationsCollectionWidget::hideAll);
 
+    using namespace nx::client::desktop;
     connect(this->context()->instance<ServerNotificationCache>(),
         &ServerNotificationCache::fileDownloaded,
         this,
@@ -327,8 +329,8 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     {
         item->addActionButton(
             icon,
-            QnActions::OpenInAlarmLayoutAction,
-            QnActionParameters(alarmCameras));
+            action::OpenInAlarmLayoutAction,
+            alarmCameras);
 
         loadThumbnailForItem(item, alarmCameras.mid(0, kMaxThumbnailCount));
     }
@@ -341,8 +343,8 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             {
                 item->addActionButton(
                     icon,
-                    QnActions::OpenInNewLayoutAction,
-                    QnActionParameters(camera).withArgument(Qn::ItemTimeRole, timestampMs));
+                    action::OpenInNewLayoutAction,
+                    action::Parameters(camera).withArgument(Qn::ItemTimeRole, timestampMs));
 
                 loadThumbnailForItem(item, camera, timestampMs);
                 break;
@@ -352,8 +354,8 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             {
                 item->addActionButton(
                     icon,
-                    QnActions::OpenInNewLayoutAction,
-                    QnActionParameters(camera));
+                    action::OpenInNewLayoutAction,
+                    camera);
 
                 loadThumbnailForItem(item, camera);
                 break;
@@ -364,8 +366,8 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             {
                 item->addActionButton(
                     icon,
-                    QnActions::CameraSettingsAction,
-                    QnActionParameters(camera));
+                    action::CameraSettingsAction,
+                    camera);
 
                 loadThumbnailForItem(item, camera);
                 break;
@@ -378,8 +380,8 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             {
                 item->addActionButton(
                     icon,
-                    QnActions::ServerSettingsAction,
-                    QnActionParameters(server));
+                    action::ServerSettingsAction,
+                    server);
                 break;
             }
 
@@ -388,8 +390,8 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                 QString webPageAddress = params.caption;
                 item->addActionButton(
                     icon,
-                    QnActions::BrowseUrlAction,
-                    QnActionParameters().withArgument(Qn::UrlRole, webPageAddress));
+                    action::BrowseUrlAction,
+                    {Qn::UrlRole, webPageAddress});
                 break;
             }
 
@@ -403,7 +405,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             {
                 item->addActionButton(
                     icon,
-                    QnActions::PreferencesLicensesTabAction);
+                    action::PreferencesLicensesTabAction);
                 break;
             }
 
@@ -415,8 +417,8 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                 {
                     item->addActionButton(
                         icon,
-                        QnActions::OpenInNewLayoutAction,
-                        QnActionParameters(sourceCameras).withArgument(Qn::ItemTimeRole, timestampMs));
+                        action::OpenInNewLayoutAction,
+                        action::Parameters(sourceCameras).withArgument(Qn::ItemTimeRole, timestampMs));
 
                     loadThumbnailForItem(item, sourceCameras.mid(0, kMaxThumbnailCount), timestampMs);
                 }
@@ -580,17 +582,17 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
 
     item = new QnNotificationWidget(m_list);
 
-    QnActionParameters actionParams;
-    if (params.canConvert<QnActionParameters>())
-        actionParams = params.value<QnActionParameters>();
+    action::Parameters actionParams;
+    if (params.canConvert<action::Parameters>())
+        actionParams = params.value<action::Parameters>();
 
     switch (message)
     {
         case QnSystemHealth::EmailIsEmpty:
             item->addActionButton(
                 qnSkin->icon("events/email.png"),
-                QnActions::UserSettingsAction,
-                QnActionParameters(context()->user())
+                action::UserSettingsAction,
+                action::Parameters(context()->user())
                     .withArgument(Qn::FocusElementRole, lit("email"))
                     .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage)
             );
@@ -599,20 +601,20 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         case QnSystemHealth::NoLicenses:
             item->addActionButton(
                 qnSkin->icon("events/license.png"),
-                QnActions::PreferencesLicensesTabAction);
+                action::PreferencesLicensesTabAction);
             break;
 
         case QnSystemHealth::SmtpIsNotSet:
             item->addActionButton(
                 qnSkin->icon("events/email.png"),
-                QnActions::PreferencesSmtpTabAction);
+                action::PreferencesSmtpTabAction);
             break;
 
         case QnSystemHealth::UsersEmailIsEmpty:
             item->addActionButton(
                 qnSkin->icon("events/email.png"),
-                QnActions::UserSettingsAction,
-                QnActionParameters(resource)
+                action::UserSettingsAction,
+                action::Parameters(resource)
                     .withArgument(Qn::FocusElementRole, lit("email"))
                     .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage)
                 );
@@ -621,13 +623,13 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         case QnSystemHealth::ConnectionLost:
             item->addActionButton(
                 qnSkin->icon("events/connection.png"),
-                QnActions::OpenLoginDialogAction);
+                action::OpenLoginDialogAction);
             break;
 
         case QnSystemHealth::NoPrimaryTimeServer:
             item->addActionButton(
                 qnSkin->icon("events/settings.png"),
-                QnActions::SelectTimeServerAction,
+                action::SelectTimeServerAction,
                 actionParams);
             break;
 
@@ -637,7 +639,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         case QnSystemHealth::EmailSendError:
             item->addActionButton(
                 qnSkin->icon("events/email.png"),
-                QnActions::PreferencesSmtpTabAction);
+                action::PreferencesSmtpTabAction);
             break;
 
         case QnSystemHealth::StoragesNotConfigured:
@@ -646,9 +648,9 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         case QnSystemHealth::ArchiveRebuildCanceled:
             item->addActionButton(
                 qnSkin->icon("events/storage.png"),
-                QnActions::ServerSettingsAction,
-                QnActionParameters(resource)
-                .withArgument(Qn::FocusTabRole, QnServerSettingsDialog::StorageManagmentPage)
+                action::ServerSettingsAction,
+                action::Parameters(resource)
+                    .withArgument(Qn::FocusTabRole, QnServerSettingsDialog::StorageManagmentPage)
             );
             break;
 
@@ -656,12 +658,12 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         {
             item->addActionButton(
                 qnSkin->icon("cloud/cloud_20.png"),
-                QnActions::PreferencesCloudTabAction);
+                action::PreferencesCloudTabAction);
 
             const auto hideCloudPromoNextRun =
                 [this]
                 {
-                    menu()->trigger(QnActions::HideCloudPromoAction);
+                    menu()->trigger(action::HideCloudPromoAction);
                 };
 
             connect(item, &QnNotificationWidget::actionTriggered, this, hideCloudPromoNextRun);
@@ -745,7 +747,8 @@ void QnNotificationsCollectionWidget::at_list_itemRemoved(QnNotificationWidget* 
     qnDeleteLater(item);
 }
 
-void QnNotificationsCollectionWidget::at_item_actionTriggered(QnActions::IDType actionId, const QnActionParameters& parameters)
+void QnNotificationsCollectionWidget::at_item_actionTriggered(action::IDType actionId,
+    const action::Parameters& parameters)
 {
     menu()->trigger(actionId, parameters);
 }

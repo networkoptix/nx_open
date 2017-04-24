@@ -8,7 +8,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_criterion.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "multiple_camera_settings_widget.h"

@@ -47,8 +47,7 @@ extern "C"
 
 #include <server/server_storage_manager.h>
 
-#include <ui/actions/action_manager.h>
-#include <ui/actions/action_parameter_types.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -82,6 +81,7 @@ extern "C"
 #include "workbench_item.h"
 #include "workbench_layout.h"
 
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -497,20 +497,21 @@ void QnWorkbenchNavigator::deinitialize()
     m_currentWidgetFlags = 0;
 }
 
-Qn::ActionScope QnWorkbenchNavigator::currentScope() const
+action::ActionScope QnWorkbenchNavigator::currentScope() const
 {
-    return Qn::TimelineScope;
+    return action::TimelineScope;
 }
 
-QnActionParameters QnWorkbenchNavigator::currentParameters(Qn::ActionScope scope) const
+action::Parameters QnWorkbenchNavigator::currentParameters(action::ActionScope scope) const
 {
-    if (scope != Qn::TimelineScope)
-        return QnActionParameters();
+    using namespace nx::client::desktop::ui::action;
+    if (scope != TimelineScope)
+        return action::Parameters();
 
     QnResourceWidgetList result;
     if (m_currentWidget)
         result.push_back(m_currentWidget);
-    return QnActionParameters(result);
+    return action::Parameters(result);
 }
 
 bool QnWorkbenchNavigator::isLiveSupported() const
@@ -1953,7 +1954,7 @@ void QnWorkbenchNavigator::setAutoPaused(bool autoPaused)
     }
 
     m_autoPaused = autoPaused;
-    action(QnActions::PlayPauseAction)->setEnabled(!m_autoPaused); /* Prevent special UI reaction on space key*/
+    action(action::PlayPauseAction)->setEnabled(!m_autoPaused); /* Prevent special UI reaction on space key*/
 }
 
 // -------------------------------------------------------------------------- //
@@ -1974,10 +1975,9 @@ bool QnWorkbenchNavigator::eventFilter(QObject *watched, QEvent *event)
     return base_type::eventFilter(watched, event);
 }
 
-void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPointF &pos, const QPoint &screenPos)
+void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPointF& pos,
+    const QPoint& /*screenPos*/)
 {
-    Q_UNUSED(screenPos);
-
     if (!context() || !context()->menu())
     {
         qnWarning("Requesting context menu for a time slider while no menu manager instance is available.");
@@ -1987,7 +1987,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     if (qnRuntime->isVideoWallMode())
         return;
 
-    QnActionManager *manager = context()->menu();
+    auto manager = context()->menu();
 
     QnTimePeriod selection;
     if (m_timeSlider->isSelectionValid())
@@ -1995,7 +1995,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
 
     qint64 position = m_timeSlider->valueFromPosition(pos);
 
-    QnActionParameters parameters = currentParameters(Qn::TimelineScope);
+    auto parameters = currentParameters(action::TimelineScope);
     parameters.setArgument(Qn::TimePeriodRole, selection);
     parameters.setArgument(Qn::TimePeriodsRole, m_timeSlider->timePeriods(CurrentLine, Qn::RecordingContent)); // TODO: #Elric move this out into global scope!
     parameters.setArgument(Qn::MergedTimePeriodsRole, m_timeSlider->timePeriods(SyncedLine, Qn::RecordingContent));
@@ -2005,16 +2005,15 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     if (!bookmarks.isEmpty())
         parameters.setArgument(Qn::CameraBookmarkRole, bookmarks.first()); // TODO: #dklychkov Implement sub-menus for the case when there're more than 1 bookmark at the position
 
-
-    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TimelineScope, nullptr, parameters));
+    QScopedPointer<QMenu> menu(manager->newMenu(action::TimelineScope, nullptr, parameters));
     if (menu->isEmpty())
         return;
 
     /* Add slider-local actions to the menu. */
     bool selectionEditable = m_timeSlider->options().testFlag(QnTimeSlider::SelectionEditable);
-    manager->redirectAction(menu.data(), QnActions::StartTimeSelectionAction, selectionEditable ? m_startSelectionAction : NULL);
-    manager->redirectAction(menu.data(), QnActions::EndTimeSelectionAction, selectionEditable ? m_endSelectionAction : NULL);
-    manager->redirectAction(menu.data(), QnActions::ClearTimeSelectionAction, selectionEditable ? m_clearSelectionAction : NULL);
+    manager->redirectAction(menu.data(), action::StartTimeSelectionAction, selectionEditable ? m_startSelectionAction : NULL);
+    manager->redirectAction(menu.data(), action::EndTimeSelectionAction, selectionEditable ? m_endSelectionAction : NULL);
+    manager->redirectAction(menu.data(), action::ClearTimeSelectionAction, selectionEditable ? m_clearSelectionAction : NULL);
 
     /* Run menu. */
     QAction *action = QnHiDpiWorkarounds::showMenu(menu.data(), QCursor::pos());
@@ -2034,7 +2033,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     {
         m_timeSlider->setSelectionValid(false);
     }
-    else if (action == context()->action(QnActions::ZoomToTimeSelectionAction))
+    else if (action == context()->action(action::ZoomToTimeSelectionAction))
     {
         if (!m_timeSlider->isSelectionValid())
             return;

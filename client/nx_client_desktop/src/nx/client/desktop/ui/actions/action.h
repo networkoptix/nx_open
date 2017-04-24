@@ -4,29 +4,30 @@
 
 #include <QtWidgets/QAction>
 
+#include <common/common_globals.h>
+
+#include <nx/client/desktop/ui/actions/action_fwd.h>
+#include <nx/client/desktop/ui/actions/action_types.h>
+
 #include <ui/workbench/workbench_context_aware.h>
 #include <client/client_globals.h>
 
-#include "action_conditions.h"
-#include "action_factories.h"
-#include "action_text_factories.h"
-#include "action_fwd.h"
-#include "actions.h"
+#include <nx/client/desktop/ui/actions/actions.h>
 
 class QGraphicsItem;
 
-class QnWorkbenchContext;
-class QnActionCondition;
-class QnActionFactory;
-class QnActionManager;
-class QnActionParameters;
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+namespace action {
 
 /**
  * Action class that hooks into actions infrastructure to correctly check
  * conditions and provide proper action parameters even if it was triggered with a
  * hotkey.
  */
-class QnAction: public QAction, public QnWorkbenchContextAware
+class Action: public QAction, public QnWorkbenchContextAware
 {
     Q_OBJECT
 public:
@@ -36,27 +37,27 @@ public:
      * \param id                        Identifier of this action.
      * \param parent                    Context-aware parent of this action.
      */
-    QnAction(QnActions::IDType id, QObject *parent = NULL);
+    Action(IDType id, QObject *parent = NULL);
 
     /**
      * Virtual destructor.
      */
-    virtual ~QnAction();
+    virtual ~Action();
 
     /**
      * \returns                         Identifier of this action.
      */
-    QnActions::IDType id() const;
+    IDType id() const;
 
     /**
      * \returns                         Scope of this action.
      */
-    Qn::ActionScopes scope() const;
+    ActionScopes scope() const;
 
     /**
      * \returns                         Possible types of this action's default parameter.
      */
-    Qn::ActionParameterTypes defaultParameterTypes() const;
+    ActionParameterTypes defaultParameterTypes() const;
 
     /**
      * \param target                    Action parameter key.
@@ -80,14 +81,11 @@ public:
     */
     void setRequiredGlobalPermission(Qn::GlobalPermission requiredPermissions);
 
+    ClientModes mode() const;
+    void setMode(ClientModes mode);
 
-    QnActionTypes::ClientModes mode() const;
-
-    void setMode(QnActionTypes::ClientModes mode);
-
-    Qn::ActionFlags flags() const;
-
-    void setFlags(Qn::ActionFlags flags);
+    ActionFlags flags() const;
+    void setFlags(ActionFlags flags);
 
     Qn::ButtonAccent accent() const;
     void setAccent(Qn::ButtonAccent value);
@@ -128,30 +126,28 @@ public:
     /**
      * \returns                         Condition associated with this action, of NULL if none.
      */
-    QnActionCondition *condition() const;
+    ConditionPtr condition() const;
 
     /**
      * \param condition                 New condition for this action.
      */
-    void setCondition(QnActionCondition *condition);
+    void setCondition(const ConditionPtr& condition);
 
-    QnActionFactory *childFactory() const;
+    FactoryPtr childFactory() const;
+    void setChildFactory(const FactoryPtr& childFactory);
 
-    void setChildFactory(QnActionFactory *childFactory);
-
-    QnActionTextFactory *textFactory() const;
-
-    void setTextFactory(QnActionTextFactory *textFactory);
+    TextFactoryPtr textFactory() const;
+    void setTextFactory(const TextFactoryPtr& textFactory);
 
     /**
      * \returns                         Child actions. These action will appear
      *                                  in a submenu for this action.
      */
-    const QList<QnAction *> &children() const;
+    const QList<Action *> &children() const;
 
-    void addChild(QnAction *action);
+    void addChild(Action *action);
 
-    void removeChild(QnAction *action);
+    void removeChild(Action *action);
 
     QString toolTipFormat() const;
     void setToolTipFormat(const QString &toolTipFormat);
@@ -164,9 +160,11 @@ public:
      *                                  action can be executed and how it will
      *                                  appear in context menu.
      */
-    Qn::ActionVisibility checkCondition(Qn::ActionScopes scope, const QnActionParameters &parameters) const;
+    ActionVisibility checkCondition(
+        ActionScopes scope,
+        const Parameters &parameters) const;
 
-    void addConditionalText(QnActionCondition *condition, const QString &text);
+    void addConditionalText(ConditionPtr condition, const QString &text);
 
     /**
      * \returns true if there is at least one conditional text
@@ -178,7 +176,7 @@ public:
      * \returns                         New text if condition is executed;
      *                                  empty string otherwise.
      */
-    QString checkConditionalText(const QnActionParameters &parameters) const;
+    QString checkConditionalText(const Parameters &parameters) const;
 
 protected:
     virtual bool event(QEvent *event) override;
@@ -192,30 +190,35 @@ private:
     QString defaultToolTipFormat() const;
 
 private:
-    const QnActions::IDType m_id;
-    Qn::ActionFlags m_flags;
+    const IDType m_id;
+    ActionFlags m_flags;
     Qn::ButtonAccent m_accent{Qn::ButtonAccent::NoAccent};
-    QnActionTypes::ClientModes m_mode;
+    ClientModes m_mode;
     QHash<int, Qn::Permissions> m_targetPermissions;
     Qn::GlobalPermission m_globalPermission;
     QString m_normalText, m_toggledText, m_pulledText;
     QString m_toolTipFormat, m_toolTipMarker;
-    QPointer<QnActionCondition> m_condition;
-    QPointer<QnActionFactory> m_childFactory;
-    QPointer<QnActionTextFactory> m_textFactory;
+    ConditionPtr m_condition;
+    FactoryPtr m_childFactory;
+    TextFactoryPtr m_textFactory;
 
-    QList<QnAction *> m_children;
+    QList<Action *> m_children;
 
     struct ConditionalText
     {
-        QnActionCondition * condition;
+        ConditionPtr condition;
         QString text;
         ConditionalText(){}
-        ConditionalText(QnActionCondition * condition, const QString &text):
+        ConditionalText(ConditionPtr condition, const QString &text):
             condition(condition), text(text) {}
     };
     QList<ConditionalText> m_conditionalTexts;
 };
 
-Q_DECLARE_METATYPE(QnAction *)
+Q_DECLARE_METATYPE(Action *)
 
+} // namespace action
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx

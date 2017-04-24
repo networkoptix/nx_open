@@ -6,12 +6,14 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/checkbox_utils.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
 #include <utils/license_usage_helper.h>
+
+using namespace nx::client::desktop::ui;
 
 QnLicensesProposeWidget::QnLicensesProposeWidget(QWidget *parent):
     QWidget(parent),
@@ -56,7 +58,7 @@ void QnLicensesProposeWidget::afterContextInitialized()
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &QnLicensesProposeWidget::updateLicensesButtonVisible);
     connect(ui->moreLicensesButton, &QPushButton::clicked, this,
-        [this] { menu()->trigger(QnActions::PreferencesLicensesTabAction); });
+        [this] { menu()->trigger(action::PreferencesLicensesTabAction); });
     updateLicensesButtonVisible();
 }
 

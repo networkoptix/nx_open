@@ -34,7 +34,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/style/globals.h>
 #include <ui/style/nx_style.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -46,6 +46,8 @@
 #include <utils/applauncher_utils.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/connection_diagnostics_helper.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -891,7 +893,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
                     qnClientMessageProcessor->setHoldConnection(false);
 
                 if (result.protocolChanged)
-                    menu()->trigger(QnActions::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
+                    menu()->trigger(action::DisconnectAction, {Qn::ForceRole, true});
 
                 break;
             }

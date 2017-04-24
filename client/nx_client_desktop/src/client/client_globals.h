@@ -218,11 +218,11 @@ namespace Qn
         MergedTimePeriodsRole,
         FileNameRole,                               /**< Role for target filename. Used in TakeScreenshotAction. */
         TextRole,                                   /**< Role for generic text. Used in several places. */
-        UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and QnActions::ConnectAction. */
+        UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and action::ConnectAction. */
         AutoLoginRole,                              /**< Role for flag that shows if client should connect with last credentials
                                                          (or to the last system) automatically next time */
         StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
-                                                         Used in QnActions::ConnectAction. */
+                                                         Used in action::ConnectAction. */
         CloudSystemIdRole,                          /**< Role for cloud system id (QString). Used in cloud system nodes and ConnectToCloudAction. */
 
         ForceRole,                                  /**< Role for 'forced' flag. Used in ConnectAction/DisconnectAction. */

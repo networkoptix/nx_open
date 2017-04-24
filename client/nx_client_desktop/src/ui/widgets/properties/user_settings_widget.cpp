@@ -13,7 +13,7 @@
 
 #include <core/resource/user_resource.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/aligner.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
@@ -29,6 +29,8 @@
 
 #include <utils/common/app_info.h>
 #include <utils/email/email.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -126,8 +128,7 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     connect(ui->editRolesButton, &QPushButton::clicked, this,
         [this]
         {
-            menu()->trigger(QnActions::UserRolesAction, QnActionParameters()
-                .withArgument(Qn::UuidRole, selectedUserRoleId()));
+            menu()->trigger(action::UserRolesAction, {Qn::UuidRole, selectedUserRoleId()});
         });
 
     autoResizePagesToContents(ui->mainStackedWidget,

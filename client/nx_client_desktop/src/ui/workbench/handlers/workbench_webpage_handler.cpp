@@ -1,5 +1,7 @@
 #include "workbench_webpage_handler.h"
 
+#include <QtWidgets/QAction>
+
 #include <common/common_module.h>
 
 #include <client/client_message_processor.h>
@@ -8,10 +10,11 @@
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <ui/actions/action.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <ui/dialogs/webpage_dialog.h>
+
+using namespace nx::client::desktop::ui;
 
 QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject* parent /*= nullptr*/):
     base_type(parent),
@@ -26,10 +29,10 @@ QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject* parent /*= nullptr
                 webPage->setStatus(Qn::Online);
         });
 
-    connect(action(QnActions::NewWebPageAction), &QAction::triggered,
+    connect(action(action::NewWebPageAction), &QAction::triggered,
         this, &QnWorkbenchWebPageHandler::at_newWebPageAction_triggered);
 
-    connect(action(QnActions::WebPageSettingsAction), &QAction::triggered,
+    connect(action(action::WebPageSettingsAction), &QAction::triggered,
         this, &QnWorkbenchWebPageHandler::at_editWebPageAction_triggered);
 }
 

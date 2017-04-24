@@ -16,7 +16,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <utils/math/math.h>
 
@@ -62,8 +62,8 @@ void LayoutTourExecutor::startTour(const ec2::ApiLayoutTourData& tour)
 
     startTourInternal();
 
-    //action(QnActions::EffectiveMaximizeAction)->setChecked(false);
-    menu()->trigger(QnActions::FreespaceAction);
+    //action(action::EffectiveMaximizeAction)->setChecked(false);
+    menu()->trigger(action::FreespaceAction);
 }
 
 void LayoutTourExecutor::updateTour(const ec2::ApiLayoutTourData& tour)
@@ -129,7 +129,7 @@ void LayoutTourExecutor::stopCurrentTour()
             m_tour.items.clear();
 
             restoreWorkbenchState();
-            menu()->trigger(QnActions::FreespaceAction);
+            menu()->trigger(action::FreespaceAction);
             break;
         }
 
@@ -233,7 +233,7 @@ void LayoutTourExecutor::restoreWorkbenchState()
     workbench()->update(m_lastState);
 
     if (workbench()->layouts().empty() || !workbench()->currentLayout()->resource())
-        menu()->trigger(QnActions::OpenNewTabAction);
+        menu()->trigger(action::OpenNewTabAction);
 }
 
 void LayoutTourExecutor::setHintVisible(bool visible)

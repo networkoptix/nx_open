@@ -20,7 +20,7 @@
 
 #include <text/time_strings.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/palette.h>
 #include <ui/common/read_only.h>
 #include <ui/common/checkbox_utils.h>
@@ -41,6 +41,8 @@
 
 using boost::algorithm::all_of;
 using boost::algorithm::any_of;
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -1119,7 +1121,7 @@ void QnCameraScheduleWidget::at_displayFpsCheckBox_stateChanged(int state)
 
 void QnCameraScheduleWidget::at_licensesButton_clicked()
 {
-    menu()->trigger(QnActions::PreferencesLicensesTabAction);
+    menu()->trigger(action::PreferencesLicensesTabAction);
 }
 
 void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target)

@@ -40,7 +40,7 @@
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <plugins/resource/avi/filetypesupport.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/dialogs/connection_name_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h>
@@ -54,6 +54,8 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
 #include <helpers/system_helpers.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -325,20 +327,20 @@ void QnLoginDialog::accept()
                     qnSettings->save();
 
                     const bool autoLogin = ui->autoLoginCheckBox->isChecked();
-                    QnActionParameters params;
+                    action::Parameters params;
                     const bool storePassword =
                         (haveToStorePassword(connectionInfo.localSystemId, url) || autoLogin);
                     params.setArgument(Qn::UrlRole, url);
                     params.setArgument(Qn::AutoLoginRole, autoLogin);
                     params.setArgument(Qn::StorePasswordRole, storePassword);
                     params.setArgument(Qn::ForceRole, true);
-                    menu()->trigger(QnActions::ConnectAction, params);
+                    menu()->trigger(action::ConnectAction, params);
 
                     break;
                 }
                 case Qn::IncompatibleProtocolConnectionResult:
                 case Qn::IncompatibleCloudHostConnectionResult:
-                    menu()->trigger(QnActions::DelayedForcedExitAction);
+                    menu()->trigger(action::DelayedForcedExitAction);
                     break; // to avoid cycle
                 default:    //error
                     return;
