@@ -68,6 +68,8 @@ namespace ec2 {
         virtual QnDistributedMutexManager* distributedMutex() const override;
         virtual TimeSynchronizationManager* timeSyncManager() const override;
 private:
+    Settings m_settingsInstance;
+
     std::unique_ptr<detail::QnDbManager> m_dbManager;
     std::unique_ptr<QnTransactionLog> m_transactionLog;
     std::unique_ptr<QnTransactionMessageBus> m_transactionMessageBus;
@@ -81,7 +83,6 @@ private:
 
     ClientQueryProcessor m_remoteQueryProcessor;
     QnMutex m_mutex;
-    Settings m_settingsInstance;
     Ec2DirectConnectionPtr m_directConnection;
 private:
     int establishDirectConnection(const QUrl& url, impl::ConnectHandlerPtr handler);

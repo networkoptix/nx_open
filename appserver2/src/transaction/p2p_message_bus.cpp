@@ -61,11 +61,10 @@ P2pMessageBus::~P2pMessageBus()
     delete m_timer;
 }
 
-void P2pMessageBus::start()
+void P2pMessageBus::stop()
 {
-    NX_ASSERT(!m_thread->isRunning());
-    if (!m_thread->isRunning())
-        m_thread->start();
+    base_type::stop();
+    m_connections.clear();
 }
 
 // P2pMessageBus
@@ -84,7 +83,7 @@ void P2pMessageBus::removeOutgoingConnectionFromPeer(QnUuid& id)
     m_outgoingConnections.remove(id);
     auto itr = m_connections.find(id);
     if (itr != m_connections.end() && itr.value()->direction() == P2pConnection::Direction::outgoing)
-        m_connections.erase(itr);
+        itr.value()->setState(P2pConnection::State::Error);
 }
 
 void P2pMessageBus::gotConnectionFromRemotePeer(P2pConnectionPtr connection)
@@ -158,15 +157,26 @@ void P2pMessageBus::processTemporaryOutgoingConnections()
     }
 }
 
+void P2pMessageBus::cleanupRoutingRecords(const ApiPersistentIdData& id)
+{
+    for (auto itr = m_allPeers.begin(); itr != m_allPeers.end(); ++itr)
+        itr.value().routingInfo.remove(id);
+}
+
 void P2pMessageBus::removeClosedConnections()
 {
     for (auto itr = m_connections.begin(); itr != m_connections.end();)
     {
         auto& connection = itr.value();
         if (connection->state() == P2pConnection::State::Error)
+        {
+            cleanupRoutingRecords(connection->remotePeer());
             itr = m_connections.erase(itr);
+        }
         else
+        {
             ++itr;
+        }
     }
 }
 
@@ -321,6 +331,11 @@ void P2pMessageBus::deserializeAlivePeersMessageRequest(
 
 void P2pMessageBus::sendAlivePeersMessage()
 {
+    if (commonModule()->instanceCounter() != 0)
+    {
+        int gg = 4;
+    }
+
     QByteArray data = serializePeersMessage();
     for (const auto& connection : m_connections)
     {

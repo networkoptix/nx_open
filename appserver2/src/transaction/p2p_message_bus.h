@@ -36,7 +36,8 @@ using SubscribeForDataUpdatesMessageType = QVector<SubscribeForDataUpdateRecord>
 
 class P2pMessageBus: public QnTransactionMessageBusBase
 {
-    Q_OBJECT
+    Q_OBJECT;
+    using base_type = QnTransactionMessageBusBase;
 public:
     P2pMessageBus(
         detail::QnDbManager* db,
@@ -52,7 +53,7 @@ public:
     // Self peer information
     ApiPeerData localPeer() const;
 
-    void start();
+    virtual void stop() override;
 
 
     template<class T>
@@ -97,6 +98,7 @@ private:
     void removeClosedConnections();
     void createOutgoingConnections();
     void sendAlivePeersMessage();
+    void cleanupRoutingRecords(const ApiPersistentIdData& id);
 
     QVector<PeerNumberType> deserializeCompressedPeers(const QByteArray& data, bool* success);
     void deserializeAlivePeersMessageRequest(

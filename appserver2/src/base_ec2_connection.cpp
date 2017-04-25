@@ -81,6 +81,8 @@ void BaseEc2Connection<QueryProcessorType>::stopReceivingNotifications()
 {
     m_connectionFactory->messageBus()->disconnectAndJoin(this);
     m_connectionFactory->messageBus()->stop();
+
+    m_connectionFactory->p2pMessageBus()->stop();
 }
 
 template<class QueryProcessorType>

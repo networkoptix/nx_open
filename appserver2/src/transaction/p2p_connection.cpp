@@ -152,7 +152,7 @@ P2pConnection::P2pConnection(
     m_readBuffer.reserve(1024 * 1024);
 
     using namespace std::placeholders;
-
+    setState(State::Connected);
     m_webSocket->readSomeAsync(
         &m_readBuffer,
         std::bind(&P2pConnection::onNewMessageRead, this, _1, _2));
@@ -456,6 +456,11 @@ void P2pConnection::onMessageSent(SystemError::ErrorCode errorCode, size_t bytes
 void P2pConnection::onNewMessageRead(SystemError::ErrorCode errorCode, size_t bytesRead)
 {
     QnMutexLocker lock(&m_mutex);
+    if (bytesRead == 0)
+    {
+        setState(State::Error);
+        return; //< connection closed
+    }
 
     if (errorCode != SystemError::noError ||
         !handleMessage(m_readBuffer))

@@ -29,13 +29,18 @@ static Appserver2Ptr createAppserver()
     static int instanceCounter = 0;
 
     const auto tmpDir =
-        (QDir::homePath() + "/ec2_server_sync_ut.data") + QString::number(instanceCounter++);
+        (QDir::homePath() + "/ec2_server_sync_ut.data") + QString::number(instanceCounter);
     QDir(tmpDir).removeRecursively();
 
     Appserver2Ptr result(new Appserver2());
 
     const QString dbFileArg = lit("--dbFile=%1").arg(tmpDir);
     result->addArg(dbFileArg.toStdString().c_str());
+
+    const QString instanceArg = lit("--moduleInstance=%1").arg(instanceCounter);
+    result->addArg(instanceArg.toStdString().c_str());
+
+    ++instanceCounter;
 
     result->start();
     return result;
