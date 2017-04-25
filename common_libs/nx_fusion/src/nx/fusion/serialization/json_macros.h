@@ -10,10 +10,23 @@
 #include "lexical.h"
 
 namespace QJsonDetail {
-    struct TrueChecker {
-        template<class T>
-        bool operator()(const T &) const { return true; }
-    };
+
+/** Return true if the whole struct must be serialized. Is not used for any structs really. */
+struct TrueChecker
+{
+    template<class T>
+    bool operator()(const T &) const { return true; }
+};
+
+/** Return true if value must be omitted in lazy mode. */
+struct LazyChecker
+{
+    template<class T>
+    bool operator()(const T &) const { return false; }
+
+    bool operator()(const QString& value) const { return value.isEmpty(); }
+    bool operator()(const QnUuid& value) const { return value.isNull(); }
+};
 
     class SerializationVisitor {
     public:
@@ -28,6 +41,14 @@ namespace QJsonDetail {
 
             if(!invoke(access(checker, TrueChecker()), value))
                 return true; /* Skipped. */
+
+            // In lazy mode we can skip empty structure fields
+            if (access(lazy, false))
+            {
+                const auto realValue = invoke(access(getter), value);
+                if (LazyChecker()(realValue))
+                    return true;
+            }
 
             QJson::serialize(m_ctx, invoke(access(getter), value), access(name), &m_object);
             return true;
