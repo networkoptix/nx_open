@@ -6,9 +6,45 @@
 #include <QtCore/QVector>
 #include <QtCore/QDir>
 
+#include <nx/fusion/model_functions_fwd.h>
+
 namespace nx {
 namespace vms {
 namespace common {
+
+struct DownloaderFileInformation
+{
+    Q_GADGET
+
+public:
+
+    DownloaderFileInformation();
+    DownloaderFileInformation(const QString& fileName);
+
+    bool isValid() const;
+
+    enum class Status
+    {
+        notFound,
+        downloading,
+        downloaded,
+        corrupted
+    };
+    Q_ENUM(Status)
+
+    QString name;
+    qint64 size = -1;
+    QByteArray md5;
+    QUrl url;
+    qint64 chunkSize = 0;
+    Status status = Status::notFound;
+    QBitArray downloadedChunks;
+};
+#define DownloaderFileInformation_Fields \
+    (name)(size)(md5)(url)(chunkSize)(status)(downloadedChunks)
+
+QN_FUSION_DECLARE_FUNCTIONS(DownloaderFileInformation::Status, (lexical))
+QN_FUSION_DECLARE_FUNCTIONS(DownloaderFileInformation, (json))
 
 class DistributedFileDownloaderPrivate;
 class DistributedFileDownloader: public QObject
@@ -29,37 +65,16 @@ public:
         noFreeSpace
     };
 
-    enum class FileStatus
-    {
-        notFound,
-        downloading,
-        downloaded,
-        corrupted
-    };
-    Q_ENUM(FileStatus)
-
-    struct FileInformation
-    {
-        FileInformation();
-        FileInformation(const QString& fileName);
-
-        QString name;
-        qint64 size = -1;
-        QByteArray md5;
-        QUrl url;
-        qint64 chunkSize = 0;
-        FileStatus status = FileStatus::notFound;
-        QBitArray downloadedChunks;
-    };
-
     DistributedFileDownloader(const QDir& downloadsDirectory, QObject* parent = nullptr);
     ~DistributedFileDownloader();
 
     QStringList files() const;
 
-    FileInformation fileInformation(const QString& fileName) const;
+    QString filePath(const QString& fileName) const;
 
-    ErrorCode addFile(const FileInformation& fileInformation);
+    DownloaderFileInformation fileInformation(const QString& fileName) const;
+
+    ErrorCode addFile(const DownloaderFileInformation& fileInformation);
 
     ErrorCode readFileChunk(
         const QString& fileName,
@@ -73,10 +88,10 @@ public:
 
     ErrorCode deleteFile(const QString& fileName, bool deleteData = true);
 
-    QVector<QByteArray> getChunkChecksums(const QString& fileName);
+    QVector<QByteArray> getChunkChecksums(const QString& filePath);
 
-    static QByteArray calculateMd5(const QString& fileName);
-    static qint64 calculateFileSize(const QString& fileName);
+    static QByteArray calculateMd5(const QString& filePath);
+    static qint64 calculateFileSize(const QString& filePath);
     static int calculateChunkCount(qint64 fileSize, qint64 chunkSize);
 
 private:

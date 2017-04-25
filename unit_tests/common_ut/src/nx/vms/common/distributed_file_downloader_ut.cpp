@@ -26,7 +26,8 @@ protected:
         workingDirectory.removeRecursively();
         ASSERT_TRUE(QDir().mkdir(workingDirectory.absolutePath()));
 
-        testFileName = workingDirectory.absoluteFilePath(kTestFileName);
+        testFileName = kTestFileName;
+        testFilePath = workingDirectory.absoluteFilePath(testFileName);
 
         downloader.reset(new DistributedFileDownloader(workingDirectory));
     }
@@ -39,7 +40,7 @@ protected:
 
     bool createTestFile(const QString& fileName, qint64 size)
     {
-        QFile file(fileName);
+        QFile file(workingDirectory.absoluteFilePath(fileName));
 
         if (!file.open(QFile::WriteOnly))
             return false;
@@ -61,8 +62,8 @@ protected:
         if (!createTestFile(testFileName, kTestFileSize))
             return false;
 
-        testFileMd5 = DistributedFileDownloader::calculateMd5(testFileName);
-        if (testFileName.isEmpty())
+        testFileMd5 = DistributedFileDownloader::calculateMd5(testFilePath);
+        if (testFileMd5.isEmpty())
             return false;
 
         return true;
@@ -70,6 +71,7 @@ protected:
 
     QDir workingDirectory;
     QString testFileName;
+    QString testFilePath;
     QByteArray testFileMd5;
     QScopedPointer<DistributedFileDownloader> downloader;
 };
@@ -77,7 +79,7 @@ protected:
 TEST_F(DistributedFileDownloaderTest, inexistentFileRequests)
 {
     const auto& fileInfo = downloader->fileInformation(testFileName);
-    ASSERT_EQ(fileInfo.status, DistributedFileDownloader::FileStatus::notFound);
+    ASSERT_EQ(fileInfo.status, DownloaderFileInformation::Status::notFound);
 
     QByteArray buffer;
 
@@ -98,7 +100,7 @@ TEST_F(DistributedFileDownloaderTest, addNewFileWithoutInformation)
 
     const auto& fileInfo = downloader->fileInformation(testFileName);
 
-    ASSERT_EQ(fileInfo.status, DistributedFileDownloader::FileStatus::downloading);
+    ASSERT_EQ(fileInfo.status, DownloaderFileInformation::Status::downloading);
     ASSERT_EQ(fileInfo.size, -1);
     ASSERT_TRUE(fileInfo.md5.isEmpty());
 }
@@ -108,7 +110,7 @@ TEST_F(DistributedFileDownloaderTest, addNewFile)
     const QByteArray md5("md5_test");
 
     {
-        DistributedFileDownloader::FileInformation fileInfo(testFileName);
+        DownloaderFileInformation fileInfo(testFileName);
         fileInfo.size = kTestFileSize;
         fileInfo.md5 = md5;
 
@@ -117,7 +119,7 @@ TEST_F(DistributedFileDownloaderTest, addNewFile)
 
     const auto& fileInfo = downloader->fileInformation(testFileName);
 
-    ASSERT_EQ(fileInfo.status, DistributedFileDownloader::FileStatus::downloading);
+    ASSERT_EQ(fileInfo.status, DownloaderFileInformation::Status::downloading);
     ASSERT_EQ(fileInfo.size, kTestFileSize);
     ASSERT_TRUE(fileInfo.md5 == md5);
     ASSERT_FALSE(fileInfo.downloadedChunks.isEmpty());
@@ -128,14 +130,14 @@ TEST_F(DistributedFileDownloaderTest, addDownloadedFile)
     ASSERT_TRUE(createDefaultTestFile());
 
     {
-        DistributedFileDownloader::FileInformation fileInfo(testFileName);
-        fileInfo.status = DistributedFileDownloader::FileStatus::downloaded;
+        DownloaderFileInformation fileInfo(testFileName);
+        fileInfo.status = DownloaderFileInformation::Status::downloaded;
 
         ASSERT_EQ(downloader->addFile(fileInfo), DistributedFileDownloader::ErrorCode::noError);
     }
 
     const auto& fileInfo = downloader->fileInformation(testFileName);
-    ASSERT_EQ(fileInfo.status, DistributedFileDownloader::FileStatus::downloaded);
+    ASSERT_EQ(fileInfo.status, DownloaderFileInformation::Status::downloaded);
     ASSERT_EQ(fileInfo.size, kTestFileSize);
     ASSERT_TRUE(fileInfo.md5 == testFileMd5);
     ASSERT_TRUE(fileInfo.chunkSize > 0);
@@ -148,7 +150,7 @@ TEST_F(DistributedFileDownloaderTest, addDownloadedFileAsNotDownloaded)
     ASSERT_TRUE(createDefaultTestFile());
 
     {
-        DistributedFileDownloader::FileInformation fileInfo(testFileName);
+        DownloaderFileInformation fileInfo(testFileName);
         fileInfo.md5 = testFileMd5;
 
         ASSERT_EQ(downloader->addFile(fileInfo), DistributedFileDownloader::ErrorCode::noError);
@@ -156,7 +158,7 @@ TEST_F(DistributedFileDownloaderTest, addDownloadedFileAsNotDownloaded)
 
     // Valid file is already exists, so file should became downloaded.
     const auto& fileInfo = downloader->fileInformation(testFileName);
-    ASSERT_EQ(fileInfo.status, DistributedFileDownloader::FileStatus::downloaded);
+    ASSERT_EQ(fileInfo.status, DownloaderFileInformation::Status::downloaded);
     ASSERT_EQ(fileInfo.size, kTestFileSize);
     ASSERT_TRUE(fileInfo.md5 == testFileMd5);
     ASSERT_TRUE(fileInfo.chunkSize > 0);
@@ -169,8 +171,8 @@ TEST_F(DistributedFileDownloaderTest, addFileWithWrongChecksum)
     ASSERT_TRUE(createDefaultTestFile());
 
     {
-        DistributedFileDownloader::FileInformation fileInfo(testFileName);
-        fileInfo.status = DistributedFileDownloader::FileStatus::downloaded;
+        DownloaderFileInformation fileInfo(testFileName);
+        fileInfo.status = DownloaderFileInformation::Status::downloaded;
         fileInfo.md5 = "invalid_md5";
 
         ASSERT_EQ(downloader->addFile(fileInfo),
@@ -178,17 +180,15 @@ TEST_F(DistributedFileDownloaderTest, addFileWithWrongChecksum)
     }
 
     const auto& fileInfo = downloader->fileInformation(testFileName);
-    ASSERT_EQ(fileInfo.status, DistributedFileDownloader::FileStatus::notFound);
+    ASSERT_EQ(fileInfo.status, DownloaderFileInformation::Status::notFound);
 }
 
 TEST_F(DistributedFileDownloaderTest, fileDuplicate)
 {
-    DistributedFileDownloader downloader(workingDirectory);
-
-    ASSERT_EQ(downloader.addFile(testFileName),
+    ASSERT_EQ(downloader->addFile(testFileName),
         DistributedFileDownloader::ErrorCode::noError);
 
-    ASSERT_EQ(downloader.addFile(testFileName),
+    ASSERT_EQ(downloader->addFile(testFileName),
         DistributedFileDownloader::ErrorCode::fileAlreadyExists);
 }
 
@@ -204,14 +204,14 @@ TEST_F(DistributedFileDownloaderTest, fileDeletion)
         DistributedFileDownloader::ErrorCode::noError);
     ASSERT_EQ(downloader->deleteFile(testFileName, false),
         DistributedFileDownloader::ErrorCode::noError);
-    ASSERT_TRUE(QFile::exists(testFileName));
+    ASSERT_TRUE(QFile::exists(testFilePath));
 
     // Delete download with its data.
     ASSERT_EQ(downloader->addFile(testFileName),
         DistributedFileDownloader::ErrorCode::noError);
     ASSERT_EQ(downloader->deleteFile(testFileName),
         DistributedFileDownloader::ErrorCode::noError);
-    ASSERT_FALSE(QFile::exists(testFileName));
+    ASSERT_FALSE(QFile::exists(testFilePath));
 }
 
 TEST_F(DistributedFileDownloaderTest, findDownloadsForDownloadedFiles)
@@ -219,8 +219,8 @@ TEST_F(DistributedFileDownloaderTest, findDownloadsForDownloadedFiles)
     ASSERT_TRUE(createDefaultTestFile());
 
     {
-        DistributedFileDownloader::FileInformation fileInfo(testFileName);
-        fileInfo.status = DistributedFileDownloader::FileStatus::downloaded;
+        DownloaderFileInformation fileInfo(testFileName);
+        fileInfo.status = DownloaderFileInformation::Status::downloaded;
 
         ASSERT_EQ(this->downloader->addFile(fileInfo),
             DistributedFileDownloader::ErrorCode::noError);
@@ -229,7 +229,7 @@ TEST_F(DistributedFileDownloaderTest, findDownloadsForDownloadedFiles)
     DistributedFileDownloader downloader(workingDirectory);
 
     const auto& fileInfo = downloader.fileInformation(testFileName);
-    ASSERT_EQ(fileInfo.status, DistributedFileDownloader::FileStatus::downloaded);
+    ASSERT_EQ(fileInfo.status, DownloaderFileInformation::Status::downloaded);
     ASSERT_EQ(fileInfo.size, kTestFileSize);
     ASSERT_TRUE(fileInfo.md5 == testFileMd5);
     ASSERT_TRUE(fileInfo.chunkSize > 0);
@@ -245,7 +245,7 @@ TEST_F(DistributedFileDownloaderTest, findDownloadsForNewFiles)
     DistributedFileDownloader downloader(workingDirectory);
 
     const auto& fileInfo = downloader.fileInformation(testFileName);
-    ASSERT_EQ(fileInfo.status, DistributedFileDownloader::FileStatus::downloading);
+    ASSERT_EQ(fileInfo.status, DownloaderFileInformation::Status::downloading);
 }
 
 TEST_F(DistributedFileDownloaderTest, findFileAfterDeletion)
@@ -260,23 +260,23 @@ TEST_F(DistributedFileDownloaderTest, findFileAfterDeletion)
     DistributedFileDownloader downloader(workingDirectory);
 
     const auto& fileInfo = downloader.fileInformation(testFileName);
-    ASSERT_EQ(fileInfo.status, DistributedFileDownloader::FileStatus::notFound);
+    ASSERT_EQ(fileInfo.status, DownloaderFileInformation::Status::notFound);
 }
 
 TEST_F(DistributedFileDownloaderTest, chunkOperations)
 {
     ASSERT_TRUE(createDefaultTestFile());
 
-    const auto targetFileName = workingDirectory.absoluteFilePath(kTestFileName + ".new");
+    const auto targetFileName = testFileName + ".new";
 
     {
-        DistributedFileDownloader::FileInformation fileInfo(testFileName);
-        fileInfo.status = DistributedFileDownloader::FileStatus::downloaded;
+        DownloaderFileInformation fileInfo(testFileName);
+        fileInfo.status = DownloaderFileInformation::Status::downloaded;
 
         ASSERT_EQ(downloader->addFile(fileInfo),
             DistributedFileDownloader::ErrorCode::noError);
 
-        DistributedFileDownloader::FileInformation targetFileInfo(targetFileName);
+        DownloaderFileInformation targetFileInfo(targetFileName);
         targetFileInfo.md5 = testFileMd5;
         targetFileInfo.size = kTestFileSize;
 
@@ -297,9 +297,10 @@ TEST_F(DistributedFileDownloaderTest, chunkOperations)
     }
 
     const auto& targetFileInfo = downloader->fileInformation(targetFileName);
-    ASSERT_EQ(targetFileInfo.status, DistributedFileDownloader::FileStatus::downloaded);
+    ASSERT_EQ(targetFileInfo.status, DownloaderFileInformation::Status::downloaded);
 
-    const auto targetMd5 = DistributedFileDownloader::calculateMd5(targetFileInfo.name);
+    const auto targetMd5 = DistributedFileDownloader::calculateMd5(
+        workingDirectory.absoluteFilePath(targetFileInfo.name));
     ASSERT_TRUE(testFileMd5 == targetMd5);
 }
 
@@ -307,8 +308,8 @@ TEST_F(DistributedFileDownloaderTest, readByInvalidChunkIndex)
 {
     ASSERT_TRUE(createDefaultTestFile());
 
-    DistributedFileDownloader::FileInformation fileInformation(testFileName);
-    fileInformation.status = DistributedFileDownloader::FileStatus::downloaded;
+    DownloaderFileInformation fileInformation(testFileName);
+    fileInformation.status = DownloaderFileInformation::Status::downloaded;
 
     ASSERT_EQ(downloader->addFile(fileInformation),
         DistributedFileDownloader::ErrorCode::noError);
@@ -322,7 +323,7 @@ TEST_F(DistributedFileDownloaderTest, writeInvalidChunks)
 {
     ASSERT_TRUE(createDefaultTestFile());
 
-    DistributedFileDownloader::FileInformation fileInformation(testFileName);
+    DownloaderFileInformation fileInformation(testFileName);
     fileInformation.size = 1;
 
     ASSERT_EQ(downloader->addFile(fileInformation),
@@ -342,8 +343,8 @@ TEST_F(DistributedFileDownloaderTest, writeToDownloadedFile)
 {
     ASSERT_TRUE(createDefaultTestFile());
 
-    DistributedFileDownloader::FileInformation fileInformation(testFileName);
-    fileInformation.status = DistributedFileDownloader::FileStatus::downloaded;
+    DownloaderFileInformation fileInformation(testFileName);
+    fileInformation.status = DownloaderFileInformation::Status::downloaded;
 
     ASSERT_EQ(downloader->addFile(fileInformation),
         DistributedFileDownloader::ErrorCode::noError);
@@ -356,7 +357,7 @@ TEST_F(DistributedFileDownloaderTest, writeToDownloadedFile)
 TEST_F(DistributedFileDownloaderTest, fileCorruptionDuringDownload)
 {
     {
-        DistributedFileDownloader::FileInformation fileInfo(testFileName);
+        DownloaderFileInformation fileInfo(testFileName);
         fileInfo.md5 = "md5_corrupted";
         fileInfo.size = 1;
 
@@ -367,15 +368,15 @@ TEST_F(DistributedFileDownloaderTest, fileCorruptionDuringDownload)
         DistributedFileDownloader::ErrorCode::noError);
 
     const auto& fileInformation = downloader->fileInformation(testFileName);
-    ASSERT_EQ(fileInformation.status, DistributedFileDownloader::FileStatus::corrupted);
+    ASSERT_EQ(fileInformation.status, DownloaderFileInformation::Status::corrupted);
 }
 
 TEST_F(DistributedFileDownloaderTest, getChecksums)
 {
     ASSERT_TRUE(createDefaultTestFile());
 
-    DistributedFileDownloader::FileInformation fileInformation(testFileName);
-    fileInformation.status = DistributedFileDownloader::FileStatus::downloaded;
+    DownloaderFileInformation fileInformation(testFileName);
+    fileInformation.status = DownloaderFileInformation::Status::downloaded;
 
     ASSERT_EQ(downloader->addFile(fileInformation),
         DistributedFileDownloader::ErrorCode::noError);
@@ -392,8 +393,8 @@ TEST_F(DistributedFileDownloaderTest, getChecksumsAfterDownload)
 {
     ASSERT_TRUE(createTestFile(testFileName, 1024));
 
-    DistributedFileDownloader::FileInformation fileInfo(testFileName);
-    fileInfo.status = DistributedFileDownloader::FileStatus::downloaded;
+    DownloaderFileInformation fileInfo(testFileName);
+    fileInfo.status = DownloaderFileInformation::Status::downloaded;
 
     ASSERT_EQ(downloader->addFile(fileInfo),
         DistributedFileDownloader::ErrorCode::noError);
@@ -404,7 +405,7 @@ TEST_F(DistributedFileDownloaderTest, getChecksumsAfterDownload)
     ASSERT_EQ(downloader->readFileChunk(testFileName, 0, data),
         DistributedFileDownloader::ErrorCode::noError);
 
-    DistributedFileDownloader::FileInformation targetFileInfo(testFileName + ".new");
+    DownloaderFileInformation targetFileInfo(testFileName + ".new");
     targetFileInfo.size = fileInfo.size;
     targetFileInfo.md5 = fileInfo.md5;
     ASSERT_EQ(downloader->addFile(targetFileInfo),
