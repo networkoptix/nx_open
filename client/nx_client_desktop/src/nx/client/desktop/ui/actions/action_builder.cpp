@@ -71,7 +71,7 @@ Builder Builder::shortcutContext(Qt::ShortcutContext context)
     return *this;
 }
 
-Builder Builder::icon(const QIcon &icon)
+Builder Builder::icon(const QIcon& icon)
 {
     m_action->setIcon(icon);
     return *this;
