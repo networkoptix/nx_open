@@ -377,6 +377,8 @@ bool LilinResource::writeEntry(const RemoteArchiveEntry& entry, nx_http::BufferT
         fileNameWithExtension,
         nullptr,
         buffer->size());
+
+    return true;
 }
 
 bool LilinResource::convertAndWriteBuffer(
@@ -385,7 +387,7 @@ bool LilinResource::convertAndWriteBuffer(
     int64_t* outDurationMs)
 {
     qDebug() << "Converting and writing file" << fileName;
-    NX_LOGX(lm("Converting and writing file").arg(fileName), cl_logDEBUG1);
+    NX_LOGX(lm("Converting and writing file %1").arg(fileName), cl_logDEBUG1);
 
     const QString temporaryFilePath = QString::number(nx::utils::random::number());
     QnExtIODeviceStorageResourcePtr storage(new QnExtIODeviceStorageResource());
@@ -411,11 +413,12 @@ bool LilinResource::convertAndWriteBuffer(
 
     mediaFileReader->setAudioChannel(0);
 
-    auto recorder = new QnStreamRecorder(toResourcePtr());
+    auto recorder = std::make_unique<QnStreamRecorder>(toResourcePtr());
     recorder->clearUnprocessedData();
     recorder->addRecordingContext(fileName, qnNormalStorageMan->getOptimalStorageRoot());
     recorder->setContainer(kArchiveContainer);
     recorder->forceAudioLayout(audioLayout);
+    recorder->disableRegisterFile(true);
 
     while (auto mediaData = mediaFileReader->getNextData())
     {
@@ -425,7 +428,6 @@ bool LilinResource::convertAndWriteBuffer(
         recorder->processData(mediaData);
     }
     
-    recorder->close();
     return true;
 }
 

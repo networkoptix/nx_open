@@ -86,6 +86,8 @@ public:
 
     void forceAudioLayout(const QnResourceAudioLayoutPtr& layout);
 
+    void disableRegisterFile(bool disable);
+
 #ifdef SIGN_FRAME_ENABLED
     void setSignLogo(const QImage& logo);
 #endif
@@ -208,6 +210,7 @@ private:
     std::mt19937 m_gen;
 
     QnResourceAudioLayoutPtr m_forcedAudioLayout;
+    bool m_disableRegisterFile;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

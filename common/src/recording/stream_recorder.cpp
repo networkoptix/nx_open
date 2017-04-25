@@ -113,7 +113,8 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_recordingFinished(false),
     m_role(StreamRecorderRole::serverRecording),
     m_gen(m_rd()),
-    m_forcedAudioLayout(nullptr)
+    m_forcedAudioLayout(nullptr),
+    m_disableRegisterFile(false)
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
     memset(m_motionFileList, 0, sizeof(m_motionFileList));
@@ -179,7 +180,7 @@ void QnStreamRecorder::close()
             qint64 fileDuration = m_startDateTime !=
                 qint64(AV_NOPTS_VALUE)  ? m_endDateTime/1000 - m_startDateTime/1000 : 0; // bug was here! rounded sum is not same as rounded summand!
 
-            if (m_lastError.lastError != StreamRecorderError::fileCreate)
+            if (m_lastError.lastError != StreamRecorderError::fileCreate && !m_disableRegisterFile)
                 fileFinished(
                     fileDuration,
                     m_recordingContextVector[i].fileName,
@@ -840,6 +841,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 audioStream->first_dts = 0;
             }
 
+            qDebug() << "URL!!!" << m_recordingContextVector[i].fileName;
+
             initIoContext(
                 m_recordingContextVector[i].storage,
                 m_recordingContextVector[i].fileName,
@@ -871,12 +874,14 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 return false;
             }
         }
-        fileStarted(
-            m_startDateTime/1000,
-            m_currentTimeZone,
-            m_recordingContextVector[i].fileName,
-            m_mediaProvider
-        );
+
+        if (!m_disableRegisterFile)
+            fileStarted(
+                m_startDateTime/1000,
+                m_currentTimeZone,
+                m_recordingContextVector[i].fileName,
+                m_mediaProvider
+            );
 
         if (m_truncateInterval > 0)
         {
@@ -1103,6 +1108,11 @@ void QnStreamRecorder::disconnectFromResource()
 void QnStreamRecorder::forceAudioLayout(const QnResourceAudioLayoutPtr& layout)
 {
     m_forcedAudioLayout = layout;
+}
+
+void QnStreamRecorder::disableRegisterFile(bool disable)
+{
+    m_disableRegisterFile = disable;
 }
 
 void QnStreamRecorder::setExtraTranscodeParams(const QnImageFilterHelper& extraParams)
