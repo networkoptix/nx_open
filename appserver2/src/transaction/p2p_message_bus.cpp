@@ -426,53 +426,6 @@ void P2pMessageBus::doSubscribe()
         resubscribePeers(newSubscription);
 }
 
-#if 0
-void P2pMessageBus::doSubscribe()
-{
-    const auto localPeer = this->localPeer();
-
-    QMap<ApiPersistentIdData, QVector<ApiPersistentIdData>> candidatesToSubscribe; //< key: who, value: where
-    for (auto itr = m_allPeers.begin(); itr != m_allPeers.end(); ++itr)
-    {
-        const ApiPersistentIdData& peer = itr.key();
-        const PeerInfo& info = itr.value();
-        qint32 directDistance = info.distanceVia(localPeer);
-        QVector<ApiPersistentIdData> viaList;
-        qint32 minDistance = info.minDistance(&viaList);
-        if (minDistance < directDistance)
-        {
-            if (P2pConnectionPtr subscribedVia = m_subscriptionList.value(peer))
-            {
-                qint32 subscribedDistance = info.distanceVia(subscribedVia->remotePeer());
-                if (minDistance < subscribedDistance)
-                    subscribedVia->unsubscribeFrom(peer);
-                else
-                    continue; //< already subscribed
-            }
-            int maxSubscription = 0;
-            ApiPersistentIdData peerWithMaxSubscription;
-            for (int i = 0; i < viaList.size(); ++i)
-            {
-                int subscription = candidatesToSubscribe.value(viaList[i]).size();
-                if (subscription > maxSubscription)
-                {
-                    maxSubscription = subscription;
-                    peerWithMaxSubscription = viaList[i];
-                }
-            }
-        }
-    }
-
-    for (auto itr = candidatesToSubscribe.begin(); itr != candidatesToSubscribe.end(); ++itr)
-    {
-        P2pConnectionPtr connection = m_connections.value(itr.key().id);
-        NX_ASSERT(connection);
-        if (connection)
-            connection->subscribeTo(itr.value());
-    }
-}
-#endif
-
 void P2pMessageBus::doPeriodicTasks()
 {
     processTemporaryOutgoingConnections(); //< resolve doubled ingoing + outgoing connections
