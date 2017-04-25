@@ -22,7 +22,7 @@ bool ApiLayoutTourData::isValid() const
 
 bool ApiLayoutTourData::operator!=(const ApiLayoutTourData& rhs) const
 {
-    return !((*this) == rhs);
+    return !(*this == rhs);
 }
 
 bool ApiLayoutTourData::operator==(const ApiLayoutTourData& rhs) const

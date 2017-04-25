@@ -3,7 +3,8 @@
 
 namespace nx {
 namespace network {
-namespace websocket {
+
+using namespace websocket;
 
 Websocket::Websocket(
     std::unique_ptr<AbstractStreamSocket> streamSocket,
@@ -158,6 +159,5 @@ void Websocket::handleError(Error err)
     closeConnection(SystemError::invalidData, nullptr);
 }
 
-} // namespace websocket
 } // namespace network
 } // namespace nx

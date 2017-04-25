@@ -21,15 +21,6 @@ static const nx::Buffer kVersionNum = "13";
 static const nx::Buffer kMagic = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 
 
-static nx::Buffer makeAcceptKey(const nx::Buffer& requestKey)
-{
-    nx::Buffer result = nx::Buffer::fromBase64(requestKey);
-    result += kMagic;
-    QnCryptographicHash hash(QnCryptographicHash::Sha1);
-    hash.addData(result);
-    return hash.result().toBase64();
-}
-
 static nx::Buffer makeClientKey()
 {
     return nx::utils::random::generate(16).toBase64();
@@ -48,7 +39,7 @@ static Error validateHeaders(const nx_http::HttpHeaders& headers)
     nx_http::HttpHeaders::const_iterator headersIt;
 
     if (((headersIt = headers.find(kUpgrade)) == headers.cend() || headersIt->second != kWebsocket)
-        || ((headersIt = headers.find(kConnection)) == headers.cend() || headersIt->second != kUpgrade))  
+        || ((headersIt = headers.find(kConnection)) == headers.cend() || headersIt->second != kUpgrade))
     {
         return Error::handshakeError;
     }
@@ -84,7 +75,7 @@ static Error validateResponseHeaders(const nx_http::HttpHeaders& headers, const 
 
     nx_http::HttpHeaders::const_iterator headersIt;
     if ((headersIt = headers.find(kAccept)) == headers.cend()
-        || makeAcceptKey(request.headers.find(kKey)->second) != headersIt->second)
+        || detail::makeAcceptKey(request.headers.find(kKey)->second) != headersIt->second)
     {
         return Error::handshakeError;
     }
@@ -104,8 +95,20 @@ static Error validateResponseHeaders(const nx_http::HttpHeaders& headers, const 
     return Error::noError;
 }
 
-
 } // namespace <anonymous>
+
+namespace detail {
+
+nx::Buffer makeAcceptKey(const nx::Buffer& requestKey)
+{
+    nx::Buffer result = nx::Buffer::fromBase64(requestKey);
+    result += kMagic;
+    QnCryptographicHash hash(QnCryptographicHash::Sha1);
+    hash.addData(result);
+    return hash.result().toBase64();
+}
+
+}
 
 Error validateRequest(const nx_http::Request& request, nx_http::Response* response)
 {
@@ -117,10 +120,13 @@ Error validateRequest(const nx_http::Request& request, nx_http::Response* respon
     if (result != Error::noError)
         return result;
 
+    if (!response)
+        return Error::noError;
+
     response->statusLine.statusCode = nx_http::StatusCode::upgrade;
     response->headers.emplace(kConnection, kUpgrade);
     response->headers.emplace(kUpgrade, kWebsocket);
-    response->headers.emplace(kAccept, makeAcceptKey(request.headers.find(kKey)->second));
+    response->headers.emplace(kAccept, detail::makeAcceptKey(request.headers.find(kKey)->second));
 
     auto websocketProtocolIt = request.headers.find(kProtocol);
     if (websocketProtocolIt != request.headers.cend())

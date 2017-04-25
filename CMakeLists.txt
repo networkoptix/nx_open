@@ -105,6 +105,11 @@ if(withDesktopClient OR withMobileClient)
             Quick)
 endif()
 
+set(QML_IMPORT_PATH
+    "${QT_DIR}/qml"
+    "${CMAKE_CURRENT_LIST_DIR}/client/mobile_client/static-resources/qml"
+    CACHE STRING "Extra QML import paths")
+
 if(ANDROID)
     find_package(Qt5 COMPONENTS AndroidExtras)
 endif()

@@ -7,6 +7,12 @@ namespace nx {
 namespace network {
 namespace websocket {
 
+namespace detail {
+
+NX_NETWORK_API nx::Buffer makeAcceptKey(const nx::Buffer& requestKey);
+
+}
+
 NX_NETWORK_API Error validateRequest(const nx_http::Request& request, nx_http::Response* response);
 NX_NETWORK_API void addClientHeaders(nx_http::Request* request, const nx::Buffer& protocolName);
 

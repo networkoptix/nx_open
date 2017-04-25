@@ -20,7 +20,7 @@ const QLatin1String kDataDir("dataDir");
 //-------------------------------------------------------------------------------------------------
 // Http
 
-const QLatin1String kHttpEndpointsToListen("listenOn");
+const QLatin1String kHttpEndpointsToListen("http/listenOn");
 const QLatin1String kDefaultHttpEndpointsToListen("0.0.0.0:3349");
 
 const QLatin1String kHttpTcpBacklogSize("http/tcpBacklogSize");
@@ -53,7 +53,7 @@ static const QString kModuleName = lit("traffic_relay");
 Http::Http():
     tcpBacklogSize(kDefaultHttpTcpBacklogSize)
 {
-    endpointsToListen.push_back(SocketAddress(kDefaultHttpEndpointsToListen));
+    endpoints.push_back(SocketAddress(kDefaultHttpEndpointsToListen));
 }
 
 ListeningPeer::ListeningPeer():
@@ -86,7 +86,6 @@ bool Settings::isShowHelpRequested() const
 
 void Settings::load(int argc, const char **argv)
 {
-    m_commandLineParser.parse(argc, argv, stderr);
     m_settings.parseArgs(argc, argv);
 
     loadSettings();
@@ -150,11 +149,11 @@ void Settings::loadHttp()
         kDefaultHttpEndpointsToListen).toString().split(',');
     if (!httpAddrToListenStrList.isEmpty())
     {
-        m_http.endpointsToListen.clear();
+        m_http.endpoints.clear();
         std::transform(
             httpAddrToListenStrList.begin(),
             httpAddrToListenStrList.end(),
-            std::back_inserter(m_http.endpointsToListen),
+            std::back_inserter(m_http.endpoints),
             [](const QString& str) { return SocketAddress(str); });
     }
 

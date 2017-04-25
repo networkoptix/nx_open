@@ -52,9 +52,9 @@ QnUniversalRequestProcessor::QnUniversalRequestProcessor(
 }
 
 static QByteArray m_unauthorizedPageBody = STATIC_UNAUTHORIZED_HTML;
-static AuthMethod::Values m_unauthorizedPageForMethods = AuthMethod::NotDefined;
+static nx_http::AuthMethod::Values m_unauthorizedPageForMethods = nx_http::AuthMethod::NotDefined;
 
-void QnUniversalRequestProcessor::setUnauthorizedPageBody(const QByteArray& value, AuthMethod::Values methods)
+void QnUniversalRequestProcessor::setUnauthorizedPageBody(const QByteArray& value, nx_http::AuthMethod::Values methods)
 {
     m_unauthorizedPageBody = value;
     m_unauthorizedPageForMethods = methods;
@@ -78,7 +78,7 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
         const bool isProxy = needStandardProxy(d->owner->commonModule(), d->request);
         QElapsedTimer t;
         t.restart();
-        AuthMethod::Value usedMethod = AuthMethod::noAuth;
+        nx_http::AuthMethod::Value usedMethod = nx_http::AuthMethod::noAuth;
         Qn::AuthResult authResult;
         while ((authResult = qnAuthHelper->authenticate(d->request, d->response, isProxy, accessRights, &usedMethod)) != Qn::Auth_OK)
         {
@@ -138,9 +138,9 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
             if (t.elapsed() >= AUTH_TIMEOUT || !d->socket->isConnected())
                 return false; // close connection
         }
-        if (qnAuthHelper->restrictionList()->getAllowedAuthMethods(d->request) & AuthMethod::noAuth)
+        if (qnAuthHelper->restrictionList()->getAllowedAuthMethods(d->request) & nx_http::AuthMethod::noAuth)
             *noAuth = true;
-        if (usedMethod != AuthMethod::noAuth)
+        if (usedMethod != nx_http::AuthMethod::noAuth)
             d->authenticatedOnce = true;
     }
     return true;
