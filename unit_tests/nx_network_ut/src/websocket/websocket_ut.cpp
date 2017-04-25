@@ -189,9 +189,6 @@ TEST_F(WebSocket, MultipleMessages_twoWay)
             doneCount++;
             if (doneCount == kIterations || ecode != SystemError::noError)
             {
-                //clientWebSocket->pleaseStop([]() {});
-                //serverWebSocket->pleaseStop([]() {});
-                std::this_thread::sleep_for(std::chrono::milliseconds(500));
                 readyPromise.set_value();
                 return;
             }
