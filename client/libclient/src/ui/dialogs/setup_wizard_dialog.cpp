@@ -7,6 +7,8 @@
 #include <client/client_translation_manager.h>
 
 #include <ui/dialogs/private/setup_wizard_dialog_p.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 
 #include <nx/utils/log/log.h>
 
@@ -51,6 +53,8 @@ QnSetupWizardDialog::QnSetupWizardDialog(QWidget *parent)
 #endif
     layout->addWidget(d->webView);
     setFixedSize(kSetupWizardSize);
+
+    setHelpTopic(this, Qn::Setup_Wizard_Help);
 }
 
 QnSetupWizardDialog::~QnSetupWizardDialog()

@@ -1,4 +1,5 @@
 #pragma once
+#if defined(ENABLE_ONVIF)
 
 #include "onvif_resource_information_fetcher.h"
 
@@ -15,3 +16,5 @@ void hikvisionManufacturerReplacement(EndpointAdditionalInfo* outInfo);
 } // namespace onvif
 } // namespace plugins
 } // namespace nx
+
+#endif // defined(ENABLE_ONVIF)

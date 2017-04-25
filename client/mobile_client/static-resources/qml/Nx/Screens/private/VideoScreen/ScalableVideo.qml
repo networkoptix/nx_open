@@ -32,8 +32,10 @@ ZoomableFlickable
 
     readonly property bool zoomed: contentWidth > width * 1.05 || contentHeight > height * 1.05
 
-    allowedHorizontalMargin: zoomed ? width / 3 - content.horizontalPadding : 0
-    allowedVerticalMargin: zoomed ? height / 3 - content.verticalPadding : 0
+    allowedLeftMargin: zoomed ? width / 4 - content.leftPadding : 0
+    allowedRightMargin: zoomed ? width / 4 - content.rightPadding : 0
+    allowedTopMargin: zoomed ? height / 4 - content.topPadding : 0
+    allowedBottomMargin: zoomed ? height / 4 - content.bottomPadding : 0
 
     clip: true
 

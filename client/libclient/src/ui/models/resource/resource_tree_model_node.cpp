@@ -843,6 +843,9 @@ int QnResourceTreeModelNode::helpTopicId() const
     if (m_flags.testFlag(Qn::videowall))
         return Qn::Videowall_Help;
 
+    if (m_flags.testFlag(Qn::web_page))
+        return Qn::MainWindow_Tree_WebPage_Help;
+
     return -1;
 }
 
