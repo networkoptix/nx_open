@@ -24,7 +24,7 @@ WebSocket::WebSocket(
 {
     nx::Buffer tmpBuf(requestData);
     m_parser.consume(tmpBuf);
-    handleRead();
+    m_baseConnection.dispatch([this](){ handleRead(); });
 }
 
 void WebSocket::setIsLastFrame()
