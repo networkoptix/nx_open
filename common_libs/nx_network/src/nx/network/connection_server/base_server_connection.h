@@ -112,6 +112,9 @@ public:
         m_streamSocket->dispatch(
             [this, inactivityTimeout]()
             {
+                if (m_receiving)
+                    return;
+
                 setInactivityTimeout(inactivityTimeout);
                 if (!m_streamSocket->setNonBlockingMode(true))
                     return onBytesRead(SystemError::getLastOSErrorCode(), (size_t)-1);
