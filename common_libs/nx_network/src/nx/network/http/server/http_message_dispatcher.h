@@ -54,8 +54,60 @@ private:
     std::map<nx_http::StringType, Mapped> m_pathToMapped;
 };
 
+class AbstractMessageDispatcher
+{
+public:
+    virtual ~AbstractMessageDispatcher() = default;
+
+    /**
+     * Pass message to corresponding processor.
+     *
+     *  @param message This object is not moved in case of failure to find processor.
+     *  @return true if request processing passed to corresponding processor and async processing
+     *      has been started,  false otherwise.
+     */
+    template<class CompletionFuncRefType>
+    bool dispatchRequest(
+        HttpServerConnection* const connection,
+        nx_http::Message message,
+        nx::utils::stree::ResourceContainer authInfo,
+        CompletionFuncRefType completionFunc) const
+    {
+        NX_ASSERT(message.type == nx_http::MessageType::request);
+        nx_http::RequestLine& request = message.request->requestLine;
+        applyModRewrite(&request.url);
+
+        auto handler = getHandler(request.method, request.url.path());
+        if (!handler)
+            return false;
+
+        const auto handlerPtr = handler.get();
+        return handlerPtr->processRequest(
+            connection, std::move(message), std::move(authInfo),
+            [handler = std::move(handler), completionFunc = std::move(completionFunc)](
+                nx_http::Message message,
+                std::unique_ptr<nx_http::AbstractMsgBodySource> bodySource,
+                ConnectionEvents connectionEvents) mutable
+            {
+                completionFunc(
+                    std::move(message),
+                    std::move(bodySource),
+                    std::move(connectionEvents));
+
+                handler.reset();
+            });
+    }
+
+protected:
+    virtual void applyModRewrite(QUrl* url) const = 0;
+    virtual std::unique_ptr<AbstractHttpRequestHandler> getHandler(
+        const StringType& method,
+        const QString& path) const = 0;
+};
+
 template<template<typename> class PathMatcher>
-class BasicMessageDispatcher
+class BasicMessageDispatcher:
+    public AbstractMessageDispatcher
 {
 public:
     virtual ~BasicMessageDispatcher() = default;
@@ -98,45 +150,6 @@ public:
         m_rewritePrefixes.emplace(std::move(oldPrefix), std::move(newPrefix));
     }
 
-    /**
-     * Pass message to corresponding processor.
-     *
-     *  @param message This object is not moved in case of failure to find processor.
-     *  @return true if request processing passed to corresponding processor and async processing
-     *      has been started,  false otherwise.
-     */
-    template<class CompletionFuncRefType>
-    bool dispatchRequest(
-        HttpServerConnection* const connection,
-        nx_http::Message message,
-        nx::utils::stree::ResourceContainer authInfo,
-        CompletionFuncRefType completionFunc) const
-    {
-        NX_ASSERT(message.type == nx_http::MessageType::request);
-        nx_http::RequestLine& request = message.request->requestLine;
-        applyModRewrite(&request.url);
-
-        auto handler = makeHandler(request.method, request.url.path());
-        if (!handler)
-            return false;
-
-        const auto handlerPtr = handler.get();
-        return handlerPtr->processRequest(
-            connection, std::move(message), std::move(authInfo),
-            [handler = std::move(handler), completionFunc = std::move(completionFunc)](
-                nx_http::Message message,
-                std::unique_ptr<nx_http::AbstractMsgBodySource> bodySource,
-                ConnectionEvents connectionEvents) mutable
-            {
-                completionFunc(
-                    std::move(message),
-                    std::move(bodySource),
-                    std::move(connectionEvents));
-
-                handler.reset();
-            });
-    }
-
 private:
     using FactoryFunc = std::function<std::unique_ptr<AbstractHttpRequestHandler>()>;
 
@@ -149,7 +162,7 @@ private:
     std::map<QString, QString> m_rewritePrefixes;
     std::map<nx_http::StringType /*method*/, PathMatchContext> m_factories;
 
-    void applyModRewrite(QUrl* url) const
+    virtual void applyModRewrite(QUrl* url) const override
     {
         if (const auto it = findByMaxPrefix(m_rewritePrefixes, url->path()))
         {
@@ -159,9 +172,9 @@ private:
         }
     }
 
-    std::unique_ptr<AbstractHttpRequestHandler> makeHandler(
+    virtual std::unique_ptr<AbstractHttpRequestHandler> getHandler(
         const StringType& method,
-        const QString& path) const
+        const QString& path) const override
     {
         auto methodFactory = m_factories.find(method);
         if (methodFactory != m_factories.end())
