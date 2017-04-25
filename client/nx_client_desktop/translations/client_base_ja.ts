@@ -267,6 +267,33 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+        <source>Zoom In</source>
+        <translation>ズームイン</translation>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation>ズームアウト</translation>
+    </message>
+    <message>
+        <source>Focus Far</source>
+        <translation>フォーカス遠</translation>
+    </message>
+    <message>
+        <source>Focus Near</source>
+        <translation>フォーカス近</translation>
+    </message>
+    <message>
+        <source>Auto Focus</source>
+        <translation>オートフォーカス</translation>
+    </message>
+    <message>
+        <source>Change Dewarping Mode</source>
+        <translation>歪み補正モード</translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>Parameter 1 is null.</source>
@@ -605,7 +632,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>About...</source>
-        <translation>について...</translation>
+        <translation>本製品について...</translation>
     </message>
     <message>
         <source>Exit</source>
@@ -1193,11 +1220,11 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Monitor in New Tab</source>
-        <translation>新規タブで監視</translation>
+        <translation>新規タブを開く</translation>
     </message>
     <message>
         <source>Monitor in New Window</source>
-        <translation>新規ウィンドウで監視</translation>
+        <translation>新規ウィンドウを開く</translation>
     </message>
     <message>
         <source>Open Layout in New Tab</source>
@@ -1225,7 +1252,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Disconnect from Server</source>
-        <translation>サーバーから切断します</translation>
+        <translation>接続サーバーから切断</translation>
     </message>
     <message>
         <source>Browse Local Files</source>
@@ -2637,7 +2664,7 @@ devices</source>
     <message>
         <source>Disconnect System from %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation>%1 からシステムを切断します</translation>
+        <translation>%1 からシステムを切断</translation>
     </message>
     <message>
         <source>Open %1 Portal</source>
@@ -4722,11 +4749,11 @@ to %1</source>
     </message>
     <message>
         <source>Native</source>
-        <translation>ネイティブ</translation>
+        <translation>Native</translation>
     </message>
     <message>
         <source>Quarter Native</source>
-        <translation>クォーターネイティブ</translation>
+        <translation>Quarter Native</translation>
     </message>
     <message>
         <source>1920x1080</source>
@@ -6302,22 +6329,22 @@ to %1</source>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-        <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
+        <translation>yyyy/MMMM/dd hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm ap</source>
         <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <translation type="unfinished">dd MMMM yyyy hh:mm ap</translation>
+        <translation>yyyy/MMMM/dd hh:mm ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-        <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
+        <translation>yyyy/MMMM/dd hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy h ap</source>
         <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <translation type="unfinished">dd MMMM yyyy h ap</translation>
+        <translation>yyyy/MMMM/dd h ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy</source>
@@ -7311,7 +7338,7 @@ to %1</source>
     </message>
     <message>
         <source>Recording in %1...</source>
-        <translation>%1 の記録中...</translation>
+        <translation>スクリーン録画開始 %1 秒前</translation>
     </message>
     <message>
         <source>Recorded Video</source>

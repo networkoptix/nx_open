@@ -5,6 +5,7 @@
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
 #include <ui/common/geometry.h>
+#include <ui/workaround/sharp_pixmap_painting.h>
 
 class GraphicsPixmapPrivate {
 public:
@@ -44,8 +45,7 @@ void GraphicsPixmap::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     QRectF rect = d->pixmap.rect();
     rect = QnGeometry::scaled(rect, option->rect.size(), rect.center(), d->aspectRatioMode);
     rect.moveCenter(option->rect.center());
-
-    painter->drawPixmap(rect.toRect(), d->pixmap);
+    paintPixmapSharp(painter, d->pixmap, rect.toRect());
 }
 
 Qt::AspectRatioMode GraphicsPixmap::aspectRatioMode() const {

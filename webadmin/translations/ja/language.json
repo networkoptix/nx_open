@@ -13,10 +13,10 @@
   },
   "passwordRequirements":{
     "minLengthMessage":"パスワードは8文字以上必要です",
-    "requiredMessage":"英数字とキーボードの記号のみを使用して、先頭と末尾の空白を避けます",
-    "weakMessage":"大文字と小文字の文字、特殊記号を使用して、強固なパスワードを作る",
+    "requiredMessage":"ラテン文字、数字、およびキーボードの記号のみが許可されます",
+    "weakMessage":"パスワードは異なる種類のシンボルを含める必要があります",
     "strongMessage":"強力なパスワード!",
-    "commonMessage":"このパスワードは、世界で最も人気のあるパスワード"
+    "commonMessage":"このパスワードは最も人気のあるパスワードのリストです"
   },
   "settings":{
     "tabs":{

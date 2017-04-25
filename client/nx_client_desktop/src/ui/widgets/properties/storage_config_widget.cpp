@@ -18,6 +18,7 @@
 #include <core/resource/client_storage_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_history.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource_management/resources_changes_manager.h>
@@ -25,8 +26,7 @@
 #include <core/resource_management/resource_changes_listener.h>
 
 #include <server/server_storage_manager.h>
-#include <ui/actions/action.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/item_view_hover_tracker.h>
 #include <ui/delegates/switch_item_delegate.h>
 #include <ui/dialogs/storage_url_dialog.h>

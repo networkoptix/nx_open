@@ -1,11 +1,13 @@
 #include "workbench_layout_aspect_ratio_watcher.h"
 
+#include <ui/graphics/items/resource/resource_widget.h>
+
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
-#include <ui/graphics/items/resource/resource_widget.h>
+
 #include <utils/common/aspect_ratio.h>
 
 QnWorkbenchLayoutAspectRatioWatcher::QnWorkbenchLayoutAspectRatioWatcher(QObject *parent) :

@@ -14,8 +14,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resources_changes_manager.h>
 
-#include <ui/actions/action_parameters.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <ui/help/help_topics.h>
 #include <ui/widgets/properties/camera_settings_widget.h>
@@ -26,6 +26,8 @@
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 
 #include <utils/license_usage_helper.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -216,12 +218,12 @@ void QnCameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton b
 
 void QnCameraSettingsDialog::at_diagnoseButton_clicked()
 {
-    menu()->trigger(QnActions::CameraIssuesAction, m_settingsWidget->cameras());
+    menu()->trigger(action::CameraIssuesAction, m_settingsWidget->cameras());
 }
 
 void QnCameraSettingsDialog::at_rulesButton_clicked()
 {
-    menu()->trigger(QnActions::CameraBusinessRulesAction, m_settingsWidget->cameras());
+    menu()->trigger(action::CameraBusinessRulesAction, m_settingsWidget->cameras());
 }
 
 void QnCameraSettingsDialog::updateReadOnly()
@@ -351,7 +353,7 @@ void QnCameraSettingsDialog::saveCameras(const QnVirtualCameraResourceList &came
 void QnCameraSettingsDialog::at_openButton_clicked()
 {
     QnVirtualCameraResourceList cameras = m_settingsWidget->cameras();
-    menu()->trigger(QnActions::OpenInNewLayoutAction, cameras);
+    menu()->trigger(action::OpenInNewLayoutAction, cameras);
     m_settingsWidget->setCameras(cameras);
     retranslateUi();
 }

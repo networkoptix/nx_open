@@ -12,6 +12,10 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <nx/client/desktop/ui/actions/action_conditions.h>
+#include <nx/client/desktop/ui/actions/action_target_provider.h>
+#include <nx/client/desktop/ui/actions/action_parameter_types.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
@@ -22,90 +26,100 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
-#include "action_manager.h"
-#include "action_target_provider.h"
-#include "action_conditions.h"
-#include "action_factories.h"
-#include "action_parameter_types.h"
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+namespace action {
 
-QnAction::QnAction(QnActions::IDType id, QObject* parent) :
+Action::Action(IDType id, QObject* parent) :
     QAction(parent),
     QnWorkbenchContextAware(parent),
     m_id(id),
     m_flags(0),
-    m_mode(QnActionTypes::AnyMode),
+    m_mode(AnyMode),
     m_globalPermission(Qn::NoGlobalPermissions),
     m_toolTipMarker(lit("<b></b>"))
 {
     setToolTip(m_toolTipMarker);
 
-    connect(this, &QAction::changed, this, &QnAction::updateToolTipSilent);
+    connect(this, &QAction::changed, this, &Action::updateToolTipSilent);
 }
 
-QnAction::~QnAction()
+Action::~Action()
 {}
 
-QnActions::IDType QnAction::id() const
+IDType Action::id() const
 {
     return m_id;
 }
 
-Qn::ActionScopes QnAction::scope() const
+ActionScopes Action::scope() const
 {
-    return static_cast<Qn::ActionScopes>(static_cast<int>(m_flags) & Qn::ScopeMask);
+    return static_cast<ActionScopes>(static_cast<int>(m_flags) & ScopeMask);
 }
 
-Qn::ActionParameterTypes QnAction::defaultParameterTypes() const
+ActionParameterTypes Action::defaultParameterTypes() const
 {
-    return static_cast<Qn::ActionParameterTypes>(static_cast<int>(m_flags) & Qn::TargetTypeMask);
+    return static_cast<ActionParameterTypes>(static_cast<int>(m_flags) & TargetTypeMask);
 }
 
-Qn::Permissions QnAction::requiredTargetPermissions(int target /* = -1*/) const
+Qn::Permissions Action::requiredTargetPermissions(int target /* = -1*/) const
 {
     return m_targetPermissions.value(target);
 }
 
-void QnAction::setRequiredTargetPermissions(Qn::Permissions requiredPermissions)
+void Action::setRequiredTargetPermissions(Qn::Permissions requiredPermissions)
 {
     setRequiredTargetPermissions(-1, requiredPermissions);
 }
 
-void QnAction::setRequiredTargetPermissions(int target, Qn::Permissions requiredPermissions)
+void Action::setRequiredTargetPermissions(int target, Qn::Permissions requiredPermissions)
 {
     m_targetPermissions[target] = requiredPermissions;
 }
 
-void QnAction::setRequiredGlobalPermission(Qn::GlobalPermission requiredPermission)
+void Action::setRequiredGlobalPermission(Qn::GlobalPermission requiredPermission)
 {
     m_globalPermission = requiredPermission;
 }
 
-QnActionTypes::ClientModes QnAction::mode() const
+ClientModes Action::mode() const
 {
     return m_mode;
 }
 
-void QnAction::setFlags(Qn::ActionFlags flags)
+void Action::setFlags(ActionFlags flags)
 {
     m_flags = flags;
 }
 
-const QString & QnAction::normalText() const
+Qn::ButtonAccent Action::accent() const
+{
+    return m_accent;
+}
+
+void Action::setAccent(Qn::ButtonAccent value)
+{
+    m_accent = value;
+}
+
+const QString & Action::normalText() const
 {
     return m_normalText;
 }
 
-void QnAction::setMode(QnActionTypes::ClientModes mode)
+void Action::setMode(ClientModes mode)
 {
     m_mode = mode;
 }
 
-Qn::ActionFlags QnAction::flags() const
+ActionFlags Action::flags() const
 {
     return m_flags;
 }
 
-void QnAction::setNormalText(const QString& normalText)
+void Action::setNormalText(const QString& normalText)
 {
     if (m_normalText == normalText)
         return;
@@ -115,12 +129,12 @@ void QnAction::setNormalText(const QString& normalText)
     updateText();
 }
 
-const QString & QnAction::toggledText() const
+const QString & Action::toggledText() const
 {
     return m_toggledText.isEmpty() ? m_normalText : m_toggledText;
 }
 
-void QnAction::setToggledText(const QString& toggledText)
+void Action::setToggledText(const QString& toggledText)
 {
     if (m_toggledText == toggledText)
         return;
@@ -128,69 +142,69 @@ void QnAction::setToggledText(const QString& toggledText)
     m_toggledText = toggledText;
 
     if (m_toggledText.isEmpty())
-        disconnect(this, &QAction::toggled, this, &QnAction::updateText);
+        disconnect(this, &QAction::toggled, this, &Action::updateText);
     else
-        connect(this, &QAction::toggled, this, &QnAction::updateText, Qt::UniqueConnection);
+        connect(this, &QAction::toggled, this, &Action::updateText, Qt::UniqueConnection);
 
     updateText();
 }
 
-const QString& QnAction::pulledText() const
+const QString& Action::pulledText() const
 {
     return m_pulledText.isEmpty() ? m_normalText : m_pulledText;
 }
 
-void QnAction::setPulledText(const QString& pulledText)
+void Action::setPulledText(const QString& pulledText)
 {
     m_pulledText = pulledText;
 }
 
-QnActionCondition* QnAction::condition() const
+ConditionPtr Action::condition() const
 {
-    return m_condition.data();
+    return m_condition;
 }
 
-void QnAction::setCondition(QnActionCondition* condition)
+void Action::setCondition(const ConditionPtr& condition)
 {
     m_condition = condition;
 }
 
-QnActionFactory* QnAction::childFactory() const
+FactoryPtr Action::childFactory() const
 {
-    return m_childFactory.data();
+    return m_childFactory;
 }
 
-void QnAction::setChildFactory(QnActionFactory* childFactory)
+void Action::setChildFactory(const FactoryPtr& childFactory)
 {
     m_childFactory = childFactory;
 }
 
-QnActionTextFactory* QnAction::textFactory() const
+TextFactoryPtr Action::textFactory() const
 {
-    return m_textFactory.data();
+    return m_textFactory;
 }
 
-void QnAction::setTextFactory(QnActionTextFactory* textFactory)
+void Action::setTextFactory(const TextFactoryPtr& textFactory)
 {
     m_textFactory = textFactory;
 }
 
-const QList<QnAction*>& QnAction::children() const
+const QList<Action*>& Action::children() const
 {
     return m_children;
 }
 
-void QnAction::addChild(QnAction* action)
+void Action::addChild(Action* action)
 {
     m_children.push_back(action);
 }
 
-void QnAction::removeChild(QnAction* action)
+void Action::removeChild(Action* action)
 {
     m_children.removeOne(action);
 }
 
-QString QnAction::defaultToolTipFormat() const
+QString Action::defaultToolTipFormat() const
 {
     if (shortcuts().empty())
     {
@@ -202,12 +216,12 @@ QString QnAction::defaultToolTipFormat() const
     }
 }
 
-QString QnAction::toolTipFormat() const
+QString Action::toolTipFormat() const
 {
     return m_toolTipFormat.isEmpty() ? defaultToolTipFormat() : m_toolTipFormat;
 }
 
-void QnAction::setToolTipFormat(const QString& toolTipFormat)
+void Action::setToolTipFormat(const QString& toolTipFormat)
 {
     if (m_toolTipFormat == toolTipFormat)
         return;
@@ -217,43 +231,43 @@ void QnAction::setToolTipFormat(const QString& toolTipFormat)
     updateToolTip(true);
 }
 
-Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnActionParameters& parameters) const
+ActionVisibility Action::checkCondition(ActionScopes scope, const Parameters& parameters) const
 {
     if (!isVisible())
-        return Qn::InvisibleAction; // TODO: #Elric cheat!
+        return InvisibleAction; // TODO: #Elric cheat!
 
     if (!(this->scope() & scope) && this->scope() != scope)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
-    if (m_flags.testFlag(Qn::DevMode) && !qnRuntime->isDevMode())
-        return Qn::InvisibleAction;
+    if (m_flags.testFlag(DevMode) && !qnRuntime->isDevMode())
+        return InvisibleAction;
 
     if (m_globalPermission != Qn::NoGlobalPermissions &&
         !accessController()->hasGlobalPermission(m_globalPermission))
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     if (qnRuntime->isVideoWallMode() &&
-        !m_mode.testFlag(QnActionTypes::VideoWallMode))
-        return Qn::InvisibleAction;
+        !m_mode.testFlag(VideoWallMode))
+        return InvisibleAction;
 
     if (qnRuntime->isActiveXMode() &&
-        !m_mode.testFlag(QnActionTypes::ActiveXMode))
-        return Qn::InvisibleAction;
+        !m_mode.testFlag(ActiveXMode))
+        return InvisibleAction;
 
     int size = parameters.size();
 
-    if (size == 0 && !m_flags.testFlag(Qn::NoTarget))
-        return Qn::InvisibleAction;
+    if (size == 0 && !m_flags.testFlag(NoTarget))
+        return InvisibleAction;
 
-    if (size == 1 && !m_flags.testFlag(Qn::SingleTarget))
-        return Qn::InvisibleAction;
+    if (size == 1 && !m_flags.testFlag(SingleTarget))
+        return InvisibleAction;
 
-    if (size > 1 && !m_flags.testFlag(Qn::MultiTarget))
-        return Qn::InvisibleAction;
+    if (size > 1 && !m_flags.testFlag(MultiTarget))
+        return InvisibleAction;
 
-    Qn::ActionParameterType type = parameters.type();
+    ActionParameterType type = parameters.type();
     if (!defaultParameterTypes().testFlag(type) && size != 0)
-        return Qn::InvisibleAction;
+        return InvisibleAction;
 
     if (!m_targetPermissions.empty())
     {
@@ -265,7 +279,7 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
             QnResourceList resources;
             if (parameters.hasArgument(key))
             {
-                resources = QnActionParameterTypes::resources(parameters.argument(key));
+                resources = ParameterTypes::resources(parameters.argument(key));
             }
             else if (key == Qn::CurrentLayoutResourceRole)
             {
@@ -274,7 +288,7 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
             }
             else if (key == Qn::CurrentLayoutMediaItemsRole)
             {
-                const QnResourceList& resList = QnActionParameterTypes::resources(context()->display()->widgets());
+                const QnResourceList& resList = ParameterTypes::resources(context()->display()->widgets());
                 for (const QnResourcePtr& res : resList)
                 {
                     if (res.dynamicCast<QnMediaResource>())
@@ -283,28 +297,28 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
             }
 
             if (resources.isEmpty() && required > 0)
-                return Qn::InvisibleAction;
+                return InvisibleAction;
 
             if ((accessController()->combinedPermissions(resources) & required) != required)
-                return Qn::InvisibleAction;
+                return InvisibleAction;
         }
     }
 
     if (m_condition)
     {
-        if (parameters.scope() == Qn::InvalidScope)
+        if (parameters.scope() == InvalidScope)
         {
-            QnActionParameters scopedParameters(parameters);
+            Parameters scopedParameters(parameters);
             scopedParameters.setScope(scope);
             return m_condition->check(scopedParameters);
         }
         return m_condition->check(parameters);
     }
 
-    return Qn::EnabledAction;
+    return EnabledAction;
 }
 
-bool QnAction::event(QEvent* event)
+bool Action::event(QEvent* event)
 {
     if (event->type() != QEvent::Shortcut)
         return QObject::event(event);
@@ -314,7 +328,8 @@ bool QnAction::event(QEvent* event)
 
     if (e->isAmbiguous())
     {
-        NX_ASSERT(m_flags.testFlag(Qn::IntentionallyAmbiguous), lit("Ambiguous shortcut overload: %1.").arg(e->key().toString()));
+        NX_ASSERT(m_flags.testFlag(IntentionallyAmbiguous),
+            lit("Ambiguous shortcut overload: %1.").arg(e->key().toString()));
 
         QSet<QAction*> actions;
         for (QWidget* widget : associatedWidgets())
@@ -345,31 +360,31 @@ bool QnAction::event(QEvent* event)
         }
     }
 
-    QnActionParameters parameters;
-    Qn::ActionScope scope = static_cast<Qn::ActionScope>(static_cast<int>(this->scope()));
+    Parameters parameters;
+    ActionScope scope = static_cast<ActionScope>(static_cast<int>(this->scope()));
 
-    if (QnActionTargetProvider* targetProvider = QnWorkbenchContextAware::menu()->targetProvider())
+    if (auto targetProvider = QnWorkbenchContextAware::menu()->targetProvider())
     {
-        if (!flags().testFlag(Qn::ScopelessHotkey))
+        if (!flags().testFlag(ScopelessHotkey))
             scope = targetProvider->currentScope();
 
-        if (!flags().testFlag(Qn::TargetlessHotkey))
+        if (!flags().testFlag(TargetlessHotkey))
             parameters = targetProvider->currentParameters(scope);
     }
 
-    if (checkCondition(scope, parameters) == Qn::EnabledAction)
+    if (checkCondition(scope, parameters) == EnabledAction)
         QnWorkbenchContextAware::menu()->trigger(id(), parameters);
 
     /* Skip shortcut to be handled as usual key event. */
     return false;
 }
 
-void QnAction::updateText()
+void Action::updateText()
 {
     setText(isChecked() ? toggledText() : normalText());
 }
 
-void QnAction::updateToolTip(bool notify)
+void Action::updateToolTip(bool notify)
 {
     if (!toolTip().endsWith(m_toolTipMarker))
         return; /* We have an explicitly set tooltip. */
@@ -399,22 +414,22 @@ void QnAction::updateToolTip(bool notify)
         blockSignals(signalsBlocked);
 }
 
-void QnAction::updateToolTipSilent()
+void Action::updateToolTipSilent()
 {
     updateToolTip(false);
 }
 
-void QnAction::addConditionalText(QnActionCondition* condition, const QString& text)
+void Action::addConditionalText(ConditionPtr condition, const QString& text)
 {
     m_conditionalTexts << ConditionalText(condition, text);
 }
 
-bool QnAction::hasConditionalTexts()
+bool Action::hasConditionalTexts()
 {
     return !m_conditionalTexts.isEmpty();
 }
 
-QString QnAction::checkConditionalText(const QnActionParameters& parameters) const
+QString Action::checkConditionalText(const Parameters& parameters) const
 {
     for (const ConditionalText& conditionalText : m_conditionalTexts)
     {
@@ -423,3 +438,9 @@ QString QnAction::checkConditionalText(const QnActionParameters& parameters) con
     }
     return normalText();
 }
+
+} // namespace action
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx

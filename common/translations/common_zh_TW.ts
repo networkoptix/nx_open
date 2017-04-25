@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_TW" sourcelanguage="en">
+<TS version="2.1" language="zh-TW" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -189,10 +189,6 @@
     <message>
         <source>Source: %1</source>
         <translation>來源：%1</translation>
-    </message>
-    <message>
-        <source>Url: %1</source>
-        <translation>網址：%1</translation>
     </message>
     <message>
         <source>Reason: %1</source>

@@ -8,8 +8,8 @@
 #include <utils/common/hash.h>
 #include <nx/utils/random.h>
 
-#include <ui/actions/action.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/constrained_geometrically.h>
 #include <ui/common/constrained_resizable.h>
@@ -27,6 +27,8 @@
 #include "instrument_manager.h"
 #include "resizing_instrument.h"
 #include "selection_item.h"
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -894,8 +896,8 @@ void ZoomWindowInstrument::at_resizing(QGraphicsView *view, QGraphicsWidget *, R
     if(!newTargetWidget || newTargetWidget == windowTarget()->overlay()->target())
         return;
 
-    QnAction *action = menu()->action(QnActions::CreateZoomWindowAction);
-    if(!action || action->checkCondition(action->scope(), QnActionParameters(newTargetWidget)) != Qn::EnabledAction)
+    auto action = menu()->action(action::CreateZoomWindowAction);
+    if (!action || action->checkCondition(action->scope(), newTargetWidget) != action::EnabledAction)
         return;
 
     QnMediaResourceWidget *widget = windowTarget()->zoomWidget();

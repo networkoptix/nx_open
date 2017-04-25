@@ -14,7 +14,7 @@ class ZoomOverlayWidget;
 class ZoomWindowWidget;
 class ResizingInfo;
 class ResizingInstrument;
-
+class QnResourceWidget;
 class QnMediaResourceWidget;
 
 class ZoomWindowInstrument: public DragProcessingInstrument, public QnWorkbenchContextAware {

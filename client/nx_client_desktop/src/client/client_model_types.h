@@ -55,11 +55,13 @@ public:
     QnUuid userId;          /*< Id of the user. Works as first part of the key. */
     QnUuid localSystemId;   /*< Id of the system. Works as second part of the key. */
     QnUuid currentLayoutId;
+    QnUuid runningTourId;
     QList<QnUuid> layoutUuids;
 
     bool isValid() const;
 };
-#define QnWorkbenchState_Fields (userId)(localSystemId)(currentLayoutId)(layoutUuids)
+#define QnWorkbenchState_Fields \
+    (userId)(localSystemId)(currentLayoutId)(runningTourId)(layoutUuids)
 
 using QnWorkbenchStateList = QList<QnWorkbenchState>;
 

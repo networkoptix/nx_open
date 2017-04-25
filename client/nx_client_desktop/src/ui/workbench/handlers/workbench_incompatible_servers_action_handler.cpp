@@ -1,7 +1,9 @@
 #include "workbench_incompatible_servers_action_handler.h"
 
-#include <QtWidgets/QInputDialog>
 #include <QtCore/QUrl>
+
+#include <QtWidgets/QAction>
+#include <QtWidgets/QInputDialog>
 
 #include <core/resource/resource.h>
 #include <core/resource/fake_media_server.h>
@@ -11,9 +13,7 @@
 #include <licensing/license.h>
 #include <licensing/remote_licenses.h>
 
-#include <ui/actions/action_manager.h>
-#include <ui/actions/action.h>
-#include <ui/actions/action_parameter_types.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/dialogs/merge_systems_dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/progress_dialog.h>
@@ -25,6 +25,8 @@
 #include <utils/merge_systems_common.h>
 #include <network/system_helpers.h>
 
+using namespace nx::client::desktop::ui;
+
 QnWorkbenchIncompatibleServersActionHandler::QnWorkbenchIncompatibleServersActionHandler(
     QObject* parent)
     :
@@ -33,9 +35,9 @@ QnWorkbenchIncompatibleServersActionHandler::QnWorkbenchIncompatibleServersActio
     m_connectTool(nullptr),
     m_mergeDialog(nullptr)
 {
-    connect(action(QnActions::ConnectToCurrentSystem), &QAction::triggered, this,
+    connect(action(action::ConnectToCurrentSystem), &QAction::triggered, this,
         &QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemAction_triggered);
-    connect(action(QnActions::MergeSystems), &QAction::triggered, this,
+    connect(action(action::MergeSystems), &QAction::triggered, this,
         &QnWorkbenchIncompatibleServersActionHandler::at_mergeSystemsAction_triggered);
 }
 

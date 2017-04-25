@@ -13,10 +13,10 @@
   },
   "passwordRequirements":{
     "minLengthMessage":"A jelszónak legalább 8 karakterből kell állnia",
-    "requiredMessage":"Csak alfanumerikus karakterek és billentyűzet szimbólumok használhatók, kerülje a szóközöket.",
-    "weakMessage":"Használjon kis és nagybetűket\nés speciális karaktereket az erősebb jelszó érdekében",
+    "requiredMessage":"A jelszó csak latin betűkből, számokból és szimbólumokból állhat",
+    "weakMessage":"A jelszónak különböző típusú szimbólumokat kell tartalmaznia",
     "strongMessage":"Erős jelszó!",
-    "commonMessage":"Ez a jelszó a leggyakoribb jelszavak egyike"
+    "commonMessage":"A jelszó a leggyakrabban használt jelszavak egyike"
   },
   "settings":{
     "tabs":{

@@ -11,12 +11,11 @@
 
 #include <utils/common/instance_storage.h>
 #include <core/resource/resource_fwd.h>
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/action_fwd.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/vms/utils/system_uri.h>
 
 struct QnStartupParameters;
-
-class QAction;
 
 class QnWorkbench;
 class QnWorkbenchSynchronizer;
@@ -26,7 +25,6 @@ class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
 class QnWorkbenchUserWatcher;
 class QnWorkbenchLayoutWatcher;
-class QnActionManager;
 class QnControlsStatisticsModule;
 
 /**
@@ -43,7 +41,7 @@ public:
 
     QnWorkbench* workbench() const;
     QnWorkbenchLayoutSnapshotManager* snapshotManager() const;
-    QnActionManager* menu() const;
+    nx::client::desktop::ui::action::Manager* menu() const;
 
     QnWorkbenchAccessController* accessController() const;
     void setAccessController(QnWorkbenchAccessController* value);
@@ -55,7 +53,7 @@ public:
     QWidget* mainWindow() const;
     void setMainWindow(QWidget* mainWindow);
 
-    QAction *action(const QnActions::IDType id) const;
+    QAction *action(const nx::client::desktop::ui::action::IDType id) const;
 
     QnUserResourcePtr user() const;
     void setUserName(const QString &userName);
@@ -94,7 +92,7 @@ private:
     QScopedPointer<QnWorkbench> m_workbench;
     QScopedPointer<QnWorkbenchSynchronizer> m_synchronizer;
     QScopedPointer<QnWorkbenchLayoutSnapshotManager> m_snapshotManager;
-    QScopedPointer<QnActionManager> m_menu;
+    QScopedPointer<nx::client::desktop::ui::action::Manager> m_menu;
     QScopedPointer<QnWorkbenchDisplay> m_display;
     QScopedPointer<QnWorkbenchNavigator> m_navigator;
     QScopedPointer<QnControlsStatisticsModule> m_statisticsModule;

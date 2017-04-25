@@ -1,6 +1,7 @@
 #include "buttons.h"
 
-#include <ui/actions/action.h>
+#include <nx/client/desktop/ui/actions/action.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
@@ -12,26 +13,30 @@
 
 #include <nx/fusion/model_functions.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 
-QString aliasFromAction(QAction *action)
+QString alias(action::Action* action)
 {
-    static const auto kUndefinedAlias = lit("undefined");
-    const auto ourAction = dynamic_cast<QnAction *>(action);
-    if (!ourAction)
-        return kUndefinedAlias;
-    return QnLexical::serialized(ourAction->id());
+    return QnLexical::serialized(action->id());
 }
 
 } //namespace
 
 namespace NxUi {
 
-QnImageButtonWidget* newActionButton(QGraphicsItem *parent, QnWorkbenchContext* context,
-    QAction* action, int helpTopicId)
+QnImageButtonWidget* newActionButton(
+    QGraphicsItem *parent,
+    QnWorkbenchContext* context,
+    action::IDType actionId,
+    int helpTopicId)
 {
+    NX_EXPECT(context);
+    const auto action = context->menu()->action(actionId);
+
     QnImageButtonWidget* button = new QnImageButtonWidget(parent);
-    context->statisticsModule()->registerButton(aliasFromAction(action), button);
+    context->statisticsModule()->registerButton(alias(action), button);
 
     button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::ToolButton);
     button->setDefaultAction(action);
@@ -44,10 +49,16 @@ QnImageButtonWidget* newActionButton(QGraphicsItem *parent, QnWorkbenchContext* 
 }
 
 template<class T>
-T* newCustomShowHideButton(QGraphicsItem* parent, QnWorkbenchContext* context, QAction* action)
+T* newCustomShowHideButton(
+    QGraphicsItem* parent,
+    QnWorkbenchContext* context,
+    action::IDType actionId)
 {
+    NX_EXPECT(context);
+    const auto action = context->menu()->action(actionId);
+
     auto button = new T(parent);
-    context->statisticsModule()->registerButton(aliasFromAction(action), button);
+    context->statisticsModule()->registerButton(alias(action), button);
 
     if (action)
         button->setDefaultAction(action);
@@ -63,22 +74,33 @@ T* newCustomShowHideButton(QGraphicsItem* parent, QnWorkbenchContext* context, Q
     return button;
 }
 
-QnImageButtonWidget* newShowHideButton(QGraphicsItem* parent, QnWorkbenchContext* context,
-    QAction* action)
+QnImageButtonWidget* newShowHideButton(
+    QGraphicsItem* parent,
+    QnWorkbenchContext* context,
+    action::IDType actionId)
 {
-    return newCustomShowHideButton<QnImageButtonWidget>(parent, context, action);
+    return newCustomShowHideButton<QnImageButtonWidget>(parent, context, actionId);
 }
 
-QnBlinkingImageButtonWidget* newBlinkingShowHideButton(QGraphicsItem* parent, QnWorkbenchContext* context, QAction* action)
+QnBlinkingImageButtonWidget* newBlinkingShowHideButton(
+    QGraphicsItem* parent,
+    QnWorkbenchContext* context,
+    action::IDType actionId)
 {
-    return newCustomShowHideButton<QnBlinkingImageButtonWidget>(parent, context, action);
+    return newCustomShowHideButton<QnBlinkingImageButtonWidget>(parent, context, actionId);
 }
 
-QnImageButtonWidget* newPinButton(QGraphicsItem* parent, QnWorkbenchContext* context,
-    QAction* action, bool smallIcon)
+QnImageButtonWidget* newPinButton(
+    QGraphicsItem* parent,
+    QnWorkbenchContext* context,
+    action::IDType actionId,
+    bool smallIcon)
 {
+    NX_EXPECT(context);
+    const auto action = context->menu()->action(actionId);
+
     QnImageButtonWidget* button = new QnImageButtonWidget(parent);
-    context->statisticsModule()->registerButton(aliasFromAction(action), button);
+    context->statisticsModule()->registerButton(alias(action), button);
 
     if (action)
         button->setDefaultAction(action);

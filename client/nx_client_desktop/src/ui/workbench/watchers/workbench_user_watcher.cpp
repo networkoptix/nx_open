@@ -11,10 +11,12 @@
 
 #include <core/resource/user_resource.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
+
+using namespace nx::client::desktop::ui;
 
 QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
     base_type(parent),
@@ -142,8 +144,7 @@ void QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr
     setCurrentUser(QnUserResourcePtr());
     if (!commonModule()->remoteGUID().isNull())
     {
-        menu()->trigger(QnActions::DisconnectAction, QnActionParameters()
-            .withArgument(Qn::ForceRole, true));
+        menu()->trigger(action::DisconnectAction, {Qn::ForceRole, true});
     }
 }
 
@@ -172,7 +173,7 @@ bool QnWorkbenchUserWatcher::isReconnectRequired(const QnUserResourcePtr &user)
 
 void QnWorkbenchUserWatcher::reconnect()
 {
-    menu()->trigger(QnActions::ReconnectAction);
+    menu()->trigger(action::ReconnectAction);
 }
 
 void QnWorkbenchUserWatcher::at_user_resourceChanged(const QnResourcePtr &resource)
