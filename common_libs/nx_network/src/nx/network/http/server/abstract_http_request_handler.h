@@ -60,7 +60,7 @@ public:
      * Then this method will return {cartman}.
      * Works only when using RestMessageDispatcher.
      */
-    const std::vector<std::string>& requestPathParams() const;
+    const std::vector<StringType>& requestPathParams() const;
 
 protected:
     /**
@@ -80,7 +80,7 @@ protected:
 private:
     nx_http::Message m_responseMsg;
     ResponseIsReadyHandler m_completionHandler;
-    std::vector<std::string> m_requestPathParams;
+    std::vector<StringType> m_requestPathParams;
 
     void requestDone(RequestResult requestResult);
 };
