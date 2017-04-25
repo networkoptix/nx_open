@@ -61,8 +61,38 @@ struct LazyMockData
 };
 #define LazyMockData_Fields (id)(str)
 
+struct LazyMockDataWithVector
+{
+    std::vector<QString> items;
+
+    bool operator==(const LazyMockDataWithVector& other) const
+    {
+        return items == other.items;
+    }
+
+    bool operator!=(const LazyMockDataWithVector& other) const { return !(*this == other); }
+};
+#define LazyMockDataWithVector_Fields (items)
+
+struct LazyMockDataWithQList
+{
+    QList<QString> items;
+
+    bool operator==(const LazyMockDataWithQList& other) const
+    {
+        return items == other.items;
+    }
+
+    bool operator!=(const LazyMockDataWithQList& other) const { return !(*this == other); }
+};
+#define LazyMockDataWithQList_Fields (items)
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((IntMockData), (json), _Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((LazyMockData), (json), _Fields, (lazy, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (LazyMockData)
+    (LazyMockDataWithVector)
+    (LazyMockDataWithQList),
+    (json), _Fields, (lazy, true))
 
 } // namespace
 
@@ -188,4 +218,46 @@ TEST_F(QnFusionTestFixture, serializeStructListLazy)
         .toUtf8();
     ASSERT_EQ(jsonStr, QJson::serialized(data));
     ASSERT_EQ(data, QJson::deserialized<std::vector<LazyMockData>>(jsonStr));
+}
+
+TEST_F(QnFusionTestFixture, serializeVectorLazy)
+{
+    LazyMockDataWithVector data;
+    data.items.push_back(kHelloWorld);
+    data.items.push_back(QString());
+    data.items.push_back(kHelloWorld);
+    const QByteArray jsonStr = QString(R"json({"items":["%1","","%1"]})json")
+        .arg(kHelloWorld)
+        .toUtf8();
+    ASSERT_EQ(jsonStr, QJson::serialized(data));
+    ASSERT_EQ(data, QJson::deserialized<LazyMockDataWithVector>(jsonStr));
+}
+
+TEST_F(QnFusionTestFixture, serializeEmptyVectorLazy)
+{
+    LazyMockDataWithVector data;
+    const QByteArray jsonStr = QString(R"json({})json").toUtf8();
+    ASSERT_EQ(jsonStr, QJson::serialized(data));
+    ASSERT_EQ(data, QJson::deserialized<LazyMockDataWithVector>(jsonStr));
+}
+
+TEST_F(QnFusionTestFixture, serializeQListLazy)
+{
+    LazyMockDataWithQList data;
+    data.items.push_back(kHelloWorld);
+    data.items.push_back(QString());
+    data.items.push_back(kHelloWorld);
+    const QByteArray jsonStr = QString(R"json({"items":["%1","","%1"]})json")
+        .arg(kHelloWorld)
+        .toUtf8();
+    ASSERT_EQ(jsonStr, QJson::serialized(data));
+    ASSERT_EQ(data, QJson::deserialized<LazyMockDataWithQList>(jsonStr));
+}
+
+TEST_F(QnFusionTestFixture, serializeEmptyQListLazy)
+{
+    LazyMockDataWithQList data;
+    const QByteArray jsonStr = QString(R"json({})json").toUtf8();
+    ASSERT_EQ(jsonStr, QJson::serialized(data));
+    ASSERT_EQ(data, QJson::deserialized<LazyMockDataWithQList>(jsonStr));
 }

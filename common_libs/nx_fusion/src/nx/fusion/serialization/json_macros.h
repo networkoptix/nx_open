@@ -24,6 +24,12 @@ struct LazyChecker
     template<class T>
     bool operator()(const T &) const { return false; }
 
+    template<class U>
+    bool operator()(const std::vector<U>& value) const { return value.empty(); }
+
+    template<class U>
+    bool operator()(const QList<U>& value) const { return value.empty(); }
+
     bool operator()(const QString& value) const { return value.isEmpty(); }
     bool operator()(const QnUuid& value) const { return value.isNull(); }
 };
