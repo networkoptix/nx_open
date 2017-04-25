@@ -1,3 +1,4 @@
+#include <functional>
 #include <future>
 #include <gtest/gtest.h>
 #include <nx/network/websocket/websocket.h>
@@ -34,6 +35,8 @@ protected:
                         std::move(clientSocket2),
                         nx::Buffer()));
 
+                clientWebSocket->bindToAioThread(serverWebSocket->getAioThread());
+
                 startPromise.set_value();
             });
 
@@ -47,8 +50,8 @@ protected:
 
     virtual void TearDown() override
     {
-        //clientSocket1->pleaseStopSync();
-        //clientSocket2->pleaseStopSync();
+        clientWebSocket->pleaseStopSync();
+        serverWebSocket->pleaseStopSync();
     }
 
     void prepareTestData(nx::Buffer* payload, int size)
@@ -109,35 +112,116 @@ TEST_F(WebSocket, SingleMessage_singleTransfer)
     ASSERT_EQ(readBuffer, sendBuf);
 }
 
-TEST_F(WebSocket, MultipleMessages)
+TEST_F(WebSocket, MultipleMessages_oneWay)
 {
     startFuture.wait();
 
     int kIterations = 10;
+    int doneCount = 0;
     nx::Buffer sendBuf;
+    prepareTestData(&sendBuf, 1024 * 1024 * 10);
+    readBuffer.reserve(1024 * 1024 * 11);
 
-    for (int i = 0; i < kIterations; ++i)
-    {
-        prepareTestData(&sendBuf, 1024 * 1024 * i);
-
-        clientWebSocket->sendAsync(
-            sendBuf,
-            [this](SystemError::ErrorCode ecode, size_t transferred)
+    std::function<void(SystemError::ErrorCode, size_t)> sendCb =
+        [this, &doneCount, &kIterations, &sendBuf, &sendCb](SystemError::ErrorCode ecode, size_t transferred)
         {
             ASSERT_EQ(ecode, SystemError::noError);
-        });
+            if (doneCount == kIterations)
+                return;
+            clientWebSocket->sendAsync(sendBuf, sendCb);
+        };
 
-        serverWebSocket->readSomeAsync(
-            &readBuffer,
-            [this](SystemError::ErrorCode ecode, size_t transferred)
+    std::function<void(SystemError::ErrorCode, size_t)> readCb =
+        [this, &doneCount, &kIterations, &sendBuf, &readCb](SystemError::ErrorCode ecode, size_t transferred)
         {
+            ASSERT_EQ(ecode, SystemError::noError);
+            doneCount++;
+            if (doneCount == kIterations)
+            {
+                readyPromise.set_value();
+                return;
+            }
+            ASSERT_EQ(readBuffer, sendBuf);
             readBuffer.clear();
-        });
+            readBuffer.reserve(1024 * 1024 * 11);
+            auto capacity = readBuffer.capacity();
+            auto size = readBuffer.size();
+            serverWebSocket->readSomeAsync(&readBuffer, readCb);
+        };
 
-        ASSERT_EQ(readBuffer, sendBuf);
-        if (i == kIterations - 1)
-            readyPromise.set_value();
-    }
+    clientWebSocket->sendAsync(sendBuf, sendCb);
+    serverWebSocket->readSomeAsync(&readBuffer, readCb);
+
+    readyFuture.wait();
+}
+
+TEST_F(WebSocket, MultipleMessages_twoWay)
+{
+    startFuture.wait();
+
+    int kIterations = 10;
+    int doneCount = 0;
+
+    nx::Buffer clientSendBuf;
+    prepareTestData(&clientSendBuf, 1024 * 1024 * 10);
+    nx::Buffer clientReadBuf;
+
+    nx::Buffer serverSendBuf;
+    prepareTestData(&serverSendBuf, 1024 * 1024 * 3);
+    nx::Buffer serverReadBuf;
+
+    std::function<void(SystemError::ErrorCode, size_t)> clientSendCb;
+    std::function<void(SystemError::ErrorCode, size_t)> clientReadCb;
+    std::function<void(SystemError::ErrorCode, size_t)> serverSendCb;
+    std::function<void(SystemError::ErrorCode, size_t)> serverReadCb;
+
+    clientSendCb =
+        [&](SystemError::ErrorCode ecode, size_t transferred)
+        {
+            if (doneCount == kIterations || ecode != SystemError::noError)
+                return;
+            clientWebSocket->readSomeAsync(&clientReadBuf, clientReadCb);
+        };
+
+    clientReadCb =
+        [&](SystemError::ErrorCode ecode, size_t transferred)
+        {
+            doneCount++;
+            if (doneCount == kIterations || ecode != SystemError::noError)
+            {
+                //clientWebSocket->pleaseStop([]() {});
+                //serverWebSocket->pleaseStop([]() {});
+                std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                readyPromise.set_value();
+                return;
+            }
+
+            ASSERT_EQ(clientReadBuf, serverSendBuf);
+            clientReadBuf.clear();
+            clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
+        };
+
+    serverSendCb =
+        [&](SystemError::ErrorCode ecode, size_t transferred)
+        {
+            if (doneCount == kIterations || ecode != SystemError::noError)
+                return;
+            serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
+        };
+
+    serverReadCb =
+        [&](SystemError::ErrorCode ecode, size_t transferred)
+        {
+            if (doneCount == kIterations || ecode != SystemError::noError)
+                return;
+
+            ASSERT_EQ(serverReadBuf, clientSendBuf);
+            serverReadBuf.clear();
+            serverWebSocket->sendAsync(serverSendBuf, serverSendCb);
+        };
+
+    clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
+    serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
 
     readyFuture.wait();
 }

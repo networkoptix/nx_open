@@ -46,6 +46,8 @@ public:
         ReceiveMode receiveMode = ReceiveMode::message,
         websocket::Role role = websocket::Role::undefined); /**< if role is undefined, payload won't be masked (unmasked) */
 
+    ~WebSocket();
+
     virtual void readSomeAsync(
         nx::Buffer* const buffer,
         std::function<void(SystemError::ErrorCode, size_t)> handler) override;
@@ -55,6 +57,8 @@ public:
         std::function<void(SystemError::ErrorCode, size_t)> handler) override;
 
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
+
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     /**
      * Makes sense only in multiFrameMessage mode.
@@ -101,6 +105,8 @@ private:
     nx::Buffer* m_readBuffer;
     nx::Buffer m_writeBuffer;
     websocket::MultiBuffer m_buffer;
+
+    virtual void stopWhileInAioThread() override;
 };
 
 } // namespace network

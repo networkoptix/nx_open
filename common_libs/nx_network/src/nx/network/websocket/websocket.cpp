@@ -24,7 +24,23 @@ WebSocket::WebSocket(
 {
     nx::Buffer tmpBuf(requestData);
     m_parser.consume(tmpBuf);
+    bindToAioThread(m_baseConnection.getAioThread());
     m_baseConnection.dispatch([this](){ handleRead(); });
+}
+
+WebSocket::~WebSocket()
+{
+}
+
+void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    AbstractAsyncChannel::bindToAioThread(aioThread);
+    m_baseConnection.bindToAioThread(aioThread);
+}
+
+void WebSocket::stopWhileInAioThread()
+{
+    m_baseConnection.pleaseStopSync();
 }
 
 void WebSocket::setIsLastFrame()
@@ -53,10 +69,7 @@ void WebSocket::handleRead()
         return;
 
     if (m_buffer.readySize() == 0)
-    {
-        NX_LOG(lit("[WebSocket] handleRead() called but read buffer is not ready. This should not happen."), cl_logDEBUG1);
         return;
-    }
 
     decltype(m_readHandler) handlerCopy = std::move(m_readHandler);
     m_readHandler = nullptr;
