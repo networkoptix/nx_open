@@ -32,6 +32,14 @@ public:
     virtual ~LayoutTourReviewController() override;
 
 private:
+    void handleTourChanged(const ec2::ApiLayoutTourData& tour);
+    void handleTourRemoved(const QnUuid& tourId);
+
+    /** Handle current layout changes to update the tour review. */
+    void startListeningLayout();
+    /** Stop handling current layout changes. */
+    void stopListeningLayout();
+
     void reviewLayoutTour(const ec2::ApiLayoutTourData& tour);
 
     QnUuid currentTourId() const;
@@ -50,6 +58,14 @@ private:
 
     /** Calculate items from the review layout. */
     bool fillTourItems(ec2::ApiLayoutTourItemDataList* items);
+
+// Actions handlers
+private:
+    void at_reviewLayoutTourAction_triggered();
+    void at_dropResourcesAction_triggered();
+    void at_startCurrentLayoutTourAction_triggered();
+    void at_saveCurrentLayoutTourAction_triggered();
+    void at_removeCurrentLayoutTourAction_triggered();
 
 private:
     QnDisconnectHelperPtr m_connections;
