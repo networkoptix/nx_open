@@ -31,11 +31,7 @@ protected:
 
         ASSERT_TRUE(result);
         ASSERT_EQ(expectedValue, *result);
-        ASSERT_EQ(expectedParams.size(), params.size());
-        for (std::size_t i = 0; i < expectedParams.size(); ++i)
-        {
-            ASSERT_EQ(expectedParams[i], params[i]);
-        }
+        ASSERT_EQ(expectedParams, params);
     }
 
     void assertPathNotMatched(const std::string& path)
@@ -56,6 +52,16 @@ TEST_F(RestPathMatcher, find_handler)
     assertPathMatches("/account/vpupkin/systems", 1, { "vpupkin" });
     assertPathMatches("/account/vpu-pk.i_n/systems", 1, { "vpu-pk.i_n" });
     assertPathMatches("/systems/sys1/users", 2, { "sys1" });
+}
+
+TEST_F(RestPathMatcher, find_handler_multiple_params)
+{
+    assertPathRegistered("/account/{accountId}/system/{systemName}/info", 3);
+
+    assertPathMatches(
+        "/account/akolesnikov/system/la_office_test/info",
+        3,
+        { "akolesnikov", "la_office_test" });
 }
 
 TEST_F(RestPathMatcher, find_case_insensitive)

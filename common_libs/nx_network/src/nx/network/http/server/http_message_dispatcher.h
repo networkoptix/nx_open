@@ -186,7 +186,11 @@ private:
         boost::optional<const FactoryFunc&> factory =
             pathMatchContext.pathToFactory.match(path.toStdString(), &pathParams);
         if (factory)
-            return (*factory)();
+        {
+            auto handler = (*factory)();
+            handler->setRequestPathParams(std::move(pathParams));
+            return handler;
+        }
 
         if (pathMatchContext.defaultFactory)
             return pathMatchContext.defaultFactory();

@@ -38,17 +38,11 @@ public:
     {
         for (auto& matchContext: m_restPathToMatchContext)
         {
-            auto str = QString::fromStdString(path);
-
-            int pos = 0;
-            while ((pos = matchContext.second.regex.indexIn(str, pos)) != -1)
-            {
-                pathParams->push_back(matchContext.second.regex.cap(1).toStdString());
-                pos += matchContext.second.regex.matchedLength();
-            }
-
-            if (pathParams->empty())
+            if (!matchContext.second.regex.exactMatch(QString::fromStdString(path)))
                 continue;
+
+            for (int i = 1; i <= matchContext.second.regex.captureCount(); ++i)
+                pathParams->push_back(matchContext.second.regex.cap(i).toStdString());
 
             return boost::optional<const Mapped&>(matchContext.second.mapped);
         }
@@ -69,7 +63,7 @@ private:
     QRegExp convertToRegex(const QString& pathTemplate)
     {
         const QRegExp replaceRestParams("\\{[0-9a-zA-Z]+\\}", Qt::CaseInsensitive);
-        const QString replacement("([0-9a-zA-Z_.-]+)");
+        const QString replacement("([^/]+)");
 
         QString restPathMatchRegex;
         restPathMatchRegex += "^";

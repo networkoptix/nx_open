@@ -52,6 +52,16 @@ public:
         nx::utils::stree::ResourceContainer&& authInfo,
         ResponseIsReadyHandler completionHandler);
 
+    void setRequestPathParams(std::vector<std::string> params);
+    /**
+     * Parameters parsed from URL path. 
+     * E.g., given http handler registered on path /account/%1/systems.
+     * When receiving request with path /account/cartman/systems.
+     * Then this method will return {cartman}.
+     * Works only when using RestMessageDispatcher.
+     */
+    const std::vector<std::string>& requestPathParams() const;
+
 protected:
     /**
      * Implement this method to handle request
@@ -66,15 +76,6 @@ protected:
         nx_http::RequestProcessedHandler completionHandler) = 0;
 
     nx_http::Response* response();
-
-    /**
-     * Parameters parsed from URL path. 
-     * E.g., given http handler registered on path /account/%1/systems.
-     * When receiving request with path /account/cartman/systems.
-     * Then this method will return {cartman}.
-     * Works only when using RestMessageDispatcher.
-     */
-    const std::vector<std::string>& requestPathParams() const;
 
 private:
     nx_http::Message m_responseMsg;
