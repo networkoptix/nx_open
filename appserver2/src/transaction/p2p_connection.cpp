@@ -209,7 +209,7 @@ void P2pConnection::fillAuthInfo(const nx_http::AsyncHttpClientPtr& httpClient, 
 
 void P2pConnection::cancelConnecting()
 {
-    NX_LOG(QnLog::EC2_TRAN_LOG,
+    NX_LOG(
         lit("%1 Connection to peer %2 canceled from state %3").
         arg(Q_FUNC_INFO).arg(m_remotePeer.id.toString()).arg(toString(state())),
         cl_logDEBUG1);
@@ -220,7 +220,7 @@ void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client
 {
     const int statusCode = client->response()->statusLine.statusCode;
 
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("P2pConnection::at_responseReceived. statusCode = %1").
+    NX_LOG( lit("P2pConnection::at_responseReceived. statusCode = %1").
         arg(statusCode), cl_logDEBUG2);
 
     if (statusCode == nx_http::StatusCode::unauthorized)
@@ -329,7 +329,7 @@ void P2pConnection::onHttpClientDone(const nx_http::AsyncHttpClientPtr& client)
 
     using namespace nx::network;
 
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::at_httpClientDone. state = %1").
+    NX_LOG( lit("QnTransactionTransportBase::at_httpClientDone. state = %1").
         arg((int)client->state()), cl_logDEBUG2);
 
     nx_http::AsyncHttpClient::State state = client->state();
@@ -406,8 +406,11 @@ P2pConnection::Direction P2pConnection::direction() const
 
 void P2pConnection::sendMessage(MessageType messageType, const nx::Buffer& data)
 {
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("Peer %1. Send message %2 to %3").
-        arg(commonModule()->moduleGUID().toString()).arg(toString(messageType)).arg(remotePeer().id.toString()), cl_logDEBUG1);
+    NX_LOG( lit("Peer %1(%2). Send message %3 to %4")
+        .arg(commonModule()->moduleGUID().toString())
+        .arg(commonModule()->instanceCounter())
+        .arg(toString(messageType))
+        .arg(remotePeer().id.toString()), cl_logDEBUG1);
 
     nx::Buffer buffer;
     buffer.reserve(data.size() + 1);
@@ -418,6 +421,13 @@ void P2pConnection::sendMessage(MessageType messageType, const nx::Buffer& data)
 
 void P2pConnection::sendMessage(const nx::Buffer& data)
 {
+    MessageType messageType = (MessageType) data[0];
+    NX_LOG(lit("Peer %1(%2). Send message %3 to %4")
+        .arg(commonModule()->moduleGUID().toString())
+        .arg(commonModule()->instanceCounter())
+        .arg(toString(messageType))
+        .arg(remotePeer().id.toString()), cl_logDEBUG1);
+
     using namespace std::placeholders;
 
     QnMutexLocker lock(&m_mutex);
