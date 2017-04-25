@@ -106,7 +106,7 @@ PtzPresetsToursFactory::PtzPresetsToursFactory(QObject* parent):
 {
 }
 
-QList<QAction *> PtzPresetsToursFactory::newActions(const Parameters& parameters,
+QList<QAction*> PtzPresetsToursFactory::newActions(const Parameters& parameters,
     QObject* parent)
 {
     QList<QAction*> result;
