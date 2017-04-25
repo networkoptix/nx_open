@@ -39,7 +39,7 @@ public:
      *
      * \param parent                    Context-aware parent of this action manager.
      */
-    Manager(QObject *parent = NULL);
+    Manager(QObject* parent = nullptr);
 
     /**
      * Virtual destructor.
@@ -61,7 +61,7 @@ public:
 
     /**
      * \param id                        Id of the action to get.
-     * \returns                         Action for the given id, or NULL if no such action exists.
+     * \returns                         Action for the given id, or nullptr if no such action exists.
      */
     Action* action(IDType id) const;
 
@@ -104,27 +104,36 @@ public:
      *                                  Ownership of the created menu is passed to
      *                                  the caller.
      */
-    QMenu *newMenu(ActionScope scope, QWidget *parent = NULL, const Parameters& parameters = Parameters(), CreationOptions options = 0);
+    QMenu* newMenu(
+        ActionScope scope,
+        QWidget* parent = nullptr,
+        const Parameters& parameters = Parameters(),
+        CreationOptions options = 0);
 
-    QMenu *newMenu(IDType rootId, ActionScope scope, QWidget *parent = NULL, const Parameters& parameters = Parameters(), CreationOptions options = 0);
+    QMenu* newMenu(
+        IDType rootId,
+        ActionScope scope,
+        QWidget* parent = nullptr,
+        const Parameters& parameters = Parameters(),
+        CreationOptions options = 0);
 
     /**
      * \returns                         Action target provider that is assigned to this
      *                                  action manager.
      */
-    TargetProvider *targetProvider() const;
+    TargetProvider* targetProvider() const;
 
     /**
      * \param targetProvider            New target provider for this action manager.
      */
-    void setTargetProvider(TargetProvider *targetProvider);
+    void setTargetProvider(TargetProvider* targetProvider);
 
     /**
      * \param action                    Action that has just been activated.
      * \returns                         Parameters with which the given action
      *                                  was triggered.
      */
-    Parameters currentParameters(Action *action) const;
+    Parameters currentParameters(Action* action) const;
 
     /**
      * This is a convenience overload to be used inside handlers of <tt>QAction</tt>'s
@@ -134,7 +143,7 @@ public:
      * \returns                         Parameters with which the given action
      *                                  was triggered.
      */
-    Parameters currentParameters(QObject *sender) const;
+    Parameters currentParameters(QObject* sender) const;
 
     /**
      * This function replaces one action in the given menu with another one.
@@ -143,7 +152,7 @@ public:
      * \param targetId                  Id of the action to be replaced.
      * \param targetAction              Replacement action.
      */
-    void redirectAction(QMenu *menu, IDType sourceId, QAction *targetAction);
+    void redirectAction(QMenu* menu, IDType sourceId, QAction* targetAction);
 
     /** Check if any menu is visible right now */
     bool isMenuVisible() const;
@@ -160,7 +169,7 @@ protected:
 
     void copyAction(QAction* dst, Action* src, bool forwardSignals = true);
 
-    QMenu *newMenuRecursive(
+    QMenu* newMenuRecursive(
         const Action* parent,
         ActionScope scope,
         const Parameters& parameters,
@@ -189,7 +198,7 @@ private:
     QHash<Action*, IDType> m_idByAction;
 
     /** Mapping from a menu created by this manager to the parameters that were
-     * passed to it at construction time. NULL key is used for shortcut actions. */
+     * passed to it at construction time. nullptr key is used for shortcut actions. */
     QHash<QMenu*, Parameters> m_parametersByMenu;
 
     /** Target provider for actions. */
