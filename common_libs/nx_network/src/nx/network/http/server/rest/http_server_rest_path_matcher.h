@@ -58,7 +58,7 @@ private:
     };
 
     /** REST path template, context */
-    std::map<std::string, MatchContext> m_restPathToMatchContext;
+    std::map<nx_http::StringType, MatchContext> m_restPathToMatchContext;
 
     QRegExp convertToRegex(const QString& pathTemplate)
     {
