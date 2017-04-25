@@ -24,11 +24,13 @@ Builder::Builder(Action* action):
     action->setShortcutContext(Qt::WindowShortcut);
 }
 
-Builder Builder::shortcut(const QKeySequence& keySequence, ActionPlatform platform,
+Builder Builder::shortcut(
+    const QKeySequence& keySequence,
+    Platform platform,
     bool replaceExisting)
 {
+    // This check is required to avoid crashes in the client unit tests
     QGuiApplication* guiApp = qobject_cast<QGuiApplication*>(qApp);
-
     if (!guiApp)
         return *this;
 

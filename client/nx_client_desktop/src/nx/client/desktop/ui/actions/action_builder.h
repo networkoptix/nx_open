@@ -19,7 +19,7 @@ namespace action {
 class Builder
 {
 public:
-    enum ActionPlatform
+    enum Platform
     {
         AllPlatforms = -1,
         Windows,
@@ -29,7 +29,7 @@ public:
 
     Builder(Action* action);
 
-    Builder shortcut(const QKeySequence& keySequence, ActionPlatform platform, bool replaceExisting);
+    Builder shortcut(const QKeySequence& keySequence, Platform platform, bool replaceExisting);
     Builder shortcut(const QKeySequence& keySequence);
     Builder shortcutContext(Qt::ShortcutContext context);
     Builder icon(const QIcon& icon);
@@ -48,8 +48,8 @@ public:
     Builder requiredTargetPermissions(int key, Qn::Permissions permissions);
     Builder requiredTargetPermissions(Qn::Permissions permissions);
     Builder separator(bool isSeparator = true);
-    Builder conditionalText(const QString &text, const ConditionPtr& condition);
-    Builder conditionalText(const QString &text, const QnResourceCriterion& criterion,
+    Builder conditionalText(const QString& text, const ConditionPtr& condition);
+    Builder conditionalText(const QString& text, const QnResourceCriterion& criterion,
         MatchMode matchMode = All);
     Builder checkable(bool isCheckable = true);
     Builder checked(bool isChecked = true);
