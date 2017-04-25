@@ -44,55 +44,55 @@ struct IntMockData
 };
 #define IntMockData_Fields (a)(b)(c)
 
-struct LazyMockData
+struct BriefMockData
 {
     QnUuid id;
     QString str;
-    LazyMockData() = default;
-    LazyMockData(const QnUuid& id, const QString& str): id(id), str(str) {}
+    BriefMockData() = default;
+    BriefMockData(const QnUuid& id, const QString& str): id(id), str(str) {}
 
-    bool operator==(const LazyMockData& other) const
+    bool operator==(const BriefMockData& other) const
     {
         return id == other.id && str == other.str;
     }
 
-    bool operator!=(const LazyMockData& other) const { return !(*this == other); }
+    bool operator!=(const BriefMockData& other) const { return !(*this == other); }
 
 };
-#define LazyMockData_Fields (id)(str)
+#define BriefMockData_Fields (id)(str)
 
-struct LazyMockDataWithVector
+struct BriefMockDataWithVector
 {
     std::vector<QString> items;
 
-    bool operator==(const LazyMockDataWithVector& other) const
+    bool operator==(const BriefMockDataWithVector& other) const
     {
         return items == other.items;
     }
 
-    bool operator!=(const LazyMockDataWithVector& other) const { return !(*this == other); }
+    bool operator!=(const BriefMockDataWithVector& other) const { return !(*this == other); }
 };
-#define LazyMockDataWithVector_Fields (items)
+#define BriefMockDataWithVector_Fields (items)
 
-struct LazyMockDataWithQList
+struct BriefMockDataWithQList
 {
     QList<QString> items;
 
-    bool operator==(const LazyMockDataWithQList& other) const
+    bool operator==(const BriefMockDataWithQList& other) const
     {
         return items == other.items;
     }
 
-    bool operator!=(const LazyMockDataWithQList& other) const { return !(*this == other); }
+    bool operator!=(const BriefMockDataWithQList& other) const { return !(*this == other); }
 };
-#define LazyMockDataWithQList_Fields (items)
+#define BriefMockDataWithQList_Fields (items)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((IntMockData), (json), _Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (LazyMockData)
-    (LazyMockDataWithVector)
-    (LazyMockDataWithQList),
-    (json), _Fields, (lazy, true))
+    (BriefMockData)
+    (BriefMockDataWithVector)
+    (BriefMockDataWithQList),
+    (json), _Fields, (brief, true))
 
 } // namespace
 
@@ -182,33 +182,33 @@ TEST_F(QnFusionTestFixture, deserializeStructWithDeprecatedFields)
     ASSERT_EQ(data, deserializedData);
 }
 
-TEST_F(QnFusionTestFixture, serializeStructLazyId)
+TEST_F(QnFusionTestFixture, serializeStructBriefId)
 {
-    LazyMockData data{QnUuid(), kHelloWorld};
+    BriefMockData data{QnUuid(), kHelloWorld};
     const QByteArray jsonStr = QString(R"json({"str":"%1"})json").arg(kHelloWorld).toUtf8();
     ASSERT_EQ(jsonStr, QJson::serialized(data));
-    ASSERT_EQ(data, QJson::deserialized<LazyMockData>(jsonStr));
+    ASSERT_EQ(data, QJson::deserialized<BriefMockData>(jsonStr));
 }
 
-TEST_F(QnFusionTestFixture, serializeStructLazyStr)
+TEST_F(QnFusionTestFixture, serializeStructBriefStr)
 {
-    LazyMockData data{kTestId, QString()};
+    BriefMockData data{kTestId, QString()};
     const QByteArray jsonStr = QString(R"json({"id":"%1"})json").arg(kTestId.toString()).toUtf8();
     ASSERT_EQ(jsonStr, QJson::serialized(data));
-    ASSERT_EQ(data, QJson::deserialized<LazyMockData>(jsonStr));
+    ASSERT_EQ(data, QJson::deserialized<BriefMockData>(jsonStr));
 }
 
-TEST_F(QnFusionTestFixture, serializeStructLazyBoth)
+TEST_F(QnFusionTestFixture, serializeStructBriefBoth)
 {
-    LazyMockData data;
+    BriefMockData data;
     const QByteArray jsonStr = QString(R"json({})json").toUtf8();
     ASSERT_EQ(jsonStr, QJson::serialized(data));
-    ASSERT_EQ(data, QJson::deserialized<LazyMockData>(jsonStr));
+    ASSERT_EQ(data, QJson::deserialized<BriefMockData>(jsonStr));
 }
 
-TEST_F(QnFusionTestFixture, serializeStructListLazy)
+TEST_F(QnFusionTestFixture, serializeStructListBrief)
 {
-    std::vector<LazyMockData> data;
+    std::vector<BriefMockData> data;
     data.emplace_back(QnUuid(), kHelloWorld);
     data.emplace_back(kTestId, QString());
     data.emplace_back(QnUuid(), QString());
@@ -217,12 +217,12 @@ TEST_F(QnFusionTestFixture, serializeStructListLazy)
         .arg(kTestId.toString())
         .toUtf8();
     ASSERT_EQ(jsonStr, QJson::serialized(data));
-    ASSERT_EQ(data, QJson::deserialized<std::vector<LazyMockData>>(jsonStr));
+    ASSERT_EQ(data, QJson::deserialized<std::vector<BriefMockData>>(jsonStr));
 }
 
-TEST_F(QnFusionTestFixture, serializeVectorLazy)
+TEST_F(QnFusionTestFixture, serializeVectorBrief)
 {
-    LazyMockDataWithVector data;
+    BriefMockDataWithVector data;
     data.items.push_back(kHelloWorld);
     data.items.push_back(QString());
     data.items.push_back(kHelloWorld);
@@ -230,20 +230,20 @@ TEST_F(QnFusionTestFixture, serializeVectorLazy)
         .arg(kHelloWorld)
         .toUtf8();
     ASSERT_EQ(jsonStr, QJson::serialized(data));
-    ASSERT_EQ(data, QJson::deserialized<LazyMockDataWithVector>(jsonStr));
+    ASSERT_EQ(data, QJson::deserialized<BriefMockDataWithVector>(jsonStr));
 }
 
-TEST_F(QnFusionTestFixture, serializeEmptyVectorLazy)
+TEST_F(QnFusionTestFixture, serializeEmptyVectorBrief)
 {
-    LazyMockDataWithVector data;
+    BriefMockDataWithVector data;
     const QByteArray jsonStr = QString(R"json({})json").toUtf8();
     ASSERT_EQ(jsonStr, QJson::serialized(data));
-    ASSERT_EQ(data, QJson::deserialized<LazyMockDataWithVector>(jsonStr));
+    ASSERT_EQ(data, QJson::deserialized<BriefMockDataWithVector>(jsonStr));
 }
 
-TEST_F(QnFusionTestFixture, serializeQListLazy)
+TEST_F(QnFusionTestFixture, serializeQListBrief)
 {
-    LazyMockDataWithQList data;
+    BriefMockDataWithQList data;
     data.items.push_back(kHelloWorld);
     data.items.push_back(QString());
     data.items.push_back(kHelloWorld);
@@ -251,13 +251,13 @@ TEST_F(QnFusionTestFixture, serializeQListLazy)
         .arg(kHelloWorld)
         .toUtf8();
     ASSERT_EQ(jsonStr, QJson::serialized(data));
-    ASSERT_EQ(data, QJson::deserialized<LazyMockDataWithQList>(jsonStr));
+    ASSERT_EQ(data, QJson::deserialized<BriefMockDataWithQList>(jsonStr));
 }
 
-TEST_F(QnFusionTestFixture, serializeEmptyQListLazy)
+TEST_F(QnFusionTestFixture, serializeEmptyQListBrief)
 {
-    LazyMockDataWithQList data;
+    BriefMockDataWithQList data;
     const QByteArray jsonStr = QString(R"json({})json").toUtf8();
     ASSERT_EQ(jsonStr, QJson::serialized(data));
-    ASSERT_EQ(data, QJson::deserialized<LazyMockDataWithQList>(jsonStr));
+    ASSERT_EQ(data, QJson::deserialized<BriefMockDataWithQList>(jsonStr));
 }

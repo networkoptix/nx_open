@@ -18,8 +18,8 @@ struct TrueChecker
     bool operator()(const T &) const { return true; }
 };
 
-/** Return true if value must be omitted in lazy mode. */
-struct LazyChecker
+/** Return true if value must be omitted in brief mode. */
+struct BriefChecker
 {
     template<class T>
     bool operator()(const T &) const { return false; }
@@ -48,11 +48,11 @@ struct LazyChecker
             if(!invoke(access(checker, TrueChecker()), value))
                 return true; /* Skipped. */
 
-            // In lazy mode we can skip empty structure fields
-            if (access(lazy, false))
+            // In brief mode we can skip empty structure fields
+            if (access(brief, false))
             {
                 const auto realValue = invoke(access(getter), value);
-                if (LazyChecker()(realValue))
+                if (BriefChecker()(realValue))
                     return true;
             }
 
