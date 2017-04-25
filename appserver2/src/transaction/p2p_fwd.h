@@ -33,7 +33,7 @@ struct SubscribeRecord
     qint32 sequence = 0;
 };
 
-static const quint32 kMaxDistance = std::numeric_limits<quint32>::max();
+static const qint32 kMaxDistance = std::numeric_limits<qint32>::max();
 static const char* kP2pProtoName = "p2p";
 
 Q_DECLARE_METATYPE(MessageType)

@@ -53,6 +53,36 @@ public:
     ApiPeerData localPeer() const;
 
     void start();
+
+
+    template<class T>
+    void sendTransaction(const QnTransaction<T>& tran)
+    {
+        NX_ASSERT(tran.command != ApiCommand::NotDefined);
+        QnMutexLocker lock(&m_mutex);
+        if (m_connections.isEmpty())
+            return;
+        for (const auto& connection: connections)
+        {
+            if (!connection->isSubscribedTo(ApiPersistentIdData(tran.peerID, tran.persistentInfo.dbID)))
+                continue;
+            switch (connection->remotePeer().dataFormat)
+            {
+            case Qn::JsonFormat:
+                connection->sendMessage(
+                    QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(transaction) + QByteArray("\r\n"));
+                break;
+            case Qn::UbjsonFormat:
+                connection->sendMessage(MessageType::pushTransactionData,
+                    QnUbjsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(transaction));
+                break;
+            default:
+                qWarning() << "Client has requested data in an unsupported format" << connection->remotePeer().dataFormat;
+                break;
+            }
+        }
+    }
+
 private:
     QByteArray serializePeersMessage();
     QByteArray serializeCompressedPeers(MessageType messageType, const QVector<PeerNumberType>& peers);

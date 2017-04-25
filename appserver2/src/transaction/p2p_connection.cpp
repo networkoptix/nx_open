@@ -32,6 +32,25 @@ const char* toString(P2pConnection::State value)
     }
 }
 
+const char* toString(MessageType value)
+{
+    switch (value)
+    {
+    case MessageType::resolvePeerNumberRequest:
+        return "resolvePeerNumberRequest";
+    case MessageType::resolvePeerNumberResponse:
+        return "resolvePeerNumberResponse";
+    case MessageType::alivePeers:
+        return "alivePeers";
+    case MessageType::subscribeForDataUpdates:
+        return "subscribeForDataUpdates";
+    case MessageType::pushTransactionData:
+        return "pushTransactionData";
+    default:
+        return "Unknown";
+    }
+}
+
 P2pConnection::P2pConnection(
     QnCommonModule* commonModule,
     const QnUuid& remoteId,
@@ -334,6 +353,8 @@ void P2pConnection::onHttpClientDone(const nx_http::AsyncHttpClientPtr& client)
     auto keepAliveTimeout = commonModule()->globalSettings()->connectionKeepAliveTimeout() * 1000;
     socket->setRecvTimeout(std::chrono::milliseconds(keepAliveTimeout * 2).count());
     socket->setSendTimeout(std::chrono::milliseconds(keepAliveTimeout * 2).count());
+    socket->setNonBlockingMode(true);
+    socket->setNoDelay(true);
 
     //m_webSocket.reset(new Websocket( std::move(socket), msgBuffer));
     m_webSocket = std::move(socket);
@@ -385,6 +406,9 @@ P2pConnection::Direction P2pConnection::direction() const
 
 void P2pConnection::sendMessage(MessageType messageType, const nx::Buffer& data)
 {
+    NX_LOG(QnLog::EC2_TRAN_LOG, lit("Peer %1. Send message %2 to %3").
+        arg(commonModule()->moduleGUID().toString()).arg(toString(messageType)).arg(remotePeer().id.toString()), cl_logDEBUG1);
+
     nx::Buffer buffer;
     buffer.reserve(data.size() + 1);
     buffer.append((char) messageType);
@@ -458,6 +482,13 @@ ApiPersistentIdData P2pConnection::decode(PeerNumberType shortPeerNumber) const
 PeerNumberType P2pConnection::encode(const ApiPersistentIdData& fullId, PeerNumberType shortPeerNumber)
 {
     return m_shortPeerInfo.encode(fullId, shortPeerNumber);
+}
+
+bool P2pConnection::isSubscribedTo(const ApiPersistentIdData& peer)
+{
+    const auto& data = m_miscData.remoteSubscription;
+    auto itr = std::find(data.begin(), data.end(), peer);
+    return itr != data.end();
 }
 
 } // namespace ec2

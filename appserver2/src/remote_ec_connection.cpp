@@ -7,7 +7,8 @@
 
 #include <api/app_server_connection.h>
 
-#include "transaction/transaction_message_bus.h"
+#include <transaction/transaction_message_bus.h>
+#include <transaction/p2p_message_bus.h>
 #include "common/common_module.h"
 #include "managers/time_manager.h"
 
@@ -39,7 +40,8 @@ namespace ec2
 
     void RemoteEC2Connection::startReceivingNotifications()
     {
-        m_connectionFactory->messageBus()->setHandler( notificationManager() );
+        m_connectionFactory->messageBus()->setHandler(notificationManager());
+        m_connectionFactory->p2pMessageBus()->setHandler(notificationManager());
 
         base_type::startReceivingNotifications();
 
@@ -59,6 +61,8 @@ namespace ec2
         {
             m_connectionFactory->messageBus()->removeConnectionFromPeer( m_peerUrl );
             m_connectionFactory->messageBus()->removeHandler( notificationManager() );
+
+            m_connectionFactory->p2pMessageBus()->removeHandler(notificationManager());
         }
 
         //TODO #ak next call can be placed here just because we always have just one connection to EC

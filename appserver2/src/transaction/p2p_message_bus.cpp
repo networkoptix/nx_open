@@ -324,8 +324,13 @@ void P2pMessageBus::sendAlivePeersMessage()
     QByteArray data = serializePeersMessage();
     for (const auto& connection : m_connections)
     {
-        if (connection->state() == P2pConnection::State::Connected)
+        if (connection->state() != P2pConnection::State::Connected)
+            continue;
+        if (data != connection->miscData().localPeersMessage)
+        {
+            connection->miscData().localPeersMessage = data;
             connection->sendMessage(data);
+        }
     }
 }
 
@@ -381,6 +386,8 @@ void P2pMessageBus::doSubscribe()
     for (auto itr = m_allPeers.begin(); itr != m_allPeers.end(); ++itr)
     {
         const ApiPersistentIdData& peer = itr.key();
+        if (peer == localPeer)
+            continue;
         const PeerInfo& info = itr.value();
         auto subscribedVia = currentSubscription.value(peer);
         qint32 subscribedDistance = kMaxDistance;
@@ -555,7 +562,7 @@ void P2pMessageBus::deserializeResolvePeerNumberResponse(const P2pConnectionPtr&
 bool P2pMessageBus::handleResolvePeerNumberResponse(const P2pConnectionPtr& connection, const QByteArray& data)
 {
     deserializeResolvePeerNumberResponse(connection, data);
-    const QByteArray msg = connection->miscData().lastAliveMessage;
+    const QByteArray msg = connection->miscData().remotePeersMessage;
     if (!msg.isEmpty())
         handleAlivePeers(connection, msg);
     return true;
@@ -600,9 +607,6 @@ QByteArray P2pMessageBus::serializeSubscribeRequest(
     writer.flushBits();
     result.truncate(writer.getBytesCount());
     return result;
-
-
-    return serializeCompressedPeers(MessageType::subscribeForDataUpdates, peers);
 }
 
 QByteArray P2pMessageBus::serializeResolvePeerNumberResponse(const QVector<PeerNumberType>& peers)
@@ -653,7 +657,7 @@ bool P2pMessageBus::handleAlivePeers(const P2pConnectionPtr& connection, const Q
         return true;
     }
     connection->sendMessage(serializeResolvePeerNumberRequest(numbersToResolve));
-    connection->miscData().lastAliveMessage = data;
+    connection->miscData().remotePeersMessage = data;
     return true;
 }
 
@@ -686,7 +690,7 @@ struct SendTransactionToTransportFuction
         switch (connection->remotePeer().dataFormat)
         {
             case Qn::JsonFormat:
-                connection->sendMessage(MessageType::pushTransactionData,
+                connection->sendMessage(
                     QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(transaction) + QByteArray("\r\n"));
                 break;
             case Qn::UbjsonFormat:
@@ -725,6 +729,7 @@ bool P2pMessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connec
     for (const auto& shortPeer : request)
     {
         const auto& id = m_localShortPeerInfo.decode(shortPeer.peer);
+        NX_ASSERT(!id.isNull());
         selectRequest.insert(id, shortPeer.sequence);
     }
     auto newSubscription = selectRequest.keys();

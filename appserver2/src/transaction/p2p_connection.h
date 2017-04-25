@@ -71,7 +71,9 @@ public:
     /** MiscData contains members that managed by P2pMessageBus. P2pConnection doesn't touch it */
     struct MiscData
     {
-        QByteArray lastAliveMessage;
+        QByteArray localPeersMessage; //< last sent peers message
+        QByteArray remotePeersMessage; //< last received peers message
+
         QVector<ApiPersistentIdData> localSubscription; //< local -> remote subscription
         QVector<ApiPersistentIdData> remoteSubscription; //< remote -> local subscription
     };
@@ -79,6 +81,7 @@ public:
     MiscData& miscData();
 
     const Qn::UserAccessData& getUserAccessData() const { return m_userAccessData; }
+    bool isSubscribedTo(const ApiPersistentIdData& peer);
 signals:
     void gotMessage(P2pConnectionPtr connection, MessageType messageType, const QByteArray& payload);
 private:
