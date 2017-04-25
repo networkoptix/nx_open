@@ -21,6 +21,8 @@
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 #include <ui/dialogs/setup_wizard_dialog.h>
 #include <ui/workbench/workbench_resource.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <client/startup_tile_manager.h>
 #include <client/forgotten_systems_manager.h>
 #include <client_core/client_core_settings.h>
@@ -125,6 +127,8 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
     m_widget->installEventFilter(this);
     m_quickView->installEventFilter(this);
     qApp->installEventFilter(this); //< QTBUG-34414 workaround
+
+    setHelpTopic(m_widget, Qn::Login_Help);
 
     connect(this, &QnWorkbenchWelcomeScreen::visibleChanged, this,
         [this]()
