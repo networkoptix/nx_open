@@ -17,11 +17,11 @@ public:
         const conf::Settings& settings,
         Model* model);
 
-    controller::ConnectSessionManager& connectSessionManager();
+    controller::AbstractConnectSessionManager& connectSessionManager();
 
 private:
     controller::TrafficRelay m_trafficRelay;
-    controller::ConnectSessionManager m_connectSessionManager;
+    std::unique_ptr<controller::AbstractConnectSessionManager> m_connectSessionManager;
 };
 
 } // namespace relay

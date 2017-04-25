@@ -18,7 +18,7 @@ class BeginListeningHandler:
 public:
     static const char* kPath;
 
-    BeginListeningHandler(controller::ConnectSessionManager* connectSessionManager):
+    BeginListeningHandler(controller::AbstractConnectSessionManager* connectSessionManager):
         m_connectSessionManager(connectSessionManager)
     {
     }
@@ -39,7 +39,7 @@ public:
     }
 
 private:
-    controller::ConnectSessionManager* m_connectSessionManager;
+    controller::AbstractConnectSessionManager* m_connectSessionManager;
 
     void onRequestProcessed(
         api::ResultCode resultCode,
@@ -65,7 +65,7 @@ class CreateClientSessionHandler:
 public:
     static const char* kPath;
 
-    CreateClientSessionHandler(controller::ConnectSessionManager* connectSessionManager):
+    CreateClientSessionHandler(controller::AbstractConnectSessionManager* connectSessionManager):
         m_connectSessionManager(connectSessionManager)
     {
     }
@@ -86,7 +86,7 @@ public:
     }
 
 private:
-    controller::ConnectSessionManager* m_connectSessionManager;
+    controller::AbstractConnectSessionManager* m_connectSessionManager;
 
     void onRequestProcessed(
         api::ResultCode resultCode,
@@ -108,7 +108,7 @@ class ConnectToPeerHandler:
 public:
     static const char* kPath;
 
-    ConnectToPeerHandler(controller::ConnectSessionManager* connectSessionManager):
+    ConnectToPeerHandler(controller::AbstractConnectSessionManager* connectSessionManager):
         m_connectSessionManager(connectSessionManager)
     {
     }
@@ -129,7 +129,7 @@ public:
     }
 
 private:
-    controller::ConnectSessionManager* m_connectSessionManager;
+    controller::AbstractConnectSessionManager* m_connectSessionManager;
 
     void onRequestProcessed(
         api::ResultCode resultCode,

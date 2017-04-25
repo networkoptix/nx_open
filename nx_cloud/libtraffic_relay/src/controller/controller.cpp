@@ -11,16 +11,17 @@ Controller::Controller(
     Model* model)
     :
     m_connectSessionManager(
-        settings,
-        &model->clientSessionPool(),
-        &model->listeningPeerPool(),
-        &m_trafficRelay)
+        controller::ConnectSessionManagerFactory::create(
+            settings,
+            &model->clientSessionPool(),
+            &model->listeningPeerPool(),
+            &m_trafficRelay))
 {
 }
 
-controller::ConnectSessionManager& Controller::connectSessionManager()
+controller::AbstractConnectSessionManager& Controller::connectSessionManager()
 {
-    return m_connectSessionManager;
+    return *m_connectSessionManager;
 }
 
 } // namespace relay
