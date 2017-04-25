@@ -1285,7 +1285,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
 
         if (isTimeout && !isPeerUsing(url) && !m_restartPending &&
             (ApiPeerData::isClient(m_localPeerType) ||
-                !ec2::Settings::instance()->dbReadOnly()))
+                !commonModule()->isReadOnly()))
         {
             if (!connectInfo.discoveredPeer.isNull())
             {

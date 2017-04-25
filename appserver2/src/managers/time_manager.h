@@ -55,6 +55,8 @@
 namespace ec2 {
 
 class Ec2DirectConnection;
+class Settings;
+
 /**
  * Sequence has less priority than TimeSynchronizationManager::peerIsServer and
  * TimeSynchronizationManager::peerTimeSynchronizedWithInternetServer flags
@@ -123,7 +125,8 @@ public:
     TimeSynchronizationManager(
         Qn::PeerType peerType,
         nx::utils::TimerManager* const timerManager,
-        QnTransactionMessageBus* messageBus);
+        QnTransactionMessageBus* messageBus,
+        Settings* settings);
     virtual ~TimeSynchronizationManager();
 
     /** Implemenattion of QnStoppable::pleaseStop. */
@@ -258,6 +261,7 @@ private:
     bool m_timeSynchronized;
     int m_internetSynchronizationFailureCount;
     std::map<QnUuid, PeerContext> m_peersToSendTimeSyncTo;
+    Settings* m_settings;
 
     void selectLocalTimeAsSynchronized(
         QnMutexLockerBase* const lk,

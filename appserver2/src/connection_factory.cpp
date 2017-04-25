@@ -58,7 +58,7 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
     m_p2pMessageBus(
         new P2pMessageBus(m_dbManager.get(), peerType, commonModule)),
     m_timeSynchronizationManager(
-        new TimeSynchronizationManager(peerType, timerManager, m_transactionMessageBus.get())),
+        new TimeSynchronizationManager(peerType, timerManager, m_transactionMessageBus.get(), &m_settingsInstance)),
     m_serverQueryProcessor(
         peerType == Qn::PT_Server
         ? new ServerQueryProcessorAccess(m_dbManager.get(), m_transactionMessageBus.get())
@@ -1690,7 +1690,7 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
     #endif
     connectionInfo->allowSslConnections = m_sslEnabled;
     connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
-    connectionInfo->ecDbReadOnly = Settings::instance()->dbReadOnly();
+    connectionInfo->ecDbReadOnly = m_settingsInstance.dbReadOnly();
     connectionInfo->newSystem = commonModule()->globalSettings()->isNewSystem();
     if (response)
     {

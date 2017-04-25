@@ -641,7 +641,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
     if (!execSQLScript("vacuum;", m_sdb))
         qWarning() << "failed to vacuum ecs database" << Q_FUNC_INFO;
 
-    m_dbReadOnly = ec2::Settings::instance()->dbReadOnly();
+    m_dbReadOnly = commonModule()->isReadOnly();
     emit initialized();
     m_initialized = true;
 

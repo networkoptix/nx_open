@@ -285,7 +285,7 @@ static const size_t INTERNET_SYNC_TIME_PERIOD_SEC = 60*60;
 static const int TIME_SYNC_SEND_TIMEOUT_SEC = 10*60;
 #endif
 /**
- * If time synchronization with internet failes, period is multiplied on this value, 
+ * If time synchronization with internet failes, period is multiplied on this value,
  * but it cannot exceed MAX_PUBLIC_SYNC_TIME_PERIOD_SEC.
  */
 static const size_t INTERNET_SYNC_TIME_FAILURE_PERIOD_GROW_COEFF = 2;
@@ -320,7 +320,8 @@ static_assert( INTERNET_SYNC_TIME_PERIOD_SEC <= MAX_INTERNET_SYNC_TIME_PERIOD_SE
 TimeSynchronizationManager::TimeSynchronizationManager(
     Qn::PeerType peerType,
     nx::utils::TimerManager* const timerManager,
-    QnTransactionMessageBus* messageBus)
+    QnTransactionMessageBus* messageBus,
+    Settings* settings)
 :
     m_localSystemTimeDelta( std::numeric_limits<qint64>::min() ),
     m_broadcastSysTimeTaskID( 0 ),
@@ -333,7 +334,8 @@ TimeSynchronizationManager::TimeSynchronizationManager(
     m_timerManager(timerManager),
     m_internetTimeSynchronizationPeriod( INITIAL_INTERNET_SYNC_TIME_PERIOD_SEC ),
     m_timeSynchronized( false ),
-    m_internetSynchronizationFailureCount( 0 )
+    m_internetSynchronizationFailureCount( 0 ),
+    m_settings(settings)
 {
 }
 
@@ -526,7 +528,7 @@ void TimeSynchronizationManager::selectLocalTimeAsSynchronized(
 
     //local peer is selected by user as primary time server
     const bool synchronizingByCurrentServer = m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey;
-    //incrementing sequence 
+    //incrementing sequence
     m_localTimePriorityKey.sequence = newTimePriorityKeySequence;
     //"select primary time server" means "take its local time", so resetting internet synchronization flag
     m_localTimePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
@@ -539,7 +541,7 @@ void TimeSynchronizationManager::selectLocalTimeAsSynchronized(
 
     //using current server time info
     const qint64 elapsed = m_monotonicClock.elapsed();
-    //selection of peer as primary time server means it's local system time is to be used as synchronized time 
+    //selection of peer as primary time server means it's local system time is to be used as synchronized time
     //in case of internet connection absence
     m_usedTimeSyncInfo = TimeSyncInfo(
         elapsed,
@@ -890,7 +892,7 @@ void TimeSynchronizationManager::synchronizeWithPeer( const QnUuid& peerID )
 
     if (!commonModule->globalSettings()->isTimeSynchronizationEnabled())
     {
-            peerIter->second.syncTimerID = 
+            peerIter->second.syncTimerID =
             nx::utils::TimerManager::TimerGuard(
                 m_timerManager,
                 m_timerManager->addTimer(
@@ -1001,7 +1003,7 @@ void TimeSynchronizationManager::timeSyncRequestDone(
     //scheduling next synchronization
     if( m_terminated )
         return;
-        peerIter->second.syncTimerID = 
+        peerIter->second.syncTimerID =
         nx::utils::TimerManager::TimerGuard(
             m_timerManager,
             m_timerManager->addTimer(
@@ -1097,8 +1099,8 @@ void TimeSynchronizationManager::syncTimeWithInternet( quint64 taskID )
     if (!isSynchronizingTimeWithInternet)
     {
         NX_LOG(lit("TimeSynchronizationManager. Not synchronizing time with internet"), cl_logDEBUG2);
-            m_internetTimeSynchronizationPeriod = 
-            Settings::instance()->internetSyncTimePeriodSec(INTERNET_SYNC_TIME_PERIOD_SEC);
+            m_internetTimeSynchronizationPeriod =
+            m_settings->internetSyncTimePeriodSec(INTERNET_SYNC_TIME_PERIOD_SEC);
         addInternetTimeSynchronizationTask();
         return;
     }
@@ -1143,7 +1145,7 @@ void TimeSynchronizationManager::onTimeFetchingDone( const qint64 millisFromEpoc
 
             m_internetSynchronizationFailureCount = 0;
 
-            m_internetTimeSynchronizationPeriod = Settings::instance()->internetSyncTimePeriodSec(INTERNET_SYNC_TIME_PERIOD_SEC);
+            m_internetTimeSynchronizationPeriod = m_settings->internetSyncTimePeriodSec(INTERNET_SYNC_TIME_PERIOD_SEC);
 
             const qint64 curLocalTime = currentMSecsSinceEpoch();
 
@@ -1179,7 +1181,7 @@ void TimeSynchronizationManager::onTimeFetchingDone( const qint64 millisFromEpoc
 
             m_internetTimeSynchronizationPeriod = std::min<>(
                 MIN_INTERNET_SYNC_TIME_PERIOD_SEC + m_internetTimeSynchronizationPeriod * INTERNET_SYNC_TIME_FAILURE_PERIOD_GROW_COEFF,
-                Settings::instance()->maxInternetTimeSyncRetryPeriodSec(MAX_INTERNET_SYNC_TIME_PERIOD_SEC));
+                m_settings->maxInternetTimeSyncRetryPeriodSec(MAX_INTERNET_SYNC_TIME_PERIOD_SEC));
 
             ++m_internetSynchronizationFailureCount;
             if( m_internetSynchronizationFailureCount > MAX_SEQUENT_INTERNET_SYNCHRONIZATION_FAILURES )
@@ -1380,7 +1382,7 @@ void TimeSynchronizationManager::onTransactionReceived(
 
         QnMutexLocker lk(&m_mutex);
         if (m_usedTimeSyncInfo.timePriorityKey.hasLessPriorityThan(
-            remotePeerTimeSyncInfo.timePriorityKey, 
+            remotePeerTimeSyncInfo.timePriorityKey,
             settings->isSynchronizingTimeWithInternet()))
         {
             syncTimeWithAllKnownServers(&lk);
@@ -1422,7 +1424,7 @@ void TimeSynchronizationManager::checkSystemTimeForChange()
         NX_LOGX(lm("Local system time change has been detected"),
             cl_logDEBUG1);
 
-        //local OS time has been changed. If system time is set 
+        //local OS time has been changed. If system time is set
         //by local host time then updating system time
         const bool isSystemTimeSynchronizedWithInternet =
             settings->isSynchronizingTimeWithInternet() &&
