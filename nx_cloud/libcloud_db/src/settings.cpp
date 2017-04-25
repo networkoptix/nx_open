@@ -116,14 +116,11 @@ Http::Http():
 }
 
 Settings::Settings():
-    m_settings(
+    base_type(
         QnAppInfo::organizationNameForSettings(),
         QnLibCloudDbAppInfo::applicationName(),
-        kModuleName),
-    m_showHelp(false)
+        kModuleName)
 {
-    fillSupportedCmdParameters();
-
     m_dbConnectionOptions.driverType = nx::db::RdbmsDriverType::mysql;
     m_dbConnectionOptions.hostName = "127.0.0.1";
     m_dbConnectionOptions.port = 3306;
@@ -135,34 +132,16 @@ Settings::Settings():
     m_dbConnectionOptions.maxPeriodQueryWaitsForAvailableConnection = std::chrono::minutes(1);
 }
 
-void Settings::load(int argc, const char **argv)
-{
-    m_commandLineParser.parse(argc, argv, stderr);
-    m_settings.parseArgs(argc, argv);
-
-    loadConfiguration();
-}
-
-bool Settings::isShowHelpRequested() const
-{
-    return m_showHelp;
-}
-
-void Settings::printCmdLineArgsHelp()
-{
-    // TODO: #ak
-}
-
 QString Settings::dataDir() const
 {
-    const QString& dataDirFromSettings = m_settings.value(kDataDir).toString();
+    const QString& dataDirFromSettings = settings().value(kDataDir).toString();
     if (!dataDirFromSettings.isEmpty())
         return dataDirFromSettings;
 
 #ifdef Q_OS_LINUX
     QString defVarDirName = QString("/opt/%1/%2/var")
         .arg(QnAppInfo::linuxOrganizationName()).arg(kModuleName);
-    QString varDirName = m_settings.value("varDir", defVarDirName).toString();
+    QString varDirName = settings().value("varDir", defVarDirName).toString();
     return varDirName;
 #else
     const QStringList& dataDirList = QStandardPaths::standardLocations(QStandardPaths::DataLocation);
@@ -232,7 +211,7 @@ const Http& Settings::http() const
 
 std::list<SocketAddress> Settings::endpointsToListen() const
 {
-    const QStringList& httpAddrToListenStrList = m_settings.value(
+    const QStringList& httpAddrToListenStrList = settings().value(
         kEndpointsToListen,
         kDefaultEndpointsToListen ).toString().split( ',' );
     std::list<SocketAddress> httpAddrToListenList;
@@ -245,91 +224,85 @@ std::list<SocketAddress> Settings::endpointsToListen() const
     return httpAddrToListenList;
 }
 
-void Settings::fillSupportedCmdParameters()
-{
-    m_commandLineParser.addParameter(
-        &m_showHelp, "--help", NULL, "Show help message", false );
-}
-
-void Settings::loadConfiguration()
+void Settings::loadSettings()
 {
     using namespace std::chrono;
 
     //log
-    m_logging.load(m_settings, QLatin1String("log"));
-    m_vmsSynchronizationLogging.load(m_settings, QLatin1String("syncroLog"));
+    m_logging.load(settings(), QLatin1String("log"));
+    m_vmsSynchronizationLogging.load(settings(), QLatin1String("syncroLog"));
 
     //DB
-    m_dbConnectionOptions.loadFromSettings(&m_settings);
+    m_dbConnectionOptions.loadFromSettings(settings());
 
-    m_changeUser = m_settings.value(kChangeUser).toString();
+    m_changeUser = settings().value(kChangeUser).toString();
 
     //email
-    m_notification.url = m_settings.value(kNotificationUrl).toString();
+    m_notification.url = settings().value(kNotificationUrl).toString();
     m_notification.enabled =
-        m_settings.value(
+        settings().value(
             kNotificationEnabled,
             kDefaultNotificationEnabled ? "true" : "false").toString() == "true";
 
     //accountManager
     m_accountManager.accountActivationCodeExpirationTimeout = duration_cast<seconds>(
         nx::utils::parseTimerDuration(
-            m_settings.value(kAccountActivationCodeExpirationTimeout).toString(),
+            settings().value(kAccountActivationCodeExpirationTimeout).toString(),
             kDefaultAccountActivationCodeExpirationTimeout));
 
     m_accountManager.passwordResetCodeExpirationTimeout = duration_cast<seconds>(
         nx::utils::parseTimerDuration(
-            m_settings.value(kPasswordResetCodeExpirationTimeout).toString(),
+            settings().value(kPasswordResetCodeExpirationTimeout).toString(),
             kDefaultPasswordResetCodeExpirationTimeout));
 
     //system manager
     m_systemManager.reportRemovedSystemPeriod = duration_cast<seconds>(
         nx::utils::parseTimerDuration(
-            m_settings.value(kReportRemovedSystemPeriodSec).toString(),
+            settings().value(kReportRemovedSystemPeriodSec).toString(),
             kDefaultReportRemovedSystemPeriodSec));
 
     m_systemManager.notActivatedSystemLivePeriod = duration_cast<seconds>(
         nx::utils::parseTimerDuration(
-            m_settings.value(kNotActivatedSystemLivePeriodSec).toString(),
+            settings().value(kNotActivatedSystemLivePeriodSec).toString(),
             kDefaultNotActivatedSystemLivePeriodSec));
 
     m_systemManager.dropExpiredSystemsPeriod = duration_cast<seconds>(
         nx::utils::parseTimerDuration(
-            m_settings.value(kDropExpiredSystemsPeriodSec).toString(),
+            settings().value(kDropExpiredSystemsPeriodSec).toString(),
             kDefaultDropExpiredSystemsPeriodSec));
 
     m_systemManager.controlSystemStatusByDb =
-        m_settings.value(
+        settings().value(
             kControlSystemStatusByDb,
             kDefaultControlSystemStatusByDb ? "true" : "false").toString() == "true";
 
     //auth
-    m_auth.rulesXmlPath = m_settings.value(kAuthXmlPath, kDefaultAuthXmlPath).toString();
+    m_auth.rulesXmlPath = settings().value(kAuthXmlPath, kDefaultAuthXmlPath).toString();
     m_auth.nonceValidityPeriod = duration_cast<seconds>(
         nx::utils::parseTimerDuration(
-            m_settings.value(kNonceValidityPeriod).toString(),
+            settings().value(kNonceValidityPeriod).toString(),
             kDefaultNonceValidityPeriod));
     m_auth.intermediateResponseValidityPeriod = duration_cast<seconds>(
         nx::utils::parseTimerDuration(
-            m_settings.value(kIntermediateResponseValidityPeriod).toString(),
+            settings().value(kIntermediateResponseValidityPeriod).toString(),
             kDefaultIntermediateResponseValidityPeriod));
     m_auth.connectionInactivityPeriod = duration_cast<seconds>(
         nx::utils::parseTimerDuration(
-            m_settings.value(kConnectionInactivityPeriod).toString(),
+            settings().value(kConnectionInactivityPeriod).toString(),
             kDefaultConnectionInactivityPeriod));
 
     //event manager
     m_eventManager.mediaServerConnectionIdlePeriod = duration_cast<seconds>(
         nx::utils::parseTimerDuration(
-            m_settings.value(kMediaServerConnectionIdlePeriod).toString(),
+            settings().value(kMediaServerConnectionIdlePeriod).toString(),
             kDefaultMediaServerConnectionIdlePeriod));
 
-    m_p2pDb.load(m_settings);
+    m_p2pDb.load(settings());
 
-    m_moduleFinder.cloudModulesXmlTemplatePath = m_settings.value(
+    m_moduleFinder.cloudModulesXmlTemplatePath = settings().value(
         kCloudModuleXmlTemplatePath, kDefaultCloudModuleXmlTemplatePath).toString();
 
-    m_http.tcpBacklogSize = m_settings.value(
+    m_http.tcpBacklogSize = settings().value(
         kTcpBacklogSize, kDefaultTcpBacklogSize).toInt();
 }
 
