@@ -195,6 +195,11 @@ QList<QAction*> PtzPresetsToursFactory::newActions(const Parameters& parameters,
     return result;
 }
 
+EdgeNodeFactory::EdgeNodeFactory(QObject* parent):
+    Factory(parent)
+{
+}
+
 QMenu* EdgeNodeFactory::newMenu(const Parameters& parameters, QWidget* parentWidget)
 {
     auto edgeCamera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
@@ -203,6 +208,11 @@ QMenu* EdgeNodeFactory::newMenu(const Parameters& parameters, QWidget* parentWid
 
     return menu()->newMenu(action::NoAction, TreeScope, parentWidget,
         Parameters(edgeCamera->getParentResource()));
+}
+
+AspectRatioFactory::AspectRatioFactory(QObject* parent):
+    Factory(parent)
+{
 }
 
 QList<QAction*> AspectRatioFactory::newActions(const Parameters& /*parameters*/,
