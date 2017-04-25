@@ -21,10 +21,10 @@ template<typename Mapped>
 class RestPathMatcher
 {
 public:
-    bool add(const std::string& pathTemplate, Mapped mapped)
+    bool add(const nx_http::StringType& pathTemplate, Mapped mapped)
     {
         MatchContext matchContext;
-        matchContext.regex = convertToRegex(QString::fromStdString(pathTemplate));
+        matchContext.regex = convertToRegex(QString::fromUtf8(pathTemplate));
         matchContext.mapped = std::move(mapped);
 
         return m_restPathToMatchContext.emplace(
@@ -33,16 +33,16 @@ public:
     }
 
     boost::optional<const Mapped&> match(
-        const std::string& path,
-        std::vector<std::string>* pathParams) const
+        const nx_http::StringType& path,
+        std::vector<nx_http::StringType>* pathParams) const
     {
         for (auto& matchContext: m_restPathToMatchContext)
         {
-            if (!matchContext.second.regex.exactMatch(QString::fromStdString(path)))
+            if (!matchContext.second.regex.exactMatch(QString::fromUtf8(path)))
                 continue;
 
             for (int i = 1; i <= matchContext.second.regex.captureCount(); ++i)
-                pathParams->push_back(matchContext.second.regex.cap(i).toStdString());
+                pathParams->push_back(matchContext.second.regex.cap(i).toUtf8());
 
             return boost::optional<const Mapped&>(matchContext.second.mapped);
         }

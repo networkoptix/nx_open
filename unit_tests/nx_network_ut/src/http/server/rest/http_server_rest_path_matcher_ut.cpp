@@ -11,22 +11,22 @@ class RestPathMatcher:
     public ::testing::Test
 {
 protected:
-    void assertPathRegistered(const std::string& restPath, int val)
+    void assertPathRegistered(const nx_http::StringType& restPath, int val)
     {
         ASSERT_TRUE(m_dictionary.add(restPath, val));
     }
 
-    void assertPathNotRegistered(const std::string& restPath, int val)
+    void assertPathNotRegistered(const nx_http::StringType& restPath, int val)
     {
         ASSERT_FALSE(m_dictionary.add(restPath, val));
     }
 
     void assertPathMatches(
-        const std::string& path,
+        const nx_http::StringType& path,
         int expectedValue,
-        std::vector<std::string> expectedParams)
+        std::vector<nx_http::StringType> expectedParams)
     {
-        std::vector<std::string> params;
+        std::vector<nx_http::StringType> params;
         const auto& result = m_dictionary.match(path, &params);
 
         ASSERT_TRUE(result);
@@ -34,9 +34,9 @@ protected:
         ASSERT_EQ(expectedParams, params);
     }
 
-    void assertPathNotMatched(const std::string& path)
+    void assertPathNotMatched(const nx_http::StringType& path)
     {
-        std::vector<std::string> params;
+        std::vector<nx_http::StringType> params;
         ASSERT_FALSE(m_dictionary.match(path, &params));
     }
 

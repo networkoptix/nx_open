@@ -34,14 +34,14 @@ template<typename Mapped>
 class ExactPathMatcher
 {
 public:
-    bool add(const std::string& path, Mapped mapped)
+    bool add(const nx_http::StringType& path, Mapped mapped)
     {
         return m_pathToMapped.emplace(path, std::move(mapped)).second;
     }
 
     boost::optional<const Mapped&> match(
-        const std::string& path,
-        std::vector<std::string>* /*pathParams*/) const
+        const nx_http::StringType& path,
+        std::vector<nx_http::StringType>* /*pathParams*/) const
     {
         auto it = m_pathToMapped.find(path);
         if (it == m_pathToMapped.end())
@@ -51,7 +51,7 @@ public:
     }
 
 private:
-    std::map<std::string, Mapped> m_pathToMapped;
+    std::map<nx_http::StringType, Mapped> m_pathToMapped;
 };
 
 template<template<typename> class PathMatcher>
@@ -79,7 +79,7 @@ public:
             return true;
         }
         
-        return pathMatchContext.pathToFactory.add(path.toStdString(), std::move(factoryFunc));
+        return pathMatchContext.pathToFactory.add(path.toUtf8(), std::move(factoryFunc));
     }
 
     template<typename RequestHandlerType>
@@ -182,9 +182,9 @@ private:
         const PathMatchContext& pathMatchContext,
         const QString& path) const
     {
-        std::vector<std::string> pathParams;
+        std::vector<StringType> pathParams;
         boost::optional<const FactoryFunc&> factory =
-            pathMatchContext.pathToFactory.match(path.toStdString(), &pathParams);
+            pathMatchContext.pathToFactory.match(path.toUtf8(), &pathParams);
         if (factory)
         {
             auto handler = (*factory)();

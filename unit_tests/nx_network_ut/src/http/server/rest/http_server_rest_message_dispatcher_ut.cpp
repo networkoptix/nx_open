@@ -15,18 +15,18 @@ class HttpServerRestMessageDispatcher:
     public HttpServerBasicMessageDispatcher<rest::MessageDispatcher>
 {
 protected:
-    void givenRegisteredHandler(const std::string& pathTemplate)
+    void givenRegisteredHandler(const nx_http::StringType& pathTemplate)
     {
         registerHandler(pathTemplate);
     }
 
-    void whenSentRequest(const std::string& requestPath)
+    void whenSentRequest(const nx_http::StringType& requestPath)
     {
         assertRequestIsDispatched(requestPath, nx_http::Method::GET);
     }
 
     void thenParametersHaveBeenPassedToTheHandler(
-        const std::vector<std::string>& expectedParams)
+        const std::vector<nx_http::StringType>& expectedParams)
     {
         ASSERT_EQ(expectedParams, issuedRequest().requestPathParams);
     }

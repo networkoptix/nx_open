@@ -52,7 +52,7 @@ public:
         nx::utils::stree::ResourceContainer&& authInfo,
         ResponseIsReadyHandler completionHandler);
 
-    void setRequestPathParams(std::vector<std::string> params);
+    void setRequestPathParams(std::vector<StringType> params);
     /**
      * Parameters parsed from URL path. 
      * E.g., given http handler registered on path /account/%1/systems.

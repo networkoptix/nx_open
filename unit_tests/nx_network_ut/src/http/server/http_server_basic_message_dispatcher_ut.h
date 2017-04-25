@@ -14,8 +14,8 @@ namespace detail {
 
 struct RequestContext
 {
-    std::string pathTemplate;
-    std::vector<std::string> requestPathParams;
+    nx_http::StringType pathTemplate;
+    std::vector<nx_http::StringType> requestPathParams;
 };
 
 class DummyHandler:
@@ -23,7 +23,7 @@ class DummyHandler:
 {
 public:
     DummyHandler(
-        const std::string& pathTemplate,
+        const nx_http::StringType& pathTemplate,
         std::deque<RequestContext>* requests)
         :
         m_pathTemplate(pathTemplate),
@@ -42,7 +42,7 @@ public:
     }
 
 private:
-    std::string m_pathTemplate;
+    nx_http::StringType m_pathTemplate;
     std::deque<RequestContext>* m_requests;
 };
 
@@ -58,10 +58,10 @@ class HttpServerBasicMessageDispatcher:
     public ::testing::Test
 {
 protected:
-    void registerHandler(const std::string& path, nx_http::StringType method = kAnyMethod)
+    void registerHandler(const nx_http::StringType& path, nx_http::StringType method = kAnyMethod)
     {
         m_messageDispatcher.template registerRequestProcessor<detail::DummyHandler>(
-            QString::fromStdString(path),
+            path,
             std::bind(&HttpServerBasicMessageDispatcher::handlerFactoryFunc, this, path),
             method);
     }
@@ -74,7 +74,7 @@ protected:
     }
 
     void assertHandlerIsFound(
-        const std::string& path,
+        const nx_http::StringType& path,
         nx_http::StringType method = nx_http::Method::GET)
     {
         assertRequestIsDispatched(path, method);
@@ -83,7 +83,7 @@ protected:
     }
 
     void assertHandlerNotFound(
-        const std::string& path,
+        const nx_http::StringType& path,
         nx_http::StringType method = nx_http::Method::GET)
     {
         ASSERT_FALSE(
@@ -95,7 +95,7 @@ protected:
     }
 
     void assertDefaultHandlerFound(
-        const std::string& path,
+        const nx_http::StringType& path,
         nx_http::StringType method = nx_http::Method::GET)
     {
         assertRequestIsDispatched(path, method);
@@ -104,7 +104,7 @@ protected:
     }
 
     void assertRequestIsDispatched(
-        const std::string& path,
+        const nx_http::StringType& path,
         nx_http::StringType method)
     {
         ASSERT_TRUE(
@@ -126,7 +126,8 @@ private:
     MessageDispatcherType m_messageDispatcher;
     std::deque<detail::RequestContext> m_dispatchedPathQueue;
 
-    std::unique_ptr<detail::DummyHandler> handlerFactoryFunc(const std::string& path)
+    std::unique_ptr<detail::DummyHandler> handlerFactoryFunc(
+        const nx_http::StringType& path)
     {
         return std::make_unique<detail::DummyHandler>(
             path, &m_dispatchedPathQueue);
@@ -134,13 +135,13 @@ private:
 
     nx_http::Message prepareDummyMessage(
         const nx_http::StringType& method,
-        const std::string& path)
+        const nx_http::StringType& path)
     {
         nx_http::Message message(nx_http::MessageType::request);
         message.request->requestLine.method = method;
         message.request->requestLine.version = nx_http::http_1_1;
         message.request->requestLine.url =
-            QUrl(QString("http://127.0.0.1:7001%1").arg(path.c_str()));
+            QUrl(QString("http://127.0.0.1:7001%1").arg(QString::fromUtf8(path)));
         return message;
     }
 };
