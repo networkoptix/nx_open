@@ -48,4 +48,4 @@ QnUuid QnBusinessEventParameters::getParamsHash() const {
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (QnEventMetaData)(QnBusinessEventParameters), (ubjson)(json)(eq)(xml)(csv_record), _Fields, (lazy, true))
+    (QnEventMetaData)(QnBusinessEventParameters), (ubjson)(json)(eq)(xml)(csv_record), _Fields, (brief, true))
