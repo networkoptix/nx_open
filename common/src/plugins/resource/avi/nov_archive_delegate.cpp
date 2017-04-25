@@ -11,7 +11,7 @@ QnNovArchiveDelegate::QnNovArchiveDelegate():
 
 }
 
-void QnNovArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
+void QnNovArchiveDelegate::onReverseMode(qint64 /*displayTime*/, bool value)
 {
     m_reverseMode = value;
 }
