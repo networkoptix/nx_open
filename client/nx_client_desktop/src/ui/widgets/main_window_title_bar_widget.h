@@ -38,12 +38,12 @@ protected:
 
 private:
     QnToolButton* newActionButton(
-        QnActions::IDType actionId,
+        nx::client::desktop::ui::action::IDType actionId,
         int helpTopicId = Qn::Empty_Help,
         const QSize& fixedSize = QSize());
 
     QnToolButton* newActionButton(
-        QnActions::IDType actionId,
+        nx::client::desktop::ui::action::IDType actionId,
         const QSize& fixedSize = QSize());
 
 private:

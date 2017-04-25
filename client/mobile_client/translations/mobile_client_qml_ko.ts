@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Press Ctrl + Arrow or use mouse wheel</source>
-        <translation>Ctrl + 화살표를 누르거나 마우스 휠을 사용 하 여</translation>
+        <translation>Ctrl + 화살표를 누르거나 마우스 휠을 사용 하십시요</translation>
     </message>
     <message>
         <source>Authentication required</source>

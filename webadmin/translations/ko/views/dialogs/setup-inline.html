@@ -399,7 +399,7 @@
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnServer')">
     <h2>서버를 인터넷에 연결</h2>
     <p class="master-description">
-        {{Config.cloud.productName}}을 사용하여 어디서든 접속하려면 인터넷을 설정하세요.
+        {{Config.cloud.productName}}을 사용하여 어디서든 <br> 접속하려면 인터넷을 설정하세요.
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">재시도</button>         <button class="btn btn-default" ng-click="skip()">로컬 시스템 설치</button>
@@ -445,7 +445,7 @@
 
 <div class="panel-footer lite-client-instruction" ng-if="settings.liteClient && stepIs('start')">
     <p>
-        다음 방법중 하나를 사용하여 다른 컴퓨터에서 이 장비에 접속을 할 수 있습니다.
+        다음 방법중 하나를 사용하여 다른 컴퓨터에서 <br>이 장비에 접속을 할 수 있습니다.
     </p>
     <div class="row">
         <div class="col-xs-6">

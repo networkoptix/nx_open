@@ -21,7 +21,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/videowall_resource.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
@@ -44,6 +44,8 @@
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/linear_combination.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -360,15 +362,15 @@ void QnVideowallItemWidget::dragLeaveEvent(QGraphicsSceneDragDropEvent *event)
 
 void QnVideowallItemWidget::dropEvent(QGraphicsSceneDragDropEvent *event)
 {
-    QnActionParameters parameters;
+    action::Parameters parameters;
     if (!m_dragged.videoWallItems.isEmpty())
-        parameters = QnActionParameters(m_dragged.videoWallItems);
+        parameters = m_dragged.videoWallItems;
     else
-        parameters = QnActionParameters(m_dragged.resources);
+        parameters = m_dragged.resources;
     parameters.setArgument(Qn::VideoWallItemGuidRole, m_itemUuid);
     parameters.setArgument(Qn::KeyboardModifiersRole, event->modifiers());
 
-    menu()->trigger(QnActions::DropOnVideoWallItemAction, parameters);
+    menu()->trigger(action::DropOnVideoWallItemAction, parameters);
 
     event->acceptProposedAction();
 }
@@ -422,8 +424,7 @@ void QnVideowallItemWidget::clickedNotify(QGraphicsSceneMouseEvent *event)
     if (event->button() != Qt::RightButton)
         return;
 
-    QScopedPointer<QMenu> popupMenu(menu()->newMenu(Qn::SceneScope, nullptr,
-        QnActionParameters(m_indices)));
+    QScopedPointer<QMenu> popupMenu(menu()->newMenu(action::SceneScope, nullptr, m_indices));
 
     if (popupMenu->isEmpty())
         return;
@@ -446,10 +447,7 @@ void QnVideowallItemWidget::at_doubleClicked(Qt::MouseButton button)
     if (button != Qt::LeftButton)
         return;
 
-    menu()->triggerIfPossible(
-        QnActions::StartVideoWallControlAction,
-        QnActionParameters(m_indices)
-    );
+    menu()->triggerIfPossible(action::StartVideoWallControlAction, m_indices);
 }
 
 void QnVideowallItemWidget::updateLayout()

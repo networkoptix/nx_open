@@ -3159,22 +3159,30 @@ QSize QnNxStyle::sizeFromContents(
 
         case CT_PushButton:
         {
-            QSize result(size.width(), qMax(size.height(), Metrics::kButtonHeight));
-            result.rwidth() += pixelMetric(PM_ButtonMargin, option, widget) * 2;
-
             bool hasIcon = false;
+            bool hasText = false;
             if (auto button = qstyleoption_cast<const QStyleOptionButton*>(option))
             {
                 hasIcon = !button->icon.isNull();
+                hasText = !button->text.isEmpty();
+            }
+
+            const bool textButton = QnNxStylePrivate::isTextButton(option);
+
+            QSize result(size.width(), qMax(size.height(), Metrics::kButtonHeight));
+            if (hasText)
+            {
+                result.rwidth() += pixelMetric(PM_ButtonMargin, option, widget) * 2;
                 if (hasIcon)
                     result.rwidth() -= 4; // Compensate for QPushButton::sizeHint magic
             }
 
-            const bool textButton = QnNxStylePrivate::isTextButton(option);
             if (textButton)
                 result.rwidth() += (hasIcon ? Metrics::kTextButtonIconMargin : 0);
-            else
+            else if (hasText)
                 result.rwidth() = qMax(result.rwidth(), Metrics::kMinimumButtonWidth);
+            else // Make button at least square
+                result.rwidth() = qMax(result.rwidth(), result.rheight());
 
             if (QnNxStylePrivate::isCheckableButton(option))
             {
@@ -3393,8 +3401,14 @@ int QnNxStyle::pixelMetric(
 
             if (auto button = qstyleoption_cast<const QStyleOptionButton*>(option))
             {
-                if (!button->icon.isNull())
-                    return Metrics::kPushButtonIconMargin * 2;
+                const bool hasText = !button->text.isEmpty();
+                const bool hasIcon = !button->icon.isNull();
+                if (hasIcon)
+                {
+                    return hasText
+                        ? Metrics::kPushButtonIconMargin * 2
+                        : Metrics::kPushButtonIconOnlyMargin * 2;
+                }
             }
 
             if (widget)

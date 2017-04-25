@@ -6,7 +6,7 @@
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui"/>
         <source>About</source>
-        <translation>について</translation>
+        <translation>本製品について</translation>
     </message>
     <message>
         <location/>
@@ -1165,7 +1165,7 @@
     <message>
         <location/>
         <source>First Source</source>
-        <translation>最初のソース</translation>
+        <translation>入力１</translation>
     </message>
     <message>
         <location/>
@@ -1175,12 +1175,12 @@
     <message>
         <location/>
         <source>Second Source</source>
-        <translation>2 番目のソース</translation>
+        <translation>入力2</translation>
     </message>
     <message>
         <location/>
         <source>Run Application when PC Boots up</source>
-        <translation>PC が起動するときにアプリケーションを実行</translation>
+        <translation>PC が起動時にアプリケーション起動</translation>
     </message>
 </context>
 <context>
@@ -1632,7 +1632,7 @@
     <message>
         <location/>
         <source>Show additional info in tree</source>
-        <translation>追加情報をツリーに表示</translation>
+        <translation>リソースツリーにIP表示</translation>
     </message>
     <message>
         <location/>

@@ -54,7 +54,7 @@
 #include <nx/audio/audiodevice.h>
 #include <nx/utils/crash_dump/systemexcept.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/help/help_handler.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>
@@ -205,7 +205,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     const bool instantlyMaximize = !startupParams.fullScreenDisabled && qnRuntime->isDesktopMode();
 
     if (instantlyMaximize)
-        context->action(QnActions::EffectiveMaximizeAction)->trigger();
+        context->action(ui::action::EffectiveMaximizeAction)->trigger();
     else
         mainWindow->updateDecorationsState();
 

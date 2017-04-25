@@ -23,8 +23,8 @@ QnWorkbenchSynchronizer::QnWorkbenchSynchronizer(QObject *parent):
         delete workbench()->layouts().back();
 
     /* Start listening to changes. */
-    connect(resourcePool(),      &QnResourcePool::resourceRemoved,  this,   &QnWorkbenchSynchronizer::at_resourcePool_resourceRemoved);
-    connect(workbench(),    &QnWorkbench::layoutsChanged,      this,   &QnWorkbenchSynchronizer::at_workbench_layoutsChanged);
+    connect(workbench(), &QnWorkbench::layoutsChanged, this,
+        &QnWorkbenchSynchronizer::at_workbench_layoutsChanged);
 
     m_submit = m_update = true;
 }
@@ -73,26 +73,6 @@ void QnWorkbenchSynchronizer::submit()
             resourcePool()->addResource(resource);
         }
     }
-}
-
-
-// -------------------------------------------------------------------------- //
-// Handlers
-// -------------------------------------------------------------------------- //
-void QnWorkbenchSynchronizer::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
-    if(!m_update)
-        return;
-
-    QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
-
-    QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
-    if(!layoutResource)
-        return;
-
-    /* Layout was removed, we need to remove it from the workbench too. */
-    QnWorkbenchLayout *layout = QnWorkbenchLayout::instance(layoutResource);
-    if(layout != NULL)
-        delete layout;
 }
 
 void QnWorkbenchSynchronizer::at_workbench_layoutsChanged() {

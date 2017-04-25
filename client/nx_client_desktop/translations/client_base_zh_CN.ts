@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_CN" sourcelanguage="en">
+<TS version="2.1" language="zh-CN" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -268,6 +268,33 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+        <source>Zoom In</source>
+        <translation>放大</translation>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation>缩小</translation>
+    </message>
+    <message>
+        <source>Focus Far</source>
+        <translation>远焦</translation>
+    </message>
+    <message>
+        <source>Focus Near</source>
+        <translation>近焦</translation>
+    </message>
+    <message>
+        <source>Auto Focus</source>
+        <translation>自动对焦</translation>
+    </message>
+    <message>
+        <source>Change Dewarping Mode</source>
+        <translation>图像矫正模式</translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>Parameter 1 is null.</source>
@@ -313,7 +340,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>%1 version %2 (%3).</source>
-        <translation>版本 %1  %2 (%3).</translation>
+        <translation>版本 %1 %2 (%3).</translation>
     </message>
     <message>
         <source>Built for %1-%2 with %3.</source>
@@ -1723,13 +1750,13 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>%1 of %n devices</source>
         <translation>
-            <numerusform> %n 设备的 %1</numerusform>
+            <numerusform>%n 设备的 %1</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%1 of %n cameras</source>
         <translation>
-            <numerusform> %n 摄像机的 %1</numerusform>
+            <numerusform>%n 摄像机的 %1</numerusform>
         </translation>
     </message>
     <message>
@@ -2864,7 +2891,7 @@ to %1</source>
     </message>
     <message>
         <source>Please close %1 and start it again using the shortcut in the start menu.</source>
-        <translation>请关闭应用程序并重新打开.</translation>
+        <translation>请关闭%1, 应用程序并重新打开.</translation>
     </message>
     <message>
         <source>You have to download another version of %1 to connect to this Server.</source>
@@ -2897,7 +2924,7 @@ to %1</source>
     <message>
         <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation>连接错误。请检查您的互联网连接或稍后再试。</translation>
+        <translation>连接错误%1。请检查您的互联网连接或稍后再试。</translation>
     </message>
     <message>
         <source>Connection to Server could not be established.</source>
@@ -5869,79 +5896,79 @@ to %1</source>
     </message>
     <message>
         <source>Apply changes to start backup.</source>
-        <translation type="unfinished">Apply changes to start backup.</translation>
+        <translation>应用更改来启动备份。</translation>
     </message>
     <message>
         <source>in %1</source>
-        <translation type="unfinished">in %1</translation>
+        <translation>在 %1</translation>
     </message>
     <message>
         <source>%1 before now</source>
-        <translation type="unfinished">%1 before now</translation>
+        <translation>%1 以前</translation>
     </message>
     <message>
         <source>Realtime backup is active...</source>
-        <translation type="unfinished">Realtime backup is active...</translation>
+        <translation>实时备份運行中...</translation>
     </message>
     <message>
         <source>Realtime backup is set up.</source>
-        <translation type="unfinished">Realtime backup is set up.</translation>
+        <translation>实时备份已设置。</translation>
     </message>
     <message>
         <source>There is no backup yet.</source>
-        <translation type="unfinished">There is no backup yet.</translation>
+        <translation>目前还没有备份。</translation>
     </message>
     <message>
         <source>Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="unfinished">Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</translation>
+        <translation>档案备份被完成 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="unfinished">Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</translation>
+        <translation>下一次备份被定于 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Next backup is not scheduled.</source>
-        <translation type="unfinished">Next backup is not scheduled.</translation>
+        <translation>未预定下一次备份。</translation>
     </message>
     <message>
         <source>Depending on the total size of the archive, reindexing can take up to several hours.</source>
-        <translation type="unfinished">Depending on the total size of the archive, reindexing can take up to several hours.</translation>
+        <translation>根据归档文件的总大小，重建索引可以占用到几个小时。</translation>
     </message>
     <message>
         <source>Reindexing is only necessary if your archive folders have been moved, renamed or deleted.</source>
-        <translation type="unfinished">Reindexing is only necessary if your archive folders have been moved, renamed or deleted.</translation>
+        <translation>如果移动、 重命名或删除你的存档文件夹，重新索引是必要的。</translation>
     </message>
     <message>
         <source>You can cancel this operation at any moment without data loss.</source>
-        <translation type="unfinished">You can cancel this operation at any moment without data loss.</translation>
+        <translation>您可以取消此操作，在任何时刻而没有数据丢失。</translation>
     </message>
     <message>
         <source>Continue anyway?</source>
-        <translation type="unfinished">Continue anyway?</translation>
+        <translation>是否继续？</translation>
     </message>
     <message>
         <source>Hard disk load will increase significantly</source>
-        <translation type="unfinished">Hard disk load will increase significantly</translation>
+        <translation>硬磁盘负载会显著增加</translation>
     </message>
     <message>
         <source>Select at least one device in the Backup Settings to start backup.</source>
-        <translation type="unfinished">Select at least one device in the Backup Settings to start backup.</translation>
+        <translation>要开始备份的备份设置中选择至少一个设备。</translation>
     </message>
     <message>
         <source>Select at least one camera in the Backup Settings to start backup.</source>
-        <translation type="unfinished">Select at least one camera in the Backup Settings to start backup.</translation>
+        <translation>要开始备份的备份设置中选择至少一个相机。</translation>
     </message>
     <message>
         <source>Archive reindexing completed</source>
-        <translation type="unfinished">Archive reindexing completed</translation>
+        <translation>档案重新索引已完成</translation>
     </message>
     <message>
         <source>Backup reindexing completed</source>
-        <translation type="unfinished">Backup reindexing completed</translation>
+        <translation>重建索引已完成的备份</translation>
     </message>
     <message>
         <source>Backup completed</source>
-        <translation type="unfinished">Backup completed</translation>
+        <translation>备份已完成。</translation>
     </message>
 </context>
 <context>
@@ -5991,19 +6018,19 @@ to %1</source>
     <name>QnStorageRebuildWidget</name>
     <message>
         <source>Fast Backup Scan...</source>
-        <translation type="unfinished">Fast Backup Scan...</translation>
+        <translation>快速备份扫描......</translation>
     </message>
     <message>
         <source>Fast Archive Scan...</source>
-        <translation type="unfinished">Fast Archive Scan...</translation>
+        <translation>快速存档扫描......</translation>
     </message>
     <message>
         <source>Reindexing Backup...</source>
-        <translation type="unfinished">Reindexing Backup...</translation>
+        <translation>重建索引备份...</translation>
     </message>
     <message>
         <source>Reindexing Archive...</source>
-        <translation type="unfinished">Reindexing Archive...</translation>
+        <translation>重建索引存档...</translation>
     </message>
 </context>
 <context>
@@ -6018,27 +6045,27 @@ to %1</source>
     </message>
     <message>
         <source>Invalid credentials for external storage</source>
-        <translation type="unfinished">Invalid credentials for external storage</translation>
+        <translation>外部存储的凭据无效</translation>
     </message>
     <message>
         <source>Invalid storage path</source>
-        <translation type="unfinished">Invalid storage path</translation>
+        <translation>无效的存储路径</translation>
     </message>
     <message>
         <source>Add this storage anyway?</source>
-        <translation type="unfinished">Add this storage anyway?</translation>
+        <translation>添加此存储吗？</translation>
     </message>
     <message>
         <source>Storage path used by another server</source>
-        <translation type="unfinished">Storage path used by another server</translation>
+        <translation>存储路径被用在另一台服务器</translation>
     </message>
     <message>
         <source>Add Storage</source>
-        <translation type="unfinished">Add Storage</translation>
+        <translation>添加存储设备</translation>
     </message>
     <message>
         <source>It is not recommended to use one recording location for different servers.</source>
-        <translation type="unfinished">It is not recommended to use one recording location for different servers.</translation>
+        <translation>不推荐一个录制位置用于不同的服务器。</translation>
     </message>
 </context>
 <context>
@@ -6558,20 +6585,20 @@ to %1</source>
     </message>
     <message>
         <source>Users will have no permissions unless changed later.</source>
-        <translation type="unfinished">Users will have no permissions unless changed later.</translation>
+        <translation>用户将没有任何权限，除非做更改。</translation>
     </message>
     <message>
         <source>Assign a new role</source>
-        <translation type="unfinished">Assign a new role</translation>
+        <translation>分配一个新的角色</translation>
     </message>
     <message>
         <source>Delete such users</source>
-        <translation type="unfinished">Delete such users</translation>
+        <translation>删除这用户</translation>
     </message>
     <message numerus="yes">
         <source>Please select an action to perform on %n users with this role</source>
-        <translation type="unfinished">
-            <numerusform>Please select an action to perform on %n users with this role</numerusform>
+        <translation>
+            <numerusform>请选择要对 %n 具有此角色的用户执行的操作</numerusform>
         </translation>
     </message>
 </context>
@@ -6579,7 +6606,7 @@ to %1</source>
     <name>QnUserRolesDialog</name>
     <message>
         <source>Role Info</source>
-        <translation type="unfinished">Role Info</translation>
+        <translation>角色信息</translation>
     </message>
     <message>
         <source>Permissions</source>
@@ -6587,7 +6614,7 @@ to %1</source>
     </message>
     <message>
         <source>Cameras &amp;&amp; Resources</source>
-        <translation type="unfinished">Cameras &amp;&amp; Resources</translation>
+        <translation>摄像机与资源</translation>
     </message>
     <message>
         <source>Layouts</source>
@@ -6595,18 +6622,18 @@ to %1</source>
     </message>
     <message>
         <source>New Role</source>
-        <translation type="unfinished">New Role</translation>
+        <translation>新角色</translation>
     </message>
     <message>
         <source>New Role %1</source>
-        <translation type="unfinished">New Role %1</translation>
+        <translation>新角色 %1</translation>
     </message>
 </context>
 <context>
     <name>QnUserSettingsDialog</name>
     <message>
         <source>User Information</source>
-        <translation type="unfinished">User Information</translation>
+        <translation>用户资讯</translation>
     </message>
     <message>
         <source>Permissions</source>
@@ -6614,7 +6641,7 @@ to %1</source>
     </message>
     <message>
         <source>Cameras &amp;&amp; Resources</source>
-        <translation type="unfinished">Cameras &amp;&amp; Resources</translation>
+        <translation>摄像机与资源</translation>
     </message>
     <message>
         <source>Layouts</source>
@@ -6622,7 +6649,7 @@ to %1</source>
     </message>
     <message>
         <source>Send Invite</source>
-        <translation type="unfinished">Send Invite</translation>
+        <translation>发送邀请</translation>
     </message>
     <message>
         <source>New User...</source>
@@ -6630,11 +6657,11 @@ to %1</source>
     </message>
     <message>
         <source>User Settings - %1 (readonly)</source>
-        <translation type="unfinished">User Settings - %1 (readonly)</translation>
+        <translation>用户设置-%1 (只读)</translation>
     </message>
     <message>
         <source>User Settings - %1</source>
-        <translation type="unfinished">User Settings - %1</translation>
+        <translation>用户设置-%1</translation>
     </message>
     <message>
         <source>Enabled</source>
@@ -6642,22 +6669,22 @@ to %1</source>
     </message>
     <message>
         <source>User is disabled</source>
-        <translation type="unfinished">User is disabled</translation>
+        <translation>用户已被禁用</translation>
     </message>
     <message>
         <source>Apply changes before switching to another user?</source>
-        <translation type="unfinished">Apply changes before switching to another user?</translation>
+        <translation>在切换到另一个用户之前应用更改吗？</translation>
     </message>
 </context>
 <context>
     <name>QnUserSettingsWidget</name>
     <message>
         <source>Local</source>
-        <translation type="unfinished">Local</translation>
+        <translation>本地</translation>
     </message>
     <message>
         <source>Cloud</source>
-        <translation type="unfinished">Cloud</translation>
+        <translation>云</translation>
     </message>
     <message>
         <source>Login</source>
@@ -6665,15 +6692,15 @@ to %1</source>
     </message>
     <message>
         <source>Login cannot be empty.</source>
-        <translation type="unfinished">Login cannot be empty.</translation>
+        <translation>登录名不能为空。</translation>
     </message>
     <message>
         <source>User with specified login already exists.</source>
-        <translation type="unfinished">User with specified login already exists.</translation>
+        <translation>指定登录的用户已经存在。</translation>
     </message>
     <message>
         <source>User has been renamed. Password must be updated.</source>
-        <translation type="unfinished">User has been renamed. Password must be updated.</translation>
+        <translation>用户已被重命名。必须更新密码。</translation>
     </message>
     <message>
         <source>Name</source>
@@ -6685,7 +6712,7 @@ to %1</source>
     </message>
     <message>
         <source>Email cannot be empty.</source>
-        <translation type="unfinished">Email cannot be empty.</translation>
+        <translation>电子邮件不能为空。</translation>
     </message>
     <message>
         <source>Password</source>
@@ -6701,14 +6728,14 @@ to %1</source>
     </message>
     <message>
         <source>Cloud user with specified Email already exists.</source>
-        <translation type="unfinished">Cloud user with specified Email already exists.</translation>
+        <translation>拥有指定的电子邮件云用户已存在。</translation>
     </message>
 </context>
 <context>
     <name>QnValidatorStrings</name>
     <message>
         <source>Email cannot be empty.</source>
-        <translation type="unfinished">Email cannot be empty.</translation>
+        <translation>电子邮件不能为空。</translation>
     </message>
     <message>
         <source>Email is not valid.</source>
@@ -6720,7 +6747,7 @@ to %1</source>
     </message>
     <message>
         <source>Avoid leading and trailing spaces.</source>
-        <translation type="unfinished">Avoid leading and trailing spaces.</translation>
+        <translation>避免前导和尾随空格。</translation>
     </message>
 </context>
 <context>
@@ -6739,28 +6766,28 @@ to %1</source>
     </message>
     <message>
         <source>Display %1</source>
-        <translation type="unfinished">Display %1</translation>
+        <translation>显示器 %1</translation>
     </message>
     <message>
         <source>Delete &quot;%1&quot;?</source>
-        <translation type="unfinished">Delete &quot;%1&quot;?</translation>
+        <translation>删除&quot;%1&quot;？</translation>
     </message>
 </context>
 <context>
     <name>QnVideowallScreenWidget</name>
     <message>
         <source>PC %1</source>
-        <translation type="unfinished">PC %1</translation>
+        <translation>PC %1</translation>
     </message>
     <message>
         <source>PC %1 - Display %2</source>
-        <translation type="unfinished">PC %1 - Display %2</translation>
+        <translation>PC %1-显示 %2</translation>
     </message>
     <message numerus="yes">
         <source>PC %1 - Displays %2</source>
         <comment>%2 will be substituted by _list_ of displays</comment>
-        <translation type="unfinished">
-            <numerusform>PC %1 - Displays %2</numerusform>
+        <translation>
+            <numerusform>PC %1-显示 %2</numerusform>
         </translation>
     </message>
 </context>
@@ -6775,7 +6802,7 @@ to %1</source>
     <name>QnWebResourceWidget</name>
     <message>
         <source>Fullscreen mode</source>
-        <translation type="unfinished">Fullscreen mode</translation>
+        <translation>全屏模式</translation>
     </message>
 </context>
 <context>
@@ -6844,11 +6871,11 @@ to %1</source>
     </message>
     <message>
         <source>Confirm files deleting</source>
-        <translation type="unfinished">Confirm files deleting</translation>
+        <translation>确认文件删除</translation>
     </message>
     <message>
         <source>Client</source>
-        <translation type="unfinished">Client</translation>
+        <translation>客户端</translation>
     </message>
     <message>
         <source>Server</source>
@@ -6856,20 +6883,20 @@ to %1</source>
     </message>
     <message numerus="yes">
         <source>Failed to move %n devices</source>
-        <translation type="unfinished">
-            <numerusform>Failed to move %n devices</numerusform>
+        <translation>
+            <numerusform>移动 %n 设备失败</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Failed to move %n cameras</source>
-        <translation type="unfinished">
-            <numerusform>Failed to move %n cameras</numerusform>
+        <translation>
+            <numerusform>移动 %n 相机失败</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Failed to move %n I/O Modules</source>
-        <translation type="unfinished">
-            <numerusform>Failed to move %n I/O Modules</numerusform>
+        <translation>
+            <numerusform>移动 %n I/O 模块失败</numerusform>
         </translation>
     </message>
     <message>
@@ -7206,27 +7233,27 @@ to %1</source>
     </message>
     <message>
         <source>Systems will be merged shortly</source>
-        <translation type="unfinished">Systems will be merged shortly</translation>
+        <translation>系统将于短期内合并</translation>
     </message>
     <message>
         <source>Servers from the other System will appear in the resource tree.</source>
-        <translation type="unfinished">Servers from the other System will appear in the resource tree.</translation>
+        <translation>来自其他系统的服务器将显示在资源树中。</translation>
     </message>
     <message>
         <source>Failed to merge Systems</source>
-        <translation>无法联网系统</translation>
+        <translation>无法合并系统</translation>
     </message>
     <message>
         <source>Failed to update Server</source>
-        <translation type="unfinished">Failed to update Server</translation>
+        <translation>更新服务器失败</translation>
     </message>
     <message>
         <source>Total amount of licenses will decrease</source>
-        <translation type="unfinished">Total amount of licenses will decrease</translation>
+        <translation>授权的总量将减少</translation>
     </message>
     <message>
         <source>Server connected to System</source>
-        <translation type="unfinished">Server connected to System</translation>
+        <translation>服务器连接到系统</translation>
     </message>
     <message>
         <source>Password cannot be empty.</source>
@@ -7234,7 +7261,7 @@ to %1</source>
     </message>
     <message>
         <source>Cloud Systems cannot be merged</source>
-        <translation type="unfinished">Cloud Systems cannot be merged</translation>
+        <translation>云系统不能合并</translation>
     </message>
 </context>
 <context>
@@ -7264,37 +7291,37 @@ to %1</source>
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message numerus="yes">
         <source>The following %n items are not saved:</source>
-        <translation type="unfinished">
-            <numerusform>The following %n items are not saved:</numerusform>
+        <translation>
+            <numerusform>以下%n 项未保存.</numerusform>
         </translation>
     </message>
     <message>
         <source>Changing System configuration not allowed in Safe Mode</source>
-        <translation type="unfinished">Changing System configuration not allowed in Safe Mode</translation>
+        <translation>更改系统配置不允许在安全模式下</translation>
     </message>
     <message>
         <source>Failed to save changes</source>
-        <translation type="unfinished">Failed to save changes</translation>
+        <translation>无法保存更改</translation>
     </message>
     <message numerus="yes">
         <source>The following %n items are not deleted:</source>
-        <translation type="unfinished">
-            <numerusform>The following %n items are not deleted:</numerusform>
+        <translation>
+            <numerusform>以下 %n项未删除.</numerusform>
         </translation>
     </message>
     <message>
         <source>Deleting objects not allowed in Safe Mode</source>
-        <translation type="unfinished">Deleting objects not allowed in Safe Mode</translation>
+        <translation>不允许在安全模式下删除对象</translation>
     </message>
     <message numerus="yes">
         <source>Failed to delete %n items:</source>
-        <translation type="unfinished">
-            <numerusform>Failed to delete %n items:</numerusform>
+        <translation>
+            <numerusform>未能删除 %n 项目︰</numerusform>
         </translation>
     </message>
     <message>
         <source>System is in Safe Mode. It is not allowed to make any changes except license activation.</source>
-        <translation type="unfinished">System is in Safe Mode. It is not allowed to make any changes except license activation.</translation>
+        <translation>系统在安全模式下。不允许进行任何除了更改授权激活外。</translation>
     </message>
 </context>
 <context>
@@ -7308,27 +7335,27 @@ to %1</source>
     <name>QnWorkbenchScreenRecordingHandler</name>
     <message>
         <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-        <translation type="unfinished">Screen capturing subsystem is not initialized yet. Please try again later.</translation>
+        <translation>屏幕捕捉子系统尚未初始化。请稍后再试。</translation>
     </message>
     <message>
         <source>Recording in %1...</source>
-        <translation type="unfinished">Recording in %1...</translation>
+        <translation>%1 后开始录像...</translation>
     </message>
     <message>
         <source>Recorded Video</source>
-        <translation type="unfinished">Recorded Video</translation>
+        <translation>录像视频</translation>
     </message>
     <message>
         <source>Save Recording As...</source>
-        <translation type="unfinished">Save Recording As...</translation>
+        <translation>录像保存为...</translation>
     </message>
     <message>
         <source>AVI (Audio/Video Interleaved) (*.avi)</source>
-        <translation type="unfinished">AVI (Audio/Video Interleaved) (*.avi)</translation>
+        <translation>AVI (音频/视频交错) (*.avi)</translation>
     </message>
     <message>
         <source>Failed to start recording</source>
-        <translation type="unfinished">Failed to start recording</translation>
+        <translation>开始录制视频失败</translation>
     </message>
 </context>
 <context>
@@ -7379,11 +7406,11 @@ to %1</source>
     </message>
     <message>
         <source>Failed to save screenshot</source>
-        <translation type="unfinished">Failed to save screenshot</translation>
+        <translation>未能保存截图</translation>
     </message>
     <message>
         <source>Failed to take screenshot</source>
-        <translation type="unfinished">Failed to take screenshot</translation>
+        <translation>未能采取截图</translation>
     </message>
 </context>
 <context>
@@ -7394,11 +7421,11 @@ to %1</source>
     </message>
     <message>
         <source>%1 version available</source>
-        <translation type="unfinished">%1 version available</translation>
+        <translation>%1 版本可用</translation>
     </message>
     <message>
         <source>Major issues have been fixed. Update is strongly recommended.</source>
-        <translation type="unfinished">Major issues have been fixed. Update is strongly recommended.</translation>
+        <translation>主要问题已得到修复。强烈建议更新。</translation>
     </message>
     <message>
         <source>Update...</source>
@@ -7406,7 +7433,7 @@ to %1</source>
     </message>
     <message>
         <source>Do not notify again about this update</source>
-        <translation type="unfinished">Do not notify again about this update</translation>
+        <translation>不再提醒此更新.</translation>
     </message>
 </context>
 <context>
@@ -7429,33 +7456,33 @@ to %1</source>
     </message>
     <message>
         <source>Video Wall license required</source>
-        <translation type="unfinished">Video Wall license required</translation>
+        <translation>所需的视频墙授权</translation>
     </message>
     <message>
         <source>To enable this feature, please activate a Video Wall license.</source>
-        <translation type="unfinished">To enable this feature, please activate a Video Wall license.</translation>
+        <translation>若要启用此功能，请激活视频墙授权。</translation>
     </message>
     <message>
         <source>Failed to apply changes</source>
-        <translation type="unfinished">Failed to apply changes</translation>
+        <translation>应用更改失败</translation>
     </message>
     <message>
         <source>To enable Video Wall, please activate a Video Wall license.</source>
-        <translation type="unfinished">To enable Video Wall, please activate a Video Wall license.</translation>
+        <translation>若要启用视频墙，请激活视频墙授权。</translation>
     </message>
     <message numerus="yes">
         <source>Delete %n items?</source>
-        <translation type="unfinished">
-            <numerusform>Delete %n items?</numerusform>
+        <translation>
+            <numerusform>删除 %n 项目吗？</numerusform>
         </translation>
     </message>
     <message>
         <source>Stop Video Wall?</source>
-        <translation type="unfinished">Stop Video Wall?</translation>
+        <translation>停止视频墙吗？</translation>
     </message>
     <message>
         <source>To start it again, you should have physical access to its computer.</source>
-        <translation type="unfinished">To start it again, you should have physical access to its computer.</translation>
+        <translation>要再次启动它，您应该直接访问其计算机。</translation>
     </message>
     <message>
         <source>Stop</source>
@@ -7463,37 +7490,37 @@ to %1</source>
     </message>
     <message numerus="yes">
         <source>Delete %n matrices?</source>
-        <translation type="unfinished">
-            <numerusform>Delete %n matrices?</numerusform>
+        <translation>
+            <numerusform>删除 %n 矩阵？</numerusform>
         </translation>
     </message>
     <message>
         <source>More Video Wall licenses required</source>
-        <translation type="unfinished">More Video Wall licenses required</translation>
+        <translation>更多所需的视频墙授权</translation>
     </message>
     <message>
         <source>Control session cannot be started.</source>
-        <translation type="unfinished">Control session cannot be started.</translation>
+        <translation>不能启动控制会话。</translation>
     </message>
     <message>
         <source>Cannot save empty matrix</source>
-        <translation type="unfinished">Cannot save empty matrix</translation>
+        <translation>无法保存空矩阵</translation>
     </message>
     <message>
         <source>Screen is being controlled by another user</source>
-        <translation type="unfinished">Screen is being controlled by another user</translation>
+        <translation>正在由另一个用户控制屏幕</translation>
     </message>
     <message>
         <source>Activate one more license to start Video Wall control session.</source>
-        <translation type="unfinished">Activate one more license to start Video Wall control session.</translation>
+        <translation>激活一个更多的授权来启动视频墙控制会话。</translation>
     </message>
     <message>
         <source>Enter the name of Video Wall to create:</source>
-        <translation type="unfinished">Enter the name of Video Wall to create:</translation>
+        <translation>输入创建的电视墙名称:</translation>
     </message>
     <message>
         <source>Activate one more license to start Video Wall.</source>
-        <translation type="unfinished">Activate one more license to start Video Wall.</translation>
+        <translation>激活一个更多的授权开始视频墙。</translation>
     </message>
 </context>
 <context>
@@ -7504,169 +7531,169 @@ to %1</source>
     </message>
     <message>
         <source>This Web Page already exists</source>
-        <translation type="unfinished">This Web Page already exists</translation>
+        <translation>此网页已存在</translation>
     </message>
     <message>
         <source>Enter URL of Web Page to add:</source>
-        <translation type="unfinished">Enter URL of Web Page to add:</translation>
+        <translation>输入 URL 的 Web 页以添加︰</translation>
     </message>
 </context>
 <context>
     <name>Resources</name>
     <message>
         <source>There is another layout with the same name</source>
-        <translation type="unfinished">There is another layout with the same name</translation>
+        <translation>还有另一个具有相同名称的布局</translation>
     </message>
     <message>
         <source>Overwrite existing layout?</source>
-        <translation type="unfinished">Overwrite existing layout?</translation>
+        <translation>覆盖现有的布局？</translation>
     </message>
     <message>
         <source>There is another layout with the same name.</source>
-        <translation type="unfinished">There is another layout with the same name.</translation>
+        <translation>还有另一个具有相同名称的布局</translation>
     </message>
     <message numerus="yes">
         <source>User will still have access to %n removed resources:</source>
-        <translation type="unfinished">
-            <numerusform>User will still have access to %n removed resources:</numerusform>
+        <translation>
+            <numerusform>用户仍然可对 %n 删除资源访问︰</numerusform>
         </translation>
     </message>
     <message>
         <source>To remove access, please go to User Settings.</source>
-        <translation type="unfinished">To remove access, please go to User Settings.</translation>
+        <translation>要移除访问权限，请转到用户设置。</translation>
     </message>
     <message numerus="yes">
         <source>All users with this role will get access to %n resources:</source>
-        <translation type="unfinished">
-            <numerusform>All users with this role will get access to %n resources:</numerusform>
+        <translation>
+            <numerusform>具有此角色的所有用户将都获得 %n 资源︰</numerusform>
         </translation>
     </message>
     <message>
         <source>To remove access, please go to Role Settings.</source>
-        <translation type="unfinished">To remove access, please go to Role Settings.</translation>
+        <translation>要移除访问权限，请转到角色设置。</translation>
     </message>
     <message numerus="yes">
         <source>All users with this role will still have access to %n removed resources:</source>
-        <translation type="unfinished">
-            <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
+        <translation>
+            <numerusform>具有此角色的所有用户将仍然都有对 %n 中删除资源的访问︰</numerusform>
         </translation>
     </message>
     <message>
         <source>Changes will affect other users</source>
-        <translation type="unfinished">Changes will affect other users</translation>
+        <translation>更改将影响其他用户</translation>
     </message>
     <message>
         <source>This layout is shared with other users, so you change it for them too.</source>
-        <translation type="unfinished">This layout is shared with other users, so you change it for them too.</translation>
+        <translation>这布局是与其他用户共享，所以你也替他们改变它了。</translation>
     </message>
     <message numerus="yes">
         <source>User will lose access to %n resources:</source>
-        <translation type="unfinished">
-            <numerusform>User will lose access to %n resources:</numerusform>
+        <translation>
+            <numerusform>用户将不能访问 %n 资源︰</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>All users with this role will lose access to %n resources:</source>
-        <translation type="unfinished">
-            <numerusform>All users with this role will lose access to %n resources:</numerusform>
+        <translation>
+            <numerusform>具有此角色的所有用户将都失去对 %n 资源访问权︰</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Delete %n shared layouts?</source>
-        <translation type="unfinished">
-            <numerusform>Delete %n shared layouts?</numerusform>
+        <translation>
+            <numerusform>删除 %n 共享布局吗？</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-        <translation type="unfinished">
-            <numerusform>These %n layouts are shared with other users, so you delete it for them too.</numerusform>
+        <translation>
+            <numerusform>这些 %n 布局是与其他用户共享，所以你也为他们删除它。</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Remove %n items from layout?</source>
-        <translation type="unfinished">
-            <numerusform>Remove %n items from layout?</numerusform>
+        <translation>
+            <numerusform>从布局中删除 %n 项目吗？</numerusform>
         </translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation>移除</translation>
+        <translation>删除</translation>
     </message>
     <message>
         <source>You will lose access to following resources:</source>
-        <translation type="unfinished">You will lose access to following resources:</translation>
+        <translation>您将无法访问以下资源︰</translation>
     </message>
     <message numerus="yes">
         <source>Delete %n users?</source>
-        <translation type="unfinished">
-            <numerusform>Delete %n users?</numerusform>
+        <translation>
+            <numerusform>删除 %n 用户吗？</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Delete %n devices?</source>
-        <translation type="unfinished">
-            <numerusform>Delete %n devices?</numerusform>
+        <translation>
+            <numerusform>删除 %n 设备吗？</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Delete %n cameras?</source>
-        <translation type="unfinished">
-            <numerusform>Delete %n cameras?</numerusform>
+        <translation>
+            <numerusform>删除 %n 相机吗？</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Delete %n I/O Modules?</source>
-        <translation type="unfinished">
-            <numerusform>Delete %n I/O Modules?</numerusform>
+        <translation>
+            <numerusform>删除 %n I/O 模块吗？</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Delete %n items?</source>
-        <translation type="unfinished">
-            <numerusform>Delete %n items?</numerusform>
+        <translation>
+            <numerusform>删除 %n 项目吗？</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n of them are auto-discovered.</source>
-        <translation type="unfinished">
-            <numerusform>%n of them are auto-discovered.</numerusform>
+        <translation>
+            <numerusform>其中 %n 是自动发现。</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n cameras are auto-discovered.</source>
-        <translation type="unfinished">
-            <numerusform>%n cameras are auto-discovered.</numerusform>
+        <translation>
+            <numerusform>%n 相机是自动发现。</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n I/O modules are auto-discovered.</source>
-        <translation type="unfinished">
-            <numerusform>%n I/O modules are auto-discovered.</numerusform>
+        <translation>
+            <numerusform>%n I/O 模块是自动发现。</numerusform>
         </translation>
     </message>
     <message>
         <source>They may be auto-discovered again after removing.</source>
-        <translation type="unfinished">They may be auto-discovered again after removing.</translation>
+        <translation>他们可能在删除后马上被自动发现。</translation>
     </message>
     <message>
         <source>You do not have permission to overwrite it.</source>
-        <translation type="unfinished">You do not have permission to overwrite it.</translation>
+        <translation>您没有权限来覆盖它。</translation>
     </message>
     <message>
         <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
-        <translation type="unfinished">You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</translation>
+        <translation>你打算删除一些只有在视频墙有权访问的资源。你不会再看到他们在资源列表中，也将不能再将它们添加到视频墙。</translation>
     </message>
 </context>
 <context>
     <name>VideoWall</name>
     <message>
         <source>There is another video wall with the same name</source>
-        <translation type="unfinished">There is another video wall with the same name</translation>
+        <translation>还有另一个具有相同名称的视频墙</translation>
     </message>
     <message>
         <source>Close %1 before starting Video Wall?</source>
-        <translation type="unfinished">Close %1 before starting Video Wall?</translation>
+        <translation>开始视频墙前请关闭 %1？</translation>
     </message>
     <message>
         <source>Close</source>
@@ -7674,15 +7701,15 @@ to %1</source>
     </message>
     <message>
         <source>Keep</source>
-        <translation type="unfinished">Keep</translation>
+        <translation>保留</translation>
     </message>
     <message>
         <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
-        <translation type="unfinished">Local files cannot be placed on Video Wall Screen attached to another computer</translation>
+        <translation>本地文件不能放置在附加到另一台计算机的视频墙屏幕</translation>
     </message>
     <message>
         <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
-        <translation type="unfinished">To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</translation>
+        <translation>若要显示视频墙上的本地文件，请附上他们使用计算机所在视频墙。</translation>
     </message>
 </context>
 </TS>

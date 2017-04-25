@@ -184,7 +184,8 @@ public:
 QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem* parent, QnWorkbenchContext* context):
     base_type(parent),
     QnWorkbenchContextAware(nullptr, context),
-    d_ptr(new QnGridBackgroundItemPrivate())
+    d_ptr(new QnGridBackgroundItemPrivate()),
+    m_panelColor(Qt::black)
 {
     setAcceptedMouseButtons(Qt::NoButton);
 
@@ -385,6 +386,16 @@ QRect QnGridBackgroundItem::sceneBoundingRect() const
     return !d->imageData.imageIsVisible(d->connected) ? QRect() : d->sceneBoundingRect;
 }
 
+QColor QnGridBackgroundItem::panelColor() const
+{
+    return m_panelColor;
+}
+
+void QnGridBackgroundItem::setPanelColor(const QColor& color)
+{
+    m_panelColor = color;
+}
+
 void QnGridBackgroundItem::updateGeometry()
 {
     Q_D(QnGridBackgroundItem);
@@ -545,13 +556,13 @@ void QnGridBackgroundItem::setImage(const QImage& image)
 void QnGridBackgroundItem::paint(
     QPainter* painter,
     const QStyleOptionGraphicsItem* /* option*/,
-    QWidget* /* widget */)
+    QWidget* /*widget*/)
 {
     Q_D(QnGridBackgroundItem);
 
     if (d->backgroundType == BackgroundType::Special)
     {
-        painter->setBrush(Qt::red);
+        painter->setBrush(m_panelColor);
         painter->drawRect(display()->boundedViewportGeometry());
         return;
     }

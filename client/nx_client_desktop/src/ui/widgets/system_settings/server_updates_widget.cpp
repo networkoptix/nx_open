@@ -34,7 +34,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/style/globals.h>
 #include <ui/style/nx_style.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -46,6 +46,8 @@
 #include <utils/applauncher_utils.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/connection_diagnostics_helper.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -458,7 +460,7 @@ void QnServerUpdatesWidget::discardChanges()
             this);
 
         const auto cancelUpdateButton = dialog.addButton(
-            tr("Cancel Update"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+            tr("Cancel Update"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
         dialog.addButton(
             tr("Continue in Background"), QDialogButtonBox::RejectRole);
 
@@ -807,7 +809,7 @@ void QnServerUpdatesWidget::at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning& l
         this);
 
     dialog.addCustomWidget(new QnResourceListView(failedServers, false, &dialog));
-    dialog.addButton(tr("Force Update"), QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+    dialog.addButton(tr("Force Update"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
 
     const auto result = dialog.exec();
     if (result == QDialogButtonBox::Cancel)
@@ -891,7 +893,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
                     qnClientMessageProcessor->setHoldConnection(false);
 
                 if (result.protocolChanged)
-                    menu()->trigger(QnActions::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
+                    menu()->trigger(action::DisconnectAction, {Qn::ForceRole, true});
 
                 break;
             }

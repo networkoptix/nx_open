@@ -19,7 +19,7 @@
 #include <nx/client/desktop/ui/messages/resources_messages.h>
 
 #include <ui/common/palette.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/item_view_hover_tracker.h>
 #include <ui/delegates/switch_item_delegate.h>
 #include <ui/dialogs/ldap_settings_dialog.h>
@@ -43,6 +43,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
 
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -437,12 +438,12 @@ void QnUserManagementWidget::openLdapSettings()
 
 void QnUserManagementWidget::editRoles()
 {
-    menu()->triggerIfPossible(QnActions::UserRolesAction); //TODO: #vkutin #GDM correctly set parent widget
+    menu()->triggerIfPossible(action::UserRolesAction); //TODO: #vkutin #GDM correctly set parent widget
 }
 
 void QnUserManagementWidget::createUser()
 {
-    menu()->triggerIfPossible(QnActions::NewUserAction); //TODO: #GDM correctly set parent widget
+    menu()->triggerIfPossible(action::NewUserAction); //TODO: #GDM correctly set parent widget
 }
 
 void QnUserManagementWidget::fetchUsers()
@@ -494,7 +495,7 @@ void QnUserManagementWidget::at_usersTable_clicked(const QModelIndex& index)
             break;
 
         default:
-            menu()->trigger(QnActions::UserSettingsAction, QnActionParameters(user)
+            menu()->trigger(action::UserSettingsAction, action::Parameters(user)
                 .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage)
                 .withArgument(Qn::ForceRole, true)
             );

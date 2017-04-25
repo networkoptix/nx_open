@@ -42,9 +42,10 @@ private:
 
     void customContextMenuRequested();
 
-    void openInNewLayout(const QnActionParameters &params, const QnTimePeriod &window);
+    void openInNewLayout(const nx::client::desktop::ui::action::Parameters& params,
+        const QnTimePeriod &window);
 
-    bool fillActionParameters(QnActionParameters &params, QnTimePeriod &window);
+    bool fillActionParameters(nx::client::desktop::ui::action::Parameters &params, QnTimePeriod &window);
 
     bool currentUserHasAllCameras();
 

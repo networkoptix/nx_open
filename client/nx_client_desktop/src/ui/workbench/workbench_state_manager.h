@@ -2,6 +2,8 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
+class QnWorkbenchState;
+
 /** Delegate to maintain knowledge about current connection session. */
 class QnSessionAwareDelegate: public QnWorkbenchContextAware
 {
@@ -11,6 +13,8 @@ public:
 
     virtual bool tryClose(bool force) = 0;
     virtual void forcedUpdate() = 0;
+    virtual void loadState(const QnWorkbenchState& state);
+    virtual void submitState(QnWorkbenchState* state);
 };
 
 template <typename T>
