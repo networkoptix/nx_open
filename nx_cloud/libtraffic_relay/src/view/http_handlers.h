@@ -28,7 +28,7 @@ public:
         using namespace std::placeholders;
 
         api::BeginListeningRequest inputData;
-        inputData.peerName = requestPathParams()[0];
+        inputData.peerName = requestPathParams()[0].toStdString();
 
         m_connectSessionManager->beginListening(
             std::move(inputData),
