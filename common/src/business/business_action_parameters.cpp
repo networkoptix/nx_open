@@ -38,4 +38,4 @@ bool QnBusinessActionParameters::isDefault() const
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (QnBusinessActionParameters), (ubjson)(json)(eq)(xml)(csv_record), _Fields)
+    (QnBusinessActionParameters), (ubjson)(json)(eq)(xml)(csv_record), _Fields, (lazy, true))
