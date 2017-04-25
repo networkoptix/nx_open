@@ -6,7 +6,7 @@ namespace network {
 
 using namespace websocket;
 
-Websocket::Websocket(
+WebSocket::WebSocket(
     std::unique_ptr<AbstractStreamSocket> streamSocket,
     const nx::Buffer& requestData,
     SendMode sendMode,
@@ -27,18 +27,18 @@ Websocket::Websocket(
     handleRead();
 }
 
-void Websocket::setIsLastFrame()
+void WebSocket::setIsLastFrame()
 {
     m_isLastFrame = true;
 }
 
-void Websocket::bytesReceived(nx::Buffer& buffer)
+void WebSocket::bytesReceived(nx::Buffer& buffer)
 {
     m_parser.consume(buffer.data(), buffer.size());
     handleRead();
 }
 
-void Websocket::readyToSendData(size_t count)
+void WebSocket::readyToSendData(size_t count)
 {
     m_writeBuffer.clear();
     auto writeHandlerCopy = std::move(m_writeHandler);
@@ -47,14 +47,14 @@ void Websocket::readyToSendData(size_t count)
         writeHandlerCopy(SystemError::noError, count);
 }
 
-void Websocket::handleRead()
+void WebSocket::handleRead()
 {
     if (!m_readHandler)
         return;
 
     if (m_buffer.readySize() == 0)
     {
-        NX_LOG(lit("[Websocket] handleRead() called but read buffer is not ready. This should not happen."), cl_logDEBUG1);
+        NX_LOG(lit("[WebSocket] handleRead() called but read buffer is not ready. This should not happen."), cl_logDEBUG1);
         return;
     }
 
@@ -63,13 +63,13 @@ void Websocket::handleRead()
     m_baseConnection.stopReading();
     auto handoutBuffer = m_buffer.pop();
 
-    NX_LOG(lit("[Websocket] handleRead(): user data size: %1").arg(handoutBuffer.size()), cl_logDEBUG2);
+    NX_LOG(lit("[WebSocket] handleRead(): user data size: %1").arg(handoutBuffer.size()), cl_logDEBUG2);
 
     *m_readBuffer->append(handoutBuffer);
     handlerCopy(SystemError::noError, handoutBuffer.size());
 }
 
-void Websocket::readSomeAsync(
+void WebSocket::readSomeAsync(
     nx::Buffer* const buffer,
     std::function<void(SystemError::ErrorCode, size_t)> handler)
 {
@@ -82,7 +82,7 @@ void Websocket::readSomeAsync(
         m_baseConnection.startReadingConnection();
 }
 
-void Websocket::sendAsync(
+void WebSocket::sendAsync(
     const nx::Buffer& buffer,
     std::function<void(SystemError::ErrorCode, size_t)> handler)
 {
@@ -104,26 +104,26 @@ void Websocket::sendAsync(
     m_baseConnection.sendBufAsync(m_writeBuffer);
 }
 
-void Websocket::cancelIOSync(nx::network::aio::EventType /*eventType*/)
+void WebSocket::cancelIOSync(nx::network::aio::EventType /*eventType*/)
 {
     m_baseConnection.pleaseStopSync();
 }
 
-void Websocket::closeConnection(SystemError::ErrorCode closeReason, ConnectionType* /*connection*/)
+void WebSocket::closeConnection(SystemError::ErrorCode closeReason, ConnectionType* /*connection*/)
 {
     m_readHandler(closeReason, 0);
     m_baseConnection.pleaseStopSync();
 }
 
 
-void Websocket::frameStarted(FrameType /*type*/, bool /*fin*/)
+void WebSocket::frameStarted(FrameType /*type*/, bool /*fin*/)
 {
-    NX_LOG(lit("[Websocket] frame started. type: %1, size from header: %2")
+    NX_LOG(lit("[WebSocket] frame started. type: %1, size from header: %2")
            .arg(m_parser.frameType())
            .arg(m_parser.frameSize()), cl_logDEBUG2);
 }
 
-void Websocket::framePayload(const char* data, int len)
+void WebSocket::framePayload(const char* data, int len)
 {
     m_buffer.append(data, len);
 
@@ -131,9 +131,9 @@ void Websocket::framePayload(const char* data, int len)
         m_buffer.lock();
 }
 
-void Websocket::frameEnded()
+void WebSocket::frameEnded()
 {
-    NX_LOG(lit("[Websocket] frame ended. type: %1, size from header: %2")
+    NX_LOG(lit("[WebSocket] frame ended. type: %1, size from header: %2")
            .arg(m_parser.frameType())
            .arg(m_parser.frameSize()), cl_logDEBUG2);
 
@@ -143,9 +143,9 @@ void Websocket::frameEnded()
     m_buffer.lock();
 }
 
-void Websocket::messageEnded()
+void WebSocket::messageEnded()
 {
-    NX_LOG(lit("[Websocket] message ended"), cl_logDEBUG2);
+    NX_LOG(lit("[WebSocket] message ended"), cl_logDEBUG2);
 
     if (m_receiveMode != ReceiveMode::message)
         return;
@@ -153,9 +153,9 @@ void Websocket::messageEnded()
     m_buffer.lock();
 }
 
-void Websocket::handleError(Error err)
+void WebSocket::handleError(Error err)
 {
-    NX_LOG(lit("[Websocket] Parse error %1. Closing connection").arg((int)err), cl_logDEBUG1);
+    NX_LOG(lit("[WebSocket] Parse error %1. Closing connection").arg((int)err), cl_logDEBUG1);
     closeConnection(SystemError::invalidData, nullptr);
 }
 

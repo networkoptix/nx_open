@@ -5,7 +5,7 @@
 
 namespace test {
 
-class Websocket : public ::testing::Test
+class WebSocket : public ::testing::Test
 {
 protected:
     virtual void SetUp() override
@@ -24,13 +24,13 @@ protected:
                 m_acceptor.reset();
                 clientSocket1.reset(clientSocket);
 
-                clientWebsocket.reset(
-                    new nx::network::Websocket(
+                clientWebSocket.reset(
+                    new nx::network::WebSocket(
                         std::move(clientSocket1),
                         nx::Buffer()));
 
-                serverWebsocket.reset(
-                    new nx::network::Websocket(
+                serverWebSocket.reset(
+                    new nx::network::WebSocket(
                         std::move(clientSocket2),
                         nx::Buffer()));
 
@@ -38,6 +38,7 @@ protected:
             });
 
         clientSocket2 = SocketFactory::createStreamSocket();
+        clientSocket2->setNonBlockingMode(true);
         ASSERT_TRUE(clientSocket2->connect(m_acceptor->getLocalAddress()));
 
         readyFuture = readyPromise.get_future();
@@ -71,8 +72,8 @@ protected:
     std::unique_ptr<AbstractStreamSocket> clientSocket1;
     std::unique_ptr<AbstractStreamSocket> clientSocket2;
 
-    std::unique_ptr<nx::network::Websocket> clientWebsocket;
-    std::unique_ptr<nx::network::Websocket> serverWebsocket;
+    std::unique_ptr<nx::network::WebSocket> clientWebSocket;
+    std::unique_ptr<nx::network::WebSocket> serverWebSocket;
 
     std::promise<void> startPromise;
     std::future<void> startFuture;
@@ -83,25 +84,24 @@ protected:
     nx::Buffer readBuffer;
 };
 
-TEST_F(Websocket, SingleMessage_singleTransfer)
+TEST_F(WebSocket, SingleMessage_singleTransfer)
 {
     startFuture.wait();
 
     nx::Buffer sendBuf;
     prepareTestData(&sendBuf, 1024 * 1024 * 10);
 
-    clientWebsocket->sendAsync(
+    clientWebSocket->sendAsync(
         sendBuf,
         [this](SystemError::ErrorCode ecode, size_t transferred)
         {
             ASSERT_EQ(ecode, SystemError::noError);
         });
 
-    serverWebsocket->readSomeAsync(
+    serverWebSocket->readSomeAsync(
         &readBuffer,
         [this](SystemError::ErrorCode ecode, size_t transferred)
         {
-            auto i = transferred;
             readyPromise.set_value();
         });
 
@@ -109,8 +109,37 @@ TEST_F(Websocket, SingleMessage_singleTransfer)
     ASSERT_EQ(readBuffer, sendBuf);
 }
 
-TEST_F(Websocket, SingleMessage_singleTransfer)
+TEST_F(WebSocket, MultipleMessages)
 {
+    startFuture.wait();
+
+    int kIterations = 10;
+    nx::Buffer sendBuf;
+
+    for (int i = 0; i < kIterations; ++i)
+    {
+        prepareTestData(&sendBuf, 1024 * 1024 * i);
+
+        clientWebSocket->sendAsync(
+            sendBuf,
+            [this](SystemError::ErrorCode ecode, size_t transferred)
+        {
+            ASSERT_EQ(ecode, SystemError::noError);
+        });
+
+        serverWebSocket->readSomeAsync(
+            &readBuffer,
+            [this](SystemError::ErrorCode ecode, size_t transferred)
+        {
+            readBuffer.clear();
+        });
+
+        ASSERT_EQ(readBuffer, sendBuf);
+        if (i == kIterations - 1)
+            readyPromise.set_value();
+    }
+
+    readyFuture.wait();
 }
 
 }

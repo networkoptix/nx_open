@@ -11,7 +11,7 @@
 namespace nx {
 namespace network {
 
-class NX_NETWORK_API Websocket :
+class NX_NETWORK_API WebSocket :
     public aio::AbstractAsyncChannel,
     private nx_api::BaseServerConnectionHandler,
     private websocket::ParserHandler,
@@ -39,7 +39,7 @@ public:
     };
 
 public:
-    Websocket(
+    WebSocket(
         std::unique_ptr<AbstractStreamSocket> streamSocket,
         const nx::Buffer& requestData,
         SendMode sendMode = SendMode::singleMessage,
