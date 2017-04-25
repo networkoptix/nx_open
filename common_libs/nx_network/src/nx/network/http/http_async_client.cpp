@@ -1309,6 +1309,9 @@ AsyncClient::Result AsyncClient::invokeHandler(
     nx::utils::MoveOnlyFunc<void(Args...)>& handler,
     Args... args)
 {
+    if (!handler)
+        return Result::proceed;
+
     nx::utils::ObjectDestructionFlag::Watcher objectDestructionWatcher(&m_objectDestructionFlag);
     handler(args...);
     return objectDestructionWatcher.objectDestroyed()

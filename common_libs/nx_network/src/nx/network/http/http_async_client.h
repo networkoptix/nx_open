@@ -137,13 +137,8 @@ public:
     /**
      * This overload is same as:
      * @code{.cpp}
-     * QObject::connect(
-     *     httpClient.get(), &nx_http::AsyncClient::done,
-     *     [completionHandler](AsyncHttpClientPtr httpClient)
-     *     {
-     *         completionHandler(httpClient);
-     *     });
-     * httpClient->doGet();
+     * httpClient->setOnDone(func);
+     * httpClient->doGet(url);
      * @endcode
      */
     void doGet(
