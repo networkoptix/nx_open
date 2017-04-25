@@ -69,17 +69,20 @@ void WebSocket::handleRead()
         return;
 
     if (m_buffer.readySize() == 0)
+    {
+        m_baseConnection.setReceivingStarted();
         return;
+    }
 
     decltype(m_readHandler) handlerCopy = std::move(m_readHandler);
     m_readHandler = nullptr;
-    m_baseConnection.stopReading();
     auto handoutBuffer = m_buffer.pop();
 
     NX_LOG(lit("[WebSocket] handleRead(): user data size: %1").arg(handoutBuffer.size()), cl_logDEBUG2);
 
     *m_readBuffer->append(handoutBuffer);
     handlerCopy(SystemError::noError, handoutBuffer.size());
+    m_baseConnection.stopReading();
 }
 
 void WebSocket::readSomeAsync(

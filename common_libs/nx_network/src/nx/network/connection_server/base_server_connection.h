@@ -112,14 +112,12 @@ public:
         m_streamSocket->dispatch(
             [this, inactivityTimeout]()
             {
-                if (m_receiving)
-                    return;
-
                 setInactivityTimeout(inactivityTimeout);
                 if (!m_streamSocket->setNonBlockingMode(true))
                     return onBytesRead(SystemError::getLastOSErrorCode(), (size_t)-1);
 
                 m_receiving = true;
+                m_readBuffer.resize(0);
                 m_streamSocket->readSomeAsync(
                     &m_readBuffer,
                     std::bind(&SelfType::onBytesRead, this, _1, _2));
@@ -130,6 +128,12 @@ public:
     {
         NX_ASSERT(isInSelfAioThread());
         m_receiving = false;
+    }
+
+    void setReceivingStarted()
+    {
+        NX_ASSERT(isInSelfAioThread());
+        m_receiving = true;
     }
 
     /**

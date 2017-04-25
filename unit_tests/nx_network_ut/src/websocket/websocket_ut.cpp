@@ -143,9 +143,6 @@ TEST_F(WebSocket, MultipleMessages_oneWay)
             }
             ASSERT_EQ(readBuffer, sendBuf);
             readBuffer.clear();
-            readBuffer.reserve(1024 * 1024 * 11);
-            auto capacity = readBuffer.capacity();
-            auto size = readBuffer.size();
             serverWebSocket->readSomeAsync(&readBuffer, readCb);
         };
 
