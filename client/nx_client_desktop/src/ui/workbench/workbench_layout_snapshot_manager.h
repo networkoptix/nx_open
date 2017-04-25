@@ -15,6 +15,7 @@
 #include "workbench_context_aware.h"
 
 class QnWorkbenchContext;
+class QnWorkbenchLayout;
 class QnWorkbenchLayoutSnapshotStorage;
 class QnWorkbenchLayoutSnapshotManager;
 

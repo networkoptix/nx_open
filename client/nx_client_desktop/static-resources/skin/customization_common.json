@@ -444,11 +444,15 @@
         "palette": {
             "default": {
                 "_": "Scene background color.",
-
                 "base": "dark4"
             }
         }
     },
+    
+    "QnGridBackgroundItem": {
+        "_": "Scene background color for custom layouts.",
+        "panelColor": "#1d2327"
+    },    
 
     "QnControlBackgroundWidget": {
         "_": "Background for ui panels (resource tree, notifications panel).",

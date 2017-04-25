@@ -25,14 +25,14 @@ namespace desktop {
 namespace ui {
 namespace workbench {
 
-class LayoutTourController: public Connective<QObject>, public QnWorkbenchContextAware
+class LayoutTourExecutor: public Connective<QObject>, public QnWorkbenchContextAware
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
 
 public:
-    LayoutTourController(QObject* parent = nullptr);
-    virtual ~LayoutTourController() override;
+    LayoutTourExecutor(QObject* parent = nullptr);
+    virtual ~LayoutTourExecutor() override;
 
     void startTour(const ec2::ApiLayoutTourData& tour);
     void updateTour(const ec2::ApiLayoutTourData& tour);

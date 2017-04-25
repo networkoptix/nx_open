@@ -19,7 +19,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <ui/workbench/watchers/workbench_user_email_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -34,6 +34,7 @@
 #include <watchers/cloud_status_watcher.h>
 
 using namespace nx::client::desktop;
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -91,13 +92,13 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
             setSystemHealthEventVisible(QnSystemHealth::NoPrimaryTimeServer, true);
         });
 
-    connect(action(QnActions::SelectTimeServerAction), &QAction::triggered, this,
+    connect(action(action::SelectTimeServerAction), &QAction::triggered, this,
         [this]
         {
             setSystemHealthEventVisible(QnSystemHealth::NoPrimaryTimeServer, false);
         });
 
-    connect(action(QnActions::HideCloudPromoAction), &QAction::triggered, this,
+    connect(action(action::HideCloudPromoAction), &QAction::triggered, this,
         [this]
         {
             qnClientShowOnce->setFlag(kCloudPromoShowOnceKey);

@@ -1,7 +1,8 @@
 #include "workbench_resources_settings_handler.h"
 
-#include <ui/actions/action_manager.h>
-#include <ui/actions/action.h>
+#include <QtWidgets/QAction>
+
+#include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -20,6 +21,8 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout.h>
 
+using namespace nx::client::desktop::ui;
+
 QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -27,19 +30,19 @@ QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject
     m_serverSettingsDialog(),
     m_userSettingsDialog()
 {
-    connect(action(QnActions::CameraSettingsAction), &QAction::triggered, this,
+    connect(action(action::CameraSettingsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered);
-    connect(action(QnActions::ServerSettingsAction), &QAction::triggered, this,
+    connect(action(action::ServerSettingsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered);
-    connect(action(QnActions::NewUserAction), &QAction::triggered, this,
+    connect(action(action::NewUserAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered);
-    connect(action(QnActions::UserSettingsAction), &QAction::triggered, this,
+    connect(action(action::UserSettingsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered);
-    connect(action(QnActions::UserRolesAction), &QAction::triggered, this,
+    connect(action(action::UserRolesAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_userRolesAction_triggered);
-    connect(action(QnActions::LayoutSettingsAction), &QAction::triggered, this,
+    connect(action(action::LayoutSettingsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_layoutSettingsAction_triggered);
-    connect(action(QnActions::CurrentLayoutSettingsAction), &QAction::triggered, this,
+    connect(action(action::CurrentLayoutSettingsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_currentLayoutSettingsAction_triggered);
 }
 
@@ -74,7 +77,7 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
 
 void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
 {
-    QnActionParameters params = menu()->currentParameters(sender());
+    const auto params = menu()->currentParameters(sender());
     QnMediaServerResourceList servers = params.resources().filtered<QnMediaServerResource>(
         [](const QnMediaServerResourcePtr &server)
         {
@@ -118,7 +121,7 @@ void QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered()
 
 void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
 {
-    QnActionParameters params = menu()->currentParameters(sender());
+    const auto params = menu()->currentParameters(sender());
     QnUserResourcePtr user = params.resource().dynamicCast<QnUserResource>();
     if (!user)
         return;
@@ -144,7 +147,7 @@ void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
 
 void QnWorkbenchResourcesSettingsHandler::at_userRolesAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     QnUuid userRoleId = parameters.argument(Qn::UuidRole).value<QnUuid>();
 
     QScopedPointer<QnUserRolesDialog> dialog(new QnUserRolesDialog(mainWindow()));
@@ -156,7 +159,7 @@ void QnWorkbenchResourcesSettingsHandler::at_userRolesAction_triggered()
 
 void QnWorkbenchResourcesSettingsHandler::at_layoutSettingsAction_triggered()
 {
-    QnActionParameters params = menu()->currentParameters(sender());
+    const auto params = menu()->currentParameters(sender());
     openLayoutSettingsDialog(params.resource().dynamicCast<QnLayoutResource>());
 }
 
@@ -188,6 +191,6 @@ void QnWorkbenchResourcesSettingsHandler::openLayoutSettingsDialog(
         if (auto wlayout = QnWorkbenchLayout::instance(layout))
             wlayout->centralizeItems();
     }
-    menu()->triggerIfPossible(QnActions::SaveLayoutAction, layout);
+    menu()->triggerIfPossible(action::SaveLayoutAction, layout);
 }
 

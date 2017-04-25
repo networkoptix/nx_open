@@ -19,8 +19,8 @@
 #include <utils/common/delayed.h>
 #include <utils/common/app_info.h>
 #include <utils/connection_diagnostics_helper.h>
-#include <ui/actions/actions.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/nx_style.h>
 #include <ui/dialogs/login_dialog.h>
@@ -34,6 +34,8 @@
 #include <helpers/system_helpers.h>
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace
 {
@@ -141,7 +143,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
                 qnStartupTileManager->skipTileAction(); //< available only on first show
             }
 
-            context()->action(QnActions::EscapeHotkeyAction)->setEnabled(!m_visible);
+            context()->action(action::EscapeHotkeyAction)->setEnabled(!m_visible);
         });
 
     setVisible(true);
@@ -381,8 +383,8 @@ void QnWorkbenchWelcomeScreen::makeDrop(const QList<QUrl>& urls)
     if (resources.isEmpty())
         return;
 
-    if (menu()->triggerIfPossible(QnActions::DropResourcesAction, QnActionParameters(resources)))
-        action(QnActions::ResourcesModeAction)->setChecked(true);
+    if (menu()->triggerIfPossible(action::DropResourcesAction, resources))
+        action(action::ResourcesModeAction)->setChecked(true);
 }
 
 void QnWorkbenchWelcomeScreen::connectToLocalSystem(
@@ -447,11 +449,11 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
             if (!credentials.user.isEmpty())
                 url.setUserName(credentials.user);
 
-            QnActionParameters params;
+            action::Parameters params;
             params.setArgument(Qn::UrlRole, url);
             params.setArgument(Qn::StorePasswordRole, storePassword);
             params.setArgument(Qn::AutoLoginRole, autoLogin);
-            menu()->trigger(QnActions::ConnectAction, params);
+            menu()->trigger(action::ConnectAction, params);
         };
 
     enum { kMinimalDelay = 1};
@@ -472,7 +474,7 @@ void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString& systemId, con
 
 void QnWorkbenchWelcomeScreen::connectToAnotherSystem()
 {
-    menu()->trigger(QnActions::OpenLoginDialogAction);
+    menu()->trigger(action::OpenLoginDialogAction);
 }
 
 void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
@@ -524,22 +526,22 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
 
 void QnWorkbenchWelcomeScreen::logoutFromCloud()
 {
-    menu()->trigger(QnActions::LogoutFromCloud);
+    menu()->trigger(action::LogoutFromCloud);
 }
 
 void QnWorkbenchWelcomeScreen::manageCloudAccount()
 {
-    menu()->trigger(QnActions::OpenCloudManagementUrl);
+    menu()->trigger(action::OpenCloudManagementUrl);
 }
 
 void QnWorkbenchWelcomeScreen::loginToCloud()
 {
-    menu()->trigger(QnActions::LoginToCloud);
+    menu()->trigger(action::LoginToCloud);
 }
 
 void QnWorkbenchWelcomeScreen::createAccount()
 {
-    menu()->trigger(QnActions::OpenCloudRegisterUrl);
+    menu()->trigger(action::OpenCloudRegisterUrl);
 }
 
 //

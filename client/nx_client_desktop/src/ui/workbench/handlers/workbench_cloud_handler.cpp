@@ -16,13 +16,15 @@
 
 #include <helpers/cloud_url_helper.h>
 
-#include <ui/actions/actions.h>
-#include <ui/actions/action_parameters.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/dialogs/cloud/login_to_cloud_dialog.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <watchers/cloud_status_watcher.h>
+
+using namespace nx::client::desktop::ui;
 
 QnWorkbenchCloudHandler::QnWorkbenchCloudHandler(QObject* parent):
     base_type(parent),
@@ -32,16 +34,16 @@ QnWorkbenchCloudHandler::QnWorkbenchCloudHandler(QObject* parent):
         nx::vms::utils::SystemUri::ReferralContext::CloudMenu,
         this))
 {
-    connect(action(QnActions::LoginToCloud), &QAction::triggered, this,
+    connect(action(action::LoginToCloud), &QAction::triggered, this,
         &QnWorkbenchCloudHandler::at_loginToCloudAction_triggered);
-    connect(action(QnActions::LogoutFromCloud), &QAction::triggered, this,
+    connect(action(action::LogoutFromCloud), &QAction::triggered, this,
         &QnWorkbenchCloudHandler::at_logoutFromCloudAction_triggered);
-    connect(action(QnActions::OpenCloudMainUrl), &QAction::triggered, this,
+    connect(action(action::OpenCloudMainUrl), &QAction::triggered, this,
         &QnWorkbenchCloudHandler::at_openCloudMainUrlAction_triggered);
-    connect(action(QnActions::OpenCloudManagementUrl), &QAction::triggered, this,
+    connect(action(action::OpenCloudManagementUrl), &QAction::triggered, this,
         &QnWorkbenchCloudHandler::at_openCloudManagementUrlAction_triggered);
 
-    connect(action(QnActions::OpenCloudRegisterUrl), &QAction::triggered, this,
+    connect(action(action::OpenCloudRegisterUrl), &QAction::triggered, this,
         [this]()
         {
             QDesktopServices::openUrl(m_cloudUrlHelper->createAccountUrl());

@@ -3,11 +3,13 @@
 
 #include <business/business_action_parameters.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/common/scoped_value_rollback.h>
+
+using namespace nx::client::desktop::ui;
 
 QnSendmailBusinessActionWidget::QnSendmailBusinessActionWidget(QWidget *parent) :
     base_type(parent),
@@ -17,7 +19,7 @@ QnSendmailBusinessActionWidget::QnSendmailBusinessActionWidget(QWidget *parent) 
     ui->setupUi(this);
 
     connect(ui->emailLineEdit, SIGNAL(textChanged(QString)), this, SLOT(paramsChanged()));
-    connect(ui->settingsButton, &QPushButton::clicked, action(QnActions::PreferencesSmtpTabAction), &QAction::trigger);
+    connect(ui->settingsButton, &QPushButton::clicked, action(action::PreferencesSmtpTabAction), &QAction::trigger);
 }
 
 QnSendmailBusinessActionWidget::~QnSendmailBusinessActionWidget()

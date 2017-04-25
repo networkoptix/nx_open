@@ -11,7 +11,7 @@
 namespace nx {
 namespace network {
 
-class NX_NETWORK_API Websocket :
+class NX_NETWORK_API WebSocket :
     public aio::AbstractAsyncChannel,
     private nx_api::BaseServerConnectionHandler,
     private websocket::ParserHandler,
@@ -39,12 +39,14 @@ public:
     };
 
 public:
-    Websocket(
+    WebSocket(
         std::unique_ptr<AbstractStreamSocket> streamSocket,
         const nx::Buffer& requestData,
         SendMode sendMode = SendMode::singleMessage,
         ReceiveMode receiveMode = ReceiveMode::message,
         websocket::Role role = websocket::Role::undefined); /**< if role is undefined, payload won't be masked (unmasked) */
+
+    ~WebSocket();
 
     virtual void readSomeAsync(
         nx::Buffer* const buffer,
@@ -55,6 +57,8 @@ public:
         std::function<void(SystemError::ErrorCode, size_t)> handler) override;
 
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
+
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     /**
      * Makes sense only in multiFrameMessage mode.
@@ -101,6 +105,8 @@ private:
     nx::Buffer* m_readBuffer;
     nx::Buffer m_writeBuffer;
     websocket::MultiBuffer m_buffer;
+
+    virtual void stopWhileInAioThread() override;
 };
 
 } // namespace network

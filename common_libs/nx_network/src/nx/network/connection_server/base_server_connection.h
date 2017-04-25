@@ -112,6 +112,9 @@ public:
         m_streamSocket->dispatch(
             [this, inactivityTimeout]()
             {
+                if (m_receiving)
+                    return;
+
                 setInactivityTimeout(inactivityTimeout);
                 if (!m_streamSocket->setNonBlockingMode(true))
                     return onBytesRead(SystemError::getLastOSErrorCode(), (size_t)-1);
@@ -249,6 +252,7 @@ private:
         {
             nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
             BaseServerConnectionAccess::bytesReceived<CustomConnectionType>(this, m_readBuffer);
+            m_readBuffer.resize(0);
             if (watcher.objectDestroyed() || !m_receiving)
                 return; //< Connection has been removed by handler.
         }
@@ -256,7 +260,6 @@ private:
         if (bytesRead == 0)    //< Connection closed by remote peer.
             return handleSocketError(SystemError::connectionReset);
 
-        m_readBuffer.resize(0);
         m_streamSocket->readSomeAsync(
             &m_readBuffer,
             std::bind(&SelfType::onBytesRead, this, _1, _2));
@@ -333,18 +336,18 @@ public:
     virtual ~BaseServerConnectionHandler() {}
 };
 
-class BaseServerConnectionWrapper : 
-    public BaseServerConnection<BaseServerConnectionWrapper> 
+class BaseServerConnectionWrapper :
+    public BaseServerConnection<BaseServerConnectionWrapper>
 {
     friend struct BaseServerConnectionAccess;
 public:
     BaseServerConnectionWrapper(
         StreamConnectionHolder<BaseServerConnectionWrapper>* connectionManager,
         std::unique_ptr<AbstractStreamSocket> streamSocket,
-        BaseServerConnectionHandler* handler) 
-        : 
+        BaseServerConnectionHandler* handler)
+        :
         BaseServerConnection<BaseServerConnectionWrapper>(connectionManager, std::move(streamSocket)),
-        m_handler(handler) 
+        m_handler(handler)
     {}
 
 private:

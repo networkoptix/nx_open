@@ -191,10 +191,6 @@
         <translation>Fuente: %1</translation>
     </message>
     <message>
-        <source>Url: %1</source>
-        <translation>Url: %1</translation>
-    </message>
-    <message>
         <source>Reason: %1</source>
         <translation>Razón: %1</translation>
     </message>

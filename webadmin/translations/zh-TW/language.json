@@ -1,6 +1,6 @@
 {
-  "language":"LANGUAGE_CODE",
-  "language_name":"LANGUAGE_NAME",
+  "language":"zh_TW",
+  "language_name":"繁体中文",
   "dialogs":{
     "okButton":"確定",
     "openLink":"前往此連結",
@@ -12,11 +12,11 @@
     "errorNoNetwork":"此設備需要網路連接才能運作.<br>請將它連接到本地網路或網際網路"
   },
   "passwordRequirements":{
-    "minLengthMessage":"密碼必須包含至少 8 個字元",
-    "requiredMessage":"只能使用字母, 數字和鍵盤 \n 符號, 注意前後別輸入空格.",
-    "weakMessage":"運用大寫字母, 小寫字母 \n 和特殊符號使密碼更強",
+    "minLengthMessage":"密碼長度必須至少為8個字元",
+    "requiredMessage":"只允許拉丁字母、 數字和符號.",
+    "weakMessage":"密碼應該包含不同類型的符號.",
     "strongMessage":"理想的密碼!",
-    "commonMessage":"此密碼是很常用的組合"
+    "commonMessage":"此密碼是常見的熱門密碼."
   },
   "settings":{
     "tabs":{

@@ -26,6 +26,8 @@
 
 #include <utils/common/delayed.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 
 /** Countdown value before screen recording starts. */
@@ -46,7 +48,7 @@ QnWorkbenchScreenRecordingHandler::QnWorkbenchScreenRecordingHandler(QObject *pa
     m_dataProvider(nullptr),
     m_recorder(nullptr)
 {
-    const auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction);
+    const auto screenRecordingAction = action(action::ToggleScreenRecordingAction);
     if (!screenRecordingAction)
         return;
 
@@ -109,7 +111,7 @@ bool QnWorkbenchScreenRecordingHandler::isRecording() const
 
 void QnWorkbenchScreenRecordingHandler::startRecordingCountdown()
 {
-    const auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction);
+    const auto screenRecordingAction = action(action::ToggleScreenRecordingAction);
     NX_ASSERT(screenRecordingAction);
     if (!screenRecordingAction)
         return;
@@ -180,7 +182,7 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
         return;
     }
 
-    const auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction);
+    const auto screenRecordingAction = action(action::ToggleScreenRecordingAction);
     if(!screenRecordingAction)
     {
         qnWarning("Screen recording is not supported on this platform.");
@@ -253,7 +255,7 @@ void QnWorkbenchScreenRecordingHandler::onStreamRecordingFinished(
     if (status.lastError == StreamRecorderError::noError)
         return;
 
-    action(QnActions::ToggleScreenRecordingAction)->setChecked(false);
+    action(action::ToggleScreenRecordingAction)->setChecked(false);
 
     const auto errorReason = QnStreamRecorder::errorString(status.lastError);
     onError(errorReason);
@@ -263,7 +265,7 @@ void QnWorkbenchScreenRecordingHandler::stopRecording()
 {
     stopRecordingCountdown();
 
-    const auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction);
+    const auto screenRecordingAction = action(action::ToggleScreenRecordingAction);
     if (!screenRecordingAction)
     {
         qnWarning("Screen recording is not supported on this platform.");

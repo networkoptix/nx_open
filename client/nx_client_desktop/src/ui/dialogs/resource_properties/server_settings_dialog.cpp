@@ -10,8 +10,7 @@
 
 #include <nx/network/http/httptypes.h>
 
-#include <ui/actions/action.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/widgets/properties/server_settings_widget.h>
@@ -25,6 +24,8 @@
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 #include <core/resource/fake_media_server.h>
 #include <utils/common/html.h>
+
+using namespace nx::client::desktop::ui;
 
 QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
     base_type(parent),
@@ -90,7 +91,7 @@ void QnServerSettingsDialog::setupShowWebServerLink()
     buttonsLayout->insertWidget(0, m_webPageLink);
     setHelpTopic(m_webPageLink, Qn::ServerSettings_WebClient_Help);
     connect(m_webPageLink, &QLabel::linkActivated, this,
-        [this] { menu()->trigger(QnActions::WebAdminAction, m_server); });
+        [this] { menu()->trigger(action::WebAdminAction, m_server); });
 }
 
 

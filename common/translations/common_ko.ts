@@ -6,7 +6,7 @@
     <message>
         <source>Language Name</source>
         <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-        <translation>한국어</translation>
+        <translation>언어</translation>
     </message>
     <message>
         <source>Locale Code</source>
@@ -189,10 +189,6 @@
     <message>
         <source>Source: %1</source>
         <translation>소스: %1</translation>
-    </message>
-    <message>
-        <source>Url: %1</source>
-        <translation>URL: %1</translation>
     </message>
     <message>
         <source>Reason: %1</source>
