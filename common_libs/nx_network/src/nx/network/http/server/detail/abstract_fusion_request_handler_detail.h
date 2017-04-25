@@ -76,23 +76,23 @@ protected:
         Qn::SerializationFormat* const inputDataFormat = nullptr)
     {
         // input/output formats can differ. E.g., GET request can specify input data in url query only.
-        // TODO #ak: Fetching m_outputDataFormat from url query.
+        // TODO: #ak Fetching m_outputDataFormat from url query.
         //if( no format in query )
         //{
         if (request.requestLine.method == nx_http::Method::GET)
         {
             if (inputDataFormat)
             {
-                // TODO #ak fetching format from Accept header.
+                // TODO: #ak Fetching format from Accept header.
                 *inputDataFormat = Qn::UrlQueryFormat;
             }
         }
-        else    //POST, PUT
+        else //< POST, PUT
         {
             const auto contentTypeIter = request.headers.find("Content-Type");
             if (contentTypeIter != request.headers.cend())
             {
-                // TODO: #ak add Content-Type header parser to nx_http.
+                // TODO: #ak Add Content-Type header parser to nx_http.
                 const QByteArray dataFormatStr = contentTypeIter->second.split(';')[0];
                 m_outputDataFormat = Qn::serializationFormatFromHttpContentType(dataFormatStr);
             }
@@ -205,7 +205,7 @@ class BaseFusionRequestHandlerWithOutput:
 public:
     /**
      * Call this method after request has been processed.
-     * @note This overload is for requests returning something.
+     * NOTE: This overload is for requests returning something.
      */
     void requestCompleted(
         FusionRequestResult result,
@@ -253,7 +253,7 @@ public:
 };
 
 /**
- * @note for requests that set Input to non-void.
+ * NOTE: For requests that set Input to non-void.
  */
 template<typename Input, typename Output, typename Descendant>
 class BaseFusionRequestHandlerWithInput:
