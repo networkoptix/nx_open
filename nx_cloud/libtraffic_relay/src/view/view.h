@@ -40,6 +40,9 @@ private:
     std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>> m_multiAddressHttpServer;
 
     void registerApiHandlers();
+    template<typename Handler> void registerApiHandler();
+
+    void startAcceptor();
 };
 
 } // namespace relay

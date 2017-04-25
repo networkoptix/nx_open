@@ -9,7 +9,9 @@ namespace path {
 /**
  * Parameter %1 is a server host name.
  */
-const char* const kServerIncomingConnections = "/relay/server/%1/incoming_connections/";
+const char* const kServerIncomingConnections = "/relay/server/{serverId}/incoming_connections/";
+const char* const kServerClientSessions = "/relay/server/{serverPeerName}/client_sessions/";
+const char* const kClientSessionConnections = "/relay/client_session/{sessionId}/connections/";
 
 } // namespace path
 } // namespace api

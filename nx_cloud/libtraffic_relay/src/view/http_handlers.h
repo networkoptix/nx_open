@@ -7,6 +7,7 @@
 namespace nx {
 namespace cloud {
 namespace relay {
+namespace view {
 
 class BeginListeningHandler:
     public nx_http::AbstractFusionRequestHandler<
@@ -15,6 +16,8 @@ class BeginListeningHandler:
     using self_type = BeginListeningHandler;
 
 public:
+    static const char* kPath;
+
     BeginListeningHandler(controller::ConnectSessionManager* connectSessionManager):
         m_connectSessionManager(connectSessionManager)
     {
@@ -51,6 +54,93 @@ private:
     }
 };
 
+//-------------------------------------------------------------------------------------------------
+
+class CreateClientSessionHandler:
+    public nx_http::AbstractFusionRequestHandler<
+        api::CreateClientSessionRequest, api::CreateClientSessionResponse>
+{
+    using self_type = CreateClientSessionHandler;
+
+public:
+    static const char* kPath;
+
+    CreateClientSessionHandler(controller::ConnectSessionManager* connectSessionManager):
+        m_connectSessionManager(connectSessionManager)
+    {
+    }
+
+    virtual void processRequest(
+        nx_http::HttpServerConnection* const /*connection*/,
+        const nx_http::Request& /*request*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
+        api::CreateClientSessionRequest inputData) override
+    {
+        using namespace std::placeholders;
+
+        inputData.targetPeerName = requestPathParams()[0].toStdString();
+
+        m_connectSessionManager->createClientSession(
+            std::move(inputData),
+            std::bind(&self_type::onRequestProcessed, this, _1, _2));
+    }
+
+private:
+    controller::ConnectSessionManager* m_connectSessionManager;
+
+    void onRequestProcessed(
+        api::ResultCode resultCode,
+        api::CreateClientSessionResponse response)
+    {
+        this->requestCompleted(
+            api::resultCodeToFusionRequestResult(resultCode),
+            std::move(response));
+    }
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class ConnectToPeerHandler:
+    public nx_http::AbstractFusionRequestHandler<void, void>
+{
+    using self_type = ConnectToPeerHandler;
+
+public:
+    static const char* kPath;
+
+    ConnectToPeerHandler(controller::ConnectSessionManager* connectSessionManager):
+        m_connectSessionManager(connectSessionManager)
+    {
+    }
+
+    virtual void processRequest(
+        nx_http::HttpServerConnection* const /*connection*/,
+        const nx_http::Request& /*request*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/) override
+    {
+        using namespace std::placeholders;
+
+        api::ConnectToPeerRequest inputData;
+        inputData.sessionId = requestPathParams()[0].toStdString();
+
+        m_connectSessionManager->connectToPeer(
+            std::move(inputData),
+            std::bind(&self_type::onRequestProcessed, this, _1, _2));
+    }
+
+private:
+    controller::ConnectSessionManager* m_connectSessionManager;
+
+    void onRequestProcessed(
+        api::ResultCode resultCode,
+        nx_http::ConnectionEvents connectionEvents)
+    {
+        setConnectionEvents(std::move(connectionEvents));
+        this->requestCompleted(api::resultCodeToFusionRequestResult(resultCode));
+    }
+};
+
+} // namespace view
 } // namespace relay
 } // namespace cloud
 } // namespace nx
