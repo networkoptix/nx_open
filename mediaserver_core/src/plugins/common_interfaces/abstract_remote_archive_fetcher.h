@@ -19,8 +19,16 @@ using BufferType = QByteArray;
 struct RemoteArchiveEntry 
 {
     QString id;
-    uint64_t startTime;
-    uint64_t duration;
+    uint64_t startTimeMs = 0;
+    uint64_t durationMs = 0;
+
+    RemoteArchiveEntry() = default;
+    RemoteArchiveEntry(QString _id, uint64_t _startTime, uint64_t _duration):
+        id(_id),
+        startTimeMs(_startTime),
+        durationMs(_duration)
+    {
+    }
 };
 
 /**
@@ -43,7 +51,7 @@ public:
     virtual bool listAvailableArchiveEntries(
         std::vector<RemoteArchiveEntry>* outArchiveEntries,
         uint64_t startTimeMs = 0,
-        uint64_t endTimeMs = std::numeric_limits<uint64_t>::max()) const = 0;
+        uint64_t endTimeMs = std::numeric_limits<uint64_t>::max()) = 0;
 
     /**
      * Downloads specified entry content.
@@ -55,7 +63,7 @@ public:
      * Removes the specified entry from the device.
      * @return True if entry has been successfully deleted from the device, false otherwise. 
      */
-    virtual bool removeArchiveEntry(const QString& entryId) = 0;
+    virtual bool removeArchiveEntries(const std::vector<QString>& entryIds) = 0;
 };
 
 } // namespace plugins

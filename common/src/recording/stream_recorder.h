@@ -83,6 +83,9 @@ public:
     void setNeedCalcSignature(bool value);
 
     virtual void disconnectFromResource() override;
+
+    void forceAudioLayout(const QnResourceAudioLayoutPtr& layout);
+
 #ifdef SIGN_FRAME_ENABLED
     void setSignLogo(const QImage& logo);
 #endif
@@ -203,6 +206,8 @@ private:
 
     std::random_device m_rd;
     std::mt19937 m_gen;
+
+    QnResourceAudioLayoutPtr m_forcedAudioLayout;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

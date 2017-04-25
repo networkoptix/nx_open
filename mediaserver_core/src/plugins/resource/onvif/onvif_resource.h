@@ -175,8 +175,8 @@ public:
     int getPrimaryH264Profile() const;
     int getSecondaryH264Profile() const;
     QSize getMaxResolution() const;
-    int getTimeDrift() const; // return clock diff between camera and local clock at seconds
-    void setTimeDrift(int value); // return clock diff between camera and local clock at seconds
+    qint64 getTimeDrift() const; // return clock diff between camera and local clock at seconds
+    void setTimeDrift(qint64 value); // return clock diff between camera and local clock at seconds
     //bool isSoapAuthorized() const;
     const QSize getVideoSourceSize() const;
 
@@ -222,7 +222,7 @@ public:
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
 
     void calcTimeDrift(int* outSoapRes = nullptr) const; // calculate clock diff between camera and local clock at seconds
-    static int calcTimeDrift(const QString& deviceUrl, int* outSoapRes = nullptr);
+    static qint64 calcTimeDrift(const QString& deviceUrl, int* outSoapRes = nullptr);
 
     virtual bool getParamPhysical(const QString &id, QString &value) override;
     virtual bool getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result);
@@ -491,7 +491,7 @@ private:
     QString m_ptzUrl;
     QString m_ptzProfileToken;
     QString m_ptzConfigurationToken;
-    mutable int m_timeDrift;
+    mutable qint64 m_timeDrift;
     mutable QElapsedTimer m_timeDriftTimer;
     std::vector<RelayOutputInfo> m_relayOutputInfo;
     std::map<QString, bool> m_relayInputStates;

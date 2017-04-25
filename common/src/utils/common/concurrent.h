@@ -538,7 +538,7 @@ namespace QnConcurrent
     template<typename Function>
     QnFuture<typename std::result_of<Function()>::type> run( Function function )
     {
-        return run( *QThreadPool::globalInstance(), 0, function );
+        return run( QThreadPool::globalInstance(), 0, function );
     }
 }
 

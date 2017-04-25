@@ -112,7 +112,8 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_truncateIntervalEps(0),
     m_recordingFinished(false),
     m_role(StreamRecorderRole::serverRecording),
-    m_gen(m_rd())
+    m_gen(m_rd()),
+    m_forcedAudioLayout(nullptr)
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
     memset(m_motionFileList, 0, sizeof(m_motionFileList));
@@ -552,7 +553,7 @@ void QnStreamRecorder::endOfRun()
 bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& mediaData)
 {
     m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (mediaData->dataProvider);
-    NX_ASSERT(m_mediaProvider);
+    //NX_ASSERT(m_mediaProvider); //< Commented out since 
 
     m_endDateTime = m_startDateTime = mediaData->timestamp;
 
@@ -784,7 +785,10 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 videoStream->first_dts = 0;
             }
 
-            QnConstResourceAudioLayoutPtr audioLayout = mediaDev->getAudioLayout(m_mediaProvider);
+            QnConstResourceAudioLayoutPtr audioLayout = m_forcedAudioLayout 
+                ? m_forcedAudioLayout.dynamicCast<const QnResourceAudioLayout>()
+                : mediaDev->getAudioLayout(m_mediaProvider);
+
             m_isAudioPresent = false;
             for (int j = 0; j < audioLayout->channelCount(); ++j)
             {
@@ -1094,6 +1098,11 @@ void QnStreamRecorder::disconnectFromResource()
 {
     stop();
     QnResourceConsumer::disconnectFromResource();
+}
+
+void QnStreamRecorder::forceAudioLayout(const QnResourceAudioLayoutPtr& layout)
+{
+    m_forcedAudioLayout = layout;
 }
 
 void QnStreamRecorder::setExtraTranscodeParams(const QnImageFilterHelper& extraParams)

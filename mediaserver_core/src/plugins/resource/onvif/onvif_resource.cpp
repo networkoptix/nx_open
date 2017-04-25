@@ -1419,7 +1419,7 @@ bool QnPlOnvifResource::isSoapAuthorized() const
 }
 */
 
-int QnPlOnvifResource::getTimeDrift() const
+qint64 QnPlOnvifResource::getTimeDrift() const
 {
     if (m_timeDriftTimer.elapsed() > MAX_TIME_DRIFT_UPDATE_PERIOD_MS)
         calcTimeDrift();
@@ -1427,7 +1427,7 @@ int QnPlOnvifResource::getTimeDrift() const
     return m_timeDrift;
 }
 
-void QnPlOnvifResource::setTimeDrift(int value)
+void QnPlOnvifResource::setTimeDrift(qint64 value)
 {
     m_timeDrift = value;
     m_timeDriftTimer.restart();
@@ -1439,7 +1439,7 @@ void QnPlOnvifResource::calcTimeDrift(int* outSoapRes) const
     m_timeDriftTimer.restart();
 }
 
-int QnPlOnvifResource::calcTimeDrift(const QString& deviceUrl, int* outSoapRes)
+qint64 QnPlOnvifResource::calcTimeDrift(const QString& deviceUrl, int* outSoapRes)
 {
     DeviceSoapWrapper soapWrapper(deviceUrl.toStdString(), QString(), QString(), 0);
 
@@ -1457,7 +1457,7 @@ int QnPlOnvifResource::calcTimeDrift(const QString& deviceUrl, int* outSoapRes)
             return 0;
 
         QDateTime datetime(QDate(date->Year, date->Month, date->Day), QTime(time->Hour, time->Minute, time->Second), Qt::UTC);
-        int drift = datetime.toMSecsSinceEpoch()/MS_PER_SECOND - QDateTime::currentMSecsSinceEpoch()/MS_PER_SECOND;
+        qint64 drift = datetime.toMSecsSinceEpoch()/MS_PER_SECOND - QDateTime::currentMSecsSinceEpoch()/MS_PER_SECOND;
         return drift;
     }
     return 0;
