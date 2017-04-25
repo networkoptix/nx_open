@@ -27,7 +27,6 @@ public:
     {
         using namespace std::placeholders;
 
-        NX_CRITICAL(requestPathParams().size() == 1); //< Failure here means bug somewhere down the stack.
         api::BeginListeningRequest inputData;
         inputData.peerName = requestPathParams()[0];
 
