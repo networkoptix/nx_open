@@ -22,6 +22,7 @@ QnTransactionMessageBusBase::QnTransactionMessageBusBase(
 QnTransactionMessageBusBase::~QnTransactionMessageBusBase()
 {
     stop();
+    delete m_thread;
 }
 
 void QnTransactionMessageBusBase::start()

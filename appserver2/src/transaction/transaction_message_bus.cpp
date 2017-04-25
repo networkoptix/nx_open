@@ -137,7 +137,6 @@ QnTransactionMessageBus::~QnTransactionMessageBus()
     for (QnTransactionTransport* transport : m_connectingConnections)
         delete transport;
 
-    delete m_thread;
     delete m_timer;
 }
 

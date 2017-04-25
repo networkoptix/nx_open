@@ -254,7 +254,8 @@ void P2pMessageBus::addOfflinePeersFromDb()
         if (!peerData.isOnline)
         {
             qint32 sequence = itr.value();
-            peerData.routingInfo.insert(localPeer(), RoutingRecord(sequence, qnSyncTime->currentMSecsSinceEpoch()));
+            RoutingRecord record(kMaxDistance - sequence, qnSyncTime->currentMSecsSinceEpoch());
+            peerData.routingInfo.insert(localPeer(), record);
         }
     }
 }
@@ -398,22 +399,21 @@ void P2pMessageBus::doSubscribe()
     const auto localPeer = this->localPeer();
     bool isUpdated = false;
 
-    for (auto itr = m_allPeers.begin(); itr != m_allPeers.end(); ++itr)
+    for (auto itr = m_allPeers.constBegin(); itr != m_allPeers.constEnd(); ++itr)
     {
         const ApiPersistentIdData& peer = itr.key();
         if (peer == localPeer)
             continue;
         const PeerInfo& info = itr.value();
         auto subscribedVia = currentSubscription.value(peer);
-        qint32 subscribedDistance = kMaxDistance;
-        if (subscribedVia)
-            subscribedDistance = info.distanceVia(subscribedVia->remotePeer());
+        qint32 subscribedDistance = info.distanceVia(
+            subscribedVia ? subscribedVia->remotePeer() : localPeer);
 
         QVector<ApiPersistentIdData> viaList;
         qint32 minDistance = info.minDistance(&viaList);
-        NX_ASSERT(!viaList.empty());
         if (minDistance < subscribedDistance)
         {
+            NX_ASSERT(!viaList.empty());
             // in case of several equal routes, use any(random) of them
             int rndValue = nx::utils::random::number(0, (int) viaList.size() - 1);
             auto connection = findConnectionById(viaList[rndValue]);
