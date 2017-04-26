@@ -1244,13 +1244,13 @@ QnCommonModule* QnResource::commonModule() const
     return nullptr;
 }
 
-void QnResource::saveParams()
+bool QnResource::saveParams()
 {
-    commonModule()->propertyDictionary()->saveParams(getId());
+    return commonModule()->propertyDictionary()->saveParams(getId());
 }
 
-void QnResource::saveParamsAsync()
+int QnResource::saveParamsAsync()
 {
-    commonModule()->propertyDictionary()->saveParamsAsync(getId());
+    return commonModule()->propertyDictionary()->saveParamsAsync(getId());
 }
 
