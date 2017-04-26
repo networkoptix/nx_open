@@ -5,6 +5,7 @@ Rectangle
     id: control
 
     color: "blue" // todo remove me
+    opacity: mouseArea.pressed ? 0.8 : 1
 
     /**
      * "direction" property specifies blah blah TODO: write comment
@@ -65,7 +66,7 @@ Rectangle
                 Qt.rgba(1, 1, 1, 0), Qt.rgba(1, 1, 1, 0.5))
 
             var angle = mathHelpers.getAngle(d.radialVector)
-            var angleOffset = drawer.drawButtonBorders && d.currentSectionData
+            var angleOffset = drawer.drawButtonBorders && control.ptzType != kFreeWayPtz
                 ? d.currentSectionData.step / 2
                 : Math.PI
 
@@ -174,17 +175,24 @@ Rectangle
             visible: d.dragging
 
             color: "lightgrey"
-            opacity: 0.2
+            opacity: 0.4
         }
 
         Rectangle
         {
             id: circleMarker
 
-            anchors.fill: parent
+            anchors.centerIn: parent
+            width: 24
+            height: width
+            border.width: 2
             radius: width / 2
 
-            color: drawer.drawButtonBorders ? control.color : "transparent"
+            color: drawer.drawButtonBorders && !markerShadow.visible
+                ? control.color
+                : "transparent"
+
+            opacity: markerShadow.visible ? markerShadow.opacity : control.opacity
             border.color: "white" // todo replace with actual color
         }
     }
@@ -193,8 +201,8 @@ Rectangle
     {
         id: pointerItem
 
-        property vector2d position: d.radialVector.times(1.1).plus(d.centerPoint)
-        property real iconRotation: 135
+        property vector2d position: d.radialVector.times(1.15).plus(d.centerPoint)
+        property real iconRotation: 135 //< points to right
 
         width: 12
         height: width
@@ -254,6 +262,46 @@ Rectangle
         }
         onMouseXChanged: { drawer.requestPaint() }
         onMouseYChanged: { drawer.requestPaint() }
+    }
+
+    Repeater
+    {
+        model: d.currentSectionData.buttons.length
+
+        delegate: Item
+        {
+            property int directionId: d.currentSectionData ? d.currentSectionData.buttons[index] : 0
+            property bool horizontal: directionId == 3 || directionId == 4
+            property real offset: marker.height / 2 + 16 + 16
+
+            property vector2d position: d.centerPoint.plus(horizontal
+                ? Qt.vector2d(directionId == 3 ? -offset : offset, 0)
+                : Qt.vector2d(0, directionId == 1 ? -offset : offset))
+
+            property real iconRotation: 135 //< points to right by default
+            property color color: mouseArea.pressed ? "grey" : "white"
+
+            x: position.x - width / 2
+            y: position.y - height / 2
+            width: 12
+            height: width
+
+            rotation: iconRotation + d.kButtonRotations[directionId]
+
+            Rectangle
+            {
+                width: parent.width
+                height: 2
+                color: parent.color
+            }
+
+            Rectangle
+            {
+                width: 2
+                height: parent.height
+                color: parent.color
+            }
+        }
     }
 
     QtObject
@@ -340,14 +388,16 @@ Rectangle
                     return kFourWayPtzSectorData
                 case kEightWayPtz:
                     return kEightWayPtzSectorData
+                case kFreeWayPtz:
+                    return kFreeWayPtzSectorData
                 default:
-                    return null
+                    throw "Invalid ptz type"
             }
         }
 
         property int currentSectionIndex:
         {
-            if (!currentSectionData) //< Free-way ptz
+            if (control.ptzType == kFreeWayPtz)
                 return -1
 
             var sectorsCount = currentSectionData.sectorsMapping.length
@@ -367,7 +417,7 @@ Rectangle
 
         property int currentSectionId:
         {
-            return !currentSectionData || currentSectionIndex < 0
+            return control.ptzType == kFreeWayPtz || currentSectionIndex < 0
                 ? -1
                 : currentSectionData.sectorsMapping[currentSectionIndex]
         }
@@ -376,29 +426,40 @@ Rectangle
         {
             "startAngle": 0,
             "step": Math.PI,
-            "sectorsMapping": [6, 1]
+            "sectorsMapping": [6, 1],
+            "buttons": [6, 1]
         }
 
         readonly property var kTwoWayHorizontalSectorData:
         {
             "startAngle": -Math.PI / 2,
             "step": Math.PI,
-            "sectorsMapping": [4, 3]
+            "sectorsMapping": [4, 3],
+            "buttons": [4, 3]
         }
 
         readonly property var kFourWayPtzSectorData:
         {
             "startAngle": -Math.PI / 4,
             "step": Math.PI / 2,
-            "sectorsMapping": [4, 6, 3, 1]
+            "sectorsMapping": [4, 6, 3, 1],
+            "buttons": [4, 6, 3, 1]
         }
 
         readonly property var kEightWayPtzSectorData:
         {
             "startAngle": -Math.PI * 7 / 8,
             "step": Math.PI / 4,
-            "sectorsMapping": [0, 1, 2, 3, 4, 5, 6, 7]
+            "sectorsMapping": [0, 1, 2, 3, 4, 5, 6, 7],
+            "buttons": [4, 6, 3, 1]
         }
+
+        readonly property var kFreeWayPtzSectorData:
+        {
+            "buttons": [4, 6, 3, 1]
+        }
+
+        readonly property var kButtonRotations: [-1, -90, -1,  180, 0, -1, 90, -1]
     }
 
     QtObject
