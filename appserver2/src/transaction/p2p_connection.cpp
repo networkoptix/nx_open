@@ -376,10 +376,6 @@ P2pConnection::State P2pConnection::state() const
 
 void P2pConnection::setState(State state)
 {
-    if (state == State::Error)
-    {
-        int gg = 4;
-    }
     m_state = state;
 }
 
