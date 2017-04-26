@@ -60,7 +60,7 @@ void ClientToRelayConnection::startSession(
         [this, handler = std::move(handler), desiredSessionId]()
         {
             nx::cloud::relay::api::CreateClientSessionResponse response;
-            response.sessionId = desiredSessionId;
+            response.sessionId = desiredSessionId.toStdString();
             if (m_failRequests)
                 handler(nx::cloud::relay::api::ResultCode::networkError, std::move(response));
             else
