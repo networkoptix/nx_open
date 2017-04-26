@@ -9,14 +9,17 @@ namespace relay {
 namespace test {
 
 class ClientToRelayConnection:
-    public nx::cloud::relay::api::ClientToRelayConnection
+    public nx::cloud::relay::api::Client
 {
-    using base_type = nx::cloud::relay::api::ClientToRelayConnection;
+    using base_type = nx::cloud::relay::api::Client;
 
 public:
     ClientToRelayConnection();
     virtual ~ClientToRelayConnection() override;
 
+    virtual void beginListening(
+        const nx::String& peerName,
+        nx::cloud::relay::api::BeginListeningHandler completionHandler) override;
     virtual void startSession(
         const nx::String& desiredSessionId,
         const nx::String& /*targetPeerName*/,

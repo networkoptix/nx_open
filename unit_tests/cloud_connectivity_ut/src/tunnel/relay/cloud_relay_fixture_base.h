@@ -24,11 +24,11 @@ protected:
     virtual void onClientToRelayConnectionDestroyed(ClientToRelayConnection*) {}
 
 private:
-    nx::cloud::relay::api::ClientToRelayConnectionFactory::CustomFactoryFunc
-        m_clientToRelayConnectionFactoryBak;
+    nx::cloud::relay::api::ClientFactory::CustomFactoryFunc
+        m_clientFactoryBak;
 
-    std::unique_ptr<nx::cloud::relay::api::ClientToRelayConnection> 
-        clientToRelayConnectionFactoryFunc(const SocketAddress& /*relayEndpoint*/);
+    std::unique_ptr<nx::cloud::relay::api::Client> 
+        clientFactoryFunc(const QUrl& /*relayUrl*/);
 };
 
 } // namespace test
