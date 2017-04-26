@@ -115,6 +115,11 @@ public:
         return m_moduleInstance;
     }
 
+    const ModuleProcessType* moduleInstance() const
+    {
+        return m_moduleInstance.get();
+    }
+
 private:
     std::vector<char*> m_args;
     std::unique_ptr<ModuleProcessType> m_moduleInstance;

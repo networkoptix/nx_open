@@ -2,7 +2,7 @@
 
 #include <nx/network/socket_common.h>
 #include <nx/utils/settings.h>
-#include <nx/utils/abstract_service_settings.h>
+#include <nx/utils/basic_service_settings.h>
 
 namespace nx {
 namespace cloud {
@@ -36,17 +36,15 @@ struct ConnectingPeer
 };
 
 class Settings:
-    public nx::utils::AbstractServiceSettings
+    public nx::utils::BasicServiceSettings
 {
+    using base_type = nx::utils::BasicServiceSettings;
+
 public:
     Settings();
 
     Settings(const Settings&) = delete;
     Settings& operator=(const Settings&) = delete;
-
-    virtual void load(int argc, const char **argv) override;
-    virtual bool isShowHelpRequested() const override;
-    virtual void printCmdLineArgsHelp() override;
 
     virtual QString dataDir() const override;
     virtual utils::log::Settings logging() const override;
@@ -56,14 +54,13 @@ public:
     const Http& http() const;
 
 private:
-    QnSettings m_settings;
-    bool m_showHelpRequested;
     utils::log::Settings m_logging;
     Http m_http;
     ListeningPeer m_listeningPeer;
     ConnectingPeer m_connectingPeer;
 
-    void loadSettings();
+    virtual void loadSettings() override;
+
     void loadHttp();
     void loadListeningPeer();
     void loadConnectingPeer();

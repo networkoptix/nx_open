@@ -6,6 +6,9 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
+#include "http_handlers.h"
+#include "../controller/connect_session_manager.h"
+#include "../controller/controller.h"
 #include "../settings.h"
 
 namespace nx {
@@ -15,35 +18,14 @@ namespace relay {
 View::View(
     const conf::Settings& settings,
     const Model& /*model*/,
-    Controller* /*controller*/)
+    Controller* controller)
     :
     m_settings(settings),
+    m_controller(controller),
     m_authenticationManager(m_authRestrictionList)
 {
-    const auto& httpEndpoints = settings.http().endpoints;
-    if (httpEndpoints.empty())
-    {
-        NX_LOGX("No HTTP address to listen", cl_logALWAYS);
-        throw std::runtime_error("No HTTP address to listen");
-    }
-
-    //registerApiHandlers(&m_httpMessageDispatcher);
-
-    //m_authRestrictionList.allow(http_handler::GetCloudModulesXml::kHandlerPath, AuthMethod::noAuth);
-
-    m_multiAddressHttpServer =
-        std::make_unique<MultiAddressServer<nx_http::HttpStreamSocketServer>>(
-            &m_authenticationManager,
-            &m_httpMessageDispatcher,
-            false,
-            nx::network::NatTraversalSupport::disabled);
-
-    if (!m_multiAddressHttpServer->bind(httpEndpoints))
-    {
-        throw std::runtime_error(
-            lm("Cannot bind to address(es) %1. %2")
-            .container(httpEndpoints).arg(SystemError::getLastOSErrorText()).toStdString());
-    }
+    registerApiHandlers();
+    startAcceptor();
 }
 
 View::~View()
@@ -68,6 +50,49 @@ void View::start()
 std::vector<SocketAddress> View::httpEndpoints() const
 {
     return m_multiAddressHttpServer->endpoints();
+}
+
+void View::registerApiHandlers()
+{
+    registerApiHandler<view::BeginListeningHandler>();
+    registerApiHandler<view::CreateClientSessionHandler>();
+    registerApiHandler<view::ConnectToPeerHandler>();
+}
+
+template<typename Handler>
+void View::registerApiHandler()
+{
+    m_httpMessageDispatcher.registerRequestProcessor<Handler>(
+        Handler::kPath,
+        [this]() -> std::unique_ptr<Handler>
+        {
+            return std::make_unique<Handler>(&m_controller->connectSessionManager());
+        });
+}
+
+void View::startAcceptor()
+{
+    const auto& httpEndpoints = m_settings.http().endpoints;
+    if (httpEndpoints.empty())
+    {
+        NX_LOGX("No HTTP address to listen", cl_logALWAYS);
+        throw std::runtime_error("No HTTP address to listen");
+    }
+
+    m_multiAddressHttpServer =
+        std::make_unique<MultiAddressServer<nx_http::HttpStreamSocketServer>>(
+            &m_authenticationManager,
+            &m_httpMessageDispatcher,
+            false,
+            nx::network::NatTraversalSupport::disabled);
+
+    if (!m_multiAddressHttpServer->bind(httpEndpoints))
+    {
+        throw std::runtime_error(
+            lm("Cannot bind to address(es) %1. %2")
+                .container(httpEndpoints)
+                .arg(SystemError::getLastOSErrorText()).toStdString());
+    }
 }
 
 } // namespace relay

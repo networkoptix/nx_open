@@ -71,41 +71,23 @@ ConnectingPeer::ConnectingPeer():
 // Settings
 
 Settings::Settings():
-    m_settings(
+    base_type(
         QnAppInfo::organizationNameForSettings(),
         TrafficRelayAppInfo::applicationName(),
-        kModuleName),
-    m_showHelpRequested(false)
+        kModuleName)
 {
-}
-
-bool Settings::isShowHelpRequested() const
-{
-    return m_showHelpRequested;
-}
-
-void Settings::load(int argc, const char **argv)
-{
-    m_settings.parseArgs(argc, argv);
-
-    loadSettings();
-}
-
-void Settings::printCmdLineArgsHelp()
-{
-    // TODO: 
 }
 
 QString Settings::dataDir() const
 {
-    const QString& dataDirFromSettings = m_settings.value(kDataDir).toString();
+    const QString& dataDirFromSettings = settings().value(kDataDir).toString();
     if (!dataDirFromSettings.isEmpty())
         return dataDirFromSettings;
 
 #ifdef Q_OS_LINUX
     QString defVarDirName = QString("/opt/%1/%2/var")
         .arg(QnAppInfo::linuxOrganizationName()).arg(kModuleName);
-    QString varDirName = m_settings.value("varDir", defVarDirName).toString();
+    QString varDirName = settings().value("varDir", defVarDirName).toString();
     return varDirName;
 #else
     const QStringList& dataDirList =
@@ -136,7 +118,7 @@ const Http& Settings::http() const
 
 void Settings::loadSettings()
 {
-    m_logging.load(m_settings, QLatin1String("log"));
+    m_logging.load(settings(), QLatin1String("log"));
     loadHttp();
     loadListeningPeer();
     loadConnectingPeer();
@@ -144,7 +126,7 @@ void Settings::loadSettings()
 
 void Settings::loadHttp()
 {
-    const QStringList& httpAddrToListenStrList = m_settings.value(
+    const QStringList& httpAddrToListenStrList = settings().value(
         kHttpEndpointsToListen,
         kDefaultHttpEndpointsToListen).toString().split(',');
     if (!httpAddrToListenStrList.isEmpty())
@@ -157,17 +139,17 @@ void Settings::loadHttp()
             [](const QString& str) { return SocketAddress(str); });
     }
 
-    m_http.tcpBacklogSize = m_settings.value(
+    m_http.tcpBacklogSize = settings().value(
         kHttpTcpBacklogSize, kDefaultHttpTcpBacklogSize).toInt();
 }
 
 void Settings::loadListeningPeer()
 {
-    m_listeningPeer.recommendedPreemptiveConnectionCount = m_settings.value(
+    m_listeningPeer.recommendedPreemptiveConnectionCount = settings().value(
         kRecommendedPreemptiveConnectionCount,
         kDefaultRecommendedPreemptiveConnectionCount).toInt();
 
-    m_listeningPeer.maxPreemptiveConnectionCount = m_settings.value(
+    m_listeningPeer.maxPreemptiveConnectionCount = settings().value(
         kMaxPreemptiveConnectionCount,
         kDefaultMaxPreemptiveConnectionCount).toInt();
 }
@@ -176,7 +158,7 @@ void Settings::loadConnectingPeer()
 {
     m_connectingPeer.connectSessionIdleTimeout = 
         nx::utils::parseTimerDuration(
-            m_settings.value(kConnectSessionIdleTimeout).toString(),
+            settings().value(kConnectSessionIdleTimeout).toString(),
             kDefaultConnectSessionIdleTimeout);
 }
 

@@ -34,7 +34,7 @@ namespace server {
 } // namespace server
 
 class NX_NETWORK_API HttpServerConnection;
-class MessageDispatcher;
+class AbstractMessageDispatcher;
 
 /** Used to install handlers on some events on HTTP connection.
     \warning There is no way to remove installed event handler.
@@ -92,7 +92,7 @@ public:
         StreamConnectionHolder<HttpServerConnection>* socketServer,
         std::unique_ptr<AbstractStreamSocket> sock,
         nx_http::server::AbstractAuthenticationManager* const authenticationManager,
-        nx_http::MessageDispatcher* const httpMessageDispatcher);
+        nx_http::AbstractMessageDispatcher* const httpMessageDispatcher);
     virtual ~HttpServerConnection();
 
     virtual void pleaseStop(
@@ -105,7 +105,7 @@ public:
 
 private:
     nx_http::server::AbstractAuthenticationManager* const m_authenticationManager;
-    nx_http::MessageDispatcher* const m_httpMessageDispatcher;
+    nx_http::AbstractMessageDispatcher* const m_httpMessageDispatcher;
     std::unique_ptr<nx_http::AbstractMsgBodySource> m_currentMsgBody;
     bool m_isPersistent;
     bool m_persistentConnectionEnabled;

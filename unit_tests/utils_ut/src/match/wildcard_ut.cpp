@@ -26,4 +26,8 @@ TEST( MatchFunctions, wildcardMatch )
     ASSERT_TRUE( wildcardMatch( "abc*def*hren?z??", "abc123456defhren1z11" ) );
     ASSERT_FALSE( wildcardMatch( "abc*def*hren?z??", "abc123456defhren1z1123" ) );
     ASSERT_TRUE( wildcardMatch( "abc*def*hren?z*?", "abc123456def0000hren1z12321311" ) );
+
+    ASSERT_TRUE(wildcardMatch("/account/*/systems", "/account/pupkin/systems"));
+    ASSERT_FALSE(wildcardMatch("/account/*/systems/", "/account/pupkin/systems"));
+    ASSERT_FALSE(wildcardMatch("/account/*/systems/", "/account/pupkin/syst"));
 }
