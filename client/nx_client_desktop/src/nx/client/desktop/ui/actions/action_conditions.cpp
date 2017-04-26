@@ -1020,28 +1020,6 @@ ActionVisibility CreateZoomWindowCondition::check(const QnResourceWidgetList& wi
     return EnabledAction;
 }
 
-TreeNodeTypeCondition::TreeNodeTypeCondition(Qn::NodeType nodeType):
-    m_nodeTypes({nodeType})
-{
-}
-
-TreeNodeTypeCondition::TreeNodeTypeCondition(QList<Qn::NodeType> nodeTypes):
-    m_nodeTypes(nodeTypes.toSet())
-{
-}
-
-ActionVisibility TreeNodeTypeCondition::check(const Parameters& parameters, QnWorkbenchContext* context)
-{
-    if (parameters.hasArgument(Qn::NodeTypeRole))
-    {
-        Qn::NodeType nodeType = parameters.argument(Qn::NodeTypeRole).value<Qn::NodeType>();
-        return m_nodeTypes.contains(nodeType)
-            ? EnabledAction
-            : InvisibleAction;
-    }
-    return EnabledAction;
-}
-
 ActionVisibility NewUserLayoutCondition::check(const Parameters& parameters, QnWorkbenchContext* context)
 {
     if (!parameters.hasArgument(Qn::NodeTypeRole))
@@ -1674,6 +1652,16 @@ ConditionWrapper isSafeMode()
 ConditionWrapper hasFlags(Qn::ResourceFlags flags, MatchMode matchMode)
 {
     return new ResourceCondition(QnResourceCriterionExpressions::hasFlags(flags), matchMode);
+}
+
+ConditionWrapper treeNodeType(QSet<Qn::NodeType> types)
+{
+    return new CustomBoolCondition(
+        [types](const Parameters& parameters, QnWorkbenchContext* context)
+        {
+            return parameters.hasArgument(Qn::NodeTypeRole)
+                && types.contains(parameters.argument(Qn::NodeTypeRole).value<Qn::NodeType>());
+        });
 }
 
 } // namespace condition

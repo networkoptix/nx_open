@@ -130,7 +130,7 @@ void initialize(Manager* manager, Action* root)
     factory(ConnectToCloudSystemAction)
         .flags(Tree | NoTarget)
         .text(tr("Connect to System"))
-        .condition(new TreeNodeTypeCondition(Qn::CloudSystemNode));
+        .condition(condition::treeNodeType(Qn::CloudSystemNode));
 
     factory(ReconnectAction)
         .flags(NoTarget);
@@ -321,7 +321,7 @@ void initialize(Manager* manager, Action* root)
             .text(tr("User.."))
             .pulledText(tr("New User.."))
             .condition(
-                ConditionWrapper(new TreeNodeTypeCondition(Qn::UsersNode))
+                condition::treeNodeType(Qn::UsersNode)
                 && !condition::isSafeMode()
             )
             .autoRepeat(false);
@@ -340,7 +340,7 @@ void initialize(Manager* manager, Action* root)
             .text(tr("Web Page.."))
             .pulledText(tr("New Web Page.."))
             .condition(
-                ConditionWrapper(new TreeNodeTypeCondition(Qn::WebPagesNode))
+                condition::treeNodeType(Qn::WebPagesNode)
                 && !condition::isSafeMode()
             )
             .autoRepeat(false);
@@ -351,10 +351,7 @@ void initialize(Manager* manager, Action* root)
             .text(tr("Layout Tour.."))
             .pulledText(tr("New Layout Tour.."))
             .condition(
-            (
-                ConditionWrapper(new TreeNodeTypeCondition(Qn::LayoutsNode))
-                || ConditionWrapper(new TreeNodeTypeCondition(Qn::LayoutToursNode))
-                )
+                condition::treeNodeType({Qn::LayoutsNode, Qn::LayoutToursNode})
                 && !condition::isSafeMode()
             )
             .autoRepeat(false);
@@ -410,7 +407,7 @@ void initialize(Manager* manager, Action* root)
             .autoRepeat(false)
             .condition(
                 ConditionWrapper(new LoggedInCondition())
-                && ConditionWrapper(new TreeNodeTypeCondition({Qn::CurrentSystemNode, Qn::ServersNode}))
+                && condition::treeNodeType({Qn::CurrentSystemNode, Qn::ServersNode})
             );
 
     } factory.endSubMenu();
@@ -548,7 +545,7 @@ void initialize(Manager* manager, Action* root)
         .text(tr("System Administration.."))
         .shortcut(lit("Ctrl+Alt+A"))
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
-        .condition(new TreeNodeTypeCondition({Qn::CurrentSystemNode, Qn::ServersNode}));
+        .condition(condition::treeNodeType({Qn::CurrentSystemNode, Qn::ServersNode}));
 
     factory(SystemUpdateAction)
         .flags(NoTarget)
@@ -559,7 +556,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Main | Tree)
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .text(tr("User Management.."))
-        .condition(new TreeNodeTypeCondition(Qn::UsersNode));
+        .condition(condition::treeNodeType(Qn::UsersNode));
 
     factory(PreferencesGeneralTabAction)
         .flags(Main)
@@ -632,7 +629,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Main | Tree)
         .text(tr("Merge Systems.."))
         .condition(
-            ConditionWrapper(new TreeNodeTypeCondition({Qn::CurrentSystemNode, Qn::ServersNode}))
+            condition::treeNodeType({Qn::CurrentSystemNode, Qn::ServersNode})
             && !condition::isSafeMode()
             && ConditionWrapper(new RequiresOwnerCondition())
         );
@@ -675,12 +672,12 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | SingleTarget | ResourceTarget)
         .childFactory(new EdgeNodeFactory(manager))
         .text(tr("Server.."))
-        .condition(new TreeNodeTypeCondition(Qn::EdgeNode));
+        .condition(condition::treeNodeType(Qn::EdgeNode));
 
     factory()
         .flags(Tree | SingleTarget | ResourceTarget)
         .separator()
-        .condition(new TreeNodeTypeCondition(Qn::EdgeNode));
+        .condition(condition::treeNodeType(Qn::EdgeNode));
 
     /* Resource actions. */
     factory(OpenInLayoutAction)
@@ -1118,7 +1115,7 @@ void initialize(Manager* manager, Action* root)
         .text(tr("Rename"))
         .shortcut(lit("F2"))
         .condition(
-            ConditionWrapper(new TreeNodeTypeCondition(Qn::LayoutTourNode))
+            condition::treeNodeType(Qn::LayoutTourNode)
             && !condition::isSafeMode()
         )
         .autoRepeat(false);
@@ -1154,12 +1151,9 @@ void initialize(Manager* manager, Action* root)
     factory(UserRolesAction)
         .flags(Tree | NoTarget)
         .text(tr("User Roles.."))
-        .conditionalText(tr("Role Settings.."), new TreeNodeTypeCondition(Qn::RoleNode))
+        .conditionalText(tr("Role Settings.."), condition::treeNodeType(Qn::RoleNode))
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
-        .condition(
-            ConditionWrapper(new TreeNodeTypeCondition(Qn::UsersNode))
-            || ConditionWrapper(new TreeNodeTypeCondition(Qn::RoleNode))
-        );
+        .condition(condition::treeNodeType({Qn::UsersNode, Qn::RoleNode}));
 
     factory(CameraIssuesAction)
         .mode(DesktopMode)
@@ -1298,7 +1292,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
         .text(tr("Merge to Currently Connected System.."))
         .condition(
-            ConditionWrapper(new TreeNodeTypeCondition(Qn::ResourceNode))
+            condition::treeNodeType(Qn::ResourceNode)
             && !condition::isSafeMode()
             && ConditionWrapper(new MergeToCurrentSystemCondition())
             && ConditionWrapper(new RequiresOwnerCondition())
@@ -1365,7 +1359,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | NoTarget)
         .mode(DesktopMode)
         .text(tr("Review Layout Tour"))
-        .condition(new TreeNodeTypeCondition(Qn::LayoutTourNode))
+        .condition(condition::treeNodeType(Qn::LayoutTourNode))
         .autoRepeat(false);
 
     factory(ToggleLayoutTourModeAction)
@@ -1376,7 +1370,7 @@ void initialize(Manager* manager, Action* root)
         .checkable()
         .autoRepeat(false)
         .condition(
-            ConditionWrapper(new TreeNodeTypeCondition(Qn::LayoutTourNode))
+            condition::treeNodeType(Qn::LayoutTourNode)
             && ConditionWrapper(new ToggleTourCondition())
         );
 
@@ -1387,7 +1381,7 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(Qn::GlobalAdminPermission) //TODO: #GDM #3.1 #tbd
         .shortcut(lit("Del"))
         .shortcut(Qt::Key_Backspace, Builder::Mac, true)
-        .condition(new TreeNodeTypeCondition(Qn::LayoutTourNode));
+        .condition(condition::treeNodeType(Qn::LayoutTourNode));
 
     factory(StartCurrentLayoutTourAction)
         .flags(Scene | NoTarget)
@@ -1656,7 +1650,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | NoTarget)
         .text(tr("Pin Tree"))
         .toggledText(tr("Unpin Tree"))
-        .condition(new TreeNodeTypeCondition(Qn::RootNode));
+        .condition(condition::treeNodeType(Qn::RootNode));
 
     factory(PinCalendarAction)
         .text(tr("Pin Calendar"))
@@ -1670,7 +1664,7 @@ void initialize(Manager* manager, Action* root)
         .flags(NoTarget)
         .text(tr("Show Tree"))
         .toggledText(tr("Hide Tree"))
-        .condition(new TreeNodeTypeCondition(Qn::RootNode));
+        .condition(condition::treeNodeType(Qn::RootNode));
 
     factory(ToggleTimelineAction)
         .flags(NoTarget)

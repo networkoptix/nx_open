@@ -413,18 +413,6 @@ public:
     virtual ActionVisibility check(const QnResourceWidgetList& widgets, QnWorkbenchContext* context) override;
 };
 
-class TreeNodeTypeCondition: public Condition
-{
-public:
-    TreeNodeTypeCondition(Qn::NodeType nodeType);
-    TreeNodeTypeCondition(QList<Qn::NodeType> nodeTypes);
-
-    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
-
-private:
-    QSet<Qn::NodeType> m_nodeTypes;
-};
-
 class ResourceStatusCondition: public Condition
 {
 public:
@@ -642,6 +630,9 @@ ConditionWrapper isSafeMode();
 
 /** Allowed only for resource parameters with corresponding flags. */
 ConditionWrapper hasFlags(Qn::ResourceFlags flags, MatchMode matchMode);
+
+ConditionWrapper treeNodeType(QSet<Qn::NodeType> types);
+inline ConditionWrapper treeNodeType(Qn::NodeType type) { return treeNodeType({{type}}); }
 
 } // namespace condition
 
