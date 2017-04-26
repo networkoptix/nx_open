@@ -76,7 +76,7 @@ private:
     {
         auto connectSessionManager = std::make_unique<ConnectSessionManagerMock>();
         m_connectSessionManager = connectSessionManager.get();
-        return connectSessionManager;
+        return std::move(connectSessionManager);
     }
 
     QUrl prepareUrl() const
