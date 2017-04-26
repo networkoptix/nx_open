@@ -18,7 +18,7 @@ class Factory: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
 public:
-    Factory(QObject* parent = nullptr);
+    Factory(QObject* parent);
     virtual QList<QAction*> newActions(const Parameters& parameters, QObject* parent = nullptr);
     virtual QMenu* newMenu(const Parameters& /*parameters*/, QWidget* /*parentWidget*/);
 };
@@ -28,7 +28,7 @@ class OpenCurrentUserLayoutFactory: public Factory
 {
     Q_OBJECT
 public:
-    OpenCurrentUserLayoutFactory(QObject* parent = nullptr);
+    OpenCurrentUserLayoutFactory(QObject* parent);
     virtual QList<QAction*> newActions(const Parameters& parameters, QObject* parent) override;
 };
 
@@ -37,7 +37,7 @@ class PtzPresetsToursFactory: public Factory
 {
     Q_OBJECT
 public:
-    PtzPresetsToursFactory(QObject* parent = nullptr);
+    PtzPresetsToursFactory(QObject* parent);
     virtual QList<QAction*> newActions(const Parameters& parameters, QObject* parent) override;
 };
 
@@ -45,7 +45,7 @@ class EdgeNodeFactory: public Factory
 {
     Q_OBJECT
 public:
-    EdgeNodeFactory(QObject* parent = nullptr);
+    EdgeNodeFactory(QObject* parent);
     virtual QMenu* newMenu(const Parameters& parameters, QWidget *parentWidget) override;
 };
 
@@ -53,7 +53,7 @@ class AspectRatioFactory: public Factory
 {
     Q_OBJECT
 public:
-    AspectRatioFactory(QObject* parent = nullptr);
+    AspectRatioFactory(QObject* parent);
     virtual QList<QAction*> newActions(const Parameters& parameters, QObject* parent) override;
 };
 

@@ -176,16 +176,16 @@ Builder Builder::separator(bool isSeparator)
     return *this;
 }
 
-Builder Builder::conditionalText(const QString& text, const ConditionPtr& condition)
+Builder Builder::conditionalText(const QString& text, ConditionWrapper&& condition)
 {
-    m_action->addConditionalText(condition, text);
+    m_action->addConditionalText(std::move(condition), text);
     return *this;
 }
 
 Builder Builder::conditionalText(const QString& text, const QnResourceCriterion& criterion,
     MatchMode matchMode)
 {
-    m_action->addConditionalText(new ResourceCondition(criterion, matchMode, m_action), text);
+    m_action->addConditionalText(new ResourceCondition(criterion, matchMode), text);
     return *this;
 }
 
@@ -213,17 +213,17 @@ Builder Builder::accent(Qn::ButtonAccent value)
     return *this;
 }
 
-Builder Builder::condition(const ConditionPtr& condition)
+Builder Builder::condition(const QnResourceCriterion& criterion, MatchMode matchMode)
 {
-    NX_ASSERT(m_action->condition().isNull());
-    m_action->setCondition(condition.data());
+    NX_ASSERT(!m_action->hasCondition());
+    m_action->setCondition(new ResourceCondition(criterion, matchMode));
     return *this;
 }
 
-Builder Builder::condition(const QnResourceCriterion& criterion, MatchMode matchMode)
+Builder Builder::condition(ConditionWrapper&& condition)
 {
-    NX_ASSERT(m_action->condition().isNull());
-    m_action->setCondition(new ResourceCondition(criterion, matchMode, m_action));
+    NX_ASSERT(!m_action->hasCondition());
+    m_action->setCondition(std::move(condition));
     return *this;
 }
 
