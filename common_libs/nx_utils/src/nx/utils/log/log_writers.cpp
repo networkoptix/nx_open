@@ -1,6 +1,7 @@
 #include "log_writers.h"
 
 #include <iostream>
+#include <QtCore/QDir>
 #include <QtCore/QFile>
 
 namespace nx {
@@ -40,7 +41,8 @@ QString File::makeFileName(size_t backupNumber) const
     else
     {
         static const QLatin1String kTemplate("%1_%2.log");
-        return QString(kTemplate).arg(m_settings.name).arg(backupNumber, 3, QLatin1Char('0'));
+        return QString(kTemplate).arg(m_settings.name).arg(
+            (int) backupNumber, 3, 10, QLatin1Char('0'));
     }
 }
 
@@ -49,10 +51,11 @@ bool File::openFile()
     if (m_file.is_open())
         return true;
 
+    const auto fileNameQString = makeFileName();
     #ifdef Q_OS_WIN
-        const auto fileName = makeFileName().toStdWString();
+        const auto fileName = fileNameQString.toStdWString();
     #else
-        const auto fileName = makeFileName().toStdString();
+        const auto fileName = fileNameQString.toStdString();
     #endif
 
     m_file.open(fileName, std::ios_base::in | std::ios_base::out);
@@ -62,6 +65,10 @@ bool File::openFile()
         m_file.seekp(std::ios_base::streamoff(0), std::ios_base::end);
         return !m_file.fail();
     }
+
+    const auto directory = QFileInfo(fileNameQString).absoluteDir();
+    if (!directory.exists())
+        directory.mkpath(QLatin1String("."));
 
     m_file.open(fileName, std::ios_base::out);
     if (m_file.fail())
@@ -74,14 +81,22 @@ bool File::openFile()
 
 void File::rotateIfNeeded()
 {
-    if (m_file.tellp() < m_settings.size)
+    const auto currentPosition = m_file.tellp();
+    if (currentPosition < m_settings.size)
         return;
 
     m_file.close();
+    if (m_settings.count == 0)
+    {
+        QFile::remove(makeFileName());
+        return;
+    }
+
     if (QFile::exists(makeFileName(m_settings.count)))
     {
         // If all files used up we need to rotate all of them.
-        for (size_t i = 2; i <= m_settings.size; ++i)
+        QFile::remove(makeFileName(1));
+        for (size_t i = 2; i <= m_settings.count; ++i)
             QFile::rename(makeFileName(i), makeFileName(i - 1));
 
         QFile::rename(makeFileName(), makeFileName(m_settings.count));
@@ -93,7 +108,7 @@ void File::rotateIfNeeded()
         while (QFile::exists(makeFileName(firstFreeNumber)))
             ++firstFreeNumber;
 
-        QFile::rename(makeFileName(), makeFileName(m_settings.count));
+        QFile::rename(makeFileName(), makeFileName(firstFreeNumber));
     }
 }
 
