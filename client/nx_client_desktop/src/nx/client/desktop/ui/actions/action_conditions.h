@@ -161,12 +161,6 @@ public:
     virtual ActionVisibility check(const QnResourceWidgetList& widgets, QnWorkbenchContext* context) override;
 };
 
-class CheckFileSignatureCondition: public Condition
-{
-public:
-    virtual ActionVisibility check(const QnResourceWidgetList& widgets, QnWorkbenchContext* context) override;
-};
-
 /**
  * ResourceCriterion-based action Condition.
  */

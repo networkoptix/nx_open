@@ -992,7 +992,7 @@ void initialize(Manager* manager, Action* root)
         .text(tr("Check File Watermark"))
         .shortcut(lit("Alt+C"))
         .autoRepeat(false)
-        .condition(new CheckFileSignatureCondition());
+        .condition(hasFlags(Qn::exported_media));
 
     factory(TakeScreenshotAction)
         .flags(Scene | SingleTarget | HotkeyOnly)
