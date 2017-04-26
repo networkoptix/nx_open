@@ -64,6 +64,7 @@ public:
         invalidChunkSize,
         noFreeSpace
     };
+    Q_ENUM(ErrorCode)
 
     DistributedFileDownloader(const QDir& downloadsDirectory, QObject* parent = nullptr);
     ~DistributedFileDownloader();
@@ -98,6 +99,8 @@ private:
     QScopedPointer<DistributedFileDownloaderPrivate> const d_ptr;
     Q_DECLARE_PRIVATE(DistributedFileDownloader)
 };
+
+QN_FUSION_DECLARE_FUNCTIONS(DistributedFileDownloader::ErrorCode, (lexical))
 
 } // namespace common
 } // namespace vms

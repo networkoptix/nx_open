@@ -20,6 +20,7 @@ namespace vms {
 namespace common {
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(DownloaderFileInformation, Status)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(DistributedFileDownloader, ErrorCode)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((DownloaderFileInformation), (json), _Fields)
 
 namespace detail {
