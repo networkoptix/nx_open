@@ -63,7 +63,7 @@ public:
 
     ConnectionOptions();
 
-    void loadFromSettings(QnSettings* const settings);
+    void loadFromSettings(const QnSettings& settings);
 
     bool operator==(const ConnectionOptions&) const;
 };
