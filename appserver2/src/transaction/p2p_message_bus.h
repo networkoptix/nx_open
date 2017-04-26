@@ -135,7 +135,7 @@ private:
     QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list
     QMap<QnUuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections
     QMap<QnUuid, QUrl> m_remoteUrls; //< Url list for outgoing connections
-    PeerNumberInfo m_localShortPeerInfo;
+    PeerNumberInfo m_localShortPeerInfo; //< Short numbers created by current peer
 
     typedef QMap<ApiPersistentIdData, RoutingRecord> RoutingInfo;
     struct PeerInfo
@@ -145,7 +145,6 @@ private:
         qint32 distanceVia(const ApiPersistentIdData& via) const;
         qint32 minDistance(QVector<ApiPersistentIdData>* outViaList) const;
 
-        bool isOnline = false;
         RoutingInfo routingInfo; // key: route throw, value - distance in hops
     };
     typedef QMap<ApiPersistentIdData, PeerInfo> PeersMap;

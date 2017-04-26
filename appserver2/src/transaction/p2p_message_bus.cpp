@@ -234,7 +234,6 @@ void P2pMessageBus::addOwnfInfoToPeerList()
     if (m_allPeers.isEmpty())
     {
         auto& peerData = m_allPeers[localPeer()];
-        peerData.isOnline = true;
         peerData.routingInfo.insert(localPeer(), RoutingRecord(0, 0));
     }
 }
@@ -251,12 +250,10 @@ void P2pMessageBus::addOfflinePeersFromDb()
             itr.key().id,
             itr.key().persistentId);  //< persistent id
         auto& peerData = m_allPeers[peer];
-        if (!peerData.isOnline)
-        {
-            qint32 sequence = itr.value();
-            RoutingRecord record(kMaxDistance - sequence, qnSyncTime->currentMSecsSinceEpoch());
-            peerData.routingInfo.insert(localPeer(), record);
-        }
+
+        qint32 sequence = itr.value();
+        RoutingRecord record(kMaxDistance - sequence, qnSyncTime->currentMSecsSinceEpoch());
+        peerData.routingInfo.insert(localPeer(), record);
     }
 }
 
@@ -282,8 +279,9 @@ QByteArray P2pMessageBus::serializePeersMessage()
                 continue;
             qint16 peerNumber = m_localShortPeerInfo.encode(itr.key());
             serializeCompressPeerNumber(writer, peerNumber);
-            writer.putBit(peer.isOnline);
-            if (peer.isOnline)
+            bool isOnline = minDistance < kMaxOnlineDistance;
+            writer.putBit(isOnline);
+            if (isOnline)
                 NALUnit::writeUEGolombCode(writer, minDistance); //< distance
             else
                 writer.putBits(32, minDistance); //< distance
@@ -317,8 +315,6 @@ void P2pMessageBus::deserializeAlivePeersMessageRequest(
             else
                 receivedDistance = reader.getBits(32);
             PeerInfo& peerInfo = m_allPeers[peerId];
-            if (peerInfo.isOnline && !isOnline)
-                continue; //< ignore incoming offline record because we have online data
 
             RoutingRecord& record = peerInfo.routingInfo[connection->remotePeer()];
             record.distance = std::min(receivedDistance, record.distance);
@@ -332,11 +328,6 @@ void P2pMessageBus::deserializeAlivePeersMessageRequest(
 
 void P2pMessageBus::sendAlivePeersMessage()
 {
-    if (commonModule()->instanceCounter() != 0)
-    {
-        int gg = 4;
-    }
-
     QByteArray data = serializePeersMessage();
     for (const auto& connection : m_connections)
     {

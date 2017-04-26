@@ -34,6 +34,7 @@ struct SubscribeRecord
 };
 
 static const qint32 kMaxDistance = std::numeric_limits<qint32>::max();
+static const qint32 kMaxOnlineDistance = 16384;
 static const char* kP2pProtoName = "p2p";
 
 Q_DECLARE_METATYPE(MessageType)
