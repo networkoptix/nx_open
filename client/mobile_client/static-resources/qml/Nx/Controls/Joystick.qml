@@ -7,7 +7,7 @@ Rectangle
     color: "blue" // todo remove me
 
     property vector2d direction: d.dragging
-        ? d.dragMovementVector
+        ? d.movementVector
         : Qt.vector2d(0, 0)
 
     property int ptzType: 0
@@ -248,9 +248,8 @@ Rectangle
             if (!mouseArea.pressed)
                 return centerPoint
 
-            var isFreeWayPtz = control.ptzType == kFreeWayPtz
-            if (dragging || isFreeWayPtz)
-                return directionToPosition(dragMovementVector, controlRadius, true)
+            if (control.ptzType == kFreeWayPtz)
+                return directionToPosition(mousePos.minus(centerPoint), controlRadius, true)
 
             if (!currentSectionData || currentSectionIndex == -1 || currentSectionId == -1)
                 return centerPoint
@@ -258,16 +257,28 @@ Rectangle
             var directionAngle = currentSectionData.startAngle
                 + currentSectionData.step * (currentSectionIndex + 0.5)
 
-            var radialVector = d.getRadialVector(d.controlRadius, directionAngle)
+            var radialVector = getRadialVector(d.controlRadius, directionAngle)
 
             return centerPoint.plus(radialVector)
         }
 
         property bool dragging: false
-        property vector2d dragMovementVector:
-            d.positionToDirection(mousePos, markerMaxDistance)
+        property vector2d movementVector:
+        {
+            var mouseVector = mousePos.minus(centerPoint)
+            var radialVector = radialPosition.minus(centerPoint)
+            var cosAlpha = getCosBetweenVectors(mouseVector, radialVector)
+            var result = radialVector.times(cosAlpha * mouseVector.length()
+                / (controlRadius * controlRadius))
+
+            if (result.length() > 1)
+                result = result.normalized()
+            return result
+        }
+
+        //onMovementVectorChanged: console.log(movementVector, radialPosition)
         property vector2d markerCenterPosition: dragging
-            ? directionToPosition(dragMovementVector, markerMaxDistance)
+            ? movementVector.times(markerMaxDistance).plus(centerPoint)
             : centerPoint
 
         /**
@@ -388,13 +399,16 @@ Rectangle
             return value > -eps && value < eps
         }
 
+        function getCosBetweenVectors(first, second)
+        {
+            return first.normalized().dotProduct(second.normalized())
+        }
+
         function getAngle(vector)
         {
             var horizontalVector = Qt.vector2d(1, 0)
-
-            var normalized = vector.normalized()
-            var cosAlpha = normalized.dotProduct(horizontalVector)
-            var sign = fuzzyIsNull(normalized.y) ? 1 : Math.abs(normalized.y) / normalized.y
+            var cosAlpha = getCosBetweenVectors(vector, horizontalVector)
+            var sign = fuzzyIsNull(vector.y) ? 1 : Math.abs(vector.y) / vector.y
             var result = Math.acos(cosAlpha) * sign
             return result
         }

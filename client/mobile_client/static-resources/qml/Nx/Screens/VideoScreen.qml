@@ -333,7 +333,7 @@ PageBase
 
                 Joystick
                 {
-                    ptzType: 0
+                    ptzType: 2
 
                     visible: enabled;
                     anchors.verticalCenter: parent.verticalCenter
