@@ -27,8 +27,7 @@ public:
     OutgoingTunnelConnection(
         SocketAddress relayEndpoint,
         nx::String relaySessionId,
-        std::unique_ptr<nx::cloud::relay::api::ClientToRelayConnection> clientToRelayConnection);
-    virtual ~OutgoingTunnelConnection();
+        std::unique_ptr<nx::cloud::relay::api::Client> relayApiClient);
 
     virtual void stopWhileInAioThread() override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
@@ -47,14 +46,14 @@ public:
 private:
     struct RequestContext
     {
-        std::unique_ptr<nx::cloud::relay::api::ClientToRelayConnection> relayClient;
+        std::unique_ptr<nx::cloud::relay::api::Client> relayClient;
         OnNewConnectionHandler completionHandler;
         nx::network::aio::Timer timer;
     };
 
     const SocketAddress m_relayEndpoint;
     const nx::String m_relaySessionId;
-    std::unique_ptr<nx::cloud::relay::api::ClientToRelayConnection> m_controlConnection;
+    std::unique_ptr<nx::cloud::relay::api::Client> m_relayApiClient;
     QnMutex m_mutex;
     std::list<std::unique_ptr<RequestContext>> m_activeRequests;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_tunnelClosedHandler;

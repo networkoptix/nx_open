@@ -1,8 +1,13 @@
 #pragma once
 
+#include <list>
+
 #include <nx/network/aio/basic_pollable.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/fusion_data_http_client.h>
 #include <nx/utils/move_only_func.h>
 
+#include "relay_api_data_types.h"
 #include "relay_api_result_code.h"
 
 namespace nx {
@@ -11,18 +16,24 @@ namespace relay {
 namespace api {
 
 //-------------------------------------------------------------------------------------------------
-// ClientToRelayConnection
+// Client
 
-using StartClientConnectSessionHandler = 
-    nx::utils::MoveOnlyFunc<void(ResultCode, nx::String /*sessionId*/)>;
+using BeginListeningHandler =
+    nx::utils::MoveOnlyFunc<void(ResultCode, BeginListeningResponse)>;
+
+using StartClientConnectSessionHandler =
+    nx::utils::MoveOnlyFunc<void(ResultCode, CreateClientSessionResponse)>;
 
 using OpenRelayConnectionHandler = 
     nx::utils::MoveOnlyFunc<void(ResultCode, std::unique_ptr<AbstractStreamSocket>)>;
 
-class NX_NETWORK_API ClientToRelayConnection:
+class NX_NETWORK_API Client:
     public network::aio::BasicPollable
 {
 public:
+    virtual void beginListening(
+        const nx::String& peerName,
+        BeginListeningHandler completionHandler) = 0;
     virtual void startSession(
         const nx::String& desiredSessionId,
         const nx::String& targetPeerName,
@@ -38,28 +49,35 @@ public:
 };
 
 //-------------------------------------------------------------------------------------------------
-// ClientToRelayConnectionFactory
+// ClientFactory
 
-class NX_NETWORK_API ClientToRelayConnectionFactory
+class NX_NETWORK_API ClientFactory
 {
 public:
     using CustomFactoryFunc = 
-        nx::utils::MoveOnlyFunc<std::unique_ptr<ClientToRelayConnection>(const SocketAddress&)>;
+        nx::utils::MoveOnlyFunc<std::unique_ptr<Client>(const QUrl&)>;
 
-    static std::unique_ptr<ClientToRelayConnection> create(const SocketAddress& relayEndpoint);
+    static std::unique_ptr<Client> create(const QUrl& baseUrl);
 
     static CustomFactoryFunc setCustomFactoryFunc(CustomFactoryFunc newFactoryFunc);
 };
 
 //-------------------------------------------------------------------------------------------------
-// ClientToRelayConnectionImpl
+// ClientImpl
 
-class NX_NETWORK_API ClientToRelayConnectionImpl:
-    public ClientToRelayConnection
+class NX_NETWORK_API ClientImpl:
+    public Client
 {
+    using base_type = Client;
+
 public:
-    ClientToRelayConnectionImpl(const SocketAddress& relayEndpoint);
-    virtual ~ClientToRelayConnectionImpl() override;
+    ClientImpl(const QUrl& baseUrl);
+
+    virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread);
+
+    virtual void beginListening(
+        const nx::String& peerName,
+        BeginListeningHandler completionHandler) override;
 
     virtual void startSession(
         const nx::String& desiredSessionId,
@@ -73,9 +91,53 @@ public:
     virtual SystemError::ErrorCode prevRequestSysErrorCode() const override;
 
 private:
-    const SocketAddress m_relayEndpoint;
+    const QUrl m_baseUrl;
+    SystemError::ErrorCode m_prevSysErrorCode;
+    nx_http::AuthInfo m_authInfo;
+    std::list<std::unique_ptr<network::aio::BasicPollable>> m_activeRequests;
 
     virtual void stopWhileInAioThread() override;
+
+    template<
+        typename Request,
+        typename Response,
+        typename RequestPathArgument,
+        typename CompletionHandler
+    >
+    void issueRequest(
+        Request request,
+        const char* requestPathTemplate,
+        std::initializer_list<RequestPathArgument> requestPathArguments,
+        CompletionHandler completionHandler);
+
+    template<
+        typename Request,
+        typename Response,
+        typename RequestPathArgument
+    >
+    std::unique_ptr<nx_http::FusionDataHttpClient<Request, Response>>
+        prepareHttpClient(
+            Request request,
+            const char* requestPathTemplate,
+            std::initializer_list<RequestPathArgument> requestPathArguments);
+
+    template<
+        typename Response,
+        typename HttpClient,
+        typename CompletionHandler
+    >
+    void executeRequest(
+        HttpClient httpClient,
+        CompletionHandler completionHandler);
+
+    template<typename HttpClient, typename CompletionHandler>
+    void executeOpenConnectionRequest(
+        HttpClient httpClient,
+        CompletionHandler completionHandler);
+
+    ResultCode toResultCode(
+        SystemError::ErrorCode sysErrorCode,
+        const nx_http::Response* httpResponse);
 };
 
 } // namespace api
