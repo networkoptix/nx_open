@@ -26,7 +26,7 @@ WebSocket::WebSocket(
     nx::Buffer tmpBuf(requestData);
     m_parser.consume(tmpBuf);
     AbstractAsyncChannel::bindToAioThread(m_baseConnection.getAioThread());
-    m_baseConnection.dispatch([this](){ handleRead(); });
+    m_baseConnection.post([this](){ handleRead(); });
 }
 
 WebSocket::~WebSocket()
@@ -94,7 +94,7 @@ void WebSocket::readSomeAsync(
     m_readBuffer = buffer;
 
     if (m_buffer.readySize() != 0)
-        m_baseConnection.dispatch([this]() { handleRead(); });
+        m_baseConnection.post([this]() { handleRead(); });
     else
         m_baseConnection.startReadingConnection();
 }
