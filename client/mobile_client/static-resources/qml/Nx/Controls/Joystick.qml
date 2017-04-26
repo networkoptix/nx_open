@@ -6,6 +6,9 @@ Rectangle
 
     color: "blue" // todo remove me
 
+    /**
+     * "direction" property specifies blah blah TODO: write comment
+     */
     property vector2d direction: d.dragging
         ? d.movementVector
         : Qt.vector2d(0, 0)
@@ -17,10 +20,6 @@ Rectangle
     readonly property int kFourWayPtz: 2
     readonly property int kTwoWayHorizontal: 3
     readonly property int kTwoWayVertical: 4
-
-    /**
-     * "direction" property specifies blah blah TODO: write comment
-     */
 
     signal singleShot(point direction)
     signal buttonPressed(point direction)
@@ -60,12 +59,12 @@ Rectangle
             if (d.dragging)
                 return
 
-            var gradientStartPoint = d.centerPoint.minus(d.radialPosition.minus(d.centerPoint))
+            var gradientStartPoint = d.centerPoint.minus(d.radialVector)
 
             context.fillStyle = createGradient(context, gradientStartPoint, d.radialPosition,
                 Qt.rgba(1, 1, 1, 0), Qt.rgba(1, 1, 1, 0.5))
 
-            var angle = mathHelpers.getAngle(d.radialPosition.minus(d.centerPoint))
+            var angle = mathHelpers.getAngle(d.radialVector)
             var angleOffset = drawer.drawButtonBorders && d.currentSectionData
                 ? d.currentSectionData.step / 2
                 : Math.PI
@@ -154,18 +153,6 @@ Rectangle
         }
     }
 
-    Rectangle
-    {
-        id: centerMarker
-
-        width: 4
-        height: 4
-        radius: 2
-
-        anchors.centerIn: parent
-        visible: d.dragging
-    }
-
     Item
     {
         id: marker
@@ -202,6 +189,49 @@ Rectangle
         }
     }
 
+    Item
+    {
+        id: pointerItem
+
+        property vector2d position: d.radialVector.times(1.1).plus(d.centerPoint)
+        property real iconRotation: 135
+
+        width: 12
+        height: width
+
+        x: position.x - width / 2
+        y: position.y - height / 2
+
+        rotation: iconRotation + mathHelpers.getAngle(d.radialVector) * 180 / Math.PI
+
+        visible: mouseArea.pressed
+        scale: d.movementVector.length()
+
+        Rectangle
+        {
+            width: parent.width
+            height: 2
+        }
+
+        Rectangle
+        {
+            width: 2
+            height: parent.height
+        }
+    }
+
+    Rectangle
+    {
+        id: centerMarker
+
+        width: 4
+        height: 4
+        radius: 2
+
+        anchors.centerIn: parent
+        visible: d.dragging
+    }
+
     MouseArea
     {
         id: mouseArea
@@ -235,11 +265,15 @@ Rectangle
         property real markerMaxDistance: controlRadius - markerRadius
 
         property bool dragging: false
+
+        property vector2d mouseVector: mousePos.minus(centerPoint)
         property vector2d mousePos: mouseArea.pressed
             ? Qt.vector2d(mouseArea.mouseX, mouseArea.mouseY)
             : centerPoint
 
         property vector2d centerPoint: Qt.vector2d(controlRadius, controlRadius)
+
+        property vector2d radialVector: radialPosition.minus(centerPoint)
         property vector2d radialPosition:
         {
             if (!mouseArea.pressed)
@@ -247,10 +281,7 @@ Rectangle
 
 
             if (control.ptzType == kFreeWayPtz)
-            {
-                return mathHelpers.directionToPosition(
-                    mousePos.minus(centerPoint), controlRadius, true)
-            }
+                return mathHelpers.directionToPosition(mouseVector, controlRadius, true)
 
             if (!currentSectionData || currentSectionIndex == -1 || currentSectionId == -1)
                 return centerPoint
@@ -267,8 +298,6 @@ Rectangle
 
         property vector2d movementVector:
         {
-            var mouseVector = mousePos.minus(centerPoint)
-            var radialVector = radialPosition.minus(centerPoint)
             var cosAlpha = mathHelpers.getCosBetweenVectors(mouseVector, radialVector)
             var result = radialVector.times(cosAlpha * mouseVector.length()
                 / (controlRadius * controlRadius))
