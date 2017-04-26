@@ -88,7 +88,7 @@ TEST(P2pMessageBus, connect)
 {
     QnStaticCommonModule staticCommon;
 
-    static const int kInstanceCount = 2;
+    static const int kInstanceCount = 3;
     static const int kMaxSyncTimeoutMs = 1000 * 5 * 1000;
 
     std::vector<Appserver2Ptr> servers;

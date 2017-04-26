@@ -683,7 +683,11 @@ QVector<SubscribeRecord> P2pMessageBus::deserializeSubscribeForDataUpdatesReques
     BitStreamReader reader((quint8*) data.data(), data.size());
     try {
         while (reader.bitsLeft() > 0)
-            result.push_back(SubscribeRecord(reader.getBits(16), reader.getBits(32)));
+        {
+            PeerNumberType peer = reader.getBits(16);
+            qint32 sequence = reader.getBits(32);
+            result.push_back(SubscribeRecord(peer, sequence));
+        }
         *success = true;
     }
     catch (...)
