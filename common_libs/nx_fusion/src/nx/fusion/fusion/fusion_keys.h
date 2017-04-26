@@ -40,6 +40,7 @@ QN_FUSION_DEFINE_KEY(sql_placeholder_name)
 QN_FUSION_DEFINE_KEY(classname)
 QN_FUSION_DEFINE_KEY(c_classname)
 QN_FUSION_DEFINE_KEY(optional)
+QN_FUSION_DEFINE_KEY(brief)
 
 #define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_base true
 #define QN_FUSION_PROPERTY_EXTENSION_FOR_base(KEY, VALUE) (base, std::declval<VALUE>())
@@ -68,6 +69,9 @@ QN_FUSION_DEFINE_KEY(optional)
 
 #define QN_FUSION_PROPERTY_IS_TYPED_FOR_optional true
 #define QN_FUSION_PROPERTY_TYPE_FOR_optional bool
+
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_brief true
+#define QN_FUSION_PROPERTY_TYPE_FOR_brief bool
 
 /**
  * \internal

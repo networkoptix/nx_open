@@ -20,7 +20,7 @@ public:
      *
      * \param parent                    Context-aware parent.
      */
-    TextFactory(QObject *parent);
+    TextFactory(QObject* parent);
 
     /**
      * \param parameters                Action parameters.
@@ -32,8 +32,7 @@ public:
 class DevicesNameTextFactory: public TextFactory
 {
 public:
-    DevicesNameTextFactory(const QnCameraDeviceStringSet& stringSet,
-        QObject *parent = nullptr);
+    DevicesNameTextFactory(const QnCameraDeviceStringSet& stringSet, QObject* parent);
     virtual QString text(const Parameters& parameters, QnWorkbenchContext* context) const override;
 private:
     const QnCameraDeviceStringSet m_stringSet;

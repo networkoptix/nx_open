@@ -3159,14 +3159,9 @@ QSize QnNxStyle::sizeFromContents(
 
         case CT_PushButton:
         {
-            bool hasIcon = false;
-            bool hasText = false;
-            if (auto button = qstyleoption_cast<const QStyleOptionButton*>(option))
-            {
-                hasIcon = !button->icon.isNull();
-                hasText = !button->text.isEmpty();
-            }
-
+            const auto button = qstyleoption_cast<const QStyleOptionButton*>(option);
+            const bool hasIcon = button && !button->icon.isNull();
+            const bool hasText = button && !button->text.isEmpty();
             const bool textButton = QnNxStylePrivate::isTextButton(option);
 
             QSize result(size.width(), qMax(size.height(), Metrics::kButtonHeight));

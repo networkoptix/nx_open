@@ -13,6 +13,7 @@
 #include <client/client_globals.h>
 
 #include <nx/client/desktop/ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/action_conditions.h>
 
 class QGraphicsItem;
 
@@ -126,12 +127,12 @@ public:
     /**
      * \returns                         Condition associated with this action, of NULL if none.
      */
-    ConditionPtr condition() const;
+    bool hasCondition() const;
 
     /**
      * \param condition                 New condition for this action.
      */
-    void setCondition(const ConditionPtr& condition);
+    void setCondition(ConditionWrapper&& condition);
 
     FactoryPtr childFactory() const;
     void setChildFactory(const FactoryPtr& childFactory);
@@ -164,7 +165,7 @@ public:
         ActionScopes scope,
         const Parameters &parameters) const;
 
-    void addConditionalText(ConditionPtr condition, const QString &text);
+    void addConditionalText(ConditionWrapper&& condition, const QString &text);
 
     /**
      * \returns true if there is at least one conditional text
@@ -198,7 +199,7 @@ private:
     Qn::GlobalPermission m_globalPermission;
     QString m_normalText, m_toggledText, m_pulledText;
     QString m_toolTipFormat, m_toolTipMarker;
-    ConditionPtr m_condition;
+    ConditionWrapper m_condition;
     FactoryPtr m_childFactory;
     TextFactoryPtr m_textFactory;
 
@@ -206,13 +207,14 @@ private:
 
     struct ConditionalText
     {
-        ConditionPtr condition;
+        ConditionWrapper condition;
         QString text;
-        ConditionalText(){}
-        ConditionalText(ConditionPtr condition, const QString &text):
-            condition(condition), text(text) {}
+        ConditionalText() = delete;
+        ConditionalText(ConditionalText&& conditionalText);
+        ConditionalText(ConditionWrapper&& condition, const QString &text);
+        ~ConditionalText();
     };
-    QList<ConditionalText> m_conditionalTexts;
+    std::vector<ConditionalText> m_conditionalTexts;
 };
 
 } // namespace action

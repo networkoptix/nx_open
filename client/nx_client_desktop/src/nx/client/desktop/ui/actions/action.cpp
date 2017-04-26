@@ -159,14 +159,14 @@ void Action::setPulledText(const QString& pulledText)
     m_pulledText = pulledText;
 }
 
-ConditionPtr Action::condition() const
+bool Action::hasCondition() const
 {
-    return m_condition;
+     return m_condition ? true : false; //< using explicit operator bool
 }
 
-void Action::setCondition(const ConditionPtr& condition)
+void Action::setCondition(ConditionWrapper&& condition)
 {
-    m_condition = condition;
+    m_condition = std::move(condition);
 }
 
 FactoryPtr Action::childFactory() const
@@ -304,15 +304,15 @@ ActionVisibility Action::checkCondition(ActionScopes scope, const Parameters& pa
         }
     }
 
-    if (m_condition)
+    if (hasCondition())
     {
         if (parameters.scope() == InvalidScope)
         {
             Parameters scopedParameters(parameters);
             scopedParameters.setScope(scope);
-            return m_condition->check(scopedParameters);
+            return m_condition->check(scopedParameters, context());
         }
-        return m_condition->check(parameters);
+        return m_condition->check(parameters, context());
     }
 
     return EnabledAction;
@@ -419,24 +419,40 @@ void Action::updateToolTipSilent()
     updateToolTip(false);
 }
 
-void Action::addConditionalText(ConditionPtr condition, const QString& text)
+void Action::addConditionalText(ConditionWrapper&& condition, const QString& text)
 {
-    m_conditionalTexts << ConditionalText(condition, text);
+    m_conditionalTexts.emplace_back(std::move(condition), text);
 }
 
 bool Action::hasConditionalTexts()
 {
-    return !m_conditionalTexts.isEmpty();
+    return !m_conditionalTexts.empty();
 }
 
 QString Action::checkConditionalText(const Parameters& parameters) const
 {
-    for (const ConditionalText& conditionalText : m_conditionalTexts)
+    for (const auto& conditionalText: m_conditionalTexts)
     {
-        if (conditionalText.condition->check(parameters))
+        if (conditionalText.condition->check(parameters, context()))
             return conditionalText.text;
     }
     return normalText();
+}
+
+Action::ConditionalText::ConditionalText(ConditionWrapper&& condition, const QString &text):
+    condition(std::move(condition)),
+    text(text)
+{
+}
+
+Action::ConditionalText::ConditionalText(ConditionalText&& conditionalText):
+    condition(std::move(conditionalText.condition)),
+    text(conditionalText.text)
+{
+}
+
+Action::ConditionalText::~ConditionalText()
+{
 }
 
 } // namespace action

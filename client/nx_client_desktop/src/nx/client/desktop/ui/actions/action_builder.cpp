@@ -24,11 +24,13 @@ Builder::Builder(Action* action):
     action->setShortcutContext(Qt::WindowShortcut);
 }
 
-Builder Builder::shortcut(const QKeySequence& keySequence, ActionPlatform platform,
+Builder Builder::shortcut(
+    const QKeySequence& keySequence,
+    Platform platform,
     bool replaceExisting)
 {
+    // This check is required to avoid crashes in the client unit tests
     QGuiApplication* guiApp = qobject_cast<QGuiApplication*>(qApp);
-
     if (!guiApp)
         return *this;
 
@@ -69,7 +71,7 @@ Builder Builder::shortcutContext(Qt::ShortcutContext context)
     return *this;
 }
 
-Builder Builder::icon(const QIcon &icon)
+Builder Builder::icon(const QIcon& icon)
 {
     m_action->setIcon(icon);
     return *this;
@@ -174,16 +176,16 @@ Builder Builder::separator(bool isSeparator)
     return *this;
 }
 
-Builder Builder::conditionalText(const QString& text, const ConditionPtr& condition)
+Builder Builder::conditionalText(const QString& text, ConditionWrapper&& condition)
 {
-    m_action->addConditionalText(condition, text);
+    m_action->addConditionalText(std::move(condition), text);
     return *this;
 }
 
 Builder Builder::conditionalText(const QString& text, const QnResourceCriterion& criterion,
     MatchMode matchMode)
 {
-    m_action->addConditionalText(new ResourceCondition(criterion, matchMode, m_action), text);
+    m_action->addConditionalText(new ResourceCondition(criterion, matchMode), text);
     return *this;
 }
 
@@ -211,17 +213,17 @@ Builder Builder::accent(Qn::ButtonAccent value)
     return *this;
 }
 
-Builder Builder::condition(const ConditionPtr& condition)
+Builder Builder::condition(const QnResourceCriterion& criterion, MatchMode matchMode)
 {
-    NX_ASSERT(m_action->condition().isNull());
-    m_action->setCondition(condition.data());
+    NX_ASSERT(!m_action->hasCondition());
+    m_action->setCondition(new ResourceCondition(criterion, matchMode));
     return *this;
 }
 
-Builder Builder::condition(const QnResourceCriterion& criterion, MatchMode matchMode)
+Builder Builder::condition(ConditionWrapper&& condition)
 {
-    NX_ASSERT(m_action->condition().isNull());
-    m_action->setCondition(new ResourceCondition(criterion, matchMode, m_action));
+    NX_ASSERT(!m_action->hasCondition());
+    m_action->setCondition(std::move(condition));
     return *this;
 }
 
