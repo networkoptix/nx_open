@@ -333,18 +333,16 @@ PageBase
 
                 Joystick
                 {
+                    ptzType: 0
 
-                    supportSingleShot: supportDrag;
-                    supportDrag:
+                    visible: enabled;
+                    anchors.verticalCenter: parent.verticalCenter
+                    enabled:
                     {
                         var ptzCaps = ptzController.capabilities & Ptz.ContinuousPtzCapabilities
                         return ptzCaps == Ptz.ContinuousPtzCapabilities
                     }
 
-                    visible: enabled;
-                    enabled: supportDrag || supportSingleShot;
-
-                    anchors.verticalCenter: parent.verticalCenter
                     onSingleShot:
                     {
                         console.log("---------------------------")

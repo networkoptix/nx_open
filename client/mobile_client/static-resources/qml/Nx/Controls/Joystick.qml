@@ -4,21 +4,23 @@ Rectangle
 {
     id: control
 
-    color: "lightblue" // todo remove me
+    color: "blue" // todo remove me
 
-    property alias direction: _private.direction
+    property vector2d direction: d.dragging
+        ? d.dragMovementVector
+        : Qt.vector2d(0, 0)
 
-    readonly property int kEightWayPtz: 0
-    readonly property int kFourWayPtz: 1
+    property int ptzType: 0
+
+    readonly property int kFreeWayPtz: 0
+    readonly property int kEightWayPtz: 1
+    readonly property int kFourWayPtz: 2
     readonly property int kTwoWayHorizontal: 3
     readonly property int kTwoWayVertical: 4
 
     /**
      * "direction" property specifies blah blah TODO: write comment
      */
-
-    property bool supportDrag: false
-    property bool supportSingleShot: false
 
     signal singleShot(point direction)
     signal buttonPressed(point direction)
@@ -28,15 +30,13 @@ Rectangle
     implicitHeight: implicitWidth
     radius: width / 2
 
-    onDirectionChanged: { gradientDrawer.requestPaint() }
-
     Canvas
     {
-        id: gradientDrawer
+        id: drawer
 
-        property real angle: Math.PI / 2
-        property real halfAngle: angle / 2
+        property bool drawButtonBorders: ptzType != kEightWayPtz && ptzType != kFreeWayPtz
 
+        visible: drawButtonBorders || mouseArea.pressed
         anchors.fill: parent
 
         onPaint:
@@ -44,25 +44,44 @@ Rectangle
             var context = getContext("2d")
             context.reset()
 
-            var center = _private.centerPoint
-            var radial = _private.radialPosition
-            var radius = _private.controlRadius
-            var startAngle = _private.currentAngle - halfAngle
-            var finishAngle = _private.currentAngle + halfAngle
+            var center = d.centerPoint
+            var radius = d.controlRadius
 
-            context.fillStyle = createGradient(context, center, radial,
-                Qt.rgba(1, 1, 1, 0), Qt.rgba(1, 1, 1, 0.3))
 
-            drawSegment(context, center, radius, startAngle, finishAngle)
+            if (mouseArea.pressed)
+                drawGradient(context)
 
-            var innerRadius = _private.active ? 0 : marker.width / 2
-            drawDelimitter(context, kFourWayPtz, center, innerRadius, radius)
+            if (drawButtonBorders)
+                drawBorders(context)
         }
 
-        function createGradient(context, startPoint, endPoint, startColor, endColor)
+        function drawGradient(context)
         {
+            if (d.dragging)
+                return
+
+            var radius = d.controlRadius
+            var center = d.centerPoint
+            var radial = d.radialPosition
+
+            var gradientStartPoint = center.minus(radial.minus(center))
+
+            context.fillStyle = createGradient(context, gradientStartPoint, radial,
+                Qt.rgba(1, 1, 1, 0), Qt.rgba(1, 1, 1, 0.5))
+
+            var angle = d.getAngle(radial.minus(center))
+            var angleOffset = drawer.drawButtonBorders && d.currentSectionData
+                ? d.currentSectionData.step / 2
+                : Math.PI
+
+            drawSegment(context, center, radius, angle - angleOffset, angle + angleOffset)
+        }
+
+        function createGradient(context, startPoint, finishPoint, startColor, endColor)
+        {
+            var vector = finishPoint.minus(startPoint)
             var gradient = context.createLinearGradient(
-                startPoint.x, startPoint.y, endPoint.x, endPoint.y)
+                startPoint.x, startPoint.y, finishPoint.x, finishPoint.y)
             gradient.addColorStop(0, startColor)
             gradient.addColorStop(1, endColor)
             return gradient
@@ -77,7 +96,7 @@ Rectangle
             context.fill()
         }
 
-        function drawLine(context, from, to, holeLength)
+        function drawLineWithHole(context, from, to, holeLength)
         {
             var vector = to.minus(from)
             var vectorLength = vector.length()
@@ -93,37 +112,44 @@ Rectangle
             context.stroke()
         }
 
-        function drawDelimitter(context, type, center, innerRadius, outerRadius)
+        function drawBorders(context)
         {
-            var holeLength = innerRadius * 2
+            var type = control.ptzType
+            var center = d.centerPoint
+            var radius = d.controlRadius
+            var holeLength = markerShadow.width
+
             switch(type)
             {
                 case kTwoWayHorizontal:
-                    var verticalOffset = Qt.vector2d(0, outerRadius)
+                    var verticalOffset = Qt.vector2d(0, radius)
                     var topPoint = center.minus(verticalOffset)
                     var bottomPoint = center.plus(verticalOffset)
-                    drawLine(context, topPoint, bottomPoint, holeLength)
+                    drawLineWithHole(context, topPoint, bottomPoint, holeLength)
                     return
 
                 case kTwoWayVertical:
-                    var horizontalOffset = Qt.vector2d(outerRadius, 0)
+                    var horizontalOffset = Qt.vector2d(radius, 0)
                     var leftPoint = center.minus(horizontalOffset)
                     var rightPoint = center.plus(horizontalOffset)
-                    drawLine(context, leftPoint, rightPoint, holeLength)
+                    drawLineWithHole(context, leftPoint, rightPoint, holeLength)
                     return
 
                 case kFourWayPtz:
-                case kEightWayPtz:
-                    var radial = _private.getRadialVector(outerRadius, -Math.PI / 4)
+                    var radial = d.getRadialVector(radius, -Math.PI / 4)
                     var topRight = center.plus(radial)
                     var bottomLeft = center.minus(radial)
-                    drawLine(context, topRight, bottomLeft, holeLength)
+                    drawLineWithHole(context, topRight, bottomLeft, holeLength)
 
-                    radial = _private.getRadialVector(outerRadius, Math.PI / 4)
+                    radial = d.getRadialVector(radius, Math.PI / 4)
                     var bottomRight = center.plus(radial)
                     var topLeft = center.minus(radial)
-                    drawLine(context, bottomRight, topLeft, holeLength)
+                    drawLineWithHole(context, bottomRight, topLeft, holeLength)
                     return
+
+                case kEightWayPtz: //< Fallthrough
+                case kFreeWayPtz:
+                    return //< We don't need to draw delimiter lines
 
                 default:
                     console.log("Invalid ptz type")
@@ -141,15 +167,15 @@ Rectangle
         radius: 2
 
         anchors.centerIn: parent
-        visible: _private.active
+        visible: d.dragging
     }
 
     Item
     {
         id: marker
 
-        x: _private.markerCenterPosition.x - width / 2
-        y: _private.markerCenterPosition.y - height / 2
+        x: d.markerCenterPosition.x - width / 2
+        y: d.markerCenterPosition.y - height / 2
         width: 32
         height: width
 
@@ -162,7 +188,7 @@ Rectangle
             width: 48
             height: width
             radius: width / 2
-            visible: _private.active
+            visible: d.dragging
 
             color: "lightgrey"
             opacity: 0.2
@@ -175,8 +201,7 @@ Rectangle
             anchors.fill: parent
             radius: width / 2
 
-            visible: control.supportDrag
-            color: "transparent"
+            color: drawer.drawButtonBorders ? control.color : "transparent"
             border.color: "white" // todo replace with actual color
         }
     }
@@ -186,29 +211,161 @@ Rectangle
         id: mouseArea
 
         anchors.fill: parent
-        hoverEnabled: true
+
+        onPressed:
+        {
+            var mousePos = Qt.vector2d(mouseX, mouseY) //< Use explicit value to avoid dependencies
+            if (d.pointInCircle(mousePos, d.centerPoint, d.markerRadius))
+                d.dragging = true
+
+            drawer.requestPaint()
+        }
+
+        onReleased:
+        {
+            d.dragging = false
+            drawer.requestPaint()
+        }
+        onMouseXChanged: { drawer.requestPaint() }
+        onMouseYChanged: { drawer.requestPaint() }
     }
 
     QtObject
     {
-        id: _private;
-
-        property bool active: supportDrag && mouseArea.pressed
+        id: d;
 
         property real controlRadius: control.width / 2
         property real markerRadius: marker.width / 2
         property real markerMaxDistance: controlRadius - markerRadius
 
-        property vector2d direction: _private.positionToDirection(
-            markerTargetPosition, markerMaxDistance)
+        property vector2d mousePos: mouseArea.pressed
+            ? Qt.vector2d(mouseArea.mouseX, mouseArea.mouseY)
+            : centerPoint
 
         property vector2d centerPoint: Qt.vector2d(controlRadius, controlRadius)
-        property vector2d radialPosition: directionToPosition(direction, controlRadius, true)
-        property real currentAngle: getAngle(radialPosition.minus(centerPoint))
-        property vector2d markerCenterPosition: directionToPosition(direction, markerMaxDistance)
-        property vector2d markerTargetPosition: active
-            ? Qt.vector2d(mouseArea.mouseX, mouseArea.mouseY)
-            : _private.centerPoint
+        property vector2d radialPosition:
+        {
+            if (!mouseArea.pressed)
+                return centerPoint
+
+            var isFreeWayPtz = control.ptzType == kFreeWayPtz
+            if (dragging || isFreeWayPtz)
+                return directionToPosition(dragMovementVector, controlRadius, true)
+
+            if (!currentSectionData || currentSectionIndex == -1 || currentSectionId == -1)
+                return centerPoint
+
+            var directionAngle = currentSectionData.startAngle
+                + currentSectionData.step * (currentSectionIndex + 0.5)
+
+            var radialVector = d.getRadialVector(d.controlRadius, directionAngle)
+
+            return centerPoint.plus(radialVector)
+        }
+
+        property bool dragging: false
+        property vector2d dragMovementVector:
+            d.positionToDirection(mousePos, markerMaxDistance)
+        property vector2d markerCenterPosition: dragging
+            ? directionToPosition(dragMovementVector, markerMaxDistance)
+            : centerPoint
+
+        /**
+          * Eight-way ptz has 8 sectors with following layout:
+          * 0 1 2
+          * 3 - 4
+          * 5 6 7
+          * where:
+          * 1 is "go up" command
+          * 2 is "go up-left" command
+          * .. etc
+          *
+          * All ptz with less ways count should map their sectors for listed above.
+          * For example, four-way ptz layout is:
+          *   1
+          * 3 - 4
+          *   6
+          */
+
+        property var currentSectionData:
+        {
+            switch(control.ptzType)
+            {
+                case kTwoWayHorizontal:
+                    return kTwoWayHorizontalSectorData
+                case kTwoWayVertical:
+                    return kTwoWayVerticalSectorData
+                case kFourWayPtz:
+                    return kFourWayPtzSectorData
+                case kEightWayPtz:
+                    return kEightWayPtzSectorData
+                default:
+                    return null
+            }
+        }
+
+        function toGrad(rad)
+        {
+            return rad * 180  / Math.PI
+        }
+
+        property int currentSectionIndex:
+        {
+            if (!currentSectionData) //< Free-way ptz
+                return -1
+
+            var sectorsCount = currentSectionData.sectorsMapping.length
+            for (var i = 0; i !== sectorsCount; ++i)
+            {
+                var startAngle = currentSectionData.startAngle + currentSectionData.step * i
+                var finishAngle = currentSectionData.startAngle + currentSectionData.step * (i + 1)
+                if (angleInSector(d.mousePos, d.centerPoint, startAngle, finishAngle))
+                    return i
+            }
+
+            throw "Can't find sector"
+            return -1
+        }
+
+        property int currentSectionId:
+        {
+            return !currentSectionData || currentSectionIndex < 0
+                ? -1
+                : currentSectionData.sectorsMapping[currentSectionIndex]
+        }
+
+        readonly property var kTwoWayVerticalSectorData:
+        {
+            "startAngle": 0,
+            "step": Math.PI,
+            "sectorsMapping": [6, 1]
+        }
+
+        readonly property var kTwoWayHorizontalSectorData:
+        {
+            "startAngle": -Math.PI / 2,
+            "step": Math.PI,
+            "sectorsMapping": [4, 3]
+        }
+
+        readonly property var kFourWayPtzSectorData:
+        {
+            "startAngle": -Math.PI / 4,
+            "step": Math.PI / 2,
+            "sectorsMapping": [4, 6, 3, 1]
+        }
+
+        readonly property var kEightWayPtzSectorData:
+        {
+            "startAngle": -Math.PI * 7 / 8,
+            "step": Math.PI / 4,
+            "sectorsMapping": [0, 1, 2, 3, 4, 5, 6, 7]
+        }
+
+        function getAngleWithOffset(startAngle, step, count)
+        {
+            return startAngle + step * count
+        }
 
         function positionToDirection(position, maxLength)
         {
@@ -245,6 +402,45 @@ Rectangle
         function getRadialVector(radius, angle)
         {
             return Qt.vector2d(radius * Math.cos(angle), radius * Math.sin(angle))
+        }
+
+        function pointInCircle(point, center, radius)
+        {
+            return point.minus(center).length() <= radius
+        }
+
+        /**
+          * Returns angle in range [0, 2 * PI)
+          */
+        function to2PIRange(angle)
+        {
+            var doublePi = Math.PI * 2
+            while(angle < 0)
+                angle += doublePi
+
+            while(angle > doublePi)
+                angle -= doublePi
+
+            return angle
+        }
+
+        /**
+          * Determnes if angle from "center" to "point" lays between specified angles.
+          * Clockwise check.
+          */
+        function angleInSector(point, center, startAngle, finishAngle)
+        {
+            // TODO: check me!
+            var vector = point.minus(center)
+            var start = to2PIRange(startAngle)
+            var finish = to2PIRange(finishAngle)
+            var angle = to2PIRange(getAngle(vector))
+
+            var result = start < finish
+                ? angle >= start && angle <= finish
+                : angle >= start || angle <= finish
+
+            return result
         }
     }
 }
