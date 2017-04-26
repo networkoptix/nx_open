@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/tunnel/relay/api/client_to_relay_connection.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_client.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/std/cpp14.h>

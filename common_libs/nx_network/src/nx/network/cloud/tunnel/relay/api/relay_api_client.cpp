@@ -1,4 +1,4 @@
-#include "client_to_relay_connection.h"
+#include "relay_api_client.h"
 
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/rest/http_rest_client.h>

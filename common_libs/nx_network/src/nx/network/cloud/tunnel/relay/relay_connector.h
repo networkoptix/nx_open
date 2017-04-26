@@ -5,7 +5,7 @@
 #include <nx/network/aio/timer.h>
 
 #include "../abstract_tunnel_connector.h"
-#include "api/client_to_relay_connection.h"
+#include "api/relay_api_client.h"
 
 namespace nx {
 namespace network {

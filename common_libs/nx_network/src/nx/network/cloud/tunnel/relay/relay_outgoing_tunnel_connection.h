@@ -11,7 +11,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include "../abstract_outgoing_tunnel_connection.h"
-#include "api/client_to_relay_connection.h"
+#include "api/relay_api_client.h"
 
 namespace nx {
 namespace network {
