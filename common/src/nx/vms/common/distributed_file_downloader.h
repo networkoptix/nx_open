@@ -88,7 +88,7 @@ public:
 
     ErrorCode deleteFile(const QString& fileName, bool deleteData = true);
 
-    QVector<QByteArray> getChunkChecksums(const QString& filePath);
+    QVector<QByteArray> getChunkChecksums(const QString& fileName);
 
     static QByteArray calculateMd5(const QString& filePath);
     static qint64 calculateFileSize(const QString& filePath);

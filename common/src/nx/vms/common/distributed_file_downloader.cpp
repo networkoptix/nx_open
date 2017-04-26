@@ -505,11 +505,11 @@ DistributedFileDownloader::ErrorCode DistributedFileDownloader::deleteFile(
     return ErrorCode::noError;
 }
 
-QVector<QByteArray> DistributedFileDownloader::getChunkChecksums(const QString& filePath)
+QVector<QByteArray> DistributedFileDownloader::getChunkChecksums(const QString& fileName)
 {
     Q_D(DistributedFileDownloader);
 
-    const auto& fileInfo = d->fileMetadata(filePath);
+    const auto& fileInfo = d->fileMetadata(fileName);
     if (!fileInfo.isValid())
         return QVector<QByteArray>();
 
