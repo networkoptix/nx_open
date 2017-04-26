@@ -20,7 +20,8 @@ WebSocket::WebSocket(
     m_receiveMode(receiveMode),
     m_isLastFrame(false),
     m_isFirstFrame(true),
-    m_readBuffer(nullptr)
+    m_readBuffer(nullptr),
+    m_writeSize(0)
 {
     nx::Buffer tmpBuf(requestData);
     m_parser.consume(tmpBuf);
@@ -54,13 +55,13 @@ void WebSocket::bytesReceived(nx::Buffer& buffer)
     handleRead();
 }
 
-void WebSocket::readyToSendData(size_t count)
+void WebSocket::readyToSendData()
 {
     m_writeBuffer.clear();
     auto writeHandlerCopy = std::move(m_writeHandler);
     m_writeHandler = nullptr;
     if (writeHandlerCopy)
-        writeHandlerCopy(SystemError::noError, count);
+        writeHandlerCopy(SystemError::noError, m_writeSize);
 }
 
 void WebSocket::handleRead()
@@ -116,7 +117,9 @@ void WebSocket::sendAsync(
             m_isLastFrame = false;
     }
 
+
     m_writeHandler = std::move(handler);
+    m_writeSize = buffer.size();
     m_baseConnection.sendBufAsync(m_writeBuffer);
 }
 
