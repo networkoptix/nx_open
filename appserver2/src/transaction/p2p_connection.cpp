@@ -449,9 +449,6 @@ void P2pConnection::onMessageSent(SystemError::ErrorCode errorCode, size_t bytes
         setState(State::Error);
         return;
     }
-    NX_ASSERT(
-        bytesSent == m_dataToSend.front().size() + 2 ||
-        bytesSent == m_dataToSend.front().size() + 4);
     using namespace std::placeholders;
     m_dataToSend.pop_front();
     if (!m_dataToSend.empty())
