@@ -154,7 +154,7 @@ bool DistributedFileDownloaderPrivate::reserveSpace(const QString& fileName, con
 {
     QFile file(fileName);
 
-    if (!file.open(QFile::WriteOnly))
+    if (!file.open(QFile::ReadWrite))
         return false;
 
     if (!file.resize(size))
@@ -389,6 +389,8 @@ DistributedFileDownloader::ErrorCode DistributedFileDownloader::addFile(
 
             if (!d->reserveSpace(path, info.size >= 0 ? info.size : 0))
                 return ErrorCode::noFreeSpace;
+
+            d->checkDownloadCompleted(info);
         }
     }
 
