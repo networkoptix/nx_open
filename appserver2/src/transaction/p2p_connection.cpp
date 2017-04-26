@@ -8,6 +8,7 @@
 #include <http/custom_headers.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <api/global_settings.h>
+#include <common/static_common_module.h>
 
 namespace {
 
@@ -415,14 +416,19 @@ void P2pConnection::sendMessage(MessageType messageType, const nx::Buffer& data)
 
 void P2pConnection::sendMessage(const nx::Buffer& data)
 {
-    MessageType messageType = (MessageType) data[0];
-    NX_LOG(lit("Peer %1(%2). Send message %3 to %4. size=%5")
-        .arg(commonModule()->moduleGUID().toString())
-        .arg(commonModule()->instanceCounter())
-        .arg(toString(messageType))
-        .arg(remotePeer().id.toString())
-        .arg(data.size()),
-        cl_logDEBUG1);
+    if (QnLog::instance()->logLevel() >= cl_logDEBUG1)
+    {
+        auto localPeerName = qnStaticCommon->moduleDisplayName(commonModule()->moduleGUID());
+        auto remotePeerName = qnStaticCommon->moduleDisplayName(remotePeer().id);
+
+        MessageType messageType = (MessageType)data[0];
+        NX_LOG(lit("Send message:\t %1 ---> %2. Type: %3. Size=%4")
+            .arg(localPeerName)
+            .arg(remotePeerName)
+            .arg(toString(messageType))
+            .arg(data.size()),
+            cl_logDEBUG1);
+    }
 
     using namespace std::placeholders;
 

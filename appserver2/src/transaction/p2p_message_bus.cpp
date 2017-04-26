@@ -12,6 +12,7 @@
 #include <nx/utils/random.h>
 #include "ubjson_transaction_serializer.h"
 #include "json_transaction_serializer.h"
+#include <common/static_common_module.h>
 
 namespace ec2 {
 
@@ -443,12 +444,19 @@ void P2pMessageBus::at_gotMessage(const QSharedPointer<P2pConnection>& connectio
 {
     QnMutexLocker lock(&m_mutex);
 
-    NX_LOG(lit("Peer %1(%2). Got message %3. size = %4")
-        .arg(commonModule()->moduleGUID().toString())
-        .arg(commonModule()->instanceCounter())
-        .arg(toString(messageType))
-        .arg(payload.size()),
-        cl_logDEBUG1);
+    if (QnLog::instance()->logLevel() >= cl_logDEBUG1)
+    {
+        auto localPeerName = qnStaticCommon->moduleDisplayName(commonModule()->moduleGUID());
+        auto remotePeerName = qnStaticCommon->moduleDisplayName(connection->remotePeer().id);
+
+        NX_LOG(lit("Got message:\t %1 <--- %2. Type: %3. Size=%4")
+            .arg(localPeerName)
+            .arg(remotePeerName)
+            .arg(toString(messageType))
+            .arg(payload.size() + 1),
+            cl_logDEBUG1);
+    }
+
 
     bool result = false;
     switch (messageType)
@@ -753,12 +761,17 @@ void P2pMessageBus::gotTransaction(
 {
     if (!tran.persistentInfo.isNull() && m_db)
     {
+        if (QnLog::instance()->logLevel() >= cl_logDEBUG1)
+        {
+            auto localPeerName = qnStaticCommon->moduleDisplayName(commonModule()->moduleGUID());
+            auto remotePeerName = qnStaticCommon->moduleDisplayName(connection->remotePeer().id);
 
-        NX_LOG(lit("Peer %1(%2). Got transaction %3")
-            .arg(commonModule()->moduleGUID().toString())
-            .arg(commonModule()->instanceCounter())
-            .arg(toString(tran.command)),
-            cl_logDEBUG1);
+            NX_LOG(lit("Got tran:\t %1 <--- %2. Command: %3.")
+                .arg(localPeerName)
+                .arg(remotePeerName)
+                .arg(toString(tran.command)),
+                cl_logDEBUG1);
+        }
 
         QByteArray serializedTran =
             QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);

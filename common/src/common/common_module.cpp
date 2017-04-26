@@ -427,13 +427,3 @@ void QnCommonModule::setResourceDiscoveryManager(QnResourceDiscoveryManager* dis
         delete m_resourceDiscoveryManager;
     m_resourceDiscoveryManager = discoveryManager;
 }
-
-void QnCommonModule::setInstanceCounter(int value)
-{
-    m_instanceCounter = value;
-}
-
-int QnCommonModule::instanceCounter() const
-{
-    return m_instanceCounter;
-}

@@ -224,7 +224,7 @@ int Appserver2Process::exec()
         //TODO
         return 0;
     }
-    m_commonModule->setInstanceCounter(settings.moduleInstance());
+    qnStaticCommon->registerShortInstance(m_commonModule->moduleGUID(), settings.moduleInstance());
 
     //initializeLogging(settings);
     std::unique_ptr<ec2::AbstractECConnectionFactory>
