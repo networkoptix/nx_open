@@ -27,9 +27,9 @@ struct BaseServerConnectionAccess
     }
 
     template<typename Derived, typename Base>
-    static void readyToSendData(Base* base, size_t count)
+    static void readyToSendData(Base* base)
     {
-        static_cast<Derived*>(base)->readyToSendData(count);
+        static_cast<Derived*>(base)->readyToSendData();
     }
 };
 
@@ -280,7 +280,7 @@ private:
         static_cast<void>(count);
         NX_ASSERT(count == m_bytesToSend);
 
-        BaseServerConnectionAccess::readyToSendData<CustomConnectionType>(this, count);
+        BaseServerConnectionAccess::readyToSendData<CustomConnectionType>(this);
     }
 
     void handleSocketError(SystemError::ErrorCode errorCode)
@@ -335,7 +335,7 @@ class BaseServerConnectionHandler
 {
 public:
     virtual void bytesReceived(nx::Buffer& buffer) = 0;
-    virtual void readyToSendData(size_t count) = 0;
+    virtual void readyToSendData() = 0;
 
     virtual ~BaseServerConnectionHandler() {}
 };
@@ -360,9 +360,9 @@ private:
         m_handler->bytesReceived(buf);
     }
 
-    void readyToSendData(size_t count)
+    void readyToSendData()
     {
-        m_handler->readyToSendData(count);
+        m_handler->readyToSendData();
     }
 
 private:

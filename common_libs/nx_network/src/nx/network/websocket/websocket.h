@@ -25,7 +25,7 @@ public:
         singleMessage,
 
         /**
-         * Wrap buffer passed to sendAsync() in a complete websocket message.
+         * Wrap buffer passed to sendAsync() in a complete websocket frame.
          * @note Call setIsLastFrame() to mark final frame in the message.
          */
         multiFrameMessage
@@ -74,7 +74,7 @@ public:
 private:
     /**  BaseServerConnectionHandler implementation */
     virtual void bytesReceived(nx::Buffer& buffer) override;
-    virtual void readyToSendData(size_t count) override;
+    virtual void readyToSendData() override;
 
     /** StreamConnectionHolder implementation */
     virtual void closeConnection(
@@ -104,6 +104,7 @@ private:
     std::function<void(SystemError::ErrorCode, size_t)> m_writeHandler;
     nx::Buffer* m_readBuffer;
     nx::Buffer m_writeBuffer;
+    int m_writeSize;
     websocket::MultiBuffer m_buffer;
 
     virtual void stopWhileInAioThread() override;
