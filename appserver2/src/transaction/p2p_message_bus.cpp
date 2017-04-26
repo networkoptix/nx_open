@@ -243,6 +243,7 @@ void P2pMessageBus::addOfflinePeersFromDb()
 {
     if (!m_db)
         return;
+    const auto localPeer = this->localPeer();
 
     auto persistentState = m_db->transactionLog()->getTransactionsState().values;
     for (auto itr = persistentState.begin(); itr != persistentState.end(); ++itr)
@@ -253,8 +254,14 @@ void P2pMessageBus::addOfflinePeersFromDb()
         auto& peerData = m_allPeers[peer];
 
         qint32 sequence = itr.value();
-        RoutingRecord record(kMaxDistance - sequence, qnSyncTime->currentMSecsSinceEpoch());
-        peerData.routingInfo.insert(localPeer(), record);
+        qint32 distance = kMaxDistance - sequence;
+        auto routingItr = peerData.routingInfo.find(localPeer);
+        if (routingItr == peerData.routingInfo.end()
+            || distance < routingItr.value().distance)
+        {
+            RoutingRecord record(distance, qnSyncTime->currentMSecsSinceEpoch());
+            peerData.routingInfo[localPeer] = record;
+        }
     }
 }
 
@@ -298,10 +305,42 @@ QByteArray P2pMessageBus::serializePeersMessage()
     }
 }
 
-void P2pMessageBus::deserializeAlivePeersMessageRequest(
+void P2pMessageBus::printPeersMessage()
+{
+    QList<QString> records;
+
+    for (auto itr = m_allPeers.begin(); itr != m_allPeers.end(); ++itr)
+    {
+        const auto& peer = itr.value();
+
+        qint32 minDistance = kMaxDistance;
+        for (const RoutingRecord& rec : peer.routingInfo)
+            minDistance = std::min(minDistance, rec.distance);
+        if (minDistance == kMaxDistance)
+            continue;
+        qint16 peerNumber = m_localShortPeerInfo.encode(itr.key());
+
+        records << lit("\t\t\t\t\t To:  %1(dbId=%2). Distance: %3")
+            .arg(qnStaticCommon->moduleDisplayName(itr.key().id))
+            .arg(itr.key().persistentId.toString())
+            .arg(minDistance);
+    }
+
+    NX_LOG(lit("Peer %1 records:\n%3")
+        .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
+        .arg(records.join("\n")),
+        cl_logDEBUG1);
+}
+
+void P2pMessageBus::processAlivePeersMessage(
     const P2pConnectionPtr& connection,
     const QByteArray& data)
 {
+    const auto& remotePeer = connection->remotePeer();
+
+    for (auto& peer: m_allPeers)
+        peer.routingInfo.remove(remotePeer); //< remove old data
+
     BitStreamReader reader((const quint8*) data.data(), data.size());
     try
     {
@@ -315,11 +354,12 @@ void P2pMessageBus::deserializeAlivePeersMessageRequest(
                 receivedDistance = NALUnit::extractUEGolombCode(reader); // todo: move function to another place
             else
                 receivedDistance = reader.getBits(32);
-            PeerInfo& peerInfo = m_allPeers[peerId];
 
-            RoutingRecord& record = peerInfo.routingInfo[connection->remotePeer()];
-            record.distance = std::min(receivedDistance, record.distance);
-            record.lastRecvTime = qnSyncTime->currentMSecsSinceEpoch();
+            const qint32 distance = receivedDistance + 1;
+            qint64 time = qnSyncTime->currentMSecsSinceEpoch();
+
+            PeerInfo& peerInfo = m_allPeers[peerId];
+            peerInfo.routingInfo.insert(remotePeer, RoutingRecord(distance, time));
         }
     }
     catch (...)
@@ -337,6 +377,8 @@ void P2pMessageBus::sendAlivePeersMessage()
         if (data != connection->miscData().localPeersMessage)
         {
             connection->miscData().localPeersMessage = data;
+            if (QnLog::instance()->logLevel() >= cl_logDEBUG1)
+                printPeersMessage();
             connection->sendMessage(data);
         }
     }
@@ -627,7 +669,7 @@ bool P2pMessageBus::handleAlivePeers(const P2pConnectionPtr& connection, const Q
     }
     if (numbersToResolve.empty())
     {
-        deserializeAlivePeersMessageRequest(connection, data);
+        processAlivePeersMessage(connection, data);
         return true;
     }
     connection->sendMessage(serializeResolvePeerNumberRequest(numbersToResolve));

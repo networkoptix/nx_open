@@ -99,9 +99,10 @@ private:
     void createOutgoingConnections();
     void sendAlivePeersMessage();
     void cleanupRoutingRecords(const ApiPersistentIdData& id);
+    void printPeersMessage();
 
     QVector<PeerNumberType> deserializeCompressedPeers(const QByteArray& data, bool* success);
-    void deserializeAlivePeersMessageRequest(
+    void processAlivePeersMessage(
         const P2pConnectionPtr& connection,
         const QByteArray& data);
     void deserializeResolvePeerNumberResponse(
