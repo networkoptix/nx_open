@@ -72,7 +72,11 @@ private:
 
     bool writeEntry(const RemoteArchiveEntry& entry, nx_http::BufferType* buffer);
 
-    bool convertAndWriteBuffer(nx_http::BufferType* buffer, const QString& fileName, int64_t* outDurationMs);
+    bool convertAndWriteBuffer(
+        nx_http::BufferType* buffer,
+        const QString& fileName,
+        int64_t startTimeMs,
+        int64_t* outDurationMs);
 };
 
 } // namespace plugins

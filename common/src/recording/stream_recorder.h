@@ -40,7 +40,8 @@ class QnFfmpegVideoTranscoder;
 class QnStreamRecorder : public QnAbstractDataConsumer, public QnResourceConsumer
 {
     Q_OBJECT
-
+    
+    using MotionHandler = std::function<bool(const QnConstMetaDataV1Ptr& motion)>;
 public:
     static QString errorString(StreamRecorderError errCode);
 
@@ -87,6 +88,8 @@ public:
     void forceAudioLayout(const QnResourceAudioLayoutPtr& layout);
 
     void disableRegisterFile(bool disable);
+
+    void setSaveMotionHandler(MotionHandler handler);
 
 #ifdef SIGN_FRAME_ENABLED
     void setSignLogo(const QImage& logo);
@@ -211,6 +214,7 @@ private:
 
     QnResourceAudioLayoutPtr m_forcedAudioLayout;
     bool m_disableRegisterFile;
+    MotionHandler m_motionHandler;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

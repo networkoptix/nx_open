@@ -9,12 +9,14 @@
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <plugins/storage/memory/ext_iodevice_storage.h>
 #include <plugins/resource/avi/avi_archive_delegate.h>
+#include <plugins/utils/avi_motion_archive_delegate.h>
 #include <utils/common/util.h>
 #include <utils/common/concurrent.h>
 #include <recorder/storage_manager.h>
 #include <recording/stream_recorder.h>
 #include <transcoding/transcoding_utils.h>
 #include <core/resource/dummy_resource.h>
+#include <motion/motion_helper.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -361,7 +363,7 @@ bool LilinResource::writeEntry(const RemoteArchiveEntry& entry, nx_http::BufferT
     }
 
     int64_t realDurationMs = AV_NOPTS_VALUE;
-    if (!convertAndWriteBuffer(buffer, fileNameWithExtension, &realDurationMs))
+    if (!convertAndWriteBuffer(buffer, fileNameWithExtension, entry.startTimeMs, &realDurationMs))
         return false;
     
     const uint64_t kEpsilonMs = 100; 
@@ -384,6 +386,7 @@ bool LilinResource::writeEntry(const RemoteArchiveEntry& entry, nx_http::BufferT
 bool LilinResource::convertAndWriteBuffer(
     nx_http::BufferType* buffer,
     const QString& fileName,
+    int64_t startTimeMs,
     int64_t* outDurationMs)
 {
     qDebug() << "Converting and writing file" << fileName;
@@ -406,12 +409,14 @@ bool LilinResource::convertAndWriteBuffer(
     storage->registerResourceData(temporaryFilePath, ioDevice);
     resource->setUrl(temporaryFilePath);
 
-    QnAviArchiveDelegatePtr mediaFileReader(new QnAviArchiveDelegate());
+    auto mediaFileReader = std::make_shared<AviMotionArchiveDelegate>();
     mediaFileReader->setStorage(storage);
     if (!mediaFileReader->open(resource))
         return false;
 
     mediaFileReader->setAudioChannel(0);
+    mediaFileReader->setMotionRegion(getMotionRegion(0));
+    mediaFileReader->setStartTimeUs(startTimeMs * 1000);
 
     auto recorder = std::make_unique<QnStreamRecorder>(toResourcePtr());
     recorder->clearUnprocessedData();
@@ -419,6 +424,26 @@ bool LilinResource::convertAndWriteBuffer(
     recorder->setContainer(kArchiveContainer);
     recorder->forceAudioLayout(audioLayout);
     recorder->disableRegisterFile(true);
+    recorder->setSaveMotionHandler(
+        [this](const QnConstMetaDataV1Ptr& motion)
+        {
+            if (motion)
+            {
+                auto helper = QnMotionHelper::instance();
+                QnMotionArchive* archive = helper->getArchive(toResourcePtr(), motion->channelNumber);
+                if (archive)
+                    archive->saveToArchive(motion);
+            }
+            return true;
+        });
+
+    auto connection = connect(
+        this,
+        &QnSecurityCamResource::motionRegionChanged, 
+        [&mediaFileReader, this](const QnResourcePtr& res)
+        { 
+            mediaFileReader->setMotionRegion(getMotionRegion(0));
+        });
 
     while (auto mediaData = mediaFileReader->getNextData())
     {
@@ -427,6 +452,8 @@ bool LilinResource::convertAndWriteBuffer(
 
         recorder->processData(mediaData);
     }
+
+    disconnect(connection); //< TODO: #dmishin possible crash here
     
     return true;
 }

@@ -50,6 +50,7 @@ public:
     virtual bool open(const QnResourcePtr &resource);
     virtual void close();
     virtual qint64 startTime() const;
+    virtual void setStartTimeUs(qint64 startTimeUs);
     virtual qint64 endTime() const;
     virtual QnAbstractMediaDataPtr getNextData();
     virtual qint64 seek (qint64 time, bool findIFrame);

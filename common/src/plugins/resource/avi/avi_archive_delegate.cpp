@@ -150,6 +150,11 @@ qint64 QnAviArchiveDelegate::startTime() const
     return m_startTimeUsec;
 }
 
+void QnAviArchiveDelegate::setStartTimeUs(qint64 startTimeUs)
+{
+    m_startTimeUsec = startTimeUs;
+}
+
 qint64 QnAviArchiveDelegate::endTime() const
 {
     //if (!m_streamsFound && !findStreams())
