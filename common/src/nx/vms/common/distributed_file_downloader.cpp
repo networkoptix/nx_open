@@ -69,7 +69,9 @@ class DistributedFileDownloaderPrivate: public QObject
     Q_DECLARE_PUBLIC(DistributedFileDownloader)
 
 public:
-    DistributedFileDownloaderPrivate(DistributedFileDownloader* q);
+    DistributedFileDownloaderPrivate(
+        const QDir& downloadsDirectory,
+        DistributedFileDownloader* q);
 
     bool saveMetadata(const detail::FileMetadata& fileInformation);
     detail::FileMetadata loadMetadata(const QString& fileName);
@@ -84,13 +86,17 @@ public:
     static QVector<QByteArray> calculateChecksums(const QString& fileName, qint64 chunkSize);
 
 private:
-    QDir downloadsDir;
+    const QDir downloadsDir;
     QHash<QString, detail::FileMetadata> fileInformationByName;
 };
 
-DistributedFileDownloaderPrivate::DistributedFileDownloaderPrivate(DistributedFileDownloader* q):
+DistributedFileDownloaderPrivate::DistributedFileDownloaderPrivate(
+    const QDir& downloadsDirectory,
+    DistributedFileDownloader* q)
+    :
     QObject(q),
-    q_ptr(q)
+    q_ptr(q),
+    downloadsDir(downloadsDirectory)
 {
 }
 
@@ -286,10 +292,9 @@ DistributedFileDownloader::DistributedFileDownloader(
     QObject* parent)
     :
     QObject(parent),
-    d_ptr(new DistributedFileDownloaderPrivate(this))
+    d_ptr(new DistributedFileDownloaderPrivate(downloadsDirectory, this))
 {
     Q_D(DistributedFileDownloader);
-    d->downloadsDir = downloadsDirectory;
     d->findDownloads();
 }
 
