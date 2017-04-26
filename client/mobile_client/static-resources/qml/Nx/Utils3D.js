@@ -1,7 +1,8 @@
 var SphereProjectionTypes = 
 { 
     Equidistant: 0, 
-    Stereographic: 1 
+    Stereographic: 1,
+    Equisolid: 2 
 }
 
 function radians(degrees)

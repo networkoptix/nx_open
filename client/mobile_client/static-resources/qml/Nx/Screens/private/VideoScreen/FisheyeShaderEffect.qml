@@ -34,11 +34,14 @@ ShaderEffect
     {
         switch (viewProjectionType)
         {
-            case Utils3D.SphereProjectionTypes.Stereographic:
-                return (720.0 / Math.PI) * Math.atan(1.0 / viewScale)
-
-            default: // Utils3D.SphereProjectionTypes.Equidistant
+            case Utils3D.SphereProjectionTypes.Equidistant:
                 return 180.0 / viewScale
+
+            case Utils3D.SphereProjectionTypes.Equisolid:
+                return 4.0 * Utils3D.degrees(Math.asin(1.0 / (viewScale * Math.sqrt(2.0))))
+
+            default: // Utils3D.SphereProjectionTypes.Stereographic
+                return 4.0 * Utils3D.degrees(Math.atan(1.0 / viewScale))
         }
     }
 
@@ -141,6 +144,15 @@ ShaderEffect
                     }"
             }
 
+            case Utils3D.SphereProjectionTypes.Equisolid:
+            {
+                return "
+                    vec2 project(vec3 coords)
+                    {
+                         return coords.xy / sqrt(1.0 - coords.z);
+                    }"
+            }
+
             default: // Utils3D.SphereProjectionTypes.Equidistant
             {
                 return "
@@ -165,6 +177,16 @@ ShaderEffect
                          float r = length(coords);
                          float theta = clamp(r, 0.0, 2.0) * (pi / 2.0);
                          return vec3(coords * sin(theta) / r, -cos(theta));
+                    }"
+            }
+
+            case Utils3D.SphereProjectionTypes.Equisolid:
+            {
+                return "
+                    vec3 unproject(vec2 coords)
+                    {
+                         float r2 = dot(coords, coords);
+                         return vec3(coords * sqrt(2.0 - r2), r2 - 1.0);
                     }"
             }
 
