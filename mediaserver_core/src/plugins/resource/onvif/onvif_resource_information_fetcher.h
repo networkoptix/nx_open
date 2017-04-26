@@ -1,7 +1,5 @@
-#ifndef onvif_resource_information_fetcher_h
-#define onvif_resource_information_fetcher_h
-
-#ifdef ENABLE_ONVIF
+#pragma once
+#if defined(ENABLE_ONVIF)
 
 #include <QtCore/QCoreApplication>
 
@@ -118,6 +116,4 @@ private:
     EndpointInfoHookChain m_hookChain;
 };
 
-#endif //ENABLE_ONVIF
-
-#endif // onvif_resource_information_fetcher_h
+#endif // defined(ENABLE_ONVIF)
