@@ -103,7 +103,8 @@ function TimelineConfig(){
         chunkHeight:24/100, // %    //Height for event line
         minChunkWidth: 0,
         minPixelsPerLevel: 1,
-        chunksBgColor:[76,188,40,0.15],
+        chunksBgColor:[235,239,241],
+        chunksBgBorderColor: [225,231,234],
         exactChunkColor: [76,188,40], //Archive
         loadingChunkColor: [0,255,255,0.3],
         blindChunkColor:  [255,0,255,0.3],
