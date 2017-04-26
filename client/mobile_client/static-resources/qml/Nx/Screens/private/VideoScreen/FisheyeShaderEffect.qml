@@ -10,6 +10,9 @@ ShaderEffect
         ? Qt.size(sourceItem.width, sourceItem.height)
         : Qt.size(0.0, 0.0)
 
+    property int lensProjectionType: Utils3D.SphereProjectionTypes.Equidistant
+    property int viewProjectionType: lensProjectionType // Utils3D.SphereProjectionTypes.Stereographic
+
     blending: false
 
     /* Fisheye parameters: */
@@ -27,7 +30,17 @@ ShaderEffect
 
     /* Feedback parameters (to be queried from outside): */
 
-    readonly property real fov: (720.0 / Math.PI) * Math.atan(1.0 / viewScale) // field of view in degrees
+    readonly property real fov: // field of view in degrees
+    {
+        switch (viewProjectionType)
+        {
+            case Utils3D.SphereProjectionTypes.Stereographic:
+                return (720.0 / Math.PI) * Math.atan(1.0 / viewScale)
+
+            default: // Utils3D.SphereProjectionTypes.Equidistant
+                return 180.0 / viewScale
+        }
+    }
 
     /* Shader uniforms: */
 
@@ -52,7 +65,7 @@ ShaderEffect
     readonly property matrix4x4 textureMatrix: // maps hemispere projection coords into texture coords
     {
         var sourceAspectRatio = sourceSize.width / sourceSize.height
-        var textureCoordsScale = Qt.vector2d(1.0, fieldStretch / sourceAspectRatio).times(1.0 / fieldRadius)
+        var textureCoordsScale = Qt.vector2d(1.0, fieldStretch / sourceAspectRatio).times(0.5 / fieldRadius)
         var textureCoordsCenter = Qt.vector2d(0.5, 0.5).minus(fieldOffset)
 
         return Utils3D.translation(textureCoordsCenter.x, textureCoordsCenter.y, 0.0).times(
@@ -77,7 +90,7 @@ ShaderEffect
 
         void main()
         {
-            projectionCoords = ((qt_MultiTexCoord0 - viewCenter) / projectionCoordsScale) * 2.0;
+            projectionCoords = ((qt_MultiTexCoord0 - viewCenter) / projectionCoordsScale);
             gl_Position = qt_Matrix * qt_Vertex;
         }"
 
@@ -91,6 +104,8 @@ ShaderEffect
         uniform sampler2D sourceTexture;
         uniform float qt_Opacity;
 
+        #define pi 3.1415926
+
         vec4 texture2DBlackBorder(sampler2D sampler, vec2 coord)
         {
              /* Turn outside areas to black without conditional operator: */
@@ -98,22 +113,71 @@ ShaderEffect
              return texture2D(sampler, coord) * vec4(vec3(float(isInside)), 1.0);
         }
 
-        vec2 stereographicProject(vec3 coords)
-        {
-             return coords.xy / (1.0 - coords.z);
-        }
-
-        vec3 stereographicUnproject(vec2 coords)
-        {
-             float r2 = dot(coords, coords);
-             return vec3(coords * 2.0, r2 - 1.0) / (r2 + 1.0);
-        }
+        /* Projection functions should be written with the following consideration:
+         *  a unit hemisphere is projected into a unit circle. */
+        vec2 project(vec3 coords); 
+        vec3 unproject(vec2 coords);
 
         void main() 
         {
-             vec4 pointOnSphere = vec4(stereographicUnproject(projectionCoords), 1.0);
-             vec2 transformedProjectionCoords = stereographicProject(viewRotationMatrix * pointOnSphere);
+             vec4 pointOnSphere = vec4(unproject(projectionCoords), 1.0);
+             vec2 transformedProjectionCoords = project(viewRotationMatrix * pointOnSphere);
              vec2 textureCoords = (textureMatrix * vec4(transformedProjectionCoords, 0.0, 1.0)).xy;
              gl_FragColor = texture2DBlackBorder(sourceTexture, textureCoords);
         }"
+        + projectFunctionText()
+        + unprojectFunctionText()
+
+    function projectFunctionText()
+    {
+        switch (lensProjectionType)
+        {
+            case Utils3D.SphereProjectionTypes.Stereographic:
+            {
+                return "
+                    vec2 project(vec3 coords)
+                    {
+                         return coords.xy / ((1.0 - coords.z) * 2.0);
+                    }"
+            }
+
+            default: // Utils3D.SphereProjectionTypes.Equidistant
+            {
+                return "
+                    vec2 project(vec3 coords)
+                    {
+                         float theta = acos(clamp(-coords.z, -1.0, 1.0));
+                         return coords.xy * (theta / (length(coords.xy) * pi));
+                    }"
+            }
+        }
+    }
+
+    function unprojectFunctionText()
+    {
+        switch (viewProjectionType)
+        {
+            case Utils3D.SphereProjectionTypes.Stereographic:
+            {
+                return "
+                    vec3 unproject(vec2 coords)
+                    {
+                         vec2 scaled = coords * 2.0;
+                         float r2 = dot(scaled, scaled);
+                         return vec3(scaled * 2.0, r2 - 1.0) / (r2 + 1.0);
+                    }"
+            }
+
+            default: // Utils3D.SphereProjectionTypes.Equidistant
+            {
+                return "
+                    vec3 unproject(vec2 coords)
+                    {
+                         float r = length(coords);
+                         float theta = clamp(r, 0.0, 1.0) * pi;
+                         return vec3(coords * sin(theta) / r, -cos(theta));
+                    }"
+            }
+        }
+    }
 }

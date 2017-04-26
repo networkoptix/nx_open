@@ -1,3 +1,9 @@
+var SphereProjectionTypes = 
+{ 
+    Equidistant: 0, 
+    Stereographic: 1 
+}
+
 function radians(degrees)
 {
     return degrees * Math.PI / 180.0
