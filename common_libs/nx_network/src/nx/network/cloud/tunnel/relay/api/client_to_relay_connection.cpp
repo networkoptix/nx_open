@@ -57,7 +57,7 @@ void ClientImpl::beginListening(
     using namespace std::placeholders;
 
     BeginListeningRequest request;
-    request.peerName = peerName;
+    request.peerName = peerName.toStdString();
 
     issueRequest<BeginListeningRequest, BeginListeningResponse>(
         std::move(request),
@@ -74,8 +74,8 @@ void ClientImpl::startSession(
     using namespace std::placeholders;
 
     CreateClientSessionRequest request;
-    request.desiredSessionId = desiredSessionId;
-    request.targetPeerName = targetPeerName;
+    request.desiredSessionId = desiredSessionId.toStdString();
+    request.targetPeerName = targetPeerName.toStdString();
 
     issueRequest<CreateClientSessionRequest, CreateClientSessionResponse>(
         std::move(request),
@@ -91,7 +91,7 @@ void ClientImpl::openConnectionToTheTargetHost(
     using namespace std::placeholders;
 
     ConnectToPeerRequest request;
-    request.sessionId = sessionId;
+    request.sessionId = sessionId.toStdString();
 
     auto httpClient = prepareHttpClient<ConnectToPeerRequest, void>(
         std::move(request),
