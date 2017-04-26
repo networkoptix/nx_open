@@ -17,7 +17,7 @@ ShaderEffect
 
     /* Fisheye parameters: */
 
-    property real fieldRadius: Math.min(sourceSize.width, sourceSize.height) / sourceSize.width
+    property real fieldRadius: Math.min(sourceSize.width, sourceSize.height) / (sourceSize.width * 2.0)
     property vector2d fieldOffset: Qt.vector2d(0.0, 0.0)
     property real fieldStretch: 1.0
     property real fieldRotation: 0.0
@@ -58,14 +58,14 @@ ShaderEffect
     {
         var targetAspectRatio = width / height
         return (targetAspectRatio < 1.0
-            ? Qt.vector2d(1.0, targetAspectRatio)
-            : Qt.vector2d(1.0 / targetAspectRatio, 1.0)).times(viewScale)
+            ? Qt.vector2d(1.0, 1.0 / targetAspectRatio)
+            : Qt.vector2d(targetAspectRatio, 1.0)).times(2.0 / viewScale)
     }
 
     readonly property matrix4x4 textureMatrix: // maps hemispere projection coords into texture coords
     {
         var sourceAspectRatio = sourceSize.width / sourceSize.height
-        var textureCoordsScale = Qt.vector2d(1.0, fieldStretch / sourceAspectRatio).times(0.5 / fieldRadius)
+        var textureCoordsScale = Qt.vector2d(1.0, fieldStretch / sourceAspectRatio).times(1.0 / fieldRadius)
         var textureCoordsCenter = Qt.vector2d(0.5, 0.5).minus(fieldOffset)
 
         return Utils3D.translation(textureCoordsCenter.x, textureCoordsCenter.y, 0.0).times(
@@ -90,7 +90,7 @@ ShaderEffect
 
         void main()
         {
-            projectionCoords = ((qt_MultiTexCoord0 - viewCenter) / projectionCoordsScale);
+            projectionCoords = (qt_MultiTexCoord0 - viewCenter) * projectionCoordsScale;
             gl_Position = qt_Matrix * qt_Vertex;
         }"
 
@@ -137,7 +137,7 @@ ShaderEffect
                 return "
                     vec2 project(vec3 coords)
                     {
-                         return coords.xy / ((1.0 - coords.z) * 2.0);
+                         return coords.xy / (1.0 - coords.z);
                     }"
             }
 
@@ -147,7 +147,7 @@ ShaderEffect
                     vec2 project(vec3 coords)
                     {
                          float theta = acos(clamp(-coords.z, -1.0, 1.0));
-                         return coords.xy * (theta / (length(coords.xy) * pi));
+                         return coords.xy * (theta / (length(coords.xy) * (pi / 2.0)));
                     }"
             }
         }
@@ -157,25 +157,24 @@ ShaderEffect
     {
         switch (viewProjectionType)
         {
-            case Utils3D.SphereProjectionTypes.Stereographic:
-            {
-                return "
-                    vec3 unproject(vec2 coords)
-                    {
-                         vec2 scaled = coords * 2.0;
-                         float r2 = dot(scaled, scaled);
-                         return vec3(scaled * 2.0, r2 - 1.0) / (r2 + 1.0);
-                    }"
-            }
-
-            default: // Utils3D.SphereProjectionTypes.Equidistant
+            case Utils3D.SphereProjectionTypes.Equidistant:
             {
                 return "
                     vec3 unproject(vec2 coords)
                     {
                          float r = length(coords);
-                         float theta = clamp(r, 0.0, 1.0) * pi;
+                         float theta = clamp(r, 0.0, 2.0) * (pi / 2.0);
                          return vec3(coords * sin(theta) / r, -cos(theta));
+                    }"
+            }
+
+            default: // Utils3D.SphereProjectionTypes.Stereographic
+            {
+                return "
+                    vec3 unproject(vec2 coords)
+                    {
+                         float r2 = dot(coords, coords);
+                         return vec3(coords * 2.0, r2 - 1.0) / (r2 + 1.0);
                     }"
             }
         }
