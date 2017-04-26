@@ -132,4 +132,7 @@ private:
 };
 Q_DECLARE_METATYPE(P2pConnectionPtr)
 
+const char* toString(MessageType value);
+const char* toString(P2pConnection::State value);
+
 } // namespace ec2

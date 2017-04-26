@@ -356,8 +356,8 @@ void P2pConnection::onHttpClientDone(const nx_http::AsyncHttpClientPtr& client)
     socket->setNonBlockingMode(true);
     socket->setNoDelay(true);
 
-    //m_webSocket.reset(new Websocket( std::move(socket), msgBuffer));
-    m_webSocket = std::move(socket);
+    m_webSocket.reset(new WebSocket( std::move(socket), msgBuffer));
+    //m_webSocket = std::move(socket);
     NX_ASSERT(msgBuffer.isEmpty());
 
     m_httpClient.reset();
@@ -376,6 +376,10 @@ P2pConnection::State P2pConnection::state() const
 
 void P2pConnection::setState(State state)
 {
+    if (state == State::Error)
+    {
+        int gg = 4;
+    }
     m_state = state;
 }
 
@@ -406,12 +410,6 @@ P2pConnection::Direction P2pConnection::direction() const
 
 void P2pConnection::sendMessage(MessageType messageType, const nx::Buffer& data)
 {
-    NX_LOG( lit("Peer %1(%2). Send message %3 to %4")
-        .arg(commonModule()->moduleGUID().toString())
-        .arg(commonModule()->instanceCounter())
-        .arg(toString(messageType))
-        .arg(remotePeer().id.toString()), cl_logDEBUG1);
-
     nx::Buffer buffer;
     buffer.reserve(data.size() + 1);
     buffer.append((char) messageType);
@@ -422,11 +420,13 @@ void P2pConnection::sendMessage(MessageType messageType, const nx::Buffer& data)
 void P2pConnection::sendMessage(const nx::Buffer& data)
 {
     MessageType messageType = (MessageType) data[0];
-    NX_LOG(lit("Peer %1(%2). Send message %3 to %4")
+    NX_LOG(lit("Peer %1(%2). Send message %3 to %4. size=%5")
         .arg(commonModule()->moduleGUID().toString())
         .arg(commonModule()->instanceCounter())
         .arg(toString(messageType))
-        .arg(remotePeer().id.toString()), cl_logDEBUG1);
+        .arg(remotePeer().id.toString())
+        .arg(data.size()),
+        cl_logDEBUG1);
 
     using namespace std::placeholders;
 
@@ -444,7 +444,14 @@ void P2pConnection::onMessageSent(SystemError::ErrorCode errorCode, size_t bytes
 
     if (errorCode != SystemError::noError)
         setState(State::Error);
-
+    if (bytesSent == 0)
+    {
+        setState(State::Error);
+        return;
+    }
+    NX_ASSERT(
+        bytesSent == m_dataToSend.front().size() + 2 ||
+        bytesSent == m_dataToSend.front().size() + 4);
     using namespace std::placeholders;
     m_dataToSend.pop_front();
     if (!m_dataToSend.empty())

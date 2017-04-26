@@ -452,6 +452,13 @@ void P2pMessageBus::at_gotMessage(const QSharedPointer<P2pConnection>& connectio
 {
     QnMutexLocker lock(&m_mutex);
 
+    NX_LOG(lit("Peer %1(%2). Got message %3. size = %4")
+        .arg(commonModule()->moduleGUID().toString())
+        .arg(commonModule()->instanceCounter())
+        .arg(toString(messageType))
+        .arg(payload.size()),
+        cl_logDEBUG1);
+
     bool result = false;
     switch (messageType)
     {
@@ -755,6 +762,13 @@ void P2pMessageBus::gotTransaction(
 {
     if (!tran.persistentInfo.isNull() && m_db)
     {
+
+        NX_LOG(lit("Peer %1(%2). Got transaction %3")
+            .arg(commonModule()->moduleGUID().toString())
+            .arg(commonModule()->instanceCounter())
+            .arg(toString(tran.command)),
+            cl_logDEBUG1);
+
         QByteArray serializedTran =
             QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
         ErrorCode errorCode = dbManager(m_db, connection->getUserAccessData())
@@ -781,6 +795,10 @@ void P2pMessageBus::gotTransaction(
 
     if (m_handler)
         m_handler->triggerNotification(tran, NotificationSource::Remote);
+    else
+    {
+        int gg = 4;
+    }
 }
 
 struct GotTransactionFuction

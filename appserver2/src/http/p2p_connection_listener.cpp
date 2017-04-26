@@ -183,16 +183,16 @@ void P2pConnectionProcessor::run()
     socket->setSendTimeout(std::chrono::milliseconds(keepAliveTimeout * 2).count());
     socket->setNoDelay(true);
 
-    /*
-    WebSocketPtr webSocket(new websocket::Websocket(
+
+    WebSocketPtr webSocket(new WebSocket(
         std::move(socket),
         d->request.messageBody));
-    */
+
     P2pConnectionPtr connection(new P2pConnection(
         commonModule,
         remotePeer,
         d->messageBus->localPeer(),
-        std::move(socket)));
+        std::move(webSocket)));
     d->messageBus->gotConnectionFromRemotePeer(connection);
 
 }
