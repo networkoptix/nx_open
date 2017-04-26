@@ -5,6 +5,7 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QCryptographicHash>
 
+#include <nx/utils/thread/mutex.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/json.h>
 
@@ -88,6 +89,8 @@ public:
 private:
     const QDir downloadsDir;
     QHash<QString, detail::FileMetadata> fileInformationByName;
+
+    mutable QnMutex mutex;
 };
 
 DistributedFileDownloaderPrivate::DistributedFileDownloaderPrivate(
@@ -305,6 +308,7 @@ DistributedFileDownloader::~DistributedFileDownloader()
 QStringList DistributedFileDownloader::files() const
 {
     Q_D(const DistributedFileDownloader);
+    QnMutexLocker lock(&d->mutex);
     return d->fileInformationByName.keys();
 }
 
@@ -318,6 +322,7 @@ DownloaderFileInformation DistributedFileDownloader::fileInformation(
     const QString& fileName) const
 {
     Q_D(const DistributedFileDownloader);
+    QnMutexLocker lock(&d->mutex);
     return d->fileMetadata(fileName);
 }
 
@@ -325,6 +330,8 @@ DistributedFileDownloader::ErrorCode DistributedFileDownloader::addFile(
     const DownloaderFileInformation& fileInformation)
 {
     Q_D(DistributedFileDownloader);
+
+    QnMutexLocker lock(&d->mutex);
 
     if (d->fileInformationByName.contains(fileInformation.name))
         return ErrorCode::fileAlreadyExists;
@@ -415,6 +422,8 @@ DistributedFileDownloader::ErrorCode DistributedFileDownloader::readFileChunk(
 {
     Q_D(DistributedFileDownloader);
 
+    QnMutexLocker lock(&d->mutex);
+
     auto it = d->fileInformationByName.find(fileName);
     if (it == d->fileInformationByName.end())
         return ErrorCode::fileDoesNotExist;
@@ -446,6 +455,8 @@ DistributedFileDownloader::ErrorCode DistributedFileDownloader::writeFileChunk(
     const QByteArray& buffer)
 {
     Q_D(DistributedFileDownloader);
+
+    QnMutexLocker lock(&d->mutex);
 
     auto it = d->fileInformationByName.find(fileName);
     if (it == d->fileInformationByName.end())
@@ -489,6 +500,8 @@ DistributedFileDownloader::ErrorCode DistributedFileDownloader::deleteFile(
 {
     Q_D(DistributedFileDownloader);
 
+    QnMutexLocker lock(&d->mutex);
+
     auto it = d->fileInformationByName.find(fileName);
     if (it == d->fileInformationByName.end())
         return ErrorCode::fileDoesNotExist;
@@ -516,6 +529,8 @@ DistributedFileDownloader::ErrorCode DistributedFileDownloader::deleteFile(
 QVector<QByteArray> DistributedFileDownloader::getChunkChecksums(const QString& fileName)
 {
     Q_D(DistributedFileDownloader);
+
+    QnMutexLocker lock(&d->mutex);
 
     const auto& fileInfo = d->fileMetadata(fileName);
     if (!fileInfo.isValid())
