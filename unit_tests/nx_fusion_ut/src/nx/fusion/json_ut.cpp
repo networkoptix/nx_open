@@ -78,6 +78,7 @@ TEST_F(QnFusionTestFixture, bitArray)
     value.setBit(16);
 
     const auto data = QJson::serialized(value);
+    ASSERT_EQ(data, str("YgoBAQ==")); //< Base64 is expected.
 
     QBitArray target;
     ASSERT_TRUE(QJson::deserialize(data, &target));
