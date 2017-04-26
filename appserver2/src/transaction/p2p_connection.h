@@ -10,6 +10,7 @@
 #include <utils/common/from_this_to_shared.h>
 #include <core/resource/shared_resource_pointer.h>
 #include <core/resource_access/user_access_data.h>
+#include <QtCore/QElapsedTimer>
 
 namespace ec2 {
 
@@ -71,8 +72,14 @@ public:
     /** MiscData contains members that managed by P2pMessageBus. P2pConnection doesn't touch it */
     struct MiscData
     {
+        MiscData()
+        {
+            localPeersTimer.invalidate();
+        }
+
         QByteArray localPeersMessage; //< last sent peers message
         QByteArray remotePeersMessage; //< last received peers message
+        QElapsedTimer localPeersTimer; //< last sent peers time
 
         QVector<ApiPersistentIdData> localSubscription; //< local -> remote subscription
         QVector<ApiPersistentIdData> remoteSubscription; //< remote -> local subscription
@@ -84,6 +91,7 @@ public:
     bool isSubscribedTo(const ApiPersistentIdData& peer);
 signals:
     void gotMessage(P2pConnectionPtr connection, MessageType messageType, const QByteArray& payload);
+    void stateChanged(P2pConnectionPtr connection, P2pConnection::State state);
 private:
     void cancelConnecting();
 
@@ -131,6 +139,7 @@ private:
 
 };
 Q_DECLARE_METATYPE(P2pConnectionPtr)
+Q_DECLARE_METATYPE(P2pConnection::State)
 
 const char* toString(MessageType value);
 const char* toString(P2pConnection::State value);

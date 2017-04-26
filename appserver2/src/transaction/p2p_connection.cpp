@@ -362,6 +362,7 @@ void P2pConnection::onHttpClientDone(const nx_http::AsyncHttpClientPtr& client)
     NX_ASSERT(msgBuffer.isEmpty());
 
     m_httpClient.reset();
+
     setState(State::Connected);
 
     using namespace std::placeholders;
@@ -377,7 +378,11 @@ P2pConnection::State P2pConnection::state() const
 
 void P2pConnection::setState(State state)
 {
-    m_state = state;
+    if (state != m_state)
+    {
+        m_state = state;
+        emit stateChanged(toSharedPointer(), state);
+    }
 }
 
 void P2pConnection::setRemoteIdentityTime(qint64 time)
@@ -444,9 +449,8 @@ void P2pConnection::onMessageSent(SystemError::ErrorCode errorCode, size_t bytes
 {
     QnMutexLocker lock(&m_mutex);
 
-    if (errorCode != SystemError::noError)
-        setState(State::Error);
-    if (bytesSent == 0)
+    if (errorCode != SystemError::noError ||
+        bytesSent == 0)
     {
         setState(State::Error);
         return;

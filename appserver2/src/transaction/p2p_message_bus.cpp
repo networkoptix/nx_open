@@ -13,6 +13,22 @@
 #include "ubjson_transaction_serializer.h"
 #include "json_transaction_serializer.h"
 #include <common/static_common_module.h>
+#include <api/global_settings.h>
+
+namespace {
+
+    // todo: move these timeouts to the globalSettings
+
+    // How often send 'peers' message to the peer if something is changed
+    // As soon as connection is opened first message is sent immediately
+    std::chrono::seconds sendPeersInfoInterval(10);
+
+    // If new connection is recently established/closed, don't sent subscribe request to the peer
+    std::chrono::seconds subscribeIntervalLow(5);
+
+    // If new connections always established/closed too long time, send subscribe request anyway
+    std::chrono::seconds subscribeIntervalHigh(15);
+} // namespace
 
 namespace ec2 {
 
@@ -48,11 +64,13 @@ P2pMessageBus::P2pMessageBus(
     QnTransactionMessageBusBase(db, peerType, commonModule)
 {
     qRegisterMetaType<MessageType>();
+    qRegisterMetaType<P2pConnection::State>("P2pConnection::State");
     qRegisterMetaType<P2pConnectionPtr>("P2pConnectionPtr");
 
     m_thread->setObjectName("P2pMessageBus");
     m_timer = new QTimer();
     connect(m_timer, &QTimer::timeout, this, &P2pMessageBus::doPeriodicTasks);
+    m_lastSubscribeTimer.restart();
     m_timer->start(500);
 }
 
@@ -130,7 +148,9 @@ void P2pMessageBus::gotConnectionFromRemotePeer(P2pConnectionPtr connection)
             return;
         }
     }
+    m_lastConnectDisconnectTimer.restart();
     connect(connection.data(), &P2pConnection::gotMessage, this, &P2pMessageBus::at_gotMessage);
+    connect(connection.data(), &P2pConnection::stateChanged, this, &P2pMessageBus::at_stateChanged);
 }
 
 // Temporary outgoing connection list is used to resolve two-connections conflict in case of
@@ -172,6 +192,7 @@ void P2pMessageBus::removeClosedConnections()
         if (connection->state() == P2pConnection::State::Error)
         {
             cleanupRoutingRecords(connection->remotePeer());
+            m_lastConnectDisconnectTimer.restart();
             itr = m_connections.erase(itr);
         }
         else
@@ -192,6 +213,7 @@ void P2pMessageBus::createOutgoingConnections()
             P2pConnectionPtr connection(
                 new P2pConnection(commonModule(), remoteId, localPeer(), url));
             connect(connection.data(), &P2pConnection::gotMessage, this, &P2pMessageBus::at_gotMessage);
+            connect(connection.data(), &P2pConnection::stateChanged, this, &P2pMessageBus::at_stateChanged);
             m_connections.insert(remoteId, connection);
         }
     }
@@ -370,13 +392,19 @@ void P2pMessageBus::processAlivePeersMessage(
 void P2pMessageBus::sendAlivePeersMessage()
 {
     QByteArray data = serializePeersMessage();
+    int peersIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+        sendPeersInfoInterval).count();
     for (const auto& connection : m_connections)
     {
         if (connection->state() != P2pConnection::State::Connected)
             continue;
-        if (data != connection->miscData().localPeersMessage)
+        auto& miscData = connection->miscData();
+        if (miscData.localPeersTimer.isValid() && !miscData.localPeersTimer.hasExpired(peersIntervalMs))
+            continue;
+        if (data != miscData.localPeersMessage)
         {
-            connection->miscData().localPeersMessage = data;
+            miscData.localPeersMessage = data;
+            miscData.localPeersTimer.restart();
             if (QnLog::instance()->logLevel() >= cl_logDEBUG1)
                 printPeersMessage();
             connection->sendMessage(data);
@@ -428,6 +456,24 @@ P2pConnectionPtr P2pMessageBus::findConnectionById(const ApiPersistentIdData& id
 
 void P2pMessageBus::doSubscribe()
 {
+    std::chrono::seconds subscribeIntervalLow(5);
+
+    // If new connections always established/closed too long time, send subscribe request anyway
+    std::chrono::seconds subscribeIntervalHigh(15);
+
+    if (m_lastConnectDisconnectTimer.isValid())
+    {
+        std::chrono::milliseconds connectionsElapsed(m_lastConnectDisconnectTimer.elapsed());
+        std::chrono::milliseconds subscribeElapsed(m_lastSubscribeTimer.elapsed());
+        if (connectionsElapsed < subscribeIntervalLow &&
+            subscribeElapsed < subscribeIntervalHigh)
+        {
+            return;
+        }
+    }
+    m_lastSubscribeTimer.restart();
+
+
     QMap<ApiPersistentIdData, P2pConnectionPtr> currentSubscription = getCurrentSubscription();
     QMap<ApiPersistentIdData, P2pConnectionPtr> newSubscription = currentSubscription;
     const auto localPeer = this->localPeer();
@@ -480,6 +526,13 @@ ApiPeerData P2pMessageBus::localPeer() const
         commonModule()->runningInstanceGUID(),
         commonModule()->dbId(),
         m_localPeerType);
+}
+
+void P2pMessageBus::at_stateChanged(
+    const QSharedPointer<P2pConnection>& /*connection*/,
+    P2pConnection::State /*state*/)
+{
+    m_lastConnectDisconnectTimer.restart();
 }
 
 void P2pMessageBus::at_gotMessage(const QSharedPointer<P2pConnection>& connection, MessageType messageType, const nx::Buffer& payload)
@@ -845,10 +898,6 @@ void P2pMessageBus::gotTransaction(
 
     if (m_handler)
         m_handler->triggerNotification(tran, NotificationSource::Remote);
-    else
-    {
-        int gg = 4;
-    }
 }
 
 struct GotTransactionFuction

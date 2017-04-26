@@ -132,6 +132,7 @@ private:
     void gotTransaction(const QnTransaction<T>& tran,const P2pConnectionPtr& connection);
 private slots:
     void at_gotMessage(const QSharedPointer<P2pConnection>& connection, MessageType messageType, const QByteArray& payload);
+    void at_stateChanged(const QSharedPointer<P2pConnection>& connection, P2pConnection::State state);
 private:
     QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list
     QMap<QnUuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections
@@ -154,6 +155,8 @@ private:
 
     QMap<ApiPersistentIdData, P2pConnectionPtr> m_subscriptionList;
     QTimer* m_timer = nullptr;
+    QElapsedTimer m_lastConnectDisconnectTimer;
+    QElapsedTimer m_lastSubscribeTimer;
 };
 
 } // ec2
