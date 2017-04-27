@@ -273,42 +273,28 @@ PageBase
 
             Row
             {
-                Column
+                PtzFocusControl
                 {
                     id: focusPanel
 
                     property bool continuousFocusEnabled:
                         ptzController.capabilities & Ptz.ContinuousFocusCapability
 
-                    property bool autoFocusEnabled:
-                        ptzController.auxTraits & Ptz.ManualAutoFocusPtzTrait
+                    supportsAutoFocus: true//ptzController.auxTraits & Ptz.ManualAutoFocusPtzTrait
 
-                    visible: continuousFocusEnabled || autoFocusEnabled
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    spacing: 0
-
-                    Button
+                    onFocusInPressedChanged:
                     {
-                        text: "focus +"
-                        onPressed: ptzController.continuousFocus(0.1)
-                        onReleased: ptzController.continuousFocus(0.0)
+                        var focusSpeed = focusInPressed ? 1.0 : 0
+                        ptzController.continuousFocus(focusSpeed)
                     }
 
-                    Button
+                    onFocusOutPressedChanged:
                     {
-                        id: autofocusButton
-                        text: "set autofocus"
-                        onClicked: ptzController.setAutoFocus()
-                        enabled: focusPanel.autoFocusEnabled
+                        var focusSpeed = focusOutPressed ? -1.0 : 0
+                        ptzController.continuousFocus(focusSpeed)
                     }
 
-                    Button
-                    {
-                        text: "focus -"
-                        onPressed: ptzController.continuousFocus(-0.1)
-                        onReleased: ptzController.continuousFocus(0.0)
-                    }
+                    onAutoFocusClicked: { ptzController.setAutoFocus() }
                 }
 
                 Column
@@ -331,7 +317,7 @@ PageBase
                     }
                 }
 
-                Joystick
+                PtzJoystick
                 {
                     ptzType: 2
 
