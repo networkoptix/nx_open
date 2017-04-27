@@ -177,16 +177,16 @@ void HttpServerConnection::prepareAndSendResponse(
     std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
     ConnectionEvents connectionEvents)
 {
-    msg.response->statusLine.version = std::move( version );
+    msg.response->statusLine.version = std::move(version);
     msg.response->statusLine.reasonPhrase =
-        nx_http::StatusCode::toString( msg.response->statusLine.statusCode );
+        nx_http::StatusCode::toString(msg.response->statusLine.statusCode);
 
     nx_http::insertOrReplaceHeader(
         &msg.response->headers,
-        nx_http::HttpHeader(nx_http::header::Server::NAME, nx_http::serverString() ) );
+        nx_http::HttpHeader(nx_http::header::Server::NAME, nx_http::serverString()));
     nx_http::insertOrReplaceHeader(
         &msg.response->headers,
-        nx_http::HttpHeader( "Date", nx_http::formatDateTime( QDateTime::currentDateTime() ) ) );
+        nx_http::HttpHeader("Date", nx_http::formatDateTime(QDateTime::currentDateTime())));
 
     if (responseMsgBody)
     {
@@ -200,23 +200,25 @@ void HttpServerConnection::prepareAndSendResponse(
         {
             nx_http::insertOrReplaceHeader(
                 &msg.response->headers,
-                nx_http::HttpHeader( "Content-Type", contentType ) );
+                nx_http::HttpHeader("Content-Type", contentType));
 
             const auto contentLength = responseMsgBody->contentLength();
-            if( contentLength )
+            if (contentLength)
+            {
                 nx_http::insertOrReplaceHeader(
                     &msg.response->headers,
                     nx_http::HttpHeader(
                         "Content-Length",
                         nx_http::StringType::number(
-                            static_cast<qulonglong>( contentLength.get() ) ) ) );
+                            static_cast<qulonglong>(contentLength.get()))));
+            }
         }
     }
     else
     {
         nx_http::insertOrReplaceHeader(
             &msg.response->headers,
-            nx_http::HttpHeader( "Content-Length", "0" ) );
+            nx_http::HttpHeader("Content-Length", "0"));
     }
 
     if (responseMsgBody)
