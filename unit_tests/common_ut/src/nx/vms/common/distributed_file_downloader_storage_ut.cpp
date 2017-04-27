@@ -186,6 +186,30 @@ TEST_F(DistributedFileDownloaderStorageTest, addFileWithWrongChecksum)
     ASSERT_EQ(fileInfo.status, DownloaderFileInformation::Status::notFound);
 }
 
+TEST_F(DistributedFileDownloaderStorageTest, addFileForUpload)
+{
+    {
+        DownloaderFileInformation fileInfo(testFileName);
+        fileInfo.status = DownloaderFileInformation::Status::uploading;
+
+        ASSERT_EQ(downloaderStorage->addFile(fileInfo),
+            DistributedFileDownloader::ErrorCode::invalidFileSize);
+
+        fileInfo.size = kTestFileSize;
+
+        ASSERT_EQ(downloaderStorage->addFile(fileInfo),
+            DistributedFileDownloader::ErrorCode::invalidChecksum);
+
+        fileInfo.md5 = "md5";
+
+        ASSERT_EQ(downloaderStorage->addFile(fileInfo),
+            DistributedFileDownloader::ErrorCode::noError);
+    }
+
+    const auto& fileInfo = downloaderStorage->fileInformation(testFileName);
+    ASSERT_EQ(fileInfo.status, DownloaderFileInformation::Status::uploading);
+}
+
 TEST_F(DistributedFileDownloaderStorageTest, fileDuplicate)
 {
     ASSERT_EQ(downloaderStorage->addFile(testFileName),

@@ -110,7 +110,18 @@ DistributedFileDownloader::ErrorCode DistributedFileDownloaderStorage::addFile(
         }
         else
         {
-            info.status = DownloaderFileInformation::Status::downloading;
+            if (info.status == DownloaderFileInformation::Status::notFound)
+                info.status = DownloaderFileInformation::Status::downloading;
+
+            if (info.status == DownloaderFileInformation::Status::uploading)
+            {
+                if (info.size < 0)
+                    return DistributedFileDownloader::ErrorCode::invalidFileSize;
+
+                if (info.md5.isEmpty())
+                    return DistributedFileDownloader::ErrorCode::invalidChecksum;
+            }
+
             if (info.size >= 0)
             {
                 const int chunkCount = calculateChunkCount(info.size, info.chunkSize);
