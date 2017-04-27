@@ -2333,7 +2333,7 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
     const auto resultHandler =
         [this](bool success)
         {
-            return true; //TODO: FIXME!!! #vkutin
+            //TODO: FIXME!!! #vkutin Implement this.
         };
 
     if (info.prolonged)
