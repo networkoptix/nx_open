@@ -273,6 +273,7 @@ PageBase
 
             Row
             {
+                spacing: 20
                 PtzFocusControl
                 {
                     id: focusPanel
@@ -280,7 +281,7 @@ PageBase
                     property bool continuousFocusEnabled:
                         ptzController.capabilities & Ptz.ContinuousFocusCapability
 
-                    supportsAutoFocus: true//ptzController.auxTraits & Ptz.ManualAutoFocusPtzTrait
+                    supportsAutoFocus: true || ptzController.auxTraits & Ptz.ManualAutoFocusPtzTrait
 
                     onFocusInPressedChanged:
                     {
@@ -297,23 +298,25 @@ PageBase
                     onAutoFocusClicked: { ptzController.setAutoFocus() }
                 }
 
-                Column
+                PtzZoomControl
                 {
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 0
-
-                    Button
+                    supporsValuesMarker: true
+                    onZoomInPressedChanged:
                     {
-                        text: "zoom in"
-                        onPressed: ptzController.continuousMove(Qt.vector3d(0, 0, 0.1))
-                        onReleased: ptzController.continuousMove(Qt.vector3d(0, 0, 0))
+                        var zoomVector = zoomInPressed
+                            ? Qt.vector3d(0, 0, 0.1)
+                            : Qt.vector3d(0, 0, 0)
+
+                        ptzController.continuousMove(zoomVector)
                     }
 
-                    Button
+                    onZoomOutPressedChanged:
                     {
-                        text: "zoom out"
-                        onPressed: ptzController.continuousMove(Qt.vector3d(0, 0, -0.1))
-                        onReleased: ptzController.continuousMove(Qt.vector3d(0, 0, 0))
+                        var zoomVector = zoomInPressed
+                            ? Qt.vector3d(0, 0, -0.1)
+                            : Qt.vector3d(0, 0, 0)
+
+                        ptzController.continuousMove(zoomVector)
                     }
                 }
 
@@ -331,18 +334,17 @@ PageBase
 
                     onSingleShot:
                     {
-                        console.log("---------------------------")
                         ptzController.continuousMove(Qt.vector3d(direction.x, direction.y, 0))
                         ptzController.continuousMove(Qt.vector3d(0, 0, 0))
                     }
+
                     onButtonPressed:
                     {
-                        console.log(">>>>>>>>>>>")
                         ptzController.continuousMove(Qt.vector3d(direction.x, direction.y, 0))
                     }
+
                     onButtonReleased:
                     {
-                        console.log("<<<<<<<<<<<")
                         ptzController.continuousMove(Qt.vector3d(0, 0, 0))
                     }
                 }

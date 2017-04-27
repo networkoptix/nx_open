@@ -47,7 +47,6 @@ Rectangle
             var center = d.centerPoint
             var radius = d.controlRadius
 
-
             if (mouseArea.pressed)
                 drawGradient(context)
 
