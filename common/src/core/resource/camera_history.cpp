@@ -133,9 +133,27 @@ QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
         QnBusiness::EventType eventType = businessAction->getRuntimeParams().eventType;
         if (eventType >= QnBusiness::SystemHealthEvent && eventType <= QnBusiness::MaxSystemHealthEvent) {
             QnSystemHealth::MessageType healthMessage = QnSystemHealth::MessageType(eventType - QnBusiness::SystemHealthEvent);
-            if (healthMessage == QnSystemHealth::ArchiveRebuildFinished || healthMessage == QnSystemHealth::ArchiveFastScanFinished)
+            if (healthMessage == QnSystemHealth::ArchiveRebuildFinished 
+                || healthMessage == QnSystemHealth::ArchiveFastScanFinished
+                || healthMessage == QnSystemHealth::RemoteArchiveSyncFinished)
             {
-                auto cameras = getServerFootageData(businessAction->getRuntimeParams().eventResourceId);
+                auto eventParams = businessAction->getRuntimeParams();
+                std::vector<QnUuid> cameras;
+
+                if (healthMessage == QnSystemHealth::RemoteArchiveSyncFinished)
+                {
+                    auto neededCameras = eventParams.metadata.cameraRefs;
+                    if (neededCameras.empty())
+                        return;
+
+                    cameras.push_back(neededCameras[0]);
+                }
+                else
+                {
+                    cameras = getServerFootageData(eventParams.eventResourceId);
+                }
+                
+
                 for (const auto &cameraId: cameras)
                     invalidateCameraHistory(cameraId);
 

@@ -15,10 +15,11 @@ public:
     AviMotionArchiveDelegate();
 
     virtual QnAbstractMediaDataPtr getNextData() override;
-    virtual void setMotionRegion(const QnMotionRegion& region);
+    virtual void setMotionRegion(const QnMotionRegion& region) override;
 
 private:
     QnMetaDataV1Ptr analyzeMotion(const QnAbstractMediaDataPtr& video);
+    
 
 private:
     mutable QnMutex m_mutex;

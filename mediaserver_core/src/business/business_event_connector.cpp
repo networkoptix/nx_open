@@ -16,6 +16,7 @@
 #include "core/resource/camera_resource.h"
 #include "business/events/custom_business_event.h"
 #include "business/events/conflict_business_event.h"
+#include <media_server/serverutil.h>
 
 //#define REDUCE_NET_ISSUE_HACK
 
@@ -158,6 +159,28 @@ void QnBusinessEventConnector::at_archiveBackupFinished(const QnResourcePtr &res
 {
     QnBackupFinishedBusinessEventPtr bEvent(new QnBackupFinishedBusinessEvent(resource, timeStamp, reasonCode, reasonText));
     qnBusinessRuleProcessor->processBusinessEvent(bEvent);
+}
+
+void QnBusinessEventConnector::at_remoteArchiveSyncStarted(const QnResourcePtr& resource)
+{
+    QnAbstractBusinessActionPtr action(
+        new QnSystemHealthBusinessAction(QnSystemHealth::MessageType::RemoteArchiveSyncStarted,
+        serverGuid()));
+
+    auto params = action->getRuntimeParams();
+    params.metadata.cameraRefs.push_back(resource->getId());
+    qnBusinessRuleProcessor->broadcastBusinessAction(action);
+}
+
+void QnBusinessEventConnector::at_remoteArchiveSyncFinished(const QnResourcePtr &resource)
+{
+    QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(
+        QnSystemHealth::MessageType::RemoteArchiveSyncFinished,
+        serverGuid()));
+
+    auto params = action->getRuntimeParams();
+    params.metadata.cameraRefs.push_back(resource->getId());
+    qnBusinessRuleProcessor->broadcastBusinessAction(action);
 }
 
 bool QnBusinessEventConnector::createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState, QString* errMessage)

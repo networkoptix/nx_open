@@ -10,6 +10,8 @@
 
 #include <nx/utils/thread/mutex.h>
 
+#include <core/resource/motion_window.h>
+
 extern "C"
 {
 // For typedef struct AVIOContext.
@@ -67,6 +69,7 @@ public:
     void setUseAbsolutePos(bool value);
     void setStorage(const QnStorageResourcePtr &storage);
     virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;
+    virtual void setMotionRegion(const QnMotionRegion& region) override;
 
     //void setMotionConnection(QnAbstractMotionArchiveConnectionPtr connection, int channel);
     virtual bool findStreams();

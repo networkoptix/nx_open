@@ -30,7 +30,10 @@ enum MessageType
 
     CloudPromo, //local promo message
 
-    Count
+    Count,
+
+    RemoteArchiveSyncStarted,
+    RemoteArchiveSyncFinished
 };
 
 /** Some messages are not to be displayed in any case. */

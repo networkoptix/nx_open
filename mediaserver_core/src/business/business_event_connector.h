@@ -78,6 +78,10 @@ public slots:
 
     void at_archiveBackupFinished(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonText);
 
+    void at_remoteArchiveSyncStarted(const QnResourcePtr& resource);
+
+    void at_remoteArchiveSyncFinished(const QnResourcePtr &resource);
+
     bool createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState, QString* errMessage = 0);
 private slots:
     void onNewResource(const QnResourcePtr &resource);

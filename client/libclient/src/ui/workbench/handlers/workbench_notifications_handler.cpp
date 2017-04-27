@@ -224,6 +224,8 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
     {
         case QnSystemHealth::EmailIsEmpty:
         case QnSystemHealth::ConnectionLost:
+        case QnSystemHealth::RemoteArchiveSyncStarted:
+        case QnSystemHealth::RemoteArchiveSyncFinished:
             return false;
 
         case QnSystemHealth::NoLicenses:
@@ -317,6 +319,8 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
         case QnSystemHealth::StoragesNotConfigured:
         case QnSystemHealth::ArchiveRebuildFinished:
         case QnSystemHealth::ArchiveRebuildCanceled:
+        case QnSystemHealth::RemoteArchiveSyncStarted:
+        case QnSystemHealth::RemoteArchiveSyncFinished:
             return;
 
         case QnSystemHealth::SystemIsReadOnly:

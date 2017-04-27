@@ -73,6 +73,8 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
         /* Green notifications */
         case QnSystemHealth::ArchiveRebuildFinished:
         case QnSystemHealth::ArchiveFastScanFinished: //this one is never displayed though
+        case QnSystemHealth::RemoteArchiveSyncStarted:
+        case QnSystemHealth::RemoteArchiveSyncFinished:
             return QnNotificationLevel::Value::CommonNotification;
 
         /* Yellow notifications */

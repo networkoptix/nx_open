@@ -746,6 +746,11 @@ QnAbstractMotionArchiveConnectionPtr QnAviArchiveDelegate::getMotionConnection(i
     return QnAbstractMotionArchiveConnectionPtr(new QnLightMotionArchiveConnection(motionData, channel));
 }
 
+void QnAviArchiveDelegate::setMotionRegion(const QnMotionRegion& /*region*/)
+{
+    // Do nothing.
+}
+
 /*
 void QnAviArchiveDelegate::setMotionConnection(QnAbstractMotionArchiveConnectionPtr connection, int channel)
 {

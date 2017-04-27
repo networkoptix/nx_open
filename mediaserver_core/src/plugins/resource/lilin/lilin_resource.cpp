@@ -17,6 +17,7 @@
 #include <transcoding/transcoding_utils.h>
 #include <core/resource/dummy_resource.h>
 #include <motion/motion_helper.h>
+#include <business/business_event_connector.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -44,6 +45,7 @@ static const int kMinuteStringLength(2);
 static const int kSecondStringLength(2);
 
 static const QString kArchiveContainer("matroska");
+static const QString kArchiveContainerExtension(".mkv");
 
 static const int kDateStringLength = kYearStringLength
     + kMonthStringLength
@@ -54,6 +56,8 @@ static const int kDateStringLength = kYearStringLength
 
 static const QString kDateTimeFormat("yyyyMMddhhmmss");
 static const QString kDateTimeFormat2("yyyy/MM/dd hh:mm:ss");
+
+static const QSize kMaxLowStreamResolution(1024, 768);
 
 } // namespace 
 
@@ -269,12 +273,20 @@ bool LilinResource::synchronizeArchive()
     // 2. Filter list (keep only needed records)
     auto filtered = filterEntries(sdCardArchiveEntries);
 
+    if (filtered.empty())
+        return true;
+
+    auto res = toResourcePtr();
+    qnBusinessRuleConnector->at_remoteArchiveSyncStarted(res);
+
     // 3. In cycle move all records to archive.
     for (const auto& entry: filtered)
         moveEntryToArchive(entry);
 
     qDebug() << "Archive synchronization is done.";
     NX_LOGX(lit("Archive synchronization is done."), cl_logDEBUG1);
+
+    qnBusinessRuleConnector->at_remoteArchiveSyncFinished(res);
     return true; //< Seems to be a nonsense
 }
 
@@ -290,7 +302,10 @@ std::vector<RemoteArchiveEntry> LilinResource::filterEntries(const std::vector<R
     for (const auto& entry: allEntries)
     {
         if (!catalog->containTime(entry.startTimeMs + entry.durationMs / 2))
+        {
+            qDebug() << "DOES NOT CONTAIN TIME" << entry.startTimeMs + entry.durationMs / 2 << entry.durationMs;
             filtered.push_back(entry);
+        }
     }
 
     qDebug() << "Filtered entries count" << filtered.size() << ". All entries count" << allEntries.size();
@@ -332,20 +347,57 @@ bool LilinResource::writeEntry(const RemoteArchiveEntry& entry, nx_http::BufferT
     QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(toSharedPointer(this));
     NX_ASSERT(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
 
+    QBuffer ioDevice;
+    ioDevice.setBuffer(buffer);
+    ioDevice.open(QIODevice::ReadOnly);
+
+    // Obtain real media duration
+    auto helper = nx::transcoding::Helper(&ioDevice);
+    if (!helper.open())
+    {
+        qDebug() << "Can not open buffer";
+        NX_LOGX(lit("Can not open buffer"), cl_logDEBUG1);
+        return false;
+    }
+
+    const uint64_t kEpsilonMs = 100;
+    int64_t realDurationMs = std::round(helper.durationMs());
+    
+    auto diff = entry.durationMs - realDurationMs;
+    if (diff < 0)
+        diff = -diff;
+
+    if (realDurationMs == AV_NOPTS_VALUE || diff <= kEpsilonMs)
+        realDurationMs = entry.durationMs;
+
+    // Determine chunks catalog by resolution
+    auto resolution = helper.resolution();
+    auto catalogType = chunksCatalogByResolution(resolution);
+    auto catalogPrefix = DeviceFileCatalog::prefixByCatalog(catalogType);
+    auto catalog = qnNormalStorageMan->getFileCatalog(
+        getUniqueId(),
+        catalogPrefix);
+    
+    // Ignore media if it is already in catalog
+    if (catalog->containTime(entry.startTimeMs + realDurationMs / 2))
+        return true;
+
     auto normalStorage = qnNormalStorageMan->getOptimalStorageRoot();
     if (!normalStorage)
         return false;
-
-    QString fileName;
     
-    fileName = qnNormalStorageMan->getFileName(
+    auto fileName = qnNormalStorageMan->getFileName(
         entry.startTimeMs,
         currentTimeZone() / 60,
         netResource,
-        DeviceFileCatalog::prefixByCatalog(QnServer::ChunksCatalog::HiQualityCatalog),
+        catalogPrefix,
         normalStorage);
 
-    QString fileNameWithExtension = fileName + lit(".mkv");
+    auto fileNameWithExtension = fileName + kArchiveContainerExtension;
+    QFileInfo info(fileNameWithExtension);
+    QDir dir = info.dir();
+    if (!dir.exists() && !dir.mkpath("."))
+        return false;
 
     qnNormalStorageMan->fileStarted(
         entry.startTimeMs,
@@ -353,78 +405,64 @@ bool LilinResource::writeEntry(const RemoteArchiveEntry& entry, nx_http::BufferT
         fileNameWithExtension,
         nullptr);
 
-    QFileInfo info(fileNameWithExtension);
-    QDir dir = info.dir();
+    auto audioLayout = helper.audioLayout();
+    bool needMotion = isMotionDetectionNeeded(catalogType);
 
-    if (!dir.exists())
-    {
-        if (!dir.mkpath("."))
-            return false;
-    }
+    helper.close();
 
-    int64_t realDurationMs = AV_NOPTS_VALUE;
-    if (!convertAndWriteBuffer(buffer, fileNameWithExtension, entry.startTimeMs, &realDurationMs))
-        return false;
+    bool succesfulWrite = convertAndWriteBuffer(
+        buffer,
+        fileNameWithExtension,
+        entry.startTimeMs,
+        audioLayout,
+        needMotion);
     
-    const uint64_t kEpsilonMs = 100; 
-    auto diff = entry.durationMs - realDurationMs;
-    if (diff < 0)
-        diff = -diff; 
+    qDebug() << "File " << fileNameWithExtension << "has been written";
 
-    if (realDurationMs == AV_NOPTS_VALUE || diff <= kEpsilonMs)
-        realDurationMs = entry.durationMs;
+    if (!succesfulWrite)
+        return false; //< Should we call fileFinished?
 
     return qnNormalStorageMan->fileFinished(
         realDurationMs,
         fileNameWithExtension,
         nullptr,
         buffer->size());
-
-    return true;
 }
 
 bool LilinResource::convertAndWriteBuffer(
     nx_http::BufferType* buffer,
     const QString& fileName,
     int64_t startTimeMs,
-    int64_t* outDurationMs)
+    const QnResourceAudioLayoutPtr& audioLayout,
+    bool needMotion)
 {
     qDebug() << "Converting and writing file" << fileName;
     NX_LOGX(lm("Converting and writing file %1").arg(fileName), cl_logDEBUG1);
 
-    const QString temporaryFilePath = QString::number(nx::utils::random::number());
-    QnExtIODeviceStorageResourcePtr storage(new QnExtIODeviceStorageResource());
-    QnResourcePtr resource(new DummyResource());
-
-    QBuffer* ioDevice = new QBuffer();
+    QBuffer* ioDevice = new QBuffer(); //< Will be freed by the owning storage.
     ioDevice->setBuffer(buffer);
     ioDevice->open(QIODevice::ReadOnly);
 
-    auto audioLayout = nx::transcoding::audioLayout(ioDevice);
-    ioDevice->reset();
+    const QString temporaryFilePath = QString::number(nx::utils::random::number());
+    QnResourcePtr resource(new DummyResource());
+    resource->setUrl(temporaryFilePath); //< Check it if something doesn't work.
 
-    *outDurationMs = std::round(nx::transcoding::mediaDurationMs(ioDevice) / 1000.0);
-    ioDevice->reset();
-
+    QnExtIODeviceStorageResourcePtr storage(new QnExtIODeviceStorageResource());
     storage->registerResourceData(temporaryFilePath, ioDevice);
-    resource->setUrl(temporaryFilePath);
 
-    auto mediaFileReader = std::make_shared<AviMotionArchiveDelegate>();
-    mediaFileReader->setStorage(storage);
-    if (!mediaFileReader->open(resource))
+    std::shared_ptr<QnAviArchiveDelegate> reader(needMotion 
+        ? new QnAviArchiveDelegate()
+        : new AviMotionArchiveDelegate());
+
+    reader->setStorage(storage);
+    if (!reader->open(resource))
         return false;
 
-    mediaFileReader->setAudioChannel(0);
-    mediaFileReader->setMotionRegion(getMotionRegion(0));
-    mediaFileReader->setStartTimeUs(startTimeMs * 1000);
+    reader->setAudioChannel(0);
+    reader->setMotionRegion(getMotionRegion(0));
+    reader->setStartTimeUs(startTimeMs * 1000);
 
-    auto recorder = std::make_unique<QnStreamRecorder>(toResourcePtr());
-    recorder->clearUnprocessedData();
-    recorder->addRecordingContext(fileName, qnNormalStorageMan->getOptimalStorageRoot());
-    recorder->setContainer(kArchiveContainer);
-    recorder->forceAudioLayout(audioLayout);
-    recorder->disableRegisterFile(true);
-    recorder->setSaveMotionHandler(
+    auto saveMotionHandler = 
         [this](const QnConstMetaDataV1Ptr& motion)
         {
             if (motion)
@@ -435,27 +473,60 @@ bool LilinResource::convertAndWriteBuffer(
                     archive->saveToArchive(motion);
             }
             return true;
-        });
+        };
+
+    QnStreamRecorder recorder(toResourcePtr());
+    recorder.clearUnprocessedData();
+    recorder.addRecordingContext(fileName, qnNormalStorageMan->getOptimalStorageRoot());
+    recorder.setContainer(kArchiveContainer);
+    recorder.forceAudioLayout(audioLayout);
+    recorder.disableRegisterFile(true);
+    recorder.setSaveMotionHandler(saveMotionHandler);   
 
     auto connection = connect(
         this,
         &QnSecurityCamResource::motionRegionChanged, 
-        [&mediaFileReader, this](const QnResourcePtr& res)
+        [&reader, this](const QnResourcePtr& res)
         { 
-            mediaFileReader->setMotionRegion(getMotionRegion(0));
+            reader->setMotionRegion(getMotionRegion(0));
         });
 
-    while (auto mediaData = mediaFileReader->getNextData())
+    while (auto mediaData = reader->getNextData())
     {
         if (mediaData->dataType == QnAbstractMediaData::EMPTY_DATA)
             break;
 
-        recorder->processData(mediaData);
+        recorder.processData(mediaData);
     }
 
     disconnect(connection); //< TODO: #dmishin possible crash here
     
     return true;
+}
+
+QnServer::ChunksCatalog LilinResource::chunksCatalogByResolution(const QSize& resolution) const
+{
+    const auto maxLowStreamArea = kMaxLowStreamResolution.width() * kMaxLowStreamResolution.height();
+    const auto area = resolution.width() * resolution.height();
+
+    return area <= maxLowStreamArea
+        ? QnServer::ChunksCatalog::LowQualityCatalog
+        : QnServer::ChunksCatalog::HiQualityCatalog;
+}
+
+bool LilinResource::isMotionDetectionNeeded(QnServer::ChunksCatalog catalog) const
+{
+    if (catalog == QnServer::ChunksCatalog::LowQualityCatalog)
+    {
+        return true;
+    }
+    else if (catalog == QnServer::ChunksCatalog::HiQualityCatalog)
+    {
+        auto streamForMotionDetection = getProperty(QnMediaResource::motionStreamKey()).toLower();
+        return streamForMotionDetection == QnMediaResource::primaryStreamValue();
+    }
+
+    return false;
 }
 
 } // namespace plugins

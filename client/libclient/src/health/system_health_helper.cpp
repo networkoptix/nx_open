@@ -34,6 +34,10 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
             return tr("Rebuilding archive index is completed");
         case QnSystemHealth::ArchiveRebuildCanceled:
             return tr("Rebuilding archive index is canceled by user");
+        case QnSystemHealth::RemoteArchiveSyncStarted:
+            return tr("Remote archive synchronization has been started");
+        case QnSystemHealth::RemoteArchiveSyncFinished:
+            return tr("Remote archive synchronization has been finished");
         default:
             break;
     }
@@ -110,6 +114,12 @@ QString QnSystemHealthStringsHelper::messageTooltip(QnSystemHealth::MessageType 
             break;
         case QnSystemHealth::ArchiveRebuildCanceled:
             messageParts << tr("Rebuilding archive index is canceled by user on the following Server:") << resourceName;
+            break;
+        case QnSystemHealth::RemoteArchiveSyncStarted:
+            messageParts << tr("Remote archive synchronization has been started for the following device:") << resourceName;
+            break;
+        case QnSystemHealth::RemoteArchiveSyncFinished:
+            messageParts << tr("Remote archive synchronization has been finished for the following device:") << resourceName;
             break;
         default:
             break;

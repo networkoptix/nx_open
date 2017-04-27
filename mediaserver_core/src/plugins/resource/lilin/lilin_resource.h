@@ -9,7 +9,7 @@
 #include <nx/network/http/httpclient.h>
 #include <plugins/resource/onvif/onvif_resource.h>
 #include <plugins/common_interfaces/abstract_remote_archive_fetcher.h>
-#include <transcoding/file_transcoder.h>
+#include <server/server_globals.h>
 
 
 namespace nx {
@@ -76,7 +76,12 @@ private:
         nx_http::BufferType* buffer,
         const QString& fileName,
         int64_t startTimeMs,
-        int64_t* outDurationMs);
+        const QnResourceAudioLayoutPtr& audioLayout,
+        bool needMotion);
+
+    QnServer::ChunksCatalog chunksCatalogByResolution(const QSize& resolution) const;
+
+    bool isMotionDetectionNeeded(QnServer::ChunksCatalog catalog) const;
 };
 
 } // namespace plugins

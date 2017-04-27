@@ -1,10 +1,5 @@
 #include "transcoding_utils.h"
 
-extern "C" {
-#include <libavformat/avio.h>
-#include <libavformat/avformat.h>
-}
-
 #include <nx/utils/log/log.h>
 #include <nx/streaming/av_codec_media_context.h>
 
@@ -38,58 +33,81 @@ int writeToQIODevice(void *opaque, uint8_t* buf, int size)
 
 } // namespace
 
-uint64_t mediaDurationMs(QIODevice* device)
+Helper::Helper(QIODevice* inputMedia):
+    m_inputMedia(inputMedia),
+    m_inputAvioContext(nullptr),
+    m_inputFormatContext(nullptr)
 {
-    auto buffer = (unsigned char*)av_malloc(kBufferSize);
-    auto avioContext = avio_alloc_context(
-        buffer,
-        kBufferSize,
-        kReadOnlyBufferFlag,
-        device,
-        readFromQIODevice,
-        writeToQIODevice,
-        nullptr);
-
-    AVFormatContext* avformatContext = avformat_alloc_context();
-    avformatContext->pb = avioContext;
-
-    avformat_open_input(&avformatContext, "dummy", nullptr, nullptr);
-
-    avformat_find_stream_info(avformatContext, 0);
-
-    auto duration = avformatContext->duration;
-
-    avformat_close_input(&avformatContext);
-    avformat_free_context(avformatContext);
-
-    av_freep(&avioContext->buffer);
-    av_freep(&avioContext);
-
-    return duration;
 }
 
-QnResourceAudioLayoutPtr audioLayout(QIODevice* inputMedia)
+Helper::~Helper()
 {
+    close();
+}
+
+bool Helper::open()
+{
+    if (m_inputMedia->isOpen())
+        m_inputMedia->open(QIODevice::ReadOnly);
+
     auto buffer = (unsigned char*)av_malloc(kBufferSize);
     auto avioContext = avio_alloc_context(
         buffer,
         kBufferSize,
         kReadOnlyBufferFlag,
-        inputMedia,
+        m_inputMedia,
         readFromQIODevice,
         writeToQIODevice,
         nullptr);
 
-    AVFormatContext* avformatContext = avformat_alloc_context();
-    avformatContext->pb = avioContext;
+    m_inputFormatContext = avformat_alloc_context();
 
-    avformat_open_input(&avformatContext, "dummy", nullptr, nullptr);
+    if (!m_inputFormatContext)
+        return false;
 
-    avformat_find_stream_info(avformatContext, 0);
+    m_inputFormatContext->pb = avioContext;
 
-    for (auto i = 0; i < avformatContext->nb_streams; i++)
+    if (avformat_open_input(&m_inputFormatContext, "dummy", nullptr, nullptr) < 0)
+        return false;
+
+    if (avformat_find_stream_info(m_inputFormatContext, 0) < 0)
+        return false;
+
+    return true;
+}
+
+void Helper::close()
+{
+    avformat_close_input(&m_inputFormatContext);
+    m_inputFormatContext = nullptr;
+
+    if (m_inputAvioContext)
     {
-        auto stream = avformatContext->streams[i];
+        av_freep(&m_inputAvioContext->buffer);
+        av_freep(&m_inputAvioContext);
+    }
+
+    if (!m_inputMedia->isSequential())
+        m_inputMedia->reset();
+}
+
+int64_t Helper::durationMs()
+{
+    if (!m_inputFormatContext)
+        return AV_NOPTS_VALUE;
+
+    // Potential overflow here
+    return av_rescale(m_inputFormatContext->duration, 1, AV_TIME_BASE) * 1000; 
+}
+
+QnResourceAudioLayoutPtr Helper::audioLayout()
+{
+    if (!m_inputFormatContext)
+        return QnResourceAudioLayoutPtr();
+
+    for (auto i = 0; i < m_inputFormatContext->nb_streams; i++)
+    {
+        auto stream = m_inputFormatContext->streams[i];
         auto codecParameters = stream->codecpar;
         if (codecParameters->codec_type == AVMEDIA_TYPE_AUDIO)
         {
@@ -108,17 +126,27 @@ QnResourceAudioLayoutPtr audioLayout(QIODevice* inputMedia)
             track.codecContext = mediaContext;
             layout->addAudioTrack(track);
 
-            avformat_close_input(&avformatContext);
-            avformat_free_context(avformatContext);
-
-            av_freep(&avioContext->buffer);
-            av_freep(&avioContext);
-
             return layout;
         }
     }
 
-    return QnResourceAudioLayoutPtr(new QnEmptyResourceAudioLayout());
+    return QnResourceAudioLayoutPtr();
+}
+
+QSize Helper::resolution()
+{
+    if (!m_inputFormatContext)
+        return QSize();
+
+    for (auto i = 0; i < m_inputFormatContext->nb_streams; i++)
+    {
+        auto stream = m_inputFormatContext->streams[i];
+        auto codecParameters = stream->codecpar;
+        if (codecParameters->codec_type == AVMEDIA_TYPE_VIDEO)
+            return QSize(codecParameters->width, codecParameters->height);
+    }
+
+    return QSize();
 }
 
 Error remux(QIODevice* inputMedia, QIODevice* outputMedia, const QString& dstContainer)
