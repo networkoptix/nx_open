@@ -411,6 +411,10 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
         // qnClientInstanceManager is not initialized in self-update mode
         logFileNameSuffix = lit("self_update");
     }
+    else if (qnRuntime->isActiveXMode())
+    {
+        logFileNameSuffix = lit("ax");
+    }
     else if (qnClientInstanceManager && qnClientInstanceManager->isValid())
     {
         int idx = qnClientInstanceManager->instanceIndex();

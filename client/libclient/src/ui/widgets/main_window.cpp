@@ -367,6 +367,9 @@ QWidget *QnMainWindow::viewport() const {
 
 bool QnMainWindow::isTitleVisible() const
 {
+    if (!qnRuntime->isDesktopMode())
+        return false;
+
     return m_titleVisible || isWelcomeScreenVisible();
 }
 
