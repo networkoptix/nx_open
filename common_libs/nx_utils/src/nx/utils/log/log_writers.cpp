@@ -112,6 +112,20 @@ void File::rotateIfNeeded()
     }
 }
 
+void Buffer::write(const QString& message)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_messages.push_back(message);
+}
+
+std::vector<QString> Buffer::take()
+{
+    QnMutexLocker lock(&m_mutex);
+    std::vector<QString> messages;
+    std::swap(m_messages, messages);
+    return messages;
+}
+
 } // namespace log
 } // namespace utils
 } // namespace nx

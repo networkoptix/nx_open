@@ -33,11 +33,13 @@ public:
     std::shared_ptr<Logger> get(const QString& tag)
     {
         QnMutexLocker lock(&m_mutex);
-        const auto it = m_loggersByTags.lower_bound(tag);
-        if (it != m_loggersByTags.end() && tag.startsWith(it->first))
-            return it->second;
-        else
-            return m_mainLogger;
+        for (auto& it: m_loggersByTags)
+        {
+            if (tag.startsWith(it.first))
+                return it.second;
+        }
+
+        return m_mainLogger;
     }
 
 private:

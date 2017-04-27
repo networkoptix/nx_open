@@ -2,6 +2,15 @@
 
 #include <QtCore/QDateTime>
 
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
+    #include <sys/types.h>
+    #include <linux/unistd.h>
+    static QString thisThreadId() { return QString::number(syscall(__NR_gettid), 6); }
+#else
+    #include <QtCore/QThread>
+    static QString thisThreadId() { return QString::number((qint64) QThread::currentThreadId(), 6, 16); }
+#endif
+
 namespace nx {
 namespace utils {
 namespace log {
@@ -60,11 +69,12 @@ QString toString(Level level)
     return QLatin1String("unknown");
 }
 
-Logger::Logger(Level level, std::vector<std::unique_ptr<AbstractWriter>> writers):
+Logger::Logger(Level level, std::unique_ptr<AbstractWriter> writer):
     m_mutex(QnMutex::Recursive),
-    m_defaultLevel(level),
-    m_writers(std::move(writers))
+    m_defaultLevel(level)
 {
+    if (writer)
+        m_writers.push_back(std::move(writer));
 }
 
 void Logger::log(Level level, const QString& tag, const QString& message)
@@ -73,24 +83,32 @@ void Logger::log(Level level, const QString& tag, const QString& message)
     if (!isToBeLogged(level, tag))
         return;
 
-    static const QString kTemplate = QLatin1String("%1 %2 %3: %4");
+    static const QString kTemplate = QLatin1String("%1 %2 %3 %4: %5");
     const auto output = kTemplate
-        .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss.zzz"))
-        .arg(toString(level).toUpper(), 7, QLatin1Char(' ')).arg(message);
+        .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss.zzz")).arg(thisThreadId())
+        .arg(toString(level).toUpper(), 7, QLatin1Char(' ')).arg(tag).arg(message);
 
     for (auto& writer: m_writers)
         writer->write(output);
+
+    if (m_writers.empty())
+    {
+        static StdOut stdOut;
+        stdOut.write(output);
+    }
 }
 
 bool Logger::isToBeLogged(Level level, const QString& tag)
 {
     QnMutexLocker lock(&m_mutex);
-    if (static_cast<int>(level) < static_cast<int>(m_defaultLevel))
+    if (static_cast<int>(level) <= static_cast<int>(m_defaultLevel))
         return true;
 
-    const auto it = m_exceptionFilters.lower_bound(tag);
-    if (it != m_exceptionFilters.end() && tag.startsWith(*it))
-        return true;
+    for (const auto& filter: m_exceptionFilters)
+    {
+        if (tag.startsWith(filter))
+            return true;
+    }
 
     return false;
 }
@@ -104,7 +122,7 @@ Level Logger::defaultLevel()
 void Logger::setDefaultLevel(Level level)
 {
     QnMutexLocker lock(&m_mutex);
-    m_defaultLevel = m_defaultLevel;
+    m_defaultLevel = level;
 }
 
 std::set<QString> Logger::exceptionFilters()
@@ -116,7 +134,7 @@ std::set<QString> Logger::exceptionFilters()
 void Logger::setExceptionFilters(std::set<QString> filters)
 {
     QnMutexLocker lock(&m_mutex);
-    m_exceptionFilters = filters;
+    m_exceptionFilters = std::move(filters);
 }
 
 void Logger::setWriters(std::vector<std::unique_ptr<AbstractWriter>> writers)

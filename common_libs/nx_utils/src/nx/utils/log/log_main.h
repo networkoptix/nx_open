@@ -21,10 +21,10 @@ std::shared_ptr<Logger> NX_UTILS_API get(const QString& tag);
  */
 #define NX_UTILS_LOG(LEVEL, TAG, MESSAGE) do \
     { \
-        const auto tag = toString(TAG); \
+        const auto tag = ::toString(TAG); \
         const auto logger = nx::utils::log::get(tag); \
-        if (logger.isToBeLogged(LEVEL, tag)) \
-            logger.log(LEVEL, tag, MESSAGE); \
+        if (logger->isToBeLogged(LEVEL, tag)) \
+            logger->log(LEVEL, tag, MESSAGE); \
     } while (0)
 
 #define NX_ALWAYS(TAG, MESSAGE) NX_UTILS_LOG(nx::utils::log::Level::always, TAG, MESSAGE)

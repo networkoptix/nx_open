@@ -50,6 +50,20 @@ private:
     std::fstream m_file;
 };
 
+/**
+ * Writes messages to internal buffer.
+ */
+class NX_UTILS_API Buffer: public AbstractWriter
+{
+public:
+    virtual void write(const QString& message) override;
+    std::vector<QString> take();
+
+private:
+    QnMutex m_mutex;
+    std::vector<QString> m_messages;
+};
+
 } // namespace log
 } // namespace utils
 } // namespace nx
