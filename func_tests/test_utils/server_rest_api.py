@@ -85,6 +85,8 @@ class ServerRestApiProxy(object):
                 raise HttpError(self._server_name, url, response.status_code, response.reason)
             else:
                 response.raise_for_status()
+        if not response.content:
+            return None
         json = response.json()
         if type(json) != type({}) or not raise_exception:
             return json

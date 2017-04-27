@@ -150,7 +150,7 @@ class ServerConfig(object):
 
 class Server(object):
 
-    def __init__(self, company_name, name, rest_api_url, host=None, box=None, rest_api_timeout_sec=None):
+    def __init__(self, company_name, name, rest_api_url, host=None, box=None, rest_api_timeout_sec=None, internal_ip_port=None):
         self._company_name = company_name
         self.title = name
         self.name = '%s-%s' % (name, str(uuid.uuid4())[-12:])
@@ -168,6 +168,7 @@ class Server(object):
         self.settings = None
         self.local_system_id = None
         self.ecs_guid = None
+        self.internal_ip_port = internal_ip_port or MEDIASERVER_LISTEN_PORT
         self.internal_ip_address = None
         self.storage = self._get_storage()
         self._is_started = None
@@ -180,7 +181,7 @@ class Server(object):
 
     @property
     def internal_url(self):
-        return 'http://%s:%d/' % (self.internal_ip_address, MEDIASERVER_LISTEN_PORT)
+        return 'http://%s:%d/' % (self.internal_ip_address, self.internal_ip_port)
 
     def init(self, must_start, reset, log_level=DEFAULT_SERVER_LOG_LEVEL, patch_set_cloud_host=None, config_file_params=None):
         for path in self.list_core_files():
