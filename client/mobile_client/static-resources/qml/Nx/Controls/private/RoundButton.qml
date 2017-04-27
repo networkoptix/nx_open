@@ -1,4 +1,5 @@
 import QtQuick 2.6
+import Nx 1.0
 
 MouseArea
 {
@@ -16,6 +17,6 @@ MouseArea
         visible: control.pressed
         anchors.centerIn: parent
 
-        color: "grey" // TODO change me
+        color: ColorTheme.transparent(ColorTheme.contrast1, 0.2)
     }
 }

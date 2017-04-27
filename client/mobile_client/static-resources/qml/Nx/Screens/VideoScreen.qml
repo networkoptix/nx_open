@@ -322,7 +322,7 @@ PageBase
 
                 PtzJoystick
                 {
-                    ptzType: 2
+                    ptzType: 0
 
                     visible: enabled;
                     anchors.verticalCenter: parent.verticalCenter

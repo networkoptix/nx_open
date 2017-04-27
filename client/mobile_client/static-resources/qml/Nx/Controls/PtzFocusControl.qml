@@ -1,5 +1,7 @@
 import QtQuick 2.6
 
+import Nx 1.0
+
 import "private" as Private
 
 Private.GenericValueControl
@@ -9,23 +11,24 @@ Private.GenericValueControl
     property alias supportsAutoFocus: control.showCenterArea
     property alias focusInPressed: control.upPressed
     property alias focusOutPressed: control.downPressed
+    property bool autoFocusIsOn: false
 
     actionButtonHeight: control.supportsAutoFocus ? 52 : 56
 
     signal autoFocusClicked()
 
-    upButtonDecoration: Text
+    upButtonDecoration: Image
     {
         anchors.centerIn: parent
-        color: "white"
-        text: "F+"
+        source: lp("/images/ptz/ptz_plus.png")
+        opacity: enabled ? 1.0 : 0.2
     }
 
-    downButtonDecoration: Text
+    downButtonDecoration: Image
     {
         anchors.centerIn: parent
-        color: "white"
-        text: "F-"
+        source: lp("/images/ptz/ptz_minus.png")
+        opacity: enabled ? 1.0 : 0.2
     }
 
     centralAreaDelegate: Private.RoundButton
@@ -33,21 +36,14 @@ Private.GenericValueControl
         width: control.width
         height: 32
 
-        Rectangle
+        Image
         {
-            x: 4
-            width: parent.width - x * 2
-            height: parent.height
-
-            radius: 8
-            visible: !control.focusInPressed && !control.focusOutPressed
-        }
-
-        Text
-        {
-            text: qsTr("AF")
             anchors.centerIn: parent
-            color: control.focusInPressed || control.focusOutPressed ? "white" : "black"
+            source: control.autoFocusIsOn
+                ? lp("/images/ptz/af_on.png")
+                : lp("/images/ptz/af_off.png")
+
+            opacity: enabled ? 1.0 : 0.2
         }
 
         onClicked: { control.autoFocusClicked() }

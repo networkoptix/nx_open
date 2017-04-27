@@ -1,4 +1,5 @@
 import QtQuick 2.6
+import Nx 1.0
 
 Rectangle
 {
@@ -15,7 +16,7 @@ Rectangle
     property Component downButtonDecoration
     property Component centralAreaDelegate
 
-    color: "LightSlateGrey" // TODO: set appropriate
+    color: ColorTheme.transparent(ColorTheme.base8, 0.8)
 
     implicitWidth: 56
     implicitHeight: showCenterArea ? 136 : 112

@@ -1,11 +1,11 @@
 import QtQuick 2.6
 
+import Nx 1.0
+
 Rectangle
 {
     id: control
 
-    color: "blue" // todo remove me
-    opacity: mouseArea.pressed ? 0.8 : 1
 
     /**
      * "direction" property specifies blah blah TODO: write comment
@@ -29,6 +29,7 @@ Rectangle
     implicitWidth: 136
     implicitHeight: implicitWidth
     radius: width / 2
+    color: ColorTheme.transparent(ColorTheme.base8, 0.8)
 
     Canvas
     {
@@ -61,8 +62,10 @@ Rectangle
 
             var gradientStartPoint = d.centerPoint.minus(d.radialVector)
 
+            var startColor = ColorTheme.transparent(ColorTheme.contrast1, 0.0)
+            var finishColor = ColorTheme.transparent(ColorTheme.contrast1, 0.2)
             context.fillStyle = createGradient(context, gradientStartPoint, d.radialPosition,
-                Qt.rgba(1, 1, 1, 0), Qt.rgba(1, 1, 1, 0.5))
+                startColor, finishColor)
 
             var angle = mathHelpers.getAngle(d.radialVector)
             var angleOffset = drawer.drawButtonBorders && control.ptzType != kFreeWayPtz
@@ -196,35 +199,19 @@ Rectangle
         }
     }
 
-    Item
+    Image
     {
-        id: pointerItem
+        id: pointerImage
 
-        property vector2d position: d.radialVector.times(1.15).plus(d.centerPoint)
-        property real iconRotation: 135 //< points to right
+        property vector2d position: d.radialVector.times(1.2).plus(d.centerPoint)
 
-        width: 12
-        height: width
+        source: lp("/images/ptz/ptz_arrow.png")
 
         x: position.x - width / 2
         y: position.y - height / 2
-
-        rotation: iconRotation + mathHelpers.getAngle(d.radialVector) * 180 / Math.PI
-
-        visible: mouseArea.pressed
         scale: d.movementVector.length()
-
-        Rectangle
-        {
-            width: parent.width
-            height: 2
-        }
-
-        Rectangle
-        {
-            width: 2
-            height: parent.height
-        }
+        visible: mouseArea.pressed
+        rotation: mathHelpers.getAngle(d.radialVector) * 180 / Math.PI
     }
 
     Rectangle
@@ -267,7 +254,7 @@ Rectangle
     {
         model: d.currentSectionData.buttons.length
 
-        delegate: Item
+        delegate: Image
         {
             property int directionId: d.currentSectionData ? d.currentSectionData.buttons[index] : 0
             property bool horizontal: directionId == 3 || directionId == 4
@@ -277,29 +264,13 @@ Rectangle
                 ? Qt.vector2d(directionId == 3 ? -offset : offset, 0)
                 : Qt.vector2d(0, directionId == 1 ? -offset : offset))
 
-            property real iconRotation: 135 //< points to right by default
             property color color: mouseArea.pressed ? "grey" : "white"
+
+            source: lp("/images/ptz/ptz_arrow_dimmed.png")
 
             x: position.x - width / 2
             y: position.y - height / 2
-            width: 12
-            height: width
-
-            rotation: iconRotation + d.kButtonRotations[directionId]
-
-            Rectangle
-            {
-                width: parent.width
-                height: 2
-                color: parent.color
-            }
-
-            Rectangle
-            {
-                width: 2
-                height: parent.height
-                color: parent.color
-            }
+            rotation: d.kButtonRotations[directionId]
         }
     }
 

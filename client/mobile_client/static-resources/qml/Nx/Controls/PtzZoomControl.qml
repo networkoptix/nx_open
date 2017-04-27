@@ -1,5 +1,7 @@
 import QtQuick 2.6
 
+import Nx 1.0
+
 import "private" as Private
 
 Private.GenericValueControl
@@ -10,22 +12,22 @@ Private.GenericValueControl
     property alias zoomInPressed: control.upPressed
     property alias zoomOutPressed: control.downPressed
 
-    property int selectedMarkerIndex: 0
+    property int selectedMarkerIndex: 2
 
     actionButtonHeight: control.supporsValuesMarker ? 44 : 56
 
-    upButtonDecoration: Text
+    upButtonDecoration: Image
     {
         anchors.centerIn: parent
-        color: "white"
-        text: "Z+"
+        source: lp("/images/ptz/ptz_zoom_plus.png")
+        opacity: enabled ? 1.0 : 0.2
     }
 
-    downButtonDecoration: Text
+    downButtonDecoration: Image
     {
         anchors.centerIn: parent
-        color: "white"
-        text: "Z-"
+        source: lp("/images/ptz/ptz_zoom_minus.png")
+        opacity: enabled ? 1.0 : 0.2
     }
 
     centralAreaDelegate: Column
@@ -51,7 +53,7 @@ Private.GenericValueControl
                 {
                     x: current ? -parent.width / 2 : 0
                     y: current ? -parent.height / 2 : 0
-                    color: current ? "white" : "lightgrey"
+                    color: current ? ColorTheme.contrast1 : ColorTheme.contrast16
                     width: current ? 8 : 4
                     height: width
                     radius: width / 2
