@@ -17,7 +17,6 @@ struct DownloaderFileInformation
     Q_GADGET
 
 public:
-
     DownloaderFileInformation();
     DownloaderFileInformation(const QString& fileName);
 
@@ -42,9 +41,6 @@ public:
 };
 #define DownloaderFileInformation_Fields \
     (name)(size)(md5)(url)(chunkSize)(status)(downloadedChunks)
-
-QN_FUSION_DECLARE_FUNCTIONS(DownloaderFileInformation::Status, (lexical))
-QN_FUSION_DECLARE_FUNCTIONS(DownloaderFileInformation, (json))
 
 class DistributedFileDownloaderPrivate;
 class DistributedFileDownloader: public QObject
@@ -91,15 +87,13 @@ public:
 
     QVector<QByteArray> getChunkChecksums(const QString& fileName);
 
-    static QByteArray calculateMd5(const QString& filePath);
-    static qint64 calculateFileSize(const QString& filePath);
-    static int calculateChunkCount(qint64 fileSize, qint64 chunkSize);
-
 private:
     QScopedPointer<DistributedFileDownloaderPrivate> const d_ptr;
     Q_DECLARE_PRIVATE(DistributedFileDownloader)
 };
 
+QN_FUSION_DECLARE_FUNCTIONS(DownloaderFileInformation, (json))
+QN_FUSION_DECLARE_FUNCTIONS(DownloaderFileInformation::Status, (lexical))
 QN_FUSION_DECLARE_FUNCTIONS(DistributedFileDownloader::ErrorCode, (lexical))
 
 } // namespace common
