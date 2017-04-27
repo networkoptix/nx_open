@@ -129,7 +129,7 @@ private:
 
         ASSERT_TRUE(m_server->setReuseAddrFlag(true)) << lastError();
         ASSERT_TRUE(m_server->bind(m_endpointToBindTo)) << lastError();
-        ASSERT_TRUE(m_server->listen(testClientCount())) << lastError();
+        ASSERT_TRUE(m_server->listen((int)testClientCount())) << lastError();
 
         ASSERT_TRUE(m_server->setRecvTimeout(100)) << lastError();
         std::unique_ptr<AbstractStreamSocket> client(m_server->accept());
@@ -270,7 +270,7 @@ void socketTransferSyncFlags(
 {
     auto server = serverMaker();
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress))<< lastError();
-    ASSERT_TRUE(server->listen(testClientCount())) << lastError();
+    ASSERT_TRUE(server->listen((int)testClientCount())) << lastError();
     if (!endpointToConnectTo)
         endpointToConnectTo = server->getLocalAddress();
 
@@ -361,7 +361,7 @@ void socketTransferAsync(
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     //ASSERT_TRUE(server->setRecvTimeout(kTestTimeout.count() * 2));
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << lastError();
-    ASSERT_TRUE(server->listen(testClientCount())) << lastError();
+    ASSERT_TRUE(server->listen((int)testClientCount())) << lastError();
 
     auto serverAddress = server->getLocalAddress();
     NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logINFO);
@@ -638,7 +638,7 @@ void socketTransferFragmentation(
     auto server = serverMaker();
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << lastError();
-    ASSERT_TRUE(server->listen(testClientCount())) << lastError();
+    ASSERT_TRUE(server->listen((int)testClientCount())) << lastError();
 
     auto serverAddress = server->getLocalAddress();
     NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);
@@ -684,7 +684,7 @@ void socketMultiConnect(
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << lastError();
-    ASSERT_TRUE(server->listen(testClientCount())) << lastError();
+    ASSERT_TRUE(server->listen((int)testClientCount())) << lastError();
 
     nx::utils::TestSyncQueue< SystemError::ErrorCode > acceptResults;
     nx::utils::TestSyncQueue< SystemError::ErrorCode > connectResults;
@@ -749,7 +749,7 @@ void socketMultiConnect(
         };
 
     const auto kClientCount = testClientCount();
-    connectNewClients(kClientCount);
+    connectNewClients((int)kClientCount);
     for (size_t i = 0; i < kClientCount; ++i)
     {
         ASSERT_EQ(acceptResults.pop(), SystemError::noError);
@@ -890,7 +890,7 @@ void socketAcceptMixed(
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
-    ASSERT_TRUE(server->listen(testClientCount()));
+    ASSERT_TRUE(server->listen((int)testClientCount()));
 
     auto serverAddress = server->getLocalAddress();
     NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);
@@ -937,7 +937,7 @@ void acceptedSocketOptionsInheritance(
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     ASSERT_TRUE(server->setRecvTimeout(10 * 1000));
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
-    ASSERT_TRUE(server->listen(testClientCount()));
+    ASSERT_TRUE(server->listen((int)testClientCount()));
     auto serverAddress = server->getLocalAddress();
 
     auto client = clientMaker();
@@ -1106,7 +1106,7 @@ void socketIsUsefulAfterCancelIo(
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     ASSERT_TRUE(server->setRecvTimeout(100));
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << lastError();
-    ASSERT_TRUE(server->listen(testClientCount())) << lastError();
+    ASSERT_TRUE(server->listen((int)testClientCount())) << lastError();
 
     auto serverAddress = server->getLocalAddress();
     NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logINFO);
