@@ -1072,7 +1072,7 @@ void AsyncClient::addBodyToRequest()
     {
         m_request.headers.emplace(
             "Content-Length",
-            StringType::number(*m_requestBody->contentLength()));
+            StringType::number((qulonglong)*m_requestBody->contentLength()));
     }
     // TODO: #ak Support chunked encoding & compression.
     m_request.headers.insert(make_pair("Content-Encoding", "identity"));
