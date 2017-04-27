@@ -88,7 +88,8 @@ public:
     MiscData& miscData();
 
     const Qn::UserAccessData& getUserAccessData() const { return m_userAccessData; }
-    bool isSubscribedTo(const ApiPersistentIdData& peer);
+    bool remotePeerSubscribedTo(const ApiPersistentIdData& peer) const;
+    bool localPeerSubscribedTo(const ApiPersistentIdData& peer) const;
 signals:
     void gotMessage(P2pConnectionPtr connection, MessageType messageType, const QByteArray& payload);
     void stateChanged(P2pConnectionPtr connection, P2pConnection::State state);

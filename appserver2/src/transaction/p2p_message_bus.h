@@ -11,6 +11,7 @@
 #include "p2p_connection.h"
 #include "p2p_fwd.h"
 #include "transaction.h"
+#include <common/static_common_module.h>
 
 namespace ec2 {
 
@@ -65,10 +66,16 @@ public:
         QnMutexLocker lock(&m_mutex);
         if (m_connections.isEmpty())
             return;
+        const ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
         for (const auto& connection: m_connections)
         {
-            if (!connection->isSubscribedTo(ApiPersistentIdData(tran.peerID, tran.persistentInfo.dbID)))
+            if (!connection->remotePeerSubscribedTo(peerId))
                 continue;
+            NX_ASSERT(!(ApiPersistentIdData(connection->remotePeer()) == peerId)); //< loop
+
+            if (QnLog::instance()->logLevel() >= cl_logDEBUG1)
+                printTran(connection, tran, P2pConnection::Direction::outgoing);
+
             switch (connection->remotePeer().dataFormat)
             {
             case Qn::JsonFormat:
@@ -85,6 +92,11 @@ public:
             }
         }
     }
+
+    void printTran(
+        const P2pConnectionPtr& connection,
+        const QnAbstractTransaction& tran,
+        P2pConnection::Direction direction) const;
 
 private:
     QByteArray serializePeersMessage();
@@ -134,8 +146,14 @@ private:
 
     friend struct GotTransactionFuction;
 
+    void P2pMessageBus::gotTransaction(
+        const QnTransaction<ApiUpdateSequenceData> &tran,
+        const P2pConnectionPtr& connection);
+
     template <class T>
     void gotTransaction(const QnTransaction<T>& tran,const P2pConnectionPtr& connection);
+
+    void proxyFillerTransaction(const QnAbstractTransaction& tran);
 private slots:
     void at_gotMessage(const QSharedPointer<P2pConnection>& connection, MessageType messageType, const QByteArray& payload);
     void at_stateChanged(const QSharedPointer<P2pConnection>& connection, P2pConnection::State state);

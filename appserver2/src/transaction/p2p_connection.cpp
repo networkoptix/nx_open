@@ -67,6 +67,7 @@ P2pConnection::P2pConnection(
 
     QUrl remotePeerUrl = _remotePeerUrl;
     m_remotePeer.id = remoteId;
+    NX_ASSERT(m_localPeer.id != m_remotePeer.id);
 
 
     connect(
@@ -150,6 +151,7 @@ P2pConnection::P2pConnection(
     m_webSocket(webSocket),
     m_direction(Direction::incoming)
 {
+    NX_ASSERT(m_localPeer.id != m_remotePeer.id);
     m_readBuffer.reserve(1024 * 1024);
 
     using namespace std::placeholders;
@@ -427,12 +429,15 @@ void P2pConnection::sendMessage(const nx::Buffer& data)
         auto remotePeerName = qnStaticCommon->moduleDisplayName(remotePeer().id);
 
         MessageType messageType = (MessageType)data[0];
-        NX_LOG(lit("Send message:\t %1 ---> %2. Type: %3. Size=%4")
-            .arg(localPeerName)
-            .arg(remotePeerName)
-            .arg(toString(messageType))
-            .arg(data.size()),
-            cl_logDEBUG1);
+        if (messageType != MessageType::pushTransactionData)
+        {
+            NX_LOG(lit("Send message:\t %1 ---> %2. Type: %3. Size=%4")
+                .arg(localPeerName)
+                .arg(remotePeerName)
+                .arg(toString(messageType))
+                .arg(data.size()),
+                cl_logDEBUG1);
+        }
     }
 
     using namespace std::placeholders;
@@ -509,9 +514,16 @@ PeerNumberType P2pConnection::encode(const ApiPersistentIdData& fullId, PeerNumb
     return m_shortPeerInfo.encode(fullId, shortPeerNumber);
 }
 
-bool P2pConnection::isSubscribedTo(const ApiPersistentIdData& peer)
+bool P2pConnection::remotePeerSubscribedTo(const ApiPersistentIdData& peer) const
 {
     const auto& data = m_miscData.remoteSubscription;
+    auto itr = std::find(data.begin(), data.end(), peer);
+    return itr != data.end();
+}
+
+bool P2pConnection::localPeerSubscribedTo(const ApiPersistentIdData& peer) const
+{
+    const auto& data = m_miscData.localSubscription;
     auto itr = std::find(data.begin(), data.end(), peer);
     return itr != data.end();
 }

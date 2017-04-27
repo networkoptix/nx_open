@@ -215,8 +215,11 @@ ErrorCode QnTransactionLog::updateSequence(const ApiUpdateSequenceData& data)
 {
     detail::QnDbManager::QnDbTransactionLocker
         locker(dbManager(m_dbManager, Qn::kSystemAccess).getTransaction());
+
     for(const ApiSyncMarkerRecord& record: data.markers)
     {
+        NX_ASSERT(m_state.values.value(ApiPersistentIdData(record.peerID, record.dbID)) <= record.sequence);
+
         NX_LOG( QnLog::EC2_TRAN_LOG, lit("update transaction sequence in log. key=%1 dbID=%2 dbSeq=%3").arg(record.peerID.toString()).arg(record.dbID.toString()).arg(record.sequence), cl_logDEBUG1);
         ErrorCode result = updateSequenceNoLock(record.peerID, record.dbID, record.sequence);
         if (result != ErrorCode::ok)
@@ -434,7 +437,7 @@ ErrorCode QnTransactionLog::getTransactionsAfterInternal(
         extraFilter = lit("AND tran_type = %1").arg(TransactionType::Cloud);
 
     QMap <ApiPersistentIdData, int> tranLogSequence;
-    for(auto itr = m_state.values.begin(); itr != m_state.values.end(); ++itr)
+    for(auto itr = stateToIterate.values.begin(); itr != stateToIterate.values.end(); ++itr)
     {
         const ApiPersistentIdData& key = itr.key();
         QSqlQuery query(m_dbManager->getDB());
