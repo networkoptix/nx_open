@@ -274,8 +274,6 @@ bool AxHDWitness::doInitialize()
 
 void AxHDWitness::doFinalize()
 {
-
-
     m_axClientWindow.reset(nullptr);
     m_axClientModule.reset(nullptr);
 

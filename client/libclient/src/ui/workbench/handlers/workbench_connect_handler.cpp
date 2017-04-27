@@ -376,11 +376,15 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
 
     context()->instance<QnAppServerNotificationCache>();
 
+    QnWorkbenchWelcomeScreen* welcomeScreen = qnRuntime->isDesktopMode()
+        ? context()->instance<QnWorkbenchWelcomeScreen>()
+        : nullptr;
     const auto resourceModeAction = action(QnActions::ResourcesModeAction);
     connect(resourceModeAction, &QAction::toggled, this,
-        [this, welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>()](bool checked)
+        [this, welcomeScreen](bool checked)
         {
-            welcomeScreen->setVisible(!checked);
+            if (welcomeScreen)
+                welcomeScreen->setVisible(!checked);
             if (workbench()->layouts().isEmpty())
                 action(QnActions::OpenNewTabAction)->trigger();
         }, Qt::QueuedConnection); //< QueuedConnection is needed here because 2 title bars
@@ -446,9 +450,12 @@ void QnWorkbenchConnectHandler::handleConnectReply(
             if (helpers::isNewSystem(connectionInfo) && !connectionInfo.ecDbReadOnly)
             {
                 disconnectFromServer(DisconnectFlag::Force);
-                auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-                /* Method is called from QML where we are passing QString. */
-                welcomeScreen->setupFactorySystem(connectionInfo.effectiveUrl().toString());
+                if (qnRuntime->isDesktopMode())
+                {
+                    auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+                    /* Method is called from QML where we are passing QString. */
+                    welcomeScreen->setupFactorySystem(connectionInfo.effectiveUrl().toString());
+                }
             }
             else
             {
@@ -681,6 +688,9 @@ void QnWorkbenchConnectHandler::setPhysicalState(PhysicalState value)
 
 void QnWorkbenchConnectHandler::showPreloader()
 {
+    if (!qnRuntime->isDesktopMode())
+        return;
+
     const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
     const auto resourceModeAction = action(QnActions::ResourcesModeAction);
 
@@ -693,17 +703,21 @@ void QnWorkbenchConnectHandler::handleStateChanged(LogicalState logicalValue,
     PhysicalState physicalValue)
 {
     const auto resourceModeAction = action(QnActions::ResourcesModeAction);
-    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
 
     qDebug() << "QnWorkbenchConnectHandler state changed" << logicalValue << physicalValue;
     switch (logicalValue)
     {
         case LogicalState::disconnected:
-            welcomeScreen->handleDisconnectedFromSystem();
-            welcomeScreen->setGlobalPreloaderVisible(false);
+        {
+            if (qnRuntime->isDesktopMode())
+            {
+                const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+                welcomeScreen->handleDisconnectedFromSystem();
+                welcomeScreen->setGlobalPreloaderVisible(false);
+            }
             resourceModeAction->setChecked(false);  //< Shows welcome screen
             break;
-
+        }
         case LogicalState::connecting_to_target:
             showPreloader();
             break;
@@ -831,10 +845,13 @@ void QnWorkbenchConnectHandler::at_messageProcessor_initialResourcesReceived()
 
 void QnWorkbenchConnectHandler::at_connectAction_triggered()
 {
-    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-    welcomeScreen->setVisibleControls(true);
+    if (qnRuntime->isDesktopMode())
+    {
+        const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+        welcomeScreen->setVisibleControls(true);
+    }
 
-    bool directConnection = qnRuntime->isActiveXMode() || qnRuntime->isVideoWallMode();
+    bool directConnection = !qnRuntime->isDesktopMode();
     if (m_logicalState == LogicalState::connected)
     {
         // Ask user if he wants to save changes.
