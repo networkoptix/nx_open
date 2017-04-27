@@ -65,8 +65,8 @@ AsyncClient::AsyncClient():
     m_proxyAuthorizationTried(false),
     m_ha1RecalcTried(false),
     m_terminated(false),
-    m_bytesRead(0),
-    m_totalRequests(0),
+    m_totalBytesReadPerRequest(0),
+    m_totalRequestsSentViaCurrentConnection(0),
     m_contentEncodingUsed(true),
     m_sendTimeoutMs(DEFAULT_SEND_TIMEOUT),
     m_responseReadTimeoutMs(DEFAULT_RESPONSE_READ_TIMEOUT),
@@ -84,8 +84,6 @@ AsyncClient::AsyncClient():
 
 AsyncClient::~AsyncClient()
 {
-    if (isInSelfAioThread())
-        stopWhileInAioThread();
 }
 
 const std::unique_ptr<AbstractStreamSocket>& AsyncClient::socket()
@@ -309,7 +307,7 @@ const QUrl& AsyncClient::contentLocationUrl() const
 
 quint64 AsyncClient::bytesRead() const
 {
-    return m_bytesRead;
+    return m_totalBytesReadPerRequest;
 }
 
 void AsyncClient::setUseCompression(bool toggleUseEntityEncoding)
@@ -588,10 +586,10 @@ void AsyncClient::initiateHttpMessageDelivery()
         m_httpStreamReader.resetState();
         m_awaitedMessageNumber = 0;
         m_lastSysErrorCode = SystemError::noError;
-        m_totalRequests = 0;
+        m_totalRequestsSentViaCurrentConnection = 0;
     }
-    ++m_totalRequests;
-    m_bytesRead = 0;
+    ++m_totalRequestsSentViaCurrentConnection;
+    m_totalBytesReadPerRequest = 0;
 
     m_state = sInit;
 
@@ -695,7 +693,7 @@ size_t AsyncClient::parseReceivedBytes(size_t bytesRead)
         return -1;
     }
 
-    m_bytesRead += bytesProcessed;
+    m_totalBytesReadPerRequest += bytesProcessed;
 
     if (m_httpStreamReader.state() == HttpStreamReader::parseError)
     {
@@ -958,7 +956,7 @@ AsyncClient::Result AsyncClient::processResponseMessageBodyBytes(
 {
     using namespace std::placeholders;
 
-    //TODO #ak reconnect in case of error
+    // TODO: #ak Reconnect in case of error.
     if (bytesRead != (std::size_t)-1)
     {
         if (emitSomeMessageBodyAvailable() == Result::thisDestroyed)
@@ -1100,8 +1098,8 @@ void AsyncClient::serializeRequest()
 bool AsyncClient::reconnectIfAppropriate()
 {
     if ((m_connectionClosed || m_state == sSendingRequest || m_state == sReceivingResponse) &&
-        m_bytesRead == 0 &&
-        m_totalRequests > 1)
+        m_totalBytesReadPerRequest == 0 &&
+        m_totalRequestsSentViaCurrentConnection > 1)
     {
         //< Reconnect if TCP timeout for keep-alive connections
         m_connectionClosed = true;
@@ -1109,7 +1107,7 @@ bool AsyncClient::reconnectIfAppropriate()
         return true;
     }
 
-    //TODO #ak we need reconnect and request entity from the point we stopped at
+    // TODO #ak: We need reconnect and request entity from the point we stopped at.
     return false;
 }
 

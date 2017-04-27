@@ -4,13 +4,11 @@ namespace nx {
 namespace cloud {
 namespace relay {
 namespace api {
-namespace path {
 
-NX_NETWORK_API extern const char* const kServerIncomingConnections;
-NX_NETWORK_API extern const char* const kServerClientSessions;
-NX_NETWORK_API extern const char* const kClientSessionConnections;
+NX_NETWORK_API extern const char* const kServerIncomingConnectionsPath;
+NX_NETWORK_API extern const char* const kServerClientSessionsPath;
+NX_NETWORK_API extern const char* const kClientSessionConnectionsPath;
 
-} // namespace path
 } // namespace api
 } // namespace relay
 } // namespace cloud
