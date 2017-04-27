@@ -238,7 +238,7 @@ namespace StatusCode
         {
             case _continue:
                 return StringType("Continue");
-            case upgrade:
+            case switchingProtocols:
                 return StringType("Switching Protocols");
             case ok:
                 return StringType("OK");

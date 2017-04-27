@@ -13,6 +13,7 @@
 #include <nx/utils/system_error.h>
 
 #include "auth_tools.h"
+#include "buffer_source.h"
 
 static const int DEFAULT_SEND_TIMEOUT = 3000;
 static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
@@ -109,6 +110,8 @@ void AsyncClient::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread
     base_type::bindToAioThread(aioThread);
     if (m_socket)
         m_socket->bindToAioThread(aioThread);
+    if (m_requestBody)
+        m_requestBody->bindToAioThread(aioThread);
 }
 
 AsyncClient::State AsyncClient::state() const
@@ -151,6 +154,12 @@ void AsyncClient::setOnDone(nx::utils::MoveOnlyFunc<void()> handler)
     m_onDone = std::move(handler);
 }
 
+void AsyncClient::setRequestBody(std::unique_ptr<AbstractMsgBodySource> body)
+{
+    m_requestBody = std::move(body);
+    m_requestBody->bindToAioThread(getAioThread());
+}
+
 void AsyncClient::doGet(const QUrl& url)
 {
     NX_ASSERT(!url.host().isEmpty());
@@ -171,11 +180,7 @@ void AsyncClient::doGet(
     doGet(url);
 }
 
-void AsyncClient::doPost(
-    const QUrl& url,
-    const nx_http::StringType& contentType,
-    nx_http::StringType messageBody,
-    bool includeContentLength)
+void AsyncClient::doPost(const QUrl& url)
 {
     NX_ASSERT(url.isValid());
 
@@ -183,30 +188,20 @@ void AsyncClient::doPost(
     m_requestUrl = url;
     m_contentLocationUrl = url;
     composeRequest(nx_http::Method::POST);
-    m_request.headers.insert(make_pair("Content-Type", contentType));
-    if (includeContentLength)
-        m_request.headers.insert(make_pair("Content-Length", StringType::number(messageBody.size())));
-    //TODO #ak support chunked encoding & compression
-    m_request.headers.insert(make_pair("Content-Encoding", "identity"));
-    m_request.messageBody = std::move(messageBody);
+    addBodyToRequest();
+
     initiateHttpMessageDelivery();
 }
 
 void AsyncClient::doPost(
     const QUrl& url,
-    const nx_http::StringType& contentType,
-    nx_http::StringType messageBody,
-    bool includeContentLength,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
-    doPost(url, contentType, std::move(messageBody), includeContentLength);
+    doPost(url);
 }
 
-void AsyncClient::doPut(
-    const QUrl& url,
-    const nx_http::StringType& contentType,
-    nx_http::StringType messageBody)
+void AsyncClient::doPut(const QUrl& url)
 {
     NX_ASSERT(url.isValid());
 
@@ -214,41 +209,35 @@ void AsyncClient::doPut(
     m_requestUrl = url;
     m_contentLocationUrl = url;
     composeRequest(nx_http::Method::PUT);
-    m_request.headers.insert(make_pair("Content-Type", contentType));
-    m_request.headers.insert(make_pair("Content-Length", StringType::number(messageBody.size())));
-    //TODO #ak support chunked encoding & compression
-    m_request.messageBody = std::move(messageBody);
+    addBodyToRequest();
+
     initiateHttpMessageDelivery();
 }
 
 void AsyncClient::doPut(
     const QUrl& url,
-    const nx_http::StringType& contentType,
-    nx_http::StringType messageBody,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
-    doPut(url, contentType, std::move(messageBody));
+    doPut(url);
 }
 
-void AsyncClient::doOptions(const QUrl& url)
+void AsyncClient::doUpgrade(
+    const QUrl& url,
+    const StringType& protocolToUpgradeTo,
+    nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
+    m_onDone = std::move(completionHandler);
+
     NX_ASSERT(url.isValid());
 
     resetDataBeforeNewRequest();
     m_requestUrl = url;
     m_contentLocationUrl = url;
-    m_contentLocationUrl.setPath(QLatin1String("*"));
+    m_additionalHeaders.emplace("Connection", "Upgrade");
+    m_additionalHeaders.emplace("Upgrade", protocolToUpgradeTo);
     composeRequest(nx_http::Method::OPTIONS);
     initiateHttpMessageDelivery();
-}
-
-void AsyncClient::doOptions(
-    const QUrl& url,
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
-{
-    m_onDone = std::move(completionHandler);
-    doOptions(url);
 }
 
 const nx_http::Request& AsyncClient::request() const
@@ -395,6 +384,7 @@ void AsyncClient::setMessageBodyReadTimeoutMs(unsigned int messageBodyReadTimeou
 void AsyncClient::stopWhileInAioThread()
 {
     m_socket.reset();
+    m_requestBody.reset();
 }
 
 void AsyncClient::asyncConnectDone(SystemError::ErrorCode errorCode)
@@ -1066,10 +1056,37 @@ void AsyncClient::composeRequest(const nx_http::StringType& httpMethod)
         }
         else
         {
-            //not using Basic authentication by default, since it is not secure
+            // Not using Basic authentication by default, since it is not secure.
             nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
         }
     }
+}
+
+void AsyncClient::addBodyToRequest()
+{
+    if (!m_requestBody)
+        return;
+
+    m_request.headers.emplace("Content-Type", m_requestBody->mimeType());
+    if (m_requestBody->contentLength())
+    {
+        m_request.headers.emplace(
+            "Content-Length",
+            StringType::number(*m_requestBody->contentLength()));
+    }
+    // TODO: #ak Support chunked encoding & compression.
+    m_request.headers.insert(make_pair("Content-Encoding", "identity"));
+
+    // TODO: #ak Add support for any body.
+    NX_CRITICAL(
+        dynamic_cast<BufferSource*>(m_requestBody.get()) != nullptr,
+        "Only fixed request body supported at the moment");
+    m_requestBody->readAsync(
+        [this](SystemError::ErrorCode /*sysErrorCode*/, nx_http::BufferType buffer)
+        {
+            m_request.messageBody = std::move(buffer);
+        });
+    NX_ASSERT(m_request.messageBody.size() == *m_requestBody->contentLength());
 }
 
 void AsyncClient::addAdditionalHeader(const StringType& key, const StringType& value)

@@ -9,6 +9,7 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical_functions.h>
 #include <nx/network/aio/basic_pollable.h>
+#include <nx/network/http/buffer_source.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/utils/move_only_func.h>
 
@@ -89,11 +90,14 @@ public:
         {
             decltype(m_requestBody) requestBody;
             requestBody.swap(m_requestBody);
+
+            m_httpClient.setRequestBody(
+                std::make_unique<nx_http::BufferSource>(
+                    m_requestContentType,
+                    std::move(requestBody)));
+
             m_httpClient.doPost(
                 m_url,
-                m_requestContentType,
-                std::move(requestBody),
-                true,
                 std::bind(&self_type::requestDone, this, &m_httpClient));
         }
     }
