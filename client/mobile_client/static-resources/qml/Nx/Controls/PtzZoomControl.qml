@@ -10,7 +10,7 @@ Private.GenericValueControl
     property alias zoomInPressed: control.upPressed
     property alias zoomOutPressed: control.downPressed
 
-    property int selectedMarkerIndex: 2
+    property int selectedMarkerIndex: 0
 
     actionButtonHeight: control.supporsValuesMarker ? 44 : 56
 

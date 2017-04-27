@@ -5,7 +5,6 @@ MouseArea
     id: control
 
     property int spotRadius: width / 2
-    property real pressedSpotItemVerticalOffset: 0
 
     Rectangle
     {
@@ -16,7 +15,6 @@ MouseArea
         radius: control.spotRadius
         visible: control.pressed
         anchors.centerIn: parent
-        anchors.verticalCenterOffset: control.pressedSpotItemVerticalOffset
 
         color: "grey" // TODO change me
     }
