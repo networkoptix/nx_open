@@ -152,6 +152,9 @@ private:
 
     void runTilesTest()
     {
+        if (!qnRuntime->isDesktopMode())
+            return;
+
         if (!m_tilesTests)
         {
             static constexpr auto kSomeFarPriority = 1000;
