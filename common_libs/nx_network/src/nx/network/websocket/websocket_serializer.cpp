@@ -86,6 +86,11 @@ Serializer::Serializer(bool masked, unsigned mask)
     setMasked(masked, mask);
 }
 
+void Serializer::prepareMessage(const nx::Buffer& payload, FrameType type, nx::Buffer* outBuffer)
+{
+    prepareFrame(payload, type, true, outBuffer);
+}
+
 int Serializer::prepareFrame(
     const char* payload, int payloadLen,
     FrameType type, bool fin, char* out, int outLen)
