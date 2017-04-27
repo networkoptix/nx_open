@@ -63,7 +63,7 @@ public:
         QnMutexLocker lock(&m_mutex);
         if (m_connections.isEmpty())
             return;
-        for (const auto& connection: connections)
+        for (const auto& connection: m_connections)
         {
             if (!connection->isSubscribedTo(ApiPersistentIdData(tran.peerID, tran.persistentInfo.dbID)))
                 continue;
@@ -71,11 +71,11 @@ public:
             {
             case Qn::JsonFormat:
                 connection->sendMessage(
-                    QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(transaction) + QByteArray("\r\n"));
+                    QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(tran) + QByteArray("\r\n"));
                 break;
             case Qn::UbjsonFormat:
                 connection->sendMessage(MessageType::pushTransactionData,
-                    QnUbjsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(transaction));
+                    QnUbjsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(tran));
                 break;
             default:
                 qWarning() << "Client has requested data in an unsupported format" << connection->remotePeer().dataFormat;
@@ -99,7 +99,11 @@ private:
     void createOutgoingConnections();
     void sendAlivePeersMessage();
     void cleanupRoutingRecords(const ApiPersistentIdData& id);
+
     void printPeersMessage();
+    void printSubscribeMessage(
+        const QnUuid& remoteId,
+        const QVector<ApiPersistentIdData>& subscribedTo) const;
 
     QVector<PeerNumberType> deserializeCompressedPeers(const QByteArray& data, bool* success);
     void processAlivePeersMessage(

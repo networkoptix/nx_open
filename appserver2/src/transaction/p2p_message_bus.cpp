@@ -21,13 +21,13 @@ namespace {
 
     // How often send 'peers' message to the peer if something is changed
     // As soon as connection is opened first message is sent immediately
-    std::chrono::seconds sendPeersInfoInterval(10);
+    std::chrono::seconds sendPeersInfoInterval(5);
 
     // If new connection is recently established/closed, don't sent subscribe request to the peer
-    std::chrono::seconds subscribeIntervalLow(5);
+    std::chrono::seconds subscribeIntervalLow(3);
 
     // If new connections always established/closed too long time, send subscribe request anyway
-    std::chrono::seconds subscribeIntervalHigh(15);
+    std::chrono::seconds subscribeIntervalHigh(10);
 } // namespace
 
 namespace ec2 {
@@ -354,6 +354,26 @@ void P2pMessageBus::printPeersMessage()
         cl_logDEBUG1);
 }
 
+void P2pMessageBus::printSubscribeMessage(
+    const QnUuid& remoteId,
+    const QVector<ApiPersistentIdData>& subscribedTo) const
+{
+    QList<QString> records;
+
+    for (const auto& peer: subscribedTo)
+    {
+        records << lit("\t\t\t\t\t To:  %1(dbId=%2)")
+            .arg(qnStaticCommon->moduleDisplayName(peer.id))
+            .arg(peer.persistentId.toString());
+    }
+
+    NX_LOG(lit("Subscribe:\t %1 ---> %2:\n%3")
+        .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
+        .arg(qnStaticCommon->moduleDisplayName(remoteId))
+        .arg(records.join("\n")),
+        cl_logDEBUG1);
+}
+
 void P2pMessageBus::processAlivePeersMessage(
     const P2pConnectionPtr& connection,
     const QByteArray& data)
@@ -441,6 +461,8 @@ void P2pMessageBus::resubscribePeers(
             QVector<PeerNumberType> shortValues;
             for (const auto& id: newValue)
                 shortValues.push_back(connection->encode(id));
+            if (QnLog::instance()->logLevel() >= cl_logDEBUG1)
+                printSubscribeMessage(connection->remotePeer().id, miscData.localSubscription);
             connection->sendMessage(serializeSubscribeRequest(
                 shortValues,
                 m_db->transactionLog()->getTransactionsState(newValue)));
@@ -456,11 +478,7 @@ P2pConnectionPtr P2pMessageBus::findConnectionById(const ApiPersistentIdData& id
 
 void P2pMessageBus::doSubscribe()
 {
-    std::chrono::seconds subscribeIntervalLow(5);
-
     // If new connections always established/closed too long time, send subscribe request anyway
-    std::chrono::seconds subscribeIntervalHigh(15);
-
     if (m_lastConnectDisconnectTimer.isValid())
     {
         std::chrono::milliseconds connectionsElapsed(m_lastConnectDisconnectTimer.elapsed());
@@ -895,6 +913,10 @@ void P2pMessageBus::gotTransaction(
             return;
         }
     }
+
+    // Proxy transaction to subscribed peers
+    NX_ASSERT(!connection->isSubscribedTo(ApiPersistentIdData(tran.peerID, tran.persistentInfo.dbID))); //< loop
+    sendTransaction(tran);
 
     if (m_handler)
         m_handler->triggerNotification(tran, NotificationSource::Remote);
