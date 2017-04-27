@@ -148,7 +148,6 @@ void P2pMessageBus::gotConnectionFromRemotePeer(P2pConnectionPtr connection)
             return;
         }
     }
-    m_lastConnectDisconnectTimer.restart();
     connect(connection.data(), &P2pConnection::gotMessage, this, &P2pMessageBus::at_gotMessage);
     connect(connection.data(), &P2pConnection::stateChanged, this, &P2pMessageBus::at_stateChanged);
 }
@@ -192,7 +191,6 @@ void P2pMessageBus::removeClosedConnections()
         if (connection->state() == P2pConnection::State::Error)
         {
             cleanupRoutingRecords(connection->remotePeer());
-            m_lastConnectDisconnectTimer.restart();
             itr = m_connections.erase(itr);
         }
         else
@@ -479,9 +477,9 @@ P2pConnectionPtr P2pMessageBus::findConnectionById(const ApiPersistentIdData& id
 void P2pMessageBus::doSubscribe()
 {
     // If new connections always established/closed too long time, send subscribe request anyway
-    if (m_lastConnectDisconnectTimer.isValid())
+    if (m_lastPeerInfoTimer.isValid())
     {
-        std::chrono::milliseconds connectionsElapsed(m_lastConnectDisconnectTimer.elapsed());
+        std::chrono::milliseconds connectionsElapsed(m_lastPeerInfoTimer.elapsed());
         std::chrono::milliseconds subscribeElapsed(m_lastSubscribeTimer.elapsed());
         if (connectionsElapsed < subscribeIntervalLow &&
             subscribeElapsed < subscribeIntervalHigh)
@@ -550,7 +548,6 @@ void P2pMessageBus::at_stateChanged(
     const QSharedPointer<P2pConnection>& /*connection*/,
     P2pConnection::State /*state*/)
 {
-    m_lastConnectDisconnectTimer.restart();
 }
 
 void P2pMessageBus::at_gotMessage(const QSharedPointer<P2pConnection>& connection, MessageType messageType, const nx::Buffer& payload)
@@ -581,7 +578,7 @@ void P2pMessageBus::at_gotMessage(const QSharedPointer<P2pConnection>& connectio
         result = handleResolvePeerNumberResponse(connection, payload);
         break;
     case MessageType::alivePeers:
-        result = handleAlivePeers(connection, payload);
+        result = handlePeersMessage(connection, payload);
         break;
     case MessageType::subscribeForDataUpdates:
         result = handleSubscribeForDataUpdates(connection, payload);
@@ -651,7 +648,7 @@ bool P2pMessageBus::handleResolvePeerNumberResponse(const P2pConnectionPtr& conn
     deserializeResolvePeerNumberResponse(connection, data);
     const QByteArray msg = connection->miscData().remotePeersMessage;
     if (!msg.isEmpty())
-        handleAlivePeers(connection, msg);
+        handlePeersMessage(connection, msg);
     return true;
 }
 
@@ -717,8 +714,9 @@ QByteArray P2pMessageBus::serializeResolvePeerNumberResponse(const QVector<PeerN
     return result;
 }
 
-bool P2pMessageBus::handleAlivePeers(const P2pConnectionPtr& connection, const QByteArray& data)
+bool P2pMessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QByteArray& data)
 {
+    m_lastPeerInfoTimer.restart();
     QVector<PeerNumberType> numbersToResolve;
     BitStreamReader reader((const quint8*)data.data(), data.size());
     try

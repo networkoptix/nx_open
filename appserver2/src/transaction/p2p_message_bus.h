@@ -126,7 +126,7 @@ private:
 
     bool handleResolvePeerNumberRequest(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handleResolvePeerNumberResponse(const P2pConnectionPtr& connection, const QByteArray& data);
-    bool handleAlivePeers(const P2pConnectionPtr& connection, const QByteArray& data);
+    bool handlePeersMessage(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handleSubscribeForDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handlePushTransactionData(const P2pConnectionPtr& connection, const QByteArray& data);
 
@@ -159,7 +159,7 @@ private:
 
     QMap<ApiPersistentIdData, P2pConnectionPtr> m_subscriptionList;
     QTimer* m_timer = nullptr;
-    QElapsedTimer m_lastConnectDisconnectTimer;
+    QElapsedTimer m_lastPeerInfoTimer;
     QElapsedTimer m_lastSubscribeTimer;
 };
 
