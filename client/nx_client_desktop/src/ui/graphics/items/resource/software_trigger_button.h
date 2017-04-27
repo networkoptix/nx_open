@@ -1,18 +1,25 @@
 #pragma once
 
+#include <QtCore/QScopedPointer.h>
+
 #include <ui/graphics/items/generic/image_button_widget.h>
 
-class QnStyledTooltipWidget;
-class HoverFocusProcessor;
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+namespace graphics {
 
-class QnSoftwareTriggerButton: public QnImageButtonWidget
+class SoftwareTriggerButtonPrivate;
+
+class SoftwareTriggerButton: public QnImageButtonWidget
 {
     Q_OBJECT
     using base_type = QnImageButtonWidget;
 
 public:
-    QnSoftwareTriggerButton(QGraphicsItem* parent = nullptr);
-    virtual ~QnSoftwareTriggerButton();
+    SoftwareTriggerButton(QGraphicsItem* parent = nullptr);
+    virtual ~SoftwareTriggerButton();
 
     QString toolTip() const;
     void setToolTip(const QString& toolTip);
@@ -36,17 +43,12 @@ protected:
     using base_type::setIcon;
 
 private:
-    void updateToolTipPosition();
-    void updateToolTipTailEdge();
-    void updateToolTipVisibility();
-    void ensureIcon();
-
-private:
-    QnStyledTooltipWidget* const m_toolTip;
-    HoverFocusProcessor* const m_toolTipHoverProcessor;
-    Qt::Edge m_toolTipEdge;
-    QString m_iconName;
-    QSize m_buttonSize;
-    bool m_prolonged = false;
-    bool m_iconDirty = false;
+    Q_DECLARE_PRIVATE(SoftwareTriggerButton)
+    QScopedPointer<SoftwareTriggerButtonPrivate> d_ptr;
 };
+
+} // namespace graphics
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx

@@ -814,7 +814,7 @@
         "palette": { "default": { "window": "dark8" } }
     },
 
-    "QnSoftwareTriggerButton": {
+    "nx::client::desktop::ui::graphics::SoftwareTriggerButton": {
         "palette": {
             "default": {
                 "window": "dark1.setAlpha(128)",

@@ -31,6 +31,23 @@ typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
 #include <utils/color_space/image_correction.h>
 #include <utils/media/sse_helper.h>
 
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+namespace graphics {
+
+class SoftwareTriggerButton;
+
+} // namespace graphics
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx
+
+//TODO: Remove this when QnMediaResourceWidget is refactored and put into proper namespace.
+using QnSoftwareTriggerButton = nx::client::desktop::ui::graphics::SoftwareTriggerButton;
+
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
 class QnFisheyeHomePtzController;
@@ -39,7 +56,6 @@ class QnScrollableItemsWidget;
 class QnScrollableTextItemsWidget;
 class QnGraphicsStackedWidget;
 class QnTwoWayAudioWidget;
-class QnSoftwareTriggerButton;
 
 struct QnHtmlTextItemOptions;
 
