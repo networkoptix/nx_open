@@ -16,7 +16,12 @@
 namespace ec2
 {
 
-QnTransactionLog::QnTransactionLog(detail::QnDbManager* db): m_dbManager(db)
+QnTransactionLog::QnTransactionLog(
+    detail::QnDbManager* db,
+    QnUbjsonTransactionSerializer* tranSerializer)
+:
+    m_dbManager(db),
+    m_tranSerializer(tranSerializer)
 {
     m_lastTimestamp = Timestamp::fromInteger(0);
     m_baseTime = 0;
@@ -475,7 +480,7 @@ ErrorCode QnTransactionLog::getTransactionsAfterInternal(
             syncMarkersTran.params.markers.push_back(record);
         }
     }
-    result << QnUbjsonTransactionSerializer::instance()->serializedTransaction(syncMarkersTran);
+    result << m_tranSerializer->serializedTransaction(syncMarkersTran);
 
     return ErrorCode::ok;
 }

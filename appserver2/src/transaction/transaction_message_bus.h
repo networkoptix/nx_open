@@ -19,9 +19,6 @@
 #include "runtime_transaction_log.h"
 #include "transport_connection_info.h"
 
-#include <transaction/binary_transaction_serializer.h>
-#include <transaction/json_transaction_serializer.h>
-
 #include "connection_guard_shared_state.h"
 #include "transaction_message_bus_base.h"
 
@@ -42,7 +39,9 @@ public:
     QnTransactionMessageBus(
         detail::QnDbManager* db,
         Qn::PeerType peerType,
-        QnCommonModule* commonModule);
+        QnCommonModule* commonModule,
+        QnJsonTransactionSerializer* jsonTranSerializer,
+        QnUbjsonTransactionSerializer* ubjsonTranSerializer);
 
     virtual ~QnTransactionMessageBus();
 
@@ -265,9 +264,6 @@ private slots:
 private:
 
     TimeSynchronizationManager* m_timeSyncManager = nullptr;
-
-    QScopedPointer<QnJsonTransactionSerializer> m_jsonTranSerializer;
-    QScopedPointer<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
 
     struct RemoteUrlConnectInfo
     {

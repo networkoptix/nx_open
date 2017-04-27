@@ -88,13 +88,15 @@ struct SendTransactionToTransportFastFuction
 
 // --------------------------------- QnTransactionMessageBus ------------------------------
 
-QnTransactionMessageBus::QnTransactionMessageBus(detail::QnDbManager* db,
+QnTransactionMessageBus::QnTransactionMessageBus(
+    detail::QnDbManager* db,
     Qn::PeerType peerType,
-    QnCommonModule* commonModule)
+    QnCommonModule* commonModule,
+    QnJsonTransactionSerializer* jsonTranSerializer,
+    QnUbjsonTransactionSerializer* ubjsonTranSerializer)
+
 :
-    QnTransactionMessageBusBase(db, peerType, commonModule),
-    m_jsonTranSerializer(new QnJsonTransactionSerializer()),
-    m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
+    QnTransactionMessageBusBase(db, peerType, commonModule, jsonTranSerializer, ubjsonTranSerializer),
     m_timer(nullptr),
     m_runtimeTransactionLog(new QnRuntimeTransactionLog(commonModule)),
     m_restartPending(false)
@@ -418,6 +420,7 @@ void QnTransactionMessageBus::at_gotTransaction(
 
     using namespace std::placeholders;
     if (!handleTransaction(
+        this,
         tranFormat,
         std::move(serializedTran),
         std::bind(GotTransactionFuction(), this, _1, sender, transportHeader),
@@ -679,7 +682,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
                     if (!tran.persistentInfo.isNull() && m_db)
                     {
                         QByteArray serializedTran =
-                            QnUbjsonTransactionSerializer::instance()->serializedTransaction(
+                            m_ubjsonTranSerializer->serializedTransaction(
                                 tran
                             );
                         ErrorCode errorCode = dbManager(m_db, sender->getUserAccessData())
@@ -826,7 +829,9 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(
 
         using namespace std::placeholders;
         for (const auto& serializedTran : serializedTransactions)
-            if (!handleTransaction(Qn::UbjsonFormat,
+            if (!handleTransaction(
+                this,
+                Qn::UbjsonFormat,
                 serializedTran,
                 std::bind(
                     SendTransactionToTransportFuction(),
@@ -1305,7 +1310,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
 
             itr.value().lastConnectedTime.restart();
             QnTransactionTransport* transport = new QnTransactionTransport(
-                commonModule(),
+                this,
                 &m_connectionGuardSharedState,
                 localPeer());
             connect(transport, &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction, Qt::QueuedConnection);
@@ -1430,7 +1435,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(
         return; // reject incoming connection because of media server is about to restart
 
     QnTransactionTransport* transport = new QnTransactionTransport(
-        commonModule(),
+        this,
         connectionGuid,
         std::move(connectionLockGuard),
         localPeer(),

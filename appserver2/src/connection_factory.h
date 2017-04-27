@@ -23,6 +23,9 @@
 #include <mutex/distributed_mutex_manager.h>
 #include <transaction/p2p_message_bus.h>
 
+#include <transaction/json_transaction_serializer.h>
+#include <transaction/ubjson_transaction_serializer.h>
+
 namespace ec2 {
 
 // TODO: #2.4 remove Ec2 prefix to avoid ec2::Ec2DirectConnectionFactory
@@ -67,13 +70,21 @@ namespace ec2 {
         virtual P2pMessageBus* p2pMessageBus() const;
         virtual QnDistributedMutexManager* distributedMutex() const override;
         virtual TimeSynchronizationManager* timeSyncManager() const override;
+
+        QnJsonTransactionSerializer* jsonTranSerializer() const;
+        QnUbjsonTransactionSerializer* ubjsonTranSerializer() const;
+
 private:
     Settings m_settingsInstance;
+
+    std::unique_ptr<QnJsonTransactionSerializer> m_jsonTranSerializer;
+    std::unique_ptr<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
 
     std::unique_ptr<detail::QnDbManager> m_dbManager;
     std::unique_ptr<QnTransactionLog> m_transactionLog;
     std::unique_ptr<QnTransactionMessageBus> m_transactionMessageBus;
     std::unique_ptr<P2pMessageBus> m_p2pMessageBus;
+
     std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
     std::unique_ptr<ServerQueryProcessorAccess> m_serverQueryProcessor;
     std::unique_ptr<QnDistributedMutexManager> m_distributedMutexManager;

@@ -7,8 +7,13 @@ typedef std::function<bool(Qn::SerializationFormat, const QByteArray&)> FastFunc
 
 //Overload for ubjson transactions
 template<typename Function, typename Param>
-bool handleTransactionParams(const QByteArray &serializedTransaction, QnUbjsonReader<QByteArray> *stream, const QnAbstractTransaction &abstractTransaction,
-    Function function, FastFunctionType fastFunction)
+bool handleTransactionParams(
+    QnTransactionMessageBusBase* bus,
+    const QByteArray &serializedTransaction,
+    QnUbjsonReader<QByteArray> *stream,
+    const QnAbstractTransaction &abstractTransaction,
+    Function function,
+    FastFunctionType fastFunction)
 {
     if (fastFunction(Qn::UbjsonFormat, serializedTransaction))
     {
@@ -22,15 +27,20 @@ bool handleTransactionParams(const QByteArray &serializedTransaction, QnUbjsonRe
         return false;
     }
     if (!abstractTransaction.persistentInfo.isNull())
-        QnUbjsonTransactionSerializer::instance()->addToCache(abstractTransaction.persistentInfo, abstractTransaction.command, serializedTransaction);
+        bus->ubjsonTranSerializer()->addToCache(abstractTransaction.persistentInfo, abstractTransaction.command, serializedTransaction);
     function(transaction);
     return true;
 }
 
 //Overload for json transactions
 template<typename Function, typename Param>
-bool handleTransactionParams(const QByteArray &serializedTransaction, const QJsonObject& jsonData, const QnAbstractTransaction &abstractTransaction,
-    Function function, FastFunctionType fastFunction)
+bool handleTransactionParams(
+    QnTransactionMessageBusBase* bus,
+    const QByteArray &serializedTransaction,
+    const QJsonObject& jsonData,
+    const QnAbstractTransaction &abstractTransaction,
+    Function function,
+    FastFunctionType fastFunction)
 {
     if (fastFunction(Qn::JsonFormat, serializedTransaction))
     {
@@ -48,10 +58,11 @@ bool handleTransactionParams(const QByteArray &serializedTransaction, const QJso
 
 #define HANDLE_TRANSACTION_PARAMS_APPLY(_, value, param, ...) \
 case ApiCommand::value : \
-    return handleTransactionParams<Function, param>(serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    return handleTransactionParams<Function, param>(bus, serializedTransaction, serializationSupport, transaction, function, fastFunction);
 
 template<typename SerializationSupport, typename Function>
 bool handleTransaction2(
+    QnTransactionMessageBusBase* bus,
     const QnAbstractTransaction& transaction,
     const SerializationSupport& serializationSupport,
     const QByteArray& serializedTransaction,
@@ -71,6 +82,7 @@ bool handleTransaction2(
 
 template<class Function>
 bool handleTransaction(
+    QnTransactionMessageBusBase* bus,
     Qn::SerializationFormat tranFormat,
     const QByteArray &serializedTransaction,
     const Function &function,
@@ -87,6 +99,7 @@ bool handleTransaction(
         }
 
         return handleTransaction2(
+            bus,
             transaction,
             &stream,
             serializedTransaction,
@@ -104,6 +117,7 @@ bool handleTransaction(
             return false;
 
         return handleTransaction2(
+            bus,
             transaction,
             tranObject["tran"].toObject(),
             serializedTransaction,

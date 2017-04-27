@@ -638,7 +638,7 @@ private:
             return ErrorCode::forbidden;
 
         m_db.db()->transactionLog()->fillPersistentInfo(tran);
-        QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
+        QByteArray serializedTran = m_owner->messageBus()->ubjsonTranSerializer()->serializedTransaction(tran);
 
         ErrorCode errorCode =
             m_db.executeTransactionNoLock(tran, serializedTran);

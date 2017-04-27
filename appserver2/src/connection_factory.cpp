@@ -45,18 +45,31 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
     :
     QnCommonModuleAware(commonModule),
     // dbmanager is initialized by direct connection.
+
+    m_jsonTranSerializer(new QnJsonTransactionSerializer()),
+    m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
+
     m_dbManager(
         peerType == Qn::PT_Server
         ? new detail::QnDbManager(commonModule)
         : nullptr),
     m_transactionLog(
         peerType == Qn::PT_Server
-        ? new QnTransactionLog(m_dbManager.get())
+        ? new QnTransactionLog(m_dbManager.get(), m_ubjsonTranSerializer.get())
         : nullptr),
     m_transactionMessageBus(
-        new QnTransactionMessageBus(m_dbManager.get(), peerType, commonModule)),
+        new QnTransactionMessageBus(
+            m_dbManager.get(),
+            peerType,
+            commonModule,
+            m_jsonTranSerializer.get(),
+            m_ubjsonTranSerializer.get())),
     m_p2pMessageBus(
-        new P2pMessageBus(m_dbManager.get(), peerType, commonModule)),
+        new P2pMessageBus(
+            m_dbManager.get(),
+            peerType, commonModule,
+            m_jsonTranSerializer.get(),
+            m_ubjsonTranSerializer.get())),
     m_timeSynchronizationManager(
         new TimeSynchronizationManager(peerType, timerManager, m_transactionMessageBus.get(), &m_settingsInstance)),
     m_serverQueryProcessor(

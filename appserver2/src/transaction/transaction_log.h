@@ -13,6 +13,7 @@ namespace ec2
 
     namespace detail { class QnDbManager; }
 
+    class QnUbjsonTransactionSerializer;
 
     class QnTransactionLog
     {
@@ -24,8 +25,10 @@ namespace ec2
             Reason_Timestamp
         };
 
-        QnTransactionLog(detail::QnDbManager* db);
+        QnTransactionLog(detail::QnDbManager* db, QnUbjsonTransactionSerializer* tranSerializer);
         virtual ~QnTransactionLog();
+
+        QnUbjsonTransactionSerializer* serializer() const { return m_tranSerializer; }
 
         /**
          * Return transactions from the log
@@ -140,6 +143,7 @@ namespace ec2
         quint64 m_baseTime;
         Timestamp m_lastTimestamp;
         CommitData m_commitData;
+        QnUbjsonTransactionSerializer* m_tranSerializer;
     };
 };
 

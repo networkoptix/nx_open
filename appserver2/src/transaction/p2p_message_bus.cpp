@@ -59,9 +59,12 @@ qint32 P2pMessageBus::PeerInfo::minDistance(QVector<ApiPersistentIdData>* outVia
 P2pMessageBus::P2pMessageBus(
     detail::QnDbManager* db,
     Qn::PeerType peerType,
-    QnCommonModule* commonModule)
+    QnCommonModule* commonModule,
+    QnJsonTransactionSerializer* jsonTranSerializer,
+    QnUbjsonTransactionSerializer* ubjsonTranSerializer)
+
 :
-    QnTransactionMessageBusBase(db, peerType, commonModule)
+    QnTransactionMessageBusBase(db, peerType, commonModule, jsonTranSerializer, ubjsonTranSerializer)
 {
     qRegisterMetaType<MessageType>();
     qRegisterMetaType<P2pConnection::State>("P2pConnection::State");
@@ -772,7 +775,7 @@ struct SendTransactionToTransportFuction
 
     template<class T>
     void operator()(
-        P2pMessageBus* /*bus*/,
+        P2pMessageBus* bus,
         const QnTransaction<T> &transaction,
         const P2pConnectionPtr& connection) const
     {
@@ -780,11 +783,11 @@ struct SendTransactionToTransportFuction
         {
             case Qn::JsonFormat:
                 connection->sendMessage(
-                    QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(transaction) + QByteArray("\r\n"));
+                    bus->jsonTranSerializer()->serializedTransactionWithoutHeader(transaction) + QByteArray("\r\n"));
                 break;
             case Qn::UbjsonFormat:
                 connection->sendMessage(MessageType::pushTransactionData,
-                    QnUbjsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(transaction));
+                    bus->ubjsonTranSerializer()->serializedTransactionWithoutHeader(transaction));
                 break;
             default:
                 qWarning() << "Client has requested data in an unsupported format" << connection->remotePeer().dataFormat;
@@ -854,7 +857,9 @@ bool P2pMessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connec
     using namespace std::placeholders;
     for (const auto& serializedTran : serializedTransactions)
     {
-        if (!handleTransaction(connection->remotePeer().dataFormat,
+        if (!handleTransaction(
+            this,
+            connection->remotePeer().dataFormat,
             serializedTran,
             std::bind(
                 SendTransactionToTransportFuction(),
@@ -889,7 +894,7 @@ void P2pMessageBus::gotTransaction(
         }
 
         QByteArray serializedTran =
-            QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
+            m_ubjsonTranSerializer->serializedTransaction(tran);
         ErrorCode errorCode = dbManager(m_db, connection->getUserAccessData())
             .executeTransaction(tran, serializedTran);
         switch (errorCode)
@@ -939,6 +944,7 @@ bool P2pMessageBus::handlePushTransactionData(const P2pConnectionPtr& connection
 {
     using namespace std::placeholders;
     return handleTransaction(
+        this,
         connection->remotePeer().dataFormat,
         std::move(serializedTran),
         std::bind(GotTransactionFuction(), this, _1, connection),

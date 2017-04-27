@@ -7,6 +7,9 @@
 
 namespace ec2
 {
+    class QnJsonTransactionSerializer;
+    class QnUbjsonTransactionSerializer;
+
     class ECConnectionNotificationManager;
     namespace detail {
         class QnDbManager;
@@ -18,7 +21,10 @@ namespace ec2
         QnTransactionMessageBusBase(
             detail::QnDbManager* db,
             Qn::PeerType peerType,
-            QnCommonModule* commonModule);
+            QnCommonModule* commonModule,
+            QnJsonTransactionSerializer* jsonTranSerializer,
+            QnUbjsonTransactionSerializer* ubjsonTranSerializer
+        );
 
         struct RoutingRecord
         {
@@ -36,10 +42,16 @@ namespace ec2
         void setHandler(ECConnectionNotificationManager* handler);
         void removeHandler(ECConnectionNotificationManager* handler);
 
+        QnJsonTransactionSerializer* jsonTranSerializer() const;
+        QnUbjsonTransactionSerializer* ubjsonTranSerializer() const;
+
     protected:
         detail::QnDbManager* m_db = nullptr;
         QThread* m_thread = nullptr;
         ECConnectionNotificationManager* m_handler = nullptr;
+
+        QnJsonTransactionSerializer* m_jsonTranSerializer = nullptr;
+        QnUbjsonTransactionSerializer* m_ubjsonTranSerializer = nullptr;
 
         /** Info about us. */
         Qn::PeerType m_localPeerType = Qn::PT_NotDefined;

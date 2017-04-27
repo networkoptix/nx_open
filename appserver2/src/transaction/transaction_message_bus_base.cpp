@@ -8,11 +8,15 @@ namespace ec2 {
 QnTransactionMessageBusBase::QnTransactionMessageBusBase(
     detail::QnDbManager* db,
     Qn::PeerType peerType,
-    QnCommonModule* commonModule)
+    QnCommonModule* commonModule,
+    QnJsonTransactionSerializer* jsonTranSerializer,
+    QnUbjsonTransactionSerializer* ubjsonTranSerializer)
 :
     QnCommonModuleAware(commonModule),
     m_db(db),
     m_thread(new QThread()),
+    m_jsonTranSerializer(jsonTranSerializer),
+    m_ubjsonTranSerializer(ubjsonTranSerializer),
     m_localPeerType(peerType),
     m_mutex(QnMutex::Recursive)
 {
@@ -62,5 +66,14 @@ void QnTransactionMessageBusBase::removeHandler(ECConnectionNotificationManager*
         m_handler = nullptr;
 }
 
+QnJsonTransactionSerializer* QnTransactionMessageBusBase::jsonTranSerializer() const
+{
+    return m_jsonTranSerializer;
+}
+
+QnUbjsonTransactionSerializer* QnTransactionMessageBusBase::ubjsonTranSerializer() const
+{
+    return m_ubjsonTranSerializer;
+}
 
 } // namespace ec2

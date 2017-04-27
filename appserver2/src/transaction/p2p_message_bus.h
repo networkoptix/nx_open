@@ -42,7 +42,9 @@ public:
     P2pMessageBus(
         detail::QnDbManager* db,
         Qn::PeerType peerType,
-        QnCommonModule* commonModule);
+        QnCommonModule* commonModule,
+        QnJsonTransactionSerializer* jsonTranSerializer,
+        QnUbjsonTransactionSerializer* ubjsonTranSerializer);
     virtual ~P2pMessageBus();
 
     void gotConnectionFromRemotePeer(P2pConnectionPtr connection);
@@ -71,11 +73,11 @@ public:
             {
             case Qn::JsonFormat:
                 connection->sendMessage(
-                    QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(tran) + QByteArray("\r\n"));
+                    m_jsonTranSerializer->serializedTransactionWithoutHeader(tran) + QByteArray("\r\n"));
                 break;
             case Qn::UbjsonFormat:
                 connection->sendMessage(MessageType::pushTransactionData,
-                    QnUbjsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(tran));
+                    m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
                 break;
             default:
                 qWarning() << "Client has requested data in an unsupported format" << connection->remotePeer().dataFormat;

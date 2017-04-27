@@ -1,5 +1,4 @@
-#ifndef __UBJSON_TRANSACTION_SERIALIZER_H_
-#define __UBJSON_TRANSACTION_SERIALIZER_H_
+#pragma once
 
 #include <memory>
 
@@ -16,7 +15,7 @@ namespace ec2
     /**
      * This class serialized a transaction into a byte array.
      */
-    class QnUbjsonTransactionSerializer: public Singleton<QnUbjsonTransactionSerializer>
+    class QnUbjsonTransactionSerializer
     {
     public:
         struct CacheKey
@@ -39,13 +38,15 @@ namespace ec2
         {
         }
 
-        void addToCache(const QnAbstractTransaction::PersistentInfo& key, ApiCommand::Value command, const QByteArray& data) {
+        void addToCache(const QnAbstractTransaction::PersistentInfo& key, ApiCommand::Value command, const QByteArray& data)
+        {
             QnMutexLocker lock( &m_mutex );
             m_cache.insert(CacheKey(key, command), new QByteArray(data), data.size());
         }
 
         template<class T>
-        QByteArray serializedTransaction(const QnTransaction<T>& tran) {
+        QByteArray serializedTransaction(const QnTransaction<T>& tran)
+        {
             QnMutexLocker lock( &m_mutex );
             Q_UNUSED(lock);
 
@@ -100,5 +101,3 @@ namespace ec2
 #endif
 
 }
-
-#endif // __UBJSON_TRANSACTION_SERIALIZER_H_

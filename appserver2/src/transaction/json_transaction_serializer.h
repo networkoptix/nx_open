@@ -1,5 +1,4 @@
-#ifndef __JSON_TRANSACTION_SERIALIZER_H_
-#define __JSON_TRANSACTION_SERIALIZER_H_
+#pragma once
 
 #include <QtCore/QCache>
 
@@ -16,7 +15,7 @@ namespace ec2
     /**
      * This class serialized a transaction into a byte array.
      */
-    class QnJsonTransactionSerializer: public Singleton<QnJsonTransactionSerializer>
+    class QnJsonTransactionSerializer
     {
     public:
         QnJsonTransactionSerializer() {}
@@ -88,4 +87,3 @@ namespace ec2
     };
 }
 
-#endif // __JSON_TRANSACTION_SERIALIZER_H_
