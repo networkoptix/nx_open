@@ -1081,12 +1081,13 @@ void AsyncClient::addBodyToRequest()
     NX_CRITICAL(
         dynamic_cast<BufferSource*>(m_requestBody.get()) != nullptr,
         "Only fixed request body supported at the moment");
+    const auto contentLength = *m_requestBody->contentLength();
     m_requestBody->readAsync(
         [this](SystemError::ErrorCode /*sysErrorCode*/, nx_http::BufferType buffer)
         {
             m_request.messageBody = std::move(buffer);
         });
-    NX_ASSERT(m_request.messageBody.size() == *m_requestBody->contentLength());
+    NX_ASSERT(static_cast<std::size_t>(m_request.messageBody.size()) == contentLength);
 }
 
 void AsyncClient::addAdditionalHeader(const StringType& key, const StringType& value)
