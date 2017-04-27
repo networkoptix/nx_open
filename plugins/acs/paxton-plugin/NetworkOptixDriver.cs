@@ -81,7 +81,7 @@ namespace Paxton.NetworkOptixControl
         }
     }
 
-    public class NetworkOptixDriver
+    public class NetworkOptixDriver : IOemDvrMiniDriver
     {
         private static readonly int PLAY_OFFSET_MS = 5000;
         private static readonly int DEFAULT_NX_PORT = 7001;
