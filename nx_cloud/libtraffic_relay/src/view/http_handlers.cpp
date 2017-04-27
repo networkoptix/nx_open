@@ -7,11 +7,11 @@ namespace cloud {
 namespace relay {
 namespace view {
 
-const char* BeginListeningHandler::kPath = api::path::kServerIncomingConnections;
+const char* BeginListeningHandler::kPath = api::kServerIncomingConnectionsPath;
 
-const char* CreateClientSessionHandler::kPath = api::path::kServerClientSessions;
+const char* CreateClientSessionHandler::kPath = api::kServerClientSessionsPath;
 
-const char* ConnectToPeerHandler::kPath = api::path::kClientSessionConnections;
+const char* ConnectToPeerHandler::kPath = api::kClientSessionConnectionsPath;
 
 } // namespace view
 } // namespace relay

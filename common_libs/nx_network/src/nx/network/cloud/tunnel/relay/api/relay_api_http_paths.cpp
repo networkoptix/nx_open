@@ -4,16 +4,14 @@ namespace nx {
 namespace cloud {
 namespace relay {
 namespace api {
-namespace path {
 
 /**
  * Parameter %1 is a server host name.
  */
-const char* const kServerIncomingConnections = "/relay/server/{serverId}/incoming_connections/";
-const char* const kServerClientSessions = "/relay/server/{serverPeerName}/client_sessions/";
-const char* const kClientSessionConnections = "/relay/client_session/{sessionId}/connections/";
+const char* const kServerIncomingConnectionsPath = "/relay/server/{serverId}/incoming_connections/";
+const char* const kServerClientSessionsPath = "/relay/server/{serverPeerName}/client_sessions/";
+const char* const kClientSessionConnectionsPath = "/relay/client_session/{sessionId}/connections/";
 
-} // namespace path
 } // namespace api
 } // namespace relay
 } // namespace cloud

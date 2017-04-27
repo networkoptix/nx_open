@@ -95,7 +95,7 @@ public:
     State state() const;
 
     /**
-     * Returns true if no response has been recevied due to transport error.
+     * @return true if no response has been recevied due to transport error.
      */
     bool failed() const;
     SystemError::ErrorCode lastSysErrorCode() const;
@@ -294,8 +294,8 @@ private:
     bool m_proxyAuthorizationTried;
     bool m_ha1RecalcTried;
     bool m_terminated;
-    quint64 m_bytesRead; //< total read bytes per request
-    int m_totalRequests; //< total sent requests via single connection
+    quint64 m_totalBytesReadPerRequest; //< total read bytes per request
+    int m_totalRequestsSentViaCurrentConnection; //< total sent requests via single connection
     bool m_contentEncodingUsed;
     unsigned int m_sendTimeoutMs;
     unsigned int m_responseReadTimeoutMs;

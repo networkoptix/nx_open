@@ -49,6 +49,31 @@ nx_http::StatusCode::Value toHttpStatusCode(ResultCode resultCode)
     }
 }
 
+ResultCode fromHttpStatusCode(nx_http::StatusCode::Value statusCode)
+{
+    switch (statusCode)
+    {
+        case nx_http::StatusCode::ok:
+            return ResultCode::ok;
+
+        case nx_http::StatusCode::notFound:
+            return ResultCode::notFound;
+
+        case nx_http::StatusCode::serviceUnavailable:
+            return ResultCode::networkError;
+
+        case nx_http::StatusCode::badRequest:
+            return ResultCode::networkError;
+
+        case nx_http::StatusCode::forbidden:
+        case nx_http::StatusCode::unauthorized:
+            return ResultCode::notAuthorized;
+
+        default:
+            return ResultCode::networkError;
+    }
+}
+
 //-------------------------------------------------------------------------------------------------
 // Support of nx_http::FusionRequestResult
 
@@ -109,4 +134,5 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cloud::relay::api, ResultCode,
     (ResultCode::timedOut, "timedOut")
     (ResultCode::networkError, "networkError")
     (ResultCode::preemptiveConnectionCountAtMaximum, "preemptiveConnectionCountAtMaximum")
+    (ResultCode::unknownError, "unknownError")
 )

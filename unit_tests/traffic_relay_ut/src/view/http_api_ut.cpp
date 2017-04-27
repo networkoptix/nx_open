@@ -2,8 +2,9 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/cloud/tunnel/relay/api/relay_api_client.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
-#include <nx/network/http/http_async_client.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
 
@@ -24,29 +25,36 @@ class HttpApi:
 public:
 
 protected:
-    void whenIssuedApiRequest()
+    utils::SyncQueue<api::BeginListeningRequest> m_receivedBeginListeningRequests;
+    utils::SyncQueue<api::CreateClientSessionRequest> m_receivedCreateClientSessionRequests;
+    utils::SyncQueue<api::ConnectToPeerRequest> m_receivedConnectToPeerRequests;
+
+    void thenRequestSucceeded()
     {
-        m_httpClient = std::make_unique<nx_http::AsyncClient>();
-        m_httpClient->doGet(
-            prepareUrl(),
-            std::bind(&HttpApi::onRequestCompletion, this));
+        ASSERT_EQ(api::ResultCode::ok, m_apiResponse.pop());
     }
 
-    void thenRequestHasBeenDeliveredToTheManager()
+    api::Client& relayClient()
     {
-        // TODO
+        if (!m_relayClient)
+        {
+            m_relayClient = api::ClientFactory::create(
+                nx::network::url::Builder().setScheme("http").setHost("127.0.0.1")
+                .setPort(moduleInstance()->httpEndpoints()[0].port));
+        }
+        return *m_relayClient;
     }
 
-    void thenResponseHasBeenReceived()
+    void onRequestCompletion(api::ResultCode resultCode)
     {
-        m_apiResponse.pop();
+        m_apiResponse.push(resultCode);
     }
 
 private:
     controller::ConnectSessionManagerFactory::FactoryFunc m_factoryFuncBak;
     ConnectSessionManagerMock* m_connectSessionManager = nullptr;
-    nx::utils::SyncQueue<bool> m_apiResponse;
-    std::unique_ptr<nx_http::AsyncClient> m_httpClient;
+    nx::utils::SyncQueue<api::ResultCode> m_apiResponse;
+    std::unique_ptr<api::Client> m_relayClient;
 
     virtual void SetUp() override
     {
@@ -54,13 +62,15 @@ private:
 
         m_factoryFuncBak =
             controller::ConnectSessionManagerFactory::setFactoryFunc(
-                std::bind(&HttpApi::createConnectSessionManager, this, _1, _2, _3, _4));
+                std::bind(&HttpApi::createConnectSessionManager, this,
+                    _1, _2, _3, _4));
         ASSERT_TRUE(startAndWaitUntilStarted());
     }
 
     virtual void TearDown() override
     {
-        m_httpClient->pleaseStopSync();
+        if (m_relayClient)
+            m_relayClient->pleaseStopSync();
         stop();
 
         controller::ConnectSessionManagerFactory::setFactoryFunc(
@@ -74,29 +84,102 @@ private:
             model::ListeningPeerPool* /*listeningPeerPool*/,
             controller::AbstractTrafficRelay* /*trafficRelay*/)
     {
-        auto connectSessionManager = std::make_unique<ConnectSessionManagerMock>();
+        auto connectSessionManager = 
+            std::make_unique<ConnectSessionManagerMock>(
+                &m_receivedBeginListeningRequests,
+                &m_receivedCreateClientSessionRequests,
+                &m_receivedConnectToPeerRequests);
         m_connectSessionManager = connectSessionManager.get();
         return std::move(connectSessionManager);
     }
+};
 
-    QUrl prepareUrl() const
+//-------------------------------------------------------------------------------------------------
+// HttpApiBeginListening
+
+class HttpApiBeginListening:
+    public HttpApi
+{
+protected:
+    void whenIssuedApiRequest()
     {
-        return QUrl(lm("http://127.0.0.1:%1%2")
-            .str(moduleInstance()->httpEndpoints()[0].port)
-            .str(api::path::kServerIncomingConnections));
+        using namespace std::placeholders;
+
+        relayClient().beginListening(
+            "some_server_name",
+            std::bind(&HttpApiBeginListening::onRequestCompletion, this, _1));
     }
 
-    void onRequestCompletion()
+    void thenRequestHasBeenDeliveredToTheManager()
     {
-        m_apiResponse.push(true);
+        m_receivedBeginListeningRequests.pop();
     }
 };
 
-TEST_F(HttpApi, test)
+TEST_F(HttpApiBeginListening, request_is_delivered)
 {
     whenIssuedApiRequest();
     thenRequestHasBeenDeliveredToTheManager();
-    thenResponseHasBeenReceived();
+    thenRequestSucceeded();
+}
+
+//-------------------------------------------------------------------------------------------------
+// HttpApiCreateClientSession
+
+class HttpApiCreateClientSession:
+    public HttpApi
+{
+protected:
+    void whenIssuedApiRequest()
+    {
+        using namespace std::placeholders;
+
+        relayClient().startSession(
+            "some_session_id",
+            "some_server_name",
+            std::bind(&HttpApiCreateClientSession::onRequestCompletion, this, _1));
+    }
+
+    void thenRequestHasBeenDeliveredToTheManager()
+    {
+        m_receivedCreateClientSessionRequests.pop();
+    }
+};
+
+TEST_F(HttpApiCreateClientSession, request_is_delivered)
+{
+    whenIssuedApiRequest();
+    thenRequestHasBeenDeliveredToTheManager();
+    thenRequestSucceeded();
+}
+
+//-------------------------------------------------------------------------------------------------
+// HttpApiOpenConnectionToTheTargetHost
+
+class HttpApiOpenConnectionToTheTargetHost:
+    public HttpApi
+{
+protected:
+    void whenIssuedApiRequest()
+    {
+        using namespace std::placeholders;
+
+        relayClient().openConnectionToTheTargetHost(
+            "some_session_id",
+            std::bind(&HttpApiOpenConnectionToTheTargetHost::onRequestCompletion, this, _1));
+    }
+
+    void thenRequestHasBeenDeliveredToTheManager()
+    {
+        m_receivedConnectToPeerRequests.pop();
+    }
+};
+
+TEST_F(HttpApiOpenConnectionToTheTargetHost, request_is_delivered)
+{
+    whenIssuedApiRequest();
+    thenRequestHasBeenDeliveredToTheManager();
+    thenRequestSucceeded();
 }
 
 } // namespace test

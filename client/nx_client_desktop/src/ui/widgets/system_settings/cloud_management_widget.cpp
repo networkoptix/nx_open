@@ -15,6 +15,7 @@
 
 #include <ui/dialogs/cloud/connect_to_cloud_dialog.h>
 #include <ui/dialogs/cloud/disconnect_from_cloud_dialog.h>
+#include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/common/palette.h>
 #include <ui/style/helper.h>
@@ -41,6 +42,8 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
         this))
 {
     ui->setupUi(this);
+
+    setHelpTopic(this, Qn::SystemSettings_Cloud_Help);
 
     const QColor nxColor(qApp->palette().color(QPalette::Normal, QPalette::BrightText));
     QFont accountFont(ui->accountLabel->font());
