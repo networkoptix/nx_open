@@ -3000,7 +3000,7 @@ void MediaServerProcess::run()
             const auto current = nx::network::UdtStatistics::global.internetBytesTransfered.load();
             const auto update = old + (qulonglong) current;
             if (server->setProperty(Qn::UDT_INTERNET_TRFFIC, QString::number(update))
-                && common->propertyDictionary()->saveParams(server->getId()))
+                && server->saveParams())
             {
                 NX_LOG(lm("%1 is updated to %2").strs(Qn::UDT_INTERNET_TRFFIC, update), cl_logDEBUG1);
                 nx::network::UdtStatistics::global.internetBytesTransfered -= current;

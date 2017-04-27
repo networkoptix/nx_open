@@ -23,13 +23,13 @@ namespace controller {
 
 class AbstractTrafficRelay;
 
-class ConnectSessionManager
+class AbstractConnectSessionManager
 {
 public:
     //---------------------------------------------------------------------------------------------
     // Completion handler types.
 
-    using BeginListeningHandler = 
+    using BeginListeningHandler =
         nx::utils::MoveOnlyFunc<void(
             api::ResultCode, api::BeginListeningResponse, nx_http::ConnectionEvents)>;
 
@@ -40,8 +40,26 @@ public:
         nx::utils::MoveOnlyFunc<void(api::ResultCode, nx_http::ConnectionEvents)>;
 
     //---------------------------------------------------------------------------------------------
-    // Methods.
 
+    virtual ~AbstractConnectSessionManager() = default;
+
+    virtual void beginListening(
+        const api::BeginListeningRequest& request,
+        BeginListeningHandler completionHandler) = 0;
+
+    virtual void createClientSession(
+        const api::CreateClientSessionRequest& request,
+        CreateClientSessionHandler completionHandler) = 0;
+
+    virtual void connectToPeer(
+        const api::ConnectToPeerRequest& request,
+        ConnectToPeerHandler completionHandler) = 0;
+};
+
+class ConnectSessionManager:
+    public AbstractConnectSessionManager
+{
+public:
     ConnectSessionManager(
         const conf::Settings& settings,
         model::ClientSessionPool* clientSessionPool,
@@ -49,17 +67,17 @@ public:
         controller::AbstractTrafficRelay* trafficRelay);
     ~ConnectSessionManager();
 
-    void beginListening(
+    virtual void beginListening(
         const api::BeginListeningRequest& request,
-        BeginListeningHandler completionHandler);
+        BeginListeningHandler completionHandler) override;
 
-    void createClientSession(
+    virtual void createClientSession(
         const api::CreateClientSessionRequest& request,
-        CreateClientSessionHandler completionHandler);
+        CreateClientSessionHandler completionHandler) override;
 
-    void connectToPeer(
+    virtual void connectToPeer(
         const api::ConnectToPeerRequest& request,
-        ConnectToPeerHandler completionHandler);
+        ConnectToPeerHandler completionHandler) override;
 
 private:
     const conf::Settings& m_settings;
@@ -83,6 +101,27 @@ private:
         const std::string& listeningPeerName,
         std::unique_ptr<AbstractStreamSocket> listeningPeerConnection,
         nx_http::HttpServerConnection* httpConnection);
+};
+
+class ConnectSessionManagerFactory
+{
+public:
+    using FactoryFunc = nx::utils::MoveOnlyFunc<
+        std::unique_ptr<AbstractConnectSessionManager>(
+            const conf::Settings& settings,
+            model::ClientSessionPool* clientSessionPool,
+            model::ListeningPeerPool* listeningPeerPool,
+            controller::AbstractTrafficRelay* trafficRelay)>;
+
+    static std::unique_ptr<AbstractConnectSessionManager> create(
+        const conf::Settings& settings,
+        model::ClientSessionPool* clientSessionPool,
+        model::ListeningPeerPool* listeningPeerPool,
+        controller::AbstractTrafficRelay* trafficRelay);
+    /**
+     * @return Previous factory func.
+     */
+    static FactoryFunc setFactoryFunc(FactoryFunc func);
 };
 
 } // namespace controller

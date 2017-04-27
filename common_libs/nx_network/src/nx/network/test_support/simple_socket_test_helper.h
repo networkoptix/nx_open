@@ -571,7 +571,7 @@ void socketSyncAsyncSwitch(
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     ASSERT_TRUE(server->setRecvTimeout(100));
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << lastError();
-    ASSERT_TRUE(server->listen(testClientCount())) << lastError();
+    ASSERT_TRUE(server->listen((int)testClientCount())) << lastError();
 
     auto serverAddress = server->getLocalAddress();
     NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);

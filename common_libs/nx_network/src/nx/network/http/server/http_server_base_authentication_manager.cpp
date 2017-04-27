@@ -112,13 +112,7 @@ void BaseAuthenticationManager::passwordLookupDone(
 void BaseAuthenticationManager::reportSuccess(
     AuthenticationCompletionHandler completionHandler)
 {
-    completionHandler(
-        nx_http::server::AuthenticationResult(
-            true,
-            nx::utils::stree::ResourceContainer(),
-            header::WWWAuthenticate(),
-            nx_http::HttpHeaders(),
-            nullptr));
+    completionHandler(nx_http::server::SuccessfulAuthenticationResult());
 }
 
 nx::String BaseAuthenticationManager::generateNonce()

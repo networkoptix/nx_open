@@ -235,8 +235,8 @@ public:
     static bool isStopping() { return m_appStopping; }
     void setRemovedFromPool(bool value);
 
-    virtual void saveParams();
-    virtual void saveParamsAsync();
+    virtual bool saveParams();
+    virtual int saveParamsAsync();
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QString &param) const;
     void statusChanged(const QnResourcePtr &resource, Qn::StatusChangeReason reason);

@@ -175,7 +175,7 @@ private:
 
 private:
     ArgumentHash m_arguments;
-    ActionScopes m_scope { InvalidScope } ;
+    ActionScopes m_scope{InvalidScope};
 };
 
 } // namespace action
