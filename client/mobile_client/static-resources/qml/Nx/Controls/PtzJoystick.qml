@@ -1,4 +1,5 @@
 import QtQuick 2.6
+import QtQuick.Window 2.0
 
 import Nx 1.0
 
@@ -37,16 +38,17 @@ Rectangle
 
         property bool drawButtonBorders: ptzType != kEightWayPtz && ptzType != kFreeWayPtz
 
+        anchors.centerIn: parent
         visible: drawButtonBorders || mouseArea.pressed
-        anchors.fill: parent
+        width: parent.width * Screen.devicePixelRatio
+        height: parent.height * Screen.devicePixelRatio
+        scale: 1.0 / Screen.devicePixelRatio
 
         onPaint:
         {
             var context = getContext("2d")
             context.reset()
-
-            var center = d.centerPoint
-            var radius = d.controlRadius
+            context.scale(Screen.devicePixelRatio, Screen.devicePixelRatio)
 
             if (mouseArea.pressed)
                 drawGradient(context)
@@ -60,7 +62,9 @@ Rectangle
             if (d.dragging)
                 return
 
-            var gradientStartPoint = d.centerPoint.minus(d.radialVector)
+            var gradientStartPoint = drawButtonBorders
+                ? d.centerPoint
+                : d.centerPoint.minus(d.radialVector)
 
             var startColor = ColorTheme.transparent(ColorTheme.contrast1, 0.0)
             var finishColor = ColorTheme.transparent(ColorTheme.contrast1, 0.2)
@@ -162,6 +166,7 @@ Rectangle
 
         x: d.markerCenterPosition.x - width / 2
         y: d.markerCenterPosition.y - height / 2
+        z: 1
         width: 32
         height: width
 
@@ -169,33 +174,22 @@ Rectangle
         {
             id: markerShadow
 
-            x: -8
-            y: -8
-            width: 48
+            width: 40
             height: width
+            anchors.centerIn: parent
             radius: width / 2
             visible: d.dragging
 
-            color: "lightgrey"
-            opacity: 0.4
+
+            color: ColorTheme.transparent(ColorTheme.contrast1, 0.2)
         }
 
-        Rectangle
+        Image
         {
             id: circleMarker
 
             anchors.centerIn: parent
-            width: 24
-            height: width
-            border.width: 2
-            radius: width / 2
-
-            color: drawer.drawButtonBorders && !markerShadow.visible
-                ? control.color
-                : "transparent"
-
-            opacity: markerShadow.visible ? markerShadow.opacity : control.opacity
-            border.color: "white" // todo replace with actual color
+            source: lp("/images/ptz/ptz_circle.png")
         }
     }
 
@@ -203,13 +197,14 @@ Rectangle
     {
         id: pointerImage
 
-        property vector2d position: d.radialVector.times(1.2).plus(d.centerPoint)
+        property vector2d position: d.radialVector.times(
+            1 + 0.15 * (d.dragging ? d.movementVector.length() : 1)).plus(d.centerPoint)
 
         source: lp("/images/ptz/ptz_arrow.png")
 
         x: position.x - width / 2
         y: position.y - height / 2
-        scale: d.movementVector.length()
+        scale: d.dragging ? d.movementVector.length() : 1
         visible: mouseArea.pressed
         rotation: mathHelpers.getAngle(d.radialVector) * 180 / Math.PI
     }
@@ -271,12 +266,15 @@ Rectangle
             x: position.x - width / 2
             y: position.y - height / 2
             rotation: d.kButtonRotations[directionId]
+            enabled: !d.dragging
+            opacity: enabled ? 1 : 0.2
         }
     }
 
     QtObject
     {
         id: d
+
 
         property real controlRadius: control.width / 2
         property real markerRadius: marker.width / 2
@@ -446,7 +444,7 @@ Rectangle
             if (normalize)
                 direction = direction.normalized()
             var vector = direction.times(maxLength)
-            return vector.plus(centerPoint)
+            return vector.plus(d.centerPoint)
         }
 
         function fuzzyIsNull(value)

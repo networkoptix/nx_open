@@ -62,7 +62,8 @@ ZoomableFlickable
             return aspectRatio
         }
 
-        item: MultiVideoOutput { id: video }
+        item: video
+        MultiVideoOutput { id: video }
 
         onSourceSizeChanged: fitToBounds()
     }

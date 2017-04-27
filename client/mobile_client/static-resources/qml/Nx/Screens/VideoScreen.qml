@@ -322,15 +322,15 @@ PageBase
 
                 PtzJoystick
                 {
-                    ptzType: 0
+                    ptzType: 1
 
                     visible: enabled;
                     anchors.verticalCenter: parent.verticalCenter
-                    enabled:
-                    {
-                        var ptzCaps = ptzController.capabilities & Ptz.ContinuousPtzCapabilities
-                        return ptzCaps == Ptz.ContinuousPtzCapabilities
-                    }
+                    enabled: true
+//                    {
+//                        var ptzCaps = ptzController.capabilities & Ptz.ContinuousPtzCapabilities
+//                        return ptzCaps == Ptz.ContinuousPtzCapabilities
+//                    }
 
                     onSingleShot:
                     {
