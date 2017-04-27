@@ -23,17 +23,6 @@ HttpServerConnection::HttpServerConnection(
 {
 }
 
-void HttpServerConnection::pleaseStop(
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
-{
-    base_type::pleaseStop(
-        [this, completionHandler = std::move(completionHandler)]()
-        {
-            m_currentMsgBody.reset(); //< We are in aio thread, so this is ok.
-            completionHandler();
-        });
-}
-
 void HttpServerConnection::processMessage(nx_http::Message&& requestMessage)
 {
     // TODO: #ak Incoming message body. Use AbstractMsgBodySource.
@@ -81,6 +70,17 @@ void HttpServerConnection::processMessage(nx_http::Message&& requestMessage)
                         std::move(requestMessage));
                 });
         });
+}
+
+void HttpServerConnection::setPersistentConnectionEnabled(bool value)
+{
+    m_persistentConnectionEnabled = value;
+}
+
+void HttpServerConnection::stopWhileInAioThread()
+{
+    base_type::stopWhileInAioThread();
+    m_currentMsgBody.reset();
 }
 
 void HttpServerConnection::onAuthenticationDone(
@@ -324,11 +324,6 @@ void HttpServerConnection::checkForConnectionPersistency(const Message& msg)
         else if (request.requestLine.version == nx_http::http_1_0)
             m_isPersistent = nx_http::getHeaderValue(request.headers, "Connection").toLower() == "keep-alive";
     }
-}
-
-void HttpServerConnection::setPersistentConnectionEnabled(bool value)
-{
-    m_persistentConnectionEnabled = value;
 }
 
 } // namespace nx_http

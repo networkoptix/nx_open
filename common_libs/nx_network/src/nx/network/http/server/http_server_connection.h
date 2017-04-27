@@ -43,24 +43,6 @@ public:
     nx::utils::MoveOnlyFunc<void(HttpServerConnection*)> onResponseHasBeenSent;
 };
 
-struct ResponseMessageContext
-{
-    nx_http::Message msg;
-    std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody;
-    ConnectionEvents connectionEvents;
-
-    ResponseMessageContext(
-        nx_http::Message msg,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
-        ConnectionEvents connectionEvents)
-        :
-        msg(std::move(msg)),
-        responseMsgBody(std::move(responseMsgBody)),
-        connectionEvents(std::move(connectionEvents))
-    {
-    }
-};
-
 using ResponseIsReadyHandler =
     nx::utils::MoveOnlyFunc<void(
         nx_http::Message,
@@ -96,15 +78,33 @@ public:
     HttpServerConnection(const HttpServerConnection&) = delete;
     HttpServerConnection& operator=(const HttpServerConnection&) = delete;
 
-    virtual void pleaseStop(
-        nx::utils::MoveOnlyFunc<void()> completionHandler) override;
-
     void processMessage(nx_http::Message&& request);
 		
     /** Introduced for test purpose. */
     void setPersistentConnectionEnabled(bool value);
 
+protected:
+    virtual void stopWhileInAioThread() override;
+
 private:
+    struct ResponseMessageContext
+    {
+        nx_http::Message msg;
+        std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody;
+        ConnectionEvents connectionEvents;
+
+        ResponseMessageContext(
+            nx_http::Message msg,
+            std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
+            ConnectionEvents connectionEvents)
+            :
+            msg(std::move(msg)),
+            responseMsgBody(std::move(responseMsgBody)),
+            connectionEvents(std::move(connectionEvents))
+        {
+        }
+    };
+
     nx_http::server::AbstractAuthenticationManager* const m_authenticationManager;
     nx_http::AbstractMessageDispatcher* const m_httpMessageDispatcher;
     std::unique_ptr<nx_http::AbstractMsgBodySource> m_currentMsgBody;
