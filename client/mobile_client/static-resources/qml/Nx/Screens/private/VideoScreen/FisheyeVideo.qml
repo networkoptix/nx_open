@@ -244,7 +244,7 @@ Item
         function updateScale(scale)
         {
             interactor.scalePower = startScalePower
-            interactor.scaleBy(Math.log2(pinchEvent.scale))
+            interactor.scaleBy(Math.log(scale) / Math.LN2)
         }                
     }
 }

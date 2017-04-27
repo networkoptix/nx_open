@@ -81,6 +81,7 @@ ShaderEffect
     /* Vertex shader code: */
 
     vertexShader: "
+        #version 110
         uniform vec2 projectionCoordsScale;
         uniform vec2 viewCenter;
         uniform float viewScale;
@@ -100,6 +101,7 @@ ShaderEffect
     /* Fragment shader code: */
 
     fragmentShader: "
+        #version 110
         varying vec2 projectionCoords;
 
         uniform mat4 textureMatrix;
@@ -107,7 +109,7 @@ ShaderEffect
         uniform sampler2D sourceTexture;
         uniform float qt_Opacity;
 
-        #define pi 3.1415926
+        const float pi = 3.1415926;
 
         vec4 texture2DBlackBorder(sampler2D sampler, vec2 coord)
         {
@@ -124,7 +126,7 @@ ShaderEffect
         void main() 
         {
              vec4 pointOnSphere = vec4(unproject(projectionCoords), 1.0);
-             vec2 transformedProjectionCoords = project(viewRotationMatrix * pointOnSphere);
+             vec2 transformedProjectionCoords = project((viewRotationMatrix * pointOnSphere).xyz);
              vec2 textureCoords = (textureMatrix * vec4(transformedProjectionCoords, 0.0, 1.0)).xy;
              gl_FragColor = texture2DBlackBorder(sourceTexture, textureCoords);
         }"
