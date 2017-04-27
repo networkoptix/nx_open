@@ -32,10 +32,10 @@ void QnClientCoreMetaTypes::initialize()
     qmlRegisterType<nx::client::ModelDataAccessor>("Nx.Models", 1, 0, "ModelDataAccessor");
 
     qmlRegisterUncreatableType<NxGlobalsObject>(
-        "Nx", 1, 0, "NxGlobals", lit("Cannot create an instance of NxGlobals."));
+        "Nx", 1, 0, "NxGlobals", QLatin1String("Cannot create an instance of NxGlobals."));
     qRegisterMetaType<QnUrlHelper>();
     qmlRegisterUncreatableType<QnUrlHelper>(
-        "Nx", 1, 0, "UrlHelper", lit("Cannot create an instance of UrlHelper."));
+        "Nx", 1, 0, "UrlHelper", QLatin1String("Cannot create an instance of UrlHelper."));
     qmlRegisterUncreatableType<QnSoftwareVersion>(
-        "Nx", 1, 0, "SoftwareVersion", lit("Cannot create an instance of SoftwareVersion."));
+        "Nx", 1, 0, "SoftwareVersion", QLatin1String("Cannot create an instance of SoftwareVersion."));
 }

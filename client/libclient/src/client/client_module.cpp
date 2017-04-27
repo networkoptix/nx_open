@@ -170,8 +170,14 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     initSkin(startupParams);
     initLocalResources(startupParams);
 
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
-    QWebSettings::globalSettings()->enablePersistentStorage();
+    // WebKit initialization must occur only once per application run. Actual for ActiveX module.
+    static bool isWebKitInitialized = false;
+    if (!isWebKitInitialized)
+    {
+        QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
+        QWebSettings::globalSettings()->enablePersistentStorage();
+        isWebKitInitialized = true;
+    }
 }
 
 QnClientModule::~QnClientModule()
