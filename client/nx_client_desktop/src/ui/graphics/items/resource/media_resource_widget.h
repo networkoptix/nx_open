@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <functional>
 
 #include "resource_widget.h"
 
@@ -200,6 +201,7 @@ protected:
     bool animationAllowed() const;
 
     void invokeTrigger(const QString& id,
+        std::function<void(bool)> resultHandler,
         QnBusiness::EventState toggleState = QnBusiness::UndefinedState);
 
 private slots:

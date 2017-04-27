@@ -2330,26 +2330,32 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
         ? lit("%1 (%2)").arg(name).arg(tr("press and hold", "Software Trigger"))
         : name);
 
+    const auto resultHandler =
+        [this](bool success)
+        {
+            return true; //TODO: FIXME!!! #vkutin
+        };
+
     if (info.prolonged)
     {
         connect(button, &QnImageButtonWidget::pressed, this,
-            [this, id = info.triggerId]()
+            [this, resultHandler, id = info.triggerId]()
             {
-                invokeTrigger(id, QnBusiness::ActiveState);
+                invokeTrigger(id, resultHandler, QnBusiness::ActiveState);
             });
 
         connect(button, &QnImageButtonWidget::released, this,
-            [this, id = info.triggerId]()
+            [this, resultHandler, id = info.triggerId]()
             {
-                invokeTrigger(id, QnBusiness::InactiveState);
+                invokeTrigger(id, resultHandler, QnBusiness::InactiveState);
             });
     }
     else
     {
         connect(button, &QnImageButtonWidget::clicked, this,
-            [this, id = info.triggerId]()
+            [this, resultHandler, id = info.triggerId]()
             {
-                invokeTrigger(id);
+                invokeTrigger(id, resultHandler);
             });
     }
 }
@@ -2401,20 +2407,26 @@ void QnMediaResourceWidget::at_businessRuleChanged(const QnBusinessEventRulePtr&
 
 void QnMediaResourceWidget::invokeTrigger(
     const QString& id,
+    std::function<void(bool)> resultHandler,
     QnBusiness::EventState toggleState)
 {
     if (!accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission))
         return;
 
     const auto responseHandler =
-        [this, id](bool success, rest::Handle handle, const QnJsonRestResult& result)
+        [this, resultHandler, id](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             Q_UNUSED(handle);
-            if (success && result.error == QnRestResult::NoError)
-                return;
+            success = success && result.error == QnRestResult::NoError;
 
-            NX_LOG(tr("Failed to invoke trigger %1 (%2)").arg(id).arg(result.errorString),
-                cl_logERROR);
+            if (!success)
+            {
+                NX_LOG(tr("Failed to invoke trigger %1 (%2)")
+                    .arg(id).arg(result.errorString), cl_logERROR);
+            }
+
+            if (resultHandler)
+                resultHandler(success);
         };
 
     commonModule()->currentServer()->restConnection()->softwareTriggerCommand(
