@@ -15,6 +15,52 @@
 #include "nx/fusion/serialization/ubjson.h"
 #include <nx_ec/transaction_timestamp.h>
 
+/**
+ * This class describes all possible transactions and defines various access righs check for them.
+ *
+ * Couple of examples:
+ *
+ * APPLY(                   -- macro header
+ * 604,                     -- integer enum id
+ * getLayoutTours,          -- transaction name
+ * ApiLayoutTourDataList,   -- passed data structure
+ * false,                   -- transaction is not persistent (does not save anything to database)
+ * false,                   -- transaction is not system (handled common way)
+ * InvalidGetHashHelper(),  -- actual only for persistent transactions
+ * InvalidTriggerNotificationHelper(),  -- actual only for persistent transactions
+ * InvalidAccess(),         -- actual only for persistent transactions with one element
+ * InvalidAccess(),         -- actual only for read transactions for one element
+ * InvalidFilterFunc(),     -- actual only for persistent transactions with element list
+ * FilterListByAccess<AllowForAllAccess>(), -- filtering requested list by the passed checker
+ * ReadListAccessOut<AllowForAllAccess>(), -- nobody can explain what should we fill here,
+ *      but this is for resending persistent transactions, similar to TriggerNotificationHelper
+ * RegularTransactionType() -- transaction is common, regular, without any magic
+ * )
+ *
+ * APPLY(                   -- macro header
+ * 605,                     -- integer enum id
+ * saveLayoutTour,          -- transaction name
+ * ApiLayoutTourData,       -- passed data structure
+ * true,                    -- transaction is persistent
+ * false,                   -- transaction is not system (handled common way)
+ * CreateHashByIdHelper(),  -- id is enough to generate hash
+ * LayoutTourNotificationManagerHelper(), -- notify other users that we have changed the tour
+ * AdminOnlyAccess(),       -- for now only admins can save tours
+ * AllowForAllAccess(),     -- everybody can read the tours for now
+ * InvalidFilterFunc(),     -- actual only for list transactions
+ * InvalidFilterFunc(),     -- actual only for list transactions
+ * AllowForAllAccessOut(),  -- nobody can explain what should we fill here,
+ *      but this is for resending persistent transactions, similar to TriggerNotificationHelper
+ * RegularTransactionType() -- transaction is common, regular, without any magic
+ * )
+ *
+ *                                      --WARNING--
+ * all transaction descriptors for the same api data structures should have the same Access Rights
+ * checker functions. For example setResourceParam and getResourceParam have the same checker for
+ * read access - ReadResourceParamAccess.
+ */
+
+
 namespace ec2
 {
 
@@ -656,7 +702,7 @@ APPLY(508, getPredefinedRoles, ApiPredefinedRoleDataList, \
                        InvalidTriggerNotificationHelper(), /* trigger notification*/ \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -667,7 +713,7 @@ APPLY(600, getLayouts, ApiLayoutDataList, \
                        InvalidTriggerNotificationHelper(), /* trigger notification*/ \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -707,14 +753,14 @@ APPLY(603, removeLayout, ApiIdData, \
 APPLY(604, getLayoutTours, ApiLayoutTourDataList, \
                        false, /* persistent*/ \
                        false, /* system*/ \
-                       InvalidGetHashHelper(), /* getHash*/ \
-                       InvalidTriggerNotificationHelper(), /* trigger notification*/ \
+                       InvalidGetHashHelper(), \
+                       InvalidTriggerNotificationHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       InvalidFilterFunc(), /* Filter save func */ \
-                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
+                       InvalidFilterFunc(), \
+                       FilterListByAccess<AllowForAllAccess>(), \
+                       ReadListAccessOut<AllowForAllAccess>(), \
+                       RegularTransactionType()) \
 APPLY(605, saveLayoutTour, ApiLayoutTourData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
