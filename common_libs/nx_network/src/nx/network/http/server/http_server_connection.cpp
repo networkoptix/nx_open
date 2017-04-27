@@ -1,4 +1,3 @@
-
 #include "http_server_connection.h"
 
 #include <memory>
@@ -8,53 +7,43 @@
 #include "http_message_dispatcher.h"
 #include "http_stream_socket_server.h"
 
+namespace nx_http {
 
-namespace nx_http
-{
 HttpServerConnection::HttpServerConnection(
     StreamConnectionHolder<HttpServerConnection>* socketServer,
     std::unique_ptr<AbstractStreamSocket> sock,
     nx_http::server::AbstractAuthenticationManager* const authenticationManager,
-    nx_http::AbstractMessageDispatcher* const httpMessageDispatcher )
-:
-    BaseType( socketServer, std::move(sock) ),
-    m_authenticationManager( authenticationManager ),
-    m_httpMessageDispatcher( httpMessageDispatcher ),
-    m_isPersistent( false ),
+    nx_http::AbstractMessageDispatcher* const httpMessageDispatcher)
+    :
+    base_type(socketServer, std::move(sock)),
+    m_authenticationManager(authenticationManager),
+    m_httpMessageDispatcher(httpMessageDispatcher),
+    m_isPersistent(false),
     m_persistentConnectionEnabled(true)
-{
-}
-
-HttpServerConnection::~HttpServerConnection()
 {
 }
 
 void HttpServerConnection::pleaseStop(
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
-    BaseType::pleaseStop(
+    base_type::pleaseStop(
         [this, completionHandler = std::move(completionHandler)]()
         {
-            m_currentMsgBody.reset(); // we are in aio thread, so this is ok
+            m_currentMsgBody.reset(); //< We are in aio thread, so this is ok.
             completionHandler();
         });
 }
 
-void HttpServerConnection::processMessage( nx_http::Message&& requestMessage )
+void HttpServerConnection::processMessage(nx_http::Message&& requestMessage)
 {
-    //TODO incoming message body
-    //    should use AbstractMsgBodySource also
+    // TODO: #ak Incoming message body. Use AbstractMsgBodySource.
 
-    //TODO #ak pipelining support
-    //    can add sequence to sendResponseFunc and use it to queue responses
+    // TODO: #ak pipelining support.
+    // Makes sense to add sequence to sendResponseFunc and use it to queue responses.
 
-    //checking if connection is persistent
+    // Checking if connection is persistent.
     checkForConnectionPersistency(requestMessage);
 
-    //TODO #ak performing authentication
-    //    authentication manager should be able to return some custom data
-    //    which will be forwarded to the request handler.
-    //    Should this data be template parameter?
     if (!m_authenticationManager)
     {
         onAuthenticationDone(
@@ -76,7 +65,7 @@ void HttpServerConnection::processMessage( nx_http::Message&& requestMessage )
             if (!strongThis)
                 return;
 
-            if (!socket())  //< connection has been removed while request authentication in progress
+            if (!socket())  //< Connection has been removed while request authentication was in progress.
             {
                 closeConnection(SystemError::noError);
                 return;
@@ -121,7 +110,7 @@ void HttpServerConnection::onAuthenticationDone(
             auto strongThis = weakThis.lock();
             if (!strongThis)
                 return;
-            if (!socket())  //< connection has been removed while request has been processed
+            if (!socket())  //< Connection has been removed while request was being processed.
             {
                 closeConnection(SystemError::noError);
                 return;
@@ -149,7 +138,6 @@ void HttpServerConnection::onAuthenticationDone(
             std::move(authenticationResult.authInfo),
             std::move(sendResponseFunc)))
     {
-        //creating and sending error response
         nx_http::Message response(nx_http::MessageType::response);
         response.response->statusLine.statusCode = nx_http::StatusCode::notFound;
         return prepareAndSendResponse(
@@ -193,7 +181,6 @@ void HttpServerConnection::prepareAndSendResponse(
     msg.response->statusLine.reasonPhrase =
         nx_http::StatusCode::toString( msg.response->statusLine.statusCode );
 
-    //TODO #ak adding necessary headers
     nx_http::insertOrReplaceHeader(
         &msg.response->headers,
         nx_http::HttpHeader(nx_http::header::Server::NAME, nx_http::serverString() ) );
@@ -201,9 +188,7 @@ void HttpServerConnection::prepareAndSendResponse(
         &msg.response->headers,
         nx_http::HttpHeader( "Date", nx_http::formatDateTime( QDateTime::currentDateTime() ) ) );
 
-    //TODO #ak connection persistency
-
-    if( responseMsgBody )
+    if (responseMsgBody)
     {
         const auto contentType = responseMsgBody->mimeType();
         if (contentType.isEmpty())
@@ -237,7 +222,6 @@ void HttpServerConnection::prepareAndSendResponse(
     if (responseMsgBody)
         responseMsgBody->bindToAioThread(getAioThread());
 
-    //posting request to the queue
     m_responseQueue.emplace_back(
         std::move(msg),
         std::move(responseMsgBody),
@@ -258,8 +242,8 @@ void HttpServerConnection::sendNextResponse()
 
 void HttpServerConnection::responseSent()
 {
-    //TODO #ak check sendData error code
-    if( !m_currentMsgBody )
+    // TODO: #ak check sendData error code.
+    if (!m_currentMsgBody)
     {
         fullMessageHasBeenSent();
         return;
@@ -270,27 +254,27 @@ void HttpServerConnection::responseSent()
 
 void HttpServerConnection::someMsgBodyRead(
     SystemError::ErrorCode errorCode,
-    BufferType buf )
+    BufferType buf)
 {
-    if( errorCode != SystemError::noError )
+    if (errorCode != SystemError::noError)
     {
         closeConnection(errorCode);
         return;
     }
 
-    if( buf.isEmpty() )
+    if (buf.isEmpty())
     {
-        //done with message body
+        // Done with message body.
         fullMessageHasBeenSent();
         return;
     }
 
-    //TODO #ak read and send message body async
-    //    move async reading/writing to some separate class (async pipe) to enable reusage
+    // TODO #ak read and send message body async.
+    //    Move async reading/writing to some separate class (async pipe) to enable reusage.
 
     sendData(
-        std::move( buf ),
-        std::bind( &HttpServerConnection::readMoreMessageBodyData, this ) );
+        std::move(buf),
+        std::bind(&HttpServerConnection::readMoreMessageBodyData, this));
 }
 
 void HttpServerConnection::readMoreMessageBodyData()
@@ -325,9 +309,9 @@ void HttpServerConnection::fullMessageHasBeenSent()
         sendNextResponse();
 }
 
-void HttpServerConnection::checkForConnectionPersistency( const Message& msg )
+void HttpServerConnection::checkForConnectionPersistency(const Message& msg)
 {
-    if( msg.type != MessageType::request )
+    if (msg.type != MessageType::request)
         return;
 
     const auto& request = *msg.request;
@@ -347,4 +331,4 @@ void HttpServerConnection::setPersistentConnectionEnabled(bool value)
     m_persistentConnectionEnabled = value;
 }
 
-}
+} // namespace nx_http
