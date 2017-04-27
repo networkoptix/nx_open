@@ -317,6 +317,7 @@ private:
     size_t parseReceivedBytes(size_t bytesRead);
     void processReceivedBytes(std::size_t bytesParsed);
     Result processResponseHeadersBytes(bool* const continueReceiving);
+    bool isMalformed(const nx_http::Response& response) const;
     bool repeatRequestIfNeeded(const Response& response);
     bool sendRequestToNewLocation(const Response& response);
     Result processResponseMessageBodyBytes(std::size_t bytesRead, bool* const continueReceiving);

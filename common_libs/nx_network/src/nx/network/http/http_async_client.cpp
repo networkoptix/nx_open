@@ -799,6 +799,12 @@ AsyncClient::Result AsyncClient::processResponseHeadersBytes(
         return emitDone();
     }
 
+    if (isMalformed(*m_httpStreamReader.message().response))
+    {
+        m_state = sFailed;
+        return emitDone();
+    }
+
     NX_LOGX(lm("Response from %1 has been successfully read: %2")
         .arg(m_contentLocationUrl)
         .str(logTraffic() ? response()->toString() : response()->statusLine.toString()),
@@ -873,6 +879,23 @@ AsyncClient::Result AsyncClient::processResponseHeadersBytes(
 
     m_state = m_httpStreamReader.state() == HttpStreamReader::parseError ? sFailed : sDone;
     return emitDone();
+}
+
+bool AsyncClient::isMalformed(const nx_http::Response& response) const
+{
+    if (response.statusLine.statusCode == StatusCode::switchingProtocols)
+    {
+        if (response.headers.find("Upgrade") == response.headers.end())
+        {
+            NX_LOGX(lm("Received malformed response from %1. "
+                "Status code is %2 and no Upgrade header present")
+                .arg(m_contentLocationUrl).str(response.statusLine.statusCode),
+                cl_logDEBUG1);
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool AsyncClient::repeatRequestIfNeeded(const Response& response)

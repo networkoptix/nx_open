@@ -15,6 +15,11 @@ class HttpAsyncClient:
     public ::testing::Test
 {
 protected:
+    void initializeServerThatDoesNotSendUpgradeHeaderInResponse()
+    {
+        m_serverSendUpgradeHeaderInResponse = false;
+    }
+
     void whenPerformedUpgrade()
     {
         m_httpClient.doUpgrade(
@@ -34,14 +39,20 @@ protected:
     void thenConnectionHasBeenUpgraded()
     {
         auto responseContext = m_upgradeResponses.pop();
-        ASSERT_EQ(nx_http::StatusCode::switchingProtocols, responseContext.statusCode);
+        ASSERT_EQ(nx_http::StatusCode::switchingProtocols, *responseContext.statusCode);
         ASSERT_NE(nullptr, responseContext.connection);
+    }
+
+    void thenRequestHasFailed()
+    {
+        auto responseContext = m_upgradeResponses.pop();
+        ASSERT_FALSE(responseContext.statusCode);
     }
 
 private:
     struct ResponseContext
     {
-        nx_http::StatusCode::Value statusCode = nx_http::StatusCode::ok;
+        boost::optional<nx_http::StatusCode::Value> statusCode;
         std::unique_ptr<AbstractStreamSocket> connection;
     };
 
@@ -49,6 +60,7 @@ private:
     AsyncClient m_httpClient;
     nx::utils::SyncQueue<nx_http::Request> m_upgradeRequests;
     nx::utils::SyncQueue<ResponseContext> m_upgradeResponses;
+    bool m_serverSendUpgradeHeaderInResponse = true;
 
     virtual void SetUp() override
     {
@@ -74,7 +86,8 @@ private:
     {
         m_upgradeRequests.push(std::move(request));
 
-        response->headers.emplace("Upgrade", kUpgradeTo);
+        if (m_serverSendUpgradeHeaderInResponse)
+            response->headers.emplace("Upgrade", kUpgradeTo);
         response->headers.emplace("Connection", "Upgrade");
         completionHandler(nx_http::StatusCode::switchingProtocols);
     }
@@ -89,8 +102,11 @@ private:
     {
         ResponseContext response;
         response.connection = m_httpClient.takeSocket();
-        response.statusCode = static_cast<nx_http::StatusCode::Value>(
-            m_httpClient.response()->statusLine.statusCode);
+        if (!m_httpClient.failed())
+        {
+            response.statusCode = static_cast<nx_http::StatusCode::Value>(
+                m_httpClient.response()->statusLine.statusCode);
+        }
         m_upgradeResponses.push(std::move(response));
     }
 };
@@ -100,6 +116,14 @@ TEST_F(HttpAsyncClient, upgrade_successful)
     whenPerformedUpgrade();
     thenUpgradeRequestIsCorrect();
     thenConnectionHasBeenUpgraded();
+}
+
+TEST_F(HttpAsyncClient, upgrade_missing_protocol_in_response)
+{
+    initializeServerThatDoesNotSendUpgradeHeaderInResponse();
+
+    whenPerformedUpgrade();
+    thenRequestHasFailed();
 }
 
 } // namespace test
