@@ -45,11 +45,10 @@ class RequestHelper
 {
 public:
     RequestHelper(
+        QnDistributedFileDownloaderRestHandler* handler,
         const QnRequestParamList& params,
         QByteArray& result,
         QByteArray& resultContentType);
-
-    QString getFileName();
 
     int handleAddDownload();
     int handleRemoveDownload();
@@ -58,11 +57,16 @@ public:
     int handleUploadChunk(const QByteArray& body, const QByteArray& contentType);
     int handleStatus();
 
-    void setError(const QnRestResult::Error& error, const QString& errorString);
-    void setDownloaderError(DistributedFileDownloader::ErrorCode errorCode);
-    void setJson(const QByteArray& json);
-    void setBinaryData(const QByteArray& data);
+    int makeError(
+        int httpStatusCode,
+        const QnRestResult::Error& error,
+        const QString& errorString);
+    int makeInvalidParameterError(
+        const QString& parameter,
+        const QnRestResult::Error& error = QnRestResult::InvalidParameter);
+    int makeDownloaderError(DistributedFileDownloader::ErrorCode errorCode);
 
+    QnDistributedFileDownloaderRestHandler* handler;
     DistributedFileDownloader* const downloader;
     const QnRequestParamList& params;
     QByteArray& result;
@@ -70,38 +74,26 @@ public:
 };
 
 RequestHelper::RequestHelper(
+    QnDistributedFileDownloaderRestHandler* handler,
     const QnRequestParamList& params,
     QByteArray& result,
     QByteArray& resultContentType)
     :
+    handler(handler),
     downloader(qnServerModule->findInstance<DistributedFileDownloader>()),
     params(params),
     result(result),
     resultContentType(resultContentType)
 {
-    if (!downloader)
-    {
-        setError(QnRestResult::CantProcessRequest,
-            "DistributedFileDownloader is not initialized.");
-    }
-}
-
-QString RequestHelper::getFileName()
-{
-    const auto& fileName = params.value("fileName");
-    if (fileName.isEmpty())
-        setError(QnRestResult::MissingParameter, "File name must be specified.");
-
-    return fileName;
 }
 
 int RequestHelper::handleAddDownload()
 {
     DownloaderFileInformation fileInfo;
 
-    fileInfo.name = getFileName();
+    fileInfo.name = params.value("fileName");
     if (fileInfo.name.isEmpty())
-        return nx_http::StatusCode::invalidParameter;
+        return makeInvalidParameterError("fileName", QnRestResult::MissingParameter);
 
     const auto sizeString = params.value("size");
     if (!sizeString.isEmpty())
@@ -109,10 +101,7 @@ int RequestHelper::handleAddDownload()
         bool ok;
         fileInfo.size = sizeString.toInt(&ok);
         if (!ok || fileInfo.size <= 0)
-        {
-            setError(QnRestResult::InvalidParameter, "Invalid file size.");
-            return nx_http::StatusCode::invalidParameter;
-        }
+            return makeInvalidParameterError("size");
     }
 
     const auto md5String = params.value("md5").toUtf8();
@@ -122,11 +111,7 @@ int RequestHelper::handleAddDownload()
         /* QByteArray::fromBase64() silently ignores all invalid characters,
            so converting md5 back to base64 to check the checksum format validity. */
         if (fileInfo.md5.toBase64() != md5String)
-        {
-            setError(QnRestResult::InvalidParameter,
-                "Invalid md5 checksum. Should be base64-encoded.");
-            return nx_http::StatusCode::invalidParameter;
-        }
+            return makeInvalidParameterError("md5");
     }
 
     const auto urlString = params.value("url");
@@ -134,113 +119,92 @@ int RequestHelper::handleAddDownload()
     {
         fileInfo.url = QUrl(urlString);
         if (!fileInfo.url.isValid())
-        {
-            setError(QnRestResult::InvalidParameter, "Invalid URL.");
-            return nx_http::StatusCode::invalidParameter;
-        }
+            return makeInvalidParameterError("url");
     }
 
     const auto errorCode = downloader->addFile(fileInfo);
     if (errorCode != DistributedFileDownloader::ErrorCode::noError)
-    {
-        setDownloaderError(errorCode);
-        return nx_http::StatusCode::internalServerError;
-    }
+        return makeDownloaderError(errorCode);
 
     return nx_http::StatusCode::ok;
 }
 
 int RequestHelper::handleRemoveDownload()
 {
-    const auto fileName = getFileName();
+    const auto fileName = params.value("fileName");
     if (fileName.isEmpty())
-        return nx_http::StatusCode::invalidParameter;
+        return makeInvalidParameterError("fileName", QnRestResult::MissingParameter);
 
     const bool deleteData = params.value("deleteData", "true") != "false";
 
     const auto errorCode = downloader->deleteFile(fileName, deleteData);
     if (errorCode != DistributedFileDownloader::ErrorCode::noError)
-    {
-        setDownloaderError(errorCode);
-        return nx_http::StatusCode::internalServerError;
-    }
+        return makeDownloaderError(errorCode);
 
     return nx_http::StatusCode::ok;
 }
 
 int RequestHelper::handleGetChunkChecksums()
 {
-    const auto fileName = getFileName();
+    const auto fileName = params.value("fileName");
     if (fileName.isEmpty())
-        return nx_http::StatusCode::invalidParameter;
+        return makeInvalidParameterError("fileName", QnRestResult::MissingParameter);
 
     const auto& fileInfo = downloader->fileInformation(fileName);
     if (!fileInfo.isValid())
-    {
-        setError(QnRestResult::InvalidParameter, "The requested file does not exist.");
-        return nx_http::StatusCode::invalidParameter;
-    }
+        return makeInvalidParameterError("fileName: File does not exist.");
 
     const auto& checksums = downloader->getChunkChecksums(fileInfo.name);
 
-    setJson(QJson::serialized(checksums));
+    QnFusionRestHandlerDetail::serializeJsonRestReply(
+        checksums, params, result, resultContentType, QnRestResult());
     return nx_http::StatusCode::ok;
 }
 
 int RequestHelper::handleDownloadChunk()
 {
-    const auto fileName = getFileName();
+    const auto fileName = params.value("fileName");
     if (fileName.isEmpty())
-        return nx_http::StatusCode::invalidParameter;
+        return makeInvalidParameterError("fileName", QnRestResult::MissingParameter);
 
     bool ok;
     const int chunkIndex = params.value("index").toInt(&ok);
     if (!ok)
-    {
-        setError(QnRestResult::MissingParameter, "Missing \"index\" parameter.");
-        return nx_http::StatusCode::invalidParameter;
-    }
+        return makeInvalidParameterError("index", QnRestResult::MissingParameter);
 
     QByteArray data;
     const auto errorCode = downloader->readFileChunk(fileName, chunkIndex, data);
     if (errorCode != DistributedFileDownloader::ErrorCode::noError)
-    {
-        setDownloaderError(errorCode);
-        return nx_http::StatusCode::internalServerError;
-    }
+        return makeDownloaderError(errorCode);
 
-    setBinaryData(data);
+    result = data;
+    resultContentType = kOctetStreamContentType;
     return nx_http::StatusCode::ok;
 }
 
 int RequestHelper::handleUploadChunk(const QByteArray& body, const QByteArray& contentType)
 {
-    const auto fileName = getFileName();
+    const auto fileName = params.value("fileName");
     if (fileName.isEmpty())
-        return nx_http::StatusCode::invalidParameter;
+        return makeInvalidParameterError("fileName", QnRestResult::MissingParameter);
 
     bool ok;
     const int chunkIndex = params.value("index").toInt(&ok);
     if (!ok)
-    {
-        setError(QnRestResult::MissingParameter, "Missing \"index\" parameter.");
-        return nx_http::StatusCode::invalidParameter;
-    }
+        return makeInvalidParameterError("index", QnRestResult::MissingParameter);
 
     if (contentType != kOctetStreamContentType)
     {
-        setError(QnRestResult::CantProcessRequest,
+        return makeError(
+            nx_http::StatusCode::badRequest,
+            QnRestResult::CantProcessRequest,
             lit("Only %1 Content-Type is supported.").arg(
                 QLatin1String(kOctetStreamContentType)));
-        return nx_http::StatusCode::badRequest;
     }
 
     const auto errorCode = downloader->writeFileChunk(fileName, chunkIndex, body);
     if (errorCode != DistributedFileDownloader::ErrorCode::noError)
-    {
-        setDownloaderError(errorCode);
-        return nx_http::StatusCode::internalServerError;
-    }
+        return makeDownloaderError(errorCode);
 
     return nx_http::StatusCode::ok;
 }
@@ -252,12 +216,10 @@ int RequestHelper::handleStatus()
     {
         const auto& fileInfo = downloader->fileInformation(fileName);
         if (!fileInfo.isValid())
-        {
-            setError(QnRestResult::InvalidParameter, "The requested file does not exist.");
-            return nx_http::StatusCode::invalidParameter;
-        }
+            return makeInvalidParameterError("fileName: File does not exist.");
 
-        setJson(QJson::serialized(fileInfo));
+        QnFusionRestHandlerDetail::serializeJsonRestReply(
+            fileInfo, params, result, resultContentType, QnRestResult());
     }
     else
     {
@@ -268,36 +230,44 @@ int RequestHelper::handleStatus()
             infoList.append(fileInfo);
         }
 
-        setJson(QJson::serialized(infoList));
+        QnFusionRestHandlerDetail::serializeJsonRestReply(
+            infoList, params, result, resultContentType, QnRestResult());
     }
 
     return nx_http::StatusCode::ok;
 }
 
-void RequestHelper::setError(const QnRestResult::Error& error, const QString& errorString)
+int RequestHelper::makeError(
+    int httpStatusCode,
+    const QnRestResult::Error& error,
+    const QString& errorString)
 {
-    QnRestResult restResult;
-    restResult.setError(error, errorString);
-    setJson(QJson::serialized(restResult));
+    return handler->makeError(
+        httpStatusCode,
+        errorString,
+        &result,
+        &resultContentType,
+        Qn::JsonFormat,
+        false,
+        error);
 }
 
-void RequestHelper::setDownloaderError(DistributedFileDownloader::ErrorCode errorCode)
+int RequestHelper::makeInvalidParameterError(
+    const QString& parameter, const QnRestResult::Error& error)
 {
-    setError(QnRestResult::CantProcessRequest,
+    return makeError(
+        nx_http::StatusCode::invalidParameter,
+        QnRestResult::InvalidParameter,
+        parameter);
+}
+
+int RequestHelper::makeDownloaderError(DistributedFileDownloader::ErrorCode errorCode)
+{
+    return makeError(
+        nx_http::StatusCode::internalServerError,
+        QnRestResult::CantProcessRequest,
         lit("DistributedFileDownloader returned error: %1").arg(
             QnLexical::serialized(errorCode)));
-}
-
-void RequestHelper::setJson(const QByteArray& json)
-{
-    result = json;
-    resultContentType = kJsonContentType;
-}
-
-void RequestHelper::setBinaryData(const QByteArray& data)
-{
-    result = data;
-    resultContentType = kOctetStreamContentType;
 }
 
 } // namespace
@@ -328,10 +298,15 @@ int QnDistributedFileDownloaderRestHandler::executePost(
     QByteArray& resultContentType,
     const QnRestConnectionProcessor* /*processor*/)
 {
-    RequestHelper helper(params, result, resultContentType);
+    RequestHelper helper(this, params, result, resultContentType);
 
     if (!helper.downloader)
-        return nx_http::StatusCode::internalServerError;
+    {
+        return helper.makeError(
+            nx_http::StatusCode::internalServerError,
+            QnRestResult::CantProcessRequest,
+            "DistributedFileDownloader is not initialized.");
+    }
 
     const auto command = commandFromPath(path);
     switch (command)
@@ -355,8 +330,10 @@ int QnDistributedFileDownloaderRestHandler::executePost(
             return helper.handleStatus();
 
         default:
-            helper.setError(QnRestResult::InvalidParameter, "Invalid path specified.");
-            return nx_http::StatusCode::notFound;
+            return helper.makeError(
+                nx_http::StatusCode::badRequest,
+                QnRestResult::InvalidParameter,
+                "Invalid path specified.");
     }
 
     return nx_http::StatusCode::ok;

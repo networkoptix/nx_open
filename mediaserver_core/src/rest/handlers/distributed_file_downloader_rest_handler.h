@@ -1,8 +1,8 @@
 #pragma once
 
-#include <rest/server/request_handler.h>
+#include <rest/server/fusion_rest_handler.h>
 
-class QnDistributedFileDownloaderRestHandler: public QnRestRequestHandler
+class QnDistributedFileDownloaderRestHandler: public QnFusionRestHandler
 {
 public:
     virtual int executeGet(
