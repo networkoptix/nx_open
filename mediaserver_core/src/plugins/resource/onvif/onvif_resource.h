@@ -107,8 +107,10 @@ public:
 
     struct RelayInputState
     {
-        bool value = false;
-        qint64 timestamp = 0;
+        bool value;
+        qint64 timestamp;
+
+        RelayInputState(): value(false), timestamp(0) {}
     };
 
     enum CODECS
