@@ -877,7 +877,7 @@ ScaleManager.prototype.setViewportWidth = function(width){ // For initialization
     this.updateCurrentInterval();
 };
 ScaleManager.prototype.setStart = function(start){// Update the begining end of the timeline. Live mode must be supported here
-    this.start = start;
+    this.start = this.serverTime(start);
     this.updateTotalInterval();
 };
 ScaleManager.prototype.setEnd = function(end){ // Update right end of the timeline. Live mode must be supported here
