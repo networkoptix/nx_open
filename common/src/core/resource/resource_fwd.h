@@ -1,7 +1,8 @@
-#ifndef QN_RESOURCE_FWD_H
-#define QN_RESOURCE_FWD_H
+#pragma once
 
 #include <memory>
+
+#include <licensing/license_fwd.h>
 
 #include "shared_resource_pointer.h"
 #include "shared_resource_pointer_list.h"
@@ -24,10 +25,6 @@ struct QnCameraHistoryItem;
 class QnCameraHistory;
 typedef QSharedPointer<QnCameraHistory> QnCameraHistoryPtr;
 typedef QList<QnCameraHistoryPtr> QnCameraHistoryList;
-
-class QnLicense;
-typedef QSharedPointer<QnLicense> QnLicensePtr;
-typedef QList<QnLicensePtr> QnLicenseList;
 
 class QnVideoWallItem;
 class QnVideoWallMatrix;
@@ -197,8 +194,22 @@ class QnFlirEIPResource;
 typedef QnSharedResourcePointer<QnFlirEIPResource> QnFlirEIPResourcePtr;
 typedef QnSharedResourcePointerList<QnFlirEIPResource> QnFlirEIPResourceList;
 
+namespace nx {
+namespace plugins {
+namespace flir {
+
+class FcResource;
+class OnvifResource;
+
+} // namespace flir
+} // namespace plugins
+} // namespace nx
+
+typedef QnSharedResourcePointer<nx::plugins::flir::FcResource> QnFlirFcResourcePtr;
+typedef QnSharedResourcePointerList<nx::plugins::flir::FcResource> QnFlirFcResourceList;
+
+typedef QnSharedResourcePointer<nx::plugins::flir::OnvifResource> QnFlirOnvifResourcePtr;
+typedef QnSharedResourcePointerList<nx::plugins::flir::OnvifResource> QnFlirOnvifResourceList;
+
 class QnAdamResource;
 typedef QnSharedResourcePointer<QnAdamResource> QnAdamResourcePtr;
-
-
-#endif // QN_RESOURCE_FWD_H

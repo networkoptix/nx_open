@@ -21,11 +21,14 @@ public:
         const std::string& accountEmail,
         const std::string& accountPassword);
 
+    void setMaxDelayBeforeConnect(std::chrono::milliseconds delay);
     void setTransactionConnectionCount(int connectionCount);
 
     void start();
 
     std::size_t activeConnectionCount() const;
+    std::size_t totalFailedConnections() const;
+    std::size_t connectedConnections() const;
 
 private:
     const std::string m_cdbUrl;

@@ -4,8 +4,8 @@
 #include <nx/network/time/time_protocol_client.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_initializer.h>
-#include <utils/common/guard.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/scope_guard.h>
+#include <nx/utils/system_error.h>
 
 #include "settings.h"
 #include "time_protocol_server.h"
@@ -44,7 +44,7 @@ void TimeServerProcess::setOnStartedEventHandler(
 int TimeServerProcess::exec()
 {
     bool processStartResult = false;
-    auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
+    auto triggerOnStartedEventHandlerGuard = makeScopeGuard(
         [this, &processStartResult]
         {
             if (m_startedEventHandler)

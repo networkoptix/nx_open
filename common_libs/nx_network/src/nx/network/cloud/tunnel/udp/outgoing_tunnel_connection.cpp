@@ -100,7 +100,7 @@ void OutgoingTunnelConnection::establishNewConnection(
     NX_LOGX(lm("cross-nat %1. New stream socket has been requested")
         .arg(m_connectionId), cl_logDEBUG2);
 
-    auto newConnection = std::make_unique<UdtStreamSocket>(AF_INET);
+    auto newConnection = std::make_unique<UdtStreamSocket>(SocketFactory::udpIpVersion());
     if (!socketAttributes.applyTo(newConnection.get()) ||
         !newConnection->bind(SocketAddress(HostAddress::anyHost, m_localPunchedAddress.port)) ||
         !newConnection->setNonBlockingMode(true))

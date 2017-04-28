@@ -6,7 +6,7 @@
 #ifndef CLOUD_DB_AUTH_TYPES_H
 #define CLOUD_DB_AUTH_TYPES_H
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 
 
 namespace nx {
@@ -34,25 +34,25 @@ class AuthenticationInfo
 public:
     AccessRole role;
     //!Parameters, discovered during authentication (e.g., account id)
-    stree::ResourceContainer params;
+    nx::utils::stree::ResourceContainer params;
 };
 
 class AuthorizationInfo
 :
-    public stree::AbstractResourceReader,
-    public stree::AbstractIteratableContainer
+    public nx::utils::stree::AbstractResourceReader,
+    public nx::utils::stree::AbstractIteratableContainer
 {
 public:
     AuthorizationInfo();
-    AuthorizationInfo( stree::ResourceContainer&& rc );
+    AuthorizationInfo( nx::utils::stree::ResourceContainer&& rc );
 
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
-    virtual std::unique_ptr<stree::AbstractConstIterator> begin() const override;
+    virtual std::unique_ptr<nx::utils::stree::AbstractConstIterator> begin() const override;
 
     bool accessAllowedToOwnDataOnly() const;
 
 private:
-    stree::ResourceContainer m_rc;
+    nx::utils::stree::ResourceContainer m_rc;
 };
 
 }   //cdb

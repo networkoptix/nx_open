@@ -43,7 +43,7 @@ std::unique_ptr<AbstractStreamSocket> SocketFactory::createStreamSocket(
 
 #ifdef ENABLE_SSL
     if (sslRequired || s_isSslEnforced)
-        result.reset(new SslSocket(result.release(), false));
+        result.reset(new deprecated::SslSocket(result.release(), false));
 #endif // ENABLE_SSL
 
     return std::move(result);
@@ -65,10 +65,10 @@ std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerS
 
 #ifdef ENABLE_SSL
     if (s_isSslEnforced)
-        result.reset(new SslServerSocket(result.release(), false));
+        result.reset(new deprecated::SslServerSocket(result.release(), false));
     else
         if (sslRequired)
-            result.reset(new SslServerSocket(result.release(), true));
+            result.reset(new deprecated::SslServerSocket(result.release(), true));
 #endif // ENABLE_SSL
 
     return std::move(result);
@@ -223,7 +223,7 @@ std::atomic< bool > SocketFactory::s_isSslEnforced(false);
 #if TARGET_OS_IPHONE
     std::atomic<int> SocketFactory::s_tcpServerIpVersion(AF_INET6);
     std::atomic<int> SocketFactory::s_tcpClientIpVersion(AF_INET6);
-    std::atomic<int> SocketFactory::s_udpIpVersion(AF_INET);
+    std::atomic<int> SocketFactory::s_udpIpVersion(AF_INET6);
 #else
     std::atomic<int> SocketFactory::s_tcpServerIpVersion(AF_INET);
     std::atomic<int> SocketFactory::s_tcpClientIpVersion(AF_INET);

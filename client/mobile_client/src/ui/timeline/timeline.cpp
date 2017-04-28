@@ -9,7 +9,7 @@
 #include <QtQuick/QSGVertexColorMaterial>
 #include <QtQuick/QSGTextureMaterial>
 #include <QtQuick/QQuickWindow>
-#include <QtCore/qmath.h>
+#include <QtCore/QtMath>
 #include <QtCore/QElapsedTimer>
 #include <QtGui/QFontMetricsF>
 #include <QtGui/QPainter>
@@ -635,6 +635,7 @@ void QnTimeline::finishZoom(qreal scale)
 
 void QnTimeline::startDrag(int x)
 {
+    d->targetPosition = -1;
     d->zoomKineticHelper.stop();
     d->stickyTime = d->pixelPosToTime(x);
     d->stickyPointKineticHelper.start(x);
@@ -642,12 +643,14 @@ void QnTimeline::startDrag(int x)
 
 void QnTimeline::updateDrag(int x)
 {
+    d->targetPosition = -1;
     d->stickyPointKineticHelper.move(x);
     update();
 }
 
 void QnTimeline::finishDrag(int x)
 {
+    d->targetPosition = -1;
     d->stickyPointKineticHelper.finish(x);
     if (d->stickyPointKineticHelper.isStopped())
         emit moveFinished();
@@ -717,12 +720,17 @@ void QnTimeline::setChunkProvider(QnCameraChunkProvider* chunkProvider)
 
     if (d->chunkProvider)
     {
-        connect(d->chunkProvider, &QnCameraChunkProvider::timePeriodsUpdated, this,
+        auto handleTimePeriodsUpdated =
             [this]()
             {
                 d->timePeriods[Qn::RecordingContent] = d->chunkProvider->timePeriods();
                 update();
-            });
+            };
+
+        connect(d->chunkProvider, &QnCameraChunkProvider::timePeriodsUpdated,
+            this, handleTimePeriodsUpdated);
+
+        handleTimePeriodsUpdated();
     }
 
     emit chunkProviderChanged();

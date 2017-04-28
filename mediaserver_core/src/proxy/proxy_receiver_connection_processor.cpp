@@ -14,7 +14,7 @@ public:
 
 QnProxyReceiverConnection::QnProxyReceiverConnection(QSharedPointer<AbstractStreamSocket> socket,
                                                      QnHttpConnectionListener* owner):
-    QnTCPConnectionProcessor(new QnProxyReceiverConnectionPrivate, socket)
+    QnTCPConnectionProcessor(new QnProxyReceiverConnectionPrivate, socket, owner->commonModule())
 {
     Q_D(QnProxyReceiverConnection);
 
@@ -45,7 +45,7 @@ void QnProxyReceiverConnection::run()
 
     sendResponse(nx_http::StatusCode::ok, QByteArray());
 
-    auto guid = nx_http::getHeaderValue(d->request.headers, Qn::SERVER_GUID_HEADER_NAME);
+    auto guid = nx_http::getHeaderValue(d->request.headers, Qn::PROXY_SENDER_HEADER_NAME);
     if (d->owner->registerProxyReceiverConnection(guid, d->socket)) {
         d->takeSocketOwnership = true; // remove ownership from socket
         d->socket.clear();

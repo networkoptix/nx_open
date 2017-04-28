@@ -14,13 +14,11 @@ class VMaxStreamFetcher;
 class QnVMax480ConnectionProcessor;
 class QnVMax480ConnectionProcessorPrivate;
 
-class QnVMax480Server: public QnTcpListener
+class QnVMax480Server: public QnTcpListener, public Singleton<QnVMax480Server>
 {
 public:
-    QnVMax480Server();
+    QnVMax480Server(QnCommonModule* commonModule);
     virtual ~QnVMax480Server();
-
-    static QnVMax480Server* instance();
 
     bool waitForConnection(const QString& tcpID, int timeoutMs);
 

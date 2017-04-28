@@ -15,7 +15,6 @@ public:
     static Q_INVOKABLE QString organizationName();
     static Q_INVOKABLE QString linuxOrganizationName();
     static Q_INVOKABLE QString organizationNameForSettings();
-    static Q_INVOKABLE QString realm();
 
     static Q_INVOKABLE QString applicationVersion();
     static Q_INVOKABLE QString applicationRevision();
@@ -37,6 +36,11 @@ public:
     static Q_INVOKABLE QString productNameLong();
     static Q_INVOKABLE QString customizationName();
 
+    static Q_INVOKABLE QString brand()
+    {
+        return productNameShort();
+    }
+
     static Q_INVOKABLE QString defaultLanguage();
 
     static Q_INVOKABLE QString clientExecutableName();
@@ -52,10 +56,6 @@ public:
     static Q_INVOKABLE QString supportPhone();
 
     static Q_INVOKABLE QString updateGeneratorUrl();
-    static Q_INVOKABLE QString defaultCloudHost();
-    static Q_INVOKABLE QString defaultCloudPortalUrl();
-    static Q_INVOKABLE QString defaultCloudModulesXmlUrl();
-    static Q_INVOKABLE QString cloudName();
 
     static Q_INVOKABLE int freeLicenseCount();
     static Q_INVOKABLE QString freeLicenseKey();

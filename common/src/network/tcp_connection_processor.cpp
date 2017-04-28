@@ -2,12 +2,14 @@
 
 #include <QtCore/QTime>
 
-#include <nx/utils/log/log.h>
-#include <utils/common/util.h>
-
+#include <nx/network/aio/unified_pollset.h>
 #include <nx/network/flash_socket/types.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/network/http/http_mod_manager.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/gzip/gzip_compressor.h>
+
+#include <utils/common/util.h>
 
 #include "tcp_listener.h"
 #include "tcp_connection_priv.h"
@@ -18,8 +20,6 @@
 #include "core/resource_management/resource_pool.h"
 #include "http/custom_headers.h"
 #include "common/common_module.h"
-#include "utils/gzip/gzip_compressor.h"
-#include "nx/network/aio/unified_pollset.h"
 
 // we need enough size for updates
 #ifdef __arm__
@@ -29,7 +29,11 @@
 #endif
 
 
-QnTCPConnectionProcessor::QnTCPConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket):
+QnTCPConnectionProcessor::QnTCPConnectionProcessor(
+    QSharedPointer<AbstractStreamSocket> socket,
+    QnCommonModule* commonModule)
+:
+    QnCommonModuleAware(commonModule),
     d_ptr(new QnTCPConnectionProcessorPrivate)
 {
     Q_D(QnTCPConnectionProcessor);
@@ -37,12 +41,16 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(QSharedPointer<AbstractStream
     d->chunkedMode = false;
 }
 
-QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* dptr, QSharedPointer<AbstractStreamSocket> socket):
+QnTCPConnectionProcessor::QnTCPConnectionProcessor(
+    QnTCPConnectionProcessorPrivate* dptr,
+    QSharedPointer<AbstractStreamSocket> socket,
+    QnCommonModule* commonModule)
+:
+    QnCommonModuleAware(commonModule),
     d_ptr(dptr)
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = socket;
-    //d->socket->setNoDelay(true);
     d->chunkedMode = false;
 }
 
@@ -240,7 +248,7 @@ QByteArray QnTCPConnectionProcessor::createResponse(int httpStatusCode, const QB
     }
     nx_http::insertOrReplaceHeader(
         &d->response.headers,
-        nx_http::HttpHeader("Date", dateTimeToHTTPFormat(QDateTime::currentDateTime())) );
+        nx_http::HttpHeader("Date", nx_http::formatDateTime(QDateTime::currentDateTime())) );
 
     // this header required to perform new HTTP requests if server port has been on the fly changed
     nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Access-Control-Allow-Origin", "*" ) );
@@ -532,8 +540,7 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
         result.fromByteArray(existSession);
         return result;
     }
-
-    if (const auto& userRes = qnResPool->getResourceById(d->accessRights.userId))
+    if (const auto& userRes = resourcePool()->getResourceById(d->accessRights.userId))
         result.userName = userRes->getName();
     else if (!nx_http::getHeaderValue( d->request.headers,  Qn::VIDEOWALL_GUID_HEADER_NAME).isEmpty())
         result.userName = lit("Video wall");
@@ -583,7 +590,7 @@ void QnTCPConnectionProcessor::sendUnauthorizedResponse(nx_http::StatusCode::Val
         d->response.messageBody = messageBody;
     }
     if (nx_http::getHeaderValue( d->response.headers, Qn::SERVER_GUID_HEADER_NAME ).isEmpty())
-        d->response.headers.insert(nx_http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray()));
+        d->response.headers.insert(nx_http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, commonModule()->moduleGUID().toByteArray()));
 
     auto acceptEncodingHeaderIter = d->request.headers.find( "Accept-Encoding" );
     QByteArray contentEncoding;
@@ -598,7 +605,7 @@ void QnTCPConnectionProcessor::sendUnauthorizedResponse(nx_http::StatusCode::Val
         {
             contentEncoding = "gzip";
             if( !d->response.messageBody.isEmpty() )
-                d->response.messageBody = GZipCompressor::compressData(d->response.messageBody);
+                d->response.messageBody = nx::utils::bsf::gzip::Compressor::compressData(d->response.messageBody);
         }
         else
         {

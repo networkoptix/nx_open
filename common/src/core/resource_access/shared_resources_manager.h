@@ -1,5 +1,7 @@
 #pragma once
 
+#include <common/common_module.h>
+
 #include <core/resource_access/resource_access_subject.h>
 
 #include <nx/utils/thread/mutex.h>
@@ -7,7 +9,7 @@
 #include <nx/utils/uuid.h>
 
 /** Manager class for shared resources: layouts, cameras, web pages and server statistics. */
-class QnSharedResourcesManager: public QObject, public Singleton<QnSharedResourcesManager>
+class QnSharedResourcesManager: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
 
@@ -42,4 +44,3 @@ private:
     QHash<QnUuid, QSet<QnUuid> > m_sharedResources;
 };
 
-#define qnSharedResourcesManager QnSharedResourcesManager::instance()

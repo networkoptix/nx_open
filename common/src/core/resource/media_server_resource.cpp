@@ -6,6 +6,7 @@
 
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/fusion/serialization/lexical.h>
 
@@ -45,8 +46,8 @@ QString QnMediaServerResource::apiUrlScheme(bool sslAllowed)
     return sslAllowed ? lit("https") : lit("http");
 }
 
-QnMediaServerResource::QnMediaServerResource():
-    base_type(),
+QnMediaServerResource::QnMediaServerResource(QnCommonModule* commonModule):
+    base_type(commonModule),
     m_serverFlags(Qn::SF_None),
     m_panicModeCache(
         std::bind(&QnMediaServerResource::calculatePanicMode, this),
@@ -58,24 +59,11 @@ QnMediaServerResource::QnMediaServerResource():
 
     m_statusTimer.restart();
 
-    QnResourceList resList = qnResPool->getResourcesByParentId(getId()).filtered<QnSecurityCamResource>();
-    if (!resList.isEmpty())
-        m_firstCamera = resList.first();
-
-    connect(qnResPool, &QnResourcePool::resourceAdded,
-        this, &QnMediaServerResource::onNewResource, Qt::DirectConnection);
-
-    connect(qnResPool, &QnResourcePool::resourceRemoved,
-        this, &QnMediaServerResource::onRemoveResource, Qt::DirectConnection);
-
     connect(this, &QnResource::resourceChanged,
         this, &QnMediaServerResource::atResourceChanged, Qt::DirectConnection);
 
     connect(this, &QnResource::propertyChanged,
         this, &QnMediaServerResource::at_propertyChanged, Qt::DirectConnection);
-
-    connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
-        this, &QnMediaServerResource::at_cloudSettingsChanged, Qt::DirectConnection);
 }
 
 QnMediaServerResource::~QnMediaServerResource()
@@ -140,7 +128,7 @@ QString QnMediaServerResource::getName() const
     }
 
     {
-        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+        QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId() );
         if( !(*lk)->name.isEmpty() )
             return (*lk)->name;
     }
@@ -166,7 +154,7 @@ void QnMediaServerResource::setName( const QString& name )
         return;
 
     {
-        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+        QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId() );
         if ((*lk)->name == name)
             return;
         (*lk)->name = name;
@@ -277,8 +265,11 @@ QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
     {
         QnMediaServerResourcePtr thisPtr = toSharedPointer(this).dynamicCast<QnMediaServerResource>();
         m_apiConnection = QnMediaServerConnectionPtr(
-            new QnMediaServerConnection(thisPtr, QnAppServerConnectionFactory::videowallGuid()),
-            &qnDeleteLater);
+            new QnMediaServerConnection(
+                commonModule(),
+                thisPtr,
+                commonModule()->videowallGuid()),
+                &qnDeleteLater);
     }
 
     return m_apiConnection;
@@ -289,7 +280,9 @@ rest::QnConnectionPtr QnMediaServerResource::restConnection()
     QnMutexLocker lock( &m_mutex );
 
     if (!m_restConnection)
-        m_restConnection = rest::QnConnectionPtr(new rest::ServerConnection(getId()));
+        m_restConnection = rest::QnConnectionPtr(new rest::ServerConnection(
+            resourcePool()->commonModule(),
+            getId()));
 
     return m_restConnection;
 }
@@ -312,17 +305,21 @@ void QnMediaServerResource::setUrl(const QString& url)
 
 QUrl QnMediaServerResource::getApiUrl() const
 {
-    return getPrimaryAddress().toUrl(apiUrlScheme(isSslAllowed()));
+    return nx::network::url::Builder()
+        .setScheme(apiUrlScheme(isSslAllowed()))
+        .setEndpoint(getPrimaryAddress()).toUrl();
 }
 
 QString QnMediaServerResource::getUrl() const
 {
-    return getPrimaryAddress().toUrl(kUrlScheme).toString();
+    return nx::network::url::Builder()
+        .setScheme(kUrlScheme)
+        .setEndpoint(getPrimaryAddress()).toUrl().toString();
 }
 
 QnStorageResourceList QnMediaServerResource::getStorages() const
 {
-    return qnResPool->getResourcesByParentId(getId()).filtered<QnStorageResource>();
+    return commonModule()->resourcePool()->getResourcesByParentId(getId()).filtered<QnStorageResource>();
 }
 
 void QnMediaServerResource::setPrimaryAddress(const SocketAddress& primaryAddress)
@@ -334,7 +331,7 @@ void QnMediaServerResource::setPrimaryAddress(const SocketAddress& primaryAddres
 
         m_primaryAddress = primaryAddress;
         if (m_apiConnection)
-            m_apiConnection->setUrl(m_primaryAddress.toUrl(apiUrlScheme(m_sslAllowed)));
+            m_apiConnection->setUrl(buildApiUrl());
     }
 
     emit primaryAddressChanged(toSharedPointer(this));
@@ -355,13 +352,7 @@ void QnMediaServerResource::setSslAllowed(bool sslAllowed)
 
         m_sslAllowed = sslAllowed;
         if (m_apiConnection)
-        {
-            auto url = m_primaryAddress.isNull()
-                ? m_apiConnection->url()
-                : m_primaryAddress.toUrl(apiUrlScheme(m_sslAllowed));
-            url.setScheme(apiUrlScheme(m_sslAllowed));
-            m_apiConnection->setUrl(url);
-        }
+            m_apiConnection->setUrl(buildApiUrl());
     }
 
     emit primaryAddressChanged(toSharedPointer(this));
@@ -469,24 +460,25 @@ QnSoftwareVersion QnMediaServerResource::getVersion() const
 
 void QnMediaServerResource::setMaxCameras(int value)
 {
-    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId() );
     (*lk)->maxCameras = value;
 }
 
 int QnMediaServerResource::getMaxCameras() const
 {
-    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId() );
     return (*lk)->maxCameras;
 }
 
-QnServerBackupSchedule QnMediaServerResource::getBackupSchedule() const {
-    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+QnServerBackupSchedule QnMediaServerResource::getBackupSchedule() const
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId() );
     return (*lk)->backupSchedule;
 }
 
 void QnMediaServerResource::setBackupSchedule(const QnServerBackupSchedule &value) {
     {
-        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+        QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId() );
         if ((*lk)->backupSchedule == value)
             return;
         (*lk)->backupSchedule = value;
@@ -497,7 +489,7 @@ void QnMediaServerResource::setBackupSchedule(const QnServerBackupSchedule &valu
 void QnMediaServerResource::setRedundancy(bool value)
 {
     {
-        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+        QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId() );
         if ((*lk)->isRedundancyEnabled == value)
             return;
         (*lk)->isRedundancyEnabled = value;
@@ -507,7 +499,7 @@ void QnMediaServerResource::setRedundancy(bool value)
 
 bool QnMediaServerResource::isRedundancy() const
 {
-    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId() );
     return (*lk)->isRedundancyEnabled;
 }
 
@@ -535,8 +527,8 @@ void QnMediaServerResource::setSystemInfo(const QnSystemInformation &systemInfo)
 }
 QnModuleInformation QnMediaServerResource::getModuleInformation() const
 {
-    if (getId() == qnCommon->moduleGUID())
-        return qnCommon->moduleInformation();
+    if (getId() == resourcePool()->commonModule()->moduleGUID())
+        return resourcePool()->commonModule()->moduleInformation();
 
     // build module information for other server
 
@@ -555,14 +547,15 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const
             getProperty(safeModePropertyName), moduleInformation.ecDbReadOnly);
     }
 
-    moduleInformation.localSystemId = qnGlobalSettings->localSystemId();
-    moduleInformation.systemName = qnGlobalSettings->systemName();
+    const auto& settings = resourcePool()->commonModule()->globalSettings();
+    moduleInformation.localSystemId = settings->localSystemId();
+    moduleInformation.systemName = settings->systemName();
     moduleInformation.id = getId();
     moduleInformation.port = getPort();
     moduleInformation.version = getVersion();
     moduleInformation.systemInformation = getSystemInfo();
     moduleInformation.serverFlags = getServerFlags();
-    moduleInformation.cloudSystemId = qnGlobalSettings->cloudSystemId();
+    moduleInformation.cloudSystemId = settings->cloudSystemId();
 
     return moduleInformation;
 }
@@ -589,7 +582,7 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusCh
         }
 
         QnResource::setStatus(newStatus, reason);
-        QnResourceList childList = qnResPool->getResourcesByParentId(getId());
+        QnResourceList childList = resourcePool()->getResourcesByParentId(getId());
         for(const QnResourcePtr& res: childList)
         {
             if (res->hasFlags(Qn::depend_on_parent_status))
@@ -623,5 +616,52 @@ void QnMediaServerResource::setAuthKey(const QString& authKey)
 
 QString QnMediaServerResource::realm() const
 {
-    return QnAppInfo::realm();
+    return nx::network::AppInfo::realm();
+}
+
+void QnMediaServerResource::setResourcePool(QnResourcePool *resourcePool)
+{
+    if (auto oldPool = this->resourcePool())
+    {
+        oldPool->disconnect(this);
+        oldPool->commonModule()->globalSettings()->disconnect(this);
+        m_firstCamera.clear();
+    }
+
+    base_type::setResourcePool(resourcePool);
+
+    if (auto pool = this->resourcePool())
+    {
+        connect(pool, &QnResourcePool::resourceAdded,
+            this, &QnMediaServerResource::onNewResource, Qt::DirectConnection);
+
+        connect(pool, &QnResourcePool::resourceRemoved,
+            this, &QnMediaServerResource::onRemoveResource, Qt::DirectConnection);
+
+        QnResourceList resList = pool->getResourcesByParentId(getId()).filtered<QnSecurityCamResource>();
+        if (!resList.isEmpty())
+            m_firstCamera = resList.first();
+
+        const auto& settings = pool->commonModule()->globalSettings();
+        connect(settings, &QnGlobalSettings::cloudSettingsChanged,
+            this, &QnMediaServerResource::at_cloudSettingsChanged, Qt::DirectConnection);
+    }
+}
+
+QUrl QnMediaServerResource::buildApiUrl() const
+{
+    QUrl url;
+    if (m_primaryAddress.isNull())
+    {
+        url = m_apiConnection->url();
+        url.setScheme(apiUrlScheme(m_sslAllowed));
+    }
+    else
+    {
+        url = nx::network::url::Builder()
+            .setScheme(apiUrlScheme(m_sslAllowed))
+            .setEndpoint(m_primaryAddress).toUrl();
+    }
+
+    return url;
 }

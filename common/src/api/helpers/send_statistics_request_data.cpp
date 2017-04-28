@@ -8,9 +8,10 @@ namespace
     const auto kStatServerUrlTag = lit("statUrl");
 }
 
-void QnSendStatisticsRequestData::loadFromParams(const QnRequestParamList& params)
+void QnSendStatisticsRequestData::loadFromParams(QnResourcePool* resourcePool,
+    const QnRequestParamList& params)
 {
-    QnMultiserverRequestData::loadFromParams(params);
+    QnMultiserverRequestData::loadFromParams(resourcePool, params);
 
     if (params.contains(kStatServerUrlTag) )
         statisticsServerUrl = params.value(kStatServerUrlTag);

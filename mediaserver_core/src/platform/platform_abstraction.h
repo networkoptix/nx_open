@@ -6,17 +6,21 @@
 #include <platform/core_platform_abstraction.h>
 #include "monitoring/global_monitor.h"
 
-class QnPlatformAbstraction: public QnCorePlatformAbstraction {
+class QnPlatformAbstraction: public QnCorePlatformAbstraction
+{
     Q_OBJECT
     typedef QnCorePlatformAbstraction base_type;
 
 public:
-    QnPlatformAbstraction(int statsUpdatePeriodMs, QObject *parent = nullptr);
+    QnPlatformAbstraction(QObject *parent = nullptr);
     virtual ~QnPlatformAbstraction();
 
-    QnGlobalMonitor *monitor() const {
+    QnGlobalMonitor *monitor() const
+    {
         return m_monitor;
     }
+
+    void setUpdatePeriodMs(int value);
 
 private:
     QnGlobalMonitor *m_monitor;

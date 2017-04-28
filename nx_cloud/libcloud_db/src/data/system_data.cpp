@@ -31,7 +31,8 @@ bool SystemRegistrationData::getAsVariant( int /*resID*/, QVariant* const /*valu
 // class SystemData
 
 SystemData::SystemData():
-    expirationTimeUtc(0)
+    expirationTimeUtc(0),
+    activationInDbNeeded(false)
 {
 }
 

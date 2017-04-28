@@ -5,7 +5,7 @@
 #include <deque>
 
 #include <QByteArray>
-#include <QElapsedTimer>
+#include <QtCore/QElapsedTimer>
 #include <QSet>
 
 #include <transaction/transaction.h>
@@ -31,6 +31,7 @@
 #include <utils/common/id.h>
 
 #include "connection_guard.h"
+#include <common/common_module_aware.h>
 
 
 namespace ec2
@@ -103,6 +104,7 @@ public:
 
     /** Initializer for incoming connection. */
     QnTransactionTransportBase(
+        const QnUuid& localSystemId,
         const QnUuid& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
         const ApiPeerData& localPeer,
@@ -114,6 +116,7 @@ public:
         int keepAliveProbeCount);
     //!Initializer for outgoing connection
     QnTransactionTransportBase(
+        const QnUuid& localSystemId,
         ConnectionGuardSharedState* const connectionGuardSharedState,
         const ApiPeerData& localPeer,
         std::chrono::milliseconds tcpKeepAliveTimeout,
@@ -225,7 +228,7 @@ protected:
     {
         QnTransactionTransportHeader header(_header);
         NX_ASSERT(header.processedPeers.contains(m_localPeer.id));
-        header.fillSequence();
+        header.fillSequence(m_localPeer.id, m_localPeer.instanceId);
 #ifdef _DEBUG
 
         for (const QnUuid& peer : header.dstPeers)
@@ -290,6 +293,7 @@ private:
         none,
     };
 
+    QnUuid m_localSystemId;
     const ApiPeerData m_localPeer;
     ApiPeerData m_remotePeer;
 
@@ -327,8 +331,8 @@ private:
     ConnectionType::Type m_connectionType;
     const PeerRole m_peerRole;
     QByteArray m_contentEncoding;
-    std::shared_ptr<AbstractByteStreamFilter> m_incomingTransactionStreamParser;
-    std::shared_ptr<AbstractByteStreamFilter> m_sizedDecoder;
+    std::shared_ptr<nx::utils::bsf::AbstractByteStreamFilter> m_incomingTransactionStreamParser;
+    std::shared_ptr<nx::utils::bsf::AbstractByteStreamFilter> m_sizedDecoder;
     bool m_compressResponseMsgBody;
     QnUuid m_connectionGuid;
     ConnectionGuardSharedState* const m_connectionGuardSharedState;
@@ -357,6 +361,7 @@ private:
 
 private:
     QnTransactionTransportBase(
+        const QnUuid& localSystemId,
         ConnectionGuardSharedState* const connectionGuardSharedState,
         const ApiPeerData& localPeer,
         PeerRole peerRole,

@@ -8,7 +8,7 @@
 #include <atomic>
 #include <memory>
 
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/stoppable.h>
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/utils/thread/mutex.h>

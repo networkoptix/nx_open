@@ -15,8 +15,8 @@
 #include <nx/utils/thread/wait_condition.h>
 
 #include "utils/common/request_param.h"
-#include <utils/common/safe_direct_connection.h>
-
+#include <nx/utils/safe_direct_connection.h>
+#include <common/common_module_aware.h>
 
 struct AsyncRequestInfo
 {
@@ -39,15 +39,17 @@ struct AsyncRequestInfo
 Q_DECLARE_METATYPE(AsyncRequestInfo);
 
 // TODO: #Elric separate into two objects, one object per thread.
-class QnSessionManager: public QObject, public Qn::EnableSafeDirectConnection
+class QnSessionManager:
+    public QObject,
+    public QnCommonModuleAware,
+    public Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
 
 public:
-    QnSessionManager(QObject *parent = NULL);
+    QnSessionManager(QObject* parent);
     virtual ~QnSessionManager();
 
-    static QnSessionManager *instance();
     static QByteArray formatNetworkError(int error);
 
     void stop();

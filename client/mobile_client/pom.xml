@@ -37,8 +37,8 @@
 
         <project.version.code>${buildNumber}</project.version.code>
         <project.version.name>${release.version}</project.version.name>
-        <provisioning_profile>${static.customization.dir}/mobile_client/ios/provisioning_profiles/testing.mobileprovision</provisioning_profile>
-        <mobile_client_entitlements>mobile_client-beta.entitlements</mobile_client_entitlements>
+        <provisioning_profile>${static.customization.dir}/mobile_client/ios/provisioning_profiles/production.mobileprovision</provisioning_profile>
+        <mobile_client_entitlements>mobile_client-release.entitlements</mobile_client_entitlements>
         <provisioning_profile_id/>
     </properties>
 
@@ -46,11 +46,11 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>libclient_core</artifactId>
+            <artifactId>nx_client_core</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/client/libclient_core/pom.xml</systemPath>
+            <systemPath>${root.dir}/client/nx_client_core/pom.xml</systemPath>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -123,20 +123,6 @@
     </build>
 
     <profiles>
-        <profile>
-            <id>nobeta</id>
-            <activation>
-                <property>
-                    <name>beta</name>
-                    <value>false</value>
-                </property>
-            </activation>
-            <properties>
-                <provisioning_profile>${static.customization.dir}/mobile_client/ios/provisioning_profiles/production.mobileprovision</provisioning_profile>
-                <mobile_client_entitlements>mobile_client-release.entitlements</mobile_client_entitlements>
-            </properties>
-        </profile>
-
         <profile>
             <id>mobile-android</id>
             <activation>

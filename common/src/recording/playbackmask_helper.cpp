@@ -7,6 +7,7 @@ extern "C"
 
 #include <utils/common/util.h>
 
+#include <nx/utils/datetime.h>
 
 QnPlaybackMaskHelper::QnPlaybackMaskHelper()
 {
@@ -21,7 +22,7 @@ qint64 QnPlaybackMaskHelper::findTimeAtPlaybackMask(qint64 timeUsec, bool isForw
     QnTimePeriodList::const_iterator itr = m_playbackMask.findNearestPeriod(timeMs, isForwardDirection);
     if (itr == m_playbackMask.cend())
         return isForwardDirection ? DATETIME_NOW : 0;
-    
+
     m_curPlaybackPeriod = *itr;
     if (!m_curPlaybackPeriod.contains(timeMs)) {
         if (isForwardDirection)
@@ -46,7 +47,7 @@ QnTimePeriod QnPlaybackMaskHelper::getPlaybackRange() const
 void QnPlaybackMaskHelper::setPlaybackRange(const QnTimePeriod& playbackRange)
 {
     m_playbackRange = playbackRange;
-    
+
     if (m_playbackRange.isEmpty())
         m_playbackMask = m_playBackMaskOrig;
     else if (m_playbackMask.empty())

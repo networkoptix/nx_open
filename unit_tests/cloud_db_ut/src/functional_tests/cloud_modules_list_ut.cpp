@@ -142,7 +142,7 @@ protected:
             m_expectedHost, endpoint());
 
         FetcherType fetcher(std::make_unique<network::cloud::RandomEndpointSelector>());
-        auto fetcherGuard = makeScopedGuard([&fetcher]() { fetcher.pleaseStopSync(); });
+        auto fetcherGuard = makeScopeGuard([&fetcher]() { fetcher.pleaseStopSync(); });
 
         fetcher.setModulesXmlUrl(QUrl(lm("http://%1:%2%3")
             .arg(m_expectedHost).arg(endpoint().port).arg(kCloudModuleXmlPath)));

@@ -176,7 +176,7 @@ bool AccessRestrictions::parse(const std::string& str)
     return true;
 }
 
-bool AccessRestrictions::authorize(const stree::AbstractResourceReader& requestAttributes) const
+bool AccessRestrictions::authorize(const nx::utils::stree::AbstractResourceReader& requestAttributes) const
 {
     std::string requestPath;
     if (!requestAttributes.get(attr::requestPath, &requestPath))

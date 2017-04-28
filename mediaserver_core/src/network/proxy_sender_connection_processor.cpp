@@ -97,14 +97,14 @@ int QnProxySenderConnection::sendRequest(const QByteArray& data)
     return totalSend;
 }
 
-static QByteArray makeProxyRequest(const QnUuid& serverUuid, const QUrl& url)
+QByteArray QnProxySenderConnection::makeProxyRequest(const QnUuid& serverUuid, const QUrl& url) const
 {
     const QByteArray H_REALM("NX");
     const QByteArray H_METHOD("CONNECT");
     const QByteArray H_PATH("/proxy-reverse");
     const QByteArray H_AUTH("auth-int");
 
-    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(serverUuid);
+    QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(serverUuid);
     if (!server)
         return QByteArray();
 
@@ -113,7 +113,7 @@ static QByteArray makeProxyRequest(const QnUuid& serverUuid, const QUrl& url)
     nx_http::header::WWWAuthenticate authHeader;
     authHeader.authScheme = nx_http::header::AuthScheme::digest;
     authHeader.params["nonce"] = QString::number(time, 16).toLatin1();
-    authHeader.params["realm"] = QnAppInfo::realm().toLatin1();
+    authHeader.params["realm"] = nx::network::AppInfo::realm().toLatin1();
 
     nx_http::header::DigestAuthorization digestHeader;
     if (!nx_http::calcDigestResponse(

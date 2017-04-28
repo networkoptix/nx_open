@@ -10,12 +10,16 @@
 #include <utils/common/system_information.h>
 #include <utils/common/software_version.h>
 #include <nx/utils/singleton.h>
+#include <common/common_module_aware.h>
 
 class QFile;
 class QIODevice;
 class QnZipExtractor;
 
-class QnServerUpdateTool : public QObject, public Singleton<QnServerUpdateTool>
+class QnServerUpdateTool:
+    public QObject,
+    public QnCommonModuleAware,
+    public Singleton<QnServerUpdateTool>
 {
     Q_OBJECT
 
@@ -35,7 +39,7 @@ public:
         Delayed
     };
 
-    QnServerUpdateTool();
+    QnServerUpdateTool(QnCommonModule* commonModule);
     ~QnServerUpdateTool();
 
     bool addUpdateFile(const QString &updateId, const QByteArray &data);
@@ -50,7 +54,7 @@ private:
     ReplyCode processUpdate(const QString &updateId, QIODevice *ioDevice, bool sync);
     void sendReply(int code);
     void clearUpdatesLocation(const QString &idToLeave = QString());
-
+    bool initializeUpdateLog(const QString& targetVersion, QString* logFileName) const;
 private slots:
     void at_zipExtractor_extractionFinished(int error);
 

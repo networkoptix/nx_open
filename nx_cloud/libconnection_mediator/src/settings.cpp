@@ -13,8 +13,8 @@
 
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/cloud/data/connection_parameters.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/timer_manager.h>
-#include <nx/utils/url_builder.h>
 
 #include <utils/common/app_info.h>
 
@@ -141,9 +141,32 @@ Settings::Settings():
     initializeWithDefaultValues();
 }
 
-bool Settings::showHelp() const
+void Settings::load(int argc, const char **argv)
+{
+    m_commandLineParser.parse(argc, argv, stderr);
+    m_settings.parseArgs(argc, argv);
+
+    loadConfiguration();
+}
+
+bool Settings::isShowHelpRequested() const
 {
     return m_showHelp;
+}
+
+void Settings::printCmdLineArgsHelp()
+{
+    //TODO #ak
+}
+
+QString Settings::dataDir() const
+{
+    return m_general.dataDir;
+}
+
+nx::utils::log::Settings Settings::logging() const
+{
+    return m_logging;
 }
 
 const General& Settings::general() const
@@ -171,11 +194,6 @@ const ConnectionParameters& Settings::connectionParameters() const
     return m_connectionParameters;
 }
 
-const nx::utils::log::Settings& Settings::logging() const
-{
-    return m_logging;
-}
-
 const nx::db::ConnectionOptions& Settings::dbConnectionOptions() const
 {
     return m_dbConnectionOptions;
@@ -184,19 +202,6 @@ const nx::db::ConnectionOptions& Settings::dbConnectionOptions() const
 const Statistics& Settings::statistics() const
 {
     return m_statistics;
-}
-
-void Settings::load(int argc, const char **argv)
-{
-    m_commandLineParser.parse(argc, argv, stderr);
-    m_settings.parseArgs(argc, argv);
-
-    loadConfiguration();
-}
-
-void Settings::printCmdLineArgsHelp()
-{
-    //TODO #ak
 }
 
 void Settings::fillSupportedCmdParameters()
@@ -245,7 +250,7 @@ void Settings::loadConfiguration()
             if (m_cloudDB.url->host().isEmpty() || m_cloudDB.url->scheme().isEmpty())
             {
                 const SocketAddress endpoint(endpointString);
-                *m_cloudDB.url = nx::utils::UrlBuilder()
+                *m_cloudDB.url = nx::network::url::Builder()
                     .setScheme("http").setHost(endpoint.address.toString())
                     .setPort(endpoint.port).toUrl();
             }

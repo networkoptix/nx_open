@@ -54,6 +54,12 @@ QnLogMessage QnLogMessage::arg(const QUrl& a, int fieldWidth, wchar_t fillChar) 
     return m_str.arg(toString(a), fieldWidth, fillChar);
 }
 
+QnLogMessage QnLogMessage::arg(const QSize& size, int fieldWidth, wchar_t fillChar) const
+{
+    return m_str.arg(QString::fromLatin1("(%1, %2)").arg(size.width()).arg(size.height()),
+        fieldWidth, fillChar);
+}
+
 QnLogMessage QnLogMessage::arg(std::chrono::seconds a, int fieldWidth, wchar_t fillChar) const
 {
     return m_str.arg(QString::fromLatin1("%1s").arg(a.count()), fieldWidth, fillChar);

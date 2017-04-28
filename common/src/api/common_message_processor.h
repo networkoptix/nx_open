@@ -1,5 +1,4 @@
-#ifndef COMMON_MESSAGE_PROCESSOR_H
-#define COMMON_MESSAGE_PROCESSOR_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -15,19 +14,22 @@
 
 #include <nx/utils/singleton.h>
 #include <utils/common/connective.h>
+#include <common/common_module_aware.h>
 
 class QnResourceFactory;
 
-class QnCommonMessageProcessor: public Connective<QObject>, public Singleton<QnCommonMessageProcessor>
+class QnCommonMessageProcessor: public Connective<QObject>, public QnCommonModuleAware
 {
     Q_OBJECT
 
     typedef Connective<QObject> base_type;
 public:
-    explicit QnCommonMessageProcessor(QObject *parent = 0);
+    explicit QnCommonMessageProcessor(QObject* parent = nullptr);
     virtual ~QnCommonMessageProcessor() {}
 
     virtual void init(const ec2::AbstractECConnectionPtr& connection);
+
+    ec2::AbstractECConnectionPtr connection() const;
 
     /**
      * @param resource resource to update
@@ -121,6 +123,7 @@ private slots:
     void on_resourceParamChanged(const ec2::ApiResourceParamWithRefData& param );
     void on_resourceParamRemoved(const ec2::ApiResourceParamWithRefData& param );
     void on_resourceRemoved(const QnUuid& resourceId );
+    void on_resourceStatusRemoved(const QnUuid& resourceId);
 
     void on_accessRightsChanged(const ec2::ApiAccessRightsData& accessRights);
     void on_userRoleChanged(const ec2::ApiUserRoleData& userRole);
@@ -145,4 +148,4 @@ protected:
     QMap<QnUuid, QnBusinessEventRulePtr> m_rules;
 };
 
-#endif // COMMON_MESSAGE_PROCESSOR_H
+#define qnCommonMessageProcessor commonModule()->messageProcessor()

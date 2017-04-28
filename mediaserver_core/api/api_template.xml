@@ -138,7 +138,7 @@
                         <param>
                             <name>name</name>
                             <description>Caption of the bookmark.</description>
-                            <optional>true</optional>
+                            <optional>false</optional>
                         </param>
                         <param>
                             <name>description</name>
@@ -158,7 +158,7 @@
                         <param>
                             <name>duration</name>
                             <description>Length of the bookmark (in milliseconds).</description>
-                            <optional>true</optional>
+                            <optional>false</optional>
                         </param>
                         <param>
                             <name>tag</name>
@@ -292,7 +292,7 @@
                         <param>
                             <name>name</name>
                             <description>Caption of the bookmark.</description>
-                            <optional>true</optional>
+                            <optional>false</optional>
                         </param>
                         <param>
                             <name>description</name>
@@ -312,7 +312,7 @@
                         <param>
                             <name>duration</name>
                             <description>Length of the bookmark (in milliseconds).</description>
-                            <optional>true</optional>
+                            <optional>false</optional>
                         </param>
                         <param>
                             <name>tag</name>
@@ -381,7 +381,7 @@
                         </param>
                     </params>
                     <result>
-                        <caption>Return the amount of free space available for update files in bytes
+                        <caption>The amount of free space available for update files in bytes
                             for each online server in the system, in the specified format.</caption>
                     </result>
                 </function>
@@ -485,7 +485,7 @@
                         </param>
                     </params>
                     <result>
-                        <caption>Return JSON object with error code, error message and the list of JSON objects in "reply" field:
+                        <caption>JSON object with an error code, error message and the list of JSON objects in "reply" field:
                           if no "flat" parameter is specified,
                           "reply" field is the list which contains for each server its GUID (as "guid"
                           field) and the list of chunks (as "periods" field); if "flat" parameter
@@ -509,7 +509,7 @@
                     <method>GET</method>
                     <params/>
                     <result>
-                        <caption>Returns hardware information in JSON form</caption>
+                        <caption>JSON with hardware information.</caption>
                     </result>
                 </function>
                 <function proprietary="true">
@@ -520,12 +520,12 @@
                     <method>POST</method>
                     <params/>
                     <result>
-                        <caption>Return XML with "OK" message or error code</caption>
+                        <caption>XML with the "OK" message or an error code.</caption>
                     </result>
                 </function>
                 <function proprietary="true">
                     <name>events</name>
-                    <description>Returns event log in proprietary binary format</description>
+                    <description>Return event log in the proprietary binary format.</description>
                     <method>GET</method>
                     <params>
                         <param>
@@ -555,7 +555,7 @@
                         </param>
                     </params>
                     <result>
-                        <caption>Return server event log in proprietary binary format</caption>
+                        <caption>Server event log in the proprietary binary format.</caption>
                     </result>
                 </function>
                 <function proprietary="true">
@@ -571,7 +571,7 @@
                         </param>
                     </params>
                     <result>
-                        <caption>Returns json result with error code and error string</caption>
+                        <caption>JSON result with an error code and an error string.</caption>
                     </result>
                 </function>
               <function>
@@ -685,7 +685,7 @@
                         </param>
                     </params>
                     <result>
-                        <caption>Return JSON object with error code, error message and diagnostics result.</caption>
+                        <caption>JSON object with an error code, error message and diagnostics result.</caption>
                     </result>
                 </function>
                 <function>
@@ -710,8 +710,8 @@
                         </param>
                     </params>
                     <result>
-                        <caption>Returns OK if all parameters have been set, otherwise returns error 500
-                        (Internal server error) and result of setting for every parameter.</caption>
+                        <caption>"OK" if all parameters have been set, otherwise return error 500
+                        (Internal server error) and the result of setting for every parameter.</caption>
                     </result>
                 </function>
                 <function>
@@ -735,13 +735,17 @@
                         </param>
                     </params>
                     <result>
-                        <caption>Returns required parameter values in form of paramName=paramValue, each
-                        parameter on new line</caption>
+                        <caption>Required parameter values in form of paramName=paramValue, each
+                        parameter on a new line.</caption>
                     </result>
                 </function>
                 <function>
                     <name>image</name>
-                    <description>Return image from camera</description>
+                    <description>
+                        <b>Deprecated, support expires by 3.1.</b> Use /api/cameraThumbnail instead.
+                        The new method can get thumbnails from cameras located on other servers (the old one can't).
+                        <br />
+                        Return image from the camera.</description>
                     <method>GET</method>
                     <params>
                         <param>
@@ -809,12 +813,12 @@
                             <values>
                                 <value>
                                     <name>before</name>
-                                    <description>Returns nearest I-frame before specified
+                                    <description>Return nearest I-frame before the specified
                                         time.</description>
                                 </value>
                                 <value>
                                     <name>after</name>
-                                    <description>Returns nearest I-frame after specified
+                                    <description>Return nearest I-frame after the specified
                                         time.</description>
                                 </value>
                                 <value>
@@ -838,12 +842,12 @@
                         </param>
                     </params>
                     <result>
-                        <caption>Returns image.</caption>
+                        <caption>The image.</caption>
                     </result>
                 </function>
                 <function>
                     <name>showLog</name>
-                    <description>Returns tail of the server log file</description>
+                    <description>Return tail of the server log file</description>
                     <method>GET</method>
                     <params>
                         <param>
@@ -877,7 +881,7 @@
                 </function>
                 <function>
                     <name>getEvents</name>
-                    <description>Returns event log information.</description>
+                    <description>Get server event log information.</description>
                     <permissions>At least Advanced Viewer.</permissions>
                     <method>GET</method>
                     <params>
@@ -920,12 +924,349 @@
                         </param>
                     </params>
                     <result>
-                        <caption>Tail of the server log file in text format</caption>
+                        <caption>JSON with an error code, error message and a list of JSON objects in "reply" field:</caption>
+                        <params>
+                            <param>TO
+                                <name>actionType</name>
+                                <description>Type of the action.</description>
+                                <values>
+                                    <value>
+                                        <name>UndefinedAction</name>
+                                        <description></description>
+                                    </value>
+                                    <value>
+                                        <name>CameraOutputAction</name>
+                                        <description>Change camera output state.</description>
+                                    </value>
+                                    <value>
+                                        <name>BookmarkAction</name>
+                                        <description></description>
+                                    </value>
+                                    <value>
+                                        <name>CameraRecordingAction</name>
+                                        <description>Start camera recording.</description>
+                                    </value>
+                                    <value>
+                                        <name>PanicRecordingAction</name>
+                                        <description>Activate panic recording mode.</description>
+                                    </value>
+                                    <value>
+                                        <name>SendMailAction</name>
+                                        <description>Send an email.</description>
+                                    </value>
+                                    <value>
+                                        <name>DiagnosticsAction</name>
+                                        <description>Write a record to the server's log.</description>
+                                    </value>
+                                    <value>
+                                        <name>ShowPopupAction</name>
+                                        <description></description>
+                                    </value>
+                                    <value>
+                                        <name>PlaySoundAction</name>
+                                        <description></description>
+                                    </value>
+                                    <value>
+                                        <name>PlaySoundOnceAction</name>
+                                        <description></description>
+                                    </value>
+                                    <value>
+                                        <name>SayTextAction</name>
+                                        <description></description>
+                                    </value>
+                                    <value>
+                                        <name>ExecutePtzPresetAction</name>
+                                        <description>Execute given PTZ preset.</description>
+                                    </value>
+                                    <value>
+                                        <name>ShowTextOverlayAction</name>
+                                        <description>Show text overlay over the given camera(s).</description>
+                                    </value>
+                                    <value>
+                                        <name>ShowOnAlarmLayoutAction</name>
+                                        <description>Put the given camera(s) to the Alarm Layout.</description>
+                                    </value>
+                                    <value>
+                                        <name>ExecHttpRequestAction</name>
+                                        <description>Send HTTP request as an action.</description>
+                                    </value>
+                                </values>
+                            </param>
+                            <param>
+                                <name>actionParams</name>
+                                <description>JSON object with action parameters.
+                                    Only fields that are applicable to the particular action are used.</description>
+                            </param>
+                            <param>
+                                <name>actionParams.actionResourceId</name>
+                                <description>Additional parameter for event log convenience.</description>
+                            </param>
+                            <param>
+                                <name>actionParams.url</name>
+                                <description>Play Sound / exec HTTP action.</description>
+                            </param>
+                            <param>
+                                <name>actionParams.emailAddress</name>
+                                <description>Email.</description>
+                            </param>
+                            <param>
+                                <name>actionParams.userGroup</name>
+                                <description>Popups and System Health.</description>
+                                <values>
+                                    <value><name>EveryOne></name></value>
+                                    <value><name>AdminOnly</name></value>
+                                </values>
+                            </param>
+                            <param>
+                                <name>actionParams.fps</name>
+                                <description>Frames per second for recording.</description>
+                            </param>
+                            <param>
+                                <name>actionParams.streamQuality</name>
+                                <description>Stream quality for recording.</description>
+                                <values>
+                                    <value><name>QualityLowest</name></value>
+                                    <value><name>QualityLow</name></value>
+                                    <value><name>QualityNormal</name></value>
+                                    <value><name>QualityHigh</name></value>
+                                    <value><name>QualityHighest</name></value>
+                                    <value><name>QualityPreSet</name></value>
+                                    <value><name>QualityNotDefined</name></value>
+                                </values>
+                            </param>
+                            <param>
+                                <name>actionParams.recordingDuration</name>
+                                <description>Duration of the recording, in seconds.</description>
+                            </param>
+                            <param>
+                                <name>actionParams.recordAfter</name>
+                                <description>For bookmarks, extension to the recording time, in seconds.</description>
+                            </param>
+                            <param>
+                                <name>actionParams.relayOutputId</name>
+                                <description>Camera Output.</description>
+                            </param>
+                            <param>
+                                <name>actionParams.sayText</name>
+                                <description></description>
+                            </param>
+                            <param>
+                                <name>actionParams.tags</name>
+                                <description>Bookmark.</description>
+                            </param>
+                            <param>
+                                <name>actionParams.text</name>
+                                <description>Generic text: Show Text Overlay / exec HTTP action: message body.</description>
+                            </param>
+                            <param>
+                                <name>actionParams.durationMs</name>
+                                <description>Generic duration in milliseconds: Bookmark, Show Text Overlay.</description>
+                            </param>
+                            <param>
+                                <name>actionParams.additionalResources</name>
+                                <description>JSON list of ids of Generic additional resources: Show On Alarm Layout - users.</description>
+                            </param>
+                            <param>
+                                <name>actionParams.forced</name>
+                                <description>Alarm Layout - if it must be opened immediately.</description>
+                                <values>
+                                    <value><name>true</name></value>
+                                    <value><name>false</name></value>
+                                </values>
+                            </param>
+                            <param>
+                                <name>actionParams.presetId</name>
+                                <description>Execute PTZ preset action.</description>
+                            </param>
+                            <param>
+                                <name>actionParams.useSource</name>
+                                <description>Alarm Layout - if the source resource should also be used.</description>
+                            </param>
+                            <param>
+                                <name>actionParams.recordBeforeMs</name>
+                                <description>Bookmark start time is adjusted to the left by this value in milliseconds.</description>
+                            </param>
+                            <param>
+                                <name>actionParams.playToClient</name>
+                                <description>Say text.</description>
+                            </param>
+                            <param>
+                                <name>actionParams.contentType</name>
+                                <description>HTTP action.</description>
+                            </param>
+                            <param>
+                                <name>eventParams</name>
+                                <description>JSON object with event parameters.</description>
+                            </param>
+                            <param>
+                                <name>eventParams.eventType</name>
+                                <description>Type of the event.</description>
+                                <values>
+                                    <value>
+                                        <name>UndefinedEvent</name>
+                                        <description>Event type is not defined. Used in rules.</description>
+                                    </value>
+                                    <value>
+                                        <name>CameraMotionEvent</name>
+                                        <description>Motion has occurred on a camera.</description>
+                                    </value>
+                                    <value>
+                                        <name>CameraInputEvent</name>
+                                        <description>Camera input signal is received.</description>
+                                    </value>
+                                    <value>
+                                        <name>CameraDisconnectEvent</name>
+                                        <description>Camera was disconnected.</description>
+                                    </value>
+                                    <value>
+                                        <name>StorageFailureEvent</name>
+                                        <description>Storage read error has occurred.</description>
+                                    </value>
+                                    <value>
+                                        <name>NetworkIssueEvent</name>
+                                        <description>Network issue: packet lost, RTP timeout, etc.</description>
+                                    </value>
+                                    <value>
+                                        <name>CameraIpConflictEvent</name>
+                                        <description>Found some cameras with same IP address.</description>
+                                    </value>
+                                    <value>
+                                        <name>ServerFailureEvent</name>
+                                        <description>Connection to server lost.</description>
+                                    </value>
+                                    <value>
+                                        <name>ServerConflictEvent</name>
+                                        <description>Two or more servers are running.</description>
+                                    </value>
+                                    <value>
+                                        <name>ServerStartEvent</name>
+                                        <description>Server started.</description>
+                                    </value>
+                                    <value>
+                                        <name>LicenseIssueEvent</name>
+                                        <description>Not enough licenses.</description>
+                                    </value>
+                                    <value>
+                                        <name>BackupFinishedEvent</name>
+                                        <description>Archive backup done.</description>
+                                    </value>
+                                    <value>
+                                        <name>SystemHealthEvent</name>
+                                        <description>System health message.</description>
+                                    </value>
+                                    <value>
+                                        <name>MaxSystemHealthEvent</name>
+                                        <description>System health message.</description>
+                                    </value>
+                                    <value>
+                                        <name>AnyCameraEvent</name>
+                                        <description>Event group.</description>
+                                    </value>
+                                    <value>
+                                        <name>AnyServerEvent</name>
+                                        <description>Event group.</description>
+                                    </value>
+                                    <value>
+                                        <name>AnyBusinessEvent</name>
+                                        <description>Event group.</description>
+                                    </value>
+                                    <value>
+                                        <name>UserDefinedEvent</name>
+                                        <description>Base index for the user defined events</description>
+                                    </value>
+                                </values>
+                            </param>
+                            <param>
+                                <name>eventParams.eventTimestampUsec</name>
+                                <description> When did the event occur, in microseconds.</description>
+                            </param>
+                            <param>
+                                <name>eventParams.eventResourceId</name>
+                                <description>Event source - camera or server id.</description>
+                            </param>
+                            <param>
+                                <name>eventParams.resourceName</name>
+                                <description>Name of the resource which caused the event. Used if no resource is actually registered in
+the system. External custom event can provide some resource name with doesn't match
+resourceId in the system. In this case resourceName is filled and resourceId remains empty.
+                                </description>
+                            </param>
+                            <param>
+                                <name>eventParams.sourceServerId</name>
+                                <description>Id of a server that generated the event.</description>
+                            </param>
+                            <param>
+                                <name>eventParams.reasonCode</name>
+                                <description>Used in Reasoned Events as a reason code.</description>
+                                <values>
+                                    <value><name>NoReason</name></value>
+                                    <value><name>NetworkNoFrameReason</name></value>
+                                    <value><name>NetworkConnectionClosedReason</name></value>
+                                    <value><name>NetworkRtpPacketLossReason</name></value>
+                                    <value><name>ServerTerminatedReason</name></value>
+                                    <value><name>ServerStartedReason</name></value>
+                                    <value><name>StorageIoErrorReason</name></value>
+                                    <value><name>StorageTooSlowReason</name></value>
+                                    <value><name>StorageFullReason</name></value>
+                                    <value><name>LicenseRemoved</name></value>
+                                    <value><name>BackupFailedNoBackupStorageError</name></value>
+                                    <value><name>BackupFailedSourceStorageError</name></value>
+                                    <value><name>BackupFailedSourceFileError</name></value>
+                                    <value><name>BackupFailedTargetFileError</name></value>
+                                    <value><name>BackupFailedChunkError</name></value>
+                                    <value><name>BackupEndOfPeriod</name></value>
+                                    <value><name>BackupDone</name></value>
+                                    <value><name>BackupCancelled</name></value>
+                                    <value><name>NetworkNoResponseFromDevice</name></value>
+                                </values>
+                            </param>
+                            <param>
+                                <name>eventParams.inputPortId</name>
+                                <description>Used for Input events only.</description>
+                            </param>
+                            <param>
+                                <name>eventParams.caption</name>
+                                <description>Short event description. Used for camera/server
+                                    conflict as resource name which cause error. Used in custom
+                                    events as a short description.</description>
+                            </param>
+                            <param>
+                                <name>eventParams.description</name>
+                                <description>Long event description. Used for camera/server
+                                    conflict as a long description (conflict list). Used in
+                                    Reasoned Events as reason description. Used in custom events as
+                                    a long description.</description>
+                            </param>
+                            <param>
+                                <name>eventParams.metadata</name>
+                                <description>Camera list which is associated with the event.
+                                    EventResourceId may be a POS terminal, but this is a camera
+                                    list which should be shown with this event.</description>
+                            </param>
+                            <param>
+                                <name>businessRuleId</name>
+                                <description>Id of the event rule.</description>
+                            </param>
+                            <param>
+                                <name>aggregationCount</name>
+                                <description>Number of identical events groupped into one.</description>
+                            </param>
+                            <param proprietary="true">
+                                <name>flags</name>
+                                <description>Combination (via "|") or the following flags:</description>
+                                <values>
+                                    <value>
+                                        <name>VideoLinkExists</name>
+                                        <description></description>
+                                    </value>
+                                </values>
+                            </param>
+                        </params>
                     </result>
                 </function>
                 <function>
                     <name>auditLog</name>
-                    <description>Returns audit log information in the requested format.</description>
+                    <description>Return audit log information in the requested format.</description>
                     <method>GET</method>
                     <params>
                         <param>
@@ -1244,7 +1585,7 @@ content type "application/json". Example of such object:
                         </param>
                     </params>
                     <result>
-                        <caption>JSON message with error message and error code (0 means OK).</caption>
+                        <caption>JSON object with an error code (0 means OK) and error message.</caption>
                     </result>
                 </function>
                 <function>
@@ -1322,7 +1663,7 @@ content type "application/json". Example of such object:
                   </function>
                   <function>
                     <name>statistics</name>
-                    <description>Returns server info: CPU usage, HDD usage e.t.c.</description>
+                    <description>Return server info: CPU usage, HDD usage e.t.c.</description>
                     <method>GET</method>
                     <params/>
                     <result>
@@ -1331,7 +1672,7 @@ content type "application/json". Example of such object:
                   </function>
                   <function>
                     <name>storageSpace</name>
-                    <description>Returns a list of all server storages.</description>
+                    <description>Return a list of all server storages.</description>
                     <method>GET</method>
                     <params/>
                     <result>
@@ -1443,7 +1784,7 @@ content type "application/json". Example of such object:
                   </function>
                   <function>
                     <name>discoveredPeers</name>
-                    <description>Returns a list of the discovered peers.</description>
+                    <description>Return a list of the discovered peers.</description>
                     <method>GET</method>
                     <params/>
                     <result>
@@ -1680,7 +2021,7 @@ content type "application/json". Example of such object:
                 </function>
                 <function proprietary="true">
                     <name>scriptList</name>
-                    <description>Returns list of scripts to execute.</description>
+                    <description>Return list of scripts to execute.</description>
                     <permissions>Administrator.</permissions>
                     <method>GET</method>
                     <params/>
@@ -1978,7 +2319,7 @@ the respective JSON fields can be empty.</description>
                 <method>GET</method>
                 <params />
                 <result>
-                  <caption>Return JSON object with error code, error message and the list of JSON objects in "reply" field:</caption>
+                  <caption>JSON object with an error code, error message, and the list of JSON objects in "reply" field:</caption>
                   <params>
                     <param>
                       <name>comment</name>
@@ -2115,7 +2456,7 @@ the respective JSON fields can be empty.</description>
                         </param>
                     </params>
                     <result>
-                        <caption>Return RTSP video stream</caption>
+                        <caption>RTSP video stream.</caption>
                     </result>
                 </function>
                 <function>
@@ -2274,7 +2615,7 @@ the respective JSON fields can be empty.</description>
                     <method>GET</method>
                     <params/>
                     <result>
-                        <caption>Return result of the target api request.</caption>
+                        <caption>Result of the target API request.</caption>
                     </result>
                 </function>
             </functions>
@@ -2300,7 +2641,7 @@ the respective JSON fields can be empty.</description>
                     <description>
                         Cookie authorization scheme allows to avoid standard login/password dialog in web-applications.<br/>
                         It provides you a way to replace it with your own. <br/>
-                        It works mostly like sessions, but a bit more secure because it doesn"t send user"s password over HTTP.<br/>
+                        It works mostly like sessions, but a bit more secure because it doesn't send user's password over HTTP.<br/>
                         <ul>
                         <li>To check authentication:
                             <ol>
@@ -2352,7 +2693,7 @@ the respective JSON fields can be empty.</description>
                         For url-based authentification and cookie-based authentification you need to calculate hash manually, using the following algorythm:
                         <ul>
                             <li>Get <i>nonce</i> and <i>realm</i> from server</li>
-                            <li>Translate user"s <i>username</i> to lower case</li>
+                            <li>Translate user's <i>username</i> to lower case</li>
                             <li>Check required <i>method</i> ("GET" for http-requests, "PLAY" for rtsp)</li>
                             <li>
                                 <i>ha1 = MD5(usename:realm:password)</i>

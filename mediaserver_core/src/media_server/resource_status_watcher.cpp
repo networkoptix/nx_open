@@ -5,10 +5,12 @@
 
 #include "api/app_server_connection.h"
 #include "core/resource/media_server_resource.h"
+#include <common/common_module.h>
 
-QnResourceStatusWatcher::QnResourceStatusWatcher()
+QnResourceStatusWatcher::QnResourceStatusWatcher(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
 {
-    connect(qnResPool, &QnResourcePool::statusChanged, this, &QnResourceStatusWatcher::at_resource_statusChanged);
+    connect(commonModule->resourcePool(), &QnResourcePool::statusChanged, this, &QnResourceStatusWatcher::at_resource_statusChanged);
     connect(this, &QnResourceStatusWatcher::statusChanged, this, &QnResourceStatusWatcher::updateResourceStatusInternal, Qt::QueuedConnection);
 }
 
@@ -42,7 +44,7 @@ void QnResourceStatusWatcher::updateResourceStatusAsync(const QnResourcePtr &res
         return;
 
     m_setStatusInProgress.insert(resource->getId());
-    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto connection = commonModule()->ec2Connection();
     auto manager = connection->getResourceManager(Qn::kSystemAccess);
     manager->setResourceStatus(
         resource->getId(),
@@ -59,6 +61,6 @@ void QnResourceStatusWatcher::requestFinished2(int /*reqID*/, ec2::ErrorCode err
     m_setStatusInProgress.remove(id);
     if (m_awaitingSetStatus.contains(id)) {
         m_awaitingSetStatus.remove(id);
-        updateResourceStatusAsync(qnResPool->getResourceById(id));
+        updateResourceStatusAsync(resourcePool()->getResourceById(id));
     }
 }

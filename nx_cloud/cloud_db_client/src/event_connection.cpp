@@ -13,7 +13,7 @@
 
 #include <http/custom_headers.h>
 #include <utils/math/math.h>
-#include <utils/media/custom_output_stream.h>
+#include <nx/utils/custom_output_stream.h>
 
 #include "cdb_request_path.h"
 #include "data/types.h"
@@ -214,7 +214,7 @@ void EventConnection::onHttpResponseReceived(nx_http::AsyncHttpClientPtr httpCli
 
     m_multipartContentParser = std::make_shared<nx_http::MultipartContentParser>();
     m_multipartContentParser->setNextFilter(
-        makeCustomOutputStream(
+        nx::utils::bsf::makeCustomOutputStream(
             std::bind(
                 &EventConnection::onReceivingSerializedEvent,
                 this,

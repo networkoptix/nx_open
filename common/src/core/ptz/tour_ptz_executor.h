@@ -8,18 +8,19 @@
 class QnTourPtzExecutorPrivate;
 
 /**
- * A controller that runs a PTZ tour on a given PTZ controller. Note that it 
+ * A controller that runs a PTZ tour on a given PTZ controller. Note that it
  * uses event loop and timers, and thus must be run in a thread with event loop,
  * better an dedicated thread.
- * 
- * Public functions of this class are thread-safe. 
+ *
+ * Public functions of this class are thread-safe.
  */
-class QnTourPtzExecutor: public QObject {
+class QnTourPtzExecutor: public QObject
+{
     Q_OBJECT
     typedef QObject base_type;
 
 public:
-    QnTourPtzExecutor(const QnPtzControllerPtr &controller);
+    QnTourPtzExecutor(const QnPtzControllerPtr &controller, QThreadPool* threadPool);
     virtual ~QnTourPtzExecutor();
 
     void startTour(const QnPtzTour &tour);

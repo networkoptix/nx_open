@@ -1,5 +1,5 @@
-rdep_add_package(openssl)
-rdep_add_package(ffmpeg)
+nx_rdep_add_package(openssl)
+nx_rdep_add_package(ffmpeg)
 
 nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/qt.conf"
     ${CMAKE_CURRENT_BINARY_DIR}/resources/qt/etc/qt.conf)
@@ -25,7 +25,7 @@ nx_add_target(common LIBRARY
         nx_utils nx_fusion)
 
 if(NOT ANDROID AND NOT IOS)
-    rdep_add_package(quazip)
+    nx_rdep_add_package(quazip)
     target_link_libraries(common PUBLIC quazip)
 endif()
 
@@ -37,7 +37,11 @@ target_include_directories(common
         "${CMAKE_SOURCE_DIR}/common_libs/nx_network/src")
 
 target_compile_definitions(common
-    PUBLIC NX_NETWORK_API=${API_IMPORT_MACRO})
+    PRIVATE NX_NETWORK_API=${API_IMPORT_MACRO})
+
+if(WIN32)
+    target_link_libraries(common PUBLIC Winmm)
+endif()
 
 if(MACOSX)
     find_library(CoreGraphics_LIBRARY CoreGraphics)

@@ -16,6 +16,8 @@ namespace test {
 class TestPollable:
     public aio::BasicPollable
 {
+    using base_type = aio::BasicPollable;
+
 public:
     TestPollable():
         m_cleanupDone(false)
@@ -24,7 +26,8 @@ public:
 
     ~TestPollable()
     {
-        stopWhileInAioThread();
+        if (isInSelfAioThread())
+            stopWhileInAioThread();
     }
 
     bool isCleanupDone() const
@@ -35,6 +38,7 @@ public:
 protected:
     virtual void stopWhileInAioThread() override
     {
+        base_type::stopWhileInAioThread();
         m_cleanupDone = true;
     }
 
@@ -176,14 +180,26 @@ TEST_F(BasicPollable, stopWhileInAioThread)
     thenCleanupShouldOccur();
 }
 
-TEST_F(BasicPollable, pleaseStop)
-{
-    // TODO
-}
+//TEST_F(BasicPollable, pleaseStop)
 
-TEST_F(BasicPollable, pleaseStopSync)
+TEST_F(BasicPollable, post_cancelled_by_pleaseStopSync_called_within_aio_thread)
 {
-    // TODO
+    nx::utils::promise<void> secondCallPosted;
+    std::atomic<int> asyncCallsDone(0);
+
+    pollable().post(
+        [this, &asyncCallsDone, &secondCallPosted]()
+        {
+            ++asyncCallsDone;
+            secondCallPosted.get_future().wait();
+            pollable().pleaseStopSync();
+        });
+
+    pollable().post([&asyncCallsDone]() { ++asyncCallsDone; });
+    secondCallPosted.set_value();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    ASSERT_EQ(1, asyncCallsDone.load());
 }
 
 //-------------------------------------------------------------------------------------------------

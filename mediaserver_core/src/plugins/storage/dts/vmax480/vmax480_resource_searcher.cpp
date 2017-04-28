@@ -19,7 +19,10 @@ static const int TCP_TIMEOUT = 3000;
 static const QString NAME_PREFIX(QLatin1String("VMAX-"));
 
 // ====================================================================
-QnPlVmax480ResourceSearcher::QnPlVmax480ResourceSearcher()
+QnPlVmax480ResourceSearcher::QnPlVmax480ResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule),
+    QnUpnpResourceSearcherAsync(commonModule)
 {
 
 }
@@ -75,7 +78,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
         QString uniqId = QString(QLatin1String("%1_%2")).arg(mac.toString()).arg(i+1);
         bool needHttpData = true;
 
-        QnPlVmax480ResourcePtr existsRes = qnResPool->getResourceByUniqueId<QnPlVmax480Resource>(uniqId);
+        QnPlVmax480ResourcePtr existsRes = resourcePool()->getResourceByUniqueId<QnPlVmax480Resource>(uniqId);
         if (existsRes && (existsRes->getStatus() == Qn::Online || existsRes->getStatus() == Qn::Recording))
         {
             resource->setName(existsRes->getName());
@@ -291,7 +294,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
         QnPlVmax480ResourcePtr existsRes;
         for (int i = 0; i < VMAX_MAX_CH; ++i) {
             QString uniqId = QString(QLatin1String("VMAX_DVR_%1_%2")).arg(url.host()).arg(i+1);
-            existsRes = qnResPool->getResourceByUniqueId<QnPlVmax480Resource>(uniqId);
+            existsRes = resourcePool()->getResourceByUniqueId<QnPlVmax480Resource>(uniqId);
             if (existsRes)
                 break;
         }

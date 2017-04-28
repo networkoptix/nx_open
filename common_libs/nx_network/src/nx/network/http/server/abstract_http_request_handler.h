@@ -4,7 +4,7 @@
 #include <memory>
 #include <mutex>
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 
 #include "http_server_connection.h"
 #include "../abstract_msg_body_source.h"
@@ -36,7 +36,6 @@ typedef nx::utils::MoveOnlyFunc<void(RequestResult)> RequestProcessedHandler;
 class NX_NETWORK_API AbstractHttpRequestHandler
 {
 public:
-    AbstractHttpRequestHandler();
     virtual ~AbstractHttpRequestHandler();
 
     /**
@@ -48,7 +47,7 @@ public:
     bool processRequest(
         nx_http::HttpServerConnection* const connection,
         nx_http::Message&& request,
-        stree::ResourceContainer&& authInfo,
+        nx::utils::stree::ResourceContainer&& authInfo,
         ResponseIsReadyHandler completionHandler);
 
 protected:
@@ -59,10 +58,10 @@ protected:
      */
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,
-        stree::ResourceContainer authInfo,
+        nx::utils::stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const response,
-        nx_http::RequestProcessedHandler completionHandler ) = 0;
+        nx_http::RequestProcessedHandler completionHandler) = 0;
 
     nx_http::Response* response();
 

@@ -1,13 +1,18 @@
 #include "ldap_manager.h"
 
-#include "api/global_settings.h"
-#include <nx/utils/log/log.h>
-#include <utils/crypt/symmetrical.h>
+#include <api/global_settings.h>
+#include <common/common_module.h>
 #include <iostream>
+#include <cstdio>
 #include <sstream>
 
 #include <QtCore/QCryptographicHash>
-#include <stdio.h>
+
+#include <nx/utils/log/log.h>
+#include <nx/utils/string.h>
+
+#include <utils/crypt/symmetrical.h>
+
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -194,7 +199,8 @@ namespace {
     }
 }
 
-QnLdapManager::QnLdapManager()
+QnLdapManager::QnLdapManager(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
 {
 }
 
@@ -385,13 +391,13 @@ Qn::AuthResult LdapSession::authenticateWithDigest(const QString &login, const Q
 
     QMap<QByteArray, QByteArray> responseDictionary;
     QByteArray initialResponse(servresp->bv_val, servresp->bv_len);
-    for (QByteArray line : smartSplit(initialResponse, ',')) {
+    for (QByteArray line : nx::utils::smartSplit(initialResponse, ',')) {
         line = line.trimmed();
         int eqIndex = line.indexOf('=');
         if (eqIndex == -1)
             continue;
 
-        responseDictionary[line.mid(0, eqIndex)] = unquoteStr(line.mid(eqIndex + 1));
+        responseDictionary[line.mid(0, eqIndex)] = nx::utils::unquoteStr(line.mid(eqIndex + 1));
     }
 
     if (!responseDictionary.contains("realm") || !responseDictionary.contains("nonce"))
@@ -467,14 +473,14 @@ QString LdapSession::getRealm()
 
     QMap<QByteArray, QByteArray> responseDictionary;
     QByteArray initialResponse(servresp->bv_val, servresp->bv_len);
-    for (QByteArray line : smartSplit(initialResponse, ',')) {
+    for (QByteArray line : nx::utils::smartSplit(initialResponse, ',')) {
         line = line.trimmed();
         int eqIndex = line.indexOf('=');
         if (eqIndex == -1)
             continue;
 
         if (line.mid(0, eqIndex) == "realm") {
-            result = QString::fromLatin1(unquoteStr(line.mid(eqIndex + 1)));
+            result = QString::fromLatin1(nx::utils::unquoteStr(line.mid(eqIndex + 1)));
             break;
         }
     }
@@ -547,12 +553,12 @@ Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers &users, const QnLdapSetting
 }
 
 Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers &users) {
-    QnLdapSettings settings = QnGlobalSettings::instance()->ldapSettings();
+    QnLdapSettings settings = qnGlobalSettings->ldapSettings();
     return fetchUsers(users, settings);
 }
 
 Qn::AuthResult QnLdapManager::authenticateWithDigest(const QString &login, const QString &digest) {
-    QnLdapSettings settings = QnGlobalSettings::instance()->ldapSettings();
+    QnLdapSettings settings = qnGlobalSettings->ldapSettings();
     LdapSession session(settings);
     if (!session.connect())
     {
@@ -569,7 +575,7 @@ Qn::AuthResult QnLdapManager::authenticateWithDigest(const QString &login, const
 
 Qn::AuthResult  QnLdapManager::realm(QString* realm) const
 {
-    QnLdapSettings settings = QnGlobalSettings::instance()->ldapSettings();
+    QnLdapSettings settings = qnGlobalSettings->ldapSettings();
     QString uriString = settings.uri.toString();
     *realm = QString();
 

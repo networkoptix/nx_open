@@ -6,7 +6,7 @@
 #ifndef NX_CDB_STREE_SOCKET_ATTR_READER_H
 #define NX_CDB_STREE_SOCKET_ATTR_READER_H
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 #include <nx/network/socket.h>
 
 
@@ -15,7 +15,7 @@ namespace cdb {
 
 class SocketResourceReader
 :
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
     SocketResourceReader(const AbstractCommunicatingSocket& sock);

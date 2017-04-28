@@ -19,8 +19,8 @@
         <product.display.title>${mediaserver.display.name}</product.display.title>
         <template>lib</template>
 
-        <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <global.libs>-lcommon -lappserver2 -lcloud_db_client -ludt -lnx_email -lnx_streaming -lnx_network -lnx_speech_synthesizer -lnx_fusion -lnx_utils</global.libs>
+        <qt.libs>core network xml xmlpatterns sql concurrent multimedia websockets</qt.libs>
+        <global.libs>-lcommon -lappserver2 -ludt -lnx_email -lnx_streaming -lnx_network -lnx_speech_synthesizer -lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
         <linux.oslibs>-ldl</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>

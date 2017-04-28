@@ -58,6 +58,7 @@ private:
     QnPlOnvifResourcePtr m_resource;
     Qn::PtzCapabilities m_capabilities;
     bool m_stopBroken;
+    bool m_speedBroken;
 
     SpeedLimits m_panSpeedLimits, m_tiltSpeedLimits, m_zoomSpeedLimits, m_focusSpeedLimits;
     QnPtzLimits m_limits;

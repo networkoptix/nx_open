@@ -15,19 +15,19 @@ class QnTimePeriodList;
 /*
 * QnLayoutFileStorageResource uses for layout export
 */
-class QnLayoutFileStorageResource
-    : public QnStorageResource
+class QnLayoutFileStorageResource: public QnStorageResource
 {
+    using base_type = QnStorageResource;
 public:
     enum StorageFlags {
         ReadOnly        = 0x1,
         ContainsCameras = 0x2,
     };
 
-    QnLayoutFileStorageResource();
+    QnLayoutFileStorageResource(QnCommonModule* commonModule);
     virtual ~QnLayoutFileStorageResource();
 
-    static QnStorageResource* instance(const QString&);
+    static QnStorageResource* instance(QnCommonModule* commonModule, const QString&);
 
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
 

@@ -1,15 +1,19 @@
 #include "flir_resource_searcher.h"
 
-#ifdef ENABLE_ONVIF
+#ifdef ENABLE_FLIR
 
 #include <QtEndian>
 #include "flir_eip_resource.h"
 
-QnFlirResourceSearcher::QnFlirResourceSearcher()
+QnFlirResourceSearcher::QnFlirResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule),
+    base_type(commonModule)
 {
     m_eipFlirResTypeId = qnResTypePool->getResourceTypeId(manufacture(), lit("FLIR-AX8"), true);
     m_cgiFlirResTypeId = qnResTypePool->getResourceTypeId(manufacture(), lit("FLIR_COMMON"), true);
 }
+
 QnFlirResourceSearcher::~QnFlirResourceSearcher()
 {
 }
@@ -41,11 +45,11 @@ QnResourcePtr QnFlirResourceSearcher::createResource(const QnUuid &resourceTypeI
 }
 
 QList<QnResourcePtr> QnFlirResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
-{    
+{
     QList<QnResourcePtr> result;
     FlirDeviceInfo deviceInfo;
     auto hostname = url.host().isEmpty() ?
-        url.toString(): 
+        url.toString():
         url.host();
 
     SimpleEIPClient eipClient(hostname);
@@ -196,4 +200,4 @@ void QnFlirResourceSearcher::createResource(const FlirDeviceInfo& info, const QA
     result << resource;
 }
 
-#endif // ENABLE_ONVIF
+#endif // ENABLE_FLIR

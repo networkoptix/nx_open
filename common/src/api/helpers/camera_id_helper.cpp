@@ -5,8 +5,10 @@
 #include <nx/utils/log/log.h>
 
 namespace nx {
+namespace camera_id_helper {
 
-void camera_id_helper::findAllCamerasByFlexibleIds(
+void findAllCamerasByFlexibleIds(
+    QnResourcePool* resourcePool,
     QnSecurityCamResourceList* cameras,
     const QnRequestParamList& params,
     const QStringList& flexibleIdParamNames)
@@ -22,14 +24,15 @@ void camera_id_helper::findAllCamerasByFlexibleIds(
 
     for (const auto& flexibleId: allFlexibleIds)
     {
-        if (auto camera = findCameraByFlexibleId(flexibleId))
+        if (auto camera = findCameraByFlexibleId(resourcePool, flexibleId))
             *cameras << camera;
         else
             NX_LOG(lit("Camera not found by id %1, ignoring").arg(flexibleId), cl_logWARNING);
     }
 }
 
-QnSecurityCamResourcePtr camera_id_helper::findCameraByFlexibleIds(
+QnSecurityCamResourcePtr findCameraByFlexibleIds(
+    QnResourcePool* resourcePool,
     QString* outNotFoundCameraId,
     const QnRequestParams& params,
     const QStringList& idParamNames)
@@ -60,7 +63,7 @@ QnSecurityCamResourcePtr camera_id_helper::findCameraByFlexibleIds(
     QString flexibleId = params.value(flexibleIdParamName);
     NX_ASSERT(!flexibleId.isNull()); //< NOTE: Can be empty if specified empty in the request.
 
-    auto camera = findCameraByFlexibleId(flexibleId);
+    auto camera = findCameraByFlexibleId(resourcePool, flexibleId);
     if (!camera)
     {
         if (outNotFoundCameraId)
@@ -69,19 +72,22 @@ QnSecurityCamResourcePtr camera_id_helper::findCameraByFlexibleIds(
     return camera;
 }
 
-QnSecurityCamResourcePtr camera_id_helper::findCameraByFlexibleId(const QString& flexibleId)
+QnSecurityCamResourcePtr findCameraByFlexibleId(
+    QnResourcePool* resourcePool,
+    const QString& flexibleId)
 {
     QnResourcePtr result;
     const QnUuid uuid = QnUuid::fromStringSafe(flexibleId);
     if (!uuid.isNull())
-        result = qnResPool->getResourceById(uuid);
+        result = resourcePool->getResourceById(uuid);
     if (!result)
-        result = qnResPool->getNetResourceByPhysicalId(flexibleId);
+        result = resourcePool->getNetResourceByPhysicalId(flexibleId);
     if (!result)
-        result = qnResPool->getResourceByMacAddress(flexibleId);
+        result = resourcePool->getResourceByMacAddress(flexibleId);
 
     // If the found resource is not a camera, return null.
     return result.dynamicCast<QnSecurityCamResource>();
 }
 
+} // namespace camera_id_helper
 } // namespace nx

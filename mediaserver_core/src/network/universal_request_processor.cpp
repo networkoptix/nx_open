@@ -12,7 +12,7 @@
 #include "universal_request_processor_p.h"
 #include <nx/fusion/model_functions.h>
 #include "utils/common/synctime.h"
-#include "utils/gzip/gzip_compressor.h"
+#include <nx/utils/gzip/gzip_compressor.h>
 #include <nx/network/flash_socket/types.h>
 #include <rest/server/rest_connection_processor.h>
 #include <utils/common/app_info.h>
@@ -30,7 +30,7 @@ QnUniversalRequestProcessor::~QnUniversalRequestProcessor()
 QnUniversalRequestProcessor::QnUniversalRequestProcessor(
         QSharedPointer<AbstractStreamSocket> socket,
         QnUniversalTcpListener* owner, bool needAuth)
-    : QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket)
+    : QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket, owner->commonModule())
 {
     Q_D(QnUniversalRequestProcessor);
     d->processor = 0;
@@ -43,7 +43,7 @@ QnUniversalRequestProcessor::QnUniversalRequestProcessor(
 QnUniversalRequestProcessor::QnUniversalRequestProcessor(
         QnUniversalRequestProcessorPrivate* priv, QSharedPointer<AbstractStreamSocket> socket,
         QnUniversalTcpListener* owner, bool needAuth)
-    : QnTCPConnectionProcessor(priv, socket)
+    : QnTCPConnectionProcessor(priv, socket, owner->commonModule())
 {
     Q_D(QnUniversalRequestProcessor);
     d->processor = 0;
@@ -75,7 +75,7 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
     {
         QUrl url = getDecodedUrl();
         // set variable to true if standard proxy_unauthorized should be used
-        const bool isProxy = needStandardProxy(d->request);
+        const bool isProxy = needStandardProxy(d->owner->commonModule(), d->request);
         QElapsedTimer t;
         t.restart();
         AuthMethod::Value usedMethod = AuthMethod::noAuth;
@@ -236,33 +236,35 @@ void QnUniversalRequestProcessor::pleaseStop()
     QnTCPConnectionProcessor::pleaseStop();
 }
 
-bool QnUniversalRequestProcessor::isProxy(const nx_http::Request& request)
+bool QnUniversalRequestProcessor::isProxy(QnCommonModule* commonModule, const nx_http::Request& request)
 {
     nx_http::HttpHeaders::const_iterator xServerGuidIter = request.headers.find( Qn::SERVER_GUID_HEADER_NAME );
     if( xServerGuidIter != request.headers.end() )
     {
         // is proxy to other media server
         QnUuid desiredServerGuid(xServerGuidIter->second);
-        if (desiredServerGuid != qnCommon->moduleGUID())
+        if (desiredServerGuid != commonModule->moduleGUID())
             return true;
     }
 
-    return needStandardProxy(request);
+    return needStandardProxy(commonModule, request);
 }
 
-bool QnUniversalRequestProcessor::needStandardProxy(const nx_http::Request& request)
+bool QnUniversalRequestProcessor::needStandardProxy(QnCommonModule* commonModule, const nx_http::Request& request)
 {
-    return isCloudRequest(request) || isProxyForCamera(request);
+    return isCloudRequest(request) || isProxyForCamera(commonModule, request);
 }
 
 bool QnUniversalRequestProcessor::isCloudRequest(const nx_http::Request& request)
 {
-    return request.requestLine.url.host() == QnAppInfo::defaultCloudHost() ||
+    return request.requestLine.url.host() == nx::network::AppInfo::defaultCloudHost() ||
            request.requestLine.url.path().startsWith("/cdb") ||
            request.requestLine.url.path().startsWith("/nxcloud");
 }
 
-bool QnUniversalRequestProcessor::isProxyForCamera(const nx_http::Request& request)
+bool QnUniversalRequestProcessor::isProxyForCamera(
+    QnCommonModule* commonModule,
+    const nx_http::Request& request)
 {
     nx_http::BufferType desiredCameraGuid;
     nx_http::HttpHeaders::const_iterator xCameraGuidIter = request.headers.find( Qn::CAMERA_GUID_HEADER_NAME );
@@ -274,7 +276,7 @@ bool QnUniversalRequestProcessor::isProxyForCamera(const nx_http::Request& reque
         desiredCameraGuid = request.getCookieValue(Qn::CAMERA_GUID_HEADER_NAME);
     }
     if (!desiredCameraGuid.isEmpty()) {
-        QnResourcePtr camera = qnResPool->getResourceById(QnUuid::fromStringSafe(desiredCameraGuid));
+        QnResourcePtr camera = commonModule->resourcePool()->getResourceById(QnUuid::fromStringSafe(desiredCameraGuid));
         return camera != 0;
     }
 

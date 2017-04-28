@@ -5,19 +5,15 @@
 #include <functional>
 #include <memory>
 
+#include <nx/network/async_stoppable.h>
 #include <nx/utils/move_only_func.h>
-#include <utils/common/byte_array.h>
-#include <utils/common/systemerror.h>
-#include <utils/common/stoppable.h>
+#include <nx/utils/system_error.h>
 
 #include "aio/event_type.h"
 #include "buffer.h"
 #include "nettools.h"
 #include "socket_common.h"
 
-//todo: #ak cancel asynchoronous operations
-
-// forward
 namespace nx {
 namespace network {
 
@@ -261,7 +257,6 @@ public:
     */
     virtual int send( const void* buffer, unsigned int bufferLen ) = 0;
     int send( const QByteArray& data );
-    int send( const QnByteArray& data );
     //!Returns host address/port of remote host, socket has been connected to
     /*!
         Get the foreign address.  Call connect() before calling recv()
@@ -483,6 +478,9 @@ public:
     virtual bool isEncryptionEnabled() const = 0;
 };
 
+using AcceptCompletionHandler = 
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, AbstractStreamSocket*)>;
+
 //!Interface for server socket, accepting stream connections
 /*!
     \note This socket has default recv timeout of 250ms for backward compatibility
@@ -492,6 +490,8 @@ class NX_NETWORK_API AbstractStreamServerSocket
     public AbstractSocket
 {
 public:
+    static const int kDefaultBacklogSize = 128;
+
     //!Start listening for incoming connections
     /*!
         \note Method returns immediately
@@ -499,7 +499,7 @@ public:
             If queue is full and new connection arrives, it receives ECONNREFUSED error
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
-    virtual bool listen( int queueLen = 128 ) = 0;
+    virtual bool listen(int backlog = kDefaultBacklogSize) = 0;
     //!Accepts new connection
     /*!
         \return NULL in case of error (use \a SystemError::getLastOSErrorCode() to get error description)
@@ -515,10 +515,7 @@ public:
             \endcode
             \a newConnection is NULL, if errorCode is not SystemError::noError
     */
-    virtual void acceptAsync(
-        nx::utils::MoveOnlyFunc<void(
-            SystemError::ErrorCode,
-            AbstractStreamSocket*)> handler) = 0;
+    virtual void acceptAsync(AcceptCompletionHandler handler) = 0;
     /** Cancel active \a AbstractStreamServerSocket::acceptAsync */
     virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) = 0;
     /** Cancel active \a AbstractStreamServerSocket::acceptAsync waiting for completion.

@@ -20,6 +20,7 @@
 #include "managers/camera_manager.h"
 #include "managers/discovery_manager.h"
 #include "managers/layout_manager.h"
+#include <managers/layout_tour_manager.h>
 #include "managers/license_manager.h"
 #include "managers/media_server_manager.h"
 #include "managers/misc_manager.h"
@@ -243,6 +244,7 @@ void apiIdDataTriggerNotificationHelper(const QnTransaction<ApiIdData> &tran, co
         case ApiCommand::removeServerUserAttributes:
             return notificationParams.mediaServerNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::removeResource:
+        case ApiCommand::removeResourceStatus:
             return notificationParams.resourceNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::removeCamera:
             return notificationParams.cameraNotificationManager->triggerNotification(tran, notificationParams.source);
@@ -256,6 +258,8 @@ void apiIdDataTriggerNotificationHelper(const QnTransaction<ApiIdData> &tran, co
             return notificationParams.businessEventNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::removeLayout:
             return notificationParams.layoutNotificationManager->triggerNotification(tran, notificationParams.source);
+        case ApiCommand::removeLayoutTour:
+            return notificationParams.layoutTourNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::removeVideowall:
             return notificationParams.videowallNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::removeWebPage:
@@ -264,7 +268,6 @@ void apiIdDataTriggerNotificationHelper(const QnTransaction<ApiIdData> &tran, co
             return notificationParams.cameraNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::forcePrimaryTimeServer:
         case ApiCommand::removeAccessRights:
-        case ApiCommand::removeResourceStatus:
             //#ak no notification needed
             break;
         default:
@@ -349,6 +352,15 @@ struct LayoutNotificationManagerHelper
     void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
     {
         notificationParams.layoutNotificationManager->triggerNotification(tran, notificationParams.source);
+    }
+};
+
+struct LayoutTourNotificationManagerHelper
+{
+    template<typename Param>
+    void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
+    {
+        notificationParams.layoutTourNotificationManager->triggerNotification(tran, notificationParams.source);
     }
 };
 
@@ -438,7 +450,7 @@ void apiIdDataListTriggerNotificationHelper(const QnTransaction<ApiIdDataList> &
 struct InvalidAccess
 {
     template<typename Param>
-    bool operator()(const Qn::UserAccessData&, const Param&)
+    bool operator()(QnCommonModule*, const Qn::UserAccessData&, const Param&)
     {
         auto td = getTransactionDescriptorByParam<Param>();
         auto transactionName = td->getName();
@@ -450,7 +462,7 @@ struct InvalidAccess
 struct InvalidAccessOut
 {
     template<typename Param>
-    RemotePeerAccess operator()(const Qn::UserAccessData&, const Param&)
+    RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData&, const Param&)
     {
         auto td = getTransactionDescriptorByParam<Param>();
         auto transactionName = td->getName();
@@ -467,7 +479,7 @@ bool hasSystemAccess(const Qn::UserAccessData& accessData)
 struct SystemSuperUserAccessOnly
 {
     template<typename Param>
-    bool operator()(const Qn::UserAccessData& accessData, const Param&)
+    bool operator()(QnCommonModule*, const Qn::UserAccessData& accessData, const Param&)
     {
         return hasSystemAccess(accessData);
     }
@@ -476,7 +488,7 @@ struct SystemSuperUserAccessOnly
 struct SystemSuperUserAccessOnlyOut
 {
     template<typename Param>
-    RemotePeerAccess operator()(const Qn::UserAccessData& accessData, const Param&)
+    RemotePeerAccess operator()(QnCommonModule*, const Qn::UserAccessData& accessData, const Param&)
     {
         return hasSystemAccess(accessData)
             ? RemotePeerAccess::Allowed
@@ -487,30 +499,34 @@ struct SystemSuperUserAccessOnlyOut
 struct AllowForAllAccess
 {
     template<typename Param>
-    bool operator()(const Qn::UserAccessData&, const Param&) { return true; }
+    bool operator()(QnCommonModule*, const Qn::UserAccessData&, const Param&) { return true; }
 };
 
 struct AllowForAllAccessOut
 {
     template<typename Param>
-    RemotePeerAccess operator()(const Qn::UserAccessData&, const Param&) { return RemotePeerAccess::Allowed; }
+    RemotePeerAccess operator()(QnCommonModule*, const Qn::UserAccessData&, const Param&) { return RemotePeerAccess::Allowed; }
 };
 
-bool resourceAccessHelper(const Qn::UserAccessData& accessData, const QnUuid& resourceId, Qn::Permissions permissions)
+bool resourceAccessHelper(
+    QnCommonModule* commonModule,
+    const Qn::UserAccessData& accessData,
+    const QnUuid& resourceId,
+    Qn::Permissions permissions)
 {
     if (hasSystemAccess(accessData))
         return true;
-
-    QnResourcePtr target = qnResPool->getResourceById(resourceId);
-    auto userResource = qnResPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-    if (qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalAdminPermission))
+    const auto& resPool = commonModule->resourcePool();
+    QnResourcePtr target = resPool->getResourceById(resourceId);
+    auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
+    if (commonModule->resourceAccessManager()->hasGlobalPermission(userResource, Qn::GlobalAdminPermission))
         return true;
 
     if (permissions == Qn::ReadPermission
         && accessData.access == Qn::UserAccessData::Access::ReadAllResources)
             return true;
 
-    bool result = qnResourceAccessManager->hasPermission(userResource, target, permissions);
+    bool result = commonModule->resourceAccessManager()->hasPermission(userResource, target, permissions);
     if (!result)
         NX_LOG(
             lit("%1 \n\tuser %2 with %3 permissions is asking for \
@@ -529,22 +545,22 @@ struct ModifyResourceAccess
     ModifyResourceAccess(bool isRemove): isRemove(isRemove) {}
 
     template<typename Param>
-    bool operator()(const Qn::UserAccessData& accessData, const Param& param)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const Param& param)
     {
         if (hasSystemAccess(accessData))
             return true;
-
-        auto userResource = qnResPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-        QnResourcePtr target = qnResPool->getResourceById(param.id);
+        const auto& resPool = commonModule->resourcePool();
+        auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
+        QnResourcePtr target = resPool->getResourceById(param.id);
 
         if (isRemove)
-            return qnResourceAccessManager->hasPermission(userResource, target, Qn::RemovePermission);
+            return commonModule->resourceAccessManager()->hasPermission(userResource, target, Qn::RemovePermission);
 
         bool result = false;
         if (!target)
-            result = qnResourceAccessManager->canCreateResource(userResource, param);
+            result = commonModule->resourceAccessManager()->canCreateResource(userResource, param);
         else
-            result = qnResourceAccessManager->canModifyResource(userResource, target, param);
+            result = commonModule->resourceAccessManager()->canModifyResource(userResource, target, param);
 
         if (!result)
             NX_LOG(lit("Modify resource access returned false for transaction %1. User resource isNull: %2. Target resource isNull %3")
@@ -561,7 +577,7 @@ struct ModifyResourceAccess
 
 struct ModifyCameraDataAccess
 {
-    bool operator()(const Qn::UserAccessData& accessData, const ApiCameraData& param)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiCameraData& param)
     {
         if (!hasSystemAccess(accessData))
         {
@@ -573,23 +589,23 @@ struct ModifyCameraDataAccess
             }
         }
 
-        return ModifyResourceAccess(/*isRemove*/ false)(accessData, param);
+        return ModifyResourceAccess(/*isRemove*/ false)(commonModule, accessData, param);
     }
 };
 
 
 template<typename Param>
-void applyColumnFilter(const Qn::UserAccessData& /*accessData*/, Param& /*data*/) {}
+void applyColumnFilter(QnCommonModule*, const Qn::UserAccessData& /*accessData*/, Param& /*data*/) {}
 
-void applyColumnFilter(const Qn::UserAccessData& accessData, ApiMediaServerData& data)
+void applyColumnFilter(QnCommonModule*, const Qn::UserAccessData& accessData, ApiMediaServerData& data)
 {
     if (accessData != Qn::kSystemAccess)
         data.authKey.clear();
 }
 
-void applyColumnFilter(const Qn::UserAccessData& accessData, ApiStorageData& data)
+void applyColumnFilter(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ApiStorageData& data)
 {
-    if (!hasSystemAccess(accessData) && !qnResourceAccessManager->hasGlobalPermission(
+    if (!hasSystemAccess(accessData) && !commonModule->resourceAccessManager()->hasGlobalPermission(
             accessData,
             Qn::GlobalPermission::GlobalAdminPermission))
     {
@@ -600,11 +616,11 @@ void applyColumnFilter(const Qn::UserAccessData& accessData, ApiStorageData& dat
 struct ReadResourceAccess
 {
     template<typename Param>
-    bool operator()(const Qn::UserAccessData& accessData, Param& param)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, Param& param)
     {
-        if (resourceAccessHelper(accessData, param.id, Qn::ReadPermission))
+        if (resourceAccessHelper(commonModule, accessData, param.id, Qn::ReadPermission))
         {
-            applyColumnFilter(accessData, param);
+            applyColumnFilter(commonModule, accessData, param);
             return true;
         }
         return false;
@@ -614,9 +630,9 @@ struct ReadResourceAccess
 struct ReadResourceAccessOut
 {
     template<typename Param>
-    RemotePeerAccess operator()(const Qn::UserAccessData& accessData, const Param& param)
+    RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const Param& param)
     {
-        return resourceAccessHelper(accessData, param.id, Qn::ReadPermission)
+        return resourceAccessHelper(commonModule, accessData, param.id, Qn::ReadPermission)
             ? RemotePeerAccess::Allowed
             : RemotePeerAccess::Forbidden;
     }
@@ -624,17 +640,17 @@ struct ReadResourceAccessOut
 
 struct ReadResourceParamAccess
 {
-    bool operator()(const Qn::UserAccessData& accessData, ApiResourceParamWithRefData& param)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ApiResourceParamWithRefData& param)
     {
-        if (resourceAccessHelper(accessData, param.resourceId, Qn::ReadPermission))
+        if (resourceAccessHelper(commonModule, accessData, param.resourceId, Qn::ReadPermission))
         {
-            operator()(accessData, static_cast<ApiResourceParamData&>(param));
+            operator()(commonModule, accessData, static_cast<ApiResourceParamData&>(param));
             return true;
         }
         return false;
     }
 
-    bool operator()(const Qn::UserAccessData& accessData, ApiResourceParamData& param)
+    bool operator()(QnCommonModule*, const Qn::UserAccessData& accessData, ApiResourceParamData& param)
     {
         namespace ahlp = access_helpers;
         ahlp::FilterFunctorListType filters = {
@@ -654,9 +670,9 @@ struct ReadResourceParamAccess
 
 struct ReadResourceParamAccessOut
 {
-    RemotePeerAccess operator()(const Qn::UserAccessData& accessData, const ApiResourceParamWithRefData& param)
+    RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiResourceParamWithRefData& param)
     {
-        return resourceAccessHelper(accessData, param.resourceId, Qn::ReadPermission)
+        return resourceAccessHelper(commonModule, accessData, param.resourceId, Qn::ReadPermission)
             ? RemotePeerAccess::Allowed
             : RemotePeerAccess::Forbidden;
     }
@@ -666,21 +682,24 @@ struct ModifyResourceParamAccess
 {
     ModifyResourceParamAccess(bool isRemove): isRemove(isRemove) {}
 
-    bool operator()(const Qn::UserAccessData& accessData, const ApiResourceParamWithRefData& param)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiResourceParamWithRefData& param)
     {
         if (hasSystemAccess(accessData))
             return true;
 
         if (isRemove)
-            qnResourceAccessManager->hasPermission(qnResPool->getResourceById<QnUserResource>(accessData.userId),
-                qnResPool->getResourceById(param.resourceId),
+        {
+            const auto& resPool = commonModule->resourcePool();
+            commonModule->resourceAccessManager()->hasPermission(resPool->getResourceById<QnUserResource>(accessData.userId),
+                resPool->getResourceById(param.resourceId),
                 Qn::RemovePermission);
+        }
 
         Qn::Permissions permissions = Qn::SavePermission;
         if (param.name == Qn::USER_FULL_NAME)
             permissions |= Qn::WriteFullNamePermission;
 
-        return resourceAccessHelper(accessData, param.resourceId, permissions);
+        return resourceAccessHelper(commonModule, accessData, param.resourceId, permissions);
     }
 
     bool isRemove;
@@ -688,17 +707,17 @@ struct ModifyResourceParamAccess
 
 struct ReadFootageDataAccess
 {
-    bool operator()(const Qn::UserAccessData& accessData, const ApiServerFootageData& param)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiServerFootageData& param)
     {
-        return resourceAccessHelper(accessData, param.serverGuid, Qn::ReadPermission);
+        return resourceAccessHelper(commonModule, accessData, param.serverGuid, Qn::ReadPermission);
     }
 };
 
 struct ReadFootageDataAccessOut
 {
-    RemotePeerAccess operator()(const Qn::UserAccessData& accessData, const ApiServerFootageData& param)
+    RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiServerFootageData& param)
     {
-        return resourceAccessHelper(accessData, param.serverGuid, Qn::ReadPermission)
+        return resourceAccessHelper(commonModule, accessData, param.serverGuid, Qn::ReadPermission)
             ? RemotePeerAccess::Allowed
             : RemotePeerAccess::Forbidden;
     }
@@ -706,46 +725,47 @@ struct ReadFootageDataAccessOut
 
 struct ModifyFootageDataAccess
 {
-    bool operator()(const Qn::UserAccessData& accessData, const ApiServerFootageData& param)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiServerFootageData& param)
     {
-        return resourceAccessHelper(accessData, param.serverGuid, Qn::SavePermission);
+        return resourceAccessHelper(commonModule, accessData, param.serverGuid, Qn::SavePermission);
     }
 };
 
 struct ReadCameraAttributesAccess
 {
-    bool operator()(const Qn::UserAccessData& accessData, const ApiCameraAttributesData& param)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiCameraAttributesData& param)
     {
-        return resourceAccessHelper(accessData, param.cameraId, Qn::ReadPermission);
+        return resourceAccessHelper(commonModule, accessData, param.cameraId, Qn::ReadPermission);
     }
 };
 
 struct ReadCameraAttributesAccessOut
 {
-    RemotePeerAccess operator()(const Qn::UserAccessData& accessData, const ApiCameraAttributesData& param)
+    RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiCameraAttributesData& param)
     {
-        return resourceAccessHelper(accessData, param.cameraId, Qn::ReadPermission)
+        return resourceAccessHelper(commonModule, accessData, param.cameraId, Qn::ReadPermission)
             ? RemotePeerAccess::Allowed
             : RemotePeerAccess::Forbidden;
     }
 };
 struct ModifyCameraAttributesAccess
 {
-    bool operator()(const Qn::UserAccessData& accessData, const ApiCameraAttributesData& param)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiCameraAttributesData& param)
     {
         if (accessData == Qn::kSystemAccess)
             return true;
 
-        if (!resourceAccessHelper(accessData, param.cameraId, Qn::SavePermission))
+        if (!resourceAccessHelper(commonModule, accessData, param.cameraId, Qn::SavePermission))
         {
             qWarning() << "save ApiCameraAttributesData forbidden because no save permissions. id=" << param.cameraId;
             return false;
         }
 
-        QnCamLicenseUsageHelper licenseUsageHelper;
+        QnCamLicenseUsageHelper licenseUsageHelper(commonModule);
         QnVirtualCameraResourceList cameras;
 
-        auto camera = qnResPool->getResourceById(param.cameraId).dynamicCast<QnVirtualCameraResource>();
+        const auto& resPool = commonModule->resourcePool();
+        auto camera = resPool->getResourceById(param.cameraId).dynamicCast<QnVirtualCameraResource>();
         if (!camera)
         {
             qWarning() << "save ApiCameraAttributesData forbidden because camera object is not exists. id=" << param.cameraId;
@@ -769,24 +789,25 @@ struct ModifyCameraAttributesAccess
 
 struct ModifyCameraAttributesListAccess
 {
-    void operator()(const Qn::UserAccessData& accessData, ApiCameraAttributesDataList& param)
+    void operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ApiCameraAttributesDataList& param)
     {
         if (accessData == Qn::kSystemAccess)
             return;
 
         for (const auto& p : param)
-            if (!resourceAccessHelper(accessData, p.cameraId, Qn::SavePermission))
+            if (!resourceAccessHelper(commonModule, accessData, p.cameraId, Qn::SavePermission))
             {
                 param = ApiCameraAttributesDataList();
                 return;
             }
 
-        QnCamLicenseUsageHelper licenseUsageHelper;
+        QnCamLicenseUsageHelper licenseUsageHelper(commonModule);
         QnVirtualCameraResourceList cameras;
 
+        const auto& resPool = commonModule->resourcePool();
         for (const auto& p : param)
         {
-            auto camera = qnResPool->getResourceById(p.cameraId).dynamicCast<QnVirtualCameraResource>();
+            auto camera = resPool->getResourceById(p.cameraId).dynamicCast<QnVirtualCameraResource>();
             if (!camera)
             {
                 param = ApiCameraAttributesDataList();
@@ -809,17 +830,17 @@ struct ModifyCameraAttributesListAccess
 
 struct ReadServerAttributesAccess
 {
-    bool operator()(const Qn::UserAccessData& accessData, const ApiMediaServerUserAttributesData& param)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiMediaServerUserAttributesData& param)
     {
-        return resourceAccessHelper(accessData, param.serverId, Qn::ReadPermission);
+        return resourceAccessHelper(commonModule, accessData, param.serverId, Qn::ReadPermission);
     }
 };
 
 struct ReadServerAttributesAccessOut
 {
-    RemotePeerAccess operator()(const Qn::UserAccessData& accessData, const ApiMediaServerUserAttributesData& param)
+    RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiMediaServerUserAttributesData& param)
     {
-        return resourceAccessHelper(accessData, param.serverId, Qn::ReadPermission)
+        return resourceAccessHelper(commonModule, accessData, param.serverId, Qn::ReadPermission)
             ? RemotePeerAccess::Allowed
             : RemotePeerAccess::Forbidden;
     }
@@ -827,22 +848,23 @@ struct ReadServerAttributesAccessOut
 
 struct ModifyServerAttributesAccess
 {
-    bool operator()(const Qn::UserAccessData& accessData, const ApiMediaServerUserAttributesData& param)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiMediaServerUserAttributesData& param)
     {
-        return resourceAccessHelper(accessData, param.serverId, Qn::SavePermission);
+        return resourceAccessHelper(commonModule, accessData, param.serverId, Qn::SavePermission);
     }
 };
 
 struct UserInputAccess
 {
     template<typename Param>
-    bool operator()(const Qn::UserAccessData& accessData, const Param&)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const Param&)
     {
         if (hasSystemAccess(accessData))
             return true;
 
-        auto userResource = qnResPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-        bool result = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalUserInputPermission);
+        const auto& resPool = commonModule->resourcePool();
+        auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
+        bool result = commonModule->resourceAccessManager()->hasGlobalPermission(userResource, Qn::GlobalUserInputPermission);
         return result;
     }
 };
@@ -850,13 +872,14 @@ struct UserInputAccess
 struct AdminOnlyAccess
 {
     template<typename Param>
-    bool operator()(const Qn::UserAccessData& accessData, const Param&)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const Param&)
     {
         if (hasSystemAccess(accessData))
             return true;
 
-        auto userResource = qnResPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-        bool result = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalAdminPermission);
+        const auto& resPool = commonModule->resourcePool();
+        auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
+        bool result = commonModule->resourceAccessManager()->hasGlobalPermission(userResource, Qn::GlobalAdminPermission);
         return result;
     }
 };
@@ -864,13 +887,14 @@ struct AdminOnlyAccess
 struct AdminOnlyAccessOut
 {
     template<typename Param>
-    RemotePeerAccess operator()(const Qn::UserAccessData& accessData, const Param&)
+    RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const Param&)
     {
         if (hasSystemAccess(accessData))
             return RemotePeerAccess::Allowed;
 
-        auto userResource = qnResPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-        RemotePeerAccess result = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalAdminPermission)
+        const auto& resPool = commonModule->resourcePool();
+        auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
+        RemotePeerAccess result = commonModule->resourceAccessManager()->hasGlobalPermission(userResource, Qn::GlobalAdminPermission)
             ? RemotePeerAccess::Allowed
             : RemotePeerAccess::Forbidden;
         return result;
@@ -879,15 +903,16 @@ struct AdminOnlyAccessOut
 
 struct RemoveUserRoleAccess
 {
-    bool operator()(const Qn::UserAccessData& accessData, const ApiIdData& param)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiIdData& param)
     {
-        if (!AdminOnlyAccess()(accessData, param))
+        if (!AdminOnlyAccess()(commonModule, accessData, param))
         {
             qWarning() << "Removing user role is forbidden because the user has no admin access";
             return false;
         }
 
-        for (const auto& user : qnResPool->getResources<QnUserResource>())
+        const auto& resPool = commonModule->resourcePool();
+        for (const auto& user: resPool->getResources<QnUserResource>())
         {
             if (user->userRoleId() == param.id)
             {
@@ -902,12 +927,13 @@ struct RemoveUserRoleAccess
 
 struct VideoWallControlAccess
 {
-    bool operator()(const Qn::UserAccessData& accessData, const ApiVideowallControlMessageData&)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiVideowallControlMessageData&)
     {
         if (hasSystemAccess(accessData))
             return true;
-        auto userResource = qnResPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-        bool result = qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalControlVideoWallPermission);
+        const auto& resPool = commonModule->resourcePool();
+        auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
+        bool result = commonModule->resourceAccessManager()->hasGlobalPermission(userResource, Qn::GlobalControlVideoWallPermission);
         if (!result)
         {
             QString userName = userResource ? userResource->fullName() : lit("Unknown user");
@@ -922,7 +948,7 @@ struct VideoWallControlAccess
 struct InvalidFilterFunc
 {
     template<typename ParamType>
-    void operator()(const Qn::UserAccessData&, ParamType&)
+    void operator()(QnCommonModule*, const Qn::UserAccessData&, ParamType&)
     {
         auto td = getTransactionDescriptorByParam<ParamType>();
         auto transactionName = td->getName();
@@ -934,12 +960,12 @@ template<typename SingleAccess >
 struct FilterListByAccess
 {
     template<typename ParamContainer>
-    void operator()(const Qn::UserAccessData& accessData, ParamContainer& outList)
+    void operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ParamContainer& outList)
     {
         outList.erase(std::remove_if(outList.begin(), outList.end(),
-            [&accessData](typename ParamContainer::value_type &param)
+            [&accessData, commonModule](typename ParamContainer::value_type &param)
         {
-            return !SingleAccess()(accessData, param);
+            return !SingleAccess()(commonModule, accessData, param);
         }), outList.end());
     }
 };
@@ -950,12 +976,12 @@ struct FilterListByAccess<ModifyResourceAccess>
     FilterListByAccess(bool isRemove): isRemove(isRemove) {}
 
     template<typename ParamContainer>
-    void operator()(const Qn::UserAccessData& accessData, ParamContainer& outList)
+    void operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ParamContainer& outList)
     {
         outList.erase(std::remove_if(outList.begin(), outList.end(),
-            [&accessData, this](const typename ParamContainer::value_type &param)
+            [&accessData, this, commonModule](const typename ParamContainer::value_type &param)
         {
-            return !ModifyResourceAccess(isRemove)(accessData, param);
+            return !ModifyResourceAccess(isRemove)(commonModule, accessData, param);
         }), outList.end());
     }
 
@@ -967,12 +993,12 @@ struct FilterListByAccess<ModifyResourceParamAccess>
 {
     FilterListByAccess(bool isRemove): isRemove(isRemove) {}
 
-    void operator()(const Qn::UserAccessData& accessData, ApiResourceParamWithRefDataList& outList)
+    void operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ApiResourceParamWithRefDataList& outList)
     {
         outList.erase(std::remove_if(outList.begin(), outList.end(),
-            [&accessData, this](const ApiResourceParamWithRefData &param)
+            [&accessData, commonModule, this](const ApiResourceParamWithRefData &param)
         {
-            return !ModifyResourceParamAccess(isRemove)(accessData, param);
+            return !ModifyResourceParamAccess(isRemove)(commonModule, accessData, param);
         }), outList.end());
     }
 
@@ -983,10 +1009,10 @@ template<typename SingleAccess>
 struct ModifyListAccess
 {
     template<typename ParamContainer>
-    bool operator()(const Qn::UserAccessData& accessData, const ParamContainer& paramContainer)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ParamContainer& paramContainer)
     {
         ParamContainer tmpContainer = paramContainer;
-        FilterListByAccess<SingleAccess>()(accessData, tmpContainer);
+        FilterListByAccess<SingleAccess>()(commonModule, accessData, tmpContainer);
         if (paramContainer.size() != tmpContainer.size())
         {
             NX_LOG(lit("Modify list access filtered out %1 entries from %2. Transaction: %3")
@@ -1004,10 +1030,10 @@ template<typename SingleAccess>
 struct ReadListAccess
 {
     template<typename ParamContainer>
-    bool operator()(const Qn::UserAccessData& accessData, const ParamContainer& paramContainer)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ParamContainer& paramContainer)
     {
         ParamContainer tmpContainer = paramContainer;
-        FilterListByAccess<SingleAccess>()(accessData, tmpContainer);
+        FilterListByAccess<SingleAccess>()(commonModule, accessData, tmpContainer);
         return tmpContainer.size() != paramContainer.size() && tmpContainer.empty();
     }
 };
@@ -1016,10 +1042,10 @@ template<typename SingleAccess>
 struct ReadListAccessOut
 {
     template<typename ParamContainer>
-    RemotePeerAccess operator()(const Qn::UserAccessData& accessData, const ParamContainer& paramContainer)
+    RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ParamContainer& paramContainer)
     {
         ParamContainer tmpContainer = paramContainer;
-        FilterListByAccess<SingleAccess>()(accessData, tmpContainer);
+        FilterListByAccess<SingleAccess>()(commonModule, accessData, tmpContainer);
         if (paramContainer.size() != tmpContainer.size() && tmpContainer.empty())
             return RemotePeerAccess::Forbidden;
         if (tmpContainer.size() == paramContainer.size())
@@ -1031,7 +1057,7 @@ struct ReadListAccessOut
 struct RegularTransactionType
 {
     template<typename Param>
-    ec2::TransactionType::Value operator()(const Param&)
+    ec2::TransactionType::Value operator()(QnCommonModule*, const Param&, detail::QnDbManager*)
     {
         return TransactionType::Regular;
     }
@@ -1040,16 +1066,16 @@ struct RegularTransactionType
 struct LocalTransactionType
 {
     template<typename Param>
-    ec2::TransactionType::Value operator()(const Param&)
+    ec2::TransactionType::Value operator()(QnCommonModule*, const Param&, detail::QnDbManager*)
     {
         return TransactionType::Local;
     }
 };
 
-ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id)
+ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id, detail::QnDbManager* db)
 {
     ApiMediaServerDataList serverDataList;
-    ec2::ErrorCode errorCode = QnDbManager::instance()->doQueryNoLock(id, serverDataList);
+    ec2::ErrorCode errorCode = db->doQueryNoLock(id, serverDataList);
 
     if (errorCode != ErrorCode::ok || serverDataList.empty())
         return ec2::TransactionType::Unknown;
@@ -1059,11 +1085,12 @@ ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id)
 
 struct SetStatusTransactionType
 {
-    ec2::TransactionType::Value operator()(const ApiResourceStatusData& params)
+    ec2::TransactionType::Value operator()(QnCommonModule* commonModule, const ApiResourceStatusData& params, detail::QnDbManager* db)
     {
-        QnResourcePtr resource = qnResPool->getResourceById<QnResource>(params.id);
+        const auto& resPool = commonModule->resourcePool();
+        QnResourcePtr resource = resPool->getResourceById<QnResource>(params.id);
         if (!resource)
-            return getStatusTransactionTypeFromDb(params.id);
+            return getStatusTransactionTypeFromDb(params.id, db);
         if(resource.dynamicCast<QnMediaServerResource>())
             return TransactionType::Local;
         else
@@ -1073,7 +1100,7 @@ struct SetStatusTransactionType
 
 struct SaveUserTransactionType
 {
-    ec2::TransactionType::Value operator()(const ApiUserData& params)
+    ec2::TransactionType::Value operator()(QnCommonModule*, const ApiUserData& params, detail::QnDbManager* /*db*/)
     {
         return params.isCloud ? TransactionType::Cloud : TransactionType::Regular;
     }
@@ -1081,7 +1108,10 @@ struct SaveUserTransactionType
 
 struct SetResourceParamTransactionType
 {
-    ec2::TransactionType::Value operator()(const ApiResourceParamWithRefData& param)
+    ec2::TransactionType::Value operator()(
+		QnCommonModule*,
+        const ApiResourceParamWithRefData& param,
+        detail::QnDbManager* /*db*/)
     {
         if (param.resourceId == QnUserResource::kAdminGuid &&
             param.name == nx::settings_names::kNameSystemName)
@@ -1094,10 +1124,12 @@ struct SetResourceParamTransactionType
     }
 };
 
-ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(const QnUuid& id)
+ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(
+    const QnUuid& id,
+    detail::QnDbManager* db)
 {
     ApiUserDataList userDataList;
-    ec2::ErrorCode errorCode = QnDbManager::instance()->doQueryNoLock(id, userDataList);
+    ec2::ErrorCode errorCode = db->doQuery(id, userDataList);
 
     if (errorCode != ErrorCode::ok || userDataList.empty())
         return ec2::TransactionType::Unknown;
@@ -1107,11 +1139,12 @@ ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(const QnUuid& id)
 
 struct RemoveUserTransactionType
 {
-    ec2::TransactionType::Value operator()(const ApiIdData& params)
+    ec2::TransactionType::Value operator()(QnCommonModule* commonModule, const ApiIdData& params, detail::QnDbManager* db)
     {
-        auto user = qnResPool->getResourceById<QnUserResource>(params.id);
+        const auto& resPool = commonModule->resourcePool();
+        auto user = resPool->getResourceById<QnUserResource>(params.id);
         if (!user)
-            return getRemoveUserTransactionTypeFromDb(params.id);
+            return getRemoveUserTransactionTypeFromDb(params.id, db);
         return user->isCloud() ? TransactionType::Cloud : TransactionType::Regular;
     }
 };

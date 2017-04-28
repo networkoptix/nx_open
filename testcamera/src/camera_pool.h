@@ -5,7 +5,7 @@
 #include <QtCore/QMutex>
 #include "test_camera.h"
 #include <nx/network/socket.h>
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 #include <network/tcp_listener.h>
 
 class QnCameraDiscoveryListener;
@@ -16,10 +16,10 @@ public:
     /*!
         \param localInterfacesToListen If empty, all local interfaces are listened
     */
-    QnCameraPool( const QStringList& localInterfacesToListen );
+    QnCameraPool(const QStringList& localInterfacesToListen, QnCommonModule* commonModule);
     virtual ~QnCameraPool();
 
-    static void initGlobalInstance( QnCameraPool* _inst );
+    static void initGlobalInstance(QnCameraPool* _inst);
     static QnCameraPool* instance();
 
     void addCameras(bool cameraForEachFile, int count, QStringList primaryFileList, QStringList secondaryFileList, int offlineFreq);

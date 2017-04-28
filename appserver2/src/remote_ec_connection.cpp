@@ -14,10 +14,11 @@
 namespace ec2
 {
     RemoteEC2Connection::RemoteEC2Connection(
+        const AbstractECConnectionFactory* connectionFactory,
         const FixedUrlClientQueryProcessorPtr& queryProcessor,
         const QnConnectionInfo& connectionInfo )
     :
-        base_type( queryProcessor.get() ),
+        base_type(connectionFactory, queryProcessor.get() ),
         m_queryProcessor( queryProcessor ),
         m_connectionInfo( connectionInfo )
     {
@@ -36,9 +37,9 @@ namespace ec2
         return m_connectionInfo.ecUrl.password();
     }
 
-    void RemoteEC2Connection::startReceivingNotifications() {
-
-        QnTransactionMessageBus::instance()->setHandler( notificationManager() );
+    void RemoteEC2Connection::startReceivingNotifications()
+    {
+        m_connectionFactory->messageBus()->setHandler( notificationManager() );
 
         base_type::startReceivingNotifications();
 
@@ -49,18 +50,32 @@ namespace ec2
         QUrlQuery q;
         url.setQuery(q);
         m_peerUrl = url;
-        QnTransactionMessageBus::instance()->addConnectionToPeer(url);
+        m_connectionFactory->messageBus()->addConnectionToPeer(url);
     }
 
     void RemoteEC2Connection::stopReceivingNotifications() {
         base_type::stopReceivingNotifications();
-        if (QnTransactionMessageBus::instance()) {
-            QnTransactionMessageBus::instance()->removeConnectionFromPeer( m_peerUrl );
-            QnTransactionMessageBus::instance()->removeHandler( notificationManager() );
+        if (m_connectionFactory->messageBus())
+        {
+            m_connectionFactory->messageBus()->removeConnectionFromPeer( m_peerUrl );
+            m_connectionFactory->messageBus()->removeHandler( notificationManager() );
         }
 
         //TODO #ak next call can be placed here just because we always have just one connection to EC
-        TimeSynchronizationManager::instance()->forgetSynchronizedTime();
+        //todo: #singletone it is not true any more
+        m_connectionFactory->timeSyncManager()->forgetSynchronizedTime();
+    }
+
+    Timestamp RemoteEC2Connection::getTransactionLogTime() const
+    {
+        NX_ASSERT(true); //< not implemented
+        return Timestamp();
+    }
+
+    void RemoteEC2Connection::setTransactionLogTime(Timestamp /*value*/)
+    {
+        NX_ASSERT(true); //< not implemented
     }
 
 }
+

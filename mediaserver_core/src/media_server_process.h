@@ -17,7 +17,7 @@
 #include "platform/monitoring/global_monitor.h"
 #include <platform/platform_abstraction.h>
 
-#include "utils/common/long_runnable.h"
+#include "nx/utils/thread/long_runnable.h"
 #include "nx_ec/impl/ec_api_impl.h"
 #include "utils/common/public_ip_discovery.h"
 #include <nx/network/http/http_mod_manager.h>
@@ -27,6 +27,7 @@
 
 #include "health/system_health.h"
 #include "platform/platform_abstraction.h"
+#include <nx/utils/log/log.h>
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -89,7 +90,7 @@ class MediaServerProcess: public QnLongRunnable
     Q_OBJECT
 
 public:
-    MediaServerProcess(int argc, char* argv[]);
+    MediaServerProcess(int argc, char* argv[], bool serviceMode = false);
     ~MediaServerProcess();
 
     void stopObjects();
@@ -103,14 +104,22 @@ public:
 
     const CmdLineArguments cmdLineArguments() const;
     void setObsoleteGuid(const QnUuid& obsoleteGuid) { m_obsoleteGuid = obsoleteGuid; }
-
+    QnCommonModule* commonModule() const
+    {
+        if (const auto& module = m_serverModule.lock())
+            return module->commonModule();
+        else
+            return nullptr;
+    }
 signals:
     void started();
 public slots:
     void stopAsync();
     void stopSync();
 private slots:
-    void loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor);
+    void loadResourcesFromECS(
+        ec2::AbstractECConnectionPtr ec2Connection,
+        QnCommonMessageProcessor* messageProcessor);
     void at_portMappingChanged(QString address);
     void at_serverSaved(int, ec2::ErrorCode err);
     void at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList);
@@ -128,7 +137,6 @@ private slots:
     void at_databaseDumped();
     void at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
     void at_updatePublicAddress(const QHostAddress& publicIP);
-
 private:
 
     void updateDisabledVendorsIfNeeded();
@@ -136,8 +144,13 @@ private:
     void moveHandlingCameras();
     void updateAddressesList();
     void initStoragesAsync(QnCommonMessageProcessor* messageProcessor);
-    void registerRestHandlers(CloudManagerGroup* const cloudManagerGroup);
-    bool initTcpListener(CloudManagerGroup* const cloudManagerGroup);
+    void registerRestHandlers(
+        CloudManagerGroup* const cloudManagerGroup,
+        QnUniversalTcpListener* tcpListener,
+        ec2::QnTransactionMessageBus* messageBus);
+    bool initTcpListener(
+        CloudManagerGroup* const cloudManagerGroup,
+        ec2::QnTransactionMessageBus* messageBus);
     std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
     Qn::ServerFlags calcServerFlags();
     void initPublicIpDiscovery();
@@ -149,15 +162,20 @@ private:
     void performActionsOnExit();
     void parseCommandLineParameters(int argc, char* argv[]);
     void updateAllowedInterfaces();
-    void addCommandLineParametersFromConfig();
+    void addCommandLineParametersFromConfig(MSSettings* settings);
     void saveServerInfo(const QnMediaServerResourcePtr& server);
+
+    void serviceModeInit();
+    void initTransactionLog(const QString& logDir, QnLogLevel level);
+    void initPermissionsLog(const QString& logDir, QnLogLevel level);
+    QString hardwareIdAsGuid();
+    void updateGuidIfNeeded();
 private:
     int m_argc;
     char** m_argv;
     bool m_startMessageSent;
     qint64 m_firstRunningTime;
 
-    QnModuleFinder* m_moduleFinder;
     std::unique_ptr<QnAutoRequestForwarder> m_autoRequestForwarder;
     std::unique_ptr<nx_http::HttpModManager> m_httpModManager;
     QnUniversalTcpListener* m_universalTcpListener;
@@ -176,6 +194,9 @@ private:
     std::unique_ptr<QnPlatformAbstraction> m_platform;
     CmdLineArguments m_cmdLineArguments;
     QnUuid m_obsoleteGuid;
+    std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
+    std::weak_ptr<QnMediaServerModule> m_serverModule;
+    bool m_serviceMode;
 };
 
 #endif // MEDIA_SERVER_PROCESS_H

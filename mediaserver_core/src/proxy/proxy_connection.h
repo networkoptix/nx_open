@@ -8,10 +8,15 @@ class QnAbstractStreamDataProvider;
 class QnProxyConnectionProcessorPrivate;
 struct QnRoute;
 
+namespace ec2 {
+    class QnTransactionMessageBus;
+}
+
 class QnProxyConnectionProcessor: public QnTCPConnectionProcessor
 {
 public:
     QnProxyConnectionProcessor(
+        ec2::QnTransactionMessageBus* messageBus,
         QSharedPointer<AbstractStreamSocket> socket,
         QnHttpConnectionListener* owner);
 
@@ -19,6 +24,9 @@ public:
         QnProxyConnectionProcessorPrivate* priv,
         QSharedPointer<AbstractStreamSocket> socket,
         QnHttpConnectionListener* owner);
+
+
+    static void cleanupProxyInfo(nx_http::Request* request);
 
     virtual ~QnProxyConnectionProcessor();
 protected:

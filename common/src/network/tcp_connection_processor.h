@@ -1,26 +1,28 @@
-#ifndef __TCP_CONNECTION_PROCESSOR_H__
-#define __TCP_CONNECTION_PROCESSOR_H__
+#pragma once
 
-#include <nx/utils/thread/mutex.h>
 #include <QtCore/QUrl>
 
-#include "utils/common/long_runnable.h"
+#include <common/common_module_aware.h>
+
+#include "nx/utils/thread/long_runnable.h"
 #include <nx/network/socket.h>
 #include "utils/common/byte_array.h"
 #include "api/model/audit/auth_session.h"
+
 #include <nx/network/http/httptypes.h>
+#include <nx/utils/thread/mutex.h>
 
 class QnTcpListener;
 class QnTCPConnectionProcessorPrivate;
 
-class QnTCPConnectionProcessor: public QnLongRunnable {
+class QnTCPConnectionProcessor: public QnLongRunnable, public QnCommonModuleAware
+{
     Q_OBJECT;
 
 public:
     static const int KEEP_ALIVE_TIMEOUT = 5  * 1000;
 
-
-    QnTCPConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket);
+    QnTCPConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnCommonModule* commonModule);
     virtual ~QnTCPConnectionProcessor();
 
     /**
@@ -85,7 +87,10 @@ protected:
     int readSocket( quint8* buffer, int bufSize );
     SocketAddress remoteHostAddress() const;
 
-    QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* d_ptr, QSharedPointer<AbstractStreamSocket> socket);
+    QnTCPConnectionProcessor(
+        QnTCPConnectionProcessorPrivate* d_ptr,
+        QSharedPointer<AbstractStreamSocket> socket,
+        QnCommonModule* commonModule);
 
     bool sendData(const char* data, int size);
     inline bool sendData(const QByteArray& data) { return sendData(data.constData(), data.size()); }
@@ -97,5 +102,3 @@ protected:
 
     bool isConnectionCanBePersistent() const;
 };
-
-#endif // __TCP_CONNECTION_PROCESSOR_H__

@@ -80,14 +80,14 @@ public:
         \note Returned data is actual for the moment of calling this method
         \note Lock on shared memory is required for calling this method
     */
-    stree::ResourceContainer currentTotalUsage() const;
+    nx::utils::stree::ResourceContainer currentTotalUsage() const;
     //!Add decoder \a decoder to the list of current sessions
     /*!
         Before \a decoder destruction one MUST call method \a decoderIsAboutToBeDestroyed
     */
-    void decoderCreated( stree::AbstractResourceReader* const decoder );
+    void decoderCreated( nx::utils::stree::AbstractResourceReader* const decoder );
     //!Removes \a decoder from current session list
-    void decoderIsAboutToBeDestroyed( stree::AbstractResourceReader* const decoder );
+    void decoderIsAboutToBeDestroyed( nx::utils::stree::AbstractResourceReader* const decoder );
 
     //!Locks shared memory from being used by other processes
     bool lockSharedMemory();
@@ -112,7 +112,7 @@ protected:
 private:
     mutable QnMutex m_mutex;
     QString m_uniquePluginID;
-    std::set<stree::AbstractResourceReader*> m_currentSessions;
+    std::set<nx::utils::stree::AbstractResourceReader*> m_currentSessions;
     bool m_sharedMemoryLocked;
     //!Used to synchronize access to shared memory. We do not use QSharedMemory internal semaphore, because it can dead-lock on ms windows in case of unexpected process termination
     NamedMutex m_sharedMemoryLocker;

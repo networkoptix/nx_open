@@ -19,13 +19,17 @@ const QString moduleInfoStr(lit(", { seed: \"%1\" }, {peerType: \"%2\"}"));
 
 }
 
+RevealRequest::RevealRequest(const QnUuid& moduleGuid, Qn::PeerType peerType):
+    m_moduleGuid(moduleGuid),
+    m_peerType(peerType)
+{
+}
+
 QByteArray RevealRequest::serialize()
 {
     QByteArray result = revealRequestStr;
-    QString moduleGuid = qnCommon->moduleGUID().toString();
-    if (moduleGuid.startsWith(lit("{")))
-        moduleGuid = moduleGuid.mid(1, moduleGuid.length() - 2);
-    result += moduleInfoStr.arg(moduleGuid).arg(QnLexical::serialized(qnCommon->localPeerType())).toLatin1();
+    QString moduleGuid = m_moduleGuid.toSimpleString();
+    result += moduleInfoStr.arg(moduleGuid).arg(QnLexical::serialized(m_peerType)).toLatin1();
     return result;
 }
 

@@ -51,6 +51,21 @@ QString AppInfo::applicationArch()
     return QStringLiteral("${arch}");
 }
 
+QString AppInfo::organizationName()
+{
+    return QStringLiteral("${company.name}");
+}
+
+QString AppInfo::productNameShort()
+{
+    return QStringLiteral("${product.name.short}");
+}
+
+QString AppInfo::productNameLong()
+{
+    return QStringLiteral("${display.product.name}");
+}
+
 QString AppInfo::armBox()
 {
     // TODO: #akolesnikov: For now, box value has sense on ARM devices only.

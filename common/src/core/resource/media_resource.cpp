@@ -10,6 +10,7 @@
 #include "camera_user_attribute_pool.h"
 #include "resource_media_layout.h"
 #include "nx/streaming/abstract_stream_data_provider.h"
+#include <common/common_module.h>
 
 namespace {
     const QString customAspectRatioKey          = lit("overrideAr");
@@ -154,8 +155,14 @@ void QnMediaResource::initMediaResource()
     toResource()->addFlags(Qn::media);
 }
 
-QnMediaDewarpingParams QnMediaResource::getDewarpingParams() const {
-    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), toResource()->getId() );
+QnCameraUserAttributePool* QnMediaResource::userAttributesPool() const
+{
+    return toResource()->commonModule()->cameraUserAttributesPool();
+}
+
+QnMediaDewarpingParams QnMediaResource::getDewarpingParams() const
+{
+    QnCameraUserAttributePool::ScopedLock userAttributesLock(userAttributesPool(), toResource()->getId() );
     return (*userAttributesLock)->dewarpingParams;
 }
 
@@ -163,7 +170,7 @@ QnMediaDewarpingParams QnMediaResource::getDewarpingParams() const {
 void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params)
 {
     {
-        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), toResource()->getId() );
+        QnCameraUserAttributePool::ScopedLock userAttributesLock(userAttributesPool(), toResource()->getId() );
         if ((*userAttributesLock)->dewarpingParams == params)
             return;
 
@@ -172,7 +179,8 @@ void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params)
     emit toResource()->mediaDewarpingParamsChanged(this->toResourcePtr());
 }
 
-qreal QnMediaResource::customAspectRatio() const {
+qreal QnMediaResource::customAspectRatio() const
+{
     if (!this->toResource()->hasProperty(::customAspectRatioKey))
         return noCustomAspectRatio;
 

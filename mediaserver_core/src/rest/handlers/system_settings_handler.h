@@ -10,6 +10,8 @@
 #include <core/resource_access/user_access_data.h>
 #include <api/model/audit/auth_session.h>
 
+class QnCommonModule;
+
 /*!
     If no parameters are specified then just returns list of settings.
     If setting(s) to set is specified, then new values are returned
@@ -28,6 +30,7 @@ public:
         const QnRestConnectionProcessor* owner) override;
 
     bool updateSettings(
+        QnCommonModule* commonModule,
         const QnRequestParams& params,
         QnJsonRestResult& result,
         const Qn::UserAccessData& accessRights,

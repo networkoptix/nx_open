@@ -10,22 +10,12 @@
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
+#include <common/static_common_module.h>
 
-
-QnPlPulseSearcher::QnPlPulseSearcher()
+QnPlPulseSearcher::QnPlPulseSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule)
 {
-
-}
-
-static std::unique_ptr<QnPlPulseSearcher> QnPlPulseSearcher_instance;
-static std::once_flag QnPlPulseSearcher_onceFlag;
-
-QnPlPulseSearcher& QnPlPulseSearcher::instance()
-{
-    std::call_once(
-        QnPlPulseSearcher_onceFlag,
-        [](){ QnPlPulseSearcher_instance.reset( new QnPlPulseSearcher() ); } );
-    return *QnPlPulseSearcher_instance.get();
 }
 
 QnResourceList QnPlPulseSearcher::findResources()
@@ -41,12 +31,12 @@ QnResourceList QnPlPulseSearcher::findResources()
         if (!res)
             continue;
 
-        QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), r.name);
+        QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), r.name);
         if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
             continue; // model forced by ONVIF
 
         QnPhysicalCameraResourcePtr cameraRes = res.dynamicCast<QnPhysicalCameraResource>();
-        
+
         res->setName(r.name);
         if (cameraRes)
             cameraRes->setModel(r.name);
@@ -56,7 +46,7 @@ QnResourceList QnPlPulseSearcher::findResources()
         result.push_back(res);
 
     }
-    
+
 
     return result;
 }
@@ -81,7 +71,7 @@ QnResourcePtr QnPlPulseSearcher::createResource(const QnUuid &resourceTypeId, co
     else
         return result;
 
-    
+
     result->setTypeId(resourceTypeId);
 
     qDebug() << "Create Pulse camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
@@ -118,7 +108,7 @@ QnNetworkResourcePtr QnPlPulseSearcher::createResource(const QString& manufactur
     {
         result = QnNetworkResourcePtr(new QnPlPulseResource());
     }
-        
+
     if (result)
         result->setTypeId(rt);
 

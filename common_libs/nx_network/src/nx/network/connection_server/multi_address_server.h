@@ -10,12 +10,10 @@
 #include <memory>
 #include <tuple>
 
-#include <common/common_globals.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/log/log.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_factory.h>
-
 
 //!Listens multiple addresses by creating multiple servers (\a SocketServerType)
 template<class SocketServerType>
@@ -89,11 +87,11 @@ public:
     }
 
     //!Returns true, if all binded addresses are successfully listened
-    bool listen()
+    bool listen(int backlogSize = AbstractStreamServerSocket::kDefaultBacklogSize)
     {
         for (auto it = m_listeners.cbegin(); it != m_listeners.cend(); )
         {
-            if (!(*it)->listen())
+            if (!(*it)->listen(backlogSize))
             {
                 const auto& errorText = SystemError::getLastOSErrorText();
                 NX_LOG(QString::fromLatin1("Failed to listen address %1. %2")

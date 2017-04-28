@@ -15,13 +15,14 @@
 
 #include <onvif/stdsoap2.h>
 
-#include <utils/common/joinable.h>
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/joinable.h>
+#include <nx/utils/thread/stoppable.h>
 #include <nx/network/socket.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/network/http/httpstreamreader.h>
 
 #include "soap_wrapper.h"
+#include <onvif/soapDeviceBindingProxy.h>
 
 
 class GSoapAsyncCallWrapperBase

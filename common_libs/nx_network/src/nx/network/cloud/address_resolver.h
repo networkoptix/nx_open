@@ -5,7 +5,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/dns_resolver.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 #include "cloud_module_url_fetcher.h"
 #include "mediator_client_connections.h"

@@ -9,11 +9,8 @@
 #include <limits>
 #include <memory>
 
-#include <utils/common/stoppable.h>
-
 #include "aio/basic_pollable.h"
 #include "aio/timer.h"
-
 
 namespace nx {
 namespace network {
@@ -32,6 +29,8 @@ public:
     constexpr static const unsigned int kDefaultDelayMultiplier = 2;
     constexpr static const std::chrono::milliseconds kDefaultMaxDelay =
         std::chrono::minutes(1);
+
+    const static RetryPolicy kNoRetries;
 
     unsigned int maxRetryCount;
     std::chrono::milliseconds initialDelay;

@@ -1,5 +1,4 @@
-#ifndef __TIME_IMAGE_FILTER_H__
-#define __TIME_IMAGE_FILTER_H__
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -7,12 +6,16 @@
 
 #include "abstract_image_filter.h"
 
+#include <transcoding/timestamp_params.h>
+
 class QnResourceVideoLayout;
 
 class QnTimeImageFilter: public QnAbstractImageFilter
 {
 public:
-    QnTimeImageFilter(const QSharedPointer<const QnResourceVideoLayout>& videoLayout, Qn::Corner datePos, qint64 timeOffsetMs, qint64 timeMsec);
+    QnTimeImageFilter(
+        const QSharedPointer<const QnResourceVideoLayout>& videoLayout,
+        const QnTimeStampParams& params);
     virtual ~QnTimeImageFilter();
     CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
     virtual QSize updatedResolution(const QSize& srcSize) override { return srcSize; }
@@ -27,14 +30,10 @@ private:
     int m_bufYOffs;
     QImage* m_timeImg;
     QSize m_timeImgSrcSiz;
-    qint64 m_onscreenDateOffset;
     quint8* m_imageBuffer;
-    Qn::Corner m_dateTextPos;
     bool m_checkHash;
     qint64 m_hash;
-    qint64 m_timeMsec;
+    QnTimeStampParams m_params;
 };
 
 #endif // ENABLE_DATA_PROVIDER
-
-#endif // __TIME_IMAGE_FILTER_H__

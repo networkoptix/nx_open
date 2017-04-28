@@ -1,8 +1,9 @@
 #ifndef __RTSP_CLIENT_ARCHIVE_DELEGATE_H
 #define __RTSP_CLIENT_ARCHIVE_DELEGATE_H
 
-#include <QElapsedTimer>
 #include <atomic>
+
+#include <QtCore/QElapsedTimer>
 
 #include <nx/utils/uuid.h>
 #include <nx/streaming/abstract_archive_delegate.h>
@@ -119,8 +120,6 @@ private:
     QnArchiveStreamReader* m_reader;
     int m_frameCnt;
     QnCustomResourceVideoLayoutPtr m_customVideoLayout;
-
-    QnUuid m_runtimeId;
 
 	QMap<int, QSharedPointer<QnNxRtpParser>> m_parsers;
 

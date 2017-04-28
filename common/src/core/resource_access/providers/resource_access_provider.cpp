@@ -5,9 +5,11 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/utils/log/assert.h>
+#include <common/common_module.h>
 
 QnResourceAccessProvider::QnResourceAccessProvider(QObject* parent):
-    base_type(parent)
+    base_type(parent),
+    QnCommonModuleAware(parent)
 {
 }
 
@@ -118,9 +120,9 @@ void QnResourceAccessProvider::endUpdateInternal()
 
 void QnResourceAccessProvider::afterUpdate()
 {
-    for (const auto& subject: qnResourceAccessSubjectsCache->allSubjects())
+    for (const auto& subject: resourceAccessSubjectsCache()->allSubjects())
     {
-        for (const QnResourcePtr& resource: qnResPool->getResources())
+        for (const QnResourcePtr& resource: commonModule()->resourcePool()->getResources())
         {
             auto value = accessibleVia(subject, resource);
             if (value != QnAbstractResourceAccessProvider::Source::none)

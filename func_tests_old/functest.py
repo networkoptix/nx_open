@@ -1315,15 +1315,9 @@ SimpleTestKeys = {
 BoxTestKeys = OrderedDict([
     ('--ts-noinet', TimeSyncNoInetTest),
     ('--ts-inet', TimeSyncWithInetTest),
-    ('--bstorage', BackupStorageTest),
-    ('--msarch', MultiserverArchiveTest),
     ('--stream', StreamingTest),
     ('--hlso', HlsOnlyTest),
-    ('--dbup', DBTest),
-    ('--camera', VirtualCameraTest),
     ('--htstress', HTTPStressTest),
-    ('--natcon', NatConnectionTest),
-    ('--instance', InstanceTest),
     ('--boxtests', None),
 ])
 KeysSkipList = ('--boxtests', '--ts-noinet', '--ts-inet', '--hlso')

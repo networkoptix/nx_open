@@ -13,7 +13,7 @@
 #include "utils/common/util.h"
 #include "utils/common/synctime.h"
 #include <nx/network/simple_http_client.h>
-#include <utils/match/wildcard.h>
+#include <nx/utils/match/wildcard.h>
 #include "api/app_server_connection.h"
 #include "common/common_module.h"
 #include "core/resource/media_server_resource.h"
@@ -34,7 +34,6 @@
 #include <nx/utils/string.h>
 
 #include "cloud/cloud_manager_group.h"
-
 
 ////////////////////////////////////////////////////////////
 //// class QnAuthHelper
@@ -62,24 +61,26 @@ static const QString TEMP_AUTH_KEY_NAME = lit("authKey");
 const unsigned int QnAuthHelper::MAX_AUTHENTICATION_KEY_LIFE_TIME_MS = 60 * 60 * 1000;
 
 QnAuthHelper::QnAuthHelper(
+    QnCommonModule* commonModule,
     TimeBasedNonceProvider* timeBasedNonceProvider,
     CloudManagerGroup* cloudManagerGroup)
-    :
+:
+    QnCommonModuleAware(commonModule),
     m_timeBasedNonceProvider(timeBasedNonceProvider),
     m_nonceProvider(&cloudManagerGroup->authenticationNonceFetcher),
     m_userDataProvider(&cloudManagerGroup->userAuthenticator)
 {
 #ifndef USE_USER_RESOURCE_PROVIDER
-    connect(qnResPool, SIGNAL(resourceAdded(const QnResourcePtr &)), this, SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
-    connect(qnResPool, SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
-    connect(qnResPool, SIGNAL(resourceRemoved(const QnResourcePtr &)), this, SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
+    connect(resourcePool(), SIGNAL(resourceAdded(const QnResourcePtr &)), this, SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
+    connect(resourcePool(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
+    connect(resourcePool(), SIGNAL(resourceRemoved(const QnResourcePtr &)), this, SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
 #endif
 }
 
 QnAuthHelper::~QnAuthHelper()
 {
 #ifndef USE_USER_RESOURCE_PROVIDER
-    disconnect(qnResPool, NULL, this, NULL);
+    disconnect(resourcePool(), NULL, this, NULL);
 #endif
 }
 
@@ -127,7 +128,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
         if (!videoWall_auth.isEmpty()) {
             if (usedAuthMethod)
                 *usedAuthMethod = AuthMethod::videowall;
-            if (qnResPool->getResourceById<QnVideoWallResource>(QnUuid(videoWall_auth)).isNull())
+            if (resourcePool()->getResourceById<QnVideoWallResource>(QnUuid(videoWall_auth)).isNull())
                 return Qn::Auth_Forbidden;
             else
             {
@@ -190,7 +191,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
                 userResource = findUserByName(nxUserName);
                 if (userResource)
                 {
-                    QString desiredRealm = QnAppInfo::realm();
+                    QString desiredRealm = nx::network::AppInfo::realm();
                     if (userResource->isLdap()) {
                         auto errCode = QnLdapManager::instance()->realm(&desiredRealm);
                         if (errCode != Qn::Auth_OK)
@@ -219,7 +220,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
             else {
                 // use admin's realm by default for better compatibility with previous version
                 // in case of default realm upgrade
-                userResource = qnResPool->getAdministrator();
+                userResource = resourcePool()->getAdministrator();
             }
 
             addAuthHeader(
@@ -235,7 +236,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
         //TODO #ak better call m_userDataProvider->authorize here
         QnUserResourcePtr userResource = findUserByName(authorizationHeader.userid());
 
-        QString desiredRealm = QnAppInfo::realm();
+        QString desiredRealm = nx::network::AppInfo::realm();
         if (userResource && userResource->isLdap()) {
             Qn::AuthResult authResult = QnLdapManager::instance()->realm(&desiredRealm);
             if (authResult != Qn::Auth_OK)
@@ -289,7 +290,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
 
             // update user information if authorization by server authKey and user-name is specified
             if (accessRights &&
-                qnResPool->getResourceById<QnMediaServerResource>(accessRights->userId))
+                resourcePool()->getResourceById<QnMediaServerResource>(accessRights->userId))
             {
                 *accessRights = Qn::kSystemAccess;
                 auto itr = request.headers.find(Qn::CUSTOM_USERNAME_HEADER_NAME);
@@ -465,7 +466,7 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
         {
             if (server->getId().toString().toUtf8().toLower() == userName)
             {
-                QString ha1Data = lit("%1:%2:%3").arg(server->getId().toString()).arg(QnAppInfo::realm()).arg(server->getAuthKey());
+                QString ha1Data = lit("%1:%2:%3").arg(server->getId().toString()).arg(nx::network::AppInfo::realm()).arg(server->getAuthKey());
                 QCryptographicHash ha1(QCryptographicHash::Md5);
                 ha1.addData(ha1Data.toUtf8());
 
@@ -485,12 +486,12 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
     }
 
     if (userResource &&
-        userResource->getRealm() != QnAppInfo::realm())
+        userResource->getRealm() != nx::network::AppInfo::realm())
     {
         //requesting client to re-calculate user's HA1 digest
         nx_http::insertOrReplaceHeader(
             &responseHeaders.headers,
-            nx_http::HttpHeader(Qn::REALM_HEADER_NAME, QnAppInfo::realm().toLatin1()));
+            nx_http::HttpHeader(Qn::REALM_HEADER_NAME, nx::network::AppInfo::realm().toLatin1()));
     }
     addAuthHeader(
         responseHeaders,
@@ -647,7 +648,7 @@ void QnAuthHelper::addAuthHeader(
     }
     else
     {
-        realm = QnAppInfo::realm();
+        realm = nx::network::AppInfo::realm();
     }
 
     const QString auth =
@@ -714,7 +715,7 @@ Qn::AuthResult QnAuthHelper::authenticateByUrl(
     authorization.digest->userid = authFields[0];
     authorization.digest->params["response"] = authFields[2];
     authorization.digest->params["nonce"] = authFields[1];
-    authorization.digest->params["realm"] = QnAppInfo::realm().toUtf8();
+    authorization.digest->params["realm"] = nx::network::AppInfo::realm().toUtf8();
     //digestAuthParams.params["uri"];   uri is empty
 
     if (!m_nonceProvider->isNonceValid(authorization.digest->params["nonce"]))
@@ -801,7 +802,7 @@ void QnAuthHelper::applyClientCalculatedPasswordHashToResource(
     fromResourceToApi(userResource, userData);
 
 
-    QnAppServerConnectionFactory::getConnection2()->getUserManager(Qn::kSystemAccess)->save(
+    commonModule()->ec2Connection()->getUserManager(Qn::kSystemAccess)->save(
         userData,
         QString(),
         ec2::DummyHandler::instance(),

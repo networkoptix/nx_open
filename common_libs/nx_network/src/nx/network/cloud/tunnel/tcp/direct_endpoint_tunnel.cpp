@@ -96,7 +96,8 @@ void DirectTcpEndpointTunnel::startConnection(
     std::list<ConnectionContext>::iterator connectionContextIter,
     std::chrono::milliseconds timeout)
 {
-    connectionContextIter->tcpSocket = std::make_unique<TCPSocket>(AF_INET);
+    connectionContextIter->tcpSocket = 
+        std::make_unique<TCPSocket>(SocketFactory::tcpClientIpVersion());
     connectionContextIter->tcpSocket->bindToAioThread(getAioThread());
     if (!connectionContextIter->tcpSocket->setNonBlockingMode(true) ||
         !connectionContextIter->tcpSocket->setSendTimeout(timeout.count()))

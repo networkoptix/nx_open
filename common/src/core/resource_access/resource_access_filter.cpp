@@ -68,10 +68,13 @@ QnResourceList QnResourceAccessFilter::filteredResources(Filter filter, const Qn
     return QnResourceList();
 }
 
-QSet<QnUuid> QnResourceAccessFilter::filteredResources(Filter filter, const QSet<QnUuid>& source)
+QSet<QnUuid> QnResourceAccessFilter::filteredResources(
+    QnResourcePool* resPool,
+    Filter filter,
+    const QSet<QnUuid>& source)
 {
     QSet<QnUuid> result;
-    for (const auto& resource : filteredResources(filter, qnResPool->getResources(source)))
+    for (const auto& resource : filteredResources(filter, resPool->getResources(source)))
         result << resource->getId();
     return result;
 }

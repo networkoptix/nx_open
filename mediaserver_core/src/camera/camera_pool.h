@@ -10,6 +10,8 @@
 #include <core/resource/resource_fwd.h>
 
 #include "camera/video_camera.h"
+#include <common/common_module_aware.h>
+#include <nx/utils/singleton.h>
 
 #define qnCameraPool QnVideoCameraPool::instance()
 
@@ -26,12 +28,10 @@ private:
     QnVideoCameraPtr m_camera;
 };
 
-class QnVideoCameraPool
+class QnVideoCameraPool: public QnCommonModuleAware, public Singleton<QnVideoCameraPool>
 {
 public:
-    static void initStaticInstance( QnVideoCameraPool* inst );
-    static QnVideoCameraPool* instance();
-
+    QnVideoCameraPool(QnCommonModule* commonModule);
     virtual ~QnVideoCameraPool();
 
     void stop();
@@ -49,7 +49,7 @@ public:
 private:
     typedef QMap<QnResourcePtr, QnVideoCameraPtr> CameraMap;
     CameraMap m_cameras;
-    static QnMutex m_staticMtx;
+    mutable QnMutex m_mutex;
 };
 
 #endif //  __CAMERA_POOL_H__

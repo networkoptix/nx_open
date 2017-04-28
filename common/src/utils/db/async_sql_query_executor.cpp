@@ -1,8 +1,3 @@
-/**********************************************************
-* 7 may 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "async_sql_query_executor.h"
 
 #include <thread>
@@ -22,7 +17,8 @@ AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
     const ConnectionOptions& connectionOptions)
     :
     m_connectionOptions(connectionOptions),
-    m_terminated(false)
+    m_terminated(false),
+    m_statisticsCollector(nullptr)
 {
     m_dropConnectionThread =
         nx::utils::thread(
@@ -105,11 +101,23 @@ bool AsyncSqlQueryExecutor::init()
     return true;
 }
 
+void AsyncSqlQueryExecutor::setStatisticsCollector(
+    StatisticsCollector* statisticsCollector)
+{
+    m_statisticsCollector = statisticsCollector;
+}
+
 void AsyncSqlQueryExecutor::reserveConnections(int count)
 {
     QnMutexLocker lock(&m_mutex);
     for (int i = 0; i < count; ++i)
         openNewConnection(lock);
+}
+
+std::size_t AsyncSqlQueryExecutor::pendingQueryCount() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_requestQueue.size();
 }
 
 bool AsyncSqlQueryExecutor::isNewConnectionNeeded(const QnMutexLockerBase& /*lk*/) const

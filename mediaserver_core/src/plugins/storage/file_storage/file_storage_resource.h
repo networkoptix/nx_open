@@ -20,15 +20,16 @@ const QString NX_TEMP_FOLDER_NAME = QnAppInfo::productNameShort() + "_temp_folde
 
 class QnFileStorageResource: public QnStorageResource
 {
+    using base_type = QnStorageResource;
 private:
     static const QString FROM_SEP;
     static const QString TO_SEP;
 
 public:
-    QnFileStorageResource();
+    QnFileStorageResource(QnCommonModule* commonModule);
     ~QnFileStorageResource();
 
-    static QnStorageResource* instance(const QString&);
+    static QnStorageResource* instance(QnCommonModule* commonModule, const QString&);
 
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
     QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode, int bufferSize);
@@ -56,7 +57,7 @@ public:
     qint64 calculateAndSetTotalSpaceWithoutInit();
 
     // true if storage is located on local disks
-    static bool isLocal(const QString &url);
+    bool isLocal();
     // calculate space limit judging by partition type
     static qint64 calcSpaceLimit(QnPlatformMonitor::PartitionType ptype);
 

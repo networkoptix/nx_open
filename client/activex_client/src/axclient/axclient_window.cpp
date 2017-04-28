@@ -2,6 +2,8 @@
 
 #include <client/client_message_processor.h>
 
+#include <common/common_module.h>
+
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/network_resource.h>
@@ -33,6 +35,8 @@ namespace {
     const qint64 displayWindowLengthMs = 5 * 60 * 1000;
 
 }
+
+using namespace nx::client::desktop::ui;
 
 QnAxClientWindow::QnAxClientWindow(QWidget *parent)
     : base_type(parent)
@@ -131,7 +135,7 @@ void QnAxClientWindow::addResourcesToLayout(const QList<QnUuid> &uniqueIds, qint
     QnResourceList resources;
     for(const auto& id: uniqueIds)
     {
-        QnResourcePtr resource = qnResPool->getResourceById(id);
+        QnResourcePtr resource = resourcePool()->getResourceById(id);
         if(resource)
             resources << resource;
     }
@@ -154,7 +158,7 @@ void QnAxClientWindow::addResourcesToLayout(const QList<QnUuid> &uniqueIds, qint
     layout->setParentId(m_context->user()->getId());
     layout->setCellSpacing(0);
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, timeStampMs, 1.0)));
-    qnResPool->addResource(layout);
+    resourcePool()->addResource(layout);
 
     QnWorkbenchLayout *wlayout = new QnWorkbenchLayout(layout, this);
     m_context->workbench()->addLayout(wlayout);
@@ -225,8 +229,8 @@ void QnAxClientWindow::createMainWindow() {
     QnActions::IDType effectiveMaximizeActionId = QnActions::FullscreenAction;
     m_context->menu()->registerAlias(QnActions::EffectiveMaximizeAction, effectiveMaximizeActionId);
 
-    m_mainWindow.reset(new QnMainWindow(m_context.data()));
-    m_mainWindow->setOptions(m_mainWindow->options() & ~(QnMainWindow::TitleBarDraggable));
+    m_mainWindow.reset(new MainWindow(m_context.data()));
+    m_mainWindow->setOptions(m_mainWindow->options() & ~(MainWindow::TitleBarDraggable));
 
     m_mainWindow->resize(100, 100);
     m_context->setMainWindow(m_mainWindow.data());

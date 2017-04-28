@@ -5,7 +5,8 @@
 
 #include "auth_restriction_list.h"
 
-#include "utils/match/wildcard.h"
+#include <nx/utils/match/wildcard.h>
+
 #include <network/tcp_listener.h>
 
 

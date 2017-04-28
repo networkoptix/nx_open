@@ -2,25 +2,18 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="tr" sourcelanguage="en">
 <context>
-    <name>QnCameraFlow</name>
+    <name>CameraItem</name>
     <message>
-        <source>Hidden cameras</source>
-        <translation>Gizlenmiş Kameralar</translation>
+        <source>Select camera</source>
+        <translation>Kamera seç</translation>
     </message>
-    <message numerus="yes">
-        <source>%n cameras are hidden</source>
-        <translation>
-            <numerusform>%n Kameralar Gizlenmiş</numerusform>
-        </translation>
-    </message>
-</context>
-<context>
-    <name>QnCameraItem</name>
     <message>
-        <source>Authentication
-required</source>
-        <translation>Kimlik Doğrulama
-gerekli</translation>
+        <source>Press Ctrl + Arrow or use mouse wheel</source>
+        <translation>Ctrl + ok tuşlarına basın veya fare tekerleğini kullanın</translation>
+    </message>
+    <message>
+        <source>Authentication required</source>
+        <translation>Kimlik doğrulaması gerekli</translation>
     </message>
     <message>
         <source>Offline</source>
@@ -28,141 +21,310 @@ gerekli</translation>
     </message>
 </context>
 <context>
-    <name>QnCameraMenu</name>
+    <name>CloudPanel</name>
     <message>
-        <source>Quality</source>
-        <translation>Kalite</translation>
-    </message>
-    <message>
-        <source>Auto</source>
-        <translation>Otomatik</translation>
+        <source>Log in to %1</source>
+        <translation>%1 e giriş yapın</translation>
     </message>
 </context>
 <context>
-    <name>QnDiscoveredSessionItem</name>
+    <name>CloudScreen</name>
     <message>
-        <source>Unknown</source>
-        <translation>Bilinmeyen</translation>
-    </message>
-    <message>
-        <source>incompatible server version</source>
-        <translation>Uyumsuz Sunucu Versiyonu</translation>
+        <source>Cloud Account</source>
+        <translation>Bulut hesabı</translation>
     </message>
 </context>
 <context>
-    <name>QnHiddenCameraItem</name>
+    <name>CloudSummary</name>
     <message>
-        <source>Show</source>
-        <translation>Göster</translation>
+        <source>Log out</source>
+        <translation>Çıkış</translation>
+    </message>
+    <message>
+        <source>Go to %1</source>
+        <translation>%1 e git</translation>
     </message>
 </context>
 <context>
-    <name>QnHorizontalCalendarLayout</name>
+    <name>CredentialsEditor</name>
+    <message>
+        <source>Email</source>
+        <translation>Eposta</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation>Parola</translation>
+    </message>
+    <message>
+        <source>Learn more about %1</source>
+        <translation>%1 Detay</translation>
+    </message>
+    <message>
+        <source>Create account</source>
+        <translation>Hesap oluştur</translation>
+    </message>
+    <message>
+        <source>Forgot your password?</source>
+        <translation>Parolanızı mı unuttunuz?</translation>
+    </message>
+    <message>
+        <source>Cannot connect to %1</source>
+        <translation>%1 e bağlanılamıyor</translation>
+    </message>
+    <message>
+        <source>Email and password cannot be empty</source>
+        <translation>E-posta ve parola boş olamaz</translation>
+    </message>
+    <message>
+        <source>Log in</source>
+        <translation>Giriş yap</translation>
+    </message>
+    <message>
+        <source>Incorrect Email or Password</source>
+        <translation>Hatalı e-posta veya parola</translation>
+    </message>
+</context>
+<context>
+    <name>CustomConnectionScreen</name>
+    <message>
+        <source>Delete</source>
+        <translation>Sil</translation>
+    </message>
+    <message>
+        <source>Connect to Server</source>
+        <translation>Sunucuya bağlan</translation>
+    </message>
+    <message>
+        <source>Enter server address</source>
+        <translation>Sunucu adresini girin</translation>
+    </message>
+    <message>
+        <source>Delete login &quot;%1&quot;?</source>
+        <translation>%1 e giriş bilgilerini sil?</translation>
+    </message>
+    <message>
+        <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
+        <translation>Sunucu adresleri ve oturumlar kaydedildi. Bağlantı bilgilerini silmek için tüm kayıtlı oturumları silmelisiniz.</translation>
+    </message>
+    <message>
+        <source>Delete connection?</source>
+        <translation>Bağlantıyı silmek istiyor musunuz?</translation>
+    </message>
+    <message>
+        <source>Login cannot be empty</source>
+        <translation>Giriş bilgileri boş bırakılamaz</translation>
+    </message>
+    <message>
+        <source>Password cannot be empty</source>
+        <translation>Parola boş olamaz</translation>
+    </message>
+</context>
+<context>
+    <name>DeveloperSettingsScreen</name>
+    <message>
+        <source>Developer Settings</source>
+        <translation>Geliştirici Ayarları</translation>
+    </message>
+    <message>
+        <source>Log Level</source>
+        <translation>Günlük kayıt seviyesi</translation>
+    </message>
+</context>
+<context>
+    <name>DialogButtonBox</name>
+    <message>
+        <source>OK</source>
+        <translation>TAMAM</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>İptal</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Kapat</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Evet</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Hayır</translation>
+    </message>
+    <message>
+        <source>Abort</source>
+        <translation>İptal</translation>
+    </message>
+    <message>
+        <source>Retry</source>
+        <translation>Tekrar Dene</translation>
+    </message>
+</context>
+<context>
+    <name>DownloadOldClientDialog</name>
+    <message>
+        <source>To connect to old servers please download the legacy application from Google Play.</source>
+        <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
+        <translation>Eski versiyonlara bağlanmak için Lütfen Google Play&apos;den uyumlu versiyonu indirin.</translation>
+    </message>
+    <message>
+        <source>To connect to old servers please download the legacy application from the App Store.</source>
+        <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
+        <translation>Eski versiyonlara bağlanmak için Lütfen Apple Store&apos;dan uyumlu versiyonu indirin.</translation>
+    </message>
+    <message>
+        <source>To connect to old servers please download the legacy application from the Internet.</source>
+        <translation>Eski versiyonlara bağlanmak için Lütfen uyumlu versiyonu indirin.</translation>
+    </message>
+    <message>
+        <source>Download</source>
+        <translation>İndir</translation>
+    </message>
+</context>
+<context>
+    <name>HelpPopup</name>
+    <message>
+        <source>Select another cell</source>
+        <translation>Başka bir hücreyi seçin</translation>
+    </message>
+    <message>
+        <source>Switch camera in the cell</source>
+        <translation>Hücredeki kamerayı değiştir</translation>
+    </message>
+    <message>
+        <source>Enter or exit fullscreen</source>
+        <translation>Giriş yapın yada tama ekrandan çıkın</translation>
+    </message>
+    <message>
+        <source>Press any key to go to cameras</source>
+        <translation>Kameralara için gitmek için herhangi bir tuşa basın</translation>
+    </message>
+    <message>
+        <source>Press F1 to show this message again</source>
+        <translation>Bu iletiyi bir daha görmek için F1 tuşuna basın</translation>
+    </message>
+</context>
+<context>
+    <name>HorizontalCalendar</name>
     <message>
         <source>Close</source>
         <translation>Kapat</translation>
     </message>
 </context>
 <context>
-    <name>QnLiveVideoNavigation</name>
+    <name>InformationLabel</name>
+    <message>
+        <source>Unknown</source>
+        <translation>Belirtilmemiş</translation>
+    </message>
+    <message>
+        <source>%1 fps</source>
+        <translation>%1 fps</translation>
+    </message>
+    <message>
+        <source>%1 Mbps</source>
+        <translation>%1 Mbps</translation>
+    </message>
+    <message>
+        <source>Hi-Res</source>
+        <translation>Yüksek Kalite</translation>
+    </message>
+    <message>
+        <source>Lo-Res</source>
+        <translation>Düşük kalite</translation>
+    </message>
+    <message>
+        <source>Keyfr + Lo-Res</source>
+        <translation>Keyfr + Lo-Res</translation>
+    </message>
+    <message>
+        <source>Custom-Res</source>
+        <translation>Özel Çözünürlük</translation>
+    </message>
+</context>
+<context>
+    <name>LaunchButton</name>
+    <message>
+        <source>Turn On</source>
+        <translation>Çalıştır</translation>
+    </message>
+</context>
+<context>
+    <name>LiteClientControlScreen</name>
+    <message>
+        <source>Cannot start client</source>
+        <translation>İstemci başlatılamıyor</translation>
+    </message>
+    <message>
+        <source>Cannot stop client</source>
+        <translation>İstemci kapatılamadı</translation>
+    </message>
+    <message>
+        <source>Please make sure that display is connected to %1.</source>
+        <translation>Lütfen %1 e ekran bağlandığına emin olun.</translation>
+    </message>
+    <message>
+        <source>%1 is offline</source>
+        <translation>%1 Kapalı</translation>
+    </message>
+</context>
+<context>
+    <name>LiveVideoNavigation</name>
     <message>
         <source>LIVE</source>
         <translation>CANLI</translation>
     </message>
 </context>
 <context>
-    <name>QnLoginPage</name>
-    <message>
-        <source>New Connection</source>
-        <translation>Yeni Bağlantı</translation>
-    </message>
-    <message>
-        <source>Host</source>
-        <translation>Yönetici</translation>
-    </message>
-    <message>
-        <source>Port (optional)</source>
-        <translation>Port (İsteğe Bağlı)</translation>
-    </message>
-    <message>
-        <source>Login</source>
-        <translation>Giriş</translation>
-    </message>
-    <message>
-        <source>Password</source>
-        <translation>Şifre</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation>Kaydet</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Sil</translation>
-    </message>
+    <name>LoginButton</name>
     <message>
         <source>Connect</source>
         <translation>Bağlan</translation>
     </message>
+</context>
+<context>
+    <name>NoCameraItem</name>
     <message>
-        <source>Auto-discovered systems</source>
-        <translation>Otomatik Bulunan Sistemler</translation>
-    </message>
-    <message>
-        <source>Incorrect login or password</source>
-        <translation>Hatalı Giriş veya Şifre</translation>
-    </message>
-    <message>
-        <source>Server or network is not available</source>
-        <translation>Sunucu veya Ağ Kullanılamıyor</translation>
-    </message>
-    <message>
-        <source>Incompatible server</source>
-        <translation>Uyumsuz Sunucu</translation>
-    </message>
-    <message>
-        <source>Incompatible server version %1</source>
-        <translation>%1 Uyumsuz Sunucu Versiyonu</translation>
+        <source>No image</source>
+        <translation>İmaj yok</translation>
     </message>
 </context>
 <context>
-    <name>QnOldClientOfferDialog</name>
+    <name>NoDisplayDummy</name>
     <message>
-        <source>To connect to old servers please download the legacy application from Google Play.</source>
-        <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-        <translation>Eski Sunuculara Bağlanmak İçin Lütfen Eski Uygulamayı Google Play&apos;dan İndirin.</translation>
-    </message>
-    <message>
-        <source>To connect to old servers please download the legacy application from the App Store.</source>
-        <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-        <translation>Eski Sunuculara Bağlanmak İçin Lütfen Eski Uygulamayı App Store&apos;dan İndirin.</translation>
-    </message>
-    <message>
-        <source>To connect to old servers please download the legacy application from the Internet.</source>
-        <translation>Eski Sunuculara Bağlanmak İçin Lütfen Eski Uygulamayı İnternetten İndirin.</translation>
-    </message>
-    <message>
-        <source>Download</source>
-        <translation>İndir</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>İptal</translation>
+        <source>No display connected</source>
+        <translation>Bağlı ekran yok</translation>
     </message>
 </context>
 <context>
-    <name>QnQualityDialog</name>
+    <name>OfflineDummy</name>
     <message>
-        <source>Video quality</source>
-        <translation>Görüntü Kalitesi</translation>
-    </message>
-    <message>
-        <source>Auto</source>
-        <translation>Otomatik</translation>
+        <source>You are not connected to any System</source>
+        <translation>İstemci herhangi bir sisteme bağlı değil</translation>
     </message>
 </context>
 <context>
-    <name>QnResourcesPage</name>
+    <name>QualityDialog</name>
+    <message>
+        <source>Video Quality</source>
+        <translation>Video Kalitesi</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation>Belirtilmemiş</translation>
+    </message>
+    <message>
+        <source>Highest speed</source>
+        <translation>En yüksek hız</translation>
+    </message>
+    <message>
+        <source>Best quality</source>
+        <translation>En iyi kalite</translation>
+    </message>
+</context>
+<context>
+    <name>ResourcesScreen</name>
     <message>
         <source>Server offline</source>
         <translation>Sunucu Çevrimdışı</translation>
@@ -173,54 +335,236 @@ gerekli</translation>
     </message>
     <message>
         <source>Connecting...</source>
-        <translation>Bağlanıyor...</translation>
+        <translation>Bağlantı kuruluyor...</translation>
+    </message>
+    <message>
+        <source>No cameras available on this layout</source>
+        <translation>Bu düzende erişilebilir kamera yok</translation>
+    </message>
+    <message>
+        <source>Show all cameras</source>
+        <translation>Tüm kameralar göster</translation>
+    </message>
+    <message>
+        <source>Nothing found</source>
+        <translation>Hiçbir şey bulunamadı</translation>
+    </message>
+    <message>
+        <source>Cannot connect to server</source>
+        <translation>Sunucuya bağlanılamıyor</translation>
+    </message>
+    <message>
+        <source>Press %1 to exit</source>
+        <translation>Çıkmak için %1 e basın</translation>
     </message>
 </context>
 <context>
-    <name>QnSearchItem</name>
+    <name>SearchToolBar</name>
     <message>
         <source>Search</source>
-        <translation>Ara</translation>
+        <translation>Arama</translation>
     </message>
 </context>
 <context>
-    <name>QnSettingsPage</name>
+    <name>ServerOfflineDummy</name>
+    <message>
+        <source>%1 is offline</source>
+        <translation>%1 çevrimdışı</translation>
+    </message>
+</context>
+<context>
+    <name>SessionCredentialsEditor</name>
+    <message>
+        <source>Host : Port</source>
+        <translation>Sunucu: bağlantı noktası</translation>
+    </message>
+    <message>
+        <source>Login</source>
+        <translation>Giriş</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation>Parola</translation>
+    </message>
+    <message>
+        <source>Hosts</source>
+        <translation>Sunucular</translation>
+    </message>
+    <message>
+        <source>Users</source>
+        <translation>Kullanıcılar</translation>
+    </message>
+</context>
+<context>
+    <name>SessionItem</name>
+    <message>
+        <source>This server has too old version. Please update it to the latest version.</source>
+        <translation>Sunucu versiyonu çok eski. Lütfen en son sürüme güncelleyin.</translation>
+    </message>
+    <message>
+        <source>OFFLINE</source>
+        <translation>ÇEVRİMDIŞI</translation>
+    </message>
+    <message>
+        <source>INCOMPATIBLE</source>
+        <translation>UYUMSUZ</translation>
+    </message>
+</context>
+<context>
+    <name>SessionsScreen</name>
+    <message>
+        <source>Log in to %1</source>
+        <translation>%1 e giriş yapın</translation>
+    </message>
+    <message>
+        <source>Cannot connect to %1</source>
+        <translation>%1 e bağlanılamıyor</translation>
+    </message>
+    <message>
+        <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
+        <translation>Ağ bağlantısını kontrol edin veya daha önce bağlanılan bir sunucu için &quot;%1&quot; e basın.</translation>
+    </message>
+    <message>
+        <source>Check your network connection or contact a system administrator</source>
+        <translation>Bağlanıtınızı kontrol edin veya sistem yöneticinize başvurun</translation>
+    </message>
+    <message>
+        <source>Connect to Server...</source>
+        <translation>Sunucuya Bağlan...</translation>
+    </message>
+    <message>
+        <source>Connect to Another Server...</source>
+        <translation>Başka bir Sunucuya Bağlan...</translation>
+    </message>
+    <message>
+        <source>No Systems found</source>
+        <translation>Hiçbir sistem bulundu</translation>
+    </message>
+    <message>
+        <source>Cannot connect to System &quot;%1&quot;</source>
+        <translation>%1 e bağlanılamıyor</translation>
+    </message>
+    <message>
+        <source>Cannot connect to Server</source>
+        <translation>Sunucuya bağlanılamıyor</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsScreen</name>
     <message>
         <source>Settings</source>
         <translation>Ayarlar</translation>
     </message>
     <message>
-        <source>Show offline cameras</source>
-        <translation>Çevrimdışı Kameraları Göster</translation>
+        <source>Live previews in the cameras list</source>
+        <translation>Kamera listesinde canlı önizlemeyi göster</translation>
+    </message>
+    <message>
+        <source>Save passwords for servers</source>
+        <translation>Bu sunucular için parolayı kaydet</translation>
     </message>
 </context>
 <context>
-    <name>QnSideNavigation</name>
-    <message>
-        <source>Saved connections</source>
-        <translation>Kaydedilmiş Bağlantılar</translation>
-    </message>
+    <name>SideNavigation</name>
     <message>
         <source>New connection</source>
-        <translation>Yeni Bağlantı</translation>
+        <translation>Yeni bağlantı</translation>
     </message>
     <message>
         <source>Settings</source>
         <translation>Ayarlar</translation>
     </message>
+    <message>
+        <source>Start test</source>
+        <translation>Test et</translation>
+    </message>
+    <message>
+        <source>Stop test</source>
+        <translation>Testi durdur</translation>
+    </message>
+    <message>
+        <source>Disconnect from Server</source>
+        <translation>Sunucu ile bağlantıyı kes</translation>
+    </message>
 </context>
 <context>
-    <name>QnVerticalCalendarLayout</name>
+    <name>StartingDummy</name>
+    <message>
+        <source>Turning on</source>
+        <translation>Açılıyor</translation>
+    </message>
+</context>
+<context>
+    <name>StoppingDummy</name>
+    <message>
+        <source>Turning off</source>
+        <translation>Kapatılıyor</translation>
+    </message>
+</context>
+<context>
+    <name>SystemInformationBlock</name>
+    <message>
+        <source>Unknown</source>
+        <translation>Belirtilmemiş</translation>
+    </message>
+</context>
+<context>
+    <name>TestSelectionDialog</name>
+    <message>
+        <source>Select Test</source>
+        <translation>Test edin</translation>
+    </message>
+</context>
+<context>
+    <name>TextField</name>
+    <message>
+        <source>Cut</source>
+        <translation>Kes</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation>Kopyala</translation>
+    </message>
+    <message>
+        <source>Paste</source>
+        <translation>Yapıştır</translation>
+    </message>
+    <message>
+        <source>Select All</source>
+        <translation>Tümünü Seç</translation>
+    </message>
+</context>
+<context>
+    <name>VerticalCalendar</name>
     <message>
         <source>Close</source>
         <translation>Kapat</translation>
     </message>
 </context>
 <context>
-    <name>QnVideoNavigation</name>
+    <name>VideoDummy</name>
+    <message>
+        <source>Server offline</source>
+        <translation>Sunucu Çevrimdışı</translation>
+    </message>
+    <message>
+        <source>Authentication required</source>
+        <translation>Kimlik doğrulaması gerekli</translation>
+    </message>
+    <message>
+        <source>Camera offline</source>
+        <translation>Kamera çevrimdışı</translation>
+    </message>
+    <message>
+        <source>Cannot load video</source>
+        <translation>Video yüklenemiyor</translation>
+    </message>
+</context>
+<context>
+    <name>VideoNavigation</name>
     <message>
         <source>No Archive</source>
-        <translation>Arşiv Yok</translation>
+        <translation>Arşiv yok</translation>
     </message>
     <message>
         <source>LIVE</source>
@@ -229,27 +573,33 @@ gerekli</translation>
     <message>
         <source>d MMMM yyyy</source>
         <comment>DO NOT TRANSLATE THIS STRING!</comment>
-        <translation></translation>
+        <translation type="unfinished">d MMMM yyyy</translation>
     </message>
 </context>
 <context>
-    <name>QnVideoPage</name>
+    <name>VideoScreen</name>
     <message>
-        <source>Server offline</source>
-        <translation>Sunucu Çevrimdışı</translation>
+        <source>Change Quality</source>
+        <translation>Kaliteyi değiştir</translation>
     </message>
     <message>
-        <source>Authentication
-required</source>
-        <translation>Kimlik Doğrulama Gerekli</translation>
+        <source>Information</source>
+        <translation>Bilgi</translation>
     </message>
     <message>
-        <source>Camera offline</source>
-        <translation>Kamera Çevrimdışı</translation>
+        <source>Select camera</source>
+        <translation>Kamera seç</translation>
     </message>
     <message>
-        <source>Can&apos;t load video</source>
-        <translation>Video Yüklenemiyor</translation>
+        <source>Press Ctrl + Arrow or use mouse wheel</source>
+        <translation>Ctrl + ok tuşlarına basın veya fare tekerleğini kullanın</translation>
+    </message>
+</context>
+<context>
+    <name>WelcomeScreen</name>
+    <message>
+        <source>Skip</source>
+        <translation>Geç</translation>
     </message>
 </context>
 </TS>

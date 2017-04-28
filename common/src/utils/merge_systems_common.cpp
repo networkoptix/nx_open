@@ -2,6 +2,8 @@
 
 #include <QtCore/QCoreApplication>
 
+#include <nx/network/app_info.h>
+
 #include <utils/common/app_info.h>
 
 namespace {
@@ -50,7 +52,7 @@ public:
                 return tr("Cannot connect to the other System "
                     "because current System is already connected to %1.",
                     "%1 is the cloud name (like 'Nx Cloud')")
-                        .arg(QnAppInfo::cloudName());
+                        .arg(nx::network::AppInfo::cloudName());
             case backupFailed:
                 return tr("Cannot create database backup.");
             case starterLicense:
@@ -70,15 +72,15 @@ public:
                 return tr("Cloud System can only be merged with non-Cloud. "
                     "System name and password are taken from Cloud System.",
                     "%1 is the cloud name (like 'Nx Cloud')")
-                    .arg(QnAppInfo::cloudName());
+                    .arg(nx::network::AppInfo::cloudName());
             case bothSystemBoundToCloud:
                 return tr("Both Systems are connected to %1. Merge is not allowed.",
                     "%1 is the cloud name (like 'Nx Cloud')")
-                    .arg(QnAppInfo::cloudName());
+                    .arg(nx::network::AppInfo::cloudName());
             case differentCloudHost:
                 return tr("These Systems are built with different %1 URL. Merge is not allowed.",
                     "%1 is the cloud name (like 'Nx Cloud')")
-                    .arg(QnAppInfo::cloudName());
+                    .arg(nx::network::AppInfo::cloudName());
             case unconfiguredSystem:
                 return tr("System name is not configured yet.");
             default:

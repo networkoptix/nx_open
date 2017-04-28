@@ -8,6 +8,8 @@ namespace network {
 namespace cloud {
 namespace tcp {
 
+// TODO: #ak Inherit aio::BasicPollable?
+
 /**
  * Initiates NXRC/1.0 connection over HTTP upgrade.
  * It is only safe to remove this object when async operations are in progress or from bound AIO
@@ -16,8 +18,12 @@ namespace tcp {
 class NX_NETWORK_API ReverseConnector
 {
 public:
+    // TODO: MoveOnlyFunc when HttpClient supports it
+    using ConnectHandler = std::function<void(SystemError::ErrorCode)>;
+
     ReverseConnector(
         String selfHostName, String targetHostName, aio::AbstractAioThread* aioThread);
+    virtual ~ReverseConnector();
 
     ReverseConnector(const ReverseConnector&) = delete;
     ReverseConnector(ReverseConnector&&) = delete;
@@ -26,8 +32,6 @@ public:
 
     void setHttpTimeouts(nx_http::AsyncHttpClient::Timeouts timeouts);
 
-    // TODO: MoveOnlyFunc when HttpClient supports it
-    typedef std::function<void(SystemError::ErrorCode)> ConnectHandler;
     void connect(const SocketAddress& endpoint, ConnectHandler handler);
 
     std::unique_ptr<BufferedStreamSocket> takeSocket();

@@ -32,6 +32,28 @@ Pane
         systemId: control.systemId
         localSystemId: control.localId
     }
+    ModelDataAccessor
+    {
+        id: hostsModelAccessor
+        model: hostsModel
+
+        property string defaultAddress: ""
+
+        onDataChanged:
+        {
+            if (startRow === 0)
+                updateDefaultAddress()
+        }
+        onCountChanged: updateDefaultAddress()
+
+        function updateDefaultAddress()
+        {
+            defaultAddress = count > 0
+                ? getData(0, "url")
+                : ""
+        }
+    }
+
     AuthenticationDataModel
     {
         id: authenticationDataModel
@@ -68,7 +90,7 @@ Pane
     {
         id: informationBlock
         enabled: compatible && online
-        address: Nx.url(hostsModel.firstHost).address()
+        address: Nx.url(hostsModelAccessor.defaultAddress).address()
         user: authenticationDataModel.defaultCredentials.user
     }
 
@@ -140,7 +162,7 @@ Pane
             if (!hostsModel.isEmpty)
             {
                 if (!connectionManager.connectToServer(
-                    hostsModel.firstHost,
+                    hostsModelAccessor.defaultAddress,
                     cloudStatusWatcher.credentials.user,
                     cloudStatusWatcher.credentials.password))
                 {
@@ -156,7 +178,7 @@ Pane
             if (authenticationDataModel.hasStoredPassword)
             {
                 if (!connectionManager.connectToServer(
-                    hostsModel.firstHost,
+                    hostsModelAccessor.defaultAddress,
                     authenticationDataModel.defaultCredentials.user,
                     authenticationDataModel.defaultCredentials.password))
                 {

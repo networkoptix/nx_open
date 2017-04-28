@@ -11,10 +11,12 @@
 
 #include "smtpclient/smtpclient.h"
 #include "smtpclient/QnSmtpMime"
+#include <common/common_module.h>
 
 
 namespace {
-    SmtpClient::ConnectionType smtpConnectionType(QnEmail::ConnectionType ct) {
+    SmtpClient::ConnectionType smtpConnectionType(QnEmail::ConnectionType ct)
+    {
         if (ct == QnEmail::Ssl)
             return SmtpClient::SslConnection;
         else if (ct == QnEmail::Tls)
@@ -24,8 +26,8 @@ namespace {
     }
 }
 
-
-EmailManagerImpl::EmailManagerImpl()
+EmailManagerImpl::EmailManagerImpl(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
 {
 }
 
@@ -136,6 +138,6 @@ SmtpOperationResult EmailManagerImpl::sendEmail(
 SmtpOperationResult EmailManagerImpl::sendEmail( const ec2::ApiEmailData& data ) const
 {
     return sendEmail(
-        QnGlobalSettings::instance()->emailSettings(),
+        commonModule()->globalSettings()->emailSettings(),
         data );
 }

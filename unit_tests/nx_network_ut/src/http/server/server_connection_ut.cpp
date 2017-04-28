@@ -52,7 +52,7 @@ public:
     //!Implementation of \a nx_http::AbstractHttpRequestHandler::processRequest
     virtual void processRequest(
         nx_http::HttpServerConnection* const /*connection*/,
-        stree::ResourceContainer /*authInfo*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
         nx_http::Request /*request*/,
         nx_http::Response* const /*response*/,
         nx_http::RequestProcessedHandler completionHandler )
@@ -114,7 +114,7 @@ public:
     //!Implementation of \a nx_http::AbstractHttpRequestHandler::processRequest
     virtual void processRequest(
         nx_http::HttpServerConnection* const /*connection*/,
-        stree::ResourceContainer /*authInfo*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
         nx_http::Request request,
         nx_http::Response* const response,
         nx_http::RequestProcessedHandler completionHandler )

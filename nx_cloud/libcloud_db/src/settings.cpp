@@ -77,6 +77,11 @@ const auto kDefaultMediaServerConnectionIdlePeriod = std::chrono::minutes(1);
 const QLatin1String kCloudModuleXmlTemplatePath("moduleFinder/cloudModuleXmlTemplatePath");
 const QLatin1String kDefaultCloudModuleXmlTemplatePath(":/cloud_modules_template.xml");
 
+//-------------------------------------------------------------------------------------------------
+// Http
+const QLatin1String kTcpBacklogSize("http/tcpBacklogSize");
+const int kDefaultTcpBacklogSize = 1024;
+
 } // namespace
 
 
@@ -105,6 +110,10 @@ EventManager::EventManager():
 {
 }
 
+Http::Http():
+    tcpBacklogSize(kDefaultTcpBacklogSize)
+{
+}
 
 Settings::Settings():
     m_settings(
@@ -126,12 +135,42 @@ Settings::Settings():
     m_dbConnectionOptions.maxPeriodQueryWaitsForAvailableConnection = std::chrono::minutes(1);
 }
 
-bool Settings::showHelp() const
+void Settings::load(int argc, const char **argv)
+{
+    m_commandLineParser.parse(argc, argv, stderr);
+    m_settings.parseArgs(argc, argv);
+
+    loadConfiguration();
+}
+
+bool Settings::isShowHelpRequested() const
 {
     return m_showHelp;
 }
 
-const nx::utils::log::Settings& Settings::logging() const
+void Settings::printCmdLineArgsHelp()
+{
+    // TODO: #ak
+}
+
+QString Settings::dataDir() const
+{
+    const QString& dataDirFromSettings = m_settings.value(kDataDir).toString();
+    if (!dataDirFromSettings.isEmpty())
+        return dataDirFromSettings;
+
+#ifdef Q_OS_LINUX
+    QString defVarDirName = QString("/opt/%1/%2/var")
+        .arg(QnAppInfo::linuxOrganizationName()).arg(kModuleName);
+    QString varDirName = m_settings.value("varDir", defVarDirName).toString();
+    return varDirName;
+#else
+    const QStringList& dataDirList = QStandardPaths::standardLocations(QStandardPaths::DataLocation);
+    return dataDirList.isEmpty() ? QString() : dataDirList[0];
+#endif
+}
+
+nx::utils::log::Settings Settings::logging() const
 {
     return m_logging;
 }
@@ -186,6 +225,11 @@ const ModuleFinder& Settings::moduleFinder() const
     return m_moduleFinder;
 }
 
+const Http& Settings::http() const
+{
+    return m_http;
+}
+
 std::list<SocketAddress> Settings::endpointsToListen() const
 {
     const QStringList& httpAddrToListenStrList = m_settings.value(
@@ -199,36 +243,6 @@ std::list<SocketAddress> Settings::endpointsToListen() const
         []( const QString& str ) { return SocketAddress( str ); } );
 
     return httpAddrToListenList;
-}
-
-QString Settings::dataDir() const
-{
-    const QString& dataDirFromSettings = m_settings.value( kDataDir ).toString();
-    if( !dataDirFromSettings.isEmpty() )
-        return dataDirFromSettings;
-
-#ifdef Q_OS_LINUX
-    QString defVarDirName = QString( "/opt/%1/%2/var" )
-            .arg(QnAppInfo::linuxOrganizationName()).arg( kModuleName );
-    QString varDirName = m_settings.value( "varDir", defVarDirName ).toString();
-    return varDirName;
-#else
-    const QStringList& dataDirList = QStandardPaths::standardLocations( QStandardPaths::DataLocation );
-    return dataDirList.isEmpty() ? QString() : dataDirList[0];
-#endif
-}
-
-void Settings::load( int argc, const char **argv )
-{
-    m_commandLineParser.parse(argc, argv, stderr);
-    m_settings.parseArgs(argc, argv);
-
-    loadConfiguration();
-}
-
-void Settings::printCmdLineArgsHelpToCout()
-{
-    // TODO: #ak
 }
 
 void Settings::fillSupportedCmdParameters()
@@ -314,6 +328,9 @@ void Settings::loadConfiguration()
 
     m_moduleFinder.cloudModulesXmlTemplatePath = m_settings.value(
         kCloudModuleXmlTemplatePath, kDefaultCloudModuleXmlTemplatePath).toString();
+
+    m_http.tcpBacklogSize = m_settings.value(
+        kTcpBacklogSize, kDefaultTcpBacklogSize).toInt();
 }
 
 } // namespace conf

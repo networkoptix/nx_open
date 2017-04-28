@@ -58,9 +58,9 @@ bool Pipeline::failed() const
     return m_failed;
 }
 
-void Pipeline::close()
+void Pipeline::shutdown()
 {
-    // TODO
+    SSL_shutdown(ssl());
 }
 
 SSL* Pipeline::ssl()
@@ -125,9 +125,7 @@ int Pipeline::doHandshake()
 {
     const int ret = SSL_do_handshake(m_ssl.get());
     if (ret == 1)
-    {
         m_state = State::handshakeDone;
-    }
 
     return ret;
 }
@@ -259,12 +257,12 @@ int Pipeline::bioFree(BIO* bio)
     if (bio == NULL) return(0);
     if (bio->shutdown)
     {
-        if (bio->init)
-        {
-            Pipeline* sslSock = static_cast<Pipeline*>(BIO_get_app_data(bio));
-            if (sslSock)
-                sslSock->close();
-        }
+        //if (bio->init)
+        //{
+        //    Pipeline* sslSock = static_cast<Pipeline*>(BIO_get_app_data(bio));
+        //    if (sslSock)
+        //        sslSock->close();
+        //}
 
         bio->init = 0;
         bio->flags = 0;

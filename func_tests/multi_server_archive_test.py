@@ -19,7 +19,7 @@ def env(env_builder, server):
 
 def test_merged_archive(env, camera, sample_media_file):
     log.debug('camera: %r, sample media file: %r', camera, sample_media_file)
-    camera_id = env.one.add_camera(camera)
+    env.one.add_camera(camera)
     one_storage = env.one.storage
     two_storage = env.two.storage
     sample = sample_media_file
@@ -51,13 +51,13 @@ def test_merged_archive(env, camera, sample_media_file):
         two_storage.save_media_sample(camera, st, sample)
     env.one.rebuild_archive()
     env.two.rebuild_archive()
-    assert all_expected_periods == env.one.get_recorded_time_periods(camera_id)
-    assert all_expected_periods == env.two.get_recorded_time_periods(camera_id)
-    return (camera_id, expected_periods_one, expected_periods_two)
+    assert all_expected_periods == env.one.get_recorded_time_periods(camera)
+    assert all_expected_periods == env.two.get_recorded_time_periods(camera)
+    return (expected_periods_one, expected_periods_two)
 
 
 def test_separated_archive(env, camera, sample_media_file):
-    camera_id, expected_periods_one, expected_periods_two = test_merged_archive(env, camera, sample_media_file)
+    expected_periods_one, expected_periods_two = test_merged_archive(env, camera, sample_media_file)
     env.one.change_system_id('{%s}' % uuid.uuid4())
-    assert expected_periods_one == env.one.get_recorded_time_periods(camera_id)
-    assert expected_periods_two == env.two.get_recorded_time_periods(camera_id)
+    assert expected_periods_one == env.one.get_recorded_time_periods(camera)
+    assert expected_periods_two == env.two.get_recorded_time_periods(camera)

@@ -23,7 +23,7 @@
 #include <sys/statvfs.h>
 
 #include <nx/utils/log/log.h>
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 #include <utils/fs/dir.h>
 
 static const int BYTES_PER_MB = 1024*1024;

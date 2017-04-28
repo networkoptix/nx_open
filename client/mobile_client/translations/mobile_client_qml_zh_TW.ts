@@ -1,171 +1,164 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_TW" sourcelanguage="en_US">
+<TS version="2.1" language="zh-TW" sourcelanguage="en">
 <context>
     <name>CameraItem</name>
     <message>
         <source>Select camera</source>
-        <translation type="unfinished"></translation>
+        <translation>選取攝影機</translation>
     </message>
     <message>
         <source>Press Ctrl + Arrow or use mouse wheel</source>
-        <translation type="unfinished"></translation>
+        <translation>按下 Ctrl + 方向鍵或使用滑鼠滾輪</translation>
     </message>
     <message>
         <source>Authentication required</source>
-        <translation type="unfinished"></translation>
+        <translation>需要身份驗證</translation>
     </message>
     <message>
         <source>Offline</source>
-        <translation type="unfinished">離線</translation>
+        <translation>離線</translation>
     </message>
 </context>
 <context>
     <name>CloudPanel</name>
     <message>
         <source>Log in to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>登錄到 %1</translation>
     </message>
 </context>
 <context>
     <name>CloudScreen</name>
     <message>
         <source>Cloud Account</source>
-        <translation type="unfinished"></translation>
+        <translation>雲端帳號</translation>
     </message>
 </context>
 <context>
     <name>CloudSummary</name>
     <message>
         <source>Log out</source>
-        <translation type="unfinished"></translation>
+        <translation>登出</translation>
     </message>
     <message>
         <source>Go to %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>CloudSystemInformation</name>
-    <message>
-        <source>OFFLINE</source>
-        <translation type="unfinished"></translation>
+        <translation>跳到 %1</translation>
     </message>
 </context>
 <context>
     <name>CredentialsEditor</name>
     <message>
         <source>Email</source>
-        <translation type="unfinished"></translation>
+        <translation>電子郵件</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished">密碼</translation>
+        <translation>密碼</translation>
     </message>
     <message>
         <source>Learn more about %1</source>
-        <translation type="unfinished"></translation>
+        <translation>瞭解更多關於 %1</translation>
     </message>
     <message>
         <source>Create account</source>
-        <translation type="unfinished"></translation>
+        <translation>註冊帳號</translation>
     </message>
     <message>
         <source>Forgot your password?</source>
-        <translation type="unfinished"></translation>
+        <translation>忘了密碼？</translation>
     </message>
     <message>
         <source>Cannot connect to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>無法連接到 %1</translation>
     </message>
     <message>
         <source>Email and password cannot be empty</source>
-        <translation type="unfinished"></translation>
+        <translation>電子郵件和密碼不能為空</translation>
     </message>
     <message>
         <source>Log in</source>
-        <translation type="unfinished"></translation>
+        <translation>登入</translation>
     </message>
     <message>
-        <source>Incorrect Email or password</source>
-        <translation type="unfinished"></translation>
+        <source>Incorrect Email or Password</source>
+        <translation>不正確的電子郵件或密碼</translation>
     </message>
 </context>
 <context>
     <name>CustomConnectionScreen</name>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">刪除</translation>
+        <translation>刪除</translation>
     </message>
     <message>
         <source>Connect to Server</source>
-        <translation type="unfinished"></translation>
+        <translation>連線到伺服器</translation>
     </message>
     <message>
         <source>Enter server address</source>
-        <translation type="unfinished"></translation>
+        <translation>輸入伺服器位址</translation>
     </message>
     <message>
         <source>Delete login &quot;%1&quot;?</source>
-        <translation type="unfinished"></translation>
+        <translation>刪除登錄 &quot;%1&quot;？</translation>
     </message>
     <message>
         <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
-        <translation type="unfinished"></translation>
+        <translation>伺服器位址和其它登錄仍將保存. 要刪除所有連接資訊, 您應該刪除所有已儲存之登錄.</translation>
     </message>
     <message>
         <source>Delete connection?</source>
-        <translation type="unfinished"></translation>
+        <translation>刪除連線?</translation>
     </message>
     <message>
         <source>Login cannot be empty</source>
-        <translation type="unfinished"></translation>
+        <translation>帳號不能為空值</translation>
     </message>
     <message>
         <source>Password cannot be empty</source>
-        <translation type="unfinished"></translation>
+        <translation>密碼不能為空值</translation>
     </message>
 </context>
 <context>
     <name>DeveloperSettingsScreen</name>
     <message>
         <source>Developer Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>開發人員設定</translation>
     </message>
     <message>
         <source>Log Level</source>
-        <translation type="unfinished"></translation>
+        <translation>登錄層級</translation>
     </message>
 </context>
 <context>
     <name>DialogButtonBox</name>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>確定</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">取消</translation>
+        <translation>取消</translation>
     </message>
     <message>
         <source>Close</source>
-        <translation type="unfinished">關閉</translation>
+        <translation>關閉</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished"></translation>
+        <translation>是</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation>否</translation>
     </message>
     <message>
         <source>Abort</source>
-        <translation type="unfinished"></translation>
+        <translation>捨棄</translation>
     </message>
     <message>
         <source>Retry</source>
-        <translation type="unfinished"></translation>
+        <translation>重試</translation>
     </message>
 </context>
 <context>
@@ -173,405 +166,409 @@
     <message>
         <source>To connect to old servers please download the legacy application from Google Play.</source>
         <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-        <translation type="unfinished">要連線至舊版伺服器請至Google Play下載舊版APP.</translation>
+        <translation>要連線至舊版伺服器請至Google Play下載舊版APP.</translation>
     </message>
     <message>
         <source>To connect to old servers please download the legacy application from the App Store.</source>
         <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-        <translation type="unfinished">要連線至舊版伺服器請至App Store下載舊版APP.</translation>
+        <translation>要連線至舊版伺服器請至App Store下載舊版APP.</translation>
     </message>
     <message>
         <source>To connect to old servers please download the legacy application from the Internet.</source>
-        <translation type="unfinished">要連線至舊版伺服器請上網下載舊版APP.</translation>
+        <translation>要連線至舊版伺服器請上網下載舊版APP.</translation>
     </message>
     <message>
         <source>Download</source>
-        <translation type="unfinished">下載</translation>
+        <translation>下載</translation>
     </message>
 </context>
 <context>
     <name>HelpPopup</name>
     <message>
         <source>Select another cell</source>
-        <translation type="unfinished"></translation>
+        <translation>選擇另一個儲存格</translation>
     </message>
     <message>
         <source>Switch camera in the cell</source>
-        <translation type="unfinished"></translation>
+        <translation>在儲存格中切換攝影機</translation>
     </message>
     <message>
         <source>Enter or exit fullscreen</source>
-        <translation type="unfinished"></translation>
+        <translation>進入或退出全螢幕</translation>
     </message>
     <message>
         <source>Press any key to go to cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>按任意鍵前往攝影機</translation>
     </message>
     <message>
         <source>Press F1 to show this message again</source>
-        <translation type="unfinished"></translation>
+        <translation>按 F1 鍵以再次顯示此訊息</translation>
     </message>
 </context>
 <context>
     <name>HorizontalCalendar</name>
     <message>
         <source>Close</source>
-        <translation type="unfinished">關閉</translation>
+        <translation>關閉</translation>
     </message>
 </context>
 <context>
     <name>InformationLabel</name>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">未知</translation>
+        <translation>未知</translation>
     </message>
     <message>
         <source>%1 fps</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 fps</translation>
     </message>
     <message>
         <source>%1 Mbps</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Mbps</translation>
     </message>
     <message>
         <source>Hi-Res</source>
-        <translation type="unfinished"></translation>
+        <translation>高解析度</translation>
     </message>
     <message>
         <source>Lo-Res</source>
-        <translation type="unfinished"></translation>
+        <translation>低解析度</translation>
     </message>
     <message>
         <source>Keyfr + Lo-Res</source>
-        <translation type="unfinished"></translation>
+        <translation>關鍵幀+低解析</translation>
     </message>
     <message>
         <source>Custom-Res</source>
-        <translation type="unfinished"></translation>
+        <translation>自訂解析度</translation>
     </message>
 </context>
 <context>
     <name>LaunchButton</name>
     <message>
         <source>Turn On</source>
-        <translation type="unfinished"></translation>
+        <translation>開啟</translation>
     </message>
 </context>
 <context>
     <name>LiteClientControlScreen</name>
     <message>
         <source>Cannot start client</source>
-        <translation type="unfinished"></translation>
+        <translation>無法啟動用戶端</translation>
     </message>
     <message>
         <source>Cannot stop client</source>
-        <translation type="unfinished"></translation>
+        <translation>無法停止用戶端</translation>
     </message>
     <message>
         <source>Please make sure that display is connected to %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>請確認螢幕已連接到 %1.</translation>
     </message>
     <message>
         <source>%1 is offline</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 已離線</translation>
     </message>
 </context>
 <context>
     <name>LiveVideoNavigation</name>
     <message>
         <source>LIVE</source>
-        <translation type="unfinished">即時影像</translation>
+        <translation>即時影像</translation>
     </message>
 </context>
 <context>
     <name>LoginButton</name>
     <message>
         <source>Connect</source>
-        <translation type="unfinished">連線</translation>
+        <translation>連線</translation>
     </message>
 </context>
 <context>
     <name>NoCameraItem</name>
     <message>
         <source>No image</source>
-        <translation type="unfinished"></translation>
+        <translation>無影像</translation>
     </message>
 </context>
 <context>
     <name>NoDisplayDummy</name>
     <message>
         <source>No display connected</source>
-        <translation type="unfinished"></translation>
+        <translation>未連接到螢幕</translation>
     </message>
 </context>
 <context>
     <name>OfflineDummy</name>
     <message>
-        <source>You are not connected to any system</source>
-        <translation type="unfinished"></translation>
+        <source>You are not connected to any System</source>
+        <translation>您尚未連接到任何系統</translation>
     </message>
 </context>
 <context>
     <name>QualityDialog</name>
     <message>
         <source>Video Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>影像品質</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">未知</translation>
+        <translation>未知</translation>
     </message>
     <message>
         <source>Highest speed</source>
-        <translation type="unfinished"></translation>
+        <translation>速度優先</translation>
     </message>
     <message>
         <source>Best quality</source>
-        <translation type="unfinished"></translation>
+        <translation>品質優先</translation>
     </message>
 </context>
 <context>
     <name>ResourcesScreen</name>
     <message>
         <source>Server offline</source>
-        <translation type="unfinished">伺服器離線</translation>
+        <translation>伺服器離線</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation type="unfinished">讀取中...</translation>
+        <translation>讀取中...</translation>
     </message>
     <message>
         <source>Connecting...</source>
-        <translation type="unfinished">連線中...</translation>
+        <translation>連線中...</translation>
     </message>
     <message>
         <source>No cameras available on this layout</source>
-        <translation type="unfinished"></translation>
+        <translation>佈局上無任何攝影機</translation>
     </message>
     <message>
         <source>Show all cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>顯示所有的攝影機</translation>
     </message>
     <message>
         <source>Nothing found</source>
-        <translation type="unfinished"></translation>
+        <translation>未找到任何內容</translation>
     </message>
     <message>
         <source>Cannot connect to server</source>
-        <translation type="unfinished"></translation>
+        <translation>無法連線至伺服器</translation>
     </message>
     <message>
         <source>Press %1 to exit</source>
-        <translation type="unfinished"></translation>
+        <translation>按 %1 退出</translation>
     </message>
 </context>
 <context>
     <name>SearchToolBar</name>
     <message>
         <source>Search</source>
-        <translation type="unfinished">搜尋</translation>
+        <translation>搜尋</translation>
     </message>
 </context>
 <context>
     <name>ServerOfflineDummy</name>
     <message>
         <source>%1 is offline</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 已離線</translation>
     </message>
 </context>
 <context>
     <name>SessionCredentialsEditor</name>
     <message>
         <source>Host : Port</source>
-        <translation type="unfinished"></translation>
+        <translation>主機︰ 埠</translation>
     </message>
     <message>
         <source>Login</source>
-        <translation type="unfinished">帳號</translation>
+        <translation>帳號</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished">密碼</translation>
+        <translation>密碼</translation>
     </message>
     <message>
         <source>Hosts</source>
-        <translation type="unfinished"></translation>
+        <translation>主機</translation>
     </message>
     <message>
         <source>Users</source>
-        <translation type="unfinished"></translation>
+        <translation>使用者</translation>
     </message>
 </context>
 <context>
     <name>SessionItem</name>
     <message>
         <source>This server has too old version. Please update it to the latest version.</source>
-        <translation type="unfinished"></translation>
+        <translation>此伺服器版本太舊. 請更新到最新版本.</translation>
+    </message>
+    <message>
+        <source>OFFLINE</source>
+        <translation>離線</translation>
+    </message>
+    <message>
+        <source>INCOMPATIBLE</source>
+        <translation>不相容</translation>
     </message>
 </context>
 <context>
     <name>SessionsScreen</name>
     <message>
         <source>Log in to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>登入到 %1</translation>
     </message>
     <message>
         <source>Cannot connect to %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No systems found</source>
-        <translation type="unfinished"></translation>
+        <translation>無法連接到 %1</translation>
     </message>
     <message>
         <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot connect to the system &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot connect to the server</source>
-        <translation type="unfinished"></translation>
+        <translation>請檢查網路連接或按 &quot;%1&quot; 以輸入伺服器位址.</translation>
     </message>
     <message>
         <source>Check your network connection or contact a system administrator</source>
-        <translation type="unfinished"></translation>
+        <translation>請檢查您的網路連接或與系統管理員聯繫</translation>
     </message>
     <message>
         <source>Connect to Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>連線至伺服器...</translation>
     </message>
     <message>
         <source>Connect to Another Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>連線至其他伺服器...</translation>
+    </message>
+    <message>
+        <source>No Systems found</source>
+        <translation>找不到任何系統</translation>
+    </message>
+    <message>
+        <source>Cannot connect to System &quot;%1&quot;</source>
+        <translation>無法連接到系統 &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <source>Cannot connect to Server</source>
+        <translation>無法連線至伺服器</translation>
     </message>
 </context>
 <context>
     <name>SettingsScreen</name>
     <message>
         <source>Settings</source>
-        <translation type="unfinished">設定</translation>
+        <translation>設定</translation>
     </message>
     <message>
         <source>Live previews in the cameras list</source>
-        <translation type="unfinished"></translation>
+        <translation>攝影機列表即時預覽</translation>
     </message>
     <message>
         <source>Save passwords for servers</source>
-        <translation type="unfinished"></translation>
+        <translation>儲存伺服器密碼</translation>
     </message>
 </context>
 <context>
     <name>SideNavigation</name>
     <message>
         <source>New connection</source>
-        <translation type="unfinished">建立新的連線</translation>
+        <translation>建立新的連線</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished">設定</translation>
+        <translation>設定</translation>
     </message>
     <message>
         <source>Start test</source>
-        <translation type="unfinished"></translation>
+        <translation>啟動測試</translation>
     </message>
     <message>
         <source>Stop test</source>
-        <translation type="unfinished"></translation>
+        <translation>停止測試</translation>
     </message>
     <message>
         <source>Disconnect from Server</source>
-        <translation type="unfinished"></translation>
+        <translation>從伺服器中斷連線</translation>
     </message>
 </context>
 <context>
     <name>StartingDummy</name>
     <message>
         <source>Turning on</source>
-        <translation type="unfinished"></translation>
+        <translation>開啟中</translation>
     </message>
 </context>
 <context>
     <name>StoppingDummy</name>
     <message>
         <source>Turning off</source>
-        <translation type="unfinished"></translation>
+        <translation>關閉中</translation>
     </message>
 </context>
 <context>
     <name>SystemInformationBlock</name>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">未知</translation>
-    </message>
-    <message>
-        <source>INCOMPATIBLE</source>
-        <translation type="unfinished"></translation>
+        <translation>未知</translation>
     </message>
 </context>
 <context>
     <name>TestSelectionDialog</name>
     <message>
         <source>Select Test</source>
-        <translation type="unfinished"></translation>
+        <translation>選擇測試</translation>
     </message>
 </context>
 <context>
     <name>TextField</name>
     <message>
         <source>Cut</source>
-        <translation type="unfinished"></translation>
+        <translation>中斷</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished"></translation>
+        <translation>複製</translation>
     </message>
     <message>
         <source>Paste</source>
-        <translation type="unfinished"></translation>
+        <translation>貼上</translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation type="unfinished"></translation>
+        <translation>選擇全部</translation>
     </message>
 </context>
 <context>
     <name>VerticalCalendar</name>
     <message>
         <source>Close</source>
-        <translation type="unfinished">關閉</translation>
+        <translation>關閉</translation>
     </message>
 </context>
 <context>
     <name>VideoDummy</name>
     <message>
         <source>Server offline</source>
-        <translation type="unfinished">伺服器離線</translation>
+        <translation>伺服器離線</translation>
     </message>
     <message>
         <source>Authentication required</source>
-        <translation type="unfinished"></translation>
+        <translation>需要身份驗證</translation>
     </message>
     <message>
         <source>Camera offline</source>
-        <translation type="unfinished">攝影機離線</translation>
+        <translation>攝影機離線</translation>
     </message>
     <message>
         <source>Cannot load video</source>
-        <translation type="unfinished"></translation>
+        <translation>無法載入影像</translation>
     </message>
 </context>
 <context>
     <name>VideoNavigation</name>
     <message>
         <source>No Archive</source>
-        <translation type="unfinished">無歷史影像</translation>
+        <translation>無歷史影像</translation>
     </message>
     <message>
         <source>LIVE</source>
-        <translation type="unfinished">即時影像</translation>
+        <translation>即時影像</translation>
     </message>
     <message>
         <source>d MMMM yyyy</source>
@@ -583,26 +580,26 @@
     <name>VideoScreen</name>
     <message>
         <source>Change Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>變更品質</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>資訊</translation>
     </message>
     <message>
         <source>Select camera</source>
-        <translation type="unfinished"></translation>
+        <translation>選取攝影機</translation>
     </message>
     <message>
         <source>Press Ctrl + Arrow or use mouse wheel</source>
-        <translation type="unfinished"></translation>
+        <translation>按下 Ctrl + 方向鍵或使用滑鼠滾輪</translation>
     </message>
 </context>
 <context>
     <name>WelcomeScreen</name>
     <message>
         <source>Skip</source>
-        <translation type="unfinished"></translation>
+        <translation>略過</translation>
     </message>
 </context>
 </TS>

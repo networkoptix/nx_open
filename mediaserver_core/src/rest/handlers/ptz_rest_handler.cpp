@@ -17,6 +17,9 @@
 #include <core/resource/user_resource.h>
 #include <api/helpers/camera_id_helper.h>
 #include <nx/utils/log/log.h>
+#include <common/common_module.h>
+#include <rest/server/rest_connection_processor.h>
+#include <network/tcp_listener.h>
 
 namespace {
 
@@ -25,8 +28,12 @@ static const QString kDeprecatedResourceIdParam = lit("resourceId");
 
 static const int OLD_SEQUENCE_THRESHOLD = 1000 * 60 * 5;
 
-bool checkUserAccess(const Qn::UserAccessData& accessRights, const QnSecurityCamResourcePtr& camera, Qn::PtzCommand command)
+bool checkUserAccess(
+    const Qn::UserAccessData& accessRights,
+    const QnSecurityCamResourcePtr& camera,
+    Qn::PtzCommand command)
 {
+    const auto& accessManager = camera->commonModule()->resourceAccessManager();
     switch (command)
     {
         case Qn::ContinuousMovePtzCommand:
@@ -39,7 +46,7 @@ bool checkUserAccess(const Qn::UserAccessData& accessRights, const QnSecurityCam
         case Qn::RunAuxilaryCommandPtzCommand:
         case Qn::ActivatePresetPtzCommand:
         {
-            if (!qnResourceAccessManager->hasPermission(accessRights, camera, Qn::WritePtzPermission))
+            if (!accessManager->hasPermission(accessRights, camera, Qn::WritePtzPermission))
                 return false;
             return true;
         }
@@ -50,8 +57,8 @@ bool checkUserAccess(const Qn::UserAccessData& accessRights, const QnSecurityCam
         case Qn::UpdatePresetPtzCommand:
         case Qn::RemovePresetPtzCommand:
         {
-            if (!qnResourceAccessManager->hasPermission(accessRights, camera, Qn::SavePermission) ||
-                !qnResourceAccessManager->hasPermission(accessRights, camera, Qn::WritePtzPermission))
+            if (!accessManager->hasPermission(accessRights, camera, Qn::SavePermission) ||
+                !accessManager->hasPermission(accessRights, camera, Qn::WritePtzPermission))
             {
                 return false;
             }
@@ -140,8 +147,11 @@ int QnPtzRestHandler::execCommandAsync(const QString& sequence, AsyncFunc functi
 }
 
 int QnPtzRestHandler::executePost(
-    const QString& path, const QnRequestParams& params, const QByteArray& body,
-    QnJsonRestResult& result, const QnRestConnectionProcessor* processor)
+    const QString& path,
+    const QnRequestParams& params,
+    const QByteArray& body,
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* processor)
 {
     NX_LOG(lit("QnPtzRestHandler: received request %1").arg(path), cl_logDEBUG1);
 
@@ -161,7 +171,10 @@ int QnPtzRestHandler::executePost(
 
     QString notFoundCameraId = QString::null;
     QnSecurityCamResourcePtr camera = nx::camera_id_helper::findCameraByFlexibleIds(
-        &notFoundCameraId, params, {kCameraIdParam, kDeprecatedResourceIdParam});
+        processor->owner()->resourcePool(),
+        &notFoundCameraId,
+        params,
+        {kCameraIdParam, kDeprecatedResourceIdParam});
     if (!camera)
     {
         QString errStr;

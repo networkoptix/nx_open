@@ -1,15 +1,14 @@
-#ifndef ipwebcam_droid_device_server_h_1657
-#define ipwebcam_droid_device_server_h_1657
+#pragma once
 
 #ifdef ENABLE_DROID
 
 #include "core/resource_management/resource_searcher.h"
 
-class QnPlIpWebCamResourceSearcher : public QnAbstractNetworkResourceSearcher
+class QnPlIpWebCamResourceSearcher: public QnAbstractNetworkResourceSearcher
 {
-
+    using base_type = QnAbstractNetworkResourceSearcher;
 public:
-    QnPlIpWebCamResourceSearcher();
+    QnPlIpWebCamResourceSearcher(QnCommonModule* commonModule);
 
     QnResourceList findResources();
 
@@ -20,8 +19,6 @@ public:
 protected:
     // return the manufacture of the server
     virtual QString manufacture() const;
-   
 };
 
 #endif // #ifdef ENABLE_DROID
-#endif //ipwebcam_droid_device_server_h_1657

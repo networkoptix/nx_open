@@ -17,8 +17,7 @@ namespace api {
 /**
  * [connection_mediator, 4.3.5]
  */
-class NX_NETWORK_API ConnectRequest
-:
+class NX_NETWORK_API ConnectRequest:
     public StunRequestData
 {
 public:
@@ -43,8 +42,7 @@ public:
     virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
-class NX_NETWORK_API ConnectResponse
-:
+class NX_NETWORK_API ConnectResponse:
     public StunResponseData
 {
 public:
@@ -53,6 +51,7 @@ public:
 
     std::list<SocketAddress> forwardedTcpEndpointList;
     std::list<SocketAddress> udpEndpointList;
+    std::list<SocketAddress> trafficRelayEndpointList;
     ConnectionParameters params;
     CloudConnectVersion cloudConnectVersion;
 

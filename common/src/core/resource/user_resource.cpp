@@ -6,6 +6,7 @@
 
 #include <utils/common/synctime.h>
 #include <core/resource_management/resource_properties.h>
+#include <common/common_module.h>
 
 namespace {
     static const int LDAP_PASSWORD_PROLONGATION_PERIOD_SEC = 5 * 60;
@@ -17,7 +18,7 @@ const QnUuid QnUserResource::kAdminGuid("99cbc715-539b-4bfe-856f-799b45b69b1e");
 
 QnUserResource::QnUserResource(QnUserType userType):
     m_userType(userType),
-    m_realm(QnAppInfo::realm()),
+    m_realm(nx::network::AppInfo::realm()),
     m_permissions(0),
     m_userRoleId(),
     m_isOwner(false),
@@ -297,7 +298,9 @@ void QnUserResource::setEmail(const QString& email)
 
 QString QnUserResource::fullName() const
 {
-    QString result = propertyDictionary->value(getId(), Qn::USER_FULL_NAME);
+    QString result;
+    if (commonModule())
+        result = commonModule()->propertyDictionary()->value(getId(), Qn::USER_FULL_NAME);
     QnMutexLocker locker(&m_mutex);
     return result.isNull() ? m_fullName : result;
 }
@@ -305,7 +308,7 @@ QString QnUserResource::fullName() const
 ec2::ApiResourceParamWithRefDataList QnUserResource::params() const
 {
     ec2::ApiResourceParamWithRefDataList result;
-    QString value = propertyDictionary->value(getId(), Qn::USER_FULL_NAME);
+    QString value = commonModule()->propertyDictionary()->value(getId(), Qn::USER_FULL_NAME);
     if (value.isEmpty() && !fullName().isEmpty() && isCloud())
         value = fullName(); //< move fullName to property dictionary to sync data with cloud correctly
     if (!value.isEmpty())

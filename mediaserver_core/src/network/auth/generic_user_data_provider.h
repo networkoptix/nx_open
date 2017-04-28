@@ -9,19 +9,21 @@
 #include <QtCore/QObject>
 
 #include "abstract_user_data_provider.h"
-#include <utils/common/safe_direct_connection.h>
+#include <nx/utils/safe_direct_connection.h>
+#include <common/common_module_aware.h>
 
 
 class GenericUserDataProvider
 :
     public QObject,
+    public QnCommonModuleAware,
     public AbstractUserDataProvider,
     public Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
 
 public:
-    GenericUserDataProvider();
+    GenericUserDataProvider(QnCommonModule* commonModule);
     ~GenericUserDataProvider();
 
     virtual QnResourcePtr findResByName(const QByteArray& nxUserName) const override;

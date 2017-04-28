@@ -195,7 +195,7 @@ QnAbstractVideoDecoder* QuicksyncDecoderPlugin::create(
     return videoDecoderSwitcher.release();
 }
 
-bool QuicksyncDecoderPlugin::isStreamSupported( const stree::AbstractResourceReader& newStreamParams ) const
+bool QuicksyncDecoderPlugin::isStreamSupported( const nx::utils::stree::AbstractResourceReader& newStreamParams ) const
 {
     QMutexLocker lk( &m_mutex );
     return isStreamSupportedNonSafe( newStreamParams );
@@ -440,7 +440,7 @@ QString QuicksyncDecoderPlugin::winVersionToName( const OSVERSIONINFOEX& osVersi
         arg(osVersionInfo.dwMajorVersion).arg(osVersionInfo.dwMinorVersion);
 }
 
-bool QuicksyncDecoderPlugin::isStreamSupportedNonSafe( const stree::AbstractResourceReader& streamParams ) const
+bool QuicksyncDecoderPlugin::isStreamSupportedNonSafe( const nx::utils::stree::AbstractResourceReader& streamParams ) const
 {
     DecoderStreamDescription desc;
     //filling stream parameters
@@ -449,9 +449,9 @@ bool QuicksyncDecoderPlugin::isStreamSupportedNonSafe( const stree::AbstractReso
     desc.put( DecoderParameter::osName, m_osName );
     desc.put( DecoderParameter::totalCurrentNumberOfDecoders, m_usageWatcher->currentSessionCount() );  //TODO/IMPL add currentSWDecoderCount
 
-    stree::MultiSourceResourceReader mediaStreamParams1( desc, *m_graphicsDesc.get() );
-    stree::MultiSourceResourceReader mediaStreamParams2( mediaStreamParams1, streamParams );
-    stree::MultiSourceResourceReader mediaStreamParams( mediaStreamParams2, *m_cpuDesc.get() );
+    nx::utils::stree::MultiSourceResourceReader mediaStreamParams1( desc, *m_graphicsDesc.get() );
+    nx::utils::stree::MultiSourceResourceReader mediaStreamParams2( mediaStreamParams1, streamParams );
+    nx::utils::stree::MultiSourceResourceReader mediaStreamParams( mediaStreamParams2, *m_cpuDesc.get() );
 
     //locking shared memory region
     PluginUsageWatcher::ScopedLock usageLock( m_usageWatcher.get() );
@@ -469,7 +469,7 @@ bool QuicksyncDecoderPlugin::isStreamSupportedNonSafe( const stree::AbstractReso
 
     //retrieving existing sessions' info
     //adding availableVideoMemory param
-    stree::ResourceContainer curUsageParams = m_usageWatcher->currentTotalUsage();
+    nx::utils::stree::ResourceContainer curUsageParams = m_usageWatcher->currentTotalUsage();
     quint64 newStreamEstimatedVideoMemoryUsage = 0;
     if( !m_d3dDevices.empty() )
     {

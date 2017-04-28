@@ -13,18 +13,20 @@
 #include <network/authenticate_helper.h>
 
 #include <utils/common/app_info.h>
+#include <common/common_module.h>
 
 
-GenericUserDataProvider::GenericUserDataProvider()
+GenericUserDataProvider::GenericUserDataProvider(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
 {
     Qn::directConnect(
-        qnResPool, &QnResourcePool::resourceAdded,
+        commonModule->resourcePool(), &QnResourcePool::resourceAdded,
         this, &GenericUserDataProvider::at_resourcePool_resourceAdded);
     Qn::directConnect(
-        qnResPool, &QnResourcePool::resourceChanged,
+        commonModule->resourcePool(), &QnResourcePool::resourceChanged,
         this, &GenericUserDataProvider::at_resourcePool_resourceAdded);
     Qn::directConnect(
-        qnResPool, &QnResourcePool::resourceRemoved,
+        commonModule->resourcePool(), &QnResourcePool::resourceRemoved,
         this, &GenericUserDataProvider::at_resourcePool_resourceRemoved);
 }
 
@@ -70,7 +72,7 @@ Qn::AuthResult GenericUserDataProvider::authorize(
         }
         else if (auto server = res.dynamicCast<QnMediaServerResource>())
         {
-            const QString ha1Data = lit("%1:%2:%3").arg(server->getId().toString()).arg(QnAppInfo::realm()).arg(server->getAuthKey());
+            const QString ha1Data = lit("%1:%2:%3").arg(server->getId().toString()).arg(nx::network::AppInfo::realm()).arg(server->getAuthKey());
             ha1 = QCryptographicHash::hash(ha1Data.toUtf8(), QCryptographicHash::Md5).toHex();
         }
 

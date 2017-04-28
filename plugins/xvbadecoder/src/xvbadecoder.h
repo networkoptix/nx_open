@@ -84,7 +84,7 @@ class PluginUsageWatcher;
 class QnXVBADecoder
 :
     public QnAbstractVideoDecoder,
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
     /*!
@@ -116,7 +116,7 @@ public:
     //!Implementation of AbstractDecoder::setLightCpuMode
     virtual void setLightCpuMode( QnAbstractVideoDecoder::DecodeMode );
 #endif
-    //!Implementation of stree::AbstractResourceReader::get
+    //!Implementation of nx::utils::stree::AbstractResourceReader::get
     /*!
         Following parameters are supported:\n
             - framePictureWidth

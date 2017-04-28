@@ -6,20 +6,20 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
-#include <nx/utils/url_builder.h>
+#include <nx/network/url/url_builder.h>
 
 #include "module_finder.h"
 #include "multicast_module_finder.h"
 #include "direct_module_finder.h"
 
-using nx::utils::UrlBuilder;
+using namespace nx::network;
 
 namespace {
     const int checkInterval = 3000;
 
     QUrl makeUrl(const QString& host, int port)
     {
-        return UrlBuilder()
+        return url::Builder()
             .setScheme(lit("http"))
             .setHost(host)
             .setPort(port);
@@ -27,7 +27,7 @@ namespace {
 
     QUrl clearUrl(const QUrl& url)
     {
-        return UrlBuilder()
+        return url::Builder()
             .setScheme(lit("http"))
             .setHost(url.host())
             .setPort(url.port());
@@ -55,10 +55,12 @@ QnDirectModuleFinderHelper::QnDirectModuleFinderHelper(QnModuleFinder *moduleFin
 {
     NX_ASSERT(moduleFinder);
 
-    connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnDirectModuleFinderHelper::at_resourceAdded);
-    connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnDirectModuleFinderHelper::at_resourceRemoved);
-    connect(qnResPool,  &QnResourcePool::resourceChanged,   this,   &QnDirectModuleFinderHelper::at_resourceChanged);
-    connect(qnResPool,  &QnResourcePool::statusChanged,     this,   &QnDirectModuleFinderHelper::at_resourceStatusChanged);
+    const auto& resPool = m_moduleFinder->commonModule()->resourcePool();
+
+    connect(resPool,  &QnResourcePool::resourceAdded,     this,   &QnDirectModuleFinderHelper::at_resourceAdded);
+    connect(resPool,  &QnResourcePool::resourceRemoved,   this,   &QnDirectModuleFinderHelper::at_resourceRemoved);
+    connect(resPool,  &QnResourcePool::resourceChanged,   this,   &QnDirectModuleFinderHelper::at_resourceChanged);
+    connect(resPool,  &QnResourcePool::statusChanged,     this,   &QnDirectModuleFinderHelper::at_resourceStatusChanged);
     connect(moduleFinder->multicastModuleFinder(), &QnMulticastModuleFinder::responseReceived, this, &QnDirectModuleFinderHelper::at_responseReceived);
 
     QTimer *timer = new QTimer(this);
@@ -115,8 +117,9 @@ void QnDirectModuleFinderHelper::setForcedUrls(QObject* requester, const QSet<QU
     mergeForcedUrls();
 }
 
-void QnDirectModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource) {
-    if (resource->getId() == qnCommon->moduleGUID())
+void QnDirectModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource)
+{
+    if (resource->getId() == m_moduleFinder->commonModule()->moduleGUID())
         return;
 
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
@@ -165,8 +168,9 @@ void QnDirectModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource)
     updateModuleFinder();
 }
 
-void QnDirectModuleFinderHelper::at_resourceRemoved(const QnResourcePtr &resource) {
-    if (resource->getId() == qnCommon->moduleGUID())
+void QnDirectModuleFinderHelper::at_resourceRemoved(const QnResourcePtr &resource)
+{
+    if (resource->getId() == m_moduleFinder->commonModule()->moduleGUID())
         return;
 
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();

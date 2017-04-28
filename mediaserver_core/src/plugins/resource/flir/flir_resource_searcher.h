@@ -1,7 +1,6 @@
-#ifndef FLIR_RESOURCE_SERACHER_H
-#define FLIR_RESOURCE_SERACHER_H
+#pragma once
 
-#ifdef ENABLE_ONVIF
+#ifdef ENABLE_FLIR
 
 #include "../mdns/mdns_resource_searcher.h"
 #include "flir_eip_data.h"
@@ -15,11 +14,11 @@ struct FlirDeviceInfo
     QUrl url;
 };
 
-class QnFlirResourceSearcher : public QnMdnsResourceSearcher
+class QnFlirResourceSearcher: public QnMdnsResourceSearcher
 {
-
+    using base_type = QnMdnsResourceSearcher;
 public:
-    QnFlirResourceSearcher();
+    QnFlirResourceSearcher(QnCommonModule* commonModule);
     ~QnFlirResourceSearcher();
 
     static const quint16 kFlirVendorId = 1161;
@@ -50,5 +49,4 @@ private:
 
 };
 
-#endif // #ifdef ENABLE_ONVIF
-#endif // FLIR_RESOURCE_SERACHER_H
+#endif // #ifdef ENABLE_FLIR
