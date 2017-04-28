@@ -831,13 +831,14 @@ ShortCache.prototype.setPlayingPosition = function(position){
 
 
 
-function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initialWidth, stickToLiveMs, zoomAccuracyMs, lastMinuteInterval, minPixelsPerLevel, $q){
+function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initialWidth, stickToLiveMs, zoomAccuracyMs, lastMinuteInterval, minPixelsPerLevel, useServerTime, $q){
     this.absMaxMsPerPixel = maxMsPerPixel;
     this.minMsPerPixel = minMsPerPixel;
     this.stickToLiveMs = stickToLiveMs;
     this.zoomAccuracyMs = zoomAccuracyMs;
     this.minPixelsPerLevel = minPixelsPerLevel;
     this.lastMinuteInterval  = lastMinuteInterval;
+    this.useServerTime = useServerTime;
     this.$q = $q;
 
     this.levels = {
@@ -860,6 +861,9 @@ function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initia
     this.anchorPoint = 1;
     this.anchorDate = this.end;
     this.updateCurrentInterval();
+
+    this.timeZoneOffset = 0;
+    this.timeCorrection = 0;
 }
 
 ScaleManager.prototype.updateTotalInterval = function(){
@@ -878,7 +882,7 @@ ScaleManager.prototype.setStart = function(start){// Update the begining end of 
 };
 ScaleManager.prototype.setEnd = function(end){ // Update right end of the timeline. Live mode must be supported here
     var needZoomOut = !this.checkZoomOut();
-    this.end = end;
+    this.end = this.serverTime(end);
     this.updateTotalInterval();
     if(needZoomOut){
         this.zoom(1);
@@ -1011,6 +1015,7 @@ ScaleManager.prototype.setAnchorCoordinate = function(coordinate){ // Set anchor
 ScaleManager.prototype.setAnchorDateAndPoint = function(date,point){ // Set anchor date
     this.anchorDate = date;
     if(typeof(point)!="undefined") {
+        //console.log('anchorPoint', point);
         this.anchorPoint = point;
     }
     this.updateCurrentInterval();
@@ -1259,4 +1264,15 @@ ScaleManager.prototype.zoomAroundDate = function(zoomValue, aroundDate){
 
 ScaleManager.prototype.lastMinute = function(){
     return (new Date(this.end - this.lastMinuteInterval)).getTime();
+};
+
+ScaleManager.prototype.updateServerOffset = function(serverOffset){
+    this.timeZoneOffset = serverOffset.timeZoneOffset;
+    this.timeCorrection = serverOffset.timeCorrection;
+};
+
+ScaleManager.prototype.serverTime = function(date){
+    if(!this.useServerTime)
+        return date;
+    return ((new Date(date)).getTime() + (new Date(date)).getTimezoneOffset() * 60000) + this.timeZoneOffset - this.timeCorrection;
 };

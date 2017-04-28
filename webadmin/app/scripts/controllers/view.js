@@ -70,6 +70,8 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.settings = {id: ''};
         $scope.volumeLevel = typeof($scope.storage.volumeLevel) === 'number' ? $scope.storage.volumeLevel : 50;
 
+        $scope.serverTime = {};
+
         mediaserver.getModuleInformation().then(function (r) {
             $scope.settings = {
                 id: r.data.reply.id
@@ -722,11 +724,15 @@ angular.module('webadminApp').controller('ViewCtrl',
         });
 
         mediaserver.getTime().then(function(result){
+
             var serverTime = parseInt(result.data.reply.utcTime);
             var clientTime = (new Date()).getTime();
             if(Math.abs(clientTime - serverTime) > minTimeLag){
                 timeCorrection = clientTime - serverTime;
             }
+            
+            $scope.serverTime.timeZoneOffset = parseInt(result.data.reply.timeZoneOffset);
+            $scope.serverTime.timeCorrection = timeCorrection;
         });
 
         mediaserver.getCurrentUser().then(function(result) {

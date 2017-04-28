@@ -12,7 +12,8 @@ angular.module('webadminApp')
                 canPlayLive: '=',
                 ngClick: '&',
                 positionHandler: '=',
-                volumeLevel: '='
+                volumeLevel: '=',
+                serverTime: '='
             },
             templateUrl: 'views/components/timeline.html',
             link: function (scope, element/*, attrs*/) {
@@ -70,6 +71,7 @@ angular.module('webadminApp')
                     timelineConfig.zoomAccuracyMs,
                     timelineConfig.lastMinuteDuration,
                     timelineConfig.minPixelsPerLevel,
+                    Config.settingsConfig.useServerTime,
                     $q); //Init boundariesProvider
 
                 var animationState = {
@@ -226,7 +228,7 @@ angular.module('webadminApp')
                     }
                     mouseYOverTimeline = event.offsetY || (event.pageY - $(canvas).offset().top);
 
-                    mouseOverElements = timelineRender.checkElementsUnderCursor(mouseXOverTimeline,mouseYOverTimeline);
+                    mouseOverElements = timelineRender.checkElementsUnderCursor(mouseXOverTimeline,mouseYOverTimeline);//,timelineActions.scrollingNow, timelineActions.catchScrollBar);
 
                 }
 
@@ -424,6 +426,10 @@ angular.module('webadminApp')
                     if(scope.positionProvider && scope.positionProvider.liveMode) {
                         goToLive (true);
                     }
+                });
+
+                scope.$watch('serverTime.timeZoneOffset', function(){
+                    scope.scaleManager.updateServerOffset(scope.serverTime);
                 });
 
                 if(scope.positionProvider) {
