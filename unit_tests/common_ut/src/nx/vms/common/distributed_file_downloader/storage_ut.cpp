@@ -23,7 +23,7 @@ class DistributedFileDownloaderStorageTest: public ::testing::Test
 protected:
     virtual void SetUp() override
     {
-        workingDirectory = QDir::temp().absoluteFilePath("__tmp_dfd_test");
+        workingDirectory = QDir::temp().absoluteFilePath("__tmp_dfd_storage_test");
         workingDirectory.removeRecursively();
         ASSERT_TRUE(QDir().mkdir(workingDirectory.absolutePath()));
 
