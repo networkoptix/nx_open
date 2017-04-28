@@ -80,26 +80,26 @@ public:
     void execute(nx::utils::MoveOnlyFunc<HandlerFunc> handler)
     {
         m_handler = std::move(handler);
+        addRequestBody();
+        auto completionHandler = std::bind(&self_type::requestDone, this, &m_httpClient);
+
         if (m_requestContentType.isEmpty())
-        {
-            m_httpClient.doGet(
-                m_url,
-                std::bind(&self_type::requestDone, this, &m_httpClient));
-        }
+            m_httpClient.doGet(m_url, std::move(completionHandler));
         else
-        {
-            decltype(m_requestBody) requestBody;
-            requestBody.swap(m_requestBody);
+            m_httpClient.doPost(m_url, std::move(completionHandler));
+    }
 
-            m_httpClient.setRequestBody(
-                std::make_unique<nx_http::BufferSource>(
-                    m_requestContentType,
-                    std::move(requestBody)));
+    void executeUpgrade(
+        const nx_http::StringType& protocolToUpgradeConnectionTo,
+        nx::utils::MoveOnlyFunc<HandlerFunc> handler)
+    {
+        m_handler = std::move(handler);
+        addRequestBody();
 
-            m_httpClient.doPost(
-                m_url,
-                std::bind(&self_type::requestDone, this, &m_httpClient));
-        }
+        m_httpClient.doUpgrade(
+            m_url,
+            protocolToUpgradeConnectionTo,
+            std::bind(&self_type::requestDone, this, &m_httpClient));
     }
 
     void setRequestTimeout(std::chrono::milliseconds timeout)
@@ -128,6 +128,17 @@ private:
     virtual void stopWhileInAioThread() override
     {
         m_httpClient.pleaseStopSync();
+    }
+
+    void addRequestBody()
+    {
+        decltype(m_requestBody) requestBody;
+        requestBody.swap(m_requestBody);
+
+        m_httpClient.setRequestBody(
+            std::make_unique<nx_http::BufferSource>(
+                m_requestContentType,
+                std::move(requestBody)));
     }
 };
 
