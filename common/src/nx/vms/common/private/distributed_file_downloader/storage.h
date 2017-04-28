@@ -4,11 +4,12 @@
 
 #include <nx/utils/thread/mutex.h>
 
-#include "../distributed_file_downloader.h"
+#include "../../distributed_file_downloader.h"
 
 namespace nx {
 namespace vms {
 namespace common {
+namespace distributed_file_downloader {
 
 struct FileMetadata: DownloaderFileInformation
 {
@@ -24,10 +25,10 @@ struct FileMetadata: DownloaderFileInformation
     QVector<QByteArray> chunkChecksums;
 };
 
-class DistributedFileDownloaderStorage
+class Storage
 {
 public:
-    DistributedFileDownloaderStorage(const QDir& m_downloadsDirectory);
+    Storage(const QDir& m_downloadsDirectory);
 
     QStringList files() const;
 
@@ -78,6 +79,7 @@ private:
     mutable QnMutex m_mutex;
 };
 
+} // namespace distributed_file_downloader
 } // namespace common
 } // namespace vms
 } // namespace nx

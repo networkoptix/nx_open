@@ -2,7 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-#include "private/distributed_file_downloader_storage.h"
+#include "private/distributed_file_downloader/storage.h"
 
 namespace nx {
 namespace vms {
@@ -35,7 +35,7 @@ public:
     DistributedFileDownloaderPrivate(DistributedFileDownloader* q);
 
 private:
-    QScopedPointer<DistributedFileDownloaderStorage> storage;
+    QScopedPointer<distributed_file_downloader::Storage> storage;
 };
 
 DistributedFileDownloaderPrivate::DistributedFileDownloaderPrivate(DistributedFileDownloader* q):
@@ -54,7 +54,7 @@ DistributedFileDownloader::DistributedFileDownloader(
     d_ptr(new DistributedFileDownloaderPrivate(this))
 {
     Q_D(DistributedFileDownloader);
-    d->storage.reset(new DistributedFileDownloaderStorage(downloadsDirectory));
+    d->storage.reset(new distributed_file_downloader::Storage(downloadsDirectory));
 }
 
 DistributedFileDownloader::~DistributedFileDownloader()

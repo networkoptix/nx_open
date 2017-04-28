@@ -1,4 +1,4 @@
-#include "distributed_file_downloader_storage.h"
+#include "storage.h"
 
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
@@ -17,10 +17,11 @@ static const QString kMetadataSuffix = lit(".vmsdownload");
 namespace nx {
 namespace vms {
 namespace common {
+namespace distributed_file_downloader {
 
 QN_FUSION_DECLARE_FUNCTIONS(FileMetadata, (json))
 
-DistributedFileDownloaderStorage::DistributedFileDownloaderStorage(
+Storage::Storage(
     const QDir& downloadsDirectory)
     :
     m_downloadsDirectory(downloadsDirectory)
@@ -28,25 +29,25 @@ DistributedFileDownloaderStorage::DistributedFileDownloaderStorage(
     findDownloads();
 }
 
-QStringList DistributedFileDownloaderStorage::files() const
+QStringList Storage::files() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_fileInformationByName.keys();
 }
 
-QString DistributedFileDownloaderStorage::filePath(const QString& fileName) const
+QString Storage::filePath(const QString& fileName) const
 {
     return m_downloadsDirectory.absoluteFilePath(fileName);
 }
 
-DownloaderFileInformation DistributedFileDownloaderStorage::fileInformation(
+DownloaderFileInformation Storage::fileInformation(
     const QString& fileName) const
 {
     QnMutexLocker lock(&m_mutex);
     return m_fileInformationByName.value(fileName);
 }
 
-DistributedFileDownloader::ErrorCode DistributedFileDownloaderStorage::addFile(
+DistributedFileDownloader::ErrorCode Storage::addFile(
     const DownloaderFileInformation& fileInfo)
 {
     QnMutexLocker lock(&m_mutex);
@@ -144,7 +145,7 @@ DistributedFileDownloader::ErrorCode DistributedFileDownloaderStorage::addFile(
     return DistributedFileDownloader::ErrorCode::noError;
 }
 
-DistributedFileDownloader::ErrorCode DistributedFileDownloaderStorage::readFileChunk(
+DistributedFileDownloader::ErrorCode Storage::readFileChunk(
     const QString& fileName, int chunkIndex, QByteArray& buffer)
 {
     QnMutexLocker lock(&m_mutex);
@@ -174,7 +175,7 @@ DistributedFileDownloader::ErrorCode DistributedFileDownloaderStorage::readFileC
     return DistributedFileDownloader::ErrorCode::noError;
 }
 
-DistributedFileDownloader::ErrorCode DistributedFileDownloaderStorage::writeFileChunk(
+DistributedFileDownloader::ErrorCode Storage::writeFileChunk(
     const QString& fileName, int chunkIndex, const QByteArray& buffer)
 {
     QnMutexLocker lock(&m_mutex);
@@ -215,7 +216,7 @@ DistributedFileDownloader::ErrorCode DistributedFileDownloaderStorage::writeFile
     return DistributedFileDownloader::ErrorCode::noError;
 }
 
-DistributedFileDownloader::ErrorCode DistributedFileDownloaderStorage::deleteFile(
+DistributedFileDownloader::ErrorCode Storage::deleteFile(
     const QString& fileName, bool deleteData)
 {
     QnMutexLocker lock(&m_mutex);
@@ -244,7 +245,7 @@ DistributedFileDownloader::ErrorCode DistributedFileDownloaderStorage::deleteFil
     return DistributedFileDownloader::ErrorCode::noError;
 }
 
-QVector<QByteArray> DistributedFileDownloaderStorage::getChunkChecksums(
+QVector<QByteArray> Storage::getChunkChecksums(
     const QString& fileName)
 {
     QnMutexLocker lock(&m_mutex);
@@ -256,7 +257,7 @@ QVector<QByteArray> DistributedFileDownloaderStorage::getChunkChecksums(
     return fileInfo.chunkChecksums;
 }
 
-void DistributedFileDownloaderStorage::findDownloads()
+void Storage::findDownloads()
 {
     if (!m_downloadsDirectory.exists())
         return;
@@ -272,7 +273,7 @@ void DistributedFileDownloaderStorage::findDownloads()
     }
 }
 
-QByteArray DistributedFileDownloaderStorage::calculateMd5(const QString& filePath)
+QByteArray Storage::calculateMd5(const QString& filePath)
 {
     QFile file(filePath);
     if (!file.open(QFile::ReadOnly))
@@ -283,7 +284,7 @@ QByteArray DistributedFileDownloaderStorage::calculateMd5(const QString& filePat
     return hash.result();
 }
 
-qint64 DistributedFileDownloaderStorage::calculateFileSize(const QString& filePath)
+qint64 Storage::calculateFileSize(const QString& filePath)
 {
     QFile file(filePath);
     if (!file.open(QFile::ReadOnly))
@@ -292,7 +293,7 @@ qint64 DistributedFileDownloaderStorage::calculateFileSize(const QString& filePa
     return file.size();
 }
 
-int DistributedFileDownloaderStorage::calculateChunkCount(qint64 fileSize, qint64 chunkSize)
+int Storage::calculateChunkCount(qint64 fileSize, qint64 chunkSize)
 {
     if (chunkSize <= 0 || fileSize < 0)
         return -1;
@@ -300,7 +301,7 @@ int DistributedFileDownloaderStorage::calculateChunkCount(qint64 fileSize, qint6
     return (fileSize + chunkSize - 1) / chunkSize;
 }
 
-bool DistributedFileDownloaderStorage::saveMetadata(const FileMetadata& fileInformation)
+bool Storage::saveMetadata(const FileMetadata& fileInformation)
 {
     const auto fileName = metadataFileName(filePath(fileInformation.name));
 
@@ -319,7 +320,7 @@ bool DistributedFileDownloaderStorage::saveMetadata(const FileMetadata& fileInfo
     return true;
 }
 
-FileMetadata DistributedFileDownloaderStorage::loadMetadata(const QString& fileName)
+FileMetadata Storage::loadMetadata(const QString& fileName)
 {
     auto metadataFileName = fileName;
     if (!metadataFileName.endsWith(kMetadataSuffix))
@@ -348,13 +349,13 @@ FileMetadata DistributedFileDownloaderStorage::loadMetadata(const QString& fileN
     return fileInfo;
 }
 
-FileMetadata DistributedFileDownloaderStorage::fileMetadata(const QString& fileName) const
+FileMetadata Storage::fileMetadata(const QString& fileName) const
 {
     return m_fileInformationByName.value(fileName);
 }
 
 
-DistributedFileDownloader::ErrorCode DistributedFileDownloaderStorage::loadDownload(
+DistributedFileDownloader::ErrorCode Storage::loadDownload(
     const QString& fileName)
 {
     auto fileInfo = loadMetadata(fileName);
@@ -365,7 +366,7 @@ DistributedFileDownloader::ErrorCode DistributedFileDownloaderStorage::loadDownl
     return addFile(fileInfo);
 }
 
-void DistributedFileDownloaderStorage::checkDownloadCompleted(FileMetadata& fileInfo)
+void Storage::checkDownloadCompleted(FileMetadata& fileInfo)
 {
     if (fileInfo.size < 0 || fileInfo.chunkSize <= 0)
     {
@@ -399,7 +400,7 @@ void DistributedFileDownloaderStorage::checkDownloadCompleted(FileMetadata& file
     fileInfo.chunkChecksums = calculateChecksums(path, fileInfo.size);
 }
 
-bool DistributedFileDownloaderStorage::reserveSpace(const QString& fileName, const qint64 size)
+bool Storage::reserveSpace(const QString& fileName, const qint64 size)
 {
     QFile file(fileName);
 
@@ -412,7 +413,7 @@ bool DistributedFileDownloaderStorage::reserveSpace(const QString& fileName, con
     return true;
 }
 
-QString DistributedFileDownloaderStorage::metadataFileName(const QString& fileName)
+QString Storage::metadataFileName(const QString& fileName)
 {
     if (fileName.isEmpty())
         return QString();
@@ -420,7 +421,7 @@ QString DistributedFileDownloaderStorage::metadataFileName(const QString& fileNa
     return fileName + kMetadataSuffix;
 }
 
-qint64 DistributedFileDownloaderStorage::calculateChunkSize(
+qint64 Storage::calculateChunkSize(
     qint64 fileSize, int chunkIndex, qint64 chunkSize)
 {
     if (fileSize < 0 || chunkIndex < 0)
@@ -435,7 +436,7 @@ qint64 DistributedFileDownloaderStorage::calculateChunkSize(
         : fileSize - chunkSize * (chunkCount - 1);
 }
 
-QVector<QByteArray> DistributedFileDownloaderStorage::calculateChecksums(
+QVector<QByteArray> Storage::calculateChecksums(
     const QString& fileName, qint64 chunkSize)
 {
     QVector<QByteArray> result;
@@ -464,6 +465,7 @@ QVector<QByteArray> DistributedFileDownloaderStorage::calculateChecksums(
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     FileMetadata, (json), DownloaderFileInformation_Fields (chunkChecksums))
 
+} // namespace distributed_file_downloader
 } // namespace common
 } // namespace vms
 } // namespace nx
