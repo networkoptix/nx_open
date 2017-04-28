@@ -87,6 +87,15 @@ DistributedFileDownloader::ErrorCode DistributedFileDownloader::addFile(
     return d->storage->addFile(fileInformation);
 }
 
+DistributedFileDownloader::ErrorCode DistributedFileDownloader::updateFileInformation(
+    const QString& fileName,
+    int size,
+    const QByteArray& md5)
+{
+    Q_D(DistributedFileDownloader);
+    return d->storage->updateFileInformation(fileName, size, md5);
+}
+
 DistributedFileDownloader::ErrorCode DistributedFileDownloader::readFileChunk(
     const QString& fileName,
     int chunkIndex,

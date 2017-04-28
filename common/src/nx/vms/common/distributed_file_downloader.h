@@ -60,6 +60,7 @@ public:
         ioError,
         fileDoesNotExist,
         fileAlreadyExists,
+        fileAlreadyDownloaded,
         invalidChecksum,
         invalidFileSize,
         invalidChunkIndex,
@@ -69,6 +70,7 @@ public:
     Q_ENUM(ErrorCode)
 
     DistributedFileDownloader(const QDir& downloadsDirectory, QObject* parent = nullptr);
+
     ~DistributedFileDownloader();
 
     QStringList files() const;
@@ -78,6 +80,11 @@ public:
     DownloaderFileInformation fileInformation(const QString& fileName) const;
 
     ErrorCode addFile(const DownloaderFileInformation& fileInformation);
+
+    ErrorCode updateFileInformation(
+        const QString& fileName,
+        int size,
+        const QByteArray& md5);
 
     ErrorCode readFileChunk(
         const QString& fileName,

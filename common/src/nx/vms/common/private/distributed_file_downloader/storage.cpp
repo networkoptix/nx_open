@@ -145,6 +145,51 @@ DistributedFileDownloader::ErrorCode Storage::addFile(
     return DistributedFileDownloader::ErrorCode::noError;
 }
 
+DistributedFileDownloader::ErrorCode Storage::updateFileInformation(
+    const QString& fileName, qint64 size, const QByteArray& md5)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    auto it = m_fileInformationByName.find(fileName);
+    if (it == m_fileInformationByName.end())
+        return DistributedFileDownloader::ErrorCode::fileDoesNotExist;
+
+    if (it->status == DownloaderFileInformation::Status::downloaded)
+        return DistributedFileDownloader::ErrorCode::fileAlreadyDownloaded;
+
+    bool updated = false;
+    bool resizeFailed = false;
+
+    if (size >= 0 && it->size != size)
+    {
+        it->size = size;
+
+        const int chunkCount = calculateChunkCount(size, it->chunkSize);
+        it->downloadedChunks.resize(chunkCount);
+        it->chunkChecksums.resize(chunkCount);
+        resizeFailed = !QFile::resize(filePath(fileName), size);
+
+        updated = true;
+    }
+
+    if (!md5.isEmpty() && it->md5 != md5)
+    {
+        it->md5 = md5;
+        updated = true;
+    }
+
+    if (resizeFailed)
+        return DistributedFileDownloader::ErrorCode::noFreeSpace;
+
+    if (updated)
+        checkDownloadCompleted(it.value());
+
+    if (!saveMetadata(it.value()))
+        return DistributedFileDownloader::ErrorCode::ioError;
+
+    return DistributedFileDownloader::ErrorCode::noError;
+}
+
 DistributedFileDownloader::ErrorCode Storage::readFileChunk(
     const QString& fileName, int chunkIndex, QByteArray& buffer)
 {

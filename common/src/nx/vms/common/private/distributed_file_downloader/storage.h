@@ -38,6 +38,11 @@ public:
 
     DistributedFileDownloader::ErrorCode addFile(const DownloaderFileInformation& fileInfo);
 
+    DistributedFileDownloader::ErrorCode updateFileInformation(
+        const QString& fileName,
+        qint64 size,
+        const QByteArray& md5);
+
     DistributedFileDownloader::ErrorCode readFileChunk(
         const QString& fileName,
         int chunkIndex,
