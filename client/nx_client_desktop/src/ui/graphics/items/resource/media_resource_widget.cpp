@@ -2461,9 +2461,7 @@ rest::Handle QnMediaResourceWidget::invokeTrigger(
                 resultHandler(success, handle);
         };
 
-    auto res = commonModule()->currentServer()->restConnection()->softwareTriggerCommand(
+    return commonModule()->currentServer()->restConnection()->softwareTriggerCommand(
         m_resource->toResource()->getId(), id, toggleState,
         responseHandler, QThread::currentThread());
-
-    return res;
 }
