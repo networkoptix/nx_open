@@ -1,7 +1,15 @@
 #pragma once
 
+#include <QtCore/QPointer>
+#include <QtCore/QScopedPointer>
+#include <QtCore/QElapsedTimer>
+
+#include "../software_trigger_button.h"
+
 class HoverFocusProcessor;
+class QnBusyIndicatorGraphicsWidget;
 class QnStyledTooltipWidget;
+class QTimer;
 
 namespace nx {
 namespace client {
@@ -37,12 +45,28 @@ public:
     bool prolonged() const;
     void setProlonged(bool value);
 
-    void ensureIcon();
+    SoftwareTriggerButton::State state() const;
+    void setState(SoftwareTriggerButton::State state);
+
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+        QWidget* widget);
 
 private:
     void updateToolTipPosition();
     void updateToolTipTailEdge();
     void updateToolTipVisibility();
+
+    void paintCircle(QPainter* painter, const QColor& background,
+        const QColor& frame = QColor());
+
+    void paintPixmap(QPainter* painter, const QPixmap& pixmap);
+
+    void setStateTimer(QTimer* timer);
+
+    QPixmap generatePixmap(const QColor& background, const QColor& frame, const QPixmap& icon);
+    void ensureImages();
+
+    QRect buttonRect() const;
 
 private:
     QString m_iconName;
@@ -52,7 +76,17 @@ private:
 
     QnStyledTooltipWidget* const m_toolTip;
     HoverFocusProcessor* const m_toolTipHoverProcessor;
-    bool m_iconDirty = false;
+    SoftwareTriggerButton::State m_state = SoftwareTriggerButton::kDefaultState;
+    QScopedPointer<QnBusyIndicatorGraphicsWidget> m_busyIndicator;
+    QPointer<QTimer> m_stateTimer = nullptr;
+    bool m_imagesDirty = false;
+
+    QElapsedTimer m_animationTime;
+    QPixmap m_waitingPixmap;
+    QPixmap m_successPixmap;
+    QPixmap m_failurePixmap;
+    QPixmap m_failureFramePixmap;
+    QPixmap m_activityFramePixmap;
 };
 
 } // namespace graphics

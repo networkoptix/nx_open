@@ -76,12 +76,23 @@ void SoftwareTriggerButton::setProlonged(bool value)
     d->setProlonged(value);
 }
 
+SoftwareTriggerButton::State SoftwareTriggerButton::state() const
+{
+    Q_D(const SoftwareTriggerButton);
+    return d->state();
+}
+
+void SoftwareTriggerButton::setState(State state)
+{
+    Q_D(SoftwareTriggerButton);
+    d->setState(state);
+}
+
 void SoftwareTriggerButton::paint(QPainter* painter,
     const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     Q_D(SoftwareTriggerButton);
-    d->ensureIcon();
-    base_type::paint(painter, option, widget);
+    d->paint(painter, option, widget);
 }
 
 } // namespace graphics

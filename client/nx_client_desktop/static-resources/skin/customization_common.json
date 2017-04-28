@@ -819,8 +819,9 @@
             "default": {
                 "window": "dark1.setAlpha(128)",
                 "midlight": "brand_core.setAlpha(179)",
-                "highlight": "red_l2.setAlpha(179)",
-                "dark": "brand_core.setAlpha(128)"
+                "dark": "brand_core.setAlpha(128)",
+                "highlight": "red_core.setAlpha(128)",
+                "highlightedText": "red_core"
             }
         }
     },

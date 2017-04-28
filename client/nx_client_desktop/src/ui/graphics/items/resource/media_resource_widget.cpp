@@ -120,6 +120,8 @@ static constexpr qreal kMaxBackwardSpeed = 16.0;
 static constexpr int kTriggersSpacing = 4;
 static constexpr int kTriggerButtonSize = 40;
 
+static const char* kTriggerRequestIdProperty = "_qn_triggerRequestId";
+
 template<class Cont, class Item>
 bool contains(const Cont& cont, const Item& item)
 {
@@ -2331,31 +2333,61 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
         : name);
 
     const auto resultHandler =
-        [this](bool success)
+        [button = QPointer<QnSoftwareTriggerButton>(button)](bool success, qint64 requestId)
         {
-            //TODO: FIXME!!! #vkutin Implement this.
+            if (!button)
+                return;
+
+            if (button->property(kTriggerRequestIdProperty).value<rest::Handle>() != requestId)
+                return;
+
+            button->setEnabled(true);
+
+            button->setState(success
+                ? QnSoftwareTriggerButton::kSuccessState
+                : QnSoftwareTriggerButton::kFailureState);
         };
 
     if (info.prolonged)
     {
-        connect(button, &QnImageButtonWidget::pressed, this,
-            [this, resultHandler, id = info.triggerId]()
+        connect(button, &QnSoftwareTriggerButton::pressed, this,
+            [this, button, resultHandler, id = info.triggerId]()
             {
-                invokeTrigger(id, resultHandler, QnBusiness::ActiveState);
+                const auto requestId = invokeTrigger(id, resultHandler, QnBusiness::ActiveState);
+                const bool success = requestId != rest::Handle();
+                button->setProperty(kTriggerRequestIdProperty, requestId);
+                button->setState(success
+                    ? QnSoftwareTriggerButton::kWaitingState
+                    : QnSoftwareTriggerButton::kFailureState);
             });
 
-        connect(button, &QnImageButtonWidget::released, this,
-            [this, resultHandler, id = info.triggerId]()
+        connect(button, &QnSoftwareTriggerButton::released, this,
+            [this, button, resultHandler, id = info.triggerId]()
             {
-                invokeTrigger(id, resultHandler, QnBusiness::InactiveState);
+                /* In case of activation error don't try to deactivate: */
+                if (button->state() == QnSoftwareTriggerButton::kFailureState)
+                    return;
+
+                const auto requestId = invokeTrigger(id, resultHandler, QnBusiness::InactiveState);
+                const bool success = requestId != rest::Handle();
+                button->setProperty(kTriggerRequestIdProperty, requestId);
+                button->setState(success
+                    ? QnSoftwareTriggerButton::kDefaultState
+                    : QnSoftwareTriggerButton::kFailureState);
             });
     }
     else
     {
-        connect(button, &QnImageButtonWidget::clicked, this,
-            [this, resultHandler, id = info.triggerId]()
+        connect(button, &QnSoftwareTriggerButton::clicked, this,
+            [this, button, resultHandler, id = info.triggerId]()
             {
-                invokeTrigger(id, resultHandler);
+                const auto requestId = invokeTrigger(id, resultHandler);
+                const bool success = requestId != rest::Handle();
+                button->setProperty(kTriggerRequestIdProperty, requestId);
+                button->setEnabled(!success);
+                button->setState(success
+                    ? QnSoftwareTriggerButton::kWaitingState
+                    : QnSoftwareTriggerButton::kFailureState);
             });
     }
 }
@@ -2405,13 +2437,13 @@ void QnMediaResourceWidget::at_businessRuleChanged(const QnBusinessEventRulePtr&
     }
 };
 
-void QnMediaResourceWidget::invokeTrigger(
+rest::Handle QnMediaResourceWidget::invokeTrigger(
     const QString& id,
-    std::function<void(bool)> resultHandler,
+    std::function<void(bool, rest::Handle)> resultHandler,
     QnBusiness::EventState toggleState)
 {
     if (!accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission))
-        return;
+        return rest::Handle();
 
     const auto responseHandler =
         [this, resultHandler, id](bool success, rest::Handle handle, const QnJsonRestResult& result)
@@ -2426,10 +2458,12 @@ void QnMediaResourceWidget::invokeTrigger(
             }
 
             if (resultHandler)
-                resultHandler(success);
+                resultHandler(success, handle);
         };
 
-    commonModule()->currentServer()->restConnection()->softwareTriggerCommand(
+    auto res = commonModule()->currentServer()->restConnection()->softwareTriggerCommand(
         m_resource->toResource()->getId(), id, toggleState,
         responseHandler, QThread::currentThread());
+
+    return res;
 }

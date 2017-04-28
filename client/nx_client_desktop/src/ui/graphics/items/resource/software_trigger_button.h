@@ -36,6 +36,17 @@ public:
     bool prolonged() const;
     void setProlonged(bool value);
 
+    enum State
+    {
+        kDefaultState, //< default state
+        kWaitingState, //< waiting for server response state
+        kSuccessState, //< show success notification state
+        kFailureState  //< show failure notification state
+    };
+
+    State state() const;
+    void setState(State state);
+
     virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
         QWidget* widget) override;
 

@@ -7,9 +7,9 @@
 
 #include <QtGui/QStaticText>
 
-#include <camera/camera_bookmarks_manager_fwd.h>
-
+#include <api/server_rest_connection_fwd.h>
 #include <business/business_fwd.h>
+#include <camera/camera_bookmarks_manager_fwd.h>
 #include <core/resource/resource_fwd.h>
 
 struct QnMetaDataV1;
@@ -216,8 +216,8 @@ protected:
     void ensureTwoWayAudioWidget();
     bool animationAllowed() const;
 
-    void invokeTrigger(const QString& id,
-        std::function<void(bool)> resultHandler,
+    rest::Handle invokeTrigger(const QString& id,
+        std::function<void(bool, rest::Handle)> resultHandler,
         QnBusiness::EventState toggleState = QnBusiness::UndefinedState);
 
 private slots:
