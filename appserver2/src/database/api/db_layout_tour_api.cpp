@@ -37,9 +37,11 @@ bool insertOrReplaceTour(const QSqlDatabase& database, const ApiLayoutTourData& 
         INTO vms_layout_tours
         (
             id,
+            parentId,
             name
         ) VALUES (
             :id,
+            :parentId,
             :name
         )
     )sql");
@@ -122,9 +124,7 @@ bool fetchLayoutTours(const QSqlDatabase& database, ApiLayoutTourDataList& tours
     query.setForwardOnly(true);
 
     QString queryStr(R"sql(
-        SELECT
-            id,
-            name
+        SELECT *
         FROM vms_layout_tours
         ORDER BY id
     )sql");
@@ -138,10 +138,7 @@ bool fetchLayoutTours(const QSqlDatabase& database, ApiLayoutTourDataList& tours
     QSqlQuery queryItems(database);
     queryItems.setForwardOnly(true);
     QString queryItemsStr(R"sql(
-        SELECT
-            tourId,
-            layoutId,
-            delayMs
+        SELECT *
         FROM vms_layout_tour_items
         ORDER BY tourId
     )sql");

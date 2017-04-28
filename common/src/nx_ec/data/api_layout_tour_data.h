@@ -25,6 +25,7 @@ struct ApiLayoutTourItemData: ApiData
 struct ApiLayoutTourData: ApiData
 {
     QnUuid id;
+    QnUuid parentId;
     QString name;
     ApiLayoutTourItemDataList items;
 
@@ -34,6 +35,6 @@ struct ApiLayoutTourData: ApiData
     bool operator!=(const ApiLayoutTourData& rhs) const;
 };
 
-#define ApiLayoutTourData_Fields (id)(name)(items)
+#define ApiLayoutTourData_Fields (id)(parentId)(name)(items)
 
 } // namespace ec2

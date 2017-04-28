@@ -480,7 +480,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
         case Qn::RoleUsersNode:
         case Qn::SharedResourceNode:
         case Qn::RoleNode:
-        case Qn::LayoutTourNode: //TODO: #GDM #3.1 #tbd
+        case Qn::LayoutTourNode:
         case Qn::SharedLayoutNode:
         case Qn::RecorderNode:
         case Qn::SystemNode:

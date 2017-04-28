@@ -29,8 +29,6 @@ private:
 
     QnResourceTreeModelNodePtr ensureLayoutTourNode(const ec2::ApiLayoutTourData& tour);
 
-    bool canSeeTour(const ec2::ApiLayoutTourData& tour) const;
-
     void rebuild();
 
     /** Cleanup all node references. */

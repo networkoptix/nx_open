@@ -77,11 +77,6 @@ QnResourceTreeModelNodePtr QnResourceTreeModelLayoutToursNode::ensureLayoutTourN
     return *iter;
 }
 
-bool QnResourceTreeModelLayoutToursNode::canSeeTour(const ec2::ApiLayoutTourData& tour) const
-{
-    return true; //TODO: #GDM #3.1 #tbd
-}
-
 void QnResourceTreeModelLayoutToursNode::rebuild()
 {
     clean();

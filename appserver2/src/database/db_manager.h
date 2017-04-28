@@ -711,6 +711,7 @@ public:
         filterData(data->userRoles);
         filterData(data->accessRights);
         filterData(data->layouts);
+        filterData(data->layoutTours);
         filterData(data->videowalls);
         filterData(data->rules);
         filterData(data->cameraHistory);

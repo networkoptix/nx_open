@@ -756,27 +756,27 @@ APPLY(604, getLayoutTours, ApiLayoutTourDataList, \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), \
-                       FilterListByAccess<AllowForAllAccess>(), \
-                       ReadListAccessOut<AllowForAllAccess>(), \
+                       FilterListByAccess<LayoutTourAccess>(), \
+                       AllowForAllAccessOut(), /* not actual for non-persistent */ \
                        RegularTransactionType()) \
 APPLY(605, saveLayoutTour, ApiLayoutTourData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        LayoutTourNotificationManagerHelper(), /* trigger notification*/ \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AllowForAllAccess(), /* read permission checker */ \
+                       LayoutTourAccess(), /* save permission checker */ \
+                       LayoutTourAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
+                       AccessOut<LayoutTourAccess>(), \
+                       RegularTransactionType()) \
 APPLY(606, removeLayoutTour, ApiIdData, \
                        true, \
                        false, \
                        CreateHashByIdHelper(), \
                        &apiIdDataTriggerNotificationHelper, \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AllowForAllAccess(), /* read permission checker */ \
+                       LayoutTourAccessById(), /* save permission checker */ \
+                       LayoutTourAccessById(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
