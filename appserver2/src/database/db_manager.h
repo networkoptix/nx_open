@@ -753,6 +753,8 @@ public:
     ApiObjectType getObjectTypeNoLock(const QnUuid& objectId);
     ApiObjectInfoList getNestedObjectsNoLock(const ApiObjectInfo& parentObject);
     ApiObjectInfoList getObjectsNoLock(const ApiObjectType& objectType);
+    ApiIdDataList getLayoutToursNoLock(const QnUuid& parentId);
+
     void getResourceParamsNoLock(const QnUuid& resourceId, ApiResourceParamWithRefDataList& resourceParams);
 
     template <typename T1, typename T2>
