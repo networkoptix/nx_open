@@ -10,8 +10,8 @@
 class QnResourceTreeModelLayoutToursNode: public QnResourceTreeModelNode
 {
     using base_type = QnResourceTreeModelNode;
-
     Q_OBJECT
+
 public:
     QnResourceTreeModelLayoutToursNode(QnResourceTreeModel* model);
     virtual ~QnResourceTreeModelLayoutToursNode();
