@@ -8,20 +8,6 @@ namespace nx {
 namespace utils {
 namespace log {
 
-enum class Level
-{
-    none,
-    always,
-    error,
-    warning,
-    info,
-    debug,
-    verbose
-};
-
-Level NX_UTILS_API levelFromString(const QString& levelString);
-QString NX_UTILS_API toString(Level level);
-
 class NX_UTILS_API Logger
 {
 public:
@@ -41,6 +27,9 @@ public:
     void setExceptionFilters(std::set<QString> filters);
 
     void setWriters(std::vector<std::unique_ptr<AbstractWriter>> writers = {});
+    void setWriter(std::unique_ptr<AbstractWriter> writer);
+
+    boost::optional<QString> logFilePath();
 
 private:
     QnMutex m_mutex;

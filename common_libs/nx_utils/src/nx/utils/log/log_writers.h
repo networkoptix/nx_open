@@ -8,10 +8,25 @@ namespace nx {
 namespace utils {
 namespace log {
 
+enum class Level
+{
+    undefined,
+    none,
+    always,
+    error,
+    warning,
+    info,
+    debug,
+    verbose
+};
+
+Level NX_UTILS_API levelFromString(const QString& levelString);
+QString NX_UTILS_API toString(Level level);
+
 class NX_UTILS_API AbstractWriter
 {
 public:
-    virtual void write(const QString& message) = 0;
+    virtual void write(Level level, const QString& message) = 0;
 };
 
 /**
@@ -20,7 +35,10 @@ public:
 class NX_UTILS_API StdOut: public AbstractWriter
 {
 public:
-    virtual void write(const QString& message) override;
+    virtual void write(Level level, const QString& message) override;
+
+private:
+    static void writeImpl(Level level, const QString& message);
 };
 
 /**
@@ -37,10 +55,10 @@ public:
     };
 
     File(Settings settings);
-    virtual void write(const QString& message) override;
+    virtual void write(Level level, const QString& message) override;
+    QString makeFileName(size_t backupNumber = 0) const;
 
 private:
-    QString makeFileName(size_t backupNumber = 0) const;
     bool openFile();
     void rotateIfNeeded();
 
@@ -56,7 +74,7 @@ private:
 class NX_UTILS_API Buffer: public AbstractWriter
 {
 public:
-    virtual void write(const QString& message) override;
+    virtual void write(Level level, const QString& message) override;
     std::vector<QString> take();
 
 private:

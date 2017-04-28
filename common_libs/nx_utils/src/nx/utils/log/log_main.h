@@ -14,7 +14,7 @@ std::shared_ptr<Logger> NX_UTILS_API main();
 std::shared_ptr<Logger> NX_UTILS_API add(const std::set<QString>& filters);
 
 /** Get logger by tag or main if no specific logger is set. */
-std::shared_ptr<Logger> NX_UTILS_API get(const QString& tag);
+std::shared_ptr<Logger> NX_UTILS_API get(const QString& tag, bool allowMain = true);
 
 /**
  * Calculate and log message if it's supposed to be logged.
@@ -24,7 +24,7 @@ std::shared_ptr<Logger> NX_UTILS_API get(const QString& tag);
         const auto tag = ::toString(TAG); \
         const auto logger = nx::utils::log::get(tag); \
         if (logger->isToBeLogged(LEVEL, tag)) \
-            logger->log(LEVEL, tag, MESSAGE); \
+            logger->log(LEVEL, tag, ::toString(MESSAGE)); \
     } while (0)
 
 #define NX_ALWAYS(TAG, MESSAGE) NX_UTILS_LOG(nx::utils::log::Level::always, TAG, MESSAGE)

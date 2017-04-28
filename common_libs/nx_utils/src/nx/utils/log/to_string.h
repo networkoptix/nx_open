@@ -3,12 +3,16 @@
 #include <memory>
 #include <chrono>
 
+#include <boost/core/demangle.hpp>
 #include <boost/optional.hpp>
 
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
 #include <QtCore/QUrl>
 #include <QtNetwork/QAbstractSocket>
+
+// ------------------------------------------------------------------------------------------------
+// General.
 
 template<typename T>
 QString toStringSfinae(const T& t, decltype(&T::toString))
@@ -29,7 +33,6 @@ QString toString(const T& t)
 }
 
 NX_UTILS_API QString toString(const char* s);
-NX_UTILS_API QString toString(void* p);
 NX_UTILS_API QString toString(const QByteArray& t);
 NX_UTILS_API QString toString(const QUrl& url);
 NX_UTILS_API QString toString(const std::string& t);
@@ -39,18 +42,54 @@ NX_UTILS_API QString toString(const std::chrono::minutes& t);
 NX_UTILS_API QString toString(const std::chrono::seconds& t);
 NX_UTILS_API QString toString(const std::chrono::milliseconds& t);
 NX_UTILS_API QString toString(QAbstractSocket::SocketError error);
- 
+
+// ------------------------------------------------------------------------------------------------
+// Pointers.
+
+template<typename T>
+QString pointerTypeName(const T* p)
+{
+    auto typeName = boost::core::demangle(typeid(*p).name());
+    #ifdef Q_OS_WIN
+        const auto space = typename.indexOf(" ");
+        typeName = typeName.substr(space + 1);
+    #endif
+    return QString::fromStdString(typeName);
+}
+
+inline
+QString pointerTypeName(const void* /*p*/)
+{
+    return QLatin1String("void");
+}
+
+template<typename T>
+QString toString(const T* p)
+{
+    return QString(QLatin1String("%1(0x%2)"))
+        .arg(pointerTypeName(p)).arg(reinterpret_cast<qulonglong>(p), 0, 16);
+}
+
+template<typename T>
+QString toString(T* p)
+{
+    return toString((const T*) p);
+}
+
 template<typename T>
 QString toString(const std::unique_ptr<T>& p)
 {
-    return toString((void*) p.get());
+    return toString(p.get());
 }
 
 template<typename T>
 QString toString(const std::shared_ptr<T>& p)
 {
-    return toString((void*) p.get());
+    return toString(p.get());
 }
+
+// ------------------------------------------------------------------------------------------------
+// Templates.
 
 template<typename T>
 QString toString(const boost::optional<T>& t)

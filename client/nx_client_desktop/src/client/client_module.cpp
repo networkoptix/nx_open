@@ -57,7 +57,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/http/http_mod_manager.h>
 #include <vms_gateway_embeddable.h>
-#include <nx/utils/log/log.h>
+#include <nx/utils/log/log_initializer.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/ec2_lib.h>
 
@@ -424,49 +424,29 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
             logFileNameSuffix = L'_' + QString::number(idx) + L'_';
     }
 
-
-    static const int DEFAULT_MAX_LOG_FILE_SIZE = 10 * 1024 * 1024;
-    static const int DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
-
     const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
 
     if (logLevel.isEmpty())
         logLevel = qnSettings->logLevel();
 
-    QnLog::initLog(logLevel);
-    QString logFileLocation = dataLocation + QLatin1String("/log");
-    QString logFileName = logFileLocation + QLatin1String("/log_file") + logFileNameSuffix;
-    if (!QDir().mkpath(logFileLocation))
-        cl_log.log(lit("Could not create log folder: ") + logFileLocation, cl_logALWAYS);
-    if (!cl_log.create(logFileName, DEFAULT_MAX_LOG_FILE_SIZE, DEFAULT_MSG_LOG_ARCHIVE_SIZE, QnLog::instance()->logLevel()))
-        cl_log.log(lit("Could not create log file") + logFileName, cl_logALWAYS);
-    cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);
+    nx::utils::log::Settings logSettings;
+    logSettings.level = nx::utils::log::levelFromString(logLevel);
+    logSettings.maxFileSize = 10 * 1024 * 1024;
+    logSettings.maxBackupCount = 5;
 
-    if (ec2TranLogLevel.isEmpty())
-        ec2TranLogLevel = qnSettings->ec2TranLogLevel();
+    nx::utils::log::initialize(
+        logSettings, dataLocation, qApp->applicationName(), qApp->applicationFilePath());
 
-    //preparing transaction log
+    const auto ec2logger = nx::utils::log::add({QnLog::EC2_TRAN_LOG});
     if (ec2TranLogLevel != lit("none"))
     {
-        QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
-            dataLocation + QLatin1String("/log/ec2_tran"),
-            DEFAULT_MAX_LOG_FILE_SIZE,
-            DEFAULT_MSG_LOG_ARCHIVE_SIZE,
-            QnLog::logLevelFromString(ec2TranLogLevel));
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
+        logSettings.level = nx::utils::log::levelFromString(ec2TranLogLevel);
+        nx::utils::log::initialize(
+            logSettings, dataLocation, qApp->applicationName(), qApp->applicationFilePath(),
+            QLatin1String("ec2_tran"), ec2logger);
     }
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
-
-    //TODO: #GDM Standartize log header and calling conventions
-    cl_log.log(qApp->applicationDisplayName(), " started", cl_logALWAYS);
-    cl_log.log("Software version: ", QApplication::applicationVersion(), cl_logALWAYS);
-    cl_log.log("binary path: ", qApp->applicationFilePath(), cl_logALWAYS);
 }
 
 void QnClientModule::initNetwork(const QnStartupParameters& startupParams)

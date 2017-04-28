@@ -59,21 +59,21 @@ TEST_F(LogFile, Single)
 {
     {
         auto w = makeWriter(20);
-        w->write(lit("1234567890"));
-        w->write(lit("1"));
+        w->write(Level::undefined, lit("1234567890"));
+        w->write(Level::undefined, lit("1"));
     }
     checkFile({"1234567890", "1"});
 
     {
         auto w = makeWriter(20);
-        w->write(lit("7777777")); //<< Overflow.
+        w->write(Level::undefined, lit("7777777")); //<< Overflow.
     }
     checkFile();
 
     {
         auto w = makeWriter(20);
-        w->write(lit("12345"));
-        w->write(lit("aaa"));
+        w->write(Level::undefined, lit("12345"));
+        w->write(Level::undefined, lit("aaa"));
     }
     checkFile({"12345", "aaa"});
 }
@@ -82,29 +82,29 @@ TEST_F(LogFile, Rotation)
 {
     {
         auto w = makeWriter(20, 3);
-        w->write(lit("1234567890"));
+        w->write(Level::undefined, lit("1234567890"));
     }
     checkFile({"1234567890"});
 
     {
         auto w = makeWriter(20, 3);
-        w->write(lit("1234567890")); //< Overflow
+        w->write(Level::undefined, lit("1234567890")); //< Overflow
     }
     checkFile({"1234567890", "1234567890"}, "_001");
     checkFile();
 
     {
         auto w = makeWriter(20, 3);
-        w->write(lit("xxx"));
-        w->write(lit("yyy"));
+        w->write(Level::undefined, lit("xxx"));
+        w->write(Level::undefined, lit("yyy"));
     }
     checkFile({"1234567890", "1234567890"}, "_001");
     checkFile({"xxx", "yyy"});
 
     {
         auto w = makeWriter(20, 3);
-        w->write(lit("12345678901234567890")); // Overflow
-        w->write(lit("1234567890"));
+        w->write(Level::undefined, lit("12345678901234567890")); // Overflow
+        w->write(Level::undefined, lit("1234567890"));
     }
     checkFile({"1234567890", "1234567890"}, "_001");
     checkFile({"xxx", "yyy", "12345678901234567890"}, "_002");
@@ -112,9 +112,9 @@ TEST_F(LogFile, Rotation)
 
     {
         auto w = makeWriter(20, 3);
-        w->write(lit("7777777777")); //< Overflow
-        w->write(lit("a"));
-        w->write(lit("b"));
+        w->write(Level::undefined, lit("7777777777")); //< Overflow
+        w->write(Level::undefined, lit("a"));
+        w->write(Level::undefined, lit("b"));
     }
     checkFile({"1234567890", "1234567890"}, "_001");
     checkFile({"xxx", "yyy", "12345678901234567890"}, "_002");
@@ -123,7 +123,7 @@ TEST_F(LogFile, Rotation)
 
     {
         auto w = makeWriter(20, 3);
-        w->write(lit("12345678901234567890")); //< Overflow + Rotation
+        w->write(Level::undefined, lit("12345678901234567890")); //< Overflow + Rotation
     }
     checkFile({"xxx", "yyy", "12345678901234567890"}, "_001");
     checkFile({"1234567890", "7777777777"}, "_002");
@@ -132,9 +132,9 @@ TEST_F(LogFile, Rotation)
 
     {
         auto w = makeWriter(20, 3);
-        w->write(lit("6666666666"));
-        w->write(lit("1234567890")); //< Overflow
-        w->write(lit("zzz"));
+        w->write(Level::undefined, lit("6666666666"));
+        w->write(Level::undefined, lit("1234567890")); //< Overflow
+        w->write(Level::undefined, lit("zzz"));
     }
     checkFile({"1234567890", "7777777777"}, "_001");
     checkFile({"a", "b", "12345678901234567890"}, "_002");

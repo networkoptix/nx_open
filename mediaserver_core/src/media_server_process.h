@@ -166,8 +166,6 @@ private:
     void saveServerInfo(const QnMediaServerResourcePtr& server);
 
     void serviceModeInit();
-    void initTransactionLog(const QString& logDir, QnLogLevel level);
-    void initPermissionsLog(const QString& logDir, QnLogLevel level);
     QString hardwareIdAsGuid();
     void updateGuidIfNeeded();
 private:
