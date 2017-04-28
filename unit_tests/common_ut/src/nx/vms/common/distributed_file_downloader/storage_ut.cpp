@@ -8,6 +8,7 @@
 namespace nx {
 namespace vms {
 namespace common {
+namespace distributed_file_downloader {
 namespace test {
 
 namespace {
@@ -16,8 +17,6 @@ static const QString kTestFileName("test.dat");
 static const qint64 kTestFileSize = 1024 * 1024 * 4 + 42;
 
 } // namespace
-
-using distributed_file_downloader::Storage;
 
 class DistributedFileDownloaderStorageTest: public ::testing::Test
 {
@@ -582,6 +581,7 @@ TEST_F(DistributedFileDownloaderStorageTest, getChecksumsAfterDownload)
 }
 
 } // namespace test
+} // namespace distributed_file_downloader
 } // namespace common
 } // namespace vms
 } // namespace nx
