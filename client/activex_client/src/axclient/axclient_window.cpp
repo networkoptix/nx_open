@@ -25,6 +25,8 @@
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 
+#include <nx/utils/log/log.h>
+
 #ifdef _DEBUG
     #define QN_WAIT_FOR_DEBUGGER
 #endif
@@ -65,10 +67,6 @@ void QnAxClientWindow::show() {
         m_parentWidget->setLayout(mainLayout);
     }
 
-    executeDelayed([this] {
-        m_context->action(action::FullscreenAction)->setChecked(true);
-/*        m_mainWindow->showFullScreen(); */
-    });
 }
 
 void QnAxClientWindow::jumpToLive() {
@@ -129,19 +127,27 @@ void QnAxClientWindow::setCurrentTimeUsec(qint64 timeUsec) {
 
 void QnAxClientWindow::addResourcesToLayout(const QList<QnUuid> &uniqueIds, qint64 timeStampMs)
 {
+    NX_LOG("Adding resources to layout", cl_logINFO);
     if (!m_context || !m_context->user())
+    {
+        NX_LOG("Not logged in, returning...", cl_logINFO);
         return;
+    }
 
     QnResourceList resources;
     for(const auto& id: uniqueIds)
     {
         QnResourcePtr resource = resourcePool()->getResourceById(id);
-        if(resource)
+        NX_LOG(lm("Found resource: %1").arg(resource ? resource->getName() : "???"), cl_logDEBUG1);
+        if (resource)
             resources << resource;
     }
 
     if (resources.isEmpty())
+    {
+        NX_LOG("No cameras found, returning...", cl_logINFO);
         return;
+    }
 
     qint64 maxTime = qnSyncTime->currentMSecsSinceEpoch();
     if (timeStampMs < 0)

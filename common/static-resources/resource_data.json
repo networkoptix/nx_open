@@ -597,7 +597,8 @@
                 "H264|N51820L",
                 "TRUEN Co., Ltd.|TN-P4230CSLXIR",
                 "TRUEN Co. Ltd.|*",
-				"Vista|VK2-3MPEFEDre"
+				"Vista|VK2-3MPEFEDre",
+                "eneo|IEP-63M2812M0A"
             ],
             "ptzTraits": "FourWayPtz"
         },
@@ -610,7 +611,8 @@
                 "Cellinx|STH795",
                 "Honeywell Security Group|HISD-2201WE", "MESSOA|SPD970",
                 "H264|N51820L",
-                "onvif|v047-1"
+                "onvif|v047-1",
+                "iPIXA|*"
             ],
             "onvifPtzPresetsEnabled": true
         },

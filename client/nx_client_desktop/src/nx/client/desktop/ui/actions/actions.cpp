@@ -572,6 +572,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(OpenBookmarksSearchAction)
         .flags(Main | GlobalHotkey)
+        .mode(DesktopMode)
         .requiredGlobalPermission(Qn::GlobalViewBookmarksPermission)
         .text(tr("Bookmark Search.."))
         .shortcut(lit("Ctrl+B"))

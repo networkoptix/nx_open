@@ -10,7 +10,7 @@
 #include <ui/graphics/items/standard/graphics_web_view.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/overlays/resource_title_item.h>
-
+#include <ui/help/help_topics.h>
 
 QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /*= NULL*/ )
     : base_type(context, item, parent)
@@ -55,6 +55,11 @@ QnWebResourceWidget::~QnWebResourceWidget()
 {
     /* statusChanged will be emitted during the destruction process. */
     disconnect(m_webView, nullptr, this, nullptr);
+}
+
+int QnWebResourceWidget::helpTopicAt(const QPointF& /*pos*/) const
+{
+    return Qn::MainWindow_WebPageItem_Help;
 }
 
 void QnWebResourceWidget::setupOverlays()
