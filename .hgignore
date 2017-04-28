@@ -39,6 +39,7 @@ target/*
 target-bpi/*
 packages.config
 .vs
+.vscode
 .git
 TAGS
 *.kdev4
