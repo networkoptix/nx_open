@@ -1,8 +1,9 @@
 #include "manager.h"
 
-#include "common/common_module.h"
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/media_server_resource.h"
+#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace vms {
@@ -115,10 +116,18 @@ void Manager::initializeConnector()
             }
 
             if (isNew)
+            {
+                NX_LOGX(lm("Found module %1, endpoint %2").strs(information.id, endpoint),
+                    cl_logDEBUG1);
                 return found(module);
+            }
 
             if (*iterator != module)
+            {
+                NX_LOGX(lm("Changed module %1, endpoint %2").strs(information.id, endpoint),
+                    cl_logDEBUG1);
                 return changed(module);
+            }
 
             NX_ASSERT(false);
         });
@@ -126,12 +135,14 @@ void Manager::initializeConnector()
     m_moduleConnector->setDisconnectHandler(
         [this](QnUuid id)
         {
+            QnMutexLocker lock(&m_mutex);
+            const auto it = m_modules.find(id);
+            if (it != m_modules.end())
             {
-                QnMutexLocker lock(&m_mutex);
-                m_modules.erase(id);
+                m_modules.erase(it);
+                lock.unlock();
+                emit lost(id);
             }
-
-            emit lost(id);
         });
 }
 
@@ -147,11 +158,11 @@ void Manager::initializeMulticastFinders(bool clientMode)
 
     if (!clientMode)
     {
-        const auto updateMf =
-            [this](){ m_multicastFinder->multicastInformation(commonModule()->moduleInformation()); };
-
-        connect(commonModule(), &QnCommonModule::moduleInformationChanged, updateMf);
-        updateMf();
+        connect(commonModule(), &QnCommonModule::moduleInformationChanged,
+            [this]()
+            {
+                m_multicastFinder->multicastInformation(commonModule()->moduleInformation());
+            });
     }
 
     QnMulticastModuleFinder::Options options;
