@@ -129,7 +129,7 @@ protected:
             };
     }
 
-    void givenClientServerExchangeMessagesWithPingsCallbacks()
+    void givenClientManyMessagesWithServerRespondingCallbacks()
     {
         clientSendCb =
             [this](SystemError::ErrorCode ecode, size_t transferred)
@@ -261,11 +261,11 @@ TEST_F(WebSocket, MultipleMessages_ReceiveModeFrame_twoWay)
     readyFuture.wait();
 }
 
-TEST_F(WebSocket, MultipleMessages_withPings_twoWay)
+TEST_F(WebSocket, MultipleMessagesFromClient_ServerResponds)
 {
     givenClientTestDataPrepared(1 * 1024 * 1024);
     givenServerTestDataPrepared(2 * 1024 * 1024);
-    givenClientServerExchangeMessagesWithPingsCallbacks();
+    givenClientManyMessagesWithServerRespondingCallbacks();
     givenClientModes(SendMode::singleMessage, ReceiveMode::message);
     givenServerModes(SendMode::singleMessage, ReceiveMode::message);
     givenSocketAreConnected();

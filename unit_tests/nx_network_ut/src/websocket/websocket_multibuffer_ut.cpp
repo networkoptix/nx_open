@@ -8,7 +8,7 @@ namespace websocket {
 
 namespace test {
 
-class WebsocketMultibuffer : public ::testing::Test 
+class WebsocketMultibuffer : public ::testing::Test
 {
 protected:
     enum class Locked
@@ -24,7 +24,7 @@ protected:
     {
         ASSERT_EQ(buffer.readySize(), 0);
         ASSERT_EQ(buffer.locked(), false);
-        ASSERT_EQ(buffer.pop(), nx::Buffer());
+        ASSERT_EQ(buffer.popFront(), nx::Buffer());
 
         // assert no crashes
         buffer.clearLast();
@@ -55,7 +55,7 @@ TEST_F(WebsocketMultibuffer, SingleBuffer_lockLast)
     whenSomeBuffersAppended(1, kPerBufferWrites, Locked::yes);
     ASSERT_EQ(buffer.readySize(), 1);
 
-    auto popResult = buffer.pop();
+    auto popResult = buffer.popFront();
     ASSERT_EQ(popResult.size(), kPerBufferWrites * strlen(kPattern));
 
     assertCorrectEmptyState();
@@ -72,7 +72,7 @@ TEST_F(WebsocketMultibuffer, MultipleBuffer_lockLast)
     whenSomeBuffersAppended(10, kPerBufferWrites, Locked::yes);
     ASSERT_EQ(buffer.readySize(), 10);
 
-    auto popResult = buffer.pop();
+    auto popResult = buffer.popFront();
     ASSERT_EQ(popResult.size(), kPerBufferWrites * strlen(kPattern));
     ASSERT_EQ(buffer.readySize(), 9);
 }
@@ -103,4 +103,4 @@ TEST_F(WebsocketMultibuffer, clear)
 } // namespace test
 } // namespace network
 } // namespace websocket
-} // namespace nx 
+} // namespace nx

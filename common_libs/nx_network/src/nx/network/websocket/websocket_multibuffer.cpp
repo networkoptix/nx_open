@@ -33,13 +33,24 @@ void MultiBuffer::lock()
     m_buffers.back().locked = true;
 }
 
-nx::Buffer MultiBuffer::pop()
+nx::Buffer MultiBuffer::popFront()
 {
     if (m_buffers.empty() || !m_buffers.front().locked)
         return nx::Buffer();
 
     nx::Buffer result = std::move(m_buffers.front().buffer);
     m_buffers.pop_front();
+
+    return result;
+}
+
+nx::Buffer MultiBuffer::popBack()
+{
+    if (m_buffers.empty() || !m_buffers.back().locked)
+        return nx::Buffer();
+
+    nx::Buffer result = std::move(m_buffers.back().buffer);
+    m_buffers.pop_back();
 
     return result;
 }

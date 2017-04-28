@@ -1,8 +1,11 @@
 #pragma once
 
 #include <memory>
+#include <QtCore>
+#include <nx/utils/log/log.h>
 #include <nx/network/aio/abstract_async_channel.h>
 #include <nx/network/connection_server/base_server_connection.h>
+#include <nx/network/aio/timer.h>
 #include <nx/network/buffer.h>
 #include "websocket_parser.h"
 #include "websocket_serializer.h"
@@ -15,6 +18,7 @@ namespace network {
 namespace websocket {
 
 class NX_NETWORK_API WebSocket :
+    public QObject,
     public aio::AbstractAsyncChannel,
     private nx_api::BaseServerConnectionHandler,
     private websocket::ParserHandler,
@@ -37,6 +41,8 @@ class NX_NETWORK_API WebSocket :
 
         WriteData() {}
     };
+
+    Q_OBJECT
 
 public:
 
@@ -61,6 +67,24 @@ public:
     // TODO: implement
     void sendCloseAsync(); /**< Send close frame */
 
+
+    template<typename Rep, typename Period>
+    void setPingTimeout(std::chrono::duration<Rep,Period> timeout)
+    {
+        dispatch(
+            [this, timeout]()
+            {
+                m_pingTimer->start(timeout, [this]() { sendControlRequest(FrameType::ping); });
+            });
+    }
+
+signals:
+    /**
+     * Connection is not usable after this signal is emitted.
+     */
+    void remotePeerClosedConnection();
+
+
 private:
     /**  BaseServerConnectionHandler implementation */
     virtual void bytesReceived(nx::Buffer& buffer) override;
@@ -71,6 +95,8 @@ private:
         SystemError::ErrorCode closeReason,
         ConnectionType* connection) override;
 
+
+    virtual void stopWhileInAioThread() override;
 
     /** Parser handler implementation */
     virtual void frameStarted(FrameType type, bool fin) override;
@@ -83,10 +109,12 @@ private:
     void handleRead();
     bool isDataFrame() const;
     void sendPreparedMessage(nx::Buffer* buffer, int writeSize, HandlerType handler);
+    void sendControlResponse(FrameType requestType, FrameType responseType);
+    void sendControlRequest(FrameType type);
     void readWithoutAddingToQueue();
 
 private:
-    nx_api::BaseServerConnectionWrapper m_baseConnection;
+    std::unique_ptr<nx_api::BaseServerConnectionWrapper> m_baseConnection;
     Parser m_parser;
     Serializer m_serializer;
     SendMode m_sendMode;
@@ -95,9 +123,10 @@ private:
     bool m_isFirstFrame;
     HandlerQueue<WriteData> m_writeQueue;
     HandlerQueue<nx::Buffer*> m_readQueue;
-    websocket::MultiBuffer m_buffer;
-
-    virtual void stopWhileInAioThread() override;
+    websocket::MultiBuffer m_userDataBuffer;
+    nx::Buffer m_controlBuffer;
+    std::unique_ptr<nx::network::aio::Timer> m_pingTimer;
+    bool m_terminating;
 };
 
 } // namespace websocket

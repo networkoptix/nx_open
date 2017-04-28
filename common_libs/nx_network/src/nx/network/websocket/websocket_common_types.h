@@ -30,6 +30,8 @@ enum FrameType
     pong = 0xa
 };
 
+QString frameTypeString(FrameType type);
+
 enum class Error
 {
     noError,

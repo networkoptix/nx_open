@@ -9,7 +9,7 @@ namespace websocket {
 
 /**
  * Multi-frame(message) buffer. Represents a deque (queue) of buffers.
- * Appends are allowed only to the front buffer. After front buffer is full it
+ * Appends are allowed only to the back buffer. After back buffer is full it
  * can be locked. Only locked buffers are allowed for pop.
  */
 class NX_NETWORK_API MultiBuffer
@@ -33,7 +33,8 @@ public:
     void lock();
     bool locked() const;
 
-    nx::Buffer pop();
+    nx::Buffer popBack();
+    nx::Buffer popFront();
 
     void clear();
     void clearLast();
