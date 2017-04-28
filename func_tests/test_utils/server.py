@@ -150,7 +150,7 @@ class ServerConfig(object):
 
 class Server(object):
 
-    def __init__(self, company_name, name, box, rest_api_url, host=None):
+    def __init__(self, company_name, name, rest_api_url, host=None, box=None, rest_api_timeout_sec=None, internal_ip_port=None):
         self._company_name = company_name
         self.title = name
         self.name = '%s-%s' % (name, str(uuid.uuid4())[-12:])
@@ -164,10 +164,11 @@ class Server(object):
         self.service = Service(box, MEDIASERVER_SERVICE_NAME.format(company_name=self._company_name))
         self.user = REST_API_USER
         self.password = REST_API_PASSWORD
-        self._init_rest_api()
+        self.rest_api = ServerRestApi(self.title, self.rest_api_url, self.user, self.password, rest_api_timeout_sec)
         self.settings = None
         self.local_system_id = None
         self.ecs_guid = None
+        self.internal_ip_port = internal_ip_port or MEDIASERVER_LISTEN_PORT
         self.internal_ip_address = None
         self.storage = self._get_storage()
         self._is_started = None
@@ -180,7 +181,7 @@ class Server(object):
 
     @property
     def internal_url(self):
-        return 'http://%s:%d/' % (self.internal_ip_address, MEDIASERVER_LISTEN_PORT)
+        return 'http://%s:%d/' % (self.internal_ip_address, self.internal_ip_port)
 
     def init(self, must_start, reset, log_level=DEFAULT_SERVER_LOG_LEVEL, patch_set_cloud_host=None, config_file_params=None):
         for path in self.list_core_files():
@@ -211,9 +212,6 @@ class Server(object):
         return (self.host.run_command(
             ['ls', os.path.join(self.dir, 'bin/core*')], check_retcode=False)
             .splitlines())
-
-    def _init_rest_api(self):
-        self.rest_api = ServerRestApi(self.title, self.rest_api_url, self.user, self.password)
 
     def is_started(self):
         assert self._is_started is not None, 'is_started state is still unknown'
@@ -379,7 +377,6 @@ class Server(object):
             **kw)
         settings = setup_response['settings']
         self.set_user_password(cloud_host.user, cloud_host.password)
-        self._init_rest_api()
         self.load_system_settings()
         assert self.settings['systemName'] == self.name
         return settings
@@ -429,7 +426,7 @@ class Server(object):
         log.debug('%s got user/password: %r/%r', self, user, password)
         self.user = user
         self.password = password
-        self._init_rest_api()
+        self.rest_api.set_credentials(self.user, self.password)
         if self._is_started:
             self._wait_for_credentials_accepted()
 
