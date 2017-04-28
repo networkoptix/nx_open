@@ -232,6 +232,8 @@ void QnWorkbenchTextOverlaysHandlerPrivate::hideTextOverlays(
     const QnResourcePtr& resource, const QnUuid& id)
 {
     auto data = findData(resource, id);
+    if (!data)
+        return;
 
     const qint64 remainingMs = data->elapsedTimer.isValid()
         ? kMinimumTextOverlayDurationMs - data->elapsedTimer.elapsed()
