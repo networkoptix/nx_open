@@ -41,6 +41,16 @@ void HttpServerConnection::processMessage(nx_http::Message&& requestMessage)
         return;
     }
 
+    authenticate(std::move(requestMessage));
+}
+
+void HttpServerConnection::setPersistentConnectionEnabled(bool value)
+{
+    m_persistentConnectionEnabled = value;
+}
+
+void HttpServerConnection::authenticate(nx_http::Message requestMessage)
+{
     const nx_http::Request& request = *requestMessage.request;
     auto strongRef = shared_from_this();
     std::weak_ptr<HttpServerConnection> weakThis = strongRef;
@@ -72,11 +82,6 @@ void HttpServerConnection::processMessage(nx_http::Message&& requestMessage)
         });
 }
 
-void HttpServerConnection::setPersistentConnectionEnabled(bool value)
-{
-    m_persistentConnectionEnabled = value;
-}
-
 void HttpServerConnection::stopWhileInAioThread()
 {
     base_type::stopWhileInAioThread();
@@ -97,54 +102,9 @@ void HttpServerConnection::onAuthenticationDone(
         return;
     }
 
-    auto strongRef = shared_from_this();
-    std::weak_ptr<HttpServerConnection> weakThis = strongRef;
-
-    auto protoVersion = requestMessage.request->requestLine.version;
-    auto sendResponseFunc =
-        [this, weakThis, protoVersion](
-            nx_http::Message response,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
-            ConnectionEvents connectionEvents) mutable
-        {
-            auto strongThis = weakThis.lock();
-            if (!strongThis)
-                return;
-            if (!socket())  //< Connection has been removed while request was being processed.
-            {
-                closeConnection(SystemError::noError);
-                return;
-            }
-
-            strongThis->post(
-                [this, strongThis = std::move(strongThis),
-                    protoVersion = std::move(protoVersion),
-                    response = std::move(response),
-                    responseMsgBody = std::move(responseMsgBody),
-                    connectionEvents = std::move(connectionEvents)]() mutable
-                {
-                    prepareAndSendResponse(
-                        std::move(protoVersion),
-                        std::move(response),
-                        std::move(responseMsgBody),
-                        std::move(connectionEvents));
-                });
-        };
-
-    if (!m_httpMessageDispatcher ||
-        !m_httpMessageDispatcher->dispatchRequest(
-            this,
-            std::move(requestMessage),
-            std::move(authenticationResult.authInfo),
-            std::move(sendResponseFunc)))
-    {
-        nx_http::Message response(nx_http::MessageType::response);
-        response.response->statusLine.statusCode = nx_http::StatusCode::notFound;
-        return prepareAndSendResponse(
-            std::move(protoVersion),
-            std::move(response),
-            nullptr);
-    }
+    dispatchRequest(
+        std::move(authenticationResult),
+        std::move(requestMessage));
 }
 
 void HttpServerConnection::sendUnauthorizedResponse(
@@ -171,9 +131,79 @@ void HttpServerConnection::sendUnauthorizedResponse(
         std::move(msgBody));
 }
 
+void HttpServerConnection::dispatchRequest(
+    nx_http::server::AuthenticationResult authenticationResult,
+    nx_http::Message requestMessage)
+{
+    auto strongRef = shared_from_this();
+    std::weak_ptr<HttpServerConnection> weakThis = strongRef;
+
+    auto protoVersion = requestMessage.request->requestLine.version;
+    auto sendResponseFunc =
+        [this, weakThis, protoVersion](
+            nx_http::Message response,
+            std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
+            ConnectionEvents connectionEvents) mutable
+        {
+            auto strongThis = weakThis.lock();
+            if (!strongThis)
+                return;
+
+            processResponse(
+                std::move(strongThis),
+                std::move(protoVersion),
+                std::move(response),
+                std::move(responseMsgBody),
+                std::move(connectionEvents));
+        };
+
+    if (!m_httpMessageDispatcher ||
+        !m_httpMessageDispatcher->dispatchRequest(
+            this,
+            std::move(requestMessage),
+            std::move(authenticationResult.authInfo),
+            std::move(sendResponseFunc)))
+    {
+        nx_http::Message response(nx_http::MessageType::response);
+        response.response->statusLine.statusCode = nx_http::StatusCode::notFound;
+        return prepareAndSendResponse(
+            std::move(protoVersion),
+            std::move(response),
+            nullptr);
+    }
+}
+
+void HttpServerConnection::processResponse(
+    std::shared_ptr<HttpServerConnection> strongThis,
+    nx_http::MimeProtoVersion protoVersion,
+    nx_http::Message response,
+    std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
+    ConnectionEvents connectionEvents)
+{
+    if (!socket())  //< Connection has been removed while request was being processed.
+    {
+        closeConnection(SystemError::noError);
+        return;
+    }
+
+    strongThis->post(
+        [this, strongThis = std::move(strongThis),
+            protoVersion = std::move(protoVersion),
+            response = std::move(response),
+            responseMsgBody = std::move(responseMsgBody),
+            connectionEvents = std::move(connectionEvents)]() mutable
+        {
+            prepareAndSendResponse(
+                std::move(protoVersion),
+                std::move(response),
+                std::move(responseMsgBody),
+                std::move(connectionEvents));
+        });
+}
+
 void HttpServerConnection::prepareAndSendResponse(
     nx_http::MimeProtoVersion version,
-    nx_http::Message&& msg,
+    nx_http::Message msg,
     std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
     ConnectionEvents connectionEvents)
 {
@@ -181,48 +211,18 @@ void HttpServerConnection::prepareAndSendResponse(
     msg.response->statusLine.reasonPhrase =
         nx_http::StatusCode::toString(msg.response->statusLine.statusCode);
 
-    nx_http::insertOrReplaceHeader(
-        &msg.response->headers,
-        nx_http::HttpHeader(nx_http::header::Server::NAME, nx_http::serverString()));
-    nx_http::insertOrReplaceHeader(
-        &msg.response->headers,
-        nx_http::HttpHeader("Date", nx_http::formatDateTime(QDateTime::currentDateTime())));
-
     if (responseMsgBody)
     {
-        const auto contentType = responseMsgBody->mimeType();
-        if (contentType.isEmpty())
+        responseMsgBody->bindToAioThread(getAioThread());
+        if (responseMsgBody->mimeType().isEmpty())
         {
-            // Switching protocols, no content information should be provided at all
+            // Malformed message body? 
+            // TODO: #ak Add assert here and ensure no one uses this path.
             responseMsgBody.reset();
         }
-        else
-        {
-            nx_http::insertOrReplaceHeader(
-                &msg.response->headers,
-                nx_http::HttpHeader("Content-Type", contentType));
-
-            const auto contentLength = responseMsgBody->contentLength();
-            if (contentLength)
-            {
-                nx_http::insertOrReplaceHeader(
-                    &msg.response->headers,
-                    nx_http::HttpHeader(
-                        "Content-Length",
-                        nx_http::StringType::number(
-                            static_cast<qulonglong>(contentLength.get()))));
-            }
-        }
-    }
-    else
-    {
-        nx_http::insertOrReplaceHeader(
-            &msg.response->headers,
-            nx_http::HttpHeader("Content-Length", "0"));
     }
 
-    if (responseMsgBody)
-        responseMsgBody->bindToAioThread(getAioThread());
+    addResponseHeaders(msg.response, responseMsgBody.get());
 
     m_responseQueue.emplace_back(
         std::move(msg),
@@ -230,6 +230,49 @@ void HttpServerConnection::prepareAndSendResponse(
         std::move(connectionEvents));
     if (m_responseQueue.size() == 1)
         sendNextResponse();
+}
+
+void HttpServerConnection::addResponseHeaders(
+    nx_http::Response* response,
+    nx_http::AbstractMsgBodySource* responseMsgBody)
+{
+    nx_http::insertOrReplaceHeader(
+        &response->headers,
+        nx_http::HttpHeader(nx_http::header::Server::NAME, nx_http::serverString()));
+    nx_http::insertOrReplaceHeader(
+        &response->headers,
+        nx_http::HttpHeader("Date", nx_http::formatDateTime(QDateTime::currentDateTime())));
+
+    addMessageBodyHeaders(response, responseMsgBody);
+}
+
+void HttpServerConnection::addMessageBodyHeaders(
+    nx_http::Response* response,
+    nx_http::AbstractMsgBodySource* responseMsgBody)
+{
+    if (responseMsgBody)
+    {
+        nx_http::insertOrReplaceHeader(
+            &response->headers,
+            nx_http::HttpHeader("Content-Type", responseMsgBody->mimeType()));
+
+        const auto contentLength = responseMsgBody->contentLength();
+        if (contentLength)
+        {
+            nx_http::insertOrReplaceHeader(
+                &response->headers,
+                nx_http::HttpHeader(
+                    "Content-Length",
+                    nx_http::StringType::number(
+                        static_cast<qulonglong>(contentLength.get()))));
+        }
+    }
+    else
+    {
+        nx_http::insertOrReplaceHeader(
+            &response->headers,
+            nx_http::HttpHeader("Content-Length", "0"));
+    }
 }
 
 void HttpServerConnection::sendNextResponse()

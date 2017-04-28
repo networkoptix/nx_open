@@ -112,6 +112,7 @@ private:
     bool m_persistentConnectionEnabled;
     std::deque<ResponseMessageContext> m_responseQueue;
 
+    void authenticate(nx_http::Message requestMessage);
     void onAuthenticationDone(
         nx_http::server::AuthenticationResult authenticationResult,
         nx_http::Message requestMessage);
@@ -120,11 +121,27 @@ private:
         boost::optional<header::WWWAuthenticate> wwwAuthenticate,
         nx_http::HttpHeaders responseHeaders,
         std::unique_ptr<AbstractMsgBodySource> msgBody);
+    void dispatchRequest(
+        nx_http::server::AuthenticationResult authenticationResult,
+        nx_http::Message requestMessage);
+    void processResponse(
+        std::shared_ptr<HttpServerConnection> strongThis,
+        nx_http::MimeProtoVersion version,
+        nx_http::Message msg,
+        std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
+        ConnectionEvents connectionEvents);
     void prepareAndSendResponse(
         nx_http::MimeProtoVersion version,
-        nx_http::Message&& response,
+        nx_http::Message response,
         std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
         ConnectionEvents connectionEvents = ConnectionEvents());
+    void addResponseHeaders(
+        nx_http::Response* response,
+        nx_http::AbstractMsgBodySource* responseMsgBody);
+    void addMessageBodyHeaders(
+        nx_http::Response* response,
+        nx_http::AbstractMsgBodySource* responseMsgBody);
+
     void sendNextResponse();
     void responseSent();
     void someMsgBodyRead(SystemError::ErrorCode, BufferType buf);
