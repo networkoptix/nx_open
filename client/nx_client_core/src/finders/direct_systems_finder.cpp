@@ -2,7 +2,7 @@
 
 #include <common/common_module.h>
 
-#include <network/module_finder.h>
+#include <nx/vms/discovery/manager.h>
 #include <network/system_helpers.h>
 #include <network/local_system_description.h>
 
@@ -30,19 +30,17 @@ bool isCloudAddress(const HostAddress& address)
 QnDirectSystemsFinder::QnDirectSystemsFinder(QObject *parent)
     : base_type(parent)
 {
-    const auto moduleFinder = qnModuleFinder;
-    NX_ASSERT(moduleFinder, Q_FUNC_INFO, "Module finder does not exist");
-    if (!moduleFinder)
+    const auto moduleManager = commonModule()->moduleDiscoveryManager();
+    NX_ASSERT(moduleManager, Q_FUNC_INFO, "Module finder does not exist");
+    if (!moduleManager)
         return;
 
-    connect(moduleFinder, &QnModuleFinder::moduleChanged
-        , this, &QnDirectSystemsFinder::addServer);
-    connect(moduleFinder, &QnModuleFinder::moduleLost
-        , this, &QnDirectSystemsFinder::removeServer);
-    connect(moduleFinder, &QnModuleFinder::modulePrimaryAddressChanged
-        , this, &QnDirectSystemsFinder::updatePrimaryAddress);
+    moduleManager->onSignals(this,
+        &QnDirectSystemsFinder::addServer,
+        &QnDirectSystemsFinder::updatePrimaryAddress,
+        &QnDirectSystemsFinder::removeServer);
 
-    for (const auto moduleInformation: moduleFinder->discoveredServers())
+    for (const auto moduleInformation: moduleManager->getAll())
         addServer(moduleInformation);
 }
 
@@ -87,11 +85,11 @@ void QnDirectSystemsFinder::removeSystem(const SystemsHash::iterator& it)
     emit systemLost(system->id());
 }
 
-void QnDirectSystemsFinder::addServer(QnModuleInformation moduleInformation)
+void QnDirectSystemsFinder::addServer(nx::vms::discovery::Manager::ModuleData data)
 {
-    const auto systemId = helpers::getTargetSystemId(moduleInformation);
+    const auto systemId = helpers::getTargetSystemId(data);
 
-    const auto systemIt = getSystemItByServer(moduleInformation.id);
+    const auto systemIt = getSystemItByServer(data.id);
     if (systemIt != m_systems.end())
     {
         /**
@@ -102,7 +100,7 @@ void QnDirectSystemsFinder::addServer(QnModuleInformation moduleInformation)
 
         // Checks if "new system" state hasn't been changed yet
         const bool sameNewSystemState =
-            (current->isNewSystem() == helpers::isNewSystem(moduleInformation));
+            (current->isNewSystem() == helpers::isNewSystem(data));
 
         // Checks if server has same system id (in case of merge/restore operations)
         const bool belongsToSameSystem = (current->id() == systemId);
@@ -110,23 +108,23 @@ void QnDirectSystemsFinder::addServer(QnModuleInformation moduleInformation)
         if (sameNewSystemState && belongsToSameSystem)
         {
             // Just update system
-            updateServer(systemIt, moduleInformation);
+            updateServer(systemIt, data);
             return;
         }
 
-        removeServer(moduleInformation);
+        removeServer(data.id);
     }
 
     auto itSystem = m_systems.find(systemId);
     const auto createNewSystem = (itSystem == m_systems.end());
     if (createNewSystem)
     {
-        const auto systemName = (isOldServer(moduleInformation)
+        const auto systemName = (isOldServer(data)
             ? tr("System")
-            : moduleInformation.systemName);
+            : data.systemName);
 
-        const bool isNewSystem = helpers::isNewSystem(moduleInformation);
-        const auto localId = helpers::getLocalSystemId(moduleInformation);
+        const bool isNewSystem = helpers::isNewSystem(data);
+        const auto localId = helpers::getLocalSystemId(data);
         const auto systemDescription = (isNewSystem
             ? QnLocalSystemDescription::createFactory(systemId)
             : QnLocalSystemDescription::create(systemId, localId, systemName));
@@ -135,42 +133,40 @@ void QnDirectSystemsFinder::addServer(QnModuleInformation moduleInformation)
     }
 
     const auto systemDescription = itSystem.value();
-    if (systemDescription->containsServer(moduleInformation.id))
-        systemDescription->updateServer(moduleInformation);
+    if (systemDescription->containsServer(data.id))
+        systemDescription->updateServer(data);
     else
-        systemDescription->addServer(moduleInformation, QnSystemDescription::kDefaultPriority);
+        systemDescription->addServer(data, QnSystemDescription::kDefaultPriority);
 
-    m_serverToSystem[moduleInformation.id] = systemId;
-
-    const auto host = qnModuleFinder->primaryAddress(moduleInformation.id);
-    updatePrimaryAddress(moduleInformation, host);
+    m_serverToSystem[data.id] = systemId;
+    updatePrimaryAddress(data);
 
     if (createNewSystem)
         emit systemDiscovered(systemDescription);
 }
 
-void QnDirectSystemsFinder::removeServer(const QnModuleInformation &moduleInformation)
+void QnDirectSystemsFinder::removeServer(QnUuid id)
 {
-    const auto systemIt = getSystemItByServer(moduleInformation.id);
+    const auto systemIt = getSystemItByServer(id);
     const auto serverIsInKnownSystem = (systemIt != m_systems.end());
     NX_ASSERT(serverIsInKnownSystem, Q_FUNC_INFO, "Server is not known");
     if (!serverIsInKnownSystem)
         return;
 
-    const auto removedCount = m_serverToSystem.remove(moduleInformation.id);
+    const auto removedCount = m_serverToSystem.remove(id);
     if (!removedCount)
         return;
 
     const auto systemDescription = systemIt.value();
-    systemDescription->removeServer(moduleInformation.id);
+    systemDescription->removeServer(id);
     if (!systemDescription->servers().isEmpty())
         return;
 
     removeSystem(systemIt);
 }
 
-void QnDirectSystemsFinder::updateServer(const SystemsHash::iterator systemIt
-    , const QnModuleInformation &moduleInformation)
+void QnDirectSystemsFinder::updateServer(
+    const SystemsHash::iterator systemIt, nx::vms::discovery::Manager::ModuleData module)
 {
     const bool serverIsInKnownSystem = (systemIt != m_systems.end());
     NX_ASSERT(serverIsInKnownSystem, Q_FUNC_INFO, "Server is not known");
@@ -178,38 +174,39 @@ void QnDirectSystemsFinder::updateServer(const SystemsHash::iterator systemIt
         return;
 
     auto systemDescription = systemIt.value();
-    const auto changes = systemDescription->updateServer(moduleInformation);
+    const auto changes = systemDescription->updateServer(module);
     if (!changes.testFlag(QnServerField::CloudId))
         return;
 
     // Factory status has changed. We have to
     // remove server from current system and add to new
-    const auto serverHost = systemDescription->getServerHost(moduleInformation.id);
-    removeServer(moduleInformation);
-    addServer(moduleInformation);
-    updatePrimaryAddress(moduleInformation, nx::network::url::getEndpoint(serverHost));
+    const auto serverHost = systemDescription->getServerHost(module.id);
+    removeServer(module.id);
+    addServer(module);
+
+    module.endpoint = nx::network::url::getEndpoint(serverHost);
+    updatePrimaryAddress(std::move(module));
 }
 
-void QnDirectSystemsFinder::updatePrimaryAddress(const QnModuleInformation &moduleInformation
-    , const SocketAddress &address)
+void QnDirectSystemsFinder::updatePrimaryAddress(nx::vms::discovery::Manager::ModuleData module)
 {
-    auto systemIt = getSystemItByServer(moduleInformation.id);
+    auto systemIt = getSystemItByServer(module.id);
     const bool serverIsInKnownSystem = (systemIt != m_systems.end());
-    const bool isCloudHost = isCloudAddress(address.address);
+    const bool isCloudHost = isCloudAddress(module.endpoint.address);
 
     if (isCloudHost)
     {
         // Do not allow servers with cloud host to be discovered
         if (serverIsInKnownSystem)
-            removeServer(moduleInformation);
+            removeServer(module.id);
 
         return;
     }
     else if (!serverIsInKnownSystem)
     {
         // Primary address was changed from cloud to direct
-        addServer(moduleInformation);
-        systemIt = getSystemItByServer(moduleInformation.id);
+        addServer(module);
+        systemIt = getSystemItByServer(module.id);
         if (systemIt == m_systems.end())
             return;
     }
@@ -217,16 +214,16 @@ void QnDirectSystemsFinder::updatePrimaryAddress(const QnModuleInformation &modu
 
     const auto systemDescription = systemIt.value();
     const auto url = nx::network::url::Builder()
-        .setScheme(moduleInformation.sslAllowed ? lit("https") : QString())
-        .setEndpoint(address).toUrl();
-    systemDescription->setServerHost(moduleInformation.id, url);
+        .setScheme(module.sslAllowed ? lit("https") : QString())
+        .setEndpoint(module.endpoint).toUrl();
+    systemDescription->setServerHost(module.id, url);
 
     // Workaround for systems with version less than 2.3.
     // In these systems only one server is visible, and system name does not exist.
 
     static const auto kNameTemplate = tr("System (%1)", "%1 is ip and port of system");
-    if (isOldServer(moduleInformation))
-        systemDescription->setName(kNameTemplate.arg(address.toString()));
+    if (isOldServer(module))
+        systemDescription->setName(kNameTemplate.arg(module.endpoint.toString()));
 
 }
 

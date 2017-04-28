@@ -28,12 +28,12 @@
 #include "health/system_health.h"
 #include "platform/platform_abstraction.h"
 #include <nx/utils/log/log.h>
+#include <nx/vms/discovery/manager.h>
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
 class QnServerMessageProcessor;
 struct QnModuleInformation;
-class QnModuleFinder;
 struct QnPeerRuntimeInfo;
 class QnLdapManager;
 struct BeforeRestoreDbData;
@@ -129,7 +129,7 @@ private slots:
     void at_archiveBackupFinished(qint64 backedUpToMs, QnBusiness::EventReason code);
     void at_timer();
     void at_connectionOpened();
-    void at_serverModuleConflict(const QnModuleInformation &moduleInformation, const SocketAddress &address);
+    void at_serverModuleConflict(nx::vms::discovery::Manager::ModuleData module);
 
     void at_appStarted();
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);

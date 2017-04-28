@@ -16,7 +16,6 @@ UdpMulticastFinder::UdpMulticastFinder(network::aio::AbstractAioThread* thread)
     : network::aio::BasicPollable(thread)
 {
     m_updateTimer.bindToAioThread(getAioThread());
-    m_updateTimer.post([this] { updateInterfaces(); });
 }
 
 /** Sets moduleInformation to multicast, starts multicast process if not running yet. */
@@ -34,7 +33,7 @@ void UdpMulticastFinder::multicastInformation(
 
 /** Listens to module information multicasts, executes handler on each message recieved. */
 void UdpMulticastFinder::listen(
-    utils::MoveOnlyFunc<void(const QnModuleInformationWithAddresses& module)> handler)
+    nx::utils::MoveOnlyFunc<void(const QnModuleInformationWithAddresses& module)> handler)
 {
     m_updateTimer.post(
         [this, handler = std::move(handler)]() mutable
@@ -93,7 +92,7 @@ void UdpMulticastFinder::makeInterface(const HostAddress& ip)
 UdpMulticastFinder::Interface::Interface(
     network::aio::AbstractAioThread* thread,
     const HostAddress& localIp,
-    utils::MoveOnlyFunc<void()> errorHandler)
+    nx::utils::MoveOnlyFunc<void()> errorHandler)
 :
     m_errorHandler(std::move(errorHandler))
 {
@@ -114,7 +113,8 @@ void UdpMulticastFinder::Interface::updateData(const Buffer* data)
     sendData();
 }
 
-void UdpMulticastFinder::Interface::readForever(utils::MoveOnlyFunc<void(const Buffer&)> handler)
+void UdpMulticastFinder::Interface::readForever(
+    nx::utils::MoveOnlyFunc<void(const Buffer&)> handler)
 {
     m_newDataHandler = std::move(handler);
     readData();

@@ -31,6 +31,23 @@ void ModuleConnector::newEndpoint(const SocketAddress& endpoint, const QnUuid& i
     getModule(id)->addEndpoint(endpoint);
 }
 
+void ModuleConnector::ignoreEndpoints(std::set<SocketAddress> endpoints, const QnUuid& id)
+{
+    getModule(id)->forbidEndpoints(std::move(endpoints));
+}
+
+void ModuleConnector::activate()
+{
+    m_isPassiveMode = false;
+    for (const auto& module: m_modules)
+        module.second->ensureConnect();
+}
+
+void ModuleConnector::diactivate()
+{
+    m_isPassiveMode = true;
+}
+
 void ModuleConnector::stopWhileInAioThread()
 {
     m_modules.clear();
@@ -61,12 +78,25 @@ void ModuleConnector::Module::addEndpoint(const SocketAddress& endpoint)
     else
         m_endpoints[kOther].insert(endpoint);
 
+    ensureConnect();
+}
+
+void ModuleConnector::Module::ensureConnect()
+{
     if (m_httpClients.empty() && !m_socket)
         connect(m_endpoints.begin());
 }
 
+void ModuleConnector::Module::forbidEndpoints(std::set<SocketAddress> endpoints)
+{
+    m_forbiddenEndpoints = std::move(endpoints);
+}
+
 void ModuleConnector::Module::connect(Endpoints::iterator endpointsGroup)
 {
+    if (m_parent->m_isPassiveMode)
+        return;
+
     if (endpointsGroup == m_endpoints.end())
     {
         NX_LOGX(lm("No more endpoints, retry in %1").strs(kReconnectInterval), cl_logDEBUG2);
@@ -75,12 +105,14 @@ void ModuleConnector::Module::connect(Endpoints::iterator endpointsGroup)
         return;
     }
 
-    if (endpointsGroup->second.empty())
-        return connect(++endpointsGroup);
-
+    size_t endpointsInProgress = 0;
     m_timer.cancelSync();
     for (const auto& endpoint: endpointsGroup->second)
     {
+        if (m_forbiddenEndpoints.count(endpoint))
+            continue;
+
+        ++endpointsInProgress;
         NX_LOGX(lm("Attempt to connect to %1 by %2").strs(m_id, endpoint), cl_logDEBUG2);
         const auto client = nx_http::AsyncHttpClient::create();
         m_httpClients.insert(client);
@@ -107,6 +139,9 @@ void ModuleConnector::Module::connect(Endpoints::iterator endpointsGroup)
                 connect(++endpointsGroup);
             });
     }
+
+    if (endpointsInProgress == 0)
+        return connect(++endpointsGroup);
 }
 
 boost::optional<QnModuleInformation> ModuleConnector::Module::getInformation(

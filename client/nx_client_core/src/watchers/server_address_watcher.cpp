@@ -4,10 +4,8 @@
 
 #include <common/common_module.h>
 
-#include <network/module_finder.h>
+#include <nx/vms/discovery/manager.h>
 #include <nx/network/socket_global.h>
-#include <network/direct_module_finder.h>
-#include <network/direct_module_finder_helper.h>
 #include <client/client_message_processor.h>
 #include <nx/network/url/url_builder.h>
 
@@ -40,17 +38,10 @@ void QnServerAddressWatcher::setAccessors(const Getter& getter, const Setter& se
 
     using namespace nx::utils;
 
-    const auto moduleFinder = qnModuleFinder;
-    NX_ASSERT(qnModuleFinder, "QnModuleFinder is not ready");
-    if (!moduleFinder)
+    const auto moduleManager = commonModule()->moduleDiscoveryManager();
+    NX_ASSERT(moduleManager);
+    if (!moduleManager)
         return;
-
-    const auto directModuleFinderHelper = moduleFinder->directModuleFinderHelper();
-    NX_ASSERT(directModuleFinderHelper, "QnDirectModuleFinderHelper is not ready");
-    if (!directModuleFinderHelper)
-        return;
-
-    const auto directModuleFinder = moduleFinder->directModuleFinder();
 
     m_urls = getter();
     if (m_urls.size() > kMaxUrlsToStore)
@@ -58,13 +49,12 @@ void QnServerAddressWatcher::setAccessors(const Getter& getter, const Setter& se
         shrinkUrlsList();
         setter(m_urls);
     }
-    directModuleFinderHelper->setForcedUrls(this, QSet<QUrl>::fromList(m_urls));
 
     for (const auto& url: m_urls)
-        directModuleFinder->checkUrl(url);
+        moduleManager->checkEndpoint(url);
 
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionOpened,
-        this, [this, directModuleFinderHelper, directModuleFinder, setter]()
+        this, [this, moduleManager, setter]()
         {
             QUrl url = commonModule()->currentUrl();
             if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
@@ -80,11 +70,7 @@ void QnServerAddressWatcher::setAccessors(const Getter& getter, const Setter& se
             m_urls.prepend(url);
             shrinkUrlsList();
 
-            // Forces QnDirectModuleFinder to use url of connection
-            directModuleFinder->checkUrl(url);
-
-            directModuleFinderHelper->setForcedUrls(this, QSet<QUrl>::fromList(m_urls));
-
+            moduleManager->checkEndpoint(url);
             setter(m_urls);
         }
     );

@@ -4,6 +4,7 @@
 #include <finders/abstract_systems_finder.h>
 #include <network/system_description.h>
 #include <nx/network/socket_common.h>
+#include <nx/vms/discovery/manager.h>
 
 struct QnModuleInformation;
 
@@ -23,19 +24,15 @@ public: // overrides
     QnSystemDescriptionPtr getSystem(const QString &id) const override;
 
 private:
-    void addServer(QnModuleInformation moduleInformation);
-
-    void removeServer(const QnModuleInformation &moduleInformation);
+    void addServer(nx::vms::discovery::Manager::ModuleData moduleInformation);
+    void removeServer(QnUuid id);
 
     typedef QHash<QString, QnSystemDescription::PointerType> SystemsHash;
-    void updateServer(const SystemsHash::iterator systemIt
-        , const QnModuleInformation &moduleInformation);
+    void updateServer(
+        const SystemsHash::iterator systemIt, nx::vms::discovery::Manager::ModuleData module);
 
-    void updatePrimaryAddress(const QnModuleInformation &moduleInformation
-        , const SocketAddress &address);
-
+    void updatePrimaryAddress(nx::vms::discovery::Manager::ModuleData module);
     SystemsHash::iterator getSystemItByServer(const QnUuid &serverId);
-
     void removeSystem(const SystemsHash::iterator& it);
 
 private:
