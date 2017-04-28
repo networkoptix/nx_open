@@ -224,8 +224,7 @@ void QnWorkbenchTextOverlaysHandlerPrivate::showTextOverlays(
     data.timeoutMs = timeoutMs;
     data.elapsedTimer.start();
 
-    if (timeoutMs > 0)
-        setupAutohideTimer(data, resource, id, timeoutMs);
+    setupAutohideTimer(data, resource, id, timeoutMs); //< will clear timer if timeoutMs < 0
 }
 
 void QnWorkbenchTextOverlaysHandlerPrivate::hideTextOverlays(
