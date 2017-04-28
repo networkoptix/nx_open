@@ -247,17 +247,19 @@ void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client
         return;
     }
 
-    nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find(Qn::EC2_GUID_HEADER_NAME);
-    nx_http::HttpHeaders::const_iterator itrRuntimeGuid = client->response()->headers.find(Qn::EC2_RUNTIME_GUID_HEADER_NAME);
-    nx_http::HttpHeaders::const_iterator itrSystemIdentityTime = client->response()->headers.find(Qn::EC2_SYSTEM_IDENTITY_HEADER_NAME);
-    if (itrSystemIdentityTime != client->response()->headers.end())
-        setRemoteIdentityTime(itrSystemIdentityTime->second.toLongLong());
-
-    if (itrGuid == client->response()->headers.end())
+    const auto& headers = client->response()->headers;
+    QnUuid remoteGuid = nx_http::getHeaderValue(headers, Qn::EC2_GUID_HEADER_NAME);
+    if (remoteGuid.isNull())
     {
         cancelConnecting();
         return;
     }
+
+    QnUuid remoteRuntimeGuid = nx_http::getHeaderValue(headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+    QnUuid remoteDbGuid = nx_http::getHeaderValue(headers, Qn::EC2_DB_GUID_HEADER_NAME);
+    nx_http::HttpHeaders::const_iterator itrSystemIdentityTime = headers.find(Qn::EC2_SYSTEM_IDENTITY_HEADER_NAME);
+    if (itrSystemIdentityTime != headers.end())
+        setRemoteIdentityTime(itrSystemIdentityTime->second.toLongLong());
 
     nx_http::HttpHeaders::const_iterator ec2CloudHostItr =
         client->response()->headers.find(Qn::EC2_CLOUD_HOST_HEADER_NAME);
@@ -299,9 +301,9 @@ void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client
         }
     }
 
-    m_remotePeer.id = QnUuid(itrGuid->second);
-    if (itrRuntimeGuid != client->response()->headers.end())
-        m_remotePeer.instanceId = QnUuid(itrRuntimeGuid->second);
+    m_remotePeer.id = remoteGuid;
+    m_remotePeer.instanceId = remoteRuntimeGuid;
+    m_remotePeer.persistentId = remoteDbGuid;
 
     NX_ASSERT(!m_remotePeer.instanceId.isNull());
     if (m_remotePeer.id == kCloudPeerId)

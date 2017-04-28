@@ -231,6 +231,26 @@ ErrorCode QnTransactionLog::updateSequence(const ApiUpdateSequenceData& data)
         return ErrorCode::dbError;
 }
 
+ErrorCode QnTransactionLog::updateSequence(const QnAbstractTransaction& tran)
+{
+    detail::QnDbManager::QnDbTransactionLocker
+        locker(dbManager(m_dbManager, Qn::kSystemAccess).getTransaction());
+
+    NX_ASSERT(m_state.values.value(ApiPersistentIdData(tran.peerID, tran.persistentInfo.dbID)) <= tran.persistentInfo.sequence);
+
+    NX_LOG(QnLog::EC2_TRAN_LOG, lit("update transaction sequence in log. key=%1 dbID=%2 dbSeq=%3")
+        .arg(tran.peerID.toString())
+        .arg(tran.persistentInfo.dbID.toString())
+        .arg(tran.persistentInfo.sequence), cl_logDEBUG1);
+    ErrorCode result = updateSequenceNoLock(tran.peerID, tran.persistentInfo.dbID, tran.persistentInfo.sequence);
+    if (result != ErrorCode::ok)
+        return result;
+    if (locker.commit())
+        return ErrorCode::ok;
+    else
+        return ErrorCode::dbError;
+}
+
 ErrorCode QnTransactionLog::updateSequenceNoLock(const QnUuid& peerID, const QnUuid& dbID, int sequence)
 {
     ApiPersistentIdData key(peerID, dbID);
@@ -413,7 +433,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(
     QList<QByteArray>& result)
 {
     QnReadLocker lock(&m_dbManager->getMutex());
-    return getTransactionsAfterInternal(m_state, state, onlyCloudData, result);
+    return getTransactionsAfterInternal(state, onlyCloudData, result, Protocol::MessageBus_3_0);
 }
 
 ErrorCode QnTransactionLog::getExactTransactionsAfter(
@@ -422,15 +442,17 @@ ErrorCode QnTransactionLog::getExactTransactionsAfter(
     QList<QByteArray>& result)
 {
     QnReadLocker lock(&m_dbManager->getMutex());
-    return getTransactionsAfterInternal(state, state, onlyCloudData, result);
+    return getTransactionsAfterInternal(state, onlyCloudData, result, Protocol::P2P_3_1);
 }
 
 ErrorCode QnTransactionLog::getTransactionsAfterInternal(
-    const QnTranState& stateToIterate,
     const QnTranState& filterState,
     bool onlyCloudData,
-    QList<QByteArray>& result)
+    QList<QByteArray>& result,
+    Protocol protocol)
 {
+
+    const QnTranState& stateToIterate = protocol == Protocol::MessageBus_3_0 ? m_state : filterState;
 
     QString extraFilter;
     if (onlyCloudData)
@@ -473,17 +495,36 @@ ErrorCode QnTransactionLog::getTransactionsAfterInternal(
 			QnUuid::fromRfc4122(query.value(0).toByteArray()),
 			QnUuid::fromRfc4122(query.value(1).toByteArray())
 		);
+
+        if (protocol == Protocol::P2P_3_1)
+        {
+            if (!stateToIterate.values.contains(key))
+                continue;
+        }
+
         int latestSequence =  query.value(2).toInt();
-        if (latestSequence > tranLogSequence[key]) {
-            // add filler transaction with latest sequence
-            ApiSyncMarkerRecord record;
-            record.peerID = key.id;
-            record.dbID = key.persistentId;
-            record.sequence = latestSequence;
-            syncMarkersTran.params.markers.push_back(record);
+        if (latestSequence > tranLogSequence[key])
+        {
+            if (protocol == Protocol::MessageBus_3_0)
+            {
+                // add filler transaction with latest sequence
+                ApiSyncMarkerRecord record;
+                record.peerID = key.id;
+                record.dbID = key.persistentId;
+                record.sequence = latestSequence;
+                syncMarkersTran.params.markers.push_back(record);
+            }
+            else
+            {
+                syncMarkersTran.peerID = key.id;
+                syncMarkersTran.persistentInfo.dbID = key.persistentId;
+                syncMarkersTran.persistentInfo.sequence = latestSequence;
+                result << m_tranSerializer->serializedTransaction(syncMarkersTran);
+            }
         }
     }
-    result << m_tranSerializer->serializedTransaction(syncMarkersTran);
+    if (protocol == Protocol::MessageBus_3_0)
+        result << m_tranSerializer->serializedTransaction(syncMarkersTran);
 
     return ErrorCode::ok;
 }

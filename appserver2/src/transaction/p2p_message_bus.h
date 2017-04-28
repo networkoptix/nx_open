@@ -154,6 +154,8 @@ private:
     void gotTransaction(const QnTransaction<T>& tran,const P2pConnectionPtr& connection);
 
     void proxyFillerTransaction(const QnAbstractTransaction& tran);
+    void addRouteToDirectlyConnectedPeer(const P2pConnectionPtr& connection);
+
 private slots:
     void at_gotMessage(const QSharedPointer<P2pConnection>& connection, MessageType messageType, const QByteArray& payload);
     void at_stateChanged(const QSharedPointer<P2pConnection>& connection, P2pConnection::State state);
@@ -164,23 +166,35 @@ private:
     PeerNumberInfo m_localShortPeerInfo; //< Short numbers created by current peer
 
     typedef QMap<ApiPersistentIdData, RoutingRecord> RoutingInfo;
-    struct PeerInfo
-    {
-        PeerInfo() {}
 
-        qint32 distanceVia(const ApiPersistentIdData& via) const;
+    struct AlivePeerInfo
+    {
+        AlivePeerInfo() {}
+
+        qint32 distanceTo(const ApiPersistentIdData& via) const;
+
+        RoutingInfo routeTo; // key: route to, value - distance in hops
+    };
+    typedef QMap<ApiPersistentIdData, AlivePeerInfo> AlivePeersMap;
+    AlivePeersMap m_alivePeers; //< alive peers in the system. key - route via, value - route to
+
+    // Technically this struct is the same as the previous one. But it is used in another semantic.
+    struct RouteToPeerInfo
+    {
+        RouteToPeerInfo() {}
+
         qint32 minDistance(QVector<ApiPersistentIdData>* outViaList) const;
 
-        RoutingInfo routingInfo; // key: route throw, value - distance in hops
+        RoutingInfo routeVia; // key: route via, value - distance in hops
     };
-    typedef QMap<ApiPersistentIdData, PeerInfo> PeersMap;
+    typedef QMap<ApiPersistentIdData, RouteToPeerInfo> RouteToPeerMap;
 
-    PeersMap m_allPeers; //< all peers in a system
 
-    QMap<ApiPersistentIdData, P2pConnectionPtr> m_subscriptionList;
     QTimer* m_timer = nullptr;
     QElapsedTimer m_lastPeerInfoTimer;
     QElapsedTimer m_lastSubscribeTimer;
+private:
+    RouteToPeerMap allPeersDistances() const;
 };
 
 } // ec2

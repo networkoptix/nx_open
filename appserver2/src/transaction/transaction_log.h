@@ -89,6 +89,7 @@ namespace ec2
         static QnUuid makeHash(const QByteArray &extraData, const ApiDiscoveryData &data);
 
         ErrorCode updateSequence(const ApiUpdateSequenceData& data);
+        ErrorCode updateSequence(const QnAbstractTransaction& tran);
         void fillPersistentInfo(QnAbstractTransaction& tran);
 
         void beginTran();
@@ -112,11 +113,17 @@ namespace ec2
 
         ErrorCode updateSequenceNoLock(const QnUuid& peerID, const QnUuid& dbID, int sequence);
 
+        enum class Protocol
+        {
+            MessageBus_3_0,
+            P2P_3_1
+        };
+
         ErrorCode getTransactionsAfterInternal(
-            const QnTranState& stateToIterate,
             const QnTranState& filterState,
             bool onlyCloudData,
-            QList<QByteArray>& result);
+            QList<QByteArray>& result,
+            Protocol protocol);
     private:
         struct UpdateHistoryData
         {

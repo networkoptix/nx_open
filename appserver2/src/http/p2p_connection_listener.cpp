@@ -128,7 +128,7 @@ void P2pConnectionProcessor::run()
     if (query.hasQueryItem("format"))
         QnLexical::deserialize(query.queryItemValue("format"), &dataFormat);
 
-    ApiPeerData remotePeer(remoteGuid, remoteRuntimeGuid, peerType, dataFormat);
+    ApiPeerData remotePeer(remoteGuid, remoteRuntimeGuid, remoteDbGuid, peerType, dataFormat);
 
     if (peerType == Qn::PT_Server && commonModule()->isReadOnly())
     {
