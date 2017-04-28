@@ -1,5 +1,6 @@
 #include "workbench_welcome_screen.h"
 
+#include <QtCore/QMimeData>
 
 #include <QtQuickWidgets/QQuickWidget>
 #include <QtQuick/QQuickView>
