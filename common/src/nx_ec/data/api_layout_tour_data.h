@@ -22,12 +22,19 @@ struct ApiLayoutTourItemData: ApiData
 
 #define ApiLayoutTourItemData_Fields (layoutId)(delayMs)
 
+struct ApiLayoutTourSettings: ApiData
+{
+    bool manual = false;
+};
+#define ApiLayoutTourSettings_Fields (manual)
+
 struct ApiLayoutTourData: ApiData
 {
     QnUuid id;
     QnUuid parentId;
     QString name;
     ApiLayoutTourItemDataList items;
+    ApiLayoutTourSettings settings;
 
     bool isValid() const;
 
@@ -35,6 +42,10 @@ struct ApiLayoutTourData: ApiData
     bool operator!=(const ApiLayoutTourData& rhs) const;
 };
 
-#define ApiLayoutTourData_Fields (id)(parentId)(name)(items)
+#define ApiLayoutTourData_Fields (id)(parentId)(name)(items)(settings)
 
 } // namespace ec2
+
+// Support SQL via JSON (de)serialization
+void serialize_field(const ec2::ApiLayoutTourSettings& settings, QVariant* target);
+void deserialize_field(const QVariant& value, ec2::ApiLayoutTourSettings* target);
