@@ -82,7 +82,7 @@ protected:
         const QString& path) const = 0;
 };
 
-template<template<typename> class PathMatcher>
+template<template<typename> class PathMatcherType>
 class BasicMessageDispatcher:
     public AbstractMessageDispatcher
 {
@@ -133,7 +133,7 @@ private:
     struct PathMatchContext
     {
         FactoryFunc defaultFactory;
-        PathMatcher<FactoryFunc> pathToFactory;
+        PathMatcherType<FactoryFunc> pathToFactory;
     };
 
     std::map<QString, QString> m_rewritePrefixes;
