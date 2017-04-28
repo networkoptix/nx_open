@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QtCore/QScopedPointer.h>
+#include <QtCore/QScopedPointer>
 
 #include <ui/graphics/items/generic/image_button_widget.h>
 
