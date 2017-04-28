@@ -20,13 +20,13 @@ namespace {
 
     // How often send 'peers' message to the peer if something is changed
     // As soon as connection is opened first message is sent immediately
-    std::chrono::seconds sendPeersInfoInterval(5);
+    std::chrono::seconds sendPeersInfoInterval(1);
 
     // If new connection is recently established/closed, don't sent subscribe request to the peer
-    std::chrono::seconds subscribeIntervalLow(3);
+    std::chrono::seconds subscribeIntervalLow(1);
 
     // If new connections always established/closed too long time, send subscribe request anyway
-    std::chrono::seconds subscribeIntervalHigh(10);
+    std::chrono::seconds subscribeIntervalHigh(1);
 } // namespace
 
 namespace ec2 {
@@ -1180,5 +1180,32 @@ bool P2pMessageBus::handlePushTransactionData(const P2pConnectionPtr& connection
         [](Qn::SerializationFormat, const QByteArray&) { return false; });
 }
 
+bool P2pMessageBus::isSubscribedTo(const ApiPersistentIdData& peer) const
+{
+    QnMutexLocker lock(&m_mutex);
+    if (ApiPersistentIdData(localPeer()) == peer)
+        return true;
+    for (const auto& connection: m_connections)
+    {
+        if (connection->state() != P2pConnection::State::Connected)
+            continue;
+        if (connection->localPeerSubscribedTo(peer))
+            return true;
+    }
+    return false;
+}
+
+bool P2pMessageBus::distanceTo(const ApiPersistentIdData& peer) const
+{
+    QnMutexLocker lock(&m_mutex);
+    if (ApiPersistentIdData(localPeer()) == peer)
+        return true;
+    for (const auto& alivePeer : m_alivePeers)
+    {
+        if (alivePeer.distanceTo(peer) <= kMaxOnlineDistance)
+            return true;
+    }
+    return false;
+}
 
 } // ec2

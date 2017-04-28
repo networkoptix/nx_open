@@ -98,6 +98,9 @@ public:
         const QnAbstractTransaction& tran,
         P2pConnection::Direction direction) const;
 
+    bool isSubscribedTo(const ApiPersistentIdData& peer) const;
+    bool distanceTo(const ApiPersistentIdData& peer) const;
+
 private:
     QByteArray serializePeersMessage();
     QByteArray serializeCompressedPeers(MessageType messageType, const QVector<PeerNumberType>& peers);
