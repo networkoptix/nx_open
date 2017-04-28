@@ -88,6 +88,8 @@ private:
 
         if (m_serverSendUpgradeHeaderInResponse)
             response->headers.emplace("Upgrade", kUpgradeTo);
+        else
+            response->headers.emplace("Upgrade", nx_http::StringType());
         response->headers.emplace("Connection", "Upgrade");
         completionHandler(nx_http::StatusCode::switchingProtocols);
     }

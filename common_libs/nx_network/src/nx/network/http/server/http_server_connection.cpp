@@ -256,9 +256,8 @@ void HttpServerConnection::addResponseHeaders(
 
     if (response->statusLine.statusCode == nx_http::StatusCode::switchingProtocols)
     {
-        nx_http::insertOrReplaceHeader(
-            &response->headers,
-            HttpHeader("Upgrade", processingContext.protocolToUpgradeTo));
+        if (response->headers.find("Upgrade") == response->headers.end())
+            response->headers.emplace("Upgrade", processingContext.protocolToUpgradeTo);
         nx_http::insertOrReplaceHeader(
             &response->headers,
             HttpHeader("Connection", "Upgrade"));

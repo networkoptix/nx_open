@@ -885,7 +885,7 @@ bool AsyncClient::isMalformed(const nx_http::Response& response) const
 {
     if (response.statusLine.statusCode == StatusCode::switchingProtocols)
     {
-        if (response.headers.find("Upgrade") == response.headers.end())
+        if (nx_http::getHeaderValue(response.headers, "Upgrade").isEmpty())
         {
             NX_LOGX(lm("Received malformed response from %1. "
                 "Status code is %2 and no Upgrade header present")
