@@ -83,10 +83,12 @@ template<typename Request, typename CompletionHandler, typename ... Response>
 class BasicHandlerWithoutRequestBody:
     public BasicHandler<Request, void, CompletionHandler, Response...>
 {
+    using base_type = BasicHandler<Request, void, CompletionHandler, Response...>;
+
 public:
     template<typename ... Args>
     BasicHandlerWithoutRequestBody(Args ... args):
-        BasicHandler(std::move(args)...)
+        base_type(std::move(args)...)
     {
     }
 
@@ -109,10 +111,12 @@ template<typename Request, typename CompletionHandler, typename ... Response>
 class BasicHandlerWithRequestBody:
     public BasicHandler<Request, Request, CompletionHandler, Response...>
 {
+    using base_type = BasicHandler<Request, Request, CompletionHandler, Response...>;
+
 public:
     template<typename ... Args>
     BasicHandlerWithRequestBody(Args ... args):
-        BasicHandler(std::move(args)...)
+        base_type(std::move(args)...)
     {
     }
 
