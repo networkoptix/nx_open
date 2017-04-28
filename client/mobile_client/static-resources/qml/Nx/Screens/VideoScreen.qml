@@ -317,7 +317,7 @@ PageBase
                         onZoomInPressedChanged:
                         {
                             var zoomVector = zoomInPressed
-                                ? Qt.vector3d(0, 0, 1)
+                                ? Qt.vector3d(0, 0, 0.5)
                                 : Qt.vector3d(0, 0, 0)
 
                             ptzController.continuousMove(zoomVector)
@@ -326,7 +326,7 @@ PageBase
                         onZoomOutPressedChanged:
                         {
                             var zoomVector = zoomOutPressed
-                                ? Qt.vector3d(0, 0, -1)
+                                ? Qt.vector3d(0, 0, 0.5)
                                 : Qt.vector3d(0, 0, 0)
 
                             ptzController.continuousMove(zoomVector)
