@@ -293,7 +293,8 @@ PageBase
                         property bool continuousFocusEnabled:
                             ptzController.capabilities & Ptz.ContinuousFocusCapability
 
-                        supportsAutoFocus: true || ptzController.auxTraits & Ptz.ManualAutoFocusPtzTrait
+                        visible: continuousFocusEnabled
+                        supportsAutoFocus: ptzController.auxTraits & Ptz.ManualAutoFocusPtzTrait
 
                         onFocusInPressedChanged:
                         {
@@ -316,7 +317,7 @@ PageBase
                         onZoomInPressedChanged:
                         {
                             var zoomVector = zoomInPressed
-                                ? Qt.vector3d(0, 0, 0.1)
+                                ? Qt.vector3d(0, 0, 1)
                                 : Qt.vector3d(0, 0, 0)
 
                             ptzController.continuousMove(zoomVector)
@@ -324,8 +325,8 @@ PageBase
 
                         onZoomOutPressedChanged:
                         {
-                            var zoomVector = zoomInPressed
-                                ? Qt.vector3d(0, 0, -0.1)
+                            var zoomVector = zoomOutPressed
+                                ? Qt.vector3d(0, 0, -1)
                                 : Qt.vector3d(0, 0, 0)
 
                             ptzController.continuousMove(zoomVector)
@@ -348,20 +349,9 @@ PageBase
                         return ptzCaps == Ptz.ContinuousPtzCapabilities
                     }
 
-                    onSingleShot:
+                    onDirectionChanged:
                     {
                         ptzController.continuousMove(Qt.vector3d(direction.x, direction.y, 0))
-                        ptzController.continuousMove(Qt.vector3d(0, 0, 0))
-                    }
-
-                    onButtonPressed:
-                    {
-                        ptzController.continuousMove(Qt.vector3d(direction.x, direction.y, 0))
-                    }
-
-                    onButtonReleased:
-                    {
-                        ptzController.continuousMove(Qt.vector3d(0, 0, 0))
                     }
                 }
             }
@@ -384,7 +374,6 @@ PageBase
 
                     onCurrentPresetIndexChanged:
                     {
-                        console.log("--------------- set preset: ", currentPresetIndex)
                         if (currentPresetIndex == -1)
                             return;
 

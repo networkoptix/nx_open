@@ -48,7 +48,7 @@ Item
             {
                 id: repeater
 
-                model: control.presetsCount + 30
+                model: control.presetsCount
 
                 delegate: MouseArea
                 {

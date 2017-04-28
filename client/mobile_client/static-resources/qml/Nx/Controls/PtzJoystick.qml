@@ -11,10 +11,7 @@ Rectangle
     /**
      * "direction" property specifies blah blah TODO: write comment
      */
-    property vector2d direction: d.dragging
-        ? d.movementVector
-        : Qt.vector2d(0, 0)
-
+    property alias direction: d.movementVector
     property int ptzType: 0
 
     readonly property int kFreeWayPtz: 0
@@ -23,7 +20,6 @@ Rectangle
     readonly property int kTwoWayHorizontal: 3
     readonly property int kTwoWayVertical: 4
 
-    signal singleShot(point direction)
     signal buttonPressed(point direction)
     signal buttonReleased()
 
@@ -315,12 +311,11 @@ Rectangle
         property vector2d movementVector:
         {
             var cosAlpha = mathHelpers.getCosBetweenVectors(mouseVector, radialVector)
-            var result = radialVector.times(cosAlpha * mouseVector.length()
-                / (controlRadius * controlRadius))
+            var coeff = 1 / controlRadius *
+                (dragging ? cosAlpha * mouseVector.length() / controlRadius : 1)
 
-            if (result.length() > 1)
-                result = result.normalized()
-            return result
+            var result = radialVector.times(coeff)
+            return result.length() > 1 ? result.normalized() : result
         }
 
         property vector2d markerCenterPosition: dragging
