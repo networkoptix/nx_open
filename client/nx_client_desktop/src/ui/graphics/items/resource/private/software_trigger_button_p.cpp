@@ -2,7 +2,6 @@
 
 #include <cmath>
 
-#include <QtCore/QTimer>
 #include <QtWidgets/QApplication>
 
 #include <ui/animation/opacity_animator.h>

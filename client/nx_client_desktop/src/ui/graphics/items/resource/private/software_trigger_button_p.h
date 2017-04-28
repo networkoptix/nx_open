@@ -3,6 +3,7 @@
 #include <QtCore/QPointer>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QTimer>
 
 #include "../software_trigger_button.h"
 
