@@ -54,20 +54,21 @@ std::vector<SocketAddress> View::httpEndpoints() const
 
 void View::registerApiHandlers()
 {
-    registerApiHandler<view::BeginListeningHandler>();
-    registerApiHandler<view::CreateClientSessionHandler>();
-    registerApiHandler<view::ConnectToPeerHandler>();
+    registerApiHandler<view::BeginListeningHandler>(nx_http::Method::OPTIONS);
+    registerApiHandler<view::CreateClientSessionHandler>(nx_http::Method::POST);
+    registerApiHandler<view::ConnectToPeerHandler>(nx_http::Method::OPTIONS);
 }
 
 template<typename Handler>
-void View::registerApiHandler()
+void View::registerApiHandler(const nx_http::StringType& method)
 {
     m_httpMessageDispatcher.registerRequestProcessor<Handler>(
         Handler::kPath,
         [this]() -> std::unique_ptr<Handler>
         {
             return std::make_unique<Handler>(&m_controller->connectSessionManager());
-        });
+        },
+        method);
 }
 
 void View::startAcceptor()

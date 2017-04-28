@@ -119,8 +119,8 @@ protected:
 TEST_F(HttpApiBeginListening, request_is_delivered)
 {
     whenIssuedApiRequest();
-    thenRequestHasBeenDeliveredToTheManager();
     thenRequestSucceeded();
+    thenRequestHasBeenDeliveredToTheManager();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -149,8 +149,8 @@ protected:
 TEST_F(HttpApiCreateClientSession, request_is_delivered)
 {
     whenIssuedApiRequest();
-    thenRequestHasBeenDeliveredToTheManager();
     thenRequestSucceeded();
+    thenRequestHasBeenDeliveredToTheManager();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -178,8 +178,8 @@ protected:
 TEST_F(HttpApiOpenConnectionToTheTargetHost, request_is_delivered)
 {
     whenIssuedApiRequest();
-    thenRequestHasBeenDeliveredToTheManager();
     thenRequestSucceeded();
+    thenRequestHasBeenDeliveredToTheManager();
 }
 
 } // namespace test
