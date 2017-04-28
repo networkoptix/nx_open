@@ -267,70 +267,86 @@ PageBase
             id: ptzPanel
 
             anchors.bottom: parent.bottom
-            width: parent.width
+            x: 8
+            width: parent.width - x * 2
 
             visible: ptzController.available
 
-            Row
+            spacing: 8
+
+            Item
             {
-                spacing: 20
-                PtzFocusControl
+                id: topPtzPanel
+
+                width: parent.width
+                height: Math.max(zoomFocusRow.height, ptzJoystick.height)
+
+                Row
                 {
-                    id: focusPanel
+                    id: zoomFocusRow
 
-                    property bool continuousFocusEnabled:
-                        ptzController.capabilities & Ptz.ContinuousFocusCapability
-
-                    supportsAutoFocus: true || ptzController.auxTraits & Ptz.ManualAutoFocusPtzTrait
-
-                    onFocusInPressedChanged:
+                    spacing: 8
+                    PtzFocusControl
                     {
-                        var focusSpeed = focusInPressed ? 1.0 : 0
-                        ptzController.continuousFocus(focusSpeed)
+                        id: focusPanel
+
+                        property bool continuousFocusEnabled:
+                            ptzController.capabilities & Ptz.ContinuousFocusCapability
+
+                        supportsAutoFocus: true || ptzController.auxTraits & Ptz.ManualAutoFocusPtzTrait
+
+                        onFocusInPressedChanged:
+                        {
+                            var focusSpeed = focusInPressed ? 1.0 : 0
+                            ptzController.continuousFocus(focusSpeed)
+                        }
+
+                        onFocusOutPressedChanged:
+                        {
+                            var focusSpeed = focusOutPressed ? -1.0 : 0
+                            ptzController.continuousFocus(focusSpeed)
+                        }
+
+                        onAutoFocusClicked: { ptzController.setAutoFocus() }
                     }
 
-                    onFocusOutPressedChanged:
+                    PtzZoomControl
                     {
-                        var focusSpeed = focusOutPressed ? -1.0 : 0
-                        ptzController.continuousFocus(focusSpeed)
-                    }
+                        supporsValuesMarker: true
+                        onZoomInPressedChanged:
+                        {
+                            var zoomVector = zoomInPressed
+                                ? Qt.vector3d(0, 0, 0.1)
+                                : Qt.vector3d(0, 0, 0)
 
-                    onAutoFocusClicked: { ptzController.setAutoFocus() }
-                }
+                            ptzController.continuousMove(zoomVector)
+                        }
 
-                PtzZoomControl
-                {
-                    supporsValuesMarker: true
-                    onZoomInPressedChanged:
-                    {
-                        var zoomVector = zoomInPressed
-                            ? Qt.vector3d(0, 0, 0.1)
-                            : Qt.vector3d(0, 0, 0)
+                        onZoomOutPressedChanged:
+                        {
+                            var zoomVector = zoomInPressed
+                                ? Qt.vector3d(0, 0, -0.1)
+                                : Qt.vector3d(0, 0, 0)
 
-                        ptzController.continuousMove(zoomVector)
-                    }
-
-                    onZoomOutPressedChanged:
-                    {
-                        var zoomVector = zoomInPressed
-                            ? Qt.vector3d(0, 0, -0.1)
-                            : Qt.vector3d(0, 0, 0)
-
-                        ptzController.continuousMove(zoomVector)
+                            ptzController.continuousMove(zoomVector)
+                        }
                     }
                 }
 
                 PtzJoystick
                 {
-                    ptzType: 1
+                    id: ptzJoystick
+
+                    ptzType: 2
 
                     visible: enabled;
-                    anchors.verticalCenter: parent.verticalCenter
-                    enabled: true
-//                    {
-//                        var ptzCaps = ptzController.capabilities & Ptz.ContinuousPtzCapabilities
-//                        return ptzCaps == Ptz.ContinuousPtzCapabilities
-//                    }
+                    anchors.bottom: parent.bottom
+                    anchors.right: parent.right
+                    enabled:
+                    {
+                        var ptzCaps = ptzController.capabilities & Ptz.ContinuousPtzCapabilities
+                        return ptzCaps == Ptz.ContinuousPtzCapabilities
+                    }
 
                     onSingleShot:
                     {
@@ -350,21 +366,45 @@ PageBase
                 }
             }
 
-            PtzPresetsItem
+            Item
             {
-                id: presetsItem
+                id: bottomPtzPanel
 
-                visible: ptzController.presetsCount
-                presetsCount: ptzController.presetsCount
+                width: parent.width
+                height: Math.max(presetsItem.height)
 
-                onCurrentPresetIndexChanged:
+                PtzPresetsItem
                 {
-                    console.log("--------------- set preset: ", currentPresetIndex)
-                    if (currentPresetIndex == -1)
-                        return;
+                    id: presetsItem
 
-                    if (!ptzController.setPreset(currentPresetIndex))
-                        console.log("+++++++++++ can't set preset: ", currentPresetIndex);
+                    visible: ptzController.presetsCount
+                    presetsCount: ptzController.presetsCount
+                    anchors.left: parent.left
+                    anchors.right: hidePtzButton.left
+
+                    onCurrentPresetIndexChanged:
+                    {
+                        console.log("--------------- set preset: ", currentPresetIndex)
+                        if (currentPresetIndex == -1)
+                            return;
+
+                        if (!ptzController.setPreset(currentPresetIndex))
+                            console.log("+++++++++++ can't set preset: ", currentPresetIndex);
+                    }
+                }
+
+                Button
+                {
+                    id: hidePtzButton
+
+                    width: 48
+                    height: width
+                    anchors.right: parent.right
+                    anchors.rightMargin: 4
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    flat: true
+                    icon: lp("/images/close.png")
                 }
             }
         }
