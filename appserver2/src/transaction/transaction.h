@@ -31,9 +31,8 @@
  * InvalidAccess(),         -- actual only for persistent transactions with one element
  * InvalidAccess(),         -- actual only for read transactions for one element
  * InvalidFilterFunc(),     -- actual only for persistent transactions with element list
- * FilterListByAccess<AllowForAllAccess>(), -- filtering requested list by the passed checker
- * ReadListAccessOut<AllowForAllAccess>(), -- nobody can explain what should we fill here,
- *      but this is for resending persistent transactions, similar to TriggerNotificationHelper
+ * FilterListByAccess<LayoutTourAccess>(), -- filtering requested list by the passed checker
+ * AllowForAllAccessOut(),  -- ctual only for persistent transactions
  * RegularTransactionType() -- transaction is common, regular, without any magic
  * )
  *
@@ -45,12 +44,11 @@
  * false,                   -- transaction is not system (handled common way)
  * CreateHashByIdHelper(),  -- id is enough to generate hash
  * LayoutTourNotificationManagerHelper(), -- notify other users that we have changed the tour
- * AdminOnlyAccess(),       -- for now only admins can save tours
- * AllowForAllAccess(),     -- everybody can read the tours for now
+ * LayoutTourAccess(),      -- check access to save
+ * LayoutTourAccess(),      -- check access to read
  * InvalidFilterFunc(),     -- actual only for list transactions
  * InvalidFilterFunc(),     -- actual only for list transactions
- * AllowForAllAccessOut(),  -- nobody can explain what should we fill here,
- *      but this is for resending persistent transactions, similar to TriggerNotificationHelper
+ * AccessOut<LayoutTourAccess>(),  -- resending persistent transactions
  * RegularTransactionType() -- transaction is common, regular, without any magic
  * )
  *
