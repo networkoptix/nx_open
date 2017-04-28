@@ -7,10 +7,17 @@
 #include <QtCore/QDir>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <common/common_module_aware.h>
 
 namespace nx {
 namespace vms {
 namespace common {
+
+namespace distributed_file_downloader {
+
+class AbstractPeerManagerFactory;
+
+} // namespace distributed_file_downloader
 
 struct DownloaderFileInformation
 {
@@ -49,7 +56,7 @@ public:
     (name)(size)(md5)(url)(chunkSize)(status)(downloadedChunks)
 
 class DistributedFileDownloaderPrivate;
-class DistributedFileDownloader: public QObject
+class DistributedFileDownloader: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
 
@@ -69,7 +76,11 @@ public:
     };
     Q_ENUM(ErrorCode)
 
-    DistributedFileDownloader(const QDir& downloadsDirectory, QObject* parent = nullptr);
+    DistributedFileDownloader(
+        const QDir& downloadsDirectory,
+        QnCommonModule* commonModule,
+        distributed_file_downloader::AbstractPeerManagerFactory* peerManagerFactory = nullptr,
+        QObject* parent = nullptr);
 
     ~DistributedFileDownloader();
 

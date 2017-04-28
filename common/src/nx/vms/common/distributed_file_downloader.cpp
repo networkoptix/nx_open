@@ -1,12 +1,20 @@
 #include "distributed_file_downloader.h"
 
+#include <QtCore/QHash>
+
+#include <nx/utils/thread/mutex.h>
+#include <utils/common/delayed.h>
 #include <nx/fusion/model_functions.h>
 
 #include "private/distributed_file_downloader/storage.h"
+#include "private/distributed_file_downloader/worker.h"
+#include "private/distributed_file_downloader/resource_pool_peer_manager.h"
 
 namespace nx {
 namespace vms {
 namespace common {
+
+using namespace distributed_file_downloader;
 
 //-------------------------------------------------------------------------------------------------
 
@@ -34,8 +42,13 @@ class DistributedFileDownloaderPrivate: public QObject
 public:
     DistributedFileDownloaderPrivate(DistributedFileDownloader* q);
 
+    void createWorker(const QString& fileName);
+
 private:
-    QScopedPointer<distributed_file_downloader::Storage> storage;
+    QnMutex mutex;
+    QScopedPointer<Storage> storage;
+    QHash<QString, Worker*> workers;
+    AbstractPeerManagerFactory* peerManagerFactory = nullptr;
 };
 
 DistributedFileDownloaderPrivate::DistributedFileDownloaderPrivate(DistributedFileDownloader* q):
@@ -44,21 +57,55 @@ DistributedFileDownloaderPrivate::DistributedFileDownloaderPrivate(DistributedFi
 {
 }
 
+void DistributedFileDownloaderPrivate::createWorker(const QString& fileName)
+{
+    QnMutexLocker lock(&mutex);
+
+    NX_ASSERT(!workers.contains(fileName));
+    if (workers.contains(fileName))
+        return;
+
+    const auto status = storage->fileInformation(fileName).status;
+
+    if (status != DownloaderFileInformation::Status::downloaded
+        && status != DownloaderFileInformation::Status::uploading)
+    {
+        Q_Q(DistributedFileDownloader);
+        auto worker = new Worker(
+            fileName, storage.data(), peerManagerFactory->createPeerManager());
+        workers[fileName] = worker;
+        worker->start();
+    }
+}
+
 //-------------------------------------------------------------------------------------------------
 
 DistributedFileDownloader::DistributedFileDownloader(
     const QDir& downloadsDirectory,
+    QnCommonModule* commonModule,
+    AbstractPeerManagerFactory* peerManagerFactory,
     QObject* parent)
     :
     QObject(parent),
+    QnCommonModuleAware(commonModule),
     d_ptr(new DistributedFileDownloaderPrivate(this))
 {
     Q_D(DistributedFileDownloader);
-    d->storage.reset(new distributed_file_downloader::Storage(downloadsDirectory));
+    d->storage.reset(new Storage(downloadsDirectory));
+
+    if (peerManagerFactory)
+        d->peerManagerFactory = peerManagerFactory;
+    else
+        d->peerManagerFactory = new ResourcePoolPeerManagerFactory(commonModule);
+
+    for (const auto& fileName: d->storage->files())
+        d->createWorker(fileName);
 }
 
 DistributedFileDownloader::~DistributedFileDownloader()
 {
+    Q_D(DistributedFileDownloader);
+    qDeleteAll(d->workers);
 }
 
 QStringList DistributedFileDownloader::files() const
@@ -84,7 +131,19 @@ DistributedFileDownloader::ErrorCode DistributedFileDownloader::addFile(
     const DownloaderFileInformation& fileInformation)
 {
     Q_D(DistributedFileDownloader);
-    return d->storage->addFile(fileInformation);
+
+    auto errorCode = d->storage->addFile(fileInformation);
+    if (errorCode != ErrorCode::noError)
+        return errorCode;
+
+    executeInThread(thread(),
+        [this, fileName = fileInformation.name]
+        {
+            Q_D(DistributedFileDownloader);
+            d->createWorker(fileName);
+        });
+
+    return errorCode;
 }
 
 DistributedFileDownloader::ErrorCode DistributedFileDownloader::updateFileInformation(
