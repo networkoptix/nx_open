@@ -246,6 +246,8 @@
 #include <rest/helpers/permissions_helper.h>
 #include "misc/migrate_oldwin_dir.h"
 #include "media_server_process_aux.h"
+#include <recorder/remote_archive_synchronizer.h>
+#include <nx/utils/std/cpp14.h>
 
 #if !defined(EDGE_SERVER)
 #include <nx_speech_synthesizer/text_to_wav.h>
@@ -2207,6 +2209,8 @@ void MediaServerProcess::run()
         QnAppInfo::productName().toUtf8(), "US",
         QnAppInfo::organizationName().toUtf8());
 
+    auto remoteArchiveSynchronizer = 
+        std::make_unique<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer>();
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
     QScopedPointer<QnCameraHistoryPool> historyPool(new QnCameraHistoryPool());
     QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());

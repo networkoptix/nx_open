@@ -13,6 +13,7 @@
 #include "business/business_fwd.h"
 #include "api/model/api_ioport_data.h"
 #include "core/dataconsumer/audio_data_transmitter.h"
+#include <core/resource/abstract_remote_archive_manager.h>
 
 #include <mutex>
 #include <map>
@@ -275,6 +276,8 @@ public:
 #ifdef ENABLE_DATA_PROVIDERS
     virtual QnAudioTransmitterPtr getAudioTransmitter();
 #endif
+
+    virtual nx::core::resource::AbstractRemoteArchiveManager* remoteArchiveManager();
 
 public slots:
     virtual void inputPortListenerAttached();

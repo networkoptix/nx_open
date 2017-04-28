@@ -8,8 +8,8 @@
 #include <QtCore/QByteArray>
 
 namespace nx {
-namespace mediaserver_core {
-namespace plugins {
+namespace core {
+namespace resource {
 
 using BufferType = QByteArray;
 
@@ -32,11 +32,14 @@ struct RemoteArchiveEntry
 };
 
 /**
- * Trait class that allows to control archive on remote device (e.g. on camera SD card).
+ * Allows to control archive on remote device (e.g. on camera SD card).
  */
-class AbstractRemoteArchiveFetcher
+class AbstractRemoteArchiveManager
 {
 public:
+
+    virtual ~AbstractRemoteArchiveManager() {};
+
     /**
      * Lists all entries on remote device that satisfies the given conditions.
      *
@@ -66,6 +69,6 @@ public:
     virtual bool removeArchiveEntries(const std::vector<QString>& entryIds) = 0;
 };
 
-} // namespace plugins
-} // namespace mediaserver_core
+} // namespace resource
+} // namespace core
 } // namespace nx
