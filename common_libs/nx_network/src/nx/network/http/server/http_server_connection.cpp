@@ -92,55 +92,69 @@ void HttpServerConnection::onAuthenticationDone(
     nx_http::server::AuthenticationResult authenticationResult,
     nx_http::Message requestMessage)
 {
+    RequestProcessingContext processingContext = 
+        prepareRequestProcessingContext(*requestMessage.request);
+
     if (!authenticationResult.isSucceeded)
     {
         sendUnauthorizedResponse(
-            requestMessage.request->requestLine.version,
-            std::move(authenticationResult.wwwAuthenticate),
-            std::move(authenticationResult.responseHeaders),
-            std::move(authenticationResult.msgBody));
+            std::move(processingContext),
+            std::move(authenticationResult));
         return;
     }
 
     dispatchRequest(
+        std::move(processingContext),
         std::move(authenticationResult),
         std::move(requestMessage));
 }
 
+HttpServerConnection::RequestProcessingContext 
+    HttpServerConnection::prepareRequestProcessingContext(
+        const nx_http::Request& request)
+{
+    RequestProcessingContext processingContext;
+    processingContext.httpVersion = request.requestLine.version;
+    processingContext.protocolToUpgradeTo =
+        nx_http::getHeaderValue(request.headers, "Upgrade");
+    return processingContext;
+}
+
 void HttpServerConnection::sendUnauthorizedResponse(
-    const nx_http::MimeProtoVersion& protoVersion,
-    boost::optional<header::WWWAuthenticate> wwwAuthenticate,
-    nx_http::HttpHeaders responseHeaders,
-    std::unique_ptr<AbstractMsgBodySource> msgBody)
+    RequestProcessingContext processingContext,
+    nx_http::server::AuthenticationResult authenticationResult)
 {
     nx_http::Message response(nx_http::MessageType::response);
     std::move(
-        responseHeaders.begin(),
-        responseHeaders.end(),
+        authenticationResult.responseHeaders.begin(),
+        authenticationResult.responseHeaders.end(),
         std::inserter(response.response->headers, response.response->headers.end()));
     response.response->statusLine.statusCode = nx_http::StatusCode::unauthorized;
-    if (wwwAuthenticate)
+    if (authenticationResult.wwwAuthenticate)
     {
         response.response->headers.emplace(
             header::WWWAuthenticate::NAME,
-            wwwAuthenticate.get().serialized());
+            authenticationResult.wwwAuthenticate.get().serialized());
     }
+
     prepareAndSendResponse(
-        protoVersion,
-        std::move(response),
-        std::move(msgBody));
+        processingContext,
+        ResponseMessageContext(
+            std::move(response),
+            std::move(authenticationResult.msgBody),
+            ConnectionEvents()));
 }
 
 void HttpServerConnection::dispatchRequest(
+    RequestProcessingContext processingContext,
     nx_http::server::AuthenticationResult authenticationResult,
     nx_http::Message requestMessage)
 {
     auto strongRef = shared_from_this();
     std::weak_ptr<HttpServerConnection> weakThis = strongRef;
 
-    auto protoVersion = requestMessage.request->requestLine.version;
     auto sendResponseFunc =
-        [this, weakThis, protoVersion](
+        [this, weakThis, processingContext](
             nx_http::Message response,
             std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
             ConnectionEvents connectionEvents) mutable
@@ -151,10 +165,11 @@ void HttpServerConnection::dispatchRequest(
 
             processResponse(
                 std::move(strongThis),
-                std::move(protoVersion),
-                std::move(response),
-                std::move(responseMsgBody),
-                std::move(connectionEvents));
+                std::move(processingContext),
+                ResponseMessageContext(
+                    std::move(response),
+                    std::move(responseMsgBody),
+                    std::move(connectionEvents)));
         };
 
     if (!m_httpMessageDispatcher ||
@@ -167,18 +182,15 @@ void HttpServerConnection::dispatchRequest(
         nx_http::Message response(nx_http::MessageType::response);
         response.response->statusLine.statusCode = nx_http::StatusCode::notFound;
         return prepareAndSendResponse(
-            std::move(protoVersion),
-            std::move(response),
-            nullptr);
+            std::move(processingContext),
+            ResponseMessageContext(std::move(response), nullptr, ConnectionEvents()));
     }
 }
 
 void HttpServerConnection::processResponse(
     std::shared_ptr<HttpServerConnection> strongThis,
-    nx_http::MimeProtoVersion protoVersion,
-    nx_http::Message response,
-    std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
-    ConnectionEvents connectionEvents)
+    RequestProcessingContext processingContext,
+    ResponseMessageContext responseMessageContext)
 {
     if (!socket())  //< Connection has been removed while request was being processed.
     {
@@ -188,51 +200,48 @@ void HttpServerConnection::processResponse(
 
     strongThis->post(
         [this, strongThis = std::move(strongThis),
-            protoVersion = std::move(protoVersion),
-            response = std::move(response),
-            responseMsgBody = std::move(responseMsgBody),
-            connectionEvents = std::move(connectionEvents)]() mutable
+            processingContext = std::move(processingContext),
+            responseMessageContext = std::move(responseMessageContext)]() mutable
         {
             prepareAndSendResponse(
-                std::move(protoVersion),
-                std::move(response),
-                std::move(responseMsgBody),
-                std::move(connectionEvents));
+                std::move(processingContext),
+                std::move(responseMessageContext));
         });
 }
 
 void HttpServerConnection::prepareAndSendResponse(
-    nx_http::MimeProtoVersion version,
-    nx_http::Message msg,
-    std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
-    ConnectionEvents connectionEvents)
+    RequestProcessingContext processingContext,
+    ResponseMessageContext responseMessageContext)
 {
-    msg.response->statusLine.version = std::move(version);
-    msg.response->statusLine.reasonPhrase =
-        nx_http::StatusCode::toString(msg.response->statusLine.statusCode);
+    responseMessageContext.msg.response->statusLine.version = 
+        std::move(processingContext.httpVersion);
+    responseMessageContext.msg.response->statusLine.reasonPhrase =
+        nx_http::StatusCode::toString(
+            responseMessageContext.msg.response->statusLine.statusCode);
 
-    if (responseMsgBody)
+    if (responseMessageContext.msgBody)
     {
-        responseMsgBody->bindToAioThread(getAioThread());
-        if (responseMsgBody->mimeType().isEmpty())
+        responseMessageContext.msgBody->bindToAioThread(getAioThread());
+        if (responseMessageContext.msgBody->mimeType().isEmpty())
         {
             // Malformed message body? 
             // TODO: #ak Add assert here and ensure no one uses this path.
-            responseMsgBody.reset();
+            responseMessageContext.msgBody.reset();
         }
     }
 
-    addResponseHeaders(msg.response, responseMsgBody.get());
+    addResponseHeaders(
+        processingContext,
+        responseMessageContext.msg.response,
+        responseMessageContext.msgBody.get());
 
-    m_responseQueue.emplace_back(
-        std::move(msg),
-        std::move(responseMsgBody),
-        std::move(connectionEvents));
+    m_responseQueue.push_back(std::move(responseMessageContext));
     if (m_responseQueue.size() == 1)
         sendNextResponse();
 }
 
 void HttpServerConnection::addResponseHeaders(
+    const RequestProcessingContext& processingContext,
     nx_http::Response* response,
     nx_http::AbstractMsgBodySource* responseMsgBody)
 {
@@ -244,6 +253,16 @@ void HttpServerConnection::addResponseHeaders(
         nx_http::HttpHeader("Date", nx_http::formatDateTime(QDateTime::currentDateTime())));
 
     addMessageBodyHeaders(response, responseMsgBody);
+
+    if (response->statusLine.statusCode == nx_http::StatusCode::switchingProtocols)
+    {
+        nx_http::insertOrReplaceHeader(
+            &response->headers,
+            HttpHeader("Upgrade", processingContext.protocolToUpgradeTo));
+        nx_http::insertOrReplaceHeader(
+            &response->headers,
+            HttpHeader("Connection", "Upgrade"));
+    }
 }
 
 void HttpServerConnection::addMessageBodyHeaders(
@@ -279,7 +298,7 @@ void HttpServerConnection::sendNextResponse()
 {
     NX_ASSERT(!m_responseQueue.empty());
 
-    m_currentMsgBody = std::move(m_responseQueue.front().responseMsgBody);
+    m_currentMsgBody = std::move(m_responseQueue.front().msgBody);
     sendMessage(
         std::move(m_responseQueue.front().msg),
         std::bind(&HttpServerConnection::responseSent, this));

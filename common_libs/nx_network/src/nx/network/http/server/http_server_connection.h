@@ -87,19 +87,25 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
+    struct RequestProcessingContext
+    {
+        nx_http::MimeProtoVersion httpVersion;
+        nx_http::StringType protocolToUpgradeTo;
+    };
+
     struct ResponseMessageContext
     {
         nx_http::Message msg;
-        std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody;
+        std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody;
         ConnectionEvents connectionEvents;
 
         ResponseMessageContext(
             nx_http::Message msg,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
+            std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody,
             ConnectionEvents connectionEvents)
             :
             msg(std::move(msg)),
-            responseMsgBody(std::move(responseMsgBody)),
+            msgBody(std::move(msgBody)),
             connectionEvents(std::move(connectionEvents))
         {
         }
@@ -113,31 +119,37 @@ private:
     std::deque<ResponseMessageContext> m_responseQueue;
 
     void authenticate(nx_http::Message requestMessage);
+
     void onAuthenticationDone(
         nx_http::server::AuthenticationResult authenticationResult,
         nx_http::Message requestMessage);
+
+    RequestProcessingContext prepareRequestProcessingContext(
+        const nx_http::Request& request);
+
     void sendUnauthorizedResponse(
-        const nx_http::MimeProtoVersion& protoVersion,
-        boost::optional<header::WWWAuthenticate> wwwAuthenticate,
-        nx_http::HttpHeaders responseHeaders,
-        std::unique_ptr<AbstractMsgBodySource> msgBody);
+        RequestProcessingContext processingContext,
+        nx_http::server::AuthenticationResult authenticationResult);
+
     void dispatchRequest(
+        RequestProcessingContext processingContext,
         nx_http::server::AuthenticationResult authenticationResult,
         nx_http::Message requestMessage);
+
     void processResponse(
         std::shared_ptr<HttpServerConnection> strongThis,
-        nx_http::MimeProtoVersion version,
-        nx_http::Message msg,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
-        ConnectionEvents connectionEvents);
+        RequestProcessingContext processingContext,
+        ResponseMessageContext responseMessageContext);
+
     void prepareAndSendResponse(
-        nx_http::MimeProtoVersion version,
-        nx_http::Message response,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
-        ConnectionEvents connectionEvents = ConnectionEvents());
+        RequestProcessingContext processingContext,
+        ResponseMessageContext responseMessageContext);
+
     void addResponseHeaders(
+        const RequestProcessingContext& processingContext,
         nx_http::Response* response,
         nx_http::AbstractMsgBodySource* responseMsgBody);
+
     void addMessageBodyHeaders(
         nx_http::Response* response,
         nx_http::AbstractMsgBodySource* responseMsgBody);
