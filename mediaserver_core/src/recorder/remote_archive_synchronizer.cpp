@@ -35,7 +35,8 @@ static const QString kArchiveContainerExtension(".mkv");
 
 using namespace nx::core::resource;
 
-RemoteArchiveSynchronizer::RemoteArchiveSynchronizer()
+RemoteArchiveSynchronizer::RemoteArchiveSynchronizer():
+    m_terminated(false)
 {
     connect(
         qnResPool,
@@ -44,8 +45,23 @@ RemoteArchiveSynchronizer::RemoteArchiveSynchronizer()
         &RemoteArchiveSynchronizer::at_newResourceAdded);
 }
 
+RemoteArchiveSynchronizer::~RemoteArchiveSynchronizer()
+{
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_terminated = true;
+    }
+
+    cancelAllTasks();
+    waitForAllTasks();
+}
+
 void RemoteArchiveSynchronizer::at_newResourceAdded(const QnResourcePtr& resource)
 {
+    QnMutexLocker lock(&m_mutex);
+    if (m_terminated)
+        return;
+
     connect(
         resource.data(),
         &QnResource::initializedChanged,
@@ -55,6 +71,9 @@ void RemoteArchiveSynchronizer::at_newResourceAdded(const QnResourcePtr& resourc
 
 void RemoteArchiveSynchronizer::at_resourceInitializationChanged(const QnResourcePtr& resource)
 {
+    if (m_terminated)
+        return;
+
     auto securityCameraResource = resource.dynamicCast<QnSecurityCamResource>();
     if (!securityCameraResource)
         return;
@@ -63,12 +82,100 @@ void RemoteArchiveSynchronizer::at_resourceInitializationChanged(const QnResourc
         && securityCameraResource->hasCameraCapabilities(Qn::RemoteArchiveCapability); 
 
     if (!archiveCanBeSynchronized)
+    {
+        cancelTaskForResource(securityCameraResource->getId());
         return;
+    }
 
-    synchronizeArchive(securityCameraResource);
+    auto id = securityCameraResource->getId();
+    
+    auto task = std::make_shared<SynchronizationTask>();
+    task->setResource(securityCameraResource);
+    task->setDoneHandler([this, id](){removeTaskFromAwaited(id);});
+
+    {
+        if (m_terminated)
+            return;
+
+        QnMutexLocker lock(&m_mutex);
+        SynchronizationTaskContext context;
+        context.task = task;
+        context.result = QnConcurrent::run([task](){task->execute();});
+        m_syncTasks[id] = context; 
+    }
 }
 
-bool RemoteArchiveSynchronizer::synchronizeArchive(const QnSecurityCamResourcePtr& resource)
+void RemoteArchiveSynchronizer::removeTaskFromAwaited(const QnUuid& id)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    auto itr = m_syncTasks.find(id);
+    if (itr == m_syncTasks.end());
+        return;
+
+    m_syncTasks.erase(id);
+}
+
+void RemoteArchiveSynchronizer::cancelTaskForResource(const QnUuid& id)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto itr = m_syncTasks.find(id);
+    if (itr == m_syncTasks.end())
+        return;
+
+    auto context = itr->second;
+    context.task->cancel();
+}
+
+void RemoteArchiveSynchronizer::cancelAllTasks()
+{
+    QnMutexLocker lock(&m_mutex);
+    for (auto& entry: m_syncTasks)
+    {
+        auto context = entry.second;
+        context.task->cancel();
+    }
+}
+
+void RemoteArchiveSynchronizer::waitForAllTasks()
+{
+    decltype(m_syncTasks) copy;
+    {
+        QnMutexLocker lock(&m_mutex);
+        copy = m_syncTasks;
+    }
+
+    for (auto& item: copy)
+    {
+        auto context = item.second;
+        context.result.waitForFinished();
+    }
+}
+
+//------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------
+
+void SynchronizationTask::setResource(const QnSecurityCamResourcePtr& resource)
+{
+    m_resource = resource;
+}
+
+void SynchronizationTask::setDoneHandler(std::function<void()> handler)
+{
+    m_doneHandler = handler;
+}
+
+void SynchronizationTask::cancel()
+{
+    m_canceled = true;
+}
+
+bool SynchronizationTask::execute()
+{
+    return synchronizeArchive(m_resource);
+}
+
+bool SynchronizationTask::synchronizeArchive(const QnSecurityCamResourcePtr& resource)
 {
     qDebug() << "Starting archive synchronization.";
     NX_LOGX(lit("Starting archive synchronization."), cl_logDEBUG1);
@@ -81,6 +188,9 @@ bool RemoteArchiveSynchronizer::synchronizeArchive(const QnSecurityCamResourcePt
     // 1. Get list of records from camera.
     std::vector<RemoteArchiveEntry> sdCardArchiveEntries;
     manager->listAvailableArchiveEntries(&sdCardArchiveEntries);
+
+    if (m_canceled)
+        return false;
 
     // 2. Filter list (keep only needed records)
     auto filtered = filterEntries(resource, sdCardArchiveEntries);
@@ -97,10 +207,10 @@ bool RemoteArchiveSynchronizer::synchronizeArchive(const QnSecurityCamResourcePt
     NX_LOGX(lit("Archive synchronization is done."), cl_logDEBUG1);
 
     qnBusinessRuleConnector->at_remoteArchiveSyncFinished(resource);
-    return true; //< Seems to be nonsense
+    return true;
 }
 
-std::vector<RemoteArchiveEntry> RemoteArchiveSynchronizer::filterEntries(
+std::vector<RemoteArchiveEntry> SynchronizationTask::filterEntries(
     const QnSecurityCamResourcePtr& resource,
     const std::vector<RemoteArchiveEntry>& allEntries)
 {
@@ -113,6 +223,10 @@ std::vector<RemoteArchiveEntry> RemoteArchiveSynchronizer::filterEntries(
 
     for (const auto& entry : allEntries)
     {
+      
+        if (m_canceled)
+            return filtered;
+
         if (!catalog->containTime(entry.startTimeMs + entry.durationMs / 2))
         {
             qDebug() << "DOES NOT CONTAIN TIME" << entry.startTimeMs + entry.durationMs / 2 << entry.durationMs;
@@ -130,10 +244,13 @@ std::vector<RemoteArchiveEntry> RemoteArchiveSynchronizer::filterEntries(
     return filtered;
 }
 
-bool RemoteArchiveSynchronizer::moveEntryToArchive(
+bool SynchronizationTask::moveEntryToArchive(
     const QnSecurityCamResourcePtr& resource,
     const RemoteArchiveEntry& entry)
 {
+    if (m_canceled)
+        return false;
+
     BufferType buffer;
     auto manager = resource->remoteArchiveManager();
     if (!manager)
@@ -161,7 +278,7 @@ bool RemoteArchiveSynchronizer::moveEntryToArchive(
     return writeEntry(resource, entry, &buffer);
 }
 
-bool RemoteArchiveSynchronizer::writeEntry(
+bool SynchronizationTask::writeEntry(
     const QnSecurityCamResourcePtr& resource,
     const RemoteArchiveEntry& entry,
     BufferType* buffer)
@@ -249,7 +366,7 @@ bool RemoteArchiveSynchronizer::writeEntry(
         buffer->size());
 }
 
-bool RemoteArchiveSynchronizer::convertAndWriteBuffer(
+bool SynchronizationTask::convertAndWriteBuffer(
     const QnSecurityCamResourcePtr& resource,
     BufferType* buffer,
     const QString& fileName,
@@ -266,7 +383,7 @@ bool RemoteArchiveSynchronizer::convertAndWriteBuffer(
 
     const QString temporaryFilePath = QString::number(nx::utils::random::number());
     QnResourcePtr storageResource(new DummyResource());
-    resource->setUrl(temporaryFilePath); //< Check it if something doesn't work.
+    storageResource->setUrl(temporaryFilePath); //< Check it if something doesn't work.
 
     QnExtIODeviceStorageResourcePtr storage(new QnExtIODeviceStorageResource());
     storage->registerResourceData(temporaryFilePath, ioDevice);
@@ -308,7 +425,7 @@ bool RemoteArchiveSynchronizer::convertAndWriteBuffer(
     recorder.disableRegisterFile(true);
     recorder.setSaveMotionHandler(saveMotionHandler);
 
-    auto connection = connect(
+    auto connection = QObject::connect(
         resource.data(),
         &QnSecurityCamResource::motionRegionChanged,
         [&reader, &resource](const QnResourcePtr& res)
@@ -318,18 +435,21 @@ bool RemoteArchiveSynchronizer::convertAndWriteBuffer(
 
     while (auto mediaData = reader->getNextData())
     {
+        if (m_canceled)
+            break;
+
         if (mediaData->dataType == QnAbstractMediaData::EMPTY_DATA)
             break;
 
         recorder.processData(mediaData);
     }
 
-    disconnect(connection); //< TODO: #dmishin possible crash here
+    QObject::disconnect(connection); //< TODO: #dmishin possible crash here
 
     return true;
 }
 
-QnServer::ChunksCatalog RemoteArchiveSynchronizer::chunksCatalogByResolution(const QSize& resolution) const
+QnServer::ChunksCatalog SynchronizationTask::chunksCatalogByResolution(const QSize& resolution) const
 {
     const auto maxLowStreamArea = kMaxLowStreamResolution.width() * kMaxLowStreamResolution.height();
     const auto area = resolution.width() * resolution.height();
@@ -339,7 +459,7 @@ QnServer::ChunksCatalog RemoteArchiveSynchronizer::chunksCatalogByResolution(con
         : QnServer::ChunksCatalog::HiQualityCatalog;
 }
 
-bool RemoteArchiveSynchronizer::isMotionDetectionNeeded(
+bool SynchronizationTask::isMotionDetectionNeeded(
     const QnSecurityCamResourcePtr& resource,
     QnServer::ChunksCatalog catalog) const
 {

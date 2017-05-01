@@ -4,33 +4,33 @@
 #include <QtCore/QByteArray>
 
 #include <vector>
+#include <atomic>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/abstract_remote_archive_manager.h>
 #include <core/resource/resource_media_layout.h>
 #include <server/server_globals.h>
+#include <utils/common/concurrent.h>
 
 namespace nx {
 namespace mediaserver_core {
 namespace recorder {
 
-class RemoteArchiveSynchronizer: public QObject
+class SynchronizationTask
 {
-    Q_OBJECT
-
     using AbstractRemoteArchiveManager = nx::core::resource::AbstractRemoteArchiveManager;
     using RemoteArchiveEntry = nx::core::resource::RemoteArchiveEntry;
     using BufferType = QByteArray;
 
 public:
-    RemoteArchiveSynchronizer();
+    void setResource(const QnSecurityCamResourcePtr& resource);
+    void setDoneHandler(std::function<void()> handler);
+    void cancel();
 
-public slots:
-    void at_newResourceAdded(const QnResourcePtr& resource);
-    void at_resourceInitializationChanged(const QnResourcePtr& resource);
+    bool execute();
 
 private:
-    bool synchronizeArchive(const QnSecurityCamResourcePtr& manager);
+    bool synchronizeArchive(const QnSecurityCamResourcePtr& resource);
 
     std::vector<RemoteArchiveEntry> filterEntries(
         const QnSecurityCamResourcePtr& resource,
@@ -58,7 +58,47 @@ private:
     bool isMotionDetectionNeeded(
         const QnSecurityCamResourcePtr& resource,
         QnServer::ChunksCatalog catalog) const;
+
+private:
+    QnSecurityCamResourcePtr m_resource;
+    std::atomic<bool> m_canceled;
+    std::function<void()> m_doneHandler;
 };
+
+struct SynchronizationTaskContext
+{
+    std::shared_ptr<SynchronizationTask> task;
+    QnConcurrent::QnFuture<void> result;
+};
+
+
+class RemoteArchiveSynchronizer: public QObject
+{
+    Q_OBJECT
+
+public:
+    RemoteArchiveSynchronizer();
+    virtual ~RemoteArchiveSynchronizer();
+
+public slots:
+    void at_newResourceAdded(const QnResourcePtr& resource);
+    void at_resourceInitializationChanged(const QnResourcePtr& resource);
+
+private:
+    void removeTaskFromAwaited(const QnUuid& resource);
+    void cancelTaskForResource(const QnUuid& resource);
+    void cancelAllTasks();
+
+    void waitForAllTasks();
+
+private:
+    mutable QnMutex m_mutex;
+    std::map<QnUuid, SynchronizationTaskContext> m_syncTasks;
+    std::atomic<bool> m_terminated;
+};
+
+
+
 
 } // namespace recorder
 } // namespace mediaserver_core
