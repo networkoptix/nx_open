@@ -228,7 +228,7 @@ angular.module('webadminApp')
                     }
                     mouseYOverTimeline = event.offsetY || (event.pageY - $(canvas).offset().top);
 
-                    mouseOverElements = timelineRender.checkElementsUnderCursor(mouseXOverTimeline,mouseYOverTimeline);//,timelineActions.scrollingNow, timelineActions.catchScrollBar);
+                    mouseOverElements = timelineRender.checkElementsUnderCursor(mouseXOverTimeline,mouseYOverTimeline);
 
                 }
 

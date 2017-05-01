@@ -853,7 +853,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         }
     };
 
-    this.checkElementsUnderCursor = function(mouseX, mouseY){//, isScrolling, catchScrollBarSlider){
+    this.checkElementsUnderCursor = function(mouseX, mouseY){
         var result = {
             scrollbar: false,
             scrollbarSlider: false,
@@ -862,14 +862,14 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
             eventsRow: false
         };
 
-        var buttons = drawOrCheckScrollButtons(null, mouseX, mouseY);//, isScrolling);
+        var buttons = drawOrCheckScrollButtons(null, mouseX, mouseY);
         _.extend(result, buttons);
         if(result.leftButton || result.rightButton)
         {
             return result;
         }
 
-        var scrollbar = drawOrCheckScrollBar(null, mouseX, mouseY); //, catchScrollBarSlider);
+        var scrollbar = drawOrCheckScrollBar(null, mouseX, mouseY);
         _.extend(result, scrollbar);
         if(result.scrollbar){
             return result;
