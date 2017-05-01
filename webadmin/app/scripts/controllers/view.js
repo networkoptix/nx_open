@@ -246,7 +246,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
 
 
-            $scope.positionProvider.init(playing);
+            $scope.positionProvider.init(playing, timeCorrection);
             if(live){
                 playing = (new Date()).getTime();
             }else{
@@ -724,15 +724,20 @@ angular.module('webadminApp').controller('ViewCtrl',
         });
 
         mediaserver.getTime().then(function(result){
+            var clientDate = new Date();
 
             var serverTime = parseInt(result.data.reply.utcTime);
-            var clientTime = (new Date()).getTime();
+            var clientTime = clientDate.getTime();
             if(Math.abs(clientTime - serverTime) > minTimeLag){
                 timeCorrection = clientTime - serverTime;
             }
             
             $scope.serverTime.timeZoneOffset = parseInt(result.data.reply.timeZoneOffset);
-            $scope.serverTime.timeCorrection = timeCorrection;
+            $scope.serverTime.latency = timeCorrection;
+
+            if(Config.settingsConfig.useServerTime){
+                timeCorrection = $scope.serverTime.timeZoneOffset + clientDate.getTimezoneOffset() * 60000 - timeCorrection;
+            }
         });
 
         mediaserver.getCurrentUser().then(function(result) {

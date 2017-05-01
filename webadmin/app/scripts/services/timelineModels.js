@@ -640,7 +640,7 @@ function ShortCache(cameras,mediaserver,$q,timeCorrection){
 
     this.timeCorrection = timeCorrection || 0;
 }
-ShortCache.prototype.init = function(start){
+ShortCache.prototype.init = function(start, timeCorrection){
     this.liveMode = false;
     if(!start){
         this.liveMode = true;
@@ -656,6 +656,7 @@ ShortCache.prototype.init = function(start){
 
     this.lastPlayedPosition = 0; // Save the boundaries of uploaded cache
     this.lastPlayedDate = 0;
+    this.timeCorrection = timeCorrection || 0;
 
     this.update();
 };
@@ -863,7 +864,7 @@ function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initia
     this.updateCurrentInterval();
 
     this.timeZoneOffset = 0;
-    this.timeCorrection = 0;
+    this.latency = 0;
 }
 
 ScaleManager.prototype.updateTotalInterval = function(){
@@ -1268,11 +1269,12 @@ ScaleManager.prototype.lastMinute = function(){
 
 ScaleManager.prototype.updateServerOffset = function(serverOffset){
     this.timeZoneOffset = serverOffset.timeZoneOffset;
-    this.timeCorrection = serverOffset.timeCorrection;
+    this.latency = serverOffset.latency;
 };
 
 ScaleManager.prototype.serverTime = function(date){
     if(!this.useServerTime)
         return date;
-    return ((new Date(date)).getTime() + (new Date(date)).getTimezoneOffset() * 60000) + this.timeZoneOffset - this.timeCorrection;
+    var currentTime = new Date(date);
+    return (currentTime.getTime() + currentTime.getTimezoneOffset() * 60000) + this.timeZoneOffset - this.latency;
 };
