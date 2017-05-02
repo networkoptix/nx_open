@@ -405,6 +405,7 @@ void P2pConnection::startConnection()
 void P2pConnection::startReading()
 {
     using namespace std::placeholders;
+    m_miscData.lastDataTimer.restart();
     m_webSocket->readSomeAsync(
         &m_readBuffer,
         std::bind(&P2pConnection::onNewMessageRead, this, _1, _2));

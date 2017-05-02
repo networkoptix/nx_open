@@ -88,6 +88,8 @@ public:
 
         QVector<ApiPersistentIdData> localSubscription; //< local -> remote subscription
         QVector<ApiPersistentIdData> remoteSubscription; //< remote -> local subscription
+        QElapsedTimer lastDataTimer;
+        QElapsedTimer wantToResubscribeTimer;
     };
 
     MiscData& miscData();

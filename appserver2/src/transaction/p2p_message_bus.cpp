@@ -20,13 +20,13 @@ namespace {
 
     // How often send 'peers' message to the peer if something is changed
     // As soon as connection is opened first message is sent immediately
-    std::chrono::seconds sendPeersInfoInterval(5);
+    std::chrono::seconds sendPeersInfoInterval(15);
 
     // If new connection is recently established/closed, don't sent subscribe request to the peer
-    std::chrono::seconds subscribeIntervalLow(1);
+    static const int subscribeIntervalLowMs = 1000 * 3;
 
     // If new connections always established/closed too long time, send subscribe request anyway
-    std::chrono::seconds subscribeIntervalHigh(1);
+    static const int subscribeIntervalHiMs = 1000 * 15;
 
     int commitIntervalMs = 1000;
 } // namespace
@@ -202,8 +202,8 @@ void P2pMessageBus::createOutgoingConnections()
                 ConnectionLockGuard::Direction::Outgoing);
 
             P2pConnectionPtr connection(new P2pConnection(
-                commonModule(), 
-                remoteId, 
+                commonModule(),
+                remoteId,
                 localPeer(),
                 std::move(connectionLockGuard),
                 url));
@@ -486,8 +486,23 @@ P2pMessageBus::RouteToPeerMap P2pMessageBus::allPeersDistances() const
     return result;
 }
 
-bool P2pMessageBus::needSubscribeDelay()
+bool P2pMessageBus::needReSubscribeDelay(const P2pConnectionPtr& currentSubscription)
 {
+    //if (!m_lastPeerInfoTimer.isValid())
+    //    return false;
+    //if (m_lastPeerInfoTimer.elapsed() < subscribeIntervalLowMs)
+    //    return true;
+    QElapsedTimer& timer = currentSubscription->miscData().lastDataTimer;
+    if (timer.elapsed() < subscribeIntervalLowMs)
+    {
+        QElapsedTimer& wantToResubscribeTimer = currentSubscription->miscData().wantToResubscribeTimer;
+        if (!wantToResubscribeTimer.isValid())
+            wantToResubscribeTimer.restart();
+        if (wantToResubscribeTimer.elapsed() < subscribeIntervalHiMs)
+            return true;
+    }
+
+#if 0
     // If alive peers has been recently received, postpone subscription for some time.
     // This peer could be found via another neighbor.
     if (m_lastPeerInfoTimer.isValid())
@@ -510,13 +525,14 @@ bool P2pMessageBus::needSubscribeDelay()
         }
     }
     m_wantToSubscribeTimer.invalidate();
+#endif
     return false;
 }
 
 void P2pMessageBus::doSubscribe()
 {
-    if (needSubscribeDelay())
-        return;
+    //if (needSubscribeDelay())
+    //    return;
 
     QMap<ApiPersistentIdData, P2pConnectionPtr> currentSubscription = getCurrentSubscription();
     QMap<ApiPersistentIdData, P2pConnectionPtr> newSubscription = currentSubscription;
@@ -539,6 +555,9 @@ void P2pMessageBus::doSubscribe()
         qint32 minDistance = info.minDistance(&viaList);
         if (minDistance < subscribedDistance)
         {
+            if (subscribedVia && needReSubscribeDelay(subscribedVia))
+                continue;
+
             NX_ASSERT(!viaList.empty());
             // If any of connections with min distance subscribed to us then postpone our subscription.
             // It could happen if neighbor(or closer) peer just goes offline
@@ -700,6 +719,7 @@ void P2pMessageBus::at_gotMessage(
         result = handleSubscribeForDataUpdates(connection, payload);
         break;
     case MessageType::pushTransactionData:
+        connection->miscData().lastDataTimer.restart();
         result = handlePushTransactionData(connection, payload);
         break;
     default:
