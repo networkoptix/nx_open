@@ -76,8 +76,7 @@ def main():
     for idx, (host, port) in enumerate(read_servers(config)):
         server_name = 'Server_%d' % idx
         rest_api_url = 'http://%s:%s/' % (host, port)
-        server = Server('networkoptix', server_name, rest_api_url,
-                        host=host, internal_ip_port=port)
+        server = Server('networkoptix', server_name, rest_api_url, internal_ip_port=port)
         server._is_started = True
         server.load_system_settings()
         servers[server_name] = server
