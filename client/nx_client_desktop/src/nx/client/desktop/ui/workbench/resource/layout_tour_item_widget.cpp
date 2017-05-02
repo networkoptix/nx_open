@@ -24,6 +24,7 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_layout.h>
 
 namespace nx {
 namespace client {
@@ -176,6 +177,21 @@ void LayoutTourItemWidget::initOverlay()
     footerLayout->addStretch();
     footerLayout->addItem(delayHintLabel);
     footerLayout->addItem(delayWidget);
+
+    auto updateManualMode = [this, delayHintLabel, delayWidget]
+        {
+            const bool isManual = item()->layout()->data(Qn::LayoutTourIsManualRole).toBool();
+            delayHintLabel->setVisible(!isManual);
+            delayWidget->setVisible(!isManual);
+        };
+
+    connect(item()->layout(), &QnWorkbenchLayout::dataChanged, this,
+        [updateManualMode](int role)
+        {
+            if (role == Qn::LayoutTourIsManualRole)
+                updateManualMode();
+        });
+    updateManualMode();
 
     auto contentWidget = new LayoutPreviewWidget(m_previewPainter);
 

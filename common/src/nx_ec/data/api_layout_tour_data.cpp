@@ -20,6 +20,16 @@ bool ApiLayoutTourItemData::operator==(const ApiLayoutTourItemData& rhs) const
          && delayMs == rhs.delayMs;
 }
 
+bool ApiLayoutTourSettings::operator==(const ApiLayoutTourSettings& rhs) const
+{
+    return manual == rhs.manual;
+}
+
+bool ApiLayoutTourSettings::operator!=(const ApiLayoutTourSettings& rhs) const
+{
+    return !(*this == rhs);
+}
+
 bool ApiLayoutTourData::isValid() const
 {
     return !id.isNull();
@@ -34,7 +44,8 @@ bool ApiLayoutTourData::operator==(const ApiLayoutTourData& rhs) const
 {
     return id == rhs.id
         && name == rhs.name
-        && items == rhs.items;
+        && items == rhs.items
+        && settings == rhs.settings;
 }
 
 } // namespace ec2

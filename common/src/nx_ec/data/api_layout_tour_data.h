@@ -25,6 +25,9 @@ struct ApiLayoutTourItemData: ApiData
 struct ApiLayoutTourSettings: ApiData
 {
     bool manual = false;
+
+    bool operator==(const ApiLayoutTourSettings& rhs) const;
+    bool operator!=(const ApiLayoutTourSettings& rhs) const;
 };
 #define ApiLayoutTourSettings_Fields (manual)
 
