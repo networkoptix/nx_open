@@ -2209,8 +2209,6 @@ void MediaServerProcess::run()
         QnAppInfo::productName().toUtf8(), "US",
         QnAppInfo::organizationName().toUtf8());
 
-    auto remoteArchiveSynchronizer = 
-        std::make_unique<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer>();
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
     QScopedPointer<QnCameraHistoryPool> historyPool(new QnCameraHistoryPool());
     QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
@@ -2284,6 +2282,9 @@ void MediaServerProcess::run()
     );
 
     std::unique_ptr<QnFileDeletor> fileDeletor( new QnFileDeletor() );
+
+    auto remoteArchiveSynchronizer =
+        std::make_unique<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer>();
 
     connect(QnResourceDiscoveryManager::instance(), &QnResourceDiscoveryManager::CameraIPConflict, this, &MediaServerProcess::at_cameraIPConflict);
     connect(qnNormalStorageMan, &QnStorageManager::noStoragesAvailable, this, &MediaServerProcess::at_storageManager_noStoragesAvailable);

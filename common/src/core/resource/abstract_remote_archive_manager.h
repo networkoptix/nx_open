@@ -19,11 +19,11 @@ using BufferType = QByteArray;
 struct RemoteArchiveEntry 
 {
     QString id;
-    uint64_t startTimeMs = 0;
-    uint64_t durationMs = 0;
+    int64_t startTimeMs = 0;
+    int64_t durationMs = 0;
 
     RemoteArchiveEntry() = default;
-    RemoteArchiveEntry(QString _id, uint64_t _startTime, uint64_t _duration):
+    RemoteArchiveEntry(QString _id, int64_t _startTime, int64_t _duration):
         id(_id),
         startTimeMs(_startTime),
         durationMs(_duration)
@@ -53,8 +53,8 @@ public:
      */
     virtual bool listAvailableArchiveEntries(
         std::vector<RemoteArchiveEntry>* outArchiveEntries,
-        uint64_t startTimeMs = 0,
-        uint64_t endTimeMs = std::numeric_limits<uint64_t>::max()) = 0;
+        int64_t startTimeMs = 0,
+        int64_t endTimeMs = std::numeric_limits<int64_t>::max()) = 0;
 
     /**
      * Downloads specified entry content.

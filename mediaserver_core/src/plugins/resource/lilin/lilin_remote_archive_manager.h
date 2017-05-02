@@ -32,8 +32,8 @@ public:
     // Implementation of AbstractRemoteArchiveManager::listAvailableArchiveEntries 
     virtual bool listAvailableArchiveEntries(
         std::vector<RemoteArchiveEntry>* outArchiveEntries,
-        uint64_t startTimeMs = 0,
-        uint64_t endTimeMs = std::numeric_limits<uint64_t>::max()) override;
+        int64_t startTimeMs = 0,
+        int64_t endTimeMs = std::numeric_limits<int64_t>::max()) override;
 
     // Implementation of AbstractRemoteArchiveManager::fetchArchiveEntries
     virtual bool fetchArchiveEntry(const QString& entryId, BufferType* outBuffer) override;
@@ -52,14 +52,14 @@ private:
     std::unique_ptr<nx_http::HttpClient> initHttpClient() const;
     boost::optional<nx_http::BufferType> doRequest(const QString& requestPath, bool expectOnlyBody = false);
 
-    boost::optional<uint64_t> getRecordingBound(RecordingBound bound);
-    boost::optional<uint64_t> getRecordingStart();
-    boost::optional<uint64_t> getRecordingEnd();
+    boost::optional<int64_t> getRecordingBound(RecordingBound bound);
+    boost::optional<int64_t> getRecordingStart();
+    boost::optional<int64_t> getRecordingEnd();
 
     std::vector<QString> getDirectoryList();
     bool fetchFileList(const QString& directory, std::vector<QString>* outFileLists);
 
-    boost::optional<uint64_t> parseDate(
+    boost::optional<int64_t> parseDate(
         const QString& dateTimeStr,
         const QString& dateTimeFormat);
 

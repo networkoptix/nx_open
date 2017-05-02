@@ -3,6 +3,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QByteArray>
 
+#include <set>
+#include <map>
 #include <vector>
 #include <atomic>
 
@@ -36,14 +38,15 @@ private:
         const QnSecurityCamResourcePtr& resource,
         const std::vector<RemoteArchiveEntry>& allEntries);
 
-    bool moveEntryToArchive(
+    bool copyEntryToArchive(
         const QnSecurityCamResourcePtr& resource,
         const RemoteArchiveEntry& entry);
 
     bool writeEntry(
         const QnSecurityCamResourcePtr& resource,
         const RemoteArchiveEntry& entry,
-        BufferType* buffer);
+        BufferType* buffer,
+        qint64* outRealDurationMs = nullptr);
 
     bool convertAndWriteBuffer(
         const QnSecurityCamResourcePtr& resource,
@@ -83,8 +86,11 @@ public:
 public slots:
     void at_newResourceAdded(const QnResourcePtr& resource);
     void at_resourceInitializationChanged(const QnResourcePtr& resource);
+    void at_resourceParentIdChanged(const QnResourcePtr& resource);
 
 private:
+    void makeAndRunTaskUnsafe(const QnSecurityCamResourcePtr& resoource);
+
     void removeTaskFromAwaited(const QnUuid& resource);
     void cancelTaskForResource(const QnUuid& resource);
     void cancelAllTasks();
@@ -93,11 +99,10 @@ private:
 
 private:
     mutable QnMutex m_mutex;
+    std::set<QnUuid> m_delayedTasks;
     std::map<QnUuid, SynchronizationTaskContext> m_syncTasks;
     std::atomic<bool> m_terminated;
 };
-
-
 
 
 } // namespace recorder

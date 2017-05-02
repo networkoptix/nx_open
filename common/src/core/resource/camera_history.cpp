@@ -142,11 +142,10 @@ QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
 
                 if (healthMessage == QnSystemHealth::RemoteArchiveSyncFinished)
                 {
-                    auto neededCameras = eventParams.metadata.cameraRefs;
-                    if (neededCameras.empty())
+                    if (eventParams.metadata.cameraRefs.empty())
                         return;
 
-                    cameras.push_back(neededCameras[0]);
+                    cameras = eventParams.metadata.cameraRefs;
                 }
                 else
                 {

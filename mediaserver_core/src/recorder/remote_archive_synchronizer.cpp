@@ -6,6 +6,7 @@
 #include <transcoding/transcoding_utils.h>
 #include <utils/common/util.h>
 #include <motion/motion_helper.h>
+#include <database/server_db.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
@@ -67,11 +68,17 @@ void RemoteArchiveSynchronizer::at_newResourceAdded(const QnResourcePtr& resourc
         &QnResource::initializedChanged,
         this,
         &RemoteArchiveSynchronizer::at_resourceInitializationChanged);
+
+    connect(
+        resource.data(),
+        &QnResource::parentIdChanged,
+        this,
+        &RemoteArchiveSynchronizer::at_resourceParentIdChanged);
 }
 
 void RemoteArchiveSynchronizer::at_resourceInitializationChanged(const QnResourcePtr& resource)
 {
-    if (m_terminated)
+    if (m_terminated || resource->hasFlags(Qn::foreigner))
         return;
 
     auto securityCameraResource = resource.dynamicCast<QnSecurityCamResource>();
@@ -87,22 +94,31 @@ void RemoteArchiveSynchronizer::at_resourceInitializationChanged(const QnResourc
         return;
     }
 
-    auto id = securityCameraResource->getId();
-    
-    auto task = std::make_shared<SynchronizationTask>();
-    task->setResource(securityCameraResource);
-    task->setDoneHandler([this, id](){removeTaskFromAwaited(id);});
-
     {
         QnMutexLocker lock(&m_mutex);
-        if (m_terminated)
-            return;
-
-        SynchronizationTaskContext context;
-        context.task = task;
-        context.result = QnConcurrent::run([task](){task->execute();});
-        m_syncTasks[id] = context; 
+        makeAndRunTaskUnsafe(securityCameraResource);
     }
+}
+
+void RemoteArchiveSynchronizer::at_resourceParentIdChanged(const QnResourcePtr& resource)
+{
+    cancelTaskForResource(resource->getId());
+}
+
+void RemoteArchiveSynchronizer::makeAndRunTaskUnsafe(const QnSecurityCamResourcePtr& resource)
+{
+    if (m_terminated)
+        return;
+
+    auto id = resource->getId();
+    auto task = std::make_shared<SynchronizationTask>();
+    task->setResource(resource);
+    task->setDoneHandler([this, id]() { removeTaskFromAwaited(id); });
+
+    SynchronizationTaskContext context;
+    context.task = task;
+    context.result = QnConcurrent::run([task]() { task->execute(); });
+    m_syncTasks[id] = context;    
 }
 
 void RemoteArchiveSynchronizer::removeTaskFromAwaited(const QnUuid& id)
@@ -194,9 +210,9 @@ bool SynchronizationTask::synchronizeArchive(const QnSecurityCamResourcePtr& res
 
     qnBusinessRuleConnector->at_remoteArchiveSyncStarted(resource);
 
-    // 3. In cycle move all records to archive.
+    // 3. In cycle copy all records to archive.
     for (const auto& entry : filtered)
-        moveEntryToArchive(resource, entry);
+        copyEntryToArchive(resource, entry);
 
     qDebug() << "Archive synchronization is done.";
     NX_LOGX(lit("Archive synchronization is done."), cl_logDEBUG1);
@@ -209,22 +225,40 @@ std::vector<RemoteArchiveEntry> SynchronizationTask::filterEntries(
     const QnSecurityCamResourcePtr& resource,
     const std::vector<RemoteArchiveEntry>& allEntries)
 {
+    NX_ASSERT(
+        qnNormalStorageMan,
+        lit("Storage manager should be initialized before archive synchronizer"));
+
     auto uniqueId = resource->getUniqueId();
     auto catalog = qnNormalStorageMan->getFileCatalog(
         uniqueId,
         DeviceFileCatalog::prefixByCatalog(QnServer::ChunksCatalog::HiQualityCatalog));
 
-    std::vector<RemoteArchiveEntry> filtered;
+    auto serverDb = QnServerDb::instance();
+    if (!serverDb)
+        return std::vector<RemoteArchiveEntry>();
 
+    auto lastSyncTimeMs = serverDb->getLastRemoteArchiveSyncTimeMs(resource);
+
+    std::vector<RemoteArchiveEntry> filtered;
     for (const auto& entry : allEntries)
     {
-      
         if (m_canceled)
             return filtered;
 
-        if (!catalog->containTime(entry.startTimeMs + entry.durationMs / 2))
+        bool needSyncEntry = (lastSyncTimeMs < (int64_t)(entry.startTimeMs + entry.durationMs))
+            && !catalog->containTime(entry.startTimeMs + entry.durationMs / 2);
+
+        qDebug() << "ENTRY NEED TO BE SYNCHRONIZED:" << needSyncEntry
+            << "(CONTAIN TIME)" << catalog->containTime(entry.startTimeMs + entry.durationMs / 2)
+            << "(LESS)" << (lastSyncTimeMs < (entry.startTimeMs + entry.durationMs)) << (entry.startTimeMs + entry.durationMs)
+            << "(LASTSYNC TIME)" << lastSyncTimeMs
+            << "(ENTRY END TIME)" << entry.startTimeMs + entry.durationMs
+            << "(MIDDLE)" << entry.startTimeMs + entry.durationMs / 2
+            << "(DURATION)" << entry.durationMs;
+
+        if (needSyncEntry)
         {
-            qDebug() << "DOES NOT CONTAIN TIME" << entry.startTimeMs + entry.durationMs / 2 << entry.durationMs;
             filtered.push_back(entry);
         }
     }
@@ -239,12 +273,16 @@ std::vector<RemoteArchiveEntry> SynchronizationTask::filterEntries(
     return filtered;
 }
 
-bool SynchronizationTask::moveEntryToArchive(
+bool SynchronizationTask::copyEntryToArchive(
     const QnSecurityCamResourcePtr& resource,
     const RemoteArchiveEntry& entry)
 {
     if (m_canceled)
         return false;
+
+    auto serverDb = QnServerDb::instance();
+    if (!serverDb)
+        return serverDb;
 
     BufferType buffer;
     auto manager = resource->remoteArchiveManager();
@@ -270,13 +308,19 @@ bool SynchronizationTask::moveEntryToArchive(
             .arg(buffer.size()),
         cl_logDEBUG1);
 
-    return writeEntry(resource, entry, &buffer);
+    int64_t realDurationMs = 0;
+    result = writeEntry(resource, entry, &buffer, &realDurationMs);
+    if (result)
+        serverDb->updateLastRemoteArchiveSyncTimeMs(resource, entry.startTimeMs + realDurationMs);
+
+    return result;
 }
 
 bool SynchronizationTask::writeEntry(
     const QnSecurityCamResourcePtr& resource,
     const RemoteArchiveEntry& entry,
-    BufferType* buffer)
+    BufferType* buffer,
+    qint64* outRealDurationMs)
 {
     QBuffer ioDevice;
     ioDevice.setBuffer(buffer);
@@ -291,10 +335,10 @@ bool SynchronizationTask::writeEntry(
         return false;
     }
 
-    const uint64_t kEpsilonMs = 100;
+    const int64_t kEpsilonMs = 100;
     int64_t realDurationMs = std::round(helper.durationMs());
 
-    auto diff = entry.durationMs - realDurationMs;
+    int64_t diff = entry.durationMs - realDurationMs;
     if (diff < 0)
         diff = -diff;
 
@@ -354,6 +398,9 @@ bool SynchronizationTask::writeEntry(
     if (!succesfulWrite)
         return false; //< Should we call fileFinished?
 
+    if (outRealDurationMs)
+        *outRealDurationMs = realDurationMs;
+
     return qnNormalStorageMan->fileFinished(
         realDurationMs,
         fileNameWithExtension,
@@ -378,15 +425,15 @@ bool SynchronizationTask::convertAndWriteBuffer(
 
     const QString temporaryFilePath = QString::number(nx::utils::random::number());
     QnResourcePtr storageResource(new DummyResource());
-    storageResource->setUrl(temporaryFilePath); //< Check it if something doesn't work.
+    storageResource->setUrl(temporaryFilePath);
 
     QnExtIODeviceStorageResourcePtr storage(new QnExtIODeviceStorageResource());
     storage->registerResourceData(temporaryFilePath, ioDevice);
 
     using namespace  nx::mediaserver_core::plugins;
     std::shared_ptr<QnAviArchiveDelegate> reader(needMotion
-        ? new QnAviArchiveDelegate()
-        : new AviMotionArchiveDelegate());
+        ? new AviMotionArchiveDelegate()
+        : new QnAviArchiveDelegate());
 
     reader->setStorage(storage);
     if (!reader->open(storageResource))
@@ -420,14 +467,6 @@ bool SynchronizationTask::convertAndWriteBuffer(
     recorder.disableRegisterFile(true);
     recorder.setSaveMotionHandler(saveMotionHandler);
 
-    auto connection = QObject::connect(
-        resource.data(),
-        &QnSecurityCamResource::motionRegionChanged,
-        [&reader, &resource](const QnResourcePtr& res)
-        {
-            reader->setMotionRegion(resource->getMotionRegion(0));
-        });
-
     while (auto mediaData = reader->getNextData())
     {
         if (m_canceled)
@@ -438,8 +477,6 @@ bool SynchronizationTask::convertAndWriteBuffer(
 
         recorder.processData(mediaData);
     }
-
-    QObject::disconnect(connection); //< TODO: #dmishin possible crash here
 
     return true;
 }
@@ -474,3 +511,4 @@ bool SynchronizationTask::isMotionDetectionNeeded(
 } // namespace reorder
 } // namespace mediaserver_core
 } // namespace nx
+

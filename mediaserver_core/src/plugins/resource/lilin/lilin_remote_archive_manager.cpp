@@ -8,6 +8,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <utils/common/util.h>
 
+
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
@@ -46,8 +47,8 @@ LilinRemoteArchiveManager::~LilinRemoteArchiveManager()
 
 bool LilinRemoteArchiveManager::listAvailableArchiveEntries(
     std::vector<RemoteArchiveEntry>* outArchiveEntries, 
-    uint64_t startTimeMs,
-    uint64_t endTimeMs)
+    int64_t startTimeMs,
+    int64_t endTimeMs)
 {
     auto dirs = getDirectoryList();
 
@@ -73,7 +74,7 @@ bool LilinRemoteArchiveManager::listAvailableArchiveEntries(
                 continue;
         }
 
-        const uint64_t kMillisecondsInMinute = 60000;
+        const int64_t kMillisecondsInMinute = 60000;
 
         auto duration = nextChunkStartMs
             ? nextChunkStartMs.get() - currentChunkStartMs.get()
@@ -85,7 +86,7 @@ bool LilinRemoteArchiveManager::listAvailableArchiveEntries(
             duration);
     }
 
-    return true; //< TODO #dmishin absolutely useless
+    return true;
 }
 
 bool LilinRemoteArchiveManager::fetchArchiveEntry(const QString& entryId, BufferType* outBuffer)
@@ -153,7 +154,7 @@ boost::optional<nx_http::BufferType> LilinRemoteArchiveManager::doRequest(const 
     return response;
 }
 
-boost::optional<uint64_t> LilinRemoteArchiveManager::getRecordingBound(RecordingBound bound)
+boost::optional<int64_t> LilinRemoteArchiveManager::getRecordingBound(RecordingBound bound)
 {
     auto path = bound == RecordingBound::start
         ? kStartDatePath
@@ -167,12 +168,12 @@ boost::optional<uint64_t> LilinRemoteArchiveManager::getRecordingBound(Recording
     return datetime;
 }
 
-boost::optional<uint64_t> LilinRemoteArchiveManager::getRecordingStart()
+boost::optional<int64_t> LilinRemoteArchiveManager::getRecordingStart()
 {
     return getRecordingBound(RecordingBound::start);
 }
 
-boost::optional<uint64_t> LilinRemoteArchiveManager::getRecordingEnd()
+boost::optional<int64_t> LilinRemoteArchiveManager::getRecordingEnd()
 {
     return getRecordingBound(RecordingBound::end);
 }
@@ -212,7 +213,7 @@ bool LilinRemoteArchiveManager::fetchFileList(const QString& directory, std::vec
     return true;
 }
 
-boost::optional<uint64_t> LilinRemoteArchiveManager::parseDate(const QString& dateTimeStr, const QString& dateTimeFormat)
+boost::optional<int64_t> LilinRemoteArchiveManager::parseDate(const QString& dateTimeStr, const QString& dateTimeFormat)
 {
     auto dateTime = QDateTime::fromString(dateTimeStr, dateTimeFormat);
 
