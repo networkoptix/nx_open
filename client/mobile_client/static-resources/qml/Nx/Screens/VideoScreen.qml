@@ -386,27 +386,41 @@ PageBase
                 width: parent.width
                 height: Math.max(presetsItem.height)
 
-                PtzPresetsItem
+                Row
                 {
-                    id: presetsItem
-
-                    property bool supportsPresets:
-                        ptzController.capabilities & Ptz.PresetsPtzCapability
-
-                    visible: ptzController.presetsCount && supportsPresets
-
-                    presetsCount: ptzController.presetsCount
                     anchors.left: parent.left
                     anchors.right: hidePtzButton.left
-                    currentPresetIndex: ptzController.activePresetIndex
+                    visible: ptzController.presetsCount && supportsPresets
 
-                    onGoToPreset:
+                    PtzPresetsButton
                     {
-                        if (presetIndex == -1)
-                            return;
+                        id: goToPresetMenu
 
-                        if (!ptzController.setPreset(presetIndex))
-                            console.log("+++++++++++ can't set preset: ", presetIndex);
+                        uniqueResourceId: ptzController.uniqueResourceId
+                        popupParent: videoScreen
+
+                        onPresetChoosen: { ptzController.setPresetById(id) }
+                    }
+
+                    PtzPresetsItem
+                    {
+                        id: presetsItem
+
+                        property bool supportsPresets:
+                            ptzController.capabilities & Ptz.PresetsPtzCapability
+
+                        visible: ptzController.presetsCount && supportsPresets
+
+                        presetsCount: ptzController.presetsCount
+                        currentPresetIndex: ptzController.activePresetIndex
+
+                        onGoToPreset:
+                        {
+                            if (presetIndex == -1)
+                                return;
+
+                            ptzController.setPresetByIndex(presetIndex)
+                        }
                     }
                 }
 

@@ -33,6 +33,7 @@
 #include <settings/qml_settings_adaptor.h>
 #include <nx/mobile_client/helpers/inter_client_message.h>
 #include <nx/mobile_client/controllers/resource_ptz_controller.h>
+#include <nx/mobile_client/models/ptz_preset_model.h>
 
 using namespace nx::client::mobile;
 
@@ -85,6 +86,8 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
         "com.networkoptix.qml", 1, 0, "DeveloperSettingsHelper");
     qmlRegisterType<nx::client::mobile::ResourcePtzController>(
         "com.networkoptix.qml", 1, 0, "PtzController");
+    qmlRegisterType<nx::client::mobile::PtzPresetModel>(
+        "com.networkoptix.qml", 1, 0, "PtzPresetModel");
 
     qmlRegisterRevision<QQuickTextInput, 6>("Nx.Controls", 1, 0);
     qmlRegisterRevision<QQuickItem, 1>("Nx.Controls", 1, 0);

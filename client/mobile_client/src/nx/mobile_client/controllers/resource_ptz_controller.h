@@ -37,7 +37,8 @@ public: // Properties section
 
 public:
     Q_INVOKABLE bool setAutoFocus();
-    Q_INVOKABLE bool setPreset(int index);
+    Q_INVOKABLE bool setPresetByIndex(int index);
+    Q_INVOKABLE bool setPresetById(const QString& id);
 
 signals:
     void uniqueResourceIdChanged();

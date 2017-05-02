@@ -2,75 +2,55 @@ import QtQuick 2.6
 import Nx.Controls 1.0
 import Nx 1.0
 
-Item
+Flickable
 {
     id: control
 
     property int presetsCount: 0
     property int currentPresetIndex: -1
 
-    signal presetsButtonClicked()
     signal goToPreset(int presetIndex)
 
-    implicitWidth: presetsButton.width
-    implicitHeight: presetsButton.height
+    clip: true
+    width: parent.width
+    height: parent.height
 
-    Button
+    flickableDirection: Flickable.HorizontalFlick
+    boundsBehavior: Flickable.StopAtBounds
+    contentWidth: presetButtonRow.width
+    contentHeight: presetButtonRow.height
+
+    Row
     {
-        id: presetsButton
-        height: 48
-        flat: true
+        id: presetButtonRow
 
-        text: qsTr("PRESETS")
-        onClicked: { control.presetsButtonClicked() }
-    }
+        spacing: 0
 
-    Flickable
-    {
-        id: flickable
-
-        clip: true
-        x: presetsButton.width
-        width: parent.width - x
-        height: parent.height
-
-        flickableDirection: Flickable.HorizontalFlick
-        boundsBehavior: Flickable.StopAtBounds
-        contentWidth: presetButtonRow.width
-        contentHeight: presetButtonRow.height
-
-        Row
+        Repeater
         {
-            id: presetButtonRow
+            id: repeater
 
-            spacing: 0
+            model: control.presetsCount
 
-            Repeater
+            delegate: MouseArea
             {
-                id: repeater
+                width: 32
+                height: 48
 
-                model: control.presetsCount
-
-                delegate: MouseArea
+                Text
                 {
-                    width: 32
-                    height: presetsButton.height
+                    anchors.centerIn: parent
 
-                    Text
-                    {
-                        anchors.centerIn: parent
+                    color: index == currentPresetIndex
+                        ? ColorTheme.windowText
+                        : ColorTheme.transparent(ColorTheme.windowText, 0.2)
 
-                        color: index == currentPresetIndex
-                            ? ColorTheme.windowText
-                            : ColorTheme.transparent(ColorTheme.windowText, 0.2)
-
-                        font.pixelSize: 16
-                        font.weight: Font.DemiBold
-                        text: index + 1
-                    }
-
-                    onClicked: { control.goToPreset(index) }
+                    font.pixelSize: 16
+                    font.weight: Font.DemiBold
+                    text: index + 1
                 }
+
+                onClicked: { control.goToPreset(index) }
             }
         }
     }

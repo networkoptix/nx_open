@@ -37,10 +37,7 @@ ResourcePtzController::ResourcePtzController(QObject* parent):
                 emit activePresetIndexChanged();
             }
             if (fields.testFlag(Qn::ActiveObjectPtzField))
-            {
-                qDebug() << "---------- active object changed";
                 emit activePresetIndexChanged();
-            }
         });
 
     connect(this, &base_type::baseControllerChanged, this,
@@ -96,19 +93,11 @@ int ResourcePtzController::presetsCount() const
 int ResourcePtzController::activePresetIndex() const
 {
     if (!supports(Qn::GetActiveObjectPtzCommand))
-    {
-        qDebug() << "---------- not supported";
         return -1;
-    }
 
     QnPtzObject activeObject;
     if (!getActiveObject(&activeObject) || activeObject.type != Qn::PresetPtzObject)
-    {
-        qDebug() << "---------- not active object";
         return -1;
-    }
-
-    qDebug() << "---------- active object id:" << activeObject.id;
 
     QnPtzPresetList presets;
     if (!getPresets(&presets))
@@ -122,7 +111,7 @@ int ResourcePtzController::activePresetIndex() const
     return -1;
 }
 
-bool ResourcePtzController::setPreset(int index)
+bool ResourcePtzController::setPresetByIndex(int index)
 {
     if (!getCapabilities().testFlag(Ptz::PresetsPtzCapability)
         || !qBetween(0, index, presetsCount()))
@@ -133,6 +122,22 @@ bool ResourcePtzController::setPreset(int index)
     QnPtzPresetList presets;
     return getPresets(&presets) && activatePreset(presets.at(index).id,
         QnAbstractPtzController::MaxPtzSpeed);
+}
+
+bool ResourcePtzController::setPresetById(const QString& id)
+{
+    if (!getCapabilities().testFlag(Ptz::PresetsPtzCapability))
+        return false;
+
+    QnPtzPresetList presets;
+    if (!getPresets(&presets))
+        return false;
+
+    const bool found = std::find_if(presets.begin(), presets.end(),
+        [id](const QnPtzPreset& preset) { return id == preset.id; }) != presets.end();
+
+    return found && activatePreset(id, QnAbstractPtzController::MaxPtzSpeed);
+
 }
 
 bool ResourcePtzController::setAutoFocus()
