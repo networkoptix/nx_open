@@ -10,6 +10,7 @@ Item
     property int currentPresetIndex: -1
 
     signal presetsButtonClicked()
+    signal goToPreset(int presetIndex)
 
     implicitWidth: presetsButton.width
     implicitHeight: presetsButton.height
@@ -68,7 +69,7 @@ Item
                         text: index + 1
                     }
 
-                    onClicked: { control.currentPresetIndex = index }
+                    onClicked: { control.goToPreset(index) }
                 }
             }
         }

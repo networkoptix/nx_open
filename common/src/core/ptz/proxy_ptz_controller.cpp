@@ -165,7 +165,7 @@ bool QnProxyPtzController::getTours(QnPtzTourList* tours)
         : false;
 }
 
-bool QnProxyPtzController::getActiveObject(QnPtzObject* activeObject)
+bool QnProxyPtzController::getActiveObject(QnPtzObject* activeObject) const
 {
     return m_controller
         ? m_controller->getActiveObject(activeObject)

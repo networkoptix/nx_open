@@ -45,7 +45,8 @@ bool QnAbstractPtzController::getData(Qn::PtzDataFields query, QnPtzData *data)
     return true;
 }
 
-bool QnAbstractPtzController::supports(Qn::PtzCommand command) {
+bool QnAbstractPtzController::supports(Qn::PtzCommand command) const
+{
     Ptz::Capabilities capabilities = getCapabilities();
 
     switch (command) {
@@ -81,6 +82,10 @@ bool QnAbstractPtzController::supports(Qn::PtzCommand command) {
     case Qn::ActivatePresetPtzCommand:
     case Qn::GetPresetsPtzCommand:
         return (capabilities & Ptz::Capability::PresetsPtzCapability);
+
+    case Qn::GetActiveObjectPtzCommand:
+        return capabilities.testFlag(Ptz::Capability::PresetsPtzCapability)
+            || capabilities.testFlag(Ptz::Capability::ToursPtzCapability);
 
     case Qn::CreateTourPtzCommand:
     case Qn::RemoveTourPtzCommand:

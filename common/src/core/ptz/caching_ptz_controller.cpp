@@ -161,7 +161,8 @@ bool QnCachingPtzController::getTours(QnPtzTourList *tours) {
     }
 }
 
-bool QnCachingPtzController::getActiveObject(QnPtzObject *activeObject) {
+bool QnCachingPtzController::getActiveObject(QnPtzObject* activeObject) const
+{
     if(!base_type::getActiveObject(activeObject))
         return false;
 

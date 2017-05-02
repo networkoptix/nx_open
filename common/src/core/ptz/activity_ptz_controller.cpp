@@ -106,7 +106,8 @@ bool QnActivityPtzController::activateTour(const QString &tourId) {
     return true;
 }
 
-bool QnActivityPtzController::getActiveObject(QnPtzObject *activeObject) {
+bool QnActivityPtzController::getActiveObject(QnPtzObject* activeObject) const
+{
     *activeObject = m_adaptor->value();
     return true;
 }

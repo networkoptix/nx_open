@@ -147,11 +147,10 @@ Rectangle
                     return
 
                 case kEightWayPtz: //< Fallthrough
-                case kFreeWayPtz:
+                case kFreeWayPtz: //< Fallthrough
+                default:
                     return //< We don't need to draw delimiter lines
 
-                default:
-                    throw "Invalid ptz type"
             }
         }
     }
@@ -243,7 +242,7 @@ Rectangle
 
     Repeater
     {
-        model: d.currentSectionData.buttons.length
+        model: d.currentSectionData ? d.currentSectionData.buttons.length : 0
 
         delegate: Image
         {
@@ -332,7 +331,7 @@ Rectangle
           * 2 is "go up-left" command
           * .. etc
           *
-          * All ptz with less ways count should map their sectors for listed above.
+          * All ptz with less ways count should map their sectors to listed above.
           * For example, four-way ptz layout is:
           *   1
           * 3 - 4
@@ -354,13 +353,13 @@ Rectangle
                 case kFreeWayPtz:
                     return kFreeWayPtzSectorData
                 default:
-                    throw "Invalid ptz type"
+                    return null //< No ptz supported
             }
         }
 
         property int currentSectionIndex:
         {
-            if (control.ptzType == kFreeWayPtz)
+            if (control.ptzType == kFreeWayPtz || !currentSectionData)
                 return -1
 
             var sectorsCount = currentSectionData.sectorsMapping.length
@@ -380,7 +379,7 @@ Rectangle
 
         property int currentSectionId:
         {
-            return control.ptzType == kFreeWayPtz || currentSectionIndex < 0
+            return control.ptzType == kFreeWayPtz || currentSectionIndex < 0 || !currentSectionData
                 ? -1
                 : currentSectionData.sectorsMapping[currentSectionIndex]
         }

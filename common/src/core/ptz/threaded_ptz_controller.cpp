@@ -175,7 +175,8 @@ bool QnThreadedPtzController::getTours(QnPtzTourList *) {
     RUN_COMMAND(Qn::GetToursPtzCommand, QnPtzTourList, result, getTours, &result);
 }
 
-bool QnThreadedPtzController::getActiveObject(QnPtzObject *) {
+bool QnThreadedPtzController::getActiveObject(QnPtzObject* /* object */) const
+{
     RUN_COMMAND(Qn::GetActiveObjectPtzCommand, QnPtzObject, result, getActiveObject, &result);
 }
 

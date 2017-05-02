@@ -11,10 +11,11 @@ class QnActivityPtzController: public QnProxyPtzController {
     typedef QnProxyPtzController base_type;
 
 public:
-    enum Mode {
-        Local,
-        Client,
-        Server
+    enum Mode
+    {
+        Local, //< Fisheye mode
+        Client, //< Client mode. Does not change resource properties
+        Server //< Used at the server side (PTZ preset as an action, for example)
     };
 
     QnActivityPtzController(Mode mode, const QnPtzControllerPtr &baseController);
@@ -34,7 +35,7 @@ public:
     virtual bool removeTour(const QString &tourId) override;
     virtual bool activateTour(const QString &tourId) override;
 
-    virtual bool getActiveObject(QnPtzObject *activeObject) override;
+    virtual bool getActiveObject(QnPtzObject* activeObject) const override;
 
     virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override;
 

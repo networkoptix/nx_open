@@ -286,6 +286,7 @@ PageBase
                     id: zoomFocusRow
 
                     spacing: 8
+
                     PtzFocusControl
                     {
                         id: focusPanel
@@ -326,7 +327,7 @@ PageBase
                         onZoomOutPressedChanged:
                         {
                             var zoomVector = zoomOutPressed
-                                ? Qt.vector3d(0, 0, 0.5)
+                                ? Qt.vector3d(0, 0, -0.5)
                                 : Qt.vector3d(0, 0, 0)
 
                             ptzController.continuousMove(zoomVector)
@@ -338,16 +339,38 @@ PageBase
                 {
                     id: ptzJoystick
 
-                    ptzType: 2
+                    ptzType:
+                    {
+                        if (!enabled)
+                            return -1
+
+                        var caps = ptzController.capabilities
+                        if (caps & Ptz.ContinuousPanTiltCapabilities)
+                        {
+                            if (caps & Ptz.EightWayPtzTrait)
+                                return kEightWayPtz
+                            if (caps & Ptz.FourWayPtzTrait)
+                                return kFourWayPtz
+
+                            return kFreeWayPtz
+                        }
+
+                        if (caps & Ptz.ContinuousPanCapability)
+                            return kTwoWayHorizontal
+
+                        if (caps & Ptz.ContinuousTiltCapability)
+                            return kTwoWayVertical
+
+                        return -1
+                    }
 
                     visible: enabled;
                     anchors.bottom: parent.bottom
                     anchors.right: parent.right
-                    enabled:
-                    {
-                        var ptzCaps = ptzController.capabilities & Ptz.ContinuousPtzCapabilities
-                        return ptzCaps == Ptz.ContinuousPtzCapabilities
-                    }
+                    enabled: ptzController &&
+                        (ptzController.capabilities & Ptz.ContinuousPanCapability
+                        || ptzController.capabilities & Ptz.ContinuousTiltCapability)
+
 
                     onDirectionChanged:
                     {
@@ -367,18 +390,23 @@ PageBase
                 {
                     id: presetsItem
 
-                    visible: ptzController.presetsCount
+                    property bool supportsPresets:
+                        ptzController.capabilities & Ptz.PresetsPtzCapability
+
+                    visible: ptzController.presetsCount && supportsPresets
+
                     presetsCount: ptzController.presetsCount
                     anchors.left: parent.left
                     anchors.right: hidePtzButton.left
+                    currentPresetIndex: ptzController.activePresetIndex
 
-                    onCurrentPresetIndexChanged:
+                    onGoToPreset:
                     {
-                        if (currentPresetIndex == -1)
+                        if (presetIndex == -1)
                             return;
 
-                        if (!ptzController.setPreset(currentPresetIndex))
-                            console.log("+++++++++++ can't set preset: ", currentPresetIndex);
+                        if (!ptzController.setPreset(presetIndex))
+                            console.log("+++++++++++ can't set preset: ", presetIndex);
                     }
                 }
 

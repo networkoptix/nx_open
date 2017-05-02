@@ -20,6 +20,7 @@ class ResourcePtzController: public QnProxyPtzController
     Q_PROPERTY(Ptz::Capabilities capabilities READ getCapabilities NOTIFY capabilitiesChanged)
     Q_PROPERTY(Ptz::Traits auxTraits READ auxTraits NOTIFY auxTraitsChanged)
     Q_PROPERTY(int presetsCount READ presetsCount NOTIFY presetsCountChanged)
+    Q_PROPERTY(int activePresetIndex READ activePresetIndex NOTIFY activePresetIndexChanged)
 
 public:
     ResourcePtzController(QObject* parent = nullptr);
@@ -32,6 +33,7 @@ public: // Properties section
 
     Ptz::Traits auxTraits() const;
     int presetsCount() const;
+    int activePresetIndex() const;
 
 public:
     Q_INVOKABLE bool setAutoFocus();
@@ -44,6 +46,7 @@ signals:
     void capabilitiesChanged();
     void auxTraitsChanged();
     void presetsCountChanged();
+    void activePresetIndexChanged();
 
 private:
     QUuid m_uniqueResourceId;

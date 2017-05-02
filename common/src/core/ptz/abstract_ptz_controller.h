@@ -53,7 +53,7 @@ public slots:
      * \param command                   Ptz command to check.
      * \returns                         Whether this controller supports the given command.
      */
-    bool supports(Qn::PtzCommand command);
+    bool supports(Qn::PtzCommand command) const;
 
     /**
      * Starts or stops continuous PTZ movement.
@@ -271,7 +271,7 @@ public slots:
      */
     virtual bool getTours(QnPtzTourList *tours) = 0;
 
-    virtual bool getActiveObject(QnPtzObject *activeObject) = 0;
+    virtual bool getActiveObject(QnPtzObject *activeObject) const = 0;
 
     /**
      * Updates PTZ home position for the camera.

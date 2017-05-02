@@ -32,7 +32,7 @@ public:
     virtual bool activateTour(const QString &) override                                     { return false; }
     virtual bool getTours(QnPtzTourList *) override                                         { return false; }
 
-    virtual bool getActiveObject(QnPtzObject *) override                                    { return false; }
+    virtual bool getActiveObject(QnPtzObject* ) const override                                    { return false; }
     virtual bool updateHomeObject(const QnPtzObject &) override                             { return false; }
     virtual bool getHomeObject(QnPtzObject *) override                                      { return false; }
 

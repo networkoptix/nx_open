@@ -140,7 +140,8 @@ bool QnRemotePtzController::getTours(QnPtzTourList *) {
     RUN_COMMAND(Qn::GetToursPtzCommand, QVariant(), ptzGetToursAsync);
 }
 
-bool QnRemotePtzController::getActiveObject(QnPtzObject *) {
+bool QnRemotePtzController::getActiveObject(QnPtzObject *) const
+{
     RUN_COMMAND(Qn::GetActiveObjectPtzCommand, QVariant(), ptzGetActiveObjectAsync);
 }
 

@@ -1,5 +1,6 @@
 #include "resource_ptz_controller.h"
 
+#include <core/ptz/activity_ptz_controller.h>
 #include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -14,9 +15,13 @@ ResourcePtzController::ResourcePtzController(QObject* parent):
         [this]()
         {
             const auto resource = qnResPool->getResourceById(m_uniqueResourceId);
-            const auto controller = qnClientPtzPool->controller(resource);
-            if (baseController() != controller)
-                setBaseController(controller);
+            auto controller = qnClientPtzPool->controller(resource);
+            if (controller)
+            {
+                controller.reset(new QnActivityPtzController(
+                    QnActivityPtzController::Client, controller));
+            }
+            setBaseController(controller);
         });
 
     connect(this, &base_type::changed, this,
@@ -27,7 +32,15 @@ ResourcePtzController::ResourcePtzController(QObject* parent):
             if (fields.testFlag(Qn::AuxilaryTraitsPtzField))
                 emit auxTraitsChanged();
             if (fields.testFlag(Qn::PresetsPtzField))
+            {
                 emit presetsCountChanged();
+                emit activePresetIndexChanged();
+            }
+            if (fields.testFlag(Qn::ActiveObjectPtzField))
+            {
+                qDebug() << "---------- active object changed";
+                emit activePresetIndexChanged();
+            }
         });
 
     connect(this, &base_type::baseControllerChanged, this,
@@ -80,6 +93,34 @@ int ResourcePtzController::presetsCount() const
     return getPresets(&presets) ? presets.size() : 0;
 }
 
+int ResourcePtzController::activePresetIndex() const
+{
+    if (!supports(Qn::GetActiveObjectPtzCommand))
+    {
+        qDebug() << "---------- not supported";
+        return -1;
+    }
+
+    QnPtzObject activeObject;
+    if (!getActiveObject(&activeObject) || activeObject.type != Qn::PresetPtzObject)
+    {
+        qDebug() << "---------- not active object";
+        return -1;
+    }
+
+    qDebug() << "---------- active object id:" << activeObject.id;
+
+    QnPtzPresetList presets;
+    if (!getPresets(&presets))
+        return -1;
+
+    for (int i = 0; i != presets.count(); ++i)
+    {
+        if (presets.at(i).id == activeObject.id)
+            return i;
+    }
+    return -1;
+}
 
 bool ResourcePtzController::setPreset(int index)
 {
