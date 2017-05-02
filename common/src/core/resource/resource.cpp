@@ -1226,26 +1226,31 @@ void QnResource::setRemovedFromPool(bool value)
 
 void QnResource::setCommonModule(QnCommonModule* commonModule)
 {
+    QnMutexLocker mutexLocker(&m_mutex);
     m_commonModule = commonModule;
 }
 
 QnCommonModule* QnResource::commonModule() const
 {
-    if (m_commonModule)
-        return m_commonModule;
-    else if (resourcePool())
-        return resourcePool()->commonModule();
-    else
-        return nullptr;
+    {
+        QnMutexLocker mutexLocker(&m_mutex);
+        if (m_commonModule)
+            return m_commonModule;
+    }
+
+    if (const auto pool = resourcePool())
+        return pool->commonModule();
+
+    return nullptr;
 }
 
-void QnResource::saveParams()
+bool QnResource::saveParams()
 {
-    commonModule()->propertyDictionary()->saveParams(getId());
+    return commonModule()->propertyDictionary()->saveParams(getId());
 }
 
-void QnResource::saveParamsAsync()
+int QnResource::saveParamsAsync()
 {
-    commonModule()->propertyDictionary()->saveParamsAsync(getId());
+    return commonModule()->propertyDictionary()->saveParamsAsync(getId());
 }
 

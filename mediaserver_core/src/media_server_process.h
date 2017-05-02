@@ -168,8 +168,9 @@ private:
     void serviceModeInit();
     void initTransactionLog(const QString& logDir, QnLogLevel level);
     void initPermissionsLog(const QString& logDir, QnLogLevel level);
-    QString hardwareIdAsGuid();
+    QString hardwareIdAsGuid() const;
     void updateGuidIfNeeded();
+
 private:
     int m_argc;
     char** m_argv;

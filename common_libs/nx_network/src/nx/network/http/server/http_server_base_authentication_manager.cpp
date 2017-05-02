@@ -69,11 +69,12 @@ void BaseAuthenticationManager::reportAuthenticationFailure(
     AuthenticationCompletionHandler completionHandler)
 {
     completionHandler(
-        false,
-        nx::utils::stree::ResourceContainer(),
-        generateWwwAuthenticateHeader(),
-        nx_http::HttpHeaders(),
-        nullptr);
+        nx_http::server::AuthenticationResult(
+            false,
+            nx::utils::stree::ResourceContainer(),
+            generateWwwAuthenticateHeader(),
+            nx_http::HttpHeaders(),
+            nullptr));
 }
 
 header::WWWAuthenticate BaseAuthenticationManager::generateWwwAuthenticateHeader()
@@ -111,12 +112,7 @@ void BaseAuthenticationManager::passwordLookupDone(
 void BaseAuthenticationManager::reportSuccess(
     AuthenticationCompletionHandler completionHandler)
 {
-    completionHandler(
-        true,
-        nx::utils::stree::ResourceContainer(),
-        header::WWWAuthenticate(),
-        nx_http::HttpHeaders(),
-        nullptr);
+    completionHandler(nx_http::server::SuccessfulAuthenticationResult());
 }
 
 nx::String BaseAuthenticationManager::generateNonce()

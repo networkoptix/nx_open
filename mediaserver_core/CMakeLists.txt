@@ -1,3 +1,5 @@
+find_package(Qt5 COMPONENTS WebSockets)
+
 nx_rdep_add_package(any/nx_sdk-1.6.0)
 nx_rdep_add_package(any/nx_storage_sdk-1.6.0)
 nx_rdep_add_package(onvif)
@@ -33,7 +35,7 @@ nx_add_target(mediaserver_core LIBRARY
         "${customization_dir}/mediaserver_core/resources"
         "${CMAKE_CURRENT_BINARY_DIR}/resources"
     PUBLIC_LIBS
-        qtservice qtsinglecoreapplication
+        qtservice qtsinglecoreapplication Qt5::WebSockets
         onvif sigar
         appserver2 nx_email nx_speech_synthesizer cloud_db_client)
 

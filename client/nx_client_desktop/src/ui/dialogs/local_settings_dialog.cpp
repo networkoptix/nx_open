@@ -7,9 +7,9 @@
 #include <client/client_settings.h>
 #include <client/client_app_info.h>
 
-#include <ui/actions/actions.h>
-#include <ui/actions/action_manager.h>
-#include <ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 
 #include <ui/screen_recording/video_recorder_settings.h>
 #include <ui/style/custom_style.h>
@@ -22,6 +22,8 @@
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_desktop_camera_watcher.h>
+
+using namespace nx::client::desktop::ui;
 
 QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
     base_type(parent),
@@ -46,7 +48,7 @@ QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
 
     addPage(LookAndFeelPage, m_lookAndFeelWidget, tr("Look and Feel"));
 
-    const auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction);
+    const auto screenRecordingAction = action(action::ToggleScreenRecordingAction);
     if (screenRecordingAction)
     {
         auto recordingSettingsWidget = new QnRecordingSettingsWidget(recorderSettings, this);
@@ -107,7 +109,7 @@ void QnLocalSettingsDialog::accept()
 
         dialog.setStandardButtons(QDialogButtonBox::Cancel);
         const auto restartNowButton = dialog.addButton(
-            tr("Restart Now"), QDialogButtonBox::YesRole, QnButtonAccent::Standard);
+            tr("Restart Now"), QDialogButtonBox::YesRole, Qn::ButtonAccent::Standard);
 
         dialog.addButton(
             tr("Restart Later"), QDialogButtonBox::NoRole);
@@ -122,7 +124,7 @@ void QnLocalSettingsDialog::accept()
     base_type::accept();
 
     if (restartQueued)
-        menu()->trigger(QnActions::QueueAppRestartAction);
+        menu()->trigger(action::QueueAppRestartAction);
 }
 
 bool QnLocalSettingsDialog::isRestartRequired() const

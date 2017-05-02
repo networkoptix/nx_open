@@ -15,6 +15,7 @@ class QnRestProcessorPool
 {
 public:
     typedef QMap<QString, QnRestRequestHandlerPtr> Handlers;
+    typedef QMap<QString, QString> RedirectRules;
 
     QnRestProcessorPool();
 
@@ -25,8 +26,12 @@ public:
     QnRestRequestHandlerPtr findHandler( QString path ) const;
     const Handlers& handlers() const;
 
+    void registerRedirectRule( const QString& path, const QString& newPath );
+    boost::optional<QString> getRedirectRule( const QString& path );
+
 private:
     Handlers m_handlers;
+    RedirectRules m_redirectRules;
 };
 
 class QnRestConnectionProcessorPrivate;

@@ -1,12 +1,11 @@
-
 #pragma once
+
+#include <nx/client/desktop/ui/actions/action_fwd.h>
 
 #include <statistics/base/base_fwd.h>
 #include <statistics/abstract_statistics_module.h>
 
-class QnActionManager;
 class AbstractMultimetric;
-typedef QPointer<QnActionManager> QnActionManagerPtr;
 
 class QnActionsStatisticsModule : public QnAbstractStatisticsModule
 {
@@ -19,7 +18,7 @@ public:
 
     virtual ~QnActionsStatisticsModule();
 
-    void setActionManager(const QnActionManagerPtr &manager);
+    void setActionManager(const nx::client::desktop::ui::action::ManagerPtr& manager);
 
     QnStatisticValuesHash values() const override;
 
@@ -28,6 +27,6 @@ public:
 private:
     typedef QList<QnStatisticsValuesProviderPtr> ModulesList;
 
-    QnActionManagerPtr m_actionManager;
+    nx::client::desktop::ui::action::ManagerPtr m_actionManager;
     ModulesList m_modules;
 };

@@ -8,7 +8,7 @@
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_settings.h>
 #include <nx/utils/settings.h>
-#include <nx/utils/abstract_service_settings.h>
+#include <nx/utils/basic_service_settings.h>
 
 #include <utils/common/command_line_parser.h>
 #include <utils/db/types.h>
@@ -97,8 +97,10 @@ public:
  * @note Values specified via command-line have priority over conf file (or win32 registry) values.
  */
 class Settings:
-    public utils::AbstractServiceSettings
+    public utils::BasicServiceSettings
 {
+    using base_type = utils::BasicServiceSettings;
+
 public:
     Settings();
 
@@ -106,9 +108,6 @@ public:
     Settings& operator=(const Settings&) = delete;
 
     /** Loads settings from both command line and conf file (or win32 registry). */
-    virtual void load(int argc, const char **argv) override;
-    virtual bool isShowHelpRequested() const override;
-    virtual void printCmdLineArgsHelp() override;
     virtual QString dataDir() const override;
     virtual nx::utils::log::Settings logging() const override;
 
@@ -128,10 +127,6 @@ public:
     const Http& http() const;
 
 private:
-    QnCommandLineParser m_commandLineParser;
-    QnSettings m_settings;
-    bool m_showHelp;
-
     nx::utils::log::Settings m_logging;
     nx::utils::log::Settings m_vmsSynchronizationLogging;
     db::ConnectionOptions m_dbConnectionOptions;
@@ -145,8 +140,7 @@ private:
     ModuleFinder m_moduleFinder;
     Http m_http;
 
-    void fillSupportedCmdParameters();
-    void loadConfiguration();
+    virtual void loadSettings() override;
 };
 
 } // namespace conf

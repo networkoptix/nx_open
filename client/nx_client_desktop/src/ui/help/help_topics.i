@@ -20,6 +20,7 @@
 QN_HELP_TOPIC(MainWindow_TitleBar_MainMenu_Help,                "main_menu.htm")
 QN_HELP_TOPIC(MainWindow_TitleBar_Tabs_Help,                    "tabs.htm")
 QN_HELP_TOPIC(MainWindow_TitleBar_NewLayout_Help,               "creating_a_new_layout_(admin_only).htm")
+QN_HELP_TOPIC(MainWindow_TitleBar_Cloud_Help,                   "connecting_as_cloud_user.htm")
 QN_HELP_TOPIC(MainWindow_ContextHelp_Help,						"getting_context_help.htm")
 QN_HELP_TOPIC(MainWindow_Pin_Help,                              "showing_and_hiding_side_panels.htm")
 QN_HELP_TOPIC(MainWindow_Panic_Help,                            "panic_recording.htm")
@@ -36,6 +37,7 @@ QN_HELP_TOPIC(MainWindow_Tree_Local_Help,                       "local_files_str
 QN_HELP_TOPIC(MainWindow_Tree_Recorder_Help,					"setting_up_analog_cameras.htm")
 QN_HELP_TOPIC(MainWindow_Tree_DragCameras_Help,					"swapping_cameras_between_media_servers_(admin_only.htm")
 QN_HELP_TOPIC(MainWindow_Tree_Camera_Help,                      "configuring_cameras.htm")
+QN_HELP_TOPIC(MainWindow_Tree_WebPage_Help,                     "using_display_product_name_as_.htm")
 QN_HELP_TOPIC(MainWindow_Scene_Help,                            "vms_user_interface_overview.htm")
 QN_HELP_TOPIC(MainWindow_Scene_EMapping_Help,                   "e-mapping.htm") // TODO
 QN_HELP_TOPIC(MainWindow_Scene_PreviewSearch_Help,              "thumbnail_search.htm") // TODO
@@ -63,6 +65,7 @@ QN_HELP_TOPIC(MainWindow_MediaItem_Diagnostics_Help,			"diagnosing_offline_camer
 QN_HELP_TOPIC(MainWindow_MediaItem_AnalogCamera_Help,			"setting_up_analog_cameras.htm")
 QN_HELP_TOPIC(MainWindow_MonitoringItem_Help,                   "monitoring_media_servers.htm")
 QN_HELP_TOPIC(MainWindow_MonitoringItem_Log_Help,               "viewing_events_log.htm")
+QN_HELP_TOPIC(MainWindow_WebPageItem_Help,                      "using_display_product_name_as_.htm")
 QN_HELP_TOPIC(MainWindow_Notifications_Help,					"notifications.htm")
 QN_HELP_TOPIC(MainWindow_Notifications_EventLog_Help,			"viewing_events_log.htm")
 
@@ -91,6 +94,7 @@ QN_HELP_TOPIC(SystemSettings_Server_Backup_Help,                "backing_up_and_
 QN_HELP_TOPIC(SystemSettings_Server_CameraAutoDiscovery_Help,   "disabling_automatic_discovery.htm")
 QN_HELP_TOPIC(SystemSettings_Notifications_Help,                "notifications.htm")
 QN_HELP_TOPIC(SystemSettings_UserManagement_Help,               "user_management_form.htm")
+QN_HELP_TOPIC(SystemSettings_Cloud_Help,                        "connecting_system_to_cloud.htm")
 
 QN_HELP_TOPIC(Administration_Help,                              "system-wide_configurations.htm")
 QN_HELP_TOPIC(Administration_General_CamerasList_Help,          "viewing_full_cameras_list.htm")
@@ -114,6 +118,8 @@ QN_HELP_TOPIC(NewUser_Help,                                     "creating_a_new_
 QN_HELP_TOPIC(UserSettings_DisableUser_Help,                    "disabling_user.htm")
 QN_HELP_TOPIC(UserSettings_LdapIntegration_Help,                "setting_up_ldap_integration.htm")
 QN_HELP_TOPIC(UserSettings_LdapFetch_Help,                      "importing_users_from_ldap_serv.htm")
+
+QN_HELP_TOPIC(UserRoles_Help,                                   "roles_management.htm")
 
 QN_HELP_TOPIC(ManualCameraAddition_Help,                        "adding_cameras_manually.htm")
 
@@ -154,7 +160,7 @@ QN_HELP_TOPIC(EventsActions_ShowOnAlarmLayout_Help,             "showing_cameras
 QN_HELP_TOPIC(EventsActions_Bookmark_Help,                      "create_bookmark.htm")
 QN_HELP_TOPIC(EventsActions_ExecutePtzPreset_Help,              "execute_ptz_preset.htm")
 QN_HELP_TOPIC(EventsActions_ShowTextOverlay_Help,               "display_text_on_cameras.htm")
-QN_HELP_TOPIC(EventsActions_ExecHttpRequest_Help,               "http_action.htm")
+QN_HELP_TOPIC(EventsActions_ExecHttpRequest_Help,               "perform_http_request.htm")
 
 QN_HELP_TOPIC(EventsActions_EcConnectionLost_Help,				"ec_connection_lost.htm")
 QN_HELP_TOPIC(EventsActions_NoLicenses_Help,					"licenses_are_not_configured.htm")
@@ -225,5 +231,9 @@ QN_HELP_TOPIC(Videowall_Display_Help,                           "controlling_vid
 QN_HELP_TOPIC(Videowall_Attach_Help,                            "adding_or_removing_physical_di.htm")
 QN_HELP_TOPIC(Videowall_VwModeWarning_Help,                     "switching_to_video_wall_mode.htm")
 QN_HELP_TOPIC(Videowall_Appearance_Help,                        "changing_appearance_of_video_w.htm")
+
+QN_HELP_TOPIC(Setup_Wizard_Help,                                "vms_quick_start.htm")
+
+QN_HELP_TOPIC(Rapid_Review_Help,                                "rapid_review_export.htm")
 
 #undef QN_HELP_TOPIC

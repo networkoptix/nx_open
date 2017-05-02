@@ -15,7 +15,7 @@
 
 #include <client/client_settings.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
@@ -29,6 +29,8 @@
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
 #include <nx/utils/random.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
     const int kUpdatePeriodMSec = 60 * 60 * 1000; /* 1 hour. */
@@ -87,7 +89,7 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &in
         return;
 
     /* We have no access rights. */
-    if (!menu()->canTrigger(QnActions::SystemUpdateAction))
+    if (!menu()->canTrigger(action::SystemUpdateAction))
         return;
 
     /* User was already notified about this release. */
@@ -155,7 +157,7 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
         text, extras, QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         mainWindow());
 
-    messageBox.addButton(tr("Update..."), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+    messageBox.addButton(tr("Update..."), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
     messageBox.setCustomCheckBoxText(tr("Do not notify again about this update"));
 
     const auto result = messageBox.exec();
@@ -167,5 +169,5 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
     }
 
     if (result != QDialogButtonBox::Cancel)
-        action(QnActions::SystemUpdateAction)->trigger();
+        action(action::SystemUpdateAction)->trigger();
 }

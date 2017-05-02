@@ -1,6 +1,7 @@
 import logging
 import calendar
 import pytz
+import tzlocal
 from datetime import datetime
 
 
@@ -34,6 +35,9 @@ def log_list(name, values):
     for i, value in enumerate(values):
         log.debug('\t #%d: %s', i, value)
 
+def quote(s, char='"'):
+    return '%c%s%c' % (char, s, char)
+
 def bool_to_str(val, false_str = 'false', true_str = 'true'):
     if val: return true_str
     else: return false_str
@@ -54,6 +58,10 @@ def datetime_utc_from_timestamp(timestamp):
 
 def datetime_utc_now():
     return datetime.utcnow().replace(tzinfo=pytz.utc)
+
+def as_local_tz(dt):
+    tz = tzlocal.get_localzone()
+    return dt.astimezone(tz)
 
 def datetime_to_str(date_time):
   return date_time.strftime('%Y-%m-%d %H:%M:%S.%f %Z')

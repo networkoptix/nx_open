@@ -1,13 +1,15 @@
 
 #include "action_metrics.h"
 
-#include <ui/actions/action.h>
-#include <ui/actions/actions.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/action.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <statistics/base/metrics_container.h>
 #include <statistics/base/time_duration_metric.h>
 
 #include <nx/fusion/model_functions.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace
 {
@@ -17,7 +19,7 @@ namespace
         return QPointer<Type>(value);
     }
 
-    QString aliasByActionId(QnActions::IDType id)
+    QString aliasByActionId(action::IDType id)
     {
         return QnLexical::serialized(id);
     }
@@ -54,13 +56,13 @@ namespace
     {
         typedef QnTimeDurationMetric base_type;
     public:
-        ActionDurationMetric(QnAction *action);
+        ActionDurationMetric(action::Action* action);
 
         virtual ~ActionDurationMetric();
     private:
     };
 
-    ActionDurationMetric::ActionDurationMetric(QnAction *action)
+    ActionDurationMetric::ActionDurationMetric(action::Action* action)
         : base_type()
         , QObject()
     {
@@ -91,7 +93,7 @@ namespace
 
 //
 
-AbstractActionsMetrics::AbstractActionsMetrics(QnActionManager *actionManager)
+AbstractActionsMetrics::AbstractActionsMetrics(const action::ManagerPtr& actionManager)
     : base_type()
     , QnStatisticsValuesProvider()
 {
@@ -99,7 +101,7 @@ AbstractActionsMetrics::AbstractActionsMetrics(QnActionManager *actionManager)
         return;
 
     const auto guard = makePointer(this);
-    const auto addAction = [this, guard, actionManager](QnActions::IDType id)
+    const auto addAction = [this, guard, actionManager](action::IDType id)
     {
         if (!guard)
             return;
@@ -111,7 +113,7 @@ AbstractActionsMetrics::AbstractActionsMetrics(QnActionManager *actionManager)
         addActionMetric(action);
     };
 
-    connect(actionManager, &QnActionManager::actionRegistered, this, addAction);
+    connect(actionManager.data(), &action::Manager::actionRegistered, this, addAction);
 }
 
 AbstractActionsMetrics::~AbstractActionsMetrics()
@@ -119,7 +121,7 @@ AbstractActionsMetrics::~AbstractActionsMetrics()
 
 //
 
-ActionsTriggeredCountMetrics::ActionsTriggeredCountMetrics(QnActionManager *actionManager)
+ActionsTriggeredCountMetrics::ActionsTriggeredCountMetrics(const action::ManagerPtr& actionManager)
     : base_type(actionManager)
     , m_values()
 {
@@ -130,7 +132,7 @@ ActionsTriggeredCountMetrics::ActionsTriggeredCountMetrics(QnActionManager *acti
         addActionMetric(action);
 }
 
-void ActionsTriggeredCountMetrics::addActionMetric(QnAction *action)
+void ActionsTriggeredCountMetrics::addActionMetric(action::Action *action)
 {
     const auto id = action->id();
     const auto guard = makePointer(this);
@@ -157,7 +159,7 @@ QnStatisticValuesHash ActionsTriggeredCountMetrics::values() const
     QnStatisticValuesHash result;
     for (auto it = m_values.cbegin(); it != m_values.end(); ++it)
     {
-        const auto actionId = static_cast<QnActions::IDType>(it.key());
+        const auto actionId = static_cast<action::IDType>(it.key());
         const auto alias = aliasByActionId(actionId);
 
         const auto &countByParams = it.value();
@@ -180,7 +182,7 @@ void ActionsTriggeredCountMetrics::reset()
 
 //
 
-ActionCheckedTimeMetric::ActionCheckedTimeMetric(QnActionManager *actionManager)
+ActionCheckedTimeMetric::ActionCheckedTimeMetric(const action::ManagerPtr& actionManager)
     : base_type(actionManager)
     , m_metrics(new QnMetricsContainer())
 {
@@ -194,7 +196,7 @@ ActionCheckedTimeMetric::ActionCheckedTimeMetric(QnActionManager *actionManager)
 ActionCheckedTimeMetric::~ActionCheckedTimeMetric()
 {}
 
-void ActionCheckedTimeMetric::addActionMetric(QnAction *action)
+void ActionCheckedTimeMetric::addActionMetric(action::Action *action)
 {
     if (!action)
         return;

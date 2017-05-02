@@ -72,6 +72,17 @@ bool AbstractHttpRequestHandler::processRequest(
     return true;
 }
 
+void AbstractHttpRequestHandler::setRequestPathParams(
+    std::vector<StringType> params)
+{
+    m_requestPathParams = std::move(params);
+}
+
+const std::vector<StringType>& AbstractHttpRequestHandler::requestPathParams() const
+{
+    return m_requestPathParams;
+}
+
 nx_http::Response* AbstractHttpRequestHandler::response()
 {
     return m_responseMsg.response;

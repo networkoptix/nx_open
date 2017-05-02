@@ -13,11 +13,15 @@
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 
 #include <watchers/cloud_status_watcher.h>
 
 //TODO: #dklychkov Uncomment when cloud login is implemented
 //#define DIRECT_CLOUD_CONNECT
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -65,6 +69,8 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
     font.setWeight(QFont::Bold);
     setFont(font);
 
+    setHelpTopic(this, Qn::MainWindow_TitleBar_Cloud_Help);
+
     connect(this, &QnCloudStatusPanel::justPressed, qnCloudStatusWatcher,
         &QnCloudStatusWatcher::updateSystems);
 
@@ -73,7 +79,7 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
         {
             if (qnCloudStatusWatcher->status() == QnCloudStatusWatcher::LoggedOut)
             {
-                action(QnActions::LoginToCloud)->trigger();
+                action(action::LoginToCloud)->trigger();
                 return;
             }
 
@@ -119,10 +125,10 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent)
 {
     Q_Q(QnCloudStatusPanel);
     loggedInMenu->setWindowFlags(loggedInMenu->windowFlags());
-    loggedInMenu->addAction(q->action(QnActions::OpenCloudMainUrl));
+    loggedInMenu->addAction(q->action(action::OpenCloudMainUrl));
     loggedInMenu->addSeparator();
-    loggedInMenu->addAction(q->action(QnActions::OpenCloudManagementUrl));
-    loggedInMenu->addAction(q->action(QnActions::LogoutFromCloud));
+    loggedInMenu->addAction(q->action(action::OpenCloudManagementUrl));
+    loggedInMenu->addAction(q->action(action::LogoutFromCloud));
 
     auto offlineAction = new QAction(this);
     offlineAction->setText(QnCloudStatusPanel::tr("Cannot connect to %1",
@@ -132,7 +138,7 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent)
     offlineMenu->setWindowFlags(offlineMenu->windowFlags());
     offlineMenu->addAction(offlineAction);
     offlineMenu->addSeparator();
-    offlineMenu->addAction(q->action(QnActions::LogoutFromCloud));
+    offlineMenu->addAction(q->action(action::LogoutFromCloud));
 
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged, this,
         &QnCloudStatusPanelPrivate::updateUi);

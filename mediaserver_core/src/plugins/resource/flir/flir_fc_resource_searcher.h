@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLE_FLIR)
+
 #include <queue>
 #include <set>
 #include <unordered_map>
@@ -8,6 +10,7 @@
 #include "flir_fc_private.h"
 
 #include <nx/network/system_socket.h>
+#include <nx/network/http/asynchttpclient.h>
 #include <core/resource_management/resource_searcher.h>
 
 namespace nx {
@@ -81,3 +84,4 @@ private:
 } // namespace plugins
 } // namespace nx
 
+#endif // defined(ENABLE_FLIR)

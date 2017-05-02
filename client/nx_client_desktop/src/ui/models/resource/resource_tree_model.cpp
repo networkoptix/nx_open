@@ -32,7 +32,7 @@
 
 #include <api/global_settings.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/delegates/resource_tree_model_custom_column_delegate.h>
 
 #include <ui/models/resource/resource_tree_model_node.h>
@@ -51,6 +51,8 @@
 #include <ui/workbench/workbench_access_controller.h>
 
 #include <utils/common/scoped_value_rollback.h>
+
+using namespace nx::client::desktop::ui;
 
 #define DEBUG_RESOURCE_TREE_MODEL
 #ifdef DEBUG_RESOURCE_TREE_MODEL
@@ -788,14 +790,18 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
     /* Drop on videowall is handled in videowall. */
     if (node->type() == Qn::VideoWallItemNode)
     {
-        QnActionParameters parameters;
+        action::Parameters parameters;
         if (mimeData->hasFormat(QnVideoWallItem::mimeType()))
-            parameters = QnActionParameters(
-                resourcePool()->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData)));
+        {
+            parameters = resourcePool()->getVideoWallItemsByUuid(
+                QnVideoWallItem::deserializeUuids(mimeData));
+        }
         else
-            parameters = QnActionParameters(sourceResources);
+        {
+            parameters = sourceResources;
+        }
         parameters.setArgument(Qn::VideoWallItemGuidRole, node->uuid());
-        menu()->trigger(QnActions::DropOnVideoWallItemAction, parameters);
+        menu()->trigger(action::DropOnVideoWallItemAction, parameters);
     }
     else if (node->type() == Qn::RoleNode)
     {
@@ -810,9 +816,9 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
             TRACE("Sharing layout " << layout->getName() << " with role "
                 << node->m_displayName);
             menu()->trigger(
-                QnActions::ShareLayoutAction,
-                QnActionParameters(layout).
-                withArgument(Qn::UuidRole, roleId)
+                action::ShareLayoutAction,
+                action::Parameters(layout)
+                    .withArgument(Qn::UuidRole, roleId)
             );
         }
     }
@@ -990,16 +996,9 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
 
         if (!droppable.isEmpty())
         {
-            menu()->trigger(
-                QnActions::OpenInLayoutAction,
-                QnActionParameters(droppable).
-                withArgument(Qn::LayoutResourceRole, layout)
-            );
-
-            menu()->trigger(
-                QnActions::SaveLayoutAction,
-                QnActionParameters(layout)
-            );
+            menu()->trigger(action::OpenInLayoutAction,  action::Parameters(droppable)
+                .withArgument(Qn::LayoutResourceRole, layout));
+            menu()->trigger(action::SaveLayoutAction, layout);
         }
     }
 
@@ -1017,10 +1016,8 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
                 continue;
 
             TRACE("Sharing layout " << sourceLayout->getName() << " with " << targetUser->getName())
-            menu()->trigger(
-                QnActions::ShareLayoutAction,
-                QnActionParameters(sourceLayout).
-                withArgument(Qn::UserResourceRole, targetUser)
+            menu()->trigger(action::ShareLayoutAction, action::Parameters(sourceLayout)
+                .withArgument(Qn::UserResourceRole, targetUser)
             );
         }
     }
@@ -1037,11 +1034,11 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
 
         QnVirtualCameraResourceList cameras = sourceResources.filtered<QnVirtualCameraResource>();
         if (!cameras.empty())
-            menu()->trigger(
-                QnActions::MoveCameraAction,
-                QnActionParameters(cameras).
-                withArgument(Qn::MediaServerResourceRole, server)
+        {
+            menu()->trigger(action::MoveCameraAction, action::Parameters(cameras)
+                .withArgument(Qn::MediaServerResourceRole, server)
             );
+        }
     }
 }
 

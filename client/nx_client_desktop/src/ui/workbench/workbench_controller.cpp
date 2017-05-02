@@ -84,8 +84,8 @@
 
 #include <ui/help/help_handler.h>
 
-#include <ui/actions/action_manager.h>
-#include <ui/actions/action_target_provider.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_target_provider.h>
 
 #include <ui/workaround/hidpi_workarounds.h>
 
@@ -99,6 +99,8 @@
 #include "workbench_access_controller.h"
 
 #include <plugins/io_device/joystick/joystick_manager.h>
+
+using namespace nx::client::desktop::ui;
 
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
 #ifdef QN_WORKBENCH_CONTROLLER_DEBUG
@@ -444,39 +446,39 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
 
     /* Set up context menu. */
     QWidget *window = display()->view()->window();
-    window->addAction(action(QnActions::ToggleSmartSearchAction));
-    window->addAction(action(QnActions::ToggleInfoAction));
+    window->addAction(action(action::ToggleSmartSearchAction));
+    window->addAction(action(action::ToggleInfoAction));
 
-    const auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction);
+    const auto screenRecordingAction = action(action::ToggleScreenRecordingAction);
     if (screenRecordingAction)
         window->addAction(screenRecordingAction);
 
-    connect(action(QnActions::SelectAllAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_selectAllAction_triggered()));
-    connect(action(QnActions::StartSmartSearchAction), SIGNAL(triggered()),                                                                this,                           SLOT(at_startSmartSearchAction_triggered()));
-    connect(action(QnActions::StopSmartSearchAction), SIGNAL(triggered()),                                                                 this,                           SLOT(at_stopSmartSearchAction_triggered()));
-    connect(action(QnActions::ToggleSmartSearchAction), SIGNAL(triggered()),                                                               this,                           SLOT(at_toggleSmartSearchAction_triggered()));
-    connect(action(QnActions::ClearMotionSelectionAction), SIGNAL(triggered()),                                                            this,                           SLOT(at_clearMotionSelectionAction_triggered()));
-    connect(action(QnActions::ShowInfoAction), SIGNAL(triggered()),                                                                        this,                           SLOT(at_showInfoAction_triggered()));
-    connect(action(QnActions::HideInfoAction), SIGNAL(triggered()),                                                                        this,                           SLOT(at_hideInfoAction_triggered()));
-    connect(action(QnActions::ToggleInfoAction), SIGNAL(triggered()),                                                                      this,                           SLOT(at_toggleInfoAction_triggered()));
-    connect(action(QnActions::CheckFileSignatureAction), SIGNAL(triggered()),                                                              this,                           SLOT(at_checkFileSignatureAction_triggered()));
-    connect(action(QnActions::MaximizeItemAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_maximizeItemAction_triggered()));
-    connect(action(QnActions::UnmaximizeItemAction), SIGNAL(triggered()),                                                                  this,                           SLOT(at_unmaximizeItemAction_triggered()));
-    connect(action(QnActions::FitInViewAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_fitInViewAction_triggered()));
+    connect(action(action::SelectAllAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_selectAllAction_triggered()));
+    connect(action(action::StartSmartSearchAction), SIGNAL(triggered()),                                                                this,                           SLOT(at_startSmartSearchAction_triggered()));
+    connect(action(action::StopSmartSearchAction), SIGNAL(triggered()),                                                                 this,                           SLOT(at_stopSmartSearchAction_triggered()));
+    connect(action(action::ToggleSmartSearchAction), SIGNAL(triggered()),                                                               this,                           SLOT(at_toggleSmartSearchAction_triggered()));
+    connect(action(action::ClearMotionSelectionAction), SIGNAL(triggered()),                                                            this,                           SLOT(at_clearMotionSelectionAction_triggered()));
+    connect(action(action::ShowInfoAction), SIGNAL(triggered()),                                                                        this,                           SLOT(at_showInfoAction_triggered()));
+    connect(action(action::HideInfoAction), SIGNAL(triggered()),                                                                        this,                           SLOT(at_hideInfoAction_triggered()));
+    connect(action(action::ToggleInfoAction), SIGNAL(triggered()),                                                                      this,                           SLOT(at_toggleInfoAction_triggered()));
+    connect(action(action::CheckFileSignatureAction), SIGNAL(triggered()),                                                              this,                           SLOT(at_checkFileSignatureAction_triggered()));
+    connect(action(action::MaximizeItemAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_maximizeItemAction_triggered()));
+    connect(action(action::UnmaximizeItemAction), SIGNAL(triggered()),                                                                  this,                           SLOT(at_unmaximizeItemAction_triggered()));
+    connect(action(action::FitInViewAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_fitInViewAction_triggered()));
 
     connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
         &QnWorkbenchController::at_accessController_permissionsChanged);
 
     connect(
-        action(QnActions::GoToNextItemAction), &QAction::triggered,
+        action(action::GoToNextItemAction), &QAction::triggered,
         this, &QnWorkbenchController::at_nextItemAction_triggered);
 
     connect(
-        action(QnActions::GoToPreviousItemAction), &QAction::triggered,
+        action(action::GoToPreviousItemAction), &QAction::triggered,
         this, &QnWorkbenchController::at_previousItemAction_triggered);
 
     connect(
-        action(QnActions::ToggleCurrentItemMaximizationStateAction), &QnAction::triggered,
+        action(action::ToggleCurrentItemMaximizationStateAction), &QAction::triggered,
         this, &QnWorkbenchController::at_toggleCurrentItemMaximizationState_triggered);
 
 }
@@ -545,7 +547,7 @@ bool QnWorkbenchController::eventFilter(QObject* watched, QEvent* event)
             if (!widget->isSelected())
                 display()->scene()->clearSelection();
 
-            menu()->trigger(QnActions::RemoveLayoutItemFromSceneAction, widget);
+            menu()->trigger(action::RemoveLayoutItemFromSceneAction, widget);
             event->ignore();
             return true;
         }
@@ -641,8 +643,11 @@ void QnWorkbenchController::showContextMenuAt(const QPoint &pos){
                               Q_ARG(QPoint, pos), Q_ARG(WeakGraphicsItemPointerList, display()->scene()->selectedItems()));
 }
 
-void QnWorkbenchController::showContextMenuAtInternal(const QPoint &pos, const WeakGraphicsItemPointerList &selectedItems) {
-    QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, nullptr, selectedItems.materialized()));
+void QnWorkbenchController::showContextMenuAtInternal(const QPoint &pos,
+    const WeakGraphicsItemPointerList &selectedItems)
+{
+    QScopedPointer<QMenu> menu(this->menu()->newMenu(action::SceneScope, nullptr,
+        selectedItems.materialized()));
     if(menu->isEmpty())
         return;
 
@@ -741,7 +746,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
         if (objectId.isEmpty())
             break;
 
-        menu()->trigger(QnActions::PtzActivateObjectAction, QnActionParameters(widget).withArgument(Qn::PtzObjectIdRole, objectId));
+        menu()->trigger(action::PtzActivateObjectAction, action::Parameters(widget).withArgument(Qn::PtzObjectIdRole, objectId));
         break;
     }
     default:
@@ -1063,7 +1068,9 @@ void QnWorkbenchController::at_zoomRectChanged(QnMediaResourceWidget *widget, co
 }
 
 void QnWorkbenchController::at_zoomRectCreated(QnMediaResourceWidget *widget, const QColor &color, const QRectF &zoomRect) {
-    menu()->trigger(QnActions::CreateZoomWindowAction, QnActionParameters(widget).withArgument(Qn::ItemZoomRectRole, zoomRect).withArgument(Qn::ItemFrameDistinctionColorRole, color));
+    menu()->trigger(action::CreateZoomWindowAction, action::Parameters(widget)
+        .withArgument(Qn::ItemZoomRectRole, zoomRect)
+        .withArgument(Qn::ItemFrameDistinctionColorRole, color));
     widget->setCheckedButtons(widget->checkedButtons() & ~Qn::ZoomWindowButton);
 }
 
@@ -1233,9 +1240,9 @@ void QnWorkbenchController::at_item_doubleClicked(QnResourceWidget *widget)
     if (zoomedItem == workbenchItem)
     {
         // Stop layout tour if it is running.
-        if (action(QnActions::ToggleLayoutTourModeAction)->isChecked())
+        if (action(action::ToggleLayoutTourModeAction)->isChecked())
         {
-            menu()->trigger(QnActions::ToggleLayoutTourModeAction);
+            menu()->trigger(action::ToggleLayoutTourModeAction);
             return;
         }
 
@@ -1375,7 +1382,7 @@ void QnWorkbenchController::at_selectAllAction_triggered() {
         widget->setSelected(true);
 
     /* Move focus to scene if it's not there. */
-    if(menu()->targetProvider() && menu()->targetProvider()->currentScope() != Qn::SceneScope)
+    if (menu()->targetProvider() && menu()->targetProvider()->currentScope() != action::SceneScope)
         display()->scene()->setFocusItem(NULL);
 }
 
@@ -1550,8 +1557,8 @@ void QnWorkbenchController::toggleCurrentItemMaximizationState()
 {
     QnResourceWidget *widget = display()->widget(Qn::CentralRole);
     if(widget && widget == display()->widget(Qn::ZoomedRole)) {
-        menu()->trigger(QnActions::UnmaximizeItemAction, widget);
+        menu()->trigger(action::UnmaximizeItemAction, widget);
     } else {
-        menu()->trigger(QnActions::MaximizeItemAction, widget);
+        menu()->trigger(action::MaximizeItemAction, widget);
     }
 }

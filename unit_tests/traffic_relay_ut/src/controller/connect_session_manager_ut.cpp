@@ -1,20 +1,70 @@
 #include <gtest/gtest.h>
 
+#include <boost/algorithm/string/predicate.hpp>
+
 #include <nx/network/http/server/http_server_connection.h>
+#include <nx/network/socket_delegate.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
 
 #include <controller/connect_session_manager.h>
+#include <controller/traffic_relay.h>
 #include <model/client_session_pool.h>
 #include <model/listening_peer_pool.h>
 #include <settings.h>
+
+#include "../stream_socket_stub.h"
 
 namespace nx {
 namespace cloud {
 namespace relay {
 namespace controller {
 namespace test {
+
+namespace {
+
+class TrafficRelayStub:
+    public controller::AbstractTrafficRelay
+{
+public:
+    virtual void startRelaying(
+        RelayConnectionData clientConnection,
+        RelayConnectionData serverConnection) override
+    {
+        m_relaySessions.push_back(
+            {std::move(clientConnection), std::move(serverConnection)});
+    }
+
+    bool hasRelaySession(
+        AbstractStreamSocket* clientConnection,
+        AbstractStreamSocket* serverConnection,
+        const std::string& listeningPeerName) const
+    {
+        for (const auto& relaySession: m_relaySessions)
+        {
+            if (relaySession.clientConnection.connection.get() == clientConnection &&
+                relaySession.serverConnection.connection.get() == serverConnection &&
+                relaySession.serverConnection.peerId == listeningPeerName)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+private:
+    struct RelaySessionContext
+    {
+        RelayConnectionData clientConnection;
+        RelayConnectionData serverConnection;
+    };
+
+    std::deque<RelaySessionContext> m_relaySessions;
+};
+
+} // namespace
 
 static constexpr int kMaxPreemptiveConnectionCount = 7;
 static constexpr int kRecommendedPreemptiveConnectionCount = 4;
@@ -27,7 +77,12 @@ class ConnectSessionManager:
 public:
     ConnectSessionManager():
         m_clientSessionPool(m_settings),
-        m_connectSessionManager(m_settings, &m_clientSessionPool, &m_listeningPeerPool),
+        m_connectSessionManager(
+            std::make_unique<controller::ConnectSessionManager>(
+                m_settings,
+                &m_clientSessionPool,
+                &m_listeningPeerPool,
+                &m_trafficRelayStub)),
         m_peerName(nx::utils::generateRandomName(17).toStdString())
     {
         std::array<const char*, 3> argv{
@@ -36,7 +91,7 @@ public:
             "--connectingPeer/connectSessionIdleTimeout=11s"
         };
 
-        m_settings.load(argv.size(), argv.data());
+        m_settings.load(static_cast<int>(argv.size()), argv.data());
     }
 
 protected:
@@ -49,26 +104,24 @@ protected:
         }
 
         ASSERT_EQ(
-            kMaxPreemptiveConnectionCount,
+            (std::size_t)kMaxPreemptiveConnectionCount,
             m_listeningPeerPool.getConnectionCountByPeerName(m_peerName));
     }
 
     void whenInvokedBeginListening()
     {
-        using namespace std::placeholders;
+        addListeningPeerConnection();
+    }
 
-        api::BeginListeningRequest request;
-        request.peerName = m_peerName;
-
-        m_connectSessionManager.beginListening(
-            request,
-            std::bind(&ConnectSessionManager::onBeginListeningCompletion, this, _1, _2, _3));
+    void whenFreedConnectionManager()
+    {
+        m_connectSessionManager.reset();
     }
 
     void thenTcpConnectionHasBeenSavedToThePool()
     {
         ASSERT_EQ(api::ResultCode::ok, m_beginListeningResults.pop());
-        ASSERT_EQ(1, m_listeningPeerPool.getConnectionCountByPeerName(m_peerName));
+        ASSERT_EQ(1U, m_listeningPeerPool.getConnectionCountByPeerName(m_peerName));
     }
 
     void thenRequestHasFailed()
@@ -81,9 +134,14 @@ protected:
         return m_clientSessionPool;
     }
 
+    TrafficRelayStub& trafficRelayStub()
+    {
+        return m_trafficRelayStub;
+    }
+
     controller::ConnectSessionManager& connectSessionManager()
     {
-        return m_connectSessionManager;
+        return *m_connectSessionManager;
     }
 
     std::string listeningPeerName() const
@@ -91,13 +149,42 @@ protected:
         return m_peerName;
     }
 
+    void setListeningPeerName(std::string listeningPeerName)
+    {
+        m_peerName = std::move(listeningPeerName);
+    }
+
+    void addListeningPeerConnection()
+    {
+        addListeningPeerConnection(m_peerName);
+    }
+
+    void addListeningPeerConnection(std::string peerName)
+    {
+        using namespace std::placeholders;
+
+        api::BeginListeningRequest request;
+        request.peerName = std::move(peerName);
+
+        m_connectSessionManager->beginListening(
+            request,
+            std::bind(&ConnectSessionManager::onBeginListeningCompletion, this, _1, _2, _3));
+    }
+
+    StreamSocketStub* lastListeningPeerConnection()
+    {
+        return m_lastListeningPeerConnection;
+    }
+
 private:
     conf::Settings m_settings;
     model::ClientSessionPool m_clientSessionPool;
     model::ListeningPeerPool m_listeningPeerPool;
-    controller::ConnectSessionManager m_connectSessionManager;
+    TrafficRelayStub m_trafficRelayStub;
+    std::unique_ptr<controller::ConnectSessionManager> m_connectSessionManager;
     std::string m_peerName;
     nx::utils::SyncQueue<api::ResultCode> m_beginListeningResults;
+    StreamSocketStub* m_lastListeningPeerConnection = nullptr;
 
     void onBeginListeningCompletion(
         api::ResultCode resultCode,
@@ -106,8 +193,8 @@ private:
     {
         if (connectionEvents.onResponseHasBeenSent)
         {
-            auto tcpConnection = std::make_unique<nx::network::TCPSocket>(AF_INET);
-            ASSERT_TRUE(tcpConnection->setNonBlockingMode(true));
+            auto tcpConnection = std::make_unique<StreamSocketStub>();
+            m_lastListeningPeerConnection = tcpConnection.get();
             auto httpConnection = std::make_unique<nx_http::HttpServerConnection>(
                 nullptr,
                 std::move(tcpConnection),
@@ -154,12 +241,31 @@ public:
     }
 
 protected:
+    void givenClientSessionToListeningPeerWithIdleConnections()
+    {
+        addListeningPeerConnection();
+        
+        whenIssuedCreateSessionWithPredefinedId();
+        thenSessionHasBeenCreated();
+    }
+
+    void givenMultipleClientSessions()
+    {
+        m_connectSessionIds.resize(3);
+        for (auto& sessionId: m_connectSessionIds)
+        {
+            sessionId = nx::utils::generateRandomName(11).toStdString();
+            issueCreateSession(sessionId);
+            thenSessionHasBeenCreated();
+        }
+    }
+
     void whenIssuedCreateSessionWithoutId()
     {
         issueCreateSession(std::string());
     }
     
-    void whenIssuedCreateSessionWithoutPredefinedId()
+    void whenIssuedCreateSessionWithPredefinedId()
     {
         m_expectedSessionId = QnUuid::createUuid().toSimpleString().toStdString();
         issueCreateSession(m_expectedSessionId);
@@ -167,12 +273,40 @@ protected:
 
     void whenIssuedCreateSessionWithAlreadyUsedId()
     {
-        whenIssuedCreateSessionWithoutPredefinedId();
+        whenIssuedCreateSessionWithPredefinedId();
         thenSessionHasBeenCreated();
 
         std::string sessionId;
         m_expectedSessionId.swap(sessionId);
         issueCreateSession(sessionId);
+    }
+
+    void whenIssuedCreateSessionWithUnknownPeerName()
+    {
+        setListeningPeerName("unknown peer");
+        whenIssuedCreateSessionWithPredefinedId();
+    }
+
+    void whenRequestedConnectionToPeer()
+    {
+        using namespace std::placeholders;
+
+        api::ConnectToPeerRequest request;
+        request.sessionId = m_expectedSessionId;
+        connectSessionManager().connectToPeer(
+            request,
+            std::bind(&ConnectSessionManagerConnectingPeer::onConnectCompletion, this, _1, _2));
+    }
+
+    void whenIssuedConnectUsingUnknownSessionId()
+    {
+        m_expectedSessionId = "abra kadabra";
+        whenRequestedConnectionToPeer();
+    }
+
+    void whenListeningPeerDisconnects()
+    {
+        lastListeningPeerConnection()->setConnectionToClosedState();
     }
 
     void thenSessionHasBeenCreated()
@@ -184,9 +318,57 @@ protected:
         if (!m_expectedSessionId.empty())
             ASSERT_EQ(m_expectedSessionId, result.response.sessionId);
         ASSERT_EQ(kConnectSessionIdleTimeout, result.response.sessionTimeout);
-        ASSERT_EQ(
-            listeningPeerName(),
-            clientSessionPool().getPeerNameBySessionId(result.response.sessionId));
+        ASSERT_TRUE(boost::ends_with(
+            clientSessionPool().getPeerNameBySessionId(result.response.sessionId),
+            listeningPeerName()));
+    }
+
+    void thenCreateSessionReportedNotFound()
+    {
+        ASSERT_EQ(api::ResultCode::notFound, m_createClientSessionResults.pop().code);
+    }
+
+    void thenConnectRequestSucceeded()
+    {
+        ASSERT_EQ(api::ResultCode::ok, m_connectResults.pop().code);
+    }
+
+    void thenProxyingHasBeenStarted()
+    {
+        ASSERT_TRUE(
+            trafficRelayStub().hasRelaySession(
+                m_lastClientConnection,
+                lastListeningPeerConnection(),
+                listeningPeerName()));
+    }
+
+    void thenConnectHasReportedNotFound()
+    {
+        ASSERT_EQ(api::ResultCode::notFound, m_connectResults.pop().code);
+    }
+
+    void thenClientSessionsAreClosed()
+    {
+        for (const auto& sessionId: m_connectSessionIds)
+        {
+            for (;;)
+            {
+                api::ConnectToPeerRequest request;
+                request.sessionId = sessionId;
+                nx::utils::promise<api::ResultCode> completed;
+                connectSessionManager().connectToPeer(
+                    request,
+                    [&completed](api::ResultCode resultCode, nx_http::ConnectionEvents)
+                    {
+                        completed.set_value(resultCode);
+                    });
+                const auto resultCode = completed.get_future().get();
+                if (resultCode == api::ResultCode::ok)
+                    continue;
+                ASSERT_EQ(api::ResultCode::notFound, resultCode);
+                break;
+            }
+        }
     }
 
 private:
@@ -196,8 +378,16 @@ private:
         api::CreateClientSessionResponse response;
     };
 
+    struct ConnectResult
+    {
+        api::ResultCode code = api::ResultCode::ok;
+    };
+
     nx::utils::SyncQueue<CreateClientSessionResult> m_createClientSessionResults;
+    nx::utils::SyncQueue<ConnectResult> m_connectResults;
     std::string m_expectedSessionId;
+    StreamSocketStub* m_lastClientConnection = nullptr;
+    std::vector<std::string> m_connectSessionIds;
 
     void registerListeningPeer()
     {
@@ -228,6 +418,27 @@ private:
         result.response = std::move(response);
         m_createClientSessionResults.push(std::move(result));
     }
+
+    void onConnectCompletion(
+        api::ResultCode resultCode,
+        nx_http::ConnectionEvents connectionEvents)
+    {
+        if (connectionEvents.onResponseHasBeenSent)
+        {
+            auto tcpConnection = std::make_unique<StreamSocketStub>();
+            m_lastClientConnection = tcpConnection.get();
+            auto httpConnection = std::make_unique<nx_http::HttpServerConnection>(
+                nullptr,
+                std::move(tcpConnection),
+                nullptr,
+                nullptr);
+            connectionEvents.onResponseHasBeenSent(httpConnection.get());
+        }
+
+        ConnectResult result;
+        result.code = resultCode;
+        m_connectResults.push(result);
+    }
 };
 
 TEST_F(ConnectSessionManagerConnectingPeer, create_client_session_auto_generate_id)
@@ -238,7 +449,7 @@ TEST_F(ConnectSessionManagerConnectingPeer, create_client_session_auto_generate_
 
 TEST_F(ConnectSessionManagerConnectingPeer, create_client_session_desired_session_id)
 {
-    whenIssuedCreateSessionWithoutPredefinedId();
+    whenIssuedCreateSessionWithPredefinedId();
     thenSessionHasBeenCreated();
 }
 
@@ -248,12 +459,151 @@ TEST_F(ConnectSessionManagerConnectingPeer, create_client_session_id_is_already_
     thenSessionHasBeenCreated();
 }
 
-//TEST_F(ConnectSessionManagerConnectingPeer, client_session_expiration)
+TEST_F(ConnectSessionManagerConnectingPeer, create_client_session_to_unknown_peer)
+{
+    whenIssuedCreateSessionWithUnknownPeerName();
+    thenCreateSessionReportedNotFound();
+}
 
-//TEST_F(ConnectSessionManagerConnectingPeer, connect_to_listening_peer)
-//TEST_F(ConnectSessionManagerConnectingPeer, connect_to_unknown_peer)
-//TEST_F(ConnectSessionManagerConnectingPeer, connect_with_unknown_session_id)
-//TEST_F(ConnectSessionManagerConnectingPeer, connect_to_listening_peer_with_no_idle_connections)
+TEST_F(ConnectSessionManagerConnectingPeer, connect_with_unknown_session_id)
+{
+    whenIssuedConnectUsingUnknownSessionId();
+    thenConnectHasReportedNotFound();
+}
+
+TEST_F(
+    ConnectSessionManagerConnectingPeer,
+    all_client_sessions_are_closed_when_listening_peer_disappears)
+{
+    givenMultipleClientSessions();
+    whenListeningPeerDisconnects();
+    thenClientSessionsAreClosed();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class ConnectSessionManagerConnectingByDomainName:
+    public ConnectSessionManagerConnectingPeer
+{
+public:
+    ConnectSessionManagerConnectingByDomainName()
+    {
+        m_domainName = utils::generateRandomName(11).toStdString();
+        setListeningPeerName(m_domainName);
+    }
+
+protected:
+    void givenMultipleListeningPeersWithOneConnectionEach()
+    {
+        m_peerCount = 7;
+        m_connectionsPerPeer = 1;
+        createConnections();
+    }
+
+    void givenMultipleListeningPeersWithMultipleConnectionsEach()
+    {
+        m_peerCount = 7;
+        m_connectionsPerPeer = 7;
+        createConnections();
+    }
+
+    void whenRequestedConnectionByDomainName()
+    {
+        whenRequestedMultipleConnectionsByDomainName();
+    }
+
+    void whenRequestedMultipleConnectionsByDomainName()
+    {
+        whenIssuedCreateSessionWithPredefinedId();
+        thenSessionHasBeenCreated();
+
+        for (int i = 0; i < m_connectionsPerPeer; ++i)
+            whenRequestedConnectionToPeer();
+    }
+
+    void thenAllConnectionsBelongToTheSamePeer()
+    {
+        for (int i = 0; i < m_connectionsPerPeer; ++i)
+            thenConnectRequestSucceeded();
+        // TODO
+    }
+
+    void thenNoConnectionCouldBeRetrievedWithinSameSession()
+    {
+        whenRequestedConnectionToPeer();
+        thenConnectHasReportedNotFound();
+    }
+
+private:
+    std::string m_domainName;
+    std::vector<std::string> m_listeningPeersNames;
+    int m_peerCount = 0;
+    int m_connectionsPerPeer = 0;
+
+    void createConnections()
+    {
+        m_listeningPeersNames.resize(m_peerCount);
+        for (auto& peerName: m_listeningPeersNames)
+        {
+            peerName = utils::generateRandomName(11).toStdString();
+            for (int i = 0; i < m_connectionsPerPeer; ++i)
+                addListeningPeerConnection(peerName + "." + m_domainName);
+        }
+    }
+};
+
+TEST_F(
+    ConnectSessionManagerConnectingByDomainName,
+    all_connections_within_session_go_to_the_same_peer)
+{
+    givenMultipleListeningPeersWithOneConnectionEach();
+    whenRequestedConnectionByDomainName();
+    thenConnectRequestSucceeded();
+    thenNoConnectionCouldBeRetrievedWithinSameSession();
+}
+
+TEST_F(
+    ConnectSessionManagerConnectingByDomainName,
+    all_connections_within_session_go_to_the_same_peer2)
+{
+    givenMultipleListeningPeersWithMultipleConnectionsEach();
+    whenRequestedMultipleConnectionsByDomainName();
+    thenAllConnectionsBelongToTheSamePeer();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class ConnectSessionManagerConnectingPeerConnectTo:
+    public ConnectSessionManagerConnectingPeer
+{
+public:
+    ConnectSessionManagerConnectingPeerConnectTo()
+    {
+        whenIssuedCreateSessionWithPredefinedId();
+        thenSessionHasBeenCreated();
+    }
+
+protected:
+    void givenOngoingConnectToPeerRequest()
+    {
+        whenRequestedConnectionToPeer();
+    }
+};
+
+TEST_F(ConnectSessionManagerConnectingPeerConnectTo, connect_to_listening_peer)
+{
+    whenRequestedConnectionToPeer();
+
+    thenConnectRequestSucceeded();
+    thenProxyingHasBeenStarted();
+}
+
+TEST_F(ConnectSessionManagerConnectingPeerConnectTo, waits_for_request_completion)
+{
+    givenOngoingConnectToPeerRequest();
+    whenFreedConnectionManager();
+    thenConnectRequestSucceeded();
+}
 
 } // namespace test
 } // namespace controller

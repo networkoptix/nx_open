@@ -33,10 +33,10 @@ QnAutoRequestForwarder::QnAutoRequestForwarder(QnCommonModule* commonModule):
 void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
 {
     const auto allowedMethods = m_restrictionList.getAllowedAuthMethods(*request);
-    //TODO #ak AuthMethod::videowall is used here to imply existing class
-        //QnAuthMethodRestrictionList with no change, since release 2.5 is coming.
+    //TODO #ak nx_http::AuthMethod::videowall is used here to imply existing class
+        //nx_http::AuthMethodRestrictionList with no change, since release 2.5 is coming.
         //Proper types will be introduced in 2.6
-    if (!(allowedMethods & AuthMethod::videowall))
+    if (!(allowedMethods & nx_http::AuthMethod::videowall))
         return; //not processing url
 
     const QUrlQuery urlQuery( request->requestLine.url.query() );
@@ -131,7 +131,7 @@ bool QnAutoRequestForwarder::addProxyToRequest(
 
 void QnAutoRequestForwarder::addPathToIgnore(const QString& pathWildcardMask)
 {
-    m_restrictionList.deny(pathWildcardMask, AuthMethod::videowall);
+    m_restrictionList.deny(pathWildcardMask, nx_http::AuthMethod::videowall);
 }
 
 bool QnAutoRequestForwarder::findCameraGuid(

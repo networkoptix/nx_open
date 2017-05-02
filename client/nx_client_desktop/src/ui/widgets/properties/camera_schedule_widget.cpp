@@ -20,7 +20,7 @@
 
 #include <text/time_strings.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/palette.h>
 #include <ui/common/read_only.h>
 #include <ui/common/checkbox_utils.h>
@@ -41,6 +41,8 @@
 
 using boost::algorithm::all_of;
 using boost::algorithm::any_of;
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -541,6 +543,12 @@ void QnCameraScheduleWidget::submitToResources()
         if (minDays != kRecordedDaysDontChange)
             camera->setMinDays(minDays);
 
+        if (canChangeRecording)
+        {
+            camera->setLicenseUsed(enableRecording);
+            camera->setScheduleDisabled(!enableRecording);
+        }
+
         if (camera->isDtsBased())
             continue;
 
@@ -551,12 +559,6 @@ void QnCameraScheduleWidget::submitToResources()
             updateRecordThresholds(scheduleTasks);
         }
         camera->setScheduleTasks(scheduleTasks);
-
-        if (canChangeRecording)
-        {
-            camera->setLicenseUsed(enableRecording);
-            camera->setScheduleDisabled(!enableRecording);
-        }
     }
 
     if (!canChangeRecording)
@@ -1119,7 +1121,7 @@ void QnCameraScheduleWidget::at_displayFpsCheckBox_stateChanged(int state)
 
 void QnCameraScheduleWidget::at_licensesButton_clicked()
 {
-    menu()->trigger(QnActions::PreferencesLicensesTabAction);
+    menu()->trigger(action::PreferencesLicensesTabAction);
 }
 
 void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target)

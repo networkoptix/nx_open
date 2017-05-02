@@ -1,5 +1,7 @@
 #include "traffic_relay.h"
 
+#include <nx/utils/std/cpp14.h>
+
 namespace nx {
 namespace cloud {
 namespace relay {

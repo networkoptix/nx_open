@@ -17,7 +17,7 @@
         <guid>${traffic_relay.guid}</guid>
         <product.title>${company.name} traffic relay launcher</product.title>
 
-        <qt.libs>core network concurrent</qt.libs>
+        <qt.libs>core network concurrent gui</qt.libs>
         <global.libs>-lcommon -ludt -lnx_network -lnx_streaming -lnx_fusion -lnx_utils -ltraffic_relay</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>

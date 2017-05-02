@@ -426,9 +426,8 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
         case QnManualResourceSearchStatus::CheckingOnline:
         {
             Q_ASSERT(m_hostRangeSize);
-            int currentProgress = m_ipChecker.hostsChecked()
-                * PORT_SCAN_MAX_PROGRESS_PERCENT
-                / m_hostRangeSize;
+            int currentProgress = m_hostRangeSize ?
+                m_ipChecker.hostsChecked() * PORT_SCAN_MAX_PROGRESS_PERCENT / m_hostRangeSize : 0;
 
             result.status = QnManualResourceSearchStatus(m_state, currentProgress, MAX_PERCENT);
 

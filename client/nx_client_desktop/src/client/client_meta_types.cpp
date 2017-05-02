@@ -9,8 +9,8 @@
 #include <camera/thumbnail.h>
 #include <camera/data/abstract_camera_data.h>
 
-#include <ui/actions/actions.h>
-#include <ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <ui/common/weak_graphics_item_pointer.h>
 #include <ui/customization/customization.h>
 #include <ui/customization/palette_data.h>
@@ -38,6 +38,8 @@ QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
 Q_DECLARE_METATYPE(nx::cdb::api::ResultCode)
 Q_DECLARE_METATYPE(nx::cdb::api::SystemData)
 Q_DECLARE_METATYPE(rest::QnConnectionPtr)
+
+using namespace nx::client::desktop;
 
 void QnClientMetaTypes::initialize() {
     /* Note that running the code twice is perfectly OK,
@@ -68,8 +70,8 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnBackgroundImage>();
     qRegisterMetaType<Qn::ImageBehaviour>();
     qRegisterMetaType<ImageCorrectionParams>();
-    qRegisterMetaType<QnActions::IDType>();
-    qRegisterMetaType<QnActionParameters>();
+    qRegisterMetaType<ui::action::IDType>();
+    qRegisterMetaType<ui::action::Parameters>();
     qRegisterMetaType<QnUpdateInfo>();
     qRegisterMetaTypeStreamOperators<QnUpdateInfo>();
 

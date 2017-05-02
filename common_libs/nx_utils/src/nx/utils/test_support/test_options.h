@@ -2,6 +2,8 @@
 
 #include <atomic>
 
+#include <QtCore/QString>
+
 #include <nx/utils/argument_parser.h>
 
 namespace nx {
@@ -25,10 +27,14 @@ public:
 
     static void applyArguments(const ArgumentParser& args);
 
+    static void setTemporaryDirectoryPath(const QString& path);
+    static QString temporaryDirectoryPath();
+
 private:
     static std::atomic<size_t> s_timeoutMultiplier;
     static std::atomic<bool> s_disableTimeAsserts;
     static std::atomic<LoadMode> s_loadMode;
+    static QString sTemporaryDirectoryPath;
 };
 
 template<typename Count>

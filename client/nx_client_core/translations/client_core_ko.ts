@@ -5,7 +5,7 @@
     <name>QnCloudResultInfo</name>
     <message>
         <source>Successful.</source>
-        <translation>성공!</translation>
+        <translation>성공</translation>
     </message>
     <message>
         <source>Invalid login or password.</source>

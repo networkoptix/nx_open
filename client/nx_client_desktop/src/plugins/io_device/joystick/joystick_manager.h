@@ -38,7 +38,7 @@ private:
 
     EventHandler makeEventHandler(const config::Rule& rule, controls::ControlPtr control);
 
-    QnActionParameters createActionParameters(
+    nx::client::desktop::ui::action::Parameters createActionParameters(
         const config::Rule& rule,
         const controls::ControlPtr& control,
         const EventParameters& eventParameters);

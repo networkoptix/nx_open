@@ -15,6 +15,11 @@ RelayService::RelayService(int argc, char **argv):
 {
 }
 
+std::vector<SocketAddress> RelayService::httpEndpoints() const
+{
+    return m_view->httpEndpoints();
+}
+
 std::unique_ptr<utils::AbstractServiceSettings> RelayService::createSettings()
 {
     return std::make_unique<conf::Settings>();
@@ -27,6 +32,7 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
     Model model(settings);
     Controller controller(settings, &model);
     View view(settings, model, &controller);
+    m_view = &view;
 
     // TODO: #ak: process rights reduction should be done here.
 

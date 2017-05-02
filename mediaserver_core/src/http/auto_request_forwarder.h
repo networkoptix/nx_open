@@ -1,7 +1,7 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-#include <nx/network/auth_restriction_list.h>
+#include <nx/network/http/auth_restriction_list.h>
 #include <nx/network/http/httptypes.h>
 #include <common/common_module_aware.h>
 
@@ -17,7 +17,7 @@ public:
 
     void addPathToIgnore(const QString& pathWildcardMask);
 private:
-    QnAuthMethodRestrictionList m_restrictionList;
+    nx_http::AuthMethodRestrictionList m_restrictionList;
 
     bool findCameraGuid(
         const nx_http::Request& request,
