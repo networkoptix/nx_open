@@ -16,9 +16,9 @@ namespace ec2 {
 namespace database {
 namespace migrations {
 
-bool addDefaultWebpages(const QSqlDatabase& database)
+bool addDefaultWebpages(ec2::database::api::Context* context)
 {
-    auto addWebPage = [&database](const QString& name, const QString& url)
+    auto addWebPage = [context](const QString& name, const QString& url)
         {
             NX_ASSERT(!name.isEmpty());
             NX_ASSERT(QUrl(url).isValid());
@@ -31,7 +31,7 @@ bool addDefaultWebpages(const QSqlDatabase& database)
             webPage.typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kWebPageTypeId);
             webPage.url = url;
             webPage.name = name;
-            return api::saveWebPage(database, webPage);
+            return api::saveWebPage(context, webPage);
         };
 
     QFile config(":/serverProperties.json");

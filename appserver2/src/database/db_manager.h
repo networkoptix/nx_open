@@ -21,6 +21,7 @@
 #include "core/resource_access/user_access_data.h"
 #include "core/resource_access/resource_access_manager.h"
 #include "core/resource/user_resource.h"
+#include <database/api/db_resource_api.h>
 
 struct BeforeRestoreDbData;
 
@@ -679,6 +680,7 @@ namespace detail
         bool resyncIfNeeded(ResyncFlags flags);
 
         QString getDatabaseName(const QString& baseName);
+        void resetPreparedStatements();
     private:
         QnUuid m_storageTypeId;
         QnUuid m_serverTypeId;
@@ -704,6 +706,8 @@ namespace detail
         ResyncFlags m_resyncFlags;
         QnTransactionLog* m_tranLog;
         TimeSynchronizationManager* m_timeSyncManager;
+        std::unique_ptr<QSqlQuery> m_insCameraQuery;
+        ec2::database::api::Context m_resourceContext;
     };
 
 } // namespace detail

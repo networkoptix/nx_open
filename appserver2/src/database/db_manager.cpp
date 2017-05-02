@@ -244,7 +244,8 @@ QnDbManager::QnDbManager(QnCommonModule* commonModule):
     m_dbReadOnly(false),
     m_resyncFlags(),
     m_tranLog(nullptr),
-    m_timeSyncManager(nullptr)
+    m_timeSyncManager(nullptr),
+    m_resourceContext(m_sdb)
 {
 }
 
@@ -686,7 +687,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
         if (!locker.commit())
             return false;
     } // end of DB update
-
+    resetPreparedStatements();
     if (!execSQLScript("vacuum;", m_sdb))
         qWarning() << "failed to vacuum ecs database" << Q_FUNC_INFO;
 
@@ -1464,7 +1465,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/85_add_default_webpages.sql")))
     {
-        return ec2::database::migrations::addDefaultWebpages(m_sdb)
+        return ec2::database::migrations::addDefaultWebpages(&m_resourceContext)
             && resyncIfNeeded(ResyncWebPages);
     }
 
@@ -1473,7 +1474,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/87_migrate_videowall_layouts.sql")))
     {
-        return ec2::database::migrations::reparentVideoWallLayouts(m_sdb)
+        return ec2::database::migrations::reparentVideoWallLayouts(&m_resourceContext)
             && resyncIfNeeded({ResyncLayouts, ResyncVideoWalls});
     }
 
@@ -1627,7 +1628,7 @@ ErrorCode QnDbManager::fetchResourceParams( const QnQueryFilter& filter, ApiReso
 
 qint32 QnDbManager::getResourceInternalId( const QnUuid& guid )
 {
-    return database::api::getResourceInternalId(m_sdb, guid);
+    return database::api::getResourceInternalId(&m_resourceContext, guid);
 }
 
 QnUuid QnDbManager::getResourceGuid(const qint32 &internalId) {
@@ -1642,7 +1643,7 @@ QnUuid QnDbManager::getResourceGuid(const qint32 &internalId) {
 
 ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint32* internalId)
 {
-    if (!database::api::insertOrReplaceResource(m_sdb, data, internalId))
+    if (!database::api::insertOrReplaceResource(&m_resourceContext, data, internalId))
         return ErrorCode::dbError;
     return ErrorCode::ok;
 }
@@ -1738,19 +1739,25 @@ ErrorCode QnDbManager::insertOrReplaceUserRole(const ApiUserRoleData& data)
 
 ErrorCode QnDbManager::insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId)
 {
-    QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("\
-        INSERT OR REPLACE INTO vms_camera (vendor, manually_added, resource_ptr_id, group_name, group_id,\
-        mac, model, status_flags, physical_id) VALUES\
-        (:vendor, :manuallyAdded, :internalId, :groupName, :groupId, :mac, :model, :statusFlags, :physicalId)\
-    ");
-    QnSql::bind(data, &insQuery);
-    insQuery.bindValue(":internalId", internalId);
-    if (insQuery.exec()) {
+    if (!m_insCameraQuery)
+    {
+        m_insCameraQuery.reset(new QSqlQuery(m_sdb));
+        m_insCameraQuery->prepare("\
+            INSERT OR REPLACE INTO vms_camera (vendor, manually_added, resource_ptr_id, group_name, group_id,\
+            mac, model, status_flags, physical_id) VALUES\
+            (:vendor, :manuallyAdded, :internalId, :groupName, :groupId, :mac, :model, :statusFlags, :physicalId)\
+        ");
+    }
+
+    QnSql::bind(data, m_insCameraQuery.get());
+    m_insCameraQuery->bindValue(":internalId", internalId);
+    if (m_insCameraQuery->exec())
+    {
         return ErrorCode::ok;
     }
-    else {
-        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+    else
+    {
+        qWarning() << Q_FUNC_INFO << m_insCameraQuery->lastError().text();
         return ErrorCode::dbError;
     }
 }
@@ -2292,7 +2299,7 @@ ErrorCode QnDbManager::removeBusinessRule( const QnUuid& guid )
 
 ErrorCode QnDbManager::saveLayout(const ApiLayoutData& params)
 {
-    if (!database::api::saveLayout(m_sdb, params))
+    if (!database::api::saveLayout(&m_resourceContext, params))
         return ErrorCode::dbError;
     return ErrorCode::ok;
 }
@@ -2568,7 +2575,7 @@ ErrorCode QnDbManager::removeServer(const QnUuid& guid)
 
 ErrorCode QnDbManager::removeLayout(const QnUuid& id)
 {
-    return database::api::removeLayout(m_sdb, id)
+    return database::api::removeLayout(&m_resourceContext, id)
         ? ErrorCode::ok
         : ErrorCode::dbError;
 }
@@ -4027,7 +4034,14 @@ bool QnDbManager::tuneDBAfterOpen(QSqlDatabase* const sqlDb)
     if (!QnDbHelper::tuneDBAfterOpen(sqlDb))
         return false;
     m_tranLog->resetPreparedStatements();
+    resetPreparedStatements();
     return true;
+}
+
+void QnDbManager::resetPreparedStatements()
+{
+    m_resourceContext.reset();
+    m_insCameraQuery.reset();
 }
 
 // TODO: Change to a function. ATTENTION: Macro contains "return".
@@ -4546,7 +4560,7 @@ ErrorCode QnDbManager::insertOrReplaceVideowall(const ApiVideowallData& data, qi
 
 ErrorCode QnDbManager::saveWebPage(const ApiWebPageData& params)
 {
-    if (!database::api::saveWebPage(m_sdb, params))
+    if (!database::api::saveWebPage(&m_resourceContext, params))
         return ErrorCode::dbError;
     return ErrorCode::ok;
 }
