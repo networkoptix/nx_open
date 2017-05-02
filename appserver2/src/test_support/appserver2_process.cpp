@@ -283,7 +283,6 @@ int Appserver2Process::exec()
     //Must call messageProcessor->init(ec2Connection)
     //commonModule->setEc2Connection(ec2Connection);
 
-    nx_http::HttpModManager httpModManager;
     QnSimpleHttpConnectionListener tcpListener(
         m_commonModule.get(),
         QHostAddress::Any,
