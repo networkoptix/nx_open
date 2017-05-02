@@ -57,6 +57,14 @@ public:
     virtual QList<QAction*> newActions(const Parameters& parameters, QObject* parent) override;
 };
 
+class CurrentLayoutTourSettingsFactory: public Factory
+{
+    Q_OBJECT
+public:
+    CurrentLayoutTourSettingsFactory(QObject* parent);
+    virtual QList<QAction*> newActions(const Parameters& parameters, QObject* parent) override;
+};
+
 } // namespace action
 } // namespace ui
 } // namespace desktop

@@ -144,6 +144,7 @@ namespace Qn
         LayoutTourUuidRole,                         /**< Role for layout tour review layouts. */
         LayoutTourItemDelayMsRole,                  /**< Role for layout tour item delay. */
         LayoutTourItemOrderRole,                    /**< Role for layout tour item delay. */
+        LayoutTourIsManualRole,                     /**< Role for layout tour review layout in manual mode. */
 
         /* Layout-based. */
         LayoutCellSpacingRole,                      /**< Role for layout's cell spacing. Value of type qreal. */

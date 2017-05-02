@@ -61,6 +61,8 @@ void LayoutTourExecutor::startTour(const ec2::ApiLayoutTourData& tour)
     clearWorkbenchState();
 
     startTourInternal();
+    if (!tour.settings.manual)
+        startTimer();
 
     //action(action::EffectiveMaximizeAction)->setChecked(false);
     menu()->trigger(action::FreespaceAction);
@@ -75,6 +77,17 @@ void LayoutTourExecutor::updateTour(const ec2::ApiLayoutTourData& tour)
         return;
 
     NX_EXPECT(tour.isValid());
+
+    // Start/stop timer before items check.
+    bool isTourManual = !isTimerRunning();
+    if (isTourManual != tour.settings.manual)
+    {
+        if (tour.settings.manual)
+            stopTimer();
+        else
+            startTimer();
+    }
+
     m_tour.items = QnLayoutTourItem::createList(tour.items, resourcePool());
     if (m_tour.items.empty())
         stopCurrentTour();
@@ -92,6 +105,7 @@ void LayoutTourExecutor::startSingleLayoutTour()
 {
     m_mode = Mode::SingleLayout;
     startTourInternal();
+    startTimer();
 }
 
 QnUuid LayoutTourExecutor::runningTour() const
@@ -143,13 +157,12 @@ void LayoutTourExecutor::stopCurrentTour()
 
 void LayoutTourExecutor::processTourStep()
 {
-    NX_EXPECT(m_tour.elapsed.isValid());
     switch (m_mode)
     {
         case Mode::SingleLayout:
         {
             auto item = workbench()->item(Qn::ZoomedRole);
-            if (item && !m_tour.elapsed.hasExpired(qnSettings->tourCycleTime()))
+            if (item && isTimerRunning() && !m_tour.elapsed.hasExpired(qnSettings->tourCycleTime()))
                 return;
 
             auto items = workbench()->currentLayout()->items().toList();
@@ -165,7 +178,8 @@ void LayoutTourExecutor::processTourStep()
             else
                 item = items[0];
             workbench()->setItem(Qn::ZoomedRole, item);
-            m_tour.elapsed.restart();
+            if (isTimerRunning())
+                m_tour.elapsed.restart();
             break;
         }
         case Mode::MultipleLayouts:
@@ -179,7 +193,9 @@ void LayoutTourExecutor::processTourStep()
                 return;
             }
 
-            const bool isRunning = qBetween(0, m_tour.currentIndex, (int) m_tour.items.size());
+            const bool isRunning = isTimerRunning()
+                && qBetween(0, m_tour.currentIndex, (int) m_tour.items.size());
+
             if (isRunning)
             {
                 // No need to switch the only item.
@@ -207,7 +223,8 @@ void LayoutTourExecutor::processTourStep()
                 wbLayout = qnWorkbenchLayoutsFactory->create(layout, workbench());
                 workbench()->addLayout(wbLayout);
             }
-            m_tour.elapsed.restart();
+            if (isTimerRunning())
+                m_tour.elapsed.restart();
             workbench()->setCurrentLayout(wbLayout);
             break;
         }
@@ -261,6 +278,9 @@ void LayoutTourExecutor::startTimer()
 
 void LayoutTourExecutor::stopTimer()
 {
+    if (!isTimerRunning())
+        return;
+
     NX_EXPECT(m_tour.timerId != 0);
     killTimer(m_tour.timerId);
     m_tour.timerId = 0;
@@ -271,8 +291,12 @@ void LayoutTourExecutor::stopTimer()
 void LayoutTourExecutor::startTourInternal()
 {
     setHintVisible(true);
-    startTimer();
     processTourStep();
+}
+
+bool LayoutTourExecutor::isTimerRunning() const
+{
+    return m_tour.elapsed.isValid();
 }
 
 } // namespace workbench

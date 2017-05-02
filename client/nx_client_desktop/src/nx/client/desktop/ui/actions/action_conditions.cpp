@@ -291,16 +291,6 @@ ActionVisibility VideoWallReviewModeCondition::check(const Parameters& /*paramet
         : InvisibleAction;
 }
 
-ActionVisibility LayoutTourReviewModeCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
-{
-    const bool isLayoutTourReviewMode = context->workbench()->currentLayout()->data()
-        .contains(Qn::LayoutTourUuidRole);
-
-    return isLayoutTourReviewMode
-        ? EnabledAction
-        : InvisibleAction;
-}
-
 ActionVisibility RequiresOwnerCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
 {
     if (context->user() && context->user()->isOwner())
@@ -1650,6 +1640,15 @@ ConditionWrapper treeNodeType(QSet<Qn::NodeType> types)
             // Actions, triggered manually or from scene, must not check node type
             return !parameters.hasArgument(Qn::NodeTypeRole)
                 || types.contains(parameters.argument(Qn::NodeTypeRole).value<Qn::NodeType>());
+        });
+}
+
+ConditionWrapper isLayoutTourReviewMode()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
+        {
+            return context->workbench()->currentLayout()->data().contains(Qn::LayoutTourUuidRole);
         });
 }
 

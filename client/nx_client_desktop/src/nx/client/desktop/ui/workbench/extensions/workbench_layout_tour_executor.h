@@ -62,6 +62,7 @@ private:
     void startTimer();
     void stopTimer();
     void startTourInternal();
+    bool isTimerRunning() const;
 
 private:
     enum class Mode
