@@ -885,6 +885,8 @@ bool P2pMessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const
 QVector<SubscribeRecord> P2pMessageBus::deserializeSubscribeForDataUpdatesRequest(const QByteArray& data, bool* success)
 {
     QVector<SubscribeRecord> result;
+    if (data.isEmpty())
+        return result;
     BitStreamReader reader((quint8*) data.data(), data.size());
     try {
         while (reader.bitsLeft() > 0)

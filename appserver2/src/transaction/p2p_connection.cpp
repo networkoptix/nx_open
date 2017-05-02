@@ -531,7 +531,7 @@ void P2pConnection::onNewMessageRead(SystemError::ErrorCode errorCode, size_t by
 
 bool P2pConnection::handleMessage(const nx::Buffer& message)
 {
-    NX_ASSERT(message.size() > 1);
+    NX_ASSERT(!message.isEmpty());
     MessageType messageType = (MessageType) message[0];
     NX_ASSERT(!m_remotePeer.persistentId.isNull());
     emit gotMessage(toSharedPointer(), messageType, message.mid(1));
