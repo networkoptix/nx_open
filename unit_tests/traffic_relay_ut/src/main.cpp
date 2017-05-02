@@ -17,9 +17,6 @@ int main(int argc, char** argv)
         argc, argv,
         [](const nx::utils::ArgumentParser& args)
         {
-            if (const auto value = args.get("tmp"))
-                nx::utils::TestOptions::setTemporaryDirectoryPath(*value);
-
             return nx::utils::test::DeinitFunctions();
         },
         nx::network::InitializationFlags::disableUdt);
