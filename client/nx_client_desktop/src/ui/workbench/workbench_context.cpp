@@ -7,9 +7,8 @@
 #include <client/client_runtime_settings.h>
 #include <client/client_message_processor.h>
 
-#include <ui/actions/action_manager.h>
-#include <ui/actions/action.h>
-
+#include <nx/client/desktop/ui/actions/action.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_synchronizer.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
@@ -42,6 +41,8 @@
 
 #include <nx/utils/log/log.h>
 
+using namespace nx::client::desktop::ui;
+
 QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessController, QObject* parent):
     QObject(parent),
     m_accessController(accessController),
@@ -70,7 +71,7 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
     /* Create dependent objects. */
     m_synchronizer.reset(new QnWorkbenchSynchronizer(this));
 
-    m_menu.reset(new QnActionManager(this));
+    m_menu.reset(new nx::client::desktop::ui::action::Manager(this));
     m_display.reset(new QnWorkbenchDisplay(this));
     m_navigator.reset(new QnWorkbenchNavigator(this));
 
@@ -82,7 +83,7 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
     auto statisticsManager = commonModule()->instance<QnStatisticsManager>();
 
     const auto actionsStatModule = instance<QnActionsStatisticsModule>();
-    actionsStatModule->setActionManager(m_menu.data()); // TODO: #ynikitenkov refactor QnActionManager to singleton
+    actionsStatModule->setActionManager(m_menu.data());
     statisticsManager->registerStatisticsModule(lit("actions"), actionsStatModule);
 
     const auto userStatModule = instance<QnUsersStatisticsModule>();
@@ -137,7 +138,7 @@ QnWorkbenchLayoutSnapshotManager* QnWorkbenchContext::snapshotManager() const
     return m_snapshotManager.data();
 }
 
-QnActionManager* QnWorkbenchContext::menu() const
+nx::client::desktop::ui::action::Manager* QnWorkbenchContext::menu() const
 {
     return m_menu.data();
 }
@@ -182,7 +183,7 @@ void QnWorkbenchContext::setMainWindow(QWidget *mainWindow)
 }
 
 
-QAction *QnWorkbenchContext::action(const QnActions::IDType id) const {
+QAction *QnWorkbenchContext::action(const action::IDType id) const {
     return m_menu->action(id);
 }
 
@@ -248,9 +249,9 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
                 NX_LOG(lit("Custom URI: System is cloud, connecting to cloud first"), cl_logDEBUG1);
             }
 
-            auto parameters = QnActionParameters().withArgument(Qn::UrlRole, systemUrl);
+            auto parameters = action::Parameters().withArgument(Qn::UrlRole, systemUrl);
             parameters.setArgument(Qn::ForceRole, true);
-            menu()->trigger(QnActions::ConnectAction, parameters);
+            menu()->trigger(action::ConnectAction, parameters);
             return true;
 
         }
@@ -278,14 +279,14 @@ bool QnWorkbenchContext::connectUsingCommandLineAuth(const QnStartupParameters& 
         appServerUrl.setUserName(startupParams.videoWallGuid.toString());
     }
 
-    auto params = QnActionParameters().withArgument(Qn::UrlRole, appServerUrl);
+    auto params = action::Parameters().withArgument(Qn::UrlRole, appServerUrl);
     params.setArgument(Qn::ForceRole, true);
     if (qnSettings->autoLogin())
     {
         params.setArgument(Qn::AutoLoginRole, true);
         params.setArgument(Qn::StorePasswordRole, true);
     }
-    menu()->trigger(QnActions::ConnectAction, params);
+    menu()->trigger(action::ConnectAction, params);
     return true;
 }
 
@@ -312,8 +313,11 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
     * * we have opened exported exe-file
     * Otherwise we should try to connect or show welcome page.
     */
-    const auto welcomeScreen = instance<QnWorkbenchWelcomeScreen>();
-    welcomeScreen->setVisibleControls(true);
+    if (qnRuntime->isDesktopMode())
+    {
+        const auto welcomeScreen = instance<QnWorkbenchWelcomeScreen>();
+        welcomeScreen->setVisibleControls(true);
+    }
 
     if (!connectUsingCustomUri(startupParams.customUri)
         && startupParams.instantDrop.isEmpty()
@@ -326,7 +330,7 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
 
     if (!startupParams.videoWallGuid.isNull())
     {
-        menu()->trigger(QnActions::DelayedOpenVideoWallItemAction, QnActionParameters()
+        menu()->trigger(action::DelayedOpenVideoWallItemAction, action::Parameters()
                                  .withArgument(Qn::VideoWallGuidRole, startupParams.videoWallGuid)
                                  .withArgument(Qn::VideoWallItemGuidRole, startupParams.videoWallItemGuid));
     }
@@ -335,12 +339,12 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
         NX_ASSERT(startupParams.instantDrop.isEmpty());
 
         QByteArray data = QByteArray::fromBase64(startupParams.delayedDrop.toLatin1());
-        menu()->trigger(QnActions::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
+        menu()->trigger(action::DelayedDropResourcesAction, {Qn::SerializedDataRole, data});
     }
     else if (!startupParams.instantDrop.isEmpty())
     {
         QByteArray data = QByteArray::fromBase64(startupParams.instantDrop.toLatin1());
-        menu()->trigger(QnActions::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
+        menu()->trigger(action::InstantDropResourcesAction, {Qn::SerializedDataRole, data});
     }
 
     /* Show beta version warning message for the main instance only */
@@ -351,11 +355,11 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
         && startupParams.customUri.isNull();
 
     if (showBetaWarning)
-        action(QnActions::BetaVersionMessageAction)->trigger();
+        action(action::BetaVersionMessageAction)->trigger();
 
 #ifdef _DEBUG
     /* Show FPS in debug. */
-    menu()->trigger(QnActions::ShowFpsAction);
+    menu()->trigger(action::ShowFpsAction);
 #endif
 
     return true;
@@ -365,7 +369,7 @@ void QnWorkbenchContext::initWorkarounds()
 {
     instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
 
-    QnActions::IDType effectiveMaximizeActionId = QnActions::FullscreenAction;
+    action::IDType effectiveMaximizeActionId = action::FullscreenAction;
 #ifdef Q_OS_LINUX
     /* In Ubuntu its launcher is configured to be shown when a non-fullscreen window has appeared.
     * In our case it means that launcher overlaps our fullscreen window when the user opens any dialogs.
@@ -376,8 +380,8 @@ void QnWorkbenchContext::initWorkarounds()
     * we just disable fullscreen for unity-3d desktop session.
     */
     if (QnX11LauncherWorkaround::isUnity3DSession())
-        effectiveMaximizeActionId = QnActions::MaximizeAction;
+        effectiveMaximizeActionId = action::MaximizeAction;
 #endif
-    menu()->registerAlias(QnActions::EffectiveMaximizeAction, effectiveMaximizeActionId);
+    menu()->registerAlias(action::EffectiveMaximizeAction, effectiveMaximizeActionId);
 }
 

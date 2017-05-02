@@ -317,6 +317,8 @@ public:
      */
     void setData(Qn::ItemDataRole role, const QVariant &value);
 
+    static void sortByGeometry(QList<QnWorkbenchItem*>* items);
+
 signals:
     void geometryChanged();
     void geometryDeltaChanged();

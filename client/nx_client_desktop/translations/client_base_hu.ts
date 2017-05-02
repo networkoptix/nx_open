@@ -268,6 +268,33 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
 </context>
 <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+        <source>Zoom In</source>
+        <translation>Zoom be</translation>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation>Zoom ki</translation>
+    </message>
+    <message>
+        <source>Focus Far</source>
+        <translation>Fókusz távoli</translation>
+    </message>
+    <message>
+        <source>Focus Near</source>
+        <translation>Fókusz közeli</translation>
+    </message>
+    <message>
+        <source>Auto Focus</source>
+        <translation>Autó fókusz</translation>
+    </message>
+    <message>
+        <source>Change Dewarping Mode</source>
+        <translation>Dewarping mód változtatása</translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>Parameter 1 is null.</source>
@@ -1226,7 +1253,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
         <source>Disconnect from Server</source>
-        <translation>Lekapcsolódás a szerverről</translation>
+        <translation>Kijelentkezés a szerverről</translation>
     </message>
     <message>
         <source>Browse Local Files</source>
@@ -1252,12 +1279,12 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Log out from %1</source>
         <comment>Log out from Nx Cloud</comment>
-        <translation>Jelentkezzen ki innen %1</translation>
+        <translation>Jelentkezzen ki a %1-ból</translation>
     </message>
     <message>
         <source>Open %1 Portal...</source>
         <comment>Open Nx Cloud Portal</comment>
-        <translation>Nyissa meg a %1 portál...</translation>
+        <translation>Nyissa meg a %1 portált...</translation>
     </message>
     <message>
         <source>Stop Sharing Layout</source>
@@ -3114,7 +3141,7 @@ to %1</source>
     <message>
         <source>Failed to disconnect System from %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation>Lekapcsolódás %1 felhőről sikertelen</translation>
+        <translation>Kijelentkezés a %1 felhőről sikertelen</translation>
     </message>
     <message>
         <source>Disconnect System from %1?</source>

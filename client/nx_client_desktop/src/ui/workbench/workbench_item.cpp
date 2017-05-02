@@ -441,3 +441,18 @@ void QnWorkbenchItem::setData(Qn::ItemDataRole role, const QVariant &value)
         }
     }
 }
+
+void QnWorkbenchItem::sortByGeometry(QList<QnWorkbenchItem*>* items)
+{
+    NX_EXPECT(items);
+    if (!items)
+        return;
+
+    std::sort(items->begin(), items->end(),
+        [](QnWorkbenchItem* l, QnWorkbenchItem* r)
+        {
+            QRect lg = l->geometry();
+            QRect rg = r->geometry();
+            return lg.y() < rg.y() || (lg.y() == rg.y() && lg.x() < rg.x());
+        });
+}

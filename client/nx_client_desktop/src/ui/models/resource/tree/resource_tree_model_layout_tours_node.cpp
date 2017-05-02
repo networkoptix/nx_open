@@ -5,7 +5,6 @@
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/models/resource/resource_tree_model_node_factory.h>
 
-#include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 
 QnResourceTreeModelLayoutToursNode::QnResourceTreeModelLayoutToursNode(QnResourceTreeModel* model):
@@ -44,11 +43,6 @@ void QnResourceTreeModelLayoutToursNode::deinitialize()
     base_type::deinitialize();
 }
 
-QIcon QnResourceTreeModelLayoutToursNode::calculateIcon() const
-{
-    return qnResIconCache->icon(QnResourceIconCache::Layouts);
-}
-
 void QnResourceTreeModelLayoutToursNode::handleTourAdded(const ec2::ApiLayoutTourData& tour)
 {
     ensureLayoutTourNode(tour);
@@ -75,11 +69,6 @@ QnResourceTreeModelNodePtr QnResourceTreeModelLayoutToursNode::ensureLayoutTourN
         iter = m_nodes.insert(tour.id, node);
     }
     return *iter;
-}
-
-bool QnResourceTreeModelLayoutToursNode::canSeeTour(const ec2::ApiLayoutTourData& tour) const
-{
-    return true; //TODO: #GDM #3.1 #tbd
 }
 
 void QnResourceTreeModelLayoutToursNode::rebuild()

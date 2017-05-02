@@ -568,7 +568,7 @@
     <message>
         <location/>
         <source>Add selected</source>
-        <translation>&amp;Добавить выбранные</translation>
+        <translation>Добавить выбранные</translation>
     </message>
 </context>
 <context>
@@ -1145,7 +1145,7 @@
     <message>
         <location/>
         <source>Add...</source>
-        <translation>&amp;Добавить...</translation>
+        <translation>Добавить...</translation>
     </message>
     <message>
         <location/>
@@ -1963,7 +1963,7 @@
     <message>
         <location/>
         <source>Add...</source>
-        <translation>&amp;Добавить...</translation>
+        <translation>Добавить...</translation>
     </message>
     <message>
         <location/>

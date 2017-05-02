@@ -465,6 +465,9 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
         case Qn::VideoWallItemNode:
             return itemStateForVideoWallItem(index);
 
+        case Qn::LayoutTourNode:
+            return itemStateForLayoutTour(index);
+
         default:
             break;
     }
@@ -626,6 +629,16 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForVideoWallI
             return ItemState::Accented;
     }
     return ItemState::Selected;
+}
+
+QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForLayoutTour(
+    const QModelIndex& index) const
+{
+    /* Layout Tours are Selected when they are opened on the scene. */
+    const QnUuid currentTourId = workbench()->currentLayout()->data(Qn::LayoutTourUuidRole).value<QnUuid>();
+    if (!currentTourId.isNull() && index.data(Qn::UuidRole).value<QnUuid>() == currentTourId)
+        return ItemState::Selected;
+    return ItemState::Normal;
 }
 
 void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& baseName, QString& extInfo) const

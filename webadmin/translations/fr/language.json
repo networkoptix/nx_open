@@ -12,11 +12,11 @@
     "errorNoNetwork":"Cet appareil a besoin de connexion réseau pour fonctionner. <br>S.V.P connecter au réseau local ou Internet"
   },
   "passwordRequirements":{
-    "minLengthMessage":"Mot de passe doit contenir au moins 8 caractères",
-    "requiredMessage":"Utilisez uniquement des caractères alphanumériques\net des symboles du clavier, éviter les espaces de début et de fin.",
-    "weakMessage":"Utilisez des lettres majuscule et minuscule\net symboles spéciaux pour rendre le mot de passe plus fort",
+    "minLengthMessage":"Mot de passe doit avoir au moins 8 caractères",
+    "requiredMessage":"Uniquement lettres latines, chiffres et symboles clavier sont autorisés",
+    "weakMessage":"Mot de passe doit contenir différents types de symboles",
     "strongMessage":"Mot de passe fort!",
-    "commonMessage":"Ce mot de passe est en haut de la liste des plus populaires dans le monde"
+    "commonMessage":"Ce mot de passe est dans la liste des mots de passe plus populaires"
   },
   "settings":{
     "tabs":{

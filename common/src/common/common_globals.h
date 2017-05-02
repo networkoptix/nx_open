@@ -15,7 +15,7 @@ Q_OBJECT
 #endif
 QN_DECLARE_METAOBJECT_HEADER(Qn,
     ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
-    PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent
+    PtzCapability StreamFpsSharingMethod MotionType TimePeriodContent SystemComponent
     ConnectionRole ResourceStatus BitratePerGopType
     StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PeerType StatisticsDeviceType
     ServerFlag BackupType StorageInitResult CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
@@ -23,7 +23,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     Permission GlobalPermission UserRole ConnectionResult
     ,
     ResourceFlags CameraCapabilities PtzDataFields PtzCapabilities PtzTraits
-    MotionTypes TimePeriodTypes
+    MotionTypes
     ServerFlags CameraBackupQualities TimeFlags CameraStatusFlags IOPortTypes
     Permissions GlobalPermissions
     )

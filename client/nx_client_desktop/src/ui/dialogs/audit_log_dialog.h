@@ -9,7 +9,7 @@
 
 #include <api/model/audit/audit_record.h>
 #include <core/resource/resource_fwd.h>
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 
 class QnAuditLogMasterModel;
@@ -80,7 +80,7 @@ private:
     QnAuditRecordRefList filterChildDataByCameras(const QnAuditRecordRefList& checkedRows);
     void setupFilterCheckbox(QCheckBox* checkbox, const QColor& color, Qn::AuditRecordTypes filteredTypes);
     void processPlaybackAction(const QnAuditRecord* record);
-    void triggerAction(const QnAuditRecord* record, QnActions::IDType ActionId, int selectedPage);
+    void triggerAction(const QnAuditRecord* record, nx::client::desktop::ui::action::IDType ActionId, int selectedPage);
     QnAuditRecordRefList applyFilter();
     void makeSessionData();
     void makeCameraData();

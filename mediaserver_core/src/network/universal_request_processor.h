@@ -19,7 +19,7 @@ public:
 
     virtual ~QnUniversalRequestProcessor();
 
-    static void setUnauthorizedPageBody(const QByteArray& value, AuthMethod::Values methods);
+    static void setUnauthorizedPageBody(const QByteArray& value, nx_http::AuthMethod::Values methods);
     static QByteArray unauthorizedPageBody();
 
     static bool isProxy(QnCommonModule* commonModule, const nx_http::Request& request);

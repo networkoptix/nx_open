@@ -19,6 +19,7 @@
 #include <utils/common/connective.h>
 
 class QnWorkbenchItem;
+class QnWorkbenchLayout;
 class QnResourceWidget;
 class QTimer;
 class QnVideoWallLicenseUsageHelper;

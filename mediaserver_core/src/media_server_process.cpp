@@ -94,6 +94,7 @@
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <nx_ec/managers/abstract_server_manager.h>
 #include <nx/network/socket.h>
+#include <nx/network/udt/udt_socket.h>
 #include <nx/network/upnp/upnp_device_searcher.h>
 
 #include <plugins/native_sdk/common_plugin_container.h>
@@ -273,6 +274,7 @@ static const QByteArray NO_SETUP_WIZARD("noSetupWizard");
 static QString SERVICE_NAME = lit("%1 Server").arg(QnAppInfo::organizationName());
 static const quint64 DEFAULT_MAX_LOG_FILE_SIZE = 10*1024*1024;
 static const quint64 DEFAULT_LOG_ARCHIVE_SIZE = 25;
+static const int UDT_INTERNET_TRAFIC_TIMER = 24 * 60 * 60 * 1000; //< Once a day;
 //static const quint64 DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 static const QByteArray APPSERVER_PASSWORD("appserverPassword");
@@ -1800,7 +1802,13 @@ void MediaServerProcess::registerRestHandlers(
     QnUniversalTcpListener* tcpListener,
     ec2::QnTransactionMessageBus* messageBus)
 {
-    auto processorPool = tcpListener->processorPool();
+	auto processorPool = tcpListener->processorPool();
+    const auto welcomePage = lit("/static/index.html");
+    processorPool->registerRedirectRule(lit(""), welcomePage);
+    processorPool->registerRedirectRule(lit("/"), welcomePage);
+    processorPool->registerRedirectRule(lit("/static"), welcomePage);
+    processorPool->registerRedirectRule(lit("/static/"), welcomePage);
+
     auto reg =
         [processorPool](const QString& path, QnRestRequestHandler* handler,
             Qn::GlobalPermission permissions = Qn::NoGlobalPermissions)
@@ -1940,9 +1948,9 @@ bool MediaServerProcess::initTcpListener(
 
     // Server return code 403 (forbidden) instead of 401 if user isn't authorized for requests starting with 'web' path
     m_universalTcpListener->setPathIgnorePrefix("web/");
-    QnAuthHelper::instance()->restrictionList()->deny(lit("/web/*"), AuthMethod::http);
+    QnAuthHelper::instance()->restrictionList()->deny(lit("/web/*"), nx_http::AuthMethod::http);
 
-    AuthMethod::Values methods = (AuthMethod::Values)(AuthMethod::cookie | AuthMethod::urlQueryParam | AuthMethod::tempUrlQueryParam);
+    nx_http::AuthMethod::Values methods = (nx_http::AuthMethod::Values)(nx_http::AuthMethod::cookie | nx_http::AuthMethod::urlQueryParam | nx_http::AuthMethod::tempUrlQueryParam);
     QnUniversalRequestProcessor::setUnauthorizedPageBody(QnFileConnectionProcessor::readStaticFile("static/login.html"), methods);
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
@@ -2182,7 +2190,7 @@ void MediaServerProcess::updateAllowedInterfaces()
     setInterfaceListFilter(allowedInterfaces);
 }
 
-QString MediaServerProcess::hardwareIdAsGuid()
+QString MediaServerProcess::hardwareIdAsGuid() const
 {
     auto hwId = LLUtil::getLatestHardwareId();
     auto hwIdString = QnUuid::fromHardwareId(hwId).toString();
@@ -2386,27 +2394,27 @@ void MediaServerProcess::run()
     connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &MediaServerProcess::at_emptyDigestDetected);
 
     //TODO #ak following is to allow "OPTIONS * RTSP/1.0" without authentication
-    QnAuthHelper::instance()->restrictionList()->allow( lit( "?" ), AuthMethod::noAuth );
+    QnAuthHelper::instance()->restrictionList()->allow( lit( "?" ), nx_http::AuthMethod::noAuth );
 
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/ping"), AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/camera_event*"), AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/showLog*"), AuthMethod::urlQueryParam);   //allowed by default for now
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/moduleInformation"), AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/gettime"), AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/getTimeZones"), AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/getNonce"), AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/cookieLogin"), AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/cookieLogout"), AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/getCurrentUser"), AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/static/*"), AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("/crossdomain.xml"), AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/startLiteClient"), AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/installUpdate"), AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/ping"), nx_http::AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/camera_event*"), nx_http::AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/showLog*"), nx_http::AuthMethod::urlQueryParam);   //allowed by default for now
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/moduleInformation"), nx_http::AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/gettime"), nx_http::AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/getTimeZones"), nx_http::AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/getNonce"), nx_http::AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/cookieLogin"), nx_http::AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/cookieLogout"), nx_http::AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/getCurrentUser"), nx_http::AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/static/*"), nx_http::AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("/crossdomain.xml"), nx_http::AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/startLiteClient"), nx_http::AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/installUpdate"), nx_http::AuthMethod::noAuth);
     // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud authentication is implemented.
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/installUpdateUnauthenticated"), AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/installUpdateUnauthenticated"), nx_http::AuthMethod::noAuth);
 
     //by following delegating hls authentication to target server
-    QnAuthHelper::instance()->restrictionList()->allow( lit("*/proxy/*/hls/*"), AuthMethod::noAuth );
+    QnAuthHelper::instance()->restrictionList()->allow( lit("*/proxy/*/hls/*"), nx_http::AuthMethod::noAuth );
 
     std::unique_ptr<QnBusinessRuleProcessor> mserverBusinessRuleProcessor(new QnMServerBusinessRuleProcessor(commonModule()));
 
@@ -2982,6 +2990,23 @@ void MediaServerProcess::run()
     connect(&timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
     timer.start(QnVirtualCameraResource::issuesTimeoutMs());
     at_timer();
+
+    QTimer udtInternetTrafficTimer;
+    connect(&udtInternetTrafficTimer, &QTimer::timeout,
+        [common = commonModule()]()
+        {
+            QnResourcePtr server = common->resourcePool()->getResourceById(common->moduleGUID());
+            const auto old = server->getProperty(Qn::UDT_INTERNET_TRFFIC).toULongLong();
+            const auto current = nx::network::UdtStatistics::global.internetBytesTransfered.load();
+            const auto update = old + (qulonglong) current;
+            if (server->setProperty(Qn::UDT_INTERNET_TRFFIC, QString::number(update))
+                && server->saveParams())
+            {
+                NX_LOG(lm("%1 is updated to %2").strs(Qn::UDT_INTERNET_TRFFIC, update), cl_logDEBUG1);
+                nx::network::UdtStatistics::global.internetBytesTransfered -= current;
+            }
+        });
+    udtInternetTrafficTimer.start(UDT_INTERNET_TRAFIC_TIMER);
 
     QTimer::singleShot(3000, this, SLOT(at_connectionOpened()));
     QTimer::singleShot(0, this, SLOT(at_appStarted()));

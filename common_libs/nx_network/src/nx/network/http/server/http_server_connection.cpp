@@ -15,7 +15,7 @@ HttpServerConnection::HttpServerConnection(
     StreamConnectionHolder<HttpServerConnection>* socketServer,
     std::unique_ptr<AbstractStreamSocket> sock,
     nx_http::server::AbstractAuthenticationManager* const authenticationManager,
-    nx_http::MessageDispatcher* const httpMessageDispatcher )
+    nx_http::AbstractMessageDispatcher* const httpMessageDispatcher )
 :
     BaseType( socketServer, std::move(sock) ),
     m_authenticationManager( authenticationManager ),
@@ -58,12 +58,8 @@ void HttpServerConnection::processMessage( nx_http::Message&& requestMessage )
     if (!m_authenticationManager)
     {
         onAuthenticationDone(
-            true,
-            nx::utils::stree::ResourceContainer(),
-            std::move(requestMessage),
-            boost::none,
-            nx_http::HttpHeaders(),
-            nullptr);
+            nx_http::server::SuccessfulAuthenticationResult(),
+            std::move(requestMessage));
         return;
     }
 
@@ -73,13 +69,8 @@ void HttpServerConnection::processMessage( nx_http::Message&& requestMessage )
     m_authenticationManager->authenticate(
         *this,
         request,
-        [this, weakThis = std::move(weakThis),
-            requestMessage = std::move(requestMessage)](
-                bool authenticationResult,
-                nx::utils::stree::ResourceContainer authInfo,
-                boost::optional<header::WWWAuthenticate> wwwAuthenticate,
-                nx_http::HttpHeaders responseHeaders,
-                std::unique_ptr<AbstractMsgBodySource> msgBody) mutable
+        [this, weakThis = std::move(weakThis), requestMessage = std::move(requestMessage)](
+            nx_http::server::AuthenticationResult authenticationResult) mutable
         {
             auto strongThis = weakThis.lock();
             if (!strongThis)
@@ -93,39 +84,27 @@ void HttpServerConnection::processMessage( nx_http::Message&& requestMessage )
 
             strongThis->post(
                 [this,
-                    authenticationResult,
-                    authInfo = std::move(authInfo),
-                    requestMessage = std::move(requestMessage),
-                    wwwAuthenticate = std::move(wwwAuthenticate),
-                    responseHeaders = std::move(responseHeaders),
-                    msgBody = std::move(msgBody)]() mutable
+                    authenticationResult = std::move(authenticationResult),
+                    requestMessage = std::move(requestMessage)]() mutable
                 {
                     onAuthenticationDone(
-                        authenticationResult,
-                        std::move(authInfo),
-                        std::move(requestMessage),
-                        std::move(wwwAuthenticate),
-                        std::move(responseHeaders),
-                        std::move(msgBody));
+                        std::move(authenticationResult),
+                        std::move(requestMessage));
                 });
         });
 }
 
 void HttpServerConnection::onAuthenticationDone(
-    bool authenticationResult,
-    nx::utils::stree::ResourceContainer authInfo,
-    nx_http::Message requestMessage,
-    boost::optional<header::WWWAuthenticate> wwwAuthenticate,
-    nx_http::HttpHeaders responseHeaders,
-    std::unique_ptr<AbstractMsgBodySource> msgBody)
+    nx_http::server::AuthenticationResult authenticationResult,
+    nx_http::Message requestMessage)
 {
-    if (!authenticationResult)
+    if (!authenticationResult.isSucceeded)
     {
         sendUnauthorizedResponse(
             requestMessage.request->requestLine.version,
-            std::move(wwwAuthenticate),
-            std::move(responseHeaders),
-            std::move(msgBody));
+            std::move(authenticationResult.wwwAuthenticate),
+            std::move(authenticationResult.responseHeaders),
+            std::move(authenticationResult.msgBody));
         return;
     }
 
@@ -167,7 +146,7 @@ void HttpServerConnection::onAuthenticationDone(
         !m_httpMessageDispatcher->dispatchRequest(
             this,
             std::move(requestMessage),
-            std::move(authInfo),
+            std::move(authenticationResult.authInfo),
             std::move(sendResponseFunc)))
     {
         //creating and sending error response

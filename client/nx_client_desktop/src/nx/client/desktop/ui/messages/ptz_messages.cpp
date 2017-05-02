@@ -43,7 +43,7 @@ bool deletePresetInUse(QWidget* parent)
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, parent);
 
     dialog.addCustomButton(QnMessageBoxCustomButton::Delete,
-        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+        QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
     dialog.setCheckBoxEnabled();
 
     const auto result = (dialog.exec() != QDialogButtonBox::Cancel);

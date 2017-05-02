@@ -72,6 +72,8 @@ void QnWorkbenchStateManager::saveState()
     state.localSystemId = localSystemId;
     state.userId = userId;
     workbench()->submit(state);
+    for (const auto& d: m_delegates)
+        d->submitState(&state);
 
     auto states = qnSettings->workbenchStates();
     states.erase(std::remove_if(states.begin(), states.end(),
@@ -102,8 +104,13 @@ void QnWorkbenchStateManager::restoreState()
         {
             return state.localSystemId == localId && state.userId == userId;
         });
+
     if (iter != states.cend())
+    {
         workbench()->update(*iter);
+        for (const auto& d : m_delegates)
+            d->loadState(*iter);
+    }
 }
 
 void QnWorkbenchStateManager::registerDelegate(QnSessionAwareDelegate* d)
@@ -131,4 +138,14 @@ QnSessionAwareDelegate::QnSessionAwareDelegate(QObject *parent /* = NULL*/) :
 QnSessionAwareDelegate::~QnSessionAwareDelegate()
 {
     context()->instance<QnWorkbenchStateManager>()->unregisterDelegate(this);
+}
+
+void QnSessionAwareDelegate::loadState(const QnWorkbenchState& state)
+{
+
+}
+
+void QnSessionAwareDelegate::submitState(QnWorkbenchState* state)
+{
+
 }

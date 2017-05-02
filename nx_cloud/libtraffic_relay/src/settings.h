@@ -2,9 +2,7 @@
 
 #include <nx/network/socket_common.h>
 #include <nx/utils/settings.h>
-#include <nx/utils/abstract_service_settings.h>
-
-#include <utils/common/command_line_parser.h>
+#include <nx/utils/basic_service_settings.h>
 
 namespace nx {
 namespace cloud {
@@ -13,7 +11,7 @@ namespace conf {
 
 struct Http
 {
-    std::list<SocketAddress> endpointsToListen;
+    std::list<SocketAddress> endpoints;
     /**
      * Backlog value to pass to tcpServerSocket->listen call.
      */
@@ -38,17 +36,15 @@ struct ConnectingPeer
 };
 
 class Settings:
-    public nx::utils::AbstractServiceSettings
+    public nx::utils::BasicServiceSettings
 {
+    using base_type = nx::utils::BasicServiceSettings;
+
 public:
     Settings();
 
     Settings(const Settings&) = delete;
     Settings& operator=(const Settings&) = delete;
-
-    virtual void load(int argc, const char **argv) override;
-    virtual bool isShowHelpRequested() const override;
-    virtual void printCmdLineArgsHelp() override;
 
     virtual QString dataDir() const override;
     virtual utils::log::Settings logging() const override;
@@ -58,15 +54,13 @@ public:
     const Http& http() const;
 
 private:
-    QnCommandLineParser m_commandLineParser;
-    QnSettings m_settings;
-    bool m_showHelpRequested;
     utils::log::Settings m_logging;
     Http m_http;
     ListeningPeer m_listeningPeer;
     ConnectingPeer m_connectingPeer;
 
-    void loadSettings();
+    virtual void loadSettings() override;
+
     void loadHttp();
     void loadListeningPeer();
     void loadConnectingPeer();
