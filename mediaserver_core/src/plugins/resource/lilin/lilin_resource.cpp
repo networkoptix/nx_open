@@ -21,10 +21,12 @@ LilinResource::~LilinResource()
 
 CameraDiagnostics::Result LilinResource::initInternal()
 {
-    base_type::initInternal();
+    auto result = base_type::initInternal();
+
+    if (result.errorCode != CameraDiagnostics::ErrorCode::Value::noError)
+        return result;
 
     setCameraCapability(Qn::RemoteArchiveCapability, true);
-    //QnConcurrent::run([&](){synchronizeArchive();});
 
     return CameraDiagnostics::NoErrorResult();
 }

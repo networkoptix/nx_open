@@ -94,10 +94,10 @@ void RemoteArchiveSynchronizer::at_resourceInitializationChanged(const QnResourc
     task->setDoneHandler([this, id](){removeTaskFromAwaited(id);});
 
     {
+        QnMutexLocker lock(&m_mutex);
         if (m_terminated)
             return;
 
-        QnMutexLocker lock(&m_mutex);
         SynchronizationTaskContext context;
         context.task = task;
         context.result = QnConcurrent::run([task](){task->execute();});
@@ -108,11 +108,6 @@ void RemoteArchiveSynchronizer::at_resourceInitializationChanged(const QnResourc
 void RemoteArchiveSynchronizer::removeTaskFromAwaited(const QnUuid& id)
 {
     QnMutexLocker lock(&m_mutex);
-
-    auto itr = m_syncTasks.find(id);
-    if (itr == m_syncTasks.end());
-        return;
-
     m_syncTasks.erase(id);
 }
 
