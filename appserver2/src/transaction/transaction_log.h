@@ -47,9 +47,11 @@ namespace ec2
          * This function is similar to previous one but returns transactions included in state parameter only
          */
         ErrorCode getExactTransactionsAfter(
-            const QnTranState& state,
+            QnTranState* inOutState,
             bool onlyCloudData,
-            QList<QByteArray>& result);
+            QList<QByteArray>& result,
+            int limit,
+            bool* isFinished);
 
         QnTranState getTransactionsState();
 
@@ -121,10 +123,12 @@ namespace ec2
         };
 
         ErrorCode getTransactionsAfterInternal(
-            const QnTranState& filterState,
+            QnTranState* inOutState,
             bool onlyCloudData,
             QList<QByteArray>& result,
-            Protocol protocol);
+            Protocol protocol,
+            int limit,
+            bool* isFinished);
     private:
         struct UpdateHistoryData
         {

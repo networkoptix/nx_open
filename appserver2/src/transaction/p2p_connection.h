@@ -12,6 +12,7 @@
 #include <core/resource_access/user_access_data.h>
 #include <QtCore/QElapsedTimer>
 #include "connection_guard.h"
+#include <nx_ec/data/api_tran_state_data.h>
 
 namespace ec2 {
 
@@ -87,7 +88,10 @@ public:
         QElapsedTimer localPeersTimer; //< last sent peers time
 
         QVector<ApiPersistentIdData> localSubscription; //< local -> remote subscription
-        QVector<ApiPersistentIdData> remoteSubscription; //< remote -> local subscription
+        //QVector<ApiPersistentIdData> remoteSubscription; //< remote -> local subscription
+        QnTranState remoteTranState;  //< remote -> local subscription
+        bool tranLogInProgress = false;
+
         QElapsedTimer lastDataTimer;
         QElapsedTimer wantToResubscribeTimer;
     };
@@ -100,6 +104,7 @@ public:
 signals:
     void gotMessage(P2pConnectionPtr connection, MessageType messageType, const QByteArray& payload);
     void stateChanged(P2pConnectionPtr connection, P2pConnection::State state);
+    void allDataSent(P2pConnectionPtr connection);
 private:
     void cancelConnecting();
 

@@ -116,9 +116,9 @@ bool QnTransactionLog::init()
     QSqlQuery query2(m_dbManager->getDB());
     query2.setForwardOnly(true);
     query2.prepare("SELECT tran_guid, timestamp_hi, timestamp, peer_guid, db_guid FROM transaction_log");
-    if (query2.exec()) 
+    if (query2.exec())
     {
-        while (query2.next()) 
+        while (query2.next())
         {
             QnUuid hash = QnUuid::fromRfc4122(query2.value("tran_guid").toByteArray());
             Timestamp timestamp;
@@ -265,7 +265,7 @@ ErrorCode QnTransactionLog::updateSequenceNoLock(const QnUuid& peerID, const QnU
     m_updateSequenceQuery->addBindValue(peerID.toRfc4122());
     m_updateSequenceQuery->addBindValue(dbID.toRfc4122());
     m_updateSequenceQuery->addBindValue(sequence);
-    if (!m_updateSequenceQuery->exec()) 
+    if (!m_updateSequenceQuery->exec())
     {
         qWarning() << Q_FUNC_INFO << m_updateSequenceQuery->lastError().text();
         return ErrorCode::failure;
@@ -315,7 +315,7 @@ ErrorCode QnTransactionLog::saveToDB(
     m_insTranQuery->addBindValue(hash.toRfc4122());
     m_insTranQuery->addBindValue(data);
     m_insTranQuery->addBindValue(tran.transactionType);
-    if (!m_insTranQuery->exec()) 
+    if (!m_insTranQuery->exec())
     {
         qWarning() << Q_FUNC_INFO << m_insTranQuery->lastError().text();
         return ErrorCode::failure;
@@ -436,26 +436,45 @@ ErrorCode QnTransactionLog::getTransactionsAfter(
     bool onlyCloudData,
     QList<QByteArray>& result)
 {
+    QnTranState inOutState = state;
     QnReadLocker lock(&m_dbManager->getMutex());
-    return getTransactionsAfterInternal(state, onlyCloudData, result, Protocol::MessageBus_3_0);
+    bool isFinished;
+    return getTransactionsAfterInternal(
+        &inOutState,
+        onlyCloudData,
+        result,
+        Protocol::MessageBus_3_0,
+        std::numeric_limits<int>::max(),
+        &isFinished);
 }
 
 ErrorCode QnTransactionLog::getExactTransactionsAfter(
-    const QnTranState& state,
+    QnTranState* inOutState,
     bool onlyCloudData,
-    QList<QByteArray>& result)
+    QList<QByteArray>& result,
+    int limit,
+    bool* isFinished)
 {
     QnReadLocker lock(&m_dbManager->getMutex());
-    return getTransactionsAfterInternal(state, onlyCloudData, result, Protocol::P2P_3_1);
+    return getTransactionsAfterInternal(
+        inOutState,
+        onlyCloudData,
+        result,
+        Protocol::P2P_3_1,
+        limit,
+        isFinished);
 }
 
 ErrorCode QnTransactionLog::getTransactionsAfterInternal(
-    const QnTranState& filterState,
+    QnTranState* inOutState,
     bool onlyCloudData,
     QList<QByteArray>& result,
-    Protocol protocol)
+    Protocol protocol,
+    int limit,
+    bool* isFinished)
 {
-    const QnTranState& stateToIterate = protocol == Protocol::MessageBus_3_0 ? m_state : filterState;
+    *isFinished = false;
+    const QnTranState& stateToIterate = protocol == Protocol::MessageBus_3_0 ? m_state : *inOutState;
 
     QnTransaction<ApiUpdateSequenceData> syncMarkersTran(
         ApiCommand::updatePersistentSequence,
@@ -469,7 +488,7 @@ ErrorCode QnTransactionLog::getTransactionsAfterInternal(
     for(auto itr = stateToIterate.values.begin(); itr != stateToIterate.values.end(); ++itr)
     {
         const ApiPersistentIdData& key = itr.key();
-        qint32 querySequence = filterState.values.value(key);
+        qint32 querySequence = inOutState->values.value(key);
         QSqlQuery query(m_dbManager->getDB());
         query.setForwardOnly(true);
         query.prepare(lit("SELECT tran_data, sequence FROM transaction_log WHERE peer_guid = ? \
@@ -481,14 +500,22 @@ ErrorCode QnTransactionLog::getTransactionsAfterInternal(
         if (!query.exec())
             return ErrorCode::failure;
 
-        qint32 lastSequence = 0;
-        while (query.next()) 
+        qint32 lastSelectedSequence = 0;
+        while (query.next())
         {
             result << query.value(0).toByteArray();
-            lastSequence = query.value(1).toInt();
+            lastSelectedSequence = query.value(1).toInt();
+            if (--limit == 0)
+            {
+                NX_ASSERT(inOutState->values.contains(key));
+                inOutState->values[key] = std::max(querySequence, lastSelectedSequence);
+                return ErrorCode::ok;
+            }
         }
         qint32 latestSequence = m_state.values.value(itr.key());
-        if (latestSequence > lastSequence)
+        NX_ASSERT(inOutState->values.contains(key));
+        inOutState->values[key] = std::max(querySequence, latestSequence);
+        if (latestSequence > lastSelectedSequence)
         {
             if (protocol == Protocol::MessageBus_3_0)
             {
@@ -511,6 +538,7 @@ ErrorCode QnTransactionLog::getTransactionsAfterInternal(
             }
         }
     }
+    *isFinished = true;
 
     if (protocol == Protocol::MessageBus_3_0)
         result << m_tranSerializer->serializedTransaction(syncMarkersTran);

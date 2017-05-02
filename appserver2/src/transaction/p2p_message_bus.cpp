@@ -29,6 +29,8 @@ namespace {
     static const int subscribeIntervalHiMs = 1000 * 15;
 
     int commitIntervalMs = 1000;
+
+    static const int kTranRecordsLimit = 10;
 } // namespace
 
 namespace ec2 {
@@ -172,6 +174,7 @@ void P2pMessageBus::connectSignals(const P2pConnectionPtr& connection)
     QnMutexLocker lock(&m_mutex);
     connect(connection.data(), &P2pConnection::stateChanged, this, &P2pMessageBus::at_stateChanged);
     connect(connection.data(), &P2pConnection::gotMessage, this, &P2pMessageBus::at_gotMessage);
+    connect(connection.data(), &P2pConnection::allDataSent, this, &P2pMessageBus::at_ConnectionAllDataSent);
 }
 
 void P2pMessageBus::cleanupRoutingRecords(const ApiPersistentIdData& id)
@@ -555,8 +558,8 @@ void P2pMessageBus::doSubscribe()
         qint32 minDistance = info.minDistance(&viaList);
         if (minDistance < subscribedDistance)
         {
-            if (subscribedVia && needReSubscribeDelay(subscribedVia))
-                continue;
+            //if (subscribedVia && needReSubscribeDelay(subscribedVia))
+            //    continue;
 
             NX_ASSERT(!viaList.empty());
             // If any of connections with min distance subscribed to us then postpone our subscription.
@@ -673,6 +676,18 @@ void P2pMessageBus::at_stateChanged(
     }
 }
 
+void P2pMessageBus::at_ConnectionAllDataSent(const QSharedPointer<P2pConnection>& connection)
+{
+    if (!connection)
+        return;
+
+    QnMutexLocker lock(&m_mutex);
+    if (m_connections.value(connection->remotePeer().id) != connection)
+        return;
+    if (connection->miscData().tranLogInProgress)
+        selectTransactions(connection, connection->miscData().remoteTranState);
+}
+
 void P2pMessageBus::at_gotMessage(
     const QSharedPointer<P2pConnection>& connection,
     MessageType messageType,
@@ -680,10 +695,11 @@ void P2pMessageBus::at_gotMessage(
 {
     if (!connection)
         return;
+
+    QnMutexLocker lock(&m_mutex);
     if (m_connections.value(connection->remotePeer().id) != connection)
         return;
 
-    QnMutexLocker lock(&m_mutex);
 
     if (connection->state() == P2pConnection::State::Error)
         return; //< Connection has been closed
@@ -955,12 +971,10 @@ struct SendTransactionToTransportFastFuction
             ApiPersistentIdData tranId(transaction.peerID, transaction.persistentInfo.dbID);
             NX_ASSERT(connection->remotePeerSubscribedTo(tranId));
         }
-
         connection->sendMessage(MessageType::pushTransactionData, serializedTran);
         return true;
     }
 };
-
 
 bool P2pMessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data)
 {
@@ -968,16 +982,16 @@ bool P2pMessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connec
     QVector<SubscribeRecord> request = deserializeSubscribeForDataUpdatesRequest(data, &success);
     if (!success)
         return false;
-    QnTranState tranState;
-    auto& selectRequest = tranState.values;
+    QnTranState selectTranState;
+    auto& selectRequest = selectTranState.values;
     for (const auto& shortPeer : request)
     {
         const auto& id = m_localShortPeerInfo.decode(shortPeer.peer);
         NX_ASSERT(!id.isNull());
         selectRequest.insert(id, shortPeer.sequence);
     }
-    auto newSubscription = selectRequest.keys();
-    auto& oldSubscription = connection->miscData().remoteSubscription;
+
+    const auto& oldSubscription = connection->miscData().remoteTranState.values.keys();
 
     // remove already subscribed records
     auto itrFilter = oldSubscription.begin();
@@ -990,14 +1004,23 @@ bool P2pMessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connec
         else
             ++itr;
     }
-    connection->miscData().remoteSubscription = newSubscription.toVector();
-    NX_ASSERT(!connection->remotePeerSubscribedTo(connection->remotePeer()));
 
+    NX_ASSERT(!connection->remotePeerSubscribedTo(connection->remotePeer()));
+    return selectTransactions(connection, selectTranState);
+}
+
+bool P2pMessageBus::selectTransactions(const P2pConnectionPtr& connection, const QnTranState& _selectTranState)
+{
+    QnTranState selectTranState = _selectTranState;
     QList<QByteArray> serializedTransactions;
+    bool isFinished;
     const ErrorCode errorCode = m_db->transactionLog()->getExactTransactionsAfter(
-        tranState,
+        &selectTranState,
         connection->remotePeer().peerType == Qn::PeerType::PT_CloudServer,
-        serializedTransactions);
+        serializedTransactions,
+        kTranRecordsLimit,
+        &isFinished);
+    connection->miscData().tranLogInProgress = !isFinished;
     if (errorCode != ErrorCode::ok)
     {
         NX_LOG(
@@ -1006,6 +1029,10 @@ bool P2pMessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connec
             cl_logWARNING);
         return false;
     }
+
+    auto& newTranState = connection->miscData().remoteTranState;
+    for (auto itr = selectTranState.values.begin(); itr != selectTranState.values.end(); ++itr)
+        newTranState.values[itr.key()] = itr.value();
 
     using namespace std::placeholders;
     for (const auto& serializedTran : serializedTransactions)
