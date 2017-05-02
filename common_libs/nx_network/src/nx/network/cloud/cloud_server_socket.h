@@ -1,10 +1,12 @@
 #pragma once 
 
 #include <nx/network/abstract_socket.h>
-#include <nx/network/cloud/mediator_server_connections.h>
-#include <nx/network/cloud/tunnel/incoming_tunnel_pool.h>
 #include <nx/network/retry_timer.h>
 #include <nx/network/socket_attributes_cache.h>
+
+#include "mediator_server_connections.h"
+#include "tunnel/incoming_tunnel_pool.h"
+#include "tunnel/relay/relay_connection_acceptor.h"
 
 namespace nx {
 namespace network {
@@ -88,10 +90,17 @@ protected:
     void startAcceptor(std::unique_ptr<AbstractTunnelAcceptor> acceptor);
     void onListenRequestCompleted(
         nx::hpm::api::ResultCode resultCode, hpm::api::ListenResponse response);
+    void startAcceptingConnections(const hpm::api::ListenResponse& response);
+    void initializeRelaying(const hpm::api::ListenResponse& response);
+    void retryRegistration();
+    void reportResult(SystemError::ErrorCode sysErrorCode);
     void acceptAsyncInternal(
         nx::utils::MoveOnlyFunc<void(
             SystemError::ErrorCode code,
             AbstractStreamSocket*)> handler);
+    void onNewConnectionHasBeenAccepted(std::unique_ptr<AbstractStreamSocket> socket);
+    void cancelAccept();
+
     void issueRegistrationRequest();
     void onConnectionRequested(hpm::api::ConnectionRequestedEvent event);
     void onMediatorConnectionRestored();
@@ -104,8 +113,8 @@ protected:
     std::atomic<State> m_state;
     std::vector<std::unique_ptr<AbstractTunnelAcceptor>> m_acceptors;
     std::unique_ptr<IncomingTunnelPool> m_tunnelPool;
+    std::unique_ptr<relay::ConnectionAcceptor> m_relayConnectionAcceptor;
     mutable SystemError::ErrorCode m_lastError;
-    std::unique_ptr<AbstractStreamSocket> m_acceptedSocket;
     nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode code,
         AbstractStreamSocket*)> m_savedAcceptHandler;

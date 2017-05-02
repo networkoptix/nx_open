@@ -273,25 +273,28 @@ void CloudServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
     m_mediatorRegistrationRetryTimer.post(
         [this, handler = std::move(handler)]() mutable
         {
-            m_tunnelPool->cancelAccept();
-            m_savedAcceptHandler = nullptr;
+            cancelAccept();
             handler();
         });
 }
 
 void CloudServerSocket::cancelIOSync()
 {
-    // We need dispatch here to avoid blocking if called within aio thread.
-    nx::utils::promise<void> cancelledPromise;
-    m_mediatorRegistrationRetryTimer.dispatch(
-        [this, &cancelledPromise]
-        {
-            // TODO: #ak Deal with copy-paste here.
-            m_tunnelPool->cancelAccept();
-            m_savedAcceptHandler = nullptr;
-            cancelledPromise.set_value();
-        });
-    cancelledPromise.get_future().wait();
+    if (m_mediatorRegistrationRetryTimer.isInSelfAioThread())
+    {
+        cancelAccept();
+    }
+    else
+    {
+        // We need dispatch here to avoid blocking if called within aio thread.
+        nx::utils::promise<void> cancelledPromise;
+        cancelIOAsync(
+            [this, &cancelledPromise]
+            {
+                cancelledPromise.set_value();
+            });
+        cancelledPromise.get_future().wait();
+    }
 }
 
 bool CloudServerSocket::isInSelfAioThread()
@@ -302,16 +305,16 @@ bool CloudServerSocket::isInSelfAioThread()
 void CloudServerSocket::registerOnMediator(
     nx::utils::MoveOnlyFunc<void(hpm::api::ResultCode)> handler)
 {
+    using namespace std::placeholders;
+
     if (m_state == State::listening)
         return handler(hpm::api::ResultCode::ok);
 
     if (m_state == State::init)
     {
         initTunnelPool(m_acceptQueueLen);
-        m_mediatorConnection->setOnConnectionRequestedHandler(std::bind(
-            &CloudServerSocket::onConnectionRequested,
-            this,
-            std::placeholders::_1));
+        m_mediatorConnection->setOnConnectionRequestedHandler(
+            std::bind(&CloudServerSocket::onConnectionRequested, this, _1));
         m_state = State::readyToListen;
     }
 
@@ -338,13 +341,12 @@ void CloudServerSocket::setSupportedConnectionMethods(hpm::api::ConnectionMethod
 
 void CloudServerSocket::moveToListeningState()
 {
+    using namespace std::placeholders;
+
     if (!m_tunnelPool)
         initTunnelPool(m_acceptQueueLen);
     m_mediatorConnection->setOnConnectionRequestedHandler(
-        std::bind(
-            &CloudServerSocket::onConnectionRequested,
-            this,
-            std::placeholders::_1));
+        std::bind(&CloudServerSocket::onConnectionRequested, this, _1));
     m_state = State::listening;
 }
 
@@ -397,51 +399,72 @@ void CloudServerSocket::onListenRequestCompleted(
     {
         NX_LOGX(lm("Listen request completed successfully"), cl_logDEBUG1);
         m_state = State::listening;
-
-        m_mediatorConnection->setOnReconnectedHandler(
-            std::bind(&CloudServerSocket::onMediatorConnectionRestored, this));
-
-        // This is important to know if connection is lost, so server will use some keep alive even
-        // even if mediator does not ask it to use any.
-        const auto keepAliveOptions = response.tcpConnectionKeepAlive
-            ? *response.tcpConnectionKeepAlive : kDefaultKeepAlive;
-
-        if (response.cloudConnectOptions.testFlag(hpm::api::serverChecksConnectionState))
-            m_mediatorConnection->monitorListeningState(keepAliveOptions.maxDelay());
-        else
-            m_mediatorConnection->client()->setKeepAliveOptions(keepAliveOptions);
-
-        auto acceptHandler = std::move(m_savedAcceptHandler);
-        m_savedAcceptHandler = nullptr;
-        if (acceptHandler)
-            acceptAsyncInternal(std::move(acceptHandler));
+        startAcceptingConnections(response);
+        return;
     }
-    else
+
+    NX_LOGX(lm("Listen request has failed: %1")
+        .arg(QnLexical::serialized(resultCode)), cl_logDEBUG1);
+
+    if (!m_mediatorRegistrationRetryTimer.scheduleNextTry(
+            std::bind(&CloudServerSocket::retryRegistration, this)))
     {
-        NX_LOGX(lm("Listen request has failed: %1")
-            .arg(QnLexical::serialized(resultCode)), cl_logDEBUG1);
-
-        // Should retry if failed since system registration data can be propagated to mediator
-        // with some delay.
-        const auto retry = m_mediatorRegistrationRetryTimer.scheduleNextTry(
-            [this]()
-            {
-                NX_LOGX(lm("Retry to register on mediator"), cl_logDEBUG1);
-                issueRegistrationRequest();
-            });
-
-        if (retry)
-            return; //< Another attempt will follow.
-
-        // Is not supposted to happen in production, is it?
-        NX_LOGX(lm("Stop mediator registration retries"), cl_logWARNING);
+        // It is not supposed to happen in production, is it?
+        NX_LOGX(lm("Stopped mediator registration retries"), cl_logWARNING);
         m_state = State::readyToListen;
-
-        auto acceptHandler = std::move(m_savedAcceptHandler);
-        m_savedAcceptHandler = nullptr;
-        if (acceptHandler)
-            acceptHandler(SystemError::invalidData, nullptr);
+        reportResult(SystemError::invalidData); //< TODO: #ak Use better error code.
     }
+}
+
+void CloudServerSocket::startAcceptingConnections(
+    const hpm::api::ListenResponse& response)
+{
+    m_mediatorConnection->setOnReconnectedHandler(
+        std::bind(&CloudServerSocket::onMediatorConnectionRestored, this));
+
+    // This is important to know if connection is lost, 
+    // so server will use some keep alive even if mediator does not ask it to use any.
+    const auto keepAliveOptions = response.tcpConnectionKeepAlive
+        ? *response.tcpConnectionKeepAlive : kDefaultKeepAlive;
+
+    if (response.cloudConnectOptions.testFlag(hpm::api::serverChecksConnectionState))
+        m_mediatorConnection->monitorListeningState(keepAliveOptions.maxDelay());
+    else
+        m_mediatorConnection->client()->setKeepAliveOptions(keepAliveOptions);
+
+    if (response.relayEndpoint)
+        initializeRelaying(response);
+
+    if (m_savedAcceptHandler)
+    {
+        decltype(m_savedAcceptHandler) acceptHandler;
+        acceptHandler.swap(m_savedAcceptHandler);
+        acceptAsyncInternal(std::move(acceptHandler));
+    }
+}
+
+void CloudServerSocket::initializeRelaying(
+    const hpm::api::ListenResponse& response)
+{
+    m_relayConnectionAcceptor = 
+        std::make_unique<relay::ConnectionAcceptor>(*response.relayEndpoint);
+    m_relayConnectionAcceptor->bindToAioThread(getAioThread());
+}
+
+void CloudServerSocket::retryRegistration()
+{
+    NX_LOGX(lm("Retrying to register on mediator"), cl_logDEBUG1);
+    issueRegistrationRequest();
+}
+
+void CloudServerSocket::reportResult(SystemError::ErrorCode sysErrorCode)
+{
+    if (!m_savedAcceptHandler)
+        return;
+
+    decltype(m_savedAcceptHandler) acceptHandler;
+    acceptHandler.swap(m_savedAcceptHandler);
+    acceptHandler(sysErrorCode, nullptr);
 }
 
 void CloudServerSocket::acceptAsyncInternal(
@@ -449,35 +472,66 @@ void CloudServerSocket::acceptAsyncInternal(
         SystemError::ErrorCode code,
         AbstractStreamSocket*)> handler)
 {
+    using namespace std::placeholders;
+
+    NX_ASSERT(isInSelfAioThread());
+
+    m_savedAcceptHandler = std::move(handler);
+
     m_tunnelPool->getNextSocketAsync(
-        [this, handler = std::move(handler)](
-            std::unique_ptr<AbstractStreamSocket> socket) mutable
-        {
-            if (socket)
-            {
-                DEBUG_LOG(lm("Return socket from tunnel pool %1").arg(socket));
-                handler(SystemError::noError, socket.release());
-            }
-            else
-            {
-                DEBUG_LOG(lm("Tunnel pool accept timed out"));
-                handler(SystemError::timedOut, nullptr);
-            }
-        },
+        std::bind(&CloudServerSocket::onNewConnectionHasBeenAccepted, this, _1),
         m_socketAttributes.recvTimeout);
+
+    if (m_relayConnectionAcceptor)
+    {
+        m_relayConnectionAcceptor->getNextSocketAsync(
+            std::bind(&CloudServerSocket::onNewConnectionHasBeenAccepted, this, _1));
+    }
+}
+
+void CloudServerSocket::onNewConnectionHasBeenAccepted(
+    std::unique_ptr<AbstractStreamSocket> socket)
+{
+    decltype(m_savedAcceptHandler) handler;
+    handler.swap(m_savedAcceptHandler);
+
+    m_tunnelPool->cancelAccept();
+    if (m_relayConnectionAcceptor)
+        m_relayConnectionAcceptor->cancelAccept();
+
+    if (socket)
+    {
+        DEBUG_LOG(lm("Return socket from tunnel pool %1").arg(socket));
+        handler(SystemError::noError, socket.release());
+    }
+    else
+    {
+        DEBUG_LOG(lm("Tunnel pool accept timed out"));
+        handler(SystemError::timedOut, nullptr);
+    }
+}
+
+void CloudServerSocket::cancelAccept()
+{
+    m_tunnelPool->cancelAccept();
+    if (m_relayConnectionAcceptor)
+        m_relayConnectionAcceptor->cancelAccept();
+    m_savedAcceptHandler = nullptr;
 }
 
 void CloudServerSocket::issueRegistrationRequest()
 {
-    const auto cloudCredentials = m_mediatorConnection
-        ->credentialsProvider()->getSystemCredentials();
+    using namespace std::placeholders;
 
-    if (!cloudCredentials)  //TODO #ak this MUST be assert
+    const auto cloudCredentials = 
+        m_mediatorConnection->credentialsProvider()->getSystemCredentials();
+
+    if (!cloudCredentials)  //< TODO: #ak this MUST be assert.
     {
-        //specially for unit tests
-        m_mediatorRegistrationRetryTimer.dispatch(std::bind(
-            &CloudServerSocket::onListenRequestCompleted, this,
-            nx::hpm::api::ResultCode::notAuthorized, hpm::api::ListenResponse()));
+        // Specially for unit tests.
+        m_mediatorRegistrationRetryTimer.dispatch(
+            std::bind(&CloudServerSocket::onListenRequestCompleted, this,
+                nx::hpm::api::ResultCode::notAuthorized, hpm::api::ListenResponse()));
         return;
     }
 
@@ -486,12 +540,7 @@ void CloudServerSocket::issueRegistrationRequest()
     listenRequestData.serverId = cloudCredentials->serverId;
     m_mediatorConnection->listen(
         std::move(listenRequestData),
-        [this](nx::hpm::api::ResultCode resultCode, hpm::api::ListenResponse response)
-        {
-            m_mediatorRegistrationRetryTimer.dispatch(std::bind(
-                &CloudServerSocket::onListenRequestCompleted, this,
-                resultCode, std::move(response)));
-        });
+        std::bind(&CloudServerSocket::onListenRequestCompleted, this, _1, _2));
 }
 
 void CloudServerSocket::onConnectionRequested(
@@ -502,7 +551,7 @@ void CloudServerSocket::onConnectionRequested(
         .strs(event.connectSessionId, event.originatingPeerID,
             hpm::api::ConnectionMethod::toString(event.connectionMethods)));
 
-    for (const auto& maker : m_acceptorMakers)
+    for (const auto& maker: m_acceptorMakers)
     {
         if (auto acceptor = maker(event))
         {
@@ -536,6 +585,7 @@ void CloudServerSocket::stopWhileInAioThread()
     m_mediatorConnection->pleaseStopSync();
     m_acceptors.clear();
     m_tunnelPool.reset();
+    m_relayConnectionAcceptor.reset();
 }
 
 } // namespace cloud
