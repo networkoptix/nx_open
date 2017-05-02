@@ -443,12 +443,12 @@ public:
     virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const = 0;
 };
 
-/**Stream socket with encryption
-/*!
-    In most cases, AbstractStreamSocket interface is enough. This one is needed for SMTP/TLS, for example
-*/
-class NX_NETWORK_API AbstractEncryptedStreamSocket
-:
+/**
+ * Stream socket with encryption.
+ * In most cases, AbstractStreamSocket interface is enough. 
+ * This one is needed for SMTP/TLS, for example.
+ */
+class NX_NETWORK_API AbstractEncryptedStreamSocket:
     public AbstractStreamSocket
 {
 public:
