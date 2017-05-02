@@ -16,7 +16,7 @@ void ConnectionAcceptor::bindToAioThread(aio::AbstractAioThread* aioThread)
 }
 
 void ConnectionAcceptor::getNextSocketAsync(
-    nx::utils::MoveOnlyFunc<void(std::unique_ptr<AbstractStreamSocket>)> handler)
+    nx::utils::MoveOnlyFunc<void(std::unique_ptr<AbstractStreamSocket>)> /*handler*/)
 {
 }
 
