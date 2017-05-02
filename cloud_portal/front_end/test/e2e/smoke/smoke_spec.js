@@ -35,13 +35,17 @@ describe('Smoke test:', function () {
     });
 
     fit("can view system page", function () {
-        var userList = helper.getParentOf(element.all(by.repeater('user in system.users')).first());
+        var userStrings = element.all(by.repeater('user in system.users'));
+        var userList = helper.getParentOf(userStrings.first());
 
         helper.login();
         expect(browser.getCurrentUrl()).toContain('systems');
         expect(element(by.cssContainingText('h2', 'katya_korneevas_property')).isDisplayed()).toBe(true);
 
         element.all(by.cssContainingText('h2', 'katya_korneevas_property')).first().click();
+
+        browser.sleep(1000);
+        helper.waitIfNotPresent(userStrings,100);
         expect(userList.isDisplayed()).toBe(true);
     });
 

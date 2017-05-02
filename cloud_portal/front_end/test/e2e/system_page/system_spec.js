@@ -51,7 +51,7 @@ describe('System suite', function () {
                 p.helper.navigateBack();
             }
         });
-    }, 120000);
+    }, 240000);
 
     it("should confirm, if owner deletes system (You are going to disconnect your system from cloud)", function() {
         p.helper.loginToSystems(p.helper.userEmailOwner, p.helper.userPassword);
