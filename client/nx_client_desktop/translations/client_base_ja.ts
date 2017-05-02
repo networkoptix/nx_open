@@ -7365,7 +7365,7 @@ to %1</source>
     </message>
     <message>
         <source>JPEG Image (*.jpg)</source>
-        <translation>JPEG形式 (*.png)</translation>
+        <translation>JPEG形式 (*.jpg)</translation>
     </message>
     <message>
         <source>Save Screenshot As...</source>

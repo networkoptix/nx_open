@@ -361,6 +361,17 @@
         },
         {
             "keys": [
+                "Hikvision|*"
+            ],
+            "possibleDefaultCredentials": [
+                {
+                    "user": "admin",
+                    "password": "12345"
+                }
+            ]
+        },        
+        {
+            "keys": [
                 "Axis|*"
             ],
             "possibleDefaultCredentials": [
