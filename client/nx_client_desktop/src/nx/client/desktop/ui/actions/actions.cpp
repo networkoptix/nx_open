@@ -347,7 +347,6 @@ void initialize(Manager* manager, Action* root)
 
         factory(NewLayoutTourAction)
             .flags(Main | Tree | NoTarget)
-            .requiredGlobalPermission(Qn::GlobalAdminPermission)
             .text(tr("Layout Tour.."))
             .pulledText(tr("New Layout Tour.."))
             .condition(
@@ -1109,10 +1108,8 @@ void initialize(Manager* manager, Action* root)
         .condition(!condition::isSafeMode())
         .autoRepeat(false);
 
-    //TODO: #GDM #3.1 #tbd
     factory(RenameLayoutTourAction)
         .flags(Tree | NoTarget | IntentionallyAmbiguous)
-        .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .text(tr("Rename"))
         .shortcut(lit("F2"))
         .condition(
@@ -1379,7 +1376,6 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | NoTarget | IntentionallyAmbiguous)
         .mode(DesktopMode)
         .text(tr("Delete Layout Tour"))
-        .requiredGlobalPermission(Qn::GlobalAdminPermission) //TODO: #GDM #3.1 #tbd
         .shortcut(lit("Del"))
         .shortcut(Qt::Key_Backspace, Builder::Mac, true)
         .condition(condition::treeNodeType(Qn::LayoutTourNode));

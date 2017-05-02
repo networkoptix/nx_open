@@ -29,6 +29,7 @@ namespace ec2 {
     struct ApiLayoutData;
     struct ApiLayoutTourItemData;
     struct ApiLayoutTourData;
+    struct ApiLayoutTourSettings;
     struct ApiLicenseData;
     struct ApiDetailedLicenseData;
     struct ApiLockData;
@@ -161,6 +162,7 @@ namespace ec2 {
     (ApiLayoutData)\
     (ApiLayoutTourItemData)\
     (ApiLayoutTourData)\
+    (ApiLayoutTourSettings)\
     (ApiLicenseData)\
     (ApiDetailedLicenseData)\
     (ApiLockData)\

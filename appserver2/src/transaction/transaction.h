@@ -31,9 +31,8 @@
  * InvalidAccess(),         -- actual only for persistent transactions with one element
  * InvalidAccess(),         -- actual only for read transactions for one element
  * InvalidFilterFunc(),     -- actual only for persistent transactions with element list
- * FilterListByAccess<AllowForAllAccess>(), -- filtering requested list by the passed checker
- * ReadListAccessOut<AllowForAllAccess>(), -- nobody can explain what should we fill here,
- *      but this is for resending persistent transactions, similar to TriggerNotificationHelper
+ * FilterListByAccess<LayoutTourAccess>(), -- filtering requested list by the passed checker
+ * AllowForAllAccessOut(),  -- ctual only for persistent transactions
  * RegularTransactionType() -- transaction is common, regular, without any magic
  * )
  *
@@ -45,12 +44,11 @@
  * false,                   -- transaction is not system (handled common way)
  * CreateHashByIdHelper(),  -- id is enough to generate hash
  * LayoutTourNotificationManagerHelper(), -- notify other users that we have changed the tour
- * AdminOnlyAccess(),       -- for now only admins can save tours
- * AllowForAllAccess(),     -- everybody can read the tours for now
+ * LayoutTourAccess(),      -- check access to save
+ * LayoutTourAccess(),      -- check access to read
  * InvalidFilterFunc(),     -- actual only for list transactions
  * InvalidFilterFunc(),     -- actual only for list transactions
- * AllowForAllAccessOut(),  -- nobody can explain what should we fill here,
- *      but this is for resending persistent transactions, similar to TriggerNotificationHelper
+ * AccessOut<LayoutTourAccess>(),  -- resending persistent transactions
  * RegularTransactionType() -- transaction is common, regular, without any magic
  * )
  *
@@ -758,27 +756,27 @@ APPLY(604, getLayoutTours, ApiLayoutTourDataList, \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), \
-                       FilterListByAccess<AllowForAllAccess>(), \
-                       ReadListAccessOut<AllowForAllAccess>(), \
+                       FilterListByAccess<LayoutTourAccess>(), \
+                       AllowForAllAccessOut(), /* not actual for non-persistent */ \
                        RegularTransactionType()) \
 APPLY(605, saveLayoutTour, ApiLayoutTourData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        LayoutTourNotificationManagerHelper(), /* trigger notification*/ \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AllowForAllAccess(), /* read permission checker */ \
+                       LayoutTourAccess(), /* save permission checker */ \
+                       LayoutTourAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
+                       AccessOut<LayoutTourAccess>(), \
+                       RegularTransactionType()) \
 APPLY(606, removeLayoutTour, ApiIdData, \
                        true, \
                        false, \
                        CreateHashByIdHelper(), \
                        &apiIdDataTriggerNotificationHelper, \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AllowForAllAccess(), /* read permission checker */ \
+                       LayoutTourAccessById(), /* save permission checker */ \
+                       LayoutTourAccessById(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \

@@ -321,7 +321,7 @@ private:
     QnResourcePropertyAdaptor<int> *m_portAdaptor;
     QnResourcePropertyAdaptor<int> *m_timeoutAdaptor;
     /** Flag that we are using simple smtp settings set */
-    QnResourcePropertyAdaptor<bool> *m_simpleAdaptor;   //TODO: #GDM #Common think where else we can store it
+    QnResourcePropertyAdaptor<bool> *m_simpleAdaptor;
 
     // set of ldap settings adaptors
     QnResourcePropertyAdaptor<QUrl> *m_ldapUriAdaptor;

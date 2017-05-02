@@ -19,7 +19,7 @@
         <product.title>${client.name} Core</product.title>
         <product.display.title>${client.display.name} Core</product.display.title>
         <template>lib</template>
-        <targetName>client_core</targetName>
+        <targetName>nx_client_core</targetName>
         <qt.libs>core gui quick quick-private network multimedia multimedia-private qtmultimediaquicktools_private concurrent sql</qt.libs>
         <global.libs>-lcommon -lnx_media -lnx_streaming -lappserver2 -lcloud_db_client -lnx_vms_utils -lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm</windows.oslibs>
