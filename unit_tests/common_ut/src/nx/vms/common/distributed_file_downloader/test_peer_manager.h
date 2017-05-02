@@ -12,10 +12,20 @@ namespace distributed_file_downloader {
 class TestPeerManager: public AbstractPeerManager
 {
 public:
+    struct FileInformation: DownloaderFileInformation
+    {
+        using DownloaderFileInformation::DownloaderFileInformation;
+        QString filePath;
+    };
+
     TestPeerManager();
 
     void addPeer(const QnUuid& peer);
-    void setFileInformation(const QnUuid& peer, const DownloaderFileInformation& fileInformation);
+    QnUuid addPeer();
+    QList<QnUuid> peers() const;
+
+    void setFileInformation(const QnUuid& peer, const FileInformation& fileInformation);
+    FileInformation fileInformation(const QnUuid& peer, const QString& fileName) const;
 
     // AbstractPeerManager implementation
 
@@ -31,7 +41,7 @@ public:
 private:
     struct PeerInfo
     {
-        QHash<QString, DownloaderFileInformation> fileInformationByName;
+        QHash<QString, FileInformation> fileInformationByName;
     };
 
     QHash<QnUuid, PeerInfo> m_peers;

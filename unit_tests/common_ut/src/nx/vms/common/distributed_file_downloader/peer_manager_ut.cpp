@@ -65,7 +65,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, fileInfo)
 
     peerManager->addPeer(peer);
 
-    DownloaderFileInformation fileInformation("test");
+    TestPeerManager::FileInformation fileInformation("test");
     peerManager->setFileInformation(peer, fileInformation);
 
     bool ok = false;

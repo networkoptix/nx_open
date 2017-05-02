@@ -15,9 +15,28 @@ void TestPeerManager::addPeer(const QnUuid& peer)
         m_peers.insert(peer, PeerInfo());
 }
 
-void TestPeerManager::setFileInformation(const QnUuid& peer, const DownloaderFileInformation& fileInformation)
+QnUuid TestPeerManager::addPeer()
+{
+    const auto peerId = QnUuid::createUuid();
+    addPeer(peerId);
+    return peerId;
+}
+
+QList<QnUuid> TestPeerManager::peers() const
+{
+    return m_peers.keys();
+}
+
+void TestPeerManager::setFileInformation(
+    const QnUuid& peer, const FileInformation& fileInformation)
 {
     m_peers[peer].fileInformationByName[fileInformation.name] = fileInformation;
+}
+
+TestPeerManager::FileInformation TestPeerManager::fileInformation(
+    const QnUuid& peer, const QString& fileName) const
+{
+    return m_peers[peer].fileInformationByName[fileName];
 }
 
 QList<QnUuid> TestPeerManager::getAllPeers() const
