@@ -142,9 +142,10 @@ public:
     void sendBufAsync(const nx::Buffer& buf)
     {
         using namespace std::placeholders;
-
-        m_streamSocket->dispatch(
-            [this, &buf]()
+        if (m_streamSocket)
+        {
+            m_streamSocket->dispatch(
+                [this, &buf]()
             {
                 m_isSendingData = true;
                 if (m_inactivityTimeout)
@@ -156,6 +157,7 @@ public:
                 m_bytesToSend = buf.size();
 
             });
+        }
     }
 
     void closeConnection(SystemError::ErrorCode closeReasonCode)
@@ -263,10 +265,12 @@ private:
 
         if (bytesRead == 0)    //< Connection closed by remote peer.
             return handleSocketError(SystemError::connectionReset);
-
-        m_streamSocket->readSomeAsync(
-            &m_readBuffer,
-            std::bind(&SelfType::onBytesRead, this, _1, _2));
+        if (m_streamSocket)
+        {
+            m_streamSocket->readSomeAsync(
+                &m_readBuffer,
+                std::bind(&SelfType::onBytesRead, this, _1, _2));
+        }
     }
 
     void onBytesSent(SystemError::ErrorCode errorCode, size_t count)

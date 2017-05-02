@@ -19,7 +19,6 @@
 #include "runtime_transaction_log.h"
 #include "transport_connection_info.h"
 
-#include "connection_guard_shared_state.h"
 #include "transaction_message_bus_base.h"
 
 class QTimer;
@@ -122,8 +121,6 @@ public:
     */
     AlivePeersMap aliveServerPeers() const;
     AlivePeersMap aliveClientPeers() const;
-
-    ConnectionGuardSharedState* connectionGuardSharedState();
 
     void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager);
 signals:
@@ -296,7 +293,6 @@ private:
     QMap<QnUuid, DelayedAliveData> m_delayedAliveTran;
     QElapsedTimer m_relativeTimer;
 
-    ConnectionGuardSharedState m_connectionGuardSharedState;
     AlivePeersMap m_alivePeers; //< alive peers in a system
 
 };

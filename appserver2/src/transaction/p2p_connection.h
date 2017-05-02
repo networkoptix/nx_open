@@ -11,6 +11,7 @@
 #include <core/resource/shared_resource_pointer.h>
 #include <core/resource_access/user_access_data.h>
 #include <QtCore/QElapsedTimer>
+#include "connection_guard.h"
 
 namespace ec2 {
 
@@ -43,11 +44,13 @@ public:
         QnCommonModule* commonModule,
         const QnUuid& remoteId,
         const ApiPeerData& localPeer,
-        const QUrl& url);
+        ConnectionLockGuard connectionLockGuard,
+        const QUrl& remotePeerUrl);
     P2pConnection(
         QnCommonModule* commonModule,
         const ApiPeerData& remotePeer,
         const ApiPeerData& localPeer,
+        ConnectionLockGuard connectionLockGuard,
         const WebSocketPtr& webSocket);
     virtual ~P2pConnection();
 
@@ -68,6 +71,8 @@ public:
     ApiPersistentIdData decode(PeerNumberType shortPeerNumber) const;
     PeerNumberType encode(const ApiPersistentIdData& fullId, PeerNumberType shortPeerNumber = kUnknownPeerNumnber);
 
+    void startConnection();
+    void startReading();
 
     /** MiscData contains members that managed by P2pMessageBus. P2pConnection doesn't touch it */
     struct MiscData
@@ -131,9 +136,11 @@ private:
     Direction m_direction;
     MiscData m_miscData;
     qint64 m_remoteIdentityTime = 0;
+    QUrl m_remotePeerUrl;
     const Qn::UserAccessData m_userAccessData = Qn::kSystemAccess;
 
     PeerNumberInfo m_shortPeerInfo;
+    std::unique_ptr<ConnectionLockGuard> m_connectionLockGuard;
 
     int m_remotePeerEcProtoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION;
     int m_localPeerProtocolVersion = nx_ec::EC2_PROTO_VERSION;

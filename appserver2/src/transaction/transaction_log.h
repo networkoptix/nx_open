@@ -12,6 +12,7 @@ namespace ec2
     static const char ADD_HASH_DATA[] = "$$_HASH_$$";
 
     namespace detail { class QnDbManager; }
+    enum class TranLockType;
 
     class QnUbjsonTransactionSerializer;
 
@@ -89,7 +90,7 @@ namespace ec2
         static QnUuid makeHash(const QByteArray &extraData, const ApiDiscoveryData &data);
 
         ErrorCode updateSequence(const ApiUpdateSequenceData& data);
-        ErrorCode updateSequence(const QnAbstractTransaction& tran);
+        ErrorCode updateSequence(const QnAbstractTransaction& tran, TranLockType lockType);
         void fillPersistentInfo(QnAbstractTransaction& tran);
 
         void beginTran();
@@ -102,16 +103,16 @@ namespace ec2
             const QnAbstractTransaction &tranID,
             const QnUuid &hash,
             const QByteArray &data);
+        void resetPreparedStatements();
     private:
         friend class detail::QnDbManager;
+        ErrorCode updateSequenceNoLock(const QnUuid& peerID, const QnUuid& dbID, int sequence);
 
         template <class T>
         ContainsReason contains(const QnTransaction<T>& tran) { return contains(tran, transactionHash(tran.command, tran.params)); }
         ContainsReason contains(const QnAbstractTransaction& tran, const QnUuid& hash) const;
 
         int currentSequenceNoLock() const;
-
-        ErrorCode updateSequenceNoLock(const QnUuid& peerID, const QnUuid& dbID, int sequence);
 
         enum class Protocol
         {
@@ -151,6 +152,8 @@ namespace ec2
         Timestamp m_lastTimestamp;
         CommitData m_commitData;
         QnUbjsonTransactionSerializer* m_tranSerializer;
+        std::unique_ptr<QSqlQuery> m_insTranQuery;
+        std::unique_ptr<QSqlQuery> m_updateSequenceQuery;
     };
 };
 

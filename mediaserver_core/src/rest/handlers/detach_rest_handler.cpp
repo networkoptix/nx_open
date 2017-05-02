@@ -56,7 +56,7 @@ int QnDetachFromCloudRestHandler::execute(
     NX_LOGX(lm("Detaching system from cloud. cloudSystemId %1")
         .arg(owner->globalSettings()->cloudSystemId()), cl_logDEBUG2);
 
-    if (QnPermissionsHelper::isSafeMode())
+    if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
     {
         NX_LOGX(lm("Cannot detach from cloud while in safe mode. cloudSystemId %1")
             .arg(owner->globalSettings()->cloudSystemId()), cl_logDEBUG1);

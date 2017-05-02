@@ -1,9 +1,11 @@
 #pragma once
 
+#include <QtCore/QThread>
+
 #include <nx_ec/data/api_peer_data.h>
 #include <nx/utils/thread/mutex.h>
 #include <common/common_module_aware.h>
-#include <QtCore/QThread>
+#include "connection_guard_shared_state.h"
 
 namespace ec2
 {
@@ -45,6 +47,8 @@ namespace ec2
         QnJsonTransactionSerializer* jsonTranSerializer() const;
         QnUbjsonTransactionSerializer* ubjsonTranSerializer() const;
 
+        ConnectionGuardSharedState* connectionGuardSharedState();
+
     protected:
         detail::QnDbManager* m_db = nullptr;
         QThread* m_thread = nullptr;
@@ -57,5 +61,7 @@ namespace ec2
         Qn::PeerType m_localPeerType = Qn::PT_NotDefined;
 
         mutable QnMutex m_mutex;
+        ConnectionGuardSharedState m_connectionGuardSharedState;
+
     };
 };

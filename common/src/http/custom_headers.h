@@ -39,6 +39,7 @@ namespace Qn
     static const QByteArray EC2_CONNECTION_GUID_HEADER_NAME = "X-Nx-Connection-Guid";
     static const QByteArray EC2_CONNECTION_TIMEOUT_HEADER_NAME = "X-Nx-Connection-Timeout";
     static const QByteArray EC2_GUID_HEADER_NAME = "X-guid";
+    static const QByteArray EC2_CONNECT_STAGE_1 = "X-connect-stage1";
     static const QByteArray EC2_SERVER_GUID_HEADER_NAME = "X-server-guid";
     static const QByteArray EC2_RUNTIME_GUID_HEADER_NAME = "X-runtime-guid";
     static const QByteArray EC2_DB_GUID_HEADER_NAME = "X-db-guid";

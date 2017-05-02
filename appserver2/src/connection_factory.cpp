@@ -104,12 +104,12 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
 
 Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
 {
-    pleaseStop();
-    join();
-
     // Have to do it before m_transactionMessageBus destruction since TimeSynchronizationManager
     // uses QnTransactionMessageBus.
     m_timeSynchronizationManager->pleaseStop();
+
+    pleaseStop();
+    join();
 }
 
 void Ec2DirectConnectionFactory::pleaseStop()

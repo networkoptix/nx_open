@@ -2898,7 +2898,7 @@ void MediaServerProcess::run()
     if (!qnServerModule->roSettings()->value(QnServer::kNoInitStoragesOnStartup, false).toBool())
         initStoragesAsync(commonModule()->messageProcessor());
 
-    if (!QnPermissionsHelper::isSafeMode())
+    if (!QnPermissionsHelper::isSafeMode(commonModule()))
     {
         if (nx::mserver_aux::needToResetSystem(
                     nx::mserver_aux::isNewServerInstance(

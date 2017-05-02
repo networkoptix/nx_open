@@ -1773,11 +1773,6 @@ void QnTransactionMessageBus::onEc2ConnectionSettingsChanged(const QString& key)
     }
 }
 
-ConnectionGuardSharedState* QnTransactionMessageBus::connectionGuardSharedState()
-{
-    return &m_connectionGuardSharedState;
-}
-
 void QnTransactionMessageBus::setTimeSyncManager(TimeSynchronizationManager* timeSyncManager)
 {
     m_timeSyncManager = timeSyncManager;

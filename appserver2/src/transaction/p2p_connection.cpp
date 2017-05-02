@@ -56,6 +56,7 @@ P2pConnection::P2pConnection(
     QnCommonModule* commonModule,
     const QnUuid& remoteId,
     const ApiPeerData& localPeer,
+    ConnectionLockGuard connectionLockGuard,
     const QUrl& _remotePeerUrl)
 :
     QnCommonModuleAware(commonModule),
@@ -63,9 +64,12 @@ P2pConnection::P2pConnection(
     m_localPeer(localPeer),
     m_direction(Direction::outgoing)
 {
+    m_connectionLockGuard = std::make_unique<ConnectionLockGuard>(
+        std::move(connectionLockGuard));
+
     m_readBuffer.reserve(1024 * 1024);
 
-    QUrl remotePeerUrl = _remotePeerUrl;
+    m_remotePeerUrl = _remotePeerUrl;
     m_remotePeer.id = remoteId;
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
 
@@ -84,15 +88,15 @@ P2pConnection::P2pConnection(
         &P2pConnection::onHttpClientDone,
         Qt::DirectConnection);
 
-    if (remotePeerUrl.userName().isEmpty())
+    if (m_remotePeerUrl.userName().isEmpty())
     {
         fillAuthInfo(m_httpClient, m_credentialsSource == CredentialsSource::serverKey);
     }
     else
     {
         m_credentialsSource = CredentialsSource::remoteUrl;
-        m_httpClient->setUserName(remotePeerUrl.userName());
-        m_httpClient->setUserPassword(remotePeerUrl.password());
+        m_httpClient->setUserName(m_remotePeerUrl.userName());
+        m_httpClient->setUserPassword(m_remotePeerUrl.password());
     }
 
     if (m_localPeer.isServer())
@@ -124,7 +128,7 @@ P2pConnection::P2pConnection(
     nx::network::websocket::addClientHeaders(&request, kP2pProtoName);
     m_httpClient->addRequestHeaders(request.headers);
 
-    QUrlQuery q(remotePeerUrl.query());
+    QUrlQuery q(m_remotePeerUrl.query());
 
 #ifdef USE_JSON
     q.addQueryItem("format", QnLexical::serialized(Qn::JsonFormat));
@@ -134,31 +138,28 @@ P2pConnection::P2pConnection(
 #endif
     q.addQueryItem("peerType", QnLexical::serialized(m_localPeer.peerType));
 
-    remotePeerUrl.setQuery(q);
-
-    m_httpClient->doGet(remotePeerUrl);
+    m_remotePeerUrl.setQuery(q);
 }
 
 P2pConnection::P2pConnection(
     QnCommonModule* commonModule,
     const ApiPeerData& remotePeer,
     const ApiPeerData& localPeer,
+    ConnectionLockGuard connectionLockGuard,
     const WebSocketPtr& webSocket)
 :
     QnCommonModuleAware(commonModule),
     m_remotePeer(remotePeer),
     m_localPeer(localPeer),
     m_webSocket(webSocket),
+    m_state(State::Connected),
     m_direction(Direction::incoming)
 {
+    m_connectionLockGuard = std::make_unique<ConnectionLockGuard>(
+        std::move(connectionLockGuard));
+
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
     m_readBuffer.reserve(1024 * 1024);
-
-    using namespace std::placeholders;
-    setState(State::Connected);
-    m_webSocket->readSomeAsync(
-        &m_readBuffer,
-        std::bind(&P2pConnection::onNewMessageRead, this, _1, _2));
 }
 
 P2pConnection::~P2pConnection()
@@ -232,7 +233,7 @@ void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client
         if (m_credentialsSource < CredentialsSource::none)
         {
             fillAuthInfo(m_httpClient, m_credentialsSource == CredentialsSource::serverKey);
-            m_httpClient->doGet(m_httpClient->url());
+            m_httpClient->doGet(m_remotePeerUrl);
         }
         else
         {
@@ -240,6 +241,12 @@ void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client
         }
         return;
     }
+    else if (statusCode == nx_http::StatusCode::forbidden)
+    {
+        cancelConnecting();
+        return;
+    }
+
 
     if (!client->response())
     {
@@ -326,27 +333,28 @@ void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client
         cancelConnecting();
         return;
     }
-}
 
-void P2pConnection::onHttpClientDone(const nx_http::AsyncHttpClientPtr& client)
-{
-    QnMutexLocker lock(&m_mutex);
+    if (headers.find(Qn::EC2_CONNECT_STAGE_1) != headers.end())
+    {
+        // addition stage for server to server connect. It prevent establishing two (incoming and outgoing) connections at once
+        if (m_connectionLockGuard->tryAcquireConnecting())
+            m_httpClient->doGet(m_remotePeerUrl);
+        else
+            cancelConnecting();
+        return;
+    }
 
-    using namespace nx::network;
-
-    NX_LOG( lit("QnTransactionTransportBase::at_httpClientDone. state = %1").
-        arg((int)client->state()), cl_logDEBUG2);
-
-    nx_http::AsyncHttpClient::State state = client->state();
-    if (state == nx_http::AsyncHttpClient::sFailed) {
+    if (!m_connectionLockGuard->tryAcquireConnected())
+    {
         cancelConnecting();
         return;
     }
 
+    using namespace nx::network;
     auto error = websocket::validateResponse(client->request(), *client->response());
     if (error != websocket::Error::noError)
     {
-        NX_LOG(lm("Can't establish WEB socket connection. Validation failed. Error: %1").arg((int) error), cl_logERROR);
+        NX_LOG(lm("Can't establish WEB socket connection. Validation failed. Error: %1").arg((int)error), cl_logERROR);
         setState(State::Error);
         m_httpClient.reset();
         return;
@@ -361,14 +369,41 @@ void P2pConnection::onHttpClientDone(const nx_http::AsyncHttpClientPtr& client)
     socket->setNonBlockingMode(true);
     socket->setNoDelay(true);
 
-    m_webSocket.reset(new WebSocket( std::move(socket), msgBuffer));
+    m_webSocket.reset(new WebSocket(std::move(socket), msgBuffer));
     //m_webSocket = std::move(socket);
-    NX_ASSERT(msgBuffer.isEmpty());
-
+    //NX_ASSERT(msgBuffer.isEmpty());
     m_httpClient.reset();
 
     setState(State::Connected);
+    using namespace std::placeholders;
+    m_webSocket->readSomeAsync(
+        &m_readBuffer,
+        std::bind(&P2pConnection::onNewMessageRead, this, _1, _2));
+}
 
+void P2pConnection::onHttpClientDone(const nx_http::AsyncHttpClientPtr& client)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    NX_LOG( lit("QnTransactionTransportBase::at_httpClientDone. state = %1").
+        arg((int)client->state()), cl_logDEBUG2);
+
+    nx_http::AsyncHttpClient::State state = client->state();
+    if (state == nx_http::AsyncHttpClient::sFailed) 
+    {
+        cancelConnecting();
+        return;
+    }
+
+}
+
+void P2pConnection::startConnection()
+{
+    m_httpClient->doGet(m_remotePeerUrl);
+}
+
+void P2pConnection::startReading()
+{
     using namespace std::placeholders;
     m_webSocket->readSomeAsync(
         &m_readBuffer,
@@ -497,6 +532,7 @@ bool P2pConnection::handleMessage(const nx::Buffer& message)
 {
     NX_ASSERT(message.size() > 1);
     MessageType messageType = (MessageType) message[0];
+    NX_ASSERT(!m_remotePeer.persistentId.isNull());
     emit gotMessage(toSharedPointer(), messageType, message.mid(1));
     return true;
 }

@@ -145,7 +145,7 @@ int QnMergeSystemsRestHandler::execute(
 {
     using MergeStatus = utils::MergeSystemsStatus::Value;
 
-    if (QnPermissionsHelper::isSafeMode())
+    if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
         return QnPermissionsHelper::safeModeError(result);
     if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), owner->accessRights()))
         return QnPermissionsHelper::notOwnerError(result);

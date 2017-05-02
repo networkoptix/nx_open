@@ -10,8 +10,13 @@
 #include <transaction/transaction_message_bus.h>
 #include <transaction/p2p_message_bus.h>
 #include <core/resource_management/resource_pool.h>
+#include "ec2_thread_pool.h"
 
 namespace {
+
+static const int kInstanceCount = 100;
+static const int kMaxSyncTimeoutMs = 1000 * 20 * 1000;
+static const int kCamerasCount = 100;
 
 static void initResourceTypes(ec2::AbstractECConnection* ec2Connection)
 {
@@ -66,6 +71,7 @@ static void createData(const Appserver2Ptr& server)
         auto serverManager = connection->getMediaServerManager(Qn::kSystemAccess);
         ASSERT_EQ(ec2::ErrorCode::ok, serverManager->saveSync(serverData));
     }
+    for (int i = 0; i < kCamerasCount; ++i)
     {
         ec2::ApiCameraData cameraData;
         auto resTypePtr = qnResTypePool->getResourceTypeByName("Camera");
@@ -82,14 +88,118 @@ static void createData(const Appserver2Ptr& server)
     }
 }
 
+} // namespace
+
+void checkDistance(const std::vector<Appserver2Ptr>& servers, bool waitForSync, int& syncDoneCounter)
+{
+    QElapsedTimer timer;
+    timer.restart();
+    do
+    {
+        syncDoneCounter = 0;
+        for (const auto& server : servers)
+        {
+            const auto& connection = server->moduleInstance()->ecConnection();
+            const auto& bus = connection->p2pMessageBus();
+            const auto& commonModule = server->moduleInstance()->commonModule();
+            for (const auto& serverTo : servers)
+            {
+                const auto& commonModuleTo = serverTo->moduleInstance()->commonModule();
+                ec2::ApiPersistentIdData peer(commonModuleTo->moduleGUID(), commonModuleTo->dbId());
+                if (bus->distanceTo(peer) > ec2::kMaxOnlineDistance)
+                {
+                    if (!waitForSync)
+                        NX_LOG(lit("Peer %1 has not online distance to peer %2")
+                            .arg(qnStaticCommon->moduleDisplayName(commonModule->moduleGUID()))
+                            .arg(qnStaticCommon->moduleDisplayName(commonModuleTo->moduleGUID())),
+                            cl_logDEBUG1);
+                }
+                else
+                {
+                    ++syncDoneCounter;
+                }
+                if (!waitForSync)
+                    ASSERT_TRUE(bus->isSubscribedTo(peer));
+            }
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    } while (waitForSync && syncDoneCounter != kInstanceCount*kInstanceCount && timer.elapsed() < kMaxSyncTimeoutMs);
 }
 
-TEST(P2pMessageBus, connect)
+void checkSubscription(const std::vector<Appserver2Ptr>& servers, bool waitForSync, int& syncDoneCounter)
 {
-    QnStaticCommonModule staticCommon;
+    QElapsedTimer timer;
+    timer.restart();
+    do
+    {
+        syncDoneCounter = 0;
+        for (const auto& server: servers)
+        {
+            const auto& connection = server->moduleInstance()->ecConnection();
+            const auto& bus = connection->p2pMessageBus();
+            const auto& commonModule = server->moduleInstance()->commonModule();
+            for (const auto& serverTo : servers)
+            {
+                const auto& commonModuleTo = serverTo->moduleInstance()->commonModule();
+                ec2::ApiPersistentIdData peer(commonModuleTo->moduleGUID(), commonModuleTo->dbId());
+                if (!bus->isSubscribedTo(peer))
+                {
+                    if (!waitForSync)
+                        NX_LOG(lit("Peer %1 is not subscribed to peer %2")
+                            .arg(qnStaticCommon->moduleDisplayName(commonModule->moduleGUID()))
+                            .arg(qnStaticCommon->moduleDisplayName(commonModuleTo->moduleGUID())),
+                            cl_logDEBUG1);
+                }
+                else
+                {
+                    ++syncDoneCounter;
+                }
+                if (!waitForSync)
+                    ASSERT_TRUE(bus->isSubscribedTo(peer));
+            }
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    } while (waitForSync && syncDoneCounter != kInstanceCount*kInstanceCount && timer.elapsed() < kMaxSyncTimeoutMs);
+}
 
-    static const int kInstanceCount = 4;
-    static const int kMaxSyncTimeoutMs = 1000 * 20;
+// connect servers: 0 --> 1 -->2 --> N
+void sequenceConnect(std::vector<Appserver2Ptr>& servers)
+{
+    for (int i = 1; i < servers.size(); ++i)
+    {
+        const auto addr = servers[i]->moduleInstance()->endpoint();
+        QUrl url = lit("http://%1:%2/ec2/messageBus").arg(addr.address.toString()).arg(addr.port);
+        servers[i - 1]->moduleInstance()->ecConnection()->p2pMessageBus()->
+            addOutgoingConnectionToPeer(servers[i]->moduleInstance()->commonModule()->moduleGUID(), url);
+    }
+}
+
+// connect all servers to each others
+void fullConnect(std::vector<Appserver2Ptr>& servers)
+{
+    for (int i = 0; i < servers.size(); ++i)
+    {
+        for (int j = 0; j < servers.size(); ++j)
+        {
+            if (j == i)
+                continue;
+            const auto addr = servers[i]->moduleInstance()->endpoint();
+            const auto id = servers[i]->moduleInstance()->commonModule()->moduleGUID();
+            QUrl url = lit("http://%1:%2/ec2/messageBus").arg(addr.address.toString()).arg(addr.port);
+            servers[j]->moduleInstance()->ecConnection()->p2pMessageBus()->
+                addOutgoingConnectionToPeer(id, url);
+        }
+    }
+}
+
+static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverConnectFunc)
+{
+    QElapsedTimer t;
+    t.restart();
+
+    QnStaticCommonModule staticCommon;
+    ec2::Ec2ThreadPool::instance()->setMaxThreadCount(
+        std::max(QThread::idealThreadCount(), kInstanceCount * 2));
 
     std::vector<Appserver2Ptr> servers;
     for (int i = 0; i < kInstanceCount; ++i)
@@ -102,70 +212,29 @@ TEST(P2pMessageBus, connect)
             cl_logINFO);
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
+    //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    t.restart();
     for (const auto& server: servers)
         createData(server);
 
-    for (int i = 1; i < servers.size(); ++i)
-    {
-        const auto addr = servers[i]->moduleInstance()->endpoint();
-        QUrl url = lit("http://%1:%2/ec2/messageBus").arg(addr.address.toString()).arg(addr.port);
-        servers[i - 1]->moduleInstance()->ecConnection()->p2pMessageBus()->
-            addOutgoingConnectionToPeer(servers[i]->moduleInstance()->commonModule()->moduleGUID(), url);
-    }
+    NX_LOG(lit("Create test data time: %1 ms").arg(t.elapsed()), cl_logINFO);
+
+
+    serverConnectFunc(servers);
 
     int syncDoneCounter = 0;
     QElapsedTimer timer;
     timer.restart();
 
     // check subscription
-    do
-    {
-        syncDoneCounter = 0;
-        for (const auto& server: servers)
-        {
-            const auto& connection = server->moduleInstance()->ecConnection();
-            const auto& bus = connection->p2pMessageBus();
+    checkSubscription(servers, true, syncDoneCounter);
+    if (syncDoneCounter != servers.size() * servers.size())
+        checkSubscription(servers, false, syncDoneCounter); //< report detailed error
 
-            for (const auto& serverTo: servers)
-            {
-                const auto& commonModule = serverTo->moduleInstance()->commonModule();
-                ec2::ApiPersistentIdData peer(commonModule->moduleGUID(), commonModule->dbId());
-                if (bus->isSubscribedTo(peer))
-                    ++syncDoneCounter;
-            }
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    } while (syncDoneCounter != kInstanceCount*kInstanceCount && timer.elapsed() < kMaxSyncTimeoutMs);
-
-    for (const auto& server : servers)
-    {
-        const auto& connection = server->moduleInstance()->ecConnection();
-        const auto& bus = connection->p2pMessageBus();
-        const auto& commonModule = server->moduleInstance()->commonModule();
-        for (const auto& serverTo : servers)
-        {
-            const auto& commonModuleTo = serverTo->moduleInstance()->commonModule();
-            ec2::ApiPersistentIdData peer(commonModuleTo->moduleGUID(), commonModuleTo->dbId());
-            if (bus->distanceTo(peer) > ec2::kMaxOnlineDistance)
-            {
-                NX_LOG(lit("Peer %1 has not online distance to peer %2")
-                    .arg(qnStaticCommon->moduleDisplayName(commonModule->moduleGUID()))
-                    .arg(qnStaticCommon->moduleDisplayName(commonModuleTo->moduleGUID())),
-                    cl_logDEBUG1);
-            }
-            ASSERT_TRUE(bus->distanceTo(peer) <= ec2::kMaxOnlineDistance);
-            if (!bus->isSubscribedTo(peer))
-            {
-                NX_LOG(lit("Peer %1 is not subscribed to peer %2")
-                    .arg(qnStaticCommon->moduleDisplayName(commonModule->moduleGUID()))
-                    .arg(qnStaticCommon->moduleDisplayName(commonModuleTo->moduleGUID())),
-                    cl_logDEBUG1);
-            }
-            ASSERT_TRUE(bus->isSubscribedTo(peer));
-        }
-    }
+    // check peers distances
+    checkDistance(servers, true, syncDoneCounter);
+    if (syncDoneCounter != servers.size() * servers.size())
+        checkDistance(servers, false, syncDoneCounter); //< report detailed error
 
     // wait for data sync
     do
@@ -175,10 +244,25 @@ TEST(P2pMessageBus, connect)
         {
             const auto& resPool = server->moduleInstance()->commonModule()->resourcePool();
             const auto& cameraList = resPool->getAllCameras(QnResourcePtr());
-            if (cameraList.size() == kInstanceCount)
+            if (cameraList.size() == kInstanceCount * kCamerasCount)
                 ++syncDoneCounter;
+            else
+                break;
         }
         ASSERT_TRUE(timer.elapsed() < kMaxSyncTimeoutMs);
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
     } while (syncDoneCounter != kInstanceCount && timer.elapsed() < kMaxSyncTimeoutMs);
+
+    NX_LOG(lit("Sync data time: %1 ms").arg(timer.elapsed()), cl_logINFO);
+
+}
+
+TEST(P2pMessageBus, SequenceConnect)
+{
+    testMain(sequenceConnect);
+}
+
+TEST(P2pMessageBus, FullConnect)
+{
+    testMain(fullConnect);
 }

@@ -70,8 +70,15 @@ public:
 
 class QnDbManagerAccess;
 
+enum class TranLockType
+{
+    Regular,
+    Lazy
+};
+
 namespace detail
 {
+
     class QnDbManager
     :
         public QObject,
@@ -169,11 +176,10 @@ namespace detail
 
         //!Reads settings (properties of user 'admin')
 
-        virtual QnDbTransaction* getTransaction() override;
-
         void setTransactionLog(QnTransactionLog* tranLog);
         void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager);
         QnTransactionLog* transactionLog() const;
+        virtual bool tuneDBAfterOpen(QSqlDatabase* const sqlDb) override;
 
     signals:
         //!Emitted after \a QnDbManager::init was successfully executed
@@ -568,7 +574,7 @@ namespace detail
         qint32 getBusinessRuleInternalId( const QnUuid& guid );
 
         bool isReadOnly() const { return m_dbReadOnly; }
-    private:
+    public:
         class QnDbTransactionExt: public QnDbTransaction
         {
         public:
@@ -578,16 +584,38 @@ namespace detail
                 QnReadWriteLock& mutex)
                 :
                 QnDbTransaction(database, mutex),
-                m_tranLog(tranLog)
+                m_tranLog(tranLog),
+                m_lazyTranInProgress(false)
             {
             }
 
             virtual bool beginTran() override;
             virtual void rollback() override;
             virtual bool commit() override;
+
+            bool beginLazyTran();
+            bool commitLazyTran();
         private:
+            friend class QnLazyTransactionLocker;
+
             QnTransactionLog* m_tranLog;
+            bool m_lazyTranInProgress;
         };
+
+        class QnLazyTransactionLocker: public QnAbstractTransactionLocker
+        {
+        public:
+            QnLazyTransactionLocker(QnDbTransactionExt* tran);
+            virtual ~QnLazyTransactionLocker();
+            virtual bool commit() override;
+
+        private:
+            bool m_committed;
+            QnDbTransactionExt* m_tran;
+        };
+
+        virtual QnDbTransactionExt* getTransaction() override;
+    private:
 
         enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash, CM_String, CM_INT};
 
@@ -677,6 +705,7 @@ namespace detail
         QnTransactionLog* m_tranLog;
         TimeSynchronizationManager* m_timeSyncManager;
     };
+
 } // namespace detail
 
 class QnDbManagerAccess

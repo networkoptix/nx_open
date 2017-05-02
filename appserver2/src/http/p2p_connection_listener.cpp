@@ -75,6 +75,48 @@ P2pConnectionProcessor::~P2pConnectionProcessor()
     stop();
 }
 
+void P2pConnectionProcessor::addResponseHeaders()
+{
+    Q_D(P2pConnectionProcessor);
+
+    auto keepAliveTimeout = commonModule()->globalSettings()->connectionKeepAliveTimeout() * 1000;
+    d->response.headers.emplace(
+        Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME,
+        nx_http::header::KeepAlive(
+            keepAliveTimeout).toString());
+
+    d->response.headers.insert(nx_http::HttpHeader(
+        Qn::EC2_GUID_HEADER_NAME,
+        commonModule()->moduleGUID().toByteArray()));
+    d->response.headers.insert(nx_http::HttpHeader(
+        Qn::EC2_RUNTIME_GUID_HEADER_NAME,
+        commonModule()->runningInstanceGUID().toByteArray()));
+    d->response.headers.insert(nx_http::HttpHeader(
+        Qn::EC2_DB_GUID_HEADER_NAME,
+        commonModule()->dbId().toByteArray()));
+
+    d->response.headers.insert(nx_http::HttpHeader(
+        Qn::EC2_SYSTEM_IDENTITY_HEADER_NAME,
+        QByteArray::number(commonModule()->systemIdentityTime())));
+    d->response.headers.insert(nx_http::HttpHeader(
+        Qn::EC2_PROTO_VERSION_HEADER_NAME,
+        nx_http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
+    d->response.headers.insert(nx_http::HttpHeader(
+        Qn::EC2_CLOUD_HOST_HEADER_NAME,
+        nx::network::AppInfo::defaultCloudHost().toUtf8()));
+    d->response.headers.insert(nx_http::HttpHeader(
+        Qn::EC2_SYSTEM_ID_HEADER_NAME,
+        commonModule()->globalSettings()->localSystemId().toByteArray()));
+
+}
+
+bool P2pConnectionProcessor::isDisabledPeer(const ApiPeerData& remotePeer) const
+{
+    return (!commonModule()->allowedPeers().isEmpty() && 
+        !commonModule()->allowedPeers().contains(remotePeer.id) &&
+        !remotePeer.isClient());
+}
+
 void P2pConnectionProcessor::run()
 {
     Q_D(P2pConnectionProcessor);
@@ -86,16 +128,6 @@ void P2pConnectionProcessor::run()
             return;
     }
     parseRequest();
-
-    using namespace nx::network;
-
-    auto error = websocket::validateRequest(d->request, &d->response);
-    if (error != websocket::Error::noError)
-    {
-        NX_LOG(lm("Invalid WEB socket request. Validation failed. Error: %1").arg((int)error), cl_logERROR);
-        d->socket->close();
-        return;
-    }
 
     QUrlQuery query = QUrlQuery(d->request.requestLine.url.query());
 
@@ -146,39 +178,60 @@ void P2pConnectionProcessor::run()
         return;
     }
 
-    auto keepAliveTimeout = commonModule->globalSettings()->connectionKeepAliveTimeout() * 1000;
-    d->response.headers.emplace(
-        Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME,
-        nx_http::header::KeepAlive(
-            keepAliveTimeout).toString());
+    addResponseHeaders();
 
-    d->response.headers.insert(nx_http::HttpHeader(
-        Qn::EC2_GUID_HEADER_NAME,
-        commonModule->moduleGUID().toByteArray()));
-    d->response.headers.insert(nx_http::HttpHeader(
-        Qn::EC2_RUNTIME_GUID_HEADER_NAME,
-        commonModule->runningInstanceGUID().toByteArray()));
-    d->response.headers.insert(nx_http::HttpHeader(
-        Qn::EC2_DB_GUID_HEADER_NAME,
-        commonModule->dbId().toByteArray()));
+    ConnectionLockGuard connectionLockGuard(
+        commonModule->moduleGUID(),
+        d->messageBus->connectionGuardSharedState(),
+        remoteGuid,
+        ConnectionLockGuard::Direction::Incoming);
 
-    d->response.headers.insert(nx_http::HttpHeader(
-        Qn::EC2_SYSTEM_IDENTITY_HEADER_NAME,
-        QByteArray::number(commonModule->systemIdentityTime())));
-    d->response.headers.insert(nx_http::HttpHeader(
-        Qn::EC2_PROTO_VERSION_HEADER_NAME,
-        nx_http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
-    d->response.headers.insert(nx_http::HttpHeader(
-        Qn::EC2_CLOUD_HOST_HEADER_NAME,
-        nx::network::AppInfo::defaultCloudHost().toUtf8()));
-    d->response.headers.insert(nx_http::HttpHeader(
-        Qn::EC2_SYSTEM_ID_HEADER_NAME,
-        commonModule->globalSettings()->localSystemId().toByteArray()));
+    if (remotePeer.peerType == Qn::PT_Server)
+    {
+        // addition checking to prevent two connections (ingoing and outgoing) at once
 
+        // 1-st stage
+        bool lockOK = connectionLockGuard.tryAcquireConnecting();
+
+        d->response.headers.insert(nx_http::HttpHeader(
+            Qn::EC2_CONNECT_STAGE_1,
+            nx_http::StringType()));
+
+        sendResponse(
+            lockOK ? nx_http::StatusCode::noContent : nx_http::StatusCode::forbidden,
+            nx_http::StringType());
+        if (!lockOK)
+            return;
+
+        // 2-nd stage
+        if (!readRequest())
+            return;
+
+        parseRequest();
+        addResponseHeaders();
+    }
+
+    if(!connectionLockGuard.tryAcquireConnected() || //< lock failed
+        remotePeer.id == commonModule->moduleGUID() || //< can't connect to itself
+        isDisabledPeer(remotePeer)) //< allowed peers are stricted
+    {
+        sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
+        return;
+    }
+
+    using namespace nx::network;
+    auto error = websocket::validateRequest(d->request, &d->response);
+    if (error != websocket::Error::noError)
+    {
+        NX_LOG(lm("Invalid WEB socket request. Validation failed. Error: %1").arg((int)error), cl_logERROR);
+        d->socket->close();
+        return;
+    }
     sendResponse(nx_http::StatusCode::upgrade, nx_http::StringType());
 
     std::unique_ptr<ShareSocketDelegate> socket(new ShareSocketDelegate(std::move(d->socket)));
     socket->setNonBlockingMode(true);
+    auto keepAliveTimeout = commonModule->globalSettings()->connectionKeepAliveTimeout() * 1000;
     socket->setRecvTimeout(std::chrono::milliseconds(keepAliveTimeout * 2).count());
     socket->setSendTimeout(std::chrono::milliseconds(keepAliveTimeout * 2).count());
     socket->setNoDelay(true);
@@ -192,6 +245,7 @@ void P2pConnectionProcessor::run()
         commonModule,
         remotePeer,
         d->messageBus->localPeer(),
+        std::move(connectionLockGuard),
         std::move(webSocket)));
     d->messageBus->gotConnectionFromRemotePeer(connection);
 

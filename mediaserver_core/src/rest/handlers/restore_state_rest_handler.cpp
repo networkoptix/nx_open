@@ -39,7 +39,7 @@ int QnRestoreStateRestHandler::execute(
 {
     const Qn::UserAccessData& accessRights = owner->accessRights();
 
-    if (QnPermissionsHelper::isSafeMode())
+    if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
         return QnPermissionsHelper::safeModeError(result);
     if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), accessRights))
         return QnPermissionsHelper::notOwnerError(result);
@@ -51,7 +51,7 @@ int QnRestoreStateRestHandler::execute(
         return nx_http::StatusCode::ok;
     }
 
-    if (QnPermissionsHelper::isSafeMode())
+    if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
         return QnPermissionsHelper::safeModeError(result);
 
     return nx_http::StatusCode::ok;

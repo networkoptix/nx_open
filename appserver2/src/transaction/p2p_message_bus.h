@@ -50,8 +50,8 @@ public:
 
     void gotConnectionFromRemotePeer(P2pConnectionPtr connection);
 
-    void addOutgoingConnectionToPeer(QnUuid& id, const QUrl& url);
-    void removeOutgoingConnectionFromPeer(QnUuid& id);
+    void addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& url);
+    void removeOutgoingConnectionFromPeer(const QnUuid& id);
 
     // Self peer information
     ApiPeerData localPeer() const;
@@ -99,8 +99,8 @@ public:
         P2pConnection::Direction direction) const;
 
     bool isSubscribedTo(const ApiPersistentIdData& peer) const;
-    bool distanceTo(const ApiPersistentIdData& peer) const;
-
+    qint32 distanceTo(const ApiPersistentIdData& peer) const;
+    void commitLazyData();
 private:
     QByteArray serializePeersMessage();
     QByteArray serializeCompressedPeers(MessageType messageType, const QVector<PeerNumberType>& peers);
@@ -111,8 +111,6 @@ private:
         const QVector<qint32>& sequences);
 private:
     void doPeriodicTasks();
-    void processTemporaryOutgoingConnections();
-    void removeClosedConnections();
     void createOutgoingConnections();
     void sendAlivePeersMessage();
     void cleanupRoutingRecords(const ApiPersistentIdData& id);
@@ -157,8 +155,10 @@ private:
     void gotTransaction(const QnTransaction<T>& tran,const P2pConnectionPtr& connection);
 
     void proxyFillerTransaction(const QnAbstractTransaction& tran);
-    void addRouteToDirectlyConnectedPeer(const P2pConnectionPtr& connection);
-
+    bool needSubscribeDelay();
+    void connectSignals(const P2pConnectionPtr& connection);
+    void dropConnections();
+    void resotreAfterDbError();
 private slots:
     void at_gotMessage(const QSharedPointer<P2pConnection>& connection, MessageType messageType, const QByteArray& payload);
     void at_stateChanged(const QSharedPointer<P2pConnection>& connection, P2pConnection::State state);
@@ -195,7 +195,8 @@ private:
 
     QTimer* m_timer = nullptr;
     QElapsedTimer m_lastPeerInfoTimer;
-    QElapsedTimer m_lastSubscribeTimer;
+    QElapsedTimer m_wantToSubscribeTimer;
+    QElapsedTimer m_dbCommitTimer;
 private:
     RouteToPeerMap allPeersDistances() const;
 };

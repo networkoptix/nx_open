@@ -77,4 +77,10 @@ QnUbjsonTransactionSerializer* QnTransactionMessageBusBase::ubjsonTranSerializer
     return m_ubjsonTranSerializer;
 }
 
+ConnectionGuardSharedState* QnTransactionMessageBusBase::connectionGuardSharedState()
+{
+    return &m_connectionGuardSharedState;
+}
+
+
 } // namespace ec2

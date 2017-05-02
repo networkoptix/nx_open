@@ -140,10 +140,35 @@ bool businessRuleObjectUpdater(ApiBusinessRuleData& data)
 //-------------------------------------------------------------------------------------------------
 // QnDbTransactionExt
 
+bool QnDbManager::QnDbTransactionExt::beginLazyTran()
+{
+    m_mutex.lockForWrite();
+
+    if (!m_lazyTranInProgress)
+        m_database.transaction();
+    m_lazyTranInProgress = true;
+
+    m_tranLog->beginTran();
+    return true;
+}
+
+bool QnDbManager::QnDbTransactionExt::commitLazyTran()
+{
+    m_tranLog->commit();
+    m_mutex.unlock();
+    return true;
+}
+
 bool QnDbManager::QnDbTransactionExt::beginTran()
 {
-    if( !QnDbTransaction::beginTran() )
-        return false;
+    m_mutex.lockForWrite();
+
+    if (m_lazyTranInProgress)
+        m_database.commit();
+    m_lazyTranInProgress = false;
+    m_database.transaction();
+
+
     m_tranLog->beginTran();
     return true;
 }
@@ -151,12 +176,15 @@ bool QnDbManager::QnDbTransactionExt::beginTran()
 void QnDbManager::QnDbTransactionExt::rollback()
 {
     m_tranLog->rollback();
-    QnDbTransaction::rollback();
+    m_database.rollback();
+    m_lazyTranInProgress = false;
+    m_mutex.unlock();
 }
 
 bool QnDbManager::QnDbTransactionExt::commit()
 {
     const bool rez = m_database.commit();
+    m_lazyTranInProgress = false;
     if (rez) {
         m_tranLog->commit();
         m_mutex.unlock();
@@ -166,6 +194,27 @@ bool QnDbManager::QnDbTransactionExt::commit()
     }
     return rez;
 }
+
+QnDbManager::QnLazyTransactionLocker::QnLazyTransactionLocker(QnDbTransactionExt* tran) :
+    m_committed(false),
+    m_tran(tran)
+{
+    m_tran->beginLazyTran();
+}
+
+QnDbManager::QnLazyTransactionLocker::~QnLazyTransactionLocker()
+{
+    if (!m_committed)
+        m_tran->rollback();
+
+}
+
+bool QnDbManager::QnLazyTransactionLocker::commit()
+{
+    m_committed = m_tran->commitLazyTran();
+    return m_committed;
+}
+
 
 //-------------------------------------------------------------------------------------------------
 // QnDbManager
@@ -3935,7 +3984,6 @@ ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& 
     //tuning DB
     if( !tuneDBAfterOpen(&m_sdb) )
         return ErrorCode::dbError;
-
     return ErrorCode::ok;
 }
 
@@ -3972,6 +4020,14 @@ ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, ApiDatabas
         return ErrorCode::dbError;
 
     return ErrorCode::ok;
+}
+
+bool QnDbManager::tuneDBAfterOpen(QSqlDatabase* const sqlDb)
+{
+    if (!QnDbHelper::tuneDBAfterOpen(sqlDb))
+        return false;
+    m_tranLog->resetPreparedStatements();
+    return true;
 }
 
 // TODO: Change to a function. ATTENTION: Macro contains "return".
@@ -4580,7 +4636,7 @@ bool QnDbManager::updateId()
     return true;
 }
 
-QnDbManager::QnDbTransaction* QnDbManager::getTransaction()
+QnDbManager::QnDbTransactionExt* QnDbManager::getTransaction()
 {
     return m_tran.get();
 }

@@ -39,7 +39,7 @@ int QnSetupLocalSystemRestHandler::execute(
     const QnRestConnectionProcessor* owner,
     QnJsonRestResult &result)
 {
-    if (QnPermissionsHelper::isSafeMode())
+    if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
         return QnPermissionsHelper::safeModeError(result);
     if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), owner->accessRights()))
         return QnPermissionsHelper::notOwnerError(result);
