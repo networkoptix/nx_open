@@ -366,7 +366,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
             
             $scope.serverTime.timeZoneOffset = parseInt(result.data.reply.timeZoneOffset);
-            $scope.serverTime.latency = timeCorrection;
+            $scope.serverTime.latency = $scope.timeCorrection;
 
             if(Config.settingsConfig.useServerTime){
                 $scope.timeCorrection = $scope.serverTime.timeZoneOffset + clientDate.getTimezoneOffset() * 60000 - $scope.timeCorrection;
