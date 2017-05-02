@@ -22,11 +22,6 @@ QnUuid TestPeerManager::addPeer()
     return peerId;
 }
 
-QList<QnUuid> TestPeerManager::peers() const
-{
-    return m_peers.keys();
-}
-
 void TestPeerManager::setFileInformation(
     const QnUuid& peer, const FileInformation& fileInformation)
 {

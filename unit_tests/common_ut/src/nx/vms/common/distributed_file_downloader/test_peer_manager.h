@@ -22,7 +22,6 @@ public:
 
     void addPeer(const QnUuid& peer);
     QnUuid addPeer();
-    QList<QnUuid> peers() const;
 
     void setFileInformation(const QnUuid& peer, const FileInformation& fileInformation);
     FileInformation fileInformation(const QnUuid& peer, const QString& fileName) const;
