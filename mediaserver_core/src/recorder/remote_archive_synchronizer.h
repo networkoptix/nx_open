@@ -46,7 +46,7 @@ private:
         const QnSecurityCamResourcePtr& resource,
         const RemoteArchiveEntry& entry,
         BufferType* buffer,
-        qint64* outRealDurationMs = nullptr);
+        int64_t* outRealDurationMs = nullptr);
 
     bool convertAndWriteBuffer(
         const QnSecurityCamResourcePtr& resource,

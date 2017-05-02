@@ -322,7 +322,7 @@ bool SynchronizationTask::writeEntry(
     const QnSecurityCamResourcePtr& resource,
     const RemoteArchiveEntry& entry,
     BufferType* buffer,
-    qint64* outRealDurationMs)
+    int64_t* outRealDurationMs)
 {
     QBuffer ioDevice;
     ioDevice.setBuffer(buffer);
