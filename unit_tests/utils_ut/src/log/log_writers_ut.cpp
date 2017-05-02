@@ -11,7 +11,7 @@ namespace utils {
 namespace log {
 namespace test {
 
-#ifdef _WINDOWS
+#ifdef Q_OS_WIN
     const QByteArray kLineSplit("\r\n");
 #else
     const QByteArray kLineSplit("\n");
@@ -20,6 +20,7 @@ namespace test {
 class LogFile: public ::testing::Test
 {
 public:
+    // TODO: Use temp directory from TestOptions when avaliable.
     LogFile(): m_basePath(lm("/tmp/log_test_%1/log").arg(nx::utils::random::number())) {}
 
     std::unique_ptr<AbstractWriter> makeWriter(size_t size, size_t count = 0)

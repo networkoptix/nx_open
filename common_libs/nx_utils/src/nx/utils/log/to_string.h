@@ -3,7 +3,6 @@
 #include <memory>
 #include <chrono>
 
-#include <boost/core/demangle.hpp>
 #include <boost/optional.hpp>
 
 #include <QtCore/QByteArray>
@@ -46,21 +45,13 @@ NX_UTILS_API QString toString(QAbstractSocket::SocketError error);
 // ------------------------------------------------------------------------------------------------
 // Pointers.
 
+NX_UTILS_API QString demangleTypeName(const char* type);
+NX_UTILS_API QString pointerTypeName(const void* /*p*/);
+
 template<typename T>
 QString pointerTypeName(const T* p)
 {
-    auto typeName = boost::core::demangle(typeid(*p).name());
-    #ifdef Q_OS_WIN
-        const auto space = typename.indexOf(" ");
-        typeName = typeName.substr(space + 1);
-    #endif
-    return QString::fromStdString(typeName);
-}
-
-inline
-QString pointerTypeName(const void* /*p*/)
-{
-    return QLatin1String("void");
+    return demangleTypeName(typeid(*p).name());
 }
 
 template<typename T>

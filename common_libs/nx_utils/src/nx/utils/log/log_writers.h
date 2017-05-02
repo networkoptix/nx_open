@@ -27,6 +27,7 @@ class NX_UTILS_API AbstractWriter
 {
 public:
     virtual void write(Level level, const QString& message) = 0;
+    virtual ~AbstractWriter() = default;
 };
 
 /**

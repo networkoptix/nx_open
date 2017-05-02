@@ -1,5 +1,8 @@
 #include "to_string.h"
 
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/core/demangle.hpp>
+
 QString toString(const char* s)
 {
     return QString::fromUtf8(s);
@@ -104,4 +107,25 @@ QString toString(QAbstractSocket::SocketError error)
         default:
             return QString(QLatin1String("Unknown error (not recognized by nx)"));
     }
+}
+
+QString demangleTypeName(const char* type)
+{
+    auto typeName = boost::core::demangle(type);
+
+    #ifdef _MSC_VER
+        static const std::vector<std::string> kTypePrefixes = { "struct ", "class " };
+        for (const auto& preffix: kTypePrefixes)
+        {
+            if (boost::starts_with(typeName, preffix))
+                typeName = typeName.substr(preffix.size());
+        }
+    #endif
+
+    return QString::fromStdString(typeName);
+}
+
+QString pointerTypeName(const void* /*p*/)
+{
+    return QLatin1String("void");
 }

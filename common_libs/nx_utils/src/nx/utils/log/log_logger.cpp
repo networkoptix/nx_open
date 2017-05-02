@@ -5,10 +5,10 @@
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
     #include <sys/types.h>
     #include <linux/unistd.h>
-    static QString thisThreadId() { return QString::number(syscall(__NR_gettid), 6); }
+    static QString thisThreadId() { return QString::number(syscall(__NR_gettid)); }
 #else
     #include <QtCore/QThread>
-    static QString thisThreadId() { return QString::number((qint64) QThread::currentThreadId(), 6, 16); }
+    static QString thisThreadId() { return QString::number((qint64) QThread::currentThreadId(), 16); }
 #endif
 
 namespace nx {
@@ -31,7 +31,7 @@ void Logger::log(Level level, const QString& tag, const QString& message)
 
     static const QString kTemplate = QLatin1String("%1 %2 %3 %4: %5");
     const auto output = kTemplate
-        .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss.zzz")).arg(thisThreadId())
+        .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss.zzz")).arg(thisThreadId(), 6)
         .arg(toString(level).toUpper(), 7, QLatin1Char(' ')).arg(tag).arg(message);
 
     for (auto& writer: m_writers)

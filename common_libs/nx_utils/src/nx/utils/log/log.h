@@ -15,17 +15,17 @@ static constexpr const QnLogLevel cl_logDEBUG2 = nx::utils::log::Level::verbose;
 struct QnLogs;
 struct QnLog
 {
-    static const QString MAIN_LOG_ID;
-    static const QString CUSTOM_LOG_BASE_ID;
-    static const QString HTTP_LOG_INDEX;
-    static const QString EC2_TRAN_LOG;
-    static const QString HWID_LOG;
-    static const QString PERMISSIONS_LOG;
+    static NX_UTILS_API const QString MAIN_LOG_ID;
+    static NX_UTILS_API const QString CUSTOM_LOG_BASE_ID;
+    static NX_UTILS_API const QString HTTP_LOG_INDEX;
+    static NX_UTILS_API const QString EC2_TRAN_LOG;
+    static NX_UTILS_API const QString HWID_LOG;
+    static NX_UTILS_API const QString PERMISSIONS_LOG;
 
-    static std::vector<QString> kAllLogs;
+    static NX_UTILS_API std::vector<QString> kAllLogs;
 
-    static void initLog(QnLog* log);
-    static QnLogs& instance();
+    static NX_UTILS_API void initLog(QnLog* log);
+    static NX_UTILS_API QnLogs& instance();
 };
 
 struct QnLogs
