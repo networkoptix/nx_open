@@ -24,8 +24,7 @@ namespace test {
 /**
  * Accepts usual TCP connections
  */
-class FakeTcpTunnelConnection
-:
+class FakeTcpTunnelConnection:
     public AbstractIncomingTunnelConnection
 {
 public:
@@ -134,18 +133,19 @@ struct FakeTcpTunnelAcceptor:
             m_ioThreadSocket->bindToAioThread(m_designatedAioThread);
         }
 
-        m_ioThreadSocket->dispatch([this, handler = std::move(handler)]()
-        {
-            if (!m_hasConnection)
-                return m_ioThreadSocket->registerTimer(
-                    100, [handler](){ handler(SystemError::timedOut, nullptr); });
+        m_ioThreadSocket->dispatch(
+            [this, handler = std::move(handler)]()
+            {
+                if (!m_hasConnection)
+                    return m_ioThreadSocket->registerTimer(
+                        100, [handler](){ handler(SystemError::timedOut, nullptr); });
 
-            auto connection = std::make_unique<FakeTcpTunnelConnection>(
-                m_ioThreadSocket->getAioThread(), m_addressManager, m_clientsLimit);
+                auto connection = std::make_unique<FakeTcpTunnelConnection>(
+                    m_ioThreadSocket->getAioThread(), m_addressManager, m_clientsLimit);
 
-            m_hasConnection = false;
-            handler(SystemError::noError, std::move(connection));
-        });
+                m_hasConnection = false;
+                handler(SystemError::noError, std::move(connection));
+            });
     }
 
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override
@@ -556,6 +556,12 @@ public:
         SocketGlobalsHolder::instance()->reinitialize();
     }
 
+    ~CloudServerSocketTest()
+    {
+        if (m_cloudServerSocket)
+            destroyServerSocket();
+    }
+
 protected:
     hpm::MediatorFunctionalTest m_mediator;
     hpm::AbstractCloudDataProvider::System system;
@@ -566,7 +572,7 @@ protected:
         ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
         system = m_mediator.addRandomSystem();
         server = m_mediator.addRandomServer(
-                system, boost::none, hpm::ServerTweak::noBindEndpoint);
+            system, boost::none, hpm::ServerTweak::noBindEndpoint);
 
         ASSERT_NE(nullptr, server);
         SocketGlobals::mediatorConnector().setSystemCredentials(
@@ -578,6 +584,31 @@ protected:
         SocketGlobals::mediatorConnector().mockupAddress(m_mediator.stunEndpoint());
         SocketGlobals::mediatorConnector().enable(true);
     }
+
+    void givenInitializedServerSocket()
+    {
+        m_cloudServerSocket = std::make_unique<CloudServerSocket>(
+            nx::network::SocketGlobals::mediatorConnector().systemConnection());
+        ASSERT_EQ(
+            hpm::api::ResultCode::ok,
+            m_cloudServerSocket->registerOnMediatorSync());
+        ASSERT_TRUE(m_cloudServerSocket->listen(128));
+        m_cloudServerSocket->moveToListeningState();
+    }
+
+    void destroyServerSocket()
+    {
+        m_cloudServerSocket->pleaseStopSync();
+        m_cloudServerSocket.reset();
+    }
+
+    CloudServerSocket& cloudServerSocket()
+    {
+        return *m_cloudServerSocket;
+    }
+
+private:
+    std::unique_ptr<CloudServerSocket> m_cloudServerSocket;
 };
 
 TEST_F(CloudServerSocketTest, reconnect)
@@ -597,13 +628,8 @@ TEST_F(CloudServerSocketTest, reconnect)
 
     for (int i = 0; i < 17; ++i)
     {
-        CloudServerSocket cloudServerSocket(
-            nx::network::SocketGlobals::mediatorConnector().systemConnection());
-        ASSERT_EQ(hpm::api::ResultCode::ok, cloudServerSocket.registerOnMediatorSync());
-        ASSERT_TRUE(cloudServerSocket.listen(128));
-        cloudServerSocket.moveToListeningState();
-
-        cloudServerSocket.pleaseStopSync();
+        givenInitializedServerSocket();
+        destroyServerSocket();
 
         // Breaking connection to mediator.
         nx::utils::promise<void> cloudCredentialsModified;
@@ -622,15 +648,13 @@ TEST_F(CloudServerSocketTest, reconnect)
 TEST_F(CloudServerSocketTest, serverChecksConnectionState)
 {
     const KeepAliveOptions kKeepAliveOptions(1, 1, 1);
-    m_mediator.addArg("-general/cloudConnectOptions", "serverChecksConnectionState");
-    m_mediator.addArg("-stun/keepAliveOptions", kKeepAliveOptions.toString().toStdString().c_str());
+    m_mediator.addArg(
+        "-general/cloudConnectOptions", "serverChecksConnectionState");
+    m_mediator.addArg(
+        "-stun/keepAliveOptions", kKeepAliveOptions.toString().toStdString().c_str());
     startMediatorAndRegister();
 
-    CloudServerSocket cloudServerSocket(
-        nx::network::SocketGlobals::mediatorConnector().systemConnection());
-    ASSERT_EQ(hpm::api::ResultCode::ok, cloudServerSocket.registerOnMediatorSync());
-    ASSERT_TRUE(cloudServerSocket.listen(128));
-    cloudServerSocket.moveToListeningState();
+    givenInitializedServerSocket();
 
     const auto peerPool = m_mediator.moduleInstance()->impl()->listeningPeerPool();
     {
@@ -650,6 +674,59 @@ TEST_F(CloudServerSocketTest, serverChecksConnectionState)
         ASSERT_TRUE((bool) peer);
         ASSERT_TRUE(peer->value().isListening);
     }
+}
+
+//-------------------------------------------------------------------------------------------------
+// CloudServerSocketMultipleAcceptors
+
+class CloudServerSocketMultipleAcceptors:
+    public CloudServerSocketTest
+{
+public:
+    CloudServerSocketMultipleAcceptors()
+    {
+        startMediatorAndRegister();
+    }
+
+protected:
+    void givenAcceptingServerSocket()
+    {
+        // TODO
+    }
+
+    void whenAcceptIsInvoked()
+    {
+        // TODO
+    }
+    
+    void whenOneAcceptorReturnsSocket()
+    {
+        // TODO
+    }
+
+    void thenEveryAcceptorIsInvoked()
+    {
+        // TODO
+    }
+
+    void thenEveryAcceptorIsCancelled()
+    {
+        // TODO
+    }
+};
+
+TEST_F(CloudServerSocketMultipleAcceptors, all_acceptors_are_used)
+{
+    givenInitializedServerSocket();
+    whenAcceptIsInvoked();
+    thenEveryAcceptorIsInvoked();
+}
+
+TEST_F(CloudServerSocketMultipleAcceptors, all_acceptors_are_cancelled)
+{
+    givenAcceptingServerSocket();
+    whenOneAcceptorReturnsSocket();
+    thenEveryAcceptorIsCancelled();
 }
 
 } // namespace test
