@@ -70,6 +70,9 @@ void LayoutTourReviewController::handleTourChanged(const ec2::ApiLayoutTourData&
         return;
 
     reviewLayout->setData(Qn::CustomPanelTitleRole, tour.name);
+    reviewLayout->setData(Qn::LayoutTourIsManualRole, tour.settings.manual);
+    if (auto wbLayout = QnWorkbenchLayout::instance(reviewLayout))
+        wbLayout->setData(Qn::LayoutTourIsManualRole, tour.settings.manual);
 
     // Check if items were not changed (e.g. we have just changed them ourselves).
     ec2::ApiLayoutTourItemDataList currentItems;
@@ -140,6 +143,7 @@ void LayoutTourReviewController::reviewLayoutTour(const ec2::ApiLayoutTourData& 
     layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadWriteSavePermission
         | Qn::AddRemoveItemsPermission));
     layout->setData(Qn::LayoutTourUuidRole, qVariantFromValue(tour.id));
+    layout->setData(Qn::LayoutTourIsManualRole, tour.settings.manual);
     layout->setCellAspectRatio(kCellAspectRatio);
 
     for (auto item : tour.items)
@@ -312,6 +316,7 @@ void LayoutTourReviewController::at_saveCurrentLayoutTourAction_triggered()
 
     tour.items.clear();
     fillTourItems(&tour.items);
+    tour.settings.manual = workbench()->currentLayout()->data(Qn::LayoutTourIsManualRole).toBool();
     qnLayoutTourManager->addOrUpdateTour(tour);
     menu()->trigger(action::SaveLayoutTourAction, {Qn::UuidRole, id});
 }
