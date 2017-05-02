@@ -29,6 +29,11 @@ Storage::Storage(
     findDownloads();
 }
 
+QDir Storage::downloadsDirectory() const
+{
+    return m_downloadsDirectory;
+}
+
 QStringList Storage::files() const
 {
     QnMutexLocker lock(&m_mutex);

@@ -30,6 +30,8 @@ class Storage
 public:
     Storage(const QDir& m_downloadsDirectory);
 
+    QDir downloadsDirectory() const;
+
     QStringList files() const;
 
     QString filePath(const QString& fileName) const;
