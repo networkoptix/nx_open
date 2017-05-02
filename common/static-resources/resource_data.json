@@ -532,7 +532,8 @@
                 "VISTA|VK2-ENCODER",
                 "*|DW-CP04", "*|DW-CP16",
                 "ACTI|I96","ACTI|I98",
-                "UNIVIEW|IPC6242SR-X22"
+                "UNIVIEW|IPC6242SR-X22",
+                "Milesight*|MS-C2961-EB"
             ],
             "ptzTraits": "EightWayPtz"
         },
