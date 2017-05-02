@@ -4,6 +4,8 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
+#include "to_string.h"
+
 namespace nx {
 namespace utils {
 namespace log {
@@ -93,6 +95,9 @@ void StdOut::write(Level level, const QString& message)
 File::File(Settings settings):
     m_settings(std::move(settings))
 {
+    std::cout 
+        << ::toString(this).toStdString() << ": " 
+        << makeFileName().toStdString() << std::endl;
 }
 
 void File::write(Level /*level*/, const QString& message)

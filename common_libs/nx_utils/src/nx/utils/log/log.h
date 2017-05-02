@@ -30,7 +30,7 @@ struct QnLog
 
 struct QnLogs
 {
-    static QnLog* get();
+    static NX_UTILS_API QnLog* get();
 };
 
 #define NX_LOG_2(MESSAGE, LEVEL) NX_UTILS_LOG(LEVEL, QnLog::MAIN_LOG_ID, MESSAGE)
