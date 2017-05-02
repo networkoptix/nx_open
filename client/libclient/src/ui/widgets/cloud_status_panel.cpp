@@ -10,6 +10,8 @@
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 
 #include <watchers/cloud_status_watcher.h>
 
@@ -61,6 +63,8 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
     font.setPixelSize(kFontPixelSize);
     font.setWeight(QFont::Bold);
     setFont(font);
+
+    setHelpTopic(this, Qn::MainWindow_TitleBar_Cloud_Help);
 
     connect(this, &QnCloudStatusPanel::justPressed, qnCloudStatusWatcher,
         &QnCloudStatusWatcher::updateSystems);

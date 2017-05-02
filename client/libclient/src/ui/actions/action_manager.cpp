@@ -972,6 +972,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::OpenBookmarksSearchAction).
         flags(Qn::Main | Qn::GlobalHotkey).
+        mode(QnActionTypes::DesktopMode).
         requiredGlobalPermission(Qn::GlobalViewBookmarksPermission).
         text(tr("Bookmark Search...")).
         shortcut(lit("Ctrl+B")).

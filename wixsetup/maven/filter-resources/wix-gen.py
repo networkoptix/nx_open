@@ -19,10 +19,13 @@ generated_items = [
 if '${nxtool}' == 'true':
     generated_items += [('qtquickcontrols', '')]
 
+if ('${arch}' == 'x86' and '${paxton}' == 'true'):
+    generated_items += [('vcrt14', 'Paxton')]   
+    
 for wxs, args in generated_items:
     p = subprocess.Popen('${init.python.dir}/python generate-{}-wxs.py {}'.format(wxs, args), shell=True, stdout=PIPE, stderr=STDOUT)
     out, err = p.communicate()
-    print ('\n++++++++++++++++++++++Applying heat to generate-%s-wxs.py++++++++++++++++++++++' % wxs)
+    print ('\n++++++++++++++++++++++Applying heat to generate-%s-wxs.py for %s ++++++++++++++++++++++' % (wxs, args))
     print out
     p.wait()
     if p.returncode:

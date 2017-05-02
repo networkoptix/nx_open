@@ -51,7 +51,7 @@
     </message>
     <message>
         <source>&amp;Quit</source>
-        <translation>&amp;Выход</translation>
+        <translation>Выход</translation>
     </message>
     <message>
         <source>An error has occurred while trying to access installed services:</source>

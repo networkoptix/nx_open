@@ -1,9 +1,11 @@
-
 #include "workbench_welcome_screen.h"
 
+#include <QtWidgets/QWhatsThis>
 #include <QtQuickWidgets/QQuickWidget>
 #include <QtQuick/QQuickView>
 #include <QtQml/QQmlContext>
+
+#include <client/client_runtime_settings.h>
 
 #include <common/common_module.h>
 #include <core/resource/resource_fwd.h>
@@ -21,6 +23,8 @@
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 #include <ui/dialogs/setup_wizard_dialog.h>
 #include <ui/workbench/workbench_resource.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <client/startup_tile_manager.h>
 #include <client/forgotten_systems_manager.h>
 #include <client_core/client_core_settings.h>
@@ -112,6 +116,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
     m_message(),
     m_appInfo(new QnAppInfo(this))
 {
+    NX_EXPECT(qnRuntime->isDesktopMode());
     NX_CRITICAL(qnStartupTileManager, Q_FUNC_INFO, "Startup tile manager does not exists");
     NX_CRITICAL(qnCloudStatusWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged,
@@ -125,6 +130,8 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
     m_widget->installEventFilter(this);
     m_quickView->installEventFilter(this);
     qApp->installEventFilter(this); //< QTBUG-34414 workaround
+
+    setHelpTopic(m_widget, Qn::Login_Help);
 
     connect(this, &QnWorkbenchWelcomeScreen::visibleChanged, this,
         [this]()
@@ -573,6 +580,28 @@ void QnWorkbenchWelcomeScreen::hideSystem(const QString& systemId)
 
 bool QnWorkbenchWelcomeScreen::eventFilter(QObject* obj, QEvent* event)
 {
+    // TODO: #3.1 Implement something generic to handle help events inside QQuickView items.
+    if (obj == m_quickView && event->type() == QEvent::MouseButtonPress)
+    {
+        const auto mouseEvent = static_cast<QMouseEvent*>(event);
+        if (QWhatsThis::inWhatsThisMode())
+        {
+            if (mouseEvent->button() == Qt::LeftButton)
+            {
+                QHelpEvent helpEvent(
+                    QEvent::WhatsThis, mouseEvent->pos(), mouseEvent->globalPos());
+                qApp->sendEvent(m_widget, &helpEvent);
+            }
+            else
+            {
+                QWhatsThis::leaveWhatsThisMode();
+            }
+
+            event->accept();
+            return true;
+        }
+    }
+
     if (obj != m_widget)
         return base_type::eventFilter(obj, event);
 

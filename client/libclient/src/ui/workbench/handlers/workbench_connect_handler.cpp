@@ -376,11 +376,15 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
 
     context()->instance<QnAppServerNotificationCache>();
 
+    QnWorkbenchWelcomeScreen* welcomeScreen = qnRuntime->isDesktopMode()
+        ? context()->instance<QnWorkbenchWelcomeScreen>()
+        : nullptr;
     const auto resourceModeAction = action(QnActions::ResourcesModeAction);
     connect(resourceModeAction, &QAction::toggled, this,
-        [this, welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>()](bool checked)
+        [this, welcomeScreen](bool checked)
         {
-            welcomeScreen->setVisible(!checked);
+            if (welcomeScreen)
+                welcomeScreen->setVisible(!checked);
             if (workbench()->layouts().isEmpty())
                 action(QnActions::OpenNewTabAction)->trigger();
         }, Qt::QueuedConnection); //< QueuedConnection is needed here because 2 title bars
@@ -406,20 +410,32 @@ void QnWorkbenchConnectHandler::handleConnectReply(
 {
     /* Check if we have entered 'connect' method again while were in 'connecting...' state */
     if (m_connecting.handle != handle)
+    {
+        NX_LOG("handleConnectReply: waiting for another request, ignore", cl_logDEBUG1);
         return;
+    }
 
     if (m_logicalState == LogicalState::disconnected)
+    {
+        NX_LOG("handleConnectReply: already disconnected, ignore", cl_logDEBUG1);
         return;
+    }
 
     if (m_physicalState != PhysicalState::testing)
+    {
+        NX_LOG(lm("handleConnectReply: invalid physical state %1").arg(physicalToString(m_physicalState)), cl_logDEBUG1);
         return;
+    }
 
     m_connecting.reset();
 
     /* Preliminary exit if application was closed while we were in the inner loop. */
     NX_ASSERT(!context()->closingDown());
     if (context()->closingDown())
+    {
+        NX_LOG("handleConnectReply: closing application", cl_logDEBUG1);
         return;
+    }
 
     NX_ASSERT(connection || errorCode != ec2::ErrorCode::ok);
     QnConnectionInfo connectionInfo;
@@ -433,6 +449,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
         ? QnConnectionValidator::validateConnection(connectionInfo, errorCode)
         : QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, mainWindow());
     NX_ASSERT(connection || status != Qn::SuccessConnectionResult);
+    NX_LOG(lm("handleConnectReply: connection status %1").arg(status), cl_logDEBUG1);
 
     if (m_logicalState == LogicalState::reconnecting)
     {
@@ -446,9 +463,12 @@ void QnWorkbenchConnectHandler::handleConnectReply(
             if (helpers::isNewSystem(connectionInfo) && !connectionInfo.ecDbReadOnly)
             {
                 disconnectFromServer(DisconnectFlag::Force);
-                auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-                /* Method is called from QML where we are passing QString. */
-                welcomeScreen->setupFactorySystem(connectionInfo.effectiveUrl().toString());
+                if (qnRuntime->isDesktopMode())
+                {
+                    auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+                    /* Method is called from QML where we are passing QString. */
+                    welcomeScreen->setupFactorySystem(connectionInfo.effectiveUrl().toString());
+                }
             }
             else
             {
@@ -681,6 +701,9 @@ void QnWorkbenchConnectHandler::setPhysicalState(PhysicalState value)
 
 void QnWorkbenchConnectHandler::showPreloader()
 {
+    if (!qnRuntime->isDesktopMode())
+        return;
+
     const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
     const auto resourceModeAction = action(QnActions::ResourcesModeAction);
 
@@ -693,17 +716,21 @@ void QnWorkbenchConnectHandler::handleStateChanged(LogicalState logicalValue,
     PhysicalState physicalValue)
 {
     const auto resourceModeAction = action(QnActions::ResourcesModeAction);
-    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
 
     qDebug() << "QnWorkbenchConnectHandler state changed" << logicalValue << physicalValue;
     switch (logicalValue)
     {
         case LogicalState::disconnected:
-            welcomeScreen->handleDisconnectedFromSystem();
-            welcomeScreen->setGlobalPreloaderVisible(false);
+        {
+            if (qnRuntime->isDesktopMode())
+            {
+                const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+                welcomeScreen->handleDisconnectedFromSystem();
+                welcomeScreen->setGlobalPreloaderVisible(false);
+            }
             resourceModeAction->setChecked(false);  //< Shows welcome screen
             break;
-
+        }
         case LogicalState::connecting_to_target:
             showPreloader();
             break;
@@ -831,10 +858,13 @@ void QnWorkbenchConnectHandler::at_messageProcessor_initialResourcesReceived()
 
 void QnWorkbenchConnectHandler::at_connectAction_triggered()
 {
-    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-    welcomeScreen->setVisibleControls(true);
+    if (qnRuntime->isDesktopMode())
+    {
+        const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+        welcomeScreen->setVisibleControls(true);
+    }
 
-    bool directConnection = qnRuntime->isActiveXMode() || qnRuntime->isVideoWallMode();
+    bool directConnection = !qnRuntime->isDesktopMode();
     if (m_logicalState == LogicalState::connected)
     {
         // Ask user if he wants to save changes.

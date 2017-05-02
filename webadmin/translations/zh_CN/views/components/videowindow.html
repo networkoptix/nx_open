@@ -1,0 +1,54 @@
+<div class="videowindow">
+
+    <div class="camera-view-informer camera-loading" ng-if="loading">
+        <div class="camera-view-preloader camera-view-message-icon"></div>
+    </div>
+
+    <div class="camera-view-informer" ng-if="flashRequired">
+        无法播放视频。<br>
+        请 <a href="https://get.adobe.com/flashplayer/" target="_blank">安装 Adobe Flash</a> 播放视频从基于 ARM 的服务器。<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="flashOrWebmRequired">
+        无法播放视频。<br>
+        请 <a href="https://get.adobe.com/flashplayer/" target="_blank">安装 Adobe Flash</a> 或 <a href="https://tools.google.com/dlpage/webmmf/" target="_blank">WebM 编解码器</a> 以在 Ie 中播放视频。<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="noArmSupport">
+        无法播放视频。<br>
+        此浏览器或设备不支持视频播放从基于 ARM 的服务器。<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="noFormat">
+        无法播放视频。<br>
+        此浏览器或设备不支持从这个相机的视频播放。<br>
+    </div>
+
+
+    <div class="camera-view-informer" ng-if="ieNoWebm">
+        无法播放视频。<br>
+        请为 Ie 安装 <a href="https://tools.google.com/dlpage/webmmf/" target="_blank">WebM 编解码器</a>。<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="ieWin10">
+        无法播放视频。<br>
+        请使用 Microsoft Edge 或 Google Chrome 浏览器。<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="ubuntuNX">
+        无法播放视频。<br>
+        此浏览器不支持从基于 ARM 服务器的视频。请改为使用 Chromium 浏览器。<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="errorLoading">
+        无法播放视频。<br>
+        错误发生。<br>
+    </div>
+
+
+    <div class="videoplayer" ng-if="flashls" ng-class="{'invisible':loading}" ng-include="Config.viewsDir + 'components/flashls.html'">
+    </div>
+
+    <div class="videoplayer" ng-hide="!native" ng-class="{'invisible': loading}">
+    </div>
+</div>
