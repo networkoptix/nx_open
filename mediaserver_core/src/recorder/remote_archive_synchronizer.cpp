@@ -206,7 +206,10 @@ bool SynchronizationTask::synchronizeArchive(const QnSecurityCamResourcePtr& res
     // 2. Filter list (keep only needed records)
     auto filtered = filterEntries(resource, sdCardArchiveEntries);
     if (filtered.empty())
+    {
+        qDebug() << "Archive is fully synchronized. There is no need in any further actions";
         return true;
+    }
 
     qnBusinessRuleConnector->at_remoteArchiveSyncStarted(resource);
 
@@ -251,7 +254,6 @@ std::vector<RemoteArchiveEntry> SynchronizationTask::filterEntries(
 
         qDebug() << "ENTRY NEED TO BE SYNCHRONIZED:" << needSyncEntry
             << "(CONTAIN TIME)" << catalog->containTime(entry.startTimeMs + entry.durationMs / 2)
-            << "(LESS)" << (lastSyncTimeMs < (entry.startTimeMs + entry.durationMs)) << (entry.startTimeMs + entry.durationMs)
             << "(LASTSYNC TIME)" << lastSyncTimeMs
             << "(ENTRY END TIME)" << entry.startTimeMs + entry.durationMs
             << "(MIDDLE)" << entry.startTimeMs + entry.durationMs / 2

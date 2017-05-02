@@ -1407,7 +1407,7 @@ qint64 QnServerDb::getLastRemoteArchiveSyncTimeMs(const QnResourcePtr& resource)
     bool success = false;
     auto rawVal = query.value(0);
 
-    auto parsed = rawVal.toInt(&success);
+    auto parsed = rawVal.toLongLong(&success);
     if (!success)
         return std::numeric_limits<qint64>::min();
 
