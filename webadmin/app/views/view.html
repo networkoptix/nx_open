@@ -47,7 +47,14 @@
             <tr>
                 <td class="hidden-mobile">
                     <div class="view-wrapper">
-                        <div class="cameras-panel">
+                        <camera-panel active-camera="activeCamera" search-cams="searchCams" 
+                                      storage="storage" player="player" 
+                                      time-correction="timeCorrection" position-provider="positionProvider"
+                                      current-resolution="currentResolution", current-user="currentUser"
+                                      update-video-source="updateVideoSource" switch-playing="switchPlaying"
+                                      tree-request="treeRequest" active-video-records="activeVideoRecords"
+                                      live-only="liveOnly"></camera-panel>
+                        <!--<div class="cameras-panel">
                             <div class="cameras-search">
                                 <label class="input-group input-group">
                                     <span class="input-group-addon" ><span class="glyphicon glyphicon-search"></span></span>
@@ -93,7 +100,7 @@
                                     </ul>
                                 </li>
                             </ul>
-                        </div>
+                        </div>-->
                     </div>
                 </td>
                 <td width="100%" >
