@@ -18,8 +18,10 @@ namespace network {
 namespace cloud {
 
 namespace {
+
 const int kDefaultAcceptQueueSize = 128;
 const KeepAliveOptions kDefaultKeepAlive(std::chrono::minutes(1), std::chrono::seconds(10), 5);
+
 } // namespace
 
 static const std::vector<CloudServerSocket::AcceptorMaker> defaultAcceptorMakers()
@@ -106,6 +108,7 @@ bool CloudServerSocket::bind(const SocketAddress& localAddress)
 
 SocketAddress CloudServerSocket::getLocalAddress() const
 {
+    // TODO: #ak what listening port should mean here?
     // TODO: #mux Figure out if it causes any problems
     return SocketAddress();
 }
@@ -146,7 +149,7 @@ AbstractSocket::SOCKET_HANDLE CloudServerSocket::handle() const
 
 bool CloudServerSocket::listen(int queueLen)
 {
-    //actual initialization is done with first accept call
+    // Actual initialization is done with first accept call.
     m_acceptQueueLen = queueLen != 0 ? queueLen : kDefaultAcceptQueueSize;
     return true;
 }
@@ -266,7 +269,8 @@ void CloudServerSocket::acceptAsync(
 
 void CloudServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    m_mediatorRegistrationRetryTimer.post(  //doing post to avoid calling handler within this call
+    // Doing post to avoid calling handler within this call.
+    m_mediatorRegistrationRetryTimer.post(
         [this, handler = std::move(handler)]() mutable
         {
             m_tunnelPool->cancelAccept();
@@ -277,12 +281,12 @@ void CloudServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
 
 void CloudServerSocket::cancelIOSync()
 {
-    //we need dispatch here to avoid blocking if called within aio thread
+    // We need dispatch here to avoid blocking if called within aio thread.
     nx::utils::promise<void> cancelledPromise;
     m_mediatorRegistrationRetryTimer.dispatch(
         [this, &cancelledPromise]
         {
-            //TODO #ak deal with copy-paste here
+            // TODO: #ak Deal with copy-paste here.
             m_tunnelPool->cancelAccept();
             m_savedAcceptHandler = nullptr;
             cancelledPromise.set_value();
@@ -350,7 +354,7 @@ void CloudServerSocket::initTunnelPool(int queueLen)
 }
 
 void CloudServerSocket::startAcceptor(
-        std::unique_ptr<AbstractTunnelAcceptor> acceptor)
+    std::unique_ptr<AbstractTunnelAcceptor> acceptor)
 {
     auto acceptorPtr = acceptor.get();
     m_acceptors.push_back(std::move(acceptor));
@@ -377,7 +381,8 @@ void CloudServerSocket::startAcceptor(
 }
 
 void CloudServerSocket::onListenRequestCompleted(
-    nx::hpm::api::ResultCode resultCode, hpm::api::ListenResponse response)
+    nx::hpm::api::ResultCode resultCode,
+    hpm::api::ListenResponse response)
 {
     const auto registrationHandlerGuard = makeScopeGuard(
         [handler = std::move(m_registrationHandler), resultCode]()

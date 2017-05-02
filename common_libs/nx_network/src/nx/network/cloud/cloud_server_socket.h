@@ -1,5 +1,4 @@
-#ifndef nx_cc_cloud_server_socket_h
-#define nx_cc_cloud_server_socket_h
+#pragma once 
 
 #include <nx/network/abstract_socket.h>
 #include <nx/network/cloud/mediator_server_connections.h>
@@ -7,25 +6,22 @@
 #include <nx/network/retry_timer.h>
 #include <nx/network/socket_attributes_cache.h>
 
-
 namespace nx {
 namespace network {
 namespace cloud {
 
-//!Accepts connections incoming via mediator
-/*!
-    Listening hostname is reported to the mediator to listen on.
-    \todo #ak what listening port should mean in this case?
-*/
-class NX_NETWORK_API CloudServerSocket
-:
+/**
+ * Accepts connections incoming via mediator.
+ * Listening hostname is reported to the mediator to listen on.
+ */
+class NX_NETWORK_API CloudServerSocket:
     public AbstractSocketAttributesCache<
         AbstractStreamServerSocket, SocketAttributes>
 {
 public:
-    typedef std::function<
-                std::unique_ptr<AbstractTunnelAcceptor>(
-                    const hpm::api::ConnectionRequestedEvent&)> AcceptorMaker;
+    using AcceptorMaker = std::function<
+        std::unique_ptr<AbstractTunnelAcceptor>(
+            const hpm::api::ConnectionRequestedEvent&)>;
 
     static const std::vector<AcceptorMaker> kDefaultAcceptorMakers;
 
@@ -37,7 +33,6 @@ public:
 
     ~CloudServerSocket();
 
-    //!Implementation of AbstractSocket::*
     bool bind(const SocketAddress& localAddress) override;
     SocketAddress getLocalAddress() const override;
     bool close() override;
@@ -46,40 +41,38 @@ public:
     bool getLastError(SystemError::ErrorCode* errorCode) const override;
     AbstractSocket::SOCKET_HANDLE handle() const override;
 
-    //!Implementation of AbstractStreamServerSocket::*
     bool listen(int queueLen) override;
     AbstractStreamSocket* accept() override;
 
-    //!Implementation of QnStoppable::pleaseStop
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
 
-    //!Implementation of AbstractSocket::*
     void post(nx::utils::MoveOnlyFunc<void()> handler) override;
     void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override;
     aio::AbstractAioThread* getAioThread() const override;
     void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
-    //!Implementation of AbstractStreamServerSocket::acceptAsync
     virtual void acceptAsync(
         nx::utils::MoveOnlyFunc<void(
             SystemError::ErrorCode,
             AbstractStreamSocket*)> handler) override;
-    //!Implementation of AbstractStreamServerSocket::cancelIOAsync
     virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
-    //!Implementation of AbstractStreamServerSocket::cancelIOSync
     virtual void cancelIOSync() override;
 
     bool isInSelfAioThread();
 
-    /** Invokes listen on mediator */
+    /**
+     * Invokes listen on mediator.
+     */
     void registerOnMediator(
         nx::utils::MoveOnlyFunc<void(hpm::api::ResultCode)> handler);
 
     hpm::api::ResultCode registerOnMediatorSync();
     void setSupportedConnectionMethods(hpm::api::ConnectionMethods value);
 
-    /** test only */
+    /**
+     * For use in tests only.
+     */
     void moveToListeningState();
 
 protected:
@@ -116,7 +109,7 @@ protected:
     nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode code,
         AbstractStreamSocket*)> m_savedAcceptHandler;
-    hpm::api::ConnectionMethods m_supportedConnectionMethods = 0xFFFF; //< No limits by default
+    hpm::api::ConnectionMethods m_supportedConnectionMethods = 0xFFFF; //< No limits by default.
     nx::utils::MoveOnlyFunc<void(hpm::api::ResultCode)> m_registrationHandler;
 
 private:
@@ -126,5 +119,3 @@ private:
 } // namespace cloud
 } // namespace network
 } // namespace nx
-
-#endif  //nx_cc_cloud_server_socket_h
