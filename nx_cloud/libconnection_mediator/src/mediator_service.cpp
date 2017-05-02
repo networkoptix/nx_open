@@ -140,6 +140,9 @@ int MediatorProcess::exec()
     businessLogicComposite.stop();
     stunServerComposite.reset();
 
+    NX_LOGX(lit("%1 is stopped")
+        .arg(QnLibConnectionMediatorAppInfo::applicationName()), cl_logALWAYS);
+
     return 0;
 }
 
