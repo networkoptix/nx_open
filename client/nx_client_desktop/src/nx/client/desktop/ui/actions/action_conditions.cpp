@@ -1647,8 +1647,9 @@ ConditionWrapper treeNodeType(QSet<Qn::NodeType> types)
     return new CustomBoolCondition(
         [types](const Parameters& parameters, QnWorkbenchContext* /*context*/)
         {
-            return parameters.hasArgument(Qn::NodeTypeRole)
-                && types.contains(parameters.argument(Qn::NodeTypeRole).value<Qn::NodeType>());
+            // Actions, triggered manually or from scene, must not check node type
+            return !parameters.hasArgument(Qn::NodeTypeRole)
+                || types.contains(parameters.argument(Qn::NodeTypeRole).value<Qn::NodeType>());
         });
 }
 

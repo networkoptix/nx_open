@@ -6,11 +6,13 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/layout_tour_manager.h>
+#include <core/resource/user_resource.h>
 
 #include <nx_ec/ec_api.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/style/skin.h>
+#include <ui/workbench/workbench_context.h>
 #include <nx/client/desktop/ui/workbench/extensions/workbench_layout_tour_executor.h>
 #include <nx/client/desktop/ui/workbench/extensions/workbench_layout_tour_review_controller.h>
 
@@ -37,12 +39,17 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
     connect(action(action::NewLayoutTourAction), &QAction::triggered, this,
         [this]()
         {
+            NX_EXPECT(context()->user());
+            if (!context()->user())
+                return;
+
             QStringList usedNames;
             for (const auto& tour: qnLayoutTourManager->tours())
                 usedNames << tour.name;
 
             ec2::ApiLayoutTourData tour;
             tour.id = QnUuid::createUuid();
+            tour.parentId = context()->user()->getId();
             tour.name = nx::utils::generateUniqueString(
                 usedNames, tr("Layout Tour"), tr("Layout Tour %1"));
             qnLayoutTourManager->addOrUpdateTour(tour);
