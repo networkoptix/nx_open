@@ -70,6 +70,9 @@ void Worker::start()
 void Worker::nextStep()
 {
     const auto& fileInfo = m_storage->fileInformation(m_fileName);
+    NX_ASSERT(fileInfo.isValid());
+    if (!fileInfo.isValid())
+        return;
 
     if (fileInfo.size < 0 || fileInfo.md5.isEmpty())
         findFileInformation();
