@@ -157,7 +157,8 @@ private:
     int handleRecvResult(int recvResult);
 
     std::unique_ptr<aio::AsyncSocketImplHelper<UdtStreamSocket>> m_aioHelper;
-    bool m_noDelay;
+    bool m_noDelay = false;
+    bool m_isInternetConnection = false;
 
 private:
     Q_DISABLE_COPY(UdtStreamSocket)
@@ -192,6 +193,14 @@ private:
     void stopWhileInAioThread();
 
     Q_DISABLE_COPY(UdtStreamServerSocket)
+};
+
+class NX_NETWORK_API UdtStatistics
+{
+public:
+    std::atomic<size_t> internetBytesTransfered{0};
+
+    static UdtStatistics global;
 };
 
 } // namespace network

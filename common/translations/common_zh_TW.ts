@@ -191,10 +191,6 @@
         <translation>來源：%1</translation>
     </message>
     <message>
-        <source>Url: %1</source>
-        <translation>網址：%1</translation>
-    </message>
-    <message>
         <source>Reason: %1</source>
         <translation>原因：%1</translation>
     </message>

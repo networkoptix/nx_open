@@ -58,7 +58,7 @@
   <String Id="FilesInUseDontCloseRadioButton">Lütfen uygulamayı kapatmayın. Sonrasında yeniden başlatma gerekebilir</String>
   <String Id="FilesInUseOkButton">TAMAM</String>
   <String Id="FilesInUseCancelButton">İptal</String>
-  <String Id="InstallLicenseText">\"Kabul et ve yükle\" tıklayarak onaylamış olursunuz</String>
+  <String Id="InstallLicenseText">"Kabul et ve yükle" tıklayarak onaylamış olursunuz</String>
   <String Id="Options">Seçenekler</String>
   <String Id="SelectApps">Yüklenecek uygulamaları seçin:</String>
 </WixLocalization>

@@ -97,10 +97,9 @@ class ResourceGenerator(object):
 
 class SeedResourceGenerator(ResourceGenerator):
 
-    _seed = 0
-
-    def __init__(self, gen_fn):
+    def __init__(self, gen_fn, initial=0):
         ResourceGenerator.__init__(self, gen_fn)
+        self._seed = initial
 
     def next(self):
         self._seed += 1
@@ -116,10 +115,20 @@ class SeedResourceWithParentGenerator(SeedResourceGenerator):
         return self.gen_fn(self.next(), parentId=generator.get_resource_id(val))
 
 
+class SeedResourceList(SeedResourceGenerator):
+
+    def __init__(self, gen_fn, list_size, initial=0):
+        SeedResourceGenerator.__init__(self,  gen_fn, initial)
+        self._list_size = list_size
+
+    def get(self, server, val):
+        return self.gen_fn(self.next(), val, self._list_size)
+
+
 class LayoutItemGenerator(SeedResourceGenerator):
 
-    def __init__(self):
-        ResourceGenerator.__init__(self, generator.generate_layout_item)
+    def __init__(self, initial=0):
+        SeedResourceGenerator.__init__(self, generator.generate_layout_item, initial)
         self.__resources = dict()
 
     def set_resources(self, resources):
@@ -145,9 +154,9 @@ class LayoutGenerator(SeedResourceGenerator):
 
     MAX_LAYOUT_ITEMS = 10
 
-    def __init__(self):
-        ResourceGenerator.__init__(self, generator.generate_layout_data)
-        self.items_generator = LayoutItemGenerator()
+    def __init__(self, initial=0):
+        SeedResourceGenerator.__init__(self, generator.generate_layout_data, initial)
+        self.items_generator = LayoutItemGenerator(initial * self.MAX_LAYOUT_ITEMS)
 
     def get(self, server, val):
         items = self.items_generator.get(server, self._seed % self.MAX_LAYOUT_ITEMS)
@@ -164,7 +173,7 @@ def resource_generators():
         saveCameraUserAttributes=ResourceGenerator(generator.generate_camera_user_attributes_data),
         saveMediaServerUserAttributes=ResourceGenerator(generator.generate_mediaserver_user_attributes_data),
         removeResource=ResourceGenerator(generator.generate_remove_resource_data),
-        setResourceParams=ResourceGenerator(generator.generate_resource_params_data),
+        setResourceParams=SeedResourceList(generator.generate_resource_params_data_list, 1),
         saveStorage=SeedResourceWithParentGenerator(generator.generate_storage_data),
         saveLayout=LayoutGenerator())
 
@@ -212,7 +221,7 @@ def wait_entity_merge_done(servers, method, api_object, api_method):
             return
         if time.time() - start >= MEDIASERVER_MERGE_TIMEOUT_SEC:
             log.error("'%s' was not synchronized in %d seconds: '%r' and '%r'" % (
-                api_method, MEDIASERVER_MERGE_TIMEOUT_SEC, servers[0].box, result[0].box))
+                api_method, MEDIASERVER_MERGE_TIMEOUT_SEC, servers[0], result[0]))
             assert result[1] == result_expected
         time.sleep(MEDIASERVER_MERGE_TIMEOUT_SEC / 10.)
 
@@ -227,7 +236,7 @@ def check_transaction_log(env):
     servers = env.servers.values()
 
     def servers_to_str(servers):
-        return ', '.join("%r" % s.box for s in servers)
+        return ', '.join("%r" % s for s in servers)
 
     def transactions_to_str(transactions):
         return '\n  '.join("%s: [%s]" % (k, servers_to_str(v)) for k, v in transactions.iteritems())
@@ -307,7 +316,7 @@ def prepare_call_list(env, api_method, sequence=None):
         if not server or env.system_is_merged:
             # If the resource's server isn't specified or system is already merged,
             # get server for modification request by index
-            return get_server_by_index(env, i) 
+            return get_server_by_index(env, i)
         else:
             # Otherwise, get the resource's owner for modification.
             return server

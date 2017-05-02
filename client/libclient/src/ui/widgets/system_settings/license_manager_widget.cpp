@@ -276,7 +276,7 @@ void QnLicenseManagerWidget::updateLicenses()
                 else
                 {
                     messages << setWarningStyleHtml(tr("At least %n %1 are required", "",
-                        helper->usedLicenses(lt)).arg(QnLicense::longDisplayName(lt)));
+                        helper->requiredLicenses(lt)).arg(QnLicense::longDisplayName(lt)));
                 }
 
 

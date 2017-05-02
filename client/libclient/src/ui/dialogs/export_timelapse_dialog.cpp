@@ -1,13 +1,16 @@
 #include "export_timelapse_dialog.h"
 #include "ui_export_timelapse_dialog.h"
 
+#include <array>
+
 #include <text/time_strings.h>
 
 #include <ui/workaround/widgets_signals_workaround.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/qtimespan.h>
-#include <array>
 
 namespace {
 
@@ -75,6 +78,8 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
 {
     ui->setupUi(this);
 
+    setHelpTopic(this, Qn::Rapid_Review_Help);
+
     QFont infoFont(this->font());
     infoFont.setPixelSize(kInfoFontPixelSize);
 
@@ -104,6 +109,7 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
         setExpectedLengthMsInternal(m_sourcePeriodLengthMs / absoluteValue);
     });
 
+    // TODO: Refactor this in 3.1
     auto resultLengthChangedInternal =
         [this](double value)
         {
@@ -141,7 +147,7 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
             // Here we must adjust time value to keep speed as near to previous as possible
             qreal valueInUnits = expectedLength / expectedLengthMeasureUnit(value);
             ui->resultLengthSpinBox->setValue(valueInUnits);
-            //resultLengthChangedInternal(ui->resultLengthSpinBox->value());
+            resultLengthChangedInternal(ui->resultLengthSpinBox->value());
         });
 
     initControls();

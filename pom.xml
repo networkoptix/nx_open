@@ -151,7 +151,7 @@
         <packages.dir>${environment.dir}/packages</packages.dir>
         <qt.path>packages/${rdep.target}/qt-${qt.version}</qt.path>
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
-        <ClientHelpSourceDir>${libdir}/bin/release/help</ClientHelpSourceDir>
+        <ClientHelpSourceDir>${packages.dir}/any/help-${customization}-${release.version}/bin/help</ClientHelpSourceDir>
         <ClientVoxSourceDir>${libdir}/bin/release/vox</ClientVoxSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <launcher.version.dir>${libdir}/bin/${build.configuration}</launcher.version.dir>
@@ -267,7 +267,7 @@
         <artifact.name.cloud_debug>${artifact.name.prefix}-cloud_debug-${artifact.name.suffix}</artifact.name.cloud_debug>
         <artifact.name.testcamera>${artifact.name.prefix}-testcamera-${artifact.name.suffix}</artifact.name.testcamera>
 
-        <nxcloud.version>1.0.134</nxcloud.version>
+        <nxcloud.version>1.0.135</nxcloud.version>
     </properties>
 
     <build>

@@ -35,11 +35,14 @@ DEFAULT_MAX_LOG_WIDTH = 500
 MEDIA_SAMPLE_FPATH = 'sample.mkv'
 MEDIA_STREAM_FPATH = 'sample.testcam-stream.data'
 
-
 log = logging.getLogger(__name__)
 
-
 def pytest_addoption(parser):
+    log_levels = [logging.getLevelName(logging.DEBUG),
+                  logging.getLevelName(logging.INFO),
+                  logging.getLevelName(logging.WARNING),
+                  logging.getLevelName(logging.ERROR),
+                  logging.getLevelName(logging.CRITICAL)]
     parser.addoption('--cloud-group', default=DEFAULT_CLOUD_GROUP,
                      help='Cloud group; cloud host for it will be requested from ireg.hdw.mx;'
                           ' default is %r' % DEFAULT_CLOUD_GROUP)
@@ -77,6 +80,12 @@ def pytest_addoption(parser):
                      help='Working directory at host with virtualbox, used to store vagrant files')
     parser.addoption('--max-log-width', default=DEFAULT_MAX_LOG_WIDTH, type=int,
                      help='Change maximum log message width. Default is %d' % DEFAULT_MAX_LOG_WIDTH)
+    parser.addoption('--log-level', default=log_levels[0], type=str.upper,
+                     choices=log_levels,
+                     help='Change log level (%s). Default is %s' % (', '.join(log_levels), log_levels[0]))
+    parser.addoption('--scalability-yaml-config-file',
+                     help='Configuration file for the scalability test.')
+
 
 @pytest.fixture(scope='session')
 def run_options(request):
@@ -105,6 +114,7 @@ def run_options(request):
         vm_ssh_host_config=vm_ssh_host_config,
         vm_host_work_dir=request.config.getoption('--vm-host-dir'),
         max_log_width=request.config.getoption('--max-log-width'),
+        log_level=request.config.getoption('--log-level'),
         )
 
 @pytest.fixture(scope='session')
@@ -169,7 +179,7 @@ def test_session(run_options):
     #format = '%(asctime)-15s %(threadName)s %(name)s %(levelname)s  %(message)s'
     # %.10s limits formatted string to 10 chars; %(text).10s makes the same for dict-style formatting
     format = '%%(asctime)-15s %%(threadName)-15s %%(levelname)-7s %%(message).%ds' % run_options.max_log_width
-    logging.basicConfig(level=logging.DEBUG, format=format)
+    logging.basicConfig(level=run_options.log_level, format=format)
     session = TestSession(run_options.recreate_boxes)
     session.init(run_options)
     return session

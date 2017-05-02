@@ -103,7 +103,7 @@ public:
 
     const CmdLineArguments cmdLineArguments() const;
     void setObsoleteGuid(const QnUuid& obsoleteGuid) { m_obsoleteGuid = obsoleteGuid; }
-
+    void setNeedInitHardwareId(bool value);
 signals:
     void started();
 public slots:
@@ -128,7 +128,6 @@ private slots:
     void at_databaseDumped();
     void at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
     void at_updatePublicAddress(const QHostAddress& publicIP);
-
 private:
 
     void updateDisabledVendorsIfNeeded();
@@ -151,6 +150,10 @@ private:
     void updateAllowedInterfaces();
     void addCommandLineParametersFromConfig();
     void saveServerInfo(const QnMediaServerResourcePtr& server);
+
+    bool initHardwareId();
+    QString hardwareIdAsGuid() const;
+    void updateGuidIfNeeded();
 private:
     int m_argc;
     char** m_argv;
@@ -177,6 +180,7 @@ private:
     CmdLineArguments m_cmdLineArguments;
     QnUuid m_obsoleteGuid;
     std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
+    bool m_needInitHardwareId = false;
 };
 
 #endif // MEDIA_SERVER_PROCESS_H

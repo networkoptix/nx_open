@@ -225,10 +225,6 @@
         <translation>Evento: %1</translation>
     </message>
     <message>
-        <source>Url: %1</source>
-        <translation>Url: %1</translation>
-    </message>
-    <message>
         <source>Storage Failure at %1</source>
         <translation>Falha de Armazenamento em %1</translation>
     </message>

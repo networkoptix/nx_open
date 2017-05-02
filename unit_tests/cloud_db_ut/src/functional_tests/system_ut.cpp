@@ -1204,8 +1204,12 @@ protected:
     void assertRegistrationTimestampIsValid()
     {
         const auto system = fetchSystem(m_system.id);
-        ASSERT_GE(system.registrationTime, m_registrationTimeValidRange.first);
-        ASSERT_LE(system.registrationTime, m_registrationTimeValidRange.second);
+        ASSERT_GE(
+            system.registrationTime,
+            nx::utils::floor<std::chrono::milliseconds>(m_registrationTimeValidRange.first));
+        ASSERT_LE(
+            system.registrationTime,
+            nx::utils::floor<std::chrono::milliseconds>(m_registrationTimeValidRange.second));
     }
     
 private:

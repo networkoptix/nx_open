@@ -20,7 +20,10 @@
 #include <ui/widgets/properties/permissions_widget.h>
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 
+#include <nx/utils/raii_guard.h>
 #include <nx/utils/string.h>
 
 
@@ -31,6 +34,8 @@ QnUserRolesDialog::QnUserRolesDialog(QWidget* parent):
 {
     ui->setupUi(this);
     setTabWidget(ui->tabWidget);
+
+    setHelpTopic(this, Qn::UserRoles_Help);
 
     addPage(
         SettingsPage,
@@ -206,29 +211,52 @@ void QnUserRolesDialog::applyChanges()
             continue;
 
         const auto& usersWithUserRole = m_model->users(userRole.id, false);
-        auto replacement = m_model->replacement(userRole.id);
+        if (usersWithUserRole.isEmpty())
+        {
+            qnResourcesChangesManager->removeUserRole(userRole.id);
+            continue;
+        }
 
+        const auto replacement = m_model->replacement(userRole.id);
         if (replacement.isEmpty())
         {
-            qnResourcesChangesManager->deleteResources(usersWithUserRole);
+            qnResourcesChangesManager->deleteResources(usersWithUserRole,
+                [roleId = userRole.id](bool success)
+                {
+                    if (success)
+                        qnResourcesChangesManager->removeUserRole(roleId);
+                });
         }
         else
         {
+            const auto deleteRoleGuard = QnRaiiGuard::createDestructible(
+                [roleId = userRole.id]()
+                {
+                    qnResourcesChangesManager->removeUserRole(roleId);
+                });
+
+            const auto handleUserSaved =
+                [deleteRoleGuard](bool success)
+                {
+                    if (!success)
+                        deleteRoleGuard->disableDestructionHandler();
+                };
+
+            const auto applyChanges =
+                [replacement](const QnUserResourcePtr& user)
+                {
+                    user->setUserRoleId(replacement.userRoleId);
+                    user->setRawPermissions(replacement.permissions);
+                };
+
             for (const auto& user: usersWithUserRole)
             {
-                qnResourcesChangesManager->saveUser(user,
-                    [replacement](const QnUserResourcePtr& user)
-                    {
-                        user->setUserRoleId(replacement.userRoleId);
-                        user->setRawPermissions(replacement.permissions);
-                    });
+                qnResourcesChangesManager->saveUser(user, applyChanges, handleUserSaved);
 
                 if (replacement.permissions == Qn::GlobalCustomUserPermission)
                     qnResourcesChangesManager->saveAccessibleResources(user, QSet<QnUuid>());
             }
         }
-
-        qnResourcesChangesManager->removeUserRole(userRole.id);
     }
 
     updateButtonBox();

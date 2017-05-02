@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_CN" sourcelanguage="en">
+<TS version="2.1" language="zh-CN" sourcelanguage="en">
 <context>
     <name>QnLayoutsModelUnsorted</name>
     <message>
         <source>All Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>所有摄像机</translation>
     </message>
 </context>
 </TS>
