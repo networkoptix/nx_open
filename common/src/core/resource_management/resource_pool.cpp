@@ -32,6 +32,13 @@ QnResourcePool::QnResourcePool(QObject* parent):
     m_tranInProgress(false)
 {
     invalidateCache();
+
+    connect(this, &QnResourcePool::resourceAddedInternal, this,
+        [this](const QnResourcePtr &resource)
+        {
+            emit resourceAdded(resource); //< always emit resourceAdded from own thread
+        }
+    );
 }
 
 QnResourcePool::~QnResourcePool()
@@ -135,11 +142,14 @@ void QnResourcePool::addResources(const QnResourceList& resources, bool mainPool
         }
     }
 
-
-    for (const auto& resource: addedResources)
+    const bool isOwnThread = QThread::currentThread() == thread();
+    for (const auto& resource : addedResources)
     {
         TRACE("RESOURCE ADDED" << resource->metaObject()->className() << resource->getName());
-        //emit resourceAdded(resource);
+        if (isOwnThread)
+            emit resourceAdded(resource);
+        else
+            emit resourceAddedInternal(resource);
     }
 }
 

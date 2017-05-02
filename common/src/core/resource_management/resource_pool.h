@@ -223,6 +223,9 @@ signals:
 
     void aboutToBeDestroyed();
 private:
+signals:
+    void resourceAddedInternal(const QnResourcePtr &resource);
+private:
     /*!
         \note MUST be called with \a m_resourcesMtx locked
     */
