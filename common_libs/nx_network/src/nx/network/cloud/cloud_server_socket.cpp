@@ -170,9 +170,9 @@ AbstractStreamSocket* CloudServerSocket::accept()
     nx::utils::promise<SystemError::ErrorCode> promise;
     std::unique_ptr<AbstractStreamSocket> acceptedSocket;
     acceptAsync(
-        [&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
+        [&](SystemError::ErrorCode code, std::unique_ptr<AbstractStreamSocket> socket)
         {
-            acceptedSocket.reset(socket);
+            acceptedSocket = std::move(socket);
             promise.set_value(code);
         });
 
@@ -230,10 +230,7 @@ void CloudServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
     m_mediatorConnection->bindToAioThread(aioThread);
 }
 
-void CloudServerSocket::acceptAsync(
-    nx::utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode code,
-        AbstractStreamSocket*)> handler)
+void CloudServerSocket::acceptAsync(AcceptCompletionHandler handler)
 {
     dispatch(
         [this, handler = std::move(handler)]() mutable
@@ -467,10 +464,7 @@ void CloudServerSocket::reportResult(SystemError::ErrorCode sysErrorCode)
     acceptHandler(sysErrorCode, nullptr);
 }
 
-void CloudServerSocket::acceptAsyncInternal(
-    nx::utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode code,
-        AbstractStreamSocket*)> handler)
+void CloudServerSocket::acceptAsyncInternal(AcceptCompletionHandler handler)
 {
     using namespace std::placeholders;
 
@@ -502,7 +496,7 @@ void CloudServerSocket::onNewConnectionHasBeenAccepted(
     if (socket)
     {
         DEBUG_LOG(lm("Return socket from tunnel pool %1").arg(socket));
-        handler(SystemError::noError, socket.release());
+        handler(SystemError::noError, std::move(socket));
     }
     else
     {

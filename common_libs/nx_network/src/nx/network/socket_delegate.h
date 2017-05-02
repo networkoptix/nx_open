@@ -282,10 +282,7 @@ public:
     virtual void pleaseStopSync(bool assertIfCalledUnderLock = true);
     virtual bool listen(int backlog = kDefaultBacklogSize) override;
     virtual AbstractStreamSocket* accept();
-    virtual void acceptAsync(
-        nx::utils::MoveOnlyFunc<void(
-            SystemError::ErrorCode,
-            AbstractStreamSocket*)> handler);
+    virtual void acceptAsync(AcceptCompletionHandler handler);
     virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler);
     virtual void cancelIOSync();
 };

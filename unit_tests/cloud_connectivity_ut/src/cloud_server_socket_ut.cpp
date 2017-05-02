@@ -56,12 +56,12 @@ public:
 
         m_server->acceptAsync(
             [this, handler](
-                SystemError::ErrorCode c, AbstractStreamSocket* s)
+                SystemError::ErrorCode c, std::unique_ptr<AbstractStreamSocket> s)
             {
                 EXPECT_EQ(c, SystemError::noError);
                 --m_clientsLimit;
                 NX_LOGX(lm("accepted, %1 left").arg(m_clientsLimit), cl_logDEBUG2);
-                handler(c, std::unique_ptr<AbstractStreamSocket>(s));
+                handler(c, std::move(s));
             });
     }
 
@@ -240,8 +240,8 @@ NX_NETWORK_SERVER_SOCKET_TEST_CASE(
 TEST_F(CloudServerSocketTcpTest, TransferSyncSsl)
 {
     network::test::socketTransferSync(
-        [&]() { return std::make_unique<deprecated::SslServerSocket>(makeServerTester().release(), false); },
-        [&]() { return std::make_unique<deprecated::SslSocket>(makeClientTester().release(), false); });
+        [&]() { return std::make_unique<deprecated::SslServerSocket>(makeServerTester(), false); },
+        [&]() { return std::make_unique<deprecated::SslSocket>(makeClientTester(), false); });
 }
 
 TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
@@ -359,16 +359,16 @@ protected:
     void acceptServerForever()
     {
         m_server->acceptAsync(
-            [this](SystemError::ErrorCode code, AbstractStreamSocket* socket)
+            [this](SystemError::ErrorCode code, std::unique_ptr<AbstractStreamSocket> socket)
             {
                 ASSERT_EQ(code, SystemError::noError);
                 acceptServerForever();
                 ASSERT_TRUE(socket->setNonBlockingMode(true));
                 socket->sendAsync(
                     network::test::kTestMessage,
-                    [this, socket](SystemError::ErrorCode code, size_t size)
+                    [this, socketPtr = socket.get()](SystemError::ErrorCode code, size_t size)
                     {
-                        NX_LOGX(lm("test message is sent to %1").arg(socket),
+                        NX_LOGX(lm("test message is sent to %1").arg(socketPtr),
                             cl_logDEBUG2);
 
                         ASSERT_EQ(code, SystemError::noError);
@@ -377,8 +377,7 @@ protected:
 
                 {
                     QnMutexLocker lock(&m_mutex);
-                    m_acceptedSockets.push_back(
-                        std::unique_ptr<AbstractStreamSocket>(socket));
+                    m_acceptedSockets.push_back(std::move(socket));
                 }
             });
     }

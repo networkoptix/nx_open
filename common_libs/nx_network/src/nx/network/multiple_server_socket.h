@@ -63,10 +63,7 @@ public:
     // Implementation of AbstractStreamServerSocket::*
     virtual bool listen(int queueLen) override;
     virtual AbstractStreamSocket* accept() override;
-    virtual void acceptAsync(
-        nx::utils::MoveOnlyFunc<void(
-            SystemError::ErrorCode,
-            AbstractStreamSocket*)> handler) override;
+    virtual void acceptAsync(AcceptCompletionHandler handler) override;
     virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void cancelIOSync() override;
 
@@ -95,7 +92,7 @@ protected:
     void accepted(
         ServerSocketContext* source,
         SystemError::ErrorCode code,
-        AbstractStreamSocket* socket);
+        std::unique_ptr<AbstractStreamSocket> socket);
 
     void cancelIoFromAioThread();
 
@@ -106,9 +103,7 @@ protected:
     bool* m_terminated;
     aio::Timer m_timer;
     std::list<ServerSocketContext> m_serverSockets;
-    nx::utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode,
-        AbstractStreamSocket*)> m_acceptHandler;
+    AcceptCompletionHandler m_acceptHandler;
 
 private:
     void stopWhileInAioThread();

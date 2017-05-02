@@ -104,7 +104,8 @@ private:
 //   StreamSocketServer & StreamServerConnectionHolder responsibility.
 
 /**
- * Listens local tcp address, accepts incoming connections and forwards them to the specified handler.
+ * Listens local tcp address, accepts incoming connections 
+ *   and forwards them to the specified handler.
  */
 template<class CustomServerType, class ConnectionType>
     class StreamSocketServer
@@ -155,7 +156,8 @@ public:
         {
             return false;
         }
-        m_socket->acceptAsync(std::bind(&SelfType::newConnectionAccepted, this, _1, _2));
+        m_socket->acceptAsync(
+            std::bind(&StreamSocketServer::newConnectionAccepted, this, _1, _2));
         return true;
     }
 
@@ -164,18 +166,23 @@ public:
         return m_socket->getLocalAddress();
     }
 
-    void newConnectionAccepted(SystemError::ErrorCode code, AbstractStreamSocket* socket)
+    void newConnectionAccepted(
+        SystemError::ErrorCode code,
+        std::unique_ptr<AbstractStreamSocket> socket)
     {
         // TODO: #ak handle errorCode: try to call acceptAsync after some delay?
         m_socket->acceptAsync(
-            [this](SystemError::ErrorCode code, AbstractStreamSocket* socket)
+            [this](
+                SystemError::ErrorCode code,
+                std::unique_ptr<AbstractStreamSocket> socket)
             {
-                newConnectionAccepted(code, socket);
+                newConnectionAccepted(code, std::move(socket));
             });
 
         if (code != SystemError::noError)
         {
-            NX_LOGX(lm("Accept has failed: %1").arg(SystemError::toString(code)), cl_logWARNING);
+            NX_LOGX(lm("Accept has failed: %1")
+                .arg(SystemError::toString(code)), cl_logWARNING);
             return;
         }
 
@@ -185,7 +192,7 @@ public:
             NX_ASSERT(isKeepAliveSet, SystemError::getLastOSErrorText());
         }
 
-        auto connection = createConnection(std::unique_ptr<AbstractStreamSocket>(socket));
+        auto connection = createConnection(std::move(socket));
         connection->startReadingConnection(m_connectionInactivityTimeout);
         this->saveConnection(std::move(connection));
     }

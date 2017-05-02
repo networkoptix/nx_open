@@ -195,30 +195,32 @@ AbstractStreamSocket* MultipleServerSocket::accept()
         return nullptr;
     }
 
-    nx::utils::promise<std::pair<SystemError::ErrorCode, AbstractStreamSocket*>> promise;
+    nx::utils::promise<
+        std::pair<SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>>
+    > promise;
     acceptAsync(
-        [this, &promise](SystemError::ErrorCode code, AbstractStreamSocket* rawSocket)
+        [this, &promise](
+            SystemError::ErrorCode code,
+            std::unique_ptr<AbstractStreamSocket> rawSocket)
         {
-            std::unique_ptr<AbstractStreamSocket> socket(rawSocket);
-
             // Here we have to post, to make all of m_serverSockets good to remove
             // right after sync accept is returned.
             post(
-                [this, &promise, code, socket = std::move(socket)]() mutable
+                [this, &promise, code, socket = std::move(rawSocket)]() mutable
                 {
                     DEBUG_LOG(lm("accept() returns %1").arg(socket));
-                    promise.set_value(std::make_pair(code, socket.release()));
+                    promise.set_value(std::make_pair(code, std::move(socket)));
                 });
         });
 
-    const auto result = promise.get_future().get();
+    auto result = promise.get_future().get();
     if (result.first != SystemError::noError)
     {
         m_lastError = result.first;
         SystemError::setLastErrorCode(result.first);
     }
 
-    return result.second;
+    return result.second.release();
 }
 
 void MultipleServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
@@ -256,10 +258,7 @@ void MultipleServerSocket::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
     m_timer.dispatch(std::move(handler));
 }
 
-void MultipleServerSocket::acceptAsync(
-    nx::utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode,
-        AbstractStreamSocket*)> handler)
+void MultipleServerSocket::acceptAsync(AcceptCompletionHandler handler)
 {
     dispatch([this, handler = std::move(handler)]() mutable
     {
@@ -275,7 +274,7 @@ void MultipleServerSocket::acceptAsync(
                     nullptr, SystemError::timedOut, nullptr));
         }
 
-        for (auto& source : m_serverSockets)
+        for (auto& source: m_serverSockets)
         {
             if (!source.isAccepting)
             {
@@ -410,11 +409,10 @@ size_t MultipleServerSocket::count() const
 void MultipleServerSocket::accepted(
     ServerSocketContext* source,
     SystemError::ErrorCode code,
-    AbstractStreamSocket* rawSocket)
+    std::unique_ptr<AbstractStreamSocket> socket)
 {
-    std::unique_ptr<AbstractStreamSocket> socket(rawSocket);
     DEBUG_LOG(lm("Accepted socket(%1) (%2) from source(%3)")
-        .arg(rawSocket).arg(SystemError::toString(code)).arg(source));
+        .arg(socket.get()).arg(SystemError::toString(code)).arg(source));
 
     if (source)
     {
@@ -442,7 +440,7 @@ void MultipleServerSocket::accepted(
     for (auto& socketContext : m_serverSockets)
         socketContext.stopAccepting();
 
-    handler(code, socket.release());
+    handler(code, std::move(socket));
 }
 
 void MultipleServerSocket::cancelIoFromAioThread()

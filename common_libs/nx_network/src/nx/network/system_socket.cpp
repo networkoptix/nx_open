@@ -1337,10 +1337,7 @@ int TCPServerSocket::accept(int sockDesc)
     return acceptWithTimeout(sockDesc);
 }
 
-void TCPServerSocket::acceptAsync(
-    nx::utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode,
-        AbstractStreamSocket*)> handler)
+void TCPServerSocket::acceptAsync(AcceptCompletionHandler handler)
 {
     bool nonBlockingMode = false;
     if (!getNonBlockingMode(&nonBlockingMode))

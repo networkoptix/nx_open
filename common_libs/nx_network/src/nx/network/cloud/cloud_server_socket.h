@@ -54,10 +54,7 @@ public:
     aio::AbstractAioThread* getAioThread() const override;
     void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
-    virtual void acceptAsync(
-        nx::utils::MoveOnlyFunc<void(
-            SystemError::ErrorCode,
-            AbstractStreamSocket*)> handler) override;
+    virtual void acceptAsync(AcceptCompletionHandler handler) override;
     virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void cancelIOSync() override;
 
@@ -94,10 +91,7 @@ protected:
     void initializeRelaying(const hpm::api::ListenResponse& response);
     void retryRegistration();
     void reportResult(SystemError::ErrorCode sysErrorCode);
-    void acceptAsyncInternal(
-        nx::utils::MoveOnlyFunc<void(
-            SystemError::ErrorCode code,
-            AbstractStreamSocket*)> handler);
+    void acceptAsyncInternal(AcceptCompletionHandler handler);
     void onNewConnectionHasBeenAccepted(std::unique_ptr<AbstractStreamSocket> socket);
     void cancelAccept();
 
@@ -115,9 +109,7 @@ protected:
     std::unique_ptr<IncomingTunnelPool> m_tunnelPool;
     std::unique_ptr<relay::ConnectionAcceptor> m_relayConnectionAcceptor;
     mutable SystemError::ErrorCode m_lastError;
-    nx::utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode code,
-        AbstractStreamSocket*)> m_savedAcceptHandler;
+    AcceptCompletionHandler m_savedAcceptHandler;
     hpm::api::ConnectionMethods m_supportedConnectionMethods = 0xFFFF; //< No limits by default.
     nx::utils::MoveOnlyFunc<void(hpm::api::ResultCode)> m_registrationHandler;
 

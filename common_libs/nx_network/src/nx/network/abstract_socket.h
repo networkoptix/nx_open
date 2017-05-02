@@ -470,7 +470,8 @@ public:
 };
 
 using AcceptCompletionHandler = 
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, AbstractStreamSocket*)>;
+    nx::utils::MoveOnlyFunc<void(
+        SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>)>;
 
 /**
  * Interface for server socket, accepting stream connections.

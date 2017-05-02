@@ -65,7 +65,9 @@ void IncomingTunnelConnection::accept(AcceptHandler handler)
 
             m_acceptHandler = std::move(handler);
             m_serverSocket->acceptAsync(
-                [this](SystemError::ErrorCode code, AbstractStreamSocket* socket)
+                [this](
+                    SystemError::ErrorCode code,
+                    std::unique_ptr<AbstractStreamSocket> socket)
                 {
                     NX_LOGX(lm("Accepted %1 (%2)")
                         .arg(socket).arg(SystemError::toString(code)), cl_logDEBUG2);
@@ -77,9 +79,7 @@ void IncomingTunnelConnection::accept(AcceptHandler handler)
 
                     decltype(m_acceptHandler) handler;
                     handler.swap(m_acceptHandler);
-                    handler(
-                        SystemError::noError,
-                        std::unique_ptr<AbstractStreamSocket>(socket));
+                    handler(SystemError::noError, std::move(socket));
                 });
         });
 }
