@@ -4,6 +4,7 @@
 #include <QtCore/QFile>
 
 #include <nx/vms/common/private/distributed_file_downloader/storage.h>
+#include "utils.h"
 
 namespace nx {
 namespace vms {
@@ -41,19 +42,8 @@ protected:
 
     bool createTestFile(const QString& fileName, qint64 size)
     {
-        QFile file(workingDirectory.absoluteFilePath(fileName));
-
-        if (!file.open(QFile::WriteOnly))
+        if (!utils::createTestFile(workingDirectory.absoluteFilePath(fileName), size))
             return false;
-
-        for (qint64 i = 0; i < size; ++i)
-        {
-            const char c = static_cast<char>(rand());
-            if (file.write(&c, 1) != 1)
-                return false;
-        }
-
-        file.close();
 
         testFileMd5 = Storage::calculateMd5(testFilePath);
         if (testFileMd5.isEmpty())
