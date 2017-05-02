@@ -1142,8 +1142,13 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
             return qnResIconCache->icon(QnResourceIconCache::Cameras);
 
         case Qn::LayoutsNode:
-        case Qn::LayoutTourNode:
             return qnResIconCache->icon(QnResourceIconCache::Layouts);
+
+        case Qn::LayoutTourNode:
+            return qnResIconCache->icon(QnResourceIconCache::LayoutTour);
+
+        case Qn::LayoutToursNode:
+            return qnResIconCache->icon(QnResourceIconCache::LayoutTours);
 
         case Qn::AllLayoutsAccessNode:
             return qnResIconCache->icon(QnResourceIconCache::SharedLayouts);

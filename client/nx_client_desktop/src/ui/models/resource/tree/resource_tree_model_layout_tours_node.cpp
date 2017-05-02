@@ -5,7 +5,6 @@
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/models/resource/resource_tree_model_node_factory.h>
 
-#include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 
 QnResourceTreeModelLayoutToursNode::QnResourceTreeModelLayoutToursNode(QnResourceTreeModel* model):
@@ -42,11 +41,6 @@ void QnResourceTreeModelLayoutToursNode::deinitialize()
 
     clean();
     base_type::deinitialize();
-}
-
-QIcon QnResourceTreeModelLayoutToursNode::calculateIcon() const
-{
-    return qnResIconCache->icon(QnResourceIconCache::Layouts);
 }
 
 void QnResourceTreeModelLayoutToursNode::handleTourAdded(const ec2::ApiLayoutTourData& tour)

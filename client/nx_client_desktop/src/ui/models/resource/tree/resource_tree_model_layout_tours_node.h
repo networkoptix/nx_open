@@ -19,9 +19,6 @@ public:
     virtual void initialize() override;
     virtual void deinitialize() override;
 
-protected:
-    virtual QIcon calculateIcon() const override;
-
 private:
     void handleTourAdded(const ec2::ApiLayoutTourData& tour);
     void handleTourChanged(const ec2::ApiLayoutTourData& tour);
