@@ -28,6 +28,7 @@ describe('Smoke test:', function () {
         var systemsList = element.all(by.repeater('system in systems'));
 
         helper.login();
+        helper.get(helper.urls.systems);
         expect(browser.getCurrentUrl()).toContain('systems');
         expect(helper.htmlBody.getText()).toContain('Systems');
         expect(systemsList.first().isDisplayed()).toBe(true);
@@ -39,6 +40,7 @@ describe('Smoke test:', function () {
         var userList = helper.getParentOf(userStrings.first());
 
         helper.login();
+        helper.get(helper.urls.systems);
         expect(browser.getCurrentUrl()).toContain('systems');
         expect(element(by.cssContainingText('h2', 'katya_korneevas_property')).isDisplayed()).toBe(true);
 
