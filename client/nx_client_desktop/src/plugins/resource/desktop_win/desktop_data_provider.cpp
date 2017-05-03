@@ -139,7 +139,6 @@ void QnDesktopDataProvider::EncodedAudioInfo::gotData()
         QnWritableCompressedAudioDataPtr outData(new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, packetSize));
         outData->m_data.write(data->lpData, data->dwBytesRecorded);
         outData->timestamp = m_owner->currentTime(); // - m_startDelay;
-        //cl_log.log("got audio data. time=", outData->timestamp, cl_logALWAYS);
         m_audioQueue.push(outData);
 
         waveInUnprepareHeader(hWaveIn, data, sizeof(WAVEHDR));
@@ -417,8 +416,6 @@ bool QnDesktopDataProvider::init()
         if (param.size()==2)
         {
             int res = av_set_string3(m_videoCodecCtx, param.at(0).trimmed().toLatin1().data(), param.at(1).trimmed().toLatin1().data(), 1, NULL);
-            if (res != 0)
-                cl_log.log(QLatin1String("Wrong option for video codec:"), param.at(0), cl_logWARNING);
         }
     }
     */
@@ -587,8 +584,6 @@ void QnDesktopDataProvider::putAudioData()
         qint64 expectedAudioPts = m_storedAudioPts + m_audioFramesCount * m_audioFrameDuration;
         int audioJitter = qAbs(audioPts - expectedAudioPts);
 
-        //cl_log.log("audio jitter=", audioJitter, cl_logALWAYS); // all in ms
-
         if (audioJitter < m_maxAudioJitter)
         {
             audioPts = expectedAudioPts;
@@ -746,10 +741,9 @@ void QnDesktopDataProvider::run()
                 m_frame->pts = m_encodedFrames;
                 if (processData(false) < 0)
                 {
-                    cl_log.log(QLatin1String("Video encoding error. Stop recording."), cl_logWARNING);
+                    NX_WARNING(this, "Video encoding error. Stop recording.");
                     break;
                 }
-                //cl_log.log(QLatin1String("encode pts="), m_encodedFrames, cl_logALWAYS);
 
                 m_encodedFrames++;
                 firstStep = false;
@@ -766,7 +760,7 @@ void QnDesktopDataProvider::run()
     if (!m_capturingStopped)
         stopCapturing();
 
-    cl_log.log(QLatin1String("flushing video buffer"), cl_logDEBUG2);
+    NX_VERBOSE(this, "flushing video buffer");
     if (needVideoData())
     {
         do {

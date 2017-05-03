@@ -674,7 +674,6 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 
     calcSampleAR(outFrame, dec);
 
-    //cl_log.log(QDateTime::fromMSecsSinceEpoch(data->timestamp/1000).toString("hh.mm.ss.zzz"), cl_logALWAYS);
     if (processDecodedFrame(dec, outFrame, enableFrameQueue, reverseMode))
         return Status_Displayed;
     else
@@ -763,7 +762,6 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, cons
             {
                 bool wasWaiting = m_bufferedFrameDisplayer->addFrame(outFrame);
                 qint64 bufferedDuration = m_bufferedFrameDisplayer->bufferedDuration();
-                //cl_log.log("buffered duration=", bufferedDuration, cl_logALWAYS);
                 if (wasWaiting) {
                     dec->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full);
                     m_queueWasFilled = true;
