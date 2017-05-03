@@ -74,11 +74,7 @@ protected:
             }
         }
 
-        if (!utils::createTestFile(fileInfo.absoluteFilePath(), size))
-        {
-            NX_ASSERT("Cannot create test file.");
-            return TestPeerManager::FileInformation();
-        }
+        utils::createTestFile(fileInfo.absoluteFilePath(), size);
 
         TestPeerManager::FileInformation testFileInfo(kTestFileName);
         testFileInfo.filePath = workingDirectory.absoluteFilePath(fileName);

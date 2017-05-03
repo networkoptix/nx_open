@@ -2,6 +2,8 @@
 
 #include <QtCore/QFile>
 
+#include <nx/utils/log/assert.h>
+
 namespace nx {
 namespace vms {
 namespace common {
@@ -9,23 +11,27 @@ namespace distributed_file_downloader {
 namespace test {
 namespace utils {
 
-bool createTestFile(const QString& fileName, qint64 size)
+void createTestFile(const QString& fileName, qint64 size)
 {
     QFile file(fileName);
 
     if (!file.open(QFile::WriteOnly))
-        return false;
+    {
+        NX_ASSERT(false, "Cannot create test file.");
+        return;
+    }
 
     for (qint64 i = 0; i < size; ++i)
     {
         const char c = static_cast<char>(rand());
         if (file.write(&c, 1) != 1)
-            return false;
+        {
+            NX_ASSERT(false, "Cannot write into test file.");
+            return;
+        }
     }
 
     file.close();
-
-    return true;
 }
 
 } // namespace utils

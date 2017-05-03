@@ -9,7 +9,7 @@ namespace distributed_file_downloader {
 namespace test {
 namespace utils {
 
-bool createTestFile(const QString& fileName, qint64 size);
+void createTestFile(const QString& fileName, qint64 size);
 
 } // namespace utils
 } // namespace test

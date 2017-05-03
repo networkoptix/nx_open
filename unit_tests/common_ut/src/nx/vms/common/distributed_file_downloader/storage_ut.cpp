@@ -26,7 +26,7 @@ protected:
     {
         workingDirectory = QDir::temp().absoluteFilePath("__tmp_dfd_storage_test");
         workingDirectory.removeRecursively();
-        ASSERT_TRUE(QDir().mkdir(workingDirectory.absolutePath()));
+        NX_ASSERT(QDir().mkdir(workingDirectory.absolutePath()));
 
         testFileName = kTestFileName;
         testFilePath = workingDirectory.absoluteFilePath(testFileName);
@@ -37,24 +37,20 @@ protected:
     virtual void TearDown() override
     {
         downloaderStorage.reset();
-        ASSERT_TRUE(workingDirectory.removeRecursively());
+        NX_ASSERT(workingDirectory.removeRecursively());
     }
 
-    bool createTestFile(const QString& fileName, qint64 size)
+    void createTestFile(const QString& fileName, qint64 size)
     {
-        if (!utils::createTestFile(workingDirectory.absoluteFilePath(fileName), size))
-            return false;
+        utils::createTestFile(workingDirectory.absoluteFilePath(fileName), size);
 
         testFileMd5 = Storage::calculateMd5(testFilePath);
-        if (testFileMd5.isEmpty())
-            return false;
-
-        return true;
+        NX_ASSERT(!testFileMd5.isEmpty());
     }
 
-    bool createDefaultTestFile()
+    void createDefaultTestFile()
     {
-        return createTestFile(testFileName, kTestFileSize);
+        createTestFile(testFileName, kTestFileSize);
     }
 
     QDir workingDirectory;
@@ -116,7 +112,7 @@ TEST_F(DistributedFileDownloaderStorageTest, addNewFile)
 
 TEST_F(DistributedFileDownloaderStorageTest, addDownloadedFile)
 {
-    ASSERT_TRUE(createDefaultTestFile());
+    createDefaultTestFile();
 
     {
         DownloaderFileInformation fileInfo(testFileName);
@@ -137,7 +133,7 @@ TEST_F(DistributedFileDownloaderStorageTest, addDownloadedFile)
 
 TEST_F(DistributedFileDownloaderStorageTest, addDownloadedFileAsNotDownloaded)
 {
-    ASSERT_TRUE(createDefaultTestFile());
+    createDefaultTestFile();
 
     {
         DownloaderFileInformation fileInfo(testFileName);
@@ -159,7 +155,7 @@ TEST_F(DistributedFileDownloaderStorageTest, addDownloadedFileAsNotDownloaded)
 
 TEST_F(DistributedFileDownloaderStorageTest, addFileWithWrongChecksum)
 {
-    ASSERT_TRUE(createDefaultTestFile());
+    createDefaultTestFile();
 
     {
         DownloaderFileInformation fileInfo(testFileName);
@@ -209,7 +205,7 @@ TEST_F(DistributedFileDownloaderStorageTest, fileDuplicate)
 
 TEST_F(DistributedFileDownloaderStorageTest, fileDeletion)
 {
-    ASSERT_TRUE(createTestFile(testFileName, 0));
+    createTestFile(testFileName, 0);
 
     ASSERT_EQ(downloaderStorage->deleteFile(testFileName),
         DistributedFileDownloader::ErrorCode::fileDoesNotExist);
@@ -252,7 +248,7 @@ TEST_F(DistributedFileDownloaderStorageTest, updateEmptyFile)
 
 TEST_F(DistributedFileDownloaderStorageTest, updateDownloadedFile)
 {
-    ASSERT_TRUE(createDefaultTestFile());
+    createDefaultTestFile();
 
     DownloaderFileInformation fileInfo(testFileName);
     fileInfo.status = DownloaderFileInformation::Status::downloaded;
@@ -265,7 +261,7 @@ TEST_F(DistributedFileDownloaderStorageTest, updateDownloadedFile)
 
 TEST_F(DistributedFileDownloaderStorageTest, updateCorruptedFile)
 {
-    ASSERT_TRUE(createTestFile(testFileName, 1));
+    createTestFile(testFileName, 1);
 
     DownloaderFileInformation fileInfo(testFileName);
     fileInfo.size = 1;
@@ -302,7 +298,7 @@ TEST_F(DistributedFileDownloaderStorageTest, updateCorruptedFile)
 
 TEST_F(DistributedFileDownloaderStorageTest, findDownloadsForDownloadedFiles)
 {
-    ASSERT_TRUE(createDefaultTestFile());
+    createDefaultTestFile();
 
     {
         DownloaderFileInformation fileInfo(testFileName);
@@ -337,7 +333,7 @@ TEST_F(DistributedFileDownloaderStorageTest, findDownloadsForNewFiles)
 
 TEST_F(DistributedFileDownloaderStorageTest, findDownloadsForFilesInProgress)
 {
-    ASSERT_TRUE(createDefaultTestFile());
+    createDefaultTestFile();
 
     const auto targetFileName = testFileName + ".new";
     const auto targetFilePath = workingDirectory.absoluteFilePath(targetFileName);
@@ -400,7 +396,7 @@ TEST_F(DistributedFileDownloaderStorageTest, findCorruptedFiles)
 
 TEST_F(DistributedFileDownloaderStorageTest, findFileAfterDeletion)
 {
-    ASSERT_TRUE(createTestFile(testFileName, 0));
+    createTestFile(testFileName, 0);
 
     ASSERT_EQ(this->downloaderStorage->addFile(testFileName),
         DistributedFileDownloader::ErrorCode::noError);
@@ -415,7 +411,7 @@ TEST_F(DistributedFileDownloaderStorageTest, findFileAfterDeletion)
 
 TEST_F(DistributedFileDownloaderStorageTest, chunkOperations)
 {
-    ASSERT_TRUE(createDefaultTestFile());
+    createDefaultTestFile();
 
     const auto targetFileName = testFileName + ".new";
 
@@ -456,7 +452,7 @@ TEST_F(DistributedFileDownloaderStorageTest, chunkOperations)
 
 TEST_F(DistributedFileDownloaderStorageTest, readByInvalidChunkIndex)
 {
-    ASSERT_TRUE(createDefaultTestFile());
+    createDefaultTestFile();
 
     DownloaderFileInformation fileInformation(testFileName);
     fileInformation.status = DownloaderFileInformation::Status::downloaded;
@@ -471,7 +467,7 @@ TEST_F(DistributedFileDownloaderStorageTest, readByInvalidChunkIndex)
 
 TEST_F(DistributedFileDownloaderStorageTest, writeInvalidChunks)
 {
-    ASSERT_TRUE(createDefaultTestFile());
+    createDefaultTestFile();
 
     DownloaderFileInformation fileInformation(testFileName);
     fileInformation.size = 1;
@@ -491,7 +487,7 @@ TEST_F(DistributedFileDownloaderStorageTest, writeInvalidChunks)
 
 TEST_F(DistributedFileDownloaderStorageTest, writeToDownloadedFile)
 {
-    ASSERT_TRUE(createDefaultTestFile());
+    createDefaultTestFile();
 
     DownloaderFileInformation fileInformation(testFileName);
     fileInformation.status = DownloaderFileInformation::Status::downloaded;
@@ -524,7 +520,7 @@ TEST_F(DistributedFileDownloaderStorageTest, fileCorruptionDuringDownload)
 
 TEST_F(DistributedFileDownloaderStorageTest, getChecksums)
 {
-    ASSERT_TRUE(createDefaultTestFile());
+    createDefaultTestFile();
 
     DownloaderFileInformation fileInformation(testFileName);
     fileInformation.status = DownloaderFileInformation::Status::downloaded;
@@ -542,7 +538,7 @@ TEST_F(DistributedFileDownloaderStorageTest, getChecksums)
 
 TEST_F(DistributedFileDownloaderStorageTest, getChecksumsAfterDownload)
 {
-    ASSERT_TRUE(createTestFile(testFileName, 1024));
+    createTestFile(testFileName, 1024);
 
     DownloaderFileInformation fileInfo(testFileName);
     fileInfo.status = DownloaderFileInformation::Status::downloaded;
