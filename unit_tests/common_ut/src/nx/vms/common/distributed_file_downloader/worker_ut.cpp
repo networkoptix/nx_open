@@ -3,6 +3,8 @@
 #include <nx/vms/common/private/distributed_file_downloader/storage.h>
 #include <nx/vms/common/private/distributed_file_downloader/worker.h>
 
+#include <test_setup.h>
+
 #include "utils.h"
 #include "test_peer_manager.h"
 
@@ -45,7 +47,8 @@ class DistributedFileDownloaderWorkerTest: public ::testing::Test
 protected:
     virtual void SetUp() override
     {
-        workingDirectory = QDir::temp().absoluteFilePath("__tmp_dfd_worker_test");
+        workingDirectory =
+            QDir(TestSetup::getTemporaryDirectoryPath()).absoluteFilePath("worker_ut");
         workingDirectory.removeRecursively();
         NX_ASSERT(QDir().mkpath(workingDirectory.absolutePath()));
 
@@ -58,6 +61,7 @@ protected:
     {
         worker.reset();
         storage.reset();
+        NX_ASSERT(workingDirectory.removeRecursively());
     }
 
     TestPeerManager::FileInformation createTestFile(

@@ -4,6 +4,9 @@
 #include <QtCore/QFile>
 
 #include <nx/vms/common/private/distributed_file_downloader/storage.h>
+
+#include <test_setup.h>
+
 #include "utils.h"
 
 namespace nx {
@@ -24,7 +27,8 @@ class DistributedFileDownloaderStorageTest: public ::testing::Test
 protected:
     virtual void SetUp() override
     {
-        workingDirectory = QDir::temp().absoluteFilePath("__tmp_dfd_storage_test");
+        workingDirectory =
+            QDir(TestSetup::getTemporaryDirectoryPath()).absoluteFilePath("storage_ut");
         workingDirectory.removeRecursively();
         NX_ASSERT(QDir().mkdir(workingDirectory.absolutePath()));
 
