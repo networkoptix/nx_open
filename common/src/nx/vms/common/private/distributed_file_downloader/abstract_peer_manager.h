@@ -29,7 +29,7 @@ public:
         FileInfoCallback callback) = 0;
 
     using ChecksumsCallback =
-        std::function<void(bool, rest::Handle, const QList<QByteArray>&)>;
+        std::function<void(bool, rest::Handle, const QVector<QByteArray>&)>;
     virtual rest::Handle requestChecksums(
         const QnUuid& peer,
         const QString& fileName,

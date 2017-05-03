@@ -17,7 +17,7 @@ public:
     {
         using DownloaderFileInformation::DownloaderFileInformation;
         QString filePath;
-        QList<QByteArray> checksums;
+        QVector<QByteArray> checksums;
     };
 
     TestPeerManager();

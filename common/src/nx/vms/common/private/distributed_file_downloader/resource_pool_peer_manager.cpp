@@ -79,9 +79,9 @@ rest::Handle ResourcePoolPeerManager::requestChecksums(
         [this, callback](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             if (!success)
-                callback(success, handle, QList<QByteArray>());
+                callback(success, handle, QVector<QByteArray>());
 
-            const auto& checksums = result.deserialized<QList<QByteArray>>();
+            const auto& checksums = result.deserialized<QVector<QByteArray>>();
             callback(success, handle, checksums);
         };
 
