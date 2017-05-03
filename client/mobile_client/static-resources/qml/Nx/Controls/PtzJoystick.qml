@@ -310,8 +310,8 @@ Rectangle
         property vector2d movementVector:
         {
             var cosAlpha = mathHelpers.getCosBetweenVectors(mouseVector, radialVector)
-            var coeff = 1 / controlRadius *
-                (dragging ? cosAlpha * mouseVector.length() / controlRadius : 1)
+            var coeff = 1 / controlRadius
+                * (dragging ? cosAlpha * mouseVector.length() / controlRadius : 1)
 
             var result = radialVector.times(coeff)
             return result.length() > 1 ? result.normalized() : result
@@ -481,10 +481,10 @@ Rectangle
         function to2PIRange(angle)
         {
             var doublePi = Math.PI * 2
-            while(angle < 0)
+            while (angle < 0)
                 angle += doublePi
 
-            while(angle > doublePi)
+            while (angle > doublePi)
                 angle -= doublePi
 
             return angle

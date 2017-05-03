@@ -55,8 +55,6 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterUncreatableType<QnConnectionManager>("com.networkoptix.qml", 1, 0, "QnConnectionManager", lit("Cannot create an instance of QnConnectionManager."));
     qmlRegisterUncreatableType<QnMobileAppInfo>("com.networkoptix.qml", 1, 0, "QnMobileAppInfo", lit("Cannot create an instance of QnMobileAppInfo."));
     qmlRegisterUncreatableType<QnCloudUrlHelper>("com.networkoptix.qml", 1, 0, "QnCloudUrlHelper", lit("Cannot create an instance of QnCloudUrlHelper."));
-    qmlRegisterUncreatableType<Ptz>("com.networkoptix.qml", 1, 0, "Ptz",
-        lit("Cannot create an instance of Ptz class"));
     qmlRegisterUncreatableType<nx::client::mobile::QmlSettingsAdaptor>(
         "Nx.Settings", 1, 0, "MobileSettings",
         lit("Cannot create an instance of MobileSettings."));
@@ -83,11 +81,13 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnLiteClientController>("com.networkoptix.qml", 1, 0, "QnLiteClientController");
     qmlRegisterType<QnLiteClientLayoutHelper>("com.networkoptix.qml", 1, 0, "QnLiteClientLayoutHelper");
     qmlRegisterType<utils::DeveloperSettingsHelper>(
-        "com.networkoptix.qml", 1, 0, "DeveloperSettingsHelper");
-    qmlRegisterType<nx::client::mobile::ResourcePtzController>(
-        "com.networkoptix.qml", 1, 0, "PtzController");
-    qmlRegisterType<nx::client::mobile::PtzPresetModel>(
-        "com.networkoptix.qml", 1, 0, "PtzPresetModel");
+        "Nx.Core", 1, 0, "DeveloperSettingsHelper");
+
+    // Ptz related classes
+    qmlRegisterUncreatableType<Ptz>("Nx.Core", 1, 0, "Ptz",
+        lit("Cannot create an instance of Ptz class"));
+    qmlRegisterType<nx::client::mobile::ResourcePtzController>("Nx.Core", 1, 0, "PtzController");
+    qmlRegisterType<nx::client::mobile::PtzPresetModel>("Nx.Core", 1, 0, "PtzPresetModel");
 
     qmlRegisterRevision<QQuickTextInput, 6>("Nx.Controls", 1, 0);
     qmlRegisterRevision<QQuickItem, 1>("Nx.Controls", 1, 0);

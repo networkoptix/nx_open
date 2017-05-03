@@ -1,9 +1,9 @@
 import QtQuick 2.6
 
 import Nx 1.0
+import Nx.Core 1.0
 import Nx.Dialogs 1.0
 import Nx.Controls 1.0
-import com.networkoptix.qml 1.0
 
 DialogBase
 {
@@ -37,35 +37,24 @@ DialogBase
 
             delegate: DialogListItem
             {
-                Row
+                Text
                 {
-                    anchors.left: parent.left
-                    anchors.leftMargin: 16
-                    anchors.right: parent.right
+                    id: indexText
+                    x: 16
                     anchors.verticalCenter: parent.verticalCenter
+                    text: (index + 1) + "."
 
-                    Text
-                    {
-                        text: (index + 1) + "."
-
-                        font.bold: true
-                        width: 28
-                        elide: Text.ElideRight
-                        font.pixelSize: 16
-                        leftPadding: 0
-                        color: ColorTheme.contrast16
-                    }
-
-                    Text
-                    {
-                        text: display
-
-                        elide: Text.ElideRight
-                        font.pixelSize: 16
-                        leftPadding: 0
-                        color: ColorTheme.base4
-                    }
+                    font.bold: true
+                    width: 28
+                    elide: Text.ElideRight
+                    font.pixelSize: 16
+                    leftPadding: 0
+                    color: ColorTheme.contrast16
                 }
+
+                text: display
+                textColor: ColorTheme.base4
+                leftPadding: indexText.x + indexText.width
 
                 onClicked:
                 {

@@ -7,8 +7,8 @@
 namespace {
 
 static constexpr int kIdRoleId = Qt::UserRole + 1;
-static const auto kRoleNames = QHash<int, QByteArray>
-    {{kIdRoleId, QByteArray("id")}};
+static const auto kRoleNames = QHash<int, QByteArray>{
+    {kIdRoleId, "id"}};
 
 QnPtzPresetList getPresets(const QnPtzControllerPtr& controller)
 {
@@ -61,11 +61,11 @@ PtzPresetModel::~PtzPresetModel()
 QVariant PtzPresetModel::data(const QModelIndex& index, int role) const
 {
     const auto row = index.row();
-    if (!qBetween(0, row, rowCount()))
+    if (!hasIndex(row, 0))
         return QVariant();
 
     const auto& preset = d->presets.at(row);
-    switch(role)
+    switch (role)
     {
         case Qt::DisplayRole:
             return preset.name;
