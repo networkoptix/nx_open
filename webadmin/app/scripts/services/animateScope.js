@@ -163,6 +163,7 @@ angular.module('webadminApp')
         }
         return {
             start:function(handler){
+                animations = [];
                 animationRunning = true;
                 animationHandler = handler;
                 animationFunction(true);

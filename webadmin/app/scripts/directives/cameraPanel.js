@@ -84,7 +84,7 @@ angular.module('webadminApp')
                     if (!silent && scope.activeCamera) {
                         scope.positionProvider = cameraRecords.getPositionProvider([scope.activeCamera.physicalId], scope.timeCorrection);
                         scope.activeVideoRecords = cameraRecords.getRecordsProvider([scope.activeCamera.physicalId], 640, scope.timeCorrection);
-                        $timeout(updateStream(position));
+                        $timeout(function(){updateStream(position)});
                     }
                 };
                 scope.selectCamera = function (activeCamera) {
