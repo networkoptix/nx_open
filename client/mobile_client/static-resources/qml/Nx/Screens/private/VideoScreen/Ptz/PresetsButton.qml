@@ -18,7 +18,7 @@ Button
     onClicked:
     {
         var dialog = Workflow.openDialog(
-            "Items/private/PtzPresetsButton/PresetsDialog.qml",
+            "Screens/private/VideoScreen/Ptz/PresetsDialog.qml",
             {
                 "uniqueResourceId": control.uniqueResourceId
             })
