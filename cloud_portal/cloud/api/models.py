@@ -25,10 +25,13 @@ class Account(PermissionsMixin):
     REQUIRED_FIELDS = ['registeredDate', 'createdDate']
 
     def get_full_name(self):
-        return self.email
+        return self.first_name + ' ' + self.last_name
 
     def get_short_name(self):
         return self.first_name
+
+    def get_username(self):
+        return self.email
 
     @staticmethod
     def is_authenticated():
