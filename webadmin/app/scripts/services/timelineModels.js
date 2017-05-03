@@ -640,7 +640,7 @@ function ShortCache(cameras,mediaserver,$q,timeCorrection){
 
     this.timeCorrection = timeCorrection || 0;
 }
-ShortCache.prototype.init = function(start){
+ShortCache.prototype.init = function(start, isPlaying){
     this.liveMode = false;
     if(!start){
         this.liveMode = true;
@@ -656,7 +656,7 @@ ShortCache.prototype.init = function(start){
 
     this.lastPlayedPosition = 0; // Save the boundaries of uploaded cache
     this.lastPlayedDate = 0;
-    this.playing = true;
+    this.playing = typeof(isPlaying) != "undefined" ? isPlaying : true;
 
     this.update();
 };
