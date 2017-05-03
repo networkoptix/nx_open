@@ -810,7 +810,9 @@
                 "Dahua|DH-SD6AL240-HNI",
                 "Dahua|RPZ-230F-HNI",
                 "Dahua|DH-SD6AL230F-HNI",
-                "General|RPZ-230F-HNI"
+                "General|RPZ-230F-HNI",
+                "Dahua|XVR",
+                "Private|XVR"
             ],
             "preferredAuthScheme": "Automatic"
         },
