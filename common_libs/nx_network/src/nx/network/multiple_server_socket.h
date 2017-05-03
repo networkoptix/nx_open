@@ -5,9 +5,9 @@
 
 #include <nx/utils/std/cpp14.h>
 
-#include "nx/network/aio/timer.h"
+#include "aggregate_acceptor.h"
+#include "aio/timer.h"
 #include "system_socket.h"
-
 
 namespace nx {
 namespace network {
@@ -76,34 +76,16 @@ public:
     size_t count() const;
 
 protected:
-    struct NX_NETWORK_API ServerSocketContext
-    {
-        std::unique_ptr<AbstractStreamServerSocket> socket;
-        bool isAccepting;
-
-        ServerSocketContext(std::unique_ptr<AbstractStreamServerSocket> socket_);
-        ServerSocketContext(ServerSocketContext&&) = default;
-        ServerSocketContext& operator=(ServerSocketContext&&) = default;
-
-        AbstractStreamServerSocket* operator->() const;
-        void stopAccepting();
-    };
-
-    void accepted(
-        ServerSocketContext* source,
-        SystemError::ErrorCode code,
-        std::unique_ptr<AbstractStreamSocket> socket);
-
-    void cancelIoFromAioThread();
-
-protected:
     bool m_nonBlockingMode;
     unsigned int m_recvTmeout;
     mutable SystemError::ErrorCode m_lastError;
     bool* m_terminated;
     aio::Timer m_timer;
-    std::list<ServerSocketContext> m_serverSockets;
+    std::vector<AbstractStreamServerSocket*> m_serverSockets;
     AcceptCompletionHandler m_acceptHandler;
+    AggregateAcceptor m_aggregateAcceptor;
+
+    void cancelIoFromAioThread();
 
 private:
     void stopWhileInAioThread();
