@@ -29,7 +29,7 @@ namespace {
     std::chrono::seconds subscribeIntervalHigh(15);
 
     int commitIntervalMs = 1000;
-    static const int kMaxSelectDataSize = 1024 * 16;
+    static const int kMaxSelectDataSize = 1024 * 32;
 } // namespace
 
 namespace ec2 {
