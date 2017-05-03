@@ -166,7 +166,7 @@ private:
     void saveServerInfo(const QnMediaServerResourcePtr& server);
 
     void serviceModeInit();
-    QString hardwareIdAsGuid();
+    QString hardwareIdAsGuid() const;
     void updateGuidIfNeeded();
 private:
     int m_argc;
