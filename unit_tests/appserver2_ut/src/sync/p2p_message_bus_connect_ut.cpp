@@ -14,10 +14,11 @@
 #include <nx/network/system_socket.h>
 #include "ec2_connection.h"
 #include <transaction/transaction_message_bus_base.h>
+#include <transaction/p2p_connection.h>
 
 namespace {
 
-static const int kInstanceCount = 80;
+static const int kInstanceCount = 130;
 static const int kMaxSyncTimeoutMs = 1000 * 20 * 1000;
 static const int kCamerasCount = 100;
 
@@ -273,6 +274,24 @@ static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverCon
         .arg(totalDbData)
         .arg(nx::network::totalSocketBytesSent() / (float) totalDbData), cl_logINFO);
 
+    const auto& counters = ec2::P2pConnection::sendCounters();
+    qint64 webSocketBytes = 0;
+    for (int i = 0; i < (int)ec2::MessageType::counter; ++i)
+        webSocketBytes += counters[i];
+
+    NX_LOG(lit("Total bytes via P2P: %1, dbSize: %2, ratio: %3")
+        .arg(webSocketBytes)
+        .arg(totalDbData)
+        .arg(webSocketBytes / (float)totalDbData), cl_logINFO);
+
+    for (int i = 0; i < (int)ec2::MessageType::counter; ++i)
+    {
+        NX_LOG(lit("P2P message: %1, bytes %2, dbSize: %3, ratio: %4")
+            .arg(toString(ec2::MessageType(i)))
+            .arg(webSocketBytes)
+            .arg(totalDbData)
+            .arg(counters[i] / (float)totalDbData), cl_logINFO);
+    }
 }
 
 TEST(P2pMessageBus, SequenceConnect)

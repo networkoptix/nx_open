@@ -10,6 +10,8 @@ enum class MessageType
     alivePeers,
     subscribeForDataUpdates,
     pushTransactionData,
+
+    counter
 };
 
 using PeerNumberType = quint16;

@@ -17,8 +17,11 @@
 namespace ec2 {
 
 class P2pConnection;
+class QnAbstractTransaction;
 //using P2pConnectionPtr = QSharedPointer<P2pConnection>;
 using P2pConnectionPtr = QnSharedResourcePointer<P2pConnection>;
+using SendCounters = std::array<std::atomic<qint64>, (int(MessageType::counter))>;
+
 
 class P2pConnection:
     public QObject,
@@ -54,6 +57,8 @@ public:
         ConnectionLockGuard connectionLockGuard,
         const WebSocketPtr& webSocket);
     virtual ~P2pConnection();
+
+    static const SendCounters& sendCounters() { return m_sendCounters;  }
 
     /** Peer that opens this connection */
     Direction direction() const;
@@ -96,6 +101,7 @@ public:
 
     const Qn::UserAccessData& getUserAccessData() const { return m_userAccessData; }
     bool remotePeerSubscribedTo(const ApiPersistentIdData& peer) const;
+    bool updateSequence(const QnAbstractTransaction& tran);
     bool localPeerSubscribedTo(const ApiPersistentIdData& peer) const;
 signals:
     void gotMessage(P2pConnectionPtr connection, MessageType messageType, const QByteArray& payload);
@@ -148,7 +154,9 @@ private:
     int m_remotePeerEcProtoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION;
     int m_localPeerProtocolVersion = nx_ec::EC2_PROTO_VERSION;
 
+    static SendCounters m_sendCounters;
 };
+
 Q_DECLARE_METATYPE(P2pConnectionPtr)
 Q_DECLARE_METATYPE(P2pConnection::State)
 

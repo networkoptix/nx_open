@@ -69,7 +69,7 @@ public:
         const ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
         for (const auto& connection: m_connections)
         {
-            if (connection->miscData().selectingDataInProgress || !connection->remotePeerSubscribedTo(peerId))
+            if (connection->miscData().selectingDataInProgress || !connection->updateSequence(tran))
                 continue;
             NX_ASSERT(!(ApiPersistentIdData(connection->remotePeer()) == peerId)); //< loop
 

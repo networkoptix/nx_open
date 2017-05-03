@@ -9,6 +9,7 @@
 #include <nx/fusion/serialization/lexical.h>
 #include <api/global_settings.h>
 #include <common/static_common_module.h>
+#include "transaction.h"
 
 namespace {
 
@@ -17,6 +18,8 @@ namespace {
 } // namespace
 
 namespace ec2 {
+
+SendCounters P2pConnection::m_sendCounters = {};
 
 const char* toString(P2pConnection::State value)
 {
@@ -389,7 +392,7 @@ void P2pConnection::onHttpClientDone(const nx_http::AsyncHttpClientPtr& client)
         arg((int)client->state()), cl_logDEBUG2);
 
     nx_http::AsyncHttpClient::State state = client->state();
-    if (state == nx_http::AsyncHttpClient::sFailed) 
+    if (state == nx_http::AsyncHttpClient::sFailed)
     {
         cancelConnecting();
         return;
@@ -482,9 +485,14 @@ void P2pConnection::sendMessage(const nx::Buffer& data)
     QnMutexLocker lock(&m_mutex);
     m_dataToSend.push_back(data);
     if (m_dataToSend.size() == 1)
+    {
+        quint8 messageType = (quint8) m_dataToSend.front().at(0);
+        m_sendCounters[messageType] += m_dataToSend.front().size();
+
         m_webSocket->sendAsync(
             m_dataToSend.front(),
             std::bind(&P2pConnection::onMessageSent, this, _1, _2));
+    }
 }
 
 void P2pConnection::onMessageSent(SystemError::ErrorCode errorCode, size_t bytesSent)
@@ -501,6 +509,9 @@ void P2pConnection::onMessageSent(SystemError::ErrorCode errorCode, size_t bytes
     m_dataToSend.pop_front();
     if (!m_dataToSend.empty())
     {
+        quint8 messageType = (quint8)m_dataToSend.front().at(0);
+        m_sendCounters[messageType] += m_dataToSend.front().size();
+
         m_webSocket->sendAsync(
             m_dataToSend.front(),
             std::bind(&P2pConnection::onMessageSent, this, _1, _2));
@@ -561,6 +572,20 @@ PeerNumberType P2pConnection::encode(const ApiPersistentIdData& fullId, PeerNumb
 bool P2pConnection::remotePeerSubscribedTo(const ApiPersistentIdData& peer) const
 {
     return m_miscData.remoteSubscription.values.contains(peer);
+}
+
+bool P2pConnection::updateSequence(const QnAbstractTransaction& tran)
+{
+    const ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
+    auto itr = m_miscData.remoteSubscription.values.find(peerId);
+    if (itr == m_miscData.remoteSubscription.values.end())
+        return false;
+    if (tran.persistentInfo.sequence > itr.value())
+    {
+        itr.value() = tran.persistentInfo.sequence;
+        return true;
+    }
+    return false;
 }
 
 bool P2pConnection::localPeerSubscribedTo(const ApiPersistentIdData& peer) const
