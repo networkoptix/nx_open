@@ -157,8 +157,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, simpleDownload)
     auto fileInfo = createTestFile();
     NX_ASSERT(storage->addFile(fileInfo) == DistributedFileDownloader::ErrorCode::noError);
 
-    fileInfo.downloadedChunks.fill(
-        true, Storage::calculateChunkCount(fileInfo.size, fileInfo.chunkSize));
+    fileInfo.downloadedChunks.fill(true);
 
     addPeerWithFile(peerManager, fileInfo);
 
@@ -169,11 +168,62 @@ TEST_F(DistributedFileDownloaderWorkerTest, simpleDownload)
     worker->start();
     peerManager->processRequests();
 
-    for (int i = 0; i < fileInfo.downloadedChunks.size(); ++i)
+    const int maxSteps = fileInfo.downloadedChunks.size() + 4;
+
+    for (int i = 0; i < maxSteps; ++i)
     {
-        ASSERT_FALSE(finished);
+        if (finished)
+            break;
+
         peerManager->processRequests();
     }
+
+    ASSERT_TRUE(finished);
+
+    const auto& newFileInfo = storage->fileInformation(fileInfo.name);
+    ASSERT_TRUE(newFileInfo.isValid());
+    ASSERT_EQ(newFileInfo.size, fileInfo.size);
+    ASSERT_EQ(newFileInfo.md5, fileInfo.md5);
+}
+
+TEST_F(DistributedFileDownloaderWorkerTest, corruptedFile)
+{
+    auto fileInfo = createTestFile();
+    fileInfo.downloadedChunks.setBit(0); //< Making file corrupted.
+
+    NX_ASSERT(storage->addFile(fileInfo) == DistributedFileDownloader::ErrorCode::noError);
+
+    fileInfo.downloadedChunks.fill(true);
+
+    addPeerWithFile(peerManager, fileInfo);
+
+    bool finished = false;
+
+    QObject::connect(worker.data(), &Worker::finished, [&finished] { finished = true; });
+
+    worker->start();
+    peerManager->processRequests();
+
+    const int maxSteps = fileInfo.downloadedChunks.size() + 4;
+
+    bool wasCorrupted = false;
+
+    for (int i = 0; i < maxSteps; ++i)
+    {
+        if (finished)
+            break;
+
+        if (worker->state() == Worker::State::requestingChecksums)
+        {
+            ASSERT_EQ(storage->fileInformation(fileInfo.name).status,
+                DownloaderFileInformation::Status::corrupted);
+            wasCorrupted = true;
+        }
+
+        peerManager->processRequests();
+    }
+
+    ASSERT_TRUE(wasCorrupted);
     ASSERT_TRUE(finished);
 
     const auto& newFileInfo = storage->fileInformation(fileInfo.name);
