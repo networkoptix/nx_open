@@ -18,11 +18,6 @@ public:
     AbstractPeerManager(QObject* parent = nullptr);
     virtual ~AbstractPeerManager();
 
-    int peersPerOperation() const;
-    void setPeersPerOperation(int peersPerOperation);
-
-    QList<QnUuid> selectPeersForOperation();
-
     virtual QString peerString(const QnUuid& peerId) const;
     virtual QList<QnUuid> getAllPeers() const = 0;
 
@@ -33,10 +28,22 @@ public:
         const QString& fileName,
         FileInfoCallback callback) = 0;
 
-    virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) = 0;
+    using ChecksumsCallback =
+        std::function<void(bool, rest::Handle, const QList<QByteArray>&)>;
+    virtual rest::Handle requestChecksums(
+        const QnUuid& peer,
+        const QString& fileName,
+        ChecksumsCallback callback) = 0;
 
-private:
-    int m_peersPerOperation = 1;
+    using ChunkCallback =
+        std::function<void(bool, rest::Handle, const QByteArray&)>;
+    virtual rest::Handle downloadChunk(
+        const QnUuid& peer,
+        const QString& fileName,
+        int chunkIndex,
+        ChunkCallback callback) = 0;
+
+    virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) = 0;
 };
 
 class AbstractPeerManagerFactory

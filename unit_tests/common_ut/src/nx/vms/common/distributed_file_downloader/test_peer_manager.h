@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QHash>
+#include <QtCore/QQueue>
 
 #include <nx/vms/common/private/distributed_file_downloader/abstract_peer_manager.h>
 
@@ -16,6 +17,7 @@ public:
     {
         using DownloaderFileInformation::DownloaderFileInformation;
         QString filePath;
+        QList<QByteArray> checksums;
     };
 
     TestPeerManager();
@@ -35,7 +37,26 @@ public:
         const QString& fileName,
         FileInfoCallback callback) override;
 
+    virtual rest::Handle requestChecksums(
+        const QnUuid& peer,
+        const QString& fileName,
+        ChecksumsCallback callback) override;
+
+    virtual rest::Handle downloadChunk(
+        const QnUuid& peer,
+        const QString& fileName,
+        int chunkIndex,
+        ChunkCallback callback) override;
+
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
+
+    void processRequests();
+
+private:
+    rest::Handle getRequestHandle();
+    void enqueueCallback(std::function<void()> callback);
+
+    static QByteArray readFileChunk(const FileInformation& fileInformation, int chunkIndex);
 
 private:
     struct PeerInfo
@@ -45,6 +66,8 @@ private:
 
     QHash<QnUuid, PeerInfo> m_peers;
     int m_requestIndex = 0;
+
+    QQueue<std::function<void()>> m_callbacksQueue;
 };
 
 } // namespace distributed_file_downloader

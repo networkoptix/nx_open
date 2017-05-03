@@ -1,12 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "test_peer_manager.h"
-
-namespace {
-
-constexpr int kDefaultPeersPerOperation = 5;
-
-} // namespace
+#include "utils.h"
 
 namespace nx {
 namespace vms {
@@ -20,28 +15,10 @@ protected:
     virtual void SetUp() override
     {
         peerManager.reset(new TestPeerManager());
-        peerManager->setPeersPerOperation(kDefaultPeersPerOperation);
     }
 
     QScopedPointer<TestPeerManager> peerManager;
 };
-
-TEST_F(DistributedFileDownloaderPeerManagerTest, simpleSelection)
-{
-    peerManager->addPeer(QnUuid::createUuid());
-    peerManager->addPeer(QnUuid::createUuid());
-
-    auto peers = peerManager->selectPeersForOperation();
-    ASSERT_EQ(peers.size(), 2);
-
-    peerManager->addPeer(QnUuid::createUuid());
-    peerManager->addPeer(QnUuid::createUuid());
-    peerManager->addPeer(QnUuid::createUuid());
-    peerManager->addPeer(QnUuid::createUuid());
-
-    peers = peerManager->selectPeersForOperation();
-    ASSERT_EQ(peers.size(), kDefaultPeersPerOperation);
-}
 
 TEST_F(DistributedFileDownloaderPeerManagerTest, invalidPeerRequest)
 {
@@ -54,6 +31,8 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, invalidPeerRequest)
             // Should not be called.
             called = true;
         });
+
+    peerManager->processRequests();
 
     ASSERT_EQ(handle, 0);
     ASSERT_FALSE(called);
@@ -75,6 +54,8 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, fileInfo)
             ok = success && fileInfo.name == fileInformation.name;
         });
 
+    peerManager->processRequests();
+
     ASSERT_TRUE(ok);
 }
 
@@ -91,7 +72,32 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, emptyFileInfo)
         ok = !success && fileInfo.status == DownloaderFileInformation::Status::notFound;
     });
 
+    peerManager->processRequests();
+
     ASSERT_TRUE(ok);
+}
+
+TEST_F(DistributedFileDownloaderPeerManagerTest, invalidChunk)
+{
+    const auto& peer = QnUuid::createUuid();
+
+    peerManager->addPeer(peer);
+
+    TestPeerManager::FileInformation fileInformation("test");
+    fileInformation.size = 1024;
+    fileInformation.chunkSize = 1024;
+    peerManager->setFileInformation(peer, fileInformation);
+
+    bool ok = true;
+    peerManager->downloadChunk(peer, fileInformation.name, 2,
+        [&](bool success, rest::Handle /*handle*/, const QByteArray& data)
+        {
+            ok = success && !data.isEmpty();
+        });
+
+    peerManager->processRequests();
+
+    ASSERT_FALSE(ok);
 }
 
 } // namespace test

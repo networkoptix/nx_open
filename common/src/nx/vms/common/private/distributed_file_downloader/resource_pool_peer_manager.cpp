@@ -66,6 +66,41 @@ rest::Handle ResourcePoolPeerManager::requestFileInfo(
     return connection->downloaderFileStatus(fileName, handleReply, thread());
 }
 
+rest::Handle ResourcePoolPeerManager::requestChecksums(
+    const QnUuid& peerId,
+    const QString& fileName,
+    AbstractPeerManager::ChecksumsCallback callback)
+{
+    const auto& connection = getConnection(peerId);
+    if (!connection)
+        return -1;
+
+    auto handleReply =
+        [this, callback](bool success, rest::Handle handle, const QnJsonRestResult& result)
+        {
+            if (!success)
+                callback(success, handle, QList<QByteArray>());
+
+            const auto& checksums = result.deserialized<QList<QByteArray>>();
+            callback(success, handle, checksums);
+        };
+
+    return connection->downloaderChunkChecksums(fileName, handleReply, thread());
+}
+
+rest::Handle ResourcePoolPeerManager::downloadChunk(
+    const QnUuid& peerId,
+    const QString& fileName,
+    int chunkIndex,
+    AbstractPeerManager::ChunkCallback callback)
+{
+    const auto& connection = getConnection(peerId);
+    if (!connection)
+        return -1;
+
+    return connection->downloaderDownloadChunk(fileName, chunkIndex, callback, thread());
+}
+
 void ResourcePoolPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle handle)
 {
     const auto& connection = getConnection(peerId);

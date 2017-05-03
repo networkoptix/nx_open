@@ -22,9 +22,20 @@ public:
     virtual QList<QnUuid> getAllPeers() const override;
 
     virtual rest::Handle requestFileInfo(
-        const QnUuid& peer,
+        const QnUuid& peerId,
         const QString& fileName,
         FileInfoCallback callback) override;
+
+    virtual rest::Handle requestChecksums(
+        const QnUuid& peerId,
+        const QString& fileName,
+        ChecksumsCallback callback) override;
+
+    virtual rest::Handle downloadChunk(
+        const QnUuid& peerId,
+        const QString& fileName,
+        int chunkIndex,
+        ChunkCallback callback) override;
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
 
