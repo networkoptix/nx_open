@@ -1,66 +1,49 @@
 import QtQuick 2.6
+
 import Nx 1.0
+import Nx.Controls 1.0
 
 Rectangle
 {
     id: control
 
-    property bool showCenterArea: false
-    property int actionButtonHeight: 56 //< Just some default value
+    property bool showCentralArea: false
+    property Item centralArea: null
 
-    property alias upPressed: upButton.pressed
-    property alias downPressed: downButton.pressed
-
-
-    property Component upButtonDecoration
-    property Component downButtonDecoration
-    property Component centralAreaDelegate
+    property alias upButton: upButtonControl
+    property alias downButton: downButtonControl
 
     color: ColorTheme.transparent(ColorTheme.base8, 0.8)
 
     implicitWidth: 56
-    implicitHeight: showCenterArea ? 136 : 112
+    implicitHeight: showCentralArea ? 136 : 112
 
     radius: 28
 
-    RoundButton
+    IconButton
     {
-        id: upButton
+        id: upButtonControl
 
-        y: spotRadius - height / 2
         width: control.width
-        height: actionButtonHeight
-
-        Loader
-        {
-            anchors.centerIn: parent
-            sourceComponent: control.upButtonDecoration
-        }
+        height: width
+        padding: 0
     }
 
-    Loader
+    IconButton
     {
-        id: centerAreaLoader
+        id: downButtonControl
 
-        z: 1
-        anchors.centerIn: parent
-        sourceComponent: control.centralAreaDelegate
-        visible: control.showCenterArea
+        width: control.width
+        height: width
+        anchors.bottom: parent.bottom
+        padding: 0
     }
 
-    RoundButton
+    onCentralAreaChanged:
     {
-        id: downButton
-
-        y: parent.height - (spotRadius + height / 2)
-        width: control.width
-        height: actionButtonHeight
-
-        Loader
-        {
-            anchors.centerIn: parent
-            sourceComponent: control.downButtonDecoration
-        }
+        centralArea.parent = control
+        centralArea.anchors.centerIn = control
+        centralArea.visible = Qt.binding(function() { return control.showCentralArea })
     }
 }
 

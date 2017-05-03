@@ -8,24 +8,9 @@ Private.GenericValueControl
 {
     id: control
 
-    property alias zoomInPressed: control.upPressed
-    property alias zoomOutPressed: control.downPressed
+    property bool zoomInPressed: upButton.pressed
+    property bool zoomOutPressed: downButton.pressed
 
-    property int selectedMarkerIndex: 2
-
-    actionButtonHeight: control.supporsValuesMarker ? 44 : 56
-
-    upButtonDecoration: Image
-    {
-        anchors.centerIn: parent
-        source: lp("/images/ptz/ptz_zoom_plus.png")
-        opacity: enabled ? 1.0 : 0.2
-    }
-
-    downButtonDecoration: Image
-    {
-        anchors.centerIn: parent
-        source: lp("/images/ptz/ptz_zoom_minus.png")
-        opacity: enabled ? 1.0 : 0.2
-    }
+    upButton.icon: lp("/images/ptz/ptz_zoom_plus.png")
+    downButton.icon: lp("/images/ptz/ptz_zoom_minus.png")
 }
