@@ -16,7 +16,7 @@ void ConnectionAcceptor::bindToAioThread(aio::AbstractAioThread* aioThread)
     // TODO
 }
 
-void ConnectionAcceptor::acceptAsync(AcceptCompletionHandler handler)
+void ConnectionAcceptor::acceptAsync(AcceptCompletionHandler /*handler*/)
 {
     // TODO
 }
