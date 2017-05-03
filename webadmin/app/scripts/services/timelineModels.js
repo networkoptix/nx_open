@@ -656,7 +656,7 @@ ShortCache.prototype.init = function(start, timeCorrection){
 
     this.lastPlayedPosition = 0; // Save the boundaries of uploaded cache
     this.lastPlayedDate = 0;
-    this.timeCorrection = timeCorrection || 0;
+    this.timeCorrection = timeCorrection;
 
     this.update();
 };
