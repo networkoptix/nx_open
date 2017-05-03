@@ -93,8 +93,7 @@ void QnAbstractArchiveStreamReader::run()
 {
     initSystemThreadId();
 
-    CL_LOG(cl_logINFO) NX_LOG(QLatin1String("QnArchiveStreamReader started."), cl_logINFO);
-
+    NX_INFO(this, "Started");
     beforeRun();
 
     while(!needToStop())
@@ -164,6 +163,5 @@ void QnAbstractArchiveStreamReader::run()
     }
 
     afterRun();
-
-    CL_LOG(cl_logINFO) NX_LOG(QLatin1String("QnArchiveStreamReader reader stopped."), cl_logINFO);
+    NX_INFO(this, "Stopped");
 }

@@ -135,9 +135,8 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
 
     m_shaders = qn_glRendererShaders_instanceStorage()->get(context);
 
-
-
-    cl_log.log( QString(QLatin1String("OpenGL max texture size: %1.")).arg(QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE)), cl_logINFO );
+    NX_INFO(this, lm("OpenGL max texture size: %1.").arg(
+        QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE)));
 }
 
 QnGLRenderer::~QnGLRenderer()
@@ -441,7 +440,7 @@ void QnGLRenderer::drawVideoTextureDirectly(
     const float* v_array,
     qreal opacity)
 {
-    cl_log.log( lit("QnGLRenderer::drawVideoTextureDirectly. texture %1").arg(tex0ID), cl_logDEBUG2 );
+    NX_VERBOSE(this, lit("drawVideoTextureDirectly. texture %1").arg(tex0ID));
 
     float tx_array[8] = {
         (float)tex0Coords.x(), (float)tex0Coords.y(),

@@ -67,8 +67,7 @@ aio::AIOService& SocketGlobals::AioServiceGuard::aioService()
 // SocketGlobals
 
 SocketGlobals::SocketGlobals(int initializationFlags):
-    m_initializationFlags(initializationFlags),
-    m_log(QnLog::logs())
+    m_initializationFlags(initializationFlags)
 {
     if (m_initializationFlags & InitializationFlags::disableUdt)
         m_pollSetFactory.disableUdt();

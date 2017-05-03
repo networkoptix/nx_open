@@ -1602,7 +1602,7 @@ void QnCamDisplay::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val)
     if (val == m_lightCpuMode)
         return;
 
-    cl_log.log("set CPUMode=", val, cl_logWARNING);
+    NX_WARNING(this, lit("set CPUMode=%1").arg(val));
 
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {
@@ -1746,7 +1746,7 @@ void QnCamDisplay::enqueueVideo(QnCompressedVideoDataPtr vd)
     m_videoQueue[vd->channelNumber].enqueue(vd);
     if (m_videoQueue[vd->channelNumber].size() > 60 * 6) // I assume we are not gonna buffer
     {
-        cl_log.log(lit("Video buffer overflow!"), cl_logWARNING);
+        NX_WARNING(this, "Video buffer overflow!");
         dequeueVideo(vd->channelNumber);
         // some protection for very large difference between video and audio tracks. Need to improve sync logic for this case (now a lot of glithces)
         m_videoBufferOverflow = true;

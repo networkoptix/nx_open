@@ -1,5 +1,6 @@
 #include "service.h"
 
+#include "log/log.h"
 #include "log/log_initializer.h"
 #include "scope_guard.h"
 
@@ -66,9 +67,7 @@ void Service::initializeLog(const AbstractServiceSettings& settings)
     utils::log::initialize(
         settings.logging(),
         settings.dataDir(),
-        m_applicationDisplayName,
-        "log_file",
-        QnLog::MAIN_LOG_ID);
+        m_applicationDisplayName);
 }
 
 void Service::reportStartupResult(bool result)

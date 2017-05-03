@@ -249,7 +249,7 @@ QJsonObject::const_iterator QJsonDetail::findField(
     {
         NX_LOG(lit(
             "JSON field %2 of %1 not found (no deprecated names for this struct) in { %3 }")
-            .arg(NX_TYPE_NAME(structTypeInfo)).arg(fieldName)
+            .arg(pointerTypeName(&structTypeInfo)).arg(fieldName)
             .arg(jsonObject.keys().join(", ")), cl_logDEBUG2);
         return jsonObject.end();
     }
@@ -259,7 +259,7 @@ QJsonObject::const_iterator QJsonDetail::findField(
     {
         NX_LOG(lit(
             "JSON field %2 of %1 not found (no deprecated name for this field) in { %3 }")
-            .arg(NX_TYPE_NAME(structTypeInfo)).arg(fieldName)
+            .arg(pointerTypeName(&structTypeInfo)).arg(fieldName)
             .arg(jsonObject.keys().join(", ")), cl_logDEBUG2);
         return jsonObject.end();
     }
@@ -269,7 +269,7 @@ QJsonObject::const_iterator QJsonDetail::findField(
     {
         NX_LOG(lit(
             "JSON field %2 of %1 not found even as deprecated %3 in { %4 }")
-            .arg(NX_TYPE_NAME(structTypeInfo)).arg(fieldName).arg(deprecatedFieldName)
+            .arg(pointerTypeName(&structTypeInfo)).arg(fieldName).arg(deprecatedFieldName)
             .arg(jsonObject.keys().join(", ")), cl_logDEBUG2);
         return jsonObject.end();
     }

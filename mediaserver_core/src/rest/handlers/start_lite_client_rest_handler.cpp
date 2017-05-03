@@ -4,6 +4,7 @@
 #include <QProcess>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/log/log_initializer.h>
 #include <nx/network/http/httptypes.h>
 #include "media_server/serverutil.h"
 #include <rest/server/rest_connection_processor.h>
@@ -80,7 +81,7 @@ int QnStartLiteClientRestHandler::executeGet(
     QStringList args{
         "--url", url.toString(),
         "--videowall-instance-guid", videowallInstanceGuid.toString(),
-        "--log-level", QnLog::logLevelToString(QnLog::instance()->logLevel())};
+        "--log-level", nx::utils::log::toString(nx::utils::log::Settings::kDefaultLevel)};
 
     if (startCamerasMode)
         args.append(QStringList{"--auto-login", "enabled"});

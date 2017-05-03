@@ -10,6 +10,8 @@
 #include <mutex>
 #include <vector>
 
+#include <QtCore/QFile>
+
 #include <gtest/gtest.h>
 
 #include <common/common_globals.h>
