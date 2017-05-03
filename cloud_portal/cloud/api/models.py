@@ -1,8 +1,11 @@
 from django.db import models
+from django.contrib.auth.models import PermissionsMixin
 from account_backend import AccountManager
 
+from django.utils import timezone
 
-class Account(models.Model):
+
+class Account(PermissionsMixin):
 
     objects = AccountManager()
 
@@ -16,6 +19,7 @@ class Account(models.Model):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     language = models.CharField(max_length=7, blank=True)
+
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['registeredDate', 'createdDate']
