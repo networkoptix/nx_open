@@ -136,6 +136,7 @@ private:
 
     QMap<ApiPersistentIdData, P2pConnectionPtr> getCurrentSubscription() const;
     void resubscribePeers(QMap<ApiPersistentIdData, P2pConnectionPtr> newSubscription);
+    void startStopConnections();
     void doSubscribe();
     P2pConnectionPtr findConnectionById(const ApiPersistentIdData& id) const;
 
@@ -167,7 +168,18 @@ private:
 private:
     QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list
     QMap<QnUuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections
-    QMap<QnUuid, QUrl> m_remoteUrls; //< Url list for outgoing connections
+    //QMap<QnUuid, QUrl> m_remoteUrls; //< Url list for outgoing connections
+    struct RemoteConnection
+    {
+        RemoteConnection() {}
+        RemoteConnection(const QnUuid& id, const QUrl& url) : id(id), url(url) {}
+
+        QnUuid id;
+        QUrl url;
+    };
+
+    std::vector<RemoteConnection> m_remoteUrls;
+
     PeerNumberInfo m_localShortPeerInfo; //< Short numbers created by current peer
 
     typedef QMap<ApiPersistentIdData, RoutingRecord> RoutingInfo;
@@ -188,7 +200,7 @@ private:
     {
         RouteToPeerInfo() {}
 
-        qint32 minDistance(QVector<ApiPersistentIdData>* outViaList) const;
+        qint32 minDistance(QVector<ApiPersistentIdData>* outViaList = nullptr) const;
 
         RoutingInfo routeVia; // key: route via, value - distance in hops
     };
@@ -199,6 +211,9 @@ private:
     QElapsedTimer m_lastPeerInfoTimer;
     QElapsedTimer m_wantToSubscribeTimer;
     QElapsedTimer m_dbCommitTimer;
+
+    int m_lastOutgoingIndex = 0;
+    QElapsedTimer m_outConnectionsTimer;
 private:
     RouteToPeerMap allPeersDistances() const;
 };

@@ -40,6 +40,10 @@ const char* toString(MessageType value)
 {
     switch (value)
     {
+    case MessageType::start:
+        return "start";
+    case MessageType::stop:
+        return "stop";
     case MessageType::resolvePeerNumberRequest:
         return "resolvePeerNumberRequest";
     case MessageType::resolvePeerNumberResponse:
@@ -422,6 +426,10 @@ void P2pConnection::setState(State state)
 {
     if (state != m_state)
     {
+        if (state == State::Error)
+        {
+            NX_LOG("error state!", cl_logWARNING);
+        }
         m_state = state;
         emit stateChanged(toSharedPointer(), state);
     }

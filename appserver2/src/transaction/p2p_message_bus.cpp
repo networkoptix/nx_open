@@ -30,6 +30,12 @@ namespace {
 
     int commitIntervalMs = 1000;
     static const int kMaxSelectDataSize = 1024 * 32;
+
+
+    // How many new connections we could try to open at the same time
+    static const int kMaxConnectionsAtOnce = 10;
+
+    static const int kOutConnectionsInterval = 1000 * 5;
 } // namespace
 
 namespace ec2 {
@@ -143,14 +149,22 @@ void P2pMessageBus::stop()
 void P2pMessageBus::addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& url)
 {
     QnMutexLocker lock(&m_mutex);
-    m_remoteUrls.insert(id, url);
+    int pos = nx::utils::random::number((int) 0, (int) m_remoteUrls.size());
+    m_remoteUrls.insert(m_remoteUrls.begin() + pos, RemoteConnection(id, url));
 }
 
 void P2pMessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
 {
     QnMutexLocker lock(&m_mutex);
+    for (int i = 0; i < m_remoteUrls.size() - 1; ++i)
+    {
+        if (m_remoteUrls[i].id == id)
+        {
+            m_remoteUrls.erase(m_remoteUrls.begin() + i);
+            break;
+        }
+    }
 
-    m_remoteUrls.remove(id);
     m_outgoingConnections.remove(id);
     auto itr = m_connections.find(id);
     if (itr != m_connections.end() && itr.value()->direction() == P2pConnection::Direction::outgoing)
@@ -184,34 +198,46 @@ void P2pMessageBus::cleanupRoutingRecords(const ApiPersistentIdData& id)
 
 void P2pMessageBus::createOutgoingConnections()
 {
-    for (auto itr = m_remoteUrls.begin(); itr != m_remoteUrls.end(); ++itr)
+    if (m_outConnectionsTimer.isValid() && !m_outConnectionsTimer.hasExpired(kOutConnectionsInterval))
+        return;
+    m_outConnectionsTimer.restart();
+
+    auto itr = m_remoteUrls.begin();
+
+    //for (auto itr = m_remoteUrls.begin(); itr != m_remoteUrls.end(); ++itr)
+    for (int i = 0; i < m_remoteUrls.size(); ++i)
     {
-        const QnUuid remoteId = itr.key();
-        const QUrl url = itr.value();
-        if (!m_connections.contains(remoteId) && !m_outgoingConnections.contains(remoteId))
+        if (m_outgoingConnections.size() >= kMaxConnectionsAtOnce)
+            return; //< wait a bit
+
+        int pos = m_lastOutgoingIndex % m_remoteUrls.size();
+
+        const RemoteConnection& remoteConnection = m_remoteUrls[pos];
+        if (!m_connections.contains(remoteConnection.id) && !m_outgoingConnections.contains(remoteConnection.id))
         {
             {
                 // This check is redundant (can be ommited). But it reduce network race condition time.
                 // So, it reduce frequency of in/out conflict and network traffic a bit.
-                if (m_connectionGuardSharedState.contains(remoteId))
+                if (m_connectionGuardSharedState.contains(remoteConnection.id))
                     continue; //< incoming connection in progress
             }
 
             ConnectionLockGuard connectionLockGuard(
                 commonModule()->moduleGUID(),
                 connectionGuardSharedState(),
-                remoteId,
+                remoteConnection.id,
                 ConnectionLockGuard::Direction::Outgoing);
 
             P2pConnectionPtr connection(new P2pConnection(
                 commonModule(),
-                remoteId,
+                remoteConnection.id,
                 localPeer(),
                 std::move(connectionLockGuard),
-                url));
-            m_outgoingConnections.insert(remoteId, connection);
+                remoteConnection.url));
+            m_outgoingConnections.insert(remoteConnection.id, connection);
             connectSignals(connection);
             connection->startConnection();
+            ++m_lastOutgoingIndex;
         }
     }
 }
@@ -414,6 +440,9 @@ void P2pMessageBus::sendAlivePeersMessage()
     {
         if (connection->state() != P2pConnection::State::Connected)
             continue;
+        if (!connection->miscData().isRemoteStarted)
+            continue;
+
         auto& miscData = connection->miscData();
         if (miscData.localPeersTimer.isValid() && !miscData.localPeersTimer.hasExpired(peersIntervalMs))
             continue;
@@ -508,6 +537,35 @@ bool P2pMessageBus::needSubscribeDelay()
     return false;
 }
 
+void P2pMessageBus::startStopConnections()
+{
+    QMap<ApiPersistentIdData, P2pConnectionPtr> currentSubscription = getCurrentSubscription();
+    RouteToPeerMap allPeerDistances = allPeersDistances();
+
+    // start using connection if need
+    for (auto& connection: m_connections)
+    {
+        if (connection->miscData().isLocalStarted)
+            continue; //< already in use
+
+        ApiPersistentIdData peer = connection->remotePeer();
+        qint32 currentDistance = allPeerDistances.value(peer).minDistance();
+        auto subscribedVia = currentSubscription.value(peer);
+        static const int kMaxDistanceToUseProxy = 2;
+        static const int kMaxSubscriptionToResubscribe = 5;
+        if (currentDistance > kMaxDistanceToUseProxy ||
+            (subscribedVia && subscribedVia->miscData().localSubscription.size() > kMaxSubscriptionToResubscribe))
+        {
+            connection->miscData().isLocalStarted = true;
+            connection->sendMessage(MessageType::start, QByteArray());
+        }
+        else
+        {
+            int gg = 4;
+        }
+    }
+}
+
 void P2pMessageBus::doSubscribe()
 {
     const bool needDelay = needSubscribeDelay();
@@ -535,6 +593,7 @@ void P2pMessageBus::doSubscribe()
         {
             if (needDelay && minDistance > 1)
                 continue; //< allow only direct subscription if network configuration are still changing
+
 
             NX_ASSERT(!viaList.empty());
             // If any of connections with min distance subscribed to us then postpone our subscription.
@@ -589,6 +648,8 @@ void P2pMessageBus::doPeriodicTasks()
     addOwnfInfoToPeerList();
     addOfflinePeersFromDb();
     sendAlivePeersMessage();
+
+    startStopConnections();
 
     doSubscribe();
     commitLazyData();
@@ -698,6 +759,15 @@ void P2pMessageBus::at_gotMessage(
     bool result = false;
     switch (messageType)
     {
+    case MessageType::start:
+        connection->miscData().isRemoteStarted = true;
+        result = true;
+        break;
+    case MessageType::stop:
+        connection->miscData().selectingDataInProgress = false;
+        connection->miscData().isRemoteStarted = false;
+        connection->miscData().remoteSubscription.values.clear();
+        break;
     case MessageType::resolvePeerNumberRequest:
         result = handleResolvePeerNumberRequest(connection, payload);
         break;

@@ -88,13 +88,17 @@ public:
             localPeersTimer.invalidate();
         }
 
+        // to local part
         QByteArray localPeersMessage; //< last sent peers message
-        QByteArray remotePeersMessage; //< last received peers message
         QElapsedTimer localPeersTimer; //< last sent peers time
-
         QVector<ApiPersistentIdData> localSubscription; //< local -> remote subscription
+        bool isLocalStarted = false; //< we opened connection to remote peer
+
+        // to remote part
+        QByteArray remotePeersMessage; //< last received peers message
         QnTranState remoteSubscription; //< remote -> local subscription
         bool selectingDataInProgress = false;
+        bool isRemoteStarted = false; //< remote peer has open logical connection to us
     };
 
     MiscData& miscData();

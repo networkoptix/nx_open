@@ -5,6 +5,8 @@ namespace ec2 {
 
 enum class MessageType
 {
+    start,
+    stop,
     resolvePeerNumberRequest,
     resolvePeerNumberResponse,
     alivePeers,

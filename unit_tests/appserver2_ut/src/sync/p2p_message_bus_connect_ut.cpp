@@ -18,7 +18,7 @@
 
 namespace {
 
-static const int kInstanceCount = 130;
+static const int kInstanceCount = 100;
 static const int kMaxSyncTimeoutMs = 1000 * 20 * 1000;
 static const int kCamerasCount = 100;
 
@@ -288,7 +288,7 @@ static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverCon
     {
         NX_LOG(lit("P2P message: %1, bytes %2, dbSize: %3, ratio: %4")
             .arg(toString(ec2::MessageType(i)))
-            .arg(webSocketBytes)
+            .arg(counters[i])
             .arg(totalDbData)
             .arg(counters[i] / (float)totalDbData), cl_logINFO);
     }
