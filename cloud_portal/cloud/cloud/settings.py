@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'corsheaders',
     'notifications',
     'api',
+    'cms'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -111,7 +112,6 @@ DATABASES = {
         }
     }
 }
-
 
 CACHES = {
     'default': {

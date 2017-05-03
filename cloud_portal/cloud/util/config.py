@@ -14,5 +14,5 @@ def get_config(customization = None):
         customization = '../../etc'
         # raise RuntimeError('CLOUD_PORTAL_BASE_CONF_DIR environment variable is undefined')
 
-    print (conf_dir, customization, 'cloud_portal.yaml')
+    print (join(conf_dir, customization, 'cloud_portal.yaml'))
     return yaml.safe_load(open(join(conf_dir, customization, 'cloud_portal.yaml')))
