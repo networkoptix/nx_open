@@ -1272,6 +1272,16 @@ ScaleManager.prototype.updateServerOffset = function(serverOffset){
     this.latency = serverOffset.latency;
 };
 
+
+/*
+Input: date to be corrected
+Output: date adjusted to server time
+Summary: 1)We convert the input date into a Date object.
+         2)We convert the timezone offset from minutes to ms.
+         3)Add timezone offset to current time in ms.
+         4)Adding the server's timezone and minus the latency sets the
+           local time to the server's time.
+*/
 ScaleManager.prototype.serverTime = function(date){
     if(!this.useServerTime)
         return date;
