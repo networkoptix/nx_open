@@ -1,0 +1,24 @@
+#pragma once
+
+#include <memory>
+
+#include "abstract_socket.h"
+#include "aio/basic_pollable.h"
+
+namespace nx {
+namespace network {
+
+class NX_NETWORK_API AbstractAcceptor:
+    public aio::BasicPollable
+{
+public:
+    virtual void acceptAsync(AcceptCompletionHandler handler) = 0;
+    /**
+     * Does not block if called within object's aio thread.
+     * If called from any other thread then will block if completion handler is already running.
+     */
+    virtual void cancelIOSync() = 0;
+};
+
+} // namespace network
+} // namespace nx
