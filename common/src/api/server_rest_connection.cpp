@@ -297,7 +297,7 @@ Handle ServerConnection::downloaderChunkChecksums(
 Handle ServerConnection::downloaderDownloadChunk(
     const QString& fileName,
     int index,
-    GetCallback callback,
+    Result<QByteArray>::type callback,
     QThread* targetThread)
 {
     return executeGet(

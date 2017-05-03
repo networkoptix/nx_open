@@ -129,7 +129,7 @@ namespace rest
         Handle downloaderDownloadChunk(
             const QString& fileName,
             int index,
-            GetCallback callback,
+            Result<QByteArray>::type callback,
             QThread* targetThread = nullptr);
 
         Handle downloaderUploadChunk(
