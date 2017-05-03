@@ -9,7 +9,7 @@ int main(int argc, char** argv)
 {
     return nx::network::test::runTest(
         argc, argv,
-        [](const nx::utils::ArgumentParser& args)
+        [](const nx::utils::ArgumentParser& /*args*/)
         {
             nx::network::ssl::Engine::useRandomCertificate("vms_gateway_ut");
             return nx::utils::test::DeinitFunctions();
