@@ -241,7 +241,7 @@ def add_build_nxtool_commands(commands):
 def add_build_paxton_commands(commands):
     add_build_commands_msi_generic(commands, 'paxton', 
                 paxton_msi_folder, paxton_msi_name,
-                ['-dNoStrip=no'],
+                ['-dNoStrip=yes'],
                 paxton_components)
 
 def main():

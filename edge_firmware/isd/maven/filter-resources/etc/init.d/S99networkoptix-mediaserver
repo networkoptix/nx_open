@@ -25,6 +25,7 @@ start()
        return 0
     fi
 
+    # Make sure that STORAGE_PATH dir exists and is in /proc/mounts.
     if ! grep "$STORAGE_PATH" /proc/mounts >/dev/null 2>&1 || [ ! -d "$STORAGE_PATH" ]; then
         echo "SD card not inserted"
         return 1
@@ -116,7 +117,8 @@ kill_ms_if_high_mem_usage()
         exit 0
     fi
 
-    MEM_USAGE=$(cat /proc/$MSERVER_PID/status | grep VmRSS | cut -d: -f2 | tr -d "\t " | cut -d "k" -f 1)
+    MEM_USAGE=$(cat /proc/$MSERVER_PID/status \
+        |grep VmRSS |cut -d ":" -f2 |tr -d "\t " |cut -d "k" -f 1)
 
     if [ "$MEM_USAGE" -gt 89000 ]; then
         kill -FPE "$MSERVER_PID"
@@ -147,11 +149,9 @@ case "$1" in
     start)
         start && start_watchdog
         ;;
-
     startquiet)
         start
         ;;
-
     start_console)
         grep "$STORAGE_PATH" /proc/mounts >/dev/null 2>&1
         if [ $? -ne 0 ] || [ ! -d "$STORAGE_PATH" ]; then
@@ -159,24 +159,21 @@ case "$1" in
             return 1
         fi
 
-        $BIN_PATH -e --conf-file=$MEDIASERVER_DIR/etc/mediaserver.conf --msg-log-level=$HTTP_LOG_LEVEL
+        "$BIN_PATH" -e \
+            "--conf-file=$MEDIASERVER_DIR/etc/mediaserver.conf" "--msg-log-level=$HTTP_LOG_LEVEL"
         ;;
-
     start_gdb)
-        gdbserver 0.0.0.0:12345 $BIN_PATH -e --conf-file=$MEDIASERVER_DIR/etc/mediaserver.conf \
-            --msg-log-level=$HTTP_LOG_LEVEL
+        gdbserver 0.0.0.0:12345 "$BIN_PATH" -e \
+            "--conf-file=$MEDIASERVER_DIR/etc/mediaserver.conf" "--msg-log-level=$HTTP_LOG_LEVEL"
         ;;
-
     stop)
         stop_watchdog
         stop
         ;;
-
     kill)
         stop_watchdog
         stop -9
         ;;
-
     status)
         SERVICE_PID=$(pidof "$BIN_NAME")
         if [ ! -z "$SERVICE_PID" ]; then
@@ -187,13 +184,11 @@ case "$1" in
             exit 1
         fi
         ;;
-
     server_status)
         if [ $(pidof "$BIN_NAME") ]; then
             echo "1"
         fi
         ;;
-
     restart|reload|force-reload)
         stop_watchdog
         stop
@@ -202,19 +197,15 @@ case "$1" in
         done
         start && start_watchdog
         ;;
-
     start_watchdog)
         start_watchdog
         ;;
-
     run_watchdog)
         run_watchdog
         ;;
-
     stop_watchdog)
         stop_watchdog
         ;;
-
     *)
         echo "Usage: $0 {start|startquiet|stop|restart|status}"
         exit 1

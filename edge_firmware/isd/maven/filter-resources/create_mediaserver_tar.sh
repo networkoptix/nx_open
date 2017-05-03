@@ -1,25 +1,6 @@
 #!/bin/bash
 set -e
 
-# TODO: #mshevchenko: RESTORE
-if true; then
-    CUSTOMIZATION="digitalwatchdog"
-    PRODUCT_NAME="dwspectrum"
-    MODULE="mediaserver"
-    VERSION="3.0.0.0"
-    MAJOR_VERSION="3"
-    MINOR_VERSION="0"
-    BUILD_VERSION="0"
-    PACKAGE_NAME="dwspectrum-server-3.0.0.0-isd_s2-test.tar.gz"
-    UPDATE_NAME="dwspectrum-server_update-3.0.0.0-isd_s2-test.zip"
-    BUILD_OUTPUT_DIR="/home/mshevchenko/develop/nx_vms-edge/build_environment/target-isd_s2"
-    RESOURCE_BUILD_DIR="/home/mshevchenko/develop/nx_vms-edge/edge_firmware/isd/target-isd_s2"
-    LIBS_DIR="$BUILD_OUTPUT_DIR/lib/release"
-    BINS_DIR="$BUILD_OUTPUT_DIR/bin/release"
-    STRIP="/home/mshevchenko/develop/buildenv/packages/isd_s2/gcc-4.9.3/bin/arm-linux-gnueabihf-strip"
-    QT_DIR="/home/mshevchenko/develop/buildenv/packages/isd_s2/qt-5.6.1"
-    INSTALL_PATH="sdcard/$CUSTOMIZATION"
-else
 CUSTOMIZATION=${deb.customization.company.name}
 PRODUCT_NAME="${product.name.short}"
 MODULE="mediaserver"
@@ -36,7 +17,6 @@ BINS_DIR="$BUILD_OUTPUT_DIR/bin/${build.configuration}"
 STRIP="${packages.dir}/${rdep.target}/gcc-${gcc.version}/bin/arm-linux-gnueabihf-strip"
 QT_DIR="${qt.dir}"
 INSTALL_PATH="sdcard/$CUSTOMIZATION"
-fi
 
 help()
 {
@@ -102,6 +82,7 @@ copyLibs()
             "$STRIP" "$ROOT_DIR/$MODULE/lib/$LIB"
         fi
     done
+    # TODO: Use "find" instead of "*" to copy all libs except ".debug".
     rm "$ROOT_DIR/$MODULE/lib"/*.debug #< Delete debug symbol files copied above via "*".
 
     QT_LIBS_TO_COPY=( Core Gui Xml XmlPatterns Concurrent Network Sql Multimedia )
