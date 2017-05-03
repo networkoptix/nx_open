@@ -1417,6 +1417,12 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | NoTarget)
         .separator();
 
+    factory(MakeLayoutTourAction)
+        .flags(Tree | MultiTarget | ResourceTarget)
+        .text(tr("Make Layout Tour"))
+        .condition(condition::hasFlags(Qn::layout, All)
+            && !condition::isSafeMode());
+
     factory(CurrentLayoutSettingsAction)
         .flags(Scene | NoTarget)
         .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::EditLayoutSettingsPermission)

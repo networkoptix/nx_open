@@ -57,6 +57,16 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             menu()->trigger(action::ReviewLayoutTourAction, {Qn::UuidRole, tour.id});
         });
 
+    connect(action(action::MakeLayoutTourAction), &QAction::triggered, this,
+        [this]()
+        {
+            if (!menu()->triggerIfPossible(action::NewLayoutTourAction))
+                return;
+            const auto parameters = menu()->currentParameters(sender());
+            menu()->trigger(action::DropResourcesAction, parameters);
+            menu()->trigger(action::SaveCurrentLayoutTourAction);
+        });
+
     connect(action(action::RenameLayoutTourAction), &QAction::triggered, this,
         [this]()
         {
