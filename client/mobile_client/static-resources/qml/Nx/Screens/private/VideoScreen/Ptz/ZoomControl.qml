@@ -2,9 +2,7 @@ import QtQuick 2.6
 
 import Nx 1.0
 
-import "private" as Private
-
-Private.GenericValueControl
+GenericValueControl
 {
     id: control
 

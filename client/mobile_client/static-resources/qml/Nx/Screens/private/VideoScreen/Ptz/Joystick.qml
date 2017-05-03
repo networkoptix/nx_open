@@ -3,22 +3,14 @@ import QtQuick.Window 2.0
 
 import Nx 1.0
 
+import "joystick_utils.js" as JoystickUtils
+
 Rectangle
 {
     id: control
 
-
-    /**
-     * "direction" property specifies blah blah TODO: write comment
-     */
     property alias direction: d.movementVector
-    property int ptzType: 0
-
-    readonly property int kFreeWayPtz: 0
-    readonly property int kEightWayPtz: 1
-    readonly property int kFourWayPtz: 2
-    readonly property int kTwoWayHorizontal: 3
-    readonly property int kTwoWayVertical: 4
+    property int joystickType: 0
 
     signal buttonPressed(point direction)
     signal buttonReleased()
@@ -30,9 +22,10 @@ Rectangle
 
     Canvas
     {
-        id: drawer
+        id: customCanvas
 
-        property bool drawButtonBorders: ptzType != kEightWayPtz && ptzType != kFreeWayPtz
+        property bool drawButtonBorders: joystickType != JoystickUtils.Type.EightWayPtz
+            && joystickType != JoystickUtils.Type.FreeWayPtz
 
         anchors.centerIn: parent
         visible: drawButtonBorders || mouseArea.pressed
@@ -68,7 +61,8 @@ Rectangle
                 startColor, finishColor)
 
             var angle = mathHelpers.getAngle(d.radialVector)
-            var angleOffset = drawer.drawButtonBorders && control.ptzType != kFreeWayPtz
+            var angleOffset = customCanvas.drawButtonBorders
+                && control.joystickType != JoystickUtils.Type.FreeWayPtz
                 ? d.currentSectionData.step / 2
                 : Math.PI
 
@@ -113,28 +107,28 @@ Rectangle
 
         function drawBorders(context)
         {
-            var type = control.ptzType
+            var type = control.joystickType
             var center = d.centerPoint
             var radius = d.controlRadius
             var holeLength = markerShadow.width
 
             switch(type)
             {
-                case kTwoWayHorizontal:
+                case JoystickUtils.Type.TwoWayHorizontal:
                     var verticalOffset = Qt.vector2d(0, radius)
                     var topPoint = center.minus(verticalOffset)
                     var bottomPoint = center.plus(verticalOffset)
                     drawLineWithHole(context, topPoint, bottomPoint, holeLength)
                     return
 
-                case kTwoWayVertical:
+                case JoystickUtils.Type.TwoWayVertical:
                     var horizontalOffset = Qt.vector2d(radius, 0)
                     var leftPoint = center.minus(horizontalOffset)
                     var rightPoint = center.plus(horizontalOffset)
                     drawLineWithHole(context, leftPoint, rightPoint, holeLength)
                     return
 
-                case kFourWayPtz:
+                case JoystickUtils.Type.FourWayPtz:
                     var radial = mathHelpers.getRadialVector(radius, -Math.PI / 4)
                     var topRight = center.plus(radial)
                     var bottomLeft = center.minus(radial)
@@ -146,11 +140,10 @@ Rectangle
                     drawLineWithHole(context, bottomRight, topLeft, holeLength)
                     return
 
-                case kEightWayPtz: //< Fallthrough
-                case kFreeWayPtz: //< Fallthrough
+                case JoystickUtils.Type.EightWayPtz: //< Fallthrough
+                case JoystickUtils.Type.FreeWayPtz: //< Fallthrough
                 default:
                     return //< We don't need to draw delimiter lines
-
             }
         }
     }
@@ -228,16 +221,16 @@ Rectangle
             if (mathHelpers.pointInCircle(mousePos, d.centerPoint, d.markerRadius))
                 d.dragging = true
 
-            drawer.requestPaint()
+            customCanvas.requestPaint()
         }
 
         onReleased:
         {
             d.dragging = false
-            drawer.requestPaint()
+            customCanvas.requestPaint()
         }
-        onMouseXChanged: { drawer.requestPaint() }
-        onMouseYChanged: { drawer.requestPaint() }
+        onMouseXChanged: { customCanvas.requestPaint() }
+        onMouseYChanged: { customCanvas.requestPaint() }
     }
 
     Repeater
@@ -291,7 +284,7 @@ Rectangle
                 return centerPoint
 
 
-            if (control.ptzType == kFreeWayPtz)
+            if (control.joystickType == JoystickUtils.Type.FreeWayPtz)
                 return mathHelpers.directionToPosition(mouseVector, controlRadius, true)
 
             if (!currentSectionData || currentSectionIndex == -1 || currentSectionId == -1)
@@ -340,17 +333,17 @@ Rectangle
 
         property var currentSectionData:
         {
-            switch(control.ptzType)
+            switch(control.joystickType)
             {
-                case kTwoWayHorizontal:
+                case JoystickUtils.Type.TwoWayHorizontal:
                     return kTwoWayHorizontalSectorData
-                case kTwoWayVertical:
+                case JoystickUtils.Type.TwoWayVertical:
                     return kTwoWayVerticalSectorData
-                case kFourWayPtz:
+                case JoystickUtils.Type.FourWayPtz:
                     return kFourWayPtzSectorData
-                case kEightWayPtz:
+                case JoystickUtils.Type.EightWayPtz:
                     return kEightWayPtzSectorData
-                case kFreeWayPtz:
+                case JoystickUtils.Type.FreeWayPtz:
                     return kFreeWayPtzSectorData
                 default:
                     return null //< No ptz supported
@@ -359,7 +352,7 @@ Rectangle
 
         property int currentSectionIndex:
         {
-            if (control.ptzType == kFreeWayPtz || !currentSectionData)
+            if (control.joystickType == JoystickUtils.Type.FreeWayPtz || !currentSectionData)
                 return -1
 
             var sectorsCount = currentSectionData.sectorsMapping.length
@@ -379,7 +372,8 @@ Rectangle
 
         property int currentSectionId:
         {
-            return control.ptzType == kFreeWayPtz || currentSectionIndex < 0 || !currentSectionData
+            return control.joystickType == JoystickUtils.Type.FreeWayPtz
+                || currentSectionIndex < 0 || !currentSectionData
                 ? -1
                 : currentSectionData.sectorsMapping[currentSectionIndex]
         }

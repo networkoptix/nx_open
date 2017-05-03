@@ -3,8 +3,6 @@ import QtQuick 2.6
 import Nx 1.0
 import Nx.Controls 1.0
 
-import "private"
-
 GenericValueControl
 {
     id: control

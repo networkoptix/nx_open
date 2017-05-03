@@ -4,7 +4,8 @@ import Nx.Media 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
 import Nx.Models 1.0
-import Nx.Core 1.0 //< Remove me!
+
+import com.networkoptix.qml 1.0
 
 import "private/VideoScreen"
 
@@ -254,190 +255,15 @@ PageBase
             }
         }
 
-
-        PtzController
-        {
-            id: ptzController
-
-            uniqueResourceId: videoScreenController.resourceHelper.resourceId
-
-            property bool supportsPresets:
-                ptzController.capabilities & Ptz.PresetsPtzCapability
-        }
-
-        Column
+        PtzPanel
         {
             id: ptzPanel
 
-            anchors.bottom: parent.bottom
             x: 8
             width: parent.width - x * 2
+            anchors.bottom: parent.bottom
 
-            visible: ptzController.available
-
-            spacing: 8
-
-            Item
-            {
-                id: topPtzPanel
-
-                width: parent.width
-                height: Math.max(zoomFocusRow.height, ptzJoystick.height)
-
-                Row
-                {
-                    id: zoomFocusRow
-
-                    spacing: 8
-
-                    PtzFocusControl
-                    {
-                        id: focusPanel
-
-                        property bool continuousFocusEnabled:
-                            ptzController.capabilities & Ptz.ContinuousFocusCapability
-
-                        visible: continuousFocusEnabled
-                        supportsAutoFocus: ptzController.auxTraits & Ptz.ManualAutoFocusPtzTrait
-
-                        onFocusInPressedChanged:
-                        {
-                            var focusSpeed = focusInPressed ? 1.0 : 0
-                            ptzController.continuousFocus(focusSpeed)
-                        }
-
-                        onFocusOutPressedChanged:
-                        {
-                            var focusSpeed = focusOutPressed ? -1.0 : 0
-                            ptzController.continuousFocus(focusSpeed)
-                        }
-
-                        onAutoFocusClicked: { ptzController.setAutoFocus() }
-                    }
-
-                    PtzZoomControl
-                    {
-                        onZoomInPressedChanged:
-                        {
-                            var zoomVector = zoomInPressed
-                                ? Qt.vector3d(0, 0, 0.5)
-                                : Qt.vector3d(0, 0, 0)
-
-                            ptzController.continuousMove(zoomVector)
-                        }
-
-                        onZoomOutPressedChanged:
-                        {
-                            var zoomVector = zoomOutPressed
-                                ? Qt.vector3d(0, 0, -0.5)
-                                : Qt.vector3d(0, 0, 0)
-
-                            ptzController.continuousMove(zoomVector)
-                        }
-                    }
-                }
-
-                PtzJoystick
-                {
-                    id: ptzJoystick
-
-                    ptzType:
-                    {
-                        if (!enabled)
-                            return -1
-
-                        var caps = ptzController.capabilities
-                        if (caps & Ptz.ContinuousPanTiltCapabilities)
-                        {
-                            if (caps & Ptz.EightWayPtzTrait)
-                                return kEightWayPtz
-                            if (caps & Ptz.FourWayPtzTrait)
-                                return kFourWayPtz
-
-                            return kFreeWayPtz
-                        }
-
-                        if (caps & Ptz.ContinuousPanCapability)
-                            return kTwoWayHorizontal
-
-                        if (caps & Ptz.ContinuousTiltCapability)
-                            return kTwoWayVertical
-
-                        return -1
-                    }
-
-                    visible: enabled;
-                    anchors.bottom: parent.bottom
-                    anchors.right: parent.right
-                    enabled: ptzController &&
-                        (ptzController.capabilities & Ptz.ContinuousPanCapability
-                        || ptzController.capabilities & Ptz.ContinuousTiltCapability)
-
-
-                    onDirectionChanged:
-                    {
-                        ptzController.continuousMove(Qt.vector3d(direction.x, direction.y, 0))
-                    }
-                }
-            }
-
-            Item
-            {
-                id: bottomPtzPanel
-
-                width: parent.width
-                height: Math.max(presetsItem.height)
-
-                Row
-                {
-                    anchors.left: parent.left
-                    anchors.right: hidePtzButton.left
-                    visible: ptzController.presetsCount && ptzController.supportsPresets
-
-                    PtzPresetsButton
-                    {
-                        id: goToPresetMenu
-
-                        uniqueResourceId: ptzController.uniqueResourceId
-                        popupParent: videoScreen
-
-                        onPresetChoosen: { ptzController.setPresetById(id) }
-                    }
-
-                    PtzPresetsItem
-                    {
-                        id: presetsItem
-
-
-                        visible: ptzController.presetsCount && ptzController.supportsPresets
-
-                        presetsCount: ptzController.presetsCount
-                        currentPresetIndex: ptzController.activePresetIndex
-
-                        onGoToPreset:
-                        {
-                            if (presetIndex == -1)
-                                return;
-
-                            ptzController.setPresetByIndex(presetIndex)
-                        }
-                    }
-                }
-
-                Button
-                {
-                    id: hidePtzButton
-
-                    width: 48
-                    height: width
-                    anchors.right: parent.right
-                    anchors.rightMargin: 4
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    flat: true
-                    icon: lp("/images/close.png")
-                }
-            }
+            uniqueResourceId: videoScreenController.resourceHelper.resourceId
         }
 
         Loader
@@ -447,7 +273,7 @@ PageBase
             anchors.bottom: parent.bottom
             width: parent.width
 
-            visible: opacity > 0 && !ptzController.available
+            visible: opacity > 0 && !ptzPanel.visible
             opacity: Math.min(d.uiOpacity, d.navigationOpacity)
 
             sourceComponent:
