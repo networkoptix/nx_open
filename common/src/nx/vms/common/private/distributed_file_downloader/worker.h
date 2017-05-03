@@ -1,9 +1,12 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QBitArray>
 
 #include <nx/utils/uuid.h>
 #include <api/server_rest_connection_fwd.h>
+
+#include "../../distributed_file_downloader.h"
 
 class QTimer;
 
@@ -22,6 +25,19 @@ class Worker: public QObject
     using base_type = QObject;
 
 public:
+    enum class State
+    {
+        initial,
+        requestingFileInformation,
+        foundFileInformation,
+        requestingAvailableChunks,
+        foundAvailableChunks,
+        requestingChecksums,
+        downloadingChunks,
+        finished
+    };
+    Q_ENUM(State)
+
     Worker(
         const QString& fileName,
         Storage* storage,
@@ -31,20 +47,41 @@ public:
 
     void start();
 
+    State state() const;
+
+    int peersPerOperation() const;
+    void setPeersPerOperation(int peersPerOperation);
+
+    bool haveChunksToDownload();
+
 signals:
     void finished(const QString& fileName);
 
 private:
+    void setState(State state);
     void nextStep();
-    void findFileInformation();
-    void findChunksInformation();
+    void requestFileInformationInternal();
+    void requestFileInformation();
+    void requestAvailableChunks();
+    void requestChecksums();
     void downloadNextChunk();
 
     void cancelRequests();
 
+    void finish();
+
     QString logMessage(const char* message) const;
 
+    bool addAvailableChunksInfo(const QBitArray& chunks);
+    QList<QnUuid> peersForChunk(int chunkIndex) const;
+
 protected:
+    DownloaderFileInformation fileInformation() const;
+
+    QList<QnUuid> selectPeersForOperation(
+        int count = -1, const QList<QnUuid>& referencePeers = QList<QnUuid>());
+    int selectNextChunk() const;
+
     virtual void waitForNextStep(int delay = -1);
 
 private:
@@ -52,9 +89,24 @@ private:
     AbstractPeerManager* m_peerManager;
     const QString m_fileName;
 
+    State m_state = State::initial;
+
     bool m_started = false;
     QTimer* m_stepDelayTimer;
     QHash<rest::Handle, QnUuid> m_peerByRequestHandle;
+
+    QBitArray m_availableChunks;
+
+    int m_peersPerOperation = 1;
+    struct PeerInformation
+    {
+        QBitArray downloadedChunks;
+        int rank = 0;
+
+        void increaseRank(int value = 1);
+        void decreaseRank(int value = 1);
+    };
+    QHash<QnUuid, PeerInformation> m_peerInfoById;
 };
 
 } // namespace distributed_file_downloader

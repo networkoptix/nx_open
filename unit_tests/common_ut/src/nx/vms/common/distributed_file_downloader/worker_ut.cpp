@@ -15,7 +15,8 @@ namespace test {
 namespace {
 
 static const QString kTestFileName("test.dat");
-static const qint64 kTestFileSize = 1024 * 1024 * 4 + 42;
+static const qint64 kTestFileSize = 42;
+static const int kChunkSize = 4;
 
 } // namespace
 
@@ -23,6 +24,7 @@ class TestWorker: public Worker
 {
 public:
     using Worker::Worker;
+    using Worker::selectPeersForOperation;
 
     virtual void waitForNextStep(int /*delay*/) override
     {
@@ -45,7 +47,17 @@ protected:
     {
         workingDirectory = QDir::temp().absoluteFilePath("__tmp_dfd_worker_test");
         workingDirectory.removeRecursively();
-        ASSERT_TRUE(QDir().mkpath(workingDirectory.absolutePath()));
+        NX_ASSERT(QDir().mkpath(workingDirectory.absolutePath()));
+
+        peerManager = new TestPeerManager();
+        storage.reset(createStorage("default"));
+        worker.reset(new TestWorker(kTestFileName, storage.data(), peerManager));
+    }
+
+    virtual void TearDown() override
+    {
+        worker.reset();
+        storage.reset();
     }
 
     TestPeerManager::FileInformation createTestFile(
@@ -56,28 +68,43 @@ protected:
         if (!directory.exists())
         {
             if (!QDir().mkpath(directory.absolutePath()))
+            {
+                NX_ASSERT("Cannot create directory for test file.");
                 return TestPeerManager::FileInformation();
+            }
         }
 
         if (!utils::createTestFile(fileInfo.absoluteFilePath(), size))
+        {
+            NX_ASSERT("Cannot create test file.");
             return TestPeerManager::FileInformation();
+        }
 
         TestPeerManager::FileInformation testFileInfo(kTestFileName);
         testFileInfo.filePath = workingDirectory.absoluteFilePath(fileName);
+        testFileInfo.chunkSize = kChunkSize;
         testFileInfo.size = kTestFileSize;
         testFileInfo.md5 = Storage::calculateMd5(testFileInfo.filePath);
         if (testFileInfo.md5.isEmpty())
+        {
+            NX_ASSERT("Cannot calculate md5 for file.");
             return TestPeerManager::FileInformation();
+        }
+        testFileInfo.downloadedChunks.resize(
+            Storage::calculateChunkCount(testFileInfo.size, testFileInfo.chunkSize));
 
         return testFileInfo;
     }
 
-    std::unique_ptr<Storage> createStorage(const QString& name)
+    Storage* createStorage(const QString& name)
     {
         if (!workingDirectory.mkpath(name))
+        {
+            NX_ASSERT("Cannot create storage directory");
             return nullptr;
+        }
 
-        return std::make_unique<Storage>(workingDirectory.absoluteFilePath(name));
+        return new Storage(workingDirectory.absoluteFilePath(name));
     }
 
     void addPeerWithFile(TestPeerManager* peerManager,
@@ -88,23 +115,40 @@ protected:
     }
 
     QDir workingDirectory;
+    TestPeerManager* peerManager;
+    QScopedPointer<Storage> storage;
+    QScopedPointer<TestWorker> worker;
 };
+
+TEST_F(DistributedFileDownloaderWorkerTest, simplePeerSelection)
+{
+    constexpr int kPeersPerOperation = 5;
+    worker->setPeersPerOperation(kPeersPerOperation);
+
+    peerManager->addPeer(QnUuid::createUuid());
+    peerManager->addPeer(QnUuid::createUuid());
+
+    auto peers = worker->selectPeersForOperation();
+    ASSERT_EQ(peers.size(), 2);
+
+    peerManager->addPeer(QnUuid::createUuid());
+    peerManager->addPeer(QnUuid::createUuid());
+    peerManager->addPeer(QnUuid::createUuid());
+    peerManager->addPeer(QnUuid::createUuid());
+
+    peers = worker->selectPeersForOperation();
+    ASSERT_EQ(peers.size(), kPeersPerOperation);
+}
 
 TEST_F(DistributedFileDownloaderWorkerTest, requestingFileInfo)
 {
     const auto& fileInfo = createTestFile();
-    ASSERT_TRUE(fileInfo.isValid());
 
-    auto peerManager = new TestPeerManager();
     addPeerWithFile(peerManager, fileInfo);
-
-    auto storage = createStorage("worker");
-    ASSERT_TRUE(storage);
     storage->addFile(fileInfo.name);
 
-    TestWorker worker(fileInfo.name, storage.get(), peerManager);
-
-    worker.start();
+    worker->start();
+    peerManager->processRequests();
 
     const auto& newFileInfo = storage->fileInformation(fileInfo.name);
     ASSERT_TRUE(newFileInfo.isValid());
@@ -114,26 +158,25 @@ TEST_F(DistributedFileDownloaderWorkerTest, requestingFileInfo)
 
 TEST_F(DistributedFileDownloaderWorkerTest, simpleDownload)
 {
-    const auto& fileInfo = createTestFile();
-    ASSERT_TRUE(fileInfo.isValid());
+    auto fileInfo = createTestFile();
+    NX_ASSERT(storage->addFile(fileInfo) == DistributedFileDownloader::ErrorCode::noError);
 
-    auto peerManager = new TestPeerManager();
+    fileInfo.downloadedChunks.fill(
+        true, Storage::calculateChunkCount(fileInfo.size, fileInfo.chunkSize));
+
     addPeerWithFile(peerManager, fileInfo);
-
-    auto storage = createStorage("worker");
-    ASSERT_EQ(storage->addFile(fileInfo), DistributedFileDownloader::ErrorCode::noError);
 
     bool finished = false;
 
-    TestWorker worker(fileInfo.name, storage.get(), peerManager);
-    QObject::connect(&worker, &Worker::finished, [&finished] { finished = true; });
+    QObject::connect(worker.data(), &Worker::finished, [&finished] { finished = true; });
 
-    worker.start();
+    worker->start();
+    peerManager->processRequests();
 
-    for (int i = 0; i < fileInfo.downloadedChunks.size() - 1; ++i)
+    for (int i = 0; i < fileInfo.downloadedChunks.size(); ++i)
     {
         ASSERT_FALSE(finished);
-        worker.waitForNextStep(0);
+        peerManager->processRequests();
     }
     ASSERT_TRUE(finished);
 
