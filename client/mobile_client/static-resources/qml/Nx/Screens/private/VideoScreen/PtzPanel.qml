@@ -8,20 +8,15 @@ import "Ptz/joystick_utils.js" as JoystickUtils
 
 Column
 {
-    id: ptzPanel
+    id: control
 
-    property alias uniqueResourceId: ptzController.uniqueResourceId
-
-    visible: ptzController.available
-    spacing: 8
-
-    PtzController
+    property PtzController controller: PtzController
     {
-        id: ptzController
-
-        property bool supportsPresets:
-            ptzController.capabilities & Ptz.PresetsPtzCapability
+        property bool supportsPresets: capabilities & Ptz.PresetsPtzCapability
     }
+
+    visible: false
+    spacing: 8
 
     Item
     {
@@ -38,25 +33,29 @@ Column
 
             FocusControl
             {
+                id: focusControl
+
                 anchors.bottom: parent.bottom
-                visible: ptzController.capabilities & Ptz.ContinuousFocusCapability
-                supportsAutoFocus: ptzController.auxTraits & Ptz.ManualAutoFocusPtzTrait
+                visible: controller.capabilities & Ptz.ContinuousFocusCapability
+                supportsAutoFocus: controller.auxTraits & Ptz.ManualAutoFocusPtzTrait
 
                 onFocusInPressedChanged: moveFocus(focusInPressed, 1)
                 onFocusOutPressedChanged: moveFocus(focusOutPressed, -1)
-                onAutoFocusClicked: ptzController.setAutoFocus()
+                onAutoFocusClicked: controller.setAutoFocus()
 
                 function moveFocus(shouldMove, speed)
                 {
                     var focusSpeed = shouldMove? speed : 0
-                    ptzController.continuousFocus(focusSpeed)
+                    controller.continuousFocus(focusSpeed)
                 }
             }
 
             ZoomControl
             {
+                id: zoomControl
+
                 anchors.bottom: parent.bottom
-                visible: ptzController.capabilities & Ptz.ContinuousZoomCapability
+                visible: controller.capabilities & Ptz.ContinuousZoomCapability
 
                 onZoomInPressedChanged: zoomMove(zoomInPressed, 0.5)
                 onZoomOutPressedChanged: zoomMove(zoomOutPressed, -0.5)
@@ -67,7 +66,7 @@ Column
                         ? Qt.vector3d(0, 0, speed)
                         : Qt.vector3d(0, 0, 0)
 
-                    ptzController.continuousMove(zoomVector)
+                    controller.continuousMove(zoomVector)
                 }
             }
         }
@@ -81,7 +80,7 @@ Column
                 if (!visible)
                     return JoystickUtils.Type.Any
 
-                var caps = ptzController.capabilities
+                var caps = controller.capabilities
                 if (caps & Ptz.ContinuousPanTiltCapabilities)
                 {
                     if (caps & Ptz.EightWayPtzTrait)
@@ -103,13 +102,13 @@ Column
 
             anchors.bottom: parent.bottom
             anchors.right: parent.right
-            visible: ptzController &&
-                (ptzController.capabilities & Ptz.ContinuousPanCapability
-                || ptzController.capabilities & Ptz.ContinuousTiltCapability)
+            visible: controller &&
+                (controller.capabilities & Ptz.ContinuousPanCapability
+                || controller.capabilities & Ptz.ContinuousTiltCapability)
 
             onDirectionChanged:
             {
-                ptzController.continuousMove(Qt.vector3d(direction.x, direction.y, 0))
+                controller.continuousMove(Qt.vector3d(direction.x, direction.y, 0))
             }
         }
     }
@@ -123,29 +122,30 @@ Column
         {
             anchors.left: parent.left
             anchors.right: hidePtzButton.left
-            visible: ptzController.presetsCount && ptzController.supportsPresets
+            visible: controller.presetsCount && controller.supportsPresets
 
             PresetsButton
             {
-                uniqueResourceId: ptzController.uniqueResourceId
+                visible: presetsItem.visible
+                uniqueResourceId: controller.uniqueResourceId
                 popupParent: videoScreen
 
-                onPresetChoosen: ptzController.setPresetById(id)
+                onPresetChoosen: controller.setPresetById(id)
             }
 
             PresetsListItem
             {
                 id: presetsItem
 
-                presetsCount: ptzController.presetsCount
-                currentPresetIndex: ptzController.activePresetIndex
+                presetsCount: controller.presetsCount
+                currentPresetIndex: controller.activePresetIndex
 
-                visible: ptzController.presetsCount && ptzController.supportsPresets
+                visible: controller.presetsCount && controller.supportsPresets
 
                 onGoToPreset:
                 {
                     if (presetIndex != -1)
-                        ptzController.setPresetByIndex(presetIndex)
+                        controller.setPresetByIndex(presetIndex)
                 }
             }
         }
@@ -162,6 +162,8 @@ Column
 
             flat: true
             icon: lp("/images/close.png")
+
+            onClicked: control.visible = false
         }
     }
 }

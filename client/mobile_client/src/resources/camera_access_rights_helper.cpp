@@ -22,6 +22,11 @@ public:
     QnUserResourcePtr user;
     QnVirtualCameraResourcePtr camera;
     bool canViewArchive;
+    bool canManagePtz;
+
+private:
+    void setCanViewArchive(bool value);
+    void setCanManagePtz(bool value);
 };
 
 QnCameraAccessRightsHelper::QnCameraAccessRightsHelper(QObject *parent)
@@ -64,6 +69,11 @@ bool QnCameraAccessRightsHelper::canViewArchive() const
     return d->canViewArchive;
 }
 
+bool QnCameraAccessRightsHelper::canManagePtz() const
+{
+    Q_D(const QnCameraAccessRightsHelper);
+    return d->canManagePtz;
+}
 
 QnCameraAccessRightsHelperPrivate::QnCameraAccessRightsHelperPrivate(QnCameraAccessRightsHelper *q)
     : q_ptr(q)
@@ -71,19 +81,35 @@ QnCameraAccessRightsHelperPrivate::QnCameraAccessRightsHelperPrivate(QnCameraAcc
 {
 }
 
-void QnCameraAccessRightsHelperPrivate::updateAccessRights()
+void QnCameraAccessRightsHelperPrivate::setCanViewArchive(bool value)
 {
-    if (camera && user)
-    {
-        canViewArchive = qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalViewArchivePermission);
-    }
-    else
-    {
-        canViewArchive = false;
-    }
+    if (canViewArchive == value)
+        return;
+
+    canViewArchive = value;
 
     Q_Q(QnCameraAccessRightsHelper);
     emit q->canViewArchiveChanged();
+}
+
+void QnCameraAccessRightsHelperPrivate::setCanManagePtz(bool value)
+{
+    if (canManagePtz == value)
+        return;
+
+    canManagePtz = value;
+
+    Q_Q(QnCameraAccessRightsHelper);
+    emit q->canManagePtzChanged();
+}
+
+void QnCameraAccessRightsHelperPrivate::updateAccessRights()
+{
+    setCanViewArchive(camera && user
+        && qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalViewArchivePermission));
+
+    setCanManagePtz(camera && user
+        && qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalUserInputPermission));
 }
 
 void QnCameraAccessRightsHelperPrivate::at_userWatcher_userChanged(const QnUserResourcePtr &newUser)
