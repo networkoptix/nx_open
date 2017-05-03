@@ -381,9 +381,9 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         var $window = $(window);
         var $top = $('#top');
-        var $viewPanel = $('.view-panel');
-        var $camerasPanel = $('.cameras-panel');
         var updateHeights = function() {
+            var $viewPanel = $('.view-panel');
+            var $camerasPanel = $('.cameras-panel');
             var windowHeight = $window.height();
             var topHeight = $top.outerHeight();
 
@@ -395,7 +395,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
 
             var viewportHeight = (windowHeight - topHeight - topAlertHeight) + 'px';
-
+            
             $camerasPanel.css('height',viewportHeight );
             $viewPanel.css('height',viewportHeight );
 
@@ -406,8 +406,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
         };
 
-        updateHeights();
-        setTimeout(updateHeights,50);
+        setTimeout(function(){updateHeights();},10);
         $window.resize(updateHeights);
 
         $scope.mobileAppAlertClose = function(){

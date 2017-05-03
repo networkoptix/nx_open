@@ -163,7 +163,6 @@ angular.module('webadminApp')
         }
         return {
             start:function(handler){
-                animations = [];
                 animationRunning = true;
                 animationHandler = handler;
                 animationFunction(true);
@@ -213,6 +212,14 @@ angular.module('webadminApp')
             },
             setScope:function(scope){
                 defaultScope = scope;
+            },
+            stopScope:function(scope){
+                var targetAnimation = _.find(animations,function(anim){ // Try to find,if there
+                    return anim.scope === scope && anim.value === value;
+                });
+                if(targetAnimation){
+                    targetAnimation.breakAnimation();
+                } 
             }
         };
     }]);

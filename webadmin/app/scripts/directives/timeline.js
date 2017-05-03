@@ -463,7 +463,7 @@ angular.module('webadminApp')
                 animateScope.setDuration(timelineConfig.animationDuration);
                 animateScope.setScope(scope);
                 animateScope.start(render);
-                scope.$on('$destroy', function() { animateScope.stop(); });
+                scope.$on('$destroy', function() { animateScope.stopScope(scope); });
             }
         };
     }]);
