@@ -47,7 +47,7 @@ describe('Smoke test:', function () {
         element.all(by.cssContainingText('h2', 'katya_korneevas_property')).first().click();
 
         browser.sleep(1000);
-        helper.waitIfNotPresent(userStrings,100);
+        helper.waitIfNotPresent(userList, 100);
         expect(userList.isDisplayed()).toBe(true);
     });
 
