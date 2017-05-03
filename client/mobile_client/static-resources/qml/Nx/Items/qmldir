@@ -11,5 +11,3 @@ VideoPositioner 1.0 VideoPositioner.qml
 MultiVideoOutput 1.0 MultiVideoOutput.qml
 DummyMessage 1.0 DummyMessage.qml
 IssueLabel 1.0 IssueLabel.qml
-PtzPresetsItem 1.0 PtzPresetsItem.qml
-PtzPresetsButton 1.0 PtzPresetsButton.qml
