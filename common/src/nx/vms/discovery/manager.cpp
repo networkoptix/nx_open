@@ -12,6 +12,7 @@ namespace discovery {
 Manager::Manager(QnCommonModule* commonModule, bool clientMode, QnResourcePool* resourcePool):
     QnCommonModuleAware(commonModule)
 {
+    qRegisterMetaType<nx::vms::discovery::Manager::ModuleData>();
     initializeConnector();
     initializeMulticastFinders(clientMode);
     monitorServerUrls(resourcePool);
@@ -96,6 +97,27 @@ void Manager::checkEndpoint(const QUrl& url)
     checkEndpoint(SocketAddress(url.host(), (uint16_t) url.port()));
 }
 
+static bool isChanged(const Manager::ModuleData& lhs, const Manager::ModuleData& rhs)
+{
+    return lhs.type == rhs.type
+        && lhs.customization == rhs.customization
+        && lhs.brand == rhs.brand
+        && lhs.version == rhs.version
+        && lhs.systemName == rhs.systemName
+        && lhs.name == rhs.name
+        && lhs.port == rhs.port
+        && lhs.sslAllowed == rhs.sslAllowed
+        && lhs.protoVersion == rhs.protoVersion
+        && lhs.runtimeId == rhs.runtimeId
+        && lhs.serverFlags == rhs.serverFlags
+        && lhs.ecDbReadOnly == rhs.ecDbReadOnly
+        && lhs.cloudSystemId == rhs.cloudSystemId
+        && lhs.cloudPortalUrl == rhs.cloudPortalUrl
+        && lhs.cloudHost == rhs.cloudHost
+        && lhs.localSystemId == rhs.localSystemId
+        && lhs.endpoint == rhs.endpoint;
+}
+
 void Manager::initializeConnector()
 {
     m_moduleConnector = std::make_unique<ModuleConnector>();
@@ -107,29 +129,36 @@ void Manager::initializeConnector()
                 return conflict(module);
 
             bool isNew = false;
-            ModuleData* iterator = nullptr;
             {
                 QnMutexLocker lock(&m_mutex);
                 const auto insert = m_modules.emplace(module.id, module);
-                iterator = &insert.first->second;
-                isNew = insert.second;
+                if (insert.second)
+                {
+                    isNew = true;
+                }
+                else
+                {
+                    if (!isChanged(insert.first->second, module))
+                        return;
+
+                    insert.first->second = module;
+                }
             }
 
             if (isNew)
             {
                 NX_LOGX(lm("Found module %1, endpoint %2").strs(information.id, endpoint),
                     cl_logDEBUG1);
-                return found(module);
-            }
 
-            if (*iterator != module)
+                emit found(module);
+            }
+            else
             {
                 NX_LOGX(lm("Changed module %1, endpoint %2").strs(information.id, endpoint),
                     cl_logDEBUG1);
-                return changed(module);
-            }
 
-            NX_ASSERT(false);
+                emit changed(module);
+            }
         });
 
     m_moduleConnector->setDisconnectHandler(
@@ -141,6 +170,8 @@ void Manager::initializeConnector()
             {
                 m_modules.erase(it);
                 lock.unlock();
+
+                NX_LOGX(lm("Lost module %1").strs(id), cl_logDEBUG1);
                 emit lost(id);
             }
         });

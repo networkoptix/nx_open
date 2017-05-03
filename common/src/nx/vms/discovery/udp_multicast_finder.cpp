@@ -77,7 +77,9 @@ void UdpMulticastFinder::makeInterface(const HostAddress& ip)
     interface = std::make_unique<Interface>(
         getAioThread(), ip, [this, iterator] { m_interfaces.erase(iterator); });
 
-    interface->updateData(&m_ownModuleInformation);
+    if (!m_ownModuleInformation.isEmpty())
+        interface->updateData(&m_ownModuleInformation);
+
     interface->readForever(
         [this](const Buffer& buffer)
         {
@@ -97,8 +99,10 @@ UdpMulticastFinder::Interface::Interface(
     m_errorHandler(std::move(errorHandler))
 {
     m_socket.bindToAioThread(thread);
-    if (!m_socket.setNonBlockingMode(true) || !m_socket.setReuseAddrFlag(true)
-        || !m_socket.bind(SocketAddress(localIp, kMulticastEndpoint.port)))
+    if (!m_socket.setNonBlockingMode(true)
+        || !m_socket.setReuseAddrFlag(true)
+        || !m_socket.bind(SocketAddress(localIp, kMulticastEndpoint.port))
+        || !m_socket.joinGroup(kMulticastEndpoint.address.toString(), localIp.toString()))
     {
         m_socket.post(
             [this, code = SystemError::getLastOSErrorCode()] { handleError("init", code); });
@@ -146,7 +150,7 @@ void UdpMulticastFinder::Interface::readData()
     m_inData.reserve(kMaxDatagramSize); // ~ MTU
     m_inData.resize(0);
     m_socket.recvFromAsync(&m_inData,
-        [this](SystemError::ErrorCode code, SocketAddress endpoint, size_t size)
+        [this](SystemError::ErrorCode code, SocketAddress endpoint, size_t /*size*/)
         {
             if (code != SystemError::noError)
                 return handleError("recv", code);

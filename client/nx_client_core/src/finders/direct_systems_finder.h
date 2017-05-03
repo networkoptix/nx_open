@@ -16,15 +16,13 @@ class QnDirectSystemsFinder : public QnAbstractSystemsFinder
 public:
     QnDirectSystemsFinder(QObject *parent = nullptr);
 
-    virtual ~QnDirectSystemsFinder();
-
 public: // overrides
     SystemDescriptionList systems() const override;
 
     QnSystemDescriptionPtr getSystem(const QString &id) const override;
 
 private:
-    void addServer(nx::vms::discovery::Manager::ModuleData moduleInformation);
+    void addServer(nx::vms::discovery::Manager::ModuleData module);
     void removeServer(QnUuid id);
 
     typedef QHash<QString, QnSystemDescription::PointerType> SystemsHash;

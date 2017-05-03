@@ -11,13 +11,10 @@
 QnServerInterfaceWatcher::QnServerInterfaceWatcher(QObject *parent) :
     QObject(parent)
 {
-    const auto moduleManager = commonModule()->moduleDiscoveryManager();
-    connect(moduleManager, &nx::vms::discovery::Manager::found,
-        this, &QnServerInterfaceWatcher::at_connectionChanged);
-    connect(moduleManager, &nx::vms::discovery::Manager::changed,
-        this, &QnServerInterfaceWatcher::at_connectionChanged);
-    connect(moduleManager, &nx::vms::discovery::Manager::lost,
-        this, &QnServerInterfaceWatcher::at_connectionChangedById);
+    commonModule()->moduleDiscoveryManager()->onSignals(this,
+        &QnServerInterfaceWatcher::at_connectionChanged,
+         &QnServerInterfaceWatcher::at_connectionChanged,
+         &QnServerInterfaceWatcher::at_connectionChangedById);
 
     connect(resourcePool(), &QnResourcePool::statusChanged,
         this, &QnServerInterfaceWatcher::at_resourcePool_statusChanged);

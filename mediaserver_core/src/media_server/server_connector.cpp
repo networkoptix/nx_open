@@ -81,20 +81,15 @@ void QnServerConnector::removeConnection(const QnUuid& id)
 
 void QnServerConnector::start()
 {
-    const auto moduleManager = commonModule()->moduleDiscoveryManager();
-    moduleManager->onSignals(this,
+    commonModule()->moduleDiscoveryManager()->onSignals(this,
         &QnServerConnector::at_moduleChanged,
         &QnServerConnector::at_moduleChanged,
         &QnServerConnector::at_moduleLost);
-
-    for(const auto& module: moduleManager->getAll())
-        at_moduleChanged(module);
 }
 
 void QnServerConnector::stop()
 {
-    const auto moduleManager = commonModule()->moduleDiscoveryManager();
-    moduleManager->disconnect(this);
+    commonModule()->moduleDiscoveryManager()->disconnect(this);
 
     decltype(m_urls) usedUrls;
     {

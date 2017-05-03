@@ -48,7 +48,7 @@ private:
 
         void connect(Endpoints::iterator endpointsGroup);
         boost::optional<QnModuleInformation> getInformation(nx_http::AsyncHttpClientPtr client);
-        void saveConnection(SocketAddress endpoint, nx_http::AsyncHttpClientPtr client,
+        bool saveConnection(SocketAddress endpoint, nx_http::AsyncHttpClientPtr client,
             const QnModuleInformation& information);
 
     private:

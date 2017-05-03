@@ -248,14 +248,10 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
     /* Should be done after model resetting to avoid state loss. */
     ui->autoLoginCheckBox->setChecked(qnSettings->autoLogin());
 
-    const auto moduleManager = commonModule()->moduleDiscoveryManager();
-    moduleManager->onSignals(this,
+    commonModule()->moduleDiscoveryManager()->onSignals(this,
         &QnLoginDialog::at_moduleChanged,
         &QnLoginDialog::at_moduleChanged,
         &QnLoginDialog::at_moduleLost);
-
-    for(const auto& module: moduleManager->getAll())
-        at_moduleChanged(module);
 }
 
 QnLoginDialog::~QnLoginDialog()

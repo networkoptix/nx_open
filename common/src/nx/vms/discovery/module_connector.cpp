@@ -58,11 +58,12 @@ ModuleConnector::Module::Module(ModuleConnector* parent, const QnUuid& id):
     m_id(id)
 {
     m_timer.bindToAioThread(parent->getAioThread());
-    NX_LOGX(lm("New %1").strs(id), cl_logDEBUG1);
+    NX_LOGX(lm("New %1").strs(m_id), cl_logDEBUG1);
 }
 
 ModuleConnector::Module::~Module()
 {
+    NX_LOGX(lm("Delete %1").strs(m_id), cl_logDEBUG1);
     NX_ASSERT(m_timer.isInSelfAioThread());
     m_socket.reset();
     for (const auto& client: m_httpClients)
@@ -125,12 +126,17 @@ void ModuleConnector::Module::connect(Endpoints::iterator endpointsGroup)
                 if (moduleInformation)
                 {
                     if (moduleInformation->id == m_id)
-                        return saveConnection(endpoint, std::move(client), *moduleInformation);
-
-                    // Transfer this connection to a different module.
-                    endpointsGroup->second.erase(endpoint);
-                    m_parent->getModule(moduleInformation->id)
-                        ->saveConnection(endpoint, std::move(client), *moduleInformation);
+                    {
+                        if (saveConnection(endpoint, std::move(client), *moduleInformation))
+                            return;
+                    }
+                    else
+                    {
+                        // Transfer this connection to a different module.
+                        endpointsGroup->second.erase(endpoint);
+                        m_parent->getModule(moduleInformation->id)
+                            ->saveConnection(endpoint, std::move(client), *moduleInformation);
+                    }
                 }
 
                 if (!m_httpClients.empty())
@@ -147,6 +153,12 @@ void ModuleConnector::Module::connect(Endpoints::iterator endpointsGroup)
 boost::optional<QnModuleInformation> ModuleConnector::Module::getInformation(
     nx_http::AsyncHttpClientPtr client)
 {
+    if (!client->hasRequestSuccesed())
+    {
+        NX_LOGX(lm("Request to %1 has failed").strs(client->url()), cl_logDEBUG1);
+        return boost::none;
+    }
+
     const auto contentType = nx_http::getHeaderValue(
         client->response()->headers, "Content-Type");
 
@@ -178,34 +190,45 @@ boost::optional<QnModuleInformation> ModuleConnector::Module::getInformation(
     return moduleInformation;
 }
 
-void ModuleConnector::Module::saveConnection(
+bool ModuleConnector::Module::saveConnection(
    SocketAddress endpoint, nx_http::AsyncHttpClientPtr client, const QnModuleInformation& information)
 {
     if (m_socket)
-        return;
+        return true;
 
     for (const auto& client: m_httpClients)
         client->pleaseStopSync();
     m_httpClients.clear();
 
-    NX_LOGX(lm("Connected to %1").strs(m_id), cl_logDEBUG1);
+    NX_LOGX(lm("Connected to %1").strs(m_id), cl_logDEBUG2);
     m_parent->m_connectedHandler(information, std::move(endpoint));
 
     // TODO: It is better to reask for moduleInformation instead of connection failure wait,
     // but is easier for now.
+    auto socket = client->takeSocket();
+    if (!socket->setRecvTimeout(0) || !socket->setKeepAlive(kKeepAliveOptions))
+    {
+        NX_LOGX(lm("Unable to save connection: %1").strs(
+            SystemError::getLastOSErrorText()), cl_logWARNING);
+
+        return false;
+    }
+
     const auto buffer = std::make_shared<Buffer>();
     buffer->reserve(100);
-    m_socket = client->takeSocket();
-    m_socket->setKeepAlive(kKeepAliveOptions);
+
+    m_socket = std::move(socket);
     m_socket->readSomeAsync(buffer.get(),
         [this, buffer](SystemError::ErrorCode code, size_t size)
         {
             NX_LOGX(lm("Unexpectd connection read size=%1: %2").strs(
-                size, SystemError::toString(code)), cl_logDEBUG1);
+                size, SystemError::toString(code)), cl_logDEBUG2);
 
             m_socket.reset();
             connect(m_endpoints.begin()); //< Reconnect attempt.
         });
+
+    return true;
 }
 
 ModuleConnector::Module* ModuleConnector::getModule(const QnUuid& id)

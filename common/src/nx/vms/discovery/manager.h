@@ -44,13 +44,23 @@ public:
         connect(this, &Manager::found, ptr, foundSlot);
         connect(this, &Manager::changed, ptr, changedSlot);
         connect(this, &Manager::lost, ptr, lostSlot);
+
+        for (const auto& module: getAll())
+            (ptr->*foundSlot)(module);
     }
 
 signals:
-    void found(ModuleData module); //< New reachable module is found.
-    void changed(ModuleData module); //< Module information or active endpoint is changed.
-    void lost(QnUuid information); //< Module connection is lost.
-    void conflict(ModuleData module); //< Found module with the same UUID as we are.
+    /** New reachable module is found. */
+    void found(nx::vms::discovery::Manager::ModuleData module);
+
+    /** Module information or active endpoint of reachable module is changed. */
+    void changed(nx::vms::discovery::Manager::ModuleData module);
+
+    /** Module connection is lost and could not be restored. */
+    void lost(QnUuid information);
+
+    /** Found the module with the same UUID as we are. */
+    void conflict(nx::vms::discovery::Manager::ModuleData module);
 
 private:
     void initializeConnector();
@@ -71,3 +81,5 @@ private:
 } // namespace discovery
 } // namespace vms
 } // namespace nx
+
+Q_DECLARE_METATYPE(nx::vms::discovery::Manager::ModuleData);
