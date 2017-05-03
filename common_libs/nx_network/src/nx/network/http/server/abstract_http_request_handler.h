@@ -3,6 +3,8 @@
 #include <atomic>
 #include <memory>
 #include <mutex>
+#include <string>
+#include <vector>
 
 #include <nx/utils/stree/resourcecontainer.h>
 
@@ -50,6 +52,16 @@ public:
         nx::utils::stree::ResourceContainer&& authInfo,
         ResponseIsReadyHandler completionHandler);
 
+    void setRequestPathParams(std::vector<StringType> params);
+    /**
+     * Parameters parsed from URL path. 
+     * E.g., given http handler registered on path /account/%1/systems.
+     * When receiving request with path /account/cartman/systems.
+     * Then this method will return {cartman}.
+     * Works only when using RestMessageDispatcher.
+     */
+    const std::vector<StringType>& requestPathParams() const;
+
 protected:
     /**
      * Implement this method to handle request
@@ -68,6 +80,7 @@ protected:
 private:
     nx_http::Message m_responseMsg;
     ResponseIsReadyHandler m_completionHandler;
+    std::vector<StringType> m_requestPathParams;
 
     void requestDone(RequestResult requestResult);
 };

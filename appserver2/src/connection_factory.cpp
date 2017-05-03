@@ -344,7 +344,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * </p>
      * %permissions Administrator.
      * %param[opt] id Storage unique id. Can be omitted when creating a new object.
-     * %param parentId Should be empty.
+     * %param parentId Server unique id.
      * %param name Storage name.
      * %param url Should be empty.
      * %param spaceLimit Free space to maintain on the storage,

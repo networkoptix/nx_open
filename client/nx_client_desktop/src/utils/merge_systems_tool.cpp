@@ -13,9 +13,6 @@
 #include "network/module_finder.h"
 #include <nx/utils/log/log.h>
 #include "client/client_settings.h"
-#include "ui/workbench/workbench_context.h"
-#include "ui/actions/action_manager.h"
-#include "ui/actions/action.h"
 #include <network/authutil.h>
 #include <nx/network/http/asynchttpclient.h>
 

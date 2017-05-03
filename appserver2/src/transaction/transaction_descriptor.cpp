@@ -945,6 +945,32 @@ struct VideoWallControlAccess
     }
 };
 
+struct LayoutTourAccess
+{
+    bool operator()(
+        QnCommonModule* /*commonModule*/,
+        const Qn::UserAccessData& accessData,
+        const ApiLayoutTourData& tour)
+    {
+        return hasSystemAccess(accessData)
+            || tour.parentId.isNull()
+            || accessData.userId == tour.parentId;
+    }
+};
+
+struct LayoutTourAccessById
+{
+    bool operator()(
+        QnCommonModule* /*commonModule*/,
+        const Qn::UserAccessData& accessData,
+        const ApiIdData& tourId)
+    {
+        //TODO: #GDM #3.1 get actual tour and check it via LayoutTourAccess
+        //Possibly we can pass detail::QnDbManager* db here instead of the common module
+        return true;
+    }
+};
+
 struct InvalidFilterFunc
 {
     template<typename ParamType>
@@ -953,6 +979,21 @@ struct InvalidFilterFunc
         auto td = getTransactionDescriptorByParam<ParamType>();
         auto transactionName = td->getName();
         NX_ASSERT(0, lit("This transaction (%1) param type doesn't support filtering").arg(transactionName));
+    }
+};
+
+template<typename SingleAccess>
+struct AccessOut
+{
+    template<typename Param>
+    RemotePeerAccess operator()(
+        QnCommonModule* commonModule,
+        const Qn::UserAccessData& accessData,
+        const Param& param)
+    {
+        return SingleAccess()(commonModule, accessData, param)
+            ? RemotePeerAccess::Allowed
+            : RemotePeerAccess::Forbidden;
     }
 };
 

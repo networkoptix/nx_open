@@ -48,6 +48,7 @@
 #include <utils/common/delayed.h>
 
 using boost::algorithm::any_of;
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -271,7 +272,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
         &QnBusinessRulesDialog::at_afterModelChanged);
 
     connect(ui->eventLogButton, &QPushButton::clicked,
-        context()->action(QnActions::OpenBusinessLogAction), &QAction::trigger);
+        context()->action(action::OpenBusinessLogAction), &QAction::trigger);
 
     connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged, this,
         &QnBusinessRulesDialog::updateFilter);
@@ -413,7 +414,7 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked()
         this);
 
     dialog.addCustomButton(QnMessageBoxCustomButton::Reset,
-        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+        QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 

@@ -98,10 +98,10 @@ class EnvironmentBuilder(object):
                 return config
         return None
 
-    def _init_server(self, box_config_to_box, http_schema, config):
+    def _init_server(self, box_config_to_box, http_schema, config, rest_api_timeout_sec):
         box = box_config_to_box[config.box]
         url = '%s://%s:%d/' % (http_schema, self._vm_host.host, config.box.rest_api_forwarded_port)
-        server = Server(self._company_name, config.name, box, url)
+        server = Server(self._company_name, config.name, url, box=box, rest_api_timeout_sec=rest_api_timeout_sec)
         if config.leave_initial_cloud_host:
             patch_set_cloud_host = None
         else:
@@ -123,7 +123,12 @@ class EnvironmentBuilder(object):
             assert server_2.is_started(), 'Requested merge of not started server: %s' % server_2
             server_1.merge_systems(server_2)
 
-    def build_environment(self, http_schema=DEFAULT_HTTP_SCHEMA, boxes=None, merge_servers=None,  **kw):
+    def build_environment(self,
+                          http_schema=DEFAULT_HTTP_SCHEMA,
+                          boxes=None,
+                          merge_servers=None,
+                          rest_api_timeout_sec=None,
+                          **kw):
         if not boxes:
             boxes = []
         log.info('TEST_DIR=%r, WORK_DIR=%r, BIN_DIR=%r, CLOUD_HOST=%r, COMPANY_NAME=%r',
@@ -169,7 +174,7 @@ class EnvironmentBuilder(object):
 
         servers = {}
         for config in servers_config:
-            servers[config.name] = self._init_server(box_config_to_box, http_schema, config)
+            servers[config.name] = self._init_server(box_config_to_box, http_schema, config, rest_api_timeout_sec)
         self._run_servers_merge(merge_servers or [], servers)
 
         for name, server in servers.items():
@@ -211,10 +216,12 @@ class Environment(object):
         log.info('FINALIZER for %s', self.artifact_path_prefix)
         for name, server in self.servers.items():
             path_prefix = '%s-server-%s' % (self.artifact_path_prefix, name)
-            log_path = '%s.log' % path_prefix
-            with open(log_path, 'wb') as f:
-                f.write(server.get_log_file())
-            log.debug('log file for server %s, %s is stored to %s', name.upper(), server, log_path)
+            log_contents = server.get_log_file()
+            if log_contents:
+                log_path = '%s.log' % path_prefix
+                with open(log_path, 'wb') as f:
+                    f.write(log_contents)
+                log.debug('log file for server %s, %s is stored to %s', name.upper(), server, log_path)
             for remote_core_path in server.list_core_files():
                 local_core_path = '%s.%s' % (path_prefix, os.path.basename(remote_core_path))
                 server.host.get_file(remote_core_path, local_core_path)

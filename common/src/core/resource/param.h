@@ -95,6 +95,7 @@ namespace Qn
     static const QString PRODUCT_NAME_SHORT = lit("productNameShort");
     static const QString SYSTEM_RUNTIME = lit("systemRuntime");
     static const QString BOOKMARK_COUNT = lit("bookmarkCount");
+    static const QString UDT_INTERNET_TRFFIC = lit("udtInternetTraffic_bytes");
     static const QString HDD_LIST = lit("hddList");
     static const QString HDD_LIST_FILE = lit("/tmp/hddlist");
 

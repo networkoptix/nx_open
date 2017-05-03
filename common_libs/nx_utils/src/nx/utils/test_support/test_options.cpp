@@ -11,6 +11,8 @@
 namespace nx {
 namespace utils {
 
+QString TestOptions::sTemporaryDirectoryPath;
+
 void TestOptions::setTimeoutMultiplier(size_t value)
 {
     s_timeoutMultiplier = value;
@@ -78,6 +80,16 @@ void TestOptions::applyArguments(const utils::ArgumentParser& arguments)
         win32_exception::setCreateFullCrashDump(generateFullCrashDump);
     }
 #endif
+}
+
+void TestOptions::setTemporaryDirectoryPath(const QString& path)
+{
+    sTemporaryDirectoryPath = path;
+}
+
+QString TestOptions::temporaryDirectoryPath()
+{
+    return sTemporaryDirectoryPath;
 }
 
 std::atomic<size_t> TestOptions::s_timeoutMultiplier(1);

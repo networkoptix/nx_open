@@ -18,7 +18,7 @@
 #include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/controls/bookmark_tags_control.h>
-#include <ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <ui/help/help_topics.h>
 
 #include <nx/utils/string.h>

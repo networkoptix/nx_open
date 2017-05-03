@@ -151,7 +151,7 @@ TEST(IoServerMonitorTest, main)
 
     QObject::connect(
         httpClient.get(), &nx_http::AsyncHttpClient::done,
-        [&allDataProcessed](nx_http::AsyncHttpClientPtr httpClient)
+        [&allDataProcessed](nx_http::AsyncHttpClientPtr /*httpClient*/)
         {
             allDataProcessed.set_value();
         });

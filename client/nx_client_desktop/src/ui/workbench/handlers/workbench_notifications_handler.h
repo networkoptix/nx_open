@@ -14,7 +14,6 @@
 #include <utils/common/connective.h>
 
 class QnWorkbenchUserEmailWatcher;
-class QnActionParameters;
 class QnBusinessEventsFilterResourcePropertyAdaptor;
 
 class QnWorkbenchNotificationsHandler : public Connective<QObject>, public QnSessionAwareDelegate
@@ -38,7 +37,7 @@ signals:
 
     void notificationAdded(const QnAbstractBusinessActionPtr& businessAction);
     void notificationRemoved(const QnAbstractBusinessActionPtr& businessAction);
-    
+
     void cleared();
 
 public slots:
@@ -63,11 +62,10 @@ private:
      */
     bool adminOnlyMessage(QnSystemHealth::MessageType message);
 
-    void setSystemHealthEventVisible( QnSystemHealth::MessageType message, bool visible);
-   // void setSystemHealthEventVisible( QnSystemHealth::MessageType message, const QnActionParameters& actionParams, bool visible );
-    void setSystemHealthEventVisible( QnSystemHealth::MessageType message, const QnResourcePtr& resource, bool visible);
+    void setSystemHealthEventVisible(QnSystemHealth::MessageType message, bool visible);
+    void setSystemHealthEventVisible(QnSystemHealth::MessageType message, const QnResourcePtr& resource, bool visible);
 
-    void setSystemHealthEventVisibleInternal( QnSystemHealth::MessageType message, const QVariant& params, bool visible);
+    void setSystemHealthEventVisibleInternal(QnSystemHealth::MessageType message, const QVariant& params, bool visible);
 
     void checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message);
 

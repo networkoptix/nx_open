@@ -13,10 +13,9 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/layout_resource.h>
 
-#include <ui/actions/action.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/models/resource_properties/user_settings_model.h>
 #include <ui/widgets/properties/user_profile_widget.h>
 #include <ui/widgets/properties/user_settings_widget.h>
@@ -29,6 +28,7 @@
 
 #include <utils/common/html.h>
 
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -484,8 +484,8 @@ void QnUserSettingsDialog::applyChanges()
 
         for (const auto& layout : layoutsToShare)
         {
-            menu()->trigger(QnActions::ShareLayoutAction,
-                QnActionParameters(layout).withArgument(Qn::UserResourceRole, m_user));
+            menu()->trigger(action::ShareLayoutAction,
+                action::Parameters(layout).withArgument(Qn::UserResourceRole, m_user));
         }
 
         qnResourcesChangesManager->saveAccessibleResources(m_user, accessibleResources);

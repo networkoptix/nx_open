@@ -6,7 +6,7 @@
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui"/>
         <source>About</source>
-        <translation>상세</translation>
+        <translation>정보</translation>
     </message>
     <message>
         <location/>

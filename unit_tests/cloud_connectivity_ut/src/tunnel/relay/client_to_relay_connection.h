@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/network/cloud/tunnel/relay/api/client_to_relay_connection.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_client.h>
 
 namespace nx {
 namespace network {
@@ -9,14 +9,17 @@ namespace relay {
 namespace test {
 
 class ClientToRelayConnection:
-    public nx::cloud::relay::api::ClientToRelayConnection
+    public nx::cloud::relay::api::Client
 {
-    using base_type = nx::cloud::relay::api::ClientToRelayConnection;
+    using base_type = nx::cloud::relay::api::Client;
 
 public:
     ClientToRelayConnection();
     virtual ~ClientToRelayConnection() override;
 
+    virtual void beginListening(
+        const nx::String& peerName,
+        nx::cloud::relay::api::BeginListeningHandler completionHandler) override;
     virtual void startSession(
         const nx::String& desiredSessionId,
         const nx::String& /*targetPeerName*/,

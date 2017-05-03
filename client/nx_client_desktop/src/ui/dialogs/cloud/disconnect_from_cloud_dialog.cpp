@@ -14,7 +14,7 @@
 
 #include <client/client_settings.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/aligner.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -237,8 +237,8 @@ void QnDisconnectFromCloudDialogPrivate::setVisibleButton(VisibleButton button)
 {
     const bool okButtonVisible = (button == VisibleButton::Ok);
     const auto style = okButtonVisible
-        ? QnButtonAccent::Warning
-        : QnButtonAccent::Standard;
+        ? Qn::ButtonAccent::Warning
+        : Qn::ButtonAccent::Standard;
     const auto defaultButton = (okButtonVisible ? okButton : nextButton);
 
     okButton->setVisible(okButtonVisible);
@@ -307,7 +307,7 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
             q->setIcon(QnMessageBoxIcon::Warning);
             q->setText(lit("Internal system error"));
             q->setStandardButtons(QDialogButtonBox::NoButton);
-            q->setDefaultButton(okButton, QnButtonAccent::Warning);
+            q->setDefaultButton(okButton, Qn::ButtonAccent::Warning);
             break;
     }
 

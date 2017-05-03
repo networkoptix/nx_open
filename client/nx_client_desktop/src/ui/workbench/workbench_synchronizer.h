@@ -13,7 +13,7 @@ class QnWorkbenchSynchronizer;
 class QnResourcePool;
 
 /**
- * This class performs bidirectional synchronization of instances of 
+ * This class performs bidirectional synchronization of instances of
  * <tt>QnWorkbench</tt> and <tt>QnResourcePool</tt>.
  */
 class QnWorkbenchSynchronizer: public QObject, public QnWorkbenchContextAware {
@@ -28,7 +28,6 @@ public slots:
     void submit();
 
 protected slots:
-    void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
     void at_workbench_layoutsChanged();
 
 private:

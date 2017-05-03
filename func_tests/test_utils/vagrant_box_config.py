@@ -4,7 +4,7 @@ Functional tests define configuration required for them indirectly (via 'box' fi
 '''
 
 from netaddr import IPNetwork, IPAddress
-from .utils import is_list_inst
+from .utils import is_list_inst, quote
 
 
 DEFAULT_NATNET1 = '10.10.0/24'
@@ -44,9 +44,6 @@ class ConfigCommand(object):
             kwargs=self.kwargs,
             )
 
-
-def quote(s):
-    return '"%s"' % s
 
 # we only support address mask of 24
 def make_vm_config_internal_network_command(vbox_manage, network):

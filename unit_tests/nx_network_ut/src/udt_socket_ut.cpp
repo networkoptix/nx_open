@@ -185,7 +185,7 @@ NX_NETWORK_BOTH_SOCKET_TEST_CASE(
 
 static std::unique_ptr<UdtStreamSocket> rendezvousUdtSocket(
     std::chrono::milliseconds connectTimeout)
-{
+{   
     auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
     EXPECT_TRUE(socket->setRendezvous(true));
     EXPECT_TRUE(socket->setSendTimeout(connectTimeout.count()));

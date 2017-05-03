@@ -141,6 +141,11 @@ namespace Qn
         VideoWallItemGuidRole,                      /**< Role for videowall item unique id. Value of type QnUuid. */
         VideoWallItemIndicesRole,                   /**< Role for videowall item indices list. Value of type QnVideoWallItemIndexList. */
 
+        LayoutTourUuidRole,                         /**< Role for layout tour review layouts. */
+        LayoutTourItemDelayMsRole,                  /**< Role for layout tour item delay. */
+        LayoutTourItemOrderRole,                    /**< Role for layout tour item delay. */
+        LayoutTourIsManualRole,                     /**< Role for layout tour review layout in manual mode. */
+
         /* Layout-based. */
         LayoutCellSpacingRole,                      /**< Role for layout's cell spacing. Value of type qreal. */
         LayoutCellAspectRatioRole,                  /**< Role for layout's cell aspect ratio. Value of type qreal. */
@@ -201,7 +206,7 @@ namespace Qn
         LayoutIconRole,
         CustomPanelTitleRole,
         CustomPanelDescriptionRole,
-        CustomPanelActionsRoleRole,
+        CustomPanelActionsRole,
 
         /* Arguments. */
         ActionIdRole,
@@ -214,11 +219,11 @@ namespace Qn
         MergedTimePeriodsRole,
         FileNameRole,                               /**< Role for target filename. Used in TakeScreenshotAction. */
         TextRole,                                   /**< Role for generic text. Used in several places. */
-        UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and QnActions::ConnectAction. */
+        UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and action::ConnectAction. */
         AutoLoginRole,                              /**< Role for flag that shows if client should connect with last credentials
                                                          (or to the last system) automatically next time */
         StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
-                                                         Used in QnActions::ConnectAction. */
+                                                         Used in action::ConnectAction. */
         CloudSystemIdRole,                          /**< Role for cloud system id (QString). Used in cloud system nodes and ConnectToCloudAction. */
 
         ForceRole,                                  /**< Role for 'forced' flag. Used in ConnectAction/DisconnectAction. */
@@ -466,6 +471,14 @@ namespace Qn
         NoData,
         Refreshing
     };
+
+    enum class ButtonAccent
+    {
+        NoAccent,
+        Standard,
+        Warning
+    };
+
 
 } // namespace Qn
 

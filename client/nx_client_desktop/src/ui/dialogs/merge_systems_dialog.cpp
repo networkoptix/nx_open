@@ -18,7 +18,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/watchers/workbench_user_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/merge_systems_tool.h>
@@ -28,6 +28,8 @@
 
 #include <nx/utils/string.h>
 #include <network/system_helpers.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -108,7 +110,7 @@ void QnMergeSystemsDialog::done(int result)
 //         url.setPassword(m_remoteOwnerCredentials.password());
 //         QnAppServerConnectionFactory::setUrl(url);
 
-        menu()->trigger(QnActions::ReconnectAction);
+        menu()->trigger(action::ReconnectAction);
         context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
     }
 }

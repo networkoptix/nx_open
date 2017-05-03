@@ -1,5 +1,6 @@
 #include "relay_outgoing_tunnel_connection.h"
 
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/std/cpp14.h>
 
 namespace nx {
@@ -10,26 +11,20 @@ namespace relay {
 OutgoingTunnelConnection::OutgoingTunnelConnection(
     SocketAddress relayEndpoint,
     nx::String relaySessionId,
-    std::unique_ptr<nx::cloud::relay::api::ClientToRelayConnection> clientToRelayConnection)
+    std::unique_ptr<nx::cloud::relay::api::Client> relayApiClient)
     :
     m_relayEndpoint(std::move(relayEndpoint)),
     m_relaySessionId(std::move(relaySessionId)),
-    m_controlConnection(std::move(clientToRelayConnection)),
+    m_relayApiClient(std::move(relayApiClient)),
     m_usageCounter(std::make_shared<int>(0))
 {
     bindToAioThread(getAioThread());
 }
 
-OutgoingTunnelConnection::~OutgoingTunnelConnection()
-{
-    if (isInSelfAioThread())
-        stopWhileInAioThread();
-}
-
 void OutgoingTunnelConnection::stopWhileInAioThread()
 {
     m_inactivityTimer.pleaseStopSync();
-    m_controlConnection.reset();
+    m_relayApiClient.reset();
     m_activeRequests.clear();
 }
 
@@ -38,8 +33,8 @@ void OutgoingTunnelConnection::bindToAioThread(aio::AbstractAioThread* aioThread
     base_type::bindToAioThread(aioThread);
 
     m_inactivityTimer.bindToAioThread(aioThread);
-    if (m_controlConnection)
-        m_controlConnection->bindToAioThread(aioThread);
+    if (m_relayApiClient)
+        m_relayApiClient->bindToAioThread(aioThread);
     for (auto& request: m_activeRequests)
     {
         request->relayClient->bindToAioThread(aioThread);
@@ -70,9 +65,10 @@ void OutgoingTunnelConnection::establishNewConnection(
             auto requestIter = --m_activeRequests.end();
         
             auto relayClient =
-                m_controlConnection
-                ? std::move(m_controlConnection)
-                : nx::cloud::relay::api::ClientToRelayConnectionFactory::create(m_relayEndpoint);
+                m_relayApiClient
+                ? std::move(m_relayApiClient)
+                : nx::cloud::relay::api::ClientFactory::create(
+                    url::Builder().setScheme("http").setEndpoint(m_relayEndpoint));
             relayClient->bindToAioThread(getAioThread());
             relayClient->openConnectionToTheTargetHost(
                 m_relaySessionId,
