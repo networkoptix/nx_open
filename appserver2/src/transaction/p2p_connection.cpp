@@ -389,7 +389,7 @@ void P2pConnection::onHttpClientDone(const nx_http::AsyncHttpClientPtr& client)
         arg((int)client->state()), cl_logDEBUG2);
 
     nx_http::AsyncHttpClient::State state = client->state();
-    if (state == nx_http::AsyncHttpClient::sFailed)
+    if (state == nx_http::AsyncHttpClient::sFailed) 
     {
         cancelConnecting();
         return;
@@ -405,7 +405,6 @@ void P2pConnection::startConnection()
 void P2pConnection::startReading()
 {
     using namespace std::placeholders;
-    m_miscData.lastDataTimer.restart();
     m_webSocket->readSomeAsync(
         &m_readBuffer,
         std::bind(&P2pConnection::onNewMessageRead, this, _1, _2));
@@ -561,7 +560,7 @@ PeerNumberType P2pConnection::encode(const ApiPersistentIdData& fullId, PeerNumb
 
 bool P2pConnection::remotePeerSubscribedTo(const ApiPersistentIdData& peer) const
 {
-    return m_miscData.remoteTranState.values.contains(peer);
+    return m_miscData.remoteSubscription.values.contains(peer);
 }
 
 bool P2pConnection::localPeerSubscribedTo(const ApiPersistentIdData& peer) const

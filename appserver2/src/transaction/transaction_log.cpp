@@ -432,49 +432,13 @@ bool QnTransactionLog::contains(const QnTranState& state) const
 }
 
 ErrorCode QnTransactionLog::getTransactionsAfter(
-    const QnTranState& state,
+    const QnTranState& filterState,
     bool onlyCloudData,
     QList<QByteArray>& result)
 {
-    QnTranState inOutState = state;
     QnReadLocker lock(&m_dbManager->getMutex());
-    bool isFinished;
-    return getTransactionsAfterInternal(
-        &inOutState,
-        onlyCloudData,
-        result,
-        Protocol::MessageBus_3_0,
-        std::numeric_limits<int>::max(),
-        &isFinished);
-}
 
-ErrorCode QnTransactionLog::getExactTransactionsAfter(
-    QnTranState* inOutState,
-    bool onlyCloudData,
-    QList<QByteArray>& result,
-    int limit,
-    bool* isFinished)
-{
-    QnReadLocker lock(&m_dbManager->getMutex());
-    return getTransactionsAfterInternal(
-        inOutState,
-        onlyCloudData,
-        result,
-        Protocol::P2P_3_1,
-        limit,
-        isFinished);
-}
-
-ErrorCode QnTransactionLog::getTransactionsAfterInternal(
-    QnTranState* inOutState,
-    bool onlyCloudData,
-    QList<QByteArray>& result,
-    Protocol protocol,
-    int limit,
-    bool* isFinished)
-{
-    *isFinished = false;
-    const QnTranState& stateToIterate = protocol == Protocol::MessageBus_3_0 ? m_state : *inOutState;
+    const QnTranState& stateToIterate = m_state;
 
     QnTransaction<ApiUpdateSequenceData> syncMarkersTran(
         ApiCommand::updatePersistentSequence,
@@ -484,11 +448,10 @@ ErrorCode QnTransactionLog::getTransactionsAfterInternal(
     if (onlyCloudData)
         extraFilter = lit("AND tran_type = %1").arg(TransactionType::Cloud);
 
-    //QMap <ApiPersistentIdData, int> tranLogSequence;
-    for(auto itr = stateToIterate.values.begin(); itr != stateToIterate.values.end(); ++itr)
+    for (auto itr = stateToIterate.values.begin(); itr != stateToIterate.values.end(); ++itr)
     {
         const ApiPersistentIdData& key = itr.key();
-        qint32 querySequence = inOutState->values.value(key);
+        qint32 querySequence = filterState.values.value(key);
         QSqlQuery query(m_dbManager->getDB());
         query.setForwardOnly(true);
         query.prepare(lit("SELECT tran_data, sequence FROM transaction_log WHERE peer_guid = ? \
@@ -505,43 +468,86 @@ ErrorCode QnTransactionLog::getTransactionsAfterInternal(
         {
             result << query.value(0).toByteArray();
             lastSelectedSequence = query.value(1).toInt();
-            if (--limit == 0)
+        }
+        qint32 latestSequence = m_state.values.value(itr.key());
+        if (latestSequence > lastSelectedSequence)
+        {
+            // add filler transaction with latest sequence
+            ApiSyncMarkerRecord record;
+            record.peerID = key.id;
+            record.dbID = key.persistentId;
+            record.sequence = latestSequence;
+            syncMarkersTran.params.markers.push_back(record);
+        }
+    }
+
+    result << m_tranSerializer->serializedTransaction(syncMarkersTran);
+    return ErrorCode::ok;
+}
+
+ErrorCode QnTransactionLog::getExactTransactionsAfter(
+    QnTranState* inOutState,
+    bool onlyCloudData,
+    QList<QByteArray>& result,
+    int maxDataSize,
+    bool* outIsFinished)
+{
+    *outIsFinished = false;
+    QnReadLocker lock(&m_dbManager->getMutex());
+
+    QnTransaction<ApiUpdateSequenceData> syncMarkersTran(
+        ApiCommand::updatePersistentSequence,
+        m_dbManager->commonModule()->moduleGUID());
+
+    QString extraFilter;
+    if (onlyCloudData)
+        extraFilter = lit("AND tran_type = %1").arg(TransactionType::Cloud);
+
+    //QMap <ApiPersistentIdData, int> tranLogSequence;
+    for (auto itr = inOutState->values.begin(); itr != inOutState->values.end(); ++itr)
+    {
+        const ApiPersistentIdData& key = itr.key();
+        qint32 querySequence = itr.value();
+        const qint32 latestSequence = m_state.values.value(itr.key());
+        if (querySequence >= latestSequence)
+            continue;
+
+        QSqlQuery query(m_dbManager->getDB());
+        query.setForwardOnly(true);
+        query.prepare(lit("SELECT tran_data, sequence FROM transaction_log WHERE peer_guid = ? \
+            AND db_guid = ? AND sequence > ? \
+            %1 ORDER BY sequence").arg(extraFilter));
+        query.addBindValue(key.id.toRfc4122());
+        query.addBindValue(key.persistentId.toRfc4122());
+        query.addBindValue(querySequence);
+        if (!query.exec())
+            return ErrorCode::failure;
+
+        qint32 lastSelectedSequence = 0;
+        while (query.next())
+        {
+            result << query.value(0).toByteArray();
+            lastSelectedSequence = query.value(1).toInt();
+            maxDataSize -= result.last().size();
+            if (maxDataSize <= 0)
             {
-                NX_ASSERT(inOutState->values.contains(key));
-                inOutState->values[key] = std::max(querySequence, lastSelectedSequence);
+                itr.value() = std::max(querySequence, lastSelectedSequence);
                 return ErrorCode::ok;
             }
         }
-        qint32 latestSequence = m_state.values.value(itr.key());
-        NX_ASSERT(inOutState->values.contains(key));
-        inOutState->values[key] = std::max(querySequence, latestSequence);
+        itr.value() = std::max(querySequence, latestSequence);
         if (latestSequence > lastSelectedSequence)
         {
-            if (protocol == Protocol::MessageBus_3_0)
+            if (latestSequence > querySequence)
             {
-                // add filler transaction with latest sequence
-                ApiSyncMarkerRecord record;
-                record.peerID = key.id;
-                record.dbID = key.persistentId;
-                record.sequence = latestSequence;
-                syncMarkersTran.params.markers.push_back(record);
-            }
-            else
-            {
-                if (latestSequence > querySequence)
-                {
-                    syncMarkersTran.peerID = key.id;
-                    syncMarkersTran.persistentInfo.dbID = key.persistentId;
-                    syncMarkersTran.persistentInfo.sequence = latestSequence;
-                    result << m_tranSerializer->serializedTransaction(syncMarkersTran);
-                }
+                syncMarkersTran.peerID = key.id;
+                syncMarkersTran.persistentInfo.dbID = key.persistentId;
+                syncMarkersTran.persistentInfo.sequence = latestSequence;
+                result << m_tranSerializer->serializedTransaction(syncMarkersTran);
             }
         }
     }
-    *isFinished = true;
-
-    if (protocol == Protocol::MessageBus_3_0)
-        result << m_tranSerializer->serializedTransaction(syncMarkersTran);
+    *outIsFinished = true;
     return ErrorCode::ok;
 }
 

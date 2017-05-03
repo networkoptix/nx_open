@@ -23,14 +23,13 @@ namespace {
     std::chrono::seconds sendPeersInfoInterval(15);
 
     // If new connection is recently established/closed, don't sent subscribe request to the peer
-    static const int subscribeIntervalLowMs = 1000 * 3;
+    std::chrono::seconds subscribeIntervalLow(3);
 
     // If new connections always established/closed too long time, send subscribe request anyway
-    static const int subscribeIntervalHiMs = 1000 * 15;
+    std::chrono::seconds subscribeIntervalHigh(15);
 
     int commitIntervalMs = 1000;
-
-    static const int kTranRecordsLimit = 10;
+    static const int kMaxSelectDataSize = 1024 * 16;
 } // namespace
 
 namespace ec2 {
@@ -174,7 +173,7 @@ void P2pMessageBus::connectSignals(const P2pConnectionPtr& connection)
     QnMutexLocker lock(&m_mutex);
     connect(connection.data(), &P2pConnection::stateChanged, this, &P2pMessageBus::at_stateChanged);
     connect(connection.data(), &P2pConnection::gotMessage, this, &P2pMessageBus::at_gotMessage);
-    connect(connection.data(), &P2pConnection::allDataSent, this, &P2pMessageBus::at_ConnectionAllDataSent);
+    connect(connection.data(), &P2pConnection::allDataSent, this, &P2pMessageBus::at_allDataSent);
 }
 
 void P2pMessageBus::cleanupRoutingRecords(const ApiPersistentIdData& id)
@@ -284,7 +283,6 @@ void P2pMessageBus::addOfflinePeersFromDb()
 QByteArray P2pMessageBus::serializePeersMessage()
 {
     RouteToPeerMap allPeerDistances = allPeersDistances();
-
     QByteArray result;
     result.resize(allPeerDistances.size() * 6 + 1);
     BitStreamWriter writer;
@@ -489,23 +487,8 @@ P2pMessageBus::RouteToPeerMap P2pMessageBus::allPeersDistances() const
     return result;
 }
 
-bool P2pMessageBus::needReSubscribeDelay(const P2pConnectionPtr& currentSubscription)
+bool P2pMessageBus::needSubscribeDelay()
 {
-    //if (!m_lastPeerInfoTimer.isValid())
-    //    return false;
-    //if (m_lastPeerInfoTimer.elapsed() < subscribeIntervalLowMs)
-    //    return true;
-    QElapsedTimer& timer = currentSubscription->miscData().lastDataTimer;
-    if (timer.elapsed() < subscribeIntervalLowMs)
-    {
-        QElapsedTimer& wantToResubscribeTimer = currentSubscription->miscData().wantToResubscribeTimer;
-        if (!wantToResubscribeTimer.isValid())
-            wantToResubscribeTimer.restart();
-        if (wantToResubscribeTimer.elapsed() < subscribeIntervalHiMs)
-            return true;
-    }
-
-#if 0
     // If alive peers has been recently received, postpone subscription for some time.
     // This peer could be found via another neighbor.
     if (m_lastPeerInfoTimer.isValid())
@@ -515,27 +498,19 @@ bool P2pMessageBus::needReSubscribeDelay(const P2pConnectionPtr& currentSubscrip
         if (lastPeerInfoElapsed < subscribeIntervalLow)
         {
             if (!m_wantToSubscribeTimer.isValid())
-            {
                 m_wantToSubscribeTimer.restart();
+            std::chrono::milliseconds wantToSubscribeElapsed(m_wantToSubscribeTimer.elapsed());
+            if (wantToSubscribeElapsed < subscribeIntervalHigh)
                 return true;
-            }
-            else
-            {
-                std::chrono::milliseconds wantToSubscribeElapsed(m_wantToSubscribeTimer.elapsed());
-                if (wantToSubscribeElapsed < subscribeIntervalHigh)
-                    return true;
-            }
         }
     }
     m_wantToSubscribeTimer.invalidate();
-#endif
     return false;
 }
 
 void P2pMessageBus::doSubscribe()
 {
-    //if (needSubscribeDelay())
-    //    return;
+    const bool needDelay = needSubscribeDelay();
 
     QMap<ApiPersistentIdData, P2pConnectionPtr> currentSubscription = getCurrentSubscription();
     QMap<ApiPersistentIdData, P2pConnectionPtr> newSubscription = currentSubscription;
@@ -558,8 +533,8 @@ void P2pMessageBus::doSubscribe()
         qint32 minDistance = info.minDistance(&viaList);
         if (minDistance < subscribedDistance)
         {
-            //if (subscribedVia && needReSubscribeDelay(subscribedVia))
-            //    continue;
+            if (needDelay && minDistance > 1)
+                continue; //< allow only direct subscription if network configuration are still changing
 
             NX_ASSERT(!viaList.empty());
             // If any of connections with min distance subscribed to us then postpone our subscription.
@@ -676,7 +651,7 @@ void P2pMessageBus::at_stateChanged(
     }
 }
 
-void P2pMessageBus::at_ConnectionAllDataSent(const QSharedPointer<P2pConnection>& connection)
+void P2pMessageBus::at_allDataSent(const QSharedPointer<P2pConnection>& connection)
 {
     if (!connection)
         return;
@@ -684,8 +659,9 @@ void P2pMessageBus::at_ConnectionAllDataSent(const QSharedPointer<P2pConnection>
     QnMutexLocker lock(&m_mutex);
     if (m_connections.value(connection->remotePeer().id) != connection)
         return;
-    if (connection->miscData().tranLogInProgress)
-        selectTransactions(connection, connection->miscData().remoteTranState);
+    if (connection->miscData().selectingDataInProgress)
+        selectAndSendTransactions(connection, connection->miscData().remoteSubscription);
+
 }
 
 void P2pMessageBus::at_gotMessage(
@@ -735,7 +711,6 @@ void P2pMessageBus::at_gotMessage(
         result = handleSubscribeForDataUpdates(connection, payload);
         break;
     case MessageType::pushTransactionData:
-        connection->miscData().lastDataTimer.restart();
         result = handlePushTransactionData(connection, payload);
         break;
     default:
@@ -971,10 +946,12 @@ struct SendTransactionToTransportFastFuction
             ApiPersistentIdData tranId(transaction.peerID, transaction.persistentInfo.dbID);
             NX_ASSERT(connection->remotePeerSubscribedTo(tranId));
         }
+
         connection->sendMessage(MessageType::pushTransactionData, serializedTran);
         return true;
     }
 };
+
 
 bool P2pMessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data)
 {
@@ -982,45 +959,52 @@ bool P2pMessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connec
     QVector<SubscribeRecord> request = deserializeSubscribeForDataUpdatesRequest(data, &success);
     if (!success)
         return false;
-    QnTranState selectTranState;
-    auto& selectRequest = selectTranState.values;
+    QnTranState newSubscription;
     for (const auto& shortPeer : request)
     {
         const auto& id = m_localShortPeerInfo.decode(shortPeer.peer);
         NX_ASSERT(!id.isNull());
-        selectRequest.insert(id, shortPeer.sequence);
+        newSubscription.values.insert(id, shortPeer.sequence);
     }
 
-    const auto& oldSubscription = connection->miscData().remoteTranState.values.keys();
+    // merge current and new subscription
+    QnTranState& oldSubscription = connection->miscData().remoteSubscription;
 
-    // remove already subscribed records
-    auto itrFilter = oldSubscription.begin();
-    for (auto itr = selectRequest.begin(); itr != selectRequest.end();)
+    auto itrOldSubscription = oldSubscription.values.begin();
+    for (auto itr = newSubscription.values.begin(); itr != newSubscription.values.end(); ++itr)
     {
-        while (itrFilter != oldSubscription.end() && *itrFilter < itr.key())
-            ++itrFilter;
-        if (itrFilter != oldSubscription.end() && *itrFilter == itr.key())
-            itr = selectRequest.erase(itr); //< filter record
-        else
-            ++itr;
+        while (itrOldSubscription != oldSubscription.values.end() && itrOldSubscription.key() < itr.key())
+            ++itrOldSubscription;
+
+        if (itrOldSubscription != oldSubscription.values.end() && itrOldSubscription.key() == itr.key())
+        {
+            itr.value() = std::max(itr.value(), itrOldSubscription.value());
+        }
+    }
+    NX_ASSERT(!connection->remotePeerSubscribedTo(connection->remotePeer()));
+    if (connection->miscData().selectingDataInProgress)
+    {
+        connection->miscData().remoteSubscription = newSubscription;
+        return true;
     }
 
-    NX_ASSERT(!connection->remotePeerSubscribedTo(connection->remotePeer()));
-    return selectTransactions(connection, selectTranState);
+    return selectAndSendTransactions(connection, std::move(newSubscription));
 }
 
-bool P2pMessageBus::selectTransactions(const P2pConnectionPtr& connection, const QnTranState& _selectTranState)
+bool P2pMessageBus::selectAndSendTransactions(
+    const P2pConnectionPtr& connection,
+    QnTranState newSubscription)
 {
-    QnTranState selectTranState = _selectTranState;
+
     QList<QByteArray> serializedTransactions;
-    bool isFinished;
+    bool isFinished = false;
     const ErrorCode errorCode = m_db->transactionLog()->getExactTransactionsAfter(
-        &selectTranState,
+        &newSubscription,
         connection->remotePeer().peerType == Qn::PeerType::PT_CloudServer,
         serializedTransactions,
-        kTranRecordsLimit,
+        kMaxSelectDataSize,
         &isFinished);
-    connection->miscData().tranLogInProgress = !isFinished;
+    connection->miscData().selectingDataInProgress = !isFinished;
     if (errorCode != ErrorCode::ok)
     {
         NX_LOG(
@@ -1029,13 +1013,10 @@ bool P2pMessageBus::selectTransactions(const P2pConnectionPtr& connection, const
             cl_logWARNING);
         return false;
     }
-
-    auto& newTranState = connection->miscData().remoteTranState;
-    for (auto itr = selectTranState.values.begin(); itr != selectTranState.values.end(); ++itr)
-        newTranState.values[itr.key()] = itr.value();
+    connection->miscData().remoteSubscription = newSubscription;
 
     using namespace std::placeholders;
-    for (const auto& serializedTran : serializedTransactions)
+    for (const auto& serializedTran: serializedTransactions)
     {
         if (!handleTransaction(
             this,

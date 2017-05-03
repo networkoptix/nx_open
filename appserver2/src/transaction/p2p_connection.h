@@ -88,12 +88,8 @@ public:
         QElapsedTimer localPeersTimer; //< last sent peers time
 
         QVector<ApiPersistentIdData> localSubscription; //< local -> remote subscription
-        //QVector<ApiPersistentIdData> remoteSubscription; //< remote -> local subscription
-        QnTranState remoteTranState;  //< remote -> local subscription
-        bool tranLogInProgress = false;
-
-        QElapsedTimer lastDataTimer;
-        QElapsedTimer wantToResubscribeTimer;
+        QnTranState remoteSubscription; //< remote -> local subscription
+        bool selectingDataInProgress = false;
     };
 
     MiscData& miscData();

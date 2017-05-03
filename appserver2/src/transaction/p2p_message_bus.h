@@ -69,7 +69,7 @@ public:
         const ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
         for (const auto& connection: m_connections)
         {
-            if (connection->miscData().tranLogInProgress || !connection->remotePeerSubscribedTo(peerId))
+            if (connection->miscData().selectingDataInProgress || !connection->remotePeerSubscribedTo(peerId))
                 continue;
             NX_ASSERT(!(ApiPersistentIdData(connection->remotePeer()) == peerId)); //< loop
 
@@ -155,15 +155,15 @@ private:
     void gotTransaction(const QnTransaction<T>& tran,const P2pConnectionPtr& connection);
 
     void proxyFillerTransaction(const QnAbstractTransaction& tran);
+    bool needSubscribeDelay();
     void connectSignals(const P2pConnectionPtr& connection);
     void dropConnections();
     void resotreAfterDbError();
-    bool needReSubscribeDelay(const P2pConnectionPtr& currentSubscription);
-    bool selectTransactions(const P2pConnectionPtr& connection, const QnTranState& selectTranState);
-private slots:
+    bool selectAndSendTransactions(const P2pConnectionPtr& connection, QnTranState newSubscription);
+    private slots:
     void at_gotMessage(const QSharedPointer<P2pConnection>& connection, MessageType messageType, const QByteArray& payload);
     void at_stateChanged(const QSharedPointer<P2pConnection>& connection, P2pConnection::State state);
-    void at_ConnectionAllDataSent(const QSharedPointer<P2pConnection>& connection);
+    void at_allDataSent(const QSharedPointer<P2pConnection>& connection);
 private:
     QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list
     QMap<QnUuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections

@@ -50,8 +50,8 @@ namespace ec2
             QnTranState* inOutState,
             bool onlyCloudData,
             QList<QByteArray>& result,
-            int limit,
-            bool* isFinished);
+            int maxDataSize,
+            bool* outIsFinished);
 
         QnTranState getTransactionsState();
 
@@ -116,19 +116,6 @@ namespace ec2
 
         int currentSequenceNoLock() const;
 
-        enum class Protocol
-        {
-            MessageBus_3_0,
-            P2P_3_1
-        };
-
-        ErrorCode getTransactionsAfterInternal(
-            QnTranState* inOutState,
-            bool onlyCloudData,
-            QList<QByteArray>& result,
-            Protocol protocol,
-            int limit,
-            bool* isFinished);
     private:
         struct UpdateHistoryData
         {
