@@ -48,7 +48,7 @@ namespace ec2
         QnUbjsonTransactionSerializer* ubjsonTranSerializer() const;
 
         ConnectionGuardSharedState* connectionGuardSharedState();
-
+        detail::QnDbManager* getDb() const { return m_db; }
     protected:
         detail::QnDbManager* m_db = nullptr;
         QThread* m_thread = nullptr;

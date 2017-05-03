@@ -11,10 +11,13 @@
 #include <transaction/p2p_message_bus.h>
 #include <core/resource_management/resource_pool.h>
 #include "ec2_thread_pool.h"
+#include <nx/network/system_socket.h>
+#include "ec2_connection.h"
+#include <transaction/transaction_message_bus_base.h>
 
 namespace {
 
-static const int kInstanceCount = 100;
+static const int kInstanceCount = 80;
 static const int kMaxSyncTimeoutMs = 1000 * 20 * 1000;
 static const int kCamerasCount = 100;
 
@@ -253,7 +256,22 @@ static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverCon
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
     } while (syncDoneCounter != kInstanceCount && timer.elapsed() < kMaxSyncTimeoutMs);
 
+
+    ec2::Ec2DirectConnection* connection =
+        dynamic_cast<ec2::Ec2DirectConnection*> (servers[0]->moduleInstance()->ecConnection());
+    ec2::detail::QnDbManager* db = connection->p2pMessageBus()->getDb();
+    ec2::ApiTransactionDataList tranList;
+    db->doQuery(ec2::ApiTranLogFilter(), tranList);
+    qint64 totalDbData = 0;
+    for (const auto& tran: tranList)
+        totalDbData += tran.dataSize;
+
+
     NX_LOG(lit("Sync data time: %1 ms").arg(timer.elapsed()), cl_logINFO);
+    NX_LOG(lit("Total bytes sent: %1, dbSize: %2, ratio: %3")
+        .arg(nx::network::totalSocketBytesSent())
+        .arg(totalDbData)
+        .arg(nx::network::totalSocketBytesSent() / (float) totalDbData), cl_logINFO);
 
 }
 

@@ -3761,6 +3761,7 @@ ErrorCode QnDbManager::doQueryNoLock(const ApiTranLogFilter& filter, ApiTransact
         ApiTransactionData tran;
         tran.tranGuid = QnSql::deserialized_field<QnUuid>(query.value(0));
         QByteArray srcData = query.value(1).toByteArray();
+        tran.dataSize = srcData.size();
         QnUbjsonReader<QByteArray> stream(&srcData);
         if (QnUbjson::deserialize(&stream, &tran.tran)) {
             tranList.push_back(std::move(tran));

@@ -1539,6 +1539,7 @@ APPLY(10101, getMiscParam, ApiMiscData, \
     {
         QnUuid tranGuid;
         QnAbstractTransaction tran;
+        int dataSize = 0;
 
         ApiTransactionData() {}
         ApiTransactionData(const QnUuid& peerGuid): tran(peerGuid) {}
@@ -1548,7 +1549,7 @@ APPLY(10101, getMiscParam, ApiMiscData, \
         ApiTransactionData(ApiTransactionData&&) = default;
         ApiTransactionData& operator=(ApiTransactionData&&) = default;
     };
-#define ApiTransactionData_Fields (tranGuid)(tran)
+#define ApiTransactionData_Fields (tranGuid)(tran)(dataSize)
 QN_FUSION_DECLARE_FUNCTIONS(ApiTransactionData, (json)(ubjson)(xml)(csv_record))
 
     int generateRequestID();

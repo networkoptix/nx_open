@@ -334,5 +334,7 @@ private:
         quint16* const sourcePort );
 };
 
+qint64 NX_NETWORK_API totalSocketBytesSent();
+
 } // namespace network
 } // namespace nx
