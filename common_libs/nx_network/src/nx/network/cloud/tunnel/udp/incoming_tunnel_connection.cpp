@@ -2,7 +2,6 @@
 
 #include <nx/utils/log/log.h>
 
-
 namespace nx {
 namespace network {
 namespace cloud {
@@ -10,13 +9,14 @@ namespace udp {
 
 IncomingTunnelConnection::IncomingTunnelConnection(
     std::unique_ptr<IncomingControlConnection> controlConnection)
-:
+    :
     m_state(SystemError::noError),
     m_controlConnection(std::move(controlConnection)),
-    m_serverSocket(new UdtStreamServerSocket(AF_INET))
+    m_serverSocket(std::make_unique<UdtStreamServerSocket>(SocketFactory::udpIpVersion()))
 {
+    bindToAioThread(getAioThread());
+
     auto controlSocket = m_controlConnection->socket();
-    m_serverSocket->bindToAioThread(controlSocket->getAioThread());
 
     m_controlConnection->setErrorHandler(
         [this](SystemError::ErrorCode code)
@@ -37,7 +37,9 @@ IncomingTunnelConnection::IncomingTunnelConnection(
             }
         });
 
-    const SocketAddress addressToBind(HostAddress::anyHost, controlSocket->getLocalAddress().port);
+    const SocketAddress addressToBind(
+        HostAddress::anyHost,
+        controlSocket->getLocalAddress().port);
     if (!m_serverSocket->setNonBlockingMode(true) ||
         !m_serverSocket->bind(addressToBind) ||
         !m_serverSocket->listen())
@@ -52,6 +54,13 @@ IncomingTunnelConnection::IncomingTunnelConnection(
         NX_LOGX(lm("Listening for new connections on %1")
             .arg(m_serverSocket->getLocalAddress().toString()), cl_logDEBUG1);
     }
+}
+
+void IncomingTunnelConnection::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    base_type::bindToAioThread(aioThread);
+    m_controlConnection->bindToAioThread(aioThread);
+    m_serverSocket->bindToAioThread(aioThread);
 }
 
 void IncomingTunnelConnection::accept(AcceptHandler handler)
@@ -84,15 +93,10 @@ void IncomingTunnelConnection::accept(AcceptHandler handler)
         });
 }
 
-void IncomingTunnelConnection::pleaseStop(
-    nx::utils::MoveOnlyFunc<void()> handler)
+void IncomingTunnelConnection::stopWhileInAioThread()
 {
-    m_serverSocket->pleaseStop(
-        [this, handler = std::move(handler)]()
-        {
-            m_controlConnection.reset();
-            handler();
-        });
+    m_controlConnection.reset();
+    m_serverSocket.reset();
 }
 
 } // namespace udp

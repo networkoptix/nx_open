@@ -12,6 +12,9 @@ class NX_NETWORK_API AbstractAcceptor:
     public aio::BasicPollable
 {
 public:
+    /**
+     * @param handler Sockets, passed here, can be bound to any aio thread.
+     */
     virtual void acceptAsync(AcceptCompletionHandler handler) = 0;
     /**
      * Does not block if called within object's aio thread.

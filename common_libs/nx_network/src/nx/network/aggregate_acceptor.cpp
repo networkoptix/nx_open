@@ -48,7 +48,7 @@ void AggregateAcceptor::acceptAsync(AcceptCompletionHandler handler)
             NX_ASSERT(!m_acceptHandler, "Concurrent accept call");
             m_acceptHandler = std::move(handler);
 
-            if (m_acceptTimeout)
+            if (m_acceptTimeout && (*m_acceptTimeout > std::chrono::milliseconds::zero()))
             {
                 m_timer.start(
                     *m_acceptTimeout,

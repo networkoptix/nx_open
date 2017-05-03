@@ -1,6 +1,7 @@
 #pragma once 
 
 #include <nx/network/abstract_socket.h>
+#include <nx/network/aggregate_acceptor.h>
 #include <nx/network/retry_timer.h>
 #include <nx/network/socket_attributes_cache.h>
 
@@ -92,7 +93,9 @@ protected:
     void retryRegistration();
     void reportResult(SystemError::ErrorCode sysErrorCode);
     void acceptAsyncInternal(AcceptCompletionHandler handler);
-    void onNewConnectionHasBeenAccepted(std::unique_ptr<AbstractStreamSocket> socket);
+    void onNewConnectionHasBeenAccepted(
+        SystemError::ErrorCode sysErrorCode,
+        std::unique_ptr<AbstractStreamSocket> socket);
     void cancelAccept();
 
     void issueRegistrationRequest();
@@ -106,12 +109,13 @@ protected:
 
     std::atomic<State> m_state;
     std::vector<std::unique_ptr<AbstractTunnelAcceptor>> m_acceptors;
-    std::unique_ptr<IncomingTunnelPool> m_tunnelPool;
-    std::unique_ptr<relay::ConnectionAcceptor> m_relayConnectionAcceptor;
+    IncomingTunnelPool* m_tunnelPool = nullptr;
+    relay::ConnectionAcceptor* m_relayConnectionAcceptor = nullptr;
     mutable SystemError::ErrorCode m_lastError;
     AcceptCompletionHandler m_savedAcceptHandler;
     hpm::api::ConnectionMethods m_supportedConnectionMethods = 0xFFFF; //< No limits by default.
     nx::utils::MoveOnlyFunc<void(hpm::api::ResultCode)> m_registrationHandler;
+    AggregateAcceptor m_aggregateAcceptor;
 
 private:
     void stopWhileInAioThread();

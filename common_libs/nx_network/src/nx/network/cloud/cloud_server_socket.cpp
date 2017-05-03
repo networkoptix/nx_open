@@ -162,6 +162,8 @@ AbstractStreamSocket* CloudServerSocket::accept()
     {
         if (auto socket = m_tunnelPool->getNextSocketIfAny())
             return socket.release();
+        //if (auto socket = m_relayConnectionAcceptor->getNextSocketIfAny())
+        //    return socket.release();
 
         SystemError::setLastErrorCode(SystemError::wouldBlock);
         return nullptr;
@@ -228,6 +230,7 @@ void CloudServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
     NX_ASSERT(!m_tunnelPool && m_acceptors.empty());
     m_mediatorRegistrationRetryTimer.bindToAioThread(aioThread);
     m_mediatorConnection->bindToAioThread(aioThread);
+    m_aggregateAcceptor.bindToAioThread(aioThread);
 }
 
 void CloudServerSocket::acceptAsync(AcceptCompletionHandler handler)
@@ -331,7 +334,8 @@ hpm::api::ResultCode CloudServerSocket::registerOnMediatorSync()
     return promise.get_future().get();
 }
 
-void CloudServerSocket::setSupportedConnectionMethods(hpm::api::ConnectionMethods value)
+void CloudServerSocket::setSupportedConnectionMethods(
+    hpm::api::ConnectionMethods value)
 {
     m_supportedConnectionMethods = value;
 }
@@ -349,7 +353,9 @@ void CloudServerSocket::moveToListeningState()
 
 void CloudServerSocket::initTunnelPool(int queueLen)
 {
-    m_tunnelPool = std::make_unique<IncomingTunnelPool>(getAioThread(), queueLen);
+    auto tunnelPool = std::make_unique<IncomingTunnelPool>(getAioThread(), queueLen);
+    m_tunnelPool = tunnelPool.get();
+    m_aggregateAcceptor.addSocket(std::move(tunnelPool));
 }
 
 void CloudServerSocket::startAcceptor(
@@ -443,9 +449,12 @@ void CloudServerSocket::startAcceptingConnections(
 void CloudServerSocket::initializeRelaying(
     const hpm::api::ListenResponse& response)
 {
-    m_relayConnectionAcceptor = 
+    auto relayConnectionAcceptor = 
         std::make_unique<relay::ConnectionAcceptor>(*response.relayEndpoint);
-    m_relayConnectionAcceptor->bindToAioThread(getAioThread());
+    relayConnectionAcceptor->bindToAioThread(getAioThread());
+    m_relayConnectionAcceptor = relayConnectionAcceptor.get();
+
+    m_aggregateAcceptor.addSocket(std::move(relayConnectionAcceptor));
 }
 
 void CloudServerSocket::retryRegistration()
@@ -472,44 +481,35 @@ void CloudServerSocket::acceptAsyncInternal(AcceptCompletionHandler handler)
 
     m_savedAcceptHandler = std::move(handler);
 
-    m_tunnelPool->getNextSocketAsync(
-        std::bind(&CloudServerSocket::onNewConnectionHasBeenAccepted, this, _1),
-        m_socketAttributes.recvTimeout);
-
-    if (m_relayConnectionAcceptor)
+    if (m_socketAttributes.recvTimeout)
     {
-        m_relayConnectionAcceptor->getNextSocketAsync(
-            std::bind(&CloudServerSocket::onNewConnectionHasBeenAccepted, this, _1));
+        m_aggregateAcceptor.setAcceptTimeout(
+            std::chrono::milliseconds(*m_socketAttributes.recvTimeout));
     }
+    else
+    {
+        m_aggregateAcceptor.setAcceptTimeout(boost::none);
+    }
+
+    m_aggregateAcceptor.acceptAsync(
+        std::bind(&CloudServerSocket::onNewConnectionHasBeenAccepted, this, _1, _2));
 }
 
 void CloudServerSocket::onNewConnectionHasBeenAccepted(
+    SystemError::ErrorCode sysErrorCode,
     std::unique_ptr<AbstractStreamSocket> socket)
 {
     decltype(m_savedAcceptHandler) handler;
     handler.swap(m_savedAcceptHandler);
 
-    m_tunnelPool->cancelAccept();
-    if (m_relayConnectionAcceptor)
-        m_relayConnectionAcceptor->cancelAccept();
-
-    if (socket)
-    {
-        DEBUG_LOG(lm("Return socket from tunnel pool %1").arg(socket));
-        handler(SystemError::noError, std::move(socket));
-    }
-    else
-    {
-        DEBUG_LOG(lm("Tunnel pool accept timed out"));
-        handler(SystemError::timedOut, nullptr);
-    }
+    NX_LOGX(lm("Returning socket from tunnel pool. Result code %1")
+        .arg(SystemError::toString(sysErrorCode)), cl_logDEBUG2);
+    handler(sysErrorCode, std::move(socket));
 }
 
 void CloudServerSocket::cancelAccept()
 {
-    m_tunnelPool->cancelAccept();
-    if (m_relayConnectionAcceptor)
-        m_relayConnectionAcceptor->cancelAccept();
+    m_aggregateAcceptor.cancelIOSync();
     m_savedAcceptHandler = nullptr;
 }
 
@@ -578,8 +578,9 @@ void CloudServerSocket::stopWhileInAioThread()
     m_mediatorRegistrationRetryTimer.pleaseStopSync();
     m_mediatorConnection->pleaseStopSync();
     m_acceptors.clear();
-    m_tunnelPool.reset();
-    m_relayConnectionAcceptor.reset();
+    m_aggregateAcceptor.pleaseStopSync();
+    m_tunnelPool = nullptr;
+    m_relayConnectionAcceptor = nullptr;
 }
 
 } // namespace cloud

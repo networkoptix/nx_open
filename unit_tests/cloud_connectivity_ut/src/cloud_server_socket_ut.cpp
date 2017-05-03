@@ -27,6 +27,8 @@ namespace test {
 class FakeTcpTunnelConnection:
     public AbstractIncomingTunnelConnection
 {
+    using base_type = AbstractIncomingTunnelConnection;
+
 public:
     FakeTcpTunnelConnection(
         aio::AbstractAioThread* aioThread,
@@ -37,6 +39,7 @@ public:
         m_server(new TCPServerSocket(AF_INET)),
         m_addressManager(std::move(addressManager))
     {
+        bindToAioThread(getAioThread());
         init(aioThread);
     }
 
@@ -44,6 +47,12 @@ public:
     {
         m_addressManager.remove(m_server->getLocalAddress());
         NX_LOGX(lm("removed, %1 sockets left").arg(m_clientsLimit), cl_logDEBUG1);
+    }
+
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
+    {
+        base_type::bindToAioThread(aioThread);
+        m_server->bindToAioThread(aioThread);
     }
 
     void accept(AcceptHandler handler) override
@@ -65,15 +74,15 @@ public:
             });
     }
 
-    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override
-    {
-        m_server->pleaseStop(std::move(handler));
-    }
-
 private:
     size_t m_clientsLimit;
     std::unique_ptr<AbstractStreamServerSocket> m_server;
     network::test::AddressBinder::Manager m_addressManager;
+
+    virtual void stopWhileInAioThread() override
+    {
+        m_server.reset();
+    }
 
     void init(aio::AbstractAioThread* aioThread)
     {

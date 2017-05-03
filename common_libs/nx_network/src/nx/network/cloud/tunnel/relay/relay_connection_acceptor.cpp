@@ -13,19 +13,22 @@ ConnectionAcceptor::ConnectionAcceptor(const SocketAddress& relayEndpoint):
 void ConnectionAcceptor::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
+    // TODO
 }
 
-void ConnectionAcceptor::getNextSocketAsync(
-    nx::utils::MoveOnlyFunc<void(std::unique_ptr<AbstractStreamSocket>)> /*handler*/)
+void ConnectionAcceptor::acceptAsync(AcceptCompletionHandler handler)
 {
+    // TODO
 }
 
-void ConnectionAcceptor::cancelAccept()
+void ConnectionAcceptor::cancelIOSync()
 {
+    // TODO
 }
 
 void ConnectionAcceptor::stopWhileInAioThread()
 {
+    // TODO
 }
 
 } // namespace relay
