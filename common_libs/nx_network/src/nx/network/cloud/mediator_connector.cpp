@@ -101,7 +101,7 @@ void MediatorConnector::mockupAddress( SocketAddress address, bool suppressWarni
     if (!suppressWarning)
     {
         NX_LOGX( lit( "Mediator address is mocked up: %1" )
-                 .arg( address.toString() ), cl_logWARNING );
+                 .arg( address.toString() ), cl_logINFO );
     }
 
     m_mediatorAddress = address;

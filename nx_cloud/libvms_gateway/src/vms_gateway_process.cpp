@@ -198,6 +198,9 @@ int VmsGatewayProcess::exec()
                 m_cond.wait(lk.mutex());
         }
 
+        NX_LOG(lm("%1 has been stopped")
+            .arg(QnLibVmsGatewayAppInfo::applicationDisplayName()), cl_logALWAYS);
+
         return 0;
     }
     catch (const std::exception& e)
