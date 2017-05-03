@@ -126,11 +126,13 @@ bool QnThreadedPtzController::viewportMove(qreal aspectRatio, const QRectF &view
     RUN_COMMAND(Qn::ViewportMovePtzCommand, void *, viewport, viewportMove, aspectRatio, viewport, speed);
 }
 
-bool QnThreadedPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *) {
+bool QnThreadedPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D* /*position*/) const
+{
     RUN_COMMAND(spaceCommand(Qn::GetDevicePositionPtzCommand, space), QVector3D, result, getPosition, space, &result);
 }
 
-bool QnThreadedPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *) {
+bool QnThreadedPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* /*limits*/) const
+{
     RUN_COMMAND(spaceCommand(Qn::GetDeviceLimitsPtzCommand, space), QnPtzLimits, result, getLimits, space, &result);
 }
 

@@ -27,8 +27,8 @@ public: // Overrides section
         qreal speed) override;
     virtual bool viewportMove(qreal aspectRatio, const QRectF& viewport, qreal speed) override;
 
-    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D* position) override;
-    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) override;
+    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D* position) const override;
+    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const override;
     virtual bool getFlip(Qt::Orientations* flip) override;
 
     virtual bool createPreset(const QnPtzPreset& preset) override;

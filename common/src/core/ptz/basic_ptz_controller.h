@@ -17,8 +17,8 @@ public:
     virtual bool absoluteMove(Qn::PtzCoordinateSpace, const QVector3D &, qreal) override    { return false; }
     virtual bool viewportMove(qreal, const QRectF &, qreal) override                        { return false; }
 
-    virtual bool getPosition(Qn::PtzCoordinateSpace, QVector3D *) override                  { return false; }
-    virtual bool getLimits(Qn::PtzCoordinateSpace, QnPtzLimits *) override                  { return false; }
+    virtual bool getPosition(Qn::PtzCoordinateSpace, QVector3D* /*position*/) const override                  { return false; }
+    virtual bool getLimits(Qn::PtzCoordinateSpace, QnPtzLimits* /*limits*/) const override                  { return false; }
     virtual bool getFlip(Qt::Orientations *) override                                       { return false; }
 
     virtual bool createPreset(const QnPtzPreset &) override                                 { return false; }

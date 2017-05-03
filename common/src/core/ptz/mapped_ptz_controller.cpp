@@ -28,7 +28,8 @@ bool QnMappedPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVe
     }
 }
 
-bool QnMappedPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
+bool QnMappedPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D* position) const
+{
     if(space == Qn::DevicePtzCoordinateSpace) {
         return base_type::getPosition(Qn::DevicePtzCoordinateSpace, position);
     } else {
@@ -41,7 +42,8 @@ bool QnMappedPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D 
     }
 }
 
-bool QnMappedPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) {
+bool QnMappedPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const
+{
     if(space == Qn::DevicePtzCoordinateSpace) {
         return base_type::getLimits(space, limits);
     } else {

@@ -187,7 +187,8 @@ QVector3D QnFisheyePtzController::boundedPosition(const QVector3D &position) {
     return result;
 }
 
-QVector3D QnFisheyePtzController::getPositionInternal() {
+QVector3D QnFisheyePtzController::getPositionInternal() const
+{
     return QVector3D(
         qRadiansToDegrees(m_itemDewarpingParams.xAngle),
         qRadiansToDegrees(m_itemDewarpingParams.yAngle),
@@ -230,7 +231,8 @@ Ptz::Capabilities QnFisheyePtzController::getCapabilities() const
     return m_capabilities;
 }
 
-bool QnFisheyePtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) {
+bool QnFisheyePtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const
+{
     if(space != Qn::LogicalPtzCoordinateSpace)
         return false;
 
@@ -296,7 +298,8 @@ bool QnFisheyePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QV
     return true;
 }
 
-bool QnFisheyePtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
+bool QnFisheyePtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D* position) const
+{
     if(space != Qn::LogicalPtzCoordinateSpace)
         return false;
     

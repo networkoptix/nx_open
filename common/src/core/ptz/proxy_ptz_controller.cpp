@@ -78,7 +78,7 @@ bool QnProxyPtzController::viewportMove(
 
 bool QnProxyPtzController::getPosition(
     Qn::PtzCoordinateSpace space,
-    QVector3D* position)
+    QVector3D* position) const
 {
     return m_controller
         ? m_controller->getPosition(space, position)
@@ -87,7 +87,7 @@ bool QnProxyPtzController::getPosition(
 
 bool QnProxyPtzController::getLimits(
     Qn::PtzCoordinateSpace space,
-    QnPtzLimits* limits)
+    QnPtzLimits* limits) const
 {
     return m_controller
         ? m_controller->getLimits(space, limits)

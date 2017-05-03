@@ -132,7 +132,7 @@ public slots:
      * \returns                         Whether the operation was successful.
      * \see absoluteMove
      */
-    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) = 0;
+    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D* position) const = 0;
 
     /**
      * Gets PTZ limits of the camera.
@@ -144,7 +144,7 @@ public slots:
      * \param[out] limits               Ptz limits.
      * \returns                         Whether the operation was successful.
      */
-    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) = 0;
+    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) const = 0;
 
     /**
      * Returns the camera streams's flipped state. This function can be used for

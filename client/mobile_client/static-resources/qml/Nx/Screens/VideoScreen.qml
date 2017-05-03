@@ -260,6 +260,9 @@ PageBase
             id: ptzController
 
             uniqueResourceId: videoScreenController.resourceHelper.resourceId
+
+            property bool supportsPresets:
+                ptzController.capabilities & Ptz.PresetsPtzCapability
         }
 
         Column
@@ -314,7 +317,6 @@ PageBase
 
                     PtzZoomControl
                     {
-                        supporsValuesMarker: true
                         onZoomInPressedChanged:
                         {
                             var zoomVector = zoomInPressed
@@ -390,7 +392,7 @@ PageBase
                 {
                     anchors.left: parent.left
                     anchors.right: hidePtzButton.left
-                    visible: ptzController.presetsCount && supportsPresets
+                    visible: ptzController.presetsCount && ptzController.supportsPresets
 
                     PtzPresetsButton
                     {
@@ -406,10 +408,8 @@ PageBase
                     {
                         id: presetsItem
 
-                        property bool supportsPresets:
-                            ptzController.capabilities & Ptz.PresetsPtzCapability
 
-                        visible: ptzController.presetsCount && supportsPresets
+                        visible: ptzController.presetsCount && ptzController.supportsPresets
 
                         presetsCount: ptzController.presetsCount
                         currentPresetIndex: ptzController.activePresetIndex

@@ -66,12 +66,14 @@ bool QnCachingPtzController::viewportMove(qreal aspectRatio, const QRectF &viewp
     return base_type::viewportMove(aspectRatio, viewport, speed);
 }
 
-bool QnCachingPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
+bool QnCachingPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D* position) const
+{
     /* We don't cache position => no need to check cache here. */
     return base_type::getPosition(space, position);
 }
 
-bool QnCachingPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) {
+bool QnCachingPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const
+{
     if(!base_type::getLimits(space, limits))
         return false;
 

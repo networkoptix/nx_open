@@ -91,11 +91,13 @@ bool QnRemotePtzController::viewportMove(qreal aspectRatio, const QRectF &viewpo
     RUN_COMMAND(Qn::ViewportMovePtzCommand, viewport, ptzViewportMoveAsync, aspectRatio, viewport, speed, m_sequenceId, nextSequenceNumber());
 }
 
-bool QnRemotePtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *) {
+bool QnRemotePtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D* /*position*/) const
+{
     RUN_COMMAND(spaceCommand(Qn::GetDevicePositionPtzCommand, space), QVariant(), ptzGetPositionAsync, space);
 }
 
-bool QnRemotePtzController::getLimits(Qn::PtzCoordinateSpace, QnPtzLimits *) {
+bool QnRemotePtzController::getLimits(Qn::PtzCoordinateSpace, QnPtzLimits * /*limits*/) const
+{
     return false;
 }
 
