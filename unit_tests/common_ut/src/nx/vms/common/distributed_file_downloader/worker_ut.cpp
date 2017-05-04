@@ -174,6 +174,33 @@ TEST_F(DistributedFileDownloaderWorkerTest, preferredPeersSelection)
     }
 }
 
+TEST_F(DistributedFileDownloaderWorkerTest, neighbourPeersSelection)
+{
+    for (int i = 0; i < 100; ++i)
+        peerManager->addPeer(QnUuid::createUuid());
+
+    auto peers = peerManager->getAllPeers();
+    peers.append(peerManager->selfId());
+
+    std::sort(peers.begin(), peers.end());
+
+    const int selfPos = peers.indexOf(peerManager->selfId());
+
+    const int maxDistance = (worker->peersPerOperation() + 1) / 2;
+
+    auto distance =
+        [&peers, selfPos](const QnUuid& peerId)
+        {
+            const int pos = peers.indexOf(peerId);
+            const int dist = std::abs(selfPos - pos);
+            return std::min(dist, peers.size() - dist);
+        };
+
+    const auto& selectedPeers = worker->selectPeersForOperation();
+    for (const auto& peerId: selectedPeers)
+        ASSERT_LE(distance(peerId), maxDistance);
+}
+
 TEST_F(DistributedFileDownloaderWorkerTest, requestingFileInfo)
 {
     const auto& fileInfo = createTestFile();
