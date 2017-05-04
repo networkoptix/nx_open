@@ -7,12 +7,27 @@
 
 ::-webkit-scrollbar-track
 {
-  background: rgb(28,35,39);
+  background: $light4;
 }
 
 ::-webkit-scrollbar-thumb
 {
-  background: rgb(53,70,79);
+  background: $light8;
+}
+
+::-webkit-scrollbar-track:hover
+{
+  background: $light9;
+}
+
+::-webkit-scrollbar-thumb:hover
+{
+  background: $light9;
+}
+
+::-webkit-scrollbar-thumb:active
+{
+  background: $light11;
 }
 
 ::-ms-clear { display: none; }
@@ -60,7 +75,7 @@ table.webclient-window>tbody>tr>td.alert{
   height: 100%;
   width:100%;
 
-  background-color: #171C1F;
+  background-color: $additional_light2;
   border-right: 1px solid #121517;
 }
 .camera-status{
@@ -169,13 +184,16 @@ table.webclient-window>tbody>tr>td.alert{
   padding: 10px 0px;
 }
 .cameras-search{
-  padding:10px;
-
+  padding:10px 0 10px 0;
   margin:3px 0;
+  height: 44px;
+  border-bottom: 1px solid $light6;
+  font-size: 13px;
+  background-color: $additional-light2;
 }
 
 .cameras-search>.input-group{
-  margin:0;
+  margin-top: -9px;
 }
 
 .cameras-search>.input-group>*{
@@ -204,16 +222,53 @@ table.webclient-window>tbody>tr>td.alert{
   font-size: 13px;
 }
 
+.clear-button{
+  width: 40px;
+  height: 43px;
+}
+.icon{
+  width: 44px;
+  height: 43px;
+}
+.icon-40{
+  width: 40px;
+}
+
+.clear-button-right{
+  background-color: $light4 !important;
+  position: relative;
+  height: 24px;
+  width: 1px;
+  top: 10px;
+}
+
+.info-icon.active{
+  color: $blue10 !important;
+}
+
+.info-icon:hover,
+.info-icon.active:hover{
+  background-color: $additional_light3 !important;
+}
+
+.info-icon:active,
+.info-icon.active:active{
+  background-color: $light5 !important;
+}
 
 .cameras-search>.input-group>input{
   border:none;
   box-shadow:none;
-  color: #FFFFFF;
   font-size: 16px;
 }
 
-.cameras-search .clear-button{
-  color: #FFFFFF;
+.camers-search:hover{
+  backgroud-color: $light2;
+}
+
+.cameras-search.active,
+.cameras-search:active{
+  background-color: $light1;
 }
 
 
@@ -442,7 +497,7 @@ div.text-center{
 
 .webclient-window .cameras-panel{
   height: 100%;
-  width: 350px;
+  width: 320px;
   overflow-y: scroll;
   overflow-x: hidden;
 }
@@ -451,6 +506,7 @@ div.text-center{
 .webclient-window .tree{
   font-size: 114%; /*16px*/
   font-weight: 500;
+  padding: 8px;
 }
 
 .webclient-window .tree .offline {
@@ -468,7 +524,8 @@ div.text-center{
 .server-underline{
   display: inline-block;
   width:100%;
-  border-bottom: 1px solid #263137;
+  height: 40px;
+  border-bottom: 1px solid $light6;
 }
 .webclient-panel-border{
   height: 30px;
@@ -606,7 +663,7 @@ div.text-center{
 }
 
 .dark-theme .nav > li > a{
-  color:white;
+  color:$dark9;
   font-weight: normal;
 }
 .dark-theme .nav > li > a:hover,
@@ -630,7 +687,9 @@ div.text-center{
   padding-left:92px;
 }
 
-
+.camera-node{
+  height: 56px;
+}
 
 .camera-node small{
   color: rgb(105,135,150);
@@ -710,17 +769,20 @@ div.text-center{
  background-color: rgba(198,234,255,0.15);
 }
 .server-link{
-  position:relative;
-  height:60px;
+  height:40px;
+  line-height:20px !important;
   padding: 10px;
-  border-top: 1px solid #0D0E0F;
+  border-bottom: 1px solid $light6;
 }
-.server-link:before{
-  position:absolute;
-  z-index: -1;
-  top:1px;
-  border-top: 1px solid #1C2327;
+.server-link:hover{
+  background-color: $additional_light3 !important;
+  border-radius: 2px;
 }
+.server-link:active{
+  background-color: $light5;
+  border-radius: 2px;
+}
+
 .server-link>*{
   vertical-align: middle;
 }
