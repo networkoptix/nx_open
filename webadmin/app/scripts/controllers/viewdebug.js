@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('webadminApp').controller('ViewCtrl',
+angular.module('webadminApp').controller('ViewdebugCtrl',
     function ($scope, $rootScope, $location, $routeParams, mediaserver, cameraRecords, $poll, $q,
               $sessionStorage, $localStorage, currentUser) {
 
@@ -19,13 +19,12 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.storage = $localStorage;
         $scope.storage.serverStates = $scope.storage.serverStates || {};
         
-        $scope.playerApi = false;
         $scope.cameras = {};
         $scope.liveOnly = true;
         $scope.storage.cameraId = $routeParams.cameraId || $scope.storage.cameraId   || null;
 
         if(!$routeParams.cameraId &&  $scope.storage.cameraId){
-            $location.path('/view/' + $scope.storage.cameraId, false);
+            $location.path('/viewdebug/' + $scope.storage.cameraId, false);
         }
 
         $scope.activeCamera = null;
@@ -70,7 +69,6 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.settings = {id: ''};
         $scope.volumeLevel = typeof($scope.storage.volumeLevel) === 'number' ? $scope.storage.volumeLevel : 50;
 
-        $scope.serverTime = {};
 
         mediaserver.getModuleInformation().then(function (r) {
             $scope.settings = {
@@ -100,7 +98,24 @@ angular.module('webadminApp').controller('ViewCtrl',
                 return true;
             });
             $scope.hasMobileApp = !!found;
+        }
 
+        $scope.players = [];
+        for(var i = 0; i < 4; ++i){
+            $scope.players.push({'updateTime': 'updateTime($currentTime,$duration)',
+                                'playerAPI': 'playerReady($API)',
+                                'activeVideoSource': $scope.activeVideoSource,
+                                'player': $scope.player,
+                                'activeFormat': $scope.activeFormat,
+                                'playerId': 'player'+i.toString()
+            });
+        }
+        var selectedPlayer = 0;
+        $scope.selectedPlayer = 0;
+        $scope.selectPlayer = function(player){
+            $scope.selectedPlayer = player;
+            selectedPlayer = player;
+            //console.log("selected ", player+1);
         }
 
 
@@ -225,9 +240,10 @@ angular.module('webadminApp').controller('ViewCtrl',
         }
 
         $scope.playerReady = function(API){
-            $scope.playerAPI = API;
+            $scope.players[selectedPlayer].playerAPI = API;
+            console.log("Players");
             if(API) {
-                $scope.switchPlaying($scope.positionProvider.playing);
+                $scope.switchPlaying(true);
                 $scope.playerAPI.volume($scope.volumeLevel);
             }
         };
@@ -246,7 +262,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
 
 
-            $scope.positionProvider.init(playing, timeCorrection, $scope.positionProvider.playing);
+            $scope.positionProvider.init(playing);
             if(live){
                 playing = (new Date()).getTime();
             }else{
@@ -273,7 +289,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             $scope.resolution = resolutionHls;
 
             $scope.currentResolution = $scope.player == "webm" ? resolution : resolutionHls;
-            $scope.activeVideoSource = _.filter([
+            $scope.players[selectedPlayer].activeVideoSource = _.filter([
                 { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?'            + resolutionHls + positionMedia + authParam ), type: mimeTypes.hls, transport:'hls'},
                 { src: ( serverUrl + '/media/' + cameraId + '.webm?rt&resolution=' + resolution + positionMedia + authParam ), type: mimeTypes.webm, transport:'webm' }
             ],function(src){
@@ -328,7 +344,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
         };
         $scope.selectCamera = function (activeCamera) {
-            $location.path('/view/' + activeCamera.id, false);
+            $location.path('/viewdebug/' + activeCamera.id, false);
             $scope.selectCameraById(activeCamera.id,false);
         };
 
@@ -338,11 +354,13 @@ angular.module('webadminApp').controller('ViewCtrl',
         };
 
         $scope.switchPlaying = function(play){
-            if($scope.playerAPI) {
+            var currentPlayer = $scope.players[selectedPlayer].playerAPI;
+            console.log($scope.players);
+            if(currentPlayer) {
                 if (play) {
-                    $scope.playerAPI.play();
+                    currentPlayer.play();
                 } else {
-                    $scope.playerAPI.pause();
+                    currentPlayer.pause();
                 }
                 if ($scope.positionProvider) {
                     $scope.positionProvider.playing = play;
@@ -368,6 +386,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         };
 
         $scope.selectFormat = function(format){
+            $scope.players[selectedPlayer].activeFormat = format;
             $scope.activeFormat = format;
             updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
         };
@@ -718,26 +737,17 @@ angular.module('webadminApp').controller('ViewCtrl',
         },true);
 
         $scope.$watch('volumeLevel', function(){
-            if($scope.playerAPI)
-                $scope.playerAPI.volume($scope.volumeLevel);
+            var currentPlayer = $scope.players[selectedPlayer].playerAPI;
+            if(currentPlayer)
+                currentPlayer.volume($scope.volumeLevel);
             $scope.storage.volumeLevel = $scope.volumeLevel;
         });
 
-
         mediaserver.getTime().then(function(result){
-            var clientDate = new Date();
-
             var serverTime = parseInt(result.data.reply.utcTime);
-            var clientTime = clientDate.getTime();
+            var clientTime = (new Date()).getTime();
             if(Math.abs(clientTime - serverTime) > minTimeLag){
                 timeCorrection = clientTime - serverTime;
-            }
-            
-            $scope.serverTime.timeZoneOffset = parseInt(result.data.reply.timeZoneOffset);
-            $scope.serverTime.latency = timeCorrection;
-
-            if(Config.settingsConfig.useServerTime){
-                timeCorrection = $scope.serverTime.timeZoneOffset + clientDate.getTimezoneOffset() * 60000 - timeCorrection;
             }
         });
 
