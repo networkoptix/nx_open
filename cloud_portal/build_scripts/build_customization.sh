@@ -74,7 +74,7 @@ dir=../customizations/$CUSTOMIZATION/
         popd
 
         echo "Clean sources"
-        rm -rf $TARGET_DIR/$CUSTOMIZATION/source/templates/src
+        rm -rf $TARGET_DIR/$CUSTOMIZATION/source/templates/lang_$LANG/src
     done
     echo "Templates success"
 

@@ -8,7 +8,7 @@ from jsonfield import JSONField
 # CMS structure (data structure). Only developers can change that
 
 class Product(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
 
 
 class Context(models.Model):
@@ -39,12 +39,12 @@ class DataStructure(models.Model):
 # CMS settings. Release engineer can change that
 
 class Language(models.Model):
-    name = models.CharField(max_length=1024)
-    code = models.CharField(max_length=8)
+    name = models.CharField(max_length=255, unique=True)
+    code = models.CharField(max_length=8, unique=True)
 
 
 class Customization(models.Model):
-    name = models.CharField(max_length=1024)
+    name = models.CharField(max_length=255, unique=True)
     default_language = models.ForeignKey(Language)
 
 
