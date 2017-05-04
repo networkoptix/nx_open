@@ -25,12 +25,14 @@ angular.module('webadminApp')
             scope: {
                 vgUpdateTime:"&",
                 vgPlayerReady:"&",
-                vgSrc:"="
+                playerId: "=",
+                vgSrc:"=",
+                player:"=",
+                activeFormat:"="
             },
             templateUrl: Config.viewsDir + 'components/videowindow.html',// ???
 
             link: function (scope, element/*, attrs*/) {
-
                 var mimeTypes = {
                     'hls': 'application/x-mpegURL',
                     'webm': 'video/webm',
@@ -38,16 +40,20 @@ angular.module('webadminApp')
                     'flv': 'video/x-flv',
                     'mp4': 'video/mp4'
                 };
-
                 scope.Config = Config;
                 scope.debugMode = Config.debug.video && Config.allowDebugMode;
                 scope.debugFormat = Config.allowDebugMode && Config.debug.videoFormat;
-
+                scope.jshlsHideError = Config.debug.jshlsHideError && Config.allowDebugMode;
+                scope.jshlsDebugMode = Config.debug.jshlsDebug && Config.allowDebugMode;
+                
                 function getFormatSrc(mediaformat) {
                     var src = _.find(scope.vgSrc,function(src){return src.type == mimeTypes[mediaformat];});
                     if( scope.debugMode){
                         console.log("playing",src?src.src:null);
                     }
+                    //return "http://sample.vodobox.net/skate_phantom_flex_4k/skate_phantom_flex_4k.m3u8";
+                    //return "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8";
+                    //return "http://184.72.239.149/vod/smil:BigBuckBunny.smil/playlist.m3u8";
                     return src?src.src:null;
                 }
 
@@ -63,8 +69,8 @@ angular.module('webadminApp')
                     scope.ieWin10 = false;
                     scope.ubuntuNX = false;
 
-                    if(scope.debugMode && scope.debugFormat){
-                        return scope.debugFormat;
+                    if(scope.debugMode && scope.activeFormat != "Auto"){
+                        return scope.activeFormat;
                     }
 
                     //This function gets available sources for camera and chooses the best player for this browser
@@ -91,21 +97,11 @@ angular.module('webadminApp')
                     }
                     var weHaveWebm = _.find(scope.vgSrc,function(src){return src.type == mimeTypes['webm'];});
                     var weHaveHls = _.find(scope.vgSrc,function(src){return src.type == mimeTypes['hls'];});
-                    var weHaveRtsp = _.find(scope.vgSrc,function(src){return src.type == mimeTypes['rtsp'];});
+                    var jsHlsSupported = Hls.isSupported();
 
-                    if(weHaveHls && canPlayNatively("hls")){
+                    //Should Catch MS edge, Safari, Mobile Devices
+                    if(weHaveHls && (canPlayNatively("hls") || window.jscd.mobile)){
                         return "native-hls";
-                    }
-
-                    // Test native support. Native is always better choice
-                    if(weHaveWebm && canPlayNatively("webm")){ // webm is our best format for now
-                        if(window.jscd.browser == 'Microsoft Internet Explorer' && window.jscd.osVersion >= 10) {
-                            // This is hack to prevent using webm codec in Windows 10.
-                            // Pretend we do not support webm in Windows 10
-                            // TODO: remove this hack in happy future
-                        }else{
-                            return "webm";
-                        }
                     }
 
                     // Hardcode native support
@@ -119,56 +115,41 @@ angular.module('webadminApp')
                         }
                     }
 
-                    if(window.jscd.mobile && weHaveHls){
-                        return "native-hls"; // Only one choice on mobile.
-                        // TODO: Try removing this line.
-                    }
-
                     // No native support
                     //Presume we are on desktop:
                     switch(window.jscd.browser){
                         case 'Microsoft Internet Explorer':
                             // Check version here
-
-                            if(weHaveHls && window.jscd.flashVersion ){ // We have flash - try to play using flash
+                            if(jsHlsSupported && weHaveHls){
+                                return "jshls";
+                            }
+                            if(window.jscd.flashVersion && weHaveHls){ // We have flash - try to play using flash
                                 return "flashls";
                             }
-
-                            /*if(window.jscd.browserMajorVersion>=10 && weHaveHls){
-                                return "jshls";
-                            }*/
-
-                            if(weHaveHls && weHaveWebm && (window.jscd.osVersion < 10)){
-                                scope.flashOrWebmRequired = true;
-                                return false;
+                            if(weHaveWebm && window.jscd.osVersion < 10 && canPlayNatively("webm")){
+                                return 'webm';
                             }
-
-                            if(weHaveHls) {
-                                scope.flashRequired = true;
-                                return false;
+                            //Could not find a supported player for the Browser gonna display whats needed instead.
+                            if(weHaveWebm){
+                                if(window.jscd.osVersion < 10){
+                                    if(weHaveHls){
+                                        scope.flashOrWebmRequired = true;
+                                    }
+                                    else{
+                                        scope.ieNoWebm = true;
+                                    }
+                                }
+                                else{
+                                    scope.ieWin10 = true;
+                                }
                             }
-
-                            if(weHaveWebm && (window.jscd.osVersion < 10))
-                            {
-                                scope.ieNoWebm = true;
-                                return false;
-                            }
-
-                            if(weHaveWebm && (window.jscd.osVersion >= 10)){
-                                scope.ieWin10 = true; // Not supported browser
-                                return false;
-                            }
-
-                            scope.noFormat = true;
-                            return false; // IE9 - No other supported formats
-
-
-                        case "Safari": // TODO: Try removing this line.
-                            if(weHaveHls) {
-                                return "native-hls";
-                            }
+                            break;
 
                         case "Firefox":
+                            if(weHaveWebm && canPlayNatively("webm"))
+                            {
+                                return "webm";
+                            }
                             if(weHaveHls && window.jscd.os === 'Linux'){
                                 scope.ubuntuNX = true;
                                 return false;
@@ -178,23 +159,20 @@ angular.module('webadminApp')
                         case "Opera":
                         case "Webkit":
                         default:
-                            if(weHaveHls && window.jscd.flashVersion ){ // We have flash - try to play using flash
+                            if(jsHlsSupported && weHaveHls) {
+                                return "jshls";// We are hoping that we have some good browser
+                            }
+                            if(window.jscd.flashVersion &&  weHaveHls){ // We have flash - try to play using flash
                                 return "flashls";
                             }
-                            /*if(weHaveHls) {
-                                return "jshls";// We are hoping that we have some good browser
-                            }*/
-                            if(weHaveRtsp && window.jscd.flashVersion){
-                                return "rtsp";
+                            if(weHaveWebm && canPlayNatively("webm")){
+                                return "webm";
                             }
-                            if(weHaveHls) {
-                                scope.flashRequired = true;
-                                return false;
-                            }
-
-                            scope.noFormat = true;
-                            return false; // IE9 - No supported formats
                     }
+
+                    scope.flashRequired = true;
+                    scope.noFormat = true;
+                    return false; // IE9 - No supported formats
                 }
 
 
@@ -203,20 +181,11 @@ angular.module('webadminApp')
                 var activePlayer = null;
                 function recyclePlayer(player){
                     if(activePlayer != player) {
-                        if(scope.vgApi && scope.vgApi.destroy){
-                            scope.vgApi.destroy(); // try to destroy
-                        }
                         element.find(".videoplayer").html("");
                         scope.vgPlayerReady({$API: null});
-                    }
-
-                    if(activePlayer == 'flashls' && player == 'webm'){
-                        // This is hack! When switching from flashls to webm video - webm player stucks. Seems like chrome issue.
                         activePlayer = player;
                         return false;
                     }
-
-                    activePlayer = player;
                     return true;
                 }
 
@@ -228,6 +197,7 @@ angular.module('webadminApp')
 
                     scope.native = true;
                     scope.flashls = false;
+                    scope.jsHls = false;
 
                     var autoshow = null;
                     nativePlayer.init(element.find(".videoplayer"), function (api) {
@@ -272,14 +242,23 @@ angular.module('webadminApp')
                     });
                 }
 
+                
                 function initFlashls() {
                     scope.flashls = true;
                     scope.native = false;
-                    scope.flashSource = "components/flashlsChromeless.swf";
+                    scope.jsHls = false;
 
+                    var playerId = scope.playerId;
+                    if(!playerId){
+                        playerId = "player0";
+                    }
+                    
+                    scope.flashSource = "components/flashlsChromeless.swf";
                     if(scope.debugMode && scope.debugFormat){
                         scope.flashSource = "components/flashlsChromeless_debug.swf";
                     }
+
+                    var flashlsAPI = new FlashlsAPI(null);
 
                     if(flashlsAPI.ready()){
                         flashlsAPI.kill();
@@ -287,14 +266,14 @@ angular.module('webadminApp')
                         $timeout(initFlashls);
                     }else {
                         $timeout(function () {// Force DOM to refresh here
-                            flashlsAPI.init("videowindow", function (api) {
+                            flashlsAPI.init(playerId, function (api) {
                                 scope.vgApi = api;
-
                                 if (scope.vgSrc) {
                                     $timeout(function () {
                                         scope.loading = !!format;
                                     });
                                     scope.vgApi.load(getFormatSrc('hls'));
+
                                 }
 
                                 scope.vgPlayerReady({$API: api});
@@ -304,6 +283,7 @@ angular.module('webadminApp')
                                     scope.loading = false;
                                     scope.flashls = false;// Kill flashls with his error
                                     scope.native = false;
+                                    scoep.jsHls = false;
                                 });
                                 console.error(error);
                             }, function (position, duration) {
@@ -317,80 +297,56 @@ angular.module('webadminApp')
                 }
 
                 function initJsHls(){
-                    jshlsAPI.init( element.find(".videoplayer"), function (api) {
+                    scope.flashls = false;
+                    scope.native = false;
+                    scope.jsHls = true;
+
+                    var hlsAPI = new JsHlsAPI();
+                    hlsAPI.init( element.find(".videoplayer"), scope.jshlsHideError, scope.jshlsDebugMode, function (api) {
                         scope.vgApi = api;
-
                         if (scope.vgSrc) {
-
                             $timeout(function(){
-                                scope.loading = !!format;
+                                scope.loading = false;
                             });
                             scope.vgApi.load(getFormatSrc('hls'));
-                        }
-
-                        scope.vgPlayerReady({$API:api});
-                    }, function (api) {
-                        console.error("some error");
-                    });
-
-                }
-
-                function initRtsp(){
-                    var locomote = new Locomote('videowindow', /*'bower_components/locomote/dist/Player.swf'/**/'components/Player.swf'/**/);
-                    locomote.on('apiReady', function() {
-                        scope.vgApi = locomote;
-
-                        /* Tell Locomote to play the specified media */
-                        if(!scope.vgApi.load ) {
-
-                            $timeout(function(){
-                                scope.loading = !!format;
+                            scope.vgApi.addEventListener("timeupdate", function (event) {
+                                var video = event.srcElement || event.originalTarget;
+                                scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
+                                if (scope.loading) {
+                                    $timeout(function () {
+                                        scope.loading = false;
+                                    });
+                                }
                             });
-
-                            scope.vgApi.load = scope.vgApi.play;
-                            scope.vgApi.play = function(){
-                                scope.vgApi.load(getFormatSrc('rtsp'));
-                            }
                         }
-
-                        /* Start listening for streamStarted event */
-                        locomote.on('streamStarted', function() {
-                            //console.log('stream has started');
-                        });
-
-                        /* If any error occurs, we should take action */
-                        locomote.on('error', function(err) {
-                            console.error(err);
-                        });
-
-                        if (scope.vgSrc) {
-                            scope.vgApi.play(scope.vgSrc[2].src);
-                        }
-
                         scope.vgPlayerReady({$API:api});
+                    },  function (api) {
+                            scope.errorLoading = true;
+                            scope.jsHls = false;
+                            console.log(api);
                     });
                 }
 
                 element.bind('contextmenu',function() { return !!scope.debugMode; }); // Kill context menu
-                var format = null;
+                
 
+                var format = null;
                 function srcChanged(){
                     scope.loading = false;
                     scope.errorLoading = false;
-                    if(/*!scope.vgApi && */scope.vgSrc ) {
+                    if(scope.vgSrc ) {
                         format = detectBestFormat();
-
                         if(!recyclePlayer(format)){ // Remove or recycle old player.
                             // Some problem happened. We must reload video here
                             $timeout(srcChanged);
                         }
-
                         if(!format){
                             scope.native = false;
                             scope.flashls = false;
+                            scope.jsHls = false;
                             return;
                         }
-
+                        scope.player = format;
                         switch(format){
                             case "flashls":
                                 initFlashls();
@@ -398,10 +354,6 @@ angular.module('webadminApp')
 
                             case "jshls":
                                 initJsHls();
-                                break;
-
-                            case "rtsp":
-                                initRtsp();
                                 break;
 
                             case "native-hls":
@@ -414,14 +366,36 @@ angular.module('webadminApp')
                                 break;
                         }
                     }
-                    //if(scope.vgApi && scope.vgSrc ) {
-                    //    scope.vgApi.load(scope.vgSrc[0].src);
-                    //}
                 }
 
                 scope.$watch("vgSrc",srcChanged);
 
                 scope.$on('$destroy',recyclePlayer);
+
+                if(scope.debugMode)
+                    scope.$watch('activeFormat', srcChanged);
+                
+                scope.initFlash = function(){
+                    var playerId = !scope.playerId ? 'player0': scope.playerId;
+                
+                    var tmp = '<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"codebase="" id="flashvideoembed_'+playerId+'"';
+                    tmp += 'width="100%" height="100%">';
+                    tmp += '\n\t<param name="movie"  value="'+scope.flashSource+'?inline=1" />';
+                    tmp += '\n\t<param name="quality" value="high" />';
+                    tmp += '\n\t<param name="swliveconnect" value="true" />';
+                    tmp += '\n\t<param name="allowScriptAccess" value="always" />';
+                    tmp += '\n\t<param name="bgcolor" value="#1C2327" />';
+                    tmp += '\n\t<param name="allowFullScreen" value="true" />';
+                    tmp += '\n\t<param name="wmode" value="transparent" />';
+                    tmp += '\n\t<param name="FlashVars" value="callback=' + playerId + '" />';
+                    tmp += '\n\t<embed src="'+scope.flashSource+'?inline=1" width="100%" height="100%"';
+                    tmp += ' name="flashvideoembed_'+playerId+'" quality="high" bgcolor="#1C2327" align="middle" allowFullScreen="true"';
+                    tmp += 'allowScriptAccess="always" type="application/x-shockwave-flash" swliveconnect="true" wmode="transparent"';
+                    tmp += 'FlashVars="callback='+playerId+'">\n\t</embed>\n</object>';
+                    
+                    playerId = !scope.playerId ? '' : '#'+playerId;
+                    $('videowindow'+playerId)[0].children[0].children[0].innerHTML = tmp;
+                };
             }
         }
     }]);

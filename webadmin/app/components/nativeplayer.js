@@ -36,6 +36,10 @@ var nativePlayer = new (function () {
         }
     };
 
+    this.volume = function(volumeLevel){
+        currentVideo.volume = volumeLevel/100;
+    }
+
     this.destroy = function(){
         if( currentVideo || node.has("video").length){
             try {
