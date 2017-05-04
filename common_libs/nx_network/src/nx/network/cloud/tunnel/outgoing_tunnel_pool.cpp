@@ -1,9 +1,10 @@
 #include "outgoing_tunnel_pool.h"
 
+#include <nx/network/socket_global.h>
 #include <nx/utils/thread/barrier_handler.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/random.h>
+#include <nx/utils/std/cpp14.h>
 
 namespace nx {
 namespace network {
@@ -19,6 +20,8 @@ OutgoingTunnelPool::OutgoingTunnelPool():
 
 OutgoingTunnelPool::~OutgoingTunnelPool()
 {
+    m_counter.wait();
+
     NX_ASSERT(m_terminated);
     NX_ASSERT(m_pool.empty());
 }
@@ -164,6 +167,8 @@ void OutgoingTunnelPool::reportConnectionResult(
 
 void OutgoingTunnelPool::onTunnelClosed(OutgoingTunnel* tunnelPtr)
 {
+    const auto callLocker = m_counter.getScopedIncrement();
+
     std::list<OutgoingTunnel::NewConnectionHandler> userHandlers;
     std::unique_ptr<OutgoingTunnel> tunnel;
     QString remoteHostName;
