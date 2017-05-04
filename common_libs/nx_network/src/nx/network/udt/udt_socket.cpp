@@ -1036,6 +1036,7 @@ AbstractStreamSocket* UdtStreamServerSocket::systemAccept()
         m_ipVersion,
         new detail::UdtSocketImpl(ret),
         detail::SocketState::connected);
+    acceptedSocket->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
 
     if (!acceptedSocket->setSendTimeout(0) || !acceptedSocket->setRecvTimeout(0))
     {
