@@ -1434,9 +1434,10 @@ void TimeSynchronizationManager::handleLocalTimePriorityKeyChange(QnMutexLockerB
 
         auto manager = m_connection->getMiscManager(Qn::kSystemAccess);
         manager->saveMiscParam(localTimeData, this,
-            [](int reqID, ec2::ErrorCode ErrorCode)
+            [](int /*reqID*/, ec2::ErrorCode errCode)
             {
-                qWarning() << "Failed to save misc param to the local DB";
+            if (errCode != ec2::ErrorCode::ok)
+                qWarning() << "Failed to save time data to the database";
             });
 }
 }
@@ -1510,14 +1511,16 @@ void TimeSynchronizationManager::saveSyncTimeAsync(
 
     auto manager = m_connection->getMiscManager(Qn::kSystemAccess);
     manager->saveMiscParam(deltaData, this,
-        [](int /*reqID*/, ErrorCode /*erCode*/)
+        [](int /*reqID*/, ErrorCode errCode)
     {
-        NX_LOG(lm("Failed to save time data to the database"), cl_logWARNING);
+        if (errCode != ec2::ErrorCode::ok)
+            NX_LOG(lm("Failed to save time data to the database"), cl_logWARNING);
     });
     manager->saveMiscParam(priorityData, this,
-        [](int /*reqID*/, ErrorCode /*erCode*/)
+        [](int /*reqID*/, ErrorCode errCode)
     {
-        NX_LOG(lm("Failed to save time data to the database"), cl_logWARNING);
+        if (errCode != ec2::ErrorCode::ok)
+            NX_LOG(lm("Failed to save time data to the database"), cl_logWARNING);
     });
 }
 
