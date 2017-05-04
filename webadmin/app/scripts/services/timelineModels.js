@@ -640,8 +640,7 @@ function ShortCache(cameras,mediaserver,$q,timeCorrection){
 
     this.timeCorrection = timeCorrection || 0;
 }
-ShortCache.prototype.init = function(start, timeCorrection){
-ShortCache.prototype.init = function(start, isPlaying){
+ShortCache.prototype.init = function(start, timeCorrection, isPlaying){
     this.liveMode = false;
     if(!start){
         this.liveMode = true;

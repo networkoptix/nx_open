@@ -246,8 +246,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
 
 
-            $scope.positionProvider.init(playing, timeCorrection);
-            $scope.positionProvider.init(playing, $scope.positionProvider.playing);
+            $scope.positionProvider.init(playing, timeCorrection, $scope.positionProvider.playing);
             if(live){
                 playing = (new Date()).getTime();
             }else{
