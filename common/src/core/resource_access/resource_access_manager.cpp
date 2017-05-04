@@ -755,6 +755,11 @@ bool QnResourceAccessManager::canCreateLayout(const QnResourceAccessSubject& sub
     if (resPool->getResourceById<QnVideoWallResource>(layoutParentId))
         return hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission);
 
+    // Tour owner can create layouts in it.
+    const auto tour = layoutTourManager()->tour(layoutParentId);
+    if (tour.isValid())
+        return tour.parentId == subject.id();
+
     const auto ownerResource = resPool->getResourceById(layoutParentId);
 
     /* Everybody can create layout for lite client. */
