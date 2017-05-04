@@ -34,7 +34,8 @@ public:
         foundAvailableChunks,
         requestingChecksums,
         downloadingChunks,
-        finished
+        finished,
+        failed
     };
     Q_ENUM(State)
 
@@ -56,6 +57,7 @@ public:
 
 signals:
     void finished(const QString& fileName);
+    void failed(const QString& fileName);
 
 private:
     void setState(State state);
@@ -69,6 +71,7 @@ private:
     void cancelRequests();
 
     void finish();
+    void fail();
 
     QString logMessage(const char* message) const;
 

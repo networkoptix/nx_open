@@ -241,12 +241,9 @@ void Worker::requestFileInformationInternal()
                     waitForNextStep(0);
                 });
 
-            if (!success)
-                return;
-
             auto& peerInfo = m_peerInfoById[peerId];
 
-            if (!fileInfo.isValid())
+            if (!success || !fileInfo.isValid())
             {
                 peerInfo.decreaseRank();
                 return;
@@ -313,6 +310,87 @@ void Worker::requestAvailableChunks()
 void Worker::requestChecksums()
 {
     setState(State::requestingChecksums);
+
+    const auto peers = selectPeersForOperation();
+    if (peers.isEmpty())
+    {
+        waitForNextStep();
+        return;
+    }
+
+    auto handleReply =
+        [this](bool success, rest::Handle handle, const QVector<QByteArray>& checksums)
+        {
+            const auto peerId = m_peerByRequestHandle.take(handle);
+            if (peerId.isNull())
+                return;
+
+            NX_LOGX(
+                logMessage("Got checksums from %1: %2")
+                    .arg(m_peerManager->peerString(peerId))
+                    .arg(statusString(success)),
+                cl_logDEBUG2);
+
+            auto exitGuard = QnRaiiGuard::createDestructible(
+                [this, &success]()
+                {
+                    if (success)
+                    {
+                        cancelRequests();
+                        waitForNextStep();
+                        return;
+                    }
+
+                    waitForNextStep(0);
+                });
+
+            auto& peerInfo = m_peerInfoById[peerId];
+
+            if (!success || checksums.isEmpty() || checksums.size() != m_availableChunks.size())
+            {
+                success = false;
+                peerInfo.decreaseRank();
+                return;
+            }
+
+            const auto errorCode =
+                m_storage->setChunkChecksums(m_fileName, checksums);
+
+            if (errorCode != DistributedFileDownloader::ErrorCode::noError)
+            {
+                NX_LOGX(
+                    logMessage("Cannot set checksums: %1").arg(QnLexical::serialized(errorCode)),
+                    cl_logWARNING);
+                return;
+            }
+
+            NX_LOGX(logMessage("Updated checksums."), cl_logDEBUG1);
+
+            const auto& fileInfo = fileInformation();
+            if (fileInfo.status != DownloaderFileInformation::Status::downloading
+                || fileInfo.downloadedChunks.count(true) == fileInfo.downloadedChunks.size())
+            {
+                fail();
+                return;
+            }
+
+            setState(State::downloadingChunks);
+        };
+
+    for (const auto& peer: peers)
+    {
+        NX_LOGX(
+            logMessage("Requesting checksums from server %1.")
+                .arg(m_peerManager->peerString(peer)),
+            cl_logDEBUG2);
+
+        const auto handle = m_peerManager->requestChecksums(peer, m_fileName, handleReply);
+        if (handle > 0)
+            m_peerByRequestHandle[handle] = peer;
+    }
+
+    if (m_peerByRequestHandle.isEmpty())
+        waitForNextStep();
 }
 
 void Worker::downloadNextChunk()
@@ -397,6 +475,13 @@ void Worker::finish()
     setState(State::finished);
     NX_LOGX(logMessage("Download finished."), cl_logINFO);
     emit finished(m_fileName);
+}
+
+void Worker::fail()
+{
+    setState(State::failed);
+    NX_LOGX(logMessage("Download failed."), cl_logERROR);
+    emit failed(m_fileName);
 }
 
 QString Worker::logMessage(const char* message) const

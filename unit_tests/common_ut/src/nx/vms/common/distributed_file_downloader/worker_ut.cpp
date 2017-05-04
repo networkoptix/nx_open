@@ -85,6 +85,8 @@ protected:
         testFileInfo.chunkSize = kChunkSize;
         testFileInfo.size = kTestFileSize;
         testFileInfo.md5 = Storage::calculateMd5(testFileInfo.filePath);
+        testFileInfo.checksums =
+            Storage::calculateChecksums(testFileInfo.filePath, testFileInfo.chunkSize);
         if (testFileInfo.md5.isEmpty())
         {
             NX_ASSERT("Cannot calculate md5 for file.");
@@ -208,7 +210,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, corruptedFile)
     worker->start();
     peerManager->processRequests();
 
-    const int maxSteps = fileInfo.downloadedChunks.size() + 4;
+    const int maxSteps = fileInfo.downloadedChunks.size() + 8;
 
     bool wasCorrupted = false;
 
