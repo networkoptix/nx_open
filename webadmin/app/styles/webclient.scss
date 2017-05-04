@@ -219,23 +219,24 @@ table.webclient-window>tbody>tr>td.alert{
 
 div.text-left{
   width:168px;
-  height:100px;
+  height:100%;
   background-color: $additional_light2;
-  border-right: 1px solid $additional_light2;
+  border-left: 1px solid $light6;
+  border-right: 1px solid $light6;
 }
 
 .player-controls{
-  margin: 30px 12px 30px 11px;
+  margin: 30px 12px 30px 10px;
 }
 
 .zoom-level{
-  height: 100px;
+  height: 100%;
   margin-top: 6px;
 }
 
 div.text-right{
   width:104px;
-  height:100px;
+  height:100%;
   background-color: $additional_light2;
   border-left: 1px solid $additional_light2;
 }
@@ -259,7 +260,7 @@ live-circle{
 
 .live-button{
   width: 63px;
-  height: 100px;
+  height: 100%;
   text-align: center;
   line-height: 100px;
   border-left: 1px solid $light6 !important;
@@ -297,7 +298,7 @@ live-circle{
 
 .volume{
   width: 40px;
-  height: 100px;
+  height: 100%;
 }
 .volume .glyphicon-volume-up{
   margin: 40px auto !important;
@@ -331,7 +332,7 @@ volume-control{
 
 div.text-center{
   margin: 0 104px 0 168px;
-  height:100px;
+  height:100%;
 }
 
 .webclient-button{
