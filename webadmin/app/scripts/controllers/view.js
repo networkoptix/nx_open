@@ -70,6 +70,8 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.settings = {id: ''};
         $scope.volumeLevel = typeof($scope.storage.volumeLevel) === 'number' ? $scope.storage.volumeLevel : 50;
 
+        $scope.serverTime = {};
+
         mediaserver.getModuleInformation().then(function (r) {
             $scope.settings = {
                 id: r.data.reply.id
@@ -225,7 +227,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.playerReady = function(API){
             $scope.playerAPI = API;
             if(API) {
-                $scope.switchPlaying(true);
+                $scope.switchPlaying($scope.positionProvider.playing);
                 $scope.playerAPI.volume($scope.volumeLevel);
             }
         };
@@ -244,7 +246,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
 
 
-            $scope.positionProvider.init(playing);
+            $scope.positionProvider.init(playing, timeCorrection, $scope.positionProvider.playing);
             if(live){
                 playing = (new Date()).getTime();
             }else{
@@ -721,11 +723,21 @@ angular.module('webadminApp').controller('ViewCtrl',
             $scope.storage.volumeLevel = $scope.volumeLevel;
         });
 
+
         mediaserver.getTime().then(function(result){
+            var clientDate = new Date();
+
             var serverTime = parseInt(result.data.reply.utcTime);
-            var clientTime = (new Date()).getTime();
+            var clientTime = clientDate.getTime();
             if(Math.abs(clientTime - serverTime) > minTimeLag){
                 timeCorrection = clientTime - serverTime;
+            }
+            
+            $scope.serverTime.timeZoneOffset = parseInt(result.data.reply.timeZoneOffset);
+            $scope.serverTime.latency = timeCorrection;
+
+            if(Config.settingsConfig.useServerTime){
+                timeCorrection = $scope.serverTime.timeZoneOffset + clientDate.getTimezoneOffset() * 60000 - timeCorrection;
             }
         });
 

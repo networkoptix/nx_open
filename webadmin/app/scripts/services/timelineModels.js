@@ -640,7 +640,7 @@ function ShortCache(cameras,mediaserver,$q,timeCorrection){
 
     this.timeCorrection = timeCorrection || 0;
 }
-ShortCache.prototype.init = function(start){
+ShortCache.prototype.init = function(start, timeCorrection, isPlaying){
     this.liveMode = false;
     if(!start){
         this.liveMode = true;
@@ -656,6 +656,8 @@ ShortCache.prototype.init = function(start){
 
     this.lastPlayedPosition = 0; // Save the boundaries of uploaded cache
     this.lastPlayedDate = 0;
+    this.timeCorrection = timeCorrection;
+    this.playing = typeof(isPlaying) != "undefined" ? isPlaying : true;
 
     this.update();
 };
@@ -823,7 +825,7 @@ ShortCache.prototype.setPlayingPosition = function(position){
     if(oldPosition > this.playedPosition && Config.allowDebugMode){
         console.error("Position jumped back! ms:" , oldPosition - this.playedPosition);
     }
-
+    
     return this.playedPosition;
 };
 
@@ -831,13 +833,14 @@ ShortCache.prototype.setPlayingPosition = function(position){
 
 
 
-function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initialWidth, stickToLiveMs, zoomAccuracyMs, lastMinuteInterval, minPixelsPerLevel, $q){
+function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initialWidth, stickToLiveMs, zoomAccuracyMs, lastMinuteInterval, minPixelsPerLevel, useServerTime, $q){
     this.absMaxMsPerPixel = maxMsPerPixel;
     this.minMsPerPixel = minMsPerPixel;
     this.stickToLiveMs = stickToLiveMs;
     this.zoomAccuracyMs = zoomAccuracyMs;
     this.minPixelsPerLevel = minPixelsPerLevel;
     this.lastMinuteInterval  = lastMinuteInterval;
+    this.useServerTime = useServerTime;
     this.$q = $q;
 
     this.levels = {
@@ -860,6 +863,9 @@ function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initia
     this.anchorPoint = 1;
     this.anchorDate = this.end;
     this.updateCurrentInterval();
+
+    this.timeZoneOffset = 0;
+    this.latency = 0;
 }
 
 ScaleManager.prototype.updateTotalInterval = function(){
@@ -873,12 +879,12 @@ ScaleManager.prototype.setViewportWidth = function(width){ // For initialization
     this.updateCurrentInterval();
 };
 ScaleManager.prototype.setStart = function(start){// Update the begining end of the timeline. Live mode must be supported here
-    this.start = start;
+    this.start = this.serverTime(start);
     this.updateTotalInterval();
 };
 ScaleManager.prototype.setEnd = function(end){ // Update right end of the timeline. Live mode must be supported here
     var needZoomOut = !this.checkZoomOut();
-    this.end = end;
+    this.end = this.serverTime(end);
     this.updateTotalInterval();
     if(needZoomOut){
         this.zoom(1);
@@ -1011,6 +1017,7 @@ ScaleManager.prototype.setAnchorCoordinate = function(coordinate){ // Set anchor
 ScaleManager.prototype.setAnchorDateAndPoint = function(date,point){ // Set anchor date
     this.anchorDate = date;
     if(typeof(point)!="undefined") {
+        //console.log('anchorPoint', point);
         this.anchorPoint = point;
     }
     this.updateCurrentInterval();
@@ -1259,4 +1266,26 @@ ScaleManager.prototype.zoomAroundDate = function(zoomValue, aroundDate){
 
 ScaleManager.prototype.lastMinute = function(){
     return (new Date(this.end - this.lastMinuteInterval)).getTime();
+};
+
+ScaleManager.prototype.updateServerOffset = function(serverOffset){
+    this.timeZoneOffset = serverOffset.timeZoneOffset;
+    this.latency = serverOffset.latency;
+};
+
+
+/*
+Input: date to be corrected
+Output: date adjusted to server time
+Summary: 1)We convert the input date into a Date object.
+         2)We convert the timezone offset from minutes to ms.
+         3)Add timezone offset to current time in ms.
+         4)Adding the server's timezone and minus the latency sets the
+           local time to the server's time.
+*/
+ScaleManager.prototype.serverTime = function(date){
+    if(!this.useServerTime)
+        return date;
+    var currentTime = new Date(date);
+    return (currentTime.getTime() + currentTime.getTimezoneOffset() * 60000) + this.timeZoneOffset - this.latency;
 };

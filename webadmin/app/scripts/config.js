@@ -115,7 +115,9 @@ var Config = {
         systemNameForId: {label: 'System name', type: 'text'},
         takeCameraOwnershipWithoutLock: {label: 'Take cameras ownership without lock', type: 'checkbox'},
         timeSynchronizationEnabled: {label: 'Time synchronization enabled', type: 'checkbox'},
-        upnpPortMappingEnabled: {label: 'UPNP port mapping enabled', type: 'checkbox'}
+        upnpPortMappingEnabled: {label: 'UPNP port mapping enabled', type: 'checkbox'},
+
+        useServerTime: true
     },
     debugEvents: {
         events: [

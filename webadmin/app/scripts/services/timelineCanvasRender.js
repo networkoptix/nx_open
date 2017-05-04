@@ -426,8 +426,16 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
         if(context ) {
             context.fillStyle = blurColor(timelineConfig.chunksBgColor, 1);
-
             context.fillRect(0, top, self.canvas.width, timelineConfig.chunkHeight * self.canvas.height);
+
+            //Draws borders on chunks background of timline
+            context.beginPath();
+            context.strokeStyle = blurColor(timelineConfig.chunksBgBorderColor,1);
+            context.moveTo(0, top+1);
+            context.lineTo(self.canvas.width, top+1);
+            context.moveTo(0, timelineConfig.chunkHeight * self.canvas.height + top-1);
+            context.lineTo(self.canvas.width, timelineConfig.chunkHeight * self.canvas.height + top-1);
+            context.stroke();
 
             var level = self.scaleManager.levels.events.level;
             var levelIndex = self.scaleManager.levels.events.index;

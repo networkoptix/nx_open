@@ -82,6 +82,7 @@ TimelineActions.prototype.updatePosition = function(){
             if(self.positionProvider.liveMode || self.nextPlayedPosition == self.positionProvider.playedPosition){
                 self.scope.lastPlayedPosition = self.nextPlayedPosition;
                 self.nextPlayedPosition = 0;
+                self.scaleManager.tryToSetLiveDate(self.scope.lastPlayedPosition, self.positionProvider.liveMode, (new Date()).getTime());
             }
             return; // ignore changes until played position wasn't changed
         }
