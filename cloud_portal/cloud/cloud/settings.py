@@ -301,6 +301,7 @@ NOTIFICATIONS_AUTO_SUBSCRIBE = False
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_LOCATION = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = '/app/app/static/common/static'
 
 
 LANGUAGES = conf['languages']
