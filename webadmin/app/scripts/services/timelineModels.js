@@ -641,6 +641,7 @@ function ShortCache(cameras,mediaserver,$q,timeCorrection){
     this.timeCorrection = timeCorrection || 0;
 }
 ShortCache.prototype.init = function(start, timeCorrection){
+ShortCache.prototype.init = function(start, isPlaying){
     this.liveMode = false;
     if(!start){
         this.liveMode = true;
@@ -657,6 +658,7 @@ ShortCache.prototype.init = function(start, timeCorrection){
     this.lastPlayedPosition = 0; // Save the boundaries of uploaded cache
     this.lastPlayedDate = 0;
     this.timeCorrection = timeCorrection;
+    this.playing = typeof(isPlaying) != "undefined" ? isPlaying : true;
 
     this.update();
 };
@@ -824,7 +826,7 @@ ShortCache.prototype.setPlayingPosition = function(position){
     if(oldPosition > this.playedPosition && Config.allowDebugMode){
         console.error("Position jumped back! ms:" , oldPosition - this.playedPosition);
     }
-
+    
     return this.playedPosition;
 };
 

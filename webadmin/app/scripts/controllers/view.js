@@ -227,7 +227,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.playerReady = function(API){
             $scope.playerAPI = API;
             if(API) {
-                $scope.switchPlaying(true);
+                $scope.switchPlaying($scope.positionProvider.playing);
                 $scope.playerAPI.volume($scope.volumeLevel);
             }
         };
@@ -247,6 +247,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
 
             $scope.positionProvider.init(playing, timeCorrection);
+            $scope.positionProvider.init(playing, $scope.positionProvider.playing);
             if(live){
                 playing = (new Date()).getTime();
             }else{
@@ -722,6 +723,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 $scope.playerAPI.volume($scope.volumeLevel);
             $scope.storage.volumeLevel = $scope.volumeLevel;
         });
+
 
         mediaserver.getTime().then(function(result){
             var clientDate = new Date();
