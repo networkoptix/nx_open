@@ -2,7 +2,18 @@
 
 #include <core/ptz/activity_ptz_controller.h>
 #include <core/ptz/client_ptz_controller_pool.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+
+namespace {
+
+#if defined(NO_MOBILE_PTZ_SUPPORT)
+    static constexpr bool kSupportMobilePtz = false;
+#else
+    static constexpr bool kSupportMobilePtz = true;
+#endif
+
+}
 
 namespace nx {
 namespace client {
@@ -65,7 +76,15 @@ void ResourcePtzController::setUniqueResourceId(const QUuid& value)
 
 bool ResourcePtzController::available() const
 {
-    return baseController();
+    const auto ptzResource = baseController() ? baseController()->resource() : QnResourcePtr();
+    if (!ptzResource)
+        return false;
+
+    const auto server = ptzResource->getParentResource().dynamicCast<QnMediaServerResource>();
+    if (!server || server->getVersion() < QnSoftwareVersion(2, 6))
+        return false;
+
+    return kSupportMobilePtz && baseController();
 }
 
 Ptz::Traits ResourcePtzController::auxTraits() const
