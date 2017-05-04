@@ -23,14 +23,14 @@ namespace nx_http {
 /**
  * Http client. All operations are done asynchronously.
  *
- * To get new instance use AsyncClient::create
- * This class methods are not thread-safe
- * All signals are emitted from io::AIOService threads
- * State is changed just before emitting signal
- * @warning It is strongly recommended to listen for AsyncClient::someMessageBodyAvailable() signal and
- *  read current message body buffer with AsyncClient::fetchMessageBodyBuffer() call every time
- *  to avoid internal message body buffer to consume too much memory.
- * @warning It is strongly recommended to connect to signals using Qt::DirectConnection and slot MUST NOT use blocking calls.
+ * All events (setOn...) are delivered within object's aio thread.
+ * State is changed just before delivering event.
+ * This class methods are not thread-safe.
+ * NOTE: This class is a replacement for nx_http::AsyncHttpClient.
+ *   As soon as it becomes ready, nx_http::AsyncHttpClient will be declared as deprecated.
+ * @warning It is strongly recommended to listen for someMessageBodyAvailable() event and
+ *   read current message body buffer with AsyncClient::fetchMessageBodyBuffer() call every time
+ *   to avoid internal message body buffer to consume too much memory.
  */
 class NX_NETWORK_API AsyncClient:
     public nx::network::aio::BasicPollable
