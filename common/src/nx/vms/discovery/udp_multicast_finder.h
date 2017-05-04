@@ -16,7 +16,14 @@ class UdpMulticastFinder:
     public network::aio::BasicPollable
 {
 public:
+    static const SocketAddress kMulticastEndpoint;
+    static const std::chrono::milliseconds kUpdateInterfacesInterval;
+    static const std::chrono::milliseconds kSendInterval;
+
     UdpMulticastFinder(network::aio::AbstractAioThread* thread = nullptr);
+    void setMulticastEndpoint(SocketAddress endpoint);
+    void setUpdateInterfacesInterval(std::chrono::milliseconds interval);
+    void setSendInterval(std::chrono::milliseconds interval);
 
     /** Sets moduleInformation to multicast, starts multicast process if not running yet. */
     void multicastInformation(const QnModuleInformationWithAddresses& information);
@@ -28,37 +35,25 @@ public:
     void updateInterfaces();
 
 private:
-    void makeInterface(const HostAddress& ip);
+    typedef std::map<HostAddress, std::unique_ptr<network::UDPSocket>> Senders;
 
-    class Interface
-    {
-    public:
-        Interface(
-            network::aio::AbstractAioThread* thread,
-            const HostAddress& localIp,
-            nx::utils::MoveOnlyFunc<void()> errorHandler);
-
-        void updateData(const Buffer* data);
-        void readForever(nx::utils::MoveOnlyFunc<void(const Buffer&)> handler);
-
-    private:
-        void sendData();
-        void readData();
-        void handleError(const char* stage, SystemError::ErrorCode code);
-
-    private:
-        network::UDPSocket m_socket;
-        nx::utils::MoveOnlyFunc<void()> m_errorHandler;
-        const Buffer* m_outData;
-        Buffer m_inData;
-        nx::utils::MoveOnlyFunc<void(const Buffer&)> m_newDataHandler;
-    };
+    std::unique_ptr<network::UDPSocket> makeSocket(const SocketAddress& endpoint);
+    void joinMulticastGroup(const HostAddress& ip);
+    void receiveModuleInformation();
+    void sendModuleInformation(Senders::iterator senderIterator);
 
 private:
+    SocketAddress m_multicatEndpoint;
+    std::chrono::milliseconds m_updateInterfacesInterval;
+    std::chrono::milliseconds m_sendInterval;
+
     network::aio::Timer m_updateTimer;
     Buffer m_ownModuleInformation;
-    nx::utils::MoveOnlyFunc<void(const QnModuleInformationWithAddresses& module)> m_foundModuleHandler;
-    std::map<HostAddress, std::unique_ptr<Interface>> m_interfaces;
+    Senders m_senders;
+
+    Buffer m_inData;
+    std::unique_ptr<network::UDPSocket> m_receiver;
+    nx::utils::MoveOnlyFunc<void(const QnModuleInformationWithAddresses& module)> m_moduleHandler;
 };
 
 } // namespace discovery
