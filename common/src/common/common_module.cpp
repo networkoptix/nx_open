@@ -29,6 +29,7 @@
 #include "core/resource_management/status_dictionary.h"
 #include "core/resource_management/server_additional_addresses_dictionary.h"
 #include <core/resource_management/resource_discovery_manager.h>
+#include <core/resource_management/layout_tour_manager.h>
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -135,6 +136,8 @@ QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
     instance<QnServerAdditionalAddressesDictionary>(); // todo: static common or common?
 
     m_resourcePool = new QnResourcePool(this);  /*< Depends on nothing. */
+    m_layoutTourManager = new QnLayoutTourManager(this);  //< Depends on nothing.
+
     m_moduleFinder = new QnModuleFinder(this, clientMode); //< Depend on resPool
     m_router = new QnRouter(this, m_moduleFinder); //< Depend on moduleFinder
 

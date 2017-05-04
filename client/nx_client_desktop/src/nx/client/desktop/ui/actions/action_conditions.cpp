@@ -886,7 +886,7 @@ ActionVisibility ToggleTourCondition::check(const Parameters& parameters, QnWork
     }
     else
     {
-        const auto tour = qnLayoutTourManager->tour(tourId);
+        const auto tour = context->layoutTourManager()->tour(tourId);
         if (tour.isValid() && tour.items.size() > 0)
             return EnabledAction;
     }
@@ -898,7 +898,7 @@ ActionVisibility StartCurrentLayoutTourCondition::check(const Parameters& /*para
 {
     const auto tourId = context->workbench()->currentLayout()->data()
         .value(Qn::LayoutTourUuidRole).value<QnUuid>();
-    const auto tour = qnLayoutTourManager->tour(tourId);
+    const auto tour = context->layoutTourManager()->tour(tourId);
     if (tour.isValid() && tour.items.size() > 0)
         return EnabledAction;
     return DisabledAction;
