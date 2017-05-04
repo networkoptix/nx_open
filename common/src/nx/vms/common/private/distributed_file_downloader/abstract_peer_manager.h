@@ -18,6 +18,8 @@ public:
     AbstractPeerManager(QObject* parent = nullptr);
     virtual ~AbstractPeerManager();
 
+    virtual QnUuid selfId() const = 0;
+
     virtual QString peerString(const QnUuid& peerId) const;
     virtual QList<QnUuid> getAllPeers() const = 0;
 

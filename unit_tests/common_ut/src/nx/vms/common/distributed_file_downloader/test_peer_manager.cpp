@@ -5,7 +5,8 @@ namespace vms {
 namespace common {
 namespace distributed_file_downloader {
 
-TestPeerManager::TestPeerManager()
+TestPeerManager::TestPeerManager():
+    m_selfId(QnUuid::createUuid())
 {
 }
 
@@ -32,6 +33,11 @@ TestPeerManager::FileInformation TestPeerManager::fileInformation(
     const QnUuid& peer, const QString& fileName) const
 {
     return m_peers[peer].fileInformationByName[fileName];
+}
+
+QnUuid TestPeerManager::selfId() const
+{
+    return m_selfId;
 }
 
 QList<QnUuid> TestPeerManager::getAllPeers() const

@@ -18,6 +18,8 @@ class ResourcePoolPeerManager: public AbstractPeerManager, public QnCommonModule
 public:
     ResourcePoolPeerManager(QnCommonModule* commonModule);
 
+    virtual QnUuid selfId() const override;
+
     virtual QString peerString(const QnUuid& peerId) const override;
     virtual QList<QnUuid> getAllPeers() const override;
 

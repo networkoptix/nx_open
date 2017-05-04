@@ -29,6 +29,7 @@ public:
     FileInformation fileInformation(const QnUuid& peer, const QString& fileName) const;
 
     // AbstractPeerManager implementation
+    virtual QnUuid selfId() const override;
 
     virtual QList<QnUuid> getAllPeers() const override;
 
@@ -59,6 +60,8 @@ private:
     static QByteArray readFileChunk(const FileInformation& fileInformation, int chunkIndex);
 
 private:
+    QnUuid m_selfId;
+
     struct PeerInfo
     {
         QHash<QString, FileInformation> fileInformationByName;

@@ -17,6 +17,11 @@ ResourcePoolPeerManager::ResourcePoolPeerManager(QnCommonModule* commonModule):
 {
 }
 
+QnUuid ResourcePoolPeerManager::selfId() const
+{
+    return commonModule()->moduleGUID();;
+}
+
 QString ResourcePoolPeerManager::peerString(const QnUuid& peerId) const
 {
     const auto& server = resourcePool()->getResourceById<QnMediaServerResource>(peerId);
@@ -32,7 +37,7 @@ QString ResourcePoolPeerManager::peerString(const QnUuid& peerId) const
 QList<QnUuid> ResourcePoolPeerManager::getAllPeers() const
 {
     const auto& servers = resourcePool()->getAllServers(Qn::Online);
-    const auto& currentId = commonModule()->moduleGUID();
+    const auto& currentId = selfId();
 
     QList<QnUuid> result;
 
