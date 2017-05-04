@@ -223,7 +223,7 @@ void P2pConnection::cancelConnecting()
     NX_LOG(QnLog::P2P_TRAN_LOG,
         lit("%1 Connection to peer %2 canceled from state %3").
         arg(Q_FUNC_INFO).arg(m_remotePeer.id.toString()).arg(toString(state())),
-        cl_logDEBUG1);
+        cl_logDEBUG2);
     setState(State::Error);
 }
 
@@ -471,7 +471,7 @@ void P2pConnection::sendMessage(MessageType messageType, const nx::Buffer& data)
 
 void P2pConnection::sendMessage(const nx::Buffer& data)
 {
-    if (nx::utils::log::main()->isToBeLogged(cl_logDEBUG1))
+    if (nx::utils::log::isToBeLogged(cl_logDEBUG1, QnLog::P2P_TRAN_LOG))
     {
         auto localPeerName = qnStaticCommon->moduleDisplayName(commonModule()->moduleGUID());
         auto remotePeerName = qnStaticCommon->moduleDisplayName(remotePeer().id);

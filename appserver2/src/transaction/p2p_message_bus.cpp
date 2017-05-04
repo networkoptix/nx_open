@@ -452,7 +452,7 @@ void P2pMessageBus::sendAlivePeersMessage()
         {
             miscData.localPeersMessage = data;
             miscData.localPeersTimer.restart();
-            if (nx::utils::log::main()->isToBeLogged(cl_logDEBUG1))
+            if (nx::utils::log::isToBeLogged(cl_logDEBUG1, QnLog::P2P_TRAN_LOG))
                 printPeersMessage();
             connection->sendMessage(data);
         }
@@ -488,7 +488,7 @@ void P2pMessageBus::resubscribePeers(
             QVector<PeerNumberType> shortValues;
             for (const auto& id: newValue)
                 shortValues.push_back(connection->encode(id));
-            if (nx::utils::log::main()->isToBeLogged(cl_logDEBUG1))
+            if (nx::utils::log::isToBeLogged(cl_logDEBUG1, QnLog::P2P_TRAN_LOG))
                 printSubscribeMessage(connection->remotePeer().id, miscData.localSubscription);
 
             NX_ASSERT(newValue.contains(connection->remotePeer()));
@@ -560,14 +560,17 @@ void P2pMessageBus::startStopConnections()
         const auto& data = connection->miscData();
         if (data.isLocalStarted && data.remotePeersMessage.isEmpty())
         {
-#if 0
-            // Curerent peer send 'start' but doesn't get response yet. Postpone to start new connections.
-            NX_LOG(QnLog::P2P_TRAN_LOG,
-                lit("Peer %1. Postpone stars to the remove peer %2 because start is not answered yet.")
-                .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
-                .arg(qnStaticCommon->moduleDisplayName(connection->remotePeer().id)),
-                cl_logDEBUG1);
-#endif
+            auto& miscData = connection->miscData();
+            if (miscData.sendStartTimer.elapsed() > 1000 * 7)
+            {
+                // Curerent peer send 'start' but doesn't get response yet. Postpone to start new connections.
+                NX_LOG(QnLog::P2P_TRAN_LOG,
+                    lit("Peer %1. Postpone stars to the remove peer %2 because start is not answered yet.")
+                    .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
+                    .arg(qnStaticCommon->moduleDisplayName(connection->remotePeer().id)),
+                    cl_logDEBUG1);
+                int gg = 4;
+            }
             return;
         }
     }
@@ -576,8 +579,8 @@ void P2pMessageBus::startStopConnections()
     // start using connection if need
     for (auto& connection: m_connections)
     {
-        if (connection->miscData().isLocalStarted)
-            continue; //< already in use
+        if (connection->state() != P2pConnection::State::Connected ||  connection->miscData().isLocalStarted)
+            continue; //< already in use or not ready yet
 
         ApiPersistentIdData peer = connection->remotePeer();
         qint32 currentDistance = allPeerDistances.value(peer).minDistance();
@@ -588,6 +591,7 @@ void P2pMessageBus::startStopConnections()
             (subscribedVia && subscribedVia->miscData().localSubscription.size() > kMaxSubscriptionToResubscribe))
         {
             connection->miscData().isLocalStarted = true;
+            connection->miscData().sendStartTimer.restart();
             connection->sendMessage(MessageType::start, QByteArray());
         }
         else
@@ -790,7 +794,7 @@ void P2pMessageBus::at_gotMessage(
 
     if (connection->state() == P2pConnection::State::Error)
         return; //< Connection has been closed
-    if (nx::utils::log::main()->isToBeLogged(cl_logDEBUG1) &&
+    if (nx::utils::log::isToBeLogged(cl_logDEBUG1, QnLog::P2P_TRAN_LOG) &&
         messageType != MessageType::pushTransactionData)
     {
         auto localPeerName = qnStaticCommon->moduleDisplayName(commonModule()->moduleGUID());
@@ -1033,7 +1037,7 @@ struct SendTransactionToTransportFuction
         NX_ASSERT(connection->remotePeerSubscribedTo(tranId));
         NX_ASSERT(!(ApiPersistentIdData(connection->remotePeer()) == tranId));
 
-        if (nx::utils::log::main()->isToBeLogged(cl_logDEBUG1))
+        if (nx::utils::log::isToBeLogged(cl_logDEBUG1, QnLog::P2P_TRAN_LOG))
             bus->printTran(connection, transaction, P2pConnection::Direction::outgoing);
 
         switch (connection->remotePeer().dataFormat)
@@ -1061,7 +1065,7 @@ struct SendTransactionToTransportFastFuction
         const QByteArray& serializedTran,
         const P2pConnectionPtr& connection) const
     {
-        if (nx::utils::log::main()->isToBeLogged(cl_logDEBUG1))
+        if (nx::utils::log::isToBeLogged(cl_logDEBUG1, QnLog::P2P_TRAN_LOG))
         {
             QnAbstractTransaction transaction;
             QnUbjsonReader<QByteArray> stream(&serializedTran);
@@ -1187,7 +1191,7 @@ void P2pMessageBus::gotTransaction(
     //NX_ASSERT(connection->localPeerSubscribedTo(peerId)); //< loop
     NX_ASSERT(!connection->remotePeerSubscribedTo(peerId)); //< loop
 
-    if (nx::utils::log::main()->isToBeLogged(cl_logDEBUG1))
+    if (nx::utils::log::isToBeLogged(cl_logDEBUG1, QnLog::P2P_TRAN_LOG))
         printTran(connection, tran, P2pConnection::Direction::incoming);
 
     if (!m_db)
@@ -1213,7 +1217,7 @@ void P2pMessageBus::gotTransaction(
     const QnTransaction<T> &tran,
     const P2pConnectionPtr& connection)
 {
-    if (nx::utils::log::main()->isToBeLogged(cl_logDEBUG1))
+    if (nx::utils::log::isToBeLogged(cl_logDEBUG1, QnLog::P2P_TRAN_LOG))
         printTran(connection, tran, P2pConnection::Direction::incoming);
 
     ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
