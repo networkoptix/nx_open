@@ -77,31 +77,6 @@ CustomRunnable<Function>* make_custom_runnable( Function&& function )
 /**
  * @param syncTimeToLocalDelta local_time - sync_time
  */
-bool saveSyncTime(
-    Ec2DirectConnectionPtr connection,
-    qint64 syncTimeToLocalDelta,
-    const TimePriorityKey& syncTimeKey)
-{
-    if (!connection)
-        return false;
-
-    ApiMiscData deltaData(
-        TIME_DELTA_PARAM_NAME,
-            QByteArray::number(syncTimeToLocalDelta));
-
-    ApiMiscData priorityData(
-        USED_TIME_PRIORITY_KEY_PARAM_NAME,
-        QByteArray::number(syncTimeKey.toUInt64()));
-
-    auto manager = connection->getMiscManager(Qn::kSystemAccess);
-    return
-        manager->saveMiscParamSync(deltaData) == ErrorCode::ok &&
-        manager->saveMiscParamSync(priorityData) == ErrorCode::ok;
-}
-
-/**
- * @param syncTimeToLocalDelta local_time - sync_time
- */
 bool loadSyncTime(
     Ec2DirectConnectionPtr connection,
     qint64* const syncTimeToLocalDelta,
@@ -552,11 +527,9 @@ void TimeSynchronizationManager::selectLocalTimeAsSynchronized(
     //saving synchronized time to DB
     if (m_connection)
     {
-        Ec2ThreadPool::instance()->start(make_custom_runnable(std::bind(
-            &saveSyncTime,
-            m_connection,
+        saveSyncTimeAsync(
             0,
-            m_usedTimeSyncInfo.timePriorityKey)));
+            m_usedTimeSyncInfo.timePriorityKey);
     }
 
     if (!synchronizingByCurrentServer)
@@ -780,11 +753,9 @@ void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
     m_timeSynchronized = true;
     if (m_connection)
     {
-            Ec2ThreadPool::instance()->start( make_custom_runnable( std::bind(
-            &saveSyncTime,
-            m_connection,
+        saveSyncTimeAsync(
             QDateTime::currentMSecsSinceEpoch() - curSyncTime,
-                m_usedTimeSyncInfo.timePriorityKey) ) );
+            m_usedTimeSyncInfo.timePriorityKey);
     }
     lock->unlock();
     {
@@ -1311,8 +1282,7 @@ void TimeSynchronizationManager::onDbManagerInitialized()
     lk.unlock();
 
     if (syncTimeDataToSave)
-        saveSyncTime(
-            m_connection,
+        saveSyncTimeSync(
             syncTimeDataToSave->first,
             syncTimeDataToSave->second);
 
@@ -1438,11 +1408,9 @@ void TimeSynchronizationManager::checkSystemTimeForChange()
 
         if (m_connection)
         {
-            Ec2ThreadPool::instance()->start(make_custom_runnable(std::bind(
-                &saveSyncTime,
-                m_connection,
+            saveSyncTimeAsync(
                 QDateTime::currentMSecsSinceEpoch() - getSyncTime(),
-                m_usedTimeSyncInfo.timePriorityKey)));
+                m_usedTimeSyncInfo.timePriorityKey);
         }
     }
 
@@ -1458,15 +1426,16 @@ void TimeSynchronizationManager::handleLocalTimePriorityKeyChange(QnMutexLockerB
 {
     if (m_connection)
     {
-        Ec2ThreadPool::instance()->start(make_custom_runnable([this]
-        {
-            ApiMiscData localTimeData(
-                LOCAL_TIME_PRIORITY_KEY_PARAM_NAME,
-                QByteArray::number(m_localTimePriorityKey.toUInt64()));
-            auto manager = m_connection->getMiscManager(Qn::kSystemAccess);
-            if (manager->saveMiscParamSync(localTimeData) != ec2::ErrorCode::ok)
+        ApiMiscData localTimeData(
+            LOCAL_TIME_PRIORITY_KEY_PARAM_NAME,
+            QByteArray::number(m_localTimePriorityKey.toUInt64()));
+
+        auto manager = m_connection->getMiscManager(Qn::kSystemAccess);
+        manager->saveMiscParam(localTimeData, this,
+            [](int reqID, ec2::ErrorCode ErrorCode)
+            {
                 qWarning() << "Failed to save misc param to the local DB";
-        }));
+            });
 }
 }
 
@@ -1496,6 +1465,58 @@ void TimeSynchronizationManager::onTimeSynchronizationSettingsChanged()
         switchBackToLocalTime(&lock);
         syncTimeWithAllKnownServers(&lock);
     }
+}
+
+bool TimeSynchronizationManager::saveSyncTimeSync(
+    qint64 syncTimeToLocalDelta,
+    const TimePriorityKey& syncTimeKey)
+{
+    if (!m_connection)
+        return false;
+
+    ApiMiscData deltaData(
+        TIME_DELTA_PARAM_NAME,
+        QByteArray::number(syncTimeToLocalDelta));
+
+    ApiMiscData priorityData(
+        USED_TIME_PRIORITY_KEY_PARAM_NAME,
+        QByteArray::number(syncTimeKey.toUInt64()));
+
+    auto manager = m_connection->getMiscManager(Qn::kSystemAccess);
+    return
+        manager->saveMiscParamSync(deltaData) == ErrorCode::ok &&
+        manager->saveMiscParamSync(priorityData) == ErrorCode::ok;
+}
+
+/**
+* @param syncTimeToLocalDelta local_time - sync_time
+*/
+void TimeSynchronizationManager::saveSyncTimeAsync(
+    qint64 syncTimeToLocalDelta,
+    const TimePriorityKey& syncTimeKey)
+{
+    if (!m_connection)
+        return;
+
+    ApiMiscData deltaData(
+        TIME_DELTA_PARAM_NAME,
+        QByteArray::number(syncTimeToLocalDelta));
+
+    ApiMiscData priorityData(
+        USED_TIME_PRIORITY_KEY_PARAM_NAME,
+        QByteArray::number(syncTimeKey.toUInt64()));
+
+    auto manager = m_connection->getMiscManager(Qn::kSystemAccess);
+    manager->saveMiscParam(deltaData, this,
+        [](int /*reqID*/, ErrorCode /*erCode*/)
+    {
+        NX_LOG(lm("Failed to save time data to the database"), cl_logWARNING);
+    });
+    manager->saveMiscParam(priorityData, this,
+        [](int /*reqID*/, ErrorCode /*erCode*/)
+    {
+        NX_LOG(lm("Failed to save time data to the database"), cl_logWARNING);
+    });
 }
 
 } // namespace ec2
