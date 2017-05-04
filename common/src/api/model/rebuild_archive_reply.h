@@ -1,5 +1,7 @@
 #pragma once
 
+#include <common/common_globals.h>
+
 #include <nx/fusion/model_functions_fwd.h>
 
 /** Info about storage rebuild process (if running). */

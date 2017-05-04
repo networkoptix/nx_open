@@ -8,7 +8,7 @@
 
 #include <cdb/ec2_request_paths.h>
 #include <http/custom_headers.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 #include "access_control/authorization_manager.h"
 #include "compatible_ec2_protocol_version.h"
@@ -80,7 +80,7 @@ ConnectionManager::~ConnectionManager()
 
 void ConnectionManager::createTransactionConnection(
     nx_http::HttpServerConnection* const connection,
-    stree::ResourceContainer authInfo,
+    nx::utils::stree::ResourceContainer authInfo,
     nx_http::Request request,
     nx_http::Response* const response,
     nx_http::RequestProcessedHandler completionHandler)
@@ -164,7 +164,7 @@ void ConnectionManager::createTransactionConnection(
 
 void ConnectionManager::pushTransaction(
     nx_http::HttpServerConnection* const connection,
-    stree::ResourceContainer /*authInfo*/,
+    nx::utils::stree::ResourceContainer /*authInfo*/,
     nx_http::Request request,
     nx_http::Response* const /*response*/,
     nx_http::RequestProcessedHandler completionHandler)
@@ -332,7 +332,7 @@ void ConnectionManager::closeConnectionsToSystem(
 {
     auto allConnectionsRemovedGuard = makeSharedGuard(std::move(completionHandler));
 
-    QnMutexLocker lk(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
     auto& connectionBySystemIdAndPeerIdIndex =
         m_connections.get<kConnectionByFullPeerNameIndex>();
@@ -342,7 +342,7 @@ void ConnectionManager::closeConnectionsToSystem(
            it->fullPeerName.systemId == systemId)
     {
         removeConnectionByIter(
-            &lk,
+            lock,
             connectionBySystemIdAndPeerIdIndex,
             it++,
             [allConnectionsRemovedGuard](){});
@@ -355,19 +355,18 @@ ConnectionManager::SystemStatusChangedSubscription&
     return m_systemStatusChangedSubscription;
 }
 
-const ConnectionManager::SystemStatusChangedSubscription&
-    ConnectionManager::systemStatusChangedSubscription() const
-{
-    return m_systemStatusChangedSubscription;
-}
-
 bool ConnectionManager::addNewConnection(ConnectionContext context)
 {
+    using namespace std::placeholders;
+
     QnMutexLocker lock(&m_mutex);
+
+    const auto systemWasOffline = getConnectionCountBySystemId(
+        lock, context.fullPeerName.systemId) == 0;
 
     removeExistingConnection<
         kConnectionByFullPeerNameIndex,
-        decltype(context.fullPeerName)>(&lock, context.fullPeerName);
+        decltype(context.fullPeerName)>(lock, context.fullPeerName);
 
     if (!isOneMoreConnectionFromSystemAllowed(lock, context))
         return false;
@@ -376,18 +375,15 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
         std::bind(&ConnectionManager::removeConnection, this, context.connectionId));
     context.connection->setOnGotTransaction(
         std::bind(
-            &ConnectionManager::onGotTransaction,
-            this, context.connection->connectionGuid().toByteArray(),
-            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+            &ConnectionManager::onGotTransaction, this,
+            context.connection->connectionGuid().toByteArray(), _1, _2, _3));
 
     NX_LOGX(QnLog::EC2_TRAN_LOG,
         lm("Adding new transaction connection %1 from %2")
-        .arg(context.connectionId)
-        .str(context.connection->commonTransportHeaderOfRemoteTransaction()),
+            .arg(context.connectionId)
+            .str(context.connection->commonTransportHeaderOfRemoteTransaction()),
         cl_logDEBUG1);
 
-    const auto systemWasOffline = getConnectionCountBySystemId(
-        lock, context.fullPeerName.systemId) == 0;
     const auto systemId = context.fullPeerName.systemId.toStdString();
 
     if (!m_connections.insert(std::move(context)).second)
@@ -399,8 +395,7 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
     if (systemWasOffline)
     {
         lock.unlock();
-        m_systemStatusChangedSubscription.notify(
-            systemId, api::SystemHealth::online);
+        m_systemStatusChangedSubscription.notify(systemId, api::SystemHealth::online);
     }
 
     return true;
@@ -410,12 +405,17 @@ bool ConnectionManager::isOneMoreConnectionFromSystemAllowed(
     const QnMutexLockerBase& lk,
     const ConnectionContext& context) const
 {
-    if (getConnectionCountBySystemId(lk, context.fullPeerName.systemId) >=
-        m_settings.maxConcurrentConnectionsFromSystem)
+    const auto existingConnectionCount =
+        getConnectionCountBySystemId(lk, context.fullPeerName.systemId);
+
+    if (existingConnectionCount >= m_settings.maxConcurrentConnectionsFromSystem)
     {
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Refusing connection %1 from %2 since "
-                "there are already %3 connections from that system"),
+                "there are already %3 connections from that system")
+            .arg(context.connectionId)
+            .str(context.connection->commonTransportHeaderOfRemoteTransaction())
+            .arg(existingConnectionCount),
             cl_logDEBUG2);
         return false;
     }
@@ -445,7 +445,7 @@ unsigned int ConnectionManager::getConnectionCountBySystemId(
 
 template<int connectionIndexNumber, typename ConnectionKeyType>
 void ConnectionManager::removeExistingConnection(
-    QnMutexLockerBase* const lock,
+    const QnMutexLockerBase& lock,
     ConnectionKeyType connectionKey)
 {
     auto& connectionIndex = m_connections.get<connectionIndexNumber>();
@@ -462,7 +462,7 @@ void ConnectionManager::removeExistingConnection(
 
 template<typename ConnectionIndex, typename Iterator, typename CompletionHandler>
 void ConnectionManager::removeConnectionByIter(
-    QnMutexLockerBase* const /*lock*/,
+    const QnMutexLockerBase& /*lock*/,
     ConnectionIndex& connectionIndex,
     Iterator connectionIterator,
     CompletionHandler completionHandler)
@@ -513,8 +513,8 @@ void ConnectionManager::sendSystemOfflineNotificationIfNeeded(
 
 void ConnectionManager::removeConnection(const nx::String& connectionId)
 {
-    QnMutexLocker lk(&m_mutex);
-    removeExistingConnection<kConnectionByIdIndex>(&lk, connectionId);
+    QnMutexLocker lock(&m_mutex);
+    removeExistingConnection<kConnectionByIdIndex>(lock, connectionId);
 }
 
 void ConnectionManager::onGotTransaction(
@@ -547,8 +547,8 @@ void ConnectionManager::onTransactionDone(
             cl_logDEBUG1);
 
         // Closing connection in case of failure.
-        QnMutexLocker lk(&m_mutex);
-        removeExistingConnection<kConnectionByIdIndex, nx::String>(&lk, connectionId);
+        QnMutexLocker lock(&m_mutex);
+        removeExistingConnection<kConnectionByIdIndex, nx::String>(lock, connectionId);
     }
 }
 

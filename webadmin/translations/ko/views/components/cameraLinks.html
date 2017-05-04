@@ -1,5 +1,5 @@
 <div>
-    카메라
+    카메라:
     <ul>
         <li>이름: {{activeCamera.name}}</li>
         <li>PhysicalID: {{activeCamera.physicalId}}</li>
@@ -13,7 +13,10 @@
         </li>
 
         <li>
-            다운로드: <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'download')}}"> 높은</a> <a target="_blank" ng-href="{{formatLink(activeCamera, 1, 'download')}}"> 낮은</a> <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'preview')}}"> 미리 보기</a>
+            다운로드:
+<a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'download')}}">높은</a>&nbsp;
+<a target="_blank" ng-href="{{formatLink(activeCamera, 1, 'download')}}">낮은</a>&nbsp;
+<a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'preview')}}">미리 보기</a>
         </li>
 
     </ul>

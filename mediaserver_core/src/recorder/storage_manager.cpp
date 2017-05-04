@@ -49,6 +49,7 @@
 #include <map>
 #include "database/server_db.h"
 #include "common/common_globals.h"
+#include <media_server/media_server_module.h>
 
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -86,40 +87,6 @@ struct TasksQueueInfo {
 
 const QString dbRefFileName( QLatin1String("%1_db_ref.guid") );
 
-bool getSqlDbPath(const QnStorageResourcePtr &storage, QString &dbFolderPath)
-{
-    QString storageUrl = storage->getUrl();
-    QString dbRefFilePath;
-
-    dbRefFilePath = closeDirPath(storageUrl) + dbRefFileName.arg(QnStorageDbPool::getLocalGuid());
-    QByteArray dbRefGuidStr;
-
-    //checking for file db_ref.guid existence
-    if (storage->isFileExists(dbRefFilePath))
-    {
-        //have to use db from data directory, not from storage
-        //reading guid from file
-        auto dbGuidFile = std::unique_ptr<QIODevice>(storage->open(dbRefFilePath, QIODevice::ReadOnly));
-
-        if (!dbGuidFile)
-            return false;
-        dbRefGuidStr = dbGuidFile->readAll();
-        //dbGuidFile->close();
-    }
-
-    if( !dbRefGuidStr.isEmpty() )
-    {
-        dbFolderPath = QDir(getDataDirectory() + "/storage_db/" + dbRefGuidStr).absolutePath();
-        return true;
-    }
-    else if (storage->getCapabilities() & QnAbstractStorageResource::DBReady)
-    {
-        dbFolderPath = storage->getPath();
-        return true;
-    }
-    return false;
-}
-
 } // namespace <anonymous>
 class ArchiveScanPosition
 {
@@ -144,12 +111,12 @@ public:
         serializedData = serializedData.arg(m_storagePath)
                                        .arg(QnLexical::serialized(m_catalog))
                                        .arg(m_cameraUniqueId);
-        MSSettings::roSettings()->setValue(settingName(m_role), serializedData);
-        MSSettings::roSettings()->sync();
+        qnServerModule->roSettings()->setValue(settingName(m_role), serializedData);
+        qnServerModule->roSettings()->sync();
     }
 
     void load() {
-        QString serializedData = MSSettings::roSettings()->value(settingName(m_role)).toString();
+        QString serializedData = qnServerModule->roSettings()->value(settingName(m_role)).toString();
         QStringList data = serializedData.split(";;");
         if (data.size() == 3) {
             m_storagePath = data[0];
@@ -166,8 +133,8 @@ public:
     }
 
     static void reset(QnServer::StoragePool role) {
-        MSSettings::roSettings()->setValue(settingName(role), QString());
-        MSSettings::roSettings()->sync();
+        qnServerModule->roSettings()->setValue(settingName(role), QString());
+        qnServerModule->roSettings()->sync();
     }
 
     bool isEmpty() const { return m_cameraUniqueId.isEmpty(); }
@@ -432,7 +399,7 @@ public:
             {
                 const auto space = QString::number(storage->getTotalSpace());
                 if (storage->setProperty(Qn::SPACE, space))
-                    propertyDictionary->saveParams(storage->getId());
+                    m_owner->propertyDictionary()->saveParams(storage->getId());
             }
         }
 
@@ -449,7 +416,11 @@ private:
 static QnStorageManager* QnNormalStorageManager_instance = nullptr;
 static QnStorageManager* QnBackupStorageManager_instance = nullptr;
 
-QnStorageManager::QnStorageManager(QnServer::StoragePool role):
+QnStorageManager::QnStorageManager(
+    QnCommonModule* commonModule,
+    QnServer::StoragePool role)
+:
+    QnCommonModuleAware(commonModule),
     m_role(role),
     m_mutexStorages(QnMutex::Recursive),
     m_mutexCatalog(QnMutex::Recursive),
@@ -458,12 +429,10 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     m_rebuildCancelled(false),
     m_rebuildArchiveThread(0),
     m_firstStoragesTestDone(false),
-    m_isRenameDisabled(MSSettings::roSettings()->value("disableRename").toInt()),
-    m_camInfoWriterHandler(this),
+    m_isRenameDisabled(qnServerModule->roSettings()->value("disableRename").toInt()),
+    m_camInfoWriterHandler(this, commonModule->resourcePool()),
     m_camInfoWriter(&m_camInfoWriterHandler)
 {
-    m_storageDbPoolRef = qnStorageDbPool->create();
-
     NX_ASSERT(m_role == QnServer::StoragePool::Normal || m_role == QnServer::StoragePool::Backup);
     m_storageWarnTimer.restart();
     m_testStorageThread = new TestStorageThread(this);
@@ -481,13 +450,13 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
 
     m_oldStorageIndexes = deserializeStorageFile();
 
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
 
-	connect(this, &QnStorageManager::rebuildFinished, 
-        [this] (QnSystemHealth::MessageType message) 
+	connect(this, &QnStorageManager::rebuildFinished,
+        [this] (QnSystemHealth::MessageType message)
         {
-    		if (message == QnSystemHealth::ArchiveFastScanFinished || 
+    		if (message == QnSystemHealth::ArchiveFastScanFinished ||
                 message == QnSystemHealth::ArchiveRebuildFinished)
             {
                 for (const auto& storage: getUsedWritableStorages())
@@ -495,15 +464,16 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
                     if (!storage->hasFlags(Qn::storage_fastscan))
                     {
                         auto storageIndex = qnStorageDbPool->getStorageIndex(storage);
-                        m_spaceInfo.storageRebuilded(storageIndex, storage->getFreeSpace(), 
+                        m_spaceInfo.storageRebuilded(storageIndex, storage->getFreeSpace(),
                             calculateNxOccupiedSpace(storageIndex), storage->getSpaceLimit());
                     }
                 }
             }
     	});
 
-    if (m_role == QnServer::StoragePool::Backup) {
-        m_scheduleSync.reset(new QnScheduleSync());
+    if (m_role == QnServer::StoragePool::Backup)
+    {
+        m_scheduleSync.reset(new QnScheduleSync(commonModule));
         connect(m_scheduleSync.get(), &QnScheduleSync::backupFinished, this, &QnStorageManager::backupFinished, Qt::DirectConnection);
     }
 
@@ -560,8 +530,9 @@ void QnStorageManager::createArchiveCameras(const nx::caminfo::ArchiveCameraData
     {
         ec2::ErrorCode errCode =
             QnAppserverResourceProcessor::addAndPropagateCamResource(
-                camera.coreData, camera.properties
-            );
+                commonModule(),
+                camera.coreData,
+                camera.properties);
     }
 
     updateCameraHistory();
@@ -638,13 +609,49 @@ QMap<QString, QSet<int>> QnStorageManager::deserializeStorageFile()
     return storageIndexes;
 }
 
-void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storage)
+bool QnStorageManager::getSqlDbPath(
+    const QnStorageResourcePtr& storage,
+    QString& dbFolderPath) const
+{
+    QString storageUrl = storage->getUrl();
+    QString dbRefFilePath;
+
+    dbRefFilePath = closeDirPath(storageUrl) + dbRefFileName.arg(QnStorageDbPool::getLocalGuid(commonModule()));
+    QByteArray dbRefGuidStr;
+
+    //checking for file db_ref.guid existence
+    if (storage->isFileExists(dbRefFilePath))
+    {
+        //have to use db from data directory, not from storage
+        //reading guid from file
+        auto dbGuidFile = std::unique_ptr<QIODevice>(storage->open(dbRefFilePath, QIODevice::ReadOnly));
+
+        if (!dbGuidFile)
+            return false;
+        dbRefGuidStr = dbGuidFile->readAll();
+        //dbGuidFile->close();
+    }
+
+    if (!dbRefGuidStr.isEmpty())
+    {
+        dbFolderPath = QDir(getDataDirectory() + "/storage_db/" + dbRefGuidStr).absolutePath();
+        return true;
+    }
+    else if (storage->getCapabilities() & QnAbstractStorageResource::DBReady)
+    {
+        dbFolderPath = storage->getPath();
+        return true;
+    }
+    return false;
+}
+
+void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storage) const
 {
     QString dbPath;
     if (!getSqlDbPath(storage, dbPath))
         return;
 
-    QString simplifiedGUID = QnStorageDbPool::getLocalGuid();
+    QString simplifiedGUID = QnStorageDbPool::getLocalGuid(commonModule());
     QString oldFileName = closeDirPath(dbPath) + QString::fromLatin1("media.sqlite");
     QString fileName =
         closeDirPath(dbPath) +
@@ -976,7 +983,9 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
                 return file->readAll();
             };
 
-        nx::caminfo::ServerReaderHandler readerHandler;
+        nx::caminfo::ServerReaderHandler readerHandler(
+            commonModule()->moduleGUID(),
+            commonModule()->resourcePool());
         nx::caminfo::Reader(&readerHandler, fi, getFileDataFunc)(&archiveCameraList);
 
         QString cameraUniqueId = fi.fileName();
@@ -1043,7 +1052,7 @@ bool QnStorageManager::checkIfMyStorage(const QnStorageResourcePtr &storage) con
 void QnStorageManager::onNewResource(const QnResourcePtr &resource)
 {
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
-    if (storage && storage->getParentId() == qnCommon->moduleGUID())
+    if (storage && storage->getParentId() == commonModule()->moduleGUID())
     {
 		m_warnSended = false;
         connect(storage.data(), &QnStorageResource::isBackupChanged, this, &QnStorageManager::at_storageChanged);
@@ -1055,7 +1064,7 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
 void QnStorageManager::onDelResource(const QnResourcePtr &resource)
 {
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
-    if (storage && storage->getParentId() == qnCommon->moduleGUID() && checkIfMyStorage(storage)) {
+    if (storage && storage->getParentId() == commonModule()->moduleGUID() && checkIfMyStorage(storage)) {
 		m_warnSended = false;
         removeStorage(storage);
         qnStorageDbPool->removeSDB(storage);
@@ -1467,27 +1476,27 @@ void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
     }
 }
 
-void QnStorageManager::updateCameraHistory()
+void QnStorageManager::updateCameraHistory() const
 {
     auto archivedListNew = getCamerasWithArchive();
 
     std::vector<QnUuid> archivedListOld =
-        qnCameraHistoryPool->getServerFootageData(qnCommon->moduleGUID());
+        cameraHistoryPool()->getServerFootageData(commonModule()->moduleGUID());
     std::sort(archivedListOld.begin(), archivedListOld.end());
 
     if (archivedListOld == archivedListNew)
         return;
 
-    const ec2::AbstractECConnectionPtr& appServerConnection = QnAppServerConnectionFactory::getConnection2();
+    const ec2::AbstractECConnectionPtr& appServerConnection = commonModule()->ec2Connection();
 
-    ec2::ErrorCode errCode = appServerConnection->getCameraManager(Qn::kSystemAccess)->setServerFootageDataSync(qnCommon->moduleGUID(), archivedListNew);
+    ec2::ErrorCode errCode = appServerConnection->getCameraManager(Qn::kSystemAccess)->setServerFootageDataSync(commonModule()->moduleGUID(), archivedListNew);
 
     if (errCode != ec2::ErrorCode::ok) {
         qCritical() << "ECS server error during execute method addCameraHistoryItem: "
                     << ec2::toString(errCode);
         return;
     }
-    qnCameraHistoryPool->setServerFootageData(qnCommon->moduleGUID(),
+    cameraHistoryPool()->setServerFootageData(commonModule()->moduleGUID(),
                                               archivedListNew);
     return;
 }
@@ -1531,7 +1540,7 @@ void QnStorageManager::clearSpace(bool forced)
     }
 
     qint64 toDeleteTotal = 0;
-    std::chrono::time_point<std::chrono::steady_clock> cleanupStartTime = std::chrono::steady_clock::now(); 
+    std::chrono::time_point<std::chrono::steady_clock> cleanupStartTime = std::chrono::steady_clock::now();
 
     if (QnLog::logs() && QnLog::logs()->get()->logLevel() >= cl_logDEBUG2)
     {
@@ -1541,8 +1550,8 @@ void QnStorageManager::clearSpace(bool forced)
 
         for (const auto& storage: storages)
         {
-            if (storage->getSpaceLimit() == 0 || 
-                (storage->getCapabilities() & QnAbstractStorageResource::cap::RemoveFile) 
+            if (storage->getSpaceLimit() == 0 ||
+                (storage->getCapabilities() & QnAbstractStorageResource::cap::RemoveFile)
                     != QnAbstractStorageResource::cap::RemoveFile)
             {
                 NX_LOG(lit("[Cleanup, measure]: storage: %1 spaceLimit: %2, RemoveFileCap: %3, skipping")
@@ -1582,7 +1591,7 @@ void QnStorageManager::clearSpace(bool forced)
         QString clearSpaceLogMessage;
         QTextStream clearSpaceLogStream(&clearSpaceLogMessage);
         auto cleanupEndTime = std::chrono::steady_clock::now();
-        qint64 elapsedMs = 
+        qint64 elapsedMs =
             std::chrono::duration_cast<std::chrono::milliseconds>
                 (cleanupEndTime - cleanupStartTime).count();
         qint64 elapsedSecs = qMax((elapsedMs / 1000), 1ll);
@@ -1590,10 +1599,10 @@ void QnStorageManager::clearSpace(bool forced)
         clearSpaceLogStream << "[Cleanup, measure]: Cleanup routine for "
                             << (m_role == QnServer::StoragePool::Normal ? "main " : "backup")
                             << " storage manager has finished" << endl;
-        clearSpaceLogStream << "[Cleanup, measure]: time elapsed: " << elapsedMs << " ms " 
+        clearSpaceLogStream << "[Cleanup, measure]: time elapsed: " << elapsedMs << " ms "
                             << "(" << elapsedSecs << " secs) "
                             << "(" << (elapsedSecs / (60 * 60)) << " hrs)" << endl;
-        clearSpaceLogStream << "[Cleanup, measure]: cleanup speed was " 
+        clearSpaceLogStream << "[Cleanup, measure]: cleanup speed was "
                             << (toDeleteTotal / (1024 * 1024 * elapsedSecs)) << " Mb/s"
                             << endl;
         NX_LOG(clearSpaceLogMessage, cl_logDEBUG2);
@@ -1785,7 +1794,7 @@ void QnStorageManager::clearMaxDaysData(QnServer::ChunksCatalog catalogIdx)
     }
 
     for(const DeviceFileCatalogPtr& catalog: catalogMap.values()) {
-        QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(catalog->cameraUniqueId());
+        QnSecurityCamResourcePtr camera = resourcePool()->getResourceByUniqueId<QnSecurityCamResource>(catalog->cameraUniqueId());
         if (camera && camera->maxDays() > 0) {
             qint64 timeToDelete = qnSyncTime->currentMSecsSinceEpoch() - MSECS_PER_DAY * camera->maxDays();
             deleteRecordsToTime(catalog, timeToDelete);
@@ -1824,12 +1833,12 @@ void QnStorageManager::clearCameraHistory()
             itr.value() == DATETIME_NOW; // delete all history if catalog is empty
     }
 
-    QList<QnCameraHistoryItem> itemsToRemove = qnCameraHistoryPool->getUnusedItems(minTimes, qnCommon->moduleGUID());
-    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+    QList<QnCameraHistoryItem> itemsToRemove = cameraHistoryPool()->getUnusedItems(minTimes, commonModule()->moduleGUID());
+    ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
     for(const QnCameraHistoryItem& item: itemsToRemove) {
         ec2::ErrorCode errCode = ec2Connection->getCameraManager()->removeCameraHistoryItemSync(item);
         if (errCode == ec2::ErrorCode::ok)
-            qnCameraHistoryPool->removeCameraHistoryItem(item);
+            cameraHistoryPool()->removeCameraHistoryItem(item);
     }
 }
 
@@ -1869,7 +1878,7 @@ void QnStorageManager::findTotalMinTime(const bool useMinArchiveDays, const File
         if (curMinTime != (qint64)AV_NOPTS_VALUE && curMinTime < minTime)
         {
             if (useMinArchiveDays) {
-                QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(itr.key());
+                QnSecurityCamResourcePtr camera = resourcePool()->getResourceByUniqueId<QnSecurityCamResource>(itr.key());
                 if (camera && camera->minDays() > 0) {
                     qint64 threshold = qnSyncTime->currentMSecsSinceEpoch() - MSECS_PER_DAY * camera->minDays();
                     if (threshold < curMinTime)
@@ -2128,28 +2137,6 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
     QnStorageResourcePtr result;
     std::vector<int> allowedIndexes;
 
-    for (const auto& storage: getUsedWritableStorages())
-    {
-        if (pred(storage) && 
-            storage->getFreeSpace() > kMinStorageFreeSpace)
-        {
-            allowedIndexes.push_back(qnStorageDbPool->getStorageIndex(storage));
-        }
-    }
-
-    auto optimalStorageIndex = m_spaceInfo.getOptimalStorageIndex(allowedIndexes);
-    if (optimalStorageIndex == -1)
-        return result;
-
-    result = getStorageByIndex(optimalStorageIndex);
-    if (!result)
-    {
-        NX_LOG(lit("[Storage, Selection] Failed to find storage for index %1")
-            .arg(optimalStorageIndex), cl_logDEBUG2);
-        return result;
-    }
-    NX_LOG(lit("[Storage, Selection] Selected storage %1").arg(result->getUrl()), cl_logDEBUG2);
-
     auto hasFastScanned = [this]
     {
         auto allStorages = getAllStorages();
@@ -2161,9 +2148,12 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
         return false;
     };
 
-
-    if (!result) {
-        if (!m_warnSended && !hasFastScanned() && m_firstStoragesTestDone) {
+    auto emitFailureAndReturnNullStorage = [this, hasFastScanned](int optimalStorageIndex)
+    {
+        NX_LOG(lit("[Storage, Selection] Failed to find storage for index %1").arg(optimalStorageIndex),
+               cl_logDEBUG2);
+        if (!m_warnSended && !hasFastScanned() && m_firstStoragesTestDone)
+        {
             if (m_role == QnServer::StoragePool::Normal)
             {   // 'noStorageAvailbale' signal results in client notification.
                 // For backup storages No Available Storage error is translated to
@@ -2175,9 +2165,31 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
             }
             m_warnSended = true;
         }
+
+        return QnStorageResourcePtr();
+    };
+
+    for (const auto& storage: getUsedWritableStorages())
+    {
+        if (pred(storage) &&
+            storage->getFreeSpace() > kMinStorageFreeSpace)
+        {
+            allowedIndexes.push_back(qnStorageDbPool->getStorageIndex(storage));
+        }
     }
 
-    return result;
+    auto optimalStorageIndex = m_spaceInfo.getOptimalStorageIndex(allowedIndexes);
+    if (optimalStorageIndex == -1)
+        return emitFailureAndReturnNullStorage(optimalStorageIndex);
+
+    result = getStorageByIndex(optimalStorageIndex);
+    if (result)
+    {
+        NX_LOG(lit("[Storage, Selection] Selected storage %1").arg(result->getUrl()), cl_logDEBUG2);
+        return result;
+    }
+
+    return emitFailureAndReturnNullStorage(optimalStorageIndex);
 }
 
 QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, const QnNetworkResourcePtr &camera, const QString& prefix, const QnStorageResourcePtr& storage)
@@ -2554,7 +2566,7 @@ std::vector<QnUuid> QnStorageManager::getCamerasWithArchiveHelper() const
     getCamerasWithArchiveInternal(internalData, m_devFileCatalog[QnServer::LowQualityCatalog]);
     getCamerasWithArchiveInternal(internalData, m_devFileCatalog[QnServer::HiQualityCatalog]);
     for(const QString& uniqueId: internalData) {
-        const QnResourcePtr cam = qnResPool->getResourceByUniqueId(uniqueId);
+        const QnResourcePtr cam = resourcePool()->getResourceByUniqueId(uniqueId);
         if (cam)
             result.push_back(cam->getId());
     }

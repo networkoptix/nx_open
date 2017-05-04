@@ -15,6 +15,8 @@
 #include <media_server/serverutil.h>
 #include "recording/time_period.h"
 #include <api/helpers/camera_id_helper.h>
+#include <rest/server/rest_connection_processor.h>
+#include <common/common_module.h>
 
 namespace {
 
@@ -24,8 +26,11 @@ static const QString kDeprecatedPhysicalIdParam = lit("physicalId");
 } // namespace
 
 int QnBusinessEventLogRestHandler::executeGet(
-    const QString& /*path*/, const QnRequestParamList& params, QByteArray& result,
-    QByteArray& contentType, const QnRestConnectionProcessor* /*owner*/)
+    const QString& /*path*/,
+    const QnRequestParamList& params,
+    QByteArray& result,
+    QByteArray& contentType,
+    const QnRestConnectionProcessor* owner)
 {
     QnTimePeriod period(-1, -1);
     QnSecurityCamResourceList resList;
@@ -34,7 +39,10 @@ int QnBusinessEventLogRestHandler::executeGet(
     QnBusiness::ActionType actionType = QnBusiness::UndefinedAction;
     QnUuid businessRuleId;
 
-    nx::camera_id_helper::findAllCamerasByFlexibleIds(&resList, params,
+    nx::camera_id_helper::findAllCamerasByFlexibleIds(
+        owner->commonModule()->resourcePool(),
+        &resList,
+        params,
         {kCameraIdParam, kDeprecatedPhysicalIdParam});
 
     for (int i = 0; i < params.size(); ++i)

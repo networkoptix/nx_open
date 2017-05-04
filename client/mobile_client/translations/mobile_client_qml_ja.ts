@@ -49,7 +49,7 @@
     <name>CredentialsEditor</name>
     <message>
         <source>Email</source>
-        <translation>E-Mail</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Password</source>
@@ -403,11 +403,11 @@
     </message>
     <message>
         <source>OFFLINE</source>
-        <translation type="unfinished">OFFLINE</translation>
+        <translation>オフライン</translation>
     </message>
     <message>
         <source>INCOMPATIBLE</source>
-        <translation type="unfinished">INCOMPATIBLE</translation>
+        <translation>互換性なし</translation>
     </message>
 </context>
 <context>
@@ -484,7 +484,7 @@
     </message>
     <message>
         <source>Disconnect from Server</source>
-        <translation>サーバーから切断します</translation>
+        <translation>接続サーバーから切断</translation>
     </message>
 </context>
 <context>
@@ -573,7 +573,7 @@
     <message>
         <source>d MMMM yyyy</source>
         <comment>DO NOT TRANSLATE THIS STRING!</comment>
-        <translation type="unfinished">d MMMM yyyy</translation>
+        <translation>yyyy/MMMM/d</translation>
     </message>
 </context>
 <context>

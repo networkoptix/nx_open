@@ -16,11 +16,12 @@
 #include <QDir>
 
 #include <nx/network/socket_global.h>
+#include <nx/utils/thread/barrier_handler.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/type_utils.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 #include "ssl/ssl_static_data.h"
 
@@ -42,6 +43,7 @@ static const std::size_t kSslAsyncRecvBufferSize(1024 * 100);
 
 namespace nx {
 namespace network {
+namespace deprecated {
 
 class SslAsyncOperation
 {
@@ -1917,6 +1919,7 @@ void SslServerSocket::connectionAccepted(
     handler(errorCode, newSocket);
 }
 
+} // namespace deprecated
 } // namespace network
 } // namespace nx
 

@@ -45,6 +45,22 @@ void toUrlParams(const ApiStoredFilePath& name, QUrlQuery* query)
 }
 
 bool parseHttpRequestParams(
+    const QString& /*command*/,
+    const QnRequestParamList& params,
+    QByteArray* value)
+{
+    QString tmp;
+    bool result = deserialize(params, lit("id"), &tmp);
+    *value = tmp.toUtf8();
+    return result;
+}
+
+void toUrlParams(const QByteArray& id, QUrlQuery* query)
+{
+    serialize(QLatin1String(id), lit("id"), query);
+}
+
+bool parseHttpRequestParams(
     const QString& /*command*/, const QnRequestParamList& params, QnUuid* id)
 {
     return deserialize(params, lit("id"), id);

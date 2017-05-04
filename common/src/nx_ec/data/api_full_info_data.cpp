@@ -21,6 +21,7 @@
 #include <nx_ec/data/api_camera_history_data.h>
 #include <nx_ec/data/api_email_data.h>
 #include <nx_ec/data/api_layout_data.h>
+#include <nx_ec/data/api_layout_tour_data.h>
 #include <nx_ec/data/api_peer_system_time_data.h>
 #include <nx_ec/data/api_access_rights_data.h>
 #include <nx_ec/data/api_user_role_data.h>

@@ -207,7 +207,9 @@ Control
                 videoRotation: resourceHelper.customRotation
                 sourceSize: Qt.size(videoOutput.sourceRect.width, videoOutput.sourceRect.height)
 
-                item: VideoOutput
+                item: videoOutput
+
+                VideoOutput
                 {
                     id: videoOutput
 
@@ -348,12 +350,12 @@ Control
         {
             if (event.key == Qt.Key_Left)
             {
-                nextCameraRequested()
+                previousCameraRequested()
                 event.accepted = true
             }
             else if (event.key == Qt.Key_Right)
             {
-                previousCameraRequested()
+                nextCameraRequested()
                 event.accepted = true
             }
         }

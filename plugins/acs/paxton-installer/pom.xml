@@ -3,12 +3,12 @@
     <parent>
         <artifactId>hdwitness</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.1.0-SNAPSHOT</version>
         <relativePath>../../..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
     <artifactId>paxton-installer</artifactId>
     <packaging>pom</packaging>
     <name>Paxton Integration Module Installer</name> 
@@ -45,11 +45,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>libclient</artifactId>
+            <artifactId>nx_client_desktop</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/client/libclient/pom.xml</systemPath>
+            <systemPath>${root.dir}/client/nx_client_desktop/pom.xml</systemPath>
         </dependency>        
     </dependencies>  
     <build>

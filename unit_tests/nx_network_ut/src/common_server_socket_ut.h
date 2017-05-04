@@ -5,7 +5,7 @@
 #include <nx/network/abstract_socket.h>
 #include <nx/utils/std/future.h>
 
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 namespace nx {
 namespace network {

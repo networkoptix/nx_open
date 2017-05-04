@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="es" sourcelanguage="en">
+<TS version="2.1" language="es-ES" sourcelanguage="en">
 <context>
     <name>QObject</name>
     <message>
@@ -59,59 +59,59 @@
     </message>
     <message>
         <source>Server has been stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>Servidor se ha detenido</translation>
     </message>
     <message>
         <source>Server has been started</source>
-        <translation type="unfinished"></translation>
+        <translation>Servidor se ha iniciado</translation>
     </message>
     <message>
         <source>Server will be stopped. Continue?</source>
-        <translation type="unfinished">Se detendrá el servidor multimedia. ¿Desea continuar?</translation>
+        <translation>Se detendrá el servidor multimedia. ¿Desea continuar?</translation>
     </message>
     <message>
         <source>Show Server Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar registro de servidor</translation>
     </message>
     <message>
         <source>Start Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Iniciar Servidor</translation>
     </message>
     <message>
         <source>Stop Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Detener servidor</translation>
     </message>
     <message>
         <source>Server Web Page</source>
-        <translation type="unfinished"></translation>
+        <translation>Página Web de servidor</translation>
     </message>
     <message>
         <source>stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>detenido</translation>
     </message>
     <message>
         <source>starting</source>
-        <translation type="unfinished"></translation>
+        <translation>iniciando</translation>
     </message>
     <message>
         <source>stopping</source>
-        <translation type="unfinished"></translation>
+        <translation>deteniendo</translation>
     </message>
     <message>
         <source>started</source>
-        <translation type="unfinished"></translation>
+        <translation>iniciado</translation>
     </message>
     <message>
         <source>resuming</source>
-        <translation type="unfinished"></translation>
+        <translation>reanudado</translation>
     </message>
     <message>
         <source>paused</source>
-        <translation type="unfinished"></translation>
+        <translation>pausa</translation>
     </message>
     <message>
         <source>pausing</source>
-        <translation type="unfinished"></translation>
+        <translation>en pausa</translation>
     </message>
 </context>
 </TS>

@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include <nx/network/url/url_parse_helper.h>
-#include <nx/utils/url_builder.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
 
 #include <utils/common/app_info.h>
@@ -41,7 +41,8 @@ void DataGenerator::prepareSystemsToAdd(int systemCount)
     {
         SystemContext systemContext;
         systemContext.registrationData.customization = QnAppInfo::customizationName().toStdString();
-        systemContext.registrationData.name = "load_test_system_" + utils::generateRandomName(8);
+        systemContext.registrationData.name = 
+            "load_test_system_" + utils::generateRandomName(8).toStdString();
         m_systemsToRegister.push_back(std::move(systemContext));
     }
 }

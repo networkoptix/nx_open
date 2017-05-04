@@ -37,7 +37,7 @@ int QnCookieLoginRestHandler::executePost(
     const_cast<QnRestConnectionProcessor*>(owner)->setAccessRights(accessRights);
     if (authResult == Qn::Auth_CloudConnectError)
     {
-        result.setError(QnRestResult::CantProcessRequest, QnAppInfo::cloudName() + " is not accessible yet. Please try again later.");
+        result.setError(QnRestResult::CantProcessRequest, nx::network::AppInfo::cloudName() + " is not accessible yet. Please try again later.");
         return nx_http::StatusCode::ok;
     }
     else if (authResult == Qn::Auth_LDAPConnectError)

@@ -20,8 +20,14 @@ public:
 
     const AccountWithPassword& account() const;
     const api::SystemData& system() const;
+    /**
+     * Opens connection. Each has random peerId.
+     */
     void openTransactionConnections(int count);
-    void openTransactionConnectionsOfSpecifiedVersion(int count, int protoVersion);
+    /**
+     * @return Ids of connections created.
+     */
+    std::vector<int> openTransactionConnectionsOfSpecifiedVersion(int count, int protoVersion);
     void waitForConnectionsToMoveToACertainState(
         const std::vector<::ec2::QnTransactionTransportBase::State>& desiredStates,
         std::chrono::milliseconds waitTimeout);
@@ -29,9 +35,15 @@ public:
     void waitUntilActiveConnectionCountReaches(int count);
     void waitUntilClosedConnectionCountReaches(int count);
     void closeAllConnections();
+    void useAnotherSystem();
+
+    QUrl cdbSynchronizationUrl() const;
 
     OnConnectionBecomesActiveSubscription& onConnectionBecomesActiveSubscription();
     OnConnectionFailureSubscription& onConnectionFailureSubscription();
+
+protected:
+    test::TransactionConnectionHelper& connectionHelper();
 
 private:
     AccountWithPassword m_account;

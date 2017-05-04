@@ -3,6 +3,8 @@
 #include <atomic>
 #include <functional>
 
+#include <QtCore/QPointer>
+
 class QnUpdatable
 {
 public:

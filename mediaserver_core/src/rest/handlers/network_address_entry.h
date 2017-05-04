@@ -21,5 +21,6 @@ typedef QVector<QnNetworkAddressEntry> QnNetworkAddressEntryList;
 #define QnNetworkAddressEntry_Fields (name)(ipAddr)(netMask)(mac)(gateway)(dhcp)(extraParams)(dns_servers)
 QN_FUSION_DECLARE_FUNCTIONS(QnNetworkAddressEntry, (json)) 
 
+QnNetworkAddressEntryList systemNetworkAddressEntryList(bool* isOk = nullptr, bool addFromConfig = false);
 
 #endif

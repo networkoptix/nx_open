@@ -258,7 +258,9 @@ void TimerManager::run()
 
     while (!m_terminated)
     {
-        boost::optional<std::chrono::milliseconds> timeToWait;
+        boost::optional<std::chrono::milliseconds> timeToWait(
+            std::chrono::milliseconds::zero());
+        timeToWait.reset();
 
         try
         {

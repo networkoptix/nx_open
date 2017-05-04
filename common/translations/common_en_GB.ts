@@ -49,42 +49,42 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>In this version you can only merge systems which are not connected to %1.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Both systems are connected to %1. Merge is not allowed.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>These systems are built with different %1 URL. Merge is not allowed.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot connect to the other system because current system is already connected to %1.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>System was not found.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The discovered system %1 has an incompatible version %2.</source>
+        <source>The discovered System %1 has an incompatible version %2.</source>
         <comment>%1 is name of System, %2 is version information</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The discovered system %1 is in safe mode.</source>
+        <source>Cannot connect to the other System because current System is already connected to %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The discovered System %1 is in safe mode.</source>
         <comment>%1 is name of System</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not configure the remote system %1.</source>
+        <source>Could not configure the remote System %1.</source>
         <comment>%1 is name of System</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Both Systems are connected to %1. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -188,10 +188,6 @@
     </message>
     <message>
         <source>Source: %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Url: %1</source>
         <translation></translation>
     </message>
     <message>
@@ -433,50 +429,50 @@
     <message numerus="yes">
         <source>Motion on Cameras</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Motion on Cameras</numerusform>
+            <numerusform>Motion on Camera</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Input Signal on Devices</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Input Signal on Device</numerusform>
+            <numerusform>Input Signal on Devices</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Input Signal on Cameras</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Input Signal on Cameras</numerusform>
+            <numerusform>Input Signal on Camera</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Devices Disconnected</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Device Disconnected</numerusform>
+            <numerusform>Devices Disconnected</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cameras Disconnected</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Camera Disconnected</numerusform>
+            <numerusform>Cameras Disconnected</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Devices IP Conflict</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Device IP Conflict</numerusform>
+            <numerusform>Devices IP Conflict</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cameras IP Conflict</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Camera IP Conflict</numerusform>
+            <numerusform>Cameras IP Conflict</numerusform>
         </translation>
     </message>
     <message>
@@ -1194,7 +1190,7 @@
 <context>
     <name>QnSystemDescription</name>
     <message>
-        <source>Unnamed system</source>
+        <source>Unnamed System</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1311,64 +1307,64 @@
         <source>milliseconds</source>
         <comment>Full suffix for displaying milliseconds</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>millisecond</numerusform>
+            <numerusform>milliseconds</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>seconds</source>
         <comment>Full suffix for displaying seconds</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>second</numerusform>
+            <numerusform>seconds</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>minutes</source>
         <comment>Full suffix for displaying minutes</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>minute</numerusform>
+            <numerusform>minutes</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>hours</source>
         <comment>Full suffix for displaying hours</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>hour</numerusform>
+            <numerusform>hours</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>days</source>
         <comment>Full suffix for displaying days</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>day</numerusform>
+            <numerusform>days</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>weeks</source>
         <comment>Full suffix for displaying weeks</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>week</numerusform>
+            <numerusform>weeks</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>months</source>
         <comment>Full suffix for displaying months</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>month</numerusform>
+            <numerusform>months</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>years</source>
         <comment>Full suffix for displaying years</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>year</numerusform>
+            <numerusform>years</numerusform>
         </translation>
     </message>
 </context>
@@ -1422,14 +1418,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Has access to whole system and can do everything.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Has access to whole system and can manage it. Can create users.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Can manage all cameras and bookmarks.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1447,6 +1435,14 @@
     </message>
     <message>
         <source>Custom permissions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Has access to whole System and can do everything.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Has access to whole System and can manage it. Can create users.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

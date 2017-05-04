@@ -143,7 +143,7 @@ public:
                 ++planes;
                 data[i] = frame->data[i];
                 linesize[i] = frame->linesize[i];
-                
+
                 int bytesPerPlane = linesize[i] * frame->height;
                 if (i > 0)
                 {
@@ -152,7 +152,7 @@ public:
                 }
                 *numBytes += bytesPerPlane;
             }
-        
+
         }
 
         return planes;
@@ -263,12 +263,11 @@ void IOSVideoDecoderPrivate::closeCodecContext()
 // FfmpegDecoder
 
 IOSVideoDecoder::IOSVideoDecoder(
-    const ResourceAllocatorPtr& allocator, const QSize& resolution)
+    const ResourceAllocatorPtr& /*allocator*/, const QSize& /*resolution*/)
 :
     AbstractVideoDecoder(),
     d_ptr(new IOSVideoDecoderPrivate())
 {
-    QN_UNUSED(allocator, resolution);
 }
 
 IOSVideoDecoder::~IOSVideoDecoder()
@@ -293,7 +292,6 @@ bool IOSVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolutio
 
 QSize IOSVideoDecoder::maxResolution(const AVCodecID codec)
 {
-    QN_UNUSED(codec);
     //todo: implement me. Need detect at runtime.
     if (codec == AV_CODEC_ID_H264)
         return QSize(1920, 1080);

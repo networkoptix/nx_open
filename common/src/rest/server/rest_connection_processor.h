@@ -9,12 +9,15 @@
 #include "request_handler.h"
 #include <core/resource_access/user_access_data.h>
 
+class QnHttpConnectionListener;
+
 class QnRestProcessorPool
-:
-    public Singleton<QnRestProcessorPool>
 {
 public:
     typedef QMap<QString, QnRestRequestHandlerPtr> Handlers;
+    typedef QMap<QString, QString> RedirectRules;
+
+    QnRestProcessorPool();
 
     /*!
         Takes ownership of \a handler
@@ -23,17 +26,24 @@ public:
     QnRestRequestHandlerPtr findHandler( QString path ) const;
     const Handlers& handlers() const;
 
+    void registerRedirectRule( const QString& path, const QString& newPath );
+    boost::optional<QString> getRedirectRule( const QString& path );
+
 private:
     Handlers m_handlers;
+    RedirectRules m_redirectRules;
 };
 
 class QnRestConnectionProcessorPrivate;
 
-class QnRestConnectionProcessor: public QnTCPConnectionProcessor {
+class QnRestConnectionProcessor: public QnTCPConnectionProcessor
+{
     Q_OBJECT
 
 public:
-    QnRestConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnRestConnectionProcessor(
+        QSharedPointer<AbstractStreamSocket> socket,
+        QnHttpConnectionListener* owner);
     virtual ~QnRestConnectionProcessor();
     void setAuthNotRequired(bool noAuth);
 

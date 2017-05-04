@@ -11,6 +11,7 @@
             <includes>
                 <include>audio/qtaudio_windows.dll</include>
                 <include>fonts/*.ttf</include>
+                <include>help/**</include>
                 <include>imageformats/qgif.dll</include>
                 <include>imageformats/qjpeg.dll</include>
                 <include>imageformats/qtiff.dll</include>
@@ -82,10 +83,6 @@
             <includes>
                 <include>*.*</include>
             </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${environment.dir}/help/${release.version}/${customization}</directory>
-            <outputDirectory>../help</outputDirectory>
         </fileSet>
     </fileSets>
 </assembly>

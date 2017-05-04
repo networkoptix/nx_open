@@ -6,6 +6,8 @@
 #include <QtCore/QTimer>
 #include <QtCore/QMutex>
 
+#include <common/common_module.h>
+
 #include <nx/utils/debug_utils.h>
 #include <nx/utils/flag_config.h>
 #include <nx/utils/log/log.h>
@@ -655,9 +657,10 @@ void PlayerPrivate::applyVideoQuality()
     }
     else
     {
+        // Use "auto" width for correct aspect ratio, because quality.width() is in logical pixels.
         NX_ASSERT(quality.isValid());
         archiveReader->setQuality(MEDIA_Quality_CustomResolution, /*fastSwitch*/ true,
-            QSize(/*width*/ 0, quality.height())); //< Use "auto" width.
+            QSize(/*width*/ 0, quality.height()));
     }
     at_hurryUp(); //< skip waiting for current frame
 }
@@ -801,7 +804,9 @@ qint64 Player::position() const
 void Player::setPosition(qint64 value)
 {
     Q_D(Player);
-    d->log(lit("setPosition(%1)").arg(value));
+    d->log(lit("setPosition(%1: %2)")
+        .arg(value)
+        .arg(QDateTime::fromMSecsSinceEpoch(value, Qt::UTC).toString()));
 
     d->positionMs = d->lastSeekTimeMs = value;
     if (d->archiveReader)
@@ -891,6 +896,7 @@ void Player::stop()
     d->updateCurrentResolution(QSize());
 
     d->setState(State::Stopped);
+    d->setMediaStatus(MediaStatus::NoMedia);
     d->log(lit("stop() END"));
 }
 
@@ -922,7 +928,7 @@ void Player::setSource(const QUrl& url)
     }
     else
     {
-        d->resource = qnResPool->getResourceById(QnUuid(path));
+        d->resource = commonModule()->resourcePool()->getResourceById(QnUuid(path));
     }
 
     if (d->resource && currentState == State::Playing)

@@ -19,6 +19,7 @@
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
 #include <plugins/resource/archive_camera/archive_camera.h>
+#include <common/common_module.h>
 
 
 static const int MAX_PERCENT = 100;
@@ -33,7 +34,7 @@ namespace {
         if (netRes->hasCameraCapabilities(Qn::ShareIpCapability))
             return false; //< don't block
 
-        QnNetworkResourceList existResList = qnResPool->getAllNetResourceByHostAddress(netRes->getHostAddress());
+        QnNetworkResourceList existResList = netRes->resourcePool()->getAllNetResourceByHostAddress(netRes->getHostAddress());
         existResList = existResList.filtered(
             [&netRes](const QnNetworkResourcePtr& existRes)
             {
@@ -84,22 +85,6 @@ namespace {
             return entryFromCamera(camera);
 
         return QnManualResourceSearchEntry();
-    }
-
-    QList<QnAbstractNetworkResourceSearcher*> getAllNetworkSearchers()
-    {
-        QList<QnAbstractNetworkResourceSearcher*> result;
-
-        for(QnAbstractResourceSearcher* as: QnResourceDiscoveryManager::instance()->plugins())
-        {
-            QnAbstractNetworkResourceSearcher* ns =
-                dynamic_cast<QnAbstractNetworkResourceSearcher*>(as);
-            Q_ASSERT(ns);
-
-            result.push_back(ns);
-        }
-
-        return result;
     }
 }
 
@@ -162,6 +147,7 @@ void QnSearchTask::doSearch()
 
         for (const auto& res: seqResults)
         {
+            res->setCommonModule(checker->commonModule());
             QnSecurityCamResourcePtr camRes = res.dynamicCast<QnSecurityCamResource>();
             Q_ASSERT(camRes);
             // Checking, if found resource is reserved by some other searcher
@@ -201,7 +187,8 @@ QString QnSearchTask::toString()
     return str;
 }
 
-QnManualCameraSearcher::QnManualCameraSearcher():
+QnManualCameraSearcher::QnManualCameraSearcher(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule),
     m_state(QnManualResourceSearchStatus::Init),
     m_cancelled(false),
     m_hostRangeSize(0),
@@ -213,6 +200,23 @@ QnManualCameraSearcher::QnManualCameraSearcher():
 QnManualCameraSearcher::~QnManualCameraSearcher()
 {
 }
+
+QList<QnAbstractNetworkResourceSearcher*> QnManualCameraSearcher::getAllNetworkSearchers() const
+{
+    QList<QnAbstractNetworkResourceSearcher*> result;
+
+    for (QnAbstractResourceSearcher* as : commonModule()->resourceDiscoveryManager()->plugins())
+    {
+        QnAbstractNetworkResourceSearcher* ns =
+            dynamic_cast<QnAbstractNetworkResourceSearcher*>(as);
+        Q_ASSERT(ns);
+
+        result.push_back(ns);
+    }
+
+    return result;
+}
+
 
 bool QnManualCameraSearcher::run(
     QThreadPool* threadPool,
@@ -422,9 +426,8 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
         case QnManualResourceSearchStatus::CheckingOnline:
         {
             Q_ASSERT(m_hostRangeSize);
-            int currentProgress = m_ipChecker.hostsChecked()
-                * PORT_SCAN_MAX_PROGRESS_PERCENT
-                / m_hostRangeSize;
+            int currentProgress = m_hostRangeSize ?
+                m_ipChecker.hostsChecked() * PORT_SCAN_MAX_PROGRESS_PERCENT / m_hostRangeSize : 0;
 
             result.status = QnManualResourceSearchStatus(m_state, currentProgress, MAX_PERCENT);
 
@@ -568,7 +571,7 @@ void QnManualCameraSearcher::runTasksUnsafe(QThreadPool* threadPool)
             QnSearchTask task = queue.dequeue();
 
             auto taskFn = std::bind(&QnSearchTask::doSearch, task);
-            QnConcurrent::run(threadPool, taskFn);
+            nx::utils::concurrent::run(threadPool, taskFn);
 
             context.runningTaskCount++;
             totalRunningTasks++;

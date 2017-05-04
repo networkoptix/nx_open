@@ -13,7 +13,7 @@
 #include <network/module_information.h>
 #include <rest/server/json_rest_result.h>
 #include <utils/common/sync_call.h>
-#include <utils/crypt/linux_passwd_crypt.h>
+#include <nx/utils/crypt/linux_passwd_crypt.h>
 
 namespace nx {
 namespace hpm {
@@ -33,7 +33,7 @@ public:
 
     virtual void processRequest(
         nx_http::HttpServerConnection* const /*connection*/,
-        stree::ResourceContainer /*authInfo*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
         nx_http::Request /*request*/,
         nx_http::Response* const /*response*/,
         nx_http::RequestProcessedHandler handler) override

@@ -16,7 +16,7 @@
 #include <utils/common/sync_call.h>
 
 #include "business_data_generator.h"
-#include "cloud_db_process.h"
+#include "cloud_db_service.h"
 #include "managers/email_manager.h"
 
 namespace nx {
@@ -92,7 +92,7 @@ CdbLauncher::~CdbLauncher()
 
 bool CdbLauncher::waitUntilStarted()
 {
-    if (!utils::test::ModuleLauncher<CloudDBProcessPublic>::waitUntilStarted())
+    if (!utils::test::ModuleLauncher<CloudDbServicePublic>::waitUntilStarted())
         return false;
 
     const auto& httpEndpoints = moduleInstance()->impl()->httpEndpoints();

@@ -49,42 +49,42 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>In this version you can only merge systems which are not connected to %1.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Both systems are connected to %1. Merge is not allowed.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>These systems are built with different %1 URL. Merge is not allowed.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot connect to the other system because current system is already connected to %1.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>System was not found.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The discovered system %1 has an incompatible version %2.</source>
+        <source>The discovered System %1 has an incompatible version %2.</source>
         <comment>%1 is name of System, %2 is version information</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The discovered system %1 is in safe mode.</source>
+        <source>Cannot connect to the other System because current System is already connected to %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The discovered System %1 is in safe mode.</source>
         <comment>%1 is name of System</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not configure the remote system %1.</source>
+        <source>Could not configure the remote System %1.</source>
         <comment>%1 is name of System</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Both Systems are connected to %1. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -188,10 +188,6 @@
     </message>
     <message>
         <source>Source: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Url: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1174,7 +1170,7 @@
 <context>
     <name>QnSystemDescription</name>
     <message>
-        <source>Unnamed system</source>
+        <source>Unnamed System</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1394,14 +1390,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Has access to whole system and can do everything.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Has access to whole system and can manage it. Can create users.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Can manage all cameras and bookmarks.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1419,6 +1407,14 @@
     </message>
     <message>
         <source>Custom permissions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Has access to whole System and can do everything.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Has access to whole System and can manage it. Can create users.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

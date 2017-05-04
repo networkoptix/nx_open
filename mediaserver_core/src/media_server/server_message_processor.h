@@ -18,7 +18,7 @@ class QnServerMessageProcessor : public QnCommonMessageProcessor
 
     typedef QnCommonMessageProcessor base_type;
 public:
-    QnServerMessageProcessor();
+    QnServerMessageProcessor(QnCommonModule* commonModule);
 
     virtual void updateResource(const QnResourcePtr &resource, ec2::NotificationSource source) override;
     void registerProxySender(QnUniversalTcpListener* tcpListener);

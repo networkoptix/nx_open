@@ -4,7 +4,7 @@
   "dialogs":{
     "okButton":"Ok",
     "openLink":"이 링크를 방문",
-    "openLinkWithTitle":"{{title} 링크를 방문"
+    "openLinkWithTitle":"{{title}} 링크를 방문"
   },
   "setup":{
     "createAccount":"계정을 만듭니다",
@@ -12,11 +12,11 @@
     "errorNoNetwork":"이 장치에 네트워크 연결이 필요 합니다. <br>로컬 네트워크 or 인터넷에 연결하세요"
   },
   "passwordRequirements":{
-    "minLengthMessage":"비밀번호는 최소 8자 이상 포함되어야 합니다.",
-    "requiredMessage":"공백 삭제 후 영문자 및 키보드 기호만 사용하세요",
-    "weakMessage":"대소문자 및 특수 기호를 사용 하 여 강력한 암호 만들기",
+    "minLengthMessage":"비밀번호는 8자 이상이어야 합니다",
+    "requiredMessage":"라틴 문자, 숫자 및 키보드 기호만 사용할 수 있습니다.",
+    "weakMessage":"암호는 다양한 유형의 기호를 포함 해야 합니다.",
     "strongMessage":"강력한 암호!",
-    "commonMessage":"현재 암호는 가능 많이 사용되는 암호입니다."
+    "commonMessage":"이 비밀번호는 매우 흔한 비밀번호입니다."
   },
   "settings":{
     "tabs":{
@@ -38,7 +38,7 @@
     "confirmRestoreSettings":"모든 서버 설정을 복원할까요? 녹화데이터는 유지되지만 네트워크 설정이 초기화됩니다.",
     "confirmRestoreSettingsNotNetwork":"서버 구성을 다시 설정 하겠습니까? 녹화데이터 및 네트워크 설정은유지 됩니다.",
     "unavailable":"이용 불가",
-    "unsafePortConfirm":"It is not safe to use port number less than 1025. Server might be not accessible. Continue anyway?",
+    "unsafePortConfirm":"1025 이하의 포트를 사용 하는 것은 안전 하지 않습니다. 서버를 액세스하지 못할 수 있습니다. 그래도 진행 하시겠습니까?",
     "confirmDisconnectFromCloud":"{{CLOUD_NAME}} 에서 시스템을 분리",
     "confirmDisconnectFromCloudTitle":"<span class='warning-label'> 모든 클라우드 사용자 삭제 됩니다.</span> <br><br>로컬 네트워크에서 관리자 계정을 통해 액세스할 수 있을 것입니다.",
     "confirmDisconnectFromCloudAction":"연결 해제",

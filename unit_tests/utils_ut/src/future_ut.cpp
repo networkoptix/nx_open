@@ -1,8 +1,3 @@
-/**********************************************************
-* May 18, 2016
-* a.kolesnikov
-***********************************************************/
-
 #include <iostream>
 #include <thread>
 
@@ -12,17 +7,13 @@
 #include <nx/utils/std/thread.h>
 #include <nx/utils/random.h>
 
-
 TEST(promise, general)
 {
-    for (int i = 0; i < 100; ++i)
-    {
-        nx::utils::promise<bool> promise;
-        nx::utils::thread thread([&promise]{ promise.set_value(true); });
-        std::this_thread::sleep_for(std::chrono::microseconds(
-            nx::utils::random::number(0, 99999)));
+    nx::utils::promise<bool> promise;
+    nx::utils::thread thread([&promise]{ promise.set_value(true); });
+    std::this_thread::sleep_for(std::chrono::microseconds(
+        nx::utils::random::number(0, 99999)));
 
-        ASSERT_TRUE(promise.get_future().get());
-        thread.join();
-    }
+    ASSERT_TRUE(promise.get_future().get());
+    thread.join();
 }

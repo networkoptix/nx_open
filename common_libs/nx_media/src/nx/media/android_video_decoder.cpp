@@ -3,6 +3,8 @@
 
 #include <deque>
 
+#include <QtCore/QElapsedTimer>
+
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOpenGLShaderProgram>
@@ -455,8 +457,6 @@ void AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(const AVCodecID codec)
             "maxDecoderWidth", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
         jint maxHeight = javaDecoder.callMethod<jint>(
             "maxDecoderHeight", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
-        NX_LOG(lm("Maximum hardware decoder resolution: (%1, %2) for codec %3")
-            .arg(maxWidth).arg(maxHeight).arg(codecMimeType), cl_logWARNING);
         const QSize maxSize{maxWidth, maxHeight};
         if (maxSize.isEmpty())
         {
@@ -466,8 +466,8 @@ void AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(const AVCodecID codec)
         }
         else
         {
-            NX_LOG(lm("Maximum hardware decoder resolution: (%1, %2) for codec %3")
-                .arg(maxSize.width()).arg(maxSize.height()).arg(codecMimeType), cl_logWARNING);
+            NX_LOG(lm("Maximum hardware decoder resolution: %1 for codec %2")
+                .arg(maxSize).arg(codecMimeType), cl_logWARNING);
             maxResolutions[codec] = maxSize;
         }
     }
@@ -485,10 +485,8 @@ bool AndroidVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resol
 
     if (resolution.width() > maxSize.width() || resolution.height() > maxSize.height())
     {
-        NX_LOG(lm("Codec for %1 is not compatible with resolution (%2, %3) because max is (%4, %5)")
-            .arg(codecToString(codec))
-            .arg(resolution.width()).arg(resolution.height())
-            .arg(maxSize.width()).arg(maxSize.height()), cl_logWARNING);
+        NX_LOG(lm("Codec for %1 is not compatible with resolution %2 because max is %3")
+            .arg(codecToString(codec)).arg(resolution).arg(maxSize), cl_logWARNING);
         return false;
     }
 

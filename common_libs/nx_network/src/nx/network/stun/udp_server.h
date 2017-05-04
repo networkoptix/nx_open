@@ -1,6 +1,6 @@
 #pragma once
 
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 #include <nx/network/aio/basic_pollable.h>
 
@@ -37,8 +37,9 @@ public:
     /**
      * Start receiving messages.
      * If UdpServer::bind has not been called, random local address is occupied.
+     * @param backlogSize Ignored. Introduce to make API compatible with tcp servers.
      */
-    bool listen();
+    bool listen(int backlogSize = 0);
 
     void stopReceivingMessagesSync();
 

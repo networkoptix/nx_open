@@ -1,5 +1,7 @@
 #include "camera_chunk_provider.h"
 
+#include <common/common_module.h>
+
 #include <camera/loaders/flat_camera_data_loader.h>
 #include <camera/data/abstract_camera_data.h>
 #include <core/resource/camera_resource.h>
@@ -33,7 +35,7 @@ void QnCameraChunkProvider::setResourceId(const QString& id)
     if (m_loader)
     {
         m_loader->disconnect(this);
-        qnCameraHistoryPool->disconnect(m_loader);
+        cameraHistoryPool()->disconnect(m_loader);
         m_loader->deleteLater();
         m_loader = nullptr;
     }
@@ -43,7 +45,7 @@ void QnCameraChunkProvider::setResourceId(const QString& id)
     emit bottomBoundChanged();
     emit bottomBoundDateChanged();
 
-    const auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid(id));
+    const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(QnUuid(id));
 
     m_loading = !camera.isNull();
     emit loadingChanged();
@@ -51,7 +53,11 @@ void QnCameraChunkProvider::setResourceId(const QString& id)
     if (!camera)
         return;
 
-    m_loader = new QnFlatCameraDataLoader(camera, Qn::RecordingContent, this);
+    m_loader = new QnFlatCameraDataLoader(
+        camera,
+        commonModule()->currentServer(),
+        Qn::RecordingContent,
+        this);
     connect(m_loader, &QnFlatCameraDataLoader::ready, this,
         [this](const QnAbstractCameraDataPtr& data)
         {
@@ -67,9 +73,9 @@ void QnCameraChunkProvider::setResourceId(const QString& id)
             }
         });
 
-    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraFootageChanged,
+    connect(cameraHistoryPool(), &QnCameraHistoryPool::cameraFootageChanged,
         m_loader, [this](){ m_loader->discardCachedData(); } );
-    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraHistoryInvalidated,
+    connect(cameraHistoryPool(), &QnCameraHistoryPool::cameraHistoryInvalidated,
         this, &QnCameraChunkProvider::update);
 
     update();
@@ -152,7 +158,7 @@ void QnCameraChunkProvider::update()
 
     m_loader->load(QString(), 1);
 
-    auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(
+    auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(
         m_loader->resource()->getId());
-    qnCameraHistoryPool->updateCameraHistoryAsync(camera, nullptr);
+    cameraHistoryPool()->updateCameraHistoryAsync(camera, nullptr);
 }

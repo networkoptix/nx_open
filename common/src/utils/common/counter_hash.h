@@ -37,18 +37,14 @@ public:
     bool remove(const T& key)
     {
         auto iter = m_hash.find(key);
-        NX_EXPECT(iter != m_hash.end());
+        if (iter == m_hash.end())
+            return false;
 
-        if (iter != m_hash.end())
-        {
-            NX_EXPECT(iter.value() > 0);
-            const bool wasLast = (--iter.value() <= 0);
-            if (wasLast)
-                m_hash.erase(iter);
-            return wasLast;
-        }
-
-        return false;
+        NX_EXPECT(iter.value() > 0);
+        const bool wasLast = (--iter.value() <= 0);
+        if (wasLast)
+            m_hash.erase(iter);
+        return wasLast;
     }
 
     bool contains(const T& key) const

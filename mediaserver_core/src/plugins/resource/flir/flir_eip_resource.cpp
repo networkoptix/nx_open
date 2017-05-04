@@ -1,9 +1,12 @@
+#ifdef ENABLE_FLIR
+
 #include "flir_eip_resource.h"
 #include "common/common_module.h"
 #include <utils/common/synctime.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <plugins/resource/onvif/dataprovider/rtp_stream_provider.h>
 #include <nx/utils/log/log.h>
+#include <common/static_common_module.h>
 
 const QString QnFlirEIPResource::MANUFACTURE(lit("FLIR"));
 
@@ -28,7 +31,7 @@ QnFlirEIPResource::~QnFlirEIPResource()
 }
 
 QByteArray QnFlirEIPResource::PASSTHROUGH_EPATH()
-{    
+{
     return MessageRouterRequest::buildEPath(
         FlirEIPClass::kPassThrough,
         0x01);
@@ -384,7 +387,7 @@ bool QnFlirEIPResource::getParamPhysical(const QString &id, QString &value)
 
     auto client = std::unique_ptr<SimpleEIPClient>(new SimpleEIPClient(getHostAddress()));
     if (!client->registerSession())
-        return false;    
+        return false;
 
     const auto response = client->doServiceRequest(eipRequest);
 
@@ -544,7 +547,7 @@ bool QnFlirEIPResource::findAlarmInputByTypeAndId(int id, const QString& type, Q
 void QnFlirEIPResource::initializeIO()
 {
     QnMutexLocker lock(&m_ioMutex);
-    auto resData = qnCommon->dataPool()->data(MANUFACTURE, getModel());
+    auto resData = qnStaticCommon->dataPool()->data(MANUFACTURE, getModel());
     auto portList = resData.value<QnIOPortDataList>(Qn::IO_SETTINGS_PARAM_NAME);
     auto alarmsCount = resData.value<int>(kAlarmsCountParamName);
 
@@ -565,7 +568,7 @@ void QnFlirEIPResource::initializeIO()
         {
             m_outputPorts.push_back(port);
         }
-    
+
     for (size_t i = 0; i < alarmsCount; i++)
         m_alarmStates.push_back(false);
 
@@ -626,9 +629,58 @@ MessageRouterRequest QnFlirEIPResource::buildEIPOutputPortRequest(const QString 
 
 bool QnFlirEIPResource::setRelayOutputState(const QString &outputID, bool activate, unsigned int autoResetTimeoutMS)
 {
+    QnMutexLocker lock(&m_ioMutex);
     QString id = outputID.isEmpty() ?
         m_outputPorts[0].id :
         outputID;
+
+
+    if (!activate)
+    {
+        for (auto it = m_autoResetTimers.begin(); it != m_autoResetTimers.end(); ++it)
+        {
+            auto timerId = it->first;
+            auto portTimerEntry = it->second;
+            if (it->second.portId == outputID)
+            {
+                nx::utils::TimerManager::instance()->deleteTimer(timerId);
+                it = m_autoResetTimers.erase(it);
+                break;
+            }
+        }
+    }
+
+    if (activate && autoResetTimeoutMS)
+    {
+        auto autoResetTimer = nx::utils::TimerManager::instance()->addTimer(
+            [this](quint64  timerId)
+            {
+                boost::optional<PortTimerEntry> timerEntry(boost::none);
+
+                {
+                    QnMutexLocker lock(&m_ioMutex);
+                    if (m_autoResetTimers.count(timerId))
+                    {
+                        timerEntry = m_autoResetTimers[timerId];
+                        m_autoResetTimers.erase(timerId);
+                    }
+                }
+
+                if (timerEntry)
+                {
+                    setRelayOutputState(
+                        timerEntry->portId,
+                        timerEntry->state,
+                        0);
+                }
+            },
+            std::chrono::milliseconds(autoResetTimeoutMS));
+
+        PortTimerEntry portTimerEntry;
+        portTimerEntry.portId = outputID;
+        portTimerEntry.state = !activate;
+        m_autoResetTimers[autoResetTimer] = portTimerEntry;
+    }
 
     auto req = buildEIPOutputPortRequest(id, activate);
     return m_outputEipAsyncClient->doServiceRequestAsync(req);
@@ -829,3 +881,5 @@ quint8 QnFlirEIPResource::getOutputPortCIPAttributeById(const QString &portId) c
 {
     return static_cast<quint8>(portId.toUInt());
 }
+
+#endif

@@ -6,7 +6,7 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/move_only_func.h>
 
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 #include "message.h"
 

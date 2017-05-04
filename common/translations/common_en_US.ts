@@ -191,10 +191,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Url: %1</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Reason: %1</source>
         <translation></translation>
     </message>
@@ -1311,64 +1307,64 @@
         <source>milliseconds</source>
         <comment>Full suffix for displaying milliseconds</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>millisecond</numerusform>
+            <numerusform>milliseconds</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>seconds</source>
         <comment>Full suffix for displaying seconds</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>second</numerusform>
+            <numerusform>seconds</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>minutes</source>
         <comment>Full suffix for displaying minutes</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>minute</numerusform>
+            <numerusform>minutes</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>hours</source>
         <comment>Full suffix for displaying hours</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>hour</numerusform>
+            <numerusform>hours</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>days</source>
         <comment>Full suffix for displaying days</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>day</numerusform>
+            <numerusform>days</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>weeks</source>
         <comment>Full suffix for displaying weeks</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>week</numerusform>
+            <numerusform>weeks</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>months</source>
         <comment>Full suffix for displaying months</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>month</numerusform>
+            <numerusform>months</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>years</source>
         <comment>Full suffix for displaying years</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>year</numerusform>
+            <numerusform>years</numerusform>
         </translation>
     </message>
 </context>

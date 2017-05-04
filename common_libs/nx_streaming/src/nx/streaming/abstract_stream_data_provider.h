@@ -1,7 +1,7 @@
 #ifndef ABSTRACT_STREAM_DATA_PROVIDER
 #define ABSTRACT_STREAM_DATA_PROVIDER
 
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 #include <core/resource/resource_consumer.h>
 #include <nx/streaming/abstract_data_packet.h>
 #include <core/resource/resource_media_layout.h>

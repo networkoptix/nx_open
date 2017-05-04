@@ -5,7 +5,7 @@
 
 #include "old_ec_connection.h"
 
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 #include <utils/common/scoped_thread_rollback.h>
 
 #include "ec2_thread_pool.h"
@@ -63,6 +63,11 @@ namespace ec2
     AbstractLayoutManagerPtr OldEcConnection::getLayoutManager(const Qn::UserAccessData &)
     {
         return AbstractLayoutManagerPtr();
+    }
+
+    AbstractLayoutTourManagerPtr OldEcConnection::getLayoutTourManager(const Qn::UserAccessData& userAccessData)
+    {
+        return AbstractLayoutTourManagerPtr();
     }
 
     AbstractVideowallManagerPtr OldEcConnection::getVideowallManager(const Qn::UserAccessData &)
@@ -140,6 +145,11 @@ namespace ec2
         return AbstractLayoutNotificationManagerPtr();
     }
 
+    AbstractLayoutTourNotificationManagerPtr OldEcConnection::getLayoutTourNotificationManager()
+    {
+        return AbstractLayoutTourNotificationManagerPtr();
+    }
+
     AbstractWebPageNotificationManagerPtr OldEcConnection::getWebPageNotificationManager()
     {
         return AbstractWebPageNotificationManagerPtr();
@@ -173,21 +183,21 @@ namespace ec2
     int OldEcConnection::dumpDatabaseAsync(impl::DumpDatabaseHandlerPtr handler)
     {
         const int reqID = generateRequestID();
-        QnConcurrent::run(Ec2ThreadPool::instance(), std::bind(&impl::DumpDatabaseHandler::done, handler, reqID, ec2::ErrorCode::notImplemented, ec2::ApiDatabaseDumpData()));
+        nx::utils::concurrent::run(Ec2ThreadPool::instance(), std::bind(&impl::DumpDatabaseHandler::done, handler, reqID, ec2::ErrorCode::notImplemented, ec2::ApiDatabaseDumpData()));
         return reqID;
     }
 
     int OldEcConnection::dumpDatabaseToFileAsync( const QString& /*dumpFilePath*/, ec2::impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
-        QnConcurrent::run(Ec2ThreadPool::instance(), std::bind(&impl::SimpleHandler::done, handler, reqID, ec2::ErrorCode::notImplemented));
+        nx::utils::concurrent::run(Ec2ThreadPool::instance(), std::bind(&impl::SimpleHandler::done, handler, reqID, ec2::ErrorCode::notImplemented));
         return reqID;
     }
 
     int OldEcConnection::restoreDatabaseAsync(const ApiDatabaseDumpData& /*dbFile*/, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
-        QnConcurrent::run(Ec2ThreadPool::instance(), std::bind(&impl::SimpleHandler::done, handler, reqID, ec2::ErrorCode::notImplemented));
+        nx::utils::concurrent::run(Ec2ThreadPool::instance(), std::bind(&impl::SimpleHandler::done, handler, reqID, ec2::ErrorCode::notImplemented));
         return reqID;
     }
 
@@ -196,10 +206,6 @@ namespace ec2
     }
 
     void OldEcConnection::deleteRemotePeer(const QUrl& /*url*/)
-    {
-    }
-
-    void OldEcConnection::sendRuntimeData(const ec2::ApiRuntimeData& /*data*/)
     {
     }
 

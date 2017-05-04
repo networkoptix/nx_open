@@ -12,11 +12,11 @@
     "errorNoNetwork":"Bu cihazın çalışması için ağ bağlantısına ihtiyaç vardır. <br>Lütfen yerel bir ağa veya internete bağlayın"
   },
   "passwordRequirements":{
-    "minLengthMessage":"Şifre en az 8 karakter içermelidir",
-    "requiredMessage":"Sadece alfanümerik ve klavye \n karakterleri kullanın.",
-    "weakMessage":"Parolanın güçlü olması için \nküçük büyük harf ve özel karakterler kullanın",
+    "minLengthMessage":"Parola en az 8 karakterden oluşmalıdır",
+    "requiredMessage":"Sadece latin harfler, sayılar ve klavye simgeler izin verilir",
+    "weakMessage":"Parola farklı simgeler içermelidir.",
     "strongMessage":"Güçlü parola!",
-    "commonMessage":"Dünyada en çok kullanılan parolayı seçtiniz"
+    "commonMessage":"Bu parola sık kullanılanlar listesinde ve tahmin edilebilir."
   },
   "settings":{
     "tabs":{
@@ -100,13 +100,13 @@
     "invalidFile":"Güncelleme başarısız. Dosyalar geçersiz.",
     "incompatibleSystem":"Güncelleme başarısız. Dosyalar başka bir sistem için ayarlanmış.",
     "extractionError":"Güncelleme başarısız. Yükleme alanı yetersiz. Lütfen diskteki boş alanı kontrol edin.",
-    "installationError":"Güncelleme başarısız. Yükelme komutları çalıştırılılamıyor.",
+    "installationError":"Güncelleme başarısız. Yükleme komutları çalıştırılamıyor.",
     "selectFiles":"Dosyaları seç"
   },
   "cameraLinks":{
     "highStream":"Yüksek akış",
     "lowStream":"Düşük akış",
-    "transcoding":"Transkodlama",
+    "transcoding":"Dönüştürme",
     "unknown":"Bilinmeyen"
   },
   "advanced":{

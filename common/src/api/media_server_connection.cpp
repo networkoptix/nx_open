@@ -44,7 +44,9 @@
 #include "model/recording_stats_reply.h"
 #include <api/model/getnonce_reply.h>
 #include "common/common_module.h"
+
 #include <nx/utils/log/log.h>
+#include <nx/utils/datetime.h>
 
 namespace {
 
@@ -329,10 +331,12 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
 // QnMediaServerConnection
 
 QnMediaServerConnection::QnMediaServerConnection(
-    const QnMediaServerResourcePtr& mserver, const QnUuid& videowallGuid,
-    bool enableOfflineRequests, QObject* parent)
-    :
-    base_type(parent, mserver),
+    QnCommonModule* commonModule,
+    const QnMediaServerResourcePtr& mserver,
+    const QnUuid& videowallGuid,
+    bool enableOfflineRequests)
+:
+    base_type(commonModule, mserver),
     m_proxyPort(0),
     m_enableOfflineRequests(enableOfflineRequests)
 {
@@ -355,9 +359,12 @@ QnMediaServerConnection::QnMediaServerConnection(
     if (!videowallGuid.isNull())
         extraHeaders.emplace(Qn::VIDEOWALL_GUID_HEADER_NAME, videowallGuid.toByteArray());
     extraHeaders.emplace(Qn::EC2_RUNTIME_GUID_HEADER_NAME,
-        qnCommon->runningInstanceGUID().toByteArray());
-    extraHeaders.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME,
-        QnAppServerConnectionFactory::url().userName().toUtf8());
+        commonModule->runningInstanceGUID().toByteArray());
+    if (const auto& connection = commonModule->ec2Connection())
+    {
+        extraHeaders.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME,
+            connection->connectionInfo().ecUrl.userName().toUtf8());
+    }
 	extraHeaders.emplace(nx_http::header::kUserAgent, nx_http::userAgentString());
     setExtraHeaders(std::move(extraHeaders));
 }
@@ -1052,7 +1059,9 @@ int QnMediaServerConnection::cameraHistory(
 int QnMediaServerConnection::recordedTimePeriods(
     const QnChunksRequestData& request, QObject* target, const char* slot)
 {
-    const auto connectionVersion = QnAppServerConnectionFactory::connectionInfo().version;
+    QnSoftwareVersion connectionVersion;
+    if (const auto& connection = commonModule()->ec2Connection())
+        connectionVersion = connection->connectionInfo().version;
 
     QnChunksRequestData fixedFormatRequest(request);
     fixedFormatRequest.format = Qn::CompressedPeriodsFormat;

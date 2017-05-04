@@ -2,7 +2,7 @@
 
 #include <boost/algorithm/cxx11/any_of.hpp>
 
-#include <nx/utils/url_builder.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <client_core/client_core_settings.h>
@@ -55,7 +55,7 @@ static void migrateFrom24To25()
     {
         QnLoginSession session;
         session.systemName = importedSession.title;
-        session.url = nx::utils::UrlBuilder()
+        session.url = nx::network::url::Builder()
             .setScheme(lit("http"))
             .setHost(importedSession.host)
             .setPort(importedSession.port)

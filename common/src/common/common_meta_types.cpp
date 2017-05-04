@@ -92,6 +92,7 @@
 #include <nx_ec/data/api_resource_type_data.h>
 #include <nx_ec/data/api_license_data.h>
 #include <nx_ec/data/api_layout_data.h>
+#include <nx_ec/data/api_layout_tour_data.h>
 #include <nx_ec/data/api_camera_data.h>
 #include <nx_ec/data/api_business_rule_data.h>
 #include <nx_ec/data/api_access_rights_data.h>
@@ -112,7 +113,6 @@ namespace {
     bool qn_commonMetaTypes_initialized = false;
 }
 
-QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::Corner)
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ResourceInfoLevel);
 
 void QnCommonMetaTypes::initialize() {
@@ -257,9 +257,6 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnMediaDewarpingParams>();
     qRegisterMetaType<QnItemDewarpingParams>();
 
-    qRegisterMetaType<Qn::Corner>();
-    qRegisterMetaTypeStreamOperators<Qn::Corner>();
-
     qRegisterMetaType<QnConnectionInfo>();
     qRegisterMetaType<Qn::PanicMode>();
     qRegisterMetaType<Qn::RebuildState>();
@@ -333,6 +330,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::ApiMediaServerUserAttributesData>("ec2::ApiMediaServerUserAttributesData");
     qRegisterMetaType<ec2::ApiStorageData>("ec2::ApiStorageData");
     qRegisterMetaType<ec2::ApiResourceParamWithRefDataList>("ec2::ApiResourceParamWithRefDataList");
+    qRegisterMetaType<ec2::ApiLayoutTourData>("ec2::ApiLayoutTourData");
 
     qRegisterMetaType<QnUuid>();
     qRegisterMetaTypeStreamOperators<QnUuid>();

@@ -4,9 +4,10 @@
 
 #include <nx/utils/test_support/module_instance_launcher.h>
 
+#include <common/static_common_module.h>
 #include <test_support/appserver2_process.h>
-#include "../test_setup.h"
 
+#include "../test_setup.h"
 
 namespace nx {
 namespace cdb {
@@ -79,6 +80,7 @@ protected:
         ::ec2::ApiTransactionDataList* const transactionList);
 
 private:
+    QnStaticCommonModule m_staticCommonModule;
     utils::test::ModuleLauncher<::ec2::Appserver2ProcessPublic> m_appserver2;
     CdbLauncher m_cdb;
     AccountWithPassword m_account;

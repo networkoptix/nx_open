@@ -36,7 +36,8 @@ function setLanguage(lang){
 
     var userLang = getCookie("language");
     if(!userLang) {
-        var match = window.location.href.match(/[?&]lang=([^&]+)/gi);
+        var match = window.location.href.match(/[?&]lang=([^&#]+)/i);
+        console.log(match);
         if(match){
             userLang = match[1];
         }

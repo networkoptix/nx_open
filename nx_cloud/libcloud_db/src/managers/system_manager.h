@@ -19,8 +19,8 @@
 #include <nx/utils/timer_manager.h>
 #include <nx_ec/data/api_data.h>
 #include <nx_ec/data/api_user_data.h>
-#include <utils/common/counter.h>
-#include <utils/common/subscription.h>
+#include <nx/utils/counter.h>
+#include <nx/utils/subscription.h>
 #include <utils/db/async_sql_query_executor.h>
 #include <utils/db/filter.h>
 
@@ -28,7 +28,7 @@
 #include "access_control/abstract_authentication_data_provider.h"
 #include "cache.h"
 #include "dao/rdb/system_sharing_data_object.h"
-#include "dao/rdb/system_data_object.h"
+#include "dao/abstract_system_data_object.h"
 #include "data/account_data.h"
 #include "data/data_filter.h"
 #include "data/system_data.h"
@@ -89,8 +89,8 @@ public:
     virtual void authenticateByName(
         const nx_http::StringType& username,
         std::function<bool(const nx::Buffer&)> validateHa1Func,
-        const stree::AbstractResourceReader& authSearchInputData,
-        stree::ResourceContainer* const authProperties,
+        const nx::utils::stree::AbstractResourceReader& authSearchInputData,
+        nx::utils::stree::ResourceContainer* const authProperties,
         nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
     /** Binds system to an account associated with authzInfo. */
@@ -228,11 +228,11 @@ private:
     SystemsDict m_systems;
     mutable QnMutex m_mutex;
     AccountSystemAccessRoleDict m_accountAccessRoleForSystem;
-    QnCounter m_startedAsyncCallsCounter;
+    nx::utils::Counter m_startedAsyncCallsCounter;
     uint64_t m_dropSystemsTimerId;
     std::atomic<bool> m_dropExpiredSystemsTaskStillRunning;
     nx::utils::Subscription<std::string> m_systemMarkedAsDeletedSubscription;
-    dao::rdb::SystemDataObject m_systemDao;
+    std::unique_ptr<dao::AbstractSystemDataObject> m_systemDao;
     dao::rdb::SystemSharingDataObject m_systemSharingDao;
 
     nx::db::DBResult insertSystemToDB(
@@ -249,7 +249,7 @@ private:
         const data::SystemRegistrationDataWithAccount& newSystem,
         nx::cdb::data::SystemSharing* const ownerSharing);
     void systemAdded(
-        QnCounter::ScopedIncrement asyncCallLocker,
+        nx::utils::Counter::ScopedIncrement asyncCallLocker,
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         data::SystemRegistrationDataWithAccount systemRegistrationData,
@@ -260,7 +260,7 @@ private:
         nx::db::QueryContext* const queryContext,
         const std::string& systemId);
     void systemMarkedAsDeleted(
-        QnCounter::ScopedIncrement /*asyncCallLocker*/,
+        nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         std::string systemId,
@@ -271,7 +271,7 @@ private:
         nx::db::QueryContext* const queryContext,
         const data::SystemId& systemId);
     void systemDeleted(
-        QnCounter::ScopedIncrement asyncCallLocker,
+        nx::utils::Counter::ScopedIncrement asyncCallLocker,
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         data::SystemId systemId,
@@ -379,18 +379,22 @@ private:
     void updateSystemAttributesInCache(
         data::SystemAttributesUpdate data);
     void systemNameUpdated(
-        QnCounter::ScopedIncrement asyncCallLocker,
+        nx::utils::Counter::ScopedIncrement asyncCallLocker,
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         data::SystemAttributesUpdate data,
         std::function<void(api::ResultCode)> completionHandler);
 
+    template<typename SystemDictionary>
+    void activateSystemIfNeeded(
+        const QnMutexLockerBase& lock,
+        SystemDictionary& systemByIdIndex,
+        typename SystemDictionary::iterator systemIter);
     void systemActivated(
-        QnCounter::ScopedIncrement asyncCallLocker,
+        nx::utils::Counter::ScopedIncrement asyncCallLocker,
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
-        std::string systemId,
-        std::function<void(api::ResultCode)> completionHandler);
+        std::string systemId);
 
     nx::db::DBResult saveUserSessionStart(
         nx::db::QueryContext* queryContext,
@@ -417,7 +421,7 @@ private:
 
     void dropExpiredSystems(uint64_t timerId);
     void expiredSystemsDeletedFromDb(
-        QnCounter::ScopedIncrement /*asyncCallLocker*/,
+        nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult);
 

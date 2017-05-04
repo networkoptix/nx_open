@@ -124,7 +124,7 @@
     </message>
     <message>
         <source>Network Issue</source>
-        <translation>Netzwerk-Problem</translation>
+        <translation>Netzwerkproblem</translation>
     </message>
     <message>
         <source>Server Failure</source>
@@ -132,7 +132,7 @@
     </message>
     <message>
         <source>Server Conflict</source>
-        <translation>Server-Konflikt</translation>
+        <translation>Serverkonflikt</translation>
     </message>
     <message>
         <source>Server Started</source>
@@ -164,11 +164,11 @@
     </message>
     <message>
         <source>Storage Failure at %1</source>
-        <translation>Speicher-Fehler auf %1</translation>
+        <translation>Speicherfehler auf %1</translation>
     </message>
     <message>
         <source>Network Issue at %1</source>
-        <translation>Netzwerk-Problem auf %1</translation>
+        <translation>Netzwerkproblem auf %1</translation>
     </message>
     <message>
         <source>Server &quot;%1&quot; Failure</source>
@@ -189,10 +189,6 @@
     <message>
         <source>Source: %1</source>
         <translation>Quelle: %1</translation>
-    </message>
-    <message>
-        <source>Url: %1</source>
-        <translation>URL: %1</translation>
     </message>
     <message>
         <source>Reason: %1</source>
@@ -468,15 +464,15 @@
     <message numerus="yes">
         <source>Devices IP Conflict</source>
         <translation>
-            <numerusform>IP-Adress-Konflikt auf einem Gerät</numerusform>
-            <numerusform>IP-Adress-Konflikt auf mehreren Geräten</numerusform>
+            <numerusform>IP-Adresskonflikt auf einem Gerät</numerusform>
+            <numerusform>IP-Adresskonflikt auf mehreren Geräten</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cameras IP Conflict</source>
         <translation>
-            <numerusform>IP-Adress-Konflikt auf einer Kamera</numerusform>
-            <numerusform>IP-Adress-Konflikt auf mehreren Kameras</numerusform>
+            <numerusform>IP-Adresskonflikt auf einer Kamera</numerusform>
+            <numerusform>IP-Adresskonflikt auf mehreren Kameras</numerusform>
         </translation>
     </message>
     <message>
@@ -498,7 +494,7 @@
     </message>
     <message>
         <source>Send Email</source>
-        <translation>E-Mail senden</translation>
+        <translation>Email senden</translation>
     </message>
 </context>
 <context>
@@ -934,7 +930,7 @@
     </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-        <translation>Der eingegebene Lizenzschlüssel ist ungültig. Bitte überprüfen Sie ihre Eingabe. Bitte kontaktieren Sie das Support-Team, falls das Problem bestehen bleibt, um einen gültigen Lizenzschlüssel zu erhalten bzw. Ihren Lizenzschlüssel zu prüfen.</translation>
+        <translation>Der eingegebene Lizenzschlüssel ist ungültig. Bitte überprüfen Sie ihre Eingabe. Bitte kontaktieren Sie das Supportteam, falls das Problem bestehen bleibt, um einen gültigen Lizenzschlüssel zu erhalten bzw. Ihren Lizenzschlüssel zu prüfen.</translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
@@ -946,7 +942,7 @@
     </message>
     <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-        <translation>Es gab ein Problem bei der Aktivierung Ihrer Lizenz. Ungültige Daten wurden empfangen. Kontaktieren Sie bitte das Support-Team.</translation>
+        <translation>Es gab ein Problem bei der Aktivierung Ihrer Lizenz. Ungültige Daten wurden empfangen. Kontaktieren Sie bitte das Supportteam.</translation>
     </message>
     <message numerus="yes">
         <source>Activate %n more %1.</source>

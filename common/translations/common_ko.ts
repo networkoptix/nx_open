@@ -6,7 +6,7 @@
     <message>
         <source>Language Name</source>
         <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-        <translation>한국어</translation>
+        <translation>언어</translation>
     </message>
     <message>
         <source>Locale Code</source>
@@ -191,10 +191,6 @@
         <translation>소스: %1</translation>
     </message>
     <message>
-        <source>Url: %1</source>
-        <translation>Url: %1</translation>
-    </message>
-    <message>
         <source>Reason: %1</source>
         <translation>원인: %1</translation>
     </message>
@@ -217,7 +213,7 @@
     </message>
     <message>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-        <translation>RTP 패킷 손실이 발생함,  prev seq.=%1 next seq.=%2.</translation>
+        <translation>RTP 패킷 손실이 발생함, prev seq.=%1 next seq.=%2.</translation>
     </message>
     <message>
         <source>RTP packet loss detected.</source>
@@ -229,7 +225,7 @@
     </message>
     <message>
         <source>Not enough HDD/SSD speed for recording to %1.</source>
-        <translation>%1.에 저장을 위한 HDD/SSD 속도 정보.</translation>
+        <translation>%1. 에 저장을 위한 HDD/SSD 속도 정보.</translation>
     </message>
     <message>
         <source>HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.</source>
@@ -237,7 +233,7 @@
     </message>
     <message>
         <source>Conflicting Server: %1</source>
-        <translation>서버 충돌 : %1</translation>
+        <translation>서버 충돌: %1</translation>
     </message>
     <message>
         <source>start</source>
@@ -507,7 +503,7 @@
     </message>
     <message>
         <source>Unknown error. Please contact support.</source>
-        <translation>알수없는 오류가 발생하였습니다.관리자의 지원을 받으십시오.</translation>
+        <translation>알수없는 오류가 발생하였습니다. 관리자의 지원을 받으십시오.</translation>
     </message>
     <message>
         <source>(unknown)</source>
@@ -523,7 +519,7 @@
     </message>
     <message>
         <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-        <translation>%1 서버로 부터 잘못된 응답이 접수됨 : &quot;%2&quot;.</translation>
+        <translation>%1 서버로 부터 잘못된 응답이 접수됨: &quot;%2&quot;.</translation>
     </message>
     <message>
         <source>Check if Server is up and has the proper version.</source>
@@ -547,7 +543,7 @@
     </message>
     <message>
         <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-        <translation>입, 출력 오류가 발생하였습니다. OS 메세지 : &quot;%1&quot;.</translation>
+        <translation>입, 출력 오류가 발생하였습니다. OS 메세지: &quot;%1&quot;.</translation>
     </message>
     <message>
         <source>Parameters:</source>
@@ -811,7 +807,7 @@
     </message>
     <message>
         <source>Only single license is allowed for this device</source>
-        <translation>이 장치는 하나의(단일) 인증키만 허용합니다</translation>
+        <translation>이 장치는 하나의 (단일) 인증키만 허용합니다</translation>
     </message>
     <message>
         <source>Unknown error</source>

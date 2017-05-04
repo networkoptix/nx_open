@@ -11,17 +11,19 @@
 
 struct AVFormatContext;
 
-/** Struct for adding custom fields to an exported video file. */
+/**
+ * Custom fields in an exported video file.
+ */
 struct QnAviArchiveMetadata
 {
     enum class Format
     {
         avi,
         mp4,
-        mkv
+        custom //< Allows to setup any fields
     };
 
-    /** This version is set if no metadata is found */
+    /** This version is set if no metadata is found. */
     static const int kDefaultVersion = 0;
 
     static const int kLatestVersion = 1;
@@ -29,7 +31,7 @@ struct QnAviArchiveMetadata
     int version = kDefaultVersion;
     QByteArray signature;
     qint64 timeZoneOffset = Qn::InvalidUtcOffset;
-    qint64 startTimeMs = 0; // Start time in milliseconds since epoch
+    qint64 startTimeMs = 0; //< Start time in milliseconds since epoch.
     QVector<int> videoLayoutChannels;
     QSize videoLayoutSize;
     QnMediaDewarpingParams dewarpingParams;

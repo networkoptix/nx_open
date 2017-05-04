@@ -6,7 +6,7 @@
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/time.h>
 
-#include <utils/common/counter.h>
+#include <nx/utils/counter.h>
 #include <utils/db/async_sql_query_executor.h>
 #include <utils/db/request_execution_thread.h>
 #include <utils/db/test_support/test_with_db_helper.h>
@@ -94,7 +94,7 @@ private:
     {
         m_transactionLog = std::make_unique<ec2::TransactionLog>(
             m_peerId,
-            persistentDbManager()->queryExecutor().get(),
+            &persistentDbManager()->queryExecutor(),
             &m_outgoingTransactionDispatcher);
     }
 };
@@ -486,7 +486,7 @@ private:
     api::SystemSharingEx m_sharing;
     QnMutex m_mutex;
     QnWaitCondition m_cond;
-    QnCounter m_startedAsyncCallsCounter;
+    nx::utils::Counter m_startedAsyncCallsCounter;
 
     nx::db::DBResult doSomeDataModifications(nx::db::QueryContext* queryContext)
     {
@@ -613,7 +613,7 @@ protected:
     {
         constexpr std::size_t transactionCount = 5;
 
-        persistentDbManager()->queryExecutor()->reserveConnections(transactionCount);
+        persistentDbManager()->queryExecutor().reserveConnections(transactionCount);
 
         auto dbTransactions = startDbTransactions(transactionCount);
         for (std::size_t i = 0; i < dbTransactions.size(); ++i)

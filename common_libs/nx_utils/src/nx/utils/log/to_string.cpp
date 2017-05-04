@@ -53,3 +53,60 @@ QString toString(const std::chrono::milliseconds& t)
 
     return QString(QLatin1String("%1ms")).arg(t.count());
 }
+
+QString toString(QAbstractSocket::SocketError error)
+{
+    switch (error)
+    {
+        case QAbstractSocket::ConnectionRefusedError:
+            return QString(QLatin1String("Connection refused"));
+        case QAbstractSocket::RemoteHostClosedError:
+            return QString(QLatin1String("Remote host closed the connection"));
+        case QAbstractSocket::HostNotFoundError:
+            return QString(QLatin1String("Host was not found"));
+        case QAbstractSocket::SocketAccessError:
+            return QString(QLatin1String("Socket access error"));
+        case QAbstractSocket::SocketResourceError:
+            return QString(QLatin1String("Socket resource error"));
+        case QAbstractSocket::SocketTimeoutError:
+            return QString(QLatin1String("Socket operation timed out"));
+        case QAbstractSocket::DatagramTooLargeError:
+            return QString(QLatin1String("Datagram is to large"));
+        case QAbstractSocket::NetworkError:
+            return QString(QLatin1String("Network error"));
+        case QAbstractSocket::AddressInUseError:
+            return QString(QLatin1String("Address is already in use"));
+        case QAbstractSocket::SocketAddressNotAvailableError:
+            return QString(QLatin1String("Address does not belong to host"));
+        case QAbstractSocket::UnsupportedSocketOperationError:
+            return QString(QLatin1String("Requested operation is not supported"));
+        case QAbstractSocket::ProxyAuthenticationRequiredError:
+            return QString(QLatin1String("Proxy authentication required"));
+        case QAbstractSocket::SslHandshakeFailedError:
+            return QString(QLatin1String("SSL handshake failed"));
+        case QAbstractSocket::UnfinishedSocketOperationError:
+            return QString(QLatin1String("The last operation is not finished yet"));
+        case QAbstractSocket::ProxyConnectionRefusedError:
+            return QString(QLatin1String("Proxy connection refused"));
+        case QAbstractSocket::ProxyConnectionClosedError:
+            return QString(QLatin1String("Proxy connection closed"));
+        case QAbstractSocket::ProxyConnectionTimeoutError:
+            return QString(QLatin1String("Proxy connection timeout"));
+        case QAbstractSocket::ProxyNotFoundError:
+            return QString(QLatin1String("Proxy not found"));
+        case QAbstractSocket::ProxyProtocolError:
+            return QString(QLatin1String("Proxy protocol error"));
+        case QAbstractSocket::OperationError:
+            return QString(QLatin1String("Socket operation error"));
+        case QAbstractSocket::SslInternalError:
+            return QString(QLatin1String("Ssl internal error"));
+        case QAbstractSocket::SslInvalidUserDataError:
+            return QString(QLatin1String("Ssl invalid user data"));
+        case QAbstractSocket::TemporaryError:
+            return QString(QLatin1String("Temporary error"));
+        case QAbstractSocket::UnknownSocketError:
+            return QString(QLatin1String("Unknown error"));
+        default:
+            return QString(QLatin1String("Unknown error (not recognized by nx)"));
+    }
+}

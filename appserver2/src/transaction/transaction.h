@@ -13,8 +13,51 @@
 #include "nx/fusion/serialization/xml.h"
 #include "nx/fusion/serialization/csv.h"
 #include "nx/fusion/serialization/ubjson.h"
-#include "common/common_module.h"
 #include <nx_ec/transaction_timestamp.h>
+
+/**
+ * This class describes all possible transactions and defines various access righs check for them.
+ *
+ * Couple of examples:
+ *
+ * APPLY(                   -- macro header
+ * 604,                     -- integer enum id
+ * getLayoutTours,          -- transaction name
+ * ApiLayoutTourDataList,   -- passed data structure
+ * false,                   -- transaction is not persistent (does not save anything to database)
+ * false,                   -- transaction is not system (handled common way)
+ * InvalidGetHashHelper(),  -- actual only for persistent transactions
+ * InvalidTriggerNotificationHelper(),  -- actual only for persistent transactions
+ * InvalidAccess(),         -- actual only for persistent transactions with one element
+ * InvalidAccess(),         -- actual only for read transactions for one element
+ * InvalidFilterFunc(),     -- actual only for persistent transactions with element list
+ * FilterListByAccess<LayoutTourAccess>(), -- filtering requested list by the passed checker
+ * AllowForAllAccessOut(),  -- ctual only for persistent transactions
+ * RegularTransactionType() -- transaction is common, regular, without any magic
+ * )
+ *
+ * APPLY(                   -- macro header
+ * 605,                     -- integer enum id
+ * saveLayoutTour,          -- transaction name
+ * ApiLayoutTourData,       -- passed data structure
+ * true,                    -- transaction is persistent
+ * false,                   -- transaction is not system (handled common way)
+ * CreateHashByIdHelper(),  -- id is enough to generate hash
+ * LayoutTourNotificationManagerHelper(), -- notify other users that we have changed the tour
+ * LayoutTourAccess(),      -- check access to save
+ * LayoutTourAccess(),      -- check access to read
+ * InvalidFilterFunc(),     -- actual only for list transactions
+ * InvalidFilterFunc(),     -- actual only for list transactions
+ * AccessOut<LayoutTourAccess>(),  -- resending persistent transactions
+ * RegularTransactionType() -- transaction is common, regular, without any magic
+ * )
+ *
+ *                                      --WARNING--
+ * all transaction descriptors for the same api data structures should have the same Access Rights
+ * checker functions. For example setResourceParam and getResourceParam have the same checker for
+ * read access - ReadResourceParamAccess.
+ */
+
 
 namespace ec2
 {
@@ -657,7 +700,7 @@ APPLY(508, getPredefinedRoles, ApiPredefinedRoleDataList, \
                        InvalidTriggerNotificationHelper(), /* trigger notification*/ \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -668,7 +711,7 @@ APPLY(600, getLayouts, ApiLayoutDataList, \
                        InvalidTriggerNotificationHelper(), /* trigger notification*/ \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(false), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
@@ -701,6 +744,39 @@ APPLY(603, removeLayout, ApiIdData, \
                        &apiIdDataTriggerNotificationHelper, /* trigger notification*/ \
                        ModifyResourceAccess(true), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
+APPLY(604, getLayoutTours, ApiLayoutTourDataList, \
+                       false, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), \
+                       InvalidTriggerNotificationHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), \
+                       FilterListByAccess<LayoutTourAccess>(), \
+                       AllowForAllAccessOut(), /* not actual for non-persistent */ \
+                       RegularTransactionType()) \
+APPLY(605, saveLayoutTour, ApiLayoutTourData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       CreateHashByIdHelper(), /* getHash*/ \
+                       LayoutTourNotificationManagerHelper(), /* trigger notification*/ \
+                       LayoutTourAccess(), /* save permission checker */ \
+                       LayoutTourAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AccessOut<LayoutTourAccess>(), \
+                       RegularTransactionType()) \
+APPLY(606, removeLayoutTour, ApiIdData, \
+                       true, \
+                       false, \
+                       CreateHashByIdHelper(), \
+                       &apiIdDataTriggerNotificationHelper, \
+                       LayoutTourAccessById(), /* save permission checker */ \
+                       LayoutTourAccessById(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
@@ -1150,28 +1226,6 @@ APPLY(2008, cleanupDatabase, ApiCleanupDatabaseData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(),      \
                        LocalTransactionType()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(4001, getClientInfoList, ApiClientInfoDataList, \
-                       false, \
-                       false, \
-                       InvalidGetHashHelper(), \
-                       InvalidTriggerNotificationHelper(), \
-                       InvalidAccess(), /* save permission checker */ \
-                       InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
-                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
-APPLY(4002, saveClientInfo, ApiClientInfoData, \
-                       true, \
-                       false, \
-                       CreateHashByIdRfc4122Helper(), \
-                       EmptyNotificationHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AllowForAllAccess(), /* read permission checker */ \
-                       InvalidFilterFunc(), /* Filter save func */ \
-                       InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(5001, getStatisticsReport, ApiSystemStatistics, \
                        false, \
                        false, \
@@ -1269,7 +1323,30 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */
+                       RegularTransactionType()) /* regular transaction type */ \
+APPLY(10100, saveMiscParam, ApiMiscData, \
+                       true, /* persistent*/ \
+                       false,  /* system*/ \
+                       InvalidGetHashHelper(), \
+                       [] (const QnTransaction<ApiMiscData> &tran, const NotificationParams &notificationParams) \
+                        { return notificationParams.miscNotificationManager->triggerNotification(tran); }, \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       LocalTransactionType()) /* local transaction type */ \
+APPLY(10101, getMiscParam, ApiMiscData, \
+                       true, /* persistent*/ \
+                       false,  /* system*/ \
+                       InvalidGetHashHelper(), \
+                       InvalidTriggerNotificationHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       LocalTransactionType()) /* regular transaction type */ \
 
 #define TRANSACTION_ENUM_APPLY(value, name, ...) name = value,
 
@@ -1330,20 +1407,10 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
         typedef Timestamp TimestampType;
 
         /**
-         * Sets \a QnAbstractTransaction::peerID to \a qnCommon->moduleGUID().
+         * Sets \a QnAbstractTransaction::peerID to \a commonModule()->moduleGUID().
          */
         QnAbstractTransaction():
             command(ApiCommand::NotDefined),
-            peerID(qnCommon->moduleGUID()),
-            transactionType(TransactionType::Regular)
-        {
-        }
-        /**
-         * Sets \a QnAbstractTransaction::peerID to \a qnCommon->moduleGUID().
-         */
-        QnAbstractTransaction(ApiCommand::Value value):
-            command(value),
-            peerID(qnCommon->moduleGUID()),
             transactionType(TransactionType::Regular)
         {
         }
@@ -1419,14 +1486,6 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
         }
         QnTransaction(const QnAbstractTransaction& abstractTran):
             QnAbstractTransaction(abstractTran)
-        {
-        }
-        QnTransaction(
-            ApiCommand::Value command,
-            const T& params = T())
-            :
-            QnAbstractTransaction(command),
-            params(params)
         {
         }
         QnTransaction(

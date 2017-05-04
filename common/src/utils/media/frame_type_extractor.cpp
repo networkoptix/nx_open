@@ -75,15 +75,12 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getH264FrameType(
     while (data < end)
     {
         if (m_dataWithNalPrefixes)
-        {
             data = NALUnit::findNextNAL(data, end);
-            if (data >= end)
-                break;
-        }
         else
-        {
             data += 4;
-        }
+        if (data >= end)
+            break;
+
         quint8 nalType = *data & 0x1f;
         if (nalType >= nuSliceNonIDR && nalType <= nuSliceIDR)
         {

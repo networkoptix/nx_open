@@ -327,16 +327,6 @@ std::string SocketAddress::toStdString() const
     return toString().toStdString();
 }
 
-QUrl SocketAddress::toUrl(const QString& scheme) const
-{
-    QUrl url;
-    url.setScheme(scheme.isEmpty() ? lit("http") : scheme);
-    url.setHost(address.toString());
-    if (port > 0)
-        url.setPort(port);
-    return url;
-}
-
 bool SocketAddress::isNull() const
 {
     return address == HostAddress() && port == 0;

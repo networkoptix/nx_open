@@ -2,7 +2,7 @@
 
 #include "messaging.h"
 
-#include <QElapsedTimer>
+#include <QtCore/QElapsedTimer>
 #include <QDateTime>
 
 #include <utils/memory/data_stream_helpers.h>

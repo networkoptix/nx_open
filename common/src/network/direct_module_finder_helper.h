@@ -16,7 +16,8 @@ class QnMulticastModuleFinder;
 class SocketAddress;
 struct QnModuleInformation;
 
-class QnDirectModuleFinderHelper : public Connective<QObject> {
+class QnDirectModuleFinderHelper: public Connective<QObject>
+{
     Q_OBJECT
     typedef Connective<QObject> base_type;
 

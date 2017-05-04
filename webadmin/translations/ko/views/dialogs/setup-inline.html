@@ -362,7 +362,7 @@
     <h2>시스템 사용할 준비가 되었습니다.</h2>
     <p>로그인:</p>
     <h4>{{settings.cloudEmail}}</h4>
-    <p>Sharing and account settings</p>
+    <p>공유 및 계정 설정</p>
     <h4><a class="external" ng-href="{{portalSystemLink}}"  title="open {{Config.cloud.productName}}"
            ng-click="openLink($event)">{{portalShortLink}}</a></h4>
 </div>
@@ -387,7 +387,7 @@
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('configureNetworkForInternet')">
-    <p><b>Configure the network to set up Internet connection</b></p>
+    <p><b>인터넷 연결을 하시려면 네트워크 구성을 하십시요</b></p>
     <network-settings settings="networkSettings[0]" ></network-settings>
 
     <p class="vertical-bottom">
@@ -399,7 +399,7 @@
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnServer')">
     <h2>서버를 인터넷에 연결</h2>
     <p class="master-description">
-        Set up Internet connection on the server to be able <br> to connect to it anywhere using {{Config.cloud.productName}}.
+        {{Config.cloud.productName}}을 사용하여 어디서든 <br> 접속하려면 인터넷을 설정하세요.
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">재시도</button>         <button class="btn btn-default" ng-click="skip()">로컬 시스템 설치</button>
@@ -434,8 +434,8 @@
 <div class="panel-body text-center" ng-if="stepIs('localFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>시스템을 설정 할수 없습니다.</h2>
-    <p class="master-description">Something went totally wrong. <br>
-        Error description: {{settings.localError}}
+    <p class="master-description">잘못된 설정이 있습니다. <br>
+        오류 설명: {{settings.localError}}
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">재시도</button>
@@ -445,20 +445,19 @@
 
 <div class="panel-footer lite-client-instruction" ng-if="settings.liteClient && stepIs('start')">
     <p>
-        It is possible to set it up from another computer by connecting<br>
-        to this device by one of the following ways:
+        다음 방법중 하나를 사용하여 다른 컴퓨터에서 <br>이 장비에 접속을 할 수 있습니다.
     </p>
     <div class="row">
         <div class="col-xs-6">
-            <div class="text-center"><b>Using web browser</b></div>
-            <div class="col-xs-4 text-right">Address</div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
+            <div class="text-center"><b>웹 브라우저를 사용 하 여</b></div>
+            <div class="col-xs-4 text-right">주소</div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
         </div>
         <div class="col-xs-6">
-            <div class="text-center"><b>Using {{Config.productName}} application</b></div>
-            <div class="col-xs-6 text-right">Host</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
-            <div class="col-xs-6 text-right">Port</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
-            <div class="col-xs-6 text-right">Login</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
-            <div class="col-xs-6 text-right">Password</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
+            <div class="text-center"><b>{{Config.productName}} 응용 프로그램을 사용 하 여</b></div>
+            <div class="col-xs-6 text-right">호스트</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
+            <div class="col-xs-6 text-right">포트:</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
+            <div class="col-xs-6 text-right">로그인:</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
+            <div class="col-xs-6 text-right">패스워드</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
         </div>
     </div>
 </div>
@@ -467,7 +466,7 @@
     <button class="btn btn-default"
             ng-if="activeStep.cancel"
             ng-disabled="lockNextButton"
-            ng-click="cancel()">Cancel</button>
+            ng-click="cancel()">취소</button>
     <button class="btn btn-default"
             ng-if="activeStep.back"
             ng-disabled="lockNextButton"
@@ -476,10 +475,10 @@
             ng-if="activeStep.next"
             ng-disabled="lockNextButton"
             enter-button auto-focus
- ng-click="next()">Next <span class="glyphicon glyphicon-arrow-right"></span></button>
+ ng-click="next()">다음 <span class="glyphicon glyphicon-arrow-right"></span></button>
     <button class="btn btn-primary pull-right"
             ng-if="activeStep.finish"
             ng-disabled="lockNextButton"
             enter-button auto-focus
- ng-click="finish()">Finish</button>
+ ng-click="finish()">종료</button>
 </div>

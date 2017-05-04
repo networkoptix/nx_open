@@ -9,7 +9,7 @@ struct QnPermissionsHelper
     static bool isSafeMode();
 
     /** Check if user is system owner. */
-    static bool hasOwnerPermissions(const Qn::UserAccessData& accessRights);
+    static bool hasOwnerPermissions(QnResourcePool* resPool, const Qn::UserAccessData& accessRights);
 
     /** Fill result with correct values and return fixed error code. */
     static int safeModeError(QnRestResult& result);

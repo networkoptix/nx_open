@@ -45,6 +45,9 @@ update () {
     FONTCONFIG=$(dpkg -l | grep fontconfig | grep 2.11 | awk '{print $3}')
     if [ -z $FONTCONFIG ]; then dpkg -i /opt/deb/fontconfig/*.deb; fi
 
+    FONTCONFIG=$(dpkg -l | grep fonts-takao-mincho | awk '{print $3}')
+    if [ -z $FONTCONFIG ]; then dpkg -i /opt/deb/fonts-takao-mincho/*.deb; fi
+
     touch /dev/cedar_dev
     chmod 777 /dev/disp
     chmod 777 /dev/cedar_dev

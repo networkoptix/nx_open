@@ -46,72 +46,72 @@
         <translation>Nem lehet hozzáférni a telepített szolgáltatásokhoz</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to access installed services:</source>
-        <translation>Hiba történ a telepített szolgáltatások hozzáférése közben:</translation>
-    </message>
-    <message>
         <source>No %1 services installed</source>
-        <translation>A(z) %1 szolgáltatások nincsenek telepítve</translation>
+        <translation>%1 szolgáltatások nincsenek telepítve</translation>
     </message>
     <message>
         <source>&amp;Quit</source>
         <translation>&amp;Kilépés</translation>
     </message>
     <message>
+        <source>An error has occurred while trying to access installed services:</source>
+        <translation>Hiba történ a telepített szolgáltatások hozzáférése közben:</translation>
+    </message>
+    <message>
         <source>Server has been stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>A szerver leállíva</translation>
     </message>
     <message>
         <source>Server has been started</source>
-        <translation type="unfinished"></translation>
+        <translation>A szerver elindítva</translation>
     </message>
     <message>
         <source>Server will be stopped. Continue?</source>
-        <translation type="unfinished">A media szerver le fog állni. Folytatja?</translation>
+        <translation>A media szerver le fog állni. Folytatja?</translation>
     </message>
     <message>
         <source>Show Server Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Szervernapló mutatása</translation>
     </message>
     <message>
         <source>Start Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Szerver indítása</translation>
     </message>
     <message>
         <source>Stop Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Szerver leállítása</translation>
     </message>
     <message>
         <source>Server Web Page</source>
-        <translation type="unfinished"></translation>
+        <translation>Szerver weboldala</translation>
     </message>
     <message>
         <source>stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>lellítva</translation>
     </message>
     <message>
         <source>starting</source>
-        <translation type="unfinished"></translation>
+        <translation>elindítva</translation>
     </message>
     <message>
         <source>stopping</source>
-        <translation type="unfinished"></translation>
+        <translation>leállás</translation>
     </message>
     <message>
         <source>started</source>
-        <translation type="unfinished"></translation>
+        <translation>indulás</translation>
     </message>
     <message>
         <source>resuming</source>
-        <translation type="unfinished"></translation>
+        <translation>folytatás</translation>
     </message>
     <message>
         <source>paused</source>
-        <translation type="unfinished"></translation>
+        <translation>szüneteltetve</translation>
     </message>
     <message>
         <source>pausing</source>
-        <translation type="unfinished"></translation>
+        <translation>szüneteltetés</translation>
     </message>
 </context>
 </TS>

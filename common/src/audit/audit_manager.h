@@ -5,7 +5,7 @@
 #include <deque>
 
 #include <QTimer>
-#include <QElapsedTimer>
+#include <QtCore/QElapsedTimer>
 
 #include <nx/utils/thread/mutex.h>
 
@@ -14,9 +14,11 @@
 #include "api/model/audit/auth_session.h"
 #include "recording/time_period.h"
 #include <nx/utils/singleton.h>
+#include <common/common_module_aware.h>
 
 class QnAuditManager:
     public QObject,
+    public QnCommonModuleAware,
     public Singleton<QnAuditManager>
 {
     Q_OBJECT
@@ -26,7 +28,7 @@ public:
     static const int AGGREGATION_TIME_MS = 1000 * 5;
     static const qint64 MIN_SEEK_DISTANCE_TO_LOG = 1000 * 60;
 
-    QnAuditManager();
+    QnAuditManager(QObject* parent);
 
 public:
     static QnAuditRecord prepareRecord(const QnAuthSession& authInfo, Qn::AuditRecordType recordType);

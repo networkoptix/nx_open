@@ -12,6 +12,8 @@
 #include "utils/fs/file.h"
 #include <common/common_module.h>
 #include <utils/common/writer_pool.h>
+#include <nx/fusion/serialization/lexical.h>
+#include <media_server/media_server_module.h>
 
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>
@@ -176,19 +178,19 @@ QIODevice* QnFileStorageResource::open(
     int ffmpegBufferSize = 0;
 
     int ffmpegMaxBufferSize =
-        MSSettings::roSettings()->value(
+        qnServerModule->roSettings()->value(
             nx_ms_conf::MAX_FFMPEG_BUFFER_SIZE,
             nx_ms_conf::DEFAULT_MAX_FFMPEG_BUFFER_SIZE).toInt();
 
     int systemFlags = 0;
     if (openMode & QIODevice::WriteOnly)
     {
-        ioBlockSize = MSSettings::roSettings()->value(
+        ioBlockSize = qnServerModule->roSettings()->value(
             nx_ms_conf::IO_BLOCK_SIZE,
             nx_ms_conf::DEFAULT_IO_BLOCK_SIZE).toInt();
 
         ffmpegBufferSize = qMax(
-            MSSettings::roSettings()->value(
+            qnServerModule->roSettings()->value(
                 nx_ms_conf::FFMPEG_BUFFER_SIZE,
                 nx_ms_conf::DEFAULT_FFMPEG_BUFFER_SIZE).toInt(),
             bufferSize);
@@ -196,7 +198,7 @@ QIODevice* QnFileStorageResource::open(
 #ifdef Q_OS_WIN
         if ((openMode & QIODevice::ReadWrite) == QIODevice::ReadWrite)
             systemFlags = 0;
-        else if (MSSettings::roSettings()->value(nx_ms_conf::DISABLE_DIRECT_IO).toInt() != 1)
+        else if (qnServerModule->roSettings()->value(nx_ms_conf::DISABLE_DIRECT_IO).toInt() != 1)
             systemFlags = FILE_FLAG_NO_BUFFERING;
 #endif
     }
@@ -312,7 +314,10 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
     QString url = getUrl();
 
     if (url.isEmpty())
+    {
+        NX_LOG("[initOrUpdate] storage url is empty", cl_logDEBUG2);
         return Qn::StorageInit_WrongPath;
+    }
 
     if (url.contains("://"))
         result = mountTmpDrive(url);
@@ -322,7 +327,10 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
         if (storageDir.exists() || storageDir.mkpath(url))
             result = Qn::StorageInit_Ok;
         else
+        {
+            NX_LOG("[initOrUpdate] storage dir doesn't exist or mkdir failed", cl_logDEBUG2);
             result = Qn::StorageInit_WrongPath;
+        }
     }
 
     QString sysPath = sysDrivePath();
@@ -690,7 +698,8 @@ void QnFileStorageResource::setUrl(const QString& url)
     m_valid = false;
 }
 
-QnFileStorageResource::QnFileStorageResource():
+QnFileStorageResource::QnFileStorageResource(QnCommonModule* commonModule):
+    base_type(commonModule),
     m_valid(false),
     m_capabilities(0),
     m_cachedTotalSpace(QnStorageResource::kUnknownSize),
@@ -827,7 +836,7 @@ qint64 QnFileStorageResource::getFileSize(const QString& url) const
 bool QnFileStorageResource::testWriteCapInternal() const
 {
     QString fileName(lit("%1%2.tmp"));
-    QString localGuid = qnCommon->moduleGUID().toString();
+    QString localGuid = commonModule()->moduleGUID().toString();
     localGuid = localGuid.mid(1, localGuid.length() - 2);
     fileName = fileName.arg(closeDirPath(translateUrlToLocal(getPath()))).arg(localGuid);
     QFile file(fileName);
@@ -836,7 +845,7 @@ bool QnFileStorageResource::testWriteCapInternal() const
 
 Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
 {
-    NX_LOG("QnFileStorageResource::initOrUpdate begin", cl_logDEBUG1);
+    NX_LOG(lit("[initOrUpdate] for storage %1 begin").arg(getUrl()), cl_logDEBUG2);
 
     Qn::StorageInitResult result;
     {
@@ -848,6 +857,9 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
 
         if (!(oldValid == false && m_valid == true) && !isStorageDirMounted())
         {
+            NX_LOG(lit("[initOrUpdate] storage dir is not mounted. oldValid: %1 valid: %2")
+                    .arg(oldValid)
+                    .arg(m_valid), cl_logDEBUG2);
             m_valid = false;
             return Qn::StorageInit_WrongPath;
         }
@@ -859,12 +871,13 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
     // remount attempt in initOrUpdate()
     if (!m_writeCapCached)
     {
+        NX_LOG("[initOrUpdate] write test file failed", cl_logDEBUG2);
         m_valid = false;
         return Qn::StorageInit_WrongPath;
     }
     QString localPath = getLocalPathSafe();
     m_cachedTotalSpace = getDiskTotalSpace(localPath.isEmpty() ? getPath() : localPath); // update cached value periodically
-    NX_LOG("QnFileStorageResource::initOrUpdate completed", cl_logDEBUG1);
+    NX_LOG("QnFileStorageResource::initOrUpdate completed", cl_logDEBUG2);
 
     return Qn::StorageInit_Ok;
 }
@@ -875,21 +888,17 @@ QString QnFileStorageResource::removeProtocolPrefix(const QString& url)
     return prefix == -1 ? url :QUrl(url).path().mid(1);
 }
 
-QnStorageResource* QnFileStorageResource::instance(const QString&)
+QnStorageResource* QnFileStorageResource::instance(QnCommonModule* commonModule, const QString&)
 {
-    return new QnFileStorageResource();
+    return new QnFileStorageResource(commonModule);
 }
 
 qint64 QnFileStorageResource::calcInitialSpaceLimit()
 {
-    QString url = getUrl();
-    NX_ASSERT(!url.isEmpty());
-    bool local = isLocal(url);
-
+    auto local = isLocal();
     qint64 baseSpaceLimit = calcSpaceLimit(
-        local
-        ? QnPlatformMonitor::LocalDiskPartition
-        : QnPlatformMonitor::NetworkPartition);
+        local ? QnPlatformMonitor::LocalDiskPartition :
+        QnPlatformMonitor::NetworkPartition);
 
     if (m_cachedTotalSpace < 0)
         return baseSpaceLimit;
@@ -906,7 +915,7 @@ qint64 QnFileStorageResource::calcInitialSpaceLimit()
 
 qint64 QnFileStorageResource::calcSpaceLimit(QnPlatformMonitor::PartitionType ptype)
 {
-    const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(
+    const qint64 defaultStorageSpaceLimit = qnServerModule->roSettings()->value(
         nx_ms_conf::MIN_STORAGE_SPACE,
         nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE
     ).toLongLong();
@@ -916,23 +925,30 @@ qint64 QnFileStorageResource::calcSpaceLimit(QnPlatformMonitor::PartitionType pt
            QnStorageResource::kNasStorageLimit;
 }
 
-bool QnFileStorageResource::isLocal(const QString &url)
+bool QnFileStorageResource::isLocal()
 {
+    auto url = getUrl();
     if (url.contains(lit("://")))
         return false;
 
-    auto platformMonitor = static_cast<QnPlatformMonitor*>(qnPlatform->monitor());
+    auto storageTypeString = getStorageType();
+    if (!storageTypeString.isEmpty())
+    {
+       if (storageTypeString == QnLexical::serialized(QnPlatformMonitor::LocalDiskPartition))
+          return true;
+       return false;
+    }
 
-    QList<QnPlatformMonitor::PartitionSpace> partitions =
-        platformMonitor->totalPartitionSpaceInfo(
-            QnPlatformMonitor::LocalDiskPartition
-        );
+    auto platformMonitor = static_cast<QnPlatformMonitor*>(qnPlatform->monitor());
+    auto partitions = platformMonitor->totalPartitionSpaceInfo(QnPlatformMonitor::NetworkPartition);
 
     for (const auto &partition : partitions)
+    {
         if (url.startsWith(partition.path))
-            return true;
+            return false;
+    }
 
-    return false;
+    return true;
 }
 
 float QnFileStorageResource::getAvarageWritingUsage() const
@@ -1014,12 +1030,16 @@ bool QnFileStorageResource::isStorageDirMounted() const
 {
     QString mountPoint;
 
+    NX_LOG(lit("[initOrUpdate, isStorageDirMounted] local path: %1, getPath(): %2")
+            .arg(m_localPath)
+            .arg(getPath()), cl_logDEBUG2);
+
     if (!m_localPath.isEmpty())
         return findPathInTabFile(m_localPath, lit("/proc/mounts"), &mountPoint, true);
     else if (findPathInTabFile(getPath(), lit("/etc/fstab"), &mountPoint, false))
         return findPathInTabFile(mountPoint, lit("/etc/mtab"), &mountPoint, true);
 
-    return false;
+    return findPathInTabFile(getPath(), lit("/etc/mtab"), &mountPoint, false);
 }
 #endif    // _WIN32
 

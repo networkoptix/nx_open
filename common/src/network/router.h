@@ -7,6 +7,7 @@
 #include <nx/utils/singleton.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/network/socket_common.h>
+#include <common/common_module_aware.h>
 
 class QnModuleFinder;
 
@@ -19,14 +20,17 @@ struct QnRoute
     bool reverseConnect;// if target server should connect to this one
     int distance;
 
-    QnRoute() : reverseConnect(false), distance(0) {}
+    QnRoute(): reverseConnect(false), distance(0) {}
     bool isValid() const { return !addr.isNull(); }
 };
 
-class QnRouter : public QObject, public Singleton<QnRouter> {
+class QnRouter: public QObject, public QnCommonModuleAware
+{
     Q_OBJECT
 public:
-    explicit QnRouter(QnModuleFinder *moduleFinder, QObject *parent = 0);
+    explicit QnRouter(
+        QObject* parent,
+        QnModuleFinder *moduleFinder);
     ~QnRouter();
 
     // todo: new routing functions below. We have to delete above functions

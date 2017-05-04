@@ -7,6 +7,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <api/global_settings.h>
 #include <utils/common/app_info.h>
+#include <network/tcp_listener.h>
 
 
 namespace {
@@ -25,9 +26,9 @@ QnCrossdomainConnectionProcessor::QnCrossdomainConnectionProcessor(
     :
     QnTCPConnectionProcessor(
         new QnCrossdomainConnectionProcessorPrivate,
-        socket)
+        socket,
+        owner->commonModule())
 {
-    Q_UNUSED(owner);
 }
 
 QnCrossdomainConnectionProcessor::~QnCrossdomainConnectionProcessor()
@@ -49,8 +50,8 @@ void QnCrossdomainConnectionProcessor::run()
     parseRequest();
     d->response.messageBody.clear();
 
-    QnUuid selfId = qnCommon->moduleGUID();
-    QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(selfId);
+    QnUuid selfId = commonModule()->moduleGUID();
+    QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(selfId);
     QFile file(":/static/crossdomain.xml");
     if (!mServer || !file.open(QFile::ReadOnly))
     {
@@ -75,7 +76,7 @@ void QnCrossdomainConnectionProcessor::run()
         else if (lines[i].contains(kCrossdomainPattern))
         {
             lines.removeAt(i);
-            const QString portalUrl = QUrl(QnAppInfo::defaultCloudModulesXmlUrl()).host();
+            const QString portalUrl = QUrl(nx::network::AppInfo::defaultCloudModulesXmlUrl()).host();
             if (!portalUrl.isEmpty())
                 lines.insert(i, pattern.replace(kCrossdomainPattern, portalUrl.toUtf8()));
         }

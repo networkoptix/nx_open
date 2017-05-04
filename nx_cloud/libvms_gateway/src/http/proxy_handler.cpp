@@ -26,7 +26,7 @@ ProxyHandler::ProxyHandler(
 
 void ProxyHandler::processRequest(
     nx_http::HttpServerConnection* const connection,
-    stree::ResourceContainer /*authInfo*/,
+    nx::utils::stree::ResourceContainer /*authInfo*/,
     nx_http::Request request,
     nx_http::Response* const /*response*/,
     nx_http::RequestProcessedHandler completionHandler)
@@ -225,7 +225,7 @@ void ProxyHandler::onConnected(
     static const auto isSsl =
         [](const std::unique_ptr<AbstractStreamSocket>& s)
         {
-            return (bool) dynamic_cast<nx::network::SslSocket*>(s.get());
+            return (bool) dynamic_cast<nx::network::deprecated::SslSocket*>(s.get());
         };
 
     if (errorCode != SystemError::noError)

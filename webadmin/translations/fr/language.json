@@ -3,116 +3,116 @@
   "language_name":"Français",
   "dialogs":{
     "okButton":"Ok",
-    "openLink":"Besuchen Sie diesen Link",
-    "openLinkWithTitle":"Besuchen Sie diesen Link für {{title}}"
+    "openLink":"Visitez ce lien",
+    "openLinkWithTitle":"À {{title}}, visitez ce lien"
   },
   "setup":{
-    "createAccount":"Account erstellen",
-    "errorNoHDD":"Dieses Gerät ist dafür gedacht mit einem installierten Festplattenlaufwerk zu arbeiten.<br>Schalten Sie das Gerät bitte ab und installieren Sie ein Festplattenlaufwerk.",
-    "errorNoNetwork":"Dieses Gerät benötigt eine Netzwerkverbindung um zu funktionieren.<br>Bitte verbinden Sie es mit dem lokalen Netzwerk zum Internet"
+    "createAccount":"créer compte",
+    "errorNoHDD":"Ce périphérique sert à travailler avec le disque dur installé. <br>S.V.P éteindre l’appareil et installer un disque dur.",
+    "errorNoNetwork":"Cet appareil a besoin de connexion réseau pour fonctionner. <br>S.V.P connecter au réseau local ou Internet"
   },
   "passwordRequirements":{
-    "minLengthMessage":"Passwort muss mindestens 8 Zeichen enthalten",
-    "requiredMessage":"Verwenden Sie nur alphanumerische Zeichen und Tastatursymbole, vermeiden Sie führende und nachfolgende Leerzeichen.",
-    "weakMessage":"Verwenden Sie Groß- und Kleinbuchstaben und Sonderzeichen, um Ihr Passwort sicherer machen",
-    "strongMessage":"Sicheres Passwort!",
-    "commonMessage":"Dieses Passwort ist eines der beliebtesten Passwörter auf der Welt"
+    "minLengthMessage":"Mot de passe doit avoir au moins 8 caractères",
+    "requiredMessage":"Uniquement lettres latines, chiffres et symboles clavier sont autorisés",
+    "weakMessage":"Mot de passe doit contenir différents types de symboles",
+    "strongMessage":"Mot de passe fort!",
+    "commonMessage":"Ce mot de passe est dans la liste des mots de passe plus populaires"
   },
   "settings":{
     "tabs":{
-      "server":"Server",
-      "system":"System",
-      "device":"Gerät"
+      "server":"Serveur",
+      "system":"Système",
+      "device":"Périphérique"
     },
-    "confirmRestart":"Server neu starten?",
-    "couldntCheckInternet":"Cloudverbindung konnte nicht überprüft werden",
-    "confirmRestoreDefault":"Datenbank und Einstellungen löschen? Dieser Vorgang dauert einige Zeit und der Server wird anschließend neu gestartet.",
-    "confirmRestoreDefaultTitle":"Werkseinstellungen wiederherstellen",
-    "unexpectedError":"Fehler: unerwarteter Fehler ist aufgetreten",
-    "connnetionError":"Verbindungsfehler",
-    "wrongPassword":"Falsches Passwort.",
-    "error":"Fehler: ",
-    "restartNeeded":"Änderungen gespeichert. Starten Sie den Server neu um die Einstellungen zu übernehmen?",
-    "settingsSaved":"Einstellungen gespeichert",
-    "confirmHardwareRestart":"Serverbetriebssystem neu starten?",
-    "confirmRestoreSettings":"Alle Servereinstellungen zurücksetzen? Das Archiv wird gespeichert, aber die Netzwerkeinstellungen werden zurückgesetzt.",
-    "confirmRestoreSettingsNotNetwork":"Servereinstellungen zurücksetzen? Das Archiv und die Netzwerkeinstellungen werden gespeichert.",
-    "unavailable":"Nicht verfügbar",
-    "unsafePortConfirm":"Es ist nicht sicher Portnummern unter 1025 zu verwenden. Der Server ist dann möglicherweise nicht mehr erreichbar. Trotzdem fortfahren?",
-    "confirmDisconnectFromCloud":"System von {{CLOUD_NAME}} trennen",
-    "confirmDisconnectFromCloudTitle":"<span class='warning-label'>Alle Cloudnutzer werden gelöscht.</span><br><br>Das System wird über das lokale Netzwerk mit dem lokalen Administratoraccount erreichbar sein.",
-    "confirmDisconnectFromCloudAction":"Trennen",
-    "disconnectedSuccess":"Das System wurde erfolgreich getrennt",
-    "connectedSuccess":"Das System wurde erfolgreich verbunden",
+    "confirmRestart":"Redémarrer serveur?",
+    "couldntCheckInternet":"Impossible de vérifier la connexion nuage",
+    "confirmRestoreDefault":"Effacer la base de données et paramètres? Ce processus prendra du temps et le serveur sera redémarré après.",
+    "confirmRestoreDefaultTitle":"Restaurer les paramètres par défaut",
+    "unexpectedError":"Échec : une erreur inattendue survenue",
+    "connnetionError":"Erreur de connexion",
+    "wrongPassword":"Mot de passe incorrect.",
+    "error":"Erreur: ",
+    "restartNeeded":"Changements enregistrées. Redémarrer le serveur pour appliquer?",
+    "settingsSaved":"Paramètres enregistrés",
+    "confirmHardwareRestart":"Redémarrer le système d’exploitation du serveur?",
+    "confirmRestoreSettings":"Restaurer tous les paramètres du serveur? Les archives seront gardéess, mais les paramètres réseau seront réinitialisés.",
+    "confirmRestoreSettingsNotNetwork":"Réinitialiser la configuration du serveur? Archives et paramètres réseau seront enregistrées.",
+    "unavailable":"Non disponible",
+    "unsafePortConfirm":"Il n’est pas sécuritaire d’utiliser un port inférieur à 1025. Le Serveur ne sera peut-être pas accessible. Continuer quand même?",
+    "confirmDisconnectFromCloud":"Déconnecter le système de {{CLOUD_NAME}}",
+    "confirmDisconnectFromCloudTitle":"<span class='warning-label'> Tous les utilisateurs de nuages seront supprimés.</span> <br><br>Système sera accessible via un réseau local avec le compte administrateur local.",
+    "confirmDisconnectFromCloudAction":"Déconnecter",
+    "disconnectedSuccess":"Système déconnecté avec succès",
+    "connectedSuccess":"Système connecté avec succès",
     "createLocalOwner":"",
-    "createLocalOwnerTitle":"Lokalen Administrator erstellen",
-    "confirmChangePassword":"Adminpasswort ändern",
-    "confirmChangePasswordTitle":"Systempasswort ändern? Es wird sich auf den Benutzer \"admin\" und das Root-Passwort für einige Server auswirken",
-    "confirmChangePasswordAction":"Neues Passwort speichern",
-    "nx1ControlHint":"Die Clientanwendung wurde gestartet. Verwenden Sie eine Tastatur/Maus oder die mobile Anwendung, um zu steuern."
+    "createLocalOwnerTitle":"Créer administrateur local",
+    "confirmChangePassword":"Changer mot de passe admin",
+    "confirmChangePasswordTitle":"Changer mot de passe système? Cela affectera l’utilisateur \"admin\" et mot de passe root pour certains serveurs",
+    "confirmChangePasswordAction":"Enregistrer nouveau mot de passe",
+    "nx1ControlHint":"Application Client démarrée. Utiliser un clavier/souris ou une application mobile pour contrôler."
   },
   "info":{
     "tabs":{
-      "healthMonitoring":"Statusüberwachung",
-      "storage":"Speicher",
-      "log":"Log"
+      "healthMonitoring":"Moniteur de santé",
+      "storage":"Stockage",
+      "log":"Journal"
     }
   },
   "join":{
-    "systemIsUnreacheble":"System ist nicht erreichbar oder existiert nicht.",
-    "incorrectCurrentPassword":"Das Passwort ist falsch.",
-    "incorrectRemotePassword":"Login oder Passwort falsch.",
-    "incompatibleVersion":"System ist nicht erreichbar/nicht vorhanden oder es handelt sich um eine inkompatible Version.",
-    "wrongUrl":"Keine Verbindung zum angegebenen Server.",
-    "newSystemError":"Systeme können nicht zusammengeführt werden. Remote-System ist nicht konfiguriert.",
-    "safeMode":"Systeme können nicht zusammengeführt werden. Remote-System ist im abgesicherten Modus.",
-    "configError":"Systeme können nicht zusammengeführt werden. Vielleicht ist eines der Systeme im abgesicherten Modus.",
-    "cloudError":"Systeme können nicht zusammengeführt werden. Abhängiges System ist mit der Cloud verbunden. Sie müssen es zuerst trennen.",
-    "cloudBothError":"Systeme können nicht zusammengeführt werden. Beide Systeme sind mit der Cloud verbunden. Sie müssen erst eines davon trennen.",
-    "cloudHostConflict":"Systeme können nicht zusammengeführt werden, da die Server mit verschiedenen Cloud-Hosts erstellt wurden",
-    "licenceError":"Warnung! Sie haben vor Systeme mit Starter-Lizenzen zusammenzuführen. Nur eine Starter-Lizenz pro System ist erlaubt, weshalb die zweite Lizenz deaktiviert wird. Trotzdem zusammenführen?",
-    "connectionFailed":"Verbindung fehlgeschlagen: ",
-    "unknownError":"Unbekannter Fehler",
-    "mergeFailed":"Fehler beim Zusammenführen: ",
-    "mergeSucceed":"Zusammenführung erfolgreich abgeschlossen.",
-    "newSystemDisplayName":"Neues System",
-    "incompatibleProtocol":"inkompatible Version",
-    "incompatibleCloudHost":"Cloud-Konflikt",
-    "incompatibleCloudState":"Cloud verbunden"
+    "systemIsUnreacheble":"Système inaccessible ou n’existe pas.",
+    "incorrectCurrentPassword":"Mot de passe actuel incorrect.",
+    "incorrectRemotePassword":"Identifiant ou mot de passe incorrect.",
+    "incompatibleVersion":"Système est inaccessible, il n’existe pas ou a version incompatible.",
+    "wrongUrl":"Impossible de se connecter au serveur spécifié.",
+    "newSystemError":"Impossible de fusionner les systèmes. Système distant n’est pas configuré.",
+    "safeMode":"Impossible de fusionner les systèmes. Système distant en mode sans échec.",
+    "configError":"Impossible de fusionner les systèmes. Un des systèmes est peut-être en mode sans échec.",
+    "cloudError":"Impossible de fusionner les systèmes. Le système dépendant est connecté au nuage. Vous devez tout d’abord déconnecter.",
+    "cloudBothError":"Impossible de fusionner les systèmes. Ils sont reliés aux nuages. Vous devez en déconnecter un.",
+    "cloudHostConflict":"Impossible de fusionner les systèmes, parce que les serveurs sont conçus avec de différents hôtes nuages",
+    "licenceError":"Attention! Vous êtes sur le point de fusionner les systèmes disposant de licences Starter. Une seule licence Starter est autorisé par système, donc la seconde licence sera désactivée. Fusionner quand même ?",
+    "connectionFailed":"Échec de connexion: ",
+    "unknownError":"Erreur inconnue",
+    "mergeFailed":"Échec de fusion: ",
+    "mergeSucceed":"Fusion réussie.",
+    "newSystemDisplayName":"Nouveau système",
+    "incompatibleProtocol":"version incompatible",
+    "incompatibleCloudHost":"conflit de nuage",
+    "incompatibleCloudState":"nuage connecté"
   },
   "login":{
-    "incorrectPassword":"Login oder Passwort falsch"
+    "incorrectPassword":"Identifiant ou mot de passe incorrect"
   },
   "navigaion":{
-    "cannotGetUser":"Serverfehler: kann die aktuellen Benutzerdaten nicht abrufen"
+    "cannotGetUser":"Panne du serveur : impossible de récupérer les données d’usager actuel"
   },
   "offlineDialog":{
-    "serverOffline":"Server ist offline"
+    "serverOffline":"serveur hors ligne"
   },
   "restartDialog":{
-    "serverStarting":"Server wird gestartet",
-    "serverRestarting":"Server startet neu",
-    "serverOffline":"Server ist offline"
+    "serverStarting":"démarrage du serveur",
+    "serverRestarting":"redémarrage du serveur",
+    "serverOffline":"serveur Hors ligne"
   },
   "fileUpload":{
-    "started":"Update wurde erfolgreich gestartet. Es kann einige Minuten dauern",
-    "upToDate":"Update fehlgeschlagen. Die angebotene Version ist bereits installiert.",
-    "invalidFile":"Update fehlgeschlagen. Die angegebene Datei ist kein gültiges Update-Archiv.",
-    "incompatibleSystem":"Update fehlgeschlagen. Die angegebene Datei ist für ein anderes System.",
-    "extractionError":"Update fehlgeschlagen. Nicht genügend Speicherplatz für den Archivauszug vorhanden, bitte verfügbaren Speicher prüfen.",
-    "installationError":"Update fehlgeschlagen. Das Installationsskript kann nicht ausgeführt werden.",
-    "selectFiles":"Dateien auswählen"
+    "started":"Mise à jour démarré avec succès. Cela prendra plusieurs minutes",
+    "upToDate":"Mise à jour échoué. La version fournie est déjà installée.",
+    "invalidFile":"Mise à jour échoué. Fichier fourni n’est pas une archive de mise à jour valide.",
+    "incompatibleSystem":"Mise à jour a échoué. Fichier fourni est ciblé pour un autre système.",
+    "extractionError":"Mise à jour a échoué. Espace insuffisant pour extraire l’archive, confimez stockage disponible.",
+    "installationError":"Mise à jour a échoué. Ne peut pas exécuter le script d’installation.",
+    "selectFiles":"Sélectionner fichiers"
   },
   "cameraLinks":{
-    "highStream":"Hoher Stream",
-    "lowStream":"Niedriger Stream",
-    "transcoding":"Umkodierung",
-    "unknown":"Unbekannt"
+    "highStream":"Flux Haut",
+    "lowStream":"Flux Bas",
+    "transcoding":"Transcodage",
+    "unknown":"Inconnue"
   },
   "advanced":{
-    "free":"Kostenlos",
-    "total":"Insgesamt",
-    "occupied":"Belegt",
-    "reserved":"Reserviert"
+    "free":"Gratuit",
+    "total":"Total",
+    "occupied":"Occupé",
+    "reserved":"Réservés"
   }
 }

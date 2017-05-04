@@ -6,7 +6,7 @@
 #include <random>
 #include <unordered_map>
 
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 #include <utils/common/writer_pool.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource_management/resource_pool.h>
@@ -19,7 +19,7 @@
 #include <media_server/settings.h>
 #include <core/resource_management/status_dictionary.h>
 #include "utils/common/util.h"
-#include <common/common_module.h>
+#include <media_server/media_server_module.h>
 
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>
@@ -36,14 +36,20 @@
 
 #include <core/resource_management/resource_properties.h>
 #include "../utils.h"
+#include <media_server/media_server_module.h>
 
 extern nx::ut::cfg::Config config;
 
 namespace
 {
 
-class AbstractStorageResourceTest: public ::testing::Test
+class AbstractStorageResourceTest: public ::testing::Test, public QnMediaServerModule
 {
+public:
+    AbstractStorageResourceTest():
+        QnMediaServerModule()
+    {
+    }
 protected:
 
     virtual void SetUp() override
@@ -53,47 +59,39 @@ protected:
         ASSERT_TRUE((bool)workDirResource.getDirName());
 
         QString fileStorageUrl = *workDirResource.getDirName();
-        QnStorageResourcePtr fileStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(fileStorageUrl));
+        QnStorageResourcePtr fileStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(commonModule(), fileStorageUrl));
         fileStorage->setUrl(fileStorageUrl);
         ASSERT_TRUE(fileStorage && fileStorage->initOrUpdate() == Qn::StorageInit_Ok);
-
-        storageManager->addStorage(fileStorage);
+        qnNormalStorageMan->addStorage(fileStorage);
 
         if (!config.ftpUrl.isEmpty())
         {
-            QnStorageResourcePtr ftpStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(config.ftpUrl, false));
+            QnStorageResourcePtr ftpStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(commonModule(), config.ftpUrl, false));
             EXPECT_TRUE(ftpStorage && ftpStorage->initOrUpdate() == Qn::StorageInit_Ok) << "Ftp storage is unavailable. Check if server is online and url is correct." << std::endl;
         }
 
         if (!config.smbUrl.isEmpty())
         {
-            QnStorageResourcePtr smbStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(config.smbUrl));
+            QnStorageResourcePtr smbStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(commonModule(), config.smbUrl));
             EXPECT_TRUE(smbStorage && smbStorage->initOrUpdate() == Qn::StorageInit_Ok);
             smbStorage->setUrl(smbStorageUrl);
-            storageManager->addStorage(smbStorage);
+            qnNormalStorageMan->addStorage(smbStorage);
         }
    }
 
     void prepare()
     {
-        MSSettings::initializeROSettings();
-
         this->ftpStorageUrl = config.ftpUrl;
         this->smbStorageUrl = config.smbUrl;
 
-        resourcePool = std::unique_ptr<QnResourcePool>(new QnResourcePool);
+        commonModule()->setModuleGUID(QnUuid("6F789D28-B675-49D9-AEC0-CEFFC99D674E"));
 
-        commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
-        commonModule->setModuleGUID(QnUuid("6F789D28-B675-49D9-AEC0-CEFFC99D674E"));
-
-        storageManager = std::unique_ptr<QnStorageManager>(new QnStorageManager(QnServer::StoragePool::Normal));
-        fileDeletor = std::unique_ptr<QnFileDeletor>(new QnFileDeletor);
         pluginManager = std::unique_ptr<PluginManager>( new PluginManager);
 
-        platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction(0));
+        platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
 
         QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true);
-        PluginManager::instance()->loadPlugins(MSSettings::roSettings());
+        PluginManager::instance()->loadPlugins(roSettings());
 
         for (const auto storagePlugin : PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
         {
@@ -102,6 +100,7 @@ protected:
                 std::bind(
                     &QnThirdPartyStorageResource::instance,
                     std::placeholders::_1,
+                    std::placeholders::_2,
                     storagePlugin
                 ),
                 false
@@ -111,24 +110,16 @@ protected:
 
     QString                             ftpStorageUrl;
     QString                             smbStorageUrl;
-    QnWriterPool writerPool;
-    std::unique_ptr<QnFileDeletor>      fileDeletor;
-    std::unique_ptr<QnStorageManager>   storageManager;
-    std::unique_ptr<QnResourcePool>     resourcePool;
-    std::unique_ptr<QnCommonModule>     commonModule;
     std::unique_ptr<PluginManager>      pluginManager;
-    QnResourceStatusDictionary          rdict;
-
     nx::ut::utils::WorkDirResource workDirResource;
 
     std::unique_ptr<QnPlatformAbstraction > platformAbstraction;
 };
 } // namespace <anonymous>
 
-
 TEST_F(AbstractStorageResourceTest, Capabilities)
 {
-    for (auto storage : storageManager->getStorages())
+    for (auto storage : qnNormalStorageMan->getStorages())
     {
         std::cout << "Storage: " << storage->getUrl().toStdString() << std::endl;
         // storage general functions
@@ -181,7 +172,7 @@ TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
         return pathStream.str();
     };
 
-    for (auto storage : storageManager->getStorages())
+    for (auto storage : qnNormalStorageMan->getStorages())
     {
         std::cout << "Storage: " << storage->getUrl().toStdString() << std::endl;
 
@@ -276,7 +267,7 @@ TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
 
 TEST_F(AbstractStorageResourceTest, IODevice)
 {
-    for (auto storage : storageManager->getStorages())
+    for (auto storage : qnNormalStorageMan->getStorages())
     {
         std::cout << "Storage: " << storage->getUrl().toStdString() << std::endl;
 
@@ -368,7 +359,7 @@ using StorageSelectionsMap = std::unordered_map<int, int>;
 using namespace nx::recorder;
 
 StorageDistributionMap getStorageDistribution(
-    const SpaceInfo& spaceInfo, 
+    const SpaceInfo& spaceInfo,
     int iterations,
     const std::vector<int>& allowedIndexes)
 {
@@ -401,8 +392,8 @@ TEST_F(StorageBalancingAlgorithmTest, EqualStorages_NxSpaceNotKnown)
     spaceInfo.storageRebuilded(0, 50, 20, 10);
     spaceInfo.storageRebuilded(1, 30, 20, 10);
 
-    /* no storage rebulded call for the third storage. getOptimalStorageIndex() should be 
-    *  equally distributed 
+    /* no storage rebulded call for the third storage. getOptimalStorageIndex() should be
+    *  equally distributed
     */
     auto storageDistribution = getStorageDistribution(spaceInfo, 100 * 1000, {0, 1, 2});
     ASSERT_LT(storageDistribution[0] - 0.33, 0.05);

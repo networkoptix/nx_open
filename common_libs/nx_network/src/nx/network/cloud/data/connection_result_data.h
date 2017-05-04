@@ -3,7 +3,7 @@
 #include "stun_message_data.h"
 
 #include <nx/fusion/model_functions_fwd.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 namespace nx {
 namespace hpm {
@@ -18,7 +18,9 @@ enum class NatTraversalResultCode
     noSynFromTargetPeer,
     udtConnectFailed,
     tcpConnectFailed,
-    endpointVerificationFailure
+    endpointVerificationFailure,
+    errorConnectingToRelay,
+    notFoundOnRelay,
 };
 
 class NX_NETWORK_API ConnectionResultRequest:

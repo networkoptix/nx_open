@@ -1,7 +1,7 @@
 #include "mserver_cloud_synchronization_connection_fixture.h"
 
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/test_support/utils.h>
-#include <nx/utils/url_builder.h>
 
 #include <nx_ec/ec_proto_version.h>
 
@@ -32,20 +32,23 @@ void Ec2MserverCloudSynchronizationConnection::openTransactionConnections(int co
     openTransactionConnectionsOfSpecifiedVersion(count, nx_ec::EC2_PROTO_VERSION);
 }
 
-void Ec2MserverCloudSynchronizationConnection::openTransactionConnectionsOfSpecifiedVersion(
+std::vector<int> Ec2MserverCloudSynchronizationConnection::openTransactionConnectionsOfSpecifiedVersion(
     int count, int protoVersion)
 {
+    std::vector<int> connectionIds;
+
     for (int i = 0; i < count; ++i)
     {
-        m_connectionIds.push_back(
+        connectionIds.push_back(
             m_connectionHelper.establishTransactionConnection(
-                utils::UrlBuilder().setScheme("http")
-                .setHost(endpoint().address.toString()).setPort(endpoint().port),
+                cdbSynchronizationUrl(),
                 system().id,
                 system().authKey,
                 KeepAlivePolicy::enableKeepAlive,
                 protoVersion));
     }
+    std::copy(connectionIds.begin(), connectionIds.end(), std::back_inserter(m_connectionIds));
+    return connectionIds;
 }
 
 void Ec2MserverCloudSynchronizationConnection::waitForConnectionsToMoveToACertainState(
@@ -87,6 +90,18 @@ void Ec2MserverCloudSynchronizationConnection::waitUntilClosedConnectionCountRea
 void Ec2MserverCloudSynchronizationConnection::closeAllConnections()
 {
     m_connectionHelper.closeAllConnections();
+    m_connectionIds.clear();
+}
+
+void Ec2MserverCloudSynchronizationConnection::useAnotherSystem()
+{
+    m_system = addRandomSystemToAccount(m_account);
+}
+
+QUrl Ec2MserverCloudSynchronizationConnection::cdbSynchronizationUrl() const
+{
+    return network::url::Builder().setScheme("http")
+        .setHost(endpoint().address.toString()).setPort(endpoint().port);
 }
 
 OnConnectionBecomesActiveSubscription& 
@@ -99,6 +114,11 @@ OnConnectionFailureSubscription&
     Ec2MserverCloudSynchronizationConnection::onConnectionFailureSubscription()
 {
     return m_connectionHelper.onConnectionFailureSubscription();
+}
+
+test::TransactionConnectionHelper& Ec2MserverCloudSynchronizationConnection::connectionHelper()
+{
+    return m_connectionHelper;
 }
 
 void Ec2MserverCloudSynchronizationConnection::waitForAtLeastNConnectionsToMoveToACertainState(

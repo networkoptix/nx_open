@@ -49,43 +49,43 @@
         <translation>Объединить?</translation>
     </message>
     <message>
-        <source>In this version you can only merge systems which are not connected to %1.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation>В этой версии можно объединять только системы, которые не связаны с %1.</translation>
-    </message>
-    <message>
-        <source>Both systems are connected to %1. Merge is not allowed.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation>Обе системы подключены к %1. Объединение не допускается.</translation>
-    </message>
-    <message>
-        <source>These systems are built with different %1 URL. Merge is not allowed.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation>Эти системы построены с различными %1 URL. Объединение не допускается.</translation>
-    </message>
-    <message>
-        <source>Cannot connect to the other system because current system is already connected to %1.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation>Не удаётся подключиться к другой системе, поскольку текущая система уже подключена к %1.</translation>
-    </message>
-    <message>
         <source>System was not found.</source>
         <translation>Система не найдена.</translation>
     </message>
     <message>
-        <source>The discovered system %1 has an incompatible version %2.</source>
+        <source>The discovered System %1 has an incompatible version %2.</source>
         <comment>%1 is name of System, %2 is version information</comment>
         <translation>Найденная система %1 несовместима с версией %2.</translation>
     </message>
     <message>
-        <source>The discovered system %1 is in safe mode.</source>
+        <source>Cannot connect to the other System because current System is already connected to %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Не удаётся подключиться к другой системе, поскольку текущая система уже подключена к %1.</translation>
+    </message>
+    <message>
+        <source>The discovered System %1 is in safe mode.</source>
         <comment>%1 is name of System</comment>
         <translation>Найденная система %1 находится в безопасном режиме.</translation>
     </message>
     <message>
-        <source>Could not configure the remote system %1.</source>
+        <source>Could not configure the remote System %1.</source>
         <comment>%1 is name of System</comment>
         <translation>Не удалось настроить удаленную систему %1.</translation>
+    </message>
+    <message>
+        <source>Both Systems are connected to %1. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Обе системы подключены к %1. Объединение не допускается.</translation>
+    </message>
+    <message>
+        <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Эти системы построены с различными %1 URL. Объединение не допускается.</translation>
+    </message>
+    <message>
+        <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Облачная система может быть объединена только с локальной. Системное имя и пароль берутся из облачной системы.</translation>
     </message>
 </context>
 <context>
@@ -191,10 +191,6 @@
         <translation>Источник: %1</translation>
     </message>
     <message>
-        <source>Url: %1</source>
-        <translation>Адрес: %1</translation>
-    </message>
-    <message>
         <source>Reason: %1</source>
         <translation>Причина: %1</translation>
     </message>
@@ -243,11 +239,11 @@
     </message>
     <message>
         <source>start</source>
-        <translation>начать</translation>
+        <translation>начинается</translation>
     </message>
     <message>
         <source>stop</source>
-        <translation>остановить</translation>
+        <translation>заканчивается</translation>
     </message>
     <message>
         <source>While %1</source>
@@ -255,7 +251,7 @@
     </message>
     <message>
         <source>On %1 %2</source>
-        <translation>При %2: %1</translation>
+        <translation>Когда %2 %1</translation>
     </message>
     <message>
         <source>An unknown event has occurred</source>
@@ -1214,7 +1210,7 @@
 <context>
     <name>QnSystemDescription</name>
     <message>
-        <source>Unnamed system</source>
+        <source>Unnamed System</source>
         <translation>Система без имени</translation>
     </message>
 </context>
@@ -1404,7 +1400,7 @@
     <name>QnTranscoder</name>
     <message>
         <source>OpenCL transcoding is not implemented.</source>
-        <translation>OpenCL кодирование не реализовано.</translation>
+        <translation>OpenCL перекодирование не реализовано.</translation>
     </message>
     <message>
         <source>Unknown transcoding method.</source>
@@ -1443,19 +1439,11 @@
     </message>
     <message>
         <source>Custom Role</source>
-        <translation>Настраиваемая роль</translation>
+        <translation>Особая роль</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation>Настраиваемая</translation>
-    </message>
-    <message>
-        <source>Has access to whole system and can do everything.</source>
-        <translation>Имеет доступ ко всей системе и может делать все.</translation>
-    </message>
-    <message>
-        <source>Has access to whole system and can manage it. Can create users.</source>
-        <translation>Имеет доступ ко всей системе и может ей управлять. Может создавать пользователей.</translation>
+        <translation>Особая</translation>
     </message>
     <message>
         <source>Can manage all cameras and bookmarks.</source>
@@ -1471,11 +1459,19 @@
     </message>
     <message>
         <source>Custom user role.</source>
-        <translation>Пользовательская роль.</translation>
+        <translation>Особая роль.</translation>
     </message>
     <message>
         <source>Custom permissions.</source>
-        <translation>Пользовательские полномочия.</translation>
+        <translation>Особые полномочия.</translation>
+    </message>
+    <message>
+        <source>Has access to whole System and can do everything.</source>
+        <translation>Имеет доступ ко всей системе и может делать все.</translation>
+    </message>
+    <message>
+        <source>Has access to whole System and can manage it. Can create users.</source>
+        <translation>Имеет доступ ко всей системе и может ей управлять. Может создавать пользователей.</translation>
     </message>
 </context>
 <context>

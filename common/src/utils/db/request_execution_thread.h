@@ -4,7 +4,7 @@
 
 #include <nx/utils/std/thread.h>
 
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 
 #include "base_request_executor.h"
 #include "db_connection_holder.h"

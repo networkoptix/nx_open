@@ -2,12 +2,12 @@
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/utils/thread/mutex.h>
 
-#include <QElapsedTimer>
+#include <QtCore/QElapsedTimer>
 #include <nx/utils/timer_manager.h>
 
 namespace nx_http {
 
-class ClientPool : public QObject
+class ClientPool: public QObject, public Singleton<ClientPool>
 {
     Q_OBJECT
 public:
@@ -34,7 +34,6 @@ public:
 
     ClientPool(QObject *parent = nullptr);
     virtual ~ClientPool();
-    static ClientPool* instance();
 
     int doGet(const QUrl& url, nx_http::HttpHeaders headers = nx_http::HttpHeaders());
 

@@ -1,7 +1,9 @@
-rdep_add_package(any/nx_sdk-1.6.0)
-rdep_add_package(any/nx_storage_sdk-1.6.0)
-rdep_add_package(onvif)
-rdep_add_package(sigar)
+find_package(Qt5 COMPONENTS WebSockets)
+
+nx_rdep_add_package(any/nx_sdk-1.6.0)
+nx_rdep_add_package(any/nx_storage_sdk-1.6.0)
+nx_rdep_add_package(onvif)
+nx_rdep_add_package(sigar)
 
 set(product.title "${mediaserver.name}")
 set(product.display.title "${mediaserver.display.name}")
@@ -11,8 +13,10 @@ nx_configure_file(
     ${CMAKE_CURRENT_BINARY_DIR})
 
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/resources/static")
-nx_copy_if_different(${NX_SDK_PACKAGE} "${CMAKE_CURRENT_BINARY_DIR}/resources/static")
-nx_copy_if_different(${NX_STORAGE_SDK_PACKAGE} "${CMAKE_CURRENT_BINARY_DIR}/resources/static")
+nx_copy(IF_NEWER "${NX_SDK_PACKAGE}"
+    DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/resources/static")
+nx_copy(IF_NEWER "${NX_STORAGE_SDK_PACKAGE}"
+    DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/resources/static")
 
 execute_process(
     COMMAND
@@ -21,8 +25,8 @@ execute_process(
         -vms-path "${PROJECT_SOURCE_DIR}"
         -template-xml "${CMAKE_CURRENT_SOURCE_DIR}/api/api_template.xml"
         -output-xml "${CMAKE_CURRENT_BINARY_DIR}/api.xml")
-nx_copy_if_different(${CMAKE_CURRENT_BINARY_DIR}/api.xml
-    ${CMAKE_CURRENT_BINARY_DIR}/resources/static)
+nx_copy(IF_DIFFERENT "${CMAKE_CURRENT_BINARY_DIR}/api.xml"
+    DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/resources/static")
 
 nx_add_target(mediaserver_core LIBRARY
     ADDITIONAL_SOURCES
@@ -31,10 +35,14 @@ nx_add_target(mediaserver_core LIBRARY
         "${customization_dir}/mediaserver_core/resources"
         "${CMAKE_CURRENT_BINARY_DIR}/resources"
     PUBLIC_LIBS
-        qtservice qtsinglecoreapplication
+        qtservice qtsinglecoreapplication Qt5::WebSockets
         onvif sigar
         appserver2 nx_email nx_speech_synthesizer cloud_db_client)
 
 if(LINUX)
     target_link_libraries(mediaserver_core PRIVATE ldap)
+endif()
+
+if(WIN32)
+    target_link_libraries(mediaserver_core PRIVATE Wldap32.dll Iphlpapi.dll Crypt32.lib)
 endif()

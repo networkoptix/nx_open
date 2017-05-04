@@ -4,6 +4,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+set(CMAKE_LINK_DEPENDS_NO_SHARED ON)
+
 add_definitions(
     -DUSE_NX_HTTP
     -D__STDC_CONSTANT_MACROS
@@ -17,7 +19,7 @@ add_definitions(
 if(WIN32)
     add_definitions(
         -DENABLE_VMAX
-        -DENABLE_DESKTOP_CAMERA    )
+        -DENABLE_DESKTOP_CAMERA)
 endif()
 
 if(UNIX)
@@ -54,7 +56,8 @@ if(enableAllVendors)
         -DENABLE_STARDOT
         -DENABLE_IQE
         -DENABLE_ISD
-        -DENABLE_PULSE_CAMERA)
+        -DENABLE_PULSE_CAMERA
+        -DENABLE_FLIR)
 endif()
 
 if(WIN32)
@@ -73,6 +76,33 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     if(analyzeMutexLocksForDeadlock)
         add_definitions(-DANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
     endif()
+endif()
+
+if(WIN32)
+    add_definitions(
+        -DNOMINMAX=
+        -DUNICODE)
+    set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS
+        $<$<STREQUAL:$<TARGET_PROPERTY:TYPE>,STATIC_LIBRARY>:QN_EXPORT=>
+        $<$<NOT:$<STREQUAL:$<TARGET_PROPERTY:TYPE>,STATIC_LIBRARY>>:QN_EXPORT=Q_DECL_EXPORT>)
+
+    add_compile_options(
+        /MP
+        /bigobj
+        /wd4290
+        /wd4661
+        /wd4100
+        /we4717)
+
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_compile_options(/wd4250)
+    endif()
+
+    set(_extra_linker_flags "/LARGEADDRESSAWARE /OPT:NOREF /ignore:4221")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${_extra_linker_flags}")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${_extra_linker_flags}")
+    set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /ignore:4221")
+    unset(_extra_linker_flags)
 endif()
 
 if(UNIX)
@@ -100,31 +130,25 @@ if(LINUX)
         -Wno-ignored-qualifiers)
 
     set(CMAKE_SKIP_BUILD_RPATH ON)
-    set(CMAKE_EXE_LINKER_FLAGS "-Wl,--disable-new-dtags")
-    set(CMAKE_SHARED_LINKER_FLAGS "-rdynamic -Wl,--allow-shlib-undefined")
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+
+    if(LINUX)
+        set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
+    endif()
+
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
+    set(CMAKE_SHARED_LINKER_FLAGS
+        "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic -Wl,--allow-shlib-undefined")
 endif()
 
 if(MACOSX)
     add_compile_options(
         -msse4.1
         -Wno-unused-local-typedef)
-    set(CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
 endif()
 
 option(qml_debug "Enable QML debugger" ON)
 if(qml_debug)
     add_definitions(-DQT_QML_DEBUG)
 endif()
-
-# set(CMAKE_AUTOMOC_MOC_OPTIONS "-bstdafx.h")
-#
-# if(WIN32)
-#     set(platform "windows")
-#     set(additional.compiler "msvc2012u3")
-#     set(modification "winxp")
-#     set(platformToolSet "v110_xp")
-#     if(MSVC)
-#         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
-#         message(STATUS "Added parallel build arguments to CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
-#     endif()
-# endif()

@@ -1,22 +1,27 @@
 #include "runtime_transaction_log.h"
 
 #include <nx/utils/log/log.h>
-
+#include <common/common_module.h>
 
 namespace ec2
 {
 
-QnRuntimeTransactionLog::QnRuntimeTransactionLog(QObject* parent):
-    QObject(parent)
+QnRuntimeTransactionLog::QnRuntimeTransactionLog(
+    QnCommonModule* commonModule)
+    :
+    QObject(nullptr),
+    QnCommonModuleAware(commonModule)
 {
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnRuntimeTransactionLog::at_runtimeInfoChanged, Qt::DirectConnection);
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnRuntimeTransactionLog::at_runtimeInfoChanged, Qt::DirectConnection);
+    const auto& manager = commonModule->runtimeInfoManager();
+    connect(manager, &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnRuntimeTransactionLog::at_runtimeInfoChanged, Qt::DirectConnection);
+    connect(manager, &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnRuntimeTransactionLog::at_runtimeInfoChanged, Qt::DirectConnection);
 }
 
 QnRuntimeTransactionLog::~QnRuntimeTransactionLog()
 {
-    disconnect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnRuntimeTransactionLog::at_runtimeInfoChanged);
-    disconnect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnRuntimeTransactionLog::at_runtimeInfoChanged);
+    const auto& manager = commonModule()->runtimeInfoManager();
+    disconnect(manager, &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnRuntimeTransactionLog::at_runtimeInfoChanged);
+    disconnect(manager, &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnRuntimeTransactionLog::at_runtimeInfoChanged);
 }
 
 void QnRuntimeTransactionLog::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
@@ -25,8 +30,8 @@ void QnRuntimeTransactionLog::at_runtimeInfoChanged(const QnPeerRuntimeInfo& run
     QnTranStateKey key(runtimeInfo.data.peer.id, runtimeInfo.data.peer.instanceId);
     m_state.values[key] = runtimeInfo.data.version;
     m_data[key] = runtimeInfo.data;
-    if (runtimeInfo.data.peer.id == qnCommon->moduleGUID())
-        clearOldRuntimeDataUnsafe(lock, QnTranStateKey(qnCommon->moduleGUID(), qnCommon->runningInstanceGUID()));
+    if (runtimeInfo.data.peer.id == commonModule()->moduleGUID())
+        clearOldRuntimeDataUnsafe(lock, QnTranStateKey(commonModule()->moduleGUID(), commonModule()->runningInstanceGUID()));
 }
 
 void QnRuntimeTransactionLog::clearOldRuntimeData(const QnTranStateKey& key)
@@ -54,7 +59,9 @@ void QnRuntimeTransactionLog::clearOldRuntimeDataUnsafe(QnMutexLockerBase& lock,
         }
     }
     if (newPeerFound && oldPeerFound) {
-        QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged);
+        QnTransaction<ApiRuntimeData> tran(
+            ApiCommand::runtimeInfoChanged,
+            commonModule()->moduleGUID());
         tran.params = m_data[key];
         lock.unlock();
         emit runtimeDataUpdated(tran);
@@ -131,7 +138,9 @@ ErrorCode QnRuntimeTransactionLog::getTransactionsAfter(const QnTranState& state
     {
         QnTranStateKey key(data.peer.id, data.peer.instanceId);
         if (data.version > state.values.value(key)) {
-            QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged);
+            QnTransaction<ApiRuntimeData> tran(
+                ApiCommand::runtimeInfoChanged,
+                commonModule()->moduleGUID());
             tran.params = data;
             result << tran;
         }

@@ -25,6 +25,15 @@
 #include "settings.h"
 
 #include <utils/common/delayed.h>
+#include <business/business_message_bus.h>
+#include <plugins/storage/dts/vmax480/vmax480_tcp_server.h>
+#include <streaming/streaming_chunk_cache.h>
+#include <recorder/file_deletor.h>
+#include <core/ptz/server_ptz_controller_pool.h>
+#include <recorder/storage_db_pool.h>
+#include <recorder/storage_manager.h>
+#include <common/static_common_module.h>
+#include <utils/common/app_info.h>
 
 namespace {
 
@@ -39,20 +48,31 @@ void installTranslations()
 
 } // namespace
 
-QnMediaServerModule::QnMediaServerModule(const QString& enforcedMediatorEndpoint, QObject *parent):
-    QObject(parent)
+QnMediaServerModule::QnMediaServerModule(
+    const QString& enforcedMediatorEndpoint,
+    const QString& roSettingsPath,
+    const QString& rwSettingsPath,
+    QObject* parent)
 {
-    instance<QnLongRunnablePool>();
-
     Q_INIT_RESOURCE(mediaserver_core);
     Q_INIT_RESOURCE(appserver2);
 
+    store(new QnStaticCommonModule(
+        Qn::PT_Server,
+        QnAppInfo::productNameShort(),
+        QnAppInfo::customizationName()));
+
+    m_settings = store(new MSSettings(roSettingsPath, rwSettingsPath));
+
+    m_commonModule = store(new QnCommonModule(/*clientMode*/ false));
+
+    instance<QnLongRunnablePool>();
     instance<QnWriterPool>();
 #ifdef ENABLE_ONVIF
     store<PasswordHelper>(new PasswordHelper());
 
     const bool isDiscoveryDisabled =
-        MSSettings::roSettings()->value(QnServer::kNoResourceDiscovery, false).toBool();
+        m_settings->roSettings()->value(QnServer::kNoResourceDiscovery, false).toBool();
     QnSoapServer* soapServer = nullptr;
     if (!isDiscoveryDisabled)
     {
@@ -62,18 +82,70 @@ QnMediaServerModule::QnMediaServerModule(const QString& enforcedMediatorEndpoint
     }
 #endif //ENABLE_ONVIF
 
-    m_common = new QnCommonModule(this);
-    m_common->store(new QnFfmpegInitializer());
+    store(new QnFfmpegInitializer());
 
     if (!enforcedMediatorEndpoint.isEmpty())
         nx::network::SocketGlobals::mediatorConnector().mockupAddress(enforcedMediatorEndpoint);
     nx::network::SocketGlobals::mediatorConnector().enable(true);
 
-    m_common->store(new QnNewSystemServerFlagWatcher());
+    store(new QnNewSystemServerFlagWatcher(commonModule()));
+    store(new QnMasterServerStatusWatcher(commonModule()));
+
+    store(new QnBusinessMessageBus(commonModule()));
+#ifdef ENABLE_VMAX
+    store(new QnVMax480Server(commonModule()));
+#endif
+
+    store(new QnServerPtzControllerPool(commonModule()));
+
+    store(new QnStorageDbPool(commonModule()));
+
+    m_streamingChunkCache = store(new StreamingChunkCache(commonModule()));
+
+    // std::shared_pointer based singletones should be placed after InstanceStorage singletones
+
+    m_context.reset(new UniquePtrContext());
+
+    m_context->normalStorageManager.reset(
+        new QnStorageManager(
+            commonModule(),
+            QnServer::StoragePool::Normal
+        ));
+
+    m_context->backupStorageManager.reset(
+        new QnStorageManager(
+            commonModule(),
+            QnServer::StoragePool::Backup
+        ));
+
+    store(new QnFileDeletor(commonModule()));
 
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
 }
 
-QnMediaServerModule::~QnMediaServerModule() {
+QnMediaServerModule::~QnMediaServerModule()
+{
+    m_context.reset();
+    clear();
+}
+
+StreamingChunkCache* QnMediaServerModule::streamingChunkCache() const
+{
+    return m_streamingChunkCache;
+}
+
+QnCommonModule* QnMediaServerModule::commonModule() const
+{
+    return m_commonModule;
+}
+
+QSettings* QnMediaServerModule::roSettings() const
+{
+    return m_settings->roSettings();
+}
+
+QSettings* QnMediaServerModule::runTimeSettings() const
+{
+    return m_settings->runTimeSettings();
 }

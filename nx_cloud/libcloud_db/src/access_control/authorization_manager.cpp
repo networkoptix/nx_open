@@ -28,11 +28,11 @@ AuthorizationManager::AuthorizationManager(
 }
 
 bool AuthorizationManager::authorize(
-    const stree::AbstractResourceReader& authenticationProperties,
-    const stree::AbstractResourceReader& dataToAuthorize,
+    const nx::utils::stree::AbstractResourceReader& authenticationProperties,
+    const nx::utils::stree::AbstractResourceReader& dataToAuthorize,
     EntityType requestedEntity,
     DataActionType requestedAction,
-    stree::AbstractResourceWriter* const authzInfo ) const
+    nx::utils::stree::AbstractResourceWriter* const authzInfo ) const
 {
     //adding helper attributes
 
@@ -42,7 +42,7 @@ bool AuthorizationManager::authorize(
     const auto authenticatedSystemID =
         authenticationProperties.get<std::string>(attr::authSystemId);
     const auto requestedSystemID = dataToAuthorize.get<std::string>(attr::systemId);
-    stree::ResourceContainer auxSearchAttrs;
+    nx::utils::stree::ResourceContainer auxSearchAttrs;
     if (authenticatedAccountEmail)
     {
         //adding account status
@@ -92,11 +92,11 @@ bool AuthorizationManager::authorize(
     auxSearchAttrs.put(attr::entity, QnLexical::serialized(requestedEntity));
     auxSearchAttrs.put(attr::action, QnLexical::serialized(requestedAction));
 
-    stree::ResourceContainer additionalResourceContainer;
-    stree::ResourceWriterProxy resProxy(authzInfo, &additionalResourceContainer);
+    nx::utils::stree::ResourceContainer additionalResourceContainer;
+    nx::utils::stree::ResourceWriterProxy resProxy(authzInfo, &additionalResourceContainer);
     m_stree.search(
         StreeOperation::authorization,
-        stree::MultiSourceResourceReader(
+        nx::utils::stree::MultiSourceResourceReader(
             authenticationProperties,
             dataToAuthorize,
             auxSearchAttrs,

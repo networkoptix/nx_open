@@ -109,7 +109,7 @@ if [[ "${box}" == "bpi" ]]; then
             ldpreloadhook \
             libcedrus \
             libnx_vms_utils \
-            libclient_core \
+            libnx_client_core \
             libnx_audio \
             libnx_media \
             libopenal \
@@ -145,7 +145,7 @@ do
 done
 
 #copying qt libs
-QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Multimedia Sql"
+QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Multimedia Sql WebSockets"
 if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
     QTLIBS="Concurrent Core EglDeviceIntegration Gui LabsTemplates MultimediaQuick_p Multimedia Network Qml Quick Sql Xml XmlPatterns DBus Web*"
 fi
@@ -256,7 +256,11 @@ if [[ "${box}" == "bpi" ]]; then
     do
       echo "Adding lib" ${var}
       cp $SYSROOT_PREFIX/${var}* $BUILD_DIR/$TARGET_LIB_DIR/ -av
-done
+    done
+elif [[ "${box}" == "bananapi" ]]; then
+    # Add files required for bananapi on Debian 8 "Jessie".
+    cp -r "$SYSROOT_PREFIX"/libglib* "$BUILD_DIR/$TARGET_LIB_DIR/"
+    cp -r "$PACKAGES_ROOT/sysroot/usr/bin/hdparm" "$BUILD_DIR/$PREFIX_DIR/mediaserver/bin/"
 fi
 
 #copying vox

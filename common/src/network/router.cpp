@@ -1,7 +1,5 @@
 #include "router.h"
 
-#include <QtCore/QElapsedTimer>
-
 // #include <nx/utils/log/log.h>
 // #include "nx_ec/dummy_handler.h"
 // #include "nx_ec/ec_api.h"
@@ -13,9 +11,14 @@
 #include <core/resource_management/resource_pool.h>
 
 #include "network/module_finder.h"
+#include <common/common_module.h>
 
-QnRouter::QnRouter(QnModuleFinder *moduleFinder, QObject *parent) :
+QnRouter::QnRouter(
+    QObject* parent,
+    QnModuleFinder *moduleFinder)
+    :
     QObject(parent),
+    QnCommonModuleAware(parent),
     m_moduleFinder(moduleFinder)
 {
 }
@@ -29,17 +32,17 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
     result.addr = m_moduleFinder->primaryAddress(id);
     if (!result.addr.isNull())
         return result; // direct access to peer
-    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto connection = commonModule()->ec2Connection();
     if (!connection)
         return result; // no connection to the server, can't route
 
-    bool isknownServer = qnResPool->getResourceById<QnMediaServerResource>(id) != 0;
-    bool isClient = qnCommon->remoteGUID() != qnCommon->moduleGUID();
+    bool isknownServer = commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(id) != 0;
+    bool isClient = commonModule()->remoteGUID() != commonModule()->moduleGUID();
     if (!isknownServer && isClient) {
-		if (qnCommon->remoteGUID().isNull())
+		if (commonModule()->remoteGUID().isNull())
             return result;
-			
-        result.gatewayId = qnCommon->remoteGUID(); // proxy via current server to the other/incompatible system (client side only)
+
+        result.gatewayId = commonModule()->remoteGUID(); // proxy via current server to the other/incompatible system (client side only)
         result.addr = m_moduleFinder->primaryAddress(result.gatewayId);
         NX_ASSERT(!result.addr.isNull(), Q_FUNC_INFO, "QnRouter: no primary interface found for current EC.");
 		// todo: add distance for camera route
@@ -69,7 +72,7 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
 void QnRouter::updateRequest(QUrl& url, nx_http::HttpHeaders& headers, const QnUuid &id)
 {
     QnRoute route = routeTo(id);
-    if (route.isValid()) 
+    if (route.isValid())
     {
         url.setHost(route.addr.address.toString());
         url.setPort(route.addr.port);

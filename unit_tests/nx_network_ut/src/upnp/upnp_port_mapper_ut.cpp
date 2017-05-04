@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <nx/network/upnp/upnp_device_searcher.h>
+
 #include "upnp_port_mapper_mocked.h"
 
 #include <common/common_globals.h>
@@ -12,8 +14,9 @@ namespace test {
 class UpnpPortMapper: public ::testing::Test
 {
 public:
-    UpnpPortMapper() : deviceSearcher( nullptr ) {}
+    UpnpPortMapper() : deviceSearcher(deviceSearcherSettings) {}
     nx::utils::TimerManager timerManager;
+    DeviceSearcherDefaultSettings deviceSearcherSettings;
     DeviceSearcher deviceSearcher;
 
     static std::pair< quint16, PortMapper::Protocol > tcpPort( quint16 port )

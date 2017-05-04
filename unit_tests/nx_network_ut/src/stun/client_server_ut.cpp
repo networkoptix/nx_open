@@ -1,8 +1,7 @@
-
 #include <thread>
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/stun/async_client.h>
@@ -14,7 +13,7 @@
 #include <nx/utils/test_support/sync_queue.h>
 
 #include <common/common_globals.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace stun {
@@ -25,30 +24,44 @@ class TestServer:
 {
 public:
     TestServer(const nx::stun::MessageDispatcher& dispatcher):
-        SocketServer(&dispatcher, false)
+        SocketServer(&dispatcher, false),
+        m_totalConnectionsAccepted(0)
     {
     }
 
     virtual ~TestServer() override
     {
         pleaseStopSync();
-        for (auto& connection: connections)
+        for (auto& connection: m_connections)
         {
             connection->pleaseStopSync();
             connection.reset();
         }
     }
 
-    std::vector<std::shared_ptr<ServerConnection>> connections;
+    std::size_t totalConnectionsAccepted() const
+    {
+        return m_totalConnectionsAccepted.load();
+    }
+
+    std::vector<std::shared_ptr<ServerConnection>>& connections()
+    {
+        return m_connections;
+    }
 
 protected:
     virtual std::shared_ptr<ServerConnection> createConnection(
         std::unique_ptr<AbstractStreamSocket> _socket) override
     {
+        ++m_totalConnectionsAccepted;
         auto connection = SocketServer::createConnection(std::move(_socket));
-        connections.push_back(connection);
+        m_connections.push_back(connection);
         return connection;
     };
+
+private:
+    std::atomic<std::size_t> m_totalConnectionsAccepted;
+    std::vector<std::shared_ptr<ServerConnection>> m_connections;
 };
 
 class StunClientServerTest:
@@ -106,7 +119,7 @@ protected:
     SystemError::ErrorCode sendIndicationSync(int method)
     {
         utils::TestSyncQueue<SystemError::ErrorCode> sendWaiter;
-        const auto connection = server->connections.front();
+        const auto connection = server->connections().front();
         connection->sendMessage(
             Message(Header(MessageClass::indication, method)),
             sendWaiter.pusher());
@@ -133,7 +146,7 @@ TEST_F(StunClientServerTest, Connectivity)
     const auto address = startServer();
     server.reset();
     client->connect(address);
-    auto clientGuard = makeScopedGuard([this]() { client->pleaseStopSync(); });
+    auto clientGuard = makeScopeGuard([this]() { client->pleaseStopSync(); });
 
     EXPECT_THAT(sendTestRequestSync(), testing::AnyOf(
         SystemError::connectionRefused, SystemError::connectionReset,
@@ -156,8 +169,9 @@ TEST_F(StunClientServerTest, Connectivity)
     ASSERT_EQ(1U, server->connectionCount());
 
     ASSERT_TRUE(client->addConnectionTimer(timerPeriod, incrementTimer, nullptr));
-    std::this_thread::sleep_for(timerPeriod * 5);
-    ASSERT_GT(timerTicks, 3U); //< Expect at least 3 timer ticks in 5 periods.
+    // Checking that timer ticks certain times per some period is not reliable.
+    while (timerTicks < 3)
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
     server.reset();
     ASSERT_NE(sendTestRequestSync(), SystemError::noError);
@@ -170,14 +184,16 @@ TEST_F(StunClientServerTest, Connectivity)
     startServer(address);
     reconnectEvents.pop(); // Automatic reconnect is expected, again.
 
-    // TODO: It may take an undefined time for server->connectionCount() to be increased.
+    while (server->totalConnectionsAccepted() == 0)
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    ASSERT_EQ(1U, server->connectionCount()) << 
+        "Total connections accepted: " << server->totalConnectionsAccepted();
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    ASSERT_EQ(1U, server->connectionCount());
-
-    ASSERT_TRUE(client->addConnectionTimer(timerPeriod, incrementTimer, nullptr));
-    std::this_thread::sleep_for(timerPeriod * 5);
-    ASSERT_GT(timerTicks, 3U); //< Expect at least 3 timer ticks in 5 periods.
+    ASSERT_TRUE(client->addConnectionTimer(timerPeriod, incrementTimer, nullptr)) <<
+        "Server connection count " << server->connectionCount();
+    // Checking that timer ticks certain times per some period is not reliable.
+    while (timerTicks < 3)
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
 
 TEST_F(StunClientServerTest, RequestResponse)
@@ -300,7 +316,7 @@ TEST_F(StunClientServerTest, cancellation)
     const auto incrementTimer = [&timerTicks]() { ++timerTicks; };
     const auto timerPeriod = defaultSettings().reconnectPolicy.initialDelay / 2;
 
-    auto clientGuard = makeScopedGuard([this]() { client->pleaseStopSync(); });
+    auto clientGuard = makeScopeGuard([this]() { client->pleaseStopSync(); });
     client->connect(address);
     client->addOnReconnectedHandler(reconnectHandler);
     client->addConnectionTimer(timerPeriod, incrementTimer, nullptr);

@@ -17,13 +17,13 @@
 #include <nx/utils/singleton.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/network/auth_restriction_list.h>
+#include <nx/network/http/auth_restriction_list.h>
 
 #include "ldap/ldap_manager.h"
 #include "network/auth/abstract_nonce_provider.h"
 #include "network/auth/abstract_user_data_provider.h"
 #include <core/resource_access/user_access_data.h>
-
+#include <common/common_module_aware.h>
 
 #define USE_USER_RESOURCE_PROVIDER
 
@@ -35,6 +35,7 @@ struct CloudManagerGroup;
 class QnAuthHelper
 :
     public QObject,
+    public QnCommonModuleAware,
     public Singleton<QnAuthHelper>
 {
     Q_OBJECT
@@ -43,6 +44,7 @@ public:
     static const unsigned int MAX_AUTHENTICATION_KEY_LIFE_TIME_MS;
 
     QnAuthHelper(
+        QnCommonModule* commonModule,
         TimeBasedNonceProvider* timeBasedNonceProvider,
         CloudManagerGroup* cloudManagerGroup);
     virtual ~QnAuthHelper();
@@ -53,9 +55,9 @@ public:
         nx_http::Response& response,
         bool isProxy = false,
         Qn::UserAccessData* accessRights = 0,
-        AuthMethod::Value* usedAuthMethod = 0);
+        nx_http::AuthMethod::Value* usedAuthMethod = 0);
 
-    QnAuthMethodRestrictionList* restrictionList();
+    nx_http::AuthMethodRestrictionList* restrictionList();
 
     //!Creates query item for \a path which does not require authentication
     /*!
@@ -161,7 +163,7 @@ private:
     QMap<QnUuid, QnUserResourcePtr> m_users;
     QMap<QnUuid, QnMediaServerResourcePtr> m_servers;
 #endif
-    QnAuthMethodRestrictionList m_authMethodRestrictionList;
+    nx_http::AuthMethodRestrictionList m_authMethodRestrictionList;
     std::map<QString, TempAuthenticationKeyCtx> m_authenticatedPaths;
     AbstractNonceProvider* m_timeBasedNonceProvider;
     AbstractNonceProvider* m_nonceProvider;

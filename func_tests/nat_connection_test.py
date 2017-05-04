@@ -1,6 +1,10 @@
+import time
 import logging
 import pytest
-from test_utils.vagrant_box_config import DEFAULT_HOSTNET
+from datetime import datetime
+from test_utils.server import TimePeriod
+from test_utils.server import MEDIASERVER_MERGE_TIMEOUT_SEC
+import pytz
 
 
 log = logging.getLogger(__name__)
@@ -19,20 +23,40 @@ def env(env_builder, box, server, http_schema, nat_schema):
         env_factory = nat_env
     return env_factory(env_builder, box, server, http_schema)
 
+
 def direct_env(env_builder, box, server, http_schema):
-    one = server()
-    two = server()
-    return env_builder(http_schema, merge_servers=[one, two], one=one, two=two)
+    in_front = server()
+    behind = server()
+    return env_builder(http_schema, merge_servers=[in_front, behind], in_front=in_front, behind=behind)
+
 
 def nat_env(env_builder, box, server, http_schema):
-    behind_net    = '10.0.7.0'
-    behind_net_gw = '10.0.7.200'
-    nat = box('nat', ip_address_list=[DEFAULT_HOSTNET, behind_net_gw],
-              install_server=False, provision_scripts=['box-provision-nat.sh'])
-    behind = box('behind', ip_address_list=[behind_net], provision_scripts=['box-provision-behind-nat.sh'])
-    one = server()
-    two = server(box=behind)
-    return env_builder(http_schema, merge_servers=[one, two], boxes=[nat], one=one, two=two)
+    in_front_net    = '10.10.1/24'
+    in_front_net_gw = '10.10.1.1/24'
+    behind_net      = '10.10.2/24'
+    behind_net_gw   = '10.10.2.1/24'
+    router = box('router', ip_address_list=[in_front_net_gw, behind_net_gw],
+                 install_server=False, provision_scripts=['box-provision-nat-router.sh'])
+    behind_box = box('behind', ip_address_list=[behind_net], provision_scripts=['box-provision-nat-behind.sh'])
+    in_front_box = box('in-front', ip_address_list=[in_front_net])
+    in_front = server(box=in_front_box)
+    behind = server(box=behind_box)
+    # behind must go first in merge_servers, it can reach sever in_front, but not vise-versa
+    return env_builder(http_schema, merge_servers=[behind, in_front], boxes=[router], in_front=in_front, behind=behind)
+
+
+def wait_for_servers_return_same_results_to_api_call(env, method, api_object, api_method):
+    log.info('TEST for %s %s.%s:', method, api_object, api_method)
+    start = time.time()
+    while True:
+        result_in_front = env.in_front.rest_api.get_api_fn(method, api_object, api_method)()
+        result_behind = env.behind.rest_api.get_api_fn(method, api_object, api_method)()
+        if result_in_front == result_behind:
+            return
+        if time.time() - start >= MEDIASERVER_MERGE_TIMEOUT_SEC:
+            assert result_in_front == result_behind
+        time.sleep(MEDIASERVER_MERGE_TIMEOUT_SEC / 10.0)
+
 
 def test_merged_servers_should_return_same_results_to_certain_api_calls(env):
     test_api_calls = [
@@ -43,7 +67,59 @@ def test_merged_servers_should_return_same_results_to_certain_api_calls(env):
         ('GET', 'ec2', 'getUsers'),
         ]
     for method, api_object, api_method in test_api_calls:
-        log.info('TEST for %s %s.%s:', method, api_object, api_method)
-        result_one = env.one.rest_api.get_api_fn(method, api_object, api_method)()
-        result_two = env.two.rest_api.get_api_fn(method, api_object, api_method)()
-        assert result_one == result_two
+        wait_for_servers_return_same_results_to_api_call(env, method, api_object, api_method)
+
+
+def assert_both_servers_are_online(env):
+    server_guids = [env.in_front.ecs_guid, env.behind.ecs_guid]
+    for server in [env.in_front, env.behind]:
+        online_servers = [s for s in server.rest_api.ec2.getMediaServersEx.GET()
+                          if s['status'] == 'Online' and s['id'] in server_guids]
+        assert len(online_servers) == 2, "'%r' has only %d online servers" % (
+            server, len(online_servers))
+
+
+@pytest.mark.parametrize('http_schema', ['http'])
+@pytest.mark.parametrize('nat_schema', ['nat'])
+def test_proxy_requests(env):
+    assert_both_servers_are_online(env)
+    direct_response_in_front = env.in_front.rest_api.api.moduleInformation.GET()
+    direct_response_behind = env.behind.rest_api.api.moduleInformation.GET()
+    proxy_response_in_front = env.behind.rest_api.api.moduleInformation.GET(
+        headers={'X-server-guid': env.in_front.ecs_guid})
+    proxy_response_behind = env.in_front.rest_api.api.moduleInformation.GET(
+        headers={'X-server-guid': env.behind.ecs_guid})
+    assert direct_response_in_front == proxy_response_in_front
+    assert direct_response_behind == proxy_response_behind
+    assert direct_response_in_front != direct_response_behind
+
+
+def assert_server_stream(server, camera, sample_media_file, stream_type, artifact_path_prefix, start_time):
+    assert TimePeriod(start_time, sample_media_file.duration) in server.get_recorded_time_periods(camera)
+    stream = server.get_media_stream(stream_type, camera)
+    metadata_list = stream.load_archive_stream_metadata(
+        '%s-stream-media-%s' % (artifact_path_prefix, stream_type),
+        pos=start_time, duration=sample_media_file.duration)
+    for metadata in metadata_list:
+        assert metadata.width == sample_media_file.width
+        assert metadata.height == sample_media_file.height
+
+
+@pytest.mark.parametrize('http_schema', ['http'])
+@pytest.mark.parametrize('nat_schema', ['nat'])
+def test_get_streams(env, camera, sample_media_file, stream_type):
+    env.behind.add_camera(camera)
+    start_time_1 = datetime(2017, 1, 27, tzinfo=pytz.utc)
+    env.in_front.storage.save_media_sample(camera, start_time_1, sample_media_file)
+    env.in_front.rebuild_archive()
+    start_time_2 = datetime(2017, 2, 27, tzinfo=pytz.utc)
+    env.behind.storage.save_media_sample(camera, start_time_2, sample_media_file)
+    env.behind.rebuild_archive()
+    assert_server_stream(
+        env.behind, camera, sample_media_file, stream_type, env.artifact_path_prefix, start_time_1)
+    assert_server_stream(
+        env.in_front, camera, sample_media_file, stream_type, env.artifact_path_prefix, start_time_1)
+    assert_server_stream(
+        env.behind, camera, sample_media_file, stream_type, env.artifact_path_prefix, start_time_2)
+    assert_server_stream(
+        env.in_front, camera, sample_media_file, stream_type, env.artifact_path_prefix, start_time_2)

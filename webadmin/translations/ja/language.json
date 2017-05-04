@@ -1,6 +1,6 @@
 {
   "language":"ja",
-  "language_name":"言語",
+  "language_name":"日本語",
   "dialogs":{
     "okButton":"Ok",
     "openLink":"このリンクをご覧ください",
@@ -13,10 +13,10 @@
   },
   "passwordRequirements":{
     "minLengthMessage":"パスワードは8文字以上必要です",
-    "requiredMessage":"英数字とキーボードの記号のみを使用して、先頭と末尾の空白を避けます",
-    "weakMessage":"大文字と小文字の文字、特殊記号を使用して、強固なパスワードを作る",
+    "requiredMessage":"ラテン文字、数字、およびキーボードの記号のみが許可されます",
+    "weakMessage":"パスワードは異なる種類のシンボルを含める必要があります",
     "strongMessage":"強力なパスワード!",
-    "commonMessage":"このパスワードは、世界で最も人気のあるパスワード"
+    "commonMessage":"このパスワードは最も人気のあるパスワードのリストです"
   },
   "settings":{
     "tabs":{
@@ -26,7 +26,7 @@
     },
     "confirmRestart":"サーバーを再起動しますか？",
     "couldntCheckInternet":"クラウド接続を確認できませんでした",
-    "confirmRestoreDefault":"設定データベースをクリアする. このプロセスはいくつかの時間を要し、その後サーバーが再起動します",
+    "confirmRestoreDefault":"設定データベースをクリアする　 このプロセスには時間を要し、その後サーバーが再起動します",
     "confirmRestoreDefaultTitle":"出荷時のデフォルトに戻す",
     "unexpectedError":"失敗: 予期しないエラーが発生しました",
     "connnetionError":"接続エラー",
@@ -74,7 +74,7 @@
     "connectionFailed":"接続失敗: ",
     "unknownError":"不明なエラー",
     "mergeFailed":"統合に失敗: ",
-    "mergeSucceed":"マージ成功",
+    "mergeSucceed":"統合成功",
     "newSystemDisplayName":"新規システム",
     "incompatibleProtocol":"互換性のないバージョン",
     "incompatibleCloudHost":"クラウドの競合",

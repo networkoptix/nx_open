@@ -1,7 +1,7 @@
 #include "load_emulator.h"
 
+#include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
-#include <nx/utils/url_builder.h>
 #include <nx/utils/string.h>
 
 namespace nx {
@@ -19,6 +19,11 @@ LoadEmulator::LoadEmulator(
     m_cdbClient.setCloudUrl(m_cdbUrl);
     m_cdbClient.setCredentials(accountEmail, accountPassword);
     m_connectionHelper.setRemoveConnectionAfterClosure(true);
+}
+
+void LoadEmulator::setMaxDelayBeforeConnect(std::chrono::milliseconds delay)
+{
+    m_connectionHelper.setMaxDelayBeforeConnect(delay);
 }
 
 void LoadEmulator::setTransactionConnectionCount(int connectionCount)
@@ -40,6 +45,16 @@ std::size_t LoadEmulator::activeConnectionCount() const
     return m_connectionHelper.activeConnectionCount();
 }
 
+std::size_t LoadEmulator::totalFailedConnections() const
+{
+    return m_connectionHelper.totalFailedConnections();
+}
+
+std::size_t LoadEmulator::connectedConnections() const
+{
+    return m_connectionHelper.connectedConnections();
+}
+
 void LoadEmulator::onSystemListReceived(
     api::ResultCode resultCode,
     api::SystemDataExList systems)
@@ -53,8 +68,8 @@ void LoadEmulator::onSystemListReceived(
 
 void LoadEmulator::openConnections()
 {
-    const SocketAddress cdbEndpoint =
-        network::url::getEndpoint(QUrl(QString::fromStdString(m_cdbUrl)));
+    QUrl cdbUrl(QString::fromStdString(m_cdbUrl));
+    const SocketAddress cdbEndpoint = network::url::getEndpoint(cdbUrl);
 
     std::size_t systemIndex = 0;
     for (int i = 0; i < m_transactionConnectionCount; ++i)
@@ -62,7 +77,7 @@ void LoadEmulator::openConnections()
         const auto& system = m_systems.systems[systemIndex];
 
         m_connectionHelper.establishTransactionConnection(
-            utils::UrlBuilder().setScheme("https")
+            network::url::Builder().setScheme(cdbUrl.scheme())
                 .setHost(cdbEndpoint.address.toString())
                 .setPort(cdbEndpoint.port),
             system.id,

@@ -14,7 +14,7 @@ namespace nx {
 namespace cdb {
 namespace data {
 
-std::unique_ptr<stree::AbstractConstIterator> DataFilter::begin() const
+std::unique_ptr<nx::utils::stree::AbstractConstIterator> DataFilter::begin() const
 {
     return m_rc.begin();
 }
@@ -34,12 +34,12 @@ bool DataFilter::empty() const
     return m_rc.empty();
 }
 
-stree::ResourceContainer& DataFilter::resources()
+nx::utils::stree::ResourceContainer& DataFilter::resources()
 {
     return m_rc;
 }
 
-const stree::ResourceContainer& DataFilter::resources() const
+const nx::utils::stree::ResourceContainer& DataFilter::resources() const
 {
     return m_rc;
 }
@@ -51,7 +51,7 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, DataFilter* const dataFilter)
     {
         const auto resDescription = 
             StreeManager::instance()->resourceNameSet().findResourceByName(item.first);
-        if (resDescription.id == stree::INVALID_RES_ID)
+        if (resDescription.id == nx::utils::stree::INVALID_RES_ID)
             continue;
         QVariant val(item.second);
         val.convert(resDescription.type);
@@ -71,7 +71,7 @@ bool deserialize(QnJsonContext*, const QJsonValue& value, DataFilter* dataFilter
     {
         const auto resDescription =
             StreeManager::instance()->resourceNameSet().findResourceByName(it.key());
-        if (resDescription.id == stree::INVALID_RES_ID)
+        if (resDescription.id == nx::utils::stree::INVALID_RES_ID)
             continue;
         QVariant val(it.value());
         val.convert(resDescription.type);

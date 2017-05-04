@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_TW" sourcelanguage="en">
+<TS version="2.1" language="zh-TW" sourcelanguage="en">
 <context>
     <name>QObject</name>
     <message>
@@ -35,11 +35,11 @@
     </message>
     <message>
         <source>Specified database does not exist.</source>
-        <translation>指定的資料庫不存在。</translation>
+        <translation>指定的資料庫不存在.</translation>
     </message>
     <message>
         <source>Specified parameter is invalid.</source>
-        <translation>指定的參數是無效的。</translation>
+        <translation>指定的參數是無效的.</translation>
     </message>
     <message>
         <source>Could not access installed services</source>
@@ -47,11 +47,11 @@
     </message>
     <message>
         <source>No %1 services installed</source>
-        <translation>無 %1 已安裝服務</translation>
+        <translation>無已安裝服務 %1</translation>
     </message>
     <message>
         <source>&amp;Quit</source>
-        <translation>&amp;離開</translation>
+        <translation>&amp;退出</translation>
     </message>
     <message>
         <source>An error has occurred while trying to access installed services:</source>
@@ -59,59 +59,59 @@
     </message>
     <message>
         <source>Server has been stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>伺服器已停止運作</translation>
     </message>
     <message>
         <source>Server has been started</source>
-        <translation type="unfinished"></translation>
+        <translation>伺服器已啟動</translation>
     </message>
     <message>
         <source>Server will be stopped. Continue?</source>
-        <translation type="unfinished">Media server即將停止運作 是否繼續?</translation>
+        <translation>伺服器即將停止運作 是否繼續?</translation>
     </message>
     <message>
         <source>Show Server Log</source>
-        <translation type="unfinished"></translation>
+        <translation>顯示伺服器日誌</translation>
     </message>
     <message>
         <source>Start Server</source>
-        <translation type="unfinished"></translation>
+        <translation>啟動伺服器</translation>
     </message>
     <message>
         <source>Stop Server</source>
-        <translation type="unfinished"></translation>
+        <translation>停止伺服器</translation>
     </message>
     <message>
         <source>Server Web Page</source>
-        <translation type="unfinished"></translation>
+        <translation>伺服器 Web 頁面</translation>
     </message>
     <message>
         <source>stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>已停止</translation>
     </message>
     <message>
         <source>starting</source>
-        <translation type="unfinished"></translation>
+        <translation>開始</translation>
     </message>
     <message>
         <source>stopping</source>
-        <translation type="unfinished"></translation>
+        <translation>停止中</translation>
     </message>
     <message>
         <source>started</source>
-        <translation type="unfinished"></translation>
+        <translation>已啟動</translation>
     </message>
     <message>
         <source>resuming</source>
-        <translation type="unfinished"></translation>
+        <translation>恢復中</translation>
     </message>
     <message>
         <source>paused</source>
-        <translation type="unfinished"></translation>
+        <translation>已暫停</translation>
     </message>
     <message>
         <source>pausing</source>
-        <translation type="unfinished"></translation>
+        <translation>暫停中</translation>
     </message>
 </context>
 </TS>

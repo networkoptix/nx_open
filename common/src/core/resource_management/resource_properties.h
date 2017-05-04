@@ -1,5 +1,4 @@
-#ifndef __RESOURCE_PROPERTY_DICTIONARY_H
-#define __RESOURCE_PROPERTY_DICTIONARY_H
+#pragma once
 
 #include "utils/common/threadsafe_item_storage.h"
 #include <nx/utils/singleton.h>
@@ -9,12 +8,11 @@
 
 typedef QHash<QString, QString> QnResourcePropertyList;
 
-class QnResourcePropertyDictionary: public QObject,
-    public Singleton<QnResourcePropertyDictionary>
+class QnResourcePropertyDictionary: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
 public:
-    QnResourcePropertyDictionary(QObject *parent = NULL);
+    QnResourcePropertyDictionary(QObject* parent);
 
     bool saveParams(const QnUuid& resourceId);
     int saveParamsAsync(const QnUuid& resourceId);
@@ -52,7 +50,3 @@ private:
     mutable QnMutex m_mutex;
     mutable QnMutex m_requestMutex;
 };
-
-#define propertyDictionary QnResourcePropertyDictionary::instance()
-
-#endif // __RESOURCE_PROPERTY_DICTIONARY_H

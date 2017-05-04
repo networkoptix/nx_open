@@ -21,12 +21,13 @@
 #include <api/model/api_ioport_data.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/model_functions.h>
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_data_pool.h>
 
 #include <motion/motion_detection.h>
+#include <common/static_common_module.h>
 
 using namespace std;
 
@@ -99,7 +100,7 @@ QString QnPlAxisResource::portIndexToReqParam(int number) const
     return QString::number(number + 1);
 }
 
-class AxisIOMessageBodyParser: public AbstractByteStreamFilter
+class AxisIOMessageBodyParser: public nx::utils::bsf::AbstractByteStreamFilter
 {
 public:
     AxisIOMessageBodyParser(QnPlAxisResource* owner): m_owner(owner) {}
@@ -551,9 +552,9 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
         if (m_resolutions[SECONDARY_ENCODER_INDEX].size.isEmpty())
             m_resolutions[SECONDARY_ENCODER_INDEX] = getNearestResolution(QSize(480,316), 0.0); // try to get secondary resolution again (ignore aspect ratio)
     }
-    
+
     enableDuplexMode();
-    
+
     //root.Image.MotionDetection=no
     //root.Image.I0.TriggerData.MotionDetectionEnabled=yes
     //root.Image.I1.TriggerData.MotionDetectionEnabled=yes
@@ -1016,7 +1017,7 @@ void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPt
 
 void QnPlAxisResource::onMonitorConnectionClosed( nx_http::AsyncHttpClientPtr httpClient )
 {
-    if (getParentId() != qnCommon->moduleGUID() || !isInitialized())
+    if (getParentId() != commonModule()->moduleGUID() || !isInitialized())
         return;
     QnMutexLocker lk( &m_inputPortMutex );
     if (httpClient == m_ioHttpMonitor[0].httpClient) {
@@ -1429,11 +1430,11 @@ void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & res, const QStri
     if (key == Qn::IO_SETTINGS_PARAM_NAME && res && !res->hasFlags(Qn::foreigner))
     {
         QnUuid id = res->getId();
-        QnConcurrent::run(
+        nx::utils::concurrent::run(
             QThreadPool::globalInstance(),
-            [id]()
+            [id, this]()
             {
-                if (auto res = qnResPool->getResourceById<QnPlAxisResource>(id))
+                if (auto res = resourcePool()->getResourceById<QnPlAxisResource>(id))
                     res->asyncUpdateIOSettings();
             });
     }
@@ -1521,7 +1522,7 @@ void QnPlAxisResource::fetchAndSetAdvancedParameters()
         return;
     }
 
-    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     auto overloads = resData.value<std::vector<QnCameraAdvancedParameterOverload>>(
                 Qn::ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME);
 

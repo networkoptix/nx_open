@@ -18,8 +18,8 @@
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <platform/process/current_process.h>
 #include <utils/common/command_line_parser.h>
-#include <utils/common/guard.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/scope_guard.h>
+#include <nx/utils/system_error.h>
 #include <utils/common/app_info.h>
 
 #include "business_logic_composite.h"
@@ -33,22 +33,10 @@ namespace nx {
 namespace hpm {
 
 MediatorProcess::MediatorProcess(int argc, char **argv):
-    m_argc(argc),
-    m_argv(argv),
+    base_type(argc, argv, QnLibConnectionMediatorAppInfo::applicationDisplayName()),
     m_businessLogicComposite(nullptr),
     m_stunServerComposite(nullptr)
 {
-}
-
-void MediatorProcess::pleaseStop()
-{
-    m_processTerminationEvent.set_value();
-}
-
-void MediatorProcess::setOnStartedEventHandler(
-    nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler)
-{
-    m_startedEventHandler = std::move(handler);
 }
 
 const std::vector<SocketAddress>& MediatorProcess::httpEndpoints() const
@@ -61,32 +49,23 @@ const std::vector<SocketAddress>& MediatorProcess::stunEndpoints() const
     return m_stunServerComposite->endpoints();
 }
 
-int MediatorProcess::exec()
+ListeningPeerPool* MediatorProcess::listeningPeerPool() const
 {
-    bool processStartResult = false;
-    auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
-        [this, &processStartResult]
-        {
-            if (m_startedEventHandler)
-                m_startedEventHandler(processStartResult);
-        });
+    return &m_businessLogicComposite->listeningPeerPool();
+}
 
-    conf::Settings settings;
-    //parsing command line arguments
-    settings.load(m_argc, (const char**) m_argv);
-    if (settings.showHelp())
-    {
-        settings.printCmdLineArgsHelp();
-        return 0;
-    }
+std::unique_ptr<nx::utils::AbstractServiceSettings> MediatorProcess::createSettings()
+{
+    return std::make_unique<conf::Settings>();
+}
 
-    nx::utils::log::initialize(
-        settings.logging(), settings.general().dataDir,
-        QnLibConnectionMediatorAppInfo::applicationDisplayName());
+int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstractSettings)
+{
+    const conf::Settings& settings = static_cast<const conf::Settings&>(abstractSettings);
 
     if (settings.stun().addrToListenList.empty())
     {
-        NX_LOGX( "No STUN address to listen", cl_logALWAYS );
+        NX_LOGX("No STUN address to listen", cl_logALWAYS);
         return 1;
     }
 
@@ -130,22 +109,16 @@ int MediatorProcess::exec()
     NX_LOGX(lit("STUN Server is listening on %1")
         .arg(containerString(settings.stun().addrToListenList)), cl_logALWAYS);
 
-    processStartResult = true;
-    triggerOnStartedEventHandlerGuard.fire();
-
-    // This is actually the main loop.
-    m_processTerminationEvent.get_future().wait();
+    const int result = runMainLoop();
 
     stunServerComposite->stopAcceptingNewRequests();
     businessLogicComposite.stop();
     stunServerComposite.reset();
 
-    return 0;
-}
+    NX_LOGX(lit("%1 is stopped")
+        .arg(QnLibConnectionMediatorAppInfo::applicationDisplayName()), cl_logALWAYS);
 
-ListeningPeerPool* MediatorProcess::listeningPeerPool() const
-{
-    return &m_businessLogicComposite->listeningPeerPool();
+    return result;
 }
 
 bool MediatorProcess::launchHttpServerIfNeeded(

@@ -5,6 +5,8 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/string.h>
+#include <nx/utils/datetime.h>
+
 #include <api/helpers/camera_id_helper.h>
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnThumbnailRequestData, RoundMethod,
@@ -56,11 +58,13 @@ bool QnThumbnailRequestData::isSpecialTimeValue(qint64 value)
     return value < 0 || value == DATETIME_NOW;
 }
 
-void QnThumbnailRequestData::loadFromParams(const QnRequestParamList& params)
+void QnThumbnailRequestData::loadFromParams(QnResourcePool* resourcePool,
+    const QnRequestParamList& params)
 {
-    QnMultiserverRequestData::loadFromParams(params);
+    QnMultiserverRequestData::loadFromParams(resourcePool, params);
 
     camera = nx::camera_id_helper::findCameraByFlexibleIds(
+        resourcePool,
         /*outNotFoundCameraId*/ nullptr,
         params.toHash(),
         {kCameraIdParam, kDeprecatedPhysicalIdParam, kDeprecatedMacParam})

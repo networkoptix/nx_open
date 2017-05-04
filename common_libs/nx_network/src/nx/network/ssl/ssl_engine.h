@@ -8,8 +8,9 @@
 
 namespace nx {
 namespace network {
+namespace ssl {
 
-class NX_NETWORK_API SslEngine
+class NX_NETWORK_API Engine
 {
     static const size_t kBufferSize;
     static const int kRsaLength;
@@ -28,7 +29,9 @@ public:
     static void useRandomCertificate(const String& module);
 
     static void setAllowedServerVersions(const String& versions);
+    static void setAllowedServerCiphers(const String& versions);
 };
 
+} // namespace ssl
 } // namespace network
 } // namespace nx

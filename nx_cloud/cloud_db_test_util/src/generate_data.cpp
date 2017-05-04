@@ -1,5 +1,7 @@
 #include "generate_data.h"
 
+#include <nx/utils/std/cpp14.h>
+
 #include "data_generator.h"
 
 namespace nx {
