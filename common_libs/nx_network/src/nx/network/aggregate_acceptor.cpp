@@ -117,28 +117,32 @@ bool AggregateAcceptor::addSocket(std::unique_ptr<AbstractAcceptor> socket)
 void AggregateAcceptor::removeSocket(size_t pos)
 {
     NX_LOGX(lm("Remove socket(%1)").arg(pos), cl_logDEBUG2);
-    nx::utils::promise<void> socketRemovedPromise;
-    dispatch(
-        [this, &socketRemovedPromise, pos]()
+
+    removeByIterator(
+        [this, pos]()
         {
             if (pos >= m_acceptors.size())
             {
                 NX_ASSERT(false, lm("pos = %1, m_acceptors.size() = %2")
                     .arg(pos).arg(m_acceptors.size()));
-                return;
+                return m_acceptors.end();
             }
-
-            auto itemToRemoveIter = std::next(m_acceptors.begin(), pos);
-            auto serverSocketContext = std::move(*itemToRemoveIter);
-            m_acceptors.erase(itemToRemoveIter);
-            serverSocketContext.acceptor->pleaseStopSync();
-
-            NX_LOGX(lm("Socket(%1) is removed")
-                .arg(serverSocketContext.acceptor), cl_logDEBUG1);
-            socketRemovedPromise.set_value();
+            return std::next(m_acceptors.begin(), pos);
         });
+}
 
-    socketRemovedPromise.get_future().wait();
+void AggregateAcceptor::remove(AbstractAcceptor* acceptor)
+{
+    removeByIterator(
+        [this, acceptor]()
+        {
+            return std::find_if(
+                m_acceptors.begin(), m_acceptors.end(),
+                [acceptor](const AcceptorContext& element)
+                {
+                    return element.acceptor.get() == acceptor;
+                });
+        });
 }
 
 size_t AggregateAcceptor::count() const
@@ -197,6 +201,29 @@ void AggregateAcceptor::cancelIoFromAioThread()
     m_timer.cancelSync();
     for (auto& socketContext: m_acceptors)
         socketContext.stopAccepting();
+}
+
+template<typename FindIteratorFunc>
+void AggregateAcceptor::removeByIterator(FindIteratorFunc findIterator)
+{
+    nx::utils::promise<void> socketRemovedPromise;
+    dispatch(
+        [this, &socketRemovedPromise, &findIterator]()
+        {
+            auto itemToRemoveIter = findIterator();
+            if (itemToRemoveIter == m_acceptors.end())
+                return;
+
+            auto serverSocketContext = std::move(*itemToRemoveIter);
+            m_acceptors.erase(itemToRemoveIter);
+            serverSocketContext.acceptor->pleaseStopSync();
+
+            NX_LOGX(lm("Acceptor(%1) is removed")
+                .arg(serverSocketContext.acceptor), cl_logDEBUG1);
+            socketRemovedPromise.set_value();
+        });
+
+    socketRemovedPromise.get_future().wait();
 }
 
 } // namespace network

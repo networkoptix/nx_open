@@ -30,6 +30,7 @@ public:
      */
     bool addSocket(std::unique_ptr<AbstractAcceptor> acceptor);
     void removeSocket(size_t pos);
+    void remove(AbstractAcceptor* acceptor);
     size_t count() const;
 
     void setAcceptTimeout(boost::optional<std::chrono::milliseconds> timeout);
@@ -60,6 +61,9 @@ private:
         std::unique_ptr<AbstractStreamSocket> socket);
 
     void cancelIoFromAioThread();
+
+    template<typename FindIteratorFunc>
+    void removeByIterator(FindIteratorFunc findIterator);
 };
 
 } // namespace network
