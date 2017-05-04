@@ -683,7 +683,7 @@ void initialize(Manager* manager, Action* root)
     factory(OpenInLayoutAction)
         .flags(SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget | WidgetTarget)
         .requiredTargetPermissions(Qn::LayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
-        .text(tr("Open in Layout"))
+        .text(lit("Open in Layout"))
         .condition(new OpenInLayoutCondition());
 
     factory(OpenInCurrentLayoutAction)
@@ -691,7 +691,9 @@ void initialize(Manager* manager, Action* root)
         .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
         .text(tr("Open"))
         .conditionalText(tr("Monitor"), hasFlags(Qn::server), All)
-        .condition(new OpenInCurrentLayoutCondition());
+        .condition(
+            ConditionWrapper(new OpenInCurrentLayoutCondition())
+            && !condition::isLayoutTourReviewMode());
 
     factory(OpenInNewLayoutAction)
         .mode(DesktopMode)
@@ -1414,6 +1416,12 @@ void initialize(Manager* manager, Action* root)
     factory()
         .flags(Scene | NoTarget)
         .separator();
+
+    factory(MakeLayoutTourAction)
+        .flags(Tree | MultiTarget | ResourceTarget)
+        .text(tr("Make Layout Tour"))
+        .condition(condition::hasFlags(Qn::layout, All)
+            && !condition::isSafeMode());
 
     factory(CurrentLayoutSettingsAction)
         .flags(Scene | NoTarget)

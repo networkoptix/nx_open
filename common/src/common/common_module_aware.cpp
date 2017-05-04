@@ -144,3 +144,9 @@ QnGlobalSettings* QnCommonModuleAware::globalSettings() const
     NX_ASSERT(m_initialized);
     return m_commonModule ? m_commonModule->globalSettings() : nullptr;
 }
+
+QnLayoutTourManager* QnCommonModuleAware::layoutTourManager() const
+{
+    NX_ASSERT(m_initialized);
+    return m_commonModule ? m_commonModule->layoutTourManager() : nullptr;
+}
