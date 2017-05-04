@@ -2,6 +2,7 @@
 
 #include <nx/network/cloud/tunnel/relay/relay_outgoing_tunnel_connection.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
@@ -253,8 +254,8 @@ private:
         using namespace std::placeholders;
         using namespace nx::cloud::relay;
 
-        auto clientToRelayConnection =
-            api::ClientToRelayConnectionFactory::create(m_relayEndpoint);
+        auto clientToRelayConnection = api::ClientFactory::create(
+            nx::network::url::Builder().setScheme("http").setEndpoint(m_relayEndpoint));
 
         m_tunnelConnection = std::make_unique<relay::OutgoingTunnelConnection>(
             m_relayEndpoint,

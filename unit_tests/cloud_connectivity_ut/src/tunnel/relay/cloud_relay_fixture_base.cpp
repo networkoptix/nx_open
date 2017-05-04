@@ -14,24 +14,24 @@ CloudRelayFixtureBase::CloudRelayFixtureBase()
 {
     using namespace std::placeholders;
 
-    m_clientToRelayConnectionFactoryBak =
-        api::ClientToRelayConnectionFactory::setCustomFactoryFunc(
-            std::bind(&CloudRelayFixtureBase::clientToRelayConnectionFactoryFunc, this, _1));
+    m_clientFactoryBak =
+        api::ClientFactory::setCustomFactoryFunc(
+            std::bind(&CloudRelayFixtureBase::clientFactoryFunc, this, _1));
 }
 
 CloudRelayFixtureBase::~CloudRelayFixtureBase()
 {
-    api::ClientToRelayConnectionFactory::setCustomFactoryFunc(
-        std::move(m_clientToRelayConnectionFactoryBak));
+    api::ClientFactory::setCustomFactoryFunc(
+        std::move(m_clientFactoryBak));
 }
 
-std::unique_ptr<api::ClientToRelayConnection> 
-    CloudRelayFixtureBase::clientToRelayConnectionFactoryFunc(
-        const SocketAddress& /*relayEndpoint*/)
+std::unique_ptr<api::Client> 
+    CloudRelayFixtureBase::clientFactoryFunc(const QUrl& /*relayUrl*/)
 {
     auto result = std::make_unique<ClientToRelayConnection>();
     result->setOnBeforeDestruction(
-        std::bind(&CloudRelayFixtureBase::onClientToRelayConnectionDestroyed, this, result.get()));
+        std::bind(&CloudRelayFixtureBase::onClientToRelayConnectionDestroyed, this,
+            result.get()));
     onClientToRelayConnectionInstanciated(result.get());
     return std::move(result);
 }

@@ -102,7 +102,6 @@ void QnBufferedScreenGrabber::run()
         qint64 nextTiming = ++m_currentFrameNum * 1000 / m_frameRate;
 
         int toSleep = nextTiming - currentTime();
-        //cl_log.log("sleep time=", toSleep, cl_logALWAYS);
         if (toSleep > 0)
             msleep(toSleep);
         else if (toSleep <= -MAX_JITTER)

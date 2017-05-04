@@ -573,7 +573,6 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
                         << " expectedTime=" << QDateTime::fromMSecsSinceEpoch(m_lastSeekTime/1000).toString("hh:mm:ss.zzz")
                         << " packetTime=" << QDateTime::fromMSecsSinceEpoch(result->timestamp/1000).toString("hh:mm:ss.zzz");
                     str.flush();
-                    cl_log.log(s, cl_logALWAYS);
                 }
                 m_waitBOF = false;
             }

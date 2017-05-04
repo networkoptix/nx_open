@@ -6,9 +6,7 @@
 
 #include <nx/client/desktop/ui/actions/action_fwd.h>
 
-class QAction;
 class QWidget;
-class QMenu;
 
 namespace nx {
 namespace client {
@@ -20,8 +18,8 @@ class Factory: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
 public:
-    Factory(QObject* parent = nullptr);
-    virtual QList<QAction *> newActions(const Parameters& parameters, QObject* parent = nullptr);
+    Factory(QObject* parent);
+    virtual QList<QAction*> newActions(const Parameters& parameters, QObject* parent = nullptr);
     virtual QMenu* newMenu(const Parameters& /*parameters*/, QWidget* /*parentWidget*/);
 };
 
@@ -30,8 +28,8 @@ class OpenCurrentUserLayoutFactory: public Factory
 {
     Q_OBJECT
 public:
-    OpenCurrentUserLayoutFactory(QObject* parent = NULL);
-    virtual QList<QAction *> newActions(const Parameters& parameters, QObject* parent) override;
+    OpenCurrentUserLayoutFactory(QObject* parent);
+    virtual QList<QAction*> newActions(const Parameters& parameters, QObject* parent) override;
 };
 
 
@@ -39,15 +37,15 @@ class PtzPresetsToursFactory: public Factory
 {
     Q_OBJECT
 public:
-    PtzPresetsToursFactory(QObject* parent = NULL);
-    virtual QList<QAction *> newActions(const Parameters& parameters, QObject* parent) override;
+    PtzPresetsToursFactory(QObject* parent);
+    virtual QList<QAction*> newActions(const Parameters& parameters, QObject* parent) override;
 };
 
 class EdgeNodeFactory: public Factory
 {
     Q_OBJECT
 public:
-    EdgeNodeFactory(QObject* parent = NULL): Factory(parent) {}
+    EdgeNodeFactory(QObject* parent);
     virtual QMenu* newMenu(const Parameters& parameters, QWidget *parentWidget) override;
 };
 
@@ -55,7 +53,15 @@ class AspectRatioFactory: public Factory
 {
     Q_OBJECT
 public:
-    AspectRatioFactory(QObject* parent = NULL): Factory(parent) {}
+    AspectRatioFactory(QObject* parent);
+    virtual QList<QAction*> newActions(const Parameters& parameters, QObject* parent) override;
+};
+
+class CurrentLayoutTourSettingsFactory: public Factory
+{
+    Q_OBJECT
+public:
+    CurrentLayoutTourSettingsFactory(QObject* parent);
     virtual QList<QAction*> newActions(const Parameters& parameters, QObject* parent) override;
 };
 

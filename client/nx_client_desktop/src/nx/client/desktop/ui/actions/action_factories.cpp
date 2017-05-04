@@ -11,12 +11,14 @@
 #include <core/ptz/ptz_preset.h>
 #include <core/ptz/ptz_tour.h>
 
+#include <core/resource_management/layout_tour_manager.h>
+#include <core/resource_management/resource_pool.h>
+
 #include <core/resource/user_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
-#include <core/resource_management/resource_pool.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -65,7 +67,7 @@ QList<QAction*> OpenCurrentUserLayoutFactory::newActions(const Parameters& /*par
     }
 
     std::sort(layouts.begin(), layouts.end(),
-        [](const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r)
+        [](const QnLayoutResourcePtr& l, const QnLayoutResourcePtr& r)
         {
             return nx::utils::naturalStringLess(l->getName(), r->getName());
         });
@@ -106,7 +108,7 @@ PtzPresetsToursFactory::PtzPresetsToursFactory(QObject* parent):
 {
 }
 
-QList<QAction *> PtzPresetsToursFactory::newActions(const Parameters& parameters,
+QList<QAction*> PtzPresetsToursFactory::newActions(const Parameters& parameters,
     QObject* parent)
 {
     QList<QAction*> result;
@@ -123,13 +125,13 @@ QList<QAction *> PtzPresetsToursFactory::newActions(const Parameters& parameters
     widget->ptzController()->getActiveObject(&activeObject);
 
     std::sort(presets.begin(), presets.end(),
-        [](const QnPtzPreset &l, const QnPtzPreset &r)
+        [](const QnPtzPreset& l, const QnPtzPreset& r)
         {
             return nx::utils::naturalStringLess(l.name, r.name);
         });
 
     std::sort(tours.begin(), tours.end(),
-        [](const QnPtzTour &l, const QnPtzTour &r)
+        [](const QnPtzTour& l, const QnPtzTour& r)
         {
             return nx::utils::naturalStringLess(l.name, r.name);
         });
@@ -195,6 +197,11 @@ QList<QAction *> PtzPresetsToursFactory::newActions(const Parameters& parameters
     return result;
 }
 
+EdgeNodeFactory::EdgeNodeFactory(QObject* parent):
+    Factory(parent)
+{
+}
+
 QMenu* EdgeNodeFactory::newMenu(const Parameters& parameters, QWidget* parentWidget)
 {
     auto edgeCamera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
@@ -203,6 +210,11 @@ QMenu* EdgeNodeFactory::newMenu(const Parameters& parameters, QWidget* parentWid
 
     return menu()->newMenu(action::NoAction, TreeScope, parentWidget,
         Parameters(edgeCamera->getParentResource()));
+}
+
+AspectRatioFactory::AspectRatioFactory(QObject* parent):
+    Factory(parent)
+{
 }
 
 QList<QAction*> AspectRatioFactory::newActions(const Parameters& /*parameters*/,
@@ -216,7 +228,7 @@ QList<QAction*> AspectRatioFactory::newActions(const Parameters& /*parameters*/,
     auto actionGroup = new QActionGroup(parent);
     for (const auto& aspectRatio: QnAspectRatio::standardRatios())
     {
-        QAction *action = new QAction(parent);
+        auto action = new QAction(parent);
         action->setText(aspectRatio.toString());
         action->setCheckable(true);
         action->setChecked(aspectRatio == currentAspectRatio);
@@ -230,6 +242,35 @@ QList<QAction*> AspectRatioFactory::newActions(const Parameters& /*parameters*/,
     return actionGroup->actions();
 }
 
+CurrentLayoutTourSettingsFactory::CurrentLayoutTourSettingsFactory(QObject* parent):
+    Factory(parent)
+{
+}
+
+
+QList<QAction*> CurrentLayoutTourSettingsFactory::newActions(const Parameters& parameters,
+    QObject* parent)
+{
+    const auto isManual = workbench()->currentLayout()->data(Qn::LayoutTourIsManualRole).toBool();
+    auto actionGroup = new QActionGroup(parent);
+    actionGroup->setExclusive(true);
+    for (auto manual: {false, true})
+    {
+        auto action = new QAction(parent);
+        action->setText(manual
+            ? tr("Switch Layouts by Hotkeys")
+            : tr("Switch Layouts By Timer"));
+        action->setCheckable(true);
+        action->setChecked(manual == isManual);
+        connect(action, &QAction::triggered, this,
+            [this, manual]
+            {
+                workbench()->currentLayout()->setData(Qn::LayoutTourIsManualRole, manual);
+            });
+        actionGroup->addAction(action);
+    }
+    return actionGroup->actions();
+}
 
 } // namespace action
 } // namespace ui

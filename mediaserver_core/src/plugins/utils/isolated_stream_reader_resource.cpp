@@ -45,14 +45,16 @@ bool IsolatedStreamReaderResource::setProperty(
     return true;
 }
 
-void IsolatedStreamReaderResource::saveParams()
+bool IsolatedStreamReaderResource::saveParams()
 {
     // Do nothing.
+    return true;
 }
 
-void IsolatedStreamReaderResource::saveParamsAsync()
+int IsolatedStreamReaderResource::saveParamsAsync()
 {
     // Do nothing.
+    return 0;
 }
 
 int IsolatedStreamReaderResource::saveAsync()

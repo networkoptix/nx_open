@@ -15,6 +15,8 @@ public:
     virtual ~QnWebResourceWidget();
 
 protected:
+    virtual int helpTopicAt(const QPointF& pos) const override;
+
     virtual QString calculateDetailsText() const override;
     virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const override;
 

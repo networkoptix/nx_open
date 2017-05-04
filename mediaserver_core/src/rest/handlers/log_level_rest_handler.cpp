@@ -21,22 +21,17 @@ int QnLogLevelRestHandler::executeGet(
 {
     QN_UNUSED(path, processor);
 
-    auto _nx_logs = QnLog::logs();
-    if (!_nx_logs)
-    {
-        result.setError(
-            QnJsonRestResult::InvalidParameter,
-            lit("Logging subsystem is not initialized"));
-        return CODE_OK;
-    }
+    int logId = 0;
+    requireParameter(params, idParam, result, &logId, true);
 
-    int logID = QnLog::MAIN_LOG_ID;
-    requireParameter(params, idParam, result, &logID, true);
+    std::shared_ptr<nx::utils::log::Logger> logger;
+    if ((size_t) logId < QnLog::kAllLogs.size())
+        logger = nx::utils::log::get(QnLog::kAllLogs[logId], /*allowMain*/ false);
 
-    if (!_nx_logs->exists(logID))
+    if (!logger)
     {
         result.setError(QnJsonRestResult::InvalidParameter,
-            lit("Parameter '%1' has invalid value '%2'").arg(idParam).arg(logID));
+            lit("Parameter '%1' has invalid value '%2'").arg(idParam).arg(logId));
         return CODE_OK;
     }
 
@@ -52,7 +47,7 @@ int QnLogLevelRestHandler::executeGet(
         }
 
         QString level = *setValue;
-        QnLogLevel logLevel = QnLog::logLevelFromString(level);
+        QnLogLevel logLevel = nx::utils::log::levelFromString(level);
 
         if (logLevel == cl_logUNKNOWN)
         {
@@ -60,11 +55,10 @@ int QnLogLevelRestHandler::executeGet(
                 lit("Parameter '%1' has invalid value '%2'").arg(valueParam).arg(level));
             return CODE_OK;
         }
-        QnLog::instance(logID)->setLogLevel(logLevel);
+
+        logger->setDefaultLevel(logLevel);
     }
 
-    const QnLogLevel resultLevel = QnLog::instance(logID)->logLevel();
-    result.setReply(QnLog::logLevelToString(resultLevel));
-
+    result.setReply(nx::utils::log::toString(logger->defaultLevel()));
     return CODE_OK;
 }

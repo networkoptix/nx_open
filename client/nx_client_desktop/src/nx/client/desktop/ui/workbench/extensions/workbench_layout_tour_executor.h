@@ -47,6 +47,7 @@ public:
     void stopCurrentTour();
 
     QnUuid runningTour() const;
+
 protected:
     virtual void timerEvent(QTimerEvent* event) override;
 
@@ -61,6 +62,7 @@ private:
     void startTimer();
     void stopTimer();
     void startTourInternal();
+    bool isTimerRunning() const;
 
 private:
     enum class Mode

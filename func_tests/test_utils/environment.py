@@ -98,10 +98,10 @@ class EnvironmentBuilder(object):
                 return config
         return None
 
-    def _init_server(self, box_config_to_box, http_schema, config):
+    def _init_server(self, box_config_to_box, http_schema, config, rest_api_timeout_sec):
         box = box_config_to_box[config.box]
         url = '%s://%s:%d/' % (http_schema, self._vm_host.host, config.box.rest_api_forwarded_port)
-        server = Server(self._company_name, config.name, box, url)
+        server = Server(self._company_name, config.name, url, box=box, rest_api_timeout_sec=rest_api_timeout_sec)
         if config.leave_initial_cloud_host:
             patch_set_cloud_host = None
         else:
@@ -123,7 +123,12 @@ class EnvironmentBuilder(object):
             assert server_2.is_started(), 'Requested merge of not started server: %s' % server_2
             server_1.merge_systems(server_2)
 
-    def build_environment(self, http_schema=DEFAULT_HTTP_SCHEMA, boxes=None, merge_servers=None,  **kw):
+    def build_environment(self,
+                          http_schema=DEFAULT_HTTP_SCHEMA,
+                          boxes=None,
+                          merge_servers=None,
+                          rest_api_timeout_sec=None,
+                          **kw):
         if not boxes:
             boxes = []
         log.info('TEST_DIR=%r, WORK_DIR=%r, BIN_DIR=%r, CLOUD_HOST=%r, COMPANY_NAME=%r',
@@ -169,7 +174,7 @@ class EnvironmentBuilder(object):
 
         servers = {}
         for config in servers_config:
-            servers[config.name] = self._init_server(box_config_to_box, http_schema, config)
+            servers[config.name] = self._init_server(box_config_to_box, http_schema, config, rest_api_timeout_sec)
         self._run_servers_merge(merge_servers or [], servers)
 
         for name, server in servers.items():

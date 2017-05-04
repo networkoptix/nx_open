@@ -317,6 +317,13 @@ private:
     void checkSystemTimeForChange();
     void handleLocalTimePriorityKeyChange(QnMutexLockerBase* const lk);
 
+    void saveSyncTimeAsync(
+        qint64 syncTimeToLocalDelta,
+        const TimePriorityKey& syncTimeKey);
+    bool saveSyncTimeSync(
+        qint64 syncTimeToLocalDelta,
+        const TimePriorityKey& syncTimeKey);
+
 private slots:
     void onNewConnectionEstablished(QnTransactionTransportBase* transport );
     void onPeerLost( ApiPeerAliveData data );

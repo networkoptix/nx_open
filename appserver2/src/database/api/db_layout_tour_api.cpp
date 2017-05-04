@@ -24,8 +24,10 @@ struct ApiLayoutTourItemWithRefData: ApiLayoutTourItemData
 };
 #define ApiLayoutTourItemWithRefData_Fields ApiLayoutTourItemData_Fields (tourId)
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ApiLayoutTourItemWithRefData, (sql_record),
-    ApiLayoutTourItemWithRefData_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (ApiLayoutTourItemWithRefData),
+    (sql_record),
+    _Fields)
 
 namespace {
 
@@ -37,10 +39,14 @@ bool insertOrReplaceTour(const QSqlDatabase& database, const ApiLayoutTourData& 
         INTO vms_layout_tours
         (
             id,
-            name
+            parentId,
+            name,
+            settings
         ) VALUES (
             :id,
-            :name
+            :parentId,
+            :name,
+            :settings
         )
     )sql");
 
@@ -122,9 +128,7 @@ bool fetchLayoutTours(const QSqlDatabase& database, ApiLayoutTourDataList& tours
     query.setForwardOnly(true);
 
     QString queryStr(R"sql(
-        SELECT
-            id,
-            name
+        SELECT *
         FROM vms_layout_tours
         ORDER BY id
     )sql");
@@ -138,10 +142,7 @@ bool fetchLayoutTours(const QSqlDatabase& database, ApiLayoutTourDataList& tours
     QSqlQuery queryItems(database);
     queryItems.setForwardOnly(true);
     QString queryItemsStr(R"sql(
-        SELECT
-            tourId,
-            layoutId,
-            delayMs
+        SELECT *
         FROM vms_layout_tour_items
         ORDER BY tourId
     )sql");
@@ -153,6 +154,7 @@ bool fetchLayoutTours(const QSqlDatabase& database, ApiLayoutTourDataList& tours
         return false;
 
     QnSql::fetch_many(query, &tours);
+
     std::vector<ApiLayoutTourItemWithRefData> items;
     QnSql::fetch_many(queryItems, &items);
     QnDbHelper::mergeObjectListData(

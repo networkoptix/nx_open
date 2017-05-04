@@ -26,7 +26,7 @@ QPixmap getTriggerPixmap(const QString& name)
 
 QString QnSoftwareTriggerPixmaps::pixmapsPath()
 {
-    return lit("soft_triggers") + QDir::separator();
+    return lit("soft_triggers/user_selectable") + QDir::separator();
 }
 
 QString QnSoftwareTriggerPixmaps::defaultPixmapName()

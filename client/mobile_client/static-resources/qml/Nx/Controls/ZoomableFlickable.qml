@@ -19,6 +19,11 @@ Item
     property real allowedHorizontalMargin: 0
     property real allowedVerticalMargin: 0
 
+    property real allowedLeftMargin: 0
+    property real allowedRightMargin: 0
+    property real allowedTopMargin: 0
+    property real allowedBottomMargin: 0
+
     readonly property alias contentX: flick.contentX
     readonly property alias contentY: flick.contentY
 
@@ -41,7 +46,11 @@ Item
         bottomMargin: 0
         rightMargin: 0
 
-        readonly property bool allowOvershoot: allowedHorizontalMargin > 0 || allowedVerticalMargin > 0
+        readonly property bool allowOvershoot:
+            allowedLeftMargin > 0
+                || allowedRightMargin > 0
+                || allowedTopMargin > 0
+                || allowedBottomMargin > 0
         property bool animating: false
 
         flickableDirection: Flickable.HorizontalAndVerticalFlick
@@ -97,10 +106,10 @@ Item
             var x = contentX
             var y = contentY
 
-            leftMargin = Qt.binding(function() { return Math.max(allowedHorizontalMargin, (width - contentWidth) / 2) })
-            topMargin = Qt.binding(function() { return Math.max(allowedVerticalMargin, (height - contentHeight) / 3) })
-            rightMargin = Qt.binding(function() { return leftMargin })
-            bottomMargin = Qt.binding(function() { return Math.max(allowedVerticalMargin, (height - contentHeight) / 3 * 2) })
+            leftMargin = Qt.binding(function() { return allowedLeftMargin })
+            topMargin = Qt.binding(function() { return allowedTopMargin })
+            rightMargin = Qt.binding(function() { return allowedRightMargin })
+            bottomMargin = Qt.binding(function() { return allowedBottomMargin })
 
             contentX = x
             contentY = y
@@ -160,18 +169,15 @@ Item
                 h = ch
             }
 
-            var xMargin = Math.max(allowedHorizontalMargin, (width - w) / 2)
-            if (-x + w < width - xMargin)
-                x = w - width + xMargin
-            if (-x > xMargin)
-                x = -xMargin
+            if (-x + w < width - allowedRightMargin)
+                x = w - width + allowedRightMargin
+            if (-x > allowedLeftMargin)
+                x = -allowedLeftMargin
 
-            var topMargin = Math.max(allowedVerticalMargin, (rootItem.height - h) / 3)
-            var bottomMargin = Math.max(allowedVerticalMargin, (rootItem.height - h) / 3 * 2)
-            if (-y + h < rootItem.height - bottomMargin)
-                y = h - rootItem.height + bottomMargin
-            if (-y > topMargin)
-                y = -topMargin
+            if (-y + h < rootItem.height - allowedBottomMargin)
+                y = h - rootItem.height + allowedBottomMargin
+            if (-y > allowedTopMargin)
+                y = -allowedTopMargin
 
             if (animate)
             {

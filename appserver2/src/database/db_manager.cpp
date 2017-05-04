@@ -4706,6 +4706,19 @@ ApiObjectInfoList QnDbManagerAccess::getObjectsNoLock(const ApiObjectType& objec
     return m_dbManager->getObjectsNoLock(objectType);
 }
 
+ApiIdDataList QnDbManagerAccess::getLayoutToursNoLock(const QnUuid& parentId)
+{
+    ApiIdDataList result;
+    ApiLayoutTourDataList tours;
+    database::api::fetchLayoutTours(m_dbManager->getDB(), tours);
+    for (const auto& tour: tours)
+    {
+        if (tour.parentId == parentId)
+            result.push_back(tour.id);
+    }
+    return result;
+}
+
 void QnDbManagerAccess::getResourceParamsNoLock(const QnUuid& resourceId, ApiResourceParamWithRefDataList& resourceParams)
 {
     m_dbManager->doQueryNoLock(resourceId, resourceParams);

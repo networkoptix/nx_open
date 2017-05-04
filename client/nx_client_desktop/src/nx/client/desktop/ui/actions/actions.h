@@ -944,6 +944,8 @@ enum IDType
     SaveCurrentLayoutTourAction,
     RemoveCurrentLayoutTourAction,
 
+    CurrentLayoutTourSettingsAction,
+
     /* Timeline actions. */
 
     /**

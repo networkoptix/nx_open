@@ -13,7 +13,7 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_settings.h>
-#include <nx/utils/abstract_service_settings.h>
+#include <nx/utils/basic_service_settings.h>
 #include <nx/utils/settings.h>
 
 #include <utils/common/command_line_parser.h>
@@ -85,17 +85,12 @@ struct ConnectionParameters:
  * @note Values specified via command-line have priority over conf file (or win32 registry) values.
  */
 class Settings:
-    public nx::utils::AbstractServiceSettings
+    public nx::utils::BasicServiceSettings
 {
+    using base_type = nx::utils::BasicServiceSettings;
+
 public:
     Settings();
-
-    /**
-     * Loads settings from both command line and conf file (or win32 registry).
-     */
-    virtual void load(int argc, const char **argv) override;
-    virtual bool isShowHelpRequested() const override;
-    virtual void printCmdLineArgsHelp() override;
 
     virtual QString dataDir() const override;
     virtual nx::utils::log::Settings logging() const override;
@@ -109,10 +104,6 @@ public:
     const Statistics& statistics() const;
 
 private:
-    QnCommandLineParser m_commandLineParser;
-    QnSettings m_settings;
-    bool m_showHelp;
-
     General m_general;
     nx::utils::log::Settings m_logging;
     CloudDB m_cloudDB;
@@ -122,9 +113,9 @@ private:
     nx::db::ConnectionOptions m_dbConnectionOptions;
     Statistics m_statistics;
 
-    void fillSupportedCmdParameters();
+    virtual void loadSettings() override;
+
     void initializeWithDefaultValues();
-    void loadConfiguration();
     void readEndpointList(
         const QString& str,
         std::list<SocketAddress>* const addrToListenList);

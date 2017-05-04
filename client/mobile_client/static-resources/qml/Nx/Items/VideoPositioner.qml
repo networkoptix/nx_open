@@ -17,18 +17,12 @@ Item
     property real visibleVideoWidth: Utils.isRotated90(videoRotation) ? item.height : item.width
     property real visibleVideoHeight: Utils.isRotated90(videoRotation) ? item.width : item.height
 
-    readonly property real horizontalPadding:
-    {
-        return (Utils.isRotated90(videoRotation)
-            ? (width - item.height) / 2
-            : (width - item.width) / 2)
-    }
-    readonly property real verticalPadding:
-    {
-        return (Utils.isRotated90(videoRotation)
-            ? (height - item.width) / 2
-            : (height - item.height) / 2)
-    }
+    readonly property real leftPadding: (width - visibleVideoWidth) / 2
+    readonly property real rightPadding: leftPadding
+
+    readonly property real topPadding:
+        (height - visibleVideoHeight) / 2 * (1 - videoCenterHeightOffsetFactor)
+    readonly property real bottomPadding: height - visibleVideoHeight - topPadding
 
     readonly property size implicitSize:
     {

@@ -6,12 +6,93 @@
 
 namespace {
 
-QByteArray str(const QByteArray& source)
+QByteArray str(const QString& source)
 {
-    return "\"" + source + "\"";
+    return "\"" + source.toUtf8() + "\"";
 }
 
-static const QByteArray kHelloWorld(str("hello world"));
+static const QnUuid kTestId("b4a5d7ec-1952-4225-96ed-a08eaf34d97a");
+static const QString kHelloWorld("hello world");
+
+struct IntMockData
+{
+    int a = 661;
+    int b = 662;
+    int c = 663;
+
+    IntMockData() = default;
+
+    IntMockData(int a, int b, int c): a(a), b(b), c(c) {}
+
+    bool operator==(const IntMockData& other) const
+    {
+        return a == other.a && b == other.b && c == other.c;
+    }
+
+    bool operator!=(const IntMockData& other) const { return !(*this == other); }
+
+    std::string toJsonString() const { return QJson::serialized(*this).toStdString(); }
+
+    static DeprecatedFieldNames* getDeprecatedFieldNames()
+    {
+        static DeprecatedFieldNames kDeprecatedFieldNames{
+            {lit("b"), lit("deprecatedB")},
+            {lit("c"), lit("deprecatedC")},
+        };
+        return &kDeprecatedFieldNames;
+    }
+};
+#define IntMockData_Fields (a)(b)(c)
+
+struct BriefMockData
+{
+    QnUuid id;
+    QString str;
+    BriefMockData() = default;
+    BriefMockData(const QnUuid& id, const QString& str): id(id), str(str) {}
+
+    bool operator==(const BriefMockData& other) const
+    {
+        return id == other.id && str == other.str;
+    }
+
+    bool operator!=(const BriefMockData& other) const { return !(*this == other); }
+
+};
+#define BriefMockData_Fields (id)(str)
+
+struct BriefMockDataWithVector
+{
+    std::vector<QString> items;
+
+    bool operator==(const BriefMockDataWithVector& other) const
+    {
+        return items == other.items;
+    }
+
+    bool operator!=(const BriefMockDataWithVector& other) const { return !(*this == other); }
+};
+#define BriefMockDataWithVector_Fields (items)
+
+struct BriefMockDataWithQList
+{
+    QList<QString> items;
+
+    bool operator==(const BriefMockDataWithQList& other) const
+    {
+        return items == other.items;
+    }
+
+    bool operator!=(const BriefMockDataWithQList& other) const { return !(*this == other); }
+};
+#define BriefMockDataWithQList_Fields (items)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((IntMockData), (json), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (BriefMockData)
+    (BriefMockDataWithVector)
+    (BriefMockDataWithQList),
+    (json), _Fields, (brief, true))
 
 } // namespace
 
@@ -25,14 +106,14 @@ TEST_F(QnFusionTestFixture, integralTypes)
 
 TEST_F(QnFusionTestFixture, QtStringTypes)
 {
-    //ASSERT_EQ(kHelloWorld, QJson::serialized(kHelloWorld)); -- not supported, returns base64
-    ASSERT_EQ(kHelloWorld, QJson::serialized(QString("hello world")));
+    //ASSERT_EQ(kHelloWorld, QJson::serialized(kHelloWorld.toUtf8())); -- not supported, returns base64
+    ASSERT_EQ(str(kHelloWorld), QJson::serialized(kHelloWorld));
 }
 
 TEST_F(QnFusionTestFixture, stdStringTypes)
 {
     // ASSERT_EQ(kHelloWorld, QJson::serialized("hello world")); -- not supported, return "true"
-    ASSERT_EQ(kHelloWorld, QJson::serialized(std::string("hello world")));
+    ASSERT_EQ(str(kHelloWorld), QJson::serialized(kHelloWorld.toStdString()));
 }
 
 TEST_F(QnFusionTestFixture, enumValue)
@@ -67,44 +148,9 @@ TEST_F(QnFusionTestFixture, flagsNumeric)
     ASSERT_EQ(nx::Flag1|nx::Flag2, flags);
 }
 
-namespace {
-
-struct MockData
-{
-    int a = 661;
-    int b = 662;
-    int c = 663;
-
-    MockData() = default;
-
-    MockData(int a, int b, int c): a(a), b(b), c(c) {}
-
-    bool operator==(const MockData& other) const
-    {
-        return a == other.a && b == other.b && c == other.c;
-    }
-
-    bool operator!=(const MockData& other) const { return !(*this == other); }
-
-    std::string toJsonString() const { return QJson::serialized(*this).toStdString(); }
-
-    static DeprecatedFieldNames* getDeprecatedFieldNames()
-    {
-        static DeprecatedFieldNames kDeprecatedFieldNames{
-            {lit("b"), lit("deprecatedB")},
-            {lit("c"), lit("deprecatedC")},
-        };
-        return &kDeprecatedFieldNames;
-    }
-};
-#define MockData_Fields (a)(b)(c)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((MockData), (ubjson)(json), _Fields)
-
-} // namespace
-
 TEST_F(QnFusionTestFixture, deserializeStruct)
 {
-    const MockData data(113, 115, 117);
+    const IntMockData data(113, 115, 117);
 
     const QByteArray jsonStr = R"json(
         {
@@ -114,14 +160,14 @@ TEST_F(QnFusionTestFixture, deserializeStruct)
         }
     )json";
 
-    MockData deserializedData;
+    IntMockData deserializedData;
     ASSERT_TRUE(QJson::deserialize(jsonStr, &deserializedData));
     ASSERT_EQ(data, deserializedData);
 }
 
 TEST_F(QnFusionTestFixture, deserializeStructWithDeprecatedFields)
 {
-    const MockData data(113, 115, 117);
+    const IntMockData data(113, 115, 117);
 
     const QByteArray jsonStr = R"json(
         {
@@ -131,7 +177,87 @@ TEST_F(QnFusionTestFixture, deserializeStructWithDeprecatedFields)
         }
     )json";
 
-    MockData deserializedData;
+    IntMockData deserializedData;
     ASSERT_TRUE(QJson::deserialize(jsonStr, &deserializedData));
     ASSERT_EQ(data, deserializedData);
+}
+
+TEST_F(QnFusionTestFixture, serializeStructBriefId)
+{
+    BriefMockData data{QnUuid(), kHelloWorld};
+    const QByteArray jsonStr = QString(R"json({"str":"%1"})json").arg(kHelloWorld).toUtf8();
+    ASSERT_EQ(jsonStr, QJson::serialized(data));
+    ASSERT_EQ(data, QJson::deserialized<BriefMockData>(jsonStr));
+}
+
+TEST_F(QnFusionTestFixture, serializeStructBriefStr)
+{
+    BriefMockData data{kTestId, QString()};
+    const QByteArray jsonStr = QString(R"json({"id":"%1"})json").arg(kTestId.toString()).toUtf8();
+    ASSERT_EQ(jsonStr, QJson::serialized(data));
+    ASSERT_EQ(data, QJson::deserialized<BriefMockData>(jsonStr));
+}
+
+TEST_F(QnFusionTestFixture, serializeStructBriefBoth)
+{
+    BriefMockData data;
+    const QByteArray jsonStr = QString(R"json({})json").toUtf8();
+    ASSERT_EQ(jsonStr, QJson::serialized(data));
+    ASSERT_EQ(data, QJson::deserialized<BriefMockData>(jsonStr));
+}
+
+TEST_F(QnFusionTestFixture, serializeStructListBrief)
+{
+    std::vector<BriefMockData> data;
+    data.emplace_back(QnUuid(), kHelloWorld);
+    data.emplace_back(kTestId, QString());
+    data.emplace_back(QnUuid(), QString());
+    const QByteArray jsonStr = QString(R"json([{"str":"%1"},{"id":"%2"},{}])json")
+        .arg(kHelloWorld)
+        .arg(kTestId.toString())
+        .toUtf8();
+    ASSERT_EQ(jsonStr, QJson::serialized(data));
+    ASSERT_EQ(data, QJson::deserialized<std::vector<BriefMockData>>(jsonStr));
+}
+
+TEST_F(QnFusionTestFixture, serializeVectorBrief)
+{
+    BriefMockDataWithVector data;
+    data.items.push_back(kHelloWorld);
+    data.items.push_back(QString());
+    data.items.push_back(kHelloWorld);
+    const QByteArray jsonStr = QString(R"json({"items":["%1","","%1"]})json")
+        .arg(kHelloWorld)
+        .toUtf8();
+    ASSERT_EQ(jsonStr, QJson::serialized(data));
+    ASSERT_EQ(data, QJson::deserialized<BriefMockDataWithVector>(jsonStr));
+}
+
+TEST_F(QnFusionTestFixture, serializeEmptyVectorBrief)
+{
+    BriefMockDataWithVector data;
+    const QByteArray jsonStr = QString(R"json({})json").toUtf8();
+    ASSERT_EQ(jsonStr, QJson::serialized(data));
+    ASSERT_EQ(data, QJson::deserialized<BriefMockDataWithVector>(jsonStr));
+}
+
+TEST_F(QnFusionTestFixture, serializeQListBrief)
+{
+    BriefMockDataWithQList data;
+    data.items.push_back(kHelloWorld);
+    data.items.push_back(QString());
+    data.items.push_back(kHelloWorld);
+    const QByteArray jsonStr = QString(R"json({"items":["%1","","%1"]})json")
+        .arg(kHelloWorld)
+        .toUtf8();
+    ASSERT_EQ(jsonStr, QJson::serialized(data));
+    ASSERT_EQ(data, QJson::deserialized<BriefMockDataWithQList>(jsonStr));
+}
+
+TEST_F(QnFusionTestFixture, serializeEmptyQListBrief)
+{
+    BriefMockDataWithQList data;
+    const QByteArray jsonStr = QString(R"json({})json").toUtf8();
+    ASSERT_EQ(jsonStr, QJson::serialized(data));
+    ASSERT_EQ(data, QJson::deserialized<BriefMockDataWithQList>(jsonStr));
 }

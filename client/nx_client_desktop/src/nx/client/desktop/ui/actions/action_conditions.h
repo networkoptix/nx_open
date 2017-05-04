@@ -37,16 +37,11 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(TimePeriodTypes)
  * Base class for implementing conditions that must be satisfied for the
  * action to be triggerable via hotkey or visible in the menu.
  */
-class Condition: public QObject, public QnWorkbenchContextAware
+class Condition
 {
 public:
-    /**
-     * Constructor.
-     *
-     * \param parent                    Context-aware parent.
-     */
-    Condition(QObject* parent);
-
+    Condition();
+    virtual ~Condition();
     /**
      * Main condition checking function.
      *
@@ -57,60 +52,63 @@ public:
      * \param parameters                Parameters to check.
      * \returns                         Check result.
      */
-    virtual ActionVisibility check(const Parameters& parameters);
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context);
 
     /**
      * Specialized condition function that catches all action parameters that
      * are convertible to a resource list (<tt>Qn::ResourceType</tt>).
      */
-    virtual ActionVisibility check(const QnResourceList& resources);
+    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context);
 
     /**
      * Specialized condition function that catches all action parameters that
      * are convertible to a list of layout items (<tt>Qn::LayoutItemType</tt>).
      */
-    virtual ActionVisibility check(const QnLayoutItemIndexList& layoutItems);
+    virtual ActionVisibility check(const QnLayoutItemIndexList& layoutItems, QnWorkbenchContext* context);
 
     /**
      * Specialized condition function that catches all action parameters that
      * are convertible to a list of resource widgets. (<tt>Qn::WidgetType</tt>).
      */
-    virtual ActionVisibility check(const QnResourceWidgetList& widgets);
+    virtual ActionVisibility check(const QnResourceWidgetList& widgets, QnWorkbenchContext* context);
 
     /**
      * Specialized condition function that catches all action parameters that
      * are convertible to a list of workbench layouts. (<tt>Qn::LayoutType</tt>).
      */
-    virtual ActionVisibility check(const QnWorkbenchLayoutList& layouts);
+    virtual ActionVisibility check(const QnWorkbenchLayoutList& layouts, QnWorkbenchContext* context);
 };
 
-ConditionPtr operator&&(const ConditionPtr& l, const ConditionPtr& r);
-ConditionPtr operator||(const ConditionPtr& l, const ConditionPtr& r);
-ConditionPtr operator!(const ConditionPtr& l);
+class ConditionWrapper
+{
+public:
+    ConditionWrapper();
+    /** Wrapper will take ownership of the condition. */
+    ConditionWrapper(Condition* condition);
+    Condition* operator->() const;
+    explicit operator bool() const;
+private:
+    std::unique_ptr<Condition> m_condition;
+};
+
+ConditionWrapper operator&&(ConditionWrapper&& l, ConditionWrapper&& r);
+ConditionWrapper operator||(ConditionWrapper&& l, ConditionWrapper&& r);
+ConditionWrapper operator!(ConditionWrapper&& l);
+
 
 /** Base condition class for actions that should be visible in videowall review mode only. */
 class VideoWallReviewModeCondition: public Condition
 {
 public:
-    VideoWallReviewModeCondition(QObject* parent);
-    bool isVideoWallReviewMode() const;
-    virtual ActionVisibility check(const Parameters& parameters) override;
-};
-
-/** Condition class for actions that should be visible in layout tour review mode */
-class LayoutTourReviewModeCondition: public Condition
-{
-public:
-    LayoutTourReviewModeCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    bool isVideoWallReviewMode(QnWorkbenchContext* context) const;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
 /** Condition class for actions, that require owner privileges. */
 class RequiresOwnerCondition: public Condition
 {
 public:
-    RequiresOwnerCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
 /**
@@ -119,8 +117,8 @@ public:
 class ItemZoomedCondition: public Condition
 {
 public:
-    ItemZoomedCondition(bool requiredZoomedState, QObject* parent);
-    virtual ActionVisibility check(const QnResourceWidgetList& widgets) override;
+    ItemZoomedCondition(bool requiredZoomedState);
+    virtual ActionVisibility check(const QnResourceWidgetList& widgets, QnWorkbenchContext* context) override;
 
 private:
     bool m_requiredZoomedState;
@@ -129,9 +127,9 @@ private:
 class SmartSearchCondition: public Condition
 {
 public:
-    SmartSearchCondition(bool requiredGridDisplayValue, QObject* parent);
-    SmartSearchCondition(QObject* parent);
-    virtual ActionVisibility check(const QnResourceWidgetList& widgets) override;
+    SmartSearchCondition();
+    SmartSearchCondition(bool requiredGridDisplayValue);
+    virtual ActionVisibility check(const QnResourceWidgetList& widgets, QnWorkbenchContext* context) override;
 
 private:
     bool m_hasRequiredGridDisplayValue;
@@ -141,9 +139,9 @@ private:
 class DisplayInfoCondition: public Condition
 {
 public:
-    DisplayInfoCondition(bool requiredDisplayInfoValue, QObject* parent);
-    DisplayInfoCondition(QObject* parent);
-    virtual ActionVisibility check(const QnResourceWidgetList& widgets) override;
+    DisplayInfoCondition(bool requiredDisplayInfoValue);
+    DisplayInfoCondition();
+    virtual ActionVisibility check(const QnResourceWidgetList& widgets, QnWorkbenchContext* context) override;
 
 private:
     bool m_hasRequiredDisplayInfoValue;
@@ -153,15 +151,7 @@ private:
 class ClearMotionSelectionCondition: public Condition
 {
 public:
-    ClearMotionSelectionCondition(QObject* parent);
-    virtual ActionVisibility check(const QnResourceWidgetList& widgets) override;
-};
-
-class CheckFileSignatureCondition: public Condition
-{
-public:
-    CheckFileSignatureCondition(QObject* parent);
-    virtual ActionVisibility check(const QnResourceWidgetList& widgets) override;
+    virtual ActionVisibility check(const QnResourceWidgetList& widgets, QnWorkbenchContext* context) override;
 };
 
 /**
@@ -172,11 +162,9 @@ class ResourceCondition: public Condition
 public:
     ResourceCondition(
         const QnResourceCriterion &criterion,
-        MatchMode matchMode,
-        QObject* parent);
-    virtual ~ResourceCondition();
-    virtual ActionVisibility check(const QnResourceList& resources) override;
-    virtual ActionVisibility check(const QnResourceWidgetList& widgets) override;
+        MatchMode matchMode);
+    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
+    virtual ActionVisibility check(const QnResourceWidgetList& widgets, QnWorkbenchContext* context) override;
 
 protected:
     template<class Item, class ItemSequence>
@@ -196,15 +184,13 @@ private:
 class ResourceRemovalCondition: public Condition
 {
 public:
-    ResourceRemovalCondition(QObject* parent): Condition(parent) {}
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
 class StopSharingCondition: public Condition
 {
 public:
-    StopSharingCondition(QObject* parent): Condition(parent) {}
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
 /**
@@ -213,8 +199,8 @@ public:
 class EdgeServerCondition: public Condition
 {
 public:
-    EdgeServerCondition(bool isEdgeServer, QObject* parent);
-    virtual ActionVisibility check(const QnResourceList& resources) override;
+    EdgeServerCondition(bool isEdgeServer);
+    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
 
 private:
     /** If this flag is true action is visible for edge servers only,
@@ -229,8 +215,7 @@ private:
 class RenameResourceCondition: public Condition
 {
 public:
-    RenameResourceCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
 /**
@@ -239,8 +224,7 @@ public:
 class LayoutItemRemovalCondition: public Condition
 {
 public:
-    LayoutItemRemovalCondition(QObject* parent);
-    virtual ActionVisibility check(const QnLayoutItemIndexList& layoutItems) override;
+    virtual ActionVisibility check(const QnLayoutItemIndexList& layoutItems, QnWorkbenchContext* context) override;
 };
 
 
@@ -250,8 +234,8 @@ public:
 class SaveLayoutCondition: public Condition
 {
 public:
-    SaveLayoutCondition(bool isCurrent, QObject* parent);
-    virtual ActionVisibility check(const QnResourceList& resources) override;
+    SaveLayoutCondition(bool isCurrent);
+    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
 
 private:
     bool m_current;
@@ -263,8 +247,8 @@ private:
 class SaveLayoutAsCondition: public Condition
 {
 public:
-    SaveLayoutAsCondition(bool isCurrent, QObject* parent);
-    virtual ActionVisibility check(const QnResourceList& resources) override;
+    SaveLayoutAsCondition(bool isCurrent);
+    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
 
 private:
     bool m_current;
@@ -276,8 +260,8 @@ private:
 class LayoutCountCondition: public Condition
 {
 public:
-    LayoutCountCondition(int minimalRequiredCount, QObject* parent);
-    virtual ActionVisibility check(const QnWorkbenchLayoutList& layouts) override;
+    LayoutCountCondition(int minimalRequiredCount);
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 
 private:
     int m_minimalRequiredCount;
@@ -290,8 +274,7 @@ private:
 class TakeScreenshotCondition: public Condition
 {
 public:
-    TakeScreenshotCondition(QObject* parent);
-    virtual ActionVisibility check(const QnResourceWidgetList& widgets) override;
+    virtual ActionVisibility check(const QnResourceWidgetList& widgets, QnWorkbenchContext* context) override;
 };
 
 
@@ -301,8 +284,7 @@ public:
 class AdjustVideoCondition: public Condition
 {
 public:
-    AdjustVideoCondition(QObject* parent);
-    virtual ActionVisibility check(const QnResourceWidgetList& widgets) override;
+    virtual ActionVisibility check(const QnResourceWidgetList& widgets, QnWorkbenchContext* context) override;
 };
 
 /**
@@ -314,9 +296,8 @@ class TimePeriodCondition: public Condition
 public:
     TimePeriodCondition(
         TimePeriodTypes periodTypes,
-        ActionVisibility nonMatchingVisibility,
-        QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+        ActionVisibility nonMatchingVisibility);
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 
 private:
     TimePeriodTypes m_periodTypes;
@@ -326,8 +307,8 @@ private:
 class ExportCondition: public Condition
 {
 public:
-    ExportCondition(bool centralItemRequired, QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    ExportCondition(bool centralItemRequired);
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 
 private:
     bool m_centralItemRequired;
@@ -336,120 +317,95 @@ private:
 class AddBookmarkCondition: public Condition
 {
 public:
-    AddBookmarkCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
 class ModifyBookmarkCondition: public Condition
 {
 public:
-    ModifyBookmarkCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
 class RemoveBookmarksCondition: public Condition
 {
 public:
-    RemoveBookmarksCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
 class PreviewCondition: public ExportCondition
 {
 public:
-    PreviewCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    PreviewCondition();
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
 class PanicCondition: public Condition
 {
 public:
-    PanicCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
 class ToggleTourCondition: public Condition
 {
 public:
-    ToggleTourCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
 class StartCurrentLayoutTourCondition: public Condition
 {
 public:
-    StartCurrentLayoutTourCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
 class ArchiveCondition: public Condition
 {
 public:
-    ArchiveCondition(QObject* parent);
-    virtual ActionVisibility check(const QnResourceList& resources) override;
+    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
 };
 
 class TimelineVisibleCondition: public Condition
 {
 public:
-    TimelineVisibleCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
 class ToggleTitleBarCondition: public Condition
 {
 public:
-    ToggleTitleBarCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
 class NoArchiveCondition: public Condition
 {
 public:
-    NoArchiveCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
 class OpenInFolderCondition: public Condition
 {
 public:
-    OpenInFolderCondition(QObject* parent);
-    virtual ActionVisibility check(const QnResourceList& resources) override;
-    virtual ActionVisibility check(const QnLayoutItemIndexList& layoutItems) override;
+    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
+    virtual ActionVisibility check(const QnLayoutItemIndexList& layoutItems, QnWorkbenchContext* context) override;
 };
 
 class LayoutSettingsCondition: public Condition
 {
 public:
-    LayoutSettingsCondition(QObject* parent);
-    virtual ActionVisibility check(const QnResourceList& resources) override;
+    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
 };
 
 class CreateZoomWindowCondition: public Condition
 {
 public:
-    CreateZoomWindowCondition(QObject* parent);
-    virtual ActionVisibility check(const QnResourceWidgetList& widgets) override;
-};
-
-class TreeNodeTypeCondition: public Condition
-{
-public:
-    TreeNodeTypeCondition(Qn::NodeType nodeType, QObject* parent);
-    TreeNodeTypeCondition(QList<Qn::NodeType> nodeTypes, QObject* parent);
-
-    virtual ActionVisibility check(const Parameters& parameters) override;
-
-private:
-    QSet<Qn::NodeType> m_nodeTypes;
+    virtual ActionVisibility check(const QnResourceWidgetList& widgets, QnWorkbenchContext* context) override;
 };
 
 class ResourceStatusCondition: public Condition
 {
 public:
-    ResourceStatusCondition(const QSet<Qn::ResourceStatus> statuses, bool allResources, QObject* parent);
-    ResourceStatusCondition(Qn::ResourceStatus status, bool allResources, QObject* parent);
-    virtual ActionVisibility check(const QnResourceList& resources) override;
+    ResourceStatusCondition(const QSet<Qn::ResourceStatus> statuses, bool allResources);
+    ResourceStatusCondition(Qn::ResourceStatus status, bool allResources);
+    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
 
 private:
     QSet<Qn::ResourceStatus> m_statuses;
@@ -459,15 +415,13 @@ private:
 class NewUserLayoutCondition: public Condition
 {
 public:
-    NewUserLayoutCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
 class OpenInLayoutCondition: public Condition
 {
 public:
-    OpenInLayoutCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 
 protected:
     bool canOpen(const QnResourceList& resources, const QnLayoutResourcePtr& layout) const;
@@ -476,57 +430,51 @@ protected:
 class OpenInCurrentLayoutCondition: public OpenInLayoutCondition
 {
 public:
-    OpenInCurrentLayoutCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
-    virtual ActionVisibility check(const QnResourceList& resources) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
+    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
 };
 
 class OpenInNewEntityCondition: public OpenInLayoutCondition
 {
 public:
-    OpenInNewEntityCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
-    virtual ActionVisibility check(const QnResourceList& resources) override;
-    virtual ActionVisibility check(const QnLayoutItemIndexList& layoutItems) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
+    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
+    virtual ActionVisibility check(const QnLayoutItemIndexList& layoutItems, QnWorkbenchContext* context) override;
 };
 
 class SetAsBackgroundCondition: public Condition
 {
 public:
-    SetAsBackgroundCondition(QObject* parent);
-    virtual ActionVisibility check(const QnResourceList& resources) override;
-    virtual ActionVisibility check(const QnLayoutItemIndexList& layoutItems) override;
+    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
+    virtual ActionVisibility check(const QnLayoutItemIndexList& layoutItems, QnWorkbenchContext* context) override;
 };
 
 class ChangeResolutionCondition: public VideoWallReviewModeCondition
 {
 public:
-    ChangeResolutionCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
 /** Display action only if user is logged in. */
 class LoggedInCondition: public Condition
 {
 public:
-    LoggedInCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
 class BrowseLocalFilesCondition: public Condition
 {
 public:
-    BrowseLocalFilesCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
 class PtzCondition: public Condition
 {
 public:
-    PtzCondition(Qn::PtzCapabilities capabilities, bool disableIfPtzDialogVisible, QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
-    virtual ActionVisibility check(const QnResourceList& resources) override;
-    virtual ActionVisibility check(const QnResourceWidgetList& widgets) override;
+    PtzCondition(Qn::PtzCapabilities capabilities, bool disableIfPtzDialogVisible);
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
+    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
+    virtual ActionVisibility check(const QnResourceWidgetList& widgets, QnWorkbenchContext* context) override;
 
 private:
     bool check(const QnPtzControllerPtr &controller);
@@ -539,22 +487,20 @@ private:
 class NonEmptyVideowallCondition: public Condition
 {
 public:
-    NonEmptyVideowallCondition(QObject* parent);
-    virtual ActionVisibility check(const QnResourceList& resources) override;
+    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
 };
 
 class RunningVideowallCondition: public Condition
 {
 public:
-    RunningVideowallCondition(QObject* parent);
-    virtual ActionVisibility check(const QnResourceList& resources) override;
+    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
 };
 
 class SaveVideowallReviewCondition: public Condition
 {
 public:
-    SaveVideowallReviewCondition(bool isCurrent, QObject* parent);
-    virtual ActionVisibility check(const QnResourceList& resources) override;
+    SaveVideowallReviewCondition(bool isCurrent);
+    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
 private:
     bool m_current;
 };
@@ -562,58 +508,50 @@ private:
 class StartVideowallCondition: public Condition
 {
 public:
-    StartVideowallCondition(QObject* parent);
-    virtual ActionVisibility check(const QnResourceList& resources) override;
+    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
 };
 
 class IdentifyVideoWallCondition: public RunningVideowallCondition
 {
 public:
-    IdentifyVideoWallCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
 class DetachFromVideoWallCondition: public Condition
 {
 public:
-    DetachFromVideoWallCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
 class StartVideoWallControlCondition: public Condition
 {
 public:
-    StartVideoWallControlCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
-
 
 class RotateItemCondition: public Condition
 {
 public:
-    RotateItemCondition(QObject* parent);
-    virtual ActionVisibility check(const QnResourceWidgetList& widgets) override;
+    virtual ActionVisibility check(const QnResourceWidgetList& widgets, QnWorkbenchContext* context) override;
 };
 
 class AutoStartAllowedCondition: public Condition
 {
 public:
-    AutoStartAllowedCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
 class DesktopCameraCondition: public Condition
 {
 public:
-    DesktopCameraCondition(QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
 class LightModeCondition: public Condition
 {
 public:
-    LightModeCondition(Qn::LightModeFlags flags, QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    LightModeCondition(Qn::LightModeFlags flags);
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 
 private:
     Qn::LightModeFlags m_lightModeFlags;
@@ -629,8 +567,8 @@ public:
         OneItem = 1
     };
 
-    ItemsCountCondition(int count, QObject* parent);
-    virtual ActionVisibility check(const Parameters& parameters) override;
+    ItemsCountCondition(int count);
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 
 private:
     int m_count;
@@ -639,23 +577,21 @@ private:
 class IoModuleCondition: public Condition
 {
 public:
-    IoModuleCondition(QObject* parent);
-    virtual ActionVisibility check(const QnResourceList& resources) override;
+    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
 };
 
 class MergeToCurrentSystemCondition: public Condition
 {
 public:
-    MergeToCurrentSystemCondition(QObject* parent);
-    virtual ActionVisibility check(const QnResourceList& resources) override;
+    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
 };
 
 
 class FakeServerCondition: public Condition
 {
 public:
-    FakeServerCondition(bool allResources, QObject* parent);
-    virtual ActionVisibility check(const QnResourceList& resources) override;
+    FakeServerCondition(bool allResources);
+    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
 
 private:
     bool m_all;
@@ -664,8 +600,8 @@ private:
 class CloudServerCondition: public Condition
 {
 public:
-    CloudServerCondition(MatchMode matchMode, QObject* parent);
-    virtual ActionVisibility check(const QnResourceList& resources) override;
+    CloudServerCondition(MatchMode matchMode);
+    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
 
 private:
     MatchMode m_matchMode;
@@ -674,13 +610,19 @@ private:
 namespace condition {
 
 /** Visible in preview search mode only. */
-ConditionPtr isPreviewSearchMode(QObject* parent);
+ConditionWrapper isPreviewSearchMode();
 
 /** Visible in safe mode only. */
-ConditionPtr isSafeMode(QObject* parent);
+ConditionWrapper isSafeMode();
 
 /** Allowed only for resource parameters with corresponding flags. */
-ConditionPtr hasFlags(Qn::ResourceFlags flags, MatchMode matchMode, QObject* parent);
+ConditionWrapper hasFlags(Qn::ResourceFlags flags, MatchMode matchMode);
+
+ConditionWrapper treeNodeType(QSet<Qn::NodeType> types);
+inline ConditionWrapper treeNodeType(Qn::NodeType type) { return treeNodeType({{type}}); }
+
+/**< Visible in layout tour preview mode only. */
+ConditionWrapper isLayoutTourReviewMode();
 
 } // namespace condition
 

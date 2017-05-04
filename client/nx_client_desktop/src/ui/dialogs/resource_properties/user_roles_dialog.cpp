@@ -20,6 +20,8 @@
 #include <ui/widgets/properties/permissions_widget.h>
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/string.h>
@@ -33,6 +35,8 @@ QnUserRolesDialog::QnUserRolesDialog(QWidget* parent):
 {
     ui->setupUi(this);
     setTabWidget(ui->tabWidget);
+
+    setHelpTopic(this, Qn::UserRoles_Help);
 
     addPage(
         SettingsPage,

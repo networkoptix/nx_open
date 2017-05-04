@@ -14,17 +14,12 @@ DeveloperSettingsHelper::DeveloperSettingsHelper(QObject* parent):
 
 QString DeveloperSettingsHelper::logLevel() const
 {
-    const auto& log = QnLog::instance();
-    return QnLog::logLevelToString(log ? log->logLevel() : cl_logUNKNOWN);
+    return nx::utils::log::toString(nx::utils::log::main()->defaultLevel());
 }
 
 void DeveloperSettingsHelper::setLogLevel(QString logLevel)
 {
-    if (auto& log = QnLog::instance())
-    {
-        log->setLogLevel(QnLog::logLevelFromString(logLevel));
-        emit logLevelChanged();
-    }
+    nx::utils::log::main()->setDefaultLevel(nx::utils::log::levelFromString(logLevel));
 }
 
 } // namespace utils

@@ -1,6 +1,7 @@
 #include "connect_session_manager.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/uuid.h>
 
 #include "traffic_relay.h"
@@ -176,6 +177,31 @@ void ConnectSessionManager::startRelaying(
     m_trafficRelay->startRelaying(
         {std::move(clientConnection), std::string()},
         {std::move(listeningPeerConnection), listeningPeerName});
+}
+
+//-------------------------------------------------------------------------------------------------
+// ConnectSessionManagerFactory
+
+static ConnectSessionManagerFactory::FactoryFunc customFactoryFunc;
+
+std::unique_ptr<AbstractConnectSessionManager> ConnectSessionManagerFactory::create(
+    const conf::Settings& settings,
+    model::ClientSessionPool* clientSessionPool,
+    model::ListeningPeerPool* listeningPeerPool,
+    controller::AbstractTrafficRelay* trafficRelay)
+{
+    if (customFactoryFunc)
+        return customFactoryFunc(settings, clientSessionPool, listeningPeerPool, trafficRelay);
+    return std::make_unique<ConnectSessionManager>(
+        settings, clientSessionPool, listeningPeerPool, trafficRelay);
+}
+
+ConnectSessionManagerFactory::FactoryFunc 
+    ConnectSessionManagerFactory::setFactoryFunc(
+        ConnectSessionManagerFactory::FactoryFunc func)
+{
+    customFactoryFunc.swap(func);
+    return func;
 }
 
 } // namespace controller

@@ -194,7 +194,7 @@ bool LayoutPreviewPainter::paintItem(QPainter* painter, const QRectF& itemRect,
             pixmap.height() * mediaLayout.height());
 
         auto drawPixmap =
-            [painter, &pixmap, &mediaLayout](const QRectF &targetRect)
+            [painter, &pixmap, &mediaLayout](const QRectF& targetRect)
             {
                 int width = targetRect.width() / mediaLayout.width();
                 int height = targetRect.height() / mediaLayout.height();

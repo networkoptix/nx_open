@@ -15,6 +15,7 @@ namespace ui {
 namespace action {
 
 class Action;
+
 class Parameters;
 
 class Manager;
@@ -27,7 +28,7 @@ class TextFactory;
 using TextFactoryPtr = QPointer<TextFactory>;
 
 class Condition;
-using ConditionPtr = QPointer<Condition>;
+class ConditionWrapper;
 
 class TargetProvider;
 

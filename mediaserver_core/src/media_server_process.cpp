@@ -192,6 +192,7 @@
 #include <utils/common/command_line_parser.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/log/log_initializer.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
 #include <utils/common/sleep.h>
@@ -940,30 +941,6 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
     qnLogMsgHandler(type, ctx, msg);
 }
 
-/** Initialize log. */
-void initLog(const QString& _logLevel)
-{
-    QString logLevel = _logLevel;
-    const QString& configLogLevel = qnServerModule->roSettings()->value("logLevel").toString();
-    if (!configLogLevel.isEmpty())
-        logLevel = configLogLevel;
-
-    QnLog::initLog(logLevel);
-    const QString& dataLocation = getDataDirectory();
-    const QString& logFileLocation = qnServerModule->roSettings()->value( "logDir", dataLocation + QLatin1String("/log/") ).toString();
-    if (!QDir().mkpath(logFileLocation))
-        NX_LOG(lit("Could not create log folder: ") + logFileLocation, cl_logALWAYS);
-    const QString& logFileName = logFileLocation + QLatin1String("log_file");
-    if (!cl_log.create(
-            logFileName,
-            qnServerModule->roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
-            qnServerModule->roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
-            QnLog::logLevelFromString(logLevel)))
-        NX_LOG(lit("Could not create log file ") + logFileName, cl_logALWAYS);
-    qnServerModule->roSettings()->setValue("logFile", logFileName);
-    NX_LOG(QLatin1String("================================================================================="), cl_logALWAYS);
-}
-
 QUrl appServerConnectionUrl(QSettings &settings)
 {
     // migrate appserverPort settings from version 2.2 if exist
@@ -1050,37 +1027,6 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
     m_platform->setUpdatePeriodMs(
         isStatisticsDisabled ? 0 : QnGlobalMonitor::kDefaultUpdatePeridMs);
 }
-
-void MediaServerProcess::initTransactionLog(const QString& logDir, QnLogLevel level)
-{
-    //on "always" log level only server start messages are logged, so using it instead of disabled
-    QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
-        logDir + lit("ec2_tran"),
-        qnServerModule->roSettings()->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toULongLong(),
-        qnServerModule->roSettings()->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toULongLong(),
-        level);
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS);
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("binary path: %1").arg(QFile::decodeName(m_argv[0])), cl_logALWAYS);
-}
-
-void MediaServerProcess::initPermissionsLog(const QString& logDir, QnLogLevel level)
-{
-    QnLog::instance(QnLog::PERMISSIONS_LOG)->create(
-        logDir + lit("permissions"),
-        qnServerModule->roSettings()->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toULongLong(),
-        qnServerModule->roSettings()->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toULongLong(),
-        level);
-    NX_LOG(QnLog::PERMISSIONS_LOG, lit("================================================================================="), cl_logALWAYS);
-    NX_LOG(QnLog::PERMISSIONS_LOG, lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS);
-    NX_LOG(QnLog::PERMISSIONS_LOG, lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
-    NX_LOG(QnLog::PERMISSIONS_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
-}
-
 
 void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
 {
@@ -2252,32 +2198,33 @@ void MediaServerProcess::updateGuidIfNeeded()
 
 void MediaServerProcess::serviceModeInit()
 {
-    const QString& dataLocation = getDataDirectory();
-    const QString& logDir = qnServerModule->roSettings()->value("logDir", dataLocation + QLatin1String("/log/")).toString();
+    const auto settings = qnServerModule->roSettings();
+    const auto dataLocation = getDataDirectory();
+    const auto binaryPath = QFile::decodeName(m_argv[0]);
 
-    initLog(cmdLineArguments().logLevel);
+    nx::utils::log::Settings logSettings;
+    logSettings.directory = settings->value("logDir").toString();
+    logSettings.maxFileSize = settings->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toUInt();
+    logSettings.maxBackupCount = settings->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toUInt();
 
-    QnLog::instance(QnLog::HTTP_LOG_INDEX)->create(
-        logDir + QLatin1String("/http_log"),
-        qnServerModule->roSettings()->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toULongLong(),
-        qnServerModule->roSettings()->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toULongLong(),
-        QnLog::logLevelFromString(cmdLineArguments().msgLogLevel));
+    logSettings.level = nx::utils::log::levelFromString(cmdLineArguments().logLevel);
+    nx::utils::log::initialize(
+        logSettings, dataLocation, qApp->applicationName(), binaryPath);
 
-    //preparing transaction log
-    initTransactionLog(logDir, QnLog::logLevelFromString(cmdLineArguments().ec2TranLogLevel));
+    logSettings.level = nx::utils::log::levelFromString(cmdLineArguments().msgLogLevel);
+    nx::utils::log::initialize(
+        logSettings, dataLocation, qApp->applicationName(), binaryPath,
+        QLatin1String("http_log"), nx::utils::log::add({QnLog::HTTP_LOG_INDEX}));
 
-    QnLog::instance(QnLog::HWID_LOG)->create(
-        logDir + QLatin1String("/hw_log"),
-        qnServerModule->roSettings()->value("maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE).toULongLong(),
-        qnServerModule->roSettings()->value("logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE).toULongLong(),
-        QnLogLevel::cl_logINFO);
+    logSettings.level = nx::utils::log::levelFromString(cmdLineArguments().ec2TranLogLevel);
+    nx::utils::log::initialize(
+        logSettings, dataLocation, qApp->applicationName(), binaryPath,
+        QLatin1String("ec2_tran"), nx::utils::log::add({QnLog::EC2_TRAN_LOG}));
 
-    initPermissionsLog(logDir, QnLog::logLevelFromString(cmdLineArguments().permissionsLogLevel));
-
-    NX_LOG(lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS);
-    NX_LOG(lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
-    NX_LOG(lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
-    NX_LOG(lit("binary path: %1").arg(QFile::decodeName(m_argv[0])), cl_logALWAYS);
+    logSettings.level = nx::utils::log::levelFromString(cmdLineArguments().permissionsLogLevel);
+    nx::utils::log::initialize(
+        logSettings, dataLocation, qApp->applicationName(), binaryPath,
+        QLatin1String("permissions"), nx::utils::log::add({QnLog::PERMISSIONS_LOG}));
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 
@@ -3000,7 +2947,7 @@ void MediaServerProcess::run()
             const auto current = nx::network::UdtStatistics::global.internetBytesTransfered.load();
             const auto update = old + (qulonglong) current;
             if (server->setProperty(Qn::UDT_INTERNET_TRFFIC, QString::number(update))
-                && common->propertyDictionary()->saveParams(server->getId()))
+                && server->saveParams())
             {
                 NX_LOG(lm("%1 is updated to %2").strs(Qn::UDT_INTERNET_TRFFIC, update), cl_logDEBUG1);
                 nx::network::UdtStatistics::global.internetBytesTransfered -= current;
