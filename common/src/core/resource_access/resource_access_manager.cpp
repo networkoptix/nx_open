@@ -4,6 +4,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <core/resource_management/layout_tour_manager.h>
 
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/global_permissions_manager.h>
@@ -631,6 +632,14 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
                         const auto server = resourcePool()->getResourceById<QnMediaServerResource>(ownerId);
                         if (server)
                             return Qn::FullLayoutPermissions;
+
+                        const auto tour = commonModule()->layoutTourManager()->tour(ownerId);
+                        if (tour.isValid())
+                        {
+                            return tour.parentId == user->getId()
+                                ? Qn::FullLayoutPermissions
+                                : Qn::NoPermissions;
+                        }
 
                         /* Layout of user, which we don't know of. */
                         return hasGlobalPermission(subject, Qn::GlobalAdminPermission)
