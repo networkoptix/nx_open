@@ -9,11 +9,8 @@ Rectangle
 {
     id: control
 
-    property alias direction: d.movementVector
-    property int joystickType: 0
-
-    signal buttonPressed(point direction)
-    signal buttonReleased()
+    property vector2d direction: Qt.vector2d(d.movementVector.x, -d.movementVector.y)
+    property int joystickType: JoystickUtils.Type.Any
 
     implicitWidth: 136
     implicitHeight: implicitWidth
@@ -24,7 +21,8 @@ Rectangle
     {
         id: customCanvas
 
-        property bool drawButtonBorders: joystickType != JoystickUtils.Type.EightWayPtz
+        property bool drawButtonBorders:
+            joystickType != JoystickUtils.Type.EightWayPtz
             && joystickType != JoystickUtils.Type.FreeWayPtz
 
         anchors.centerIn: parent
@@ -60,7 +58,7 @@ Rectangle
             context.fillStyle = createGradient(context, gradientStartPoint, d.radialPosition,
                 startColor, finishColor)
 
-            var angle = mathHelpers.getAngle(d.radialVector)
+            var angle = JoystickUtils.getAngle(d.radialVector)
             var angleOffset = customCanvas.drawButtonBorders
                 && control.joystickType != JoystickUtils.Type.FreeWayPtz
                 ? d.currentSectionData.step / 2
@@ -68,7 +66,7 @@ Rectangle
 
             var startAngle = angle - angleOffset
             var finishAngle = angle + angleOffset
-            drawSegment(context, d.centerPoint, d.controlRadius, startAngle, finishAngle)
+            drawSegment(context, d.centerPoint, control.radius, startAngle, finishAngle)
         }
 
         function createGradient(context, startPoint, finishPoint, startColor, endColor)
@@ -109,7 +107,7 @@ Rectangle
         {
             var type = control.joystickType
             var center = d.centerPoint
-            var radius = d.controlRadius
+            var radius = control.radius
             var holeLength = markerShadow.width
 
             switch(type)
@@ -129,12 +127,12 @@ Rectangle
                     return
 
                 case JoystickUtils.Type.FourWayPtz:
-                    var radial = mathHelpers.getRadialVector(radius, -Math.PI / 4)
+                    var radial = JoystickUtils.getRadialVector(radius, -Math.PI / 4)
                     var topRight = center.plus(radial)
                     var bottomLeft = center.minus(radial)
                     drawLineWithHole(context, topRight, bottomLeft, holeLength)
 
-                    radial = mathHelpers.getRadialVector(radius, Math.PI / 4)
+                    radial = JoystickUtils.getRadialVector(radius, Math.PI / 4)
                     var bottomRight = center.plus(radial)
                     var topLeft = center.minus(radial)
                     drawLineWithHole(context, bottomRight, topLeft, holeLength)
@@ -194,7 +192,7 @@ Rectangle
         y: position.y - height / 2
         scale: d.dragging ? d.movementVector.length() : 1
         visible: mouseArea.pressed
-        rotation: mathHelpers.getAngle(d.radialVector) * 180 / Math.PI
+        rotation: JoystickUtils.getAngle(d.radialVector) * 180 / Math.PI
     }
 
     Rectangle
@@ -218,19 +216,30 @@ Rectangle
         onPressed:
         {
             var mousePos = Qt.vector2d(mouseX, mouseY) //< Use explicit value to avoid dependencies
-            if (mathHelpers.pointInCircle(mousePos, d.centerPoint, d.markerRadius))
+            if (JoystickUtils.pointInCircle(mousePos, d.centerPoint, d.markerRadius))
                 d.dragging = true
 
-            customCanvas.requestPaint()
+            handleMouseMove()
         }
 
         onReleased:
         {
             d.dragging = false
+            d.markerDragStarted = false
             customCanvas.requestPaint()
         }
-        onMouseXChanged: { customCanvas.requestPaint() }
-        onMouseYChanged: { customCanvas.requestPaint() }
+
+        onMouseXChanged: handleMouseMove()
+        onMouseYChanged: handleMouseMove()
+
+        function handleMouseMove()
+        {
+            var mousePos = Qt.vector2d(mouseX, mouseY) //< Use explicit value to avoid dependencies
+            if (d.centerPoint.minus(mousePos).length() > d.markerStartDragEps)
+                d.markerDragStarted = true
+
+            customCanvas.requestPaint()
+        }
     }
 
     Repeater
@@ -239,21 +248,27 @@ Rectangle
 
         delegate: Image
         {
-            property int directionId: d.currentSectionData ? d.currentSectionData.buttons[index] : 0
-            property bool horizontal: directionId == 3 || directionId == 4
             property real offset: marker.height / 2 + 16 + 16
 
-            property vector2d position: d.centerPoint.plus(horizontal
-                ? Qt.vector2d(directionId == 3 ? -offset : offset, 0)
-                : Qt.vector2d(0, directionId == 1 ? -offset : offset))
+            property int buttonDirection:
+                d.currentSectionData
+                && d.currentSectionData.buttons.length > index
+                ? d.currentSectionData.buttons[index]
+                : JoystickUtils.Direction.Unknown
 
-            property color color: mouseArea.pressed ? "grey" : "white"
+            property bool horizontal:
+                buttonDirection == JoystickUtils.Direction.Left
+                || buttonDirection == JoystickUtils.Direction.Right
+
+            property vector2d position: d.centerPoint.plus(horizontal
+                ? Qt.vector2d(buttonDirection == JoystickUtils.Direction.Left ? -offset : offset, 0)
+                : Qt.vector2d(0, buttonDirection == JoystickUtils.Direction.Top ? -offset : offset))
 
             source: lp("/images/ptz/ptz_arrow_dimmed.png")
 
             x: position.x - width / 2
             y: position.y - height / 2
-            rotation: d.kButtonRotations[directionId]
+            rotation: JoystickUtils.ButtonRotations[buttonDirection]
             enabled: !d.dragging
             opacity: enabled ? 1 : 0.2
         }
@@ -263,19 +278,19 @@ Rectangle
     {
         id: d
 
-
-        property real controlRadius: control.width / 2
         property real markerRadius: marker.width / 2
-        property real markerMaxDistance: controlRadius - markerRadius
+        property real markerStartDragEps: markerRadius
+        property real markerMaxDistance: control.radius - markerRadius
 
         property bool dragging: false
 
         property vector2d mouseVector: mousePos.minus(centerPoint)
-        property vector2d mousePos: mouseArea.pressed
+        property vector2d mousePos: mouseArea.pressed && markerDragStarted
             ? Qt.vector2d(mouseArea.mouseX, mouseArea.mouseY)
             : centerPoint
+        property bool markerDragStarted: false
 
-        property vector2d centerPoint: Qt.vector2d(controlRadius, controlRadius)
+        property vector2d centerPoint: Qt.vector2d(control.radius, control.radius)
 
         property vector2d radialVector: radialPosition.minus(centerPoint)
         property vector2d radialPosition:
@@ -283,28 +298,26 @@ Rectangle
             if (!mouseArea.pressed)
                 return centerPoint
 
-
             if (control.joystickType == JoystickUtils.Type.FreeWayPtz)
-                return mathHelpers.directionToPosition(mouseVector, controlRadius, true)
+                return JoystickUtils.directionToPosition(mouseVector, control.radius, true)
 
-            if (!currentSectionData || currentSectionIndex == -1 || currentSectionId == -1)
+            if (!currentSectionData || currentSectionIndex == -1)
                 return centerPoint
 
-
-            var directionAngle = mathHelpers.getAngleWithOffset(
+            var directionAngle = JoystickUtils.getAngleWithOffset(
                 currentSectionData.startAngle, currentSectionData.step, currentSectionIndex + 0.5)
 
-            var radialVector = mathHelpers.getRadialVector(
-                d.controlRadius, directionAngle)
+            var vector = JoystickUtils.getRadialVector(
+                control.radius, directionAngle)
 
-            return centerPoint.plus(radialVector)
+            return centerPoint.plus(vector)
         }
 
         property vector2d movementVector:
         {
-            var cosAlpha = mathHelpers.getCosBetweenVectors(mouseVector, radialVector)
-            var coeff = 1 / controlRadius
-                * (dragging ? cosAlpha * mouseVector.length() / controlRadius : 1)
+            var cosAlpha = JoystickUtils.getCosBetweenVectors(mouseVector, radialVector)
+            var coeff = 1 / control.radius
+                * (dragging ? cosAlpha * mouseVector.length() / control.radius : 1)
 
             var result = radialVector.times(coeff)
             return result.length() > 1 ? result.normalized() : result
@@ -314,192 +327,30 @@ Rectangle
             ? movementVector.times(markerMaxDistance).plus(centerPoint)
             : centerPoint
 
-        /**
-          * Eight-way ptz has 8 sectors with following layout:
-          * 0 1 2
-          * 3 - 4
-          * 5 6 7
-          * where:
-          * 1 is "go up" command
-          * 2 is "go up-left" command
-          * .. etc
-          *
-          * All ptz with less ways count should map their sectors to listed above.
-          * For example, four-way ptz layout is:
-          *   1
-          * 3 - 4
-          *   6
-          */
-
-        property var currentSectionData:
-        {
-            switch(control.joystickType)
-            {
-                case JoystickUtils.Type.TwoWayHorizontal:
-                    return kTwoWayHorizontalSectorData
-                case JoystickUtils.Type.TwoWayVertical:
-                    return kTwoWayVerticalSectorData
-                case JoystickUtils.Type.FourWayPtz:
-                    return kFourWayPtzSectorData
-                case JoystickUtils.Type.EightWayPtz:
-                    return kEightWayPtzSectorData
-                case JoystickUtils.Type.FreeWayPtz:
-                    return kFreeWayPtzSectorData
-                default:
-                    return null //< No ptz supported
-            }
-        }
+        property var currentSectionData: JoystickUtils.getSectorData(control.joystickType)
 
         property int currentSectionIndex:
         {
-            if (control.joystickType == JoystickUtils.Type.FreeWayPtz || !currentSectionData)
+            if (control.joystickType == JoystickUtils.Type.FreeWayPtz
+                || !currentSectionData
+                || mousePos == centerPoint)
+            {
                 return -1
+            }
 
-            var sectorsCount = currentSectionData.sectorsMapping.length
+            var sectorsCount = currentSectionData.sectorsCount
             for (var i = 0; i !== sectorsCount; ++i)
             {
-                var startAngle = mathHelpers.getAngleWithOffset(
+                var startAngle = JoystickUtils.getAngleWithOffset(
                     currentSectionData.startAngle, currentSectionData.step, i)
-                var finishAngle = mathHelpers.getAngleWithOffset(
+                var finishAngle = JoystickUtils.getAngleWithOffset(
                     currentSectionData.startAngle, currentSectionData.step, i + 1)
 
-                if (mathHelpers.angleInSector(d.mousePos, d.centerPoint, startAngle, finishAngle))
+                if (JoystickUtils.angleInSector(d.mousePos, d.centerPoint, startAngle, finishAngle))
                     return i
             }
 
             throw "Can't find sector"
-        }
-
-        property int currentSectionId:
-        {
-            return control.joystickType == JoystickUtils.Type.FreeWayPtz
-                || currentSectionIndex < 0 || !currentSectionData
-                ? -1
-                : currentSectionData.sectorsMapping[currentSectionIndex]
-        }
-
-        readonly property var kTwoWayVerticalSectorData:
-        {
-            "startAngle": 0,
-            "step": Math.PI,
-            "sectorsMapping": [6, 1],
-            "buttons": [6, 1]
-        }
-
-        readonly property var kTwoWayHorizontalSectorData:
-        {
-            "startAngle": -Math.PI / 2,
-            "step": Math.PI,
-            "sectorsMapping": [4, 3],
-            "buttons": [4, 3]
-        }
-
-        readonly property var kFourWayPtzSectorData:
-        {
-            "startAngle": -Math.PI / 4,
-            "step": Math.PI / 2,
-            "sectorsMapping": [4, 6, 3, 1],
-            "buttons": [4, 6, 3, 1]
-        }
-
-        readonly property var kEightWayPtzSectorData:
-        {
-            "startAngle": -Math.PI * 7 / 8,
-            "step": Math.PI / 4,
-            "sectorsMapping": [0, 1, 2, 3, 4, 5, 6, 7],
-            "buttons": [4, 6, 3, 1]
-        }
-
-        readonly property var kFreeWayPtzSectorData:
-        {
-            "buttons": [4, 6, 3, 1]
-        }
-
-        readonly property var kButtonRotations: [-1, -90, -1,  180, 0, -1, 90, -1]
-    }
-
-    QtObject
-    {
-        id: mathHelpers
-
-        function getAngleWithOffset(startAngle, step, count)
-        {
-            return startAngle + step * count
-        }
-
-        function directionToPosition(direction, maxLength, normalize)
-        {
-            if (normalize)
-                direction = direction.normalized()
-            var vector = direction.times(maxLength)
-            return vector.plus(d.centerPoint)
-        }
-
-        function fuzzyIsNull(value)
-        {
-            var eps = 0.000001
-            return value > -eps && value < eps
-        }
-
-        function getCosBetweenVectors(first, second)
-        {
-            return first.normalized().dotProduct(second.normalized())
-        }
-
-        function getAngle(vector)
-        {
-            var horizontalVector = Qt.vector2d(1, 0)
-            var cosAlpha = getCosBetweenVectors(vector, horizontalVector)
-            var sign = fuzzyIsNull(vector.y) ? 1 : Math.abs(vector.y) / vector.y
-            var result = Math.acos(cosAlpha) * sign
-            return result
-        }
-
-        function getRadialVector(radius, angle)
-        {
-            return Qt.vector2d(radius * Math.cos(angle), radius * Math.sin(angle))
-        }
-
-        /**
-          * Checks if point (represented as vector2d) is inside circle with specified radius
-          * and center.
-          */
-        function pointInCircle(point, center, radius)
-        {
-            return point.minus(center).length() <= radius
-        }
-
-        /**
-          * Returns angle in range [0, 2 * PI)
-          */
-        function to2PIRange(angle)
-        {
-            var doublePi = Math.PI * 2
-            while (angle < 0)
-                angle += doublePi
-
-            while (angle > doublePi)
-                angle -= doublePi
-
-            return angle
-        }
-
-        /**
-          * Determnes if angle from "center" to "point" lays between specified angles.
-          * Clockwise check.
-          */
-        function angleInSector(point, center, startAngle, finishAngle)
-        {
-            var vector = point.minus(center)
-            var start = to2PIRange(startAngle)
-            var finish = to2PIRange(finishAngle)
-            var angle = to2PIRange(getAngle(vector))
-
-            var result = start < finish
-                ? angle >= start && angle <= finish
-                : angle >= start || angle <= finish
-
-            return result
         }
     }
 }
