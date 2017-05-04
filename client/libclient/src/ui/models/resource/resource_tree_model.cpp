@@ -955,6 +955,13 @@ void QnResourceTreeModel::rebuildTree()
 
     m_rootNodes[Qn::CurrentUserNode]->setResource(context()->user());
 
+    // Force re-create camera nodes for edge servers.
+    for (const auto& resource: qnResPool->getAllServers(Qn::AnyStatus))
+    {
+        if (QnMediaServerResource::isHiddenServer(resource))
+            at_server_redundancyChanged(resource);
+    }
+
     for (auto nodeType : rootNodeTypes())
     {
         auto node = m_rootNodes[nodeType];
