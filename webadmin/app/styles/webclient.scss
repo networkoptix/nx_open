@@ -2,7 +2,7 @@
 
 
 ::-webkit-scrollbar {
-  width: 12px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track
@@ -85,6 +85,17 @@ table.webclient-window>tbody>tr>td.alert{
   font-size:120%;
   line-height: 1;
 }
+
+.camera-info{
+  margin-left: -32px;
+}
+.camera-preview .camera-status{
+  position: absolute;
+  z-index: 1;
+  top: -5px;
+  left: -4px;
+}
+
 .view-wrapper{
   width:100%;
   height:100%;
@@ -230,9 +241,7 @@ table.webclient-window>tbody>tr>td.alert{
   width: 44px;
   height: 43px;
 }
-.icon-40{
-  width: 40px;
-}
+
 
 .clear-button-right{
   background-color: $light4 !important;
@@ -572,14 +581,17 @@ div.text-center{
 }
 
 .camera-preview{
-  width:72px !important;
+  width:70px !important;
   height:40px !important;
   margin-right: 10px;
-  background-color: black;
+  background-color: $light5;
+  border: 1px solid $light1;
+  boreder-radius: 1px;
+  font-size: 14px;
 
 
   position:absolute;
-  margin-left:-80px;
+  margin-left:-86px;
 }
 
 .camera-node.Unauthorized ,
@@ -615,10 +627,11 @@ div.text-center{
   margin-left: auto;
   margin-right: auto;
 }
+
 .camera-preview>.camera-preview-image>img{
   visibility:hidden;
-  max-width:72px !important;
-  max-height:40px !important;
+  max-width:68px !important;
+  max-height:38px !important;
 }
 
 
@@ -680,11 +693,13 @@ div.text-center{
   padding-left:95px;
 }
 
+.dark-theme .nav > li > a:hover{
+  background-color: $additional-light3;
+}
+
 .dark-theme .nav > li.active > a{
   text-decoration: none;
-  background-color: rgba(53,70,79,0.4);
-  border-left: 3px solid #2FA2DB;
-  padding-left:92px;
+  background-color: $light5;
 }
 
 .camera-node{
@@ -692,7 +707,7 @@ div.text-center{
 }
 
 .camera-node small{
-  color: rgb(105,135,150);
+  color: $light13;
   font-size: 75%
 }
 
@@ -728,9 +743,6 @@ div.text-center{
   .camera-preview {
     margin-left: -60px;
   }
-  .dark-theme .nav > li.active > a {
-    padding-left: 72px;
-  }
 
   .webclient-window .cameras-panel {
     height: 100%;
@@ -738,8 +750,8 @@ div.text-center{
   }
 
   .camera-preview {
-    width: 50px !important;
-    height: 30px !important;
+    width: 70px !important;
+    height: 40px !important;
   }
 
   .camera-preview > img {
@@ -787,5 +799,19 @@ div.text-center{
   vertical-align: middle;
 }
 .server-link .glyphicon{
-  top: 5px;
+  top: 6px;
+}
+
+.server-link small{
+  font-size: 75%;
+  color: $light13;
+}
+
+.server-name{
+  margin-left: -17px;
+  font-size: 14px;
+}
+
+.pull-up-3{
+  margin-top: -3px;
 }
