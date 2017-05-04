@@ -20,6 +20,7 @@ constexpr int kStartDelayMs = milliseconds(seconds(1)).count();
 constexpr int kDefaultStepDelayMs = milliseconds(minutes(1)).count();
 constexpr int kMaxAutoRank = 4;
 constexpr int kMinAutoRank = -1;
+constexpr int kDefaultRank = 0;
 
 QString statusString(bool success)
 {
@@ -115,6 +116,22 @@ bool Worker::haveChunksToDownload()
             return true;
     }
     return false;
+}
+
+QList<QnUuid> Worker::forcedPeers() const
+{
+    return m_forcedPeers;
+}
+
+void Worker::setForcedPeers(const QList<QnUuid>& forcedPeers)
+{
+    m_forcedPeers = forcedPeers;
+}
+
+void Worker::setPreferredPeers(const QList<QnUuid>& preferredPeers)
+{
+    for (const auto& peerId: preferredPeers)
+        m_peerInfoById[peerId].rank = kMaxAutoRank;
 }
 
 void Worker::setState(State state)
@@ -531,11 +548,18 @@ DownloaderFileInformation Worker::fileInformation() const
     return fileInfo;
 }
 
+QList<QnUuid> Worker::allPeers() const
+{
+    return m_forcedPeers.isEmpty()
+        ? m_peerManager->getAllPeers()
+        : m_forcedPeers;
+}
+
 QList<QnUuid> Worker::selectPeersForOperation(int count, const QList<QnUuid>& referencePeers)
 {
     QList<QnUuid> result;
 
-    auto peers = referencePeers.isEmpty() ? m_peerManager->getAllPeers() : referencePeers;
+    auto peers = referencePeers.isEmpty() ? allPeers() : referencePeers;
     if (count <= 0)
         count = m_peersPerOperation;
 

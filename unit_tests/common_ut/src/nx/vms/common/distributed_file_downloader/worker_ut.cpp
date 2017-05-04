@@ -142,6 +142,38 @@ TEST_F(DistributedFileDownloaderWorkerTest, simplePeerSelection)
     ASSERT_EQ(peers.size(), kPeersPerOperation);
 }
 
+TEST_F(DistributedFileDownloaderWorkerTest, forcedPeersSelection)
+{
+    const QList<QnUuid> forcedPeers{QnUuid::createUuid()};
+
+    peerManager->addPeer(forcedPeers.first());
+    peerManager->addPeer(QnUuid::createUuid());
+    peerManager->addPeer(QnUuid::createUuid());
+    peerManager->addPeer(QnUuid::createUuid());
+    peerManager->addPeer(QnUuid::createUuid());
+
+    worker->setForcedPeers(forcedPeers);
+    auto peers = worker->selectPeersForOperation();
+    ASSERT_EQ(peers.size(), forcedPeers.size());
+}
+
+TEST_F(DistributedFileDownloaderWorkerTest, preferredPeersSelection)
+{
+    const QList<QnUuid> preferredPeers{QnUuid::createUuid()};
+
+    peerManager->addPeer(preferredPeers.first());
+    for (int i = 0; i < 100; ++i)
+        peerManager->addPeer(QnUuid::createUuid());
+
+    worker->setPreferredPeers(preferredPeers);
+
+    for (int i = 0; i < 5; ++i)
+    {
+        auto peers = worker->selectPeersForOperation();
+        ASSERT_TRUE(peers.contains(preferredPeers.first()));
+    }
+}
+
 TEST_F(DistributedFileDownloaderWorkerTest, requestingFileInfo)
 {
     const auto& fileInfo = createTestFile();

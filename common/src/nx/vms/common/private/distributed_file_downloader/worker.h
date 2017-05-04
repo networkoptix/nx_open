@@ -55,6 +55,20 @@ public:
 
     bool haveChunksToDownload();
 
+    /*! Forced peers are peers from which the worker will choose to perform the operation.
+        All other peers from the peer manager will be ignored.
+        This is used by updates manager to prevent the downloader from looking for files
+        on peers which cannot contain an apropriate update file, e.g. ignore Linux servers
+        when looking for updates for a Windows server. */
+    QList<QnUuid> forcedPeers() const;
+    void setForcedPeers(const QList<QnUuid>& forcedPeers);
+
+    /*! Preferred peers could be used to hint the worker where to find the file.
+        This is used similarly to forced peers but does not limit the worker in selecting
+        other peers.
+     */
+    void setPreferredPeers(const QList<QnUuid>& preferredPeers);
+
 signals:
     void finished(const QString& fileName);
     void failed(const QString& fileName);
@@ -81,6 +95,7 @@ private:
 protected:
     DownloaderFileInformation fileInformation() const;
 
+    QList<QnUuid> allPeers() const;
     QList<QnUuid> selectPeersForOperation(
         int count = -1, const QList<QnUuid>& referencePeers = QList<QnUuid>());
     int selectNextChunk() const;
@@ -110,6 +125,7 @@ private:
         void decreaseRank(int value = 1);
     };
     QHash<QnUuid, PeerInformation> m_peerInfoById;
+    QList<QnUuid> m_forcedPeers;
 };
 
 } // namespace distributed_file_downloader
