@@ -96,6 +96,8 @@ protected:
     void initializeCustomAcceptors(const hpm::api::ListenResponse& response);
     void retryRegistration();
     void reportResult(SystemError::ErrorCode sysErrorCode);
+    AbstractStreamSocket* acceptNonBlocking();
+    AbstractStreamSocket* acceptBlocking();
     void acceptAsyncInternal(AcceptCompletionHandler handler);
     void onNewConnectionHasBeenAccepted(
         SystemError::ErrorCode sysErrorCode,
@@ -114,7 +116,7 @@ protected:
     std::atomic<State> m_state;
     std::vector<std::unique_ptr<AbstractTunnelAcceptor>> m_acceptors;
     IncomingTunnelPool* m_tunnelPool = nullptr;
-    std::vector<AbstractAcceptor*> m_customConnectionAcceptors;
+    std::vector<AbstractConnectionAcceptor*> m_customConnectionAcceptors;
     mutable SystemError::ErrorCode m_lastError;
     AcceptCompletionHandler m_savedAcceptHandler;
     hpm::api::ConnectionMethods m_supportedConnectionMethods = 0xFFFF; //< No limits by default.
@@ -129,10 +131,12 @@ private:
 
 class NX_NETWORK_API CustomAcceptorFactory:
     public nx::utils::BasicFactory<
-        std::vector<std::unique_ptr<AbstractAcceptor>>(const hpm::api::ListenResponse&)>
+        std::vector<std::unique_ptr<AbstractConnectionAcceptor>>(
+            const hpm::api::ListenResponse&)>
 {
     using base_type = nx::utils::BasicFactory<
-        std::vector<std::unique_ptr<AbstractAcceptor>>(const hpm::api::ListenResponse&)>;
+        std::vector<std::unique_ptr<AbstractConnectionAcceptor>>(
+            const hpm::api::ListenResponse&)>;
 
 public:
     CustomAcceptorFactory();
@@ -140,7 +144,7 @@ public:
     static CustomAcceptorFactory& instance();
 
 private:
-    std::vector<std::unique_ptr<AbstractAcceptor>> defaultFactoryFunc(
+    std::vector<std::unique_ptr<AbstractConnectionAcceptor>> defaultFactoryFunc(
         const hpm::api::ListenResponse&);
 };
 

@@ -4,6 +4,7 @@
 #include <nx/utils/std/future.h>
 #include <nx/fusion/serialization/lexical.h>
 
+#include "tunnel/relay/relay_connection_acceptor.h"
 #include "tunnel/udp/acceptor.h"
 #include "tunnel/tcp/reverse_tunnel_acceptor.h"
 
@@ -159,33 +160,9 @@ AbstractStreamSocket* CloudServerSocket::accept()
     NX_CRITICAL(!SocketGlobals::aioService().isInAnyAioThread());
 
     if (m_socketAttributes.nonBlockingMode && *m_socketAttributes.nonBlockingMode)
-    {
-        if (auto socket = m_tunnelPool->getNextSocketIfAny())
-            return socket.release();
-        //if (auto socket = m_customConnectionAcceptors->getNextSocketIfAny())
-        //    return socket.release();
+        return acceptNonBlocking();
 
-        SystemError::setLastErrorCode(SystemError::wouldBlock);
-        return nullptr;
-    }
-
-    nx::utils::promise<SystemError::ErrorCode> promise;
-    std::unique_ptr<AbstractStreamSocket> acceptedSocket;
-    acceptAsync(
-        [&](SystemError::ErrorCode code, std::unique_ptr<AbstractStreamSocket> socket)
-        {
-            acceptedSocket = std::move(socket);
-            promise.set_value(code);
-        });
-
-    const auto errorCode = promise.get_future().get();
-    if (errorCode != SystemError::noError)
-    {
-        SystemError::setLastErrorCode(errorCode);
-        return nullptr;
-    }
-
-    return acceptedSocket.release();
+    return acceptBlocking();
 }
 
 void CloudServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
@@ -495,6 +472,41 @@ void CloudServerSocket::acceptAsyncInternal(AcceptCompletionHandler handler)
         std::bind(&CloudServerSocket::onNewConnectionHasBeenAccepted, this, _1, _2));
 }
 
+AbstractStreamSocket* CloudServerSocket::acceptNonBlocking()
+{
+    if (auto socket = m_tunnelPool->getNextSocketIfAny())
+        return socket.release();
+    for (auto& acceptor: m_customConnectionAcceptors)
+    {
+        if (auto socket = acceptor->getNextSocketIfAny())
+            return socket.release();
+    }
+
+    SystemError::setLastErrorCode(SystemError::wouldBlock);
+    return nullptr;
+}
+
+AbstractStreamSocket* CloudServerSocket::acceptBlocking()
+{
+    nx::utils::promise<SystemError::ErrorCode> promise;
+    std::unique_ptr<AbstractStreamSocket> acceptedSocket;
+    acceptAsync(
+        [&](SystemError::ErrorCode code, std::unique_ptr<AbstractStreamSocket> socket)
+        {
+            acceptedSocket = std::move(socket);
+            promise.set_value(code);
+        });
+
+    const auto errorCode = promise.get_future().get();
+    if (errorCode != SystemError::noError)
+    {
+        SystemError::setLastErrorCode(errorCode);
+        return nullptr;
+    }
+
+    return acceptedSocket.release();
+}
+
 void CloudServerSocket::onNewConnectionHasBeenAccepted(
     SystemError::ErrorCode sysErrorCode,
     std::unique_ptr<AbstractStreamSocket> socket)
@@ -603,15 +615,15 @@ CustomAcceptorFactory& CustomAcceptorFactory::instance()
     return staticInstance;
 }
 
-std::vector<std::unique_ptr<AbstractAcceptor>> CustomAcceptorFactory::defaultFactoryFunc(
-    const hpm::api::ListenResponse& response)
+std::vector<std::unique_ptr<AbstractConnectionAcceptor>> 
+    CustomAcceptorFactory::defaultFactoryFunc(const hpm::api::ListenResponse& response)
 {
-    std::vector<std::unique_ptr<AbstractAcceptor>> acceptors;
+    std::vector<std::unique_ptr<AbstractConnectionAcceptor>> acceptors;
 
     if (response.trafficRelayEndpoint)
     {
         acceptors.push_back(
-            relay::ConnectionAcceptorFactory::instance().create(
+            std::make_unique<relay::ConnectionAcceptor>(
                 *response.trafficRelayEndpoint));
     }
 

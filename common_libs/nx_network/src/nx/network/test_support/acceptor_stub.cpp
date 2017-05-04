@@ -25,6 +25,11 @@ void AcceptorStub::cancelIOSync()
 {
 }
 
+std::unique_ptr<AbstractStreamSocket> AcceptorStub::getNextSocketIfAny()
+{
+    return nullptr;
+}
+
 void AcceptorStub::setRemovedAcceptorsQueue(
     utils::SyncQueue<AcceptorStub*>* removedAcceptorsQueue)
 {

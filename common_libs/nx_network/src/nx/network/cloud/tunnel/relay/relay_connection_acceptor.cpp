@@ -28,6 +28,12 @@ void ConnectionAcceptor::cancelIOSync()
     // TODO
 }
 
+std::unique_ptr<AbstractStreamSocket> ConnectionAcceptor::getNextSocketIfAny()
+{
+    // TODO
+    return nullptr;
+}
+
 void ConnectionAcceptor::stopWhileInAioThread()
 {
     // TODO
@@ -47,7 +53,7 @@ ConnectionAcceptorFactory& ConnectionAcceptorFactory::instance()
     return factoryInstance;
 }
 
-std::unique_ptr<AbstractAcceptor> ConnectionAcceptorFactory::defaultFactoryFunc(
+std::unique_ptr<AbstractConnectionAcceptor> ConnectionAcceptorFactory::defaultFactoryFunc(
     const SocketAddress& relayEndpoint)
 {
     return std::make_unique<ConnectionAcceptor>(relayEndpoint);

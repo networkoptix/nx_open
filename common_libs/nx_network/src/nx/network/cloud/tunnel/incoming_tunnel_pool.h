@@ -11,6 +11,7 @@
 #include <nx/network/aio/timer.h>
 
 #include "abstract_tunnel_acceptor.h"
+#include "../cloud_abstract_connection_acceptor.h"
 
 namespace nx {
 namespace network {
@@ -20,7 +21,7 @@ namespace cloud {
  * Stores incoming cloud tunnels and accepts new sockets from them.
  */
 class NX_NETWORK_API IncomingTunnelPool:
-    public AbstractAcceptor
+    public AbstractConnectionAcceptor
 {
     using base_type = AbstractAcceptor;
 
@@ -31,16 +32,12 @@ public:
 
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
     virtual void cancelIOSync() override;
+    virtual std::unique_ptr<AbstractStreamSocket> getNextSocketIfAny() override;
 
     void setAcceptTimeout(boost::optional<std::chrono::milliseconds> acceptTimeout);
 
     /** Saves and accepts @param connection until it's exhausted. */
     void addNewTunnel(std::unique_ptr<AbstractIncomingTunnelConnection> connection);
-
-    /** 
-     * @returns queued socket if avaliable. nullptr otherwise.
-     */
-    std::unique_ptr<AbstractStreamSocket> getNextSocketIfAny();
 
 private:
     using TunnelPool = std::set<std::unique_ptr<AbstractIncomingTunnelConnection>>;

@@ -751,10 +751,10 @@ private:
     cloud::CustomAcceptorFactory::Function m_factoryFuncBak;
     utils::SyncQueue<network::test::AcceptorStub*> m_removedAcceptorsQueue;
 
-    std::vector<std::unique_ptr<AbstractAcceptor>> customAcceptorFactoryFunc(
+    std::vector<std::unique_ptr<AbstractConnectionAcceptor>> customAcceptorFactoryFunc(
         const hpm::api::ListenResponse& /*response*/)
     {
-        std::vector<std::unique_ptr<AbstractAcceptor>> acceptors;
+        std::vector<std::unique_ptr<AbstractConnectionAcceptor>> acceptors;
         auto acceptor = std::make_unique<network::test::AcceptorStub>();
         acceptor->setRemovedAcceptorsQueue(&m_removedAcceptorsQueue);
         acceptors.push_back(std::move(acceptor));

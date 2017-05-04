@@ -1,15 +1,14 @@
 #pragma once
 
+#include <nx/network/cloud/cloud_abstract_connection_acceptor.h>
 #include <nx/utils/thread/sync_queue.h>
-
-#include "../abstract_acceptor.h"
 
 namespace nx {
 namespace network {
 namespace test {
 
 class NX_NETWORK_API AcceptorStub:
-    public AbstractAcceptor
+    public cloud::AbstractConnectionAcceptor
 {
 public:
     AcceptorStub();
@@ -17,6 +16,7 @@ public:
 
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
     virtual void cancelIOSync() override;
+    virtual std::unique_ptr<AbstractStreamSocket> getNextSocketIfAny() override;
 
     void setRemovedAcceptorsQueue(
         utils::SyncQueue<AcceptorStub*>* removedAcceptorsQueue);

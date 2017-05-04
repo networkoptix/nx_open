@@ -52,6 +52,17 @@ void IncomingTunnelPool::cancelIOSync()
     m_acceptHandler = nullptr;
 }
 
+std::unique_ptr<AbstractStreamSocket> IncomingTunnelPool::getNextSocketIfAny()
+{
+    QnMutexLocker lock(&m_mutex);
+    if (m_acceptedSockets.empty())
+        return nullptr;
+
+    auto socket = std::move(m_acceptedSockets.front());
+    m_acceptedSockets.pop_front();
+    return std::move(socket);
+}
+
 void IncomingTunnelPool::setAcceptTimeout(
     boost::optional<std::chrono::milliseconds> acceptTimeout)
 {
@@ -66,17 +77,6 @@ void IncomingTunnelPool::addNewTunnel(
     auto insert = m_pool.emplace(std::move(connection));
     NX_ASSERT(insert.second);
     acceptTunnel(insert.first);
-}
-
-std::unique_ptr<AbstractStreamSocket> IncomingTunnelPool::getNextSocketIfAny()
-{
-    QnMutexLocker lock(&m_mutex);
-    if (m_acceptedSockets.empty())
-        return nullptr;
-
-    auto socket = std::move(m_acceptedSockets.front());
-    m_acceptedSockets.pop_front();
-    return std::move(socket);
 }
 
 void IncomingTunnelPool::stopWhileInAioThread()

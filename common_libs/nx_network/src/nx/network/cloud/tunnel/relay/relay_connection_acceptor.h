@@ -7,15 +7,17 @@
 #include <nx/utils/basic_factory.h>
 #include <nx/utils/move_only_func.h>
 
+#include "../../cloud_abstract_connection_acceptor.h"
+
 namespace nx {
 namespace network {
 namespace cloud {
 namespace relay {
 
 class NX_NETWORK_API ConnectionAcceptor:
-    public AbstractAcceptor
+    public AbstractConnectionAcceptor
 {
-    using base_type = AbstractAcceptor;
+    using base_type = AbstractConnectionAcceptor;
 
 public:
     ConnectionAcceptor(const SocketAddress& relayEndpoint);
@@ -24,6 +26,8 @@ public:
 
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
     virtual void cancelIOSync() override;
+
+    virtual std::unique_ptr<AbstractStreamSocket> getNextSocketIfAny() override;
 
 protected:
     virtual void stopWhileInAioThread() override;
@@ -36,10 +40,10 @@ private:
 
 class NX_NETWORK_API ConnectionAcceptorFactory:
     public nx::utils::BasicFactory<
-        std::unique_ptr<AbstractAcceptor>(const SocketAddress& /*relayEndpoint*/)>
+        std::unique_ptr<AbstractConnectionAcceptor>(const SocketAddress& /*relayEndpoint*/)>
 {
     using base_type = nx::utils::BasicFactory<
-        std::unique_ptr<AbstractAcceptor>(const SocketAddress& /*relayEndpoint*/)>;
+        std::unique_ptr<AbstractConnectionAcceptor>(const SocketAddress& /*relayEndpoint*/)>;
 
 public:
     ConnectionAcceptorFactory();
@@ -47,7 +51,7 @@ public:
     static ConnectionAcceptorFactory& instance();
 
 private:
-    std::unique_ptr<AbstractAcceptor> defaultFactoryFunc(
+    std::unique_ptr<AbstractConnectionAcceptor> defaultFactoryFunc(
         const SocketAddress& relayEndpoint);
 };
 
