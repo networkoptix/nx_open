@@ -719,17 +719,23 @@ public:
 protected:
     void givenAcceptingServerSocket()
     {
-        // TODO
+        givenInitializedServerSocket();
+        whenAcceptIsInvoked();
+        thenEveryAcceptorIsInvoked();
     }
 
     void whenAcceptIsInvoked()
     {
-        // TODO
+        using namespace std::placeholders;
+
+        cloudServerSocket().acceptAsync(
+            std::bind(&CloudServerSocketMultipleAcceptors::onAcceptCompletion, this, _1, _2));
     }
     
     void whenOneAcceptorReturnsSocket()
     {
-        // TODO
+        auto acceptor = nx::utils::random::choice(m_acceptorsCreated);
+        acceptor->addReadyConnection(std::make_unique<network::TCPSocket>(AF_INET));
     }
 
     void thenCustomAcceptorsAreRemoved()
@@ -739,26 +745,55 @@ protected:
 
     void thenEveryAcceptorIsInvoked()
     {
-        // TODO
+        for (;;)
+        {
+            bool isEveryAcceptorInvoked = true;
+            for (const auto& acceptor: m_acceptorsCreated)
+                isEveryAcceptorInvoked &= acceptor->isAsyncAcceptInProgress();
+            if (isEveryAcceptorInvoked)
+                break;
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
     }
 
     void thenEveryAcceptorIsCancelled()
     {
-        // TODO
+        for (;;)
+        {
+            bool isAnyAcceptorNotInvoked = false;
+            for (const auto& acceptor: m_acceptorsCreated)
+                isAnyAcceptorNotInvoked |= acceptor->isAsyncAcceptInProgress();
+            if (!isAnyAcceptorNotInvoked)
+                break;
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
     }
 
 private:
     cloud::CustomAcceptorFactory::Function m_factoryFuncBak;
     utils::SyncQueue<network::test::AcceptorStub*> m_removedAcceptorsQueue;
+    std::vector<network::test::AcceptorStub*> m_acceptorsCreated;
 
     std::vector<std::unique_ptr<AbstractConnectionAcceptor>> customAcceptorFactoryFunc(
         const hpm::api::ListenResponse& /*response*/)
     {
+        const int acceptorCount = 7;
+
         std::vector<std::unique_ptr<AbstractConnectionAcceptor>> acceptors;
-        auto acceptor = std::make_unique<network::test::AcceptorStub>();
-        acceptor->setRemovedAcceptorsQueue(&m_removedAcceptorsQueue);
-        acceptors.push_back(std::move(acceptor));
+        for (int i = 0; i < acceptorCount; ++i)
+        {
+            auto acceptor = std::make_unique<network::test::AcceptorStub>();
+            acceptor->setRemovedAcceptorsQueue(&m_removedAcceptorsQueue);
+            m_acceptorsCreated.push_back(acceptor.get());
+            acceptors.push_back(std::move(acceptor));
+        }
         return acceptors;
+    }
+
+    void onAcceptCompletion(
+        SystemError::ErrorCode /*sysErrorCode*/,
+        std::unique_ptr<AbstractStreamSocket> /*connection*/)
+    {
     }
 };
 
