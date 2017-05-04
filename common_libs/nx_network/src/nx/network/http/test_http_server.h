@@ -49,7 +49,7 @@ public:
     TestHttpServer();
     ~TestHttpServer();
 
-    bool bindAndListen();
+    bool bindAndListen(const SocketAddress& endpoint = SocketAddress::anyPrivateAddress);
     SocketAddress serverAddress() const;
 
     template<typename RequestHandlerType>

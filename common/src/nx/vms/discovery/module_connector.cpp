@@ -7,13 +7,18 @@ namespace nx {
 namespace vms {
 namespace discovery {
 
-static const std::chrono::milliseconds kReconnectInterval = std::chrono::minutes(1);
 static const auto kUrl = lit("http://%1/api/moduleInformation?showAddresses=false");
 static const KeepAliveOptions kKeepAliveOptions(60, 10, 3);
 
 ModuleConnector::ModuleConnector(network::aio::AbstractAioThread* thread):
-    network::aio::BasicPollable(thread)
+    network::aio::BasicPollable(thread),
+    m_reconnectInterval(std::chrono::minutes(1))
 {
+}
+
+void ModuleConnector::setReconnectInterval(std::chrono::milliseconds interval)
+{
+    m_reconnectInterval = interval;
 }
 
 void ModuleConnector::setConnectHandler(ConnectedHandler handler)
@@ -28,24 +33,40 @@ void ModuleConnector::setDisconnectHandler(DisconnectedHandler handler)
 
 void ModuleConnector::newEndpoint(const SocketAddress& endpoint, const QnUuid& id)
 {
-    getModule(id)->addEndpoint(endpoint);
+    dispatch(
+        [this, endpoint, id]()
+        {
+            getModule(id)->addEndpoint(endpoint);
+        });
 }
 
 void ModuleConnector::ignoreEndpoints(std::set<SocketAddress> endpoints, const QnUuid& id)
 {
-    getModule(id)->forbidEndpoints(std::move(endpoints));
+    dispatch(
+        [this, endpoints = std::move(endpoints), id]()
+        {
+            getModule(id)->forbidEndpoints(std::move(endpoints));
+        });
 }
 
 void ModuleConnector::activate()
 {
-    m_isPassiveMode = false;
-    for (const auto& module: m_modules)
-        module.second->ensureConnect();
+    dispatch(
+        [this]()
+        {
+            m_isPassiveMode = false;
+            for (const auto& module: m_modules)
+                module.second->ensureConnect();
+        });
 }
 
 void ModuleConnector::diactivate()
 {
-    m_isPassiveMode = true;
+    dispatch(
+        [this]()
+        {
+            m_isPassiveMode = true;
+        });
 }
 
 void ModuleConnector::stopWhileInAioThread()
@@ -72,8 +93,12 @@ ModuleConnector::Module::~Module()
 
 void ModuleConnector::Module::addEndpoint(const SocketAddress& endpoint)
 {
-    if (endpoint.address.isLocal())
-        m_endpoints[kLocal].insert(endpoint);
+    if (m_id.isNull())
+        m_endpoints[kDefault].insert(endpoint); // Do not sort endpoints for unknown server.
+    else if (endpoint.address == HostAddress::localhost)
+        m_endpoints[kLocalHost].insert(endpoint);
+    else if (endpoint.address.isLocal())
+        m_endpoints[kLocalNetwork].insert(endpoint);
     else if (endpoint.address.isIpAddress())
         m_endpoints[kIp].insert(endpoint); // TODO: check if we have such interface?
     else
@@ -84,25 +109,36 @@ void ModuleConnector::Module::addEndpoint(const SocketAddress& endpoint)
 
 void ModuleConnector::Module::ensureConnect()
 {
-    if (m_httpClients.empty() && !m_socket)
+    if ((m_id.isNull()) || (m_httpClients.empty() && !m_socket))
         connect(m_endpoints.begin());
 }
 
 void ModuleConnector::Module::forbidEndpoints(std::set<SocketAddress> endpoints)
 {
+    NX_ASSERT(!m_id.isNull(), "Does it make sense to block endpoints for unknown servers?");
     m_forbiddenEndpoints = std::move(endpoints);
 }
 
 void ModuleConnector::Module::connect(Endpoints::iterator endpointsGroup)
 {
     if (m_parent->m_isPassiveMode)
+    {
+        if (!m_id.isNull())
+            m_parent->m_disconnectedHandler(m_id);
+
         return;
+    }
 
     if (endpointsGroup == m_endpoints.end())
     {
-        NX_LOGX(lm("No more endpoints, retry in %1").strs(kReconnectInterval), cl_logDEBUG2);
-        m_parent->m_disconnectedHandler(m_id);
-        m_timer.start(kReconnectInterval, [this](){ connect(m_endpoints.begin()); });
+        if (!m_id.isNull())
+        {
+            const auto reconnectInterval = m_parent->m_reconnectInterval;
+            NX_LOGX(lm("No more endpoints, retry in %1").str(reconnectInterval), cl_logDEBUG2);
+            m_timer.start(reconnectInterval, [this](){ connect(m_endpoints.begin()); });
+            m_parent->m_disconnectedHandler(m_id);
+        }
+
         return;
     }
 
@@ -114,40 +150,52 @@ void ModuleConnector::Module::connect(Endpoints::iterator endpointsGroup)
             continue;
 
         ++endpointsInProgress;
-        NX_LOGX(lm("Attempt to connect to %1 by %2").strs(m_id, endpoint), cl_logDEBUG2);
-        const auto client = nx_http::AsyncHttpClient::create();
-        m_httpClients.insert(client);
-        client->bindToAioThread(m_timer.getAioThread());
-        client->doGet(kUrl.arg(endpoint.toString()),
-            [this, endpoint, endpointsGroup](nx_http::AsyncHttpClientPtr client) mutable
-            {
-                m_httpClients.erase(client);
-                const auto moduleInformation = getInformation(client);
-                if (moduleInformation)
-                {
-                    if (moduleInformation->id == m_id)
-                    {
-                        if (saveConnection(endpoint, std::move(client), *moduleInformation))
-                            return;
-                    }
-                    else
-                    {
-                        // Transfer this connection to a different module.
-                        endpointsGroup->second.erase(endpoint);
-                        m_parent->getModule(moduleInformation->id)
-                            ->saveConnection(endpoint, std::move(client), *moduleInformation);
-                    }
-                }
-
-                if (!m_httpClients.empty())
-                    return; //< Wait for other HTTP clients.
-
-                connect(++endpointsGroup);
-            });
+        connect(endpoint, endpointsGroup);
     }
 
     if (endpointsInProgress == 0)
         return connect(++endpointsGroup);
+}
+
+void ModuleConnector::Module::connect(
+    const SocketAddress& endpoint, Endpoints::iterator endpointsGroup)
+{
+    NX_LOGX(lm("Attempt to connect to %1 by %2").strs(m_id, endpoint), cl_logDEBUG2);
+    const auto client = nx_http::AsyncHttpClient::create();
+    m_httpClients.insert(client);
+    client->bindToAioThread(m_timer.getAioThread());
+    client->doGet(kUrl.arg(endpoint.toString()),
+        [this, endpoint, endpointsGroup](nx_http::AsyncHttpClientPtr client) mutable
+        {
+            m_httpClients.erase(client);
+            const auto moduleInformation = getInformation(client);
+            if (moduleInformation)
+            {
+                if (moduleInformation->id == m_id)
+                {
+                    if (saveConnection(endpoint, std::move(client), *moduleInformation))
+                        return;
+                }
+                else
+                {
+                    // Transfer this connection to a different module.
+                    endpointsGroup->second.erase(endpoint);
+                    m_parent->getModule(moduleInformation->id)
+                        ->saveConnection(endpoint, std::move(client), *moduleInformation);
+                }
+            }
+
+            if (m_id.isNull())
+            {
+                endpointsGroup->second.erase(endpoint);
+                return;
+            }
+
+            if (!m_httpClients.empty())
+                return; //< Wait for other HTTP clients.
+
+            connect(++endpointsGroup);
+        });
 }
 
 boost::optional<QnModuleInformation> ModuleConnector::Module::getInformation(
@@ -193,7 +241,8 @@ boost::optional<QnModuleInformation> ModuleConnector::Module::getInformation(
 bool ModuleConnector::Module::saveConnection(
    SocketAddress endpoint, nx_http::AsyncHttpClientPtr client, const QnModuleInformation& information)
 {
-    if (m_socket)
+    NX_ASSERT(!m_id.isNull());
+    if (m_socket || m_id.isNull())
         return true;
 
     for (const auto& client: m_httpClients)

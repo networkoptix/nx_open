@@ -19,6 +19,7 @@ public:
     typedef nx::utils::MoveOnlyFunc<void(QnUuid)> DisconnectedHandler;
 
     ModuleConnector(network::aio::AbstractAioThread* thread = nullptr);
+    void setReconnectInterval(std::chrono::milliseconds interval);
     void setConnectHandler(ConnectedHandler handler);
     void setDisconnectHandler(DisconnectedHandler handler);
 
@@ -43,10 +44,11 @@ private:
         void forbidEndpoints(std::set<SocketAddress> endpoints);
 
     private:
-        enum Priority { kLocal, kIp, kOther };
+        enum Priority { kDefault, kLocalHost, kLocalNetwork, kIp, kOther };
         typedef std::map<Priority, std::set<SocketAddress>> Endpoints;
 
         void connect(Endpoints::iterator endpointsGroup);
+        void connect(const SocketAddress& endpoint, Endpoints::iterator endpointsGroup);
         boost::optional<QnModuleInformation> getInformation(nx_http::AsyncHttpClientPtr client);
         bool saveConnection(SocketAddress endpoint, nx_http::AsyncHttpClientPtr client,
             const QnModuleInformation& information);
@@ -65,6 +67,7 @@ private:
 
 private:
     bool m_isPassiveMode = true;
+    std::chrono::milliseconds m_reconnectInterval;
     ConnectedHandler m_connectedHandler;
     DisconnectedHandler m_disconnectedHandler;
     std::map<QnUuid, std::unique_ptr<Module>> m_modules;
