@@ -59,12 +59,15 @@ public:
         const QString& fileName, bool deleteData = true);
 
     QVector<QByteArray> getChunkChecksums(const QString& fileName);
+    DistributedFileDownloader::ErrorCode setChunkChecksums(
+        const QString& fileName, const QVector<QByteArray>& chunkChecksums);
 
     void findDownloads();
 
     static QByteArray calculateMd5(const QString& filePath);
     static qint64 calculateFileSize(const QString& filePath);
     static int calculateChunkCount(qint64 fileSize, qint64 calculateChunkSize);
+    static QVector<QByteArray> calculateChecksums(const QString& filePath, qint64 chunkSize);
 
 private:
     bool saveMetadata(const FileMetadata& fileInformation);
@@ -76,8 +79,6 @@ private:
     static bool reserveSpace(const QString& fileName, const qint64 size);
     static QString metadataFileName(const QString& fileName);
     static qint64 calculateChunkSize(qint64 fileSize, int chunkIndex, qint64 calculateChunkSize);
-    static QVector<QByteArray> calculateChecksums(
-        const QString& fileName, qint64 calculateChunkSize);
 
 private:
     const QDir m_downloadsDirectory;

@@ -570,6 +570,63 @@ TEST_F(DistributedFileDownloaderStorageTest, getChecksumsAfterDownload)
     ASSERT_FALSE(checksums[0].isEmpty());
 }
 
+TEST_F(DistributedFileDownloaderStorageTest, setChecksumsToCorruptedFile)
+{
+    const int kChunkSize = 1024 * 1024;
+
+    createDefaultTestFile();
+    const auto checksums = Storage::calculateChecksums(testFilePath, kChunkSize);
+
+    QFile file(testFilePath);
+    if (!file.open(QFile::ReadWrite))
+    {
+        NX_ASSERT(false, "Cannot open test file.");
+        return;
+    }
+    file.seek(0);
+    file.write(QByteArray(kChunkSize, '\0'));
+    file.close();
+
+    DownloaderFileInformation fileInfo(testFileName);
+    fileInfo.status = DownloaderFileInformation::Status::corrupted;
+    fileInfo.size = kTestFileSize;
+    fileInfo.md5 = testFileMd5;
+    fileInfo.chunkSize = kChunkSize;
+    fileInfo.downloadedChunks.fill(true, Storage::calculateChunkCount(kTestFileSize, kChunkSize));
+
+    ASSERT_EQ(downloaderStorage->addFile(fileInfo),
+        DistributedFileDownloader::ErrorCode::noError);
+
+    ASSERT_EQ(downloaderStorage->setChunkChecksums(testFileName, QVector<QByteArray>(1)),
+              DistributedFileDownloader::ErrorCode::invalidChecksum);
+
+    ASSERT_EQ(downloaderStorage->setChunkChecksums(testFileName, checksums),
+        DistributedFileDownloader::ErrorCode::noError);
+
+    fileInfo = downloaderStorage->fileInformation(testFileName);
+    ASSERT_FALSE(fileInfo.downloadedChunks[0]);
+    ASSERT_EQ(fileInfo.downloadedChunks.count(true), fileInfo.downloadedChunks.size() - 1);
+    ASSERT_EQ(fileInfo.status, DownloaderFileInformation::Status::downloading);
+}
+
+TEST_F(DistributedFileDownloaderStorageTest, setChecksumsToDownloadedFile)
+{
+    createDefaultTestFile();
+
+    DownloaderFileInformation fileInfo(testFileName);
+    fileInfo.status = DownloaderFileInformation::Status::downloaded;
+
+    ASSERT_EQ(downloaderStorage->addFile(fileInfo),
+        DistributedFileDownloader::ErrorCode::noError);
+
+    fileInfo = downloaderStorage->fileInformation(testFileName);
+
+    ASSERT_EQ(
+        downloaderStorage->setChunkChecksums(
+            testFileName, QVector<QByteArray>(fileInfo.downloadedChunks.size())),
+        DistributedFileDownloader::ErrorCode::fileAlreadyDownloaded);
+}
+
 } // namespace test
 } // namespace distributed_file_downloader
 } // namespace common

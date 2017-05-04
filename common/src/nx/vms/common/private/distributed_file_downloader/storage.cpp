@@ -307,6 +307,45 @@ QVector<QByteArray> Storage::getChunkChecksums(
     return fileInfo.chunkChecksums;
 }
 
+DistributedFileDownloader::ErrorCode Storage::setChunkChecksums(
+    const QString& fileName, const QVector<QByteArray>& chunkChecksums)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    auto it = m_fileInformationByName.find(fileName);
+    if (it == m_fileInformationByName.end())
+        return DistributedFileDownloader::ErrorCode::fileDoesNotExist;
+
+    if (it->chunkChecksums == chunkChecksums)
+        return DistributedFileDownloader::ErrorCode::noError;
+
+    if (it->status == DownloaderFileInformation::Status::downloaded)
+        return DistributedFileDownloader::ErrorCode::fileAlreadyDownloaded;
+
+    if (it->size >= 0 && it->downloadedChunks.size() != chunkChecksums.size())
+        return DistributedFileDownloader::ErrorCode::invalidChecksum;
+
+    it->chunkChecksums = chunkChecksums;
+
+    if (it->size < 0)
+        return DistributedFileDownloader::ErrorCode::noError;
+
+    auto actualChecksums = calculateChecksums(filePath(fileName), it->chunkSize);
+    if (actualChecksums.size() != it->downloadedChunks.size())
+        actualChecksums.resize(it->downloadedChunks.size());
+
+    for (int i = 0; i < actualChecksums.size(); ++i)
+    {
+        if (actualChecksums[i] != chunkChecksums[i])
+        {
+            it->downloadedChunks[i] = false;
+            it->status = DownloaderFileInformation::Status::downloading;
+        }
+    }
+
+    return DistributedFileDownloader::ErrorCode::noError;
+}
+
 void Storage::findDownloads()
 {
     if (!m_downloadsDirectory.exists())
@@ -349,6 +388,31 @@ int Storage::calculateChunkCount(qint64 fileSize, qint64 chunkSize)
         return -1;
 
     return (fileSize + chunkSize - 1) / chunkSize;
+}
+
+QVector<QByteArray> Storage::calculateChecksums(const QString& filePath, qint64 chunkSize)
+{
+    QVector<QByteArray> result;
+
+    QFile file(filePath);
+
+    if (!file.open(QFile::ReadOnly))
+        return result;
+
+    const qint64 fileSize = file.size();
+    const int chunkCount = calculateChunkCount(fileSize, chunkSize);
+    result.resize(chunkCount);
+
+    for (int i = 0; i < chunkCount; ++i)
+    {
+        const auto data = file.read(chunkSize);
+        if (data.size() != calculateChunkSize(fileSize, i, chunkSize))
+            return QVector<QByteArray>();
+
+        result[i] = QCryptographicHash::hash(data, QCryptographicHash::Md5);
+    }
+
+    return result;
 }
 
 bool Storage::saveMetadata(const FileMetadata& fileInformation)
@@ -484,32 +548,6 @@ qint64 Storage::calculateChunkSize(
     return chunkIndex < chunkCount - 1
         ? chunkSize
         : fileSize - chunkSize * (chunkCount - 1);
-}
-
-QVector<QByteArray> Storage::calculateChecksums(
-    const QString& fileName, qint64 chunkSize)
-{
-    QVector<QByteArray> result;
-
-    QFile file(fileName);
-
-    if (!file.open(QFile::ReadOnly))
-        return result;
-
-    const qint64 fileSize = file.size();
-    const int chunkCount = calculateChunkCount(fileSize, chunkSize);
-    result.resize(chunkCount);
-
-    for (int i = 0; i < chunkCount; ++i)
-    {
-        const auto data = file.read(chunkSize);
-        if (data.size() != calculateChunkSize(fileSize, i, chunkSize))
-            return QVector<QByteArray>();
-
-        result[i] = QCryptographicHash::hash(data, QCryptographicHash::Md5);
-    }
-
-    return result;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
