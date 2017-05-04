@@ -1,10 +1,14 @@
 [General]
+
+appserverHost=file:///sdcard/mserver.data/
+dataDir=/sdcard/mserver.data/
+
 secureAppserverConnection=1
 minStorageSpace=1000000000
 port=7001
 resourceInitThreadsCount=8
 allowSslConnections=false
-logLevel=ALWAYS
+logLevel=INFO
 statisticsReportAllowed=true
 logArchiveSize=10
 maxLogFileSize=2000000
