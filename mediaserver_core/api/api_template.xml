@@ -138,7 +138,7 @@
                         <param>
                             <name>name</name>
                             <description>Caption of the bookmark.</description>
-                            <optional>true</optional>
+                            <optional>false</optional>
                         </param>
                         <param>
                             <name>description</name>
@@ -153,12 +153,12 @@
                         <param>
                             <name>startTime</name>
                             <description>Start time of the bookmark (in milliseconds since epoch).</description>
-                            <optional>true</optional>
+                            <optional>false</optional>
                         </param>
                         <param>
                             <name>duration</name>
                             <description>Length of the bookmark (in milliseconds).</description>
-                            <optional>true</optional>
+                            <optional>false</optional>
                         </param>
                         <param>
                             <name>tag</name>
@@ -292,7 +292,7 @@
                         <param>
                             <name>name</name>
                             <description>Caption of the bookmark.</description>
-                            <optional>true</optional>
+                            <optional>false</optional>
                         </param>
                         <param>
                             <name>description</name>
@@ -312,7 +312,7 @@
                         <param>
                             <name>duration</name>
                             <description>Length of the bookmark (in milliseconds).</description>
-                            <optional>true</optional>
+                            <optional>false</optional>
                         </param>
                         <param>
                             <name>tag</name>

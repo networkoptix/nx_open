@@ -1,0 +1,15 @@
+#pragma once
+
+namespace nx {
+namespace cloud {
+namespace relay {
+namespace api {
+
+NX_NETWORK_API extern const char* const kServerIncomingConnectionsPath;
+NX_NETWORK_API extern const char* const kServerClientSessionsPath;
+NX_NETWORK_API extern const char* const kClientSessionConnectionsPath;
+
+} // namespace api
+} // namespace relay
+} // namespace cloud
+} // namespace nx

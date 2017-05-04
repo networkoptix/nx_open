@@ -17,17 +17,21 @@
 
 #include <iostream>
 
-#include <client/self_updater.h>
-
 #include <QtCore/QString>
 #include <QtCore/QDir>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QSettings>
 
 #include <QtGui/QDesktopServices>
+#include <QtGui/QWindow>
 
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
+
+#include <QtOpenGL/QGLWidget>
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
@@ -35,19 +39,22 @@
 
 #include <QtSingleApplication>
 
+#include <common/static_common_module.h>
+
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_module.h>
-
 #include <client/client_startup_parameters.h>
+#include <client/self_updater.h>
 
+#include <nx/network/app_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/timer_manager.h>
 
 #include <nx/audio/audiodevice.h>
 #include <nx/utils/crash_dump/systemexcept.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/help/help_handler.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>
@@ -77,6 +84,10 @@ namespace
 
 #ifndef API_TEST_MAIN
 
+namespace nx {
+namespace client {
+namespace desktop {
+
 int runApplication(QtSingleApplication* application, int argc, char **argv)
 {
     const QnStartupParameters startupParams = QnStartupParameters::fromCommandLineArg(argc, argv);
@@ -96,7 +107,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
                 manager->deleteLater();
             });
 
-        QUrl url(QnAppInfo::defaultCloudPortalUrl());
+        QUrl url(nx::network::AppInfo::defaultCloudPortalUrl());
         url.setPath(lit("/api/utils/visitedKey"));
         qDebug() << "Sending Cloud Portal Confirmation to" << url.toString();
 
@@ -155,7 +166,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     using namespace nx::client::plugins::io_device;
     std::unique_ptr<joystick::Manager> joystickManager(new joystick::Manager(context.data()));
 
-    QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data(), NULL, flags));
+    QScopedPointer<ui::MainWindow> mainWindow(new ui::MainWindow(context.data(), NULL, flags));
     context->setMainWindow(mainWindow.data());
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
     application->setActivationWindow(mainWindow.data());
@@ -194,12 +205,15 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     const bool instantlyMaximize = !startupParams.fullScreenDisabled && qnRuntime->isDesktopMode();
 
     if (instantlyMaximize)
-        context->action(QnActions::EffectiveMaximizeAction)->trigger();
+        context->action(ui::action::EffectiveMaximizeAction)->trigger();
     else
         mainWindow->updateDecorationsState();
 
     if (!allowMultipleClientInstances)
-        QObject::connect(application, &QtSingleApplication::messageReceived, mainWindow.data(), &QnMainWindow::handleMessage);
+    {
+        QObject::connect(application, &QtSingleApplication::messageReceived, mainWindow.data(),
+            &ui::MainWindow::handleMessage);
+    }
 
     client.initDesktopCamera(dynamic_cast<QGLWidget*>(mainWindow->viewport()));
     client.startLocalSearchers();
@@ -219,6 +233,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
 
     return result;
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx
 
 int main(int argc, char** argv)
 {
@@ -265,7 +283,7 @@ int main(int argc, char** argv)
     mac_restoreFileAccess();
 #endif
 
-    int result = runApplication(application.data(), argc, argv);
+    int result = nx::client::desktop::runApplication(application.data(), argc, argv);
 
 #ifdef Q_OS_MAC
     mac_stopFileAccess();

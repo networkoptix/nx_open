@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QThread>
+#include <QtCore/QElapsedTimer>
 
 #include "../active_camera_thumbnail_loader.h"
 

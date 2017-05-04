@@ -34,6 +34,7 @@ public:
 
     SocketAddress endpoint() const;
     int port() const;
+    QnCommonModule* commonModule() const;
 
     void addSetting(const QString& name, const QVariant& value);
 

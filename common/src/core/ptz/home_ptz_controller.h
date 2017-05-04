@@ -10,12 +10,13 @@ class QnResourcePropertyAdaptor;
 
 class QnHomePtzExecutor;
 
-class QnHomePtzController: public QnProxyPtzController {
+class QnHomePtzController: public QnProxyPtzController
+{
     Q_OBJECT
     typedef QnProxyPtzController base_type;
 
 public:
-    QnHomePtzController(const QnPtzControllerPtr &baseController);
+    QnHomePtzController(const QnPtzControllerPtr &baseController, QThread* executorThread);
     virtual ~QnHomePtzController();
 
     static bool extends(Qn::PtzCapabilities capabilities);

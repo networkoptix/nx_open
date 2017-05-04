@@ -29,6 +29,7 @@
 #include <rest/helpers/permissions_helper.h>
 #include <api/global_settings.h>
 #include <api/resource_property_adaptor.h>
+#include <media_server/media_server_module.h>
 
 namespace
 {
@@ -39,6 +40,12 @@ namespace
         ResultSkip
     };
 
+}
+
+QnConfigureRestHandler::QnConfigureRestHandler(ec2::QnTransactionMessageBus* messageBus):
+    QnJsonRestHandler(),
+    m_messageBus(messageBus)
+{
 }
 
 int QnConfigureRestHandler::executeGet(
@@ -75,7 +82,7 @@ int QnConfigureRestHandler::execute(
 {
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
-    if (!QnPermissionsHelper::hasOwnerPermissions(owner->accessRights()))
+    if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), owner->accessRights()))
         return QnPermissionsHelper::notOwnerError(result);
 
     QString errStr;
@@ -89,22 +96,22 @@ int QnConfigureRestHandler::execute(
     // Configure request must support systemName changes to maintain compatibility with NxTool
     if (!data.systemName.isEmpty())
     {
-        qnGlobalSettings->setSystemName(data.systemName);
-        qnGlobalSettings->synchronizeNowSync();
+        owner->globalSettings()->setSystemName(data.systemName);
+        owner->globalSettings()->synchronizeNowSync();
     }
 
     /* set system id and move tran log time */
-    const auto oldSystemId = qnGlobalSettings->localSystemId();
-    if (!data.localSystemId.isNull() && data.localSystemId != qnGlobalSettings->localSystemId())
+    const auto oldSystemId = owner->globalSettings()->localSystemId();
+    if (!data.localSystemId.isNull() && data.localSystemId != owner->globalSettings()->localSystemId())
     {
-        if (!backupDatabase())
+        if (!backupDatabase(owner->commonModule()->ec2Connection()))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
             NX_LOG(lit("QnConfigureRestHandler: database backup error"), cl_logWARNING);
             return CODE_OK;
         }
 
-        if (!changeLocalSystemId(data))
+        if (!changeLocalSystemId(data, m_messageBus))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
             NX_LOG(lit("QnConfigureRestHandler: can't change local system Id"), cl_logWARNING);
@@ -112,7 +119,7 @@ int QnConfigureRestHandler::execute(
         }
         if (data.wholeSystem)
         {
-            auto connection = QnAppServerConnectionFactory::getConnection2();
+            auto connection = owner->commonModule()->ec2Connection();
             auto manager = connection->getMiscManager(owner->accessRights());
             manager->changeSystemId(
                 data.localSystemId,
@@ -126,12 +133,12 @@ int QnConfigureRestHandler::execute(
     // rewrite system settings to update transaction time
     if (data.rewriteLocalSettings)
     {
-        QnAppServerConnectionFactory::getConnection2()->setTransactionLogTime(data.tranLogTime);
-        qnGlobalSettings->resynchronizeNowSync();
+        owner->commonModule()->ec2Connection()->setTransactionLogTime(data.tranLogTime);
+        owner->globalSettings()->resynchronizeNowSync();
     }
 
     /* set port */
-    int changePortResult = changePort(owner->accessRights(), data.port);
+    int changePortResult = changePort(owner, data.port);
     if (changePortResult == ResultFail)
     {
         NX_LOG(lit("QnConfigureRestHandler: can't change TCP port"), cl_logWARNING);
@@ -141,14 +148,18 @@ int QnConfigureRestHandler::execute(
     /* set password */
     if (data.hasPassword())
     {
-        if (!updateUserCredentials(data, QnOptionalBool(), qnResPool->getAdministrator()))
+        if (!updateUserCredentials(
+            owner->commonModule()->ec2Connection(),
+            data,
+            QnOptionalBool(),
+            owner->resourcePool()->getAdministrator()))
         {
             NX_LOG(lit("QnConfigureRestHandler: can't update administrator credentials"), cl_logWARNING);
             result.setError(QnJsonRestResult::CantProcessRequest, lit("PASSWORD"));
         }
         else
         {
-            auto adminUser = qnResPool->getAdministrator();
+            auto adminUser = owner->resourcePool()->getAdministrator();
             if (adminUser)
             {
                 QnAuditRecord auditRecord = qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_UserUpdate);
@@ -171,9 +182,11 @@ int QnConfigureRestHandler::execute(
     return CODE_OK;
 }
 
-int QnConfigureRestHandler::changePort(const Qn::UserAccessData& accessRights, int port)
+int QnConfigureRestHandler::changePort(const QnRestConnectionProcessor* owner, int port)
 {
-    int sPort = MSSettings::roSettings()->value(
+    const Qn::UserAccessData& accessRights = owner->accessRights();
+
+    int sPort = qnServerModule->roSettings()->value(
         nx_ms_conf::SERVER_PORT,
         nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
     if (port == 0 || port == sPort)
@@ -183,7 +196,7 @@ int QnConfigureRestHandler::changePort(const Qn::UserAccessData& accessRights, i
         return ResultFail;
 
     QnMediaServerResourcePtr server =
-        qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+        owner->resourcePool()->getResourceById<QnMediaServerResource>(owner->commonModule()->moduleGUID());
     if (!server)
         return ResultFail;
 
@@ -203,14 +216,14 @@ int QnConfigureRestHandler::changePort(const Qn::UserAccessData& accessRights, i
 
     ec2::ApiMediaServerData apiServer;
     ec2::fromResourceToApi(server, apiServer);
-    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto connection = owner->commonModule()->ec2Connection();
     auto manager = connection->getMediaServerManager(accessRights);
     auto errCode = manager->saveSync(apiServer);
     NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
     if (errCode != ec2::ErrorCode::ok)
         return ResultFail;
 
-    MSSettings::roSettings()->setValue(nx_ms_conf::SERVER_PORT, port);
+    qnServerModule->roSettings()->setValue(nx_ms_conf::SERVER_PORT, port);
 
     return ResultOk;
 }

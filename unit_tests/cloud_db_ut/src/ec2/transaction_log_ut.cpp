@@ -6,7 +6,7 @@
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/time.h>
 
-#include <utils/common/counter.h>
+#include <nx/utils/counter.h>
 #include <utils/db/async_sql_query_executor.h>
 #include <utils/db/request_execution_thread.h>
 #include <utils/db/test_support/test_with_db_helper.h>
@@ -486,7 +486,7 @@ private:
     api::SystemSharingEx m_sharing;
     QnMutex m_mutex;
     QnWaitCondition m_cond;
-    QnCounter m_startedAsyncCallsCounter;
+    nx::utils::Counter m_startedAsyncCallsCounter;
 
     nx::db::DBResult doSomeDataModifications(nx::db::QueryContext* queryContext)
     {

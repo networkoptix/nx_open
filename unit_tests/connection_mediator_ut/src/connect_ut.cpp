@@ -16,7 +16,7 @@
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/socket_global.h>
-#include <utils/crypt/linux_passwd_crypt.h>
+#include <nx/utils/crypt/linux_passwd_crypt.h>
 #include <nx/utils/std/cpp14.h>
 
 #include <listening_peer_pool.h>
@@ -84,7 +84,7 @@ TEST_F( ConnectTest, BindConnect )
     }
 
     stun::AsyncClient msClient;
-    auto msClientGuard = makeScopedGuard([&msClient]() { msClient.pleaseStopSync(); });
+    auto msClientGuard = makeScopeGuard([&msClient]() { msClient.pleaseStopSync(); });
 
     msClient.connect( address() );
     {

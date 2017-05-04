@@ -44,7 +44,7 @@ static const QString rtspUrl( QLatin1String("rtsp://192.168.0.27:554/axis-media/
 
 TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP )
 {
-    QnResourcePropertyDictionary resPropertyDictionary;
+    //QnResourcePropertyDictionary resPropertyDictionary;
     QnSyncTime syncTimeInstance;
 
     QnNetworkResourcePtr resource( new QnNetworkResource() );
@@ -503,7 +503,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP8 )
 TEST( QnMulticodecRtpReader, DISABLED_rtpParsingPerformance )
 {
     //creating necessary single-tones
-    QnResourcePropertyDictionary resPropertyDictionary;
+    //QnResourcePropertyDictionary resPropertyDictionary;
     QnSyncTime syncTimeInstance;
 
     //preparing test data

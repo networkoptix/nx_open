@@ -5,7 +5,7 @@
 #include <cloud_db_client/src/data/maintenance_data.h>
 #include <nx_ec/data/api_fwd.h>
 #include <nx/network/aio/timer.h>
-#include <utils/common/counter.h>
+#include <nx/utils/counter.h>
 #include <utils/db/db_instance_controller.h>
 
 #include "data/statistics_data.h"
@@ -57,10 +57,10 @@ private:
     ec2::SyncronizationEngine* const m_syncronizationEngine;
     const db::InstanceController& m_dbInstanceController;
     nx::network::aio::Timer m_timer;
-    QnCounter m_startedAsyncCallsCounter;
+    nx::utils::Counter m_startedAsyncCallsCounter;
 
     void onTransactionLogRead(
-        QnCounter::ScopedIncrement /*asyncCallLocker*/,
+        nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
         const std::string& systemId,
         api::ResultCode resultCode,
         std::vector<ec2::dao::TransactionLogRecord> serializedTransactions,

@@ -5,11 +5,12 @@
 
 #include <QCache>
 
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 #include <nx/network/aio/pollset.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "networkoptixmodulerevealcommon.h"
+#include <common/common_module_aware.h>
 
 
 namespace nx {
@@ -32,7 +33,8 @@ class SocketAddress;
 
     \note Requests are sent via all available local network interfaces
 */
-class QnMulticastModuleFinder : public QnLongRunnable {
+class QnMulticastModuleFinder: public QnLongRunnable, public QnCommonModuleAware
+{
     Q_OBJECT
 
 public:
@@ -46,6 +48,7 @@ public:
         \param keepAliveMultiply if 0, default value is used
     */
     QnMulticastModuleFinder(
+        QObject* parent,
         bool clientOnly,
         const QHostAddress &multicastGroupAddress = QHostAddress(),
         const quint16 multicastGroupPort = 0,

@@ -131,10 +131,9 @@ namespace nx
             emit done(message);
         }
 
-        void QnModbusAsyncClient::closeConnection(SystemError::ErrorCode closeReason, ConnectionType* connection)
+        void QnModbusAsyncClient::closeConnection(SystemError::ErrorCode closeReason,
+            ConnectionType* /*connection*/)
         {
-            QN_UNUSED(connection);
-
             m_modbusConnection.reset();
             m_state = ModbusClientState::disconnected;
 

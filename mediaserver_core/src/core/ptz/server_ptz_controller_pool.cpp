@@ -14,9 +14,11 @@
 #include <core/ptz/tour_ptz_controller.h>
 #include <core/ptz/activity_ptz_controller.h>
 #include <core/ptz/home_ptz_controller.h>
+#include <common/static_common_module.h>
+#include <core/ptz/ptz_controller_pool.h>
 
-QnServerPtzControllerPool::QnServerPtzControllerPool(QObject *parent): 
-    base_type(parent) 
+QnServerPtzControllerPool::QnServerPtzControllerPool(QObject *parent):
+    base_type(parent)
 {
     setConstructionMode(ThreadedControllerConstruction);
     connect(this, &QnServerPtzControllerPool::controllerAboutToBeChanged, this, &QnServerPtzControllerPool::at_controllerAboutToBeChanged);
@@ -30,7 +32,7 @@ QnServerPtzControllerPool::~QnServerPtzControllerPool()
 }
 
 void QnServerPtzControllerPool::registerResource(const QnResourcePtr &resource) {
-    // TODO: #Elric we're creating controller from main thread. 
+    // TODO: #Elric we're creating controller from main thread.
     // Controller ctor may take some time (several seconds).
     // => main thread will stall.
     connect(resource, &QnResource::initializedChanged, this, &QnServerPtzControllerPool::updateController, Qt::QueuedConnection);
@@ -56,7 +58,7 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
     QnPtzControllerPtr controller(camera->createPtzController());
     if(controller) {
         if(QnMappedPtzController::extends(controller->getCapabilities()))
-            if(QnPtzMapperPtr mapper = qnCommon->dataPool()->data(camera).value<QnPtzMapperPtr>(lit("ptzMapper")))
+            if(QnPtzMapperPtr mapper = qnStaticCommon->dataPool()->data(camera).value<QnPtzMapperPtr>(lit("ptzMapper")))
                 controller.reset(new QnMappedPtzController(mapper, controller));
 
         if(QnViewportPtzController::extends(controller->getCapabilities()))
@@ -66,13 +68,22 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
             controller.reset(new QnPresetPtzController(controller));
 
         if(QnTourPtzController::extends(controller->getCapabilities()))
-            controller.reset(new QnTourPtzController(controller));
+            controller.reset(new
+                QnTourPtzController(
+                    controller,
+                    qnPtzPool->commandThreadPool(),
+                    qnPtzPool->executorThread()));
 
         if(QnActivityPtzController::extends(controller->getCapabilities()))
-            controller.reset(new QnActivityPtzController(QnActivityPtzController::Server, controller));
+            controller.reset(new QnActivityPtzController(
+                commonModule(),
+                QnActivityPtzController::Server,
+                controller));
 
         if(QnHomePtzController::extends(controller->getCapabilities()))
-            controller.reset(new QnHomePtzController(controller));
+            controller.reset(new QnHomePtzController(
+                controller,
+                qnPtzPool->executorThread()));
 
         if(QnWorkaroundPtzController::extends(controller->getCapabilities()))
             controller.reset(new QnWorkaroundPtzController(controller));

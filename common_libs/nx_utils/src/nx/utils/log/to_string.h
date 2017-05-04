@@ -8,6 +8,7 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
 #include <QtCore/QUrl>
+#include <QtNetwork/QAbstractSocket>
 
 template<typename T>
 QString toStringSfinae(const T& t, decltype(&T::toString))
@@ -37,7 +38,8 @@ NX_UTILS_API QString toString(const std::chrono::hours& t);
 NX_UTILS_API QString toString(const std::chrono::minutes& t);
 NX_UTILS_API QString toString(const std::chrono::seconds& t);
 NX_UTILS_API QString toString(const std::chrono::milliseconds& t);
-
+NX_UTILS_API QString toString(QAbstractSocket::SocketError error);
+ 
 template<typename T>
 QString toString(const std::unique_ptr<T>& p)
 {

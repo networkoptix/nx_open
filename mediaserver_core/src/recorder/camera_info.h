@@ -85,7 +85,7 @@ class ServerWriterHandler:
     public ComposerHandler
 {
 public: // WriterHandler
-    ServerWriterHandler(QnStorageManager* storageManager);
+    ServerWriterHandler(QnStorageManager* storageManager, QnResourcePool* resPool);
     virtual QStringList storagesUrls() const override;
     virtual QStringList camerasIds(QnServer::ChunksCatalog) const override;
     virtual bool needStop() const override;
@@ -102,6 +102,7 @@ public: // ComposerHandler
 
 private:
     QnStorageManager* m_storageManager;
+    QnResourcePool* m_resPool;
     QnSecurityCamResourcePtr m_camera;
 };
 
@@ -197,6 +198,8 @@ private:
 class ServerReaderHandler: public ReaderHandler
 {
 public:
+    ServerReaderHandler(const QnUuid& moduleId, QnResourcePool* resPool);
+
     virtual QnUuid moduleGuid() const override;
     virtual QnUuid archiveCamTypeId() const override;
     virtual bool isCameraInResPool(const QnUuid& cameraId) const override;
@@ -204,6 +207,8 @@ public:
 
 private:
     mutable QnUuid m_archiveCamTypeId;
+    QnUuid m_moduleId;
+    QnResourcePool* m_resPool;
 };
 
 }

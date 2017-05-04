@@ -40,7 +40,7 @@ def measure_call_duration(fn):
         date_time = fn(*args, **kw)
         duration = utils.datetime_utc_now() - start_time
         assert isinstance(date_time, datetime)
-        assert duration < timedelta(seconds=1)
+        assert duration < MAX_TIME_DIFF
         return (date_time, duration)
     return wrapper
 

@@ -3,6 +3,8 @@
 #include <QtNetwork/QNetworkInterface>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/network/app_info.h>
+
 #include <common/common_module.h>
 #include <nx_ec/ec_proto_version.h>
 #include <api/model/connection_info.h>
@@ -33,10 +35,10 @@ QnModuleInformation::QnModuleInformation():
     protoVersion(0),
     runtimeId(),
     serverFlags(0),
-    realm(QnAppInfo::realm()),
+    realm(nx::network::AppInfo::realm()),
     ecDbReadOnly(false),
     cloudSystemId(),
-    cloudHost(QnAppInfo::defaultCloudHost())
+    cloudHost(nx::network::AppInfo::defaultCloudHost())
 {
 }
 

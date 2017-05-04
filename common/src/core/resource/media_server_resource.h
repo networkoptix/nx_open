@@ -6,7 +6,7 @@
 #include <utils/common/value_cache.h>
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
-#include <utils/common/safe_direct_connection.h>
+#include <nx/utils/safe_direct_connection.h>
 #include <core/resource/resource.h>
 #include <nx/network/socket_common.h>
 
@@ -25,7 +25,7 @@ class QnMediaServerResource:
 
     typedef QnResource base_type;
 public:
-    QnMediaServerResource();
+    QnMediaServerResource(QnCommonModule* commonModule);
     virtual ~QnMediaServerResource();
 
     virtual QString getUniqueId() const;
@@ -105,6 +105,8 @@ public:
     QString getAuthKey() const;
     void setAuthKey(const QString& value);
 
+    virtual void setResourcePool(QnResourcePool *resourcePool) override;
+
     //!Returns realm to use in HTTP authentication
     QString realm() const;
 
@@ -160,6 +162,7 @@ private:
     mutable QnResourcePtr m_firstCamera;
 
     Qn::PanicMode calculatePanicMode() const;
+    QUrl buildApiUrl() const;
 };
 
 Q_DECLARE_METATYPE(QnMediaServerResourcePtr)

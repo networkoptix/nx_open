@@ -191,10 +191,6 @@
         <translation>nguồn：%1</translation>
     </message>
     <message>
-        <source>Url: %1</source>
-        <translation>nơi：%1</translation>
-    </message>
-    <message>
         <source>Reason: %1</source>
         <translation>lý do：%1</translation>
     </message>

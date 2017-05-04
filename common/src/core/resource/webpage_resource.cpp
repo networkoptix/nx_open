@@ -1,27 +1,22 @@
 #include "webpage_resource.h"
 
-QnWebPageResource::QnWebPageResource()
-    : base_type()
+QnWebPageResource::QnWebPageResource(QnCommonModule* commonModule):
+    base_type(commonModule)
 {
     setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kWebPageTypeId));
     addFlags(Qn::web_page);
 }
 
-QnWebPageResource::QnWebPageResource(const QUrl& url)
-    : QnWebPageResource()
+QnWebPageResource::QnWebPageResource(const QUrl& url, QnCommonModule* commonModule):
+    QnWebPageResource(commonModule)
 {
-    setId(guidFromArbitraryData(url.toString().toUtf8()));
+    setId(QnUuid::createUuid());
     setName(nameForUrl(url));
     setUrl(url.toString());
 }
 
 QnWebPageResource::~QnWebPageResource()
 {
-}
-
-QString QnWebPageResource::getUniqueId() const
-{
-    return getUrl();
 }
 
 void QnWebPageResource::setUrl(const QString& url)
@@ -36,4 +31,21 @@ QString QnWebPageResource::nameForUrl(const QUrl& url)
     if (!url.path().isEmpty())
         name += L'/' + url.path();
     return name;
+}
+
+Qn::ResourceStatus QnWebPageResource::getStatus() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_status;
+}
+
+void QnWebPageResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
+{
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_status == newStatus)
+            return;
+        m_status = newStatus;
+    }
+    emit statusChanged(toSharedPointer(), reason);
 }

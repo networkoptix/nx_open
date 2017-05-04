@@ -5,7 +5,6 @@
 #include <deque>
 
 #include <QtCore/QtGlobal>
-#include <QtCore/QElapsedTimer>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/flag_config.h>

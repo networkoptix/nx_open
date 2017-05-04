@@ -42,7 +42,7 @@ class UdtSocket:
     public InterfaceToImplement
 {
 public:
-    UdtSocket();
+    UdtSocket(int ipVersion);
     virtual ~UdtSocket();
 
     /**
@@ -82,11 +82,16 @@ public:
     virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override;
 
 protected:
-    detail::SocketState m_state;
-    detail::UdtSocketImpl* m_impl;
     friend class UdtPollSet;
 
-    UdtSocket(detail::UdtSocketImpl* impl, detail::SocketState state);
+    detail::SocketState m_state;
+    detail::UdtSocketImpl* m_impl;
+    const int m_ipVersion;
+
+    UdtSocket(
+        int ipVersion,
+        detail::UdtSocketImpl* impl,
+        detail::SocketState state);
 
     bool open();
 
@@ -99,9 +104,14 @@ protected:
 class NX_NETWORK_API UdtStreamSocket:
     public UdtSocket<AbstractStreamSocket>
 {
+    using base_type = UdtSocket<AbstractStreamSocket>;
+
 public:
     explicit UdtStreamSocket(int ipVersion = AF_INET);
-    UdtStreamSocket(detail::UdtSocketImpl* impl, detail::SocketState state);
+    UdtStreamSocket(
+        int ipVersion,
+        detail::UdtSocketImpl* impl,
+        detail::SocketState state);
     // We must declare this trivial constructor even it is trivial.
     // Since this will make std::unique_ptr call correct destructor for our
     // partial, forward declaration of class UdtSocketImp;
@@ -157,7 +167,8 @@ private:
     int handleRecvResult(int recvResult);
 
     std::unique_ptr<aio::AsyncSocketImplHelper<UdtStreamSocket>> m_aioHelper;
-    bool m_noDelay;
+    bool m_noDelay = false;
+    bool m_isInternetConnection = false;
 
 private:
     Q_DISABLE_COPY(UdtStreamSocket)
@@ -166,6 +177,8 @@ private:
 class NX_NETWORK_API UdtStreamServerSocket:
     public UdtSocket<AbstractStreamServerSocket>
 {
+    using base_type = UdtSocket<AbstractStreamServerSocket>;
+
 public:
     explicit UdtStreamServerSocket(int ipVersion = AF_INET);
     virtual ~UdtStreamServerSocket();
@@ -192,6 +205,14 @@ private:
     void stopWhileInAioThread();
 
     Q_DISABLE_COPY(UdtStreamServerSocket)
+};
+
+class NX_NETWORK_API UdtStatistics
+{
+public:
+    std::atomic<size_t> internetBytesTransfered{0};
+
+    static UdtStatistics global;
 };
 
 } // namespace network

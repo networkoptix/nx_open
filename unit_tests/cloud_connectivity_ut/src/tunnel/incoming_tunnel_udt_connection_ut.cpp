@@ -9,7 +9,7 @@
 #include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/sync_queue.h>
 
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace network {
@@ -31,7 +31,7 @@ protected:
         utils::TestSyncQueue<SystemError::ErrorCode> results;
 
         auto tmpSocket = makeSocket(true);
-        auto tmpSocketGuard = makeScopedGuard([&tmpSocket]() { tmpSocket->pleaseStopSync(); });
+        auto tmpSocketGuard = makeScopeGuard([&tmpSocket]() { tmpSocket->pleaseStopSync(); });
 
         ASSERT_TRUE(tmpSocket->setSendTimeout(0));
         ASSERT_TRUE(tmpSocket->setRecvTimeout(0));

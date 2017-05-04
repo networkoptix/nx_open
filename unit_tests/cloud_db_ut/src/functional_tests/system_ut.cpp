@@ -1203,9 +1203,15 @@ protected:
     
     void assertRegistrationTimestampIsValid()
     {
+        using namespace std::chrono;
+
         const auto system = fetchSystem(m_system.id);
-        ASSERT_GE(system.registrationTime, m_registrationTimeValidRange.first);
-        ASSERT_LE(system.registrationTime, m_registrationTimeValidRange.second);
+        ASSERT_GE(
+            nx::utils::floor<milliseconds>(system.registrationTime),
+            nx::utils::floor<milliseconds>(m_registrationTimeValidRange.first));
+        ASSERT_LE(
+            nx::utils::floor<milliseconds>(system.registrationTime),
+            nx::utils::floor<milliseconds>(m_registrationTimeValidRange.second));
     }
     
 private:

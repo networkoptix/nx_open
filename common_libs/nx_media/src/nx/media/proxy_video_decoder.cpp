@@ -129,10 +129,8 @@ bool ProxyVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolut
     return true;
 }
 
-QSize ProxyVideoDecoder::maxResolution(const AVCodecID codec)
+QSize ProxyVideoDecoder::maxResolution(const AVCodecID /*codec*/)
 {
-    QN_UNUSED(codec);
-
     int w, h;
     ProxyDecoder::getMaxResolution(&w, &h);
     return QSize(w, h);

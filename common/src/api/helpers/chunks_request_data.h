@@ -18,7 +18,7 @@ struct QnChunksRequestData
 
     QnChunksRequestData();
 
-    static QnChunksRequestData fromParams(const QnRequestParamList& params);
+    static QnChunksRequestData fromParams(QnResourcePool* resourcePool, const QnRequestParamList& params);
     QnRequestParamList toParams() const;
     QUrlQuery toUrlQuery() const;
     bool isValid() const;

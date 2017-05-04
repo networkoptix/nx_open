@@ -2,12 +2,12 @@
     <parent>
         <artifactId>build_ut</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.1.0-SNAPSHOT</version>
         <relativePath>../build_ut</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>mediaserver_core_ut</artifactId>
     <packaging>pom</packaging>
@@ -18,7 +18,7 @@
         <!--Specify the project to test-->
         <master.project.directory>mediaserver_core</master.project.directory>
 
-        <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
+        <qt.libs>core network xml xmlpatterns sql concurrent multimedia websockets</qt.libs>
         <global.libs>-lmediaserver_core -lcommon -lnx_network -lnx_fusion -lnx_streaming -lappserver2 -lnx_email -ludt -lcloud_db_client -lcloud_db -lnx_speech_synthesizer -lnx_utils</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm Wldap32.lib Crypt32.lib</windows.oslibs>
         <linux.oslibs>-ldl -lldap -ltermcap</linux.oslibs>

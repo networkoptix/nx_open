@@ -99,16 +99,7 @@ TEST_F(CloudModuleUrlProvider, host_inserted_correctly)
 
 TEST_F(CloudModuleUrlProvider, not_found_template_file_causes_error)
 {
-    try
-    {
-        tryToLoadInvalidFile();
-    }
-    catch (std::exception)
-    {
-        return;
-    }
-    
-    FAIL();
+    ASSERT_ANY_THROW(tryToLoadInvalidFile());
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -142,7 +133,7 @@ protected:
             m_expectedHost, endpoint());
 
         FetcherType fetcher(std::make_unique<network::cloud::RandomEndpointSelector>());
-        auto fetcherGuard = makeScopedGuard([&fetcher]() { fetcher.pleaseStopSync(); });
+        auto fetcherGuard = makeScopeGuard([&fetcher]() { fetcher.pleaseStopSync(); });
 
         fetcher.setModulesXmlUrl(QUrl(lm("http://%1:%2%3")
             .arg(m_expectedHost).arg(endpoint().port).arg(kCloudModuleXmlPath)));

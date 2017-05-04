@@ -92,7 +92,7 @@ QnAbstractVideoDecoder* QnXVBADecoderPlugin::create(
     desc.put( DecoderParameter::decoderName, DECODER_NAME );
 
     //joining media stream parameters with GPU description
-    if( !m_usageCalculator->isEnoughHWResourcesForAnotherDecoder( stree::MultiSourceResourceReader( &desc, m_graphicsDesc.get() ) ) )
+    if( !m_usageCalculator->isEnoughHWResourcesForAnotherDecoder( nx::utils::stree::MultiSourceResourceReader( &desc, m_graphicsDesc.get() ) ) )
         return NULL;
 
     return new VideoDecoderSwitcher( decoder.release(), data );

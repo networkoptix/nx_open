@@ -1,15 +1,16 @@
-#ifndef _DESKTOP_CAMERA_DELETER_H__
-#define _DESKTOP_CAMERA_DELETER_H__
+#pragma once
 
 #ifdef ENABLE_DESKTOP_CAMERA
 
 #include <core/resource/resource_fwd.h>
+#include <common/common_module_aware.h>
 
 /** Utility class that deletes desktop cameras after some time of inactivity. */
-class QnDesktopCameraDeleter: public QObject {
+class QnDesktopCameraDeleter: public QObject, public QnCommonModuleAware
+{
     Q_OBJECT
 public:
-    QnDesktopCameraDeleter(QObject *parent = NULL);
+    QnDesktopCameraDeleter(QObject *parent);
 private:
 
     /** Remove desktop cameras that have been offline for more than one iteration. */
@@ -22,5 +23,3 @@ private:
 };
 
 #endif //ENABLE_DESKTOP_CAMERA
-
-#endif // _DESKTOP_CAMERA_DELETER_H__

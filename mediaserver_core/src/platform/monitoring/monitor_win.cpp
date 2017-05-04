@@ -7,7 +7,7 @@
 #include <QtCore/QVector>
 
 #include <nx/utils/log/log.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 #include <utils/common/warnings.h>
 
 #define NOMINMAX

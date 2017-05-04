@@ -54,7 +54,7 @@ function(_rdep_try_package package)
     set(package_dir "${PACKAGES_DIR}/${package}")
 
     if(rdepSync)
-        rdep_sync_package(${package} RESULT_VARIABLE result)
+        nx_rdep_sync_package(${package} RESULT_VARIABLE result)
     else()
         set(result 0)
         message(STATUS "Looking for the existing package ${package}")
@@ -66,7 +66,10 @@ function(_rdep_try_package package)
         endif()
 
         _rdep_load_package_from_dir("${package_dir}")
-        nx_copy_package("${package_dir}")
+
+        if(NOT EXISTS "${package_dir}/.nocopy")
+            nx_copy_package("${package_dir}")
+        endif()
 
         if(RDEP_PATH_VARIABLE)
             set(${RDEP_PATH_VARIABLE} "${package_dir}" PARENT_SCOPE)

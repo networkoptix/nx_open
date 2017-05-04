@@ -8,6 +8,7 @@
 #include <nx/network/udt/udt_socket.h>
 #include <nx/network/ssl_socket.h>
 #include <nx/utils/string.h>
+#include <nx/utils/thread/barrier_handler.h>
 
 #include <utils/common/command_line_parser.h>
 
@@ -167,7 +168,7 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
 
     auto multiServerSocket = new network::MultipleServerSocket();
     std::unique_ptr<AbstractStreamServerSocket> serverSocket(multiServerSocket);
-    const auto guard = makeScopedGuard([&serverSocket]()
+    const auto guard = makeScopeGuard([&serverSocket]()
     {
         if (serverSocket)
             serverSocket->pleaseStopSync();
@@ -274,7 +275,7 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
             return 7;
         }
 
-        const auto certificate = network::SslEngine::makeCertificateAndKey(
+        const auto certificate = network::ssl::Engine::makeCertificateAndKey(
             "cloud_connect_test_util", "US", "NX");
 
         if (certificate.isEmpty())
@@ -283,8 +284,8 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
             return 4;
         }
 
-        NX_CRITICAL(network::SslEngine::useCertificateAndPkey(certificate));
-        serverSocket.reset(new SslServerSocket(serverSocket.release(), false));
+        NX_CRITICAL(network::ssl::Engine::useCertificateAndPkey(certificate));
+        serverSocket.reset(new deprecated::SslServerSocket(serverSocket.release(), false));
     }
 
     server.setServerSocket(std::move(serverSocket));

@@ -1,0 +1,38 @@
+<div>
+    摄像头：
+    <ul>
+        <li>名称︰ {{activeCamera.name}}</li>
+        <li>PhysicalID: {{activeCamera.physicalId}}</li>
+        <li>IP (URL): <a target="_blank" ng-href="{{activeCamera.url}}">{{activeCamera.url}}</a></li>
+        <li ng-repeat="stream in activeCamera.mediaStreams">
+            {{streamName(stream)}}:
+            <span ng-repeat="transport in stream.transports">
+                <a target="_blank" ng-href="{{formatLink(activeCamera,stream.encoderIndex,transport)}}">{{transport}}</a>&nbsp;
+            </span>
+
+        </li>
+
+        <li>
+            下载︰ 
+            <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'download')}}">高</a>&nbsp; 
+            <a target="_blank" ng-href="{{formatLink(activeCamera, 1, 'download')}}">低</a> &nbsp;
+            <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'preview')}}">预览</a>
+        </li>
+
+    </ul>
+    链接设置︰
+    <ul>
+        <li>
+            <label><input type="checkbox" ng-model="useAuth">&nbsp;使用身份验证密钥</label>
+        </li>
+        <li>
+            <label title="下载">持续时间 (秒): <input type="text" class="input-sm" ng-model="duration"></label>
+        </li>
+        <li>
+            <label title="转码">分辨率: <input type="text" class="input-sm" ng-model="resolution"></label>
+        </li>
+        <li>
+            <label>播放位置︰ {{liveMode?'live': position}}</label>
+        </li>
+    </ul>
+</div>

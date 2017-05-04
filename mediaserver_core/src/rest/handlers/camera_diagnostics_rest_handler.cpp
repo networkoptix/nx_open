@@ -10,6 +10,8 @@
 #include <camera/camera_pool.h>
 #include <api/helpers/camera_id_helper.h>
 #include <nx/utils/log/log.h>
+#include <rest/server/rest_connection_processor.h>
+#include <common/common_module.h>
 
 namespace {
 
@@ -23,7 +25,7 @@ int QnCameraDiagnosticsRestHandler::executeGet(
     const QString& path,
     const QnRequestParams& params,
     QnJsonRestResult& result,
-    const QnRestConnectionProcessor* /*owner*/)
+    const QnRestConnectionProcessor* owner)
 {
     NX_LOG(lit("QnCameraDiagnosticsRestHandler: received request %1").arg(path), cl_logDEBUG1);
 
@@ -38,7 +40,10 @@ int QnCameraDiagnosticsRestHandler::executeGet(
 
     QString notFoundCameraId = QString::null;
     QnSecurityCamResourcePtr camera = nx::camera_id_helper::findCameraByFlexibleIds(
-        &notFoundCameraId, params, {kCameraIdParam, kDeprecatedResIdParam});
+        owner->commonModule()->resourcePool(),
+        &notFoundCameraId,
+        params,
+        {kCameraIdParam, kDeprecatedResIdParam});
     if (!camera)
     {
         if (!notFoundCameraId.isNull())

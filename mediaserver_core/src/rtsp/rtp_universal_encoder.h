@@ -6,6 +6,8 @@
 #include "transcoding/ffmpeg_transcoder.h"
 #include "utils/common/byte_array.h"
 
+class QnCommonModule;
+
 class QnUniversalRtpEncoder: public QnRtspEncoder
 {
 public:
@@ -15,8 +17,12 @@ public:
     * param transcodeToCodec - if codec specified, all media packets are transcoded to specified codec.
     * param videoSize - transcoded video size
     */
-    QnUniversalRtpEncoder(QnConstAbstractMediaDataPtr media, AVCodecID transcodeToCodec, const QSize& videoSize,
-                          const QnImageFilterHelper& extraTranscodeParams);
+    QnUniversalRtpEncoder(
+        QnCommonModule* commonModule,
+        QnConstAbstractMediaDataPtr media,
+        AVCodecID transcodeToCodec,
+        const QSize& videoSize,
+        const QnImageFilterHelper& extraTranscodeParams);
 
     virtual QByteArray getAdditionSDP( const std::map<QString, QString>& streamParams ) override;
 

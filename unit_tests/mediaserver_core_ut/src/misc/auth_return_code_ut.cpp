@@ -17,7 +17,8 @@
 #include <rest/server/json_rest_result.h>
 #include "utils/common/sleep.h"
 
-class AuthReturnCodeTest : public ::testing::Test
+class AuthReturnCodeTest:
+    public ::testing::Test
 {
 public:
     static void SetUpTestCase()
@@ -33,7 +34,7 @@ public:
 
     virtual void SetUp() override
     {
-        auto ec2Connection = QnAppServerConnectionFactory::getConnection2();
+        auto ec2Connection = mediaServerLauncher->commonModule()->ec2Connection();
         ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
 
         userData.id = QnUuid::createUuid();
@@ -59,12 +60,12 @@ public:
 
     void addLocalUser(QString userName, QString password)
     {
-        auto ec2Connection = QnAppServerConnectionFactory::getConnection2();
+        auto ec2Connection = mediaServerLauncher->commonModule()->ec2Connection();
         ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
 
         userData.id = QnUuid::createUuid();
         userData.name = userName;
-        userData.digest = nx_http::calcHa1(userName, QnAppInfo::realm(), password);
+        userData.digest = nx_http::calcHa1(userName, nx::network::AppInfo::realm(), password);
         userData.isEnabled = true;
         userData.isCloud = false;
         ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(userData));
@@ -103,7 +104,7 @@ public:
         cookieLogin.auth = createHttpQueryAuthParam(
             login,
             password,
-            QnAppInfo::realm().toUtf8(),
+            nx::network::AppInfo::realm().toUtf8(),
             nx_http::Method::GET,
             QnAuthHelper::instance()->generateNonce());
 

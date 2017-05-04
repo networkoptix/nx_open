@@ -12,8 +12,8 @@
 #include <api/helpers/camera_id_helper.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
-
 #include "media_server/settings.h"
+#include <media_server/media_server_module.h>
 
 StreamingChunk::SequentialReadingContext::SequentialReadingContext(StreamingChunk* chunk):
     m_currentOffset( 0 ),
@@ -27,16 +27,18 @@ StreamingChunk::SequentialReadingContext::~SequentialReadingContext()
     m_chunk->m_readers.erase(this);
 }
 
-StreamingChunk::StreamingChunk( const StreamingChunkCacheKey& params ):
-    m_params( params ),
+StreamingChunk::StreamingChunk(
+    QnResourcePool* resPool,
+    const StreamingChunkCacheKey& params):
+    m_params(params),
     m_modificationState( State::init ),
     m_maxInternalBufferSize(
-        MSSettings::roSettings()->value(
+        qnServerModule->roSettings()->value(
             nx_ms_conf::HLS_MAX_CHUNK_BUFFER_SIZE,
             nx_ms_conf::DEFAULT_HLS_MAX_CHUNK_BUFFER_SIZE).toUInt() ),
     m_dataOffsetAtTheFrontOfTheBuffer(0)
 {
-    const auto res = nx::camera_id_helper::findCameraByFlexibleId(params.srcResourceUniqueID());
+    const auto res = nx::camera_id_helper::findCameraByFlexibleId(resPool, params.srcResourceUniqueID());
     if (res)
         m_videoCameraLocker = qnCameraPool->getVideoCameraLockerByResourceId(res->getId());
 }
@@ -227,7 +229,7 @@ bool StreamingChunk::waitForChunkReadyOrInternalBufferFilled()
 void StreamingChunk::disableInternalBufferLimit()
 {
     QnMutexLocker lk(&m_mutex);
-    m_maxInternalBufferSize = 
+    m_maxInternalBufferSize =
         std::numeric_limits<decltype(m_maxInternalBufferSize)>::max();
 }
 

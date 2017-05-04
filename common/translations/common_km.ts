@@ -191,10 +191,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Url: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Reason: %1</source>
         <translation type="unfinished"></translation>
     </message>

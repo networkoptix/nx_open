@@ -1,5 +1,7 @@
 #include "common_message_processor.h"
 
+#include <QtCore/QElapsedTimer>
+
 #include <nx_ec/ec_api.h>
 #include <nx_ec/managers/abstract_user_manager.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
@@ -51,8 +53,9 @@
 #include <nx/utils/log/log.h>
 
 
-QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
-    base_type(parent)
+QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent):
+    base_type(parent),
+    QnCommonModuleAware(parent)
 {
 }
 
@@ -72,6 +75,11 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     connection->startReceivingNotifications();
 }
 
+
+ec2::AbstractECConnectionPtr QnCommonMessageProcessor::connection() const
+{
+    return m_connection;
+}
 
 void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection)
 {
@@ -191,7 +199,7 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &
 
     QUrl url(data.url);
 
-    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(data.id);
+    QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(data.id);
     if (!server) {
         if (!data.ignore) {
             QList<QUrl> urls = QnServerAdditionalAddressesDictionary::instance()->additionalUrls(data.id);
@@ -246,41 +254,41 @@ void QnCommonMessageProcessor::on_resourceStatusChanged(
     if (source == ec2::NotificationSource::Local)
         return; //< ignore local setStatus call. Data already in the resourcePool
 
-    QnResourcePtr resource = qnResPool->getResourceById(resourceId);
+    QnResourcePtr resource = resourcePool()->getResourceById(resourceId);
     if (resource)
         onResourceStatusChanged(resource, status, source);
     else
-        qnStatusDictionary->setValue(resourceId, status);
+        statusDictionary()->setValue(resourceId, status);
 }
 
 void QnCommonMessageProcessor::on_resourceParamChanged(const ec2::ApiResourceParamWithRefData& param )
 {
-    QnResourcePtr resource = qnResPool->getResourceById(param.resourceId);
+    QnResourcePtr resource = resourcePool()->getResourceById(param.resourceId);
     if (resource)
         resource->setProperty(param.name, param.value, QnResource::NO_MARK_DIRTY);
     else
-        propertyDictionary->setValue(param.resourceId, param.name, param.value, false);
+        propertyDictionary()->setValue(param.resourceId, param.name, param.value, false);
 }
 
 void QnCommonMessageProcessor::on_resourceParamRemoved(const ec2::ApiResourceParamWithRefData& param )
 {
-    QnResourcePtr resource = qnResPool->getResourceById(param.resourceId);
+    QnResourcePtr resource = resourcePool()->getResourceById(param.resourceId);
     if (resource)
         resource->removeProperty(param.name);
     else
-        propertyDictionary->removeProperty(param.resourceId, param.name);
+        propertyDictionary()->removeProperty(param.resourceId, param.name);
 }
 
 void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
 {
     if (canRemoveResource(resourceId))
     {
-        if (QnResourcePtr ownResource = qnResPool->getResourceById(resourceId))
+        if (QnResourcePtr ownResource = resourcePool()->getResourceById(resourceId))
         {
             // delete dependent objects
-            for(const QnResourcePtr& subRes: qnResPool->getResourcesByParentId(resourceId))
-                qnResPool->removeResource(subRes);
-            qnResPool->removeResource(ownResource);
+            for(const QnResourcePtr& subRes: resourcePool()->getResourcesByParentId(resourceId))
+                resourcePool()->removeResource(subRes);
+            resourcePool()->removeResource(ownResource);
         }
     }
     else
@@ -291,11 +299,14 @@ void QnCommonMessageProcessor::on_resourceStatusRemoved(const QnUuid& resourceId
 {
     if (!canRemoveResource(resourceId))
     {
-        auto res = qnResPool->getResourceById(resourceId);
-        if (res)
+        if (auto res = resourcePool()->getResourceById(resourceId))
         {
-            auto connection = QnAppServerConnectionFactory::getConnection2();
-            connection->getResourceManager(Qn::kSystemAccess)->setResourceStatusSync(resourceId, res->getStatus());
+            if (auto connection = commonModule()->ec2Connection())
+            {
+                connection->getResourceManager(Qn::kSystemAccess)->setResourceStatusSync(
+                    resourceId,
+                    res->getStatus());
+            }
         }
     }
 }
@@ -305,27 +316,27 @@ void QnCommonMessageProcessor::on_accessRightsChanged(const ec2::ApiAccessRights
     QSet<QnUuid> accessibleResources;
     for (const QnUuid& id : accessRights.resourceIds)
         accessibleResources << id;
-    if (auto user = qnResPool->getResourceById<QnUserResource>(accessRights.userId))
+    if (auto user = resourcePool()->getResourceById<QnUserResource>(accessRights.userId))
     {
-        qnSharedResourcesManager->setSharedResources(user, accessibleResources);
+        sharedResourcesManager()->setSharedResources(user, accessibleResources);
     }
     else
     {
-        auto role = qnUserRolesManager->userRole(accessRights.userId);
+        auto role = userRolesManager()->userRole(accessRights.userId);
         if (!role.isNull())
-            qnSharedResourcesManager->setSharedResources(role, accessibleResources);
+            sharedResourcesManager()->setSharedResources(role, accessibleResources);
     }
 }
 
 void QnCommonMessageProcessor::on_userRoleChanged(const ec2::ApiUserRoleData& userRole)
 {
-    qnUserRolesManager->addOrUpdateUserRole(userRole);
+    userRolesManager()->addOrUpdateUserRole(userRole);
 }
 
 void QnCommonMessageProcessor::on_userRoleRemoved(const QnUuid& userRoleId)
 {
-    qnUserRolesManager->removeUserRole(userRoleId);
-    for (const auto& user : qnResPool->getResources<QnUserResource>())
+    userRolesManager()->removeUserRole(userRoleId);
+    for (const auto& user : resourcePool()->getResources<QnUserResource>())
     {
         if (user->userRoleId() == userRoleId)
             user->setUserRoleId(QnUuid());
@@ -339,10 +350,12 @@ void QnCommonMessageProcessor::on_cameraUserAttributesChanged(const ec2::ApiCame
 
     QSet<QByteArray> modifiedFields;
     {
-        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), userAttributes->cameraId );
+        QnCameraUserAttributePool::ScopedLock userAttributesLock(
+            cameraUserAttributesPool(),
+            userAttributes->cameraId );
         (*userAttributesLock)->assign( *userAttributes, &modifiedFields );
     }
-    const QnResourcePtr& res = qnResPool->getResourceById(userAttributes->cameraId);
+    const QnResourcePtr& res = resourcePool()->getResourceById(userAttributes->cameraId);
     if( res )   //it is OK if resource is missing
         res->emitModificationSignals( modifiedFields );
 }
@@ -351,12 +364,14 @@ void QnCommonMessageProcessor::on_cameraUserAttributesRemoved(const QnUuid& came
 {
     QSet<QByteArray> modifiedFields;
     {
-        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), cameraId );
+        QnCameraUserAttributePool::ScopedLock userAttributesLock(
+            cameraUserAttributesPool(),
+            cameraId );
         //TODO #ak for now, never removing this structure, just resetting to empty value
         (*userAttributesLock)->assign( QnCameraUserAttributes(), &modifiedFields );
         (*userAttributesLock)->cameraId = cameraId;
     }
-    const QnResourcePtr& res = qnResPool->getResourceById(cameraId);
+    const QnResourcePtr& res = resourcePool()->getResourceById(cameraId);
     if( res )
         res->emitModificationSignals( modifiedFields );
 }
@@ -368,10 +383,12 @@ void QnCommonMessageProcessor::on_mediaServerUserAttributesChanged(const ec2::Ap
 
     QSet<QByteArray> modifiedFields;
     {
-        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), userAttributes->serverId );
+        QnMediaServerUserAttributesPool::ScopedLock lk(
+            mediaServerUserAttributesPool(),
+            userAttributes->serverId );
         (*lk)->assign( *userAttributes, &modifiedFields );
     }
-    const QnResourcePtr& res = qnResPool->getResourceById(userAttributes->serverId);
+    const QnResourcePtr& res = resourcePool()->getResourceById(userAttributes->serverId);
     if( res )   //it is OK if resource is missing
         res->emitModificationSignals( modifiedFields );
 }
@@ -380,26 +397,26 @@ void QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved(const QnUuid&
 {
     QSet<QByteArray> modifiedFields;
     {
-        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), serverId );
+        QnMediaServerUserAttributesPool::ScopedLock lk(mediaServerUserAttributesPool(), serverId );
         //TODO #ak for now, never removing this structure, just resetting to empty value
         (*lk)->assign( QnMediaServerUserAttributes(), &modifiedFields );
     }
-    const QnResourcePtr& res = qnResPool->getResourceById(serverId);
+    const QnResourcePtr& res = resourcePool()->getResourceById(serverId);
     if( res )   //it is OK if resource is missing
         res->emitModificationSignals( modifiedFields );
 }
 
 void QnCommonMessageProcessor::on_cameraHistoryChanged(const ec2::ApiServerFootageData &serverFootageData)
 {
-    qnCameraHistoryPool->setServerFootageData(serverFootageData);
+    cameraHistoryPool()->setServerFootageData(serverFootageData);
 }
 
 void QnCommonMessageProcessor::on_licenseChanged(const QnLicensePtr &license) {
-    qnLicensePool->addLicense(license);
+    licensePool()->addLicense(license);
 }
 
 void QnCommonMessageProcessor::on_licenseRemoved(const QnLicensePtr &license) {
-    qnLicensePool->removeLicense(license);
+    licensePool()->removeLicense(license);
 }
 
 void QnCommonMessageProcessor::on_businessEventAddedOrUpdated(const QnBusinessEventRulePtr &businessRule){
@@ -462,7 +479,7 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
 {
     /* Store all remote resources id to clean them if they are not in the list anymore. */
     QHash<QnUuid, QnResourcePtr> remoteResources;
-    for (const QnResourcePtr &resource: qnResPool->getResourcesWithFlag(Qn::remote))
+    for (const QnResourcePtr &resource: resourcePool()->getResourcesWithFlag(Qn::remote))
         remoteResources.insert(resource->getId(), resource);
 
     /* //TODO: #GDM #c++14 re-enable when generic lambdas will be supported
@@ -478,7 +495,7 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
 
 
     /* Packet adding. */
-    qnResPool->beginTran();
+    resourcePool()->beginTran();
 
     updateResources(fullData.users, remoteResources);
     updateResources(fullData.cameras, remoteResources);
@@ -488,22 +505,23 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
     updateResources(fullData.servers, remoteResources);
     updateResources(fullData.storages, remoteResources);
 
-    qnResPool->commit();
+    resourcePool()->commit();
 
 #undef updateResources
 
     /* Remove absent resources. */
     for (const QnResourcePtr& resource: remoteResources)
-        qnResPool->removeResource(resource);
+        resourcePool()->removeResource(resource);
 }
 
 void QnCommonMessageProcessor::resetLicenses(const ec2::ApiLicenseDataList& licenses)
 {
-    qnLicensePool->replaceLicenses(licenses);
+    licensePool()->replaceLicenses(licenses);
 }
 
-void QnCommonMessageProcessor::resetCamerasWithArchiveList(const ec2::ApiServerFootageDataList& cameraHistoryList) {
-    qnCameraHistoryPool->resetServerFootageData(cameraHistoryList);
+void QnCommonMessageProcessor::resetCamerasWithArchiveList(const ec2::ApiServerFootageDataList& cameraHistoryList)
+{
+    cameraHistoryPool()->resetServerFootageData(cameraHistoryList);
 }
 
 void QnCommonMessageProcessor::resetTime()
@@ -516,6 +534,7 @@ void QnCommonMessageProcessor::resetTime()
     auto timeManager = m_connection->getTimeManager(Qn::kSystemAccess);
     timeManager->getCurrentTime(this, [this](int handle, ec2::ErrorCode errCode, qint64 syncTime)
     {
+        const auto& runtimeManager = runtimeInfoManager();
         Q_UNUSED(handle);
         if (errCode != ec2::ErrorCode::ok || !m_connection)
             return;
@@ -525,12 +544,12 @@ void QnCommonMessageProcessor::resetTime()
         ec2::QnPeerTimeInfoList peers = m_connection->getTimeManager(Qn::kSystemAccess)->getPeerTimeInfoList();
         for (const ec2::QnPeerTimeInfo &info : peers)
         {
-            if (!QnRuntimeInfoManager::instance()->hasItem(info.peerId))
+            if (!runtimeManager->hasItem(info.peerId))
             {
                 qWarning() << "Time for peer" << info.peerId << "received before peer was found";
                 continue;
             }
-            NX_ASSERT(ec2::ApiPeerData::isServer(QnRuntimeInfoManager::instance()->item(info.peerId).data.peer.peerType));
+            NX_ASSERT(ec2::ApiPeerData::isServer(runtimeManager->item(info.peerId).data.peer.peerType));
             emit peerTimeChanged(info.peerId, syncTime, info.time);
         }
     });
@@ -538,12 +557,12 @@ void QnCommonMessageProcessor::resetTime()
 
 void QnCommonMessageProcessor::resetAccessRights(const ec2::ApiAccessRightsDataList& accessRights)
 {
-    qnSharedResourcesManager->reset(accessRights);
+    sharedResourcesManager()->reset(accessRights);
 }
 
 void QnCommonMessageProcessor::resetUserRoles(const ec2::ApiUserRoleDataList& roles)
 {
-    qnUserRolesManager->resetUserRoles(roles);
+    userRolesManager()->resetUserRoles(roles);
 }
 
 bool QnCommonMessageProcessor::canRemoveResource(const QnUuid &)
@@ -566,33 +585,33 @@ void QnCommonMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
 
 void QnCommonMessageProcessor::resetServerUserAttributesList( const ec2::ApiMediaServerUserAttributesDataList& serverUserAttributesList )
 {
-    QnMediaServerUserAttributesPool::instance()->clear();
+    mediaServerUserAttributesPool()->clear();
     for( const auto& serverAttrs: serverUserAttributesList )
     {
         QnMediaServerUserAttributesPtr dstElement(new QnMediaServerUserAttributes());
         fromApiToResource(serverAttrs, dstElement);
 
-        QnMediaServerUserAttributesPool::ScopedLock userAttributesLock( QnMediaServerUserAttributesPool::instance(), serverAttrs.serverId );
+        QnMediaServerUserAttributesPool::ScopedLock userAttributesLock( mediaServerUserAttributesPool(), serverAttrs.serverId );
         *(*userAttributesLock) = *dstElement;
     }
 }
 
 void QnCommonMessageProcessor::resetCameraUserAttributesList( const ec2::ApiCameraAttributesDataList& cameraUserAttributesList )
 {
-    QnCameraUserAttributePool::instance()->clear();
+    cameraUserAttributesPool()->clear();
     for( const auto & cameraAttrs: cameraUserAttributesList )
     {
         QnCameraUserAttributesPtr dstElement(new QnCameraUserAttributes());
         fromApiToResource(cameraAttrs, dstElement);
 
-        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), cameraAttrs.cameraId );
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( cameraUserAttributesPool(), cameraAttrs.cameraId );
         *(*userAttributesLock) = *dstElement;
     }
 }
 
 void QnCommonMessageProcessor::resetPropertyList(const ec2::ApiResourceParamWithRefDataList& params) {
     /* Store existing parameter keys. */
-    auto existingProperties = propertyDictionary->allPropertyNamesByResource();
+    auto existingProperties = propertyDictionary()->allPropertyNamesByResource();
 
     /* Update changed values. */
     for(const ec2::ApiResourceParamWithRefData& param: params) {
@@ -611,10 +630,10 @@ void QnCommonMessageProcessor::resetPropertyList(const ec2::ApiResourceParamWith
 
 void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataList& params)
 {
-    auto keys = qnStatusDictionary->values().keys();
-    qnStatusDictionary->clear();
+    auto keys = statusDictionary()->values().keys();
+    statusDictionary()->clear();
     for(const QnUuid& id: keys) {
-        if (QnResourcePtr resource = qnResPool->getResourceById(id))
+        if (QnResourcePtr resource = resourcePool()->getResourceById(id))
         {
             NX_LOG(lit("%1 Emit statusChanged signal for resource %2, %3, %4")
                     .arg(QString::fromLatin1(Q_FUNC_INFO))
@@ -631,11 +650,8 @@ void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataL
 
 void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoData& fullData)
 {
-    qDebug() << "start loading resources";
-    QElapsedTimer tt;
-    tt.start();
-    qnResourceAccessManager->beginUpdate();
-    qnResourceAccessProvider->beginUpdate();
+    resourceAccessManager()->beginUpdate();
+    resourceAccessProvider()->beginUpdate();
 
     QnServerAdditionalAddressesDictionary::instance()->clear();
 
@@ -651,11 +667,8 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
     resetLicenses(fullData.licenses);
     resetTime();
 
-    qDebug() << "resources loaded for" << tt.elapsed();
-    qnResourceAccessProvider->endUpdate();
-    qDebug() << "access ready" << tt.elapsed();
-    qnResourceAccessManager->endUpdate();
-    qDebug() << "permissions ready" << tt.elapsed();
+    resourceAccessProvider()->endUpdate();
+    resourceAccessManager()->endUpdate();
 
     emit initialResourcesReceived();
 }
@@ -670,13 +683,13 @@ void QnCommonMessageProcessor::updateResource(const QnResourcePtr&, ec2::Notific
 
 void QnCommonMessageProcessor::updateResource(const ec2::ApiUserData& user, ec2::NotificationSource source)
 {
-    QnUserResourcePtr qnUser(fromApiToResource(user));
+    QnUserResourcePtr qnUser(fromApiToResource(user, commonModule()));
     updateResource(qnUser, source);
 }
 
 void QnCommonMessageProcessor::updateResource(const ec2::ApiLayoutData& layout, ec2::NotificationSource source)
 {
-    QnLayoutResourcePtr qnLayout(new QnLayoutResource());
+    QnLayoutResourcePtr qnLayout(new QnLayoutResource(commonModule()));
     if (!layout.url.isEmpty())
     {
         NX_LOG(lit("Invalid server layout with url %1").arg(layout.url), cl_logWARNING);
@@ -693,14 +706,14 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiLayoutData& layout, 
 
 void QnCommonMessageProcessor::updateResource(const ec2::ApiVideowallData& videowall, ec2::NotificationSource source)
 {
-    QnVideoWallResourcePtr qnVideowall(new QnVideoWallResource());
+    QnVideoWallResourcePtr qnVideowall(new QnVideoWallResource(commonModule()));
     fromApiToResource(videowall, qnVideowall);
     updateResource(qnVideowall, source);
 }
 
 void QnCommonMessageProcessor::updateResource(const ec2::ApiWebPageData& webpage, ec2::NotificationSource source)
 {
-    QnWebPageResourcePtr qnWebpage(new QnWebPageResource());
+    QnWebPageResourcePtr qnWebpage(new QnWebPageResource(commonModule()));
     fromApiToResource(webpage, qnWebpage);
     updateResource(qnWebpage, source);
 }
@@ -710,6 +723,7 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera, 
     QnVirtualCameraResourcePtr qnCamera = getResourceFactory()->createResource(camera.typeId,
             QnResourceParams(camera.id, camera.url, camera.vendor))
         .dynamicCast<QnVirtualCameraResource>();
+    qnCamera->setCommonModule(commonModule());
 
     NX_ASSERT(qnCamera, Q_FUNC_INFO, QByteArray("Unknown resource type:") + camera.typeId.toByteArray());
     if (qnCamera)
@@ -725,7 +739,7 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera, 
 
 void QnCommonMessageProcessor::updateResource(const ec2::ApiMediaServerData& server, ec2::NotificationSource source)
 {
-    QnMediaServerResourcePtr qnServer(new QnMediaServerResource());
+    QnMediaServerResourcePtr qnServer(new QnMediaServerResource(commonModule()));
     fromApiToResource(server, qnServer);
     updateResource(qnServer, source);
 }
@@ -740,6 +754,7 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiStorageData& storage
     QnStorageResourcePtr qnStorage = getResourceFactory()->createResource(resTypeId,
             QnResourceParams(storage.id, storage.url, QString()))
         .dynamicCast<QnStorageResource>();
+    qnStorage->setCommonModule(commonModule());
     NX_ASSERT(qnStorage, Q_FUNC_INFO, "Invalid resource type pool state");
     if (qnStorage)
     {

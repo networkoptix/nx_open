@@ -294,4 +294,8 @@ void QnAdamResource::at_propertyChanged(const QnResourcePtr &res, const QString 
     }
 }
 
+void QnAdamResource::setIframeDistance(int /*frames*/, int /*timeMs*/)
+{
+}
+
 #endif //< ENABLE_ADVANTECH

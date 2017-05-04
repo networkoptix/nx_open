@@ -34,10 +34,12 @@
 #include <nx_ec/data/api_media_server_data.h>
 #include <nx_ec/data/api_access_rights_data.h>
 #include <nx_ec/data/api_user_role_data.h>
+#include <nx_ec/data/api_misc_data.h>
 #include "nx_ec/managers/abstract_server_manager.h"
 #include "nx_ec/managers/abstract_camera_manager.h"
 #include "nx_ec/managers/abstract_user_manager.h"
 #include "nx_ec/managers/abstract_layout_manager.h"
+#include <nx_ec/managers/abstract_layout_tour_manager.h>
 #include "nx_ec/managers/abstract_webpage_manager.h"
 #include "nx_ec/managers/abstract_videowall_manager.h"
 
@@ -46,6 +48,7 @@
 
 class QnRestProcessorPool;
 class QnHttpConnectionListener;
+class QnCommonModule;
 struct QnModuleInformation;
 
 //!Contains API classes for the new Server
@@ -55,7 +58,10 @@ struct QnModuleInformation;
 */
 namespace ec2
 {
-class ECConnectionNotificationManager;
+    class ECConnectionNotificationManager;
+    class QnTransactionMessageBus;
+    class QnDistributedMutexManager;
+    class TimeSynchronizationManager;
 
     struct QnPeerTimeInfo {
 
@@ -494,13 +500,23 @@ class ECConnectionNotificationManager;
             return impl::doSyncCall<impl::GetDiscoveryDataHandler>(std::bind(fn, this, std::placeholders::_1), discoveryDataList);
         }
 
-        template<class TargetType, class HandlerType> int sendDiscoveredServer(const ApiDiscoveredServerData &discoveredServer, TargetType *target, HandlerType handler) {
-            return sendDiscoveredServer(discoveredServer, std::static_pointer_cast<impl::SimpleHandler>(
+        template<class TargetType, class HandlerType> int sendDiscoveredServer(
+            QnTransactionMessageBus* messageBus,
+            const ApiDiscoveredServerData &discoveredServer,
+            TargetType *target,
+            HandlerType handler)
+        {
+            return sendDiscoveredServer(messageBus, discoveredServer, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        template<class TargetType, class HandlerType> int sendDiscoveredServersList(const ApiDiscoveredServerDataList &discoveredServersList, TargetType *target, HandlerType handler) {
-            return sendDiscoveredServersList(discoveredServersList, std::static_pointer_cast<impl::SimpleHandler>(
+        template<class TargetType, class HandlerType> int sendDiscoveredServersList(
+            QnTransactionMessageBus* messageBus,
+            const ApiDiscoveredServerDataList &discoveredServersList,
+            TargetType *target,
+            HandlerType handler)
+        {
+            return sendDiscoveredServersList(messageBus, discoveredServersList, std::static_pointer_cast<impl::SimpleHandler>(
                  std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
@@ -509,8 +525,14 @@ class ECConnectionNotificationManager;
         virtual int addDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) = 0;
         virtual int removeDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) = 0;
         virtual int getDiscoveryData(impl::GetDiscoveryDataHandlerPtr handler) = 0;
-        virtual int sendDiscoveredServer(const ApiDiscoveredServerData &discoveredServer, impl::SimpleHandlerPtr handler) = 0;
-        virtual int sendDiscoveredServersList(const ApiDiscoveredServerDataList &discoveredServersList, impl::SimpleHandlerPtr handler) = 0;
+        virtual int sendDiscoveredServer(
+            QnTransactionMessageBus* messageBus,
+            const ApiDiscoveredServerData &discoveredServer,
+            impl::SimpleHandlerPtr handler) = 0;
+        virtual int sendDiscoveredServersList(
+            QnTransactionMessageBus* messageBus,
+            const ApiDiscoveredServerDataList &discoveredServersList,
+            impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractDiscoveryManager> AbstractDiscoveryManagerPtr;
 
@@ -584,6 +606,7 @@ class ECConnectionNotificationManager;
     public:
     signals:
         void systemIdChangeRequested(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime);
+        void miscDataChanged(const QString& name, const QString& value);
     };
 
     typedef std::shared_ptr<AbstractMiscNotificationManager> AbstractMiscNotificationManagerPtr;
@@ -619,20 +642,50 @@ class ECConnectionNotificationManager;
             return impl::doSyncCall<impl::SimpleHandler>(std::bind(fn, this, value, time, std::placeholders::_1));
         }
 
+        ErrorCode saveMiscParamSync(const ec2::ApiMiscData& param)
+        {
+            int(AbstractMiscManager::*fn)(const ec2::ApiMiscData&, impl::SimpleHandlerPtr) = &AbstractMiscManager::saveMiscParam;
+            return impl::doSyncCall<impl::SimpleHandler>(std::bind(fn, this, param, std::placeholders::_1));
+        }
+
+        template<class TargetType, class HandlerType>
+        int saveRuntimeInfo(const ApiRuntimeData& data, TargetType* target,
+            HandlerType handler)
+        {
+            return saveRuntimeInfo(data, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(
+                    target, handler)));
+        }
+
+        template<class TargetType, class HandlerType>
+        int getMisParam(const QByteArray& paramName, TargetType* target, HandlerType handler)
+        {
+            return getMiscParam(paramName, std::static_pointer_cast<impl::GetMiscParamHandler>(std::make_shared<impl::CustomGetMiscParamHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        ErrorCode getMiscParamSync(const QByteArray& paramName, ApiMiscData* const outData)
+        {
+            return impl::doSyncCall<impl::GetMiscParamHandler>(
+                [=](const impl::GetMiscParamHandlerPtr &handler) {
+                    return this->getMiscParam(paramName, handler);
+                },
+                outData);
+        }
 
     protected:
         virtual int changeSystemId(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime, impl::SimpleHandlerPtr handler) = 0;
         virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) = 0;
         virtual int cleanupDatabase(bool cleanupDbObjects, bool cleanupTransactionLog, impl::SimpleHandlerPtr handler) = 0;
+        virtual int saveMiscParam(const ec2::ApiMiscData& param, impl::SimpleHandlerPtr handler) = 0;
+        virtual int saveRuntimeInfo(const ec2::ApiRuntimeData& data, impl::SimpleHandlerPtr handler) = 0;
+        virtual int getMiscParam(const QByteArray& paramName, impl::GetMiscParamHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractMiscManager> AbstractMiscManagerPtr;
 
     /*!
         \note All methods are asynchronous if other not specified
     */
-    class AbstractECConnection
-    :
-        public QObject
+    class AbstractECConnection: public QObject
     {
         Q_OBJECT
 
@@ -651,7 +704,6 @@ class ECConnectionNotificationManager;
 
         virtual void addRemotePeer(const QUrl& url) = 0;
         virtual void deleteRemotePeer(const QUrl& url) = 0;
-        virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) = 0;
 
         virtual Timestamp getTransactionLogTime() const = 0;
         virtual void setTransactionLogTime(Timestamp value) = 0;
@@ -663,6 +715,7 @@ class ECConnectionNotificationManager;
         virtual AbstractBusinessEventManagerPtr getBusinessEventManager(const Qn::UserAccessData &userAccessData) = 0;
         virtual AbstractUserManagerPtr getUserManager(const Qn::UserAccessData &userAccessData) = 0;
         virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserAccessData &userAccessData) = 0;
+        virtual AbstractLayoutTourManagerPtr getLayoutTourManager(const Qn::UserAccessData& userAccessData) = 0;
         virtual AbstractVideowallManagerPtr getVideowallManager(const Qn::UserAccessData &userAccessData) = 0;
         virtual AbstractStoredFileManagerPtr getStoredFileManager(const Qn::UserAccessData &userAccessData) = 0;
         virtual AbstractUpdatesManagerPtr getUpdatesManager(const Qn::UserAccessData &userAccessData) = 0;
@@ -679,6 +732,7 @@ class ECConnectionNotificationManager;
         virtual AbstractBusinessEventNotificationManagerPtr getBusinessEventNotificationManager() = 0;
         virtual AbstractUserNotificationManagerPtr getUserNotificationManager() = 0;
         virtual AbstractLayoutNotificationManagerPtr getLayoutNotificationManager() = 0;
+        virtual AbstractLayoutTourNotificationManagerPtr getLayoutTourNotificationManager() = 0;
         virtual AbstractWebPageNotificationManagerPtr getWebPageNotificationManager() = 0;
         virtual AbstractDiscoveryNotificationManagerPtr getDiscoveryNotificationManager() = 0;
         virtual AbstractMiscNotificationManagerPtr getMiscNotificationManager() = 0;
@@ -686,7 +740,11 @@ class ECConnectionNotificationManager;
         virtual AbstractStoredFileNotificationManagerPtr getStoredFileNotificationManager() = 0;
         virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() = 0;
 
+        virtual QnCommonModule* commonModule() const = 0;
+
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const = 0;
+        virtual QnTransactionMessageBus* messageBus() const = 0;
+
         virtual ECConnectionNotificationManager* notificationManager()
         {
             NX_ASSERT(0);
@@ -758,9 +816,7 @@ class ECConnectionNotificationManager;
     /*!
         \note All methods are asynchronous if other not specified
     */
-    class AbstractECConnectionFactory
-    :
-        public QObject
+    class AbstractECConnectionFactory: public QObject
     {
         Q_OBJECT
 
@@ -792,7 +848,9 @@ class ECConnectionNotificationManager;
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) = 0;
         virtual void registerTransactionListener(QnHttpConnectionListener* httpConnectionListener) = 0;
         virtual void setConfParams( std::map<QString, QVariant> confParams ) = 0;
-
+        virtual QnTransactionMessageBus* messageBus() const = 0;
+        virtual QnDistributedMutexManager* distributedMutex() const = 0;
+        virtual TimeSynchronizationManager* timeSyncManager() const = 0;
     protected:
         virtual int testConnectionAsync( const QUrl& addr, impl::TestConnectionHandlerPtr handler ) = 0;
         virtual int connectAsync( const QUrl& addr, const ApiClientInfoData& clientInfo,

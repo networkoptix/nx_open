@@ -143,7 +143,7 @@ void TunnelConnector::doSimpleConnectTest(
     CrossNatConnector connector(
         SocketAddress((server->serverId() + "." + system.id).constData()),
         mediatorAddressForConnector);
-    auto connectorGuard = makeScopedGuard([&connector]() { connector.pleaseStopSync(); });
+    auto connectorGuard = makeScopeGuard([&connector]() { connector.pleaseStopSync(); });
 
     auto t1 = std::chrono::steady_clock::now();
     connector.connect(

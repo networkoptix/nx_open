@@ -2,8 +2,9 @@
 
 #include <nx/utils/log/assert.h>
 
-QnResourceStatusDictionary::QnResourceStatusDictionary(QObject *parent):
-    QObject(parent)
+QnResourceStatusDictionary::QnResourceStatusDictionary(QObject* parent):
+    QObject(parent),
+    QnCommonModuleAware(parent)
 {
 
 }

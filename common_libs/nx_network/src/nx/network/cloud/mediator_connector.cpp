@@ -5,8 +5,6 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-#include "common/common_globals.h"
-
 static const std::chrono::milliseconds kRetryIntervalInitial = std::chrono::seconds(1);
 static const std::chrono::milliseconds kRetryIntervalMax = std::chrono::minutes(10);
 
@@ -101,7 +99,7 @@ void MediatorConnector::mockupAddress( SocketAddress address, bool suppressWarni
     if (!suppressWarning)
     {
         NX_LOGX( lit( "Mediator address is mocked up: %1" )
-                 .arg( address.toString() ), cl_logWARNING );
+                 .arg( address.toString() ), cl_logINFO );
     }
 
     m_mediatorAddress = address;

@@ -1,7 +1,5 @@
-#ifndef onvif_resource_information_fetcher_h
-#define onvif_resource_information_fetcher_h
-
-#ifdef ENABLE_ONVIF
+#pragma once
+#if defined(ENABLE_ONVIF)
 
 #include <QtCore/QCoreApplication>
 
@@ -75,13 +73,11 @@ private:
 
 typedef QHash<QString, EndpointAdditionalInfo> EndpointInfoHash;
 
-class OnvifResourceInformationFetcher
+class OnvifResourceInformationFetcher: public QnCommonModuleAware
 {
     Q_DECLARE_TR_FUNCTIONS(OnvifResourceInformationFetcher)
 public:
-    OnvifResourceInformationFetcher();
-
-    static OnvifResourceInformationFetcher& instance();
+    OnvifResourceInformationFetcher(QnCommonModule* commonModule);
 
     void findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result, DiscoveryMode discoveryMode) const;
     void findResources(const QString& endpoint, const EndpointAdditionalInfo& info, QnResourceList& result, DiscoveryMode discoveryMode) const;
@@ -118,6 +114,4 @@ private:
     EndpointInfoHookChain m_hookChain;
 };
 
-#endif //ENABLE_ONVIF
-
-#endif // onvif_resource_information_fetcher_h
+#endif // defined(ENABLE_ONVIF)

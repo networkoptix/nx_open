@@ -1,15 +1,10 @@
-/**********************************************************
-* Feb 3, 2016
-* akolesnikov
-***********************************************************/
-
 #include "connector_factory.h"
 
 #include "cross_nat_connector.h"
 #include "nx/network/socket_global.h"
 #include "udp/connector.h"
 #include "tcp/direct_endpoint_connector.h"
-
+#include "relay/relay_connector.h"
 
 namespace nx {
 namespace network {
@@ -41,6 +36,14 @@ ConnectorFactory::CloudConnectors ConnectorFactory::createCloudConnectors(
         connectors.emplace_back(
             std::make_unique<tcp::DirectEndpointConnector>(
                 targetAddress, connectSessionId));
+    }
+
+    if (((s_cloudConnectTypeMask & (int)CloudConnectType::proxy) > 0) &&
+        !response.trafficRelayEndpointList.empty())
+    {
+        connectors.emplace_back(
+            std::make_unique<relay::Connector>(
+                response.trafficRelayEndpointList.front(), targetAddress, connectSessionId));
     }
 
     return connectors;

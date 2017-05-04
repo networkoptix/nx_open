@@ -46,11 +46,6 @@ int AbstractCommunicatingSocket::send(const QByteArray& data)
     return send(data.constData(), data.size());
 }
 
-int AbstractCommunicatingSocket::send(const QnByteArray& data)
-{
-    return send(data.constData(), data.size());
-}
-
 void AbstractCommunicatingSocket::registerTimer(
     unsigned int timeout,
     nx::utils::MoveOnlyFunc<void()> handler)

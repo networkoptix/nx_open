@@ -12,8 +12,9 @@
 #include <nx_ec/data/api_peer_system_time_data.h>
 #include <utils/common/enable_multi_thread_direct_connection.h>
 #include <utils/common/id.h>
+#include <nx/utils/thread/stoppable.h>
 #include <nx/utils/timer_manager.h>
-#include <utils/common/safe_direct_connection.h>
+#include <nx/utils/safe_direct_connection.h>
 #include <nx/utils/singleton.h>
 #include <nx/network/time/abstract_accurate_time_fetcher.h>
 #include <nx/network/http/httptypes.h>
@@ -53,18 +54,19 @@
 
 namespace ec2 {
 
+class Ec2DirectConnection;
 /**
- * Sequence has less priority than TimeSynchronizationManager::peerIsServer and 
+ * Sequence has less priority than TimeSynchronizationManager::peerIsServer and
  * TimeSynchronizationManager::peerTimeSynchronizedWithInternetServer flags
  */
 class TimePriorityKey
 {
 public:
-    /** Sequence number. Incremented with each peer selection by user. */
+        //!sequence number. Incremented with each peer selection by user
     quint16 sequence;
-    /** Bitset of flags from TimeSynchronizationManager class. */
+        //!bitset of flags from \a TimeSynchronizationManager class
     quint16 flags;
-    /** Some random number. */
+        //!some random number
     quint32 seed;
 
     TimePriorityKey();
@@ -110,7 +112,6 @@ class TimeSynchronizationManager:
     public QObject,
     public QnStoppable,
     public EnableMultiThreadDirectConnection<TimeSynchronizationManager>,
-    public Singleton<TimeSynchronizationManager>,
     public Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
@@ -121,7 +122,8 @@ public:
      */
     TimeSynchronizationManager(
         Qn::PeerType peerType,
-        nx::utils::TimerManager* const timerManager);
+        nx::utils::TimerManager* const timerManager,
+        QnTransactionMessageBus* messageBus);
     virtual ~TimeSynchronizationManager();
 
     /** Implemenattion of QnStoppable::pleaseStop. */
@@ -132,7 +134,7 @@ public:
      * @note Cannot do it in constructor to keep valid object destruction order.
      * TODO #ak look like incapsulation failure. Better remove this method.
      */
-    void start();
+    void start(const std::shared_ptr<Ec2DirectConnection>& connection);
 
     /** Returns synchronized time (millis from epoch, UTC). */
     qint64 getSyncTime() const;
@@ -211,6 +213,7 @@ private:
             authData( std::move(_authData) )
         {}
 
+            //PeerContext( PeerContext&& right ) = default;
         PeerContext( PeerContext&& right )
         :
             peerAddress( std::move(right.peerAddress) ),
@@ -219,6 +222,7 @@ private:
             httpClient( std::move(right.httpClient) )
         {}
 
+            //PeerContext& operator=( PeerContext&& right ) = default;
         PeerContext& operator=( PeerContext&& right )
         {
             peerAddress = std::move(right.peerAddress);
@@ -243,6 +247,8 @@ private:
     boost::optional<qint64> m_prevSysTime;
     boost::optional<qint64> m_prevMonotonicClock;
     bool m_terminated;
+    std::shared_ptr<Ec2DirectConnection> m_connection;
+    QnTransactionMessageBus* m_messageBus;
     /** TimeSyncInfo::syncTime stores local time on specified server. */
     std::map<QnUuid, TimeSyncInfo> m_systemTimeByPeer;
     const Qn::PeerType m_peerType;

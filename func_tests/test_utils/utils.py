@@ -34,6 +34,9 @@ def log_list(name, values):
     for i, value in enumerate(values):
         log.debug('\t #%d: %s', i, value)
 
+def quote(s, char='"'):
+    return '%c%s%c' % (char, s, char)
+
 def bool_to_str(val, false_str = 'false', true_str = 'true'):
     if val: return true_str
     else: return false_str

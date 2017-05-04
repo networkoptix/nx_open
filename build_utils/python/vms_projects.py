@@ -32,10 +32,10 @@ translatableProjects = [
 #    TranslatableProject("qtbase", "common"),
     TranslatableProject("common"),
     TranslatableProject("traytool"),
-    TranslatableProject("client_base", "client/libclient"),
-    TranslatableProject("client_ui", "client/libclient").ui(),
-    TranslatableProject("client_core", "client/libclient_core"),
-    TranslatableProject("client_qml", "client/libclient").qml(),
+    TranslatableProject("client_base", "client/nx_client_desktop"),
+    TranslatableProject("client_ui", "client/nx_client_desktop").ui(),
+    TranslatableProject("client_core", "client/nx_client_core"),
+    TranslatableProject("client_qml", "client/nx_client_desktop").qml(),
     TranslatableProject("mobile_client_base", "client/mobile_client"),
     TranslatableProject("mobile_client_qml", "client/mobile_client").qml()
 ]
@@ -81,9 +81,9 @@ customizableProjects = [
     CustomizableProject("client-dmg"),
     CustomizableProject(
         "client",
-        ["client/libclient/src", "client/libclient/static-resources/src"],
-        ["client/libclient/static-resources/skin"],
-        ["libclient/resources/skin"],
+        ["client/nx_client_desktop/src", "client/nx_client_desktop/static-resources/src"],
+        ["client/nx_client_desktop/static-resources/skin"],
+        ["nx_client_desktop/resources/skin"],
         "skin"
         ),
     CustomizableProject(

@@ -3,8 +3,8 @@
 Functional tests define configuration required for them indirectly (via 'box' fixture) using BoxConfig class.
 '''
 
-from netaddr import IPNetwork
-from .utils import is_list_inst
+from netaddr import IPNetwork, IPAddress
+from .utils import is_list_inst, quote
 
 
 DEFAULT_NATNET1 = '10.10.0/24'
@@ -44,9 +44,6 @@ class ConfigCommand(object):
             kwargs=self.kwargs,
             )
 
-
-def quote(s):
-    return '"%s"' % s
 
 # we only support address mask of 24
 def make_vm_config_internal_network_command(vbox_manage, network):
@@ -110,7 +107,8 @@ class BoxConfig(object):
             vm_port_base=d['vm_port_base'],
             )
 
-    def __init__(self, name, ip_address_list, required_file_list, vm_commands, vbox_commands, idx=None, vm_name_prefix=None, vm_port_base=None):
+    def __init__(self, name, ip_address_list, required_file_list, vm_commands, vbox_commands,
+                 idx=None, vm_name_prefix=None, vm_port_base=None):
         assert is_list_inst(ip_address_list, IPNetwork), repr(ip_address_list)
         self.name = name
         self.ip_address_list = ip_address_list
@@ -160,6 +158,7 @@ class BoxConfig(object):
                 and self.vm_commands == other.vm_commands
                 and self.vbox_commands == other.vbox_commands)
 
+    @property
     def box_name(self):
         assert self.idx is not None  # must be assigned for box_name
         if self.name:
@@ -168,26 +167,24 @@ class BoxConfig(object):
             suffix = ''
         return 'box-%d%s' % (self.idx, suffix)
 
+    @property
     def vm_box_name(self):
         assert self.vm_name_prefix  # must be set before this call
-        return self.vm_name_prefix + self.box_name()
+        return self.vm_name_prefix + self.box_name
 
+    @property
     def rest_api_forwarded_port(self):
         return self.vm_port_base + self.idx
 
-    def get_vagrant_config_commands(self, type):
-        return [command for command in self.vagrant_config_commands if command.type() == type]
-
     def expand(self, vbox_manage):
-        network_commands = [
-            self._expand_vm_command(make_vm_config_internal_network_command(vbox_manage, ip_address))
-            for ip_address in self.ip_address_list]
+        network_vm_commands = [make_vm_config_internal_network_command(vbox_manage, ip_address)
+                               for ip_address in self.ip_address_list]
         return ExpandedBoxConfig(
-            box_name=self.box_name(),
-            vm_box_name=self.vm_box_name(),
+            box_name=self.box_name,
+            vm_box_name=self.vm_box_name,
             rest_api_internal_port=MEDIASERVER_LISTEN_PORT,
-            rest_api_forwarded_port=self.rest_api_forwarded_port(),
-            vm_commands=network_commands + map(self._expand_vm_command, self.vm_commands),
+            rest_api_forwarded_port=self.rest_api_forwarded_port,
+            vm_commands=map(self._expand_vm_command, network_vm_commands + self.vm_commands),
             vbox_commands=map(self._expand_vbox_command, self.vbox_commands),
             )
 
@@ -203,7 +200,8 @@ class BoxConfig(object):
 
 class ExpandedBoxConfig(object):
 
-    def __init__(self, box_name, vm_box_name, rest_api_internal_port, rest_api_forwarded_port, vm_commands, vbox_commands):
+    def __init__(self, box_name, vm_box_name, rest_api_internal_port, rest_api_forwarded_port,
+                 vm_commands, vbox_commands):
         self.box_name = box_name
         self.vm_box_name = vm_box_name
         self.rest_api_internal_port = rest_api_internal_port

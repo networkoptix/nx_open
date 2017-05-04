@@ -20,7 +20,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
 #include <utils/common/sync_call.h>
-#include <utils/crypt/linux_passwd_crypt.h>
+#include <nx/utils/crypt/linux_passwd_crypt.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
 

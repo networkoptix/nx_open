@@ -4,6 +4,7 @@
 #include <rest/server/json_rest_handler.h>
 
 class QnPlatformMonitor;
+class QnCommonModule;
 
 class QnStorageSpaceRestHandler: public QnJsonRestHandler {
     Q_OBJECT
@@ -25,8 +26,5 @@ private:
     *   Get list of storages that do not exist in the resource pool, but
     *   can be created on the local (or mounted) partitions.
     */
-    QnStorageSpaceDataList getOptionalStorages() const;
-
-private:
-    QnPlatformMonitor *m_monitor;
+    QnStorageSpaceDataList getOptionalStorages(QnCommonModule* commonModule) const;
 };

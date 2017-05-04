@@ -14,7 +14,7 @@
 
 #include <common/common_globals.h>
 #include <nx/utils/std/cpp14.h>
-#include <utils/media/custom_output_stream.h>
+#include <nx/utils/custom_output_stream.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/multipart_content_parser.h>

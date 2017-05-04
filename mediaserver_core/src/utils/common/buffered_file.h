@@ -10,7 +10,7 @@
 #include <QtCore/QQueue>
 #include "utils/fs/file.h"
 #include "utils/common/threadqueue.h"
-#include "utils/common/long_runnable.h"
+#include "nx/utils/thread/long_runnable.h"
 #include "utils/common/byte_array.h"
 #include "utils/memory/cycle_buffer.h"
 #include <utils/common/connective.h>

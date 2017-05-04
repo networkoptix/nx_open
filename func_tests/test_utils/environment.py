@@ -6,8 +6,10 @@ Used to create test environmant - virtual boxes, servers.
 import os
 import os.path
 import logging
+import re
 import shutil
 import subprocess
+import netaddr
 from .host import host_from_config
 from .vagrant_box_config import BoxConfig
 from .vagrant_box import Vagrant
@@ -81,10 +83,11 @@ class EnvironmentBuilder(object):
             config = required_config.clone(
                 idx=self._last_box_idx,
                 vm_name_prefix=self._vm_name_prefix,
-                vm_port_base=self._vm_port_base)
+                vm_port_base=self._vm_port_base,
+                )
             self._boxes_config.append(config)
         config.is_allocated = True
-        log.info('BOX CONFIG %s: %s', config.box_name(), config)
+        log.info('BOX CONFIG %s: %s', config.box_name, config)
         return config
 
     def _find_matching_box_config(self, required_config):
@@ -97,7 +100,7 @@ class EnvironmentBuilder(object):
 
     def _init_server(self, box_config_to_box, http_schema, config):
         box = box_config_to_box[config.box]
-        url = '%s://%s:%d/' % (http_schema, self._vm_host.host, config.box.rest_api_forwarded_port())
+        url = '%s://%s:%d/' % (http_schema, self._vm_host.host, config.box.rest_api_forwarded_port)
         server = Server(self._company_name, config.name, box, url)
         if config.leave_initial_cloud_host:
             patch_set_cloud_host = None
@@ -208,10 +211,12 @@ class Environment(object):
         log.info('FINALIZER for %s', self.artifact_path_prefix)
         for name, server in self.servers.items():
             path_prefix = '%s-server-%s' % (self.artifact_path_prefix, name)
-            log_path = '%s.log' % path_prefix
-            with open(log_path, 'wb') as f:
-                f.write(server.get_log_file())
-            log.debug('log file for server %s, %s is stored to %s', name.upper(), server, log_path)
+            log_contents = server.get_log_file()
+            if log_contents:
+                log_path = '%s.log' % path_prefix
+                with open(log_path, 'wb') as f:
+                    f.write(log_contents)
+                log.debug('log file for server %s, %s is stored to %s', name.upper(), server, log_path)
             for remote_core_path in server.list_core_files():
                 local_core_path = '%s.%s' % (path_prefix, os.path.basename(remote_core_path))
                 server.host.get_file(remote_core_path, local_core_path)

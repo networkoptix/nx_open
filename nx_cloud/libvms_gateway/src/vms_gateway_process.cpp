@@ -9,7 +9,7 @@
 #include <QtCore/QDir>
 #include <QtSql/QSqlQuery>
 
-#include <nx/network/auth_restriction_list.h>
+#include <nx/network/http/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/socket_global.h>
@@ -18,12 +18,12 @@
 
 #include <api/global_settings.h>
 #include <platform/process/current_process.h>
-#include <plugins/videodecoder/stree/stree_manager.h>
+#include <nx/utils/stree/stree_manager.h>
 #include <utils/common/app_info.h>
 #include <nx/utils/std/cpp14.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 #include <utils/common/public_ip_discovery.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 #include "access_control/authentication_manager.h"
 #include "http/connect_handler.h"
@@ -80,7 +80,7 @@ int VmsGatewayProcess::exec()
     using namespace std::placeholders;
 
     bool processStartResult = false;
-    auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
+    auto triggerOnStartedEventHandlerGuard = makeScopeGuard(
         [this, &processStartResult]
         {
             if (m_startedEventHandler)
@@ -143,14 +143,14 @@ int VmsGatewayProcess::exec()
         timerManager.start();
 
         CdbAttrNameSet attrNameSet;
-        stree::StreeManager streeManager(
+        nx::utils::stree::StreeManager streeManager(
             attrNameSet,
             settings.auth().rulesXmlPath);
 
         nx_http::MessageDispatcher httpMessageDispatcher;
 
         //TODO #ak move following to stree xml
-        QnAuthMethodRestrictionList authRestrictionList;
+        nx_http::AuthMethodRestrictionList authRestrictionList;
 
         AuthenticationManager authenticationManager(
             authRestrictionList,
@@ -161,7 +161,7 @@ int VmsGatewayProcess::exec()
 
         if (settings.http().sslSupport)
         {
-            network::SslEngine::useOrCreateCertificate(
+            network::ssl::Engine::useOrCreateCertificate(
                 settings.http().sslCertPath, QnAppInfo::productName().toUtf8(),
                 "US", QnAppInfo::organizationName().toUtf8());
         }
@@ -197,6 +197,9 @@ int VmsGatewayProcess::exec()
             while (!m_terminated)
                 m_cond.wait(lk.mutex());
         }
+
+        NX_LOG(lm("%1 has been stopped")
+            .arg(QnLibVmsGatewayAppInfo::applicationDisplayName()), cl_logALWAYS);
 
         return 0;
     }

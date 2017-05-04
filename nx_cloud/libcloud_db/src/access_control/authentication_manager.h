@@ -15,8 +15,9 @@
 
 #include "auth_types.h"
 
-
-class QnAuthMethodRestrictionList;
+namespace nx_http {
+class AuthMethodRestrictionList;
+} // namespace nx_http
 
 namespace nx {
 namespace cdb {
@@ -39,7 +40,7 @@ class AuthenticationManager:
 public:
     AuthenticationManager(
         std::vector<AbstractAuthenticationDataProvider*> authDataProviders,
-        const QnAuthMethodRestrictionList& authRestrictionList,
+        const nx_http::AuthMethodRestrictionList& authRestrictionList,
         const StreeManager& stree);
 
     virtual void authenticate(
@@ -50,7 +51,7 @@ public:
     static nx::String realm(); 
 
 private:
-    const QnAuthMethodRestrictionList& m_authRestrictionList;
+    const nx_http::AuthMethodRestrictionList& m_authRestrictionList;
     const StreeManager& m_stree;
     std::random_device m_rd;
     std::uniform_int_distribution<size_t> m_dist;
@@ -60,8 +61,8 @@ private:
     api::ResultCode authenticateInDataManagers(
         const nx_http::StringType& username,
         std::function<bool(const nx::Buffer&)> validateHa1Func,
-        const stree::AbstractResourceReader& authSearchInputData,
-        stree::ResourceContainer* const authProperties);
+        const nx::utils::stree::AbstractResourceReader& authSearchInputData,
+        nx::utils::stree::ResourceContainer* const authProperties);
     void addWWWAuthenticateHeader(
         boost::optional<nx_http::header::WWWAuthenticate>* const wwwAuthenticate );
     nx::Buffer generateNonce();

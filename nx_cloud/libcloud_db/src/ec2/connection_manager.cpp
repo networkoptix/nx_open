@@ -8,7 +8,7 @@
 
 #include <cdb/ec2_request_paths.h>
 #include <http/custom_headers.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 #include "access_control/authorization_manager.h"
 #include "compatible_ec2_protocol_version.h"
@@ -80,7 +80,7 @@ ConnectionManager::~ConnectionManager()
 
 void ConnectionManager::createTransactionConnection(
     nx_http::HttpServerConnection* const connection,
-    stree::ResourceContainer authInfo,
+    nx::utils::stree::ResourceContainer authInfo,
     nx_http::Request request,
     nx_http::Response* const response,
     nx_http::RequestProcessedHandler completionHandler)
@@ -164,7 +164,7 @@ void ConnectionManager::createTransactionConnection(
 
 void ConnectionManager::pushTransaction(
     nx_http::HttpServerConnection* const connection,
-    stree::ResourceContainer /*authInfo*/,
+    nx::utils::stree::ResourceContainer /*authInfo*/,
     nx_http::Request request,
     nx_http::Response* const /*response*/,
     nx_http::RequestProcessedHandler completionHandler)
@@ -357,6 +357,8 @@ ConnectionManager::SystemStatusChangedSubscription&
 
 bool ConnectionManager::addNewConnection(ConnectionContext context)
 {
+    using namespace std::placeholders;
+
     QnMutexLocker lock(&m_mutex);
 
     const auto systemWasOffline = getConnectionCountBySystemId(
@@ -373,14 +375,13 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
         std::bind(&ConnectionManager::removeConnection, this, context.connectionId));
     context.connection->setOnGotTransaction(
         std::bind(
-            &ConnectionManager::onGotTransaction,
-            this, context.connection->connectionGuid().toByteArray(),
-            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+            &ConnectionManager::onGotTransaction, this,
+            context.connection->connectionGuid().toByteArray(), _1, _2, _3));
 
     NX_LOGX(QnLog::EC2_TRAN_LOG,
         lm("Adding new transaction connection %1 from %2")
-        .arg(context.connectionId)
-        .str(context.connection->commonTransportHeaderOfRemoteTransaction()),
+            .arg(context.connectionId)
+            .str(context.connection->commonTransportHeaderOfRemoteTransaction()),
         cl_logDEBUG1);
 
     const auto systemId = context.fullPeerName.systemId.toStdString();
@@ -394,8 +395,7 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
     if (systemWasOffline)
     {
         lock.unlock();
-        m_systemStatusChangedSubscription.notify(
-            systemId, api::SystemHealth::online);
+        m_systemStatusChangedSubscription.notify(systemId, api::SystemHealth::online);
     }
 
     return true;
@@ -405,12 +405,17 @@ bool ConnectionManager::isOneMoreConnectionFromSystemAllowed(
     const QnMutexLockerBase& lk,
     const ConnectionContext& context) const
 {
-    if (getConnectionCountBySystemId(lk, context.fullPeerName.systemId) >=
-        m_settings.maxConcurrentConnectionsFromSystem)
+    const auto existingConnectionCount =
+        getConnectionCountBySystemId(lk, context.fullPeerName.systemId);
+
+    if (existingConnectionCount >= m_settings.maxConcurrentConnectionsFromSystem)
     {
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Refusing connection %1 from %2 since "
-                "there are already %3 connections from that system"),
+                "there are already %3 connections from that system")
+            .arg(context.connectionId)
+            .str(context.connection->commonTransportHeaderOfRemoteTransaction())
+            .arg(existingConnectionCount),
             cl_logDEBUG2);
         return false;
     }

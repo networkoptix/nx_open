@@ -1,10 +1,4 @@
-/**********************************************************
-* 23 dec 2013
-* a.kolesnikov
-***********************************************************/
-
-#ifndef HTTP_STREAM_SOCKET_SERVER_H
-#define HTTP_STREAM_SOCKET_SERVER_H
+#pragma once
 
 #include <nx/network/connection_server/stream_socket_server.h>
 
@@ -12,9 +6,8 @@
 #include "http_message_dispatcher.h"
 #include "http_server_connection.h"
 
+namespace nx_http {
 
-namespace nx_http
-{
 class HttpStreamSocketServer:
     public StreamSocketServer<HttpStreamSocketServer, HttpServerConnection>
 {
@@ -25,7 +18,7 @@ public:
 
     HttpStreamSocketServer(
         nx_http::server::AbstractAuthenticationManager* const authenticationManager,
-        nx_http::MessageDispatcher* const httpMessageDispatcher,
+        nx_http::AbstractMessageDispatcher* const httpMessageDispatcher,
         bool sslRequired,
         nx::network::NatTraversalSupport natTraversalSupport)
 	:
@@ -56,9 +49,8 @@ protected:
 
 private:
     nx_http::server::AbstractAuthenticationManager* const m_authenticationManager;
-    nx_http::MessageDispatcher* const m_httpMessageDispatcher;
+    nx_http::AbstractMessageDispatcher* const m_httpMessageDispatcher;
     bool m_persistentConnectionEnabled;
 };
-}
 
-#endif  //HTTP_STREAM_SOCKET_SERVER_H
+} // namespace nx_http

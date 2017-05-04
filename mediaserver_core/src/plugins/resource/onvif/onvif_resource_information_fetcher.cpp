@@ -24,7 +24,10 @@
 #include <common/common_module.h>
 #include <plugins/resource/hikvision/hikvision_onvif_resource.h>
 #include <nx/utils/log/log.h>
+#include <common/static_common_module.h>
+#include <plugins/resource/flir/flir_onvif_resource.h>
 
+using namespace nx::plugins;
 using namespace nx::plugins::onvif;
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
@@ -77,9 +80,8 @@ bool OnvifResourceInformationFetcher::isModelContainVendor(const QString& vendor
         return false;
 }
 
-OnvifResourceInformationFetcher::OnvifResourceInformationFetcher()
-:
-    /*passwordsData(PasswordHelper::instance()),*/
+OnvifResourceInformationFetcher::OnvifResourceInformationFetcher(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule),
     camersNamesData(NameHelper::instance()),
     m_shouldStop(false)
 {
@@ -101,17 +103,6 @@ OnvifResourceInformationFetcher::OnvifResourceInformationFetcher()
     m_hookChain.registerHook(searcher_hooks::hikvisionManufacturerReplacement);
 }
 
-static std::unique_ptr<OnvifResourceInformationFetcher> OnvifResourceInformationFetcher_instance;
-static std::once_flag OnvifResourceInformationFetcher_onceFlag;
-
-OnvifResourceInformationFetcher& OnvifResourceInformationFetcher::instance()
-{
-    std::call_once(
-        OnvifResourceInformationFetcher_onceFlag,
-        [](){ OnvifResourceInformationFetcher_instance.reset( new OnvifResourceInformationFetcher() ); } );
-    return *OnvifResourceInformationFetcher_instance.get();
-}
-
 void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result, DiscoveryMode discoveryMode) const
 {
     EndpointInfoHash::ConstIterator iter = endpointInfo.begin();
@@ -125,7 +116,7 @@ void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endp
 
 bool OnvifResourceInformationFetcher::ignoreCamera(const QString& manufacturer, const QString& name)
 {
-    QnResourceData resourceData = qnCommon->dataPool()->data(manufacturer, name);
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacturer, name);
 
     if (resourceData.value<bool>(Qn::IGNORE_ONVIF_PARAM_NAME))
         return true;
@@ -178,7 +169,11 @@ bool OnvifResourceInformationFetcher::needIgnoreCamera(
     return false;
 }
 
-void OnvifResourceInformationFetcher::findResources(const QString& endpoint, const EndpointAdditionalInfo& originalInfo, QnResourceList& result, DiscoveryMode discoveryMode) const
+void OnvifResourceInformationFetcher::findResources(
+    const QString& endpoint,
+    const EndpointAdditionalInfo& originalInfo,
+    QnResourceList& result,
+    DiscoveryMode discoveryMode) const
 {
     if (endpoint.isEmpty()) {
         qDebug() << "OnvifResourceInformationFetcher::findResources: response packet was received, but appropriate URL was not found.";
@@ -207,7 +202,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     //TODO: #vasilenko UTF unuse std::string
     DeviceSoapWrapper soapWrapper(endpoint.toStdString(), QString(), QString(), 0);
 
-    QnVirtualCameraResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
+    QnVirtualCameraResourcePtr existResource = resourcePool()->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
 
     if (existResource)
     {
@@ -286,7 +281,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         return;
 
 
-    QnResourceData resourceData = qnCommon->dataPool()->data(res->getVendor(), res->getModel());
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(res->getVendor(), res->getModel());
     bool shouldAppearAsSingleChannel =
         resourceData.value<bool>(Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
 
@@ -348,7 +343,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
     if (uniqId.isEmpty())
         return QnPlOnvifResourcePtr();
 
-    auto resData = qnCommon->dataPool()->data(manufacturer, model);
+    auto resData = qnStaticCommon->dataPool()->data(manufacturer, model);
     auto manufacturerAlias = resData.value<QString>(Qn::ONVIF_VENDOR_SUBTYPE);
 
     manufacturerAlias = manufacturerAlias.isEmpty() ? manufacturer : manufacturerAlias;
@@ -436,7 +431,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
     else if (manufacture.toLower().contains(QLatin1String("hikvision")))
         resource = QnPlOnvifResourcePtr(new QnHikvisionOnvifResource());
     else if (manufacture.toLower().contains(QLatin1String("flir")))
-        resource = QnPlOnvifResourcePtr(new QnFlirOnvifResource());
+        resource = QnPlOnvifResourcePtr(new nx::plugins::flir::OnvifResource());
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
 

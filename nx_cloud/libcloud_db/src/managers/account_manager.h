@@ -4,10 +4,10 @@
 #include <string>
 #include <vector>
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 #include <nx/network/buffer.h>
 #include <nx/utils/thread/mutex.h>
-#include <utils/common/counter.h>
+#include <nx/utils/counter.h>
 #include <utils/db/async_sql_query_executor.h>
 #include <utils/db/filter.h>
 
@@ -53,8 +53,8 @@ public:
     virtual void authenticateByName(
         const nx_http::StringType& username,
         std::function<bool(const nx::Buffer&)> validateHa1Func,
-        const stree::AbstractResourceReader& authSearchInputData,
-        stree::ResourceContainer* const authProperties,
+        const nx::utils::stree::AbstractResourceReader& authSearchInputData,
+        nx::utils::stree::ResourceContainer* const authProperties,
         nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
     //---------------------------------------------------------------------------------------------
@@ -139,7 +139,7 @@ private:
     mutable QnMutex m_mutex;
     /** map<email, temporary password>. */
     std::multimap<std::string, data::TemporaryAccountCredentials> m_accountPassword;
-    QnCounter m_startedAsyncCallsCounter;
+    nx::utils::Counter m_startedAsyncCallsCounter;
     UpdateAccountSubroutine m_updateAccountSubroutine;
     dao::rdb::AccountDataObject m_accountDbController;
 
@@ -156,7 +156,7 @@ private:
         std::unique_ptr<AbstractActivateAccountNotification> notification,
         data::AccountConfirmationCode* const resultData);
     void accountReactivated(
-        QnCounter::ScopedIncrement asyncCallLocker,
+        nx::utils::Counter::ScopedIncrement asyncCallLocker,
         bool requestSourceSecured,
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult resultCode,
@@ -169,7 +169,7 @@ private:
         const data::AccountConfirmationCode& verificationCode,
         std::string* const accountEmail);
     void sendActivateAccountResponse(
-        QnCounter::ScopedIncrement asyncCallLocker,
+        nx::utils::Counter::ScopedIncrement asyncCallLocker,
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult resultCode,
         data::AccountConfirmationCode verificationCode,
@@ -201,7 +201,7 @@ private:
         data::AccountConfirmationCode* const confirmationCode);
 
     void temporaryCredentialsSaved(
-        QnCounter::ScopedIncrement asyncCallLocker,
+        nx::utils::Counter::ScopedIncrement asyncCallLocker,
         api::ResultCode resultCode,
         const std::string& accountEmail,
         api::TemporaryCredentials temporaryCredentials,

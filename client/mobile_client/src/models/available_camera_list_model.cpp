@@ -1,5 +1,7 @@
 #include "available_camera_list_model.h"
 
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -7,7 +9,7 @@
 #include <common/common_module.h>
 #include <watchers/available_cameras_watcher.h>
 
-class QnAvailableCameraListModelPrivate : public Connective<QObject>
+class QnAvailableCameraListModelPrivate : public Connective<QObject>, public QnConnectionContextAware
 {
     QnAvailableCameraListModel* q_ptr;
     Q_DECLARE_PUBLIC(QnAvailableCameraListModel)
@@ -115,7 +117,7 @@ QModelIndex QnAvailableCameraListModel::indexByResourceId(const QnUuid& resource
 {
     Q_D(const QnAvailableCameraListModel);
 
-    const auto resource = qnResPool->getResourceById(resourceId);
+    const auto resource = resourcePool()->getResourceById(resourceId);
     if (!resource)
         return QModelIndex();
 
@@ -141,7 +143,7 @@ bool QnAvailableCameraListModel::filterAcceptsResource(const QnResourcePtr& reso
 QnAvailableCameraListModelPrivate::QnAvailableCameraListModelPrivate(QnAvailableCameraListModel* parent) :
     q_ptr(parent)
 {
-    connect(qnResPool, &QnResourcePool::resourceChanged,
+    connect(resourcePool(), &QnResourcePool::resourceChanged,
             this, &QnAvailableCameraListModelPrivate::at_resourceChanged);
 
     resetResources();
@@ -162,7 +164,7 @@ void QnAvailableCameraListModelPrivate::setLayout(const QnLayoutResourcePtr& new
 
 void QnAvailableCameraListModelPrivate::resetResources()
 {
-    const auto* camerasWatcher = qnCommon->instance<QnAvailableCamerasWatcher>();
+    const auto* camerasWatcher = commonModule()->instance<QnAvailableCamerasWatcher>();
 
     Q_Q(QnAvailableCameraListModel);
 
@@ -176,14 +178,14 @@ void QnAvailableCameraListModelPrivate::resetResources()
     {
         for (const auto& item: layout->getItems())
         {
-            const auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(item.resource.id);
+            const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(item.resource.id);
             if (camera)
                 addCamera(camera, true);
         }
     }
     else
     {
-        const auto* camerasWatcher = qnCommon->instance<QnAvailableCamerasWatcher>();
+        const auto* camerasWatcher = commonModule()->instance<QnAvailableCamerasWatcher>();
         const auto cameras = camerasWatcher->availableCameras();
         for (const auto& camera: cameras)
             addCamera(camera, true);
@@ -269,7 +271,7 @@ void QnAvailableCameraListModelPrivate::at_layout_itemAdded(
 {
     NX_ASSERT(resource == layout);
 
-    const auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(item.resource.id);
+    const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(item.resource.id);
     if (camera)
         addCamera(camera);
 }
@@ -279,7 +281,7 @@ void QnAvailableCameraListModelPrivate::at_layout_itemRemoved(
 {
     NX_ASSERT(resource == layout);
 
-    const auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(item.resource.id);
+    const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(item.resource.id);
     if (camera)
         removeCamera(camera);
 }

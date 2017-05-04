@@ -19,6 +19,22 @@ static QString defaultConfigFileName = QString("/opt/%1/mediaserver/etc/mediaser
 static QString defaultConfigFileNameRunTime = QString("/opt/%1/mediaserver/etc/running_time.conf").arg(QnAppInfo::linuxOrganizationName());
 #endif
 
+MSSettings::MSSettings(
+    const QString& roSettingsPath,
+    const QString& rwSettingsPath)
+{
+    if (!roSettingsPath.isEmpty())
+        initializeROSettingsFromConfFile(roSettingsPath);
+    else
+        initializeROSettings();
+
+    if (!rwSettingsPath.isEmpty())
+        initializeRunTimeSettingsFromConfFile(rwSettingsPath);
+    else
+        initializeRunTimeSettings();
+
+}
+
 QString MSSettings::defaultROSettingsFilePath()
 {
 #ifdef _WIN32
@@ -28,11 +44,9 @@ QString MSSettings::defaultROSettingsFilePath()
 #endif
 }
 
-static std::unique_ptr<QSettings> roSettingsInstance;
-
 void MSSettings::initializeROSettingsFromConfFile( const QString& fileName )
 {
-    roSettingsInstance.reset( new QSettings( fileName, QSettings::IniFormat ) );
+    m_roSettings.reset( new QSettings( fileName, QSettings::IniFormat ) );
 }
 
 void MSSettings::initializeROSettings()
@@ -49,7 +63,7 @@ void MSSettings::initializeROSettings()
         }
     }
 #endif
-    roSettingsInstance.reset(new QSettings(
+    m_roSettings.reset(new QSettings(
 #ifndef _WIN32
         defaultConfigFileName, QSettings::IniFormat
 #else
@@ -62,7 +76,7 @@ void MSSettings::initializeROSettings()
 
 QSettings* MSSettings::roSettings()
 {
-    return roSettingsInstance.get();
+    return m_roSettings.get();
 }
 
 QString MSSettings::defaultRunTimeSettingsFilePath()
@@ -74,16 +88,14 @@ QString MSSettings::defaultRunTimeSettingsFilePath()
 #endif
 }
 
-static std::unique_ptr<QSettings> rwSettingsInstance;
-
 void MSSettings::initializeRunTimeSettingsFromConfFile( const QString& fileName )
 {
-    rwSettingsInstance.reset( new QSettings( fileName, QSettings::IniFormat ) );
+    m_rwSettings.reset( new QSettings( fileName, QSettings::IniFormat ) );
 }
 
 void MSSettings::initializeRunTimeSettings()
 {
-    rwSettingsInstance.reset(new QSettings(
+    m_rwSettings.reset(new QSettings(
 #ifndef _WIN32
         defaultConfigFileNameRunTime, QSettings::IniFormat
 #else
@@ -94,5 +106,6 @@ void MSSettings::initializeRunTimeSettings()
 
 QSettings* MSSettings::runTimeSettings()
 {
-    return rwSettingsInstance.get();
+    return m_rwSettings.get();
 }
+

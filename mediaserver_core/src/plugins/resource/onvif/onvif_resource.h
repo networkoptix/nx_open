@@ -75,13 +75,12 @@ struct QnOnvifServiceUrls
 
 };
 
-class QnPlOnvifResource
-:
-    public QnPhysicalCameraResource
+class QnPlOnvifResource: public QnPhysicalCameraResource
 {
     Q_OBJECT
-
+    using base_type = QnPhysicalCameraResource;
 public:
+
     typedef GSoapAsyncCallWrapper <
         PullPointSubscriptionWrapper,
         _onvifEvents__PullMessages,
@@ -132,7 +131,7 @@ public:
 
     static const QString fetchMacAddress(const NetIfacesResp& response, const QString& senderIpAddress);
 
-    QnPlOnvifResource();
+    QnPlOnvifResource(QnCommonModule* commonModule = nullptr);
     virtual ~QnPlOnvifResource();
 
     static const QString createOnvifEndpointUrl(const QString& ipAddress);

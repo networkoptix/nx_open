@@ -19,12 +19,14 @@ QnUuid QnBusinessEventParameters::getParamsHash() const {
         case QnBusiness::ServerFailureEvent:
         case QnBusiness::StorageFailureEvent:
             paramKey += '_' + QByteArray::number(reasonCode);
-            if (reasonCode == QnBusiness::StorageIoErrorReason 
-                || reasonCode == QnBusiness::StorageTooSlowReason 
-                || reasonCode == QnBusiness::StorageFullReason 
+            if (reasonCode == QnBusiness::StorageIoErrorReason
+                || reasonCode == QnBusiness::StorageTooSlowReason
+                || reasonCode == QnBusiness::StorageFullReason
                 || reasonCode == QnBusiness::LicenseRemoved)
                 paramKey += '_' + description.toUtf8();
             break;
+
+        //TODO: #vkutin #gdm Do we need to handle SoftwareTriggerEvent here?
 
         case QnBusiness::CameraInputEvent:
             paramKey += '_' + inputPortId.toUtf8();
@@ -46,4 +48,4 @@ QnUuid QnBusinessEventParameters::getParamsHash() const {
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (QnEventMetaData)(QnBusinessEventParameters), (ubjson)(json)(eq)(xml)(csv_record), _Fields)
+    (QnEventMetaData)(QnBusinessEventParameters), (ubjson)(json)(eq)(xml)(csv_record), _Fields, (brief, true))

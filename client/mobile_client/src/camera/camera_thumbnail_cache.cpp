@@ -45,11 +45,11 @@ void QnCameraThumbnailCache::start()
     if (m_elapsedTimer.isValid())
         return;
 
-    for (const QnResourcePtr &resource: qnResPool->getResources())
+    for (const QnResourcePtr &resource: resourcePool()->getResources())
         at_resourcePool_resourceAdded(resource);
 
-    connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnCameraThumbnailCache::at_resourcePool_resourceAdded);
-    connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnCameraThumbnailCache::at_resourcePool_resourceRemoved);
+    connect(resourcePool(),  &QnResourcePool::resourceAdded,     this,   &QnCameraThumbnailCache::at_resourcePool_resourceAdded);
+    connect(resourcePool(),  &QnResourcePool::resourceRemoved,   this,   &QnCameraThumbnailCache::at_resourcePool_resourceRemoved);
 
     m_elapsedTimer.start();
 }
@@ -59,7 +59,7 @@ void QnCameraThumbnailCache::stop()
     if (!m_elapsedTimer.isValid())
         return;
 
-    disconnect(qnResPool, 0, this, 0);
+    disconnect(resourcePool(), 0, this, 0);
 
     m_thumbnailByResourceId.clear();
     m_pixmaps.clear();
@@ -116,11 +116,11 @@ void QnCameraThumbnailCache::at_resourcePool_resourceRemoved(const QnResourcePtr
 
 void QnCameraThumbnailCache::refreshThumbnail(const QnUuid &id)
 {
-    QnVirtualCameraResourcePtr camera = qnResPool->getResourceById<QnVirtualCameraResource>(id);
+    QnVirtualCameraResourcePtr camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id);
     if (!camera)
         return;
 
-    QnMediaServerResourcePtr server = qnCommon->currentServer();
+    QnMediaServerResourcePtr server = commonModule()->currentServer();
     if (!server)
         return;
 

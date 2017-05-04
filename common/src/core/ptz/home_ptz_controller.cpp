@@ -11,16 +11,18 @@
 #include "ptz_controller_pool.h"
 #include "home_ptz_executor.h"
 
-QnHomePtzController::QnHomePtzController(const QnPtzControllerPtr &baseController):
+QnHomePtzController::QnHomePtzController(
+    const QnPtzControllerPtr &baseController,
+    QThread* executorThread)
+    :
     base_type(baseController),
     m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzObject>(lit("ptzHomeObject"), QnPtzObject(), this)),
     m_executor(new QnHomePtzExecutor(baseController))
 {
-    NX_ASSERT(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
     NX_ASSERT(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
 
     m_adaptor->setResource(baseController->resource());
-    m_executor->moveToThread(qnPtzPool->executorThread());
+    m_executor->moveToThread(executorThread);
 
     connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, &QnHomePtzController::at_adaptor_valueChanged);
 
@@ -33,7 +35,7 @@ QnHomePtzController::~QnHomePtzController() {
 }
 
 bool QnHomePtzController::extends(Qn::PtzCapabilities capabilities) {
-    return 
+    return
         (capabilities & (Qn::PresetsPtzCapability | Qn::ToursPtzCapability)) &&
         !(capabilities & Qn::HomePtzCapability);
 }
@@ -105,7 +107,7 @@ void QnHomePtzController::restartExecutor() {
 
 void QnHomePtzController::at_adaptor_valueChanged() {
     m_executor->setHomePosition(m_adaptor->value());
-    
+
     /* Restart only if it's running right now. */
     if(m_executor->isRunning())
         restartExecutor();

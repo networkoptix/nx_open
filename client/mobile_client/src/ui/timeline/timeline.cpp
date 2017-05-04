@@ -9,7 +9,7 @@
 #include <QtQuick/QSGVertexColorMaterial>
 #include <QtQuick/QSGTextureMaterial>
 #include <QtQuick/QQuickWindow>
-#include <QtCore/qmath.h>
+#include <QtCore/QtMath>
 #include <QtCore/QElapsedTimer>
 #include <QtGui/QFontMetricsF>
 #include <QtGui/QPainter>
@@ -454,12 +454,12 @@ void QnTimeline::setPosition(qint64 position)
 
     if (!stickToEnd())
     {
-        d->targetPosition = qBound(
-            d->startBoundTime,
-            position,
-            d->endBoundTime != -1
-                ? d->endBoundTime
-                : QDateTime::currentMSecsSinceEpoch());
+        const auto startBound = d->autoReturnToBounds ? d->startBoundTime : -1;
+        const auto endBound = (d->autoReturnToBounds && d->endBoundTime != -1)
+            ? d->endBoundTime
+            : QDateTime::currentMSecsSinceEpoch();
+
+        d->targetPosition = qBound(startBound, position, endBound);
     }
 
     update();
@@ -467,25 +467,23 @@ void QnTimeline::setPosition(qint64 position)
 
 void QnTimeline::setPositionImmediately(qint64 position)
 {
-    if (position == this->position()
-        && (d->targetPosition == -1 || d->targetPosition == position))
-    {
-        return;
-    }
-
+    d->targetPosition = -1;
     clearCorrection();
-
     setStickToEnd(position < 0);
 
-    const auto windowSize = windowEnd() - windowStart();
-    const auto endBound = d->endBoundTime != -1
+    if (position == this->position())
+        return;
+
+    const auto startBound = d->autoReturnToBounds ? d->startBoundTime : -1;
+    const auto endBound = (d->autoReturnToBounds && d->endBoundTime != -1)
         ? d->endBoundTime
         : QDateTime::currentMSecsSinceEpoch();
 
     position = stickToEnd()
         ? endBound
-        : qBound(d->startBoundTime, position, endBound);
+        : qBound(startBound, position, endBound);
 
+    const auto windowSize = this->windowSize();
     const auto newWindowEnd = position + windowSize / 2;
     setWindow(newWindowEnd - windowSize, newWindowEnd);
 }
@@ -635,6 +633,7 @@ void QnTimeline::finishZoom(qreal scale)
 
 void QnTimeline::startDrag(int x)
 {
+    d->targetPosition = -1;
     d->zoomKineticHelper.stop();
     d->stickyTime = d->pixelPosToTime(x);
     d->stickyPointKineticHelper.start(x);
@@ -642,12 +641,14 @@ void QnTimeline::startDrag(int x)
 
 void QnTimeline::updateDrag(int x)
 {
+    d->targetPosition = -1;
     d->stickyPointKineticHelper.move(x);
     update();
 }
 
 void QnTimeline::finishDrag(int x)
 {
+    d->targetPosition = -1;
     d->stickyPointKineticHelper.finish(x);
     if (d->stickyPointKineticHelper.isStopped())
         emit moveFinished();
@@ -1370,10 +1371,18 @@ void QnTimelinePrivate::animateProperties()
         }
         else
         {
-            if (position < startBound)
-                position = calculateNewPosition(position, startBound);
-            else if (position > endBound)
-                position = calculateNewPosition(position, endBound);
+            if (autoReturnToBounds)
+            {
+                if (position < startBound)
+                    position = calculateNewPosition(position, startBound);
+                else if (position > endBound)
+                    position = calculateNewPosition(position, endBound);
+            }
+            else
+            {
+                if (endBoundTime == -1 && position > endBound)
+                    position = calculateNewPosition(position, endBound);
+            }
         }
 
         const auto delta = position - parent->position();

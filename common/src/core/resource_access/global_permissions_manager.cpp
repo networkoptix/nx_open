@@ -6,20 +6,22 @@
 #include <core/resource_management/user_roles_manager.h>
 
 #include <core/resource/user_resource.h>
+#include <common/common_module.h>
 
 QnGlobalPermissionsManager::QnGlobalPermissionsManager(QObject* parent):
     base_type(parent),
+    QnCommonModuleAware(parent),
     m_mutex(QnMutex::NonRecursive),
     m_cache()
 {
-    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         &QnGlobalPermissionsManager::handleResourceAdded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnGlobalPermissionsManager::handleResourceRemoved);
 
-    connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
+    connect(userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
         &QnGlobalPermissionsManager::handleRoleAddedOrUpdated);
-    connect(qnUserRolesManager, &QnUserRolesManager::userRoleRemoved, this,
+    connect(userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
         &QnGlobalPermissionsManager::handleRoleRemoved);
 }
 
@@ -70,7 +72,8 @@ bool QnGlobalPermissionsManager::hasGlobalPermission(const Qn::UserAccessData& a
     if (accessRights == Qn::kSystemAccess)
         return true;
 
-    auto user = qnResPool->getResourceById<QnUserResource>(accessRights.userId);
+    const auto& resPool = commonModule()->resourcePool();
+    auto user = resPool->getResourceById<QnUserResource>(accessRights.userId);
     if (!user)
         return false;
     return hasGlobalPermission(user, requiredPermission);
@@ -78,7 +81,7 @@ bool QnGlobalPermissionsManager::hasGlobalPermission(const Qn::UserAccessData& a
 
 void QnGlobalPermissionsManager::recalculateAllPermissions()
 {
-    for (const auto& subject: qnResourceAccessSubjectsCache->allSubjects())
+    for (const auto& subject: resourceAccessSubjectsCache()->allSubjects())
         updateGlobalPermissions(subject);
 }
 
@@ -131,7 +134,7 @@ Qn::GlobalPermissions QnGlobalPermissionsManager::calculateGlobalPermissions(
         switch (user->userRole())
         {
             case Qn::UserRole::CustomUserRole:
-                result = globalPermissions(qnUserRolesManager->userRole(user->userRoleId()));
+                result = globalPermissions(userRolesManager()->userRole(user->userRoleId()));
                 break;
             case Qn::UserRole::Owner:
             case Qn::UserRole::Administrator:
@@ -193,14 +196,14 @@ void QnGlobalPermissionsManager::handleResourceRemoved(const QnResourcePtr& reso
 void QnGlobalPermissionsManager::handleRoleAddedOrUpdated(const ec2::ApiUserRoleData& userRole)
 {
     updateGlobalPermissions(userRole);
-    for (auto subject: qnResourceAccessSubjectsCache->usersInRole(userRole.id))
+    for (auto subject: resourceAccessSubjectsCache()->usersInRole(userRole.id))
         updateGlobalPermissions(subject);
 }
 
 void QnGlobalPermissionsManager::handleRoleRemoved(const ec2::ApiUserRoleData& userRole)
 {
     handleSubjectRemoved(userRole);
-    for (auto subject: qnResourceAccessSubjectsCache->usersInRole(userRole.id))
+    for (auto subject: resourceAccessSubjectsCache()->usersInRole(userRole.id))
         updateGlobalPermissions(subject);
 }
 

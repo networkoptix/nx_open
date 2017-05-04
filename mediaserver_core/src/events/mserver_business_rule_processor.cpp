@@ -66,7 +66,7 @@
 #include <nx/streaming/abstract_archive_stream_reader.h>
 
 #include <utils/common/app_info.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
 #include <rest/handlers/multiserver_chunks_rest_handler.h>
@@ -193,11 +193,11 @@ struct QnEmailAttachmentData {
     QString imageName;
 };
 
-QnMServerBusinessRuleProcessor::QnMServerBusinessRuleProcessor():
-    QnBusinessRuleProcessor(),
-    m_emailManager(new EmailManagerImpl())
+QnMServerBusinessRuleProcessor::QnMServerBusinessRuleProcessor(QnCommonModule* commonModule):
+    QnBusinessRuleProcessor(commonModule),
+    m_emailManager(new EmailManagerImpl(commonModule))
 {
-    connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(onRemoveResource(QnResourcePtr)), Qt::QueuedConnection);
+    connect(resourcePool(), SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(onRemoveResource(QnResourcePtr)), Qt::QueuedConnection);
 }
 
 QnMServerBusinessRuleProcessor::~QnMServerBusinessRuleProcessor()
@@ -284,7 +284,7 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
 bool QnMServerBusinessRuleProcessor::executePlaySoundAction(const QnAbstractBusinessActionPtr &action)
 {
     const auto params = action->getParams();
-    const auto resource = qnResPool->getResourceById<QnSecurityCamResource>(params.actionResourceId);
+    const auto resource = resourcePool()->getResourceById<QnSecurityCamResource>(params.actionResourceId);
 
     if (!resource)
         return false;
@@ -340,7 +340,7 @@ bool QnMServerBusinessRuleProcessor::executeSayTextAction(const QnAbstractBusine
 #if !defined(EDGE_SERVER)
     const auto params = action->getParams();
     const auto text = params.sayText;
-    const auto resource = qnResPool->getResourceById<QnSecurityCamResource>(params.actionResourceId);
+    const auto resource = resourcePool()->getResourceById<QnSecurityCamResource>(params.actionResourceId);
     if (!resource)
         return false;
 
@@ -362,7 +362,7 @@ bool QnMServerBusinessRuleProcessor::executeSayTextAction(const QnAbstractBusine
 
 bool QnMServerBusinessRuleProcessor::executePanicAction(const QnPanicBusinessActionPtr& action)
 {
-    const QnResourcePtr& mediaServerRes = qnResPool->getResourceById(serverGuid());
+    const QnResourcePtr& mediaServerRes = resourcePool()->getResourceById(serverGuid());
     QnMediaServerResource* mediaServer = dynamic_cast<QnMediaServerResource*> (mediaServerRes.data());
     if (!mediaServer)
         return false;
@@ -373,7 +373,7 @@ bool QnMServerBusinessRuleProcessor::executePanicAction(const QnPanicBusinessAct
     if (action->getToggleState() == QnBusiness::ActiveState)
         val =  Qn::PM_BusinessEvents;
     mediaServer->setPanicMode(val);
-    propertyDictionary->saveParams(mediaServer->getId());
+    commonModule()->propertyDictionary()->saveParams(mediaServer->getId());
     return true;
 }
 
@@ -430,7 +430,7 @@ bool QnMServerBusinessRuleProcessor::executeHttpRequestAction(const QnAbstractBu
 
 bool QnMServerBusinessRuleProcessor::executePtzAction(const QnAbstractBusinessActionPtr& action)
 {
-    auto camera = qnResPool->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
+    auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
     if (!camera)
         return false;
     if (camera->getDewarpingParams().enabled)
@@ -445,7 +445,7 @@ bool QnMServerBusinessRuleProcessor::executePtzAction(const QnAbstractBusinessAc
 bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBusinessActionPtr& action)
 {
     NX_ASSERT(action);
-    auto camera = qnResPool->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
+    auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
     //NX_ASSERT(camera);
     bool rez = false;
     if (camera) {
@@ -466,7 +466,7 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBus
 bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusinessActionPtr &action)
 {
     NX_ASSERT(action);
-    auto camera = qnResPool->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
+    auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
     if (!camera)
         return false;
 
@@ -499,8 +499,9 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
     bookmark.durationMs = fixedDurationMs > 0 ? fixedDurationMs : endTimeMs - startTimeMs;
     bookmark.durationMs += recordBeforeMs + recordAfterMs;
     bookmark.cameraId = camera->getId();
-    bookmark.name = QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl);
-    bookmark.description = QnBusinessStringsHelper::eventDetails(action->getRuntimeParams()).join(L'\n');
+    QnBusinessStringsHelper helper(commonModule());
+    bookmark.name = helper.eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl);
+    bookmark.description = helper.eventDetails(action->getRuntimeParams()).join(L'\n');
     bookmark.tags = action->getParams().tags.split(L',', QString::SkipEmptyParts).toSet();
 
     return qnServerDb->addBookmark(bookmark);
@@ -513,7 +514,7 @@ QnUuid QnMServerBusinessRuleProcessor::getGuid() const {
 
 bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action)
 {
-    auto resource = qnResPool->getResourceById(action->getParams().actionResourceId);
+    auto resource = resourcePool()->getResourceById(action->getParams().actionResourceId);
     if( !resource )
     {
         NX_LOG( lit("Received BA_CameraOutput with no resource reference. Ignoring..."), cl_logWARNING );
@@ -536,10 +537,10 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
                 autoResetTimeout );
 }
 
-QByteArray QnMServerBusinessRuleProcessor::getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize)
+QByteArray QnMServerBusinessRuleProcessor::getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize) const
 {
-    QnVirtualCameraResourcePtr cameraRes = qnResPool->getResourceById<QnVirtualCameraResource>(id);
-    const QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    QnVirtualCameraResourcePtr cameraRes = resourcePool()->getResourceById<QnVirtualCameraResource>(id);
+    const QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     if (!cameraRes || !server)
         return QByteArray();
 
@@ -553,7 +554,8 @@ QByteArray QnMServerBusinessRuleProcessor::getEventScreenshotEncoded(const QnUui
     QnMultiserverThumbnailRestHandler handler;
     QByteArray frame;
     QByteArray contentType;
-    if (handler.getScreenshot(request, frame, contentType, server->getPort()) != nx_http::StatusCode::ok)
+    auto result = handler.getScreenshot(commonModule(), request, frame, contentType, server->getPort());
+    if (result != nx_http::StatusCode::ok)
         return QByteArray();
     return frame;
 
@@ -584,13 +586,15 @@ bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessA
     return true;
 }
 
-void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr action, QStringList recipients, int aggregatedResCount)
+void QnMServerBusinessRuleProcessor::sendEmailAsync(
+    QnSendMailBusinessActionPtr action,
+    QStringList recipients, int aggregatedResCount)
 {
     QnEmailAttachmentList attachments;
     QVariantMap contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments);
     QnEmailAttachmentData attachmentData(action->getRuntimeParams().eventType);  //TODO: https://networkoptix.atlassian.net/browse/VMS-2831
-    QnEmailSettings emailSettings = QnGlobalSettings::instance()->emailSettings();
-    QString cloudOwnerAccount = QnGlobalSettings::instance()->cloudAccountName();
+    QnEmailSettings emailSettings = commonModule()->globalSettings()->emailSettings();
+    QString cloudOwnerAccount = commonModule()->globalSettings()->cloudAccountName();
 
     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpSystemIcon, lit(":/skin/email_attachments/systemIcon.png"), tpImageMimeType)));
@@ -602,7 +606,7 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
         contextMap[tpOwnerIcon] = lit("cid:") + tpOwnerIcon;
         contextMap[tpCloudOwnerEmail] = cloudOwnerAccount;
 
-        const auto allUsers = qnResPool->getResources<QnUserResource>();
+        const auto allUsers = resourcePool()->getResources<QnUserResource>();
         for (const auto& user: allUsers)
         {
             if (user->isCloud() && user->getEmail() == cloudOwnerAccount)
@@ -622,13 +626,14 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
         ? lit("mailto:%1").arg(supportEmail.value())
         : emailSettings.supportEmail;
     contextMap[tpSupportLinkText] = emailSettings.supportEmail;
-    contextMap[tpSystemName] = qnGlobalSettings->systemName();
+    contextMap[tpSystemName] = commonModule()->globalSettings()->systemName();
     contextMap[tpSystemSignature] = emailSettings.signature;
 
     contextMap[tpCaption] = action->getRuntimeParams().caption;
     contextMap[tpDescription] = action->getRuntimeParams().description;
-    contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(action->getRuntimeParams(), Qn::ResourceInfoLevel::RI_NameOnly);
-    contextMap[tpSourceIP] = QnBusinessStringsHelper::getResoureIPFromParams(action->getRuntimeParams());
+    QnBusinessStringsHelper helper(commonModule());
+    contextMap[tpSource] = helper.getResoureNameFromParams(action->getRuntimeParams(), Qn::ResourceInfoLevel::RI_NameOnly);
+    contextMap[tpSourceIP] = helper.getResoureIPFromParams(action->getRuntimeParams());
 
     QString messageBody;
     renderTemplateFromFile(attachmentData.templatePath, contextMap, &messageBody);
@@ -636,8 +641,8 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
     ec2::ApiEmailData data(
         recipients,
         aggregatedResCount > 1
-        ? QnBusinessStringsHelper::eventAtResources(action->getRuntimeParams())
-        : QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl),
+        ? helper.eventAtResources(action->getRuntimeParams())
+        : helper.eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl),
         messageBody,
         emailSettings.timeout,
         attachments
@@ -704,33 +709,35 @@ void QnMServerBusinessRuleProcessor::sendAggregationEmail( const SendEmailAggreg
     m_aggregatedEmails.erase( aggregatedActionIter );
 }
 
-QVariantMap QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstractBusinessActionPtr& action,
-                                                                 const QnBusinessAggregationInfo &aggregationInfo,
-                                                                 QnEmailAttachmentList& attachments)
+QVariantMap QnMServerBusinessRuleProcessor::eventDescriptionMap(
+    const QnAbstractBusinessActionPtr& action,
+    const QnBusinessAggregationInfo &aggregationInfo,
+    QnEmailAttachmentList& attachments) const
 {
     QnBusinessEventParameters params = action->getRuntimeParams();
     QnBusiness::EventType eventType = params.eventType;
 
     QVariantMap contextMap;
+    QnBusinessStringsHelper helper(commonModule());
 
     contextMap[tpProductName] = QnAppInfo::productNameLong();
     const int deviceCount = aggregationInfo.toList().size();
-    contextMap[tpEvent] = QnBusinessStringsHelper::eventName(eventType, qMax(1, deviceCount));
-    contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(params, Qn::ResourceInfoLevel::RI_NameOnly);
-    contextMap[tpSourceIP] = QnBusinessStringsHelper::getResoureIPFromParams(params);
+    contextMap[tpEvent] = helper.eventName(eventType, qMax(1, deviceCount));
+    contextMap[tpSource] = helper.getResoureNameFromParams(params, Qn::ResourceInfoLevel::RI_NameOnly);
+    contextMap[tpSourceIP] = helper.getResoureIPFromParams(params);
 
     if (eventType == QnBusiness::CameraMotionEvent ||
         eventType == QnBusiness::CameraInputEvent)
     {
-        auto camRes = qnResPool->getResourceById<QnVirtualCameraResource>( action->getRuntimeParams().eventResourceId);
-        qnCameraHistoryPool->updateCameraHistorySync(camRes);
+        auto camRes = resourcePool()->getResourceById<QnVirtualCameraResource>( action->getRuntimeParams().eventResourceId);
+        cameraHistoryPool()->updateCameraHistorySync(camRes);
         if (camRes->hasVideo(nullptr))
         {
             QByteArray screenshotData = getEventScreenshotEncoded(action->getRuntimeParams().eventResourceId, action->getRuntimeParams().eventTimestampUsec, SCREENSHOT_SIZE);
             if (!screenshotData.isNull())
             {
-                contextMap[tpUrlInt] = QnBusinessStringsHelper::urlForCamera(params.eventResourceId, params.eventTimestampUsec, false);
-                contextMap[tpUrlExt] = QnBusinessStringsHelper::urlForCamera(params.eventResourceId, params.eventTimestampUsec, true);
+                contextMap[tpUrlInt] = helper.urlForCamera(params.eventResourceId, params.eventTimestampUsec, false);
+                contextMap[tpUrlExt] = helper.urlForCamera(params.eventResourceId, params.eventTimestampUsec, true);
 
                 QBuffer screenshotStream(&screenshotData);
                 attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot, screenshotStream, lit("image/jpeg"))));
@@ -747,7 +754,7 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstract
             int screenshotNum = 1;
             for (const QnUuid& cameraId: metadata.cameraRefs)
             {
-                if (QnVirtualCameraResourcePtr camRes = qnResPool->getResourceById<QnVirtualCameraResource>(cameraId))
+                if (QnVirtualCameraResourcePtr camRes = resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId))
                 {
                     QVariantMap camera;
 
@@ -755,9 +762,9 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstract
                     camera[tpCameraName] = camInfo.name();
                     camera[tpCameraIP] = camInfo.host();
 
-                    qnCameraHistoryPool->updateCameraHistorySync(camRes);
-                    camera[tpUrlInt] = QnBusinessStringsHelper::urlForCamera(cameraId, params.eventTimestampUsec, false);
-                    camera[tpUrlExt] = QnBusinessStringsHelper::urlForCamera(cameraId, params.eventTimestampUsec, true);
+                    cameraHistoryPool()->updateCameraHistorySync(camRes);
+                    camera[tpUrlInt] = helper.urlForCamera(cameraId, params.eventTimestampUsec, false);
+                    camera[tpUrlExt] = helper.urlForCamera(cameraId, params.eventTimestampUsec, true);
 
                     QByteArray screenshotData = getEventScreenshotEncoded(cameraId, params.eventTimestampUsec, SCREENSHOT_SIZE);
                     if (!screenshotData.isNull()) {
@@ -785,7 +792,7 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstract
 QVariantList QnMServerBusinessRuleProcessor::aggregatedEventDetailsMap(
     const QnAbstractBusinessActionPtr& action,
     const QnBusinessAggregationInfo& aggregationInfo,
-    Qn::ResourceInfoLevel detailLevel)
+    Qn::ResourceInfoLevel detailLevel) const
 {
     QVariantList result;
     if (aggregationInfo.isEmpty()) {
@@ -801,7 +808,7 @@ QVariantList QnMServerBusinessRuleProcessor::aggregatedEventDetailsMap(
 QVariantList QnMServerBusinessRuleProcessor::aggregatedEventDetailsMap(
     const QnAbstractBusinessActionPtr& action,
     const QList<QnInfoDetail>& aggregationDetailList,
-    Qn::ResourceInfoLevel detailLevel)
+    Qn::ResourceInfoLevel detailLevel) const
 {
     QVariantList result;
     for (const QnInfoDetail& detail: aggregationDetailList)
@@ -814,12 +821,13 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDetailsMap(
     const QnAbstractBusinessActionPtr& action,
     const QnInfoDetail& aggregationData,
     Qn::ResourceInfoLevel detailLevel,
-    bool addSubAggregationData )
+    bool addSubAggregationData ) const
 {
     using namespace QnBusiness;
 
     const QnBusinessEventParameters& params = aggregationData.runtimeParams();
     const int aggregationCount = aggregationData.count();
+    QnBusinessStringsHelper helper(commonModule());
 
     QVariantMap detailsMap;
 
@@ -832,14 +840,14 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDetailsMap(
     }
 
     detailsMap[tpCount] = QString::number(aggregationCount);
-    detailsMap[tpTimestamp] = QnBusinessStringsHelper::eventTimestampShort(params, aggregationCount);
-    detailsMap[tpTimestampDate] = QnBusinessStringsHelper::eventTimestampDate(params);
-    detailsMap[tpTimestampTime] = QnBusinessStringsHelper::eventTimestampTime(params);
+    detailsMap[tpTimestamp] = helper.eventTimestampShort(params, aggregationCount);
+    detailsMap[tpTimestampDate] = helper.eventTimestampDate(params);
+    detailsMap[tpTimestampTime] = helper.eventTimestampTime(params);
 
     switch (params.eventType) {
     case CameraDisconnectEvent: {
-        detailsMap[tpSource] =  QnBusinessStringsHelper::getResoureNameFromParams(params, detailLevel);
-        detailsMap[tpSourceIP] = QnBusinessStringsHelper::getResoureIPFromParams(params);
+        detailsMap[tpSource] = helper.getResoureNameFromParams(params, detailLevel);
+        detailsMap[tpSourceIP] = helper.getResoureIPFromParams(params);
         break;
     }
 
@@ -850,9 +858,9 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDetailsMap(
 
     case NetworkIssueEvent:
         {
-            detailsMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(params, detailLevel);
-            detailsMap[tpSourceIP] = QnBusinessStringsHelper::getResoureIPFromParams(params);
-            detailsMap[tpReason] = QnBusinessStringsHelper::eventReason(params);
+            detailsMap[tpSource] = helper.getResoureNameFromParams(params, detailLevel);
+            detailsMap[tpSourceIP] = helper.getResoureIPFromParams(params);
+            detailsMap[tpReason] = helper.eventReason(params);
             break;
         }
     case StorageFailureEvent:
@@ -860,7 +868,7 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDetailsMap(
     case LicenseIssueEvent:
     case BackupFinishedEvent:
         {
-            detailsMap[tpReason] = QnBusinessStringsHelper::eventReason(params);
+            detailsMap[tpReason] = helper.eventReason(params);
 
             // Fill event-specific reason context here
             QVariantMap reasonContext;
@@ -870,7 +878,7 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDetailsMap(
                 QVariantList disabledCameras;
 
                 for (const QString &id: params.description.split(L';'))
-                    if (const QnVirtualCameraResourcePtr &camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid(id)))
+                    if (const QnVirtualCameraResourcePtr &camera = resourcePool()->getResourceById<QnVirtualCameraResource>(QnUuid(id)))
                         disabledCameras << QnResourceDisplayInfo(camera).toString(Qn::RI_WithUrl);
 
                 reasonContext[lit("disabledCameras")] = disabledCameras;
@@ -930,8 +938,8 @@ void QnMServerBusinessRuleProcessor::updateRecipientsList(
         QString::SkipEmptyParts);
 
     const auto ids = action->getResources();
-    const auto userRoles = qnUserRolesManager->userRoles(ids);
-    const auto users = qnResPool->getResources<QnUserResource>(ids);
+    const auto userRoles = userRolesManager()->userRoles(ids);
+    const auto users = resourcePool()->getResources<QnUserResource>(ids);
 
     QStringList recipients;
     auto addRecipient = [&recipients](const QString& email)
@@ -957,7 +965,7 @@ void QnMServerBusinessRuleProcessor::updateRecipientsList(
 
     for (const auto& userRole: userRoles)
     {
-        for (const auto& subject: qnResourceAccessSubjectsCache->usersInRole(userRole.id))
+        for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(userRole.id))
         {
             const auto& user = subject.user();
             NX_ASSERT(user);

@@ -40,7 +40,7 @@ unsigned int QnAbstractArchiveStreamReader::getCurrentAudioChannel() const
 CameraDiagnostics::Result QnAbstractArchiveStreamReader::diagnoseMediaStreamConnection()
 {
     //TODO/IMPL
-    return CameraDiagnostics::Result( CameraDiagnostics::ErrorCode::unknown );
+    return CameraDiagnostics::Result(CameraDiagnostics::ErrorCode::unknown );
 }
 
 QStringList QnAbstractArchiveStreamReader::getAudioTracksInfo() const
@@ -146,7 +146,7 @@ void QnAbstractArchiveStreamReader::run()
             data->dataProvider = this;
 
         auto mediaRes = m_resource.dynamicCast<QnMediaResource>();
-        if (mediaRes && !mediaRes->hasVideo(this)) 
+        if (mediaRes && !mediaRes->hasVideo(this))
         {
             if (data)
                 m_stat[data->channelNumber].onData(

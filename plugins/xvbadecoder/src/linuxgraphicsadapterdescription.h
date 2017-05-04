@@ -18,7 +18,7 @@
 */
 class LinuxGraphicsAdapterDescription
 :
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
     /*!
