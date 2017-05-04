@@ -471,7 +471,7 @@ void P2pConnection::sendMessage(MessageType messageType, const nx::Buffer& data)
 
 void P2pConnection::sendMessage(const nx::Buffer& data)
 {
-    if (QnLog::instance()->logLevel() >= cl_logDEBUG1)
+    if (nx::utils::log::main()->isToBeLogged(cl_logDEBUG1))
     {
         auto localPeerName = qnStaticCommon->moduleDisplayName(commonModule()->moduleGUID());
         auto remotePeerName = qnStaticCommon->moduleDisplayName(remotePeer().id);

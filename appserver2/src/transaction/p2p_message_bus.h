@@ -73,7 +73,7 @@ public:
                 continue;
             NX_ASSERT(!(ApiPersistentIdData(connection->remotePeer()) == peerId)); //< loop
 
-            if (QnLog::instance()->logLevel() >= cl_logDEBUG1)
+            if (nx::utils::log::main()->isToBeLogged(cl_logDEBUG1))
                 printTran(connection, tran, P2pConnection::Direction::outgoing);
 
             switch (connection->remotePeer().dataFormat)

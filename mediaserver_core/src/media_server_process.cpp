@@ -1336,8 +1336,8 @@ void MediaServerProcess::loadResourcesFromECS(
                 else
                     ++it;
             }
-            qnServerAdditionalAddressesDictionary->setAdditionalUrls(mediaServer.id, additionalAddresses);
-            qnServerAdditionalAddressesDictionary->setIgnoredUrls(mediaServer.id, ignoredAddressesById.values(mediaServer.id));
+            commonModule()->serverAdditionalAddressesDictionary()->setAdditionalUrls(mediaServer.id, additionalAddresses);
+            commonModule()->serverAdditionalAddressesDictionary()->setIgnoredUrls(mediaServer.id, ignoredAddressesById.values(mediaServer.id));
             messageProcessor->updateResource(mediaServer, ec2::NotificationSource::Local);
         }
         do {
