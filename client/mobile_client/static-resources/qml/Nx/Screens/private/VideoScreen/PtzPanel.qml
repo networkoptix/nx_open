@@ -30,6 +30,7 @@ Column
             id: zoomFocusRow
 
             spacing: 8
+            anchors.bottom: parent.bottom
 
             FocusControl
             {
@@ -116,12 +117,13 @@ Column
     Item
     {
         width: parent.width
-        height: Math.max(presetsItem.height)
+        height: 56
 
         Row
         {
             anchors.left: parent.left
             anchors.right: hidePtzButton.left
+            anchors.verticalCenter: parent.verticalCenter
             visible: controller.presetsCount && controller.supportsPresets
 
             PresetsButton
