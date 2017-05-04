@@ -578,6 +578,26 @@ void P2pMessageBus::startStopConnections()
     }
 }
 
+P2pConnectionPtr P2pMessageBus::findBestConnectionToSubscribe(
+    const QVector<ApiPersistentIdData>& viaList) const
+{
+    P2pConnectionPtr result;
+    for (const auto& via: viaList)
+    {
+        auto connection = findConnectionById(via);
+        NX_ASSERT(connection);
+        if (!connection)
+            continue;
+        if (!result ||
+            connection->miscData().localSubscription.size() < result->miscData().localSubscription.size())
+        {
+            result = connection;
+        }
+    }
+
+    return result;
+}
+
 void P2pMessageBus::doSubscribe()
 {
     const bool needDelay = needSubscribeDelay();
@@ -621,16 +641,14 @@ void P2pMessageBus::doSubscribe()
                 continue;
             }
 
-            // in case of several equal routes, use any(random) of them
-            int rndValue = nx::utils::random::number(0, (int)viaList.size() - 1);
-            auto connection = findConnectionById(viaList[rndValue]);
+            auto connection = findBestConnectionToSubscribe(viaList);
             if (subscribedVia)
             {
                 NX_LOG(lit("Peer %1 is changing subscription to %2. subscribed via %3. new subscribe via %4")
                     .arg(qnStaticCommon->moduleDisplayName(localPeer.id))
                     .arg(qnStaticCommon->moduleDisplayName(peer.id))
                     .arg(qnStaticCommon->moduleDisplayName(subscribedVia->remotePeer().id))
-                    .arg(qnStaticCommon->moduleDisplayName(viaList[rndValue].id)),
+                    .arg(qnStaticCommon->moduleDisplayName(connection->remotePeer().id)),
                     cl_logDEBUG1);
             }
             newSubscription[peer] = connection;

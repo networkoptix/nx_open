@@ -109,6 +109,8 @@ private:
     QByteArray serializeSubscribeRequest(
         const QVector<PeerNumberType>& shortValues,
         const QVector<qint32>& sequences);
+    P2pConnectionPtr findBestConnectionToSubscribe(
+        const QVector<ApiPersistentIdData>& viaList) const;
 private:
     void doPeriodicTasks();
     void createOutgoingConnections();
