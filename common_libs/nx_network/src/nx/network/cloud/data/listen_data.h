@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/optional.hpp>
+
 #include <nx/network/abstract_socket.h>
 #include <nx/network/cloud/cloud_connect_version.h>
 #include <nx/network/cloud/cloud_connect_options.h>
@@ -37,7 +39,7 @@ public:
 
     boost::optional<KeepAliveOptions> tcpConnectionKeepAlive;
     CloudConnectOptions cloudConnectOptions;
-    boost::optional<SocketAddress> relayEndpoint;
+    boost::optional<SocketAddress> trafficRelayEndpoint;
 
     ListenResponse();
     void serializeAttributes(nx::stun::Message* const message);
