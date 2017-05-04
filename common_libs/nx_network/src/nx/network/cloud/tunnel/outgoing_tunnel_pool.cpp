@@ -141,6 +141,7 @@ OutgoingTunnelPool::TunnelContext&
         cl_logDEBUG1);
 
     auto tunnel = std::make_unique<OutgoingTunnel>(targetHostAddress);
+    tunnel->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
     tunnel->setOnClosedHandler(
         std::bind(&OutgoingTunnelPool::onTunnelClosed, this, tunnel.get()));
 
