@@ -1,5 +1,7 @@
 #include "relay_connection_acceptor.h"
 
+#include <nx/utils/std/cpp14.h>
+
 namespace nx {
 namespace network {
 namespace cloud {
@@ -29,6 +31,26 @@ void ConnectionAcceptor::cancelIOSync()
 void ConnectionAcceptor::stopWhileInAioThread()
 {
     // TODO
+}
+
+//-------------------------------------------------------------------------------------------------
+
+ConnectionAcceptorFactory::ConnectionAcceptorFactory():
+    base_type(std::bind(&ConnectionAcceptorFactory::defaultFactoryFunc, this,
+        std::placeholders::_1))
+{
+}
+
+ConnectionAcceptorFactory& ConnectionAcceptorFactory::instance()
+{
+    static ConnectionAcceptorFactory factoryInstance;
+    return factoryInstance;
+}
+
+std::unique_ptr<AbstractAcceptor> ConnectionAcceptorFactory::defaultFactoryFunc(
+    const SocketAddress& relayEndpoint)
+{
+    return std::make_unique<ConnectionAcceptor>(relayEndpoint);
 }
 
 } // namespace relay

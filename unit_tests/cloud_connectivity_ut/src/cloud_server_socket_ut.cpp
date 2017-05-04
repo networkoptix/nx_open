@@ -693,7 +693,17 @@ class CloudServerSocketMultipleAcceptors:
 public:
     CloudServerSocketMultipleAcceptors()
     {
+        using namespace std::placeholders;
+
         startMediatorAndRegister();
+        m_factoryFuncBak = cloud::relay::ConnectionAcceptorFactory::instance().setCustomFunc(
+            std::bind(&CloudServerSocketMultipleAcceptors::customAcceptorFactoryFunc, this, _1));
+    }
+
+    ~CloudServerSocketMultipleAcceptors()
+    {
+        cloud::relay::ConnectionAcceptorFactory::instance().setCustomFunc(
+            std::move(m_factoryFuncBak));
     }
 
 protected:
@@ -720,6 +730,16 @@ protected:
     void thenEveryAcceptorIsCancelled()
     {
         // TODO
+    }
+
+private:
+    cloud::relay::ConnectionAcceptorFactory::Function m_factoryFuncBak;
+
+    std::unique_ptr<AbstractAcceptor> customAcceptorFactoryFunc(
+        const SocketAddress& /*relayEndpoint*/)
+    {
+        // TODO
+        return nullptr;
     }
 };
 

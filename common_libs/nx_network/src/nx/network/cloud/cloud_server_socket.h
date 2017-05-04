@@ -110,7 +110,7 @@ protected:
     std::atomic<State> m_state;
     std::vector<std::unique_ptr<AbstractTunnelAcceptor>> m_acceptors;
     IncomingTunnelPool* m_tunnelPool = nullptr;
-    relay::ConnectionAcceptor* m_relayConnectionAcceptor = nullptr;
+    AbstractAcceptor* m_relayConnectionAcceptor = nullptr;
     mutable SystemError::ErrorCode m_lastError;
     AcceptCompletionHandler m_savedAcceptHandler;
     hpm::api::ConnectionMethods m_supportedConnectionMethods = 0xFFFF; //< No limits by default.

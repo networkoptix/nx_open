@@ -4,6 +4,7 @@
 
 #include <nx/network/abstract_acceptor.h>
 #include <nx/network/socket_common.h>
+#include <nx/utils/basic_factory.h>
 #include <nx/utils/move_only_func.h>
 
 namespace nx {
@@ -29,6 +30,25 @@ protected:
 
 private:
     const SocketAddress m_relayEndpoint;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class NX_NETWORK_API ConnectionAcceptorFactory:
+    public nx::utils::BasicFactory<
+        std::unique_ptr<AbstractAcceptor>(const SocketAddress& /*relayEndpoint*/)>
+{
+    using base_type = nx::utils::BasicFactory<
+        std::unique_ptr<AbstractAcceptor>(const SocketAddress& /*relayEndpoint*/)>;
+
+public:
+    ConnectionAcceptorFactory();
+
+    static ConnectionAcceptorFactory& instance();
+
+private:
+    std::unique_ptr<AbstractAcceptor> defaultFactoryFunc(
+        const SocketAddress& relayEndpoint);
 };
 
 } // namespace relay

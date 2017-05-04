@@ -450,7 +450,7 @@ void CloudServerSocket::initializeRelaying(
     const hpm::api::ListenResponse& response)
 {
     auto relayConnectionAcceptor = 
-        std::make_unique<relay::ConnectionAcceptor>(*response.relayEndpoint);
+        relay::ConnectionAcceptorFactory::instance().create(*response.relayEndpoint);
     relayConnectionAcceptor->bindToAioThread(getAioThread());
     m_relayConnectionAcceptor = relayConnectionAcceptor.get();
 
