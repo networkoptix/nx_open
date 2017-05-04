@@ -4,6 +4,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/ssl_socket.h>
 #include <nx/network/system_socket.h>
+#include <nx/network/test_support/acceptor_stub.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/test_support/stun_async_client_mock.h>
@@ -604,8 +605,15 @@ protected:
         m_cloudServerSocket->moveToListeningState();
     }
 
+    void whenMediatorIsRestarted()
+    {
+        ASSERT_TRUE(m_mediator.restart());
+    }
+
     void destroyServerSocket()
     {
+        if (!m_cloudServerSocket)
+            return;
         m_cloudServerSocket->pleaseStopSync();
         m_cloudServerSocket.reset();
     }
@@ -696,13 +704,15 @@ public:
         using namespace std::placeholders;
 
         startMediatorAndRegister();
-        m_factoryFuncBak = cloud::relay::ConnectionAcceptorFactory::instance().setCustomFunc(
+        m_factoryFuncBak = cloud::CustomAcceptorFactory::instance().setCustomFunc(
             std::bind(&CloudServerSocketMultipleAcceptors::customAcceptorFactoryFunc, this, _1));
     }
 
     ~CloudServerSocketMultipleAcceptors()
     {
-        cloud::relay::ConnectionAcceptorFactory::instance().setCustomFunc(
+        destroyServerSocket();
+
+        cloud::CustomAcceptorFactory::instance().setCustomFunc(
             std::move(m_factoryFuncBak));
     }
 
@@ -722,6 +732,11 @@ protected:
         // TODO
     }
 
+    void thenCustomAcceptorsAreRemoved()
+    {
+        m_removedAcceptorsQueue.pop();
+    }
+
     void thenEveryAcceptorIsInvoked()
     {
         // TODO
@@ -733,15 +748,26 @@ protected:
     }
 
 private:
-    cloud::relay::ConnectionAcceptorFactory::Function m_factoryFuncBak;
+    cloud::CustomAcceptorFactory::Function m_factoryFuncBak;
+    utils::SyncQueue<network::test::AcceptorStub*> m_removedAcceptorsQueue;
 
-    std::unique_ptr<AbstractAcceptor> customAcceptorFactoryFunc(
-        const SocketAddress& /*relayEndpoint*/)
+    std::vector<std::unique_ptr<AbstractAcceptor>> customAcceptorFactoryFunc(
+        const hpm::api::ListenResponse& /*response*/)
     {
-        // TODO
-        return nullptr;
+        std::vector<std::unique_ptr<AbstractAcceptor>> acceptors;
+        auto acceptor = std::make_unique<network::test::AcceptorStub>();
+        acceptor->setRemovedAcceptorsQueue(&m_removedAcceptorsQueue);
+        acceptors.push_back(std::move(acceptor));
+        return acceptors;
     }
 };
+
+TEST_F(CloudServerSocketMultipleAcceptors, restoring_connection_to_the_cloud)
+{
+    givenInitializedServerSocket();
+    whenMediatorIsRestarted();
+    thenCustomAcceptorsAreRemoved();
+}
 
 TEST_F(CloudServerSocketMultipleAcceptors, all_acceptors_are_used)
 {

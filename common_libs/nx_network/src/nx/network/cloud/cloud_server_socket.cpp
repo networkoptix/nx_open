@@ -162,7 +162,7 @@ AbstractStreamSocket* CloudServerSocket::accept()
     {
         if (auto socket = m_tunnelPool->getNextSocketIfAny())
             return socket.release();
-        //if (auto socket = m_relayConnectionAcceptor->getNextSocketIfAny())
+        //if (auto socket = m_customConnectionAcceptors->getNextSocketIfAny())
         //    return socket.release();
 
         SystemError::setLastErrorCode(SystemError::wouldBlock);
@@ -435,8 +435,7 @@ void CloudServerSocket::startAcceptingConnections(
     else
         m_mediatorConnection->client()->setKeepAliveOptions(keepAliveOptions);
 
-    if (response.relayEndpoint)
-        initializeRelaying(response);
+    initializeCustomAcceptors(response);
 
     if (m_savedAcceptHandler)
     {
@@ -446,15 +445,16 @@ void CloudServerSocket::startAcceptingConnections(
     }
 }
 
-void CloudServerSocket::initializeRelaying(
+void CloudServerSocket::initializeCustomAcceptors(
     const hpm::api::ListenResponse& response)
 {
-    auto relayConnectionAcceptor = 
-        relay::ConnectionAcceptorFactory::instance().create(*response.relayEndpoint);
-    relayConnectionAcceptor->bindToAioThread(getAioThread());
-    m_relayConnectionAcceptor = relayConnectionAcceptor.get();
-
-    m_aggregateAcceptor.addSocket(std::move(relayConnectionAcceptor));
+    auto acceptors = CustomAcceptorFactory::instance().create(response);
+    for (auto& acceptor: acceptors)
+    {
+        acceptor->bindToAioThread(getAioThread());
+        m_customConnectionAcceptors.push_back(acceptor.get());
+        m_aggregateAcceptor.addSocket(std::move(acceptor));
+    }
 }
 
 void CloudServerSocket::retryRegistration()
@@ -563,10 +563,16 @@ void CloudServerSocket::onConnectionRequested(
 
 void CloudServerSocket::onMediatorConnectionRestored()
 {
+    NX_ASSERT(isInSelfAioThread());
+
     if (m_state == State::listening)
     {
         m_state = State::registeringOnMediator;
         m_mediatorRegistrationRetryTimer.reset();
+
+        for (const auto& customAcceptor: m_customConnectionAcceptors)
+            m_aggregateAcceptor.remove(customAcceptor);
+        m_customConnectionAcceptors.clear();
 
         NX_LOGX(lm("Register on mediator after reconnect"), cl_logDEBUG1);
         issueRegistrationRequest();
@@ -580,7 +586,36 @@ void CloudServerSocket::stopWhileInAioThread()
     m_acceptors.clear();
     m_aggregateAcceptor.pleaseStopSync();
     m_tunnelPool = nullptr;
-    m_relayConnectionAcceptor = nullptr;
+    m_customConnectionAcceptors.clear();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+CustomAcceptorFactory::CustomAcceptorFactory():
+    base_type(std::bind(&CustomAcceptorFactory::defaultFactoryFunc, this,
+        std::placeholders::_1))
+{
+}
+
+CustomAcceptorFactory& CustomAcceptorFactory::instance()
+{
+    static CustomAcceptorFactory staticInstance;
+    return staticInstance;
+}
+
+std::vector<std::unique_ptr<AbstractAcceptor>> CustomAcceptorFactory::defaultFactoryFunc(
+    const hpm::api::ListenResponse& response)
+{
+    std::vector<std::unique_ptr<AbstractAcceptor>> acceptors;
+
+    if (response.trafficRelayEndpoint)
+    {
+        acceptors.push_back(
+            relay::ConnectionAcceptorFactory::instance().create(
+                *response.trafficRelayEndpoint));
+    }
+
+    return acceptors;
 }
 
 } // namespace cloud

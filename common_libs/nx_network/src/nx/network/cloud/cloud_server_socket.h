@@ -1,9 +1,13 @@
 #pragma once 
 
+#include <memory>
+#include <vector>
+
 #include <nx/network/abstract_socket.h>
 #include <nx/network/aggregate_acceptor.h>
 #include <nx/network/retry_timer.h>
 #include <nx/network/socket_attributes_cache.h>
+#include <nx/utils/basic_factory.h>
 
 #include "mediator_server_connections.h"
 #include "tunnel/incoming_tunnel_pool.h"
@@ -89,7 +93,7 @@ protected:
     void onListenRequestCompleted(
         nx::hpm::api::ResultCode resultCode, hpm::api::ListenResponse response);
     void startAcceptingConnections(const hpm::api::ListenResponse& response);
-    void initializeRelaying(const hpm::api::ListenResponse& response);
+    void initializeCustomAcceptors(const hpm::api::ListenResponse& response);
     void retryRegistration();
     void reportResult(SystemError::ErrorCode sysErrorCode);
     void acceptAsyncInternal(AcceptCompletionHandler handler);
@@ -110,7 +114,7 @@ protected:
     std::atomic<State> m_state;
     std::vector<std::unique_ptr<AbstractTunnelAcceptor>> m_acceptors;
     IncomingTunnelPool* m_tunnelPool = nullptr;
-    AbstractAcceptor* m_relayConnectionAcceptor = nullptr;
+    std::vector<AbstractAcceptor*> m_customConnectionAcceptors;
     mutable SystemError::ErrorCode m_lastError;
     AcceptCompletionHandler m_savedAcceptHandler;
     hpm::api::ConnectionMethods m_supportedConnectionMethods = 0xFFFF; //< No limits by default.
@@ -119,6 +123,25 @@ protected:
 
 private:
     void stopWhileInAioThread();
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class NX_NETWORK_API CustomAcceptorFactory:
+    public nx::utils::BasicFactory<
+        std::vector<std::unique_ptr<AbstractAcceptor>>(const hpm::api::ListenResponse&)>
+{
+    using base_type = nx::utils::BasicFactory<
+        std::vector<std::unique_ptr<AbstractAcceptor>>(const hpm::api::ListenResponse&)>;
+
+public:
+    CustomAcceptorFactory();
+
+    static CustomAcceptorFactory& instance();
+
+private:
+    std::vector<std::unique_ptr<AbstractAcceptor>> defaultFactoryFunc(
+        const hpm::api::ListenResponse&);
 };
 
 } // namespace cloud
