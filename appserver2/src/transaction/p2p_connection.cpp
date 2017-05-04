@@ -220,7 +220,7 @@ void P2pConnection::fillAuthInfo(const nx_http::AsyncHttpClientPtr& httpClient, 
 
 void P2pConnection::cancelConnecting()
 {
-    NX_LOG(
+    NX_LOG(QnLog::P2P_TRAN_LOG,
         lit("%1 Connection to peer %2 canceled from state %3").
         arg(Q_FUNC_INFO).arg(m_remotePeer.id.toString()).arg(toString(state())),
         cl_logDEBUG1);
@@ -231,7 +231,7 @@ void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client
 {
     const int statusCode = client->response()->statusLine.statusCode;
 
-    NX_LOG( lit("P2pConnection::at_responseReceived. statusCode = %1").
+    NX_LOG(QnLog::P2P_TRAN_LOG, lit("P2pConnection::at_responseReceived. statusCode = %1").
         arg(statusCode), cl_logDEBUG2);
 
     if (statusCode == nx_http::StatusCode::unauthorized)
@@ -291,7 +291,8 @@ void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client
 
         if (m_localPeerProtocolVersion != m_remotePeerEcProtoVersion)
         {
-            NX_LOG(lm("Cannot connect to server %1 because of different EC2 proto version. "
+            NX_LOG(QnLog::P2P_TRAN_LOG,
+                lm("Cannot connect to server %1 because of different EC2 proto version. "
                 "Local peer version: %2, remote peer version: %3")
                 .arg(client->url()).arg(m_localPeerProtocolVersion)
                 .arg(m_remotePeerEcProtoVersion),
@@ -306,7 +307,8 @@ void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client
 
         if (nx::network::AppInfo::defaultCloudHost() != remotePeerCloudHost)
         {
-            NX_LOG(lm("Cannot connect to server %1 because they have different built in cloud host setting. "
+            NX_LOG(QnLog::P2P_TRAN_LOG,
+                lm("Cannot connect to server %1 because they have different built in cloud host setting. "
                 "Local peer host: %2, remote peer host: %3").
                 arg(client->url()).arg(nx::network::AppInfo::defaultCloudHost()).arg(remotePeerCloudHost),
                 cl_logWARNING);
@@ -361,7 +363,8 @@ void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client
     auto error = websocket::validateResponse(client->request(), *client->response());
     if (error != websocket::Error::noError)
     {
-        NX_LOG(lm("Can't establish WEB socket connection. Validation failed. Error: %1").arg((int)error), cl_logERROR);
+        NX_LOG(QnLog::P2P_TRAN_LOG,
+            lm("Can't establish WEB socket connection. Validation failed. Error: %1").arg((int)error), cl_logERROR);
         setState(State::Error);
         m_httpClient.reset();
         return;
@@ -392,7 +395,8 @@ void P2pConnection::onHttpClientDone(const nx_http::AsyncHttpClientPtr& client)
 {
     QnMutexLocker lock(&m_mutex);
 
-    NX_LOG( lit("QnTransactionTransportBase::at_httpClientDone. state = %1").
+    NX_LOG(QnLog::P2P_TRAN_LOG,
+        lit("QnTransactionTransportBase::at_httpClientDone. state = %1").
         arg((int)client->state()), cl_logDEBUG2);
 
     nx_http::AsyncHttpClient::State state = client->state();
@@ -426,10 +430,6 @@ void P2pConnection::setState(State state)
 {
     if (state != m_state)
     {
-        if (state == State::Error)
-        {
-            NX_LOG("error state!", cl_logWARNING);
-        }
         m_state = state;
         emit stateChanged(toSharedPointer(), state);
     }
@@ -479,7 +479,8 @@ void P2pConnection::sendMessage(const nx::Buffer& data)
         MessageType messageType = (MessageType)data[0];
         if (messageType != MessageType::pushTransactionData)
         {
-            NX_LOG(lit("Send message:\t %1 ---> %2. Type: %3. Size=%4")
+            NX_LOG(QnLog::P2P_TRAN_LOG,
+                lit("Send message:\t %1 ---> %2. Type: %3. Size=%4")
                 .arg(localPeerName)
                 .arg(remotePeerName)
                 .arg(toString(messageType))

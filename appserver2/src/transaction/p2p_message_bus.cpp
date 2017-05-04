@@ -122,7 +122,8 @@ void P2pMessageBus::printTran(
         directionName = lm("<---");
     }
 
-    NX_LOG(lit("%1 tran:\t %2 %3 %4. Command: %5. Created by %6")
+    NX_LOG(QnLog::P2P_TRAN_LOG,
+        lit("%1 tran:\t %2 %3 %4. Command: %5. Created by %6")
         .arg(msgName)
         .arg(localPeerName)
         .arg(directionName)
@@ -368,7 +369,8 @@ void P2pMessageBus::printPeersMessage()
             .arg(minDistance);
     }
 
-    NX_LOG(lit("Peer %1 records:\n%3")
+    NX_LOG(QnLog::P2P_TRAN_LOG,
+        lit("Peer %1 records:\n%3")
         .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
         .arg(records.join("\n")),
         cl_logDEBUG1);
@@ -387,7 +389,7 @@ void P2pMessageBus::printSubscribeMessage(
             .arg(peer.persistentId.toString());
     }
 
-    NX_LOG(lit("Subscribe:\t %1 ---> %2:\n%3")
+    NX_LOG(QnLog::P2P_TRAN_LOG, lit("Subscribe:\t %1 ---> %2:\n%3")
         .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
         .arg(qnStaticCommon->moduleDisplayName(remoteId))
         .arg(records.join("\n")),
@@ -488,6 +490,9 @@ void P2pMessageBus::resubscribePeers(
                 shortValues.push_back(connection->encode(id));
             if (nx::utils::log::main()->isToBeLogged(cl_logDEBUG1))
                 printSubscribeMessage(connection->remotePeer().id, miscData.localSubscription);
+
+            NX_ASSERT(newValue.contains(connection->remotePeer()));
+
             connection->sendMessage(serializeSubscribeRequest(
                 shortValues,
                 m_db->transactionLog()->getTransactionsState(newValue)));
@@ -542,15 +547,29 @@ void P2pMessageBus::startStopConnections()
     QMap<ApiPersistentIdData, P2pConnectionPtr> currentSubscription = getCurrentSubscription();
     RouteToPeerMap allPeerDistances = allPeersDistances();
 
+    /*
     if (std::any_of(m_connections.begin(), m_connections.end(),
         [](const P2pConnectionPtr& connection)
     {
         const auto& data = connection->miscData();
         return data.isLocalStarted && data.remotePeersMessage.isEmpty();
     }))
+    */
+    for (const auto& connection : m_connections)
     {
-        // Curerent peer send 'start' but doesn't get response yet. Postpone to start new connections.
-        return;
+        const auto& data = connection->miscData();
+        if (data.isLocalStarted && data.remotePeersMessage.isEmpty())
+        {
+#if 0
+            // Curerent peer send 'start' but doesn't get response yet. Postpone to start new connections.
+            NX_LOG(QnLog::P2P_TRAN_LOG,
+                lit("Peer %1. Postpone stars to the remove peer %2 because start is not answered yet.")
+                .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
+                .arg(qnStaticCommon->moduleDisplayName(connection->remotePeer().id)),
+                cl_logDEBUG1);
+#endif
+            return;
+        }
     }
 
 
@@ -644,7 +663,8 @@ void P2pMessageBus::doSubscribe()
             auto connection = findBestConnectionToSubscribe(viaList);
             if (subscribedVia)
             {
-                NX_LOG(lit("Peer %1 is changing subscription to %2. subscribed via %3. new subscribe via %4")
+                NX_LOG(QnLog::P2P_TRAN_LOG,
+                    lit("Peer %1 is changing subscription to %2. subscribed via %3. new subscribe via %4")
                     .arg(qnStaticCommon->moduleDisplayName(localPeer.id))
                     .arg(qnStaticCommon->moduleDisplayName(peer.id))
                     .arg(qnStaticCommon->moduleDisplayName(subscribedVia->remotePeer().id))
@@ -715,7 +735,7 @@ void P2pMessageBus::at_stateChanged(
             break;
         case P2pConnection::State::Error:
         {
-            NX_LOG(lit("Peer %1 has closed connection to %2")
+            NX_LOG(QnLog::P2P_TRAN_LOG, lit("Peer %1 has closed connection to %2")
                 .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
                 .arg(qnStaticCommon->moduleDisplayName(connection->remotePeer().id)),
                 cl_logDEBUG1);
@@ -776,7 +796,7 @@ void P2pMessageBus::at_gotMessage(
         auto localPeerName = qnStaticCommon->moduleDisplayName(commonModule()->moduleGUID());
         auto remotePeerName = qnStaticCommon->moduleDisplayName(connection->remotePeer().id);
 
-        NX_LOG(lit("Got message:\t %1 <--- %2. Type: %3. Size=%4")
+        NX_LOG(QnLog::P2P_TRAN_LOG, lit("Got message:\t %1 <--- %2. Type: %3. Size=%4")
             .arg(localPeerName)
             .arg(remotePeerName)
             .arg(toString(messageType))
@@ -942,6 +962,9 @@ QByteArray P2pMessageBus::serializeResolvePeerNumberResponse(const QVector<PeerN
 
 bool P2pMessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QByteArray& data)
 {
+
+    NX_ASSERT(!data.isEmpty());
+
     m_lastPeerInfoTimer.restart();
     QVector<PeerNumberType> numbersToResolve;
     BitStreamReader reader((const quint8*)data.data(), data.size());
@@ -962,6 +985,8 @@ bool P2pMessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const
     {
         return false; //< invalid message
     }
+
+    NX_ASSERT(!data.isEmpty());
     if (numbersToResolve.empty())
     {
         processAlivePeersMessage(connection, data);
@@ -1107,7 +1132,7 @@ bool P2pMessageBus::selectAndSendTransactions(
     if (errorCode != ErrorCode::ok)
     {
         NX_LOG(
-            QnLog::EC2_TRAN_LOG,
+            QnLog::P2P_TRAN_LOG,
             lit("P2P message bus failure. Can't select transaction list from database"),
             cl_logWARNING);
         return false;
@@ -1234,7 +1259,7 @@ void P2pMessageBus::gotTransaction(
                 return; // do not proxy if transaction already exists
             default:
                 NX_LOG(
-                    QnLog::EC2_TRAN_LOG,
+                    QnLog::P2P_TRAN_LOG,
                     lit("Can't handle transaction %1: %2. Reopening connection...")
                     .arg(ApiCommand::toString(tran.command))
                     .arg(ec2::toString(errorCode)),
