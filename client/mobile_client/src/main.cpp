@@ -12,6 +12,7 @@
 #include <time.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/log/log_initializer.h>
 #include <api/app_server_connection.h>
 
 #include <common/common_module.h>
@@ -236,35 +237,24 @@ int runApplication(QtSingleGuiApplication* application)
 
 void initLog(const QString& logLevel)
 {
-    QnLog::initLog(logLevel);
-
-    if (conf.enableEc2TranLog)
-    {
-        const auto logFileBaseName = QnAppInfo::isAndroid()
-            ? lit("-")
-            : QLatin1String(conf.tempPath()) + lit("ec2_tran");
-
-        QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
-            logFileBaseName,
-            /*DEFAULT_MAX_LOG_FILE_SIZE*/ 10 * 1024 * 1024,
-            /*DEFAULT_MSG_LOG_ARCHIVE_SIZE*/ 5,
-            cl_logDEBUG2);
-    }
+    nx::utils::log::Settings logSettings;
+    logSettings.level = nx::utils::log::levelFromString(logLevel);
+    logSettings.maxFileSize = 10 * 1024 * 1024;
+    logSettings.maxBackupCount = 5;
 
     if (conf.enableLog)
     {
-        const auto logFileBaseName =
-            conf.logFile && conf.logFile[0]
-                ? QLatin1String(conf.logFile)
-                : QnAppInfo::isAndroid()
-                    ? lit("-")
-                    : QLatin1String(conf.tempPath()) + lit("mobile_client");
+        nx::utils::log::initialize(
+            logSettings, QString::fromUtf8(conf.tempPath()), lit("mobile_client"), QString(),
+            QnAppInfo::isAndroid() ? lit("-") : lit("log_file"));
+    }
 
-        QnLog::instance(QnLog::MAIN_LOG_ID)->create(
-            logFileBaseName,
-            /*DEFAULT_MAX_LOG_FILE_SIZE*/ 10 * 1024 * 1024,
-            /*DEFAULT_MSG_LOG_ARCHIVE_SIZE*/ 5,
-            cl_logDEBUG2);
+    const auto ec2logger = nx::utils::log::add({QnLog::EC2_TRAN_LOG});
+    if (conf.enableEc2TranLog)
+    {
+        nx::utils::log::initialize(
+            logSettings, QString::fromUtf8(conf.tempPath()), lit("mobile_client"), QString(),
+            QnAppInfo::isAndroid() ? lit("-") : lit("ec2_tran"), ec2logger);
     }
 }
 

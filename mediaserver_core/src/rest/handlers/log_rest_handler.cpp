@@ -49,7 +49,14 @@ int QnLogRestHandler::executeGet(
     if (idIter != params.end())
         logId = idIter->second.toInt();
 
-    if (!QnLog::logs()->exists(logId))
+    boost::optional<QString> logFilePath;
+    if ((size_t) logId < QnLog::kAllLogs.size())
+    {
+        if (const auto logger = nx::utils::log::get(QnLog::kAllLogs[logId], /*allowMain*/ false))
+            logFilePath = logger->logFilePath();
+    }
+
+    if (!logFilePath)
     {
         result.append(QString("<root>Bad log file id</root>\n"));
         return nx_http::StatusCode::badRequest;
@@ -58,8 +65,7 @@ int QnLogRestHandler::executeGet(
     if (linesToRead == 0ll)
         linesToRead = 1000000ll;
 
-    QString fileName = QnLog::logFileName(logId);
-    QFile f(fileName);
+    QFile f(*logFilePath);
     if (!f.open(QFile::ReadOnly))
     {
         result.append(QString("<root>Can't open log file</root>\n"));
