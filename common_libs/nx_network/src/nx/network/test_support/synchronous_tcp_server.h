@@ -12,6 +12,7 @@ namespace test {
 class NX_NETWORK_API SynchronousTcpServer
 {
 public:
+    SynchronousTcpServer();
     virtual ~SynchronousTcpServer();
 
     bool bindAndListen(const SocketAddress& endpoint);
@@ -25,7 +26,7 @@ protected:
 private:
     nx::utils::thread m_thread;
     nx::network::TCPServerSocket m_serverSocket;
-    std::atomic<bool> m_stopped = false;
+    std::atomic<bool> m_stopped;
 
     void threadMain();
 };

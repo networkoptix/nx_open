@@ -4,6 +4,11 @@ namespace nx {
 namespace network {
 namespace test {
 
+SynchronousTcpServer::SynchronousTcpServer():
+    m_stopped(false)
+{
+}
+
 SynchronousTcpServer::~SynchronousTcpServer()
 {
     stop();
