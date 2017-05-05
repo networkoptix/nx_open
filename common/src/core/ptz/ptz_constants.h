@@ -46,7 +46,6 @@ public:
 
         AuxilaryPtzCapability = 0x01000000,
 
-        /* Shortcuts */
         ContinuousPanTiltCapabilities =
             ContinuousPanCapability | ContinuousTiltCapability,
 

@@ -1,5 +1,4 @@
-#ifndef QN_FISHEYE_PTZ_CONTROLLER_H
-#define QN_FISHEYE_PTZ_CONTROLLER_H
+#pragma once
 
 #include <QtCore/QPointer>
 #include <QtCore/QElapsedTimer>
@@ -17,29 +16,37 @@
 class QnResourceWidgetRenderer;
 class QnMediaResourceWidget;
 
-class QnFisheyePtzController: public QnBasicPtzController, public AnimationTimerListener {
+class QnFisheyePtzController: public QnBasicPtzController, public AnimationTimerListener
+{
     Q_OBJECT
-    typedef QnBasicPtzController base_type;
+    using base_type = QnBasicPtzController;
 
 public:
-    QnFisheyePtzController(QnMediaResourceWidget *widget);
+    QnFisheyePtzController(QnMediaResourceWidget* widget);
     QnFisheyePtzController(const QnMediaResourcePtr& mediaRes);
     virtual ~QnFisheyePtzController();
 
     virtual Ptz::Capabilities getCapabilities() const override;
 
     virtual bool continuousMove(const QVector3D &speed) override;
-    virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;
+    virtual bool absoluteMove(
+        Qn::PtzCoordinateSpace space,
+        const QVector3D& position,
+        qreal speed) override;
     
     virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D* position) const override;
     virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const override;
-    virtual bool getFlip(Qt::Orientations *flip) override;
+    virtual bool getFlip(Qt::Orientations* flip) const override;
 
     QnMediaDewarpingParams mediaDewarpingParams() const;
     QnItemDewarpingParams itemDewarpingParams() const;
 
-    static QVector3D positionFromRect(const QnMediaDewarpingParams &dewarpingParams, const QRectF &rect);
+    static QVector3D positionFromRect(
+        const QnMediaDewarpingParams& dewarpingParams,
+        const QRectF& rect);
+
     qreal customAR() const;
+
 protected:
     virtual void tick(int deltaMSecs) override;
 
@@ -51,12 +58,13 @@ private:
     Q_SLOT void updateMediaDewarpingParams();
     Q_SLOT void updateItemDewarpingParams();
 
-    QVector3D boundedPosition(const QVector3D &position);
+    QVector3D boundedPosition(const QVector3D& position);
     QVector3D getPositionInternal() const;
-    void absoluteMoveInternal(const QVector3D &position);
+    void absoluteMoveInternal(const QVector3D& position);
 
 private:
-    enum AnimationMode {
+    enum AnimationMode
+    {
         NoAnimation,
         SpeedAnimation,
         PositionAnimation
@@ -83,4 +91,3 @@ private:
     QnItemDewarpingParams m_itemDewarpingParams;
 };
 
-#endif // QN_FISHEYE_PTZ_CONTROLLER_H
