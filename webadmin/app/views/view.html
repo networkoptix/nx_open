@@ -185,11 +185,11 @@
 
                             <div class="stick-to-bottom hidden-mobile" ng-class="{invisible:liveOnly && !activeCamera}">
                                 <timeline
-                                        can-play-live="!(activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')"
+                                    can-play-live="!(activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')"
                                     live-only="liveOnly"
                                     records-provider="activeVideoRecords"
                                     position-handler="switchPosition"
-                                    play-handler="switchPlaying" 
+                                    play-handler="switchPlaying" can-view-archive="canViewArchive"
                                     position-provider="positionProvider" volume-Level="volumeLevel" server-time="serverTime"></timeline>
                             </div>
                         </div>

@@ -1,4 +1,4 @@
-<div class="timeline" ng-class="{'no-timeline':liveOnly}">
+<div class="timeline" ng-class="{'no-timeline':!canViewArchive || 1}">
     <volume-control ng-show="activeVolume" volume-level="volumeLevel"></volume-control>
     <div class="webclient-top-border webclient-bottom-border">
         <div class="text-right pull-right" >
@@ -11,7 +11,7 @@
                 <span class="glyphicon glyphicon-volume-up"></span>
             </span>
         </div>
-        <div class="text-left pull-left" ng-if="!liveOnly">
+        <div class="text-left pull-left" ng-if="canViewArchive && 0">
             <div class="inline-block player-controls pull-left">
                 <span class="webclient-button glyphicon-fwbw"
                       ng-class="{disabled:liveOnly}">
@@ -46,7 +46,7 @@
                 </span>
             </div>
         </div>
-        <div class="text-left pull-left pp-only" ng-if="liveOnly">
+        <div class="text-left pull-left pp-only" ng-if="!canViewArchive || 1">
             <span class="webclient-button glyphicon-pp"
                   ng-class="{disabled: playbackNotSupported || !canPlayLive && (liveOnly || emptyArchive || positionProvider.liveMode)}"
                   ng-click="(playbackNotSupported || !canPlayLive && (liveOnly || emptyArchive || positionProvider.liveMode)) || playPause()">
@@ -66,10 +66,10 @@
                  ng-mousedown="mouseDown($event)">
                 <canvas ></canvas>
             </div>
-            <span ng-if="emptyArchive && !liveOnly" class="caption-row no-archive-message">
+            <span ng-if="emptyArchive" class="caption-row no-archive-message">
                 No Archive
             </span>  
-            <span ng-if="liveOnly"></span>
+            <span ng-if="liveOnly && emptyArchive"></span>
         </div>
     </div>
 

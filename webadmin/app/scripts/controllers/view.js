@@ -22,6 +22,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.playerApi = false;
         $scope.cameras = {};
         $scope.liveOnly = true;
+        $scope.canViewArchive = false;
         $scope.storage.cameraId = $routeParams.cameraId || $scope.storage.cameraId   || null;
 
         if(!$routeParams.cameraId &&  $scope.storage.cameraId){
@@ -37,7 +38,6 @@ angular.module('webadminApp').controller('ViewCtrl',
         });
 
         var isAdmin = false;
-        var canViewArchive = false;
 
         var timeCorrection = 0;
         var minTimeLag = 2000;// Two seconds
@@ -317,7 +317,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640, timeCorrection);
 
                 $scope.liveOnly = true;
-                if(canViewArchive) {
+                if($scope.canViewArchive) {
                     $scope.activeVideoRecords.archiveReadyPromise.then(function (hasArchive) {
                         $scope.liveOnly = !hasArchive;
                     });
@@ -743,7 +743,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         mediaserver.getCurrentUser().then(function(result) {
             isAdmin = result.data.reply.isAdmin || (result.data.reply.permissions.indexOf(Config.globalEditServersPermissions)>=0);
-            canViewArchive = result.data.reply.isAdmin || (result.data.reply.permissions.indexOf(Config.globalViewArchivePermission)>=0);
+            $scope.canViewArchive = result.data.reply.isAdmin || (result.data.reply.permissions.indexOf(Config.globalViewArchivePermission)>=0);
 
             var userId = result.data.reply.id;
 

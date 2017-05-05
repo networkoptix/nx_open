@@ -128,9 +128,14 @@ ng-include{
   line-height: 40px !important;
 }
 
+.no-timeline,
+.no-timeline .volume,
+.no-timeline .text-left,
+.no-timeline .text-right,
 .no-timeline .text-center{
   height: 40px !important;
 }
+
 
 .pp-only{
   width: 60px !important;

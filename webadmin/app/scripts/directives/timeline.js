@@ -5,6 +5,7 @@ angular.module('webadminApp')
         return {
             restrict: 'E',
             scope: {
+                canViewArchive: "=",
                 recordsProvider: '=',
                 positionProvider: '=',
                 playHandler: '=',
