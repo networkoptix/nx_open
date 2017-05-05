@@ -561,6 +561,7 @@ void P2pMessageBus::startStopConnections()
         if (data.isLocalStarted && data.remotePeersMessage.isEmpty())
         {
             auto& miscData = connection->miscData();
+#if 0
             if (miscData.sendStartTimer.elapsed() > 1000 * 7)
             {
                 // Curerent peer send 'start' but doesn't get response yet. Postpone to start new connections.
@@ -571,11 +572,12 @@ void P2pMessageBus::startStopConnections()
                     cl_logDEBUG1);
                 int gg = 4;
             }
+#endif
             return;
         }
     }
 
-
+    int counter = kMaxConnectionsAtOnce;
     // start using connection if need
     for (auto& connection: m_connections)
     {
@@ -596,6 +598,8 @@ void P2pMessageBus::startStopConnections()
             connection->miscData().isLocalStarted = true;
             connection->miscData().sendStartTimer.restart();
             connection->sendMessage(MessageType::start, QByteArray());
+            if (--counter == 0)
+                return; //< limit start requests at once
         }
         else
         {
