@@ -204,6 +204,7 @@ namespace Qn
 
         IsSpecialLayoutRole,
         LayoutIconRole,
+        LayoutFlagsRole,                            //< Role for additional QnLayoutFlags value
         CustomPanelTitleRole,
         CustomPanelDescriptionRole,
         CustomPanelActionsRole,

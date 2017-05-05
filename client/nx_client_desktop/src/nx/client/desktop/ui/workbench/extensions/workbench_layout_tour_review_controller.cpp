@@ -10,7 +10,7 @@
 
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/style/skin.h>
+#include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -145,14 +145,16 @@ void LayoutTourReviewController::reviewLayoutTour(const ec2::ApiLayoutTourData& 
         action::RemoveCurrentLayoutTourAction
     };
 
-    static const float kCellAspectRatio{4.0f / 3.0f};
+    static const float kCellAspectRatio{16.0f / 9.0f};
 
     const auto layout = QnLayoutResourcePtr(new QnLayoutResource());
     layout->setId(QnUuid::createUuid()); //< Layout is never saved to server
     layout->setParentId(tour.id);
     layout->setName(tour.name);
     layout->setData(Qn::IsSpecialLayoutRole, true);
-    layout->setData(Qn::LayoutIconRole, qnSkin->icon(lit("tree/videowall.png")));
+    layout->setData(Qn::LayoutIconRole, qnResIconCache->icon(QnResourceIconCache::LayoutTour));
+    layout->setData(Qn::LayoutFlagsRole, qVariantFromValue(QnLayoutFlag::FixedViewport
+        | QnLayoutFlag::NoResize));
     layout->setData(Qn::CustomPanelActionsRole, qVariantFromValue(actions));
     layout->setData(Qn::CustomPanelTitleRole, tour.name);
     layout->setData(Qn::CustomPanelDescriptionRole, QString());
