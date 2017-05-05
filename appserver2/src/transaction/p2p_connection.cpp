@@ -385,10 +385,6 @@ void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client
     m_httpClient.reset();
 
     setState(State::Connected);
-    using namespace std::placeholders;
-    m_webSocket->readSomeAsync(
-        &m_readBuffer,
-        std::bind(&P2pConnection::onNewMessageRead, this, _1, _2));
 }
 
 void P2pConnection::onHttpClientDone(const nx_http::AsyncHttpClientPtr& client)

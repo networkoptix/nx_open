@@ -212,6 +212,7 @@ void P2pMessageBus::createOutgoingConnections()
             return; //< wait a bit
 
         int pos = m_lastOutgoingIndex % m_remoteUrls.size();
+        ++m_lastOutgoingIndex;
 
         const RemoteConnection& remoteConnection = m_remoteUrls[pos];
         if (!m_connections.contains(remoteConnection.id) && !m_outgoingConnections.contains(remoteConnection.id))
@@ -238,7 +239,6 @@ void P2pMessageBus::createOutgoingConnections()
             m_outgoingConnections.insert(remoteConnection.id, connection);
             connectSignals(connection);
             connection->startConnection();
-            ++m_lastOutgoingIndex;
         }
     }
 }
