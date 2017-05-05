@@ -58,6 +58,7 @@ public:
 
     // Self peer information
     ApiPeerData localPeer() const;
+    ApiPeerDataEx localPeerEx() const;
 
     virtual void stop() override;
 

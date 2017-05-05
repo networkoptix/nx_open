@@ -24,7 +24,7 @@ public:
 protected:
     virtual void run() override;
 private:
-    void addResponseHeaders();
+    QByteArray responseBody(Qn::SerializationFormat dataFormat);
     bool isDisabledPeer(const ApiPeerData& remotePeer) const;
 private:
     Q_DECLARE_PRIVATE(P2pConnectionProcessor);

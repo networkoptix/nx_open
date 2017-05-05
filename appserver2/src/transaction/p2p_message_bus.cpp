@@ -13,6 +13,7 @@
 #include "ubjson_transaction_serializer.h"
 #include "json_transaction_serializer.h"
 #include <api/global_settings.h>
+#include <nx_ec/ec_proto_version.h>
 
 namespace {
 
@@ -233,7 +234,7 @@ void P2pMessageBus::createOutgoingConnections()
             P2pConnectionPtr connection(new P2pConnection(
                 commonModule(),
                 remoteConnection.id,
-                localPeer(),
+                localPeerEx(),
                 std::move(connectionLockGuard),
                 remoteConnection.url));
             m_outgoingConnections.insert(remoteConnection.id, connection);
@@ -721,6 +722,23 @@ ApiPeerData P2pMessageBus::localPeer() const
         commonModule()->runningInstanceGUID(),
         commonModule()->dbId(),
         m_localPeerType);
+}
+
+ApiPeerDataEx P2pMessageBus::localPeerEx() const
+{
+    ApiPeerDataEx result;
+
+    result.id = commonModule()->moduleGUID();
+    result.persistentId = commonModule()->dbId();
+    result.instanceId = commonModule()->runningInstanceGUID();
+    result.systemId = commonModule()->globalSettings()->localSystemId();
+    result.peerType = Qn::PT_Server;
+    result.cloudHost = nx::network::AppInfo::defaultCloudHost();
+    result.identityTime = commonModule()->systemIdentityTime();
+    result.keepAliveTimeout = commonModule()->globalSettings()->connectionKeepAliveTimeout().count();
+    result.protoVersion = nx_ec::EC2_PROTO_VERSION;
+    result.dataFormat = Qn::UbjsonFormat;
+    return result;
 }
 
 void P2pMessageBus::at_stateChanged(

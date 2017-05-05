@@ -3,6 +3,8 @@
 #include "api_globals.h"
 #include "api_data.h"
 #include "nx/utils/latin1_array.h"
+#include <nx_ec/ec_proto_version.h>
+#include <nx/network/app_info.h>
 
 namespace ec2 {
 
@@ -122,5 +124,16 @@ struct ApiPeerData: ApiPersistentIdData
 typedef QSet<QnUuid> QnPeerSet;
 
 #define ApiPeerData_Fields ApiPersistentIdData_Fields (instanceId)(peerType)(dataFormat)
+
+struct ApiPeerDataEx: public ApiPeerData
+{
+    QnUuid systemId;
+    QString cloudHost = nx::network::AppInfo::defaultCloudHost();
+    qint64 identityTime = 0;
+    int keepAliveTimeout = 0;
+    int protoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION;
+};
+
+#define ApiPeerDataEx_Fields ApiPeerData_Fields (systemId)(cloudHost)(identityTime)(keepAliveTimeout)(protoVersion)
 
 } // namespace ec2

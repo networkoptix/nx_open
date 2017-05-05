@@ -89,6 +89,7 @@ namespace ec2 {
     typedef std::vector<ApiPeerSystemTimeData> ApiPeerSystemTimeDataList;
 
     struct ApiPeerData;
+    struct ApiPeerDataEx;
     struct ApiRuntimeData;
 
     struct ApiDatabaseDumpData;
@@ -214,6 +215,7 @@ namespace ec2 {
     (ApiTimeData)\
     (ApiMiscData)\
     (ApiPeerData)\
+    (ApiPeerDataEx)\
     (ApiRuntimeData)\
     (ApiDatabaseDumpData)\
     (ApiDatabaseDumpToFileData)\

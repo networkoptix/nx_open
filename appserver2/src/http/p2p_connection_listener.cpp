@@ -75,39 +75,28 @@ P2pConnectionProcessor::~P2pConnectionProcessor()
     stop();
 }
 
-void P2pConnectionProcessor::addResponseHeaders()
+QByteArray P2pConnectionProcessor::responseBody(Qn::SerializationFormat dataFormat)
 {
     Q_D(P2pConnectionProcessor);
 
-    auto keepAliveTimeout = commonModule()->globalSettings()->connectionKeepAliveTimeout() * 1000;
-    d->response.headers.emplace(
-        Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME,
-        nx_http::header::KeepAlive(
-            keepAliveTimeout).toString());
+    ApiPeerDataEx localPeer;
+    localPeer.id = commonModule()->moduleGUID();
+    localPeer.persistentId = commonModule()->dbId();
+    localPeer.instanceId = commonModule()->runningInstanceGUID();
+    localPeer.systemId = commonModule()->globalSettings()->localSystemId();
 
-    d->response.headers.insert(nx_http::HttpHeader(
-        Qn::EC2_GUID_HEADER_NAME,
-        commonModule()->moduleGUID().toByteArray()));
-    d->response.headers.insert(nx_http::HttpHeader(
-        Qn::EC2_RUNTIME_GUID_HEADER_NAME,
-        commonModule()->runningInstanceGUID().toByteArray()));
-    d->response.headers.insert(nx_http::HttpHeader(
-        Qn::EC2_DB_GUID_HEADER_NAME,
-        commonModule()->dbId().toByteArray()));
+    localPeer.peerType = Qn::PT_Server;
+    localPeer.cloudHost = nx::network::AppInfo::defaultCloudHost();
+    localPeer.identityTime = commonModule()->systemIdentityTime();
+    localPeer.keepAliveTimeout = commonModule()->globalSettings()->connectionKeepAliveTimeout().count();
+    localPeer.protoVersion = nx_ec::EC2_PROTO_VERSION;
 
-    d->response.headers.insert(nx_http::HttpHeader(
-        Qn::EC2_SYSTEM_IDENTITY_HEADER_NAME,
-        QByteArray::number(commonModule()->systemIdentityTime())));
-    d->response.headers.insert(nx_http::HttpHeader(
-        Qn::EC2_PROTO_VERSION_HEADER_NAME,
-        nx_http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
-    d->response.headers.insert(nx_http::HttpHeader(
-        Qn::EC2_CLOUD_HOST_HEADER_NAME,
-        nx::network::AppInfo::defaultCloudHost().toUtf8()));
-    d->response.headers.insert(nx_http::HttpHeader(
-        Qn::EC2_SYSTEM_ID_HEADER_NAME,
-        commonModule()->globalSettings()->localSystemId().toByteArray()));
-
+    if (dataFormat == Qn::JsonFormat)
+        return QJson::serialized(localPeer);
+    else if (dataFormat == Qn::UbjsonFormat)
+        return QnUbjson::serialized(localPeer);
+    else
+        return QByteArray();
 }
 
 bool P2pConnectionProcessor::isDisabledPeer(const ApiPeerData& remotePeer) const
@@ -129,61 +118,80 @@ void P2pConnectionProcessor::run()
     }
     parseRequest();
 
-    QUrlQuery query = QUrlQuery(d->request.requestLine.url.query());
-
-    QnUuid remoteGuid = nx_http::getHeaderValue(d->request.headers, Qn::EC2_GUID_HEADER_NAME);
-    if (remoteGuid.isNull())
-        remoteGuid = QnUuid::createUuid();
-    QnUuid remoteRuntimeGuid = nx_http::getHeaderValue(d->request.headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME);
-    QnUuid remoteDbGuid = nx_http::getHeaderValue(d->request.headers, Qn::EC2_DB_GUID_HEADER_NAME);
-    qint64 remoteSystemIdentityTime = nx_http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_IDENTITY_HEADER_NAME).toLongLong();
-
-    bool deserialized = false;
-    Qn::PeerType peerType = QnLexical::deserialized<Qn::PeerType>(
-        query.queryItemValue("peerType"),
-        Qn::PT_NotDefined,
-        &deserialized);
-    if (!deserialized || peerType == Qn::PT_NotDefined)
-    {
-        QnUuid videowallGuid = QnUuid(query.queryItemValue("videowallGuid"));
-        const bool isVideowall = !videowallGuid.isNull();
-        const bool isClient = query.hasQueryItem("isClient");
-        const bool isMobileClient = query.hasQueryItem("isMobile");
-
-        peerType = isMobileClient ? Qn::PT_OldMobileClient
-            : isVideowall ? Qn::PT_VideowallClient
-            : isClient ? Qn::PT_DesktopClient
-            : Qn::PT_Server;
-    }
+    ApiPeerDataEx remotePeer;
+    QUrlQuery query(d->request.requestLine.url.query());
 
     Qn::SerializationFormat dataFormat = Qn::UbjsonFormat;
     if (query.hasQueryItem("format"))
         QnLexical::deserialize(query.queryItemValue("format"), &dataFormat);
 
-    ApiPeerData remotePeer(remoteGuid, remoteRuntimeGuid, remoteDbGuid, peerType, dataFormat);
+    bool success = false;
+    QByteArray peerData = nx_http::getHeaderValue(d->request.headers, Qn::EC2_PEER_DATA);
+    peerData = QByteArray::fromBase64(peerData);
+    if (dataFormat == Qn::JsonFormat)
+        remotePeer = QJson::deserialized(peerData, ApiPeerDataEx(), &success);
+    else if (dataFormat == Qn::UbjsonFormat)
+        remotePeer = QnUbjson::deserialized(peerData, ApiPeerDataEx(), &success);
 
-    if (peerType == Qn::PT_Server && commonModule()->isReadOnly())
+    if (remotePeer.id.isNull())
+        remotePeer.id = QnUuid::createUuid();
+
+    if (remotePeer.peerType == Qn::PT_Server && commonModule()->isReadOnly())
     {
         sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
         return;
     }
 
     const auto& commonModule = d->messageBus->commonModule();
-    auto systemNameHeaderIter = d->request.headers.find(Qn::EC2_SYSTEM_ID_HEADER_NAME);
-    if ((systemNameHeaderIter != d->request.headers.end()) &&
-        (nx_http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_ID_HEADER_NAME) !=
-            commonModule->globalSettings()->localSystemId().toByteArray()))
+    if (!remotePeer.systemId.isNull() &&
+        remotePeer.systemId != commonModule->globalSettings()->localSystemId())
     {
+        NX_LOG(QnLog::P2P_TRAN_LOG,
+            lm("Reject incoming P2P connection from peer %1 because of different systemId. "
+                "Local peer version: %2, remote peer version: %3")
+            .arg(d->socket->getForeignAddress().address.toString())
+            .arg(commonModule->globalSettings()->localSystemId())
+            .arg(remotePeer.systemId),
+            cl_logWARNING);
+
         sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
         return;
     }
-
-    addResponseHeaders();
+    if (remotePeer.peerType != Qn::PT_MobileClient)
+    {
+        if (nx_ec::EC2_PROTO_VERSION != remotePeer.protoVersion)
+        {
+            NX_LOG(QnLog::P2P_TRAN_LOG,
+                lm("Reject incoming P2P connection from peer %1 because of different EC2 proto version. "
+                    "Local peer version: %2, remote peer version: %3")
+                .arg(d->socket->getForeignAddress().address.toString())
+                .arg(nx_ec::EC2_PROTO_VERSION)
+                .arg(remotePeer.protoVersion),
+                cl_logWARNING);
+            sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
+            return;
+        }
+    }
+    if (remotePeer.peerType == Qn::PT_Server)
+    {
+        if (nx::network::AppInfo::defaultCloudHost() != remotePeer.cloudHost)
+        {
+            NX_LOG(QnLog::P2P_TRAN_LOG,
+                lm("Reject incoming P2P connection from peer %1 because they have different built in cloud host setting. "
+                    "Local peer host: %2, remote peer host: %3")
+                .arg(d->socket->getForeignAddress().address.toString())
+                .arg(nx::network::AppInfo::defaultCloudHost())
+                .arg(remotePeer.cloudHost),
+                cl_logWARNING);
+            sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
+            return;
+        }
+    }
 
     ConnectionLockGuard connectionLockGuard(
         commonModule->moduleGUID(),
         d->messageBus->connectionGuardSharedState(),
-        remoteGuid,
+        remotePeer.id,
         ConnectionLockGuard::Direction::Incoming);
 
     if (remotePeer.peerType == Qn::PT_Server)
@@ -208,7 +216,6 @@ void P2pConnectionProcessor::run()
             return;
 
         parseRequest();
-        addResponseHeaders();
     }
 
     if(!connectionLockGuard.tryAcquireConnected() || //< lock failed
@@ -227,7 +234,14 @@ void P2pConnectionProcessor::run()
         d->socket->close();
         return;
     }
-    sendResponse(nx_http::StatusCode::switchingProtocols, nx_http::StringType());
+
+    d->response.headers.insert(nx_http::HttpHeader(
+        Qn::EC2_PEER_DATA,
+        responseBody(remotePeer.dataFormat).toBase64()));
+
+    sendResponse(
+        nx_http::StatusCode::switchingProtocols,
+        nx_http::StringType());
 
     std::unique_ptr<ShareSocketDelegate> socket(new ShareSocketDelegate(std::move(d->socket)));
     socket->setNonBlockingMode(true);
@@ -236,7 +250,6 @@ void P2pConnectionProcessor::run()
     socket->setSendTimeout(std::chrono::milliseconds(keepAliveTimeout * 2).count());
     socket->setNoDelay(true);
 
-
     WebSocketPtr webSocket(new WebSocket(
         std::move(socket),
         d->request.messageBody));
@@ -244,7 +257,7 @@ void P2pConnectionProcessor::run()
     P2pConnectionPtr connection(new P2pConnection(
         commonModule,
         remotePeer,
-        d->messageBus->localPeer(),
+        d->messageBus->localPeerEx(),
         std::move(connectionLockGuard),
         std::move(webSocket)));
     d->messageBus->gotConnectionFromRemotePeer(connection);

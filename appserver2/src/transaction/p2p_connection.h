@@ -48,13 +48,13 @@ public:
     P2pConnection(
         QnCommonModule* commonModule,
         const QnUuid& remoteId,
-        const ApiPeerData& localPeer,
+        const ApiPeerDataEx& localPeer,
         ConnectionLockGuard connectionLockGuard,
         const QUrl& remotePeerUrl);
     P2pConnection(
         QnCommonModule* commonModule,
-        const ApiPeerData& remotePeer,
-        const ApiPeerData& localPeer,
+        const ApiPeerDataEx& remotePeer,
+        const ApiPeerDataEx& localPeer,
         ConnectionLockGuard connectionLockGuard,
         const WebSocketPtr& webSocket);
     virtual ~P2pConnection();
@@ -72,8 +72,6 @@ public:
 
     void sendMessage(MessageType messageType, const nx::Buffer& data);
     void sendMessage(const nx::Buffer& data);
-
-    qint64 remoteIdentityTime() const;
 
     ApiPersistentIdData decode(PeerNumberType shortPeerNumber) const;
     PeerNumberType encode(const ApiPersistentIdData& fullId, PeerNumberType shortPeerNumber = kUnknownPeerNumnber);
@@ -148,19 +146,15 @@ private:
     State m_state = State::Connecting;
     CredentialsSource m_credentialsSource = CredentialsSource::serverKey;
 
-    ApiPeerData m_localPeer;
-    ApiPeerData m_remotePeer;
+    ApiPeerDataEx m_localPeer;
+    ApiPeerDataEx m_remotePeer;
     Direction m_direction;
     MiscData m_miscData;
-    qint64 m_remoteIdentityTime = 0;
     QUrl m_remotePeerUrl;
     const Qn::UserAccessData m_userAccessData = Qn::kSystemAccess;
 
     PeerNumberInfo m_shortPeerInfo;
     std::unique_ptr<ConnectionLockGuard> m_connectionLockGuard;
-
-    int m_remotePeerEcProtoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION;
-    int m_localPeerProtocolVersion = nx_ec::EC2_PROTO_VERSION;
 
     static SendCounters m_sendCounters;
 };

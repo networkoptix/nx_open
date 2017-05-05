@@ -1,5 +1,6 @@
 #pragma once
 #include <nx_ec/data/api_peer_data.h>
+#include <nx/fusion/fusion/fusion_fwd.h>
 
 namespace ec2 {
 
