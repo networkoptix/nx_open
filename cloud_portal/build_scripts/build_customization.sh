@@ -32,6 +32,14 @@ dir=../customizations/$CUSTOMIZATION/
     grunt build
     popd
 
+    cp -rf $dir/front_end/styles/* ../front_end/app/styles/custom
+
+    echo "Move fonts"
+    rm -rf $TARGET_DIR/common || true
+    mkdir $TARGET_DIR/common
+    mkdir $TARGET_DIR/common/static
+    mv ../front_end/dist/fonts $TARGET_DIR/common/static/fonts
+
     echo "Move front_end to destination"
     mv ../front_end/dist $TARGET_DIR/$CUSTOMIZATION/source/static
 
@@ -97,6 +105,7 @@ dir=../customizations/$CUSTOMIZATION/
         echo "Overwrite them with localized sources"
         cp -rf $lang_dir/views/* $TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG/views/ || true
     done
+    rm -rf $TARGET_DIR/$CUSTOMIZATION/source/static/views
 
     echo "Localization success"
 
