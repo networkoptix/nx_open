@@ -40,7 +40,8 @@ private:
     std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>> m_multiAddressHttpServer;
 
     void registerApiHandlers();
-    template<typename Handler> void registerApiHandler();
+    template<typename Handler> void registerApiHandler(
+        const nx_http::StringType& method);
 
     void startAcceptor();
 };

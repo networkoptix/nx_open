@@ -79,7 +79,7 @@ void LayoutTourExecutor::updateTour(const ec2::ApiLayoutTourData& tour)
     NX_EXPECT(tour.isValid());
 
     // Start/stop timer before items check.
-    bool isTourManual = !isTimerRunning();
+    const bool isTourManual = !isTimerRunning();
     if (isTourManual != tour.settings.manual)
     {
         if (tour.settings.manual)

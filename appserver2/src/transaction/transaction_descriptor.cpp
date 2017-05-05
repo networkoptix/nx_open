@@ -5,16 +5,20 @@
 
 #include <api/global_settings.h>
 
+#include <common/common_module.h>
+
 #include <core/resource_access/user_access_data.h>
 #include <core/resource_access/resource_access_manager.h>
+#include <core/resource_management/layout_tour_manager.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/param.h>
-#include <utils/license_usage_helper.h>
-
-#include <nx_ec/data/api_tran_state_data.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/storage_resource.h>
+#include <core/resource/param.h>
+
+#include <utils/license_usage_helper.h>
+
+#include <nx_ec/data/api_tran_state_data.h>
 
 #include "managers/business_event_manager.h"
 #include "managers/camera_manager.h"
@@ -961,13 +965,13 @@ struct LayoutTourAccess
 struct LayoutTourAccessById
 {
     bool operator()(
-        QnCommonModule* /*commonModule*/,
+        QnCommonModule* commonModule,
         const Qn::UserAccessData& accessData,
         const ApiIdData& tourId)
     {
-        //TODO: #GDM #3.1 get actual tour and check it via LayoutTourAccess
-        //Possibly we can pass detail::QnDbManager* db here instead of the common module
-        return true;
+        const auto tour = commonModule->layoutTourManager()->tour(tourId.id);
+        return !tour.isValid() //< Allow everyone to work with tours which are already deleted.
+            || LayoutTourAccess()(commonModule, accessData, tour);
     }
 };
 

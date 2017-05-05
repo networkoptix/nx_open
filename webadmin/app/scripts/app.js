@@ -96,6 +96,16 @@ angular.module('webadminApp', [
             controller: 'ViewCtrl',
             reloadOnSearch: false
         })
+        .when('/viewdebug', {
+            templateUrl: Config.viewsDir + 'viewdebug.html',
+            controller: 'ViewdebugCtrl',
+            reloadOnSearch: false
+        })
+        .when('/viewdebug/:cameraId', {
+            templateUrl: Config.viewsDir + 'viewdebug.html',
+            controller: 'ViewdebugCtrl',
+            reloadOnSearch: false
+        })
         .when('/sdkeula', {
             templateUrl: Config.viewsDir + 'sdkeula.html',
             controller: 'SdkeulaCtrl'
@@ -131,6 +141,9 @@ angular.module('webadminApp', [
                 unsubscribe();
                 unsubscribe = null;
             });
+        }
+        if($location.search().debug){
+            Config.allowDebugMode = $location.search().debug;
         }
         return original.apply($location, [path]);
     };

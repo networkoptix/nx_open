@@ -25,8 +25,16 @@ NX_NETWORK_CLIENT_SOCKET_TEST_CASE(
 TEST(CloudStreamSocketTcpByIp, TransferSyncSsl)
 {
     network::test::socketTransferSync(
-        [&]() { return std::make_unique<deprecated::SslServerSocket>(new TCPServerSocket(AF_INET), false); },
-        []() { return std::make_unique<deprecated::SslSocket>(new CloudStreamSocket(AF_INET), false); });
+        [&]()
+        {
+            return std::make_unique<deprecated::SslServerSocket>(
+                std::make_unique<TCPServerSocket>(AF_INET), false);
+        },
+        []()
+        {
+            return std::make_unique<deprecated::SslSocket>(
+                std::make_unique<CloudStreamSocket>(AF_INET), false);
+        });
 }
 
 class TestTcpServerSocket:
@@ -82,8 +90,16 @@ NX_NETWORK_CLIENT_SOCKET_TEST_CASE_EX(
 TEST_F(CloudStreamSocketTcpByHost, TransferSyncSsl)
 {
     network::test::socketTransferSync(
-        [&]() { return std::make_unique<deprecated::SslServerSocket>(new TestTcpServerSocket(testHost), false); },
-        []() { return std::make_unique<deprecated::SslSocket>(new CloudStreamSocket(AF_INET), false); },
+        [&]()
+        {
+            return std::make_unique<deprecated::SslServerSocket>(
+                std::make_unique<TestTcpServerSocket>(testHost), false);
+        },
+        []()
+        {
+            return std::make_unique<deprecated::SslSocket>(
+                std::make_unique<CloudStreamSocket>(AF_INET), false);
+        },
         SocketAddress(testHost));
 }
 

@@ -41,7 +41,7 @@ protected:
     }
 
 private:
-    rest::RestPathMatcher<int> m_dictionary;
+    rest::PathMatcher<int> m_dictionary;
 };
 
 TEST_F(RestPathMatcher, find_handler)

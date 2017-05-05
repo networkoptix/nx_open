@@ -1198,8 +1198,8 @@ bool TCPSocket::getKeepAlive(boost::optional< KeepAliveOptions >* result) const
 
 static const int DEFAULT_ACCEPT_TIMEOUT_MSEC = 250;
 /**
-* @return fd (>=0) on success, <0 on error (-2 if timed out)
-*/
+ * @return fd (>=0) on success, <0 on error (-2 if timed out)
+ */
 static int acceptWithTimeout(
     int m_fd,
     int timeoutMillis = DEFAULT_ACCEPT_TIMEOUT_MSEC,
@@ -1298,7 +1298,9 @@ public:
         int newConnSD = acceptWithTimeout(socketHandle, recvTimeoutMs, nonBlockingMode);
         if (newConnSD >= 0)
         {
-            return new TCPSocket(newConnSD, ipVersion);
+            auto tcpSocket = new TCPSocket(newConnSD, ipVersion);
+            tcpSocket->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
+            return tcpSocket;
         }
         else if (newConnSD == -2)
         {
@@ -1349,10 +1351,7 @@ int TCPServerSocket::accept(int sockDesc)
     return acceptWithTimeout(sockDesc);
 }
 
-void TCPServerSocket::acceptAsync(
-    nx::utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode,
-        AbstractStreamSocket*)> handler)
+void TCPServerSocket::acceptAsync(AcceptCompletionHandler handler)
 {
     bool nonBlockingMode = false;
     if (!getNonBlockingMode(&nonBlockingMode))

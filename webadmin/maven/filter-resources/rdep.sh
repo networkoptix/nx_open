@@ -19,6 +19,3 @@ function upload() {
 }
 
 upload "server-external-${branch}"
-if [[ "${branch}" == "prod_${release.version}" ]]; then
-    upload "server-external-${release.version}"
-fi

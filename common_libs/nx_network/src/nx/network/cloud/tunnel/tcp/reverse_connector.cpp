@@ -12,22 +12,22 @@ namespace cloud {
 namespace tcp {
 
 ReverseConnector::ReverseConnector(
-    String selfHostName, String targetHostName, aio::AbstractAioThread* aioThread)
-:
+    String selfHostName, String targetHostName)
+    :
     m_targetHostName(std::move(targetHostName))
 {
     m_httpClient = nx_http::AsyncHttpClient::create();
-    if (aioThread)
-        m_httpClient->bindToAioThread(aioThread);
-
     m_httpClient->addAdditionalHeader(kConnection, kUpgrade);
     m_httpClient->addAdditionalHeader(kUpgrade, kNxRc);
     m_httpClient->addAdditionalHeader(kNxRcHostName, selfHostName);
+
+    bindToAioThread(getAioThread());
 }
 
-ReverseConnector::~ReverseConnector()
+void ReverseConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    m_httpClient->pleaseStopSync();
+    base_type::bindToAioThread(aioThread);
+    m_httpClient->bindToAioThread(aioThread);
 }
 
 void ReverseConnector::setHttpTimeouts(nx_http::AsyncHttpClient::Timeouts timeouts)
@@ -110,7 +110,13 @@ boost::optional<KeepAliveOptions> ReverseConnector::getKeepAliveOptions() const
     return KeepAliveOptions::fromString(QString::fromUtf8(value->second));
 }
 
-SystemError::ErrorCode ReverseConnector::processHeaders(const nx_http::HttpHeaders& headers)
+void ReverseConnector::stopWhileInAioThread()
+{
+    m_httpClient->pleaseStopSync();
+}
+
+SystemError::ErrorCode ReverseConnector::processHeaders(
+    const nx_http::HttpHeaders& headers)
 {
     const auto upgrade = headers.find(kUpgrade);
     if (upgrade == headers.end() || !upgrade->second.startsWith(kNxRc))

@@ -11,9 +11,6 @@ public:
     BufferSource(
         StringType mimeType,
         BufferType msgBody);
-    ~BufferSource();
-
-    virtual void stopWhileInAioThread() override;
 
     virtual StringType mimeType() const override;
     virtual boost::optional<uint64_t> contentLength() const override;

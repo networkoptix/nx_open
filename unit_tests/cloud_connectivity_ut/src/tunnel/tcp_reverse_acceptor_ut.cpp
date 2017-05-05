@@ -39,7 +39,7 @@ protected:
         m_acceptor.setPoolSize(poolSize);
         m_acceptor.setKeepAliveOptions(kaOptions);
 
-        auto connector = std::make_unique<ReverseConnector>(hostName, kAcceptorHostName, nullptr);
+        auto connector = std::make_unique<ReverseConnector>(hostName, kAcceptorHostName);
         utils::promise<void> connectorDone;
         connector->connect(
             m_acceptorAddress,

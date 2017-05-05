@@ -45,7 +45,7 @@ void StdOut::writeImpl(Level level, const QString& message)
         toAndroidLogLevel(level),
         QCoreApplication::applicationName().toUtf8().constData(),
         "%s",
-        str.toUtf8().constData());
+        message.toUtf8().constData());
 }
 
 } // namespace log

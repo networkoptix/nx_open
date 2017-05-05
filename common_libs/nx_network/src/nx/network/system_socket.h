@@ -230,10 +230,7 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc< void() > handler) override;
     virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
 
-    virtual void acceptAsync(
-        nx::utils::MoveOnlyFunc<void(
-            SystemError::ErrorCode,
-            AbstractStreamSocket*)> handler) override;
+    virtual void acceptAsync(AcceptCompletionHandler handler) override;
     virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void cancelIOSync() override;
 

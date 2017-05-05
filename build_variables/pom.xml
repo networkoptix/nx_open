@@ -104,7 +104,6 @@
                             <arguments>
                                 <argument>-U</argument>
                                 <argument>compile</argument>
-                                <argument>-Dhelp.customization=${help.customization}</argument>
                                 <argument>-Dcustomization=${customization}</argument>
                                 <argument>-DbuildNumber=${buildNumber}</argument>
                                 <argument>-Darch=${arch}</argument>
