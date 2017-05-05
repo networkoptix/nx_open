@@ -15,6 +15,7 @@ class Context(models.Model):
     product = models.ForeignKey(Product)
     name = models.CharField(max_length=1024)
     description = models.TextField()
+    translatable = models.BooleanField(default=True)
 
     file_path = models.CharField(max_length=1024, blank=True, default='')
     url = models.CharField(max_length=1024, blank=True, default='')
@@ -33,6 +34,7 @@ class DataStructure(models.Model):
 
     type = models.IntegerField(choices=DATA_TYPES, default=0)
     default = models.CharField(max_length=1024, default='')
+    translatable = models.BooleanField(default=True)
     # meta_settings = JSONField()
 
 
