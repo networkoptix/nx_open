@@ -12,23 +12,23 @@ QnViewportPtzController::QnViewportPtzController(const QnPtzControllerPtr &baseC
     // TODO: #Elric handle finished properly
 
 #ifdef PTZ_DEBUG
-    if(!baseController->hasCapabilities(Ptz::Capability::FlipPtzCapability))
-        qnWarning("Base controller doesn't have a Ptz::Capability::FlipPtzCapability. Flip will not be taken into account by advanced PTZ.");
-    if(!baseController->hasCapabilities(Ptz::Capability::LimitsPtzCapability))
-        qnWarning("Base controller doesn't have a Ptz::Capability::LimitsPtzCapability. Position caching may not work for advanced PTZ.");
+    if(!baseController->hasCapabilities(Ptz::FlipPtzCapability))
+        qnWarning("Base controller doesn't have a Ptz::FlipPtzCapability. Flip will not be taken into account by advanced PTZ.");
+    if(!baseController->hasCapabilities(Ptz::LimitsPtzCapability))
+        qnWarning("Base controller doesn't have a Ptz::LimitsPtzCapability. Position caching may not work for advanced PTZ.");
 #endif
 }
 
 bool QnViewportPtzController::extends(Ptz::Capabilities capabilities) {
-    return capabilities.testFlag(Ptz::Capability::AbsolutePtzCapabilities)
-        && capabilities.testFlag(Ptz::Capability::LogicalPositioningPtzCapability)
-        && !capabilities.testFlag(Ptz::Capability::ViewportPtzCapability);
+    return (capabilities & Ptz::AbsolutePtzCapabilities) == Ptz::AbsolutePtzCapabilities
+        && capabilities.testFlag(Ptz::LogicalPositioningPtzCapability)
+        && !capabilities.testFlag(Ptz::ViewportPtzCapability);
 }
 
 Ptz::Capabilities QnViewportPtzController::getCapabilities() const
 {
     Ptz::Capabilities capabilities = base_type::getCapabilities();
-    return extends(capabilities) ? (capabilities | Ptz::Capability::ViewportPtzCapability) : capabilities;
+    return extends(capabilities) ? (capabilities | Ptz::ViewportPtzCapability) : capabilities;
 }
 
 bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) {

@@ -143,9 +143,9 @@ QnTourPtzExecutorPrivate::~QnTourPtzExecutorPrivate() {
 
 void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller) {
     baseController = controller; 
-    if(baseController->hasCapabilities(Ptz::Capability::AsynchronousPtzCapability)) {
+    if(baseController->hasCapabilities(Ptz::AsynchronousPtzCapability)) {
         /* Just use it as is. */
-    } else if(baseController->hasCapabilities(Ptz::Capability::VirtualPtzCapability)) {
+    } else if(baseController->hasCapabilities(Ptz::VirtualPtzCapability)) {
         usingBlockingController = true;
     } else {
         baseController.reset(new QnThreadedPtzController(baseController));
@@ -164,12 +164,12 @@ void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller) {
 
 void QnTourPtzExecutorPrivate::updateDefaults() 
 {
-    defaultSpace = baseController->hasCapabilities(Ptz::Capability::LogicalPositioningPtzCapability) ? Qn::LogicalPtzCoordinateSpace : Qn::DevicePtzCoordinateSpace;
+    defaultSpace = baseController->hasCapabilities(Ptz::LogicalPositioningPtzCapability) ? Qn::LogicalPtzCoordinateSpace : Qn::DevicePtzCoordinateSpace;
     defaultDataField = defaultSpace == Qn::LogicalPtzCoordinateSpace ? Qn::LogicalPositionPtzField : Qn::DevicePositionPtzField;
     defaultCommand = defaultSpace == Qn::LogicalPtzCoordinateSpace ? Qn::GetLogicalPositionPtzCommand : Qn::GetDevicePositionPtzCommand;
 
-    canReadPosition = baseController->hasCapabilities(Ptz::Capability::DevicePositioningPtzCapability) ||
-                      baseController->hasCapabilities(Ptz::Capability::LogicalPositioningPtzCapability);
+    canReadPosition = baseController->hasCapabilities(Ptz::DevicePositioningPtzCapability) ||
+                      baseController->hasCapabilities(Ptz::LogicalPositioningPtzCapability);
 }
 
 void QnTourPtzExecutorPrivate::stopTour() {

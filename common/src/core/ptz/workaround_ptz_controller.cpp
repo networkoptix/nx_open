@@ -16,7 +16,7 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
     m_flip(0),
     m_traits(Ptz::NoPtzTraits),
     m_overrideCapabilities(false),
-    m_capabilities(Ptz::Capability::NoPtzCapabilities)
+    m_capabilities(Ptz::NoPtzCapabilities)
 {
     QnVirtualCameraResourcePtr camera = resource().dynamicCast<QnVirtualCameraResource>();
     if(!camera)

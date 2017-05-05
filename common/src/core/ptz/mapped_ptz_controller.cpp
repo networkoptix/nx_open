@@ -9,15 +9,15 @@ QnMappedPtzController::QnMappedPtzController(const QnPtzMapperPtr &mapper, const
 
 bool QnMappedPtzController::extends(Ptz::Capabilities capabilities) {
     return 
-        (capabilities & Ptz::Capability::AbsolutePtzCapabilities) &&
-        (capabilities & Ptz::Capability::DevicePositioningPtzCapability) &&
-        !(capabilities & Ptz::Capability::LogicalPositioningPtzCapability);
+        (capabilities & Ptz::AbsolutePtzCapabilities) &&
+        (capabilities & Ptz::DevicePositioningPtzCapability) &&
+        !(capabilities & Ptz::LogicalPositioningPtzCapability);
 }
 
 Ptz::Capabilities QnMappedPtzController::getCapabilities() const
 {
     Ptz::Capabilities capabilities = base_type::getCapabilities();
-    return extends(capabilities) ? (capabilities | Ptz::Capability::LogicalPositioningPtzCapability) : capabilities;
+    return extends(capabilities) ? (capabilities | Ptz::LogicalPositioningPtzCapability) : capabilities;
 }
 
 bool QnMappedPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {

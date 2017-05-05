@@ -27,7 +27,6 @@ void QnProxyPtzController::setBaseController(const QnPtzControllerPtr& controlle
         this, &QnProxyPtzController::baseFinished);
     connect(m_controller, &QnAbstractPtzController::changed,
         this, &QnProxyPtzController::baseChanged);
-
 }
 
 QnPtzControllerPtr QnProxyPtzController::baseController() const
@@ -39,7 +38,7 @@ Ptz::Capabilities QnProxyPtzController::getCapabilities() const
 {
     return m_controller
         ? m_controller->getCapabilities()
-        : Ptz::Capability::NoPtzCapabilities;
+        : Ptz::NoPtzCapabilities;
 }
 
 bool QnProxyPtzController::continuousMove(const QVector3D& speed)
@@ -94,7 +93,7 @@ bool QnProxyPtzController::getLimits(
         : false;
 }
 
-bool QnProxyPtzController::getFlip(Qt::Orientations* flip)
+bool QnProxyPtzController::getFlip(Qt::Orientations* flip) const
 {
     return m_controller
         ? m_controller->getFlip(flip)
@@ -134,7 +133,6 @@ bool QnProxyPtzController::QnProxyPtzController::getPresets(QnPtzPresetList* pre
     return m_controller
         ? m_controller->getPresets(presets)
         : false;
-
 }
 
 bool QnProxyPtzController::createTour(const QnPtzTour& tour)
@@ -158,7 +156,7 @@ bool QnProxyPtzController::activateTour(const QString& tourId)
         : false;
 }
 
-bool QnProxyPtzController::getTours(QnPtzTourList* tours)
+bool QnProxyPtzController::getTours(QnPtzTourList* tours) const
 {
     return m_controller
         ? m_controller->getTours(tours)
@@ -179,7 +177,7 @@ bool QnProxyPtzController::updateHomeObject(const QnPtzObject& homeObject)
         : false;
 }
 
-bool QnProxyPtzController::getHomeObject(QnPtzObject* homeObject)
+bool QnProxyPtzController::getHomeObject(QnPtzObject* homeObject) const
 {
     return m_controller
         ? m_controller->getHomeObject(homeObject)
@@ -193,16 +191,27 @@ bool QnProxyPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList* auxilaryTra
         : false;
 }
 
-bool QnProxyPtzController::runAuxilaryCommand(const QnPtzAuxilaryTrait& trait, const QString& data)
+bool QnProxyPtzController::runAuxilaryCommand(
+    const QnPtzAuxilaryTrait& trait,
+    const QString& data)
 {
     return m_controller
         ? m_controller->runAuxilaryCommand(trait, data)
         : false;
 }
 
-bool QnProxyPtzController::getData(Qn::PtzDataFields query, QnPtzData *data)
+bool QnProxyPtzController::getData(Qn::PtzDataFields query, QnPtzData* data) const
 {
     // This is important because of base implementation! Do not change it!
     return base_type::getData(query, data);
 }
 
+void QnProxyPtzController::baseFinished(Qn::PtzCommand command, const QVariant& data)
+{
+    emit finished(command, data);
+}
+
+void QnProxyPtzController::baseChanged(Qn::PtzDataFields fields)
+{
+    emit changed(fields);
+}

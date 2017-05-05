@@ -43,14 +43,14 @@ const qreal itemUnzoomThreshold = 0.975; /* In sync with hardcoded constant in w
 Qt::Orientations capabilitiesToMode(Ptz::Capabilities capabilities)
 {
     Qt::Orientations result = 0;
-    bool isFisheye = capabilities.testFlag(Ptz::Capability::VirtualPtzCapability);
+    bool isFisheye = capabilities.testFlag(Ptz::VirtualPtzCapability);
     if (isFisheye)
         return result;
 
-    if (capabilities.testFlag(Ptz::Capability::ContinuousPanCapability))
+    if (capabilities.testFlag(Ptz::ContinuousPanCapability))
         result |= Qt::Horizontal;
 
-    if (capabilities.testFlag(Ptz::Capability::ContinuousTiltCapability))
+    if (capabilities.testFlag(Ptz::ContinuousTiltCapability))
         result |= Qt::Vertical;
 
     return result;
@@ -128,7 +128,7 @@ PtzOverlayWidget* PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget* widg
     if (data.overlayWidget)
         return data.overlayWidget;
 
-    bool isFisheye = data.hasCapabilities(Ptz::Capability::VirtualPtzCapability);
+    bool isFisheye = data.hasCapabilities(Ptz::VirtualPtzCapability);
     bool isFisheyeEnabled = widget->dewarpingParams().enabled;
 
     PtzOverlayWidget *overlay = new PtzOverlayWidget();
@@ -207,20 +207,20 @@ bool PtzInstrument::processMousePress(QGraphicsItem* item, QGraphicsSceneMouseEv
         m_movement = ContinuousMovement;
 
         m_movementOrientations = 0;
-        if (data.hasCapabilities(Ptz::Capability::ContinuousPanCapability))
+        if (data.hasCapabilities(Ptz::ContinuousPanCapability))
             m_movementOrientations |= Qt::Horizontal;
-        if (data.hasCapabilities(Ptz::Capability::ContinuousTiltCapability))
+        if (data.hasCapabilities(Ptz::ContinuousTiltCapability))
             m_movementOrientations |= Qt::Vertical;
     }
     else
     {
-        if (data.hasCapabilities(Ptz::Capability::VirtualPtzCapability
-            | Ptz::Capability::AbsolutePtzCapabilities
-            | Ptz::Capability::LogicalPositioningPtzCapability))
+        if (data.hasCapabilities(Ptz::VirtualPtzCapability
+            | Ptz::AbsolutePtzCapabilities
+            | Ptz::LogicalPositioningPtzCapability))
         {
             m_movement = VirtualMovement;
         }
-        else if (data.hasCapabilities(Ptz::Capability::ViewportPtzCapability))
+        else if (data.hasCapabilities(Ptz::ViewportPtzCapability))
         {
             m_movement = ViewportMovement;
         }
@@ -297,13 +297,13 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
 
         const PtzData& data = m_dataByWidget[widget];
 
-        const bool isFisheye = data.hasCapabilities(Ptz::Capability::VirtualPtzCapability);
+        const bool isFisheye = data.hasCapabilities(Ptz::VirtualPtzCapability);
         const bool isFisheyeEnabled = widget->dewarpingParams().enabled;
 
-        const bool canMove = data.hasCapabilities(Ptz::Capability::ContinuousPanCapability)
-            || data.hasCapabilities(Ptz::Capability::ContinuousTiltCapability);
-        const bool hasZoom = data.hasCapabilities(Ptz::Capability::ContinuousZoomCapability);
-        const bool hasFocus = data.hasCapabilities(Ptz::Capability::ContinuousFocusCapability);
+        const bool canMove = data.hasCapabilities(Ptz::ContinuousPanCapability)
+            || data.hasCapabilities(Ptz::ContinuousTiltCapability);
+        const bool hasZoom = data.hasCapabilities(Ptz::ContinuousZoomCapability);
+        const bool hasFocus = data.hasCapabilities(Ptz::ContinuousFocusCapability);
         const bool hasAutoFocus = data.traits.contains(Ptz::ManualAutoFocusPtzTrait);
 
         overlayWidget->manipulatorWidget()->setVisible(canMove);
@@ -333,7 +333,7 @@ void PtzInstrument::updateCapabilities(QnMediaResourceWidget* widget)
     if (data.capabilities == capabilities)
         return;
 
-    if ((data.capabilities ^ capabilities) & Ptz::Capability::AuxilaryPtzCapability)
+    if ((data.capabilities ^ capabilities) & Ptz::AuxilaryPtzCapability)
         updateTraits(widget);
 
     data.capabilities = capabilities;

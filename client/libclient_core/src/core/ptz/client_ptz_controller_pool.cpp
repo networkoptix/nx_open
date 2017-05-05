@@ -11,8 +11,8 @@ namespace {
 bool cameraSupportsPtz(const QnVirtualCameraResourcePtr& camera)
 {
     return camera
-        && camera->hasAnyOfPtzCapabilities(Ptz::Capability::ContinuousPtzCapabilities)
-        && !camera->hasAnyOfPtzCapabilities(Ptz::Capability::VirtualPtzCapability);
+        && camera->hasAnyOfPtzCapabilities(Ptz::ContinuousPtzCapabilities)
+        && !camera->hasAnyOfPtzCapabilities(Ptz::VirtualPtzCapability);
 }
 
 } // namespace

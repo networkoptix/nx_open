@@ -797,7 +797,7 @@ QnAbstractPtzController *QnResource::createPtzController()
 
     /* Do some sanity checking. */
     Ptz::Capabilities capabilities = result->getCapabilities();
-    if((capabilities & Ptz::Capability::LogicalPositioningPtzCapability) && !(capabilities & Ptz::Capability::AbsolutePtzCapabilities))
+    if((capabilities & Ptz::LogicalPositioningPtzCapability) && !(capabilities & Ptz::AbsolutePtzCapabilities))
     {
         auto message =
             lit("Logical position space capability is defined for a PTZ controller that does not support absolute movement. %1 %2")
@@ -808,7 +808,7 @@ QnAbstractPtzController *QnResource::createPtzController()
         NX_LOG(message, cl_logWARNING);
     }
 
-    if((capabilities & Ptz::Capability::DevicePositioningPtzCapability) && !(capabilities & Ptz::Capability::AbsolutePtzCapabilities))
+    if((capabilities & Ptz::DevicePositioningPtzCapability) && !(capabilities & Ptz::AbsolutePtzCapabilities))
     {
         auto message =
             lit("Device position space capability is defined for a PTZ controller that does not support absolute movement. %1 %2")
