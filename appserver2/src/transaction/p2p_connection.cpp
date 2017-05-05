@@ -167,6 +167,7 @@ P2pConnection::P2pConnection(
 
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
     m_readBuffer.reserve(1024 * 1024);
+    m_miscData.lifetimeTimer.restart();
 }
 
 P2pConnection::~P2pConnection()
@@ -383,7 +384,7 @@ void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client
     //m_webSocket = std::move(socket);
     //NX_ASSERT(msgBuffer.isEmpty());
     m_httpClient.reset();
-
+    m_miscData.lifetimeTimer.restart();
     setState(State::Connected);
 }
 

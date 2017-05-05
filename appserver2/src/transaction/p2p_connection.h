@@ -101,6 +101,7 @@ public:
         bool isRemoteStarted = false; //< remote peer has open logical connection to us
 
         QElapsedTimer sendStartTimer;
+        QElapsedTimer lifetimeTimer;
     };
 
     MiscData& miscData();
