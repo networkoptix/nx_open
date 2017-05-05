@@ -1216,6 +1216,10 @@ void QnWorkbenchController::at_item_doubleClicked(QnResourceWidget *widget)
     display()->scene()->clearSelection();
     widget->setSelected(true);
 
+    // Do nothing else in layout tour review mode
+    if (workbench()->currentLayout()->data().contains(Qn::LayoutTourUuidRole))
+        return;
+
     QnWorkbenchItem *workbenchItem = widget->item();
     QnWorkbenchItem *zoomedItem = workbench()->item(Qn::ZoomedRole);
     if (zoomedItem == workbenchItem)
@@ -1539,9 +1543,12 @@ void QnWorkbenchController::at_ptzProcessStarted(QnMediaResourceWidget *widget) 
 void QnWorkbenchController::toggleCurrentItemMaximizationState()
 {
     QnResourceWidget *widget = display()->widget(Qn::CentralRole);
-    if(widget && widget == display()->widget(Qn::ZoomedRole)) {
-        menu()->trigger(action::UnmaximizeItemAction, widget);
-    } else {
-        menu()->trigger(action::MaximizeItemAction, widget);
+    if (widget && widget == display()->widget(Qn::ZoomedRole))
+    {
+        menu()->triggerIfPossible(action::UnmaximizeItemAction, widget);
+    }
+    else
+    {
+        menu()->triggerIfPossible(action::MaximizeItemAction, widget);
     }
 }

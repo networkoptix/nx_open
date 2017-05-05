@@ -179,12 +179,9 @@ void Manager::trigger(IDType id, const Parameters& parameters)
     if (triggerIfPossible(id, parameters))
         return;
 
-    const auto action = m_actionById.value(id);
-    NX_EXPECT(action);
-    const QString text = action ? QnLexical::serialized(action->id()) : QString::number(id);
     qWarning()
         << "Action was triggered with a parameter that does not meet the action's requirements."
-        << text;
+        <<  QnLexical::serialized(id);
 }
 
 bool Manager::triggerIfPossible(IDType id, const Parameters& parameters)

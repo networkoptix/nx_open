@@ -205,7 +205,8 @@ void initialize(Manager* manager, Action* root)
 
     factory(FitInViewAction)
         .flags(Scene | NoTarget)
-        .text(tr("Fit in View"));
+        .text(tr("Fit in View"))
+        .condition(!condition::isLayoutTourReviewMode());
 
     factory()
         .flags(Scene)
