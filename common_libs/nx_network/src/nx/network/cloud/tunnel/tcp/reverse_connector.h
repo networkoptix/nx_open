@@ -2,7 +2,7 @@
 
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/buffered_stream_socket.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/http_async_client.h>
 
 namespace nx {
 namespace network {
@@ -45,7 +45,7 @@ public:
 
 private:
     const String m_targetHostName;
-    nx_http::AsyncHttpClientPtr m_httpClient;
+    nx_http::AsyncClient m_httpClient;
     ConnectHandler m_handler;
 
     virtual void stopWhileInAioThread() override;
