@@ -110,7 +110,7 @@ TEST(LogLogger, Format)
     logger.log(Level::verbose, QString(), "Message without tag");
 
     const auto messages = buffer->take();
-    ASSERT_EQ(7, messages.size());
+    ASSERT_EQ(7U, messages.size());
 
     const auto today = QDateTime::currentDateTime().toString("yyyy-MM-dd");
     const auto verifyMessage =
