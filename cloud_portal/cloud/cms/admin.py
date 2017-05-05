@@ -30,11 +30,6 @@ class CustomizationAdmin(admin.ModelAdmin):
 admin.site.register(Customization, CustomizationAdmin)
 
 
-class LanguageInCustomizationAdmin(admin.ModelAdmin):
-    pass
-admin.site.register(LanguageInCustomization, LanguageInCustomizationAdmin)
-
-
 class DataRecordAdmin(admin.ModelAdmin):
     pass
 admin.site.register(DataRecord, DataRecordAdmin)

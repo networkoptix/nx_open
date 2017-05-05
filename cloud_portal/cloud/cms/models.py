@@ -47,26 +47,22 @@ class Language(models.Model):
 
 class Customization(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    default_language = models.ForeignKey(Language)
+    default_language = models.ForeignKey(Language, related_name='default_in_%(class)s')
+    languages = models.ManyToManyField(Language)
 
 
 # CMS data. Partners can change that
-
-class LanguageInCustomization(models.Model):
-    language = models.ForeignKey(Language)
-    customization = models.ForeignKey(Customization)
-
 
 class ContentVersion(models.Model):
     customization = models.ForeignKey(Customization)
     name = models.CharField(max_length=1024)
 
     created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name='created_by_%(class)s')
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name='created_%(class)s')
 
     accepted_date = models.DateTimeField(null=True, blank=True)
     accepted_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True,
-                                    related_name='accepted_by_%(class)s')
+                                    related_name='accepted_%(class)s')
 
 
 class DataRecord(models.Model):
@@ -76,6 +72,6 @@ class DataRecord(models.Model):
     version = models.ForeignKey(ContentVersion, null=True, blank=True)
 
     created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name='created_by_%(class)s')
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name='created_%(class)s')
 
     value = models.TextField()

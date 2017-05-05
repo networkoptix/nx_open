@@ -1,4 +1,4 @@
-from ..models import Product, Language, Customization, LanguageInCustomization
+from ..models import Product, Language, Customization
 import os
 import codecs
 import json
@@ -24,7 +24,8 @@ def find_or_add_language(name, code):
 
 
 def find_or_add_language_to_customization(language, customization):
-    LanguageInCustomization(language_id=language.id, customization_id=customization.id).save()
+    customization.languages.add(language)
+    customization.save()
 
 
 # run read structure

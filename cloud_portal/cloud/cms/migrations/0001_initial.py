@@ -74,14 +74,6 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='LanguageInCustomization',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('customization', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='cms.Customization')),
-                ('language', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='cms.Language')),
-            ],
-        ),
-        migrations.CreateModel(
             name='Product',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
