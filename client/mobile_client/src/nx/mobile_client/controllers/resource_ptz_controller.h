@@ -47,7 +47,7 @@ signals:
     void activePresetIndexChanged();
 
 private:
-    QString m_resourceId;
+    QnUuid m_resourceId;
 };
 
 } // namespace mobile

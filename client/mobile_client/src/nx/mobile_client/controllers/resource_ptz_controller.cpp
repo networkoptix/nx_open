@@ -26,7 +26,7 @@ ResourcePtzController::ResourcePtzController(QObject* parent):
     connect(this, &ResourcePtzController::resourceIdChanged, this,
         [this]()
         {
-            const auto resource = qnResPool->getResourceById(QnUuid::fromStringSafe(m_resourceId));
+            const auto resource = qnResPool->getResourceById(m_resourceId);
             auto controller = qnClientPtzPool->controller(resource);
             if (controller)
             {
@@ -60,15 +60,16 @@ ResourcePtzController::ResourcePtzController(QObject* parent):
 
 QString ResourcePtzController::resourceId() const
 {
-    return m_resourceId;
+    return m_resourceId.toString();
 }
 
 void ResourcePtzController::setResourceId(const QString& value)
 {
-    if (value == m_resourceId)
+    const auto id = QnUuid::fromStringSafe(value);
+    if (id == m_resourceId)
         return;
 
-    m_resourceId = value;
+    m_resourceId = id;
     emit resourceIdChanged();
 }
 
