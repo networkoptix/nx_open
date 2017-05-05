@@ -23,7 +23,7 @@ using namespace nx::network;
 
 class QnModbusAsyncClient: 
     public QObject,
-    public StreamConnectionHolder<ModbusProtocolConnection>,
+    public network::server::StreamConnectionHolder<ModbusProtocolConnection>,
     public aio::BasicPollable
 {
     Q_OBJECT

@@ -9,7 +9,7 @@ namespace nx {
 namespace time_server {
 
 TimeProtocolConnection::TimeProtocolConnection(
-    StreamConnectionHolder<TimeProtocolConnection>* socketServer,
+    network::server::StreamConnectionHolder<TimeProtocolConnection>* socketServer,
     std::unique_ptr<AbstractStreamSocket> _socket)
     :
     m_socketServer(socketServer),
