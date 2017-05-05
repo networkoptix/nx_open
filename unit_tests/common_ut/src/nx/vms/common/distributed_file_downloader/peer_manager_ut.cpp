@@ -1,5 +1,8 @@
 #include <gtest/gtest.h>
 
+#include <nx/vms/common/private/distributed_file_downloader/storage.h>
+#include <test_setup.h>
+
 #include "test_peer_manager.h"
 #include "utils.h"
 
@@ -15,9 +18,19 @@ protected:
     virtual void SetUp() override
     {
         peerManager.reset(new TestPeerManager());
+
+        storageDir = TestSetup::getTemporaryDirectoryPath() + "/storage";
+        storageDir.removeRecursively();
+        NX_ASSERT(QDir().mkpath(storageDir.absolutePath()));
+    }
+
+    virtual void TearDown() override
+    {
+        NX_ASSERT(storageDir.removeRecursively());
     }
 
     QScopedPointer<TestPeerManager> peerManager;
+    QDir storageDir;
 };
 
 TEST_F(DistributedFileDownloaderPeerManagerTest, invalidPeerRequest)
@@ -98,6 +111,70 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, invalidChunk)
     peerManager->processRequests();
 
     ASSERT_FALSE(ok);
+}
+
+TEST_F(DistributedFileDownloaderPeerManagerTest, usingStorage)
+{
+    const QString fileName("test");
+    const QString filePath(storageDir.absoluteFilePath(fileName));
+
+    utils::createTestFile(filePath, 1);
+
+    auto storage = new Storage(storageDir);
+
+    const auto& peer = peerManager->addPeer();
+    peerManager->setPeerStorage(peer, storage);
+
+    DownloaderFileInformation originalFileInfo("test");
+    originalFileInfo.status = DownloaderFileInformation::Status::downloaded;
+    NX_ASSERT(storage->addFile(originalFileInfo) == DistributedFileDownloader::ErrorCode::noError);
+
+    originalFileInfo = storage->fileInformation(fileName);
+    const auto originalChecksums = storage->getChunkChecksums(fileName);
+
+    bool fileInfoReceived = false;
+    TestPeerManager::FileInformation fileInfo;
+
+    peerManager->requestFileInfo(peer, fileName,
+        [&](bool success, rest::Handle /*handle*/, const DownloaderFileInformation& peerFileInfo)
+        {
+            fileInfoReceived = success;
+            fileInfo = peerFileInfo;
+        });
+    peerManager->processRequests();
+
+    ASSERT_TRUE(fileInfoReceived);
+    ASSERT_TRUE(fileInfo.isValid());
+    ASSERT_EQ(fileInfo.status, originalFileInfo.status);
+    ASSERT_EQ(fileInfo.size, originalFileInfo.size);
+    ASSERT_EQ(fileInfo.md5, originalFileInfo.md5);
+
+    bool chunkDownloaded = false;
+    QByteArray chunkData;
+    peerManager->downloadChunk(peer, fileName, 0,
+        [&](bool success, rest::Handle /*handle*/, const QByteArray& data)
+        {
+            chunkDownloaded = success;
+            chunkData = data;
+        });
+    peerManager->processRequests();
+
+    ASSERT_TRUE(chunkDownloaded);
+    ASSERT_EQ(chunkData.size(), originalFileInfo.size);
+
+    bool checksumsReceived = false;
+    QVector<QByteArray> checksums;
+
+    peerManager->requestChecksums(peer, fileName,
+        [&](bool success, rest::Handle /*handle*/, const QVector<QByteArray>& fileChecksums)
+        {
+            checksumsReceived = success;
+            checksums = fileChecksums;
+        });
+    peerManager->processRequests();
+
+    ASSERT_TRUE(checksumsReceived);
+    ASSERT_EQ(checksums, originalChecksums);
 }
 
 TEST_F(DistributedFileDownloaderPeerManagerTest, calculateDistances)

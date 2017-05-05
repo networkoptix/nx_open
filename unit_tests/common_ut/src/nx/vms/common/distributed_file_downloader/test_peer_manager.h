@@ -10,23 +10,30 @@ namespace vms {
 namespace common {
 namespace distributed_file_downloader {
 
+class Storage;
+
 class TestPeerManager: public AbstractPeerManager
 {
 public:
     struct FileInformation: DownloaderFileInformation
     {
         using DownloaderFileInformation::DownloaderFileInformation;
+        FileInformation() = default;
+        FileInformation(const DownloaderFileInformation& fileInfo);
+
         QString filePath;
         QVector<QByteArray> checksums;
     };
 
     TestPeerManager();
 
-    void addPeer(const QnUuid& peer);
+    void addPeer(const QnUuid& peerId);
     QnUuid addPeer();
 
-    void setFileInformation(const QnUuid& peer, const FileInformation& fileInformation);
-    FileInformation fileInformation(const QnUuid& peer, const QString& fileName) const;
+    void setFileInformation(const QnUuid& peerId, const FileInformation& fileInformation);
+    FileInformation fileInformation(const QnUuid& peerId, const QString& fileName) const;
+
+    void setPeerStorage(const QnUuid& peerId, Storage* storage);
 
     QStringList peerGroups(const QnUuid& peerId) const;
     QList<QnUuid> peersInGroup(const QString& group) const;
@@ -47,12 +54,12 @@ public:
         FileInfoCallback callback) override;
 
     virtual rest::Handle requestChecksums(
-        const QnUuid& peer,
+        const QnUuid& peerId,
         const QString& fileName,
         ChecksumsCallback callback) override;
 
     virtual rest::Handle downloadChunk(
-        const QnUuid& peer,
+        const QnUuid& peerId,
         const QString& fileName,
         int chunkIndex,
         ChunkCallback callback) override;
@@ -70,6 +77,7 @@ private:
     {
         QHash<QString, FileInformation> fileInformationByName;
         QStringList groups;
+        Storage* storage = nullptr;
     };
 
     QHash<QnUuid, PeerInfo> m_peers;

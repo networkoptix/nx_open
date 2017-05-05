@@ -1,6 +1,7 @@
 #include "test_peer_manager.h"
 
 #include <nx/utils/log/assert.h>
+#include <nx/vms/common/private/distributed_file_downloader/storage.h>
 
 namespace nx {
 namespace vms {
@@ -11,10 +12,10 @@ TestPeerManager::TestPeerManager()
 {
 }
 
-void TestPeerManager::addPeer(const QnUuid& peer)
+void TestPeerManager::addPeer(const QnUuid& peerId)
 {
-    if (!m_peers.contains(peer))
-        m_peers.insert(peer, PeerInfo());
+    if (!m_peers.contains(peerId))
+        m_peers.insert(peerId, PeerInfo());
 }
 
 QnUuid TestPeerManager::addPeer()
@@ -25,15 +26,28 @@ QnUuid TestPeerManager::addPeer()
 }
 
 void TestPeerManager::setFileInformation(
-    const QnUuid& peer, const FileInformation& fileInformation)
+    const QnUuid& peerId, const FileInformation& fileInformation)
 {
-    m_peers[peer].fileInformationByName[fileInformation.name] = fileInformation;
+    m_peers[peerId].fileInformationByName[fileInformation.name] = fileInformation;
 }
 
 TestPeerManager::FileInformation TestPeerManager::fileInformation(
-    const QnUuid& peer, const QString& fileName) const
+    const QnUuid& peerId, const QString& fileName) const
 {
-    return m_peers[peer].fileInformationByName[fileName];
+    auto& peerInfo = m_peers[peerId];
+    if (!peerInfo.storage)
+        return m_peers[peerId].fileInformationByName[fileName];
+
+    FileInformation fileInfo = peerInfo.storage->fileInformation(fileName);
+    if (fileInfo.isValid())
+        fileInfo.filePath = peerInfo.storage->filePath(fileName);
+
+    return fileInfo;
+}
+
+void TestPeerManager::setPeerStorage(const QnUuid& peerId, Storage* storage)
+{
+    m_peers[peerId].storage = storage;
 }
 
 QStringList TestPeerManager::peerGroups(const QnUuid& peerId) const
@@ -69,20 +83,17 @@ int TestPeerManager::distanceTo(const QnUuid& /*peerId*/) const
 }
 
 rest::Handle TestPeerManager::requestFileInfo(
-    const QnUuid& peer,
+    const QnUuid& peerId,
     const QString& fileName,
     AbstractPeerManager::FileInfoCallback callback)
 {
-    auto it = m_peers.find(peer);
-    if (it == m_peers.end())
+    if (!m_peers.contains(peerId))
         return 0;
-
-    auto fileInfo = it->fileInformationByName.value(fileName);
 
     const auto handle = getRequestHandle();
 
     enqueueCallback(
-        [this, fileInfo, callback, handle]()
+        [this, fileInfo = fileInformation(peerId, fileName), callback, handle]()
         {
             callback(fileInfo.isValid(), handle, fileInfo);
         });
@@ -91,43 +102,44 @@ rest::Handle TestPeerManager::requestFileInfo(
 }
 
 rest::Handle TestPeerManager::requestChecksums(
-    const QnUuid& peer,
+    const QnUuid& peerId,
     const QString& fileName,
     AbstractPeerManager::ChecksumsCallback callback)
 {
-    auto it = m_peers.find(peer);
+    auto it = m_peers.find(peerId);
     if (it == m_peers.end())
         return 0;
-
-    const auto fileInfo = it->fileInformationByName.value(fileName);
 
     const auto handle = getRequestHandle();
 
     enqueueCallback(
-        [this, fileInfo, callback, handle]()
+        [this,
+            fileInfo = fileInformation(peerId, fileName),
+            storage = it->storage,
+            callback, handle]()
         {
-            callback(fileInfo.isValid(), handle, fileInfo.checksums);
+            callback(fileInfo.isValid(), handle,
+                storage
+                    ? storage->getChunkChecksums(fileInfo.name)
+                    : fileInfo.checksums);
         });
 
     return handle;
 }
 
 rest::Handle TestPeerManager::downloadChunk(
-    const QnUuid& peer,
+    const QnUuid& peerId,
     const QString& fileName,
     int chunkIndex,
     AbstractPeerManager::ChunkCallback callback)
 {
-    auto it = m_peers.find(peer);
-    if (it == m_peers.end())
+    if (!m_peers.contains(peerId))
         return 0;
-
-    const auto fileInfo = it->fileInformationByName.value(fileName);
 
     const auto handle = getRequestHandle();
 
     enqueueCallback(
-        [this, fileInfo, chunkIndex, callback, handle]()
+        [this, fileInfo = fileInformation(peerId, fileName), chunkIndex, callback, handle]()
         {
             QByteArray result;
             if (fileInfo.isValid())
@@ -271,6 +283,11 @@ rest::Handle ProxyTestPeerManager::downloadChunk(
 void ProxyTestPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle handle)
 {
     m_peerManager->cancelRequest(peerId, handle);
+}
+
+TestPeerManager::FileInformation::FileInformation(const DownloaderFileInformation& fileInfo):
+    DownloaderFileInformation(fileInfo)
+{
 }
 
 } // namespace distributed_file_downloader
