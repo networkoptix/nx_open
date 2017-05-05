@@ -38,74 +38,59 @@ void initialize(Manager* manager, Action* root)
 
     factory(ShowFpsAction)
         .flags(GlobalHotkey)
-        .text(lit("Show FPS"))
         .shortcut(lit("Ctrl+Alt+F"))
         .autoRepeat(false);
 
     factory(ShowDebugOverlayAction)
-        .flags(GlobalHotkey)
-        .text(lit("Show Debug"))
+        .flags(GlobalHotkey | DevMode)
+        .text(lit("Show Debug")) //< DevMode, so untranslatable
         .shortcut(lit("Ctrl+Alt+D"))
         .autoRepeat(false);
 
     factory(DropResourcesAction)
         .flags(ResourceTarget | WidgetTarget | LayoutItemTarget | LayoutTarget | SingleTarget | MultiTarget)
-        .mode(DesktopMode)
-        .text(tr("Drop Resources"));
+        .mode(DesktopMode);
 
     factory(DropResourcesIntoNewLayoutAction)
         .flags(ResourceTarget | WidgetTarget | LayoutItemTarget | LayoutTarget | SingleTarget | MultiTarget)
-        .mode(DesktopMode)
-        .text(tr("Drop Resources into New Layout"));
+        .mode(DesktopMode);
 
     factory(DelayedOpenVideoWallItemAction)
-        .flags(NoTarget)
-        .text(tr("Delayed Open Video Wall"));
+        .flags(NoTarget);
 
     factory(DelayedDropResourcesAction)
         .flags(NoTarget)
-        .mode(DesktopMode)
-        .text(tr("Delayed Drop Resources"));
+        .mode(DesktopMode);
 
     factory(InstantDropResourcesAction)
         .flags(NoTarget)
-        .mode(DesktopMode)
-        .text(tr("Instant Drop Resources"));
+        .mode(DesktopMode);
 
     factory(MoveCameraAction)
         .flags(ResourceTarget | SingleTarget | MultiTarget)
         .requiredTargetPermissions(Qn::RemovePermission)
-        .text(QnDeviceDependentStrings::getDefaultNameFromSet(
-            manager->resourcePool(),
-            tr("Move Devices"),
-            tr("Move Cameras")
-        ))
         .condition(hasFlags(Qn::network));
 
     factory(NextLayoutAction)
         .flags(GlobalHotkey)
         .mode(DesktopMode)
-        .text(tr("Next Layout"))
         .shortcut(lit("Ctrl+Tab"))
         .autoRepeat(false);
 
     factory(PreviousLayoutAction)
         .flags(GlobalHotkey)
         .mode(DesktopMode)
-        .text(tr("Previous Layout"))
         .shortcut(lit("Ctrl+Shift+Tab"))
         .autoRepeat(false);
 
     factory(SelectAllAction)
         .flags(GlobalHotkey)
-        .text(tr("Select All"))
         .shortcut(lit("Ctrl+A"))
         .shortcutContext(Qt::WidgetWithChildrenShortcut)
         .autoRepeat(false);
 
     factory(SelectionChangeAction)
-        .flags(NoTarget)
-        .text(tr("Selection Changed"));
+        .flags(NoTarget);
 
     factory(PreferencesLicensesTabAction)
         .flags(NoTarget)
@@ -118,7 +103,7 @@ void initialize(Manager* manager, Action* root)
     factory(PreferencesNotificationTabAction)
         .flags(NoTarget)
         .icon(qnSkin->icon("events/filter.png"))
-        .text(tr("Filter.."));
+        .text(tr("Filter...")); //< To be displayed on button tooltip
 
     factory(PreferencesCloudTabAction)
         .flags(NoTarget)
@@ -138,24 +123,17 @@ void initialize(Manager* manager, Action* root)
     factory(FreespaceAction)
         .flags(GlobalHotkey)
         .mode(DesktopMode)
-        .text(tr("Go to Freespace Mode"))
         .shortcut(lit("F11"))
         .autoRepeat(false);
 
     factory(WhatsThisAction)
         .flags(NoTarget)
-        .text(tr("Help"))
+        .text(tr("Help")) //< To be displayed on button tooltip
         .icon(qnSkin->icon("titlebar/window_question.png"));
 
     factory(CameraDiagnosticsAction)
         .mode(DesktopMode)
         .flags(ResourceTarget | SingleTarget)
-        .dynamicText(new DevicesNameTextFactory(
-            QnCameraDeviceStringSet(
-                tr("Device Diagnostics.."),
-                tr("Camera Diagnostics.."),
-                tr("I/O Module Diagnostics..")
-            ), manager))
         .condition(condition::hasFlags(Qn::live_cam, Any));
 
     factory(OpenBusinessLogAction)
@@ -165,19 +143,17 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(Qn::GlobalViewLogsPermission)
         .icon(qnSkin->icon("events/log.png"))
         .shortcut(lit("Ctrl+L"))
-        .text(tr("Event Log.."));
+        .text(tr("Event Log...")); //< To be displayed on button tooltip
 
     factory(OpenBusinessRulesAction)
         .mode(DesktopMode)
         .flags(NoTarget | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget | WidgetTarget)
-        .requiredGlobalPermission(Qn::GlobalAdminPermission)
-        .text(tr("Event Rules.."));
+        .requiredGlobalPermission(Qn::GlobalAdminPermission);
 
     factory(OpenFailoverPriorityAction)
         .mode(DesktopMode)
         .flags(NoTarget)
-        .requiredGlobalPermission(Qn::GlobalAdminPermission)
-        .text(tr("Failover Priority.."));
+        .requiredGlobalPermission(Qn::GlobalAdminPermission);
 
     factory(OpenBackupCamerasAction)
         .mode(DesktopMode)
@@ -204,29 +180,25 @@ void initialize(Manager* manager, Action* root)
         );
 
     factory(QueueAppRestartAction)
-        .flags(NoTarget)
-        .text(tr("Restart application"));
+        .flags(NoTarget);
 
     factory(SelectTimeServerAction)
         .flags(NoTarget)
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
-        .text(tr("Select Time Server"));
+        .text(tr("Select Time Server")); //< To be displayed on button tooltip
 
     factory(PtzActivatePresetAction)
         .flags(SingleTarget | WidgetTarget)
-        .text(tr("Go To Saved Position"))
         .requiredTargetPermissions(Qn::WritePtzPermission)
         .condition(new PtzCondition(Qn::PresetsPtzCapability, false));
 
     factory(PtzActivateTourAction)
         .flags(SingleTarget | WidgetTarget)
-        .text(tr("Activate PTZ Tour"))
         .requiredTargetPermissions(Qn::WritePtzPermission)
         .condition(new PtzCondition(Qn::ToursPtzCapability, false));
 
     factory(PtzActivateObjectAction)
         .flags(SingleTarget | WidgetTarget)
-        .text(tr("Activate PTZ Object"))
         .requiredTargetPermissions(Qn::WritePtzPermission);
 
     /* Context menu actions. */
@@ -242,7 +214,7 @@ void initialize(Manager* manager, Action* root)
     factory(MainMenuAction)
         .flags(GlobalHotkey)
         .mode(DesktopMode)
-        .text(tr("Main Menu"))
+        .text(tr("Main Menu")) //< To be displayed on button tooltip
         .shortcut(lit("Alt+Space"), Builder::Mac, true)
         .autoRepeat(false)
         .icon(qnSkin->icon("titlebar/main_menu.png"));
@@ -276,8 +248,8 @@ void initialize(Manager* manager, Action* root)
     factory(TogglePanicModeAction)
         .flags(GlobalHotkey | DevMode)
         .mode(DesktopMode)
-        .text(tr("Start Panic Recording"))
-        .toggledText(tr("Stop Panic Recording"))
+        .text(lit("Start Panic Recording")) //< DevMode, so untranslatable
+        .toggledText(lit("Stop Panic Recording")) //< DevMode, so untranslatable
         .autoRepeat(false)
         .shortcut(lit("Ctrl+P"))
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
@@ -368,7 +340,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(OpenCurrentUserLayoutMenu)
         .flags(TitleBar | SingleTarget | NoTarget)
-        .text(tr("Open Layout.."))
+        .text(tr("Open Layout...")) //< To be displayed on button tooltip
         .childFactory(new OpenCurrentUserLayoutFactory(manager))
         .icon(qnSkin->icon("titlebar/dropdown.png"));
 
@@ -389,11 +361,13 @@ void initialize(Manager* manager, Action* root)
             .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
             .text(tr("File(s).."))
             .shortcut(lit("Ctrl+O"))
+            .condition(!condition::isLayoutTourReviewMode())
             .autoRepeat(false);
 
         factory(OpenFolderAction)
             .flags(Main | Scene)
             .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
+            .condition(!condition::isLayoutTourReviewMode())
             .text(tr("Folder.."));
 
         factory().separator()
@@ -411,6 +385,16 @@ void initialize(Manager* manager, Action* root)
 
     } factory.endSubMenu();
 
+    factory(SaveCurrentLayoutTourAction)
+        .flags(Scene | NoTarget | GlobalHotkey | IntentionallyAmbiguous)
+        .mode(DesktopMode)
+        .text(tr("Save Changes")) //< To be displayed on the button
+        // Hack to show diferent texts on a button and in a context menu.
+        .conditionalText(tr("Save Layout Tour"), condition::always())
+        .condition(condition::isLayoutTourReviewMode())
+        .shortcut(lit("Ctrl+S"))
+        .autoRepeat(false);
+
     factory(SaveCurrentLayoutAction)
         .mode(DesktopMode)
         .flags(Scene | NoTarget | GlobalHotkey | IntentionallyAmbiguous)
@@ -418,7 +402,10 @@ void initialize(Manager* manager, Action* root)
         .text(tr("Save Current Layout"))
         .shortcut(lit("Ctrl+S"))
         .autoRepeat(false) /* There is no point in saving the same layout many times in a row. */
-        .condition(new SaveLayoutCondition(true));
+        .condition(
+            ConditionWrapper(new SaveLayoutCondition(true))
+            && !condition::isLayoutTourReviewMode()
+        );
 
     factory(SaveCurrentLayoutAsAction)
         .mode(DesktopMode)
@@ -430,12 +417,12 @@ void initialize(Manager* manager, Action* root)
         .condition(
             ConditionWrapper(new LoggedInCondition())
             && ConditionWrapper(new SaveLayoutAsCondition(true))
+            && !condition::isLayoutTourReviewMode()
         );
 
     factory(ShareLayoutAction)
         .mode(DesktopMode)
         .flags(SingleTarget | ResourceTarget)
-        .text(lit("Share_Layout_with"))
         .autoRepeat(false)
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .condition(!condition::isSafeMode());
@@ -519,19 +506,16 @@ void initialize(Manager* manager, Action* root)
 
     factory(VersionMismatchMessageAction)
         .flags(NoTarget)
-        .requiredGlobalPermission(Qn::GlobalAdminPermission)
-        .text(lit("Show Version Mismatch Message"));
+        .requiredGlobalPermission(Qn::GlobalAdminPermission);
 
     factory(BetaVersionMessageAction)
         .flags(NoTarget)
-        .mode(DesktopMode)
-        .text(lit("Show Beta Version Warning Message"));
+        .mode(DesktopMode);
 
     factory(AllowStatisticsReportMessageAction)
         .flags(NoTarget)
         .mode(DesktopMode)
-        .requiredGlobalPermission(Qn::GlobalAdminPermission)
-        .text(lit("Ask About Statistics Reporting"));
+        .requiredGlobalPermission(Qn::GlobalAdminPermission);
 
     factory(BrowseUrlAction)
         .flags(NoTarget)
@@ -608,7 +592,7 @@ void initialize(Manager* manager, Action* root)
         .flags(GlobalHotkey)
         .mode(DesktopMode)
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
-        .text(tr("Event Rules.."))
+        .text(tr("Event Rules..."))
         .icon(qnSkin->icon("events/settings.png"))
         .shortcut(lit("Ctrl+E"))
         .autoRepeat(false);
@@ -683,7 +667,6 @@ void initialize(Manager* manager, Action* root)
     factory(OpenInLayoutAction)
         .flags(SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget | WidgetTarget)
         .requiredTargetPermissions(Qn::LayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
-        .text(lit("Open in Layout"))
         .condition(new OpenInLayoutCondition());
 
     factory(OpenInCurrentLayoutAction)
@@ -727,9 +710,17 @@ void initialize(Manager* manager, Action* root)
         .text(tr("Open Layouts"))
         .condition(hasFlags(Qn::layout));
 
-    factory(OpenLayoutsInNewWindowAction)
-        .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
-        .text(tr("Open Layout(s) in New Window")) // TODO: #Elric split into sinle- & multi- action
+    factory(OpenSingleLayoutInNewWindowAction)
+        .flags(Tree | SingleTarget | ResourceTarget)
+        .text(tr("Open Layout in New Window"))
+        .condition(
+            condition::hasFlags(Qn::layout, ExactlyOne)
+            && ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow))
+        );
+
+    factory(OpenMultiLayoutInNewWindowAction)
+        .flags(Tree | MultiTarget | ResourceTarget)
+        .text(tr("Open Layouts in New Window"))
         .condition(
             condition::hasFlags(Qn::layout, All)
             && ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow))
@@ -737,17 +728,15 @@ void initialize(Manager* manager, Action* root)
 
     factory(OpenCurrentLayoutInNewWindowAction)
         .flags(NoTarget)
-        .text(tr("Open Current Layout in New Window"))
         .condition(new LightModeCondition(Qn::LightModeNoNewWindow));
 
     factory(OpenAnyNumberOfLayoutsAction)
         .flags(SingleTarget | MultiTarget | ResourceTarget)
-        .text(tr("Open Layout(s)"))
         .condition(hasFlags(Qn::layout));
 
-    factory(OpenVideoWallsReviewAction)
-        .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
-        .text(tr("Open Video Wall(s)"))
+    factory(OpenVideoWallReviewAction)
+        .flags(Tree | SingleTarget | ResourceTarget)
+        .text(tr("Open Video Wall"))
         .condition(hasFlags(Qn::videowall));
 
     factory(OpenInFolderAction)
@@ -768,7 +757,7 @@ void initialize(Manager* manager, Action* root)
     factory(AttachToVideoWallAction)
         .flags(Tree | SingleTarget | ResourceTarget)
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
-        .text(tr("Attach to Video Wall.."))
+        .text(tr("Attach to Video Wall..."))
         .autoRepeat(false)
         .condition(
             !condition::isSafeMode()
@@ -778,13 +767,13 @@ void initialize(Manager* manager, Action* root)
     factory(StartVideoWallAction)
         .flags(Tree | SingleTarget | ResourceTarget)
         .requiredGlobalPermission(Qn::GlobalControlVideoWallPermission)
-        .text(tr("Switch to Video Wall .mode.."))
+        .text(tr("Switch to Video Wall mode..."))
         .autoRepeat(false)
         .condition(new StartVideowallCondition());
 
     factory(SaveVideoWallReviewAction)
         .flags(Tree | SingleTarget | ResourceTarget)
-        .text(tr("Save Video Wall View"))
+        .text(tr("Save Video Wall"))
         .shortcut(lit("Ctrl+S"))
         .requiredGlobalPermission(Qn::GlobalControlVideoWallPermission)
         .autoRepeat(false)
@@ -840,18 +829,23 @@ void initialize(Manager* manager, Action* root)
         .flags(TitleBar | Tree | SingleTarget | ResourceTarget)
         .requiredTargetPermissions(Qn::SavePermission)
         .text(tr("Save Layout"))
-        .condition(new SaveLayoutCondition(false));
+        .condition(ConditionWrapper(new SaveLayoutCondition(false)));
 
-    factory(SaveLayoutAsAction)
+    factory(SaveLayoutAsAction) //TODO: #GDM #access check canCreateResource permission
         .flags(SingleTarget | ResourceTarget)
-        .requiredTargetPermissions(Qn::UserResourceRole, Qn::SavePermission)  //TODO: #GDM #access check canCreateResource permission
-        .text(lit("If you see this string, notify me. #GDM"))
-        .condition(new SaveLayoutAsCondition(false));
+        .requiredTargetPermissions(Qn::UserResourceRole, Qn::SavePermission)
+        .condition(
+            ConditionWrapper(new SaveLayoutAsCondition(false))
+            && !condition::isLayoutTourReviewMode()
+        );
 
-    factory(SaveLayoutForCurrentUserAsAction)
+    factory(SaveLayoutForCurrentUserAsAction) //TODO: #GDM #access check canCreateResource permission
         .flags(TitleBar | Tree | SingleTarget | ResourceTarget)
         .text(tr("Save Layout As.."))
-        .condition(new SaveLayoutAsCondition(false));
+        .condition(
+            ConditionWrapper(new SaveLayoutAsCondition(false))
+            && !condition::isLayoutTourReviewMode()
+        );
 
     factory()
         .flags(Scene | Tree)
@@ -861,6 +855,8 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | SingleTarget | MultiTarget | VideoWallItemTarget | IntentionallyAmbiguous)
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .text(tr("Delete"))
+        .shortcut(lit("Del"))
+        .shortcut(Qt::Key_Backspace, Builder::Mac, true)
         .condition(!condition::isSafeMode())
         .autoRepeat(false);
 
@@ -894,14 +890,16 @@ void initialize(Manager* manager, Action* root)
 
     factory(ToggleInfoAction)
         .flags(Scene | SingleTarget | MultiTarget | HotkeyOnly)
-        .text(tr("Toggle Info"))
         .shortcut(lit("Alt+I"))
         .condition(new DisplayInfoCondition());
 
     factory()
         .flags(Scene | NoTarget)
         .text(tr("Change Resolution.."))
-        .condition(new ChangeResolutionCondition());
+        .condition(
+            ConditionWrapper(new ChangeResolutionCondition())
+            && !condition::isLayoutTourReviewMode()
+        );
 
     factory.beginSubMenu();
     {
@@ -950,19 +948,6 @@ void initialize(Manager* manager, Action* root)
 
     } factory.endSubMenu();
 
-    factory(PtzCalibrateFisheyeAction)
-        .flags(SingleTarget | WidgetTarget)
-        .text(tr("Calibrate Fisheye"))
-        .condition(new PtzCondition(Qn::VirtualPtzCapability, false));
-
-#if 0
-    factory(ToggleRadassAction)
-        .flags(Scene | SingleTarget | MultiTarget | HotkeyOnly)
-        .text(tr("Toggle Resolution Mode"))
-        .shortcut(lit("Alt+I"))
-        .condition(new DisplayInfoCondition());
-#endif
-
     factory(StartSmartSearchAction)
         .flags(Scene | SingleTarget | MultiTarget)
         .text(tr("Show Motion/Smart Search"))
@@ -985,7 +970,6 @@ void initialize(Manager* manager, Action* root)
 
     factory(ToggleSmartSearchAction)
         .flags(Scene | SingleTarget | MultiTarget | HotkeyOnly)
-        .text(tr("Toggle Smart Search"))
         .shortcut(lit("Alt+G"))
         .condition(new SmartSearchCondition());
 
@@ -998,7 +982,6 @@ void initialize(Manager* manager, Action* root)
 
     factory(TakeScreenshotAction)
         .flags(Scene | SingleTarget | HotkeyOnly)
-        .text(tr("Take Screenshot"))
         .shortcut(lit("Alt+S"))
         .autoRepeat(false)
         .condition(new TakeScreenshotCondition());
@@ -1012,7 +995,6 @@ void initialize(Manager* manager, Action* root)
 
     factory(CreateZoomWindowAction)
         .flags(SingleTarget | WidgetTarget)
-        .text(tr("Create Zoom Window"))
         .condition(new CreateZoomWindowCondition());
 
     factory()
@@ -1248,8 +1230,7 @@ void initialize(Manager* manager, Action* root)
         );
 
     factory(PingAction)
-        .flags(NoTarget)
-        .text(lit("Ping.."));
+        .flags(NoTarget);
 
     factory(ServerLogsAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
@@ -1305,13 +1286,19 @@ void initialize(Manager* manager, Action* root)
         .condition(
             !ConditionWrapper(new VideoWallReviewModeCondition())
             && ConditionWrapper(new LightModeCondition(Qn::LightModeSingleItem))
+            && !condition::isLayoutTourReviewMode()
         );
 
     factory()
         .flags(Scene | NoTarget)
+        .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission)
         .text(tr("Change Cell Spacing.."))
-        .condition(new LightModeCondition(Qn::LightModeSingleItem));
+        .condition(
+            ConditionWrapper(new LightModeCondition(Qn::LightModeSingleItem))
+            && !condition::isLayoutTourReviewMode()
+            );
 
+    //TODO: #GDM Move to childFactory, reduce actions number
     factory.beginSubMenu();
     {
         factory.beginGroup();
@@ -1385,7 +1372,7 @@ void initialize(Manager* manager, Action* root)
     factory(StartCurrentLayoutTourAction)
         .flags(NoTarget)
         .mode(DesktopMode)
-        .text(tr("Start Tour"))
+        .text(tr("Start Tour")) //< To be displayed on the button
         .accent(Qn::ButtonAccent::Standard)
         .icon(qnSkin->icon("buttons/play.png"))
         .condition(
@@ -1396,20 +1383,12 @@ void initialize(Manager* manager, Action* root)
 
     factory(SaveLayoutTourAction)
         .flags(NoTarget)
-        .text(lit("Save Layout Tour (internal)"))
         .mode(DesktopMode);
-
-    factory(SaveCurrentLayoutTourAction)
-        .flags(NoTarget)
-        .mode(DesktopMode)
-        .text(tr("Save Changes"))
-        .condition(condition::isLayoutTourReviewMode())
-        .autoRepeat(false);
 
     factory(RemoveCurrentLayoutTourAction)
         .flags(NoTarget)
         .mode(DesktopMode)
-        .icon(qnSkin->icon("buttons/delete.png"))
+        .icon(qnSkin->icon("buttons/delete.png")) //< To be displayed on the button
         .condition(condition::isLayoutTourReviewMode())
         .autoRepeat(false);
 
@@ -1508,7 +1487,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(RemoveBookmarksAction)
         .flags(NoTarget | SingleTarget | ResourceTarget)
-        .text(tr("Remove Bookmarks.."))
+        .text(tr("Remove Bookmarks..")) //< Copied to an internal context menu
         .requiredGlobalPermission(Qn::GlobalManageBookmarksPermission)
         .condition(
             !condition::isSafeMode()
@@ -1547,25 +1526,25 @@ void initialize(Manager* manager, Action* root)
     factory(DebugIncrementCounterAction)
         .flags(GlobalHotkey | DevMode)
         .shortcut(lit("Ctrl+Alt+Shift++"))
-        .text(lit("Increment Debug Counter"));
+        .text(lit("Increment Debug Counter")); //< DevMode, so untranslatable
 
     factory(DebugDecrementCounterAction)
         .flags(GlobalHotkey | DevMode)
         .shortcut(lit("Ctrl+Alt+Shift+-"))
-        .text(lit("Decrement Debug Counter"));
+        .text(lit("Decrement Debug Counter")); //< DevMode, so untranslatable
 
     factory(DebugCalibratePtzAction)
         .flags(Scene | SingleTarget | DevMode)
-        .text(lit("Calibrate PTZ"));
+        .text(lit("Calibrate PTZ")); //< DevMode, so untranslatable
 
     factory(DebugGetPtzPositionAction)
         .flags(Scene | SingleTarget | DevMode)
-        .text(lit("Get PTZ Position"));
+        .text(lit("Get PTZ Position")); //< DevMode, so untranslatable
 
     factory(DebugControlPanelAction)
         .flags(GlobalHotkey | DevMode)
         .shortcut(lit("Ctrl+Alt+Shift+D"))
-        .text(lit("Debug Control Panel"));
+        .text(lit("Debug Control Panel")); //< DevMode, so untranslatable
 
     factory(PlayPauseAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
@@ -1637,60 +1616,57 @@ void initialize(Manager* manager, Action* root)
         .separator();
 
     factory(ToggleThumbnailsAction)
-        .flags(NoTarget)
-        .text(tr("Show Thumbnails"))
-        .toggledText(tr("Hide Thumbnails"));
+        .flags(NoTarget);
 
     factory(BookmarksModeAction)
         .flags(NoTarget)
-        .text(tr("Show Bookmarks"))
+        .text(tr("Show Bookmarks")) //< To be displayed on the button
         .requiredGlobalPermission(Qn::GlobalViewBookmarksPermission)
         .toggledText(tr("Hide Bookmarks"));
 
     factory(ToggleCalendarAction)
         .flags(NoTarget)
-        .text(tr("Show Calendar"))
+        .text(tr("Show Calendar")) //< To be displayed on button tooltip
         .toggledText(tr("Hide Calendar"));
 
     factory(ToggleTitleBarAction)
         .flags(NoTarget)
-        .text(tr("Show Title Bar"))
+        .text(tr("Show Title Bar")) //< To be displayed on button tooltip
         .toggledText(tr("Hide Title Bar"))
         .condition(new ToggleTitleBarCondition());
 
     factory(PinTreeAction)
         .flags(Tree | NoTarget)
-        .text(tr("Pin Tree"))
+        .text(tr("Pin Tree")) //< To be displayed on button tooltip
         .toggledText(tr("Unpin Tree"))
         .condition(condition::treeNodeType(Qn::RootNode));
 
     factory(PinCalendarAction)
-        .text(tr("Pin Calendar"))
-        .toggledText(tr("Unpin Calendar"));
+        .flags(NoTarget);
 
     factory(MinimizeDayTimeViewAction)
-        .text(tr("Minimize"))
+        .text(tr("Minimize")) //< To be displayed on button tooltip
         .icon(qnSkin->icon("titlebar/dropdown.png"));
 
     factory(ToggleTreeAction)
         .flags(NoTarget)
-        .text(tr("Show Tree"))
+        .text(tr("Show Tree")) //< To be displayed on button tooltip
         .toggledText(tr("Hide Tree"))
         .condition(condition::treeNodeType(Qn::RootNode));
 
     factory(ToggleTimelineAction)
         .flags(NoTarget)
-        .text(tr("Show Timeline"))
+        .text(tr("Show Timeline")) //< To be displayed on button tooltip
         .toggledText(tr("Hide Timeline"));
 
     factory(ToggleNotificationsAction)
         .flags(NoTarget)
-        .text(tr("Show Notifications"))
+        .text(tr("Show Notifications")) //< To be displayed on button tooltip
         .toggledText(tr("Hide Notifications"));
 
     factory(PinNotificationsAction)
         .flags(Notifications | NoTarget)
-        .text(tr("Pin Notifications"))
+        .text(tr("Pin Notifications")) //< To be displayed on button tooltip
         .toggledText(tr("Unpin Notifications"));
 
     factory(GoToNextItemAction)

@@ -609,6 +609,9 @@ private:
 
 namespace condition {
 
+/**< Visible always */
+ConditionWrapper always();
+
 /** Visible in preview search mode only. */
 ConditionWrapper isPreviewSearchMode();
 

@@ -15,6 +15,8 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
+#include <nx/fusion/model_functions.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -59,7 +61,7 @@ Action* checkSender(QObject* sender)
 bool checkType(const QVariant& items)
 {
     ActionParameterType type = ParameterTypes::type(items);
-    if (type == 0)
+    if (type == OtherType)
     {
         NX_EXPECT(false, lm("Unrecognized action target type '%1'.").arg(items.typeName()));
         return false;
@@ -178,9 +180,11 @@ void Manager::trigger(IDType id, const Parameters& parameters)
         return;
 
     const auto action = m_actionById.value(id);
-    const QString text = action ? action->text() : QString();
-    qWarning() << "Action was triggered with a parameter that does not meet the action's requirements."
-        << id << text;
+    NX_EXPECT(action);
+    const QString text = action ? QnLexical::serialized(action->id()) : QString::number(id);
+    qWarning()
+        << "Action was triggered with a parameter that does not meet the action's requirements."
+        << text;
 }
 
 bool Manager::triggerIfPossible(IDType id, const Parameters& parameters)
