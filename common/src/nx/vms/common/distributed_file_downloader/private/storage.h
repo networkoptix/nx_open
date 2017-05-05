@@ -1,10 +1,12 @@
 #pragma once
 
 #include <QtCore/QHash>
+#include <QtCore/QDir>
 
 #include <nx/utils/thread/mutex.h>
 
-#include "../downloader.h"
+#include "../error_code.h"
+#include "../file_information.h"
 
 namespace nx {
 namespace vms {
@@ -38,28 +40,16 @@ public:
 
     FileInformation fileInformation(const QString& fileName) const;
 
-    Downloader::ErrorCode addFile(const FileInformation& fileInfo);
+    ErrorCode addFile(const FileInformation& fileInfo);
+    ErrorCode updateFileInformation(const QString& fileName, qint64 size, const QByteArray& md5);
 
-    Downloader::ErrorCode updateFileInformation(
-        const QString& fileName,
-        qint64 size,
-        const QByteArray& md5);
+    ErrorCode readFileChunk(const QString& fileName, int chunkIndex, QByteArray& buffer);
+    ErrorCode writeFileChunk(const QString& fileName, int chunkIndex, const QByteArray& buffer);
 
-    Downloader::ErrorCode readFileChunk(
-        const QString& fileName,
-        int chunkIndex,
-        QByteArray& buffer);
-
-    Downloader::ErrorCode writeFileChunk(
-        const QString& fileName,
-        int chunkIndex,
-        const QByteArray& buffer);
-
-    Downloader::ErrorCode deleteFile(
-        const QString& fileName, bool deleteData = true);
+    ErrorCode deleteFile(const QString& fileName, bool deleteData = true);
 
     QVector<QByteArray> getChunkChecksums(const QString& fileName);
-    Downloader::ErrorCode setChunkChecksums(
+    ErrorCode setChunkChecksums(
         const QString& fileName, const QVector<QByteArray>& chunkChecksums);
 
     void findDownloads();
@@ -73,7 +63,7 @@ private:
     bool saveMetadata(const FileMetadata& fileInformation);
     FileMetadata loadMetadata(const QString& fileName);
     FileMetadata fileMetadata(const QString& fileName) const;
-    Downloader::ErrorCode loadDownload(const QString& fileName);
+    ErrorCode loadDownload(const QString& fileName);
     void checkDownloadCompleted(FileMetadata& fileInfo);
 
     static bool reserveSpace(const QString& fileName, const qint64 size);

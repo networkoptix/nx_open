@@ -272,7 +272,7 @@ void Worker::requestFileInformationInternal()
                 const auto errorCode = m_storage->updateFileInformation(
                     fileInfo.name, fileInfo.size, fileInfo.md5);
 
-                if (errorCode != Downloader::ErrorCode::noError)
+                if (errorCode != ErrorCode::noError)
                 {
                     NX_LOGX(
                         logMessage("During update storage returned error: %1").arg(
@@ -373,7 +373,7 @@ void Worker::requestChecksums()
             const auto errorCode =
                 m_storage->setChunkChecksums(m_fileName, checksums);
 
-            if (errorCode != Downloader::ErrorCode::noError)
+            if (errorCode != ErrorCode::noError)
             {
                 NX_LOGX(
                     logMessage("Cannot set checksums: %1").arg(QnLexical::serialized(errorCode)),
@@ -460,7 +460,7 @@ void Worker::downloadNextChunk()
             }
 
             const auto errorCode = m_storage->writeFileChunk(m_fileName, chunkIndex, data);
-            if (errorCode != Downloader::ErrorCode::noError)
+            if (errorCode != ErrorCode::noError)
             {
                 NX_LOGX(
                     logMessage("Cannot write chunk. Storage error: %1").arg(

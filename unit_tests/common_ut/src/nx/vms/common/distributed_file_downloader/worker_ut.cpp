@@ -227,7 +227,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, requestingFileInfo)
 TEST_F(DistributedFileDownloaderWorkerTest, simpleDownload)
 {
     auto fileInfo = createTestFile();
-    NX_ASSERT(storage->addFile(fileInfo) == Downloader::ErrorCode::noError);
+    NX_ASSERT(storage->addFile(fileInfo) == ErrorCode::noError);
 
     fileInfo.downloadedChunks.fill(true);
 
@@ -263,7 +263,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, corruptedFile)
     auto fileInfo = createTestFile();
     fileInfo.downloadedChunks.setBit(0); //< Making file corrupted.
 
-    NX_ASSERT(storage->addFile(fileInfo) == Downloader::ErrorCode::noError);
+    NX_ASSERT(storage->addFile(fileInfo) == ErrorCode::noError);
 
     fileInfo.downloadedChunks.fill(true);
 

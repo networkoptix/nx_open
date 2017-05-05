@@ -5,7 +5,7 @@
 #include <nx/utils/uuid.h>
 #include <api/server_rest_connection_fwd.h>
 
-#include "../downloader.h"
+#include "../file_information.h"
 
 namespace nx {
 namespace vms {

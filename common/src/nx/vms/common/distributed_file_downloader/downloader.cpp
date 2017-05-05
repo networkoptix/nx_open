@@ -4,7 +4,6 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <utils/common/delayed.h>
-#include <nx/fusion/model_functions.h>
 
 #include "private/storage.h"
 #include "private/worker.h"
@@ -14,24 +13,6 @@ namespace nx {
 namespace vms {
 namespace common {
 namespace distributed_file_downloader {
-
-//-------------------------------------------------------------------------------------------------
-
-FileInformation::FileInformation()
-{
-}
-
-FileInformation::FileInformation(const QString& fileName):
-    name(fileName)
-{
-}
-
-bool FileInformation::isValid() const
-{
-    return !name.isEmpty();
-}
-
-//-------------------------------------------------------------------------------------------------
 
 class DownloaderPrivate: public QObject
 {
@@ -126,7 +107,7 @@ FileInformation Downloader::fileInformation(
     return d->storage->fileInformation(fileName);
 }
 
-Downloader::ErrorCode Downloader::addFile(const FileInformation& fileInformation)
+ErrorCode Downloader::addFile(const FileInformation& fileInformation)
 {
     Q_D(Downloader);
 
@@ -144,7 +125,7 @@ Downloader::ErrorCode Downloader::addFile(const FileInformation& fileInformation
     return errorCode;
 }
 
-Downloader::ErrorCode Downloader::updateFileInformation(
+ErrorCode Downloader::updateFileInformation(
     const QString& fileName,
     int size,
     const QByteArray& md5)
@@ -153,7 +134,7 @@ Downloader::ErrorCode Downloader::updateFileInformation(
     return d->storage->updateFileInformation(fileName, size, md5);
 }
 
-Downloader::ErrorCode Downloader::readFileChunk(
+ErrorCode Downloader::readFileChunk(
     const QString& fileName,
     int chunkIndex,
     QByteArray& buffer)
@@ -162,7 +143,7 @@ Downloader::ErrorCode Downloader::readFileChunk(
     return d->storage->readFileChunk(fileName, chunkIndex, buffer);
 }
 
-Downloader::ErrorCode Downloader::writeFileChunk(
+ErrorCode Downloader::writeFileChunk(
     const QString& fileName,
     int chunkIndex,
     const QByteArray& buffer)
@@ -171,7 +152,7 @@ Downloader::ErrorCode Downloader::writeFileChunk(
     return d->storage->writeFileChunk(fileName, chunkIndex, buffer);
 }
 
-Downloader::ErrorCode Downloader::deleteFile(
+ErrorCode Downloader::deleteFile(
     const QString& fileName,
     bool deleteData)
 {
@@ -184,10 +165,6 @@ QVector<QByteArray> Downloader::getChunkChecksums(const QString& fileName)
     Q_D(Downloader);
     return d->storage->getChunkChecksums(fileName);
 }
-
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(FileInformation, Status)
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Downloader, ErrorCode)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((FileInformation), (json), _Fields)
 
 } // namespace distributed_file_downloader
 } // namespace common

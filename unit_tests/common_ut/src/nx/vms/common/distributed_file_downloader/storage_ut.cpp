@@ -72,19 +72,19 @@ TEST_F(DistributedFileDownloaderStorageTest, inexistentFileRequests)
     QByteArray buffer;
 
     ASSERT_EQ(downloaderStorage->readFileChunk(testFileName, 0, buffer),
-        Downloader::ErrorCode::fileDoesNotExist);
+        ErrorCode::fileDoesNotExist);
 
     ASSERT_EQ(downloaderStorage->writeFileChunk(testFileName, 0, buffer),
-        Downloader::ErrorCode::fileDoesNotExist);
+        ErrorCode::fileDoesNotExist);
 
     ASSERT_EQ(downloaderStorage->deleteFile(testFileName),
-        Downloader::ErrorCode::fileDoesNotExist);
+        ErrorCode::fileDoesNotExist);
 }
 
 TEST_F(DistributedFileDownloaderStorageTest, addNewFileWithoutInformation)
 {
     ASSERT_EQ(downloaderStorage->addFile(testFileName),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
 
     const auto& fileInfo = downloaderStorage->fileInformation(testFileName);
 
@@ -103,7 +103,7 @@ TEST_F(DistributedFileDownloaderStorageTest, addNewFile)
         fileInfo.md5 = md5;
 
         ASSERT_EQ(downloaderStorage->addFile(fileInfo),
-            Downloader::ErrorCode::noError);
+            ErrorCode::noError);
     }
 
     const auto& fileInfo = downloaderStorage->fileInformation(testFileName);
@@ -123,7 +123,7 @@ TEST_F(DistributedFileDownloaderStorageTest, addDownloadedFile)
         fileInfo.status = FileInformation::Status::downloaded;
 
         ASSERT_EQ(downloaderStorage->addFile(fileInfo),
-            Downloader::ErrorCode::noError);
+            ErrorCode::noError);
     }
 
     const auto& fileInfo = downloaderStorage->fileInformation(testFileName);
@@ -144,7 +144,7 @@ TEST_F(DistributedFileDownloaderStorageTest, addDownloadedFileAsNotDownloaded)
         fileInfo.md5 = testFileMd5;
 
         ASSERT_EQ(downloaderStorage->addFile(fileInfo),
-            Downloader::ErrorCode::noError);
+            ErrorCode::noError);
     }
 
     // Valid file is already exists, so file should became downloaded.
@@ -167,7 +167,7 @@ TEST_F(DistributedFileDownloaderStorageTest, addFileWithWrongChecksum)
         fileInfo.md5 = "invalid_md5";
 
         ASSERT_EQ(downloaderStorage->addFile(fileInfo),
-            Downloader::ErrorCode::invalidChecksum);
+            ErrorCode::invalidChecksum);
     }
 
     const auto& fileInfo = downloaderStorage->fileInformation(testFileName);
@@ -181,17 +181,17 @@ TEST_F(DistributedFileDownloaderStorageTest, addFileForUpload)
         fileInfo.status = FileInformation::Status::uploading;
 
         ASSERT_EQ(downloaderStorage->addFile(fileInfo),
-            Downloader::ErrorCode::invalidFileSize);
+            ErrorCode::invalidFileSize);
 
         fileInfo.size = kTestFileSize;
 
         ASSERT_EQ(downloaderStorage->addFile(fileInfo),
-            Downloader::ErrorCode::invalidChecksum);
+            ErrorCode::invalidChecksum);
 
         fileInfo.md5 = "md5";
 
         ASSERT_EQ(downloaderStorage->addFile(fileInfo),
-            Downloader::ErrorCode::noError);
+            ErrorCode::noError);
     }
 
     const auto& fileInfo = downloaderStorage->fileInformation(testFileName);
@@ -203,7 +203,7 @@ TEST_F(DistributedFileDownloaderStorageTest, fileNameWithSubdirectories)
     const QString fileName("one/two/three/" + testFileName);
 
     ASSERT_EQ(downloaderStorage->addFile(fileName),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
 
     const auto filePath = downloaderStorage->filePath(fileName);
 
@@ -211,7 +211,7 @@ TEST_F(DistributedFileDownloaderStorageTest, fileNameWithSubdirectories)
     ASSERT_TRUE(QFile::exists(filePath));
 
     ASSERT_EQ(downloaderStorage->deleteFile(fileName),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
 
     ASSERT_FALSE(workingDirectory.exists("one"));
 }
@@ -219,10 +219,10 @@ TEST_F(DistributedFileDownloaderStorageTest, fileNameWithSubdirectories)
 TEST_F(DistributedFileDownloaderStorageTest, fileDuplicate)
 {
     ASSERT_EQ(downloaderStorage->addFile(testFileName),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
 
     ASSERT_EQ(downloaderStorage->addFile(testFileName),
-        Downloader::ErrorCode::fileAlreadyExists);
+        ErrorCode::fileAlreadyExists);
 }
 
 TEST_F(DistributedFileDownloaderStorageTest, fileDeletion)
@@ -230,38 +230,38 @@ TEST_F(DistributedFileDownloaderStorageTest, fileDeletion)
     createTestFile(testFileName, 0);
 
     ASSERT_EQ(downloaderStorage->deleteFile(testFileName),
-        Downloader::ErrorCode::fileDoesNotExist);
+        ErrorCode::fileDoesNotExist);
 
     // Delete download storing the data.
     ASSERT_EQ(downloaderStorage->addFile(testFileName),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
     ASSERT_EQ(downloaderStorage->deleteFile(testFileName, false),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
     ASSERT_TRUE(QFile::exists(testFilePath));
 
     // Delete download with its data.
     ASSERT_EQ(downloaderStorage->addFile(testFileName),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
     ASSERT_EQ(downloaderStorage->deleteFile(testFileName),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
     ASSERT_FALSE(QFile::exists(testFilePath));
 }
 
 TEST_F(DistributedFileDownloaderStorageTest, updateEmptyFile)
 {
     ASSERT_EQ(downloaderStorage->addFile(testFileName),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
 
     ASSERT_EQ(downloaderStorage->updateFileInformation(
         testFileName + ".notfound", kTestFileSize, QByteArray()),
-        Downloader::ErrorCode::fileDoesNotExist);
+        ErrorCode::fileDoesNotExist);
 
     ASSERT_EQ(downloaderStorage->updateFileInformation(testFileName, kTestFileSize, QByteArray()),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
     ASSERT_EQ(kTestFileSize, Storage::calculateFileSize(testFilePath));
 
     ASSERT_EQ(downloaderStorage->updateFileInformation(testFileName, kTestFileSize, "md5_test"),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
 
     const auto& fileInfo = downloaderStorage->fileInformation(testFileName);
     ASSERT_EQ(fileInfo.size, kTestFileSize);
@@ -275,10 +275,10 @@ TEST_F(DistributedFileDownloaderStorageTest, updateDownloadedFile)
     FileInformation fileInfo(testFileName);
     fileInfo.status = FileInformation::Status::downloaded;
     ASSERT_EQ(downloaderStorage->addFile(fileInfo),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
 
     ASSERT_EQ(downloaderStorage->updateFileInformation(testFileName, kTestFileSize, "md5_test"),
-        Downloader::ErrorCode::fileAlreadyDownloaded);
+        ErrorCode::fileAlreadyDownloaded);
 }
 
 TEST_F(DistributedFileDownloaderStorageTest, updateCorruptedFile)
@@ -290,7 +290,7 @@ TEST_F(DistributedFileDownloaderStorageTest, updateCorruptedFile)
     fileInfo.md5 = "invalid_md5";
 
     ASSERT_EQ(downloaderStorage->addFile(fileInfo),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
 
     QByteArray data;
 
@@ -302,7 +302,7 @@ TEST_F(DistributedFileDownloaderStorageTest, updateCorruptedFile)
     }
 
     ASSERT_EQ(downloaderStorage->writeFileChunk(testFileName, 0, data),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
 
     {
         const auto& fileInfo = downloaderStorage->fileInformation(testFileName);
@@ -310,7 +310,7 @@ TEST_F(DistributedFileDownloaderStorageTest, updateCorruptedFile)
     }
 
     ASSERT_EQ(downloaderStorage->updateFileInformation(testFileName, -1, testFileMd5),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
 
     {
         const auto& fileInfo = downloaderStorage->fileInformation(testFileName);
@@ -327,7 +327,7 @@ TEST_F(DistributedFileDownloaderStorageTest, findDownloadsForDownloadedFiles)
         fileInfo.status = FileInformation::Status::downloaded;
 
         ASSERT_EQ(this->downloaderStorage->addFile(fileInfo),
-            Downloader::ErrorCode::noError);
+            ErrorCode::noError);
     }
 
     Storage downloaderStorage(workingDirectory);
@@ -345,7 +345,7 @@ TEST_F(DistributedFileDownloaderStorageTest, findDownloadsForDownloadedFiles)
 TEST_F(DistributedFileDownloaderStorageTest, findDownloadsForNewFiles)
 {
     ASSERT_EQ(this->downloaderStorage->addFile(testFileName),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
 
     Storage downloaderStorage(workingDirectory);
 
@@ -366,21 +366,21 @@ TEST_F(DistributedFileDownloaderStorageTest, findDownloadsForFilesInProgress)
         fileInfo.status = FileInformation::Status::downloaded;
 
         ASSERT_EQ(this->downloaderStorage->addFile(fileInfo),
-            Downloader::ErrorCode::noError);
+            ErrorCode::noError);
 
         fileInfo = FileInformation(targetFileName);
         fileInfo.md5 = testFileMd5;
         fileInfo.size = kTestFileSize;
 
         ASSERT_EQ(this->downloaderStorage->addFile(fileInfo),
-            Downloader::ErrorCode::noError);
+            ErrorCode::noError);
 
         QByteArray buffer;
 
         ASSERT_EQ(this->downloaderStorage->readFileChunk(testFileName, 0, buffer),
-            Downloader::ErrorCode::noError);
+            ErrorCode::noError);
         ASSERT_EQ(this->downloaderStorage->writeFileChunk(targetFileName, 0, buffer),
-            Downloader::ErrorCode::noError);
+            ErrorCode::noError);
 
         md5BeforeFind = Storage::calculateMd5(targetFilePath);
     }
@@ -400,11 +400,11 @@ TEST_F(DistributedFileDownloaderStorageTest, findCorruptedFiles)
         fileInfo.md5 = "invalid_md5";
 
         ASSERT_EQ(this->downloaderStorage->addFile(fileInfo),
-            Downloader::ErrorCode::noError);
+            ErrorCode::noError);
 
         const QByteArray buffer("_");
         ASSERT_EQ(this->downloaderStorage->writeFileChunk(testFileName, 0, buffer),
-            Downloader::ErrorCode::noError);
+            ErrorCode::noError);
 
         fileInfo = downloaderStorage->fileInformation(testFileName);
         ASSERT_EQ(fileInfo.status, FileInformation::Status::corrupted);
@@ -421,9 +421,9 @@ TEST_F(DistributedFileDownloaderStorageTest, findFileAfterDeletion)
     createTestFile(testFileName, 0);
 
     ASSERT_EQ(this->downloaderStorage->addFile(testFileName),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
     ASSERT_EQ(this->downloaderStorage->deleteFile(testFileName),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
 
     Storage downloaderStorage(workingDirectory);
 
@@ -442,14 +442,14 @@ TEST_F(DistributedFileDownloaderStorageTest, chunkOperations)
         fileInfo.status = FileInformation::Status::downloaded;
 
         ASSERT_EQ(downloaderStorage->addFile(fileInfo),
-            Downloader::ErrorCode::noError);
+            ErrorCode::noError);
 
         FileInformation targetFileInfo(targetFileName);
         targetFileInfo.md5 = testFileMd5;
         targetFileInfo.size = kTestFileSize;
 
         ASSERT_EQ(downloaderStorage->addFile(targetFileInfo),
-            Downloader::ErrorCode::noError);
+            ErrorCode::noError);
     }
 
     const auto& fileInfo = downloaderStorage->fileInformation(testFileName);
@@ -459,9 +459,9 @@ TEST_F(DistributedFileDownloaderStorageTest, chunkOperations)
         QByteArray buffer;
 
         ASSERT_EQ(downloaderStorage->readFileChunk(testFileName, i, buffer),
-            Downloader::ErrorCode::noError);
+            ErrorCode::noError);
         ASSERT_EQ(downloaderStorage->writeFileChunk(targetFileName, i, buffer),
-            Downloader::ErrorCode::noError);
+            ErrorCode::noError);
     }
 
     const auto& targetFileInfo = downloaderStorage->fileInformation(targetFileName);
@@ -480,11 +480,11 @@ TEST_F(DistributedFileDownloaderStorageTest, readByInvalidChunkIndex)
     fileInformation.status = FileInformation::Status::downloaded;
 
     ASSERT_EQ(downloaderStorage->addFile(fileInformation),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
 
     QByteArray buffer;
     ASSERT_EQ(downloaderStorage->readFileChunk(testFileName, 42, buffer),
-        Downloader::ErrorCode::invalidChunkIndex);
+        ErrorCode::invalidChunkIndex);
 }
 
 TEST_F(DistributedFileDownloaderStorageTest, writeInvalidChunks)
@@ -495,16 +495,16 @@ TEST_F(DistributedFileDownloaderStorageTest, writeInvalidChunks)
     fileInformation.size = 1;
 
     ASSERT_EQ(downloaderStorage->addFile(fileInformation),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
 
     QByteArray buffer;
 
     ASSERT_EQ(downloaderStorage->writeFileChunk(testFileName, 42, buffer),
-        Downloader::ErrorCode::invalidChunkIndex);
+        ErrorCode::invalidChunkIndex);
 
     buffer = "some_bytes";
     ASSERT_EQ(downloaderStorage->writeFileChunk(testFileName, 0, buffer),
-        Downloader::ErrorCode::invalidChunkSize);
+        ErrorCode::invalidChunkSize);
 }
 
 TEST_F(DistributedFileDownloaderStorageTest, writeToDownloadedFile)
@@ -515,11 +515,11 @@ TEST_F(DistributedFileDownloaderStorageTest, writeToDownloadedFile)
     fileInformation.status = FileInformation::Status::downloaded;
 
     ASSERT_EQ(downloaderStorage->addFile(fileInformation),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
 
     QByteArray buffer;
     ASSERT_EQ(downloaderStorage->writeFileChunk(testFileName, 0, buffer),
-        Downloader::ErrorCode::ioError);
+        ErrorCode::ioError);
 }
 
 TEST_F(DistributedFileDownloaderStorageTest, fileCorruptionDuringDownload)
@@ -530,11 +530,11 @@ TEST_F(DistributedFileDownloaderStorageTest, fileCorruptionDuringDownload)
         fileInfo.size = 1;
 
         ASSERT_EQ(downloaderStorage->addFile(fileInfo),
-            Downloader::ErrorCode::noError);
+            ErrorCode::noError);
     }
 
     ASSERT_EQ(downloaderStorage->writeFileChunk(testFileName, 0, "1"),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
 
     const auto& fileInformation = downloaderStorage->fileInformation(testFileName);
     ASSERT_EQ(fileInformation.status, FileInformation::Status::corrupted);
@@ -548,7 +548,7 @@ TEST_F(DistributedFileDownloaderStorageTest, getChecksums)
     fileInformation.status = FileInformation::Status::downloaded;
 
     ASSERT_EQ(downloaderStorage->addFile(fileInformation),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
 
     const auto& fileInfo = downloaderStorage->fileInformation(testFileName);
 
@@ -566,22 +566,22 @@ TEST_F(DistributedFileDownloaderStorageTest, getChecksumsAfterDownload)
     fileInfo.status = FileInformation::Status::downloaded;
 
     ASSERT_EQ(downloaderStorage->addFile(fileInfo),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
 
     fileInfo = downloaderStorage->fileInformation(testFileName);
 
     QByteArray data;
     ASSERT_EQ(downloaderStorage->readFileChunk(testFileName, 0, data),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
 
     FileInformation targetFileInfo(testFileName + ".new");
     targetFileInfo.size = fileInfo.size;
     targetFileInfo.md5 = fileInfo.md5;
     ASSERT_EQ(downloaderStorage->addFile(targetFileInfo),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
 
     ASSERT_EQ(downloaderStorage->writeFileChunk(targetFileInfo.name, 0, data),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
 
     const auto checksums = downloaderStorage->getChunkChecksums(targetFileInfo.name);
     ASSERT_EQ(checksums.size(), 1);
@@ -613,13 +613,13 @@ TEST_F(DistributedFileDownloaderStorageTest, setChecksumsToCorruptedFile)
     fileInfo.downloadedChunks.fill(true, Storage::calculateChunkCount(kTestFileSize, kChunkSize));
 
     ASSERT_EQ(downloaderStorage->addFile(fileInfo),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
 
     ASSERT_EQ(downloaderStorage->setChunkChecksums(testFileName, QVector<QByteArray>(1)),
-              Downloader::ErrorCode::invalidChecksum);
+        ErrorCode::invalidChecksum);
 
     ASSERT_EQ(downloaderStorage->setChunkChecksums(testFileName, checksums),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
 
     fileInfo = downloaderStorage->fileInformation(testFileName);
     ASSERT_FALSE(fileInfo.downloadedChunks[0]);
@@ -635,14 +635,14 @@ TEST_F(DistributedFileDownloaderStorageTest, setChecksumsToDownloadedFile)
     fileInfo.status = FileInformation::Status::downloaded;
 
     ASSERT_EQ(downloaderStorage->addFile(fileInfo),
-        Downloader::ErrorCode::noError);
+        ErrorCode::noError);
 
     fileInfo = downloaderStorage->fileInformation(testFileName);
 
     ASSERT_EQ(
         downloaderStorage->setChunkChecksums(
             testFileName, QVector<QByteArray>(fileInfo.downloadedChunks.size())),
-        Downloader::ErrorCode::fileAlreadyDownloaded);
+        ErrorCode::fileAlreadyDownloaded);
 }
 
 } // namespace test
