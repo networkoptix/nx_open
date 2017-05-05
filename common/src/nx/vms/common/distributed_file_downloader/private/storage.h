@@ -4,7 +4,7 @@
 
 #include <nx/utils/thread/mutex.h>
 
-#include "../../distributed_file_downloader.h"
+#include "../downloader.h"
 
 namespace nx {
 namespace vms {

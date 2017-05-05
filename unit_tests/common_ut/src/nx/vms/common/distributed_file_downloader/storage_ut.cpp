@@ -3,7 +3,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
-#include <nx/vms/common/private/distributed_file_downloader/storage.h>
+#include <nx/vms/common/distributed_file_downloader/private/storage.h>
 
 #include <test_setup.h>
 

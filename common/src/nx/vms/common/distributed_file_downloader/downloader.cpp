@@ -1,4 +1,4 @@
-#include "distributed_file_downloader.h"
+#include "downloader.h"
 
 #include <QtCore/QHash>
 
@@ -6,9 +6,9 @@
 #include <utils/common/delayed.h>
 #include <nx/fusion/model_functions.h>
 
-#include "private/distributed_file_downloader/storage.h"
-#include "private/distributed_file_downloader/worker.h"
-#include "private/distributed_file_downloader/resource_pool_peer_manager.h"
+#include "private/storage.h"
+#include "private/worker.h"
+#include "private/resource_pool_peer_manager.h"
 
 namespace nx {
 namespace vms {

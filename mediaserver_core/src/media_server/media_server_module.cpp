@@ -35,7 +35,7 @@
 #include <common/static_common_module.h>
 #include <utils/common/app_info.h>
 
-#include <nx/vms/common/distributed_file_downloader.h>
+#include <nx/vms/common/distributed_file_downloader/downloader.h>
 
 namespace {
 

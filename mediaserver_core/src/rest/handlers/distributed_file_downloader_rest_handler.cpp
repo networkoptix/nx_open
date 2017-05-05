@@ -2,7 +2,7 @@
 
 #include <nx/network/http/httptypes.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/vms/common/distributed_file_downloader.h>
+#include <nx/vms/common/distributed_file_downloader/downloader.h>
 #include <rest/server/json_rest_result.h>
 #include <media_server/media_server_module.h>
 

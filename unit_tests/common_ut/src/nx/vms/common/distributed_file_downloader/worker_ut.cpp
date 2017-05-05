@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <nx/vms/common/private/distributed_file_downloader/storage.h>
-#include <nx/vms/common/private/distributed_file_downloader/worker.h>
+#include <nx/vms/common/distributed_file_downloader/private/storage.h>
+#include <nx/vms/common/distributed_file_downloader/private/worker.h>
 
 #include <test_setup.h>
 

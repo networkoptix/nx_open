@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/vms/common/private/distributed_file_downloader/storage.h>
+#include <nx/vms/common/distributed_file_downloader/private/storage.h>
 #include <test_setup.h>
 
 #include "test_peer_manager.h"

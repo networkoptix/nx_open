@@ -1,7 +1,7 @@
 #include "test_peer_manager.h"
 
 #include <nx/utils/log/assert.h>
-#include <nx/vms/common/private/distributed_file_downloader/storage.h>
+#include <nx/vms/common/distributed_file_downloader/private/storage.h>
 
 namespace nx {
 namespace vms {

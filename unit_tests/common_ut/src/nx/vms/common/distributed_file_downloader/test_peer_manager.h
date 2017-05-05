@@ -3,7 +3,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QQueue>
 
-#include <nx/vms/common/private/distributed_file_downloader/abstract_peer_manager.h>
+#include <nx/vms/common/distributed_file_downloader/private/abstract_peer_manager.h>
 
 namespace nx {
 namespace vms {
