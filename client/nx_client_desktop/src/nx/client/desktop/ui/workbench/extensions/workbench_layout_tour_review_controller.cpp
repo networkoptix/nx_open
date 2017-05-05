@@ -400,6 +400,10 @@ void LayoutTourReviewController::at_saveCurrentLayoutTourAction_triggered()
     auto tour = layoutTourManager()->tour(id);
     NX_EXPECT(tour.isValid());
 
+    const auto reviewLayout = m_reviewLayouts.value(id);
+    NX_EXPECT(reviewLayout);
+    snapshotManager()->store(reviewLayout);
+
     tour.items.clear();
     fillTourItems(&tour.items);
     tour.settings.manual = workbench()->currentLayout()->data(Qn::LayoutTourIsManualRole).toBool();
