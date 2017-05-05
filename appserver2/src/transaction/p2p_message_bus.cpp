@@ -237,6 +237,7 @@ void P2pMessageBus::createOutgoingConnections()
                 std::move(connectionLockGuard),
                 remoteConnection.url));
             m_outgoingConnections.insert(remoteConnection.id, connection);
+            ++m_connectionTries;
             connectSignals(connection);
             connection->startConnection();
         }
@@ -885,7 +886,7 @@ void P2pMessageBus::deserializeResolvePeerNumberResponse(const P2pConnectionPtr&
     tmpBuffer.resize(16);
     PeerNumberType shortPeerNumber;
     ApiPersistentIdData fullId;
-
+    auto& miscData = connection->miscData();
     while (!in.atEnd())
     {
         in >> shortPeerNumber;
@@ -894,6 +895,13 @@ void P2pMessageBus::deserializeResolvePeerNumberResponse(const P2pConnectionPtr&
         in.readRawData(tmpBuffer.data(), tmpBuffer.size());
         fullId.persistentId = QnUuid::fromRfc4122(tmpBuffer);
         connection->encode(fullId, shortPeerNumber);
+
+        auto itr = std::find(
+            miscData.awaitingNumbersToResolve.begin(),
+            miscData.awaitingNumbersToResolve.end(),
+            shortPeerNumber);
+        if (itr != miscData.awaitingNumbersToResolve.end())
+            miscData.awaitingNumbersToResolve.erase(itr);
     }
 }
 
@@ -972,7 +980,6 @@ bool P2pMessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const
 {
 
     NX_ASSERT(!data.isEmpty());
-
     m_lastPeerInfoTimer.restart();
     QVector<PeerNumberType> numbersToResolve;
     BitStreamReader reader((const quint8*)data.data(), data.size());
@@ -994,14 +1001,33 @@ bool P2pMessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const
         return false; //< invalid message
     }
 
+    connection->miscData().remotePeersMessage = data;
     NX_ASSERT(!data.isEmpty());
+
     if (numbersToResolve.empty())
     {
         processAlivePeersMessage(connection, data);
         return true;
     }
-    connection->sendMessage(serializeResolvePeerNumberRequest(numbersToResolve));
-    connection->miscData().remotePeersMessage = data;
+
+    auto& miscData = connection->miscData();
+    std::sort(numbersToResolve.begin(), numbersToResolve.end());
+    QVector<PeerNumberType> moreNumbersToResolve;
+
+    std::set_difference(
+        numbersToResolve.begin(),
+        numbersToResolve.end(),
+        miscData.awaitingNumbersToResolve.begin(),
+        miscData.awaitingNumbersToResolve.end(),
+        std::inserter(moreNumbersToResolve, moreNumbersToResolve.begin()));
+
+    if (moreNumbersToResolve.isEmpty())
+        return true;
+
+    for (const auto& number: moreNumbersToResolve)
+        miscData.awaitingNumbersToResolve.push_back(number);
+    std::sort(miscData.awaitingNumbersToResolve.begin(), miscData.awaitingNumbersToResolve.end());
+    connection->sendMessage(serializeResolvePeerNumberRequest(moreNumbersToResolve));
     return true;
 }
 
@@ -1351,6 +1377,12 @@ QMap<QnUuid, P2pConnectionPtr> P2pMessageBus::connections() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_connections;
+}
+
+int P2pMessageBus::connectionTries() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_connectionTries;
 }
 
 } // ec2

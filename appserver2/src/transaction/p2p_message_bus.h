@@ -54,6 +54,7 @@ public:
     void removeOutgoingConnectionFromPeer(const QnUuid& id);
 
     QMap<QnUuid, P2pConnectionPtr> connections() const;
+    int connectionTries() const;
 
     // Self peer information
     ApiPeerData localPeer() const;
@@ -217,6 +218,7 @@ private:
     QElapsedTimer m_dbCommitTimer;
 
     int m_lastOutgoingIndex = 0;
+    int m_connectionTries = 0;
     QElapsedTimer m_outConnectionsTimer;
 private:
     RouteToPeerMap allPeersDistances() const;

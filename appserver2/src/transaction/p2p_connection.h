@@ -94,6 +94,7 @@ public:
         QElapsedTimer localPeersTimer; //< last sent peers time
         QVector<ApiPersistentIdData> localSubscription; //< local -> remote subscription
         bool isLocalStarted = false; //< we opened connection to remote peer
+        QVector<PeerNumberType> awaitingNumbersToResolve;
 
         // to remote part
         QByteArray remotePeersMessage; //< last received peers message

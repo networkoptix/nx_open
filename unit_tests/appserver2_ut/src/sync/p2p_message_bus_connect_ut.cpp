@@ -295,6 +295,7 @@ static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverCon
 
     int totalConnections = 0;
     int startedConnections = 0;
+    int connectionTries = 0;
     for (const auto& server: servers)
     {
         ec2::Ec2DirectConnection* connection =
@@ -306,14 +307,18 @@ static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverCon
             if (connection->miscData().isLocalStarted)
                 ++startedConnections;
         }
+        connectionTries += bus->connectionTries();
     }
 
     float k = (kInstanceCount-1) * kInstanceCount;
-    NX_LOG(lit("Total connections: %1, ratio %2, opened %3, ratio %4")
+    NX_LOG(lit("Total connections: %1, ratio %2.  Opened %3, ratio %4.  Tries: %5, ratio %6")
         .arg(totalConnections)
         .arg(totalConnections / k)
         .arg(startedConnections)
-        .arg(startedConnections / k), cl_logINFO);
+        .arg(startedConnections / k)
+        .arg(connectionTries)
+        .arg(connectionTries / k),
+        cl_logINFO);
 
 }
 
