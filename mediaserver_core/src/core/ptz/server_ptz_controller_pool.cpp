@@ -78,7 +78,7 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
             controller.reset(new QnWorkaroundPtzController(controller));
     }
 
-    Qn::PtzCapabilities caps = controller ? controller->getCapabilities() : Qn::NoPtzCapabilities;
+    Ptz::Capabilities caps = controller ? controller->getCapabilities() : Ptz::NoPtzCapabilities;
     if (camera->getPtzCapabilities() != caps) {
         camera->setPtzCapabilities(caps);
         camera->saveParamsAsync();

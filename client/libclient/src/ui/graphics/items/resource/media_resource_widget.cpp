@@ -1600,8 +1600,8 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         && item()->layout()->isSearchLayout();
 
     if (m_camera
-        && m_camera->hasAnyOfPtzCapabilities(Qn::ContinuousPtzCapabilities)
-        && !m_camera->hasAnyOfPtzCapabilities(Qn::VirtualPtzCapability)
+        && m_camera->hasAnyOfPtzCapabilities(Ptz::ContinuousPtzCapabilities)
+        && !m_camera->hasAnyOfPtzCapabilities(Ptz::VirtualPtzCapability)
         && accessController()->hasPermissions(m_resource->toResourcePtr(), Qn::WritePtzPermission)
         && !isExportedLayout
         && !isPreviewSearchLayout
@@ -1843,7 +1843,7 @@ void QnMediaResourceWidget::at_screenshotButton_clicked()
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked)
 {
     bool ptzEnabled =
-        checked && (m_camera && (m_camera->getPtzCapabilities() & Qn::ContinuousPtzCapabilities));
+        checked && (m_camera && (m_camera->getPtzCapabilities() & Ptz::ContinuousPtzCapabilities));
 
     setOption(ControlPtz, ptzEnabled);
     setOption(DisplayCrosshair, ptzEnabled);

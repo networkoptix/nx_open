@@ -9,6 +9,7 @@ Control
 
     property bool active: false
     property alias text: label.text
+    property alias textColor: label.color
 
     signal clicked()
 

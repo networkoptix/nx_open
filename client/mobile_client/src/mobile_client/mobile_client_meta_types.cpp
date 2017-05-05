@@ -32,6 +32,8 @@
 #include <utils/developer_settings_helper.h>
 #include <settings/qml_settings_adaptor.h>
 #include <nx/mobile_client/helpers/inter_client_message.h>
+#include <nx/mobile_client/controllers/resource_ptz_controller.h>
+#include <nx/mobile_client/models/ptz_preset_model.h>
 
 using namespace nx::client::mobile;
 
@@ -79,7 +81,13 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnLiteClientController>("com.networkoptix.qml", 1, 0, "QnLiteClientController");
     qmlRegisterType<QnLiteClientLayoutHelper>("com.networkoptix.qml", 1, 0, "QnLiteClientLayoutHelper");
     qmlRegisterType<utils::DeveloperSettingsHelper>(
-        "com.networkoptix.qml", 1, 0, "DeveloperSettingsHelper");
+        "Nx.Core", 1, 0, "DeveloperSettingsHelper");
+
+    // Ptz related classes
+    qmlRegisterUncreatableType<Ptz>("Nx.Core", 1, 0, "Ptz",
+        lit("Cannot create an instance of Ptz class"));
+    qmlRegisterType<nx::client::mobile::ResourcePtzController>("Nx.Core", 1, 0, "PtzController");
+    qmlRegisterType<nx::client::mobile::PtzPresetModel>("Nx.Core", 1, 0, "PtzPresetModel");
 
     qmlRegisterRevision<QQuickTextInput, 6>("Nx.Controls", 1, 0);
     qmlRegisterRevision<QQuickItem, 1>("Nx.Controls", 1, 0);

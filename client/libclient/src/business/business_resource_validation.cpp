@@ -107,7 +107,7 @@ QString QnCameraOutputPolicy::getText(const QnResourceList &resources, const boo
 }
 
 bool QnExecPtzPresetPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
-    return  camera->hasAnyOfPtzCapabilities(Qn::PresetsPtzCapability) || //|| camera->hasPtzCapabilities(Qn::VirtualPtzCapability);
+    return  camera->hasAnyOfPtzCapabilities(Ptz::PresetsPtzCapability) || //|| camera->hasPtzCapabilities(Ptz::VirtualPtzCapability);
             camera->getDewarpingParams().enabled;
 }
 

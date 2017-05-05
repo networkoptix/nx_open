@@ -94,7 +94,7 @@ private:
 
 bool getDevicePosition(const QnPtzControllerPtr &controller, QVector3D *position)
 {
-    if (!controller->hasCapabilities(Qn::AsynchronousPtzCapability))
+    if (!controller->hasCapabilities(Ptz::AsynchronousPtzCapability))
     {
         return controller->getPosition(Qn::DevicePtzCoordinateSpace, position);
     }
@@ -188,7 +188,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered()
         return;
     QnResourcePtr resource = widget->resource()->toResourcePtr();
 
-    if (!widget->ptzController()->hasCapabilities(Qn::PresetsPtzCapability))
+    if (!widget->ptzController()->hasCapabilities(Ptz::PresetsPtzCapability))
     {
         //TODO: #GDM #PTZ show appropriate error message?
         return;

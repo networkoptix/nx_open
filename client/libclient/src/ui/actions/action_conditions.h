@@ -651,7 +651,7 @@ public:
 class QnPtzActionCondition: public QnActionCondition
 {
 public:
-    QnPtzActionCondition(Qn::PtzCapabilities capabilities, bool disableIfPtzDialogVisible, QObject* parent):
+    QnPtzActionCondition(Ptz::Capabilities capabilities, bool disableIfPtzDialogVisible, QObject* parent):
         QnActionCondition(parent),
         m_capabilities(capabilities),
         m_disableIfPtzDialogVisible(disableIfPtzDialogVisible)
@@ -665,7 +665,7 @@ private:
     bool check(const QnPtzControllerPtr &controller);
 
 private:
-    Qn::PtzCapabilities m_capabilities;
+    Ptz::Capabilities m_capabilities;
     bool m_disableIfPtzDialogVisible;
 };
 
