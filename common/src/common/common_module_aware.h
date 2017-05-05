@@ -18,6 +18,7 @@ class QnCameraUserAttributePool;
 class QnMediaServerUserAttributesPool;
 class QnResourceStatusDictionary;
 class QnGlobalSettings;
+class QnLayoutTourManager;
 
 class QnCommonModuleAware
 {
@@ -50,6 +51,7 @@ public:
     QnMediaServerUserAttributesPool* mediaServerUserAttributesPool() const;
     QnResourceStatusDictionary* statusDictionary() const;
     QnGlobalSettings* globalSettings() const;
+    QnLayoutTourManager* layoutTourManager() const;
 private:
     void init(QObject *parent);
 

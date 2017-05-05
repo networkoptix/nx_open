@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <nx/utils/settings.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_settings.h>
 

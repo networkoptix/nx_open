@@ -6,7 +6,7 @@
     #include <gmock/gmock.h>
 #endif
 
-#include <nx/utils/log/log.h>
+#include <nx/utils/log/log_initializer.h>
 #include <nx/utils/flag_config.h>
 #include <nx/utils/move_only_func.h>
 
@@ -36,7 +36,7 @@ inline int runTest(int argc, const char* argv[], InitFunction extraInit = nullpt
 
     ArgumentParser args(argc, argv);
     TestOptions::applyArguments(args);
-    QnLog::applyArguments(args);
+    nx::utils::log::initializeGlobaly(args);
 
     DeinitFunctions deinitFunctions;
     if (extraInit)

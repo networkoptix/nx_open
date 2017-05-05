@@ -121,7 +121,7 @@ bool QnVideoStreamDisplay::allocScaleContext( const CLVideoDecoderOutput& outFra
                                     m_outputWidth, m_outputHeight, AV_PIX_FMT_RGBA,
                                     SWS_POINT, NULL, NULL, NULL);
     if (!m_scaleContext)
-        cl_log.log(QLatin1String("Can't get swscale context"), cl_logERROR);
+        NX_ERROR(this, "Can't get swscale context");
     return m_scaleContext != 0;
 }
 
@@ -458,7 +458,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 
     if (data->compressionType == AV_CODEC_ID_NONE)
     {
-        cl_log.log(QLatin1String("QnVideoStreamDisplay::display: unknown codec type..."), cl_logERROR);
+        NX_ERROR(this, "display: unknown codec type...");
         return Status_Displayed; // true to prevent 100% cpu usage on unknown codec
     }
 
@@ -473,8 +473,9 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
                 enableFrameQueue,
                 widgetRenderer ? widgetRenderer->glContext() : NULL);
         dec->setSpeed( m_speed );
-        if (dec == 0) {
-            cl_log.log(lit("Can't find create decoder for compression type %1").arg(data->compressionType), cl_logDEBUG2);
+        if (dec == 0)
+        {
+            NX_VERBOSE(this, lit("Can't find create decoder for compression type %1").arg(data->compressionType));
             return Status_Displayed;
         }
 
@@ -673,7 +674,6 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 
     calcSampleAR(outFrame, dec);
 
-    //cl_log.log(QDateTime::fromMSecsSinceEpoch(data->timestamp/1000).toString("hh.mm.ss.zzz"), cl_logALWAYS);
     if (processDecodedFrame(dec, outFrame, enableFrameQueue, reverseMode))
         return Status_Displayed;
     else
@@ -762,7 +762,6 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, cons
             {
                 bool wasWaiting = m_bufferedFrameDisplayer->addFrame(outFrame);
                 qint64 bufferedDuration = m_bufferedFrameDisplayer->bufferedDuration();
-                //cl_log.log("buffered duration=", bufferedDuration, cl_logALWAYS);
                 if (wasWaiting) {
                     dec->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full);
                     m_queueWasFilled = true;

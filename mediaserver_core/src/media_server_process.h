@@ -166,11 +166,8 @@ private:
     void saveServerInfo(const QnMediaServerResourcePtr& server);
 
     void serviceModeInit();
-    void initTransactionLog(const QString& logDir, QnLogLevel level);
-    void initPermissionsLog(const QString& logDir, QnLogLevel level);
     QString hardwareIdAsGuid() const;
     void updateGuidIfNeeded();
-
 private:
     int m_argc;
     char** m_argv;
