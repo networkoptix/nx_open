@@ -198,6 +198,24 @@ TEST_F(DistributedFileDownloaderStorageTest, addFileForUpload)
     ASSERT_EQ(fileInfo.status, DownloaderFileInformation::Status::uploading);
 }
 
+TEST_F(DistributedFileDownloaderStorageTest, fileNameWithSubdirectories)
+{
+    const QString fileName("one/two/three/" + testFileName);
+
+    ASSERT_EQ(downloaderStorage->addFile(fileName),
+        DistributedFileDownloader::ErrorCode::noError);
+
+    const auto filePath = downloaderStorage->filePath(fileName);
+
+    ASSERT_EQ(filePath, workingDirectory.absoluteFilePath(fileName));
+    ASSERT_TRUE(QFile::exists(filePath));
+
+    ASSERT_EQ(downloaderStorage->deleteFile(fileName),
+        DistributedFileDownloader::ErrorCode::noError);
+
+    ASSERT_FALSE(workingDirectory.exists("one"));
+}
+
 TEST_F(DistributedFileDownloaderStorageTest, fileDuplicate)
 {
     ASSERT_EQ(downloaderStorage->addFile(testFileName),

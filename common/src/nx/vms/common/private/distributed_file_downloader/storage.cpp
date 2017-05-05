@@ -100,6 +100,13 @@ DistributedFileDownloader::ErrorCode Storage::addFile(
     }
     else
     {
+        const auto fileDir = QFileInfo(path).absolutePath();
+        if (!QDir(fileDir).exists())
+        {
+            if (!QDir().mkpath(fileDir))
+                return DistributedFileDownloader::ErrorCode::ioError;
+        }
+
         if (!info.md5.isEmpty() && calculateMd5(path) == info.md5)
         {
             info.status = DownloaderFileInformation::Status::downloaded;
@@ -288,6 +295,22 @@ DistributedFileDownloader::ErrorCode Storage::deleteFile(
     {
         if (!QFile::remove(metadataFileName))
             return DistributedFileDownloader::ErrorCode::ioError;
+    }
+
+
+    QDir dir = QFileInfo(path).absoluteDir();
+    while (dir != m_downloadsDirectory)
+    {
+        if (dir.entryList(QDir::AllEntries | QDir::NoDotAndDotDot).isEmpty())
+        {
+            const auto name = dir.dirName();
+
+            if (!dir.cdUp())
+                break;
+
+            if (!dir.rmdir(name))
+                break;
+        }
     }
 
     m_fileInformationByName.erase(it);
