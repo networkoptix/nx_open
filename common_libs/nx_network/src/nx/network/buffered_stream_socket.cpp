@@ -9,10 +9,10 @@ static const int kRecvBufferCapacity = 1024 * 4;
 namespace nx {
 namespace network {
 
-BufferedStreamSocket::BufferedStreamSocket(std::unique_ptr<AbstractStreamSocket> socket)
-    : m_socket(std::move(socket))
+BufferedStreamSocket::BufferedStreamSocket(std::unique_ptr<AbstractStreamSocket> socket):
+    StreamSocketDelegate(socket.get()),
+    m_socket(std::move(socket))
 {
-    setDelegate(m_socket.get());
 }
 
 void BufferedStreamSocket::catchRecvEvent(
@@ -66,43 +66,6 @@ void BufferedStreamSocket::injectRecvData(Buffer buffer, Inject injectType)
     NX_ASSERT(false, lm("Unexpected enum value: %1").arg((int)injectType));
 }
 
-bool BufferedStreamSocket::bind(const SocketAddress& localAddress)
-{
-    return m_socket->bind(localAddress);
-}
-
-SocketAddress BufferedStreamSocket::getLocalAddress() const
-{
-    return m_socket->getLocalAddress();
-}
-
-bool BufferedStreamSocket::close()
-{
-    return m_socket->close();
-}
-
-bool BufferedStreamSocket::isClosed() const
-{
-    return m_socket->isClosed();
-}
-
-bool BufferedStreamSocket::shutdown()
-{
-    return m_socket->shutdown();
-}
-
-bool BufferedStreamSocket::reopen()
-{
-    return m_socket->reopen();
-}
-
-bool BufferedStreamSocket::connect(
-    const SocketAddress& remoteAddress,
-    unsigned int timeoutMillis)
-{
-    return m_socket->connect(remoteAddress, timeoutMillis);
-}
-
 int BufferedStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
     if (m_internalRecvBuffer.isEmpty())
@@ -123,40 +86,6 @@ int BufferedStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
     int recv = m_socket->recv((char*)buffer + internalSize, bufferLen - internalSize, flags);
     NX_LOGX(lm("recv internalSize=%1 + realRecv=%2").arg(internalSize).arg(recv), cl_logDEBUG2);
     return (recv < 0) ? (int)internalSize : internalSize + recv;
-}
-
-int BufferedStreamSocket::send(const void* buffer, unsigned int bufferLen)
-{
-    return m_socket->send(buffer, bufferLen);
-}
-
-SocketAddress BufferedStreamSocket::getForeignAddress() const
-{
-    return m_socket->getForeignAddress();
-}
-
-bool BufferedStreamSocket::isConnected() const
-{
-    return m_socket->isConnected();
-}
-
-void BufferedStreamSocket::cancelIOAsync(
-    aio::EventType eventType,
-    nx::utils::MoveOnlyFunc<void()> handler)
-{
-    return m_socket->cancelIOAsync(eventType, std::move(handler));
-}
-
-void BufferedStreamSocket::cancelIOSync(aio::EventType eventType)
-{
-    return m_socket->cancelIOSync(eventType);
-}
-
-void BufferedStreamSocket::connectAsync(
-    const SocketAddress& address,
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
-{
-    m_socket->connectAsync(address, std::move(handler));
 }
 
 void BufferedStreamSocket::readSomeAsync(
@@ -182,13 +111,6 @@ void BufferedStreamSocket::readSomeAsync(
             NX_LOGX(lm("readSomeAsync internalSize=%1").arg(recvSize), cl_logDEBUG2);
             handler(SystemError::noError, (size_t)recvSize);
         });
-}
-
-void BufferedStreamSocket::sendAsync(
-    const nx::Buffer& buf,
-    std::function<void(SystemError::ErrorCode, size_t)> handler)
-{
-    m_socket->sendAsync(buf, std::move(handler));
 }
 
 } // namespace network

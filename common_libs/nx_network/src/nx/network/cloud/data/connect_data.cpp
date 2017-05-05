@@ -58,7 +58,8 @@ void ConnectResponse::serializeAttributes(nx::stun::Message* const message)
 
     message->newAttribute< attrs::PublicEndpointList >(std::move(forwardedTcpEndpointList));
     message->newAttribute< attrs::UdtHpEndpointList >(std::move(udpEndpointList));
-    message->newAttribute< attrs::TrafficRelayEndpointList >(std::move(trafficRelayEndpointList));
+    if (trafficRelayEndpoint)
+        message->newAttribute<attrs::TrafficRelayEndpoint>(std::move(*trafficRelayEndpoint));
     params.serializeAttributes(message);
     message->addAttribute(attrs::cloudConnectVersion, (int)cloudConnectVersion);
 }
@@ -70,8 +71,9 @@ bool ConnectResponse::parseAttributes(const nx::stun::Message& message)
     if (!readEnumAttributeValue(message, attrs::cloudConnectVersion, &cloudConnectVersion))
         cloudConnectVersion = kDefaultCloudConnectVersion;  //if not present - old version
 
-    // Optional for backward compatibility.
-    readAttributeValue<attrs::TrafficRelayEndpointList>(message, &trafficRelayEndpointList);
+    SocketAddress trafficRelayEndpointLocal;
+    if (readAttributeValue<attrs::TrafficRelayEndpoint>(message, &trafficRelayEndpointLocal))
+        trafficRelayEndpoint = std::move(trafficRelayEndpointLocal);
 
     return 
         readAttributeValue<attrs::PublicEndpointList>(message, &forwardedTcpEndpointList) &&

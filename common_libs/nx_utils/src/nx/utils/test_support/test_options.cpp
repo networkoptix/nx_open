@@ -65,6 +65,9 @@ void TestOptions::applyArguments(const utils::ArgumentParser& arguments)
     if (const auto value = arguments.get("load-mode"))
         setLoadMode(*value);
 
+    if (const auto value = arguments.get("tmp"))
+        setTemporaryDirectoryPath(*value);
+
 #ifdef _WIN32
     bool enableCrashDump = true;
     if (arguments.get("disable-crash-dump"))

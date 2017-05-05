@@ -238,7 +238,7 @@ namespace StatusCode
         {
             case _continue:
                 return StringType("Continue");
-            case upgrade:
+            case switchingProtocols:
                 return StringType("Switching Protocols");
             case ok:
                 return StringType("OK");
@@ -303,6 +303,9 @@ namespace StatusCode
                 return false;
 
             default:
+                // Message body is forbidden for informational status codes.
+                if (statusCode / 100 == 1)
+                    return false;
                 return true;
         }
     }

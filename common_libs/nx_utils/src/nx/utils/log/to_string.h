@@ -49,9 +49,9 @@ NX_UTILS_API QString demangleTypeName(const char* type);
 NX_UTILS_API QString pointerTypeName(const void* /*p*/);
 
 template<typename T>
-QString pointerTypeName(const T* p)
+QString pointerTypeName(const T* /*p*/)
 {
-    return demangleTypeName(typeid(*p).name());
+    return demangleTypeName(typeid(T).name());
 }
 
 template<typename T>

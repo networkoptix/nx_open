@@ -582,6 +582,8 @@ void RandomDataTcpServer::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 
 bool RandomDataTcpServer::start(std::chrono::milliseconds rwTimeout)
 {
+    using namespace std::placeholders;
+
     m_rwTimeout = rwTimeout;
     if (!m_serverSocket)
         m_serverSocket = SocketFactory::createStreamServerSocket();
@@ -595,8 +597,7 @@ bool RandomDataTcpServer::start(std::chrono::milliseconds rwTimeout)
     }
 
     m_serverSocket->acceptAsync(std::bind(
-        &RandomDataTcpServer::onNewConnection, this,
-        std::placeholders::_1, std::placeholders::_2));
+        &RandomDataTcpServer::onNewConnection, this, _1, _2));
     return true;
 }
 
@@ -635,7 +636,7 @@ ConnectionTestStatistics RandomDataTcpServer::statistics() const
 
 void RandomDataTcpServer::onNewConnection(
     SystemError::ErrorCode errorCode,
-    AbstractStreamSocket* newConnection)
+    std::unique_ptr<AbstractStreamSocket> newConnection)
 {
     using namespace std::placeholders;
 
@@ -643,7 +644,7 @@ void RandomDataTcpServer::onNewConnection(
     if (errorCode == SystemError::noError)
     {
         auto testConnection = std::make_shared<TestConnection>(
-            std::unique_ptr<AbstractStreamSocket>(newConnection),
+            std::move(newConnection),
             m_limitType,
             m_trafficLimit,
             m_transmissionMode);
