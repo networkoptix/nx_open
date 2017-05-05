@@ -6,7 +6,7 @@ Button
 {
     id: control
 
-    property var uniqueResourceId
+    property var resourceId
     property Item popupParent
 
     signal presetChoosen(string id)
@@ -20,7 +20,7 @@ Button
         var dialog = Workflow.openDialog(
             "Screens/private/VideoScreen/Ptz/PresetsDialog.qml",
             {
-                "uniqueResourceId": control.uniqueResourceId
+                "resourceId": control.resourceId
             })
 
         dialog.onPresetChoosen.connect(control.presetChoosen)

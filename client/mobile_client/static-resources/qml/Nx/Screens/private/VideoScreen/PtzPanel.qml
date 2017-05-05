@@ -129,7 +129,7 @@ Column
             PresetsButton
             {
                 visible: presetsItem.visible
-                uniqueResourceId: controller.uniqueResourceId
+                resourceId: controller.resourceId
                 popupParent: videoScreen
 
                 onPresetChoosen: controller.setPresetById(id)

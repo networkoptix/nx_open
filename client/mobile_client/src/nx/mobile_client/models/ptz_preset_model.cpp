@@ -30,7 +30,7 @@ namespace mobile {
 
 struct PtzPresetModel::Private
 {
-    QUuid uniqueResourceId;
+    QnUuid uniqueResourceId;
     QnPtzPresetList presets;
 };
 
@@ -38,7 +38,7 @@ PtzPresetModel::PtzPresetModel(QObject* parent):
     base_type(parent),
     d(new Private())
 {
-    connect(this, &PtzPresetModel::uniqueResourceIdChanged, this,
+    connect(this, &PtzPresetModel::resourceIdChanged, this,
         [this]()
         {
             const auto resource = qnResPool->getResourceById(d->uniqueResourceId);
@@ -93,18 +93,19 @@ QHash<int, QByteArray> PtzPresetModel::roleNames() const
     return base_type::roleNames().unite(kRoleNames);
 }
 
-QUuid PtzPresetModel::uniqueResourceId() const
+QString PtzPresetModel::resourceId() const
 {
-    return d->uniqueResourceId;
+    return d->uniqueResourceId.toString();
 }
 
-void PtzPresetModel::setUniqueResourceId(const QUuid& value)
+void PtzPresetModel::setResourceId(const QString& value)
 {
-    if (d->uniqueResourceId == value)
+    const auto id = QnUuid::fromStringSafe(value);
+    if (d->uniqueResourceId == id)
         return;
 
-    d->uniqueResourceId = value;
-    emit uniqueResourceIdChanged();
+    d->uniqueResourceId = id;
+    emit resourceIdChanged();
 }
 
 } // namespace mobile

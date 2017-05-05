@@ -12,22 +12,22 @@ class PtzPresetModel: public QAbstractListModel
     Q_OBJECT
     using base_type = QAbstractListModel;
 
-    Q_PROPERTY(QUuid uniqueResourceId READ uniqueResourceId
-        WRITE setUniqueResourceId NOTIFY uniqueResourceIdChanged)
+    Q_PROPERTY(QString resourceId READ resourceId
+        WRITE setResourceId NOTIFY resourceIdChanged)
 
 public:
     PtzPresetModel(QObject* parent = nullptr);
     virtual ~PtzPresetModel();
 
-    QUuid uniqueResourceId() const;
-    void setUniqueResourceId(const QUuid& value);
+    QString resourceId() const;
+    void setResourceId(const QString& value);
 
     virtual QVariant data(const QModelIndex& index, int role) const override;
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual QHash<int, QByteArray> roleNames() const override;
 
 signals:
-    void uniqueResourceIdChanged();
+    void resourceIdChanged();
 
 private:
     struct Private;

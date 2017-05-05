@@ -9,7 +9,7 @@ DialogBase
 {
     id: control
 
-    property var uniqueResourceId
+    property var resourceId
 
     signal presetChoosen(string id)
     deleteOnClose: true
@@ -32,7 +32,7 @@ DialogBase
         {
             model: PtzPresetModel
             {
-                uniqueResourceId: control.uniqueResourceId
+                resourceId: control.resourceId
             }
 
             delegate: DialogListItem
