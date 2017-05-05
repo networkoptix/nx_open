@@ -3,16 +3,39 @@
 #include <memory>
 
 #include <nx/network/abstract_acceptor.h>
+#include <nx/network/reverse_connection_acceptor.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/basic_factory.h>
 #include <nx/utils/move_only_func.h>
 
+#include "api/relay_api_client.h"
 #include "../../cloud_abstract_connection_acceptor.h"
 
 namespace nx {
 namespace network {
 namespace cloud {
 namespace relay {
+
+namespace detail {
+
+class ReverseConnection:
+    public AbstractAcceptableReverseConnection
+{
+public:
+    virtual void connectAsync(
+        ReverseConnectionCompletionHandler handler) override;
+    virtual void waitForConnectionToBeReadyAsync(
+        ReverseConnectionCompletionHandler handler) override;
+
+    std::unique_ptr<AbstractStreamSocket> takeSocket();
+
+private:
+    std::unique_ptr<nx::cloud::relay::api::Client> m_relayClient;
+};
+
+} // namespace detail
+
+//-------------------------------------------------------------------------------------------------
 
 class NX_NETWORK_API ConnectionAcceptor:
     public AbstractConnectionAcceptor
@@ -34,6 +57,12 @@ protected:
 
 private:
     const SocketAddress m_relayEndpoint;
+    ReverseConnectionAcceptor<detail::ReverseConnection> m_acceptor;
+
+    std::unique_ptr<detail::ReverseConnection> reverseConnectionFactoryFunc();
+
+    std::unique_ptr<AbstractStreamSocket> toStreamSocket(
+        std::unique_ptr<detail::ReverseConnection> connection);
 };
 
 //-------------------------------------------------------------------------------------------------

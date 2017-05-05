@@ -7,36 +7,83 @@ namespace network {
 namespace cloud {
 namespace relay {
 
-ConnectionAcceptor::ConnectionAcceptor(const SocketAddress& relayEndpoint):
-    m_relayEndpoint(relayEndpoint)
-{
-}
+namespace detail {
 
-void ConnectionAcceptor::bindToAioThread(aio::AbstractAioThread* aioThread)
-{
-    base_type::bindToAioThread(aioThread);
-    // TODO
-}
-
-void ConnectionAcceptor::acceptAsync(AcceptCompletionHandler /*handler*/)
+void ReverseConnection::connectAsync(
+    ReverseConnectionCompletionHandler handler)
 {
     // TODO
 }
 
-void ConnectionAcceptor::cancelIOSync()
+void ReverseConnection::waitForConnectionToBeReadyAsync(
+    ReverseConnectionCompletionHandler handler)
 {
     // TODO
 }
 
-std::unique_ptr<AbstractStreamSocket> ConnectionAcceptor::getNextSocketIfAny()
+std::unique_ptr<AbstractStreamSocket> ReverseConnection::takeSocket()
 {
     // TODO
     return nullptr;
 }
 
+} // namespace detail
+
+//-------------------------------------------------------------------------------------------------
+
+ConnectionAcceptor::ConnectionAcceptor(const SocketAddress& relayEndpoint):
+    m_relayEndpoint(relayEndpoint),
+    m_acceptor(std::bind(&ConnectionAcceptor::reverseConnectionFactoryFunc, this))
+{
+    bindToAioThread(getAioThread());
+}
+
+void ConnectionAcceptor::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    base_type::bindToAioThread(aioThread);
+    m_acceptor.bindToAioThread(aioThread);
+}
+
+void ConnectionAcceptor::acceptAsync(AcceptCompletionHandler handler)
+{
+    using namespace std::placeholders;
+
+    m_acceptor.acceptAsync(
+        [this, handler = std::move(handler)](
+            SystemError::ErrorCode sysErrorCode,
+            std::unique_ptr<detail::ReverseConnection> connection) mutable
+        {
+            handler(sysErrorCode, toStreamSocket(std::move(connection)));
+        });
+}
+
+void ConnectionAcceptor::cancelIOSync()
+{
+    m_acceptor.cancelIOSync();
+}
+
+std::unique_ptr<AbstractStreamSocket> ConnectionAcceptor::getNextSocketIfAny()
+{
+    return toStreamSocket(m_acceptor.getNextConnectionIfAny());
+}
+
 void ConnectionAcceptor::stopWhileInAioThread()
 {
-    // TODO
+    m_acceptor.pleaseStopSync();
+}
+
+std::unique_ptr<detail::ReverseConnection> 
+    ConnectionAcceptor::reverseConnectionFactoryFunc()
+{
+    return std::make_unique<detail::ReverseConnection>();
+}
+
+std::unique_ptr<AbstractStreamSocket> ConnectionAcceptor::toStreamSocket(
+    std::unique_ptr<detail::ReverseConnection> connection)
+{
+    if (!connection)
+        return nullptr;
+    return connection->takeSocket();
 }
 
 //-------------------------------------------------------------------------------------------------
