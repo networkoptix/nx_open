@@ -22,6 +22,7 @@ public:
 
     virtual QString peerString(const QnUuid& peerId) const override;
     virtual QList<QnUuid> getAllPeers() const override;
+    virtual int distanceTo(const QnUuid& peerId) const override;
 
     virtual rest::Handle requestFileInfo(
         const QnUuid& peerId,

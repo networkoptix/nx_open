@@ -28,10 +28,18 @@ public:
     void setFileInformation(const QnUuid& peer, const FileInformation& fileInformation);
     FileInformation fileInformation(const QnUuid& peer, const QString& fileName) const;
 
+    QStringList peerGroups(const QnUuid& peerId) const;
+    QList<QnUuid> peersInGroup(const QString& group) const;
+    void setPeerGroups(const QnUuid& peerId, const QStringList& groups);
+
+    void processRequests();
+
     // AbstractPeerManager implementation
     virtual QnUuid selfId() const override;
 
     virtual QList<QnUuid> getAllPeers() const override;
+
+    virtual int distanceTo(const QnUuid&) const override;
 
     virtual rest::Handle requestFileInfo(
         const QnUuid& peer,
@@ -51,8 +59,6 @@ public:
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
 
-    void processRequests();
-
 private:
     rest::Handle getRequestHandle();
     void enqueueCallback(std::function<void()> callback);
@@ -60,17 +66,56 @@ private:
     static QByteArray readFileChunk(const FileInformation& fileInformation, int chunkIndex);
 
 private:
-    QnUuid m_selfId;
-
     struct PeerInfo
     {
         QHash<QString, FileInformation> fileInformationByName;
+        QStringList groups;
     };
 
     QHash<QnUuid, PeerInfo> m_peers;
+    QMultiHash<QString, QnUuid> m_peersByGroup;
     int m_requestIndex = 0;
 
     QQueue<std::function<void()>> m_callbacksQueue;
+};
+
+class ProxyTestPeerManager: public AbstractPeerManager
+{
+public:
+    ProxyTestPeerManager(TestPeerManager* peerManager);
+    ProxyTestPeerManager(TestPeerManager* peerManager, const QnUuid& id);
+
+    void calculateDistances();
+
+    // AbstractPeerManager implementation
+    virtual QnUuid selfId() const override;
+
+    virtual QList<QnUuid> getAllPeers() const override;
+
+    virtual int distanceTo(const QnUuid&) const override;
+
+    virtual rest::Handle requestFileInfo(
+        const QnUuid& peer,
+        const QString& fileName,
+        FileInfoCallback callback) override;
+
+    virtual rest::Handle requestChecksums(
+        const QnUuid& peer,
+        const QString& fileName,
+        ChecksumsCallback callback) override;
+
+    virtual rest::Handle downloadChunk(
+        const QnUuid& peer,
+        const QString& fileName,
+        int chunkIndex,
+        ChunkCallback callback) override;
+
+    virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
+
+private:
+    TestPeerManager* m_peerManager;
+    QnUuid m_selfId;
+    QHash<QnUuid, int> m_distances;
 };
 
 } // namespace distributed_file_downloader

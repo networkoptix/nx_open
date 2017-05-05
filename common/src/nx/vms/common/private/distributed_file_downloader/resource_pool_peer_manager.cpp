@@ -4,6 +4,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <api/server_rest_connection.h>
+#include <api/app_server_connection.h>
 #include <rest/server/json_rest_result.h>
 #include <common/common_module.h>
 
@@ -49,6 +50,17 @@ QList<QnUuid> ResourcePoolPeerManager::getAllPeers() const
     }
 
     return result;
+}
+
+int ResourcePoolPeerManager::distanceTo(const QnUuid& peerId) const
+{
+    const auto& connection = commonModule()->ec2Connection();
+    if (!connection)
+        return -1;
+
+    int distance = std::numeric_limits<int>::max();
+    connection->routeToPeerVia(peerId, &distance);
+    return distance;
 }
 
 rest::Handle ResourcePoolPeerManager::requestFileInfo(

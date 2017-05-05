@@ -26,7 +26,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, invalidPeerRequest)
 
     bool called = false;
     const auto handle = peerManager->requestFileInfo(peer, "test",
-        [&](bool success, rest::Handle /*handle*/, const DownloaderFileInformation& fileInfo)
+        [&](bool, rest::Handle, const DownloaderFileInformation&)
         {
             // Should not be called.
             called = true;
@@ -98,6 +98,40 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, invalidChunk)
     peerManager->processRequests();
 
     ASSERT_FALSE(ok);
+}
+
+TEST_F(DistributedFileDownloaderPeerManagerTest, calculateDistances)
+{
+    QString groupA("A");
+    QString groupB("B");
+    QString groupC("C");
+    QString groupD("D");
+
+    ProxyTestPeerManager testPeerManager(peerManager.data());
+    const auto& peerA = testPeerManager.selfId();
+    peerManager->setPeerGroups(peerA, {groupA});
+    const auto& peerA2 = peerManager->addPeer();
+    peerManager->setPeerGroups(peerA2, {groupA});
+    const auto& peerAB = peerManager->addPeer();
+    peerManager->setPeerGroups(peerAB, {groupA, groupB});
+    const auto& peerB = peerManager->addPeer();
+    peerManager->setPeerGroups(peerB, {groupB});
+    const auto& peerBC = peerManager->addPeer();
+    peerManager->setPeerGroups(peerBC, {groupB, groupC});
+    const auto& peerC = peerManager->addPeer();
+    peerManager->setPeerGroups(peerC, {groupC});
+    const auto& peerD = peerManager->addPeer();
+    peerManager->setPeerGroups(peerD, {groupD});
+
+    testPeerManager.calculateDistances();
+
+    ASSERT_EQ(testPeerManager.distanceTo(peerA), 0);
+    ASSERT_EQ(testPeerManager.distanceTo(peerA2), 1);
+    ASSERT_EQ(testPeerManager.distanceTo(peerAB), 1);
+    ASSERT_EQ(testPeerManager.distanceTo(peerB), 2);
+    ASSERT_EQ(testPeerManager.distanceTo(peerBC), 2);
+    ASSERT_EQ(testPeerManager.distanceTo(peerC), 3);
+    ASSERT_EQ(testPeerManager.distanceTo(peerD), std::numeric_limits<int>::max());
 }
 
 } // namespace test
