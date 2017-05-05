@@ -20,7 +20,7 @@ def customizable_file(filename):
 def find_or_add_context(context_name, product_id, has_language):
     if Context.objects.filter(name=context_name, product_id=product_id).exists():
         return Context.objects.get(name=context_name, product_id=product_id)
-    context = Context(name=context_name, product_id=product_id, translatable=has_language)
+    context = Context(name=context_name, file_path=context_name, product_id=product_id, translatable=has_language)
     context.save()
     return context
 
