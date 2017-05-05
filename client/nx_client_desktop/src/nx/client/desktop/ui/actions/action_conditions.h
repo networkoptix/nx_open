@@ -609,7 +609,7 @@ private:
 
 namespace condition {
 
-/**< Visible always */
+/** Visible always. */
 ConditionWrapper always();
 
 /** Visible in preview search mode only. */
@@ -624,7 +624,7 @@ ConditionWrapper hasFlags(Qn::ResourceFlags flags, MatchMode matchMode);
 ConditionWrapper treeNodeType(QSet<Qn::NodeType> types);
 inline ConditionWrapper treeNodeType(Qn::NodeType type) { return treeNodeType({{type}}); }
 
-/**< Visible in layout tour preview mode only. */
+/** Visible in layout tour preview mode only. */
 ConditionWrapper isLayoutTourReviewMode();
 
 } // namespace condition
