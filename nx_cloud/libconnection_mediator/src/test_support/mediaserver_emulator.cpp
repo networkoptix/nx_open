@@ -381,9 +381,8 @@ void MediaServerEmulator::onUdtConnectDone(SystemError::ErrorCode errorCode)
 
 void MediaServerEmulator::onUdtConnectionAccepted(
     SystemError::ErrorCode /*errorCode*/,
-    AbstractStreamSocket* acceptedSocket)
+    std::unique_ptr<AbstractStreamSocket> /*acceptedSocket*/)
 {
-    delete acceptedSocket;
 }
 
 void MediaServerEmulator::onMessageReceived(

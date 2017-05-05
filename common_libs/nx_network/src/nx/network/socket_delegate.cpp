@@ -74,10 +74,7 @@ AbstractStreamSocket* StreamServerSocketDelegate::accept()
     return m_target->accept();
 }
 
-void StreamServerSocketDelegate::acceptAsync(
-    nx::utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode,
-        AbstractStreamSocket*)> handler)
+void StreamServerSocketDelegate::acceptAsync(AcceptCompletionHandler handler)
 {
     return m_target->acceptAsync(std::move(handler));
 }

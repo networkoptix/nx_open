@@ -188,6 +188,12 @@ public:
     }
 
 protected:
+    virtual void stopWhileInAioThread() override
+    {
+        m_streamSocket.reset();
+        triggerConnectionClosedEvent();
+    }
+
     SocketAddress getForeignAddress() const
     {
         return m_streamSocket->getForeignAddress();
@@ -208,12 +214,6 @@ private:
 
     boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
     bool m_isSendingData;
-
-    virtual void stopWhileInAioThread() override
-    {
-        m_streamSocket.reset();
-        triggerConnectionClosedEvent();
-    }
 
     void onBytesRead(SystemError::ErrorCode errorCode, size_t bytesRead)
     {

@@ -39,11 +39,11 @@ ConnectorFactory::CloudConnectors ConnectorFactory::createCloudConnectors(
     }
 
     if (((s_cloudConnectTypeMask & (int)CloudConnectType::proxy) > 0) &&
-        !response.trafficRelayEndpointList.empty())
+        response.trafficRelayEndpoint)
     {
         connectors.emplace_back(
             std::make_unique<relay::Connector>(
-                response.trafficRelayEndpointList.front(), targetAddress, connectSessionId));
+                *response.trafficRelayEndpoint, targetAddress, connectSessionId));
     }
 
     return connectors;

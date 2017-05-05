@@ -104,10 +104,10 @@ private:
 
     void onSocketAccepted(
         SystemError::ErrorCode /*sysErrorCode*/,
-        AbstractStreamSocket* acceptedSocket)
+        std::unique_ptr<AbstractStreamSocket> acceptedSocket)
     {
         if (acceptedSocket)
-            m_acceptedSockets.push(std::unique_ptr<AbstractStreamSocket>(acceptedSocket));
+            m_acceptedSockets.push(std::move(acceptedSocket));
     }
 };
 
@@ -328,19 +328,18 @@ protected:
         const auto startTime = system_clock::now();
         while ((system_clock::now() < (startTime + testDurationLimit)) && !*isCancelled)
         {
-            nx::utils::promise<AbstractStreamSocket*> accepted;
+            nx::utils::promise<std::unique_ptr<AbstractStreamSocket>> accepted;
             serverSocket()->acceptAsync(
                 [this, &accepted](
                     SystemError::ErrorCode /*sysErrorCode*/,
-                    AbstractStreamSocket* acceptedConnection)
+                    std::unique_ptr<AbstractStreamSocket> acceptedConnection)
                 {
-                    accepted.set_value(acceptedConnection);
+                    accepted.set_value(std::move(acceptedConnection));
                 });
             auto clientSocket = accepted.get_future().get();
 
             if (clientSocket)
                 ++m_socketsAccepted;
-            delete clientSocket;
         }
         const auto endTime = system_clock::now();
         m_testRunDuration = duration_cast<milliseconds>(endTime - startTime);
@@ -392,7 +391,7 @@ private:
 
     void onConnectionAccepted(
         SystemError::ErrorCode /*sysErrorCode*/,
-        AbstractStreamSocket* clientSocket)
+        std::unique_ptr<AbstractStreamSocket> clientSocket)
     {
         using namespace std::chrono;
         using namespace std::placeholders;
@@ -407,7 +406,7 @@ private:
 
         if (clientSocket)
             ++m_socketsAccepted;
-        delete clientSocket;
+        clientSocket.reset();
 
         serverSocket()->acceptAsync(
             std::bind(&PerformanceMultipleServerSocketAsyncAccept::onConnectionAccepted, this, _1, _2));

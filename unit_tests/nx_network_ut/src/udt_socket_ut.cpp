@@ -107,17 +107,19 @@ private:
 
 
 namespace {
+
 void onAcceptedConnection(
     AbstractStreamServerSocket* serverSocket,
     SystemError::ErrorCode /*errCode*/,
-    AbstractStreamSocket* sock)
+    std::unique_ptr<AbstractStreamSocket> sock)
 {
-    delete sock;
+    sock.reset();
 
     using namespace std::placeholders;
     serverSocket->acceptAsync(std::bind(onAcceptedConnection, serverSocket, _1, _2));
 }
-}
+
+} // namespace
 
 TEST_F(SocketUdt, cancelConnect)
 {
@@ -372,10 +374,10 @@ TEST_F(SocketUdt, acceptingFirstConnection)
         serverSocket.acceptAsync(
             [&socketAcceptedPromise](
                 SystemError::ErrorCode errorCode,
-                AbstractStreamSocket* socket)
+                std::unique_ptr<AbstractStreamSocket> socket)
             {
                socketAcceptedPromise.set_value(
-                   std::make_pair(errorCode, std::unique_ptr<AbstractStreamSocket>(socket)));
+                   std::make_pair(errorCode, std::move(socket)));
             });
 
         UdtStreamSocket clientSock(AF_INET);
@@ -507,10 +509,10 @@ TEST_F(SocketUdt, allDataReadAfterFin)
         server.acceptAsync(
             [&connectionAcceptedPromise](
                 SystemError::ErrorCode errorCode,
-                AbstractStreamSocket* sock)
+                std::unique_ptr<AbstractStreamSocket> sock)
             {
                 connectionAcceptedPromise.set_value(
-                    std::make_pair(errorCode, std::unique_ptr<AbstractStreamSocket>(sock)));
+                    std::make_pair(errorCode, std::move(sock)));
             });
 
         std::this_thread::sleep_for(std::chrono::seconds(1));
