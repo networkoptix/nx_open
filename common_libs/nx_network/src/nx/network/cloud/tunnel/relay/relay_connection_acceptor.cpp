@@ -10,13 +10,13 @@ namespace relay {
 namespace detail {
 
 void ReverseConnection::connectAsync(
-    ReverseConnectionCompletionHandler handler)
+    ReverseConnectionCompletionHandler /*handler*/)
 {
     // TODO
 }
 
 void ReverseConnection::waitForConnectionToBeReadyAsync(
-    ReverseConnectionCompletionHandler handler)
+    ReverseConnectionCompletionHandler /*handler*/)
 {
     // TODO
 }

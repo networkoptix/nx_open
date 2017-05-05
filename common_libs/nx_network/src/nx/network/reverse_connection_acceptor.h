@@ -81,7 +81,7 @@ public:
         // TODO
     }
 
-    void acceptAsync(AcceptCompletionHandler handler)
+    void acceptAsync(AcceptCompletionHandler /*handler*/)
     {
         // TODO
     }
