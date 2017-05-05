@@ -112,7 +112,7 @@ void P2pConnectionProcessor::addResponseHeaders()
 
 bool P2pConnectionProcessor::isDisabledPeer(const ApiPeerData& remotePeer) const
 {
-    return (!commonModule()->allowedPeers().isEmpty() && 
+    return (!commonModule()->allowedPeers().isEmpty() &&
         !commonModule()->allowedPeers().contains(remotePeer.id) &&
         !remotePeer.isClient());
 }
@@ -227,7 +227,7 @@ void P2pConnectionProcessor::run()
         d->socket->close();
         return;
     }
-    sendResponse(nx_http::StatusCode::upgrade, nx_http::StringType());
+    sendResponse(nx_http::StatusCode::switchingProtocols, nx_http::StringType());
 
     std::unique_ptr<ShareSocketDelegate> socket(new ShareSocketDelegate(std::move(d->socket)));
     socket->setNonBlockingMode(true);

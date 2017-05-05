@@ -123,7 +123,7 @@ Error validateRequest(const nx_http::Request& request, nx_http::Response* respon
     if (!response)
         return Error::noError;
 
-    response->statusLine.statusCode = nx_http::StatusCode::upgrade;
+    response->statusLine.statusCode = nx_http::StatusCode::switchingProtocols;
     response->headers.emplace(kConnection, kUpgrade);
     response->headers.emplace(kUpgrade, kWebsocket);
     response->headers.emplace(kAccept, detail::makeAcceptKey(request.headers.find(kKey)->second));
@@ -146,7 +146,7 @@ void addClientHeaders(nx_http::Request* request, const nx::Buffer& protocolName)
 
 Error validateResponse(const nx_http::Request& request, const nx_http::Response& response)
 {
-    if (response.statusLine.statusCode != nx_http::StatusCode::upgrade)
+    if (response.statusLine.statusCode != nx_http::StatusCode::switchingProtocols)
         return Error::handshakeError;
 
     if (validateResponseHeaders(response.headers, request) != Error::noError)

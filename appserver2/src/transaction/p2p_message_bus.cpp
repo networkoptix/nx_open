@@ -584,9 +584,6 @@ void P2pMessageBus::startStopConnections()
         if (connection->state() != P2pConnection::State::Connected ||  connection->miscData().isLocalStarted)
             continue; //< already in use or not ready yet
 
-        if (connection->miscData().lifetimeTimer.elapsed() < 200)
-            continue; // todo: http bug. remove it after bug will be fixed
-
         ApiPersistentIdData peer = connection->remotePeer();
         qint32 currentDistance = allPeerDistances.value(peer).minDistance();
         auto subscribedVia = currentSubscription.value(peer);

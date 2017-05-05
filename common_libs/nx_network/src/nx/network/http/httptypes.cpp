@@ -292,7 +292,7 @@ namespace StatusCode
     bool isSuccessCode(int statusCode)
     {
         return (statusCode >= ok && statusCode <= lastSuccessCode) ||
-                statusCode == upgrade;
+                statusCode == switchingProtocols;
     }
 
     bool isMessageBodyAllowed(int statusCode)
