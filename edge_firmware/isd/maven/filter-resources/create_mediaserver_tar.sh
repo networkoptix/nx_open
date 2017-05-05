@@ -42,7 +42,7 @@ parseArgs()
     done
 }
 
-# [in] INSTALL_DIR 
+# [in] INSTALL_DIR
 copyLibsWithoutQt()
 {
     mkdir -p "$INSTALL_DIR/$MODULE/lib/"
@@ -90,7 +90,7 @@ copyLibsWithoutQt()
     rm "$INSTALL_DIR/$MODULE/lib"/*.debug #< Delete debug symbol files copied above via "*".
 }
 
-# [in] INSTALL_DIR 
+# [in] INSTALL_DIR
 # [in] SDCARD_STUFF_DIR
 copyQtLibs()
 {
@@ -119,7 +119,7 @@ copyQtLibs()
     done
 }
 
-# [in] INSTALL_DIR 
+# [in] INSTALL_DIR
 copyBins()
 {
     mkdir -p "$INSTALL_DIR/$MODULE/bin/"
@@ -127,17 +127,18 @@ copyBins()
     cp "$BINS_DIR/external.dat" "$INSTALL_DIR/$MODULE/bin/"
 
     mkdir -p "$INSTALL_DIR/$MODULE/bin/plugins/"
-    cp "$BINS_DIR/plugins/libisd_native_plugin.so" "$INSTALL_DIR/$MODULE/bin/plugins/"
+    cp "$LIBS_DIR/libisd_native_plugin.so.DIMA" "$INSTALL_DIR/$MODULE/bin/plugins/libisd_native_plugin.so"
+    cp "$LIBS_DIR/libcpro_ipnc_plugin.so.1.0.0" "$INSTALL_DIR/$MODULE/bin/plugins/"
 }
 
-# [in] INSTALL_DIR 
+# [in] INSTALL_DIR
 copyConf()
 {
     mkdir -p "$INSTALL_DIR/$MODULE/etc/"
     cp "mediaserver.conf.template" "$INSTALL_DIR/$MODULE/etc/mediaserver.conf"
 }
 
-# [in] TAR_DIR 
+# [in] TAR_DIR
 copyScripts()
 {
     mkdir -p "$TAR_DIR/etc/init.d"
@@ -146,7 +147,7 @@ copyScripts()
 }
 
 # [in] WORK_DIR
-# [in] TAR_DIR 
+# [in] TAR_DIR
 buildArchives()
 {
     # Create main distro archive.

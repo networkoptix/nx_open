@@ -11,7 +11,7 @@
     <version>3.0.0-SNAPSHOT</version>
     <artifactId>isd_native_plugin</artifactId>
     <packaging>pom</packaging>
-    <name>Nx Witness ISD native ARM plugin</name>	
+    <name>Nx Witness ISD native ARM plugin</name>
 
     <properties>
         <product.title>${project.name}</product.title>
@@ -23,18 +23,18 @@
 
         <windows.defines>WIN32_LEAN_AND_MEAN</windows.defines>
 
-        <rdep.packages>openssl vmux</rdep.packages>
+        <rdep.packages>openssl vmux cpro</rdep.packages>
     </properties>
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>build_variables</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/build_variables/pom.xml</systemPath>            
+            <systemPath>${root.dir}/build_variables/pom.xml</systemPath>
         </dependency>
-    </dependencies>  
+    </dependencies>
     <profiles>
         <profile>
             <id>linux</id>
@@ -60,11 +60,11 @@
                     <groupId>${project.groupId}</groupId>
                     <artifactId>nx_streaming</artifactId>
                     <version>${project.version}</version>
-                    <type>pom</type> 
+                    <type>pom</type>
                     <scope>system</scope>
                     <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
-                </dependency>           
+                </dependency>
             </dependencies>
-        </profile>	
-    </profiles>	
+        </profile>
+    </profiles>
 </project>
