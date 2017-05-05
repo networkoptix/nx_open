@@ -85,6 +85,7 @@ table.webclient-window>tbody>tr>td.alert{
 
   padding-bottom:100px;
   padding-top:80px;
+  background-color: $dark1;
 }
 
 
@@ -95,18 +96,17 @@ table.webclient-window>tbody>tr>td.alert{
 .view-panel .stick-to-top{
   position:absolute;
   width:100%;
+  height: 48px;
   top:0;
-
-  /*background-color: rgba(28, 35, 39, 0.6);*/
-
-  border-bottom: 1px solid transparent;
+  left: 0;
+  z-index: 1;
+  background-color: $dark1;
+  opacity: 0.3;
 }
 .view-panel .stick-to-bottom{
   position:absolute;
   width:100%;
   bottom:0;
-
-  /*background-color: rgba(28, 35, 39, 0.6);*/
 
   border-top: 1px solid transparent;
 }
@@ -128,10 +128,12 @@ table.webclient-window>tbody>tr>td.alert{
 .videowindow,
 .videowindow .videoplayer
 {
+  position: absolute;
+  top: 0;
+  left: 0;
   width:100%;
   height: 100%;
   overflow: hidden;
-  background-color: #1C2327;
   text-align:center;
 }
 
@@ -142,9 +144,9 @@ table.webclient-window>tbody>tr>td.alert{
   margin: 0 auto;
 
   position: relative;
-  top: 50%;
+  /*top: 50%;
   transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);*/
 }
 
 .half-height {
@@ -418,16 +420,6 @@ div.text-center{
   color:#698796;
   display:inline-block;
   padding-right:10px;
-}
-
-
-/*.webclient-top-border{
-  border-top: 1px solid #263137;
-  margin-top:20px;
-}*/
-.webclient-bottom-border{
-  border-bottom: 1px solid #263137;
-  margin-bottom:20px;
 }
 
 .webclient-panel .webclient-button.active{
