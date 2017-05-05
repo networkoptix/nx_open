@@ -177,6 +177,34 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, usingStorage)
     ASSERT_EQ(checksums, originalChecksums);
 }
 
+TEST_F(DistributedFileDownloaderPeerManagerTest, internetFile)
+{
+    const QString fileName("test");
+    const QString filePath(storageDir.absoluteFilePath(fileName));
+    const QString url("http://test.org/test");
+
+    utils::createTestFile(filePath, 1);
+
+    peerManager->addInternetFile(url, filePath);
+
+    const auto peerId = peerManager->addPeer();
+    peerManager->setHasInternetConnection(peerId);
+
+    bool chunkDownloaded = false;
+    QByteArray chunkData;
+
+    peerManager->downloadChunkFromInternet(peerId, url, 0, 1,
+    [&](bool success, rest::Handle /*handle*/, const QByteArray& data)
+        {
+            chunkDownloaded = success;
+            chunkData = data;
+        });
+    peerManager->processRequests();
+
+    ASSERT_TRUE(chunkDownloaded);
+    ASSERT_EQ(chunkData.size(), 1);
+}
+
 TEST_F(DistributedFileDownloaderPeerManagerTest, calculateDistances)
 {
     QString groupA("A");

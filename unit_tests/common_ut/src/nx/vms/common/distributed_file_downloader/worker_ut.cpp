@@ -304,6 +304,40 @@ TEST_F(DistributedFileDownloaderWorkerTest, corruptedFile)
     ASSERT_EQ(newFileInfo.md5, fileInfo.md5);
 }
 
+TEST_F(DistributedFileDownloaderWorkerTest, simpleDownloadFromInternet)
+{
+    auto fileInfo = createTestFile();
+    fileInfo.url = "http://test.org/testFile";
+    NX_ASSERT(storage->addFile(fileInfo) == ErrorCode::noError);
+
+    commonPeerManager->setHasInternetConnection(peerManager->selfId());
+    commonPeerManager->addInternetFile(fileInfo.url, fileInfo.filePath);
+
+    bool finished = false;
+
+    QObject::connect(worker.data(), &Worker::finished, [&finished] { finished = true; });
+
+    worker->start();
+    processRequests();
+
+    const int maxSteps = fileInfo.downloadedChunks.size() + 4;
+
+    for (int i = 0; i < maxSteps; ++i)
+    {
+        if (finished)
+            break;
+
+        processRequests();
+    }
+
+    ASSERT_TRUE(finished);
+
+    const auto& newFileInfo = storage->fileInformation(fileInfo.name);
+    ASSERT_TRUE(newFileInfo.isValid());
+    ASSERT_EQ(newFileInfo.size, fileInfo.size);
+    ASSERT_EQ(newFileInfo.md5, fileInfo.md5);
+}
+
 } // namespace test
 } // namespace distributed_file_downloader
 } // namespace common

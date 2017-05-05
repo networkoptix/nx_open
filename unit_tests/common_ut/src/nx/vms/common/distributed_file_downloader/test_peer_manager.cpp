@@ -50,6 +50,11 @@ void TestPeerManager::setPeerStorage(const QnUuid& peerId, Storage* storage)
     m_peers[peerId].storage = storage;
 }
 
+void TestPeerManager::setHasInternetConnection(const QnUuid& peerId, bool hasInternetConnection)
+{
+    m_peers[peerId].hasInternetConnection = hasInternetConnection;
+}
+
 QStringList TestPeerManager::peerGroups(const QnUuid& peerId) const
 {
     return m_peers[peerId].groups;
@@ -67,6 +72,11 @@ void TestPeerManager::setPeerGroups(const QnUuid& peerId, const QStringList& gro
         m_peersByGroup.insert(group, peerId);
 }
 
+void TestPeerManager::addInternetFile(const QUrl& url, const QString& fileName)
+{
+    m_fileByUrl[url] = fileName;
+}
+
 QnUuid TestPeerManager::selfId() const
 {
     return QnUuid();
@@ -80,6 +90,11 @@ QList<QnUuid> TestPeerManager::getAllPeers() const
 int TestPeerManager::distanceTo(const QnUuid& /*peerId*/) const
 {
     return std::numeric_limits<int>::max();
+}
+
+bool TestPeerManager::hasInternetConnection(const QnUuid& peerId) const
+{
+    return m_peers[peerId].hasInternetConnection;
 }
 
 rest::Handle TestPeerManager::requestFileInfo(
@@ -145,6 +160,45 @@ rest::Handle TestPeerManager::downloadChunk(
             if (fileInfo.isValid())
                 result = readFileChunk(fileInfo, chunkIndex);
 
+            callback(!result.isNull(), handle, result);
+        });
+
+    return handle;
+}
+
+rest::Handle TestPeerManager::downloadChunkFromInternet(
+    const QnUuid& peerId,
+    const QUrl& fileUrl,
+    int chunkIndex,
+    int chunkSize,
+    AbstractPeerManager::ChunkCallback callback)
+{
+    if (!m_peers.contains(peerId))
+        return 0;
+
+    const auto handle = getRequestHandle();
+
+    enqueueCallback(
+        [this, peerId, fileUrl, chunkIndex, chunkSize, callback, handle]()
+        {
+            if (!hasInternetConnection(peerId))
+            {
+                callback(false, handle, QByteArray());
+                return;
+            }
+
+            const auto fileName = m_fileByUrl.value(fileUrl);
+            if (fileName.isEmpty())
+            {
+                callback(false, handle, QByteArray());
+                return;
+            }
+
+            FileInformation fileInfo;
+            fileInfo.filePath = fileName;
+            fileInfo.chunkSize = chunkSize;
+
+            auto result = readFileChunk(fileInfo, chunkIndex);
             callback(!result.isNull(), handle, result);
         });
 
@@ -255,6 +309,11 @@ int ProxyTestPeerManager::distanceTo(const QnUuid& peerId) const
     return m_distances.value(peerId, std::numeric_limits<int>::max());
 }
 
+bool ProxyTestPeerManager::hasInternetConnection(const QnUuid& peerId) const
+{
+    return m_peerManager->hasInternetConnection(peerId);
+}
+
 rest::Handle ProxyTestPeerManager::requestFileInfo(
     const QnUuid& peer,
     const QString& fileName,
@@ -278,6 +337,17 @@ rest::Handle ProxyTestPeerManager::downloadChunk(
     AbstractPeerManager::ChunkCallback callback)
 {
     return m_peerManager->downloadChunk(peer, fileName, chunkIndex, callback);
+}
+
+rest::Handle ProxyTestPeerManager::downloadChunkFromInternet(
+    const QnUuid& peerId,
+    const QUrl& fileUrl,
+    int chunkIndex,
+    int chunkSize,
+    AbstractPeerManager::ChunkCallback callback)
+{
+    return m_peerManager->downloadChunkFromInternet(
+        peerId, fileUrl, chunkIndex, chunkSize, callback);
 }
 
 void ProxyTestPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle handle)

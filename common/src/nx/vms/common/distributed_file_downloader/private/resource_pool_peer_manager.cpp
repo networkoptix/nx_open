@@ -63,6 +63,16 @@ int ResourcePoolPeerManager::distanceTo(const QnUuid& peerId) const
     return distance;
 }
 
+bool ResourcePoolPeerManager::hasInternetConnection(const QnUuid& peerId) const
+{
+    const auto& server = getServer(peerId);
+    NX_ASSERT(server);
+    if (!server)
+        return false;
+
+    return server->getServerFlags().testFlag(Qn::SF_HasPublicIP);
+}
+
 rest::Handle ResourcePoolPeerManager::requestFileInfo(
     const QnUuid& peerId, const QString& fileName, FileInfoCallback callback)
 {
@@ -116,6 +126,17 @@ rest::Handle ResourcePoolPeerManager::downloadChunk(
         return -1;
 
     return connection->downloaderDownloadChunk(fileName, chunkIndex, callback, thread());
+}
+
+rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
+    const QnUuid& peerId,
+    const QUrl& fileUrl,
+    int chunkIndex,
+    int chunkSize,
+    AbstractPeerManager::ChunkCallback callback)
+{
+    // TODO: Implement
+    return -1;
 }
 
 void ResourcePoolPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle handle)

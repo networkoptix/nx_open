@@ -23,6 +23,7 @@ public:
     virtual QString peerString(const QnUuid& peerId) const;
     virtual QList<QnUuid> getAllPeers() const = 0;
     virtual int distanceTo(const QnUuid& peerId) const = 0;
+    virtual bool hasInternetConnection(const QnUuid& peerId) const = 0;
 
     using FileInfoCallback =
         std::function<void(bool, rest::Handle, const FileInformation&)>;
@@ -44,6 +45,13 @@ public:
         const QnUuid& peer,
         const QString& fileName,
         int chunkIndex,
+        ChunkCallback callback) = 0;
+
+    virtual rest::Handle downloadChunkFromInternet(
+        const QnUuid& peerId,
+        const QUrl& fileUrl,
+        int chunkIndex,
+        int chunkSize,
         ChunkCallback callback) = 0;
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) = 0;
