@@ -29,7 +29,7 @@ TEST(LogLogger, Levels)
     logger.log(Level::info, QString(), "ccc");
     logger.log(Level::debug, QString(), "ddd");
     logger.log(Level::verbose, QString(), "eee");
-    ASSERT_EQ((size_t) 3, buffer->take().size());
+    ASSERT_EQ((size_t) 3, buffer->takeMessages().size());
 
     logger.setDefaultLevel(Level::error);
     ASSERT_EQ(Level::error, logger.defaultLevel());
@@ -46,7 +46,7 @@ TEST(LogLogger, Levels)
     logger.log(Level::info, QString(), "ccc");
     logger.log(Level::debug, QString(), "ddd");
     logger.log(Level::verbose, QString(), "eee");
-    ASSERT_EQ((size_t) 1, buffer->take().size());
+    ASSERT_EQ((size_t) 1, buffer->takeMessages().size());
 }
 
 TEST(LogLogger, Filters)
@@ -65,7 +65,7 @@ TEST(LogLogger, Filters)
     logger.log(Level::warning, QLatin1String("nx::second::className2"), "bbb");
     logger.log(Level::debug, QLatin1String("nx::first::className3"), "ccc");
     logger.log(Level::debug, QLatin1String("nx::second::className4"), "ddd");
-    ASSERT_EQ((size_t) 2, buffer->take().size());
+    ASSERT_EQ((size_t) 2, buffer->takeMessages().size());
 
     logger.setExceptionFilters({QLatin1String("nx::first")});
     ASSERT_EQ((size_t) 1, logger.exceptionFilters().size());
@@ -79,7 +79,7 @@ TEST(LogLogger, Filters)
     logger.log(Level::warning, QLatin1String("nx::second::className2"), "bbb");
     logger.log(Level::debug, QLatin1String("nx::first::className3"), "ccc");
     logger.log(Level::debug, QLatin1String("nx::second::className4"), "ddd");
-    ASSERT_EQ((size_t) 3, buffer->take().size());
+    ASSERT_EQ((size_t) 3, buffer->takeMessages().size());
 
     logger.setExceptionFilters({QLatin1String("nx::second"), QLatin1String("nx::third")});
     ASSERT_EQ((size_t) 2, logger.exceptionFilters().size());
@@ -93,7 +93,7 @@ TEST(LogLogger, Filters)
     logger.log(Level::warning, QLatin1String("nx::second::className2"), "bbb");
     logger.log(Level::debug, QLatin1String("nx::first::className3"), "ccc");
     logger.log(Level::debug, QLatin1String("nx::second::className4"), "ddd");
-    ASSERT_EQ((size_t) 3, buffer->take().size());
+    ASSERT_EQ((size_t) 3, buffer->takeMessages().size());
 }
 
 TEST(LogLogger, Format)
@@ -109,7 +109,7 @@ TEST(LogLogger, Format)
     logger.log(Level::verbose, QLatin1String("nx::fff::Object(6)"), "Sixth message");
     logger.log(Level::verbose, QString(), "Message without tag");
 
-    const auto messages = buffer->take();
+    const auto messages = buffer->takeMessages();
     ASSERT_EQ(7, messages.size());
 
     const auto today = QDateTime::currentDateTime().toString("yyyy-MM-dd");
