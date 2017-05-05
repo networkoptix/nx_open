@@ -514,6 +514,9 @@ void CloudServerSocket::onNewConnectionHasBeenAccepted(
     decltype(m_savedAcceptHandler) handler;
     handler.swap(m_savedAcceptHandler);
 
+    if (socket)
+        socket->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
+
     NX_LOGX(lm("Returning socket from tunnel pool. Result code %1")
         .arg(SystemError::toString(sysErrorCode)), cl_logDEBUG2);
     handler(sysErrorCode, std::move(socket));
