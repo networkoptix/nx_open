@@ -313,11 +313,18 @@ Rectangle
             return centerPoint.plus(vector)
         }
 
+        readonly property real kMaxSinglePressSpeedFactor: 0.8
         property vector2d movementVector:
         {
+            if (!mouseArea.pressed)
+                return Qt.vector2d(0, 0)
+
             var cosAlpha = JoystickUtils.getCosBetweenVectors(mouseVector, radialVector)
-            var coeff = 1 / control.radius
-                * (dragging ? cosAlpha * mouseVector.length() / control.radius : 1)
+            var factor = dragging
+                ? cosAlpha * mouseVector.length() / control.radius
+                : kMaxSinglePressSpeedFactor
+
+            var coeff = factor / control.radius
 
             var result = radialVector.times(coeff)
             return result.length() > 1 ? result.normalized() : result
