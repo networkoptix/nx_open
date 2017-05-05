@@ -12,6 +12,7 @@ Button
     signal presetChoosen(string id)
     height: 48
     flat: true
+    labelPadding: 12
 
     text: qsTr("PRESETS")
 

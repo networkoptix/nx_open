@@ -35,7 +35,7 @@ Flickable
             delegate: MouseArea
             {
                 width: 32
-                height: 48
+                height: 56
 
                 Text
                 {
