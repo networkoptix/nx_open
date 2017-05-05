@@ -4,6 +4,7 @@
 #include <QtCore/QDateTime>
 
 #include <http/custom_headers.h>
+#include <nx/network/buffered_stream_socket.h>
 #include <nx/network/socket_factory.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
@@ -98,10 +99,21 @@ std::unique_ptr<AbstractStreamSocket> AsyncClient::takeSocket()
 
     m_terminated = true;
 
+    if (!m_socket)
+        return nullptr;
+
     std::unique_ptr<AbstractStreamSocket> result;
     result.swap(m_socket);
-    if (result)
-        result->cancelIOSync(nx::network::aio::etNone);
+    result->cancelIOSync(nx::network::aio::etNone);
+    if (!m_receivedBytesLeft.isEmpty())
+    {
+        auto bufferedStreamSocket = 
+            std::make_unique<nx::network::BufferedStreamSocket>(std::move(result));
+        BufferType buf;
+        buf.swap(m_receivedBytesLeft);
+        bufferedStreamSocket->injectRecvData(std::move(buf));
+        result = std::move(bufferedStreamSocket);
+    }
     return result;
 }
 
@@ -708,9 +720,9 @@ void AsyncClient::processReceivedBytes(std::size_t bytesRead)
     {
         const auto stateBak = m_state;
         const size_t bytesParsed = parseReceivedBytes(bytesRead);
-        QByteArray receivedBytesLeft;
+        m_receivedBytesLeft.clear();
         if (bytesParsed != (std::size_t)-1)
-            receivedBytesLeft = m_responseBuffer.mid((int)bytesParsed);
+            m_receivedBytesLeft = m_responseBuffer.mid((int)bytesParsed);
         m_responseBuffer.resize(0);
 
         bool continueReceiving = false;
@@ -743,7 +755,7 @@ void AsyncClient::processReceivedBytes(std::size_t bytesRead)
         if (!continueReceiving)
             break;
 
-        if (receivedBytesLeft.isEmpty())
+        if (m_receivedBytesLeft.isEmpty())
         {
             NX_ASSERT(m_responseBuffer.size() == 0);
             m_socket->readSomeAsync(
@@ -753,7 +765,10 @@ void AsyncClient::processReceivedBytes(std::size_t bytesRead)
         }
 
         NX_CRITICAL(bytesParsed != 0 && bytesParsed != (std::size_t)-1);
-        m_responseBuffer = std::move(receivedBytesLeft);
+
+        m_responseBuffer.swap(m_receivedBytesLeft);
+        m_receivedBytesLeft.clear();
+
         m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
         bytesRead = m_responseBuffer.size();
     }

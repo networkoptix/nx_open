@@ -303,6 +303,9 @@ namespace StatusCode
                 return false;
 
             default:
+                // Message body is forbidden for informational status codes.
+                if (statusCode / 100 == 1)
+                    return false;
                 return true;
         }
     }

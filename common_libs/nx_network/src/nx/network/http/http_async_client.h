@@ -273,6 +273,7 @@ private:
     QUrl m_contentLocationUrl;
     HttpStreamReader m_httpStreamReader;
     BufferType m_responseBuffer;
+    BufferType m_receivedBytesLeft;
     QString m_userAgent;
     QString m_userName;
     QString m_userPassword;
