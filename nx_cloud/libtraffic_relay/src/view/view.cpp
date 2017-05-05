@@ -81,7 +81,7 @@ void View::startAcceptor()
     }
 
     m_multiAddressHttpServer =
-        std::make_unique<MultiAddressServer<nx_http::HttpStreamSocketServer>>(
+        std::make_unique<nx::network::server::MultiAddressServer<nx_http::HttpStreamSocketServer>>(
             &m_authenticationManager,
             &m_httpMessageDispatcher,
             false,

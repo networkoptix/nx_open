@@ -60,7 +60,7 @@ private:
         const conf::Settings& settings,
         const PeerRegistrator& peerRegistrator,
         std::unique_ptr<nx_http::MessageDispatcher>* const httpMessageDispatcher,
-        std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>>* const
+        std::unique_ptr<nx::network::server::MultiAddressServer<nx_http::HttpStreamSocketServer>>* const
             multiAddressHttpServer);
 };
 

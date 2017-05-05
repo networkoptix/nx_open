@@ -128,7 +128,7 @@ public:
     using BaseType = nx_http::BaseConnection<RandomlyFailingHttpConnection>;
 
     RandomlyFailingHttpConnection(
-        StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
+        nx::network::server::StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
         std::unique_ptr<AbstractStreamSocket> sock);
     virtual ~RandomlyFailingHttpConnection();
 
@@ -144,9 +144,11 @@ private:
 };
 
 class NX_NETWORK_API RandomlyFailingHttpServer:
-    public StreamSocketServer<RandomlyFailingHttpServer, RandomlyFailingHttpConnection>
+    public nx::network::server::StreamSocketServer<
+        RandomlyFailingHttpServer, RandomlyFailingHttpConnection>
 {
-    using BaseType = StreamSocketServer<RandomlyFailingHttpServer, RandomlyFailingHttpConnection>;
+    using base_type = nx::network::server::StreamSocketServer<
+        RandomlyFailingHttpServer, RandomlyFailingHttpConnection>;
 
 public:
     RandomlyFailingHttpServer(

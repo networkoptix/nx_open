@@ -14,7 +14,9 @@
 
 #include "stream_socket_server.h"
 
-namespace nx_api {
+namespace nx {
+namespace network {
+namespace server {
 
 static constexpr size_t READ_BUFFER_CAPACITY = 16 * 1024;
 
@@ -299,4 +301,6 @@ private:
     }
 };
 
-} // namespace nx_api
+} // namespace server
+} // namespace network
+} // namespace nx

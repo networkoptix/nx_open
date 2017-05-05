@@ -14,7 +14,7 @@ namespace modbus
 {
 
 using ModbusProtocolConnection =
-    nx_api::BaseStreamProtocolConnectionEmbeddable<
+    nx::network::server::BaseStreamProtocolConnectionEmbeddable<
         ModbusMessage,
         ModbusMessageParser,
         ModbusMessageSerializer>;

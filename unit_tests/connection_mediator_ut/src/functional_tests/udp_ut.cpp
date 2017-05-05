@@ -51,7 +51,7 @@ TEST_F(MediatorFunctionalTest, udp_transport)
         nx::Buffer sendBuffer;
         sendBuffer.reserve(1);
         size_t bytesWritten = 0;
-        ASSERT_EQ(nx_api::SerializerState::done, messageSerializer.serialize(&sendBuffer, &bytesWritten));
+        ASSERT_EQ(nx::network::server::SerializerState::done, messageSerializer.serialize(&sendBuffer, &bytesWritten));
         ASSERT_EQ(bytesWritten, (size_t)sendBuffer.size());
         ASSERT_TRUE(udpSocket->sendTo(sendBuffer.data(), sendBuffer.size(), stunEndpoint()));
 
@@ -65,7 +65,7 @@ TEST_F(MediatorFunctionalTest, udp_transport)
         nx::stun::Message responseMessage;
         messageParser.setMessage(&responseMessage);
         size_t bytesParsed = 0;
-        ASSERT_EQ(nx_api::ParserState::done, messageParser.parse(recvBuffer, &bytesParsed));
+        ASSERT_EQ(nx::network::server::ParserState::done, messageParser.parse(recvBuffer, &bytesParsed));
         api::ResolvePeerResponse responseData;
         ASSERT_TRUE(responseData.parse(responseMessage));
 

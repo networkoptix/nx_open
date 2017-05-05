@@ -56,7 +56,7 @@ private:
             std::size_t bytesWritten = 0;
             MessageSerializerBuffer stream(&serializedBuffer);
             ASSERT_EQ(
-                nx_api::SerializerState::done,
+                nx::network::server::SerializerState::done,
                 testAttribute.serialize(&stream, &bytesWritten));
             ASSERT_EQ((size_t)serializedPrototype.size(), bytesWritten);
             ASSERT_EQ(serializedPrototype, serializedBuffer);
@@ -89,7 +89,7 @@ private:
             MessageSerializerBuffer serializationStream(&buffer);
             std::size_t bytesWritten = 0;
             while (originalAttribute.serialize(&serializationStream, &bytesWritten)
-                    != nx_api::SerializerState::done)
+                    != nx::network::server::SerializerState::done)
             {
                 buffer.resize(0);
                 buffer.reserve(buffer.capacity() * 2);

@@ -13,13 +13,13 @@ namespace test {
 namespace {
 
 class TestConnection:
-    public nx_api::BaseServerConnection<TestConnection>
+    public nx::network::server::BaseServerConnection<TestConnection>
 {
-    using base_type = nx_api::BaseServerConnection<TestConnection>;
+    using base_type = nx::network::server::BaseServerConnection<TestConnection>;
 
 public:
     TestConnection(
-        StreamConnectionHolder<TestConnection>* connectionManager,
+        nx::network::server::StreamConnectionHolder<TestConnection>* connectionManager,
         std::unique_ptr<AbstractStreamSocket> streamSocket)
         :
         base_type(connectionManager, std::move(streamSocket))
@@ -28,7 +28,7 @@ public:
 };
 
 class TestServer:
-    public StreamSocketServer<TestServer, TestConnection>
+    public nx::network::server::StreamSocketServer<TestServer, TestConnection>
 {
 protected:
     virtual std::shared_ptr<TestConnection> createConnection(

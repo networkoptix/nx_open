@@ -14,6 +14,10 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
+namespace nx {
+namespace network {
+namespace server {
+
 template<class _ConnectionType>
 class StreamConnectionHolder
 {
@@ -224,3 +228,7 @@ private:
     StreamSocketServer( StreamSocketServer& );
     StreamSocketServer& operator=( const StreamSocketServer& );
 };
+
+} // namespace server
+} // namespace network
+} // namespace nx

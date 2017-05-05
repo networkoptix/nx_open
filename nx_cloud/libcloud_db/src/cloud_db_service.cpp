@@ -218,7 +218,7 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
         authorizationManager,
         &httpMessageDispatcher);
 
-    MultiAddressServer<nx_http::HttpStreamSocketServer> multiAddressHttpServer(
+    nx::network::server::MultiAddressServer<nx_http::HttpStreamSocketServer> multiAddressHttpServer(
         &authenticationManager,
         &httpMessageDispatcher,
         false,  //TODO #ak enable ssl when it works properly

@@ -1,10 +1,4 @@
-/**********************************************************
-* 23 dec 2013
-* a.kolesnikov
-***********************************************************/
-
-#ifndef BASE_STREAM_PROTOCOL_CONNECTION_H
-#define BASE_STREAM_PROTOCOL_CONNECTION_H
+#pragma once
 
 #include <deque>
 #include <functional>
@@ -14,9 +8,10 @@
 #include "base_protocol_message_types.h"
 #include "base_server_connection.h"
 
+namespace nx {
+namespace network {
+namespace server {
 
-namespace nx_api
-{
 //!Connection of stream-orientied protocol of type request/respose
 /*!
     It is not tied to underlying transport (tcp, udp, etc...)
@@ -402,6 +397,7 @@ public:
 private:
     std::function<void(MessageType&&)> m_handler;
 };
-}
 
-#endif   //BASE_STREAM_PROTOCOL_CONNECTION_H
+} // namespace server
+} // namespace network
+} // namespace nx
