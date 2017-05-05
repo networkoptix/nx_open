@@ -263,7 +263,7 @@ PageBase
             width: parent.width - x * 2
             anchors.bottom: parent.bottom
 
-            controller.uniqueResourceId: videoScreenController.resourceHelper.resourceId
+            controller.resourceId: videoScreenController.resourceHelper.resourceId
         }
 
         Loader
@@ -320,6 +320,7 @@ PageBase
                     controlsOpacity: d.cameraUiOpacity
                     ptzAvailable: ptzPanel.controller.available
                         && videoScreenController.accessRightsHelper.canManagePtz
+                        && !videoScreenController.offline
                     onPtzButtonClicked: ptzPanel.visible = true
                 }
             }

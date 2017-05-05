@@ -12,11 +12,8 @@ class ResourcePtzController: public QnProxyPtzController
     Q_OBJECT
     using base_type = QnProxyPtzController;
 
-    Q_PROPERTY(QUuid uniqueResourceId READ uniqueResourceId
-        WRITE setUniqueResourceId NOTIFY uniqueResourceIdChanged)
-
+    Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
     Q_PROPERTY(bool available READ available NOTIFY availableChanged)
-
     Q_PROPERTY(Ptz::Capabilities capabilities READ getCapabilities NOTIFY capabilitiesChanged)
     Q_PROPERTY(Ptz::Traits auxTraits READ auxTraits NOTIFY auxTraitsChanged)
     Q_PROPERTY(int presetsCount READ presetsCount NOTIFY presetsCountChanged)
@@ -26,8 +23,8 @@ public:
     ResourcePtzController(QObject* parent = nullptr);
 
 public: // Properties section
-    QUuid uniqueResourceId() const;
-    void setUniqueResourceId(const QUuid& value);
+    QString resourceId() const;
+    void setResourceId(const QString& value);
 
     bool available() const;
 
@@ -41,7 +38,7 @@ public:
     Q_INVOKABLE bool setPresetById(const QString& id);
 
 signals:
-    void uniqueResourceIdChanged();
+    void resourceIdChanged();
     void availableChanged();
 
     void capabilitiesChanged();
@@ -50,7 +47,7 @@ signals:
     void activePresetIndexChanged();
 
 private:
-    QUuid m_uniqueResourceId;
+    QString m_resourceId;
 };
 
 } // namespace mobile

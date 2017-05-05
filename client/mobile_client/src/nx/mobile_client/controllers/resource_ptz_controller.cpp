@@ -2,6 +2,7 @@
 
 #include <core/ptz/activity_ptz_controller.h>
 #include <core/ptz/client_ptz_controller_pool.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -22,10 +23,10 @@ namespace mobile {
 ResourcePtzController::ResourcePtzController(QObject* parent):
     base_type()
 {
-    connect(this, &ResourcePtzController::uniqueResourceIdChanged, this,
+    connect(this, &ResourcePtzController::resourceIdChanged, this,
         [this]()
         {
-            const auto resource = qnResPool->getResourceById(m_uniqueResourceId);
+            const auto resource = qnResPool->getResourceById(QnUuid::fromStringSafe(m_resourceId));
             auto controller = qnClientPtzPool->controller(resource);
             if (controller)
             {
@@ -43,11 +44,8 @@ ResourcePtzController::ResourcePtzController(QObject* parent):
             if (fields.testFlag(Qn::AuxilaryTraitsPtzField))
                 emit auxTraitsChanged();
             if (fields.testFlag(Qn::PresetsPtzField))
-            {
                 emit presetsCountChanged();
-                emit activePresetIndexChanged();
-            }
-            if (fields.testFlag(Qn::ActiveObjectPtzField))
+            if (fields.testFlag(Qn::ActiveObjectPtzField) || fields.testFlag(Qn::PresetsPtzField))
                 emit activePresetIndexChanged();
         });
 
@@ -60,27 +58,30 @@ ResourcePtzController::ResourcePtzController(QObject* parent):
     setParent(parent);
 }
 
-QUuid ResourcePtzController::uniqueResourceId() const
+QString ResourcePtzController::resourceId() const
 {
-    return m_uniqueResourceId.toString();
+    return m_resourceId;
 }
 
-void ResourcePtzController::setUniqueResourceId(const QUuid& value)
+void ResourcePtzController::setResourceId(const QString& value)
 {
-    if (value == m_uniqueResourceId)
+    if (value == m_resourceId)
         return;
 
-    m_uniqueResourceId = value;
-    emit uniqueResourceIdChanged();
+    m_resourceId = value;
+    emit resourceIdChanged();
 }
 
 bool ResourcePtzController::available() const
 {
-    const auto ptzResource = baseController() ? baseController()->resource() : QnResourcePtr();
-    if (!ptzResource)
+    const auto cameraResource = baseController()
+        ? baseController()->resource().dynamicCast<QnVirtualCameraResource>()
+        : QnVirtualCameraResourcePtr();
+
+    if (!cameraResource)
         return false;
 
-    const auto server = ptzResource->getParentResource().dynamicCast<QnMediaServerResource>();
+    const auto server = cameraResource->getParentServer();
     if (!server || server->getVersion() < QnSoftwareVersion(2, 6))
         return false;
 
