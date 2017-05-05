@@ -11,12 +11,14 @@
 #include <core/ptz/ptz_preset.h>
 #include <core/ptz/ptz_tour.h>
 
+#include <core/resource_management/layout_tour_manager.h>
+#include <core/resource_management/resource_pool.h>
+
 #include <core/resource/user_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
-#include <core/resource_management/resource_pool.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -240,6 +242,35 @@ QList<QAction*> AspectRatioFactory::newActions(const Parameters& /*parameters*/,
     return actionGroup->actions();
 }
 
+CurrentLayoutTourSettingsFactory::CurrentLayoutTourSettingsFactory(QObject* parent):
+    Factory(parent)
+{
+}
+
+
+QList<QAction*> CurrentLayoutTourSettingsFactory::newActions(const Parameters& parameters,
+    QObject* parent)
+{
+    const auto isManual = workbench()->currentLayout()->data(Qn::LayoutTourIsManualRole).toBool();
+    auto actionGroup = new QActionGroup(parent);
+    actionGroup->setExclusive(true);
+    for (auto manual: {false, true})
+    {
+        auto action = new QAction(parent);
+        action->setText(manual
+            ? tr("Switch Layouts by Hotkeys")
+            : tr("Switch Layouts By Timer"));
+        action->setCheckable(true);
+        action->setChecked(manual == isManual);
+        connect(action, &QAction::triggered, this,
+            [this, manual]
+            {
+                workbench()->currentLayout()->setData(Qn::LayoutTourIsManualRole, manual);
+            });
+        actionGroup->addAction(action);
+    }
+    return actionGroup->actions();
+}
 
 } // namespace action
 } // namespace ui

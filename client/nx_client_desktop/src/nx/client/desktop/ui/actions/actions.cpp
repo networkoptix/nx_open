@@ -683,7 +683,7 @@ void initialize(Manager* manager, Action* root)
     factory(OpenInLayoutAction)
         .flags(SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget | WidgetTarget)
         .requiredTargetPermissions(Qn::LayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
-        .text(tr("Open in Layout"))
+        .text(lit("Open in Layout"))
         .condition(new OpenInLayoutCondition());
 
     factory(OpenInCurrentLayoutAction)
@@ -691,7 +691,9 @@ void initialize(Manager* manager, Action* root)
         .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
         .text(tr("Open"))
         .conditionalText(tr("Monitor"), hasFlags(Qn::server), All)
-        .condition(new OpenInCurrentLayoutCondition());
+        .condition(
+            ConditionWrapper(new OpenInCurrentLayoutCondition())
+            && !condition::isLayoutTourReviewMode());
 
     factory(OpenInNewLayoutAction)
         .mode(DesktopMode)
@@ -1381,45 +1383,58 @@ void initialize(Manager* manager, Action* root)
         .condition(condition::treeNodeType(Qn::LayoutTourNode));
 
     factory(StartCurrentLayoutTourAction)
-        .flags(Scene | NoTarget)
+        .flags(NoTarget)
         .mode(DesktopMode)
         .text(tr("Start Tour"))
         .accent(Qn::ButtonAccent::Standard)
         .icon(qnSkin->icon("buttons/play.png"))
         .condition(
-            ConditionWrapper(new LayoutTourReviewModeCondition())
+            condition::isLayoutTourReviewMode()
             && ConditionWrapper(new StartCurrentLayoutTourCondition())
         )
         .autoRepeat(false);
 
     factory(SaveLayoutTourAction)
         .flags(NoTarget)
-        .text(lit("Save layout tour (internal)"))
+        .text(lit("Save Layout Tour (internal)"))
         .mode(DesktopMode);
 
     factory(SaveCurrentLayoutTourAction)
-        .flags(Scene | NoTarget)
+        .flags(NoTarget)
         .mode(DesktopMode)
         .text(tr("Save Changes"))
-        .condition(new LayoutTourReviewModeCondition())
+        .condition(condition::isLayoutTourReviewMode())
         .autoRepeat(false);
 
     factory(RemoveCurrentLayoutTourAction)
         .flags(NoTarget)
         .mode(DesktopMode)
         .icon(qnSkin->icon("buttons/delete.png"))
-        .condition(new LayoutTourReviewModeCondition())
+        .condition(condition::isLayoutTourReviewMode())
         .autoRepeat(false);
 
     factory()
         .flags(Scene | NoTarget)
         .separator();
 
+    factory(MakeLayoutTourAction)
+        .flags(Tree | MultiTarget | ResourceTarget)
+        .text(tr("Make Layout Tour"))
+        .condition(condition::hasFlags(Qn::layout, All)
+            && !condition::isSafeMode());
+
     factory(CurrentLayoutSettingsAction)
         .flags(Scene | NoTarget)
         .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::EditLayoutSettingsPermission)
         .text(tr("Layout Settings.."))
         .condition(new LightModeCondition(Qn::LightModeNoLayoutBackground));
+
+    factory(CurrentLayoutTourSettingsAction)
+        .flags(Scene | NoTarget)
+        .text(tr("Tour Settings"))
+        .condition(condition::isLayoutTourReviewMode())
+        .childFactory(new CurrentLayoutTourSettingsFactory(manager))
+        .autoRepeat(false);
 
     /* Tab bar actions. */
     factory()

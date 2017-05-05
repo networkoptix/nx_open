@@ -1,5 +1,6 @@
 #include "add_default_webpages_migration.h"
 
+#include <QtCore/QFile>
 #include <QtCore/QUrl>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>

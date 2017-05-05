@@ -214,7 +214,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, con
         }
         case Qn::LayoutTourNode:
         {
-            auto tour = qnLayoutTourManager->tour(m_uuid);
+            auto tour = layoutTourManager()->tour(m_uuid);
             setNameInternal(tour.name);
             break;
         }
@@ -331,7 +331,7 @@ void QnResourceTreeModelNode::update()
         }
         case Qn::LayoutTourNode:
         {
-            auto tour = qnLayoutTourManager->tour(m_uuid);
+            auto tour = layoutTourManager()->tour(m_uuid);
             setNameInternal(tour.name.isEmpty() ? tr("Layout Tour") : tour.name);
             break;
         }

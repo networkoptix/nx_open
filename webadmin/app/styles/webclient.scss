@@ -1,3 +1,5 @@
+@import 'native-theme/_theme_palette';
+
 
 ::-webkit-scrollbar {
   width: 12px;
@@ -81,7 +83,7 @@ table.webclient-window>tbody>tr>td.alert{
   width:100%;
   height:100%;
 
-  padding-bottom:210px;
+  padding-bottom:100px;
   padding-top:80px;
 }
 
@@ -145,6 +147,13 @@ table.webclient-window>tbody>tr>td.alert{
   -ms-transform: translateY(-50%);
 }
 
+.half-height {
+  height: 50%;
+}
+
+.full-height {
+  height: 100%;
+}
 
 .videowindow video.fullsize,
 .videowindow.fullscreen video{
@@ -208,23 +217,127 @@ table.webclient-window>tbody>tr>td.alert{
 }
 
 
-.webclient-panel>div.text-left,
-.webclient-panel>div.text-right{
-  width:40%;
-  white-space: nowrap;
-  display:inline-block;
+div.text-left{
+  width:168px;
+  height:100px;
+  background-color: $additional_light2;
+  border-right: 1px solid $additional_light2;
 }
-.webclient-panel>div.text-center{
-  width:20%;
-  white-space: nowrap;
-  display:inline-block;
+
+.player-controls{
+  margin: 30px 12px 30px 11px;
+}
+
+.zoom-level{
+  height: 100px;
+  margin-top: 6px;
+}
+
+div.text-right{
+  width:104px;
+  height:100px;
+  background-color: $additional_light2;
+  border-left: 1px solid $additional_light2;
+}
+
+.live-button .webclient-button{
+  margin: 40px auto;
+}
+
+live-circle{
+  padding: 3px;
+  margin: 2px 8px 2px 0;
+  background-color: $light6;
+  display: inline-block;
+  -moz-border-radius: 100px;
+  -webkit-border-radius: 100px;
+  border-radius: 100px;
+  -moz-box-shadow: 0px 0px 2px #888;
+  -webkit-box-shadow: 0px 0px 2px #888;
+  box-shadow: 0px 0px 2px #888;
+}
+
+.live-button{
+  width: 63px;
+  height: 100px;
+  text-align: center;
+  line-height: 100px;
+  border-left: 1px solid $light6 !important;
+  border-right: 1px solid $light4 !important;
+}
+
+.live-button.active{
+  background-color: $light6 !important;
+  border-left: 1px solid $light8 !important;
+  border-right: 1px solid $light7 !important; 
+}
+
+.live-button:hover{
+  background-color: $light4 !important;
+  border-left: 1px solid $light6 !important;
+  border-right: 1px solid $light4 !important; 
+}
+
+.live-button.active:hover{
+  background-color: $light4 !important;
+  border-left: 1px solid $light7 !important;
+  border-right: 1px solid $light6 !important; 
+}
+
+.live-button:active,
+.live-button.active:active {
+  background-color: $light4 !important;
+  border-left: 1px solid $light8 !important;
+  border-right: 1px solid $light7 !important; 
+}
+
+.live-button.active live-circle{
+  background-color: chartreuse !important;
+}
+
+.volume{
+  width: 40px;
+  height: 100px;
+}
+.volume .glyphicon-volume-up{
+  margin: 40px auto !important;
+}
+
+volume-control{
+  width: 212px;
+  height: 44px;
+  position: absolute;
+  right: 0;
+  top: -44px;
+  background-color: #333333;
+}
+
+.volume-icons{
+  width: 44px;
+  height: 44px;
+}
+.volume-icons .glyphicon{
+  position: relative;
+  top: 14px;
+  left: 16px;
+}
+
+.volume-icons output{
+  position: relative;
+  top: 4px;
+  left: 6px;
+}
+
+
+div.text-center{
+  margin: 0 104px 0 168px;
+  height:100px;
 }
 
 .webclient-button{
   padding:0 10px;
   display: inline-block;
-  vertical-align: top;
-  min-width: 40px;
+  vertical-align: middle;
   text-align: center;
   cursor:pointer;
 }
@@ -238,7 +351,11 @@ table.webclient-window>tbody>tr>td.alert{
 }
 
 .webclient-button:hover{
-  background-color: rgba(198,234,255,0.05);
+  background-color: $light8;
+}
+
+.webclient-button:active{
+  background-color: $light6;
 }
 
 .webclient-button.disabled{
@@ -246,17 +363,53 @@ table.webclient-window>tbody>tr>td.alert{
   cursor:default;
 }
 
-.webclient-button.active{
-  background-color: white;
-  color:#121517 !important;
-}
 .webclient-button.active:hover{
-  background-color: white !important;
-  opacity:0.9;
+  background-color: $light5 !important;
+  /*opacity:0.9;*/
+}
+
+.webclient-button.active:active{
+  background-color: $light6;
 }
 
 .webclient-button .glyphicon{
   top:3px;
+  left:1px;
+  vertical-align: middle;
+  margin: 10px auto;
+}
+
+.glyphicon-backward,
+.glyphicon-forward,
+.glyphicon-pause,
+.glyphicon-play,
+.live-button {
+  color:black;
+}
+
+.glyphicon-volume-off,
+.glyphicon-volume-up,
+.glyphicon-minus,
+.glyphicon-plus {
+  color:gray;
+}
+
+.glyphicon-pp{
+  height:40px;
+  width: 40px;
+  margin: 0 -4px 0 -4px;
+}
+
+.glyphicon-fwbw{
+  height: 40px;
+  width: 32px;
+  padding: 0 !important;
+}
+
+.glyphicon-pm{
+  height: 44px;
+  width: 40px;
+  display: block !important;
 }
 
 .weblcient-hint{
@@ -322,9 +475,18 @@ table.webclient-window>tbody>tr>td.alert{
   position: relative;
   vertical-align: top;
   margin: 5px 10px;
-  border-left: 1px solid #263137;
+  border-left: 1px solid $dark8;
   display: inline-block;
 }
+
+.webclient-panel-border-timeline{
+  height: 100px;
+  position: relative;
+  vertical-align: top;
+  border-left: 1px solid $light4;
+  display: inline-block;
+}
+
 
 .webclient-panel .dropdown-menu{
   background-color: #E1E7EA;

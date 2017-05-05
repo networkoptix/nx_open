@@ -78,6 +78,7 @@ namespace Paxton.NetworkOptixControl
             public string systemName { get; set; }
             public string version { get; set; }
             public int nxClusterProtoVersion { get; set; }
+            public string cloudHost { get; set; }
         }
     }
 
@@ -107,10 +108,21 @@ namespace Paxton.NetworkOptixControl
                 return null;
             }
 
-            if (ourProtoVersion < connectInfo.nxClusterProtoVersion)
+            if (CustomProperties.cloudHost != connectInfo.cloudHost)
             {
-                MessageBox.Show(String.Format("Incompatible version. Please install plugin of version {0}.{1}.{2} to connect to this server",
-                    serverVersion.Major, serverVersion.Minor, serverVersion.Build), "Error", MessageBoxButtons.OK);
+                MessageBox.Show(
+                    String.Format(
+                        "Incompatible version. Please install plugin of version {0} to connect to this server. Error code 1.",
+                    serverVersion.ToString(4)), "Error", MessageBoxButtons.OK);
+                return null;
+            }
+
+            if (ourProtoVersion != connectInfo.nxClusterProtoVersion)
+            {
+                MessageBox.Show(
+                    String.Format(
+                        "Incompatible version. Please install plugin of version {0} to connect to this server. Error code 2.",
+                    serverVersion.ToString(4)), "Error", MessageBoxButtons.OK);
                 return null;
             }
 
@@ -305,9 +317,12 @@ namespace Paxton.NetworkOptixControl
             {
                 MessageBox.Show("Can't connect to the server. Verify server information in Camera Integration settings.");
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                MessageBox.Show("Generic error occured. Please try again later.");
+                MessageBox.Show(
+                    String.Format(
+                        "Generic error occured. Please try again later.\n\n{0}",
+                        e.ToString()));
             }
 
             return OemDvrStatus.FootagePlaybackFailed;

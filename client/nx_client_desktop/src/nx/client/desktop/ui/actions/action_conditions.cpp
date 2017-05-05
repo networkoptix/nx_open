@@ -291,16 +291,6 @@ ActionVisibility VideoWallReviewModeCondition::check(const Parameters& /*paramet
         : InvisibleAction;
 }
 
-ActionVisibility LayoutTourReviewModeCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
-{
-    const bool isLayoutTourReviewMode = context->workbench()->currentLayout()->data()
-        .contains(Qn::LayoutTourUuidRole);
-
-    return isLayoutTourReviewMode
-        ? EnabledAction
-        : InvisibleAction;
-}
-
 ActionVisibility RequiresOwnerCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
 {
     if (context->user() && context->user()->isOwner())
@@ -896,7 +886,7 @@ ActionVisibility ToggleTourCondition::check(const Parameters& parameters, QnWork
     }
     else
     {
-        const auto tour = qnLayoutTourManager->tour(tourId);
+        const auto tour = context->layoutTourManager()->tour(tourId);
         if (tour.isValid() && tour.items.size() > 0)
             return EnabledAction;
     }
@@ -908,7 +898,7 @@ ActionVisibility StartCurrentLayoutTourCondition::check(const Parameters& /*para
 {
     const auto tourId = context->workbench()->currentLayout()->data()
         .value(Qn::LayoutTourUuidRole).value<QnUuid>();
-    const auto tour = qnLayoutTourManager->tour(tourId);
+    const auto tour = context->layoutTourManager()->tour(tourId);
     if (tour.isValid() && tour.items.size() > 0)
         return EnabledAction;
     return DisabledAction;
@@ -1650,6 +1640,15 @@ ConditionWrapper treeNodeType(QSet<Qn::NodeType> types)
             // Actions, triggered manually or from scene, must not check node type
             return !parameters.hasArgument(Qn::NodeTypeRole)
                 || types.contains(parameters.argument(Qn::NodeTypeRole).value<Qn::NodeType>());
+        });
+}
+
+ConditionWrapper isLayoutTourReviewMode()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
+        {
+            return context->workbench()->currentLayout()->data().contains(Qn::LayoutTourUuidRole);
         });
 }
 

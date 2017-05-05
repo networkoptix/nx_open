@@ -11,11 +11,29 @@ BIN_NAME="mediaserver"
 BIN_PATH="$MEDIASERVER_DIR/bin/$BIN_NAME"
 STORAGE_PATH="/sdcard"
 HTTP_LOG_LEVEL="none"
-LOGS_PATH="$MEDIASERVER_DIR/var/log"
+LOGS_PATH="/sdcard/mserver.data/log"
 LOG_OUTPUT_FLAG="$LOGS_PATH/log_output.flag"
+OUTPUT_LOG="$LOGS_PATH/mediaserver-out.log"
 
 export VMS_PLUGIN_DIR="$MEDIASERVER_DIR/plugins"
 export SASL_PATH="$MEDIASERVER_DIR/lib/sasl2"
+
+# ATTENTION: The args should not contain spaces, because busybox shell does not support arrays.
+RUN_ARGS="\
+-e \
+--conf-file=$MEDIASERVER_DIR/etc/mediaserver.conf \
+--runtime-conf-file=$MEDIASERVER_DIR/etc/running_time.conf \
+--msg-log-level=$HTTP_LOG_LEVEL \
+"
+
+checkSdCard()
+{
+    # Make sure that STORAGE_PATH dir exists and is in /proc/mounts.
+    if ! grep "$STORAGE_PATH" /proc/mounts >/dev/null 2>&1 || [ ! -d "$STORAGE_PATH" ]; then
+        echo "SD card not inserted"
+        return 1
+    fi
+}
 
 start()
 {
@@ -25,32 +43,25 @@ start()
        return 0
     fi
 
-    if ! grep "$STORAGE_PATH" /proc/mounts >/dev/null 2>&1 || [ ! -d "$STORAGE_PATH" ]; then
-        echo "SD card not inserted"
-        return 1
-    fi
-
+    checkSdCard
+    
     if ! touch "$STORAGE_PATH" >/dev/null 2>&1; then
         #echo "RO"
         mount -o rw,remount "$STORAGE_PATH"
     fi
 
-    # ATTENTION: The args should not contain spaces.
-    local RUN_ARGS="-e --conf-file=$MEDIASERVER_DIR/etc/mediaserver.conf \
-        --runtime-conf-file=$MEDIASERVER_DIR/etc/running_time.conf \
-        --msg-log-level=$HTTP_LOG_LEVEL"
-
     if [ -f "$LOG_OUTPUT_FLAG" ]; then
-        mkdir -p "$LOGS_PATH"
-        REDIRECT_OUTPUT="$LOGS_PATH/mediaserver-out.log"
+        mkdir -p $(dirname "$OUTPUT_LOG")
+        REDIRECT_OUTPUT="$OUTPUT_LOG"
     else
         REDIRECT_OUTPUT="/dev/null"
     fi
 
     echo "Starting Media Server, outputting to $REDIRECT_OUTPUT, with command:"
-    echo "    $BIN_PATH $RUN_ARGS"
+    set -x
     "$BIN_PATH" $RUN_ARGS >>"$REDIRECT_OUTPUT" 2>&1 &
-
+    { set +x; } 2>/dev/null
+    
     sleep 1
     # See if server instantly crashes.
     if [ $(pidof "$BIN_NAME") ]; then
@@ -116,7 +127,8 @@ kill_ms_if_high_mem_usage()
         exit 0
     fi
 
-    MEM_USAGE=$(cat /proc/$MSERVER_PID/status | grep VmRSS | cut -d: -f2 | tr -d "\t " | cut -d "k" -f 1)
+    MEM_USAGE=$(cat /proc/$MSERVER_PID/status \
+        |grep VmRSS |cut -d ":" -f2 |tr -d "\t " |cut -d "k" -f 1)
 
     if [ "$MEM_USAGE" -gt 89000 ]; then
         kill -FPE "$MSERVER_PID"
@@ -134,6 +146,26 @@ run_watchdog()
     done
 }
 
+help()
+{
+    cat <<EOF
+Usage: $0 <command>
+Supported commands:
+start # Start mediaserver and watchdog, enabling output to $OUTPUT_LOG if $LOG_OUTPUT_FLAG exists.
+startquiet # Start mediaserver.
+start_console # Run mediaserver in foreground without output redirection.
+start_gdb # Run mediaserver under gdb.
+stop # Stop watchdog and kill mediaserver with SIGINT.
+kill # Stop watchdog and kill mediaserver with SIGKILL.
+status # Report whether mediaserver is running, and its pid. Exit status is non-zero if stopped.
+server_status # Output 1 if mediaserver is running, otherwise, do nothing.
+restart, reload, force-reload # Stop watchdog and mediaserver, start mediaserver and watchdog.
+start_watchdog # Start watchdog service in background.
+run_watchdog # Run watchdog in foreground.
+stop_watchdog # Stop watchdog service, if any.
+EOF
+}
+
 #--------------------------------------------------------------------------------------------------
 # main
 
@@ -147,36 +179,27 @@ case "$1" in
     start)
         start && start_watchdog
         ;;
-
     startquiet)
         start
         ;;
-
     start_console)
-        grep "$STORAGE_PATH" /proc/mounts >/dev/null 2>&1
-        if [ $? -ne 0 ] || [ ! -d "$STORAGE_PATH" ]; then
-            echo "SD card not inserted"
-            return 1
-        fi
-
-        $BIN_PATH -e --conf-file=$MEDIASERVER_DIR/etc/mediaserver.conf --msg-log-level=$HTTP_LOG_LEVEL
+        set -x
+        checkSdCard
+        "$BIN_PATH" $RUN_ARGS
         ;;
-
     start_gdb)
-        gdbserver 0.0.0.0:12345 $BIN_PATH -e --conf-file=$MEDIASERVER_DIR/etc/mediaserver.conf \
-            --msg-log-level=$HTTP_LOG_LEVEL
+        set -x
+        checkSdCard
+        gdbserver 0.0.0.0:12345 "$BIN_PATH" $RUN_ARGS
         ;;
-
     stop)
         stop_watchdog
         stop
         ;;
-
     kill)
         stop_watchdog
         stop -9
         ;;
-
     status)
         SERVICE_PID=$(pidof "$BIN_NAME")
         if [ ! -z "$SERVICE_PID" ]; then
@@ -187,35 +210,30 @@ case "$1" in
             exit 1
         fi
         ;;
-
     server_status)
         if [ $(pidof "$BIN_NAME") ]; then
             echo "1"
         fi
         ;;
-
     restart|reload|force-reload)
         stop_watchdog
         stop
+        echo "Waiting for mediaserver process to end..."
         while [ $(pidof "$BIN_NAME") ]; do
             /bin/sleep 1
         done
         start && start_watchdog
         ;;
-
     start_watchdog)
         start_watchdog
         ;;
-
     run_watchdog)
         run_watchdog
         ;;
-
     stop_watchdog)
         stop_watchdog
         ;;
-
     *)
-        echo "Usage: $0 {start|startquiet|stop|restart|status}"
+        help
         exit 1
 esac

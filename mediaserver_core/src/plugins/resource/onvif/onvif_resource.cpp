@@ -1330,7 +1330,7 @@ void QnPlOnvifResource::setVideoEncoderOptionsH264(const VideoOptionsLocal& opts
     QnMutexLocker lock( &m_mutex );
 
     //Printing fetched resolutions
-    if (cl_log.logLevel() > cl_logDEBUG1)
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::debug))
     {
         NX_LOG(QString(lit("ONVIF resolutions:")), cl_logDEBUG1);
         for (const QSize& resolution: m_resolutionList)
@@ -1366,7 +1366,8 @@ void QnPlOnvifResource::setVideoEncoderOptionsJpeg(const VideoOptionsLocal& opts
 
     QnMutexLocker lock( &m_mutex );
     //Printing fetched resolutions
-    if (cl_log.logLevel() > cl_logDEBUG1) {
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::debug))
+    {
         NX_LOG(QString(lit("ONVIF resolutions:")), cl_logDEBUG1);
         for (const QSize& resolution: m_resolutionList) {
             NX_LOG(QString(lit("%1x%2")).arg(resolution.width()).arg(resolution.height()), cl_logDEBUG1);
