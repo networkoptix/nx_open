@@ -866,7 +866,10 @@ void initialize(Manager* manager, Action* root)
         .shortcut(lit("Enter"))
         .shortcut(lit("Return"))
         .autoRepeat(false)
-        .condition(new ItemZoomedCondition(false));
+        .condition(
+            ConditionWrapper(new ItemZoomedCondition(false))
+            && !condition::isLayoutTourReviewMode()
+        );
 
     factory(UnmaximizeItemAction)
         .flags(Scene | SingleTarget)
@@ -874,7 +877,10 @@ void initialize(Manager* manager, Action* root)
         .shortcut(lit("Enter"))
         .shortcut(lit("Return"))
         .autoRepeat(false)
-        .condition(new ItemZoomedCondition(true));
+        .condition(
+            ConditionWrapper(new ItemZoomedCondition(true))
+            && !condition::isLayoutTourReviewMode()
+        );
 
     factory(ShowInfoAction)
         .flags(Scene | SingleTarget | MultiTarget)
