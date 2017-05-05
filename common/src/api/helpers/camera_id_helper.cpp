@@ -5,8 +5,9 @@
 #include <nx/utils/log/log.h>
 
 namespace nx {
+namespace camera_id_helper {
 
-void camera_id_helper::findAllCamerasByFlexibleIds(
+void findAllCamerasByFlexibleIds(
     QnResourcePool* resourcePool,
     QnSecurityCamResourceList* cameras,
     const QnRequestParamList& params,
@@ -30,7 +31,7 @@ void camera_id_helper::findAllCamerasByFlexibleIds(
     }
 }
 
-QnSecurityCamResourcePtr camera_id_helper::findCameraByFlexibleIds(
+QnSecurityCamResourcePtr findCameraByFlexibleIds(
     QnResourcePool* resourcePool,
     QString* outNotFoundCameraId,
     const QnRequestParams& params,
@@ -71,7 +72,7 @@ QnSecurityCamResourcePtr camera_id_helper::findCameraByFlexibleIds(
     return camera;
 }
 
-QnSecurityCamResourcePtr camera_id_helper::findCameraByFlexibleId(
+QnSecurityCamResourcePtr findCameraByFlexibleId(
     QnResourcePool* resourcePool,
     const QString& flexibleId)
 {
@@ -88,4 +89,5 @@ QnSecurityCamResourcePtr camera_id_helper::findCameraByFlexibleId(
     return result.dynamicCast<QnSecurityCamResource>();
 }
 
+} // namespace camera_id_helper
 } // namespace nx

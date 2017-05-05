@@ -50,7 +50,7 @@ def generate_layout_item_guid(id):
 
 
 def generate_mac(id):
-    return CAMERA_MAC_PREFIX + ":".join(  map(lambda n: "%02X" % (id >> n & 0xFF), [24, 16, 8, 0]))
+    return CAMERA_MAC_PREFIX + ":".join(map(lambda n: "%02X" % (id >> n & 0xFF), [24, 16, 8, 0]))
 
 
 def generate_name(prefix, id):
@@ -166,16 +166,23 @@ def generate_camera_user_attributes_data(camera, **kw):
     dewarpingParams = '''{"enabled":false,"fovRot":0,
     "hStretch":1,"radius":0.5,"viewMode":"1","xCenter":0.5,"yCenter":0.5}'''
     default_camera_data = dict(
+        audioEnabled=False,
+        backupType='CameraBackupDefault',
         cameraId=camera['id'],
         cameraName=camera['name'],
+        controlEnabled=True,
         dewarpingParams=dewarpingParams,
+        failoverPriority='Medium',
+        licenseUsed=True,
         maxArchiveDays=-30,
         minArchiveDays=-1,
         motionMask='5,0,0,44,32:5,0,0,44,32:5,0,0,44,32:5,0,0,44,32',
         motionType='MT_SoftwareGrid',
+        preferredServerId='{00000000-0000-0000-0000-000000000000}',
         scheduleEnabled=False,
         scheduleTasks=[],
-        secondaryStreamQuality='SSQualityMedium'
+        secondaryStreamQuality='SSQualityMedium',
+        userDefinedGroupName=''
         )
     return dict(default_camera_data, **kw)
 
@@ -225,12 +232,17 @@ def get_resource_id(resource):
     return resource
 
 
-def generate_resource_params_data(resource):
+def generate_resource_params_data(id, resource):
     resource_id = get_resource_id(resource)
-    return [dict(
-        name='Resource_%s' % resource_id,
+    return dict(
+        name='Resource_%s_%d' % (resource_id, id),
         resourceId=resource_id,
-        value='Value_%s' % resource_id)]
+        value='Value_%s_%d' % (resource_id, id))
+
+
+def generate_resource_params_data_list(id, resource, list_size):
+    return [generate_resource_params_data(id + i, resource)
+            for i in range(list_size)]
 
 
 def generate_remove_resource_data(resource):

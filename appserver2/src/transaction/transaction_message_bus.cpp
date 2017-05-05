@@ -633,7 +633,7 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
     QnTranStateKey persistentKey(tran.peerID, tran.persistentInfo.dbID);
     int persistentSeq =  m_db->transactionLog()->getLatestSequence(persistentKey);
 
-    if (QnLog::instance(QnLog::EC2_TRAN_LOG)->logLevel() >= cl_logWARNING)
+    if (nx::utils::log::get(QnLog::EC2_TRAN_LOG)->isToBeLogged(cl_logWARNING))
         if (!transport->isSyncDone() && transport->isReadSync(ApiCommand::NotDefined) && transportHeader.sender != transport->remotePeer().id)
         {
             NX_LOG(QnLog::EC2_TRAN_LOG, lit("Got transaction from peer %1 while sync with peer %2 in progress").
@@ -701,7 +701,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
     // do not perform any logic (aka sequence update) for foreign transaction. Just proxy
     if (!transportHeader.dstPeers.isEmpty() && !transportHeader.dstPeers.contains(commonModule()->moduleGUID()))
     {
-        if (QnLog::instance(QnLog::EC2_TRAN_LOG)->logLevel() >= cl_logDEBUG1)
+        if (nx::utils::log::get(QnLog::EC2_TRAN_LOG)->isToBeLogged(cl_logDEBUG1))
         {
             QString dstPeersStr;
             for (const QnUuid& peer : transportHeader.dstPeers)
@@ -910,7 +910,7 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
         proxyList << transport->remotePeer().id;
     }
 
-    if (QnLog::instance(QnLog::EC2_TRAN_LOG)->logLevel() >= cl_logDEBUG1)
+    if (nx::utils::log::get(QnLog::EC2_TRAN_LOG)->isToBeLogged(cl_logDEBUG1))
         if (!proxyList.isEmpty())
         {
             QString proxyListStr;
@@ -923,7 +923,7 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
 
 void QnTransactionMessageBus::printTranState(const QnTranState& tranState)
 {
-    if (QnLog::instance(QnLog::EC2_TRAN_LOG)->logLevel() < cl_logDEBUG1)
+    if (!nx::utils::log::get(QnLog::EC2_TRAN_LOG)->isToBeLogged(cl_logDEBUG1))
         return;
 
     for (auto itr = tranState.values.constBegin(); itr != tranState.values.constEnd(); ++itr)

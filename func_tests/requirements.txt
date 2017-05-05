@@ -12,3 +12,4 @@ hachoir-core
 hachoir-parser
 hachoir-metadata
 pytest-instafail
+pyyaml

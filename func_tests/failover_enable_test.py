@@ -79,6 +79,7 @@ def get_server_camera_ids(server):
                    if c['parentId'] == server.ecs_guid])
 
 
+@pytest.mark.testcam
 def test_enable_failover_on_one_server(env):
     cameras_one_initial = get_server_camera_ids(env.one)
     cameras_two_initial = get_server_camera_ids(env.two)
@@ -95,6 +96,7 @@ def test_enable_failover_on_one_server(env):
     wait_for_expected_online_cameras_on_server(env.one, cameras_one_initial)
 
 
+@pytest.mark.testcam
 def test_enable_failover_on_two_servers(env):
     cameras_one_initial = get_server_camera_ids(env.one)
     cameras_two_initial = get_server_camera_ids(env.two)
