@@ -63,6 +63,8 @@ void QnMediaResourceHelper::setResourceId(const QString& id)
             this, &QnMediaResourceHelper::videoLayoutChanged);
         connect(d->camera, &QnResource::parentIdChanged,
             d, &QnMediaResourceHelperPrivate::updateServer);
+        connect(d->camera, &QnResource::mediaDewarpingParamsChanged,
+            this, &QnMediaResourceHelper::fisheyeParamsChanged);
 
         d->updateServer();
     }
@@ -73,6 +75,7 @@ void QnMediaResourceHelper::setResourceId(const QString& id)
     emit customRotationChanged();
     emit resourceStatusChanged();
     emit videoLayoutChanged();
+    emit fisheyeParamsChanged();
 }
 
 Qn::ResourceStatus QnMediaResourceHelper::resourceStatus() const
@@ -121,6 +124,12 @@ QPoint QnMediaResourceHelper::channelPosition(int channel) const
 {
     Q_D(const QnMediaResourceHelper);
     return d->camera ? d->camera->getVideoLayout()->position(channel) : QPoint();
+}
+
+QnMediaDewarpingParams QnMediaResourceHelper::fisheyeParams() const
+{
+    Q_D(const QnMediaResourceHelper);
+    return d->camera ? d->camera->getDewarpingParams() : QnMediaDewarpingParams();
 }
 
 QnMediaResourceHelperPrivate::QnMediaResourceHelperPrivate(QnMediaResourceHelper* parent):

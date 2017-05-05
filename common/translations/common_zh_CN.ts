@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_CN" sourcelanguage="en">
+<TS version="2.1" language="zh-CN" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -1206,7 +1206,7 @@
     <message>
         <source>ms</source>
         <comment>Suffix for displaying milliseconds</comment>
-        <translation type="unfinished">ms</translation>
+        <translation>毫秒</translation>
     </message>
     <message>
         <source>s</source>
@@ -1266,7 +1266,7 @@
     <message>
         <source>days</source>
         <comment>Long suffix for displaying days</comment>
-        <translation type="unfinished">days</translation>
+        <translation>天</translation>
     </message>
     <message>
         <source>wks</source>
@@ -1403,19 +1403,19 @@
     </message>
     <message>
         <source>Custom user role.</source>
-        <translation type="unfinished">Custom user role.</translation>
+        <translation>自定义用户角色。</translation>
     </message>
     <message>
         <source>Custom permissions.</source>
-        <translation type="unfinished">Custom permissions.</translation>
+        <translation>自定义权限。</translation>
     </message>
     <message>
         <source>Has access to whole System and can do everything.</source>
-        <translation type="unfinished">Has access to whole System and can do everything.</translation>
+        <translation>有权访问整个系统，可以做任何事情。</translation>
     </message>
     <message>
         <source>Has access to whole System and can manage it. Can create users.</source>
-        <translation type="unfinished">Has access to whole System and can manage it. Can create users.</translation>
+        <translation>有权访问整个系统，可以管理它。可以创建用户。</translation>
     </message>
 </context>
 <context>

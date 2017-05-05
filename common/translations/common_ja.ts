@@ -191,10 +191,6 @@
         <translation>ソース:.%1</translation>
     </message>
     <message>
-        <source>Url: %1</source>
-        <translation>URL:・%1</translation>
-    </message>
-    <message>
         <source>Reason: %1</source>
         <translation>理由:・%1</translation>
     </message>
