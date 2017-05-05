@@ -153,6 +153,8 @@ void LayoutTourReviewController::reviewLayoutTour(const ec2::ApiLayoutTourData& 
     layout->setName(tour.name);
     layout->setData(Qn::IsSpecialLayoutRole, true);
     layout->setData(Qn::LayoutIconRole, qnResIconCache->icon(QnResourceIconCache::LayoutTour));
+    layout->setData(Qn::LayoutFlagsRole, qVariantFromValue(QnLayoutFlag::FixedViewport
+        | QnLayoutFlag::NoResize));
     layout->setData(Qn::CustomPanelActionsRole, qVariantFromValue(actions));
     layout->setData(Qn::CustomPanelTitleRole, tour.name);
     layout->setData(Qn::CustomPanelDescriptionRole, QString());

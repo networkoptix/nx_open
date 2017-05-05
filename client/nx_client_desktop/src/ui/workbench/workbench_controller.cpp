@@ -100,6 +100,8 @@
 
 #include <plugins/io_device/joystick/joystick_manager.h>
 
+#include <utils/common/delayed.h>
+
 using namespace nx::client::desktop::ui;
 
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
@@ -430,7 +432,6 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(workbench(),                SIGNAL(currentLayoutChanged()),                                                             this,                           SLOT(at_workbench_currentLayoutChanged()));
 
     /* Set up zoom toggle. */
-    //m_wheelZoomInstrument->recursiveDisable();
     m_zoomedToggle = new QnToggle(false, this);
     connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_moveInstrument,               SLOT(recursiveDisable()));
     connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_moveInstrument,               SLOT(recursiveEnable()));
@@ -438,8 +439,6 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_resizingInstrument,           SLOT(recursiveEnable()));
     connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_rubberBandInstrument,         SLOT(recursiveDisable()));
     connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_rubberBandInstrument,         SLOT(recursiveEnable()));
-    //connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_wheelZoomInstrument,          SLOT(recursiveEnable()));
-    //connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_wheelZoomInstrument,          SLOT(recursiveDisable()));
     connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        this,                           SLOT(at_zoomedToggle_activated()));
     connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      this,                           SLOT(at_zoomedToggle_deactivated()));
     m_zoomedToggle->setActive(display()->widget(Qn::ZoomedRole) != NULL);
@@ -477,24 +476,13 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
         action(action::GoToPreviousItemAction), &QAction::triggered,
         this, &QnWorkbenchController::at_previousItemAction_triggered);
 
-    connect(
-        action(action::ToggleCurrentItemMaximizationStateAction), &QAction::triggered,
-        this, &QnWorkbenchController::at_toggleCurrentItemMaximizationState_triggered);
+    connect(action(action::ToggleCurrentItemMaximizationStateAction), &QAction::triggered, this,
+        &QnWorkbenchController::toggleCurrentItemMaximizationState);
 
 }
 
 QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
     return workbench()->mapper();
-}
-
-Instrument* QnWorkbenchController::handScrollInstrument() const
-{
-    return m_handScrollInstrument;
-}
-
-Instrument* QnWorkbenchController::wheelZoomInstrument() const
-{
-    return m_wheelZoomInstrument;
 }
 
 Instrument* QnWorkbenchController::motionSelectionInstrument() const
@@ -525,11 +513,6 @@ Instrument* QnWorkbenchController::rubberBandInstrument() const
 Instrument* QnWorkbenchController::itemLeftClickInstrument() const
 {
     return m_itemLeftClickInstrument;
-}
-
-Instrument* QnWorkbenchController::gridAdjustmentInstrument() const
-{
-    return m_gridAdjustmentInstrument;
 }
 
 Instrument* QnWorkbenchController::sceneClickInstrument() const
@@ -635,23 +618,21 @@ void QnWorkbenchController::moveCursor(const QPoint &aAxis, const QPoint &bAxis)
     m_cursorItem = item;
 }
 
-void QnWorkbenchController::showContextMenuAt(const QPoint &pos){
-    if(!m_menuEnabled)
-        return;
-
-    QMetaObject::invokeMethod(this, "showContextMenuAtInternal", Qt::QueuedConnection,
-                              Q_ARG(QPoint, pos), Q_ARG(WeakGraphicsItemPointerList, display()->scene()->selectedItems()));
-}
-
-void QnWorkbenchController::showContextMenuAtInternal(const QPoint &pos,
-    const WeakGraphicsItemPointerList &selectedItems)
+void QnWorkbenchController::showContextMenuAt(const QPoint &pos)
 {
-    QScopedPointer<QMenu> menu(this->menu()->newMenu(action::SceneScope, nullptr,
-        selectedItems.materialized()));
-    if(menu->isEmpty())
+    if (!m_menuEnabled)
         return;
 
-    QnHiDpiWorkarounds::showMenu(menu.data(), pos);
+    WeakGraphicsItemPointerList items(display()->scene()->selectedItems());
+    executeDelayedParented([this, pos, items]()
+        {
+            QScopedPointer<QMenu> menu(this->menu()->newMenu(action::SceneScope, nullptr,
+                items.materialized()));
+            if (menu->isEmpty())
+                return;
+
+            QnHiDpiWorkarounds::showMenu(menu.data(), pos);
+        }, kDefaultDelay, this);
 }
 
 void QnWorkbenchController::updateDraggedItems()
@@ -1416,11 +1397,6 @@ void QnWorkbenchController::at_previousItemAction_triggered()
     moveCursor(QPoint(-1, 0), QPoint(0, -1));
 }
 
-void QnWorkbenchController::at_toggleCurrentItemMaximizationState_triggered()
-{
-    toggleCurrentItemMaximizationState();
-}
-
 void QnWorkbenchController::at_toggleSmartSearchAction_triggered() {
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
 
@@ -1490,30 +1466,26 @@ void QnWorkbenchController::at_fitInViewAction_triggered() {
     display()->fitInView(display()->animationAllowed());
 }
 
-void QnWorkbenchController::at_workbench_currentLayoutAboutToBeChanged() {
-    QnWorkbenchLayout *layout = workbench()->currentLayout();
-    if (!layout || !layout->resource())
-        return;
-
-    disconnect(layout->resource(), NULL, this, NULL);
-}
-
-void QnWorkbenchController::at_workbench_currentLayoutChanged() {
-    QnWorkbenchLayout *layout = workbench()->currentLayout();
-    if (!layout)
-        return;
-    if (layout->resource()) {
-        connect(layout->resource(), SIGNAL(lockedChanged(const QnLayoutResourcePtr &)), this, SLOT(updateLayoutInstruments(const QnLayoutResourcePtr &)));
-    }
-    updateLayoutInstruments(layout->resource());
-}
-
-void QnWorkbenchController::at_accessController_permissionsChanged(const QnResourcePtr &resource)
+void QnWorkbenchController::at_workbench_currentLayoutAboutToBeChanged()
 {
-    QnWorkbenchLayout *layout = workbench()->currentLayout();
-    if (!layout || !layout->resource() || layout->resource() != resource)
-        return;
-    updateLayoutInstruments(resource.dynamicCast<QnLayoutResource>());
+    if (const auto layout = workbench()->currentLayout()->resource())
+        layout->disconnect(this);
+}
+
+void QnWorkbenchController::at_workbench_currentLayoutChanged()
+{
+    if (const auto layout = workbench()->currentLayout()->resource())
+    {
+        connect(layout, &QnLayoutResource::lockedChanged, this,
+            &QnWorkbenchController::updateCurrentLayoutInstruments);
+    }
+    updateCurrentLayoutInstruments();
+}
+
+void QnWorkbenchController::at_accessController_permissionsChanged(const QnResourcePtr& resource)
+{
+    if (workbench()->currentLayout()->resource() == resource)
+        updateCurrentLayoutInstruments();
 }
 
 void QnWorkbenchController::at_zoomedToggle_activated() {
@@ -1524,18 +1496,29 @@ void QnWorkbenchController::at_zoomedToggle_deactivated() {
     m_handScrollInstrument->setMouseButtons(Qt::RightButton);
 }
 
-void QnWorkbenchController::updateLayoutInstruments(const QnLayoutResourcePtr &layout) {
-    if (!layout) {
+void QnWorkbenchController::updateCurrentLayoutInstruments()
+{
+    const auto layout = workbench()->currentLayout();
+    const auto resource = layout->resource();
+    if (!resource)
+    {
         m_moveInstrument->setEnabled(false);
         m_resizingInstrument->setEnabled(false);
+        m_wheelZoomInstrument->setEnabled(false);
         return;
     }
 
-    Qn::Permissions permissions = accessController()->permissions(layout);
+    Qn::Permissions permissions = accessController()->permissions(resource);
     bool writable = permissions & Qn::WritePermission;
 
-    m_moveInstrument->setEnabled(writable && !layout->locked());
-    m_resizingInstrument->setEnabled(writable && !layout->locked());
+    m_moveInstrument->setEnabled(writable && !resource->locked());
+    m_resizingInstrument->setEnabled(writable && !resource->locked()
+        && !layout->flags().testFlag(QnLayoutFlag::NoResize));
+
+    const bool fixedViewport = layout->flags().testFlag(QnLayoutFlag::FixedViewport);
+    m_wheelZoomInstrument->setEnabled(!fixedViewport);
+    m_handScrollInstrument->setEnabled(!fixedViewport);
+    m_gridAdjustmentInstrument->setEnabled(!fixedViewport);
 }
 
 void QnWorkbenchController::at_ptzProcessStarted(QnMediaResourceWidget *widget) {
