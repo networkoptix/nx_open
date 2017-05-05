@@ -67,7 +67,7 @@ P2pConnection::P2pConnection(
     const QUrl& _remotePeerUrl)
 :
     QnCommonModuleAware(commonModule),
-    m_httpClient(nx_http::AsyncHttpClient::create()),
+    m_httpClient(new nx_http::AsyncClient()),
     m_localPeer(localPeer),
     m_direction(Direction::outgoing)
 {
@@ -80,24 +80,9 @@ P2pConnection::P2pConnection(
     m_remotePeer.id = remoteId;
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
 
-
-    connect(
-        m_httpClient.get(),
-        &nx_http::AsyncHttpClient::responseReceived,
-        this,
-        &P2pConnection::onResponseReceived,
-        Qt::DirectConnection);
-
-    connect(
-        m_httpClient.get(),
-        &nx_http::AsyncHttpClient::done,
-        this,
-        &P2pConnection::onHttpClientDone,
-        Qt::DirectConnection);
-
     if (m_remotePeerUrl.userName().isEmpty())
     {
-        fillAuthInfo(m_httpClient, m_credentialsSource == CredentialsSource::serverKey);
+        fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey);
     }
     else
     {
@@ -178,11 +163,11 @@ P2pConnection::~P2pConnection()
         m_httpClient->pleaseStopSync();
 }
 
-void P2pConnection::fillAuthInfo(const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey)
+void P2pConnection::fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey)
 {
     if (!commonModule()->videowallGuid().isNull())
     {
-        httpClient->addAdditionalHeader(
+        m_httpClient->addAdditionalHeader(
             "X-NetworkOptix-VideoWall",
             commonModule()->videowallGuid().toString().toUtf8());
         return;
@@ -193,28 +178,28 @@ void P2pConnection::fillAuthInfo(const nx_http::AsyncHttpClientPtr& httpClient, 
         resPool->getResourceById<QnMediaServerResource>(localPeer().id);
     if (ownServer && authByKey)
     {
-        httpClient->setUserName(ownServer->getId().toString().toLower());
-        httpClient->setUserPassword(ownServer->getAuthKey());
+        m_httpClient->setUserName(ownServer->getId().toString().toLower());
+        m_httpClient->setUserPassword(ownServer->getAuthKey());
     }
     else
     {
         QUrl url;
         if (const auto& connection = commonModule()->ec2Connection())
             url = connection->connectionInfo().ecUrl;
-        httpClient->setUserName(url.userName().toLower());
+        m_httpClient->setUserName(url.userName().toLower());
         if (ApiPeerData::isServer(localPeer().peerType))
         {
             // try auth by admin user if allowed
             QnUserResourcePtr adminUser = resPool->getAdministrator();
             if (adminUser)
             {
-                httpClient->setUserPassword(adminUser->getDigest());
-                httpClient->setAuthType(nx_http::AsyncHttpClient::authDigestWithPasswordHash);
+                m_httpClient->setUserPassword(adminUser->getDigest());
+                m_httpClient->setAuthType(nx_http::AsyncClient::authDigestWithPasswordHash);
             }
         }
         else
         {
-            httpClient->setUserPassword(url.password());
+            m_httpClient->setUserPassword(url.password());
         }
     }
 }
@@ -228,9 +213,18 @@ void P2pConnection::cancelConnecting()
     setState(State::Error);
 }
 
-void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client)
+void P2pConnection::onHttpClientDone()
 {
-    const int statusCode = client->response()->statusLine.statusCode;
+    QnMutexLocker lock(&m_mutex);
+
+    nx_http::AsyncClient::State state = m_httpClient->state();
+    if (state == nx_http::AsyncClient::sFailed)
+    {
+        cancelConnecting();
+        return;
+    }
+
+    const int statusCode = m_httpClient->response()->statusLine.statusCode;
 
     NX_LOG(QnLog::P2P_TRAN_LOG, lit("P2pConnection::at_responseReceived. statusCode = %1").
         arg(statusCode), cl_logDEBUG2);
@@ -240,8 +234,11 @@ void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client
         m_credentialsSource = (CredentialsSource)((int)m_credentialsSource + 1);
         if (m_credentialsSource < CredentialsSource::none)
         {
-            fillAuthInfo(m_httpClient, m_credentialsSource == CredentialsSource::serverKey);
-            m_httpClient->doGet(m_remotePeerUrl);
+            using namespace std::placeholders;
+            fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey);
+            m_httpClient->doGet(
+                m_remotePeerUrl,
+                std::bind(&P2pConnection::onHttpClientDone, this));
         }
         else
         {
@@ -255,14 +252,7 @@ void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client
         return;
     }
 
-
-    if (!client->response())
-    {
-        cancelConnecting();
-        return;
-    }
-
-    const auto& headers = client->response()->headers;
+    const auto& headers = m_httpClient->response()->headers;
     QnUuid remoteGuid = nx_http::getHeaderValue(headers, Qn::EC2_GUID_HEADER_NAME);
     if (remoteGuid.isNull())
     {
@@ -277,16 +267,16 @@ void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client
         setRemoteIdentityTime(itrSystemIdentityTime->second.toLongLong());
 
     nx_http::HttpHeaders::const_iterator ec2CloudHostItr =
-        client->response()->headers.find(Qn::EC2_CLOUD_HOST_HEADER_NAME);
+        m_httpClient->response()->headers.find(Qn::EC2_CLOUD_HOST_HEADER_NAME);
 
     if (!localPeer().isMobileClient())
     {
         //checking remote server protocol version
         nx_http::HttpHeaders::const_iterator ec2ProtoVersionIter =
-            client->response()->headers.find(Qn::EC2_PROTO_VERSION_HEADER_NAME);
+            m_httpClient->response()->headers.find(Qn::EC2_PROTO_VERSION_HEADER_NAME);
 
         m_remotePeerEcProtoVersion =
-            ec2ProtoVersionIter == client->response()->headers.end()
+            ec2ProtoVersionIter == m_httpClient->response()->headers.end()
             ? nx_ec::INITIAL_EC2_PROTO_VERSION
             : ec2ProtoVersionIter->second.toInt();
 
@@ -294,15 +284,15 @@ void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client
         {
             NX_LOG(QnLog::P2P_TRAN_LOG,
                 lm("Cannot connect to server %1 because of different EC2 proto version. "
-                "Local peer version: %2, remote peer version: %3")
-                .arg(client->url()).arg(m_localPeerProtocolVersion)
+                    "Local peer version: %2, remote peer version: %3")
+                .arg(m_httpClient->url()).arg(m_localPeerProtocolVersion)
                 .arg(m_remotePeerEcProtoVersion),
                 cl_logWARNING);
             cancelConnecting();
             return;
         }
 
-        const QString remotePeerCloudHost = ec2CloudHostItr == client->response()->headers.end()
+        const QString remotePeerCloudHost = ec2CloudHostItr == m_httpClient->response()->headers.end()
             ? nx::network::AppInfo::defaultCloudHost()
             : QString::fromUtf8(ec2CloudHostItr->second);
 
@@ -310,8 +300,8 @@ void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client
         {
             NX_LOG(QnLog::P2P_TRAN_LOG,
                 lm("Cannot connect to server %1 because they have different built in cloud host setting. "
-                "Local peer host: %2, remote peer host: %3").
-                arg(client->url()).arg(nx::network::AppInfo::defaultCloudHost()).arg(remotePeerCloudHost),
+                    "Local peer host: %2, remote peer host: %3").
+                arg(m_httpClient->url()).arg(nx::network::AppInfo::defaultCloudHost()).arg(remotePeerCloudHost),
                 cl_logWARNING);
             cancelConnecting();
             return;
@@ -325,7 +315,7 @@ void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client
     NX_ASSERT(!m_remotePeer.instanceId.isNull());
     if (m_remotePeer.id == kCloudPeerId)
         m_remotePeer.peerType = Qn::PT_CloudServer;
-    else if (ec2CloudHostItr == client->response()->headers.end())
+    else if (ec2CloudHostItr == m_httpClient->response()->headers.end())
         m_remotePeer.peerType = Qn::PT_OldServer; // outgoing connections for server or cloud peers only
     else
         m_remotePeer.peerType = Qn::PT_Server; // outgoing connections for server or cloud peers only
@@ -348,7 +338,9 @@ void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client
     {
         // addition stage for server to server connect. It prevent establishing two (incoming and outgoing) connections at once
         if (m_connectionLockGuard->tryAcquireConnecting())
-            m_httpClient->doGet(m_remotePeerUrl);
+            m_httpClient->doGet(
+                m_remotePeerUrl,
+                std::bind(&P2pConnection::onHttpClientDone, this));
         else
             cancelConnecting();
         return;
@@ -361,7 +353,7 @@ void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client
     }
 
     using namespace nx::network;
-    auto error = websocket::validateResponse(client->request(), *client->response());
+    auto error = websocket::validateResponse(m_httpClient->request(), *m_httpClient->response());
     if (error != websocket::Error::noError)
     {
         NX_LOG(QnLog::P2P_TRAN_LOG,
@@ -371,7 +363,7 @@ void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client
         return;
     }
 
-    auto msgBuffer = client->fetchMessageBodyBuffer();
+    auto msgBuffer = m_httpClient->fetchMessageBodyBuffer();
 
     auto socket = m_httpClient->takeSocket();
     auto keepAliveTimeout = commonModule()->globalSettings()->connectionKeepAliveTimeout() * 1000;
@@ -380,34 +372,24 @@ void P2pConnection::onResponseReceived(const nx_http::AsyncHttpClientPtr& client
     socket->setNonBlockingMode(true);
     socket->setNoDelay(true);
 
+    NX_LOG(QnLog::P2P_TRAN_LOG,
+        lit("QnTransactionTransportBase::at_httpClientDone. state = %1").
+        arg((int)m_httpClient->state()), cl_logDEBUG2);
+
     m_webSocket.reset(new WebSocket(std::move(socket), msgBuffer));
     //m_webSocket = std::move(socket);
     //NX_ASSERT(msgBuffer.isEmpty());
     m_httpClient.reset();
     m_miscData.lifetimeTimer.restart();
     setState(State::Connected);
-}
-
-void P2pConnection::onHttpClientDone(const nx_http::AsyncHttpClientPtr& client)
-{
-    QnMutexLocker lock(&m_mutex);
-
-    NX_LOG(QnLog::P2P_TRAN_LOG,
-        lit("QnTransactionTransportBase::at_httpClientDone. state = %1").
-        arg((int)client->state()), cl_logDEBUG2);
-
-    nx_http::AsyncHttpClient::State state = client->state();
-    if (state == nx_http::AsyncHttpClient::sFailed)
-    {
-        cancelConnecting();
-        return;
-    }
 
 }
 
 void P2pConnection::startConnection()
 {
-    m_httpClient->doGet(m_remotePeerUrl);
+    m_httpClient->doGet(
+        m_remotePeerUrl,
+        std::bind(&P2pConnection::onHttpClientDone, this));
 }
 
 void P2pConnection::startReading()

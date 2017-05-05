@@ -53,6 +53,8 @@ public:
     void addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& url);
     void removeOutgoingConnectionFromPeer(const QnUuid& id);
 
+    QMap<QnUuid, P2pConnectionPtr> connections() const;
+
     // Self peer information
     ApiPeerData localPeer() const;
 

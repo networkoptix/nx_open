@@ -1350,4 +1350,10 @@ qint32 P2pMessageBus::distanceTo(const ApiPersistentIdData& peer) const
     return result;
 }
 
+QMap<QnUuid, P2pConnectionPtr> P2pMessageBus::connections() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_connections;
+}
+
 } // ec2

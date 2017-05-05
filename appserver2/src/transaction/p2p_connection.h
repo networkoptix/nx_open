@@ -13,6 +13,7 @@
 #include <QtCore/QElapsedTimer>
 #include "connection_guard.h"
 #include <nx_ec/data/api_tran_state_data.h>
+#include <nx/network/http/http_async_client.h>
 
 namespace ec2 {
 
@@ -117,10 +118,9 @@ signals:
 private:
     void cancelConnecting();
 
-    void onResponseReceived(const nx_http::AsyncHttpClientPtr& client);
-    void onHttpClientDone(const nx_http::AsyncHttpClientPtr& httpClient);
+    void onHttpClientDone();
 
-    void fillAuthInfo(const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey);
+    void fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey);
     void setRemoteIdentityTime(qint64 time);
 
     void onMessageSent(SystemError::ErrorCode errorCode, size_t bytesSent);
@@ -141,7 +141,7 @@ private:
     std::deque<nx::Buffer> m_dataToSend;
     QByteArray m_readBuffer;
 
-    nx_http::AsyncHttpClientPtr m_httpClient;
+    std::unique_ptr<nx_http::AsyncClient> m_httpClient;
     WebSocketPtr m_webSocket;
 
     State m_state = State::Connecting;

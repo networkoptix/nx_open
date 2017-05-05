@@ -18,7 +18,7 @@
 
 namespace {
 
-static const int kInstanceCount = 40;
+static const int kInstanceCount = 100;
 static const int kMaxSyncTimeoutMs = 1000 * 20 * 1000;
 static const int kCamerasCount = 100;
 
@@ -126,7 +126,7 @@ void checkDistance(const std::vector<Appserver2Ptr>& servers, bool waitForSync, 
                     ASSERT_TRUE(bus->isSubscribedTo(peer));
             }
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
     } while (waitForSync && syncDoneCounter != kInstanceCount*kInstanceCount && timer.elapsed() < kMaxSyncTimeoutMs);
 }
 
@@ -162,7 +162,7 @@ void checkSubscription(const std::vector<Appserver2Ptr>& servers, bool waitForSy
                     ASSERT_TRUE(bus->isSubscribedTo(peer));
             }
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
     } while (waitForSync && syncDoneCounter != kInstanceCount*kInstanceCount && timer.elapsed() < kMaxSyncTimeoutMs);
 }
 
@@ -292,6 +292,29 @@ static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverCon
             .arg(totalDbData)
             .arg(counters[i] / (float)totalDbData), cl_logINFO);
     }
+
+    int totalConnections = 0;
+    int startedConnections = 0;
+    for (const auto& server: servers)
+    {
+        ec2::Ec2DirectConnection* connection =
+            dynamic_cast<ec2::Ec2DirectConnection*> (server->moduleInstance()->ecConnection());
+        const auto bus = connection->p2pMessageBus();
+        for (const auto& connection : bus->connections())
+        {
+            ++totalConnections;
+            if (connection->miscData().isLocalStarted)
+                ++startedConnections;
+        }
+    }
+
+    float k = (kInstanceCount-1) * kInstanceCount;
+    NX_LOG(lit("Total connections: %1, ratio %2, opened %3, ratio %4")
+        .arg(totalConnections)
+        .arg(totalConnections / k)
+        .arg(startedConnections)
+        .arg(startedConnections / k), cl_logINFO);
+
 }
 
 TEST(P2pMessageBus, SequenceConnect)
