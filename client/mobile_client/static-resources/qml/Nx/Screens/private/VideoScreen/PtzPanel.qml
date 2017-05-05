@@ -119,36 +119,38 @@ Column
         width: parent.width
         height: 56
 
-        Row
+        PresetsButton
         {
+            id: presetsButton
+
             anchors.left: parent.left
-            anchors.right: hidePtzButton.left
             anchors.verticalCenter: parent.verticalCenter
+
+            resourceId: controller.resourceId
+            popupParent: videoScreen
+            onPresetChoosen: controller.setPresetById(id)
+
+            visible: controller.presetsCount && controller.supportsPresets
+        }
+
+        PresetsListItem
+        {
+            id: presetsItem
+
+            anchors.left: presetsButton.right
+            anchors.right: hidePtzButton.left
+            anchors.rightMargin: 4
+            anchors.verticalCenter: parent.verticalCenter
+
+            presetsCount: controller.presetsCount
+            currentPresetIndex: controller.activePresetIndex
+
             visible: controller.presetsCount && controller.supportsPresets
 
-            PresetsButton
+            onGoToPreset:
             {
-                visible: presetsItem.visible
-                resourceId: controller.resourceId
-                popupParent: videoScreen
-
-                onPresetChoosen: controller.setPresetById(id)
-            }
-
-            PresetsListItem
-            {
-                id: presetsItem
-
-                presetsCount: controller.presetsCount
-                currentPresetIndex: controller.activePresetIndex
-
-                visible: controller.presetsCount && controller.supportsPresets
-
-                onGoToPreset:
-                {
-                    if (presetIndex != -1)
-                        controller.setPresetByIndex(presetIndex)
-                }
+                if (presetIndex != -1)
+                    controller.setPresetByIndex(presetIndex)
             }
         }
 
