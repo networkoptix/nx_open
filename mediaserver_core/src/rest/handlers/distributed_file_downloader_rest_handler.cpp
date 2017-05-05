@@ -6,8 +6,8 @@
 #include <rest/server/json_rest_result.h>
 #include <media_server/media_server_module.h>
 
-using nx::vms::common::DistributedFileDownloader;
-using nx::vms::common::DownloaderFileInformation;
+using nx::vms::common::distributed_file_downloader::Downloader;
+using nx::vms::common::distributed_file_downloader::FileInformation;
 
 namespace {
 
@@ -64,10 +64,10 @@ public:
     int makeInvalidParameterError(
         const QString& parameter,
         const QnRestResult::Error& error = QnRestResult::InvalidParameter);
-    int makeDownloaderError(DistributedFileDownloader::ErrorCode errorCode);
+    int makeDownloaderError(Downloader::ErrorCode errorCode);
 
     QnDistributedFileDownloaderRestHandler* handler;
-    DistributedFileDownloader* const downloader;
+    Downloader* const downloader;
     const QnRequestParamList& params;
     QByteArray& result;
     QByteArray& resultContentType;
@@ -80,7 +80,7 @@ RequestHelper::RequestHelper(
     QByteArray& resultContentType)
     :
     handler(handler),
-    downloader(qnServerModule->findInstance<DistributedFileDownloader>()),
+    downloader(qnServerModule->findInstance<Downloader>()),
     params(params),
     result(result),
     resultContentType(resultContentType)
@@ -89,7 +89,7 @@ RequestHelper::RequestHelper(
 
 int RequestHelper::handleAddDownload()
 {
-    DownloaderFileInformation fileInfo;
+    FileInformation fileInfo;
 
     fileInfo.name = params.value("fileName");
     if (fileInfo.name.isEmpty())
@@ -123,7 +123,7 @@ int RequestHelper::handleAddDownload()
     }
 
     const auto errorCode = downloader->addFile(fileInfo);
-    if (errorCode != DistributedFileDownloader::ErrorCode::noError)
+    if (errorCode != Downloader::ErrorCode::noError)
         return makeDownloaderError(errorCode);
 
     return nx_http::StatusCode::ok;
@@ -138,7 +138,7 @@ int RequestHelper::handleRemoveDownload()
     const bool deleteData = params.value("deleteData", "true") != "false";
 
     const auto errorCode = downloader->deleteFile(fileName, deleteData);
-    if (errorCode != DistributedFileDownloader::ErrorCode::noError)
+    if (errorCode != Downloader::ErrorCode::noError)
         return makeDownloaderError(errorCode);
 
     return nx_http::StatusCode::ok;
@@ -174,7 +174,7 @@ int RequestHelper::handleDownloadChunk()
 
     QByteArray data;
     const auto errorCode = downloader->readFileChunk(fileName, chunkIndex, data);
-    if (errorCode != DistributedFileDownloader::ErrorCode::noError)
+    if (errorCode != Downloader::ErrorCode::noError)
         return makeDownloaderError(errorCode);
 
     result = data;
@@ -203,7 +203,7 @@ int RequestHelper::handleUploadChunk(const QByteArray& body, const QByteArray& c
     }
 
     const auto errorCode = downloader->writeFileChunk(fileName, chunkIndex, body);
-    if (errorCode != DistributedFileDownloader::ErrorCode::noError)
+    if (errorCode != Downloader::ErrorCode::noError)
         return makeDownloaderError(errorCode);
 
     return nx_http::StatusCode::ok;
@@ -223,7 +223,7 @@ int RequestHelper::handleStatus()
     }
     else
     {
-        QList<DownloaderFileInformation> infoList;
+        QList<FileInformation> infoList;
         for (const auto& fileName: downloader->files())
         {
             const auto& fileInfo = downloader->fileInformation(fileName);
@@ -261,7 +261,7 @@ int RequestHelper::makeInvalidParameterError(
         parameter);
 }
 
-int RequestHelper::makeDownloaderError(DistributedFileDownloader::ErrorCode errorCode)
+int RequestHelper::makeDownloaderError(Downloader::ErrorCode errorCode)
 {
     return makeError(
         nx_http::StatusCode::internalServerError,

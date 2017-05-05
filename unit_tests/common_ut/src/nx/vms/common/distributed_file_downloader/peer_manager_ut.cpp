@@ -39,7 +39,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, invalidPeerRequest)
 
     bool called = false;
     const auto handle = peerManager->requestFileInfo(peer, "test",
-        [&](bool, rest::Handle, const DownloaderFileInformation&)
+        [&](bool, rest::Handle, const FileInformation&)
         {
             // Should not be called.
             called = true;
@@ -62,7 +62,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, fileInfo)
 
     bool ok = false;
     peerManager->requestFileInfo(peer, fileInformation.name,
-        [&](bool success, rest::Handle /*handle*/, const DownloaderFileInformation& fileInfo)
+        [&](bool success, rest::Handle /*handle*/, const FileInformation& fileInfo)
         {
             ok = success && fileInfo.name == fileInformation.name;
         });
@@ -80,9 +80,9 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, emptyFileInfo)
 
     bool ok = false;
     peerManager->requestFileInfo(peer, "test",
-        [&](bool success, rest::Handle /*handle*/, const DownloaderFileInformation& fileInfo)
+        [&](bool success, rest::Handle /*handle*/, const FileInformation& fileInfo)
     {
-        ok = !success && fileInfo.status == DownloaderFileInformation::Status::notFound;
+        ok = !success && fileInfo.status == FileInformation::Status::notFound;
     });
 
     peerManager->processRequests();
@@ -125,9 +125,9 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, usingStorage)
     const auto& peer = peerManager->addPeer();
     peerManager->setPeerStorage(peer, storage);
 
-    DownloaderFileInformation originalFileInfo("test");
-    originalFileInfo.status = DownloaderFileInformation::Status::downloaded;
-    NX_ASSERT(storage->addFile(originalFileInfo) == DistributedFileDownloader::ErrorCode::noError);
+    FileInformation originalFileInfo("test");
+    originalFileInfo.status = FileInformation::Status::downloaded;
+    NX_ASSERT(storage->addFile(originalFileInfo) == Downloader::ErrorCode::noError);
 
     originalFileInfo = storage->fileInformation(fileName);
     const auto originalChecksums = storage->getChunkChecksums(fileName);
@@ -136,7 +136,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, usingStorage)
     TestPeerManager::FileInformation fileInfo;
 
     peerManager->requestFileInfo(peer, fileName,
-        [&](bool success, rest::Handle /*handle*/, const DownloaderFileInformation& peerFileInfo)
+        [&](bool success, rest::Handle /*handle*/, const FileInformation& peerFileInfo)
         {
             fileInfoReceived = success;
             fileInfo = peerFileInfo;

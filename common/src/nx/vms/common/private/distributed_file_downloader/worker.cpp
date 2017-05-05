@@ -152,15 +152,15 @@ void Worker::nextStep()
     switch (m_state)
     {
         case State::initial:
-            if (fileInfo.status == DownloaderFileInformation::Status::downloaded)
+            if (fileInfo.status == FileInformation::Status::downloaded)
                 finish();
             else if (fileInfo.size < 0 || fileInfo.md5.isEmpty())
                 requestFileInformation();
-            else if (fileInfo.status == DownloaderFileInformation::Status::corrupted)
+            else if (fileInfo.status == FileInformation::Status::corrupted)
                 requestChecksums();
             else if (!haveChunksToDownload())
                 requestAvailableChunks();
-            else if (fileInfo.status == DownloaderFileInformation::Status::downloading)
+            else if (fileInfo.status == FileInformation::Status::downloading)
                 downloadNextChunk();
             else
                 NX_ASSERT(false, "Invalid state.");
@@ -194,13 +194,13 @@ void Worker::nextStep()
         case State::downloadingChunks:
             switch (fileInfo.status)
             {
-                case DownloaderFileInformation::Status::downloaded:
+                case FileInformation::Status::downloaded:
                     finish();
                     break;
-                case DownloaderFileInformation::Status::corrupted:
+                case FileInformation::Status::corrupted:
                     requestChecksums();
                     break;
-                case DownloaderFileInformation::Status::downloading:
+                case FileInformation::Status::downloading:
                     downloadNextChunk();
                     break;
                 default:
@@ -230,7 +230,7 @@ void Worker::requestFileInformationInternal()
     }
 
     auto handleReply =
-        [this](bool success, rest::Handle handle, const DownloaderFileInformation& fileInfo)
+        [this](bool success, rest::Handle handle, const FileInformation& fileInfo)
         {
             const auto peerId = m_peerByRequestHandle.take(handle);
             if (peerId.isNull())
@@ -272,7 +272,7 @@ void Worker::requestFileInformationInternal()
                 const auto errorCode = m_storage->updateFileInformation(
                     fileInfo.name, fileInfo.size, fileInfo.md5);
 
-                if (errorCode != DistributedFileDownloader::ErrorCode::noError)
+                if (errorCode != Downloader::ErrorCode::noError)
                 {
                     NX_LOGX(
                         logMessage("During update storage returned error: %1").arg(
@@ -373,7 +373,7 @@ void Worker::requestChecksums()
             const auto errorCode =
                 m_storage->setChunkChecksums(m_fileName, checksums);
 
-            if (errorCode != DistributedFileDownloader::ErrorCode::noError)
+            if (errorCode != Downloader::ErrorCode::noError)
             {
                 NX_LOGX(
                     logMessage("Cannot set checksums: %1").arg(QnLexical::serialized(errorCode)),
@@ -384,7 +384,7 @@ void Worker::requestChecksums()
             NX_LOGX(logMessage("Updated checksums."), cl_logDEBUG1);
 
             const auto& fileInfo = fileInformation();
-            if (fileInfo.status != DownloaderFileInformation::Status::downloading
+            if (fileInfo.status != FileInformation::Status::downloading
                 || fileInfo.downloadedChunks.count(true) == fileInfo.downloadedChunks.size())
             {
                 fail();
@@ -460,7 +460,7 @@ void Worker::downloadNextChunk()
             }
 
             const auto errorCode = m_storage->writeFileChunk(m_fileName, chunkIndex, data);
-            if (errorCode != DistributedFileDownloader::ErrorCode::noError)
+            if (errorCode != Downloader::ErrorCode::noError)
             {
                 NX_LOGX(
                     logMessage("Cannot write chunk. Storage error: %1").arg(
@@ -537,7 +537,7 @@ QList<QnUuid> Worker::peersForChunk(int chunkIndex) const
     return result;
 }
 
-DownloaderFileInformation Worker::fileInformation() const
+FileInformation Worker::fileInformation() const
 {
     const auto& fileInfo = m_storage->fileInformation(m_fileName);
     NX_ASSERT(fileInfo.isValid());

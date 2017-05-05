@@ -25,7 +25,7 @@ public:
     virtual int distanceTo(const QnUuid& peerId) const = 0;
 
     using FileInfoCallback =
-        std::function<void(bool, rest::Handle, const DownloaderFileInformation&)>;
+        std::function<void(bool, rest::Handle, const FileInformation&)>;
     virtual rest::Handle requestFileInfo(
         const QnUuid& peer,
         const QString& fileName,

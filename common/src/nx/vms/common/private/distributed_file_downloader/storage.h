@@ -11,14 +11,14 @@ namespace vms {
 namespace common {
 namespace distributed_file_downloader {
 
-struct FileMetadata: DownloaderFileInformation
+struct FileMetadata: FileInformation
 {
     FileMetadata()
     {
     }
 
-    FileMetadata(const DownloaderFileInformation& fileInformation):
-        DownloaderFileInformation(fileInformation)
+    FileMetadata(const FileInformation& fileInformation):
+        FileInformation(fileInformation)
     {
     }
 
@@ -36,30 +36,30 @@ public:
 
     QString filePath(const QString& fileName) const;
 
-    DownloaderFileInformation fileInformation(const QString& fileName) const;
+    FileInformation fileInformation(const QString& fileName) const;
 
-    DistributedFileDownloader::ErrorCode addFile(const DownloaderFileInformation& fileInfo);
+    Downloader::ErrorCode addFile(const FileInformation& fileInfo);
 
-    DistributedFileDownloader::ErrorCode updateFileInformation(
+    Downloader::ErrorCode updateFileInformation(
         const QString& fileName,
         qint64 size,
         const QByteArray& md5);
 
-    DistributedFileDownloader::ErrorCode readFileChunk(
+    Downloader::ErrorCode readFileChunk(
         const QString& fileName,
         int chunkIndex,
         QByteArray& buffer);
 
-    DistributedFileDownloader::ErrorCode writeFileChunk(
+    Downloader::ErrorCode writeFileChunk(
         const QString& fileName,
         int chunkIndex,
         const QByteArray& buffer);
 
-    DistributedFileDownloader::ErrorCode deleteFile(
+    Downloader::ErrorCode deleteFile(
         const QString& fileName, bool deleteData = true);
 
     QVector<QByteArray> getChunkChecksums(const QString& fileName);
-    DistributedFileDownloader::ErrorCode setChunkChecksums(
+    Downloader::ErrorCode setChunkChecksums(
         const QString& fileName, const QVector<QByteArray>& chunkChecksums);
 
     void findDownloads();
@@ -73,7 +73,7 @@ private:
     bool saveMetadata(const FileMetadata& fileInformation);
     FileMetadata loadMetadata(const QString& fileName);
     FileMetadata fileMetadata(const QString& fileName) const;
-    DistributedFileDownloader::ErrorCode loadDownload(const QString& fileName);
+    Downloader::ErrorCode loadDownload(const QString& fileName);
     void checkDownloadCompleted(FileMetadata& fileInfo);
 
     static bool reserveSpace(const QString& fileName, const qint64 size);

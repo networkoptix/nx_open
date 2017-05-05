@@ -15,11 +15,11 @@ class Storage;
 class TestPeerManager: public AbstractPeerManager
 {
 public:
-    struct FileInformation: DownloaderFileInformation
+    struct FileInformation: distributed_file_downloader::FileInformation
     {
-        using DownloaderFileInformation::DownloaderFileInformation;
+        using distributed_file_downloader::FileInformation::FileInformation;
         FileInformation() = default;
-        FileInformation(const DownloaderFileInformation& fileInfo);
+        FileInformation(const distributed_file_downloader::FileInformation& fileInfo);
 
         QString filePath;
         QVector<QByteArray> checksums;

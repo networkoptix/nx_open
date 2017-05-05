@@ -285,8 +285,10 @@ void ProxyTestPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle hand
     m_peerManager->cancelRequest(peerId, handle);
 }
 
-TestPeerManager::FileInformation::FileInformation(const DownloaderFileInformation& fileInfo):
-    DownloaderFileInformation(fileInfo)
+TestPeerManager::FileInformation::FileInformation(
+    const distributed_file_downloader::FileInformation& fileInfo)
+    :
+    distributed_file_downloader::FileInformation(fileInfo)
 {
 }
 

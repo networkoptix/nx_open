@@ -74,9 +74,9 @@ rest::Handle ResourcePoolPeerManager::requestFileInfo(
         [this, callback](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             if (!success)
-                callback(success, handle, DownloaderFileInformation());
+                callback(success, handle, FileInformation());
 
-            const auto& fileInfo = result.deserialized<DownloaderFileInformation>();
+            const auto& fileInfo = result.deserialized<FileInformation>();
             callback(success, handle, fileInfo);
         };
 

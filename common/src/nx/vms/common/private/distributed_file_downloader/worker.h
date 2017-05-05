@@ -93,7 +93,7 @@ private:
     QList<QnUuid> peersForChunk(int chunkIndex) const;
 
 protected:
-    DownloaderFileInformation fileInformation() const;
+    FileInformation fileInformation() const;
 
     QList<QnUuid> allPeers() const;
     QList<QnUuid> selectPeersForOperation(

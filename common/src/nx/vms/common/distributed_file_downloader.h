@@ -12,20 +12,17 @@
 namespace nx {
 namespace vms {
 namespace common {
-
 namespace distributed_file_downloader {
 
 class AbstractPeerManagerFactory;
 
-} // namespace distributed_file_downloader
-
-struct DownloaderFileInformation
+struct FileInformation
 {
     Q_GADGET
 
 public:
-    DownloaderFileInformation();
-    DownloaderFileInformation(const QString& fileName);
+    FileInformation();
+    FileInformation(const QString& fileName);
 
     bool isValid() const;
 
@@ -52,11 +49,11 @@ public:
     Status status = Status::notFound;
     QBitArray downloadedChunks;
 };
-#define DownloaderFileInformation_Fields \
+#define FileInformation_Fields \
     (name)(size)(md5)(url)(chunkSize)(status)(downloadedChunks)
 
-class DistributedFileDownloaderPrivate;
-class DistributedFileDownloader: public QObject, public QnCommonModuleAware
+class DownloaderPrivate;
+class Downloader: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
 
@@ -76,21 +73,21 @@ public:
     };
     Q_ENUM(ErrorCode)
 
-    DistributedFileDownloader(
+    Downloader(
         const QDir& downloadsDirectory,
         QnCommonModule* commonModule,
-        distributed_file_downloader::AbstractPeerManagerFactory* peerManagerFactory = nullptr,
+        AbstractPeerManagerFactory* peerManagerFactory = nullptr,
         QObject* parent = nullptr);
 
-    ~DistributedFileDownloader();
+    ~Downloader();
 
     QStringList files() const;
 
     QString filePath(const QString& fileName) const;
 
-    DownloaderFileInformation fileInformation(const QString& fileName) const;
+    FileInformation fileInformation(const QString& fileName) const;
 
-    ErrorCode addFile(const DownloaderFileInformation& fileInformation);
+    ErrorCode addFile(const FileInformation& fileInformation);
 
     ErrorCode updateFileInformation(
         const QString& fileName,
@@ -112,14 +109,15 @@ public:
     QVector<QByteArray> getChunkChecksums(const QString& fileName);
 
 private:
-    QScopedPointer<DistributedFileDownloaderPrivate> const d_ptr;
-    Q_DECLARE_PRIVATE(DistributedFileDownloader)
+    QScopedPointer<DownloaderPrivate> const d_ptr;
+    Q_DECLARE_PRIVATE(Downloader)
 };
 
-QN_FUSION_DECLARE_FUNCTIONS(DownloaderFileInformation, (json))
-QN_FUSION_DECLARE_FUNCTIONS(DownloaderFileInformation::Status, (lexical))
-QN_FUSION_DECLARE_FUNCTIONS(DistributedFileDownloader::ErrorCode, (lexical))
+QN_FUSION_DECLARE_FUNCTIONS(FileInformation, (json))
+QN_FUSION_DECLARE_FUNCTIONS(FileInformation::Status, (lexical))
+QN_FUSION_DECLARE_FUNCTIONS(Downloader::ErrorCode, (lexical))
 
+} // namespace distributed_file_downloader
 } // namespace common
 } // namespace vms
 } // namespace nx
