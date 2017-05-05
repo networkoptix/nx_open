@@ -313,6 +313,11 @@ private:
     void checkSystemTimeForChange();
     void handleLocalTimePriorityKeyChange(QnMutexLockerBase* const lk);
 
+    void TimeSynchronizationManager::saveSyncTimeAsync(
+        QnMutexLockerBase* const lk,
+        qint64 syncTimeToLocalDelta,
+        TimePriorityKey syncTimeKey);
+
     void saveSyncTimeAsync(
         qint64 syncTimeToLocalDelta,
         const TimePriorityKey& syncTimeKey);
