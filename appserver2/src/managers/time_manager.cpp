@@ -1496,9 +1496,8 @@ void TimeSynchronizationManager::saveSyncTimeAsync(
     qint64 syncTimeToLocalDelta,
     TimePriorityKey syncTimeKey)
 {
-    lk->unlock();
+    QnMutexUnlocker unlocker(lk);
     saveSyncTimeAsync(syncTimeToLocalDelta, syncTimeKey);
-    lk->relock();
 }
 
 /**
