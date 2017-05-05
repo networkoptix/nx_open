@@ -252,8 +252,10 @@ bool ModuleConnector::Module::saveConnection(
     NX_LOGX(lm("Connected to %1").strs(m_id), cl_logDEBUG2);
     m_parent->m_connectedHandler(information, std::move(endpoint));
 
-    // TODO: It is better to reask for moduleInformation instead of connection failure wait,
-    // but is easier for now.
+    // TODO: Currently mediaserver keepAlive timeout is set to 5 seconds, it means we will go
+    // for reconnect attempt every timeout. It looks like we do not have any options for
+    // old servers.
+    // For new servers we could use WebSocket streams to reduce traffic to WebSocket keep alives.
     auto socket = client->takeSocket();
     if (!socket->setRecvTimeout(0) || !socket->setKeepAlive(kKeepAliveOptions))
     {
