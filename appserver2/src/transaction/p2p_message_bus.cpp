@@ -579,6 +579,7 @@ void P2pMessageBus::startStopConnections()
 
     int counter = kMaxConnectionsAtOnce;
     // start using connection if need
+    const int kMaxSubscriptionToResubscribe = std::sqrt(std::max(m_connections.size(), (int) m_remoteUrls.size()));
     for (auto& connection: m_connections)
     {
         if (connection->state() != P2pConnection::State::Connected ||  connection->miscData().isLocalStarted)
@@ -588,7 +589,6 @@ void P2pMessageBus::startStopConnections()
         qint32 currentDistance = allPeerDistances.value(peer).minDistance();
         auto subscribedVia = currentSubscription.value(peer);
         static const int kMaxDistanceToUseProxy = 2;
-        static const int kMaxSubscriptionToResubscribe = 5;
         if (currentDistance > kMaxDistanceToUseProxy ||
             (subscribedVia && subscribedVia->miscData().localSubscription.size() > kMaxSubscriptionToResubscribe))
         {
