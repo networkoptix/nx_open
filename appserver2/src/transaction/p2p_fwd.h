@@ -1,6 +1,7 @@
 #pragma once
 #include <nx_ec/data/api_peer_data.h>
 #include <nx/fusion/fusion/fusion_fwd.h>
+#include <utils/media/bitStream.h>
 
 namespace ec2 {
 
@@ -43,5 +44,9 @@ static const qint32 kMaxOnlineDistance = 16384;
 static const char* kP2pProtoName = "p2p";
 
 Q_DECLARE_METATYPE(MessageType)
+
+void serializeCompressPeerNumber(BitStreamWriter& writer, PeerNumberType peerNumber);
+PeerNumberType deserializeCompressPeerNumber(BitStreamReader& reader);
+
 
 } // namespace ec2

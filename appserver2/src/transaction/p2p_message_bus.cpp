@@ -245,39 +245,6 @@ void P2pMessageBus::createOutgoingConnections()
     }
 }
 
-void serializeCompressPeerNumber(BitStreamWriter& writer, PeerNumberType peerNumber)
-{
-    const static std::array<int, 3> bitsGroups = { 7, 3, 4 };
-    const static int mask = 0x3fff;  //< only low 14 bits are supported
-    NX_ASSERT(peerNumber <= mask);
-    peerNumber &= mask;
-    for (const auto& bits: bitsGroups)
-    {
-        writer.putBits(bits, peerNumber);
-        peerNumber >>= bits;
-        if (peerNumber == 0)
-        {
-            writer.putBit(0); //< end of number
-            break;
-        }
-        writer.putBit(1); //< number continuation
-    }
-}
-
-PeerNumberType deserializeCompressPeerNumber(BitStreamReader& reader)
-{
-    const static std::array<int, 3> bitsGroups = { 7, 3, 4 };
-    PeerNumberType peerNumber = 0;
-    for (int i = 0; i < bitsGroups.size(); ++i)
-    {
-        peerNumber <<= bitsGroups[i];
-        peerNumber += reader.getBits(bitsGroups[i]);
-        if (i == bitsGroups.size() - 1 || reader.getBit() == 0)
-            break;
-    }
-    return peerNumber;
-}
-
 void P2pMessageBus::addOwnfInfoToPeerList()
 {
     if (m_alivePeers.isEmpty())

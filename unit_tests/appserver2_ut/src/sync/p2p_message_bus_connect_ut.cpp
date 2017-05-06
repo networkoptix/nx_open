@@ -18,7 +18,7 @@
 
 namespace {
 
-static const int kInstanceCount = 100;
+static const int kInstanceCount = 126;
 static const int kMaxSyncTimeoutMs = 1000 * 20 * 1000;
 static const int kCamerasCount = 100;
 
@@ -330,4 +330,38 @@ TEST(P2pMessageBus, SequenceConnect)
 TEST(P2pMessageBus, FullConnect)
 {
     testMain(fullConnect);
+}
+
+TEST(P2pMessageBus, CompressPeerNumber)
+{
+    using namespace ec2;
+
+    QVector<PeerNumberType> peers;
+    for (int i = 0; i < kMaxOnlineDistance; ++i)
+        peers.push_back(i);
+    QVector<PeerNumberType> peers2;
+
+    try
+    {
+
+        // serialize
+        QByteArray serializedData;
+        serializedData.resize(peers.size() * 2);
+        BitStreamWriter writer;
+        writer.setBuffer((quint8*) serializedData.data(), serializedData.size());
+        for (const auto& peer : peers)
+            serializeCompressPeerNumber(writer, peer);
+        writer.flushBits();
+        serializedData.truncate(writer.getBytesCount());
+
+        // deserialize back
+        BitStreamReader reader((const quint8*)serializedData.data(), serializedData.size());
+        while (reader.bitsLeft() >= 8)
+            peers2.push_back(deserializeCompressPeerNumber(reader));
+    }
+    catch (...)
+    {
+        ASSERT_TRUE(0);
+    }
+    ASSERT_EQ(peers, peers2);
 }
