@@ -1,3 +1,6 @@
+#include <set>
+#include <tuple>
+
 #include <gtest/gtest.h>
 
 #include <nx/network/buffered_stream_socket.h>
@@ -5,6 +8,7 @@
 #include <nx/network/connection_server/stream_socket_server.h>
 #include <nx/network/reverse_connection_acceptor.h>
 #include <nx/network/system_socket.h>
+#include <nx/utils/thread/sync_queue.h>
 
 namespace nx {
 namespace network {
@@ -25,18 +29,74 @@ public:
         base_type(connectionManager, std::move(streamSocket))
     {
     }
+
+    void readyToSendData()
+    {
+        // TODO
+    }
+
+    void bytesReceived(const nx::Buffer& /*buf*/)
+    {
+        // TODO
+    }
 };
+
+//-------------------------------------------------------------------------------------------------
 
 class TestServer:
     public nx::network::server::StreamSocketServer<TestServer, TestConnection>
 {
+    using base_type = server::StreamSocketServer<TestServer, TestConnection>;
+
+public:
+    TestServer():
+        base_type(false, NatTraversalSupport::disabled)
+    {
+        m_randomData.resize(100);
+    }
+
+    void sendAnythingThroughAnyConnection()
+    {
+        QnMutexLocker lock(&m_mutex);
+        (*m_connections.begin())->sendBufAsync(m_randomData);
+    }
+
+    std::size_t connectionCount() const
+    {
+        QnMutexLocker lock(&m_mutex);
+        return m_connections.size();
+    }
+
 protected:
     virtual std::shared_ptr<TestConnection> createConnection(
         std::unique_ptr<AbstractStreamSocket> _socket) override
     {
-        return std::make_shared<TestConnection>(this, std::move(_socket));
+        auto connection = std::make_shared<TestConnection>(this, std::move(_socket));
+        {
+            QnMutexLocker lock(&m_mutex);
+            m_connections.erase(connection.get());
+        }
+        return connection;
     }
+
+    virtual void closeConnection(
+        SystemError::ErrorCode closeReason,
+        TestConnection* connection) override
+    {
+        {
+            QnMutexLocker lock(&m_mutex);
+            m_connections.erase(connection);
+        }
+        base_type::closeConnection(closeReason, connection);
+    }
+
+private:
+    mutable QnMutex m_mutex;
+    std::set<TestConnection*> m_connections;
+    nx::Buffer m_randomData;
 };
+
+//-------------------------------------------------------------------------------------------------
 
 class ReverseConnection:
     public BufferedStreamSocket,
@@ -67,6 +127,8 @@ private:
 
 } // namespace
 
+//-------------------------------------------------------------------------------------------------
+
 class ReverseConnectionAcceptor:
     public ::testing::Test
 {
@@ -76,33 +138,64 @@ public:
     {
     }
 
+    ~ReverseConnectionAcceptor()
+    {
+        m_server.pleaseStopSync();
+    }
+
 protected:
     void givenReadyConnection()
     {
-        // TODO
+        whenConnectionBecameReady();
     }
 
     void whenInvokedAcceptAsync()
     {
-        // TODO
+        using namespace std::placeholders;
+
+        m_acceptor.acceptAsync(
+            std::bind(&ReverseConnectionAcceptor::onAccepted, this, _1, _2));
     }
 
     void whenConnectionBecameReady()
     {
-        // TODO
+        while (m_server.connectionCount() == 0)
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        m_server.sendAnythingThroughAnyConnection();
     }
 
-    void thenConnectionHasBeenProvided()
+    void thenConnectionHasBeenAccepted()
     {
-        // TODO
+        auto acceptResult = m_acceptedConnections.pop();
+        ASSERT_EQ(SystemError::noError, std::get<0>(acceptResult));
+        ASSERT_NE(nullptr, std::get<1>(acceptResult));
     }
 
 private:
+    using AcceptResult = 
+        std::tuple<SystemError::ErrorCode, std::unique_ptr<ReverseConnection>>;
+
+    nx::utils::SyncQueue<AcceptResult> m_acceptedConnections;
     network::ReverseConnectionAcceptor<ReverseConnection> m_acceptor;
+    TestServer m_server;
+
+    virtual void SetUp() override
+    {
+        ASSERT_TRUE(m_server.bind(SocketAddress::anyPrivateAddress) && m_server.listen());
+        m_acceptor.start();
+    }
     
     std::unique_ptr<ReverseConnection> createReverseConnection()
     {
-        return std::make_unique<ReverseConnection>(SocketAddress());
+        return std::make_unique<ReverseConnection>(m_server.address());
+    }
+
+    void onAccepted(
+        SystemError::ErrorCode sysErrorCode,
+        std::unique_ptr<ReverseConnection> connection)
+    {
+        m_acceptedConnections.push(
+            std::make_tuple(sysErrorCode, std::move(connection)));
     }
 };
 
@@ -110,14 +203,14 @@ TEST_F(ReverseConnectionAcceptor, ready_connection_is_returned_by_listening_acce
 {
     whenInvokedAcceptAsync();
     whenConnectionBecameReady();
-    thenConnectionHasBeenProvided();
+    thenConnectionHasBeenAccepted();
 }
 
 TEST_F(ReverseConnectionAcceptor, ready_connection_is_peeked_by_acceptAsync)
 {
     givenReadyConnection();
     whenInvokedAcceptAsync();
-    thenConnectionHasBeenProvided();
+    thenConnectionHasBeenAccepted();
 }
 
 //TEST_F(ReverseConnectionAcceptor, ready_connection_is_peeked_by_getNextConnectionIfAny)
