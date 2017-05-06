@@ -233,7 +233,6 @@ public:
 
     static QnInitResPool* initAsyncPoolInstance();
     static bool isStopping() { return m_appStopping; }
-    void setRemovedFromPool(bool value);
 
     virtual bool saveParams();
     virtual int saveParamsAsync();
@@ -410,7 +409,6 @@ private:
     QAtomicInt m_initializationAttemptCount;
     //!map<key, <value, isDirty>>
     std::map<QString, LocalPropertyValue> m_locallySavedProperties;
-    bool m_removedFromPool;
     bool m_initInProgress;
     QnCommonModule* m_commonModule;
 };
