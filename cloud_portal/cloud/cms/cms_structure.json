@@ -1,0 +1,67 @@
+{
+  "product":"cloud_portal",
+  "contexts":[
+    {
+      "name":"branding",
+      "description":"common branding constants",
+      "translatable": false,
+      "structure":[
+        {
+          "description":"Name for cloud",
+          "name":"{{PRODUCT_NAME}}",
+          "default":"VMS Demo Cloud"
+        },
+        {
+          "description":"URL protocol for calling native clients from browser",
+          "name":"{{CLIENT_PROTOCOL}}",
+          "default":"demo-vms"
+        },
+        {
+          "description":"Name of the VMS customization. Must be short!",
+          "name":"{{VMS_NAME}}",
+          "default":"VMS Demonstration"
+        },
+        {
+          "description":"Emergency link for downloading applications (in case if cloud is down)",
+          "name":"{{downloadLink}}",
+          "default":"http://www.networkoptix.com/live-demo#fulltrial"
+        },
+        {
+          "description":"Support link. If you use phone number here - make sure you format the link correctly like 'tel:...'",
+          "name":"{{supportLink}}",
+          "default":"http://support.networkoptix.com"
+        },
+        {
+          "description":"Text to be shown on the support link",
+          "name":"{{supportLinkText}}",
+          "default":"http://support.networkoptix.com"
+        },
+        {
+          "description":"Company main web site",
+          "name":"{{companyUrl}}",
+          "default":"http://networkoptix.com"
+        },
+        {
+          "description":"App ID for iOS mobile application",
+          "name":"{{iOSappID}}",
+          "default":"L6FE34GJWM.com.networkoptix.NxMobile"
+        },
+        {
+          "description":"Link for iOS application in Apple AppStore",
+          "name":"{{IOS_APP_LINK}}",
+          "default":"disabled"
+        },
+        {
+          "description":"Link for Android application in Google Play",
+          "name":"{{ANDROID_APP_LINK}}",
+          "default":"disabled"
+        },
+        {
+          "description":"The name of the company itself",
+          "name": "{{COMPANY_NAME}}",
+          "default": "Network Optix"
+        }
+      ]
+    }
+  ]
+}

@@ -12,7 +12,7 @@ class Product(models.Model):
 
 
 class Context(models.Model):
-    product = models.ForeignKey(Product)
+    product = models.ForeignKey(Product, null=True)
     name = models.CharField(max_length=1024)
     description = models.TextField()
     translatable = models.BooleanField(default=True)

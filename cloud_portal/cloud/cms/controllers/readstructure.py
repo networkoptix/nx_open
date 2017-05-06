@@ -5,16 +5,10 @@
 # create report: added vs outdated
 import os
 import re
+import filldata
 from ..models import Product, Context, DataStructure
 
-STATIC_DIR = 'static/default/source/'
 #  from cms.controllers.readstructure import *
-
-
-def customizable_file(filename):
-    supported_format = filename.endswith('.json') or filename.endswith('.html') or filename.endswith('.mustache')
-    supported_directory = "lang_" not in filename or "lang_en_US" in filename
-    return supported_format and supported_directory
 
 
 def find_or_add_context(context_name, product_id, has_language):
@@ -41,17 +35,10 @@ def read_cms_strings(filename):
 
 
 def read_structure_file(filename, product_id):
+    context_name, language = filldata.context_for_file(filename, 'default')
 
-    context_name = filename.replace(STATIC_DIR, '')
-
-    # now read file and get records from there.
-    # if there is no records at all - we ignore it
-
-    has_language = "lang_en_US" in context_name
-    if has_language:
-        context_name = context_name.replace("lang_en_US", "lang_{{language}}")
-    # here - ignore lang_...
-
+    if language and language != "en_US":
+        return
     # now read file and get records from there.
     strings = read_cms_strings(filename)
 
@@ -60,15 +47,12 @@ def read_structure_file(filename, product_id):
         print context_name
         print strings
 
-        context = find_or_add_context(context_name, product_id, has_language)
+        context = find_or_add_context(context_name, product_id, bool(language))
         for string in strings:
-            find_or_add_data_stucture(string, context.id, has_language)
+            find_or_add_data_stucture(string, context.id, bool(language))
 
 
 def read_structure():
     product_id = Product.objects.get(name='cloud_portal').id
-    for root, dirs, files in os.walk(STATIC_DIR):
-        for filename in files:
-            file = os.path.join(root, filename)
-            if customizable_file(file):
-                read_structure_file(file, product_id)
+    for file in filldata.iterate_cms_files('default'):
+        read_structure_file(file, product_id)

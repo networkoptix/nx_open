@@ -1,37 +1,89 @@
 from ..models import *
 import os
+import re
 
-# fill data from CMS (database) to sources
+
+STATIC_DIR = 'static/{{customization}}/source/'
 
 
-def process_context(context, language, customization):
-    filename = context.file_path.replace("{{language}}", language.code)
-    source_file = os.path.join('static', customization.name, 'source', filename)
-    with open(source_file, 'r') as file:
-        content = file.read()
+def customizable_file(filename):
+    supported_format = filename.endswith('.json') or filename.endswith('.html') or filename.endswith('.mustache')
+    supported_directory = "lang_" not in filename or "lang_en_US" in filename
+    return supported_format and supported_directory
 
-    # for each structure record:
-    for record in context.datastructure_set():
+
+def context_for_file(filename, customization_name):
+    custom_dir = STATIC_DIR.replace("{{customization}}", customization_name)
+    context_name = filename.replace(custom_dir, '')
+    match = re.search(r'lang_(.+?)/', context_name)
+    language = None
+    if match:
+        language = match.group(1)
+        context_name = context_name.replace(match.group(0), 'lang_{{language}}/')
+    return context_name, language
+
+
+def iterate_cms_files(customization_name):
+    custom_dir = STATIC_DIR.replace("{{customization}}", customization_name)
+    for root, dirs, files in os.walk(custom_dir):
+        for filename in files:
+            file = os.path.join(root, filename)
+            if customizable_file(file):
+                yield file
+
+
+def process_context_structure(customization, context, content, language):
+    for record in context.datastructure_set.all():
         # try to get translated content
-        content_record = DataRecord.object.filter(language_id=language.id,
-                                                  data_structure_id=record.id,
-                                                  customization_id=customization.id)
+        if language:
+            content_record = DataRecord.objects.filter(language_id=language.id,
+                                                      data_structure_id=record.id,
+                                                      customization_id=customization.id)
         # if not - get default language
         if not content_record.exists():
-            content_record = DataRecord.object.filter(language_id=customization.default_language_id,
+            content_record = DataRecord.objects.filter(language_id=customization.default_language_id,
                                                       data_structure_id=record.id,
                                                       customization_id=customization.id)
 
-        if content_record.exists():
-            content_value = content_record.value
+        # if not - get record without language
+        if not content_record.exists():
+            content_record = DataRecord.objects.filter(language_id=None,
+                                                      data_structure_id=record.id,
+                                                      customization_id=customization.id)
+
+        if content_record and content_record.exists():
+            content_value = content_record.first().value
         else:  # if no value - use default value from structure
             content_value = record.default
 
         # replace marker with value
         content = content.replace(record.name, content_value)
+    return content
 
+
+def process_file(source_file, customization, product_id):
+    context_name, language_code = context_for_file(source_file, customization.name)
+
+    branding_context = Context.objects.filter(name='branding')
+    context = Context.objects.filter(name=context_name, product_id=product_id)
+    if language_code:
+        language = Language.objects.get(code=language_code)
+
+    with open(source_file, 'r') as file:
+        content = file.read()
+
+    if branding_context.exists():
+        print 'branding', source_file
+        content = process_context_structure(customization, branding_context.first(), content, None)
+    if context.exists() and language:
+        print 'context', source_file
+        content = process_context_structure(customization, context.first(), content, language)
+
+    filename = context_name
+    if language_code:
+        filename = filename.replace("{{language}}", language_code)
     # write content to target place
-    target_file = os.path.join('static', customization, filename)
+    target_file = os.path.join('static', customization.name, filename)
     with open(target_file, 'w') as file:
         file.write(content)
 
@@ -40,9 +92,9 @@ def fill_content(customization_name='default', product='cloud_portal'):
     product_id = Product.objects.get(name=product).id
     customization = Customization.objects.get(name=customization_name)
 
-    # go context by context in product
-    contexts = Context.objects.filter(product_id=product_id).all()
-    for context in contexts:
-        for language in customization.languages:
-            # read template (translated)
-            process_context(context, language, customization)
+    # iterate all files (same way we fill structure)
+    for source_file in iterate_cms_files(customization_name):
+        process_file(source_file, customization, product_id)
+
+
+# from cms.controllers.filldata import *
