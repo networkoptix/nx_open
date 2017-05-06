@@ -119,7 +119,6 @@ private:
     void doPeriodicTasks();
     void createOutgoingConnections();
     void sendAlivePeersMessage();
-    void cleanupRoutingRecords(const ApiPersistentIdData& id);
 
     void printPeersMessage();
     void printSubscribeMessage(
@@ -199,7 +198,6 @@ private:
         RoutingInfo routeTo; // key: route to, value - distance in hops
     };
     typedef QMap<ApiPersistentIdData, AlivePeerInfo> AlivePeersMap;
-    AlivePeersMap m_alivePeers; //< alive peers in the system. key - route via, value - route to
 
     // Technically this struct is the same as the previous one. But it is used in another semantic.
     struct RouteToPeerInfo
@@ -213,6 +211,25 @@ private:
     typedef QMap<ApiPersistentIdData, RouteToPeerInfo> RouteToPeerMap;
 
 
+    struct BidirectionRoutingInfo
+    {
+        BidirectionRoutingInfo(const ApiPersistentIdData& localPeer);
+
+        void clear();
+        void removePeer(const ApiPersistentIdData& id);
+        void addRecord(
+            const ApiPersistentIdData& via,
+            const ApiPersistentIdData& to,
+            const RoutingRecord& record);
+        qint32 distanceTo(const ApiPersistentIdData& peer) const;
+
+        AlivePeersMap alivePeers; //< alive peers in the system. key - route via, value - route to
+        RouteToPeerMap allPeerDistances;  //< vice versa
+    private:
+        ApiPersistentIdData m_localPeer;
+    };
+    std::unique_ptr<BidirectionRoutingInfo> m_peers;
+
     QTimer* m_timer = nullptr;
     QElapsedTimer m_lastPeerInfoTimer;
     QElapsedTimer m_wantToSubscribeTimer;
@@ -222,7 +239,7 @@ private:
     int m_connectionTries = 0;
     QElapsedTimer m_outConnectionsTimer;
 private:
-    RouteToPeerMap allPeersDistances() const;
+    //RouteToPeerMap allPeersDistances() const;
 };
 
 } // ec2

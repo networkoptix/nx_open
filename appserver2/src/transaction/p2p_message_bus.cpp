@@ -66,6 +66,52 @@ qint32 P2pMessageBus::RouteToPeerInfo::minDistance(QVector<ApiPersistentIdData>*
     return minDistance;
 }
 
+// ---------------------- BidirectionRoutingInfo --------------
+
+P2pMessageBus::BidirectionRoutingInfo::BidirectionRoutingInfo(
+    const ApiPersistentIdData& localPeer)
+:
+    m_localPeer(localPeer)
+{
+    auto& peerData = alivePeers[localPeer].routeTo[localPeer] = RoutingRecord(0, 0);
+    allPeerDistances[localPeer].routeVia[localPeer] = RoutingRecord(0, 0);
+}
+
+void P2pMessageBus::BidirectionRoutingInfo::clear()
+{
+    alivePeers.clear();
+    allPeerDistances.clear();
+}
+
+void P2pMessageBus::BidirectionRoutingInfo::removePeer(const ApiPersistentIdData& id)
+{
+    alivePeers.remove(id);
+    alivePeers[m_localPeer].routeTo.remove(id);
+
+    allPeerDistances[id].routeVia.remove(m_localPeer);
+    for (auto itr = allPeerDistances.begin(); itr != allPeerDistances.end(); ++itr)
+        itr->routeVia.remove(id);
+}
+
+void P2pMessageBus::BidirectionRoutingInfo::addRecord(
+    const ApiPersistentIdData& via,
+    const ApiPersistentIdData& to,
+    const RoutingRecord& record)
+{
+    alivePeers[via].routeTo[to] = record;
+    allPeerDistances[to].routeVia[via] = record;
+}
+
+qint32 P2pMessageBus::BidirectionRoutingInfo::distanceTo(const ApiPersistentIdData& peer) const
+{
+    qint32 result = kMaxDistance;
+    for (const auto& alivePeer: alivePeers)
+        result = std::min(result, alivePeer.distanceTo(peer));
+    return result;
+}
+
+// ---------------------- P2pMessageBus --------------
+
 P2pMessageBus::P2pMessageBus(
     detail::QnDbManager* db,
     Qn::PeerType peerType,
@@ -98,7 +144,7 @@ void P2pMessageBus::dropConnections()
     QnMutexLocker lock(&m_mutex);
     m_connections.clear();
     m_outgoingConnections.clear();
-    m_alivePeers.clear();
+    m_peers->clear();
 }
 
 
@@ -178,7 +224,7 @@ void P2pMessageBus::gotConnectionFromRemotePeer(P2pConnectionPtr connection)
     QnMutexLocker lock(&m_mutex);
 
     const auto remoteId = connection->remotePeer().id;
-    cleanupRoutingRecords(connection->remotePeer());
+    m_peers->removePeer(connection->remotePeer());
     m_connections[remoteId] = connection;
     connectSignals(connection);
     connection->startReading();
@@ -190,12 +236,6 @@ void P2pMessageBus::connectSignals(const P2pConnectionPtr& connection)
     connect(connection.data(), &P2pConnection::stateChanged, this, &P2pMessageBus::at_stateChanged);
     connect(connection.data(), &P2pConnection::gotMessage, this, &P2pMessageBus::at_gotMessage);
     connect(connection.data(), &P2pConnection::allDataSent, this, &P2pMessageBus::at_allDataSent);
-}
-
-void P2pMessageBus::cleanupRoutingRecords(const ApiPersistentIdData& id)
-{
-    m_alivePeers.remove(id);
-    m_alivePeers[localPeer()].routeTo.remove(id);
 }
 
 void P2pMessageBus::createOutgoingConnections()
@@ -247,11 +287,10 @@ void P2pMessageBus::createOutgoingConnections()
 
 void P2pMessageBus::addOwnfInfoToPeerList()
 {
-    if (m_alivePeers.isEmpty())
+    if (!m_peers)
     {
-        auto& peerData = m_alivePeers[localPeer()];
-        peerData.routeTo.insert(localPeer(), RoutingRecord(0, 0));
         m_localShortPeerInfo.encode(localPeer(), 0);
+        m_peers.reset(new BidirectionRoutingInfo(localPeer()));
     }
 }
 
@@ -260,7 +299,6 @@ void P2pMessageBus::addOfflinePeersFromDb()
     if (!m_db)
         return;
     const auto localPeer = this->localPeer();
-    auto& LocalPeerData = m_alivePeers[localPeer];
 
     auto persistentState = m_db->transactionLog()->getTransactionsState().values;
     for (auto itr = persistentState.begin(); itr != persistentState.end(); ++itr)
@@ -272,14 +310,13 @@ void P2pMessageBus::addOfflinePeersFromDb()
         const qint32 sequence = itr.value();
         const qint32 localOfflineDistance = kMaxDistance - sequence;
         RoutingRecord record(localOfflineDistance, qnSyncTime->currentMSecsSinceEpoch());
-        LocalPeerData.routeTo[peer] = record;
+        m_peers->addRecord(localPeer, peer, record);
     }
-
 }
 
 QByteArray P2pMessageBus::serializePeersMessage()
 {
-    RouteToPeerMap allPeerDistances = allPeersDistances();
+    const RouteToPeerMap& allPeerDistances = m_peers->allPeerDistances;
     QByteArray result;
     result.resize(allPeerDistances.size() * 6 + 1);
     BitStreamWriter writer;
@@ -322,7 +359,7 @@ void P2pMessageBus::printPeersMessage()
 {
     QList<QString> records;
 
-    for (auto itr = m_alivePeers.constBegin(); itr != m_alivePeers.constEnd(); ++itr)
+    for (auto itr = m_peers->alivePeers.constBegin(); itr != m_peers->alivePeers.constEnd(); ++itr)
     {
         const auto& peer = itr.value();
 
@@ -374,8 +411,9 @@ void P2pMessageBus::processAlivePeersMessage(
     const auto& localPeer = this->localPeer();
     NX_ASSERT(!(remotePeer == localPeer));
 
-    AlivePeerInfo& peerData = m_alivePeers[remotePeer];
-    peerData.routeTo.clear(); //< remove old data
+    //AlivePeerInfo& peerData = m_alivePeers[remotePeer];
+    //peerData.routeTo.clear(); //< remove old data
+    m_peers->removePeer(remotePeer);
 
     qint64 timeMs = qnSyncTime->currentMSecsSinceEpoch();
     BitStreamReader reader((const quint8*) data.data(), data.size());
@@ -394,7 +432,7 @@ void P2pMessageBus::processAlivePeersMessage(
 
             const qint32 distance = receivedDistance + 1;
 
-            peerData.routeTo.insert(peerId, RoutingRecord(distance, timeMs));
+            m_peers->addRecord(remotePeer, peerId, RoutingRecord(distance, timeMs));
         }
     }
     catch (...)
@@ -476,20 +514,23 @@ P2pConnectionPtr P2pMessageBus::findConnectionById(const ApiPersistentIdData& id
     return result && result->remotePeer().persistentId == id.persistentId ? result : P2pConnectionPtr();
 }
 
+#if 0
 P2pMessageBus::RouteToPeerMap P2pMessageBus::allPeersDistances() const
 {
-    P2pMessageBus::RouteToPeerMap result;
+    if (!m_allPeerDistances.isEmpty())
+        return m_allPeerDistances;
     for (auto itrVia = m_alivePeers.constBegin(); itrVia != m_alivePeers.constEnd(); ++itrVia)
     {
         const auto& toPeers = itrVia.value().routeTo;
         for (auto itrTo = toPeers.begin(); itrTo != toPeers.end(); ++itrTo)
         {
             const auto& record = itrTo.value();
-            result[itrTo.key()].routeVia[itrVia.key()] = record;
+            m_allPeerDistances[itrTo.key()].routeVia[itrVia.key()] = record;
         }
     }
-    return result;
+    return m_allPeerDistances;
 }
+#endif
 
 bool P2pMessageBus::needSubscribeDelay()
 {
@@ -515,7 +556,7 @@ bool P2pMessageBus::needSubscribeDelay()
 void P2pMessageBus::startStopConnections()
 {
     QMap<ApiPersistentIdData, P2pConnectionPtr> currentSubscription = getCurrentSubscription();
-    RouteToPeerMap allPeerDistances = allPeersDistances();
+    const RouteToPeerMap& allPeerDistances = m_peers->allPeerDistances;
 
     /*
     if (std::any_of(m_connections.begin(), m_connections.end(),
@@ -604,7 +645,9 @@ void P2pMessageBus::doSubscribe()
     const auto localPeer = this->localPeer();
     bool isUpdated = false;
 
-    RouteToPeerMap allPeerDistances = allPeersDistances();
+    const RouteToPeerMap& allPeerDistances = m_peers->allPeerDistances;
+    const auto& alivePeers =  m_peers->alivePeers;
+
     for (auto itr = allPeerDistances.constBegin(); itr != allPeerDistances.constEnd(); ++itr)
     {
         const ApiPersistentIdData& peer = itr.key();
@@ -613,7 +656,7 @@ void P2pMessageBus::doSubscribe()
 
         auto subscribedVia = currentSubscription.value(peer);
         qint32 subscribedDistance =
-            m_alivePeers[subscribedVia ? subscribedVia->remotePeer() : localPeer].distanceTo(peer);
+            alivePeers[subscribedVia ? subscribedVia->remotePeer() : localPeer].distanceTo(peer);
 
         QVector<ApiPersistentIdData> viaList;
         const auto& info = itr.value();
@@ -675,10 +718,9 @@ void P2pMessageBus::doPeriodicTasks()
 
     addOwnfInfoToPeerList();
     addOfflinePeersFromDb();
+
     sendAlivePeersMessage();
-
     startStopConnections();
-
     doSubscribe();
     commitLazyData();
 }
@@ -746,7 +788,7 @@ void P2pMessageBus::at_stateChanged(
                 auto connectedConnection = m_connections.value(remoteId);
                 if (connectedConnection == connection)
                 {
-                    cleanupRoutingRecords(connection->remotePeer());
+                    m_peers->removePeer(connection->remotePeer());
                     m_connections.remove(remoteId);
                 }
             }
@@ -1353,10 +1395,7 @@ qint32 P2pMessageBus::distanceTo(const ApiPersistentIdData& peer) const
     QnMutexLocker lock(&m_mutex);
     if (ApiPersistentIdData(localPeer()) == peer)
         return 0;
-    qint32 result = kMaxDistance;
-    for (const auto& alivePeer:  m_alivePeers)
-        result = std::min(result, alivePeer.distanceTo(peer));
-    return result;
+    return m_peers->distanceTo(peer);
 }
 
 QMap<QnUuid, P2pConnectionPtr> P2pMessageBus::connections() const
