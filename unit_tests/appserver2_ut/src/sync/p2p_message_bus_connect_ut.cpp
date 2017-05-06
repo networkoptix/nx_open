@@ -18,7 +18,7 @@
 
 namespace {
 
-static const int kInstanceCount = 100;
+static const int kInstanceCount = 20;
 static const int kMaxSyncTimeoutMs = 1000 * 20 * 1000;
 static const int kCamerasCount = 100;
 
@@ -202,8 +202,6 @@ static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverCon
     t.restart();
 
     QnStaticCommonModule staticCommon;
-    ec2::Ec2ThreadPool::instance()->setMaxThreadCount(
-        std::max(QThread::idealThreadCount(), kInstanceCount * 2));
 
     std::vector<Appserver2Ptr> servers;
     for (int i = 0; i < kInstanceCount; ++i)
