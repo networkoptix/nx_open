@@ -354,7 +354,6 @@ private:
     QString m_groupName;
     QString m_groupId;
     Qn::CameraStatusFlags m_statusFlags;
-    bool m_advancedWorking;
     bool m_manuallyAdded;
     QString m_model;
     QString m_vendor;
