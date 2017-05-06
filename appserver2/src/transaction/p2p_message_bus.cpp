@@ -284,6 +284,7 @@ void P2pMessageBus::addOwnfInfoToPeerList()
     {
         auto& peerData = m_alivePeers[localPeer()];
         peerData.routeTo.insert(localPeer(), RoutingRecord(0, 0));
+        m_localShortPeerInfo.encode(localPeer(), 0);
     }
 }
 

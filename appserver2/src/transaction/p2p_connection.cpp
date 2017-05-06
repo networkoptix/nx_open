@@ -295,6 +295,8 @@ void P2pConnection::startConnection()
 
 void P2pConnection::startReading()
 {
+    m_shortPeerInfo.encode(ApiPersistentIdData(m_remotePeer), 0);
+
     using namespace std::placeholders;
     m_webSocket->readSomeAsync(
         &m_readBuffer,
