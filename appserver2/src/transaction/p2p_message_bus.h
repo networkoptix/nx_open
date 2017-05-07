@@ -105,8 +105,8 @@ public:
     bool isSubscribedTo(const ApiPersistentIdData& peer) const;
     qint32 distanceTo(const ApiPersistentIdData& peer) const;
     void commitLazyData();
+
 private:
-    QByteArray serializePeersMessage();
     QByteArray serializeCompressedPeers(MessageType messageType, const QVector<PeerNumberType>& peers);
     QByteArray serializeResolvePeerNumberRequest(const QVector<PeerNumberType>& peers);
     QByteArray serializeResolvePeerNumberResponse(const QVector<PeerNumberType>& peers);
@@ -126,9 +126,6 @@ private:
         const QVector<ApiPersistentIdData>& subscribedTo) const;
 
     QVector<PeerNumberType> deserializeCompressedPeers(const QByteArray& data, bool* success);
-    void processAlivePeersMessage(
-        const P2pConnectionPtr& connection,
-        const QByteArray& data);
     void deserializeResolvePeerNumberResponse(
         const P2pConnectionPtr& connection,
         const QByteArray& response);
@@ -170,23 +167,7 @@ private:
     void at_gotMessage(const QSharedPointer<P2pConnection>& connection, MessageType messageType, const QByteArray& payload);
     void at_stateChanged(const QSharedPointer<P2pConnection>& connection, P2pConnection::State state);
     void at_allDataSent(const QSharedPointer<P2pConnection>& connection);
-private:
-    QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list
-    QMap<QnUuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections
-    //QMap<QnUuid, QUrl> m_remoteUrls; //< Url list for outgoing connections
-    struct RemoteConnection
-    {
-        RemoteConnection() {}
-        RemoteConnection(const QnUuid& id, const QUrl& url) : id(id), url(url) {}
-
-        QnUuid id;
-        QUrl url;
-    };
-
-    std::vector<RemoteConnection> m_remoteUrls;
-
-    PeerNumberInfo m_localShortPeerInfo; //< Short numbers created by current peer
-
+public:
     typedef QMap<ApiPersistentIdData, RoutingRecord> RoutingInfo;
 
     struct AlivePeerInfo
@@ -228,6 +209,36 @@ private:
     private:
         ApiPersistentIdData m_localPeer;
     };
+
+public:
+    static QByteArray serializePeersMessage(
+        const BidirectionRoutingInfo* peers,
+        PeerNumberInfo& shortPeerInfo);
+    static bool deserializePeersMessage(
+        const ApiPersistentIdData& remotePeer,
+        int remotePeerDistance,
+        const PeerNumberInfo& shortPeerInfo,
+        const QByteArray& data,
+        const qint64 timeMs,
+        BidirectionRoutingInfo* outPeers);
+
+private:
+    QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list
+    QMap<QnUuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections
+    //QMap<QnUuid, QUrl> m_remoteUrls; //< Url list for outgoing connections
+    struct RemoteConnection
+    {
+        RemoteConnection() {}
+        RemoteConnection(const QnUuid& id, const QUrl& url) : id(id), url(url) {}
+
+        QnUuid id;
+        QUrl url;
+    };
+
+    std::vector<RemoteConnection> m_remoteUrls;
+
+    PeerNumberInfo m_localShortPeerInfo; //< Short numbers created by current peer
+
     std::unique_ptr<BidirectionRoutingInfo> m_peers;
 
     QTimer* m_timer = nullptr;
@@ -238,8 +249,6 @@ private:
     int m_lastOutgoingIndex = 0;
     int m_connectionTries = 0;
     QElapsedTimer m_outConnectionsTimer;
-private:
-    //RouteToPeerMap allPeersDistances() const;
 };
 
 } // ec2

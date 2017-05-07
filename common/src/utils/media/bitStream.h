@@ -249,8 +249,15 @@ public:
         }
         m_totalBits --;
     }
-    inline void flushBits()
+    inline void flushBits(bool finishLastByte = false)
     {
+        if (finishLastByte)
+        {
+            int bitsLeft = 8 - (m_bitWrited % 8);
+            if (bitsLeft < 8)
+                putBits(bitsLeft, 0);
+        }
+
         m_curVal <<= INT_BIT - m_bitWrited;
         unsigned prevVal = ntohl(*m_buffer);
         prevVal &= m_masks[INT_BIT - m_bitWrited];

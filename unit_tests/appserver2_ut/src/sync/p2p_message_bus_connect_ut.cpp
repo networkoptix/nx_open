@@ -18,7 +18,7 @@
 
 namespace {
 
-static const int kInstanceCount = 100;
+static const int kInstanceCount = 10;
 static const int kMaxSyncTimeoutMs = 1000 * 20 * 1000;
 static const int kCamerasCount = 100;
 
@@ -318,6 +318,8 @@ static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverCon
         .arg(connectionTries / k),
         cl_logINFO);
 
+
+    std::this_thread::sleep_for(std::chrono::seconds(5000));
 }
 
 TEST(P2pMessageBus, SequenceConnect)
@@ -362,4 +364,70 @@ TEST(P2pMessageBus, CompressPeerNumber)
         ASSERT_TRUE(0);
     }
     ASSERT_EQ(peers, peers2);
+}
+
+TEST(P2pMessageBus, CompressPeerNumber2)
+{
+    using namespace ec2;
+
+    try
+    {
+        auto writeData = [](QByteArray& buffer, int filler)
+        {
+            buffer.resize(4);
+            buffer[0] = buffer[1] = filler;
+            BitStreamWriter writer;
+            writer.setBuffer((quint8*)buffer.data(), buffer.size());
+            serializeCompressPeerNumber(writer, 1023);
+            writer.flushBits(true);
+            buffer.truncate(2);
+        };
+
+        // serialize
+        QByteArray data1;
+        QByteArray data2;
+        writeData(data1, 0);
+        writeData(data2, 0xff);
+        ASSERT_EQ(data1, data2);
+    }
+    catch (...)
+    {
+        ASSERT_TRUE(0);
+    }
+}
+
+TEST(P2pMessageBus, SerializePeers)
+{
+    using namespace ec2;
+    ApiPersistentIdData localPeer;
+    localPeer.id = QnUuid::createUuid();
+    localPeer.persistentId = QnUuid::createUuid();
+    P2pMessageBus::BidirectionRoutingInfo peerData(localPeer);
+    PeerNumberInfo shortPeers;
+
+    std::vector<ApiPersistentIdData> peers;
+    for (int i = 0; i < 2; ++i)
+    {
+        ApiPersistentIdData p;
+        p.id = QnUuid::createUuid();
+        p.persistentId = QnUuid::createUuid();
+        peers.push_back(p);
+        shortPeers.encode(p);
+        peerData.addRecord(localPeer, p, P2pMessageBus::RoutingRecord(1, 0));
+    }
+
+    QByteArray serializedData = P2pMessageBus::serializePeersMessage(&peerData, shortPeers);
+
+    P2pMessageBus::BidirectionRoutingInfo deserializedPeerData(localPeer);
+    ASSERT_TRUE(P2pMessageBus::deserializePeersMessage(
+        localPeer, 
+        0, //< distance
+        shortPeers, 
+        serializedData.mid(1), //< skip message type
+        /*time*/0,
+        &deserializedPeerData));
+    QByteArray serializedData2 = P2pMessageBus::serializePeersMessage(&deserializedPeerData, shortPeers);
+    ASSERT_EQ(serializedData, serializedData2);
+    using namespace ec2;
+
 }

@@ -445,6 +445,11 @@ ApiPersistentIdData P2pConnection::decode(PeerNumberType shortPeerNumber) const
     return m_shortPeerInfo.decode(shortPeerNumber);
 }
 
+const PeerNumberInfo& P2pConnection::shortPeers() const
+{
+    return m_shortPeerInfo;
+}
+
 PeerNumberType P2pConnection::encode(const ApiPersistentIdData& fullId, PeerNumberType shortPeerNumber)
 {
     return m_shortPeerInfo.encode(fullId, shortPeerNumber);

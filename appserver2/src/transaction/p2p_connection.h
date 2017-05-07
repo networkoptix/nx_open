@@ -110,6 +110,7 @@ public:
     bool remotePeerSubscribedTo(const ApiPersistentIdData& peer) const;
     bool updateSequence(const QnAbstractTransaction& tran);
     bool localPeerSubscribedTo(const ApiPersistentIdData& peer) const;
+    const PeerNumberInfo& shortPeers() const;
 signals:
     void gotMessage(P2pConnectionPtr connection, MessageType messageType, const QByteArray& payload);
     void stateChanged(P2pConnectionPtr connection, P2pConnection::State state);

@@ -14,6 +14,7 @@
 #include "json_transaction_serializer.h"
 #include <api/global_settings.h>
 #include <nx_ec/ec_proto_version.h>
+#include <utils/math/math.h>
 
 namespace {
 
@@ -37,6 +38,9 @@ namespace {
     static const int kMaxConnectionsAtOnce = 10;
 
     static const int kOutConnectionsInterval = 1000 * 5;
+
+    static const int kPeerRecordSize = 6;
+    static const int kResolvePeerResponseRecordSize = 16 * 2 + 2; //< two guid + uncompressed PeerNumber per record
 } // namespace
 
 namespace ec2 {
@@ -314,11 +318,14 @@ void P2pMessageBus::addOfflinePeersFromDb()
     }
 }
 
-QByteArray P2pMessageBus::serializePeersMessage()
+QByteArray P2pMessageBus::serializePeersMessage(
+    const BidirectionRoutingInfo* peers,
+    PeerNumberInfo& shortPeerInfo)
 {
-    const RouteToPeerMap& allPeerDistances = m_peers->allPeerDistances;
     QByteArray result;
-    result.resize(allPeerDistances.size() * 6 + 1);
+    result.resize(qPower2Ceil(
+        unsigned(peers->allPeerDistances.size() * kPeerRecordSize + 1), 
+        4));
     BitStreamWriter writer;
     writer.setBuffer((quint8*) result.data(), result.size());
     try
@@ -326,7 +333,7 @@ QByteArray P2pMessageBus::serializePeersMessage()
         writer.putBits(8, (int) MessageType::alivePeers);
 
         // serialize online peers
-        for (auto itr = allPeerDistances.begin(); itr != allPeerDistances.end(); ++itr)
+        for (auto itr = peers->allPeerDistances.begin(); itr != peers->allPeerDistances.end(); ++itr)
         {
             const auto& peer = itr.value();
 
@@ -335,7 +342,7 @@ QByteArray P2pMessageBus::serializePeersMessage()
                 minDistance = std::min(minDistance, rec.distance);
             if (minDistance == kMaxDistance)
                 continue;
-            qint16 peerNumber = m_localShortPeerInfo.encode(itr.key());
+            qint16 peerNumber = shortPeerInfo.encode(itr.key());
             serializeCompressPeerNumber(writer, peerNumber);
             bool isOnline = minDistance < kMaxOnlineDistance;
             writer.putBit(isOnline);
@@ -345,7 +352,7 @@ QByteArray P2pMessageBus::serializePeersMessage()
                 writer.putBits(32, minDistance); //< distance
         }
 
-        writer.flushBits();
+        writer.flushBits(true);
         result.truncate(writer.getBytesCount());
         return result;
     }
@@ -353,6 +360,40 @@ QByteArray P2pMessageBus::serializePeersMessage()
     {
         return QByteArray();
     }
+}
+
+bool P2pMessageBus::deserializePeersMessage(
+    const ApiPersistentIdData& remotePeer,
+    int remotePeerDistance,
+    const PeerNumberInfo& shortPeerInfo,
+    const QByteArray& data,
+    const qint64 timeMs,
+    BidirectionRoutingInfo* outPeers)
+{
+    outPeers->removePeer(remotePeer);
+
+    BitStreamReader reader((const quint8*) data.data(), data.size());
+    try
+    {
+        while (reader.bitsLeft() >= 8)
+        {
+            PeerNumberType peerNumber = deserializeCompressPeerNumber(reader);
+            ApiPersistentIdData peerId = shortPeerInfo.decode(peerNumber);
+            bool isOnline = reader.getBit();
+            qint32 receivedDistance = 0;
+            if (isOnline)
+                receivedDistance = NALUnit::extractUEGolombCode(reader); // todo: move function to another place
+            else
+                receivedDistance = reader.getBits(32);
+
+            outPeers->addRecord(remotePeer, peerId, RoutingRecord(receivedDistance + remotePeerDistance, timeMs));
+        }
+    }
+    catch (...)
+    {
+        return false;
+    }
+    return true;
 }
 
 void P2pMessageBus::printPeersMessage()
@@ -403,47 +444,9 @@ void P2pMessageBus::printSubscribeMessage(
         cl_logDEBUG1);
 }
 
-void P2pMessageBus::processAlivePeersMessage(
-    const P2pConnectionPtr& connection,
-    const QByteArray& data)
-{
-    const auto& remotePeer = connection->remotePeer();
-    const auto& localPeer = this->localPeer();
-    NX_ASSERT(!(remotePeer == localPeer));
-
-    //AlivePeerInfo& peerData = m_alivePeers[remotePeer];
-    //peerData.routeTo.clear(); //< remove old data
-    m_peers->removePeer(remotePeer);
-
-    qint64 timeMs = qnSyncTime->currentMSecsSinceEpoch();
-    BitStreamReader reader((const quint8*) data.data(), data.size());
-    try
-    {
-        while (reader.bitsLeft() >= 8)
-        {
-            PeerNumberType peerNumber = deserializeCompressPeerNumber(reader);
-            ApiPersistentIdData peerId = connection->decode(peerNumber);
-            bool isOnline = reader.getBit();
-            qint32 receivedDistance = 0;
-            if (isOnline)
-                receivedDistance = NALUnit::extractUEGolombCode(reader); // todo: move function to another place
-            else
-                receivedDistance = reader.getBits(32);
-
-            const qint32 distance = receivedDistance + 1;
-
-            m_peers->addRecord(remotePeer, peerId, RoutingRecord(distance, timeMs));
-        }
-    }
-    catch (...)
-    {
-        connection->setState(P2pConnection::State::Error);
-    }
-}
-
 void P2pMessageBus::sendAlivePeersMessage()
 {
-    QByteArray data = serializePeersMessage();
+    QByteArray data = serializePeersMessage(m_peers.get(), m_localShortPeerInfo);
     int peersIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>(
         sendPeersInfoInterval).count();
     for (const auto& connection : m_connections)
@@ -945,13 +948,13 @@ bool P2pMessageBus::handleResolvePeerNumberResponse(const P2pConnectionPtr& conn
 QByteArray P2pMessageBus::serializeCompressedPeers(MessageType messageType, const QVector<PeerNumberType>& peers)
 {
     QByteArray result;
-    result.resize(peers.size() * 2 + 1);
+    result.resize(qPower2Ceil(unsigned(peers.size() * 2 + 1), 4));
     BitStreamWriter writer;
     writer.setBuffer((quint8*)result.data(), result.size());
     writer.putBits(8, (int)messageType);
     for (const auto& peer : peers)
         serializeCompressPeerNumber(writer, peer);
-    writer.flushBits();
+    writer.flushBits(true);
     result.truncate(writer.getBytesCount());
     return result;
 }
@@ -969,7 +972,7 @@ QByteArray P2pMessageBus::serializeSubscribeRequest(
     NX_ASSERT(peers.size() == sequences.size());
 
     QByteArray result;
-    result.resize(peers.size() * 6 + 1);
+    result.resize(qPower2Ceil(unsigned(peers.size() * kPeerRecordSize + 1), 4));
     BitStreamWriter writer;
     writer.setBuffer((quint8*)result.data(), result.size());
     writer.putBits(8, (int)MessageType::subscribeForDataUpdates);
@@ -978,7 +981,7 @@ QByteArray P2pMessageBus::serializeSubscribeRequest(
         writer.putBits(16, peers[i]);
         writer.putBits(32, sequences[i]);
     }
-    writer.flushBits();
+    writer.flushBits(true);
     result.truncate(writer.getBytesCount());
     return result;
 }
@@ -986,7 +989,7 @@ QByteArray P2pMessageBus::serializeSubscribeRequest(
 QByteArray P2pMessageBus::serializeResolvePeerNumberResponse(const QVector<PeerNumberType>& peers)
 {
     QByteArray result;
-    result.reserve(peers.size() * (16 * 2 + 2) + 1); // two guid + uncompressed PeerNumber per record
+    result.reserve(peers.size() * kResolvePeerResponseRecordSize + 1);
     {
         QBuffer buffer(&result);
         buffer.open(QIODevice::WriteOnly);
@@ -1017,9 +1020,9 @@ bool P2pMessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const
         {
             PeerNumberType peerNumber = deserializeCompressPeerNumber(reader);
             bool isOnline = reader.getBit();
-            qint32 distance = isOnline
+            isOnline
                 ? NALUnit::extractUEGolombCode(reader)
-                : reader.getBits(32);
+                : reader.skipBits(32); //< skip distance
             if (connection->decode(peerNumber).isNull())
                 numbersToResolve.push_back(peerNumber);
         }
@@ -1034,8 +1037,13 @@ bool P2pMessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const
 
     if (numbersToResolve.empty())
     {
-        processAlivePeersMessage(connection, data);
-        return true;
+        return deserializePeersMessage(
+            connection->remotePeer(),
+            1, //< remote peer distance
+            connection->shortPeers(),
+            data,
+            qnSyncTime->currentMSecsSinceEpoch(),
+            m_peers.get());
     }
 
     auto& miscData = connection->miscData();
