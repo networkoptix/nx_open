@@ -178,9 +178,6 @@ void Appserver2Process::setOnStartedEventHandler(
 
 int Appserver2Process::exec()
 {
-    nx::utils::TimerManager timerManager;
-    timerManager.start();
-
     bool processStartResult = false;
     auto triggerOnStartedEventHandlerGuard = makeScopeGuard(
         [this, &processStartResult]
@@ -228,7 +225,7 @@ int Appserver2Process::exec()
 
     //initializeLogging(settings);
     std::unique_ptr<ec2::AbstractECConnectionFactory>
-        ec2ConnectionFactory(getConnectionFactory(Qn::PT_Server, &timerManager, m_commonModule.get()));
+        ec2ConnectionFactory(getConnectionFactory(Qn::PT_Server, nx::utils::TimerManager::instance(), m_commonModule.get()));
 
     std::map<QString, QVariant> confParams;
     ec2ConnectionFactory->setConfParams(std::move(confParams));
