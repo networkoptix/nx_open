@@ -194,6 +194,10 @@ angular.module('webadminApp').controller('ViewCtrl',
                 $scope.availableResolutions = transcodingResolutions;
             }
 
+            if($scope.availableResolutions.length < 4){
+                $scope.availableResolutions.sort();
+            }
+
             if($scope.availableResolutions.indexOf($scope.activeResolution)<0){
                 $scope.activeResolution = $scope.availableResolutions[0];
             }
