@@ -3,11 +3,11 @@
 #include <nx/fusion/model_functions.h>
 
 QnPtzAuxilaryTrait::QnPtzAuxilaryTrait(const QString &name):
-    m_standardTrait(QnLexical::deserialized<Qn::PtzTrait>(name, Qn::NoPtzTraits)),
+    m_standardTrait(QnLexical::deserialized<Ptz::Trait>(name, Ptz::NoPtzTraits)),
     m_name(name)
 {}
 
-QnPtzAuxilaryTrait::QnPtzAuxilaryTrait(Qn::PtzTrait standardTrait):
+QnPtzAuxilaryTrait::QnPtzAuxilaryTrait(Ptz::Trait standardTrait):
     m_standardTrait(standardTrait),
     m_name(QnLexical::serialized(standardTrait))
 {}

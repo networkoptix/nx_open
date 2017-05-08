@@ -34,7 +34,7 @@ void QnDwPtzController::updateFlipState() {
     } else {
         return;
     }
-      
+
     m_flip = flip;
 }
 
@@ -44,7 +44,7 @@ QnDwPtzController::~QnDwPtzController() {
 
 bool QnDwPtzController::continuousMove(const QVector3D &speed) {
     QVector3D localSpeed = speed;
-    
+
     if(m_flip & Qt::Horizontal)
         localSpeed.setX(-localSpeed.x());
     if(m_flip & Qt::Vertical)
@@ -53,7 +53,8 @@ bool QnDwPtzController::continuousMove(const QVector3D &speed) {
     return base_type::continuousMove(localSpeed);
 }
 
-bool QnDwPtzController::getFlip(Qt::Orientations *flip) {
+bool QnDwPtzController::getFlip(Qt::Orientations *flip) const
+{
     *flip = m_flip;
     return true;
 }
