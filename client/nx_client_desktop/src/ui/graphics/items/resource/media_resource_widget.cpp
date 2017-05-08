@@ -21,7 +21,8 @@
 #include <client/client_settings.h>
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_module.h>
+
+#include <client_core/client_core_module.h>
 
 #include <common/common_module.h>
 
@@ -573,8 +574,8 @@ void QnMediaResourceWidget::createButtons()
 
 void QnMediaResourceWidget::createPtzController()
 {
-    auto threadPool = qnClientModule->ptzControllerPool()->commandThreadPool();
-    auto executorThread = qnClientModule->ptzControllerPool()->executorThread();
+    auto threadPool = qnClientCoreModule->ptzControllerPool()->commandThreadPool();
+    auto executorThread = qnClientCoreModule->ptzControllerPool()->executorThread();
 
     /* Set up PTZ controller. */
     QnPtzControllerPtr fisheyeController;

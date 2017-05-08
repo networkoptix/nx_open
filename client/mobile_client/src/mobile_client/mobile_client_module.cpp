@@ -87,8 +87,6 @@ QnMobileClientModule::QnMobileClientModule(
 
     commonModule->instance<QnCameraHistoryPool>();
     commonModule->store(new QnMobileClientCameraFactory());
-	commonModule->store(new QnClientPtzControllerPool>());
-
 
     auto userWatcher = commonModule->store(new QnUserWatcher());
 
