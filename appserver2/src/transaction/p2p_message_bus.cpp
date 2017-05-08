@@ -57,11 +57,11 @@ qint32 P2pMessageBus::AlivePeerInfo::distanceTo(const ApiPersistentIdData& via) 
 qint32 P2pMessageBus::RouteToPeerInfo::minDistance(QVector<ApiPersistentIdData>* outViaList) const
 {
     qint32 minDistance = kMaxDistance;
-    for (auto itr = routeVia.begin(); itr != routeVia.end(); ++itr)
+    for (auto itr = routeVia.cbegin(); itr != routeVia.cend(); ++itr)
         minDistance = std::min(minDistance, itr.value().distance);
     if (outViaList)
     {
-        for (auto itr = routeVia.begin(); itr != routeVia.end(); ++itr)
+        for (auto itr = routeVia.cbegin(); itr != routeVia.cend(); ++itr)
         {
             if (itr.value().distance == minDistance)
                 outViaList->push_back(itr.key());
@@ -305,7 +305,8 @@ void P2pMessageBus::addOfflinePeersFromDb()
     const auto localPeer = this->localPeer();
 
     auto persistentState = m_db->transactionLog()->getTransactionsState().values;
-    for (auto itr = persistentState.begin(); itr != persistentState.end(); ++itr)
+    const qint64 currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
+    for (auto itr = persistentState.cbegin(); itr != persistentState.cend(); ++itr)
     {
         const auto& peer = itr.key();
         if (peer == localPeer)
@@ -313,7 +314,7 @@ void P2pMessageBus::addOfflinePeersFromDb()
 
         const qint32 sequence = itr.value();
         const qint32 localOfflineDistance = kMaxDistance - sequence;
-        RoutingRecord record(localOfflineDistance, qnSyncTime->currentMSecsSinceEpoch());
+        RoutingRecord record(localOfflineDistance, currentTimeMs);
         m_peers->addRecord(localPeer, peer, record);
     }
 }
@@ -333,18 +334,15 @@ QByteArray P2pMessageBus::serializePeersMessage(
         writer.putBits(8, (int) MessageType::alivePeers);
 
         // serialize online peers
-        for (auto itr = peers->allPeerDistances.begin(); itr != peers->allPeerDistances.end(); ++itr)
+        for (auto itr = peers->allPeerDistances.cbegin(); itr != peers->allPeerDistances.cend(); ++itr)
         {
             const auto& peer = itr.value();
-
-            qint32 minDistance = kMaxDistance;
-            for (const RoutingRecord& rec: peer.routeVia)
-                minDistance = std::min(minDistance, rec.distance);
+            qint32 minDistance = peer.minDistance();
             if (minDistance == kMaxDistance)
                 continue;
-            qint16 peerNumber = shortPeerInfo.encode(itr.key());
+            const qint16 peerNumber = shortPeerInfo.encode(itr.key());
             serializeCompressPeerNumber(writer, peerNumber);
-            bool isOnline = minDistance < kMaxOnlineDistance;
+            const bool isOnline = minDistance < kMaxOnlineDistance;
             writer.putBit(isOnline);
             if (isOnline)
                 NALUnit::writeUEGolombCode(writer, minDistance); //< distance
@@ -601,7 +599,7 @@ void P2pMessageBus::startStopConnections()
 
         ApiPersistentIdData peer = connection->remotePeer();
         qint32 currentDistance = allPeerDistances.value(peer).minDistance();
-        auto subscribedVia = currentSubscription.value(peer);
+        const auto& subscribedVia = currentSubscription.value(peer);
         static const int kMaxDistanceToUseProxy = 2;
         if (currentDistance > kMaxDistanceToUseProxy ||
             (subscribedVia && subscribedVia->miscData().localSubscription.size() > kMaxSubscriptionToResubscribe))
@@ -661,14 +659,14 @@ void P2pMessageBus::doSubscribe()
         qint32 subscribedDistance =
             alivePeers[subscribedVia ? subscribedVia->remotePeer() : localPeer].distanceTo(peer);
 
-        QVector<ApiPersistentIdData> viaList;
         const auto& info = itr.value();
-        qint32 minDistance = info.minDistance(&viaList);
+        qint32 minDistance = info.minDistance();
         if (minDistance < subscribedDistance)
         {
             if (needDelay && minDistance > 1)
                 continue; //< allow only direct subscription if network configuration are still changing
-
+            QVector<ApiPersistentIdData> viaList;
+            info.minDistance(&viaList);
 
             NX_ASSERT(!viaList.empty());
             // If any of connections with min distance subscribed to us then postpone our subscription.
