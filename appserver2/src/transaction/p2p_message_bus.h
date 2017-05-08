@@ -50,7 +50,7 @@ public:
 
     void gotConnectionFromRemotePeer(P2pConnectionPtr connection);
 
-    void addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& url);
+    void addOutgoingConnectionToPeer(const ApiPersistentIdData& peer, const QUrl& url);
     void removeOutgoingConnectionFromPeer(const QnUuid& id);
 
     QMap<QnUuid, P2pConnectionPtr> connections() const;
@@ -118,7 +118,7 @@ private:
         const QVector<ApiPersistentIdData>& viaList) const;
 private:
     void doPeriodicTasks();
-    void createOutgoingConnections();
+    void createOutgoingConnections(const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription);
     void sendAlivePeersMessage();
 
     void printPeersMessage();
@@ -225,7 +225,11 @@ public:
     private:
         ApiPersistentIdData m_localPeer;
     };
+    
     int expectedConnections() const;
+    bool needStartConnection(
+        const ApiPersistentIdData& peer,
+        const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription) const;
 public:
     static QByteArray serializePeersMessage(
         const BidirectionRoutingInfo* peers,
@@ -241,13 +245,12 @@ public:
 private:
     QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list
     QMap<QnUuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections
-    //QMap<QnUuid, QUrl> m_remoteUrls; //< Url list for outgoing connections
     struct RemoteConnection
     {
         RemoteConnection() {}
-        RemoteConnection(const QnUuid& id, const QUrl& url) : id(id), url(url) {}
+        RemoteConnection(const ApiPersistentIdData& peer, const QUrl& url) : peer(peer), url(url) {}
 
-        QnUuid id;
+        ApiPersistentIdData peer;
         QUrl url;
     };
 
@@ -256,6 +259,21 @@ private:
     PeerNumberInfo m_localShortPeerInfo; //< Short numbers created by current peer
 
     std::unique_ptr<BidirectionRoutingInfo> m_peers;
+
+
+    struct MiscData
+    {
+        MiscData(const P2pMessageBus* owner): owner(owner) {}
+        void update();
+
+        int expectedConnections = 0;
+        int maxSubscriptionToResubscribe = 0;
+        int maxDistanceToUseProxy = 0;
+        int newConnectionsAtOnce = 0;
+    private:
+        const P2pMessageBus* owner;
+    } m_miscData;
+    friend class MiscData;
 
     QTimer* m_timer = nullptr;
     QElapsedTimer m_lastPeerInfoTimer;

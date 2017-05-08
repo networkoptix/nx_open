@@ -132,9 +132,9 @@ P2pMessageBus::P2pMessageBus(
     QnCommonModule* commonModule,
     QnJsonTransactionSerializer* jsonTranSerializer,
     QnUbjsonTransactionSerializer* ubjsonTranSerializer)
-
 :
-    QnTransactionMessageBusBase(db, peerType, commonModule, jsonTranSerializer, ubjsonTranSerializer)
+    QnTransactionMessageBusBase(db, peerType, commonModule, jsonTranSerializer, ubjsonTranSerializer),
+    m_miscData(this)
 {
     qRegisterMetaType<MessageType>();
     qRegisterMetaType<P2pConnection::State>("P2pConnection::State");
@@ -217,11 +217,11 @@ void P2pMessageBus::stop()
 
 // P2pMessageBus
 
-void P2pMessageBus::addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& url)
+void P2pMessageBus::addOutgoingConnectionToPeer(const ApiPersistentIdData& peer, const QUrl& url)
 {
     QnMutexLocker lock(&m_mutex);
     int pos = nx::utils::random::number((int) 0, (int) m_remoteUrls.size());
-    m_remoteUrls.insert(m_remoteUrls.begin() + pos, RemoteConnection(id, url));
+    m_remoteUrls.insert(m_remoteUrls.begin() + pos, RemoteConnection(peer, url));
 }
 
 void P2pMessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
@@ -229,7 +229,7 @@ void P2pMessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
     QnMutexLocker lock(&m_mutex);
     for (int i = 0; i < m_remoteUrls.size() - 1; ++i)
     {
-        if (m_remoteUrls[i].id == id)
+        if (m_remoteUrls[i].peer.id == id)
         {
             m_remoteUrls.erase(m_remoteUrls.begin() + i);
             break;
@@ -261,7 +261,7 @@ void P2pMessageBus::connectSignals(const P2pConnectionPtr& connection)
     connect(connection.data(), &P2pConnection::allDataSent, this, &P2pMessageBus::at_allDataSent);
 }
 
-void P2pMessageBus::createOutgoingConnections()
+void P2pMessageBus::createOutgoingConnections(const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription)
 {
     if (m_outConnectionsTimer.isValid() && !m_outConnectionsTimer.hasExpired(kOutConnectionsInterval))
         return;
@@ -269,39 +269,43 @@ void P2pMessageBus::createOutgoingConnections()
 
     auto itr = m_remoteUrls.begin();
 
-    auto connections = expectedConnections();
-    int maxStartsAtOnce = std::round(std::sqrt(connections)) / 2;
     for (int i = 0; i < m_remoteUrls.size(); ++i)
     {
-        if (m_outgoingConnections.size() >= maxStartsAtOnce)
+        if (m_outgoingConnections.size() >= m_miscData.newConnectionsAtOnce)
             return; //< wait a bit
 
         int pos = m_lastOutgoingIndex % m_remoteUrls.size();
         ++m_lastOutgoingIndex;
 
         const RemoteConnection& remoteConnection = m_remoteUrls[pos];
-        if (!m_connections.contains(remoteConnection.id) && !m_outgoingConnections.contains(remoteConnection.id))
+        if (!m_connections.contains(remoteConnection.peer.id) && !m_outgoingConnections.contains(remoteConnection.peer.id))
         {
+            if (!remoteConnection.peer.persistentId.isNull() &&
+                !needStartConnection(remoteConnection.peer, currentSubscription))
+            {
+                continue;
+            }
+
             {
                 // This check is redundant (can be ommited). But it reduce network race condition time.
                 // So, it reduce frequency of in/out conflict and network traffic a bit.
-                if (m_connectionGuardSharedState.contains(remoteConnection.id))
+                if (m_connectionGuardSharedState.contains(remoteConnection.peer.id))
                     continue; //< incoming connection in progress
             }
 
             ConnectionLockGuard connectionLockGuard(
                 commonModule()->moduleGUID(),
                 connectionGuardSharedState(),
-                remoteConnection.id,
+                remoteConnection.peer.id,
                 ConnectionLockGuard::Direction::Outgoing);
 
             P2pConnectionPtr connection(new P2pConnection(
                 commonModule(),
-                remoteConnection.id,
+                remoteConnection.peer.id,
                 localPeerEx(),
                 std::move(connectionLockGuard),
                 remoteConnection.url));
-            m_outgoingConnections.insert(remoteConnection.id, connection);
+            m_outgoingConnections.insert(remoteConnection.peer.id, connection);
             ++m_connectionTries;
             connectSignals(connection);
             connection->startConnection();
@@ -563,9 +567,15 @@ bool P2pMessageBus::needSubscribeDelay()
     return false;
 }
 
-int P2pMessageBus::expectedConnections() const
+bool P2pMessageBus::needStartConnection(
+    const ApiPersistentIdData& peer,
+    const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription) const
 {
-    return std::max(1, std::max(m_connections.size(), (int)m_remoteUrls.size()));
+    const RouteToPeerMap& allPeerDistances = m_peers->allPeerDistances;
+    qint32 currentDistance = allPeerDistances.value(peer).minDistance();
+    const auto& subscribedVia = currentSubscription.value(peer);
+    return currentDistance > m_miscData.maxDistanceToUseProxy
+        || (subscribedVia && subscribedVia->miscData().localSubscription.size() > m_miscData.maxSubscriptionToResubscribe);
 }
 
 void P2pMessageBus::startStopConnections(const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription)
@@ -583,11 +593,7 @@ void P2pMessageBus::startStopConnections(const QMap<ApiPersistentIdData, P2pConn
     }
 
     // start using connection if need
-    const int connections = expectedConnections();
-    const int kMaxSubscriptionToResubscribe = std::round(std::sqrt(connections)) * 2;
-    int maxStartsAtOnce = std::round(std::sqrt(connections)) / 2;
-    const int kMaxDistanceToUseProxy =  std::max(2, int(std::sqrt(std::sqrt(connections))));
-
+    int maxStartsAtOnce = m_miscData.newConnectionsAtOnce;
 
     for (auto& connection: m_connections)
     {
@@ -595,11 +601,7 @@ void P2pMessageBus::startStopConnections(const QMap<ApiPersistentIdData, P2pConn
             continue; //< already in use or not ready yet
 
         ApiPersistentIdData peer = connection->remotePeer();
-        qint32 currentDistance = allPeerDistances.value(peer).minDistance();
-        const auto& subscribedVia = currentSubscription.value(peer);
-        if (currentDistance > kMaxDistanceToUseProxy
-            || (subscribedVia && subscribedVia->miscData().localSubscription.size() > kMaxSubscriptionToResubscribe)
-            )
+        if (needStartConnection(peer, currentSubscription))
         {
             connection->miscData().isLocalStarted = true;
             connection->miscData().sendStartTimer.restart();
@@ -708,14 +710,24 @@ void P2pMessageBus::commitLazyData()
     }
 }
 
+void P2pMessageBus::MiscData::update()
+{
+    expectedConnections = std::max(1, std::max(owner->m_connections.size(), (int) owner->m_remoteUrls.size()));
+    maxSubscriptionToResubscribe = std::round(std::sqrt(expectedConnections)) * 2;
+    maxDistanceToUseProxy = std::max(2, int(std::sqrt(std::sqrt(expectedConnections))));
+    newConnectionsAtOnce = std::round(std::sqrt(expectedConnections)) / 2;
+}
+
 void P2pMessageBus::doPeriodicTasks()
 {
     QnMutexLocker lock(&m_mutex);
 
-    createOutgoingConnections(); //< open new connections
+    m_miscData.update();
 
-    sendAlivePeersMessage();
     const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription = getCurrentSubscription();
+    createOutgoingConnections(currentSubscription); //< open new connections
+    
+    sendAlivePeersMessage();
     startStopConnections(currentSubscription);
     doSubscribe(currentSubscription);
     commitLazyData();

@@ -173,8 +173,12 @@ void sequenceConnect(std::vector<Appserver2Ptr>& servers)
     {
         const auto addr = servers[i]->moduleInstance()->endpoint();
         QUrl url = lit("http://%1:%2/ec2/messageBus").arg(addr.address.toString()).arg(addr.port);
+        ec2::ApiPersistentIdData peer(
+            servers[i]->moduleInstance()->commonModule()->moduleGUID(),
+            servers[i]->moduleInstance()->commonModule()->dbId()
+            );
         servers[i - 1]->moduleInstance()->ecConnection()->p2pMessageBus()->
-            addOutgoingConnectionToPeer(servers[i]->moduleInstance()->commonModule()->moduleGUID(), url);
+            addOutgoingConnectionToPeer(peer, url);
     }
 }
 
@@ -188,10 +192,14 @@ void fullConnect(std::vector<Appserver2Ptr>& servers)
             if (j == i)
                 continue;
             const auto addr = servers[i]->moduleInstance()->endpoint();
-            const auto id = servers[i]->moduleInstance()->commonModule()->moduleGUID();
+            ec2::ApiPersistentIdData peer(
+                servers[i]->moduleInstance()->commonModule()->moduleGUID(),
+                servers[i]->moduleInstance()->commonModule()->dbId()
+            );
+
             QUrl url = lit("http://%1:%2/ec2/messageBus").arg(addr.address.toString()).arg(addr.port);
             servers[j]->moduleInstance()->ecConnection()->p2pMessageBus()->
-                addOutgoingConnectionToPeer(id, url);
+                addOutgoingConnectionToPeer(peer, url);
         }
     }
 }
