@@ -298,6 +298,10 @@ angular.module('webadminApp').controller('ViewCtrl',
             }*/
         };
 
+        function findRotation(param){
+            return param.name === 'rotation';
+        }
+
         $scope.selectCameraById = function (cameraId, position, silent) {
             if($scope.activeCamera && ($scope.activeCamera.id === cameraId || $scope.activeCamera.physicalId === cameraId)){
                 return;
@@ -312,6 +316,14 @@ angular.module('webadminApp').controller('ViewCtrl',
             position = position?parseInt(position):oldTimePosition;
 
             $scope.activeCamera = getCamera ($scope.storage.cameraId  );
+            
+            var camRotation = _.find($scope.activeCamera.addParams,findRotation);
+            $scope.rotation = camRotation ? parseInt(camRotation.value) : 0;
+            if(isNaN($scope.rotation)){
+                $scope.rotation = 0;
+            }
+
+
             if (!silent && $scope.activeCamera) {
                 $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId], timeCorrection);
                 $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640, timeCorrection);
