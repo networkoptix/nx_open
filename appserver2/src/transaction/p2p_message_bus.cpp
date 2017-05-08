@@ -412,13 +412,11 @@ void P2pMessageBus::printPeersMessage()
 {
     QList<QString> records;
 
-    for (auto itr = m_peers->alivePeers.constBegin(); itr != m_peers->alivePeers.constEnd(); ++itr)
+    for (auto itr = m_peers->allPeerDistances.constBegin(); itr != m_peers->allPeerDistances.constEnd(); ++itr)
     {
         const auto& peer = itr.value();
 
-        qint32 minDistance = kMaxDistance;
-        for (const RoutingRecord& rec : peer.routeTo)
-            minDistance = std::min(minDistance, rec.distance);
+        qint32 minDistance = peer.minDistance();
         if (minDistance == kMaxDistance)
             continue;
         qint16 peerNumber = m_localShortPeerInfo.encode(itr.key());
