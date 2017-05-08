@@ -33,10 +33,6 @@ namespace {
     int commitIntervalMs = 1000;
     static const int kMaxSelectDataSize = 1024 * 32;
 
-
-    // How many new connections we could try to open at the same time
-    static const int kMaxConnectionsAtOnce = 10;
-
     static const int kOutConnectionsInterval = 1000 * 5;
 
     static const int kPeerRecordSize = 6;
@@ -273,10 +269,11 @@ void P2pMessageBus::createOutgoingConnections()
 
     auto itr = m_remoteUrls.begin();
 
-    //for (auto itr = m_remoteUrls.begin(); itr != m_remoteUrls.end(); ++itr)
+    auto connections = expectedConnections();
+    int maxStartsAtOnce = std::round(std::sqrt(connections)) / 2;
     for (int i = 0; i < m_remoteUrls.size(); ++i)
     {
-        if (m_outgoingConnections.size() >= kMaxConnectionsAtOnce)
+        if (m_outgoingConnections.size() >= maxStartsAtOnce)
             return; //< wait a bit
 
         int pos = m_lastOutgoingIndex % m_remoteUrls.size();
@@ -566,6 +563,11 @@ bool P2pMessageBus::needSubscribeDelay()
     return false;
 }
 
+int P2pMessageBus::expectedConnections() const
+{
+    return std::max(1, std::max(m_connections.size(), (int)m_remoteUrls.size()));
+}
+
 void P2pMessageBus::startStopConnections(const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription)
 {
     const RouteToPeerMap& allPeerDistances = m_peers->allPeerDistances;
@@ -580,9 +582,13 @@ void P2pMessageBus::startStopConnections(const QMap<ApiPersistentIdData, P2pConn
         }
     }
 
-    int counter = kMaxConnectionsAtOnce;
     // start using connection if need
-    const int kMaxSubscriptionToResubscribe = std::sqrt(std::max(m_connections.size(), (int) m_remoteUrls.size()));
+    const int connections = expectedConnections();
+    const int kMaxSubscriptionToResubscribe = std::round(std::sqrt(connections)) * 2;
+    int maxStartsAtOnce = std::round(std::sqrt(connections)) / 2;
+    const int kMaxDistanceToUseProxy =  std::max(2, int(std::sqrt(std::sqrt(connections))));
+
+
     for (auto& connection: m_connections)
     {
         if (connection->state() != P2pConnection::State::Connected ||  connection->miscData().isLocalStarted)
@@ -591,14 +597,14 @@ void P2pMessageBus::startStopConnections(const QMap<ApiPersistentIdData, P2pConn
         ApiPersistentIdData peer = connection->remotePeer();
         qint32 currentDistance = allPeerDistances.value(peer).minDistance();
         const auto& subscribedVia = currentSubscription.value(peer);
-        static const int kMaxDistanceToUseProxy = 2;
-        if (currentDistance > kMaxDistanceToUseProxy ||
-            (subscribedVia && subscribedVia->miscData().localSubscription.size() > kMaxSubscriptionToResubscribe))
+        if (currentDistance > kMaxDistanceToUseProxy
+            || (subscribedVia && subscribedVia->miscData().localSubscription.size() > kMaxSubscriptionToResubscribe)
+            )
         {
             connection->miscData().isLocalStarted = true;
             connection->miscData().sendStartTimer.restart();
             connection->sendMessage(MessageType::start, QByteArray());
-            if (--counter == 0)
+            if (--maxStartsAtOnce == 0)
                 return; //< limit start requests at once
         }
     }

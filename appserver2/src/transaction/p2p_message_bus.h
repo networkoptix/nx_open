@@ -225,7 +225,7 @@ public:
     private:
         ApiPersistentIdData m_localPeer;
     };
-
+    int expectedConnections() const;
 public:
     static QByteArray serializePeersMessage(
         const BidirectionRoutingInfo* peers,
