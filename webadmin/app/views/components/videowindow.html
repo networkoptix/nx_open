@@ -46,12 +46,12 @@
     </div>
 
 
-    <div class="videoplayer" id="{{playerId}}" ng-if="flashls" ng-class="{'invisible':loading, rotate90: rotation == 90, rotate180: rotation == 180, rotate270: rotation == 270}" ng-init="initFlash()">
+    <div class="videoplayer" id="{{playerId}}" ng-if="flashls" ng-class="[loading ? 'invisible' : '', getRotation()]" ng-init="initFlash()">
     </div>
 
-    <div class="videoplayer" ng-if="native" ng-class="{'invisible': loading, rotate90: rotation == 90, rotate180: rotation == 180, rotate270: rotation == 270}">
+    <div class="videoplayer" ng-if="native" ng-class="[loading ? 'invisible' : '', getRotation()]">
     </div>
 
-    <video class="videoplayer" ng-if="jsHls" ng-class="{'invisible': loading, rotate90: rotation == 90, rotate180: rotation == 180, rotate270: rotation == 270}">
+    <video class="videoplayer" ng-if="jsHls" ng-class="[loading ? 'invisible' : '', getRotation()]">
     </video>
 </div>
