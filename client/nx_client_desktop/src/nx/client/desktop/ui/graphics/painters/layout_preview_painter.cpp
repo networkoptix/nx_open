@@ -222,9 +222,9 @@ bool LayoutPreviewPainter::paintItem(QPainter* painter, const QRectF& itemRect,
         }
         return true;
     }
-
-    if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+    else if (camera)
     {
+        drawFixedThumbnail(qnSkin->pixmap("item_placeholders/no_access.png"));
         m_thumbnailManager->selectCamera(camera);
         return false;
     }
