@@ -1,37 +1,20 @@
 "use strict";
 angular.module('webadminApp')
-    .directive('cameraPanel', function ($rootScope,$location, mediaserver, cameraRecords, $poll, $q, $timeout) {
+    .directive('cameraPanel', function ($rootScope,$location, mediaserver, camerasProvider, $poll, $q) {
         return {
             restrict: 'E',
             scope: {
-                currentUser: "=",
-                activeCamera: "=",
-                searchCams: "=",
                 storage: "=",
-                timeCorrection: "=",
-                positionProvider: "=",
-                updateVideoSource: "=",
-                switchPlaying: "=",
                 treeRequest: "=",
-                activeVideoRecords: "=",
-                liveOnly: "="
+                selectCameraById: "="
             },
             templateUrl: 'views/components/cameraPanel.html',
             link: function (scope, element/*, attrs*/) {
-
                 scope.Config = Config;
-
-                if(scope.currentUser === null ){
-                    return; // Do nothing, user wasn't authorised
-                }
-
+                scope.searchCams = "";
                 scope.cameras = {};
-
-                var isAdmin = false;
-                var canViewArchive = false;
                 
                 var reloadInterval = 5*1000;//30 seconds
-
                 function getServer(id) {
                     if(!scope.mediaServers) {
                         return null;
@@ -40,53 +23,7 @@ angular.module('webadminApp')
                         return server.id === id;
                     });
                 }
-                function getCamera(id){
-                    if(!scope.cameras) {
-                        return null;
-                    }
-                    for(var serverId in scope.cameras) {
-                        var cam = _.find(scope.cameras[serverId], function (camera) {
-                            return camera.id === id || camera.physicalId === id;
-                        });
-                        if(cam){
-                            return cam;
-                        }
-                    }
-                    return null;
-                }
 
-                function updateStream(position){
-                    scope.liveOnly = true;
-                    if(canViewArchive) {
-                        scope.activeVideoRecords.archiveReadyPromise.then(function (hasArchive) {
-                            scope.liveOnly = !hasArchive;
-                        });
-                    }
-                    scope.updateVideoSource(position);
-                    scope.switchPlaying(true);
-                }
-
-                scope.selectCameraById = function (cameraId, position, silent) {
-                    if(scope.activeCamera && (scope.activeCamera.id === cameraId || scope.activeCamera.physicalId === cameraId)){
-                        return;
-                    }
-
-                    var oldTimePosition = null;
-                    if(scope.positionProvider && !scope.positionProvider.liveMode){
-                        oldTimePosition = scope.positionProvider.playedPosition;
-                    }
-
-                    scope.storage.cameraId  = cameraId || scope.storage.cameraId  ;
-
-                    position = position?parseInt(position):oldTimePosition;
-
-                    scope.activeCamera = getCamera (scope.storage.cameraId  );
-                    if (!silent && scope.activeCamera) {
-                        scope.positionProvider = cameraRecords.getPositionProvider([scope.activeCamera.physicalId], scope.timeCorrection);
-                        scope.activeVideoRecords = cameraRecords.getRecordsProvider([scope.activeCamera.physicalId], 640, scope.timeCorrection);
-                        $timeout(function(){updateStream(position)});
-                    }
-                };
                 scope.selectCamera = function (activeCamera) {
                     $location.path('/view/' + activeCamera.id, false);
                     scope.selectCameraById(activeCamera.id,false);
@@ -95,7 +32,7 @@ angular.module('webadminApp')
                     server.collapsed = !server.collapsed;
                     scope.storage.serverStates[server.id] = server.collapsed;
                 };
-
+                
                 function searchCams(){
                     if(scope.searchCams.toLowerCase() == "links panel"){ // Enable cameras and clean serach fields
                         scope.cameraLinksEnabled = true;
@@ -188,7 +125,7 @@ angular.module('webadminApp')
                         }
 
                         function newCamerasFilter(camera){
-                            var oldCamera = getCamera(camera.id);
+                            var oldCamera = camerasProvider.getCamera(camera.id);
                             if(!oldCamera){
                                 return true;
                             }
@@ -280,6 +217,8 @@ angular.module('webadminApp')
                             }
                         }
 
+                        camerasProvider.setCameras(scope.cameras);
+
                         deferred.resolve(cameras);
                     }, function (error) {
                         deferred.reject(error);
@@ -287,6 +226,7 @@ angular.module('webadminApp')
 
                     return deferred.promise;
                 }
+
                 function reloadTree(){
                     function serverSorter(server){
                         server.url = extractDomain(server.url);
@@ -296,7 +236,6 @@ angular.module('webadminApp')
                         if(typeof(server.visible) === 'undefined'){
                             server.visible = true;
                         }
-
                         return objectOrderName(server);
                     }
 
@@ -321,7 +260,6 @@ angular.module('webadminApp')
                     }
                     scope.treeRequest = mediaserver.getMediaServers();
                     scope.treeRequest.then(function (data) {
-
                         if(!scope.mediaServers) {
                             scope.mediaServers = _.sortBy(data.data,serverSorter);
                         }else{
@@ -378,6 +316,10 @@ angular.module('webadminApp')
                     $poll.cancel(poll);
                 });
 
+                var killSubscription = $rootScope.$on('$routeChangeStart', function (event,next) {
+                    scope.selectCameraById(next.params.cameraId, $location.search().time || false);
+                });
+
                 var desktopCameraTypeId = null;
                 function requestResourses() {
                     mediaserver.getResourceTypes().then(function (result) {
@@ -389,18 +331,9 @@ angular.module('webadminApp')
                     });
                 }
 
+                requestResourses();
+
                 scope.$watch('searchCams',searchCams);
-
-                mediaserver.getCurrentUser().then(function(result) {
-                    isAdmin = result.data.reply.isAdmin || (result.data.reply.permissions.indexOf(Config.globalEditServersPermissions)>=0);
-                    canViewArchive = result.data.reply.isAdmin || (result.data.reply.permissions.indexOf(Config.globalViewArchivePermission)>=0);
-
-                    var userId = result.data.reply.id;
-                    requestResourses(); //Show  whole tree
-                });
-                var killSubscription = $rootScope.$on('$routeChangeStart', function (event,next) {
-                    scope.selectCameraById(next.params.cameraId, $location.search().time || false);
-                });
             }   
         };
     });

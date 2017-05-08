@@ -594,8 +594,7 @@ div.text-center{
   margin-left:-86px;
 }
 
-.camera-node.Unauthorized ,
-.camera-node.Offline {
+.camera-node.Unauthorized {
   color:#698796 !important;
 }
 
@@ -704,11 +703,19 @@ div.text-center{
 
 .camera-node{
   height: 56px;
+
+  font-size: 14px;
+  font-weight: 500 !important;
+  color: $dark9 !important;
+  line-height: 22px;
+
 }
 
 .camera-node small{
-  color: $light13;
-  font-size: 75%
+  font-size: 12px;
+  font-weight: 400;
+  color: $light16 !important;
+  line-height: 18px;
 }
 
 .not-supported.camera-view-message{
@@ -803,13 +810,19 @@ div.text-center{
 }
 
 .server-link small{
-  font-size: 75%;
-  color: $light13;
+  font-size: 12px;
+  font-weight: 400;
+  color: $light16;
+  line-height: 18px;
+
 }
 
 .server-name{
   margin-left: -17px;
   font-size: 14px;
+  font-weight: 500;
+  color: $dark9;
+  line-height: 22px;
 }
 
 .pull-up-3{

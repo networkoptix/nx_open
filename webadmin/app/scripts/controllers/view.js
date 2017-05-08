@@ -1,10 +1,10 @@
 'use strict';
 
 angular.module('webadminApp').controller('ViewCtrl',
-    function ($scope, $rootScope, $location, $routeParams, mediaserver, cameraRecords, $poll, $q,
-              $sessionStorage, $localStorage, currentUser) {
-        $scope.currentUser = currentUser;
-        if(currentUser === null ){
+    function ($scope, $rootScope, $location, $routeParams, mediaserver, cameraRecords,
+              camerasProvider, $sessionStorage, $localStorage, currentUser) {
+
+        if(currentUser === null){
             return; // Do nothing, user wasn't authorised
         }
 
@@ -30,7 +30,6 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.activeVideoRecords = null;
         $scope.liveOnly = true;
         $scope.activeCamera = null;
-        $scope.searchCams = '';
 
 
         mediaserver.systemSettings().then(function(r){
@@ -38,7 +37,9 @@ angular.module('webadminApp').controller('ViewCtrl',
         });
 
 
-        $scope.timeCorrection = 0;
+        var timeCorrection = 0;
+        var isAdmin = false;
+        var canViewArchive = false;
         var minTimeLag = 2000;// Two seconds
 
         $scope.activeResolution = 'Auto';
@@ -196,6 +197,34 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
         }
 
+        $scope.selectCameraById = function (cameraId, position, silent) {
+            if($scope.activeCamera && ($scope.activeCamera.id === cameraId || $scope.activeCamera.physicalId === cameraId)){
+                return;
+            }
+
+            var oldTimePosition = null;
+            if($scope.positionProvider && !$scope.positionProvider.liveMode){
+                oldTimePosition = $scope.positionProvider.playedPosition;
+            }
+
+            $scope.storage.cameraId  = cameraId || $scope.storage.cameraId  ;
+
+            position = position?parseInt(position):oldTimePosition;
+
+            $scope.activeCamera = camerasProvider.getCamera ($scope.storage.cameraId  );
+            if (!silent && $scope.activeCamera) {
+                $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId], timeCorrection);
+                $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640, timeCorrection);
+                $scope.liveOnly = true;
+                if(canViewArchive) {
+                    $scope.activeVideoRecords.archiveReadyPromise.then(function (hasArchive) {
+                        $scope.liveOnly = !hasArchive;
+                    });
+                }
+                updateVideoSource(position);
+                $scope.switchPlaying(true);
+            }
+        };
 
         $scope.playerReady = function(API){
             $scope.playerAPI = API;
@@ -204,7 +233,8 @@ angular.module('webadminApp').controller('ViewCtrl',
                 $scope.playerAPI.volume($scope.volumeLevel);
             }
         };
-        $scope.updateVideoSource = function(playing) {
+
+        function updateVideoSource(playing) {
             updateAvailableResolutions();
             var live = !playing;
 
@@ -214,11 +244,11 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
 
             if($scope.treeRequest){
-                $scope.treeRequest.abort('$scope.updateVideoSource'); //abort tree reloading request to speed up loading new video
+                $scope.treeRequest.abort('updateVideoSource'); //abort tree reloading request to speed up loading new video
             }
 
 
-            $scope.positionProvider.init(playing, $scope.timeCorrection);
+            $scope.positionProvider.init(playing, timeCorrection);
             if(live){
                 playing = (new Date()).getTime();
             }else{
@@ -251,7 +281,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             ],function(src){
                 return formatSupported(src.transport,false) && $scope.activeFormat === 'Auto' || $scope.debugMode && $scope.manualFormats.indexOf($scope.activeFormat) > -1;
             });
-        };
+        }
 
 
         $scope.updateTime = function(currentTime, duration){
@@ -293,7 +323,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             //var playing = $scope.positionProvider.checkPlayingDate(val);
 
             //if(playing === false) {
-                $scope.updateVideoSource(val);//We have nothing more to do with it.
+                updateVideoSource(val);//We have nothing more to do with it.
             /*}else{
                 $scope.playerAPI.seekTime(playing); // Jump to buffered video
             }*/
@@ -301,7 +331,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         $scope.selectFormat = function(format){
             $scope.activeFormat = format;
-            $scope.updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
+            updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
         };
 
         $scope.selectResolution = function(resolution){
@@ -313,7 +343,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 return;
             }
             $scope.activeResolution = resolution;
-            $scope.updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
+            updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
         };
 
         $scope.enableFullScreen = screenfull.enabled;
@@ -342,12 +372,12 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
 
             if((!$scope.positionProvider || $scope.positionProvider.liveMode) && !(status === 'Offline' || status === 'Unauthorized')){
-                $scope.updateVideoSource();
+                updateVideoSource();
             }
         });
 
         $scope.$watch('player', function(){
-            $scope.updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition)
+            updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
         },true);
 
         $scope.$watch('volumeLevel', function(){
@@ -362,15 +392,23 @@ angular.module('webadminApp').controller('ViewCtrl',
             var serverTime = parseInt(result.data.reply.utcTime);
             var clientTime = clientDate.getTime();
             if(Math.abs(clientTime - serverTime) > minTimeLag){
-                $scope.timeCorrection = clientTime - serverTime;
+                timeCorrection = clientTime - serverTime;
             }
             
             $scope.serverTime.timeZoneOffset = parseInt(result.data.reply.timeZoneOffset);
-            $scope.serverTime.latency = $scope.timeCorrection;
+            $scope.serverTime.latency = timeCorrection;
 
             if(Config.settingsConfig.useServerTime){
-                $scope.timeCorrection = $scope.serverTime.timeZoneOffset + clientDate.getTimezoneOffset() * 60000 - $scope.timeCorrection;
+                timeCorrection = $scope.serverTime.timeZoneOffset + clientDate.getTimezoneOffset() * 60000 - timeCorrection;
             }
+        });
+
+        mediaserver.getCurrentUser().then(function(result) {
+            isAdmin = result.data.reply.isAdmin || (result.data.reply.permissions.indexOf(Config.globalEditServersPermissions)>=0);
+            canViewArchive = result.data.reply.isAdmin || (result.data.reply.permissions.indexOf(Config.globalViewArchivePermission)>=0);
+
+            var userId = result.data.reply.id;
+            //requestResourses(); //Show  whole tree
         });
 
 

@@ -8,7 +8,7 @@
             <span class="input-group-addon info-icon" ng-class="{'active':toggleInfo}" ng-click="toggleInfo= !toggleInfo"><span class="glyphicon glyphicon-info-sign"></span></span>
         </label>
     </div>
-    <camera-links ng-if="cameraLinksEnabled"
+    <camera-links ng-if="cameraLinksEnabled && 0"
                   position="positionProvider.playedPosition"
                   live-mode="positionProvider.liveMode"
                   active-camera="activeCamera" player="player" current-resolution="currentResolution"></camera-links>
