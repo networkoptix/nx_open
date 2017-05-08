@@ -636,14 +636,19 @@ void P2pMessageBus::doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr
 
     const RouteToPeerMap& allPeerDistances = m_peers->allPeerDistances;
     const auto& alivePeers =  m_peers->alivePeers;
-
+    auto currentSubscriptionItr = currentSubscription.cbegin();
     for (auto itr = allPeerDistances.constBegin(); itr != allPeerDistances.constEnd(); ++itr)
     {
         const ApiPersistentIdData& peer = itr.key();
         if (peer == localPeer)
             continue;
 
-        auto subscribedVia = currentSubscription.value(peer);
+        //auto subscribedVia = currentSubscription.value(peer);
+        while (currentSubscriptionItr != currentSubscription.cend() && currentSubscriptionItr.key() < peer)
+            ++currentSubscriptionItr;
+        P2pConnectionPtr subscribedVia;
+        if (currentSubscriptionItr != currentSubscription.cend() && currentSubscriptionItr.key() == peer)
+            subscribedVia = currentSubscription.value(peer);
         qint32 subscribedDistance =
             alivePeers[subscribedVia ? subscribedVia->remotePeer() : localPeer].distanceTo(peer);
 
