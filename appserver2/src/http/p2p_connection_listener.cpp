@@ -77,8 +77,6 @@ P2pConnectionProcessor::~P2pConnectionProcessor()
 
 QByteArray P2pConnectionProcessor::responseBody(Qn::SerializationFormat dataFormat)
 {
-    Q_D(P2pConnectionProcessor);
-
     ApiPeerDataEx localPeer;
     localPeer.id = commonModule()->moduleGUID();
     localPeer.persistentId = commonModule()->dbId();

@@ -60,6 +60,7 @@ public:
     ApiPeerData localPeer() const;
     ApiPeerDataEx localPeerEx() const;
 
+    virtual void start() override;
     virtual void stop() override;
 
 
@@ -138,8 +139,8 @@ private:
 
     QMap<ApiPersistentIdData, P2pConnectionPtr> getCurrentSubscription() const;
     void resubscribePeers(QMap<ApiPersistentIdData, P2pConnectionPtr> newSubscription);
-    void startStopConnections();
-    void doSubscribe();
+    void startStopConnections(const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription);
+    void doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription);
     P2pConnectionPtr findConnectionById(const ApiPersistentIdData& id) const;
 
     bool handleResolvePeerNumberRequest(const P2pConnectionPtr& connection, const QByteArray& data);
@@ -186,8 +187,22 @@ public:
         RouteToPeerInfo() {}
 
         qint32 minDistance(QVector<ApiPersistentIdData>* outViaList = nullptr) const;
+        const RoutingInfo& routeVia() const { return m_routeVia; }
+        
+        void remove(const ApiPersistentIdData& id)
+        {
+            m_routeVia.remove(id);
+            m_minDistance = kMaxDistance;
+        }
+        void insert(const ApiPersistentIdData& id, const RoutingRecord& record)
+        {
+            m_routeVia[id] = record;
+            m_minDistance = kMaxDistance;
+        }
 
-        RoutingInfo routeVia; // key: route via, value - distance in hops
+    private:
+        RoutingInfo m_routeVia; // key: route via, value - distance in hops
+        mutable int m_minDistance = kMaxDistance;
     };
     typedef QMap<ApiPersistentIdData, RouteToPeerInfo> RouteToPeerMap;
 
@@ -203,6 +218,7 @@ public:
             const ApiPersistentIdData& to,
             const RoutingRecord& record);
         qint32 distanceTo(const ApiPersistentIdData& peer) const;
+        void updateLocalDistance(const ApiPersistentIdData& peer, qint32 sequence);
 
         AlivePeersMap alivePeers; //< alive peers in the system. key - route via, value - route to
         RouteToPeerMap allPeerDistances;  //< vice versa
