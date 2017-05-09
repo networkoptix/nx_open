@@ -103,16 +103,16 @@ table.webclient-window>tbody>tr>td.alert{
 
 .top-gradient{
   background: $dark1;
-  background: -webkit-linear-gradient(bottom,rgba(0,0,0,0.3),rgba(0,0,0,0)); /*Safari 5.1-6*/
-  background: -o-linear-gradient(top,rgba(0,0,0,0),rgba(0,0,0,0.3)); /*Opera 11.1-12*/
-  background: -moz-linear-gradient(top,rgba(0,0,0,0),rgba(0,0,0,0.3)); /*Fx 3.6-15*/
-  background: linear-gradient(to top, rgba(0,0,0,0), rgba(0,0,0,0.3)); /*Standard*/
+  background: -webkit-linear-gradient(bottom,rgba($dark1,0.3),rgba($dark1,0)); /*Safari 5.1-6*/
+  background: -o-linear-gradient(top,rgba($dark1, 0),rgba($dark1, 0.3)); /*Opera 11.1-12*/
+  background: -moz-linear-gradient(top,rgba($dark1, 0),rgba($dark1, 0.3)); /*Fx 3.6-15*/
+  background: linear-gradient(to top, rgba($dark1, 0), rgba($dark1, 0.3)); /*Standard*/
 }
 
 .video-name{
   line-height: 24px !important;
   color: $light1;
-  text-shadow: 0px 1px 3px 0px rgba(0,0,0,1)
+  text-shadow: 0px 1px 3px 0px rgba($dark1,1)
 }
 
 .video-status{
@@ -132,7 +132,7 @@ table.webclient-window>tbody>tr>td.alert{
   right: -25px;
   left:initial;
   padding: 0px !important;
-  background-color: rgba(33,42,47,0.9) !important;
+  background-color: rgba($dark7,0.9) !important;
   border-radius: 0px;
 
   color: $light16;
@@ -141,7 +141,7 @@ table.webclient-window>tbody>tr>td.alert{
 }
 
 .video-quality:hover{
-  background-color: rgba(105, 135, 150, 0.1);
+  background-color: rgba($light16, 0.1);
 }
 
 .video-settings-options:hover{
