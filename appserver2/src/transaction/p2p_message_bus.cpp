@@ -45,7 +45,6 @@ namespace ec2 {
 
 qint32 P2pMessageBus::AlivePeerInfo::distanceTo(const ApiPersistentIdData& via) const
 {
-    qint32 result = std::numeric_limits<qint32>::max();
     auto itr = routeTo.find(via);
     return itr != routeTo.end() ? itr.value().distance : kMaxDistance;
 }
@@ -528,24 +527,6 @@ P2pConnectionPtr P2pMessageBus::findConnectionById(const ApiPersistentIdData& id
     return result && result->remotePeer().persistentId == id.persistentId ? result : P2pConnectionPtr();
 }
 
-#if 0
-P2pMessageBus::RouteToPeerMap P2pMessageBus::allPeersDistances() const
-{
-    if (!m_allPeerDistances.isEmpty())
-        return m_allPeerDistances;
-    for (auto itrVia = m_alivePeers.constBegin(); itrVia != m_alivePeers.constEnd(); ++itrVia)
-    {
-        const auto& toPeers = itrVia.value().routeTo;
-        for (auto itrTo = toPeers.begin(); itrTo != toPeers.end(); ++itrTo)
-        {
-            const auto& record = itrTo.value();
-            m_allPeerDistances[itrTo.key()].routeVia[itrVia.key()] = record;
-        }
-    }
-    return m_allPeerDistances;
-}
-#endif
-
 bool P2pMessageBus::needSubscribeDelay()
 {
     // If alive peers has been recently received, postpone subscription for some time.
@@ -655,6 +636,7 @@ void P2pMessageBus::doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr
         P2pConnectionPtr subscribedVia;
         if (currentSubscriptionItr != currentSubscription.cend() && currentSubscriptionItr.key() == peer)
             subscribedVia = currentSubscriptionItr.value();
+
         qint32 subscribedDistance =
             alivePeers[subscribedVia ? subscribedVia->remotePeer() : localPeer].distanceTo(peer);
 
@@ -1293,17 +1275,6 @@ void P2pMessageBus::gotTransaction(
         printTran(connection, tran, P2pConnection::Direction::incoming);
 
     ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
-#if 0
-    if (!connection->localPeerSubscribedTo(peerId))
-    {
-        NX_LOG(lit("Peer %1 has not subscribed to %2 via %3. Ignore transaction")
-            .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
-            .arg(qnStaticCommon->moduleDisplayName(peerId.id))
-            .arg(qnStaticCommon->moduleDisplayName(connection->remotePeer().id)),
-            cl_logDEBUG1);
-        int gg = 4;
-    }
-#endif
 
     //NX_ASSERT(connection->localPeerSubscribedTo(peerId)); //< loop
     NX_ASSERT(!connection->remotePeerSubscribedTo(peerId)); //< loop
