@@ -114,7 +114,6 @@ P2pConnection::P2pConnection(
         std::move(connectionLockGuard));
 
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
-    m_readBuffer.reserve(1024 * 1024);
     m_miscData.lifetimeTimer.restart();
 }
 
