@@ -18,7 +18,7 @@
 
 namespace {
 
-static const int kInstanceCount = 100;
+static const int kInstanceCount = 150;
 static const int kMaxSyncTimeoutMs = 1000 * 20 * 1000;
 static const int kCamerasCount = 100;
 
@@ -75,21 +75,25 @@ static void createData(const Appserver2Ptr& server)
         auto serverManager = connection->getMediaServerManager(Qn::kSystemAccess);
         ASSERT_EQ(ec2::ErrorCode::ok, serverManager->saveSync(serverData));
     }
+
+    std::vector<ec2::ApiCameraData> cameras;
+    cameras.reserve(kCamerasCount);
+    const auto& moduleGuid = server->moduleInstance()->commonModule()->moduleGUID();
+    auto resTypePtr = qnResTypePool->getResourceTypeByName("Camera");
+    ASSERT_TRUE(!resTypePtr.isNull());
     for (int i = 0; i < kCamerasCount; ++i)
     {
         ec2::ApiCameraData cameraData;
-        auto resTypePtr = qnResTypePool->getResourceTypeByName("Camera");
-        ASSERT_TRUE(!resTypePtr.isNull());
         cameraData.typeId = resTypePtr->getId();
-        cameraData.parentId = server->moduleInstance()->commonModule()->moduleGUID();
+        cameraData.parentId = moduleGuid;
         cameraData.vendor = "Invalid camera";
         cameraData.physicalId = QnUuid::createUuid().toString();
         cameraData.name = server->moduleInstance()->endpoint().toString();
         cameraData.id = ec2::ApiCameraData::physicalIdToId(cameraData.physicalId);
-
-        auto cameraManager = connection->getCameraManager(Qn::kSystemAccess);
-        ASSERT_EQ(ec2::ErrorCode::ok, cameraManager->addCameraSync(cameraData));
+        cameras.push_back(std::move(cameraData));
     }
+    auto cameraManager = connection->getCameraManager(Qn::kSystemAccess);
+    ASSERT_EQ(ec2::ErrorCode::ok, cameraManager->addCamerasSync(cameras));
 }
 
 } // namespace

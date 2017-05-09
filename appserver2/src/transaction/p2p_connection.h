@@ -64,8 +64,8 @@ public:
     /** Peer that opens this connection */
     Direction direction() const { return m_direction; }
 
-    ApiPeerData localPeer() const { return m_localPeer; }
-    ApiPeerData remotePeer() const { return m_remotePeer; }
+    const ApiPeerData& localPeer() const { return m_localPeer; }
+    const ApiPeerData& remotePeer() const { return m_remotePeer; }
 
     State state() const;
     void setState(State state);
