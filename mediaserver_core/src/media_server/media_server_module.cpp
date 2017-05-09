@@ -66,7 +66,6 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_commonModule = store(new QnCommonModule(/*clientMode*/ false));
 
-    instance<QnLongRunnablePool>();
     instance<QnWriterPool>();
 #ifdef ENABLE_ONVIF
     store<PasswordHelper>(new PasswordHelper());

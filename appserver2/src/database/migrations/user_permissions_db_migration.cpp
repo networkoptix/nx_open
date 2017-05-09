@@ -83,7 +83,7 @@ int migrateFromV26(int oldPermissions)
     NX_LOG(
         lm("Migrating User Permissions: %1 -> %2")
            .arg(QnLexical::serialized(v26permissions), QnLexical::serialized(result)),
-        cl_logINFO);
+        cl_logDEBUG1);
 
     return result;
 }

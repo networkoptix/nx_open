@@ -1503,7 +1503,7 @@ bool QnDbManager::createDatabase()
 
     if (!isObjectExists(lit("table"), lit("transaction_log"), m_sdb))
     {
-        NX_LOG(lit("Update database to v 2.3"), cl_logINFO);
+        NX_LOG(lit("Update database to v 2.3"), cl_logDEBUG1);
 
         if (!execSQLFile(lit(":/00_update_2.2_stage0.sql"), m_sdb))
             return false;

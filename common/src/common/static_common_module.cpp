@@ -24,6 +24,7 @@ QnStaticCommonModule::QnStaticCommonModule(
 {
     Q_INIT_RESOURCE(common);
     QnCommonMetaTypes::initialize();
+    instance<QnLongRunnablePool>();
     nx::network::SocketGlobals::init();
 
     m_dataPool = instance<QnResourceDataPool>();

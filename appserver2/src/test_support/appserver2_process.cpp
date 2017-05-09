@@ -241,7 +241,7 @@ int Appserver2Process::exec()
         if (errorCode == ec2::ErrorCode::ok)
         {
             //connectInfo = ec2Connection->connectionInfo();
-            NX_LOG(lit("Connected to local EC2"), cl_logWARNING);
+            NX_LOG(lit("Connected to local EC2"), cl_logDEBUG1);
             break;
         }
 

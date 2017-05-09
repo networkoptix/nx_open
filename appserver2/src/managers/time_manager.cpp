@@ -725,7 +725,7 @@ void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
         NX_LOGX(lm("Received sync time update from peer %1, peer's sync time (%2). "
             "Accepting peer's synchronized time due to large drift (%3 ms, fault %4)").
             arg(remotePeerID.toString()).arg(QDateTime::fromMSecsSinceEpoch(remotePeerSyncTime).toString(Qt::ISODate)).
-            arg(timeDifference).arg(effectiveTimeErrorEstimation), cl_logINFO);
+            arg(timeDifference).arg(effectiveTimeErrorEstimation), cl_logDEBUG1);
     }
     else
     {
@@ -734,7 +734,7 @@ void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
             arg(remotePeerID.toString()).arg(QDateTime::fromMSecsSinceEpoch(remotePeerSyncTime).toString(Qt::ISODate)).
             arg(remotePeerTimePriorityKey.toUInt64(), 0, 16).arg(commonModule->moduleGUID().toString()).
             arg(QDateTime::fromMSecsSinceEpoch(getSyncTimeNonSafe()).toString(Qt::ISODate)).
-            arg(m_usedTimeSyncInfo.timePriorityKey.toUInt64(), 0, 16), cl_logINFO );
+            arg(m_usedTimeSyncInfo.timePriorityKey.toUInt64(), 0, 16), cl_logDEBUG1);
     }
 
     //taking new synchronization data

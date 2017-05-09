@@ -21,7 +21,7 @@ static const QString kLogPrefix("db::migration::");
 
 void log(const QString& message)
 {
-    NX_LOG(kLogPrefix + message, cl_logINFO);
+    NX_LOG(kLogPrefix + message, cl_logDEBUG1);
 }
 
 struct LayoutOnVideoWall
@@ -202,7 +202,7 @@ bool reparentVideoWallLayouts(ec2::database::api::Context* context)
         }
     }
 
-    NX_LOG(lit("End of DB migration: reparent videowall layouts"), cl_logINFO);
+    NX_LOG(lit("End of DB migration: reparent videowall layouts"), cl_logDEBUG1);
     return true;
 }
 

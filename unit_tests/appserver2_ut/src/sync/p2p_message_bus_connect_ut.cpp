@@ -18,7 +18,7 @@
 
 namespace {
 
-static const int kInstanceCount = 150;
+static const int kInstanceCount = 50;
 static const int kMaxSyncTimeoutMs = 1000 * 20 * 1000;
 static const int kCamerasCount = 100;
 
@@ -331,7 +331,7 @@ static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverCon
         cl_logINFO);
 
 
-    std::this_thread::sleep_for(std::chrono::seconds(5000));
+    //std::this_thread::sleep_for(std::chrono::seconds(50000));
 }
 
 TEST(P2pMessageBus, SequenceConnect)
