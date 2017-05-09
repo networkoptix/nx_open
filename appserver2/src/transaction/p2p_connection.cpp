@@ -75,8 +75,6 @@ P2pConnection::P2pConnection(
     m_connectionLockGuard = std::make_unique<ConnectionLockGuard>(
         std::move(connectionLockGuard));
 
-    m_readBuffer.reserve(1024 * 1024);
-
     m_remotePeerUrl = _remotePeerUrl;
     m_remotePeer.id = remoteId;
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
