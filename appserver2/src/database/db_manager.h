@@ -709,6 +709,7 @@ namespace detail
         
         std::unique_ptr<QSqlQuery> m_insCameraQuery;
         std::unique_ptr<QSqlQuery> m_cameraUserAttrQuery;
+        std::unique_ptr<QSqlQuery> m_insCameraScheduleQuery;
         std::unique_ptr<QSqlQuery> m_kvPairQuery;
         ec2::database::api::Context m_resourceContext;
     };

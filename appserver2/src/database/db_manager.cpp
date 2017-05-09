@@ -1935,20 +1935,25 @@ ErrorCode QnDbManager::updateCameraSchedule(const std::vector<ApiScheduleTaskDat
     if (errCode != ErrorCode::ok)
         return errCode;
 
-    QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT INTO vms_scheduletask ("
-        "camera_attrs_id, start_time, end_time, do_record_audio, record_type,"
-        "day_of_week, before_threshold, after_threshold, stream_quality, fps"
-    ") VALUES ("
-        ":internalId, :startTime, :endTime, :recordAudio, :recordingType,"
-        ":dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps"
-    ")");
-
-    insQuery.bindValue(":internalId", internalId);
-    for(const ApiScheduleTaskData& task: scheduleTasks) {
-        QnSql::bind(task, &insQuery);
-        if (!insQuery.exec()) {
-            qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+    if (!m_insCameraScheduleQuery)
+    {
+        m_insCameraScheduleQuery.reset(new QSqlQuery(m_sdb));
+        m_insCameraScheduleQuery->prepare("INSERT INTO vms_scheduletask ("
+            "camera_attrs_id, start_time, end_time, do_record_audio, record_type,"
+            "day_of_week, before_threshold, after_threshold, stream_quality, fps"
+            ") VALUES ("
+            ":internalId, :startTime, :endTime, :recordAudio, :recordingType,"
+            ":dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps"
+            ")");
+    }
+    
+    m_insCameraScheduleQuery->bindValue(":internalId", internalId);
+    for(const ApiScheduleTaskData& task: scheduleTasks) 
+    {
+        QnSql::bind(task, m_insCameraScheduleQuery.get());
+        if (!m_insCameraScheduleQuery->exec()) 
+        {
+            qWarning() << Q_FUNC_INFO << m_insCameraScheduleQuery->lastError().text();
             return ErrorCode::dbError;
         }
     }
@@ -4038,6 +4043,7 @@ void QnDbManager::resetPreparedStatements()
     m_resourceContext.reset();
     m_insCameraQuery.reset();
     m_cameraUserAttrQuery.reset();
+    m_insCameraScheduleQuery.reset();
     m_kvPairQuery.reset();
 }
 

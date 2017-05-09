@@ -39,9 +39,9 @@ public:
     const QUuid& getQUuid() const;
 
     bool isNull() const;
-    const QByteArray& toByteArray() const;
-    const QByteArray& toRfc4122() const;
-    const QString& toString() const;
+    const QByteArray toByteArray() const;
+    const QByteArray toRfc4122() const;
+    const QString toString() const;
     /** Returns guid without {}. */
     QString toSimpleString() const;
     QByteArray toSimpleByteArray() const;
@@ -73,11 +73,11 @@ public:
 
 private:
     QUuid m_uuid;
-    mutable boost::optional<QString> m_stringRepresentation;
+    //mutable boost::optional<QString> m_stringRepresentation;
     //!text representation
-    mutable boost::optional<QByteArray> m_byteArrayRepresentation;
+    //mutable boost::optional<QByteArray> m_byteArrayRepresentation;
     //!binary representation
-    mutable boost::optional<QByteArray> m_rfc4122Representation;
+   // mutable boost::optional<QByteArray> m_rfc4122Representation;
 
     friend NX_UTILS_API QDataStream& operator>>(QDataStream& s, QnUuid& id);
 };

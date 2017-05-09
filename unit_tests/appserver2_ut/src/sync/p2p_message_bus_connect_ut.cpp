@@ -98,7 +98,8 @@ static void createData(const Appserver2Ptr& server)
         userAttr.cameraId = cameraData.id;
         userAttrs.push_back(userAttr);
 
-        cameraParams.push_back(ec2::ApiResourceParamWithRefData(cameraData.id, "property1", "value1"));
+        for (int j = 0; j < 5; ++j)
+            cameraParams.push_back(ec2::ApiResourceParamWithRefData(cameraData.id, lit("property%1").arg(j), lit("value%1").arg(j)));
     }
     auto cameraManager = connection->getCameraManager(Qn::kSystemAccess);
     auto resourceManager = connection->getResourceManager(Qn::kSystemAccess);
