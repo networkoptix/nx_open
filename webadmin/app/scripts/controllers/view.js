@@ -16,6 +16,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.debugMode = Config.allowDebugMode;
         $scope.session = $sessionStorage;
         $scope.storage = $localStorage;
+        $scope.camerasProvider = camerasProvider.getProvider();
         $scope.storage.serverStates = $scope.storage.serverStates || {};
         
         $scope.playerApi = false;
@@ -211,7 +212,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             position = position?parseInt(position):oldTimePosition;
 
-            $scope.activeCamera = camerasProvider.getCamera ($scope.storage.cameraId  );
+            $scope.activeCamera = $scope.camerasProvider.getCamera ($scope.storage.cameraId  );
             if (!silent && $scope.activeCamera) {
                 $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId], timeCorrection);
                 $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640, timeCorrection);
@@ -410,6 +411,12 @@ angular.module('webadminApp').controller('ViewCtrl',
             var userId = result.data.reply.id;
             //requestResourses(); //Show  whole tree
         });
+
+        var updateTreeRequest = function(){
+            $scope.treeRequest = $scope.camerasProvider.treeRequest;
+        };
+        $scope.camerasProvider.setSelectCameraById($scope.selectCameraById);
+        $scope.$watch('camerasProvider.treeRequest', updateTreeRequest);
 
 
 
