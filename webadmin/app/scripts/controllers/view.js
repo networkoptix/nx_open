@@ -323,10 +323,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             $scope.activeCamera = getCamera ($scope.storage.cameraId  );
             
             var camRotation = _.find($scope.activeCamera.addParams,findRotation);
-            $scope.rotation = camRotation ? parseInt(camRotation.value) : 0;
-            if(isNaN($scope.rotation)){
-                $scope.rotation = 0;
-            }
+            $scope.rotation = camRotation && camRotation.value ? parseInt(camRotation.value) : 0;
 
 
             if (!silent && $scope.activeCamera) {
