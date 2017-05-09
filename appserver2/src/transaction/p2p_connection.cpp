@@ -317,21 +317,6 @@ void P2pConnection::setState(State state)
     }
 }
 
-ApiPeerData P2pConnection::localPeer() const
-{
-    return m_localPeer;
-}
-
-ApiPeerData P2pConnection::remotePeer() const
-{
-    return m_remotePeer;
-}
-
-P2pConnection::Direction P2pConnection::direction() const
-{
-    return m_direction;
-}
-
 void P2pConnection::sendMessage(MessageType messageType, const nx::Buffer& data)
 {
     nx::Buffer buffer;
