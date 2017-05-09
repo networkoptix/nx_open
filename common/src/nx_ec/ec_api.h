@@ -133,11 +133,13 @@ namespace ec2
             \param handler Functor with params: (ErrorCode, const ApiResourceParamWithRefDataList&)
         */
         template<class TargetType, class HandlerType>
-        int getKvPairs( const QnUuid& resourceId, TargetType* target, HandlerType handler ) {
+        int getKvPairs( const QnUuid& resourceId, TargetType* target, HandlerType handler ) 
+        {
             return getKvPairs( resourceId, std::static_pointer_cast<impl::GetKvPairsHandler>(std::make_shared<impl::CustomGetKvPairsHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-        ErrorCode getKvPairsSync(const QnUuid& resourceId, ApiResourceParamWithRefDataList* const outData) {
+        ErrorCode getKvPairsSync(const QnUuid& resourceId, ApiResourceParamWithRefDataList* const outData) 
+        {
             return impl::doSyncCall<impl::GetKvPairsHandler>(
                 [=](const impl::GetKvPairsHandlerPtr &handler) {
                     return this->getKvPairs(resourceId, handler);
@@ -154,7 +156,8 @@ namespace ec2
             return getStatusList( resourceId, std::static_pointer_cast<impl::GetStatusListHandler>(std::make_shared<impl::CustomGetStatusListHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-        ErrorCode getStatusListSync(const QnUuid& resourceId, ApiResourceStatusDataList* const outData) {
+        ErrorCode getStatusListSync(const QnUuid& resourceId, ApiResourceStatusDataList* const outData) 
+        {
             return impl::doSyncCall<impl::GetStatusListHandler>(
                 [=](const impl::GetStatusListHandlerPtr &handler) {
                     return this->getStatusList(resourceId, handler);
@@ -167,16 +170,18 @@ namespace ec2
             \param handler Functor with params: (ErrorCode, const ApiResourceParamWithRefDataList&)
         */
         template<class TargetType, class HandlerType>
-        int save(const ec2::ApiResourceParamWithRefDataList& kvPairs, TargetType* target, HandlerType handler ) {
-            return save(kvPairs, std::static_pointer_cast<impl::SaveKvPairsHandler>(std::make_shared<impl::CustomSaveKvPairsHandler<TargetType, HandlerType>>(target, handler)) );
+        int save(const ec2::ApiResourceParamWithRefDataList& kvPairs, TargetType* target, HandlerType handler ) 
+        {
+            return save(kvPairs, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-        ErrorCode saveSync(const ec2::ApiResourceParamWithRefDataList& kvPairs, ApiResourceParamWithRefDataList* const outData) {
-            return impl::doSyncCall<impl::SaveKvPairsHandler>(
-                [=](const impl::SaveKvPairsHandlerPtr &handler) {
+        ErrorCode saveSync(const ec2::ApiResourceParamWithRefDataList& kvPairs) 
+        {
+            return impl::doSyncCall<impl::SimpleHandler>(
+                [=](const impl::SimpleHandlerPtr &handler) 
+                {
                     return this->save(kvPairs, handler);
-                },
-                outData
+                }
             );
         }
 
@@ -185,8 +190,7 @@ namespace ec2
             ApiResourceParamWithRefDataList kvPairs;
             for (const auto& p: properties)
                 kvPairs.push_back(ApiResourceParamWithRefData(resourceId, p.name, p.value));
-            ApiResourceParamWithRefDataList dummy;
-            return saveSync(kvPairs, &dummy);
+            return saveSync(kvPairs);
         }
 
         //!Convenient method to remove resource of any type
@@ -208,7 +212,7 @@ namespace ec2
         virtual int setResourceStatus( const QnUuid& resourceId, Qn::ResourceStatus status, impl::SetResourceStatusHandlerPtr handler ) = 0;
         virtual int getKvPairs( const QnUuid &resourceId, impl::GetKvPairsHandlerPtr handler ) = 0;
         virtual int getStatusList( const QnUuid &resourceId, impl::GetStatusListHandlerPtr handler ) = 0;
-        virtual int save(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) = 0;
+        virtual int save(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SimpleHandlerPtr handler ) = 0;
         virtual int remove( const QnUuid& resource, impl::SimpleHandlerPtr handler ) = 0;
         virtual int remove( const QVector<QnUuid>& resourceList, impl::SimpleHandlerPtr handler ) = 0;
     };

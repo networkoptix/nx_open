@@ -1561,14 +1561,18 @@ QnDbManager::~QnDbManager()
 
 ErrorCode QnDbManager::insertAddParam(const ApiResourceParamWithRefData& param)
 {
-    QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT OR REPLACE INTO vms_kvpair(resource_guid, name, value) VALUES(?, ?, ?)");
+    if (!m_kvPairQuery)
+    {
+        m_kvPairQuery.reset(new QSqlQuery(m_sdb));
+        m_kvPairQuery->prepare("INSERT OR REPLACE INTO vms_kvpair(resource_guid, name, value) VALUES(?, ?, ?)");
+    }
 
-    insQuery.bindValue(0, QnSql::serialized_field(param.resourceId));
-    insQuery.bindValue(1, QnSql::serialized_field(param.name));
-    insQuery.bindValue(2, QnSql::serialized_field(param.value));
-    if (!insQuery.exec()) {
-        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+    m_kvPairQuery->bindValue(0, QnSql::serialized_field(param.resourceId));
+    m_kvPairQuery->bindValue(1, QnSql::serialized_field(param.name));
+    m_kvPairQuery->bindValue(2, QnSql::serialized_field(param.value));
+    if (!m_kvPairQuery->exec()) 
+    {
+        qWarning() << Q_FUNC_INFO << m_kvPairQuery->lastError().text();
         return ErrorCode::dbError;
     }
     return ErrorCode::ok;
@@ -1776,66 +1780,56 @@ ErrorCode QnDbManager::removeCameraAttributes(const QnUuid& id)
 
 ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributesData& data, qint32* const internalId)
 {
-    //TODO #ak if record already exists have to find id first?
-
-    QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("\
-        INSERT OR REPLACE INTO vms_camera_user_attributes ( \
-            camera_guid,                    \
-            camera_name,                    \
-            group_name,                     \
-            audio_enabled,                  \
-            control_enabled,                \
-            region,                         \
-            schedule_enabled,               \
-            motion_type,                    \
-            secondary_quality,              \
-            dewarping_params,               \
-            min_archive_days,               \
-            max_archive_days,               \
-            preferred_server_id,            \
-            license_used,                   \
-            failover_priority,              \
-            backup_type                     \
-            )                               \
-         VALUES (                           \
-            :cameraId,                      \
-            :cameraName,                    \
-            :userDefinedGroupName,          \
-            :audioEnabled,                  \
-            :controlEnabled,                \
-            :motionMask,                    \
-            :scheduleEnabled,               \
-            :motionType,                    \
-            :secondaryStreamQuality,        \
-            :dewarpingParams,               \
-            :minArchiveDays,                \
-            :maxArchiveDays,                \
-            :preferredServerId,             \
-            :licenseUsed,                   \
-            :failoverPriority,              \
-            :backupType                     \
-            )                               \
-        ");
-    QnSql::bind(data, &insQuery);
-    if( !insQuery.exec() )
+    if (!m_cameraUserAttrQuery)
     {
-        NX_LOG( lit("DB error in %1: %2").arg(Q_FUNC_INFO).arg(insQuery.lastError().text()), cl_logERROR);
+        m_cameraUserAttrQuery.reset(new QSqlQuery(m_sdb));
+        m_cameraUserAttrQuery->prepare("\
+            INSERT OR REPLACE INTO vms_camera_user_attributes ( \
+                camera_guid,                    \
+                camera_name,                    \
+                group_name,                     \
+                audio_enabled,                  \
+                control_enabled,                \
+                region,                         \
+                schedule_enabled,               \
+                motion_type,                    \
+                secondary_quality,              \
+                dewarping_params,               \
+                min_archive_days,               \
+                max_archive_days,               \
+                preferred_server_id,            \
+                license_used,                   \
+                failover_priority,              \
+                backup_type                     \
+                )                               \
+             VALUES (                           \
+                :cameraId,                      \
+                :cameraName,                    \
+                :userDefinedGroupName,          \
+                :audioEnabled,                  \
+                :controlEnabled,                \
+                :motionMask,                    \
+                :scheduleEnabled,               \
+                :motionType,                    \
+                :secondaryStreamQuality,        \
+                :dewarpingParams,               \
+                :minArchiveDays,                \
+                :maxArchiveDays,                \
+                :preferredServerId,             \
+                :licenseUsed,                   \
+                :failoverPriority,              \
+                :backupType                     \
+                )                               \
+            ");
+    }
+    QnSql::bind(data, m_cameraUserAttrQuery.get());
+    if( !m_cameraUserAttrQuery->exec() )
+    {
+        NX_LOG( lit("DB error in %1: %2").arg(Q_FUNC_INFO).arg(m_cameraUserAttrQuery->lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
-
-    *internalId = insQuery.lastInsertId().toInt();
-#if 0
-    QSqlQuery renameQuery(m_sdb);
-    renameQuery.prepare("UPDATE vms_resource set name = ? WHERE guid = ?");
-    renameQuery.addBindValue(data.cameraName);
-    renameQuery.addBindValue(QnSql::serialized_field(data.cameraId));
-    if( !renameQuery.exec() )
-    {
-        NX_LOG( lit("DB error in %1: %2").arg(Q_FUNC_INFO).arg(renameQuery.lastError().text()), cl_logERROR);
-        return ErrorCode::dbError;
-    }
-#endif
+    
+    *internalId = m_cameraUserAttrQuery->lastInsertId().toInt();
     return ErrorCode::ok;
 }
 
@@ -4043,6 +4037,8 @@ void QnDbManager::resetPreparedStatements()
 {
     m_resourceContext.reset();
     m_insCameraQuery.reset();
+    m_cameraUserAttrQuery.reset();
+    m_kvPairQuery.reset();
 }
 
 // TODO: Change to a function. ATTENTION: Macro contains "return".

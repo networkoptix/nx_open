@@ -26,10 +26,9 @@ bool QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
     if( params.empty() )
         return true;
 
-    ec2::ApiResourceParamWithRefDataList outData;
     ec2::AbstractECConnectionPtr conn = commonModule()->ec2Connection();
     //TODO: #GDM SafeMode
-    ec2::ErrorCode rez = conn->getResourceManager(Qn::kSystemAccess)->saveSync(params, &outData);
+    ec2::ErrorCode rez = conn->getResourceManager(Qn::kSystemAccess)->saveSync(params);
 
     if (rez != ec2::ErrorCode::ok)
     {

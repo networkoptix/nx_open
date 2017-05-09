@@ -18,7 +18,7 @@
 
 namespace {
 
-static const int kInstanceCount = 50;
+static const int kInstanceCount = 100;
 static const int kMaxSyncTimeoutMs = 1000 * 20 * 1000;
 static const int kCamerasCount = 100;
 
@@ -77,6 +77,8 @@ static void createData(const Appserver2Ptr& server)
     }
 
     std::vector<ec2::ApiCameraData> cameras;
+    std::vector<ec2::ApiCameraAttributesData> userAttrs;
+    ec2::ApiResourceParamWithRefDataList cameraParams;
     cameras.reserve(kCamerasCount);
     const auto& moduleGuid = server->moduleInstance()->commonModule()->moduleGUID();
     auto resTypePtr = qnResTypePool->getResourceTypeByName("Camera");
@@ -91,8 +93,17 @@ static void createData(const Appserver2Ptr& server)
         cameraData.name = server->moduleInstance()->endpoint().toString();
         cameraData.id = ec2::ApiCameraData::physicalIdToId(cameraData.physicalId);
         cameras.push_back(std::move(cameraData));
+
+        ec2::ApiCameraAttributesData userAttr;
+        userAttr.cameraId = cameraData.id;
+        userAttrs.push_back(userAttr);
+
+        cameraParams.push_back(ec2::ApiResourceParamWithRefData(cameraData.id, "property1", "value1"));
     }
     auto cameraManager = connection->getCameraManager(Qn::kSystemAccess);
+    auto resourceManager = connection->getResourceManager(Qn::kSystemAccess);
+    ASSERT_EQ(ec2::ErrorCode::ok, cameraManager->saveUserAttributesSync(userAttrs));
+    ASSERT_EQ(ec2::ErrorCode::ok, resourceManager->saveSync(cameraParams));
     ASSERT_EQ(ec2::ErrorCode::ok, cameraManager->addCamerasSync(cameras));
 }
 
@@ -331,7 +342,7 @@ static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverCon
         cl_logINFO);
 
 
-    //std::this_thread::sleep_for(std::chrono::seconds(50000));
+    std::this_thread::sleep_for(std::chrono::seconds(50000));
 }
 
 TEST(P2pMessageBus, SequenceConnect)

@@ -706,7 +706,10 @@ namespace detail
         ResyncFlags m_resyncFlags;
         QnTransactionLog* m_tranLog;
         TimeSynchronizationManager* m_timeSyncManager;
+        
         std::unique_ptr<QSqlQuery> m_insCameraQuery;
+        std::unique_ptr<QSqlQuery> m_cameraUserAttrQuery;
+        std::unique_ptr<QSqlQuery> m_kvPairQuery;
         ec2::database::api::Context m_resourceContext;
     };
 
