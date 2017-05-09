@@ -654,7 +654,7 @@ void P2pMessageBus::doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr
             ++currentSubscriptionItr;
         P2pConnectionPtr subscribedVia;
         if (currentSubscriptionItr != currentSubscription.cend() && currentSubscriptionItr.key() == peer)
-            subscribedVia = currentSubscription.value(peer);
+            subscribedVia = currentSubscriptionItr.value();
         qint32 subscribedDistance =
             alivePeers[subscribedVia ? subscribedVia->remotePeer() : localPeer].distanceTo(peer);
 
