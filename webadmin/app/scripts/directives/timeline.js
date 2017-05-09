@@ -56,6 +56,8 @@ angular.module('webadminApp')
                 var debugEventsMode = Config.debug.chunksOnTimeline && Config.allowDebugMode;
                 scope.playbackNotSupported = window.jscd.mobile;
 
+                scope.disableVolume = Config.settingsConfig.disableVolume;
+
                 // !!! Read basic parameters, DOM elements and global objects for module
                 var viewport = element.find('.viewport');
                 var $canvas = element.find('canvas');

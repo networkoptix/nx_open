@@ -117,7 +117,8 @@ var Config = {
         timeSynchronizationEnabled: {label: 'Time synchronization enabled', type: 'checkbox'},
         upnpPortMappingEnabled: {label: 'UPNP port mapping enabled', type: 'checkbox'},
 
-        useServerTime: true
+        useServerTime: true,
+        disableVolume: true
     },
     debugEvents: {
         events: [
