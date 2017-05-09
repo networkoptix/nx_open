@@ -195,7 +195,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
 
             //if there are 4 or more available resolutions then it is webm otherwise its hls
-            if($scope.availableResolutions.length < 4){
+            if($scope.player != "webm"){
                 $scope.availableResolutions.sort();
             }
 
