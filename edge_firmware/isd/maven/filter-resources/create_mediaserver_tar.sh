@@ -154,7 +154,7 @@ buildArchives()
     pushd "$TAR_DIR" >/dev/null
     mkdir -p $(dirname "$INSTALL_SYMLINK_PATH")
     ln -s "/$INSTALL_PATH" "$INSTALL_SYMLINK_PATH"
-    tar czf "$RESOURCE_BUILD_DIR/$PACKAGE_NAME" "$INSTALL_PATH" *
+    tar czf "$RESOURCE_BUILD_DIR/$PACKAGE_NAME" *
     popd >/dev/null
 
     [ ! -z "$TARGET_DIR" ] && cp "$RESOURCE_BUILD_DIR/$PACKAGE_NAME" "$TARGET_DIR"
