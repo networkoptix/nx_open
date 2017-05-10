@@ -89,7 +89,11 @@ boost::optional<Manager::ModuleData> Manager::getModule(const QnUuid& id) const
 
 void Manager::checkEndpoint(const SocketAddress& endpoint)
 {
-    m_moduleConnector->post([this, endpoint](){ m_moduleConnector->newEndpoint(endpoint); });
+    m_moduleConnector->dispatch(
+        [this, endpoint]() mutable
+        {
+            m_moduleConnector->newEndpoints({endpoint});
+        });
 }
 
 void Manager::checkEndpoint(const QUrl& url)
@@ -183,8 +187,11 @@ void Manager::initializeMulticastFinders(bool clientMode)
     m_multicastFinder->listen(
         [this](QnModuleInformationWithAddresses module)
         {
+            std::set<SocketAddress> endpoints;
             for (const auto& address: module.remoteAddresses)
-                m_moduleConnector->newEndpoint(address, module.id);
+                endpoints.insert(address);
+
+            m_moduleConnector->newEndpoints(std::move(endpoints), module.id);
         });
 
     if (!clientMode)
@@ -196,18 +203,18 @@ void Manager::initializeMulticastFinders(bool clientMode)
             });
     }
 
-    QnMulticastModuleFinder::Options options;
+    DeprecatedMulticastFinder::Options options;
     if (clientMode)
         options.multicastCount = 5;
     else
         options.listenAndRespond = true;
 
-    m_legacyMulticastFinder = new QnMulticastModuleFinder(this, options);
-    connect(m_legacyMulticastFinder, &QnMulticastModuleFinder::responseReceived,
+    m_legacyMulticastFinder = new DeprecatedMulticastFinder(this, options);
+    connect(m_legacyMulticastFinder, &DeprecatedMulticastFinder::responseReceived,
         [this](const QnModuleInformation &module,
             const SocketAddress &endpoint, const HostAddress& ip)
         {
-            m_moduleConnector->newEndpoint(SocketAddress(ip, endpoint.port), module.id);
+            m_moduleConnector->newEndpoints({SocketAddress(ip, endpoint.port)}, module.id);
         });
 }
 

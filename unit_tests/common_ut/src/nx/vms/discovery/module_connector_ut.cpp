@@ -65,16 +65,16 @@ TEST_F(DiscoveryModuleConnector, AddEndpoints)
 {
     const auto id1 = QnUuid::createUuid();
     const auto endpoint1 = addMediaserver(id1);
-    connector.newEndpoint(endpoint1, id1);
+    connector.newEndpoints({endpoint1}, id1);
     expectConnect(id1, endpoint1);
 
     const auto id2 = QnUuid::createUuid();
     const auto endpoint2 = addMediaserver(id2);
-    connector.newEndpoint(endpoint2);
+    connector.newEndpoints({endpoint2});
     expectConnect(id2, endpoint2);
 
     const auto endpoint1replace = addMediaserver(id1);
-    connector.newEndpoint(endpoint1replace, id1);
+    connector.newEndpoints({endpoint1replace}, id1);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     ASSERT_TRUE(connectedQueue.isEmpty());
     ASSERT_TRUE(disconnectedQueue.isEmpty());
@@ -97,7 +97,7 @@ TEST_F(DiscoveryModuleConnector, ActivateDiactivate)
 
     const auto id = QnUuid::createUuid();
     const auto endpoint1 = addMediaserver(id);
-    connector.newEndpoint(endpoint1);
+    connector.newEndpoints({endpoint1});
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     ASSERT_TRUE(connectedQueue.isEmpty());
     ASSERT_TRUE(disconnectedQueue.isEmpty());
@@ -111,7 +111,7 @@ TEST_F(DiscoveryModuleConnector, ActivateDiactivate)
     ASSERT_EQ(id, disconnectedQueue.pop()); //< Disconnect is reported anyway.
 
     const auto endpoint2 = addMediaserver(id);
-    connector.newEndpoint(endpoint2, id);
+    connector.newEndpoints({endpoint2}, id);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     ASSERT_TRUE(connectedQueue.isEmpty()); //< No connects on disabled connector.
     ASSERT_EQ(id, disconnectedQueue.pop()); //< Disconnect is reported anyway.
@@ -132,14 +132,13 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
 
     const auto networkEndpoint = addMediaserver(id, *interfaceIpsV4.begin());
     const auto localEndpoint = addMediaserver(id);
-    connector.newEndpoint(networkEndpoint, id);
-    connector.newEndpoint(localEndpoint, id);
+    connector.newEndpoints({localEndpoint, networkEndpoint}, id);
 
     connector.activate();
     expectConnect(id, localEndpoint); //< Local is prioritized.
 
     mediaservers.erase(localEndpoint);
-    connector.newEndpoint(networkEndpoint, id); //< Network is a second choice.
+    expectConnect(id, networkEndpoint);  //< Network is a second choice.
 
     mediaservers.erase(networkEndpoint);
     ASSERT_EQ(id, disconnectedQueue.pop()); //< Finaly no endpoint avaliable.
@@ -151,11 +150,9 @@ TEST_F(DiscoveryModuleConnector, IgnoredEndpoints)
     connector.diactivate();
 
     const auto endpoint1 = addMediaserver(id);
-    connector.newEndpoint(endpoint1, id);
     const auto endpoint2 = addMediaserver(id);
-    connector.newEndpoint(endpoint2, id);
     const auto endpoint3 = addMediaserver(id);
-    connector.newEndpoint(endpoint3, id);
+    connector.newEndpoints({endpoint1, endpoint2, endpoint3}, id);
 
     connector.ignoreEndpoints({endpoint1, endpoint3}, id);
     connector.activate();

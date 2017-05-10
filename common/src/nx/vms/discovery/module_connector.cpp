@@ -31,12 +31,12 @@ void ModuleConnector::setDisconnectHandler(DisconnectedHandler handler)
     m_disconnectedHandler = std::move(handler);
 }
 
-void ModuleConnector::newEndpoint(const SocketAddress& endpoint, const QnUuid& id)
+void ModuleConnector::newEndpoints(std::set<SocketAddress> endpoints, const QnUuid& id)
 {
     dispatch(
-        [this, endpoint, id]()
+        [this, endpoints, id]()
         {
-            getModule(id)->addEndpoint(endpoint);
+            getModule(id)->addEndpoints(endpoints);
         });
 }
 
@@ -91,20 +91,45 @@ ModuleConnector::Module::~Module()
         client->pleaseStopSync();
 }
 
-void ModuleConnector::Module::addEndpoint(const SocketAddress& endpoint)
+void ModuleConnector::Module::addEndpoints(std::set<SocketAddress> endpoints)
 {
-    if (m_id.isNull())
-        m_endpoints[kDefault].insert(endpoint); // Do not sort endpoints for unknown server.
-    else if (endpoint.address == HostAddress::localhost)
-        m_endpoints[kLocalHost].insert(endpoint);
-    else if (endpoint.address.isLocal())
-        m_endpoints[kLocalNetwork].insert(endpoint);
-    else if (endpoint.address.isIpAddress())
-        m_endpoints[kIp].insert(endpoint); // TODO: check if we have such interface?
-    else
-        m_endpoints[kOther].insert(endpoint);
+    const auto getGroup =
+        [&](Priority p){ return m_endpoints.emplace(p, std::set<SocketAddress>()).first; };
+    const auto insertIntoGroup =
+        [&](Endpoints::iterator g, SocketAddress e) { return g->second.insert(e).second; };
 
-    ensureConnect();
+    if (m_id.isNull())
+    {
+        // For unknown server connect to every new endpoint.
+        const auto group = getGroup(kDefault);
+        for (const auto& endpoint: endpoints)
+        {
+            if (insertIntoGroup(group, endpoint) && !m_parent->m_isPassiveMode)
+                connect(endpoint, group);
+        }
+    }
+    else
+    {
+        // For known server sort endpoints by acessibility type and connect by order.
+        bool hasNewEndpoints = false;
+        for (const auto& endpoint: endpoints)
+        {
+            Endpoints::iterator group;
+            if (endpoint.address == HostAddress::localhost)
+                group = getGroup(kLocalHost);
+            else if (endpoint.address.isLocal())
+                group = getGroup(kLocalNetwork);
+            else if (endpoint.address.isIpAddress())
+                group = getGroup(kIp); // TODO: check if we have such interface?
+            else
+                group = getGroup(kOther);
+
+            hasNewEndpoints |= insertIntoGroup(group, endpoint);
+        }
+
+        if (hasNewEndpoints)
+            ensureConnect();
+    }
 }
 
 void ModuleConnector::Module::ensureConnect()

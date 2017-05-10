@@ -1,7 +1,6 @@
 #pragma once
 
-#include <network/multicast_module_finder.h>
-
+#include "deprecated_multicast_finder.h"
 #include "module_connector.h"
 #include "udp_multicast_finder.h"
 
@@ -75,7 +74,7 @@ private:
 
     std::unique_ptr<ModuleConnector> m_moduleConnector;
     std::unique_ptr<UdpMulticastFinder> m_multicastFinder;
-    QnMulticastModuleFinder* m_legacyMulticastFinder;
+    DeprecatedMulticastFinder* m_legacyMulticastFinder;
 };
 
 } // namespace discovery

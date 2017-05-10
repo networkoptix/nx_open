@@ -23,7 +23,7 @@ public:
     void setConnectHandler(ConnectedHandler handler);
     void setDisconnectHandler(DisconnectedHandler handler);
 
-    void newEndpoint(const SocketAddress& endpoint, const QnUuid& id = QnUuid());
+    void newEndpoints(std::set<SocketAddress> endpoints, const QnUuid& id = QnUuid());
     void ignoreEndpoints(std::set<SocketAddress> endpoints, const QnUuid& id);
 
     void activate();
@@ -39,7 +39,7 @@ private:
         Module(ModuleConnector* parent, const QnUuid& id);
         ~Module();
 
-        void addEndpoint(const SocketAddress& endpoint);
+        void addEndpoints(std::set<SocketAddress> endpoints);
         void ensureConnect();
         void forbidEndpoints(std::set<SocketAddress> endpoints);
 
