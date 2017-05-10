@@ -20,6 +20,7 @@ namespace {
 
 static const int kInstanceCount = 100;
 static const int kMaxSyncTimeoutMs = 1000 * 20 * 1000;
+static const int kPropertiesPerCamera = 5;
 static const int kCamerasCount = 100;
 
 static void initResourceTypes(ec2::AbstractECConnection* ec2Connection)
@@ -98,7 +99,7 @@ static void createData(const Appserver2Ptr& server)
         userAttr.cameraId = cameraData.id;
         userAttrs.push_back(userAttr);
 
-        for (int j = 0; j < 5; ++j)
+        for (int j = 0; j < kPropertiesPerCamera; ++j)
             cameraParams.push_back(ec2::ApiResourceParamWithRefData(cameraData.id, lit("property%1").arg(j), lit("value%1").arg(j)));
     }
     auto cameraManager = connection->getCameraManager(Qn::kSystemAccess);
@@ -342,7 +343,6 @@ static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverCon
         .arg(connectionTries / k),
         cl_logINFO);
 
-
     std::this_thread::sleep_for(std::chrono::seconds(50000));
 }
 
@@ -444,9 +444,9 @@ TEST(P2pMessageBus, SerializePeers)
 
     P2pMessageBus::BidirectionRoutingInfo deserializedPeerData(localPeer);
     ASSERT_TRUE(P2pMessageBus::deserializePeersMessage(
-        localPeer, 
+        localPeer,
         0, //< distance
-        shortPeers, 
+        shortPeers,
         serializedData.mid(1), //< skip message type
         /*time*/0,
         &deserializedPeerData));
