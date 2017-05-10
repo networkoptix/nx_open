@@ -14,7 +14,8 @@
         <div class="text-left pull-left" ng-if="canViewArchive">
             <div class="inline-block player-controls pull-left">
                 <span class="webclient-button glyphicon-fwbw"
-                      ng-class="{disabled:liveOnly}">
+                      ng-class="{disabled:liveOnly}"
+                      ng-click="">
                       <span class="glyphicon glyphicon-backward"></span>
                 </span>
                 <span class="webclient-button glyphicon-pp"
@@ -25,7 +26,7 @@
                 </span>
                 <span class="webclient-button glyphicon-fwbw"
                       ng-class="{disabled:liveOnly}"
-                      ng-click="positionProvider.nextChunk()">
+                      ng-click="">
                       <span class="glyphicon glyphicon-forward"></span>
                 </span>
             </div>
