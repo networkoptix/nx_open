@@ -1,4 +1,3 @@
-#include "basic_component_test.h"
 
 namespace nx {
 namespace cloud {
