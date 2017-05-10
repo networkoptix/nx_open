@@ -244,8 +244,8 @@ private:
         if (resultCode != SystemError::noError)
         {
             auto connectedConnectionIter = getAnyConnectedConnection();
-            if (connectionIter != m_connections.end())
-                startAccepting(connectionIter);
+            if (connectedConnectionIter != m_connections.end())
+                startAccepting(connectedConnectionIter);
         }
         else
         {
