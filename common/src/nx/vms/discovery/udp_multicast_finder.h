@@ -43,7 +43,7 @@ private:
     void sendModuleInformation(Senders::iterator senderIterator);
 
 private:
-    SocketAddress m_multicatEndpoint;
+    SocketAddress m_multicastEndpoint;
     std::chrono::milliseconds m_updateInterfacesInterval;
     std::chrono::milliseconds m_sendInterval;
 

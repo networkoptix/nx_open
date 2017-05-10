@@ -15,7 +15,7 @@ const std::chrono::milliseconds UdpMulticastFinder::kSendInterval = std::chrono:
 
 UdpMulticastFinder::UdpMulticastFinder(network::aio::AbstractAioThread* thread):
     network::aio::BasicPollable(thread),
-    m_multicatEndpoint(kMulticastEndpoint),
+    m_multicastEndpoint(kMulticastEndpoint),
     m_updateInterfacesInterval(kUpdateInterfacesInterval),
     m_sendInterval(kSendInterval)
 {
@@ -25,7 +25,7 @@ UdpMulticastFinder::UdpMulticastFinder(network::aio::AbstractAioThread* thread):
 
 void UdpMulticastFinder::setMulticastEndpoint(SocketAddress endpoint)
 {
-    m_multicatEndpoint = std::move(endpoint);
+    m_multicastEndpoint = std::move(endpoint);
 }
 
 void UdpMulticastFinder::setUpdateInterfacesInterval(std::chrono::milliseconds interval)
@@ -98,7 +98,7 @@ void UdpMulticastFinder::updateInterfaces()
 
     if (!m_receiver)
     {
-        m_receiver = makeSocket({HostAddress::anyHost, m_multicatEndpoint.port});
+        m_receiver = makeSocket({HostAddress::anyHost, m_multicastEndpoint.port});
         for (const auto& ip: localIpList)
             joinMulticastGroup(ip);
 
@@ -129,9 +129,9 @@ void UdpMulticastFinder::joinMulticastGroup(const HostAddress& ip)
     if (!m_receiver)
         return; // Will be fixed in updateInterfaces().
 
-    if (m_receiver->joinGroup(m_multicatEndpoint.address.toString(), ip.toString()))
+    if (m_receiver->joinGroup(m_multicastEndpoint.address.toString(), ip.toString()))
     {
-        NX_LOGX(lm("Joined group %1 on %2").strs(m_multicatEndpoint.address, ip), cl_logDEBUG2);
+        NX_LOGX(lm("Joined group %1 on %2").strs(m_multicastEndpoint.address, ip), cl_logDEBUG2);
         return; // Ok.
     }
 
@@ -177,13 +177,13 @@ void UdpMulticastFinder::sendModuleInformation(Senders::iterator senderIterator)
 {
     const auto socket = senderIterator->second.get();
     socket->cancelIOSync(network::aio::etNone);
-    socket->sendToAsync(m_ownModuleInformation, m_multicatEndpoint,
+    socket->sendToAsync(m_ownModuleInformation, m_multicastEndpoint,
         [this, senderIterator, socket](SystemError::ErrorCode code, SocketAddress, size_t)
         {
             if (code == SystemError::noError)
             {
                 NX_LOGX(lm("Successfully sent from %1 to %2").strs(
-                    socket->getLocalAddress(), m_multicatEndpoint), cl_logDEBUG1);
+                    socket->getLocalAddress(), m_multicastEndpoint), cl_logDEBUG1);
 
                 socket->registerTimer(kSendInterval,
                     [this, senderIterator]{ sendModuleInformation(senderIterator); });
@@ -191,7 +191,7 @@ void UdpMulticastFinder::sendModuleInformation(Senders::iterator senderIterator)
             else
             {
                 NX_LOGX(lm("Failed to send from %1 to %2: %3").strs(
-                    socket->getLocalAddress(), m_multicatEndpoint, SystemError::toString(code)),
+                    socket->getLocalAddress(), m_multicastEndpoint, SystemError::toString(code)),
                     cl_logWARNING);
 
                 m_senders.erase(senderIterator);
