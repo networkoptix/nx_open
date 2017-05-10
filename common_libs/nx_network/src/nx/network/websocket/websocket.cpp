@@ -18,11 +18,12 @@ WebSocket::WebSocket(
     m_isLastFrame(false),
     m_isFirstFrame(true),
     m_pingTimer(new nx::network::aio::Timer),
-    m_terminating(false)
+    m_terminating(false),
+    m_pingTimeout(std::chrono::seconds(100))
 {
     AbstractAsyncChannel::bindToAioThread(m_baseConnection->getAioThread());
     m_pingTimer->bindToAioThread(m_baseConnection->getAioThread());
-    setPingTimeout(std::chrono::seconds(100));
+    setPingTimeout(m_pingTimeout);
 }
 
 void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
@@ -34,7 +35,7 @@ void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
             m_baseConnection->bindToAioThread(aioThread);
             m_pingTimer->cancelSync();
             m_pingTimer->bindToAioThread(aioThread);
-            setPingTimeout(std::chrono::seconds(100));
+            setPingTimeout(m_pingTimeout);
         });
 }
 
@@ -151,6 +152,22 @@ void WebSocket::sendAsync(const nx::Buffer& buffer, HandlerType handler)
         });
 }
 
+void WebSocket::handlePingTimer()
+{
+    sendControlRequest(FrameType::ping);
+    m_pingTimer->start(m_pingTimeout, [this]() { handlePingTimer(); });
+}
+
+void WebSocket::setPingTimeout(std::chrono::milliseconds timeout)
+{
+    dispatch(
+        [this, timeout]()
+        {
+            m_pingTimeout = timeout;
+            m_pingTimer->start(m_pingTimeout, [this]() { handlePingTimer(); });
+        });
+}
+
 void WebSocket::sendCloseAsync()
 {
     dispatch(
@@ -219,6 +236,7 @@ void WebSocket::frameEnded()
 
     if (m_parser.frameType() == FrameType::ping)
     {
+        emit pingReceived();
         sendControlResponse(FrameType::ping, FrameType::pong);
         return;
     }
@@ -227,6 +245,7 @@ void WebSocket::frameEnded()
     {
         NX_ASSERT(m_controlBuffer.isEmpty());
         NX_LOG("[WebSocket] Received pong", cl_logDEBUG2);
+        emit pongReceived();
         return;
     }
 

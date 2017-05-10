@@ -362,8 +362,6 @@ cf::future<cf::unit> websocketTestWriter(
 TEST_F(WebSocket, Wrappers)
 {
     givenClientTestDataPrepared(1 * 1024 * 1024);
-    givenServerTestDataPrepared(2 * 1024 * 1024);
-    givenClientServerExchangeMessagesCallbacks();
     givenClientModes(SendMode::singleMessage, ReceiveMode::message);
     givenServerModes(SendMode::singleMessage, ReceiveMode::message);
     givenSocketAreConnected();
@@ -380,6 +378,32 @@ TEST_F(WebSocket, Wrappers)
         clientSendBuf,
         10);
     cf::when_all(readFuture, writeFuture).wait();
+}
+
+TEST_F(WebSocket, PingPong)
+{
+    givenClientTestDataPrepared(1 * 1024 * 1024);
+    givenClientModes(SendMode::singleMessage, ReceiveMode::message);
+    givenServerModes(SendMode::singleMessage, ReceiveMode::message);
+    givenSocketAreConnected();
+    startFuture.wait();
+    int pingCount = 0;
+    int pongCount = 0;
+    QObject::connect(clientWebSocket.get(), &nx::network::WebSocket::pongReceived, [&pongCount]() { ++pongCount; });
+    clientWebSocket->setPingTimeout(std::chrono::milliseconds(5));
+    auto readFuture = websocketTestReader(
+        serverWebSocket,
+        SendMode::singleMessage,
+        ReceiveMode::message,
+        100);
+    auto writeFuture = websocketTestWriter(
+        clientWebSocket,
+        SendMode::singleMessage,
+        ReceiveMode::message,
+        clientSendBuf,
+        100);
+    cf::when_all(readFuture, writeFuture).wait();
+    ASSERT_GT(pongCount, 0);
 }
 
 }

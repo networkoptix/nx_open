@@ -62,26 +62,16 @@ public:
      * Indicates that the next sendAsync will close current message
      */
     void setIsLastFrame();
-
-    // TODO: implement
     void sendCloseAsync(); /**< Send close frame */
-
-
-    template<typename Rep, typename Period>
-    void setPingTimeout(std::chrono::duration<Rep,Period> timeout)
-    {
-        dispatch(
-            [this, timeout]()
-            {
-                m_pingTimer->start(timeout, [this]() { sendControlRequest(FrameType::ping); });
-            });
-    }
+    void WebSocket::setPingTimeout(std::chrono::milliseconds timeout);
 
 signals:
     /**
      * Connection is not usable after this signal is emitted.
      */
     void remotePeerClosedConnection();
+    void pingReceived();
+    void pongReceived();
 
 
 private:
@@ -111,6 +101,7 @@ private:
     void sendControlResponse(FrameType requestType, FrameType responseType);
     void sendControlRequest(FrameType type);
     void readWithoutAddingToQueue();
+    void handlePingTimer();
 
 private:
     std::unique_ptr<nx_api::BaseServerConnectionWrapper> m_baseConnection;
@@ -126,6 +117,7 @@ private:
     nx::Buffer m_controlBuffer;
     std::unique_ptr<nx::network::aio::Timer> m_pingTimer;
     bool m_terminating;
+    std::chrono::milliseconds m_pingTimeout;
 };
 
 } // namespace websocket
