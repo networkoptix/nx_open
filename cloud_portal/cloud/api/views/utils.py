@@ -137,7 +137,7 @@ def downloads(request):
             pass  # we cannot parse json from the result - ignore for now, we will deal with this issue on the next line
 
         # Check response result here
-        if not downloads_json or downloads_json.status_code != requests.codes.ok:
+        if not downloads_json or downloads_result.status_code != requests.codes.ok:
             # old or broken release - no downloads json
             # TODO: this is hardcode - remove it after release
             latest_version = updates_record['releases']['3.0']
