@@ -141,6 +141,7 @@ void Worker::setState(State state)
 
     NX_LOGX(logMessage("Entering state %1...").arg(QnLexical::serialized(state)), cl_logDEBUG1);
     m_state = state;
+    emit stateChanged(state);
 }
 
 void Worker::nextStep()

@@ -72,6 +72,7 @@ public:
 signals:
     void finished(const QString& fileName);
     void failed(const QString& fileName);
+    void stateChanged(State state);
 
 private:
     void setState(State state);
