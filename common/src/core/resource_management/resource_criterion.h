@@ -8,6 +8,7 @@
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_property.h>
+#include <core/ptz/ptz_constants.h>
 
 class QRegExp;
 
@@ -39,7 +40,7 @@ public:
 
     explicit QnResourceCriterion(Qn::CameraCapabilities cameraCapabilities, const char *propertyName = QnResourceProperty::cameraCapabilities, Operation matchOperation = Accept, Operation mismatchOperation = Next);
 
-    explicit QnResourceCriterion(Qn::PtzCapabilities ptzCapabilities, const char *propertyName = QnResourceProperty::ptzCapabilities, Operation matchOperation = Accept, Operation mismatchOperation = Next);
+    explicit QnResourceCriterion(Ptz::Capabilities ptzCapabilities, const char *propertyName = QnResourceProperty::ptzCapabilities, Operation matchOperation = Accept, Operation mismatchOperation = Next);
 
     explicit QnResourceCriterion(const CriterionFunction &function, const QVariant &targetValue, Operation matchOperation = Accept, Operation mismatchOperation = Next);
 

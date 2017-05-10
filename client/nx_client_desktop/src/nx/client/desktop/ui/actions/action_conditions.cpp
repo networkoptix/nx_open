@@ -1169,7 +1169,7 @@ ActionVisibility ChangeResolutionCondition::check(const Parameters& /*parameters
     return EnabledAction;
 }
 
-PtzCondition::PtzCondition(Qn::PtzCapabilities capabilities, bool disableIfPtzDialogVisible):
+PtzCondition::PtzCondition(Ptz::Capabilities capabilities, bool disableIfPtzDialogVisible):
     m_capabilities(capabilities),
     m_disableIfPtzDialogVisible(disableIfPtzDialogVisible)
 {

@@ -329,7 +329,7 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply* 
     const auto latestVersion = customizationInfo.releases[currentRelease];
     const QString updatesPrefix = customizationInfo.updates_prefix;
 
-    if (latestVersion.isNull() || updatesPrefix.isEmpty())
+    if ((m_target.version.build() == 0 && latestVersion.isNull()) || updatesPrefix.isEmpty())
     {
         if (!tryNextServer())
             finishTask(QnCheckForUpdateResult::NoSuchBuild);

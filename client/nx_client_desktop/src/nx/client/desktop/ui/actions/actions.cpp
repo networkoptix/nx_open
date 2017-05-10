@@ -216,13 +216,13 @@ void initialize(Manager* manager, Action* root)
         .flags(SingleTarget | WidgetTarget)
         .text(tr("Go To Saved Position"))
         .requiredTargetPermissions(Qn::WritePtzPermission)
-        .condition(new PtzCondition(Qn::PresetsPtzCapability, false));
+        .condition(new PtzCondition(Ptz::PresetsPtzCapability, false));
 
     factory(PtzActivateTourAction)
         .flags(SingleTarget | WidgetTarget)
         .text(tr("Activate PTZ Tour"))
         .requiredTargetPermissions(Qn::WritePtzPermission)
-        .condition(new PtzCondition(Qn::ToursPtzCapability, false));
+        .condition(new PtzCondition(Ptz::ToursPtzCapability, false));
 
     factory(PtzActivateObjectAction)
         .flags(SingleTarget | WidgetTarget)
@@ -929,7 +929,7 @@ void initialize(Manager* manager, Action* root)
         .childFactory(new PtzPresetsToursFactory(manager))
         .text(tr("PTZ.."))
         .requiredTargetPermissions(Qn::WritePtzPermission)
-        .condition(new PtzCondition(Qn::PresetsPtzCapability, false));
+        .condition(new PtzCondition(Ptz::PresetsPtzCapability, false));
 
     factory.beginSubMenu();
     {
@@ -939,21 +939,21 @@ void initialize(Manager* manager, Action* root)
             .flags(Scene | SingleTarget)
             .text(tr("Save Current Position.."))
             .requiredTargetPermissions(Qn::WritePtzPermission | Qn::SavePermission)
-            .condition(new PtzCondition(Qn::PresetsPtzCapability, true));
+            .condition(new PtzCondition(Ptz::PresetsPtzCapability, true));
 
         factory(PtzManageAction)
             .mode(DesktopMode)
             .flags(Scene | SingleTarget)
             .text(tr("Manage.."))
             .requiredTargetPermissions(Qn::WritePtzPermission | Qn::SavePermission)
-            .condition(new PtzCondition(Qn::ToursPtzCapability, false));
+            .condition(new PtzCondition(Ptz::ToursPtzCapability, false));
 
     } factory.endSubMenu();
 
     factory(PtzCalibrateFisheyeAction)
         .flags(SingleTarget | WidgetTarget)
         .text(tr("Calibrate Fisheye"))
-        .condition(new PtzCondition(Qn::VirtualPtzCapability, false));
+        .condition(new PtzCondition(Ptz::VirtualPtzCapability, false));
 
 #if 0
     factory(ToggleRadassAction)

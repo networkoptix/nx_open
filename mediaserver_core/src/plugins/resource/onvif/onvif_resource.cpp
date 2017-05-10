@@ -3149,7 +3149,7 @@ QnAbstractPtzController *QnPlOnvifResource::createPtzControllerInternal()
         return NULL;
 
     result.reset(new QnOnvifPtzController(toSharedPointer(this)));
-    if(result->getCapabilities() == Qn::NoPtzCapabilities)
+    if(result->getCapabilities() == Ptz::NoPtzCapabilities)
         return NULL;
 
     return result.take();

@@ -9,7 +9,6 @@
 
 class QGLWidget;
 class QnClientCoreModule;
-class QnPtzControllerPool;
 class QnNetworkProxyFactory;
 class QnStaticCommonModule;
 
@@ -24,7 +23,6 @@ public:
     void initDesktopCamera(QGLWidget* window);
     void startLocalSearchers();
 
-    QnPtzControllerPool* ptzControllerPool() const;
     QnNetworkProxyFactory* networkProxyFactory() const;
 
 private:
