@@ -36,12 +36,11 @@ private:
     void sendResponse(AbstractStreamSocket* connection)
     {
         // Sending response.
-        const char* responseMessage = R"http(
-HTTP/1.1 101 Switching Protocols
-Upgrade: NXRELAY/0.1
-Connection: Upgrade
-
-)http";
+        const char* responseMessage = 
+            "HTTP/1.1 101 Switching Protocols\r\n"
+            "Upgrade: NXRELAY/0.1\r\n"
+            "Connection: Upgrade\r\n"
+            "\r\n";
 
         nx::Buffer response = responseMessage + kNewProtocolMessage;
 
