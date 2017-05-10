@@ -25,14 +25,25 @@ QnUuid ResourcePoolPeerManager::selfId() const
 
 QString ResourcePoolPeerManager::peerString(const QnUuid& peerId) const
 {
-    const auto& server = resourcePool()->getResourceById<QnMediaServerResource>(peerId);
-    if (!server)
-        return lit("Unknown server %1").arg(peerId.toString());
+    QString result;
 
-    return lit("%1 (%2 %3)").arg(
-        server->getName(),
-        server->getPrimaryAddress().toString(),
-        server->getId().toString());
+    const auto& server = resourcePool()->getResourceById<QnMediaServerResource>(peerId);
+    if (server)
+    {
+        result = lit("%1 (%2 %3)").arg(
+            server->getName(),
+            server->getPrimaryAddress().toString(),
+            server->getId().toString());
+    }
+    else
+    {
+        result = lit("Unknown server %1").arg(peerId.toString());
+    }
+
+    if (peerId == selfId())
+        result += lit(" (self)");
+
+    return result;
 }
 
 QList<QnUuid> ResourcePoolPeerManager::getAllPeers() const

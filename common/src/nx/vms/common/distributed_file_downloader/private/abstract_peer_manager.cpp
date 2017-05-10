@@ -18,7 +18,10 @@ AbstractPeerManager::~AbstractPeerManager()
 
 QString AbstractPeerManager::peerString(const QnUuid& peerId) const
 {
-    return peerId.toString();
+    auto result = peerId.toString();
+    if (peerId == selfId())
+        result += lit(" (self)");
+    return result;
 }
 
 //-------------------------------------------------------------------------------------------------
