@@ -281,7 +281,7 @@ TEST_F(WebSocket, MultipleMessagesFromClient_ServerResponds)
 }
 
 
-cf::future<cf::unit> WebsocketTestReader(
+cf::future<cf::unit> websocketTestReader(
     nx::network::WebSocketPtr& socket,
     SendMode sendMode,
     ReceiveMode receiveMode,
@@ -300,7 +300,7 @@ cf::future<cf::unit> WebsocketTestReader(
         {}
         ~State(){}
     };
-    auto state = std::make_shared<State>(std::move(socket), sendMode, receiveMode, iterations);
+    auto state = std::make_shared<State>(socket, sendMode, receiveMode, iterations);
     return cf::doWhile(
         [state]() mutable
         {
@@ -320,7 +320,7 @@ cf::future<cf::unit> WebsocketTestReader(
         });
 }
 
-cf::future<cf::unit> WebsocketTestWriter(
+cf::future<cf::unit> websocketTestWriter(
     nx::network::WebSocketPtr& socket,
     SendMode sendMode,
     ReceiveMode receiveMode,
@@ -340,7 +340,7 @@ cf::future<cf::unit> WebsocketTestWriter(
             webSocket(socket)
         {}
     };
-    auto state = std::make_shared<State>(std::move(socket), sendMode, receiveMode, sendBuffer, iterations);
+    auto state = std::make_shared<State>(socket, sendMode, receiveMode, sendBuffer, iterations);
     return cf::doWhile(
         [state]() mutable
         {
@@ -368,12 +368,12 @@ TEST_F(WebSocket, Wrappers)
     givenServerModes(SendMode::singleMessage, ReceiveMode::message);
     givenSocketAreConnected();
     startFuture.wait();
-    auto readFuture = WebsocketTestReader(
+    auto readFuture = websocketTestReader(
         serverWebSocket,
         SendMode::singleMessage,
         ReceiveMode::message,
         10);
-    auto writeFuture = WebsocketTestWriter(
+    auto writeFuture = websocketTestWriter(
         clientWebSocket,
         SendMode::singleMessage,
         ReceiveMode::message,
