@@ -18,8 +18,8 @@ void Settings::load(const QnSettings& settings, const QString& prefix)
     if (confLevel != cl_logUNKNOWN)
         level = confLevel;
 
-
-    const auto filters = settings.value(makeKey("exceptionFilters")).toString().splitRef(QChar(','));
+    const auto filters = settings.value(makeKey("exceptionFilters"))
+        .toString().splitRef(QChar(','));
     for (const auto& f: filters)
         exceptionFilers.insert(f.toString());
 
