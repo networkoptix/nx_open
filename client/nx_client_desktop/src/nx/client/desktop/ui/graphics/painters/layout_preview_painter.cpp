@@ -201,33 +201,25 @@ void LayoutPreviewPainter::paintItem(QPainter* painter, const QRectF& itemRect,
     const auto info = thumbnailForItem(item);
     if (!info.pixmap.isNull())
     {
+        auto ar = QnGeometry::aspectRatio(info.pixmap.size());
+        auto rect = QnGeometry::expanded(ar, itemRect, Qt::KeepAspectRatio).toRect();
+
         if (info.ignoreTrasformation)
         {
-            auto ar = QnGeometry::aspectRatio(info.pixmap.size());
-            auto rect = QnGeometry::expanded(ar, itemRect, Qt::KeepAspectRatio).toRect();
             painter->drawPixmap(rect, info.pixmap);
-
         }
         else
         {
-//             QSize mediaLayout = camera->getVideoLayout()->size();
-//             // ensure width and height are not zero
-//             mediaLayout.setWidth(qMax(mediaLayout.width(), 1));
-//             mediaLayout.setHeight(qMax(mediaLayout.height(), 1));
-
-//             QRectF sourceRect(0, 0, pixmap.width() * mediaLayout.width(),
-//                 pixmap.height() * mediaLayout.height());
-
             auto drawPixmap =
-                [painter, &info, zoomRect = item.zoomRect](const QRectF& targetRect)
+                [painter, &info, zoomRect = item.zoomRect](const QRect& targetRect)
                 {
                     if (zoomRect.isNull())
                     {
-                        painter->drawPixmap(targetRect.toRect(), info.pixmap);
+                        painter->drawPixmap(targetRect, info.pixmap);
                     }
                     else
                     {
-                        painter->drawPixmap(targetRect.toRect(), info.pixmap,
+                        painter->drawPixmap(targetRect, info.pixmap,
                             QnGeometry::subRect(info.pixmap.rect(), zoomRect).toRect());
                     }
                 };
@@ -238,14 +230,14 @@ void LayoutPreviewPainter::paintItem(QPainter* painter, const QRectF& itemRect,
                 painter->translate(itemRect.center());
                 painter->rotate(item.rotation);
                 painter->translate(-itemRect.center());
-                const auto targetRect = QnGeometry::encloseRotatedGeometry(itemRect,
+                const auto targetRect = QnGeometry::encloseRotatedGeometry(rect,
                     QnGeometry::aspectRatio(info.pixmap.size()), item.rotation);
 
-                drawPixmap(targetRect);
+                drawPixmap(targetRect.toRect());
             }
             else
             {
-                drawPixmap(itemRect);
+                drawPixmap(rect);
             }
         }
     }
