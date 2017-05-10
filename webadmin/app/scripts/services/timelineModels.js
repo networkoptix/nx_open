@@ -639,6 +639,7 @@ function ShortCache(cameras,mediaserver,$q,timeCorrection){
     this.checkpointsFrequency = 60 * 1000;//Checkpoints - not often that once in a minute
 
     this.timeCorrection = timeCorrection || 0;
+    this.chunkPosition = 0;
 }
 ShortCache.prototype.init = function(start, timeCorrection, isPlaying){
     this.liveMode = false;
@@ -686,6 +687,7 @@ ShortCache.prototype.update = function(requestPosition,position){
 
     this.abort("update again");
     // Get next {{limitChunks}} chunks
+    //console.log("Start Time: %s\tEnd Time: %s",Math.max(requestPosition-this.timeCorrection,0),(new Date()).getTime()+100000 - this.timeCorrection);
     this.currentRequest = this.mediaserver.getRecords('/',
             this.cameras[0],
             Math.max(requestPosition - this.timeCorrection,0),
@@ -770,6 +772,7 @@ ShortCache.prototype.setPlayingPosition = function(position){
     this.played = position;
     this.playedPosition = 0;
 
+    //console.log("Position: %s\t Last requested position: %s", position, this.lastRequestPosition);
 
     if(position < this.lastRequestPosition) { // Somewhere back on timeline
         var lastPosition;
@@ -781,6 +784,7 @@ ShortCache.prototype.setPlayingPosition = function(position){
         }
         // lastPosition  is the nearest position in checkpoints
         // Estimate current playing position
+        this.chunkPosition = 0;
         this.playedPosition = lastPosition + position - this.checkPoints[lastPosition];
 
         this.update(this.checkPoints[lastPosition], lastPosition);// Request detailization from that position and to the future - restore track
@@ -790,13 +794,15 @@ ShortCache.prototype.setPlayingPosition = function(position){
     var intervalToEat = position - this.lastRequestPosition;
     this.playedPosition = this.lastRequestDate + intervalToEat;
 
-    for(var i=0; i<this.currentDetailization.length; i++){
+    for(var i= this.chunkPosition; i<this.currentDetailization.length; i++){
         intervalToEat -= this.currentDetailization[i].durationMs;// Duration of chunks count
         this.playedPosition = this.currentDetailization[i].startTimeMs + this.currentDetailization[i].durationMs + intervalToEat;
         if(intervalToEat <= 0){
             break;
         }
     }
+    //console.log("Chunk position: %s",i);
+    this.chunkPosition = i;
 
     //this.liveMode = false;
     if(i == this.currentDetailization.length){ // We have no good detailization for this moment - pretend to be playing live
@@ -828,6 +834,17 @@ ShortCache.prototype.setPlayingPosition = function(position){
     
     return this.playedPosition;
 };
+
+ShortCache.prototype.nextChunk= function(){
+    if(this.chunkPosition + 1 < this.currentDetailization.length){
+        this.chunkPosition += 1;
+    }
+    else{
+        this.chunkPosition = 0;
+        this.liveMode = true;
+    }
+}
+
 
 
 

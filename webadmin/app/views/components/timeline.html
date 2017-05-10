@@ -24,7 +24,8 @@
                             ng-class="{'glyphicon-play':!positionProvider.playing,'glyphicon-pause':positionProvider.playing}"></span>
                 </span>
                 <span class="webclient-button glyphicon-fwbw"
-                      ng-class="{disabled:liveOnly}">
+                      ng-class="{disabled:liveOnly}"
+                      ng-click="positionProvider.nextChunk()">
                       <span class="glyphicon glyphicon-forward"></span>
                 </span>
             </div>
