@@ -105,15 +105,11 @@ rest::Handle TestPeerManager::requestFileInfo(
     if (!m_peers.contains(peerId))
         return 0;
 
-    const auto handle = getRequestHandle();
-
-    enqueueCallback(
-        [this, fileInfo = fileInformation(peerId, fileName), callback, handle]()
+    return enqueueRequest(peerId,
+        [this, fileInfo = fileInformation(peerId, fileName), callback](rest::Handle handle)
         {
             callback(fileInfo.isValid(), handle, fileInfo);
         });
-
-    return handle;
 }
 
 rest::Handle TestPeerManager::requestChecksums(
@@ -125,21 +121,18 @@ rest::Handle TestPeerManager::requestChecksums(
     if (it == m_peers.end())
         return 0;
 
-    const auto handle = getRequestHandle();
-
-    enqueueCallback(
+    return enqueueRequest(peerId,
         [this,
             fileInfo = fileInformation(peerId, fileName),
             storage = it->storage,
-            callback, handle]()
+            callback]
+            (rest::Handle handle)
         {
             callback(fileInfo.isValid(), handle,
                 storage
                     ? storage->getChunkChecksums(fileInfo.name)
                     : fileInfo.checksums);
         });
-
-    return handle;
 }
 
 rest::Handle TestPeerManager::downloadChunk(
@@ -151,10 +144,12 @@ rest::Handle TestPeerManager::downloadChunk(
     if (!m_peers.contains(peerId))
         return 0;
 
-    const auto handle = getRequestHandle();
-
-    enqueueCallback(
-        [this, fileInfo = fileInformation(peerId, fileName), chunkIndex, callback, handle]()
+    return enqueueRequest(peerId,
+        [this,
+            fileInfo = fileInformation(peerId, fileName),
+            chunkIndex,
+            callback]
+            (rest::Handle handle)
         {
             QByteArray result;
             if (fileInfo.isValid())
@@ -162,8 +157,6 @@ rest::Handle TestPeerManager::downloadChunk(
 
             callback(!result.isNull(), handle, result);
         });
-
-    return handle;
 }
 
 rest::Handle TestPeerManager::downloadChunkFromInternet(
@@ -176,10 +169,8 @@ rest::Handle TestPeerManager::downloadChunkFromInternet(
     if (!m_peers.contains(peerId))
         return 0;
 
-    const auto handle = getRequestHandle();
-
-    enqueueCallback(
-        [this, peerId, fileUrl, chunkIndex, chunkSize, callback, handle]()
+    return enqueueRequest(peerId,
+        [this, peerId, fileUrl, chunkIndex, chunkSize, callback](rest::Handle handle)
         {
             if (!hasInternetConnection(peerId))
             {
@@ -201,24 +192,27 @@ rest::Handle TestPeerManager::downloadChunkFromInternet(
             auto result = readFileChunk(fileInfo, chunkIndex);
             callback(!result.isNull(), handle, result);
         });
-
-    return handle;
 }
 
-void TestPeerManager::cancelRequest(const QnUuid& /*peerId*/, rest::Handle /*handle*/)
+void TestPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle handle)
 {
-    // Dummy requests are always instant, so we have nothing to do here.
+    auto it = std::remove_if(m_requestsQueue.begin(), m_requestsQueue.end(),
+        [&peerId, &handle](const Request& request)
+        {
+            return request.peerId == peerId && request.handle == handle;
+        });
+    m_requestsQueue.erase(it, m_requestsQueue.end());
 }
 
 void TestPeerManager::processRequests()
 {
-    QQueue<std::function<void()>> callbacksQueue;
-    m_callbacksQueue.swap(callbacksQueue);
+    QQueue<Request> callbacksQueue;
+    m_requestsQueue.swap(callbacksQueue);
 
     while (!callbacksQueue.isEmpty())
     {
-        auto callback = callbacksQueue.dequeue();
-        callback();
+        const auto& request = callbacksQueue.dequeue();
+        request.callback(request.handle);
     }
 }
 
@@ -227,9 +221,11 @@ rest::Handle TestPeerManager::getRequestHandle()
     return ++m_requestIndex;
 }
 
-void TestPeerManager::enqueueCallback(std::function<void ()> callback)
+rest::Handle TestPeerManager::enqueueRequest(const QnUuid& peerId, RequestCallback callback)
 {
-    m_callbacksQueue.enqueue(callback);
+    const auto handle = getRequestHandle();
+    m_requestsQueue.enqueue(Request{peerId, handle, callback});
+    return handle;
 }
 
 QByteArray TestPeerManager::readFileChunk(

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include <QtCore/QHash>
 #include <QtCore/QQueue>
 
@@ -76,12 +78,13 @@ public:
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
 
 private:
+    using RequestCallback = std::function<void(rest::Handle)>;
+
     rest::Handle getRequestHandle();
-    void enqueueCallback(std::function<void()> callback);
+    rest::Handle enqueueRequest(const QnUuid& peerId, RequestCallback callback);
 
     static QByteArray readFileChunk(const FileInformation& fileInformation, int chunkIndex);
 
-private:
     struct PeerInfo
     {
         QHash<QString, FileInformation> fileInformationByName;
@@ -96,7 +99,14 @@ private:
 
     QHash<QUrl, QString> m_fileByUrl;
 
-    QQueue<std::function<void()>> m_callbacksQueue;
+    struct Request
+    {
+        QnUuid peerId;
+        rest::Handle handle;
+        RequestCallback callback;
+    };
+
+    QQueue<Request> m_requestsQueue;
 };
 
 class ProxyTestPeerManager: public AbstractPeerManager

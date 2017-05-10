@@ -51,6 +51,24 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, invalidPeerRequest)
     ASSERT_FALSE(called);
 }
 
+TEST_F(DistributedFileDownloaderPeerManagerTest, cancellingRequest)
+{
+    const auto& peer = peerManager->addPeer();
+
+    bool called = false;
+    const auto handle = peerManager->requestFileInfo(peer, "test",
+        [&](bool, rest::Handle, const FileInformation&)
+        {
+            // Should not be called.
+            called = true;
+        });
+
+    peerManager->cancelRequest(peer, handle);
+    peerManager->processRequests();
+
+    ASSERT_FALSE(called);
+}
+
 TEST_F(DistributedFileDownloaderPeerManagerTest, fileInfo)
 {
     const auto& peer = QnUuid::createUuid();
