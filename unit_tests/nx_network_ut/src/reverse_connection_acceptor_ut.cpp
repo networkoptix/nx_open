@@ -165,7 +165,7 @@ public:
         m_pool->beforeDestruction(this);
     }
 
-    virtual void connectAsync(
+    virtual void connectToOriginator(
         ReverseConnectionCompletionHandler handler) override
     {
         post(
@@ -179,7 +179,7 @@ public:
             });
     }
 
-    virtual void waitForConnectionToBeReadyAsync(
+    virtual void waitForOriginatorToStartUsingConnection(
         ReverseConnectionCompletionHandler handler) override
     {
         post(
@@ -310,6 +310,12 @@ protected:
         whenConnectionBecameReady();
     }
 
+    void givenStartedAcceptAsync()
+    {
+        givenStartedAcceptor();
+        whenInvokedAcceptAsync();
+    }
+
     void whenInvokedAcceptAsync()
     {
         using namespace std::placeholders;
@@ -345,6 +351,40 @@ protected:
             m_acceptor.readyConnectionQueueSize() + m_acceptor.preemptiveConnectionCount();
         while (m_reverseConnectionPool.size() < desiredConnectionCount)
             std::this_thread::yield();
+    }
+
+    void whenCancelledIo()
+    {
+        m_acceptor.cancelIOSync();
+    }
+
+    void whenCancelledIoWithinAioThread()
+    {
+        nx::utils::promise<void> done;
+
+        m_acceptor.post(
+            [&done, this]()
+            {
+                m_acceptor.cancelIOSync();
+                done.set_value();
+            });
+        done.get_future().wait();
+    }
+
+    void whenGettingConnection()
+    {
+        auto connection = m_acceptor.getNextConnectionIfAny();
+        m_acceptedConnections.push(std::make_tuple(
+            SystemError::getLastOSErrorCode(),
+            std::move(connection)));
+    }
+
+    void thenIoEventIsNotDelivered()
+    {
+        const std::chrono::milliseconds delay(100);
+
+        whenConnectionBecameReady();
+        ASSERT_FALSE(m_acceptedConnections.pop(delay));
     }
 
     void thenConnectionToTheTargetHasBeenOpened()
@@ -389,12 +429,43 @@ protected:
         ASSERT_EQ(poolSize, m_reverseConnectionPool.size());
     }
 
+    void thenConnectionIsReturnedWithoutBlocking()
+    {
+        std::unique_ptr<ReverseConnection> connection;
+        while (!(connection = m_acceptor.getNextConnectionIfAny()))
+            std::this_thread::yield();
+
+        const auto resultCode = connection
+            ? SystemError::noError
+            : SystemError::getLastOSErrorCode();
+        m_acceptedConnections.push(std::make_tuple(
+            resultCode,
+            std::move(connection)));
+
+        thenConnectionHasBeenAccepted();
+    }
+
+    void thenNoConnectionIsReturned()
+    {
+        if (!m_lastAcceptedConnection)
+            m_lastAcceptedConnection = m_acceptedConnections.pop();
+        ASSERT_EQ(nullptr, std::get<1>(*m_lastAcceptedConnection));
+    }
+
+    void thenErrorCodeIs(SystemError::ErrorCode sysErrorCode)
+    {
+        if (!m_lastAcceptedConnection)
+            m_lastAcceptedConnection = m_acceptedConnections.pop();
+        ASSERT_EQ(sysErrorCode, std::get<0>(*m_lastAcceptedConnection));
+    }
+
 private:
     using AcceptResult = 
         std::tuple<SystemError::ErrorCode, std::unique_ptr<ReverseConnection>>;
 
     const std::size_t m_preemptiveConnectionCount;
     nx::utils::SyncQueue<AcceptResult> m_acceptedConnections;
+    boost::optional<AcceptResult> m_lastAcceptedConnection;
     network::ReverseConnectionAcceptor<ReverseConnection> m_acceptor;
     ReverseConnectionPool m_reverseConnectionPool;
     nx::utils::SyncQueue<ReverseConnection*> m_connectedConnections;
@@ -526,17 +597,45 @@ TEST_F(ReverseConnectionAcceptor, stops_listening_connections_on_queue_overflow)
 
 TEST_F(ReverseConnectionAcceptor, cancel_io_in_own_aio_thread)
 {
-    // TODO
+    givenStartedAcceptAsync();
+    whenCancelledIoWithinAioThread();
+    thenIoEventIsNotDelivered();
 }
 
 TEST_F(ReverseConnectionAcceptor, cancel_io_in_other_thread)
 {
-    // TODO
+    givenStartedAcceptAsync();
+    whenCancelledIo();
+    thenIoEventIsNotDelivered();
 }
 
-//TEST_F(ReverseConnectionAcceptor, ready_connection_is_taken_by_getNextConnectionIfAny)
-//TEST_F(ReverseConnectionAcceptor, forwards_connection_error_to_the_caller)
-//TEST_F(ReverseConnectionAcceptor, error_reporting)
+TEST_F(ReverseConnectionAcceptor, ready_connection_is_taken_by_getNextConnectionIfAny)
+{
+    givenReadyConnection();
+    thenConnectionIsReturnedWithoutBlocking();
+}
+
+TEST_F(ReverseConnectionAcceptor, getNextConnectionIfAny_returns_null_if_no_accepted_connections)
+{
+    givenStartedAcceptor();
+
+    whenGettingConnection();
+
+    thenNoConnectionIsReturned();
+    thenErrorCodeIs(SystemError::wouldBlock);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+//class ReverseConnectionAcceptorErrorReporting:
+//    public ReverseConnectionAcceptor
+//{
+//};
+
+//TEST_F(ReverseConnectionAcceptorErrorReporting, connect_error_is_reported)
+//TEST_F(ReverseConnectionAcceptorErrorReporting, connect_error_is_cached_then_reported)
+//TEST_F(ReverseConnectionAcceptorErrorReporting, wait_for_originator_event_error_is_cached_then_reported)
+//TEST_F(ReverseConnectionAcceptorErrorReporting, wait_for_originator_event_error_is_reported)
 
 } // namespace test
 } // namespace network

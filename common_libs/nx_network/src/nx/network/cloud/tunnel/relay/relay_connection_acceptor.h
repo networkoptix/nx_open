@@ -22,9 +22,9 @@ class ReverseConnection:
     public AbstractAcceptableReverseConnection
 {
 public:
-    virtual void connectAsync(
+    virtual void connectToOriginator(
         ReverseConnectionCompletionHandler handler) override;
-    virtual void waitForConnectionToBeReadyAsync(
+    virtual void waitForOriginatorToStartUsingConnection(
         ReverseConnectionCompletionHandler handler) override;
 
     std::unique_ptr<AbstractStreamSocket> takeSocket();

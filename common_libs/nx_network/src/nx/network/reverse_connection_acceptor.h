@@ -6,6 +6,7 @@
 
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/system_error.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "aio/basic_pollable.h"
 
@@ -20,9 +21,9 @@ class AbstractAcceptableReverseConnection
 public:
     virtual ~AbstractAcceptableReverseConnection() = default;
 
-    virtual void connectAsync(
+    virtual void connectToOriginator(
         ReverseConnectionCompletionHandler handler) = 0;
-    virtual void waitForConnectionToBeReadyAsync(
+    virtual void waitForOriginatorToStartUsingConnection(
         ReverseConnectionCompletionHandler handler) = 0;
 };
 
@@ -34,14 +35,14 @@ public:
  *   by acceptAsync or getNextConnectionIfAny methods.
  *
  * Connection is ready to be accepted when it has triggered handler 
- *   passed to AbstractAcceptableReverseConnection::waitForConnectionToBeReadyAsync 
+ *   passed to AbstractAcceptableReverseConnection::waitForOriginatorToStartUsingConnection 
  *   with SystemError::noError code.
  * Always keeps specified number of connections alive.
  * @param AcceptableReverseConnection MUST implement 
  *   AbstractAcceptableReverseConnection and aio::BasicPollable.
  * NOTE: This class follows behavior of AbstractAcceptor, though not implements it.
  * NOTE: Does not implement accept timeout. If you need it, consider using aio::Timer.
- * NOTE: If AbstractAcceptableReverseConnection::waitForConnectionToBeReadyAsync reports error, 
+ * NOTE: If AbstractAcceptableReverseConnection::waitForOriginatorToStartUsingConnection reports error, 
  *   that error is passed to the scheduled acceptAsync call.
  */
 template<typename AcceptableReverseConnection>
@@ -97,11 +98,7 @@ public:
 
     void start()
     {
-        post(
-            [this]()
-            {
-                openConnections();
-            });
+        post([this]() { openConnections(); });
     }
 
     void acceptAsync(AcceptCompletionHandler handler)
@@ -110,8 +107,17 @@ public:
             [this, handler = std::move(handler)]() mutable
             {
                 m_acceptHandler = std::move(handler);
-                if (!m_acceptedConnections.empty())
-                    provideNextConnection();
+
+                auto connectionToReturn = takeNextAcceptedConnection();
+                if (!connectionToReturn)
+                    return;
+
+                startAcceptingAnotherConnectionIfAppropriate();
+
+                nx::utils::swapAndCall(
+                    m_acceptHandler,
+                    SystemError::noError,
+                    std::move(connectionToReturn));
             });
     }
 
@@ -134,10 +140,24 @@ public:
         }
     }
 
+    /**
+     * @return null if connection could not been accepted. 
+     * Use SystemError::getLastOsErrorCode() to get error code. 
+     * If accepted connections queue is empty, error code is set to SystemError::wouldBlock.
+     */
     std::unique_ptr<AcceptableReverseConnection> getNextConnectionIfAny()
     {
-        // TODO
-        return nullptr;
+        QnMutexLocker lock(&m_mutex);
+
+        auto connectionToReturn = takeNextAcceptedConnection();
+        if (!connectionToReturn)
+        {
+            SystemError::setLastErrorCode(SystemError::wouldBlock);
+            return nullptr;
+        }
+
+        startAcceptingAnotherConnectionIfAppropriate();
+        return connectionToReturn;
     }
 
 protected:
@@ -180,6 +200,7 @@ private:
     std::deque<std::unique_ptr<AcceptableReverseConnection>> m_acceptedConnections;
     std::size_t m_preemptiveConnectionCount = kDefaultPreemptiveConnectionCount;
     std::size_t m_maxReadyConnectionCount = kDefaultMaxReadyConnectionCount;
+    mutable QnMutex m_mutex;
 
     void openConnections()
     {
@@ -191,7 +212,7 @@ private:
         {
             auto connection = m_connectionFactory();
             m_connections.push_back(ConnectionContext());
-            connection->connectAsync(
+            connection->connectToOriginator(
                 std::bind(&ReverseConnectionAcceptor::onConnectDone, this,
                     --m_connections.end(), _1));
             m_connections.back().connection = std::move(connection);
@@ -202,6 +223,8 @@ private:
         typename Connections::iterator connectionIter,
         SystemError::ErrorCode connectResult)
     {
+        QnMutexLocker lock(&m_mutex);
+
         if (connectResult != SystemError::noError)
         {
             m_connections.erase(connectionIter);
@@ -232,29 +255,61 @@ private:
     {
         connectionIter->state = ConnectionState::accepting;
 
-        connectionIter->connection->waitForConnectionToBeReadyAsync(
-            std::bind(&ReverseConnectionAcceptor::onWaitForReadinessCompleted, this,
+        connectionIter->connection->waitForOriginatorToStartUsingConnection(
+            std::bind(&ReverseConnectionAcceptor::onConnectionReadyForUsage, this,
                 connectionIter, std::placeholders::_1));
     }
 
-    void onWaitForReadinessCompleted(
+    void onConnectionReadyForUsage(
         typename Connections::iterator connectionIter,
         SystemError::ErrorCode resultCode)
     {
-        if (resultCode != SystemError::noError)
+        std::unique_ptr<AcceptableReverseConnection> connectionToReturn;
+
+        {
+            QnMutexLocker lock(&m_mutex);
+
+            if (resultCode == SystemError::noError)
+                m_acceptedConnections.push_back(std::move(connectionIter->connection));
+
+            m_connections.erase(connectionIter);
+            openConnections();
+
+            if (m_acceptHandler)
+                connectionToReturn = takeNextAcceptedConnection();
+
+            startAcceptingAnotherConnectionIfAppropriate();
+        }
+
+        if (connectionToReturn)
+        {
+            nx::utils::swapAndCall(
+                m_acceptHandler,
+                SystemError::noError,
+                std::move(connectionToReturn));
+        }
+    }
+
+    std::unique_ptr<AcceptableReverseConnection> takeNextAcceptedConnection()
+    {
+        std::unique_ptr<AcceptableReverseConnection> result;
+        if (!m_acceptedConnections.empty())
+        {
+            result = std::move(m_acceptedConnections.front());
+            m_acceptedConnections.pop_front();
+        }
+        return result;
+    }
+
+    void startAcceptingAnotherConnectionIfAppropriate()
+    {
+        if (m_acceptedConnections.size() + connectionsBeingAcceptedCount() <
+            m_maxReadyConnectionCount)
         {
             auto connectedConnectionIter = getAnyConnectedConnection();
             if (connectedConnectionIter != m_connections.end())
                 startAccepting(connectedConnectionIter);
         }
-        else
-        {
-            auto connection = std::move(connectionIter->connection);
-            saveAcceptedConnection(std::move(connection));
-        }
-
-        m_connections.erase(connectionIter);
-        openConnections();
     }
 
     typename Connections::iterator getAnyConnectedConnection()
@@ -262,29 +317,6 @@ private:
         return std::find_if(
             m_connections.begin(), m_connections.end(),
             [](const ConnectionContext& val) { return val.state == ConnectionState::connected; });
-    }
-
-    void saveAcceptedConnection(
-        std::unique_ptr<AcceptableReverseConnection> connection)
-    {
-        m_acceptedConnections.push_back(std::move(connection));
-        if (m_acceptHandler)
-            provideNextConnection();
-    }
-
-    void provideNextConnection()
-    {
-        auto connection = std::move(m_acceptedConnections.front());
-        m_acceptedConnections.pop_front();
-
-        auto connectionIter = getAnyConnectedConnection();
-        if (connectionIter != m_connections.end())
-            startAccepting(connectionIter);
-
-        nx::utils::swapAndCall(
-            m_acceptHandler,
-            SystemError::noError,
-            std::move(connection));
     }
 
     void cancelIoWhileInOwnAioThread()
