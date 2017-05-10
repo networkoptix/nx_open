@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <nx/network/websocket/websocket.h>
 #include <nx/network/socket_factory.h>
+#include <nx/utils/thread/cf/wrappers.h>
 
 using namespace nx::network::websocket;
 
@@ -30,14 +31,12 @@ protected:
                 clientWebSocket.reset(
                     new nx::network::WebSocket(
                         std::move(clientSocket1),
-                        nx::Buffer(),
                         clientSendMode,
                         clientReceiveMode));
 
                 serverWebSocket.reset(
                     new nx::network::WebSocket(
                         std::move(clientSocket2),
-                        nx::Buffer(),
                         serverSendMode,
                         serverReceiveMode));
 
@@ -174,8 +173,10 @@ protected:
 
     virtual void TearDown() override
     {
-        clientWebSocket->pleaseStopSync();
-        serverWebSocket->pleaseStopSync();
+        if (clientWebSocket)
+            clientWebSocket->pleaseStopSync();
+        if (serverWebSocket)
+            serverWebSocket->pleaseStopSync();
     }
 
     void prepareTestData(nx::Buffer* payload, int size)
@@ -217,8 +218,8 @@ protected:
     std::unique_ptr<AbstractStreamSocket> clientSocket1;
     std::unique_ptr<AbstractStreamSocket> clientSocket2;
 
-    std::unique_ptr<nx::network::WebSocket> clientWebSocket;
-    std::unique_ptr<nx::network::WebSocket> serverWebSocket;
+    nx::network::WebSocketPtr clientWebSocket;
+    nx::network::WebSocketPtr serverWebSocket;
 
     std::promise<void> startPromise;
     std::future<void> startFuture;
@@ -277,6 +278,108 @@ TEST_F(WebSocket, MultipleMessagesFromClient_ServerResponds)
     serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
 
     readyFuture.wait();
+}
+
+
+cf::future<cf::unit> WebsocketTestReader(
+    nx::network::WebSocketPtr& socket,
+    SendMode sendMode,
+    ReceiveMode receiveMode,
+    int iterations)
+{
+    struct State
+    {
+        int count;
+        int total;
+        nx::Buffer buffer;
+        nx::network::WebSocketPtr& webSocket;
+        State(nx::network::WebSocketPtr& socket, SendMode sendMode, ReceiveMode receiveMode, int total):
+            count (0),
+            total(total),
+            webSocket(socket)
+        {}
+        ~State(){}
+    };
+    auto state = std::make_shared<State>(std::move(socket), sendMode, receiveMode, iterations);
+    return cf::doWhile(
+        [state]() mutable
+        {
+            if (state->count++ >= state->total)
+                return cf::make_ready_future(false);
+            return cf::readAsync(state->webSocket.get(), &state->buffer).then(
+                [state](cf::future<std::pair<SystemError::ErrorCode, size_t>> readFuture)
+                {
+                    auto resultPair = readFuture.get();
+                    return cf::sendAsync(state->webSocket.get(), state->buffer).then(
+                        [state](cf::future<std::pair<SystemError::ErrorCode, size_t>> sendFuture)
+                        {
+                            state->buffer.clear();
+                            return cf::unit();
+                        }).then([](cf::future<cf::unit>) { return true; });
+                });
+        });
+}
+
+cf::future<cf::unit> WebsocketTestWriter(
+    nx::network::WebSocketPtr& socket,
+    SendMode sendMode,
+    ReceiveMode receiveMode,
+    const nx::Buffer& sendBuffer,
+    int iterations)
+{
+    struct State
+    {
+        int count;
+        int total;
+        nx::Buffer buffer;
+        nx::network::WebSocketPtr& webSocket;
+        State(nx::network::WebSocketPtr& socket, SendMode sendMode, ReceiveMode receiveMode, const nx::Buffer& buffer, int total):
+            count (0),
+            total(total),
+            buffer(buffer),
+            webSocket(socket)
+        {}
+    };
+    auto state = std::make_shared<State>(std::move(socket), sendMode, receiveMode, sendBuffer, iterations);
+    return cf::doWhile(
+        [state]() mutable
+        {
+            if (state->count++ >= state->total)
+                return cf::make_ready_future(false);
+            return cf::sendAsync(state->webSocket.get(), state->buffer).then(
+                [state](cf::future<std::pair<SystemError::ErrorCode, size_t>> readFuture)
+                {
+                    state->buffer.clear();
+                    return cf::readAsync(state->webSocket.get(), &state->buffer).then(
+                        [state](cf::future<std::pair<SystemError::ErrorCode, size_t>> sendFuture)
+                        {
+                            return cf::unit();
+                        }).then([](cf::future<cf::unit>) { return true; });
+                });
+        });
+}
+
+TEST_F(WebSocket, Wrappers)
+{
+    givenClientTestDataPrepared(1 * 1024 * 1024);
+    givenServerTestDataPrepared(2 * 1024 * 1024);
+    givenClientServerExchangeMessagesCallbacks();
+    givenClientModes(SendMode::singleMessage, ReceiveMode::message);
+    givenServerModes(SendMode::singleMessage, ReceiveMode::message);
+    givenSocketAreConnected();
+    startFuture.wait();
+    auto readFuture = WebsocketTestReader(
+        serverWebSocket,
+        SendMode::singleMessage,
+        ReceiveMode::message,
+        10);
+    auto writeFuture = WebsocketTestWriter(
+        clientWebSocket,
+        SendMode::singleMessage,
+        ReceiveMode::message,
+        clientSendBuf,
+        10);
+    cf::when_all(readFuture, writeFuture).wait();
 }
 
 }
