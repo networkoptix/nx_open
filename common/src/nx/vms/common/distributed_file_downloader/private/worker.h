@@ -97,6 +97,7 @@ protected:
     FileInformation fileInformation() const;
 
     QList<QnUuid> allPeers() const;
+    QList<QnUuid> allPeersWithInternetConnection() const;
     QList<QnUuid> selectPeersForOperation(
         int count = -1, const QList<QnUuid>& referencePeers = QList<QnUuid>());
     int selectNextChunk() const;

@@ -202,7 +202,10 @@ void Worker::nextStep()
                     requestChecksums();
                     break;
                 case FileInformation::Status::downloading:
-                    downloadNextChunk();
+                    if (haveChunksToDownload())
+                        downloadNextChunk();
+                    else
+                        requestAvailableChunks();
                     break;
                 default:
                     NX_ASSERT(false, "Should never get here.");
@@ -226,6 +229,13 @@ void Worker::requestFileInformationInternal()
     const auto peers = selectPeersForOperation();
     if (peers.isEmpty())
     {
+        if (m_state == State::requestingAvailableChunks
+            && m_peerManager->hasInternetConnection(m_peerManager->selfId()))
+        {
+            downloadNextChunk();
+            return;
+        }
+
         waitForNextStep();
         return;
     }
@@ -421,7 +431,18 @@ void Worker::downloadNextChunk()
     if (chunkIndex < 0)
         return;
 
-    const auto peers = selectPeersForOperation(1, peersForChunk(chunkIndex));
+    bool useInternet = false;
+    auto peers = peersForChunk(chunkIndex);
+    if (peers.isEmpty())
+    {
+        useInternet = true;
+
+        if (m_peerManager->hasInternetConnection(m_peerManager->selfId()))
+            peers = {m_peerManager->selfId()};
+        else
+            peers = allPeersWithInternetConnection();
+    }
+    peers = selectPeersForOperation(1, peers);
     NX_ASSERT(!peers.isEmpty());
     NX_ASSERT(peers.size() == 1);
     if (peers.isEmpty())
@@ -474,8 +495,36 @@ void Worker::downloadNextChunk()
             }
         };
 
-    NX_LOGX(logMessage("Requesting chunk %1...").arg(chunkIndex), cl_logDEBUG2);
-    const auto handle = m_peerManager->downloadChunk(peerId, m_fileName, chunkIndex, handleReply);
+    const auto& fileInfo = fileInformation();
+
+    rest::Handle handle;
+
+    if (useInternet)
+    {
+        NX_LOGX(
+            logMessage("Requesting chunk %1 from the Internet via %2...")
+                .arg(chunkIndex).arg(m_peerManager->peerString(peerId)),
+            cl_logDEBUG2);
+        handle = m_peerManager->downloadChunkFromInternet(
+            peerId, fileInfo.url, chunkIndex, fileInfo.chunkSize, handleReply);
+    }
+    else
+    {
+        NX_LOGX(
+            logMessage("Requesting chunk %1 from %2...")
+                .arg(chunkIndex).arg(m_peerManager->peerString(peerId)),
+            cl_logDEBUG2);
+        handle = m_peerManager->downloadChunk(peerId, m_fileName, chunkIndex, handleReply);
+    }
+
+    if (handle < 0)
+    {
+        NX_LOGX(
+            logMessage("Cannot send request for chunk %1 to %2...")
+                .arg(chunkIndex).arg(m_peerManager->peerString(peerId)),
+            cl_logDEBUG2);
+
+    }
     m_peerByRequestHandle[handle] = peerId;
 }
 
@@ -556,6 +605,19 @@ QList<QnUuid> Worker::allPeers() const
         : m_forcedPeers;
 }
 
+QList<QnUuid> Worker::allPeersWithInternetConnection() const
+{
+    QList<QnUuid> result;
+
+    for (const auto& peer: allPeers())
+    {
+        if (m_peerManager->hasInternetConnection(peer))
+            result.append(peer);
+    }
+
+    return result;
+}
+
 QList<QnUuid> Worker::selectPeersForOperation(int count, const QList<QnUuid>& referencePeers)
 {
     QList<QnUuid> result;
@@ -590,19 +652,34 @@ int Worker::selectNextChunk() const
     const int chunksCount = fileInfo.downloadedChunks.size();
     const int randomChunk = rand() % chunksCount;
 
-    for (int i = randomChunk; i < chunksCount; ++i)
-    {
-        if (m_availableChunks[i] && !fileInfo.downloadedChunks[i])
-            return i;
-    }
+    int firstMetNotDownloadedChunk = -1;
 
-    for (int i = 0; i < randomChunk; ++i)
-    {
-        if (m_availableChunks[i] && !fileInfo.downloadedChunks[i])
-            return i;
-    }
+    auto findChunk = [this, &fileInfo, &firstMetNotDownloadedChunk](int start, int end)
+        {
+            for (int i = start; i <= end; ++i)
+            {
+                if (fileInfo.downloadedChunks[i])
+                    continue;
 
-    return -1;
+                if (firstMetNotDownloadedChunk < 0)
+                    firstMetNotDownloadedChunk = i;
+
+                if (m_availableChunks[i])
+                    return i;
+            }
+
+            return -1;
+        };
+
+    int chunk = findChunk(randomChunk, chunksCount - 1);
+    if (chunk >= 0)
+        return chunk;
+
+    chunk = findChunk(0, randomChunk - 1);
+    if (chunk >= 0)
+        return chunk;
+
+    return firstMetNotDownloadedChunk;
 }
 
 void Worker::waitForNextStep(int delay)
