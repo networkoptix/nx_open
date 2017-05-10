@@ -7,9 +7,12 @@
 #include <core/resource/layout_resource.h>
 
 #include <ui/style/globals.h>
+#include <ui/style/helper.h>
 #include <ui/style/nx_style.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/busy_indicator.h>
+#include <ui/widgets/common/autoscaled_plain_text.h>
+#include <ui/workaround/sharp_pixmap_painting.h>
 
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -241,12 +244,32 @@ void LayoutPreviewPainter::paintItem(QPainter* painter, const QRectF& itemRect,
         switch (info.status)
         {
             case Qn::ThumbnailStatus::Loaded:
-            case Qn::ThumbnailStatus::Refreshing:
-                qDebug() << "null pixmap while status is " << (int)info.status;
+                NX_EXPECT(false);
                 //fall-through
+            case Qn::ThumbnailStatus::Refreshing:
             case Qn::ThumbnailStatus::Invalid:
             case Qn::ThumbnailStatus::NoData:
+            {
+                static const int kMargin = 4;
+
+                QScopedPointer<QnAutoscaledPlainText> pw(new QnAutoscaledPlainText());
+                pw->setText(tr("NO DATA"));
+                pw->setProperty(style::Properties::kDontPolishFontProperty, true);
+                pw->setAlignment(Qt::AlignCenter);
+                pw->setGeometry(QnGeometry::eroded(itemRect.toRect(), kMargin));
+
+                const int devicePixelRatio = painter->device()->devicePixelRatio();
+
+                /* Paint into sub-cache: */
+                QPixmap pixmap(itemRect.size().toSize() * devicePixelRatio);
+                pixmap.setDevicePixelRatio(devicePixelRatio);
+                pixmap.fill(Qt::transparent);
+                pw->render(&pixmap);
+
+                paintPixmapSharp(painter, pixmap, itemRect.topLeft() + QPoint(kMargin, kMargin));
+
                 break;
+            }
 
             case Qn::ThumbnailStatus::Loading:
             {
