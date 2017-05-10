@@ -1,5 +1,4 @@
-#ifndef MULTICAST_MODULE_FINDER_H
-#define MULTICAST_MODULE_FINDER_H
+#pragma once
 
 #include <memory>
 
@@ -9,21 +8,17 @@
 #include <nx/network/aio/pollset.h>
 #include <nx/utils/thread/mutex.h>
 
-#include "networkoptixmodulerevealcommon.h"
+#include <network/networkoptixmodulerevealcommon.h>
 #include <common/common_module_aware.h>
 
-
-namespace nx {
-namespace network {
-
-class UDPSocket;
-
-}   //network
-}   //nx
-
+namespace nx { namespace network { class UDPSocket; } }
 struct QnModuleInformation;
 class HostAddress;
 class SocketAddress;
+
+namespace nx {
+namespace vms {
+namespace discovery {
 
 //!Searches for all Network Optix enterprise controllers in local network environment using multicast
 /*!
@@ -32,8 +27,10 @@ class SocketAddress;
     If there was no response from previously found host for \a pingTimeoutMillis * \a keepAliveMultiply, than host is considered to be lost
 
     \note Requests are sent via all available local network interfaces
+
+    \note DEPRECATED: old name QnMulticastModuleFinder
 */
-class QnMulticastModuleFinder: public QnLongRunnable, public QnCommonModuleAware
+class DeprecatedMulticastFinder: public QnLongRunnable, public QnCommonModuleAware
 {
     Q_OBJECT
 
@@ -55,7 +52,7 @@ public:
         \param pingTimeoutMillis multicast group ping time. if 0, default value is used
         \param keepAliveMultiply if 0, default value is used
     */
-    QnMulticastModuleFinder(
+    DeprecatedMulticastFinder(
         QObject* parent,
         Options options,
         const QHostAddress &multicastGroupAddress = QHostAddress(),
@@ -63,7 +60,7 @@ public:
         const unsigned int pingTimeoutMillis = 0,
         const unsigned int keepAliveMultiply = 0);
 
-    virtual ~QnMulticastModuleFinder();
+    virtual ~DeprecatedMulticastFinder();
 
     //! \returns true, if object has been successfully initialized (socket is created and binded to local address)
     bool isValid() const;
@@ -112,4 +109,6 @@ private:
     mutable QnMutex m_moduleInfoMutex;
 };
 
-#endif // MULTICAST_MODULE_FINDER_H
+} // namespace discovery
+} // namespace vms
+} // namespace nx

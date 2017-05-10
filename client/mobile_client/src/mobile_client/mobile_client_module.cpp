@@ -21,7 +21,6 @@
 #include <nx/utils/thread/long_runnable.h>
 #include <utils/common/app_info.h>
 #include <nx/vms/discovery/manager.h>
-#include <network/multicast_module_finder.h>
 #include <network/router.h>
 #include <cloud/cloud_connection.h>
 #include <watchers/user_watcher.h>
