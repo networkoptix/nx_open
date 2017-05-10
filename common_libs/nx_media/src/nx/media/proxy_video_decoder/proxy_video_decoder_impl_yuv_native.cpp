@@ -3,8 +3,9 @@
 
 #include <nx/utils/debug_utils.h>
 
+#include <nx/media/aligned_mem_video_buffer.h>
+
 #include "proxy_video_decoder_utils.h"
-#include "aligned_mem_video_buffer.h"
 
 namespace nx {
 namespace media {

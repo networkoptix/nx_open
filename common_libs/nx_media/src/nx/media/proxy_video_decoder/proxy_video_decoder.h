@@ -6,7 +6,7 @@
 
 #include <nx/streaming/video_data_packet.h>
 
-#include "abstract_video_decoder.h"
+#include <nx/media/abstract_video_decoder.h>
 
 namespace nx {
 namespace media {
@@ -15,8 +15,8 @@ class ProxyVideoDecoderImpl;
 
 /**
  * Implements video decoder which delegates actual decoding to an external lib 'proxydecoder',
- * which is intended not to be the part of netoptix_vms tree, and has an interface not depending on
- * ffmpeg, thus, can be compiled with a different ffmpeg version.
+ * which is intended not to be the part of nx_vms tree, and has an interface not depending on
+ * ffmpeg or any other libs, thus, can be compiled with a different ffmpeg version.
  */
 class ProxyVideoDecoder:
     public AbstractVideoDecoder

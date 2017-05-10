@@ -26,13 +26,13 @@ static ProxyVideoDecoderImpl* createProxyVideoDecoderImpl(
 
     if (flagsCount > 1)
     {
-        PRINT << "More than one impl... configuration flag is set; using STUB w/o libproxydecoder";
+        PRINT << "More than one impl... flag is set in .ini; using STUB w/o libproxydecoder";
         return ProxyVideoDecoderImpl::createImplStub(params);
     }
 
     if (flagsCount == 0)
     {
-        PRINT << "No impl... configuration flag is set; using STUB w/o libproxydecoder";
+        PRINT << "No impl... flag is set in .ini; using STUB w/o libproxydecoder";
         return ProxyVideoDecoderImpl::createImplStub(params);
     }
 

@@ -136,9 +136,9 @@ void Impl::displayDecodedFrame(void* frameHandle)
                 {
                     if (conf.displayAsyncGlFinish)
                     {
-                        GL_GET_FUNCS(QOpenGLContext::currentContext());
-                        GL(funcs->glFlush());
-                        GL(funcs->glFinish());
+                        NX_GL_GET_FUNCS(QOpenGLContext::currentContext());
+                        NX_GL(funcs->glFlush());
+                        NX_GL(funcs->glFinish());
                     }
 
                     if (conf.displayAsyncSleepMs > 0)

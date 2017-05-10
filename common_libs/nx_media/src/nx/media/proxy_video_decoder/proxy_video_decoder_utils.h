@@ -12,7 +12,7 @@
 
 #include <proxy_decoder.h>
 
-#include "media_fwd.h"
+#include <nx/media/media_fwd.h>
 
 namespace nx {
 namespace media {

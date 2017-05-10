@@ -87,9 +87,9 @@ void outputGlFbo(const char* tag)
     }
     else
     {
-        GL_GET_FUNCS(QOpenGLContext::currentContext());
+        NX_GL_GET_FUNCS(QOpenGLContext::currentContext());
         GLint curFbo = 0;
-        GL(funcs->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &curFbo));
+        NX_GL(funcs->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &curFbo));
         OUTPUT << tag << ": current FBO ==" << curFbo;
     }
 }
@@ -98,9 +98,9 @@ constexpr const char* FboManager::OUTPUT_PREFIX;
 
 void checkGlFramebufferStatus()
 {
-    GL_GET_FUNCS(QOpenGLContext::currentContext());
+    NX_GL_GET_FUNCS(QOpenGLContext::currentContext());
     GLenum res = 0;
-    GL(res = glCheckFramebufferStatus(GL_FRAMEBUFFER));
+    NX_GL(res = glCheckFramebufferStatus(GL_FRAMEBUFFER));
     if (res != GL_FRAMEBUFFER_COMPLETE)
     {
         const char* const s = glFramebufferStatusStr(res);
@@ -132,10 +132,10 @@ void debugTextureTest()
         funcs = ctx->functions();
         NX_CRITICAL(funcs);
 
-        GL(tex.setFormat(QOpenGLTexture::AlphaFormat));
-        GL(tex.setSize(1920, 1080));
-        GL(tex.allocateStorage(QOpenGLTexture::Alpha, QOpenGLTexture::UInt8));
-        GL(tex.setMinMagFilters(QOpenGLTexture::Nearest, QOpenGLTexture::Nearest));
+        NX_GL(tex.setFormat(QOpenGLTexture::AlphaFormat));
+        NX_GL(tex.setSize(1920, 1080));
+        NX_GL(tex.allocateStorage(QOpenGLTexture::Alpha, QOpenGLTexture::UInt8));
+        NX_GL(tex.setMinMagFilters(QOpenGLTexture::Nearest, QOpenGLTexture::Nearest));
 
         buffer = malloc(17 + kMediaAlignment + 1920 * 1080);
         bufferStart = nx::utils::debugUnalignPtr(buffer);
@@ -147,7 +147,7 @@ void debugTextureTest()
     funcs->glFlush();
     funcs->glFinish();
     NX_TIME_BEGIN(debugTextureTest_setData_glFlush_glFinish);
-        GL(tex.setData(QOpenGLTexture::Alpha, QOpenGLTexture::UInt8, bufferStart));
+        NX_GL(tex.setData(QOpenGLTexture::Alpha, QOpenGLTexture::UInt8, bufferStart));
     funcs->glFlush();
     funcs->glFinish();
     NX_TIME_END(debugTextureTest_setData_glFlush_glFinish);
@@ -167,8 +167,7 @@ void debugGlGetAttribsAndAbort(QSize frameSize)
     PRINT << "eglGetDisplay -> " << display;
     PRINT << "error=" << eglGetError();
 
-    EGLint configAttribs[] =
-    {
+    EGLint configAttribs[] = {
         //EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
         //EGL_RED_SIZE, 8,
         //EGL_GREEN_SIZE, 8,
@@ -220,7 +219,8 @@ void debugGlGetAttribsAndAbort(QSize frameSize)
 
 void debugTestImageExtension(QOpenGLTexture& yTex)
 {
-    PFNEGLCREATEIMAGEKHRPROC eglCreateImageKHR = (PFNEGLCREATEIMAGEKHRPROC) eglGetProcAddress("eglCreateImageKHR");
+    PFNEGLCREATEIMAGEKHRPROC eglCreateImageKHR =
+        (PFNEGLCREATEIMAGEKHRPROC) eglGetProcAddress("eglCreateImageKHR");
     PRINT << "eglCreateImageKHR =" << eglCreateImageKHR;
 
     EGLImageKHR eglImageHandle = eglCreateImageKHR(
@@ -234,7 +234,8 @@ void debugTestImageExtension(QOpenGLTexture& yTex)
     PRINT << "eglGetError() returned" << eglGetError();
 
     GLvoid* bitmapAddress(0);
-    eglQuerySurface(eglGetCurrentDisplay(), eglImageHandle, EGL_BITMAP_POINTER_KHR, (GLint*) &bitmapAddress);
+    eglQuerySurface(eglGetCurrentDisplay(), eglImageHandle, EGL_BITMAP_POINTER_KHR,
+        (GLint*) &bitmapAddress);
 
     PRINT << "bitmapAddress ==" << bitmapAddress;
     PRINT << "eglGetError() returned" << eglGetError();

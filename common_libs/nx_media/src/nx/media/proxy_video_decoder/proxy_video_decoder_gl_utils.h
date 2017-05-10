@@ -18,13 +18,13 @@ namespace media {
 
 void checkGlError(QOpenGLFunctions* funcs, const char* tag);
 
-#define GL_GET_FUNCS(Q_OPENGL_CONTEXT_PTR) \
+#define NX_GL_GET_FUNCS(Q_OPENGL_CONTEXT_PTR) \
     QOpenGLContext* qOpenGlContextPtr = (Q_OPENGL_CONTEXT_PTR); \
     NX_CRITICAL(qOpenGlContextPtr); \
     QOpenGLFunctions* funcs = qOpenGlContextPtr->functions(); \
     NX_CRITICAL(funcs);
 
-#define GL(CALL) do \
+#define NX_GL(CALL) do \
 { \
     if (conf.outputGlCalls) \
         PRINT << "OpenGL CALL: " << #CALL; \
@@ -33,7 +33,7 @@ void checkGlError(QOpenGLFunctions* funcs, const char* tag);
     checkGlError(funcs, #CALL); \
 } while (0)
 
-#define GL_CHECK(BOOL_CALL) do \
+#define NX_GL_CHECK(BOOL_CALL) do \
 { \
     if (conf.outputGlCalls) \
         PRINT << "OpenGL CALL: " << #BOOL_CALL; \
@@ -45,7 +45,7 @@ void checkGlError(QOpenGLFunctions* funcs, const char* tag);
     NX_CRITICAL(result); \
 } while (0)
 
-#define GL_DUMP(OBJ) do \
+#define NX_GL_DUMP(OBJ) do \
 { \
     OUTPUT << "OpenGL " #OBJ " BEGIN"; \
     OUTPUT << OBJ->log(); \
@@ -77,9 +77,9 @@ public:
         while ((int) m_fboQueue.size() < m_queueSize)
         {
             outputGlFbo("getFbo 1");
-            GL_GET_FUNCS(QOpenGLContext::currentContext());
+            NX_GL_GET_FUNCS(QOpenGLContext::currentContext());
             GLint prevFbo = 0;
-            GL(funcs->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prevFbo));
+            NX_GL(funcs->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prevFbo));
             QOpenGLFramebufferObject* fbo;
 
             QOpenGLFramebufferObjectFormat fmt;
@@ -88,7 +88,7 @@ public:
             fmt.setTextureTarget(GL_TEXTURE_2D);
             fmt.setInternalTextureFormat(GL_RGBA);
 
-            GL(fbo = new QOpenGLFramebufferObject(m_frameSize, fmt));
+            NX_GL(fbo = new QOpenGLFramebufferObject(m_frameSize, fmt));
             NX_CRITICAL(fbo->isValid());
             outputGlFbo("getFbo 2");
             m_fboQueue.push_back(FboPtr(fbo));
