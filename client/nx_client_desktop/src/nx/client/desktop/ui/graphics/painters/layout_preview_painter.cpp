@@ -151,8 +151,8 @@ void LayoutPreviewPainter::paint(QPainter* painter, const QRect& paintRect)
         qreal h1 = (cellRect.height() - space * 2) * yscale;
 
         QRectF itemRect(x1, y1, w1, h1);
+        paintItem(painter, QnGeometry::eroded(itemRect, 1), data);
         QnNxStyle::paintCosmeticFrame(painter, itemRect, m_frameColor, kFrameWidth, 0);
-        paintItem(painter, itemRect, data);
     }
 
     QnNxStyle::paintCosmeticFrame(painter, paintRect, m_frameColor, kFrameWidth, 0);
@@ -219,9 +219,17 @@ void LayoutPreviewPainter::paintItem(QPainter* painter, const QRectF& itemRect,
 //                 pixmap.height() * mediaLayout.height());
 
             auto drawPixmap =
-                [painter, &info](const QRectF& targetRect)
+                [painter, &info, zoomRect = item.zoomRect](const QRectF& targetRect)
                 {
-                    painter->drawPixmap(targetRect.toRect(), info.pixmap);
+                    if (zoomRect.isNull())
+                    {
+                        painter->drawPixmap(targetRect.toRect(), info.pixmap);
+                    }
+                    else
+                    {
+                        painter->drawPixmap(targetRect.toRect(), info.pixmap,
+                            QnGeometry::subRect(info.pixmap.rect(), zoomRect).toRect());
+                    }
                 };
 
             if (!qFuzzyIsNull(item.rotation))
@@ -230,8 +238,10 @@ void LayoutPreviewPainter::paintItem(QPainter* painter, const QRectF& itemRect,
                 painter->translate(itemRect.center());
                 painter->rotate(item.rotation);
                 painter->translate(-itemRect.center());
-                drawPixmap(QnGeometry::encloseRotatedGeometry(itemRect,
-                    QnGeometry::aspectRatio(info.pixmap.size()), item.rotation));
+                const auto targetRect = QnGeometry::encloseRotatedGeometry(itemRect,
+                    QnGeometry::aspectRatio(info.pixmap.size()), item.rotation);
+
+                drawPixmap(targetRect);
             }
             else
             {
