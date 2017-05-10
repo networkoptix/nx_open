@@ -6,7 +6,6 @@ namespace websocket {
 
 WebSocket::WebSocket(
     std::unique_ptr<AbstractStreamSocket> streamSocket,
-    const nx::Buffer& requestData,
     SendMode sendMode,
     ReceiveMode receiveMode,
     Role role)
@@ -21,8 +20,6 @@ WebSocket::WebSocket(
     m_pingTimer(new nx::network::aio::Timer),
     m_terminating(false)
 {
-    nx::Buffer tmpBuf(requestData);
-    m_parser.consume(tmpBuf);
     AbstractAsyncChannel::bindToAioThread(m_baseConnection->getAioThread());
     m_pingTimer->bindToAioThread(m_baseConnection->getAioThread());
     setPingTimeout(std::chrono::seconds(100));

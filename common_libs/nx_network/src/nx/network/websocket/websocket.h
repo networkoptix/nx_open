@@ -48,7 +48,6 @@ public:
 
     WebSocket(
         std::unique_ptr<AbstractStreamSocket> streamSocket,
-        const nx::Buffer& requestData,
         SendMode sendMode = SendMode::singleMessage,
         ReceiveMode receiveMode = ReceiveMode::message,
         Role role = Role::undefined); /**< if role is undefined, payload won't be masked (unmasked) */
