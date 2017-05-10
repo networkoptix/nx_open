@@ -248,7 +248,7 @@ void P2pConnectionProcessor::run()
     socket->setSendTimeout(std::chrono::milliseconds(keepAliveTimeout * 2).count());
     socket->setNoDelay(true);
 
-    WebSocketPtr webSocket(new WebSocket(
+    WebSocketPtr webSocket(new websocket::WebSocket(
         std::move(socket),
         d->request.messageBody));
 

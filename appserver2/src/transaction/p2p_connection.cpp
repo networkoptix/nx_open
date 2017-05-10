@@ -277,7 +277,7 @@ void P2pConnection::onHttpClientDone()
         lit("QnTransactionTransportBase::at_httpClientDone. state = %1").
         arg((int)m_httpClient->state()), cl_logDEBUG2);
 
-    m_webSocket.reset(new WebSocket(std::move(socket), nx::Buffer()));
+    m_webSocket.reset(new websocket::WebSocket(std::move(socket), nx::Buffer()));
     m_httpClient.reset();
     m_miscData.lifetimeTimer.restart();
     setState(State::Connected);
