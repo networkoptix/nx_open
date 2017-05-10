@@ -193,6 +193,19 @@ QSize QnCameraThumbnailManager::sizeHintForCamera(const QnVirtualCameraResourceP
     return result;
 }
 
+Qn::ThumbnailStatus QnCameraThumbnailManager::statusForCamera(
+    const QnVirtualCameraResourcePtr& camera) const
+{
+    if (!camera)
+        return Qn::ThumbnailStatus::Invalid;
+
+    auto iter = m_thumbnailByCamera.constFind(camera);
+    if (iter == m_thumbnailByCamera.cend())
+        return Qn::ThumbnailStatus::Invalid;
+
+    return iter->status;
+}
+
 bool QnCameraThumbnailManager::hasThumbnailForCamera(const QnVirtualCameraResourcePtr& camera) const
 {
     if (!camera)
@@ -204,7 +217,6 @@ bool QnCameraThumbnailManager::hasThumbnailForCamera(const QnVirtualCameraResour
 
     return iter->status == Qn::ThumbnailStatus::Loaded
         || iter->status == Qn::ThumbnailStatus::Refreshing;
-
 }
 
 QImage QnCameraThumbnailManager::thumbnailForCamera(const QnVirtualCameraResourcePtr& camera) const
