@@ -64,9 +64,10 @@ signals:
 private:
     void initializeConnector();
     void initializeMulticastFinders(bool clientMode);
-    void monitorServerUrls(QnResourcePool* resourcePool);
+    void monitorServerUrls();
 
 private:
+    QnResourcePool* const m_resourcePool;
     std::atomic<bool> isRunning;
 
     mutable QnMutex m_mutex;

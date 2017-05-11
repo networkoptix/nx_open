@@ -102,6 +102,8 @@ public:
     void setSystemInfo(const QnSystemInformation &systemInfo);
     virtual QnModuleInformation getModuleInformation() const;
 
+    QnModuleInformationWithAddresses getModuleInformationWithAddresses() const;
+
     QString getAuthKey() const;
     void setAuthKey(const QString& value);
 

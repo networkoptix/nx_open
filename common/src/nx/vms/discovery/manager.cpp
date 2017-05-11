@@ -10,12 +10,13 @@ namespace vms {
 namespace discovery {
 
 Manager::Manager(QnCommonModule* commonModule, bool clientMode, QnResourcePool* resourcePool):
-    QnCommonModuleAware(commonModule)
+    QnCommonModuleAware(commonModule),
+    m_resourcePool(resourcePool)
 {
     qRegisterMetaType<nx::vms::discovery::Manager::ModuleData>();
     initializeConnector();
     initializeMulticastFinders(clientMode);
-    monitorServerUrls(resourcePool);
+    monitorServerUrls();
 }
 
 Manager::~Manager()
@@ -187,6 +188,13 @@ void Manager::initializeMulticastFinders(bool clientMode)
     m_multicastFinder->listen(
         [this](QnModuleInformationWithAddresses module)
         {
+            if (module.id == commonModule()->moduleGUID() || module.remoteAddresses.empty())
+            {
+                NX_VERBOSE(this, lm("Reject multicast from %1 with %2 addresses").str(
+                    module.id).container(module.remoteAddresses));
+                return;
+            }
+
             std::set<SocketAddress> endpoints;
             for (const auto& address: module.remoteAddresses)
                 endpoints.insert(address);
@@ -199,7 +207,9 @@ void Manager::initializeMulticastFinders(bool clientMode)
         connect(commonModule(), &QnCommonModule::moduleInformationChanged,
             [this]()
             {
-                m_multicastFinder->multicastInformation(commonModule()->moduleInformation());
+                const auto id = commonModule()->moduleGUID();
+                if (const auto s = m_resourcePool->getResourceById<QnMediaServerResource>(id))
+                    m_multicastFinder->multicastInformation(s->getModuleInformationWithAddresses());
             });
     }
 
@@ -218,9 +228,9 @@ void Manager::initializeMulticastFinders(bool clientMode)
         });
 }
 
-void Manager::monitorServerUrls(QnResourcePool* resourcePool)
+void Manager::monitorServerUrls()
 {
-    connect(resourcePool, &QnResourcePool::resourceAdded, this,
+    connect(m_resourcePool, &QnResourcePool::resourceAdded, this,
         [this](const QnResourcePtr &resource)
         {
             if (const auto server = resource.dynamicCast<QnMediaServerResource>())
@@ -228,6 +238,15 @@ void Manager::monitorServerUrls(QnResourcePool* resourcePool)
                 connect(server.data(), &QnMediaServerResource::auxUrlsChanged, this,
                     [this, server]()
                     {
+                        if (server->getId() == commonModule()->moduleGUID())
+                        {
+                            return m_moduleConnector->post(
+                                [this, module = server->getModuleInformationWithAddresses()]()
+                                {
+                                    m_multicastFinder->multicastInformation(module);
+                                });
+                        }
+
                         int port = server->getPort();
                         std::set<SocketAddress> endpoints;
                         for (const QUrl &url: server->getIgnoredUrls())
@@ -243,7 +262,7 @@ void Manager::monitorServerUrls(QnResourcePool* resourcePool)
 
         });
 
-    connect(commonModule()->resourcePool(), &QnResourcePool::resourceRemoved, this,
+    connect(m_resourcePool, &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr &resource)
         {
             if (const auto server = resource.dynamicCast<QnMediaServerResource>())
