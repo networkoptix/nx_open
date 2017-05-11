@@ -78,7 +78,7 @@ TEST(TcpReverseConnector, General)
             ASSERT_EQ(client->send(response.data(), response.size()), response.size());
         });
 
-    auto connector = std::make_unique<ReverseConnector>("client", "server", nullptr);
+    auto connector = std::make_unique<ReverseConnector>("client", "server");
     utils::promise<void> connectorDone;
     connector->connect(
         SocketAddress(HostAddress::localhost, serverAddress.get_future().get().port),
@@ -86,19 +86,19 @@ TEST(TcpReverseConnector, General)
         {
             auto buffer = std::make_shared<Buffer>();
             buffer->reserve(100);
-            ASSERT_EQ(code, SystemError::noError);
-            ASSERT_EQ(connector->getPoolSize(), boost::make_optional<size_t>(5));
-            ASSERT_EQ(connector->getKeepAliveOptions(), KeepAliveOptions(1, 2, 3));
+            ASSERT_EQ(SystemError::noError, code);
+            ASSERT_EQ(boost::make_optional<size_t>(5), connector->getPoolSize());
+            ASSERT_EQ(KeepAliveOptions(1, 2, 3), connector->getKeepAliveOptions());
 
-            std::shared_ptr<AbstractStreamSocket> socket(connector->takeSocket().release());
+            std::shared_ptr<AbstractStreamSocket> socket(connector->takeSocket());
             auto socketRaw = socket.get();
             socketRaw->readAsyncAtLeast(
                 buffer.get(), 5,
                 [buffer, &connectorDone, socket = std::move(socket)](
                     SystemError::ErrorCode code, size_t) mutable
                 {
-                    ASSERT_EQ(code, SystemError::noError);
-                    ASSERT_EQ(*buffer, Buffer("hello"));
+                    ASSERT_EQ(SystemError::noError, code);
+                    ASSERT_EQ(Buffer("hello"), *buffer);
 
                     socket.reset();
                     connectorDone.set_value();

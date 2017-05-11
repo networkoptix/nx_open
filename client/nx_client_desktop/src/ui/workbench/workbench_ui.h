@@ -130,8 +130,6 @@ public:
     /** Whether title bar is opened. */
     bool isTitleOpened() const;
 
-    bool isLayoutPanelOpened() const;
-
     /** Whether notification pane is opened. */
     bool isNotificationsOpened() const;
 

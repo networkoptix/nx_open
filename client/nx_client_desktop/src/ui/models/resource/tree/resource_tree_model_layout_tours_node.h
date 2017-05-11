@@ -10,8 +10,8 @@
 class QnResourceTreeModelLayoutToursNode: public QnResourceTreeModelNode
 {
     using base_type = QnResourceTreeModelNode;
-
     Q_OBJECT
+
 public:
     QnResourceTreeModelLayoutToursNode(QnResourceTreeModel* model);
     virtual ~QnResourceTreeModelLayoutToursNode();
@@ -19,17 +19,12 @@ public:
     virtual void initialize() override;
     virtual void deinitialize() override;
 
-protected:
-    virtual QIcon calculateIcon() const override;
-
 private:
     void handleTourAdded(const ec2::ApiLayoutTourData& tour);
     void handleTourChanged(const ec2::ApiLayoutTourData& tour);
     void handleTourRemoved(const QnUuid& tourId);
 
     QnResourceTreeModelNodePtr ensureLayoutTourNode(const ec2::ApiLayoutTourData& tour);
-
-    bool canSeeTour(const ec2::ApiLayoutTourData& tour) const;
 
     void rebuild();
 

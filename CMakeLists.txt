@@ -16,7 +16,7 @@ option(rdepSync
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
 
-project(vms VERSION 3.0.0)
+project(vms VERSION 3.1.0)
 
 set(releaseVersion ${PROJECT_VERSION})
 set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})

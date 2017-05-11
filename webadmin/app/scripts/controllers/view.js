@@ -14,6 +14,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             Low: 'lo'
         };
         $scope.Config = Config;
+        $scope.debugMode = Config.allowDebugMode;
         $scope.session = $sessionStorage;
         $scope.storage = $localStorage;
         $scope.storage.serverStates = $scope.storage.serverStates || {};
@@ -53,21 +54,23 @@ angular.module('webadminApp').controller('ViewCtrl',
         var mimeTypes = {
             'hls': 'application/x-mpegURL',
             'webm': 'video/webm',
-            'rtsp': 'application/x-rtsp',
             'flv': 'video/x-flv',
             'mp4': 'video/mp4',
             'mjpeg':'video/x-motion-jpeg'
         };
 
         $scope.activeFormat = 'Auto';
+        $scope.manualFormats = ['Auto', 'jshls','native-hls','flashls','webm'];
         $scope.availableFormats = [
             'Auto',
             'video/webm',
-            'application/x-mpegURL',
-            'application/x-rtsp'
+            'application/x-mpegURL'
         ];
 
         $scope.settings = {id: ''};
+        $scope.volumeLevel = typeof($scope.storage.volumeLevel) === 'number' ? $scope.storage.volumeLevel : 50;
+
+        $scope.serverTime = {};
 
         mediaserver.getModuleInformation().then(function (r) {
             $scope.settings = {
@@ -101,6 +104,8 @@ angular.module('webadminApp').controller('ViewCtrl',
         }
 
 
+        var supportsHls = browserSupports('hls',true,true),
+            supportsWebm = browserSupports('webm', true, true);
         function browserSupports(type, maybe, native){
             var v = document.createElement('video');
             if(v.canPlayType && v.canPlayType(mimeTypes[type]).replace(/no/, '')) {
@@ -144,19 +149,18 @@ angular.module('webadminApp').controller('ViewCtrl',
             return !!streams;
         }
         function updateAvailableResolutions() {
+            if($scope.player == null){
+                $scope.player = supportsHls ? 'hls' : supportsWebm ? 'webm' : null;
+            }
             if(!$scope.activeCamera){
                 $scope.activeResolution = 'Auto';
                 $scope.availableResolutions = ['Auto'];
             }
-
             //1. Does browser and server support webm?
-            if(!formatSupported('webm',false) || formatSupported('hls',true) && browserSupports('hls', false, true)
-                || Config.allowDebugMode && Config.debug.videoFormat == "flashls"){
+            if($scope.player != 'webm'){
                 $scope.iOSVideoTooLarge = false;
 
                 //1. collect resolutions with hls
-
-
                 var streams = ['Auto'];
                 if($scope.activeCamera) {
                     var availableFormats = _.filter($scope.activeCamera.mediaStreams, function (stream) {
@@ -194,7 +198,6 @@ angular.module('webadminApp').controller('ViewCtrl',
                 $scope.activeResolution = $scope.availableResolutions[0];
             }
         }
-        updateAvailableResolutions();
 
 
 
@@ -224,7 +227,8 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.playerReady = function(API){
             $scope.playerAPI = API;
             if(API) {
-                $scope.switchPlaying(true);
+                $scope.switchPlaying($scope.positionProvider.playing);
+                $scope.playerAPI.volume($scope.volumeLevel);
             }
         };
         function updateVideoSource(playing) {
@@ -242,7 +246,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
 
 
-            $scope.positionProvider.init(playing);
+            $scope.positionProvider.init(playing, timeCorrection, $scope.positionProvider.playing);
             if(live){
                 playing = (new Date()).getTime();
             }else{
@@ -250,39 +254,30 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
             var cameraId = $scope.activeCamera.physicalId;
             var serverUrl = '';
-            var rtspUrl = 'rtsp://' + window.location.host;
 
             var mediaDemo = mediaserver.mediaDemo();
             if(mediaDemo){
                 serverUrl = mediaDemo;
-                rtspUrl = 'rtsp:' + mediaDemo;
             }
             var authParam = '&auth=' + mediaserver.authForMedia();
-            var rstpAuthPararm = '&auth=' + mediaserver.authForRtsp();
 
             var positionMedia = !live ? '&pos=' + (playing) : '';
 
             var resolution = $scope.activeResolution;
             var resolutionHls = channels[resolution] || channels.Low;
 
-
             // Fix here!
             if(resolutionHls === channels.Low && $scope.availableResolutions.indexOf('Low')<0){
                 resolutionHls = channels.High;
             }
+            $scope.resolution = resolutionHls;
 
-
-            $scope.acitveVideoSource = _.filter([
+            $scope.currentResolution = $scope.player == "webm" ? resolution : resolutionHls;
+            $scope.activeVideoSource = _.filter([
                 { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?'            + resolutionHls + positionMedia + authParam ), type: mimeTypes.hls, transport:'hls'},
-                { src: ( serverUrl + '/media/' + cameraId + '.webm?rt&resolution=' + resolution + positionMedia + authParam ), type: mimeTypes.webm, transport:'webm' },
-
-                // Not supported:
-                // { src: ( serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' + $scope.activeResolution + positionMedia + extParam ), type: mimeTypes.mjpeg , transport:'mjpeg'},
-
-                // Require plugin
-                { src: ( rtspUrl + '/' + cameraId + '?' + positionMedia + rstpAuthPararm  + '&stream=' + ($scope.activeResolution === 'Low'?1:0)), type: mimeTypes.rtsp, transport:'rtsp'}
+                { src: ( serverUrl + '/media/' + cameraId + '.webm?rt&resolution=' + resolution + positionMedia + authParam ), type: mimeTypes.webm, transport:'webm' }
             ],function(src){
-                return formatSupported(src.transport,false) && $scope.activeFormat === 'Auto'|| $scope.activeFormat === src.type;
+                return formatSupported(src.transport,false) && $scope.activeFormat === 'Auto' || $scope.debugMode && $scope.manualFormats.indexOf($scope.activeFormat) > -1;
             });
         }
 
@@ -329,7 +324,6 @@ angular.module('webadminApp').controller('ViewCtrl',
                 }
 
                 updateVideoSource(position);
-                updateAvailableResolutions();
                 $scope.switchPlaying(true);
             }
         };
@@ -719,11 +713,31 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
         });
 
+        $scope.$watch('player', function(){
+            updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition)
+        },true);
+
+        $scope.$watch('volumeLevel', function(){
+            if($scope.playerAPI)
+                $scope.playerAPI.volume($scope.volumeLevel);
+            $scope.storage.volumeLevel = $scope.volumeLevel;
+        });
+
+
         mediaserver.getTime().then(function(result){
+            var clientDate = new Date();
+
             var serverTime = parseInt(result.data.reply.utcTime);
-            var clientTime = (new Date()).getTime();
+            var clientTime = clientDate.getTime();
             if(Math.abs(clientTime - serverTime) > minTimeLag){
                 timeCorrection = clientTime - serverTime;
+            }
+            
+            $scope.serverTime.timeZoneOffset = parseInt(result.data.reply.timeZoneOffset);
+            $scope.serverTime.latency = timeCorrection;
+
+            if(Config.settingsConfig.useServerTime){
+                timeCorrection = $scope.serverTime.timeZoneOffset + clientDate.getTimezoneOffset() * 60000 - timeCorrection;
             }
         });
 

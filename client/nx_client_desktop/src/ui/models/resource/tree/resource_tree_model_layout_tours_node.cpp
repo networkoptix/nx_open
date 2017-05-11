@@ -5,7 +5,6 @@
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/models/resource/resource_tree_model_node_factory.h>
 
-#include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 
 QnResourceTreeModelLayoutToursNode::QnResourceTreeModelLayoutToursNode(QnResourceTreeModel* model):
@@ -26,11 +25,11 @@ void QnResourceTreeModelLayoutToursNode::initialize()
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &QnResourceTreeModelLayoutToursNode::rebuild);
 
-    connect(qnLayoutTourManager, &QnLayoutTourManager::tourAdded, this,
+    connect(layoutTourManager(), &QnLayoutTourManager::tourAdded, this,
         &QnResourceTreeModelLayoutToursNode::handleTourAdded);
-    connect(qnLayoutTourManager, &QnLayoutTourManager::tourChanged, this,
+    connect(layoutTourManager(), &QnLayoutTourManager::tourChanged, this,
         &QnResourceTreeModelLayoutToursNode::handleTourChanged);
-    connect(qnLayoutTourManager, &QnLayoutTourManager::tourRemoved, this,
+    connect(layoutTourManager(), &QnLayoutTourManager::tourRemoved, this,
         &QnResourceTreeModelLayoutToursNode::handleTourRemoved);
 
     rebuild();
@@ -42,11 +41,6 @@ void QnResourceTreeModelLayoutToursNode::deinitialize()
 
     clean();
     base_type::deinitialize();
-}
-
-QIcon QnResourceTreeModelLayoutToursNode::calculateIcon() const
-{
-    return qnResIconCache->icon(QnResourceIconCache::Layouts);
 }
 
 void QnResourceTreeModelLayoutToursNode::handleTourAdded(const ec2::ApiLayoutTourData& tour)
@@ -77,15 +71,10 @@ QnResourceTreeModelNodePtr QnResourceTreeModelLayoutToursNode::ensureLayoutTourN
     return *iter;
 }
 
-bool QnResourceTreeModelLayoutToursNode::canSeeTour(const ec2::ApiLayoutTourData& tour) const
-{
-    return true; //TODO: #GDM #3.1 #tbd
-}
-
 void QnResourceTreeModelLayoutToursNode::rebuild()
 {
     clean();
-    for (const auto& tour: qnLayoutTourManager->tours())
+    for (const auto& tour: layoutTourManager()->tours())
         handleTourAdded(tour);
 }
 

@@ -110,7 +110,7 @@ private slots:
     void at_renameAction_triggered();
     void at_identifyVideoWallAction_triggered();
     void at_startVideoWallControlAction_triggered();
-    void at_openVideoWallsReviewAction_triggered();
+    void at_openVideoWallReviewAction_triggered();
     void at_saveCurrentVideoWallReviewAction_triggered();
     void at_saveVideoWallReviewAction_triggered();
     void at_dropOnVideoWallItemAction_triggered();

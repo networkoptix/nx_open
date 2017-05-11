@@ -207,11 +207,6 @@ public:
      */
     QRectF itemGeometry(QnWorkbenchItem *item, QRectF *enclosingGeometry = NULL) const;
 
-    /**
-     * \returns                         Bounding geometry of current layout.
-     */
-    QRectF layoutBoundingGeometry() const;
-
     QRectF fitInViewGeometry() const;
 
     /**

@@ -6,7 +6,7 @@ namespace nx {
 namespace stun {
 
 ServerConnection::ServerConnection(
-    StreamConnectionHolder<ServerConnection>* socketServer,
+    nx::network::server::StreamConnectionHolder<ServerConnection>* socketServer,
     std::unique_ptr<AbstractStreamSocket> sock,
     const MessageDispatcher& dispatcher)
 :

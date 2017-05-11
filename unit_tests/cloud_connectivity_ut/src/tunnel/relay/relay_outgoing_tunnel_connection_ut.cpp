@@ -7,7 +7,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include "cloud_relay_fixture_base.h"
+#include "cloud_relay_basic_fixture.h"
 #include "client_to_relay_connection.h"
 
 namespace nx {
@@ -20,7 +20,7 @@ namespace test {
 // Test fixture.
 
 class CloudRelayOutgoingTunnelConnection:
-    public CloudRelayFixtureBase
+    public BasicFixture
 {
     struct Result
     {

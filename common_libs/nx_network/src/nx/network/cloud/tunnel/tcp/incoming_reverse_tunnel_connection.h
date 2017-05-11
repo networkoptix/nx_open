@@ -17,28 +17,26 @@ namespace tcp {
 class NX_NETWORK_API IncomingReverseTunnelConnection:
     public AbstractIncomingTunnelConnection
 {
+    using base_type = AbstractIncomingTunnelConnection;
+
 public:
     using StartHandler = std::function<void(SystemError::ErrorCode)>;
 
     IncomingReverseTunnelConnection(
         String selfHostName, String targetHostName, SocketAddress proxyServiceEndpoint);
 
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+
     /**
      * Initiates connectors spawn.
      * @param handler is called when tunnel is ready to use or failed.
      */
-    void start(aio::AbstractAioThread* aioThread, RetryPolicy policy, StartHandler handler);
+    void start(RetryPolicy policy, StartHandler handler);
     void setHttpTimeouts(nx_http::AsyncHttpClient::Timeouts timeouts);
 
     void accept(AcceptHandler handler) override;
-    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
 private:
-    void spawnConnectorIfNeeded();
-    void saveConnection(std::unique_ptr<ReverseConnector> connector);
-    void monitorSocket(std::list<std::unique_ptr<BufferedStreamSocket>>::iterator socketIt);
-    bool isExhausted() const;
-
     const String m_selfHostName;
     const String m_targetHostName;
     const SocketAddress m_proxyServiceEndpoint;
@@ -54,6 +52,13 @@ private:
     StartHandler m_startHandler;
     AcceptHandler m_acceptHandler;
     nx::utils::ObjectDestructionFlag m_destructionFlag;
+
+    virtual void stopWhileInAioThread() override;
+
+    void spawnConnectorIfNeeded();
+    void saveConnection(std::unique_ptr<ReverseConnector> connector);
+    void monitorSocket(std::list<std::unique_ptr<BufferedStreamSocket>>::iterator socketIt);
+    bool isExhausted() const;
 };
 
 } // namespace tcp

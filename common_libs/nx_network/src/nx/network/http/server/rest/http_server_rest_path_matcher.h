@@ -18,7 +18,7 @@ namespace rest {
  * Parameter cannot be empty. In that case path is not matched.
  */
 template<typename Mapped>
-class RestPathMatcher
+class PathMatcher
 {
 public:
     bool add(const nx_http::StringType& pathTemplate, Mapped mapped)

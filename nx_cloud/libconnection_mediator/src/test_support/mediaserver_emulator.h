@@ -19,7 +19,7 @@ namespace hpm {
 
 class MediaServerEmulator:
     public network::aio::BasicPollable,
-    public StreamConnectionHolder<stun::MessagePipeline>
+    public nx::network::server::StreamConnectionHolder<stun::MessagePipeline>
 {
 public:
     enum class ActionToTake
@@ -102,7 +102,7 @@ private:
     void onUdtConnectDone(SystemError::ErrorCode errorCode);
     void onUdtConnectionAccepted(
         SystemError::ErrorCode errorCode,
-        AbstractStreamSocket* acceptedSocket);
+        std::unique_ptr<AbstractStreamSocket> acceptedSocket);
     void onMessageReceived(nx::stun::Message message);
 
     virtual void closeConnection(

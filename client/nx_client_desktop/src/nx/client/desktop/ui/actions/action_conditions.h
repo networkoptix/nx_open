@@ -104,13 +104,6 @@ public:
     virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
-/** Condition class for actions that should be visible in layout tour review mode */
-class LayoutTourReviewModeCondition: public Condition
-{
-public:
-    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
-};
-
 /** Condition class for actions, that require owner privileges. */
 class RequiresOwnerCondition: public Condition
 {
@@ -616,6 +609,9 @@ private:
 
 namespace condition {
 
+/** Visible always. */
+ConditionWrapper always();
+
 /** Visible in preview search mode only. */
 ConditionWrapper isPreviewSearchMode();
 
@@ -627,6 +623,9 @@ ConditionWrapper hasFlags(Qn::ResourceFlags flags, MatchMode matchMode);
 
 ConditionWrapper treeNodeType(QSet<Qn::NodeType> types);
 inline ConditionWrapper treeNodeType(Qn::NodeType type) { return treeNodeType({{type}}); }
+
+/** Visible in layout tour preview mode only. */
+ConditionWrapper isLayoutTourReviewMode();
 
 } // namespace condition
 

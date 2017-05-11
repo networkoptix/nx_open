@@ -30,13 +30,13 @@ void ReverseTunnelAcceptor::accept(AcceptHandler handler)
                 auto connectionIt = m_connections.insert(
                     m_connections.end(),
                     std::make_unique<IncomingReverseTunnelConnection>(
-                                selfHostName, m_remotePeerId, endpoint));
+                        selfHostName, m_remotePeerId, endpoint));
 
                 NX_LOGX(lm("Start connection(%1) to %2 endpoint %3")
                     .strs(*connectionIt, m_remotePeerId, endpoint), cl_logDEBUG1);
 
+                (*connectionIt)->bindToAioThread(m_mediatorConnection->getAioThread());
                 (*connectionIt)->start(
-                    m_mediatorConnection->getAioThread(),
                     m_connectionParametes.tcpReverseRetryPolicy,
                     [this, connectionIt](SystemError::ErrorCode code)
                     {

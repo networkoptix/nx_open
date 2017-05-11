@@ -166,7 +166,7 @@ int VmsGatewayProcess::exec()
                 "US", QnAppInfo::organizationName().toUtf8());
         }
 
-        MultiAddressServer<nx_http::HttpStreamSocketServer> multiAddressHttpServer(
+        network::server::MultiAddressServer<nx_http::HttpStreamSocketServer> multiAddressHttpServer(
             &authenticationManager,
             &httpMessageDispatcher,
             settings.http().sslSupport,
@@ -197,6 +197,9 @@ int VmsGatewayProcess::exec()
             while (!m_terminated)
                 m_cond.wait(lk.mutex());
         }
+
+        NX_LOG(lm("%1 has been stopped")
+            .arg(QnLibVmsGatewayAppInfo::applicationDisplayName()), cl_logALWAYS);
 
         return 0;
     }

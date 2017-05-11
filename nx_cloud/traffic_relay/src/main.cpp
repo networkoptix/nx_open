@@ -7,5 +7,5 @@ int main(int argc, char* argv[])
 {
     nx::network::SocketGlobals::InitGuard sgGuard(
         nx::network::InitializationFlags::disableUdt);
-    return trafficRelayMain(argc, argv);
+    return nx::cloud::relay::trafficRelayMain(argc, argv);
 }

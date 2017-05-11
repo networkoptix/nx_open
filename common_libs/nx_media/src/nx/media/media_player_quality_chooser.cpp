@@ -11,10 +11,10 @@
 #include <core/resource/media_server_resource.h>
 
 #include "video_decoder_registry.h"
-#include "media_player.h" //< For enum VideoQuality.
 
 namespace nx {
 namespace media {
+namespace media_player_quality_chooser {
 
 namespace {
 
@@ -173,14 +173,7 @@ static QSize applyTranscodingIfPossible(
     return resolution;
 }
 
-} // namespace
-
-const QSize media_player_quality_chooser::kQualityLow{-1, Player::LowVideoQuality};
-const QSize media_player_quality_chooser::kQualityHigh{-1, Player::HighVideoQuality};
-const QSize media_player_quality_chooser::kQualityLowIframesOnly{-1,
-    Player::LowIframesOnlyVideoQuality};
-
-QSize media_player_quality_chooser::chooseHighStreamIfPossible(
+static QSize chooseHighStreamIfPossible(
     AVCodecID transcodingCodec,
     bool liveMode,
     qint64 positionMs,
@@ -233,7 +226,9 @@ QSize media_player_quality_chooser::chooseHighStreamIfPossible(
     return kQualityLow;
 }
 
-QSize media_player_quality_chooser::chooseVideoQuality(
+} // namespace
+
+QSize chooseVideoQuality(
     AVCodecID transcodingCodec,
     int videoQuality,
     bool liveMode,
@@ -291,5 +286,6 @@ QSize media_player_quality_chooser::chooseVideoQuality(
     return kQualityLow;
 }
 
+} // namespace media_player_quality_chooser
 } // namespace media
 } // namespace nx

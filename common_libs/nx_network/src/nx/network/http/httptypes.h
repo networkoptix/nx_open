@@ -229,7 +229,7 @@ namespace StatusCode
     {
         undefined = 0,
         _continue = 100,
-        upgrade = 101,
+        switchingProtocols = 101,
 
         ok = 200,
         noContent = 204,

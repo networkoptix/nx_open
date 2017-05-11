@@ -20,7 +20,7 @@ Q_OBJECT
 #endif
 QN_DECLARE_METAOBJECT_HEADER(action, IDType, )
 
-QN_DECLARE_TR_FUNCTIONS("action")
+QN_DECLARE_TR_FUNCTIONS("nx::client::desktop::ui::action")
 
 /**
  * Enum of all menu actions.
@@ -467,9 +467,9 @@ enum IDType
     OpenAnyNumberOfLayoutsAction,
 
     /**
-     * Opens given videowalls in review mode.
+     * Opens given videowall in review mode.
      */
-    OpenVideoWallsReviewAction,
+    OpenVideoWallReviewAction,
 
     /**
      * Menu containing all layouts belonging to the current user.
@@ -479,7 +479,12 @@ enum IDType
     /**
      * Opens selected layouts in a new window.
      */
-    OpenLayoutsInNewWindowAction,
+    OpenSingleLayoutInNewWindowAction,
+
+    /**
+     * Opens selected layouts in a new window.
+     */
+    OpenMultiLayoutInNewWindowAction,
 
     /**
      * Opens current layout in a new window.
@@ -721,11 +726,6 @@ enum IDType
     RadassLowAction,
 
     /**
-     * Toggles next RADASS state.
-     */
-    ToggleRadassAction,
-
-    /**
      * Connect incompatible server to current system
      */
     ConnectToCurrentSystem,
@@ -775,11 +775,6 @@ enum IDType
      * Opens PTZ tours management dialog.
      */
     PtzManageAction,
-
-    /**
-     * Starts fisheye calibration for the given widget.
-     */
-    PtzCalibrateFisheyeAction,
 
     /**
      * Performs continuous move with given speed.
@@ -935,6 +930,7 @@ enum IDType
     ToggleLayoutTourModeAction,
 
     NewLayoutTourAction,
+    MakeLayoutTourAction,
     RenameLayoutTourAction,
     SaveLayoutTourAction,
     ReviewLayoutTourAction,
@@ -943,6 +939,8 @@ enum IDType
     StartCurrentLayoutTourAction,
     SaveCurrentLayoutTourAction,
     RemoveCurrentLayoutTourAction,
+
+    CurrentLayoutTourSettingsAction,
 
     /* Timeline actions. */
 
