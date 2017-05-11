@@ -33,6 +33,7 @@ void ModuleConnector::setDisconnectHandler(DisconnectedHandler handler)
 
 void ModuleConnector::newEndpoints(std::set<SocketAddress> endpoints, const QnUuid& id)
 {
+    NX_ASSERT(endpoints.size());
     dispatch(
         [this, endpoints, id]()
         {
@@ -55,6 +56,8 @@ void ModuleConnector::activate()
         [this]()
         {
             m_isPassiveMode = false;
+            NX_DEBUG(this, "Activated");
+
             for (const auto& module: m_modules)
                 module.second->ensureConnect();
         });
@@ -66,6 +69,7 @@ void ModuleConnector::diactivate()
         [this]()
         {
             m_isPassiveMode = true;
+            NX_DEBUG(this, "Diactivated");
         });
 }
 
@@ -79,12 +83,12 @@ ModuleConnector::Module::Module(ModuleConnector* parent, const QnUuid& id):
     m_id(id)
 {
     m_timer.bindToAioThread(parent->getAioThread());
-    NX_LOGX(lm("New %1").strs(m_id), cl_logDEBUG1);
+    NX_DEBUG(this, lm("New %1").strs(m_id));
 }
 
 ModuleConnector::Module::~Module()
 {
-    NX_LOGX(lm("Delete %1").strs(m_id), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Delete %1").strs(m_id));
     NX_ASSERT(m_timer.isInSelfAioThread());
     m_socket.reset();
     for (const auto& client: m_httpClients)
@@ -93,6 +97,7 @@ ModuleConnector::Module::~Module()
 
 void ModuleConnector::Module::addEndpoints(std::set<SocketAddress> endpoints)
 {
+    NX_VERBOSE(this, lm("Add endpoints %1").container(endpoints));
     const auto getGroup =
         [&](Priority p){ return m_endpoints.emplace(p, std::set<SocketAddress>()).first; };
     const auto insertIntoGroup =
@@ -140,6 +145,7 @@ void ModuleConnector::Module::ensureConnect()
 
 void ModuleConnector::Module::forbidEndpoints(std::set<SocketAddress> endpoints)
 {
+    NX_VERBOSE(this, lm("Forbid endpoints %1").container(endpoints));
     NX_ASSERT(!m_id.isNull(), "Does it make sense to block endpoints for unknown servers?");
     m_forbiddenEndpoints = std::move(endpoints);
 }
@@ -159,7 +165,7 @@ void ModuleConnector::Module::connect(Endpoints::iterator endpointsGroup)
         if (!m_id.isNull())
         {
             const auto reconnectInterval = m_parent->m_reconnectInterval;
-            NX_LOGX(lm("No more endpoints, retry in %1").str(reconnectInterval), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("No more endpoints, retry in %1").str(reconnectInterval));
             m_timer.start(reconnectInterval, [this](){ connect(m_endpoints.begin()); });
             m_parent->m_disconnectedHandler(m_id);
         }
@@ -185,7 +191,7 @@ void ModuleConnector::Module::connect(Endpoints::iterator endpointsGroup)
 void ModuleConnector::Module::connect(
     const SocketAddress& endpoint, Endpoints::iterator endpointsGroup)
 {
-    NX_LOGX(lm("Attempt to connect to %1 by %2").strs(m_id, endpoint), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Attempt to connect to %1 by %2").strs(m_id, endpoint));
     const auto client = nx_http::AsyncHttpClient::create();
     m_httpClients.insert(client);
     client->bindToAioThread(m_timer.getAioThread());
@@ -228,7 +234,7 @@ boost::optional<QnModuleInformation> ModuleConnector::Module::getInformation(
 {
     if (!client->hasRequestSuccesed())
     {
-        NX_LOGX(lm("Request to %1 has failed").strs(client->url()), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Request to %1 has failed").strs(client->url()));
         return boost::none;
     }
 
@@ -237,8 +243,8 @@ boost::optional<QnModuleInformation> ModuleConnector::Module::getInformation(
 
     if (Qn::serializationFormatFromHttpContentType(contentType) != Qn::JsonFormat)
     {
-        NX_LOGX(lm("Unexpected Content-Type %2 from %3")
-            .strs(contentType, client->url()), cl_logDEBUG2);
+        NX_DEBUG(this, lm("Unexpected Content-Type %2 from %3")
+            .strs(contentType, client->url()));
         return boost::none;
     }
 
@@ -246,8 +252,8 @@ boost::optional<QnModuleInformation> ModuleConnector::Module::getInformation(
     if (!QJson::deserialize(client->fetchMessageBodyBuffer(), &restResult)
         || restResult.error != QnRestResult::Error::NoError)
     {
-        NX_LOGX(lm("Error response '%2' from %3")
-            .strs(restResult.errorString, client->url()), cl_logDEBUG2);
+        NX_DEBUG(this, lm("Error response '%2' from %3")
+            .strs(restResult.errorString, client->url()));
         return boost::none;
     }
 
@@ -255,8 +261,8 @@ boost::optional<QnModuleInformation> ModuleConnector::Module::getInformation(
     if (!QJson::deserialize<QnModuleInformation>(restResult.reply, &moduleInformation)
         || moduleInformation.id.isNull())
     {
-        NX_LOGX(lm("Can not desserialize rsponse from %1")
-            .strs(moduleInformation.id), cl_logDEBUG2);
+        NX_DEBUG(this, lm("Can not desserialize rsponse from %1")
+            .strs(moduleInformation.id));
         return boost::none;
     }
 
@@ -274,7 +280,7 @@ bool ModuleConnector::Module::saveConnection(
         client->pleaseStopSync();
     m_httpClients.clear();
 
-    NX_LOGX(lm("Connected to %1").strs(m_id), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Connected to %1").strs(m_id));
     m_parent->m_connectedHandler(information, std::move(endpoint));
 
     // TODO: Currently mediaserver keepAlive timeout is set to 5 seconds, it means we will go
@@ -284,8 +290,8 @@ bool ModuleConnector::Module::saveConnection(
     auto socket = client->takeSocket();
     if (!socket->setRecvTimeout(0) || !socket->setKeepAlive(kKeepAliveOptions))
     {
-        NX_LOGX(lm("Unable to save connection: %1").strs(
-            SystemError::getLastOSErrorText()), cl_logWARNING);
+        NX_WARNING(this, lm("Unable to save connection: %1").strs(
+            SystemError::getLastOSErrorText()));
 
         return false;
     }
@@ -297,8 +303,8 @@ bool ModuleConnector::Module::saveConnection(
     m_socket->readSomeAsync(buffer.get(),
         [this, buffer](SystemError::ErrorCode code, size_t size)
         {
-            NX_LOGX(lm("Unexpectd connection read size=%1: %2").strs(
-                size, SystemError::toString(code)), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("Unexpectd connection read size=%1: %2").strs(
+                size, SystemError::toString(code)));
 
             m_socket.reset();
             connect(m_endpoints.begin()); //< Reconnect attempt.
