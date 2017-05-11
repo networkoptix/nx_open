@@ -1,24 +1,21 @@
 'use strict';
 angular.module('webadminApp')
-    .factory('camerasProvider', function (mediaserver, $location, $localStorage, $q) {
-        var self = this;
+    .factory('camerasProvider', function (mediaserver, $location, $localStorage, $q, $poll) {
+        var reloadInterval = 5*1000;//30 seconds
+
         function camerasProvider(){
-        	this.firstTime = true;
             this.desktopCameraTypeId = null;
 
             this.cameras = {};
             this.treeRequest = null;
             this.mediaServers = null;
             this.storage = $localStorage;
+            this.poll = null;
 
-            this.selectCameraById = null;
             this.searchCams = null;
         }
 
         //setters
-        camerasProvider.prototype.setSelectCameraById = function(selectCamById){
-            this.selectCameraById = selectCamById;
-        };
         camerasProvider.prototype.setSearchCams = function(searchCams){
             this.searchCams = searchCams;
         };
@@ -42,10 +39,6 @@ angular.module('webadminApp')
         camerasProvider.prototype.getMediaServers = function(){
             return this.mediaServers;
         };
-        camerasProvider.prototype.getResourses = function(){
-            this.requestResourses();
-        };
-
 
         //internal functions
         camerasProvider.prototype.extractDomain = function(url) {
@@ -218,7 +211,7 @@ angular.module('webadminApp')
             }, function (error) {
                 deferred.reject(error);
             });
-            console.log(this.treeRequest);
+
             return deferred.promise;
         };
 
@@ -294,25 +287,43 @@ angular.module('webadminApp')
 
         camerasProvider.prototype.reloader = function(){
             var self = this;
-            return this.reloadTree().then(function(){
-                self.selectCameraById(self.storage.cameraId, self.firstTime && $location.search().time || false, !self.firstTime);
-                self.firstTime = false;
-            },function(error){
+            return this.reloadTree().catch(function(error){
                 if(typeof(error.status) === 'undefined' || !error.status) {
                     console.error(error);
                 }
+                return $q.reject(error);
             });
         };
 
-        camerasProvider.prototype.requestResourses = function() {
+        camerasProvider.prototype.requestResources = function() {
             var self = this;
+            var deferred = $q.defer();
             mediaserver.getResourceTypes().then(function (result) {
                 self.desktopCameraTypeId = _.find(result.data, function (type) {
                     return type.name === 'SERVER_DESKTOP_CAMERA';
                 });
                 self.desktopCameraTypeId = self.desktopCameraTypeId ? self.desktopCameraTypeId.id : null;
-                self.reloader();
+                self.reloader().then(function(){
+                    deferred.resolve();
+                });
             });
+            return deferred.promise;
+        };
+
+        camerasProvider.prototype.startPoll = function(){
+            this.poll = $poll(function(){
+                this.reloader();
+            },reloadInterval);
+        };
+
+        camerasProvider.prototype.stopPoll = function(){
+            $poll.cancel(this.poll);
+        };
+
+        camerasProvider.prototype.abortTree = function(){
+            if(this.treeRequest){
+                this.treeRequest.abort('updateVideoSource'); //abort tree reloading request to speed up loading new video
+            }
         };
 
         return {

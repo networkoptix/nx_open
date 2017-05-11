@@ -198,22 +198,15 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
         }
 
-        $scope.selectCameraById = function (cameraId, position, silent) {
-            if($scope.activeCamera && ($scope.activeCamera.id === cameraId || $scope.activeCamera.physicalId === cameraId)){
-                return;
-            }
-
+        $scope.updateCamera = function (position) {
             var oldTimePosition = null;
             if($scope.positionProvider && !$scope.positionProvider.liveMode){
                 oldTimePosition = $scope.positionProvider.playedPosition;
             }
 
-            $scope.storage.cameraId  = cameraId || $scope.storage.cameraId  ;
-
             position = position?parseInt(position):oldTimePosition;
 
-            $scope.activeCamera = $scope.camerasProvider.getCamera ($scope.storage.cameraId  );
-            if (!silent && $scope.activeCamera) {
+            if ($scope.activeCamera) {
                 $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId], timeCorrection);
                 $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640, timeCorrection);
                 $scope.liveOnly = true;
@@ -243,11 +236,6 @@ angular.module('webadminApp').controller('ViewCtrl',
             if(!$scope.positionProvider){
                 return;
             }
-
-            if($scope.treeRequest){
-                $scope.treeRequest.abort('updateVideoSource'); //abort tree reloading request to speed up loading new video
-            }
-
 
             $scope.positionProvider.init(playing, timeCorrection);
             if(live){
@@ -377,6 +365,12 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
         });
 
+        $scope.$watch('activeCamera', function(){
+            $scope.storage.cameraId  = $scope.activeCamera.id || $scope.storage.cameraId;
+            $location.path('/view/' + $scope.activeCamera.id, false);
+            $scope.updateCamera(false);
+        })
+
         $scope.$watch('player', function(){
             updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
         },true);
@@ -409,14 +403,21 @@ angular.module('webadminApp').controller('ViewCtrl',
             canViewArchive = result.data.reply.isAdmin || (result.data.reply.permissions.indexOf(Config.globalViewArchivePermission)>=0);
 
             var userId = result.data.reply.id;
-            //requestResourses(); //Show  whole tree
+            $scope.camerasProvider.requestResources().then(function(res){
+                $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);
+                $scope.camerasProvider.startPoll();
+            });
         });
 
-        var updateTreeRequest = function(){
-            $scope.treeRequest = $scope.camerasProvider.treeRequest;
-        };
-        $scope.camerasProvider.setSelectCameraById($scope.selectCameraById);
-        $scope.$watch('camerasProvider.treeRequest', updateTreeRequest);
+        var killSubscription = $rootScope.$on('$routeChangeStart', function (event,next) {
+            $scope.updateCamera($scope.camerasProvider.getCamera(next.params.cameraId), $location.search().time || false);
+        });
+
+        $scope.$on( '$destroy', function() {
+            $scope.camerasProvider.stopPoll();
+            killSubscription();
+        });
+
 
 
 

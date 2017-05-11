@@ -1,16 +1,16 @@
 "use strict";
 angular.module('webadminApp')
-    .directive('cameraPanel', function ($rootScope, $location, $poll) {
+    .directive('cameraPanel', function () {
         return {
             restrict: 'E',
             scope:{
-                "selectCameraById": "=",
-                "camerasProvider": "="
+                "activeCamera":"=",
+                "camerasProvider": "=",
+                "player": "=",
+                "currentResolution": "="
             },
             templateUrl: 'views/components/cameraPanel.html',
             link: function (scope, element/*, attrs*/) {
-                var reloadInterval = 5*1000;//30 seconds
-
                 scope.Config = Config;
                 scope.searchCams = "";
 
@@ -25,12 +25,13 @@ angular.module('webadminApp')
 
                 scope.$watch('camerasProvider.cameras',updateCameras);
                 scope.$watch('camerasProvider.mediaServers',updateMediaServers);
-                scope.camerasProvider.getResourses();
                 
 
                 scope.selectCamera = function (activeCamera) {
-                    $location.path('/view/' + activeCamera.id, false);
-                    scope.selectCameraById(activeCamera.id,false);
+                    if(scope.activeCamera && (scope.activeCamera.id === activeCamera.id || scope.activeCamera.physicalId === activeCamera)){
+                        return;
+                    }
+                    scope.activeCamera = activeCamera;
                 };
                 scope.toggleServerCollapsed = function(server){
                     server.collapsed = !server.collapsed;
@@ -63,16 +64,6 @@ angular.module('webadminApp')
                 }
 
                 scope.$watch('searchCams',searchCams);
-
-                var poll = $poll(scope.camerasProvider.requestResources(),reloadInterval);
-                scope.$on( '$destroy', function( ) {
-                    killSubscription();
-                    $poll.cancel(poll);
-                });
-
-                var killSubscription = $rootScope.$on('$routeChangeStart', function (event,next) {
-                    scope.selectCameraById(next.params.cameraId, $location.search().time || false);
-                });
             }   
         };
     });
