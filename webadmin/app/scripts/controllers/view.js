@@ -368,10 +368,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.$watch('activeCamera', function(){
             $scope.storage.cameraId  = $scope.activeCamera.id || $scope.storage.cameraId;
             $location.path('/view/' + $scope.activeCamera.id, false);
-            if(!timeFromUrl)
-            {
-                timeFromUrl = false;
-            }
+            timeFromUrl = timeFromUrl || null;
             $scope.updateCamera(timeFromUrl);
             timeFromUrl = null;
         });
