@@ -330,15 +330,24 @@ void Worker::requestFileInformationInternal()
                     if (m_state == State::requestingFileInformation
                         || m_state == State::requestingAvailableChunks)
                     {
-                        if (m_state == State::requestingAvailableChunks && haveInternet())
-                        {
-                            setState(State::foundAvailableChunks);
-                        }
-                        else
+                        if (!haveInternet())
                         {
                             waitForNextStep();
                             return;
                         }
+
+                        const auto& fileInfo = fileInformation();
+                        if (fileInfo.size > 0
+                            && !fileInfo.md5.isEmpty()
+                            && fileInfo.chunkSize > 0
+                            && fileInfo.url.isValid()
+                            && !m_availableChunks.isEmpty())
+                        {
+                            setState(State::foundAvailableChunks);
+                            waitForNextStep(0);
+                        }
+
+                        return;
                     }
 
                     waitForNextStep(0);
@@ -519,9 +528,11 @@ void Worker::downloadNextChunk()
     if (chunkIndex < 0)
         return;
 
+    const auto& fileInfo = fileInformation();
+
     bool useInternet = false;
     auto peers = peersForChunk(chunkIndex);
-    if (peers.isEmpty())
+    if (peers.isEmpty() && fileInfo.url.isValid())
     {
         useInternet = true;
 
@@ -582,8 +593,6 @@ void Worker::downloadNextChunk()
                 return;
             }
         };
-
-    const auto& fileInfo = fileInformation();
 
     rest::Handle handle;
 
