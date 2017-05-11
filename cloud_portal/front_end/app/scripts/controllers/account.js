@@ -18,9 +18,10 @@ angular.module('cloudApp')
 
         $scope.save = process.init(function() {
             return cloudApi.accountPost($scope.account).then(function(result){
-                if(L.language != account.language){
+                if(L.language != $scope.account.language){
                     //Need to reload page
                     window.location.reload(true); // reload window to catch new language
+                    return false;
                 }
                 return result;
             });
