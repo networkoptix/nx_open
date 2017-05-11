@@ -623,11 +623,11 @@ std::vector<std::unique_ptr<AbstractConnectionAcceptor>>
 {
     std::vector<std::unique_ptr<AbstractConnectionAcceptor>> acceptors;
 
-    if (response.trafficRelayEndpoint)
+    if (response.trafficRelayUrl)
     {
         acceptors.push_back(
             std::make_unique<relay::ConnectionAcceptor>(
-                *response.trafficRelayEndpoint));
+                QUrl(*response.trafficRelayUrl)));
     }
 
     return acceptors;
