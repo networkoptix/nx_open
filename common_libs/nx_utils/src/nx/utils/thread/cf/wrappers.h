@@ -34,6 +34,12 @@ cf::future<std::pair<SystemError::ErrorCode, size_t>> readAsync(Reader* reader, 
 }
 
 
+/**
+ * Recursive async action repeaters. F should return cf::future<bool>.
+ * Repeats action while f yields cf::future<true>. For long lasting repeated work
+ * executor overload should be generally used as it prevents long callback chains which
+ * may end up with stack overflow.
+ */
 template<typename F>
 cf::future<cf::unit> doWhile(F f)
 {
@@ -41,6 +47,17 @@ cf::future<cf::unit> doWhile(F f)
         [f](cf::future<bool> notDone)
         {
             return notDone.get() ? doWhile(f) : cf::make_ready_future<>(cf::unit());
+        });
+}
+
+template<typename Executor, typename F>
+cf::future<cf::unit> doWhile(Executor& executor, F f)
+{
+    return f().then(
+        executor,
+        [f, &executor](cf::future<bool> notDone)
+        {
+            return notDone.get() ? doWhile(executor, f) : cf::make_ready_future<>(cf::unit());
         });
 }
 

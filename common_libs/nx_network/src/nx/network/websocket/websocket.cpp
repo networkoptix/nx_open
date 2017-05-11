@@ -108,6 +108,7 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, HandlerType handler)
             if (m_terminating)
             {
                 NX_LOG("[WebSocket] readSomeAsync called after connection has been terminated. Ignoring.", cl_logDEBUG1);
+                handler(SystemError::connectionAbort, 0);
                 return;
             }
 
@@ -125,11 +126,12 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, HandlerType handler)
 void WebSocket::sendAsync(const nx::Buffer& buffer, HandlerType handler)
 {
     post(
-        [this, &buffer, handler = std::move(handler)]()
+        [this, &buffer, handler = std::move(handler)]() mutable
         {
             if (m_terminating)
             {
                 NX_LOG("[WebSocket] readSomeAsync called after connection has been terminated. Ignoring.", cl_logDEBUG1);
+                handler(SystemError::connectionAbort, 0);
                 return;
             }
 
@@ -173,8 +175,9 @@ void WebSocket::sendCloseAsync()
     dispatch(
         [this]()
         {
-            m_terminating = true;
             sendControlRequest(FrameType::close);
+            m_terminating = true;
+            emit connectionClosed();
         });
 }
 
@@ -256,6 +259,7 @@ void WebSocket::frameEnded()
             NX_LOG("[WebSocket] Received close request, responding and terminating", cl_logDEBUG1);
             sendControlResponse(FrameType::close, FrameType::close);
             m_terminating = true;
+            emit connectionClosed();
             return;
         }
         else
@@ -263,8 +267,6 @@ void WebSocket::frameEnded()
             NX_LOG("[WebSocket] Received close response, terminating", cl_logDEBUG1);
             NX_ASSERT(m_controlBuffer.isEmpty());
         }
-
-        emit remotePeerClosedConnection();
 
         return;
     }

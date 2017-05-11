@@ -69,7 +69,7 @@ signals:
     /**
      * Connection is not usable after this signal is emitted.
      */
-    void remotePeerClosedConnection();
+    void connectionClosed();
     void pingReceived();
     void pongReceived();
 
