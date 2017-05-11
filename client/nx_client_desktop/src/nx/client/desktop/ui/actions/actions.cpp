@@ -413,7 +413,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | NoTarget | GlobalHotkey)
         .text(tr("Save Current Layout As.."))
         .shortcut(lit("Ctrl+Shift+S"))
-        .shortcut(lit("Ctrl+Alt+S"), Builder::Windows, true)
+        .shortcut(lit("Ctrl+Alt+S"), Builder::Windows, false)
         .autoRepeat(false)
         .condition(
             ConditionWrapper(new LoggedInCondition())
