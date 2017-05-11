@@ -102,6 +102,8 @@ protected:
         int count = -1, const QList<QnUuid>& referencePeers = QList<QnUuid>()) const;
     int selectNextChunk() const;
 
+    bool haveInternet() const;
+
     virtual void waitForNextStep(int delay = -1);
 
     void increasePeerRank(const QnUuid& peerId, int value = 1);

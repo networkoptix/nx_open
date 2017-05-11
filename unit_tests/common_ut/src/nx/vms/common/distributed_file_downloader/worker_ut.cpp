@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <nx/utils/log/log.h>
 #include <nx/vms/common/distributed_file_downloader/private/storage.h>
 #include <nx/vms/common/distributed_file_downloader/private/worker.h>
 
@@ -32,7 +33,7 @@ public:
 
     virtual void waitForNextStep(int delay) override
     {
-        if (m_insideStep || delay >= 0)
+        if (m_insideStep || delay >= -1) // -1 is the default value
             return;
 
         m_insideStep = true;
@@ -57,7 +58,13 @@ protected:
         commonPeerManager.reset(new TestPeerManager());
 
         defaultPeer = createPeer();
-        peerById[defaultPeer->peerManager->selfId()] = defaultPeer;
+        peerById[defaultPeer->id] = defaultPeer;
+
+        NX_LOG(
+            lm("Default peer: %1, worker: %2")
+                .arg(defaultPeer->id.toString())
+                .arg(defaultPeer->worker),
+            cl_logINFO);
     }
 
     virtual void TearDown() override
@@ -122,7 +129,7 @@ protected:
         auto storage = createStorage(peerId.toString());
         auto worker = new TestWorker(kTestFileName, storage, peerManager);
 
-        return new Peer{peerManager, storage, worker};
+        return new Peer{peerId, peerManager, storage, worker};
     }
 
     void addPeerWithFile(const TestPeerManager::FileInformation& fileInformation)
@@ -133,10 +140,20 @@ protected:
 
     void nextStep()
     {
+        NX_LOG(lm("Step %1").arg(step), cl_logDEBUG2);
+
         for (const auto& peer: peerById)
-            peer->worker->waitForNextStep(-1);
+        {
+            const auto state = peer->worker->state();
+            if (state == Worker::State::finished || state == Worker::State::failed)
+                continue;
+
+            peer->worker->waitForNextStep(-2);
+        }
 
         commonPeerManager->processRequests();
+
+        ++step;
     }
 
     QDir workingDirectory;
@@ -144,6 +161,7 @@ protected:
 
     struct Peer
     {
+        QnUuid id;
         ProxyTestPeerManager* peerManager = nullptr;
         Storage* storage = nullptr;
         TestWorker* worker = nullptr;
@@ -158,6 +176,7 @@ protected:
 
     QHash<QnUuid, Peer*> peerById;
     Peer* defaultPeer = nullptr;
+    int step = 0;
 };
 
 TEST_F(DistributedFileDownloaderWorkerTest, simplePeersSelection)
@@ -323,7 +342,6 @@ TEST_F(DistributedFileDownloaderWorkerTest, corruptedFile)
 
     const int maxSteps = fileInfo.downloadedChunks.size() + 8;
 
-
     for (int i = 0; i < maxSteps && !finished; ++i)
         nextStep();
 
@@ -363,6 +381,54 @@ TEST_F(DistributedFileDownloaderWorkerTest, simpleDownloadFromInternet)
     ASSERT_TRUE(newFileInfo.isValid());
     ASSERT_EQ(newFileInfo.size, fileInfo.size);
     ASSERT_EQ(newFileInfo.md5, fileInfo.md5);
+}
+
+TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadFlatNetwork)
+{
+    auto fileInfo = createTestFile();
+    fileInfo.url = "http://test.org/testFile";
+    commonPeerManager->addInternetFile(fileInfo.url, fileInfo.filePath);
+
+    const QStringList groups{"default"};
+
+    QList<QnUuid> pendingPeers;
+
+    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ErrorCode::noError);
+    commonPeerManager->setHasInternetConnection(defaultPeer->id);
+    commonPeerManager->setPeerGroups(defaultPeer->id, groups);
+    commonPeerManager->setPeerStorage(defaultPeer->id, defaultPeer->storage);
+    QObject::connect(defaultPeer->worker, &Worker::finished,
+        [this, &pendingPeers]
+        {
+            pendingPeers.removeOne(defaultPeer->id);
+        });
+
+    for (int i = 0; i < 10; ++i)
+    {
+        auto peer = createPeer();
+        peerById[peer->id] = peer;
+        peer->storage->addFile(fileInfo.name);
+        commonPeerManager->setPeerGroups(peer->id, groups);
+        commonPeerManager->setPeerStorage(peer->id, peer->storage);
+
+        QObject::connect(peer->worker, &Worker::finished,
+            [peer, &pendingPeers]
+            {
+                pendingPeers.removeOne(peer->id);
+            });
+    }
+
+    pendingPeers = commonPeerManager->getAllPeers();
+
+    const int maxSteps = fileInfo.downloadedChunks.size() * 3;
+
+    for (auto& peer: peerById)
+        peer->worker->start();
+
+    for (int i = 0; i < maxSteps && !pendingPeers.isEmpty(); ++i)
+        nextStep();
+
+    ASSERT_EQ(pendingPeers.size(), 0);
 }
 
 } // namespace test
