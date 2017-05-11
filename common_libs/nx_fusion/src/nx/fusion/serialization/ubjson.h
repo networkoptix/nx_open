@@ -17,7 +17,6 @@ namespace QnUbjson {
         return QnSerialization::deserialize(stream, target);
     }
 
-#ifndef QN_NO_QT
     template<class T>
     void serialize(const T &value, QByteArray *target) {
         QnUbjsonWriter<QByteArray> stream(target);
@@ -41,7 +40,6 @@ namespace QnUbjson {
             *success = result;
         return result ? target : defaultValue;
     }
-#endif
 
 } // namespace QnUbjson
 
