@@ -280,6 +280,7 @@ static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverCon
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
     } while (syncDoneCounter != kInstanceCount && timer.elapsed() < kMaxSyncTimeoutMs);
 
+    NX_LOG(lit("Sync data time: %1 ms").arg(timer.elapsed()), cl_logINFO);
 
     ec2::Ec2DirectConnection* connection =
         dynamic_cast<ec2::Ec2DirectConnection*> (servers[0]->moduleInstance()->ecConnection());
@@ -290,8 +291,6 @@ static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverCon
     for (const auto& tran: tranList)
         totalDbData += tran.dataSize;
 
-
-    NX_LOG(lit("Sync data time: %1 ms").arg(timer.elapsed()), cl_logINFO);
     NX_LOG(lit("Total bytes sent: %1, dbSize: %2, ratio: %3")
         .arg(nx::network::totalSocketBytesSent())
         .arg(totalDbData)
@@ -343,7 +342,7 @@ static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverCon
         .arg(connectionTries / k),
         cl_logINFO);
 
-    std::this_thread::sleep_for(std::chrono::seconds(50000));
+    //std::this_thread::sleep_for(std::chrono::seconds(50000));
 }
 
 TEST(P2pMessageBus, SequenceConnect)
