@@ -20,9 +20,9 @@ namespace websocket {
 class NX_NETWORK_API WebSocket :
     public QObject,
     public aio::AbstractAsyncChannel,
-    private nx_api::BaseServerConnectionHandler,
+    private nx::network::server::BaseServerConnectionHandler,
     private websocket::ParserHandler,
-    private StreamConnectionHolder<nx_api::BaseServerConnectionWrapper>
+    private nx::network::server::StreamConnectionHolder<nx::network::server::BaseServerConnectionWrapper>
 {
     friend struct BaseServerConnectionAccess;
 
@@ -63,7 +63,7 @@ public:
      */
     void setIsLastFrame();
     void sendCloseAsync(); /**< Send close frame */
-    void WebSocket::setPingTimeout(std::chrono::milliseconds timeout);
+    void setPingTimeout(std::chrono::milliseconds timeout);
 
 signals:
     /**
@@ -104,7 +104,7 @@ private:
     void handlePingTimer();
 
 private:
-    std::unique_ptr<nx_api::BaseServerConnectionWrapper> m_baseConnection;
+    std::unique_ptr<nx::network::server::BaseServerConnectionWrapper> m_baseConnection;
     Parser m_parser;
     Serializer m_serializer;
     SendMode m_sendMode;

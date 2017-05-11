@@ -10,7 +10,7 @@ WebSocket::WebSocket(
     ReceiveMode receiveMode,
     Role role)
     :
-    m_baseConnection(new nx_api::BaseServerConnectionWrapper(this, std::move(streamSocket), this)),
+    m_baseConnection(new nx::network::server::BaseServerConnectionWrapper(this, std::move(streamSocket), this)),
     m_parser(role, this),
     m_serializer(role == Role::client),
     m_sendMode(sendMode),
