@@ -28,15 +28,11 @@ WebSocket::WebSocket(
 
 void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    dispatch(
-        [this, aioThread]()
-        {
-            AbstractAsyncChannel::bindToAioThread(aioThread);
-            m_baseConnection->bindToAioThread(aioThread);
-            m_pingTimer->cancelSync();
-            m_pingTimer->bindToAioThread(aioThread);
-            setPingTimeout(m_pingTimeout);
-        });
+    AbstractAsyncChannel::bindToAioThread(aioThread);
+    m_baseConnection->bindToAioThread(aioThread);
+    m_pingTimer->cancelSync();
+    m_pingTimer->bindToAioThread(aioThread);
+    setPingTimeout(m_pingTimeout);
 }
 
 void WebSocket::stopWhileInAioThread()
