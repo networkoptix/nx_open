@@ -25,13 +25,13 @@ protected:
         clientSocket2->setNoDelay(true);
 
         m_acceptor->acceptAsync(
-            [this](SystemError::ErrorCode ecode, AbstractStreamSocket* clientSocket)
+            [this](SystemError::ErrorCode ecode, std::unique_ptr<AbstractStreamSocket> clientSocket)
             {
                 ASSERT_EQ(SystemError::noError, ecode);
                 ASSERT_TRUE(clientSocket->setNonBlockingMode(true));
 
                 m_acceptor.reset();
-                clientSocket1.reset(clientSocket);
+                clientSocket1 = std::move(clientSocket);
                 clientSocket1->setNonBlockingMode(true);
                 clientSocket1->setNoDelay(true);
 
