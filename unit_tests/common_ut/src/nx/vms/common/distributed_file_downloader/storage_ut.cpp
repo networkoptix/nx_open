@@ -320,10 +320,11 @@ TEST_F(DistributedFileDownloaderStorageTest, updateCorruptedFile)
 
 TEST_F(DistributedFileDownloaderStorageTest, setChunkSize)
 {
-    createDefaultTestFile();
+    constexpr int kFileSize = 10;
+    createTestFile(testFileName, kFileSize);
 
     FileInformation fileInfo(testFileName);
-    fileInfo.size = kTestFileSize;
+    fileInfo.size = kFileSize;
     ASSERT_EQ(downloaderStorage->addFile(fileInfo), ErrorCode::noError);
 
     ASSERT_EQ(downloaderStorage->setChunkSize(testFileName, -1), ErrorCode::invalidChunkSize);
