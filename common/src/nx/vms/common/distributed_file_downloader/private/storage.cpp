@@ -201,6 +201,35 @@ ErrorCode Storage::updateFileInformation(
     return ErrorCode::noError;
 }
 
+ErrorCode Storage::setChunkSize(const QString& fileName, qint64 chunkSize)
+{
+    if (chunkSize <= 0)
+        return ErrorCode::invalidChunkSize;
+
+    QnMutexLocker lock(&m_mutex);
+
+    auto it = m_fileInformationByName.find(fileName);
+    if (it == m_fileInformationByName.end())
+        return ErrorCode::fileDoesNotExist;
+
+    if (it->status == FileInformation::Status::downloaded)
+        return ErrorCode::fileAlreadyDownloaded;
+
+    it->chunkSize = chunkSize;
+    if (it->size >= 0)
+    {
+        const int chunkCount = calculateChunkCount(it->size, chunkSize);
+        it->downloadedChunks.fill(false, chunkCount);
+        it->chunkChecksums.clear();
+        it->chunkChecksums.resize(chunkCount);
+    }
+
+    if (it->status == FileInformation::Status::corrupted)
+        it->status = FileInformation::Status::downloading;
+
+    return ErrorCode::noError;
+}
+
 ErrorCode Storage::readFileChunk(
     const QString& fileName, int chunkIndex, QByteArray& buffer)
 {

@@ -318,6 +318,65 @@ TEST_F(DistributedFileDownloaderStorageTest, updateCorruptedFile)
     }
 }
 
+TEST_F(DistributedFileDownloaderStorageTest, setChunkSize)
+{
+    createDefaultTestFile();
+
+    FileInformation fileInfo(testFileName);
+    fileInfo.size = kTestFileSize;
+    ASSERT_EQ(downloaderStorage->addFile(fileInfo), ErrorCode::noError);
+
+    ASSERT_EQ(downloaderStorage->setChunkSize(testFileName, -1), ErrorCode::invalidChunkSize);
+
+    ASSERT_EQ(downloaderStorage->setChunkSize(testFileName, 1), ErrorCode::noError);
+    fileInfo = downloaderStorage->fileInformation(testFileName);
+    ASSERT_EQ(fileInfo.downloadedChunks.size(), fileInfo.size);
+}
+
+TEST_F(DistributedFileDownloaderStorageTest, setChunkSizeToCorruptedFile)
+{
+    createTestFile(testFileName, 1);
+
+    FileInformation fileInfo(testFileName);
+    fileInfo.size = 1;
+    fileInfo.md5 = "invalid_md5";
+
+    ASSERT_EQ(downloaderStorage->addFile(fileInfo), ErrorCode::noError);
+
+    QByteArray data;
+    {
+        QFile file(testFilePath);
+        file.open(QFile::ReadOnly);
+        data = file.readAll();
+        file.close();
+    }
+
+    ASSERT_EQ(downloaderStorage->writeFileChunk(testFileName, 0, data), ErrorCode::noError);
+
+    {
+        const auto& fileInfo = downloaderStorage->fileInformation(testFileName);
+        ASSERT_EQ(fileInfo.status, FileInformation::Status::corrupted);
+    }
+
+    ASSERT_EQ(downloaderStorage->setChunkSize(testFileName, 1), ErrorCode::noError);
+
+    {
+        const auto& fileInfo = downloaderStorage->fileInformation(testFileName);
+        ASSERT_EQ(fileInfo.status, FileInformation::Status::downloading);
+    }
+}
+
+TEST_F(DistributedFileDownloaderStorageTest, setChunkSizeToDownloadedFile)
+{
+    createTestFile(testFileName, 1);
+
+    FileInformation fileInfo(testFileName);
+    fileInfo.status = FileInformation::Status::downloaded;
+
+    ASSERT_EQ(downloaderStorage->addFile(fileInfo), ErrorCode::noError);
+    ASSERT_EQ(downloaderStorage->setChunkSize(testFileName, 1), ErrorCode::fileAlreadyDownloaded);
+}
+
 TEST_F(DistributedFileDownloaderStorageTest, findDownloadsForDownloadedFiles)
 {
     createDefaultTestFile();

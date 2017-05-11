@@ -42,6 +42,7 @@ public:
 
     ErrorCode addFile(const FileInformation& fileInfo);
     ErrorCode updateFileInformation(const QString& fileName, qint64 size, const QByteArray& md5);
+    ErrorCode setChunkSize(const QString& fileName, qint64 chunkSize);
 
     ErrorCode readFileChunk(const QString& fileName, int chunkIndex, QByteArray& buffer);
     ErrorCode writeFileChunk(const QString& fileName, int chunkIndex, const QByteArray& buffer);
