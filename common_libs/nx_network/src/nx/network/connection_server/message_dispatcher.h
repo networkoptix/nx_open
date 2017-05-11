@@ -1,10 +1,4 @@
-/**********************************************************
-* 4 sep 2014
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_MESSAGE_DISPATCHER_H
-#define NX_MESSAGE_DISPATCHER_H
+#pragma once
 
 #include <functional>
 #include <memory>
@@ -12,6 +6,9 @@
 
 #include <nx/network/async_stoppable.h>
 
+namespace nx {
+namespace network {
+namespace server {
 
 //!Dispatches STUN protocol messages to corresponding processor
 /*!
@@ -92,4 +89,6 @@ private:
     ProcessorDictionaryType m_processors;
 };
 
-#endif  //NX_MESSAGE_DISPATCHER_H
+} // namespace server
+} // namespace network
+} // namespace nx

@@ -14,26 +14,28 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
+namespace nx {
+namespace network {
+namespace server {
+
 template<class _ConnectionType>
 class StreamConnectionHolder
 {
 public:
-    typedef _ConnectionType ConnectionType;
+    using ConnectionType = _ConnectionType;
 
-    virtual ~StreamConnectionHolder() {}
+    virtual ~StreamConnectionHolder() = default;
 
     virtual void closeConnection(
         SystemError::ErrorCode closeReason,
-        ConnectionType* connection ) = 0;
+        ConnectionType* connection) = 0;
 };
 
-template<class _ConnectionType>
+template<class ConnectionType>
 class StreamServerConnectionHolder:
-    public StreamConnectionHolder<_ConnectionType>
+    public StreamConnectionHolder<ConnectionType>
 {
 public:
-    typedef _ConnectionType ConnectionType;
-
     StreamServerConnectionHolder():
         m_connectionsBeingClosedCount(0)
     {
@@ -41,17 +43,17 @@ public:
 
     virtual ~StreamServerConnectionHolder()
     {
-        //we MUST be sure to remove all connections
+        // We MUST be sure to remove all connections.
         std::map<ConnectionType*, std::shared_ptr<ConnectionType>> connections;
         {
             QnMutexLocker lk(&m_mutex);
-            connections.swap( m_connections );
+            connections.swap(m_connections);
         }
         for (auto& connection: connections)
             connection.first->pleaseStopSync();
         connections.clear();
 
-        //waiting connections being cancelled through closeConnection call to finish...
+        // Waiting connections being cancelled through closeConnection call to finish...
         QnMutexLocker lk(&m_mutex);
         while (m_connectionsBeingClosedCount > 0)
             m_cond.wait(lk.mutex());
@@ -59,7 +61,7 @@ public:
 
     virtual void closeConnection(
         SystemError::ErrorCode /*closeReason*/,
-        ConnectionType* connection ) override
+        ConnectionType* connection) override
     {
         QnMutexLocker lk(&m_mutex);
         auto connectionIter = m_connections.find(connection);
@@ -108,19 +110,18 @@ private:
  *   and forwards them to the specified handler.
  */
 template<class CustomServerType, class ConnectionType>
-    class StreamSocketServer
-:
+class StreamSocketServer:
     public StreamServerConnectionHolder<ConnectionType>,
     public nx::network::aio::BasicPollable
 {
-    typedef StreamServerConnectionHolder<ConnectionType> BaseType;
-    typedef StreamSocketServer<CustomServerType, ConnectionType> SelfType;
+    using base_type = StreamServerConnectionHolder<ConnectionType>;
+    using self_type = StreamSocketServer<CustomServerType, ConnectionType>;
 
 public:
     StreamSocketServer(
         bool sslRequired,
         nx::network::NatTraversalSupport natTraversalSupport)
-    :
+        :
         m_socket(SocketFactory::createStreamServerSocket(
             sslRequired,
             natTraversalSupport))
@@ -209,7 +210,7 @@ public:
 
 protected:
     virtual std::shared_ptr<ConnectionType> createConnection(
-        std::unique_ptr<AbstractStreamSocket> _socket) = 0;
+        std::unique_ptr<AbstractStreamSocket> streamSocket) = 0;
 
     virtual void stopWhileInAioThread() override
     {
@@ -221,6 +222,10 @@ private:
     boost::optional<std::chrono::milliseconds> m_connectionInactivityTimeout;
     boost::optional<KeepAliveOptions> m_keepAliveOptions;
 
-    StreamSocketServer( StreamSocketServer& );
-    StreamSocketServer& operator=( const StreamSocketServer& );
+    StreamSocketServer(StreamSocketServer&);
+    StreamSocketServer& operator=(const StreamSocketServer&);
 };
+
+} // namespace server
+} // namespace network
+} // namespace nx

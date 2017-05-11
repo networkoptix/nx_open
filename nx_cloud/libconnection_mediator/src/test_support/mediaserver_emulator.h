@@ -19,7 +19,7 @@ namespace hpm {
 
 class MediaServerEmulator:
     public network::aio::BasicPollable,
-    public StreamConnectionHolder<stun::MessagePipeline>
+    public nx::network::server::StreamConnectionHolder<stun::MessagePipeline>
 {
 public:
     enum class ActionToTake

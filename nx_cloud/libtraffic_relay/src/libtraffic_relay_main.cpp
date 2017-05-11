@@ -10,6 +10,10 @@
 
 #include "relay_service.h"
 
+namespace nx {
+namespace cloud {
+namespace relay {
+
 static nx::utils::Service* serviceInstance = nullptr;
 
 void stopServer(int /*signal*/)
@@ -52,3 +56,7 @@ int trafficRelayMain(int argc, char* argv[])
     serviceInstance = nullptr;
     return result;
 }
+
+} // namespace relay
+} // namespace cloud
+} // namespace nx

@@ -104,14 +104,14 @@ void IncomingControlConnection::continueReadRequest()
             size_t processed = 0;
             switch(m_parser.parse(m_buffer, &processed))
             {
-                case nx_api::ParserState::init:
-                case nx_api::ParserState::inProgress:
+                case nx::network::server::ParserState::init:
+                case nx::network::server::ParserState::inProgress:
                     return continueReadRequest();
 
-                case nx_api::ParserState::done:
+                case nx::network::server::ParserState::done:
                     return processRequest();
 
-                case nx_api::ParserState::failed:
+                case nx::network::server::ParserState::failed:
                     return handleError(SystemError::invalidData);
             };
         });

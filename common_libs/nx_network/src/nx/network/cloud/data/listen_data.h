@@ -39,7 +39,7 @@ public:
 
     boost::optional<KeepAliveOptions> tcpConnectionKeepAlive;
     CloudConnectOptions cloudConnectOptions;
-    boost::optional<SocketAddress> trafficRelayEndpoint;
+    boost::optional<nx::String> trafficRelayUrl;
 
     ListenResponse();
     void serializeAttributes(nx::stun::Message* const message);

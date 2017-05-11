@@ -514,6 +514,9 @@ void CloudServerSocket::onNewConnectionHasBeenAccepted(
     decltype(m_savedAcceptHandler) handler;
     handler.swap(m_savedAcceptHandler);
 
+    if (socket)
+        socket->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
+
     NX_LOGX(lm("Returning socket from tunnel pool. Result code %1")
         .arg(SystemError::toString(sysErrorCode)), cl_logDEBUG2);
     handler(sysErrorCode, std::move(socket));
@@ -620,11 +623,11 @@ std::vector<std::unique_ptr<AbstractConnectionAcceptor>>
 {
     std::vector<std::unique_ptr<AbstractConnectionAcceptor>> acceptors;
 
-    if (response.trafficRelayEndpoint)
+    if (response.trafficRelayUrl)
     {
         acceptors.push_back(
             std::make_unique<relay::ConnectionAcceptor>(
-                *response.trafficRelayEndpoint));
+                QUrl(*response.trafficRelayUrl)));
     }
 
     return acceptors;

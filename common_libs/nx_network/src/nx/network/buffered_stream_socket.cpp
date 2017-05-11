@@ -16,17 +16,19 @@ BufferedStreamSocket::BufferedStreamSocket(std::unique_ptr<AbstractStreamSocket>
 }
 
 void BufferedStreamSocket::catchRecvEvent(
-    std::function<void(SystemError::ErrorCode)> handler)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
+    m_catchRecvEventHandler = std::move(handler);
+
     if (!m_internalRecvBuffer.isEmpty())
-        return m_socket->dispatch(std::bind(std::move(handler), SystemError::noError));
+        return triggerCatchRecvEvent(SystemError::noError);
 
     if (m_internalRecvBuffer.capacity() < kRecvBufferCapacity)
         m_internalRecvBuffer.reserve(kRecvBufferCapacity);
 
     m_socket->readSomeAsync(
         &m_internalRecvBuffer,
-        [this, handler = std::move(handler)](SystemError::ErrorCode code, size_t size) mutable
+        [this](SystemError::ErrorCode code, size_t size) mutable
         {
             NX_LOGX(lm("catchRecvEvent read size=%1: %2")
                 .arg(code == SystemError::noError ? size : 0)
@@ -37,7 +39,7 @@ void BufferedStreamSocket::catchRecvEvent(
                 code = SystemError::connectionReset;
 
             // Make socket ready for blocking mode:
-            m_socket->post(std::bind(std::move(handler), code));
+            triggerCatchRecvEvent(code);
         });
 }
 
@@ -110,6 +112,15 @@ void BufferedStreamSocket::readSomeAsync(
         {
             NX_LOGX(lm("readSomeAsync internalSize=%1").arg(recvSize), cl_logDEBUG2);
             handler(SystemError::noError, (size_t)recvSize);
+        });
+}
+
+void BufferedStreamSocket::triggerCatchRecvEvent(SystemError::ErrorCode resultCode)
+{
+    post(
+        [this, resultCode]()
+        {
+            nx::utils::swapAndCall(m_catchRecvEventHandler, resultCode);
         });
 }
 

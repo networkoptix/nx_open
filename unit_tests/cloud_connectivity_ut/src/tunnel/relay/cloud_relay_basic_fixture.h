@@ -12,12 +12,12 @@ namespace test {
 
 class ClientToRelayConnection;
 
-class CloudRelayFixtureBase:
+class BasicFixture:
     public ::testing::Test
 {
 public:
-    CloudRelayFixtureBase();
-    ~CloudRelayFixtureBase();
+    BasicFixture();
+    ~BasicFixture();
 
 protected:
     virtual void onClientToRelayConnectionInstanciated(ClientToRelayConnection*) {}
