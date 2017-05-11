@@ -215,6 +215,9 @@ ErrorCode Storage::setChunkSize(const QString& fileName, qint64 chunkSize)
     if (it->status == FileInformation::Status::downloaded)
         return ErrorCode::fileAlreadyDownloaded;
 
+    if (it->chunkSize == chunkSize)
+        return ErrorCode::noError;
+
     it->chunkSize = chunkSize;
     if (it->size >= 0)
     {
@@ -226,6 +229,9 @@ ErrorCode Storage::setChunkSize(const QString& fileName, qint64 chunkSize)
 
     if (it->status == FileInformation::Status::corrupted)
         it->status = FileInformation::Status::downloading;
+
+    if (!saveMetadata(it.value()))
+        return ErrorCode::ioError;
 
     return ErrorCode::noError;
 }
