@@ -114,7 +114,7 @@ std::unique_ptr<network::UDPSocket> UdpMulticastFinder::makeSocket(const SocketA
     if (socket->setNonBlockingMode(true)
         && socket->setReuseAddrFlag(true) && socket->bind(endpoint))
     {
-        NX_LOGX(lm("New socket %1").strs(endpoint), cl_logDEBUG2);
+        NX_LOGX(lm("New socket %1").strs(socket->getLocalAddress()), cl_logDEBUG2);
         return socket;
     }
 
