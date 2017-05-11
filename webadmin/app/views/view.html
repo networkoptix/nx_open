@@ -45,7 +45,7 @@
                 </td>
             </tr>-->
             <tr>
-                <td>
+                <td ng-class="{'mobile-camera-panel':toggleCameraPanel, 'hidden-mobile': !toggleCameraPanel}">
                     <div class="view-wrapper">
                         <camera-panel cameras-provider="camerasProvider" active-camera="activeCamera"
                                       player="player" current-resolution="currentResolution"></camera-panel>
