@@ -205,7 +205,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
 
             position = position?parseInt(position):oldTimePosition;
-
+            blockTimeUrl = false;
             if ($scope.activeCamera) {
                 $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId], timeCorrection);
                 $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640, timeCorrection);
@@ -353,7 +353,6 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
         });
 
-
         $scope.$watch('activeCamera.status',function(status,oldStatus){
 
             if(typeof(oldStatus) == "undefined"){
@@ -365,11 +364,14 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
         });
 
+        var blockTimeUrl = false;
         $scope.$watch('activeCamera', function(){
             $scope.storage.cameraId  = $scope.activeCamera.id || $scope.storage.cameraId;
             $location.path('/view/' + $scope.activeCamera.id, false);
-            $scope.updateCamera(false);
-        })
+            if(!blockTimeUrl){
+                $scope.updateCamera(false);
+            }
+        });
 
         $scope.$watch('player', function(){
             updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
@@ -410,7 +412,9 @@ angular.module('webadminApp').controller('ViewCtrl',
         });
 
         var killSubscription = $rootScope.$on('$routeChangeStart', function (event,next) {
-            $scope.updateCamera($scope.camerasProvider.getCamera(next.params.cameraId), $location.search().time || false);
+            blockTimeUrl = true;
+            $activeCamera = $scope.camerasProvider.getCamera(next.params.cameraId);
+            $scope.updateCamera($location.search().time || false);
         });
 
         $scope.$on( '$destroy', function() {

@@ -1,7 +1,7 @@
 'use strict';
 angular.module('webadminApp')
     .factory('camerasProvider', function (mediaserver, $location, $localStorage, $q, $poll) {
-        var reloadInterval = 5*1000;//30 seconds
+        var reloadInterval = Config.settingsConfig.reloadInterval;//30 seconds
 
         function camerasProvider(){
             this.desktopCameraTypeId = null;
@@ -285,16 +285,6 @@ angular.module('webadminApp')
             return deferred.promise;
         };
 
-        camerasProvider.prototype.reloader = function(){
-            var self = this;
-            return this.reloadTree().catch(function(error){
-                if(typeof(error.status) === 'undefined' || !error.status) {
-                    console.error(error);
-                }
-                return $q.reject(error);
-            });
-        };
-
         camerasProvider.prototype.requestResources = function() {
             var self = this;
             var deferred = $q.defer();
@@ -303,7 +293,7 @@ angular.module('webadminApp')
                     return type.name === 'SERVER_DESKTOP_CAMERA';
                 });
                 self.desktopCameraTypeId = self.desktopCameraTypeId ? self.desktopCameraTypeId.id : null;
-                self.reloader().then(function(){
+                self.reloadTree().then(function(){
                     deferred.resolve();
                 });
             });
@@ -312,7 +302,7 @@ angular.module('webadminApp')
 
         camerasProvider.prototype.startPoll = function(){
             this.poll = $poll(function(){
-                this.reloader();
+                this.reloadTree();
             },reloadInterval);
         };
 
