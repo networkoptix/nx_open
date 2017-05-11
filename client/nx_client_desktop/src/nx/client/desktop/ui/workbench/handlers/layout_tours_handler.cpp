@@ -141,6 +141,12 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             }
         });
 
+    connect(action(action::LayoutTourPrevStepAction), &QAction::triggered, m_tourExecutor,
+        &LayoutTourExecutor::prevTourStep);
+
+    connect(action(action::LayoutTourNextStepAction), &QAction::triggered, m_tourExecutor,
+        &LayoutTourExecutor::nextTourStep);
+
     connect(action(action::SaveLayoutTourAction), &QAction::triggered, this,
         [this]
         {
