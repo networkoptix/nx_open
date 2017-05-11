@@ -118,7 +118,8 @@ var Config = {
         upnpPortMappingEnabled: {label: 'UPNP port mapping enabled', type: 'checkbox'},
 
         useServerTime: true,
-        disableVolume: true
+        disableVolume: true,
+        reloadInterval: 5*1000
     },
     debugEvents: {
         events: [

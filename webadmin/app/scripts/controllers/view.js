@@ -1,10 +1,10 @@
 'use strict';
 
 angular.module('webadminApp').controller('ViewCtrl',
-    function ($scope, $rootScope, $location, $routeParams, mediaserver, cameraRecords, $poll, $q,
-              $sessionStorage, $localStorage, currentUser) {
+    function ($scope, $rootScope, $location, $routeParams, mediaserver, cameraRecords,
+              camerasProvider, $sessionStorage, $localStorage, currentUser) {
 
-        if(currentUser === null ){
+        if(currentUser === null){
             return; // Do nothing, user wasn't authorised
         }
 
@@ -13,15 +13,13 @@ angular.module('webadminApp').controller('ViewCtrl',
             High: 'hi',
             Low: 'lo'
         };
-        $scope.Config = Config;
         $scope.debugMode = Config.allowDebugMode;
         $scope.session = $sessionStorage;
         $scope.storage = $localStorage;
+        $scope.camerasProvider = camerasProvider.getProvider();
         $scope.storage.serverStates = $scope.storage.serverStates || {};
         
         $scope.playerApi = false;
-        $scope.cameras = {};
-        $scope.liveOnly = true;
         $scope.canViewArchive = false;
         $scope.storage.cameraId = $routeParams.cameraId || $scope.storage.cameraId   || null;
 
@@ -29,17 +27,20 @@ angular.module('webadminApp').controller('ViewCtrl',
             $location.path('/view/' + $scope.storage.cameraId, false);
         }
 
+        $scope.treeRequest = null;
+        $scope.positionProvider = null;
+        $scope.activeVideoRecords = null;
+        $scope.liveOnly = true;
         $scope.activeCamera = null;
-        $scope.searchCams = '';
 
 
         mediaserver.systemSettings().then(function(r){
             $scope.webclientDisabled = r.data.reply.settings.crossdomainEnabled == 'false' ;
         });
 
-        var isAdmin = false;
 
         var timeCorrection = 0;
+        var isAdmin = false;
         var minTimeLag = 2000;// Two seconds
 
         $scope.activeResolution = 'Auto';
@@ -49,8 +50,6 @@ angular.module('webadminApp').controller('ViewCtrl',
         var onlyHiResolution =  ['Auto', 'High'];
         var onlyLoResolution =  ['Auto', 'Low'];
 
-        var reloadInterval = 5*1000;//30 seconds
-        var quickReloadInterval = 3*1000;// 3 seconds if something was wrong
         var mimeTypes = {
             'hls': 'application/x-mpegURL',
             'webm': 'video/webm',
@@ -205,30 +204,32 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
         }
 
-
-
-        function getServer(id) {
-            if(!$scope.mediaServers) {
-                return null;
+        $scope.updateCamera = function (position) {
+            var oldTimePosition = null;
+            if($scope.positionProvider && !$scope.positionProvider.liveMode){
+                oldTimePosition = $scope.positionProvider.playedPosition;
             }
-            return _.find($scope.mediaServers, function (server) {
-                return server.id === id;
-            });
-        }
-        function getCamera(id){
-            if(!$scope.cameras) {
-                return null;
-            }
-            for(var serverId in $scope.cameras) {
-                var cam = _.find($scope.cameras[serverId], function (camera) {
-                    return camera.id === id || camera.physicalId === id;
-                });
-                if(cam){
-                    return cam;
+
+            var camRotation = _.find($scope.activeCamera.addParams,findRotation);
+            $scope.rotation = camRotation && camRotation.value ? parseInt(camRotation.value) : 0;
+
+            $scope.toggleCameraPanel = false;
+
+            position = position?parseInt(position):oldTimePosition;
+
+            if ($scope.activeCamera) {
+                $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId], timeCorrection);
+                $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640, timeCorrection);
+                $scope.liveOnly = true;
+                if($scope.canViewArchive) {
+                    $scope.activeVideoRecords.archiveReadyPromise.then(function (hasArchive) {
+                        $scope.liveOnly = !hasArchive;
+                    });
                 }
+                updateVideoSource(position);
+                $scope.switchPlaying(true);
             }
-            return null;
-        }
+        };
 
         $scope.playerReady = function(API){
             $scope.playerAPI = API;
@@ -237,20 +238,15 @@ angular.module('webadminApp').controller('ViewCtrl',
                 $scope.playerAPI.volume($scope.volumeLevel);
             }
         };
+
         function updateVideoSource(playing) {
             updateAvailableResolutions();
             var live = !playing;
 
             $scope.positionSelected = !!playing;
-
             if(!$scope.positionProvider){
                 return;
             }
-
-            if(treeRequest){
-                treeRequest.abort('updateVideoSource'); //abort tree reloading request to speed up loading new video
-            }
-
 
             $scope.positionProvider.init(playing, timeCorrection, $scope.positionProvider.playing);
             if(live){
@@ -287,8 +283,6 @@ angular.module('webadminApp').controller('ViewCtrl',
             });
         }
 
-        $scope.activeVideoRecords = null;
-        $scope.positionProvider = null;
 
         $scope.updateTime = function(currentTime, duration){
             if(currentTime === null && duration === null){
@@ -307,51 +301,6 @@ angular.module('webadminApp').controller('ViewCtrl',
         function findRotation(param){
             return param.name === 'rotation';
         }
-
-        $scope.selectCameraById = function (cameraId, position, silent) {
-            if($scope.activeCamera && ($scope.activeCamera.id === cameraId || $scope.activeCamera.physicalId === cameraId)){
-                return;
-            }
-            var oldTimePosition = null;
-            if($scope.positionProvider && !$scope.positionProvider.liveMode){
-                oldTimePosition = $scope.positionProvider.playedPosition;
-            }
-
-            $scope.storage.cameraId  = cameraId || $scope.storage.cameraId  ;
-
-            position = position?parseInt(position):oldTimePosition;
-
-            $scope.activeCamera = getCamera ($scope.storage.cameraId  );
-            
-            var camRotation = _.find($scope.activeCamera.addParams,findRotation);
-            $scope.rotation = camRotation && camRotation.value ? parseInt(camRotation.value) : 0;
-
-
-            if (!silent && $scope.activeCamera) {
-                $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId], timeCorrection);
-                $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640, timeCorrection);
-
-                $scope.liveOnly = true;
-                if($scope.canViewArchive) {
-                    $scope.activeVideoRecords.archiveReadyPromise.then(function (hasArchive) {
-                        $scope.liveOnly = !hasArchive;
-                    });
-                }
-
-                updateVideoSource(position);
-                $scope.switchPlaying(true);
-            }
-        };
-        $scope.selectCamera = function (activeCamera) {
-            $scope.toggleCameraPanel = false;
-            $location.path('/view/' + activeCamera.id, false);
-            $scope.selectCameraById(activeCamera.id,false);
-        };
-
-        $scope.toggleServerCollapsed = function(server){
-            server.collapsed = !server.collapsed;
-            $scope.storage.serverStates[server.id] = server.collapsed;
-        };
 
         $scope.switchPlaying = function(play){
             if($scope.playerAPI) {
@@ -412,311 +361,11 @@ angular.module('webadminApp').controller('ViewCtrl',
         });
 
 
-        function searchCams(){
-            if($scope.searchCams.toLowerCase() == "links panel"){ // Enable cameras and clean serach fields
-                $scope.cameraLinksEnabled = true;
-                $scope.searchCams = "";
-            }
-            function has(str, substr){
-                return str && str.toLowerCase().indexOf(substr.toLowerCase()) >= 0;
-            }
-            _.forEach($scope.mediaServers,function(server){
-                var cameras = $scope.cameras[server.id];
-                var camsVisible = false;
-                _.forEach(cameras,function(camera){
-                    camera.visible = $scope.searchCams === '' ||
-                            has(camera.name, $scope.searchCams) ||
-                            has(camera.url, $scope.searchCams);
-                    camsVisible = camsVisible || camera.visible;
-                });
-
-                server.visible = $scope.searchCams === '' ||
-                    camsVisible /*||
-                    has(server.name, $scope.searchCams) ||
-                    has(server.url, $scope.searchCams)*/;
-            });
-        }
-
-
-        function extractDomain(url) {
-            url = url.split('/')[2] || url.split('/')[0];
-            return url.split(':')[0].split('?')[0];
-        }
-        function objectOrderName(object){
-            var num = 0;
-            if(object.url) {
-                var addrArray = object.url.split('.');
-                for (var i = 0; i < addrArray.length; i++) {
-                    var power = 3 - i;
-                    num += ((parseInt(addrArray[i]) % 256 * Math.pow(256, power)));
-                }
-                if (isNaN(num)) {
-                    num = object.url;
-                } else {
-                    num = num.toString(16);
-                    if (num.length < 8) {
-                        num = '0' + num;
-                    }
-                }
-            }
-
-            return object.name + '__' + num;
-        }
-
-        var treeRequest = null;
-
-        function getCameras() {
-
-            var deferred = $q.defer();
-            if(treeRequest){
-                treeRequest.abort('getCameras');
-            }
-            treeRequest = mediaserver.getCameras();
-            treeRequest.then(function (data) {
-                var cameras = data.data;
-                
-                var findMediaStream = function(param){
-                    return param.name === 'mediaStreams';
-                };
-                
-                function cameraFilter(camera){
-                    // Filter desktop cameras here
-                    if(camera.typeId === desktopCameraTypeId){ // Hide desctop cameras
-                        return false;
-                    }
-
-                    return true;
-                }
-
-                function cameraSorter(camera) {
-                    camera.url = extractDomain(camera.url);
-                    camera.preview = mediaserver.previewUrl(camera.physicalId, false, null, 256);
-                    camera.server = getServer(camera.parentId);
-                    if(camera.server && camera.server.status === 'Offline'){
-                        camera.status = 'Offline';
-                    }
-
-                    var mediaStreams = _.find(camera.addParams,findMediaStream);
-                    camera.mediaStreams = mediaStreams?JSON.parse(mediaStreams.value).streams:[];
-
-                    if(typeof(camera.visible) === 'undefined'){
-                        camera.visible = true;
-                    }
-
-                    return objectOrderName(camera);
-                }
-
-                function newCamerasFilter(camera){
-                    var oldCamera = getCamera(camera.id);
-                    if(!oldCamera){
-                        return true;
-                    }
-
-                    $.extend(oldCamera,camera);
-                    return false;
-                }
-                /*
-
-                 // This is for encoders (group cameras):
-
-                 //1. split cameras with groupId and without
-                 var cams = _.partition(cameras, function (cam) {
-                 return cam.groupId === '';
-                 });
-
-                 //2. sort groupedCameras
-                 cams[1] = _.sortBy(cams[1], cameraSorter);
-
-                 //3. group groupedCameras by groups ^_^
-                 cams[1] = _.groupBy(cams[1], function (cam) {
-                 return cam.groupId;
-                 });
-
-                 //4. Translate into array
-                 cams[1] = _.values(cams[1]);
-
-                 //5. Emulate cameras by groups
-                 cams[1] = _.map(cams[1], function (group) {
-                 return {
-                 isGroup: true,
-                 collapsed: false,
-                 parentId: group[0].parentId,
-                 name: group[0].groupName,
-                 id: group[0].groupId,
-                 url: group[0].url,
-                 status: 'Online',
-                 cameras: group
-                 };
-                 });
-
-                 //6 union cameras back
-                 cameras = _.union(cams[0], cams[1]);
-                 */
-
-
-                cameras = _.filter(cameras, cameraFilter);
-                //7 sort again
-                cameras = _.sortBy(cameras, cameraSorter);
-
-                //8. Group by servers
-                var camerasByServers = _.groupBy(cameras, function (camera) {
-                    return camera.parentId;
-                });
-
-                if(!$scope.cameras) {
-                    $scope.cameras = camerasByServers;
-                }else{
-                    for(var serverId in $scope.cameras){
-                        var activeCameras = $scope.cameras[serverId];
-                        var newCameras = camerasByServers[serverId];
-
-                        for(var i = 0; i < activeCameras.length; i++) { // Remove old cameras
-                            if(!_.find(newCameras,function(camera){
-                                    return camera.id === activeCameras[i].id;
-                                }))
-                            {
-                                activeCameras.splice(i, 1);
-                                i--;
-                            }
-                        }
-
-
-
-                        // Merge actual cameras
-                        var newCameras = _.filter(newCameras,newCamerasFilter); //Process old cameras and get new
-
-                        // Add new cameras
-
-                        _.forEach(newCameras,function(camera){ // Add new camera
-                            activeCameras.push(camera);
-                        });
-                    }
-
-                    for(var serverId in camerasByServers){
-                        if(!$scope.cameras[serverId]){
-                            $scope.cameras[serverId] = camerasByServers[serverId];
-                        }
-                    }
-                }
-
-                deferred.resolve(cameras);
-            }, function (error) {
-                deferred.reject(error);
-            });
-
-            return deferred.promise;
-        }
-
-        function reloadTree(){
-            function serverSorter(server){
-                server.url = extractDomain(server.url);
-                server.collapsed = $scope.storage.serverStates[server.id];
-
-
-                if(typeof(server.visible) === 'undefined'){
-                    server.visible = true;
-                }
-
-                return objectOrderName(server);
-            }
-
-            function newServerFilter(server){
-                var oldserver = getServer(server.id);
-
-                server.collapsed = oldserver ? oldserver.collapsed :
-                    $scope.storage.serverStates[server.id] ||
-                    server.status !== 'Online' && (server.allowAutoRedundancy || server.flags.indexOf('SF_Edge') < 0);
-
-                if(oldserver){ // refresh old server
-                    $.extend(oldserver,server);
-                }
-
-                return !oldserver;
-            }
-
-            var deferred = $q.defer();
-
-            if(treeRequest){
-                treeRequest.abort('reloadTree');
-            }
-            treeRequest = mediaserver.getMediaServers();
-            treeRequest.then(function (data) {
-
-                if(!$scope.mediaServers) {
-                    $scope.mediaServers = _.sortBy(data.data,serverSorter);
-                }else{
-                    var servers = data.data;
-                    for(var i = 0; i < $scope.mediaServers.length; i++) { // Remove old servers
-                        if(!_.find(servers,function(server){
-                                return server.id === $scope.mediaServers[i].id;
-                            }))
-                        {
-                            $scope.mediaServers.splice(i, 1);
-                            i--;
-                        }
-                    }
-
-
-                    var newServers = _.filter(servers,newServerFilter); // Process all servers - refresh old and find new
-
-                    _.forEach(_.sortBy(newServers,serverSorter),function(server){ // Add new server
-                        $scope.mediaServers.push(server);
-                    });
-                }
-
-                getCameras().then(function(data){
-                        searchCams();
-                        deferred.resolve(data);
-                    },
-                    function(error){
-                        searchCams();
-                        deferred.reject(error);
-                    });
-
-            }, function (error) {
-                deferred.reject(error);
-            });
-
-            return deferred.promise;
-        }
-
-        var firstTime = true;
-        function reloader(){
-            return reloadTree().then(function(){
-                $scope.selectCameraById($scope.storage.cameraId  , firstTime && $location.search().time || false, !firstTime);
-                firstTime = false;
-            },function(error){
-                if(typeof(error.status) === 'undefined' || !error.status) {
-                    console.error(error);
-                }
-            });
-        }
-
-        var poll = $poll(reloader,reloadInterval);
-        $scope.$on( '$destroy', function( ) {
-            killSubscription();
-            $poll.cancel(poll);
-        });
-
-
-        var desktopCameraTypeId = null;
-        function requestResourses() {
-            mediaserver.getResourceTypes().then(function (result) {
-                desktopCameraTypeId = _.find(result.data, function (type) {
-                    return type.name === 'SERVER_DESKTOP_CAMERA';
-                });
-                desktopCameraTypeId = desktopCameraTypeId ? desktopCameraTypeId.id : null;
-                reloader();
-            });
-        }
-
         $scope.$watch('positionProvider.liveMode',function(mode){
             if(mode){
                 $scope.positionSelected = false;
             }
         });
-
-        $scope.$watch('searchCams',searchCams);
 
         $scope.$watch('activeCamera.status',function(status,oldStatus){
 
@@ -729,8 +378,18 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
         });
 
+        //timeFromUrl is used if we have a time from the url if not then set to false
+        var timeFromUrl = null;
+        $scope.$watch('activeCamera', function(){
+            $scope.storage.cameraId  = $scope.activeCamera.id || $scope.storage.cameraId;
+            $location.path('/view/' + $scope.activeCamera.id, false);
+            timeFromUrl = timeFromUrl || null;
+            $scope.updateCamera(timeFromUrl);
+            timeFromUrl = null;
+        });
+
         $scope.$watch('player', function(){
-            updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition)
+            updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
         },true);
 
         $scope.$watch('volumeLevel', function(){
@@ -762,13 +421,22 @@ angular.module('webadminApp').controller('ViewCtrl',
             $scope.canViewArchive = result.data.reply.isAdmin || (result.data.reply.permissions.indexOf(Config.globalViewArchivePermission)>=0);
 
             var userId = result.data.reply.id;
-
-            requestResourses(); //Show  whole tree
+            $scope.camerasProvider.requestResources().then(function(res){
+                $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);
+                $scope.camerasProvider.startPoll();
+            });
         });
 
         var killSubscription = $rootScope.$on('$routeChangeStart', function (event,next) {
-            $scope.selectCameraById(next.params.cameraId, $location.search().time || false);
+            timeFromUrl = $location.search().time;
+            $activeCamera = $scope.camerasProvider.getCamera(next.params.cameraId);
         });
+
+        $scope.$on( '$destroy', function() {
+            $scope.camerasProvider.stopPoll();
+            killSubscription();
+        });
+
 
 
 
@@ -778,9 +446,9 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         var $window = $(window);
         var $top = $('#top');
-        var $viewPanel = $('.view-panel');
-        var $camerasPanel = $('.cameras-panel');
         var updateHeights = function() {
+            var $viewPanel = $('.view-panel');
+            var $camerasPanel = $('.cameras-panel');
             var windowHeight = $window.height();
             var topHeight = $top.outerHeight();
 
@@ -803,8 +471,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
         };
 
-        updateHeights();
-        setTimeout(updateHeights,50);
+        setTimeout(updateHeights);
         $window.resize(updateHeights);
 
         $scope.mobileAppAlertClose = function(){
