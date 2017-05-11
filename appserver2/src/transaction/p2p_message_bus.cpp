@@ -33,7 +33,7 @@ namespace {
     int commitIntervalMs = 1000;
     static const int kMaxSelectDataSize = 1024 * 32;
 
-    static const int kOutConnectionsInterval = 1000 * 10;
+    static const int kOutConnectionsInterval = 1000;
 
     static const int kPeerRecordSize = 6;
     static const int kResolvePeerResponseRecordSize = 16 * 2 + 2; //< two guid + uncompressed PeerNumber per record
@@ -604,18 +604,21 @@ void P2pMessageBus::startStopConnections(const QMap<ApiPersistentIdData, P2pConn
 }
 
 P2pConnectionPtr P2pMessageBus::findBestConnectionToSubscribe(
-    const QVector<ApiPersistentIdData>& viaList) const
+    const QVector<ApiPersistentIdData>& viaList,
+    QMap<P2pConnectionPtr, int> newSubscriptions) const
 {
     P2pConnectionPtr result;
+    int minSubscriptions = std::numeric_limits<int>::max();
     for (const auto& via: viaList)
     {
         auto connection = findConnectionById(via);
         NX_ASSERT(connection);
         if (!connection)
             continue;
-        if (!result ||
-            connection->miscData().localSubscription.size() < result->miscData().localSubscription.size())
+        int subscriptions = connection->miscData().localSubscription.size() + newSubscriptions.value(connection);
+        if (subscriptions < minSubscriptions)
         {
+            minSubscriptions = subscriptions;
             result = connection;
         }
     }
@@ -631,6 +634,7 @@ void P2pMessageBus::doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr
     const bool needDelay = needSubscribeDelay();
 
     QMap<ApiPersistentIdData, P2pConnectionPtr> newSubscription = currentSubscription;
+    QMap<P2pConnectionPtr, int> tmpNewSubscription; //< this connections will get N new subscriptions soon
     const auto localPeer = this->localPeer();
     bool isUpdated = false;
 
@@ -686,7 +690,7 @@ void P2pMessageBus::doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr
                 continue;
             }
 
-            auto connection = findBestConnectionToSubscribe(viaList);
+            auto connection = findBestConnectionToSubscribe(viaList, tmpNewSubscription);
             if (subscribedVia)
             {
                 NX_LOG(QnLog::P2P_TRAN_LOG,
@@ -698,6 +702,7 @@ void P2pMessageBus::doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr
                     cl_logDEBUG1);
             }
             newSubscription[peer] = connection;
+            ++tmpNewSubscription[connection];
             isUpdated = true;
         }
     }

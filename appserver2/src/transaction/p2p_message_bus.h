@@ -115,7 +115,8 @@ private:
         const QVector<PeerNumberType>& shortValues,
         const QVector<qint32>& sequences);
     P2pConnectionPtr findBestConnectionToSubscribe(
-        const QVector<ApiPersistentIdData>& viaList) const;
+        const QVector<ApiPersistentIdData>& viaList,
+        QMap<P2pConnectionPtr, int> newSubscriptions) const;
 private:
     void doPeriodicTasks();
     void createOutgoingConnections(const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription);
