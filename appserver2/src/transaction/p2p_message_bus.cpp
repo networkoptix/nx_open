@@ -667,7 +667,7 @@ void P2pMessageBus::doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr
                     continue; //< allow only direct subscription if network configuration are still changing
                 if (subscribedVia &&
                     subscribedVia->miscData().lastTranListMsg.isValid() &&
-                    std::chrono::microseconds(subscribedVia->miscData().lastTranListMsg.elapsed()) < subscribeIntervalLow)
+                    std::chrono::milliseconds(subscribedVia->miscData().lastTranListMsg.elapsed()) < subscribeIntervalLow)
                 {
                     // Do not resubscribe while we are still getting data about that peer directly from via peer
                     continue;
