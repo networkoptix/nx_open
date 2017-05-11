@@ -140,6 +140,7 @@ private:
     QMap<ApiPersistentIdData, P2pConnectionPtr> getCurrentSubscription() const;
     void resubscribePeers(QMap<ApiPersistentIdData, P2pConnectionPtr> newSubscription);
     void startStopConnections(const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription);
+    bool hasStartingConnections() const;
     void doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription);
     P2pConnectionPtr findConnectionById(const ApiPersistentIdData& id) const;
 
@@ -189,7 +190,7 @@ public:
 
         qint32 minDistance(QVector<ApiPersistentIdData>* outViaList = nullptr) const;
         const RoutingInfo& routeVia() const { return m_routeVia; }
-        
+
         void remove(const ApiPersistentIdData& id)
         {
             m_routeVia.remove(id);
@@ -226,7 +227,7 @@ public:
     private:
         ApiPersistentIdData m_localPeer;
     };
-    
+
     int expectedConnections() const;
     bool needStartConnection(
         const ApiPersistentIdData& peer,

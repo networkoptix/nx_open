@@ -262,6 +262,9 @@ void P2pMessageBus::connectSignals(const P2pConnectionPtr& connection)
 
 void P2pMessageBus::createOutgoingConnections(const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription)
 {
+    if (hasStartingConnections())
+        return;
+
     if (m_outConnectionsTimer.isValid() && !m_outConnectionsTimer.hasExpired(kOutConnectionsInterval))
         return;
     m_outConnectionsTimer.restart();
@@ -339,7 +342,7 @@ QByteArray P2pMessageBus::serializePeersMessage(
 {
     QByteArray result;
     result.resize(qPower2Ceil(
-        unsigned(peers->allPeerDistances.size() * kPeerRecordSize + 1), 
+        unsigned(peers->allPeerDistances.size() * kPeerRecordSize + 1),
         4));
     BitStreamWriter writer;
     writer.setBuffer((quint8*) result.data(), result.size());
@@ -559,19 +562,26 @@ bool P2pMessageBus::needStartConnection(
         || (subscribedVia && subscribedVia->miscData().localSubscription.size() > m_miscData.maxSubscriptionToResubscribe);
 }
 
-void P2pMessageBus::startStopConnections(const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription)
+bool P2pMessageBus::hasStartingConnections() const
 {
-    const RouteToPeerMap& allPeerDistances = m_peers->allPeerDistances;
-
     for (const auto& connection : m_connections)
     {
         const auto& data = connection->miscData();
         if (data.isLocalStarted && data.remotePeersMessage.isEmpty())
         {
             auto& miscData = connection->miscData();
-            return;
+            return true;
         }
     }
+    return false;
+}
+
+void P2pMessageBus::startStopConnections(const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription)
+{
+    const RouteToPeerMap& allPeerDistances = m_peers->allPeerDistances;
+
+    if (hasStartingConnections())
+        return;
 
     // start using connection if need
     int maxStartsAtOnce = m_miscData.newConnectionsAtOnce;
@@ -615,6 +625,9 @@ P2pConnectionPtr P2pMessageBus::findBestConnectionToSubscribe(
 
 void P2pMessageBus::doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription)
 {
+    if (hasStartingConnections())
+        return;
+
     const bool needDelay = needSubscribeDelay();
 
     QMap<ApiPersistentIdData, P2pConnectionPtr> newSubscription = currentSubscription;
@@ -708,7 +721,7 @@ void P2pMessageBus::doPeriodicTasks()
 
     const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription = getCurrentSubscription();
     createOutgoingConnections(currentSubscription); //< open new connections
-    
+
     sendAlivePeersMessage();
     startStopConnections(currentSubscription);
     doSubscribe(currentSubscription);
@@ -1199,9 +1212,9 @@ bool P2pMessageBus::selectAndSendTransactions(
     }
     connection->miscData().remoteSubscription = newSubscription;
 
-#if 1
+#if 0
     if (!serializedTransactions.isEmpty() &&
-        connection->remotePeer().peerType == Qn::PT_Server && 
+        connection->remotePeer().peerType == Qn::PT_Server &&
         connection->remotePeer().dataFormat == Qn::UbjsonFormat)
     {
         QByteArray message;
