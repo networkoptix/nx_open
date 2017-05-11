@@ -39,7 +39,7 @@ public:
     QnLogMessage arg(const QSizeF& size) const;
     QnLogMessage arg(const QRect& rect) const;
     QnLogMessage arg(const QRectF& rect) const;
-
+    QnLogMessage arg(Qt::Edge edge) const;
 
     QnLogMessage arg(std::chrono::seconds a, int fieldWidth = 0, wchar_t fillChar = kSpace) const;
     QnLogMessage arg(std::chrono::milliseconds a, int fieldWidth = 0, wchar_t fillChar = kSpace) const;

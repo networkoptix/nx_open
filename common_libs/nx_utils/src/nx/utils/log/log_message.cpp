@@ -112,6 +112,24 @@ QnLogMessage QnLogMessage::arg(std::chrono::microseconds a, int fieldWidth, wcha
     return m_str.arg(QString::fromLatin1("%1usec").arg(a.count()), fieldWidth, fillChar);
 }
 
+QnLogMessage QnLogMessage::arg(Qt::Edge edge) const
+{
+    switch (edge)
+    {
+        case Qt::TopEdge:
+            return m_str.arg(QString::fromLatin1("TopEdge"));
+        case Qt::LeftEdge:
+            return m_str.arg(QString::fromLatin1("LeftEdge"));
+        case Qt::RightEdge:
+            return m_str.arg(QString::fromLatin1("RightEdge"));
+        case Qt::BottomEdge:
+            return m_str.arg(QString::fromLatin1("BottomEdge"));
+        default:
+            break;
+    }
+    return m_str.arg(QString::fromLatin1("Invalid edge %1").arg(edge));
+}
+
 QnLogMessage::operator QString() const
 {
     return m_str;
