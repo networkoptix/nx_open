@@ -33,7 +33,7 @@ namespace {
     int commitIntervalMs = 1000;
     static const int kMaxSelectDataSize = 1024 * 32;
 
-    static const int kOutConnectionsInterval = 1000 * 5;
+    static const int kOutConnectionsInterval = 1000 * 10;
 
     static const int kPeerRecordSize = 6;
     static const int kResolvePeerResponseRecordSize = 16 * 2 + 2; //< two guid + uncompressed PeerNumber per record
@@ -657,8 +657,18 @@ void P2pMessageBus::doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr
         qint32 minDistance = info.minDistance();
         if (minDistance < subscribedDistance)
         {
-            if (needDelay && minDistance > 1)
-                continue; //< allow only direct subscription if network configuration are still changing
+            if (minDistance > 1)
+            {
+                if (needDelay)
+                    continue; //< allow only direct subscription if network configuration are still changing
+                if (subscribedVia &&
+                    subscribedVia->miscData().lastTranListMsg.isValid() &&
+                    std::chrono::microseconds(subscribedVia->miscData().lastTranListMsg.elapsed()) < subscribeIntervalLow)
+                {
+                    // Do not resubscribe while we are still getting data about that peer directly from via peer
+                    continue;
+                }
+            }
             QVector<ApiPersistentIdData> viaList;
             info.minDistance(&viaList);
 
@@ -1212,7 +1222,7 @@ bool P2pMessageBus::selectAndSendTransactions(
     }
     connection->miscData().remoteSubscription = newSubscription;
 
-#if 0
+#if 1
     if (!serializedTransactions.isEmpty() &&
         connection->remotePeer().peerType == Qn::PT_Server &&
         connection->remotePeer().dataFormat == Qn::UbjsonFormat)
@@ -1394,6 +1404,7 @@ struct GotTransactionFuction
 
 bool P2pMessageBus::handlePushTransactionList(const P2pConnectionPtr& connection, const QByteArray& tranList)
 {
+    connection->miscData().lastTranListMsg.restart();
     BitStreamReader reader((const quint8*) tranList.data(), tranList.size());
     try
     {

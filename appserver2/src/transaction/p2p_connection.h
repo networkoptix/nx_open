@@ -85,6 +85,7 @@ public:
         MiscData()
         {
             localPeersTimer.invalidate();
+            lastTranListMsg.invalidate();
         }
 
         // to local part
@@ -99,6 +100,7 @@ public:
         QnTranState remoteSubscription; //< remote -> local subscription
         bool selectingDataInProgress = false;
         bool isRemoteStarted = false; //< remote peer has open logical connection to us
+        QElapsedTimer lastTranListMsg;
 
         QElapsedTimer sendStartTimer;
         QElapsedTimer lifetimeTimer;
