@@ -18,10 +18,12 @@ namespace nx {
 namespace network {
 namespace server {
 
-template<class ConnectionType>
+template<class _ConnectionType>
 class StreamConnectionHolder
 {
 public:
+    using ConnectionType = _ConnectionType;
+
     virtual ~StreamConnectionHolder() = default;
 
     virtual void closeConnection(
