@@ -51,8 +51,8 @@ void ListenResponse::serializeAttributes(nx::stun::Message* const message)
         message->newAttribute<TcpKeepAlive>(tcpConnectionKeepAlive->toString().toUtf8());
 
     message->addAttribute(attrs::cloudConnectOptions, (int) cloudConnectOptions);
-    if (trafficRelayEndpoint)
-        message->newAttribute<attrs::TrafficRelayEndpoint>(std::move(*trafficRelayEndpoint));
+    if (trafficRelayUrl)
+        message->newAttribute<attrs::TrafficRelayUrl>(std::move(*trafficRelayUrl));
 }
 
 bool ListenResponse::parseAttributes(const nx::stun::Message& message)
@@ -71,9 +71,9 @@ bool ListenResponse::parseAttributes(const nx::stun::Message& message)
     if (!readEnumAttributeValue(message, attrs::cloudConnectOptions, &cloudConnectOptions))
         cloudConnectOptions = emptyCloudConnectOptions;
 
-    SocketAddress trafficRelayEndpointLocal;
-    if (readAttributeValue<attrs::TrafficRelayEndpoint>(message, &trafficRelayEndpointLocal))
-        trafficRelayEndpoint = std::move(trafficRelayEndpointLocal);
+    nx::String trafficRelayEndpointLocal;
+    if (readStringAttributeValue<attrs::TrafficRelayUrl>(message, &trafficRelayEndpointLocal))
+        trafficRelayUrl = std::move(trafficRelayEndpointLocal);
 
     return true;
 }

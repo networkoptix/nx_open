@@ -147,7 +147,7 @@ bool TestHttpServer::registerRedirectHandler(
 // class RandomlyFailingHttpConnection
 
 RandomlyFailingHttpConnection::RandomlyFailingHttpConnection(
-    StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
+    nx::network::server::StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
     std::unique_ptr<AbstractStreamSocket> sock)
     :
     BaseType(socketServer, std::move(sock)),
@@ -200,7 +200,7 @@ RandomlyFailingHttpServer::RandomlyFailingHttpServer(
     bool sslRequired,
     nx::network::NatTraversalSupport natTraversalSupport)
     :
-    BaseType(sslRequired, natTraversalSupport)
+    base_type(sslRequired, natTraversalSupport)
 {
 }
 

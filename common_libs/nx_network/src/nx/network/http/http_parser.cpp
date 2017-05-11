@@ -12,19 +12,19 @@ void MessageParser::setMessage(Message* const msg)
     m_msg = msg;
 }
 
-nx_api::ParserState MessageParser::parse(const nx::Buffer& buf, size_t* bytesProcessed)
+nx::network::server::ParserState MessageParser::parse(const nx::Buffer& buf, size_t* bytesProcessed)
 {
     if (buf.isEmpty())
     {
         if (m_httpStreamReader.state() != HttpStreamReader::readingMessageBody)
-            return nx_api::ParserState::inProgress;
+            return nx::network::server::ParserState::inProgress;
         m_httpStreamReader.forceEndOfMsgBody();
         *m_msg = m_httpStreamReader.takeMessage();
-        return nx_api::ParserState::done;
+        return nx::network::server::ParserState::done;
     }
 
     if (!m_httpStreamReader.parseBytes(buf, nx_http::BufferNpos, bytesProcessed))
-        return nx_api::ParserState::failed;
+        return nx::network::server::ParserState::failed;
 
     switch (m_httpStreamReader.state())
     {
@@ -38,13 +38,13 @@ nx_api::ParserState MessageParser::parse(const nx::Buffer& buf, size_t* bytesPro
                 m_msg->request->messageBody = m_httpStreamReader.fetchMessageBody();
             else if (m_msg->type == MessageType::response)
                 m_msg->response->messageBody = m_httpStreamReader.fetchMessageBody();
-            return nx_api::ParserState::done;
+            return nx::network::server::ParserState::done;
 
         case HttpStreamReader::parseError:
-            return nx_api::ParserState::failed;
+            return nx::network::server::ParserState::failed;
 
         default:
-            return nx_api::ParserState::inProgress;
+            return nx::network::server::ParserState::inProgress;
     }
 }
 

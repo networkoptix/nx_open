@@ -87,7 +87,7 @@ struct GetIteratorType<const Container>
 } // namespace detail
 
 template<typename AssociativeContainer>
-typename detail::GetIteratorType<AssociativeContainer>::type findAnyElementWithPrefix(
+typename detail::GetIteratorType<AssociativeContainer>::type findFirstElementWithPrefix(
     AssociativeContainer& associativeContainer,
     const typename AssociativeContainer::key_type& prefix)
 {

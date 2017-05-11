@@ -116,7 +116,7 @@ enum AttributeType
     tcpReverseEndpointList,
     isPersistent,
     isListening,
-    trafficRelayEndpoint,
+    trafficRelayUrl,
 
     udpHolePunchingResultCode = stun::attrs::userDefined + 0x400,
     rendezvousConnectTimeout,
@@ -250,11 +250,11 @@ struct NX_NETWORK_API UdtHpEndpointList : EndpointList
         : EndpointList( TYPE, endpoints ) {}
 };
 
-struct NX_NETWORK_API TrafficRelayEndpoint: Endpoint
+struct NX_NETWORK_API TrafficRelayUrl: BaseStringAttribute
 {
-    static const AttributeType TYPE = trafficRelayEndpoint;
-    TrafficRelayEndpoint( const SocketAddress& endpoint )
-        : Endpoint( TYPE, endpoint ) {}
+    static const AttributeType TYPE = trafficRelayUrl;
+    TrafficRelayUrl(const String& value)
+        : BaseStringAttribute( TYPE, value) {}
 };
 
 struct NX_NETWORK_API TcpReverseEndpointList : EndpointList

@@ -1020,7 +1020,10 @@ void AsyncClient::composeRequest(const nx_http::StringType& httpMethod)
     }
     else    //if no proxy specified then erasing http://host:port from request url
     {
-        m_request.requestLine.url = m_contentLocationUrl.path();
+        if (httpMethod == nx_http::Method::OPTIONS && m_contentLocationUrl.path().isEmpty())
+            m_request.requestLine.url = "*";
+        else
+            m_request.requestLine.url = m_contentLocationUrl.path();
         m_request.requestLine.url.setQuery(m_contentLocationUrl.query());
         m_request.requestLine.url.setFragment(m_contentLocationUrl.fragment());
     }

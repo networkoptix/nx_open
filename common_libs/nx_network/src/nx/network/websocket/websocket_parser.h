@@ -59,12 +59,12 @@ private:
     BufferedState bufferDataIfNeeded(const char* data, int len, int neededLen);
 
 private:
+    Role m_role = Role::undefined;
     ParserHandler* m_handler;
     nx::Buffer m_buf;
     ParseState m_state = ParseState::readingHeaderFixedPart;
     int m_pos = 0;
     int m_payloadLen = 0;
-    Role m_role = Role::undefined;
 
     int m_headerExtLen;
     FrameType m_opCode;

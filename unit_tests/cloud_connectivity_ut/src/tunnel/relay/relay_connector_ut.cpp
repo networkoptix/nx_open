@@ -6,7 +6,7 @@
 #include <nx/utils/std/future.h>
 
 #include "client_to_relay_connection.h"
-#include "cloud_relay_fixture_base.h"
+#include "cloud_relay_basic_fixture.h"
 
 namespace nx {
 namespace network {
@@ -18,7 +18,7 @@ namespace test {
 // Test fixture.
 
 class CloudRelayConnector:
-    public CloudRelayFixtureBase
+    public BasicFixture
 {
 public:
     CloudRelayConnector():

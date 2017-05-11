@@ -73,7 +73,7 @@ ConnectingPeer::ConnectingPeer():
 Settings::Settings():
     base_type(
         QnAppInfo::organizationNameForSettings(),
-        TrafficRelayAppInfo::applicationName(),
+        AppInfo::applicationName(),
         kModuleName)
 {
 }

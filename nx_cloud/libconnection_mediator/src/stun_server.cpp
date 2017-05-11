@@ -10,11 +10,11 @@ namespace hpm {
 
 StunServer::StunServer(const conf::Settings& settings):
     m_settings(settings),
-    m_tcpStunServer(std::make_unique<MultiAddressServer<stun::SocketServer>>(
+    m_tcpStunServer(std::make_unique<nx::network::server::MultiAddressServer<stun::SocketServer>>(
         &m_stunMessageDispatcher,
         false,
         nx::network::NatTraversalSupport::disabled)),
-    m_udpStunServer(std::make_unique<MultiAddressServer<stun::UdpServer>>(
+    m_udpStunServer(std::make_unique<nx::network::server::MultiAddressServer<stun::UdpServer>>(
         &m_stunMessageDispatcher))
 {
 }

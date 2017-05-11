@@ -54,7 +54,7 @@ public:
     std::list<SocketAddress> forwardedTcpEndpointList;
     std::list<SocketAddress> udpEndpointList;
     /** Optional for backward compatibility. */
-    boost::optional<SocketAddress> trafficRelayEndpoint;
+    boost::optional<nx::String> trafficRelayUrl;
     ConnectionParameters params;
     CloudConnectVersion cloudConnectVersion;
 

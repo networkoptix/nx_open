@@ -1,8 +1,11 @@
 #pragma once
 
 #include <memory>
+#include <QtCore>
+#include <nx/utils/log/log.h>
 #include <nx/network/aio/abstract_async_channel.h>
 #include <nx/network/connection_server/base_server_connection.h>
+#include <nx/network/aio/timer.h>
 #include <nx/network/buffer.h>
 #include "websocket_parser.h"
 #include "websocket_serializer.h"
@@ -15,10 +18,11 @@ namespace network {
 namespace websocket {
 
 class NX_NETWORK_API WebSocket :
+    public QObject,
     public aio::AbstractAsyncChannel,
-    private nx_api::BaseServerConnectionHandler,
+    private nx::network::server::BaseServerConnectionHandler,
     private websocket::ParserHandler,
-    private StreamConnectionHolder<nx_api::BaseServerConnectionWrapper>
+    private nx::network::server::StreamConnectionHolder<nx::network::server::BaseServerConnectionWrapper>
 {
     friend struct BaseServerConnectionAccess;
 
@@ -38,11 +42,12 @@ class NX_NETWORK_API WebSocket :
         WriteData() {}
     };
 
+    Q_OBJECT
+
 public:
 
     WebSocket(
         std::unique_ptr<AbstractStreamSocket> streamSocket,
-        const nx::Buffer& requestData,
         SendMode sendMode = SendMode::singleMessage,
         ReceiveMode receiveMode = ReceiveMode::message,
         Role role = Role::undefined); /**< if role is undefined, payload won't be masked (unmasked) */
@@ -57,9 +62,17 @@ public:
      * Indicates that the next sendAsync will close current message
      */
     void setIsLastFrame();
-
-    // TODO: implement
     void sendCloseAsync(); /**< Send close frame */
+    void setPingTimeout(std::chrono::milliseconds timeout);
+
+signals:
+    /**
+     * Connection is not usable after this signal is emitted.
+     */
+    void connectionClosed();
+    void pingReceived();
+    void pongReceived();
+
 
 private:
     /**  BaseServerConnectionHandler implementation */
@@ -72,6 +85,8 @@ private:
         ConnectionType* connection) override;
 
 
+    virtual void stopWhileInAioThread() override;
+
     /** Parser handler implementation */
     virtual void frameStarted(FrameType type, bool fin) override;
     virtual void framePayload(const char* data, int len) override;
@@ -83,10 +98,13 @@ private:
     void handleRead();
     bool isDataFrame() const;
     void sendPreparedMessage(nx::Buffer* buffer, int writeSize, HandlerType handler);
+    void sendControlResponse(FrameType requestType, FrameType responseType);
+    void sendControlRequest(FrameType type);
     void readWithoutAddingToQueue();
+    void handlePingTimer();
 
 private:
-    nx_api::BaseServerConnectionWrapper m_baseConnection;
+    std::unique_ptr<nx::network::server::BaseServerConnectionWrapper> m_baseConnection;
     Parser m_parser;
     Serializer m_serializer;
     SendMode m_sendMode;
@@ -95,14 +113,17 @@ private:
     bool m_isFirstFrame;
     HandlerQueue<WriteData> m_writeQueue;
     HandlerQueue<nx::Buffer*> m_readQueue;
-    websocket::MultiBuffer m_buffer;
-
-    virtual void stopWhileInAioThread() override;
+    websocket::MultiBuffer m_userDataBuffer;
+    nx::Buffer m_controlBuffer;
+    std::unique_ptr<nx::network::aio::Timer> m_pingTimer;
+    bool m_terminating;
+    std::chrono::milliseconds m_pingTimeout;
 };
 
 } // namespace websocket
 
+using websocket::WebSocket;
+using WebSocketPtr = std::shared_ptr<WebSocket>;
+
 } // namespace network
 } // namespace nx
-
-using WebSocketPtr = std::shared_ptr<nx::network::websocket::WebSocket>;

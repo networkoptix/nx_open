@@ -36,7 +36,7 @@ static int fillHeader(char* data, bool fin, int opCode, int payloadLenType, int 
     }
     else if (payloadLenType == 127)
     {
-        *reinterpret_cast<uint64_t*>(pdata) = htonll(payloadLen);
+        *reinterpret_cast<uint64_t*>(pdata) = htonll((int64_t)payloadLen);
         pdata += 8;
     }
 

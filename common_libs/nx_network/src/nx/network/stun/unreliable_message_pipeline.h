@@ -172,7 +172,7 @@ public:
         messageSerializer.setMessage(&message);
         size_t bytesWritten = 0;
         if (messageSerializer.serialize(&serializedMessage, &bytesWritten) != 
-            nx_api::SerializerState::done)
+            nx::network::server::SerializerState::done)
         {
             NX_ASSERT(false);
         }
@@ -195,7 +195,7 @@ private:
         size_t bytesParsed = 0;
         MessageType msg;
         m_messageParser.setMessage(&msg);
-        if (m_messageParser.parse(datagram, &bytesParsed) == nx_api::ParserState::done)
+        if (m_messageParser.parse(datagram, &bytesParsed) == nx::network::server::ParserState::done)
         {
             m_customPipeline->messageReceived(
                 std::move(sourceAddress),
