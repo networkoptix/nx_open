@@ -55,6 +55,8 @@ const char* toString(MessageType value)
         return "subscribeForDataUpdates";
     case MessageType::pushTransactionData:
         return "pushTransactionData";
+    case MessageType::pushTransactionList:
+        return "pushTransactionList";
     default:
         return "Unknown";
     }
@@ -444,6 +446,7 @@ bool P2pConnection::remotePeerSubscribedTo(const ApiPersistentIdData& peer) cons
 
 bool P2pConnection::updateSequence(const QnAbstractTransaction& tran)
 {
+    NX_ASSERT(!m_miscData.selectingDataInProgress);
     const ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
     auto itr = m_miscData.remoteSubscription.values.find(peerId);
     if (itr == m_miscData.remoteSubscription.values.end())

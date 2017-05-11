@@ -23,20 +23,17 @@ PeerNumberType PeerNumberInfo::encode(
     return shortNumber;
 }
 
-void serializeCompressPeerNumber(BitStreamWriter& writer, PeerNumberType peerNumber)
+template <std::size_t N>
+void serializeCompressedValue(BitStreamWriter& writer, quint32 value, const std::array<int, N>& bitsGroups)
 {
-    const static std::array<int, 3> bitsGroups = { 7, 3, 4 };
-    const static int mask = 0x3fff;  //< only low 14 bits are supported
-    NX_ASSERT(peerNumber <= mask);
-    peerNumber &= mask;
     for (int i = 0; i < bitsGroups.size(); ++i)
     {
-        writer.putBits(bitsGroups[i], peerNumber);
+        writer.putBits(bitsGroups[i], value);
         if (i == bitsGroups.size() - 1)
             break; //< 16 bits written
 
-        peerNumber >>= bitsGroups[i];
-        if (peerNumber == 0)
+        value >>= bitsGroups[i];
+        if (value == 0)
         {
             writer.putBit(0); //< end of number
             break;
@@ -45,19 +42,43 @@ void serializeCompressPeerNumber(BitStreamWriter& writer, PeerNumberType peerNum
     }
 }
 
-PeerNumberType deserializeCompressPeerNumber(BitStreamReader& reader)
+template <std::size_t N>
+quint32 deserializeCompressedValue(BitStreamReader& reader, const std::array<int, N>& bitsGroups)
 {
-    const static std::array<int, 3> bitsGroups = { 7, 3, 4 };
-    PeerNumberType peerNumber = 0;
+    quint32 value = 0;
     int shift = 0;
     for (int i = 0; i < bitsGroups.size(); ++i)
     {
-        peerNumber += (reader.getBits(bitsGroups[i]) << shift);
+        value += (reader.getBits(bitsGroups[i]) << shift);
         if (i == bitsGroups.size() - 1 || reader.getBit() == 0)
             break;
         shift += bitsGroups[i];
     }
-    return peerNumber;
+    return value;
+}
+
+const static std::array<int, 3> peerNumberbitsGroups = { 7, 3, 4 };
+
+void serializeCompressPeerNumber(BitStreamWriter& writer, PeerNumberType peerNumber)
+{
+    serializeCompressedValue(writer, peerNumber, peerNumberbitsGroups);
+}
+
+PeerNumberType deserializeCompressPeerNumber(BitStreamReader& reader)
+{
+    return deserializeCompressedValue(reader, peerNumberbitsGroups);
+}
+
+const static std::array<int, 4> compressedSizebitsGroups = { 7, 7, 7, 8 };
+
+void serializeCompressedSize(BitStreamWriter& writer, quint32 peerNumber)
+{
+    serializeCompressedValue(writer, peerNumber, compressedSizebitsGroups);
+}
+
+quint32 deserializeCompressedSize(BitStreamReader& reader)
+{
+    return deserializeCompressedValue(reader, compressedSizebitsGroups);
 }
 
 } // namespace ec2

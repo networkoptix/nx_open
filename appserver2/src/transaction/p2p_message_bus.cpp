@@ -859,6 +859,9 @@ void P2pMessageBus::at_gotMessage(
     case MessageType::pushTransactionData:
         result = handlePushTransactionData(connection, payload);
         break;
+    case MessageType::pushTransactionList:
+        result = handlePushTransactionList(connection, payload);
+        break;
     default:
         NX_ASSERT(0, lm("Unknown message type").arg((int)messageType));
         break;
@@ -1196,6 +1199,31 @@ bool P2pMessageBus::selectAndSendTransactions(
     }
     connection->miscData().remoteSubscription = newSubscription;
 
+#if 1
+    if (!serializedTransactions.isEmpty() &&
+        connection->remotePeer().peerType == Qn::PT_Server && 
+        connection->remotePeer().dataFormat == Qn::UbjsonFormat)
+    {
+        QByteArray message;
+        unsigned expectedSize = 1 + 4 * serializedTransactions.size();
+        for (const auto& serializedTran: serializedTransactions)
+            expectedSize += serializedTran.size();
+        message.resize(qPower2Ceil(expectedSize, 4));
+        BitStreamWriter writer;
+        writer.setBuffer((quint8*) message.data(), message.size());
+        writer.putBits(8, (quint8) MessageType::pushTransactionList);
+        for (const auto& serializedTran: serializedTransactions)
+        {
+            serializeCompressedSize(writer, serializedTran.size());
+            writer.putBytes((quint8*) serializedTran.data(), serializedTran.size());
+        }
+        writer.flushBits(true);
+        message.truncate(writer.getBytesCount());
+        connection->sendMessage(message);
+        return true;
+    }
+#endif
+
     using namespace std::placeholders;
     for (const auto& serializedTran: serializedTransactions)
     {
@@ -1350,6 +1378,27 @@ struct GotTransactionFuction
     }
 };
 
+
+bool P2pMessageBus::handlePushTransactionList(const P2pConnectionPtr& connection, const QByteArray& tranList)
+{
+    BitStreamReader reader((const quint8*) tranList.data(), tranList.size());
+    try
+    {
+        while (reader.bitsLeft() > 0)
+        {
+            quint32 size = deserializeCompressedSize(reader);
+            int offset = reader.getBitsCount() / 8;
+            if (!handlePushTransactionData(connection, QByteArray::fromRawData(tranList.data() + offset, size)))
+                return false;
+            reader.skipBytes(size);
+        }
+        return true;
+    }
+    catch (...)
+    {
+        return false;
+    }
+}
 
 bool P2pMessageBus::handlePushTransactionData(const P2pConnectionPtr& connection, const QByteArray& serializedTran)
 {

@@ -164,6 +164,22 @@ public:
         }
         m_totalBits -= num;
     }
+    inline void skipBytes(unsigned num)
+    {
+        if (m_totalBits < num * 8)
+            THROW_BITSTREAM_ERR;
+        while (m_bitLeft > 0 && num > 0)
+        {
+            skipBits(8);
+            --num;
+        }
+        unsigned worldsToSkip = num >> 2;
+        m_buffer += worldsToSkip;
+        m_totalBits -= worldsToSkip * 32;
+        num &= 3;
+        skipBits(num * 8);
+    }
+
     inline void skipBit()
     {
         if (m_totalBits < 1)
@@ -226,6 +242,34 @@ public:
             m_curVal = value & m_masks[m_bitWrited];
         }
         m_totalBits -= num;
+    }
+
+    void putBytes(quint8* data, unsigned size)
+    {
+        if (m_totalBits < size)
+            THROW_BITSTREAM_ERR;
+        while (m_bitWrited > 0 && size > 0)
+        {
+            putBits(8, *data++);
+            --size;
+        }
+
+        int copySize = size & ~3; //< flor to 4
+        if (copySize > 0)
+        {
+            memcpy(m_buffer, data, copySize);
+            m_buffer += copySize / 4;
+            data += copySize;
+            size -= copySize;
+            m_totalBits -= copySize * 8;
+
+        }
+
+        while (size > 0)
+        {
+            putBits(8, *data++);
+            --size;
+        }
     }
 
     inline void putBit(unsigned value)

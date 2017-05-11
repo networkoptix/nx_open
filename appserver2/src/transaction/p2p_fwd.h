@@ -14,6 +14,7 @@ enum class MessageType
     alivePeers,
     subscribeForDataUpdates,
     pushTransactionData,
+    pushTransactionList, //< for UbJson format only
 
     counter
 };
@@ -48,5 +49,7 @@ Q_DECLARE_METATYPE(MessageType)
 void serializeCompressPeerNumber(BitStreamWriter& writer, PeerNumberType peerNumber);
 PeerNumberType deserializeCompressPeerNumber(BitStreamReader& reader);
 
+void serializeCompressedSize(BitStreamWriter& writer, quint32 peerNumber);
+quint32 deserializeCompressedSize(BitStreamReader& reader);
 
 } // namespace ec2

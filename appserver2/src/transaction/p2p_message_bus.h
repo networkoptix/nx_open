@@ -148,6 +148,7 @@ private:
     bool handlePeersMessage(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handleSubscribeForDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handlePushTransactionData(const P2pConnectionPtr& connection, const QByteArray& data);
+    bool handlePushTransactionList(const P2pConnectionPtr& connection, const QByteArray& tranList);
 
     friend struct GotTransactionFuction;
 
