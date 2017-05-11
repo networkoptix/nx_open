@@ -15,8 +15,10 @@ namespace media {
 namespace {
 
 static constexpr const char* OUTPUT_PREFIX = "ProxyVideoDecoder<gl>: ";
-static constexpr bool USE_SHARED_CTX = true;
 
+/**
+ * Experimental implementation. On banana pi, works slowly, probably due to memory bandwidth.
+ */
 class Impl: public ProxyVideoDecoderImpl
 {
 public:
@@ -34,16 +36,16 @@ public:
         OUTPUT << "~Impl() BEGIN";
         if (m_threadGlCtx)
         {
-            GL_GET_FUNCS(m_threadGlCtx.get());
+            NX_GL_GET_FUNCS(m_threadGlCtx.get());
             if (m_program)
             {
-                GL(m_yTex.release());
-                GL(m_yTex.destroy());
-                GL(m_uTex.release());
-                GL(m_uTex.destroy());
-                GL(m_vTex.release());
-                GL(m_vTex.destroy());
-                GL(m_program->release());
+                NX_GL(m_yTex.release());
+                NX_GL(m_yTex.destroy());
+                NX_GL(m_uTex.release());
+                NX_GL(m_uTex.destroy());
+                NX_GL(m_vTex.release());
+                NX_GL(m_vTex.destroy());
+                NX_GL(m_program->release());
                 m_program.reset(nullptr);
                 m_fboManager.reset(nullptr);
             }
@@ -116,7 +118,7 @@ public:
 
     virtual QVariant handle() const override
     {
-        GL_GET_FUNCS(QOpenGLContext::currentContext());
+        NX_GL_GET_FUNCS(QOpenGLContext::currentContext());
         checkGlError(funcs, "in handle()");
 
         if (!m_fbo)
@@ -146,17 +148,17 @@ void Impl::createGlResources()
             NX_CRITICAL(sharedContext);
 
             m_threadGlCtx.reset(new QOpenGLContext());
-            GL_GET_FUNCS(m_threadGlCtx.get());
-            GL(m_threadGlCtx->setShareContext(sharedContext));
-            GL(m_threadGlCtx->setFormat(sharedContext->format()));
+            NX_GL_GET_FUNCS(m_threadGlCtx.get());
+            NX_GL(m_threadGlCtx->setShareContext(sharedContext));
+            NX_GL(m_threadGlCtx->setFormat(sharedContext->format()));
 
-            GL_CHECK(m_threadGlCtx->create());
-            GL_CHECK(m_threadGlCtx->shareContext());
+            NX_GL_CHECK(m_threadGlCtx->create());
+            NX_GL_CHECK(m_threadGlCtx->shareContext());
             PRINT << "Using shared openGL ctx";
             m_offscreenSurface.reset(new QOffscreenSurface());
-            GL(m_offscreenSurface->setFormat(m_threadGlCtx->format()));
-            GL(m_offscreenSurface->create());
-            GL_CHECK(m_threadGlCtx->makeCurrent(m_offscreenSurface.get()));
+            NX_GL(m_offscreenSurface->setFormat(m_threadGlCtx->format()));
+            NX_GL(m_offscreenSurface->create());
+            NX_GL_CHECK(m_threadGlCtx->makeCurrent(m_offscreenSurface.get()));
         }
     }
 
@@ -165,12 +167,12 @@ void Impl::createGlResources()
 
     if (!m_program)
     {
-        GL_GET_FUNCS(QOpenGLContext::currentContext())
+        NX_GL_GET_FUNCS(QOpenGLContext::currentContext())
 #if 1 // all program
         m_program.reset(new QOpenGLShaderProgram());
 
         auto vertexShader = new QOpenGLShader(QOpenGLShader::Vertex, m_program.get());
-        GL_CHECK(vertexShader->compileSourceCode(
+        NX_GL_CHECK(vertexShader->compileSourceCode(
             "attribute mediump vec4 vertexCoordsArray; \n"
             "varying   mediump vec2 textureCoords; \n"
             "void main(void) \n"
@@ -178,11 +180,11 @@ void Impl::createGlResources()
             "    gl_Position = vertexCoordsArray; \n"
             "    textureCoords = ((vertexCoordsArray + vec4(1.0, 1.0, 0.0, 0.0)) * 0.5).xy; \n"
             "}\n"));
-        GL_DUMP(vertexShader);
-        GL(m_program->addShader(vertexShader));
+        NX_GL_DUMP(vertexShader);
+        NX_GL(m_program->addShader(vertexShader));
 
         auto fragmentShader = new QOpenGLShader(QOpenGLShader::Fragment, m_program.get());
-        GL_CHECK(fragmentShader->compileSourceCode(
+        NX_GL_CHECK(fragmentShader->compileSourceCode(
             "varying mediump vec2 textureCoords; \n"
 #if 1
             "uniform sampler2D yTexture; \n"
@@ -228,29 +230,29 @@ void Impl::createGlResources()
             "         1.0) * colorTransform; \n"
 #endif // 1
             "} \n"));
-        GL_DUMP(fragmentShader);
-        GL(m_program->addShader(fragmentShader));
+        NX_GL_DUMP(fragmentShader);
+        NX_GL(m_program->addShader(fragmentShader));
 
-        GL(m_program->bindAttributeLocation("vertexCoordsArray", 0));
-        GL(m_program->link());
-        GL_DUMP(m_program);
+        NX_GL(m_program->bindAttributeLocation("vertexCoordsArray", 0));
+        NX_GL(m_program->link());
+        NX_GL_DUMP(m_program);
 
 #endif // 1 // all program
 
-        GL(m_yTex.setFormat(QOpenGLTexture::LuminanceFormat));
-        GL(m_yTex.setSize(frameSize().width(), frameSize().height()));
-        GL(m_yTex.allocateStorage(QOpenGLTexture::Luminance, QOpenGLTexture::UInt8));
-        GL(m_yTex.setMinMagFilters(QOpenGLTexture::Nearest, QOpenGLTexture::Nearest));
+        NX_GL(m_yTex.setFormat(QOpenGLTexture::LuminanceFormat));
+        NX_GL(m_yTex.setSize(frameSize().width(), frameSize().height()));
+        NX_GL(m_yTex.allocateStorage(QOpenGLTexture::Luminance, QOpenGLTexture::UInt8));
+        NX_GL(m_yTex.setMinMagFilters(QOpenGLTexture::Nearest, QOpenGLTexture::Nearest));
 
-        GL(m_uTex.setFormat(QOpenGLTexture::LuminanceFormat));
-        GL(m_uTex.setSize(frameSize().width() / 2, frameSize().height() / 2));
-        GL(m_uTex.allocateStorage(QOpenGLTexture::Luminance, QOpenGLTexture::UInt8));
-        GL(m_uTex.setMinMagFilters(QOpenGLTexture::Nearest, QOpenGLTexture::Nearest));
+        NX_GL(m_uTex.setFormat(QOpenGLTexture::LuminanceFormat));
+        NX_GL(m_uTex.setSize(frameSize().width() / 2, frameSize().height() / 2));
+        NX_GL(m_uTex.allocateStorage(QOpenGLTexture::Luminance, QOpenGLTexture::UInt8));
+        NX_GL(m_uTex.setMinMagFilters(QOpenGLTexture::Nearest, QOpenGLTexture::Nearest));
 
-        GL(m_vTex.setFormat(QOpenGLTexture::LuminanceFormat));
-        GL(m_vTex.setSize(frameSize().width() / 2, frameSize().height() / 2));
-        GL(m_vTex.allocateStorage(QOpenGLTexture::Luminance, QOpenGLTexture::UInt8));
-        GL(m_vTex.setMinMagFilters(QOpenGLTexture::Nearest, QOpenGLTexture::Nearest));
+        NX_GL(m_vTex.setFormat(QOpenGLTexture::LuminanceFormat));
+        NX_GL(m_vTex.setSize(frameSize().width() / 2, frameSize().height() / 2));
+        NX_GL(m_vTex.allocateStorage(QOpenGLTexture::Luminance, QOpenGLTexture::UInt8));
+        NX_GL(m_vTex.setMinMagFilters(QOpenGLTexture::Nearest, QOpenGLTexture::Nearest));
     }
 }
 
@@ -260,7 +262,7 @@ void Impl::renderYuvBufferToFbo(const YuvBuffer* yuvBuffer, FboPtr* outFbo)
 
     NX_TIMER_CREATE("renderYuvBufferToFbo");
 
-    GL_GET_FUNCS(QOpenGLContext::currentContext());
+    NX_GL_GET_FUNCS(QOpenGLContext::currentContext());
 
     NX_CRITICAL(outFbo);
     *outFbo = m_fboManager->getFbo();
@@ -269,8 +271,8 @@ void Impl::renderYuvBufferToFbo(const YuvBuffer* yuvBuffer, FboPtr* outFbo)
     // OLD: Measured time (Full-HDs frame): YUV: 155 ms; Y-only: 120 ms; Y memcpy: 2 ms (!!!).
 #if 0
     NX_TIME_BEGIN(flush_finish);
-    GL(funcs->glFlush());
-    GL(funcs->glFinish());
+    NX_GL(funcs->glFlush());
+    NX_GL(funcs->glFinish());
     NX_TIME_END(flush_finish);
 #endif // 0
 
@@ -278,18 +280,18 @@ void Impl::renderYuvBufferToFbo(const YuvBuffer* yuvBuffer, FboPtr* outFbo)
 
     NX_TIME_BEGIN(renderYuvBufferToFbo_setData);
 #if 0 // NO_QT
-    GL(funcs->glBindTexture(GL_TEXTURE_2D, (*outFbo)->texture()));
-    GL(funcs->glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE,
+    NX_GL(funcs->glBindTexture(GL_TEXTURE_2D, (*outFbo)->texture()));
+    NX_GL(funcs->glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE,
         yuvBuffer->frameSize().width(), yuvBuffer->frameSize().height(), 0,
         GL_LUMINANCE, GL_UNSIGNED_BYTE, yuvBuffer->y()));
 #else // 0 // NO_QT
 #if 1
-    GL(m_yTex.setData(QOpenGLTexture::Luminance, QOpenGLTexture::UInt8, yuvBuffer->y()));
-    GL(m_uTex.setData(QOpenGLTexture::Luminance, QOpenGLTexture::UInt8, yuvBuffer->u()));
-    GL(m_vTex.setData(QOpenGLTexture::Luminance, QOpenGLTexture::UInt8, yuvBuffer->v()));
+    NX_GL(m_yTex.setData(QOpenGLTexture::Luminance, QOpenGLTexture::UInt8, yuvBuffer->y()));
+    NX_GL(m_uTex.setData(QOpenGLTexture::Luminance, QOpenGLTexture::UInt8, yuvBuffer->u()));
+    NX_GL(m_vTex.setData(QOpenGLTexture::Luminance, QOpenGLTexture::UInt8, yuvBuffer->v()));
     //TIME_BEGIN(renderYuvBufferToFbo_setData_Flush_Finish);
-    //    GL(funcs->glFlush());
-    //    GL(funcs->glFinish());
+    //NX_GL(funcs->glFlush());
+    //NX_GL(funcs->glFinish());
     //TIME_END(renderYuvBufferToFbo_setData_Flush_Finish);
 #endif // 1
 #endif // 0 NO_QT
@@ -305,57 +307,58 @@ void Impl::renderYuvBufferToFbo(const YuvBuffer* yuvBuffer, FboPtr* outFbo)
     GLboolean depthTestEnabled;
     GLboolean scissorTestEnabled;
     GLboolean blendEnabled;
-    GL(glGetBooleanv(GL_STENCIL_TEST, &stencilTestEnabled));
-    GL(glGetBooleanv(GL_DEPTH_TEST, &depthTestEnabled));
-    GL(glGetBooleanv(GL_SCISSOR_TEST, &scissorTestEnabled));
-    GL(glGetBooleanv(GL_BLEND, &blendEnabled));
+    NX_GL(glGetBooleanv(GL_STENCIL_TEST, &stencilTestEnabled));
+    NX_GL(glGetBooleanv(GL_DEPTH_TEST, &depthTestEnabled));
+    NX_GL(glGetBooleanv(GL_SCISSOR_TEST, &scissorTestEnabled));
+    NX_GL(glGetBooleanv(GL_BLEND, &blendEnabled));
     if (stencilTestEnabled)
-        GL(glDisable(GL_STENCIL_TEST));
+        NX_GL(glDisable(GL_STENCIL_TEST));
     if (depthTestEnabled)
-        GL(glDisable(GL_DEPTH_TEST));
+        NX_GL(glDisable(GL_DEPTH_TEST));
     if (scissorTestEnabled)
-        GL(glDisable(GL_SCISSOR_TEST));
+        NX_GL(glDisable(GL_SCISSOR_TEST));
     if (blendEnabled)
-        GL(glDisable(GL_BLEND));
+        NX_GL(glDisable(GL_BLEND));
 #endif // 1
 
 #if 1
     GLint prevFbo = 0;
-    GL(funcs->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prevFbo));
-    GL((*outFbo)->bind());
+    NX_GL(funcs->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prevFbo));
+    NX_GL((*outFbo)->bind());
     checkGlFramebufferStatus();
 #endif // 1
 
     GLint prevTexUnit = 0;
-    GL(funcs->glGetIntegerv(GL_ACTIVE_TEXTURE, &prevTexUnit));
-    GL(m_yTex.bind(0));
-    GL(m_uTex.bind(1));
-    GL(m_vTex.bind(2));
+    NX_GL(funcs->glGetIntegerv(GL_ACTIVE_TEXTURE, &prevTexUnit));
+    NX_GL(m_yTex.bind(0));
+    NX_GL(m_uTex.bind(1));
+    NX_GL(m_vTex.bind(2));
 
     GLvoid* prevPtr;
     glGetVertexAttribPointerv(0, GL_VERTEX_ATTRIB_ARRAY_POINTER, &prevPtr);
 
     GLint prevType, prevStride, prevEnabled, prevVbo, prevArraySize, prevNorm;
-    GL(funcs->glGetVertexAttribiv(0, GL_VERTEX_ATTRIB_ARRAY_TYPE, &prevType));
-    GL(funcs->glGetVertexAttribiv(0, GL_VERTEX_ATTRIB_ARRAY_STRIDE, &prevStride));
-    GL(funcs->glGetVertexAttribiv(0, GL_VERTEX_ATTRIB_ARRAY_ENABLED, &prevEnabled));
-    GL(funcs->glGetVertexAttribiv(0, GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING, &prevVbo));
-    GL(funcs->glGetVertexAttribiv(0, GL_VERTEX_ATTRIB_ARRAY_SIZE, &prevArraySize));
-    GL(funcs->glGetVertexAttribiv(0, GL_VERTEX_ATTRIB_ARRAY_NORMALIZED, &prevNorm));
+    NX_GL(funcs->glGetVertexAttribiv(0, GL_VERTEX_ATTRIB_ARRAY_TYPE, &prevType));
+    NX_GL(funcs->glGetVertexAttribiv(0, GL_VERTEX_ATTRIB_ARRAY_STRIDE, &prevStride));
+    NX_GL(funcs->glGetVertexAttribiv(0, GL_VERTEX_ATTRIB_ARRAY_ENABLED, &prevEnabled));
+    NX_GL(funcs->glGetVertexAttribiv(0, GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING, &prevVbo));
+    NX_GL(funcs->glGetVertexAttribiv(0, GL_VERTEX_ATTRIB_ARRAY_SIZE, &prevArraySize));
+    NX_GL(funcs->glGetVertexAttribiv(0, GL_VERTEX_ATTRIB_ARRAY_NORMALIZED, &prevNorm));
 
     GLint prevProgram = 0;
-    GL(funcs->glGetIntegerv(GL_CURRENT_PROGRAM, &prevProgram));
-    GL(m_program->bind());
+    NX_GL(funcs->glGetIntegerv(GL_CURRENT_PROGRAM, &prevProgram));
+    NX_GL(m_program->bind());
 #if 1
-    GL(m_program->setUniformValue("yTexture", 0));
-    GL(m_program->setUniformValue("uTexture", 1));
-    GL(m_program->setUniformValue("vTexture", 2));
+    NX_GL(m_program->setUniformValue("yTexture", 0));
+    NX_GL(m_program->setUniformValue("uTexture", 1));
+    NX_GL(m_program->setUniformValue("vTexture", 2));
 #endif // 1
-    GL(m_program->enableAttributeArray(0));
+    NX_GL(m_program->enableAttributeArray(0));
 
     GLint prevViewport[4];
-    GL(funcs->glGetIntegerv(GL_VIEWPORT, prevViewport));
-    GL(funcs->glViewport(0, 0, yuvBuffer->frameSize().width(), yuvBuffer->frameSize().height()));
+    NX_GL(funcs->glGetIntegerv(GL_VIEWPORT, prevViewport));
+    NX_GL(funcs->glViewport(
+        0, 0, yuvBuffer->frameSize().width(), yuvBuffer->frameSize().height()));
 
     static const GLfloat g_vertex_data[] =
     {
@@ -365,47 +368,47 @@ void Impl::renderYuvBufferToFbo(const YuvBuffer* yuvBuffer, FboPtr* outFbo)
         -1.f, -1.f
     };
 
-    GL(funcs->glBindBuffer(GL_ARRAY_BUFFER, 0));
-    GL(funcs->glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, g_vertex_data));
+    NX_GL(funcs->glBindBuffer(GL_ARRAY_BUFFER, 0));
+    NX_GL(funcs->glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, g_vertex_data));
 
     // Perform actual YUV->RGB transformation.
 #if 1
-    GL(funcs->glDrawArrays(GL_TRIANGLE_FAN, 0, 4));
+    NX_GL(funcs->glDrawArrays(GL_TRIANGLE_FAN, 0, 4));
 #endif // 1
-    GL(funcs->glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]));
+    NX_GL(funcs->glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]));
 
-    GL(m_program->disableAttributeArray(0));
-    GL(funcs->glUseProgram(prevProgram));
+    NX_GL(m_program->disableAttributeArray(0));
+    NX_GL(funcs->glUseProgram(prevProgram));
 
-    GL(m_vTex.release(2));
-    GL(m_uTex.release(1));
-    GL(m_yTex.release(0));
-    GL(funcs->glActiveTexture(prevTexUnit));
+    NX_GL(m_vTex.release(2));
+    NX_GL(m_uTex.release(1));
+    NX_GL(m_yTex.release(0));
+    NX_GL(funcs->glActiveTexture(prevTexUnit));
 
-    GL(funcs->glBindBuffer(GL_ARRAY_BUFFER, prevVbo));
+    NX_GL(funcs->glBindBuffer(GL_ARRAY_BUFFER, prevVbo));
 
-    GL(funcs->glVertexAttribPointer(0, prevArraySize, prevType, prevNorm, prevStride, prevPtr));
+    NX_GL(funcs->glVertexAttribPointer(0, prevArraySize, prevType, prevNorm, prevStride, prevPtr));
     if (prevEnabled)
-        GL(funcs->glEnableVertexAttribArray(0));
+        NX_GL(funcs->glEnableVertexAttribArray(0));
 
 #if 1
-    GL(funcs->glBindFramebuffer(GL_FRAMEBUFFER, prevFbo)); // sets both READ and DRAW
+    NX_GL(funcs->glBindFramebuffer(GL_FRAMEBUFFER, prevFbo)); // sets both READ and DRAW
     checkGlFramebufferStatus();
 #endif // 1
 
-    //GL(glFlush());
-    //GL(glFinish());
+    //NX_GL(glFlush());
+    //NX_GL(glFinish());
 
     // restore render states
 #if 1
     if (stencilTestEnabled)
-        GL(glEnable(GL_STENCIL_TEST));
+        NX_GL(glEnable(GL_STENCIL_TEST));
     if (depthTestEnabled)
-        GL(glEnable(GL_DEPTH_TEST));
+        NX_GL(glEnable(GL_DEPTH_TEST));
     if (scissorTestEnabled)
-        GL(glEnable(GL_SCISSOR_TEST));
+        NX_GL(glEnable(GL_SCISSOR_TEST));
     if (blendEnabled)
-        GL(glEnable(GL_BLEND));
+        NX_GL(glEnable(GL_BLEND));
 #endif // 1
 
     NX_TIMER_MARK("t3");

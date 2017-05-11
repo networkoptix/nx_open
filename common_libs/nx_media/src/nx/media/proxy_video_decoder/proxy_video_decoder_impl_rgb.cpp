@@ -3,15 +3,16 @@
 
 #include <nx/utils/debug_utils.h>
 
+#include <nx/media/aligned_mem_video_buffer.h>
+
 #include "proxy_video_decoder_utils.h"
-#include "aligned_mem_video_buffer.h"
 
 namespace nx {
 namespace media {
 
 namespace {
 
-static constexpr const char* OUTPUT_PREFIX = "ProxyVideoDecoder<stub>: ";
+static constexpr const char* OUTPUT_PREFIX = "ProxyVideoDecoder<rgb>: ";
 
 class Impl: public ProxyVideoDecoderImpl
 {
@@ -27,10 +28,6 @@ int Impl::decode(
     const QnConstCompressedVideoDataPtr& compressedVideoData,
     QVideoFramePtr* outDecodedFrame)
 {
-    Q_UNUSED(compressedVideoData);
-
-    static int frameNumber = 0;
-
     NX_CRITICAL(outDecodedFrame);
 
     const int alignedWidth = qPower2Ceil(
@@ -38,34 +35,36 @@ int Impl::decode(
     const int numBytes = avpicture_get_size(AV_PIX_FMT_BGRA, alignedWidth, frameSize().height());
     const int argbLineSize = alignedWidth * 4;
 
-    if (compressedVideoData)
+    auto videoBuffer = new AlignedMemVideoBuffer(numBytes, kMediaAlignment, argbLineSize);
+    uchar* const argbBuffer = videoBuffer->map(QAbstractVideoBuffer::WriteOnly, nullptr, nullptr);
+
+    auto compressedFrame = createUniqueCompressedFrame(compressedVideoData);
+    int64_t ptsUs = 0;
+    NX_TIME_BEGIN(decodeToRgb);
+    // Perform actual decoding to AlignedMemVideoBuffer.
+    int result = proxyDecoder().decodeToRgb(compressedFrame.get(), &ptsUs, argbBuffer, argbLineSize);
+    NX_TIME_END(decodeToRgb);
+    videoBuffer->unmap();
+
+    if (result > 0)
     {
-        auto videoBuffer = new AlignedMemVideoBuffer(numBytes, kMediaAlignment, argbLineSize);
-
-        uchar* const argbBuffer =
-            videoBuffer->map(QAbstractVideoBuffer::WriteOnly, nullptr, nullptr);
-
-        debugDrawCheckerboardArgb(
-            argbBuffer, argbLineSize, frameSize().width(), frameSize().height());
-
-        videoBuffer->unmap();
-
-        setQVideoFrame(outDecodedFrame, videoBuffer, QVideoFrame::Format_RGB32,
-            compressedVideoData->timestamp);
-
-        return ++frameNumber;
+        setQVideoFrame(outDecodedFrame, videoBuffer, QVideoFrame::Format_ARGB32, ptsUs);
     }
     else
     {
-        return 0;
+        // Error or no frame (buffering).
+        delete videoBuffer;
+        outDecodedFrame->reset();
     }
+
+    return result;
 }
 
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
 
-ProxyVideoDecoderImpl* ProxyVideoDecoderImpl::createImplStub(const Params& params)
+ProxyVideoDecoderImpl* ProxyVideoDecoderImpl::createImplRgb(const Params& params)
 {
     PRINT << "Using this impl";
     return new Impl(params);
