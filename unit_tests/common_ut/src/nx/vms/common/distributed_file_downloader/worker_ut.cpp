@@ -27,6 +27,8 @@ class TestWorker: public Worker
 public:
     using Worker::Worker;
     using Worker::selectPeersForOperation;
+    using Worker::increasePeerRank;
+    using Worker::decreasePeerRank;
 
     virtual void waitForNextStep(int delay) override
     {
@@ -158,7 +160,7 @@ protected:
     Peer* defaultPeer = nullptr;
 };
 
-TEST_F(DistributedFileDownloaderWorkerTest, simplePeerSelection)
+TEST_F(DistributedFileDownloaderWorkerTest, simplePeersSelection)
 {
     constexpr int kPeersPerOperation = 5;
     defaultPeer->worker->setPeersPerOperation(kPeersPerOperation);
@@ -203,24 +205,24 @@ TEST_F(DistributedFileDownloaderWorkerTest, preferredPeersSelection)
 
     defaultPeer->worker->setPreferredPeers(preferredPeers);
 
-    for (int i = 0; i < 5; ++i)
+    for (int i = 0; i < 20; ++i)
     {
         auto peers = defaultPeer->worker->selectPeersForOperation();
         ASSERT_TRUE(peers.contains(preferredPeers.first()));
     }
 }
 
-TEST_F(DistributedFileDownloaderWorkerTest, neighbourPeersSelection)
+TEST_F(DistributedFileDownloaderWorkerTest, closestGuidPeersSelection)
 {
     for (int i = 0; i < 100; ++i)
-        commonPeerManager->addPeer(QnUuid::createUuid());
+        commonPeerManager->addPeer();
 
     auto peers = defaultPeer->peerManager->getAllPeers();
-    peers.append(defaultPeer->peerManager->selfId());
-
     std::sort(peers.begin(), peers.end());
 
-    const int selfPos = peers.indexOf(defaultPeer->peerManager->selfId());
+    const int selfPos = std::distance(
+        peers.begin(),
+        std::lower_bound(peers.begin(), peers.end(), defaultPeer->peerManager->selfId()));
 
     const int maxDistance = (defaultPeer->worker->peersPerOperation() + 1) / 2;
 
@@ -232,9 +234,17 @@ TEST_F(DistributedFileDownloaderWorkerTest, neighbourPeersSelection)
             return std::min(dist, peers.size() - dist);
         };
 
+    for (const auto& peer: peers)
+        defaultPeer->worker->increasePeerRank(peer);
+
     const auto& selectedPeers = defaultPeer->worker->selectPeersForOperation();
+    int closestGuidPeersCount = 0;
     for (const auto& peerId: selectedPeers)
-        ASSERT_LE(distance(peerId), maxDistance);
+    {
+        if (distance(peerId) <= maxDistance)
+            ++closestGuidPeersCount;
+    }
+    ASSERT_GE(closestGuidPeersCount, selectedPeers.size() - 1);
 }
 
 TEST_F(DistributedFileDownloaderWorkerTest, requestingFileInfo)

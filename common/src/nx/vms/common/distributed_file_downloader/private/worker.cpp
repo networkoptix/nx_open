@@ -18,13 +18,73 @@ using namespace std::chrono;
 constexpr int kDefaultPeersPerOperation = 5;
 constexpr int kStartDelayMs = milliseconds(seconds(1)).count();
 constexpr int kDefaultStepDelayMs = milliseconds(minutes(1)).count();
-constexpr int kMaxAutoRank = 4;
-constexpr int kMinAutoRank = -1;
+constexpr int kMaxAutoRank = 5;
+constexpr int kMinAutoRank = 0;
 constexpr int kDefaultRank = 0;
 
 QString statusString(bool success)
 {
     return success ? lit("OK") : lit("FAIL");
+}
+
+QList<QnUuid> takeClosestGuidPeers(QList<QnUuid>& peers, int count, const QnUuid& selfId)
+{
+    QList<QnUuid> result;
+
+    const int size = peers.size();
+
+    if (size <= count)
+    {
+        result = peers;
+        peers.clear();
+        return result;
+    }
+
+    const int currentIndex = std::distance(
+        peers.begin(), std::lower_bound(peers.begin(), peers.end(), selfId));
+
+    const int firstIndex = currentIndex - (count + 1) / 2;
+    const int lastIndex = firstIndex + count - 1;
+
+    QVector<int> indexesToTake;
+    indexesToTake.reserve(count);
+
+    for (int i = firstIndex; i <= lastIndex; ++i)
+    {
+        int index = i;
+
+        if (index < 0)
+            index += size;
+        else if (index >= size)
+            index -= size;
+
+        indexesToTake.append(index);
+    }
+    std::sort(indexesToTake.begin(), indexesToTake.end());
+
+    while (!indexesToTake.isEmpty())
+        result.append(peers.takeAt(indexesToTake.takeLast()));
+
+    return result;
+}
+
+QList<QnUuid> takeRandomPeers(QList<QnUuid>& peers, int count)
+{
+    QList<QnUuid> result;
+
+    const int size = peers.size();
+
+    if (size <= count)
+    {
+        result = peers;
+        peers.clear();
+        return result;
+    }
+
+    for (int i = 0; i < count; ++i)
+        result.append(peers.takeAt(rand() % peers.size()));
+
+    return result;
 }
 
 } // namespace
@@ -618,9 +678,17 @@ QList<QnUuid> Worker::allPeersWithInternetConnection() const
     return result;
 }
 
-QList<QnUuid> Worker::selectPeersForOperation(int count, const QList<QnUuid>& referencePeers)
+QList<QnUuid> Worker::selectPeersForOperation(
+    int count, const QList<QnUuid>& referencePeers) const
 {
     QList<QnUuid> result;
+
+    auto exitLogGuard = QnRaiiGuard::createDestructible(
+        [this, &result]
+        {
+            if (result.isEmpty())
+                NX_LOGX(logMessage("No peers selected."), cl_logDEBUG2);
+        });
 
     auto peers = referencePeers.isEmpty() ? allPeers() : referencePeers;
     if (count <= 0)
@@ -629,16 +697,96 @@ QList<QnUuid> Worker::selectPeersForOperation(int count, const QList<QnUuid>& re
     if (peers.size() <= count)
     {
         result = peers;
-    }
-    else
-    {
-        // TODO: #dklychkov Implement intelligent server selection.
-        for (int i = 0; i < count; ++i)
-            result.append(peers.takeAt(rand() % peers.size()));
+        return result;
     }
 
-    if (result.isEmpty())
-        NX_LOGX(logMessage("No peers selected."), cl_logDEBUG2);
+    struct ScoredPeer
+    {
+        QnUuid peerId;
+        int score;
+    };
+
+    QList<ScoredPeer> scoredPeers;
+
+    constexpr int kBigDistance = 8;
+
+    for (const auto& peerId: peers)
+    {
+        const int rank = m_peerInfoById.value(peerId).rank;
+        const int distance = m_peerManager->distanceTo(peerId);
+
+        const int score = std::max(0, kBigDistance - distance) + rank * 2;
+        if (score == 0)
+            continue;
+
+        scoredPeers.append(ScoredPeer{peerId, score});
+    }
+
+    std::sort(scoredPeers.begin(), scoredPeers.end(),
+        [](const ScoredPeer& left, const ScoredPeer& right)
+        {
+            return left.score < right.score;
+        });
+
+    /* The result should contain:
+       1) One of the closest-guid peers: thus every server will try to use its
+          guid neighbours which should lead to more uniform peers load in flat networks.
+       2) At least one random peer which wasn't selected in the main selection: this is to avoid
+          overloading peers which started file downloading and obviously contain chunks
+          while other do not yet.
+       3) The rest is the most scored peers having the closest guids.
+
+       (1) and (2) are additionalPeers, so additionalPeers = 2.
+       If there're not enought high-score peers then the result should contain
+       random peers instead of them.
+    */
+
+    int additionalPeers = 2;
+    const int highestScorePeersNeeded = count > additionalPeers
+        ? count - additionalPeers
+        : 1;
+
+    QList<QnUuid> highestScorePeers;
+
+    constexpr int kScoreThreshold = 3;
+    int previousScore = 0;
+    while (highestScorePeers.size() < highestScorePeersNeeded && !scoredPeers.isEmpty())
+    {
+        const int currentScore = scoredPeers.last().score;
+        if (currentScore < previousScore && previousScore - currentScore > kScoreThreshold)
+            break;
+
+        while (!scoredPeers.isEmpty() && scoredPeers.last().score == currentScore)
+        {
+            const auto peerId = scoredPeers.takeLast().peerId;
+            peers.removeOne(peerId);
+            highestScorePeers.prepend(peerId);
+        }
+
+        previousScore = currentScore;
+    }
+
+    const auto selfId = m_peerManager->selfId();
+
+    // Take (3) highest-score peers.
+    std::sort(highestScorePeers.begin(), highestScorePeers.end());
+    result = takeClosestGuidPeers(highestScorePeers, highestScorePeersNeeded, selfId);
+
+    if (result.size() == count)
+        return result;
+
+    additionalPeers = count - result.size();
+
+    peers += highestScorePeers;
+    std::sort(peers.begin(), peers.end());
+
+    // Take (1) one closest-guid peer.
+    result += takeClosestGuidPeers(peers, 1, selfId);
+    --additionalPeers;
+
+    // Take (2) random peers.
+    while (additionalPeers-- > 0)
+        result += takeRandomPeers(peers, 1);
 
     return result;
 }
@@ -693,6 +841,16 @@ void Worker::waitForNextStep(int delay)
         nextStep();
     else
         m_stepDelayTimer->start(delay);
+}
+
+void Worker::increasePeerRank(const QnUuid& peerId, int value)
+{
+    m_peerInfoById[peerId].increaseRank(value);
+}
+
+void Worker::decreasePeerRank(const QnUuid& peerId, int value)
+{
+    m_peerInfoById[peerId].decreaseRank(value);
 }
 
 void Worker::PeerInformation::increaseRank(int value)

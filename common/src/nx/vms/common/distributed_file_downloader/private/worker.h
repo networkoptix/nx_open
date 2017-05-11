@@ -99,10 +99,13 @@ protected:
     QList<QnUuid> allPeers() const;
     QList<QnUuid> allPeersWithInternetConnection() const;
     QList<QnUuid> selectPeersForOperation(
-        int count = -1, const QList<QnUuid>& referencePeers = QList<QnUuid>());
+        int count = -1, const QList<QnUuid>& referencePeers = QList<QnUuid>()) const;
     int selectNextChunk() const;
 
     virtual void waitForNextStep(int delay = -1);
+
+    void increasePeerRank(const QnUuid& peerId, int value = 1);
+    void decreasePeerRank(const QnUuid& peerId, int value = 1);
 
 private:
     Storage* m_storage;
