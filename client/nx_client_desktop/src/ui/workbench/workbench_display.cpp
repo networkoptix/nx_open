@@ -1487,11 +1487,6 @@ QRectF QnWorkbenchDisplay::itemGeometry(QnWorkbenchItem *item, QRectF *enclosing
     return geometry;
 }
 
-QRectF QnWorkbenchDisplay::layoutBoundingGeometry() const
-{
-    return fitInViewGeometry();
-}
-
 QRectF QnWorkbenchDisplay::fitInViewGeometry() const
 {
     QRect layoutBoundingRect = workbench()->currentLayout()->boundingRect();
@@ -1503,6 +1498,15 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const
     QRect sceneBoundingRect = (backgroundBoundingRect.isNull())
         ? layoutBoundingRect
         : layoutBoundingRect.united(backgroundBoundingRect);
+
+    static const int kLayoutTourMinimalSize = 3; //< size in cells: 3*3
+    if (workbench()->currentLayout()->data().contains(Qn::LayoutTourUuidRole))
+    {
+        if (sceneBoundingRect.width() < kLayoutTourMinimalSize)
+            sceneBoundingRect.setWidth(kLayoutTourMinimalSize);
+        if (sceneBoundingRect.height() < kLayoutTourMinimalSize)
+            sceneBoundingRect.setHeight(kLayoutTourMinimalSize);
+    }
 
     /* Do not add additional spacing in following cases: */
     bool noAdjust = qnRuntime->isVideoWallMode()                           /*< Videowall client. */
@@ -1711,12 +1715,16 @@ void QnWorkbenchDisplay::synchronizeSceneBounds()
     }
     else
     {
-        moveRect = layoutBoundingGeometry();
+        moveRect = fitInViewGeometry();
         sizeRect = fitInViewGeometry();
     }
 
     m_boundingInstrument->setPositionBounds(m_view, moveRect);
-    m_boundingInstrument->setSizeBounds(m_view, qnGlobals->viewportLowerSizeBound(), Qt::KeepAspectRatioByExpanding, sizeRect.size(), Qt::KeepAspectRatioByExpanding);
+    m_boundingInstrument->setSizeBounds(m_view,
+        qnGlobals->viewportLowerSizeBound(),
+        Qt::KeepAspectRatioByExpanding,
+        sizeRect.size(),
+        Qt::KeepAspectRatioByExpanding);
 }
 
 void QnWorkbenchDisplay::synchronizeSceneBoundsExtension()

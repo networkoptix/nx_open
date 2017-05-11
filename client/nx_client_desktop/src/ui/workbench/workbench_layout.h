@@ -25,12 +25,15 @@ enum class QnLayoutFlag
 {
     Empty               = 0x00,
     NoDrop              = 0x01,
-    NoZoom              = 0x02,
+    FixedViewport       = 0x02, //< Disallow to zoom and hand scroll
     NoMove              = 0x04,
-    NoTimeline          = 0x08,
-    SpecialBackground   = 0x10
+    NoResize            = 0x08,
+    NoTimeline          = 0x10,
+    SpecialBackground   = 0x20,
 };
 Q_DECLARE_FLAGS(QnLayoutFlags, QnLayoutFlag)
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnLayoutFlags)
+Q_DECLARE_METATYPE(QnLayoutFlags)
 
 /**
  * Layout of a workbench.
