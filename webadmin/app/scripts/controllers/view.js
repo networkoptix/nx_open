@@ -100,6 +100,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 return true;
             });
             $scope.hasMobileApp = !!found;
+            $scope.toggleCameraPanel = true;
 
         }
 
@@ -342,6 +343,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
         };
         $scope.selectCamera = function (activeCamera) {
+            $scope.toggleCameraPanel = false;
             $location.path('/view/' + activeCamera.id, false);
             $scope.selectCameraById(activeCamera.id,false);
         };

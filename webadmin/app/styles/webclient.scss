@@ -109,10 +109,14 @@ table.webclient-window>tbody>tr>td.alert{
   background: linear-gradient(to top, rgba($dark1, 0), rgba($dark1, 0.3)); /*Standard*/
 }
 
+.back-button{
+  display: none;
+}
+
 .video-name{
   line-height: 24px !important;
   color: $light1;
-  text-shadow: 0px 1px 3px 0px rgba($dark1,1)
+  text-shadow: 0px 1px 3px rgba($dark1,1)
 }
 
 .video-status{
@@ -776,6 +780,16 @@ div.text-center{
   }
   .visible-mobile{
     display: block;
+  }
+  .mobile-camera-panel{
+    width: 100% !important;
+  }
+  .back-button{
+    vertical-align: top;
+    display: inline-block;
+  }
+  .pull-left-5{
+    margin-right: 5px;
   }
 }
 
