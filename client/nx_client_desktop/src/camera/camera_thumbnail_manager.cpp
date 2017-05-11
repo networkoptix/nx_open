@@ -199,7 +199,7 @@ Qn::ThumbnailStatus QnCameraThumbnailManager::statusForCamera(
     if (!camera)
         return Qn::ThumbnailStatus::Invalid;
 
-    auto iter = m_thumbnailByCamera.constFind(camera);
+    const auto iter = m_thumbnailByCamera.constFind(camera);
     if (iter == m_thumbnailByCamera.cend())
         return Qn::ThumbnailStatus::Invalid;
 
@@ -211,7 +211,7 @@ bool QnCameraThumbnailManager::hasThumbnailForCamera(const QnVirtualCameraResour
     if (!camera)
         return false;
 
-    auto iter = m_thumbnailByCamera.constFind(camera);
+    const auto iter = m_thumbnailByCamera.constFind(camera);
     if (iter == m_thumbnailByCamera.cend())
         return false;
 
@@ -224,7 +224,7 @@ QImage QnCameraThumbnailManager::thumbnailForCamera(const QnVirtualCameraResourc
     if (!camera)
         return QImage();
 
-    auto iter = m_thumbnailByCamera.constFind(camera);
+    const auto iter = m_thumbnailByCamera.constFind(camera);
     if (iter == m_thumbnailByCamera.cend())
         return QImage();
 
