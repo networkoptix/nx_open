@@ -9,6 +9,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include "aio/basic_pollable.h"
+#include "socket_global.h"
 
 namespace nx {
 namespace network {
@@ -70,6 +71,17 @@ public:
     ReverseConnectionAcceptor(ConnectionFactoryFunc connectionFactory):
         m_connectionFactory(std::move(connectionFactory))
     {
+        bindToAioThread(getAioThread());
+    }
+
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
+    {
+        base_type::bindToAioThread(aioThread);
+
+        for (auto& connectionContext: m_connections)
+            connectionContext.connection->bindToAioThread(aioThread);
+        for (auto& connection: m_acceptedConnections)
+            connection->bindToAioThread(aioThread);
     }
 
     void setPreemptiveConnectionCount(std::size_t count)
@@ -113,11 +125,7 @@ public:
                     return;
 
                 startAcceptingAnotherConnectionIfAppropriate();
-
-                nx::utils::swapAndCall(
-                    m_acceptHandler,
-                    SystemError::noError,
-                    std::move(connectionToReturn));
+                provideConnectionToTheCaller(std::move(connectionToReturn));
             });
     }
 
@@ -282,12 +290,7 @@ private:
         }
 
         if (connectionToReturn)
-        {
-            nx::utils::swapAndCall(
-                m_acceptHandler,
-                SystemError::noError,
-                std::move(connectionToReturn));
-        }
+            provideConnectionToTheCaller(std::move(connectionToReturn));
     }
 
     std::unique_ptr<AcceptableReverseConnection> takeNextAcceptedConnection()
@@ -310,6 +313,17 @@ private:
             if (connectedConnectionIter != m_connections.end())
                 startAccepting(connectedConnectionIter);
         }
+    }
+
+    void provideConnectionToTheCaller(
+        std::unique_ptr<AcceptableReverseConnection> connection)
+    {
+        connection->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
+
+        nx::utils::swapAndCall(
+            m_acceptHandler,
+            SystemError::noError,
+            std::move(connection));
     }
 
     typename Connections::iterator getAnyConnectedConnection()
