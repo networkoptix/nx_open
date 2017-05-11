@@ -22,10 +22,9 @@ angular.module('cloudApp')
             this.mediaserver = mediaserver(systemId);
             this.updateSystemState();
         }
-
-        system.prototype.updateSystemAuth = function(){
+        system.prototype.updateSystemAuth = function(force){
             var self = this;
-            if(self.auth){ //no need to update
+            if(!force && self.auth){ //no need to update
                 return;
             }
             return cloudApi.getSystemAuth(self.id).then(function(data){
@@ -332,7 +331,7 @@ angular.module('cloudApp')
             }); // Anyway - send another request to cloud_db to remove myself
         }
 
-        system.prototype.update = function(){
+        system.prototype.update = function(secondAttempt){
             var self = this;
             self.infoPromise = null; //Clear cache
             return self.getInfo().then(function(){
@@ -347,6 +346,29 @@ angular.module('cloudApp')
                     }
                 }
                 return self;
+            },function(error){
+                if(secondAttempt){
+                    // Something strange is happening here - pass it to controller
+                    return $q.reject(error);
+                }
+                if(error.status === 403 || error.status === 401) {
+                    // Some options here:
+                    // * Access was revoked
+                    // * System was disconnected from cloud
+                    // * Password was changed
+                    // * Nonce expired
+
+                    // We double-check nonce by trying to auth on the server again
+                    // Other cases are not distinguishable - so we just pass the error further
+
+                    return self.updateSystemAuth(true).then(function(){
+                        // Ok, just continue our data request
+                         return self.update(true);
+                    },function(){
+                        // We failed - let controller handle this situation
+                        return $q.reject(error);
+                    });
+                }
             });
         }
 
