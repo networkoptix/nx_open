@@ -249,8 +249,7 @@ void P2pConnectionProcessor::run()
     socket->setNoDelay(true);
 
     WebSocketPtr webSocket(new websocket::WebSocket(
-        std::move(socket),
-        d->request.messageBody));
+        std::move(socket)));
 
     P2pConnectionPtr connection(new P2pConnection(
         commonModule,

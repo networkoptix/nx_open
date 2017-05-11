@@ -103,7 +103,7 @@ P2pConnection::P2pConnection(
     const ApiPeerDataEx& remotePeer,
     const ApiPeerDataEx& localPeer,
     ConnectionLockGuard connectionLockGuard,
-    const WebSocketPtr& webSocket)
+    const nx::network::WebSocketPtr& webSocket)
 :
     QnCommonModuleAware(commonModule),
     m_remotePeer(remotePeer),
@@ -279,7 +279,8 @@ void P2pConnection::onHttpClientDone()
         lit("QnTransactionTransportBase::at_httpClientDone. state = %1").
         arg((int)m_httpClient->state()), cl_logDEBUG2);
 
-    m_webSocket.reset(new websocket::WebSocket(std::move(socket), nx::Buffer()));
+    using namespace nx::network;
+    m_webSocket.reset(new websocket::WebSocket(std::move(socket)));
     m_httpClient.reset();
     m_miscData.lifetimeTimer.restart();
     setState(State::Connected);

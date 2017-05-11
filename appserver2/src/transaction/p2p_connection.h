@@ -56,7 +56,7 @@ public:
         const ApiPeerDataEx& remotePeer,
         const ApiPeerDataEx& localPeer,
         ConnectionLockGuard connectionLockGuard,
-        const WebSocketPtr& webSocket);
+        const nx::network::WebSocketPtr& webSocket);
     virtual ~P2pConnection();
 
     static const SendCounters& sendCounters() { return m_sendCounters;  }
@@ -144,7 +144,7 @@ private:
     QByteArray m_readBuffer;
 
     std::unique_ptr<nx_http::AsyncClient> m_httpClient;
-    WebSocketPtr m_webSocket;
+    nx::network::WebSocketPtr m_webSocket;
 
     State m_state = State::Connecting;
     CredentialsSource m_credentialsSource = CredentialsSource::serverKey;
