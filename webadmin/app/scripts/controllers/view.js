@@ -205,7 +205,6 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
 
             position = position?parseInt(position):oldTimePosition;
-            blockTimeUrl = false;
             if ($scope.activeCamera) {
                 $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId], timeCorrection);
                 $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640, timeCorrection);
@@ -364,13 +363,17 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
         });
 
-        var blockTimeUrl = false;
+        //timeFromUrl is used if we have a time from the url if not then set to false
+        var timeFromUrl = null;
         $scope.$watch('activeCamera', function(){
             $scope.storage.cameraId  = $scope.activeCamera.id || $scope.storage.cameraId;
             $location.path('/view/' + $scope.activeCamera.id, false);
-            if(!blockTimeUrl){
-                $scope.updateCamera(false);
+            if(!timeFromUrl)
+            {
+                timeFromUrl = false;
             }
+            $scope.updateCamera(timeFromUrl);
+            timeFromUrl = null;
         });
 
         $scope.$watch('player', function(){
@@ -412,9 +415,8 @@ angular.module('webadminApp').controller('ViewCtrl',
         });
 
         var killSubscription = $rootScope.$on('$routeChangeStart', function (event,next) {
-            blockTimeUrl = true;
+            timeFromUrl = $location.search().time;
             $activeCamera = $scope.camerasProvider.getCamera(next.params.cameraId);
-            $scope.updateCamera($location.search().time || false);
         });
 
         $scope.$on( '$destroy', function() {
