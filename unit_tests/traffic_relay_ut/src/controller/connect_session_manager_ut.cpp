@@ -2,6 +2,7 @@
 
 #include <boost/algorithm/string/predicate.hpp>
 
+#include <nx/network/aio/async_channel_adapter.h>
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/network/socket_delegate.h>
 #include <nx/network/system_socket.h>
@@ -41,10 +42,22 @@ public:
         AbstractStreamSocket* serverConnection,
         const std::string& listeningPeerName) const
     {
+        using AdapterType = 
+            nx::network::aio::AsyncChannelAdapter<
+                std::unique_ptr<AbstractStreamSocket>>;
+
         for (const auto& relaySession: m_relaySessions)
         {
-            if (relaySession.clientConnection.connection.get() == clientConnection &&
-                relaySession.serverConnection.connection.get() == serverConnection &&
+            // TODO: #ak Get rid of conversion to AdapterType 
+            //   when AbstractStreamSocket inherits AbstractAsyncChannel.
+
+            auto clientConnectionAdapter = 
+                dynamic_cast<AdapterType*>(relaySession.clientConnection.connection.get());
+            auto serverConnectionAdapter = 
+                dynamic_cast<AdapterType*>(relaySession.serverConnection.connection.get());
+
+            if (clientConnectionAdapter->adaptee().get() == clientConnection &&
+                serverConnectionAdapter->adaptee().get() == serverConnection &&
                 relaySession.serverConnection.peerId == listeningPeerName)
             {
                 return true;
