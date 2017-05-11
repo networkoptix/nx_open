@@ -1,7 +1,7 @@
 <div class="container-fluid dark-theme row">
    <table style="width:100%" class="webclient-window">
         <tbody>
-            <tr class="alerts-row" ng-if="hasMobileApp && !session.mobileAppNotified || ieNoWebm && !session.ieNoWebmNotified || webclientDisabled">
+            <!--<tr class="alerts-row" ng-if="hasMobileApp && !session.mobileAppNotified || ieNoWebm && !session.ieNoWebmNotified || webclientDisabled">
                 <td colspan="2" class="alert">
                     <div class="webclient-panel mobile-alert hidden-mobile" ng-if="hasMobileApp && !session.mobileAppNotified">
                         <div class="pull-right" >
@@ -43,9 +43,9 @@
 
 
                 </td>
-            </tr>
+            </tr>-->
             <tr>
-                <td class="hidden-mobile">
+                <td ng-class="{hidden-mobile:0}">
                     <div class="view-wrapper">
                         <div class="cameras-panel">
                             <div class="cameras-search">
@@ -96,8 +96,8 @@
                         </div>
                     </div>
                 </td>
-                <td width="100%" >
-                    <div class="view-wrapper not-supported visible-mobile view-panel camera-view-message">
+                <td width="100%" ng-class="{hidden-mobile:0}">
+                    <!--<div class="view-wrapper not-supported visible-mobile view-panel camera-view-message">
                         <div ng-if="!hasMobileApp">
                             Unfortunately, web client is not supported on this device.
                         </div>
@@ -107,12 +107,12 @@
                                 Install
                             </a>
                         </div>
-                    </div>
+                    </div>-->
 
                     <div class="view-wrapper" ng-class="{invisible:!activeCamera}">
                         <div class="view-panel" ng-class="{'live-only':liveOnly}">
                             <div class="stick-to-top top-gradient">
-                                <div class="webclient-panel webclient-bottom-border hidden-mobile">
+                                <div class="webclient-panel webclient-bottom-border">
                                     <div class="pull-right" >
                                         <!--REMOVE WHEN NOT DEBUG-->
                                         <div ng-if="debugMode" class="webclient-panel-border"></div>
@@ -158,7 +158,7 @@
                                 </div>
                             </div>
 
-                            <div class="float-size hidden-mobile">
+                            <div class="float-size">
                                 <div class="camera-view-informer" ng-if="!positionSelected && activeCamera.status == 'Offline' ">
                                     <div class="camera-view-offline camera-view-message-icon"></div><br/><div class="camera-view-message">OFFLINE</div>
                                 </div>
@@ -180,7 +180,7 @@
                                 </videowindow>
                             </div>
 
-                            <div class="stick-to-bottom hidden-mobile" ng-class="{invisible:liveOnly && !activeCamera}">
+                            <div class="stick-to-bottom" ng-class="{invisible:liveOnly && !activeCamera}">
                                 <timeline
                                     can-play-live="!(activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')"
                                     live-only="liveOnly"
