@@ -417,6 +417,11 @@ void Storage::findDownloads()
     }
 }
 
+qint64 Storage::defaultChunkSize()
+{
+    return kDefaultChunkSize;
+}
+
 QByteArray Storage::calculateMd5(const QString& filePath)
 {
     QFile file(filePath);

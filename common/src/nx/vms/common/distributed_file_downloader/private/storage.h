@@ -55,6 +55,7 @@ public:
 
     void findDownloads();
 
+    static qint64 defaultChunkSize();
     static QByteArray calculateMd5(const QString& filePath);
     static qint64 calculateFileSize(const QString& filePath);
     static int calculateChunkCount(qint64 fileSize, qint64 calculateChunkSize);
