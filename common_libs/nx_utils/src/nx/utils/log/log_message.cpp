@@ -2,6 +2,19 @@
 
 constexpr wchar_t QnLogMessage::kSpace;
 
+namespace {
+
+template <typename T>
+QString debug(const T& value)
+{
+    QString result;
+    QDebug d(&result);
+    d << value;
+    return result;
+}
+
+} // namespace
+
 QnLogMessage::QnLogMessage()
 {
 }
@@ -54,10 +67,34 @@ QnLogMessage QnLogMessage::arg(const QUrl& a, int fieldWidth, wchar_t fillChar) 
     return m_str.arg(toString(a), fieldWidth, fillChar);
 }
 
-QnLogMessage QnLogMessage::arg(const QSize& size, int fieldWidth, wchar_t fillChar) const
+QnLogMessage QnLogMessage::arg(const QPoint& point) const
 {
-    return m_str.arg(QString::fromLatin1("(%1, %2)").arg(size.width()).arg(size.height()),
-        fieldWidth, fillChar);
+    return m_str.arg(debug(point));
+}
+
+QnLogMessage QnLogMessage::arg(const QPointF& point) const
+{
+    return m_str.arg(debug(point));
+}
+
+QnLogMessage QnLogMessage::arg(const QSize& size) const
+{
+    return m_str.arg(debug(size));
+}
+
+QnLogMessage QnLogMessage::arg(const QSizeF& size) const
+{
+    return m_str.arg(debug(size));
+}
+
+QnLogMessage QnLogMessage::arg(const QRect& rect) const
+{
+    return m_str.arg(debug(rect));
+}
+
+QnLogMessage QnLogMessage::arg(const QRectF& rect) const
+{
+    return m_str.arg(debug(rect));
 }
 
 QnLogMessage QnLogMessage::arg(std::chrono::seconds a, int fieldWidth, wchar_t fillChar) const
