@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('webadminApp')
+angular.module('nxCommon')
     .factory('cameraRecords', function ($q) {
         var lastRecordProvider = null;
         var lastPositionProvider = null;
