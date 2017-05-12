@@ -130,6 +130,10 @@ camera-panel {
   z-index: 1;
 }
 
+.view-panel.no-archive{
+  padding-bottom: 40px !important;
+}
+
 .top-gradient{
   background: $dark1;
   background: -webkit-linear-gradient(bottom,rgba($dark1,0.3),rgba($dark1,0)); /*Safari 5.1-6*/
@@ -418,25 +422,24 @@ camera-panel {
 
 
 div.text-left{
-  width:168px;
-  height:100px;
+  width:107px;
+  height:100%;
   background-color: $additional_light2;
   border-left: 1px solid $light6;
   border-right: 1px solid $light6;
 }
 
 .player-controls{
-  margin: 30px 12px 30px 10px;
+  padding: 33px 25px 32px 25px !important;
 }
 
 .zoom-level{
-  height: 100px;
   margin-top: 6px;
 }
 
 div.text-right{
   width:104px;
-  height:100px;
+  height:100%;
   background-color: $additional_light2;
 }
 
@@ -538,7 +541,7 @@ volume-control{
 
 
 div.text-center{
-  margin: 0 104px 0 168px;
+  margin: 0 104px 0 107px;
   height:100%;
 }
 
@@ -603,9 +606,8 @@ div.text-center{
 }
 
 .glyphicon-pp{
-  height:40px;
-  width: 40px;
-  margin: 0 -4px 0 -4px;
+  width: 64px;
+  height: 100%;
 }
 
 .glyphicon-fwbw{

@@ -422,7 +422,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         var killSubscription = $rootScope.$on('$routeChangeStart', function (event,next) {
             timeFromUrl = $location.search().time;
-            $activeCamera = $scope.camerasProvider.getCamera(next.params.cameraId);
+            $scope.activeCamera = $scope.camerasProvider.getCamera(next.params.cameraId);
         });
 
         $scope.$on( '$destroy', function() {

@@ -138,8 +138,9 @@ ng-include{
 
 
 .pp-only{
-  width: 60px !important;
+  width: 64px !important;
 }
-.pp-only .glyphicon-pp{
-  margin-left: 10px;
+
+.timeline.no-timeline .player-controls{
+  padding-top: 0px !important;
 }
