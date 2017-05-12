@@ -7,7 +7,8 @@ angular.module('webadminApp')
                 "activeCamera":"=",
                 "camerasProvider": "=",
                 "player": "=",
-                "currentResolution": "="
+                "currentResolution": "=",
+                "toggleCameraPanel": "="
             },
             templateUrl: 'views/components/cameraPanel.html',
             link: function (scope, element/*, attrs*/) {
@@ -28,6 +29,7 @@ angular.module('webadminApp')
                 
 
                 scope.selectCamera = function (activeCamera) {
+                    scope.toggleCameraPanel = false;
                     if(scope.activeCamera && (scope.activeCamera.id === activeCamera.id || scope.activeCamera.physicalId === activeCamera)){
                         return;
                     }

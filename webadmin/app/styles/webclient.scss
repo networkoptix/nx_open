@@ -139,10 +139,6 @@ camera-panel {
   background: linear-gradient(to top, rgba($dark1, 0), rgba($dark1, 0.3)); /*Standard*/
 }
 
-.back-button{
-  display: none;
-}
-
 .video-name{
   line-height: 24px !important;
   color: $light1;
@@ -859,26 +855,26 @@ div.text-center{
   display: none;
 }
 
-@media only screen and (max-device-width:640px) {
+.visible-xs-block .cameras-panel{
+  width: 100% !important; 
+}
+
+.visible-xs-inline-block.back-button{
+  vertical-align: top;
+  display: inline-block;
+  margin-left: 4px;
+}
+
+@media only screen and (max-screen-width:640px) {
   .invisible-xs,.hidden-mobile{
     display:none;
   }
   .visible-mobile{
     display: block;
   }
-  .mobile-camera-panel{
-    width: 100% !important;
-  }
-  .back-button{
-    vertical-align: top;
-    display: inline-block;
-  }
-  .pull-left-5{
-    margin-right: 5px;
-  }
 }
 
-@media only screen and (min-device-width: 641px) and (max-device-width:961px) {
+@media only screen and (min-screen-width: 641px) and (max-screen-width:961px) {
   /* For general iPad layouts */
   .cameras-panel{
     font-size:80%;

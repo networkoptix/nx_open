@@ -27,7 +27,6 @@ angular.module('webadminApp').controller('ViewCtrl',
             $location.path('/view/' + $scope.storage.cameraId, false);
         }
 
-        $scope.treeRequest = null;
         $scope.positionProvider = null;
         $scope.activeVideoRecords = null;
         $scope.liveOnly = true;
@@ -76,7 +75,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 id: r.data.reply.id
             };
         });
-
+        
         if(window.jscd.browser === 'Microsoft Internet Explorer' && ! browserSupports('webm', false, false)){
             if(window.jscd.osVersion < 10) { //For 10th version webm codec doesn't work
                 $scope.ieNoWebm = true;
@@ -212,8 +211,6 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             var camRotation = _.find($scope.activeCamera.addParams,findRotation);
             $scope.rotation = camRotation && camRotation.value ? parseInt(camRotation.value) : 0;
-
-            $scope.toggleCameraPanel = false;
 
             position = position?parseInt(position):oldTimePosition;
 
