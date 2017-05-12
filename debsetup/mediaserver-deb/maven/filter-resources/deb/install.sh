@@ -13,3 +13,6 @@ then
 else
     update 2>&1
 fi
+
+CIFSUTILS=$(dpkg --get-selections | grep -v deinstall | grep cifs-utils | awk '{print $1}')
+if [ -z $CIFSUTILS ]; then dpkg -i ./cifs-utils/*.deb; fi
