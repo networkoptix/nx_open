@@ -33,7 +33,7 @@ void initialize(
             return;
 
         logger->setDefaultLevel(settings.level);
-        logger->setExceptionFilters({}); // TODO: Add to Settings struct and handle here.
+        logger->setExceptionFilters(settings.exceptionFilers);
         if (baseName != QLatin1String("-"))
         {
             const auto logDir = settings.directory.isEmpty()
@@ -62,7 +62,7 @@ void initialize(
     if (!binaryPath.isEmpty())
         write(lm("Binary path: %1").arg(binaryPath));
 
-    const auto filePath = logger->logFilePath();
+    const auto filePath = logger->filePath();
     write(lm("Log level: %1, maxFileSize: %2, maxBackupCount: %3, file: %4").strs(
         settings.level, nx::utils::bytesToString(settings.maxFileSize), settings.maxBackupCount,
         filePath ? *filePath : QString::fromUtf8("-")));

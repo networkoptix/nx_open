@@ -1,0 +1,6 @@
+Yeni mesaj
+
+Tür: {{message.type}}
+Data:{{{message.data}}}
+
+Bu ileti türü için belirli bir şablon yok

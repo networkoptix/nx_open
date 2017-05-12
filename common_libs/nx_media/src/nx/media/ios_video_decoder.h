@@ -1,5 +1,4 @@
 #pragma once
-
 #if defined (Q_OS_IOS)
 
 #include <QtCore/QObject>

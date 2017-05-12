@@ -200,7 +200,7 @@ void Buffer::write(Level /*level*/, const QString& message)
     m_messages.push_back(message);
 }
 
-std::vector<QString> Buffer::take()
+std::vector<QString> Buffer::takeMessages()
 {
     QnMutexLocker lock(&m_mutex);
     std::vector<QString> messages;

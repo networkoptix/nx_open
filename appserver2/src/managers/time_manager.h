@@ -314,6 +314,11 @@ private:
     void handleLocalTimePriorityKeyChange(QnMutexLockerBase* const lk);
 
     void saveSyncTimeAsync(
+        QnMutexLockerBase* const lk,
+        qint64 syncTimeToLocalDelta,
+        TimePriorityKey syncTimeKey);
+
+    void saveSyncTimeAsync(
         qint64 syncTimeToLocalDelta,
         const TimePriorityKey& syncTimeKey);
     bool saveSyncTimeSync(

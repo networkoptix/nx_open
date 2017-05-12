@@ -4,6 +4,7 @@ import Nx.Media 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
 import Nx.Models 1.0
+
 import com.networkoptix.qml 1.0
 
 import "private/VideoScreen"
@@ -282,6 +283,17 @@ PageBase
             }
         }
 
+        PtzPanel
+        {
+            id: ptzPanel
+
+            x: 8
+            width: parent.width - x * 2
+            anchors.bottom: parent.bottom
+
+            controller.resourceId: videoScreenController.resourceHelper.resourceId
+        }
+
         Loader
         {
             id: navigationLoader
@@ -289,7 +301,7 @@ PageBase
             anchors.bottom: parent.bottom
             width: parent.width
 
-            visible: opacity > 0
+            visible: opacity > 0 && !ptzPanel.visible
             opacity: Math.min(d.uiOpacity, d.navigationOpacity)
 
             sourceComponent:
@@ -334,6 +346,10 @@ PageBase
                 {
                     videoScreenController: d.controller
                     controlsOpacity: d.cameraUiOpacity
+                    ptzAvailable: ptzPanel.controller.available
+                        && videoScreenController.accessRightsHelper.canManagePtz
+                        && !videoScreenController.offline
+                    onPtzButtonClicked: ptzPanel.visible = true
                 }
             }
 

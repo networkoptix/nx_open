@@ -14,8 +14,10 @@ Item
     property string resourceId
     property var videoScreenController
     property bool paused: videoScreenController.mediaPlayer.playbackState !== MediaPlayer.Playing
-
+    property bool ptzAvailable: false
     property real controlsOpacity: 1.0
+
+    signal ptzButtonClicked()
 
     implicitWidth: parent ? parent.width : 0
     implicitHeight: navigator.height + navigationPanel.height
@@ -375,6 +377,16 @@ Item
                 }
                 opacity: d.liveMode ? 0.0 : 1.0
                 Behavior on opacity { NumberAnimation { duration: 200 } }
+            }
+
+            IconButton
+            {
+                icon: lp("images/ptz/ptz.png")
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                visible: videoNavigation.ptzAvailable && d && d.liveMode
+
+                onClicked: videoNavigation.ptzButtonClicked()
             }
 
             Timer

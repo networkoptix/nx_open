@@ -14,7 +14,7 @@ public:
     virtual ~QnDwPtzController();
 
     virtual bool continuousMove(const QVector3D &speed) override;
-    virtual bool getFlip(Qt::Orientations *flip) override;
+    virtual bool getFlip(Qt::Orientations *flip) const override;
 private slots:
     void at_physicalParamChanged(const QString& id, const QString& value);
     void updateFlipState();

@@ -1,0 +1,6 @@
+Nouveau message
+
+Type: {{message.type}}
+Données: {{{message.data}}}
+
+Il n’y a pas de modèle spécifique pour ce type de message
