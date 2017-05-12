@@ -434,7 +434,7 @@ TEST_F(WebSocket, PingPong)
 TEST_F(WebSocket, Close)
 {
     givenClientTestDataPrepared(1 * 1024 * 1024);
-    givenServerTestDataPrepared(2 * 1024 * 1024);
+    givenServerTestDataPrepared(1 * 1024 * 1024);
     givenClientManyMessagesWithServerRespondingCallbacks();
     givenClientModes(SendMode::singleMessage, ReceiveMode::message);
     givenServerModes(SendMode::singleMessage, ReceiveMode::message);
@@ -462,6 +462,8 @@ TEST_F(WebSocket, Close)
     clientWebSocket->sendCloseAsync();
 
     readyFuture.wait();
+    // sleep a bit to make sure client connectionClosed signal received
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
     ASSERT_TRUE(clientClosed);
     ASSERT_TRUE(serverClosed);

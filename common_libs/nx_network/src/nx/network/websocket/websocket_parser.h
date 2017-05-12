@@ -47,15 +47,14 @@ public:
 private:
     void parse(char* data, int len);
     void processPart(
-        char* data, 
-        int len, 
-        int neededLen, 
-        ParseState nextState,
-        void (Parser::*processFunc)(char* data));
-    void processPayload(char* data, int len);
+        char* data,
+        int len,
+        int neededLen,
+        ParseState (Parser::*processFunc)(char* data));
+    ParseState processPayload(char* data, int len);
     void reset();
-    void readHeaderFixed(char* data);
-    void readHeaderExtension(char* data);
+    ParseState readHeaderFixed(char* data);
+    ParseState readHeaderExtension(char* data);
     BufferedState bufferDataIfNeeded(const char* data, int len, int neededLen);
 
 private:
