@@ -40,10 +40,10 @@ void ClientToRelayConnection::beginListening(
         {
             nx::cloud::relay::api::BeginListeningResponse response;
             response.preemptiveConnectionCount = 7;
-            if (m_failRequests)
-                handler(nx::cloud::relay::api::ResultCode::networkError, std::move(response));
-            else
-                handler(nx::cloud::relay::api::ResultCode::ok, std::move(response));
+            auto resultCode = m_failRequests
+                ? nx::cloud::relay::api::ResultCode::networkError
+                : nx::cloud::relay::api::ResultCode::ok;
+            handler(resultCode, std::move(response), nullptr);
         });
 }
 

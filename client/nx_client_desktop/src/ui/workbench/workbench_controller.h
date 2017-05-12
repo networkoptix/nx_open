@@ -78,15 +78,12 @@ public:
 
     QnWorkbenchGridMapper *mapper() const;
 
-    Instrument* handScrollInstrument() const;
-    Instrument* wheelZoomInstrument() const;
     Instrument* motionSelectionInstrument() const;
     Instrument* itemRightClickInstrument() const;
     Instrument* moveInstrument() const;
     Instrument* resizingInstrument() const;
     Instrument* rubberBandInstrument() const;
     Instrument* itemLeftClickInstrument() const;
-    Instrument* gridAdjustmentInstrument() const;
     Instrument* sceneClickInstrument() const;
 
     // TODO: #Elric split into menu_controller or smth like that
@@ -107,7 +104,6 @@ protected:
 
     void moveCursor(const QPoint &aAxis, const QPoint &bAxis);
     void showContextMenuAt(const QPoint &pos);
-    Q_SLOT void showContextMenuAtInternal(const QPoint &pos, const WeakGraphicsItemPointerList &selectedItems);
 
     void updateDraggedItems();
 protected slots:
@@ -171,12 +167,11 @@ protected slots:
     void at_checkFileSignatureAction_triggered();
     void at_nextItemAction_triggered();
     void at_previousItemAction_triggered();
-    void at_toggleCurrentItemMaximizationState_triggered();
 
     void at_zoomedToggle_activated();
     void at_zoomedToggle_deactivated();
 
-    void updateLayoutInstruments(const QnLayoutResourcePtr &layout);
+    void updateCurrentLayoutInstruments();
 
     void at_ptzProcessStarted(QnMediaResourceWidget *widget);
 

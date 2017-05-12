@@ -22,13 +22,26 @@
  * ApiLayoutTourDataList,   -- passed data structure
  * false,                   -- transaction is not persistent (does not save anything to database)
  * false,                   -- transaction is not system (handled common way)
- * InvalidGetHashHelper(),  -- actual only for persistent transactions
- * InvalidTriggerNotificationHelper(),  -- actual only for persistent transactions
- * InvalidAccess(),         -- actual only for persistent transactions with one element
- * InvalidAccess(),         -- actual only for read transactions for one element
- * InvalidFilterFunc(),     -- actual only for persistent transactions with element list
- * FilterListByAccess<LayoutTourAccess>(), -- filtering requested list by the passed checker
- * AllowForAllAccessOut(),  -- ctual only for persistent transactions
+ * InvalidGetHashHelper(),  -- Calculates hash for persistent transaction.
+ *                             MUST yield the same result for corresponing setXXX and removeXXX
+ *                             transactions. Actual for persistent transactions only.
+ * InvalidTriggerNotificationHelper(),
+ *                          -- actual mostly for persistent transactions. This callable SHOULD
+ *                             implement second stage of transaction processing "in memory, non db"
+ *                             logic (work with resource pool for example). It's quite possible
+ *                             that non persistent transaction tiriggers some notifications (for
+ *                             example dumpDataBase).
+ * InvalidAccess(),         -- actual only for persistent transactions with one element.
+ *                             Warning below MUST be fullfilled.
+ * InvalidAccess(),         -- actual only for read transactions for one element.
+ *                             Warning below MUST be fullfilled.
+ * InvalidFilterFunc(),     -- actual only for persistent transactions with element list.
+ *                             Warning below MUST be fullfilled.
+ * FilterListByAccess<LayoutTourAccess>(), -- filtering requested list by the passed checker.
+ *                             Warning below MUST be fullfilled.
+ * AllowForAllAccessOut(),  -- Actual only for persistent transactions
+ *                             Desides if remote peer has enough rights to receive this transaction
+ *                             while the proxy transaction stage.
  * RegularTransactionType() -- transaction is common, regular, without any magic
  * )
  *

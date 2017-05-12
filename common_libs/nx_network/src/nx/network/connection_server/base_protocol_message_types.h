@@ -1,19 +1,16 @@
-/**********************************************************
-* 23 dec 2013
-* a.kolesnikov
-***********************************************************/
+#pragma once
 
-#ifndef BASE_STREAM_MESSAGE_TYPES_H
-#define BASE_STREAM_MESSAGE_TYPES_H
-
-#include <nx/network/buffer.h>
 #include <array>
+#include <memory>
 #include <utility>
 #include <vector>
-#include <memory>
 
-namespace nx_api
-{
+#include <nx/network/buffer.h>
+
+namespace nx {
+namespace network {
+namespace server {
+
 enum class ParserState
 {
     init = 1,
@@ -68,6 +65,7 @@ public:
 
     SerializerState::Type serialize( nx::Buffer* const buffer, size_t* bytesWritten );
 };
-}
 
-#endif  //BASE_STREAM_MESSAGE_TYPES_H
+} // namespace server
+} // namespace network
+} // namespace nx

@@ -9,12 +9,13 @@
 namespace nx_http {
 
 class HttpStreamSocketServer:
-    public StreamSocketServer<HttpStreamSocketServer, HttpServerConnection>
+    public nx::network::server::StreamSocketServer<HttpStreamSocketServer, HttpServerConnection>
 {
-    typedef StreamSocketServer<HttpStreamSocketServer, HttpServerConnection> base_type;
+    using base_type =
+        nx::network::server::StreamSocketServer<HttpStreamSocketServer, HttpServerConnection>;
 
 public:
-    typedef HttpServerConnection ConnectionType;
+    using ConnectionType = HttpServerConnection;
 
     HttpStreamSocketServer(
         nx_http::server::AbstractAuthenticationManager* const authenticationManager,

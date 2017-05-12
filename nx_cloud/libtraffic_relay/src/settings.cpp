@@ -73,7 +73,7 @@ ConnectingPeer::ConnectingPeer():
 Settings::Settings():
     base_type(
         QnAppInfo::organizationNameForSettings(),
-        TrafficRelayAppInfo::applicationName(),
+        AppInfo::applicationName(),
         kModuleName)
 {
 }
@@ -84,16 +84,16 @@ QString Settings::dataDir() const
     if (!dataDirFromSettings.isEmpty())
         return dataDirFromSettings;
 
-#ifdef Q_OS_LINUX
-    QString defVarDirName = QString("/opt/%1/%2/var")
-        .arg(QnAppInfo::linuxOrganizationName()).arg(kModuleName);
-    QString varDirName = settings().value("varDir", defVarDirName).toString();
-    return varDirName;
-#else
-    const QStringList& dataDirList =
-        QStandardPaths::standardLocations(QStandardPaths::DataLocation);
-    return dataDirList.isEmpty() ? QString() : dataDirList[0];
-#endif
+    #if defined(Q_OS_LINUX)
+        QString defVarDirName = QString("/opt/%1/%2/var")
+            .arg(QnAppInfo::linuxOrganizationName()).arg(kModuleName);
+        QString varDirName = settings().value("varDir", defVarDirName).toString();
+        return varDirName;
+    #else
+        const QStringList& dataDirList =
+            QStandardPaths::standardLocations(QStandardPaths::DataLocation);
+        return dataDirList.isEmpty() ? QString() : dataDirList[0];
+    #endif
 }
 
 utils::log::Settings Settings::logging() const
