@@ -359,7 +359,14 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
     if(self.currentRequest){
         return;
     }
-    self.currentRequest = this.mediaserver.getRecords('/', this.cameras[0], Math.max(start - this.timeCorrection,0), end - this.timeCorrection, detailization, null, levelData.name);
+    self.currentRequest = this.mediaserver.getRecords(
+        this.cameras[0],
+        Math.max(start - this.timeCorrection,0),
+        end - this.timeCorrection,
+        detailization,
+        null,
+        levelData.name
+    );
 
     self.currentRequest.then(function (data) {
 
@@ -687,12 +694,13 @@ ShortCache.prototype.update = function(requestPosition,position){
     this.abort("update again");
     // Get next {{limitChunks}} chunks
     //console.log("Start Time: %s\tEnd Time: %s",Math.max(requestPosition-this.timeCorrection,0),(new Date()).getTime()+100000 - this.timeCorrection);
-    this.currentRequest = this.mediaserver.getRecords('/',
-            this.cameras[0],
-            Math.max(requestPosition - this.timeCorrection,0),
-            (new Date()).getTime() + 100000 - this.timeCorrection,
-            this.requestDetailization,
-            this.limitChunks);
+    this.currentRequest = this.mediaserver.getRecords(
+        this.cameras[0],
+        Math.max(requestPosition - this.timeCorrection,0),
+        (new Date()).getTime() + 100000 - this.timeCorrection,
+        this.requestDetailization,
+        this.limitChunks
+    );
 
     this.currentRequest.then(function(data){
             self.updating = false;
