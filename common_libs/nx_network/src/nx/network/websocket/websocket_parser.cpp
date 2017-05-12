@@ -27,10 +27,10 @@ Parser::BufferedState Parser::bufferDataIfNeeded(const char* data, int len, int 
     return BufferedState::enough;
 }
 
-void Parser::processPayload(char* data, int len)
+Parser::ParseState Parser::processPayload(char* data, int len)
 {
     int outLen = std::min(len, m_payloadLen);
-    if (m_masked) 
+    if (m_masked)
     {
         for (int i = 0; i < outLen; i++)
         {
@@ -46,29 +46,27 @@ void Parser::processPayload(char* data, int len)
         m_handler->frameEnded();
         if (m_fin)
             m_handler->messageEnded();
-        m_state = ParseState::readingHeaderFixedPart;
+        return ParseState::readingHeaderFixedPart;
     }
+    return ParseState::readingPayload;
 }
 
 void Parser::processPart(
-    char* data, 
-    int len, 
+    char* data,
+    int len,
     int neededLen,
-    ParseState nextState,
-    void (Parser::*processFunc)(char* data))
+    ParseState (Parser::*processFunc)(char* data))
 {
     switch (bufferDataIfNeeded(data, len, neededLen))
     {
     case BufferedState::needMore:
         break;
     case BufferedState::notNeeded:
-        (this->*processFunc)(data);
-        m_state = nextState;
+        m_state = (this->*processFunc)(data);
         m_pos += neededLen;
         break;
     case BufferedState::enough:
-        (this->*processFunc)(m_buf.data());
-        m_state = nextState;
+        m_state = (this->*processFunc)(m_buf.data());
         m_buf.clear();
         break;
     }
@@ -80,10 +78,9 @@ void Parser::parse(char* data, int len)
     {
     case ParseState::readingHeaderFixedPart:
         processPart(
-            data, 
-            len, 
-            kFixedHeaderLen, 
-            ParseState::readingHeaderExtension,
+            data,
+            len,
+            kFixedHeaderLen,
             &Parser::readHeaderFixed);
         break;
     case ParseState::readingHeaderExtension:
@@ -91,11 +88,10 @@ void Parser::parse(char* data, int len)
             data,
             len,
             m_headerExtLen,
-            ParseState::readingPayload,
             &Parser::readHeaderExtension);
         break;
     case ParseState::readingPayload:
-        processPayload(data, len);
+        m_state = processPayload(data, len);
         break;
     }
 }
@@ -117,7 +113,7 @@ void Parser::setRole(Role role)
     m_role = role;
 }
 
-void Parser::readHeaderFixed(char* data)
+Parser::ParseState Parser::readHeaderFixed(char* data)
 {
     m_opCode = (FrameType)(*data & 0x0F);
     m_fin = (*data >> 7) & 0x01;
@@ -130,9 +126,17 @@ void Parser::readHeaderFixed(char* data)
     m_payloadLen = (unsigned char)(*data & (~0x80));
     m_headerExtLen = (m_payloadLen <= 125 ? 0 : m_payloadLen == 126 ? 2 : 8) + (m_masked ? 4 : 0);
     m_handler->frameStarted(m_opCode, m_fin);
+    if (m_headerExtLen == 0 && m_payloadLen == 0)
+    {
+        m_handler->frameEnded();
+        if (m_fin)
+            m_handler->messageEnded();
+        return ParseState::readingHeaderFixedPart;
+    }
+    return m_headerExtLen == 0 ? ParseState::readingPayload: ParseState::readingHeaderExtension;
 }
 
-void Parser::readHeaderExtension(char* data)
+Parser::ParseState Parser::readHeaderExtension(char* data)
 {
     if (m_payloadLen == 126)
     {
@@ -150,6 +154,16 @@ void Parser::readHeaderExtension(char* data)
         m_mask = *((unsigned int*)(data));
         m_maskPos = 0;
     }
+
+    if (m_payloadLen == 0)
+    {
+        m_handler->frameEnded();
+        if (m_fin)
+            m_handler->messageEnded();
+        return ParseState::readingHeaderFixedPart;
+    }
+
+    return ParseState::readingPayload;
 }
 
 void Parser::reset()

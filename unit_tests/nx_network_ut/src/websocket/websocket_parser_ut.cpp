@@ -81,17 +81,17 @@ static void fillDummyPayload(std::vector<char>* payload, int size)
 class WebsocketParserTest : public ::testing::Test
 {
 protected:
-    WebsocketParserTest(): p(Role::client, &ph) 
+    WebsocketParserTest(): p(Role::client, &ph)
     {
         std::call_once(payloadInitOnceFlag, []() { fillDummyPayload(&kDefaultPayload, 1000); });
     }
 
     void testWebsocketParserAndSerializer(
-        int readSize, 
-        int frameCount, 
-        FrameType type, 
-        bool masked, 
-        unsigned int mask, 
+        int readSize,
+        int frameCount,
+        FrameType type,
+        bool masked,
+        unsigned int mask,
         const std::vector<char>& payload = kDefaultPayload)
     {
         EXPECT_CALL(ph, frameStarted(type, frameCount == 1 ? true : false)).Times(1);
