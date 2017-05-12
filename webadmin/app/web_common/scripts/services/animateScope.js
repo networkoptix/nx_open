@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('webadminApp')
+angular.module('nxCommon')
     .factory('animateScope', ['$q',function ($q) {
 
         var animations = [];
