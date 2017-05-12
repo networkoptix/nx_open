@@ -21,7 +21,7 @@ namespace {
 static const int kInstanceCount = 100;
 static const int kMaxSyncTimeoutMs = 1000 * 20 * 1000;
 static const int kPropertiesPerCamera = 5;
-static const int kCamerasCount = 100;
+static const int kCamerasCount = 20;
 
 static void initResourceTypes(ec2::AbstractECConnection* ec2Connection)
 {
@@ -221,8 +221,19 @@ void fullConnect(std::vector<Appserver2Ptr>& servers)
     }
 }
 
+static QtMessageHandler defaultMsgHandler = 0;
+static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
+{
+    if (defaultMsgHandler)
+        defaultMsgHandler(type, ctx, msg);
+
+    qnLogMsgHandler(type, ctx, msg);
+}
+
 static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverConnectFunc)
 {
+    defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
+
     QElapsedTimer t;
     t.restart();
 

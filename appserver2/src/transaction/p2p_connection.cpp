@@ -121,10 +121,24 @@ P2pConnection::P2pConnection(
 
 P2pConnection::~P2pConnection()
 {
+#if 1
+    decltype (m_webSocket) webSocket;
+    decltype (m_httpClient) httpClient;
+    {
+        QnMutexLocker lock(&m_mutex);
+        std::swap(m_webSocket, webSocket);
+        std::swap(m_httpClient, httpClient);
+    }
+    if (webSocket)
+        webSocket->pleaseStopSync();
+    if (httpClient)
+        httpClient->pleaseStopSync();
+#else
     if (m_webSocket)
         m_webSocket->pleaseStopSync();
     if (m_httpClient)
         m_httpClient->pleaseStopSync();
+#endif
 }
 
 void P2pConnection::fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey)
@@ -180,6 +194,8 @@ void P2pConnection::cancelConnecting()
 void P2pConnection::onHttpClientDone()
 {
     QnMutexLocker lock(&m_mutex);
+    if (!m_httpClient)
+        return;
 
     nx_http::AsyncClient::State state = m_httpClient->state();
     if (state == nx_http::AsyncClient::sFailed)
@@ -313,7 +329,7 @@ void P2pConnection::setState(State state)
     if (state != m_state)
     {
         m_state = state;
-        emit stateChanged(toSharedPointer(), state);
+        emit stateChanged(weakPointer(), state);
     }
 }
 
@@ -364,6 +380,8 @@ void P2pConnection::sendMessage(const nx::Buffer& data)
 void P2pConnection::onMessageSent(SystemError::ErrorCode errorCode, size_t bytesSent)
 {
     QnMutexLocker lock(&m_mutex);
+    if (!m_webSocket)
+        return;
 
     if (errorCode != SystemError::noError ||
         bytesSent == 0)
@@ -384,13 +402,16 @@ void P2pConnection::onMessageSent(SystemError::ErrorCode errorCode, size_t bytes
     }
     else
     {
-        emit allDataSent(toSharedPointer());
+        emit allDataSent(weakPointer());
     }
 }
 
 void P2pConnection::onNewMessageRead(SystemError::ErrorCode errorCode, size_t bytesRead)
 {
     QnMutexLocker lock(&m_mutex);
+    if (!m_webSocket)
+        return;
+
     if (bytesRead == 0)
     {
         setState(State::Error);
@@ -416,7 +437,7 @@ bool P2pConnection::handleMessage(const nx::Buffer& message)
     NX_ASSERT(!message.isEmpty());
     MessageType messageType = (MessageType) message[0];
     NX_ASSERT(!m_remotePeer.persistentId.isNull());
-    emit gotMessage(toSharedPointer(), messageType, message.mid(1));
+    emit gotMessage(weakPointer(), messageType, message.mid(1));
     return true;
 }
 

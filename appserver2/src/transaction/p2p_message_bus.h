@@ -168,9 +168,9 @@ private:
     void resotreAfterDbError();
     bool selectAndSendTransactions(const P2pConnectionPtr& connection, QnTranState newSubscription);
     private slots:
-    void at_gotMessage(const QSharedPointer<P2pConnection>& connection, MessageType messageType, const QByteArray& payload);
-    void at_stateChanged(const QSharedPointer<P2pConnection>& connection, P2pConnection::State state);
-    void at_allDataSent(const QSharedPointer<P2pConnection>& connection);
+    void at_gotMessage(QWeakPointer<P2pConnection> connection, MessageType messageType, const QByteArray& payload);
+    void at_stateChanged(QWeakPointer<P2pConnection> connection, P2pConnection::State state);
+    void at_allDataSent(QWeakPointer<P2pConnection> connection);
     bool pushTransactionList(
         const P2pConnectionPtr& connection, 
         const QList<QByteArray>& serializedTransactions);

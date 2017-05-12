@@ -139,6 +139,7 @@ P2pMessageBus::P2pMessageBus(
     qRegisterMetaType<MessageType>();
     qRegisterMetaType<P2pConnection::State>("P2pConnection::State");
     qRegisterMetaType<P2pConnectionPtr>("P2pConnectionPtr");
+    qRegisterMetaType<QWeakPointer<P2pConnection>>("QWeakPointer<P2pConnection>");
 
     m_thread->setObjectName("P2pMessageBus");
     m_timer = new QTimer();
@@ -771,12 +772,14 @@ ApiPeerDataEx P2pMessageBus::localPeerEx() const
 }
 
 void P2pMessageBus::at_stateChanged(
-    const QSharedPointer<P2pConnection>& connection,
+    QWeakPointer<P2pConnection> weakRef,
     P2pConnection::State state)
 {
-    QnMutexLocker lock(&m_mutex);
+    P2pConnectionPtr connection = weakRef.toStrongRef();
     if (!connection)
         return;
+
+    QnMutexLocker lock(&m_mutex);
 
     const auto& remoteId = connection->remotePeer().id;
     switch (connection->state())
@@ -818,8 +821,9 @@ void P2pMessageBus::at_stateChanged(
     }
 }
 
-void P2pMessageBus::at_allDataSent(const QSharedPointer<P2pConnection>& connection)
+void P2pMessageBus::at_allDataSent(QWeakPointer<P2pConnection> weakRef)
 {
+    P2pConnectionPtr connection = weakRef.toStrongRef();
     if (!connection)
         return;
 
@@ -832,10 +836,11 @@ void P2pMessageBus::at_allDataSent(const QSharedPointer<P2pConnection>& connecti
 }
 
 void P2pMessageBus::at_gotMessage(
-    const QSharedPointer<P2pConnection>& connection,
+    QWeakPointer<P2pConnection> weakRef,
     MessageType messageType,
     const nx::Buffer& payload)
 {
+    P2pConnectionPtr connection = weakRef.toStrongRef();
     if (!connection)
         return;
 
