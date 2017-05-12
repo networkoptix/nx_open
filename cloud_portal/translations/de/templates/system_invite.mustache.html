@@ -1,0 +1,13 @@
+<h1>Willkommen bei {{PRODUCT_NAME}}</h1>
+
+{{#message.sharer_name}}
+<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> lädt Sie zu <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a> ein und teilt sein System {{message.system_name}} mit Ihnen.</p>
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
+<p>Sie wurden eingeladen sich bei <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a> anzuschließen.
+Das System {{message.system_name}} wurde mit Ihnen geteilt.</p>
+{{/message.sharer_name}}
+
+<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Registrieren und System ansehen</a>
+
