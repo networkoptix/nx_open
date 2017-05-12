@@ -32,7 +32,6 @@ namespace {
 
     int commitIntervalMs = 1000;
     static const int kMaxSelectDataSize = 1024 * 32;
-    static const int kMaxPushTranListDataSize = 1024 * 8;
 
     static const int kOutConnectionsInterval = 1000;
 
@@ -522,6 +521,7 @@ void P2pMessageBus::resubscribePeers(
             connection->sendMessage(serializeSubscribeRequest(
                 shortValues,
                 m_db->transactionLog()->getTransactionsState(newValue)));
+            miscData.remoteSelectingDataInProgress = true;
         }
     }
 }
@@ -570,10 +570,7 @@ bool P2pMessageBus::hasStartingConnections() const
     {
         const auto& data = connection->miscData();
         if (data.isLocalStarted && data.remotePeersMessage.isEmpty())
-        {
-            auto& miscData = connection->miscData();
             return true;
-        }
     }
     return false;
 }
@@ -633,6 +630,14 @@ void P2pMessageBus::doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr
     if (hasStartingConnections())
         return;
 
+    for (const auto& connection: m_connections)
+    {
+        const auto& data = connection->miscData();
+        if (data.remoteSelectingDataInProgress)
+            return;
+    }
+
+
     const bool needDelay = needSubscribeDelay();
 
     QMap<ApiPersistentIdData, P2pConnectionPtr> newSubscription = currentSubscription;
@@ -667,13 +672,6 @@ void P2pMessageBus::doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr
             {
                 if (needDelay)
                     continue; //< allow only direct subscription if network configuration are still changing
-                if (subscribedVia &&
-                    subscribedVia->miscData().lastTranListMsg.isValid() &&
-                    std::chrono::milliseconds(subscribedVia->miscData().lastTranListMsg.elapsed()) < subscribeIntervalLow)
-                {
-                    // Do not resubscribe while we are still getting data about that peer directly from via peer
-                    continue;
-                }
             }
             QVector<ApiPersistentIdData> viaList;
             info.minDistance(&viaList);
@@ -1213,32 +1211,23 @@ bool P2pMessageBus::pushTransactionList(
     const P2pConnectionPtr& connection,
     const QList<QByteArray>& tranList)
 {
-    int prevIndex = 0;
-    int index = 0;
-    while (index < tranList.size())
+    static const int kMaxHeaderSize = 4;
+    unsigned expectedSize = 1;
+    for (const auto& tran: tranList)
+        expectedSize += kMaxHeaderSize + tran.size();
+    QByteArray message;
+    message.resize(qPower2Ceil(expectedSize, 4));
+    BitStreamWriter writer;
+    writer.setBuffer((quint8*)message.data(), message.size());
+    writer.putBits(8, (quint8)MessageType::pushTransactionList);
+    for (const auto& tran: tranList)
     {
-        unsigned expectedSize = 1;
-        while (expectedSize < kMaxPushTranListDataSize && index < tranList.size())
-        {
-            expectedSize += 4 + tranList[index].size();
-            ++index;
-        }
-        QByteArray message;
-        message.resize(qPower2Ceil(expectedSize, 4));
-        BitStreamWriter writer;
-        writer.setBuffer((quint8*)message.data(), message.size());
-        writer.putBits(8, (quint8)MessageType::pushTransactionList);
-        for (int i = prevIndex; i < index; ++i)
-        {
-            serializeCompressedSize(writer, tranList[i].size());
-            writer.putBytes((quint8*)tranList[i].data(), tranList[i].size());
-        }
-        writer.flushBits(true);
-        message.truncate(writer.getBytesCount());
-        connection->sendMessage(message);
-        prevIndex = index;
+        serializeCompressedSize(writer, tran.size());
+        writer.putBytes((quint8*)tran.data(), tran.size());
     }
-
+    writer.flushBits(true);
+    message.truncate(writer.getBytesCount());
+    connection->sendMessage(message);
     return true;
 }
 
@@ -1270,7 +1259,10 @@ bool P2pMessageBus::selectAndSendTransactions(
     if (connection->remotePeer().peerType == Qn::PT_Server &&
         connection->remotePeer().dataFormat == Qn::UbjsonFormat)
     {
-        return pushTransactionList(connection, serializedTransactions);
+        pushTransactionList(connection, serializedTransactions);
+        if (!serializedTransactions.isEmpty() && isFinished)
+            pushTransactionList(connection, QList<QByteArray>());
+        return true;
     }
 #endif
 
@@ -1431,7 +1423,12 @@ struct GotTransactionFuction
 
 bool P2pMessageBus::handlePushTransactionList(const P2pConnectionPtr& connection, const QByteArray& tranList)
 {
-    connection->miscData().lastTranListMsg.restart();
+    if (tranList.isEmpty())
+    {
+        connection->miscData().remoteSelectingDataInProgress = false;
+        return true; //< eof pushTranList reached
+    }
+
     BitStreamReader reader((const quint8*) tranList.data(), tranList.size());
     try
     {

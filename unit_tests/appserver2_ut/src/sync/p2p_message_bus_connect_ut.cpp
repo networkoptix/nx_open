@@ -18,7 +18,7 @@
 
 namespace {
 
-static const int kInstanceCount = 100;
+static const int kInstanceCount = 200;
 static const int kMaxSyncTimeoutMs = 1000 * 20 * 1000;
 static const int kPropertiesPerCamera = 5;
 static const int kCamerasCount = 20;

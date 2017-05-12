@@ -85,7 +85,6 @@ public:
         MiscData()
         {
             localPeersTimer.invalidate();
-            lastTranListMsg.invalidate();
         }
 
         // to local part
@@ -94,13 +93,13 @@ public:
         QVector<ApiPersistentIdData> localSubscription; //< local -> remote subscription
         bool isLocalStarted = false; //< we opened connection to remote peer
         QVector<PeerNumberType> awaitingNumbersToResolve;
+        bool selectingDataInProgress = false;
 
         // to remote part
         QByteArray remotePeersMessage; //< last received peers message
         QnTranState remoteSubscription; //< remote -> local subscription
-        bool selectingDataInProgress = false;
+        bool remoteSelectingDataInProgress = false;
         bool isRemoteStarted = false; //< remote peer has open logical connection to us
-        QElapsedTimer lastTranListMsg;
 
         QElapsedTimer sendStartTimer;
         QElapsedTimer lifetimeTimer;
