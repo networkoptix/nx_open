@@ -2,7 +2,7 @@
 
 angular.module('webadminApp').controller('ViewdebugCtrl',
     function ($scope, $rootScope, $location, $routeParams, mediaserver, cameraRecords, $poll, $q,
-              $sessionStorage, $localStorage, currentUser) {
+              $sessionStorage, $localStorage, currentUser, systemAPI) {
 
         if(currentUser === null ){
             return; // Do nothing, user wasn't authorised
@@ -470,7 +470,7 @@ angular.module('webadminApp').controller('ViewdebugCtrl',
             if(treeRequest){
                 treeRequest.abort('getCameras');
             }
-            treeRequest = mediaserver.getCameras();
+            treeRequest = systemAPI.getCameras();
             treeRequest.then(function (data) {
                 var cameras = data.data;
                 
@@ -489,7 +489,7 @@ angular.module('webadminApp').controller('ViewdebugCtrl',
 
                 function cameraSorter(camera) {
                     camera.url = extractDomain(camera.url);
-                    camera.preview = mediaserver.previewUrl(camera.physicalId, false, null, 256);
+                    camera.preview = systemAPI.previewUrl(camera.physicalId, false, null, 256);
                     camera.server = getServer(camera.parentId);
                     if(camera.server && camera.server.status === 'Offline'){
                         camera.status = 'Offline';
@@ -638,7 +638,7 @@ angular.module('webadminApp').controller('ViewdebugCtrl',
             if(treeRequest){
                 treeRequest.abort('reloadTree');
             }
-            treeRequest = mediaserver.getMediaServers();
+            treeRequest = systemAPI.getMediaServers();
             treeRequest.then(function (data) {
 
                 if(!$scope.mediaServers) {
@@ -700,7 +700,7 @@ angular.module('webadminApp').controller('ViewdebugCtrl',
 
         var desktopCameraTypeId = null;
         function requestResourses() {
-            mediaserver.getResourceTypes().then(function (result) {
+            systemAPI.getResourceTypes().then(function (result) {
                 desktopCameraTypeId = _.find(result.data, function (type) {
                     return type.name === 'SERVER_DESKTOP_CAMERA';
                 });

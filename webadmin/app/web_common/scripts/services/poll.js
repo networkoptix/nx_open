@@ -10,7 +10,7 @@
  It uses $interval inside to trick Protractor's waitForAngular
  */
 
-angular.module('webadminApp')
+angular.module('nxCommon')
     .factory('$poll', ['$q', '$interval', function ($q, $interval) {
 
         function poll(fn, delay, initialDelay){

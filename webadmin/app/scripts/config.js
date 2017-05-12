@@ -3,7 +3,7 @@
 
 var Config = {
     viewsDir: 'views/', //'lang_' + lang + '/views/';
-
+    webadminSystemApiCompatibility: true,
     defaultLanguage: 'en_US',
     supportedLanguages:[
         'en_US', 'ru'

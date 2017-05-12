@@ -2,7 +2,7 @@
 
 angular.module('webadminApp').controller('ViewCtrl',
     function ($scope, $rootScope, $location, $routeParams, mediaserver, cameraRecords,
-              camerasProvider, $sessionStorage, $localStorage, currentUser) {
+              camerasProvider, $sessionStorage, $localStorage, currentUser, systemAPI) {
 
         if(currentUser === null){
             return; // Do nothing, user wasn't authorised
