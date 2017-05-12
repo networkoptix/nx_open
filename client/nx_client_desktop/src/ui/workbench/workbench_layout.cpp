@@ -409,6 +409,7 @@ void QnWorkbenchLayout::moveItemInternal(QnWorkbenchItem *item, const QRect &geo
     updateBoundingRectInternal();
 
     item->setGeometryInternal(geometry);
+    emit itemMoved(item);
 }
 
 bool QnWorkbenchLayout::canMoveItems(const QList<QnWorkbenchItem *> &items, const QList<QRect> &geometries, Disposition *disposition) const

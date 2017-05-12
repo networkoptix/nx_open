@@ -1,7 +1,5 @@
 #include "workbench_layout_tour_review_controller.h"
 
-#include <QtGui/QPainter>
-
 #include <QtWidgets/QAction>
 
 #include <core/resource_access/resource_access_filter.h>
@@ -12,7 +10,8 @@
 
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/graphics/items/standard/graphics_widget.h>
+#include <nx/client/desktop/ui/graphics/items/resource/layout_tour_drop_placeholder.h>
+
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
@@ -22,6 +21,7 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_utility.h>
 
+#include <utils/common/delayed.h>
 #include <utils/common/uuid_pool.h>
 
 #include <nx/utils/log/log.h>
@@ -34,28 +34,6 @@ const QnUuid uuidPoolBase("44a18151-242e-430b-8b57-4c94691902f9");
 static const int kUuidsLimit = 16384;
 
 static const auto kMyTag = lit("__gdm");
-
-class DropPlaceholderWidget: public GraphicsWidget
-{
-    using base_type = GraphicsWidget;
-public:
-    DropPlaceholderWidget(QGraphicsItem* parent = nullptr, Qt::WindowFlags windowFlags = 0):
-        base_type(parent, windowFlags)
-    {
-        setAcceptedMouseButtons(0);
-    }
-
-    virtual QRectF boundingRect() const override
-    {
-        return QRectF(-100000, -100000, 100000, 100000);
-    }
-
-    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override
-    {
-        painter->fillRect(geometry(), Qt::red);
-    }
-
-};
 
 class PlaceholderMagnitudeCalculator: public QnDistanceMagnitudeCalculator
 {
@@ -187,10 +165,9 @@ void LayoutTourReviewController::startListeningLayout()
     updateOrder();
     updateButtons(workbench()->currentLayout()->resource());
 
-    auto placeholder = new DropPlaceholderWidget();
-    display()->setLayer(placeholder, Qn::BackLayer);
-    display()->scene()->addItem(placeholder);
-    m_dropPlaceholder = placeholder;
+    m_dropPlaceholder = new LayoutTourDropPlaceholder();
+    display()->setLayer(m_dropPlaceholder, Qn::MessageBoxLayer);
+    display()->scene()->addItem(m_dropPlaceholder);
     updatePlaceholderPosition();
 }
 
@@ -264,29 +241,23 @@ void LayoutTourReviewController::connectToLayout(QnWorkbenchLayout* layout)
     *m_connections << connect(layout, &QnWorkbenchLayout::itemAdded, this,
         [this, layout](QnWorkbenchItem* item)
         {
-            connectToItem(item);
             updateOrder();
             updateButtons(layout->resource());
+            updatePlaceholderPosition();
+        });
+    *m_connections << connect(layout, &QnWorkbenchLayout::itemMoved, this,
+        [this, layout](QnWorkbenchItem* item)
+        {
+            updateOrder();
             updatePlaceholderPosition();
         });
     *m_connections << connect(layout, &QnWorkbenchLayout::itemRemoved, this,
         [this, layout](QnWorkbenchItem* item)
         {
-            item->disconnect(this);
             updateOrder();
             updateButtons(layout->resource());
             updatePlaceholderPosition();
         });
-    for (auto item: layout->items())
-        connectToItem(item);
-}
-
-void LayoutTourReviewController::connectToItem(QnWorkbenchItem* item)
-{
-    *m_connections << connect(item, &QnWorkbenchItem::geometryChanged, this,
-        &LayoutTourReviewController::updateOrder);
-    *m_connections << connect(item, &QnWorkbenchItem::geometryChanged, this,
-        &LayoutTourReviewController::updatePlaceholderPosition);
 }
 
 void LayoutTourReviewController::updateOrder()
@@ -326,14 +297,11 @@ void LayoutTourReviewController::updatePlaceholderPosition()
     static const QPoint kStartPos(0, 0);
     static const QSize kPlaceholderSize(1, 1);
 
-    qDebug() << "placing placeholder";
     PlaceholderMagnitudeCalculator metric(kStartPos);
-    const auto freeSlot = workbench()->currentLayout()->closestFreeSlot(kStartPos, kPlaceholderSize, &metric);
+    const auto freeSlot = workbench()->currentLayout()->closestFreeSlot(kStartPos,
+        kPlaceholderSize, &metric);
     const QRectF targetRect = mapper->mapFromGrid(freeSlot);
-
-    qDebug() << "set placeholder geometry" << targetRect << "(it was cell " << freeSlot << ")";
-    m_dropPlaceholder->setGeometry(targetRect);
-    m_dropPlaceholder->update();
+    m_dropPlaceholder->setRect(targetRect);
 }
 
 void LayoutTourReviewController::addItemToReviewLayout(
