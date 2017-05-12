@@ -31,6 +31,8 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_welcome_screen.h>
 
+#include <nx/utils/log/log.h>
+
 #ifdef _DEBUG
 #define DEBUG_ACTIONS
 #endif
@@ -216,6 +218,17 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
     connect(action(action::DebugDecrementCounterAction), &QAction::triggered, this,
         &QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered);
 #endif
+
+    auto supressLog = [](const QString& tag)
+        {
+            const auto logger = nx::utils::log::add({tag});
+            logger->setDefaultLevel(nx::utils::log::Level::none);
+            logger->setWriter(std::make_unique<nx::utils::log::StdOut>());
+        };
+
+    const auto kFreeSlotTag = lit("__freeSlot");
+    supressLog(kFreeSlotTag);
+    supressLog(QnLog::PERMISSIONS_LOG);
 }
 
 void QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered()
