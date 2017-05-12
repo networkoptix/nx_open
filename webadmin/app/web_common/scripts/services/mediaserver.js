@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('webadminApp')
+angular.module('nxCommon')
     .factory('mediaserver', function ($http, $modal, $q, $localStorage, $location, $log, nativeClient) {
 
         var mediaserver = {};
@@ -15,9 +15,6 @@ angular.module('webadminApp')
                 var pair = params[i].split('=');
                 if(pair[0] === 'proxy'){
                     proxy = '/web/proxy/' + pair[1];
-                    if(pair[1] === 'demo'){
-                        proxy = Config.demo;
-                    }
                     break;
                 }
             }
@@ -245,12 +242,6 @@ angular.module('webadminApp')
             },
             url:function(){
                 return proxy;
-            },
-            mediaDemo:function(){
-                if(proxy === Config.demo){
-                    return Config.demoMedia;
-                }
-                return false;
             },
             logUrl:function(params){
                 return proxy + '/web/api/showLog' + (params||'');

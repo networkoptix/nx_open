@@ -257,10 +257,6 @@ angular.module('webadminApp').controller('ViewCtrl',
             var cameraId = $scope.activeCamera.physicalId;
             var serverUrl = '';
 
-            var mediaDemo = mediaserver.mediaDemo();
-            if(mediaDemo){
-                serverUrl = mediaDemo;
-            }
             var authParam = '&auth=' + mediaserver.authForMedia();
 
             var positionMedia = !live ? '&pos=' + (playing) : '';

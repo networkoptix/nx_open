@@ -59,7 +59,7 @@
 
 <!-- build:js scripts/vendor.js -->
 <!-- bower:js -->
-<script src="bower_components/jquery/jquery.js"></script>
+<script src="bower_components/jquery/dist/jquery.js"></script>
 <script src="bower_components/angular/angular.js"></script>
 <script src="bower_components/json3/lib/json3.js"></script>
 <script src="bower_components/sass-bootstrap/dist/js/bootstrap.js"></script>
@@ -102,9 +102,14 @@
 
 <!-- endbuild -->
 
+<!-- build:js({.tmp,app}) scripts/common.js -->
+<script src="web_common/scripts/module.js"></script>
+<script src="web_common/scripts/services/mediaserver.js"></script>
+<script src="web_common/scripts/services/nativeClient.js"></script>
+<!-- endbuild -->
+
 <!-- build:js({.tmp,app}) scripts/scripts.js -->
 <script src="scripts/bootstrap.js"></script>
-
 <script src="scripts/config.js"></script>
 <script src="scripts/app.js"></script>
 
@@ -116,14 +121,12 @@
 <script src="scripts/services/timelineCanvasRender.js"></script>
 
 <script src="scripts/services/cameraRecords.js"></script>
-<script src="scripts/services/mediaserver.js"></script>
 <script src="scripts/services/cloudAPI.js"></script>
 <script src="scripts/services/timelineModels.js"></script>
 <script src="scripts/services/cameraRecords.js"></script>
 <script src="scripts/services/animateScope.js"></script>
 <script src="scripts/services/dialogs.js"></script>
 <script src="scripts/services/poll.js"></script>
-<script src="scripts/services/nativeClient.js"></script>
 <script src="scripts/services/visualLog.js"></script>
 <script src="scripts/services/camerasProvider.js"></script>
 
