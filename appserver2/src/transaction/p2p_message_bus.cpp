@@ -32,6 +32,7 @@ namespace {
 
     int commitIntervalMs = 1000;
     static const int kMaxSelectDataSize = 1024 * 32;
+    static const int kMaxPushTranListDataSize = 1024 * 8;
 
     static const int kOutConnectionsInterval = 1000;
 
@@ -1203,6 +1204,39 @@ bool P2pMessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connec
     return selectAndSendTransactions(connection, std::move(newSubscription));
 }
 
+bool P2pMessageBus::pushTransactionList(
+    const P2pConnectionPtr& connection,
+    const QList<QByteArray>& tranList)
+{
+    int prevIndex = 0;
+    int index = 0;
+    while (index < tranList.size())
+    {
+        unsigned expectedSize = 1;
+        while (expectedSize < kMaxPushTranListDataSize && index < tranList.size())
+        {
+            expectedSize += 4 + tranList[index].size();
+            ++index;
+        }
+        QByteArray message;
+        message.resize(qPower2Ceil(expectedSize, 4));
+        BitStreamWriter writer;
+        writer.setBuffer((quint8*)message.data(), message.size());
+        writer.putBits(8, (quint8)MessageType::pushTransactionList);
+        for (int i = prevIndex; i < index; ++i)
+        {
+            serializeCompressedSize(writer, tranList[i].size());
+            writer.putBytes((quint8*)tranList[i].data(), tranList[i].size());
+        }
+        writer.flushBits(true);
+        message.truncate(writer.getBytesCount());
+        connection->sendMessage(message);
+        prevIndex = index;
+    }
+
+    return true;
+}
+
 bool P2pMessageBus::selectAndSendTransactions(
     const P2pConnectionPtr& connection,
     QnTranState newSubscription)
@@ -1228,27 +1262,10 @@ bool P2pMessageBus::selectAndSendTransactions(
     connection->miscData().remoteSubscription = newSubscription;
 
 #if 1
-    if (!serializedTransactions.isEmpty() &&
-        connection->remotePeer().peerType == Qn::PT_Server &&
+    if (connection->remotePeer().peerType == Qn::PT_Server &&
         connection->remotePeer().dataFormat == Qn::UbjsonFormat)
     {
-        QByteArray message;
-        unsigned expectedSize = 1 + 4 * serializedTransactions.size();
-        for (const auto& serializedTran: serializedTransactions)
-            expectedSize += serializedTran.size();
-        message.resize(qPower2Ceil(expectedSize, 4));
-        BitStreamWriter writer;
-        writer.setBuffer((quint8*) message.data(), message.size());
-        writer.putBits(8, (quint8) MessageType::pushTransactionList);
-        for (const auto& serializedTran: serializedTransactions)
-        {
-            serializeCompressedSize(writer, serializedTran.size());
-            writer.putBytes((quint8*) serializedTran.data(), serializedTran.size());
-        }
-        writer.flushBits(true);
-        message.truncate(writer.getBytesCount());
-        connection->sendMessage(message);
-        return true;
+        return pushTransactionList(connection, serializedTransactions);
     }
 #endif
 
