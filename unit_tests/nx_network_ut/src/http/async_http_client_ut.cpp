@@ -262,7 +262,7 @@ TEST_F(AsyncHttpClient, motionJpegRetrieval)
             [&](nx_http::AsyncHttpClientPtr client)
             {
                 ASSERT_TRUE(client->response() != nullptr);
-                ASSERT_EQ(client->response()->statusLine.statusCode, nx_http::StatusCode::ok);
+                ASSERT_EQ(nx_http::StatusCode::ok, client->response()->statusLine.statusCode);
                 auto contentTypeIter = client->response()->headers.find("Content-Type");
                 ASSERT_TRUE(contentTypeIter != client->response()->headers.end());
                 clientCtx.multipartParser.setContentType(contentTypeIter->second);
