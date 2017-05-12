@@ -424,6 +424,11 @@ void RequestCounter::incrementCounters(
     ++counters[Total][kNullGuid];
 }
 
+int RequestCounter::totalRequests() const
+{
+    return counters[Total][kNullGuid];
+}
+
 void RequestCounter::printCounters(const QString& header, TestPeerManager* peerManager) const
 {
     QTextStream out(stdout);

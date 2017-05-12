@@ -32,6 +32,8 @@ struct RequestCounter
 
     void incrementCounters(const QnUuid& peerId, RequestType requestType);
 
+    int totalRequests() const;
+
     void printCounters(const QString& header, TestPeerManager* peerManager) const;
 
     static QString requestTypeShortName(RequestType requestType);

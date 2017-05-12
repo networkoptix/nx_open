@@ -429,13 +429,16 @@ TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadFlatNetwork)
     for (const auto& peer: peerById)
         peer->peerManager->calculateDistances();
 
-    const int maxSteps = fileInfo.downloadedChunks.size() * 2;
+    const int maxRequests = fileInfo.downloadedChunks.size() * pendingPeers.size() * 5;
 
     for (auto& peer: peerById)
         peer->worker->start();
 
-    for (int i = 0; i < maxSteps && !pendingPeers.isEmpty(); ++i)
+    do
+    {
         nextStep();
+    } while (!pendingPeers.isEmpty()
+        && commonPeerManager->requestCounter()->totalRequests() < maxRequests);
 
     commonPeerManager->requestCounter()->printCounters(
         "Incoming Requests:", commonPeerManager.data());
@@ -448,6 +451,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadFlatNetwork)
     }
 
     ASSERT_EQ(pendingPeers.size(), 0);
+    ASSERT_LE(commonPeerManager->requestCounter()->totalRequests(), maxRequests);
 }
 
 } // namespace test
