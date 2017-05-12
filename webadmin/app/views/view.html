@@ -49,7 +49,7 @@
                     <div class="view-wrapper">
                         <camera-panel cameras-provider="camerasProvider" active-camera="activeCamera"
                                       player="player" current-resolution="currentResolution" toggle-camera-panel="toggleCameraPanel"
-                                      ng-class="{'visible-xs-block':toggleCameraPanel, 'hidden-xs': !toggleCameraPanel}"></camera-panel>
+                                      ng-class="{'visible-xs':toggleCameraPanel, 'hidden-xs': !toggleCameraPanel}"></camera-panel>
                     </div>
                 </td>
                 <td width="100%" ng-class="{'hidden-xs':toggleCameraPanel}">
@@ -87,7 +87,7 @@
                                         </span>
                                     </div>
                                     <div>
-                                        <span class="visible-xs-inline-block back-button" ng-click="toggleCameraPanel=true"><span class="glyphicon glyphicon-arrow-left"></span></span>
+                                        <span class="visible-xs" ng-click="toggleCameraPanel=true" ng-class="{'back-button': !toggleCameraPanel}"><span class="glyphicon glyphicon-arrow-left"></span></span>
                                         <span class="caption-row video-name">
                                             <span ng-if="activeCamera.status!='Recording' && activeCamera.scheduleEnabled" class="danger video-status">&#x25E6;</span>
                                             <span ng-if="activeCamera.status=='Recording' " class="danger video-status">&#x25CF;</span>

@@ -464,7 +464,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
         };
 
-        setTimeout(updateHeights);
+        setTimeout(updateHeights,100);
         $window.resize(updateHeights);
 
         $scope.mobileAppAlertClose = function(){

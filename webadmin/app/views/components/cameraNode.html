@@ -1,4 +1,4 @@
-<a ng-click="selectCamera(camera);$event.stopPropagation()" class="camera-node" ng-class="camera.status">
+<a ng-click="selectCamera(camera);$event.stopPropagation()" class="camera-node" ng-class="[camera.status,{'toggle-info':toggleInfo}]">
     <div class="pull-left camera-preview">
         <div>
             <span ng-if="camera.status!='Recording' && camera.scheduleEnabled" class="camera-status danger">&#x25E6;</span>

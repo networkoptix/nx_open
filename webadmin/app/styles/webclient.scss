@@ -76,7 +76,6 @@ table.webclient-window>tbody>tr>td.alert{
   width:100%;
 
   background-color: $additional_light2;
-  border-right: 1px solid #121517;
 }
 .camera-status{
   display:inline-block;
@@ -333,8 +332,15 @@ camera-panel {
   background-color: $additional_light2;
 }
 
+.cameras-search>.input-group>input{
+  margin-bottom: -20px;
+}
+.raise-input-up{
+  margin-bottom: -5px !important;
+}
+
 .cameras-search>.input-group{
-  margin-top: -9px;
+  margin-top: -11px;
 }
 
 .cameras-search>.input-group>*{
@@ -432,7 +438,6 @@ div.text-right{
   width:104px;
   height:100px;
   background-color: $additional_light2;
-  border-left: 1px solid $additional_light2;
 }
 
 .live-button .webclient-button{
@@ -461,8 +466,11 @@ live-circle{
   border-right: 1px solid $light4 !important;
 }
 
-.live-button.no-volume{
-  width: 100%;
+div.text-right.no-volume{
+  width: 64px !important;
+}
+div.text-center.no-volume{
+  margin-right: 64px !important;
 }
 
 
@@ -652,15 +660,19 @@ div.text-center{
   padding:10px;
 }
 
-.webclient-window .tree li>ul{
-  margin-bottom: 20px;
+.webclient-window .tree li > ul{
+  margin-bottom: 8px;
+}
+
+.webclient-window .tree > li{
+  padding-bottom: 8px;
+  border-bottom: 1px solid $light6;
 }
 
 .server-underline{
   display: inline-block;
   width:100%;
   height: 40px;
-  border-bottom: 1px solid $light6;
 }
 .webclient-panel-border{
   height: 30px;
@@ -711,12 +723,13 @@ div.text-center{
   margin-right: 10px;
   background-color: $light5;
   border: 1px solid $light1;
-  boreder-radius: 1px;
+  border-radius: 1px;
   font-size: 14px;
 
 
   position:absolute;
   margin-left:-86px;
+  margin-top: -2px;
 }
 
 .camera-node.Unauthorized {
@@ -832,8 +845,7 @@ div.text-center{
   font-size: 14px;
   font-weight: 500 !important;
   color: $dark9 !important;
-  line-height: 22px;
-
+  line-height: 34px;
 }
 
 .camera-node small{
@@ -841,6 +853,10 @@ div.text-center{
   font-weight: 400;
   color: $light16 !important;
   line-height: 18px;
+}
+
+.camera-node.toggle-info{
+  line-height: 18px !important;
 }
 
 .not-supported.camera-view-message{
@@ -855,15 +871,30 @@ div.text-center{
   display: none;
 }
 
-.visible-xs-block .cameras-panel{
-  width: 100% !important; 
+.visible-xs .cameras-panel{
+  width: 100% !important;
+  display: block !important; 
 }
 
-.visible-xs-inline-block.back-button{
-  vertical-align: top;
-  display: inline-block;
-  margin-left: 4px;
+camera-panel.visible-xs{
+  display: block !important;
 }
+
+.visible-xs.back-button{
+  vertical-align: top;
+  margin-left: 4px;
+  display: none !important;
+}
+
+@media (max-width: 767px){
+  .visible-xs.back-button{
+    display: inline-block !important;
+  }
+  camera-panel.visible-xs {
+    display: block !important;
+  }
+}
+
 
 @media only screen and (max-screen-width:640px) {
   .invisible-xs,.hidden-mobile{
@@ -926,7 +957,6 @@ div.text-center{
   height:40px;
   line-height:20px !important;
   padding: 10px;
-  border-bottom: 1px solid $light6;
 }
 .server-link:hover{
   background-color: $additional_light3 !important;
@@ -960,6 +990,10 @@ div.text-center{
   line-height: 22px;
 }
 
-.pull-up-3{
-  margin-top: -3px;
+.pull-up-4{
+  margin-top: -4px;
+}
+
+.server-link > .pull-right{
+  margin-top: -4px;
 }

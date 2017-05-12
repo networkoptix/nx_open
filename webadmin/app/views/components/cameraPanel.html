@@ -2,7 +2,7 @@
     <div class="cameras-search" ng-class="{active:searchCams!=''}">
         <label class="input-group input-group">
             <span class="input-group-addon icon" ><span class="glyphicon glyphicon-search"></span></span>
-            <input type="search" class="form-control" placeholder="Search" ng-model="searchCams">
+            <input type="search" class="form-control" placeholder="Search" ng-model="searchCams" ng-class="{'raise-input-up': searchCams}">
             <span ng-hide="!searchCams || searchCams==''" class="input-group-addon clear-button" ng-click="searchCams=''" ><span class="glyphicon glyphicon-remove"></span></span>
             <div class="clear-button-right" ng-hide="!searchCams || searchCams==''"></div>
             <span class="input-group-addon info-icon" ng-class="{'active':toggleInfo}" ng-click="toggleInfo= !toggleInfo"><span class="glyphicon glyphicon-info-sign"></span></span>
@@ -31,7 +31,7 @@
                         <icon for="server.status=='Offline'"      on-true="server-offline"      title="Offline"></icon>
                         <icon for="server.status!='Unauthorized' && server.status!='Offline'" on-true="server-ok"></icon>
                     </span>
-                    <span class="pull-left pull-up-3"><span class="glyphicon glyphicon-th-list"></span></span>
+                    <span class="pull-left pull-up-4"><span class="glyphicon glyphicon-th-list"></span></span>
                     <span class="server-name">&nbsp; {{server.name}}</span><small ng-if="toggleInfo">&nbsp;{{server.networkAddresses.substr(0,server.networkAddresses.indexOf(':'))}}</small>
                 </div>
             </a>
