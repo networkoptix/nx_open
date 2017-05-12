@@ -1,0 +1,6 @@
+新訊息
+
+類型: {{message.type}}
+內容: {{{message.data}}}
+
+此類型訊息無特定範本

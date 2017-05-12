@@ -17,7 +17,7 @@ public:
     QnDlinkPtzController(const QnPlOnvifResourcePtr &resource);
     virtual ~QnDlinkPtzController();
 
-    virtual Qn::PtzCapabilities getCapabilities() override;
+    virtual Ptz::Capabilities getCapabilities() const override;
     virtual bool continuousMove(const QVector3D &speed) override;
 
 private:

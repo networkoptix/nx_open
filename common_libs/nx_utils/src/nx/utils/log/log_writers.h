@@ -26,8 +26,8 @@ QString NX_UTILS_API toString(Level level);
 class NX_UTILS_API AbstractWriter
 {
 public:
-    virtual void write(Level level, const QString& message) = 0;
     virtual ~AbstractWriter() = default;
+    virtual void write(Level level, const QString& message) = 0;
 };
 
 /**
@@ -76,7 +76,7 @@ class NX_UTILS_API Buffer: public AbstractWriter
 {
 public:
     virtual void write(Level level, const QString& message) override;
-    std::vector<QString> take();
+    std::vector<QString> takeMessages();
 
 private:
     QnMutex m_mutex;

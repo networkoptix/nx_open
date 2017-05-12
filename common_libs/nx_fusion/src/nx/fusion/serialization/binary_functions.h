@@ -1,5 +1,4 @@
-#ifndef QN_SERIALIZATION_BINARY_FUNCTIONS_H
-#define QN_SERIALIZATION_BINARY_FUNCTIONS_H
+#pragma once
 
 #include <type_traits> /* For std::enable_if. */
 #include <utility> /* For std::pair, std::min. */
@@ -12,16 +11,14 @@
 #include <boost/preprocessor/tuple/enum.hpp>
 #endif
 
-#ifndef QN_NO_QT
-#   include <QtCore/QtEndian>
-#   include <QtCore/QString>
-#   include <QtCore/QByteArray>
-#   include <QtCore/QUrl>
-#   include <nx/utils/uuid.h>
-#endif
+#include <QtCore/QtEndian>
+#include <QtCore/QString>
+#include <QtCore/QByteArray>
+#include <QtCore/QUrl>
 
 #include <nx/utils/collection.h>
 #include <nx/utils/latin1_array.h>
+#include <nx/utils/uuid.h>
 
 #include "collection_fwd.h"
 #include "binary.h"
@@ -255,9 +252,6 @@ bool deserialize(QnInputBinaryStream<Input> *stream, bool *target) {
     return true;
 }
 
-
-#ifndef QN_NO_QT
-
 template<class Output>
 void serialize(const QByteArray &value, QnOutputBinaryStream<Output> *stream) {
     serialize(static_cast<qint32>(value.size()), stream);
@@ -359,9 +353,6 @@ bool deserialize(QnInputBinaryStream<Input> *stream, QnUuid *target) {
     return true;
 }
 
-#endif // QN_NO_QT
-
-
 // TODO: #Elric #ec2 check all enums we're using for explicit values.
 
 template<class T, class Output>
@@ -435,6 +426,3 @@ bool deserialize(QnInputBinaryStream<Input> *stream, std::array<T, N> *target) {
             return false;
     return true;
 }
-
-
-#endif // QN_SERIALIZATION_BINARY_FUNCTIONS_H

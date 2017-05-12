@@ -20,6 +20,7 @@ public:
     #endif
 
     Level level = kDefaultLevel;
+    std::set<QString> exceptionFilers;
     QString directory = QString(); //< dataDir/log
     quint32 maxFileSize = nx::utils::stringToBytesConst("10M");
     quint8 maxBackupCount = 5;
