@@ -176,6 +176,7 @@
         <libjpeg-turbo.version>1.4.2</libjpeg-turbo.version>
         <libcreateprocess.version>0.1</libcreateprocess.version>
         <vmux.version>1.0.0</vmux.version>
+        <cpro.version>1.0.0</cpro.version>
         <server-external.version>default</server-external.version>
         <help.version>${customization}-${release.version}</help.version>
         <gcc.version>4.9.4</gcc.version>
@@ -520,7 +521,7 @@
 
                 <!-- <module>plugins/axiscamplugin</module> -->
                 <!-- <module>storage_plugins/ftpstorageplugin</module> -->
-                <module>storage_plugins/teststorageplugin</module> 
+                <module>storage_plugins/teststorageplugin</module>
 
                 <!-- <module>mediaproxy</module> -->
             </modules>
@@ -641,7 +642,7 @@
             <properties>
                 <paxton>true</paxton>
             </properties>
-        </profile>        
+        </profile>
         <profile>
             <id>windows-nomobile</id>
             <activation>

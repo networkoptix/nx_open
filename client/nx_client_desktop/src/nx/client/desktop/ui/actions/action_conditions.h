@@ -471,7 +471,7 @@ public:
 class PtzCondition: public Condition
 {
 public:
-    PtzCondition(Qn::PtzCapabilities capabilities, bool disableIfPtzDialogVisible);
+    PtzCondition(Ptz::Capabilities capabilities, bool disableIfPtzDialogVisible);
     virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
     virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
     virtual ActionVisibility check(const QnResourceWidgetList& widgets, QnWorkbenchContext* context) override;
@@ -480,7 +480,7 @@ private:
     bool check(const QnPtzControllerPtr &controller);
 
 private:
-    Qn::PtzCapabilities m_capabilities;
+    Ptz::Capabilities m_capabilities;
     bool m_disableIfPtzDialogVisible;
 };
 

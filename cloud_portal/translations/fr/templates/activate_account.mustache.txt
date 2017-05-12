@@ -1,0 +1,8 @@
+Bienvenue sur {{PRODUCT_NAME}}
+
+Merci de joindre {{PRODUCT_NAME}}. S.V.P visitez lien lien ci-dessous  pour confirmer votre courriel et activer le compte.
+
+Activer compte: {{config.portal_url}}/activate/{{message.code}}
+
+Si vous n'avez pas enregistré sur {{PRODUCT_NAME}}, ignorez ce courriel.
+S.V.P ne partagé pas ce message ou le lien avec des tierces parties.

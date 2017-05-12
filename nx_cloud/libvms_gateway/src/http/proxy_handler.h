@@ -15,10 +15,9 @@ class RunTimeOptions;
 
 } // namespace conf
 
-class ProxyHandler
-:
+class ProxyHandler:
     public nx_http::AbstractHttpRequestHandler,
-    public StreamConnectionHolder<nx_http::AsyncMessagePipeline>
+    public network::server::StreamConnectionHolder<nx_http::AsyncMessagePipeline>
 {
 public:
     ProxyHandler(

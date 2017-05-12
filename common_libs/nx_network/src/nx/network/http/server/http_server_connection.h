@@ -50,14 +50,14 @@ using ResponseIsReadyHandler =
         ConnectionEvents)>;
 
 template<typename ConnectionType> using BaseConnection = 
-    nx_api::BaseStreamProtocolConnection<
+    nx::network::server::BaseStreamProtocolConnection<
         ConnectionType,
         nx_http::Message,
         nx_http::MessageParser,
         nx_http::MessageSerializer>;
 
 using AsyncMessagePipeline = 
-    nx_api::BaseStreamProtocolConnectionEmbeddable<
+    nx::network::server::BaseStreamProtocolConnectionEmbeddable<
         nx_http::Message,
         nx_http::MessageParser,
         nx_http::MessageSerializer>;
@@ -70,7 +70,7 @@ class NX_NETWORK_API HttpServerConnection:
 
 public:
     HttpServerConnection(
-        StreamConnectionHolder<HttpServerConnection>* socketServer,
+        nx::network::server::StreamConnectionHolder<HttpServerConnection>* socketServer,
         std::unique_ptr<AbstractStreamSocket> sock,
         nx_http::server::AbstractAuthenticationManager* const authenticationManager,
         nx_http::AbstractMessageDispatcher* const httpMessageDispatcher);

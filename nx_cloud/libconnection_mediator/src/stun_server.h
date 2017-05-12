@@ -28,8 +28,8 @@ public:
 private:
     const conf::Settings& m_settings;
     nx::stun::MessageDispatcher m_stunMessageDispatcher;
-    std::unique_ptr<MultiAddressServer<stun::SocketServer>> m_tcpStunServer;
-    std::unique_ptr<MultiAddressServer<stun::UdpServer>> m_udpStunServer;
+    std::unique_ptr<nx::network::server::MultiAddressServer<stun::SocketServer>> m_tcpStunServer;
+    std::unique_ptr<nx::network::server::MultiAddressServer<stun::UdpServer>> m_udpStunServer;
 
     std::vector<SocketAddress> m_endpoints;
 };

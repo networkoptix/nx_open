@@ -151,9 +151,9 @@ TEST(Algorithm_countElementsWithPrefix, all)
 }
 
 //-------------------------------------------------------------------------------------------------
-// findAnyElementWithPrefix
+// findFirstElementWithPrefix
 
-TEST(Algorithm_findAnyElementWithPrefix, all)
+TEST(Algorithm_findFirstElementWithPrefix, all)
 {
     std::map<std::string, int> m;
     m.emplace("a", 1);
@@ -162,12 +162,12 @@ TEST(Algorithm_findAnyElementWithPrefix, all)
     m.emplace("aaabbbeee", 4);
     m.emplace("aaafff", 5);
 
-    ASSERT_EQ(m.end(), findAnyElementWithPrefix(m, "c"));
-    ASSERT_EQ(m.end(), findAnyElementWithPrefix(m, "aaafff1"));
-    ASSERT_EQ(1, findAnyElementWithPrefix(m, "a")->second);
-    ASSERT_EQ(2, findAnyElementWithPrefix(m, "aa")->second);
-    ASSERT_EQ(4, findAnyElementWithPrefix(m, "aaabbbe")->second);
-    ASSERT_EQ(5, findAnyElementWithPrefix(m, "aaaff")->second);
+    ASSERT_EQ(m.end(), findFirstElementWithPrefix(m, "c"));
+    ASSERT_EQ(m.end(), findFirstElementWithPrefix(m, "aaafff1"));
+    ASSERT_EQ(1, findFirstElementWithPrefix(m, "a")->second);
+    ASSERT_EQ(2, findFirstElementWithPrefix(m, "aa")->second);
+    ASSERT_EQ(4, findFirstElementWithPrefix(m, "aaabbbe")->second);
+    ASSERT_EQ(5, findFirstElementWithPrefix(m, "aaaff")->second);
 }
 
 //-------------------------------------------------------------------------------------------------

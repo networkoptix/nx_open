@@ -17,10 +17,9 @@ namespace cloud {
 namespace udp {
 
 /** Extends \a RendezvousConnector functionality by adding connection id verification. */
-class RendezvousConnectorWithVerification
-:
+class RendezvousConnectorWithVerification:
     public RendezvousConnector,
-    public StreamConnectionHolder<stun::MessagePipeline>
+    public nx::network::server::StreamConnectionHolder<stun::MessagePipeline>
 {
 public:
     RendezvousConnectorWithVerification(

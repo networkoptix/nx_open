@@ -76,8 +76,8 @@ const char* toString(AttributeType val)
             return "isPersistent";
         case isListening:
             return "isListening";
-        case trafficRelayEndpoint:
-            return "trafficRelayEndpoint";
+        case trafficRelayUrl:
+            return "trafficRelayUrl";
 
         case udpHolePunchingResultCode:
             return "udpHolePunchingResultCode";

@@ -5,6 +5,7 @@
 
 #include <client_core/client_core_settings.h>
 
+#include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 
 #include <utils/media/ffmpeg_initializer.h>
@@ -28,6 +29,7 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
         nx::utils::TimerManager::instance(), commonModule()));
 
     commonModule()->instance<QnResourcesChangesManager>();
+    commonModule()->instance<QnClientPtzControllerPool>();
 }
 
 QnClientCoreModule::~QnClientCoreModule()
@@ -43,4 +45,9 @@ QnCommonModule* QnClientCoreModule::commonModule() const
 ec2::AbstractECConnectionFactory* QnClientCoreModule::connectionFactory() const
 {
     return m_connectionFactory.get();
+}
+
+QnPtzControllerPool* QnClientCoreModule::ptzControllerPool() const
+{
+    return m_commonModule->instance<QnClientPtzControllerPool>();
 }

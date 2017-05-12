@@ -100,7 +100,7 @@ static Buffer hmacSha1( const String& key, const Message* message )
     size_t bytes;
     MessageSerializer serializer;
     serializer.setMessage(message);
-    if (serializer.serialize(&buffer, &bytes) != nx_api::SerializerState::done)
+    if (serializer.serialize(&buffer, &bytes) != nx::network::server::SerializerState::done)
     {
         NX_ASSERT(false);
     }

@@ -25,9 +25,9 @@ public:
 
     void setMessage(ModbusMessage* const msg);
 
-    nx_api::ParserState parse(const nx::Buffer& buf, size_t* bytesProcessed);
+    nx::network::server::ParserState parse(const nx::Buffer& buf, size_t* bytesProcessed);
 
-    nx_api::ParserState state() const;
+    nx::network::server::ParserState state() const;
 
     void reset();
 

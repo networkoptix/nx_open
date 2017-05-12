@@ -47,6 +47,8 @@ bool QnMutex::tryLock()
 {
     if( m_impl->mutex.tryLock() )
     {
+        // #TODO: add QmMutexTryLock class
+        m_impl->afterMutexLocked("Not implemented", 0, -1);
         m_impl->threadHoldingMutex = ::currentThreadSystemId();
         return true;
     }

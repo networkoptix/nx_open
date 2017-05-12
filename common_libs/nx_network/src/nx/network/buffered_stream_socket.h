@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nx/utils/move_only_func.h>
+
 #include "socket_delegate.h"
 
 namespace nx {
@@ -18,7 +20,7 @@ public:
      * Handler will be called as soon as there is some data ready to recv.
      * @note: is not thread safe (conflicts with recv and recvAsync)
      */
-    void catchRecvEvent(std::function<void(SystemError::ErrorCode)> handler);
+    void catchRecvEvent(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
 
     enum class Inject { only, replace, begin, end };
 
@@ -41,6 +43,9 @@ public:
 private:
     std::unique_ptr<AbstractStreamSocket> m_socket;
     Buffer m_internalRecvBuffer;
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_catchRecvEventHandler;
+
+    void triggerCatchRecvEvent(SystemError::ErrorCode resultCode);
 };
 
 } // namespace network

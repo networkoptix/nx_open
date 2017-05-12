@@ -37,7 +37,7 @@ private:
     nx_http::server::rest::MessageDispatcher m_httpMessageDispatcher;
     nx_http::AuthMethodRestrictionList m_authRestrictionList;
     view::AuthenticationManager m_authenticationManager;
-    std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>> m_multiAddressHttpServer;
+    std::unique_ptr<nx::network::server::MultiAddressServer<nx_http::HttpStreamSocketServer>> m_multiAddressHttpServer;
 
     void registerApiHandlers();
     template<typename Handler> void registerApiHandler(

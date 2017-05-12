@@ -50,7 +50,7 @@ protected:
     conf::Settings settings;
     ListeningPeerPool listeningPeerPool;
     PeerRegistrator listeningPeerRegistrator;
-    MultiAddressServer<SocketServer> server;
+    network::server::MultiAddressServer<SocketServer> server;
 };
 
 static const auto SYSTEM_ID = QnUuid::createUuid().toSimpleString().toUtf8();
