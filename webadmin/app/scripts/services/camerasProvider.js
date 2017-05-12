@@ -1,6 +1,6 @@
 'use strict';
 angular.module('webadminApp')
-    .factory('camerasProvider', function (systemAPI, $location, $localStorage, $q, $poll) {
+    .factory('camerasProvider', function (systemAPI, $localStorage, $q, $poll) {
         var reloadInterval = Config.settingsConfig.reloadInterval;//30 seconds
 
         function camerasProvider(){
