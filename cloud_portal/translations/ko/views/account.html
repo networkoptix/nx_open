@@ -1,0 +1,83 @@
+
+<div ng-if="accountMode">
+    <h1>계정</h1>
+    <form name="accountForm" class="form-horizontal" novalidate>
+
+        <div class="form-group">
+            <label class="col-sm-4 control-label">이메일</label>
+            <div class="col-sm-4">
+                <input type="text"  class="form-control" ng-model="account.email" readonly>
+            </div>
+        </div>
+
+        <div class="form-group" validate-field>
+            <label for="firstName" class="col-sm-4 control-label">이름</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" ng-model="account.first_name" name="firstName" id="firstName" maxlength="255" required>
+            </div>
+            <div class="col-sm-4">
+                <span class="help-block" ng-if="accountForm.firstName.$touched && accountForm.firstName.$error.required">이름이 필요합니다.</span>
+            </div>
+        </div>
+        <div class="form-group"  validate-field>
+            <label for="lastName"  class="col-sm-4 control-label">성</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" ng-model="account.last_name" name="lastName" id="lastName" maxlength="255"  required>
+            </div>
+            <div class="col-sm-4">
+                <span class="help-block" ng-if="accountForm.lastName.$touched && accountForm.lastName.$error.required">성이 필요합니다.</span>
+            </div>
+        </div>
+        <div class="form-group"  validate-field>
+            <label for="lastName"  class="col-sm-4 control-label">언어</label>
+            <div class="col-sm-4">
+                <language-select account-mode="true" ng-model="account.language"></language-select>
+            </div>
+            <div class="col-sm-4">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-4 col-sm-4">
+                <div class="checkbox">
+                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> 이메일 뉴스 레터를 구독</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-4 col-sm-4">
+                <process-button process="save"
+                                form="accountForm"
+                                button-text="$root.L.account.saveChanges"></process-button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div ng-if="passwordMode" >
+    <h1>패스워드 변경</h1>
+    <form name="passwordForm" class="form-horizontal" novalidate>
+        <div class="form-group" validate-field>
+            <label for="password"  class="col-sm-4 control-label">현재 패스워드</label>
+            <div class="col-sm-4">
+                <input type="password" class="form-control" ng-model="pass.password"
+                       name="password"
+                       id="password" required>
+            </div>
+            <div class="col-sm-4">
+                <span class="help-block" ng-if="passwordForm.password.$touched && passwordForm.password.$error.required">현 패스워드가 필요합니다.</span>
+            </div>
+        </div>
+
+        <password-input ng-model="pass.newPassword" id="'newPassword'" label="$root.L.account.newPasswordLabel"></password-input>
+
+        <div class="form-group">
+            <div class="col-sm-offset-4 col-sm-4">
+                <process-button process="changePassword"
+                                form="passwordForm"
+                                button-text="$root.L.account.changePassword"></process-button>
+            </div>
+        </div>
+    </form>
+</div>
