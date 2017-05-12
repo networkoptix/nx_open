@@ -561,10 +561,6 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveFrame)
             ASSERT_EQ(ecode, SystemError::noError);
             ASSERT_EQ(serverReadBuf.size(), kFrameBuffer.size());
             receivedFrameCount++;
-            if (receivedFrameCount == kTotalMessageCount*kMessageFrameCount)
-            {
-                return;
-            }
             serverReadBuf.clear();
             serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
         };
@@ -577,6 +573,101 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveFrame)
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     ASSERT_EQ(receivedFrameCount, kTotalMessageCount*kMessageFrameCount);
+}
+
+TEST_F(WebSocket, SendMultiFrame_ReceiveStream)
+{
+    givenClientModes(SendMode::multiFrameMessage, ReceiveMode::frame);
+    givenServerModes(SendMode::multiFrameMessage, ReceiveMode::stream);
+    givenClientTestDataPrepared(16384 + 17);
+    givenTCPConnectionEstablished();
+
+    int frameCount = 0;
+    int sentMessageCount = 0;
+    int receivedDataSize = 0;
+    const int kMessageFrameCount = 100;
+    const int kTotalMessageCount = 20;
+
+    clientSendCb =
+        [&](SystemError::ErrorCode ecode, size_t transferred)
+        {
+            ASSERT_EQ(ecode, SystemError::noError);
+            frameCount++;
+            if (frameCount == kMessageFrameCount - 1)
+                clientWebSocket->setIsLastFrame();
+            else if (frameCount == kMessageFrameCount)
+            {
+                frameCount = 0;
+                sentMessageCount++;
+            }
+            if (sentMessageCount >= kTotalMessageCount)
+            {
+                readyPromise.set_value();
+                return;
+            }
+            clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
+        };
+
+    serverReadCb =
+        [&](SystemError::ErrorCode ecode, size_t transferred)
+        {
+            ASSERT_EQ(ecode, SystemError::noError);
+            receivedDataSize += transferred;
+            serverReadBuf.clear();
+            serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
+        };
+    startFuture.wait();
+
+    clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
+    serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
+
+    readyFuture.wait();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    ASSERT_EQ(receivedDataSize, kTotalMessageCount*kMessageFrameCount*clientSendBuf.size());
+}
+
+TEST_F(WebSocket, SendMessage_ReceiveStream)
+{
+    givenClientModes(SendMode::singleMessage, ReceiveMode::frame);
+    givenServerModes(SendMode::multiFrameMessage, ReceiveMode::stream);
+    givenClientTestDataPrepared(1684*1024 + 17);
+    givenTCPConnectionEstablished();
+
+    int sentMessageCount = 0;
+    int receivedDataSize = 0;
+    const int kTotalMessageCount = 20;
+
+    clientSendCb =
+        [&](SystemError::ErrorCode ecode, size_t transferred)
+        {
+            ASSERT_EQ(ecode, SystemError::noError);
+            sentMessageCount++;
+            if (sentMessageCount >= kTotalMessageCount)
+            {
+                readyPromise.set_value();
+                return;
+            }
+            clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
+        };
+
+    serverReadCb =
+        [&](SystemError::ErrorCode ecode, size_t transferred)
+        {
+            ASSERT_EQ(ecode, SystemError::noError);
+            receivedDataSize += transferred;
+            serverReadBuf.clear();
+            serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
+        };
+    startFuture.wait();
+
+    clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
+    serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
+
+    readyFuture.wait();
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    ASSERT_EQ(receivedDataSize, kTotalMessageCount*clientSendBuf.size());
 }
 
 }
