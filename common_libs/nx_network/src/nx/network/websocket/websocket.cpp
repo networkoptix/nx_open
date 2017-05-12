@@ -47,9 +47,9 @@ void WebSocket::setIsLastFrame()
     dispatch([this]() { m_isLastFrame = true; });
 }
 
-void WebSocket::handleSocketRead(SystemError::ErrorCode ecode, size_t /*bytesRead*/)
+void WebSocket::handleSocketRead(SystemError::ErrorCode ecode, size_t bytesRead)
 {
-    m_parser.consume(m_readBuffer.data(), m_readBuffer.size());
+    m_parser.consume(m_readBuffer.data(), bytesRead);
     m_readBuffer.resize(0);
     processReadData(ecode);
 }
