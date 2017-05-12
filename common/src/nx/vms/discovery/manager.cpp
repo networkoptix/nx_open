@@ -52,7 +52,7 @@ void Manager::stop()
     m_moduleConnector->post(
         [this]()
         {
-            m_moduleConnector->diactivate();
+            m_moduleConnector->deactivate();
             m_multicastFinder->stopWhileInAioThread();
             m_legacyMulticastFinder->pleaseStop();
         });
@@ -255,7 +255,7 @@ void Manager::monitorServerUrls()
                         m_moduleConnector->post(
                             [this, id = server->getId(), endpoints = std::move(endpoints)]()
                             {
-                                m_moduleConnector->ignoreEndpoints(std::move(endpoints), id);
+                                m_moduleConnector->setForbiddenEndpoints(std::move(endpoints), id);
                             });
                     });
             }

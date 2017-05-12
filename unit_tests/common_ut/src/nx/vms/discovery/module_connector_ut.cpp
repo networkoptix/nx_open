@@ -92,7 +92,7 @@ TEST_F(DiscoveryModuleConnector, AddEndpoints)
 
 TEST_F(DiscoveryModuleConnector, ActivateDiactivate)
 {
-    connector.diactivate();
+    connector.deactivate();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     const auto id = QnUuid::createUuid();
@@ -105,7 +105,7 @@ TEST_F(DiscoveryModuleConnector, ActivateDiactivate)
     connector.activate();
     expectConnect(id, endpoint1);
 
-    connector.diactivate();
+    connector.deactivate();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     mediaservers.erase(endpoint1);
     ASSERT_EQ(id, disconnectedQueue.pop()); //< Disconnect is reported anyway.
@@ -128,7 +128,7 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
         return;
 
     const auto id = QnUuid::createUuid();
-    connector.diactivate();
+    connector.deactivate();
 
     const auto networkEndpoint = addMediaserver(id, *interfaceIpsV4.begin());
     const auto localEndpoint = addMediaserver(id);
@@ -147,25 +147,25 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
 TEST_F(DiscoveryModuleConnector, IgnoredEndpoints)
 {
     const auto id = QnUuid::createUuid();
-    connector.diactivate();
+    connector.deactivate();
 
     const auto endpoint1 = addMediaserver(id);
     const auto endpoint2 = addMediaserver(id);
     const auto endpoint3 = addMediaserver(id);
     connector.newEndpoints({endpoint1, endpoint2, endpoint3}, id);
 
-    connector.ignoreEndpoints({endpoint1, endpoint3}, id);
+    connector.setForbiddenEndpoints({endpoint1, endpoint3}, id);
     connector.activate();
     expectConnect(id, endpoint2); //< The only one which is not blocked.
 
-    connector.ignoreEndpoints({endpoint3}, id);
+    connector.setForbiddenEndpoints({endpoint3}, id);
     mediaservers.erase(endpoint2);
     expectConnect(id, endpoint1); //< Another one is unblocked now.
 
     mediaservers.erase(endpoint1);
     ASSERT_EQ(id, disconnectedQueue.pop()); //< Ony blocked endpoint is reachable.
 
-    connector.ignoreEndpoints({}, id);
+    connector.setForbiddenEndpoints({}, id);
     expectConnect(id, endpoint3); //< The last one is unblocked now.
 }
 

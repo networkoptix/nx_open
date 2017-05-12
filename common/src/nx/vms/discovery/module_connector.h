@@ -24,10 +24,10 @@ public:
     void setDisconnectHandler(DisconnectedHandler handler);
 
     void newEndpoints(std::set<SocketAddress> endpoints, const QnUuid& id = QnUuid());
-    void ignoreEndpoints(std::set<SocketAddress> endpoints, const QnUuid& id);
+    void setForbiddenEndpoints(std::set<SocketAddress> endpoints, const QnUuid& id);
 
     void activate();
-    void diactivate();
+    void deactivate();
 
 protected:
     virtual void stopWhileInAioThread() override;
@@ -40,8 +40,8 @@ private:
         ~Module();
 
         void addEndpoints(std::set<SocketAddress> endpoints);
-        void ensureConnect();
-        void forbidEndpoints(std::set<SocketAddress> endpoints);
+        void ensureConnection();
+        void setForbiddenEndpoints(std::set<SocketAddress> endpoints);
 
     private:
         enum Priority { kDefault, kLocalHost, kLocalNetwork, kIp, kOther };

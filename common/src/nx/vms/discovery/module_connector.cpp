@@ -41,12 +41,12 @@ void ModuleConnector::newEndpoints(std::set<SocketAddress> endpoints, const QnUu
         });
 }
 
-void ModuleConnector::ignoreEndpoints(std::set<SocketAddress> endpoints, const QnUuid& id)
+void ModuleConnector::setForbiddenEndpoints(std::set<SocketAddress> endpoints, const QnUuid& id)
 {
     dispatch(
         [this, endpoints = std::move(endpoints), id]()
         {
-            getModule(id)->forbidEndpoints(std::move(endpoints));
+            getModule(id)->setForbiddenEndpoints(std::move(endpoints));
         });
 }
 
@@ -59,11 +59,11 @@ void ModuleConnector::activate()
             NX_DEBUG(this, "Activated");
 
             for (const auto& module: m_modules)
-                module.second->ensureConnect();
+                module.second->ensureConnection();
         });
 }
 
-void ModuleConnector::diactivate()
+void ModuleConnector::deactivate()
 {
     dispatch(
         [this]()
@@ -133,17 +133,17 @@ void ModuleConnector::Module::addEndpoints(std::set<SocketAddress> endpoints)
         }
 
         if (hasNewEndpoints)
-            ensureConnect();
+            ensureConnection();
     }
 }
 
-void ModuleConnector::Module::ensureConnect()
+void ModuleConnector::Module::ensureConnection()
 {
     if ((m_id.isNull()) || (m_httpClients.empty() && !m_socket))
         connect(m_endpoints.begin());
 }
 
-void ModuleConnector::Module::forbidEndpoints(std::set<SocketAddress> endpoints)
+void ModuleConnector::Module::setForbiddenEndpoints(std::set<SocketAddress> endpoints)
 {
     NX_VERBOSE(this, lm("Forbid endpoints %1").container(endpoints));
     NX_ASSERT(!m_id.isNull(), "Does it make sense to block endpoints for unknown servers?");
@@ -315,11 +315,11 @@ bool ModuleConnector::Module::saveConnection(
 
 ModuleConnector::Module* ModuleConnector::getModule(const QnUuid& id)
 {
-    const auto it = m_modules.emplace(id, std::unique_ptr<Module>());
-    if (it.second)
-        it.first->second = std::make_unique<Module>(this, id);
+    auto& module = m_modules[id];
+    if (!module)
+        module = std::make_unique<Module>(this, id);
 
-    return it.first->second.get();
+    return module.get();
 }
 
 } // namespace discovery
