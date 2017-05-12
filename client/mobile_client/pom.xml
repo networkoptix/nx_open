@@ -29,7 +29,7 @@
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
 
-        <rdep.packages>openssl ffmpeg qtsingleguiapplication roboto-ttf</rdep.packages>
+        <rdep.packages>openssl ffmpeg qtsingleguiapplication roboto-ttf any/nx_kit</rdep.packages>
         <rdep.windows.packages>quazip openal</rdep.windows.packages>
         <rdep.linux.packages>quazip</rdep.linux.packages>
         <rdep.android.packages>openal libjpeg-turbo</rdep.android.packages>

@@ -2,12 +2,12 @@
 
 #include <gtest/gtest.h>
 
-#ifdef USE_GMOCK
+#if defined(USE_GMOCK)
     #include <gmock/gmock.h>
 #endif
 
+#include <nx/kit/ini_config.h>
 #include <nx/utils/log/log_initializer.h>
-#include <nx/utils/flag_config.h>
 #include <nx/utils/move_only_func.h>
 
 #include "test_options.h"
@@ -25,13 +25,13 @@ typedef MoveOnlyFunc<DeinitFunctions(const ArgumentParser& args)> InitFunction;
 inline int runTest(int argc, const char* argv[], InitFunction extraInit = nullptr)
 {
     nx::utils::setOnAssertHandler([&](const QnLogMessage& m) { FAIL() << m.toStdString(); });
-    nx::utils::FlagConfig::setOutputAllowed(false);
+    nx::kit::IniConfig::setOutput(nullptr);
 
-    // NOTE: On osx InitGoogleTest(...) should be called independent of InitGoogleMock(...)
-    ::testing::InitGoogleTest(&argc, (char**)argv);
+    // NOTE: On osx InitGoogleTest(...) should be called independent of InitGoogleMock(...).
+    ::testing::InitGoogleTest(&argc, (char**) argv);
 
-    #ifdef USE_GMOCK
-        ::testing::InitGoogleMock(&argc, (char**)argv);
+    #if defined(USE_GMOCK)
+        ::testing::InitGoogleMock(&argc, (char**) argv);
     #endif
 
     ArgumentParser args(argc, argv);
@@ -51,7 +51,7 @@ inline int runTest(int argc, const char* argv[], InitFunction extraInit = nullpt
 
 inline int runTest(int argc, char* argv[], InitFunction extraInit = nullptr)
 {
-    return runTest(argc, (const char**)argv, std::move(extraInit));
+    return runTest(argc, (const char**) argv, std::move(extraInit));
 }
 
 } // namespace test

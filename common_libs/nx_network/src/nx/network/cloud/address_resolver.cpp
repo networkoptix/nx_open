@@ -9,7 +9,7 @@
 
 #define DEBUG_LOG(MESSAGE) do \
 { \
-    if (nx::network::SocketGlobals::debugConfig().addressResolver) \
+    if (nx::network::SocketGlobals::debugIni().addressResolver) \
         NX_LOGX(MESSAGE, cl_logDEBUG1); \
 } while (0)
 
@@ -223,7 +223,7 @@ void AddressResolver::resolveAsync(
         }
     }
 
-    if (SocketGlobals::config().isHostDisabled(hostName))
+    if (SocketGlobals::ini().isHostDisabled(hostName))
         return handler(SystemError::noPermission, std::deque<AddressEntry>());
 
     QnMutexLocker lk(&m_mutex);
@@ -273,7 +273,7 @@ std::deque<AddressEntry> AddressResolver::resolveSync(
     int ipVersion)
 {
     utils::promise<std::pair<SystemError::ErrorCode, std::deque<AddressEntry>>> promise;
-    auto handler = 
+    auto handler =
         [&](SystemError::ErrorCode code, std::deque<AddressEntry> entries)
         {
             promise.set_value({code, std::move(entries)});

@@ -25,7 +25,7 @@
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm</windows.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreServices</mac.oslibs>
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
-        <rdep.packages>openssl ffmpeg</rdep.packages>
+        <rdep.packages>openssl ffmpeg any/nx_kit</rdep.packages>
     </properties>
 
     <dependencies>

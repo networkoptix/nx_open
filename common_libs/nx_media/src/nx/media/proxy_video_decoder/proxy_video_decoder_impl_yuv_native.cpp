@@ -1,7 +1,7 @@
 #include "proxy_video_decoder_impl.h"
 #if defined(ENABLE_PROXY_DECODER)
 
-#include <nx/utils/debug_utils.h>
+#include <nx/kit/debug.h>
 
 #include <nx/media/aligned_mem_video_buffer.h>
 
@@ -11,8 +11,6 @@ namespace nx {
 namespace media {
 
 namespace {
-
-static constexpr const char* OUTPUT_PREFIX = "ProxyVideoDecoder<yuv_native>: ";
 
 class Impl: public ProxyVideoDecoderImpl
 {
@@ -41,13 +39,10 @@ public:
 
     ~VideoBuffer() override {}
 
-    virtual uchar* map(MapMode mode, int* numBytes, int* bytesPerLine) override
+    virtual uchar* map(MapMode /*mode*/, int* /*numBytes*/, int* /*bytesPerLine*/) override
     {
         // Should never be called - the buffer is multi-plane, and this method is for single-plane.
-        Q_UNUSED(mode);
-        Q_UNUSED(numBytes);
-        Q_UNUSED(bytesPerLine);
-        OUTPUT << "VideoBuffer::map(/*single_plane*/)";
+        NX_OUTPUT << "INTERNAL ERROR: VideoBuffer::map(/*single_plane*/) called.";
         return nullptr;
     }
 
@@ -64,7 +59,7 @@ public:
         }
         else
         {
-            OUTPUT << "VideoBuffer::handle(): already destroyed";
+            NX_OUTPUT << "VideoBuffer::handle(): already destroyed";
             return 0;
         }
     }
@@ -79,7 +74,7 @@ protected:
         }
         else
         {
-            OUTPUT << "VideoBuffer::doMapPlanes(): already destroyed";
+            NX_OUTPUT << "VideoBuffer::doMapPlanes(): already destroyed";
             return 0;
         }
     }
@@ -100,11 +95,11 @@ int Impl::decode(
 
     auto compressedFrame = createUniqueCompressedFrame(compressedVideoData);
     int64_t ptsUs = 0;
-    NX_TIME_BEGIN(decodeToYuvNative);
+    NX_TIME_BEGIN(DecodeToYuvNative);
     // Perform actual decoding to video memory and retrieve the pointer to it.
     int result = proxyDecoder().decodeToYuvNative(
         compressedFrame.get(), &ptsUs, &nativeBuffer, &nativeBufferSize);
-    NX_TIME_END(decodeToYuvNative);
+    NX_TIME_END(DecodeToYuvNative);
 
     if (result > 0)
     {
@@ -143,11 +138,11 @@ int Impl::decode(
 
 ProxyVideoDecoderImpl* ProxyVideoDecoderImpl::createImplYuvNative(const Params& params)
 {
-    PRINT << "Using this impl";
+    NX_PRINT << "Using this impl";
     return new Impl(params);
 }
 
 } // namespace media
 } // namespace nx
 
-#endif // ENABLE_PROXY_DECODER
+#endif // defined(ENABLE_PROXY_DECODER)

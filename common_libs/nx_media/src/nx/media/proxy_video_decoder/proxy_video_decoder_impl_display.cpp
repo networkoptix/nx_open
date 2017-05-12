@@ -1,7 +1,8 @@
 #include "proxy_video_decoder_impl.h"
 #if defined(ENABLE_PROXY_DECODER)
 
-#include <nx/utils/debug_utils.h>
+#include <nx/kit/debug.h>
+
 #include <nx/utils/string.h>
 
 #include "proxy_video_decoder_utils.h"
@@ -11,8 +12,6 @@ namespace nx {
 namespace media {
 
 namespace {
-
-static constexpr const char* OUTPUT_PREFIX = "ProxyVideoDecoder<display>: ";
 
 static const QRect kUndefinedVideoGeometry{-1, -1, -1, -1};
 static const QRect kFullscreenVideoGeometry{0, 0, 0, 0};
@@ -30,7 +29,7 @@ private:
     class VideoBuffer;
 
 private:
-    /** Call doDisplayDecodedFrame() depending on conf: either via Lambda, or immediately. */
+    /** Call doDisplayDecodedFrame() depending on .ini: either via Lambda, or immediately. */
     void displayDecodedFrame(void* frameHandle);
 
     /** Call proxydecoder().displayDecoded() immediately. */
@@ -78,12 +77,12 @@ public:
             m_displayed = true;
             if (auto owner = m_owner.lock())
             {
-                NX_SHOW_FPS("handle");
+                NX_FPS(Handle);
                 owner->displayDecodedFrame(m_frameHandle);
             }
             else
             {
-                OUTPUT << "VideoBuffer::handle(): already destroyed";
+                NX_OUTPUT << "VideoBuffer::handle(): already destroyed";
             }
         }
         return 0;
@@ -99,7 +98,7 @@ int Impl::decode(
     const QnConstCompressedVideoDataPtr& compressedVideoData,
     QVideoFramePtr* outDecodedFrame)
 {
-    NX_TIME_BEGIN(decode);
+    NX_TIME_BEGIN(Decode);
     NX_CRITICAL(outDecodedFrame);
     outDecodedFrame->reset();
 
@@ -120,13 +119,13 @@ int Impl::decode(
             result = 0;
         }
     }
-    NX_TIME_END(decode);
+    NX_TIME_END(Decode);
     return result;
 }
 
 void Impl::displayDecodedFrame(void* frameHandle)
 {
-    if (conf.displayAsync)
+    if (ini().displayAsync)
     {
         auto selfPtr = std::weak_ptr<Impl>(std::dynamic_pointer_cast<Impl>(sharedPtrToThis()));
         allocator().execAtGlThreadAsync(
@@ -134,21 +133,21 @@ void Impl::displayDecodedFrame(void* frameHandle)
             {
                 if (auto self = selfPtr.lock())
                 {
-                    if (conf.displayAsyncGlFinish)
+                    if (ini().displayAsyncGlFinish)
                     {
                         NX_GL_GET_FUNCS(QOpenGLContext::currentContext());
                         NX_GL(funcs->glFlush());
                         NX_GL(funcs->glFinish());
                     }
 
-                    if (conf.displayAsyncSleepMs > 0)
-                        usleep(conf.displayAsyncSleepMs * 1000);
+                    if (ini().displayAsyncSleepMs > 0)
+                        usleep(ini().displayAsyncSleepMs * 1000);
 
                     self->doDisplayDecodedFrame(frameHandle);
                 }
                 else
                 {
-                    OUTPUT << "displayDecodedFrame() execAtGlThreadAsync: already destroyed";
+                    NX_OUTPUT << "displayDecodedFrame() execAtGlThreadAsync: already destroyed";
                 }
             });
     }
@@ -190,7 +189,7 @@ void Impl::doDisplayDecodedFrame(void* frameHandle)
     {
         if (logPrefix)
         {
-            OUTPUT << logPrefix << " Fullscreen";
+            NX_OUTPUT << logPrefix << " Fullscreen";
         }
         proxyDecoder().displayDecoded(frameHandle, /*rect*/ nullptr); //< Null mean fullscreen.
     }
@@ -198,7 +197,7 @@ void Impl::doDisplayDecodedFrame(void* frameHandle)
     {
         if (logPrefix)
         {
-            OUTPUT << logPrefix << nx::utils::stringFormat(" %d x %d @(%d, %d)",
+            NX_OUTPUT << logPrefix << nx::utils::stringFormat(" %d x %d @(%d, %d)",
                 r.width(), r.height(), r.left(), r.top());
         }
         const ProxyDecoder::Rect rect{r.left(), r.top(), r.width(), r.height()};
@@ -212,11 +211,11 @@ void Impl::doDisplayDecodedFrame(void* frameHandle)
 
 ProxyVideoDecoderImpl* ProxyVideoDecoderImpl::createImplDisplay(const Params& params)
 {
-    PRINT << "Using this impl";
+    NX_PRINT << "Using this impl";
     return new Impl(params);
 }
 
 } // namespace media
 } // namespace nx
 
-#endif // ENABLE_PROXY_DECODER
+#endif // defined(ENABLE_PROXY_DECODER)

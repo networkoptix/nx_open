@@ -27,7 +27,7 @@
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 
-        <rdep.packages>openssl ffmpeg any/qtsinglecoreapplication any/qtservice</rdep.packages>
+        <rdep.packages>openssl ffmpeg any/qtsinglecoreapplication any/qtservice any/nx_kit</rdep.packages>
     </properties>
 
     <dependencies>

@@ -3,59 +3,70 @@
 
 #include <memory>
 #include <deque>
+#include <iostream>
 
 #include <QtCore/QtGlobal>
 
+#include <nx/kit/ini_config.h>
+
 #include <nx/utils/log/log.h>
-#include <nx/utils/flag_config.h>
 #include <nx/streaming/video_data_packet.h>
 
-#include <proxy_decoder.h>
-
 #include <nx/media/media_fwd.h>
+
+#include <proxy_decoder.h>
 
 namespace nx {
 namespace media {
 
 namespace proxy_video_decoder {
 
-class FlagConfig: public nx::utils::FlagConfig
+class Ini: public nx::kit::IniConfig
 {
 public:
-    using nx::utils::FlagConfig::FlagConfig;
+    Ini(): IniConfig("ProxyVideoDecoder.ini") {}
 
-    NX_FLAG(0, disable, "Fully disable ProxyVideoDecoder: isCompatible() -> false.");
-    NX_FLAG(1, largeOnly, "isCompatible() will allow only width > 640.");
+    NX_INI_FLAG(0, disable, "Fully disable ProxyVideoDecoder: isCompatible() -> false.");
+    NX_INI_FLAG(1, largeOnly, "isCompatible() will allow only width > 640.");
 
     // Debug output.
-    NX_FLAG(0, enableOutput, "");
-    NX_FLAG(0, enableTime, "");
-    NX_FLAG(0, enableFps, "");
+    NX_INI_FLAG(0, enableOutput, "");
+    NX_INI_FLAG(0, enableTime, "");
+    NX_INI_FLAG(0, enableFpsHandle, "Measure FPS of VideoBuffer.handle() calls.");
 
     // Choosing impl.
-    NX_FLAG(0, implStub, "Checkerboard stub, do not use libproxydecoder.");
-    NX_FLAG(1, implDisplay, "decodeToDisplayQueue() => displayDecoded() in frame handle().");
-    NX_FLAG(0, implRgb, "decodeToRgb() -> AlignedMemVideoBuffer, without OpenGL.");
-    NX_FLAG(0, implYuvPlanar, "decodeToYuvPlanar() -> AlignedMemVideoBuffer => Qt Shader.");
-    NX_FLAG(0, implYuvNative, "decodeToYuvNative() -> AlignedMemVideoBuffer => Plugin Shader.");
-    NX_FLAG(0, implGl, "decodeYuvPlanar() => Planar YUV Shader.");
+    NX_INI_FLAG(0, implStub, "Checkerboard stub, do not use libproxydecoder.");
+    NX_INI_FLAG(1, implDisplay, "decodeToDisplayQueue() => displayDecoded() in frame handle().");
+    NX_INI_FLAG(0, implRgb, "decodeToRgb() -> AlignedMemVideoBuffer, without OpenGL.");
+    NX_INI_FLAG(0, implYuvPlanar, "decodeToYuvPlanar() -> AlignedMemVideoBuffer => Qt Shader.");
+    NX_INI_FLAG(0, implYuvNative, "decodeToYuvNative() -> AlignedMemVideoBuffer => Plugin Shader.");
+    NX_INI_FLAG(0, implGl, "decodeYuvPlanar() => Planar YUV Shader.");
 
     // Display impl options.
-    NX_FLAG(0, displayAsync, "Delay displaying up to beforeSynchronizing/frameSwapped.");
-    NX_INT_PARAM(15, displayAsyncSleepMs, "Delay before displaying frame in displayAsync mode.");
-    NX_FLAG(1, displayAsyncGlFinish, "Perform glFlush() and glFinish() in displayAsync mode.");
+    NX_INI_FLAG(0, displayAsync, "Delay displaying up to beforeSynchronizing/frameSwapped.");
+    NX_INI_INT(15, displayAsyncSleepMs, "Delay before displaying frame in displayAsync mode.");
+    NX_INI_FLAG(1, displayAsyncGlFinish, "Perform glFlush() and glFinish() in displayAsync mode.");
 
     // OpenGL impl options.
-    NX_FLAG(0, stopOnGlErrors, "");
-    NX_FLAG(0, outputGlCalls, "");
-    NX_FLAG(0, useGlGuiRendering, "");
-    NX_FLAG(1, useSharedGlContext, "");
+    NX_INI_FLAG(0, stopOnGlErrors, "");
+    NX_INI_FLAG(0, outputGlCalls, "");
+    NX_INI_FLAG(0, useGlGuiRendering, "");
+    NX_INI_FLAG(1, useSharedGlContext, "");
 };
-extern FlagConfig conf;
+
+inline Ini& ini()
+{
+    static Ini ini;
+    return ini;
+}
 
 } // namespace proxy_video_decoder
 
-using proxy_video_decoder::conf;
+using proxy_video_decoder::ini;
+
+// For debug.
+std::ostream& operator<<(std::ostream& stream, const QSize& qSize);
+std::ostream& operator<<(std::ostream& stream, const QString& s);
 
 /**
  * @return Null if compressedVideoData is null.
@@ -131,4 +142,4 @@ private:
 } // namespace media
 } // namespace nx
 
-#endif // ENABLE_PROXY_DECODER
+#endif // defined(ENABLE_PROXY_DECODER)

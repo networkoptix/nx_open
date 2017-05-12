@@ -22,7 +22,7 @@
         <global.libs></global.libs>
         <windows.oslibs>-lws2_32 DbgHelp.lib -lIphlpapi -lOle32 -lSecur32 -lwinmm</windows.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreFoundation</mac.oslibs>
-
+        <rdep.packages>any/nx_kit</rdep.packages>
         <windows.defines>_USING_V110_SDK71_</windows.defines>
     </properties>
 

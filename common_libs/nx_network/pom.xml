@@ -28,7 +28,7 @@
 
         <windows.defines>_USING_V110_SDK71_</windows.defines>
         <buildLib>sharedLib</buildLib>
-        <rdep.packages>openssl</rdep.packages>
+        <rdep.packages>openssl any/nx_kit</rdep.packages>
         <rdep.windows.packages>quazip</rdep.windows.packages>
         <rdep.linux.packages>quazip ffmpeg</rdep.linux.packages>
         <rdep.mac.packages>quazip</rdep.mac.packages>
@@ -52,7 +52,7 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
         </dependency>
- 
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_fusion</artifactId>
@@ -60,8 +60,8 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_fusion/pom.xml</systemPath>
-        </dependency> 
- 
+        </dependency>
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_utils</artifactId>

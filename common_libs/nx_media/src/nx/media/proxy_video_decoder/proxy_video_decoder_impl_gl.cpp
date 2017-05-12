@@ -4,7 +4,7 @@
 #include <QtGui/QOffscreenSurface>
 #include <QtGui/QOpenGLShaderProgram>
 
-#include <nx/utils/debug_utils.h>
+#include <nx/kit/debug.h>
 
 #include "proxy_video_decoder_utils.h"
 #include "proxy_video_decoder_gl_utils.h"
@@ -13,8 +13,6 @@ namespace nx {
 namespace media {
 
 namespace {
-
-static constexpr const char* OUTPUT_PREFIX = "ProxyVideoDecoder<gl>: ";
 
 /**
  * Experimental implementation. On banana pi, works slowly, probably due to memory bandwidth.
@@ -33,7 +31,7 @@ public:
 
     ~Impl()
     {
-        OUTPUT << "~Impl() BEGIN";
+        NX_OUTPUT << "~Impl() BEGIN";
         if (m_threadGlCtx)
         {
             NX_GL_GET_FUNCS(m_threadGlCtx.get());
@@ -53,7 +51,7 @@ public:
             m_threadGlCtx.reset(nullptr);
         }
         m_offscreenSurface.reset(nullptr);
-        OUTPUT << "~Impl() END";
+        NX_OUTPUT << "~Impl() END";
     }
 
     virtual int decode(
@@ -141,7 +139,7 @@ void Impl::createGlResources()
 {
     if (!m_threadGlCtx)
     {
-        if (conf.useSharedGlContext && !conf.useGlGuiRendering)
+        if (ini().useSharedGlContext && !ini().useGlGuiRendering)
         {
             // Create shared GL context.
             QOpenGLContext* sharedContext = QOpenGLContext::globalShareContext();
@@ -154,7 +152,7 @@ void Impl::createGlResources()
 
             NX_GL_CHECK(m_threadGlCtx->create());
             NX_GL_CHECK(m_threadGlCtx->shareContext());
-            PRINT << "Using shared openGL ctx";
+            NX_PRINT << "Using shared openGL ctx";
             m_offscreenSurface.reset(new QOffscreenSurface());
             NX_GL(m_offscreenSurface->setFormat(m_threadGlCtx->format()));
             NX_GL(m_offscreenSurface->create());
@@ -260,7 +258,7 @@ void Impl::renderYuvBufferToFbo(const YuvBuffer* yuvBuffer, FboPtr* outFbo)
 {
     createGlResources();
 
-    NX_TIMER_CREATE("renderYuvBufferToFbo");
+    NX_TIME_BEGIN(RenderYuvBufferToFbo);
 
     NX_GL_GET_FUNCS(QOpenGLContext::currentContext());
 
@@ -270,15 +268,15 @@ void Impl::renderYuvBufferToFbo(const YuvBuffer* yuvBuffer, FboPtr* outFbo)
 
     // OLD: Measured time (Full-HDs frame): YUV: 155 ms; Y-only: 120 ms; Y memcpy: 2 ms (!!!).
 #if 0
-    NX_TIME_BEGIN(flush_finish);
+    NX_TIME_BEGIN(FlushFinish);
     NX_GL(funcs->glFlush());
     NX_GL(funcs->glFinish());
-    NX_TIME_END(flush_finish);
+    NX_TIME_END(FlushFinish);
 #endif // 0
 
-    NX_TIMER_MARK("t1");
+    NX_TIME_MARK(RenderYuvBufferToFbo, "t1");
 
-    NX_TIME_BEGIN(renderYuvBufferToFbo_setData);
+    NX_TIME_BEGIN(RenderYuvBufferToFbo_setData);
 #if 0 // NO_QT
     NX_GL(funcs->glBindTexture(GL_TEXTURE_2D, (*outFbo)->texture()));
     NX_GL(funcs->glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE,
@@ -295,9 +293,9 @@ void Impl::renderYuvBufferToFbo(const YuvBuffer* yuvBuffer, FboPtr* outFbo)
     //TIME_END(renderYuvBufferToFbo_setData_Flush_Finish);
 #endif // 1
 #endif // 0 NO_QT
-    NX_TIME_END(renderYuvBufferToFbo_setData);
+    NX_TIME_END(RenderYuvBufferToFbo_setData);
 
-    NX_TIMER_MARK("t2");
+    NX_TIME_MARK(RenderYuvBufferToFbo, "t2");
 
 #if 1 // ALL
 
@@ -411,23 +409,23 @@ void Impl::renderYuvBufferToFbo(const YuvBuffer* yuvBuffer, FboPtr* outFbo)
         NX_GL(glEnable(GL_BLEND));
 #endif // 1
 
-    NX_TIMER_MARK("t3");
+    NX_TIME_MARK(RenderYuvBufferToFbo, "t3");
 
 #if 0
     if (m_threadGlCtx)
     {
-        // we used decoder thread to render. flush everything to the texture
-        NX_TIME_BEGIN("renderYuvBufferToFbo::glFinish")
-            funcs->glFlush();
+        // We used decoder thread to render. Flush everything to the texture.
+        NX_TIME_BEGIN(RenderYuvBufferToFbo_glFinish)
+        funcs->glFlush();
         funcs->glFinish();
-        NX_TIME_END
-            glFinish();
+        NX_TIME_END(RenderYuvBufferToFbo_glFinish)
+        glFinish();
     }
 #endif // 0
 
 #endif // 1 // ALL
 
-    NX_TIMER_FINISH("t4");
+    NX_TIME_END(RenderYuvBufferToFbo);
 }
 
 int Impl::decode(
@@ -440,20 +438,20 @@ int Impl::decode(
     auto compressedFrame = createUniqueCompressedFrame(compressedVideoData);
     int64_t ptsUs;
 #if 1
-    NX_TIME_BEGIN(decodeToYuvPlanar);
+    NX_TIME_BEGIN(DecodeToYuvPlanar);
     // Perform actual decoding from QnCompressedVideoData to QVideoFrame.
     int result = proxyDecoder().decodeToYuvPlanar(compressedFrame.get(), &ptsUs,
         yuvBuffer->y(), yuvBuffer->yLineSize(),
         yuvBuffer->u(), yuvBuffer->v(), yuvBuffer->uVLineSize());
-    NX_TIME_END(decodeToYuvPlanar);
+    NX_TIME_END(DecodeToYuvPlanar);
 #endif // 1
     if (result < 0)
-        PRINT << "ERROR: ProxyDecoder::decodeToYuvPlanar() -> " << result;
+        NX_PRINT << "ERROR: ProxyDecoder::decodeToYuvPlanar() -> " << result;
 
     if (result <= 0)
         return result;
 
-    if (conf.useGlGuiRendering)
+    if (ini().useGlGuiRendering)
     {
         auto textureBuffer = new TextureBuffer(FboPtr(nullptr), sharedPtrToThis(), yuvBuffer);
         setQVideoFrame(outDecodedFrame, textureBuffer, QVideoFrame::Format_BGR32, ptsUs);
@@ -461,7 +459,7 @@ int Impl::decode(
     else
     {
         FboPtr fboToRender;
-        if (conf.useSharedGlContext)
+        if (ini().useSharedGlContext)
         {
             renderYuvBufferToFbo(yuvBuffer.get(), &fboToRender);
             auto textureBuffer = new TextureBuffer(
@@ -499,11 +497,11 @@ int Impl::decode(
 
 ProxyVideoDecoderImpl* ProxyVideoDecoderImpl::createImplGl(const Params& params)
 {
-    PRINT << "Using this impl";
+    NX_PRINT << "Using this impl";
     return new Impl(params);
 }
 
 } // namespace media
 } // namespace nx
 
-#endif // ENABLE_PROXY_DECODER
+#endif // defined(ENABLE_PROXY_DECODER)
