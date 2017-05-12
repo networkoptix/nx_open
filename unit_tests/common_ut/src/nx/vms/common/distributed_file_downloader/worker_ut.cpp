@@ -407,7 +407,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadFlatNetwork)
     {
         auto peer = createPeer();
         peerById[peer->id] = peer;
-        peer->storage->addFile(fileInfo.name);
+        peer->storage->addFile(fileInfo);
         commonPeerManager->setPeerGroups(peer->id, groups);
         commonPeerManager->setPeerStorage(peer->id, peer->storage);
 
@@ -420,7 +420,10 @@ TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadFlatNetwork)
 
     pendingPeers = commonPeerManager->getAllPeers();
 
-    const int maxSteps = fileInfo.downloadedChunks.size() * 3;
+    for (const auto& peer: peerById)
+        peer->peerManager->calculateDistances();
+
+    const int maxSteps = fileInfo.downloadedChunks.size() * 2;
 
     for (auto& peer: peerById)
         peer->worker->start();
