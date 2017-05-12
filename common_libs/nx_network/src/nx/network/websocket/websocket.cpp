@@ -10,7 +10,7 @@ WebSocket::WebSocket(
     ReceiveMode receiveMode,
     Role role)
     :
-    m_baseConnection(new nx::network::server::BaseServerConnectionWrapper(this, std::move(streamSocket), this)),
+    m_socket(std::move(streamSocket)),
     m_parser(role, this),
     m_serializer(role == Role::client),
     m_sendMode(sendMode),
@@ -21,27 +21,24 @@ WebSocket::WebSocket(
     m_terminating(false),
     m_pingTimeout(std::chrono::seconds(100))
 {
-    AbstractAsyncChannel::bindToAioThread(m_baseConnection->getAioThread());
-    m_pingTimer->bindToAioThread(m_baseConnection->getAioThread());
+    AbstractAsyncChannel::bindToAioThread(m_socket->getAioThread());
+    m_pingTimer->bindToAioThread(m_socket->getAioThread());
     setPingTimeout(m_pingTimeout);
+    m_readBuffer.reserve(4096);
 }
 
 void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    dispatch(
-        [this, aioThread]()
-        {
-            AbstractAsyncChannel::bindToAioThread(aioThread);
-            m_baseConnection->bindToAioThread(aioThread);
-            m_pingTimer->cancelSync();
-            m_pingTimer->bindToAioThread(aioThread);
-            setPingTimeout(m_pingTimeout);
-        });
+    AbstractAsyncChannel::bindToAioThread(aioThread);
+    m_socket->bindToAioThread(aioThread);
+    m_pingTimer->cancelSync();
+    m_pingTimer->bindToAioThread(aioThread);
+    setPingTimeout(m_pingTimeout);
 }
 
 void WebSocket::stopWhileInAioThread()
 {
-    m_baseConnection.reset();
+    m_socket.reset();
     m_pingTimer.reset();
 }
 
@@ -50,27 +47,30 @@ void WebSocket::setIsLastFrame()
     dispatch([this]() { m_isLastFrame = true; });
 }
 
-void WebSocket::bytesReceived(nx::Buffer& buffer)
+void WebSocket::handleSocketRead(SystemError::ErrorCode ecode, size_t /*bytesRead*/)
 {
-    m_parser.consume(buffer.data(), buffer.size());
-    handleRead();
+    m_parser.consume(m_readBuffer.data(), m_readBuffer.size());
+    m_readBuffer.resize(0);
+    processReadData(ecode);
 }
 
-void WebSocket::readyToSendData()
+void WebSocket::processReadData(SystemError::ErrorCode ecode)
 {
-    auto writeData = m_writeQueue.pop();
-    bool queueEmpty = m_writeQueue.empty();
-    if (writeData.handler)
-        writeData.handler(SystemError::noError, writeData.buffer.writeSize);
-    if (!queueEmpty)
-        m_baseConnection->sendBufAsync(m_writeQueue.first().buffer.buffer);
-}
+    if (ecode != SystemError::noError)
+    {
+        auto readData = m_readQueue.pop();
+        readData.handler(ecode, 0);
+        return;
+    }
 
-void WebSocket::handleRead()
-{
     if (m_userDataBuffer.readySize() == 0)
     {
-        m_baseConnection->setReceivingStarted();
+        m_socket->readSomeAsync(
+            &m_readBuffer,
+            [this](SystemError::ErrorCode ecode, size_t bytesRead)
+            {
+                handleSocketRead(ecode, bytesRead);
+            });
         return;
     }
 
@@ -81,23 +81,32 @@ void WebSocket::handleRead()
     NX_LOG(lit("[WebSocket] handleRead(): user data size: %1").arg(handoutBuffer.size()), cl_logDEBUG2);
 
     readData.buffer->append(handoutBuffer);
-    readData.handler(SystemError::noError, handoutBuffer.size());
+    readData.handler(ecode, handoutBuffer.size());
     if (queueEmpty)
-        m_baseConnection->stopReading();
-    else
-        readWithoutAddingToQueue();
+        return;
+    readWithoutAddingToQueueAsync();
+}
+
+void WebSocket::readWithoutAddingToQueueAsync()
+{
+    post([this]() { readWithoutAddingToQueue(); });
 }
 
 void WebSocket::readWithoutAddingToQueue()
 {
-    post(
-        [this]()
-        {
-            if (m_userDataBuffer.readySize() != 0)
-                handleRead();
-            else
-                m_baseConnection->startReadingConnection();
-        });
+    if (m_userDataBuffer.readySize() != 0)
+    {
+        processReadData(SystemError::noError);
+    }
+    else
+    {
+        m_socket->readSomeAsync(
+            &m_readBuffer,
+            [this](SystemError::ErrorCode ecode, size_t bytesRead)
+            {
+                handleSocketRead(ecode, bytesRead);
+            });
+    }
 }
 
 void WebSocket::readSomeAsync(nx::Buffer* const buffer, HandlerType handler)
@@ -115,11 +124,8 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, HandlerType handler)
             bool queueEmpty = m_readQueue.empty();
             nx::Buffer* tmp = buffer;
             m_readQueue.emplace(std::move(handler), std::move(tmp));
-
-            if (m_userDataBuffer.readySize() != 0)
-                handleRead();
-            else if (queueEmpty)
-                m_baseConnection->startReadingConnection();
+            if (queueEmpty)
+                readWithoutAddingToQueue();
         });
 }
 
@@ -181,26 +187,39 @@ void WebSocket::sendCloseAsync()
         });
 }
 
+void WebSocket::handleSocketWrite(SystemError::ErrorCode ecode, size_t /*bytesSent*/)
+{
+    auto writeData = m_writeQueue.pop();
+    bool queueEmpty = m_writeQueue.empty();
+    if (writeData.handler)
+        writeData.handler(ecode, writeData.buffer.writeSize);
+    if (!queueEmpty)
+        m_socket->sendAsync(
+            m_writeQueue.first().buffer.buffer,
+            [this](SystemError::ErrorCode ecode, size_t bytesSent)
+            {
+                handleSocketWrite(ecode, bytesSent);
+            });
+}
+
 void WebSocket::sendPreparedMessage(nx::Buffer* buffer, int writeSize, HandlerType handler)
 {
     WriteData writeData(std::move(*buffer), writeSize);
     bool queueEmpty = m_writeQueue.empty();
     m_writeQueue.emplace(std::move(handler), std::move(writeData));
     if (queueEmpty)
-        m_baseConnection->sendBufAsync(m_writeQueue.first().buffer.buffer);
+        m_socket->sendAsync(
+            m_writeQueue.first().buffer.buffer,
+            [this](SystemError::ErrorCode ecode, size_t bytesSent)
+            {
+                handleSocketWrite(ecode, bytesSent);
+            });
 }
 
-void WebSocket::cancelIOSync(nx::network::aio::EventType /*eventType*/)
+void WebSocket::cancelIOSync(nx::network::aio::EventType eventType)
 {
-    m_baseConnection->cancelPostedCallsSync();
+    m_socket->cancelIOSync(eventType);
     m_pingTimer->cancelPostedCallsSync();
-}
-
-void WebSocket::closeConnection(SystemError::ErrorCode closeReason, ConnectionType* /*connection*/)
-{
-    NX_LOG(lit("[WebSocket] closeConnection called, reason: %1").arg(closeReason), cl_logDEBUG1);
-    m_baseConnection.reset();
-    m_pingTimer.reset();
 }
 
 bool WebSocket::isDataFrame() const
@@ -330,7 +349,8 @@ void WebSocket::messageEnded()
 void WebSocket::handleError(Error err)
 {
     NX_LOG(lit("[WebSocket] Parse error %1. Closing connection").arg((int)err), cl_logDEBUG1);
-    closeConnection(SystemError::invalidData, nullptr);
+    sendCloseAsync();
+    emit connectionClosed();
 }
 
 QString frameTypeString(FrameType type)

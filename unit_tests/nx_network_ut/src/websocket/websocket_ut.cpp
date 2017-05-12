@@ -22,7 +22,6 @@ protected:
 
         clientSocket2 = SocketFactory::createStreamSocket();
         clientSocket2->setNonBlockingMode(true);
-        clientSocket2->setNoDelay(true);
 
         m_acceptor->acceptAsync(
             [this](SystemError::ErrorCode ecode, std::unique_ptr<AbstractStreamSocket> clientSocket)
@@ -33,7 +32,6 @@ protected:
                 m_acceptor.reset();
                 clientSocket1 = std::move(clientSocket);
                 clientSocket1->setNonBlockingMode(true);
-                clientSocket1->setNoDelay(true);
 
                 clientWebSocket.reset(
                     new nx::network::WebSocket(
@@ -47,7 +45,8 @@ protected:
                         serverSendMode,
                         serverReceiveMode));
 
-                clientWebSocket->bindToAioThread(serverWebSocket->getAioThread());
+                //clientWebSocket->bindToAioThread(serverWebSocket->getAioThread());
+                clientWebSocket->setPingTimeout(std::chrono::milliseconds(kPingTimeout));
 
                 startPromise.set_value();
             });
@@ -55,6 +54,11 @@ protected:
         startFuture = startPromise.get_future();
         readyFuture = readyPromise.get_future();
 
+    }
+
+    void givenPingTimeout(std::chrono::milliseconds timeout)
+    {
+        kPingTimeout = timeout;
     }
 
     void givenTCPConnectionEstablished()
@@ -204,8 +208,9 @@ protected:
         }
     }
 
-    int kIterations = 100;
+    int kIterations = 10;
     int doneCount = 0;
+    std::chrono::milliseconds kPingTimeout{100000};
 
     nx::Buffer clientSendBuf;
     nx::Buffer clientReadBuf;
@@ -406,11 +411,11 @@ TEST_F(WebSocket, PingPong)
     givenClientTestDataPrepared(1 * 1024 * 1024);
     givenClientModes(SendMode::singleMessage, ReceiveMode::message);
     givenServerModes(SendMode::singleMessage, ReceiveMode::message);
+    givenPingTimeout(std::chrono::milliseconds(10));
     givenTCPConnectionEstablished();
     startFuture.wait();
     int pongCount = 0;
     QObject::connect(clientWebSocket.get(), &nx::network::WebSocket::pongReceived, [&pongCount]() { ++pongCount; });
-    clientWebSocket->setPingTimeout(std::chrono::milliseconds(5));
     auto readFuture = websocketTestReader(
         serverWebSocket,
         SendMode::singleMessage,
@@ -451,12 +456,10 @@ TEST_F(WebSocket, Close)
         readyPromise.set_value();
         serverClosed = true;
     });
-
-    clientWebSocket->setPingTimeout(std::chrono::milliseconds(100));
-    clientWebSocket->sendCloseAsync();
     clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
     clientWebSocket->readSomeAsync(&clientReadBuf, clientReadCb);
     serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
+    clientWebSocket->sendCloseAsync();
 
     readyFuture.wait();
 
