@@ -1,11 +1,20 @@
 #include <gtest/gtest.h>
 #include <nx/utils/log/log_message.h>
+
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/uuid.h>
 
 template<typename ... Args>
 void testArgQString(const char* format, const Args& ... args)
 {
     const QString result = lm(format).arg(args ...);
+    EXPECT_EQ(QString::fromUtf8(format).arg(args ...), result);
+}
+
+template<typename ... Args>
+void testArgsQString(const char* format, const Args& ... args)
+{
+    const QString result = lm(format).args(args ...);
     EXPECT_EQ(QString::fromUtf8(format).arg(args ...), result);
 }
 
@@ -19,8 +28,8 @@ TEST(QnLogMessage, argQString)
     testArgQString("%1 %2 %3", 123.456);
     testArgQString("%1 %2 %3", 123.456, 10, 'E', 1, QLatin1Char('#'));
 
-    testArgQString("%1 %2", QLatin1String("hello"), QLatin1String("world"));
-    testArgQString("%1 %2 %3", QLatin1String("hello"), QLatin1String("world"), QLatin1String("!"));
+    testArgsQString("%1 %2", QLatin1String("hello"), QLatin1String("world"));
+    testArgsQString("%1 %2 %3", QLatin1String("hello"), QLatin1String("world"), QLatin1String("!"));
 }
 
 template<typename Value>
@@ -69,7 +78,7 @@ static QString toString(const FunctionTester&)
 template<typename ... Args>
 void testStrQString(const char* format, const Args& ... args)
 {
-    EXPECT_EQ(lm(format).arg(args ...), QString::fromUtf8(format).arg(args ...));
+    EXPECT_EQ(lm(format).args(args ...), QString::fromUtf8(format).arg(args ...));
 }
 
 struct SomeLongStructNameForThisTest {};
@@ -88,8 +97,8 @@ TEST(QnLogMessage, str)
 
     EXPECT_EQ(QLatin1String("A B C D"), lm("%1 %2 %3").str("A").str("B C").str("D"));
     EXPECT_EQ(QLatin1String("same same"), lm("%1 %2").str("%2").str("same"));
-    ASSERT_EQ("hello world %4 yes",
-        lm("%1 %2 %3 %4").strs("hello", "world", "%4", "yes"));
+    ASSERT_EQ(std::string("hello world %4 yes"),
+        lm("%1 %2 %3 %4").strs("hello", "world", "%4", "yes").toStdString());
 
     const auto obj1 = std::make_unique<SomeLongStructNameForThisTest>();
     const auto name1 = QLatin1String("SomeLongStructNameForThisTest(0x");

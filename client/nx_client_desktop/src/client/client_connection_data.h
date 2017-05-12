@@ -1,10 +1,11 @@
-
 #pragma once
 
 #include <QtCore/QList>
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
 #include <QtCore/QUrl>
+
+#include <nx/utils/uuid.h>
 
 struct QnConnectionData
 {

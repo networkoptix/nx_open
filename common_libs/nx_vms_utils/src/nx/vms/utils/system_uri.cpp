@@ -3,6 +3,7 @@
 #include <QtCore/QUrlQuery>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/utils/app_info.h>
 
 using namespace nx::vms::utils;

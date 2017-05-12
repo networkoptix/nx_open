@@ -1,12 +1,10 @@
 #pragma once
 
-#include <client_core/connection_context_aware.h>
-
 #include <client/client_globals.h>
-
+#include <client_core/connection_context_aware.h>
 #include <core/resource/resource_fwd.h>
-
 #include <nx/utils/singleton.h>
+#include <nx/utils/uuid.h>
 
 class QnResourceRuntimeDataManager:
     public QObject,
