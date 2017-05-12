@@ -2,6 +2,10 @@
 
 #include <ui/graphics/items/standard/graphics_widget.h>
 
+class QGraphicsScale;
+class QnViewportScaleWatcher;
+class QnViewportBoundWidget;
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -25,6 +29,9 @@ public:
 
 private:
     QRectF m_rect;
+    QGraphicsScale *m_scale;
+    QnViewportScaleWatcher* m_scaleWatcher;
+    QnViewportBoundWidget* m_widget;
 
 };
 
