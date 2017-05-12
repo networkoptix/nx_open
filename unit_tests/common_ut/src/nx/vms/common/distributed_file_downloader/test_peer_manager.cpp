@@ -1,5 +1,7 @@
 #include "test_peer_manager.h"
 
+#include <QtCore/QTextStream>
+
 #include <nx/utils/log/assert.h>
 #include <nx/vms/common/distributed_file_downloader/private/storage.h>
 
@@ -8,20 +10,30 @@ namespace vms {
 namespace common {
 namespace distributed_file_downloader {
 
+namespace {
+
+static const auto kNullGuid = QnUuid();
+
+} // namespace
+
 TestPeerManager::TestPeerManager()
 {
 }
 
-void TestPeerManager::addPeer(const QnUuid& peerId)
+void TestPeerManager::addPeer(const QnUuid& peerId, const QString& peerName)
 {
     if (!m_peers.contains(peerId))
-        m_peers.insert(peerId, PeerInfo());
+    {
+        PeerInfo info;
+        info.name = peerName;
+        m_peers.insert(peerId, info);
+    }
 }
 
-QnUuid TestPeerManager::addPeer()
+QnUuid TestPeerManager::addPeer(const QString& peerName)
 {
     const auto peerId = QnUuid::createUuid();
-    addPeer(peerId);
+    addPeer(peerId, peerName);
     return peerId;
 }
 
@@ -82,6 +94,18 @@ QnUuid TestPeerManager::selfId() const
     return QnUuid();
 }
 
+QString TestPeerManager::peerString(const QnUuid& peerId) const
+{
+    auto result = m_peers[peerId].name;
+    if (result.isEmpty())
+        result = peerId.toString();
+
+    if (peerId == selfId())
+        result += " (self)";
+
+    return result;
+}
+
 QList<QnUuid> TestPeerManager::getAllPeers() const
 {
     return m_peers.keys();
@@ -102,6 +126,8 @@ rest::Handle TestPeerManager::requestFileInfo(
     const QString& fileName,
     AbstractPeerManager::FileInfoCallback callback)
 {
+    m_requestCounter.incrementCounters(peerId, RequestCounter::FileInfoRequest);
+
     if (!m_peers.contains(peerId))
         return 0;
 
@@ -117,6 +143,8 @@ rest::Handle TestPeerManager::requestChecksums(
     const QString& fileName,
     AbstractPeerManager::ChecksumsCallback callback)
 {
+    m_requestCounter.incrementCounters(peerId, RequestCounter::ChecksumsRequest);
+
     auto it = m_peers.find(peerId);
     if (it == m_peers.end())
         return 0;
@@ -141,6 +169,8 @@ rest::Handle TestPeerManager::downloadChunk(
     int chunkIndex,
     AbstractPeerManager::ChunkCallback callback)
 {
+    m_requestCounter.incrementCounters(peerId, RequestCounter::DownloadChunkRequest);
+
     if (!m_peers.contains(peerId))
         return 0;
 
@@ -166,6 +196,8 @@ rest::Handle TestPeerManager::downloadChunkFromInternet(
     int chunkSize,
     AbstractPeerManager::ChunkCallback callback)
 {
+    m_requestCounter.incrementCounters(peerId, RequestCounter::DownloadChunkFromInternetRequest);
+
     if (!m_peers.contains(peerId))
         return 0;
 
@@ -216,6 +248,11 @@ void TestPeerManager::processRequests()
     }
 }
 
+const RequestCounter* TestPeerManager::requestCounter() const
+{
+    return &m_requestCounter;
+}
+
 rest::Handle TestPeerManager::getRequestHandle()
 {
     return ++m_requestIndex;
@@ -241,17 +278,21 @@ QByteArray TestPeerManager::readFileChunk(
     return file.read(fileInformation.chunkSize);
 }
 
-ProxyTestPeerManager::ProxyTestPeerManager(TestPeerManager* peerManager):
-    ProxyTestPeerManager(peerManager, QnUuid::createUuid())
+//-------------------------------------------------------------------------------------------------
+
+ProxyTestPeerManager::ProxyTestPeerManager(TestPeerManager* peerManager, const QString& peerName):
+    ProxyTestPeerManager(peerManager, QnUuid::createUuid(), peerName)
 {
 }
 
-ProxyTestPeerManager::ProxyTestPeerManager(TestPeerManager* peerManager, const QnUuid& id):
+ProxyTestPeerManager::ProxyTestPeerManager(
+    TestPeerManager* peerManager, const QnUuid& id, const QString& peerName)
+    :
     m_peerManager(peerManager),
     m_selfId(id)
 {
     NX_ASSERT(peerManager);
-    peerManager->addPeer(id);
+    peerManager->addPeer(id, peerName);
 }
 
 void ProxyTestPeerManager::calculateDistances()
@@ -288,9 +329,19 @@ void ProxyTestPeerManager::calculateDistances()
     }
 }
 
+const RequestCounter* ProxyTestPeerManager::requestCounter() const
+{
+    return &m_requestCounter;
+}
+
 QnUuid ProxyTestPeerManager::selfId() const
 {
     return m_selfId;
+}
+
+QString ProxyTestPeerManager::peerString(const QnUuid& peerId) const
+{
+    return m_peerManager->peerString(peerId);
 }
 
 QList<QnUuid> ProxyTestPeerManager::getAllPeers() const
@@ -315,6 +366,7 @@ rest::Handle ProxyTestPeerManager::requestFileInfo(
     const QString& fileName,
     AbstractPeerManager::FileInfoCallback callback)
 {
+    m_requestCounter.incrementCounters(peer, RequestCounter::FileInfoRequest);
     return m_peerManager->requestFileInfo(peer, fileName, callback);
 }
 
@@ -323,6 +375,7 @@ rest::Handle ProxyTestPeerManager::requestChecksums(
     const QString& fileName,
     AbstractPeerManager::ChecksumsCallback callback)
 {
+    m_requestCounter.incrementCounters(peer, RequestCounter::ChecksumsRequest);
     return m_peerManager->requestChecksums(peer, fileName, callback);
 }
 
@@ -332,6 +385,7 @@ rest::Handle ProxyTestPeerManager::downloadChunk(
     int chunkIndex,
     AbstractPeerManager::ChunkCallback callback)
 {
+    m_requestCounter.incrementCounters(peer, RequestCounter::DownloadChunkRequest);
     return m_peerManager->downloadChunk(peer, fileName, chunkIndex, callback);
 }
 
@@ -342,6 +396,7 @@ rest::Handle ProxyTestPeerManager::downloadChunkFromInternet(
     int chunkSize,
     AbstractPeerManager::ChunkCallback callback)
 {
+    m_requestCounter.incrementCounters(peerId, RequestCounter::DownloadChunkFromInternetRequest);
     return m_peerManager->downloadChunkFromInternet(
         peerId, fileUrl, chunkIndex, chunkSize, callback);
 }
@@ -356,6 +411,65 @@ TestPeerManager::FileInformation::FileInformation(
     :
     distributed_file_downloader::FileInformation(fileInfo)
 {
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void RequestCounter::incrementCounters(
+    const QnUuid& peerId, RequestCounter::RequestType requestType)
+{
+    ++counters[requestType][peerId];
+    ++counters[requestType][kNullGuid];
+    ++counters[Total][peerId];
+    ++counters[Total][kNullGuid];
+}
+
+void RequestCounter::printCounters(const QString& header, TestPeerManager* peerManager) const
+{
+    QTextStream out(stdout);
+
+    out << header << "\n";
+    out << "---------------------------------------------------\n";
+    for (int type = FirstRequestType; type < RequestTypesCount; ++type)
+        out << "|  " << requestTypeShortName(static_cast<RequestType>(type)) << "  ";
+    out << "|\n";
+    out << "---------------------------------------------------\n";
+
+    auto peers = counters[Total].keys();
+    peers.removeOne(kNullGuid);
+    peers.prepend(kNullGuid);
+    for (const auto& peerId: peers)
+    {
+        for (int type = FirstRequestType; type < RequestTypesCount; ++type)
+            out << "| " << QString::number(counters[type][peerId]).rightJustified(7) << " ";
+        out << "| "
+            << (peerId.isNull() ? "All Peers" : peerManager->peerString(peerId))
+            << "\n";
+    }
+
+    out << "---------------------------------------------------\n";
+}
+
+QString RequestCounter::requestTypeShortName(RequestCounter::RequestType requestType)
+{
+    switch (requestType)
+    {
+        case FileInfoRequest:
+            return "FINFO";
+        case ChecksumsRequest:
+            return "CHSUM";
+        case DownloadChunkRequest:
+            return "DOWNL";
+        case DownloadChunkFromInternetRequest:
+            return "DOWNI";
+        case Total:
+            return "TOTAL";
+        default:
+            // Should not get here.
+            NX_ASSERT(false);
+    }
+
+    return QString();
 }
 
 } // namespace distributed_file_downloader

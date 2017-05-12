@@ -109,10 +109,14 @@ protected:
     void increasePeerRank(const QnUuid& peerId, int value = 1);
     void decreasePeerRank(const QnUuid& peerId, int value = 1);
 
+    void setPrintSelfPeerInLogs();
+
 private:
     Storage* m_storage;
     AbstractPeerManager* m_peerManager;
     const QString m_fileName;
+
+    bool m_printSelfPeerInLogs = false;
 
     State m_state = State::initial;
 

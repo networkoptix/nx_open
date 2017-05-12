@@ -26,10 +26,20 @@ static const int kChunkSize = 4;
 class TestWorker: public Worker
 {
 public:
-    using Worker::Worker;
     using Worker::selectPeersForOperation;
     using Worker::increasePeerRank;
     using Worker::decreasePeerRank;
+
+    TestWorker(
+        const QString& fileName,
+        Storage* storage,
+        AbstractPeerManager* peerManager,
+        QObject* parent = nullptr)
+        :
+        Worker(fileName, storage, peerManager, parent)
+    {
+        setPrintSelfPeerInLogs();
+    }
 
     virtual void waitForNextStep(int delay) override
     {
@@ -57,14 +67,10 @@ protected:
 
         commonPeerManager.reset(new TestPeerManager());
 
-        defaultPeer = createPeer();
+        defaultPeer = createPeer("Default Peer");
         peerById[defaultPeer->id] = defaultPeer;
 
-        NX_LOG(
-            lm("Default peer: %1, worker: %2")
-                .arg(defaultPeer->id.toString())
-                .arg(defaultPeer->worker),
-            cl_logINFO);
+        NX_LOG(lm("Default Peer worker: %1").arg(defaultPeer->worker), cl_logINFO);
     }
 
     virtual void TearDown() override
@@ -121,11 +127,11 @@ protected:
     }
 
     struct Peer;
-    Peer* createPeer()
+    Peer* createPeer(const QString& peerName = QString())
     {
         const auto peerId = QnUuid::createUuid();
 
-        auto peerManager = new ProxyTestPeerManager(commonPeerManager.data(), peerId);
+        auto peerManager = new ProxyTestPeerManager(commonPeerManager.data(), peerId, peerName);
         auto storage = createStorage(peerId.toString());
         auto worker = new TestWorker(kTestFileName, storage, peerManager);
 
@@ -403,9 +409,9 @@ TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadFlatNetwork)
             pendingPeers.removeOne(defaultPeer->id);
         });
 
-    for (int i = 0; i < 10; ++i)
+    for (int i = 1; i <= 10; ++i)
     {
-        auto peer = createPeer();
+        auto peer = createPeer(lit("Peer %1").arg(i));
         peerById[peer->id] = peer;
         peer->storage->addFile(fileInfo);
         commonPeerManager->setPeerGroups(peer->id, groups);
@@ -430,6 +436,16 @@ TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadFlatNetwork)
 
     for (int i = 0; i < maxSteps && !pendingPeers.isEmpty(); ++i)
         nextStep();
+
+    commonPeerManager->requestCounter()->printCounters(
+        "Incoming Requests:", commonPeerManager.data());
+
+    for (auto& peer: peerById)
+    {
+        peer->peerManager->requestCounter()->printCounters(
+            "Outgoing requests from " + commonPeerManager->peerString(peer->id),
+            commonPeerManager.data());
+    }
 
     ASSERT_EQ(pendingPeers.size(), 0);
 }

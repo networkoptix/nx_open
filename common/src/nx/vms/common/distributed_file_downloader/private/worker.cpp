@@ -121,7 +121,7 @@ Worker::Worker(
     m_stepDelayTimer->setSingleShot(true);
     connect(m_stepDelayTimer, &QTimer::timeout, this, &Worker::nextStep);
 
-    NX_LOGX(logMessage("Created. Self GUID: %1").arg(peerManager->selfId().toString()),
+    NX_LOG(logMessage("Created. Self GUID: %1").arg(peerManager->selfId().toString()),
         cl_logINFO);
 }
 
@@ -134,7 +134,7 @@ void Worker::start()
     if (m_started)
         return;
 
-    NX_LOGX(logMessage("Starting..."), cl_logINFO);
+    NX_LOG(logMessage("Starting..."), cl_logINFO);
 
     const auto& fileInfo = fileInformation();
     if (!fileInfo.isValid())
@@ -200,7 +200,7 @@ void Worker::setState(State state)
     if (m_state == state)
         return;
 
-    NX_LOGX(logMessage("Entering state %1...").arg(QnLexical::serialized(state)), cl_logDEBUG1);
+    NX_LOG(logMessage("Entering state %1...").arg(QnLexical::serialized(state)), cl_logDEBUG1);
     m_state = state;
     emit stateChanged(state);
 }
@@ -290,7 +290,7 @@ void Worker::requestFileInformationInternal()
         ? lit("available chunks")
         : lit("file info");
 
-    NX_LOGX(logMessage("Trying to get %1.").arg(subject), cl_logDEBUG2);
+    NX_LOG(logMessage("Trying to get %1.").arg(subject), cl_logDEBUG2);
 
     const auto peers = selectPeersForOperation();
     if (peers.isEmpty())
@@ -314,7 +314,7 @@ void Worker::requestFileInformationInternal()
             if (peerId.isNull())
                 return;
 
-            NX_LOGX(
+            NX_LOG(
                 logMessage("Got %3 reply from %1: %2")
                     .arg(m_peerManager->peerString(peerId))
                     .arg(statusString(success))
@@ -367,7 +367,7 @@ void Worker::requestFileInformationInternal()
                 auto errorCode = m_storage->setChunkSize(fileInfo.name, fileInfo.chunkSize);
                 if (errorCode != ErrorCode::noError)
                 {
-                    NX_LOGX(
+                    NX_LOG(
                         logMessage("During setting chunk size storage returned error: %1").arg(
                             QnLexical::serialized(errorCode)),
                         cl_logWARNING);
@@ -381,12 +381,12 @@ void Worker::requestFileInformationInternal()
 
                 if (errorCode != ErrorCode::noError)
                 {
-                    NX_LOGX(
+                    NX_LOG(
                         logMessage("During update storage returned error: %1").arg(
                             QnLexical::serialized(errorCode)),
                         cl_logWARNING);
                 }
-                NX_LOGX(logMessage("Updated file info."), cl_logINFO);
+                NX_LOG(logMessage("Updated file info."), cl_logINFO);
 
                 setState(State::foundFileInformation);
             }
@@ -405,7 +405,7 @@ void Worker::requestFileInformationInternal()
 
     for (const auto& peer: peers)
     {
-        NX_LOGX(
+        NX_LOG(
             logMessage("Requesting %1 from server %2.")
                 .arg(subject)
                 .arg(m_peerManager->peerString(peer)),
@@ -450,7 +450,7 @@ void Worker::requestChecksums()
             if (peerId.isNull())
                 return;
 
-            NX_LOGX(
+            NX_LOG(
                 logMessage("Got checksums from %1: %2")
                     .arg(m_peerManager->peerString(peerId))
                     .arg(statusString(success)),
@@ -483,13 +483,13 @@ void Worker::requestChecksums()
 
             if (errorCode != ErrorCode::noError)
             {
-                NX_LOGX(
+                NX_LOG(
                     logMessage("Cannot set checksums: %1").arg(QnLexical::serialized(errorCode)),
                     cl_logWARNING);
                 return;
             }
 
-            NX_LOGX(logMessage("Updated checksums."), cl_logDEBUG1);
+            NX_LOG(logMessage("Updated checksums."), cl_logDEBUG1);
 
             const auto& fileInfo = fileInformation();
             if (fileInfo.status != FileInformation::Status::downloading
@@ -504,7 +504,7 @@ void Worker::requestChecksums()
 
     for (const auto& peer: peers)
     {
-        NX_LOGX(
+        NX_LOG(
             logMessage("Requesting checksums from server %1.")
                 .arg(m_peerManager->peerString(peer)),
             cl_logDEBUG2);
@@ -559,7 +559,7 @@ void Worker::downloadNextChunk()
             if (peerId.isNull())
                 return;
 
-            NX_LOGX(
+            NX_LOG(
                 logMessage("Got chunk %2 from %1: %3")
                     .arg(m_peerManager->peerString(peerId))
                     .arg(chunkIndex)
@@ -583,7 +583,7 @@ void Worker::downloadNextChunk()
             const auto errorCode = m_storage->writeFileChunk(m_fileName, chunkIndex, data);
             if (errorCode != ErrorCode::noError)
             {
-                NX_LOGX(
+                NX_LOG(
                     logMessage("Cannot write chunk. Storage error: %1").arg(
                         QnLexical::serialized(errorCode)),
                     cl_logWARNING);
@@ -598,7 +598,7 @@ void Worker::downloadNextChunk()
 
     if (useInternet)
     {
-        NX_LOGX(
+        NX_LOG(
             logMessage("Requesting chunk %1 from the Internet via %2...")
                 .arg(chunkIndex).arg(m_peerManager->peerString(peerId)),
             cl_logDEBUG2);
@@ -607,7 +607,7 @@ void Worker::downloadNextChunk()
     }
     else
     {
-        NX_LOGX(
+        NX_LOG(
             logMessage("Requesting chunk %1 from %2...")
                 .arg(chunkIndex).arg(m_peerManager->peerString(peerId)),
             cl_logDEBUG2);
@@ -616,7 +616,7 @@ void Worker::downloadNextChunk()
 
     if (handle < 0)
     {
-        NX_LOGX(
+        NX_LOG(
             logMessage("Cannot send request for chunk %1 to %2...")
                 .arg(chunkIndex).arg(m_peerManager->peerString(peerId)),
             cl_logDEBUG2);
@@ -637,20 +637,30 @@ void Worker::cancelRequests()
 void Worker::finish()
 {
     setState(State::finished);
-    NX_LOGX(logMessage("Download finished."), cl_logINFO);
+    NX_LOG(logMessage("Download finished."), cl_logINFO);
     emit finished(m_fileName);
 }
 
 void Worker::fail()
 {
     setState(State::failed);
-    NX_LOGX(logMessage("Download failed."), cl_logERROR);
+    NX_LOG(logMessage("Download failed."), cl_logERROR);
     emit failed(m_fileName);
 }
 
 QString Worker::logMessage(const char* message) const
 {
-    return lit("[%1] ").arg(m_fileName) + QString::fromLatin1(message);
+    auto result = lit(" [%1] ").arg(m_fileName) + QString::fromLatin1(message);
+    if (m_printSelfPeerInLogs)
+    {
+        result.prepend(
+            lit("Worker [%1]").arg(m_peerManager->peerString(m_peerManager->selfId())));
+    }
+    else
+    {
+        result.prepend(NX_TYPE_NAME(typeid(*this)));
+    }
+    return result;
 }
 
 bool Worker::addAvailableChunksInfo(const QBitArray& chunks)
@@ -729,7 +739,7 @@ QList<QnUuid> Worker::selectPeersForOperation(
         [this, &result]
         {
             if (result.isEmpty())
-                NX_LOGX(logMessage("No peers selected."), cl_logDEBUG2);
+                NX_LOG(logMessage("No peers selected."), cl_logDEBUG2);
         });
 
     auto peers = referencePeers.isEmpty() ? allPeers() : referencePeers;
@@ -891,7 +901,7 @@ void Worker::waitForNextStep(int delay)
     if (delay < 0)
         delay = kDefaultStepDelayMs;
 
-    NX_LOGX(logMessage("Start waiting for next step."), cl_logDEBUG2);
+    NX_LOG(logMessage("Start waiting for next step."), cl_logDEBUG2);
 
     if (delay == 0)
         nextStep();
@@ -907,6 +917,11 @@ void Worker::increasePeerRank(const QnUuid& peerId, int value)
 void Worker::decreasePeerRank(const QnUuid& peerId, int value)
 {
     m_peerInfoById[peerId].decreaseRank(value);
+}
+
+void Worker::setPrintSelfPeerInLogs()
+{
+    m_printSelfPeerInLogs = true;
 }
 
 void Worker::PeerInformation::increaseRank(int value)

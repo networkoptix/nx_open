@@ -13,6 +13,31 @@ namespace common {
 namespace distributed_file_downloader {
 
 class Storage;
+class TestPeerManager;
+
+struct RequestCounter
+{
+    enum RequestType
+    {
+        FirstRequestType,
+
+        FileInfoRequest = FirstRequestType,
+        ChecksumsRequest,
+        DownloadChunkRequest,
+        DownloadChunkFromInternetRequest,
+        Total,
+
+        RequestTypesCount
+    };
+
+    void incrementCounters(const QnUuid& peerId, RequestType requestType);
+
+    void printCounters(const QString& header, TestPeerManager* peerManager) const;
+
+    static QString requestTypeShortName(RequestType requestType);
+
+    std::array<QHash<QnUuid, int>, RequestTypesCount> counters;
+};
 
 class TestPeerManager: public AbstractPeerManager
 {
@@ -29,8 +54,8 @@ public:
 
     TestPeerManager();
 
-    void addPeer(const QnUuid& peerId);
-    QnUuid addPeer();
+    void addPeer(const QnUuid& peerId, const QString& peerName = QString());
+    QnUuid addPeer(const QString& peerName = QString());
 
     void setFileInformation(const QnUuid& peerId, const FileInformation& fileInformation);
     FileInformation fileInformation(const QnUuid& peerId, const QString& fileName) const;
@@ -46,8 +71,11 @@ public:
 
     void processRequests();
 
+    const RequestCounter* requestCounter() const;
+
     // AbstractPeerManager implementation
     virtual QnUuid selfId() const override;
+    virtual QString peerString(const QnUuid& peerId) const;
     virtual QList<QnUuid> getAllPeers() const override;
     virtual int distanceTo(const QnUuid&) const override;
     virtual bool hasInternetConnection(const QnUuid& peerId) const override;
@@ -87,6 +115,7 @@ private:
 
     struct PeerInfo
     {
+        QString name;
         QHash<QString, FileInformation> fileInformationByName;
         QStringList groups;
         Storage* storage = nullptr;
@@ -107,18 +136,24 @@ private:
     };
 
     QQueue<Request> m_requestsQueue;
+
+    RequestCounter m_requestCounter;
 };
 
 class ProxyTestPeerManager: public AbstractPeerManager
 {
 public:
-    ProxyTestPeerManager(TestPeerManager* peerManager);
-    ProxyTestPeerManager(TestPeerManager* peerManager, const QnUuid& id);
+    ProxyTestPeerManager(TestPeerManager* peerManager, const QString& peerName = QString());
+    ProxyTestPeerManager(
+        TestPeerManager* peerManager, const QnUuid& id, const QString& peerName = QString());
 
     void calculateDistances();
 
+    const RequestCounter* requestCounter() const;
+
     // AbstractPeerManager implementation
     virtual QnUuid selfId() const override;
+    virtual QString peerString(const QnUuid& peerId) const;
     virtual QList<QnUuid> getAllPeers() const override;
     virtual int distanceTo(const QnUuid&) const override;
     virtual bool hasInternetConnection(const QnUuid& peerId) const override;
@@ -152,6 +187,7 @@ private:
     TestPeerManager* m_peerManager;
     QnUuid m_selfId;
     QHash<QnUuid, int> m_distances;
+    RequestCounter m_requestCounter;
 };
 
 } // namespace distributed_file_downloader
