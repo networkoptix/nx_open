@@ -15,11 +15,11 @@ namespace stun {
 
 class MessageDispatcher;
 
-class SocketServer
-:
-    public StreamSocketServer<SocketServer, ServerConnection>
+class SocketServer:
+    public nx::network::server::StreamSocketServer<SocketServer, ServerConnection>
 {
-    typedef StreamSocketServer<SocketServer, ServerConnection> base_type;
+    using base_type = 
+        nx::network::server::StreamSocketServer<SocketServer, ServerConnection>;
 
 public:
     SocketServer(

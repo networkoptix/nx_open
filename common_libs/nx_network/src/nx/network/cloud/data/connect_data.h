@@ -2,13 +2,15 @@
 
 #include <list>
 
+#include <boost/optional.hpp>
+
+#include <nx/network/cloud/cloud_connect_version.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/uuid.h>
 
 #include "connection_method.h"
 #include "connection_parameters.h"
 #include "stun_message_data.h"
-#include "nx/network/cloud/cloud_connect_version.h"
 
 namespace nx {
 namespace hpm {
@@ -51,7 +53,8 @@ public:
 
     std::list<SocketAddress> forwardedTcpEndpointList;
     std::list<SocketAddress> udpEndpointList;
-    std::list<SocketAddress> trafficRelayEndpointList;
+    /** Optional for backward compatibility. */
+    boost::optional<nx::String> trafficRelayUrl;
     ConnectionParameters params;
     CloudConnectVersion cloudConnectVersion;
 

@@ -50,7 +50,7 @@ InputIt move_if(InputIt first, InputIt last, OutputIt outFirst, UnaryPredicate p
 }
 
 template<typename AssociativeContainer>
-std::size_t countByPrefix(
+std::size_t countElementsWithPrefix(
     const AssociativeContainer& associativeContainer,
     const typename AssociativeContainer::key_type& prefix)
 {
@@ -87,7 +87,7 @@ struct GetIteratorType<const Container>
 } // namespace detail
 
 template<typename AssociativeContainer>
-typename detail::GetIteratorType<AssociativeContainer>::type findAnyByPrefix(
+typename detail::GetIteratorType<AssociativeContainer>::type findFirstElementWithPrefix(
     AssociativeContainer& associativeContainer,
     const typename AssociativeContainer::key_type& prefix)
 {

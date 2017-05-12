@@ -166,7 +166,7 @@ int VmsGatewayProcess::exec()
                 "US", QnAppInfo::organizationName().toUtf8());
         }
 
-        MultiAddressServer<nx_http::HttpStreamSocketServer> multiAddressHttpServer(
+        network::server::MultiAddressServer<nx_http::HttpStreamSocketServer> multiAddressHttpServer(
             &authenticationManager,
             &httpMessageDispatcher,
             settings.http().sslSupport,

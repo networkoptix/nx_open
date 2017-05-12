@@ -4,6 +4,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <core/resource_management/layout_tour_manager.h>
 
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_access/global_permissions_manager.h>
@@ -632,6 +633,14 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
                         if (server)
                             return Qn::FullLayoutPermissions;
 
+                        const auto tour = commonModule()->layoutTourManager()->tour(ownerId);
+                        if (tour.isValid())
+                        {
+                            return tour.parentId == user->getId()
+                                ? Qn::FullLayoutPermissions
+                                : Qn::NoPermissions;
+                        }
+
                         /* Layout of user, which we don't know of. */
                         return hasGlobalPermission(subject, Qn::GlobalAdminPermission)
                             ? Qn::FullLayoutPermissions
@@ -745,6 +754,11 @@ bool QnResourceAccessManager::canCreateLayout(const QnResourceAccessSubject& sub
     /* Videowall-admins can create layouts on videowall. */
     if (resPool->getResourceById<QnVideoWallResource>(layoutParentId))
         return hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission);
+
+    // Tour owner can create layouts in it.
+    const auto tour = layoutTourManager()->tour(layoutParentId);
+    if (tour.isValid())
+        return tour.parentId == subject.id();
 
     const auto ownerResource = resPool->getResourceById(layoutParentId);
 

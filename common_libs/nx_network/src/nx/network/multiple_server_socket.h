@@ -5,9 +5,9 @@
 
 #include <nx/utils/std/cpp14.h>
 
-#include "nx/network/aio/timer.h"
+#include "aggregate_acceptor.h"
+#include "aio/timer.h"
 #include "system_socket.h"
-
 
 namespace nx {
 namespace network {
@@ -63,10 +63,7 @@ public:
     // Implementation of AbstractStreamServerSocket::*
     virtual bool listen(int queueLen) override;
     virtual AbstractStreamSocket* accept() override;
-    virtual void acceptAsync(
-        nx::utils::MoveOnlyFunc<void(
-            SystemError::ErrorCode,
-            AbstractStreamSocket*)> handler) override;
+    virtual void acceptAsync(AcceptCompletionHandler handler) override;
     virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void cancelIOSync() override;
 
@@ -79,36 +76,16 @@ public:
     size_t count() const;
 
 protected:
-    struct NX_NETWORK_API ServerSocketContext
-    {
-        std::unique_ptr<AbstractStreamServerSocket> socket;
-        bool isAccepting;
-
-        ServerSocketContext(std::unique_ptr<AbstractStreamServerSocket> socket_);
-        ServerSocketContext(ServerSocketContext&&) = default;
-        ServerSocketContext& operator=(ServerSocketContext&&) = default;
-
-        AbstractStreamServerSocket* operator->() const;
-        void stopAccepting();
-    };
-
-    void accepted(
-        ServerSocketContext* source,
-        SystemError::ErrorCode code,
-        AbstractStreamSocket* socket);
-
-    void cancelIoFromAioThread();
-
-protected:
     bool m_nonBlockingMode;
     unsigned int m_recvTmeout;
     mutable SystemError::ErrorCode m_lastError;
     bool* m_terminated;
     aio::Timer m_timer;
-    std::list<ServerSocketContext> m_serverSockets;
-    nx::utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode,
-        AbstractStreamSocket*)> m_acceptHandler;
+    std::vector<AbstractStreamServerSocket*> m_serverSockets;
+    AcceptCompletionHandler m_acceptHandler;
+    AggregateAcceptor m_aggregateAcceptor;
+
+    void cancelIoFromAioThread();
 
 private:
     void stopWhileInAioThread();

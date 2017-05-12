@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <nx/utils/log/log_message.h>
+#include <nx/utils/std/cpp14.h>
 
 template<typename ... Args>
 void testArgQString(const char* format, const Args& ... args)
@@ -71,6 +72,9 @@ void testStrQString(const char* format, const Args& ... args)
     EXPECT_EQ(lm(format).arg(args ...), QString::fromUtf8(format).arg(args ...));
 }
 
+struct SomeLongStructNameForThisTest {};
+class SomeLongClassNameForThisTest {};
+
 TEST(QnLogMessage, str)
 {
     testStrQString("%1", QLatin1String("hello"));
@@ -86,5 +90,15 @@ TEST(QnLogMessage, str)
     EXPECT_EQ(QLatin1String("same same"), lm("%1 %2").str("%2").str("same"));
     ASSERT_EQ("hello world %4 yes",
         lm("%1 %2 %3 %4").strs("hello", "world", "%4", "yes"));
+
+    const auto obj1 = std::make_unique<SomeLongStructNameForThisTest>();
+    const auto name1 = QLatin1String("SomeLongStructNameForThisTest(0x");
+    EXPECT_TRUE(QString(lm("%1").str(obj1)).startsWith(name1));
+    EXPECT_TRUE(QString(lm("%1").str(obj1.get())).startsWith(name1));
+
+    const auto obj2 = std::make_shared<SomeLongClassNameForThisTest>();
+    const auto name2 = QLatin1String("SomeLongClassNameForThisTest(0x");
+    EXPECT_TRUE(QString(lm("%1").str(obj2)).startsWith(name2));
+    EXPECT_TRUE(QString(lm("%1").str(obj2.get())).startsWith(name2));
 }
 

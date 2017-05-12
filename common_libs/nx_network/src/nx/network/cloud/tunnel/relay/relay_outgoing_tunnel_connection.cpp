@@ -93,25 +93,6 @@ void OutgoingTunnelConnection::setControlConnectionClosedHandler(
     m_tunnelClosedHandler = std::move(handler);
 }
 
-static SystemError::ErrorCode toSystemError(
-    nx::cloud::relay::api::ResultCode resultCode)
-{
-    switch (resultCode)
-    {
-        case nx::cloud::relay::api::ResultCode::ok:
-            return SystemError::noError;
-
-        case nx::cloud::relay::api::ResultCode::timedOut:
-            return SystemError::timedOut;
-
-        case nx::cloud::relay::api::ResultCode::notFound:
-            return SystemError::hostNotFound;
-
-        default:
-            return SystemError::connectionReset;
-    }
-}
-
 void OutgoingTunnelConnection::setInactivityTimeout(std::chrono::milliseconds timeout)
 {
     m_inactivityTimeout = timeout;

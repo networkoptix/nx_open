@@ -227,7 +227,7 @@ SmtpOperationResult SmtpClient::connectToHost()
                 return {SmtpError::ServerError, responseCode};
 
             m_socket = std::make_unique<nx::network::deprecated::SslSocket>(
-                m_socket.release(), /*isServerSide*/ false);
+                std::move(m_socket), /*isServerSide*/ false);
 
             // Send ELHO one more time
             sendMessage(lit("EHLO ") + name);

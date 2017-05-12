@@ -11,7 +11,7 @@ namespace cloud {
 namespace relay {
 
 RelayService::RelayService(int argc, char **argv):
-    base_type(argc, argv, TrafficRelayAppInfo::applicationDisplayName())
+    base_type(argc, argv, AppInfo::applicationDisplayName())
 {
 }
 

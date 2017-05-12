@@ -19,13 +19,20 @@ void ListenRequest::serializeAttributes(nx::stun::Message* const message)
 
 bool ListenRequest::parseAttributes(const nx::stun::Message& message)
 {
-    if (!readEnumAttributeValue(message, stun::extension::attrs::cloudConnectVersion, &cloudConnectVersion))
+    if (!readEnumAttributeValue(
+            message,
+            stun::extension::attrs::cloudConnectVersion,
+            &cloudConnectVersion))
+    {
         cloudConnectVersion = kDefaultCloudConnectVersion; //< If not present - old version.
+    }
 
     return
         readStringAttributeValue<stun::extension::attrs::SystemId>(message, &systemId) &&
         readStringAttributeValue<stun::extension::attrs::ServerId>(message, &serverId);
 }
+
+//-------------------------------------------------------------------------------------------------
 
 ListenResponse::ListenResponse():
     StunResponseData(kMethod),
@@ -33,18 +40,25 @@ ListenResponse::ListenResponse():
 {
 }
 
-typedef stun::extension::attrs::StringAttribute<stun::extension::attrs::tcpConnectionKeepAlive> TcpKeepAlive;
+using TcpKeepAlive = 
+    stun::extension::attrs::StringAttribute<stun::extension::attrs::tcpConnectionKeepAlive>;
 
 void ListenResponse::serializeAttributes(nx::stun::Message* const message)
 {
+    using namespace stun::extension;
+
     if (tcpConnectionKeepAlive)
         message->newAttribute<TcpKeepAlive>(tcpConnectionKeepAlive->toString().toUtf8());
 
-    message->addAttribute(stun::extension::attrs::cloudConnectOptions, (int) cloudConnectOptions);
+    message->addAttribute(attrs::cloudConnectOptions, (int) cloudConnectOptions);
+    if (trafficRelayUrl)
+        message->newAttribute<attrs::TrafficRelayUrl>(std::move(*trafficRelayUrl));
 }
 
 bool ListenResponse::parseAttributes(const nx::stun::Message& message)
 {
+    using namespace stun::extension;
+
     tcpConnectionKeepAlive = boost::none;
     nx::String keepAliveOptions;
     if (readStringAttributeValue<TcpKeepAlive>(message, &keepAliveOptions))
@@ -54,8 +68,12 @@ bool ListenResponse::parseAttributes(const nx::stun::Message& message)
             return false; //< Empty means parsing has failed.
     }
 
-    if (!readEnumAttributeValue(message, stun::extension::attrs::cloudConnectOptions, &cloudConnectOptions))
+    if (!readEnumAttributeValue(message, attrs::cloudConnectOptions, &cloudConnectOptions))
         cloudConnectOptions = emptyCloudConnectOptions;
+
+    nx::String trafficRelayEndpointLocal;
+    if (readStringAttributeValue<attrs::TrafficRelayUrl>(message, &trafficRelayEndpointLocal))
+        trafficRelayUrl = std::move(trafficRelayEndpointLocal);
 
     return true;
 }

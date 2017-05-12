@@ -65,9 +65,7 @@ int TimeServerProcess::exec()
         utils::log::initialize(
             settings.logging(),
             settings.dataDir(),
-            TimeServerAppInfo::applicationDisplayName(),
-            "log_file",
-            QnLog::MAIN_LOG_ID);
+            TimeServerAppInfo::applicationDisplayName());
 
         TimeProtocolServer timeProtocolServer(
             false,

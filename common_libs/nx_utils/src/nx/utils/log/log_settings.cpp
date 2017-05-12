@@ -1,8 +1,6 @@
 #include "log_settings.h"
 
-#include <QtCore/QDir>
-
-#include "../app_info.h"
+#include <nx/utils/settings.h>
 
 namespace nx {
 namespace utils {
@@ -16,8 +14,7 @@ void Settings::load(const QnSettings& settings, const QString& prefix)
             return QString(lm("%1/%2").arg(prefix).arg(key));
         };
 
-    const auto confLevel = 
-        QnLog::logLevelFromString(settings.value(makeKey("logLevel")).toString());
+    const auto confLevel = levelFromString(settings.value(makeKey("logLevel")).toString());
     if (confLevel != cl_logUNKNOWN)
         level = confLevel;
 

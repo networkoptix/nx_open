@@ -648,6 +648,12 @@ namespace ec2
             return impl::doSyncCall<impl::SimpleHandler>(std::bind(fn, this, param, std::placeholders::_1));
         }
 
+        template<class TargetType, class HandlerType> int saveMiscParam(const ApiMiscData& data, TargetType* target, HandlerType handler)
+        {
+            return saveMiscParam(data, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
         template<class TargetType, class HandlerType>
         int saveRuntimeInfo(const ApiRuntimeData& data, TargetType* target,
             HandlerType handler)

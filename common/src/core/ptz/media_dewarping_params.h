@@ -6,9 +6,18 @@
 #include <nx/fusion/model_functions_fwd.h>
 
 // TODO: #Elric doesn't really belong in this folder
-struct QnMediaDewarpingParams {
+struct QnMediaDewarpingParams
+{
     Q_GADGET
     Q_ENUMS(ViewMode)
+
+    Q_PROPERTY(bool enabled MEMBER enabled)
+    Q_PROPERTY(ViewMode viewMode MEMBER viewMode)
+    Q_PROPERTY(qreal fovRot MEMBER fovRot)
+    Q_PROPERTY(qreal xCenter MEMBER xCenter)
+    Q_PROPERTY(qreal yCenter MEMBER yCenter)
+    Q_PROPERTY(qreal radius MEMBER radius)
+    Q_PROPERTY(qreal hStretch MEMBER hStretch)
 
 public:
     enum ViewMode {
@@ -51,17 +60,17 @@ public:
     /** Camera mounting mode. */
     ViewMode viewMode;
 
-    /** View correction angle, in radians. */
+    /** View correction angle, in degrees. */
     qreal fovRot;
 
-    /** Normalized position of the circle*/ 
+    /** Normalized position of the circle*/
     qreal xCenter;
     qreal yCenter;
 
-    /** Circle radius in range 0..1 (r/width) */ 
+    /** Circle radius in range 0..1 (r/width) */
     qreal radius;
 
-    /** Horizontal stretch. Value 1.0 means no stretch */ 
+    /** Horizontal stretch. Value 1.0 means no stretch */
     qreal hStretch;
 };
 

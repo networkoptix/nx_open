@@ -18,6 +18,7 @@
 
     <properties>
         <product.title>traffic_relay unit tests</product.title>
+        <template>app</template>
 
         <qt.libs>core network xml concurrent sql multimedia</qt.libs>
         <global.libs>-lnx_network -lcommon -lnx_streaming -ludt -ltraffic_relay -lcloud_db_client -lnx_fusion -lnx_utils</global.libs>
