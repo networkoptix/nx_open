@@ -7,6 +7,8 @@
 #include <QtCore/QRegExp>
 #include <QtCore/QString>
 
+#include <nx/utils/thread/mutex.h>
+
 namespace nx_http {
 namespace server {
 namespace rest {
@@ -36,6 +38,8 @@ public:
         const nx_http::StringType& path,
         std::vector<nx_http::StringType>* pathParams) const
     {
+        QnMutexLocker lock(&m_mutex);
+
         for (auto& matchContext: m_restPathToMatchContext)
         {
             if (!matchContext.second.regex.exactMatch(QString::fromUtf8(path)))
@@ -59,6 +63,7 @@ private:
 
     /** REST path template, context */
     std::map<nx_http::StringType, MatchContext> m_restPathToMatchContext;
+    mutable QnMutex m_mutex;
 
     QRegExp convertToRegex(const QString& pathTemplate)
     {
