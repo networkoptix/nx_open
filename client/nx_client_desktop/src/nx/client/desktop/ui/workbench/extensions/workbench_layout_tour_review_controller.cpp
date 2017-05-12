@@ -1,5 +1,7 @@
 #include "workbench_layout_tour_review_controller.h"
 
+#include <QtGui/QPainter>
+
 #include <QtWidgets/QAction>
 
 #include <core/resource_access/resource_access_filter.h>
@@ -10,13 +12,19 @@
 
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
+#include <ui/workbench/workbench_utility.h>
 
 #include <utils/common/uuid_pool.h>
+
+#include <nx/utils/log/log.h>
 
 namespace {
 
@@ -24,6 +32,58 @@ static const int kDefaultDelayMs = 5000;
 
 const QnUuid uuidPoolBase("44a18151-242e-430b-8b57-4c94691902f9");
 static const int kUuidsLimit = 16384;
+
+static const auto kMyTag = lit("__gdm");
+
+class DropPlaceholderWidget: public GraphicsWidget
+{
+    using base_type = GraphicsWidget;
+public:
+    DropPlaceholderWidget(QGraphicsItem* parent = nullptr, Qt::WindowFlags windowFlags = 0):
+        base_type(parent, windowFlags)
+    {
+        setAcceptedMouseButtons(0);
+    }
+
+    virtual QRectF boundingRect() const override
+    {
+        return QRectF(-100000, -100000, 100000, 100000);
+    }
+
+    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override
+    {
+        painter->fillRect(geometry(), Qt::red);
+    }
+
+};
+
+class PlaceholderMagnitudeCalculator: public QnDistanceMagnitudeCalculator
+{
+    using base_type = QnDistanceMagnitudeCalculator;
+public:
+    /**
+    * \param origin                    Desired position for an item.
+    */
+    PlaceholderMagnitudeCalculator(const QPointF &origin):
+        base_type(origin)
+    {
+    }
+
+protected:
+    virtual qreal calculateInternal(const void *value) const override
+    {
+        const auto baseValue = base_type::calculateInternal(value);
+
+        const QPoint &p = *static_cast<const QPoint *>(value);
+        NX_DEBUG(kMyTag, lm("calculateInternal from %1 to %2: distance %3").args(m_origin, p, baseValue));
+
+        if (p.x() < m_origin.x() || p.y() < m_origin.y())
+            return baseValue * 10000;
+        return baseValue;
+    }
+};
+
+
 
 } // namespace
 
@@ -70,6 +130,11 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
 
     connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
         &LayoutTourReviewController::startListeningLayout);
+
+    const auto logger = nx::utils::log::add({kMyTag});
+    logger->setDefaultLevel(nx::utils::log::Level::none);
+    logger->setWriter(std::make_unique<nx::utils::log::StdOut>());
+    NX_DEBUG(kMyTag, "Log __gdm initialized");
 }
 
 LayoutTourReviewController::~LayoutTourReviewController()
@@ -121,11 +186,18 @@ void LayoutTourReviewController::startListeningLayout()
     connectToLayout(workbench()->currentLayout());
     updateOrder();
     updateButtons(workbench()->currentLayout()->resource());
+
+    auto placeholder = new DropPlaceholderWidget();
+    display()->setLayer(placeholder, Qn::BackLayer);
+    display()->scene()->addItem(placeholder);
+    m_dropPlaceholder = placeholder;
+    updatePlaceholderPosition();
 }
 
 void LayoutTourReviewController::stopListeningLayout()
 {
     m_connections.reset();
+    delete m_dropPlaceholder;
 }
 
 void LayoutTourReviewController::reviewLayoutTour(const ec2::ApiLayoutTourData& tour)
@@ -195,6 +267,7 @@ void LayoutTourReviewController::connectToLayout(QnWorkbenchLayout* layout)
             connectToItem(item);
             updateOrder();
             updateButtons(layout->resource());
+            updatePlaceholderPosition();
         });
     *m_connections << connect(layout, &QnWorkbenchLayout::itemRemoved, this,
         [this, layout](QnWorkbenchItem* item)
@@ -202,6 +275,7 @@ void LayoutTourReviewController::connectToLayout(QnWorkbenchLayout* layout)
             item->disconnect(this);
             updateOrder();
             updateButtons(layout->resource());
+            updatePlaceholderPosition();
         });
     for (auto item: layout->items())
         connectToItem(item);
@@ -211,6 +285,8 @@ void LayoutTourReviewController::connectToItem(QnWorkbenchItem* item)
 {
     *m_connections << connect(item, &QnWorkbenchItem::geometryChanged, this,
         &LayoutTourReviewController::updateOrder);
+    *m_connections << connect(item, &QnWorkbenchItem::geometryChanged, this,
+        &LayoutTourReviewController::updatePlaceholderPosition);
 }
 
 void LayoutTourReviewController::updateOrder()
@@ -238,6 +314,26 @@ void LayoutTourReviewController::updateButtons(const QnLayoutResourcePtr& layout
         action::RemoveCurrentLayoutTourAction
     };
     layout->setData(Qn::CustomPanelActionsRole, qVariantFromValue(actions));
+}
+
+void LayoutTourReviewController::updatePlaceholderPosition()
+{
+    if (!m_dropPlaceholder)
+        return;
+
+    const auto mapper = workbench()->mapper();
+
+    static const QPoint kStartPos(0, 0);
+    static const QSize kPlaceholderSize(1, 1);
+
+    qDebug() << "placing placeholder";
+    PlaceholderMagnitudeCalculator metric(kStartPos);
+    const auto freeSlot = workbench()->currentLayout()->closestFreeSlot(kStartPos, kPlaceholderSize, &metric);
+    const QRectF targetRect = mapper->mapFromGrid(freeSlot);
+
+    qDebug() << "set placeholder geometry" << targetRect << "(it was cell " << freeSlot << ")";
+    m_dropPlaceholder->setGeometry(targetRect);
+    m_dropPlaceholder->update();
 }
 
 void LayoutTourReviewController::addItemToReviewLayout(

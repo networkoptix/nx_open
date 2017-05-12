@@ -16,6 +16,7 @@
 class QnWorkbenchLayout;
 class QnWorkbenchItem;
 class QnUuidPool;
+class QGraphicsWidget;
 
 namespace nx {
 namespace client {
@@ -51,6 +52,7 @@ private:
 
     void updateOrder();
     void updateButtons(const QnLayoutResourcePtr& layout);
+    void updatePlaceholderPosition();
 
     void addItemToReviewLayout(
         const QnLayoutResourcePtr& layout,
@@ -75,6 +77,7 @@ private:
     QnDisconnectHelperPtr m_connections;
     QHash<QnUuid, QnLayoutResourcePtr> m_reviewLayouts;
     QScopedPointer<QnUuidPool> m_uuidPool;
+    QPointer<QGraphicsWidget> m_dropPlaceholder;
 };
 
 } // namespace workbench
