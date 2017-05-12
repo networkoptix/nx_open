@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('nxCommon')
+angular.module('webadminApp')
     .factory('mediaserver', function ($http, $modal, $q, $localStorage, $location, $log, nativeClient) {
 
         var mediaserver = {};
@@ -253,18 +253,6 @@ angular.module('nxCommon')
                 return $localStorage.authRtsp; // auth_rtsp
             },
 
-            previewUrl:function(cameraPhysicalId,time,width,height){
-                if( Config.allowDebugMode) { //TODO: remove this hack later!
-                    return '';
-                }
-
-                return proxy + '/web/api/image' +
-                    '?physicalId=' + cameraPhysicalId +
-                    (width? '&width=' + width:'') +
-                    (height? '&height=' + height:'') +
-                    ('&time=' + (time || 'LATEST')); // mb LATEST?
-
-            },
             hasProxy:function(){
                 return proxy !=='';
             },
@@ -433,20 +421,10 @@ angular.module('nxCommon')
             getStorages: function(){ return wrapGet(proxy + '/web/api/storageSpace'); },
             saveStorages:function(info){return wrapPost(proxy + '/web/ec2/saveStorages',info); },
             discoveredPeers:function(){return wrapGet(proxy + '/web/api/discoveredPeers?showAddresses=true'); },
-            getMediaServer: function(id){return wrapGet(proxy + '/web/ec2/getMediaServersEx?id=' + id.replace('{','').replace('}','')); },
-            getMediaServers: function(){return wrapGet(proxy + '/web/ec2/getMediaServersEx'); },
-            getResourceTypes:function(){return wrapGet(proxy + '/web/ec2/getResourceTypes'); },
 
             getLayouts:function(){return wrapGet(proxy + '/web/ec2/getLayouts'); },
             getUsers:function(){return wrapGet(proxy + '/web/ec2/getUsers'); },
 
-            getCameras:function(id){
-                if(typeof(id)!=='undefined'){
-                    return wrapGet(proxy + '/web/ec2/getCamerasEx?id=' + id.replace('{','').replace('}',''));
-                }
-                return wrapGet(proxy + '/web/ec2/getCamerasEx');
-            },
-            saveMediaServer: function(info){return wrapPost(proxy + '/web/ec2/saveMediaServer',info); },
             statistics:function(url){
                 url = url || proxy;
                 return wrapGet(url + '/web/api/statistics?salt=' + (new Date()).getTime());
@@ -493,14 +471,6 @@ angular.module('nxCommon')
                     cloudAccountName: cloudAccountName
                 });
             },
-            /*
-            // This method is not used anymore
-            clearCloudSystemCredentials: function(){
-                return wrapPost(proxy + '/web/api/saveCloudSystemCredentials',{
-                    reset: true
-                });
-            },
-            */
             getRecords:function(serverUrl, physicalId, startTime, endTime, detail, limit, label, periodsType){
 
                 //console.log('getRecords',serverUrl,physicalId,startTime,endTime,detail,periodsType);

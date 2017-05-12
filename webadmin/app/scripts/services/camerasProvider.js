@@ -1,6 +1,6 @@
 'use strict';
 angular.module('webadminApp')
-    .factory('camerasProvider', function (mediaserver, $location, $localStorage, $q, $poll) {
+    .factory('camerasProvider', function (systemAPI, $location, $localStorage, $q, $poll) {
         var reloadInterval = Config.settingsConfig.reloadInterval;//30 seconds
 
         function camerasProvider(){
@@ -82,7 +82,7 @@ angular.module('webadminApp')
             if(this.treeRequest){
                 this.treeRequest.abort('getCameras');
             }
-            this.treeRequest = mediaserver.getCameras();
+            this.treeRequest = systemAPI.getCameras();
             this.treeRequest.then(function (data) {
                 var cameras = data.data;
                 var findMediaStream = function(param){
@@ -100,7 +100,7 @@ angular.module('webadminApp')
 
                 function cameraSorter(camera) {
                     camera.url = self.extractDomain(camera.url);
-                    camera.preview = mediaserver.previewUrl(camera.physicalId, false, null, 256);
+                    camera.preview = systemAPI.previewUrl(camera.physicalId, false, null, 256);
                     camera.server = self.getServer(camera.parentId);
                     if(camera.server && camera.server.status === 'Offline'){
                         camera.status = 'Offline';
@@ -246,7 +246,7 @@ angular.module('webadminApp')
             if(this.treeRequest){
                 this.treeRequest.abort('reloadTree');
             }
-            this.treeRequest = mediaserver.getMediaServers();
+            this.treeRequest = systemAPI.getMediaServers();
             this.treeRequest.then(function (data) {
                 if(!self.mediaServers) {
                     self.mediaServers = _.sortBy(data.data,serverSorter);
@@ -288,7 +288,7 @@ angular.module('webadminApp')
         camerasProvider.prototype.requestResources = function() {
             var self = this;
             var deferred = $q.defer();
-            mediaserver.getResourceTypes().then(function (result) {
+            systemAPI.getResourceTypes().then(function (result) {
                 self.desktopCameraTypeId = _.find(result.data, function (type) {
                     return type.name === 'SERVER_DESKTOP_CAMERA';
                 });
