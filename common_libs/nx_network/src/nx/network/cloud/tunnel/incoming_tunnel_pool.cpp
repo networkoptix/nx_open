@@ -1,5 +1,6 @@
 #include "incoming_tunnel_pool.h"
 
+#include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/log/log.h>
 
@@ -9,19 +10,46 @@ namespace cloud {
 
 IncomingTunnelPool::IncomingTunnelPool(
     aio::AbstractAioThread* aioThread, size_t acceptLimit)
-:
+    :
     m_acceptLimit(acceptLimit)
 {
-    m_aioTimer.bindToAioThread(aioThread);
+    bindToAioThread(aioThread);
 }
 
-void IncomingTunnelPool::addNewTunnel(
-    std::unique_ptr<AbstractIncomingTunnelConnection> connection)
+void IncomingTunnelPool::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    NX_CRITICAL(m_aioTimer.isInSelfAioThread());
-    auto insert = m_pool.emplace(std::move(connection));
-    NX_ASSERT(insert.second);
-    acceptTunnel(insert.first);
+    base_type::bindToAioThread(aioThread);
+
+    m_timer.bindToAioThread(aioThread);
+    for (auto& tunnel: m_pool)
+        tunnel->bindToAioThread(aioThread);
+}
+
+void IncomingTunnelPool::acceptAsync(AcceptCompletionHandler handler)
+{
+    {
+        QnMutexLocker lock(&m_mutex);
+        NX_ASSERT(!m_acceptHandler, "Multiple accepts are not supported");
+        m_acceptHandler = std::move(handler);
+        if (!m_acceptedSockets.empty())
+        {
+            lock.unlock();
+            return dispatch([this]() { callAcceptHandler(SystemError::noError); });
+        }
+    }
+
+    if (m_acceptTimeout && (*m_acceptTimeout > std::chrono::milliseconds::zero()))
+    {
+        m_timer.start(
+            *m_acceptTimeout,
+            [this]() { callAcceptHandler(SystemError::timedOut); });
+    }
+}
+
+void IncomingTunnelPool::cancelIOSync()
+{
+    QnMutexLocker lock(&m_mutex);
+    m_acceptHandler = nullptr;
 }
 
 std::unique_ptr<AbstractStreamSocket> IncomingTunnelPool::getNextSocketIfAny()
@@ -35,43 +63,26 @@ std::unique_ptr<AbstractStreamSocket> IncomingTunnelPool::getNextSocketIfAny()
     return std::move(socket);
 }
 
-void IncomingTunnelPool::getNextSocketAsync(
-    nx::utils::MoveOnlyFunc<void(std::unique_ptr<AbstractStreamSocket>)> handler,
-    boost::optional<unsigned int> timeout)
+void IncomingTunnelPool::setAcceptTimeout(
+    boost::optional<std::chrono::milliseconds> acceptTimeout)
 {
-    {
-        QnMutexLocker lock(&m_mutex);
-        NX_ASSERT(!m_acceptHandler, Q_FUNC_INFO, "Multiple accepts are not supported");
-        m_acceptHandler = std::move(handler);
-        if (!m_acceptedSockets.empty())
-        {
-            lock.unlock();
-            return m_aioTimer.dispatch([this](){ callAcceptHandler(false); });
-        }
-    }
-
-    if (timeout && *timeout != 0)
-    {
-        m_aioTimer.start(
-            std::chrono::milliseconds(*timeout),
-            [this](){ callAcceptHandler(true); });
-    }
+    m_acceptTimeout = acceptTimeout;
 }
 
-void IncomingTunnelPool::cancelAccept()
+void IncomingTunnelPool::addNewTunnel(
+    std::unique_ptr<AbstractIncomingTunnelConnection> connection)
 {
-    QnMutexLocker lock(&m_mutex);
-    m_acceptHandler = nullptr;
+    NX_CRITICAL(m_timer.isInSelfAioThread());
+    connection->bindToAioThread(getAioThread());
+    auto insert = m_pool.emplace(std::move(connection));
+    NX_ASSERT(insert.second);
+    acceptTunnel(insert.first);
 }
 
-void IncomingTunnelPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
+void IncomingTunnelPool::stopWhileInAioThread()
 {
-    m_aioTimer.cancelAsync(
-        [this, handler = std::move(handler)]()
-        {
-            m_pool.clear();
-            handler();
-        });
+    m_pool.clear();
+    m_timer.pleaseStopSync();
 }
 
 void IncomingTunnelPool::acceptTunnel(TunnelIterator connection)
@@ -109,27 +120,27 @@ void IncomingTunnelPool::acceptTunnel(TunnelIterator connection)
                 {
                     m_acceptedSockets.push_back(std::move(socket));
                     lock.unlock();
-                    callAcceptHandler(false);
+                    callAcceptHandler(SystemError::noError);
                 }
             }
         });
 }
 
-void IncomingTunnelPool::callAcceptHandler(bool timeout)
+void IncomingTunnelPool::callAcceptHandler(SystemError::ErrorCode resultCode)
 {
-    // Cancel all possible posts (we are in corresponding IO thread)
-    m_aioTimer.cancelSync();
+    // Cancel all possible posts (we are in corresponding IO thread).
+    m_timer.cancelSync();
 
     QnMutexLocker lock(&m_mutex);
     if (!m_acceptHandler)
         return;
 
-    if (timeout)
+    if (resultCode != SystemError::noError)
     {
         const auto handler = std::move(m_acceptHandler);
         m_acceptHandler = nullptr;
         lock.unlock();
-        return handler(nullptr);
+        return handler(resultCode, nullptr);
     }
 
     if (m_acceptedSockets.empty())
@@ -142,7 +153,8 @@ void IncomingTunnelPool::callAcceptHandler(bool timeout)
     m_acceptedSockets.pop_front();
 
     lock.unlock();
-    return handler(std::move(socket));
+    socket->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
+    return handler(SystemError::noError, std::move(socket));
 }
 
 } // namespace cloud

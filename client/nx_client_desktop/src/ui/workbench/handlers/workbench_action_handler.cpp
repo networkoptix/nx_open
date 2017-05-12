@@ -265,7 +265,12 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::OpenSingleLayoutAction), SIGNAL(triggered()), this, SLOT(at_openLayoutsAction_triggered()));
     connect(action(action::OpenMultipleLayoutsAction), SIGNAL(triggered()), this, SLOT(at_openLayoutsAction_triggered()));
     connect(action(action::OpenAnyNumberOfLayoutsAction), SIGNAL(triggered()), this, SLOT(at_openLayoutsAction_triggered()));
-    connect(action(action::OpenLayoutsInNewWindowAction), SIGNAL(triggered()), this, SLOT(at_openLayoutsInNewWindowAction_triggered()));
+
+    connect(action(action::OpenSingleLayoutInNewWindowAction), &QAction::triggered, this,
+        &ActionHandler::at_openLayoutsInNewWindowAction_triggered);
+    connect(action(action::OpenMultiLayoutInNewWindowAction), &QAction::triggered, this,
+        &ActionHandler::at_openLayoutsInNewWindowAction_triggered);
+
     connect(action(action::OpenCurrentLayoutInNewWindowAction), SIGNAL(triggered()), this, SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
     connect(action(action::OpenNewWindowAction), SIGNAL(triggered()), this, SLOT(at_openNewWindowAction_triggered()));
 
@@ -843,7 +848,8 @@ void ActionHandler::at_openLayoutsAction_triggered() {
     }
 }
 
-void ActionHandler::at_openLayoutsInNewWindowAction_triggered() {
+void ActionHandler::at_openLayoutsInNewWindowAction_triggered()
+{
     // TODO: #GDM #Common this won't work for layouts that are not saved. (de)serialization of layouts is not implemented.
     QnLayoutResourceList layouts = menu()->currentParameters(sender()).resources().filtered<QnLayoutResource>();
     if (layouts.isEmpty())
@@ -851,11 +857,14 @@ void ActionHandler::at_openLayoutsInNewWindowAction_triggered() {
     openResourcesInNewWindow(layouts);
 }
 
-void ActionHandler::at_openCurrentLayoutInNewWindowAction_triggered() {
-    menu()->trigger(action::OpenLayoutsInNewWindowAction, workbench()->currentLayout()->resource());
+void ActionHandler::at_openCurrentLayoutInNewWindowAction_triggered()
+{
+    menu()->trigger(action::OpenSingleLayoutInNewWindowAction,
+        workbench()->currentLayout()->resource());
 }
 
-void ActionHandler::at_openNewWindowAction_triggered() {
+void ActionHandler::at_openNewWindowAction_triggered()
+{
     openNewWindow(QStringList());
 }
 
@@ -1016,8 +1025,8 @@ void ActionHandler::at_dropResourcesAction_triggered()
     if (!layouts.empty())
         menu()->trigger(action::OpenAnyNumberOfLayoutsAction, layouts);
 
-    if (!videowalls.empty())
-        menu()->trigger(action::OpenVideoWallsReviewAction, videowalls);
+    for (const auto& videoWall: videowalls)
+        menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
 }
 
 void ActionHandler::at_dropResourcesIntoNewLayoutAction_triggered() {

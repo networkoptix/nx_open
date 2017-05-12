@@ -49,7 +49,7 @@
 
 <!-- build:js scripts/vendor-login.js -->
 <!-- bower:js -->
-<script src="bower_components/jquery/jquery.js"></script>
+<script src="bower_components/jquery/dist/jquery.js"></script>
 <script src="bower_components/angular/angular.js"></script>
 <script src="bower_components/json3/lib/json3.js"></script>
 <script src="bower_components/sass-bootstrap/dist/js/bootstrap.js"></script>
@@ -80,15 +80,19 @@
 <!-- endbuild -->
 
 
+<!-- build:js({.tmp,app}) scripts/common-login.js -->
+<script src="web_common/scripts/module.js"></script>
+<script src="web_common/scripts/services/mediaserver.js"></script>
+<script src="web_common/scripts/services/nativeClient.js"></script>
+<!-- endbuild -->
+
 <!-- build:js({.tmp,app}) scripts/scripts-login.js -->
 <script src="scripts/bootstrap.js"></script>
 
 <script src="scripts/config.js"></script>
 <script src="scripts/app-login.js"></script>
 
-<script src="scripts/services/mediaserver.js"></script>
 <script src="scripts/services/dialogs.js"></script>
-<script src="scripts/services/nativeClient.js"></script>
 
 <script src="scripts/directives/navbar.js"></script>
 <script src="scripts/controllers/navigation.js"></script>

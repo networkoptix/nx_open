@@ -8,6 +8,7 @@
 #include <nx/utils/std/cpp14.h>
 
 #include "abstract_http_request_handler.h"
+#include "http_server_exact_path_matcher.h"
 #include "http_server_connection.h"
 
 namespace nx_http {
@@ -29,30 +30,6 @@ const std::pair<const QString, Value>* findByMaxPrefix(
 
     return &(*it);
 }
-
-template<typename Mapped>
-class ExactPathMatcher
-{
-public:
-    bool add(const nx_http::StringType& path, Mapped mapped)
-    {
-        return m_pathToMapped.emplace(path, std::move(mapped)).second;
-    }
-
-    boost::optional<const Mapped&> match(
-        const nx_http::StringType& path,
-        std::vector<nx_http::StringType>* /*pathParams*/) const
-    {
-        auto it = m_pathToMapped.find(path);
-        if (it == m_pathToMapped.end())
-            return boost::none;
-
-        return boost::optional<const Mapped&>(it->second);
-    }
-
-private:
-    std::map<nx_http::StringType, Mapped> m_pathToMapped;
-};
 
 class AbstractMessageDispatcher
 {
@@ -105,7 +82,7 @@ protected:
         const QString& path) const = 0;
 };
 
-template<template<typename> class PathMatcher>
+template<template<typename> class PathMatcherType>
 class BasicMessageDispatcher:
     public AbstractMessageDispatcher
 {
@@ -156,7 +133,7 @@ private:
     struct PathMatchContext
     {
         FactoryFunc defaultFactory;
-        PathMatcher<FactoryFunc> pathToFactory;
+        PathMatcherType<FactoryFunc> pathToFactory;
     };
 
     std::map<QString, QString> m_rewritePrefixes;

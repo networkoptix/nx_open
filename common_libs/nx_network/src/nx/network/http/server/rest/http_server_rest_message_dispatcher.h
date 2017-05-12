@@ -8,7 +8,7 @@ namespace server {
 namespace rest {
 
 class MessageDispatcher:
-    public BasicMessageDispatcher<RestPathMatcher>
+    public BasicMessageDispatcher<PathMatcher>
 {
 };
 

@@ -12,12 +12,12 @@ class Settings;
 class RunTimeOptions;
 } // namespace conf
 
-class ConnectHandler
-:
+class ConnectHandler:
     public nx_http::AbstractHttpRequestHandler,
-    public StreamConnectionHolder<nx_http::AsyncMessagePipeline>
+    public network::server::StreamConnectionHolder<nx_http::AsyncMessagePipeline>
 {
-    typedef StreamConnectionHolder<nx_http::AsyncMessagePipeline> super;
+    using base_type = 
+        network::server::StreamConnectionHolder<nx_http::AsyncMessagePipeline>;
 
 public:
     ConnectHandler(

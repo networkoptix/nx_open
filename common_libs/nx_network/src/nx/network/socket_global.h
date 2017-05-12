@@ -131,7 +131,6 @@ private:
     const int m_initializationFlags;
     Config m_config;
     DebugConfig m_debugConfig;
-    std::shared_ptr<QnLog::Logs> m_log;
 
     // Is unique_ptr because it should be initiated after m_aioService but removed after.
     std::unique_ptr<cloud::AddressResolver> m_addressResolver;

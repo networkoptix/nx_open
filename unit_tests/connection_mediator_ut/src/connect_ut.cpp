@@ -41,7 +41,7 @@ protected:
             &cloud,
             &stunMessageDispatcher,
             &listeningPeerPool);
-        server = std::make_unique<MultiAddressServer<stun::SocketServer>>(
+        server = std::make_unique<network::server::MultiAddressServer<stun::SocketServer>>(
             &stunMessageDispatcher,
             false,
             nx::network::NatTraversalSupport::disabled);
@@ -60,7 +60,7 @@ protected:
     conf::Settings settings;
     ListeningPeerPool listeningPeerPool;
     std::unique_ptr<PeerRegistrator> listeningPeerRegistrator;
-    std::unique_ptr<MultiAddressServer<stun::SocketServer>> server;
+    std::unique_ptr<network::server::MultiAddressServer<stun::SocketServer>> server;
 
     SocketAddress address() const
     {

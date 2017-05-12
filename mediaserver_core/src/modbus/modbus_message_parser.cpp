@@ -17,7 +17,7 @@ void ModbusMessageParser::setMessage(ModbusMessage* const msg)
     m_outputMessage = msg;
 }
 
-nx_api::ParserState ModbusMessageParser::parse(const nx::Buffer& buf, size_t* bytesProcessed)
+nx::network::server::ParserState ModbusMessageParser::parse(const nx::Buffer& buf, size_t* bytesProcessed)
 {
     m_state = ModbusMessageParser::State::parsingHeader;
 
@@ -29,18 +29,18 @@ nx_api::ParserState ModbusMessageParser::parse(const nx::Buffer& buf, size_t* by
     return state();
 }
 
-nx_api::ParserState ModbusMessageParser::state() const
+nx::network::server::ParserState ModbusMessageParser::state() const
 {
     switch (m_state)
     {
         case ModbusMessageParser::State::initial:
-            return nx_api::ParserState::init;
+            return nx::network::server::ParserState::init;
         case ModbusMessageParser::State::done:
-            return nx_api::ParserState::done;
+            return nx::network::server::ParserState::done;
         case ModbusMessageParser::State::failed:
-            return nx_api::ParserState::failed;
+            return nx::network::server::ParserState::failed;
         default:
-            return nx_api::ParserState::inProgress;
+            return nx::network::server::ParserState::inProgress;
     }
 }
 

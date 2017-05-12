@@ -250,9 +250,6 @@ void QnFrameScaler::downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOut
                         g+=i;
                 }
                 int e2 = t2.elapsed();
-        cl_log.log("scale factor 2. sse intr time:", e1, cl_logALWAYS);
-                cl_log.log("scale factor 2. sse time:", e2, cl_logALWAYS);
-                cl_log.log("-------------------------",  g, cl_logALWAYS);
                 */
         if (useSSE2()) {
             downscalePlate_factor2_sse2_intr(dst->data[0], dst->linesize[0],   src->data[0], src_width, src->linesize[0], src_height, 0x00);

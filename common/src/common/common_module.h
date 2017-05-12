@@ -150,6 +150,11 @@ public:
         return m_resourceDiscoveryManager;
     }
 
+    QnLayoutTourManager* layoutTourManager() const
+    {
+        return m_layoutTourManager;
+    }
+
     QnLicensePool* licensePool() const;
     QnUserRolesManager* userRolesManager() const;
     QnResourceAccessSubjectsCache* resourceAccessSubjectsCache() const;
@@ -281,6 +286,7 @@ private:
     QnGlobalPermissionsManager* m_globalPermissionsManager = nullptr;
     QnUserRolesManager* m_userRolesManager = nullptr;
     QnResourceDiscoveryManager* m_resourceDiscoveryManager = nullptr;
+    QnLayoutTourManager* m_layoutTourManager = nullptr;
 
     QnUuid m_videowallGuid;
     int m_instanceCounter = 0;

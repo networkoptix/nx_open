@@ -1,3 +1,120 @@
+-----------------------------------------------3.0.0.xxxx-----------------------------------------
+NEW FEATURES
+* Nx Cloud - connect your system to Nx Cloud to login from anywhere and share access to your system. Save hours in port-forwarding setup and coordination.
+* All New Desktop Client - completely revamped Desktop Client for Windows, Mac, and Ubuntu Linux. It looks spectacular.
+* Web Browsing in Desktop Client - users can add, view, and interact with URLs in the Desktop Client. We’re excited about the possibilities.
+* Nx1 Lite Client - The Nx1 now has a Lite Client which can be controlled from the new Mobile app. Amazing.
+* Custom User Roles - Administrators can now create custom roles and share groups of hardware and layouts. Which is nice.
+* New, Faster Mobile App - with a new, faster Nx-created media player, layouts, and live thumbnails. Heck yeah.
+* New Server Storage Database - Increases performance of Server archive management.
+* View Archive from Deleted Cameras - allows users to see archives for deleted cameras that still have footage in storage archive. Which is helpful.
+* Ubuntu 16.04 LTS Support - LTS = Long term support. So we got onboard.
+ * Axis T8311 Joystick support now added (Windows only). This make us both happy and sad at the same time.
+* 2-way audio integrated for Hikvision and ACTi devices. So that’s nice.
+* New Windows Installer - makes installation as easy as pie. Hmmm. Pie.
+
+NEW DEVICE SUPPORT
+* Axis T8311 Joystick support now added (Windows only).
+* Advanced PTZ support added for: HITRON NFX-22153D1, Digital Watchdog DWC-MPTZ30X, Sony SNC-WR600, Redvision RVX-IP30-IRWL-W, Cellinx STH795
+* Encoder License support added for: ACTi TCD2100, Axis M7001, Axis M7010, Axis M7011, Axis M7014, Axis P7016, Axis P7210, Axis P7214, Axis P7216, Axis Q7401, Axis Q7404, Axis Q7406, Axis Q7411, Bosch VIP X16 XF E, Bosch VIP-X1600-XFM4, Bosch VJT-X40XF-E, DW-CPUHDE04, DW-CPUHDE08, DW-CPUHDE16, GrandStream GXV3504, Hikvision DS-6701, Hikvision DS-6704, Hikvision DS-6716, Honeywell HVE4, Pelco NET5504, Pelco NET5508, Pelco NET5516, Samsung SPE-100, Samsung SPE-101, Samsung SPE-1600, UDP technology NVN4100, Uniview DVS4116, Vivotek VS8401, Vivotek VS8801
+* Pelco Net5504, Net5516 encoders are now supported
+* Pelco D5220 PTZ capabilities enabled
+* New Digital Watchdog devices support: DWC-MV85DiA
+* New Arecont Vision devices supported: AV08ZMD-400, AV4655m, AV4656, AV6656, AV10655, AV12565, AV12566, AV20565
+* New Axis devices supported:  C1004, C2005, C3003-E, M1045, M1054, M1065, M2025, M2026, M3044, M3045, M3046, M3104, M3105, M3106, P1264, P1254, P3707, P1244, Q1941, Q3615, Q3617, Q3708, Q6055, Q6052, Q6155
+
+IMPROVEMENTS
+* Added I/O support for FLIR FC-series cameras
+* Improved default password auto-fill during auto-discovery
+* Added Camera RTSP URL to the Advanced tab in Camera Settings
+* Tab Advanced in Camera Settings works for Axis camera now
+* Motion detection can be adjusted to any camera stream on Expert tab in Camera Settings
+* Redesigned Device output action
+* Added Restore factory defaults option to Server Web page for Nx1 devices
+* Added support of different file systems (besides ext) for Linux-based Servers
+* Improved algorithm of balancing the bitrate between storage drives
+* Adaptive Reserved space value for storage locations depending on disk size - 10-30Gb for local disks and 50-100Gb for NAS. This change doesn't affect existing Server installations
+* Added informative message when external storage can't be added because of wrong login/password
+* Time synchronization between Servers was improved
+* Camera settings are defaulted now if camera was deleted and added again
+* Redesigned email notifications (still not great - but we’re working on that)
+* Content-type for POST requests is now automatically detected (HTTP request as an action)
+* Initial connect from desktop and mobile clients was optimized to decrease the connection time
+* LIVE video buffer size can now be adjusted in Client Settings
+* Smoother timeline mechanics - like butter
+* Better support of Retina displays
+* Added free space checking to the Client and Server before update - warning will appear if at least one of the peers has not enough space to get an update pack 
+* Licenses can be now recovered during Backup/Restore procedure
+* Users can now select multiple expired licenses to remove
+* Added Export option to the licenses list in System Administration
+* Whole system can be renamed now in Web Admin Interface
+* Bookmark can be edited from the context menu on Bookmark log dialog
+* Storage Analytics doesn't take into account Backup storage any more
+* Zoom window applied to camera with strange aspect ratios also had strange aspect ratios. Moderated a bit.
+* Added a warning about the file size limitation for export to .exe
+* Added export to MP4 container format
+* Default archive export container format is changed to MKV
+* Added hotkey Ctrl+Shift+D for Disconnect from System action
+* Old crash dumps are now removed by Server to prevent high disk space usage
+* Incremental expansion of Server API documentation
+* General server stability improvements based on anonymous usage and crash statistics
+
+SECURITY VULNERABILITY UPDATE
+* Banner Information Disclosure vulnerability identified and addressed
+* Web Server directory traversal vulnerability identified and addressed
+* Added resilience measures for DDOS (Distributed Denial of Service) attacks
+* SSL vulnerabilities identified and addressed 
+
+BUG FIXES
+* Arecont Vision AV20275, AV20365, AV12275 and AV12276 displayed incorrect sensor order. Fixed.
+* Arecont Vision AV20275 maximum fps allowed value increased to 7.
+* Honeywell cameras showed unauthorized all the time. Fixed.
+* Server could not successfully authenticate with Honeywell H4D3PRV2 & H4D3PRV3. Fixed.
+* Some rare camera models show Loading when viewed in full-screen. Fixed.
+* Software Motion Detection did not work with the Pelco NET5508. Fixed.
+* Only key frames were replayed from Pelco Optera IMM12027 archive. Fixed.
+* Axis P7216 encoder duplicate discovery. Fixed.
+* New fisheye ACTi cameras faced unwanted automatical dewarping. Fixed.
+* Stream from Sony SNC-EP550 sometimes hanged and didn't have audio. Fixed.
+* All Truen branded camera had PTZ control issues. Fixed.
+* UNIVIEW IPC6242SR-X22 camera had PTZ control issues. Fixed.
+* Vista VK2-3MPEFEDre tilt worked improperly. Fixed.
+* Hikvision WH-D5216A could not be added correctly. Fixed.
+* Hikvision DS-6716HWI encoder had messed channels output. Fixed.
+* Hikvision multisensor DS-2CD6362F-I had messed stream profiles across the channels. Fixed.
+* Hikvision devices digital input was detected only for automatic port id selected in advanced event rules settings. Fixed.
+* Server on Windows periodically crashed if there were Hikvision cameras in tree. Fixed. 
+* Cameras could be duplicated in Resources Tree if they were added manually and then auto discovered by Server. Fixed.
+* Audio for some cameras and RTSP links was played in Web Client with knocking effect. Fixed.
+* Server discovered but didn't add to the resources some Onvif cameras. Fixed.
+* Media Server missed some files on fast archive scan. Fixed.
+* Server HWID on Windows differed from HWID on Linux that could lead to license loss on OS change. Fixed.
+* Admin's password for the whole system could change if one of the Servers was merged to another System via Merge to currently connected system in Resources tree in Client. Fixed.
+* Downloading HLS video of big size (>1000 seconds) via API took a huge time to prepare a file. Fixed.
+* Exported via API HLS video with duration parameter set had incorrect timeline size. Fixed.
+* Part of licenses could disappear during merge Systems. Fixed.
+* Local client settings won't change after the upgrade to Mac OS X Sierra(last opened layout, last connections list, etc.). Fixed.
+* Client on Mac OS X hung when high resolution image was set as background. Fixed.
+* Client on Mac OS X sometimes worked improperly with touch pad. Fixed.
+* After OS upgrade to Windows 10 Server DBs moved to C:\Windows.old so they was not available for Server. Fixed.
+* If Server network interface for current Client connection became unavailable, Client chose next available Server interface incorrectly. Fixed.
+* False event Input on camera stops could be generated when Event Rule was just configured (after clicking on Apply button). Fixed.
+* Cameras switched to Low-Res on layout because of high CPU usage but they didn't return to Hi-Res when CPU usage became normal. Fixed.
+* Small items on the Scene couldn't be resized by right bottom corner. Fixed.
+* Thumbnails panel didn't restore its state after Nx client was reopened. Fixed.
+* Bookmark tooltip could not be used when thumbnails panel was opened. Fixed.
+* Camera could not be added to exported layout. Fixed.
+* Speed down sometimes worked incorrect for exported layouts. Fixed.
+* Client on Window 8 hanged if export to exe format was cancelled. Fixed.
+* Client crashed on hover over bookmarks at some hardware. Fixed.
+* Search mode allowed to add cameras on Video Wall View layout. Fixed.
+* If data was exported from table Storage Analytics, not all headers were correctly exported. Fixed.
+* User login considered as case sensitive while login from Web and Mobile Clients. Fixed.
+* Low-res video stream from Nx1 was being loaded with big delay in Mobile Client on Android devices. Fixed.
+* Mobile Client on Android devices hanged after system language change. Fixed.
+* Web Client did not stop video streaming from Server when Web interface was switched to the Settings page. Fixed.
+
+
 -----------------------------------------------2.6.0.xxxx-----------------------------------------
 NEW FEATURES
 * 2-way audio integrated for Axis cameras and I/O device (requires firmware 5.x)
