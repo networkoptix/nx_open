@@ -20,12 +20,8 @@ namespace websocket {
 class NX_NETWORK_API WebSocket :
     public QObject,
     public aio::AbstractAsyncChannel,
-    private nx::network::server::BaseServerConnectionHandler,
-    private websocket::ParserHandler,
-    private nx::network::server::StreamConnectionHolder<nx::network::server::BaseServerConnectionWrapper>
+    private websocket::ParserHandler
 {
-    friend struct BaseServerConnectionAccess;
-
     struct WriteData
     {
         nx::Buffer buffer;
@@ -57,6 +53,8 @@ public:
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
+    virtual void stopWhileInAioThread() override;
+
     /**
      * Makes sense only in multiFrameMessage mode.
      * Indicates that the next sendAsync will close current message
@@ -75,18 +73,6 @@ signals:
 
 
 private:
-    /**  BaseServerConnectionHandler implementation */
-    virtual void bytesReceived(nx::Buffer& buffer) override;
-    virtual void readyToSendData() override;
-
-    /** StreamConnectionHolder implementation */
-    virtual void closeConnection(
-        SystemError::ErrorCode closeReason,
-        ConnectionType* connection) override;
-
-
-    virtual void stopWhileInAioThread() override;
-
     /** Parser handler implementation */
     virtual void frameStarted(FrameType type, bool fin) override;
     virtual void framePayload(const char* data, int len) override;
@@ -95,16 +81,19 @@ private:
     virtual void handleError(Error err) override;
 
     /** Own helper functions*/
-    void handleRead();
+    void processReadData(SystemError::ErrorCode ecode);
     bool isDataFrame() const;
     void sendPreparedMessage(nx::Buffer* buffer, int writeSize, HandlerType handler);
     void sendControlResponse(FrameType requestType, FrameType responseType);
     void sendControlRequest(FrameType type);
     void readWithoutAddingToQueue();
+    void readWithoutAddingToQueueAsync();
     void handlePingTimer();
+    void handleSocketRead(SystemError::ErrorCode ecode, size_t bytesRead);
+    void handleSocketWrite(SystemError::ErrorCode ecode, size_t bytesSent);
 
 private:
-    std::unique_ptr<nx::network::server::BaseServerConnectionWrapper> m_baseConnection;
+    std::unique_ptr<AbstractStreamSocket> m_socket;
     Parser m_parser;
     Serializer m_serializer;
     SendMode m_sendMode;
@@ -115,6 +104,7 @@ private:
     HandlerQueue<nx::Buffer*> m_readQueue;
     websocket::MultiBuffer m_userDataBuffer;
     nx::Buffer m_controlBuffer;
+    nx::Buffer m_readBuffer;
     std::unique_ptr<nx::network::aio::Timer> m_pingTimer;
     bool m_terminating;
     std::chrono::milliseconds m_pingTimeout;

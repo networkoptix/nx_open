@@ -45,7 +45,7 @@ protected:
                         serverSendMode,
                         serverReceiveMode));
 
-                clientWebSocket->bindToAioThread(serverWebSocket->getAioThread());
+                //clientWebSocket->bindToAioThread(serverWebSocket->getAioThread());
                 clientWebSocket->setPingTimeout(std::chrono::milliseconds(kPingTimeout));
 
                 startPromise.set_value();
@@ -438,7 +438,6 @@ TEST_F(WebSocket, Close)
     givenClientManyMessagesWithServerRespondingCallbacks();
     givenClientModes(SendMode::singleMessage, ReceiveMode::message);
     givenServerModes(SendMode::singleMessage, ReceiveMode::message);
-    givenPingTimeout(std::chrono::milliseconds(10));
     givenTCPConnectionEstablished();
 
     startFuture.wait();
