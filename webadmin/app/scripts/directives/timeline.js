@@ -163,7 +163,7 @@ angular.module('webadminApp')
                  */
 
                 function goToLive(force){
-                    timelineActions.goToLive(force);
+                    timelineActions.goToLive();
                     if(!scope.positionProvider.liveMode || force) {
                         scope.positionHandler(false);
                     }

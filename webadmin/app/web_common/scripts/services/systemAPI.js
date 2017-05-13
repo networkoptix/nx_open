@@ -179,6 +179,41 @@ angular.module('nxCommon')
         };
         /* End of formatting urls */
 
+        /* Working with archive*/
+        ServerConnection.prototype.getRecords = function(physicalId, startTime, endTime, detail, limit, label, periodsType){
+            //console.log('getRecords',physicalId,startTime,endTime,detail,periodsType);
+            var d = new Date();
+            if(typeof(startTime)==='undefined'){
+                startTime = d.getTime() - 30*24*60*60*1000;
+            }
+            if(typeof(endTime)==='undefined'){
+                endTime = d.getTime() + 100*1000;
+            }
+            if(typeof(detail)==='undefined'){
+                detail = (endTime - startTime) / 1000;
+            }
+
+            if(typeof(periodsType)==='undefined'){
+                periodsType = 0;
+            }
+
+            //RecordedTimePeriods
+            return  this._get('/ec2/recordedTimePeriods' +
+            '?' + (label||'') +
+            (limit?'&limit=' + limit:'') +
+            '&physicalId=' + physicalId +
+            '&startTime=' + startTime +
+            '&endTime=' + endTime +
+            '&detail=' + detail +
+            '&periodsType=' + periodsType +
+            '&flat&keepSmallChunks');
+            //http://10.1.5.129:7001/web/ec2/recordedTimePeriods?1h&            physicalId=urn_uuid_32306235-3032-6666-3238-000df120b502&startTime=1488920406724&endTime=1494626406724&detail=3600000&periodsType=0&flat&keepSmallChunks
+
+            //http://localhost:10000/web/ec2/recordedTimePeriods?&limit=100&physicalId=urn_uuid_32306235-3032-6666-3238-000df120b502&startTime=1494625266744&endTime=1494625366744&detail=1      &periodsType=0&flat&keepSmallChunks
+        };
+        /* End of Working with archive*/
+
+
         if(Config.webadminSystemApiCompatibility){
             // This is a hack to avoid changing all webadmin controllers at the same time - we initialize default connection
             var serverId = null;

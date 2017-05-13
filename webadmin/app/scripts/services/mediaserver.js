@@ -471,42 +471,7 @@ angular.module('webadminApp')
                     cloudAccountName: cloudAccountName
                 });
             },
-            getRecords:function(serverUrl, physicalId, startTime, endTime, detail, limit, label, periodsType){
 
-                //console.log('getRecords',serverUrl,physicalId,startTime,endTime,detail,periodsType);
-                var d = new Date();
-                if(typeof(startTime)==='undefined'){
-                    startTime = d.getTime() - 30*24*60*60*1000;
-                }
-                if(typeof(endTime)==='undefined'){
-                    endTime = d.getTime() + 100*1000;
-                }
-                if(typeof(detail)==='undefined'){
-                    detail = (endTime - startTime) / 1000;
-                }
-
-                if(typeof(periodsType)==='undefined'){
-                    periodsType = 0;
-                }
-
-                if(serverUrl !== '/' && serverUrl !== '' && serverUrl !== null){
-                    serverUrl = '/web/proxy/'+ serverUrl + '/';
-                }
-                if( proxy === Config.demo){
-                    serverUrl = proxy + '/';
-                }
-
-                //RecordedTimePeriods
-                return  wrapGet(serverUrl + 'ec2/recordedTimePeriods' +
-                    '?' + (label||'') +
-                    '&physicalId=' + physicalId +
-                    '&startTime=' + startTime +
-                    '&endTime=' + endTime +
-                    '&detail=' + detail +
-                    '&periodsType=' + periodsType +
-                    (limit?'&limit=' + limit:'') +
-                    '&flat&keepSmallChunks');
-            },
             debugFunctionUrl:function(url,getParams){
                 var delimeter = url.indexOf('?')>=0? '&':'?';
                 return proxy + url + delimeter + $.param(getParams);

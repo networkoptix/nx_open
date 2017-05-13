@@ -1,5 +1,5 @@
 'use strict';
-angular.module('webadminApp')
+angular.module('nxCommon')
     .factory('camerasProvider', function (systemAPI, $localStorage, $q, $poll) {
         var reloadInterval = Config.settingsConfig.reloadInterval;//30 seconds
 
