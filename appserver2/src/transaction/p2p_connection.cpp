@@ -350,7 +350,8 @@ void P2pConnection::sendMessage(const nx::Buffer& data)
         auto remotePeerName = qnStaticCommon->moduleDisplayName(remotePeer().id);
 
         MessageType messageType = (MessageType)data[0];
-        if (messageType != MessageType::pushTransactionData)
+        if (messageType != MessageType::pushTransactionData &&
+            messageType != MessageType::pushTransactionList)
         {
             NX_LOG(QnLog::P2P_TRAN_LOG,
                 lit("Send message:\t %1 ---> %2. Type: %3. Size=%4")

@@ -850,7 +850,8 @@ void P2pMessageBus::at_gotMessage(
     if (connection->state() == P2pConnection::State::Error)
         return; //< Connection has been closed
     if (nx::utils::log::isToBeLogged(cl_logDEBUG1, QnLog::P2P_TRAN_LOG) &&
-        messageType != MessageType::pushTransactionData)
+        messageType != MessageType::pushTransactionData &&
+        messageType != MessageType::pushTransactionList)
     {
         auto localPeerName = qnStaticCommon->moduleDisplayName(commonModule()->moduleGUID());
         auto remotePeerName = qnStaticCommon->moduleDisplayName(connection->remotePeer().id);
@@ -1125,9 +1126,6 @@ struct SendTransactionToTransportFuction
         NX_ASSERT(connection->remotePeerSubscribedTo(tranId));
         NX_ASSERT(!(ApiPersistentIdData(connection->remotePeer()) == tranId));
 
-        if (nx::utils::log::isToBeLogged(cl_logDEBUG1, QnLog::P2P_TRAN_LOG))
-            bus->printTran(connection, transaction, P2pConnection::Direction::outgoing);
-
         switch (connection->remotePeer().dataFormat)
         {
             case Qn::JsonFormat:
@@ -1148,21 +1146,11 @@ struct SendTransactionToTransportFuction
 struct SendTransactionToTransportFastFuction
 {
     bool operator()(
-        P2pMessageBus* bus,
+        P2pMessageBus* /*bus*/,
         Qn::SerializationFormat /* srcFormat */,
         const QByteArray& serializedTran,
         const P2pConnectionPtr& connection) const
     {
-        if (nx::utils::log::isToBeLogged(cl_logDEBUG1, QnLog::P2P_TRAN_LOG))
-        {
-            QnAbstractTransaction transaction;
-            QnUbjsonReader<QByteArray> stream(&serializedTran);
-            if (QnUbjson::deserialize(&stream, &transaction))
-                bus->printTran(connection, transaction, P2pConnection::Direction::outgoing);
-            ApiPersistentIdData tranId(transaction.peerID, transaction.persistentInfo.dbID);
-            NX_ASSERT(connection->remotePeerSubscribedTo(tranId));
-        }
-
         connection->sendMessage(MessageType::pushTransactionData, serializedTran);
         return true;
     }
@@ -1254,6 +1242,18 @@ bool P2pMessageBus::selectAndSendTransactions(
         return false;
     }
     connection->miscData().remoteSubscription = newSubscription;
+
+
+    if (nx::utils::log::isToBeLogged(cl_logDEBUG1, QnLog::P2P_TRAN_LOG))
+    {
+        for (const auto& serializedTran: serializedTransactions)
+        {
+            QnAbstractTransaction transaction;
+            QnUbjsonReader<QByteArray> stream(&serializedTran);
+            if (QnUbjson::deserialize(&stream, &transaction))
+                printTran(connection, transaction, P2pConnection::Direction::outgoing);
+        }
+    }
 
 #if 1
     if (connection->remotePeer().peerType == Qn::PT_Server &&
