@@ -246,8 +246,7 @@ bool changeLocalSystemId(const ConfigureSystemData& data, ec2::QnTransactionMess
     }
 
     // add foreign resource params
-    ec2::ApiResourceParamWithRefDataList dummyData;
-    if (connection->getResourceManager(Qn::kSystemAccess)->saveSync(data.additionParams, &dummyData) != ec2::ErrorCode::ok)
+    if (connection->getResourceManager(Qn::kSystemAccess)->saveSync(data.additionParams) != ec2::ErrorCode::ok)
     {
         if (!data.wholeSystem)
             resumeConnectionsToRemotePeers();
