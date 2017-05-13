@@ -56,7 +56,7 @@ module.exports = function (grunt) {
         // Watches files for changes and runs tasks based on the changed files
         watch: {
             js: {
-                files: ['<%= yeoman.app %>/scripts/**','<%= yeoman.app %>/components/**'],
+                files: ['<%= yeoman.app %>/scripts/**','<%= yeoman.app %>/components/**','<%= yeoman.app %>/web_common/**'],
                 tasks: ['newer:jshint:all'],
                 options: {
                     livereload: true
@@ -501,7 +501,7 @@ module.exports = function (grunt) {
                 command: 'cd ~/networkoptix/develop/' + package_dir + '; python ~/networkoptix/develop/netoptix_vms/build_utils/python/rdep.py -u -t=any;'
             },
             merge: {
-                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r vms_3.1;python ../../devtools/util/merge_dev.py -t vms_3.1;hg push;'
+                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r default;python ../../devtools/util/merge_dev.py -t default;hg push;'
             },
 
             pull: {

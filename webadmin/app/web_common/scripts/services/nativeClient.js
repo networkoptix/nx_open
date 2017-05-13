@@ -3,8 +3,8 @@
  */
 'use strict';
 
-angular.module('webadminApp')
-    .factory('nativeClient', function ($q, $log, $location, dialogs, $sessionStorage) {
+angular.module('nxCommon')
+    .factory('nativeClient', function ($q, $log, $location, $sessionStorage) {
         var nativeClientObject = typeof(setupDialog)=='undefined'?null:setupDialog; // Qt registered object
         var socketClientController = null;
 
@@ -115,12 +115,6 @@ angular.module('webadminApp')
                         deferred.resolve(result);
                     });
                     return deferred.promise;
-                }
-
-                if(socketClientController){
-                    var header = !title?L.dialogs.openLink:L.dialogs.openLinkWithTitle.replace("{{title}}", title);
-                    dialogs.alert(url, header);
-                    return $q.resolve();
                 }
 
                 if(windowFallback){
