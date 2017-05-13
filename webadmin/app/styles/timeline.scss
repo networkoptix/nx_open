@@ -124,23 +124,31 @@ ng-include{
   margin: 10px auto !important;
 }
 
-.no-timeline .live-button{
-  line-height: 40px !important;
+.no-timeline .live-button,
+.mobile-controls .live-button{
+  line-height: 60px !important;
 }
 
-.no-timeline,
-.no-timeline .volume,
-.no-timeline .text-left,
-.no-timeline .text-right,
 .no-timeline .text-center{
-  height: 40px !important;
+  height: 100px !important;
 }
 
 
 .pp-only{
-  width: 64px !important;
+  width: 63px !important;
 }
 
-.timeline.no-timeline .player-controls{
+.timeline.no-timeline .player-controls,
+.mobile-controls .player-controls{
   padding-top: 0px !important;
+}
+
+.mobile-controls{
+  height: 60px;
+  background-color: $additional_light2;
+}
+
+.mobile-controls .pp-only .glyphicon{
+  margin-top: 19px;
+  margin-left: -2px;
 }

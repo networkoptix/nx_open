@@ -54,7 +54,7 @@ angular.module('webadminApp')
                  */
 
                 var debugEventsMode = Config.debug.chunksOnTimeline && Config.allowDebugMode;
-                scope.playbackNotSupported = window.jscd.mobile;
+                scope.playbackNotSupported = false;//window.jscd.mobile;
 
                 scope.disableVolume = Config.settingsConfig.disableVolume;
 

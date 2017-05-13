@@ -116,11 +116,6 @@ camera-panel {
   background-color: $dark1;
 }
 
-
-.view-panel.live-only{
-  padding-bottom:100px;
-}
-
 .view-panel .stick-to-top{
   position:absolute;
   width:100%;
@@ -128,6 +123,10 @@ camera-panel {
   top:0;
   left: 0;
   z-index: 1;
+}
+
+.raise-10{
+  z-index: 10;
 }
 
 .view-panel.no-archive{
@@ -142,8 +141,13 @@ camera-panel {
   background: linear-gradient(to top, rgba($dark1, 0), rgba($dark1, 0.3)); /*Standard*/
 }
 
+.hide-excess-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .video-name{
-  line-height: 24px !important;
+  line-height: 19px !important;
   color: $light1;
   text-shadow: 0px 1px 3px rgba($dark1,1)
 }
@@ -151,12 +155,12 @@ camera-panel {
 .video-status{
   width: 24px;
   font-size: 250%;
-  line-height: 20px;
+  line-height: 12px;
 }
 
 .video-icon{
   width: 24px;
-  margin: 2px;
+  margin: 6px;
   line-height: 20px;
 }
 
@@ -221,6 +225,10 @@ camera-panel {
   padding: 8px;
 }
 
+.video-title-back-button{
+  margin-left: 6px;
+}
+
 .camera-settings-button{
   width: 36px;
   display: inline-block;
@@ -243,10 +251,7 @@ camera-panel {
 }
 
 .view-panel .stick-to-bottom{
-  position:absolute;
   width:100%;
-  bottom:0;
-
   border-top: 1px solid transparent;
 }
 .view-panel .float-size{
@@ -254,7 +259,6 @@ camera-panel {
   height:100%;
 
   padding: 0px 20px;
-  /*background-color: rgba(28, 35, 39, 0.6);*/
 }
 
 
@@ -329,7 +333,7 @@ camera-panel {
 
 .cameras-search{
   padding:10px 0 10px 0;
-  margin:3px 0;
+  margin-top:3px;
   height: 44px;
   border-bottom: 1px solid $light6;
   font-size: 13px;
@@ -422,7 +426,7 @@ camera-panel {
 
 
 div.text-left{
-  width:107px;
+  width:106px;
   height:100%;
   background-color: $additional_light2;
   border-left: 1px solid $light6;
@@ -472,10 +476,6 @@ live-circle{
 div.text-right.no-volume{
   width: 64px !important;
 }
-div.text-center.no-volume{
-  margin-right: 64px !important;
-}
-
 
 .live-button.active{
   background-color: $light6 !important;
@@ -541,7 +541,7 @@ volume-control{
 
 
 div.text-center{
-  margin: 0 104px 0 107px;
+  margin: 0 64px 0 106px;
   height:100%;
 }
 
@@ -606,7 +606,7 @@ div.text-center{
 }
 
 .glyphicon-pp{
-  width: 64px;
+  width: 63px;
   height: 100%;
 }
 
@@ -642,7 +642,7 @@ div.text-center{
 
 .webclient-window .cameras-panel{
   height: 100%;
-  width: 320px;
+  width: 320px !important;
   overflow-y: scroll;
   overflow-x: hidden;
 }
@@ -651,7 +651,7 @@ div.text-center{
 .webclient-window .tree{
   font-size: 114%; /*16px*/
   font-weight: 500;
-  padding: 8px;
+  padding: 0 8px;
 }
 
 .webclient-window .tree .offline {
@@ -667,7 +667,7 @@ div.text-center{
 }
 
 .webclient-window .tree > li{
-  padding-bottom: 8px;
+  padding: 8px 0;
   border-bottom: 1px solid $light6;
 }
 
@@ -720,11 +720,10 @@ div.text-center{
 }
 
 .camera-preview{
-  width:70px !important;
-  height:40px !important;
+  width:68px !important;
+  height:38px !important;
   margin-right: 10px;
   background-color: $light5;
-  border: 1px solid $light1;
   border-radius: 1px;
   font-size: 14px;
 
@@ -732,6 +731,12 @@ div.text-center{
   position:absolute;
   margin-left:-86px;
   margin-top: -2px;
+}
+
+.dark-theme .nav > li.active > a .camera-preview{
+  height: 38px !important;
+  width: 68px !important;
+  border: 1px solid $light1;
 }
 
 .camera-node.Unauthorized {
@@ -885,6 +890,7 @@ camera-panel.visible-xs{
 .visible-xs.back-button{
   vertical-align: top;
   margin-left: 4px;
+  margin-top: -2px;
   display: none !important;
 }
 
@@ -895,20 +901,30 @@ camera-panel.visible-xs{
   camera-panel.visible-xs {
     display: block !important;
   }
+  .view-panel{
+    padding-bottom: 160px;
+  }
+  div.text-center{
+    margin: 0 !important;
+  }
+  .glyphicon-pm{
+    height: 60px;
+    display: inline-block !important;
+  }
+
+  .glyphicon-pm > .glyphicon{
+    margin-top: 18px;
+  }
+
+  .stick-to-top{
+    height: 60px !important;
+    margin-top: 4px;
+  }
 }
 
 
-@media only screen and (max-screen-width:640px) {
-  .invisible-xs,.hidden-mobile{
-    display:none;
-  }
-  .visible-mobile{
-    display: block;
-  }
-}
-
-@media only screen and (min-screen-width: 641px) and (max-screen-width:961px) {
-  /* For general iPad layouts */
+/*@media only screen and (min-screen-width: 641px) and (max-screen-width:961px) {
+  /* For general iPad layouts *//*
   .cameras-panel{
     font-size:80%;
   }
@@ -933,7 +949,7 @@ camera-panel.visible-xs{
     max-width: 50px !important;
     max-height: 30px !important;
   }
-}
+}*/
 
 .mobile-alert{
   background-color: black;
