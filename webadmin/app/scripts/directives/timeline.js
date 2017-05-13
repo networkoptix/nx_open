@@ -54,7 +54,6 @@ angular.module('webadminApp')
                  */
 
                 var debugEventsMode = Config.debug.chunksOnTimeline && Config.allowDebugMode;
-                scope.playbackNotSupported = false;//window.jscd.mobile;
 
                 scope.disableVolume = Config.settingsConfig.disableVolume;
 
@@ -438,14 +437,6 @@ angular.module('webadminApp')
                 if(scope.positionProvider) {
                     scope.playingTime = dateFormat(scope.positionProvider.playedPosition,timelineConfig.dateFormat + ' ' + timelineConfig.timeFormat);
                 }
-                if(scope.playbackNotSupported) {
-                    scope.$watch('positionProvider.playedPosition', function () {
-                        if(scope.positionProvider) {
-                            scope.playingTime = dateFormat(scope.positionProvider.playedPosition, timelineConfig.dateFormat + ' ' + timelineConfig.timeFormat);
-                        }
-                    });
-                }
-
                 scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
                     if(scope.recordsProvider) {
                         scope.recordsProvider.ready.then(initTimeline);// reinit timeline here
