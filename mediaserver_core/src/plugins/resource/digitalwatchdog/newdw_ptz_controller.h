@@ -16,10 +16,10 @@ public:
     QnNewDWPtzController(const QnDigitalWatchdogResourcePtr &resource);
     virtual ~QnNewDWPtzController();
 
-    virtual Qn::PtzCapabilities getCapabilities() override;
+    virtual Ptz::Capabilities getCapabilities() const override;
     virtual bool continuousMove(const QVector3D &speed) override;
 
-    virtual bool getPresets(QnPtzPresetList *presets) override;
+    virtual bool getPresets(QnPtzPresetList *presets) const override;
     virtual bool activatePreset(const QString &presetId, qreal speed) override;
     virtual bool createPreset(const QnPtzPreset &preset) override;
     virtual bool updatePreset(const QnPtzPreset &preset) override;
@@ -32,7 +32,7 @@ private:
     QnDigitalWatchdogResourcePtr m_resource;
     QMap<QString, QString> m_extIdToIntId;
     mutable QnMutex m_mutex;
-    QMap<QString, QString> m_cachedData;
+    mutable QMap<QString, QString> m_cachedData;
     QTime m_cacheUpdateTimer;
 };
 

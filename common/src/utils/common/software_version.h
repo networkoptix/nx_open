@@ -1,12 +1,9 @@
-#ifndef QN_SOFTWARE_VERSION_H
-#define QN_SOFTWARE_VERSION_H
+#pragma once
 
 #include <array>
 
-#ifndef QN_NO_QT
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
-#endif
 
 #ifndef Q_MOC_RUN
 #include <boost/operators.hpp>
@@ -97,5 +94,3 @@ private:
 };
 
 Q_DECLARE_METATYPE(QnSoftwareVersion)
-
-#endif // QN_SOFTWARE_VERSION_H

@@ -10,6 +10,7 @@
     <?define serverBundleUpgradeCode = "${customization.serverBundleUpgradeCode}"?>
     <?define fullBundleUpgradeCode = "${customization.fullBundleUpgradeCode}"?>
     <?define nxtoolBundleUpgradeCode = "${customization.nxtoolBundleUpgradeCode}"?>
+    <?define axBundleUpgradeCode = "${customization.axBundleUpgradeCode}"?>
 
     <?define cloudHost = "${cloudHost}"?>
 

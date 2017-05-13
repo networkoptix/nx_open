@@ -875,7 +875,7 @@ bool OnvifResourceSearcherWsdd::readProbeMatches( const QnInterfaceAndAddr& ifac
                 getAddrPrefixes(iface.address.toString()),
                 iface.address.toString());
 
-            if (nx::utils::log::main()->isToBeLogged(cl_logDEBUG1))
+            if (nx::utils::log::isToBeLogged(nx::utils::log::Level::debug))
             {
                 printProbeMatches(wsddProbeMatches.wsdd__ProbeMatches->ProbeMatch,
                     ctx.soapWsddProxy.soap->header);

@@ -7,16 +7,17 @@ QnMappedPtzController::QnMappedPtzController(const QnPtzMapperPtr &mapper, const
     // TODO: #Elric proper finished handling.
 }
 
-bool QnMappedPtzController::extends(Qn::PtzCapabilities capabilities) {
+bool QnMappedPtzController::extends(Ptz::Capabilities capabilities) {
     return 
-        (capabilities & Qn::AbsolutePtzCapabilities) &&
-        (capabilities & Qn::DevicePositioningPtzCapability) &&
-        !(capabilities & Qn::LogicalPositioningPtzCapability);
+        (capabilities & Ptz::AbsolutePtzCapabilities) &&
+        (capabilities & Ptz::DevicePositioningPtzCapability) &&
+        !(capabilities & Ptz::LogicalPositioningPtzCapability);
 }
 
-Qn::PtzCapabilities QnMappedPtzController::getCapabilities() {
-    Qn::PtzCapabilities capabilities = base_type::getCapabilities();
-    return extends(capabilities) ? (capabilities | Qn::LogicalPositioningPtzCapability) : capabilities;
+Ptz::Capabilities QnMappedPtzController::getCapabilities() const
+{
+    Ptz::Capabilities capabilities = base_type::getCapabilities();
+    return extends(capabilities) ? (capabilities | Ptz::LogicalPositioningPtzCapability) : capabilities;
 }
 
 bool QnMappedPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
@@ -27,7 +28,8 @@ bool QnMappedPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVe
     }
 }
 
-bool QnMappedPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
+bool QnMappedPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D* position) const
+{
     if(space == Qn::DevicePtzCoordinateSpace) {
         return base_type::getPosition(Qn::DevicePtzCoordinateSpace, position);
     } else {
@@ -40,7 +42,8 @@ bool QnMappedPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D 
     }
 }
 
-bool QnMappedPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) {
+bool QnMappedPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const
+{
     if(space == Qn::DevicePtzCoordinateSpace) {
         return base_type::getLimits(space, limits);
     } else {

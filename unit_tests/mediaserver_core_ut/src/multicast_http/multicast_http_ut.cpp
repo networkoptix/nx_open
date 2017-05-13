@@ -15,16 +15,11 @@
 #include "media_server/serverutil.h"
 #include "../utils.h"
 #include "mediaserver_launcher.h"
+#include <common/static_common_module.h>
 
 namespace
 {
     const int MT_REQUESTS = 10;
-
-    QUuid getServerGuid()
-    {
-        static QUuid uuid(QnUuid::createUuid().toString());
-        return uuid;
-    }
 
 }
 
@@ -93,16 +88,16 @@ public:
     {
         QnMulticast::Request request;
         request.method = lit("GET");
-        request.serverId = getServerGuid();
+        request.serverId = m_launcher.commonModule()->moduleGUID().getQUuid();
         request.url = QUrl(lit("api/moduleInformation"));
         request.auth.setUser(lit("admin"));
         request.auth.setPassword(lit("admin"));
 
         m_runningRequestId = m_client.execRequest(request, [this](const QUuid& requestId, QnMulticast::ErrCode errCode, const QnMulticast::Response& response)
         {
-            ASSERT_TRUE(m_runningRequestId == requestId);
-            ASSERT_TRUE(errCode == QnMulticast::ErrCode::ok);
-            ASSERT_TRUE(response.httpResult == 200); // HTTP OK
+            ASSERT_EQ(requestId, m_runningRequestId);
+            ASSERT_EQ(QnMulticast::ErrCode::ok, errCode);
+            ASSERT_EQ(200, response.httpResult); // HTTP OK
             ASSERT_TRUE(response.contentType.toLower().contains("json"));
             ASSERT_TRUE(!response.messageBody.isEmpty());
             QJsonDocument d = QJsonDocument::fromJson(response.messageBody);
@@ -117,7 +112,7 @@ public:
     {
         QnMulticast::Request request;
         request.method = lit("GET");
-        request.serverId = getServerGuid();
+        request.serverId = m_launcher.commonModule()->moduleGUID().getQUuid();
         request.url = QUrl(lit("api/showLog"));
         request.auth.setUser(lit("admin"));
         request.auth.setPassword(lit("12345"));
@@ -191,7 +186,7 @@ public:
     {
         QnMulticast::Request request;
         request.method = lit("GET");
-        request.serverId = getServerGuid();
+        request.serverId = m_launcher.commonModule()->moduleGUID().getQUuid();
         request.url = QUrl(lit("api/configure?password=%1&oldPassword=%2").arg(newPassword).arg(oldPassword));
         request.auth.setUser(lit("admin"));
         request.auth.setPassword(oldPassword);
@@ -224,7 +219,7 @@ public:
         m_requests = 0;
         QnMulticast::Request request1;
         request1.method = lit("GET");
-        request1.serverId = getServerGuid();
+        request1.serverId = m_launcher.commonModule()->moduleGUID().getQUuid();
         request1.url = QUrl(lit("api/moduleInformation"));
         request1.auth.setUser(lit("admin"));
         request1.auth.setPassword(lit("admin"));
@@ -294,9 +289,7 @@ private:
 
 TEST(MulticastHttpTest, main)
 {
-    nx::network::SocketGlobalsHolder::instance()->reinitialize(false);
-
-
+    QnStaticCommonModule staticCommon;
     MediaServerLauncher launcher;
 
     QTimer timer;

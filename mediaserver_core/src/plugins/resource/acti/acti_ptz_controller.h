@@ -17,12 +17,12 @@ public:
     QnActiPtzController(const QnActiResourcePtr &resource);
     virtual ~QnActiPtzController();
 
-    virtual Qn::PtzCapabilities getCapabilities() override;
+    virtual Ptz::Capabilities getCapabilities() const override;
     virtual bool continuousMove(const QVector3D &speed) override;
-    virtual bool getFlip(Qt::Orientations *flip) override;
+    virtual bool getFlip(Qt::Orientations *flip) const override;
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;
-    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override;
-    
+    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) const override;
+
 private:
     QScopedPointer<QnActiPtzControllerPrivate> d;
 };
