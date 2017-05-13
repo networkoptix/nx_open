@@ -7,12 +7,10 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QVBoxLayout>
 
-#include <ui/utils/viewport_scale_watcher.h>
+#include <ui/animation/rect_animator.h>
+#include <ui/common/palette.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
-#include <ui/common/palette.h>
-
-#include <utils/common/scoped_painter_rollback.h>
 
 #include <nx/utils/math/fuzzy.h>
 
@@ -42,26 +40,9 @@ QnMaskedProxyWidget* makeMaskedProxy(
 
 void setupLabel(QLabel* label)
 {
-    const bool isDescription = false;
-    const bool isError = false;
-
-    auto font = label->font();
-    const int pixelSize = (isDescription ? 36 : (isError ? 88 : 80));
-    const int areaWidth = (isError ? 960 : 800);
-
-    font.setPixelSize(pixelSize);
-    font.setWeight(isDescription ? QFont::Normal : QFont::Light);
-    label->setFont(font);
-
     label->setAlignment(Qt::AlignCenter);
-    label->setWordWrap(isDescription);
-
-    label->setFixedWidth(isDescription
-        ? areaWidth
-        : qMax(areaWidth, label->minimumSizeHint().width()));
-
-    const auto color = Qt::red; //qnNxStyle->mainColor(QnNxStyle::Colors::kContrast));
-    setPaletteColor(label, QPalette::WindowText, color);
+    label->setWordWrap(true);
+    label->setFixedWidth(200);
 }
 
 } // namespace
@@ -76,10 +57,16 @@ LayoutTourDropPlaceholder::LayoutTourDropPlaceholder(
     Qt::WindowFlags windowFlags)
     :
     base_type(parent, windowFlags),
-    m_scaleWatcher(new QnViewportScaleWatcher(this)),
-    m_widget(new QnViewportBoundWidget(this))
+    m_widget(new QnViewportBoundWidget(this)),
+    m_geometryAnimator(new RectAnimator(this))
 {
     setAcceptedMouseButtons(0);
+    setFrameShape(Qn::RoundedRectangularFrame);
+    setFrameStyle(Qt::DashLine);
+    setFrameBrush(Qt::darkGray); //TODO: #GDM #3.1 customize
+    setFrameWidth(0); //< Cosmetic pen
+    setRoundingRadius(50);
+    setPaletteColor(this, QPalette::Window, Qt::transparent);
 
     const QString message = tr("Drag layout here to add it to the tour");
     auto caption = new QLabel(message);
@@ -108,28 +95,16 @@ LayoutTourDropPlaceholder::LayoutTourDropPlaceholder(
 
     m_widget->setOpacity(0.7);
     makeTransparentForMouse(m_widget);
-    //m_widget->setFixedSize({300, 300});
+    addOverlayWidget(m_widget, detail::OverlayParams(Visible));
 
+    m_geometryAnimator->setTargetObject(this);
+    m_geometryAnimator->setAccessor(new PropertyAccessor("geometry"));
+    m_geometryAnimator->setTimeLimit(100);
 }
 
 QRectF LayoutTourDropPlaceholder::boundingRect() const
 {
     return rect();
-}
-
-void LayoutTourDropPlaceholder::paint(
-    QPainter* painter,
-    const QStyleOptionGraphicsItem* /*option*/,
-    QWidget* /*widget*/)
-{
-    QPen pen;
-    pen.setColor(Qt::red);
-    pen.setStyle(Qt::DashLine);
-    pen.setJoinStyle(Qt::RoundJoin);
-    pen.setCosmetic(true);
-
-    QnScopedPainterPenRollback penRollback(painter, pen);
-    painter->drawRect(m_rect);
 }
 
 const QRectF& LayoutTourDropPlaceholder::rect() const
@@ -144,7 +119,20 @@ void LayoutTourDropPlaceholder::setRect(const QRectF& rect)
 
     prepareGeometryChange();
     m_rect = rect;
-    m_widget->setGeometry(rect);
+
+    m_geometryAnimator->pause();
+    m_geometryAnimator->setTargetValue(rect);
+    m_geometryAnimator->start();
+}
+
+AnimationTimer* LayoutTourDropPlaceholder::animationTimer() const
+{
+    return m_geometryAnimator->timer();
+}
+
+void LayoutTourDropPlaceholder::setAnimationTimer(AnimationTimer* timer)
+{
+    m_geometryAnimator->setTimer(timer);
 }
 
 } // namespace ui
