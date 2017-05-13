@@ -12,6 +12,7 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/graphics/items/resource/layout_tour_drop_placeholder.h>
 
+#include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
@@ -167,7 +168,8 @@ void LayoutTourReviewController::startListeningLayout()
     updateButtons(workbench()->currentLayout()->resource());
 
     m_dropPlaceholder = new LayoutTourDropPlaceholder();
-    display()->setLayer(m_dropPlaceholder, Qn::MessageBoxLayer);
+    m_dropPlaceholder->setAnimationTimer(display()->instrumentManager()->animationTimer());
+    display()->setLayer(m_dropPlaceholder, Qn::BackLayer);
     display()->scene()->addItem(m_dropPlaceholder);
     updatePlaceholderPosition();
 }

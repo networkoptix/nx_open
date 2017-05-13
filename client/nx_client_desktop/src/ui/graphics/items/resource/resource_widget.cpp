@@ -122,8 +122,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_mouseInWidget(false),
     m_renderStatus(Qn::NothingRendered),
     m_lastNewFrameTimeMSec(0),
-    m_selectionState(SelectionState::invalid),
-    m_scaleWatcher()
+    m_selectionState(SelectionState::invalid)
 {
     updateSelectedState();
 
@@ -529,9 +528,6 @@ QVariant QnResourceWidget::itemChange(GraphicsItemChange change, const QVariant 
 {
     if (change == QGraphicsItem::ItemSelectedHasChanged)
         updateSelectedState();
-
-    if (change == QGraphicsItem::ItemSceneHasChanged)
-        m_scaleWatcher.initialize(scene());
 
     return base_type::itemChange(change, value);
 }
