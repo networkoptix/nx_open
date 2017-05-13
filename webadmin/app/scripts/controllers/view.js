@@ -39,7 +39,6 @@ angular.module('webadminApp').controller('ViewCtrl',
 
 
         var timeCorrection = 0;
-        var isAdmin = false;
         var minTimeLag = 2000;// Two seconds
 
         $scope.activeResolution = 'Auto';
@@ -410,7 +409,6 @@ angular.module('webadminApp').controller('ViewCtrl',
         });
 
         mediaserver.getCurrentUser().then(function(result) {
-            isAdmin = result.data.reply.isAdmin || (result.data.reply.permissions.indexOf(Config.globalEditServersPermissions)>=0);
             $scope.canViewArchive = result.data.reply.isAdmin || (result.data.reply.permissions.indexOf(Config.globalViewArchivePermission)>=0);
 
             var userId = result.data.reply.id;

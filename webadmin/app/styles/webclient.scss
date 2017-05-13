@@ -922,35 +922,6 @@ camera-panel.visible-xs{
   }
 }
 
-
-/*@media only screen and (min-screen-width: 641px) and (max-screen-width:961px) {
-  /* For general iPad layouts *//*
-  .cameras-panel{
-    font-size:80%;
-  }
-  .dark-theme .nav > li > a {
-    padding-left: 75px;
-  }
-  .camera-preview {
-    margin-left: -60px;
-  }
-
-  .webclient-window .cameras-panel {
-    height: 100%;
-    width: 250px;
-  }
-
-  .camera-preview {
-    width: 70px !important;
-    height: 40px !important;
-  }
-
-  .camera-preview > img {
-    max-width: 50px !important;
-    max-height: 30px !important;
-  }
-}*/
-
 .mobile-alert{
   background-color: black;
   margin:0;
