@@ -1,5 +1,10 @@
 #include "p2p_fwd.h"
+
 #include <array>
+#include <nx/fusion/serialization/lexical.h>
+#include <nx/fusion/serialization/lexical_enum.h>
+
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(ec2, MessageType);
 
 namespace ec2 {
 
@@ -80,5 +85,11 @@ quint32 deserializeCompressedSize(BitStreamReader& reader)
 {
     return deserializeCompressedValue(reader, compressedSizebitsGroups);
 }
+
+QString toString(MessageType value)
+{
+    return QnLexical::serialized(value);
+}
+
 
 } // namespace ec2

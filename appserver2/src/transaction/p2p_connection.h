@@ -113,7 +113,7 @@ public:
     bool localPeerSubscribedTo(const ApiPersistentIdData& peer) const;
     const PeerNumberInfo& shortPeers() const;
 signals:
-    void gotMessage(QWeakPointer<P2pConnection> connection, MessageType messageType, const QByteArray& payload);
+    void gotMessage(QWeakPointer<P2pConnection> connection, ec2::MessageType messageType, const QByteArray& payload);
     void stateChanged(QWeakPointer<P2pConnection> connection, P2pConnection::State state);
     void allDataSent(QWeakPointer<P2pConnection> connection);
 private:
@@ -164,7 +164,6 @@ private:
 Q_DECLARE_METATYPE(P2pConnectionPtr)
 Q_DECLARE_METATYPE(P2pConnection::State)
 
-const char* toString(MessageType value);
 const char* toString(P2pConnection::State value);
 
 } // namespace ec2

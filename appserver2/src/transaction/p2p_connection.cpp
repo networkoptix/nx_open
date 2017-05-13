@@ -37,31 +37,6 @@ const char* toString(P2pConnection::State value)
     }
 }
 
-const char* toString(MessageType value)
-{
-    switch (value)
-    {
-    case MessageType::start:
-        return "start";
-    case MessageType::stop:
-        return "stop";
-    case MessageType::resolvePeerNumberRequest:
-        return "resolvePeerNumberRequest";
-    case MessageType::resolvePeerNumberResponse:
-        return "resolvePeerNumberResponse";
-    case MessageType::alivePeers:
-        return "alivePeers";
-    case MessageType::subscribeForDataUpdates:
-        return "subscribeForDataUpdates";
-    case MessageType::pushTransactionData:
-        return "pushTransactionData";
-    case MessageType::pushTransactionList:
-        return "pushTransactionList";
-    default:
-        return "Unknown";
-    }
-}
-
 P2pConnection::P2pConnection(
     QnCommonModule* commonModule,
     const QnUuid& remoteId,
