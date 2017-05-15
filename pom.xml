@@ -85,6 +85,7 @@
         <testcamera.guid>{f98dae04-4b22-4d73-b55a-038cfa0f3cfe}</testcamera.guid>
         <libtraffic_relay.guid>{237676bc-45ea-43cf-a2c1-4048468d92a9}</libtraffic_relay.guid>
         <traffic_relay.guid>{7f7104b2-1f99-4e4f-bff3-ad050eb0db8e}</traffic_relay.guid>
+        <nx_kit.guid>{5db17d17-17fe-4ebe-a14f-ffced5d2c09b}</nx_kit.guid>
 
         <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
@@ -479,6 +480,7 @@
                 <module>nx_cloud/cloud_db_client</module>
                 <module>common_libs/nx_streaming</module>
                 <module>appserver2</module>
+                <module>nx_kit</module>
             </modules>
         </profile>
         <profile>
