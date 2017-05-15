@@ -74,7 +74,7 @@ TEST(TcpSocket, DISABLED_KeepAliveOptionsServer)
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     ASSERT_TRUE(server->bind(SocketAddress::anyAddress));
     ASSERT_TRUE(server->listen(testClientCount()));
-    NX_LOGX(lm("Server address: %1").str(server->getLocalAddress()), cl_logINFO);
+    NX_LOGX(lm("Server address: %1").arg(server->getLocalAddress()), cl_logINFO);
 
     std::unique_ptr<AbstractStreamSocket> client(server->accept());
     ASSERT_TRUE(client != nullptr);

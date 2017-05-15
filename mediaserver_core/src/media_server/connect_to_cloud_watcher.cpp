@@ -73,7 +73,7 @@ void QnConnectToCloudWatcher::at_updateConnection()
                 if (statusCode != nx_http::StatusCode::ok)
                 {
                     NX_LOGX(lm("Error fetching cloud_db endpoint. HTTP result: %1")
-                        .str(statusCode), cl_logWARNING);
+                        .arg(statusCode), cl_logWARNING);
                     // try once more later
                     metaObject()->invokeMethod(this, "restartTimer", Qt::QueuedConnection);
                     return;
@@ -88,7 +88,7 @@ void QnConnectToCloudWatcher::addCloudPeer(QUrl url)
 {
     const auto& commonModule = m_messageBus->commonModule();
     NX_LOGX(lm("Creating transaction connection to cloud_db at %1")
-        .str(url), cl_logDEBUG1);
+        .arg(url), cl_logDEBUG1);
 
     m_cloudUrl = url;
     m_cloudUrl.setPath(nx::cdb::api::kEc2EventsPath);

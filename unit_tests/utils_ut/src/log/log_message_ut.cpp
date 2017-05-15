@@ -91,23 +91,23 @@ TEST(QnLogMessage, str)
     testStrQString("%1 %2 %3", 123.456);
     testStrQString("%1 %2", QLatin1String("hello"), QLatin1String("world"));
 
-    EXPECT_EQ(QLatin1String("QString"), lm("%1").str(QString::fromUtf8("QString")));
-    EXPECT_EQ(QLatin1String("MethodTester"), lm("%1").str(MethodTester()));
-    EXPECT_EQ(QLatin1String("FunctionTester"), lm("%1").str(FunctionTester()));
+    EXPECT_EQ(QLatin1String("QString"), lm("%1").arg(QString::fromUtf8("QString")));
+    EXPECT_EQ(QLatin1String("MethodTester"), lm("%1").arg(MethodTester()));
+    EXPECT_EQ(QLatin1String("FunctionTester"), lm("%1").arg(FunctionTester()));
 
-    EXPECT_EQ(QLatin1String("A B C D"), lm("%1 %2 %3").str("A").str("B C").str("D"));
-    EXPECT_EQ(QLatin1String("same same"), lm("%1 %2").str("%2").str("same"));
+    EXPECT_EQ(QLatin1String("A B C D"), lm("%1 %2 %3").arg("A").arg("B C").arg("D"));
+    EXPECT_EQ(QLatin1String("same same"), lm("%1 %2").arg("%2").arg("same"));
     ASSERT_EQ(std::string("hello world %4 yes"),
-        lm("%1 %2 %3 %4").strs("hello", "world", "%4", "yes").toStdString());
+        lm("%1 %2 %3 %4").args("hello", "world", "%4", "yes").toStdString());
 
     const auto obj1 = std::make_unique<SomeLongStructNameForThisTest>();
     const auto name1 = QLatin1String("SomeLongStructNameForThisTest(0x");
-    EXPECT_TRUE(QString(lm("%1").str(obj1)).startsWith(name1));
-    EXPECT_TRUE(QString(lm("%1").str(obj1.get())).startsWith(name1));
+    EXPECT_TRUE(QString(lm("%1").arg(obj1)).startsWith(name1));
+    EXPECT_TRUE(QString(lm("%1").arg(obj1.get())).startsWith(name1));
 
     const auto obj2 = std::make_shared<SomeLongClassNameForThisTest>();
     const auto name2 = QLatin1String("SomeLongClassNameForThisTest(0x");
-    EXPECT_TRUE(QString(lm("%1").str(obj2)).startsWith(name2));
-    EXPECT_TRUE(QString(lm("%1").str(obj2.get())).startsWith(name2));
+    EXPECT_TRUE(QString(lm("%1").arg(obj2)).startsWith(name2));
+    EXPECT_TRUE(QString(lm("%1").arg(obj2.get())).startsWith(name2));
 }
 

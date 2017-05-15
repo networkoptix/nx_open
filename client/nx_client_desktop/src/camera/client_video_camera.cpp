@@ -126,7 +126,7 @@ void QnClientVideoCamera::streamJump(qint64 time)
 
 void QnClientVideoCamera::startDisplay()
 {
-    NX_DEBUG(this, lm("startDisplay %1").str(m_resource->toResource()->getUniqueId()));
+    NX_DEBUG(this, lm("startDisplay %1").arg(m_resource->toResource()->getUniqueId()));
 
     m_camdispay.start();
     if (m_reader)

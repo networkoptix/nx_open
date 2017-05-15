@@ -55,15 +55,15 @@ void initialize(
 
     const auto write = [&](const Message& message) { logger->log(Level::always, QString(), message); };
     write(QByteArray(80, '='));
-    write(Message("%1 started").str(applicationName));
-    write(Message("Version: %1, Revision: %2").strs(
+    write(Message("%1 started").arg(applicationName));
+    write(Message("Version: %1, Revision: %2").args(
         AppInfo::applicationVersion(), AppInfo::applicationRevision()));
 
     if (!binaryPath.isEmpty())
         write(Message("Binary path: %1").arg(binaryPath));
 
     const auto filePath = logger->filePath();
-    write(Message("Log level: %1, maxFileSize: %2, maxBackupCount: %3, file: %4").strs(
+    write(Message("Log level: %1, maxFileSize: %2, maxBackupCount: %3, file: %4").args(
         settings.level, nx::utils::bytesToString(settings.maxFileSize), settings.maxBackupCount,
         filePath ? *filePath : QString::fromUtf8("-")));
 }

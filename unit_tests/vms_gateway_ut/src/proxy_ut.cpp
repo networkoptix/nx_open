@@ -101,7 +101,7 @@ public:
         const QUrl& url,
         nx_http::StatusCode::Value expectedReponseStatusCode)
     {
-        NX_LOGX(lm("testProxyUrl(%1)").str(url), cl_logINFO);
+        NX_LOGX(lm("testProxyUrl(%1)").arg(url), cl_logINFO);
         httpClient->setResponseReadTimeoutMs(1000*1000);
         ASSERT_TRUE(httpClient->doGet(url));
         ASSERT_EQ(

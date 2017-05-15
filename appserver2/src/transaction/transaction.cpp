@@ -36,7 +36,7 @@ QString QnAbstractTransaction::toString() const
 {
     return lm("command=%1 time=%2 peer=%3 dbId=%4 dbSeq=%5")
         .arg(ApiCommand::toString(command))
-        .str(persistentInfo.timestamp)
+        .arg(persistentInfo.timestamp)
         .arg(peerID.toString())
         .arg(persistentInfo.dbID.toString())
         .arg(persistentInfo.sequence);

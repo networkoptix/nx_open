@@ -78,7 +78,7 @@ void IncomingReverseTunnelConnection::stopWhileInAioThread()
 void IncomingReverseTunnelConnection::spawnConnectorIfNeeded()
 {
     NX_LOGX(lm("There are %1 connector(s) and %2 socket(s) against %3 pool size")
-        .strs(m_connectors.size(), m_sockets.size(), m_expectedPoolSize), cl_logDEBUG1);
+        .args(m_connectors.size(), m_sockets.size(), m_expectedPoolSize), cl_logDEBUG1);
 
     if (m_connectors.size() + m_sockets.size() >= m_expectedPoolSize)
         return;
@@ -131,7 +131,7 @@ void IncomingReverseTunnelConnection::saveConnection(
         if (value != m_keepAliveOptions)
         {
             m_keepAliveOptions = value;
-            NX_LOGX(lm("New keepAliveOptions=%1").str(m_keepAliveOptions), cl_logDEBUG1);
+            NX_LOGX(lm("New keepAliveOptions=%1").arg(m_keepAliveOptions), cl_logDEBUG1);
 
             for (auto it = m_sockets.begin(); it != m_sockets.end(); )
             {

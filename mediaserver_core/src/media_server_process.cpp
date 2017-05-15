@@ -1420,7 +1420,7 @@ void MediaServerProcess::loadResourcesFromECS(
                 }
                 else
                 {
-                    NX_ASSERT(false, lm("No resourse type in the pool %1").str(camera.typeId));
+                    NX_ASSERT(false, lm("No resourse type in the pool %1").arg(camera.typeId));
                 }
             }
         }
@@ -2949,7 +2949,7 @@ void MediaServerProcess::run()
             if (server->setProperty(Qn::UDT_INTERNET_TRFFIC, QString::number(update))
                 && server->saveParams())
             {
-                NX_LOG(lm("%1 is updated to %2").strs(Qn::UDT_INTERNET_TRFFIC, update), cl_logDEBUG1);
+                NX_LOG(lm("%1 is updated to %2").args(Qn::UDT_INTERNET_TRFFIC, update), cl_logDEBUG1);
                 nx::network::UdtStatistics::global.internetBytesTransfered -= current;
             }
         });

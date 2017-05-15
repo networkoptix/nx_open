@@ -44,22 +44,6 @@ public:
         return m_str.arg(toString(values) ...);
     }
 
-    // TODO: deprecated
-    template<typename ... Arguments>
-    Message str(const Arguments& ... arguments) const
-    {
-        using ::toString;
-        return arg(toString(arguments ...));
-    }
-
-    // TODO: deprecated
-    template<typename ... Values>
-    Message strs(const Values& ... values) const
-    {
-        using ::toString;
-        return args(toString(values) ...);
-    }
-
     template<typename ... Arguments>
     Message container(const Arguments& ... arguments) const
     {

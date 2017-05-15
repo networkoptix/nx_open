@@ -27,7 +27,7 @@ public:
 
     QString toString() const
     {
-        return lm("(%1.%2; %3)").str(vmsTransportHeader.sender).arg(systemId).str(endpoint);
+        return lm("(%1.%2; %3)").arg(vmsTransportHeader.sender).arg(systemId).arg(endpoint);
     }
 };
 
