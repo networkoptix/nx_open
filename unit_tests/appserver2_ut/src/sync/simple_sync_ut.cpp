@@ -112,8 +112,9 @@ TEST(SympleSyncTest, main)
     for (int i = 1; i < servers.size(); ++i)
     {
         const auto addr = servers[i]->moduleInstance()->endpoint();
+        const auto id = servers[i]->moduleInstance()->commonModule()->moduleGUID();
         QUrl url = lit("http://%1:%2/ec2/events").arg(addr.address.toString()).arg(addr.port);
-        servers[i - 1]->moduleInstance()->ecConnection()->messageBus()->addConnectionToPeer(url);
+        servers[i - 1]->moduleInstance()->ecConnection()->messageBus()->addOutgoingConnectionToPeer(id, url);
     }
 
     // wait for data sync

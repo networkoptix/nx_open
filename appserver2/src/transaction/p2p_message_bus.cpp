@@ -217,7 +217,7 @@ void P2pMessageBus::stop()
 
 // P2pMessageBus
 
-void P2pMessageBus::addOutgoingConnectionToPeer(const ApiPersistentIdData& peer, const QUrl& url)
+void P2pMessageBus::addOutgoingConnectionToPeer(const QnUuid& peer, const QUrl& url)
 {
     QnMutexLocker lock(&m_mutex);
     int pos = nx::utils::random::number((int) 0, (int) m_remoteUrls.size());
@@ -229,7 +229,7 @@ void P2pMessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
     QnMutexLocker lock(&m_mutex);
     for (int i = 0; i < m_remoteUrls.size() - 1; ++i)
     {
-        if (m_remoteUrls[i].peer.id == id)
+        if (m_remoteUrls[i].peerId == id)
         {
             m_remoteUrls.erase(m_remoteUrls.begin() + i);
             break;
@@ -281,10 +281,9 @@ void P2pMessageBus::createOutgoingConnections(const QMap<ApiPersistentIdData, P2
         ++m_lastOutgoingIndex;
 
         const RemoteConnection& remoteConnection = m_remoteUrls[pos];
-        if (!m_connections.contains(remoteConnection.peer.id) && !m_outgoingConnections.contains(remoteConnection.peer.id))
+        if (!m_connections.contains(remoteConnection.peerId) && !m_outgoingConnections.contains(remoteConnection.peerId))
         {
-            if (!remoteConnection.peer.persistentId.isNull() &&
-                !needStartConnection(remoteConnection.peer, currentSubscription))
+            if (!needStartConnection(remoteConnection.peerId, currentSubscription))
             {
                 continue;
             }
@@ -292,23 +291,23 @@ void P2pMessageBus::createOutgoingConnections(const QMap<ApiPersistentIdData, P2
             {
                 // This check is redundant (can be ommited). But it reduce network race condition time.
                 // So, it reduce frequency of in/out conflict and network traffic a bit.
-                if (m_connectionGuardSharedState.contains(remoteConnection.peer.id))
+                if (m_connectionGuardSharedState.contains(remoteConnection.peerId))
                     continue; //< incoming connection in progress
             }
 
             ConnectionLockGuard connectionLockGuard(
                 commonModule()->moduleGUID(),
                 connectionGuardSharedState(),
-                remoteConnection.peer.id,
+                remoteConnection.peerId,
                 ConnectionLockGuard::Direction::Outgoing);
 
             P2pConnectionPtr connection(new P2pConnection(
                 commonModule(),
-                remoteConnection.peer.id,
+                remoteConnection.peerId,
                 localPeerEx(),
                 std::move(connectionLockGuard),
                 remoteConnection.url));
-            m_outgoingConnections.insert(remoteConnection.peer.id, connection);
+            m_outgoingConnections.insert(remoteConnection.peerId, connection);
             ++m_connectionTries;
             connectSignals(connection);
             connection->startConnection();
@@ -562,6 +561,21 @@ bool P2pMessageBus::needStartConnection(
     const auto& subscribedVia = currentSubscription.value(peer);
     return currentDistance > m_miscData.maxDistanceToUseProxy
         || (subscribedVia && subscribedVia->miscData().localSubscription.size() > m_miscData.maxSubscriptionToResubscribe);
+}
+
+bool P2pMessageBus::needStartConnection(
+    const QnUuid& peerId,
+    const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription) const
+{
+    const RouteToPeerMap& allPeerDistances = m_peers->allPeerDistances;
+
+    bool result = true;
+    auto itr = allPeerDistances.lowerBound(ApiPersistentIdData(peerId, QnUuid()));
+    for (; itr != allPeerDistances.end() && itr.key().id == peerId; ++itr)
+    {
+        result &= needStartConnection(itr.key(), currentSubscription);
+    }
+    return result;
 }
 
 bool P2pMessageBus::hasStartingConnections() const
@@ -1492,6 +1506,30 @@ int P2pMessageBus::connectionTries() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_connectionTries;
+}
+
+QMap<QnUuid, ApiPeerData> P2pMessageBus::aliveServerPeers() const
+{
+    // todo: implement me
+    return QMap<QnUuid, ApiPeerData>();
+}
+
+QMap<QnUuid, ApiPeerData> P2pMessageBus::aliveClientPeers(int maxDistance) const
+{
+    // todo: implement me
+    return QMap<QnUuid, ApiPeerData>();
+}
+
+QnUuid P2pMessageBus::routeToPeerVia(const QnUuid& dstPeer, int* distance) const
+{
+    // todo: implement me
+    return QnUuid();
+}
+
+int P2pMessageBus::distanceToPeer(const QnUuid& dstPeer) const
+{
+    // todo: implement me
+    return 0;
 }
 
 } // ec2

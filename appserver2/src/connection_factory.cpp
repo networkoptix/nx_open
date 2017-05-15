@@ -37,58 +37,65 @@
 namespace ec2 {
 
 static const char* const kIncomingTransactionsPath = "ec2/forward_events";
+static bool isP2pMode = true;
 
 Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
     Qn::PeerType peerType,
     nx::utils::TimerManager* const timerManager,
     QnCommonModule* commonModule)
-    :
+:
     QnCommonModuleAware(commonModule),
     // dbmanager is initialized by direct connection.
 
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
     m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
-
-    m_dbManager(
-        peerType == Qn::PT_Server
-        ? new detail::QnDbManager(commonModule)
-        : nullptr),
-    m_transactionLog(
-        peerType == Qn::PT_Server
-        ? new QnTransactionLog(m_dbManager.get(), m_ubjsonTranSerializer.get())
-        : nullptr),
-    m_transactionMessageBus(
-        new QnTransactionMessageBus(
-            m_dbManager.get(),
-            peerType,
-            commonModule,
-            m_jsonTranSerializer.get(),
-            m_ubjsonTranSerializer.get())),
-    m_p2pMessageBus(
-        new P2pMessageBus(
-            m_dbManager.get(),
-            peerType, commonModule,
-            m_jsonTranSerializer.get(),
-            m_ubjsonTranSerializer.get())),
-    m_timeSynchronizationManager(
-        new TimeSynchronizationManager(peerType, timerManager, m_transactionMessageBus.get(), &m_settingsInstance)),
-    m_serverQueryProcessor(
-        peerType == Qn::PT_Server
-        ? new ServerQueryProcessorAccess(m_dbManager.get(), m_transactionMessageBus.get())
-        : nullptr),
-    m_distributedMutexManager(
-        new QnDistributedMutexManager(m_transactionMessageBus.get())),
     m_terminated(false),
     m_runningRequests(0),
     m_sslEnabled(false),
     m_remoteQueryProcessor(commonModule)
 {
+    if (peerType == Qn::PT_Server)
+    {
+        m_dbManager.reset(new detail::QnDbManager(commonModule));
+        m_transactionLog.reset(new QnTransactionLog(m_dbManager.get(), m_ubjsonTranSerializer.get()));
+    }
+
+    if (isP2pMode)
+    {
+        m_bus.reset(new P2pMessageBus(
+            m_dbManager.get(),
+            peerType,
+            commonModule,
+            m_jsonTranSerializer.get(),
+            m_ubjsonTranSerializer.get()));
+    }
+    else
+    {
+        QnTransactionMessageBus* messageBus = new QnTransactionMessageBus(
+            m_dbManager.get(),
+            peerType,
+            commonModule,
+            m_jsonTranSerializer.get(),
+            m_ubjsonTranSerializer.get());
+        m_bus.reset(messageBus);
+        m_timeSynchronizationManager.reset(new TimeSynchronizationManager(
+            peerType,
+            timerManager,
+            messageBus,
+            &m_settingsInstance));
+
+        m_distributedMutexManager.reset(new QnDistributedMutexManager(messageBus));
+    }
+
+    if (peerType == Qn::PT_Server)
+        m_serverQueryProcessor.reset(new ServerQueryProcessorAccess(m_dbManager.get(), m_bus.get()));
+
     if (m_dbManager)
     {
         m_dbManager->setTransactionLog(m_transactionLog.get());
         m_dbManager->setTimeSyncManager(m_timeSynchronizationManager.get());
     }
-    m_transactionMessageBus->setTimeSyncManager(m_timeSynchronizationManager.get());
+    m_bus->setTimeSyncManager(m_timeSynchronizationManager.get());
     if (peerType != Qn::PT_Server)
         m_timeSynchronizationManager->start(nullptr);
 
@@ -106,7 +113,8 @@ Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
 {
     // Have to do it before m_transactionMessageBus destruction since TimeSynchronizationManager
     // uses QnTransactionMessageBus.
-    m_timeSynchronizationManager->pleaseStop();
+    if (m_timeSynchronizationManager)
+        m_timeSynchronizationManager->pleaseStop();
 
     pleaseStop();
     join();
@@ -166,13 +174,18 @@ int Ec2DirectConnectionFactory::connectAsync(
 void Ec2DirectConnectionFactory::registerTransactionListener(
     QnHttpConnectionListener* httpConnectionListener)
 {
-    httpConnectionListener->addHandler<QnTransactionTcpProcessor, QnTransactionMessageBus>(
-        "HTTP", "ec2/events", m_transactionMessageBus.get());
-    httpConnectionListener->addHandler<QnHttpTransactionReceiver, QnTransactionMessageBus>(
-        "HTTP", kIncomingTransactionsPath, m_transactionMessageBus.get());
-
-    httpConnectionListener->addHandler<P2pConnectionProcessor, P2pMessageBus>(
-        "HTTP", "ec2/messageBus", m_p2pMessageBus.get());
+    if (auto bus = dynamic_cast<QnTransactionMessageBus*> (m_bus.get()))
+    {
+        httpConnectionListener->addHandler<QnTransactionTcpProcessor, QnTransactionMessageBus>(
+            "HTTP", "ec2/events", bus);
+        httpConnectionListener->addHandler<QnHttpTransactionReceiver, QnTransactionMessageBus>(
+            "HTTP", kIncomingTransactionsPath, bus);
+    }
+    else if (auto bus = dynamic_cast<P2pMessageBus*> (m_bus.get()))
+    {
+        httpConnectionListener->addHandler<P2pConnectionProcessor, P2pMessageBus>(
+            "HTTP", "ec2/messageBus", bus);
+    }
 
     m_sslEnabled = httpConnectionListener->isSslEnabled();
 }
@@ -1387,7 +1400,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
                 nullptr, out);
         });
 
-    p->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler(m_transactionMessageBus.get()));
+    if (auto bus = dynamic_cast<QnTransactionMessageBus*> (m_bus.get()))
+        p->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler(bus));
     p->registerHandler(QnTimeSyncRestHandler::PATH, new QnTimeSyncRestHandler(this));
 
 #if 0 // Using HTTP processor since HTTP REST does not support HTTP interleaving.
@@ -1424,7 +1438,8 @@ int Ec2DirectConnectionFactory::establishDirectConnection(
                     url));
             if (m_directConnection->initialized())
             {
-                m_timeSynchronizationManager->start(m_directConnection);
+                if (m_timeSynchronizationManager)
+                    m_timeSynchronizationManager->start(m_directConnection);
             }
             else
             {
@@ -1874,14 +1889,9 @@ void Ec2DirectConnectionFactory::regFunctorWithResponse(
         permission);
 }
 
-QnTransactionMessageBus* Ec2DirectConnectionFactory::messageBus() const
+QnTransactionMessageBusBase* Ec2DirectConnectionFactory::messageBus() const
 {
-    return m_transactionMessageBus.get();
-}
-
-P2pMessageBus* Ec2DirectConnectionFactory::p2pMessageBus() const
-{
-    return m_p2pMessageBus.get();
+    return m_bus.get();
 }
 
 QnDistributedMutexManager* Ec2DirectConnectionFactory::distributedMutex() const

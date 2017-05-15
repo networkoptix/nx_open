@@ -7,6 +7,8 @@
 
 namespace ec2 {
 
+class QnTransactionMessageBus;
+
 class QnTransactionTransport
 :
     public QnTransactionTransportBase

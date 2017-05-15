@@ -42,7 +42,7 @@ namespace ec2
     private:
         FixedUrlClientQueryProcessorPtr m_queryProcessor;
         const QnConnectionInfo m_connectionInfo;
-        QUrl m_peerUrl;
+        QnUuid m_peerId;
     };
     typedef std::shared_ptr<RemoteEC2Connection> RemoteEC2ConnectionPtr;
 }

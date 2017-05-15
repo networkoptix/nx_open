@@ -24,7 +24,6 @@ namespace ec2
         m_isInitialized = queryProcessor->getDb()->init(dbUrl);
 
         connectionFactory->messageBus()->setHandler(notificationManager());
-        connectionFactory->p2pMessageBus()->setHandler(notificationManager());
 
         // NOTE: Ec2StaticticsReporter can only be created after connection is established
         if (m_isInitialized)
@@ -36,7 +35,6 @@ namespace ec2
     Ec2DirectConnection::~Ec2DirectConnection()
     {
         m_connectionFactory->messageBus()->removeHandler(notificationManager());
-        m_connectionFactory->p2pMessageBus()->removeHandler(notificationManager());
     }
 
     QnConnectionInfo Ec2DirectConnection::connectionInfo() const

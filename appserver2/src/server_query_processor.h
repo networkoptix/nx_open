@@ -12,6 +12,7 @@
 #include "transaction/transaction.h"
 #include "transaction/transaction_log.h"
 #include "transaction/transaction_message_bus.h"
+#include "transaction/p2p_message_bus.h"
 #include <transaction/binary_transaction_serializer.h>
 #include <api/app_server_connection.h>
 #include <ec_connection_notification_manager.h>
@@ -28,7 +29,7 @@ namespace detail {
 
 struct ServerQueryProcessorAccess
 {
-    ServerQueryProcessorAccess(detail::QnDbManager* db, QnTransactionMessageBus* messageBus) :
+    ServerQueryProcessorAccess(detail::QnDbManager* db, QnTransactionMessageBusBase* messageBus) :
         m_db(db),
         m_messageBus(messageBus)
     {
@@ -37,13 +38,13 @@ struct ServerQueryProcessorAccess
     detail::ServerQueryProcessor getAccess(const Qn::UserAccessData userAccessData);
 
     detail::QnDbManager* getDb() const { return m_db; }
-    QnTransactionMessageBus* messageBus() { return m_messageBus; }
+    QnTransactionMessageBusBase* messageBus() { return m_messageBus; }
     PostProcessList* postProcessList() { return &m_postProcessList; }
     QnMutex* updateMutex() { return &m_updateMutex; }
     QnCommonModule* commonModule() const { return m_messageBus->commonModule();  }
 private:
     detail::QnDbManager* m_db;
-    QnTransactionMessageBus* m_messageBus;
+    QnTransactionMessageBusBase* m_messageBus;
     PostProcessList m_postProcessList;
     QnMutex m_updateMutex;
 };
@@ -125,7 +126,7 @@ struct PostProcessTransactionFunction
 {
     template<class T>
     void operator()(
-        QnTransactionMessageBus* messageBus,
+        QnTransactionMessageBusBase* messageBus,
         const aux::AuditData& auditData,
         const QnTransaction<T>& tran) const;
 };
@@ -789,7 +790,7 @@ private:
 
 template<class T>
 void PostProcessTransactionFunction::operator()(
-    QnTransactionMessageBus* messageBus,
+    QnTransactionMessageBusBase* messageBus,
     const aux::AuditData& auditData,
     const QnTransaction<T>& tran) const
 {

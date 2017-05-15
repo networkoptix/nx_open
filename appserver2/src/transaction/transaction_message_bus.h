@@ -7,8 +7,6 @@
 
 #include <common/common_module.h>
 
-#include <utils/common/enable_multi_thread_direct_connection.h>
-
 #include <nx_ec/ec_api.h>
 #include "nx_ec/data/api_lock_data.h"
 #include <nx_ec/data/api_peer_data.h>
@@ -29,8 +27,7 @@ class ECConnectionNotificationManager;
 class TimeSynchronizationManager;
 
 class QnTransactionMessageBus:
-    public QnTransactionMessageBusBase,
-    public EnableMultiThreadDirectConnection<QnTransactionMessageBus>
+    public QnTransactionMessageBusBase
 {
     Q_OBJECT;
     using base_type = QnTransactionMessageBusBase;
@@ -44,8 +41,12 @@ public:
 
     virtual ~QnTransactionMessageBus();
 
-    void addConnectionToPeer(const QUrl& url);
-    void removeConnectionFromPeer(const QUrl& url);
+    //void addConnectionToPeer(const QUrl& url);
+    //void removeConnectionFromPeer(const QUrl& url);
+    virtual void addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& url) override;
+    virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) override;
+
+
     QList<QnTransportConnectionInfo> connectionsInfo() const;
     void gotConnectionFromRemotePeer(const QnUuid& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
@@ -119,22 +120,17 @@ public:
     /*
     * Return all alive server peers
     */
-    AlivePeersMap aliveServerPeers() const;
-    AlivePeersMap aliveClientPeers() const;
+    virtual QMap<QnUuid, ApiPeerData> aliveServerPeers() const override;
+    virtual QMap<QnUuid, ApiPeerData> aliveClientPeers(int maxDistance = std::numeric_limits<int>::max()) const override;
 
-    void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager);
 signals:
-    void peerLost(ApiPeerAliveData data);
-    //!Emitted when a new peer has joined cluster or became online
-    void peerFound(ApiPeerAliveData data);
+
     //!Emitted on a new direct connection to a remote peer has been established
     void newDirectConnectionEstablished(QnTransactionTransport* transport);
 
     void gotLockRequest(ApiLockData);
     //void gotUnlockRequest(ApiLockData);
     void gotLockResponse(ApiLockData);
-
-    void remotePeerUnauthorized(const QnUuid& id);
 
     public slots:
     void dropConnections();
@@ -146,9 +142,9 @@ signals:
     * If can't find route info then return null value.
     * Otherwise return route gateway.
     */
-    QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const;
+    virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
 
-    int distanceToPeer(const QnUuid& dstPeer) const;
+    virtual int distanceToPeer(const QnUuid& dstPeer) const override;
 private:
     friend class QnTransactionTransport;
     friend struct GotTransactionFuction;
@@ -259,15 +255,17 @@ private slots:
     void onEc2ConnectionSettingsChanged(const QString& key);
 
 private:
-
-    TimeSynchronizationManager* m_timeSyncManager = nullptr;
-
     struct RemoteUrlConnectInfo
     {
-        RemoteUrlConnectInfo() { lastConnectedTime.invalidate(); }
+        RemoteUrlConnectInfo(const QnUuid& id = QnUuid()):
+            id(id)
+        {
+            lastConnectedTime.invalidate();
+        }
         QElapsedTimer lastConnectedTime;
         QnUuid discoveredPeer;
         QElapsedTimer discoveredTimeout;
+        QnUuid id;
     };
 
     QMap<QUrl, RemoteUrlConnectInfo> m_remoteUrls;

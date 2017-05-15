@@ -326,7 +326,7 @@ private:
 
 private slots:
     void onNewConnectionEstablished(QnTransactionTransportBase* transport );
-    void onPeerLost( ApiPeerAliveData data );
+    void onPeerLost(ApiPeerData peer);
     void onDbManagerInitialized();
     void onTimeSynchronizationSettingsChanged();
 };

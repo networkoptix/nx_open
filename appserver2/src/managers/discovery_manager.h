@@ -40,11 +40,11 @@ namespace ec2
         virtual int removeDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) override;
         virtual int getDiscoveryData(impl::GetDiscoveryDataHandlerPtr handler) override;
         virtual int sendDiscoveredServer(
-            QnTransactionMessageBus* messageBus,
+            QnTransactionMessageBusBase* messageBus,
             const ApiDiscoveredServerData &discoveredServer,
             impl::SimpleHandlerPtr handler) override;
         virtual int sendDiscoveredServersList(
-            QnTransactionMessageBus* messageBus,
+            QnTransactionMessageBusBase* messageBus,
             const ApiDiscoveredServerDataList &discoveredServersList,
             impl::SimpleHandlerPtr handler) override;
 

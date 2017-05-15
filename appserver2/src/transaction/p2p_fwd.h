@@ -27,6 +27,7 @@ enum class MessageType
     subscribeForDataUpdates,
     pushTransactionData,
     pushTransactionList, //< for UbJson format only
+    pushUnicastTransaction, //< for non persistent transactions only
 
     counter
 };

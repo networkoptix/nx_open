@@ -50,8 +50,8 @@ public:
 
     void gotConnectionFromRemotePeer(P2pConnectionPtr connection);
 
-    void addOutgoingConnectionToPeer(const ApiPersistentIdData& peer, const QUrl& url);
-    void removeOutgoingConnectionFromPeer(const QnUuid& id);
+    virtual void addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& url) override;
+    virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) override;
 
     QMap<QnUuid, P2pConnectionPtr> connections() const;
     int connectionTries() const;
@@ -63,14 +63,25 @@ public:
     virtual void start() override;
     virtual void stop() override;
 
+    virtual QMap<QnUuid, ApiPeerData> aliveServerPeers() const override;
+    virtual QMap<QnUuid, ApiPeerData> aliveClientPeers(int maxDistance = std::numeric_limits<int>::max()) const override;
+    virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
+    virtual int distanceToPeer(const QnUuid& dstPeer) const override;
 
     template<class T>
-    void sendTransaction(const QnTransaction<T>& tran)
+    void sendTransaction(const QnTransaction<T>& tran, const QnPeerSet& dstPeers = QnPeerSet())
     {
         NX_ASSERT(tran.command != ApiCommand::NotDefined);
         QnMutexLocker lock(&m_mutex);
         if (m_connections.isEmpty())
             return;
+
+        if (!dstPeers.isEmpty())
+        {
+            sendUnicastTransaction(tran, dstPeers);
+            return;
+        }
+
         const ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
         for (const auto& connection: m_connections)
         {
@@ -98,16 +109,22 @@ public:
         }
     }
 
+    template<class T>
+    void sendUnicastTransaction(const QnTransaction<T>& tran, const QnPeerSet& dstPeers)
+    {
+        //todo: implement me
+    }
+
+    bool isSubscribedTo(const ApiPersistentIdData& peer) const;
+    qint32 distanceTo(const ApiPersistentIdData& peer) const;
+
+private:
     void printTran(
         const P2pConnectionPtr& connection,
         const QnAbstractTransaction& tran,
         P2pConnection::Direction direction) const;
-
-    bool isSubscribedTo(const ApiPersistentIdData& peer) const;
-    qint32 distanceTo(const ApiPersistentIdData& peer) const;
     void commitLazyData();
 
-private:
     QByteArray serializeCompressedPeers(MessageType messageType, const QVector<PeerNumberType>& peers);
     QByteArray serializeResolvePeerNumberRequest(const QVector<PeerNumberType>& peers);
     QByteArray serializeResolvePeerNumberResponse(const QVector<PeerNumberType>& peers);
@@ -172,7 +189,7 @@ private:
     void at_stateChanged(QWeakPointer<P2pConnection> connection, P2pConnection::State state);
     void at_allDataSent(QWeakPointer<P2pConnection> connection);
     bool pushTransactionList(
-        const P2pConnectionPtr& connection, 
+        const P2pConnectionPtr& connection,
         const QList<QByteArray>& serializedTransactions);
 public:
     typedef QMap<ApiPersistentIdData, RoutingRecord> RoutingInfo;
@@ -236,6 +253,9 @@ public:
     bool needStartConnection(
         const ApiPersistentIdData& peer,
         const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription) const;
+    bool needStartConnection(
+        const QnUuid& peerId,
+        const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription) const;
 public:
     static QByteArray serializePeersMessage(
         const BidirectionRoutingInfo* peers,
@@ -251,12 +271,13 @@ public:
 private:
     QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list
     QMap<QnUuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections
+
     struct RemoteConnection
     {
         RemoteConnection() {}
-        RemoteConnection(const ApiPersistentIdData& peer, const QUrl& url) : peer(peer), url(url) {}
+        RemoteConnection(const QnUuid& peerId, const QUrl& url) : peerId(peerId), url(url) {}
 
-        ApiPersistentIdData peer;
+        QnUuid peerId;
         QUrl url;
     };
 
@@ -279,7 +300,7 @@ private:
     private:
         const P2pMessageBus* owner;
     } m_miscData;
-    friend class MiscData;
+    friend struct MiscData;
 
     QTimer* m_timer = nullptr;
     QElapsedTimer m_lastPeerInfoTimer;
