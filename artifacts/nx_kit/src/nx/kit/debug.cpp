@@ -24,7 +24,7 @@ uint8_t* unalignedPtr(void* data)
         17 + (((uintptr_t) data) + kMediaAlignment - 1) / kMediaAlignment * kMediaAlignment);
 }
 
-std::string format(const std::string& formatStr, ...)
+std::string format(const std::string formatStr, ...)
 {
     va_list args;
     va_start(args, formatStr);

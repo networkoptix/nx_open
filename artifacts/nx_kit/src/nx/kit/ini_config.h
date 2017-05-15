@@ -82,7 +82,7 @@ protected:
     #define NX_INI_STRING(DEFAULT, PARAM, DESCRIPTION) \
         const char* const PARAM = regStringParam(&PARAM, DEFAULT, #PARAM, DESCRIPTION)
 
-protected /* used by macros */:
+protected: // Used by macros.
     bool regBoolParam(const bool* pValue, bool defaultValue,
         const char* paramName, const char* description);
 

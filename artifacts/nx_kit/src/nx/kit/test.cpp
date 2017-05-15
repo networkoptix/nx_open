@@ -34,7 +34,7 @@ void failEq(
         "    Actual:   [" + actualValue + "] (" + actualExpr + ")");
 }
 
-static void printSection(const std::string& formatStr, ...)
+static void printSection(const std::string formatStr, ...)
 {
     static bool firstSection = true;
     if (firstSection)

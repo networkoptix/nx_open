@@ -24,7 +24,7 @@ namespace debug {
 
 NX_KIT_API uint8_t* unalignedPtr(void* data);
 
-NX_KIT_API std::string format(const std::string& formatStr, ...);
+NX_KIT_API std::string format(const std::string formatStr, ...);
 
 NX_KIT_API bool isAsciiPrintable(int c);
 
@@ -179,7 +179,7 @@ namespace detail {
 #define NX_KIT_DEBUG_DETAIL_CONCAT2(X, Y) X##Y
 
 template<typename T>
-NX_KIT_API std::string toString(T value)
+std::string toString(T value)
 {
     std::ostringstream outputString;
     outputString << value;
@@ -193,7 +193,7 @@ NX_KIT_API std::string toString(char* s);
 NX_KIT_API std::string toString(const void* ptr);
 
 template<typename P>
-NX_KIT_API std::string toString(P* ptr)
+std::string toString(P* ptr)
 {
     return toString((const void*) ptr);
 }

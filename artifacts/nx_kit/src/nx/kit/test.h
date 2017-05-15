@@ -1,7 +1,7 @@
 #pragma once
 
 /**@file
- * Rudimentary kit unit testing framework designed to mimic Google Test to a certain degree.
+ * Rudimentary standalone unit testing framework designed to mimic Google Test to a certain degree.
  */
 
 #include <functional>
