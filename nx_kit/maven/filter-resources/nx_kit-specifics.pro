@@ -13,7 +13,7 @@ CONFIG(debug, debug|release) {
   CONFIGURATION = release
 }
 
-DESTDIR = $$clean_path("${libdir}")/lib/$$CONFIGURATION
+DESTDIR = $$clean_path("${libdir}")/bin/$$CONFIGURATION
 
 SRCDIR = ${packages.dir}/any/nx_kit/src
 
