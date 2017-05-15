@@ -70,6 +70,16 @@ void FramedBase::setFrameStyle(Qt::PenStyle frameStyle)
     m_self->update();
 }
 
+const QVector<qreal>& FramedBase::dashPattern() const
+{
+    return m_dashPattern;
+}
+
+void FramedBase::setDashPattern(const QVector<qreal>& dashPattern)
+{
+    m_dashPattern = dashPattern;
+}
+
 QBrush FramedBase::frameBrush() const
 {
     return m_self->palette().color(QPalette::Highlight);
@@ -164,7 +174,11 @@ void FramedBase::paintFrame(QPainter* painter, const QRectF& rect)
     if (m_frameShape == Qn::NoFrame)
         return;
 
-    QN_SCOPED_PAINTER_PEN_ROLLBACK(painter, QPen(frameBrush(), m_frameWidth, m_frameStyle, Qt::SquareCap, Qt::MiterJoin));
+    QPen pen(frameBrush(), m_frameWidth, m_frameStyle, Qt::SquareCap, Qt::MiterJoin);
+    if (m_frameStyle == Qt::CustomDashLine)
+        pen.setDashPattern(m_dashPattern);
+
+    QN_SCOPED_PAINTER_PEN_ROLLBACK(painter, pen);
     QN_SCOPED_PAINTER_BRUSH_ROLLBACK(painter, windowBrush());
 
     qreal d = m_frameWidth / 2.0;
