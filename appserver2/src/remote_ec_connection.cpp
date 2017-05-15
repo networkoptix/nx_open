@@ -41,7 +41,6 @@ namespace ec2
     void RemoteEC2Connection::startReceivingNotifications()
     {
         m_connectionFactory->messageBus()->setHandler(notificationManager());
-        m_connectionFactory->p2pMessageBus()->setHandler(notificationManager());
 
         base_type::startReceivingNotifications();
 
@@ -55,14 +54,13 @@ namespace ec2
         m_connectionFactory->messageBus()->addConnectionToPeer(url);
     }
 
-    void RemoteEC2Connection::stopReceivingNotifications() {
+    void RemoteEC2Connection::stopReceivingNotifications()
+    {
         base_type::stopReceivingNotifications();
         if (m_connectionFactory->messageBus())
         {
             m_connectionFactory->messageBus()->removeConnectionFromPeer( m_peerUrl );
             m_connectionFactory->messageBus()->removeHandler( notificationManager() );
-
-            m_connectionFactory->p2pMessageBus()->removeHandler(notificationManager());
         }
 
         //TODO #ak next call can be placed here just because we always have just one connection to EC

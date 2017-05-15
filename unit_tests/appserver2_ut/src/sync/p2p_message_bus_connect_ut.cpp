@@ -18,7 +18,7 @@
 
 namespace {
 
-static const int kInstanceCount = 200;
+static const int kInstanceCount = 10;
 static const int kMaxSyncTimeoutMs = 1000 * 20 * 1000;
 static const int kPropertiesPerCamera = 5;
 static const int kCamerasCount = 20;
@@ -121,7 +121,7 @@ void checkDistance(const std::vector<Appserver2Ptr>& servers, bool waitForSync, 
         for (const auto& server : servers)
         {
             const auto& connection = server->moduleInstance()->ecConnection();
-            const auto& bus = connection->p2pMessageBus();
+            const auto& bus = dynamic_cast<ec2::P2pMessageBus*>(connection->messageBus());
             const auto& commonModule = server->moduleInstance()->commonModule();
             for (const auto& serverTo : servers)
             {
@@ -157,7 +157,7 @@ void checkSubscription(const std::vector<Appserver2Ptr>& servers, bool waitForSy
         for (const auto& server: servers)
         {
             const auto& connection = server->moduleInstance()->ecConnection();
-            const auto& bus = connection->p2pMessageBus();
+            const auto& bus = dynamic_cast<ec2::P2pMessageBus*>(connection->messageBus());
             const auto& commonModule = server->moduleInstance()->commonModule();
             for (const auto& serverTo : servers)
             {
@@ -190,12 +190,9 @@ void sequenceConnect(std::vector<Appserver2Ptr>& servers)
     {
         const auto addr = servers[i]->moduleInstance()->endpoint();
         QUrl url = lit("http://%1:%2/ec2/messageBus").arg(addr.address.toString()).arg(addr.port);
-        ec2::ApiPersistentIdData peer(
-            servers[i]->moduleInstance()->commonModule()->moduleGUID(),
-            servers[i]->moduleInstance()->commonModule()->dbId()
-            );
-        servers[i - 1]->moduleInstance()->ecConnection()->p2pMessageBus()->
-            addOutgoingConnectionToPeer(peer, url);
+        auto peerId = servers[i]->moduleInstance()->commonModule()->moduleGUID();
+        servers[i - 1]->moduleInstance()->ecConnection()->messageBus()->
+            addOutgoingConnectionToPeer(peerId, url);
     }
 }
 
@@ -209,14 +206,11 @@ void fullConnect(std::vector<Appserver2Ptr>& servers)
             if (j == i)
                 continue;
             const auto addr = servers[i]->moduleInstance()->endpoint();
-            ec2::ApiPersistentIdData peer(
-                servers[i]->moduleInstance()->commonModule()->moduleGUID(),
-                servers[i]->moduleInstance()->commonModule()->dbId()
-            );
+            auto peerId = servers[i]->moduleInstance()->commonModule()->moduleGUID();
 
             QUrl url = lit("http://%1:%2/ec2/messageBus").arg(addr.address.toString()).arg(addr.port);
-            servers[j]->moduleInstance()->ecConnection()->p2pMessageBus()->
-                addOutgoingConnectionToPeer(peer, url);
+            servers[j]->moduleInstance()->ecConnection()->messageBus()->
+                addOutgoingConnectionToPeer(peerId, url);
         }
     }
 }
@@ -295,7 +289,7 @@ static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverCon
 
     ec2::Ec2DirectConnection* connection =
         dynamic_cast<ec2::Ec2DirectConnection*> (servers[0]->moduleInstance()->ecConnection());
-    ec2::detail::QnDbManager* db = connection->p2pMessageBus()->getDb();
+    ec2::detail::QnDbManager* db = connection->messageBus()->getDb();
     ec2::ApiTransactionDataList tranList;
     db->doQuery(ec2::ApiTranLogFilter(), tranList);
     qint64 totalDbData = 0;
@@ -333,7 +327,7 @@ static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverCon
     {
         ec2::Ec2DirectConnection* connection =
             dynamic_cast<ec2::Ec2DirectConnection*> (server->moduleInstance()->ecConnection());
-        const auto bus = connection->p2pMessageBus();
+        const auto& bus = dynamic_cast<ec2::P2pMessageBus*>(connection->messageBus());
         for (const auto& connection : bus->connections())
         {
             ++totalConnections;

@@ -6,25 +6,6 @@
 #include "server_query_processor.h"
 #include <common/common_module.h>
 
-namespace {
-
-ec2::QnPeerSet getDirectClientPeers(ec2::QnTransactionMessageBus* messageBus)
-{
-    ec2::QnPeerSet result;
-
-    auto clients = messageBus->aliveClientPeers();
-    for (auto it = clients.begin(); it != clients.end(); ++it)
-    {
-        const auto& clientId = it.key();
-        if (it->routingInfo.contains(clientId))
-            result.insert(clientId);
-    }
-
-    return result;
-}
-
-} // namespace
-
 namespace ec2 {
 
 ApiDiscoveryData toApiDiscoveryData(
@@ -183,11 +164,11 @@ int QnDiscoveryManager<QueryProcessorType>::getDiscoveryData(impl::GetDiscoveryD
 
 template<class QueryProcessorType>
 int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServer(
-    QnTransactionMessageBus* messageBus,
+    QnTransactionMessageBusBase* messageBus,
     const ApiDiscoveredServerData &discoveredServer,
     impl::SimpleHandlerPtr handler)
 {
-    const auto peers = getDirectClientPeers(messageBus);
+    const auto peers = messageBus->aliveClientPeers(/*distance*/ 0); // directly connected
     if (peers.isEmpty())
         return -1;
 
@@ -198,7 +179,11 @@ int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServer(
 
     const int reqId = generateRequestID();
 
-    messageBus->sendTransaction(transaction, peers);
+    QSet<QnUuid> dstPeers;
+    for (const auto& p : peers)
+        dstPeers.insert(p.id);
+    messageBus->sendTransaction(transaction, dstPeers);
+
     nx::utils::concurrent::run(Ec2ThreadPool::instance(),
         [handler, reqId]{ handler->done(reqId, ErrorCode::ok); });
 
@@ -207,11 +192,11 @@ int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServer(
 
 template<class QueryProcessorType>
 int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServersList(
-    QnTransactionMessageBus* messageBus,
+    QnTransactionMessageBusBase* messageBus,
     const ApiDiscoveredServerDataList &discoveredServersList,
     impl::SimpleHandlerPtr handler)
 {
-    const auto peers = getDirectClientPeers(messageBus);
+    const auto peers = messageBus->aliveClientPeers(/*distance*/ 0); // directly connected
     if (peers.isEmpty())
         return -1;
 
@@ -222,7 +207,11 @@ int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServersList(
 
     const int reqId = generateRequestID();
 
-    messageBus->sendTransaction(transaction, peers);
+    QSet<QnUuid> dstPeers;
+    for (const auto& p: peers)
+        dstPeers.insert(p.id);
+    messageBus->sendTransaction(transaction, dstPeers);
+
     nx::utils::concurrent::run(Ec2ThreadPool::instance(),
         [handler, reqId]{ handler->done(reqId, ErrorCode::ok); });
 

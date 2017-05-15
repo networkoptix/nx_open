@@ -59,7 +59,7 @@ struct QnModuleInformation;
 namespace ec2
 {
     class ECConnectionNotificationManager;
-    class QnTransactionMessageBus;
+    class QnTransactionMessageBusBase;
     class P2pMessageBus;
     class QnDistributedMutexManager;
     class TimeSynchronizationManager;
@@ -133,12 +133,12 @@ namespace ec2
             \param handler Functor with params: (ErrorCode, const ApiResourceParamWithRefDataList&)
         */
         template<class TargetType, class HandlerType>
-        int getKvPairs( const QnUuid& resourceId, TargetType* target, HandlerType handler ) 
+        int getKvPairs( const QnUuid& resourceId, TargetType* target, HandlerType handler )
         {
             return getKvPairs( resourceId, std::static_pointer_cast<impl::GetKvPairsHandler>(std::make_shared<impl::CustomGetKvPairsHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-        ErrorCode getKvPairsSync(const QnUuid& resourceId, ApiResourceParamWithRefDataList* const outData) 
+        ErrorCode getKvPairsSync(const QnUuid& resourceId, ApiResourceParamWithRefDataList* const outData)
         {
             return impl::doSyncCall<impl::GetKvPairsHandler>(
                 [=](const impl::GetKvPairsHandlerPtr &handler) {
@@ -156,7 +156,7 @@ namespace ec2
             return getStatusList( resourceId, std::static_pointer_cast<impl::GetStatusListHandler>(std::make_shared<impl::CustomGetStatusListHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-        ErrorCode getStatusListSync(const QnUuid& resourceId, ApiResourceStatusDataList* const outData) 
+        ErrorCode getStatusListSync(const QnUuid& resourceId, ApiResourceStatusDataList* const outData)
         {
             return impl::doSyncCall<impl::GetStatusListHandler>(
                 [=](const impl::GetStatusListHandlerPtr &handler) {
@@ -170,15 +170,15 @@ namespace ec2
             \param handler Functor with params: (ErrorCode, const ApiResourceParamWithRefDataList&)
         */
         template<class TargetType, class HandlerType>
-        int save(const ec2::ApiResourceParamWithRefDataList& kvPairs, TargetType* target, HandlerType handler ) 
+        int save(const ec2::ApiResourceParamWithRefDataList& kvPairs, TargetType* target, HandlerType handler )
         {
             return save(kvPairs, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-        ErrorCode saveSync(const ec2::ApiResourceParamWithRefDataList& kvPairs) 
+        ErrorCode saveSync(const ec2::ApiResourceParamWithRefDataList& kvPairs)
         {
             return impl::doSyncCall<impl::SimpleHandler>(
-                [=](const impl::SimpleHandlerPtr &handler) 
+                [=](const impl::SimpleHandlerPtr &handler)
                 {
                     return this->save(kvPairs, handler);
                 }
@@ -506,7 +506,7 @@ namespace ec2
         }
 
         template<class TargetType, class HandlerType> int sendDiscoveredServer(
-            QnTransactionMessageBus* messageBus,
+            QnTransactionMessageBusBase* messageBus,
             const ApiDiscoveredServerData &discoveredServer,
             TargetType *target,
             HandlerType handler)
@@ -516,7 +516,7 @@ namespace ec2
         }
 
         template<class TargetType, class HandlerType> int sendDiscoveredServersList(
-            QnTransactionMessageBus* messageBus,
+            QnTransactionMessageBusBase* messageBus,
             const ApiDiscoveredServerDataList &discoveredServersList,
             TargetType *target,
             HandlerType handler)
@@ -531,11 +531,11 @@ namespace ec2
         virtual int removeDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) = 0;
         virtual int getDiscoveryData(impl::GetDiscoveryDataHandlerPtr handler) = 0;
         virtual int sendDiscoveredServer(
-            QnTransactionMessageBus* messageBus,
+            QnTransactionMessageBusBase* messageBus,
             const ApiDiscoveredServerData &discoveredServer,
             impl::SimpleHandlerPtr handler) = 0;
         virtual int sendDiscoveredServersList(
-            QnTransactionMessageBus* messageBus,
+            QnTransactionMessageBusBase* messageBus,
             const ApiDiscoveredServerDataList &discoveredServersList,
             impl::SimpleHandlerPtr handler) = 0;
     };
@@ -754,8 +754,7 @@ namespace ec2
         virtual QnCommonModule* commonModule() const = 0;
 
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const = 0;
-        virtual QnTransactionMessageBus* messageBus() const = 0;
-        virtual P2pMessageBus* p2pMessageBus() const = 0;
+        virtual QnTransactionMessageBusBase* messageBus() const = 0;
 
         virtual ECConnectionNotificationManager* notificationManager()
         {
@@ -860,8 +859,7 @@ namespace ec2
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) = 0;
         virtual void registerTransactionListener(QnHttpConnectionListener* httpConnectionListener) = 0;
         virtual void setConfParams( std::map<QString, QVariant> confParams ) = 0;
-        virtual QnTransactionMessageBus* messageBus() const = 0;
-        virtual P2pMessageBus* p2pMessageBus() const = 0;
+        virtual QnTransactionMessageBusBase* messageBus() const = 0;
         virtual QnDistributedMutexManager* distributedMutex() const = 0;
         virtual TimeSynchronizationManager* timeSyncManager() const = 0;
     protected:

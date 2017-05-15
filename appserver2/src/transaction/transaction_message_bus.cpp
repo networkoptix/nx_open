@@ -299,7 +299,7 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
         if (!isPeerExist)
         {
             NX_LOG(QnLog::EC2_TRAN_LOG, lit("emit peerFound. id=%1").arg(aliveData.peer.id.toString()), cl_logDEBUG1);
-            emit peerFound(aliveData);
+            emit peerFound(aliveData.peer);
         }
     }
     else
@@ -1083,9 +1083,9 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
     }
 
     if (isAlive)
-        emit peerFound(aliveData);
+        emit peerFound(aliveData.peer);
     else
-        emit peerLost(aliveData);
+        emit peerLost(aliveData.peer);
 }
 
 QnTransaction<ApiDiscoveredServerDataList> QnTransactionMessageBus::prepareModulesDataTransaction() const
@@ -1555,30 +1555,38 @@ QUrl QnTransactionMessageBus::addCurrentPeerInfo(const QUrl& srcUrl) const
     return url;
 }
 
-void QnTransactionMessageBus::addConnectionToPeer(const QUrl& _url)
+void QnTransactionMessageBus::addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& _url)
 {
     QUrl url = addCurrentPeerInfo(_url);
     QnMutexLocker lock(&m_mutex);
     if (!m_remoteUrls.contains(url))
     {
-        m_remoteUrls.insert(url, RemoteUrlConnectInfo());
+        m_remoteUrls.insert(url, RemoteUrlConnectInfo(id));
         QTimer::singleShot(0, this, SLOT(doPeriodicTasks()));
     }
 }
 
-void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& _url)
+void QnTransactionMessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
 {
-    QUrl url = addCurrentPeerInfo(_url);
-
     QnMutexLocker lock(&m_mutex);
-    m_remoteUrls.remove(url);
-    const SocketAddress& urlStr = getUrlAddr(url);
-    for (QnTransactionTransport* transport : m_connections.values())
+
+    for (auto itr = m_remoteUrls.begin(); itr != m_remoteUrls.end(); ++itr)
     {
-        if (transport->remoteSocketAddr() == urlStr)
+        RemoteUrlConnectInfo& info = itr.value();
+        if (info.id == id)
         {
-            NX_LOGX(lm("Disconnected from peer %1").str(url), cl_logWARNING);
-            transport->setState(QnTransactionTransport::Error);
+            QUrl url = itr.key();
+            m_remoteUrls.erase(itr);
+
+            const SocketAddress& urlStr = getUrlAddr(url);
+            for (QnTransactionTransport* transport : m_connections.values())
+            {
+                if (transport->remoteSocketAddr() == urlStr)
+                {
+                    NX_LOGX(lm("Disconnected from peer %1").str(url), cl_logWARNING);
+                    transport->setState(QnTransactionTransport::Error);
+                }
+            }
         }
     }
 }
@@ -1696,29 +1704,34 @@ QnPeerSet QnTransactionMessageBus::connectedServerPeers() const
     return result;
 }
 
-QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::aliveServerPeers() const
+QMap<QnUuid, ApiPeerData> QnTransactionMessageBus::aliveServerPeers() const
 {
     QnMutexLocker lock(&m_mutex);
-    AlivePeersMap result;
+    QMap<QnUuid, ApiPeerData> result;
     for (AlivePeersMap::const_iterator itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
     {
         if (itr->peer.isServer())
-            result.insert(itr.key(), itr.value());
+            result.insert(itr.key(), itr->peer);
     }
 
     return result;
 }
 
-QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::aliveClientPeers() const
+QMap<QnUuid, ApiPeerData> QnTransactionMessageBus::aliveClientPeers(int maxDistance) const
 {
     QnMutexLocker lock(&m_mutex);
-    AlivePeersMap result;
+    QMap<QnUuid, ApiPeerData> result;
     for (AlivePeersMap::const_iterator itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
     {
         if (itr->peer.isClient())
-            result.insert(itr.key(), itr.value());
+        {
+            int distance = std::numeric_limits<int>::max();
+            for (const RoutingRecord& rec: itr->routingInfo)
+                distance = std::min(distance, (int) rec.distance);
+            if (distance < maxDistance)
+                continue;
+        }
     }
-
     return result;
 }
 
@@ -1772,12 +1785,6 @@ void QnTransactionMessageBus::onEc2ConnectionSettingsChanged(const QString& key)
         }
     }
 }
-
-void QnTransactionMessageBus::setTimeSyncManager(TimeSynchronizationManager* timeSyncManager)
-{
-    m_timeSyncManager = timeSyncManager;
-}
-
 
 QnUuid QnTransactionMessageBus::routeToPeerVia(const QnUuid& dstPeer, int* peerDistance) const
 {

@@ -56,8 +56,7 @@ public:
     virtual void startReceivingNotifications() override;
     virtual void stopReceivingNotifications() override;
     virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
-    virtual QnTransactionMessageBus* messageBus() const override { return nullptr; }
-    virtual P2pMessageBus* p2pMessageBus() const override { return nullptr; }
+    virtual QnTransactionMessageBusBase* messageBus() const override { return nullptr; }
     virtual QnCommonModule* commonModule() const override { return nullptr; }
 protected:
     virtual int dumpDatabaseAsync(impl::DumpDatabaseHandlerPtr handler) override;

@@ -94,8 +94,7 @@ namespace ec2
 
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
 
-        virtual QnTransactionMessageBus* messageBus() const override;
-        virtual P2pMessageBus* p2pMessageBus() const override;
+        virtual QnTransactionMessageBusBase* messageBus() const override;
     protected:
         const AbstractECConnectionFactory* m_connectionFactory;
         QueryProcessorType* m_queryProcessor;

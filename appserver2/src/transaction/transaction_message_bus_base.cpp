@@ -82,5 +82,9 @@ ConnectionGuardSharedState* QnTransactionMessageBusBase::connectionGuardSharedSt
     return &m_connectionGuardSharedState;
 }
 
+void QnTransactionMessageBusBase::setTimeSyncManager(TimeSynchronizationManager* timeSyncManager)
+{
+    m_timeSyncManager = timeSyncManager;
+}
 
 } // namespace ec2

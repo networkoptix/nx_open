@@ -17,7 +17,7 @@ namespace ec2
 
 template<class QueryProcessorType>
 QnBusinessEventManager<QueryProcessorType>::QnBusinessEventManager(
-    QnTransactionMessageBus* messageBus,
+    QnTransactionMessageBusBase* messageBus,
     QueryProcessorType* const queryProcessor,
     const Qn::UserAccessData &userAccessData)
 :

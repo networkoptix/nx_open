@@ -800,12 +800,12 @@ void TimeSynchronizationManager::onNewConnectionEstablished( QnTransactionTransp
     }
 }
 
-void TimeSynchronizationManager::onPeerLost( ApiPeerAliveData data )
+void TimeSynchronizationManager::onPeerLost(ApiPeerData peer)
 {
-    stopSynchronizingTimeWithPeer( data.peer.id );
+    stopSynchronizingTimeWithPeer(peer.id);
 
     QnMutexLocker lk( &m_mutex );
-    m_systemTimeByPeer.erase( data.peer.id );
+    m_systemTimeByPeer.erase(peer.id);
 }
 
 void TimeSynchronizationManager::startSynchronizingTimeWithPeer(
