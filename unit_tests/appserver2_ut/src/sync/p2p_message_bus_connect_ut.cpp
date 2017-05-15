@@ -15,6 +15,7 @@
 #include "ec2_connection.h"
 #include <transaction/transaction_message_bus_base.h>
 #include <transaction/p2p_connection.h>
+#include <config.h>
 
 namespace {
 
@@ -226,6 +227,8 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 
 static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverConnectFunc)
 {
+    const_cast<bool&>(ec2::ini().isP2pMode) = true;
+
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 
     QElapsedTimer t;

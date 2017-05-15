@@ -33,11 +33,11 @@
 #include "http/http_transaction_receiver.h"
 #include "mutex/distributed_mutex_manager.h"
 #include <http/p2p_connection_listener.h>
+#include "config.h"
 
 namespace ec2 {
 
 static const char* const kIncomingTransactionsPath = "ec2/forward_events";
-static bool isP2pMode = false;
 
 Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
     Qn::PeerType peerType,
@@ -60,7 +60,7 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
         m_transactionLog.reset(new QnTransactionLog(m_dbManager.get(), m_ubjsonTranSerializer.get()));
     }
 
-    if (isP2pMode)
+    if (ini().isP2pMode)
     {
         m_bus.reset(new P2pMessageBus(
             m_dbManager.get(),
