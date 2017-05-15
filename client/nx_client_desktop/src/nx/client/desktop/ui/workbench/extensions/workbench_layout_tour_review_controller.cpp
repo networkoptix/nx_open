@@ -288,11 +288,11 @@ void LayoutTourReviewController::updatePlaceholderPosition()
 
     const auto mapper = workbench()->mapper();
 
-    static const QPoint kStartPos(0, 0);
     static const QSize kPlaceholderSize(1, 1);
 
-    PlaceholderMagnitudeCalculator metric(kStartPos);
-    const auto freeSlot = workbench()->currentLayout()->closestFreeSlot(kStartPos,
+    const auto startPos = workbench()->currentLayout()->boundingRect().topLeft();
+    PlaceholderMagnitudeCalculator metric(startPos);
+    const auto freeSlot = workbench()->currentLayout()->closestFreeSlot(startPos,
         kPlaceholderSize, &metric);
     const QRectF targetRect = mapper->mapFromGrid(freeSlot);
     m_dropPlaceholder->setRect(targetRect);
