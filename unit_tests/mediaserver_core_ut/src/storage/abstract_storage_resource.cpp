@@ -151,7 +151,7 @@ TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
     auto randomString = [&]
     {
         randomStringStream.clear();
-        randomStringStream.arg("");
+        randomStringStream.str("");
 
         for (size_t i = 0; i < 16; ++i)
             randomStringStream << std::hex << nameDistribution(gen);
@@ -162,7 +162,7 @@ TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
     auto randomFilePath = [&]
     {
         pathStream.clear();
-        pathStream.arg("");
+        pathStream.str("");
 
         for (int i = 0; i < pathDistribution(gen) - 1; ++i)
         {
