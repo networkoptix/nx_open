@@ -66,7 +66,7 @@ BaseEc2Connection<QueryProcessorType>::~BaseEc2Connection()
 template<class QueryProcessorType>
 void BaseEc2Connection<QueryProcessorType>::startReceivingNotifications()
 {
-    connect(m_connectionFactory->messageBus(), &QnTransactionMessageBus::peerFound,
+    connect(m_connectionFactory->messageBus(), &QnTransactionMessageBusBase::peerFound,
         this, &BaseEc2Connection<QueryProcessorType>::remotePeerFound, Qt::DirectConnection);
     connect(m_connectionFactory->messageBus(), &QnTransactionMessageBus::peerLost,
         this, &BaseEc2Connection<QueryProcessorType>::remotePeerLost, Qt::DirectConnection);

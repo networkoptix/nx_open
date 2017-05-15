@@ -37,7 +37,7 @@
 namespace ec2 {
 
 static const char* const kIncomingTransactionsPath = "ec2/forward_events";
-static bool isP2pMode = true;
+static bool isP2pMode = false;
 
 Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
     Qn::PeerType peerType,

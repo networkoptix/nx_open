@@ -255,18 +255,17 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &
     server->setIgnoredUrls(ignoredUrls);
 }
 
-void QnCommonMessageProcessor::on_remotePeerFound(const ec2::ApiPeerData &data)
+void QnCommonMessageProcessor::on_remotePeerFound(ec2::ApiPeerData data)
 {
     handleRemotePeerFound(data);
     emit remotePeerFound(data);
 }
 
-void QnCommonMessageProcessor::on_remotePeerLost(const ec2::ApiPeerData &data)
+void QnCommonMessageProcessor::on_remotePeerLost(ec2::ApiPeerData data)
 {
     handleRemotePeerLost(data);
     emit remotePeerLost(data);
 }
-
 
 void QnCommonMessageProcessor::on_resourceStatusChanged(
     const QnUuid& resourceId,

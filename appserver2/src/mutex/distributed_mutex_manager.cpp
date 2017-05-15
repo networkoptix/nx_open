@@ -10,7 +10,7 @@ QnDistributedMutexManager::QnDistributedMutexManager(QnTransactionMessageBus* me
 {
     connect(m_messageBus, &QnTransactionMessageBus::gotLockRequest,    this, &QnDistributedMutexManager::at_gotLockRequest);
     connect(m_messageBus, &QnTransactionMessageBus::gotLockResponse,   this, &QnDistributedMutexManager::at_gotLockResponse);
-    connect(m_messageBus, &QnTransactionMessageBus::peerFound,         this, &QnDistributedMutexManager::peerFound);
+    connect(m_messageBus, &QnTransactionMessageBusBase::peerFound,         this, &QnDistributedMutexManager::peerFound);
     connect(m_messageBus, &QnTransactionMessageBus::peerLost,          this, &QnDistributedMutexManager::peerLost);
 
     //connect(qnTransactionBus, &QnTransactionMessageBus::gotUnlockRequest,  this, &QnDistributedMutexManager::at_gotUnlockRequest, Qt::DirectConnection);

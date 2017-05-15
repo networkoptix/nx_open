@@ -116,8 +116,8 @@ private slots:
     void on_gotInitialNotification(const ec2::ApiFullInfoData& fullData);
     void on_gotDiscoveryData(const ec2::ApiDiscoveryData &discoveryData, bool addInformation);
 
-    void on_remotePeerFound(const ec2::ApiPeerData& data);
-    void on_remotePeerLost(const ec2::ApiPeerData& data);
+    void on_remotePeerFound(ec2::ApiPeerData data);
+    void on_remotePeerLost(ec2::ApiPeerData data);
 
     void on_resourceStatusChanged(const QnUuid &resourceId, Qn::ResourceStatus status, ec2::NotificationSource source);
     void on_resourceParamChanged(const ec2::ApiResourceParamWithRefData& param );

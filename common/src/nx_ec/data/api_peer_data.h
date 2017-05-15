@@ -137,3 +137,5 @@ struct ApiPeerDataEx: public ApiPeerData
 #define ApiPeerDataEx_Fields ApiPeerData_Fields (systemId)(cloudHost)(identityTime)(keepAliveTimeout)(protoVersion)
 
 } // namespace ec2
+
+Q_DECLARE_METATYPE(ec2::ApiPeerData);

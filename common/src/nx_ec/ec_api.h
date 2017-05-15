@@ -810,8 +810,8 @@ namespace ec2
 
         void reverseConnectionRequested(const ec2::ApiReverseConnectionData& reverseConnetionData);
 
-        void remotePeerFound(const ec2::ApiPeerData& data);
-        void remotePeerLost(const ec2::ApiPeerData& data);
+        void remotePeerFound(ec2::ApiPeerData data);
+        void remotePeerLost(ec2::ApiPeerData data);
         void remotePeerUnauthorized(const QnUuid& id);
 
         void settingsChanged(ec2::ApiResourceParamDataList settings);

@@ -84,8 +84,8 @@ namespace ec2
             dstPeerId.isNull() ? sendTransaction(tran) : sendTransaction(tran, QnPeerSet() << dstPeerId);
         }
     signals:
-        void peerFound(ApiPeerData data);
-        void peerLost(ApiPeerData data);
+        void peerFound(ec2::ApiPeerData data);
+        void peerLost(ec2::ApiPeerData data);
         void remotePeerUnauthorized(QnUuid id);
     protected:
         detail::QnDbManager* m_db = nullptr;
