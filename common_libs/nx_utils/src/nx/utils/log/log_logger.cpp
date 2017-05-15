@@ -59,7 +59,7 @@ bool Logger::isToBeLogged(Level level, const QString& tag)
     return false;
 }
 
-Level Logger::defaultLevel()
+Level Logger::defaultLevel() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_defaultLevel;
@@ -71,7 +71,7 @@ void Logger::setDefaultLevel(Level level)
     m_defaultLevel = level;
 }
 
-std::set<QString> Logger::exceptionFilters()
+std::set<QString> Logger::exceptionFilters() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_exceptionFilters;
@@ -96,7 +96,7 @@ void Logger::setWriter(std::unique_ptr<AbstractWriter> writer)
     m_writers.push_back(std::move(writer));
 }
 
-boost::optional<QString> Logger::logFilePath()
+boost::optional<QString> Logger::filePath() const
 {
     QnMutexLocker lock(&m_mutex);
     for (const auto& writer: m_writers)

@@ -1,5 +1,6 @@
 #include "connect_session_manager.h"
 
+#include <nx/network/aio/async_channel_adapter.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/uuid.h>
@@ -174,9 +175,10 @@ void ConnectSessionManager::startRelaying(
     nx_http::HttpServerConnection* httpConnection)
 {
     auto clientConnection = httpConnection->takeSocket();
+    // TODO: #ak Get rid of adapter here when StreamSocket inherits AbstractAsyncChannel.
     m_trafficRelay->startRelaying(
-        {std::move(clientConnection), std::string()},
-        {std::move(listeningPeerConnection), listeningPeerName});
+        {network::aio::makeAsyncChannelAdapter(std::move(clientConnection)), std::string()},
+        {network::aio::makeAsyncChannelAdapter(std::move(listeningPeerConnection)), listeningPeerName});
 }
 
 //-------------------------------------------------------------------------------------------------

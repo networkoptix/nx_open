@@ -62,7 +62,7 @@ void QnAbstractPtzDialog::synchronize(const QString &title) {
         return;
     }
 
-    if(m_controller->hasCapabilities(Qn::AsynchronousPtzCapability)) {
+    if(m_controller->hasCapabilities(Ptz::AsynchronousPtzCapability)) {
         m_commands.insert(Qn::GetDataPtzCommand, 0);
 
         QnPtzData data;
@@ -124,7 +124,7 @@ bool QnAbstractPtzDialog::createPreset(const QnPtzPreset &preset) {
     if (!m_controller)
         return false;
 
-    if(m_controller->hasCapabilities(Qn::AsynchronousPtzCapability))
+    if(m_controller->hasCapabilities(Ptz::AsynchronousPtzCapability))
         m_commands.insert(Qn::CreatePresetPtzCommand, 0);
     return m_controller->createPreset(preset);
 }
@@ -133,7 +133,7 @@ bool QnAbstractPtzDialog::updatePreset(const QnPtzPreset &preset) {
     if (!m_controller)
         return false;
 
-    if(m_controller->hasCapabilities(Qn::AsynchronousPtzCapability))
+    if(m_controller->hasCapabilities(Ptz::AsynchronousPtzCapability))
         m_commands.insert(Qn::UpdatePresetPtzCommand, 0);
     return m_controller->updatePreset(preset);
 }
@@ -142,7 +142,7 @@ bool QnAbstractPtzDialog::removePreset(const QString &presetId) {
     if (!m_controller)
         return false;
 
-    if(m_controller->hasCapabilities(Qn::AsynchronousPtzCapability))
+    if(m_controller->hasCapabilities(Ptz::AsynchronousPtzCapability))
         m_commands.insert(Qn::RemovePresetPtzCommand, 0);
     return m_controller->removePreset(presetId);
 }
@@ -151,7 +151,7 @@ bool QnAbstractPtzDialog::createTour(const QnPtzTour &tour) {
     if (!m_controller)
         return false;
 
-    if(m_controller->hasCapabilities(Qn::AsynchronousPtzCapability))
+    if(m_controller->hasCapabilities(Ptz::AsynchronousPtzCapability))
         m_commands.insert(Qn::CreateTourPtzCommand, 0);
     return m_controller->createTour(tour);
 }
@@ -160,7 +160,7 @@ bool QnAbstractPtzDialog::removeTour(const QString &tourId) {
     if (!m_controller)
         return false;
 
-    if(m_controller->hasCapabilities(Qn::AsynchronousPtzCapability))
+    if(m_controller->hasCapabilities(Ptz::AsynchronousPtzCapability))
         m_commands.insert(Qn::RemoveTourPtzCommand, 0);
     return m_controller->removeTour(tourId);
 }
@@ -169,7 +169,7 @@ bool QnAbstractPtzDialog::updateHomePosition(const QnPtzObject &homePosition) {
     if (!m_controller)
         return false;
 
-    if(m_controller->hasCapabilities(Qn::AsynchronousPtzCapability))
+    if(m_controller->hasCapabilities(Ptz::AsynchronousPtzCapability))
         m_commands.insert(Qn::UpdateHomeObjectPtzCommand, 0);
     return m_controller->updateHomeObject(homePosition);
 }
@@ -198,9 +198,9 @@ void QnAbstractPtzDialog::at_controller_changed(Qn::PtzDataFields fields) {
     updateFields(fields);
 }
 
-Qn::PtzCapabilities QnAbstractPtzDialog::capabilities() {
+Ptz::Capabilities QnAbstractPtzDialog::capabilities() {
     if (!m_controller)
-        return Qn::NoPtzCapabilities;
+        return Ptz::NoPtzCapabilities;
 
     return m_controller->getCapabilities();
 }

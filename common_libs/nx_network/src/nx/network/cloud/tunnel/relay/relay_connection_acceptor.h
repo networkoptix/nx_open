@@ -38,6 +38,7 @@ public:
     virtual void waitForOriginatorToStartUsingConnection(
         ReverseConnectionCompletionHandler handler) override;
 
+    nx::cloud::relay::api::BeginListeningResponse beginListeningResponse() const;
     std::unique_ptr<AbstractStreamSocket> takeSocket();
 
 protected:
@@ -50,6 +51,7 @@ private:
     std::unique_ptr<nx_http::AsyncMessagePipeline> m_httpPipeline;
     ReverseConnectionCompletionHandler m_onConnectionActivated;
     std::unique_ptr<AbstractStreamSocket> m_streamSocket;
+    nx::cloud::relay::api::BeginListeningResponse m_beginListeningResponse;
 
     virtual void closeConnection(
         SystemError::ErrorCode closeReason,

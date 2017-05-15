@@ -11,7 +11,9 @@
 
 #include "ptz_fwd.h"
 
-struct QnPtzPreset: public boost::equality_comparable1<QnPtzPreset> {
+struct QnPtzPreset: public boost::equality_comparable1<QnPtzPreset>
+{
+    Q_GADGET
 public:
     QnPtzPreset() {}
     QnPtzPreset(const QString &id, const QString &name): id(id), name(name) {}

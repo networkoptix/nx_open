@@ -15,12 +15,12 @@ class QnMappedPtzController: public QnProxyPtzController {
 public:
     QnMappedPtzController(const QnPtzMapperPtr &mapper, const QnPtzControllerPtr &baseController);
 
-    static bool extends(Qn::PtzCapabilities capabilities);
+    static bool extends(Ptz::Capabilities capabilities);
 
-    virtual Qn::PtzCapabilities getCapabilities() override;
+    virtual Ptz::Capabilities getCapabilities() const override;
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;
-    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override;
-    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override;
+    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D* position) const override;
+    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const override;
 
 private:
     QnPtzMapperPtr m_mapper;

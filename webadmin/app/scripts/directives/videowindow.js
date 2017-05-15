@@ -28,7 +28,8 @@ angular.module('webadminApp')
                 playerId: "=",
                 vgSrc:"=",
                 player:"=",
-                activeFormat:"="
+                activeFormat:"=",
+                rotation: "="
             },
             templateUrl: Config.viewsDir + 'components/videowindow.html',// ???
 
@@ -365,6 +366,9 @@ angular.module('webadminApp')
                                 initNativePlayer(format);
                                 break;
                         }
+                        if(scope.rotation != 0 && scope.rotation != 180){
+                            updateWidth();
+                        }
                     }
                 }
 
@@ -396,6 +400,34 @@ angular.module('webadminApp')
                     playerId = !scope.playerId ? '' : '#'+playerId;
                     $('videowindow'+playerId)[0].children[0].children[0].innerHTML = tmp;
                 };
+
+                scope.getRotation = function(){
+                    if(format == "webm"){
+                        return "";
+                    }
+                    switch(scope.rotation){
+                        case 90:
+                            return "rotate90";
+                        case 180:
+                            return "rotate180";
+                        case 270:
+                            return "rotate270";
+                        default:
+                            return "";
+                    }
+                };
+
+                var $videowindow = $('.videowindow');
+                var $window = $(window);
+
+                function updateWidth(){
+                    if(!scope.rotation || scope.rotation == 0 || scope.rotation == 180){
+                        return;
+                    }
+                    var videoWindowHeight = $videowindow.height();
+                    $('.videoplayer').css('width',videoWindowHeight);
+                }
+                $window.resize(updateWidth);
             }
         }
     }]);

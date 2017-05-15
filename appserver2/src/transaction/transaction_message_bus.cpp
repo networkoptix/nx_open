@@ -633,12 +633,14 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
     QnTranStateKey persistentKey(tran.peerID, tran.persistentInfo.dbID);
     int persistentSeq =  m_db->transactionLog()->getLatestSequence(persistentKey);
 
-    if (nx::utils::log::get(QnLog::EC2_TRAN_LOG)->isToBeLogged(cl_logWARNING))
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::warning, QnLog::EC2_TRAN_LOG))
+    {
         if (!transport->isSyncDone() && transport->isReadSync(ApiCommand::NotDefined) && transportHeader.sender != transport->remotePeer().id)
         {
             NX_LOG(QnLog::EC2_TRAN_LOG, lit("Got transaction from peer %1 while sync with peer %2 in progress").
                 arg(transportHeader.sender.toString()).arg(transport->remotePeer().id.toString()), cl_logWARNING);
         }
+    }
 
     if (tran.persistentInfo.sequence > persistentSeq + 1)
     {
@@ -701,7 +703,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
     // do not perform any logic (aka sequence update) for foreign transaction. Just proxy
     if (!transportHeader.dstPeers.isEmpty() && !transportHeader.dstPeers.contains(commonModule()->moduleGUID()))
     {
-        if (nx::utils::log::get(QnLog::EC2_TRAN_LOG)->isToBeLogged(cl_logDEBUG1))
+        if (nx::utils::log::isToBeLogged(nx::utils::log::Level::debug, QnLog::EC2_TRAN_LOG))
         {
             QString dstPeersStr;
             for (const QnUuid& peer : transportHeader.dstPeers)
@@ -910,7 +912,8 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
         proxyList << transport->remotePeer().id;
     }
 
-    if (nx::utils::log::get(QnLog::EC2_TRAN_LOG)->isToBeLogged(cl_logDEBUG1))
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::debug, QnLog::EC2_TRAN_LOG))
+    {
         if (!proxyList.isEmpty())
         {
             QString proxyListStr;
@@ -918,12 +921,12 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
                 proxyListStr += " " + peer.toString();
             NX_LOG(QnLog::EC2_TRAN_LOG, lit("proxy transaction %1 to (%2)").arg(tran.toString()).arg(proxyListStr), cl_logDEBUG1);
         }
-
+    }
 };
 
 void QnTransactionMessageBus::printTranState(const QnTranState& tranState)
 {
-    if (!nx::utils::log::get(QnLog::EC2_TRAN_LOG)->isToBeLogged(cl_logDEBUG1))
+    if (!nx::utils::log::isToBeLogged(nx::utils::log::Level::debug, QnLog::EC2_TRAN_LOG))
         return;
 
     for (auto itr = tranState.values.constBegin(); itr != tranState.values.constEnd(); ++itr)

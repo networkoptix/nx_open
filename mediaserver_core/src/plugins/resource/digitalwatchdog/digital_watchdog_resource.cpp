@@ -148,7 +148,7 @@ QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal(
     }
     else {
         result.reset(new QnDwPtzController(toSharedPointer(this)));
-        if(result->getCapabilities() == Qn::NoPtzCapabilities) {
+        if(result->getCapabilities() == Ptz::NoPtzCapabilities) {
             result.reset();
             if(m_hasZoom)
                 result.reset(new QnDwZoomPtzController(toSharedPointer(this)));
