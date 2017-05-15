@@ -68,15 +68,15 @@ Item
             {
                 case MediaDewarpingParams.VerticalUp:
                     return Utils3D.rotationZ(Utils3D.radians(currentRotation.y)).times(
-                           Utils3D.rotationX(Utils3D.radians(currentRotation.x)))
+                        Utils3D.rotationX(Utils3D.radians(currentRotation.x)))
 
                 case MediaDewarpingParams.VerticalDown:
                     return Utils3D.rotationZ(-Utils3D.radians(currentRotation.y)).times(
-                           Utils3D.rotationX(Utils3D.radians(currentRotation.x)))
+                        Utils3D.rotationX(Utils3D.radians(currentRotation.x)))
 
                 default:
                     return Utils3D.rotationY(Utils3D.radians(currentRotation.y)).times(
-                           Utils3D.rotationX(Utils3D.radians(currentRotation.x)))
+                        Utils3D.rotationX(Utils3D.radians(currentRotation.x)))
             }
         }
 
@@ -91,15 +91,15 @@ Item
             {
                 case MediaDewarpingParams.VerticalUp:
                     return Qt.vector2d(Math.max(-limitByEdge, Math.min(-limitByCenter, unboundedRotation.x)),
-                                       normalizedAngle(unboundedRotation.y))
+                        normalizedAngle(unboundedRotation.y))
 
                 case MediaDewarpingParams.VerticalDown:
                     return Qt.vector2d(Math.max(limitByCenter, Math.min(limitByEdge, unboundedRotation.x)),
-                                       normalizedAngle(unboundedRotation.y))
+                        normalizedAngle(unboundedRotation.y))
 
                 default:
                     return Qt.vector2d(Math.max(-limitByEdge, Math.min(limitByEdge, unboundedRotation.x)),
-                                       Math.max(-limitByEdge, Math.min(limitByEdge, unboundedRotation.y)))
+                        Math.max(-limitByEdge, Math.min(limitByEdge, unboundedRotation.y)))
             }
         }
 

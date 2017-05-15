@@ -11,7 +11,7 @@ ShaderEffect
         : Qt.size(0.0, 0.0)
 
     property int lensProjectionType: Utils3D.SphereProjectionTypes.Equidistant
-    property int viewProjectionType: lensProjectionType // Utils3D.SphereProjectionTypes.Stereographic
+    property int viewProjectionType: lensProjectionType
 
     blending: false
 
