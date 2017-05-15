@@ -11,13 +11,12 @@
 #include "database/db_manager.h"
 #include "transaction/transaction.h"
 #include "transaction/transaction_log.h"
-#include "transaction/transaction_message_bus.h"
-#include "transaction/p2p_message_bus.h"
 #include <transaction/binary_transaction_serializer.h>
 #include <api/app_server_connection.h>
 #include <ec_connection_notification_manager.h>
 #include "ec_connection_audit_manager.h"
 #include "utils/common/threadqueue.h"
+#include <transaction/message_bus_selector.h>
 
 namespace ec2 {
 
@@ -794,7 +793,7 @@ void PostProcessTransactionFunction::operator()(
     const aux::AuditData& auditData,
     const QnTransaction<T>& tran) const
 {
-    messageBus->sendTransaction(tran);
+    sendTransaction(messageBus, tran);
     aux::triggerNotification(auditData, tran);
 }
 

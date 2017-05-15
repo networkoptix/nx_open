@@ -5,6 +5,7 @@
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
 #include <common/common_module.h>
+#include <transaction/message_bus_selector.h>
 
 namespace ec2 {
 
@@ -182,7 +183,7 @@ int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServer(
     QSet<QnUuid> dstPeers;
     for (const auto& p : peers)
         dstPeers.insert(p.id);
-    messageBus->sendTransaction(transaction, dstPeers);
+    sendTransaction(messageBus, transaction, dstPeers);
 
     nx::utils::concurrent::run(Ec2ThreadPool::instance(),
         [handler, reqId]{ handler->done(reqId, ErrorCode::ok); });
@@ -210,7 +211,7 @@ int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServersList(
     QSet<QnUuid> dstPeers;
     for (const auto& p: peers)
         dstPeers.insert(p.id);
-    messageBus->sendTransaction(transaction, dstPeers);
+    sendTransaction(messageBus, transaction, dstPeers);
 
     nx::utils::concurrent::run(Ec2ThreadPool::instance(),
         [handler, reqId]{ handler->done(reqId, ErrorCode::ok); });

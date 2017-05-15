@@ -69,20 +69,6 @@ namespace ec2
         detail::QnDbManager* getDb() const { return m_db; }
         void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager);
 
-        template<class T>
-        void sendTransaction(const QnTransaction<T>& tran, const QnPeerSet& dstPeers = QnPeerSet())
-        {
-            if (auto p2pBus = dynamic_cast<P2pMessageBus*>(this))
-                p2pBus->sendTransaction<T>(tran, dstPeers);
-            else if (auto msgBus = dynamic_cast<QnTransactionMessageBus*>(this))
-                msgBus->sendTransaction<T>(tran, dstPeers);
-        }
-
-        template <class T>
-        void sendTransaction(const QnTransaction<T>& tran, const QnUuid& dstPeerId)
-        {
-            dstPeerId.isNull() ? sendTransaction(tran) : sendTransaction(tran, QnPeerSet() << dstPeerId);
-        }
     signals:
         void peerFound(ec2::ApiPeerData data);
         void peerLost(ec2::ApiPeerData data);

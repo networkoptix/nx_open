@@ -2,12 +2,11 @@
 
 #include <numeric>
 
-#include "transaction/transaction_message_bus.h"
+#include <transaction/message_bus_selector.h>
 #include "common/common_module.h"
 #include "utils/common/synctime.h"
 #include "utils/common/delete_later.h"
 #include "distributed_mutex_manager.h"
-
 
 namespace ec2
 {
@@ -55,7 +54,7 @@ void QnDistributedMutex::sendTransaction(const LockRuntimeInfo& lockInfo, ApiCom
     tran.params.timestamp = lockInfo.timestamp;
     if (m_owner->m_userDataHandler)
         tran.params.userData = m_owner->m_userDataHandler->getUserData(lockInfo.name);
-    m_owner->messageBus()->sendTransaction(tran, dstPeer);
+    ec2::sendTransaction(m_owner->messageBus(), tran, dstPeer);
 }
 
 void QnDistributedMutex::at_newPeerFound(ec2::ApiPeerData peer)

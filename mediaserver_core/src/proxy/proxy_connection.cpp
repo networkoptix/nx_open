@@ -15,8 +15,7 @@
 #include "network/tcp_listener.h"
 #include "network/universal_tcp_listener.h"
 #include "proxy_connection_processor_p.h"
-#include <transaction/transaction_message_bus.h>
-#include <transaction/p2p_message_bus.h>
+#include <transaction/message_bus_selector.h>
 
 #include <nx/network/socket.h>
 #include <nx/network/url/url_parse_helper.h>
@@ -149,7 +148,7 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
                     commonModule()->moduleGUID());
                 tran.params.targetServer = commonModule()->moduleGUID();
                 tran.params.socketCount = socketCount;
-                d->messageBus->sendTransaction(tran, target);
+                sendTransaction(d->messageBus, tran, target);
             });
     } else {
         d->dstSocket.clear();
