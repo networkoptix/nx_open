@@ -21,8 +21,6 @@ class LayoutTourDropPlaceholder: public Overlayed<Animated<QnFramedWidget>>
 public:
     LayoutTourDropPlaceholder(QGraphicsItem* parent = nullptr, Qt::WindowFlags windowFlags = 0);
 
-    virtual QRectF boundingRect() const override;
-
     const QRectF& rect() const;
     void setRect(const QRectF& rect);
 

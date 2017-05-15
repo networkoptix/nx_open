@@ -18,6 +18,10 @@
 
 namespace {
 
+static const qreal kTextOpacity = 0.7;
+static const qreal kFrameOpacity = 0.3;
+static const int kFixedTextWidth = 110; //< pixels
+
 void makeTransparentForMouse(QGraphicsItem* item)
 {
     item->setAcceptedMouseButtons(Qt::NoButton);
@@ -44,12 +48,11 @@ void setupLabel(QLabel* label)
 {
     label->setAlignment(Qt::AlignCenter);
     label->setWordWrap(true);
-    label->setFixedWidth(200);
+    label->setFixedWidth(kFixedTextWidth);
 }
 
 QColor calculateFrameColor(const QPalette& palette)
 {
-    static const qreal kFrameOpacity = 0.5;
     return toTransparent(palette.color(QPalette::WindowText), kFrameOpacity);
 }
 
@@ -97,23 +100,17 @@ LayoutTourDropPlaceholder::LayoutTourDropPlaceholder(
     horizontalLayout->addStretch(1);
 
     const auto verticalLayout = new QGraphicsLinearLayout(Qt::Vertical, m_widget);
-    verticalLayout->setContentsMargins(16, 60, 16, 60);
     verticalLayout->addStretch(1);
     verticalLayout->addItem(horizontalLayout);
     verticalLayout->addStretch(1);
 
-    m_widget->setOpacity(0.7);
+    m_widget->setOpacity(kTextOpacity);
     makeTransparentForMouse(m_widget);
     addOverlayWidget(m_widget, detail::OverlayParams(Visible));
 
     m_geometryAnimator->setTargetObject(this);
     m_geometryAnimator->setAccessor(new PropertyAccessor("geometry"));
     m_geometryAnimator->setTimeLimit(100);
-}
-
-QRectF LayoutTourDropPlaceholder::boundingRect() const
-{
-    return rect();
 }
 
 const QRectF& LayoutTourDropPlaceholder::rect() const
@@ -130,7 +127,7 @@ void LayoutTourDropPlaceholder::setRect(const QRectF& rect)
     m_rect = rect;
 
     m_geometryAnimator->pause();
-    m_geometryAnimator->setTargetValue(rect);
+    m_geometryAnimator->setTargetValue(m_rect);
     m_geometryAnimator->start();
 }
 

@@ -3,6 +3,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <ui/common/palette.h>
+#include <ui/workaround/sharp_pixmap_painting.h>
 
 #include <nx/utils/math/fuzzy.h>
 
@@ -226,8 +227,14 @@ void FramedBase::paintFrame(QPainter* painter, const QRectF& rect)
         }
 
         case Qn::RoundedRectangularFrame:
-            painter->drawRoundedRect(frameRect, m_roundingRadius, m_roundingRadius, Qt::AbsoluteSize);
+        {
+            paintSharp(painter, [this, &frameRect](QPainter* painter)
+                {
+                    painter->drawRoundedRect(frameRect, m_roundingRadius, m_roundingRadius,
+                        Qt::AbsoluteSize);
+                });
             break;
+        }
 
         case Qn::EllipticalFrame:
             painter->drawEllipse(frameRect);
