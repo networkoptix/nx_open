@@ -14,7 +14,7 @@ namespace ec2 {
 QString toString(const ::ec2::QnAbstractTransaction& tran)
 {
     return lm("seq %1, ts %2")
-        .arg(tran.persistentInfo.sequence).str(tran.persistentInfo.timestamp);
+        .arg(tran.persistentInfo.sequence).arg(tran.persistentInfo.timestamp);
 }
 
 TransactionLog::TransactionLog(
@@ -306,7 +306,7 @@ nx::db::DBResult TransactionLog::saveToDb(
         QnLog::EC2_TRAN_LOG,
         lm("systemId %1. Saving transaction %2 (%3, hash %4) to log")
             .arg(systemId).arg(::ec2::ApiCommand::toString(transaction.command))
-            .str(transaction).arg(transactionHash),
+            .arg(transaction).arg(transactionHash),
         cl_logDEBUG1);
 
     auto dbResult = m_transactionDataObject->insertOrReplaceTransaction(

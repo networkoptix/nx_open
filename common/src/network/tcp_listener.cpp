@@ -121,7 +121,7 @@ bool QnTcpListener::bindToLocalAddress()
         || !d->serverSocket->setRecvTimeout(kSocketAcceptTimeoutMs))
     {
         const auto errorMessage = lm("Error: Unable to bind and listen on %1: %2")
-            .strs(localAddress, SystemError::toString(lastError()));
+            .args(localAddress, SystemError::toString(lastError()));
 
         NX_LOGX(errorMessage, cl_logWARNING);
         qCritical() << errorMessage;
@@ -134,7 +134,7 @@ bool QnTcpListener::bindToLocalAddress()
         d->localPort = d->localEndpoint.port;
     }
 
-    NX_LOGX(lm("Server started at %1").str(localAddress), cl_logINFO);
+    NX_LOGX(lm("Server started at %1").arg(localAddress), cl_logINFO);
     return true;
 }
 

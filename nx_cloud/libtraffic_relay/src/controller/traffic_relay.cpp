@@ -27,7 +27,7 @@ void TrafficRelay::startRelaying(
     RelayConnectionData serverConnection)
 {
     NX_LOGX(lm("Starting relaying between %1 and %2")
-        .str(clientConnection.peerId).str(serverConnection.peerId),
+        .arg(clientConnection.peerId).arg(serverConnection.peerId),
         cl_logDEBUG2);
 
     RelaySession relaySession;
@@ -55,7 +55,7 @@ void TrafficRelay::onRelaySessionFinished(
         return;
 
     NX_LOGX(lm("Done relaying between %1 and %2")
-        .str(sessionIter->clientPeerId).str(sessionIter->serverPeerId),
+        .arg(sessionIter->clientPeerId).arg(sessionIter->serverPeerId),
         cl_logDEBUG2);
 
     m_relaySessions.erase(sessionIter);

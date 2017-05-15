@@ -50,7 +50,7 @@ MultipleServerSocket::~MultipleServerSocket()
 #define MultipleServerSocket_FORWARD_GET(NAME, TYPE)    \
     bool MultipleServerSocket::NAME(TYPE* value) const  \
     {                                                   \
-        TYPE firstValue;                                \
+        TYPE firstValue{};                              \
         bool firstValueFilled = false;                  \
         for (auto& socket: m_serverSockets)             \
         {                                               \

@@ -158,7 +158,7 @@ private:
 
         ASSERT_TRUE(m_testHttpServer.bindAndListen());
 
-        QUrl relayServerUrl(lm("http://%1/").str(m_testHttpServer.serverAddress()));
+        QUrl relayServerUrl(lm("http://%1/").arg(m_testHttpServer.serverAddress()));
         relayServerUrl.setUserName("server1.system1");
         m_connection = std::make_unique<detail::ReverseConnection>(relayServerUrl);
     }

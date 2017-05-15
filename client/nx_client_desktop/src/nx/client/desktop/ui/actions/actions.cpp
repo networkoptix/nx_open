@@ -413,7 +413,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | NoTarget | GlobalHotkey)
         .text(tr("Save Current Layout As.."))
         .shortcut(lit("Ctrl+Shift+S"))
-        .shortcut(lit("Ctrl+Alt+S"), Builder::Windows, true)
+        .shortcut(lit("Ctrl+Alt+S"), Builder::Windows, false)
         .autoRepeat(false)
         .condition(
             ConditionWrapper(new LoggedInCondition())
@@ -1363,10 +1363,19 @@ void initialize(Manager* manager, Action* root)
         .shortcut(lit("Alt+T"))
         .checkable()
         .autoRepeat(false)
-        .condition(
-            condition::treeNodeType(Qn::LayoutTourNode)
-            && ConditionWrapper(new ToggleTourCondition())
-        );
+        .condition(condition::tourIsRunning()
+            || (condition::treeNodeType(Qn::LayoutTourNode)
+                && ConditionWrapper(new ToggleTourCondition())));
+
+    factory(LayoutTourPrevStepAction)
+        .flags(GlobalHotkey)
+        .mode(DesktopMode)
+        .condition(condition::tourIsRunning());
+
+    factory(LayoutTourNextStepAction)
+        .flags(GlobalHotkey)
+        .mode(DesktopMode)
+        .condition(condition::tourIsRunning());
 
     factory(RemoveLayoutTourAction)
         .flags(Tree | NoTarget | IntentionallyAmbiguous)
