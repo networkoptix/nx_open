@@ -62,7 +62,8 @@ private:
 
     void paintPixmap(QPainter* painter, const QPixmap& pixmap);
 
-    void setStateTimer(QTimer* timer);
+    void scheduleChange(std::function<void()> callback, int delayMs);
+    void cancelScheduledChange();
 
     QPixmap generatePixmap(const QColor& background, const QColor& frame, const QPixmap& icon);
     void ensureImages();
@@ -79,7 +80,7 @@ private:
     HoverFocusProcessor* const m_toolTipHoverProcessor;
     SoftwareTriggerButton::State m_state = SoftwareTriggerButton::State::Default;
     QScopedPointer<QnBusyIndicatorGraphicsWidget> m_busyIndicator;
-    QPointer<QTimer> m_stateTimer = nullptr;
+    QPointer<QTimer> m_scheduledChangeTimer = nullptr;
     bool m_imagesDirty = false;
 
     QElapsedTimer m_animationTime;

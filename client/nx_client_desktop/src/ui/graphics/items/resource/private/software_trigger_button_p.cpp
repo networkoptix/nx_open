@@ -115,6 +115,7 @@ SoftwareTriggerButtonPrivate::SoftwareTriggerButtonPrivate(SoftwareTriggerButton
 
 SoftwareTriggerButtonPrivate::~SoftwareTriggerButtonPrivate()
 {
+    cancelScheduledChange();
 }
 
 QString SoftwareTriggerButtonPrivate::toolTip() const
@@ -259,7 +260,7 @@ void SoftwareTriggerButtonPrivate::setState(SoftwareTriggerButton::State state)
 
     m_state = state;
 
-    setStateTimer(nullptr);
+    cancelScheduledChange();
     m_busyIndicator.reset(nullptr);
 
     const auto setNormalState =
@@ -298,7 +299,7 @@ void SoftwareTriggerButtonPrivate::setState(SoftwareTriggerButton::State state)
                     m_busyIndicator->dots()->setDotSpacing(kBusyIndicatorDotSpacing);
                 };
 
-            setStateTimer(executeDelayedParented(showBusyIndicator, kBusyIndicatorDelayMs, this));
+            scheduleChange(showBusyIndicator, kBusyIndicatorDelayMs);
             break;
         }
 
@@ -311,7 +312,7 @@ void SoftwareTriggerButtonPrivate::setState(SoftwareTriggerButton::State state)
                 break;
             }
 
-            setStateTimer(executeDelayedParented(setNormalState, kNotificationDurationMs, this));
+            scheduleChange(setNormalState, kNotificationDurationMs);
             break;
         }
 
@@ -334,7 +335,7 @@ void SoftwareTriggerButtonPrivate::setState(SoftwareTriggerButton::State state)
                 }
             }
 
-            setStateTimer(executeDelayedParented(setNormalState, kNotificationDurationMs, this));
+            scheduleChange(setNormalState, kNotificationDurationMs);
             break;
         }
 
@@ -350,15 +351,21 @@ void SoftwareTriggerButtonPrivate::setState(SoftwareTriggerButton::State state)
         m_animationTime.start();
 }
 
-void SoftwareTriggerButtonPrivate::setStateTimer(QTimer* timer)
+void SoftwareTriggerButtonPrivate::scheduleChange(std::function<void()> callback, int delayMs)
 {
-    if (m_stateTimer)
+    if (m_scheduledChangeTimer)
     {
-        m_stateTimer->stop();
-        m_stateTimer->deleteLater();
+        m_scheduledChangeTimer->stop();
+        m_scheduledChangeTimer->deleteLater();
     }
 
-    m_stateTimer = timer;
+    if (callback)
+        m_scheduledChangeTimer = executeDelayedParented(callback, delayMs, this);
+}
+
+void SoftwareTriggerButtonPrivate::cancelScheduledChange()
+{
+    scheduleChange(std::function<void()>(), 0);
 }
 
 void SoftwareTriggerButtonPrivate::paint(QPainter* painter,
