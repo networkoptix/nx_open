@@ -24,7 +24,7 @@ namespace {
 /* Duration of success and failure notifications staying up: */
 static constexpr int kNotificationDurationMs = 1200;
 
-/* A short delay in kWaitingState before busy indicator appears: */
+/* A short delay in State::Waiting before busy indicator appears: */
 static constexpr int kBusyIndicatorDelayMs = 150;
 
 /* Geometric adjustments: */
@@ -86,7 +86,7 @@ SoftwareTriggerButtonPrivate::SoftwareTriggerButtonPrivate(SoftwareTriggerButton
         this, &SoftwareTriggerButtonPrivate::updateToolTipPosition);
 
     connect(main, &SoftwareTriggerButton::pressed, this,
-        [this]() { setState(SoftwareTriggerButton::kDefaultState); });
+        [this]() { setState(SoftwareTriggerButton::State::Default); });
 
     installEventHandler(main, QEvent::PaletteChange, this,
         [this]()
@@ -265,7 +265,7 @@ void SoftwareTriggerButtonPrivate::setState(SoftwareTriggerButton::State state)
     const auto setNormalState =
         [this]()
         {
-            setState(SoftwareTriggerButton::kDefaultState);
+            setState(SoftwareTriggerButton::State::Default);
         };
 
     Q_Q(SoftwareTriggerButton);
@@ -273,16 +273,16 @@ void SoftwareTriggerButtonPrivate::setState(SoftwareTriggerButton::State state)
 
     switch (m_state)
     {
-        case SoftwareTriggerButton::kDefaultState:
+        case SoftwareTriggerButton::State::Default:
             break;
 
-        case SoftwareTriggerButton::kWaitingState:
+        case SoftwareTriggerButton::State::Waiting:
         {
             if (m_prolonged)
             {
                 /* Immediately reset to normal for released prolonged triggers: */
                 if (!q->isPressed())
-                    m_state = SoftwareTriggerButton::kDefaultState;
+                    m_state = SoftwareTriggerButton::State::Default;
 
                 /* Don't show busy indicator for prolonged triggers. */
                 break;
@@ -302,12 +302,12 @@ void SoftwareTriggerButtonPrivate::setState(SoftwareTriggerButton::State state)
             break;
         }
 
-        case SoftwareTriggerButton::kSuccessState:
+        case SoftwareTriggerButton::State::Success:
         {
             if (m_prolonged)
             {
                 /* Immediately reset to normal for prolonged triggers: */
-                m_state = SoftwareTriggerButton::kDefaultState;
+                m_state = SoftwareTriggerButton::State::Default;
                 break;
             }
 
@@ -315,7 +315,7 @@ void SoftwareTriggerButtonPrivate::setState(SoftwareTriggerButton::State state)
             break;
         }
 
-        case SoftwareTriggerButton::kFailureState:
+        case SoftwareTriggerButton::State::Failure:
         {
             if (m_prolonged)
             {
@@ -346,7 +346,7 @@ void SoftwareTriggerButtonPrivate::setState(SoftwareTriggerButton::State state)
     }
 
     /* Restart animation timer for active prolonged trigger: */
-    if (m_prolonged && q->isPressed() && m_state == SoftwareTriggerButton::kDefaultState)
+    if (m_prolonged && q->isPressed() && m_state == SoftwareTriggerButton::State::Default)
         m_animationTime.start();
 }
 
@@ -368,8 +368,8 @@ void SoftwareTriggerButtonPrivate::paint(QPainter* painter,
 
     Q_Q(SoftwareTriggerButton);
     const auto effectiveState =
-        m_prolonged && q->isPressed() && m_state != SoftwareTriggerButton::kFailureState
-            ? SoftwareTriggerButton::kDefaultState
+        m_prolonged && q->isPressed() && m_state != SoftwareTriggerButton::State::Failure
+            ? SoftwareTriggerButton::State::Default
             : m_state;
 
     const auto currentOpacity =
@@ -385,7 +385,7 @@ void SoftwareTriggerButtonPrivate::paint(QPainter* painter,
 
     switch (effectiveState)
     {
-        case SoftwareTriggerButton::kDefaultState:
+        case SoftwareTriggerButton::State::Default:
         {
             q->SoftwareTriggerButton::base_type::paint(painter, option, widget);
             if (m_prolonged && q->isPressed())
@@ -396,19 +396,19 @@ void SoftwareTriggerButtonPrivate::paint(QPainter* painter,
             break;
         }
 
-        case SoftwareTriggerButton::kWaitingState:
+        case SoftwareTriggerButton::State::Waiting:
         {
             paintPixmapSharp(painter, m_waitingPixmap);
             break;
         }
 
-        case SoftwareTriggerButton::kSuccessState:
+        case SoftwareTriggerButton::State::Success:
         {
             paintPixmapSharp(painter, m_successPixmap); //< already with frame
             break;
         }
 
-        case SoftwareTriggerButton::kFailureState:
+        case SoftwareTriggerButton::State::Failure:
         {
             paintPixmapSharp(painter, m_failurePixmap);
             if (m_prolonged && !q->isPressed())

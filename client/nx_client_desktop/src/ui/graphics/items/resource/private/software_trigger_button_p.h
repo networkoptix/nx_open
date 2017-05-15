@@ -77,7 +77,7 @@ private:
 
     QnStyledTooltipWidget* const m_toolTip;
     HoverFocusProcessor* const m_toolTipHoverProcessor;
-    SoftwareTriggerButton::State m_state = SoftwareTriggerButton::kDefaultState;
+    SoftwareTriggerButton::State m_state = SoftwareTriggerButton::State::Default;
     QScopedPointer<QnBusyIndicatorGraphicsWidget> m_busyIndicator;
     QPointer<QTimer> m_stateTimer = nullptr;
     bool m_imagesDirty = false;
