@@ -98,14 +98,7 @@ angular.module('webadminApp')
                             $scope.settings.cloudEmail).then(successHandler,errorHandler);
                     }, cloudErrorHandler);
             }else{
-                console.error("this method is obsolete and do not work anymore");
-                /*
-                cloudAPI.disconnect( cloudSystemID, $scope.settings.cloudEmail, $scope.settings.cloudPassword).then(
-                    function(){
-                        //2. Save settings to local server
-                        mediaserver.clearCloudSystemCredentials().then(successHandler,errorHandler);
-                    }, cloudErrorHandler);
-                */
+                console.error("this method is obsolete and does not work anymore");
             }
         };
     });

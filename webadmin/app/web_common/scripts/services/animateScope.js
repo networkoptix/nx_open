@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('webadminApp')
+angular.module('nxCommon')
     .factory('animateScope', ['$q',function ($q) {
 
         var animations = [];
@@ -212,6 +212,14 @@ angular.module('webadminApp')
             },
             setScope:function(scope){
                 defaultScope = scope;
+            },
+            stopScope:function(scope){
+                var targetAnimation = _.find(animations,function(anim){ // Try to find,if there
+                    return anim.scope === scope && anim.value === value;
+                });
+                if(targetAnimation){
+                    targetAnimation.breakAnimation();
+                } 
             }
         };
     }]);

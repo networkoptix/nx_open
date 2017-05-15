@@ -5,6 +5,7 @@ angular.module('webadminApp')
         return {
             restrict: 'E',
             scope: {
+                canViewArchive: "=",
                 recordsProvider: '=',
                 positionProvider: '=',
                 playHandler: '=',
@@ -53,7 +54,8 @@ angular.module('webadminApp')
                  */
 
                 var debugEventsMode = Config.debug.chunksOnTimeline && Config.allowDebugMode;
-                scope.playbackNotSupported = window.jscd.mobile;
+
+                scope.disableVolume = Config.settingsConfig.disableVolume;
 
                 // !!! Read basic parameters, DOM elements and global objects for module
                 var viewport = element.find('.viewport');
@@ -160,7 +162,7 @@ angular.module('webadminApp')
                  */
 
                 function goToLive(force){
-                    timelineActions.goToLive(force);
+                    timelineActions.goToLive();
                     if(!scope.positionProvider.liveMode || force) {
                         scope.positionHandler(false);
                     }
@@ -435,14 +437,6 @@ angular.module('webadminApp')
                 if(scope.positionProvider) {
                     scope.playingTime = dateFormat(scope.positionProvider.playedPosition,timelineConfig.dateFormat + ' ' + timelineConfig.timeFormat);
                 }
-                if(scope.playbackNotSupported) {
-                    scope.$watch('positionProvider.playedPosition', function () {
-                        if(scope.positionProvider) {
-                            scope.playingTime = dateFormat(scope.positionProvider.playedPosition, timelineConfig.dateFormat + ' ' + timelineConfig.timeFormat);
-                        }
-                    });
-                }
-
                 scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
                     if(scope.recordsProvider) {
                         scope.recordsProvider.ready.then(initTimeline);// reinit timeline here
@@ -463,7 +457,7 @@ angular.module('webadminApp')
                 animateScope.setDuration(timelineConfig.animationDuration);
                 animateScope.setScope(scope);
                 animateScope.start(render);
-                scope.$on('$destroy', function() { animateScope.stop(); });
+                scope.$on('$destroy', function() { animateScope.stopScope(scope); });
             }
         };
     }]);

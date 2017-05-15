@@ -29,7 +29,7 @@ TimelineActions.prototype.setPositionProvider = function (positionProvider){
     this.positionProvider = positionProvider;
 };
 
-TimelineActions.prototype.goToLive = function(force){
+TimelineActions.prototype.goToLive = function(){
     var self = this;
     var moveDate = self.scaleManager.screenCoordinateToDate(1);
     self.animateScope.progress(self.scope, 'goingToLive' ).then(
