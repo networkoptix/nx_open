@@ -50,8 +50,8 @@ namespace ec2
         url = QUrl( url.toString( QUrl::RemovePath | QUrl::RemoveQuery ) + lit("/ec2/events") );
         QUrlQuery q;
         url.setQuery(q);
-        m_peerUrl = url;
-        m_connectionFactory->messageBus()->addConnectionToPeer(url);
+        m_peerId = m_queryProcessor->getId();
+        m_connectionFactory->messageBus()->addOutgoingConnectionToPeer(m_peerId, url);
     }
 
     void RemoteEC2Connection::stopReceivingNotifications()
@@ -59,7 +59,7 @@ namespace ec2
         base_type::stopReceivingNotifications();
         if (m_connectionFactory->messageBus())
         {
-            m_connectionFactory->messageBus()->removeConnectionFromPeer( m_peerUrl );
+            m_connectionFactory->messageBus()->removeOutgoingConnectionFromPeer(m_peerId);
             m_connectionFactory->messageBus()->removeHandler( notificationManager() );
         }
 

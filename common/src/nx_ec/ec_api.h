@@ -713,8 +713,8 @@ namespace ec2
         virtual void startReceivingNotifications() = 0;
         virtual void stopReceivingNotifications() = 0;
 
-        virtual void addRemotePeer(const QUrl& url) = 0;
-        virtual void deleteRemotePeer(const QUrl& url) = 0;
+        virtual void addRemotePeer(const QnUuid& id, const QUrl& _url) = 0;
+        virtual void deleteRemotePeer(const QnUuid& id) = 0;
 
         virtual Timestamp getTransactionLogTime() const = 0;
         virtual void setTransactionLogTime(Timestamp value) = 0;
@@ -810,8 +810,8 @@ namespace ec2
 
         void reverseConnectionRequested(const ec2::ApiReverseConnectionData& reverseConnetionData);
 
-        void remotePeerFound(const ec2::ApiPeerAliveData& data);
-        void remotePeerLost(const ec2::ApiPeerAliveData& data);
+        void remotePeerFound(const ec2::ApiPeerData& data);
+        void remotePeerLost(const ec2::ApiPeerData& data);
         void remotePeerUnauthorized(const QnUuid& id);
 
         void settingsChanged(ec2::ApiResourceParamDataList settings);

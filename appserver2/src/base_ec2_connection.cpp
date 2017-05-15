@@ -371,23 +371,19 @@ int BaseEc2Connection<QueryProcessorType>::restoreDatabaseAsync(
 }
 
 template<class QueryProcessorType>
-void BaseEc2Connection<QueryProcessorType>::addRemotePeer(const QUrl& _url)
+void BaseEc2Connection<QueryProcessorType>::addRemotePeer(const QnUuid& id, const QUrl& _url)
 {
     QUrl url(_url);
     url.setPath("/ec2/events");
     QUrlQuery q;
     url.setQuery(q);
-    m_connectionFactory->messageBus()->addConnectionToPeer(url);
+    m_connectionFactory->messageBus()->addOutgoingConnectionToPeer(id, url);
 }
 
 template<class QueryProcessorType>
-void BaseEc2Connection<QueryProcessorType>::deleteRemotePeer(const QUrl& _url)
+void BaseEc2Connection<QueryProcessorType>::deleteRemotePeer(const QnUuid& id)
 {
-    QUrl url(_url);
-    url.setPath("/ec2/events");
-    QUrlQuery q;
-    url.setQuery(q);
-    m_connectionFactory->messageBus()->removeConnectionFromPeer(url);
+    m_connectionFactory->messageBus()->removeOutgoingConnectionFromPeer (id);
 }
 
 template<class QueryProcessorType>

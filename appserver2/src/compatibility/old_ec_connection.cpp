@@ -201,11 +201,11 @@ namespace ec2
         return reqID;
     }
 
-    void OldEcConnection::addRemotePeer(const QUrl& /*url*/)
+    void OldEcConnection::addRemotePeer(const QnUuid& /*id*/, const QUrl& /*url*/)
     {
     }
 
-    void OldEcConnection::deleteRemotePeer(const QUrl& /*url*/)
+    void OldEcConnection::deleteRemotePeer(const QnUuid& /*id*/)
     {
     }
 
