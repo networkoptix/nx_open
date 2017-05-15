@@ -12,7 +12,20 @@ namespace cloud {
 
 static int s_cloudConnectTypeMask = (int)CloudConnectType::all;
 
-ConnectorFactory::CloudConnectors ConnectorFactory::createCloudConnectors(
+using namespace std::placeholders;
+
+ConnectorFactory::ConnectorFactory():
+    base_type(std::bind(&ConnectorFactory::defaultFunc, this, _1, _2, _3, _4))
+{
+}
+
+ConnectorFactory& ConnectorFactory::instance()
+{
+    static ConnectorFactory instance;
+    return instance;
+}
+
+CloudConnectors ConnectorFactory::defaultFunc(
     const AddressEntry& targetAddress,
     const nx::String& connectSessionId,
     const hpm::api::ConnectResponse& response,
@@ -49,25 +62,6 @@ ConnectorFactory::CloudConnectors ConnectorFactory::createCloudConnectors(
     return connectors;
 }
 
-static ConnectorFactory::FactoryFunc factoryFunc;
-
-std::unique_ptr<AbstractCrossNatConnector> 
-    ConnectorFactory::createCrossNatConnector(const AddressEntry& address)
-{
-    if (factoryFunc)
-        return factoryFunc(address);
-
-    return std::make_unique<CrossNatConnector>(address);
-}
-
-ConnectorFactory::FactoryFunc 
-    ConnectorFactory::setFactoryFunc(FactoryFunc newFactoryFunc)
-{
-    auto bak = std::move(factoryFunc);
-    factoryFunc = std::move(newFactoryFunc);
-    return bak;
-}
-
 void ConnectorFactory::setEnabledCloudConnectMask(int cloudConnectTypeMask)
 {
     s_cloudConnectTypeMask = cloudConnectTypeMask;
@@ -76,6 +70,25 @@ void ConnectorFactory::setEnabledCloudConnectMask(int cloudConnectTypeMask)
 int ConnectorFactory::getEnabledCloudConnectMask()
 {
     return s_cloudConnectTypeMask;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+CrossNatConnectorFactory::CrossNatConnectorFactory():
+    base_type(std::bind(&CrossNatConnectorFactory::defaultFunc, this, _1))
+{
+}
+
+CrossNatConnectorFactory& CrossNatConnectorFactory::instance()
+{
+    static CrossNatConnectorFactory instance;
+    return instance;
+}
+
+std::unique_ptr<AbstractCrossNatConnector> CrossNatConnectorFactory::defaultFunc(
+    const AddressEntry& address)
+{
+    return std::make_unique<CrossNatConnector>(address);
 }
 
 } // namespace cloud
