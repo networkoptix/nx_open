@@ -56,7 +56,7 @@ void MaintenanceManager::getTransactionLog(
         boost::none,
         boost::none,
         std::numeric_limits<int>::max(),
-        std::bind(&MaintenanceManager::onTransactionLogRead, this, 
+        std::bind(&MaintenanceManager::onTransactionLogRead, this,
             m_startedAsyncCallsCounter.getScopedIncrement(),
             systemId.systemId,
             _1, _2, _3, std::move(completionHandler)));
@@ -72,7 +72,7 @@ void MaintenanceManager::getStatistics(
             completionHandler = std::move(completionHandler)]()
         {
             data::Statistics statistics;
-            statistics.onlineServerCount = 
+            statistics.onlineServerCount =
                 (int)m_syncronizationEngine->connectionManager().getVmsConnectionCount();
             statistics.dbQueryStatistics =
                 m_dbInstanceController.statisticsCollector().getQueryStatistics();
@@ -95,7 +95,7 @@ void MaintenanceManager::onTransactionLogRead(
 {
     NX_LOGX(QnLog::EC2_TRAN_LOG,
         lm("system %1. Read %2 transactions. Result code %3")
-            .arg(systemId).arg(serializedTransactions.size()).arg(resultCode),
+            .arg(systemId).arg(serializedTransactions.size()).arg(api::toString(resultCode)),
         cl_logDEBUG1);
 
     NX_ASSERT(resultCode != api::ResultCode::partialContent);
