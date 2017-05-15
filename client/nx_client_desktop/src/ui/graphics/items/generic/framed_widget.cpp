@@ -186,73 +186,73 @@ void FramedBase::paintFrame(QPainter* painter, const QRectF& rect)
 
     switch (m_frameShape)
     {
-    case Qn::RectangularFrame:
-    {
-        QBrush frameBrush = this->frameBrush();
-        QBrush windowBrush = this->windowBrush();
-
-        /* For some reason this code works WAY faster than painter->drawRect(frameRect) */
-        qreal l = rect.left(), t = rect.top(), w = rect.width(), h = rect.height();
-        qreal fw = m_frameWidth;
-
-        if (m_frameBorders.testFlag(Qt::TopEdge))
+        case Qn::RectangularFrame:
         {
-            painter->fillRect(QRectF(l, t, w, fw), frameBrush);
-            t += fw;
-            h -= fw;
+            QBrush frameBrush = this->frameBrush();
+            QBrush windowBrush = this->windowBrush();
+
+            /* For some reason this code works WAY faster than painter->drawRect(frameRect) */
+            qreal l = rect.left(), t = rect.top(), w = rect.width(), h = rect.height();
+            qreal fw = m_frameWidth;
+
+            if (m_frameBorders.testFlag(Qt::TopEdge))
+            {
+                painter->fillRect(QRectF(l, t, w, fw), frameBrush);
+                t += fw;
+                h -= fw;
+            }
+
+            if (m_frameBorders.testFlag(Qt::BottomEdge))
+            {
+                h -= fw;
+                painter->fillRect(QRectF(l, t + h, w, fw), frameBrush);
+            }
+
+            if (m_frameBorders.testFlag(Qt::LeftEdge))
+            {
+                painter->fillRect(QRectF(l, t, fw, h), frameBrush);
+                l += fw;
+                w -= fw;
+            }
+
+            if (m_frameBorders.testFlag(Qt::RightEdge))
+            {
+                w -= fw;
+                painter->fillRect(QRectF(l + w, t, fw, h), frameBrush);
+            }
+
+            painter->fillRect(QRectF(l, t, w, h), windowBrush);
+            break;
         }
 
-        if (m_frameBorders.testFlag(Qt::BottomEdge))
+        case Qn::RoundedRectangularFrame:
+            painter->drawRoundedRect(frameRect, m_roundingRadius, m_roundingRadius, Qt::AbsoluteSize);
+            break;
+
+        case Qn::EllipticalFrame:
+            painter->drawEllipse(frameRect);
+            break;
+
+        case Qn::CustomFrame:
         {
-            h -= fw;
-            painter->fillRect(QRectF(l, t + h, w, fw), frameBrush);
+            QN_SCOPED_PAINTER_TRANSFORM_ROLLBACK(painter);
+
+            painter->translate(frameRect.topLeft());
+
+            const bool correctBoundWidth = !qFuzzyIsNull(m_customFramePathBoundingRect.width());
+            const bool correctBoundHeight = !qFuzzyIsNull(m_customFramePathBoundingRect.height());
+
+            static const qreal kDefaultScaleFactor = 1;
+            qreal sx = (correctBoundWidth ? frameRect.width() / m_customFramePathBoundingRect.width() : kDefaultScaleFactor);
+            qreal sy = (correctBoundHeight ? frameRect.height() / m_customFramePathBoundingRect.height() : kDefaultScaleFactor);
+            painter->scale(sx, sy);
+
+            painter->setPen(QPen(frameBrush(), m_frameWidth / ((sx + sy) / 2.0), m_frameStyle, Qt::SquareCap, Qt::MiterJoin));
+
+            painter->drawPath(m_customFramePath);
         }
 
-        if (m_frameBorders.testFlag(Qt::LeftEdge))
-        {
-            painter->fillRect(QRectF(l, t, fw, h), frameBrush);
-            l += fw;
-            w -= fw;
-        }
-
-        if (m_frameBorders.testFlag(Qt::RightEdge))
-        {
-            w -= fw;
-            painter->fillRect(QRectF(l + w, t, fw, h), frameBrush);
-        }
-
-        painter->fillRect(QRectF(l, t, w, h), windowBrush);
-        break;
-    }
-
-    case Qn::RoundedRectangularFrame:
-        painter->drawRoundedRect(frameRect, m_roundingRadius, m_roundingRadius, Qt::AbsoluteSize);
-        break;
-
-    case Qn::EllipticalFrame:
-        painter->drawEllipse(frameRect);
-        break;
-
-    case Qn::CustomFrame:
-    {
-        QN_SCOPED_PAINTER_TRANSFORM_ROLLBACK(painter);
-
-        painter->translate(frameRect.topLeft());
-
-        const bool correctBoundWidth  = !qFuzzyIsNull(m_customFramePathBoundingRect.width());
-        const bool correctBoundHeight = !qFuzzyIsNull(m_customFramePathBoundingRect.height());
-
-        static const qreal kDefaultScaleFactor = 1;
-        qreal sx = (correctBoundWidth  ? frameRect.width()  / m_customFramePathBoundingRect.width()  : kDefaultScaleFactor);
-        qreal sy = (correctBoundHeight ? frameRect.height() / m_customFramePathBoundingRect.height() : kDefaultScaleFactor);
-        painter->scale(sx, sy);
-
-        painter->setPen(QPen(frameBrush(), m_frameWidth / ((sx + sy) / 2.0), m_frameStyle, Qt::SquareCap, Qt::MiterJoin));
-
-        painter->drawPath(m_customFramePath);
-    }
-
-    default:
-        break;
+        default:
+            break;
     }
 }
