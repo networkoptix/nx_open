@@ -28,6 +28,10 @@ public:
 
     AnimationTimer* animationTimer() const;
     void setAnimationTimer(AnimationTimer* timer);
+
+protected:
+    virtual void changeEvent(QEvent* event) override;
+
 private:
     QRectF m_rect;
     QnViewportBoundWidget* m_widget;

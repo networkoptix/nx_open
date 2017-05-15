@@ -12,6 +12,8 @@
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
 
+#include <utils/math/color_transformations.h>
+
 #include <nx/utils/math/fuzzy.h>
 
 namespace {
@@ -45,6 +47,12 @@ void setupLabel(QLabel* label)
     label->setFixedWidth(200);
 }
 
+QColor calculateFrameColor(const QPalette& palette)
+{
+    static const qreal kFrameOpacity = 0.5;
+    return toTransparent(palette.color(QPalette::WindowText), kFrameOpacity);
+}
+
 } // namespace
 
 namespace nx {
@@ -62,11 +70,12 @@ LayoutTourDropPlaceholder::LayoutTourDropPlaceholder(
 {
     setAcceptedMouseButtons(0);
     setFrameShape(Qn::RoundedRectangularFrame);
-    setFrameStyle(Qt::DashLine);
-    setFrameBrush(Qt::darkGray); //TODO: #GDM #3.1 customize
+    setFrameStyle(Qt::CustomDashLine);
+    setDashPattern({10, 3});
     setFrameWidth(0); //< Cosmetic pen
     setRoundingRadius(50);
     setPaletteColor(this, QPalette::Window, Qt::transparent);
+    setFrameBrush(calculateFrameColor(palette()));
 
     const QString message = tr("Drag layout here to add it to the tour");
     auto caption = new QLabel(message);
@@ -133,6 +142,14 @@ AnimationTimer* LayoutTourDropPlaceholder::animationTimer() const
 void LayoutTourDropPlaceholder::setAnimationTimer(AnimationTimer* timer)
 {
     m_geometryAnimator->setTimer(timer);
+}
+
+void LayoutTourDropPlaceholder::changeEvent(QEvent* event)
+{
+    base_type::changeEvent(event);
+
+    if (event->type() == QEvent::PaletteChange)
+        setFrameBrush(calculateFrameColor(palette()));
 }
 
 } // namespace ui
