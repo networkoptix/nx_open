@@ -33,12 +33,14 @@ public:
     template<typename Value>
     Message arg(const Value& value, int width = 0, const QChar& fill = kSpace) const
     {
+        using ::toString;
         return m_str.arg(toString(value), width, fill);
     }
 
     template<typename ... Values>
     Message args(const Values& ... values) const
     {
+        using ::toString;
         return m_str.arg(toString(values) ...);
     }
 
@@ -46,6 +48,7 @@ public:
     template<typename ... Arguments>
     Message str(const Arguments& ... arguments) const
     {
+        using ::toString;
         return arg(toString(arguments ...));
     }
 
@@ -53,6 +56,7 @@ public:
     template<typename ... Values>
     Message strs(const Values& ... values) const
     {
+        using ::toString;
         return args(toString(values) ...);
     }
 
