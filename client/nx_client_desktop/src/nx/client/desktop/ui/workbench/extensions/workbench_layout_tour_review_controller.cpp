@@ -35,8 +35,6 @@ static const int kDefaultDelayMs = 5000;
 const QnUuid uuidPoolBase("44a18151-242e-430b-8b57-4c94691902f9");
 static const int kUuidsLimit = 16384;
 
-static const auto kMyTag = lit("__gdm");
-
 class PlaceholderMagnitudeCalculator: public QnDistanceMagnitudeCalculator
 {
     using base_type = QnDistanceMagnitudeCalculator;
@@ -55,8 +53,6 @@ protected:
         const auto baseValue = base_type::calculateInternal(value);
 
         const QPoint &p = *static_cast<const QPoint *>(value);
-        NX_DEBUG(kMyTag, lm("calculateInternal from %1 to %2: distance %3").args(m_origin, p, baseValue));
-
         if (p.x() < m_origin.x() || p.y() < m_origin.y())
             return baseValue * 10000;
         return baseValue;
@@ -110,11 +106,6 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
 
     connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
         &LayoutTourReviewController::startListeningLayout);
-
-    const auto logger = nx::utils::log::add({kMyTag});
-    logger->setDefaultLevel(nx::utils::log::Level::none);
-    logger->setWriter(std::make_unique<nx::utils::log::StdOut>());
-    NX_DEBUG(kMyTag, "Log __gdm initialized");
 }
 
 LayoutTourReviewController::~LayoutTourReviewController()
