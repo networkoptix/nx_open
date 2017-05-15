@@ -121,6 +121,8 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, HandlerType handler)
                 return;
             }
 
+            setPingTimeout(m_pingTimeout);
+
             bool queueEmpty = m_readQueue.empty();
             nx::Buffer* tmp = buffer;
             m_readQueue.emplace(std::move(handler), std::move(tmp));
@@ -140,6 +142,8 @@ void WebSocket::sendAsync(const nx::Buffer& buffer, HandlerType handler)
                 handler(SystemError::connectionAbort, 0);
                 return;
             }
+
+            setPingTimeout(m_pingTimeout);
 
             nx::Buffer writeBuffer;
             if (m_sendMode == SendMode::singleMessage)
@@ -171,6 +175,7 @@ void WebSocket::setPingTimeout(std::chrono::milliseconds timeout)
     dispatch(
         [this, timeout]()
         {
+            m_pingTimer->cancelSync();
             m_pingTimeout = timeout;
             m_pingTimer->start(m_pingTimeout, [this]() { handlePingTimer(); });
         });
