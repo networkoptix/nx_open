@@ -18,15 +18,18 @@ namespace ec2
         TimeSynchronizationManager* timeSyncManager):
         m_timeSyncManager(timeSyncManager)
     {
-        connect (timeSyncManager, &TimeSynchronizationManager::primaryTimeServerSelectionRequired,
-                 this, &QnTimeNotificationManager<QueryProcessorType>::timeServerSelectionRequired,
-                 Qt::DirectConnection );
-        connect (timeSyncManager, &TimeSynchronizationManager::timeChanged,
-                 this, &QnTimeNotificationManager<QueryProcessorType>::timeChanged,
-                 Qt::DirectConnection );
-        connect (timeSyncManager, &TimeSynchronizationManager::peerTimeChanged,
-                 this, &QnTimeNotificationManager<QueryProcessorType>::peerTimeChanged,
-                 Qt::DirectConnection );
+        if (m_timeSyncManager)
+        {
+            connect(timeSyncManager, &TimeSynchronizationManager::primaryTimeServerSelectionRequired,
+                this, &QnTimeNotificationManager<QueryProcessorType>::timeServerSelectionRequired,
+                Qt::DirectConnection);
+            connect(timeSyncManager, &TimeSynchronizationManager::timeChanged,
+                this, &QnTimeNotificationManager<QueryProcessorType>::timeChanged,
+                Qt::DirectConnection);
+            connect(timeSyncManager, &TimeSynchronizationManager::peerTimeChanged,
+                this, &QnTimeNotificationManager<QueryProcessorType>::peerTimeChanged,
+                Qt::DirectConnection);
+        }
     }
 
     template<typename QueryProcessorType>

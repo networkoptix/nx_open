@@ -58,7 +58,6 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
     {
         m_dbManager.reset(new detail::QnDbManager(commonModule));
         m_transactionLog.reset(new QnTransactionLog(m_dbManager.get(), m_ubjsonTranSerializer.get()));
-        m_serverQueryProcessor.reset(new ServerQueryProcessorAccess(m_dbManager.get(), m_bus.get()));
     }
 
     if (isP2pMode)
@@ -88,6 +87,9 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
         m_distributedMutexManager.reset(new QnDistributedMutexManager(messageBus));
     }
 
+    if (peerType == Qn::PT_Server)
+        m_serverQueryProcessor.reset(new ServerQueryProcessorAccess(m_dbManager.get(), m_bus.get()));
+
     if (m_dbManager)
     {
         m_dbManager->setTransactionLog(m_transactionLog.get());
@@ -111,7 +113,8 @@ Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
 {
     // Have to do it before m_transactionMessageBus destruction since TimeSynchronizationManager
     // uses QnTransactionMessageBus.
-    m_timeSynchronizationManager->pleaseStop();
+    if (m_timeSynchronizationManager)
+        m_timeSynchronizationManager->pleaseStop();
 
     pleaseStop();
     join();
@@ -1435,7 +1438,8 @@ int Ec2DirectConnectionFactory::establishDirectConnection(
                     url));
             if (m_directConnection->initialized())
             {
-                m_timeSynchronizationManager->start(m_directConnection);
+                if (m_timeSynchronizationManager)
+                    m_timeSynchronizationManager->start(m_directConnection);
             }
             else
             {
