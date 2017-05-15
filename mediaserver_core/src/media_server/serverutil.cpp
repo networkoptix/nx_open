@@ -32,7 +32,7 @@
 #include <core/resource_management/resource_properties.h>
 
 #include <nx/fusion/model_functions.h>
-#include <transaction/transaction_message_bus.h>
+#include <transaction/transaction_message_bus_base.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <network/authutil.h>
 
@@ -203,7 +203,7 @@ bool backupDatabase(std::shared_ptr<ec2::AbstractECConnection> connection)
     return true;
 }
 
-void dropConnectionsToRemotePeers(ec2::QnTransactionMessageBus* messageBus)
+void dropConnectionsToRemotePeers(ec2::QnTransactionMessageBusBase* messageBus)
 {
     if (QnServerConnector::instance())
         QnServerConnector::instance()->stop();
@@ -217,7 +217,7 @@ void resumeConnectionsToRemotePeers()
         QnServerConnector::instance()->start();
 }
 
-bool changeLocalSystemId(const ConfigureSystemData& data, ec2::QnTransactionMessageBus* messageBus)
+bool changeLocalSystemId(const ConfigureSystemData& data, ec2::QnTransactionMessageBusBase* messageBus)
 {
     const auto& commonModule = messageBus->commonModule();
     if (commonModule->globalSettings()->localSystemId() == data.localSystemId)

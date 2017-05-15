@@ -84,7 +84,10 @@ void QnServerConnector::at_moduleFinder_moduleChanged(const QnModuleInformation 
     }
 }
 
-void QnServerConnector::addConnection(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
+void QnServerConnector::addConnection(
+    const QnModuleInformation &moduleInformation,
+    const SocketAddress &address)
+{
     AddressInfo urlInfo;
 
     {
@@ -109,10 +112,11 @@ void QnServerConnector::addConnection(const QnModuleInformation &moduleInformati
     NX_LOG(lit("QnServerConnector: Adding connection to module %1. Url = %2").arg(moduleInformation.id.toString()).arg(urlInfo.urlString), cl_logINFO);
 
     ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
-    ec2Connection->addRemotePeer(urlInfo.urlString);
+    ec2Connection->addRemotePeer(moduleInformation.id, urlInfo.urlString);
 }
 
-void QnServerConnector::removeConnection(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
+void QnServerConnector::removeConnection(const QnModuleInformation &moduleInformation, const SocketAddress &address)
+{
     QnMutexLocker lock( &m_mutex );
     AddressInfo urlInfo = m_usedAddresses.take(address.toString());
     lock.unlock();
@@ -122,7 +126,7 @@ void QnServerConnector::removeConnection(const QnModuleInformation &moduleInform
     NX_LOG(lit("QnServerConnector: Removing connection from module %1. Url = %2").arg(moduleInformation.id.toString()).arg(urlInfo.urlString), cl_logINFO);
 
     ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
-    ec2Connection->deleteRemotePeer(urlInfo.urlString);
+    ec2Connection->deleteRemotePeer(moduleInformation.id);
 
     QnResourcePtr mServer = resourcePool()->getResourceById(moduleInformation.id);
     if (mServer && mServer->getStatus() == Qn::Unauthorized)

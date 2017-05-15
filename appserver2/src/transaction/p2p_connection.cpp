@@ -11,12 +11,8 @@
 #include <common/static_common_module.h>
 #include "transaction.h"
 #include <nx/network/http/buffer_source.h>
-
-namespace {
-
-    static const QnUuid kCloudPeerId(lit("674BAFD7-4EEC-4BBA-84AA-A1BAEA7FC6DB"));
-
-} // namespace
+#include "transaction_message_bus_base.h"
+#include "transaction_transport_base.h"
 
 namespace ec2 {
 

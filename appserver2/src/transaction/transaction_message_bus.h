@@ -122,7 +122,7 @@ public:
     */
     virtual QMap<QnUuid, ApiPeerData> aliveServerPeers() const override;
     virtual QMap<QnUuid, ApiPeerData> aliveClientPeers(int maxDistance = std::numeric_limits<int>::max()) const override;
-
+    virtual void dropConnections() override;
 signals:
 
     //!Emitted on a new direct connection to a remote peer has been established
@@ -133,7 +133,6 @@ signals:
     void gotLockResponse(ApiLockData);
 
     public slots:
-    void dropConnections();
     void reconnectAllPeers();
 
     /*

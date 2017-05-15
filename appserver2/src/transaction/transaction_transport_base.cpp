@@ -40,9 +40,8 @@ namespace {
     (all transactions that read with single read from socket)
 */
 static const int MAX_TRANS_TO_POST_AT_A_TIME = 16;
-static const QnUuid kCloudPeerId(lit("674BAFD7-4EEC-4BBA-84AA-A1BAEA7FC6DB"));
 
-}
+} // namespace
 
 namespace ec2
 {

@@ -37,6 +37,8 @@
 namespace ec2
 {
 
+static const QnUuid kCloudPeerId(lit("674BAFD7-4EEC-4BBA-84AA-A1BAEA7FC6DB"));
+
 namespace ConnectionType
 {
     enum Type

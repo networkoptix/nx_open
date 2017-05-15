@@ -110,7 +110,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     MergeSystemData, (json),
     (url)(getKey)(postKey)(takeRemoteSettings)(mergeOneServer)(ignoreIncompatible))
 
-QnMergeSystemsRestHandler::QnMergeSystemsRestHandler(ec2::QnTransactionMessageBus* messageBus):
+QnMergeSystemsRestHandler::QnMergeSystemsRestHandler(ec2::QnTransactionMessageBusBase* messageBus):
     QnJsonRestHandler(),
     m_messageBus(messageBus)
 {}

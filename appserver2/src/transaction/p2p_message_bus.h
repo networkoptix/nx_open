@@ -67,6 +67,7 @@ public:
     virtual QMap<QnUuid, ApiPeerData> aliveClientPeers(int maxDistance = std::numeric_limits<int>::max()) const override;
     virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
     virtual int distanceToPeer(const QnUuid& dstPeer) const override;
+    virtual void dropConnections() override;
 
     template<class T>
     void sendTransaction(const QnTransaction<T>& tran, const QnPeerSet& dstPeers = QnPeerSet())
@@ -181,7 +182,6 @@ private:
     void proxyFillerTransaction(const QnAbstractTransaction& tran);
     bool needSubscribeDelay();
     void connectSignals(const P2pConnectionPtr& connection);
-    void dropConnections();
     void resotreAfterDbError();
     bool selectAndSendTransactions(const P2pConnectionPtr& connection, QnTranState newSubscription);
     private slots:

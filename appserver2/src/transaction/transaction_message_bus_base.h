@@ -56,6 +56,9 @@ namespace ec2
         virtual void addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& url) = 0;
         virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) = 0;
 
+        virtual void dropConnections() = 0;
+
+
         void setHandler(ECConnectionNotificationManager* handler);
         void removeHandler(ECConnectionNotificationManager* handler);
 

@@ -147,10 +147,10 @@ private:
     void registerRestHandlers(
         CloudManagerGroup* const cloudManagerGroup,
         QnUniversalTcpListener* tcpListener,
-        ec2::QnTransactionMessageBus* messageBus);
+        ec2::QnTransactionMessageBusBase* messageBus);
     bool initTcpListener(
         CloudManagerGroup* const cloudManagerGroup,
-        ec2::QnTransactionMessageBus* messageBus);
+        ec2::QnTransactionMessageBusBase* messageBus);
     std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
     Qn::ServerFlags calcServerFlags();
     void initPublicIpDiscovery();

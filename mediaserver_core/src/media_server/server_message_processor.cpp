@@ -15,7 +15,7 @@
 #include <nx/utils/log/log.h>
 
 #include "serverutil.h"
-#include "transaction/transaction_message_bus.h"
+#include "transaction/transaction_message_bus_base.h"
 #include "business/business_message_bus.h"
 #include "settings.h"
 #include "nx_ec/data/api_conversion_functions.h"
@@ -127,39 +127,42 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
                   });
 }
 
-void QnServerMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {
+void QnServerMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection)
+{
     base_type::disconnectFromConnection(connection);
     connection->getUpdatesNotificationManager()->disconnect(this);
     connection->getMiscNotificationManager()->disconnect(this);
 }
 
-void QnServerMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data) {
-    base_type::handleRemotePeerFound(data);
-    QnResourcePtr res = resourcePool()->getResourceById(data.peer.id);
+void QnServerMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerData &peer)
+{
+    base_type::handleRemotePeerFound(peer);
+    QnResourcePtr res = resourcePool()->getResourceById(peer.id);
     if (res)
         res->setStatus(Qn::Online);
     else
-        m_delayedOnlineStatus << data.peer.id;
+        m_delayedOnlineStatus << peer.id;
 
     if (QnModuleFinder *moduleFinder = commonModule()->moduleFinder())
-        moduleFinder->setModuleStatus(data.peer.id, Qn::Online);
+        moduleFinder->setModuleStatus(peer.id, Qn::Online);
 }
 
-void QnServerMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data) {
-    base_type::handleRemotePeerLost(data);
-    QnResourcePtr res = resourcePool()->getResourceById(data.peer.id);
+void QnServerMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerData& peer)
+{
+    base_type::handleRemotePeerLost(peer);
+    QnResourcePtr res = resourcePool()->getResourceById(peer.id);
     if (res) {
         res->setStatus(Qn::Offline);
-        if (data.peer.peerType != Qn::PT_Server) {
+        if (peer.peerType != Qn::PT_Server) {
             // This server hasn't own DB
             for(const QnResourcePtr& camera: resourcePool()->getAllCameras(res))
                 camera->setStatus(Qn::Offline);
         }
     }
-    m_delayedOnlineStatus.remove(data.peer.id);
+    m_delayedOnlineStatus.remove(peer.id);
 
     if (QnModuleFinder *moduleFinder = commonModule()->moduleFinder())
-        moduleFinder->setModuleStatus(data.peer.id, Qn::Offline);
+        moduleFinder->setModuleStatus(peer.id, Qn::Offline);
 }
 
 void QnServerMessageProcessor::onResourceStatusChanged(
