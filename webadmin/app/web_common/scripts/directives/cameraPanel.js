@@ -1,5 +1,5 @@
 "use strict";
-angular.module('webadminApp')
+angular.module('nxCommon')
     .directive('cameraPanel', function () {
         return {
             restrict: 'E',

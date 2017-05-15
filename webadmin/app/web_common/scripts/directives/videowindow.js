@@ -18,7 +18,7 @@
  * playingSpeed - later
  *
  */
-angular.module('webadminApp')
+angular.module('nxCommon')
     .directive('videowindow', ['$interval','$timeout','animateScope', function ($interval,$timeout,animateScope) {
         return {
             restrict: 'E',

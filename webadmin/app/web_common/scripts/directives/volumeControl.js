@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('webadminApp')
+angular.module('nxCommon')
     .directive('volumeControl', function () {
         return{
         	restrict: 'E',
