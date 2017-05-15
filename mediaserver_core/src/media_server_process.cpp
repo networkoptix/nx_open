@@ -1579,7 +1579,29 @@ void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
     server->setProperty(Qn::PUBLIC_IP, m_ipDiscovery->publicIP().toString());
     server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
 
+    QFile hddList(Qn::HDD_LIST_FILE);
+    if (hddList.open(QFile::ReadOnly))
+    {
+        const auto content = QString::fromUtf8(hddList.readAll());
+        if (content.size())
+        {
+            auto hhds = content.split(lit("\n"), QString::SkipEmptyParts);
+            for (auto& hdd : hhds) hdd = hdd.trimmed();
+            server->setProperty(Qn::HDD_LIST, hhds.join(", "),
+                                QnResource::NO_ALLOW_EMPTY);
+        }
+    }
+
     server->saveParams();
+
+    #ifdef ENABLE_EXTENDED_STATISTICS
+        qnServerDb->setBookmarkCountController(
+            [server](size_t count)
+            {
+                server->setProperty(Qn::BOOKMARK_COUNT, QString::number(count));
+                server->saveParams();
+            });
+    #endif
 }
 
 void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
@@ -2691,28 +2713,6 @@ void MediaServerProcess::run()
         {
             m_mediaServer = server;
         }
-
-        #ifdef ENABLE_EXTENDED_STATISTICS
-            qnServerDb->setBookmarkCountController([server](size_t count){
-                server->setProperty(Qn::BOOKMARK_COUNT, QString::number(count));
-                server->saveParams();
-            });
-        #endif
-
-        QFile hddList(Qn::HDD_LIST_FILE);
-        if (hddList.open(QFile::ReadOnly))
-        {
-            const auto content = QString::fromUtf8(hddList.readAll());
-            if (content.size())
-            {
-                auto hhds = content.split(lit("\n"), QString::SkipEmptyParts);
-                for (auto& hdd : hhds) hdd = hdd.trimmed();
-                server->setProperty(Qn::HDD_LIST, hhds.join(", "),
-                                    QnResource::NO_ALLOW_EMPTY);
-            }
-        }
-
-        server->saveParams();
 
         if (m_mediaServer.isNull())
             QnSleep::msleep(1000);

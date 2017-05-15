@@ -1,0 +1,11 @@
+A rendszert megosztották Önnel
+
+{{#message.sharer_name}}
+{{message.sharer_name}} ({{message.sharer_email}}) megosztotta {{message.system_name}} rendszerét Önnel.
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
+Hozzáférést kapott {{message.system_name}} videó rendszerhez.
+{{/message.sharer_name}}
+
+Nyissa meg a rendszert: {{config.portal_url}}/rendszer/{{message.system_id}}

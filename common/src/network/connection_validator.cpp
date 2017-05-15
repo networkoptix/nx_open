@@ -15,6 +15,7 @@
 #include <api/global_settings.h>
 #include <network/system_helpers.h>
 #include <common/common_module_aware.h>
+#include <nx/network/app_info.h>
 
 namespace {
 
@@ -111,8 +112,8 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     if (!compatibleCustomization(customization, qnStaticCommon->customization(), isMobile))
         return Qn::IncompatibleInternalConnectionResult;
 
-    //if (!cloudHost.isEmpty() && cloudHost != nx::network::AppInfo::defaultCloudHost())
-    //    return Qn::IncompatibleCloudHostConnectionResult;
+    if (!cloudHost.isEmpty() && cloudHost != nx::network::AppInfo::defaultCloudHost())
+        return Qn::IncompatibleCloudHostConnectionResult;
 
     if (version < minSupportedVersion())
         return Qn::IncompatibleVersionConnectionResult;

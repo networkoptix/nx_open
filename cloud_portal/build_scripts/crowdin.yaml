@@ -1,0 +1,10 @@
+
+files:
+  -
+    source: '/**/*.*'
+    translation: '/translations/%locale_with_underscore%/**/%original_file_name%'
+    ignore:
+      - /crowdin.yaml
+      - /views/debug.html
+      - /views/static/eula.html
+      - /views/static/landing.html

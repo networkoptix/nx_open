@@ -264,12 +264,10 @@ range_end(const COLLECTION<Key, T> &x) {                                        
     return typename boost::range_const_iterator<COLLECTION<Key, T> >::type(x.end()); \
 }
 
-#ifndef QN_NO_QT
 QN_REGISTER_QT_STL_MAP_ITERATOR(QHash);
 QN_REGISTER_QT_STL_MAP_ITERATOR(QMultiHash);
 QN_REGISTER_QT_STL_MAP_ITERATOR(QMap);
 QN_REGISTER_QT_STL_MAP_ITERATOR(QMultiMap);
-#endif // QN_NO_QT
 #undef QN_REGISTER_QT_STL_MAP_ITERATOR
 
 #if 0

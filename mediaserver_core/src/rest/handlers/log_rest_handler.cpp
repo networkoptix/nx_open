@@ -53,7 +53,7 @@ int QnLogRestHandler::executeGet(
     if ((size_t) logId < QnLog::kAllLogs.size())
     {
         if (const auto logger = nx::utils::log::get(QnLog::kAllLogs[logId], /*allowMain*/ false))
-            logFilePath = logger->logFilePath();
+            logFilePath = logger->filePath();
     }
 
     if (!logFilePath)

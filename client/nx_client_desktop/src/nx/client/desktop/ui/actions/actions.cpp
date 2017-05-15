@@ -190,12 +190,12 @@ void initialize(Manager* manager, Action* root)
     factory(PtzActivatePresetAction)
         .flags(SingleTarget | WidgetTarget)
         .requiredTargetPermissions(Qn::WritePtzPermission)
-        .condition(new PtzCondition(Qn::PresetsPtzCapability, false));
+        .condition(new PtzCondition(Ptz::PresetsPtzCapability, false));
 
     factory(PtzActivateTourAction)
         .flags(SingleTarget | WidgetTarget)
         .requiredTargetPermissions(Qn::WritePtzPermission)
-        .condition(new PtzCondition(Qn::ToursPtzCapability, false));
+        .condition(new PtzCondition(Ptz::ToursPtzCapability, false));
 
     factory(PtzActivateObjectAction)
         .flags(SingleTarget | WidgetTarget)
@@ -934,7 +934,7 @@ void initialize(Manager* manager, Action* root)
         .childFactory(new PtzPresetsToursFactory(manager))
         .text(tr("PTZ.."))
         .requiredTargetPermissions(Qn::WritePtzPermission)
-        .condition(new PtzCondition(Qn::PresetsPtzCapability, false));
+        .condition(new PtzCondition(Ptz::PresetsPtzCapability, false));
 
     factory.beginSubMenu();
     {
@@ -944,14 +944,14 @@ void initialize(Manager* manager, Action* root)
             .flags(Scene | SingleTarget)
             .text(tr("Save Current Position.."))
             .requiredTargetPermissions(Qn::WritePtzPermission | Qn::SavePermission)
-            .condition(new PtzCondition(Qn::PresetsPtzCapability, true));
+            .condition(new PtzCondition(Ptz::PresetsPtzCapability, true));
 
         factory(PtzManageAction)
             .mode(DesktopMode)
             .flags(Scene | SingleTarget)
             .text(tr("Manage.."))
             .requiredTargetPermissions(Qn::WritePtzPermission | Qn::SavePermission)
-            .condition(new PtzCondition(Qn::ToursPtzCapability, false));
+            .condition(new PtzCondition(Ptz::ToursPtzCapability, false));
 
     } factory.endSubMenu();
 

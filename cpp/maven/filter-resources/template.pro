@@ -119,11 +119,13 @@ INCLUDEPATH +=  ${project.build.sourceDirectory} \
                 $$ROOT_DIR/common_libs/nx_streaming/src \
                 $$ROOT_DIR/common_libs/nx_media/src \
                 $$ROOT_DIR/common_libs/nx_audio/src \
+                ${packages.dir}/any/nx_kit/src \
                 $$clean_path("${libdir}")/include \
                 $$ADDITIONAL_QT_INCLUDES
 
 win* {
     DEFINES += \
+        NX_KIT_API=__declspec(dllimport) \
         NX_NETWORK_API=__declspec(dllimport) \
         NX_UTILS_API=__declspec(dllimport) \
         NX_FUSION_API=__declspec(dllimport) \
@@ -132,6 +134,7 @@ win* {
 
 } else {
     DEFINES += \
+        NX_KIT_API= \
         NX_NETWORK_API= \
         NX_UTILS_API= \
         NX_FUSION_API= \

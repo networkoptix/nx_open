@@ -30,7 +30,7 @@ from .host import Host
 MEDIASERVER_DIR = '/opt/{company_name}/mediaserver'
 MEDIASERVER_CONFIG_PATH = 'etc/mediaserver.conf'
 MEDIASERVER_CONFIG_PATH_INITIAL = 'etc/mediaserver.conf.initial'
-MEDIASERVER_CLOUDHOST_PATH = 'lib/libcommon.so'
+MEDIASERVER_CLOUDHOST_PATH = 'lib/libnx_network.so'
 MEDIASERVER_VAR_PATH = 'var'
 MEDIASERVER_STORAGE_PATH = 'var/data'
 MEDIASERVER_LOG_PATH = 'var/log/log_file.log'
@@ -349,6 +349,11 @@ class Server(object):
         if new_host == old_host:
             log.debug('Server binary %s at %s already has %r in it', path_to_patch, self.host, new_host)
             return
+        old_str_len =  len(MEDIASERVER_CLOUDHOST_TAG + ' ' + old_host)
+        old_padding = data[eidx : eidx + MEDIASERVER_CLOUDHOST_SIZE - old_str_len]
+        assert old_padding == '\0' * (MEDIASERVER_CLOUDHOST_SIZE - old_str_len), (
+            'Cloud host padding error: %d padding characters are expected, but got only %d' % (
+            MEDIASERVER_CLOUDHOST_SIZE - old_str_len, old_padding.rfind('\0') + 1))
         log.info('Patching %s at %s with new cloud host %r (was: %r)...', path_to_patch, self.host, new_host, old_host)
         new_str = MEDIASERVER_CLOUDHOST_TAG + ' ' + new_host
         assert len(new_str) < MEDIASERVER_CLOUDHOST_SIZE, 'Cloud host name is too long: %r' % new_host

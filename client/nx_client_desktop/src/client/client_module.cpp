@@ -38,7 +38,6 @@
 
 #include <cloud/cloud_connection.h>
 
-#include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource/client_camera_factory.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource/resource_directory_browser.h>
@@ -243,12 +242,6 @@ void QnClientModule::startLocalSearchers()
     commonModule->resourceDiscoveryManager()->start();
 }
 
-QnPtzControllerPool* QnClientModule::ptzControllerPool() const
-{
-    auto commonModule = m_clientCoreModule->commonModule();
-    return commonModule->instance<QnClientPtzControllerPool>();
-}
-
 QnNetworkProxyFactory* QnClientModule::networkProxyFactory() const
 {
     return m_networkProxyFactory;
@@ -327,7 +320,6 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->instance<QnLayoutTourManager>();
 
     commonModule->store(new QnVoiceSpectrumAnalyzer());
-    commonModule->instance<QnClientPtzControllerPool>();
 
     initializeStatisticsManager(commonModule);
 

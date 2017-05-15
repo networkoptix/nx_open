@@ -42,6 +42,7 @@
 #include <nx/mobile_client/settings/migration_helper.h>
 #include <nx/mobile_client/settings/settings_migration.h>
 #include <client_core/client_core_settings.h>
+#include <core/ptz/client_ptz_controller_pool.h>
 
 using namespace nx::mobile_client;
 
@@ -86,8 +87,6 @@ QnMobileClientModule::QnMobileClientModule(
 
     commonModule->instance<QnCameraHistoryPool>();
     commonModule->store(new QnMobileClientCameraFactory());
-
-
 
     auto userWatcher = commonModule->store(new QnUserWatcher());
 

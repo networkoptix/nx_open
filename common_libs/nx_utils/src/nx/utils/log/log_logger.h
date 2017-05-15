@@ -14,25 +14,27 @@ public:
     /** Initializes log with minimal level and writers, no writers means std out and err. */
     Logger(Level level = Level::none, std::unique_ptr<AbstractWriter> writer = nullptr);
 
-    /** Writes message to all writer if level <= log level or tar is present in exceptions. */
+    /** Writes message to every writer if it is to be logged. */
     void log(Level level, const QString& tag, const QString& message);
 
-    /** Indicates if is this logger going to log such message. */
+    /** Indicates whether this logger is going to log such a message. */
     bool isToBeLogged(Level level, const QString& tag = {});
 
-    Level defaultLevel();
+    /** Makes this logger log all messages with level <= defaultLevel. */
+    Level defaultLevel() const;
     void setDefaultLevel(Level level);
 
-    std::set<QString> exceptionFilters();
+    /** Makes this logger log all messages with tag starting with one of filters. */
+    std::set<QString> exceptionFilters() const;
     void setExceptionFilters(std::set<QString> filters);
 
     void setWriters(std::vector<std::unique_ptr<AbstractWriter>> writers = {});
     void setWriter(std::unique_ptr<AbstractWriter> writer);
 
-    boost::optional<QString> logFilePath();
+    boost::optional<QString> filePath() const;
 
 private:
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
     Level m_defaultLevel = Level::none;
     std::vector<std::unique_ptr<AbstractWriter>> m_writers;
     std::set<QString> m_exceptionFilters;

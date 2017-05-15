@@ -1,11 +1,8 @@
-#ifndef QN_FLAT_STORAGE_H
-#define QN_FLAT_STORAGE_H
+#pragma once
 
 #include <type_traits> /* For std::is_pointer. */
 
-#ifndef QN_NO_QT
-#   include <QtCore/QSet>
-#endif
+#include <QtCore/QSet>
 
 #include "flat_map.h"
 
@@ -47,5 +44,3 @@ private:
 private:
     QSet<T> m_owned;
 };
-
-#endif // QN_FLAT_STORAGE_H

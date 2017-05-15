@@ -35,7 +35,7 @@
 
 #define DEBUG_LOG(MESSAGE) do \
 { \
-    if (nx::network::SocketGlobals::debugConfig().sslSocketWrappers) \
+    if (nx::network::SocketGlobals::debugIni().sslSocketWrappers) \
         NX_LOGX(MESSAGE, cl_logDEBUG1); \
 } while (0)
 

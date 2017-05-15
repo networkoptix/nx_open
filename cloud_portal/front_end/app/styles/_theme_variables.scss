@@ -1,0 +1,148 @@
+$font-family-base:        "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+@import '_theme_palette';
+
+// Brand colors
+// -------------------------
+
+$brand-primary:         $brand_core;
+$brand-info:            $brand_l2;
+
+$gray-darker:            $dark7;     //~#222
+$gray-dark:              $dark11;    //~#333
+$gray:                   $dark17;    //~#555
+$gray-light:             $light11;   //~#999
+$gray-lighter:           $light3;    //~#EEE
+
+
+$body-bg:                 $light2;
+$navbar-default-bg:       $light1;
+$navbar-default-link-color: $dark10;
+$navbar-margin-bottom:    10px;
+$navbar-height:           56px;
+
+
+$common-border-color:   $light5;
+
+$dropdown-border:                         $common-border-color;
+$navbar-default-toggle-border-color:      $common-border-color;
+$nav-tabs-border-color:                   $common-border-color;
+$nav-tabs-active-link-hover-border-color: $common-border-color;
+$nav-tabs-justified-link-border-color:    $common-border-color;
+$pagination-border:                       $common-border-color;
+$pagination-hover-border:                 $common-border-color;
+$pagination-disabled-border:              $common-border-color;
+$list-group-border:                       $common-border-color;
+$panel-inner-border:                      $common-border-color;
+$panel-default-border:                    $common-border-color;
+$thumbnail-border:                        $common-border-color;
+$input-border:                            $common-border-color;
+$btn-default-border:                      $common-border-color;
+$navbar-default-border:                   $common-border-color;
+
+
+$nav-tabs-active-link-hover-bg:#fff;
+
+$table-border-color:          transparent;
+$modal-footer-border-color:   transparent;
+$modal-header-border-color:   transparent;
+$modal-content-border-color:  transparent;
+$panel-default-heading-bg:    transparent;
+
+
+$font-size-base:          14px;
+$font-size-large:         15px;
+$font-size-small:         13px;
+
+$font-size-h1:            22px;
+$font-size-h2:            20px;
+$font-size-h3:            18px;
+$font-size-h4:            16px;
+$font-size-h5:            $font-size-base; // 14px
+$font-size-h6:            12px;
+
+$btn-font-weight:         bold;
+$headings-font-weight:    lighter;
+
+$border-radius-base:      2px;
+$border-radius-large:     4px;
+$border-radius-small:     2px;
+
+
+$input-height-base:       32px;
+$input-bg:                $light1;
+$input-color:             $dark4;
+$input-border-focus:      $brand_core;
+$input-bg-disabled:       transparentize($light5,0.75);
+$cursor-disabled:           default;
+$padding-input-horizontal:  10px;
+
+
+$padding-base-horizontal:  16px;
+$padding-base-vertical:     5px;
+
+$btn-default-bg:            transparent;
+$button-primary-border:     $brand_d1;
+$jumbotron-bg:              transparent;
+
+
+$grid-gutter-width:       16px;
+
+$modal-sm:                  400px;
+
+$modal-backdrop-bg:         $dark9;
+$modal-backdrop-opacity:    0.1;
+$modal-content-bg:          $light1;
+$modal-title-line-height:   24px;
+$modal-title-padding:       16px;
+$modal-inner-padding:       16px;
+
+$form-group-margin-bottom:  12px;
+
+
+
+$state-success-text:             $green3;
+$state-success-bg:               $green2;
+$state-success-border:           $green1;
+
+
+
+$state-danger-text:       $error;
+$label-danger-bg:         $error;
+$label-default-bg:        $light8;
+
+/*
+$state-danger-bg:                $red2;
+$state-danger-border:            $red1;
+*/
+
+$alert-danger-bg:              $red2;
+$alert-danger-border:          $red1;
+$alert-danger-text:            $red3;
+
+
+
+$state-warning-text:             #8a6d3b !default;
+$state-warning-bg:               #fcf8e3 !default;
+$state-warning-border:           darken(adjust-hue($state-warning-bg, -10), 5%) !default;
+
+$state-info-text:              $brand_d4;
+$state-info-bg:                lighten($brand_l2, 20%);
+$state-info-border:            $brand_core;
+
+$table-bg-hover:              $light2;
+$table-cell-padding:          5px 16px 6px 16px;
+$link-color:                  $brand_d2;
+$link-hover-color:            $brand_core;
+
+$grid-float-breakpoint:       600px;
+$dialog-sm-float-breakpoint:     434px;
+
+$panel-body-padding:    16px;
+$panel-heading-padding: 16px;
+$panel-footer-padding: 16px;
+
+$navbar-default-link-active-bg: $navbar-default-bg;
+$navbar-padding-horizontal:   0;
+$navbar-padding-vertical:     0;
+$navbar-default-link-active-color: $brand_core;

@@ -83,6 +83,9 @@
         <libvms_gateway.guid>{76E39CFB-F504-428A-B67E-2544D4222E28}</libvms_gateway.guid>
         <vms_gateway.guid>{A2C631CB-073C-4F1A-9B47-63C52B68B71C}</vms_gateway.guid>
         <testcamera.guid>{f98dae04-4b22-4d73-b55a-038cfa0f3cfe}</testcamera.guid>
+        <libtraffic_relay.guid>{237676bc-45ea-43cf-a2c1-4048468d92a9}</libtraffic_relay.guid>
+        <traffic_relay.guid>{7f7104b2-1f99-4e4f-bff3-ad050eb0db8e}</traffic_relay.guid>
+        <nx_kit.guid>{5db17d17-17fe-4ebe-a14f-ffced5d2c09b}</nx_kit.guid>
 
         <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
@@ -174,6 +177,7 @@
         <libjpeg-turbo.version>1.4.2</libjpeg-turbo.version>
         <libcreateprocess.version>0.1</libcreateprocess.version>
         <vmux.version>1.0.0</vmux.version>
+        <cpro.version>1.0.0</cpro.version>
         <server-external.version>default</server-external.version>
         <help.version>${customization}-${release.version}</help.version>
         <gcc.version>4.9.4</gcc.version>
@@ -476,6 +480,7 @@
                 <module>nx_cloud/cloud_db_client</module>
                 <module>common_libs/nx_streaming</module>
                 <module>appserver2</module>
+                <module>nx_kit</module>
             </modules>
         </profile>
         <profile>
@@ -518,7 +523,7 @@
 
                 <!-- <module>plugins/axiscamplugin</module> -->
                 <!-- <module>storage_plugins/ftpstorageplugin</module> -->
-                <module>storage_plugins/teststorageplugin</module> 
+                <module>storage_plugins/teststorageplugin</module>
 
                 <!-- <module>mediaproxy</module> -->
             </modules>
@@ -639,7 +644,7 @@
             <properties>
                 <paxton>true</paxton>
             </properties>
-        </profile>        
+        </profile>
         <profile>
             <id>windows-nomobile</id>
             <activation>

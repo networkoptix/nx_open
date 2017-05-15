@@ -19,25 +19,25 @@ QnThirdPartyPtzController::QnThirdPartyPtzController(
 {
     const int ptzCapabilities = cameraPtzManager->getCapabilities();
     if( ptzCapabilities & nxcip::CameraPtzManager::ContinuousPanCapability )
-        m_capabilities |= Qn::ContinuousPanCapability;
+        m_capabilities |= Ptz::ContinuousPanCapability;
     if( ptzCapabilities & nxcip::CameraPtzManager::ContinuousTiltCapability )
-        m_capabilities |= Qn::ContinuousTiltCapability;
+        m_capabilities |= Ptz::ContinuousTiltCapability;
     if( ptzCapabilities & nxcip::CameraPtzManager::ContinuousZoomCapability )
-        m_capabilities |= Qn::ContinuousZoomCapability;
+        m_capabilities |= Ptz::ContinuousZoomCapability;
     if( ptzCapabilities & nxcip::CameraPtzManager::AbsolutePanCapability )
-        m_capabilities |= Qn::AbsolutePanCapability;
+        m_capabilities |= Ptz::AbsolutePanCapability;
     if( ptzCapabilities & nxcip::CameraPtzManager::AbsoluteTiltCapability )
-        m_capabilities |= Qn::AbsoluteTiltCapability;
+        m_capabilities |= Ptz::AbsoluteTiltCapability;
     if( ptzCapabilities & nxcip::CameraPtzManager::AbsoluteZoomCapability )
-        m_capabilities |= Qn::AbsoluteZoomCapability;
+        m_capabilities |= Ptz::AbsoluteZoomCapability;
     if( ptzCapabilities & nxcip::CameraPtzManager::FlipPtzCapability )
-        m_capabilities |= Qn::FlipPtzCapability;
+        m_capabilities |= Ptz::FlipPtzCapability;
     if( ptzCapabilities & nxcip::CameraPtzManager::LimitsPtzCapability )
-        m_capabilities |= Qn::LimitsPtzCapability;
+        m_capabilities |= Ptz::LimitsPtzCapability;
     if( ptzCapabilities & nxcip::CameraPtzManager::DevicePositioningPtzCapability )
-        m_capabilities |= Qn::DevicePositioningPtzCapability;
+        m_capabilities |= Ptz::DevicePositioningPtzCapability;
     if( ptzCapabilities & nxcip::CameraPtzManager::LogicalPositioningPtzCapability )
-        m_capabilities |= Qn::LogicalPositioningPtzCapability;
+        m_capabilities |= Ptz::LogicalPositioningPtzCapability;
 }
 
 QnThirdPartyPtzController::~QnThirdPartyPtzController()
@@ -46,7 +46,7 @@ QnThirdPartyPtzController::~QnThirdPartyPtzController()
     m_cameraPtzManager = nullptr;
 }
 
-Qn::PtzCapabilities QnThirdPartyPtzController::getCapabilities()
+Ptz::Capabilities QnThirdPartyPtzController::getCapabilities() const
 {
     return m_capabilities;
 }
@@ -64,7 +64,7 @@ bool QnThirdPartyPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const
         speed ) == nxcip::NX_NO_ERROR;
 }
 
-bool QnThirdPartyPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position)
+bool QnThirdPartyPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) const
 {
     double pan = 0, tilt = 0, zoom = 0;
     if( m_cameraPtzManager->getPosition(
@@ -78,13 +78,13 @@ bool QnThirdPartyPtzController::getPosition(Qn::PtzCoordinateSpace space, QVecto
     return true;
 }
 
-bool QnThirdPartyPtzController::getLimits(Qn::PtzCoordinateSpace /*space*/, QnPtzLimits* /*limits*/)
+bool QnThirdPartyPtzController::getLimits(Qn::PtzCoordinateSpace /*space*/, QnPtzLimits* /*limits*/) const
 {
     //TODO/IMPL
     return false;
 }
 
-bool QnThirdPartyPtzController::getFlip(Qt::Orientations* /*flip*/)
+bool QnThirdPartyPtzController::getFlip(Qt::Orientations* /*flip*/) const
 {
     //TODO/IMPL
     return false;

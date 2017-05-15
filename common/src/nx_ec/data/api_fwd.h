@@ -224,12 +224,10 @@ namespace ec2 {
     (ApiWebPageData)\
     (ApiDiscoveredServerData)\
 
-#ifndef QN_NO_BASE
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         QN_EC2_API_DATA_TYPES,
         (ubjson)(xml)(json)(sql_record)(csv_record)
     );
-#endif
 
 } // namespace ec2
 

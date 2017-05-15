@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment Id='FragmentNxtoolPackage'>
+        <PackageGroup Id="PaxtonPackageGroup">
+            <MsiPackage
+                Id="PaxtonPackage"
+                Name="$(var.PaxtonMsiName)"
+                SourceFile="bin/strip/$(var.PaxtonMsiName)"
+                Vital="yes"
+                Compressed="yes">
+                <MsiProperty Name="LICENSE_ALREADY_ACCEPTED" Value="1" />
+            </MsiPackage>
+        </PackageGroup>
+    </Fragment>
+</Wix>

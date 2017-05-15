@@ -530,6 +530,7 @@ void TimeSynchronizationManager::selectLocalTimeAsSynchronized(
     if (m_connection)
     {
         saveSyncTimeAsync(
+            lk,
             0,
             m_usedTimeSyncInfo.timePriorityKey);
     }
@@ -756,6 +757,7 @@ void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
     if (m_connection)
     {
         saveSyncTimeAsync(
+            lock,
             QDateTime::currentMSecsSinceEpoch() - curSyncTime,
             m_usedTimeSyncInfo.timePriorityKey);
     }
@@ -1489,6 +1491,15 @@ bool TimeSynchronizationManager::saveSyncTimeSync(
     return
         manager->saveMiscParamSync(deltaData) == ErrorCode::ok &&
         manager->saveMiscParamSync(priorityData) == ErrorCode::ok;
+}
+
+void TimeSynchronizationManager::saveSyncTimeAsync(
+    QnMutexLockerBase* const lk,
+    qint64 syncTimeToLocalDelta,
+    TimePriorityKey syncTimeKey)
+{
+    QnMutexUnlocker unlocker(lk);
+    saveSyncTimeAsync(syncTimeToLocalDelta, syncTimeKey);
 }
 
 /**

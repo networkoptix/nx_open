@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sequence>
+  <set resName="cdb" resValue="https://{{cloud_db_host}}:{{cloud_db_sport}}"/>
+  {% for host in connection_mediator_hosts %}
+  <set resName="hpm" resValue="stun://{{host}}:{{connection_mediator_port}}"/>
+  {% endfor %}
+  <set resName="notification_module" resValue="https://{{cloud_portal_host}}:{{cloud_portal_sport}}"/>
+</sequence>
