@@ -36,10 +36,8 @@ public:
     CrossNatConnector(
         const AddressEntry& targetPeerAddress,
         boost::optional<SocketAddress> mediatorAddress = boost::none);
-    virtual ~CrossNatConnector();
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
-    virtual void stopWhileInAioThread() override;
 
     virtual void connect(
         std::chrono::milliseconds timeout,
@@ -51,6 +49,7 @@ public:
     static utils::ResultCounter<nx::hpm::api::ResultCode>& mediatorResponseCounter();
 
 protected:
+    virtual void stopWhileInAioThread() override;
     virtual void messageReceived(
         SocketAddress sourceAddress,
         stun::Message msg) override;

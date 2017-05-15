@@ -1,8 +1,3 @@
-/**********************************************************
-* Jul 7, 2016
-* akolesnikov
-***********************************************************/
-
 #include "cross_nat_connector.h"
 
 #include <nx/fusion/serialization/lexical.h>
@@ -42,7 +37,7 @@ SystemError::ErrorCode mediatorResultToSysErrorCode(api::ResultCode resultCode)
 CrossNatConnector::CrossNatConnector(
     const AddressEntry& targetPeerAddress,
     boost::optional<SocketAddress> mediatorAddress)
-:
+    :
     m_targetPeerAddress(targetPeerAddress),
     m_connectSessionId(QnUuid::createUuid().toByteArray()),
     m_mediatorAddress(
@@ -61,25 +56,11 @@ CrossNatConnector::CrossNatConnector(
     m_timer->bindToAioThread(getAioThread());
 }
 
-CrossNatConnector::~CrossNatConnector()
-{
-    stopWhileInAioThread();
-}
-
 void CrossNatConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     AbstractCrossNatConnector::bindToAioThread(aioThread);
     m_mediatorUdpClient->bindToAioThread(aioThread);
     m_timer->bindToAioThread(aioThread);
-}
-
-void CrossNatConnector::stopWhileInAioThread()
-{
-    m_mediatorUdpClient.reset();
-    m_connectors.clear();
-    m_connectResultReportSender.reset();
-    m_connection.reset();
-    m_timer.reset();
 }
 
 void CrossNatConnector::connect(
@@ -118,6 +99,15 @@ void CrossNatConnector::replaceOriginatingHostAddress(const QString& address)
 utils::ResultCounter<nx::hpm::api::ResultCode>& CrossNatConnector::mediatorResponseCounter()
 {
     return s_mediatorResponseCounter;
+}
+
+void CrossNatConnector::stopWhileInAioThread()
+{
+    m_mediatorUdpClient.reset();
+    m_connectors.clear();
+    m_connectResultReportSender.reset();
+    m_connection.reset();
+    m_timer.reset();
 }
 
 void CrossNatConnector::messageReceived(
