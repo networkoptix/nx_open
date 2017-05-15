@@ -1508,4 +1508,28 @@ int P2pMessageBus::connectionTries() const
     return m_connectionTries;
 }
 
+QMap<QnUuid, ApiPeerData> P2pMessageBus::aliveServerPeers() const
+{
+    // todo: implement me
+    return QMap<QnUuid, ApiPeerData>();
+}
+
+QMap<QnUuid, ApiPeerData> P2pMessageBus::aliveClientPeers(int maxDistance) const
+{
+    // todo: implement me
+    return QMap<QnUuid, ApiPeerData>();
+}
+
+QnUuid P2pMessageBus::routeToPeerVia(const QnUuid& dstPeer, int* distance) const
+{
+    // todo: implement me
+    return QnUuid();
+}
+
+int P2pMessageBus::distanceToPeer(const QnUuid& dstPeer) const
+{
+    // todo: implement me
+    return 0;
+}
+
 } // ec2

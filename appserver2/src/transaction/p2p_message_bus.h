@@ -68,7 +68,6 @@ public:
     virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
     virtual int distanceToPeer(const QnUuid& dstPeer) const override;
 
-
     template<class T>
     void sendTransaction(const QnTransaction<T>& tran, const QnPeerSet& dstPeers = QnPeerSet())
     {
