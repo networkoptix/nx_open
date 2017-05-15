@@ -228,11 +228,9 @@ void FramedBase::paintFrame(QPainter* painter, const QRectF& rect)
 
         case Qn::RoundedRectangularFrame:
         {
-            paintSharp(painter, [this, &frameRect](QPainter* painter)
-                {
-                    painter->drawRoundedRect(frameRect, m_roundingRadius, m_roundingRadius,
-                        Qt::AbsoluteSize);
-                });
+            QnScopedPainterAntialiasingRollback rollback(painter, false);
+            painter->drawRoundedRect(frameRect, m_roundingRadius, m_roundingRadius,
+                Qt::AbsoluteSize);
             break;
         }
 
