@@ -13,6 +13,7 @@ namespace distributed_file_downloader {
 namespace {
 
 static const auto kNullGuid = QnUuid();
+static constexpr int kDefaultRequestTime = 50;
 
 } // namespace
 
@@ -131,7 +132,7 @@ rest::Handle TestPeerManager::requestFileInfo(
     if (!m_peers.contains(peerId))
         return 0;
 
-    return enqueueRequest(peerId,
+    return enqueueRequest(peerId, kDefaultRequestTime,
         [this, fileInfo = fileInformation(peerId, fileName), callback](rest::Handle handle)
         {
             callback(fileInfo.isValid(), handle, fileInfo);
@@ -149,7 +150,7 @@ rest::Handle TestPeerManager::requestChecksums(
     if (it == m_peers.end())
         return 0;
 
-    return enqueueRequest(peerId,
+    return enqueueRequest(peerId, kDefaultRequestTime,
         [this,
             fileInfo = fileInformation(peerId, fileName),
             storage = it->storage,
@@ -174,7 +175,7 @@ rest::Handle TestPeerManager::downloadChunk(
     if (!m_peers.contains(peerId))
         return 0;
 
-    return enqueueRequest(peerId,
+    return enqueueRequest(peerId, kDefaultRequestTime,
         [this,
             fileInfo = fileInformation(peerId, fileName),
             chunkIndex,
@@ -201,7 +202,7 @@ rest::Handle TestPeerManager::downloadChunkFromInternet(
     if (!m_peers.contains(peerId))
         return 0;
 
-    return enqueueRequest(peerId,
+    return enqueueRequest(peerId, kDefaultRequestTime,
         [this, peerId, fileUrl, chunkIndex, chunkSize, callback](rest::Handle handle)
         {
             if (!hasInternetConnection(peerId))
@@ -236,15 +237,26 @@ void TestPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle handle)
     m_requestsQueue.erase(it, m_requestsQueue.end());
 }
 
-void TestPeerManager::processRequests()
+void TestPeerManager::processNextRequest()
 {
-    QQueue<Request> callbacksQueue;
-    m_requestsQueue.swap(callbacksQueue);
+    if (m_requestsQueue.isEmpty())
+        return;
 
-    while (!callbacksQueue.isEmpty())
+    const auto& request = m_requestsQueue.dequeue();
+    m_currentTime = request.timeToReply;
+    request.callback(request.handle);
+}
+
+void TestPeerManager::exec(int maxRequests)
+{
+    for (;;)
     {
-        const auto& request = callbacksQueue.dequeue();
-        request.callback(request.handle);
+        processNextRequest();
+
+        if (maxRequests > 1)
+            --maxRequests;
+        else if (maxRequests == 1)
+            break;
     }
 }
 
@@ -253,15 +265,32 @@ const RequestCounter* TestPeerManager::requestCounter() const
     return &m_requestCounter;
 }
 
+void TestPeerManager::requestWait(const QnUuid& peerId, qint64 waitTime, WaitCallback callback)
+{
+    if (!m_peers.contains(peerId))
+        return;
+
+    enqueueRequest(peerId, waitTime, [this, callback](rest::Handle) { callback(); });
+}
+
 rest::Handle TestPeerManager::getRequestHandle()
 {
     return ++m_requestIndex;
 }
 
-rest::Handle TestPeerManager::enqueueRequest(const QnUuid& peerId, RequestCallback callback)
+rest::Handle TestPeerManager::enqueueRequest(
+    const QnUuid& peerId, qint64 time, RequestCallback callback)
 {
     const auto handle = getRequestHandle();
-    m_requestsQueue.enqueue(Request{peerId, handle, callback});
+    Request request{peerId, handle, callback, m_currentTime + time};
+
+    auto it = std::lower_bound(m_requestsQueue.begin(), m_requestsQueue.end(), request,
+        [](const Request& left, const Request& right)
+        {
+            return left.timeToReply < right.timeToReply;
+        });
+
+    m_requestsQueue.insert(it, request);
     return handle;
 }
 
@@ -332,6 +361,11 @@ void ProxyTestPeerManager::calculateDistances()
 const RequestCounter* ProxyTestPeerManager::requestCounter() const
 {
     return &m_requestCounter;
+}
+
+void ProxyTestPeerManager::requestWait(qint64 waitTime, TestPeerManager::WaitCallback callback)
+{
+    m_peerManager->requestWait(m_selfId, waitTime, callback);
 }
 
 QnUuid ProxyTestPeerManager::selfId() const

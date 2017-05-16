@@ -45,7 +45,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, invalidPeerRequest)
             called = true;
         });
 
-    peerManager->processRequests();
+    peerManager->processNextRequest();
 
     ASSERT_EQ(handle, 0);
     ASSERT_FALSE(called);
@@ -64,7 +64,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, cancellingRequest)
         });
 
     peerManager->cancelRequest(peer, handle);
-    peerManager->processRequests();
+    peerManager->processNextRequest();
 
     ASSERT_FALSE(called);
 }
@@ -85,7 +85,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, fileInfo)
             ok = success && fileInfo.name == fileInformation.name;
         });
 
-    peerManager->processRequests();
+    peerManager->processNextRequest();
 
     ASSERT_TRUE(ok);
 }
@@ -103,7 +103,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, emptyFileInfo)
         ok = !success && fileInfo.status == FileInformation::Status::notFound;
     });
 
-    peerManager->processRequests();
+    peerManager->processNextRequest();
 
     ASSERT_TRUE(ok);
 }
@@ -126,7 +126,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, invalidChunk)
             ok = success && !data.isEmpty();
         });
 
-    peerManager->processRequests();
+    peerManager->processNextRequest();
 
     ASSERT_FALSE(ok);
 }
@@ -159,7 +159,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, usingStorage)
             fileInfoReceived = success;
             fileInfo = peerFileInfo;
         });
-    peerManager->processRequests();
+    peerManager->processNextRequest();
 
     ASSERT_TRUE(fileInfoReceived);
     ASSERT_TRUE(fileInfo.isValid());
@@ -175,7 +175,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, usingStorage)
             chunkDownloaded = success;
             chunkData = data;
         });
-    peerManager->processRequests();
+    peerManager->processNextRequest();
 
     ASSERT_TRUE(chunkDownloaded);
     ASSERT_EQ(chunkData.size(), originalFileInfo.size);
@@ -189,7 +189,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, usingStorage)
             checksumsReceived = success;
             checksums = fileChecksums;
         });
-    peerManager->processRequests();
+    peerManager->processNextRequest();
 
     ASSERT_TRUE(checksumsReceived);
     ASSERT_EQ(checksums, originalChecksums);
@@ -217,7 +217,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, internetFile)
             chunkDownloaded = success;
             chunkData = data;
         });
-    peerManager->processRequests();
+    peerManager->processNextRequest();
 
     ASSERT_TRUE(chunkDownloaded);
     ASSERT_EQ(chunkData.size(), 1);

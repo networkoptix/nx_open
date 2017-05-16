@@ -71,9 +71,13 @@ public:
 
     void addInternetFile(const QUrl& url, const QString& fileName);
 
-    void processRequests();
+    void processNextRequest();
+    void exec(int maxRequests = 0);
 
     const RequestCounter* requestCounter() const;
+
+    using WaitCallback = std::function<void()>;
+    void requestWait(const QnUuid& peerId, qint64 waitTime, WaitCallback callback);
 
     // AbstractPeerManager implementation
     virtual QnUuid selfId() const override;
@@ -111,7 +115,7 @@ private:
     using RequestCallback = std::function<void(rest::Handle)>;
 
     rest::Handle getRequestHandle();
-    rest::Handle enqueueRequest(const QnUuid& peerId, RequestCallback callback);
+    rest::Handle enqueueRequest(const QnUuid& peerId, qint64 time, RequestCallback callback);
 
     static QByteArray readFileChunk(const FileInformation& fileInformation, int chunkIndex);
 
@@ -135,10 +139,11 @@ private:
         QnUuid peerId;
         rest::Handle handle;
         RequestCallback callback;
+        qint64 timeToReply;
     };
 
     QQueue<Request> m_requestsQueue;
-
+    qint64 m_currentTime = 0;
     RequestCounter m_requestCounter;
 };
 
@@ -152,6 +157,8 @@ public:
     void calculateDistances();
 
     const RequestCounter* requestCounter() const;
+
+    void requestWait(qint64 waitTime, TestPeerManager::WaitCallback callback);
 
     // AbstractPeerManager implementation
     virtual QnUuid selfId() const override;

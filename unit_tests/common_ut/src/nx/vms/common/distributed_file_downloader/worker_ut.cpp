@@ -43,16 +43,18 @@ public:
 
     virtual void waitForNextStep(int delay) override
     {
-        if (m_insideStep || delay >= -1) // -1 is the default value
+        if (delay == -1)
+            delay = defaultStepDelay();
+
+        if (delay > 0)
+        {
+            static_cast<ProxyTestPeerManager*>(peerManager())->requestWait(
+                delay, [this] { Worker::waitForNextStep(0); });
             return;
+        }
 
-        m_insideStep = true;
         Worker::waitForNextStep(0);
-        m_insideStep = false;
     }
-
-private:
-    bool m_insideStep = false;
 };
 
 class DistributedFileDownloaderWorkerTest: public ::testing::Test
@@ -142,24 +144,6 @@ protected:
     {
         const auto peerId = commonPeerManager->addPeer();
         commonPeerManager->setFileInformation(peerId, fileInformation);
-    }
-
-    void nextStep()
-    {
-        NX_LOG(lm("Step %1").arg(step), cl_logDEBUG2);
-
-        for (const auto& peer: peerById)
-        {
-            const auto state = peer->worker->state();
-            if (state == Worker::State::finished || state == Worker::State::failed)
-                continue;
-
-            peer->worker->waitForNextStep(-2);
-        }
-
-        commonPeerManager->processRequests();
-
-        ++step;
     }
 
     QDir workingDirectory;
@@ -280,7 +264,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, requestingFileInfo)
     defaultPeer->storage->addFile(fileInfo.name);
 
     defaultPeer->worker->start();
-    nextStep();
+    commonPeerManager->exec(2); //< Wait request, file info request.
 
     const auto& newFileInfo = defaultPeer->storage->fileInformation(fileInfo.name);
     ASSERT_TRUE(newFileInfo.isValid());
@@ -302,12 +286,9 @@ TEST_F(DistributedFileDownloaderWorkerTest, simpleDownload)
     QObject::connect(defaultPeer->worker, &Worker::finished, [&finished] { finished = true; });
 
     defaultPeer->worker->start();
-    nextStep();
 
-    const int maxSteps = fileInfo.downloadedChunks.size() + 4;
-
-    for (int i = 0; i < maxSteps && !finished; ++i)
-        nextStep();
+    const int maxRequests = fileInfo.downloadedChunks.size() + 4;
+    commonPeerManager->exec(maxRequests);
 
     ASSERT_TRUE(finished);
 
@@ -344,12 +325,9 @@ TEST_F(DistributedFileDownloaderWorkerTest, corruptedFile)
         });
 
     defaultPeer->worker->start();
-    nextStep();
 
-    const int maxSteps = fileInfo.downloadedChunks.size() + 8;
-
-    for (int i = 0; i < maxSteps && !finished; ++i)
-        nextStep();
+    const int maxRequests = fileInfo.downloadedChunks.size() + 8;
+    commonPeerManager->exec(maxRequests);
 
     ASSERT_TRUE(wasCorrupted);
     ASSERT_TRUE(finished);
@@ -374,12 +352,9 @@ TEST_F(DistributedFileDownloaderWorkerTest, simpleDownloadFromInternet)
     QObject::connect(defaultPeer->worker, &Worker::finished, [&finished] { finished = true; });
 
     defaultPeer->worker->start();
-    nextStep();
 
-    const int maxSteps = fileInfo.downloadedChunks.size() + 4;
-
-    for (int i = 0; i < maxSteps && !finished; ++i)
-        nextStep();
+    const int maxRequests = fileInfo.downloadedChunks.size() + 4;
+    commonPeerManager->exec(maxRequests);
 
     ASSERT_TRUE(finished);
 
@@ -436,7 +411,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadFlatNetwork)
 
     do
     {
-        nextStep();
+        commonPeerManager->processNextRequest();
     } while (!pendingPeers.isEmpty()
         && commonPeerManager->requestCounter()->totalRequests() < maxRequests);
 

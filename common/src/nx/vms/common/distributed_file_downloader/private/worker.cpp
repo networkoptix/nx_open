@@ -924,6 +924,16 @@ void Worker::setPrintSelfPeerInLogs()
     m_printSelfPeerInLogs = true;
 }
 
+qint64 Worker::defaultStepDelay()
+{
+    return kDefaultStepDelayMs;
+}
+
+AbstractPeerManager*Worker::peerManager() const
+{
+    return m_peerManager;
+}
+
 void Worker::PeerInformation::increaseRank(int value)
 {
     rank = qBound(kMinAutoRank, rank + value, kMaxAutoRank);

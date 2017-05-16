@@ -110,6 +110,8 @@ protected:
     void decreasePeerRank(const QnUuid& peerId, int value = 1);
 
     void setPrintSelfPeerInLogs();
+    static qint64 defaultStepDelay();
+    AbstractPeerManager* peerManager() const;
 
 private:
     Storage* m_storage;
