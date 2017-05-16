@@ -327,8 +327,13 @@ void WebSocket::sendControlResponse(FrameType requestType, FrameType responseTyp
     sendPreparedMessage(
         &responseFrame,
         writeSize,
-        [this, requestType](SystemError::ErrorCode, size_t)
+        [this, requestType](SystemError::ErrorCode ecode, size_t)
         {
+            if (ecode != SystemError::noError)
+            {
+                m_lastError = Error::connectionAbort;
+                return;
+            }
             NX_LOG(lit("[WebSocket] control response for %1 successfully sent")
                 .arg(frameTypeString(requestType)), cl_logDEBUG2);
         });
@@ -341,8 +346,13 @@ void WebSocket::sendControlRequest(FrameType type)
     sendPreparedMessage(
         &requestFrame,
         0,
-        [this, type](SystemError::ErrorCode, size_t)
+        [this, type](SystemError::ErrorCode ecode, size_t)
         {
+            if (ecode != SystemError::noError)
+            {
+                m_lastError = Error::connectionAbort;
+                return;
+            }
             NX_LOG(lit("[WebSocket] control request %1 successfully sent")
                 .arg(frameTypeString(type)), cl_logDEBUG2);
         });
