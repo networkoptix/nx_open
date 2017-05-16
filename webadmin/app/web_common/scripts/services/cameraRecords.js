@@ -1,18 +1,18 @@
 'use strict';
 
-angular.module('webadminApp')
-    .factory('cameraRecords', function (mediaserver,$q) {
+angular.module('nxCommon')
+    .factory('cameraRecords', function ($q) {
         var lastRecordProvider = null;
         var lastPositionProvider = null;
         return {
-            getRecordsProvider:function(cameras,width,timeCorrection){
+            getRecordsProvider:function(cameras,mediaserver,width,timeCorrection){
                 if(lastRecordProvider){
                     lastRecordProvider.abort("getRecordsProvider");
                 }
                 lastRecordProvider = new CameraRecordsProvider(cameras,mediaserver,$q,width,timeCorrection);
                 return lastRecordProvider;
             },
-            getPositionProvider:function(cameras,timeCorrection){
+            getPositionProvider:function(cameras,mediaserver,timeCorrection){
                 if(lastPositionProvider){
                     lastPositionProvider.abort("getPositionProvider");
                 }

@@ -294,7 +294,7 @@ namespace ec2
         {
             m_timerCycle = kInitialTimerCycle;
             NX_LOGX(lm("Statistics report successfully sent to %1")
-                .str(httpClient->url()), cl_logINFO);
+                .arg(httpClient->url()), cl_logINFO);
 
             const auto now = qnSyncTime->currentDateTime().toUTC();
             m_plannedReportTime = boost::none;
@@ -311,7 +311,7 @@ namespace ec2
                 m_timerCycle = kMaxTimerCycle;
 
             NX_LOGX(lm("doPost to %1 has failed, update timer cycle to %2")
-                .str(httpClient->url()).arg(m_timerCycle), cl_logWARNING);
+                .arg(httpClient->url()).arg(m_timerCycle), cl_logWARNING);
         }
 
         setupTimer();

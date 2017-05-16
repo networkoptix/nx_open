@@ -8,16 +8,16 @@ namespace utils {
 /** Change to see more or less records at the end of execution */
 static const size_t kShowTheMostCount(30);
 
-static std::function<void(const QnLogMessage&)> g_onAssertHandler;
+static std::function<void(const log::Message&)> g_onAssertHandler;
 
-void logAssert(const QnLogMessage& message)
+void logAssert(const log::Message& message)
 {
     NX_LOG(message, cl_logERROR);
     if (g_onAssertHandler)
         g_onAssertHandler(message);
 }
 
-void setOnAssertHandler(std::function<void(const QnLogMessage&)> handler)
+void setOnAssertHandler(std::function<void(const log::Message&)> handler)
 {
     g_onAssertHandler = std::move(handler);
 }

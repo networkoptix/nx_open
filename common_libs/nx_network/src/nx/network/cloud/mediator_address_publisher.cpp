@@ -88,7 +88,7 @@ void MediatorAddressPublisher::publishAddressesIfNeeded()
         [this, addresses = m_serverAddresses](nx::hpm::api::ResultCode resultCode)
         {
             NX_LOGX(lm("Publish addresses (%1) completed with result %2")
-                .container(m_publishedAddresses).str(resultCode), cl_logDEBUG1);
+                .container(m_publishedAddresses).arg(resultCode), cl_logDEBUG1);
 
             m_isRequestInProgress = false;
 

@@ -650,7 +650,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     std::ostringstream ss;
     ss<<"C:\\tmp\\12\\in."<<fileIndex;
     m_inStreamFile.open( ss.str(), std::ios_base::binary );
-    ss.str(std::string());
+    ss.arg(std::string());
     ss<<"C:\\tmp\\12\\out."<<fileIndex;
     m_outStreamFile.open( ss.str(), std::ios_base::binary );
 #endif

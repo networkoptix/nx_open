@@ -27,7 +27,7 @@
 #define TIMER_DEBUG_LOG(MESSAGE) do \
 { \
     if (nx::network::SocketGlobals::debugConfig().moduleFinders) \
-        NX_LOGX(lm("at_checkTimer_timeout %1").str(MESSAGE), cl_logDEBUG1); \
+        NX_LOGX(lm("at_checkTimer_timeout %1").arg(MESSAGE), cl_logDEBUG1); \
 } while (0)
 
 using std::chrono::duration_cast;

@@ -291,7 +291,7 @@ BufferType AsyncClient::fetchMessageBodyBuffer()
 {
     const auto buffer = m_httpStreamReader.fetchMessageBody();
     if (logTraffic())
-        NX_LOGX(lm("Response message body buffer:\n%1\n\n").str(buffer), cl_logDEBUG2);
+        NX_LOGX(lm("Response message body buffer:\n%1\n\n").arg(buffer), cl_logDEBUG2);
 
     return buffer;
 }
@@ -402,7 +402,7 @@ void AsyncClient::stopWhileInAioThread()
 void AsyncClient::asyncConnectDone(SystemError::ErrorCode errorCode)
 {
     NX_LOGX(lm("Opened connection to url %1. Result code %2")
-        .arg(m_contentLocationUrl).str(errorCode), cl_logDEBUG2);
+        .arg(m_contentLocationUrl).arg(errorCode), cl_logDEBUG2);
 
     if (m_terminated)
         return;
@@ -478,7 +478,7 @@ void AsyncClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t bytesWr
 
     NX_LOGX(lm("Request has been successfully sent to %1: %2")
         .arg(m_contentLocationUrl)
-        .strs(logTraffic() ? request().toString() : request().requestLine.toString()),
+        .args(logTraffic() ? request().toString() : request().requestLine.toString()),
         cl_logDEBUG2);
 
     const auto requestSequenceBak = m_requestSequence;
@@ -633,7 +633,7 @@ void AsyncClient::initiateTcpConnection()
     m_socket = SocketFactory::createStreamSocket(m_contentLocationUrl.scheme() == lm("https"));
 
     NX_LOGX(lm("Opening connection to %1. url %2, socket %3")
-        .str(remoteAddress).arg(m_contentLocationUrl).arg(m_socket->handle()), cl_logDEBUG2);
+        .arg(remoteAddress).arg(m_contentLocationUrl).arg(m_socket->handle()), cl_logDEBUG2);
 
     m_socket->bindToAioThread(getAioThread());
     m_connectionClosed = false;
@@ -822,7 +822,7 @@ AsyncClient::Result AsyncClient::processResponseHeadersBytes(
 
     NX_LOGX(lm("Response from %1 has been successfully read: %2")
         .arg(m_contentLocationUrl)
-        .str(logTraffic() ? response()->toString() : response()->statusLine.toString()),
+        .arg(logTraffic() ? response()->toString() : response()->statusLine.toString()),
         cl_logDEBUG2);
 
     if (repeatRequestIfNeeded(*m_httpStreamReader.message().response))
@@ -904,7 +904,7 @@ bool AsyncClient::isMalformed(const nx_http::Response& response) const
         {
             NX_LOGX(lm("Received malformed response from %1. "
                 "Status code is %2 and no Upgrade header present")
-                .arg(m_contentLocationUrl).str(response.statusLine.statusCode),
+                .arg(m_contentLocationUrl).arg(response.statusLine.statusCode),
                 cl_logDEBUG1);
             return true;
         }

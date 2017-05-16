@@ -75,7 +75,7 @@ int TimeServerProcess::exec()
         {
             const auto sysErrorCode = SystemError::getLastOSErrorCode();
             NX_LOGX(lm("Failed to bind to local endpoint %1. %2")
-                .str(timeProtocolServerEndpoint)
+                .arg(timeProtocolServerEndpoint)
                 .arg(SystemError::toString(sysErrorCode)),
                 cl_logERROR);
             return 1;
@@ -87,14 +87,14 @@ int TimeServerProcess::exec()
         {
             const auto sysErrorCode = SystemError::getLastOSErrorCode();
             NX_LOGX(lm("Failed to listen to local endpoint %1. %2")
-                .str(timeProtocolServer.address())
+                .arg(timeProtocolServer.address())
                 .arg(SystemError::toString(sysErrorCode)),
                 cl_logERROR);
             return 2;
         }
 
         NX_LOGX(lm("Serving time protocol (rfc868) on %1")
-            .str(timeProtocolServer.address()), 
+            .arg(timeProtocolServer.address()), 
             cl_logALWAYS);
 
         // Initialization succeeded.

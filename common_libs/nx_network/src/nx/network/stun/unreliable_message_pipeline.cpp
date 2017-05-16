@@ -38,7 +38,7 @@ SocketAddress DatagramPipeline::address() const
 void DatagramPipeline::startReceivingMessages()
 {
     NX_LOGX(lm("startReceivingMessages. fd %1. local address %2")
-        .arg(m_socket->handle()).str(m_socket->getLocalAddress()), cl_logDEBUG2);
+        .arg(m_socket->handle()).arg(m_socket->getLocalAddress()), cl_logDEBUG2);
 
     using namespace std::placeholders;
     m_readBuffer.resize(0);

@@ -53,17 +53,17 @@ void initialize(
         }
     }
 
-    const auto write = [&](const lm& message) { logger->log(Level::always, QString(), message); };
+    const auto write = [&](const Message& message) { logger->log(Level::always, QString(), message); };
     write(QByteArray(80, '='));
-    write(lm("%1 started").str(applicationName));
-    write(lm("Version: %1, Revision: %2").strs(
+    write(Message("%1 started").arg(applicationName));
+    write(Message("Version: %1, Revision: %2").args(
         AppInfo::applicationVersion(), AppInfo::applicationRevision()));
 
     if (!binaryPath.isEmpty())
-        write(lm("Binary path: %1").arg(binaryPath));
+        write(Message("Binary path: %1").arg(binaryPath));
 
     const auto filePath = logger->filePath();
-    write(lm("Log level: %1, maxFileSize: %2, maxBackupCount: %3, file: %4").strs(
+    write(Message("Log level: %1, maxFileSize: %2, maxBackupCount: %3, file: %4").args(
         settings.level, nx::utils::bytesToString(settings.maxFileSize), settings.maxBackupCount,
         filePath ? *filePath : QString::fromUtf8("-")));
 }

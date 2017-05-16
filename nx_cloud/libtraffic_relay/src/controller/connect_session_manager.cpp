@@ -61,8 +61,8 @@ void ConnectSessionManager::beginListening(
     {
         NX_LOGX(lm("Refusing beginListening for peer %1 since there are already "
             "%2 connections with maximum of %3")
-            .str(request.peerName).str(peerConnectionCount)
-            .str(m_settings.listeningPeer().maxPreemptiveConnectionCount),
+            .arg(request.peerName).arg(peerConnectionCount)
+            .arg(m_settings.listeningPeer().maxPreemptiveConnectionCount),
             cl_logDEBUG2);
         completionHandler(
             api::ResultCode::preemptiveConnectionCountAtMaximum,
@@ -103,7 +103,7 @@ void ConnectSessionManager::createClientSession(
     if (peerName.empty())
     {
         NX_LOGX(lm("Session %1. Listening peer %2 was not found")
-            .str(request.targetPeerName), cl_logDEBUG1);
+            .arg(request.targetPeerName), cl_logDEBUG1);
         return completionHandler(
             api::ResultCode::notFound,
             std::move(response));
@@ -125,7 +125,7 @@ void ConnectSessionManager::connectToPeer(
     std::string peerName = m_clientSessionPool->getPeerNameBySessionId(request.sessionId);
     if (peerName.empty())
     {
-        NX_LOGX(lm("Session %1 is not found").str(request.sessionId), cl_logDEBUG1);
+        NX_LOGX(lm("Session %1 is not found").arg(request.sessionId), cl_logDEBUG1);
         return completionHandler(
             api::ResultCode::notFound,
             nx_http::ConnectionEvents());

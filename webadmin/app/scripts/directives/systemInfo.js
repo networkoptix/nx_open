@@ -2,7 +2,7 @@
 
 //http://stackoverflow.com/questions/28045427/angularjs-custom-directive-with-input-element-pass-validator-from-outside
 angular.module('webadminApp')
-    .directive('systemInfo', ['mediaserver','$timeout','dialogs',function (mediaserver,$timeout,dialogs) {
+    .directive('systemInfo', ['mediaserver','$timeout','dialogs','systemAPI',function (mediaserver,$timeout,dialogs,systemAPI) {
         return {
             restrict: 'E',
             templateUrl: Config.viewsDir + 'components/systemInfo.html',
@@ -38,7 +38,7 @@ angular.module('webadminApp')
                 }
 
                 function pingServers() {
-                    return mediaserver.getMediaServers().then(function (data) {
+                    return systemAPI.getMediaServers().then(function (data) {
                         $scope.mediaServers = _.sortBy(data.data, function (server) {
                             // Set active state for server
                             server.active = $scope.settings.id.replace('{', '').replace('}', '') === server.id.replace('{', '').replace('}', '');
