@@ -15,6 +15,7 @@ public:
     using WebSocket::WebSocket;
     int pingCount() { return m_pingsReceived; }
     int pongCount() { return m_pongsReceived; }
+    AbstractStreamSocket* socket() { return WebSocket::socket(); }
 };
 
 class WebSocket : public ::testing::Test
@@ -764,5 +765,56 @@ TEST_F(WebSocket, SendMessage_ReceiveStream)
     ASSERT_EQ(receivedDataSize, kTotalMessageCount*clientSendBuf.size());
 }
 
+TEST_F(WebSocket, UnexpectedClose_deleteFromCb)
+{
+    givenClientModes(SendMode::singleMessage, ReceiveMode::message);
+    givenServerModes(SendMode::singleMessage, ReceiveMode::message);
+    givenClientTestDataPrepared(1684*1024 + 17);
+    givenTCPConnectionEstablished();
+
+    int sentMessageCount = 0;
+    const int kTotalMessageCount = 100;
+
+    clientSendCb =
+        [&](SystemError::ErrorCode ecode, size_t transferred)
+        {
+            if (ecode != SystemError::noError)
+            {
+                clientWebSocket.reset();
+                try { readyPromise.set_value(); } catch (...) {}
+                return;
+            }
+            sentMessageCount++;
+            if (sentMessageCount >= kTotalMessageCount)
+            {
+                readyPromise.set_value();
+                return;
+            }
+            clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
+        };
+
+    serverReadCb =
+        [&](SystemError::ErrorCode ecode, size_t)
+        {
+            if (ecode != SystemError::noError)
+            {
+                serverWebSocket.reset();
+                try { readyPromise.set_value(); } catch (...) {}
+                return;
+            }
+            serverReadBuf.clear();
+            serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
+        };
+    startFuture.wait();
+
+    clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
+    serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    clientWebSocket->socket()->shutdown();
+
+    readyFuture.wait();
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+}
 }
 

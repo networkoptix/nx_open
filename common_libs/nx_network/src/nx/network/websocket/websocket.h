@@ -65,6 +65,8 @@ protected:
     int m_pingsReceived = 0;
     int m_pongsReceived = 0;
 
+    AbstractStreamSocket* socket() { return m_socket.get(); }
+
 private:
     /** Parser handler implementation */
     virtual void frameStarted(FrameType type, bool fin) override;
