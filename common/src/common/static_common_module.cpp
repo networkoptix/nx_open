@@ -3,9 +3,11 @@
 #include <QtCore/QCoreApplication>
 
 #include <nx/network/socket_global.h>
-#include <core/resource_management/resource_data_pool.h>
-#include <utils/common/long_runable_cleanup.h>
+
 #include <api/http_client_pool.h>
+#include <core/resource_management/resource_data_pool.h>
+#include <network/cloud/cloud_media_server_endpoint_verificator.h>
+#include <utils/common/long_runable_cleanup.h>
 #include <utils/common/synctime.h>
 
 #include "common_meta_types.h"
@@ -25,6 +27,16 @@ QnStaticCommonModule::QnStaticCommonModule(
     Q_INIT_RESOURCE(common);
     QnCommonMetaTypes::initialize();
     nx::network::SocketGlobals::init();
+
+    // Providing mediaserver-specific way of validating peer id.
+    m_endpointVerificatorFactoryBak =
+        nx::network::cloud::tcp::EndpointVerificatorFactory::instance().setCustomFunc(
+            [](const nx::String& connectSessionId) 
+                -> std::unique_ptr<nx::network::cloud::tcp::AbstractEndpointVerificator>
+            {
+                return std::make_unique<CloudMediaServerEndpointVerificator>(
+                    connectSessionId);
+            });
 
     m_dataPool = instance<QnResourceDataPool>();
     loadResourceData(m_dataPool, lit(":/resource_data.json"), true);
@@ -46,6 +58,9 @@ void QnStaticCommonModule::loadResourceData(QnResourceDataPool *dataPool, const 
 QnStaticCommonModule::~QnStaticCommonModule()
 {
     clear();
+
+    nx::network::cloud::tcp::EndpointVerificatorFactory::instance().setCustomFunc(
+        std::move(m_endpointVerificatorFactoryBak));
     nx::network::SocketGlobals::deinit();
 }
 

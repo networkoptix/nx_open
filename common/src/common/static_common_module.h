@@ -13,6 +13,8 @@
 #include <utils/common/instance_storage.h>
 #include <utils/common/software_version.h>
 
+#include <nx/network/cloud/tunnel/tcp/tunnel_tcp_endpoint_verificator_factory.h>
+
 class QnResourceDataPool;
 
 /**
@@ -26,6 +28,7 @@ class QnStaticCommonModule:
     public Singleton<QnStaticCommonModule>
 {
     Q_OBJECT
+
 public:
     QnStaticCommonModule(
         Qn::PeerType localPeerType = Qn::PeerType::PT_NotDefined,
@@ -46,15 +49,18 @@ public:
     void setEngineVersion(const QnSoftwareVersion &version);
 
     QnResourceDataPool *dataPool() const;
+
 protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
+
 private:
     const Qn::PeerType m_localPeerType;
     const QString m_brand;
     const QString m_customization;
     QnSoftwareVersion m_engineVersion;
+    nx::network::cloud::tcp::EndpointVerificatorFactory::Function m_endpointVerificatorFactoryBak;
 
-    QnResourceDataPool *m_dataPool = nullptr;
+    QnResourceDataPool* m_dataPool = nullptr;
 };
 
 #define qnStaticCommon (QnStaticCommonModule::instance())
