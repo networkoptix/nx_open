@@ -11,14 +11,19 @@
 #include <core/resource/shared_resource_pointer.h>
 #include <core/resource_access/user_access_data.h>
 #include <QtCore/QElapsedTimer>
-#include "connection_guard.h"
+#include <transaction/connection_guard.h>
 #include <nx_ec/data/api_tran_state_data.h>
 #include <nx/network/http/http_async_client.h>
 
 namespace ec2 {
-
-class P2pConnection;
 class QnAbstractTransaction;
+}
+
+namespace nx {
+namespace p2p {
+
+using namespace ec2;
+class P2pConnection;
 //using P2pConnectionPtr = QSharedPointer<P2pConnection>;
 using P2pConnectionPtr = QnSharedResourcePointer<P2pConnection>;
 using SendCounters = std::array<std::atomic<qint64>, (int(MessageType::counter))>;
@@ -109,11 +114,11 @@ public:
 
     const Qn::UserAccessData& getUserAccessData() const { return m_userAccessData; }
     bool remotePeerSubscribedTo(const ApiPersistentIdData& peer) const;
-    bool updateSequence(const QnAbstractTransaction& tran);
+    bool updateSequence(const ec2::QnAbstractTransaction& tran);
     bool localPeerSubscribedTo(const ApiPersistentIdData& peer) const;
     const PeerNumberInfo& shortPeers() const;
 signals:
-    void gotMessage(QWeakPointer<P2pConnection> connection, ec2::MessageType messageType, const QByteArray& payload);
+    void gotMessage(QWeakPointer<P2pConnection> connection, nx::p2p::MessageType messageType, const QByteArray& payload);
     void stateChanged(QWeakPointer<P2pConnection> connection, P2pConnection::State state);
     void allDataSent(QWeakPointer<P2pConnection> connection);
 private:
@@ -166,7 +171,8 @@ private:
 
 const char* toString(P2pConnection::State value);
 
-} // namespace ec2
+} // namespace p2p
+} // namespace nx
 
-Q_DECLARE_METATYPE(ec2::P2pConnectionPtr)
-Q_DECLARE_METATYPE(ec2::P2pConnection::State)
+Q_DECLARE_METATYPE(nx::p2p::P2pConnectionPtr)
+Q_DECLARE_METATYPE(nx::p2p::P2pConnection::State)

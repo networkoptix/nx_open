@@ -10,16 +10,20 @@
 #include <nx_ec/data/api_tran_state_data.h>
 #include "p2p_connection.h"
 #include "p2p_fwd.h"
-#include "transaction.h"
+#include <transaction/transaction.h>
 #include <common/static_common_module.h>
 #include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/json_transaction_serializer.h>
+#include "routing_helpers.h"
 
 namespace ec2 {
-
 namespace detail {
-    class QnDbManager;
+class QnDbManager;
 }
+}
+
+namespace nx {
+namespace p2p {
 
 using ResolvePeerNumberMessageType = QVector<PeerNumberType>;
 
@@ -37,16 +41,16 @@ struct SubscribeForDataUpdateRecord
 };
 using SubscribeForDataUpdatesMessageType = QVector<SubscribeForDataUpdateRecord>;
 
-class P2pMessageBus: public QnTransactionMessageBusBase
+class P2pMessageBus: public ec2::QnTransactionMessageBusBase
 {
     Q_OBJECT;
-    using base_type = QnTransactionMessageBusBase;
+    using base_type = ec2::QnTransactionMessageBusBase;
 public:
     P2pMessageBus(
-        detail::QnDbManager* db,
+        ec2::detail::QnDbManager* db,
         Qn::PeerType peerType,
         QnCommonModule* commonModule,
-        QnJsonTransactionSerializer* jsonTranSerializer,
+        ec2::QnJsonTransactionSerializer* jsonTranSerializer,
         QnUbjsonTransactionSerializer* ubjsonTranSerializer);
     virtual ~P2pMessageBus();
 
@@ -72,7 +76,7 @@ public:
     virtual void dropConnections() override;
 
     template<class T>
-    void sendTransaction(const QnTransaction<T>& tran, const QnPeerSet& dstPeers = QnPeerSet())
+    void sendTransaction(const ec2::QnTransaction<T>& tran, const QnPeerSet& dstPeers = QnPeerSet())
     {
         NX_ASSERT(tran.command != ApiCommand::NotDefined);
         QnMutexLocker lock(&m_mutex);
@@ -124,16 +128,10 @@ public:
 private:
     void printTran(
         const P2pConnectionPtr& connection,
-        const QnAbstractTransaction& tran,
+        const ec2::QnAbstractTransaction& tran,
         P2pConnection::Direction direction) const;
     void commitLazyData();
 
-    QByteArray serializeCompressedPeers(MessageType messageType, const QVector<PeerNumberType>& peers);
-    QByteArray serializeResolvePeerNumberRequest(const QVector<PeerNumberType>& peers);
-    QByteArray serializeResolvePeerNumberResponse(const QVector<PeerNumberType>& peers);
-    QByteArray serializeSubscribeRequest(
-        const QVector<PeerNumberType>& shortValues,
-        const QVector<qint32>& sequences);
     P2pConnectionPtr findBestConnectionToSubscribe(
         const QVector<ApiPersistentIdData>& viaList,
         QMap<P2pConnectionPtr, int> newSubscriptions) const;
@@ -147,13 +145,9 @@ private:
         const QnUuid& remoteId,
         const QVector<ApiPersistentIdData>& subscribedTo) const;
 
-    QVector<PeerNumberType> deserializeCompressedPeers(const QByteArray& data, bool* success);
     void deserializeResolvePeerNumberResponse(
         const P2pConnectionPtr& connection,
         const QByteArray& response);
-    QVector<SubscribeRecord> deserializeSubscribeForDataUpdatesRequest(
-        const QByteArray& data,
-        bool* success);
 
     void addOwnfInfoToPeerList();
     void addOfflinePeersFromDb();
@@ -181,7 +175,7 @@ private:
     template <class T>
     void gotTransaction(const QnTransaction<T>& tran,const P2pConnectionPtr& connection);
 
-    void proxyFillerTransaction(const QnAbstractTransaction& tran);
+    void proxyFillerTransaction(const ec2::QnAbstractTransaction& tran);
     bool needSubscribeDelay();
     void connectSignals(const P2pConnectionPtr& connection);
     void resotreAfterDbError();
@@ -194,62 +188,6 @@ private:
         const P2pConnectionPtr& connection,
         const QList<QByteArray>& serializedTransactions);
 public:
-    typedef QMap<ApiPersistentIdData, RoutingRecord> RoutingInfo;
-
-    struct AlivePeerInfo
-    {
-        AlivePeerInfo() {}
-
-        qint32 distanceTo(const ApiPersistentIdData& via) const;
-
-        RoutingInfo routeTo; // key: route to, value - distance in hops
-    };
-    typedef QMap<ApiPersistentIdData, AlivePeerInfo> AlivePeersMap;
-
-    // Technically this struct is the same as the previous one. But it is used in another semantic.
-    struct RouteToPeerInfo
-    {
-        RouteToPeerInfo() {}
-
-        qint32 minDistance(QVector<ApiPersistentIdData>* outViaList = nullptr) const;
-        const RoutingInfo& routeVia() const { return m_routeVia; }
-
-        void remove(const ApiPersistentIdData& id)
-        {
-            m_routeVia.remove(id);
-            m_minDistance = kMaxDistance;
-        }
-        void insert(const ApiPersistentIdData& id, const RoutingRecord& record)
-        {
-            m_routeVia[id] = record;
-            m_minDistance = kMaxDistance;
-        }
-
-    private:
-        RoutingInfo m_routeVia; // key: route via, value - distance in hops
-        mutable int m_minDistance = kMaxDistance;
-    };
-    typedef QMap<ApiPersistentIdData, RouteToPeerInfo> RouteToPeerMap;
-
-
-    struct BidirectionRoutingInfo
-    {
-        BidirectionRoutingInfo(const ApiPersistentIdData& localPeer);
-
-        void clear();
-        void removePeer(const ApiPersistentIdData& id);
-        void addRecord(
-            const ApiPersistentIdData& via,
-            const ApiPersistentIdData& to,
-            const RoutingRecord& record);
-        qint32 distanceTo(const ApiPersistentIdData& peer) const;
-        void updateLocalDistance(const ApiPersistentIdData& peer, qint32 sequence);
-
-        AlivePeersMap alivePeers; //< alive peers in the system. key - route via, value - route to
-        RouteToPeerMap allPeerDistances;  //< vice versa
-    private:
-        ApiPersistentIdData m_localPeer;
-    };
 
     int expectedConnections() const;
     bool needStartConnection(
@@ -258,18 +196,6 @@ public:
     bool needStartConnection(
         const QnUuid& peerId,
         const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription) const;
-public:
-    static QByteArray serializePeersMessage(
-        const BidirectionRoutingInfo* peers,
-        PeerNumberInfo& shortPeerInfo);
-    static bool deserializePeersMessage(
-        const ApiPersistentIdData& remotePeer,
-        int remotePeerDistance,
-        const PeerNumberInfo& shortPeerInfo,
-        const QByteArray& data,
-        const qint64 timeMs,
-        BidirectionRoutingInfo* outPeers);
-
 private:
     QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list
     QMap<QnUuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections
@@ -314,4 +240,5 @@ private:
     QElapsedTimer m_outConnectionsTimer;
 };
 
-} // ec2
+} // namespace p2p
+} // namespace nx

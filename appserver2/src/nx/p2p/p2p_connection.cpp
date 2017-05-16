@@ -9,12 +9,13 @@
 #include <nx/fusion/serialization/lexical.h>
 #include <api/global_settings.h>
 #include <common/static_common_module.h>
-#include "transaction.h"
 #include <nx/network/http/buffer_source.h>
-#include "transaction_message_bus_base.h"
-#include "transaction_transport_base.h"
+#include <transaction/transaction_message_bus_base.h>
+#include "p2p_serialization.h"
+#include <transaction/transaction_transport_base.h>
 
-namespace ec2 {
+namespace nx {
+namespace p2p {
 
 SendCounters P2pConnection::m_sendCounters = {};
 
@@ -235,7 +236,7 @@ void P2pConnection::onHttpClientDone()
     m_remotePeer = remotePeer;
 
     NX_ASSERT(!m_remotePeer.instanceId.isNull());
-    if (m_remotePeer.id == kCloudPeerId)
+    if (m_remotePeer.id == ec2::kCloudPeerId)
         m_remotePeer.peerType = Qn::PT_CloudServer;
 
     if (!m_connectionLockGuard->tryAcquireConnected())
@@ -460,4 +461,5 @@ bool P2pConnection::localPeerSubscribedTo(const ApiPersistentIdData& peer) const
     return itr != data.end();
 }
 
-} // namespace ec2
+} // namespace p2p
+} // namespace nx

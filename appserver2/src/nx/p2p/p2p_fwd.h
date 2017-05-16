@@ -10,12 +10,13 @@
 
 #include <nx_ec/data/api_peer_data.h>
 #include <nx/fusion/fusion/fusion_fwd.h>
-#include <utils/media/bitStream.h>
+
+namespace nx {
 
 #ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
 Q_OBJECT
 #endif
-QN_DECLARE_METAOBJECT_HEADER(ec2, MessageType, )
+QN_DECLARE_METAOBJECT_HEADER(p2p, MessageType, )
 
 enum class MessageType
 {
@@ -38,11 +39,11 @@ const static PeerNumberType kUnknownPeerNumnber = 0xffff;
 
 struct PeerNumberInfo
 {
-    ApiPersistentIdData decode(PeerNumberType number) const;
-    PeerNumberType encode(const ApiPersistentIdData& peer, PeerNumberType shortNumber = kUnknownPeerNumnber);
+    ec2::ApiPersistentIdData decode(PeerNumberType number) const;
+    PeerNumberType encode(const ec2::ApiPersistentIdData& peer, PeerNumberType shortNumber = kUnknownPeerNumnber);
 private:
-    QMap<ApiPersistentIdData, PeerNumberType> m_fullIdToShortId;
-    QMap<PeerNumberType, ApiPersistentIdData> m_shortIdToFullId;
+    QMap<ec2::ApiPersistentIdData, PeerNumberType> m_fullIdToShortId;
+    QMap<PeerNumberType, ec2::ApiPersistentIdData> m_shortIdToFullId;
 };
 
 struct SubscribeRecord
@@ -54,18 +55,13 @@ struct SubscribeRecord
     qint32 sequence = 0;
 };
 
+struct BidirectionRoutingInfo;
+
 static const qint32 kMaxDistance = std::numeric_limits<qint32>::max();
 static const qint32 kMaxOnlineDistance = 16384;
 static const char* kP2pProtoName = "p2p";
 
-void serializeCompressPeerNumber(BitStreamWriter& writer, PeerNumberType peerNumber);
-PeerNumberType deserializeCompressPeerNumber(BitStreamReader& reader);
+} // namespace p2p
+} // namespace nx
 
-void serializeCompressedSize(BitStreamWriter& writer, quint32 peerNumber);
-quint32 deserializeCompressedSize(BitStreamReader& reader);
-
-QString toString(MessageType value);
-
-} // namespace ec2
-
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ec2::MessageType), (metatype)(lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::p2p::MessageType), (metatype)(lexical))

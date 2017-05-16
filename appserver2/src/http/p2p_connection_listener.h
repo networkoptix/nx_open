@@ -5,11 +5,13 @@
 #include "network/tcp_listener.h"
 #include <nx_ec/data/api_peer_data.h>
 
-namespace ec2
-{
-
 class P2pConnectionProcessorPrivate;
+
+namespace nx {
+namespace p2p {
 class P2pMessageBus;
+}
+}
 
 class P2pConnectionProcessor : public QnTCPConnectionProcessor
 {
@@ -17,7 +19,7 @@ public:
     const static QString kUrlPath;
 
     P2pConnectionProcessor(
-        P2pMessageBus* messageBus,
+        nx::p2p::P2pMessageBus* messageBus,
         QSharedPointer<AbstractStreamSocket> socket,
         QnTcpListener* owner);
 
@@ -27,9 +29,7 @@ protected:
     virtual void run() override;
 private:
     QByteArray responseBody(Qn::SerializationFormat dataFormat);
-    bool isDisabledPeer(const ApiPeerData& remotePeer) const;
+    bool isDisabledPeer(const ec2::ApiPeerData& remotePeer) const;
 private:
     Q_DECLARE_PRIVATE(P2pConnectionProcessor);
 };
-
-}

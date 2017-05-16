@@ -19,7 +19,7 @@
 #include <nx/network/websocket/websocket_handshake.h>
 #include <nx/network/websocket/websocket.h>
 #include <nx/network/socket_delegate.h>
-#include <transaction/p2p_message_bus.h>
+#include <nx/p2p/p2p_message_bus.h>
 
 class ShareSocketDelegate: public nx::network::StreamSocketDelegate
 {
@@ -38,9 +38,6 @@ private:
     QSharedPointer<AbstractStreamSocket> m_socket;
 };
 
-namespace ec2
-{
-
 // -------------------------- P2pConnectionProcessor ---------------------
 
 const QString P2pConnectionProcessor::kUrlPath(lit("/ec2/messageBus"));
@@ -55,11 +52,11 @@ public:
     {
     }
 
-    P2pMessageBus* messageBus;
+    nx::p2p::P2pMessageBus* messageBus;
 };
 
 P2pConnectionProcessor::P2pConnectionProcessor(
-    P2pMessageBus* messageBus,
+    nx::p2p::P2pMessageBus* messageBus,
     QSharedPointer<AbstractStreamSocket> socket,
     QnTcpListener* owner)
 :
@@ -78,7 +75,7 @@ P2pConnectionProcessor::~P2pConnectionProcessor()
 
 QByteArray P2pConnectionProcessor::responseBody(Qn::SerializationFormat dataFormat)
 {
-    ApiPeerDataEx localPeer;
+    ec2::ApiPeerDataEx localPeer;
     localPeer.id = commonModule()->moduleGUID();
     localPeer.persistentId = commonModule()->dbId();
     localPeer.instanceId = commonModule()->runningInstanceGUID();
@@ -98,7 +95,7 @@ QByteArray P2pConnectionProcessor::responseBody(Qn::SerializationFormat dataForm
         return QByteArray();
 }
 
-bool P2pConnectionProcessor::isDisabledPeer(const ApiPeerData& remotePeer) const
+bool P2pConnectionProcessor::isDisabledPeer(const ec2::ApiPeerData& remotePeer) const
 {
     return (!commonModule()->allowedPeers().isEmpty() &&
         !commonModule()->allowedPeers().contains(remotePeer.id) &&
@@ -117,7 +114,7 @@ void P2pConnectionProcessor::run()
     }
     parseRequest();
 
-    ApiPeerDataEx remotePeer;
+    ec2::ApiPeerDataEx remotePeer;
     QUrlQuery query(d->request.requestLine.url.query());
 
     Qn::SerializationFormat dataFormat = Qn::UbjsonFormat;
@@ -128,9 +125,9 @@ void P2pConnectionProcessor::run()
     QByteArray peerData = nx_http::getHeaderValue(d->request.headers, Qn::EC2_PEER_DATA);
     peerData = QByteArray::fromBase64(peerData);
     if (dataFormat == Qn::JsonFormat)
-        remotePeer = QJson::deserialized(peerData, ApiPeerDataEx(), &success);
+        remotePeer = QJson::deserialized(peerData, ec2::ApiPeerDataEx(), &success);
     else if (dataFormat == Qn::UbjsonFormat)
-        remotePeer = QnUbjson::deserialized(peerData, ApiPeerDataEx(), &success);
+        remotePeer = QnUbjson::deserialized(peerData, ec2::ApiPeerDataEx(), &success);
 
     if (remotePeer.id.isNull())
         remotePeer.id = QnUuid::createUuid();
@@ -187,11 +184,11 @@ void P2pConnectionProcessor::run()
         }
     }
 
-    ConnectionLockGuard connectionLockGuard(
+    ec2::ConnectionLockGuard connectionLockGuard(
         commonModule->moduleGUID(),
         d->messageBus->connectionGuardSharedState(),
         remotePeer.id,
-        ConnectionLockGuard::Direction::Incoming);
+        ec2::ConnectionLockGuard::Direction::Incoming);
 
     if (remotePeer.peerType == Qn::PT_Server)
     {
@@ -252,7 +249,7 @@ void P2pConnectionProcessor::run()
     WebSocketPtr webSocket(new websocket::WebSocket(
         std::move(socket)));
 
-    P2pConnectionPtr connection(new P2pConnection(
+    nx::p2p::P2pConnectionPtr connection(new nx::p2p::P2pConnection(
         commonModule,
         remotePeer,
         d->messageBus->localPeerEx(),
@@ -260,5 +257,4 @@ void P2pConnectionProcessor::run()
         std::move(webSocket)));
     d->messageBus->gotConnectionFromRemotePeer(connection);
 
-}
 }

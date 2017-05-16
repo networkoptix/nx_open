@@ -1,21 +1,20 @@
 #include "p2p_message_bus.h"
 
-#include <QtCore/QBuffer>
-
 #include <common/common_module.h>
 #include <utils/media/bitStream.h>
-#include <utils/media/nalUnits.h>
 #include <utils/common/synctime.h>
 #include <database/db_manager.h>
 #include "ec_connection_notification_manager.h"
-#include "transaction_message_bus_priv.h"
+#include <transaction/transaction_message_bus_priv.h>
 #include <nx/utils/random.h>
-#include "ubjson_transaction_serializer.h"
-#include "json_transaction_serializer.h"
+#include <transaction/ubjson_transaction_serializer.h>
+#include <transaction/json_transaction_serializer.h>
 #include <api/global_settings.h>
 #include <nx_ec/ec_proto_version.h>
 #include <utils/math/math.h>
 #include <http/p2p_connection_listener.h>
+#include <nx/p2p/p2p_serialization.h>
+#include <utils/media/nalUnits.h>
 
 namespace {
 
@@ -36,98 +35,17 @@ namespace {
 
     static const int kOutConnectionsInterval = 1000;
 
-    static const int kPeerRecordSize = 6;
-    static const int kResolvePeerResponseRecordSize = 16 * 2 + 2; //< two guid + uncompressed PeerNumber per record
 } // namespace
 
-namespace ec2 {
+namespace nx {
+namespace p2p {
 
-// PeerInfo
-
-qint32 P2pMessageBus::AlivePeerInfo::distanceTo(const ApiPersistentIdData& via) const
-{
-    auto itr = routeTo.find(via);
-    return itr != routeTo.end() ? itr.value().distance : kMaxDistance;
-}
-
-qint32 P2pMessageBus::RouteToPeerInfo::minDistance(QVector<ApiPersistentIdData>* outViaList) const
-{
-    if (m_minDistance == kMaxDistance)
-    {
-        for (auto itr = m_routeVia.cbegin(); itr != m_routeVia.cend(); ++itr)
-            m_minDistance = std::min(m_minDistance, itr.value().distance);
-    }
-    if (outViaList)
-    {
-        for (auto itr = m_routeVia.cbegin(); itr != m_routeVia.cend(); ++itr)
-        {
-            if (itr.value().distance == m_minDistance)
-                outViaList->push_back(itr.key());
-        }
-    }
-    return m_minDistance;
-}
-
-// ---------------------- BidirectionRoutingInfo --------------
-
-P2pMessageBus::BidirectionRoutingInfo::BidirectionRoutingInfo(
-    const ApiPersistentIdData& localPeer)
-:
-    m_localPeer(localPeer)
-{
-    auto& peerData = alivePeers[localPeer].routeTo[localPeer] = RoutingRecord(0, 0);
-    allPeerDistances[localPeer].insert(localPeer, RoutingRecord(0, 0));
-}
-
-void P2pMessageBus::BidirectionRoutingInfo::clear()
-{
-    alivePeers.clear();
-    allPeerDistances.clear();
-}
-
-void P2pMessageBus::BidirectionRoutingInfo::removePeer(const ApiPersistentIdData& id)
-{
-    alivePeers.remove(id);
-    alivePeers[m_localPeer].routeTo.remove(id);
-
-    allPeerDistances[id].remove(m_localPeer);
-    for (auto itr = allPeerDistances.begin(); itr != allPeerDistances.end(); ++itr)
-        itr->remove(id);
-}
-
-void P2pMessageBus::BidirectionRoutingInfo::addRecord(
-    const ApiPersistentIdData& via,
-    const ApiPersistentIdData& to,
-    const RoutingRecord& record)
-{
-    alivePeers[via].routeTo[to] = record;
-    allPeerDistances[to].insert(via, record);
-}
-
-qint32 P2pMessageBus::BidirectionRoutingInfo::distanceTo(const ApiPersistentIdData& peer) const
-{
-    qint32 result = kMaxDistance;
-    for (const auto& alivePeer: alivePeers)
-        result = std::min(result, alivePeer.distanceTo(peer));
-    return result;
-}
-
-void P2pMessageBus::BidirectionRoutingInfo::updateLocalDistance(const ApiPersistentIdData& peer, qint32 sequence)
-{
-    return;
-    if (peer == m_localPeer)
-        return;
-    const qint32 localOfflineDistance = kMaxDistance - sequence;
-    addRecord(
-        m_localPeer,
-        peer,
-        RoutingRecord(localOfflineDistance, qnSyncTime->currentMSecsSinceEpoch()));
-}
+using namespace ec2;
 
 // ---------------------- P2pMessageBus --------------
 
 P2pMessageBus::P2pMessageBus(
-    detail::QnDbManager* db,
+    ec2::detail::QnDbManager* db,
     Qn::PeerType peerType,
     QnCommonModule* commonModule,
     QnJsonTransactionSerializer* jsonTranSerializer,
@@ -166,7 +84,7 @@ void P2pMessageBus::dropConnections()
 
 void P2pMessageBus::printTran(
     const P2pConnectionPtr& connection,
-    const QnAbstractTransaction& tran,
+    const ec2::QnAbstractTransaction& tran,
     P2pConnection::Direction direction) const
 {
 
@@ -337,84 +255,9 @@ void P2pMessageBus::addOfflinePeersFromDb()
 
         const qint32 sequence = itr.value();
         const qint32 localOfflineDistance = kMaxDistance - sequence;
-        RoutingRecord record(localOfflineDistance, currentTimeMs);
+        nx::p2p::RoutingRecord record(localOfflineDistance, currentTimeMs);
         m_peers->addRecord(localPeer, peer, record);
     }
-}
-
-QByteArray P2pMessageBus::serializePeersMessage(
-    const BidirectionRoutingInfo* peers,
-    PeerNumberInfo& shortPeerInfo)
-{
-    QByteArray result;
-    result.resize(qPower2Ceil(
-        unsigned(peers->allPeerDistances.size() * kPeerRecordSize + 1),
-        4));
-    BitStreamWriter writer;
-    writer.setBuffer((quint8*) result.data(), result.size());
-    try
-    {
-        writer.putBits(8, (int) MessageType::alivePeers);
-
-        // serialize online peers
-        for (auto itr = peers->allPeerDistances.cbegin(); itr != peers->allPeerDistances.cend(); ++itr)
-        {
-            const auto& peer = itr.value();
-            qint32 minDistance = peer.minDistance();
-            if (minDistance == kMaxDistance)
-                continue;
-            const qint16 peerNumber = shortPeerInfo.encode(itr.key());
-            serializeCompressPeerNumber(writer, peerNumber);
-            const bool isOnline = minDistance < kMaxOnlineDistance;
-            writer.putBit(isOnline);
-            if (isOnline)
-                NALUnit::writeUEGolombCode(writer, minDistance); //< distance
-            else
-                writer.putBits(32, minDistance); //< distance
-        }
-
-        writer.flushBits(true);
-        result.truncate(writer.getBytesCount());
-        return result;
-    }
-    catch (...)
-    {
-        return QByteArray();
-    }
-}
-
-bool P2pMessageBus::deserializePeersMessage(
-    const ApiPersistentIdData& remotePeer,
-    int remotePeerDistance,
-    const PeerNumberInfo& shortPeerInfo,
-    const QByteArray& data,
-    const qint64 timeMs,
-    BidirectionRoutingInfo* outPeers)
-{
-    outPeers->removePeer(remotePeer);
-
-    BitStreamReader reader((const quint8*) data.data(), data.size());
-    try
-    {
-        while (reader.bitsLeft() >= 8)
-        {
-            PeerNumberType peerNumber = deserializeCompressPeerNumber(reader);
-            ApiPersistentIdData peerId = shortPeerInfo.decode(peerNumber);
-            bool isOnline = reader.getBit();
-            qint32 receivedDistance = 0;
-            if (isOnline)
-                receivedDistance = NALUnit::extractUEGolombCode(reader); // todo: move function to another place
-            else
-                receivedDistance = reader.getBits(32);
-
-            outPeers->addRecord(remotePeer, peerId, RoutingRecord(receivedDistance + remotePeerDistance, timeMs));
-        }
-    }
-    catch (...)
-    {
-        return false;
-    }
-    return true;
 }
 
 void P2pMessageBus::printPeersMessage()
@@ -522,10 +365,12 @@ void P2pMessageBus::resubscribePeers(
                 printSubscribeMessage(connection->remotePeer().id, miscData.localSubscription);
 
             NX_ASSERT(newValue.contains(connection->remotePeer()));
-
-            connection->sendMessage(serializeSubscribeRequest(
-                shortValues,
-                m_db->transactionLog()->getTransactionsState(newValue)));
+            auto sequences = m_db->transactionLog()->getTransactionsState(newValue);
+            QVector<SubscribeRecord> request;
+            request.reserve(shortValues.size());
+            for (int i = 0; i < shortValues.size(); ++i)
+                request.push_back(SubscribeRecord(shortValues[i], sequences[i]));
+            connection->sendMessage(serializeSubscribeRequest(request));
             miscData.remoteSelectingDataInProgress = true;
         }
     }
@@ -734,7 +579,7 @@ void P2pMessageBus::commitLazyData()
 {
     if (m_dbCommitTimer.hasExpired(commitIntervalMs))
     {
-        detail::QnDbManager::QnDbTransactionLocker dbTran(m_db->getTransaction());
+        ec2::detail::QnDbManager::QnDbTransactionLocker dbTran(m_db->getTransaction());
         dbTran.commit();
         m_dbCommitTimer.restart();
     }
@@ -923,30 +768,15 @@ void P2pMessageBus::at_gotMessage(
         connection->setState(P2pConnection::State::Error);
 }
 
-QVector<PeerNumberType> P2pMessageBus::deserializeCompressedPeers(const QByteArray& data,  bool* success)
-{
-    QVector<PeerNumberType> result;
-    BitStreamReader reader((const quint8*) data.data(), data.size());
-    *success = true;
-    try
-    {
-        while (reader.bitsLeft() >= 8)
-            result.push_back(deserializeCompressPeerNumber(reader));
-    }
-    catch (...)
-    {
-        *success = false;
-    }
-    return result;
-}
-
 bool P2pMessageBus::handleResolvePeerNumberRequest(const P2pConnectionPtr& connection, const QByteArray& data)
 {
     bool success = false;
     QVector<PeerNumberType> request = deserializeCompressedPeers(data, &success);
     if (!success)
         return false;
-    connection->sendMessage(serializeResolvePeerNumberResponse(request));
+    auto responseData = serializeResolvePeerNumberResponse(request, m_localShortPeerInfo, 1);
+    responseData.data()[0] = (quint8) MessageType::resolvePeerNumberResponse;
+    connection->sendMessage(responseData);
     return true;
 }
 
@@ -986,68 +816,6 @@ bool P2pMessageBus::handleResolvePeerNumberResponse(const P2pConnectionPtr& conn
     if (!msg.isEmpty())
         handlePeersMessage(connection, msg);
     return true;
-}
-
-QByteArray P2pMessageBus::serializeCompressedPeers(MessageType messageType, const QVector<PeerNumberType>& peers)
-{
-    QByteArray result;
-    result.resize(qPower2Ceil(unsigned(peers.size() * 2 + 1), 4));
-    BitStreamWriter writer;
-    writer.setBuffer((quint8*)result.data(), result.size());
-    writer.putBits(8, (int)messageType);
-    for (const auto& peer : peers)
-        serializeCompressPeerNumber(writer, peer);
-    writer.flushBits(true);
-    result.truncate(writer.getBytesCount());
-    return result;
-}
-
-
-QByteArray P2pMessageBus::serializeResolvePeerNumberRequest(const QVector<PeerNumberType>& peers)
-{
-    return serializeCompressedPeers(MessageType::resolvePeerNumberRequest, peers);
-}
-
-QByteArray P2pMessageBus::serializeSubscribeRequest(
-    const QVector<PeerNumberType>& peers,
-    const QVector<qint32>& sequences)
-{
-    NX_ASSERT(peers.size() == sequences.size());
-
-    QByteArray result;
-    result.resize(qPower2Ceil(unsigned(peers.size() * kPeerRecordSize + 1), 4));
-    BitStreamWriter writer;
-    writer.setBuffer((quint8*)result.data(), result.size());
-    writer.putBits(8, (int)MessageType::subscribeForDataUpdates);
-    for (int i = 0; i < peers.size(); ++i)
-    {
-        writer.putBits(16, peers[i]);
-        writer.putBits(32, sequences[i]);
-    }
-    writer.flushBits(true);
-    result.truncate(writer.getBytesCount());
-    return result;
-}
-
-QByteArray P2pMessageBus::serializeResolvePeerNumberResponse(const QVector<PeerNumberType>& peers)
-{
-    QByteArray result;
-    result.reserve(peers.size() * kResolvePeerResponseRecordSize + 1);
-    {
-        QBuffer buffer(&result);
-        buffer.open(QIODevice::WriteOnly);
-        QDataStream out(&buffer);
-
-        out << (quint8)(MessageType::resolvePeerNumberResponse);
-        for (const auto& peer : peers)
-        {
-            out << peer;
-            ApiPersistentIdData fullId = m_localShortPeerInfo.decode(peer);
-            out.writeRawData(fullId.id.toRfc4122().data(), 16);
-            out.writeRawData(fullId.persistentId.toRfc4122().data(), 16);
-        }
-    }
-    return result;
 }
 
 bool P2pMessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QByteArray& data)
@@ -1106,30 +874,11 @@ bool P2pMessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const
     for (const auto& number: moreNumbersToResolve)
         miscData.awaitingNumbersToResolve.push_back(number);
     std::sort(miscData.awaitingNumbersToResolve.begin(), miscData.awaitingNumbersToResolve.end());
-    connection->sendMessage(serializeResolvePeerNumberRequest(moreNumbersToResolve));
-    return true;
-}
 
-QVector<SubscribeRecord> P2pMessageBus::deserializeSubscribeForDataUpdatesRequest(const QByteArray& data, bool* success)
-{
-    QVector<SubscribeRecord> result;
-    if (data.isEmpty())
-        return result;
-    BitStreamReader reader((quint8*) data.data(), data.size());
-    try {
-        while (reader.bitsLeft() > 0)
-        {
-            PeerNumberType peer = reader.getBits(16);
-            qint32 sequence = reader.getBits(32);
-            result.push_back(SubscribeRecord(peer, sequence));
-        }
-        *success = true;
-    }
-    catch (...)
-    {
-        *success = false;
-    }
-    return result;
+    auto serializedData = serializeCompressedPeers(moreNumbersToResolve, 1);
+    serializedData.data()[0] = (quint8) MessageType::resolvePeerNumberRequest;
+    connection->sendMessage(serializedData);
+    return true;
 }
 
 struct SendTransactionToTransportFuction
@@ -1180,7 +929,7 @@ struct SendTransactionToTransportFastFuction
 bool P2pMessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data)
 {
     bool success = false;
-    QVector<SubscribeRecord> request = deserializeSubscribeForDataUpdatesRequest(data, &success);
+    QVector<SubscribeRecord> request = deserializeSubscribeRequest(data, &success);
     if (!success)
         return false;
     QnTranState newSubscription;
@@ -1219,22 +968,8 @@ bool P2pMessageBus::pushTransactionList(
     const P2pConnectionPtr& connection,
     const QList<QByteArray>& tranList)
 {
-    static const int kMaxHeaderSize = 4;
-    unsigned expectedSize = 1;
-    for (const auto& tran: tranList)
-        expectedSize += kMaxHeaderSize + tran.size();
-    QByteArray message;
-    message.resize(qPower2Ceil(expectedSize, 4));
-    BitStreamWriter writer;
-    writer.setBuffer((quint8*)message.data(), message.size());
-    writer.putBits(8, (quint8)MessageType::pushTransactionList);
-    for (const auto& tran: tranList)
-    {
-        serializeCompressedSize(writer, tran.size());
-        writer.putBytes((quint8*)tran.data(), tran.size());
-    }
-    writer.flushBits(true);
-    message.truncate(writer.getBytesCount());
+    auto message = serializeTransactionList(tranList, 1);
+    message.data()[0] = (quint8)MessageType::pushTransactionList;
     connection->sendMessage(message);
     return true;
 }
@@ -1268,7 +1003,7 @@ bool P2pMessageBus::selectAndSendTransactions(
     {
         for (const auto& serializedTran: serializedTransactions)
         {
-            QnAbstractTransaction transaction;
+            ec2::QnAbstractTransaction transaction;
             QnUbjsonReader<QByteArray> stream(&serializedTran);
             if (QnUbjson::deserialize(&stream, &transaction))
                 printTran(connection, transaction, P2pConnection::Direction::outgoing);
@@ -1306,10 +1041,10 @@ bool P2pMessageBus::selectAndSendTransactions(
     return true;
 }
 
-void P2pMessageBus::proxyFillerTransaction(const QnAbstractTransaction& tran)
+void P2pMessageBus::proxyFillerTransaction(const ec2::QnAbstractTransaction& tran)
 {
     // proxy filler transaction to avoid gaps in the persistent sequence
-    QnTransaction<ApiUpdateSequenceData> fillerTran(tran);
+    ec2::QnTransaction<ApiUpdateSequenceData> fillerTran(tran);
     fillerTran.command = ApiCommand::updatePersistentSequence;
 
     auto errCode = m_db->transactionLog()->updateSequence(fillerTran, TranLockType::Lazy);
@@ -1375,8 +1110,8 @@ void P2pMessageBus::gotTransaction(
         if (!tran.persistentInfo.isNull())
         {
 
-            std::unique_ptr<detail::QnDbManager::QnLazyTransactionLocker> dbTran;
-            dbTran.reset(new detail::QnDbManager::QnLazyTransactionLocker(m_db->getTransaction()));
+            std::unique_ptr<ec2::detail::QnDbManager::QnLazyTransactionLocker> dbTran;
+            dbTran.reset(new ec2::detail::QnDbManager::QnLazyTransactionLocker(m_db->getTransaction()));
 
             QByteArray serializedTran =
                 m_ubjsonTranSerializer->serializedTransaction(tran);
@@ -1441,31 +1176,23 @@ struct GotTransactionFuction
 };
 
 
-bool P2pMessageBus::handlePushTransactionList(const P2pConnectionPtr& connection, const QByteArray& tranList)
+bool P2pMessageBus::handlePushTransactionList(const P2pConnectionPtr& connection, const QByteArray& data)
 {
-    if (tranList.isEmpty())
+    if (data.isEmpty())
     {
         connection->miscData().remoteSelectingDataInProgress = false;
         return true; //< eof pushTranList reached
     }
-
-    BitStreamReader reader((const quint8*) tranList.data(), tranList.size());
-    try
-    {
-        while (reader.bitsLeft() > 0)
-        {
-            quint32 size = deserializeCompressedSize(reader);
-            int offset = reader.getBitsCount() / 8;
-            if (!handlePushTransactionData(connection, QByteArray::fromRawData(tranList.data() + offset, size)))
-                return false;
-            reader.skipBytes(size);
-        }
-        return true;
-    }
-    catch (...)
-    {
+    bool success = false;
+    auto tranList =  deserializeTransactionList(data, &success);
+    if (!success)
         return false;
+    for (const auto& transaction: tranList)
+    {
+        if (!handlePushTransactionData(connection, transaction))
+            return false;
     }
+    return true;
 }
 
 bool P2pMessageBus::handlePushTransactionData(const P2pConnectionPtr& connection, const QByteArray& serializedTran)
@@ -1538,4 +1265,5 @@ int P2pMessageBus::distanceToPeer(const QnUuid& dstPeer) const
     return 0;
 }
 
-} // ec2
+} // namespace p2p
+} // namespace nx

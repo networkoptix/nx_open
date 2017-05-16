@@ -21,7 +21,7 @@
 #include "settings.h"
 #include <transaction/transaction_log.h>
 #include <mutex/distributed_mutex_manager.h>
-#include <transaction/p2p_message_bus.h>
+#include <nx/p2p/p2p_message_bus.h>
 
 #include <transaction/json_transaction_serializer.h>
 #include <transaction/ubjson_transaction_serializer.h>

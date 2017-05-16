@@ -8,16 +8,20 @@
 #include <core/resource_access/user_access_data.h>
 #include <nx_ec/ec_api.h>
 #include <transaction/transaction_message_bus.h>
-#include <transaction/p2p_message_bus.h>
+#include <nx/p2p/p2p_message_bus.h>
 #include <core/resource_management/resource_pool.h>
 #include "ec2_thread_pool.h"
 #include <nx/network/system_socket.h>
 #include "ec2_connection.h"
 #include <transaction/transaction_message_bus_base.h>
-#include <transaction/p2p_connection.h>
+#include <nx/p2p/p2p_connection.h>
 #include <config.h>
+#include <utils/media/bitStream.h>
+#include <nx/p2p/p2p_serialization.h>
 
-namespace {
+namespace nx {
+namespace p2p {
+namespace test {
 
 static const int kInstanceCount = 10;
 static const int kMaxSyncTimeoutMs = 1000 * 20 * 1000;
@@ -110,10 +114,10 @@ static void createData(const Appserver2Ptr& server)
     ASSERT_EQ(ec2::ErrorCode::ok, cameraManager->addCamerasSync(cameras));
 }
 
-} // namespace
-
 void checkDistance(const std::vector<Appserver2Ptr>& servers, bool waitForSync, int& syncDoneCounter)
 {
+    using namespace nx::p2p;
+
     QElapsedTimer timer;
     timer.restart();
     do
@@ -122,13 +126,13 @@ void checkDistance(const std::vector<Appserver2Ptr>& servers, bool waitForSync, 
         for (const auto& server : servers)
         {
             const auto& connection = server->moduleInstance()->ecConnection();
-            const auto& bus = dynamic_cast<ec2::P2pMessageBus*>(connection->messageBus());
+            const auto& bus = dynamic_cast<P2pMessageBus*>(connection->messageBus());
             const auto& commonModule = server->moduleInstance()->commonModule();
             for (const auto& serverTo : servers)
             {
                 const auto& commonModuleTo = serverTo->moduleInstance()->commonModule();
                 ec2::ApiPersistentIdData peer(commonModuleTo->moduleGUID(), commonModuleTo->dbId());
-                if (bus->distanceTo(peer) > ec2::kMaxOnlineDistance)
+                if (bus->distanceTo(peer) > kMaxOnlineDistance)
                 {
                     if (!waitForSync)
                         NX_LOG(lit("Peer %1 has not online distance to peer %2")
@@ -158,7 +162,7 @@ void checkSubscription(const std::vector<Appserver2Ptr>& servers, bool waitForSy
         for (const auto& server: servers)
         {
             const auto& connection = server->moduleInstance()->ecConnection();
-            const auto& bus = dynamic_cast<ec2::P2pMessageBus*>(connection->messageBus());
+            const auto& bus = dynamic_cast<P2pMessageBus*>(connection->messageBus());
             const auto& commonModule = server->moduleInstance()->commonModule();
             for (const auto& serverTo : servers)
             {
@@ -304,9 +308,9 @@ static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverCon
         .arg(totalDbData)
         .arg(nx::network::totalSocketBytesSent() / (float) totalDbData), cl_logINFO);
 
-    const auto& counters = ec2::P2pConnection::sendCounters();
+    const auto& counters = P2pConnection::sendCounters();
     qint64 webSocketBytes = 0;
-    for (int i = 0; i < (int)ec2::MessageType::counter; ++i)
+    for (int i = 0; i < (int) MessageType::counter; ++i)
         webSocketBytes += counters[i];
 
     NX_LOG(lit("Total bytes via P2P: %1, dbSize: %2, ratio: %3")
@@ -314,10 +318,10 @@ static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverCon
         .arg(totalDbData)
         .arg(webSocketBytes / (float)totalDbData), cl_logINFO);
 
-    for (int i = 0; i < (int)ec2::MessageType::counter; ++i)
+    for (int i = 0; i < (int) MessageType::counter; ++i)
     {
         NX_LOG(lit("P2P message: %1, bytes %2, dbSize: %3, ratio: %4")
-            .arg(toString(ec2::MessageType(i)))
+            .arg(toString(MessageType(i)))
             .arg(counters[i])
             .arg(totalDbData)
             .arg(counters[i] / (float)totalDbData), cl_logINFO);
@@ -330,7 +334,7 @@ static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverCon
     {
         ec2::Ec2DirectConnection* connection =
             dynamic_cast<ec2::Ec2DirectConnection*> (server->moduleInstance()->ecConnection());
-        const auto& bus = dynamic_cast<ec2::P2pMessageBus*>(connection->messageBus());
+        const auto& bus = dynamic_cast<P2pMessageBus*>(connection->messageBus());
         for (const auto& connection : bus->connections())
         {
             ++totalConnections;
@@ -429,36 +433,40 @@ TEST(P2pMessageBus, CompressPeerNumber2)
 
 TEST(P2pMessageBus, SerializePeers)
 {
-    using namespace ec2;
-    ApiPersistentIdData localPeer;
+    using namespace nx::p2p;
+    ec2::ApiPersistentIdData localPeer;
     localPeer.id = QnUuid::createUuid();
     localPeer.persistentId = QnUuid::createUuid();
-    P2pMessageBus::BidirectionRoutingInfo peerData(localPeer);
+    BidirectionRoutingInfo peerData(localPeer);
     PeerNumberInfo shortPeers;
 
-    std::vector<ApiPersistentIdData> peers;
+    std::vector<ec2::ApiPersistentIdData> peers;
     for (int i = 0; i < 2; ++i)
     {
-        ApiPersistentIdData p;
+        ec2::ApiPersistentIdData p;
         p.id = QnUuid::createUuid();
         p.persistentId = QnUuid::createUuid();
         peers.push_back(p);
         shortPeers.encode(p);
-        peerData.addRecord(localPeer, p, P2pMessageBus::RoutingRecord(1, 0));
+        peerData.addRecord(localPeer, p, RoutingRecord(1, 0));
     }
 
-    QByteArray serializedData = P2pMessageBus::serializePeersMessage(&peerData, shortPeers);
+    QByteArray serializedData = serializePeersMessage(&peerData, shortPeers);
 
-    P2pMessageBus::BidirectionRoutingInfo deserializedPeerData(localPeer);
-    ASSERT_TRUE(P2pMessageBus::deserializePeersMessage(
+    BidirectionRoutingInfo deserializedPeerData(localPeer);
+    ASSERT_TRUE(deserializePeersMessage(
         localPeer,
         0, //< distance
         shortPeers,
         serializedData.mid(1), //< skip message type
         /*time*/0,
         &deserializedPeerData));
-    QByteArray serializedData2 = P2pMessageBus::serializePeersMessage(&deserializedPeerData, shortPeers);
+    QByteArray serializedData2 = serializePeersMessage(&deserializedPeerData, shortPeers);
     ASSERT_EQ(serializedData, serializedData2);
     using namespace ec2;
 
 }
+
+} // namespace test
+} // namespace p2p
+} // namespace nx

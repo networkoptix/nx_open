@@ -62,7 +62,7 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
 
     if (ini().isP2pMode)
     {
-        m_bus.reset(new P2pMessageBus(
+        m_bus.reset(new nx::p2p::P2pMessageBus(
             m_dbManager.get(),
             peerType,
             commonModule,
@@ -181,10 +181,10 @@ void Ec2DirectConnectionFactory::registerTransactionListener(
         httpConnectionListener->addHandler<QnHttpTransactionReceiver, QnTransactionMessageBus>(
             "HTTP", kIncomingTransactionsPath, bus);
     }
-    else if (auto bus = dynamic_cast<P2pMessageBus*> (m_bus.get()))
+    else if (auto bus = dynamic_cast<nx::p2p::P2pMessageBus*> (m_bus.get()))
     {
-        httpConnectionListener->addHandler<P2pConnectionProcessor, P2pMessageBus>(
-            "HTTP", P2pConnectionProcessor::kUrlPath, bus);
+        httpConnectionListener->addHandler<P2pConnectionProcessor, nx::p2p::P2pMessageBus>(
+            "HTTP", QnTcpListener::normalizedPath(P2pConnectionProcessor::kUrlPath), bus);
     }
 
     m_sslEnabled = httpConnectionListener->isSslEnabled();
