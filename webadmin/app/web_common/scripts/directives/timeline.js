@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('webadminApp')
+angular.module('nxCommon')
     .directive('timeline', ['$interval', '$timeout', 'animateScope', '$q', function ($interval, $timeout, animateScope, $q) {
         return {
             restrict: 'E',

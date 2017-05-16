@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('webadminApp').controller('ViewCtrl',
+angular.module('nxCommon').controller('ViewCtrl',
     function ($scope, $rootScope, $location, $routeParams, mediaserver, cameraRecords,
               camerasProvider, $sessionStorage, $localStorage, currentUser, systemAPI) {
 
