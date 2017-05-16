@@ -68,6 +68,7 @@ P2pConnection::P2pConnection(
     nx::network::websocket::addClientHeaders(&request, kP2pProtoName);
     request.headers.emplace(Qn::EC2_PEER_DATA, QnUbjson::serialized(m_localPeer).toBase64());
     m_httpClient->addRequestHeaders(request.headers);
+    m_httpClient->bindToAioThread(m_timer.getAioThread());
 }
 
 P2pConnection::P2pConnection(
@@ -88,29 +89,24 @@ P2pConnection::P2pConnection(
         std::move(connectionLockGuard));
 
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
-    m_miscData.lifetimeTimer.restart();
+    m_messageBusContext.lifetimeTimer.restart();
+    m_timer.bindToAioThread(m_webSocket->getAioThread());
 }
 
 P2pConnection::~P2pConnection()
 {
-#if 1
-    decltype (m_webSocket) webSocket;
-    decltype (m_httpClient) httpClient;
-    {
-        QnMutexLocker lock(&m_mutex);
-        std::swap(m_webSocket, webSocket);
-        std::swap(m_httpClient, httpClient);
-    }
-    if (webSocket)
-        webSocket->pleaseStopSync();
-    if (httpClient)
-        httpClient->pleaseStopSync();
-#else
-    if (m_webSocket)
-        m_webSocket->pleaseStopSync();
-    if (m_httpClient)
-        m_httpClient->pleaseStopSync();
-#endif
+    std::promise<void> waitToStop;
+    m_timer.pleaseStop(
+        [&]()
+        {
+            if (m_webSocket)
+                m_webSocket->pleaseStopSync();
+            if (m_httpClient)
+                m_httpClient->pleaseStopSync();
+            waitToStop.set_value();
+        }
+    );
+    waitToStop.get_future().wait();
 }
 
 void P2pConnection::fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey)
@@ -165,10 +161,6 @@ void P2pConnection::cancelConnecting()
 
 void P2pConnection::onHttpClientDone()
 {
-    QnMutexLocker lock(&m_mutex);
-    if (!m_httpClient)
-        return;
-
     nx_http::AsyncClient::State state = m_httpClient->state();
     if (state == nx_http::AsyncClient::sFailed)
     {
@@ -270,7 +262,7 @@ void P2pConnection::onHttpClientDone()
     using namespace nx::network;
     m_webSocket.reset(new websocket::WebSocket(std::move(socket)));
     m_httpClient.reset();
-    m_miscData.lifetimeTimer.restart();
+    m_messageBusContext.lifetimeTimer.restart();
     setState(State::Connected);
 }
 
@@ -335,27 +327,26 @@ void P2pConnection::sendMessage(const nx::Buffer& data)
         }
     }
 
-    using namespace std::placeholders;
+    m_timer.post(
+        [this, data]()
+        {
+            m_dataToSend.push_back(data);
+            if (m_dataToSend.size() == 1)
+            {
+                quint8 messageType = (quint8)m_dataToSend.front().at(0);
+                m_sendCounters[messageType] += m_dataToSend.front().size();
 
-    QnMutexLocker lock(&m_mutex);
-    m_dataToSend.push_back(data);
-    if (m_dataToSend.size() == 1)
-    {
-        quint8 messageType = (quint8) m_dataToSend.front().at(0);
-        m_sendCounters[messageType] += m_dataToSend.front().size();
-
-        m_webSocket->sendAsync(
-            m_dataToSend.front(),
-            std::bind(&P2pConnection::onMessageSent, this, _1, _2));
-    }
+                using namespace std::placeholders;
+                m_webSocket->sendAsync(
+                    m_dataToSend.front(),
+                    std::bind(&P2pConnection::onMessageSent, this, _1, _2));
+            }
+        }
+    );
 }
 
 void P2pConnection::onMessageSent(SystemError::ErrorCode errorCode, size_t bytesSent)
 {
-    QnMutexLocker lock(&m_mutex);
-    if (!m_webSocket)
-        return;
-
     if (errorCode != SystemError::noError ||
         bytesSent == 0)
     {
@@ -381,10 +372,6 @@ void P2pConnection::onMessageSent(SystemError::ErrorCode errorCode, size_t bytes
 
 void P2pConnection::onNewMessageRead(SystemError::ErrorCode errorCode, size_t bytesRead)
 {
-    QnMutexLocker lock(&m_mutex);
-    if (!m_webSocket)
-        return;
-
     if (bytesRead == 0)
     {
         setState(State::Error);
@@ -414,9 +401,9 @@ bool P2pConnection::handleMessage(const nx::Buffer& message)
     return true;
 }
 
-P2pConnection::MiscData& P2pConnection::miscData()
+P2pConnection::MessageBusContext& P2pConnection::miscData()
 {
-    return m_miscData;
+    return m_messageBusContext;
 }
 
 ApiPersistentIdData P2pConnection::decode(PeerNumberType shortPeerNumber) const
@@ -436,15 +423,15 @@ PeerNumberType P2pConnection::encode(const ApiPersistentIdData& fullId, PeerNumb
 
 bool P2pConnection::remotePeerSubscribedTo(const ApiPersistentIdData& peer) const
 {
-    return m_miscData.remoteSubscription.values.contains(peer);
+    return m_messageBusContext.remoteSubscription.values.contains(peer);
 }
 
 bool P2pConnection::updateSequence(const QnAbstractTransaction& tran)
 {
-    NX_ASSERT(!m_miscData.selectingDataInProgress);
+    NX_ASSERT(!m_messageBusContext.selectingDataInProgress);
     const ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
-    auto itr = m_miscData.remoteSubscription.values.find(peerId);
-    if (itr == m_miscData.remoteSubscription.values.end())
+    auto itr = m_messageBusContext.remoteSubscription.values.find(peerId);
+    if (itr == m_messageBusContext.remoteSubscription.values.end())
         return false;
     if (tran.persistentInfo.sequence > itr.value())
     {
@@ -456,7 +443,7 @@ bool P2pConnection::updateSequence(const QnAbstractTransaction& tran)
 
 bool P2pConnection::localPeerSubscribedTo(const ApiPersistentIdData& peer) const
 {
-    const auto& data = m_miscData.localSubscription;
+    const auto& data = m_messageBusContext.localSubscription;
     auto itr = std::find(data.begin(), data.end(), peer);
     return itr != data.end();
 }

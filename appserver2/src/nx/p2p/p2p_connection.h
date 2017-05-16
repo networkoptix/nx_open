@@ -85,9 +85,9 @@ public:
     void startReading();
 
     /** MiscData contains members that managed by P2pMessageBus. P2pConnection doesn't touch it */
-    struct MiscData
+    struct MessageBusContext
     {
-        MiscData()
+        MessageBusContext()
         {
             localPeersTimer.invalidate();
         }
@@ -110,7 +110,7 @@ public:
         QElapsedTimer lifetimeTimer;
     };
 
-    MiscData& miscData();
+    MessageBusContext& miscData();
 
     const Qn::UserAccessData& getUserAccessData() const { return m_userAccessData; }
     bool remotePeerSubscribedTo(const ApiPersistentIdData& peer) const;
@@ -127,7 +127,6 @@ private:
     void onHttpClientDone();
 
     void fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey);
-    void setRemoteIdentityTime(qint64 time);
 
     void onMessageSent(SystemError::ErrorCode errorCode, size_t bytesSent);
     void onNewMessageRead(SystemError::ErrorCode errorCode, size_t bytesRead);
@@ -142,8 +141,6 @@ private:
         none,
     };
 private:
-    mutable QnMutex m_mutex;
-
     std::deque<nx::Buffer> m_dataToSend;
     QByteArray m_readBuffer;
 
@@ -156,10 +153,10 @@ private:
     ApiPeerDataEx m_localPeer;
 
     nx::network::WebSocketPtr m_webSocket;
-    State m_state = State::Connecting;
+    std::atomic<State> m_state = State::Connecting;
 
     Direction m_direction;
-    MiscData m_miscData;
+    MessageBusContext m_messageBusContext;
     QUrl m_remotePeerUrl;
     const Qn::UserAccessData m_userAccessData = Qn::kSystemAccess;
 
@@ -167,6 +164,8 @@ private:
     std::unique_ptr<ConnectionLockGuard> m_connectionLockGuard;
 
     static SendCounters m_sendCounters;
+
+    network::aio::Timer m_timer;
 };
 
 const char* toString(P2pConnection::State value);
