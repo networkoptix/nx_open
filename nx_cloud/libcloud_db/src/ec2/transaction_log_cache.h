@@ -19,7 +19,7 @@ namespace ec2 {
 
 struct UpdateHistoryData
 {
-    ::ec2::QnTranStateKey updatedBy;
+    ::ec2::ApiPersistentIdData updatedBy;
     ::ec2::Timestamp timestamp;
 };
 
@@ -54,7 +54,7 @@ public:
         const QByteArray& hash) const;
 
     void restoreTransaction(
-        ::ec2::QnTranStateKey tranStateKey,
+        ::ec2::ApiPersistentIdData tranStateKey,
         int sequence,
         const nx::Buffer& tranHash,
         std::uint64_t settingsTimestampHi,
@@ -74,8 +74,8 @@ public:
      */
     const VmsDataState* state(TranId tranId) const;
     ::ec2::Timestamp generateTransactionTimestamp(TranId tranId);
-    int generateTransactionSequence(const ::ec2::QnTranStateKey& tranStateKey);
-    void shiftTransactionSequence(const ::ec2::QnTranStateKey& tranStateKey, int delta);
+    int generateTransactionSequence(const ::ec2::ApiPersistentIdData& tranStateKey);
+    void shiftTransactionSequence(const ::ec2::ApiPersistentIdData& tranStateKey, int delta);
 
     ::ec2::QnTranState committedTransactionState() const;
     std::uint64_t committedTimestampSequence() const;

@@ -24,7 +24,7 @@ bool VmsTransactionLogCache::isShouldBeIgnored(
 
     QnMutexLocker lock(&m_mutex);
 
-    QnTranStateKey key(tran.peerID, tran.persistentInfo.dbID);
+    ApiPersistentIdData key(tran.peerID, tran.persistentInfo.dbID);
     NX_ASSERT(tran.persistentInfo.sequence != 0);
     const auto currentSequence = m_committedData.transactionState.values.value(key);
     if (currentSequence >= tran.persistentInfo.sequence)
@@ -61,7 +61,7 @@ bool VmsTransactionLogCache::isShouldBeIgnored(
 }
 
 void VmsTransactionLogCache::restoreTransaction(
-    ::ec2::QnTranStateKey tranStateKey,
+    ::ec2::ApiPersistentIdData tranStateKey,
     int sequence,
     const nx::Buffer& tranHash,
     std::uint64_t settingsTimestampHi,
@@ -141,7 +141,7 @@ void VmsTransactionLogCache::insertOrReplaceTransaction(
 
     m_timestampCalculator.shiftTimestampIfNeeded(transaction.persistentInfo.timestamp);
 
-    const ::ec2::QnTranStateKey tranKey(transaction.peerID, transaction.persistentInfo.dbID);
+    const ::ec2::ApiPersistentIdData tranKey(transaction.peerID, transaction.persistentInfo.dbID);
     tranContext.data.transactionHashToUpdateAuthor[transactionHash] =
         UpdateHistoryData{
             tranKey,
@@ -166,7 +166,7 @@ const VmsDataState* VmsTransactionLogCache::state(TranId tranId) const
 }
 
 int VmsTransactionLogCache::generateTransactionSequence(
-    const ::ec2::QnTranStateKey& tranStateKey)
+    const ::ec2::ApiPersistentIdData& tranStateKey)
 {
     QnMutexLocker lock(&m_mutex);
     int& currentSequence = m_committedData.transactionState.values[tranStateKey];
@@ -175,7 +175,7 @@ int VmsTransactionLogCache::generateTransactionSequence(
 }
 
 void VmsTransactionLogCache::shiftTransactionSequence(
-    const ::ec2::QnTranStateKey& tranStateKey,
+    const ::ec2::ApiPersistentIdData& tranStateKey,
     int delta)
 {
     QnMutexLocker lock(&m_mutex);

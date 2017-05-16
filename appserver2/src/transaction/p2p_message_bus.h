@@ -12,6 +12,8 @@
 #include "p2p_fwd.h"
 #include "transaction.h"
 #include <common/static_common_module.h>
+#include <transaction/ubjson_transaction_serializer.h>
+#include <transaction/json_transaction_serializer.h>
 
 namespace ec2 {
 
@@ -172,7 +174,7 @@ private:
 
     friend struct GotTransactionFuction;
 
-    void P2pMessageBus::gotTransaction(
+    void gotTransaction(
         const QnTransaction<ApiUpdateSequenceData> &tran,
         const P2pConnectionPtr& connection);
 

@@ -8,13 +8,12 @@
 #include <core/resource_management/resource_pool.h>
 
 #include "database/db_manager.h"
-#include "transaction_message_bus.h"
 
 
 namespace ec2 {
 
 QnTransactionTransport::QnTransactionTransport(
-    QnTransactionMessageBus* bus,
+    QnTransactionMessageBusBase* bus,
     const QnUuid& connectionGuid,
     ConnectionLockGuard connectionLockGuard,
     const ApiPeerData& localPeer,
@@ -43,7 +42,7 @@ QnTransactionTransport::QnTransactionTransport(
 }
 
 QnTransactionTransport::QnTransactionTransport(
-    QnTransactionMessageBus* bus,
+    QnTransactionMessageBusBase* bus,
     ConnectionGuardSharedState* const connectionGuardSharedState,
     const ApiPeerData& localPeer)
 :

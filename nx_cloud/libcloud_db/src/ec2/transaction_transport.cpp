@@ -223,7 +223,7 @@ void TransactionTransport::sendTransaction(
                 cl_logDEBUG1);
 
             //cannot send transaction right now: updating local transaction sequence
-            const ::ec2::QnTranStateKey tranStateKey(
+            const ::ec2::ApiPersistentIdData tranStateKey(
                 transactionHeader.peerID,
                 transactionHeader.persistentInfo.dbID);
             m_tranStateToSynchronizeTo.values[tranStateKey] =

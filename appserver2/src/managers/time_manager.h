@@ -56,6 +56,7 @@ namespace ec2 {
 
 class Ec2DirectConnection;
 class Settings;
+class QnTransactionMessageBus;
 
 /**
  * Sequence has less priority than TimeSynchronizationManager::peerIsServer and

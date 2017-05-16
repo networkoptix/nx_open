@@ -143,13 +143,16 @@ private:
     QByteArray m_readBuffer;
 
     std::unique_ptr<nx_http::AsyncClient> m_httpClient;
-    nx::network::WebSocketPtr m_webSocket;
 
-    State m_state = State::Connecting;
+
     CredentialsSource m_credentialsSource = CredentialsSource::serverKey;
 
-    ApiPeerDataEx m_localPeer;
     ApiPeerDataEx m_remotePeer;
+    ApiPeerDataEx m_localPeer;
+
+    nx::network::WebSocketPtr m_webSocket;
+    State m_state = State::Connecting;
+
     Direction m_direction;
     MiscData m_miscData;
     QUrl m_remotePeerUrl;
@@ -161,9 +164,9 @@ private:
     static SendCounters m_sendCounters;
 };
 
-Q_DECLARE_METATYPE(P2pConnectionPtr)
-Q_DECLARE_METATYPE(P2pConnection::State)
-
 const char* toString(P2pConnection::State value);
 
 } // namespace ec2
+
+Q_DECLARE_METATYPE(ec2::P2pConnectionPtr)
+Q_DECLARE_METATYPE(ec2::P2pConnection::State)

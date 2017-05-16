@@ -3,11 +3,10 @@
 
 #include "transaction_descriptor.h"
 #include "transaction_transport_base.h"
+#include "transaction_message_bus_base.h"
 
 
 namespace ec2 {
-
-class QnTransactionMessageBus;
 
 class QnTransactionTransport
 :
@@ -16,7 +15,7 @@ class QnTransactionTransport
 public:
     /** Initializer for incoming connection */
     QnTransactionTransport(
-        QnTransactionMessageBus* bus,
+        QnTransactionMessageBusBase* bus,
         const QnUuid& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
         const ApiPeerData& localPeer,
@@ -28,7 +27,7 @@ public:
         const Qn::UserAccessData &userAccessData);
     /** Initializer for outgoing connection */
     QnTransactionTransport(
-        QnTransactionMessageBus* bus,
+        QnTransactionMessageBusBase* bus,
         ConnectionGuardSharedState* const connectionGuardSharedState,
         const ApiPeerData& localPeer);
     ~QnTransactionTransport();
@@ -145,7 +144,7 @@ protected:
         bool authByKey) override;
 
 private:
-    QnTransactionMessageBus* m_bus;
+    QnTransactionMessageBusBase* m_bus;
     const Qn::UserAccessData m_userAccessData;
     std::function<void()> m_beforeDestructionHandler;
 

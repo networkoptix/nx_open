@@ -1059,7 +1059,7 @@ bool P2pMessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const
             bool isOnline = reader.getBit();
             isOnline
                 ? NALUnit::extractUEGolombCode(reader)
-                : reader.skipBits(32); //< skip distance
+                : reader.getBits(32); //< skip distance
             if (connection->decode(peerNumber).isNull())
                 numbersToResolve.push_back(peerNumber);
         }
