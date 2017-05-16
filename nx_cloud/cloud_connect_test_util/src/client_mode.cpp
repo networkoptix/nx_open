@@ -5,7 +5,6 @@
 #include <nx/network/http/httpclient.h>
 #include <nx/network/test_support/socket_test_helper.h>
 
-#include <utils/common/command_line_parser.h>
 #include <nx/utils/string.h>
 
 static const auto kDefaultTotalConnections = 100;
