@@ -119,6 +119,9 @@ private:
                     SystemError::noError,
                     std::make_unique<TunnelConnectionStub>());
                 break;
+
+            case Behavior::keepSilence:
+                break;
         }
     }
 };
