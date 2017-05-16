@@ -374,7 +374,6 @@ template<class QueryProcessorType>
 void BaseEc2Connection<QueryProcessorType>::addRemotePeer(const QnUuid& id, const QUrl& _url)
 {
     QUrl url(_url);
-    url.setPath("/ec2/events");
     QUrlQuery q;
     url.setQuery(q);
     m_connectionFactory->messageBus()->addOutgoingConnectionToPeer(id, url);

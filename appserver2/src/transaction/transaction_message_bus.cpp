@@ -1546,9 +1546,10 @@ bool QnTransactionMessageBus::gotTransactionFromRemotePeer(
     return false;
 }
 
-QUrl QnTransactionMessageBus::addCurrentPeerInfo(const QUrl& srcUrl) const
+QUrl QnTransactionMessageBus::updateOutgoingUrl(const QUrl& srcUrl) const
 {
     QUrl url(srcUrl);
+    url.setPath("/ec2/events");
     QUrlQuery q(url.query());
 
     q.addQueryItem("guid", commonModule()->moduleGUID().toString());
@@ -1560,7 +1561,7 @@ QUrl QnTransactionMessageBus::addCurrentPeerInfo(const QUrl& srcUrl) const
 
 void QnTransactionMessageBus::addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& _url)
 {
-    QUrl url = addCurrentPeerInfo(_url);
+    QUrl url = updateOutgoingUrl(_url);
     QnMutexLocker lock(&m_mutex);
     if (!m_remoteUrls.contains(url))
     {
