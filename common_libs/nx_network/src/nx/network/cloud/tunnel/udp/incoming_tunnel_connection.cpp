@@ -2,7 +2,6 @@
 
 #include <nx/utils/log/log.h>
 
-
 namespace nx {
 namespace network {
 namespace cloud {
@@ -10,13 +9,14 @@ namespace udp {
 
 IncomingTunnelConnection::IncomingTunnelConnection(
     std::unique_ptr<IncomingControlConnection> controlConnection)
-:
+    :
     m_state(SystemError::noError),
     m_controlConnection(std::move(controlConnection)),
-    m_serverSocket(new UdtStreamServerSocket(AF_INET))
+    m_serverSocket(std::make_unique<UdtStreamServerSocket>(SocketFactory::udpIpVersion()))
 {
+    bindToAioThread(getAioThread());
+
     auto controlSocket = m_controlConnection->socket();
-    m_serverSocket->bindToAioThread(controlSocket->getAioThread());
 
     m_controlConnection->setErrorHandler(
         [this](SystemError::ErrorCode code)
@@ -37,13 +37,15 @@ IncomingTunnelConnection::IncomingTunnelConnection(
             }
         });
 
-    const SocketAddress addressToBind(HostAddress::anyHost, controlSocket->getLocalAddress().port);
+    const SocketAddress addressToBind(
+        HostAddress::anyHost,
+        controlSocket->getLocalAddress().port);
     if (!m_serverSocket->setNonBlockingMode(true) ||
         !m_serverSocket->bind(addressToBind) ||
         !m_serverSocket->listen())
     {
         NX_LOGX(lm("Can not listen on server socket %1: %2")
-            .strs(addressToBind, SystemError::getLastOSErrorText()), cl_logWARNING);
+            .args(addressToBind, SystemError::getLastOSErrorText()), cl_logWARNING);
 
         m_state = SystemError::getLastOSErrorCode();
     }
@@ -52,6 +54,13 @@ IncomingTunnelConnection::IncomingTunnelConnection(
         NX_LOGX(lm("Listening for new connections on %1")
             .arg(m_serverSocket->getLocalAddress().toString()), cl_logDEBUG1);
     }
+}
+
+void IncomingTunnelConnection::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    base_type::bindToAioThread(aioThread);
+    m_controlConnection->bindToAioThread(aioThread);
+    m_serverSocket->bindToAioThread(aioThread);
 }
 
 void IncomingTunnelConnection::accept(AcceptHandler handler)
@@ -65,7 +74,9 @@ void IncomingTunnelConnection::accept(AcceptHandler handler)
 
             m_acceptHandler = std::move(handler);
             m_serverSocket->acceptAsync(
-                [this](SystemError::ErrorCode code, AbstractStreamSocket* socket)
+                [this](
+                    SystemError::ErrorCode code,
+                    std::unique_ptr<AbstractStreamSocket> socket)
                 {
                     NX_LOGX(lm("Accepted %1 (%2)")
                         .arg(socket).arg(SystemError::toString(code)), cl_logDEBUG2);
@@ -77,22 +88,15 @@ void IncomingTunnelConnection::accept(AcceptHandler handler)
 
                     decltype(m_acceptHandler) handler;
                     handler.swap(m_acceptHandler);
-                    handler(
-                        SystemError::noError,
-                        std::unique_ptr<AbstractStreamSocket>(socket));
+                    handler(SystemError::noError, std::move(socket));
                 });
         });
 }
 
-void IncomingTunnelConnection::pleaseStop(
-    nx::utils::MoveOnlyFunc<void()> handler)
+void IncomingTunnelConnection::stopWhileInAioThread()
 {
-    m_serverSocket->pleaseStop(
-        [this, handler = std::move(handler)]()
-        {
-            m_controlConnection.reset();
-            handler();
-        });
+    m_controlConnection.reset();
+    m_serverSocket.reset();
 }
 
 } // namespace udp

@@ -106,7 +106,7 @@ ProxyHandler::TargetWithOptions ProxyHandler::cutTargetFromRequest(
     if (requestOptions.status != nx_http::StatusCode::ok)
     {
         NX_LOGX(lm("Failed to find address string in request path %1 received from %2")
-            .str(request->requestLine.url).str(connection.socket()->getForeignAddress()),
+            .arg(request->requestLine.url).arg(connection.socket()->getForeignAddress()),
             cl_logDEBUG1);
 
         return requestOptions;
@@ -132,7 +132,7 @@ ProxyHandler::TargetWithOptions ProxyHandler::cutTargetFromRequest(
     if (requestOptions.sslMode == conf::SslMode::enabled && !m_settings.http().sslSupport)
     {
         NX_LOGX(lm("SSL requestd but forbidden by settings %1")
-            .str(connection.socket()->getForeignAddress()), cl_logDEBUG1);
+            .arg(connection.socket()->getForeignAddress()), cl_logDEBUG1);
 
         return {nx_http::StatusCode::forbidden};
     }
@@ -231,7 +231,7 @@ void ProxyHandler::onConnected(
     if (errorCode != SystemError::noError)
     {
         NX_LOGX(lm("Failed to establish connection to %1 (path %2) with SSL=%3")
-            .strs(targetAddress, m_request.requestLine.url, isSsl(m_targetPeerSocket)),
+            .args(targetAddress, m_request.requestLine.url, isSsl(m_targetPeerSocket)),
             cl_logDEBUG1);
 
         auto handler = std::move(m_requestCompletionHandler);
@@ -242,7 +242,7 @@ void ProxyHandler::onConnected(
     }
 
     NX_LOGX(lm("Successfully established connection to %1(%2) (path %3) from %4 with SSL=%5")
-        .strs(targetAddress, m_targetPeerSocket->getForeignAddress(), m_request.requestLine.url,
+        .args(targetAddress, m_targetPeerSocket->getForeignAddress(), m_request.requestLine.url,
             m_targetPeerSocket->getLocalAddress(), isSsl(m_targetPeerSocket)), cl_logDEBUG2);
 
     m_targetHostPipeline = std::make_unique<nx_http::AsyncMessagePipeline>(
@@ -264,7 +264,7 @@ void ProxyHandler::onMessageFromTargetHost(nx_http::Message message)
     if (message.type != nx_http::MessageType::response)
     {
         NX_LOGX(lm("Received unexpected request from target host %1. Closing connection...")
-            .str(m_targetHostPipeline->socket()->getForeignAddress()), cl_logDEBUG1);
+            .arg(m_targetHostPipeline->socket()->getForeignAddress()), cl_logDEBUG1);
 
         auto handler = std::move(m_requestCompletionHandler);
         handler(nx_http::StatusCode::serviceUnavailable);  //< TODO: #ak better status code.

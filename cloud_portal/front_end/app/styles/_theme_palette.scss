@@ -1,0 +1,66 @@
+/* Palette spec is here: http://4yppjt.axshare.com/#p=colors */
+
+$dark_core:    #212A2F;
+$dark_core_index: 7;
+$dark_offset:  #050708;
+
+@function dark($index) {
+  @return $dark_core + ($dark_core_index - $index) * $dark_offset;
+}
+
+$light_core:    #FFF;
+$light_core_index:  1;
+$light_offset:  #0A0807;
+
+@function light($index) {
+  @return $light_core - ($index - $light_core_index) * $light_offset;
+}
+
+$green3: #223925;
+$green2: #DFF0D8;
+$green1: #C2E1B5;
+
+$red1:  #E8C6C6;
+$red2:  #F2DEDE;
+$red3:  #521010;
+
+$error:         #D65029;
+
+$dark1: #000000;
+$dark2: #080707;
+$dark3: #0D0E0F;
+$dark4: #121517;
+$dark5: #171C1F;
+$dark6: #1C2327;
+$dark7: #212A2F;
+$dark8: #263137;
+$dark9: #2B383F;
+$dark10: #303F47;
+$dark11: #35464F;
+$dark12: #3A4D57;
+$dark13: #3F545F;
+$dark14: #445B67;
+$dark15: #49626F;
+$dark16: #4E6977;
+$dark17: #53707F;
+
+
+
+
+$light1: #FFFFFF;
+$light2: #F5F7F8;
+$light3: #EBEFF1;
+$light4: #E1E7EA;
+$light5: #D7DFE3;
+$light6: #CDD7DC;
+$light7: #C3CFD5;
+$light8: #B9C7CE;
+$light9: #AFBFC7;
+$light10: #A5B7C0;
+$light11: #9BAFB9;
+$light12: #91A7B2;
+$light13: #879FAB;
+$light14: #7D97A4;
+$light15: #738F9D;
+$light16: #698796;
+$light17: #5F7F8F;

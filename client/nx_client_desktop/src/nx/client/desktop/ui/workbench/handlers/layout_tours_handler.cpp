@@ -13,6 +13,8 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_layout.h>
 #include <nx/client/desktop/ui/workbench/extensions/workbench_layout_tour_executor.h>
 #include <nx/client/desktop/ui/workbench/extensions/workbench_layout_tour_review_controller.h>
 
@@ -117,6 +119,16 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
                 m_tourExecutor->stopCurrentTour();
             }
 
+            if (toggled && id.isNull())
+            {
+                const auto reviewTourId = workbench()->currentLayout()->data(
+                    Qn::LayoutTourUuidRole).value<QnUuid>();
+
+                // Start Tour on a review layout must start the layout tour
+                if (!reviewTourId.isNull())
+                    id = reviewTourId;
+            }
+
             if (id.isNull())
             {
                 if (toggled)
@@ -128,6 +140,12 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
                 m_tourExecutor->startTour(layoutTourManager()->tour(id));
             }
         });
+
+    connect(action(action::LayoutTourPrevStepAction), &QAction::triggered, m_tourExecutor,
+        &LayoutTourExecutor::prevTourStep);
+
+    connect(action(action::LayoutTourNextStepAction), &QAction::triggered, m_tourExecutor,
+        &LayoutTourExecutor::nextTourStep);
 
     connect(action(action::SaveLayoutTourAction), &QAction::triggered, this,
         [this]

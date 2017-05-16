@@ -276,6 +276,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     addAction(action(action::PreviousLayoutAction));
     addAction(action(action::SaveCurrentLayoutAction));
     addAction(action(action::SaveCurrentLayoutAsAction));
+    addAction(action(action::SaveCurrentLayoutTourAction));
     addAction(action(action::SaveCurrentVideoWallReviewAction));
     addAction(action(action::ExitAction));
     addAction(action(action::EscapeHotkeyAction));
@@ -307,6 +308,8 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     addAction(action(action::AdjustVideoAction));
     addAction(action(action::TogglePanicModeAction));
     addAction(action(action::ToggleLayoutTourModeAction));
+    addAction(action(action::LayoutTourPrevStepAction));
+    addAction(action(action::LayoutTourNextStepAction));
     addAction(action(action::ReviewLayoutTourAction));
     addAction(action(action::DebugIncrementCounterAction));
     addAction(action(action::DebugDecrementCounterAction));
@@ -762,9 +765,15 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
     if (event->key() == Qt::Key_Alt || event->key() == Qt::Key_Control)
         return;
 
-    // Stop layout tour if it is running.
     if (action(action::ToggleLayoutTourModeAction)->isChecked())
-        menu()->trigger(action::ToggleLayoutTourModeAction);
+    {
+        if (event->key() == Qt::Key_Left)
+            menu()->trigger(action::LayoutTourPrevStepAction);
+        else if (event->key() == Qt::Key_Right)
+            menu()->trigger(action::LayoutTourNextStepAction);
+        else // Stop layout tour if it is running.
+            menu()->trigger(action::ToggleLayoutTourModeAction);
+    }
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {

@@ -26,18 +26,10 @@
 
         <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowSameVersionUpgrades="yes" Schedule="afterInstallInitialize"/>
 
-        <DirectoryRef Id="TARGETDIR">
-            <Merge Id="VCRedist110" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC110_CRT_${arch}.msm" DiskId="1" Language="0"/>
-        </DirectoryRef>
-
         <Feature Id="ProductFeature" Title="ACS_Installer" Level="1">
             <ComponentGroupRef Id="AxClientDirComponents"/>
             <ComponentGroupRef Id="RootComponents" />
             <ComponentGroupRef Id="OemDriverComponents"/>
-        </Feature>
-
-        <Feature Id="VCRedistVS11" Title="Visual C++ 11.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
-            <MergeRef Id="VCRedist110"/>
         </Feature>
 
         <Media Id="1" Cabinet="clmisc.cab" EmbedCab="yes" />

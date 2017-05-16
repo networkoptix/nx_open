@@ -102,36 +102,45 @@
 
 <!-- endbuild -->
 
+<!-- build:js({.tmp,app}) scripts/common.js -->
+<script src="web_common/scripts/module.js"></script>
+
+<script src="web_common/scripts/services/systemAPI.js"></script>
+<script src="web_common/scripts/services/nativeClient.js"></script>
+<script src="web_common/scripts/services/poll.js"></script>
+<script src="web_common/scripts/services/animateScope.js"></script>
+
+<script src="web_common/scripts/services/timelineConfig.js"></script>
+<script src="web_common/scripts/services/timelineActions.js"></script>
+<script src="web_common/scripts/services/timelineCanvasRender.js"></script>
+<script src="web_common/scripts/services/timelineModels.js"></script>
+<script src="web_common/scripts/services/cameraRecords.js"></script>
+<script src="web_common/scripts/services/camerasProvider.js"></script>
+
+<script src="web_common/scripts/directives/videowindow.js"></script>
+<script src="web_common/scripts/directives/cameraPanel.js"></script>
+<script src="web_common/scripts/directives/cameraLinks.js"></script>
+<script src="web_common/scripts/directives/timeline.js"></script>
+<script src="web_common/scripts/directives/volumeControl.js"></script>
+
+<script src="web_common/scripts/controllers/view.js"></script>
+<!-- endbuild -->
+
 <!-- build:js({.tmp,app}) scripts/scripts.js -->
 <script src="scripts/bootstrap.js"></script>
-
 <script src="scripts/config.js"></script>
 <script src="scripts/app.js"></script>
 
-<script src="scripts/services/animateScope.js"></script>
 
-<script src="scripts/services/timelineConfig.js"></script>
-<script src="scripts/services/timelineModels.js"></script>
-<script src="scripts/services/timelineActions.js"></script>
-<script src="scripts/services/timelineCanvasRender.js"></script>
-
-<script src="scripts/services/cameraRecords.js"></script>
-<script src="scripts/services/mediaserver.js"></script>
 <script src="scripts/services/cloudAPI.js"></script>
-<script src="scripts/services/timelineModels.js"></script>
-<script src="scripts/services/cameraRecords.js"></script>
-<script src="scripts/services/animateScope.js"></script>
+<script src="scripts/services/mediaserver.js"></script>
 <script src="scripts/services/dialogs.js"></script>
-<script src="scripts/services/poll.js"></script>
-<script src="scripts/services/nativeClient.js"></script>
 <script src="scripts/services/visualLog.js"></script>
 
 <script src="scripts/directives/navbar.js"></script>
 <script src="scripts/directives/pwcheck.js"></script>
 <script src="scripts/directives/icon.js"></script>
 <script src="scripts/directives/fileupload.js"></script>
-<script src="scripts/directives/timeline.js"></script>
-<script src="scripts/directives/videowindow.js"></script>
 <script src="scripts/directives/autofocus.js"></script>
 <script src="scripts/directives/validateField.js"></script>
 <script src="scripts/directives/disableAutocomplete.js"></script>
@@ -141,9 +150,7 @@
 <script src="scripts/directives/autoFillSync.js"></script>
 <script src="scripts/directives/networkSettings.js"></script>
 <script src="scripts/directives/debug.js"></script>
-<script src="scripts/directives/cameraLinks.js"></script>
 <script src="scripts/directives/languageSelect.js"></script>
-<script src="scripts/directives/volumeControl.js"></script>
 
 
 <script src="scripts/controllers/main.js"></script>
@@ -157,7 +164,6 @@
 <script src="scripts/controllers/restart.js"></script>
 <script src="scripts/controllers/sdkeula.js"></script>
 <script src="scripts/controllers/offline.js"></script>
-<script src="scripts/controllers/view.js"></script>
 <script src="scripts/controllers/health.js"></script>
 <script src="scripts/controllers/client.js"></script>
 <script src="scripts/controllers/dialogs/cloudDialog.js"></script>

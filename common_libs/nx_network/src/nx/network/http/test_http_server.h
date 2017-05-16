@@ -11,6 +11,7 @@
 #include "server/http_server_plain_text_credentials_provider.h"
 #include "server/http_stream_socket_server.h"
 #include "server/handler/http_server_handler_custom.h"
+#include "server/rest/http_server_rest_message_dispatcher.h"
 
 //-------------------------------------------------------------------------------------------------
 
@@ -86,7 +87,6 @@ public:
             });
     }
 
-
     bool registerStaticProcessor(
         const QString& path,
         QByteArray msgBody,
@@ -111,7 +111,7 @@ public:
     nx_http::HttpStreamSocketServer& server() { return *m_httpServer; }
 
 private:
-    nx_http::MessageDispatcher m_httpMessageDispatcher;
+    nx_http::server::rest::MessageDispatcher m_httpMessageDispatcher;
     nx_http::server::PlainTextCredentialsProvider m_credentialsProvider;
     TestAuthenticationManager m_authenticationManager;
     std::unique_ptr<nx_http::HttpStreamSocketServer> m_httpServer;
@@ -128,7 +128,7 @@ public:
     using BaseType = nx_http::BaseConnection<RandomlyFailingHttpConnection>;
 
     RandomlyFailingHttpConnection(
-        StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
+        nx::network::server::StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
         std::unique_ptr<AbstractStreamSocket> sock);
     virtual ~RandomlyFailingHttpConnection();
 
@@ -144,9 +144,11 @@ private:
 };
 
 class NX_NETWORK_API RandomlyFailingHttpServer:
-    public StreamSocketServer<RandomlyFailingHttpServer, RandomlyFailingHttpConnection>
+    public nx::network::server::StreamSocketServer<
+        RandomlyFailingHttpServer, RandomlyFailingHttpConnection>
 {
-    using BaseType = StreamSocketServer<RandomlyFailingHttpServer, RandomlyFailingHttpConnection>;
+    using base_type = nx::network::server::StreamSocketServer<
+        RandomlyFailingHttpServer, RandomlyFailingHttpConnection>;
 
 public:
     RandomlyFailingHttpServer(

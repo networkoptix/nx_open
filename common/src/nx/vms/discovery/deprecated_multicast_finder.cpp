@@ -121,24 +121,24 @@ void DeprecatedMulticastFinder::updateInterfaces()
                 if (!m_serverSocket->joinGroup(m_multicastGroupAddress.toString(), address.toString()))
                 {
                     NX_WARNING(this, lm("Unable to join multicast group %1 on interface %2: %3")
-                        .strs(m_multicastGroupAddress, address));
+                        .args(m_multicastGroupAddress, address));
                 }
                 else
                 {
                     NX_WARNING(this, lm("Joined multicast group %1 on interface %2")
-                        .strs(m_multicastGroupAddress, address));
+                        .args(m_multicastGroupAddress, address));
                 }
             }
 
             if (!m_pollSet.add(it.value(), aio::etRead, it.value()))
                 NX_ASSERT(false, SystemError::getLastOSErrorText());
             else
-                NX_DEBUG(this, lm("PollSet(%1s): Added %2 socket").strs(m_pollSet.size(), address));
+                NX_DEBUG(this, lm("PollSet(%1s): Added %2 socket").args(m_pollSet.size(), address));
         }
         catch (const std::exception &e)
         {
             NX_ERROR(this, lm("Failed to create socket on local address %1. %2")
-                .strs(address, e.what()));
+                .args(address, e.what()));
         }
     }
 
@@ -146,13 +146,13 @@ void DeprecatedMulticastFinder::updateInterfaces()
     {
         UDPSocket *socket = m_clientSockets.take(address);
         m_pollSet.remove(socket, aio::etRead);
-        NX_DEBUG(this, lm("PollSet(%1s): Removed %2 socket").strs(
+        NX_DEBUG(this, lm("PollSet(%1s): Removed %2 socket").args(
             m_pollSet.size(), socket->getLocalAddress()));
 
         if (m_serverSocket)
         {
             m_serverSocket->leaveGroup(m_multicastGroupAddress.toString(), address.toString());
-            NX_DEBUG(this, lm("Left multicast group %1 on interface %2").strs(
+            NX_DEBUG(this, lm("Left multicast group %1 on interface %2").args(
                 m_multicastGroupAddress, address));
         }
     }
@@ -168,7 +168,7 @@ void DeprecatedMulticastFinder::clearInterfaces()
             m_serverSocket->leaveGroup(m_multicastGroupAddress.toString(), it.key().toString());
 
         m_pollSet.remove(m_serverSocket.get(), aio::etRead);
-        NX_DEBUG(this, lm("PollSet(%1s): Removed server socket").str(m_pollSet.size()));
+        NX_DEBUG(this, lm("PollSet(%1s): Removed server socket").args(m_pollSet.size()));
         m_serverSocket.reset();
     }
 
@@ -201,14 +201,14 @@ bool DeprecatedMulticastFinder::processDiscoveryRequest(UDPSocket *udpSocket)
     if (bytesRead == -1)
     {
         SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-        NX_ERROR(this, lm("Failed to read socket on local address (%1). %2").strs(
+        NX_ERROR(this, lm("Failed to read socket on local address (%1). %2").args(
             udpSocket->getLocalAddress(), SystemError::toString(prevErrorCode)));
         return false;
     }
 
     if (!RevealRequest::isValid(readBuffer, readBuffer + bytesRead))
     {
-        NX_DEBUG(this, lm("Received invalid request from (%1) on local address %2").strs(
+        NX_DEBUG(this, lm("Received invalid request from (%1) on local address %2").args(
             remoteEndpoint, udpSocket->getLocalAddress()));
         return false;
     }
@@ -221,11 +221,11 @@ bool DeprecatedMulticastFinder::processDiscoveryRequest(UDPSocket *udpSocket)
     }
     if (!udpSocket->sendTo(m_serializedModuleInfo.data(), m_serializedModuleInfo.size(), remoteEndpoint))
     {
-        NX_DEBUG(this, lm("Can't send response to address (%1)").str(remoteEndpoint));
+        NX_DEBUG(this, lm("Can't send response to address (%1)").arg(remoteEndpoint));
         return false;
     };
 
-    NX_VERBOSE(this, lm("Reveal respose is sent to address (%1)").str(remoteEndpoint));
+    NX_VERBOSE(this, lm("Reveal respose is sent to address (%1)").arg(remoteEndpoint));
     return true;
 }
 
@@ -264,7 +264,7 @@ bool DeprecatedMulticastFinder::processDiscoveryResponse(UDPSocket *udpSocket)
     if (bytesRead == -1)
     {
         SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-        NX_ERROR(this, lm("Failed to read response on local address (%1). %2").strs(
+        NX_ERROR(this, lm("Failed to read response on local address (%1). %2").args(
             udpSocket->getLocalAddress(), SystemError::toString(prevErrorCode)));
         return false;
     }
@@ -272,7 +272,7 @@ bool DeprecatedMulticastFinder::processDiscoveryResponse(UDPSocket *udpSocket)
     RevealResponse *response = getCachedValue(readBuffer, readBuffer + bytesRead);
     if (!response)
     {
-        NX_DEBUG(this, lm("Received invalid response from (%1) on local address %2").strs(
+        NX_DEBUG(this, lm("Received invalid response from (%1) on local address %2").args(
             remoteEndpoint, udpSocket->getLocalAddress()));
         return false;
     }
@@ -280,7 +280,7 @@ bool DeprecatedMulticastFinder::processDiscoveryResponse(UDPSocket *udpSocket)
     if (response->type != QnModuleInformation::nxMediaServerId()
         && response->type != QnModuleInformation::nxECId())
     {
-        NX_DEBUG(this, lm("Ignoring %1 (%2) with id %3 on local address %4").strs(
+        NX_DEBUG(this, lm("Ignoring %1 (%2) with id %3 on local address %4").args(
             response->type, remoteEndpoint, response->id, udpSocket->getLocalAddress()));
         return true;
     }
@@ -288,7 +288,7 @@ bool DeprecatedMulticastFinder::processDiscoveryResponse(UDPSocket *udpSocket)
     auto connectionResult = QnConnectionValidator::validateConnection(*response);
     if (connectionResult == Qn::IncompatibleInternalConnectionResult)
     {
-        NX_DEBUG(this, lm("Ignoring %1 (%2) with different customization %3 on local address %4").strs(
+        NX_DEBUG(this, lm("Ignoring %1 (%2) with different customization %3 on local address %4").args(
             response->type, remoteEndpoint, response->customization, udpSocket->getLocalAddress()));
         return false;
     }
@@ -300,7 +300,7 @@ bool DeprecatedMulticastFinder::processDiscoveryResponse(UDPSocket *udpSocket)
         return true;
     }
 
-    NX_VERBOSE(this, lm("Accepting %1 (%2) with id %3 on local address %4").strs(
+    NX_VERBOSE(this, lm("Accepting %1 (%2) with id %3 on local address %4").args(
         response->type, remoteEndpoint, response->id, udpSocket->getLocalAddress()));
 
     emit responseReceived(
@@ -331,7 +331,7 @@ void DeprecatedMulticastFinder::run()
         if (!m_pollSet.add(m_serverSocket.get(), aio::etRead, m_serverSocket.get()))
             NX_ASSERT(false, SystemError::getLastOSErrorText());
         else
-            NX_DEBUG(this, lm("PollSet(%1s): Added server socket").str(m_pollSet.size()));
+            NX_DEBUG(this, lm("PollSet(%1s): Added server socket").arg(m_pollSet.size()));
     }
 
     while (!needToStop())
@@ -368,7 +368,7 @@ void DeprecatedMulticastFinder::run()
                     if (!socket->send(revealRequest.data(), revealRequest.size()))
                     {
                         SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-                        NX_DEBUG(this, lm("Failed to send reveal request to %1. %2").strs(
+                        NX_DEBUG(this, lm("Failed to send reveal request to %1. %2").args(
                             socket->getForeignAddress(), SystemError::toString(prevErrorCode)));
 
                         //TODO #ak if corresponding interface is down, should remove socket from set
@@ -405,7 +405,7 @@ void DeprecatedMulticastFinder::run()
         int socketCount = m_pollSet.poll(m_pingTimeoutMillis - (currentClock - m_prevPingClock));
         if (socketCount == 0)
         {
-            NX_VERBOSE(this, lm("PollSet(%1s): Time out").str(m_pollSet.size()));
+            NX_VERBOSE(this, lm("PollSet(%1s): Time out").arg(m_pollSet.size()));
             continue;
         }
 

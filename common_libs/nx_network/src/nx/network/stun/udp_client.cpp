@@ -139,14 +139,14 @@ bool UdpClient::isMessageShouldBeDiscarded(
     {
         // This may be late response.
         NX_LOGX(lm("Received message from %1 with unexpected transaction id %2")
-            .strs(sourceAddress, message.header.transactionId.toHex()), cl_logDEBUG1);
+            .args(sourceAddress, message.header.transactionId.toHex()), cl_logDEBUG1);
         return true;
     }
 
     if (sourceAddress != requestContextIter->second.resolvedServerAddress)
     {
         NX_LOGX(lm("Received message (transaction id %1) from unexpected address %2")
-            .strs(message.header.transactionId.toHex(), sourceAddress), cl_logDEBUG1);
+            .args(message.header.transactionId.toHex(), sourceAddress), cl_logDEBUG1);
         return true;
     }
 

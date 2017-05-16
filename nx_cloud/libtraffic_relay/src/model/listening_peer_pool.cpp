@@ -48,7 +48,7 @@ std::size_t ListeningPeerPool::getConnectionCountByPeerName(
     auto peerName = utils::reverseWords(peerNameOriginal, ".");
 
     QnMutexLocker lock(&m_mutex);
-    return utils::countByPrefix(m_peerNameToConnection, peerName);
+    return utils::countElementsWithPrefix(m_peerNameToConnection, peerName);
 }
 
 bool ListeningPeerPool::isPeerListening(const std::string& peerNameOriginal) const
@@ -62,7 +62,7 @@ std::string ListeningPeerPool::findListeningPeerByDomain(
     auto domainNameReversed = utils::reverseWords(domainName, ".");
 
     QnMutexLocker lock(&m_mutex);
-    auto it = utils::findAnyByPrefix(m_peerNameToConnection, domainNameReversed);
+    auto it = utils::findFirstElementWithPrefix(m_peerNameToConnection, domainNameReversed);
     if (it == m_peerNameToConnection.end())
         return std::string();
     return utils::reverseWords(it->first, ".");
@@ -76,7 +76,7 @@ void ListeningPeerPool::takeIdleConnection(
 
     auto peerName = utils::reverseWords(peerNameOriginal, ".");
 
-    auto peerConnectionIter = utils::findAnyByPrefix(m_peerNameToConnection, peerName);
+    auto peerConnectionIter = utils::findFirstElementWithPrefix(m_peerNameToConnection, peerName);
     if (peerConnectionIter == m_peerNameToConnection.end())
     {
         m_unsuccessfulResultReporter.post(

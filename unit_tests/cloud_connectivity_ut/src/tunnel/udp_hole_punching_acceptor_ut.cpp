@@ -133,11 +133,11 @@ protected:
 
         SocketAddress destinationAddress = connection->getSourceAddress();
         NX_LOGX(lm("Got connectionAck from %1")
-            .str(destinationAddress), cl_logDEBUG1);
+            .arg(destinationAddress), cl_logDEBUG1);
 
         SocketAddress sourceAddress = get2ndPeerAddress();
         NX_LOGX(lm("Initiate rendevous UDT connection from %1 to %2")
-            .str(sourceAddress).str(destinationAddress), cl_logDEBUG2);
+            .arg(sourceAddress).arg(destinationAddress), cl_logDEBUG2);
 
         if (connectionRequests)
             connectControlSocket(sourceAddress, destinationAddress);
@@ -166,7 +166,7 @@ protected:
             [=](SystemError::ErrorCode code)
             {
                 NX_LOGX(lm("Rendevous UDT connection from %1 to %2: %3")
-                    .str(sourceAddress).str(destinationAddress)
+                    .arg(sourceAddress).arg(destinationAddress)
                     .arg(SystemError::toString(code)), cl_logDEBUG1);
 
                 ASSERT_EQ(code, SystemError::noError);
@@ -210,7 +210,7 @@ protected:
 
                     size_t processed;
                     ASSERT_EQ(parser.parse(*buffer, &processed),
-                              nx_api::ParserState::done);
+                              nx::network::server::ParserState::done);
                     ASSERT_EQ(response.header.messageClass,
                               stun::MessageClass::successResponse);
                     ASSERT_EQ(response.header.method,

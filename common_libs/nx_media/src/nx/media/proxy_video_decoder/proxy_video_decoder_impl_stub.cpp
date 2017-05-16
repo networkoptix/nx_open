@@ -1,7 +1,7 @@
 #include "proxy_video_decoder_impl.h"
 #if defined(ENABLE_PROXY_DECODER)
 
-#include <nx/utils/debug_utils.h>
+#include <nx/kit/debug.h>
 
 #include <nx/media/aligned_mem_video_buffer.h>
 
@@ -11,8 +11,6 @@ namespace nx {
 namespace media {
 
 namespace {
-
-static constexpr const char* OUTPUT_PREFIX = "ProxyVideoDecoder<stub>: ";
 
 class Impl: public ProxyVideoDecoderImpl
 {
@@ -28,8 +26,6 @@ int Impl::decode(
     const QnConstCompressedVideoDataPtr& compressedVideoData,
     QVideoFramePtr* outDecodedFrame)
 {
-    Q_UNUSED(compressedVideoData);
-
     static int frameNumber = 0;
 
     NX_CRITICAL(outDecodedFrame);
@@ -68,11 +64,11 @@ int Impl::decode(
 
 ProxyVideoDecoderImpl* ProxyVideoDecoderImpl::createImplStub(const Params& params)
 {
-    PRINT << "Using this impl";
+    NX_PRINT << "Using this impl";
     return new Impl(params);
 }
 
 } // namespace media
 } // namespace nx
 
-#endif // ENABLE_PROXY_DECODER
+#endif // defined(ENABLE_PROXY_DECODER)

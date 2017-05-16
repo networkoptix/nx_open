@@ -2,12 +2,13 @@
 #define ROUTER_H
 
 #include <QtCore/QObject>
-#include <nx/utils/thread/mutex.h>
 
-#include <nx/utils/singleton.h>
+#include <common/common_module_aware.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/network/socket_common.h>
-#include <common/common_module_aware.h>
+#include <nx/utils/singleton.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/uuid.h>
 
 namespace nx { namespace vms { namespace discovery { class Manager; } } }
 

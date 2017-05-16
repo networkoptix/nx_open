@@ -491,8 +491,8 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
             &QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered);
         connect(action(action::StartVideoWallControlAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered);
-        connect(action(action::OpenVideoWallsReviewAction), &QAction::triggered, this,
-            &QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered);
+        connect(action(action::OpenVideoWallReviewAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_openVideoWallReviewAction_triggered);
         connect(action(action::SaveCurrentVideoWallReviewAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_saveCurrentVideoWallReviewAction_triggered);
         connect(action(action::SaveVideoWallReviewAction), &QAction::triggered, this,
@@ -1541,7 +1541,7 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered()
     });
 
 
-    menu()->trigger(action::OpenVideoWallsReviewAction, videoWall);
+    menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
 }
 
 void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered()
@@ -1808,45 +1808,46 @@ void QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered()
         workbench()->setCurrentLayout(layout);
 }
 
-void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered()
+void QnWorkbenchVideoWallHandler::at_openVideoWallReviewAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
-    foreach(const QnVideoWallResourcePtr &videoWall, parameters.resources().filtered<QnVideoWallResource>())
+    const auto videoWall = parameters.resource().dynamicCast<QnVideoWallResource>();
+    NX_EXPECT(videoWall);
+    if (!videoWall)
+        return;
+
+    const auto existingLayout = QnWorkbenchLayout::instance(videoWall);
+    if (existingLayout)
     {
-
-        QnWorkbenchLayout* existingLayout = QnWorkbenchLayout::instance(videoWall);
-        if (existingLayout)
-        {
-            workbench()->setCurrentLayout(existingLayout);
-            return;
-        }
-
-        /* Construct and add a new layout. */
-        QnLayoutResourcePtr layout(new QnVideowallReviewLayoutResource(videoWall));
-        layout->setId(QnUuid::createUuid());
-        if (context()->user())
-            layout->setParentId(videoWall->getId());
-        if (accessController()->hasGlobalPermission(Qn::GlobalControlVideoWallPermission))
-            layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadWriteSavePermission));
-
-        QMap<ScreenWidgetKey, QnVideoWallItemIndexList> itemGroups;
-
-        foreach(const QnVideoWallItem &item, videoWall->items()->getItems())
-        {
-            ScreenWidgetKey key(item.pcUuid, item.screenSnaps.screens());
-            itemGroups[key].append(QnVideoWallItemIndex(videoWall, item.uuid));
-        }
-
-        foreach(const QnVideoWallItemIndexList &indices, itemGroups)
-            addItemToLayout(layout, indices);
-
-        resourcePool()->addResource(layout);
-
-        menu()->trigger(action::OpenSingleLayoutAction, layout);
-
-        // new layout should not be marked as changed
-        saveVideowallAndReviewLayout(videoWall, layout);
+        workbench()->setCurrentLayout(existingLayout);
+        return;
     }
+
+    /* Construct and add a new layout. */
+    QnLayoutResourcePtr layout(new QnVideowallReviewLayoutResource(videoWall));
+    layout->setId(QnUuid::createUuid());
+    if (context()->user())
+        layout->setParentId(videoWall->getId());
+    if (accessController()->hasGlobalPermission(Qn::GlobalControlVideoWallPermission))
+        layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadWriteSavePermission));
+
+    QMap<ScreenWidgetKey, QnVideoWallItemIndexList> itemGroups;
+
+    for (const auto& item: videoWall->items()->getItems())
+    {
+        ScreenWidgetKey key(item.pcUuid, item.screenSnaps.screens());
+        itemGroups[key].append(QnVideoWallItemIndex(videoWall, item.uuid));
+    }
+
+    for (const auto& indices: itemGroups)
+        addItemToLayout(layout, indices);
+
+    resourcePool()->addResource(layout);
+
+    menu()->trigger(action::OpenSingleLayoutAction, layout);
+
+    // new layout should not be marked as changed
+    saveVideowallAndReviewLayout(videoWall, layout);
 }
 
 void QnWorkbenchVideoWallHandler::at_saveCurrentVideoWallReviewAction_triggered()

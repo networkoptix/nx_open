@@ -16,11 +16,15 @@
 class QnWorkbenchLayout;
 class QnWorkbenchItem;
 class QnUuidPool;
+class QGraphicsWidget;
 
 namespace nx {
 namespace client {
 namespace desktop {
 namespace ui {
+
+class LayoutTourDropPlaceholder;
+
 namespace workbench {
 
 class LayoutTourReviewController: public Connective<QObject>, public QnWorkbenchContextAware
@@ -47,10 +51,10 @@ private:
     bool isLayoutTourReviewMode() const;
 
     void connectToLayout(QnWorkbenchLayout* layout);
-    void connectToItem(QnWorkbenchItem* item);
 
     void updateOrder();
     void updateButtons(const QnLayoutResourcePtr& layout);
+    void updatePlaceholderPosition();
 
     void addItemToReviewLayout(
         const QnLayoutResourcePtr& layout,
@@ -75,6 +79,7 @@ private:
     QnDisconnectHelperPtr m_connections;
     QHash<QnUuid, QnLayoutResourcePtr> m_reviewLayouts;
     QScopedPointer<QnUuidPool> m_uuidPool;
+    QPointer<LayoutTourDropPlaceholder> m_dropPlaceholder;
 };
 
 } // namespace workbench

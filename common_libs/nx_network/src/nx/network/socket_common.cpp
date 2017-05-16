@@ -42,7 +42,7 @@ HostAddress::HostAddress( const QString& addrStr ):
 }
 
 HostAddress::HostAddress( const char* addrStr ):
-    m_string( QLatin1String(addrStr) )
+    HostAddress( QString::fromLatin1(addrStr) )
 {
 }
 

@@ -1,0 +1,29 @@
+
+<div class="panel panel-default" ng-if="system.isMine">
+    <div class="panel-body">
+        <h2>您的系统</h2>
+        <p></p>
+        <p>
+            <button class="btn btn-default" ng-click="rename()">重命名系统</button>
+        </p>
+        <button class="btn btn-default" ng-click="disconnect()">断开与 <span class="product-name">{{PRODUCT_NAME}}</span></button>
+    </div>
+</div>
+
+<div class="panel panel-default" ng-if="!system.isMine">
+    <div class="panel-body">
+        <h2>所有者</h2>
+        <h3 class="user-name">{{system.info.ownerFullName}}</h3>
+        <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
+        <hr>
+        <p>
+            您的权限︰ 
+<b>{{$root.L.accessRoles[system.accessRole].label | | system.accessRole}}</b>
+        </p>
+
+        <p ng-if="system.permissions.isAdmin">
+            <button class="btn btn-default" ng-click="rename()">重命名系统</button>
+        </p>
+        <button class="btn btn-default" ng-click="delete()">断开连接从我的账户</button>
+    </div>
+</div>

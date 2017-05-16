@@ -547,7 +547,7 @@ QnWorkbenchUi::Panels QnWorkbenchUi::openedPanels() const
         | (isTitleOpened() ? TitlePanel : NoPanel)
         | (isTimelineOpened() ? TimelinePanel : NoPanel)
         | (isNotificationsOpened() ? NotificationsPanel : NoPanel)
-        | (isLayoutPanelOpened() ? LayoutPanel : NoPanel);
+        ;
 }
 
 void QnWorkbenchUi::setOpenedPanels(Panels panels, bool animate)
@@ -958,11 +958,6 @@ bool QnWorkbenchUi::isTitleOpened() const
     return m_title && m_title->isOpened();
 }
 
-bool QnWorkbenchUi::isLayoutPanelOpened() const
-{
-    return m_layoutPanel && m_layoutPanel->isOpened();
-}
-
 void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
 {
     m_title = new NxUi::TitleWorkbenchPanel(settings, m_controlsWidget, this);
@@ -1066,11 +1061,11 @@ void QnWorkbenchUi::updateLayoutPanelGeometry()
 
     const auto notificationsLeft = m_notifications && m_notifications->isVisible()
         ? m_notifications->item->geometry().left()
-        : m_controlsWidgetRect.left();
+        : m_controlsWidgetRect.right();
 
     const auto treeRight = m_tree && m_tree->isVisible()
         ? m_tree->item->geometry().right()
-        : 0;
+        : m_controlsWidgetRect.left();
 
     const auto topLeft = QPointF(treeRight, titleGeometry.bottom());
     const auto size = QSizeF(notificationsLeft - treeRight, 0); // TODO #ynikitenkov: add height handling

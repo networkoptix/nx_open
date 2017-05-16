@@ -14,7 +14,9 @@
 
 #include "stream_socket_server.h"
 
-namespace nx_api {
+namespace nx {
+namespace network {
+namespace server {
 
 static constexpr size_t READ_BUFFER_CAPACITY = 16 * 1024;
 
@@ -51,10 +53,10 @@ template<
 > class BaseServerConnection:
     public nx::network::aio::BasicPollable
 {
-    typedef nx::network::aio::BasicPollable BaseType;
+    using base_type = nx::network::aio::BasicPollable;
+    using self_type = BaseServerConnection<CustomConnectionType>;
 
 public:
-    typedef BaseServerConnection<CustomConnectionType> SelfType;
 
     /**
      * @param connectionManager When connection is finished,
@@ -81,7 +83,7 @@ public:
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
     {
-        BaseType::bindToAioThread(aioThread);
+        base_type::bindToAioThread(aioThread);
 
         m_streamSocket->bindToAioThread(aioThread);
     }
@@ -105,7 +107,7 @@ public:
 
                 m_streamSocket->readSomeAsync(
                     &m_readBuffer,
-                    std::bind(&SelfType::onBytesRead, this, _1, _2));
+                    std::bind(&self_type::onBytesRead, this, _1, _2));
             });
     }
 
@@ -125,7 +127,7 @@ public:
 
                 m_streamSocket->sendAsync(
                     buf,
-                    std::bind(&SelfType::onBytesSent, this, _1, _2));
+                    std::bind(&self_type::onBytesSent, this, _1, _2));
                 m_bytesToSend = buf.size();
 
             });
@@ -188,6 +190,12 @@ public:
     }
 
 protected:
+    virtual void stopWhileInAioThread() override
+    {
+        m_streamSocket.reset();
+        triggerConnectionClosedEvent();
+    }
+
     SocketAddress getForeignAddress() const
     {
         return m_streamSocket->getForeignAddress();
@@ -208,12 +216,6 @@ private:
 
     boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
     bool m_isSendingData;
-
-    virtual void stopWhileInAioThread() override
-    {
-        m_streamSocket.reset();
-        triggerConnectionClosedEvent();
-    }
 
     void onBytesRead(SystemError::ErrorCode errorCode, size_t bytesRead)
     {
@@ -238,7 +240,7 @@ private:
         m_readBuffer.resize(0);
         m_streamSocket->readSomeAsync(
             &m_readBuffer,
-            std::bind(&SelfType::onBytesRead, this, _1, _2));
+            std::bind(&self_type::onBytesRead, this, _1, _2));
     }
 
     void onBytesSent(SystemError::ErrorCode errorCode, size_t count)
@@ -299,4 +301,6 @@ private:
     }
 };
 
-} // namespace nx_api
+} // namespace server
+} // namespace network
+} // namespace nx

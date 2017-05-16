@@ -9,11 +9,15 @@
 namespace nx {
 namespace media {
 
-namespace proxy_video_decoder {
+std::ostream& operator<<(std::ostream& stream, const QSize& qSize)
+{
+    return stream << "(" << qSize.width() << ", " << qSize.height() << ")";
+}
 
-FlagConfig conf("ProxyVideoDecoder");
-
-} // namespace proxy_video_decoder
+std::ostream& operator<<(std::ostream& stream, const QString& qString)
+{
+    return stream << qString.toUtf8().constData();
+}
 
 void debugDrawCheckerboardArgb(
     uint8_t* argbBuffer, int lineSizeBytes, int frameWidth, int frameHeight)
@@ -66,4 +70,4 @@ std::unique_ptr<ProxyDecoder::CompressedFrame> createUniqueCompressedFrame(
 } // namespace media
 } // namespace nx
 
-#endif // ENABLE_PROXY_DECODER
+#endif // defined(ENABLE_PROXY_DECODER)

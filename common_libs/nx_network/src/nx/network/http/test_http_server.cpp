@@ -71,7 +71,7 @@ bool TestHttpServer::bindAndListen(const SocketAddress& endpoint)
     if (!m_httpServer->listen())
         return false;
 
-    NX_LOGX(lm("Started on %1").str(m_httpServer->address()), cl_logINFO);
+    NX_LOGX(lm("Started on %1").arg(m_httpServer->address()), cl_logINFO);
     return true;
 }
 
@@ -147,7 +147,7 @@ bool TestHttpServer::registerRedirectHandler(
 // class RandomlyFailingHttpConnection
 
 RandomlyFailingHttpConnection::RandomlyFailingHttpConnection(
-    StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
+    nx::network::server::StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
     std::unique_ptr<AbstractStreamSocket> sock)
     :
     BaseType(socketServer, std::move(sock)),
@@ -200,7 +200,7 @@ RandomlyFailingHttpServer::RandomlyFailingHttpServer(
     bool sslRequired,
     nx::network::NatTraversalSupport natTraversalSupport)
     :
-    BaseType(sslRequired, natTraversalSupport)
+    base_type(sslRequired, natTraversalSupport)
 {
 }
 

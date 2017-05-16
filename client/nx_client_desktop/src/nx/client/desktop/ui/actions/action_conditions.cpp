@@ -640,6 +640,9 @@ ActionVisibility SaveLayoutCondition::check(const QnResourceList& resources, QnW
     if (layout->data().contains(Qn::VideoWallResourceRole))
         return InvisibleAction;
 
+    if (layout->data().contains(Qn::LayoutTourUuidRole))
+        return InvisibleAction;
+
     if (context->snapshotManager()->isSaveable(layout))
     {
         return EnabledAction;
@@ -1608,6 +1611,15 @@ ActionVisibility CloudServerCondition::check(const QnResourceList& resources, Qn
 
 namespace condition {
 
+ConditionWrapper always()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* /*context*/)
+        {
+            return true;
+        });
+}
+
 ConditionWrapper isPreviewSearchMode()
 {
     return new CustomBoolCondition(
@@ -1649,6 +1661,15 @@ ConditionWrapper isLayoutTourReviewMode()
         [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
         {
             return context->workbench()->currentLayout()->data().contains(Qn::LayoutTourUuidRole);
+        });
+}
+
+ConditionWrapper tourIsRunning()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
+        {
+            return context->action(action::ToggleLayoutTourModeAction)->isChecked();
         });
 }
 

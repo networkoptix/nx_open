@@ -156,7 +156,7 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
 
     limitStringList(&targetStrings);
     std::cout << lm("Client mode: %1, limit: %2(%3b), max concurent connections: %4, total: %5")
-        .strs(transmissionMode, trafficLimitType, nx::utils::bytesToString(trafficLimitBytes),
+        .args(transmissionMode, trafficLimitType, nx::utils::bytesToString(trafficLimitBytes),
             maxConcurrentConnections, totalConnections).toStdString() << std::endl;
 
     std::cout << lm("Target(s): %1").arg(targetStrings.join(lit(", "))).toStdString() << std::endl;

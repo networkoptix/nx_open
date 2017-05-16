@@ -6,7 +6,6 @@
   overflow:hidden;
   height:100px;
   cursor: default;
-  background-color:#171C1F;
 }
 
 
@@ -101,6 +100,7 @@ ng-include{
   height:100px;
   -webkit-touch-callout: none;
   user-select: none;
+  background-color: $additional_light2;
 
 
 }
@@ -110,8 +110,45 @@ ng-include{
 }
 
 .no-archive-message{
+  line-height: 100px;
+  font-size: 200%;
+  color:$light10;
 
-  font-size: 89%;
-  color:#53707F;
+}
 
+.no-timeline{
+  height: 40px !important;
+}
+
+.no-timeline .volume .glyphicon-volume-up{
+  margin: 10px auto !important;
+}
+
+.no-timeline .live-button,
+.mobile-controls .live-button{
+  line-height: 60px !important;
+}
+
+.no-timeline .text-center{
+  height: 100px !important;
+}
+
+
+.pp-only{
+  width: 63px !important;
+}
+
+.timeline.no-timeline .player-controls,
+.mobile-controls .player-controls{
+  padding-top: 0px !important;
+}
+
+.mobile-controls{
+  height: 60px;
+  background-color: $additional_light2;
+}
+
+.mobile-controls .pp-only .glyphicon{
+  margin-top: 19px;
+  margin-left: -2px;
 }

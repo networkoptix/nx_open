@@ -184,7 +184,7 @@ TEST_F(StunClientServerTest, Connectivity)
     startServer(address);
     reconnectEvents.pop(); // Automatic reconnect is expected, again.
 
-    while (server->totalConnectionsAccepted() == 0)
+    while (server->connectionCount() == 0)
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     ASSERT_EQ(1U, server->connectionCount()) << 
         "Total connections accepted: " << server->totalConnectionsAccepted();

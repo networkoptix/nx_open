@@ -44,7 +44,7 @@ void ReverseConnectionHolder::saveSocket(std::unique_ptr<AbstractStreamSocket> s
     if (!m_handlers.empty())
     {
         NX_LOGX(lm("Use new socket(%1), %2 sockets left")
-            .strs(socket, m_socketCount.load()), cl_logDEBUG2);
+            .args(socket, m_socketCount.load()), cl_logDEBUG2);
 
         auto handler = std::move(m_handlers.begin()->second);
         m_handlers.erase(m_handlers.begin());
@@ -54,7 +54,7 @@ void ReverseConnectionHolder::saveSocket(std::unique_ptr<AbstractStreamSocket> s
     const auto it = m_sockets.insert(m_sockets.end(), std::move(socket));
     ++m_socketCount;
     NX_LOGX(lm("One socket(%1) added, %2 sockets left")
-        .strs(*it, m_socketCount.load()), cl_logDEBUG2);
+        .args(*it, m_socketCount.load()), cl_logDEBUG2);
 
     (*it)->bindToAioThread(getAioThread());
     monitorSocket(it);
@@ -77,7 +77,7 @@ void ReverseConnectionHolder::takeSocket(std::chrono::milliseconds timeout, Hand
                 --m_socketCount;
                 m_sockets.pop_front();
                 NX_LOGX(lm("One socket(%1) used, %2 sockets left")
-                    .strs(socket, m_socketCount.load()), cl_logDEBUG2);
+                    .args(socket, m_socketCount.load()), cl_logDEBUG2);
 
                 socket->cancelIOSync(aio::etNone);
                 handler(SystemError::noError, std::move(socket));
@@ -136,13 +136,13 @@ void ReverseConnectionHolder::monitorSocket(
             if (code != SystemError::noError || size == 0)
             {
                 NX_LOGX(lm("Connection(%1) has been closed: %2 (%3 sockets left)")
-                    .strs(*it, SystemError::toString(code), m_socketCount.load() - 1),
+                    .args(*it, SystemError::toString(code), m_socketCount.load() - 1),
                     cl_logDEBUG1);
             }
             else
             {
                 NX_LOGX(lm("Unexpected read on socket(%1), size=%2. Closing socket (%3 sockets left)")
-                    .strs(*it, size, m_socketCount.load() - 1),
+                    .args(*it, size, m_socketCount.load() - 1),
                     cl_logERROR);
             }
 

@@ -164,7 +164,7 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
     auto transmissionMode = test::TestTransmissionMode::spam;
     if (args.get("ping"))
         transmissionMode = test::TestTransmissionMode::pong;
-    std::cout << lm("Server mode: %1").strs(transmissionMode).toStdString() << std::endl;
+    std::cout << lm("Server mode: %1").args(transmissionMode).toStdString() << std::endl;
 
     auto multiServerSocket = new network::MultipleServerSocket();
     std::unique_ptr<AbstractStreamServerSocket> serverSocket(multiServerSocket);
@@ -285,7 +285,7 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
         }
 
         NX_CRITICAL(network::ssl::Engine::useCertificateAndPkey(certificate));
-        serverSocket.reset(new deprecated::SslServerSocket(serverSocket.release(), false));
+        serverSocket = std::make_unique<deprecated::SslServerSocket>(std::move(serverSocket), false);
     }
 
     server.setServerSocket(std::move(serverSocket));

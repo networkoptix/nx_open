@@ -67,8 +67,11 @@ public:
             if (weightScaled)
             {
                 /* Do some sensible addition to font weight: */
-                m_effectiveFont.setWeight(m_effectiveFont.weight() + static_cast<int>(
-                    (QFont::Bold - QFont::Normal) * (factor - 1.0)));
+                int weight = m_effectiveFont.weight() + static_cast<int>(
+                    (QFont::Bold - QFont::Normal) * (factor - 1.0));
+                // Qt allows to set weight only in range [0..99]
+                weight = qBound(0, weight, 99);
+                m_effectiveFont.setWeight(weight);
             }
         }
 

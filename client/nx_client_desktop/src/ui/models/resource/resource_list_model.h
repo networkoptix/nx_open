@@ -5,6 +5,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/scoped_model_operations.h>
+#include <nx/utils/uuid.h>
 #include <utils/common/connective.h>
 
 class QnResourceListModel: public ScopedModelOperations<Connective<QAbstractItemModel>>

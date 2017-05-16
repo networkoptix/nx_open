@@ -1707,7 +1707,7 @@ void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& _url)
     {
         if (transport->remoteSocketAddr() == urlStr)
         {
-            NX_LOGX(lm("Disconnected from peer %1").str(url), cl_logWARNING);
+            NX_LOGX(lm("Disconnected from peer %1").arg(url), cl_logWARNING);
             transport->setState(QnTransactionTransport::Error);
         }
     }
@@ -1800,7 +1800,7 @@ void QnTransactionMessageBus::reconnectAllPeers(QnMutexLockerBase* const /*lock*
 {
     for (QnTransactionTransport* transport : m_connections)
     {
-        NX_LOGX(lm("Disconnected from peer %1").str(transport->remoteAddr()), cl_logWARNING);
+        NX_LOGX(lm("Disconnected from peer %1").arg(transport->remoteAddr()), cl_logWARNING);
         transport->setState(QnTransactionTransport::Error);
     }
     for (auto transport : m_connectingConnections)

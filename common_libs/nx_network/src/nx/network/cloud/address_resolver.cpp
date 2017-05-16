@@ -42,7 +42,7 @@ TypedAddress::TypedAddress(HostAddress address_, AddressType type_)
 
 QString TypedAddress::toString() const
 {
-    return lm("%1(%2)").str(address).str(type);
+    return lm("%1(%2)").args(address, type);
 }
 
 AddressAttribute::AddressAttribute(AddressAttributeType type_, quint64 value_)
@@ -101,7 +101,7 @@ bool AddressEntry::operator <(const AddressEntry& rhs) const
 
 QString AddressEntry::toString() const
 {
-    return lm("%1:%2(%3)").str(type).str(host).container(attributes);
+    return lm("%1:%2(%3)").arg(type).arg(host).container(attributes);
 }
 
 AddressResolver::AddressResolver(
@@ -118,7 +118,7 @@ void AddressResolver::addFixedAddress(
 {
     NX_ASSERT(!hostName.isIpAddress(), Q_FUNC_INFO, "Hostname should be unresolved");
     NX_ASSERT(endpoint.address.isIpAddress());
-    DEBUG_LOG(lm("Added fixed address for %1: %2").strs(hostName, endpoint));
+    DEBUG_LOG(lm("Added fixed address for %1: %2").args(hostName, endpoint));
 
     QnMutexLocker lk(&m_mutex);
     AddressEntry entry(endpoint);
@@ -130,7 +130,7 @@ void AddressResolver::addFixedAddress(
     const auto it = std::find(entries.begin(), entries.end(), entry);
     if (it == entries.end())
     {
-        NX_LOGX(lm("New fixed address for %1: %2").strs(hostName, endpoint), cl_logDEBUG1);
+        NX_LOGX(lm("New fixed address for %1: %2").args(hostName, endpoint), cl_logDEBUG1);
         entries.push_back(std::move(entry));
 
         // we possibly could also grabHandlers() to bring the result before DNS
@@ -142,7 +142,7 @@ void AddressResolver::addFixedAddress(
 void AddressResolver::removeFixedAddress(
     const HostAddress& hostName, boost::optional<SocketAddress> endpoint)
 {
-    DEBUG_LOG(lm("Removed fixed address for %1: %2").strs(hostName, endpoint));
+    DEBUG_LOG(lm("Removed fixed address for %1: %2").args(hostName, endpoint));
 
     QnMutexLocker lk(&m_mutex);
     const auto record = m_info.find(hostName);
@@ -156,13 +156,13 @@ void AddressResolver::removeFixedAddress(
         const auto it = std::find(entries.begin(), entries.end(), entry);
         if (it != entries.end())
         {
-            NX_LOGX(lm("Removed fixed address for %1: %2").strs(hostName, endpoint), cl_logDEBUG1);
+            NX_LOGX(lm("Removed fixed address for %1: %2").args(hostName, endpoint), cl_logDEBUG1);
             entries.erase(it);
         }
     }
     else
     {
-        NX_LOGX(lm("Removed all fixed address for %1").strs(hostName), cl_logDEBUG1);
+        NX_LOGX(lm("Removed all fixed address for %1").args(hostName), cl_logDEBUG1);
         entries.clear();
     }
 }

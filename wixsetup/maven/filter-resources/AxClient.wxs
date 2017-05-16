@@ -213,7 +213,6 @@
             <ComponentGroupRef Id="ClientOpenAL" />
             <ComponentGroupRef Id="ClientOpenSSL" />
             <ComponentRef Id="ClientSigar"/>
-            <ComponentGroupRef Id="PaxtonVcrt14ComponentGroup"/>
         </ComponentGroup>
     </Fragment>
 </Wix>
