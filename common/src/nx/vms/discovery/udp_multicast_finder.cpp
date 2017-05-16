@@ -142,6 +142,9 @@ void UdpMulticastFinder::joinMulticastGroup(const HostAddress& ip)
 
 void UdpMulticastFinder::receiveModuleInformation()
 {
+    if (!m_receiver)
+        return; // Will be fixed in updateInterfaces().
+
     m_inData.resize(0);
     m_receiver->recvFromAsync(&m_inData,
         [this](SystemError::ErrorCode code, SocketAddress endpoint, size_t /*size*/)
