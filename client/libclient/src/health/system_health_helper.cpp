@@ -38,6 +38,10 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
             return tr("Remote archive synchronization has been started");
         case QnSystemHealth::RemoteArchiveSyncFinished:
             return tr("Remote archive synchronization has been finished");
+        case QnSystemHealth::RemoteArchiveSyncProgress:
+            return tr("Remote archive synchronization is in progress");
+        case QnSystemHealth::RemoteArchiveSyncError:
+            return tr("Error occured during remote archive synchronization");
         default:
             break;
     }

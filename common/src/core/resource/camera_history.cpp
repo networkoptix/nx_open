@@ -135,12 +135,14 @@ QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
             QnSystemHealth::MessageType healthMessage = QnSystemHealth::MessageType(eventType - QnBusiness::SystemHealthEvent);
             if (healthMessage == QnSystemHealth::ArchiveRebuildFinished 
                 || healthMessage == QnSystemHealth::ArchiveFastScanFinished
-                || healthMessage == QnSystemHealth::RemoteArchiveSyncFinished)
+                || healthMessage == QnSystemHealth::RemoteArchiveSyncFinished
+                || healthMessage == QnSystemHealth::RemoteArchiveSyncProgress)
             {
                 auto eventParams = businessAction->getRuntimeParams();
                 std::vector<QnUuid> cameras;
 
-                if (healthMessage == QnSystemHealth::RemoteArchiveSyncFinished)
+                if (healthMessage == QnSystemHealth::RemoteArchiveSyncFinished
+                    || healthMessage == QnSystemHealth::RemoteArchiveSyncProgress)
                 {
                     if (eventParams.metadata.cameraRefs.empty())
                         return;

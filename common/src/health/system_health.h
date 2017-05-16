@@ -33,7 +33,9 @@ enum MessageType
     Count,
 
     RemoteArchiveSyncStarted,
-    RemoteArchiveSyncFinished
+    RemoteArchiveSyncFinished,
+    RemoteArchiveSyncProgress,
+    RemoteArchiveSyncError
 };
 
 /** Some messages are not to be displayed in any case. */

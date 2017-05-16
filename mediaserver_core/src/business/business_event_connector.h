@@ -82,6 +82,10 @@ public slots:
 
     void at_remoteArchiveSyncFinished(const QnResourcePtr &resource);
 
+    void at_remoteArchiveSyncError(const QnResourcePtr &resource, const QString& error);
+
+    void at_remoteArchiveSyncProgress(const QnResourcePtr &resource, double progress);
+
     bool createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState, QString* errMessage = 0);
 private slots:
     void onNewResource(const QnResourcePtr &resource);

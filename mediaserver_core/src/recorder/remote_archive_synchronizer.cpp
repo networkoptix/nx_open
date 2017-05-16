@@ -53,6 +53,7 @@ RemoteArchiveSynchronizer::~RemoteArchiveSynchronizer()
         m_terminated = true;
     }
 
+    qDebug() << "!!!! Attention !!!! RemoteArchiveSynchronizer destructor";
     cancelAllTasks();
     waitForAllTasks();
 }
@@ -90,6 +91,13 @@ void RemoteArchiveSynchronizer::at_resourceInitializationChanged(const QnResourc
 
     if (!archiveCanBeSynchronized)
     {
+        qDebug()
+            << "Archive for resource"
+            << securityCameraResource->getName()
+            << "can not be synchronized. Resource is initialized:" 
+            << securityCameraResource->isInitialized() << "."
+            << "Resource has remote archive capability:" 
+            << securityCameraResource->hasCameraCapabilities(Qn::RemoteArchiveCapability);
         cancelTaskForResource(securityCameraResource->getId());
         return;
     }
@@ -102,6 +110,9 @@ void RemoteArchiveSynchronizer::at_resourceInitializationChanged(const QnResourc
 
 void RemoteArchiveSynchronizer::at_resourceParentIdChanged(const QnResourcePtr& resource)
 {
+    qDebug() << "!!!! ATTENTION !!!!! resource parent ID has been changed"
+        << resource->getParentId();
+
     cancelTaskForResource(resource->getId());
 }
 
@@ -166,6 +177,14 @@ void RemoteArchiveSynchronizer::waitForAllTasks()
 //------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------
 
+
+SynchronizationTask::SynchronizationTask():
+    m_canceled(false),
+    m_totalChunksToSynchronize(0),
+    m_currentNumberOfSynchronizedChunks(0)
+{
+}
+
 void SynchronizationTask::setResource(const QnSecurityCamResourcePtr& resource)
 {
     m_resource = resource;
@@ -194,28 +213,80 @@ bool SynchronizationTask::synchronizeArchive(const QnSecurityCamResourcePtr& res
     auto res = resource;
     auto manager = res->remoteArchiveManager();
     if (!manager)
+    {
+        qDebug() << "Resource" << resource->getName() << "has no remote archive manager";
+        NX_LOGX(
+            lm("Resource %1 has no remote archive manager")
+                .arg(resource->getName()),
+            cl_logDEBUG1);
+
         return false;
+    }
 
     // 1. Get list of records from camera.
     std::vector<RemoteArchiveEntry> sdCardArchiveEntries;
     manager->listAvailableArchiveEntries(&sdCardArchiveEntries);
 
     if (m_canceled)
+    {
+        qDebug() << "Remote archive synchronization task for resource" << resource->getName() << "was canceled";
+        NX_LOGX(
+            lm("Remote archive synchronization task for resource %1 was canceled")
+                .arg(resource->getName()),
+            cl_logDEBUG1);
         return false;
+    }
 
     // 2. Filter list (keep only needed records)
     auto filtered = filterEntries(resource, sdCardArchiveEntries);
     if (filtered.empty())
     {
         qDebug() << "Archive is fully synchronized. There is no need in any further actions";
+        NX_LOGX(lit("Archive is fully synchronized. There is no need in any further actions"), cl_logDEBUG1);
         return true;
     }
+
+    auto totalEntriesToSynchronize = filtered.size();
+    int currentNumberOfSynchronizedEntries = 0;
+    double lastBroadcastedSyncProgress = 0; 
+    const int kNumberOfSynchronizedEntriesToNotify = 5;
+    double broadcastSyncProgressStep = 
+        kNumberOfSynchronizedEntriesToNotify / (double)totalEntriesToSynchronize;
+
+    if (broadcastSyncProgressStep > 0.7)
+        broadcastSyncProgressStep = 1;
 
     qnBusinessRuleConnector->at_remoteArchiveSyncStarted(resource);
 
     // 3. In cycle copy all records to archive.
     for (const auto& entry : filtered)
-        copyEntryToArchive(resource, entry);
+    {
+        qDebug() << "Copying entry to archive";
+        bool result = copyEntryToArchive(resource, entry);
+
+        if (!result)
+        {
+            qDebug() << lit("Can not synchronize video chunk.");
+            NX_LOGX(lit("Can not synchronize video chunk."), cl_logDEBUG1);
+            qnBusinessRuleConnector->at_remoteArchiveSyncError(
+                resource,
+                lit("Can not synchronize video chunk."));
+        }
+
+        ++currentNumberOfSynchronizedEntries;
+
+        double currentSyncProgress = 
+            (double) currentNumberOfSynchronizedEntries / totalEntriesToSynchronize;
+
+        if (currentSyncProgress - lastBroadcastedSyncProgress > broadcastSyncProgressStep)
+        {
+            qDebug() << lit("Remote archive synchronization progress is %1").arg(currentSyncProgress);
+            NX_LOGX(lm("Remote archive synchronization progress is %1").arg(currentSyncProgress), cl_logDEBUG1);
+            qnBusinessRuleConnector->at_remoteArchiveSyncProgress(resource, currentSyncProgress);
+            qDebug() << "Progress action has been broadcasted";
+            lastBroadcastedSyncProgress = currentSyncProgress;
+        }
+    }
 
     qDebug() << "Archive synchronization is done.";
     NX_LOGX(lit("Archive synchronization is done."), cl_logDEBUG1);
@@ -310,6 +381,9 @@ bool SynchronizationTask::copyEntryToArchive(
             .arg(buffer.size()),
         cl_logDEBUG1);
 
+    if (buffer.size() < 1000)
+        qDebug() << "!!!! Buffer too small. Buffer:" << buffer << "String:" << QString::fromUtf8(buffer); 
+
     int64_t realDurationMs = 0;
     result = writeEntry(resource, entry, &buffer, &realDurationMs);
     if (result)
@@ -337,7 +411,7 @@ bool SynchronizationTask::writeEntry(
         return false;
     }
 
-    const int64_t kEpsilonMs = 100;
+    const int64_t kEpsilonMs = 1010;
     int64_t realDurationMs = std::round(helper.durationMs());
 
     int64_t diff = entry.durationMs - realDurationMs;

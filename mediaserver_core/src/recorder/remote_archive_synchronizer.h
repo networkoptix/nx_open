@@ -25,6 +25,7 @@ class SynchronizationTask
     using BufferType = QByteArray;
 
 public:
+    SynchronizationTask();
     void setResource(const QnSecurityCamResourcePtr& resource);
     void setDoneHandler(std::function<void()> handler);
     void cancel();
@@ -66,6 +67,8 @@ private:
     QnSecurityCamResourcePtr m_resource;
     std::atomic<bool> m_canceled;
     std::function<void()> m_doneHandler;
+    int m_totalChunksToSynchronize;
+    int m_currentNumberOfSynchronizedChunks;
 };
 
 struct SynchronizationTaskContext

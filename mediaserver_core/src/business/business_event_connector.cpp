@@ -169,6 +169,7 @@ void QnBusinessEventConnector::at_remoteArchiveSyncStarted(const QnResourcePtr& 
 
     auto params = action->getRuntimeParams();
     params.metadata.cameraRefs.push_back(resource->getId());
+    action->setRuntimeParams(params);
     qnBusinessRuleProcessor->broadcastBusinessAction(action);
 }
 
@@ -180,6 +181,39 @@ void QnBusinessEventConnector::at_remoteArchiveSyncFinished(const QnResourcePtr 
 
     auto params = action->getRuntimeParams();
     params.metadata.cameraRefs.push_back(resource->getId());
+    action->setRuntimeParams(params);
+    qnBusinessRuleProcessor->broadcastBusinessAction(action);
+}
+
+void QnBusinessEventConnector::at_remoteArchiveSyncError(
+    const QnResourcePtr &resource,
+    const QString& error)
+{
+    QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(
+        QnSystemHealth::MessageType::RemoteArchiveSyncError,
+        serverGuid()));
+
+    auto params = action->getRuntimeParams();
+    params.metadata.cameraRefs.push_back(resource->getId());
+    params.caption = error;
+    action->setRuntimeParams(params);
+    qnBusinessRuleProcessor->broadcastBusinessAction(action);
+}
+
+void QnBusinessEventConnector::at_remoteArchiveSyncProgress(
+    const QnResourcePtr &resource,
+    double progress)
+{
+    NX_ASSERT(progress >= 0 && progress <= 1);
+
+    QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(
+        QnSystemHealth::MessageType::RemoteArchiveSyncProgress,
+        serverGuid()));
+
+    auto params = action->getRuntimeParams();
+    params.metadata.cameraRefs.push_back(resource->getId());
+    action->setRuntimeParams(params);
+    qDebug() << "Broadcasting sync progress business action";
     qnBusinessRuleProcessor->broadcastBusinessAction(action);
 }
 
