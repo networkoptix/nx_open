@@ -13,9 +13,8 @@
 #include <utils/common/instance_storage.h>
 #include <utils/common/software_version.h>
 
-#include <nx/network/cloud/tunnel/tcp/tunnel_tcp_endpoint_verificator_factory.h>
-
 class QnResourceDataPool;
+struct QnStaticCommonModulePrivate;
 
 /**
  * Storage for static common module's global state.
@@ -54,11 +53,11 @@ protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
 
 private:
+    QnStaticCommonModulePrivate* m_private;
     const Qn::PeerType m_localPeerType;
     const QString m_brand;
     const QString m_customization;
     QnSoftwareVersion m_engineVersion;
-    nx::network::cloud::tcp::EndpointVerificatorFactory::Function m_endpointVerificatorFactoryBak;
 
     QnResourceDataPool* m_dataPool = nullptr;
 };

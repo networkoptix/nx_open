@@ -2,6 +2,7 @@
 
 #include <QtCore/QCoreApplication>
 
+#include <nx/network/cloud/tunnel/tcp/tunnel_tcp_endpoint_verificator_factory.h>
 #include <nx/network/socket_global.h>
 
 #include <api/http_client_pool.h>
@@ -12,6 +13,11 @@
 
 #include "common_meta_types.h"
 
+struct QnStaticCommonModulePrivate
+{
+    nx::network::cloud::tcp::EndpointVerificatorFactory::Function endpointVerificatorFactoryBak;
+};
+
 QnStaticCommonModule::QnStaticCommonModule(
     Qn::PeerType localPeerType,
     const QString& brand,
@@ -19,6 +25,7 @@ QnStaticCommonModule::QnStaticCommonModule(
     QObject *parent)
     :
     QObject(parent),
+    m_private(new QnStaticCommonModulePrivate),
     m_localPeerType(localPeerType),
     m_brand(brand),
     m_customization(customization),
@@ -29,7 +36,7 @@ QnStaticCommonModule::QnStaticCommonModule(
     nx::network::SocketGlobals::init();
 
     // Providing mediaserver-specific way of validating peer id.
-    m_endpointVerificatorFactoryBak =
+    m_private->endpointVerificatorFactoryBak =
         nx::network::cloud::tcp::EndpointVerificatorFactory::instance().setCustomFunc(
             [](const nx::String& connectSessionId) 
                 -> std::unique_ptr<nx::network::cloud::tcp::AbstractEndpointVerificator>
@@ -60,8 +67,11 @@ QnStaticCommonModule::~QnStaticCommonModule()
     clear();
 
     nx::network::cloud::tcp::EndpointVerificatorFactory::instance().setCustomFunc(
-        std::move(m_endpointVerificatorFactoryBak));
+        std::move(m_private->endpointVerificatorFactoryBak));
     nx::network::SocketGlobals::deinit();
+
+    delete m_private;
+    m_private = nullptr;
 }
 
 Qn::PeerType QnStaticCommonModule::localPeerType() const
