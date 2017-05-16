@@ -111,6 +111,8 @@ public:
         else
             return nullptr;
     }
+    MSSettings* serverSettings() const { return m_settings.get(); }
+
 signals:
     void started();
 public slots:
@@ -195,6 +197,7 @@ private:
     std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
     std::weak_ptr<QnMediaServerModule> m_serverModule;
     bool m_serviceMode;
+    std::unique_ptr<MSSettings> m_settings;
 };
 
 #endif // MEDIA_SERVER_PROCESS_H

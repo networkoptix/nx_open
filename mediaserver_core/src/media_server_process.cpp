@@ -1014,14 +1014,14 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
 
     parseCommandLineParameters(argc, argv);
 
-    MSSettings settings(
+    m_settings.reset(new MSSettings(
         m_cmdLineArguments.configFilePath,
-        m_cmdLineArguments.rwConfigFilePath);
+        m_cmdLineArguments.rwConfigFilePath));
 
-    addCommandLineParametersFromConfig(&settings);
+    addCommandLineParametersFromConfig(m_settings.get());
 
     const bool isStatisticsDisabled =
-        settings.roSettings()->value(QnServer::kNoMonitorStatistics, false).toBool();
+        m_settings->roSettings()->value(QnServer::kNoMonitorStatistics, false).toBool();
 
     m_platform.reset(new QnPlatformAbstraction());
     m_platform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
@@ -3185,7 +3185,7 @@ protected:
             QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 
         if (application->isRunning() &&
-            qnServerModule->roSettings()->value(nx_ms_conf::ENABLE_MULTIPLE_INSTANCES).toInt() == 0)
+            m_main->serverSettings()->roSettings()->value(nx_ms_conf::ENABLE_MULTIPLE_INSTANCES).toInt() == 0)
         {
             NX_LOG("Server already started", cl_logERROR);
             qApp->quit();
