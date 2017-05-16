@@ -34,6 +34,11 @@ namespace test {
     nx::kit::test::detail::assertEq( \
         (EXPECTED), #EXPECTED, (ACTUAL), #ACTUAL, __FILE__, __LINE__)
 
+#define ASSERT_STREQ(EXPECTED, ACTUAL) \
+    nx::kit::test::detail::assertEq( \
+        std::string(EXPECTED), #EXPECTED, \
+        std::string(ACTUAL), #ACTUAL, __FILE__, __LINE__)
+
 /**
  * Usage: call from main():
  * <code><pre>
@@ -72,7 +77,7 @@ NX_KIT_API void assertEq(
     const Actual& actual, const char* actualExpr,
     const char* const file, int line)
 {
-    if (!(expected == actual)) //< Require only operator=().
+    if (!(expected == actual)) //< Require only operator==().
     {
         std::ostringstream expectedValue;
         expectedValue << expected;

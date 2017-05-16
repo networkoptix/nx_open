@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstring>
+#include <ctime>
 
 #include <nx/kit/test.h>
 #include <nx/kit/ini_config.h>
@@ -8,14 +9,20 @@
 using namespace nx::kit;
 
 /**
- * Generate a unique .ini file to avoid collisions in this test.
+ * Generate a unique .ini file name to avoid collisions in this test.
  */
-static const char* uniqueIniFile()
+static std::string uniqueIniFileName()
 {
-    constexpr int kMaxIniFileLen = 100;
-    static char iniFile[kMaxIniFileLen];
-    snprintf(iniFile, kMaxIniFileLen, "%d_test.ini", rand());
-    return iniFile;
+    static bool randomized = false;
+    if (!randomized)
+    {
+        srand((unsigned int) time(0));
+        randomized = true;
+    }
+    constexpr int kMaxIniFileNameLen = 100;
+    char iniFileName[kMaxIniFileNameLen];
+    snprintf(iniFileName, kMaxIniFileNameLen, "%d_test.ini", rand());
+    return std::string(iniFileName);
 }
 
 struct TestIniConfig: IniConfig
@@ -35,10 +42,12 @@ struct TestIniConfig: IniConfig
 
 static const TestIniConfig defaultIni("will_not_load_from_file.ini");
 
+static const std::string iniFileName = uniqueIniFileName();
+
 // Using a static instance just to test this possibility.
 static TestIniConfig& ini()
 {
-    static TestIniConfig ini(uniqueIniFile());
+    static TestIniConfig ini(iniFileName.c_str());
     return ini;
 }
 
@@ -142,7 +151,7 @@ struct IniFile
 
     ~IniFile()
     {
-        std::remove(iniFilePath.c_str()); //< Delete .ini file.
+        remove(iniFilePath.c_str()); //< Delete .ini file.
     }
 };
 
@@ -190,6 +199,10 @@ static void testReload(
 
 TEST(iniConfig, test)
 {
+    // Check path properties of IniConfig.
+    ASSERT_STREQ(iniFileName.c_str(), ini().iniFile());
+    ASSERT_EQ(std::string(ini().iniFileDir()) + iniFileName, ini().iniFilePath());
+
     std::cerr << "ini().isEnabled() -> " << (ini().isEnabled() ? "true" : "false") << std::endl;
 
     std::remove(ini().iniFilePath()); //< Clean up from failed runs (if any).

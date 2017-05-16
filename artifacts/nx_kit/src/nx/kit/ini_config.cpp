@@ -244,7 +244,7 @@ struct IniConfig::Impl
     Impl(const char* iniFile):
         iniFile(validateIniFile(iniFile)),
         iniFileDir(determineIniDir()),
-        iniFilePath(iniFile + iniFilePath)
+        iniFilePath(iniFileDir + iniFile)
     {
     }
 
@@ -258,13 +258,13 @@ struct IniConfig::Impl
     Value regParam(const Value* pValue, const Value& defaultValue,
         const char* paramName, const char* description);
 
-    static const char* validateIniFile(const char* iniFile);
+    static std::string validateIniFile(const char* iniFile);
     static std::string determineIniDir();
 
     bool parseIniFile(std::ostream* output, bool* outputIsNeeded);
     void createDefaultIniFile(std::ostream* output);
 
-    const char* const iniFile;
+    const std::string iniFile;
     const std::string iniFileDir;
     const std::string iniFilePath;
 
@@ -287,7 +287,7 @@ Value IniConfig::Impl::regParam(
     return validatedDefaultValue;
 }
 
-const char* IniConfig::Impl::validateIniFile(const char* iniFile)
+std::string IniConfig::Impl::validateIniFile(const char* iniFile)
 {
     if (iniFile == nullptr)
     {
@@ -314,7 +314,7 @@ const char* IniConfig::Impl::validateIniFile(const char* iniFile)
         }
     }
 
-    return iniFile;
+    return std::string(iniFile);
 }
 
 std::string IniConfig::Impl::determineIniDir()
@@ -510,7 +510,7 @@ const char* IniConfig::regStringParam(
 
 const char* IniConfig::iniFile() const
 {
-    return d->iniFile;
+    return d->iniFile.c_str();
 }
 
 const char* IniConfig::iniFileDir() const

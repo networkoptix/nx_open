@@ -29,8 +29,16 @@ set(TEST_SOURCES
     tests/main.cpp
 )
 
+set(C_WRAPPER_TEST_SOURCES
+    tests/ini.cpp
+    tests/main.c
+)
+
 add_executable(nx_kit_test ${TEST_SOURCES})
 target_link_libraries(nx_kit_test nx_kit)
 
 add_executable(nx_kit_disabled_ini_config_test ${TEST_SOURCES})
 target_link_libraries(nx_kit_disabled_ini_config_test nx_kit_disabled_ini_config)
+
+add_executable(nx_kit_c_wrapper_test ${C_WRAPPER_TEST_SOURCES})
+target_link_libraries(nx_kit_c_wrapper_test nx_kit)
