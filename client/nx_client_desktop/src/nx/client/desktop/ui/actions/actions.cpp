@@ -653,6 +653,100 @@ void initialize(Manager* manager, Action* root)
     factory(BeforeExitAction)
         .flags(NoTarget);
 
+    /* Slider actions. */
+    factory(StartTimeSelectionAction)
+        .flags(Slider | SingleTarget)
+        .text(tr("Mark Selection Start"))
+        .shortcut(lit("["))
+        .shortcutContext(Qt::WidgetShortcut)
+        .condition(new TimePeriodCondition(NullTimePeriod, InvisibleAction));
+
+    factory(EndTimeSelectionAction)
+        .flags(Slider | SingleTarget)
+        .text(tr("Mark Selection End"))
+        .shortcut(lit("]"))
+        .shortcutContext(Qt::WidgetShortcut)
+        .condition(new TimePeriodCondition(EmptyTimePeriod, InvisibleAction));
+
+    factory(ClearTimeSelectionAction)
+        .flags(Slider | SingleTarget)
+        .text(tr("Clear Selection"))
+        .condition(new TimePeriodCondition(EmptyTimePeriod | NormalTimePeriod, InvisibleAction));
+
+    factory(ZoomToTimeSelectionAction)
+        .flags(Slider | SingleTarget)
+        .text(tr("Zoom to Selection"))
+        .condition(new TimePeriodCondition(NormalTimePeriod, InvisibleAction));
+
+    factory(AddCameraBookmarkAction)
+        .flags(Slider | SingleTarget)
+        .text(tr("Add Bookmark..."))
+        .requiredGlobalPermission(Qn::GlobalManageBookmarksPermission)
+        .condition(
+            !condition::isSafeMode()
+            && ConditionWrapper(new AddBookmarkCondition())
+        );
+
+    factory(EditCameraBookmarkAction)
+        .flags(Slider | SingleTarget | ResourceTarget)
+        .text(tr("Edit Bookmark..."))
+        .requiredGlobalPermission(Qn::GlobalManageBookmarksPermission)
+        .condition(
+            !condition::isSafeMode()
+            && ConditionWrapper(new ModifyBookmarkCondition())
+        );
+
+    factory(RemoveCameraBookmarkAction)
+        .flags(Slider | SingleTarget)
+        .text(tr("Remove Bookmark..."))
+        .requiredGlobalPermission(Qn::GlobalManageBookmarksPermission)
+        .condition(
+            !condition::isSafeMode()
+            && ConditionWrapper(new ModifyBookmarkCondition())
+        );
+
+    factory(RemoveBookmarksAction)
+        .flags(NoTarget | SingleTarget | ResourceTarget)
+        .text(tr("Remove Bookmarks...")) //< Copied to an internal context menu
+        .requiredGlobalPermission(Qn::GlobalManageBookmarksPermission)
+        .condition(
+            !condition::isSafeMode()
+            && ConditionWrapper(new RemoveBookmarksCondition())
+        );
+
+    factory()
+        .flags(Slider | SingleTarget)
+        .separator();
+
+    factory(ExportTimeSelectionAction)
+        .flags(Slider | SingleTarget | ResourceTarget)
+        .text(tr("Export Selected Area..."))
+        .requiredTargetPermissions(Qn::ExportPermission)
+        .condition(new ExportCondition(true));
+
+    factory(ExportLayoutAction)
+        .flags(Slider | SingleTarget | MultiTarget | NoTarget)
+        .text(tr("Export Multi-Video..."))
+        .requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission)
+        .condition(new ExportCondition(false));
+
+    factory(ExportTimelapseAction)
+        .flags(Slider | SingleTarget | MultiTarget | NoTarget)
+        .text(tr("Export Rapid Review..."))
+        .requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission)
+        .condition(new ExportCondition(true));
+
+    factory(ThumbnailsSearchAction)
+        .flags(Slider | Scene | SingleTarget)
+        .mode(DesktopMode)
+        .text(tr("Preview Search..."))
+        .condition(new PreviewCondition());
+
+    factory()
+        .flags(Scene | SingleTarget)
+        .separator()
+        .condition(new PreviewCondition());
+
     factory()
         .flags(Tree | SingleTarget | ResourceTarget)
         .childFactory(new EdgeNodeFactory(manager))
@@ -1448,96 +1542,6 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .text(tr("Close All But This"))
         .condition(new LayoutCountCondition(2));
-
-    /* Slider actions. */
-    factory(StartTimeSelectionAction)
-        .flags(Slider | SingleTarget)
-        .text(tr("Mark Selection Start"))
-        .shortcut(lit("["))
-        .shortcutContext(Qt::WidgetShortcut)
-        .condition(new TimePeriodCondition(NullTimePeriod, InvisibleAction));
-
-    factory(EndTimeSelectionAction)
-        .flags(Slider | SingleTarget)
-        .text(tr("Mark Selection End"))
-        .shortcut(lit("]"))
-        .shortcutContext(Qt::WidgetShortcut)
-        .condition(new TimePeriodCondition(EmptyTimePeriod, InvisibleAction));
-
-    factory(ClearTimeSelectionAction)
-        .flags(Slider | SingleTarget)
-        .text(tr("Clear Selection"))
-        .condition(new TimePeriodCondition(EmptyTimePeriod | NormalTimePeriod, InvisibleAction));
-
-    factory(ZoomToTimeSelectionAction)
-        .flags(Slider | SingleTarget)
-        .text(tr("Zoom to Selection"))
-        .condition(new TimePeriodCondition(NormalTimePeriod, InvisibleAction));
-
-    factory(AddCameraBookmarkAction)
-        .flags(Slider | SingleTarget)
-        .text(tr("Add Bookmark..."))
-        .requiredGlobalPermission(Qn::GlobalManageBookmarksPermission)
-        .condition(
-            !condition::isSafeMode()
-            && ConditionWrapper(new AddBookmarkCondition())
-        );
-
-    factory(EditCameraBookmarkAction)
-        .flags(Slider | SingleTarget | ResourceTarget)
-        .text(tr("Edit Bookmark..."))
-        .requiredGlobalPermission(Qn::GlobalManageBookmarksPermission)
-        .condition(
-            !condition::isSafeMode()
-            && ConditionWrapper(new ModifyBookmarkCondition())
-        );
-
-    factory(RemoveCameraBookmarkAction)
-        .flags(Slider | SingleTarget)
-        .text(tr("Remove Bookmark..."))
-        .requiredGlobalPermission(Qn::GlobalManageBookmarksPermission)
-        .condition(
-            !condition::isSafeMode()
-            && ConditionWrapper(new ModifyBookmarkCondition())
-        );
-
-    factory(RemoveBookmarksAction)
-        .flags(NoTarget | SingleTarget | ResourceTarget)
-        .text(tr("Remove Bookmarks...")) //< Copied to an internal context menu
-        .requiredGlobalPermission(Qn::GlobalManageBookmarksPermission)
-        .condition(
-            !condition::isSafeMode()
-            && ConditionWrapper(new RemoveBookmarksCondition())
-        );
-
-    factory()
-        .flags(Slider | SingleTarget)
-        .separator();
-
-    factory(ExportTimeSelectionAction)
-        .flags(Slider | SingleTarget | ResourceTarget)
-        .text(tr("Export Selected Area..."))
-        .requiredTargetPermissions(Qn::ExportPermission)
-        .condition(new ExportCondition(true));
-
-    factory(ExportLayoutAction)
-        .flags(Slider | SingleTarget | MultiTarget | NoTarget)
-        .text(tr("Export Multi-Video..."))
-        .requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission)
-        .condition(new ExportCondition(false));
-
-    factory(ExportTimelapseAction)
-        .flags(Slider | SingleTarget | MultiTarget | NoTarget)
-        .text(tr("Export Rapid Review..."))
-        .requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission)
-        .condition(new ExportCondition(true));
-
-    factory(ThumbnailsSearchAction)
-        .flags(Slider | Scene | SingleTarget)
-        .mode(DesktopMode)
-        .text(tr("Preview Search..."))
-        .condition(new PreviewCondition());
-
 
     factory(DebugIncrementCounterAction)
         .flags(GlobalHotkey | DevMode)
