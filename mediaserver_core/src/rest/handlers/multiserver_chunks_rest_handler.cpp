@@ -10,6 +10,7 @@
 #include <core/resource/media_server_resource.h>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/compressed_time_functions.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/fusion/serialization/compressed_time.h>
 
