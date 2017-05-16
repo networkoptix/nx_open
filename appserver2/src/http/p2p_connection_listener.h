@@ -14,6 +14,8 @@ class P2pMessageBus;
 class P2pConnectionProcessor : public QnTCPConnectionProcessor
 {
 public:
+    const static QString kUrlPath;
+
     P2pConnectionProcessor(
         P2pMessageBus* messageBus,
         QSharedPointer<AbstractStreamSocket> socket,

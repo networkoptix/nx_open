@@ -15,6 +15,7 @@
 #include <api/global_settings.h>
 #include <nx_ec/ec_proto_version.h>
 #include <utils/math/math.h>
+#include <http/p2p_connection_listener.h>
 
 namespace {
 
@@ -218,9 +219,13 @@ void P2pMessageBus::stop()
 
 // P2pMessageBus
 
-void P2pMessageBus::addOutgoingConnectionToPeer(const QnUuid& peer, const QUrl& url)
+void P2pMessageBus::addOutgoingConnectionToPeer(const QnUuid& peer, const QUrl& _url)
 {
     QnMutexLocker lock(&m_mutex);
+
+    QUrl url(_url);
+    url.setPath(P2pConnectionProcessor::kUrlPath);
+
     int pos = nx::utils::random::number((int) 0, (int) m_remoteUrls.size());
     m_remoteUrls.insert(m_remoteUrls.begin() + pos, RemoteConnection(peer, url));
 }

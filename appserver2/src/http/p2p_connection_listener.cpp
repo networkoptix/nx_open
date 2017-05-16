@@ -43,6 +43,7 @@ namespace ec2
 
 // -------------------------- P2pConnectionProcessor ---------------------
 
+const QString P2pConnectionProcessor::kUrlPath(lit("/ec2/messageBus"));
 
 class P2pConnectionProcessorPrivate : public QnTCPConnectionProcessorPrivate
 {

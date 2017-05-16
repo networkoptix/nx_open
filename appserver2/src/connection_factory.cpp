@@ -184,7 +184,7 @@ void Ec2DirectConnectionFactory::registerTransactionListener(
     else if (auto bus = dynamic_cast<P2pMessageBus*> (m_bus.get()))
     {
         httpConnectionListener->addHandler<P2pConnectionProcessor, P2pMessageBus>(
-            "HTTP", "ec2/messageBus", bus);
+            "HTTP", P2pConnectionProcessor::kUrlPath, bus);
     }
 
     m_sslEnabled = httpConnectionListener->isSslEnabled();
