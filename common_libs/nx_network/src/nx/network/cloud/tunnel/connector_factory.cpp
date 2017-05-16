@@ -36,27 +36,30 @@ CloudConnectors ConnectorFactory::defaultFunc(
     if (((s_cloudConnectTypeMask & (int)CloudConnectType::udpHp) > 0) &&
         (udpSocket || !response.udpEndpointList.empty()))
     {
-        connectors.emplace_back(
-            std::make_unique<udp::TunnelConnector>(
-                targetAddress,
-                connectSessionId,
-                std::move(udpSocket)));
+        TunnelConnectorContext context;
+        context.connector = std::make_unique<udp::TunnelConnector>(
+            targetAddress,
+            connectSessionId,
+            std::move(udpSocket));
+        connectors.emplace_back(std::move(context));
     }
 
     if (((s_cloudConnectTypeMask & (int)CloudConnectType::forwardedTcpPort) > 0) &&
         !response.forwardedTcpEndpointList.empty())
     {
-        connectors.emplace_back(
-            std::make_unique<tcp::DirectEndpointConnector>(
-                targetAddress, connectSessionId));
+        TunnelConnectorContext context;
+        context.connector = std::make_unique<tcp::DirectEndpointConnector>(
+            targetAddress, connectSessionId);
+        connectors.emplace_back(std::move(context));
     }
 
     if (((s_cloudConnectTypeMask & (int)CloudConnectType::proxy) > 0) &&
         response.trafficRelayUrl)
     {
-        connectors.emplace_back(
-            std::make_unique<relay::Connector>(
-                *response.trafficRelayUrl, targetAddress, connectSessionId));
+        TunnelConnectorContext context;
+        context.connector = std::make_unique<relay::Connector>(
+            *response.trafficRelayUrl, targetAddress, connectSessionId);
+        connectors.emplace_back(std::move(context));
     }
 
     return connectors;

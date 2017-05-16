@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <list>
 #include <memory>
 
 #include <nx/network/aio/basic_pollable.h>
@@ -38,14 +39,23 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
+    struct ConnectorContext
+    {
+        std::unique_ptr<AbstractTunnelConnector> connector;
+        std::chrono::milliseconds startDelay;
+        std::unique_ptr<aio::Timer> timer;
+    };
+
     const nx::String m_connectSessionId;
     hpm::api::ConnectResponse m_response;
-    CloudConnectors m_connectors;
+    std::list<ConnectorContext> m_connectors;
     std::chrono::milliseconds m_connectTimeout;
     CompletionHandler m_handler;
 
+    void reportNoSuitableConnectMethod();
+    void startConnector(std::list<ConnectorContext>::iterator connectorIter);
     void onConnectorFinished(
-        CloudConnectors::iterator connectorIter,
+        std::list<ConnectorContext>::iterator connectorIter,
         nx::hpm::api::NatTraversalResultCode resultCode,
         SystemError::ErrorCode sysErrorCode,
         std::unique_ptr<AbstractOutgoingTunnelConnection> connection);

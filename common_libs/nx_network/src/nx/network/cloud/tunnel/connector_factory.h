@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <list>
 #include <map>
 
@@ -14,7 +15,13 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-using CloudConnectors = std::list<std::unique_ptr<AbstractTunnelConnector>>;
+struct TunnelConnectorContext
+{
+    std::unique_ptr<AbstractTunnelConnector> connector;
+    std::chrono::milliseconds startDelay;
+};
+
+using CloudConnectors = std::list<TunnelConnectorContext>;
 
 typedef CloudConnectors (ConnectorFactoryFunc)(
     const AddressEntry& /*targetAddress*/,
@@ -28,10 +35,6 @@ class NX_NETWORK_API ConnectorFactory:
     using base_type = nx::utils::BasicFactory<ConnectorFactoryFunc>;
 
 public:
-    typedef std::function<
-        std::unique_ptr<AbstractCrossNatConnector>(
-            const AddressEntry& /*targetAddress*/)> FactoryFunc;
-
     ConnectorFactory();
 
     static ConnectorFactory& instance();
