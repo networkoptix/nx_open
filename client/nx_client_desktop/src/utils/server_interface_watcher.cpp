@@ -77,6 +77,6 @@ void QnServerInterfaceWatcher::updatePrimaryInterface(const QnMediaServerResourc
     {
         server->setPrimaryAddress(module->endpoint);
         NX_LOG(lm("QnServerInterfaceWatcher: Set primary address of %1 (%2) to %3")
-            .strs(server->getName(), server->getId(), module->endpoint), cl_logDEBUG1);
+            .args(server->getName(), server->getId(), module->endpoint), cl_logDEBUG1);
     }
 }

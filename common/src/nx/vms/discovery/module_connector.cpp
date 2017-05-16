@@ -84,12 +84,12 @@ ModuleConnector::Module::Module(ModuleConnector* parent, const QnUuid& id):
     m_id(id)
 {
     m_timer.bindToAioThread(parent->getAioThread());
-    NX_DEBUG(this, lm("New %1").strs(m_id));
+    NX_DEBUG(this, lm("New %1").args(m_id));
 }
 
 ModuleConnector::Module::~Module()
 {
-    NX_DEBUG(this, lm("Delete %1").strs(m_id));
+    NX_DEBUG(this, lm("Delete %1").args(m_id));
     NX_ASSERT(m_timer.isInSelfAioThread());
     m_socket.reset();
     for (const auto& client: m_httpClients)
@@ -166,7 +166,7 @@ void ModuleConnector::Module::connect(Endpoints::iterator endpointsGroup)
         if (!m_id.isNull())
         {
             const auto reconnectInterval = m_parent->m_reconnectInterval;
-            NX_VERBOSE(this, lm("No more endpoints, retry in %1").str(reconnectInterval));
+            NX_VERBOSE(this, lm("No more endpoints, retry in %1").arg(reconnectInterval));
             m_timer.start(reconnectInterval, [this](){ connect(m_endpoints.begin()); });
             m_parent->m_disconnectedHandler(m_id);
         }
@@ -192,7 +192,7 @@ void ModuleConnector::Module::connect(Endpoints::iterator endpointsGroup)
 void ModuleConnector::Module::connect(
     const SocketAddress& endpoint, Endpoints::iterator endpointsGroup)
 {
-    NX_VERBOSE(this, lm("Attempt to connect to %1 by %2").strs(m_id, endpoint));
+    NX_VERBOSE(this, lm("Attempt to connect to %1 by %2").args(m_id, endpoint));
     const auto client = nx_http::AsyncHttpClient::create();
     m_httpClients.insert(client);
     client->bindToAioThread(m_timer.getAioThread());
@@ -235,7 +235,7 @@ boost::optional<QnModuleInformation> ModuleConnector::Module::getInformation(
 {
     if (!client->hasRequestSuccesed())
     {
-        NX_DEBUG(this, lm("Request to %1 has failed").strs(client->url()));
+        NX_DEBUG(this, lm("Request to %1 has failed").args(client->url()));
         return boost::none;
     }
 
@@ -245,7 +245,7 @@ boost::optional<QnModuleInformation> ModuleConnector::Module::getInformation(
     if (Qn::serializationFormatFromHttpContentType(contentType) != Qn::JsonFormat)
     {
         NX_DEBUG(this, lm("Unexpected Content-Type %2 from %3")
-            .strs(contentType, client->url()));
+            .args(contentType, client->url()));
         return boost::none;
     }
 
@@ -254,7 +254,7 @@ boost::optional<QnModuleInformation> ModuleConnector::Module::getInformation(
         || restResult.error != QnRestResult::Error::NoError)
     {
         NX_DEBUG(this, lm("Error response '%2' from %3")
-            .strs(restResult.errorString, client->url()));
+            .args(restResult.errorString, client->url()));
         return boost::none;
     }
 
@@ -263,7 +263,7 @@ boost::optional<QnModuleInformation> ModuleConnector::Module::getInformation(
         || moduleInformation.id.isNull())
     {
         NX_DEBUG(this, lm("Can not desserialize rsponse from %1")
-            .strs(moduleInformation.id));
+            .args(moduleInformation.id));
         return boost::none;
     }
 
@@ -288,7 +288,7 @@ bool ModuleConnector::Module::saveConnection(
     auto socket = client->takeSocket();
     if (!socket->setRecvTimeout(0) || !socket->setKeepAlive(kKeepAliveOptions))
     {
-        NX_WARNING(this, lm("Unable to save connection to %1: %2").strs(
+        NX_WARNING(this, lm("Unable to save connection to %1: %2").args(
             m_id, SystemError::getLastOSErrorText()));
 
         return false;
@@ -301,7 +301,7 @@ bool ModuleConnector::Module::saveConnection(
     m_socket->readSomeAsync(buffer.get(),
         [this, buffer](SystemError::ErrorCode code, size_t size)
         {
-            NX_VERBOSE(this, lm("Unexpectd connection read size=%1: %2").strs(
+            NX_VERBOSE(this, lm("Unexpectd connection read size=%1: %2").args(
                 size, SystemError::toString(code)));
 
             m_socket.reset();
@@ -309,7 +309,7 @@ bool ModuleConnector::Module::saveConnection(
         });
 
     auto ip = m_socket->getForeignAddress().address;
-    NX_VERBOSE(this, lm("Connected to %1 by %2 ip %3").strs(m_id, endpoint, ip));
+    NX_VERBOSE(this, lm("Connected to %1 by %2 ip %3").args(m_id, endpoint, ip));
     m_parent->m_connectedHandler(information, std::move(endpoint), std::move(ip));
     return true;
 }

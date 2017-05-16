@@ -70,7 +70,7 @@ void QnDirectSystemsFinder::removeSystem(const SystemsHash::iterator& it)
     if (it == m_systems.end())
         return;
 
-    NX_LOGX(lm("Removed system %1").str(it.value()->id()), cl_logDEBUG2);
+    NX_LOGX(lm("Removed system %1").arg(it.value()->id()), cl_logDEBUG2);
     const auto system = it.value();
     for (const auto server: system->servers())
         system->removeServer(server.id);
@@ -102,7 +102,7 @@ void QnDirectSystemsFinder::addServer(nx::vms::discovery::Manager::ModuleData mo
 
         if (sameNewSystemState && belongsToSameSystem)
         {
-            NX_LOGX(lm("New server %1 updates existing system %2").strs(
+            NX_LOGX(lm("New server %1 updates existing system %2").args(
                 module.id, current->id()), cl_logDEBUG2);
 
             // Just update system
@@ -140,7 +140,7 @@ void QnDirectSystemsFinder::addServer(nx::vms::discovery::Manager::ModuleData mo
 
     if (createNewSystem)
     {
-        NX_LOGX(lm("New system %1").str(systemDescription->id()), cl_logDEBUG2);
+        NX_LOGX(lm("New system %1").arg(systemDescription->id()), cl_logDEBUG2);
         emit systemDiscovered(systemDescription);
     }
 }
@@ -153,7 +153,7 @@ void QnDirectSystemsFinder::removeServer(QnUuid id)
     if (!serverIsInKnownSystem)
         return;
 
-    NX_LOGX(lm("Removed server %1 from system %2").strs(id, systemIt.value()->id()), cl_logDEBUG2);
+    NX_LOGX(lm("Removed server %1 from system %2").args(id, systemIt.value()->id()), cl_logDEBUG2);
     const auto removedCount = m_serverToSystem.remove(id);
     if (!removedCount)
         return;
@@ -179,7 +179,7 @@ void QnDirectSystemsFinder::updateServer(
     if (!changes.testFlag(QnServerField::CloudId))
         return;
 
-    NX_LOGX(lm("Readd server %1").str(module.id), cl_logDEBUG2);
+    NX_LOGX(lm("Update server %1").arg(module.id), cl_logDEBUG2);
 
     // Factory status has changed. We have to
     // remove server from current system and add to new

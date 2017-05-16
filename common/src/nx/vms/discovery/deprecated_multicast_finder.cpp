@@ -175,7 +175,7 @@ void DeprecatedMulticastFinder::clearInterfaces()
     for (UDPSocket *socket : m_clientSockets)
     {
         m_pollSet.remove(socket, aio::etRead);
-        NX_DEBUG(this, lm("PollSet(%1s): Removed %2 socket").strs(
+        NX_DEBUG(this, lm("PollSet(%1s): Removed %2 socket").args(
             m_pollSet.size(), socket->getLocalAddress()));
 
         delete socket;
@@ -295,7 +295,7 @@ bool DeprecatedMulticastFinder::processDiscoveryResponse(UDPSocket *udpSocket)
 
     if (response->port == 0)
     {
-        NX_DEBUG(this, lm("Ignoring %1 (%2) with zero port on local address %3").strs(
+        NX_DEBUG(this, lm("Ignoring %1 (%2) with zero port on local address %3").args(
             response->type, remoteEndpoint, udpSocket->getLocalAddress()));
         return true;
     }
@@ -376,7 +376,7 @@ void DeprecatedMulticastFinder::run()
                     else
                     {
                         NX_VERBOSE(this, lm("Reveal request is sent to %1 from %2")
-                            .strs(socket->getForeignAddress(), socket->getLocalAddress()));
+                            .args(socket->getForeignAddress(), socket->getLocalAddress()));
                     }
                 }
             }
@@ -384,7 +384,7 @@ void DeprecatedMulticastFinder::run()
             m_prevPingClock = currentClock;
         }
 
-        if (const auto timeout = SocketGlobals::debugConfig().multicastModuleFinderTimeout)
+        if (const auto timeout = SocketGlobals::debugIni().multicastModuleFinderTimeout)
         {
             NX_INFO(this, lm("Avoid using poll, use %1 ms recv timeouts instead").arg(timeout));
             if (m_serverSocket)

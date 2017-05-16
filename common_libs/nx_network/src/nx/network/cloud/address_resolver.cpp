@@ -9,7 +9,7 @@
 
 #define DEBUG_LOG(MESSAGE) do \
 { \
-    if (nx::network::SocketGlobals::debugConfig().addressResolver) \
+    if (nx::network::SocketGlobals::debugIni().addressResolver) \
         NX_LOGX(MESSAGE, cl_logDEBUG1); \
 } while (0)
 
@@ -177,7 +177,7 @@ void AddressResolver::resolveDomain(
             nx::hpm::api::ResultCode resultCode,
             nx::hpm::api::ResolveDomainResponse response)
         {
-            DEBUG_LOG(lm("Domain %1 resolution on mediator result: %2").strs(domain, resultCode));
+            DEBUG_LOG(lm("Domain %1 resolution on mediator result: %2").args(domain, resultCode));
             std::vector<TypedAddress> result;
             {
                 QnMutexLocker lk(&m_mutex);
@@ -195,7 +195,7 @@ void AddressResolver::resolveDomain(
                 result.emplace_back(std::move(address), AddressType::cloud);
             }
 
-            DEBUG_LOG(lm("Domain %1 is resolved to: %2").str(domain).container(result));
+            DEBUG_LOG(lm("Domain %1 is resolved to: %2").arg(domain).container(result));
             handler(std::move(result));
         });
 }
@@ -209,7 +209,7 @@ void AddressResolver::resolveAsync(
 {
     if (hostName.isIpAddress())
     {
-        DEBUG_LOG(lm("IP %1 is already resolved").str(hostName));
+        DEBUG_LOG(lm("IP %1 is already resolved").arg(hostName));
         AddressEntry entry(AddressType::direct, hostName);
         return handler(SystemError::noError, std::deque<AddressEntry>({std::move(entry)}));
     }
@@ -231,7 +231,7 @@ void AddressResolver::resolveAsync(
         }
     }
 
-    if (SocketGlobals::config().isHostDisabled(hostName))
+    if (SocketGlobals::ini().isHostDisabled(hostName))
         return handler(SystemError::noPermission, std::deque<AddressEntry>());
 
     QnMutexLocker lk(&m_mutex);
@@ -257,7 +257,7 @@ void AddressResolver::resolveAsync(
 
         lk.unlock();
 
-        DEBUG_LOG(lm("Address %1 resolved from cache: %2").str(hostName).container(entries));
+        DEBUG_LOG(lm("Address %1 resolved from cache: %2").arg(hostName).container(entries));
         const auto code = entries.size() ? SystemError::noError : SystemError::hostNotFound;
         return handler(code, std::move(entries));
     }
@@ -268,7 +268,7 @@ void AddressResolver::resolveAsync(
             requestId,
             RequestInfo(info->first, natTraversalSupport, std::move(handler))));
 
-    DEBUG_LOG(lm("Address %1 will be resolved later by request %2").strs(hostName, requestId));
+    DEBUG_LOG(lm("Address %1 will be resolved later by request %2").args(hostName, requestId));
     if (info->second.isLikelyCloudAddress && natTraversalSupport == NatTraversalSupport::enabled)
         mediatorResolve(info, &lk, true, ipVersion);
     else
@@ -462,7 +462,7 @@ void AddressResolver::tryFastDomainResolve(HaInfoIterator info)
 void AddressResolver::dnsResolve(
     HaInfoIterator info, QnMutexLockerBase* lk, bool needMediator, int ipVersion)
 {
-    NX_LOGX(lm("dnsResolve. %1. %2").str(info->first).arg((int)info->second.dnsState()), cl_logDEBUG2);
+    NX_LOGX(lm("dnsResolve. %1. %2").arg(info->first).arg((int)info->second.dnsState()), cl_logDEBUG2);
 
     switch (info->second.dnsState())
     {
@@ -475,7 +475,7 @@ void AddressResolver::dnsResolve(
             break; // continue
     }
 
-    NX_LOGX(lm("dnsResolve async. %1").str(info->first), cl_logDEBUG2);
+    NX_LOGX(lm("dnsResolve async. %1").arg(info->first), cl_logDEBUG2);
 
     info->second.dnsProgress();
     QnMutexUnlocker ulk(lk);
@@ -484,7 +484,7 @@ void AddressResolver::dnsResolve(
         [this, info, needMediator, ipVersion](
             SystemError::ErrorCode code, std::deque<HostAddress> ips)
         {
-            NX_LOGX(lm("dnsResolve async done. %1, %2").str(code).str(ips.size()), cl_logDEBUG2);
+            NX_LOGX(lm("dnsResolve async done. %1, %2").args(code, ips.size()), cl_logDEBUG2);
 
             std::vector<Guard> guards;
 
@@ -497,11 +497,11 @@ void AddressResolver::dnsResolve(
             }
 
             DEBUG_LOG(lm("Address %1 is resolved by DNS to %2")
-                .str(info->first).container(entries));
+                .arg(info->first).container(entries));
 
             info->second.setDnsEntries(std::move(entries));
             guards = grabHandlers(code, info);
-            NX_LOGX(lm("dnsResolve async done. grabndlers.size() = %1").str(guards.size()), cl_logDEBUG2);
+            NX_LOGX(lm("dnsResolve async done. grabndlers.size() = %1").arg(guards.size()), cl_logDEBUG2);
             if (needMediator && !info->second.isResolved(NatTraversalSupport::enabled))
                 mediatorResolve(info, &lk, false, ipVersion); // in case it's not resolved yet
         },
@@ -581,7 +581,7 @@ void AddressResolver::mediatorResolveImpl(
             }
 
             DEBUG_LOG(lm("Address %1 is resolved by mediator to %2")
-                .str(info->first).container(entries));
+                .arg(info->first).container(entries));
 
             const auto code = (resultCode == nx::hpm::api::ResultCode::ok)
                 ? SystemError::noError
@@ -625,7 +625,7 @@ std::vector<Guard> AddressResolver::grabHandlers(
 
                     QnMutexLocker lk(&m_mutex);
                     DEBUG_LOG(lm("Address %1 is resolved by request %2 to %3")
-                        .strs(info->first, it->first).container(entries));
+                        .args(info->first, it->first).container(entries));
 
                     guard = std::move(it->second.guard);
                     m_requests.erase(it);
@@ -642,7 +642,7 @@ std::vector<Guard> AddressResolver::grabHandlers(
     if (guards.size())
     {
         DEBUG_LOG(lm("There is(are) %1 about to be notified: %2 is resolved to %3")
-            .strs(guards.size(), info->first).container(entries));
+            .args(guards.size(), info->first).container(entries));
     }
 
     return guards;

@@ -28,7 +28,7 @@ protected:
 
         const auto module = server->moduleInstance().get();
         initServerData(module);
-        NX_ALWAYS(this, lm("Server %1 started at %2").strs(
+        NX_ALWAYS(this, lm("Server %1 started at %2").args(
             module->commonModule()->moduleGUID(), server->moduleInstance()->endpoint()));
 
         module->commonModule()->moduleDiscoveryManager()->start();
@@ -83,7 +83,7 @@ protected:
 
                 if (const auto module = discoveryManager->getModule(otherServer.first))
                 {
-                    NX_ALWAYS(this, lm("Module %1 discovered %2 with endpoint %3").strs(
+                    NX_ALWAYS(this, lm("Module %1 discovered %2 with endpoint %3").args(
                         server.first, module->id, module->endpoint));
 
                     EXPECT_EQ(module->id.toString(), otherServer.first.toString());
@@ -92,7 +92,7 @@ protected:
                 }
                 else
                 {
-                    FAIL() << lm("Module %1 failed to discover %2").strs(
+                    FAIL() << lm("Module %1 failed to discover %2").args(
                         server.first, otherServer.first).toStdString();
                 }
             }

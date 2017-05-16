@@ -24,7 +24,7 @@ public:
         module.type = lit("test");
         module.name = lit("test");
 
-        NX_LOGX(lm("New module: %1").str(module.id), cl_logINFO);
+        NX_LOGX(lm("New module: %1").arg(module.id), cl_logINFO);
         return module;
     }
 
@@ -88,7 +88,7 @@ TEST_F(DiscoveryUdpMulticastFinder, DISABLED_RealUse)
     moduleFinder.listen(
         [this](const QnModuleInformationWithAddresses& module)
         {
-            NX_LOGX(lm("Found module: %1").str(module.id), cl_logINFO);
+            NX_LOGX(lm("Found module: %1").arg(module.id), cl_logINFO);
         });
 
     while (true)

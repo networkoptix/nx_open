@@ -50,12 +50,12 @@ void QnServerConnector::addConnection(const nx::vms::discovery::Manager::ModuleD
         value = newUrl;
     }
 
-    NX_LOGX(lm("Adding connection to module %1 by URL %2").strs(module.id, newUrl), cl_logINFO);
+    NX_LOGX(lm("Adding connection to module %1 by URL %2").args(module.id, newUrl), cl_logINFO);
     commonModule()->ec2Connection()->addRemotePeer(newUrl);
 
     if (!oldUrl.isNull())
     {
-        NX_LOGX(lm("Removing old module %1 URL %2").strs(module.id, oldUrl), cl_logINFO);
+        NX_LOGX(lm("Removing old module %1 URL %2").args(module.id, oldUrl), cl_logINFO);
         commonModule()->ec2Connection()->deleteRemotePeer(oldUrl);
     }
 }
@@ -71,7 +71,7 @@ void QnServerConnector::removeConnection(const QnUuid& id)
     if (moduleUrl.isNull())
         return;
 
-    NX_LOGX(lm("Removing connection to module %1 by URL %2").strs(id, (moduleUrl)), cl_logINFO);
+    NX_LOGX(lm("Removing connection to module %1 by URL %2").args(id, (moduleUrl)), cl_logINFO);
     commonModule()->ec2Connection()->deleteRemotePeer(moduleUrl);
 
     const auto server = resourcePool()->getResourceById(id);
@@ -118,7 +118,7 @@ void QnServerConnector::at_moduleFound(nx::vms::discovery::Manager::ModuleData m
         return addConnection(module);
 
     NX_LOGX(lm("QnServerConnector: Ignore incompatable server %1 %2 %3 %4")
-        .strs(module.id, module.endpoint, module.systemName, module.version), cl_logDEBUG1);
+        .args(module.id, module.endpoint, module.systemName, module.version), cl_logDEBUG1);
 }
 
 void QnServerConnector::at_moduleChanged(nx::vms::discovery::Manager::ModuleData module)

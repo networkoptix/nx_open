@@ -156,14 +156,14 @@ void Manager::initializeConnector()
 
             if (isNew)
             {
-                NX_LOGX(lm("Found module %1, endpoint %2").strs(information.id, endpoint),
+                NX_LOGX(lm("Found module %1, endpoint %2").args(information.id, endpoint),
                     cl_logDEBUG1);
 
                 emit found(module);
             }
             else
             {
-                NX_LOGX(lm("Changed module %1, endpoint %2").strs(information.id, endpoint),
+                NX_LOGX(lm("Changed module %1, endpoint %2").args(information.id, endpoint),
                     cl_logDEBUG1);
 
                 emit changed(module);
@@ -188,7 +188,7 @@ void Manager::initializeConnector()
                 m_modules.erase(it);
                 lock.unlock();
 
-                NX_LOGX(lm("Lost module %1").strs(id), cl_logDEBUG1);
+                NX_LOGX(lm("Lost module %1").args(id), cl_logDEBUG1);
                 emit lost(id);
 
                 if (!cloudHost.isEmpty())
@@ -205,7 +205,7 @@ void Manager::initializeMulticastFinders(bool clientMode)
         {
             if (module.id == commonModule()->moduleGUID() || module.remoteAddresses.empty())
             {
-                NX_VERBOSE(this, lm("Reject multicast from %1 with %2 addresses").str(
+                NX_VERBOSE(this, lm("Reject multicast from %1 with %2 addresses").arg(
                     module.id).container(module.remoteAddresses));
                 return;
             }
