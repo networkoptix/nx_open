@@ -7,6 +7,7 @@
 
 #include <nx/network/aio/abstract_async_channel.h>
 #include <nx/utils/pipeline.h>
+#include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/thread/mutex.h>
 
 namespace nx {
@@ -70,6 +71,7 @@ private:
     std::atomic<std::size_t> m_totalBytesRead;
     mutable QnMutex m_mutex;
     QByteArray m_totalDataRead;
+    nx::utils::ObjectDestructionFlag m_destructionFlag;
 
     IoCompletionHandler m_readHandler;
     bool m_readPaused;

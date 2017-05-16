@@ -126,6 +126,7 @@ public:
      * Reads data that has previously been written with ReflectingPipeline::write.
      */
     virtual int read(void* data, size_t count) override;
+    QByteArray readAll();
 
     /**
      * @param maxSize 0 - no limit.

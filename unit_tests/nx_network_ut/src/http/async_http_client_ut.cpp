@@ -87,7 +87,7 @@ protected:
             .arg(scheme).arg(m_testHttpServer->serverAddress().toString()).arg(path));
 
         nx::utils::promise<void> promise;
-        NX_LOGX(lm("httpsTest: %1").str(url), cl_logINFO);
+        NX_LOGX(lm("httpsTest: %1").arg(url), cl_logINFO);
 
         const auto client = nx_http::AsyncHttpClient::create();
         client->doGet(url,
@@ -106,7 +106,7 @@ protected:
             .arg(m_testHttpServer->serverAddress().toString()).arg(path));
 
         nx::utils::promise<void> promise;
-        NX_LOGX(lm("testResult: %1").str(url), cl_logINFO);
+        NX_LOGX(lm("testResult: %1").arg(url), cl_logINFO);
 
         const auto client = nx_http::AsyncHttpClient::create();
         client->doGet(url,
@@ -262,7 +262,7 @@ TEST_F(AsyncHttpClient, motionJpegRetrieval)
             [&](nx_http::AsyncHttpClientPtr client)
             {
                 ASSERT_TRUE(client->response() != nullptr);
-                ASSERT_EQ(client->response()->statusLine.statusCode, nx_http::StatusCode::ok);
+                ASSERT_EQ(nx_http::StatusCode::ok, client->response()->statusLine.statusCode);
                 auto contentTypeIter = client->response()->headers.find("Content-Type");
                 ASSERT_TRUE(contentTypeIter != client->response()->headers.end());
                 clientCtx.multipartParser.setContentType(contentTypeIter->second);
@@ -406,7 +406,7 @@ protected:
 
                 ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
                 ASSERT_TRUE(server->listen());
-                NX_LOGX(lm("Server address: %1").str(server->getLocalAddress()), cl_logINFO);
+                NX_LOGX(lm("Server address: %1").arg(server->getLocalAddress()), cl_logINFO);
                 address.set_value(server->getLocalAddress());
 
                 std::unique_ptr<AbstractStreamSocket> client(server->accept());
@@ -833,7 +833,7 @@ protected:
                 "text/plain"));
         NX_GTEST_ASSERT_TRUE(testHttpServer()->bindAndListen());
 
-        m_testUrl = lm("http://%1%2").str(testHttpServer()->serverAddress()).arg(testPath);
+        m_testUrl = lm("http://%1%2").arg(testHttpServer()->serverAddress()).arg(testPath);
     }
 
     void initializeDelayedConnectionClosureServer()
@@ -850,7 +850,7 @@ protected:
                 testPath, std::move(httpHandlerFunc)));
         NX_GTEST_ASSERT_TRUE(testHttpServer()->bindAndListen());
 
-        m_testUrl = lm("http://%1%2").str(testHttpServer()->serverAddress()).arg(testPath);
+        m_testUrl = lm("http://%1%2").arg(testHttpServer()->serverAddress()).arg(testPath);
     }
 
     void scheduleRequestToValidUrlJustAfterFirstRequest()

@@ -88,7 +88,7 @@ void DirectEndpointConnector::performEndpointVerification(
     for (const SocketAddress& endpoint: endpoints)
     {
         NX_LOGX(lm("cross-nat %1. Starting connection to %2")
-            .arg(m_connectSessionId).str(endpoint), cl_logDEBUG2);
+            .arg(m_connectSessionId).arg(endpoint), cl_logDEBUG2);
 
         auto httpClient = nx_http::AsyncHttpClient::create();
         httpClient->bindToAioThread(getAioThread());
@@ -129,7 +129,7 @@ void DirectEndpointConnector::onHttpRequestDone(
     m_connections.erase(socketIter);
 
     NX_LOGX(lm("cross-nat %1. Finished probing %2")
-        .arg(m_connectSessionId).str(httpClient->url()), cl_logDEBUG2);
+        .arg(m_connectSessionId).arg(httpClient->url()), cl_logDEBUG2);
 
     if (httpClient->failed() &&
         (httpClient->lastSysErrorCode() != SystemError::noError ||
@@ -191,7 +191,7 @@ bool DirectEndpointConnector::verifyHostResponse(
     if (Qn::serializationFormatFromHttpContentType(contentType) != Qn::JsonFormat)
     {
         NX_LOGX(lm("cross-nat %1. Received unexpected Content-Type %2 from %3")
-            .strs(m_connectSessionId, contentType, httpClient->url()), cl_logDEBUG2);
+            .args(m_connectSessionId, contentType, httpClient->url()), cl_logDEBUG2);
         return false;
     }
 
@@ -200,7 +200,7 @@ bool DirectEndpointConnector::verifyHostResponse(
         || restResult.error != QnRestResult::Error::NoError)
     {
         NX_LOGX(lm("cross-nat %1. Error response '%2' from %3")
-            .strs(m_connectSessionId, restResult.errorString, httpClient->url()), cl_logDEBUG2);
+            .args(m_connectSessionId, restResult.errorString, httpClient->url()), cl_logDEBUG2);
         return false;
     }
 
@@ -209,7 +209,7 @@ bool DirectEndpointConnector::verifyHostResponse(
         || !moduleInformation.cloudId().endsWith(m_targetHostAddress.host.toString()))
     {
         NX_LOGX(lm("cross-nat %1. Connected to a wrong server (%2) instead of %3")
-            .strs(m_connectSessionId, moduleInformation.cloudId(), m_targetHostAddress.host),
+            .args(m_connectSessionId, moduleInformation.cloudId(), m_targetHostAddress.host),
             cl_logDEBUG2);
         return false;
     }
@@ -222,7 +222,7 @@ void DirectEndpointConnector::reportSuccessfulVerificationResult(
     std::unique_ptr<AbstractStreamSocket> streamSocket)
 {
     NX_LOGX(lm("cross-nat %1. Reporting successful connection to %2")
-        .arg(m_connectSessionId).str(endpoint), cl_logDEBUG2);
+        .arg(m_connectSessionId).arg(endpoint), cl_logDEBUG2);
 
     m_connections.clear();
 

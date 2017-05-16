@@ -347,7 +347,7 @@ void CloudServerSocket::startAcceptor(
         {
             NX_ASSERT(m_mediatorConnection->isInSelfAioThread());
             DEBUG_LOG(lm("Acceptor %1 returned %2: %3")
-                .strs((void*)acceptorPtr, (void*)connection.get(), SystemError::toString(code)));
+                .args((void*)acceptorPtr, (void*)connection.get(), SystemError::toString(code)));
 
             const auto it = std::find_if(
                 m_acceptors.begin(), m_acceptors.end(),
@@ -557,7 +557,7 @@ void CloudServerSocket::onConnectionRequested(
 {
     event.connectionMethods &= m_supportedConnectionMethods;
     DEBUG_LOG(lm("Connection request '%1' from %2 with methods: %3")
-        .strs(event.connectSessionId, event.originatingPeerID,
+        .args(event.connectSessionId, event.originatingPeerID,
             hpm::api::ConnectionMethod::toString(event.connectionMethods)));
 
     for (const auto& maker: m_acceptorMakers)
@@ -565,7 +565,7 @@ void CloudServerSocket::onConnectionRequested(
         if (auto acceptor = maker(event))
         {
             DEBUG_LOG(lm("Create acceptor '%1' by connection request %2 from %3")
-                .strs(acceptor, event.connectSessionId, event.originatingPeerID));
+                .args(acceptor, event.connectSessionId, event.originatingPeerID));
 
             acceptor->setConnectionInfo(
                 event.connectSessionId, event.originatingPeerID);

@@ -2,17 +2,32 @@
 
 
 ::-webkit-scrollbar {
-  width: 12px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track
 {
-  background: rgb(28,35,39);
+  background: $light4;
 }
 
 ::-webkit-scrollbar-thumb
 {
-  background: rgb(53,70,79);
+  background: $light8;
+}
+
+::-webkit-scrollbar-track:hover
+{
+  background: $light9;
+}
+
+::-webkit-scrollbar-thumb:hover
+{
+  background: $light9;
+}
+
+::-webkit-scrollbar-thumb:active
+{
+  background: $light11;
 }
 
 ::-ms-clear { display: none; }
@@ -60,8 +75,7 @@ table.webclient-window>tbody>tr>td.alert{
   height: 100%;
   width:100%;
 
-  background-color: #171C1F;
-  border-right: 1px solid #121517;
+  background-color: $additional_light2;
 }
 .camera-status{
   display:inline-block;
@@ -70,6 +84,21 @@ table.webclient-window>tbody>tr>td.alert{
   font-size:120%;
   line-height: 1;
 }
+
+.camera-info{
+  margin-left: -32px;
+}
+.camera-preview .camera-status{
+  position: absolute;
+  z-index: 1;
+  top: -5px;
+  left: -4px;
+}
+
+camera-panel {
+  color: $dark1;
+}
+
 .view-wrapper{
   width:100%;
   height:100%;
@@ -84,30 +113,141 @@ table.webclient-window>tbody>tr>td.alert{
   height:100%;
 
   padding-bottom:100px;
-  padding-top:80px;
-}
-
-
-.view-panel.live-only{
-  padding-bottom:100px;
+  background-color: $dark1;
 }
 
 .view-panel .stick-to-top{
   position:absolute;
   width:100%;
+  height: 48px;
   top:0;
-
-  /*background-color: rgba(28, 35, 39, 0.6);*/
-
-  border-bottom: 1px solid transparent;
+  left: 0;
+  z-index: 1;
 }
+
+.view-panel.no-archive{
+  padding-bottom: 40px !important;
+}
+
+.top-gradient{
+  background: $dark1;
+  background: -webkit-linear-gradient(bottom,rgba($dark1,0.3),rgba($dark1,0)); /*Safari 5.1-6*/
+  background: -o-linear-gradient(top,rgba($dark1, 0),rgba($dark1, 0.3)); /*Opera 11.1-12*/
+  background: -moz-linear-gradient(top,rgba($dark1, 0),rgba($dark1, 0.3)); /*Fx 3.6-15*/
+  background: linear-gradient(to top, rgba($dark1, 0), rgba($dark1, 0.3)); /*Standard*/
+}
+
+.hide-excess-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.video-name{
+  line-height: 19px !important;
+  color: $light1;
+  text-shadow: 0px 1px 3px rgba($dark1,1)
+}
+
+.video-status{
+  width: 24px;
+  font-size: 250%;
+  line-height: 12px;
+}
+
+.video-icon{
+  width: 24px;
+  margin: 6px;
+  line-height: 20px;
+}
+
+.video-settings{
+  min-width: 0px !important;
+  right: -25px;
+  left:initial;
+  padding: 0px !important;
+  background-color: rgba($dark7,0.9) !important;
+  border-radius: 0px;
+
+  color: $light16;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.video-quality:hover{
+  background-color: rgba($light16, 0.1);
+}
+
+.video-settings-options:hover{
+  background-color: $brand-core;
+  color: $light1;
+  font: bold 12px;
+}
+
+.camera-settings{
+  display: inline-block;
+  width: 36px;
+  text-align: center;
+  font-size: 150%;
+  vertical-align: middle;
+}
+
+.video-settings-separation-line{
+  height: 1px;
+  background-color: $light16;
+  opacity: 0.2;
+}
+
+.video-settings span{
+  color: $light1;
+}
+
+.video-settings-36{
+  height: 36px;
+  line-height: 36px;
+}
+.video-settings-36 label{
+  margin-left: 8px;
+}
+
+.video-settings-20{
+  height: 20px;
+  line-height: 13px !important;
+  font-weight: regular !important;
+  font-size: 12px !important;
+  color: $light1 !important;
+}
+
+.video-info{
+  padding: 8px;
+}
+
+.video-title-back-button{
+  margin-left: 6px;
+}
+
+.camera-settings-button{
+  width: 36px;
+  display: inline-block;
+  text-align: center;
+}
+.camera-settings-button .glyphicon{
+  margin-left: -2px;
+}
+
+.min-40{
+  width:40px;
+  display: inline-block;
+}
+
+.pull-up-5{
+  margin-top: -5px;
+}
+.margin-right-8{
+  margin-right: 8px;
+}
+
 .view-panel .stick-to-bottom{
-  position:absolute;
   width:100%;
-  bottom:0;
-
-  /*background-color: rgba(28, 35, 39, 0.6);*/
-
   border-top: 1px solid transparent;
 }
 .view-panel .float-size{
@@ -115,7 +255,6 @@ table.webclient-window>tbody>tr>td.alert{
   height:100%;
 
   padding: 0px 20px;
-  /*background-color: rgba(28, 35, 39, 0.6);*/
 }
 
 
@@ -128,23 +267,38 @@ table.webclient-window>tbody>tr>td.alert{
 .videowindow,
 .videowindow .videoplayer
 {
+  position: relative;
+  top: 0;
+  left: 0;
   width:100%;
   height: 100%;
   overflow: hidden;
-  background-color: #1C2327;
   text-align:center;
+  background-color: $dark1;
+  margin: auto;
+}
+
+.rotate90 {
+  -ms-transform: rotate(90deg);
+  -webkit-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+
+.rotate180 {
+  -ms-transform: rotate(180deg);
+  -webkit-transform: rotate(180deg);
+  transform: rotate(180deg);
+}
+
+.rotate270 {
+  -ms-transform: rotate(270deg);
+  -webkit-transform: rotate(270deg);
+  transform: rotate(270deg);
 }
 
 .videowindow video{
   max-width:100%;
   max-height:100%;
-
-  margin: 0 auto;
-
-  position: relative;
-  top: 50%;
-  transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
 }
 
 .half-height {
@@ -168,14 +322,29 @@ table.webclient-window>tbody>tr>td.alert{
   margin: 0px 20px;
   padding: 10px 0px;
 }
-.cameras-search{
-  padding:10px;
 
-  margin:3px 0;
+.webclient-bottom-border{
+  margin: 0px 4px;
+}
+
+.cameras-search{
+  padding:10px 0 10px 0;
+  margin-top:3px;
+  height: 44px;
+  border-bottom: 1px solid $light6;
+  font-size: 13px;
+  background-color: $additional_light2;
+}
+
+.cameras-search>.input-group>input{
+  margin-bottom: -20px;
+}
+.raise-input-up{
+  margin-bottom: -5px !important;
 }
 
 .cameras-search>.input-group{
-  margin:0;
+  margin-top: -11px;
 }
 
 .cameras-search>.input-group>*{
@@ -204,40 +373,74 @@ table.webclient-window>tbody>tr>td.alert{
   font-size: 13px;
 }
 
+.clear-button{
+  width: 40px;
+  height: 43px;
+}
+.icon{
+  width: 44px;
+  height: 43px;
+}
+
+
+.clear-button-right{
+  background-color: $light4 !important;
+  position: relative;
+  height: 24px;
+  width: 1px;
+  top: 10px;
+}
+
+.info-icon.active{
+  color: $blue10 !important;
+}
+
+.info-icon:hover,
+.info-icon.active:hover{
+  background-color: $additional_light3 !important;
+}
+
+.info-icon:active,
+.info-icon.active:active{
+  background-color: $light5 !important;
+}
 
 .cameras-search>.input-group>input{
   border:none;
   box-shadow:none;
-  color: #FFFFFF;
   font-size: 16px;
 }
 
-.cameras-search .clear-button{
-  color: #FFFFFF;
+.camers-search:hover{
+  backgroud-color: $light2;
+}
+
+.cameras-search.active,
+.cameras-search:active{
+  background-color: $light1;
 }
 
 
 div.text-left{
-  width:168px;
-  height:100px;
+  width:106px;
+  height:100%;
   background-color: $additional_light2;
-  border-right: 1px solid $additional_light2;
+  border-left: 1px solid $light6;
+  border-right: 1px solid $light6;
 }
 
 .player-controls{
-  margin: 30px 12px 30px 11px;
+  padding: 33px 25px 32px 25px !important;
 }
 
 .zoom-level{
-  height: 100px;
   margin-top: 6px;
 }
 
 div.text-right{
   width:104px;
-  height:100px;
+  height:100%;
   background-color: $additional_light2;
-  border-left: 1px solid $additional_light2;
 }
 
 .live-button .webclient-button{
@@ -259,11 +462,15 @@ live-circle{
 
 .live-button{
   width: 63px;
-  height: 100px;
+  height: 100%;
   text-align: center;
   line-height: 100px;
   border-left: 1px solid $light6 !important;
   border-right: 1px solid $light4 !important;
+}
+
+div.text-right.no-volume{
+  width: 64px !important;
 }
 
 .live-button.active{
@@ -297,7 +504,7 @@ live-circle{
 
 .volume{
   width: 40px;
-  height: 100px;
+  height: 100%;
 }
 .volume .glyphicon-volume-up{
   margin: 40px auto !important;
@@ -330,8 +537,8 @@ volume-control{
 
 
 div.text-center{
-  margin: 0 104px 0 168px;
-  height:100px;
+  margin: 0 64px 0 106px;
+  height:100%;
 }
 
 .webclient-button{
@@ -395,9 +602,8 @@ div.text-center{
 }
 
 .glyphicon-pp{
-  height:40px;
-  width: 40px;
-  margin: 0 -4px 0 -4px;
+  width: 63px;
+  height: 100%;
 }
 
 .glyphicon-fwbw{
@@ -419,16 +625,6 @@ div.text-center{
   padding-right:10px;
 }
 
-
-.webclient-top-border{
-  border-top: 1px solid #263137;
-  margin-top:20px;
-}
-.webclient-bottom-border{
-  border-bottom: 1px solid #263137;
-  margin-bottom:20px;
-}
-
 .webclient-panel .webclient-button.active{
   color: #3A911E;
 }
@@ -442,7 +638,7 @@ div.text-center{
 
 .webclient-window .cameras-panel{
   height: 100%;
-  width: 350px;
+  width: 320px !important;
   overflow-y: scroll;
   overflow-x: hidden;
 }
@@ -451,6 +647,7 @@ div.text-center{
 .webclient-window .tree{
   font-size: 114%; /*16px*/
   font-weight: 500;
+  padding: 0 8px;
 }
 
 .webclient-window .tree .offline {
@@ -461,14 +658,19 @@ div.text-center{
   padding:10px;
 }
 
-.webclient-window .tree li>ul{
-  margin-bottom: 20px;
+.webclient-window .tree li > ul{
+  margin-bottom: 8px;
+}
+
+.webclient-window .tree > li{
+  padding: 8px 0;
+  border-bottom: 1px solid $light6;
 }
 
 .server-underline{
   display: inline-block;
   width:100%;
-  border-bottom: 1px solid #263137;
+  height: 40px;
 }
 .webclient-panel-border{
   height: 30px;
@@ -490,7 +692,7 @@ div.text-center{
 
 .webclient-panel .dropdown-menu{
   background-color: #E1E7EA;
-  padding: 10px 0;
+  padding: 0 8px;
 }
 
 .webclient-panel .dropdown-menu > li > a{
@@ -500,13 +702,12 @@ div.text-center{
 }
 
 .webclient-panel .dropdown-menu > li > a.active{
-  background-color: #00AEEF;
-  color:white;
+  background-color: $brand_core !important;
+  color:$light1;
 }
 
 .webclient-panel .dropdown-menu > li > a:hover{
-  background-color: #F5F7F8;
-  color: #333333;
+  background-color: $light16;
 }
 
 .caption-row {
@@ -515,18 +716,26 @@ div.text-center{
 }
 
 .camera-preview{
-  width:72px !important;
-  height:40px !important;
+  width:68px !important;
+  height:38px !important;
   margin-right: 10px;
-  background-color: black;
+  background-color: $light5;
+  border-radius: 1px;
+  font-size: 14px;
 
 
   position:absolute;
-  margin-left:-80px;
+  margin-left:-86px;
+  margin-top: -2px;
 }
 
-.camera-node.Unauthorized ,
-.camera-node.Offline {
+.dark-theme .nav > li.active > a .camera-preview{
+  height: 38px !important;
+  width: 68px !important;
+  border: 1px solid $light1;
+}
+
+.camera-node.Unauthorized {
   color:#698796 !important;
 }
 
@@ -558,10 +767,11 @@ div.text-center{
   margin-left: auto;
   margin-right: auto;
 }
+
 .camera-preview>.camera-preview-image>img{
   visibility:hidden;
-  max-width:72px !important;
-  max-height:40px !important;
+  max-width:68px !important;
+  max-height:38px !important;
 }
 
 
@@ -606,7 +816,7 @@ div.text-center{
 }
 
 .dark-theme .nav > li > a{
-  color:white;
+  color:$dark9;
   font-weight: normal;
 }
 .dark-theme .nav > li > a:hover,
@@ -623,18 +833,33 @@ div.text-center{
   padding-left:95px;
 }
 
-.dark-theme .nav > li.active > a{
-  text-decoration: none;
-  background-color: rgba(53,70,79,0.4);
-  border-left: 3px solid #2FA2DB;
-  padding-left:92px;
+.dark-theme .nav > li > a:hover{
+  background-color: $additional_light3;
 }
 
+.dark-theme .nav > li.active > a{
+  text-decoration: none;
+  background-color: $light5;
+}
 
+.camera-node{
+  height: 56px;
+
+  font-size: 14px;
+  font-weight: 500 !important;
+  color: $dark9 !important;
+  line-height: 34px;
+}
 
 .camera-node small{
-  color: rgb(105,135,150);
-  font-size: 75%
+  font-size: 12px;
+  font-weight: 400;
+  color: $light16 !important;
+  line-height: 18px;
+}
+
+.camera-node.toggle-info{
+  line-height: 18px !important;
 }
 
 .not-supported.camera-view-message{
@@ -649,43 +874,47 @@ div.text-center{
   display: none;
 }
 
-@media only screen and (max-device-width:640px) {
-  .invisible-xs,.hidden-mobile{
-    display:none;
-  }
-  .visible-mobile{
-    display: block;
-  }
+.visible-xs .cameras-panel{
+  width: 100% !important;
+  display: block !important; 
 }
 
-@media only screen and (min-device-width: 641px) and (max-device-width:961px) {
-  /* For general iPad layouts */
-  .cameras-panel{
-    font-size:80%;
+camera-panel.visible-xs{
+  display: block !important;
+}
+
+.visible-xs.back-button{
+  vertical-align: top;
+  margin-left: 4px;
+  margin-top: -2px;
+  display: none !important;
+}
+
+@media (max-width: 767px){
+  .visible-xs.back-button{
+    display: inline-block !important;
   }
-  .dark-theme .nav > li > a {
-    padding-left: 75px;
+  camera-panel.visible-xs {
+    display: block !important;
   }
-  .camera-preview {
-    margin-left: -60px;
+  .view-panel{
+    padding-bottom: 160px;
   }
-  .dark-theme .nav > li.active > a {
-    padding-left: 72px;
+  div.text-center{
+    margin: 0 !important;
+  }
+  .glyphicon-pm{
+    height: 60px;
+    display: inline-block !important;
   }
 
-  .webclient-window .cameras-panel {
-    height: 100%;
-    width: 250px;
+  .glyphicon-pm > .glyphicon{
+    margin-top: 18px;
   }
 
-  .camera-preview {
-    width: 50px !important;
-    height: 30px !important;
-  }
-
-  .camera-preview > img {
-    max-width: 50px !important;
-    max-height: 30px !important;
+  .stick-to-top{
+    height: 60px !important;
+    margin-top: 4px;
   }
 }
 
@@ -710,20 +939,46 @@ div.text-center{
  background-color: rgba(198,234,255,0.15);
 }
 .server-link{
-  position:relative;
-  height:60px;
+  height:40px;
+  line-height:20px !important;
   padding: 10px;
-  border-top: 1px solid #0D0E0F;
 }
-.server-link:before{
-  position:absolute;
-  z-index: -1;
-  top:1px;
-  border-top: 1px solid #1C2327;
+.server-link:hover{
+  background-color: $additional_light3 !important;
+  border-radius: 2px;
 }
+.server-link:active{
+  background-color: $light5;
+  border-radius: 2px;
+}
+
 .server-link>*{
   vertical-align: middle;
 }
 .server-link .glyphicon{
-  top: 5px;
+  top: 6px;
+}
+
+.server-link small{
+  font-size: 12px;
+  font-weight: 400;
+  color: $light16;
+  line-height: 18px;
+
+}
+
+.server-name{
+  margin-left: -17px;
+  font-size: 14px;
+  font-weight: 500;
+  color: $dark9;
+  line-height: 22px;
+}
+
+.pull-up-4{
+  margin-top: -4px;
+}
+
+.server-link > .pull-right{
+  margin-top: -4px;
 }

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('AdvancedCtrl', function ($scope, $modal, $log, mediaserver,$location, dialogs) {
+    .controller('AdvancedCtrl', function ($scope, $modal, $log, mediaserver,$location, dialogs, systemAPI) {
 
 
         mediaserver.getUser().then(function(user){
@@ -144,7 +144,7 @@ angular.module('webadminApp')
 
             function doSave(){
                 mediaserver.getModuleInformation().then(function(settingsReply){
-                    mediaserver.getMediaServer(settingsReply.data.reply.id.replace('{','').replace('}','')).then(function(mediaServerReply){
+                    systemAPI.getMediaServers(settingsReply.data.reply.id.replace('{','').replace('}','')).then(function(mediaServerReply){
                         var info = mediaServerReply.data[0];
                         // Вот тут проапдейтить флаги в стореджах
 

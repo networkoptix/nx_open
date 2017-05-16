@@ -2,7 +2,7 @@
 
 angular.module('webadminApp').controller('ViewdebugCtrl',
     function ($scope, $rootScope, $location, $routeParams, mediaserver, cameraRecords, $poll, $q,
-              $sessionStorage, $localStorage, currentUser) {
+              $sessionStorage, $localStorage, currentUser, systemAPI) {
 
         if(currentUser === null ){
             return; // Do nothing, user wasn't authorised
@@ -271,10 +271,6 @@ angular.module('webadminApp').controller('ViewdebugCtrl',
             var cameraId = $scope.activeCamera.physicalId;
             var serverUrl = '';
 
-            var mediaDemo = mediaserver.mediaDemo();
-            if(mediaDemo){
-                serverUrl = mediaDemo;
-            }
             var authParam = '&auth=' + mediaserver.authForMedia();
 
             var positionMedia = !live ? '&pos=' + (playing) : '';
@@ -329,8 +325,8 @@ angular.module('webadminApp').controller('ViewdebugCtrl',
 
             $scope.activeCamera = getCamera ($scope.storage.cameraId  );
             if (!silent && $scope.activeCamera) {
-                $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId], timeCorrection);
-                $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], 640, timeCorrection);
+                $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId], systemAPI, timeCorrection);
+                $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], systemAPI, 640, timeCorrection);
 
                 $scope.liveOnly = true;
                 if(canViewArchive) {
@@ -474,7 +470,7 @@ angular.module('webadminApp').controller('ViewdebugCtrl',
             if(treeRequest){
                 treeRequest.abort('getCameras');
             }
-            treeRequest = mediaserver.getCameras();
+            treeRequest = systemAPI.getCameras();
             treeRequest.then(function (data) {
                 var cameras = data.data;
                 
@@ -493,7 +489,7 @@ angular.module('webadminApp').controller('ViewdebugCtrl',
 
                 function cameraSorter(camera) {
                     camera.url = extractDomain(camera.url);
-                    camera.preview = mediaserver.previewUrl(camera.physicalId, false, null, 256);
+                    camera.preview = systemAPI.previewUrl(camera.physicalId, false, null, 256);
                     camera.server = getServer(camera.parentId);
                     if(camera.server && camera.server.status === 'Offline'){
                         camera.status = 'Offline';
@@ -642,7 +638,7 @@ angular.module('webadminApp').controller('ViewdebugCtrl',
             if(treeRequest){
                 treeRequest.abort('reloadTree');
             }
-            treeRequest = mediaserver.getMediaServers();
+            treeRequest = systemAPI.getMediaServers();
             treeRequest.then(function (data) {
 
                 if(!$scope.mediaServers) {
@@ -704,7 +700,7 @@ angular.module('webadminApp').controller('ViewdebugCtrl',
 
         var desktopCameraTypeId = null;
         function requestResourses() {
-            mediaserver.getResourceTypes().then(function (result) {
+            systemAPI.getResourceTypes().then(function (result) {
                 desktopCameraTypeId = _.find(result.data, function (type) {
                     return type.name === 'SERVER_DESKTOP_CAMERA';
                 });

@@ -4,6 +4,7 @@
 
 #include <nx/network/cloud/tunnel/relay/relay_connection_acceptor.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/utils/random.h>
 #include <nx/utils/thread/sync_queue.h>
@@ -13,6 +14,8 @@ namespace network {
 namespace cloud {
 namespace relay {
 namespace test {
+
+using namespace nx::cloud::relay;
 
 class CloudRelayReverseConnection:
     public ::testing::Test
@@ -63,11 +66,12 @@ protected:
     {
         m_serverConnection = m_serverConnections.pop();
 
-        static const nx::Buffer activateConnectionNotification = 
-            "OPEN_TUNNEL /relay/client/client_peer_name NXRELAY/0.1\r\n"
-            "\r\n";
+        api::OpenTunnelNotification openTunnelNotification;
+        openTunnelNotification.setClientPeerName("test_client_name");
+        openTunnelNotification.setClientEndpoint(m_clientEndpoint);
+        m_openTunnelNotificationBuffer = openTunnelNotification.toHttpMessage().toString();
         m_serverConnection->sendAsync(
-            activateConnectionNotification,
+            m_openTunnelNotificationBuffer,
             [](SystemError::ErrorCode, std::size_t) {});
     }
 
@@ -114,7 +118,15 @@ protected:
     void thenSocketForeignEndpointMatchesClientOne()
     {
         auto streamSocket = m_connection->takeSocket();
-        ASSERT_EQ(m_clientEndpoint, streamSocket->getForeignAddress());
+        // TODO: #ak Remove toString from the following ASSERT_EQ after CLOUD-1124.
+        ASSERT_EQ(
+            m_clientEndpoint.toString(),
+            streamSocket->getForeignAddress().toString());
+    }
+
+    void thenRelaySettingsAreAvailable()
+    {
+        ASSERT_EQ(m_expectedSettings, m_connection->beginListeningResponse());
     }
 
 private:
@@ -132,19 +144,21 @@ private:
     utils::SyncQueue<std::unique_ptr<AbstractStreamSocket>> m_serverConnections;
     std::unique_ptr<AbstractStreamSocket> m_serverConnection;
     SocketAddress m_clientEndpoint;
+    nx::Buffer m_openTunnelNotificationBuffer;
+    nx::cloud::relay::api::BeginListeningResponse m_expectedSettings;
 
     virtual void SetUp() override
     {
         using namespace std::placeholders;
 
         m_testHttpServer.registerRequestProcessorFunc(
-            nx::cloud::relay::api::kServerIncomingConnectionsPath,
+            api::kServerIncomingConnectionsPath,
             std::bind(&CloudRelayReverseConnection::processIncomingConnection, this,
                 _1, _2, _3, _4, _5));
 
         ASSERT_TRUE(m_testHttpServer.bindAndListen());
 
-        QUrl relayServerUrl(lm("http://%1/").str(m_testHttpServer.serverAddress()));
+        QUrl relayServerUrl(lm("http://%1/").arg(m_testHttpServer.serverAddress()));
         relayServerUrl.setUserName("server1.system1");
         m_connection = std::make_unique<detail::ReverseConnection>(relayServerUrl);
     }
@@ -223,15 +237,17 @@ TEST_F(CloudRelayReverseConnection, reports_error_on_subsequent_connection_to_re
     thenConnectionActivationErrorIsReported();
 }
 
-//TEST_F(CloudRelayReverseConnection, provides_client_peer_name_on_success)
-//{
-//    givenActivatedConnection();
-//    thenSocketForeignEndpointMatchesClientOne();
-//}
+TEST_F(CloudRelayReverseConnection, provides_client_peer_name_on_success)
+{
+    givenActivatedConnection();
+    thenSocketForeignEndpointMatchesClientOne();
+}
 
-//TEST_F(CloudRelayReverseConnection, provides_relay_settings_on_success)
-//{
-//}
+TEST_F(CloudRelayReverseConnection, provides_relay_settings_on_success)
+{
+    givenActivatedConnection();
+    thenRelaySettingsAreAvailable();
+}
 
 } // namespace test
 } // namespace relay

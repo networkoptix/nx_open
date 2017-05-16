@@ -96,18 +96,10 @@ namespace
             path.addRect(qRound(rect.left() + i * (lineWidth + kVisualizerLineOffset)), qRound(midY - (lineHeight / 2)), lineWidth, lineHeight);
         }
 
-        bool corrected = false;
-        QTransform roundedTransform = sharpTransform(painter->transform(), &corrected);
-
-        if (corrected)
-        {
-            QnScopedPainterTransformRollback rollback(painter, roundedTransform);
-            painter->fillPath(path, color);
-        }
-        else
-        {
-            painter->fillPath(path, color);
-        }
+        paintSharp(painter, [&path, &color](QPainter* painter)
+            {
+                painter->fillPath(path, color);
+            });
     }
 
     void normalizeVector(VisualizerData& source)

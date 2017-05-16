@@ -3,7 +3,7 @@
 
 var Config = {
     viewsDir: 'views/', //'lang_' + lang + '/views/';
-
+    webadminSystemApiCompatibility: true,
     defaultLanguage: 'en_US',
     supportedLanguages:[
         'en_US', 'ru'
@@ -117,7 +117,9 @@ var Config = {
         timeSynchronizationEnabled: {label: 'Time synchronization enabled', type: 'checkbox'},
         upnpPortMappingEnabled: {label: 'UPNP port mapping enabled', type: 'checkbox'},
 
-        useServerTime: true
+        useServerTime: true,
+        disableVolume: true,
+        reloadInterval: 5*1000
     },
     debugEvents: {
         events: [

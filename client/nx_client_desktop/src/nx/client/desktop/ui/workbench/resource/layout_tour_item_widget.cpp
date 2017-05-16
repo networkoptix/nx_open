@@ -72,6 +72,7 @@ LayoutTourItemWidget::LayoutTourItemWidget(
     m_previewPainter->setLayout(m_layout);
     m_previewPainter->setFrameColor(Qt::black);                 //TODO: #GDM #3.1 customize
     m_previewPainter->setBackgroundColor(QColor("#222B2F"));    //TODO: #GDM #3.1 customize
+    m_previewPainter->setFontColor(palette().color(QPalette::WindowText)); //TODO: #GDM #3.1 customize
 
     setAcceptDrops(true);
 

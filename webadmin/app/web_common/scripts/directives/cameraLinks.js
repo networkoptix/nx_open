@@ -3,7 +3,7 @@
  */
 
 
-angular.module('webadminApp')
+angular.module('nxCommon')
     .directive('cameraLinks', ['mediaserver', function (mediaserver) {
         return {
             restrict: 'E',
