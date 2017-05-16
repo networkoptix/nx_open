@@ -13,7 +13,10 @@ ConnectionParameters::ConnectionParameters():
     rendezvousConnectTimeout(kRendezvousConnectTimeoutDefault),
     udpTunnelKeepAliveInterval(kUdpTunnelKeepAliveIntervalDefault),
     udpTunnelKeepAliveRetries(kUdpTunnelKeepAliveRetriesDefault),
-    tunnelInactivityTimeout(kDefaultTunnelInactivityTimeout)
+    tunnelInactivityTimeout(kDefaultTunnelInactivityTimeout),
+    udpHolePunchingStartDelay(std::chrono::milliseconds::zero()),
+    trafficRelayingStartDelay(std::chrono::milliseconds::zero()),
+    directTcpConnectStartDelay(std::chrono::milliseconds::zero())
 {
 }
 
