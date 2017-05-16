@@ -41,7 +41,7 @@ protected:
 
     void addConnection(const std::string& peerName)
     {
-        auto connection = std::make_unique<StreamSocketStub>();
+        auto connection = std::make_unique<relay::test::StreamSocketStub>();
         connection->bindToAioThread(
             network::SocketGlobals::aioService().getRandomAioThread());
         m_peerConnection = connection.get();
@@ -139,7 +139,7 @@ private:
     std::unique_ptr<model::ListeningPeerPool> m_pool;
     std::atomic<bool> m_poolHasBeenDestroyed;
     std::string m_peerName;
-    StreamSocketStub* m_peerConnection;
+    relay::test::StreamSocketStub* m_peerConnection;
     nx::utils::SyncQueue<TakeIdleConnectionResult> m_takeIdleConnectionResults;
 
     void onTakeIdleConnectionCompletion(

@@ -133,6 +133,14 @@ int ReflectingPipeline::read(void* data, size_t count)
     return bytesToRead;
 }
 
+QByteArray ReflectingPipeline::readAll()
+{
+    QnMutexLocker lock(&m_mutex);
+    QByteArray result;
+    result.swap(m_buffer);
+    return result;
+}
+
 void ReflectingPipeline::setMaxBufferSize(std::size_t maxSize)
 {
     m_maxSize = maxSize;
