@@ -78,10 +78,21 @@ ShaderEffect
 
     readonly property vector2d viewCenter: Qt.vector2d(0.5, 0.5).plus(viewShift)
 
+    readonly property string commonShaderHeader: "
+        #version 100
+        /* This is required for version 100 compatibility with desktop Windows. */
+        #undef lowp
+        #undef mediump
+        #undef highp
+        /* This is required for GL ES 2.0. */
+        #ifdef GL_ES
+            precision mediump float;
+            precision mediump int;
+        #endif"
+
     /* Vertex shader code: */
 
-    vertexShader: "
-        #version 110
+    vertexShader: commonShaderHeader + "
         uniform vec2 projectionCoordsScale;
         uniform vec2 viewCenter;
         uniform float viewScale;
@@ -100,8 +111,7 @@ ShaderEffect
 
     /* Fragment shader code: */
 
-    fragmentShader: "
-        #version 110
+    fragmentShader: commonShaderHeader + "
         varying vec2 projectionCoords;
 
         uniform mat4 textureMatrix;
