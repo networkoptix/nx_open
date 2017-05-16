@@ -156,8 +156,8 @@ void QnVideoRecorderSettings::setCaptureCursor(bool yes)
 
 Qn::CaptureMode QnVideoRecorderSettings::captureMode() const
 {
-    const auto mode = static_cast<Qn::CaptureMode>(settings.value(QLatin1String("captureMode"))
-        .toInt());
+    const auto mode = static_cast<Qn::CaptureMode>(
+        settings.value(QLatin1String("captureMode")).toInt());
 
     // Window mode support is removed
     return mode == Qn::WindowMode
