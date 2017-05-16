@@ -80,11 +80,11 @@ ShaderEffect
 
     readonly property string commonShaderHeader: "
         #version 100
-        /* This is required for version 100 compatibility with desktop Windows. */
+        /* This is required to counter QOpenGLShaderProgram code prefixing: */
         #undef lowp
         #undef mediump
         #undef highp
-        /* This is required for GL ES 2.0. */
+        /* This is required for GL ES 2.0: */
         #ifdef GL_ES
             precision mediump float;
             precision mediump int;
