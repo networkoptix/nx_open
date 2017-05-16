@@ -83,36 +83,29 @@ QString toString(MessageType value)
 }
 
 QByteArray serializePeersMessage(
-    const BidirectionRoutingInfo* peers,
-    PeerNumberInfo& shortPeerInfo)
+    const std::vector<PeerRecord>& records,
+    int reservedSpaceAtFront)
 {
     QByteArray result;
     result.resize(qPower2Ceil(
-        unsigned(peers->allPeerDistances.size() * kPeerRecordSize + 1),
-        4));
+        unsigned(records.size() * kPeerRecordSize + reservedSpaceAtFront),
+        kByteArrayAlignFactor));
     BitStreamWriter writer;
-    writer.setBuffer((quint8*)result.data(), result.size());
+    writer.setBuffer((quint8*) result.data(), result.size());
     try
     {
-        writer.putBits(8, (int)MessageType::alivePeers);
+        writer.putBits(reservedSpaceAtFront * 8, 0);
 
-        // serialize online peers
-        for (auto itr = peers->allPeerDistances.cbegin(); itr != peers->allPeerDistances.cend(); ++itr)
+        for (const auto& record: records)
         {
-            const auto& peer = itr.value();
-            qint32 minDistance = peer.minDistance();
-            if (minDistance == kMaxDistance)
-                continue;
-            const qint16 peerNumber = shortPeerInfo.encode(itr.key());
-            serializeCompressPeerNumber(writer, peerNumber);
-            const bool isOnline = minDistance < kMaxOnlineDistance;
+            serializeCompressPeerNumber(writer, record.peerNumber);
+            const bool isOnline = record.distance < kMaxOnlineDistance;
             writer.putBit(isOnline);
             if (isOnline)
-                NALUnit::writeUEGolombCode(writer, minDistance); //< distance
+                NALUnit::writeUEGolombCode(writer, record.distance);
             else
-                writer.putBits(32, minDistance); //< distance
+                writer.putBits(32, record.distance);
         }
-
         writer.flushBits(true);
         result.truncate(writer.getBytesCount());
         return result;
@@ -123,44 +116,36 @@ QByteArray serializePeersMessage(
     }
 }
 
-bool deserializePeersMessage(
-    const ec2::ApiPersistentIdData& remotePeer,
-    int remotePeerDistance,
-    const PeerNumberInfo& shortPeerInfo,
-    const QByteArray& data,
-    const qint64 timeMs,
-    BidirectionRoutingInfo* outPeers)
+std::vector<PeerRecord> deserializePeersMessage(const QByteArray& data, bool* success)
 {
-    outPeers->removePeer(remotePeer);
-
+    std::vector<PeerRecord> result;
     BitStreamReader reader((const quint8*)data.data(), data.size());
     try
     {
+        *success = true;
         while (reader.bitsLeft() >= 8)
         {
             PeerNumberType peerNumber = deserializeCompressPeerNumber(reader);
-            ApiPersistentIdData peerId = shortPeerInfo.decode(peerNumber);
             bool isOnline = reader.getBit();
-            qint32 receivedDistance = 0;
+            qint32 distance = 0;
             if (isOnline)
-                receivedDistance = NALUnit::extractUEGolombCode(reader); // todo: move function to another place
+                distance = NALUnit::extractUEGolombCode(reader); // todo: move function to another place
             else
-                receivedDistance = reader.getBits(32);
-
-            outPeers->addRecord(remotePeer, peerId, nx::p2p::RoutingRecord(receivedDistance + remotePeerDistance, timeMs));
+                distance = reader.getBits(32);
+            result.push_back(PeerRecord(peerNumber, distance));
         }
     }
     catch (...)
     {
-        return false;
+        *success = false;
     }
-    return true;
+    return result;
 }
 
 QByteArray serializeCompressedPeers(const QVector<PeerNumberType>& peers, int reservedSpaceAtFront)
 {
     QByteArray result;
-    result.resize(qPower2Ceil(unsigned(peers.size() * 2 + 1), kByteArrayAlignFactor));
+    result.resize(qPower2Ceil(unsigned(peers.size() * 2 + reservedSpaceAtFront), kByteArrayAlignFactor));
     BitStreamWriter writer;
     writer.setBuffer((quint8*)result.data(), result.size());
     writer.putBits(reservedSpaceAtFront * 8, 0);
@@ -278,7 +263,7 @@ QByteArray serializeResolvePeerNumberResponse(
     int reservedSpaceAtFront)
 {
     QByteArray result;
-    result.reserve(peers.size() * kResolvePeerResponseRecordSize + 1);
+    result.reserve(peers.size() * kResolvePeerResponseRecordSize + reservedSpaceAtFront);
     {
         QBuffer buffer(&result);
         buffer.open(QIODevice::WriteOnly);

@@ -13,16 +13,8 @@ PeerNumberType deserializeCompressPeerNumber(BitStreamReader& reader);
 void serializeCompressedSize(BitStreamWriter& writer, quint32 peerNumber);
 quint32 deserializeCompressedSize(BitStreamReader& reader);
 
-QByteArray serializePeersMessage(
-    const BidirectionRoutingInfo* peers,
-    PeerNumberInfo& shortPeerInfo);
-bool deserializePeersMessage(
-    const ec2::ApiPersistentIdData& remotePeer,
-    int remotePeerDistance,
-    const PeerNumberInfo& shortPeerInfo,
-    const QByteArray& data,
-    const qint64 timeMs,
-    BidirectionRoutingInfo* outPeers);
+QByteArray serializePeersMessage(const std::vector<PeerRecord>& records, int reservedSpaceAtFront = 1);
+std::vector<PeerRecord> deserializePeersMessage(const QByteArray& data, bool* success);
 
 QByteArray serializeCompressedPeers(const QVector<PeerNumberType>& peers, int reservedSpaceAtFront = 1);
 QVector<PeerNumberType> deserializeCompressedPeers(const QByteArray& data, bool* success);

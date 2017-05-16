@@ -55,6 +55,19 @@ struct SubscribeRecord
     qint32 sequence = 0;
 };
 
+struct PeerRecord
+{
+    PeerRecord() {}
+    PeerRecord(PeerNumberType peerNumber, qint32 distance):
+        peerNumber(peerNumber),
+        distance(distance)
+    {
+    }
+
+    PeerNumberType peerNumber = 0;
+    qint32 distance = 0;
+};
+
 struct BidirectionRoutingInfo;
 
 static const qint32 kMaxDistance = std::numeric_limits<qint32>::max();

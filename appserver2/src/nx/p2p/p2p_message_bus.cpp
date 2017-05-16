@@ -14,7 +14,6 @@
 #include <utils/math/math.h>
 #include <http/p2p_connection_listener.h>
 #include <nx/p2p/p2p_serialization.h>
-#include <utils/media/nalUnits.h>
 
 namespace {
 
@@ -308,7 +307,19 @@ void P2pMessageBus::printSubscribeMessage(
 
 void P2pMessageBus::sendAlivePeersMessage()
 {
-    QByteArray data = serializePeersMessage(m_peers.get(), m_localShortPeerInfo);
+    std::vector<PeerRecord> records;
+    records.reserve(m_peers->allPeerDistances.size());
+    for (auto itr = m_peers->allPeerDistances.cbegin(); itr != m_peers->allPeerDistances.cend(); ++itr)
+    {
+        qint32 minDistance = itr->minDistance();
+        if (minDistance == kMaxDistance)
+            continue;
+        const qint16 peerNumber = m_localShortPeerInfo.encode(itr.key());
+        records.push_back(PeerRecord(peerNumber, minDistance));
+    }
+    QByteArray data = serializePeersMessage(records, 1);
+    data.data()[0] = (quint8) MessageType::alivePeers;
+
     int peersIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>(
         sendPeersInfoInterval).count();
     for (const auto& connection : m_connections)
@@ -820,41 +831,37 @@ bool P2pMessageBus::handleResolvePeerNumberResponse(const P2pConnectionPtr& conn
 
 bool P2pMessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QByteArray& data)
 {
-
     NX_ASSERT(!data.isEmpty());
+
+    bool success = false;
+    auto peers = deserializePeersMessage(data, &success);
+    if (!success)
+        return false;
+
     m_lastPeerInfoTimer.restart();
+
     QVector<PeerNumberType> numbersToResolve;
     BitStreamReader reader((const quint8*)data.data(), data.size());
-    try
+    for (const auto& peer: peers)
     {
-        while (reader.bitsLeft() >= 8)
-        {
-            PeerNumberType peerNumber = deserializeCompressPeerNumber(reader);
-            bool isOnline = reader.getBit();
-            isOnline
-                ? NALUnit::extractUEGolombCode(reader)
-                : reader.getBits(32); //< skip distance
-            if (connection->decode(peerNumber).isNull())
-                numbersToResolve.push_back(peerNumber);
-        }
+        if (connection->decode(peer.peerNumber).isNull())
+            numbersToResolve.push_back(peer.peerNumber);
     }
-    catch (...)
-    {
-        return false; //< invalid message
-    }
-
     connection->miscData().remotePeersMessage = data;
-    NX_ASSERT(!data.isEmpty());
 
     if (numbersToResolve.empty())
     {
-        return deserializePeersMessage(
-            connection->remotePeer(),
-            1, //< remote peer distance
-            connection->shortPeers(),
-            data,
-            qnSyncTime->currentMSecsSinceEpoch(),
-            m_peers.get());
+        m_peers->removePeer(connection->remotePeer());
+        auto& shortPeers = connection->shortPeers();
+        qint64 timeMs = qnSyncTime->currentMSecsSinceEpoch();
+        for (const auto& peer: peers)
+        {
+            m_peers->addRecord(
+                connection->remotePeer(),
+                shortPeers.decode(peer.peerNumber),
+                nx::p2p::RoutingRecord(peer.distance + 1, timeMs));
+        }
+        return true;
     }
 
     auto& miscData = connection->miscData();

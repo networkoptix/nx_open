@@ -434,37 +434,17 @@ TEST(P2pMessageBus, CompressPeerNumber2)
 TEST(P2pMessageBus, SerializePeers)
 {
     using namespace nx::p2p;
-    ec2::ApiPersistentIdData localPeer;
-    localPeer.id = QnUuid::createUuid();
-    localPeer.persistentId = QnUuid::createUuid();
-    BidirectionRoutingInfo peerData(localPeer);
-    PeerNumberInfo shortPeers;
 
-    std::vector<ec2::ApiPersistentIdData> peers;
-    for (int i = 0; i < 2; ++i)
-    {
-        ec2::ApiPersistentIdData p;
-        p.id = QnUuid::createUuid();
-        p.persistentId = QnUuid::createUuid();
-        peers.push_back(p);
-        shortPeers.encode(p);
-        peerData.addRecord(localPeer, p, RoutingRecord(1, 0));
-    }
+    std::vector<PeerRecord> peers;
+    for (int i = 0; i < 100; ++i)
+        peers.push_back(PeerRecord(i, i * 1000));
 
-    QByteArray serializedData = serializePeersMessage(&peerData, shortPeers);
-
-    BidirectionRoutingInfo deserializedPeerData(localPeer);
-    ASSERT_TRUE(deserializePeersMessage(
-        localPeer,
-        0, //< distance
-        shortPeers,
-        serializedData.mid(1), //< skip message type
-        /*time*/0,
-        &deserializedPeerData));
-    QByteArray serializedData2 = serializePeersMessage(&deserializedPeerData, shortPeers);
+    QByteArray serializedData = serializePeersMessage(peers);
+    bool success = false;
+    auto deserializedPeers = deserializePeersMessage(serializedData, &success);
+    QByteArray serializedData2 = serializePeersMessage(deserializedPeers);
+    ASSERT_TRUE(success);
     ASSERT_EQ(serializedData, serializedData2);
-    using namespace ec2;
-
 }
 
 } // namespace test
