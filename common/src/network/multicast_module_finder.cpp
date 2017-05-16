@@ -28,7 +28,7 @@
 
 #define DEBUG_LOG(MESSAGE) do \
 { \
-    if (nx::network::SocketGlobals::debugConfig().moduleFinders) \
+    if (nx::network::SocketGlobals::debugIni().moduleFinders) \
         NX_LOGX(MESSAGE, cl_logDEBUG1); \
 } while (0)
 
@@ -374,7 +374,7 @@ void QnMulticastModuleFinder::run()
             m_prevPingClock = currentClock;
         }
 
-        if (const auto timeout = SocketGlobals::debugConfig().multicastModuleFinderTimeout)
+        if (const auto timeout = SocketGlobals::debugIni().multicastModuleFinderTimeout)
         {
             NX_LOGX(lm("Avoid using poll, use %1 ms recv timeouts instead").arg(timeout), cl_logINFO);
             if (m_serverSocket)
