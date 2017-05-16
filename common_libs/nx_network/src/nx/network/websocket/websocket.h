@@ -3,6 +3,7 @@
 #include <memory>
 #include <QtCore>
 #include <nx/utils/log/log.h>
+#include <nx/utils/object_destruction_flag.h>
 #include <nx/network/aio/abstract_async_channel.h>
 #include <nx/network/connection_server/base_server_connection.h>
 #include <nx/network/aio/timer.h>
@@ -18,7 +19,6 @@ namespace network {
 namespace websocket {
 
 class NX_NETWORK_API WebSocket :
-    public QObject,
     public aio::AbstractAsyncChannel,
     private websocket::ParserHandler
 {
@@ -37,8 +37,6 @@ class NX_NETWORK_API WebSocket :
 
         WriteData() {}
     };
-
-    Q_OBJECT
 
 public:
 
@@ -63,14 +61,9 @@ public:
     void sendCloseAsync(); /**< Send close frame */
     void setPingTimeout(std::chrono::milliseconds timeout);
 
-signals:
-    /**
-     * Connection is not usable after this signal is emitted.
-     */
-    void connectionClosed();
-    void pingReceived();
-    void pongReceived();
-
+protected:
+    int m_pingsReceived = 0;
+    int m_pongsReceived = 0;
 
 private:
     /** Parser handler implementation */
@@ -106,8 +99,9 @@ private:
     nx::Buffer m_controlBuffer;
     nx::Buffer m_readBuffer;
     std::unique_ptr<nx::network::aio::Timer> m_pingTimer;
-    bool m_terminating;
     std::chrono::milliseconds m_pingTimeout;
+    nx::utils::ObjectDestructionFlag m_destructionFlag;
+    Error m_lastError;
 };
 
 } // namespace websocket

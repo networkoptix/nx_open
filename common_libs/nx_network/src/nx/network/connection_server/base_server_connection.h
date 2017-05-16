@@ -258,7 +258,6 @@ private:
         {
             nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
             BaseServerConnectionAccess::bytesReceived<CustomConnectionType>(this, m_readBuffer);
-            m_readBuffer.resize(0);
             if (watcher.objectDestroyed() || !m_receiving)
                 return; //< Connection has been removed by handler.
         }
