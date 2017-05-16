@@ -527,8 +527,11 @@ void QnMediaServerResource::setSystemInfo(const QnSystemInformation &systemInfo)
 }
 QnModuleInformation QnMediaServerResource::getModuleInformation() const
 {
-    if (getId() == resourcePool()->commonModule()->moduleGUID())
-        return resourcePool()->commonModule()->moduleInformation();
+    if (auto module = commonModule())
+    {
+        if (getId() == module->moduleGUID())
+            return module->moduleInformation();
+    }
 
     // build module information for other server
 
