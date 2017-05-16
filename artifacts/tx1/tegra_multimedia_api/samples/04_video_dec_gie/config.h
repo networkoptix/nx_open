@@ -26,6 +26,8 @@ struct TegraVideoFlagConfig: public nx::utils::FlagConfig
         //"./gieModel.cache",
         "/opt/networkoptix/mediaserver/var/cuda_engine.cache",
         cacheFile, "");
+
+    NX_STRING_PARAM("", substituteFramesFilePrefix, "");
 };
 
 extern TegraVideoFlagConfig conf;

@@ -24,7 +24,8 @@ public:
 
     virtual bool pushCompressedFrame(const CompressedFrame* compressedFrame) override;
 
-    virtual bool pullRectsForFrame(std::vector<Rect>* rects, int64_t* outPtsUs) override;
+    virtual bool pullRectsForFrame(
+        Rect outRects[], int maxRectsCount, int* outRectsCount, int64_t* outPtsUs) override;
 
     virtual bool hasMetadata() const override;
 
@@ -79,31 +80,42 @@ bool Impl::pushCompressedFrame(const CompressedFrame* compressedFrame)
 
     m_detector->pushCompressedFrame(compressedFrame->data, compressedFrame->dataSize);
 
+    OUTPUT << "pushCompressedFrame() END -> true";
     return true;
 }
 
-bool Impl::pullRectsForFrame(std::vector<Rect>* rects, int64_t* outPtsUs)
+bool Impl::pullRectsForFrame(
+    Rect outRects[], int maxRectsCount, int* outRectsCount, int64_t* outPtsUs)
 {
-
+    OUTPUT << "pullRectsForFrame() BEGIN";
     if (!rects || !outPtsUs)
         return false;
 
     if (!m_detector->hasRectangles())
+    {
+        OUTPUT << "pullRectsForFrame() END -> false: !m_detector->hasRectangles()";
         return false;
+    }
 
     auto rectsFromGie = m_detector->getRectangles();
     auto netHeight = m_detector->getNetHeight();
     auto netWidth = m_detector->getNetWidth();
 
-    for (const auto& rect: rectsFromGie)
+    if (rectsFromGie.size() > maxRectsCount)
     {
-        TegraVideo::Rect r;
+        PRINT << "INTERNAL ERROR: pullRectsForFrame(): too many rects: " << rectsFromGie.size();
+        return false;
+    }
+    *outRectsCount = rectsFromGie.size();
+
+    for (int i = 0; i < rectsFromGie.size(); ++i)
+    {
+        const auto& rect = rectsFromGie[i];
+        TegraVideo::Rect& r = outRects[i];
         r.x = (float) rect.x / netWidth;
         r.y = (float) rect.y / netHeight;
         r.width = (float) rect.width / netWidth;
         r.height = (float) rect.height / netHeight;
-
-        rects->push_back(r);
     }
 
     {
@@ -113,6 +125,7 @@ bool Impl::pullRectsForFrame(std::vector<Rect>* rects, int64_t* outPtsUs)
         ++m_outFrameCounter;
     }
 
+    OUTPUT << "pullRectsForFrame() END";
     return true;
 }
 

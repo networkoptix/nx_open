@@ -20,7 +20,8 @@ public:
 
     virtual bool pushCompressedFrame(const CompressedFrame* compressedFrame) override;
 
-    virtual bool pullRectsForFrame(std::vector<Rect>* rects, int64_t* outPtsUs) override;
+    virtual bool pullRectsForFrame(
+        Rect outRects[], int maxRectsCount, int* outRectsCount, int64_t* outPtsUs) override;
 
     virtual bool hasMetadata() const override;
 
@@ -53,11 +54,13 @@ bool Stub::pushCompressedFrame(const CompressedFrame* compressedFrame)
     return true;
 }
 
-bool Stub::pullRectsForFrame(std::vector<Rect>* rects, int64_t* outPtsUs)
+bool Stub::pullRectsForFrame(
+    Rect outRects[], int maxRectsCount, int* outRectsCount, int64_t* outPtsUs)
 {
     OUTPUT << "pullRectsForFrame() -> false";
 
     *outPtsUs = 0;
+    *outRectsCount = 0;
     return false;
 }
 

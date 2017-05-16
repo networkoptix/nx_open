@@ -589,9 +589,6 @@ gieThread(void *arg)
             void *cuda_buf = ctx->gie_ctx->getBuffer(0);
 
             // TODO: #mshevchenko: Here they convert RGB to float directly to NN buffer in VRAM.
-OUTPUT << "Going to call mapEGLImage2Float(egl_image, width: " << ctx->gie_ctx->getNetWidth()
-    << ", height: " << ctx->gie_ctx->getNetHeight()
-    << ", buffer: " << (cuda_buf ? "not null" : "null") << ")";
 
             // map eglimage into GPU address
             mapEGLImage2Float(&egl_image,  ctx->gie_ctx->getNetWidth(),
