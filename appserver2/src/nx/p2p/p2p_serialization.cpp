@@ -83,7 +83,7 @@ QString toString(MessageType value)
 }
 
 QByteArray serializePeersMessage(
-    const std::vector<PeerRecord>& records,
+    const QVector<PeerDistanceRecord>& records,
     int reservedSpaceAtFront)
 {
     QByteArray result;
@@ -116,9 +116,9 @@ QByteArray serializePeersMessage(
     }
 }
 
-std::vector<PeerRecord> deserializePeersMessage(const QByteArray& data, bool* success)
+QVector<PeerDistanceRecord> deserializePeersMessage(const QByteArray& data, bool* success)
 {
-    std::vector<PeerRecord> result;
+    QVector<PeerDistanceRecord> result;
     BitStreamReader reader((const quint8*)data.data(), data.size());
     try
     {
@@ -132,7 +132,7 @@ std::vector<PeerRecord> deserializePeersMessage(const QByteArray& data, bool* su
                 distance = NALUnit::extractUEGolombCode(reader); // todo: move function to another place
             else
                 distance = reader.getBits(32);
-            result.push_back(PeerRecord(peerNumber, distance));
+            result.push_back(PeerDistanceRecord(peerNumber, distance));
         }
     }
     catch (...)
@@ -258,8 +258,7 @@ QVector<QByteArray> deserializeTransactionList(const QByteArray& tranList, bool*
 }
 
 QByteArray serializeResolvePeerNumberResponse(
-    const QVector<PeerNumberType>& peers,
-    const PeerNumberInfo& peerNumberInfo,
+    const QVector<PeerNumberResponseRecord>& peers,
     int reservedSpaceAtFront)
 {
     QByteArray result;
@@ -271,14 +270,43 @@ QByteArray serializeResolvePeerNumberResponse(
 
         for (int i = 0; i < reservedSpaceAtFront; ++i)
             out << (quint8) 0;
-        for (const auto& peer : peers)
+        for (const auto& peer: peers)
         {
-            out << peer;
-            ApiPersistentIdData fullId = peerNumberInfo.decode(peer);
-            out.writeRawData(fullId.id.toRfc4122().data(), 16);
-            out.writeRawData(fullId.persistentId.toRfc4122().data(), 16);
+            out << peer.peerNumber;
+            out.writeRawData(peer.id.toRfc4122().data(), 16);
+            out.writeRawData(peer.persistentId.toRfc4122().data(), 16);
         }
     }
+    return result;
+}
+
+const QVector<PeerNumberResponseRecord> deserializeResolvePeerNumberResponse(const QByteArray& _response, bool* success)
+{
+    QByteArray response(_response);
+    QVector<PeerNumberResponseRecord> result;
+
+    *success = false;
+    if (response.size() % kResolvePeerResponseRecordSize != 0)
+        return result;
+
+    QBuffer buffer(&response);
+    buffer.open(QIODevice::ReadOnly);
+    QDataStream in(&buffer);
+    QByteArray tmpBuffer;
+    tmpBuffer.resize(16);
+    PeerNumberType shortPeerNumber;
+    ApiPersistentIdData fullId;
+    while (!in.atEnd())
+    {
+        in >> shortPeerNumber;
+        in.readRawData(tmpBuffer.data(), tmpBuffer.size());
+        fullId.id = QnUuid::fromRfc4122(tmpBuffer);
+        in.readRawData(tmpBuffer.data(), tmpBuffer.size());
+        fullId.persistentId = QnUuid::fromRfc4122(tmpBuffer);
+
+        result.push_back(PeerNumberResponseRecord(shortPeerNumber, fullId));
+    }
+    *success = true;
     return result;
 }
 

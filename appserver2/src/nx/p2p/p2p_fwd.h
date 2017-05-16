@@ -55,10 +55,10 @@ struct SubscribeRecord
     qint32 sequence = 0;
 };
 
-struct PeerRecord
+struct PeerDistanceRecord
 {
-    PeerRecord() {}
-    PeerRecord(PeerNumberType peerNumber, qint32 distance):
+    PeerDistanceRecord() {}
+    PeerDistanceRecord(PeerNumberType peerNumber, qint32 distance):
         peerNumber(peerNumber),
         distance(distance)
     {
@@ -66,6 +66,18 @@ struct PeerRecord
 
     PeerNumberType peerNumber = 0;
     qint32 distance = 0;
+};
+
+struct PeerNumberResponseRecord: public ec2::ApiPersistentIdData
+{
+    PeerNumberResponseRecord() {}
+    PeerNumberResponseRecord(PeerNumberType peerNumber, const ec2::ApiPersistentIdData& id):
+        peerNumber(peerNumber),
+        ec2::ApiPersistentIdData(id)
+    {
+    }
+
+    PeerNumberType peerNumber = 0;
 };
 
 struct BidirectionRoutingInfo;

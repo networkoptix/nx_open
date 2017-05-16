@@ -145,10 +145,6 @@ private:
         const QnUuid& remoteId,
         const QVector<ApiPersistentIdData>& subscribedTo) const;
 
-    void deserializeResolvePeerNumberResponse(
-        const P2pConnectionPtr& connection,
-        const QByteArray& response);
-
     void addOwnfInfoToPeerList();
     void addOfflinePeersFromDb();
 
@@ -188,8 +184,6 @@ private:
         const P2pConnectionPtr& connection,
         const QList<QByteArray>& serializedTransactions);
 public:
-
-    int expectedConnections() const;
     bool needStartConnection(
         const ApiPersistentIdData& peer,
         const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription) const;

@@ -307,7 +307,7 @@ void P2pMessageBus::printSubscribeMessage(
 
 void P2pMessageBus::sendAlivePeersMessage()
 {
-    std::vector<PeerRecord> records;
+    QVector<PeerDistanceRecord> records;
     records.reserve(m_peers->allPeerDistances.size());
     for (auto itr = m_peers->allPeerDistances.cbegin(); itr != m_peers->allPeerDistances.cend(); ++itr)
     {
@@ -315,7 +315,7 @@ void P2pMessageBus::sendAlivePeersMessage()
         if (minDistance == kMaxDistance)
             continue;
         const qint16 peerNumber = m_localShortPeerInfo.encode(itr.key());
-        records.push_back(PeerRecord(peerNumber, minDistance));
+        records.push_back(PeerDistanceRecord(peerNumber, minDistance));
     }
     QByteArray data = serializePeersMessage(records, 1);
     data.data()[0] = (quint8) MessageType::alivePeers;
@@ -785,44 +785,38 @@ bool P2pMessageBus::handleResolvePeerNumberRequest(const P2pConnectionPtr& conne
     QVector<PeerNumberType> request = deserializeCompressedPeers(data, &success);
     if (!success)
         return false;
-    auto responseData = serializeResolvePeerNumberResponse(request, m_localShortPeerInfo, 1);
+
+    QVector<PeerNumberResponseRecord> response;
+    response.reserve(request.size());
+    for (const auto& peer : request)
+        response.push_back(PeerNumberResponseRecord(peer, m_localShortPeerInfo.decode(peer)));
+
+    auto responseData = serializeResolvePeerNumberResponse(response, 1);
     responseData.data()[0] = (quint8) MessageType::resolvePeerNumberResponse;
     connection->sendMessage(responseData);
     return true;
 }
 
-void P2pMessageBus::deserializeResolvePeerNumberResponse(const P2pConnectionPtr& connection, const QByteArray& data)
+bool P2pMessageBus::handleResolvePeerNumberResponse(const P2pConnectionPtr& connection, const QByteArray& data)
 {
-    QByteArray response(data);
-    QBuffer buffer(&response);
-    buffer.open(QIODevice::ReadOnly);
-    QDataStream in(&buffer);
-    QByteArray tmpBuffer;
-    tmpBuffer.resize(16);
-    PeerNumberType shortPeerNumber;
-    ApiPersistentIdData fullId;
+    bool success = false;
+    auto records = deserializeResolvePeerNumberResponse(data, &success);
+    if (!success)
+        return false;
+
     auto& miscData = connection->miscData();
-    while (!in.atEnd())
+    for (const auto& record: records)
     {
-        in >> shortPeerNumber;
-        in.readRawData(tmpBuffer.data(), tmpBuffer.size());
-        fullId.id = QnUuid::fromRfc4122(tmpBuffer);
-        in.readRawData(tmpBuffer.data(), tmpBuffer.size());
-        fullId.persistentId = QnUuid::fromRfc4122(tmpBuffer);
-        connection->encode(fullId, shortPeerNumber);
+        connection->encode(record, record.peerNumber);
 
         auto itr = std::find(
             miscData.awaitingNumbersToResolve.begin(),
             miscData.awaitingNumbersToResolve.end(),
-            shortPeerNumber);
+            record.peerNumber);
         if (itr != miscData.awaitingNumbersToResolve.end())
             miscData.awaitingNumbersToResolve.erase(itr);
     }
-}
 
-bool P2pMessageBus::handleResolvePeerNumberResponse(const P2pConnectionPtr& connection, const QByteArray& data)
-{
-    deserializeResolvePeerNumberResponse(connection, data);
     const QByteArray msg = connection->miscData().remotePeersMessage;
     if (!msg.isEmpty())
         handlePeersMessage(connection, msg);

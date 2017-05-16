@@ -13,8 +13,8 @@ PeerNumberType deserializeCompressPeerNumber(BitStreamReader& reader);
 void serializeCompressedSize(BitStreamWriter& writer, quint32 peerNumber);
 quint32 deserializeCompressedSize(BitStreamReader& reader);
 
-QByteArray serializePeersMessage(const std::vector<PeerRecord>& records, int reservedSpaceAtFront = 1);
-std::vector<PeerRecord> deserializePeersMessage(const QByteArray& data, bool* success);
+QByteArray serializePeersMessage(const QVector<PeerDistanceRecord>& records, int reservedSpaceAtFront = 1);
+QVector<PeerDistanceRecord> deserializePeersMessage(const QByteArray& data, bool* success);
 
 QByteArray serializeCompressedPeers(const QVector<PeerNumberType>& peers, int reservedSpaceAtFront = 1);
 QVector<PeerNumberType> deserializeCompressedPeers(const QByteArray& data, bool* success);
@@ -22,10 +22,8 @@ QVector<PeerNumberType> deserializeCompressedPeers(const QByteArray& data, bool*
 QByteArray serializeSubscribeRequest(const QVector<SubscribeRecord>& request);
 QVector<SubscribeRecord> deserializeSubscribeRequest(const QByteArray& data, bool* success);
 
-QByteArray serializeResolvePeerNumberResponse(
-    const QVector<PeerNumberType>& peers,
-    const PeerNumberInfo& peerNumberInfo,
-    int reservedSpaceAtFront = 1);
+QByteArray serializeResolvePeerNumberResponse(const QVector<PeerNumberResponseRecord>& peers, int reservedSpaceAtFront = 1);
+const QVector<PeerNumberResponseRecord> deserializeResolvePeerNumberResponse(const QByteArray& data, bool* success);
 
 QByteArray serializeTransactionList(const QList<QByteArray>& tranList, int reservedSpaceAtFront = 1);
 QVector<QByteArray> deserializeTransactionList(const QByteArray& tranList, bool* success);

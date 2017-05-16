@@ -435,9 +435,9 @@ TEST(P2pMessageBus, SerializePeers)
 {
     using namespace nx::p2p;
 
-    std::vector<PeerRecord> peers;
+    QVector<PeerDistanceRecord> peers;
     for (int i = 0; i < 100; ++i)
-        peers.push_back(PeerRecord(i, i * 1000));
+        peers.push_back(PeerDistanceRecord(i, i * 1000));
 
     QByteArray serializedData = serializePeersMessage(peers);
     bool success = false;
