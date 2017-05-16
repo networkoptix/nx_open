@@ -24,6 +24,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.storage.cameraId = $routeParams.cameraId || $scope.storage.cameraId   || null;
 
         if(!$routeParams.cameraId &&  $scope.storage.cameraId){
+            $scope.toggleCameraPanel = false;
             $location.path('/view/' + $scope.storage.cameraId, false);
         }
 
@@ -97,7 +98,8 @@ angular.module('nxCommon').controller('ViewCtrl',
                 return true;
             });
             $scope.hasMobileApp = !!found;
-            $scope.toggleCameraPanel = true;
+            if(!$scope.storage.cameraId)
+                $scope.toggleCameraPanel = true;
 
         }
 
@@ -230,8 +232,10 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.playerReady = function(API){
             $scope.playerAPI = API;
             if(API) {
-                $scope.switchPlaying($scope.positionProvider.playing);
-                $scope.playerAPI.volume($scope.volumeLevel);
+                setTimeout(function(){
+                    $scope.switchPlaying($scope.positionProvider.playing);
+                    $scope.playerAPI.volume($scope.volumeLevel);
+                },100);
             }
         };
 
@@ -385,8 +389,6 @@ angular.module('nxCommon').controller('ViewCtrl',
         },true);
 
         $scope.$watch('volumeLevel', function(){
-            if($scope.playerAPI)
-                $scope.playerAPI.volume($scope.volumeLevel);
             $scope.storage.volumeLevel = $scope.volumeLevel;
         });
 
@@ -462,8 +464,9 @@ angular.module('nxCommon').controller('ViewCtrl',
             }
         };
 
-        setTimeout(updateHeights,100);
+        setTimeout(function(){updateHeights();},100);
         $window.resize(updateHeights);
+        window.addEventListener("orientationchange",function(){setTimeout(function(){updateHeights();},200);});
 
         $scope.mobileAppAlertClose = function(){
             $scope.session.mobileAppNotified  = true;

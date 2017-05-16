@@ -150,7 +150,7 @@ camera-panel {
 
 .video-status{
   width: 24px;
-  font-size: 250%;
+  font-size: 150%;
   line-height: 12px;
 }
 
@@ -876,6 +876,7 @@ div.text-center{
 
 .visible-xs .cameras-panel{
   width: 100% !important;
+  min-width: 320px !important;
   display: block !important; 
 }
 
