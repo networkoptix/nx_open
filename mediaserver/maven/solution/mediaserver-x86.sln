@@ -37,6 +37,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "appserver2-x86", "..\appser
 		${nx_utils.guid} = ${nx_utils.guid}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_kit-x86", "..\nx_kit\src\nx_kit-x86.vcxproj", "${nx_kit.guid}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_email-x86", "..\common_libs\nx_email\src\nx_email-x86.vcxproj", "${nx_email.guid}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_streaming-x86", "..\common_libs\nx_streaming\src\nx_streaming-x86.vcxproj", "${nx_streaming.guid}"
