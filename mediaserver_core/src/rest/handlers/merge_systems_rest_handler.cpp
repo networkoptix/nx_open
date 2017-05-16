@@ -21,8 +21,7 @@
 #include "media_server/serverutil.h"
 #include "media_server/server_connector.h"
 #include "network/tcp_connection_priv.h"
-#include "network/module_finder.h"
-#include "network/direct_module_finder.h"
+#include "nx/vms/discovery/manager.h"
 #include <network/connection_validator.h>
 
 #include "utils/common/app_info.h"
@@ -349,11 +348,17 @@ int QnMergeSystemsRestHandler::execute(
             ec2::DummyHandler::instance(),
             &ec2::DummyHandler::onRequestDone);
     }
-    owner->commonModule()->moduleFinder()->directModuleFinder()->checkUrl(url);
+
+    const SocketAddress endpoint(SocketAddress(url.host(), remoteModuleInformation.port));
+    //owner->commonModule()->moduleDiscoveryManager()->checkEndpoint(
+    //    remoteModuleInformation.id, endpoint);
 
     /* Connect to server if it is compatible */
     if (connectionResult == Qn::SuccessConnectionResult && QnServerConnector::instance())
-        QnServerConnector::instance()->addConnection(remoteModuleInformation, SocketAddress(url.host(), remoteModuleInformation.port));
+    {
+        nx::vms::discovery::Manager::ModuleData modile(remoteModuleInformation, endpoint);
+        QnServerConnector::instance()->addConnection(modile);
+    }
 
     QnAuditRecord auditRecord = qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_SystemmMerge);
     qnAuditManager->addAuditRecord(auditRecord);

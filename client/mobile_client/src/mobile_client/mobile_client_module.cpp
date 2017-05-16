@@ -20,8 +20,7 @@
 #include <api/simple_network_proxy_factory.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <utils/common/app_info.h>
-#include <network/module_finder.h>
-#include <network/multicast_module_finder.h>
+#include <nx/vms/discovery/manager.h>
 #include <network/router.h>
 #include <cloud/cloud_connection.h>
 #include <watchers/user_watcher.h>
@@ -109,9 +108,6 @@ QnMobileClientModule::QnMobileClientModule(
         runtimeData.videoWallInstanceGuid = startupParameters.videowallInstanceGuid;
     commonModule->runtimeInfoManager()->updateLocalItem(runtimeData);
 
-    commonModule->moduleFinder()->multicastModuleFinder()->setCheckInterfacesTimeout(10 * 1000);
-    commonModule->moduleFinder()->start();
-
     const auto getter = []() { return qnClientCoreSettings->knownServerUrls(); };
     const auto setter =
         [](const QnServerAddressWatcher::UrlsList& values)
@@ -127,15 +123,15 @@ QnMobileClientModule::QnMobileClientModule(
     commonModule->store(new settings::SessionsMigrationHelper());
 
     connect(qApp, &QGuiApplication::applicationStateChanged, this,
-        [moduleFinder = commonModule->moduleFinder()](Qt::ApplicationState state)
+        [moduleManager = commonModule->moduleDiscoveryManager()](Qt::ApplicationState state)
         {
             switch (state)
             {
                 case Qt::ApplicationActive:
-                    moduleFinder->start();
+                    moduleManager->start();
                     break;
                 case Qt::ApplicationSuspended:
-                    moduleFinder->pleaseStop();
+                    moduleManager->stop();
                     break;
                 default:
                     break;

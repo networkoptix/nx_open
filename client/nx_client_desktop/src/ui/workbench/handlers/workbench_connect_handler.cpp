@@ -77,7 +77,7 @@
 #include <utils/common/system_information.h>
 #include <utils/common/url.h>
 #include <utils/common/delayed.h>
-#include <network/module_finder.h>
+#include <nx/vms/discovery/manager.h>
 #include <network/router.h>
 #include <network/system_helpers.h>
 #include <utils/reconnect_helper.h>
