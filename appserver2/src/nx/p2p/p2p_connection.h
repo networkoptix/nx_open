@@ -14,6 +14,7 @@
 #include <transaction/connection_guard.h>
 #include <nx_ec/data/api_tran_state_data.h>
 #include <nx/network/http/http_async_client.h>
+#include "connection_context.h"
 
 namespace ec2 {
 class QnAbstractTransaction;
@@ -78,45 +79,12 @@ public:
     void sendMessage(MessageType messageType, const nx::Buffer& data);
     void sendMessage(const nx::Buffer& data);
 
-    ApiPersistentIdData decode(PeerNumberType shortPeerNumber) const;
-    PeerNumberType encode(const ApiPersistentIdData& fullId, PeerNumberType shortPeerNumber = kUnknownPeerNumnber);
-
     void startConnection();
     void startReading();
 
-    /** MiscData contains members that managed by P2pMessageBus. P2pConnection doesn't touch it */
-    struct MessageBusContext
-    {
-        MessageBusContext()
-        {
-            localPeersTimer.invalidate();
-        }
-
-        // to local part
-        QByteArray localPeersMessage; //< last sent peers message
-        QElapsedTimer localPeersTimer; //< last sent peers time
-        QVector<ApiPersistentIdData> localSubscription; //< local -> remote subscription
-        bool isLocalStarted = false; //< we opened connection to remote peer
-        QVector<PeerNumberType> awaitingNumbersToResolve;
-        bool selectingDataInProgress = false;
-
-        // to remote part
-        QByteArray remotePeersMessage; //< last received peers message
-        QnTranState remoteSubscription; //< remote -> local subscription
-        bool remoteSelectingDataInProgress = false;
-        bool isRemoteStarted = false; //< remote peer has open logical connection to us
-
-        QElapsedTimer sendStartTimer;
-        QElapsedTimer lifetimeTimer;
-    };
-
-    MessageBusContext& miscData();
+    ConnectionContext& context();
 
     const Qn::UserAccessData& getUserAccessData() const { return m_userAccessData; }
-    bool remotePeerSubscribedTo(const ApiPersistentIdData& peer) const;
-    bool updateSequence(const ec2::QnAbstractTransaction& tran);
-    bool localPeerSubscribedTo(const ApiPersistentIdData& peer) const;
-    const PeerNumberInfo& shortPeers() const;
 signals:
     void gotMessage(QWeakPointer<P2pConnection> connection, nx::p2p::MessageType messageType, const QByteArray& payload);
     void stateChanged(QWeakPointer<P2pConnection> connection, P2pConnection::State state);
@@ -156,11 +124,10 @@ private:
     std::atomic<State> m_state = State::Connecting;
 
     Direction m_direction;
-    MessageBusContext m_messageBusContext;
+    ConnectionContext m_context;
     QUrl m_remotePeerUrl;
     const Qn::UserAccessData m_userAccessData = Qn::kSystemAccess;
 
-    PeerNumberInfo m_shortPeerInfo;
     std::unique_ptr<ConnectionLockGuard> m_connectionLockGuard;
 
     static SendCounters m_sendCounters;

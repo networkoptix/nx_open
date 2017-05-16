@@ -89,7 +89,6 @@ P2pConnection::P2pConnection(
         std::move(connectionLockGuard));
 
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
-    m_messageBusContext.lifetimeTimer.restart();
     m_timer.bindToAioThread(m_webSocket->getAioThread());
 }
 
@@ -262,7 +261,6 @@ void P2pConnection::onHttpClientDone()
     using namespace nx::network;
     m_webSocket.reset(new websocket::WebSocket(std::move(socket)));
     m_httpClient.reset();
-    m_messageBusContext.lifetimeTimer.restart();
     setState(State::Connected);
 }
 
@@ -275,8 +273,6 @@ void P2pConnection::startConnection()
 
 void P2pConnection::startReading()
 {
-    m_shortPeerInfo.encode(ApiPersistentIdData(m_remotePeer), 0);
-
     using namespace std::placeholders;
     m_webSocket->readSomeAsync(
         &m_readBuffer,
@@ -401,51 +397,9 @@ bool P2pConnection::handleMessage(const nx::Buffer& message)
     return true;
 }
 
-P2pConnection::MessageBusContext& P2pConnection::miscData()
+ConnectionContext& P2pConnection::context()
 {
-    return m_messageBusContext;
-}
-
-ApiPersistentIdData P2pConnection::decode(PeerNumberType shortPeerNumber) const
-{
-    return m_shortPeerInfo.decode(shortPeerNumber);
-}
-
-const PeerNumberInfo& P2pConnection::shortPeers() const
-{
-    return m_shortPeerInfo;
-}
-
-PeerNumberType P2pConnection::encode(const ApiPersistentIdData& fullId, PeerNumberType shortPeerNumber)
-{
-    return m_shortPeerInfo.encode(fullId, shortPeerNumber);
-}
-
-bool P2pConnection::remotePeerSubscribedTo(const ApiPersistentIdData& peer) const
-{
-    return m_messageBusContext.remoteSubscription.values.contains(peer);
-}
-
-bool P2pConnection::updateSequence(const QnAbstractTransaction& tran)
-{
-    NX_ASSERT(!m_messageBusContext.selectingDataInProgress);
-    const ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
-    auto itr = m_messageBusContext.remoteSubscription.values.find(peerId);
-    if (itr == m_messageBusContext.remoteSubscription.values.end())
-        return false;
-    if (tran.persistentInfo.sequence > itr.value())
-    {
-        itr.value() = tran.persistentInfo.sequence;
-        return true;
-    }
-    return false;
-}
-
-bool P2pConnection::localPeerSubscribedTo(const ApiPersistentIdData& peer) const
-{
-    const auto& data = m_messageBusContext.localSubscription;
-    auto itr = std::find(data.begin(), data.end(), peer);
-    return itr != data.end();
+    return m_context;
 }
 
 } // namespace p2p

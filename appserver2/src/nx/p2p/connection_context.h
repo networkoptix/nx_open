@@ -1,0 +1,51 @@
+#pragma once
+
+#include <QtCore/QElapsedTimer>
+
+#include <nx_ec/data/api_peer_data.h>
+#include <nx_ec/data/api_tran_state_data.h>
+#include "p2p_fwd.h"
+
+namespace ec2 {
+class QnAbstractTransaction;
+}
+
+namespace nx {
+namespace p2p {
+
+/** MiscData contains members that managed by P2pMessageBus. P2pConnection doesn't touch it */
+struct ConnectionContext
+{
+public:
+    ConnectionContext()
+    {
+        localPeersTimer.invalidate();
+    }
+
+    bool isRemotePeerSubscribedTo(const ec2::ApiPersistentIdData& peer) const;
+    bool isLocalPeerSubscribedTo(const ec2::ApiPersistentIdData& peer) const;
+    bool updateSequence(const ec2::QnAbstractTransaction& tran);
+
+    ec2::ApiPersistentIdData decode(PeerNumberType shortPeerNumber) const;
+    PeerNumberType encode(const ec2::ApiPersistentIdData& fullId, PeerNumberType shortPeerNumber = kUnknownPeerNumnber);
+public:
+    // to local part
+    QByteArray localPeersMessage; //< last sent peers message
+    QElapsedTimer localPeersTimer; //< last sent peers time
+    QVector<ec2::ApiPersistentIdData> localSubscription; //< local -> remote subscription
+    bool isLocalStarted = false; //< we opened connection to remote peer
+    QVector<PeerNumberType> awaitingNumbersToResolve;
+    bool selectingDataInProgress = false;
+
+    // to remote part
+    QByteArray remotePeersMessage; //< last received peers message
+    ec2::QnTranState remoteSubscription; //< remote -> local subscription
+    bool remoteSelectingDataInProgress = false;
+    bool isRemoteStarted = false; //< remote peer has open logical connection to us
+    PeerNumberInfo shortPeerInfo;
+
+    QElapsedTimer sendStartTimer;
+};
+
+} // namespace p2p
+} // namespace nx

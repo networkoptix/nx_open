@@ -338,7 +338,7 @@ static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverCon
         for (const auto& connection : bus->connections())
         {
             ++totalConnections;
-            if (connection->miscData().isLocalStarted)
+            if (connection->context().isLocalStarted)
                 ++startedConnections;
         }
         connectionTries += bus->connectionTries();

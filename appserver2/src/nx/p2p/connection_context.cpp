@@ -1,0 +1,44 @@
+#include "connection_context.h"
+#include <transaction/transaction.h>
+
+namespace nx {
+namespace p2p {
+
+bool ConnectionContext::isRemotePeerSubscribedTo(const ec2::ApiPersistentIdData& peer) const
+{
+    return remoteSubscription.values.contains(peer);
+}
+
+bool ConnectionContext::isLocalPeerSubscribedTo(const ec2::ApiPersistentIdData& peer) const
+{
+    auto itr = std::find(localSubscription.begin(), localSubscription.end(), peer);
+    return itr != localSubscription.end();
+}
+
+bool ConnectionContext::updateSequence(const ec2::QnAbstractTransaction& tran)
+{
+    NX_ASSERT(!selectingDataInProgress);
+    const ec2::ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
+    auto itr = remoteSubscription.values.find(peerId);
+    if (itr == remoteSubscription.values.end())
+        return false;
+    if (tran.persistentInfo.sequence > itr.value())
+    {
+        itr.value() = tran.persistentInfo.sequence;
+        return true;
+    }
+    return false;
+}
+
+ec2::ApiPersistentIdData ConnectionContext::decode(PeerNumberType shortPeerNumber) const
+{
+    return shortPeerInfo.decode(shortPeerNumber);
+}
+
+PeerNumberType ConnectionContext::encode(const ec2::ApiPersistentIdData& fullId, PeerNumberType shortPeerNumber)
+{
+    return shortPeerInfo.encode(fullId, shortPeerNumber);
+}
+
+} // namespace p2p
+} // namespace nx

@@ -173,7 +173,7 @@ void P2pMessageBus::gotConnectionFromRemotePeer(P2pConnectionPtr connection)
     m_peers->removePeer(connection->remotePeer());
     m_connections[remoteId] = connection;
     connectSignals(connection);
-    connection->startReading();
+    startReading(connection);
 }
 
 void P2pMessageBus::connectSignals(const P2pConnectionPtr& connection)
@@ -326,16 +326,16 @@ void P2pMessageBus::sendAlivePeersMessage()
     {
         if (connection->state() != P2pConnection::State::Connected)
             continue;
-        if (!connection->miscData().isRemoteStarted)
+        if (!connection->context().isRemoteStarted)
             continue;
 
-        auto& miscData = connection->miscData();
-        if (miscData.localPeersTimer.isValid() && !miscData.localPeersTimer.hasExpired(peersIntervalMs))
+        auto& connectionContext = connection->context();
+        if (connectionContext.localPeersTimer.isValid() && !connectionContext.localPeersTimer.hasExpired(peersIntervalMs))
             continue;
-        if (data != miscData.localPeersMessage)
+        if (data != connectionContext.localPeersMessage)
         {
-            miscData.localPeersMessage = data;
-            miscData.localPeersTimer.restart();
+            connectionContext.localPeersMessage = data;
+            connectionContext.localPeersTimer.restart();
             if (nx::utils::log::isToBeLogged(cl_logDEBUG1, QnLog::P2P_TRAN_LOG))
                 printPeersMessage();
             connection->sendMessage(data);
@@ -348,7 +348,7 @@ QMap<ApiPersistentIdData, P2pConnectionPtr> P2pMessageBus::getCurrentSubscriptio
     QMap<ApiPersistentIdData, P2pConnectionPtr> result;
     for (auto itr = m_connections.cbegin(); itr != m_connections.cend(); ++itr)
     {
-        for (const auto peer: itr.value()->miscData().localSubscription)
+        for (const auto peer: itr.value()->context().localSubscription)
             result[peer] = itr.value();
     }
     return result;
@@ -365,15 +365,15 @@ void P2pMessageBus::resubscribePeers(
     for (auto connection: m_connections.values())
     {
         const auto& newValue = updatedSubscription.value(connection);
-        auto& miscData = connection->miscData();
-        if (miscData.localSubscription != newValue)
+        auto& connectionContext = connection->context();
+        if (connectionContext.localSubscription != newValue)
         {
-            miscData.localSubscription = newValue;
+            connectionContext.localSubscription = newValue;
             QVector<PeerNumberType> shortValues;
             for (const auto& id: newValue)
-                shortValues.push_back(connection->encode(id));
+                shortValues.push_back(connectionContext.encode(id));
             if (nx::utils::log::isToBeLogged(cl_logDEBUG1, QnLog::P2P_TRAN_LOG))
-                printSubscribeMessage(connection->remotePeer().id, miscData.localSubscription);
+                printSubscribeMessage(connection->remotePeer().id, connectionContext.localSubscription);
 
             NX_ASSERT(newValue.contains(connection->remotePeer()));
             auto sequences = m_db->transactionLog()->getTransactionsState(newValue);
@@ -382,7 +382,7 @@ void P2pMessageBus::resubscribePeers(
             for (int i = 0; i < shortValues.size(); ++i)
                 request.push_back(SubscribeRecord(shortValues[i], sequences[i]));
             connection->sendMessage(serializeSubscribeRequest(request));
-            miscData.remoteSelectingDataInProgress = true;
+            connectionContext.remoteSelectingDataInProgress = true;
         }
     }
 }
@@ -422,7 +422,7 @@ bool P2pMessageBus::needStartConnection(
     qint32 currentDistance = allPeerDistances.value(peer).minDistance();
     const auto& subscribedVia = currentSubscription.value(peer);
     return currentDistance > m_miscData.maxDistanceToUseProxy
-        || (subscribedVia && subscribedVia->miscData().localSubscription.size() > m_miscData.maxSubscriptionToResubscribe);
+        || (subscribedVia && subscribedVia->context().localSubscription.size() > m_miscData.maxSubscriptionToResubscribe);
 }
 
 bool P2pMessageBus::needStartConnection(
@@ -444,7 +444,7 @@ bool P2pMessageBus::hasStartingConnections() const
 {
     for (const auto& connection : m_connections)
     {
-        const auto& data = connection->miscData();
+        const auto& data = connection->context();
         if (data.isLocalStarted && data.remotePeersMessage.isEmpty())
             return true;
     }
@@ -463,14 +463,14 @@ void P2pMessageBus::startStopConnections(const QMap<ApiPersistentIdData, P2pConn
 
     for (auto& connection: m_connections)
     {
-        if (connection->state() != P2pConnection::State::Connected ||  connection->miscData().isLocalStarted)
+        if (connection->state() != P2pConnection::State::Connected ||  connection->context().isLocalStarted)
             continue; //< already in use or not ready yet
 
         ApiPersistentIdData peer = connection->remotePeer();
         if (needStartConnection(peer, currentSubscription))
         {
-            connection->miscData().isLocalStarted = true;
-            connection->miscData().sendStartTimer.restart();
+            connection->context().isLocalStarted = true;
+            connection->context().sendStartTimer.restart();
             connection->sendMessage(MessageType::start, QByteArray());
             if (--maxStartsAtOnce == 0)
                 return; //< limit start requests at once
@@ -490,7 +490,7 @@ P2pConnectionPtr P2pMessageBus::findBestConnectionToSubscribe(
         NX_ASSERT(connection);
         if (!connection)
             continue;
-        int subscriptions = connection->miscData().localSubscription.size() + newSubscriptions.value(connection);
+        int subscriptions = connection->context().localSubscription.size() + newSubscriptions.value(connection);
         if (subscriptions < minSubscriptions)
         {
             minSubscriptions = subscriptions;
@@ -508,7 +508,7 @@ void P2pMessageBus::doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr
 
     for (const auto& connection: m_connections)
     {
-        const auto& data = connection->miscData();
+        const auto& data = connection->context();
         if (data.remoteSelectingDataInProgress)
             return;
     }
@@ -560,7 +560,7 @@ void P2pMessageBus::doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr
             {
                 auto connection = findConnectionById(via);
                 NX_ASSERT(connection);
-                return connection->remotePeerSubscribedTo(peer);
+                return connection->context().isRemotePeerSubscribedTo(peer);
             }))
             {
                 continue;
@@ -645,6 +645,12 @@ ApiPeerDataEx P2pMessageBus::localPeerEx() const
     return result;
 }
 
+void P2pMessageBus::startReading(P2pConnectionPtr connection)
+{
+    connection->context().encode(ApiPersistentIdData(connection->remotePeer()), 0);
+    connection->startReading();
+}
+
 void P2pMessageBus::at_stateChanged(
     QWeakPointer<P2pConnection> weakRef,
     P2pConnection::State state)
@@ -663,7 +669,7 @@ void P2pMessageBus::at_stateChanged(
             {
                 m_connections[remoteId] = connection;
                 m_outgoingConnections.remove(remoteId);
-                connection->startReading();
+                startReading(connection);
             }
             break;
         case P2pConnection::State::Error:
@@ -704,8 +710,8 @@ void P2pMessageBus::at_allDataSent(QWeakPointer<P2pConnection> weakRef)
     QnMutexLocker lock(&m_mutex);
     if (m_connections.value(connection->remotePeer().id) != connection)
         return;
-    if (connection->miscData().selectingDataInProgress)
-        selectAndSendTransactions(connection, connection->miscData().remoteSubscription);
+    if (connection->context().selectingDataInProgress)
+        selectAndSendTransactions(connection, connection->context().remoteSubscription);
 
 }
 
@@ -745,13 +751,13 @@ void P2pMessageBus::at_gotMessage(
     switch (messageType)
     {
     case MessageType::start:
-        connection->miscData().isRemoteStarted = true;
+        connection->context().isRemoteStarted = true;
         result = true;
         break;
     case MessageType::stop:
-        connection->miscData().selectingDataInProgress = false;
-        connection->miscData().isRemoteStarted = false;
-        connection->miscData().remoteSubscription.values.clear();
+        connection->context().selectingDataInProgress = false;
+        connection->context().isRemoteStarted = false;
+        connection->context().remoteSubscription.values.clear();
         break;
     case MessageType::resolvePeerNumberRequest:
         result = handleResolvePeerNumberRequest(connection, payload);
@@ -804,20 +810,20 @@ bool P2pMessageBus::handleResolvePeerNumberResponse(const P2pConnectionPtr& conn
     if (!success)
         return false;
 
-    auto& miscData = connection->miscData();
+    auto& connectionContext = connection->context();
     for (const auto& record: records)
     {
-        connection->encode(record, record.peerNumber);
+        connectionContext.encode(record, record.peerNumber);
 
         auto itr = std::find(
-            miscData.awaitingNumbersToResolve.begin(),
-            miscData.awaitingNumbersToResolve.end(),
+            connectionContext.awaitingNumbersToResolve.begin(),
+            connectionContext.awaitingNumbersToResolve.end(),
             record.peerNumber);
-        if (itr != miscData.awaitingNumbersToResolve.end())
-            miscData.awaitingNumbersToResolve.erase(itr);
+        if (itr != connectionContext.awaitingNumbersToResolve.end())
+            connectionContext.awaitingNumbersToResolve.erase(itr);
     }
 
-    const QByteArray msg = connection->miscData().remotePeersMessage;
+    const QByteArray msg = connection->context().remotePeersMessage;
     if (!msg.isEmpty())
         handlePeersMessage(connection, msg);
     return true;
@@ -838,15 +844,15 @@ bool P2pMessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const
     BitStreamReader reader((const quint8*)data.data(), data.size());
     for (const auto& peer: peers)
     {
-        if (connection->decode(peer.peerNumber).isNull())
+        if (connection->context().decode(peer.peerNumber).isNull())
             numbersToResolve.push_back(peer.peerNumber);
     }
-    connection->miscData().remotePeersMessage = data;
+    connection->context().remotePeersMessage = data;
 
     if (numbersToResolve.empty())
     {
         m_peers->removePeer(connection->remotePeer());
-        auto& shortPeers = connection->shortPeers();
+        auto& shortPeers = connection->context().shortPeerInfo;
         qint64 timeMs = qnSyncTime->currentMSecsSinceEpoch();
         for (const auto& peer: peers)
         {
@@ -858,23 +864,23 @@ bool P2pMessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const
         return true;
     }
 
-    auto& miscData = connection->miscData();
+    auto& connectionContext = connection->context();
     std::sort(numbersToResolve.begin(), numbersToResolve.end());
     QVector<PeerNumberType> moreNumbersToResolve;
 
     std::set_difference(
         numbersToResolve.begin(),
         numbersToResolve.end(),
-        miscData.awaitingNumbersToResolve.begin(),
-        miscData.awaitingNumbersToResolve.end(),
+        connectionContext.awaitingNumbersToResolve.begin(),
+        connectionContext.awaitingNumbersToResolve.end(),
         std::inserter(moreNumbersToResolve, moreNumbersToResolve.begin()));
 
     if (moreNumbersToResolve.isEmpty())
         return true;
 
     for (const auto& number: moreNumbersToResolve)
-        miscData.awaitingNumbersToResolve.push_back(number);
-    std::sort(miscData.awaitingNumbersToResolve.begin(), miscData.awaitingNumbersToResolve.end());
+        connectionContext.awaitingNumbersToResolve.push_back(number);
+    std::sort(connectionContext.awaitingNumbersToResolve.begin(), connectionContext.awaitingNumbersToResolve.end());
 
     auto serializedData = serializeCompressedPeers(moreNumbersToResolve, 1);
     serializedData.data()[0] = (quint8) MessageType::resolvePeerNumberRequest;
@@ -893,7 +899,7 @@ struct SendTransactionToTransportFuction
         const P2pConnectionPtr& connection) const
     {
         ApiPersistentIdData tranId(transaction.peerID, transaction.persistentInfo.dbID);
-        NX_ASSERT(connection->remotePeerSubscribedTo(tranId));
+        NX_ASSERT(connection->context().isRemotePeerSubscribedTo(tranId));
         NX_ASSERT(!(ApiPersistentIdData(connection->remotePeer()) == tranId));
 
         switch (connection->remotePeer().dataFormat)
@@ -942,7 +948,7 @@ bool P2pMessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connec
     }
 
     // merge current and new subscription
-    QnTranState& oldSubscription = connection->miscData().remoteSubscription;
+    QnTranState& oldSubscription = connection->context().remoteSubscription;
 
     auto itrOldSubscription = oldSubscription.values.begin();
     for (auto itr = newSubscription.values.begin(); itr != newSubscription.values.end(); ++itr)
@@ -955,10 +961,10 @@ bool P2pMessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connec
             itr.value() = std::max(itr.value(), itrOldSubscription.value());
         }
     }
-    NX_ASSERT(!connection->remotePeerSubscribedTo(connection->remotePeer()));
-    if (connection->miscData().selectingDataInProgress)
+    NX_ASSERT(!connection->context().isRemotePeerSubscribedTo(connection->remotePeer()));
+    if (connection->context().selectingDataInProgress)
     {
-        connection->miscData().remoteSubscription = newSubscription;
+        connection->context().remoteSubscription = newSubscription;
         return true;
     }
 
@@ -988,7 +994,7 @@ bool P2pMessageBus::selectAndSendTransactions(
         serializedTransactions,
         kMaxSelectDataSize,
         &isFinished);
-    connection->miscData().selectingDataInProgress = !isFinished;
+    connection->context().selectingDataInProgress = !isFinished;
     if (errorCode != ErrorCode::ok)
     {
         NX_LOG(
@@ -997,7 +1003,7 @@ bool P2pMessageBus::selectAndSendTransactions(
             cl_logWARNING);
         return false;
     }
-    connection->miscData().remoteSubscription = newSubscription;
+    connection->context().remoteSubscription = newSubscription;
 
 
     if (nx::utils::log::isToBeLogged(cl_logDEBUG1, QnLog::P2P_TRAN_LOG))
@@ -1068,7 +1074,7 @@ void P2pMessageBus::gotTransaction(
 {
     ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
     //NX_ASSERT(connection->localPeerSubscribedTo(peerId)); //< loop
-    NX_ASSERT(!connection->remotePeerSubscribedTo(peerId)); //< loop
+    NX_ASSERT(!connection->context().isRemotePeerSubscribedTo(peerId)); //< loop
 
     if (nx::utils::log::isToBeLogged(cl_logDEBUG1, QnLog::P2P_TRAN_LOG))
         printTran(connection, tran, P2pConnection::Direction::incoming);
@@ -1103,8 +1109,7 @@ void P2pMessageBus::gotTransaction(
     ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
 
     //NX_ASSERT(connection->localPeerSubscribedTo(peerId)); //< loop
-    NX_ASSERT(!connection->remotePeerSubscribedTo(peerId)); //< loop
-
+    NX_ASSERT(!connection->context().isRemotePeerSubscribedTo(peerId)); //< loop
 
     if (m_db)
     {
@@ -1181,7 +1186,7 @@ bool P2pMessageBus::handlePushTransactionList(const P2pConnectionPtr& connection
 {
     if (data.isEmpty())
     {
-        connection->miscData().remoteSelectingDataInProgress = false;
+        connection->context().remoteSelectingDataInProgress = false;
         return true; //< eof pushTranList reached
     }
     bool success = false;
@@ -1216,7 +1221,7 @@ bool P2pMessageBus::isSubscribedTo(const ApiPersistentIdData& peer) const
     {
         if (connection->state() != P2pConnection::State::Connected)
             continue;
-        if (connection->localPeerSubscribedTo(peer))
+        if (connection->context().isLocalPeerSubscribedTo(peer))
             return true;
     }
     return false;

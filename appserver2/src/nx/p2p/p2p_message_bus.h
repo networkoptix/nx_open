@@ -92,7 +92,7 @@ public:
         const ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
         for (const auto& connection: m_connections)
         {
-            if (connection->miscData().selectingDataInProgress || !connection->updateSequence(tran))
+            if (connection->context().selectingDataInProgress || !connection->context().updateSequence(tran))
                 continue;
             NX_ASSERT(!(ApiPersistentIdData(connection->remotePeer()) == peerId)); //< loop
 
@@ -183,6 +183,7 @@ private:
     bool pushTransactionList(
         const P2pConnectionPtr& connection,
         const QList<QByteArray>& serializedTransactions);
+    void startReading(P2pConnectionPtr connection);
 public:
     bool needStartConnection(
         const ApiPersistentIdData& peer,
