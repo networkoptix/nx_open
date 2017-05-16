@@ -26,6 +26,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/request_param.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/compressed_time_functions.h>
 #include <nx/network/http/httptypes.h>
 
 #include <api/app_server_connection.h>
