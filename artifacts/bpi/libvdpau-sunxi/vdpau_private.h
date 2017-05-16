@@ -31,7 +31,7 @@
 #include <X11/Xlib.h>
 #include "sunxi_disp.h"
 #include "pixman.h"
-#include "conf.h"
+#include "ini.h"
 
 #define INTERNAL_YCBCR_FORMAT (VdpYCbCrFormat)0xffff
 

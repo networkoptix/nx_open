@@ -5,8 +5,10 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#define OUTPUT_PREFIX "proxydecoder[vdpau]: "
 #include "proxy_decoder_utils.h"
+
+#undef NX_PRINT_PREFIX
+#define NX_PRINT_PREFIX "proxydecoder[vdpau]: "
 
 //-------------------------------------------------------------------------------------------------
 
@@ -46,9 +48,9 @@ void checkedVdpCall(VdpStatus status, const char* funcName)
     if (status != VDP_STATUS_OK)
     {
         if (vdp_get_error_string)
-            PRINT << "VDPAU ERROR: " << funcName << " -> '" << vdp_get_error_string(status) << "'";
+            NX_PRINT << "VDPAU ERROR: " << funcName << " -> '" << vdp_get_error_string(status) << "'";
         else
-            PRINT << "VDPAU ERROR: " << funcName << " -> " << status;
+            NX_PRINT << "VDPAU ERROR: " << funcName << " -> " << status;
         assert(false);
     }
 }
@@ -57,7 +59,7 @@ void vdpCheckHandle(uint32_t handle, const char* name)
 {
     if (handle == VDP_INVALID_HANDLE)
     {
-        PRINT << "VDPAU ERROR: Unable to create " << name << ".";
+        NX_PRINT << "VDPAU ERROR: Unable to create " << name << ".";
         assert(false);
     }
 }
@@ -75,7 +77,7 @@ static Drawable createX11Window(Display* display)
     XWindowAttributes rootWindowAttrs;
     if (!XGetWindowAttributes(display, rootWindow, &rootWindowAttrs))
     {
-        PRINT << "ERROR: XGetWindowAttributes() for Root Window failed.";
+        NX_PRINT << "ERROR: XGetWindowAttributes() for Root Window failed.";
         assert(false);
     }
 
@@ -86,13 +88,13 @@ static Drawable createX11Window(Display* display)
 
     if (!XMapWindow(display, window))
     {
-        PRINT << "ERROR: XMapWindow() failed.";
+        NX_PRINT << "ERROR: XMapWindow() failed.";
         assert(false);
     }
 
     if (!XFlush(display))
     {
-        PRINT << "ERROR: XFlush() failed.";
+        NX_PRINT << "ERROR: XFlush() failed.";
         assert(false);
     }
 
@@ -103,16 +105,16 @@ static VdpDevice getVdpDeviceX11(Drawable* outDrawable)
 {
     assert(outDrawable);
 
-    PRINT << "Opening X11 Display...";
+    NX_PRINT << "Opening X11 Display...";
     Display* display = XOpenDisplay(nullptr);
     if (display == nullptr)
     {
-        PRINT << "ERROR: XOpenDisplay(nullptr) returned null.";
+        NX_PRINT << "ERROR: XOpenDisplay(nullptr) returned null.";
         assert(false);
     }
 
     int stderrFile = -1;
-    if (conf.suppressX11LogVdpau)
+    if (ini().suppressX11LogVdpau)
     {
         // Redirect stderr to /dev/null temporarily to prevent libvdpau console spam.
         int devNullFile = open("/dev/null", O_WRONLY);
@@ -120,12 +122,12 @@ static VdpDevice getVdpDeviceX11(Drawable* outDrawable)
         dup2(devNullFile, STDERR_FILENO);
     }
 
-    PRINT << "vdp_device_create_x11() with X11...";
+    NX_PRINT << "vdp_device_create_x11() with X11...";
     VdpDevice vdpDevice = VDP_INVALID_HANDLE;
     VDP(vdp_device_create_x11(
         display,  DefaultScreen(display), &vdpDevice, &vdp_get_proc_address));
 
-    if (conf.suppressX11LogVdpau)
+    if (ini().suppressX11LogVdpau)
     {
         dup2(stderrFile, STDERR_FILENO);
         close(stderrFile);
@@ -134,18 +136,18 @@ static VdpDevice getVdpDeviceX11(Drawable* outDrawable)
     vdpCheckHandle(vdpDevice, "Device");
     assert(vdp_get_proc_address);
 
-    if (conf.createX11Window)
+    if (ini().createX11Window)
         *outDrawable = createX11Window(display);
     else
         *outDrawable = 0;
 
-    PRINT << "vdp_device_create_x11() with X11 OK";
+    NX_PRINT << "vdp_device_create_x11() with X11 OK";
     return vdpDevice;
 }
 
 static VdpDevice getVdpDeviceWithoutX11(Drawable* outDrawable)
 {
-    PRINT << "vdp_device_create_x11() without X11 (Nx extension to VDPAU)...";
+    NX_PRINT << "vdp_device_create_x11() without X11 (Nx extension to VDPAU)...";
     assert(outDrawable);
     *outDrawable = 0;
     VdpDevice vdpDevice = VDP_INVALID_HANDLE;
@@ -155,7 +157,7 @@ static VdpDevice getVdpDeviceWithoutX11(Drawable* outDrawable)
     vdpCheckHandle(vdpDevice, "Device");
     assert(vdp_get_proc_address);
 
-    PRINT << "vdp_device_create_x11() without X11 OK";
+    NX_PRINT << "vdp_device_create_x11() without X11 OK";
     return vdpDevice;
 }
 
@@ -224,7 +226,7 @@ static void getProcAddresses(VdpDevice vdpDevice)
 VdpDevice createVdpDevice(Drawable* outDrawable)
 {
     VdpDevice vdpDevice =
-        conf.enableX11Vdpau ? getVdpDeviceX11(outDrawable) : getVdpDeviceWithoutX11(outDrawable);
+        ini().enableX11Vdpau ? getVdpDeviceX11(outDrawable) : getVdpDeviceWithoutX11(outDrawable);
     getProcAddresses(vdpDevice);
     return vdpDevice;
 }
@@ -256,7 +258,7 @@ static std::string toStrOrHex(const char* valueStr, uint32_t value)
     if (valueStr)
         return valueStr;
     else
-        return stringFormat("0x%08X", value);
+        return format("0x%08X", value);
 }
 
 } // namespace
@@ -274,8 +276,8 @@ uint32_t calcYuvNativeQuickHash(const YuvNative* yuvNative)
 
 void logYuvNative(const YuvNative* y)
 {
-    PRINT << "YuvNative { "
-        << "virt " << stringFormat("%p", y->virt)
+    NX_PRINT << "YuvNative { "
+        << "virt " << format("%p", y->virt)
         << ", size " << y->size << ", width " << y->width << ", height " << y->height
         << ", chroma_type " << toStrOrHex(vdpChromaTypeToStr(y->chroma_type), y->chroma_type)
         << ", source_format " << toStrOrHex(vdpYCbCrFormatToStr(y->source_format), y->source_format)
@@ -318,7 +320,7 @@ static FILE* debugCreateFrameDumpFile(
     FILE* fp = fopen(filename, mode);
     if (fp == nullptr)
     {
-        PRINT << "ERROR: Unable to create dump file: " << filename;
+        NX_PRINT << "ERROR: Unable to create dump file: " << filename;
         assert(false);
     }
     return fp;
@@ -330,7 +332,7 @@ static void debugDumpFrameToFile(
     FILE* fp = debugCreateFrameDumpFile(filesPath, w, h, n, suffix, "wb");
     if (fwrite(buffer, 1, bufferSize, fp) != bufferSize)
     {
-        PRINT << "ERROR: Unable to write to a dump file.";
+        NX_PRINT << "ERROR: Unable to write to a dump file.";
         assert(false);
     }
     fclose(fp);
@@ -381,5 +383,5 @@ void debugDumpYuvSurfaceToFiles(
     debugDumpFrameToFile(filesPath, vBuffer, uVLineSize * h / 2, w, h, n, "_v.dat");
     debugDumpFrameToFile(filesPath, yuvNative.virt, (int) yuvNative.size, w, h, n, "_native.dat");
 
-    PRINT << "Dump: Frame " << n << " dumped to " << filesPath;
+    NX_PRINT << "Dump: Frame " << n << " dumped to " << filesPath;
 }

@@ -35,16 +35,15 @@ set(SOURCE_FILES
     tiled_yuv.h
     vdpau_private.h
     video_mixer.c
-    conf.h
-    conf.cpp
-    flag_config_c.h
-    nx/utils/flag_config.h
-    nx/utils/flag_config.cpp
+    ini.h
+    ini.cpp
+    ../../../buildenv/packages/any/nx_kit/src/nx/kit/ini_config.cpp
 )
 
 # Directory containing all necessary headers from the libraries used.
 include_directories(
     ../../../bpi/src/include
+    ../../../buildenv/packages/any/nx_kit/src
 )
 
 add_executable(libvdpau_sunxi ${SOURCE_FILES})

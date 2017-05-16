@@ -1,7 +1,9 @@
+NX_KIT = ../../../buildenv/packages/any/nx_kit
+
 TARGET = libproxydecoder.so
-SRC = nx/utils/flag_config.cpp nx/utils/debug_utils.cpp \
-    vdpau_utils.cpp vdpau_session.cpp proxy_decoder.cpp proxy_decoder_utils.cpp \
-	proxy_decoder_impl.cpp proxy_decoder_stub.cpp
+SRC = vdpau_utils.cpp vdpau_session.cpp proxy_decoder.cpp proxy_decoder_utils.cpp \
+    proxy_decoder_impl.cpp proxy_decoder_stub.cpp \
+    $(NX_KIT)/src/nx/kit/ini_config.cpp $(NX_KIT)/src/nx/kit/debug.cpp
 CXXFLAGS ?= -Wall -Wno-sign-compare -Wfatal-errors -O3 -std=c++11
 LDFLAGS ?= -fvisibility=hidden
 LIBS = -L/opt/networkoptix/lib -lavcodec -lavfilter -lavformat -lavutil -lavdevice -lswscale \
@@ -19,7 +21,10 @@ OBJ = $(addsuffix .o,$(basename $(SRC)))
 DEP = $(addsuffix .d,$(basename $(SRC)))
 
 MODULEDIR=/opt/networkoptix/lib
-CONF_DEFINES = -DNX_UTILS_API= -DPROXY_DECODER_API='__attribute__ ((visibility ("default")))' -fvisibility=hidden
+NX_FLAGS = \
+    -I$(NX_KIT)/src \
+    -DNX_KIT_API= \
+    -DPROXY_DECODER_API='__attribute__((visibility ("default")))' -fvisibility=hidden \
 
 .PHONY: clean all build install uninstall
 
@@ -41,6 +46,6 @@ uninstall:
 	rm -f $(DESTDIR)$(MODULEDIR)/$(TARGET)
 
 %.o: %.cpp
-	$(CXX) $(DEP_CFLAGS) $(LIB_CFLAGS) $(CXXFLAGS) $(CONF_DEFINES) -c $< -o $@
+	$(CXX) $(DEP_CFLAGS) $(LIB_CFLAGS) $(CXXFLAGS) $(NX_FLAGS) -c $< -o $@
 
 include $(wildcard $(DEP))

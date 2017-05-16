@@ -1,37 +1,43 @@
 #pragma once
 
-#include "nx/utils/flag_config.h"
-struct NX_UTILS_API ProxyDecoderFlagConfig: public nx::utils::FlagConfig
-{
-    using nx::utils::FlagConfig::FlagConfig;
+#include <nx/kit/ini_config.h>
 
-    NX_FLAG(0, disable, "Use stub implementation without any display.");
-    NX_FLAG(0, enableStub, "Use checkerboard/surface-number stub.");
-    NX_FLAG(0, enableStubSurfaceNumbers, "In 'display' mode, draw surface number instead of checkerboard.");
-    NX_FLAG(0, enableFps, "Print FPS stat in each displayDecoded().");
-    NX_FLAG(0, enableFrameHash, "Compare frame hash to the prev one when printing FPS.");
-    NX_FLAG(0, disableCscMatrix, "Avoid setting VDP_VIDEO_MIXER_ATTRIBUTE_CSC_MATRIX.");
-    NX_INT_PARAM(8, videoSurfaceCount, "1..16");
-    NX_INT_PARAM(0, outputSurfaceCount, "0 (alloc/dealloc for each frame), 1..255).");
+struct Ini: public nx::kit::IniConfig
+{
+    Ini(): IniConfig("proxydecoder.ini") {}
+
+    NX_INI_FLAG(0, disable, "Use stub implementation without any display.");
+    NX_INI_FLAG(0, enableStub, "Use checkerboard/surface-number stub.");
+    NX_INI_FLAG(0, enableStubSurfaceNumbers, "In 'display' mode, draw surface number instead of checkerboard.");
+    NX_INI_FLAG(0, enableFpsDisplayDecoded, "Print FPS stat in each displayDecoded().");
+    NX_INI_FLAG(0, enableFrameHash, "Compare frame hash to the prev one when printing FPS.");
+    NX_INI_FLAG(0, disableCscMatrix, "Avoid setting VDP_VIDEO_MIXER_ATTRIBUTE_CSC_MATRIX.");
+    NX_INI_INT(8, videoSurfaceCount, "1..16");
+    NX_INI_INT(0, outputSurfaceCount, "0 (alloc/dealloc for each frame), 1..255).");
 
     // vdpau_utils
-    NX_FLAG(0, outputVdpauCalls, "Log each VDPAU call (errors are logged anyway).");
-    NX_FLAG(0, enableX11Vdpau, "Open X11 Display for VDPAU (otherwise, use null for Display).");
-    NX_FLAG(0, suppressX11LogVdpau, "If enableX11Vdpau, do not suppress X logging to stderr.");
-    NX_FLAG(0, createX11Window, "Note: Nx ext to vdpau_sunxi allows to run with X11 without a window.");
+    NX_INI_FLAG(0, outputVdpauCalls, "Log each VDPAU call (errors are logged anyway).");
+    NX_INI_FLAG(0, enableX11Vdpau, "Open X11 Display for VDPAU; otherwise, use null for Display.");
+    NX_INI_FLAG(0, suppressX11LogVdpau, "If enableX11Vdpau, do not suppress X logging to stderr.");
+    NX_INI_FLAG(0, createX11Window, "Don't use Nx ext to vdpau_sunxi to run without X11 window.");
 
     // proxy_decoder_utils
-    NX_FLAG(0, enableOutput, "");
-    NX_FLAG(0, enableTime, "");
+    NX_INI_FLAG(0, enableOutput, "");
+    NX_INI_FLAG(0, enableTime, "");
 
     // proxy_decoder_impl
-    NX_FLAG(0, disableGetBits, "Avoid calling ...get_bits... (thus no picture).");
-    NX_FLAG(1, enableRgbYOnly, "Convert only Y to Blue, setting Red and Green to 0.");
-    NX_FLAG(1, enableRgbPartOnly, "Convert to RGB only a part of the frame.");
-    NX_FLAG(0, enableYuvDump, "Dump frames in both Native and Planar YUV to files.");
-    NX_FLAG(0, enableLogYuvNative, "Log struct returned from vdpau with native data ref.");
+    NX_INI_FLAG(0, disableGetBits, "Avoid calling ...get_bits... (thus no picture).");
+    NX_INI_FLAG(1, enableRgbYOnly, "Convert only Y to Blue, setting Red and Green to 0.");
+    NX_INI_FLAG(1, enableRgbPartOnly, "Convert to RGB only a part of the frame.");
+    NX_INI_FLAG(0, enableYuvDump, "Dump frames in both Native and Planar YUV to files.");
+    NX_INI_FLAG(0, enableLogYuvNative, "Log struct returned from vdpau with native data ref.");
 };
-extern NX_UTILS_API ProxyDecoderFlagConfig conf;
+
+inline Ini& ini()
+{
+    static Ini ini;
+    return ini;
+}
 
 #include <cassert>
 #include <iostream>
@@ -45,12 +51,9 @@ extern "C" {
 #include <libavcodec/vdpau.h>
 } // extern "C"
 
-// Configuration: should be defined before including this header.
-//#define OUTPUT_PREFIX "<ModuleName>: "
-#include "nx/utils/debug_utils.h"
+#include <nx/kit/debug.h>
 
-#include "nx/utils/string.h"
-using nx::utils::stringFormat;
+using nx::kit::debug::format;
 
 /**
  * Draw a colored checkerboard in RGB.

@@ -4,9 +4,8 @@
 
 ProxyDecoder* ProxyDecoder::create(int frameW, int frameH)
 {
-    conf.reload();
-    conf.skipNextReload(); //< Each of the methods below calls conf.reload().
-    if (conf.disable || conf.enableStub)
+    ini().reload();
+    if (ini().disable || ini().enableStub)
         return createStub(frameW, frameH);
     else
         return createImpl(frameW, frameH);

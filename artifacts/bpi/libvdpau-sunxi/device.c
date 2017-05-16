@@ -29,7 +29,7 @@ VdpStatus vdp_device_create_x11(Display *display,
                                 VdpDevice *device,
                                 VdpGetProcAddress **get_proc_address)
 {
-	conf_reload();
+	ini_reload();
 
 	if (!device || !get_proc_address)
 		return VDP_STATUS_INVALID_POINTER;

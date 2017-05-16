@@ -1,9 +1,11 @@
+NX_KIT = ../../../buildenv/packages/any/nx_kit
+
 TARGET = libvdpau_sunxi.so.1
 SRC = vdpau_private.c device.c presentation_queue.c surface_output.c surface_video.c \
 	surface_bitmap.c video_mixer.c decoder.c handles.c \
 	h264.c mpeg12.c mpeg4.c rgba.c tiled_yuv.S h265.c sunxi_disp.c \
 	sunxi_disp2.c sunxi_disp1_5.c rgba_g2d.c rgba_pixman.c
-SRC_CPP = nx/utils/flag_config.cpp conf.cpp
+SRC_CPP = $(NX_KIT)/src/nx/kit/ini_config.cpp ini.cpp
 CFLAGS ?= -Wall -O3
 LDFLAGS ?=
 #LIBS = -lrt -lm -lX11 -lpthread -lcedrus
@@ -29,7 +31,9 @@ endif
 
 .PHONY: clean all install uninstall build
 
-CONF_DEFINES = -DNX_UTILS_API='__attribute__ ((visibility ("hidden")))'
+NX_KIT_FLAGS = \
+    -DNX_KIT_API='__attribute__((visibility ("hidden")))' \
+    -I$(NX_KIT)/src \
 
 all: install
 build: $(TARGET)
@@ -51,10 +55,10 @@ uninstall:
 	rm -f $(DESTDIR)$(MODULEDIR)/$(TARGET)
 
 %.o: %.cpp
-	$(CXX) $(DEP_CFLAGS) $(CONF_DEFINES) $(CXXFLAGS) -c $< -o $@
-  
+	$(CXX) $(DEP_CFLAGS) $(CXXFLAGS) $(NX_KIT_FLAGS) -c $< -o $@
+
 %.o: %.c
-	$(CC) $(DEP_CFLAGS) $(LIB_CFLAGS) $(CFLAGS) $(CONF_DEFINES) -c $< -o $@
+	$(CC) $(DEP_CFLAGS) $(LIB_CFLAGS) $(CFLAGS) $(NX_KIT_FLAGS) -c $< -o $@
 
 %.o: %.S
 	$(CC) -c $< -o $@

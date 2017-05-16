@@ -2,13 +2,13 @@
 
 static void log_call(const char* func_name)
 {
-    if (conf.enableOutput)
+    if (ini.enableOutput)
         VDPAU_DBG("%s() BEGIN", func_name);
 }
 
 static VdpStatus log_result(VdpStatus result, const char* func_name)
 {
-    if (conf.enableOutput)
+    if (ini.enableOutput)
     {
         if (result == VDP_STATUS_OK)
         {
@@ -25,25 +25,25 @@ static VdpStatus log_result(VdpStatus result, const char* func_name)
 
 static void log_in_uint(uint32_t value, const char* name)
 {
-    if (conf.enableOutput)
+    if (ini.enableOutput)
         VDPAU_DBG("    [in] %s: %u", name, value);
 }
 
 static void log_in_uint64(uint64_t value, const char* name)
 {
-    if (conf.enableOutput)
+    if (ini.enableOutput)
         VDPAU_DBG("    [in] %s: %llu", name, value);
 }
 
 static void log_in_int(int value, const char* name)
 {
-    if (conf.enableOutput)
+    if (ini.enableOutput)
         VDPAU_DBG("    [in] %s: %d", name, value);
 }
 
 static void log_in_Display(const Display* display, const char* name)
 {
-    if (conf.enableOutput)
+    if (ini.enableOutput)
     {
         if (display == NULL)
             VDPAU_DBG("    [in] %s: null", name);
@@ -54,7 +54,7 @@ static void log_in_Display(const Display* display, const char* name)
 
 static void log_in_enum(const char* str, int value, const char* name)
 {
-    if (conf.enableOutput)
+    if (ini.enableOutput)
     {
         if (str == NULL)
             VDPAU_DBG("    [in] %s: unknown %d", name, value);
@@ -65,7 +65,7 @@ static void log_in_enum(const char* str, int value, const char* name)
 
 static void log_in_VdpColor(const VdpColor* color, const char* name)
 {
-    if (conf.enableOutput)
+    if (ini.enableOutput)
     {
         if (color == NULL)
         {
@@ -103,7 +103,7 @@ static void log_in_VdpCSCMatrix(const VdpCSCMatrix* p, const char* name)
 static void log_in_VdpVideoMixerAttribute_value(
     VdpVideoMixerAttribute attribute, const void* value, const char* name)
 {
-    if (conf.enableOutput)
+    if (ini.enableOutput)
     {
         switch (attribute)
         {
@@ -121,7 +121,7 @@ static void log_in_VdpVideoMixerAttribute_value(
 
 static void log_out_uint(const uint32_t* pValue, const char* name)
 {
-    if (conf.enableOutput)
+    if (ini.enableOutput)
     {
         if (pValue != NULL)
             VDPAU_DBG("    [out] *%s: %u", name, *pValue);
@@ -132,7 +132,7 @@ static void log_out_uint(const uint32_t* pValue, const char* name)
 
 static void log_out_ptr(void ** pValue, const char* name)
 {
-    if (conf.enableOutput)
+    if (ini.enableOutput)
     {
         if (pValue == NULL)
             VDPAU_DBG("    [out] %s is null", name);

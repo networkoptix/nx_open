@@ -137,7 +137,7 @@ VdpStatus vdp_video_surface_create(VdpDevice device,
 		return ret;
 	}
 
-	if (conf.enableOutput)
+	if (ini.enableOutput)
 	{
 		VDPAU_DBG("Created video surface #%02d, phys 0x%08X, virt 0x%08X", *surface,
 			vs->yuv->data->phys, (uint32_t) vs->yuv->data->virt);

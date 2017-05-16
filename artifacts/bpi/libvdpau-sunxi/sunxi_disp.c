@@ -98,7 +98,7 @@ static int disp_ioctl(int fd, int cmd, const uint32_t args[],
 {
 	int result = ioctl(fd, cmd, args);
 
-	if (conf.enableIoctlOutput || result < 0)
+	if (ini.enableIoctlOutput || result < 0)
 	{
 		char s[1000];
 		if (result < 0)
@@ -175,7 +175,7 @@ struct sunxi_disp *sunxi_disp_open(int osd_enabled, uint32_t* outWidthHeight)
 	{
 		DISP(DISP_CMD_LAYER_TOP, 0, disp->video_layer, 0, 0);
 
-		if (conf.enableColorKey)
+		if (ini.enableColorKey)
 		{
 			disp->video_info.pipe = 1;
 			disp->video_info.ck_enable = 1;
@@ -319,11 +319,11 @@ static void set_enhancement_and_csc(
     // set doing this unconditionally is costly.
     if (surface->csc_change)
     {
-        if (!conf.disableCscMatrix)
+        if (!ini.disableCscMatrix)
         {
             DISP(DISP_CMD_LAYER_ENHANCE_OFF, 0, disp->video_layer, 0, 0);
             enhancementTurnedOff = true;
-            if (conf.outputEnhancement)
+            if (ini.outputEnhancement)
                 VDPAU_DBG("[disp1] ENHANCEMENT=OFF: needed before settings CSC Matrix");
             DISP(DISP_CMD_LAYER_SET_BRIGHT, 0, disp->video_layer, 0xff * surface->brightness + 0x20, 0);
             DISP(DISP_CMD_LAYER_SET_CONTRAST, 0, disp->video_layer, 0x20 * surface->contrast, 0);
@@ -334,22 +334,22 @@ static void set_enhancement_and_csc(
         surface->csc_change = 0;
     }
 
-    if ((layerJustOpened && conf.enhancementOn) || (!conf.enhancementOff && enhancementTurnedOff))
+    if ((layerJustOpened && ini.enhancementOn) || (!ini.enhancementOff && enhancementTurnedOff))
     {
         DISP(DISP_CMD_LAYER_ENHANCE_ON, 0, disp->video_layer, 0, 0);
-        if (conf.outputEnhancement)
+        if (ini.outputEnhancement)
         {
             VDPAU_DBG("[disp1] ENHANCEMENT=ON: %s",
-                conf.enhancementOn
-                    ? "conf.enhancementOn=true"
+                ini.enhancementOn
+                    ? ".ini enhancementOn=true"
                     : "restoring after setting CSC Matrix");
         }
     }
-    else if (layerJustOpened && conf.enhancementOff && !enhancementTurnedOff)
+    else if (layerJustOpened && ini.enhancementOff && !enhancementTurnedOff)
     {
         DISP(DISP_CMD_LAYER_ENHANCE_OFF, 0, disp->video_layer, 0, 0);
-        if (conf.outputEnhancement)
-            VDPAU_DBG("[disp1] ENHANCEMENT=OFF: conf.enhancementOff=true");
+        if (ini.outputEnhancement)
+            VDPAU_DBG("[disp1] ENHANCEMENT=OFF: .ini enhancementOff=true");
     }
 }
 
@@ -366,19 +366,19 @@ static int sunxi_disp_set_video_layer(struct sunxi_disp *sunxi_disp,
 
     set_video_info_geometry(v, x, y, surface);
 
-	if (conf.surfaceSleepUs > 0)
-		usleep(conf.surfaceSleepUs);
+	if (ini.surfaceSleepUs > 0)
+		usleep(ini.surfaceSleepUs);
 
 	bool layerJustOpened = false;
 	// TODO: Consider rewriting: store and compare prev video_info.
-	if (!conf.enableSetFb || !disp->video_layer_opened || surface->csc_change)
+	if (!ini.enableSetFb || !disp->video_layer_opened || surface->csc_change)
 	{
 		DISP(DISP_CMD_LAYER_SET_PARA, 0, disp->video_layer, &disp->video_info, 0);
 		DISP(DISP_CMD_LAYER_OPEN, 0, disp->video_layer, 0, 0);
 		disp->video_layer_opened = true;
 		layerJustOpened = true;
 
-        if (conf.enableSetFb)
+        if (ini.enableSetFb)
 			VDPAU_DBG("[disp1] Video Layer opened: DISP_CMD_LAYER_SET_PARA, DISP_CMD_LAYER_OPEN");
 	}
 	else

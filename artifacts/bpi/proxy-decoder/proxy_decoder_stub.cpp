@@ -7,8 +7,10 @@
 
 #include "vdpau_session.h"
 
-#define OUTPUT_PREFIX "proxydecoder[STUB]: "
 #include "proxy_decoder_utils.h"
+
+#undef NX_PRINT_PREFIX
+#define NX_PRINT_PREFIX "proxydecoder[STUB]: "
 
 namespace {
 
@@ -39,7 +41,7 @@ VdpauHandler::VdpauHandler(int frameWidth, int frameHeight)
     m_frameHeight(frameHeight),
     m_vdpSession(new VdpauSession(frameWidth, frameHeight))
 {
-    for (int i = 0; i < conf.videoSurfaceCount; ++i)
+    for (int i = 0; i < ini().videoSurfaceCount; ++i)
     {
         VdpVideoSurface surface = VDP_INVALID_HANDLE;
         VDP(vdp_video_surface_create(m_vdpSession->vdpDevice(),
@@ -53,12 +55,12 @@ VdpauHandler::VdpauHandler(int frameWidth, int frameHeight)
         memset(yuvNative.virt, 0, yuvNative.size);
     }
 
-    PRINT << "VDPAU Initialized OK";
+    NX_PRINT << "VDPAU Initialized OK";
 }
 
 VdpauHandler::~VdpauHandler()
 {
-    OUTPUT << "Deinitializing VDPAU...";
+    NX_OUTPUT << "Deinitializing VDPAU...";
 
     for (auto& surface: m_vdpVideoSurfaces)
     {
@@ -73,25 +75,25 @@ VdpauHandler::~VdpauHandler()
 void VdpauHandler::display(const ProxyDecoder::Rect* rect)
 {
     const int videoSurfaceIndex = m_videoSurfaceIndex;
-    m_videoSurfaceIndex = (m_videoSurfaceIndex + 1) % conf.videoSurfaceCount;
+    m_videoSurfaceIndex = (m_videoSurfaceIndex + 1) % ini().videoSurfaceCount;
 
     VdpVideoSurface videoSurface = m_vdpVideoSurfaces[videoSurfaceIndex];
     assert(videoSurface != VDP_INVALID_HANDLE);
 
-    OUTPUT << "VdpauHandler::display() BEGIN";
-    OUTPUT << stringFormat("Using videoSurface %02d of %d {handle #%02d}",
-        videoSurfaceIndex, conf.videoSurfaceCount, videoSurface);
+    NX_OUTPUT << "VdpauHandler::display() BEGIN";
+    NX_OUTPUT << format("Using videoSurface %02d of %d {handle #%02d}",
+        videoSurfaceIndex, ini().videoSurfaceCount, videoSurface);
 
     static YuvNative yuvNative;
     getVideoSurfaceYuvNative(videoSurface, &yuvNative);
     memset(yuvNative.virt, 0, yuvNative.luma_size);
 
-    if (conf.enableStubSurfaceNumbers)
+    if (ini().enableStubSurfaceNumbers)
     {
         // Print videoSurfaceIndex in its individual position.
         debugPrintNative((uint8_t*) yuvNative.virt, m_frameWidth, m_frameHeight,
             /*x*/ 12 * (videoSurfaceIndex % 4), /*y*/ 6 * (videoSurfaceIndex / 4),
-            stringFormat("%02d", videoSurface).c_str());
+            format("%02d", videoSurface).c_str());
     }
     else
     {
@@ -100,7 +102,7 @@ void VdpauHandler::display(const ProxyDecoder::Rect* rect)
 
     m_vdpSession->displayVideoSurface(videoSurface, rect);
 
-    OUTPUT << "VdpauHandler::display() END";
+    NX_OUTPUT << "VdpauHandler::display() END";
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -156,8 +158,8 @@ Stub::Stub(int frameWidth, int frameHeight)
     assert(frameWidth > 0);
     assert(frameHeight > 0);
 
-    OUTPUT << "Stub(frameWidth: " << frameWidth << ", frameHeight: " << frameHeight << ") "
-        << (conf.disable ? "DO NOTHING: conf.disable" : "");
+    NX_OUTPUT << "Stub(frameWidth: " << frameWidth << ", frameHeight: " << frameHeight << ") "
+        << (ini().disable ? "DO NOTHING: ini().disable" : "");
 
     // Native buffer is NV12 (12 bits per pixel), arranged in 32x32 px macroblocks.
     m_nativeYuvBufferSize =
@@ -170,9 +172,9 @@ Stub::Stub(int frameWidth, int frameHeight)
 
 Stub::~Stub()
 {
-    OUTPUT << "~Stub() BEGIN";
+    NX_OUTPUT << "~Stub() BEGIN";
     free(m_nativeYuvBuffer);
-    OUTPUT << "~Stub() END";
+    NX_OUTPUT << "~Stub() END";
 }
 
 int Stub::obtainResult(const ProxyDecoder::CompressedFrame* compressedFrame, int64_t* outPtsUs)
@@ -192,11 +194,11 @@ int Stub::obtainResult(const ProxyDecoder::CompressedFrame* compressedFrame, int
 int Stub::decodeToRgb(const CompressedFrame* compressedFrame, int64_t* outPtsUs,
     uint8_t* argbBuffer, int argbLineSize)
 {
-    OUTPUT << "decodeToRgb(argbLineSize: " << argbLineSize << ")";
+    NX_OUTPUT << "decodeToRgb(argbLineSize: " << argbLineSize << ")";
     assert(argbBuffer);
     assert(argbLineSize > 0);
 
-    if (!conf.disable)
+    if (!ini().disable)
     {
         memset(argbBuffer, 0, argbLineSize * m_frameHeight);
         debugDrawCheckerboardArgb(argbBuffer, argbLineSize, m_frameWidth, m_frameHeight);
@@ -208,14 +210,14 @@ int Stub::decodeToRgb(const CompressedFrame* compressedFrame, int64_t* outPtsUs,
 int Stub::decodeToYuvPlanar(const CompressedFrame* compressedFrame, int64_t* outPtsUs,
     uint8_t* yBuffer, int yLineSize, uint8_t* uBuffer, uint8_t* vBuffer, int uVLineSize)
 {
-    OUTPUT << "decodeToYuvPlanar(yLineSize: " << yLineSize << ", uVLineSize: " << uVLineSize << ")";
+    NX_OUTPUT << "decodeToYuvPlanar(yLineSize: " << yLineSize << ", uVLineSize: " << uVLineSize << ")";
     assert(yBuffer);
     assert(uBuffer);
     assert(vBuffer);
     assert(yLineSize > 0);
     assert(uVLineSize > 0);
 
-    if (!conf.disable)
+    if (!ini().disable)
     {
         memset(yBuffer, 0, yLineSize * m_frameHeight);
         debugDrawCheckerboardY(yBuffer, yLineSize, m_frameWidth, m_frameHeight);
@@ -230,11 +232,11 @@ int Stub::decodeToYuvPlanar(const CompressedFrame* compressedFrame, int64_t* out
 int Stub::decodeToYuvNative(const CompressedFrame* compressedFrame, int64_t* outPtsUs,
     uint8_t** outBuffer, int* outBufferSize)
 {
-    OUTPUT << "decodeToYuvNative()";
+    NX_OUTPUT << "decodeToYuvNative()";
     assert(outBuffer);
     assert(outBufferSize);
 
-    if (!conf.disable)
+    if (!ini().disable)
     {
         memset(m_nativeYuvBuffer, 0,
             32 * 32 * ((m_frameWidth + 31) / 32) * ((m_frameHeight + 31) / 32));
@@ -250,7 +252,7 @@ int Stub::decodeToDisplayQueue(
     const CompressedFrame* compressedFrame, int64_t* outPtsUs,
     void **outFrameHandle)
 {
-    OUTPUT << "decodeToDisplayQueue()";
+    NX_OUTPUT << "decodeToDisplayQueue()";
     assert(outFrameHandle);
     *outFrameHandle = nullptr;
 
@@ -266,9 +268,9 @@ int Stub::decodeToDisplayQueue(
 
 void Stub::displayDecoded(void* frameHandle, const Rect* rect)
 {
-    OUTPUT << "displayDecoded(" << (frameHandle ? "frameHandle" : "nullptr") << ", rect: "
+    NX_OUTPUT << "displayDecoded(" << (frameHandle ? "frameHandle" : "nullptr") << ", rect: "
         << (rect
-            ? stringFormat(
+            ? format(
                 "{x: %d, y: %d, width: %d, height: %d}",
                 rect->x, rect->y, rect->width, rect->height)
             : "nullptr")
@@ -276,32 +278,32 @@ void Stub::displayDecoded(void* frameHandle, const Rect* rect)
 
     if (!frameHandle)
     {
-        OUTPUT << "displayDecoded() END";
+        NX_OUTPUT << "displayDecoded() END";
         return;
     }
     int64_t ptsUs = *((int64_t*) frameHandle);
 
-    if (!conf.disable)
+    if (!ini().disable)
     {
         if (!m_vdpHandler)
             m_vdpHandler.reset(new VdpauHandler(m_frameWidth, m_frameHeight));
     }
 
-    if (conf.enableFps)
+    if (ini().enableFpsDisplayDecoded)
     {
         static int64_t prevPtsUs = 0;
         std::string ptsStr;
         if (prevPtsUs != 0)
-            ptsStr = stringFormat("dPTS %3d;", (int) ((500 + ptsUs - prevPtsUs) / 1000));
+            ptsStr = format("dPTS %3d;", (int) ((500 + ptsUs - prevPtsUs) / 1000));
         prevPtsUs = ptsUs;
 
-        NX_SHOW_FPS("displayDecoded", ptsStr.c_str());
+        NX_FPS(DisplayDecoded, ptsStr.c_str());
     }
 
     if (m_vdpHandler)
         m_vdpHandler->display(rect);
 
-    OUTPUT << "displayDecoded() END";
+    NX_OUTPUT << "displayDecoded() END";
 }
 
 } // namespace
@@ -310,6 +312,6 @@ void Stub::displayDecoded(void* frameHandle, const Rect* rect)
 
 ProxyDecoder* ProxyDecoder::createStub(int frameWidth, int frameHeight)
 {
-    conf.reload();
+    ini().reload();
     return new Stub(frameWidth, frameHeight);
 }

@@ -1,27 +1,29 @@
 #include "vdpau_session.h"
 
-#define OUTPUT_PREFIX "proxydecoder[vdpau]: "
 #include "proxy_decoder_utils.h"
+
+#undef NX_PRINT_PREFIX
+#define NX_PRINT_PREFIX "proxydecoder[vdpau]: "
 
 VdpauSession::VdpauSession(int frameWidth, int frameHeight):
     m_frameWidth(frameWidth),
     m_frameHeight(frameHeight)
 {
-    if (conf.videoSurfaceCount < 1 || conf.videoSurfaceCount > 16)
+    if (ini().videoSurfaceCount < 1 || ini().videoSurfaceCount > 16)
     {
-        PRINT << "WARNING: configuration param videoSurfaceCount is "
-            << conf.videoSurfaceCount << " but should be 1..16; defaults to 1.";
-        conf.videoSurfaceCount = 1;
+        NX_PRINT << "WARNING: configuration param videoSurfaceCount is "
+            << ini().videoSurfaceCount << " but should be 1..16; defaults to 1.";
+        const_cast<int&>(ini().videoSurfaceCount) = 1;
     }
-    if (conf.outputSurfaceCount < 0 || conf.outputSurfaceCount > 255)
+    if (ini().outputSurfaceCount < 0 || ini().outputSurfaceCount > 255)
     {
-        PRINT << "WARNING: configuration param outputSurfaceCount is "
-            << conf.outputSurfaceCount << " but should be 1..100; defaults to 1.";
-        conf.outputSurfaceCount = 1;
+        NX_PRINT << "WARNING: configuration param outputSurfaceCount is "
+            << ini().outputSurfaceCount << " but should be 1..100; defaults to 1.";
+        const_cast<int&>(ini().outputSurfaceCount) = 1;
     }
-    PRINT << "Initializing VDPAU; using "
-        << conf.videoSurfaceCount << " video surfaces, "
-        << conf.outputSurfaceCount << " output surfaces";
+    NX_PRINT << "Initializing VDPAU; using "
+        << ini().videoSurfaceCount << " video surfaces, "
+        << ini().outputSurfaceCount << " output surfaces";
 
     Drawable drawable;
     m_vdpDevice = createVdpDevice(&drawable);
@@ -37,7 +39,7 @@ VdpauSession::VdpauSession(int frameWidth, int frameHeight):
         &m_vdpMixer));
     vdpCheckHandle(m_vdpMixer, "Mixer");
 
-    if (!conf.disableCscMatrix)
+    if (!ini().disableCscMatrix)
     {
         static const VdpVideoMixerAttribute attr = VDP_VIDEO_MIXER_ATTRIBUTE_CSC_MATRIX;
         // Values grabbed from mpv logs.
@@ -59,7 +61,7 @@ VdpauSession::VdpauSession(int frameWidth, int frameHeight):
     VDP(vdp_presentation_queue_create(m_vdpDevice, m_vdpTarget, &m_vdpQueue));
     vdpCheckHandle(m_vdpQueue, "Presentation Queue");
 
-    for (int i = 0; i < conf.outputSurfaceCount; ++i)
+    for (int i = 0; i < ini().outputSurfaceCount; ++i)
     {
         VdpOutputSurface outputSurface = VDP_INVALID_HANDLE;
         VDP(vdp_output_surface_create(m_vdpDevice,
@@ -94,7 +96,7 @@ VdpauSession::~VdpauSession()
     if (m_vdpMixer != VDP_INVALID_HANDLE)
         VDP(vdp_video_mixer_destroy(m_vdpMixer));
 
-    OUTPUT << "VDPAU deinitialized OK";
+    NX_OUTPUT << "VDPAU deinitialized OK";
 }
 
 void VdpauSession::displayVideoSurface(
@@ -143,7 +145,7 @@ VdpRect VdpauSession::obtainDestinationVideoRect(const ProxyDecoder::Rect* rect)
             if (!m_videoRectReported)
             {
                 m_videoRectReported = true;
-                PRINT << "WARNING: Full-screen requested but VDPAU did not provide screen size; "
+                NX_PRINT << "WARNING: Full-screen requested but VDPAU did not provide screen size; "
                     << "using defaults: " << windowWidth << " x " << windowHeight;
             }
         }
@@ -154,7 +156,7 @@ VdpRect VdpauSession::obtainDestinationVideoRect(const ProxyDecoder::Rect* rect)
             if (!m_videoRectReported)
             {
                 m_videoRectReported = true;
-                OUTPUT << "Full-screen requested; screen size: "
+                NX_OUTPUT << "Full-screen requested; screen size: "
                         << windowWidth << " x " << windowHeight;
             }
         }
@@ -198,7 +200,7 @@ VdpRect VdpauSession::obtainDestinationVideoRect(const ProxyDecoder::Rect* rect)
 VdpOutputSurface VdpauSession::obtainOutputSurface()
 {
     VdpOutputSurface outputSurface = VDP_INVALID_HANDLE;
-    if (conf.outputSurfaceCount == 0)
+    if (ini().outputSurfaceCount == 0)
     {
         VDP(vdp_output_surface_create(m_vdpDevice,
             VDP_RGBA_FORMAT_B8G8R8A8, m_frameWidth, m_frameHeight, &outputSurface));
@@ -207,16 +209,16 @@ VdpOutputSurface VdpauSession::obtainOutputSurface()
     else
     {
         const int outputSurfaceIndex = m_outputSurfaceIndex;
-        m_outputSurfaceIndex = (m_outputSurfaceIndex + 1) % conf.outputSurfaceCount;
+        m_outputSurfaceIndex = (m_outputSurfaceIndex + 1) % ini().outputSurfaceCount;
         outputSurface = m_outputSurfaces[outputSurfaceIndex];
-        OUTPUT << stringFormat("Using outputSurface %02d of %d {handle #%02d}",
-                outputSurfaceIndex, conf.outputSurfaceCount, outputSurface);
+        NX_OUTPUT << format("Using outputSurface %02d of %d {handle #%02d}",
+                outputSurfaceIndex, ini().outputSurfaceCount, outputSurface);
     }
     return outputSurface;
 }
 
 void VdpauSession::releaseOutputSurface(VdpOutputSurface outputSurface) const
 {
-    if (conf.outputSurfaceCount == 0)
+    if (ini().outputSurfaceCount == 0)
         VDP(vdp_output_surface_destroy(outputSurface));
 }

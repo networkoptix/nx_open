@@ -4,8 +4,6 @@
 
 #include "proxy_decoder.h"
 
-NX_UTILS_API ProxyDecoderFlagConfig conf("proxydecoder");
-
 void debugDrawCheckerboardArgb(
     uint8_t* argbBuffer, int lineSizeBytes, int frameW, int frameH)
 {
@@ -168,7 +166,7 @@ std::string debugDumpRenderStateRefToStr(const vdpau_render_state* renderState,
     {
         if (renderStates[i] == renderState)
         {
-            return stringFormat("vdpau_render_state %02d of %d {videoSurface handle #%02d}",
+            return format("vdpau_render_state %02d of %d {videoSurface handle #%02d}",
                 i, renderStates.size(), renderState->surface);
         }
     }

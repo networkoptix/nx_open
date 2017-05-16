@@ -13,14 +13,14 @@ extern "C" {
 
 #include "vdpau_session.h"
 
-#define OUTPUT_PREFIX "proxydecoder: "
 #include "proxy_decoder_utils.h"
+
+#undef NX_PRINT_PREFIX
+#define NX_PRINT_PREFIX "proxydecoder: "
 
 namespace {
 
-class Impl
-:
-    public ProxyDecoder
+class Impl: public ProxyDecoder
 {
 public:
     Impl(int frameWidth, int frameHeight);
@@ -109,8 +109,7 @@ Impl::InitOnce::InitOnce()
     av_register_all();
 }
 
-Impl::Impl(int frameWidth, int frameHeight)
-:
+Impl::Impl(int frameWidth, int frameHeight):
     m_frameWidth(frameWidth),
     m_frameHeight(frameHeight)
 {
@@ -142,11 +141,11 @@ void Impl::initializeVdpau()
         VDP_DECODER_PROFILE_H264_HIGH,
         m_frameWidth,
         m_frameHeight,
-        /*max_references*/ conf.videoSurfaceCount, //< Used only for checking to be <= 16.
+        /*max_references*/ ini().videoSurfaceCount, //< Used only for checking to be <= 16.
         &m_vdpDecoder));
     vdpCheckHandle(m_vdpDecoder, "Decoder");
 
-    for (int i = 0; i < conf.videoSurfaceCount; ++i)
+    for (int i = 0; i < ini().videoSurfaceCount; ++i)
     {
         vdpau_render_state* renderState = new vdpau_render_state();
         m_renderStates.push_back(renderState);
@@ -158,12 +157,12 @@ void Impl::initializeVdpau()
         vdpCheckHandle(renderState->surface, "Video Surface");
     }
 
-    PRINT << "VDPAU Initialized OK";
+    NX_PRINT << "VDPAU Initialized OK";
 }
 
 void Impl::deinitializeVdpau()
 {
-    OUTPUT << "Deinitializing VDPAU...";
+    NX_OUTPUT << "Deinitializing VDPAU...";
 
     for (auto& renderState: m_renderStates)
     {
@@ -184,7 +183,7 @@ void Impl::initializeFfmpeg()
     AVCodec* codec = avcodec_find_decoder_by_name("h264_vdpau");
     if (!codec)
     {
-        PRINT << "ERROR: avcodec_find_decoder_by_name(\"h264_vdpau\") failed";
+        NX_PRINT << "ERROR: avcodec_find_decoder_by_name(\"h264_vdpau\") failed";
         assert(false);
         return;
     }
@@ -201,7 +200,7 @@ void Impl::initializeFfmpeg()
     int res = avcodec_open2(m_codecContext, codec, nullptr);
     if (res < 0)
     {
-        PRINT << "ERROR: avcodec_open2() failed with status " << res;
+        NX_PRINT << "ERROR: avcodec_open2() failed with status " << res;
         assert(false);
         return;
     }
@@ -240,12 +239,12 @@ void Impl::doDrawHorizBand(AVCodecContext* pContext, const AVFrame* pFrame,
     vdpau_render_state* renderState = reinterpret_cast<vdpau_render_state*>(pFrame->data[0]);
     if (!renderState)
     {
-        OUTPUT << "pFrame->data[0] is null instead of vdpau_render_state*";
+        NX_OUTPUT << "pFrame->data[0] is null instead of vdpau_render_state*";
         return;
     }
     if (renderState->surface == VDP_INVALID_HANDLE)
     {
-        OUTPUT << "((vdpau_render_state*) pFrame->data[0])->surface is VDP_INVALID_HANDLE";
+        NX_OUTPUT << "((vdpau_render_state*) pFrame->data[0])->surface is VDP_INVALID_HANDLE";
         return;
     }
 
@@ -265,13 +264,13 @@ int Impl::doGetBuffer2(AVCodecContext* pContext, AVFrame* pFrame, int flags)
 
     if (flags & AV_GET_BUFFER_FLAG_REF)
     {
-        OUTPUT << "AV_GET_BUFFER_FLAG_REF is set";
+        NX_OUTPUT << "AV_GET_BUFFER_FLAG_REF is set";
     }
 
     vdpau_render_state* renderState = m_renderStates[m_renderStateIndex];
-    OUTPUT << "getRenderState(): use vdpau_render_state #" << m_renderStateIndex
+    NX_OUTPUT << "getRenderState(): use vdpau_render_state #" << m_renderStateIndex
         << " {flags: " << debugDumpRenderStateFlagsToStr(renderState) <<  "}";
-    m_renderStateIndex = (m_renderStateIndex + 1) % conf.videoSurfaceCount;
+    m_renderStateIndex = (m_renderStateIndex + 1) % ini().videoSurfaceCount;
     assert(renderState);
 
     pFrame->buf[0] = av_buffer_ref(m_stubAvBuffer);
@@ -287,27 +286,27 @@ int Impl::doGetBuffer2(AVCodecContext* pContext, AVFrame* pFrame, int flags)
 
 int Impl::callbackGetBuffer2(AVCodecContext* pContext, AVFrame* pFrame, int flags)
 {
-    OUTPUT << "callbackGetBuffer2() BEGIN";
+    NX_OUTPUT << "callbackGetBuffer2() BEGIN";
     Impl* d = (Impl*) pContext->opaque;
     assert(d);
     int result = d->doGetBuffer2(pContext, pFrame, flags);
-    OUTPUT << "callbackGetBuffer2() END";
+    NX_OUTPUT << "callbackGetBuffer2() END";
     return result;
 }
 
 void Impl::callbackDrawHorizBand(struct AVCodecContext* pContext, const AVFrame* src,
     int offset[4], int y, int type, int height)
 {
-    OUTPUT << "callbackDrawHorizBand() BEGIN";
+    NX_OUTPUT << "callbackDrawHorizBand() BEGIN";
     Impl* d = (Impl*) pContext->opaque;
     assert(d);
     d->doDrawHorizBand(pContext, src, offset, y, type, height);
-    OUTPUT << "callbackDrawHorizBand() END";
+    NX_OUTPUT << "callbackDrawHorizBand() END";
 }
 
 AVPixelFormat Impl::callbackGetFormat(AVCodecContext* pContext, const AVPixelFormat* pFmt)
 {
-    OUTPUT << "callbackGetFormat()";
+    NX_OUTPUT << "callbackGetFormat()";
 
     switch (pContext->codec_id)
     {
@@ -397,10 +396,10 @@ void Impl::convertYuvToRgb(uint8_t* argbBuffer, int argbLineSize)
     //  86 ms Y_ONLY FULL
     //  12 ms Y_ONLY PART
 
-    const int y0 = conf.enableRgbPartOnly ? (m_frameHeight / 3) : 0;
-    const int yEnd = conf.enableRgbPartOnly ? (m_frameHeight * 2 / 3) : m_frameHeight;
-    const int x0 = conf.enableRgbPartOnly ? (m_frameWidth / 3) : 0;
-    const int xEnd = conf.enableRgbPartOnly ? (m_frameWidth * 2 / 3) : m_frameWidth;
+    const int y0 = ini().enableRgbPartOnly ? (m_frameHeight / 3) : 0;
+    const int yEnd = ini().enableRgbPartOnly ? (m_frameHeight * 2 / 3) : m_frameHeight;
+    const int x0 = ini().enableRgbPartOnly ? (m_frameWidth / 3) : 0;
+    const int xEnd = ini().enableRgbPartOnly ? (m_frameWidth * 2 / 3) : m_frameWidth;
 
     uint8_t* pYSrc = m_yBufferStart + m_yLineSize * y0;
     uint8_t* pDestLine = argbBuffer + argbLineSize * y0;
@@ -410,7 +409,7 @@ void Impl::convertYuvToRgb(uint8_t* argbBuffer, int argbLineSize)
 
     for (int y = y0; y < yEnd; ++y)
     {
-        if (conf.enableRgbYOnly)
+        if (ini().enableRgbYOnly)
         {
             for (int x = x0; x < xEnd; ++x)
                 ((uint32_t*) pDestLine)[x] = pYSrc[x]; //< Convert byte to 32-bit.
@@ -442,12 +441,12 @@ int Impl::decodeFrame(const CompressedFrame* compressedFrame, int64_t* outPtsUs,
 
     AVFrame* avFrame = av_frame_alloc();
 
-    OUTPUT << "avcodec_decode_video2() BEGIN";
+    NX_OUTPUT << "avcodec_decode_video2() BEGIN";
     NX_TIME_BEGIN(avcodec_decode_video2);
     int gotPicture = 0;
     int res = avcodec_decode_video2(m_codecContext, avFrame, &gotPicture, &avpkt);
     NX_TIME_END(avcodec_decode_video2);
-    OUTPUT << "avcodec_decode_video2() END -> " << res << "; gotPicture: " << gotPicture << "";
+    NX_OUTPUT << "avcodec_decode_video2() END -> " << res << "; gotPicture: " << gotPicture << "";
 
     // Ffmpeg doc guarantees that avcodec_decode_video2() returns 0 if gotPicture is false.
     int result = 0;
@@ -478,7 +477,7 @@ int Impl::decodeFrame(const CompressedFrame* compressedFrame, int64_t* outPtsUs,
 int Impl::decodeToRgb(const CompressedFrame* compressedFrame, int64_t* outPtsUs,
     uint8_t* argbBuffer, int argbLineSize)
 {
-    OUTPUT << "decodeToRgb(argbLineSize: " << argbLineSize << ") BEGIN";
+    NX_OUTPUT << "decodeToRgb(argbLineSize: " << argbLineSize << ") BEGIN";
 
     if (!m_yuvBuffersAllocated)
     {
@@ -504,14 +503,14 @@ int Impl::decodeToRgb(const CompressedFrame* compressedFrame, int64_t* outPtsUs,
         convertYuvToRgb(argbBuffer, argbLineSize);
         NX_TIME_END(convertYuvToRgb);
     }
-    OUTPUT << "decodeToRgb() END -> " << result;
+    NX_OUTPUT << "decodeToRgb() END -> " << result;
     return result;
 }
 
 int Impl::decodeToYuvPlanar(const CompressedFrame* compressedFrame, int64_t* outPtsUs,
     uint8_t* yBuffer, int yLineSize, uint8_t* uBuffer, uint8_t* vBuffer, int uVLineSize)
 {
-    OUTPUT << "decodeToYuvPlanar(yLineSize: " << yLineSize
+    NX_OUTPUT << "decodeToYuvPlanar(yLineSize: " << yLineSize
         << ", uVLineSize: " << uVLineSize << ") BEGIN";
 
     assert(yBuffer);
@@ -524,7 +523,7 @@ int Impl::decodeToYuvPlanar(const CompressedFrame* compressedFrame, int64_t* out
     int result = decodeFrame(compressedFrame, outPtsUs, &renderState);
     if (result > 0)
     {
-        if (!conf.disableGetBits)
+        if (!ini().disableGetBits)
         {
             void* const dest[3] = {yBuffer, vBuffer, uBuffer};
             const uint32_t pitches[3] = {
@@ -536,16 +535,16 @@ int Impl::decodeToYuvPlanar(const CompressedFrame* compressedFrame, int64_t* out
                 VDP_YCBCR_FORMAT_YV12, dest, pitches));
             NX_TIME_END(vdp_video_surface_get_bits_y_cb_cr);
 
-            if (conf.enableYuvDump)
+            if (ini().enableYuvDump)
             {
-                debugDumpYuvSurfaceToFiles(conf.tempPath(), renderState->surface,
+                debugDumpYuvSurfaceToFiles(ini().iniFileDir(), renderState->surface,
                     yBuffer, yLineSize, uBuffer, vBuffer, uVLineSize);
             }
         }
 
         //renderState->state &= ~FF_VDPAU_STATE_USED_FOR_REFERENCE; //< Old approach.
     }
-    OUTPUT << "decodeToYuvPlanar() END -> " << result;
+    NX_OUTPUT << "decodeToYuvPlanar() END -> " << result;
     return result;
 }
 
@@ -553,7 +552,7 @@ int Impl::decodeToYuvNative(
     const CompressedFrame* compressedFrame, int64_t* outPtsUs,
     uint8_t** outBuffer, int* outBufferSize)
 {
-    OUTPUT << "decodeToYuvNative() BEGIN";
+    NX_OUTPUT << "decodeToYuvNative() BEGIN";
 
     assert(outBuffer);
     assert(outBufferSize);
@@ -567,7 +566,7 @@ int Impl::decodeToYuvNative(
         YuvNative yuvNative;
         assert(renderState->surface != VDP_INVALID_HANDLE);
         getVideoSurfaceYuvNative(renderState->surface, &yuvNative);
-        if (conf.enableLogYuvNative)
+        if (ini().enableLogYuvNative)
             logYuvNative(&yuvNative);
 
         *outBuffer = (uint8_t*) yuvNative.virt;
@@ -575,14 +574,14 @@ int Impl::decodeToYuvNative(
 
         //renderState->state &= ~FF_VDPAU_STATE_USED_FOR_REFERENCE; //< Old approach.
     }
-    OUTPUT << "decodeToYuvNative() END -> " << result;
+    NX_OUTPUT << "decodeToYuvNative() END -> " << result;
     return result;
 }
 
 int Impl::decodeToDisplayQueue(const CompressedFrame* compressedFrame, int64_t* outPtsUs,
     void** outFrameHandle)
 {
-    OUTPUT << "decodeForDisplaying() BEGIN";
+    NX_OUTPUT << "decodeForDisplaying() BEGIN";
     assert(outFrameHandle);
     *outFrameHandle = nullptr;
 
@@ -591,15 +590,15 @@ int Impl::decodeToDisplayQueue(const CompressedFrame* compressedFrame, int64_t* 
     if (result > 0)
         *outFrameHandle = reinterpret_cast<void*>(renderState);
 
-    OUTPUT << "decodeForDisplaying() END -> " << result;
+    NX_OUTPUT << "decodeForDisplaying() END -> " << result;
     return result;
 }
 
 void Impl::displayDecoded(void* frameHandle, const ProxyDecoder::Rect* rect)
 {
-    OUTPUT << "displayDecoded(" << (frameHandle ? "frameHandle" : "nullptr") << ", rect: "
+    NX_OUTPUT << "displayDecoded(" << (frameHandle ? "frameHandle" : "nullptr") << ", rect: "
         << (rect
-            ? stringFormat(
+            ? format(
                 "{x: %d, y: %d, width: %d, height: %d}",
                 rect->x, rect->y, rect->width, rect->height)
             : "nullptr")
@@ -607,30 +606,30 @@ void Impl::displayDecoded(void* frameHandle, const ProxyDecoder::Rect* rect)
 
     if (!frameHandle)
     {
-        OUTPUT << "displayDecoded() END";
+        NX_OUTPUT << "displayDecoded() END";
         return;
     }
     vdpau_render_state* renderState = reinterpret_cast<vdpau_render_state*>(frameHandle);
     assert(renderState->surface != VDP_INVALID_HANDLE);
 
-    if (conf.enableFps)
+    if (ini().enableFpsDisplayDecoded)
     {
-        NX_SHOW_FPS("displayDecoded",
-            (stringFormat("{%2d} ", renderState->surface)
+        NX_FPS(DisplayDecoded,
+            (format("{%2d} ", renderState->surface)
             + getFrameEqualsPrevStr(renderState)).c_str());
     }
 
-    OUTPUT << "Using " << debugDumpRenderStateRefToStr(renderState, m_renderStates);
+    NX_OUTPUT << "Using " << debugDumpRenderStateRefToStr(renderState, m_renderStates);
 
     m_vdpSession->displayVideoSurface(renderState->surface, rect);
 
-    OUTPUT << "displayDecoded() END: " << debugDumpRenderStateRefToStr(renderState, m_renderStates);
+    NX_OUTPUT << "displayDecoded() END: " << debugDumpRenderStateRefToStr(renderState, m_renderStates);
 }
 
 std::string Impl::getFrameEqualsPrevStr(const vdpau_render_state* renderState) const
 {
     std::string result;
-    if (conf.enableFrameHash)
+    if (ini().enableFrameHash)
     {
         static uint32_t prevHash = 0;
         static YuvNative yuvNative;
@@ -639,7 +638,7 @@ std::string Impl::getFrameEqualsPrevStr(const vdpau_render_state* renderState) c
         if (curHash == prevHash)
             result = "======== ";
         else
-            result = stringFormat("%08X ", curHash);
+            result = format("%08X ", curHash);
         prevHash = curHash;
     }
     return result;
@@ -651,6 +650,6 @@ std::string Impl::getFrameEqualsPrevStr(const vdpau_render_state* renderState) c
 
 ProxyDecoder* ProxyDecoder::createImpl(int frameWidth, int frameHeight)
 {
-    conf.reload();
+    ini().reload();
     return new Impl(frameWidth, frameHeight);
 }

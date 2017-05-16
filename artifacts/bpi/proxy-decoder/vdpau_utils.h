@@ -44,7 +44,7 @@ void checkedVdpCall(VdpStatus status, const char* funcName);
  */
 #define VDP(CALL) do \
 { \
-    if (conf.outputVdpauCalls) \
+    if (ini().outputVdpauCalls) \
         fprintf(stderr, "VDPAU CALL: %s\n", #CALL); \
     checkedVdpCall(CALL, #CALL); \
 } while(0)
