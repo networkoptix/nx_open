@@ -8,7 +8,7 @@
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 #include <rest/server/rest_connection_processor.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include <network/client_authenticate_helper.h>
 #include "current_user_rest_handler.h"
 #include <api/model/cookie_login_data.h>

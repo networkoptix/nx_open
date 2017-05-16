@@ -9,7 +9,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include "core/resource/network_resource.h"
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "media_server/server_message_processor.h"
 #include "network/router.h"
 #include "network/tcp_listener.h"
@@ -29,7 +29,7 @@
 #include "core/resource/network_resource.h"
 #include "transaction/transaction_message_bus.h"
 
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "api/global_settings.h"
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/aio/unified_pollset.h>

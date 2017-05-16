@@ -7,7 +7,7 @@
 #include <nx_ec/ec_proto_version.h>
 
 #include <cdb/ec2_request_paths.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx/utils/scope_guard.h>
 
 #include "access_control/authorization_manager.h"

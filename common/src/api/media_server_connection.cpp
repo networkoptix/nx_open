@@ -40,7 +40,7 @@
 #include "model/camera_list_reply.h"
 #include "model/configure_reply.h"
 #include "model/upload_update_reply.h"
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "model/recording_stats_reply.h"
 #include <api/model/getnonce_reply.h>
 #include "common/common_module.h"

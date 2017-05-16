@@ -18,7 +18,7 @@
 #include "common/common_module.h"
 #include "app_server_connection.h"
 #include <api/network_proxy_factory.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include "http_client_pool.h"
 #include <nx_ec/ec_api.h>
 

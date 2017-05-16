@@ -9,7 +9,7 @@
 #include <rest/server/rest_connection_processor.h>
 #include <network/tcp_connection_priv.h>
 
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "transaction/transaction_message_bus.h"
 #include "transaction/transaction_transport.h"
 #include "settings.h"

@@ -3,7 +3,6 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QDateTime>
 
-#include <http/custom_headers.h>
 #include <nx/network/buffered_stream_socket.h>
 #include <nx/network/socket_factory.h>
 #include <nx/network/socket_global.h>
@@ -15,6 +14,7 @@
 
 #include "auth_tools.h"
 #include "buffer_source.h"
+#include "custom_headers.h"
 
 static const int DEFAULT_SEND_TIMEOUT = 3000;
 static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
