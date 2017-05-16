@@ -18,7 +18,7 @@ namespace cloud {
 struct TunnelConnectorContext
 {
     std::unique_ptr<AbstractTunnelConnector> connector;
-    std::chrono::milliseconds startDelay;
+    std::chrono::milliseconds startDelay = std::chrono::milliseconds::zero();
 };
 
 using CloudConnectors = std::list<TunnelConnectorContext>;
