@@ -50,6 +50,8 @@ void QnServerAddressWatcher::setAccessors(const Getter& getter, const Setter& se
         setter(m_urls);
     }
 
+    // TODO: Adding url without expected server id leads to a one time check.
+    // Might make some problems if there is no internet connection at the momment.
     for (const auto& url: m_urls)
         moduleManager->checkEndpoint(url);
 
@@ -70,7 +72,7 @@ void QnServerAddressWatcher::setAccessors(const Getter& getter, const Setter& se
             m_urls.prepend(url);
             shrinkUrlsList();
 
-            moduleManager->checkEndpoint(url);
+            moduleManager->checkEndpoint(url, commonModule()->remoteGUID());
             setter(m_urls);
         }
     );

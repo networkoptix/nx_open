@@ -37,6 +37,7 @@ public:
     void push(Result result);
     bool isEmpty();
     std::size_t size() const;
+    void clear();
 
     std::function<void(Result)> pusher();
 
@@ -165,6 +166,14 @@ std::size_t SyncQueue<Result>::size() const
 {
     QnMutexLocker lock( &m_mutex );
     return m_queue.size();
+}
+
+template< typename Result>
+void SyncQueue<Result>::clear()
+{
+    QnMutexLocker lock( &m_mutex );
+    decltype( m_queue ) queue;
+    std::swap( m_queue, queue );
 }
 
 template<typename Result>

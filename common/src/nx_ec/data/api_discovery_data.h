@@ -20,8 +20,9 @@ namespace ec2 {
     struct ApiDiscoverPeerData : ApiData
     {
         QString url;
+        QnUuid id;
     };
-#define ApiDiscoverPeerData_Fields (url)
+#define ApiDiscoverPeerData_Fields (url)(id)
 
     struct ApiDiscoveredServerData : QnModuleInformationWithAddresses
     {

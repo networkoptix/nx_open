@@ -76,6 +76,8 @@ TEST_F(DiscoveryUdpMulticastFinder, Base)
 
     const auto information2 = makeModuleInformation();
     moduleFinder.multicastInformation(information2);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    discoveryQueue.clear();
     waitForDiscovery(information2); //< Replaced data.
 }
 

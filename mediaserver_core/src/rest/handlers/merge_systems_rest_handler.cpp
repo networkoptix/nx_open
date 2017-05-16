@@ -350,7 +350,8 @@ int QnMergeSystemsRestHandler::execute(
     }
 
     const SocketAddress endpoint(SocketAddress(url.host(), remoteModuleInformation.port));
-    owner->commonModule()->moduleDiscoveryManager()->checkEndpoint(endpoint);
+    //owner->commonModule()->moduleDiscoveryManager()->checkEndpoint(
+    //    remoteModuleInformation.id, endpoint);
 
     /* Connect to server if it is compatible */
     if (connectionResult == Qn::SuccessConnectionResult && QnServerConnector::instance())

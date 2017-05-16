@@ -17,7 +17,12 @@ public:
     DiscoveryModuleConnector()
     {
         connector.setReconnectInterval(std::chrono::seconds(1));
-        connector.setConnectHandler(connectedQueue.pusher());
+        connector.setConnectHandler(
+            [this](QnModuleInformation information, SocketAddress endpoint, HostAddress /*ip*/)
+            {
+                connectedQueue.push(std::move(information), std::move(endpoint));
+            });
+
         connector.setDisconnectHandler(disconnectedQueue.pusher());
         connector.activate();
     }

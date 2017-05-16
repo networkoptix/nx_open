@@ -2,6 +2,7 @@
 
 #include <nx/utils/log/log.h>
 #include <rest/server/json_rest_result.h>
+#include <nx/network/socket_global.h>
 
 namespace nx {
 namespace vms {
@@ -280,9 +281,6 @@ bool ModuleConnector::Module::saveConnection(
         client->pleaseStopSync();
     m_httpClients.clear();
 
-    NX_VERBOSE(this, lm("Connected to %1").strs(m_id));
-    m_parent->m_connectedHandler(information, std::move(endpoint));
-
     // TODO: Currently mediaserver keepAlive timeout is set to 5 seconds, it means we will go
     // for reconnect attempt every timeout. It looks like we do not have any options for
     // old servers.
@@ -290,8 +288,8 @@ bool ModuleConnector::Module::saveConnection(
     auto socket = client->takeSocket();
     if (!socket->setRecvTimeout(0) || !socket->setKeepAlive(kKeepAliveOptions))
     {
-        NX_WARNING(this, lm("Unable to save connection: %1").strs(
-            SystemError::getLastOSErrorText()));
+        NX_WARNING(this, lm("Unable to save connection to %1: %2").strs(
+            m_id, SystemError::getLastOSErrorText()));
 
         return false;
     }
@@ -310,6 +308,9 @@ bool ModuleConnector::Module::saveConnection(
             connect(m_endpoints.begin()); //< Reconnect attempt.
         });
 
+    auto ip = m_socket->getForeignAddress().address;
+    NX_VERBOSE(this, lm("Connected to %1 by %2 ip %3").strs(m_id, endpoint, ip));
+    m_parent->m_connectedHandler(information, std::move(endpoint), std::move(ip));
     return true;
 }
 

@@ -34,8 +34,15 @@ public:
     boost::optional<SocketAddress> getEndpoint(const QnUuid& id) const; //< Reachable endpoint.
     boost::optional<ModuleData> getModule(const QnUuid& id) const;
 
-    void checkEndpoint(const SocketAddress& endpoint); //< Try for find module on address.
-    void checkEndpoint(const QUrl& url);
+    /**
+     * Try for find module on specified endpoint.
+     * @param endpoint Socket address to search for module information on.
+     * @param expectedId If specified address will be added to modules's address list, might not
+     *     be used if module is already found on a different address.
+     * @note If expectedId is not scpecified the endpoint will be pinged just once.
+     */
+    void checkEndpoint(SocketAddress endpoint, QnUuid expectedId = QnUuid());
+    void checkEndpoint(const QUrl& url, QnUuid expectedId = QnUuid());
 
     template<typename Ptr, typename Found, typename Changed, typename Lost>
     void onSignals(Ptr ptr, Found foundSlot, Changed changedSlot, Lost lostSlot)

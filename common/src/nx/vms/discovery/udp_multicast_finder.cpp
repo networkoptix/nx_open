@@ -185,7 +185,7 @@ void UdpMulticastFinder::sendModuleInformation(Senders::iterator senderIterator)
                 NX_LOGX(lm("Successfully sent from %1 to %2").strs(
                     socket->getLocalAddress(), m_multicastEndpoint), cl_logDEBUG1);
 
-                socket->registerTimer(kSendInterval,
+                socket->registerTimer(m_sendInterval,
                     [this, senderIterator]{ sendModuleInformation(senderIterator); });
             }
             else

@@ -3,6 +3,7 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 
 namespace nx {
@@ -88,18 +89,18 @@ boost::optional<Manager::ModuleData> Manager::getModule(const QnUuid& id) const
     return it->second;
 }
 
-void Manager::checkEndpoint(const SocketAddress& endpoint)
+void Manager::checkEndpoint(SocketAddress endpoint, QnUuid expectedId)
 {
     m_moduleConnector->dispatch(
-        [this, endpoint]() mutable
+        [this, endpoint = std::move(endpoint), expectedId = std::move(expectedId)]() mutable
         {
-            m_moduleConnector->newEndpoints({endpoint});
+            m_moduleConnector->newEndpoints({std::move(endpoint)}, std::move(expectedId));
         });
 }
 
-void Manager::checkEndpoint(const QUrl& url)
+void Manager::checkEndpoint(const QUrl& url, QnUuid expectedId)
 {
-    checkEndpoint(SocketAddress(url.host(), (uint16_t) url.port()));
+    checkEndpoint(SocketAddress(url.host(), (uint16_t) url.port()), std::move(expectedId));
 }
 
 static bool isChanged(const Manager::ModuleData& lhs, const Manager::ModuleData& rhs)
@@ -127,12 +128,14 @@ void Manager::initializeConnector()
 {
     m_moduleConnector = std::make_unique<ModuleConnector>();
     m_moduleConnector->setConnectHandler(
-        [this](QnModuleInformation information, SocketAddress endpoint)
+        [this](QnModuleInformation information, SocketAddress endpoint, HostAddress ip)
         {
             ModuleData module(std::move(information), std::move(endpoint));
             if (commonModule()->moduleGUID() == module.id)
                 return conflict(module);
 
+            const QString newCloudHost = information.cloudId();
+            QString oldCloudHost;
             bool isNew = false;
             {
                 QnMutexLocker lock(&m_mutex);
@@ -146,6 +149,7 @@ void Manager::initializeConnector()
                     if (!isChanged(insert.first->second, module))
                         return;
 
+                    oldCloudHost = insert.first->second.cloudId();
                     insert.first->second = module;
                 }
             }
@@ -164,6 +168,13 @@ void Manager::initializeConnector()
 
                 emit changed(module);
             }
+
+            auto& resolver = network::SocketGlobals::addressResolver();
+            if (!oldCloudHost.isEmpty())
+                resolver.removeFixedAddress(oldCloudHost);
+
+            if (!newCloudHost.isEmpty() && ip.isIpAddress())
+                resolver.addFixedAddress(newCloudHost, SocketAddress(ip.toString(), endpoint.port));
         });
 
     m_moduleConnector->setDisconnectHandler(
@@ -173,11 +184,15 @@ void Manager::initializeConnector()
             const auto it = m_modules.find(id);
             if (it != m_modules.end())
             {
+                const auto cloudHost = it->second.cloudId();
                 m_modules.erase(it);
                 lock.unlock();
 
                 NX_LOGX(lm("Lost module %1").strs(id), cl_logDEBUG1);
                 emit lost(id);
+
+                if (!cloudHost.isEmpty())
+                    network::SocketGlobals::addressResolver().removeFixedAddress(cloudHost);
             }
         });
 }

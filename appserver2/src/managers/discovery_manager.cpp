@@ -50,7 +50,7 @@ void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<Api
 
     // TODO: maybe it's better to move it out and use signal?..
     if (const auto manager = commonModule()->moduleDiscoveryManager())
-        manager->checkEndpoint(QUrl(transaction.params.url));
+        manager->checkEndpoint(QUrl(transaction.params.url), transaction.params.id);
 
 //    emit peerDiscoveryRequested(QUrl(transaction.params.url));
 }
@@ -100,10 +100,11 @@ template<class QueryProcessorType>
 QnDiscoveryManager<QueryProcessorType>::~QnDiscoveryManager() {}
 
 template<class QueryProcessorType>
-int QnDiscoveryManager<QueryProcessorType>::discoverPeer(const QUrl &url, impl::SimpleHandlerPtr handler)
+int QnDiscoveryManager<QueryProcessorType>::discoverPeer(const QnUuid &id, const QUrl &url, impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();
     ApiDiscoverPeerData params;
+    params.id = id;
     params.url = url.toString();
 
     using namespace std::placeholders;
