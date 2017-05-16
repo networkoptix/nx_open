@@ -56,7 +56,7 @@ namespace ec2 {
 
 class Ec2DirectConnection;
 class Settings;
-class QnTransactionMessageBus;
+class QnTransactionMessageBusBase;
 
 /**
  * Sequence has less priority than TimeSynchronizationManager::peerIsServer and
@@ -126,7 +126,7 @@ public:
     TimeSynchronizationManager(
         Qn::PeerType peerType,
         nx::utils::TimerManager* const timerManager,
-        QnTransactionMessageBus* messageBus,
+        QnTransactionMessageBusBase* messageBus,
         Settings* settings);
     virtual ~TimeSynchronizationManager();
 
@@ -252,7 +252,7 @@ private:
     boost::optional<qint64> m_prevMonotonicClock;
     bool m_terminated;
     std::shared_ptr<Ec2DirectConnection> m_connection;
-    QnTransactionMessageBus* m_messageBus;
+    QnTransactionMessageBusBase* m_messageBus;
     /** TimeSyncInfo::syncTime stores local time on specified server. */
     std::map<QnUuid, TimeSyncInfo> m_systemTimeByPeer;
     const Qn::PeerType m_peerType;

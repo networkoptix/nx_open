@@ -158,7 +158,8 @@ void P2pMessageBus::dropConnections()
     QnMutexLocker lock(&m_mutex);
     m_connections.clear();
     m_outgoingConnections.clear();
-    m_peers->clear();
+    if (m_peers)
+        m_peers->clear();
 }
 
 

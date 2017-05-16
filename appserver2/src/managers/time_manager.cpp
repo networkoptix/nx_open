@@ -20,7 +20,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <http/custom_headers.h>
-#include <transaction/transaction_message_bus.h>
+#include <transaction/message_bus_selector.h>
 
 #include <nx_ec/data/api_runtime_data.h>
 #include <nx_ec/data/api_misc_data.h>
@@ -295,7 +295,7 @@ static_assert( INTERNET_SYNC_TIME_PERIOD_SEC <= MAX_INTERNET_SYNC_TIME_PERIOD_SE
 TimeSynchronizationManager::TimeSynchronizationManager(
     Qn::PeerType peerType,
     nx::utils::TimerManager* const timerManager,
-    QnTransactionMessageBus* messageBus,
+    QnTransactionMessageBusBase* messageBus,
     Settings* settings)
 :
     m_localSystemTimeDelta( std::numeric_limits<qint64>::min() ),
@@ -389,9 +389,13 @@ void TimeSynchronizationManager::start(const std::shared_ptr<Ec2DirectConnection
     if (m_connection)
         onDbManagerInitialized();
 
-    connect(m_messageBus, &QnTransactionMessageBus::newDirectConnectionEstablished,
-                this, &TimeSynchronizationManager::onNewConnectionEstablished,
-                Qt::DirectConnection );
+    if (const auto& bus = dynamic_cast<QnTransactionMessageBus*>(m_messageBus))
+    {
+        // todo: p2p. add p2p implementation here
+        connect(bus, &QnTransactionMessageBus::newDirectConnectionEstablished,
+            this, &TimeSynchronizationManager::onNewConnectionEstablished,
+            Qt::DirectConnection);
+    }
     connect(m_messageBus, &QnTransactionMessageBus::peerLost,
                 this, &TimeSynchronizationManager::onPeerLost,
                 Qt::DirectConnection );
@@ -1013,7 +1017,7 @@ void TimeSynchronizationManager::broadcastLocalSystemTime( quint64 taskID )
         tran.params.peerSysTime = QDateTime::currentMSecsSinceEpoch();  //currentMSecsSinceEpoch();
     }
     peerSystemTimeReceived( tran ); //remembering own system time
-    m_messageBus->sendTransaction( tran );
+    sendTransaction(m_messageBus, tran );
 }
 
 void TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired( quint64 /*taskID*/ )

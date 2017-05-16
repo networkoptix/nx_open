@@ -78,14 +78,14 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
             m_jsonTranSerializer.get(),
             m_ubjsonTranSerializer.get());
         m_bus.reset(messageBus);
-        m_timeSynchronizationManager.reset(new TimeSynchronizationManager(
-            peerType,
-            timerManager,
-            messageBus,
-            &m_settingsInstance));
-
         m_distributedMutexManager.reset(new QnDistributedMutexManager(messageBus));
     }
+
+    m_timeSynchronizationManager.reset(new TimeSynchronizationManager(
+        peerType,
+        timerManager,
+        m_bus.get(),
+        &m_settingsInstance));
 
     if (peerType == Qn::PT_Server)
         m_serverQueryProcessor.reset(new ServerQueryProcessorAccess(m_dbManager.get(), m_bus.get()));

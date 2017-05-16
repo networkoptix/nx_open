@@ -1,10 +1,8 @@
 #include "transaction_message_bus_base.h"
-#include "transaction_message_bus.h"
 #include <common/common_module.h>
 #include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 #include <ec_connection_notification_manager.h>
 #include <database/db_manager.h>
-#include <transaction/p2p_message_bus.h>
 
 namespace ec2 {
 

@@ -266,6 +266,7 @@
 #ifdef __arm__
 #include "nx1/info.h"
 #endif
+#include <config.h>
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -2266,7 +2267,6 @@ void MediaServerProcess::serviceModeInit()
 
 void MediaServerProcess::run()
 {
-
     std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(
         m_cmdLineArguments.enforcedMediatorEndpoint,
         m_cmdLineArguments.configFilePath,
