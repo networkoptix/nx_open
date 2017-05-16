@@ -466,9 +466,9 @@ QString bytesToString(uint64_t bytes, int precision)
     }
 
     if (suffix == 0)
-        return lm("%1").arg(number, 0, 'g', precision);
+        return log::Message("%1").arg(number, 0, 'g', precision);
 
-    return lm("%1%2").arg(number, 0, 'g', precision).arg(
+    return log::Message("%1%2").arg(number, 0, 'g', precision).arg(
         QChar::fromLatin1(kByteSuffexes[suffix - 1]));
 }
 

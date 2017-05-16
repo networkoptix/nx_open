@@ -1664,6 +1664,15 @@ ConditionWrapper isLayoutTourReviewMode()
         });
 }
 
+ConditionWrapper tourIsRunning()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
+        {
+            return context->action(action::ToggleLayoutTourModeAction)->isChecked();
+        });
+}
+
 } // namespace condition
 
 

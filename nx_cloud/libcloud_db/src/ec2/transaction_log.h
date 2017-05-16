@@ -107,7 +107,7 @@ public:
                 QnLog::EC2_TRAN_LOG,
                 lm("systemId %1. Transaction %2 (%3, hash %4) is skipped")
                     .arg(systemId).arg(::ec2::ApiCommand::toString(transaction.get().command))
-                    .str(transaction.get())
+                    .arg(transaction.get())
                     .arg(calculateTransactionHash(transaction.get())),
                 cl_logDEBUG1);
             // Returning nx::db::DBResult::cancelled if transaction should be skipped.
@@ -157,7 +157,7 @@ public:
             QnLog::EC2_TRAN_LOG,
             lm("systemId %1. Generated new transaction %2 (%3, hash %4)")
                 .arg(systemId).arg(::ec2::ApiCommand::toString(transaction.command))
-                .str(transaction).arg(transactionHash),
+                .arg(transaction).arg(transactionHash),
             cl_logDEBUG1);
 
         // Serializing transaction.

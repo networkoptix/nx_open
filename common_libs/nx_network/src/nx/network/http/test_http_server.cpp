@@ -71,7 +71,7 @@ bool TestHttpServer::bindAndListen()
     if (!m_httpServer->listen())
         return false;
 
-    NX_LOGX(lm("Started on %1").str(m_httpServer->address()), cl_logINFO);
+    NX_LOGX(lm("Started on %1").arg(m_httpServer->address()), cl_logINFO);
     return true;
 }
 

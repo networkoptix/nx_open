@@ -99,7 +99,7 @@ private:
 
         auto address = m_server->getLocalAddress();
         NX_LOGX(lm("listening %1 for %2 sockets")
-            .str(address.toString()).arg(m_clientsLimit), cl_logDEBUG1);
+            .arg(address.toString()).arg(m_clientsLimit), cl_logDEBUG1);
         m_addressManager.add(std::move(address));
     }
 };
@@ -126,13 +126,13 @@ struct FakeTcpTunnelAcceptor:
             m_ioThreadSocket->bindToAioThread(designatedAioThread);
 
         NX_LOGX(lm("prepare to listen '%1', c=%2, lim=%3, thread=%4")
-            .str(addressManager.key).arg(hasConnection).arg(clientsLimit)
+            .arg(addressManager.key).arg(hasConnection).arg(clientsLimit)
             .arg(designatedAioThread), cl_logDEBUG1);
     }
 
     ~FakeTcpTunnelAcceptor()
     {
-        NX_LOGX(lm("removed, c=%1").str(m_hasConnection), cl_logDEBUG1);
+        NX_LOGX(lm("removed, c=%1").arg(m_hasConnection), cl_logDEBUG1);
     }
 
     void accept(AcceptHandler handler) override
@@ -422,7 +422,7 @@ protected:
         }
 
         NX_LOGX(lm("client %1 -> %2 (timeout=%3)")
-            .arg(socket).str(peer).arg(timeout), cl_logDEBUG1);
+            .arg(socket).arg(peer).arg(timeout), cl_logDEBUG1);
 
         connectClient(socket, peer);
     }
@@ -432,7 +432,7 @@ protected:
         const auto delay = 500 * utils::TestOptions::timeoutMultiplier();
         if (auto address = m_addressBinder.random(peer))
         {
-            NX_LOGX(lm("connect %1 -> %2").arg(socket).str(*address), cl_logDEBUG2);
+            NX_LOGX(lm("connect %1 -> %2").arg(socket).arg(*address), cl_logDEBUG2);
             socket->connectAsync(
                 address.get(),
                 [=](SystemError::ErrorCode code)
@@ -453,7 +453,7 @@ protected:
                     if (auto address = m_addressBinder.random(peer))
                         return connectClient(socket, peer);
 
-                    NX_LOGX(lm("indicate %1 -> %2").arg(socket).str(peer), cl_logDEBUG2);
+                    NX_LOGX(lm("indicate %1 -> %2").arg(socket).arg(peer), cl_logDEBUG2);
                     emitIndication(peer);
                     socket->registerTimer(
                         delay, [=](){ connectClient(socket, peer); });

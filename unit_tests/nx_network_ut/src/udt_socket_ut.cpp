@@ -601,7 +601,7 @@ protected:
 
         address = server->getLocalAddress();
         NX_LOGX(lm("Server address=%1, transferSize=%2b")
-            .strs(address, nx::utils::bytesToString(kTransferSize)), cl_logINFO);
+            .args(address, nx::utils::bytesToString(kTransferSize)), cl_logINFO);
 
         ASSERT_TRUE(server->setRecvTimeout(100));
         ASSERT_EQ(nullptr, server->accept());
@@ -680,11 +680,11 @@ protected:
     {
         const auto durationMs = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
         NX_LOGX(lm("Resieve ended (%1): %2")
-            .strs(lastRecv, SystemError::getLastOSErrorText()), cl_logINFO);
+            .args(lastRecv, SystemError::getLastOSErrorText()), cl_logINFO);
 
         const auto bytesPerS = double(transferSize) * 1000 / durationMs.count();
         NX_LOGX(lm("Resieved size=%1b, count=%2, average=%3, duration=%4, speed=%5bps")
-            .strs(nx::utils::bytesToString(transferSize), transferCount,
+            .args(nx::utils::bytesToString(transferSize), transferCount,
                 nx::utils::bytesToString(transferSize / transferCount),
                 durationMs, nx::utils::bytesToString((uint64_t) bytesPerS)), cl_logINFO);
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-
+#include <nx/utils/uuid.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 
 class QnUserRolesSettingsModel;
