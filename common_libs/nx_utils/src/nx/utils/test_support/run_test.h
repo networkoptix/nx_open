@@ -24,7 +24,7 @@ typedef MoveOnlyFunc<DeinitFunctions(const ArgumentParser& args)> InitFunction;
  */
 inline int runTest(int argc, const char* argv[], InitFunction extraInit = nullptr)
 {
-    nx::utils::setOnAssertHandler([&](const QnLogMessage& m) { FAIL() << m.toStdString(); });
+    nx::utils::setOnAssertHandler([&](const log::Message& m) { FAIL() << m.toStdString(); });
     nx::utils::FlagConfig::setOutputAllowed(false);
 
     // NOTE: On osx InitGoogleTest(...) should be called independent of InitGoogleMock(...)

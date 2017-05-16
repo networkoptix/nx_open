@@ -2336,17 +2336,17 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
     const auto resultHandler =
         [button = QPointer<QnSoftwareTriggerButton>(button)](bool success, qint64 requestId)
         {
-            if (!button)
+            if (!button || button->property(
+                kTriggerRequestIdProperty).value<rest::Handle>() != requestId)
+            {
                 return;
-
-            if (button->property(kTriggerRequestIdProperty).value<rest::Handle>() != requestId)
-                return;
+            }
 
             button->setEnabled(true);
 
             button->setState(success
-                ? QnSoftwareTriggerButton::kSuccessState
-                : QnSoftwareTriggerButton::kFailureState);
+                ? QnSoftwareTriggerButton::State::Success
+                : QnSoftwareTriggerButton::State::Failure);
         };
 
     if (info.prolonged)
@@ -2358,23 +2358,23 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
                 const bool success = requestId != rest::Handle();
                 button->setProperty(kTriggerRequestIdProperty, requestId);
                 button->setState(success
-                    ? QnSoftwareTriggerButton::kWaitingState
-                    : QnSoftwareTriggerButton::kFailureState);
+                    ? QnSoftwareTriggerButton::State::Waiting
+                    : QnSoftwareTriggerButton::State::Failure);
             });
 
         connect(button, &QnSoftwareTriggerButton::released, this,
             [this, button, resultHandler, id = info.triggerId]()
             {
                 /* In case of activation error don't try to deactivate: */
-                if (button->state() == QnSoftwareTriggerButton::kFailureState)
+                if (button->state() == QnSoftwareTriggerButton::State::Failure)
                     return;
 
                 const auto requestId = invokeTrigger(id, resultHandler, QnBusiness::InactiveState);
                 const bool success = requestId != rest::Handle();
                 button->setProperty(kTriggerRequestIdProperty, requestId);
                 button->setState(success
-                    ? QnSoftwareTriggerButton::kDefaultState
-                    : QnSoftwareTriggerButton::kFailureState);
+                    ? QnSoftwareTriggerButton::State::Default
+                    : QnSoftwareTriggerButton::State::Failure);
             });
     }
     else
@@ -2387,8 +2387,8 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
                 button->setProperty(kTriggerRequestIdProperty, requestId);
                 button->setEnabled(!success);
                 button->setState(success
-                    ? QnSoftwareTriggerButton::kWaitingState
-                    : QnSoftwareTriggerButton::kFailureState);
+                    ? QnSoftwareTriggerButton::State::Waiting
+                    : QnSoftwareTriggerButton::State::Failure);
             });
     }
 }

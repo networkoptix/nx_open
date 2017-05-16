@@ -204,7 +204,7 @@ private:
         else
         {
             NX_LOGX(lm("Failed to parse UDP datagram of size %1 received from %2 on %3")
-                .arg((unsigned int)datagram.size()).str(sourceAddress).str(address()),
+                .arg((unsigned int)datagram.size()).arg(sourceAddress).arg(address()),
                 cl_logDEBUG1);
         }
     }

@@ -45,7 +45,7 @@ IncomingTunnelConnection::IncomingTunnelConnection(
         !m_serverSocket->listen())
     {
         NX_LOGX(lm("Can not listen on server socket %1: %2")
-            .strs(addressToBind, SystemError::getLastOSErrorText()), cl_logWARNING);
+            .args(addressToBind, SystemError::getLastOSErrorText()), cl_logWARNING);
 
         m_state = SystemError::getLastOSErrorCode();
     }

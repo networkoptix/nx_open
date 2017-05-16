@@ -29,7 +29,7 @@ static size_t testClientCount() { return nx::utils::TestOptions::applyLoadMode<s
 static std::string lastError() { return SystemError::getLastOSErrorText().toStdString(); }
 
 const bool kEnableTestDebugOutput = false;
-static void testDebugOutput(const QnLogMessage& message)
+static void testDebugOutput(const utils::log::Message& message)
 {
     if (kEnableTestDebugOutput)
         NX_LOG(lm("nx::network::test: %1").arg(message), cl_logDEBUG1);

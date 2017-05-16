@@ -31,6 +31,25 @@ QTransform sharpTransform(const QTransform& transform, bool* corrected)
     return transform;
 }
 
+void paintSharp(QPainter* painter, std::function<void(QPainter*)> paint)
+{
+    NX_EXPECT(paint);
+    if (!paint)
+        return;
+
+    bool corrected = false;
+    const QTransform roundedTransform = sharpTransform(painter->transform(), &corrected);
+    if (corrected)
+    {
+        const QnScopedPainterTransformRollback rollback(painter, roundedTransform);
+        paint(painter);
+    }
+    else
+    {
+        paint(painter);
+    }
+}
+
 void paintPixmapSharp(QPainter* painter, const QPixmap& pixmap, const QPointF& position)
 {
     const auto targetRect = QRectF(position, pixmap.size() / pixmap.devicePixelRatio());

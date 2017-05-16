@@ -129,7 +129,7 @@ public:
 
         #ifdef NX_STREE_ENABLE_DEBUG_LOGGING
             NX_LOG(lm("Stree. Condition. Found child with value %1 by search value %2")
-                .str(it->first).arg(value.toString()), cl_logDEBUG2);
+                .arg(it->first).arg(value.toString()), cl_logDEBUG2);
         #endif
         it->second->get( in, out );
     }

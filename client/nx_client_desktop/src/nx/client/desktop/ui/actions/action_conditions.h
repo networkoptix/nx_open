@@ -627,6 +627,9 @@ inline ConditionWrapper treeNodeType(Qn::NodeType type) { return treeNodeType({{
 /** Visible in layout tour preview mode only. */
 ConditionWrapper isLayoutTourReviewMode();
 
+/** Layout tour is running. */
+ConditionWrapper tourIsRunning();
+
 } // namespace condition
 
 } // namespace action
