@@ -91,7 +91,7 @@ void ConnectSessionManager::createClientSession(
     CreateClientSessionHandler completionHandler)
 {
     NX_LOGX(lm("Session %1. createClientSession. targetPeerName %2")
-        .str(request.desiredSessionId).str(request.targetPeerName), cl_logDEBUG2);
+        .arg(request.desiredSessionId).arg(request.targetPeerName), cl_logDEBUG2);
 
     api::CreateClientSessionResponse response;
     response.sessionTimeout = 
@@ -120,7 +120,7 @@ void ConnectSessionManager::connectToPeer(
 {
     using namespace std::placeholders;
 
-    NX_LOGX(lm("Session %1. connectToPeer").str(request.sessionId), cl_logDEBUG2);
+    NX_LOGX(lm("Session %1. connectToPeer").arg(request.sessionId), cl_logDEBUG2);
 
     std::string peerName = m_clientSessionPool->getPeerNameBySessionId(request.sessionId);
     if (peerName.empty())
@@ -167,14 +167,14 @@ void ConnectSessionManager::onAcquiredListeningPeerConnection(
     if (resultCode != api::ResultCode::ok)
     {
         NX_LOGX(lm("Session %1. Could not get listening peer %2 connection. resultCode %3")
-            .str(connectSessionId).str(listeningPeerName)
-            .str(QnLexical::serialized(resultCode)),
+            .arg(connectSessionId).arg(listeningPeerName)
+            .arg(QnLexical::serialized(resultCode)),
             cl_logDEBUG1);
         return completionHandler(resultCode, nx_http::ConnectionEvents());
     }
     
     NX_LOGX(lm("Session %1. Got listening peer %2 connection")
-        .str(connectSessionId).str(listeningPeerName), cl_logDEBUG2);
+        .arg(connectSessionId).arg(listeningPeerName), cl_logDEBUG2);
 
     NX_ASSERT(listeningPeerConnection);
 
@@ -248,9 +248,9 @@ void ConnectSessionManager::onOpenTunnelNotificationSent(
     if (sysErrorCode != SystemError::noError)
     {
         NX_LOGX(lm("Session %1. Failed to send open tunnel notification to %2 (%3). %4")
-            .str(relaySession.id).str(relaySession.listeningPeerName)
-            .str(relaySession.listeningPeerConnection->getForeignAddress())
-            .str(SystemError::toString(sysErrorCode)), cl_logDEBUG1);
+            .arg(relaySession.id).arg(relaySession.listeningPeerName)
+            .arg(relaySession.listeningPeerConnection->getForeignAddress())
+            .arg(SystemError::toString(sysErrorCode)), cl_logDEBUG1);
         return;
     }
 
