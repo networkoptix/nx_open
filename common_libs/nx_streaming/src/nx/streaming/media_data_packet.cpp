@@ -5,10 +5,11 @@
 #include <utils/media/bitStream.h>
 #include <utils/common/synctime.h>
 
+#include <nx/fusion/model_functions.h>
+#include <nx/network/socket_common.h>
 #include <nx/streaming/config.h>
 
 #include <motion/motion_detection.h>
-#include <nx/fusion/model_functions.h>
 
 #ifdef Q_OS_OSX
 #include <smmintrin.h>
