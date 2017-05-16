@@ -1440,7 +1440,7 @@ void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
                 {
                     if (depthLimit == 0)
                     {
-                        NX_LOGX(lm("Directory depth is above the limit, corupt file system? %1")
+                        NX_LOGX(lm("Directory depth is above the limit, corupted file system? %1")
                             .str(entry.absoluteFilePath()), cl_logERROR);
 
                         return false;
