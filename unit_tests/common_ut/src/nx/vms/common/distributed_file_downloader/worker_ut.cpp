@@ -447,6 +447,84 @@ TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadFlatNetwork)
     ASSERT_LE(commonPeerManager->requestCounter()->totalRequests(), maxRequests);
 }
 
+TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadNonFlatNetwork)
+{
+    auto fileInfo = createTestFile();
+    fileInfo.url = "http://test.org/testFile";
+    commonPeerManager->addInternetFile(fileInfo.url, fileInfo.filePath);
+
+    const QStringList groups{"A", "B", "C", "D", "E"};
+
+    QList<QnUuid> pendingPeers;
+
+    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ErrorCode::noError);
+    commonPeerManager->setHasInternetConnection(defaultPeer->id);
+    commonPeerManager->setPeerGroups(defaultPeer->id, {groups[0]});
+    commonPeerManager->setPeerStorage(defaultPeer->id, defaultPeer->storage);
+    QObject::connect(defaultPeer->worker, &Worker::finished,
+        [this, &pendingPeers]
+        {
+            pendingPeers.removeOne(defaultPeer->id);
+        });
+
+    QList<Peer*> peers{defaultPeer};
+
+    constexpr int kPeersPerGroup = 3;
+
+    for (int groupIndex = 0; groupIndex < groups.size(); ++groupIndex)
+    {
+        const auto& group = groups[groupIndex];
+
+        for (int i = 1; i <= kPeersPerGroup; ++i)
+        {
+            auto peer = createPeer(lit("Peer %1%2").arg(group).arg(i));
+            peers.append(peer);
+            peerById[peer->id] = peer;
+            peer->storage->addFile(fileInfo);
+            commonPeerManager->setPeerStorage(peer->id, peer->storage);
+
+            QStringList peerGroups{groups[groupIndex]};
+            if (i == kPeersPerGroup && groupIndex < groups.size() - 1)
+                peerGroups.append(groups[groupIndex + 1]);
+            commonPeerManager->setPeerGroups(peer->id, peerGroups);
+
+            QObject::connect(peer->worker, &Worker::finished,
+                [peer, &pendingPeers]
+                {
+                    pendingPeers.removeOne(peer->id);
+                });
+        }
+    }
+
+    pendingPeers = commonPeerManager->getAllPeers();
+
+    for (const auto& peer: peerById)
+    {
+        peer->worker->setPeers(peer->peerManager->getAllPeers());
+        peer->peerManager->calculateDistances();
+    }
+
+    const int maxRequests = fileInfo.downloadedChunks.size() * pendingPeers.size() * 3;
+
+    for (auto& peer: peerById)
+        peer->worker->start();
+
+    commonPeerManager->exec(maxRequests);
+
+    for (auto& peer: peers)
+    {
+        peer->peerManager->requestCounter()->printCounters(
+            "Outgoing requests from " + commonPeerManager->peerString(peer->id),
+            commonPeerManager.data());
+    }
+
+    commonPeerManager->requestCounter()->printCounters(
+        "Incoming Requests:", commonPeerManager.data());
+
+    ASSERT_EQ(pendingPeers.size(), 0);
+    ASSERT_LE(commonPeerManager->requestCounter()->totalRequests(), maxRequests);
+}
+
 } // namespace test
 } // namespace distributed_file_downloader
 } // namespace common
