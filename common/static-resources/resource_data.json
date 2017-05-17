@@ -1910,6 +1910,13 @@
                 "Bosch|IP5000*"
             ],
             "onvifPtzSpeedBroken": true
+        },
+        {
+            "keys": [
+                "AVer|FX2000"
+            ],
+            "highStreamAvailableBitrates":["100000"],
+            "lowStreamAvailableBitrates":["100000"]
         }
     ]
 }
