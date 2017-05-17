@@ -26,6 +26,7 @@ extern "C" {
 #endif
 };
 
+using namespace nx::utils;
 
 static const int text_x_offs = 16;
 static const int text_y_offs = 16;

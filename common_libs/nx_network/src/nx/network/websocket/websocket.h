@@ -111,7 +111,7 @@ private:
 } // namespace websocket
 
 using websocket::WebSocket;
-using WebSocketPtr = std::shared_ptr<WebSocket>;
+using WebSocketPtr = std::unique_ptr<WebSocket>;
 
 } // namespace network
 } // namespace nx

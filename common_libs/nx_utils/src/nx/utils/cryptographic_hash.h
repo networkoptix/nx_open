@@ -4,13 +4,16 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QScopedPointer>
 
+namespace nx {
+namespace utils {
+
 class QnCryptographicHashPrivate;
 
 /**
- * Just like <tt>QCryptographicHash</tt>, but works MUCH faster. 
+ * Just like <tt>QCryptographicHash</tt>, but works MUCH faster.
  * Uses OpenSSL internally.
  */
-class QnCryptographicHash {
+class QN_EXPORT QnCryptographicHash {
 public:
     enum Algorithm {
         Md4 = QCryptographicHash::Md4,
@@ -36,5 +39,8 @@ public:
 private:
     QScopedPointer<QnCryptographicHashPrivate> d;
 };
+
+}
+}
 
 #endif // QN_CRYPTOGRAPHIC_HASH_H
