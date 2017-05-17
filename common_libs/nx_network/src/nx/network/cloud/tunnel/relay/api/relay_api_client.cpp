@@ -5,6 +5,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/type_utils.h>
 #include <nx/network/http/custom_headers.h>
+#include <nx/network/url/url_parse_helper.h>
 
 #include "relay_api_http_paths.h"
 
@@ -182,9 +183,10 @@ std::unique_ptr<nx_http::FusionDataHttpClient<Request, Response>>
         std::initializer_list<RequestPathArgument> requestPathArguments)
 {
     QUrl requestUrl = m_baseUrl;
-    requestUrl.setPath(
+    requestUrl.setPath(network::url::normalizePath(
+        requestUrl.path() +
         nx_http::rest::substituteParameters(
-            requestPathTemplate, std::move(requestPathArguments)));
+            requestPathTemplate, std::move(requestPathArguments))));
 
     auto httpClient = std::make_unique<
         nx_http::FusionDataHttpClient<Request, Response>>(
