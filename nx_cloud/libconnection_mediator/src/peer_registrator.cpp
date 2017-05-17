@@ -200,6 +200,8 @@ void PeerRegistrator::listen(
     }
 
     api::ListenResponse response;
+    if (!m_settings.trafficRelay().url.isEmpty())
+        response.trafficRelayUrl = m_settings.trafficRelay().url.toUtf8();
     response.tcpConnectionKeepAlive = m_settings.stun().keepAliveOptions;
     response.cloudConnectOptions = m_settings.general().cloudConnectOptions;
     completionHandler(api::ResultCode::ok, std::move(response));
