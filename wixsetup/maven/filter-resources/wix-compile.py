@@ -9,21 +9,28 @@ engine_tmp_folder = 'obj'
 
 skip_sign = '${windows.skip.sign}' == 'true'
 build_nxtool = '${nxtool}' == 'true'
+build_paxton = ('${arch}' == 'x86' and '${paxton}' == 'true')
 
 bin_source_dir = '${libdir}/bin/${build.configuration}'
 
 server_msi_folder = 'bin/msi'
+server_msi_strip_folder = 'bin/strip'
 server_exe_folder = 'bin/exe'
 
 client_msi_folder = 'bin/msi'
+client_msi_strip_folder = 'bin/strip'
 client_exe_folder = 'bin/exe'
 
 full_exe_folder = 'bin/exe'
 nxtool_exe_folder = 'bin/exe'
 
+paxton_msi_folder = 'bin/msi'
+paxton_msi_strip_folder = 'bin/strip'
+paxton_exe_folder = 'bin/exe'
+
 nxtool_msi_folder = 'bin/msi'
-server_msi_strip_folder = 'bin/strip'
-client_msi_strip_folder = 'bin/strip'
+
+
 wix_pdb = 'wixsetup.wixpdb'
 
 server_msi_name = '${artifact.name.server}.msi'
@@ -37,16 +44,21 @@ full_exe_name = '${artifact.name.bundle}.exe'
 nxtool_msi_name = '${artifact.name.servertool}.msi'
 nxtool_exe_name = '${artifact.name.servertool}.exe'
 
+paxton_msi_name = '${artifact.name.paxton}.msi'
+paxton_exe_name = '${artifact.name.paxton}.exe'
+
 wix_extensions = ['WixFirewallExtension', 'WixUtilExtension', 'WixUIExtension', 'WixBalExtensionExt']
-common_components = ['MyExitDialog', 'UpgradeDlg', 'SelectionWarning']
-client_components = ['Associations', 'ClientDlg', 'ClientFonts', 'ClientVox', 'ClientBg', 'ClientQml', 'Client', 'ClientHelp', 'ClientVcrt14']
-server_components = ['ServerVox', 'Server', 'traytool', 'ServerVcrt14', 'TraytoolVcrt14']
-nxtool_components = ['NxtoolDlg', 'Nxtool', 'NxtoolQuickControls', 'NxtoolVcrt14']
+common_components = []
+client_components = ['Associations', 'ClientDlg', 'ClientFonts', 'ClientVox', 'ClientBg', 'ClientQml', 'Client', 'ClientHelp', 'ClientVcrt14', 'MyExitDialog', 'UpgradeDlg', 'SelectionWarning']
+server_components = ['ServerVox', 'Server', 'traytool', 'ServerVcrt14', 'TraytoolVcrt14', 'ClientVcrt14', 'MyExitDialog', 'UpgradeDlg', 'SelectionWarning']
+nxtool_components = ['NxtoolDlg', 'Nxtool', 'NxtoolQuickControls', 'NxtoolVcrt14', 'ClientVcrt14', 'MyExitDialog', 'UpgradeDlg', 'SelectionWarning']
+paxton_components = ['AxClient', 'ClientQml', 'ClientFonts']
 
 client_exe_components = ['ArchCheck', 'ClientPackage']
 server_exe_components = ['ArchCheck', 'ServerPackage']
 full_exe_components =   ['ArchCheck', 'ClientPackage', 'ServerPackage']
 nxtool_exe_components = ['ArchCheck', 'NxtoolPackage']
+paxton_exe_components = ['VC14RedistPackage','PaxtonPackage']
 
 def add_wix_extensions(command):
     for ext in wix_extensions:
@@ -71,6 +83,7 @@ def get_candle_command(project, suffix, args, components):
     command.append('-dClientMsiName={}'.format(client_msi_name))
     command.append('-dServerMsiName={}'.format(server_msi_name))
     command.append('-dNxtoolMsiName={}'.format(nxtool_msi_name))
+    command.append('-dPaxtonMsiName={}'.format(paxton_msi_name))
 
     add_components(command, components)
 
@@ -79,12 +92,17 @@ def get_candle_command(project, suffix, args, components):
     command.append(r'-dClientVcrt14DstDir=${customization}_${release.version}.${buildNumber}_Dir')
     command.append(r'-dTraytoolVcrt14DstDir=${customization}TrayToolDir')
     command.append(r'-dNxtoolVcrt14DstDir=${customization}NxtoolDir')
+    command.append(r'-dPaxtonVcrt14DstDir=${customization}_${release.version}_Paxton')
 
     if suffix.startswith('client'):
         command.append('-dClientQmlDir=${ClientQmlDir}')
         command.append('-dClientHelpSourceDir=${ClientHelpSourceDir}')
         command.append('-dClientFontsDir=${ClientFontsDir}')
         command.append('-dClientBgSourceDir=${ClientBgSourceDir}')
+
+    if suffix.startswith('paxton'):
+        command.append('-dClientQmlDir=${ClientQmlDir}')
+        command.append('-dClientFontsDir=${ClientFontsDir}')
 
     if suffix.startswith('nxtool'):
         command.append('-dNxtoolQuickControlsDir=${NxtoolQuickControlsDir}')
@@ -226,6 +244,15 @@ def add_build_nxtool_commands(commands):
                 None,
                 nxtool_components, nxtool_exe_components,
                 engine_tmp_folder)
+              
+def add_build_paxton_commands(commands):
+    add_build_commands_msi_exe_generic(commands, 'paxton', 'paxton-exe',
+                paxton_msi_strip_folder, paxton_msi_name,
+                paxton_exe_folder, paxton_exe_name,
+                ['-dNoStrip=no'],
+                paxton_components, paxton_exe_components,
+                engine_tmp_folder,
+                suffix='paxton-strip')
 
 def main():
     commands = []
@@ -233,11 +260,14 @@ def main():
     add_build_strip_client_commands(commands)
     add_build_strip_server_commands(commands)
     add_build_full_commands(commands)
+    if build_paxton:
+        add_build_paxton_commands(commands)
 
     if build_nxtool:
         add_build_nxtool_commands(commands)
 
     for command in commands:
+        print(command)
         execute_command(command)
 
     # Debug code to make applauncher work from the build_environment/target/bin folder

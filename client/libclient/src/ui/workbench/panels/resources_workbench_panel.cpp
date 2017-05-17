@@ -10,6 +10,7 @@
 #include <ui/animation/variant_animator.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
+#include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/edge_shadow_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
@@ -93,6 +94,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     widget->setToolTipParent(item);
     item->setFocusPolicy(Qt::StrongFocus);
     item->setProperty(Qn::NoHandScrollOver, true);
+    item->setProperty(Qn::BlockMotionSelection, true);
     item->resize(settings.span, 0.0);
     item->setZValue(ContentItemZOrder);
     connect(item, &QnMaskedProxyWidget::paintRectChanged, this,
@@ -124,6 +126,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
         });
 
     m_resizerWidget->setProperty(Qn::NoHandScrollOver, true);
+    m_resizerWidget->setProperty(Qn::BlockMotionSelection, true);
     m_resizerWidget->setZValue(ResizerItemZOrder);
     connect(m_resizerWidget, &QGraphicsWidget::geometryChanged, this,
         &ResourceTreeWorkbenchPanel::at_resizerWidget_geometryChanged);

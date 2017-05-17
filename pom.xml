@@ -151,7 +151,7 @@
         <packages.dir>${environment.dir}/packages</packages.dir>
         <qt.path>packages/${rdep.target}/qt-${qt.version}</qt.path>
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
-        <ClientHelpSourceDir>${packages.dir}/any/help-${customization}-${release.version}/bin/help</ClientHelpSourceDir>
+        <ClientHelpSourceDir>${libdir}/bin/${build.configuration}/help</ClientHelpSourceDir>
         <ClientVoxSourceDir>${libdir}/bin/release/vox</ClientVoxSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <launcher.version.dir>${libdir}/bin/${build.configuration}</launcher.version.dir>
@@ -174,6 +174,7 @@
         <libjpeg-turbo.version>1.4.2</libjpeg-turbo.version>
         <libcreateprocess.version>0.1</libcreateprocess.version>
         <vmux.version>1.0.0</vmux.version>
+        <cpro.version>1.0.0</cpro.version>
         <server-external.version>${release.version}</server-external.version>
         <help.version>${customization}-${release.version}</help.version>
         <gcc.version>4.9.4</gcc.version>
@@ -242,9 +243,12 @@
         -->
         <artifact.name.product>${installer.name}</artifact.name.product>
         <artifact.name.version>${release.version}.${buildNumber}</artifact.name.version>
-        <artifact.name.platform>INVALID_PLATFORM</artifact.name.platform> <!-- will be defined in each platform separately -->
-        <artifact.name.beta.suffix></artifact.name.beta.suffix> <!-- will be defined in artifact-name-beta profile -->
-        <artifact.name.cloud.suffix></artifact.name.cloud.suffix> <!-- will be defined in artifact-name-cloud profile -->
+        <artifact.name.platform>INVALID_PLATFORM</artifact.name.platform>
+        <!-- will be defined in each platform separately -->
+        <artifact.name.beta.suffix/>
+        <!-- will be defined in artifact-name-beta profile -->
+        <artifact.name.cloud.suffix/>
+        <!-- will be defined in artifact-name-cloud profile -->
 
         <artifact.name.prefix>${artifact.name.product}</artifact.name.prefix>
         <artifact.name.suffix>${artifact.name.version}-${artifact.name.platform}${artifact.name.beta.suffix}${artifact.name.cloud.suffix}</artifact.name.suffix>
@@ -515,7 +519,7 @@
 
                 <!-- <module>plugins/axiscamplugin</module> -->
                 <!-- <module>storage_plugins/ftpstorageplugin</module> -->
-                <module>storage_plugins/teststorageplugin</module> 
+                <module>storage_plugins/teststorageplugin</module>
 
                 <!-- <module>mediaproxy</module> -->
             </modules>
@@ -612,6 +616,31 @@
                 <artifact.name.platform>win86</artifact.name.platform>
             </properties>
         </profile>
+        <!-- Paxton stuff can be built only on Windows x86 -->
+        <profile>
+            <id>paxton</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <property>
+                    <name>arch</name>
+                    <value>x86</value>
+                </property>
+                <file>
+                    <missing>customization/${customization}/paxton.skip</missing>
+                </file>
+            </activation>
+            <modules>
+                <module>client/activex_client</module>
+                <module>plugins/nxinterface</module>
+                <module>plugins/nxcontrol</module>
+                <module>plugins/acs/paxton-plugin</module>
+            </modules>
+            <properties>
+                <paxton>true</paxton>
+            </properties>
+        </profile>
         <profile>
             <id>windows-nomobile</id>
             <activation>
@@ -641,29 +670,7 @@
                 <module>wixsetup</module>
             </modules>
         </profile>
-        <!-- Paxton stuff can be built only on Windows x86 -->
-        <profile>
-            <id>paxton</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-                <property>
-                    <name>arch</name>
-                    <value>x86</value>
-                </property>
-                <file>
-                    <missing>customization/${customization}/paxton.skip</missing>
-                </file>
-            </activation>
-            <modules>
-                <module>client/activex_client</module>
-                <module>plugins/nxinterface</module>
-                <module>plugins/nxcontrol</module>
-                <module>plugins/acs/paxton-plugin</module>
-                <module>plugins/acs/paxton-installer</module>
-            </modules>
-        </profile>
+
         <profile>
             <id>nxtool</id>
             <activation>

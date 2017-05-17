@@ -5,6 +5,8 @@
 #include <QtQuick/QQuickView>
 #include <QtQml/QQmlContext>
 
+#include <client/client_runtime_settings.h>
+
 #include <common/common_module.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
@@ -114,6 +116,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
     m_message(),
     m_appInfo(new QnAppInfo(this))
 {
+    NX_EXPECT(qnRuntime->isDesktopMode());
     NX_CRITICAL(qnStartupTileManager, Q_FUNC_INFO, "Startup tile manager does not exists");
     NX_CRITICAL(qnCloudStatusWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged,

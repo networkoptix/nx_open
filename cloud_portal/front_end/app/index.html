@@ -1,0 +1,138 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title ng-bind-html="pageTitle"></title>
+    <meta name="description" content="">
+
+    <base href="/" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <link rel="shortcut icon" href="/static/images/favicon.ico">
+
+    <link rel="stylesheet" href="fonts/roboto/roboto_bold/stylesheet.css" />
+    <link rel="stylesheet" href="fonts/roboto/roboto_light/stylesheet.css" />
+    <link rel="stylesheet" href="fonts/roboto/roboto_regular/stylesheet.css" />
+    <link rel="stylesheet" href="fonts/roboto/roboto_medium/stylesheet.css" />
+
+    <!-- build:css({.tmp,app}) static/styles/index.css -->
+
+    <link rel="stylesheet" href="bower_components/ngToast/dist/ngToast.css">
+    <link rel="stylesheet" href="bower_components/ngToast/dist/ngToast-animations.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- endbuild -->
+
+</head>
+<body class="loading">
+<!--[if lt IE 7]>
+<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+<![endif]-->
+
+<!-- Add your site or application content here -->
+
+<noscript>
+    Please, turn on JavaScript in your browser
+</noscript>
+
+<header></header>
+
+<div class="container" ng-view="" ng-model-options="{ updateOn: 'blur' }">
+</div>
+
+<footer></footer>
+
+<!--[if lt IE 9]>
+<!-- build:js static/scripts/ie-downgrade.js -->
+<script src="bower_components/es5-shim/es5-shim.js"></script>
+<script src="bower_components/json3/lib/json3.min.js"></script>
+<!-- endbuild -->
+<!--[endif]-->
+
+<!-- build:js static/scripts/vendor.js -->
+<!-- bower:js -->
+<script src="bower_components/angular/angular.js"></script>
+<script src="bower_components/json3/lib/json3.js"></script>
+<script src="bower_components/es5-shim/es5-shim.js"></script>
+<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="bower_components/bootstrap-sass/assets/javascripts/bootstrap.js"></script>
+<script src="bower_components/angular-resource/angular-resource.js"></script>
+<script src="bower_components/angular-cookies/angular-cookies.js"></script>
+<script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+<script src="bower_components/angular-route/angular-route.js"></script>
+<script src="bower_components/angular-animate/angular-animate.js"></script>
+<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+<script src="bower_components/underscore/underscore.js"></script>
+<script src="bower_components/jquery-mousewheel/jquery.mousewheel.js"></script>
+<script src="bower_components/angular-cookie/angular-cookie.js"></script>
+<script src="bower_components/ngstorage/ngStorage.js"></script>
+<script src="bower_components/angular-base64/angular-base64.js"></script>
+<script src="bower_components/ngToast/dist/ngToast.js"></script>
+<!-- endbower -->
+
+<script src="scripts/vendor/protocolcheck.js"></script>
+<!-- endbuild -->
+
+<!-- build:js({.tmp,app}) static/scripts/scripts.js -->
+
+<script src="scripts/client-detection.js"></script>
+
+<script src="scripts/config.js"></script>
+<script src="scripts/app.js"></script>
+
+<script src="scripts/controllers/startPage.js"></script>
+<script src="scripts/controllers/login.js"></script>
+<script src="scripts/controllers/register.js"></script>
+<script src="scripts/controllers/systems.js"></script>
+<script src="scripts/controllers/system.js"></script>
+<script src="scripts/controllers/share.js"></script>
+<script src="scripts/controllers/account.js"></script>
+<script src="scripts/controllers/activateRestore.js"></script>
+<script src="scripts/controllers/static.js"></script>
+<script src="scripts/controllers/debug.js"></script>
+<script src="scripts/controllers/disconnect.js"></script>
+<script src="scripts/controllers/rename.js"></script>
+<script src="scripts/controllers/download.js"></script>
+
+<script src="scripts/directives/header.js"></script>
+<script src="scripts/directives/footer.js"></script>
+<script src="scripts/directives/process.js"></script>
+<script src="scripts/directives/validateField.js"></script>
+<script src="scripts/directives/autofocus.js"></script>
+<script src="scripts/directives/passwordInput.js"></script>
+<script src="scripts/directives/validateEmail.js"></script>
+<script src="scripts/directives/setTitle.js"></script>
+<script src="scripts/directives/openClientButton.js"></script>
+<script src="scripts/directives/languageSelect.js"></script>
+
+<script src="scripts/services/poll.js"></script>
+<script src="scripts/services/angular-uuid2.js"></script>
+<script src="scripts/services/dialogs.js"></script>
+<script src="scripts/services/cloud_api.js"></script>
+<script src="scripts/services/process.js"></script>
+<script src="scripts/services/urlProtocol.js"></script>
+<script src="scripts/services/mediaserver.js"></script>
+<script src="scripts/services/system.js"></script>
+<script src="scripts/services/account.js"></script>
+<script src="scripts/services/page.js"></script>
+
+<script src="scripts/filters/highlight.js"></script>
+
+<script src="scripts/bootstrap.js"></script>
+<!-- endbuild -->
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer',Config.googleTagsCode);</script>
+<!-- End Google Tag Manager -->
+
+</body>
+</html>

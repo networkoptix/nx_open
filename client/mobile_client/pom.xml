@@ -90,6 +90,7 @@
                                     <includes>
                                         <include>*.apk</include>
                                         <include>*.ipa</include>
+                                        <include>resources/**</include>
                                     </includes>
                                 </fileset>
                             </filesets>
