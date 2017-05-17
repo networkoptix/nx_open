@@ -237,22 +237,22 @@ void TestPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle handle)
     m_requestsQueue.erase(it, m_requestsQueue.end());
 }
 
-void TestPeerManager::processNextRequest()
+bool TestPeerManager::processNextRequest()
 {
     if (m_requestsQueue.isEmpty())
-        return;
+        return false;
 
     const auto& request = m_requestsQueue.dequeue();
     m_currentTime = request.timeToReply;
     request.callback(request.handle);
+
+    return true;
 }
 
 void TestPeerManager::exec(int maxRequests)
 {
-    for (;;)
+    while (processNextRequest())
     {
-        processNextRequest();
-
         if (maxRequests > 1)
             --maxRequests;
         else if (maxRequests == 1)

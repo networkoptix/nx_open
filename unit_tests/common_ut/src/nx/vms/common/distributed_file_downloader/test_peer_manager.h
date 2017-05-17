@@ -71,7 +71,7 @@ public:
 
     void addInternetFile(const QUrl& url, const QString& fileName);
 
-    void processNextRequest();
+    bool processNextRequest();
     void exec(int maxRequests = 0);
 
     const RequestCounter* requestCounter() const;
