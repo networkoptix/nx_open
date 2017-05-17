@@ -136,7 +136,7 @@ private:
     std::unique_ptr<QObject> m_opaqueObject;
 };
 
-const char* toString(Connection::State value);
+QString toString(Connection::State value);
 
 } // namespace p2p
 } // namespace nx

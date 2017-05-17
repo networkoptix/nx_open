@@ -19,18 +19,18 @@ namespace p2p {
 
 SendCounters Connection::m_sendCounters = {};
 
-const char* toString(Connection::State value)
+QString toString(Connection::State value)
 {
     switch (value)
     {
     case Connection::State::Connecting:
-        return "Connecting";
+        return lm("Connecting");
     case Connection::State::Connected:
-        return "Connected";
+        return lm("Connected");
     case Connection::State::Error:
-        return "Error";
+        return lm("Error");
     default:
-        return "Unknown";
+        return lm("Unknown");
     }
 }
 
