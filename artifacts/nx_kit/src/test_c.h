@@ -1,7 +1,8 @@
 #pragma once
 
 /**@file
- * Rudimentary header-only unit testing framework for C99. Supports a single test only.
+ * Rudimentary header-only unit testing framework for C99. Each tests should be called manually.
+ * Process exits
  */
 
 #include <stdio.h>
@@ -9,29 +10,65 @@
 #include <stdbool.h>
 #include <string.h>
 
-static void test_detail_runTest(void);
+/**
+ * Defines a test function: int TEST_FUNC(), returning 0 if test passes and 1 if test fails.
+ */
+#define TEST(TEST_FUNC) \
+    static void nx_test_detail_test_##TEST_FUNC(void); \
+    int TEST_FUNC() \
+    { \
+        fprintf(stderr, "\nRunning C99 test: %s\n", #TEST_FUNC); \
+        fprintf(stderr, "%s\n\n", nx_test_detail_separator); \
+        nx_test_detail_test_##TEST_FUNC(); \
+        return nx_test_detail_finish_test(); \
+    } \
+    static void nx_test_detail_test_##TEST_FUNC(void) /* Function body follows the TEST macro. */
 
-int main()
+#define ASSERT_TRUE(COND) do \
+{ \
+    if (!nx_test_detail_assertBool(true, (COND), #COND, __LINE__)) \
+        return; \
+} while (0)
+
+#define ASSERT_FALSE(COND) do \
+{ \
+    if (!nx_test_detail_assertBool(false, (COND), #COND, __LINE__)) \
+        return; \
+} while (0)
+
+#define ASSERT_STREQ(EXPECTED, ACTUAL) do \
+{ \
+    if (!nx_test_detail_assertStrEq((EXPECTED), #EXPECTED, (ACTUAL), #ACTUAL, __LINE__)) \
+        return; \
+} while (0)
+
+#define ASSERT_EQ(EXPECTED, ACTUAL) do \
+{ \
+    if (!nx_test_detail_assertIntEq((EXPECTED), #EXPECTED, (ACTUAL), #ACTUAL, __LINE__)) \
+        return; \
+} while (0)
+
+//-------------------------------------------------------------------------------------------------
+// Implementation
+
+static const char* const nx_test_detail_separator =
+    "==================================================================";
+
+static bool nx_test_detail_failed = false;
+
+static int nx_test_detail_finish_test(void)
 {
-    test_detail_runTest();
-    fprintf(stderr, "\nSUCCESS: Test PASSED.\n");
+    fprintf(stderr, "\n%s\n", nx_test_detail_separator);
+    if (nx_test_detail_failed)
+    {
+        fprintf(stderr, "Test FAILED. See the messages above.\n");
+        return 1;
+    }
+    fprintf(stderr, "SUCCESS: Test PASSED.\n");
     return 0;
 }
 
-// Use instead of "main()".
-#define TEST() \
-    static void test_detail_runTest(void) /* Function body follows the TEST macro. */
-
-#define ASSERT_TRUE(COND) test_detail_assertBool(true, (COND), #COND, __LINE__)
-#define ASSERT_FALSE(COND) test_detail_assertBool(false, (COND), #COND, __LINE__)
-
-#define ASSERT_STREQ(EXPECTED, ACTUAL) \
-    test_detail_assertStrEq((EXPECTED), #EXPECTED, (ACTUAL), #ACTUAL, __LINE__)
-
-#define ASSERT_EQ(EXPECTED, ACTUAL) \
-    test_detail_assertIntEq((EXPECTED), #EXPECTED, (ACTUAL), #ACTUAL, __LINE__)
-
-static void test_detail_assertStrEq(
+static bool nx_test_detail_assertStrEq(
     const char* expected, const char* expectedStr,
     const char* actual, const char* actualStr,
     int line)
@@ -41,11 +78,13 @@ static void test_detail_assertStrEq(
         fprintf(stderr, "\nTest FAILED at line %d:\n", line);
         fprintf(stderr, "    Expected: [%s] (%s)\n", expected, expectedStr);
         fprintf(stderr, "    Actual: [%s] (%s)\n", actual, actualStr);
-        exit(1);
+        nx_test_detail_failed = true;
+        return false;
     }
+    return true;
 }
 
-static void test_detail_assertIntEq(
+static bool nx_test_detail_assertIntEq(
     int expected, const char* expectedStr,
     int actual, const char* actualStr,
     int line)
@@ -55,16 +94,20 @@ static void test_detail_assertIntEq(
         fprintf(stderr, "\nTest FAILED at line %d:\n", line);
         fprintf(stderr, "    Expected: [%d] (%s)\n", expected, expectedStr);
         fprintf(stderr, "    Actual: [%d] (%s)\n", actual, actualStr);
-        exit(1);
+        nx_test_detail_failed = true;
+        return false;
     }
+    return true;
 }
 
-static void test_detail_assertBool(bool expected, bool cond, const char* condStr, int line)
+static bool nx_test_detail_assertBool(bool expected, bool cond, const char* condStr, int line)
 {
     if (expected != cond)
     {
         fprintf(stderr, "\nTest FAILED at line %d:\n", line);
-        fprintf(stderr, "    %s: %s", (expected == true) ? "False" : "True", condStr);
-        exit(1);
+        fprintf(stderr, "    %s: %s\n", (expected == true) ? "False" : "True", condStr);
+        nx_test_detail_failed = true;
+        return false;
     }
+    return true;
 }

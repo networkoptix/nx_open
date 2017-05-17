@@ -31,42 +31,42 @@ static void createFile(const char* filename, const char* content)
 #define STR(VALUE) STR_DETAIL(VALUE)
 #define STR_DETAIL(VALUE) #VALUE
 
-TEST()
+TEST(test_ini_config_c)
 {
     const bool defaultFlag = ini.testFlag;
     const int defaultInt = ini.testInt;
     const char* const defaultString = ini.testString;
 
-    ASSERT_TRUE(ini_isEnabled());
-    ASSERT_STREQ(NX_INI_FILE, ini_iniFile());
+    ASSERT_TRUE(nx_ini_isEnabled());
+    ASSERT_STREQ(NX_INI_FILE, nx_ini_iniFile());
 
     // Test: iniFilePath() == iniFileDir() + iniFile().
     char iniFilePath[1000] = "";
-    strncat(iniFilePath, ini_iniFileDir(), sizeof(iniFilePath) - 1);
-    strncat(iniFilePath, ini_iniFile(), sizeof(iniFilePath) - 1);
-    ASSERT_STREQ(iniFilePath, ini_iniFilePath());
+    strncat(iniFilePath, nx_ini_iniFileDir(), sizeof(iniFilePath) - 1);
+    strncat(iniFilePath, nx_ini_iniFile(), sizeof(iniFilePath) - 1);
+    ASSERT_STREQ(iniFilePath, nx_ini_iniFilePath());
 
-    ini_reload(); //< Output expected: first time.
-    ini_reload(); //< No output expected: no changes.
+    nx_ini_reload(); //< Output expected: first time.
+    nx_ini_reload(); //< No output expected: no changes.
 
     ASSERT_EQ(defaultFlag, ini.testFlag);
     ASSERT_EQ(defaultInt, ini.testInt);
     ASSERT_STREQ(defaultString, ini.testString);
 
-    createFile(ini_iniFilePath(),
+    createFile(nx_ini_iniFilePath(),
         "testFlag=" STR(NEW_FLAG) "\n"
         "testInt=" STR(NEW_INT) "\n"
         "testString=" NEW_STRING "\n"
     );
 
-    ini_reload(); //< Output expected: new values arrive.
+    nx_ini_reload(); //< Output expected: new values arrive.
 
     ASSERT_EQ(NEW_FLAG, ini.testFlag);
     ASSERT_EQ(NEW_INT, ini.testInt);
     ASSERT_STREQ(NEW_STRING, ini.testString);
 
-    remove(ini_iniFilePath());
+    remove(nx_ini_iniFilePath());
 
-    ini_setOutput(NX_INI_OUTPUT_NONE);
-    ini_reload(); //< No output expected, though values change: output is disabled.
+    nx_ini_setOutput(NX_INI_OUTPUT_NONE);
+    nx_ini_reload(); //< No output expected, though values change: output is disabled.
 }

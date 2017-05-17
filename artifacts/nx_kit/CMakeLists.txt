@@ -14,31 +14,32 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
 
 include(nx_kit.cmake)
 
-get_target_property(NX_KIT_SOURCES nx_kit SOURCES)
-
-add_library(nx_kit_disabled_ini_config ${NX_KIT_SOURCES})
-target_compile_definitions(nx_kit_disabled_ini_config
+# Test for ini_config disabled via -DNX_INI_CONFIG_DISABLED.
+add_library(test_disabled_ini_config
+    src/nx/kit/ini_config.cpp
+    src/nx/kit/test.cpp
+    tests/ini_config_test.cpp
+    tests/test_disabled_ini_config.cpp
+)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(EXPORT_MACRO "__attribute__((visibility(\"default\")))")
+target_compile_definitions(test_disabled_ini_config
     PRIVATE NX_INI_CONFIG_DISABLED
-    PRIVATE NX_KIT_API=${NX_KIT_API_EXPORT_MACRO}
-    INTERFACE NX_KIT_API=${NX_KIT_API_IMPORT_MACRO}
+    PRIVATE TEST_DISABLED_INI_CONFIG_API=${EXPORT_MACRO}
+    INTERFACE TEST_DISABLED_INI_CONFIG_API=
+    PRIVATE NX_KIT_API=
+    INTERFACE NX_KIT_API=
 )
 
-set(TEST_SOURCES
+# Executable for all tests.
+add_executable(nx_kit_test
     tests/ini_config_test.cpp
     tests/debug_test.cpp
+    tests/ini.cpp
+    tests/test_ini_config_c.c
     tests/main.cpp
 )
-
-set(C_WRAPPER_TEST_SOURCES
-    tests/ini.cpp
-    tests/main.c
+target_link_libraries(nx_kit_test
+    nx_kit
+    test_disabled_ini_config
 )
-
-add_executable(nx_kit_test ${TEST_SOURCES})
-target_link_libraries(nx_kit_test nx_kit)
-
-add_executable(nx_kit_disabled_ini_config_test ${TEST_SOURCES})
-target_link_libraries(nx_kit_disabled_ini_config_test nx_kit_disabled_ini_config)
-
-add_executable(nx_kit_c_wrapper_test ${C_WRAPPER_TEST_SOURCES})
-target_link_libraries(nx_kit_c_wrapper_test nx_kit)

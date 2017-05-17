@@ -44,6 +44,7 @@ namespace test {
  * <code><pre>
  *     return nx::kit::test::runAllTests();
  * </pre></code>
+ * @return Number of failed tests.
  */
 NX_KIT_API int runAllTests();
 

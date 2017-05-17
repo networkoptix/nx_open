@@ -3,6 +3,7 @@ add_library(nx_kit
     ${CMAKE_CURRENT_LIST_DIR}/src/nx/kit/ini_config.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/nx/kit/test.cpp
 )
+
 target_include_directories(nx_kit
     PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src)
 

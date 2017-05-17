@@ -73,7 +73,8 @@ int regTest(const Test& test)
 {
     allTests().push_back(test);
 
-    std::cerr << "Test #" << allTests().size() << ": "
+    std::cerr << "Test suite [" << std::hex << (uintptr_t) &allTests() << std::dec
+        << "]: Adding test #" << allTests().size() << ": "
         << test.testCase << "." << test.testName << std::endl;
 
     return 0; //< Return value is not used.
@@ -83,12 +84,15 @@ int regTest(const Test& test)
 
 int runAllTests()
 {
-    std::vector<size_t> failedTests;
-    for (size_t i = 0; i < allTests().size(); ++i)
-    {
-        const auto& test = allTests().at(i);
+    std::cerr << std::endl << "Running " << allTests().size() << " test(s) from test suite ["
+        << std::hex << (uintptr_t) &allTests() << "]" << std::endl;
 
-        printSection("#%lu: " + test.testCase + "." + test.testName, i);
+    std::vector<size_t> failedTests;
+    for (size_t i = 1; i <= allTests().size(); ++i)
+    {
+        const auto& test = allTests().at(i - 1);
+
+        printSection("Test #%lu: " + test.testCase + "." + test.testName, i);
         std::cerr << std::endl;
 
         try
@@ -121,7 +125,7 @@ int runAllTests()
 
     if (failedTests.size() == allTests().size())
     {
-        printSection("All %lu tests FAILED. See messages above.", failedTests.size());
+        printSection("All %lu test(s) FAILED. See messages above.", failedTests.size());
         return (int) failedTests.size();
     }
     if (failedTests.size() > 1)
@@ -135,7 +139,7 @@ int runAllTests()
         printSection("Test #%lu FAILED. See the message above.", failedTests.front());
         return 1;
     }
-    printSection("SUCCESS: All %lu tests PASSED.", allTests().size());
+    printSection("SUCCESS: All %lu test(s) PASSED.", allTests().size());
     return 0;
 }
 

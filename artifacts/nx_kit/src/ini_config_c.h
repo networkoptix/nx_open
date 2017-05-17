@@ -64,12 +64,12 @@ enum NxIniOutput { NX_INI_OUTPUT_NONE, NX_INI_OUTPUT_STDOUT, NX_INI_OUTPUT_STDER
 
 NX_KIT_API extern const struct Ini ini; //< Global variable declaration. Definition is in ini.cpp.
 
-NX_KIT_API bool ini_isEnabled(void);
-NX_KIT_API void ini_setOutput(enum NxIniOutput output);
-NX_KIT_API void ini_reload(void);
-NX_KIT_API const char* ini_iniFile(void);
-NX_KIT_API const char* ini_iniFileDir(void);
-NX_KIT_API const char* ini_iniFilePath(void);
+NX_KIT_API bool nx_ini_isEnabled(void);
+NX_KIT_API void nx_ini_setOutput(enum NxIniOutput output);
+NX_KIT_API void nx_ini_reload(void);
+NX_KIT_API const char* nx_ini_iniFile(void);
+NX_KIT_API const char* nx_ini_iniFileDir(void);
+NX_KIT_API const char* nx_ini_iniFilePath(void);
 
 //-------------------------------------------------------------------------------------------------
 #else // !defined(__cplusplus) // Included from ini.cpp
@@ -114,9 +114,9 @@ static CppIni cppIni;
 
 extern "C" {
 
-NX_KIT_API bool ini_isEnabled() { return IniConfig::isEnabled(); }
+NX_KIT_API bool nx_ini_isEnabled() { return IniConfig::isEnabled(); }
 
-NX_KIT_API void ini_setOutput(enum NxIniOutput output)
+NX_KIT_API void nx_ini_setOutput(enum NxIniOutput output)
 {
     switch (output)
     {
@@ -129,10 +129,10 @@ NX_KIT_API void ini_setOutput(enum NxIniOutput output)
     }
 }
 
-NX_KIT_API void ini_reload() { cppIni.reload(); }
-NX_KIT_API const char* ini_iniFile() { return cppIni.iniFile(); }
-NX_KIT_API const char* ini_iniFileDir() { return cppIni.iniFileDir(); }
-NX_KIT_API const char* ini_iniFilePath() { return cppIni.iniFilePath(); }
+NX_KIT_API void nx_ini_reload() { cppIni.reload(); }
+NX_KIT_API const char* nx_ini_iniFile() { return cppIni.iniFile(); }
+NX_KIT_API const char* nx_ini_iniFileDir() { return cppIni.iniFileDir(); }
+NX_KIT_API const char* nx_ini_iniFilePath() { return cppIni.iniFilePath(); }
 
 } // extern "C"
 
