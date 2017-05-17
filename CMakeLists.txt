@@ -85,6 +85,8 @@ nx_rdep_add_package(any/qtservice)
 nx_rdep_add_package(any/qtsinglecoreapplication)
 nx_rdep_add_package(any/qtsingleapplication)
 
+nx_rdep_add_package(any/nx_kit)
+
 find_package(Qt5
     COMPONENTS
         LinguistTools

@@ -10,7 +10,9 @@ nx_configure_file(
 nx_add_target(nx_network LIBRARY ${library_type}
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/app_info_impl.cpp"
-    PUBLIC_LIBS nx_streaming udt)
+    PUBLIC_LIBS
+        nx_kit
+        nx_streaming udt)
 
 target_compile_definitions(nx_network
     PRIVATE NX_NETWORK_API=${API_EXPORT_MACRO}
