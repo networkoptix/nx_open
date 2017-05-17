@@ -34,7 +34,7 @@ protected:
 
     void givenUnavailableEndpoint()
     {
-        m_endpoint = SocketAddress(HostAddress::localhost, 37);
+        m_endpoint = SocketAddress("example.com", 37);
 
         m_verificator->setTimeout(std::chrono::milliseconds(100));
     }

@@ -17,90 +17,6 @@ namespace test {
 
 namespace {
 
-#if 0
-class TestConnection:
-    public nx::network::server::BaseServerConnection<TestConnection>
-{
-    using base_type = nx::network::server::BaseServerConnection<TestConnection>;
-
-public:
-    TestConnection(
-        nx::network::server::StreamConnectionHolder<TestConnection>* connectionManager,
-        std::unique_ptr<AbstractStreamSocket> streamSocket)
-        :
-        base_type(connectionManager, std::move(streamSocket))
-    {
-    }
-
-    void readyToSendData()
-    {
-        // TODO
-    }
-
-    void bytesReceived(const nx::Buffer& /*buf*/)
-    {
-        // TODO
-    }
-};
-
-//-------------------------------------------------------------------------------------------------
-
-class TestServer:
-    public nx::network::server::StreamSocketServer<TestServer, TestConnection>
-{
-    using base_type = server::StreamSocketServer<TestServer, TestConnection>;
-
-public:
-    TestServer():
-        base_type(false, NatTraversalSupport::disabled)
-    {
-        m_randomData.resize(100);
-    }
-
-    void sendAnythingThroughAnyConnection()
-    {
-        QnMutexLocker lock(&m_mutex);
-        (*m_connections.begin())->sendBufAsync(m_randomData);
-    }
-
-    std::size_t connectionCount() const
-    {
-        QnMutexLocker lock(&m_mutex);
-        return m_connections.size();
-    }
-
-protected:
-    virtual std::shared_ptr<TestConnection> createConnection(
-        std::unique_ptr<AbstractStreamSocket> _socket) override
-    {
-        auto connection = std::make_shared<TestConnection>(this, std::move(_socket));
-        {
-            QnMutexLocker lock(&m_mutex);
-            m_connections.erase(connection.get());
-        }
-        return connection;
-    }
-
-    virtual void closeConnection(
-        SystemError::ErrorCode closeReason,
-        TestConnection* connection) override
-    {
-        {
-            QnMutexLocker lock(&m_mutex);
-            m_connections.erase(connection);
-        }
-        base_type::closeConnection(closeReason, connection);
-    }
-
-private:
-    mutable QnMutex m_mutex;
-    std::set<TestConnection*> m_connections;
-    nx::Buffer m_randomData;
-};
-#endif
-
-//-------------------------------------------------------------------------------------------------
-
 class ReverseConnection;
 
 class ReverseConnectionPool
@@ -146,6 +62,8 @@ private:
     mutable QnMutex m_mutex;
     std::set<ReverseConnection*> m_connections;
 };
+
+//-------------------------------------------------------------------------------------------------
 
 class ReverseConnection:
     public aio::BasicPollable,
