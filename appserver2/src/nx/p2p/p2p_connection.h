@@ -62,7 +62,7 @@ public:
         const ApiPeerDataEx& remotePeer,
         const ApiPeerDataEx& localPeer,
         ConnectionLockGuard connectionLockGuard,
-        const nx::network::WebSocketPtr& webSocket,
+        nx::network::WebSocketPtr webSocket,
         std::unique_ptr<QObject> opaqueObject);
     virtual ~Connection();
 

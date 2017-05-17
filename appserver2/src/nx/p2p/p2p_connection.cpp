@@ -78,13 +78,13 @@ Connection::Connection(
     const ApiPeerDataEx& remotePeer,
     const ApiPeerDataEx& localPeer,
     ConnectionLockGuard connectionLockGuard,
-    const nx::network::WebSocketPtr& webSocket,
+    nx::network::WebSocketPtr webSocket,
     std::unique_ptr<QObject> opaqueObject)
 :
     QnCommonModuleAware(commonModule),
     m_remotePeer(remotePeer),
     m_localPeer(localPeer),
-    m_webSocket(webSocket),
+    m_webSocket(std::move(webSocket)),
     m_state(State::Connected),
     m_direction(Direction::incoming),
     m_opaqueObject(std::move(opaqueObject))
