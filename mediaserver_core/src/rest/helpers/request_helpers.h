@@ -1,7 +1,7 @@
 #pragma once
 
 #include <network/router.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/utils/system_error.h>
 #include <core/resource/resource_fwd.h>

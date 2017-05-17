@@ -7,7 +7,7 @@
 #include "core/resource/media_server_resource.h"
 #include "nx/fusion/serialization/json.h"
 #include <nx/fusion/model_functions.h>
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "network/router.h"
 #include "api/app_server_connection.h"
 

@@ -132,6 +132,10 @@ enum AttributeType
     tunnelInactivityTimeout,
     tcpConnectionKeepAlive,
 
+    udpHolePunchingStartDelay,
+    trafficRelayingStartDelay,
+    directTcpConnectStartDelay,
+
     systemErrorCode = stun::attrs::userDefined + 0x500,
 };
 

@@ -27,7 +27,7 @@
 
 #include <utils/common/app_info.h>
 #include "core/resource/storage_resource.h"
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "resource_status_watcher.h"
 #include <media_server/media_server_module.h>
 

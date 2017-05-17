@@ -11,7 +11,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include <utils/math/math.h>
 #include <nx/utils/custom_output_stream.h>
 

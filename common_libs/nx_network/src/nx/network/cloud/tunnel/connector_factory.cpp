@@ -41,6 +41,7 @@ CloudConnectors ConnectorFactory::defaultFunc(
             targetAddress,
             connectSessionId,
             std::move(udpSocket));
+        context.startDelay = response.params.udpHolePunchingStartDelay;
         connectors.emplace_back(std::move(context));
     }
 
@@ -50,6 +51,7 @@ CloudConnectors ConnectorFactory::defaultFunc(
         TunnelConnectorContext context;
         context.connector = std::make_unique<tcp::DirectEndpointConnector>(
             targetAddress, connectSessionId);
+        context.startDelay = response.params.directTcpConnectStartDelay;
         connectors.emplace_back(std::move(context));
     }
 
@@ -59,6 +61,7 @@ CloudConnectors ConnectorFactory::defaultFunc(
         TunnelConnectorContext context;
         context.connector = std::make_unique<relay::Connector>(
             *response.trafficRelayUrl, targetAddress, connectSessionId);
+        context.startDelay = response.params.trafficRelayingStartDelay;
         connectors.emplace_back(std::move(context));
     }
 

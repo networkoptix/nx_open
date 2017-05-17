@@ -22,7 +22,7 @@
 #include <nx/utils/time.h>
 
 #include <common/common_globals.h> //for Qn::SerializationFormat
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include <utils/common/app_info.h>
 #include <nx/utils/scope_guard.h>
 
