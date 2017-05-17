@@ -11,6 +11,8 @@
 #include <business/business_resource_validation.h>
 #include <business/business_types_comparator.h>
 
+#include <client_core/client_core_module.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
@@ -101,16 +103,16 @@ void QnSelectResourcesDialogButton::paintEvent(QPaintEvent *event)
 QnBusinessRuleItemDelegate::QnBusinessRuleItemDelegate(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_lexComparator(new QnBusinessTypesComparator())
+    m_lexComparator(new QnBusinessTypesComparator()),
+    m_businessStringsHelper(new QnBusinessStringsHelper(qnClientCoreModule->commonModule()))
 {
 }
 
 QnBusinessRuleItemDelegate::~QnBusinessRuleItemDelegate()
 {
-
 }
 
-int QnBusinessRuleItemDelegate::optimalWidth(int column, const QFontMetrics &metrics)
+int QnBusinessRuleItemDelegate::optimalWidth(int column, const QFontMetrics& /*metrics*/)
 {
     const int kExtraSpace =
         style::Metrics::kStandardPadding //< dropdown text indent
@@ -244,8 +246,8 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
             QComboBox* comboBox = new QComboBox(parent);
             comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
             //TODO: #GDM #3.1 #refactor table
-//             for (QnBusiness::EventType eventType : m_lexComparator->lexSortedEvents())
-//                 comboBox->addItem(QnBusinessStringsHelper::eventName(eventType), eventType);
+            for (QnBusiness::EventType eventType : m_lexComparator->lexSortedEvents())
+                comboBox->addItem(m_businessStringsHelper->eventName(eventType), eventType);
             return comboBox;
         }
         case QnBusiness::ActionColumn:
@@ -258,7 +260,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                 if (instantOnly && !QnBusiness::canBeInstant(actionType))
                     continue;
                 //TODO: #GDM #3.1 #refactor table
-//                comboBox->addItem(QnBusinessStringsHelper::actionName(actionType), actionType);
+                comboBox->addItem(m_businessStringsHelper->actionName(actionType), actionType);
             }
             return comboBox;
         }
