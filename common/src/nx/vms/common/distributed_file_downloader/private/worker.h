@@ -55,13 +55,13 @@ public:
 
     bool haveChunksToDownload();
 
-    /*! Forced peers are peers from which the worker will choose to perform the operation.
+    /*! Peers from which the worker will choose to perform the operation.
         All other peers from the peer manager will be ignored.
         This is used by updates manager to prevent the downloader from looking for files
         on peers which cannot contain an apropriate update file, e.g. ignore Linux servers
         when looking for updates for a Windows server. */
-    QList<QnUuid> forcedPeers() const;
-    void setForcedPeers(const QList<QnUuid>& forcedPeers);
+    QList<QnUuid> peers() const;
+    void setPeers(const QList<QnUuid>& peers);
 
     /*! Preferred peers could be used to hint the worker where to find the file.
         This is used similarly to forced peers but does not limit the worker in selecting
@@ -96,13 +96,14 @@ private:
 protected:
     FileInformation fileInformation() const;
 
-    QList<QnUuid> allPeers() const;
-    QList<QnUuid> allPeersWithInternetConnection() const;
+    QList<QnUuid> peersWithInternetConnection() const;
     QList<QnUuid> selectPeersForOperation(
-        int count = -1, const QList<QnUuid>& referencePeers = QList<QnUuid>()) const;
+        int count = -1, QList<QnUuid> peers = QList<QnUuid>()) const;
     int selectNextChunk() const;
 
-    bool haveInternet() const;
+    bool isInternetAvailable(const QList<QnUuid>& peers = QList<QnUuid>()) const;
+    bool isFileReadyForInternetDownload() const;
+    QList<QnUuid> selectPeersForInternetDownload() const;
 
     virtual void waitForNextStep(int delay = -1);
 
@@ -138,7 +139,7 @@ private:
         void decreaseRank(int value = 1);
     };
     QHash<QnUuid, PeerInformation> m_peerInfoById;
-    QList<QnUuid> m_forcedPeers;
+    QList<QnUuid> m_peers;
 };
 
 } // namespace distributed_file_downloader

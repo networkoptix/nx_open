@@ -179,14 +179,14 @@ bool Worker::haveChunksToDownload()
     return false;
 }
 
-QList<QnUuid> Worker::forcedPeers() const
+QList<QnUuid> Worker::peers() const
 {
-    return m_forcedPeers;
+    return m_peers;
 }
 
-void Worker::setForcedPeers(const QList<QnUuid>& forcedPeers)
+void Worker::setPeers(const QList<QnUuid>& peers)
 {
-    m_forcedPeers = forcedPeers;
+    m_peers = peers;
 }
 
 void Worker::setPreferredPeers(const QList<QnUuid>& preferredPeers)
@@ -296,7 +296,7 @@ void Worker::requestFileInformationInternal()
     if (peers.isEmpty())
     {
         if (m_state == State::requestingAvailableChunks
-            && m_peerManager->hasInternetConnection(m_peerManager->selfId()))
+            && !selectPeersForInternetDownload().isEmpty())
         {
             setState(State::foundAvailableChunks);
             waitForNextStep(0);
@@ -330,23 +330,15 @@ void Worker::requestFileInformationInternal()
                     if (m_state == State::requestingFileInformation
                         || m_state == State::requestingAvailableChunks)
                     {
-                        if (!haveInternet())
+                        if (isFileReadyForInternetDownload()
+                            && !selectPeersForInternetDownload().isEmpty())
                         {
-                            waitForNextStep();
-                            return;
-                        }
 
-                        const auto& fileInfo = fileInformation();
-                        if (fileInfo.size > 0
-                            && !fileInfo.md5.isEmpty()
-                            && fileInfo.chunkSize > 0
-                            && fileInfo.url.isValid()
-                            && !m_availableChunks.isEmpty())
-                        {
                             setState(State::foundAvailableChunks);
                             waitForNextStep(0);
                         }
 
+                        waitForNextStep();
                         return;
                     }
 
@@ -535,11 +527,7 @@ void Worker::downloadNextChunk()
     if (peers.isEmpty() && fileInfo.url.isValid())
     {
         useInternet = true;
-
-        if (m_peerManager->hasInternetConnection(m_peerManager->selfId()))
-            peers = {m_peerManager->selfId()};
-        else
-            peers = allPeersWithInternetConnection();
+        peers = selectPeersForInternetDownload();
     }
     peers = selectPeersForOperation(1, peers);
     NX_ASSERT(!peers.isEmpty());
@@ -710,28 +698,20 @@ FileInformation Worker::fileInformation() const
     return fileInfo;
 }
 
-QList<QnUuid> Worker::allPeers() const
-{
-    return m_forcedPeers.isEmpty()
-        ? m_peerManager->getAllPeers()
-        : m_forcedPeers;
-}
-
-QList<QnUuid> Worker::allPeersWithInternetConnection() const
+QList<QnUuid> Worker::peersWithInternetConnection() const
 {
     QList<QnUuid> result;
 
-    for (const auto& peer: allPeers())
+    for (const auto& peerId: m_peerManager->getAllPeers())
     {
-        if (m_peerManager->hasInternetConnection(peer))
-            result.append(peer);
+        if (m_peerManager->hasInternetConnection(peerId))
+            result.append(peerId);
     }
 
     return result;
 }
 
-QList<QnUuid> Worker::selectPeersForOperation(
-    int count, const QList<QnUuid>& referencePeers) const
+QList<QnUuid> Worker::selectPeersForOperation(int count, QList<QnUuid> peers) const
 {
     QList<QnUuid> result;
 
@@ -742,7 +722,9 @@ QList<QnUuid> Worker::selectPeersForOperation(
                 NX_LOG(logMessage("No peers selected."), cl_logDEBUG2);
         });
 
-    auto peers = referencePeers.isEmpty() ? allPeers() : referencePeers;
+    if (peers.isEmpty())
+        peers = m_peers;
+
     if (count <= 0)
         count = m_peersPerOperation;
 
@@ -882,18 +864,52 @@ int Worker::selectNextChunk() const
     return firstMetNotDownloadedChunk;
 }
 
-bool Worker::haveInternet() const
+bool Worker::isInternetAvailable(const QList<QnUuid>& peers) const
 {
-    if (m_peerManager->hasInternetConnection(m_peerManager->selfId()))
-        return true;
-
-    for (const auto& peerId: m_peerManager->getAllPeers())
+    if (!peers.isEmpty())
     {
-        if (m_peerManager->hasInternetConnection(peerId))
+        for (const auto& peerId: peers)
+        {
+            if (m_peerManager->hasInternetConnection(peerId))
+                return true;
+        }
+    }
+    else
+    {
+        if (m_peerManager->hasInternetConnection(m_peerManager->selfId()))
             return true;
+
+        for (const auto& peerId: m_peerManager->getAllPeers())
+        {
+            if (m_peerManager->hasInternetConnection(peerId))
+                return true;
+        }
     }
 
     return false;
+}
+
+bool Worker::isFileReadyForInternetDownload() const
+{
+    const auto& fileInfo = fileInformation();
+    return fileInfo.size > 0
+        && !fileInfo.md5.isEmpty()
+        && fileInfo.chunkSize > 0
+        && fileInfo.url.isValid()
+            && !m_availableChunks.isEmpty();
+}
+
+QList<QnUuid> Worker::selectPeersForInternetDownload() const
+{
+    if (m_peerManager->hasInternetConnection(m_peerManager->selfId()))
+        return {m_peerManager->selfId()};
+
+    const auto& peers = peersWithInternetConnection();
+
+    if (m_peers.toSet().intersects(peers.toSet()))
+        return {};
+
+    return peers;
 }
 
 void Worker::waitForNextStep(int delay)
