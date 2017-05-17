@@ -27,6 +27,11 @@ WebSocket::WebSocket(
     m_readBuffer.reserve(4096);
 }
 
+WebSocket::~WebSocket()
+{
+    pleaseStopSync();
+}
+
 void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     AbstractAsyncChannel::bindToAioThread(aioThread);

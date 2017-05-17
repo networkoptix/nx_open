@@ -46,6 +46,8 @@ public:
         ReceiveMode receiveMode = ReceiveMode::message,
         Role role = Role::undefined); /**< if role is undefined, payload won't be masked (unmasked) */
 
+    ~WebSocket();
+
     virtual void readSomeAsync(nx::Buffer* const buffer, HandlerType handler) override;
     virtual void sendAsync(const nx::Buffer& buffer, HandlerType handler) override;
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
