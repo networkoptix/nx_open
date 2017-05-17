@@ -27,6 +27,7 @@ protected:
         ASSERT_TRUE(server->startAndWaitUntilStarted());
 
         const auto module = server->moduleInstance().get();
+        ASSERT_TRUE(module);
         initServerData(module);
         NX_ALWAYS(this, lm("Server %1 started at %2").args(
             module->commonModule()->moduleGUID(), server->moduleInstance()->endpoint()));
@@ -39,15 +40,19 @@ protected:
     {
         QnSoftwareVersion version(1, 2, 3, 123);
         const auto connection = module->ecConnection();
+        ASSERT_TRUE(connection);
+
+        const auto resourceManager = connection->getResourceManager(Qn::kSystemAccess);
+        ASSERT_TRUE(resourceManager);
 
         QList<QnResourceTypePtr> resourceTypeList;
-        ASSERT_EQ(ec2::ErrorCode::ok, connection->getResourceManager(Qn::kSystemAccess)
-             ->getResourceTypesSync(&resourceTypeList));
+        ASSERT_EQ(ec2::ErrorCode::ok, resourceManager->getResourceTypesSync(&resourceTypeList));
         qnResTypePool->replaceResourceTypeList(resourceTypeList);
 
-        ec2::ApiMediaServerData serverData;
         auto resTypePtr = qnResTypePool->getResourceTypeByName("Server");
         ASSERT_TRUE(!resTypePtr.isNull());
+
+        ec2::ApiMediaServerData serverData;
         serverData.typeId = resTypePtr->getId();
         serverData.id = module->commonModule()->moduleGUID();
         serverData.authKey = QnUuid::createUuid().toString();
@@ -99,7 +104,7 @@ protected:
 
                     #ifdef Q_OS_MAC
                         // Can join different UDT sockets to the same multicast group on OSX
-                        NX_WARNING(TAG, error);
+                        NX_WARNING(this, error);
                     #else
                         FAIL() << error.toStdString();
                     #endif
