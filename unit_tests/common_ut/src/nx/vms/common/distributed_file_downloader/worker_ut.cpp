@@ -433,15 +433,15 @@ TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadFlatNetwork)
     } while (!pendingPeers.isEmpty()
         && commonPeerManager->requestCounter()->totalRequests() < maxRequests);
 
-    commonPeerManager->requestCounter()->printCounters(
-        "Incoming Requests:", commonPeerManager.data());
-
     for (auto& peer: peerById)
     {
         peer->peerManager->requestCounter()->printCounters(
             "Outgoing requests from " + commonPeerManager->peerString(peer->id),
             commonPeerManager.data());
     }
+
+    commonPeerManager->requestCounter()->printCounters(
+        "Incoming Requests:", commonPeerManager.data());
 
     ASSERT_EQ(pendingPeers.size(), 0);
     ASSERT_LE(commonPeerManager->requestCounter()->totalRequests(), maxRequests);
