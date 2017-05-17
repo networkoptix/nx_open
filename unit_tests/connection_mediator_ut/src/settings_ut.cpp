@@ -128,6 +128,15 @@ TEST_F(Settings, nat_traversal_method_delay)
     ASSERT_EQ(milliseconds(999), settings().connectionParameters().directTcpConnectStartDelay);
 }
 
+TEST_F(Settings, traffic_relay_url)
+{
+    const std::string relayUrl = "http://nxvms.com/relay";
+
+    addSetting("--trafficRelay/url="+relayUrl);
+    loadSettings();
+    ASSERT_EQ(relayUrl, settings().trafficRelay().url.toStdString());
+}
+
 } // namespace test
 } // namespace conf
 } // namespace hpm

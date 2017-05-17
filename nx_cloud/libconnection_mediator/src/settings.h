@@ -69,6 +69,11 @@ struct Statistics
     }
 };
 
+struct TrafficRelay
+{
+    QString url;
+};
+
 /**
  * Extends api::ConnectionParameters with mediator-only parameters.
  */
@@ -96,22 +101,24 @@ public:
     virtual nx::utils::log::Settings logging() const override;
 
     const General& general() const;
-    const CloudDB& cloudDB() const;
+    const CloudDb& cloudDB() const;
     const Stun& stun() const;
     const Http& http() const;
     const ConnectionParameters& connectionParameters() const;
     const nx::db::ConnectionOptions& dbConnectionOptions() const;
     const Statistics& statistics() const;
+    const TrafficRelay& trafficRelay() const;
 
 private:
     General m_general;
     nx::utils::log::Settings m_logging;
-    CloudDB m_cloudDB;
+    CloudDb m_cloudDB;
     Stun m_stun;
     Http m_http;
     ConnectionParameters m_connectionParameters;
     nx::db::ConnectionOptions m_dbConnectionOptions;
     Statistics m_statistics;
+    TrafficRelay m_trafficRelay;
 
     virtual void loadSettings() override;
 
@@ -120,6 +127,7 @@ private:
         const QString& str,
         std::list<SocketAddress>* const addrToListenList);
     void loadConnectionParameters();
+    void loadTrafficRelay();
 };
 
 } // namespace conf

@@ -132,6 +132,11 @@ const QLatin1String kRead("cloudConnect/tcpReverseHttpTimeouts/read");
 const QLatin1String kBody("cloudConnect/tcpReverseHttpTimeouts/body");
 
 } // namespace tcp_reverse_http_timeouts
+
+// Traffic Relay - related settings.
+
+const QLatin1String kTrafficRelayUrl("trafficRelay/url");
+
 } // namespace 
 
 namespace nx {
@@ -196,6 +201,11 @@ const nx::db::ConnectionOptions& Settings::dbConnectionOptions() const
 const Statistics& Settings::statistics() const
 {
     return m_statistics;
+}
+
+const TrafficRelay& Settings::trafficRelay() const
+{
+    return m_trafficRelay;
 }
 
 void Settings::initializeWithDefaultValues()
@@ -277,6 +287,8 @@ void Settings::loadSettings()
     m_statistics.enabled = settings().value(kStatisticsEnabled, kDefaultStatisticsEnabled).toBool();
 
     loadConnectionParameters();
+
+    loadTrafficRelay();
 
     //analyzing values
     if (m_general.dataDir.isEmpty())
@@ -367,6 +379,11 @@ void Settings::loadConnectionParameters()
         nx::utils::parseTimerDuration(
             settings().value(kDirectTcpConnectStartDelay).toString(),
             kDirectTcpConnectStartDelayDefault);
+}
+
+void Settings::loadTrafficRelay()
+{
+    m_trafficRelay.url = settings().value(kTrafficRelayUrl).toString();
 }
 
 void Settings::readEndpointList(
