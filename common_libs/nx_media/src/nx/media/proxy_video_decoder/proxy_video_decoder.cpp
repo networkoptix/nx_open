@@ -1,7 +1,7 @@
 #include "proxy_video_decoder.h"
 #if defined(ENABLE_PROXY_DECODER)
 
-#include <nx/utils/debug_utils.h>
+#include <nx/kit/debug.h>
 
 #include "proxy_video_decoder_utils.h"
 #include "proxy_video_decoder_impl.h"
@@ -11,42 +11,40 @@ namespace media {
 
 namespace {
 
-static constexpr const char* OUTPUT_PREFIX = "ProxyVideoDecoder: ";
-
 static ProxyVideoDecoderImpl* createProxyVideoDecoderImpl(
     const ProxyVideoDecoderImpl::Params& params)
 {
     int flagsCount =
-        (int) conf.implStub +
-        (int) conf.implDisplay +
-        (int) conf.implRgb +
-        (int) conf.implYuvPlanar +
-        (int) conf.implYuvNative +
-        (int) conf.implGl;
+        (int) ini().implStub +
+        (int) ini().implDisplay +
+        (int) ini().implRgb +
+        (int) ini().implYuvPlanar +
+        (int) ini().implYuvNative +
+        (int) ini().implGl;
 
     if (flagsCount > 1)
     {
-        PRINT << "More than one impl... flag is set in .ini; using STUB w/o libproxydecoder";
+        NX_PRINT << "More than one impl... flag is set in .ini; using STUB w/o libproxydecoder";
         return ProxyVideoDecoderImpl::createImplStub(params);
     }
 
     if (flagsCount == 0)
     {
-        PRINT << "No impl... flag is set in .ini; using STUB w/o libproxydecoder";
+        NX_PRINT << "No impl... flag is set in .ini; using STUB w/o libproxydecoder";
         return ProxyVideoDecoderImpl::createImplStub(params);
     }
 
-    if (conf.implStub)
+    if (ini().implStub)
         return ProxyVideoDecoderImpl::createImplStub(params);
-    if (conf.implDisplay)
+    if (ini().implDisplay)
         return ProxyVideoDecoderImpl::createImplDisplay(params);
-    if (conf.implRgb)
+    if (ini().implRgb)
         return ProxyVideoDecoderImpl::createImplRgb(params);
-    if (conf.implYuvPlanar)
+    if (ini().implYuvPlanar)
         return ProxyVideoDecoderImpl::createImplYuvPlanar(params);
-    if (conf.implYuvNative)
+    if (ini().implYuvNative)
         return ProxyVideoDecoderImpl::createImplYuvNative(params);
-    if (conf.implGl)
+    if (ini().implGl)
         return ProxyVideoDecoderImpl::createImplGl(params);
 
     NX_CRITICAL(false);
@@ -64,7 +62,7 @@ ProxyVideoDecoder::ProxyVideoDecoder(
     // Checked by isCompatible().
     NX_CRITICAL(resolution.width() % 2 == 0 && resolution.height() % 2 == 0);
 
-    conf.reload();
+    ini().reload();
 
     ProxyVideoDecoderImpl::Params params;
     params.owner = this;
@@ -83,21 +81,20 @@ bool ProxyVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolut
     if (!calledOnce)
     {
         calledOnce = true;
-        conf.reload();
-        conf.skipNextReload();
+        ini().reload();
     }
 
-    if (conf.disable)
+    if (ini().disable)
     {
-        PRINT << "isCompatible(codec: " << codec << ", resolution: " << resolution
-            << ") -> false: conf.disable is set";
+        NX_PRINT << "isCompatible(codec: " << codec << ", resolution: " << resolution
+            << ") -> false: ini().disable is set";
         return false;
     }
 
     // Odd frame dimensions are not tested and can be unsupported due to UV having half-res.
     if (resolution.width() % 2 != 0 || resolution.height() % 2 != 0)
     {
-        OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
+        NX_OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
             << ") -> false: only even width and height is supported";
         return false;
     }
@@ -105,7 +102,7 @@ bool ProxyVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolut
     QSize maxRes = maxResolution(codec);
     if (resolution.width() > maxRes.width() || resolution.height() > maxRes.height())
     {
-        OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
+        NX_OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
             << ") -> false: resolution is higher than "
             << maxRes.width() << " x " << maxRes.height();
         return false;
@@ -113,19 +110,19 @@ bool ProxyVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolut
 
     if (codec != AV_CODEC_ID_H264)
     {
-        OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
+        NX_OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
             << ") -> false: codec != AV_CODEC_ID_H264";
         return false;
     }
 
-    if (conf.largeOnly && resolution.width() <= 640)
+    if (ini().largeOnly && resolution.width() <= 640)
     {
-        PRINT << "isCompatible(codec: " << codec << ", resolution: " << resolution
-            << ") -> false: conf.largeOnly is set";
+        NX_PRINT << "isCompatible(codec: " << codec << ", resolution: " << resolution
+            << ") -> false: ini().largeOnly is set";
         return false;
     }
 
-    OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution << ") -> true";
+    NX_OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution << ") -> true";
     return true;
 }
 

@@ -10,7 +10,7 @@
 
 #define DEBUG_LOG(MESSAGE) do \
 { \
-    if (nx::network::SocketGlobals::debugConfig().cloudServerSocket) \
+    if (nx::network::SocketGlobals::debugIni().cloudServerSocket) \
         NX_LOGX(MESSAGE, cl_logDEBUG1); \
 } while (0)
 
