@@ -61,10 +61,10 @@
                                         <!--REMOVE WHEN NOT DEBUG-->
                                         <div class="min-40 inline">&nbsp;</div>
                                         <div class="btn-group pull-up-5">
-                                            <span class="video-icon pull-left-5" data-toggle="dropdown">
+                                            <span class="video-icon pull-left-5" data-toggle="dropdown" href="#">
                                                 <span class="glyphicon glyphicon-cog"></span>
                                             </span>
-                                            <ul class="dropdown-menu video-settings" >
+                                            <ul class="dropdown-menu video-settings" ng-class="{'no-fullscreen': !enableFullScreen}">
                                                 <li class="video-settings-36"><label>Quality</label></li>
                                                 <li class="video-settings-separation-line"></li>
                                                 <li ng-repeat="resolution in availableResolutions"><a href="#" class="video-settings-20" 
@@ -90,7 +90,7 @@
                                         <span class="visible-xs" ng-click="toggleCameraPanel=true" ng-class="{'back-button': !toggleCameraPanel}"><span class="glyphicon glyphicon-arrow-left"></span></span>
                                         <span class="caption-row video-name">
                                             <span ng-if="activeCamera.status!='Recording' && activeCamera.scheduleEnabled" class="danger video-status">&#x25E6;</span>
-                                            <span ng-if="1 || activeCamera.status=='Recording' " class="danger video-status">&#x25CF;</span>
+                                            <span ng-if="activeCamera.status=='Recording' " class="danger video-status">&#x25CF;</span>
                                             <span ng-if="activeCamera.status!='Recording' && !activeCamera.scheduleEnabled" class="video-status">&nbsp;</span>
                                             {{activeCamera.name + " (" + activeResolution + ")"}}
                                         </span>

@@ -389,6 +389,8 @@ angular.module('nxCommon').controller('ViewCtrl',
         },true);
 
         $scope.$watch('volumeLevel', function(){
+            if($scope.playerAPI)
+                $scope.playerAPI.volume($scope.volumeLevel);
             $scope.storage.volumeLevel = $scope.volumeLevel;
         });
 
@@ -477,5 +479,6 @@ angular.module('nxCommon').controller('ViewCtrl',
             $scope.session.ieNoWebmNotified = true;
             setTimeout(updateHeights,50);
         };
+        $('.video-icon.pull-left-5').dropdown();
 
     });
