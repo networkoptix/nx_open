@@ -104,6 +104,7 @@ protected:
     bool isInternetAvailable(const QList<QnUuid>& peers = QList<QnUuid>()) const;
     bool isFileReadyForInternetDownload() const;
     QList<QnUuid> selectPeersForInternetDownload() const;
+    bool needToFindBetterPeers() const;
 
     virtual void waitForNextStep(int delay = -1);
 
@@ -141,7 +142,8 @@ private:
     QHash<QnUuid, PeerInformation> m_peerInfoById;
     QList<QnUuid> m_peers;
 
-    int m_subsequentChunksToDownloadFromInternet = 0;
+    int m_subsequentChunksToDownload = -1;
+    bool m_usingInternet = false;
 };
 
 } // namespace distributed_file_downloader

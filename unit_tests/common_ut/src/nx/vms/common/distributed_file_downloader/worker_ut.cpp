@@ -19,7 +19,7 @@ namespace {
 
 static const QString kTestFileName("test.dat");
 static const qint64 kTestFileSize = 42;
-static const int kChunkSize = 4;
+static const int kChunkSize = 1;
 
 } // namespace
 
@@ -129,10 +129,9 @@ protected:
     }
 
     struct Peer;
-    Peer* createPeer(const QString& peerName = QString())
+    Peer* createPeer(
+        const QString& peerName = QString(), const QnUuid& peerId = QnUuid::createUuid())
     {
-        const auto peerId = QnUuid::createUuid();
-
         auto peerManager = new ProxyTestPeerManager(commonPeerManager.data(), peerId, peerName);
         auto storage = createStorage(peerId.toString());
         auto worker = new TestWorker(kTestFileName, storage, peerManager);
@@ -399,9 +398,14 @@ TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadFlatNetwork)
             pendingPeers.removeOne(defaultPeer->id);
         });
 
+    const auto& baseId = QUuid::createUuid();
+
+    QList<Peer*> peers{defaultPeer};
+
     for (int i = 1; i <= 10; ++i)
     {
-        auto peer = createPeer(lit("Peer %1").arg(i));
+        auto peer = createPeer(lit("Peer %1").arg(i), QnUuid::createUuidFromPool(baseId, i));
+        peers.append(peer);
         peerById[peer->id] = peer;
         peer->storage->addFile(fileInfo);
         commonPeerManager->setPeerGroups(peer->id, groups);
@@ -433,7 +437,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadFlatNetwork)
     } while (!pendingPeers.isEmpty()
         && commonPeerManager->requestCounter()->totalRequests() < maxRequests);
 
-    for (auto& peer: peerById)
+    for (auto& peer: peers)
     {
         peer->peerManager->requestCounter()->printCounters(
             "Outgoing requests from " + commonPeerManager->peerString(peer->id),

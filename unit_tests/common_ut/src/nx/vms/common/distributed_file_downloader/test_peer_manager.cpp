@@ -13,7 +13,7 @@ namespace distributed_file_downloader {
 namespace {
 
 static const auto kNullGuid = QnUuid();
-static constexpr int kDefaultRequestTime = 50;
+static constexpr int kDefaultRequestTime = 200;
 
 } // namespace
 
@@ -475,8 +475,7 @@ void RequestCounter::printCounters(const QString& header, TestPeerManager* peerM
     out << "---------------------------------------------------\n";
 
     auto peers = counters[Total].keys();
-    peers.removeOne(kNullGuid);
-    peers.prepend(kNullGuid);
+    std::sort(peers.begin(), peers.end());
     for (const auto& peerId: peers)
     {
         for (int type = FirstRequestType; type < RequestTypesCount; ++type)
