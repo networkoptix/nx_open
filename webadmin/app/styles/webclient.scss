@@ -960,9 +960,6 @@ camera-panel.visible-xs{
 .server-link>*{
   vertical-align: middle;
 }
-.server-link .glyphicon{
-  top: 6px;
-}
 
 .server-link small{
   font-size: 12px;
@@ -980,10 +977,6 @@ camera-panel.visible-xs{
   line-height: 22px;
 }
 
-.pull-up-4{
-  margin-top: -4px;
-}
-
 .server-link > .pull-right{
-  margin-top: -4px;
+  margin-top: 2px;
 }
