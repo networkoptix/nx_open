@@ -431,11 +431,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadFlatNetwork)
     for (auto& peer: peerById)
         peer->worker->start();
 
-    do
-    {
-        commonPeerManager->processNextRequest();
-    } while (!pendingPeers.isEmpty()
-        && commonPeerManager->requestCounter()->totalRequests() < maxRequests);
+    commonPeerManager->exec(maxRequests);
 
     for (auto& peer: peers)
     {
