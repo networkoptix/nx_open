@@ -121,7 +121,7 @@ private:
     ApiPeerDataEx m_localPeer;
 
     nx::network::WebSocketPtr m_webSocket;
-    std::atomic<State> m_state = State::Connecting;
+    std::atomic<State> m_state{State::Connecting};
 
     Direction m_direction;
     ConnectionContext m_context;

@@ -72,8 +72,8 @@ struct PeerNumberResponseRecord: public ec2::ApiPersistentIdData
 {
     PeerNumberResponseRecord() {}
     PeerNumberResponseRecord(PeerNumberType peerNumber, const ec2::ApiPersistentIdData& id):
-        peerNumber(peerNumber),
-        ec2::ApiPersistentIdData(id)
+        ec2::ApiPersistentIdData(id),
+        peerNumber(peerNumber)
     {
     }
 
