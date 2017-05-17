@@ -119,6 +119,7 @@ private:
     void readEndpointList(
         const QString& str,
         std::list<SocketAddress>* const addrToListenList);
+    void loadConnectionParameters();
 };
 
 } // namespace conf

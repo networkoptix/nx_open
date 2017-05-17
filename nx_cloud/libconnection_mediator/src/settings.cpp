@@ -102,6 +102,20 @@ const QLatin1String kConnectionResultWaitTimeout("cloudConnect/connectionResultW
 constexpr const std::chrono::seconds kDefaultConnectionResultWaitTimeout = 
     std::chrono::seconds(15);
 
+// Cloud connect methods start delays.
+
+const QLatin1String kUdpHolePunchingStartDelay("cloudConnect/udpHolePunchingStartDelay");
+constexpr const std::chrono::milliseconds kUdpHolePunchingStartDelayDefault =
+    nx::hpm::api::kUdpHolePunchingStartDelayDefault;
+
+const QLatin1String kTrafficRelayingStartDelay("cloudConnect/trafficRelayingStartDelay");
+constexpr const std::chrono::milliseconds kTrafficRelayingStartDelayDefault =
+    nx::hpm::api::kTrafficRelayingStartDelayDefault;
+
+const QLatin1String kDirectTcpConnectStartDelay("cloudConnect/directTcpConnectStartDelay");
+constexpr const std::chrono::milliseconds kDirectTcpConnectStartDelayDefault =
+    nx::hpm::api::kDirectTcpConnectStartDelayDefault;
+
 namespace tcp_reverse_retry_policy {
 
 const QLatin1String kMaxCount("cloudConnect/tcpReverseRetryPolicy/maxCount");
@@ -262,62 +276,7 @@ void Settings::loadSettings()
     //Statistics
     m_statistics.enabled = settings().value(kStatisticsEnabled, kDefaultStatisticsEnabled).toBool();
 
-    m_connectionParameters.rendezvousConnectTimeout =
-        nx::utils::parseTimerDuration(
-            settings().value(kRendezvousConnectTimeout).toString(),
-            kDefaultRendezvousConnectTimeout);
-    m_connectionParameters.udpTunnelKeepAliveInterval =
-        nx::utils::parseTimerDuration(
-            settings().value(kUdpTunnelKeepAliveInterval).toString(),
-            kDefaultUdpTunnelKeepAliveInterval);
-    m_connectionParameters.udpTunnelKeepAliveRetries = settings().value(
-        kUdpTunnelKeepAliveRetries,
-        kDefaultUdpTunnelKeepAliveRetries).toInt();
-    m_connectionParameters.tunnelInactivityTimeout = 
-        duration_cast<seconds>(
-            nx::utils::parseTimerDuration(
-                settings().value(kTunnelInactivityTimeout).toString(),
-                kDefaultTunnelInactivityTimeout));
-
-    m_connectionParameters.tcpReverseRetryPolicy.maxRetryCount =
-        settings().value(
-            tcp_reverse_retry_policy::kMaxCount,
-            network::RetryPolicy::kDefaultMaxRetryCount).toInt();
-    m_connectionParameters.tcpReverseRetryPolicy.initialDelay = 
-        nx::utils::parseTimerDuration(settings().value(
-            tcp_reverse_retry_policy::kInitialDelay).toString(),
-        network::RetryPolicy::kDefaultInitialDelay);
-    m_connectionParameters.tcpReverseRetryPolicy.delayMultiplier =
-        settings().value(
-            tcp_reverse_retry_policy::kDelayMultiplier,
-            network::RetryPolicy::kDefaultDelayMultiplier).toInt();
-    m_connectionParameters.tcpReverseRetryPolicy.maxDelay =
-        nx::utils::parseTimerDuration(settings().value(
-            tcp_reverse_retry_policy::kMaxDelay).toString(),
-        network::RetryPolicy::kDefaultMaxDelay);
-
-    m_connectionParameters.tcpReverseHttpTimeouts.sendTimeout =
-        nx::utils::parseTimerDuration(settings().value(
-            tcp_reverse_http_timeouts::kSend).toString(),
-        nx_http::AsyncHttpClient::Timeouts::kDefaultSendTimeout);
-    m_connectionParameters.tcpReverseHttpTimeouts.responseReadTimeout =
-        nx::utils::parseTimerDuration(settings().value(
-            tcp_reverse_http_timeouts::kRead).toString(),
-        nx_http::AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout);
-    m_connectionParameters.tcpReverseHttpTimeouts.messageBodyReadTimeout =
-        nx::utils::parseTimerDuration(settings().value(
-            tcp_reverse_http_timeouts::kBody).toString(),
-        nx_http::AsyncHttpClient::Timeouts::kDefaultMessageBodyReadTimeout);
-
-    m_connectionParameters.connectionAckAwaitTimeout =
-        nx::utils::parseTimerDuration(
-            settings().value(kConnectionAckAwaitTimeout).toString(),
-            kDefaultConnectionAckAwaitTimeout);
-
-    m_connectionParameters.connectionResultWaitTimeout =
-        nx::utils::parseTimerDuration(
-            settings().value(kConnectionResultWaitTimeout).toString(),
-            kDefaultConnectionResultWaitTimeout);
+    loadConnectionParameters();
 
     //analyzing values
     if (m_general.dataDir.isEmpty())
@@ -330,6 +289,84 @@ void Settings::loadSettings()
         m_general.dataDir = dataDirList.isEmpty() ? QString() : dataDirList[0];
 #endif
     }
+}
+
+void Settings::loadConnectionParameters()
+{
+    using namespace std::chrono;
+
+    m_connectionParameters.rendezvousConnectTimeout =
+        nx::utils::parseTimerDuration(
+            settings().value(kRendezvousConnectTimeout).toString(),
+            kDefaultRendezvousConnectTimeout);
+    m_connectionParameters.udpTunnelKeepAliveInterval =
+        nx::utils::parseTimerDuration(
+            settings().value(kUdpTunnelKeepAliveInterval).toString(),
+            kDefaultUdpTunnelKeepAliveInterval);
+    m_connectionParameters.udpTunnelKeepAliveRetries = settings().value(
+        kUdpTunnelKeepAliveRetries,
+        kDefaultUdpTunnelKeepAliveRetries).toInt();
+    m_connectionParameters.tunnelInactivityTimeout =
+        duration_cast<seconds>(
+            nx::utils::parseTimerDuration(
+                settings().value(kTunnelInactivityTimeout).toString(),
+                kDefaultTunnelInactivityTimeout));
+
+    m_connectionParameters.tcpReverseRetryPolicy.maxRetryCount =
+        settings().value(
+            tcp_reverse_retry_policy::kMaxCount,
+            network::RetryPolicy::kDefaultMaxRetryCount).toInt();
+    m_connectionParameters.tcpReverseRetryPolicy.initialDelay =
+        nx::utils::parseTimerDuration(settings().value(
+            tcp_reverse_retry_policy::kInitialDelay).toString(),
+            network::RetryPolicy::kDefaultInitialDelay);
+    m_connectionParameters.tcpReverseRetryPolicy.delayMultiplier =
+        settings().value(
+            tcp_reverse_retry_policy::kDelayMultiplier,
+            network::RetryPolicy::kDefaultDelayMultiplier).toInt();
+    m_connectionParameters.tcpReverseRetryPolicy.maxDelay =
+        nx::utils::parseTimerDuration(settings().value(
+            tcp_reverse_retry_policy::kMaxDelay).toString(),
+            network::RetryPolicy::kDefaultMaxDelay);
+
+    m_connectionParameters.tcpReverseHttpTimeouts.sendTimeout =
+        nx::utils::parseTimerDuration(settings().value(
+            tcp_reverse_http_timeouts::kSend).toString(),
+            nx_http::AsyncHttpClient::Timeouts::kDefaultSendTimeout);
+    m_connectionParameters.tcpReverseHttpTimeouts.responseReadTimeout =
+        nx::utils::parseTimerDuration(settings().value(
+            tcp_reverse_http_timeouts::kRead).toString(),
+            nx_http::AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout);
+    m_connectionParameters.tcpReverseHttpTimeouts.messageBodyReadTimeout =
+        nx::utils::parseTimerDuration(settings().value(
+            tcp_reverse_http_timeouts::kBody).toString(),
+            nx_http::AsyncHttpClient::Timeouts::kDefaultMessageBodyReadTimeout);
+
+    m_connectionParameters.connectionAckAwaitTimeout =
+        nx::utils::parseTimerDuration(
+            settings().value(kConnectionAckAwaitTimeout).toString(),
+            kDefaultConnectionAckAwaitTimeout);
+
+    m_connectionParameters.connectionResultWaitTimeout =
+        nx::utils::parseTimerDuration(
+            settings().value(kConnectionResultWaitTimeout).toString(),
+            kDefaultConnectionResultWaitTimeout);
+
+    // Connection methods start delays.
+    m_connectionParameters.udpHolePunchingStartDelay =
+        nx::utils::parseTimerDuration(
+            settings().value(kUdpHolePunchingStartDelay).toString(),
+            kUdpHolePunchingStartDelayDefault);
+
+    m_connectionParameters.trafficRelayingStartDelay =
+        nx::utils::parseTimerDuration(
+            settings().value(kTrafficRelayingStartDelay).toString(),
+            kTrafficRelayingStartDelayDefault);
+
+    m_connectionParameters.directTcpConnectStartDelay =
+        nx::utils::parseTimerDuration(
+            settings().value(kDirectTcpConnectStartDelay).toString(),
+            kDirectTcpConnectStartDelayDefault);
 }
 
 void Settings::readEndpointList(
