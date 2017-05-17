@@ -12,23 +12,6 @@
 
 #include <nx/network/socket_common.h>
 
-namespace {
-    QSet<QString> getAddresses(const QnMediaServerResourcePtr &server)
-    {
-        const auto port = server->getPort();
-        QSet<QString> result;
-        for (const SocketAddress& address: server->getAllAvailableAddresses())
-        {
-            if (address.port == port)
-                result << address.address.toString();
-            else
-                result << address.toString();
-        }
-
-        return result;
-    }
-}
-
 int QnModuleInformationRestHandler::executeGet(
     const QString &path,
     const QnRequestParams &params,
@@ -54,11 +37,8 @@ int QnModuleInformationRestHandler::executeGet(
         {
             QList<QnModuleInformationWithAddresses> modules;
             for (const QnMediaServerResourcePtr &server : allServers)
-            {
-                QnModuleInformationWithAddresses moduleInformation = server->getModuleInformation();
-                moduleInformation.remoteAddresses = getAddresses(server);
-                modules.append(std::move(moduleInformation));
-            }
+                modules.append(std::move(server->getModuleInformationWithAddresses()));
+
             result.setReply(modules);
         }
         else
@@ -71,11 +51,11 @@ int QnModuleInformationRestHandler::executeGet(
     }
     else if (useAddresses)
     {
-        QnModuleInformationWithAddresses moduleInformation(owner->commonModule()->moduleInformation());
-        QnMediaServerResourcePtr server = owner->resourcePool()->getResourceById<QnMediaServerResource>(owner->commonModule()->moduleGUID());
-        if (server)
-            moduleInformation.remoteAddresses = getAddresses(server);
-        result.setReply(moduleInformation);
+        const auto id = owner->commonModule()->moduleGUID();
+        if (const auto s = owner->resourcePool()->getResourceById<QnMediaServerResource>(id))
+            result.setReply(s->getModuleInformationWithAddresses());
+        else
+            result.setReply(owner->commonModule()->moduleInformation());
     }
     else
     {

@@ -563,6 +563,15 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const
     return moduleInformation;
 }
 
+QnModuleInformationWithAddresses QnMediaServerResource::getModuleInformationWithAddresses() const
+{
+    QnModuleInformationWithAddresses information = getModuleInformation();
+    for (const auto& endpoint: getAllAvailableAddresses())
+        information.remoteAddresses << endpoint.toString();
+
+    return information;
+}
+
 bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         return (server->getServerFlags() & Qn::SF_Edge);

@@ -50,7 +50,7 @@
 #include <decoders/video/abstract_video_decoder.h>
 
 #include <finders/systems_finder.h>
-#include <network/module_finder.h>
+#include <nx/vms/discovery/manager.h>
 #include <network/router.h>
 
 #include <nx/network/socket_global.h>
@@ -488,7 +488,7 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     runtimeData.videoWallInstanceGuid = startupParams.videoWallItemGuid;
     commonModule->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
 
-    commonModule->moduleFinder()->start();
+    commonModule->moduleDiscoveryManager()->start();
 
     commonModule->instance<QnSystemsFinder>();
     commonModule->store(new QnForgottenSystemsManager());

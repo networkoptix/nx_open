@@ -29,7 +29,7 @@ public:
         ForgottenSystems,
         SkipStartupTilesManagement,
         StartupDiscoveryPeriodMs,
-        KnownServerUrls,    //< A list of the urls that were discovered by QnDirectModuleFinder.
+        KnownServerUrls, //< A list of the urls that were discovered by module discovery manager.
 
         PropertiesCount
     };

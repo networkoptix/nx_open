@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
@@ -93,6 +93,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_vms_utils-x86", "${root.
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_utils-x86", "${root.dir}\common_libs\nx_utils\src\nx_utils-x86.vcxproj", "${nx_utils.guid}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_kit-x86", "..\nx_kit\src\nx_kit-x86.vcxproj", "${nx_kit.guid}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
