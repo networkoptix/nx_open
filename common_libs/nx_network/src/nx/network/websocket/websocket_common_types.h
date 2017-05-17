@@ -43,6 +43,7 @@ enum class Error
     noMaskBit,
     maskIsZero,
     handshakeError,
+    connectionAbort,
 };
 
 enum class SendMode

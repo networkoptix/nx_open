@@ -10,10 +10,8 @@
 
 #include <nx_ec/data/api_layout_tour_data.h>
 
-#include <ui/animation/curtain_animator.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/workbench/workbench.h>
-#include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
@@ -163,7 +161,6 @@ void LayoutTourExecutor::stopCurrentTour()
             break;
     }
 
-    display()->curtainAnimator()->uncurtain();
     setHintVisible(false);
     m_mode = Mode::Stopped;
 }
@@ -316,7 +313,6 @@ void LayoutTourExecutor::stopTimer()
 void LayoutTourExecutor::startTourInternal()
 {
     setHintVisible(true);
-    display()->curtainAnimator()->curtain();
     processTourStepInternal(true, true);
 }
 

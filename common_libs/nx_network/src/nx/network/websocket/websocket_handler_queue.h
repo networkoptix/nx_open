@@ -77,6 +77,13 @@ public:
         return !m_firstUsed;
     }
 
+    void clear()
+    {
+        m_first = Held();
+        m_firstUsed = false;
+        m_queue.swap(QueueType());
+    }
+
 private:
     Held m_first;
     bool m_firstUsed;

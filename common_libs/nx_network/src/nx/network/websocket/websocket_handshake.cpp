@@ -1,4 +1,4 @@
-#include <utils/common/cryptographic_hash.h>
+#include <nx/utils/cryptographic_hash.h>
 #include <nx/utils/random.h>
 #include "websocket_handshake.h"
 
@@ -103,7 +103,7 @@ nx::Buffer makeAcceptKey(const nx::Buffer& requestKey)
 {
     nx::Buffer result = nx::Buffer::fromBase64(requestKey);
     result += kMagic;
-    QnCryptographicHash hash(QnCryptographicHash::Sha1);
+    nx::utils::QnCryptographicHash hash(nx::utils::QnCryptographicHash::Sha1);
     hash.addData(result);
     return hash.result().toBase64();
 }

@@ -26,6 +26,7 @@ class NX_NETWORK_API Parser
         readingHeaderFixedPart,
         readingHeaderExtension,
         readingPayload,
+        error,
     };
 
     enum class BufferedState
