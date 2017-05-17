@@ -370,7 +370,7 @@ void Worker::requestFileInformationInternal()
 
             if (!success || !fileInfo.isValid())
             {
-                peerInfo.decreaseRank();
+                decreasePeerRank(peerId);
                 return;
             }
 
@@ -408,11 +408,11 @@ void Worker::requestFileInformationInternal()
             if (m_availableChunks.count(true) < fileInfo.downloadedChunks.size()
                 && !addAvailableChunksInfo(fileInfo.downloadedChunks))
             {
-                peerInfo.decreaseRank();
+                decreasePeerRank(peerId);
                 return;
             }
 
-            peerInfo.increaseRank();
+            increasePeerRank(peerId);
             if (m_state == State::requestingAvailableChunks)
                 setState(State::foundAvailableChunks);
         };
@@ -490,7 +490,7 @@ void Worker::requestChecksums()
             if (!success || checksums.isEmpty() || checksums.size() != m_availableChunks.size())
             {
                 success = false;
-                peerInfo.decreaseRank();
+                decreasePeerRank(peerId);
                 return;
             }
 
@@ -573,6 +573,13 @@ void Worker::downloadNextChunk()
 
     const auto& peerId = peers.first();
 
+    NX_LOG(
+        logMessage("Selected peer %1, rank: %2, distance: %3")
+            .arg(m_peerManager->peerString(peerId))
+            .arg(m_peerInfoById[peerId].rank)
+            .arg(m_peerManager->distanceTo(peerId)),
+        cl_logDEBUG2);
+
     auto handleReply =
         [this, chunkIndex](bool success, rest::Handle handle, const QByteArray& data)
         {
@@ -597,7 +604,7 @@ void Worker::downloadNextChunk()
 
             if (!success)
             {
-                peerInfo.decreaseRank();
+                decreasePeerRank(peerId);
                 return;
             }
 
@@ -781,14 +788,14 @@ QList<QnUuid> Worker::selectPeersForOperation(int count, QList<QnUuid> peers) co
 
     QList<ScoredPeer> scoredPeers;
 
-    constexpr int kBigDistance = 8;
+    constexpr int kBigDistance = 4;
 
     for (const auto& peerId: peers)
     {
         const int rank = m_peerInfoById.value(peerId).rank;
         const int distance = m_peerManager->distanceTo(peerId);
 
-        const int score = std::max(0, kBigDistance - distance) + rank * 2;
+        const int score = std::max(0, kBigDistance - distance) * 2 + rank;
         if (score == 0)
             continue;
 
@@ -821,7 +828,7 @@ QList<QnUuid> Worker::selectPeersForOperation(int count, QList<QnUuid> peers) co
 
     QList<QnUuid> highestScorePeers;
 
-    constexpr int kScoreThreshold = 3;
+    constexpr int kScoreThreshold = 1;
     int previousScore = 0;
     while (highestScorePeers.size() < highestScorePeersNeeded && !scoredPeers.isEmpty())
     {
@@ -985,12 +992,24 @@ void Worker::waitForNextStep(int delay)
 
 void Worker::increasePeerRank(const QnUuid& peerId, int value)
 {
-    m_peerInfoById[peerId].increaseRank(value);
+    auto& peerInfo = m_peerInfoById[peerId];
+    peerInfo.increaseRank(value);
+    NX_LOG(
+        logMessage("Increasing rank of %1: %2")
+            .arg(m_peerManager->peerString(peerId))
+            .arg(peerInfo.rank),
+        cl_logDEBUG2);
 }
 
 void Worker::decreasePeerRank(const QnUuid& peerId, int value)
 {
-    m_peerInfoById[peerId].decreaseRank(value);
+    auto& peerInfo = m_peerInfoById[peerId];
+    peerInfo.decreaseRank(value);
+    NX_LOG(
+        logMessage("Decreasing rank of %1: %2")
+            .arg(m_peerManager->peerString(peerId))
+            .arg(peerInfo.rank),
+        cl_logDEBUG2);
 }
 
 void Worker::setPrintSelfPeerInLogs()
