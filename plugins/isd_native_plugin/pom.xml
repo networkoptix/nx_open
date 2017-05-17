@@ -3,12 +3,12 @@
     <parent>
         <artifactId>plugins</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.0.1-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.1-SNAPSHOT</version>
     <artifactId>isd_native_plugin</artifactId>
     <packaging>pom</packaging>
     <name>Nx Witness ISD native ARM plugin</name>
