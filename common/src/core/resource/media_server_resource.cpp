@@ -527,8 +527,11 @@ void QnMediaServerResource::setSystemInfo(const QnSystemInformation &systemInfo)
 }
 QnModuleInformation QnMediaServerResource::getModuleInformation() const
 {
-    if (getId() == resourcePool()->commonModule()->moduleGUID())
-        return resourcePool()->commonModule()->moduleInformation();
+    if (auto module = commonModule())
+    {
+        if (getId() == module->moduleGUID())
+            return module->moduleInformation();
+    }
 
     // build module information for other server
 
@@ -558,6 +561,15 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const
     moduleInformation.cloudSystemId = settings->cloudSystemId();
 
     return moduleInformation;
+}
+
+QnModuleInformationWithAddresses QnMediaServerResource::getModuleInformationWithAddresses() const
+{
+    QnModuleInformationWithAddresses information = getModuleInformation();
+    for (const auto& endpoint: getAllAvailableAddresses())
+        information.remoteAddresses << endpoint.toString();
+
+    return information;
 }
 
 bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {

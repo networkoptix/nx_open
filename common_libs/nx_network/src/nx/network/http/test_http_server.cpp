@@ -63,15 +63,15 @@ TestHttpServer::~TestHttpServer()
     NX_LOGX("Stopped", cl_logINFO);
 }
 
-bool TestHttpServer::bindAndListen()
+bool TestHttpServer::bindAndListen(const SocketAddress& endpoint)
 {
-    if (!m_httpServer->bind(SocketAddress(HostAddress::localhost, 0)))
+    if (!m_httpServer->bind(endpoint))
         return false;
 
     if (!m_httpServer->listen())
         return false;
 
-    NX_LOGX(lm("Started on %1").str(m_httpServer->address()), cl_logINFO);
+    NX_LOGX(lm("Started on %1").arg(m_httpServer->address()), cl_logINFO);
     return true;
 }
 

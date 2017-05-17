@@ -5,7 +5,7 @@
 
 #include "time_sync_rest_handler.h"
 
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include <rest/server/rest_connection_processor.h>
 #include <nx/network/http/httptypes.h>
 

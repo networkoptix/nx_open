@@ -709,7 +709,7 @@ api::ResultCode Ec2MserverCloudSynchronization::fetchCloudTransactionLog(
     ::ec2::ApiTransactionDataList* const transactionList)
 {
     const QUrl url(lm("http://%1%2?systemId=%3")
-        .str(cdb()->endpoint()).arg(kMaintenanceGetTransactionLog)
+        .arg(cdb()->endpoint()).arg(kMaintenanceGetTransactionLog)
         .arg(registeredSystemData().id));
     return fetchTransactionLog(url, transactionList);
 }
@@ -718,7 +718,7 @@ api::ResultCode Ec2MserverCloudSynchronization::fetchCloudTransactionLogFromMedi
     ::ec2::ApiTransactionDataList* const transactionList)
 {
     QUrl url(lm("http://%1/%2?cloud_only=true")
-        .str(appserver2()->moduleInstance()->endpoint()).arg("ec2/getTransactionLog"));
+        .arg(appserver2()->moduleInstance()->endpoint()).arg("ec2/getTransactionLog"));
     url.setUserName("admin");
     url.setPassword("admin");
     return fetchTransactionLog(url, transactionList);

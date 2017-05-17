@@ -35,7 +35,7 @@
 
 #define DEBUG_LOG(MESSAGE) do \
 { \
-    if (nx::network::SocketGlobals::debugConfig().sslSocketWrappers) \
+    if (nx::network::SocketGlobals::debugIni().sslSocketWrappers) \
         NX_LOGX(MESSAGE, cl_logDEBUG1); \
 } while (0)
 
@@ -559,13 +559,13 @@ void SslAsyncBioHelper::handleSslError(int sslReturn, int sslError)
     }
 
     DEBUG_LOG(lm("SSL returns %1, error %2, stack: %3")
-        .strs(sslReturn, sslError).container(errorStack));
+        .args(sslReturn, sslError).container(errorStack));
 }
 
 void SslAsyncBioHelper::onRecv(
     SystemError::ErrorCode errorCode, std::size_t transferred)
 {
-    DEBUG_LOG(lm("transport read %1: %2").strs(transferred, SystemError::toString(errorCode)));
+    DEBUG_LOG(lm("transport read %1: %2").args(transferred, SystemError::toString(errorCode)));
     if (m_readQueue.empty()) return;
     if (errorCode != SystemError::noError) {
         DeletionFlag deleted(this);
@@ -647,7 +647,7 @@ void SslAsyncBioHelper::onSend(
         SystemError::ErrorCode errorCode,
         std::size_t transferred)
 {
-    DEBUG_LOG(lm("transport sent %1: %2").strs(transferred, SystemError::toString(errorCode)));
+    DEBUG_LOG(lm("transport sent %1: %2").args(transferred, SystemError::toString(errorCode)));
     Q_UNUSED(transferred);
     if (m_writeQueue.empty()) return;
     if (errorCode != SystemError::noError) {
@@ -896,7 +896,7 @@ private:
         std::size_t transferred,
         SnifferData data)
     {
-        DEBUG_LOG(lm("Transport read %1: %2").strs(transferred, SystemError::toString(ec)));
+        DEBUG_LOG(lm("Transport read %1: %2").args(transferred, SystemError::toString(ec)));
         // We have the data in our buffer right now
         if (ec) {
             data.completionHandler(ec,0);
@@ -1201,12 +1201,12 @@ bool SslSocket::doHandshake()
         QByteArray e(1024, '\0');
         ERR_error_string_n(SSL_get_error(d->ssl.get(), ret), e.data(), e.size());
         NX_LOGX(lm("Handshake on %1 failed %2: %3")
-            .strs(d->isServerSide ? "server" : "client").arg(ret).arg(e), cl_logDEBUG1);
+            .args(d->isServerSide ? "server" : "client").arg(ret).arg(e), cl_logDEBUG1);
     }
     else
     {
         NX_LOGX(lm("Handshake on %1 success %2")
-            .strs(d->isServerSide ? "server" : "client", ret), cl_logDEBUG2);
+            .args(d->isServerSide ? "server" : "client", ret), cl_logDEBUG2);
     }
 
     return ret == 1;

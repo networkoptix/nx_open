@@ -6,7 +6,7 @@
 #ifndef cloud_db_base_http_handler_h
 #define cloud_db_base_http_handler_h
 
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/server/abstract_fusion_request_handler.h>

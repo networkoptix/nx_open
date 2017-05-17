@@ -1,4 +1,6 @@
-#pragma once#include <QtCore/QAtomicInt>
+#pragma once
+
+#include <QtCore/QAtomicInt>
 
 #include <core/ptz/abstract_ptz_controller.h>
 

@@ -26,6 +26,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/request_param.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/compressed_time_functions.h>
 #include <nx/network/http/httptypes.h>
 
 #include <api/app_server_connection.h>
@@ -40,7 +41,7 @@
 #include "model/camera_list_reply.h"
 #include "model/configure_reply.h"
 #include "model/upload_update_reply.h"
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "model/recording_stats_reply.h"
 #include <api/model/getnonce_reply.h>
 #include "common/common_module.h"

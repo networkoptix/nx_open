@@ -113,10 +113,10 @@ AudioDevice::AudioDevice(QObject *parent)
             alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
 
             NX_INFO(this, "OpenAL info: ");
-            NX_INFO(this, lm("Version: %1").str(versionString()));
-            NX_INFO(this, lm("Company: %1").str(company()));
-            NX_INFO(this, lm("Device type: %1").str(static_cast<const char *>(alGetString(AL_RENDERER))));
-            NX_INFO(this, lm("OpenAL extensions: %1").str(static_cast<const char *>(alGetString(AL_EXTENSIONS))));
+            NX_INFO(this, lm("Version: %1").arg(versionString()));
+            NX_INFO(this, lm("Company: %1").arg(company()));
+            NX_INFO(this, lm("Device type: %1").arg(static_cast<const char *>(alGetString(AL_RENDERER))));
+            NX_INFO(this, lm("OpenAL extensions: %1").arg(static_cast<const char *>(alGetString(AL_EXTENSIONS))));
         }
     }
 }

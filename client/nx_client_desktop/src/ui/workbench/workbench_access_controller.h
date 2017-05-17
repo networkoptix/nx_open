@@ -3,14 +3,11 @@
 #include <QtCore/QObject>
 #include <QtCore/QList>
 
-#include <common/common_globals.h>
-
-#include <core/resource/resource_fwd.h>
-
-#include <client_core/connection_context_aware.h>
-
 #include <client/client_globals.h>
-
+#include <client_core/connection_context_aware.h>
+#include <common/common_globals.h>
+#include <core/resource/resource_fwd.h>
+#include <nx/utils/uuid.h>
 #include <utils/common/connective.h>
 
 class QnWorkbenchContext;

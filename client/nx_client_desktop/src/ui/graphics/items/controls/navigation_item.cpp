@@ -4,7 +4,6 @@
 #include <QtCore/QCoreApplication>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QGraphicsLinearLayout>
-#include <QtWidgets/QGraphicsProxyWidget>
 
 #include <common/common_globals.h>
 

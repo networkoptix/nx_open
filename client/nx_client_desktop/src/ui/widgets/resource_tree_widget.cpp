@@ -153,6 +153,14 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     ui->resourcesTreeView->setProperty(style::Properties::kSideIndentation,
         QVariant::fromValue(QnIndents(0, 1)));
 
+    ui->resourcesTreeView->setConfirmExpandDelegate(
+        [](const QModelIndex& index) -> bool
+        {
+            // Layouts must not expand on double click
+            const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+            return !resource || !resource->hasFlags(Qn::layout);
+        });
+
     connect(ui->resourcesTreeView, &QnTreeView::enterPressed, this,
         [this](const QModelIndex& index){emit activated(index, false); });
     connect(ui->resourcesTreeView, &QnTreeView::doubleClicked, this,

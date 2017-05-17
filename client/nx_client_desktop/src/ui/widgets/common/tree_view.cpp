@@ -107,6 +107,16 @@ void QnTreeView::timerEvent(QTimerEvent* event)
     base_type::timerEvent(event);
 }
 
+void QnTreeView::mouseDoubleClickEvent(QMouseEvent* event)
+{
+    // Delegate can occasionally change the model, so keeping persistent index
+    const QPersistentModelIndex persistent = indexAt(event->pos());
+    if (!m_confirmExpand || m_confirmExpand(persistent))
+        base_type::mouseDoubleClickEvent(event);
+    else if (persistent.isValid())
+        emit doubleClicked(persistent);
+}
+
 QSize QnTreeView::viewportSizeHint() const
 {
     /*
@@ -148,6 +158,11 @@ QRect QnTreeView::visualRect(const QModelIndex& index) const
         result.setLeft(columnViewportPosition(index.column()));
 
     return result;
+}
+
+void QnTreeView::setConfirmExpandDelegate(ConfirmExpandDelegate value)
+{
+    m_confirmExpand = value;
 }
 
 QItemSelectionModel::SelectionFlags QnTreeView::selectionCommand(

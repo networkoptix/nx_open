@@ -1,14 +1,10 @@
 #include "proxy_video_decoder_gl_utils.h"
 #if defined(ENABLE_PROXY_DECODER)
 
-#include <nx/utils/debug_utils.h>
-
 namespace nx {
 namespace media {
 
 namespace {
-
-constexpr const char* OUTPUT_PREFIX = "ProxyVideoDecoder[gl_utils]: ";
 
 static const char* glFramebufferStatusStr(GLenum status)
 {
@@ -64,7 +60,7 @@ void checkGlError(QOpenGLFunctions* funcs, const char* tag)
         if (!anyErrors)
         {
             anyErrors = true;
-            PRINT << "OpenGL ERROR:" << tag << "->";
+            NX_PRINT << "OpenGL ERROR:" << tag << "->";
         }
 
         const char* const s = glErrorStr(err);
@@ -73,7 +69,7 @@ void checkGlError(QOpenGLFunctions* funcs, const char* tag)
         else
             qWarning().nospace() << "    " << std::hex << err;
 
-        if (conf.stopOnGlErrors)
+        if (ini().stopOnGlErrors)
             NX_CRITICAL(false);
         NX_CRITICAL(err != GL_OUT_OF_MEMORY); //< Abort because GL state is undefined.
     }
@@ -83,18 +79,16 @@ void outputGlFbo(const char* tag)
 {
     if (!QOpenGLContext::currentContext())
     {
-        OUTPUT << tag << ": Unable to log FBO: no current context";
+        NX_OUTPUT << tag << ": Unable to log FBO: no current context";
     }
     else
     {
         NX_GL_GET_FUNCS(QOpenGLContext::currentContext());
         GLint curFbo = 0;
         NX_GL(funcs->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &curFbo));
-        OUTPUT << tag << ": current FBO ==" << curFbo;
+        NX_OUTPUT << tag << ": current FBO ==" << curFbo;
     }
 }
-
-constexpr const char* FboManager::OUTPUT_PREFIX;
 
 void checkGlFramebufferStatus()
 {
@@ -105,16 +99,16 @@ void checkGlFramebufferStatus()
     {
         const char* const s = glFramebufferStatusStr(res);
         if (s)
-            PRINT << "OpenGL FAILED CHECK: glCheckFramebufferStatus() -> " << s;
+            NX_PRINT << "OpenGL FAILED CHECK: glCheckFramebufferStatus() -> " << s;
         else
-            PRINT << "OpenGL FAILED CHECK: glCheckFramebufferStatus() -> " << res;
+            NX_PRINT << "OpenGL FAILED CHECK: glCheckFramebufferStatus() -> " << res;
         NX_CRITICAL(false);
     }
 }
 
 void debugTextureTest()
 {
-    PRINT << "debugTextureTest() BEGIN";
+    NX_PRINT << "debugTextureTest() BEGIN";
     static QOpenGLTexture tex(QOpenGLTexture::Target2D);
     static QOpenGLContext *ctx;
     static QOpenGLFunctions *funcs;
@@ -138,34 +132,34 @@ void debugTextureTest()
         NX_GL(tex.setMinMagFilters(QOpenGLTexture::Nearest, QOpenGLTexture::Nearest));
 
         buffer = malloc(17 + kMediaAlignment + 1920 * 1080);
-        bufferStart = nx::utils::debugUnalignPtr(buffer);
+        bufferStart = nx::kit::debug::unalignedPtr(buffer);
 
         buffer2 = malloc(17 + kMediaAlignment + 1920 * 1080);
-        buffer2Start = nx::utils::debugUnalignPtr(buffer2);
+        buffer2Start = nx::kit::debug::unalignedPtr(buffer2);
     }
 
     funcs->glFlush();
     funcs->glFinish();
-    NX_TIME_BEGIN(debugTextureTest_setData_glFlush_glFinish);
+    NX_TIME_BEGIN(DebugTextureTest_setData_glFlush_glFinish);
         NX_GL(tex.setData(QOpenGLTexture::Alpha, QOpenGLTexture::UInt8, bufferStart));
     funcs->glFlush();
     funcs->glFinish();
-    NX_TIME_END(debugTextureTest_setData_glFlush_glFinish);
+    NX_TIME_END(DebugTextureTest_setData_glFlush_glFinish);
 
-    NX_TIME_BEGIN(debugTextureTest_memcpy);
+    NX_TIME_BEGIN(DebugTextureTest_memcpy);
     memcpy(buffer2Start, bufferStart, 1920 * 1080);
-    NX_TIME_END(debugTextureTest_memcpy);
+    NX_TIME_END(DebugTextureTest_memcpy);
 
-    PRINT << "debugTextureTest() END";
+    NX_PRINT << "debugTextureTest() END";
 }
 
 void debugGlGetAttribsAndAbort(QSize frameSize)
 {
-    PRINT << "error=" << eglGetError();
+    NX_PRINT << "error=" << eglGetError();
 
     EGLDisplay display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-    PRINT << "eglGetDisplay -> " << display;
-    PRINT << "error=" << eglGetError();
+    NX_PRINT << "eglGetDisplay -> " << display;
+    NX_PRINT << "error=" << eglGetError();
 
     EGLint configAttribs[] = {
         //EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
@@ -184,15 +178,15 @@ void debugGlGetAttribsAndAbort(QSize frameSize)
     EGLConfig configs[100];
     EGLint numConfigs(0);
     eglChooseConfig(display, configAttribs, configs, 100, &numConfigs);
-    PRINT << "eglChooseConfig num configs -> " << numConfigs;
-    PRINT << "error=" << eglGetError();
+    NX_PRINT << "eglChooseConfig num configs -> " << numConfigs;
+    NX_PRINT << "error=" << eglGetError();
 
     for (int i = 0; i < numConfigs; ++i)
     {
-        PRINT << "config " << i;
+        NX_PRINT << "config " << i;
         EGLint isLockSupp(0);
         eglGetConfigAttrib(display, configs[i], EGL_LOCK_SURFACE_BIT_KHR, &isLockSupp);
-        PRINT << "isLockSupp=" << isLockSupp;
+        NX_PRINT << "isLockSupp=" << isLockSupp;
     }
 
     EGLint attribs[] = {
@@ -205,13 +199,13 @@ void debugGlGetAttribsAndAbort(QSize frameSize)
     };
 
     EGLSurface pBuffer = eglCreatePbufferSurface(display, configs[0], attribs);
-    PRINT << "eglCreatePbufferSurface -> " << pBuffer;
-    PRINT << "error=" << eglGetError();
+    NX_PRINT << "eglCreatePbufferSurface -> " << pBuffer;
+    NX_PRINT << "error=" << eglGetError();
 
     EGLint width(0), height(0);
     eglQuerySurface(display, pBuffer, EGL_WIDTH, &width);
     eglQuerySurface(display, pBuffer, EGL_HEIGHT, &height);
-    PRINT << "width=" << width << ", height=" << height;
+    NX_PRINT << "width=" << width << ", height=" << height;
 
     // Abort.
     NX_CRITICAL(false);
@@ -221,7 +215,7 @@ void debugTestImageExtension(QOpenGLTexture& yTex)
 {
     PFNEGLCREATEIMAGEKHRPROC eglCreateImageKHR =
         (PFNEGLCREATEIMAGEKHRPROC) eglGetProcAddress("eglCreateImageKHR");
-    PRINT << "eglCreateImageKHR =" << eglCreateImageKHR;
+    NX_PRINT << "eglCreateImageKHR =" << eglCreateImageKHR;
 
     EGLImageKHR eglImageHandle = eglCreateImageKHR(
         eglGetCurrentDisplay(),
@@ -230,15 +224,15 @@ void debugTestImageExtension(QOpenGLTexture& yTex)
         (EGLClientBuffer) yTex.textureId(),
         nullptr);
 
-    PRINT << "eglImageHandle ==" << eglImageHandle;
-    PRINT << "eglGetError() returned" << eglGetError();
+    NX_PRINT << "eglImageHandle ==" << eglImageHandle;
+    NX_PRINT << "eglGetError() returned" << eglGetError();
 
     GLvoid* bitmapAddress(0);
     eglQuerySurface(eglGetCurrentDisplay(), eglImageHandle, EGL_BITMAP_POINTER_KHR,
         (GLint*) &bitmapAddress);
 
-    PRINT << "bitmapAddress ==" << bitmapAddress;
-    PRINT << "eglGetError() returned" << eglGetError();
+    NX_PRINT << "bitmapAddress ==" << bitmapAddress;
+    NX_PRINT << "eglGetError() returned" << eglGetError();
 
     // Abort.
     NX_CRITICAL(false);
@@ -263,4 +257,4 @@ void debugDumpGlPrecisions()
 } // namespace media
 } // namespace nx
 
-#endif // ENABLE_PROXY_DECODER
+#endif // defined(ENABLE_PROXY_DECODER)

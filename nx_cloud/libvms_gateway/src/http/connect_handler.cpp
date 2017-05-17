@@ -74,7 +74,7 @@ void ConnectHandler::closeConnection(
 
 void ConnectHandler::connect(const SocketAddress& address)
 {
-    NX_LOGX(lm("Connecting to '%1', socket[%2] -> socket[%3]").str(address)
+    NX_LOGX(lm("Connecting to '%1', socket[%2] -> socket[%3]").arg(address)
         .arg(m_connectionSocket).arg(m_targetSocket), cl_logDEBUG1);
 
     m_targetSocket->connectAsync(

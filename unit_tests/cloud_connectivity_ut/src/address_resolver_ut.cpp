@@ -87,7 +87,7 @@ public:
         const HostAddress& address,
         utils::MoveOnlyFunc<void(HaInfoIterator it)> checker)
     {
-        NX_LOGX(lm("resolveAndCheckState %1").str(address), cl_logDEBUG1);
+        NX_LOGX(lm("resolveAndCheckState %1").arg(address), cl_logDEBUG1);
         nx::utils::TestSyncQueue<bool> syncQueue;
         static const size_t kSimultaneousQueries = 100;
         for (size_t counter = kSimultaneousQueries; counter; --counter)

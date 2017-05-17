@@ -60,7 +60,7 @@ void DirectTcpEndpointTunnel::start()
         buffer.get(),
         [this, buffer](SystemError::ErrorCode code, size_t size)
         {
-            NX_LOGX(lm("Unexpected event on control connection (size=%1): %2").strs(
+            NX_LOGX(lm("Unexpected event on control connection (size=%1): %2").args(
                 size, SystemError::toString(code)), cl_logDEBUG1);
 
             m_controlConnection.reset();

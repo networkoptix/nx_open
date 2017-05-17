@@ -1,25 +1,30 @@
 #pragma once
 
-#include <nx/utils/flag_config.h>
+#include <nx/kit/ini_config.h>
 
 namespace nx {
 namespace media {
 
-struct FlagConfig: public nx::utils::FlagConfig
+struct Ini: public nx::kit::IniConfig
 {
-    using nx::utils::FlagConfig::FlagConfig;
+    Ini(): IniConfig("nx_media.ini") {}
 
-    NX_STRING_PARAM("", substitutePlayerUrl, "Use this Url for video, e.g. file:///c:/test.MP4");
-    NX_FLAG(0, outputFrameDelays, "Log if frame delay is negative.");
-    NX_FLAG(0, enableFps, "");
-    NX_INT_PARAM(-1, hwVideoX, "If not -1, override hardware video window X.");
-    NX_INT_PARAM(-1, hwVideoY, "If not -1, override hardware video window Y.");
-    NX_INT_PARAM(-1, hwVideoWidth, "If not -1, override hardware video window width.");
-    NX_INT_PARAM(-1, hwVideoHeight, "If not -1, override hardware video window height.");
-    NX_FLAG(0, forceIframesOnly, "For Low Quality selection, force I-frames-only mode.");
-    NX_FLAG(0, unlimitFfmpegMaxResolution, "");
+    NX_INI_STRING("", substitutePlayerUrl, "Use this Url for video, e.g. file:///c:/test.MP4");
+    NX_INI_FLAG(0, outputFrameDelays, "Log if frame delay is negative.");
+    NX_INI_FLAG(0, enableFpsPresentNextFrame, "Measure FPS at presentNextFrame() start.");
+    NX_INI_INT(-1, hwVideoX, "If not -1, override hardware video window X.");
+    NX_INI_INT(-1, hwVideoY, "If not -1, override hardware video window Y.");
+    NX_INI_INT(-1, hwVideoWidth, "If not -1, override hardware video window width.");
+    NX_INI_INT(-1, hwVideoHeight, "If not -1, override hardware video window height.");
+    NX_INI_FLAG(0, forceIframesOnly, "For Low Quality selection, force I-frames-only mode.");
+    NX_INI_FLAG(0, unlimitFfmpegMaxResolution, "");
 };
-extern FlagConfig conf;
+
+inline Ini& ini()
+{
+    static Ini ini;
+    return ini;
+}
 
 } // namespace media
 } // namespace nx

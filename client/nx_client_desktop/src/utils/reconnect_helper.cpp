@@ -18,7 +18,7 @@
 
 #include <nx/utils/collection.h>
 #include <nx/utils/string.h>
-#include <network/module_finder.h>
+#include <nx/vms/discovery/manager.h>
 #include <api/global_settings.h>
 #include <network/system_helpers.h>
 
@@ -172,7 +172,7 @@ void QnReconnectHelper::updateInterfacesForServer(const QnUuid &id)
     for (InterfaceInfo &item: interfaces)
         item.online = false;
 
-    auto modules = qnModuleFinder->foundModules();
+    auto modules = commonModule()->moduleDiscoveryManager()->getAll();
     auto iter = boost::find_if(modules, [id](const QnModuleInformation &info){return info.id == id;});
     if (iter == boost::end(modules))
         return;
@@ -185,31 +185,34 @@ void QnReconnectHelper::updateInterfacesForServer(const QnUuid &id)
         return;
     }
 
-    for (const SocketAddress &remoteAddress: qnModuleFinder->moduleAddresses(iter->id)) {
-        bool found = false;
-        auto sameUrl = [remoteAddress](const QUrl &url) {
-            return url.port() == remoteAddress.port && url.host() == remoteAddress.address.toString();
-        };
-        for (InterfaceInfo &item: interfaces) {
-            if (!sameUrl(item.url))
-                continue;
-            item.online = true;
-            found = true;
-            break;
-        }
-        if (!found) {
-            InterfaceInfo info;
-            info.online = true;
-            info.url.setScheme(lit("http"));
-            info.url.setHost(remoteAddress.address.toString());
-            info.url.setPort(remoteAddress.port);
-            info.url.setUserName(m_userName);
-            info.url.setPassword(m_password);
-            interfaces << info;
-        }
+    const auto remoteAddress = commonModule()->moduleDiscoveryManager()->getEndpoint(iter->id);
+    bool found = false;
+    auto sameUrl = [remoteAddress](const QUrl &url) -> bool {
+        if (!remoteAddress)
+            return false;
 
+        return url.port() == remoteAddress->port
+            && url.host() == remoteAddress->address.toString();
+    };
+
+    for (InterfaceInfo &item: interfaces) {
+        if (!sameUrl(item.url))
+            continue;
+        item.online = true;
+        found = true;
+        break;
     }
 
+    if (!found && remoteAddress) {
+        InterfaceInfo info;
+        info.online = true;
+        info.url.setScheme(lit("http"));
+        info.url.setHost(remoteAddress->address.toString());
+        info.url.setPort(remoteAddress->port);
+        info.url.setUserName(m_userName);
+        info.url.setPassword(m_password);
+        interfaces << info;
+    }
 }
 
 QUrl QnReconnectHelper::bestInterfaceForServer(const QnUuid &id) {

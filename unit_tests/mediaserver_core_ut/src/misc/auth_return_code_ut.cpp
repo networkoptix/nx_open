@@ -8,7 +8,7 @@
 #include <api/app_server_connection.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/httpclient.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 
 #include <nx/fusion/model_functions.h>
 #include <network/authenticate_helper.h>

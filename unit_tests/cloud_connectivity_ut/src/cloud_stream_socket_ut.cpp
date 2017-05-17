@@ -492,18 +492,19 @@ public:
     CloudStreamSocketShutdown():
         m_terminated(false)
     {
+        using namespace std::placeholders;
+
         if (!SocketGlobals::mediatorConnector().mediatorAddress())
             SocketGlobals::mediatorConnector().mockupAddress(serverAddress());
 
-        m_oldFactory =
-            ConnectorFactory::setFactoryFunc(
-                std::bind(&CloudStreamSocketShutdown::connectorFactoryFunc, this, 
-                    std::placeholders::_1));
+        m_oldFactory = CrossNatConnectorFactory::instance().setCustomFunc(
+            std::bind(&CloudStreamSocketShutdown::connectorFactoryFunc, this, _1));
     }
 
     ~CloudStreamSocketShutdown()
     {
-        ConnectorFactory::setFactoryFunc(m_oldFactory);
+        CrossNatConnectorFactory::instance().setCustomFunc(
+            std::move(m_oldFactory));
         if (m_clientSocket)
         {
             m_clientSocket->pleaseStopSync();
@@ -558,7 +559,7 @@ private:
     std::unique_ptr<CloudStreamSocket> m_clientSocket;
     nx::utils::thread m_socketReadThread;
     bool m_terminated;
-    ConnectorFactory::FactoryFunc m_oldFactory;
+    CrossNatConnectorFactory::Function m_oldFactory;
     nx::utils::promise<void> m_socketInRecv;
     nx::utils::promise<bool> m_continueReadingSocket;
 

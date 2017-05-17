@@ -14,7 +14,6 @@
 #include <QtCore/QPropertyAnimation>
 #include <QtCore/QFileInfo>
 #include <QtCore/QSettings>
-#include <QtWidgets/QGraphicsProxyWidget>
 
 #include <utils/common/util.h>
 #include <utils/common/checked_cast.h>
@@ -672,12 +671,16 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     case Qt::Key_Left:
         if (e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(-15, 0));
+        else if (action(action::ToggleLayoutTourModeAction)->isChecked())
+            menu()->trigger(action::LayoutTourPrevStepAction);
         else
             moveCursor(QPoint(-1, 0), QPoint(0, -1));
         break;
     case Qt::Key_Right:
         if (e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(15, 0));
+        else if (action(action::ToggleLayoutTourModeAction)->isChecked())
+            menu()->trigger(action::LayoutTourNextStepAction);
         else
             moveCursor(QPoint(1, 0), QPoint(0, 1));
         break;

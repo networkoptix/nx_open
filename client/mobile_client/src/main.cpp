@@ -48,8 +48,7 @@
 #include <nx/mobile_client/controllers/web_admin_controller.h>
 #include <nx/mobile_client/helpers/inter_client_message.h>
 
-#include "config.h"
-using mobile_client::conf;
+#include <config.h>
 
 // TODO: #muskov Introduce a convenient cross-platform entity for crash handlers.
 #include <nx/utils/crash_dump/systemexcept.h>
@@ -131,13 +130,14 @@ int runUi(QtSingleGuiApplication* application)
     QQmlComponent mainComponent(&engine, QUrl(lit("main.qml")));
     QPointer<QQuickWindow> mainWindow(qobject_cast<QQuickWindow*>(mainComponent.create()));
 
-    QScopedPointer<QnTextureSizeHelper> textureSizeHelper(new QnTextureSizeHelper(mainWindow.data()));
+    QScopedPointer<QnTextureSizeHelper> textureSizeHelper(
+            new QnTextureSizeHelper(mainWindow.data()));
 
     if (!QnAppInfo::isMobile())
     {
         if (mainWindow)
         {
-            if (context.liteMode() && !conf.disableFullScreen)
+            if (context.liteMode() && !ini().disableFullScreen)
             {
                 mainWindow->showFullScreen();
                 if (const auto screen = mainWindow->screen())
@@ -191,7 +191,7 @@ int runUi(QtSingleGuiApplication* application)
         if (initialIntentData.isValid())
             QDesktopServices::openUrl(initialIntentData);
     #endif
-    
+
     QObject::connect(application, &QtSingleGuiApplication::messageReceived, mainWindow,
         [&context, mainWindow](const QString& serializedMessage)
         {
@@ -242,19 +242,34 @@ void initLog(const QString& logLevel)
     logSettings.maxFileSize = 10 * 1024 * 1024;
     logSettings.maxBackupCount = 5;
 
-    if (conf.enableLog)
+    if (ini().enableLog)
     {
         nx::utils::log::initialize(
-            logSettings, QString::fromUtf8(conf.tempPath()), lit("mobile_client"), QString(),
-            QnAppInfo::isAndroid() ? lit("-") : lit("log_file"));
+            logSettings,
+            /*dataDir*/ QString(),
+            /*applicationName*/ lit("mobile_client"),
+            /*binaryPath*/ QString(),
+            /*baseName*/
+                *ini().logFile
+                ? QString::fromUtf8(ini().logFile)
+                : QnAppInfo::isAndroid()
+                    ? lit("-")
+                    : (QString::fromUtf8(ini().iniFileDir()) + lit("log_file")));
     }
 
     const auto ec2logger = nx::utils::log::add({QnLog::EC2_TRAN_LOG});
-    if (conf.enableEc2TranLog)
+    if (ini().enableEc2TranLog)
     {
         nx::utils::log::initialize(
-            logSettings, QString::fromUtf8(conf.tempPath()), lit("mobile_client"), QString(),
-            QnAppInfo::isAndroid() ? lit("-") : lit("ec2_tran"), ec2logger);
+            logSettings,
+            /*dataDir*/ QString(),
+            /*applicationName*/ lit("mobile_client"),
+            /*binaryPath*/ QString(),
+            /*baseName*/
+                QnAppInfo::isAndroid()
+                ? lit("-")
+                : (QString::fromUtf8(ini().iniFileDir()) + lit("ec2_tran")),
+            ec2logger);
     }
 }
 
@@ -269,9 +284,9 @@ void processStartupParams(const QnMobileClientStartupParameters& startupParamete
             qWarning() << lit("File %1 doesn't exist. Loading from qrc...").arg(path);
     }
 
-    if (conf.forceNonLiteMode)
+    if (ini().forceNonLiteMode)
         qnSettings->setLiteMode(static_cast<int>(LiteModeType::LiteModeDisabled));
-    else if (startupParameters.liteMode || conf.forceLiteMode)
+    else if (startupParameters.liteMode || ini().forceLiteMode)
         qnSettings->setLiteMode(static_cast<int>(LiteModeType::LiteModeEnabled));
 
     if (startupParameters.url.isValid())
@@ -331,7 +346,7 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    conf.reload();
+    ini().reload();
     initLog(startupParams.logLevel);
 
     QnStaticCommonModule staticModule(Qn::PT_MobileClient, QnAppInfo::brand(),

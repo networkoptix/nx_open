@@ -10,7 +10,7 @@
 #include "api/app_server_connection.h"
 #include "nx_ec/dummy_handler.h"
 #include "common/common_module.h"
-#include "network/module_finder.h"
+#include "nx/vms/discovery/manager.h"
 #include <nx/utils/log/log.h>
 #include "client/client_settings.h"
 #include <network/authutil.h>

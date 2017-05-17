@@ -130,7 +130,7 @@ void TunnelAcceptor::startUdtConnection(
     NX_ASSERT(m_mediatorConnection->isInSelfAioThread());
     NX_LOGX(lm("Initiate rendevous UDT connection from %1 to %2, "
         "connectionId=%3, remotePeerId=%4")
-        .str((*socketIt)->getLocalAddress()).str(target)
+        .arg((*socketIt)->getLocalAddress()).arg(target)
         .arg(m_connectionId).arg(m_remotePeerId), cl_logDEBUG2);
 
     (*socketIt)->connectAsync(
@@ -142,7 +142,7 @@ void TunnelAcceptor::startUdtConnection(
 
             NX_LOGX(lm("Rendezvous UDT connection from %1 to %2 result: %3, "
                 "connectionId=%4, remotePeerId=%5")
-                .str(socket->getLocalAddress()).str(target).arg(SystemError::toString(code))
+                .arg(socket->getLocalAddress()).arg(target).arg(SystemError::toString(code))
                 .arg(m_connectionId).arg(m_remotePeerId), cl_logDEBUG1);
 
             if (code != SystemError::noError)

@@ -98,7 +98,7 @@ String OutgoingTunnelPool::ownPeerId() const
 
 void OutgoingTunnelPool::assignOwnPeerId(const String& name, const QnUuid& uuid)
 {
-    const auto id = lm("%1_%2_%3").strs(name, uuid.toSimpleString(), nx::utils::random::number());
+    const auto id = lm("%1_%2_%3").args(name, uuid.toSimpleString(), nx::utils::random::number());
 
     QnMutexLocker lock(&m_mutex);
     NX_ASSERT(s_isOwnPeerIdChangeAllowed || !m_isOwnPeerIdAssigned,

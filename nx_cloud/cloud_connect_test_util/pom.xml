@@ -21,7 +21,7 @@
         <product.title>${company.name} Cloud Connect Testing Utility</product.title>
 
         <qt.libs>core concurrent xml</qt.libs>
-        <global.libs>-lcommon -lnx_network -lnx_streaming -ludt -lnx_fusion -lnx_utils</global.libs>
+        <global.libs>-lnx_network -ludt -lnx_fusion -lnx_utils -lnx_kit</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 

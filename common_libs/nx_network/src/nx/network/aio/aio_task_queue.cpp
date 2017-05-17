@@ -181,7 +181,7 @@ void AioTaskQueue::addSockToPollset(
             const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
             failedToAddToPollset = true;
             NX_LOG(lm("Failed to add %1 to pollset. %2")
-                .strs(socket, SystemError::toString(errorCode)), cl_logWARNING);
+                .args(socket, SystemError::toString(errorCode)), cl_logWARNING);
         }
     }
     socket->impl()->eventTypeToUserData[eventType] = handlingData.get();

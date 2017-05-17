@@ -7,7 +7,7 @@
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/resource_pool.h"
 #include "common/common_module.h"
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include "network/tcp_connection_priv.h"
 #include "nx/fusion/serialization/json.h"
 #include <nx/fusion/model_functions.h>

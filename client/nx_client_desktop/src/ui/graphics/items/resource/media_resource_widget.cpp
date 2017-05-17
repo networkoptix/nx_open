@@ -120,6 +120,7 @@ static constexpr qreal kMaxBackwardSpeed = 16.0;
 
 static constexpr int kTriggersSpacing = 4;
 static constexpr int kTriggerButtonSize = 40;
+static constexpr int kTriggersMargin = 8; // overlaps HUD margin, i.e. does not sum up with it
 
 static const char* kTriggerRequestIdProperty = "_qn_triggerRequestId";
 
@@ -737,9 +738,11 @@ void QnMediaResourceWidget::setupHud()
     m_triggersContainer = new QnScrollableItemsWidget(m_hudOverlay->right());
     m_triggersContainer->setAlignment(Qt::AlignRight | Qt::AlignBottom);
 
+    const auto triggersMargin = kTriggersMargin - m_hudOverlay->contentsMargins().right();
+
     m_triggersContainer->setSpacing(kTriggersSpacing);
-    m_triggersContainer->setMaximumWidth(kTriggerButtonSize);
-    m_triggersContainer->setFlag(QGraphicsItem::ItemClipsChildrenToShape, false);
+    m_triggersContainer->setMaximumWidth(kTriggerButtonSize + triggersMargin);
+    m_triggersContainer->setContentsMargins(0, 0, triggersMargin, 0);
     setOverlayWidgetVisible(m_triggersContainer, false, /*animate=*/false);
 
     m_compositeOverlay = new QnGraphicsStackedWidget(m_hudOverlay->right());
@@ -2336,17 +2339,17 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
     const auto resultHandler =
         [button = QPointer<QnSoftwareTriggerButton>(button)](bool success, qint64 requestId)
         {
-            if (!button)
+            if (!button || button->property(
+                kTriggerRequestIdProperty).value<rest::Handle>() != requestId)
+            {
                 return;
-
-            if (button->property(kTriggerRequestIdProperty).value<rest::Handle>() != requestId)
-                return;
+            }
 
             button->setEnabled(true);
 
             button->setState(success
-                ? QnSoftwareTriggerButton::kSuccessState
-                : QnSoftwareTriggerButton::kFailureState);
+                ? QnSoftwareTriggerButton::State::Success
+                : QnSoftwareTriggerButton::State::Failure);
         };
 
     if (info.prolonged)
@@ -2358,23 +2361,23 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
                 const bool success = requestId != rest::Handle();
                 button->setProperty(kTriggerRequestIdProperty, requestId);
                 button->setState(success
-                    ? QnSoftwareTriggerButton::kWaitingState
-                    : QnSoftwareTriggerButton::kFailureState);
+                    ? QnSoftwareTriggerButton::State::Waiting
+                    : QnSoftwareTriggerButton::State::Failure);
             });
 
         connect(button, &QnSoftwareTriggerButton::released, this,
             [this, button, resultHandler, id = info.triggerId]()
             {
                 /* In case of activation error don't try to deactivate: */
-                if (button->state() == QnSoftwareTriggerButton::kFailureState)
+                if (button->state() == QnSoftwareTriggerButton::State::Failure)
                     return;
 
                 const auto requestId = invokeTrigger(id, resultHandler, QnBusiness::InactiveState);
                 const bool success = requestId != rest::Handle();
                 button->setProperty(kTriggerRequestIdProperty, requestId);
                 button->setState(success
-                    ? QnSoftwareTriggerButton::kDefaultState
-                    : QnSoftwareTriggerButton::kFailureState);
+                    ? QnSoftwareTriggerButton::State::Default
+                    : QnSoftwareTriggerButton::State::Failure);
             });
     }
     else
@@ -2387,8 +2390,8 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
                 button->setProperty(kTriggerRequestIdProperty, requestId);
                 button->setEnabled(!success);
                 button->setState(success
-                    ? QnSoftwareTriggerButton::kWaitingState
-                    : QnSoftwareTriggerButton::kFailureState);
+                    ? QnSoftwareTriggerButton::State::Waiting
+                    : QnSoftwareTriggerButton::State::Failure);
             });
     }
 }

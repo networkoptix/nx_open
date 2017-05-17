@@ -1,7 +1,7 @@
 #include "proxy_video_decoder_impl.h"
 #if defined(ENABLE_PROXY_DECODER)
 
-#include <nx/utils/debug_utils.h>
+#include <nx/kit/debug.h>
 
 #include <nx/media/aligned_mem_video_buffer.h>
 
@@ -11,8 +11,6 @@ namespace nx {
 namespace media {
 
 namespace {
-
-static constexpr const char* OUTPUT_PREFIX = "ProxyVideoDecoder<yuv_planar>: ";
 
 class Impl: public ProxyVideoDecoderImpl
 {
@@ -43,11 +41,11 @@ int Impl::decode(
 
     auto compressedFrame = createUniqueCompressedFrame(compressedVideoData);
     int64_t ptsUs = 0;
-    NX_TIME_BEGIN(decodeToYuvPlanar);
+    NX_TIME_BEGIN(DecodeToYuvPlanar);
     // Perform actual decoding to AlignedMemVideoBuffer.
     int result = proxyDecoder().decodeToYuvPlanar(compressedFrame.get(), &ptsUs,
         yBuffer, lineSize, uBuffer, vBuffer, lineSize / 2);
-    NX_TIME_END(decodeToYuvPlanar);
+    NX_TIME_END(DecodeToYuvPlanar);
     videoBuffer->unmap();
 
     if (result > 0)
@@ -69,11 +67,11 @@ int Impl::decode(
 
 ProxyVideoDecoderImpl* ProxyVideoDecoderImpl::createImplYuvPlanar(const Params& params)
 {
-    PRINT << "Using this impl";
+    NX_PRINT << "Using this impl";
     return new Impl(params);
 }
 
 } // namespace media
 } // namespace nx
 
-#endif // ENABLE_PROXY_DECODER
+#endif // defined(ENABLE_PROXY_DECODER)

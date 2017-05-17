@@ -11,7 +11,9 @@ nx_add_target(nx_utils LIBRARY ${library_type}
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/app_info_impl.cpp"
     PUBLIC_LIBS
-        boost Qt5::Core)
+        boost Qt5::Core Qt5::Xml
+        nx_kit
+)
 
 target_compile_definitions(nx_utils
     PRIVATE NX_UTILS_API=${API_EXPORT_MACRO}

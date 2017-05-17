@@ -115,10 +115,20 @@ QnUuid LayoutTourExecutor::runningTour() const
     return QnUuid();
 }
 
+void LayoutTourExecutor::prevTourStep()
+{
+    processTourStepInternal(false, true);
+}
+
+void LayoutTourExecutor::nextTourStep()
+{
+    processTourStepInternal(true, true);
+}
+
 void LayoutTourExecutor::timerEvent(QTimerEvent* event)
 {
     if (event->timerId() == m_tour.timerId)
-        processTourStep();
+        processTourStepInternal(true, false);
     base_type::timerEvent(event);
 }
 
@@ -155,15 +165,30 @@ void LayoutTourExecutor::stopCurrentTour()
     m_mode = Mode::Stopped;
 }
 
-void LayoutTourExecutor::processTourStep()
+void LayoutTourExecutor::processTourStepInternal(bool forward, bool force)
 {
+    auto nextIndex = [forward](int current, int size)
+        {
+            NX_EXPECT(size > 0);
+            if (current < 0 || size <= 0)
+                return 0;
+
+            // adding size to avoid negative modulo result
+            return (current + size + (forward ? 1 : -1)) % size;
+        };
+
     switch (m_mode)
     {
         case Mode::SingleLayout:
         {
-            auto item = workbench()->item(Qn::ZoomedRole);
-            if (item && isTimerRunning() && !m_tour.elapsed.hasExpired(qnSettings->tourCycleTime()))
+            const auto item = workbench()->item(Qn::ZoomedRole);
+            if (!force
+                && item
+                && isTimerRunning()
+                && !m_tour.elapsed.hasExpired(qnSettings->tourCycleTime()))
+            {
                 return;
+            }
 
             auto items = workbench()->currentLayout()->items().toList();
             if (items.empty())
@@ -173,11 +198,8 @@ void LayoutTourExecutor::processTourStep()
             }
 
             QnWorkbenchItem::sortByGeometry(&items);
-            if (item)
-                item = items[(items.indexOf(item) + 1) % items.size()];
-            else
-                item = items[0];
-            workbench()->setItem(Qn::ZoomedRole, item);
+            const int index = item ? items.indexOf(item) : -1;
+            workbench()->setItem(Qn::ZoomedRole, items[nextIndex(index, items.size())]);
             if (isTimerRunning())
                 m_tour.elapsed.restart();
             break;
@@ -196,7 +218,7 @@ void LayoutTourExecutor::processTourStep()
             const bool isRunning = isTimerRunning()
                 && qBetween(0, m_tour.currentIndex, (int) m_tour.items.size());
 
-            if (isRunning)
+            if (isRunning && !force)
             {
                 // No need to switch the only item.
                 if (m_tour.items.size() < 2)
@@ -207,7 +229,7 @@ void LayoutTourExecutor::processTourStep()
                     return;
             }
 
-            m_tour.currentIndex = (m_tour.currentIndex + 1) % m_tour.items.size();
+            m_tour.currentIndex = nextIndex(m_tour.currentIndex, m_tour.items.size());
             const auto& next = m_tour.items[m_tour.currentIndex];
 
             auto layout = next.layout;
@@ -291,7 +313,7 @@ void LayoutTourExecutor::stopTimer()
 void LayoutTourExecutor::startTourInternal()
 {
     setHintVisible(true);
-    processTourStep();
+    processTourStepInternal(true, true);
 }
 
 bool LayoutTourExecutor::isTimerRunning() const

@@ -224,7 +224,7 @@ bool QnSaveCloudSystemCredentialsHandler::insertCloudOwner(
     if (resultCode != ec2::ErrorCode::ok)
     {
         NX_LOGX(
-            lm("Error inserting cloud owner to the local DB. %1").str(resultCode),
+            lm("Error inserting cloud owner to the local DB. %1").arg(resultCode),
             cl_logWARNING);
         result->setError(
             QnJsonRestResult::CantProcessRequest,
