@@ -13,7 +13,7 @@
 #include "ec2_connection.h"
 #include "ec_connection_notification_manager.h"
 #include "managers/time_manager.h"
-#include "network/module_finder.h"
+#include "nx/vms/discovery/manager.h"
 #include "remote_ec_connection.h"
 #include "settings.h"
 
@@ -1098,27 +1098,17 @@ QnTransaction<ApiDiscoveredServerDataList> QnTransactionMessageBus::prepareModul
         commonModule()->moduleGUID());
 
 
-    QnModuleFinder* moduleFinder = commonModule()->moduleFinder();
-    for (const QnModuleInformation &moduleInformation : moduleFinder->foundModules())
+    const auto moduleManager = commonModule()->moduleDiscoveryManager();
+    for (const auto& serverData: getServers(moduleManager))
     {
-        ApiDiscoveredServerData serverData(moduleInformation);
-
-        SocketAddress primaryAddress = moduleFinder->primaryAddress(moduleInformation.id);
-        if (primaryAddress.isNull())
-            continue;
-
-        serverData.status = moduleFinder->moduleStaus(moduleInformation.id);
-        if (serverData.status != Qn::Online &&
-            serverData.status != Qn::Unauthorized &&
-            serverData.status != Qn::Incompatible)
+        if (serverData.status == Qn::Online ||
+            serverData.status == Qn::Unauthorized ||
+            serverData.status == Qn::Incompatible)
         {
-            continue;
+            transaction.params.push_back(std::move(serverData));
         }
-
-        serverData.remoteAddresses.insert(primaryAddress.address.toString());
-        serverData.port = primaryAddress.port;
-        transaction.params.push_back(std::move(serverData));
     }
+
     transaction.peerID = commonModule()->moduleGUID();
     transaction.transactionType = TransactionType::Local;
     return transaction;
@@ -1587,7 +1577,7 @@ void QnTransactionMessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
             {
                 if (transport->remoteSocketAddr() == urlStr)
                 {
-                    NX_LOGX(lm("Disconnected from peer %1").str(url), cl_logWARNING);
+                    NX_LOGX(lm("Disconnected from peer %1").arg(url), cl_logWARNING);
                     transport->setState(QnTransactionTransport::Error);
                 }
             }
@@ -1682,7 +1672,7 @@ void QnTransactionMessageBus::reconnectAllPeers(QnMutexLockerBase* const /*lock*
 {
     for (QnTransactionTransport* transport : m_connections)
     {
-        NX_LOGX(lm("Disconnected from peer %1").str(transport->remoteAddr()), cl_logWARNING);
+        NX_LOGX(lm("Disconnected from peer %1").arg(transport->remoteAddr()), cl_logWARNING);
         transport->setState(QnTransactionTransport::Error);
     }
     for (auto transport : m_connectingConnections)

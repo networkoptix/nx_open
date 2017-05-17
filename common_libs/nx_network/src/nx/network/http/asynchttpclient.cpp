@@ -6,7 +6,6 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QDateTime>
 
-#include <http/custom_headers.h>
 #include <nx/network/socket_factory.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
@@ -16,6 +15,7 @@
 #include <nx/utils/system_error.h>
 
 #include "auth_tools.h"
+#include "custom_headers.h"
 
 static const int DEFAULT_SEND_TIMEOUT = 3000;
 static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
@@ -346,7 +346,7 @@ BufferType AsyncHttpClient::fetchMessageBodyBuffer()
 {
     const auto buffer = m_httpStreamReader.fetchMessageBody();
     if (logTraffic())
-        NX_LOGX(lm("Response message body buffer:\n%1\n\n").str(buffer), cl_logDEBUG2);
+        NX_LOGX(lm("Response message body buffer:\n%1\n\n").arg(buffer), cl_logDEBUG2);
 
     return buffer;
 }
@@ -451,7 +451,7 @@ void AsyncHttpClient::setMessageBodyReadTimeoutMs(unsigned int messageBodyReadTi
 void AsyncHttpClient::asyncConnectDone(SystemError::ErrorCode errorCode)
 {
     NX_LOGX(lm("Opened connection to url %1. Result code %2")
-        .arg(m_contentLocationUrl).str(errorCode), cl_logDEBUG2);
+        .arg(m_contentLocationUrl).arg(errorCode), cl_logDEBUG2);
 
     std::shared_ptr<AsyncHttpClient> sharedThis(shared_from_this());
 
@@ -530,7 +530,7 @@ void AsyncHttpClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t byt
 
     NX_LOGX(lm("Request has been successfully sent to %1: %2")
         .arg(m_contentLocationUrl)
-        .strs(logTraffic() ? request().toString() : request().requestLine.toString()),
+        .args(logTraffic() ? request().toString() : request().requestLine.toString()),
         cl_logDEBUG2);
 
     const auto requestSequenceBak = m_requestSequence;
@@ -684,7 +684,7 @@ void AsyncHttpClient::initiateTcpConnection()
     m_socket = SocketFactory::createStreamSocket(m_contentLocationUrl.scheme() == lm("https"));
 
     NX_LOGX(lm("Opening connection to %1. url %2, socket %3")
-        .str(remoteAddress).arg(m_contentLocationUrl).arg(m_socket->handle()), cl_logDEBUG2);
+        .arg(remoteAddress).arg(m_contentLocationUrl).arg(m_socket->handle()), cl_logDEBUG2);
 
     m_socket->bindToAioThread(m_aioThreadBinder.getAioThread());
     m_connectionClosed = false;
@@ -872,7 +872,7 @@ void AsyncHttpClient::processResponseHeadersBytes(
 
     NX_LOGX(lm("Response from %1 has been successfully read: %2")
         .arg(m_contentLocationUrl)
-        .str(logTraffic() ? response()->toString() : response()->statusLine.toString()),
+        .arg(logTraffic() ? response()->toString() : response()->statusLine.toString()),
         cl_logDEBUG2);
 
     if (repeatRequestIfNeeded(*m_httpStreamReader.message().response))

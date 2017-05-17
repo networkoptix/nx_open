@@ -10,7 +10,7 @@
 #include "database/db_manager.h"
 #include "common/common_module.h"
 #include "transaction/transaction_transport.h"
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "audit/audit_manager.h"
 #include "settings.h"
 #include <core/resource/media_server_resource.h>

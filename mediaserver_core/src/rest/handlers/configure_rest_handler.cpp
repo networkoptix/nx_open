@@ -17,7 +17,7 @@
 #include "core/resource/user_resource.h"
 #include "core/resource/media_server_resource.h"
 #include "network/tcp_connection_priv.h"
-#include "network/module_finder.h"
+#include "nx/vms/discovery/manager.h"
 #include "api/model/configure_reply.h"
 #include "rest/server/rest_connection_processor.h"
 #include "network/tcp_listener.h"

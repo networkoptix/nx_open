@@ -265,7 +265,7 @@ private:
     Settings* m_settings;
 
     void selectLocalTimeAsSynchronized(
-        QnMutexLockerBase* const lk,
+        QnMutexLockerBase* const lock,
         quint16 newTimePriorityKeySequence);
     /**
      * @param lock Locked m_mutex. This method will unlock it to emit TimeSynchronizationManager::timeChanged signal.
@@ -306,7 +306,7 @@ private:
         nx_http::AsyncHttpClientPtr clientPtr,
         qint64 requestRttMillis);
     TimeSyncInfo getTimeSyncInfoNonSafe() const;
-    void syncTimeWithAllKnownServers(QnMutexLockerBase* const lock);
+    void syncTimeWithAllKnownServers(const QnMutexLockerBase& /*lock*/);
     void onBeforeSendingTransaction(
         QnTransactionTransportBase* transport,
         nx_http::HttpHeaders* const headers);
@@ -316,10 +316,10 @@ private:
     void forgetSynchronizedTimeNonSafe(QnMutexLockerBase* const lock);
     void switchBackToLocalTime(QnMutexLockerBase* const /*lock*/);
     void checkSystemTimeForChange();
-    void handleLocalTimePriorityKeyChange(QnMutexLockerBase* const lk);
+    void handleLocalTimePriorityKeyChange(QnMutexLockerBase* const lock);
 
     void saveSyncTimeAsync(
-        QnMutexLockerBase* const lk,
+        QnMutexLockerBase* const lock,
         qint64 syncTimeToLocalDelta,
         TimePriorityKey syncTimeKey);
 

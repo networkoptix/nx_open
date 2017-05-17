@@ -48,7 +48,7 @@ extern "C"
 #include <network/authenticate_helper.h>
 #include <media_server/settings.h>
 #include <nx/fusion/model_functions.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include <audit/audit_manager.h>
 #include <media_server/settings.h>
 #include <streaming/streaming_params.h>

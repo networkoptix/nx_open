@@ -23,11 +23,11 @@
 #include <nx_ec/managers/abstract_server_manager.h>
 #include "api/app_server_connection.h"
 #include "network/router.h"
-#include <network/module_finder.h>
+#include <nx/vms/discovery/manager.h>
 
 #include <utils/common/app_info.h>
 #include "core/resource/storage_resource.h"
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "resource_status_watcher.h"
 #include <media_server/media_server_module.h>
 
@@ -142,9 +142,6 @@ void QnServerMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerData &pee
         res->setStatus(Qn::Online);
     else
         m_delayedOnlineStatus << peer.id;
-
-    if (QnModuleFinder *moduleFinder = commonModule()->moduleFinder())
-        moduleFinder->setModuleStatus(peer.id, Qn::Online);
 }
 
 void QnServerMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerData& peer)
@@ -160,9 +157,6 @@ void QnServerMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerData& peer
         }
     }
     m_delayedOnlineStatus.remove(peer.id);
-
-    if (QnModuleFinder *moduleFinder = commonModule()->moduleFinder())
-        moduleFinder->setModuleStatus(peer.id, Qn::Offline);
 }
 
 void QnServerMessageProcessor::onResourceStatusChanged(
@@ -246,9 +240,6 @@ void QnServerMessageProcessor::at_remotePeerUnauthorized(const QnUuid& id)
     QnResourcePtr mServer = resourcePool()->getResourceById(id);
     if (mServer)
         mServer->setStatus(Qn::Unauthorized);
-
-    if (QnModuleFinder *moduleFinder = commonModule()->moduleFinder())
-        moduleFinder->setModuleStatus(id, Qn::Unauthorized);
 }
 
 bool QnServerMessageProcessor::canRemoveResource(const QnUuid& resourceId)

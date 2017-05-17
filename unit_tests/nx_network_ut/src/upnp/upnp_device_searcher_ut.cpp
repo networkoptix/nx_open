@@ -1,8 +1,8 @@
-#include "common/common_globals.h"
-#include <nx/network/upnp/upnp_device_searcher.h>
+#include <iostream>
 
 #include <gtest/gtest.h>
-#include <iostream>
+
+#include <nx/network/upnp/upnp_device_searcher.h>
 
 namespace nx_upnp {
 namespace test {

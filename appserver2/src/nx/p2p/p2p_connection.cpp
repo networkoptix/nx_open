@@ -5,7 +5,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <api/global_settings.h>
 #include <common/static_common_module.h>

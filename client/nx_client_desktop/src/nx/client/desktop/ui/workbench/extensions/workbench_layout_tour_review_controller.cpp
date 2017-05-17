@@ -10,13 +10,23 @@
 
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/graphics/items/resource/layout_tour_drop_placeholder.h>
+
+#include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
+#include <ui/workbench/workbench_utility.h>
 
+#include <utils/common/delayed.h>
 #include <utils/common/uuid_pool.h>
+
+#include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 
 namespace {
 
@@ -24,6 +34,32 @@ static const int kDefaultDelayMs = 5000;
 
 const QnUuid uuidPoolBase("44a18151-242e-430b-8b57-4c94691902f9");
 static const int kUuidsLimit = 16384;
+
+class PlaceholderMagnitudeCalculator: public QnDistanceMagnitudeCalculator
+{
+    using base_type = QnDistanceMagnitudeCalculator;
+public:
+    /**
+    * \param origin                    Desired position for an item.
+    */
+    PlaceholderMagnitudeCalculator(const QPointF &origin):
+        base_type(origin)
+    {
+    }
+
+protected:
+    virtual qreal calculateInternal(const void *value) const override
+    {
+        const auto baseValue = base_type::calculateInternal(value);
+
+        const QPoint &p = *static_cast<const QPoint *>(value);
+        if (p.x() < m_origin.x() || p.y() < m_origin.y())
+            return baseValue * 10000;
+        return baseValue;
+    }
+};
+
+
 
 } // namespace
 
@@ -121,11 +157,18 @@ void LayoutTourReviewController::startListeningLayout()
     connectToLayout(workbench()->currentLayout());
     updateOrder();
     updateButtons(workbench()->currentLayout()->resource());
+
+    m_dropPlaceholder = new LayoutTourDropPlaceholder();
+    m_dropPlaceholder->setAnimationTimer(display()->instrumentManager()->animationTimer());
+    display()->setLayer(m_dropPlaceholder, Qn::BackLayer);
+    display()->scene()->addItem(m_dropPlaceholder);
+    updatePlaceholderPosition();
 }
 
 void LayoutTourReviewController::stopListeningLayout()
 {
     m_connections.reset();
+    delete m_dropPlaceholder;
 }
 
 void LayoutTourReviewController::reviewLayoutTour(const ec2::ApiLayoutTourData& tour)
@@ -192,25 +235,23 @@ void LayoutTourReviewController::connectToLayout(QnWorkbenchLayout* layout)
     *m_connections << connect(layout, &QnWorkbenchLayout::itemAdded, this,
         [this, layout](QnWorkbenchItem* item)
         {
-            connectToItem(item);
             updateOrder();
             updateButtons(layout->resource());
+            updatePlaceholderPosition();
+        });
+    *m_connections << connect(layout, &QnWorkbenchLayout::itemMoved, this,
+        [this, layout](QnWorkbenchItem* item)
+        {
+            updateOrder();
+            updatePlaceholderPosition();
         });
     *m_connections << connect(layout, &QnWorkbenchLayout::itemRemoved, this,
         [this, layout](QnWorkbenchItem* item)
         {
-            item->disconnect(this);
             updateOrder();
             updateButtons(layout->resource());
+            updatePlaceholderPosition();
         });
-    for (auto item: layout->items())
-        connectToItem(item);
-}
-
-void LayoutTourReviewController::connectToItem(QnWorkbenchItem* item)
-{
-    *m_connections << connect(item, &QnWorkbenchItem::geometryChanged, this,
-        &LayoutTourReviewController::updateOrder);
 }
 
 void LayoutTourReviewController::updateOrder()
@@ -238,6 +279,23 @@ void LayoutTourReviewController::updateButtons(const QnLayoutResourcePtr& layout
         action::RemoveCurrentLayoutTourAction
     };
     layout->setData(Qn::CustomPanelActionsRole, qVariantFromValue(actions));
+}
+
+void LayoutTourReviewController::updatePlaceholderPosition()
+{
+    if (!m_dropPlaceholder)
+        return;
+
+    const auto mapper = workbench()->mapper();
+
+    static const QSize kPlaceholderSize(1, 1);
+
+    const auto startPos = workbench()->currentLayout()->boundingRect().topLeft();
+    PlaceholderMagnitudeCalculator metric(startPos);
+    const auto freeSlot = workbench()->currentLayout()->closestFreeSlot(startPos,
+        kPlaceholderSize, &metric);
+    const QRectF targetRect = mapper->mapFromGrid(freeSlot);
+    m_dropPlaceholder->setRect(targetRect);
 }
 
 void LayoutTourReviewController::addItemToReviewLayout(
@@ -399,6 +457,10 @@ void LayoutTourReviewController::at_saveCurrentLayoutTourAction_triggered()
     const auto id = currentTourId();
     auto tour = layoutTourManager()->tour(id);
     NX_EXPECT(tour.isValid());
+
+    const auto reviewLayout = m_reviewLayouts.value(id);
+    NX_EXPECT(reviewLayout);
+    snapshotManager()->store(reviewLayout);
 
     tour.items.clear();
     fillTourItems(&tour.items);

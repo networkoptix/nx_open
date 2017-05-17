@@ -56,11 +56,24 @@ private:
     std::size_t m_sizeBytes;
 };
 
-template<typename SourcePtr, typename DestinationPtr>
 class AsyncChannelUnidirectionalBridge
 {
 public:
-    AsyncChannelUnidirectionalBridge(
+    virtual ~AsyncChannelUnidirectionalBridge() = default;
+
+    virtual void setReadBufferSize(std::size_t readBufferSize) = 0;
+    virtual void setMaxSendQueueSizeBytes(std::size_t maxSendQueueSizeBytes) = 0;
+    virtual void start(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> doneHandler) = 0;
+    virtual void setOnSomeActivity(nx::utils::MoveOnlyFunc<void()> handler) = 0;
+    virtual bool isSendQueueEmpty() const = 0;
+};
+
+template<typename SourcePtr, typename DestinationPtr>
+class AsyncChannelUnidirectionalBridgeImpl:
+    public AsyncChannelUnidirectionalBridge
+{
+public:
+    AsyncChannelUnidirectionalBridgeImpl(
         SourcePtr& source,
         DestinationPtr& destination)
         :
@@ -75,26 +88,31 @@ public:
         m_readBuffer.reserve((int)m_readBufferSize);
     }
 
-    void setReadBufferSize(std::size_t readBufferSize)
+    virtual void setReadBufferSize(std::size_t readBufferSize) override
     {
         m_readBufferSize = readBufferSize;
         m_readBuffer.reserve((int)m_readBufferSize);
     }
 
-    void setMaxSendQueueSizeBytes(std::size_t maxSendQueueSizeBytes)
+    virtual void setMaxSendQueueSizeBytes(std::size_t maxSendQueueSizeBytes) override
     {
         m_maxSendQueueSizeBytes = maxSendQueueSizeBytes;
     }
 
-    void start(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> doneHandler)
+    virtual void start(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> doneHandler) override
     {
         m_onDoneHandler = std::move(doneHandler);
         scheduleRead();
     }
 
-    void setOnSomeActivity(nx::utils::MoveOnlyFunc<void()> handler)
+    virtual void setOnSomeActivity(nx::utils::MoveOnlyFunc<void()> handler) override
     {
         m_onSomeActivityHander = std::move(handler);
+    }
+
+    virtual bool isSendQueueEmpty() const override
+    {
+        return m_sendQueue.empty();
     }
 
 private:

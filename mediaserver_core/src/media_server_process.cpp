@@ -185,7 +185,7 @@
 
 #include <rtsp/rtsp_connection.h>
 
-#include <network/module_finder.h>
+#include <nx/vms/discovery/manager.h>
 #include <network/multicodec_rtp_reader.h>
 #include <network/router.h>
 
@@ -1200,8 +1200,9 @@ void MediaServerProcess::stopObjects()
 
     if (m_universalTcpListener)
         m_universalTcpListener->pleaseStop();
-    if (commonModule()->moduleFinder())
-        commonModule()->moduleFinder()->pleaseStop();
+
+    if (const auto manager = commonModule()->moduleDiscoveryManager())
+        manager->stop();
 
     if (m_universalTcpListener) {
         m_universalTcpListener->stop();
@@ -1421,7 +1422,7 @@ void MediaServerProcess::loadResourcesFromECS(
                 }
                 else
                 {
-                    NX_ASSERT(false, lm("No resourse type in the pool %1").str(camera.typeId));
+                    NX_ASSERT(false, lm("No resourse type in the pool %1").arg(camera.typeId));
                 }
             }
         }
@@ -1695,14 +1696,14 @@ void MediaServerProcess::at_connectionOpened()
     m_firstRunningTime = 0;
 }
 
-void MediaServerProcess::at_serverModuleConflict(const QnModuleInformation &moduleInformation, const SocketAddress &address)
+void MediaServerProcess::at_serverModuleConflict(nx::vms::discovery::Manager::ModuleData module)
 {
     const auto& resPool = commonModule()->resourcePool();
     qnBusinessRuleConnector->at_mediaServerConflict(
-                resPool->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID()),
-                qnSyncTime->currentUSecsSinceEpoch(),
-                moduleInformation,
-                QUrl(lit("http://%1").arg(address.toString())));
+        resPool->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID()),
+        qnSyncTime->currentUSecsSinceEpoch(),
+        module,
+        QUrl(lit("http://%1").arg(module.endpoint.toString())));
 }
 
 void MediaServerProcess::at_timer()
@@ -2770,7 +2771,8 @@ void MediaServerProcess::run()
         commonModule()->setAllowedPeers(allowedPeers);
     }
 
-    connect(commonModule()->moduleFinder(), &QnModuleFinder::moduleConflict, this, &MediaServerProcess::at_serverModuleConflict);
+    connect(commonModule()->moduleDiscoveryManager(), &nx::vms::discovery::Manager::conflict,
+        this, &MediaServerProcess::at_serverModuleConflict);
 
     QScopedPointer<QnServerConnector> serverConnector(new QnServerConnector(commonModule()));
 
@@ -2949,7 +2951,7 @@ void MediaServerProcess::run()
             if (server->setProperty(Qn::UDT_INTERNET_TRFFIC, QString::number(update))
                 && server->saveParams())
             {
-                NX_LOG(lm("%1 is updated to %2").strs(Qn::UDT_INTERNET_TRFFIC, update), cl_logDEBUG1);
+                NX_LOG(lm("%1 is updated to %2").args(Qn::UDT_INTERNET_TRFFIC, update), cl_logDEBUG1);
                 nx::network::UdtStatistics::global.internetBytesTransfered -= current;
             }
         });
@@ -2972,7 +2974,7 @@ void MediaServerProcess::run()
         // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
         commonModule()->setCloudMode(true);
         if (!isDiscoveryDisabled)
-            commonModule()->moduleFinder()->start();
+            commonModule()->moduleDiscoveryManager()->start();
     }
 #endif
     qnBackupStorageMan->scheduleSync()->start();
@@ -2993,7 +2995,7 @@ void MediaServerProcess::run()
         m_updatePiblicIpTimer.reset();
     }
     disconnect(m_ipDiscovery.get(), 0, this, 0);
-    disconnect(commonModule()->moduleFinder(), 0, this, 0);
+    disconnect(commonModule()->moduleDiscoveryManager(), 0, this, 0);
 
     WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed( QThread::currentThread(), 3 );
     waitingForObjectsToBeFreed.join();

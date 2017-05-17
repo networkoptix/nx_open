@@ -13,7 +13,9 @@ CONFIG(debug, debug|release) {
   CONFIGURATION = release
 }
 
-DESTDIR = $$clean_path("${libdir}")/bin/$$CONFIGURATION
+OUTPUT_PATH = $$clean_path("${libdir}")
+win*:!equals(LIBTYPE, "staticlib"): DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION
+else: DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION
 
 SRCDIR = ${packages.dir}/any/nx_kit/src
 

@@ -1,12 +1,11 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/upnp/upnp_device_searcher.h>
+#include <nx/utils/test_support/sync_queue.h>
+
+#include <api/global_settings.h>
 
 #include "upnp_port_mapper_mocked.h"
-
-#include <common/common_globals.h>
-#include <api/global_settings.h>
-#include <nx/utils/test_support/sync_queue.h>
 
 namespace nx_upnp {
 namespace test {

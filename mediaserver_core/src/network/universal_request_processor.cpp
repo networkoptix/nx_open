@@ -7,7 +7,7 @@
 #include "audit/audit_manager.h"
 #include "common/common_module.h"
 #include "core/resource_management/resource_pool.h"
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "network/tcp_connection_priv.h"
 #include "universal_request_processor_p.h"
 #include <nx/fusion/model_functions.h>

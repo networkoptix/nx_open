@@ -6,6 +6,7 @@
 #include <QtSql/QSqlRecord>
 
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/uuid.h>
 
 class QSqlDatabase;
 

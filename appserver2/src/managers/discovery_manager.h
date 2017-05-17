@@ -35,7 +35,7 @@ namespace ec2
         virtual ~QnDiscoveryManager();
 
     protected:
-        virtual int discoverPeer(const QUrl &url, impl::SimpleHandlerPtr handler) override;
+        virtual int discoverPeer(const QnUuid &id, const QUrl &url, impl::SimpleHandlerPtr handler) override;
         virtual int addDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) override;
         virtual int removeDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) override;
         virtual int getDiscoveryData(impl::GetDiscoveryDataHandlerPtr handler) override;

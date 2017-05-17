@@ -15,7 +15,7 @@
 #include <rest/server/rest_connection_processor.h>
 
 #include <utils/xml/camera_advanced_param_reader.h>
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include <api/helpers/camera_id_helper.h>
 
 namespace {

@@ -106,6 +106,13 @@ const char* toString(AttributeType val)
         case tcpConnectionKeepAlive:
             return "tcpConnectionKeepAlive";
 
+        case udpHolePunchingStartDelay:
+            return "udpHolePunchingStartDelay";
+        case trafficRelayingStartDelay:
+            return "trafficRelayingStartDelay";
+        case directTcpConnectStartDelay:
+            return "directTcpConnectStartDelay";
+
         case systemErrorCode:
             return "systemErrorCode";
 

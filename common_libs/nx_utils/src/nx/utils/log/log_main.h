@@ -16,9 +16,6 @@ std::shared_ptr<Logger> NX_UTILS_API add(const std::set<QString>& filters);
 /** Get logger by tag or main if no specific logger is set. */
 std::shared_ptr<Logger> NX_UTILS_API get(const QString& tag, bool allowMain = true);
 
-bool inline isToBeLogged(Level level, const QString& tag) { return get(tag)->isToBeLogged(level, tag); }
-
-
 /**
  * Indicates if a message is going to be logged by any logger.
  */

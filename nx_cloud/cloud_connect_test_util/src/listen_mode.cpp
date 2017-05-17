@@ -10,8 +10,6 @@
 #include <nx/utils/string.h>
 #include <nx/utils/thread/barrier_handler.h>
 
-#include <utils/common/command_line_parser.h>
-
 #include "dynamic_statistics.h"
 
 namespace nx {
@@ -164,7 +162,7 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
     auto transmissionMode = test::TestTransmissionMode::spam;
     if (args.get("ping"))
         transmissionMode = test::TestTransmissionMode::pong;
-    std::cout << lm("Server mode: %1").strs(transmissionMode).toStdString() << std::endl;
+    std::cout << lm("Server mode: %1").args(transmissionMode).toStdString() << std::endl;
 
     auto multiServerSocket = new network::MultipleServerSocket();
     std::unique_ptr<AbstractStreamServerSocket> serverSocket(multiServerSocket);

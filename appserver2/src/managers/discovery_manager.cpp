@@ -1,7 +1,6 @@
 #include "discovery_manager.h"
 
-#include "network/module_finder.h"
-#include "network/direct_module_finder.h"
+#include "nx/vms/discovery/manager.h"
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
 #include <common/common_module.h>
@@ -32,9 +31,8 @@ void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<Api
     NX_ASSERT(transaction.command == ApiCommand::discoverPeer, "Invalid command for this function", Q_FUNC_INFO);
 
     // TODO: maybe it's better to move it out and use signal?..
-    QnModuleFinder *moduleFinder = commonModule()->moduleFinder();
-    if (moduleFinder && moduleFinder->directModuleFinder())
-        moduleFinder->directModuleFinder()->checkUrl(QUrl(transaction.params.url));
+    if (const auto manager = commonModule()->moduleDiscoveryManager())
+        manager->checkEndpoint(QUrl(transaction.params.url), transaction.params.id);
 
 //    emit peerDiscoveryRequested(QUrl(transaction.params.url));
 }
@@ -84,10 +82,11 @@ template<class QueryProcessorType>
 QnDiscoveryManager<QueryProcessorType>::~QnDiscoveryManager() {}
 
 template<class QueryProcessorType>
-int QnDiscoveryManager<QueryProcessorType>::discoverPeer(const QUrl &url, impl::SimpleHandlerPtr handler)
+int QnDiscoveryManager<QueryProcessorType>::discoverPeer(const QnUuid &id, const QUrl &url, impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();
     ApiDiscoverPeerData params;
+    params.id = id;
     params.url = url.toString();
 
     using namespace std::placeholders;

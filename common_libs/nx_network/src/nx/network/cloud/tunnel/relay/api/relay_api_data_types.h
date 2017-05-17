@@ -22,6 +22,13 @@ struct BeginListeningResponse
     int preemptiveConnectionCount = 0;
 };
 
+inline bool operator==(
+    const BeginListeningResponse& left,
+    const BeginListeningResponse& right)
+{
+    return left.preemptiveConnectionCount == right.preemptiveConnectionCount;
+}
+
 #define BeginListeningResponse_Fields (preemptiveConnectionCount)
 
 struct CreateClientSessionRequest

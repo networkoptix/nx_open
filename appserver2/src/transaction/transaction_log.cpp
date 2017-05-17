@@ -412,7 +412,7 @@ QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTran
     if (rez) {
         NX_LOG( QnLog::EC2_TRAN_LOG,
             lm("Transaction log contains transaction %1, hash=%2 because of timestamp: %3 >= %4").
-            arg(tran.toString()).arg(hash.toString()).str(lastTime).str(tran.persistentInfo.timestamp), cl_logDEBUG1 );
+            arg(tran.toString()).arg(hash.toString()).arg(lastTime).arg(tran.persistentInfo.timestamp), cl_logDEBUG1 );
         return Reason_Timestamp;
     }
     else {

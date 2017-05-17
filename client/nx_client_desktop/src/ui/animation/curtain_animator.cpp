@@ -85,14 +85,17 @@ void QnCurtainAnimator::curtain(QnResourceWidget *frontWidget)
 
     pause();
 
-    restoreFrameColor();
-    m_frameOpacity = frontWidget->frameOpacity();
-    m_frameOpacityAnimator->setTargetObject(frontWidget);
-    m_frameOpacityAnimator->setTargetValue(kTransparent);
+    if (frontWidget)
+    {
+        restoreFrameColor();
+        m_frameOpacity = frontWidget->frameOpacity();
+        m_frameOpacityAnimator->setTargetObject(frontWidget);
+        m_frameOpacityAnimator->setTargetValue(kTransparent);
 
-    //TODO: #GDM #3.1 fix this hack
-    // Temporary solution to avoid glitch when switching between cameras in fullscreen
-    frontWidget->setFrameOpacity(kTransparent);
+        //TODO: #GDM #3.1 fix this hack
+        // Temporary solution to avoid glitch when switching between cameras in fullscreen
+        frontWidget->setFrameOpacity(kTransparent);
+    }
 
     m_curtainOpacityAnimator->setTargetValue(kOpaque);
     start();

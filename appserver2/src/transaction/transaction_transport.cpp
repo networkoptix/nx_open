@@ -8,8 +8,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include "database/db_manager.h"
-#include <http/custom_headers.h>
-
+#include <nx/network/http/custom_headers.h>
 
 namespace ec2 {
 

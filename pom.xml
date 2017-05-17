@@ -184,6 +184,7 @@
 
         <qt.libs/>
         <global.libs/>
+        <subdirectory.global.libs/>
         <windows.oslibs/>
         <linux.oslibs/>
         <mac.oslibs/>

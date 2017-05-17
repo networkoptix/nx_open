@@ -18,7 +18,6 @@
 
 class QSettings;
 class QnSessionManager;
-class QnModuleFinder;
 class QnRouter;
 class QnGlobalSettings;
 class QnCommonMessageProcessor;
@@ -33,9 +32,8 @@ class QnResourceStatusDictionary;
 class QnResourceDiscoveryManager;
 class QnServerAdditionalAddressesDictionary;
 
-namespace ec2 {
-    class AbstractECConnection;
-}
+namespace ec2 { class AbstractECConnection; }
+namespace nx { namespace vms { namespace discovery { class Manager; } } }
 
 struct BeforeRestoreDbData
 {
@@ -99,9 +97,9 @@ public:
         return m_globalSettings;
     }
 
-    QnModuleFinder* moduleFinder() const
+    nx::vms::discovery::Manager* moduleDiscoveryManager() const
     {
-        return m_moduleFinder;
+        return m_moduleDiscoveryManager;
     }
 
     QnCameraHistoryPool* cameraHistoryPool() const
@@ -259,7 +257,7 @@ private:
     QnResourcePool* m_resourcePool = nullptr;
     QnResourceAccessSubjectsCache* m_resourceAccessSubjectCache = nullptr;
     QnSharedResourcesManager* m_sharedResourceManager = nullptr;
-    QnModuleFinder* m_moduleFinder = nullptr;
+    nx::vms::discovery::Manager* m_moduleDiscoveryManager = nullptr;
     QnRouter* m_router = nullptr;
 
     QString m_defaultAdminPassword;

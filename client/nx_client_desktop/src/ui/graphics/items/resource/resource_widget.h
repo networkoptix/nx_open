@@ -7,7 +7,6 @@
 #include <client/client_color_types.h>
 
 #include <utils/common/connective.h>
-#include <ui/utils/viewport_scale_watcher.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
@@ -420,8 +419,6 @@ private:
     qint64 m_lastNewFrameTimeMSec;
 
     SelectionState m_selectionState;
-
-    QnViewportScaleWatcher m_scaleWatcher;
 };
 
 typedef QList<QnResourceWidget *> QnResourceWidgetList;

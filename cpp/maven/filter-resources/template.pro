@@ -109,6 +109,7 @@ LIBS += -L$$OUTPUT_PATH/lib -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L$$OUTPUT_PATH/
     LIBS += -Wl,-rpath-link,$$OUTPUT_PATH/lib/$$CONFIGURATION
 }
 LIBS += ${global.libs}
+LIBS += ${subdirectory.global.libs}
 
 INCLUDEPATH +=  ${project.build.sourceDirectory} \
                 ${project.build.directory} \
