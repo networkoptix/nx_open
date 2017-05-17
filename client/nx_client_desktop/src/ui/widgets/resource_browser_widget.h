@@ -2,7 +2,6 @@
 #define QN_RESOURCE_BROWSER_WIDGET_H
 
 #include <QtWidgets/QWidget>
-#include <QtWidgets/QGraphicsProxyWidget>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_index.h>
