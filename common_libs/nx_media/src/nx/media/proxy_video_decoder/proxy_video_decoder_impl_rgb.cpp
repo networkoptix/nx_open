@@ -1,7 +1,7 @@
 #include "proxy_video_decoder_impl.h"
 #if defined(ENABLE_PROXY_DECODER)
 
-#include <nx/utils/debug_utils.h>
+#include <nx/kit/debug.h>
 
 #include <nx/media/aligned_mem_video_buffer.h>
 
@@ -11,8 +11,6 @@ namespace nx {
 namespace media {
 
 namespace {
-
-static constexpr const char* OUTPUT_PREFIX = "ProxyVideoDecoder<rgb>: ";
 
 class Impl: public ProxyVideoDecoderImpl
 {
@@ -40,10 +38,10 @@ int Impl::decode(
 
     auto compressedFrame = createUniqueCompressedFrame(compressedVideoData);
     int64_t ptsUs = 0;
-    NX_TIME_BEGIN(decodeToRgb);
+    NX_TIME_BEGIN(DecodeToRgb);
     // Perform actual decoding to AlignedMemVideoBuffer.
     int result = proxyDecoder().decodeToRgb(compressedFrame.get(), &ptsUs, argbBuffer, argbLineSize);
-    NX_TIME_END(decodeToRgb);
+    NX_TIME_END(DecodeToRgb);
     videoBuffer->unmap();
 
     if (result > 0)
@@ -66,11 +64,11 @@ int Impl::decode(
 
 ProxyVideoDecoderImpl* ProxyVideoDecoderImpl::createImplRgb(const Params& params)
 {
-    PRINT << "Using this impl";
+    NX_PRINT << "Using this impl";
     return new Impl(params);
 }
 
 } // namespace media
 } // namespace nx
 
-#endif // ENABLE_PROXY_DECODER
+#endif // defined(ENABLE_PROXY_DECODER)

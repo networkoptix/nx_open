@@ -1,1 +1,1 @@
-nx_add_target(appserver2_ut EXECUTABLE PUBLIC_LIBS appserver2 GTest)
+nx_add_target(appserver2_ut EXECUTABLE PUBLIC_LIBS appserver2 GTest GMock)

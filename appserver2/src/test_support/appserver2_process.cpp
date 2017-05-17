@@ -8,12 +8,6 @@
 #include <chrono>
 #include <thread>
 
-#include <nx_ec/ec2_lib.h>
-#include <nx/network/http/http_mod_manager.h>
-#include <nx/utils/log/log.h>
-#include <nx/utils/timer_manager.h>
-#include <nx/utils/settings.h>
-
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
 #include <api/runtime_info_manager.h>
@@ -21,10 +15,19 @@
 #include <core/resource_management/resource_pool.h>
 #include <llutil/hardware_id.h>
 #include <network/http_connection_listener.h>
+#include <network/tcp_connection_priv.h>
+#include <nx1/info.h>
+#include <nx_ec/ec2_lib.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/network/http/http_mod_manager.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/scope_guard.h>
+#include <nx/utils/settings.h>
+#include <nx/utils/timer_manager.h>
+#include <nx/vms/discovery/manager.h>
+#include <rest/server/json_rest_result.h>
 #include <rest/server/rest_connection_processor.h>
 #include <utils/common/app_info.h>
-#include <nx/utils/scope_guard.h>
-#include <nx1/info.h>
 
 #include "ec2_connection_processor.h"
 #include <test_support/resource/test_resource_factory.h>
@@ -81,6 +84,26 @@ private:
 
 }   // namespace conf
 
+class QnMuduleInformationConnectionProcessor: public QnTCPConnectionProcessor
+{
+public:
+    QnMuduleInformationConnectionProcessor(
+        QSharedPointer<AbstractStreamSocket> socket,
+        QnHttpConnectionListener* owner)
+    :
+        QnTCPConnectionProcessor(socket, owner->commonModule())
+    {
+    }
+
+    virtual void run() override
+    {
+        QnJsonRestResult result;
+        result.setReply(commonModule()->moduleInformation());
+        d_ptr->response.messageBody = QJson::serialized(result);
+        sendResponse(nx_http::StatusCode::ok,
+            Qn::serializationFormatToHttpContentType(Qn::JsonFormat));
+    }
+};
 
 class QnSimpleHttpConnectionListener:
     public QnHttpConnectionListener
@@ -95,6 +118,7 @@ public:
     :
         QnHttpConnectionListener(commonModule, address, port, maxConnections, useSsl)
     {
+        addHandler<QnMuduleInformationConnectionProcessor>("HTTP", "api/moduleInformation");
     }
 
     ~QnSimpleHttpConnectionListener()
@@ -300,6 +324,7 @@ int Appserver2Process::exec()
     m_tcpListener = nullptr;
     tcpListener.pleaseStop();
 
+    m_commonModule->moduleDiscoveryManager()->stop();
     ec2Connection->stopReceivingNotifications();
     //Must call messageProcessor->init(ec2Connection)
     m_commonModule->messageProcessor()->init(nullptr);

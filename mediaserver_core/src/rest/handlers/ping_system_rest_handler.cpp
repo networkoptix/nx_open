@@ -4,7 +4,7 @@
 #include <licensing/license.h>
 #include <licensing/remote_licenses.h>
 
-#include "network/module_finder.h"
+#include "nx/vms/discovery/manager.h"
 #include "network/module_information.h"
 #include "network/tcp_connection_priv.h"
 #include <network/connection_validator.h>
