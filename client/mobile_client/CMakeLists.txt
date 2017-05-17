@@ -19,6 +19,7 @@ set(target_args
     PUBLIC_LIBS
         Qt5::WebChannel Qt5::WebSockets
         qtsingleguiapplication
+        nx_kit
         nx_client_core)
 
 if(ANDROID)
