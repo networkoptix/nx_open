@@ -11,7 +11,7 @@
 #include <nx/streaming/rtsp_client.h>
 #include <nx/streaming/rtp_stream_parser.h>
 
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include <network/tcp_connection_priv.h>
 #include <network/tcp_connection_processor.h>
 

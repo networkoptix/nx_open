@@ -14,7 +14,6 @@
 
 #include <gtest/gtest.h>
 
-#include <common/common_globals.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/server/http_stream_socket_server.h>

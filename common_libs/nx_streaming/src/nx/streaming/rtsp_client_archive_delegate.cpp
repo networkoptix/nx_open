@@ -30,7 +30,7 @@ extern "C"
 #include <nx/streaming/rtp_stream_parser.h>
 #include <network/ffmpeg_sdp.h>
 #include <QtConcurrent/QtConcurrentFilter>
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/rtsp_client.h>

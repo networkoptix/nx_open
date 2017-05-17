@@ -19,7 +19,7 @@
 
 #include "universal_tcp_listener.h"
 #include <core/resource/media_server_resource.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 
 #include <utils/common/app_info.h>
 

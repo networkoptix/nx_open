@@ -2,8 +2,12 @@
 
 #include <list>
 
+#include <nx/network/aio/basic_pollable.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/system_socket.h>
+#include <nx/utils/move_only_func.h>
+
+#include "tunnel_tcp_abstract_endpoint_verificator.h"
 #include "../abstract_tunnel_connector.h"
 
 namespace nx {
@@ -18,13 +22,14 @@ namespace tcp {
 class NX_NETWORK_API DirectEndpointConnector:
     public AbstractTunnelConnector
 {
+    using base_type = AbstractTunnelConnector;
+
 public:
     DirectEndpointConnector(
         AddressEntry targetHostAddress,
         nx::String connectSessionId);
-    virtual ~DirectEndpointConnector();
 
-    virtual void stopWhileInAioThread() override;
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     virtual int getPriority() const override;
     virtual void connect(
@@ -38,6 +43,9 @@ public:
      */
     static void setVerificationRequirement(bool value);
 
+protected:
+    virtual void stopWhileInAioThread() override;
+
 private:
     struct ConnectionContext
     {
@@ -45,10 +53,12 @@ private:
         nx_http::AsyncHttpClientPtr httpClient;
     };
 
+    using Verificators = std::list<std::unique_ptr<AbstractEndpointVerificator>>;
+
     const AddressEntry m_targetHostAddress;
     const nx::String m_connectSessionId;
     ConnectCompletionHandler m_completionHandler;
-    std::list<ConnectionContext> m_connections;
+    Verificators m_verificators;
     static bool s_needVerification;
 
     void performEndpointVerification(
@@ -56,14 +66,17 @@ private:
         std::chrono::milliseconds timeout,
         ConnectCompletionHandler handler);
 
-    void onHttpRequestDone(
-        nx_http::AsyncHttpClientPtr httpClient,
-        std::list<ConnectionContext>::iterator socketIter);
+    void launchVerificators(
+        const std::list<SocketAddress>& endpoints,
+        std::chrono::milliseconds timeout);
+    void onVerificationDone(
+        const SocketAddress& endpoint,
+        Verificators::iterator verificatorIter,
+        AbstractEndpointVerificator::VerificationResult result);
 
     void reportErrorOnEndpointVerificationFailure(
         nx::hpm::api::NatTraversalResultCode resultCode,
         SystemError::ErrorCode sysErrorCode);
-    bool verifyHostResponse(nx_http::AsyncHttpClientPtr httpClient);
     void reportSuccessfulVerificationResult(
         SocketAddress endpoint,
         std::unique_ptr<AbstractStreamSocket> streamSocket);

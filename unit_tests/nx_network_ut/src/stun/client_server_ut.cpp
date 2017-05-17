@@ -12,7 +12,6 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/test_support/sync_queue.h>
 
-#include <common/common_globals.h>
 #include <nx/utils/scope_guard.h>
 
 namespace nx {

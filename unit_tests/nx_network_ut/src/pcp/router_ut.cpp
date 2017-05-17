@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
+
 #include <nx/network/pcp/router_pcp.h>
+
 #include <utils/memory/data_stream_helpers.h>
 
 class TestRouter : protected pcp::Router

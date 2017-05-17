@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 #include <api/test_api_requests.h>
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/model_functions.h>
