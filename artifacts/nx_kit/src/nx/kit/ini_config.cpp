@@ -8,6 +8,8 @@
 #include <sstream>
 #include <cstring>
 #include <string>
+#include <cstdlib>
+#include <cerrno>
 
 #if !defined(NX_INI_CONFIG_DEFAULT_OUTPUT)
     #define NX_INI_CONFIG_DEFAULT_OUTPUT &std::cerr
@@ -177,7 +179,7 @@ bool Param<int>::reload(const std::string* value, std::ostream* output)
     {
         // NOTE: std::stoi() is missing on Android.
         char* pEnd = nullptr;
-        const long v = strtol(value->c_str(), &pEnd, /*base*/ 0);
+        const long v = std::strtol(value->c_str(), &pEnd, /*base*/ 0);
         if (v > INT_MAX || v < INT_MIN || errno == ERANGE || *pEnd != '\0')
             error = " [invalid value]";
         else
