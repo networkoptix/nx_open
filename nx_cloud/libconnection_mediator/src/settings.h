@@ -31,7 +31,7 @@ struct General
     api::CloudConnectOptions cloudConnectOptions = api::emptyCloudConnectOptions;
 };
 
-struct CloudDB
+struct CloudDb
 {
     bool runWithCloud;
     boost::optional<QUrl> url;
@@ -39,7 +39,7 @@ struct CloudDB
     QString password;
     std::chrono::seconds updateInterval;
 
-    CloudDB():
+    CloudDb():
         runWithCloud(true)
     {
     }

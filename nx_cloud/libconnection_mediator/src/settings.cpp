@@ -32,7 +32,7 @@ const QLatin1String kDefaultDataDir("");
 const QLatin1String kCloudConnectOptions("general/cloudConnectOptions");
 const QLatin1String kDefaultCloudConnectOptions("");
 
-//CloudDB settings
+//CloudDb settings
 const QLatin1String kRunWithCloud("cloud_db/runWithCloud");
 const QLatin1String kDefaultRunWithCloud("true");
 
@@ -173,7 +173,7 @@ const General& Settings::general() const
     return m_general;
 }
 
-const CloudDB& Settings::cloudDB() const
+const CloudDb& Settings::cloudDB() const
 {
     return m_cloudDB;
 }
