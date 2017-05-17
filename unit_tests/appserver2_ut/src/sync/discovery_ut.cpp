@@ -71,6 +71,7 @@ protected:
     void checkVisibility()
     {
         std::this_thread::sleep_for(std::chrono::seconds(10));
+        size_t totalDiscoveryLinks = 0;
         for (const auto& server: m_servers)
         {
             const auto discoveryManager = server.second->moduleInstance()->commonModule()
@@ -83,6 +84,7 @@ protected:
 
                 if (const auto module = discoveryManager->getModule(otherServer.first))
                 {
+                    ++totalDiscoveryLinks;
                     NX_ALWAYS(this, lm("Module %1 discovered %2 with endpoint %3").args(
                         server.first, module->id, module->endpoint));
 
@@ -92,11 +94,24 @@ protected:
                 }
                 else
                 {
-                    FAIL() << lm("Module %1 failed to discover %2").args(
-                        server.first, otherServer.first).toStdString();
+                    const auto error = lm("Module %1 failed to discover %2").args(
+                        server.first, otherServer.first);
+
+                    #ifdef Q_OS_MAC
+                        // Can join different UDT sockets to the same multicast group on OSX
+                        NX_WARNING(TAG, error);
+                    #else
+                        FAIL() << error.toStdString();
+                    #endif
                 }
             }
         }
+
+        #ifdef Q_OS_MAC
+            EXPECT_GE(totalDiscoveryLinks, (m_servers.size() - 1) * 2);
+        #else
+            EXPECT_EQ(m_servers.size() * (m_servers.size() - 1), totalDiscoveryLinks);
+        #endif
     }
 
 private:
