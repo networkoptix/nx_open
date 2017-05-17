@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsDropShadowEffect>
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/geometry.h>
@@ -39,10 +40,13 @@ static constexpr qreal kAnimationMinimumOpacity = 0.15;
 
 /* Tooltip adjustments: */
 static constexpr int kHoverEnterDelayMs = 0;
-static constexpr int kHoverLeaveDelayMs = 250;
+static constexpr int kHoverLeaveDelayMs = 50;
 static constexpr qreal kToolTipAnimationSpeedFactor = 2.0;
 static constexpr qreal kToolTipRoundingRadius = 2.0;
 static constexpr qreal kToolTipPadding = 8.0;
+static constexpr qreal kToolTipShadowBlurRadius = 5.0;
+static constexpr qreal kToolTipShadowOpacity = 0.36;
+static const QPointF kToolTipShadowOffset(0.0, 3.0);
 
 static Qt::Edge invertEdge(Qt::Edge edge)
 {
@@ -109,6 +113,14 @@ SoftwareTriggerButtonPrivate::SoftwareTriggerButtonPrivate(SoftwareTriggerButton
     m_toolTip->setOpacity(0.0);
     m_toolTip->setRoundingRadius(kToolTipRoundingRadius);
     m_toolTip->setFlag(QGraphicsItem::ItemIgnoresTransformations, false);
+
+    auto shadowEffect = new QGraphicsDropShadowEffect(m_toolTip);
+    auto shadowColor = QPalette().color(QPalette::Shadow);
+    shadowColor.setAlphaF(kToolTipShadowOpacity);
+    shadowEffect->setColor(shadowColor);
+    shadowEffect->setOffset(kToolTipShadowOffset);
+    shadowEffect->setBlurRadius(kToolTipShadowBlurRadius);
+    m_toolTip->setGraphicsEffect(shadowEffect);
 
     updateToolTipTailEdge();
 }
