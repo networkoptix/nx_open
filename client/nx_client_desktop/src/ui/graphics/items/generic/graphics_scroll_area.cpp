@@ -3,6 +3,45 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsSceneWheelEvent>
 
+namespace {
+
+/* There should be no horizontal clipping therefore this margin
+   should be very big but not too huge - we must avoid precision loss: */
+static constexpr qreal kHorizontalClipMargin = 100000.0;
+
+/* A margin to encompass antialiasing blur pixels: */
+static constexpr qreal kVerticalClipMargin = 0.5;
+
+} // namespace
+
+/*               Widget ownership and horizontal alignment diagram:
+
+                                  +---------------+
+                                  |  scroll area  |
+                                  +---------------+
+                                  .       |       .
+                                  .       V       .
+    +---------------------------------------------------------------------------+
+    | <- kHorizontalClipMargin -> . clipperWidget . <- kHorizontalClipMargin -> |
+    +---------------------------------------------------------------------------+
+                                  .       |       .
+                                  .       V       .
+                                  +---------------+
+                                  | contentHolder |
+                                  +---------------+
+                                          |
+                                          V
+                                      +-------------------+
+                                      |                   |
+                                      |                   |  ^
+                       horizontally   |                   |  |  vertically
+                     <- positioned -> |   contentWidget   |  | positioned by
+                         by user      |                   |  |  scroll area
+                                      |                   |  v
+                                      |                   |
+                                      +-------------------+
+*/
+
 class QnGraphicsScrollAreaPrivate: public QObject
 {
     Q_DECLARE_PUBLIC(QnGraphicsScrollArea)
@@ -11,7 +50,10 @@ class QnGraphicsScrollAreaPrivate: public QObject
 public:
     QnGraphicsScrollAreaPrivate(QnGraphicsScrollArea* parent);
 
+    QGraphicsWidget* clipperWidget = nullptr;
+    QGraphicsWidget* contentHolder = nullptr;
     QGraphicsWidget* contentWidget = nullptr;
+
     qreal yOffset = 0.0;
     Qt::Alignment alignment = 0;
     int lineHeight = 0;
@@ -52,7 +94,7 @@ void QnGraphicsScrollArea::setContentWidget(QGraphicsWidget* widget)
     }
 
     d->contentWidget = widget;
-    d->contentWidget->setParentItem(this);
+    d->contentWidget->setParentItem(d->contentHolder);
 
     connect(d->contentWidget, &QGraphicsWidget::heightChanged,
         d, &QnGraphicsScrollAreaPrivate::fitToBounds);
@@ -95,11 +137,32 @@ void QnGraphicsScrollArea::wheelEvent(QGraphicsSceneWheelEvent* event)
 
 QnGraphicsScrollAreaPrivate::QnGraphicsScrollAreaPrivate(QnGraphicsScrollArea* parent):
     QObject(parent),
-    q_ptr(parent)
+    q_ptr(parent),
+    clipperWidget(new QGraphicsWidget(parent)),
+    contentHolder(new QGraphicsWidget(clipperWidget))
 {
     Q_Q(QnGraphicsScrollArea);
     QFontMetrics fm(q->font());
     lineHeight = fm.height();
+
+    clipperWidget->setFlag(QGraphicsItem::ItemClipsChildrenToShape, true);
+
+    const auto updateClipperGeometry =
+        [this]()
+        {
+            Q_Q(const QnGraphicsScrollArea);
+
+            clipperWidget->setGeometry(QRectF(
+                QPointF(-kHorizontalClipMargin, -kVerticalClipMargin),
+                q->size() + QSizeF(kHorizontalClipMargin, kVerticalClipMargin) * 2.0));
+
+            contentHolder->setGeometry(QRectF(
+                QPointF(kHorizontalClipMargin, kVerticalClipMargin),
+                q->size()));
+        };
+
+    updateClipperGeometry();
+    connect(q, &QGraphicsWidget::geometryChanged, this, updateClipperGeometry);
 }
 
 void QnGraphicsScrollAreaPrivate::fitToBounds()
