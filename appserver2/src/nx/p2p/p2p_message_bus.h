@@ -15,6 +15,7 @@
 #include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/json_transaction_serializer.h>
 #include "routing_helpers.h"
+#include "connection_context.h"
 
 namespace ec2 {
 namespace detail {
@@ -41,20 +42,24 @@ struct SubscribeForDataUpdateRecord
 };
 using SubscribeForDataUpdatesMessageType = QVector<SubscribeForDataUpdateRecord>;
 
-class P2pMessageBus: public ec2::QnTransactionMessageBusBase
+class MessageBus: public ec2::QnTransactionMessageBusBase
 {
     Q_OBJECT;
     using base_type = ec2::QnTransactionMessageBusBase;
 public:
-    P2pMessageBus(
+    MessageBus(
         ec2::detail::QnDbManager* db,
         Qn::PeerType peerType,
         QnCommonModule* commonModule,
         ec2::QnJsonTransactionSerializer* jsonTranSerializer,
         QnUbjsonTransactionSerializer* ubjsonTranSerializer);
-    virtual ~P2pMessageBus();
+    virtual ~MessageBus();
 
-    void gotConnectionFromRemotePeer(P2pConnectionPtr connection);
+    //void gotConnectionFromRemotePeer(P2pConnectionPtr connection);
+    void gotConnectionFromRemotePeer(
+        const ec2::ApiPeerDataEx& remotePeer,
+        ec2::ConnectionLockGuard connectionLockGuard,
+        nx::network::WebSocketPtr webSocket);
 
     virtual void addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& url) override;
     virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) override;
@@ -92,12 +97,12 @@ public:
         const ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
         for (const auto& connection: m_connections)
         {
-            if (connection->context().selectingDataInProgress || !connection->context().updateSequence(tran))
+            if (context(connection)->selectingDataInProgress || !context(connection)->updateSequence(tran))
                 continue;
             NX_ASSERT(!(ApiPersistentIdData(connection->remotePeer()) == peerId)); //< loop
 
             if (nx::utils::log::isToBeLogged(cl_logDEBUG1, QnLog::P2P_TRAN_LOG))
-                printTran(connection, tran, P2pConnection::Direction::outgoing);
+                printTran(connection, tran, Connection::Direction::outgoing);
 
             switch (connection->remotePeer().dataFormat)
             {
@@ -129,7 +134,7 @@ private:
     void printTran(
         const P2pConnectionPtr& connection,
         const ec2::QnAbstractTransaction& tran,
-        P2pConnection::Direction direction) const;
+        Connection::Direction direction) const;
     void commitLazyData();
 
     P2pConnectionPtr findBestConnectionToSubscribe(
@@ -163,6 +168,7 @@ private:
     bool handlePushTransactionList(const P2pConnectionPtr& connection, const QByteArray& tranList);
 
     friend struct GotTransactionFuction;
+    friend struct SendTransactionToTransportFuction;
 
     void gotTransaction(
         const QnTransaction<ApiUpdateSequenceData> &tran,
@@ -177,9 +183,9 @@ private:
     void resotreAfterDbError();
     bool selectAndSendTransactions(const P2pConnectionPtr& connection, QnTranState newSubscription);
     private slots:
-    void at_gotMessage(QWeakPointer<P2pConnection> connection, MessageType messageType, const QByteArray& payload);
-    void at_stateChanged(QWeakPointer<P2pConnection> connection, P2pConnection::State state);
-    void at_allDataSent(QWeakPointer<P2pConnection> connection);
+    void at_gotMessage(QWeakPointer<Connection> connection, MessageType messageType, const QByteArray& payload);
+    void at_stateChanged(QWeakPointer<Connection> connection, Connection::State state);
+    void at_allDataSent(QWeakPointer<Connection> connection);
     bool pushTransactionList(
         const P2pConnectionPtr& connection,
         const QList<QByteArray>& serializedTransactions);
@@ -191,6 +197,7 @@ public:
     bool needStartConnection(
         const QnUuid& peerId,
         const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription) const;
+    static ConnectionContext* context(const P2pConnectionPtr& connection);
 private:
     QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list
     QMap<QnUuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections
@@ -213,7 +220,7 @@ private:
 
     struct MiscData
     {
-        MiscData(const P2pMessageBus* owner): owner(owner) {}
+        MiscData(const MessageBus* owner): owner(owner) {}
         void update();
 
         int expectedConnections = 0;
@@ -221,7 +228,7 @@ private:
         int maxDistanceToUseProxy = 0;
         int newConnectionsAtOnce = 0;
     private:
-        const P2pMessageBus* owner;
+        const MessageBus* owner;
     } m_miscData;
     friend struct MiscData;
 

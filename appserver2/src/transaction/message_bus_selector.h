@@ -11,7 +11,7 @@ void sendTransaction(
     const QnTransaction<T>& tran,
     const QnPeerSet& dstPeers = QnPeerSet())
 {
-    if (auto p2pBus = dynamic_cast<nx::p2p::P2pMessageBus*>(bus))
+    if (auto p2pBus = dynamic_cast<nx::p2p::MessageBus*>(bus))
         p2pBus->sendTransaction<T>(tran, dstPeers);
     else if (auto msgBus = dynamic_cast<QnTransactionMessageBus*>(bus))
         msgBus->sendTransaction<T>(tran, dstPeers);

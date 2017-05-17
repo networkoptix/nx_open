@@ -221,10 +221,10 @@ ErrorCode QnTransactionLog::updateSequence(const ApiUpdateSequenceData& data)
         return ErrorCode::dbError;
 }
 
-ErrorCode QnTransactionLog::updateSequence(const QnAbstractTransaction& tran, TranLockType lockType)
+ErrorCode QnTransactionLog::updateSequence(const QnAbstractTransaction& tran, TransactionLockType lockType)
 {
     std::unique_ptr<detail::QnDbManager::QnAbstractTransactionLocker> locker;
-    if (lockType == TranLockType::Regular)
+    if (lockType == TransactionLockType::Regular)
         locker.reset(new detail::QnDbManager::QnDbTransactionLocker(m_dbManager->getTransaction()));
     else
         locker.reset(new detail::QnDbManager::QnLazyTransactionLocker(m_dbManager->getTransaction()));
@@ -232,7 +232,7 @@ ErrorCode QnTransactionLog::updateSequence(const QnAbstractTransaction& tran, Tr
     //NX_ASSERT(m_state.values.value(ApiPersistentIdData(tran.peerID, tran.persistentInfo.dbID)) <= tran.persistentInfo.sequence);
     if (m_state.values.value(ApiPersistentIdData(tran.peerID, tran.persistentInfo.dbID)) >= tran.persistentInfo.sequence)
     {
-        if (lockType == TranLockType::Lazy)
+        if (lockType == TransactionLockType::Lazy)
             locker->commit(); //< prevent rollback previously saved data
         return ErrorCode::containsBecauseSequence;
     }

@@ -57,8 +57,8 @@ bool handleTransactionParams(
 }
 
 #define HANDLE_TRANSACTION_PARAMS_APPLY(_, value, param, ...) \
-case ApiCommand::value : \
-    return handleTransactionParams<Function, param>(bus, serializedTransaction, serializationSupport, transaction, function, fastFunction);
+    case ApiCommand::value : \
+        return handleTransactionParams<Function, param>(bus, serializedTransaction, serializationSupport, transaction, function, fastFunction);
 
 template<typename SerializationSupport, typename Function>
 bool handleTransaction2(

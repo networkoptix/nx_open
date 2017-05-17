@@ -341,4 +341,4 @@ void QnTransactionTcpProcessor::run()
 }
 
 
-}
+} // namespace ec2

@@ -9,7 +9,7 @@ class P2pConnectionProcessorPrivate;
 
 namespace nx {
 namespace p2p {
-class P2pMessageBus;
+class MessageBus;
 }
 }
 
@@ -19,7 +19,7 @@ public:
     const static QString kUrlPath;
 
     P2pConnectionProcessor(
-        nx::p2p::P2pMessageBus* messageBus,
+        nx::p2p::MessageBus* messageBus,
         QSharedPointer<AbstractStreamSocket> socket,
         QnTcpListener* owner);
 
@@ -30,6 +30,8 @@ protected:
 private:
     QByteArray responseBody(Qn::SerializationFormat dataFormat);
     bool isDisabledPeer(const ec2::ApiPeerData& remotePeer) const;
+    bool isPeerCompatible(const ec2::ApiPeerDataEx& remotePeer) const;
+    ec2::ApiPeerDataEx deserializeRemotePeerInfo();
 private:
     Q_DECLARE_PRIVATE(P2pConnectionProcessor);
 };

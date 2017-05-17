@@ -11,6 +11,7 @@ namespace ec2 {
 namespace database {
 namespace api {
 
+    // todo: get rid of this struct. Make function insertOrReplaceResource member of some class.
     struct Context
     {
         Context(const QSqlDatabase& db): database(db) {}

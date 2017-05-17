@@ -12,7 +12,7 @@ namespace ec2
     static const char ADD_HASH_DATA[] = "$$_HASH_$$";
 
     namespace detail { class QnDbManager; }
-    enum class TranLockType;
+    enum class TransactionLockType;
 
     class QnUbjsonTransactionSerializer;
 
@@ -32,8 +32,9 @@ namespace ec2
         QnUbjsonTransactionSerializer* serializer() const { return m_tranSerializer; }
 
         /**
-         * Return transactions from the log
-         * @param state return transactions with sequence bigger then state
+         * Return all transactions from the log
+         * @param state return transactions with sequence bigger then state,
+         * for other peers all transactions are returned.
          * @param output result
          * @param onlyCloudData if false returns all transactions otherwise filter
          *        result and keep only cloud related transactions.
@@ -92,7 +93,7 @@ namespace ec2
         static QnUuid makeHash(const QByteArray &extraData, const ApiDiscoveryData &data);
 
         ErrorCode updateSequence(const ApiUpdateSequenceData& data);
-        ErrorCode updateSequence(const QnAbstractTransaction& tran, TranLockType lockType);
+        ErrorCode updateSequence(const QnAbstractTransaction& tran, TransactionLockType lockType);
         void fillPersistentInfo(QnAbstractTransaction& tran);
 
         void beginTran();

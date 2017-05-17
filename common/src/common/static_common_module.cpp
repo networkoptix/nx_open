@@ -80,13 +80,13 @@ QnResourceDataPool * QnStaticCommonModule::dataPool() const
     return m_dataPool;
 }
 
-void QnStaticCommonModule::registerShortInstance(const QnUuid& id, int number)
+void QnStaticCommonModule::setModuleShortId(const QnUuid& id, int number)
 {
     QnMutexLocker lock(&m_mutex);
     m_longToShortInstanceId.insert(id, number);
 }
 
-int QnStaticCommonModule::toShortInstance(const QnUuid& id) const
+int QnStaticCommonModule::moduleShortId(const QnUuid& id) const
 {
     QnMutexLocker lock(&m_mutex);
     auto itr = m_longToShortInstanceId.find(id);

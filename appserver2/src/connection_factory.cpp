@@ -62,7 +62,7 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
 
     if (ini().isP2pMode)
     {
-        m_bus.reset(new nx::p2p::P2pMessageBus(
+        m_bus.reset(new nx::p2p::MessageBus(
             m_dbManager.get(),
             peerType,
             commonModule,
@@ -181,9 +181,9 @@ void Ec2DirectConnectionFactory::registerTransactionListener(
         httpConnectionListener->addHandler<QnHttpTransactionReceiver, QnTransactionMessageBus>(
             "HTTP", kIncomingTransactionsPath, bus);
     }
-    else if (auto bus = dynamic_cast<nx::p2p::P2pMessageBus*> (m_bus.get()))
+    else if (auto bus = dynamic_cast<nx::p2p::MessageBus*> (m_bus.get()))
     {
-        httpConnectionListener->addHandler<P2pConnectionProcessor, nx::p2p::P2pMessageBus>(
+        httpConnectionListener->addHandler<P2pConnectionProcessor, nx::p2p::MessageBus>(
             "HTTP", QnTcpListener::normalizedPath(P2pConnectionProcessor::kUrlPath), bus);
     }
 

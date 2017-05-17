@@ -221,7 +221,7 @@ int Appserver2Process::exec()
         //TODO
         return 0;
     }
-    qnStaticCommon->registerShortInstance(m_commonModule->moduleGUID(), settings.moduleInstance());
+    qnStaticCommon->setModuleShortId(m_commonModule->moduleGUID(), settings.moduleInstance());
 
     //initializeLogging(settings);
     std::unique_ptr<ec2::AbstractECConnectionFactory>

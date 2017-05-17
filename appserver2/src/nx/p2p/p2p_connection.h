@@ -14,7 +14,6 @@
 #include <transaction/connection_guard.h>
 #include <nx_ec/data/api_tran_state_data.h>
 #include <nx/network/http/http_async_client.h>
-#include "connection_context.h"
 
 namespace ec2 {
 class QnAbstractTransaction;
@@ -24,16 +23,16 @@ namespace nx {
 namespace p2p {
 
 using namespace ec2;
-class P2pConnection;
+class Connection;
 //using P2pConnectionPtr = QSharedPointer<P2pConnection>;
-using P2pConnectionPtr = QnSharedResourcePointer<P2pConnection>;
+using P2pConnectionPtr = QnSharedResourcePointer<Connection>;
 using SendCounters = std::array<std::atomic<qint64>, (int(MessageType::counter))>;
 
 
-class P2pConnection:
+class Connection:
     public QObject,
     public QnCommonModuleAware,
-    public QnFromThisToShared<P2pConnection>
+    public QnFromThisToShared<Connection>
 {
     Q_OBJECT
 public:
@@ -51,19 +50,21 @@ public:
         outgoing,
     };
 
-    P2pConnection(
+    Connection(
         QnCommonModule* commonModule,
         const QnUuid& remoteId,
         const ApiPeerDataEx& localPeer,
         ConnectionLockGuard connectionLockGuard,
-        const QUrl& remotePeerUrl);
-    P2pConnection(
+        const QUrl& remotePeerUrl,
+        std::unique_ptr<QObject> opaqueObject);
+    Connection(
         QnCommonModule* commonModule,
         const ApiPeerDataEx& remotePeer,
         const ApiPeerDataEx& localPeer,
         ConnectionLockGuard connectionLockGuard,
-        const nx::network::WebSocketPtr& webSocket);
-    virtual ~P2pConnection();
+        const nx::network::WebSocketPtr& webSocket,
+        std::unique_ptr<QObject> opaqueObject);
+    virtual ~Connection();
 
     static const SendCounters& sendCounters() { return m_sendCounters;  }
 
@@ -82,15 +83,15 @@ public:
     void startConnection();
     void startReading();
 
-    ConnectionContext& context();
+    QObject* opaqueObject();
 
     const Qn::UserAccessData& getUserAccessData() const { return m_userAccessData; }
 signals:
-    void gotMessage(QWeakPointer<P2pConnection> connection, nx::p2p::MessageType messageType, const QByteArray& payload);
-    void stateChanged(QWeakPointer<P2pConnection> connection, P2pConnection::State state);
-    void allDataSent(QWeakPointer<P2pConnection> connection);
+    void gotMessage(QWeakPointer<Connection> connection, nx::p2p::MessageType messageType, const QByteArray& payload);
+    void stateChanged(QWeakPointer<Connection> connection, Connection::State state);
+    void allDataSent(QWeakPointer<Connection> connection);
 private:
-    void cancelConnecting();
+    void cancelConnecting(const QString& reason);
 
     void onHttpClientDone();
 
@@ -124,7 +125,6 @@ private:
     std::atomic<State> m_state{State::Connecting};
 
     Direction m_direction;
-    ConnectionContext m_context;
     QUrl m_remotePeerUrl;
     const Qn::UserAccessData m_userAccessData = Qn::kSystemAccess;
 
@@ -133,12 +133,13 @@ private:
     static SendCounters m_sendCounters;
 
     network::aio::Timer m_timer;
+    std::unique_ptr<QObject> m_opaqueObject;
 };
 
-const char* toString(P2pConnection::State value);
+const char* toString(Connection::State value);
 
 } // namespace p2p
 } // namespace nx
 
 Q_DECLARE_METATYPE(nx::p2p::P2pConnectionPtr)
-Q_DECLARE_METATYPE(nx::p2p::P2pConnection::State)
+Q_DECLARE_METATYPE(nx::p2p::Connection::State)

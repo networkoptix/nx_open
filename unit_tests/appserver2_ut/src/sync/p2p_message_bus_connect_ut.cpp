@@ -126,7 +126,7 @@ void checkDistance(const std::vector<Appserver2Ptr>& servers, bool waitForSync, 
         for (const auto& server : servers)
         {
             const auto& connection = server->moduleInstance()->ecConnection();
-            const auto& bus = dynamic_cast<P2pMessageBus*>(connection->messageBus());
+            const auto& bus = dynamic_cast<MessageBus*>(connection->messageBus());
             const auto& commonModule = server->moduleInstance()->commonModule();
             for (const auto& serverTo : servers)
             {
@@ -162,7 +162,7 @@ void checkSubscription(const std::vector<Appserver2Ptr>& servers, bool waitForSy
         for (const auto& server: servers)
         {
             const auto& connection = server->moduleInstance()->ecConnection();
-            const auto& bus = dynamic_cast<P2pMessageBus*>(connection->messageBus());
+            const auto& bus = dynamic_cast<MessageBus*>(connection->messageBus());
             const auto& commonModule = server->moduleInstance()->commonModule();
             for (const auto& serverTo : servers)
             {
@@ -308,7 +308,7 @@ static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverCon
         .arg(totalDbData)
         .arg(nx::network::totalSocketBytesSent() / (float) totalDbData), cl_logINFO);
 
-    const auto& counters = P2pConnection::sendCounters();
+    const auto& counters = Connection::sendCounters();
     qint64 webSocketBytes = 0;
     for (int i = 0; i < (int) MessageType::counter; ++i)
         webSocketBytes += counters[i];
@@ -334,11 +334,11 @@ static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverCon
     {
         ec2::Ec2DirectConnection* connection =
             dynamic_cast<ec2::Ec2DirectConnection*> (server->moduleInstance()->ecConnection());
-        const auto& bus = dynamic_cast<P2pMessageBus*>(connection->messageBus());
+        const auto& bus = dynamic_cast<MessageBus*>(connection->messageBus());
         for (const auto& connection : bus->connections())
         {
             ++totalConnections;
-            if (connection->context().isLocalStarted)
+            if (bus->context(connection)->isLocalStarted)
                 ++startedConnections;
         }
         connectionTries += bus->connectionTries();

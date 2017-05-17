@@ -71,10 +71,10 @@ public:
 
 class QnDbManagerAccess;
 
-enum class TranLockType
+enum class TransactionLockType
 {
-    Regular,
-    Lazy
+    Regular, //< do commit as soon as commit() function called
+    Lazy //< delay commit unless regular commit() called
 };
 
 namespace detail
@@ -706,7 +706,7 @@ namespace detail
         ResyncFlags m_resyncFlags;
         QnTransactionLog* m_tranLog;
         TimeSynchronizationManager* m_timeSyncManager;
-        
+
         std::unique_ptr<QSqlQuery> m_insCameraQuery;
         std::unique_ptr<QSqlQuery> m_cameraUserAttrQuery;
         std::unique_ptr<QSqlQuery> m_insCameraScheduleQuery;

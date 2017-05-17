@@ -8,6 +8,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include "database/db_manager.h"
+#include <http/custom_headers.h>
 
 
 namespace ec2 {
@@ -81,7 +82,7 @@ void QnTransactionTransport::fillAuthInfo(const nx_http::AsyncHttpClientPtr& htt
     if (!m_bus->commonModule()->videowallGuid().isNull())
     {
         httpClient->addAdditionalHeader(
-            "X-NetworkOptix-VideoWall",
+            Qn::VIDEOWALL_GUID_HEADER_NAME,
             m_bus->commonModule()->videowallGuid().toString().toUtf8());
         return;
     }

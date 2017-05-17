@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QObject>
 
 #include <nx_ec/data/api_peer_data.h>
 #include <nx_ec/data/api_tran_state_data.h>
@@ -14,7 +15,7 @@ namespace nx {
 namespace p2p {
 
 /** MiscData contains members that managed by P2pMessageBus. P2pConnection doesn't touch it */
-struct ConnectionContext
+class ConnectionContext: public QObject
 {
 public:
     ConnectionContext()

@@ -48,8 +48,8 @@ public:
 
     QnResourceDataPool *dataPool() const;
 
-    void registerShortInstance(const QnUuid& id, int number);
-    int toShortInstance(const QnUuid& id) const;
+    void setModuleShortId(const QnUuid& id, int number);
+    int moduleShortId(const QnUuid& id) const;
     QString moduleDisplayName(const QnUuid& id) const;
 protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
