@@ -25,6 +25,9 @@ namespace {
 /* Duration of success and failure notifications staying up: */
 static constexpr int kNotificationDurationMs = 1200;
 
+/* Opacity for disabled button: */
+static constexpr qreal kDisabledTriggerOpacity = 0.5;
+
 /* A short delay in State::Waiting before busy indicator appears: */
 static constexpr int kBusyIndicatorDelayMs = 150;
 
@@ -98,6 +101,13 @@ SoftwareTriggerButtonPrivate::SoftwareTriggerButtonPrivate(SoftwareTriggerButton
             Q_Q(SoftwareTriggerButton);
             m_imagesDirty = true;
             q->update();
+        });
+
+    connect(main, &SoftwareTriggerButton::enabledChanged, this,
+        [this]()
+        {
+            Q_Q(const SoftwareTriggerButton);
+            m_toolTip->setVisible(q->isEnabled());
         });
 
     m_toolTipHoverProcessor->addTargetItem(main);
@@ -402,6 +412,9 @@ void SoftwareTriggerButtonPrivate::paint(QPainter* painter,
 
     QnScopedPainterOpacityRollback opacityRollback(painter);
 
+    if (!q->isEnabled())
+        painter->setOpacity(painter->opacity() * kDisabledTriggerOpacity);
+
     switch (effectiveState)
     {
         case SoftwareTriggerButton::State::Default:
@@ -502,6 +515,9 @@ void SoftwareTriggerButtonPrivate::ensureImages()
         };
 
     QIcon icon;
+    const auto normalPixmap = generateStatePixmap(QPalette::Window);
+    icon.addPixmap(normalPixmap, QIcon::Normal);
+    icon.addPixmap(normalPixmap, QIcon::Disabled);
     icon.addPixmap(generateStatePixmap(QPalette::Window), QIcon::Normal);
     icon.addPixmap(generateStatePixmap(QPalette::Midlight), QIcon::Active);
     icon.addPixmap(generateStatePixmap(QPalette::Dark), QnIcon::Pressed);

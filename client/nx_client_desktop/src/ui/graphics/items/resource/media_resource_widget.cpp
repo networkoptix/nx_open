@@ -772,7 +772,6 @@ void QnMediaResourceWidget::updateHud(bool animate)
 {
     base_type::updateHud(animate);
     setOverlayWidgetVisible(m_triggersContainer, isOverlayWidgetVisible(titleBar()), animate);
-
     updateCompositeOverlayMode();
 }
 
@@ -2175,6 +2174,8 @@ void QnMediaResourceWidget::updateCompositeOverlayMode()
 
     const bool animate = m_compositeOverlay->scene() != nullptr;
     setOverlayWidgetVisible(m_compositeOverlay, visible, animate);
+
+    m_triggersContainer->setEnabled(isLive);
 }
 
 qint64 QnMediaResourceWidget::getUtcCurrentTimeUsec() const
