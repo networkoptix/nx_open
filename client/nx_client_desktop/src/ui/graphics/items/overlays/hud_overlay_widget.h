@@ -21,6 +21,9 @@ public:
     /** Resource title bar item. */
     QnResourceTitleItem* title() const;
 
+    /** Everything under title bar. */
+    QGraphicsWidget* content() const;
+
     /** Resource details text item. */
     QnHtmlTextItem* details() const;
 

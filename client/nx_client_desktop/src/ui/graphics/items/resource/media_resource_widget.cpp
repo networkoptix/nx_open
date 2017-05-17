@@ -738,7 +738,9 @@ void QnMediaResourceWidget::setupHud()
     m_triggersContainer = new QnScrollableItemsWidget(m_hudOverlay->right());
     m_triggersContainer->setAlignment(Qt::AlignRight | Qt::AlignBottom);
 
-    const auto triggersMargin = kTriggersMargin - m_hudOverlay->contentsMargins().right();
+    qreal right = 0.0;
+    m_hudOverlay->content()->getContentsMargins(nullptr, nullptr, &right, nullptr);
+    const auto triggersMargin = kTriggersMargin - right;
 
     m_triggersContainer->setSpacing(kTriggersSpacing);
     m_triggersContainer->setMaximumWidth(kTriggerButtonSize + triggersMargin);
