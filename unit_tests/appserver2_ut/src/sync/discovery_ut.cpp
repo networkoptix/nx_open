@@ -113,7 +113,7 @@ protected:
         }
 
         #ifdef Q_OS_MAC
-            EXPECT_GE(totalDiscoveryLinks, (m_servers.size() - 1) * 2);
+            EXPECT_GE(totalDiscoveryLinks, m_servers.size() - 1);
         #else
             EXPECT_EQ(m_servers.size() * (m_servers.size() - 1), totalDiscoveryLinks);
         #endif
