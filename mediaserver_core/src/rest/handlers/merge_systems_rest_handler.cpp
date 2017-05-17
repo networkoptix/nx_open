@@ -30,7 +30,7 @@
 #include "api/model/ping_reply.h"
 #include "audit/audit_manager.h"
 #include "rest/server/rest_connection_processor.h"
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 
 #include <rest/helpers/permissions_helper.h>
 #include <network/authenticate_helper.h>

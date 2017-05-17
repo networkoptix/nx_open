@@ -5,7 +5,7 @@
 #include <QtCore/QMetaObject>
 #include <QtCore/QMetaEnum>
 
-#include <utils/common/warnings.h>
+#include <nx/utils/log/log.h>
 
 #include "lexical_functions.h"
 
@@ -139,8 +139,11 @@ void QnEnumLexicalSerializerData::serializeFlags(int value, QString *target) con
         }
     }
 
-    if(v != 0) {
-        qnWarning("Provided value '%1' could not be serialized using the values of enum '%2', falling back to integer serialization.", value, m_enumName.isEmpty() ? QStringLiteral("?") : m_enumName);
+    if(v != 0)
+    {
+        NX_LOGX(lm("Provided value '%1' could not be serialized using the values of enum '%2', "
+            "falling back to integer serialization.")
+            .arg(value).arg(m_enumName.isEmpty() ? QStringLiteral("?") : m_enumName), cl_logWARNING);
 
         if(!target->isEmpty())
             *target += L'|';

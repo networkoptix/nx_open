@@ -12,7 +12,7 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 #include <utils/fs/file.h>

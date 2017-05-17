@@ -26,7 +26,7 @@ protected:
         m_args.push_back("--cloud_db/endpoint=" + settingValue);
     }
 
-    void assertIfCloudDbUrlNotEqualTo(const boost::optional<QUrl>& expected)
+    void assertCloudDbUrlEqualTo(const boost::optional<QUrl>& expected)
     {
         loadSettings();
 
@@ -51,32 +51,32 @@ private:
 TEST_F(SettingsCloudDbUrl, no_url)
 {
     whenPassedStringAsCloudDbEndpoint("");
-    assertIfCloudDbUrlNotEqualTo(boost::none);
+    assertCloudDbUrlEqualTo(boost::none);
 }
 
 TEST_F(SettingsCloudDbUrl, parsing_url_passed_to_endpoint_setting)
 {
     whenPassedStringAsCloudDbEndpoint("http://cloud-test.hdw.mx:33461");
-    assertIfCloudDbUrlNotEqualTo(QUrl("http://cloud-test.hdw.mx:33461"));
+    assertCloudDbUrlEqualTo(QUrl("http://cloud-test.hdw.mx:33461"));
 }
 
 TEST_F(SettingsCloudDbUrl, parsing_endpoint_setting)
 {
     whenPassedStringAsCloudDbEndpoint("cloud-test.hdw.mx:33461");
-    assertIfCloudDbUrlNotEqualTo(QUrl("http://cloud-test.hdw.mx:33461"));
+    assertCloudDbUrlEqualTo(QUrl("http://cloud-test.hdw.mx:33461"));
 }
 
 TEST_F(SettingsCloudDbUrl, endpoint_setting_is_ignored_ifurl_is_present)
 {
     whenPassedCloudDbUrl("http://cloud-dev.hdw.mx:12345");
     whenPassedStringAsCloudDbEndpoint("cloud-test.hdw.mx:33461");
-    assertIfCloudDbUrlNotEqualTo(QUrl("http://cloud-dev.hdw.mx:12345"));
+    assertCloudDbUrlEqualTo(QUrl("http://cloud-dev.hdw.mx:12345"));
 }
 
 TEST_F(SettingsCloudDbUrl, passing_only_url)
 {
     whenPassedCloudDbUrl("http://cloud-dev.hdw.mx:12345");
-    assertIfCloudDbUrlNotEqualTo(QUrl("http://cloud-dev.hdw.mx:12345"));
+    assertCloudDbUrlEqualTo(QUrl("http://cloud-dev.hdw.mx:12345"));
 }
 
 } // namespace conf

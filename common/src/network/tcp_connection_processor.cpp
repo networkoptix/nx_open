@@ -18,7 +18,7 @@
 #   include <netinet/tcp.h>
 #endif
 #include "core/resource_management/resource_pool.h"
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "common/common_module.h"
 
 // we need enough size for updates

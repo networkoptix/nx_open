@@ -4,7 +4,7 @@
 #include <nx/network/http/rest/http_rest_client.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/type_utils.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 
 #include "relay_api_http_paths.h"
 

@@ -41,6 +41,10 @@ public:
     nx::network::RetryPolicy tcpReverseRetryPolicy;
     nx_http::AsyncHttpClient::Timeouts tcpReverseHttpTimeouts;
 
+    std::chrono::milliseconds udpHolePunchingStartDelay;
+    std::chrono::milliseconds trafficRelayingStartDelay;
+    std::chrono::milliseconds directTcpConnectStartDelay;
+
     ConnectionParameters();
     bool operator==(const ConnectionParameters& rhs) const;
 
