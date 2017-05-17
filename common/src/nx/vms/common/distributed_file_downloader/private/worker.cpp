@@ -16,6 +16,7 @@ namespace {
 using namespace std::chrono;
 
 constexpr int kDefaultPeersPerOperation = 5;
+constexpr int kSubsequentChunksToDownloadFromInternet = 5;
 constexpr int kStartDelayMs = milliseconds(seconds(1)).count();
 constexpr int kDefaultStepDelayMs = milliseconds(minutes(1)).count();
 constexpr int kMaxAutoRank = 5;
@@ -263,7 +264,7 @@ void Worker::nextStep()
                     requestChecksums();
                     break;
                 case FileInformation::Status::downloading:
-                    if (haveChunksToDownload())
+                    if (haveChunksToDownload() || m_subsequentChunksToDownloadFromInternet > 0)
                         downloadNextChunk();
                     else
                         requestAvailableChunks();
@@ -568,6 +569,8 @@ void Worker::downloadNextChunk()
                 return;
             }
 
+            --m_subsequentChunksToDownloadFromInternet;
+
             const auto errorCode = m_storage->writeFileChunk(m_fileName, chunkIndex, data);
             if (errorCode != ErrorCode::noError)
             {
@@ -586,6 +589,9 @@ void Worker::downloadNextChunk()
 
     if (useInternet)
     {
+        if (m_subsequentChunksToDownloadFromInternet <= 0)
+            m_subsequentChunksToDownloadFromInternet = kSubsequentChunksToDownloadFromInternet;
+
         NX_LOG(
             logMessage("Requesting chunk %1 from the Internet via %2...")
                 .arg(chunkIndex).arg(m_peerManager->peerString(peerId)),
@@ -608,7 +614,6 @@ void Worker::downloadNextChunk()
             logMessage("Cannot send request for chunk %1 to %2...")
                 .arg(chunkIndex).arg(m_peerManager->peerString(peerId)),
             cl_logDEBUG2);
-
     }
     m_peerByRequestHandle[handle] = peerId;
 }

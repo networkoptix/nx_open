@@ -140,6 +140,8 @@ private:
     };
     QHash<QnUuid, PeerInformation> m_peerInfoById;
     QList<QnUuid> m_peers;
+
+    int m_subsequentChunksToDownloadFromInternet = 0;
 };
 
 } // namespace distributed_file_downloader

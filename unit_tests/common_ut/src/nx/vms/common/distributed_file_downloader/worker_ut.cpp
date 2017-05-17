@@ -422,7 +422,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadFlatNetwork)
         peer->peerManager->calculateDistances();
     }
 
-    const int maxRequests = fileInfo.downloadedChunks.size() * pendingPeers.size() * 4;
+    const int maxRequests = fileInfo.downloadedChunks.size() * pendingPeers.size() * 3;
 
     for (auto& peer: peerById)
         peer->worker->start();
