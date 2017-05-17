@@ -95,6 +95,8 @@ mediaserver/src/*.vsp
 mediaserver/src/server.vcproj
 mediaserver/mediaserver.mak*
 
+nx_kit/src
+
 vmaxproxy/bin
 vmaxproxy/build
 vmaxproxy/src/mediaproxy.vcproj

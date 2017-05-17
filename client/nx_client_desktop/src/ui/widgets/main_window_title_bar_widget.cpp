@@ -1,5 +1,7 @@
 #include "main_window_title_bar_widget.h"
 
+#include <QtGui/QDragMoveEvent>
+
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QGraphicsProxyWidget>
 #include <QtWidgets/QGraphicsScene>

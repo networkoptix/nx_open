@@ -17,9 +17,11 @@ static const QString kPixmapExtension = lit(".png");
 
 QPixmap getTriggerPixmap(const QString& name)
 {
-    return name.isEmpty()
-        ? QPixmap()
-        : qnSkin->pixmap(QnSoftwareTriggerPixmaps::pixmapsPath() + name + kPixmapExtension);
+    if (name.isEmpty())
+        return QPixmap();
+
+    return qnSkin->pixmap(QnSoftwareTriggerPixmaps::pixmapsPath() + name + kPixmapExtension,
+        QSize(), Qt::KeepAspectRatio, Qt::FastTransformation, true);
 }
 
 } // namespace

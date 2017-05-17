@@ -130,6 +130,9 @@ void Manager::initializeConnector()
     m_moduleConnector->setConnectHandler(
         [this](QnModuleInformation information, SocketAddress endpoint, HostAddress ip)
         {
+            if (!commonModule())
+                return;
+
             ModuleData module(std::move(information), std::move(endpoint));
             if (commonModule()->moduleGUID() == module.id)
                 return conflict(module);

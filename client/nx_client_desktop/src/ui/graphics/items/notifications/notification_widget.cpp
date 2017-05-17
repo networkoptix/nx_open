@@ -35,11 +35,12 @@ QString getFullAlias(const QString& postfix)
 
 const char* kActionIndexPropertyName = "_qn_actionIndex";
 
-const int kColorSignMargin = 4;
-const int kHorizontalMargin = 12;
-const int kVerticalMargin = 6;
+static constexpr int kColorSignMargin = 4;
+static constexpr int kHorizontalMargin = 12;
+static constexpr int kVerticalMargin = 6;
+static constexpr int kNotificationIconWidth = 24;
 
-} // anonymous namespace
+} // namespace
 
 // -------------------------------------------------------------------------- //
 // QnNotificationToolTipWidget
@@ -256,7 +257,6 @@ void QnNotificationWidget::addActionButton(
 {
     QnImageButtonWidget* button = new QnImageButtonWidget(this);
     button->setAcceptHoverEvents(false);
-
     button->setIcon(icon);
     button->setProperty(kActionIndexPropertyName, m_actions.size());
     button->setFixedSize(QnSkin::maximumSize(icon));
@@ -264,12 +264,13 @@ void QnNotificationWidget::addActionButton(
     if (m_defaultActionIdx < 0 || defaultAction)
         m_defaultActionIdx = m_actions.size();
 
-
     QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    layout->setMinimumWidth(kNotificationIconWidth);
     layout->setSpacing(0.0);
     layout->addItem(button);
-    layout->addStretch(1);
+    layout->setAlignment(button, Qt::AlignHCenter);
+    layout->addStretch();
     m_layout->insertItem(0, layout);
 
     connect(button, &QnImageButtonWidget::clicked, this, [this, actionId, parameters]()

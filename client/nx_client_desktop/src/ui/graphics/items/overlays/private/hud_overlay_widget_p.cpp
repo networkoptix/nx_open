@@ -32,9 +32,6 @@ QnHudOverlayWidgetPrivate::QnHudOverlayWidgetPrivate(QnHudOverlayWidget* main):
     columnsLayout->addItem(leftLayout);
     columnsLayout->addItem(rightLayout);
 
-    static constexpr int kMargin = 2;
-    columnsLayout->setContentsMargins(kMargin, 0, kMargin, kMargin);
-
     auto mainLayout = new QGraphicsLinearLayout(Qt::Vertical, main);
     mainLayout->addItem(title);
     mainLayout->addItem(columnsLayout);

@@ -5,6 +5,7 @@
 
 #include <QtCore/QtAlgorithms>
 #include <QtWidgets/QAction>
+#include <QtWidgets/QGraphicsProxyWidget>
 #include <QtOpenGL/QGLContext>
 #include <QtOpenGL/QGLWidget>
 

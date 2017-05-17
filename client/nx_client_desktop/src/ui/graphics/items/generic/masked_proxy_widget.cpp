@@ -58,6 +58,14 @@ QnMaskedProxyWidget::QnMaskedProxyWidget(QGraphicsItem* parent, Qt::WindowFlags 
 
 QnMaskedProxyWidget::~QnMaskedProxyWidget()
 {
+    // There are some annoying bugs in graphics proxy widget implementation. Proxy widget in it's
+    // base class destructor will call widget's destructor. After that some event filters and
+    // slots may be called - but QGraphicsProxyWidget is already destroyed, what leads to crash.
+    if (QWidget* w = widget())
+    {
+        w->disconnect(this);
+        w->removeEventFilter(this);
+    }
 }
 
 void QnMaskedProxyWidget::paint(QPainter* painter,
