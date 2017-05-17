@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QtWidgets/QGraphicsSceneMouseEvent>
-#include <QtWidgets/QGraphicsProxyWidget>
 
 #include <nx/utils/math/fuzzy.h>
 #include <utils/common/forward.h>

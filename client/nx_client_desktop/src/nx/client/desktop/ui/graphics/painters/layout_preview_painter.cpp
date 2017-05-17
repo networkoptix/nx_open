@@ -171,13 +171,13 @@ LayoutPreviewPainter::ThumbnailInfo LayoutPreviewPainter::thumbnailForItem(
 
     //TODO: #GDM #rename placeholders
     if (resource->hasFlags(Qn::server))
-        return {qnSkin->pixmap("item_placeholders/videowall_server_placeholder.png")};
+        return qnSkin->pixmap("item_placeholders/videowall_server_placeholder.png");
 
     if (resource->hasFlags(Qn::web_page))
-        return {qnSkin->pixmap("item_placeholders/videowall_webpage_placeholder.png")};
+        return qnSkin->pixmap("item_placeholders/videowall_webpage_placeholder.png");
 
     if (resource->hasFlags(Qn::local_media))
-        return {qnSkin->pixmap("item_placeholders/videowall_local_placeholder.png")};
+        return qnSkin->pixmap("item_placeholders/videowall_local_placeholder.png");
 
     if (!m_thumbnailManager)
         return ThumbnailInfo();
@@ -189,7 +189,7 @@ LayoutPreviewPainter::ThumbnailInfo LayoutPreviewPainter::thumbnailForItem(
     if (!m_thumbnailManager->hasThumbnailForCamera(camera))
         m_thumbnailManager->selectCamera(camera);
 
-    return {
+    return ThumbnailInfo{
         m_thumbnailManager->statusForCamera(camera),
         false,
         QPixmap::fromImage(m_thumbnailManager->thumbnailForCamera(camera))};

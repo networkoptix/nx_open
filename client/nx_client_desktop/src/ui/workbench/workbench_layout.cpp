@@ -609,7 +609,7 @@ QRect QnWorkbenchLayout::closestFreeSlot(const QPointF& gridPos, const QSize& si
 
     /**
      * Algorithm works the following way:
-     * Checking current grid.
+     * Walker checks all available cells.
      * Expand walker to the best possible edge.
      * Repeat until we have checked all edged at least once AND did not improve current result.
      */
@@ -661,7 +661,7 @@ QRect QnWorkbenchLayout::closestFreeSlot(const QPointF& gridPos, const QSize& si
                 checkedEdges = noEdge;
 
             using edge_t = std::pair<Qt::Edge, QPoint>;
-            std::array<edge_t, 4> expansion {{
+            std::array<edge_t, 4> expansion{{
                 {Qt::RightEdge,   QPoint(walker.rect().right() + 1,   gridCell.y())},
                 {Qt::LeftEdge,    QPoint(walker.rect().left() - 1,    gridCell.y())},
                 {Qt::BottomEdge,  QPoint(gridCell.x(),                walker.rect().bottom() + 1)},

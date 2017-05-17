@@ -14,7 +14,6 @@
 #include <QtCore/QPropertyAnimation>
 #include <QtCore/QFileInfo>
 #include <QtCore/QSettings>
-#include <QtWidgets/QGraphicsProxyWidget>
 
 #include <utils/common/util.h>
 #include <utils/common/checked_cast.h>
