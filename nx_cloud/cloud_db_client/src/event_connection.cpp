@@ -12,7 +12,6 @@
 #include <nx/utils/std/cpp14.h>
 
 #include <nx/network/http/custom_headers.h>
-#include <utils/math/math.h>
 #include <nx/utils/byte_stream/custom_output_stream.h>
 
 #include "cdb_request_path.h"
