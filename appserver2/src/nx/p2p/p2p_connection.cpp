@@ -112,6 +112,20 @@ Connection::~Connection()
     waitToStop.get_future().wait();
 }
 
+QUrl Connection::remoteUrl() const
+{
+    if (m_direction == Direction::outgoing)
+        return m_remotePeerUrl;
+    if (m_webSocket)
+    {
+        auto address = m_webSocket->socket()->getForeignAddress();
+        return QUrl(lit("http://%1:%2")
+            .arg(address.address.toString())
+            .arg(address.port));
+    }
+    return QUrl();
+}
+
 void Connection::fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey)
 {
     if (!commonModule()->videowallGuid().isNull())

@@ -1400,8 +1400,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
                 nullptr, out);
         });
 
-    if (auto bus = dynamic_cast<QnTransactionMessageBus*> (m_bus.get()))
-        p->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler(bus));
+    p->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler(m_bus.get()));
     p->registerHandler(QnTimeSyncRestHandler::PATH, new QnTimeSyncRestHandler(this));
 
 #if 0 // Using HTTP processor since HTTP REST does not support HTTP interleaving.

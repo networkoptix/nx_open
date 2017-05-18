@@ -1290,5 +1290,43 @@ ConnectionContext* MessageBus::context(const P2pConnectionPtr& connection)
     return static_cast<ConnectionContext*> (connection->opaqueObject());
 }
 
+QVector<QnTransportConnectionInfo> MessageBus::connectionsInfo() const
+{
+    QVector<QnTransportConnectionInfo> result;
+    QnMutexLocker lock(&m_mutex);
+
+    for (const auto& connection: m_connections)
+    {
+        QnTransportConnectionInfo info;
+        info.url = connection->remoteUrl();
+        info.state = toString(connection->state());
+        info.isIncoming = connection->direction() == Connection::Direction::incoming;
+        info.remotePeerId = connection->remotePeer().id;
+        info.isStarted = context(connection)->isLocalStarted;
+        info.subscription = context(connection)->localSubscription;
+        result.push_back(info);
+    }
+
+    auto remoteUrls = m_remoteUrls;
+    remoteUrls.erase(std::remove_if(remoteUrls.begin(), remoteUrls.end(),
+        [this](const RemoteConnection& data)
+        {
+            return m_connections.contains(data.peerId);
+        }),
+        remoteUrls.end());
+
+    for (const auto& peer: remoteUrls)
+    {
+        QnTransportConnectionInfo info;
+        info.url = peer.url;
+        info.state = lit("Not opened");
+        info.isIncoming = false;
+        info.remotePeerId = peer.peerId;
+        result.push_back(info);
+    }
+
+    return result;
+}
+
 } // namespace p2p
 } // namespace nx

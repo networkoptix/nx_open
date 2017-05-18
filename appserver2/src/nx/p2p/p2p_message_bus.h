@@ -79,6 +79,7 @@ public:
     virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
     virtual int distanceToPeer(const QnUuid& dstPeer) const override;
     virtual void dropConnections() override;
+    virtual QVector<QnTransportConnectionInfo> connectionsInfo() const override;
 
     template<class T>
     void sendTransaction(const ec2::QnTransaction<T>& tran, const QnPeerSet& dstPeers = QnPeerSet())

@@ -1551,6 +1551,7 @@ QUrl QnTransactionMessageBus::updateOutgoingUrl(const QUrl& srcUrl) const
 
 void QnTransactionMessageBus::addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& _url)
 {
+    removeOutgoingConnectionFromPeer(id);
     QUrl url = updateOutgoingUrl(_url);
     QnMutexLocker lock(&m_mutex);
     if (!m_remoteUrls.contains(url))
@@ -1570,8 +1571,6 @@ void QnTransactionMessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
         if (info.id == id)
         {
             QUrl url = itr.key();
-            m_remoteUrls.erase(itr);
-
             const SocketAddress& urlStr = getUrlAddr(url);
             for (QnTransactionTransport* transport : m_connections.values())
             {
@@ -1581,20 +1580,22 @@ void QnTransactionMessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
                     transport->setState(QnTransactionTransport::Error);
                 }
             }
+            m_remoteUrls.erase(itr);
+            break;
         }
     }
 }
 
-QList<QnTransportConnectionInfo> QnTransactionMessageBus::connectionsInfo() const
+QVector<QnTransportConnectionInfo> QnTransactionMessageBus::connectionsInfo() const
 {
-    QList<QnTransportConnectionInfo> connections;
+    QVector<QnTransportConnectionInfo> connections;
 
     auto storeTransport = [&connections](const QnTransactionTransport *transport)
     {
         QnTransportConnectionInfo info;
         info.url = transport->remoteAddr();
-        info.state = transport->getState();
-        info.incoming = transport->isIncoming();
+        info.state = QnTransactionTransport::toString(transport->getState());
+        info.isIncoming = transport->isIncoming();
         info.remotePeerId = transport->remotePeer().id;
         connections.append(info);
     };

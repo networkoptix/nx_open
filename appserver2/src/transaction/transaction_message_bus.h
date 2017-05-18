@@ -47,7 +47,7 @@ public:
     virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) override;
 
 
-    QList<QnTransportConnectionInfo> connectionsInfo() const;
+    virtual QVector<QnTransportConnectionInfo> connectionsInfo() const override;
     void gotConnectionFromRemotePeer(const QnUuid& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
         QSharedPointer<AbstractStreamSocket> socket,

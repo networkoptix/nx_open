@@ -353,7 +353,7 @@ static void testMain(std::function<void (std::vector<Appserver2Ptr>&)> serverCon
         .arg(connectionTries / k),
         cl_logINFO);
 
-    //std::this_thread::sleep_for(std::chrono::seconds(50000));
+    std::this_thread::sleep_for(std::chrono::seconds(50000));
 }
 
 TEST(P2pMessageBus, SequenceConnect)

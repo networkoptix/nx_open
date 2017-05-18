@@ -86,6 +86,7 @@ public:
     QObject* opaqueObject();
 
     const Qn::UserAccessData& getUserAccessData() const { return m_userAccessData; }
+    QUrl remoteUrl() const;
 signals:
     void gotMessage(QWeakPointer<Connection> connection, nx::p2p::MessageType messageType, const QByteArray& payload);
     void stateChanged(QWeakPointer<Connection> connection, Connection::State state);

@@ -8,6 +8,7 @@
 #include "connection_guard_shared_state.h"
 #include "transaction.h"
 #include <utils/common/enable_multi_thread_direct_connection.h>
+#include "transport_connection_info.h"
 
 namespace ec2
 {
@@ -57,6 +58,8 @@ namespace ec2
         virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) = 0;
 
         virtual void dropConnections() = 0;
+
+        virtual QVector<QnTransportConnectionInfo> connectionsInfo() const = 0;
 
 
         void setHandler(ECConnectionNotificationManager* handler);
