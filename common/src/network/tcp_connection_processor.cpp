@@ -613,7 +613,7 @@ void QnTCPConnectionProcessor::sendUnauthorizedResponse(nx_http::StatusCode::Val
         {
             contentEncoding = "gzip";
             if( !d->response.messageBody.isEmpty() )
-                d->response.messageBody = nx::utils::bsf::gzip::Compressor::compressData(d->response.messageBody);
+                d->response.messageBody = nx::utils::bstream::gzip::Compressor::compressData(d->response.messageBody);
         }
         else
         {

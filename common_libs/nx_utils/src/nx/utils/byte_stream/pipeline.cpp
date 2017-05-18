@@ -1,10 +1,10 @@
 #include "pipeline.h"
 
-#include "random.h"
+#include "../random.h"
 
 namespace nx {
 namespace utils {
-namespace pipeline {
+namespace bstream {
 
 //-------------------------------------------------------------------------------------------------
 // AbstractOutputConverter

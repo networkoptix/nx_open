@@ -12,7 +12,6 @@
 #include <thread>
 #include <tuple>
 
-#include <common/common_globals.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/socket.h>

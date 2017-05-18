@@ -92,8 +92,8 @@ protected:
 
 private:
     std::unique_ptr<BasicPollable> m_reflector;
-    utils::pipeline::ReflectingPipeline m_input;
-    utils::pipeline::test::NotifyingOutput m_output;
+    utils::bstream::ReflectingPipeline m_input;
+    utils::bstream::test::NotifyingOutput m_output;
     nx::Buffer m_testData;
     utils::promise<SystemError::ErrorCode> m_reflectorDone;
     AsyncChannel* m_channelToReflect;

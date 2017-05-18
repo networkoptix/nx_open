@@ -6,7 +6,7 @@
 
 namespace nx {
 namespace utils {
-namespace bsf {
+namespace bstream {
 
 /**
  * Saves all incoming data to internal buffer.
@@ -25,6 +25,6 @@ private:
     QByteArray m_buffer;
 };
 
-} // namespace bsf
+} // namespace bstream
 } // namespace utils
 } // namespace nx

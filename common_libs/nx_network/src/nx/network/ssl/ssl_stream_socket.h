@@ -11,8 +11,8 @@ namespace network {
 namespace ssl {
 
 class NX_NETWORK_API StreamSocketToTwoWayPipelineAdapter:
-    public utils::pipeline::AbstractInput,
-    public utils::pipeline::AbstractOutput
+    public utils::bstream::AbstractInput,
+    public utils::bstream::AbstractOutput
 {
 public:
     StreamSocketToTwoWayPipelineAdapter(AbstractStreamSocket* streamSocket);
@@ -66,7 +66,7 @@ private:
     std::unique_ptr<AbstractStreamSocket> m_delegatee;
     std::unique_ptr<ssl::Pipeline> m_sslPipeline;
     StreamSocketToTwoWayPipelineAdapter m_socketToPipelineAdapter;
-    utils::pipeline::ProxyConverter m_proxyConverter;
+    utils::bstream::ProxyConverter m_proxyConverter;
 
     // TODO: #ak Make it virtual override after inheriting AbtractStreamSocket from aio::BasicPollable.
     void stopWhileInAioThread();
