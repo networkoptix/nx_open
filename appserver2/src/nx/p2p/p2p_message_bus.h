@@ -95,32 +95,45 @@ public:
             return;
         }
 
-        const ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
         for (const auto& connection: m_connections)
+            sendTransaction(connection, tran);
+    }
+
+    bool isSubscribedTo(const ApiPersistentIdData& peer) const;
+    qint32 distanceTo(const ApiPersistentIdData& peer) const;
+
+private:
+    template<class T>
+    void sendTransaction(const P2pConnectionPtr& connection, const ec2::QnTransaction<T>& tran)
+    {
+        const ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
+        const auto context = this->context(connection);
+        if (connection->remotePeer().isServer() &&
+            (context->selectingDataInProgress || !context->updateSequence(tran)))
         {
-            if (context(connection)->selectingDataInProgress || !context(connection)->updateSequence(tran))
-                continue;
-            NX_ASSERT(!(ApiPersistentIdData(connection->remotePeer()) == peerId)); //< loop
+            return;
+        }
+        NX_ASSERT(!(ApiPersistentIdData(connection->remotePeer()) == peerId)); //< loop
 
-            if (nx::utils::log::isToBeLogged(cl_logDEBUG1, QnLog::P2P_TRAN_LOG))
-                printTran(connection, tran, Connection::Direction::outgoing);
+        if (nx::utils::log::isToBeLogged(cl_logDEBUG1, QnLog::P2P_TRAN_LOG))
+            printTran(connection, tran, Connection::Direction::outgoing);
 
-            switch (connection->remotePeer().dataFormat)
-            {
-            case Qn::JsonFormat:
-                connection->sendMessage(
-                    m_jsonTranSerializer->serializedTransactionWithoutHeader(tran) + QByteArray("\r\n"));
-                break;
-            case Qn::UbjsonFormat:
-                connection->sendMessage(MessageType::pushTransactionData,
-                    m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
-                break;
-            default:
-                qWarning() << "Client has requested data in an unsupported format" << connection->remotePeer().dataFormat;
-                break;
-            }
+        switch (connection->remotePeer().dataFormat)
+        {
+        case Qn::JsonFormat:
+            connection->sendMessage(
+                m_jsonTranSerializer->serializedTransactionWithoutHeader(tran) + QByteArray("\r\n"));
+            break;
+        case Qn::UbjsonFormat:
+            connection->sendMessage(MessageType::pushTransactionData,
+                m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
+            break;
+        default:
+            qWarning() << "Client has requested data in an unsupported format" << connection->remotePeer().dataFormat;
+            break;
         }
     }
+
 
     template<class T>
     void sendUnicastTransaction(const QnTransaction<T>& tran, const QnPeerSet& dstPeers)
@@ -128,10 +141,6 @@ public:
         //todo: implement me
     }
 
-    bool isSubscribedTo(const ApiPersistentIdData& peer) const;
-    qint32 distanceTo(const ApiPersistentIdData& peer) const;
-
-private:
     void printTran(
         const P2pConnectionPtr& connection,
         const ec2::QnAbstractTransaction& tran,
@@ -142,9 +151,10 @@ private:
         const QVector<ApiPersistentIdData>& viaList,
         QMap<P2pConnectionPtr, int> newSubscriptions) const;
 private:
-    void doPeriodicTasks();
+    void doPeriodicTasksForServer();
+    void doPeriodicTasksForClient();
     void createOutgoingConnections(const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription);
-    void sendAlivePeersMessage();
+    void sendAlivePeersMessage(const P2pConnectionPtr& connection = P2pConnectionPtr());
 
     void printPeersMessage();
     void printSubscribeMessage(
@@ -153,6 +163,8 @@ private:
 
     void addOwnfInfoToPeerList();
     void addOfflinePeersFromDb();
+
+    void emitPeerFoundLostSignals();
 
     QMap<ApiPersistentIdData, P2pConnectionPtr> getCurrentSubscription() const;
     void resubscribePeers(QMap<ApiPersistentIdData, P2pConnectionPtr> newSubscription);
@@ -191,6 +203,7 @@ private:
         const P2pConnectionPtr& connection,
         const QList<QByteArray>& serializedTransactions);
     void startReading(P2pConnectionPtr connection);
+    void sendInitialDataToClient(const P2pConnectionPtr& connection);
 public:
     bool needStartConnection(
         const ApiPersistentIdData& peer,
@@ -227,7 +240,7 @@ private:
         int expectedConnections = 0;
         int maxSubscriptionToResubscribe = 0;
         int maxDistanceToUseProxy = 0;
-        int newConnectionsAtOnce = 0;
+        int newConnectionsAtOnce = 1;
     private:
         const MessageBus* owner;
     } m_miscData;
@@ -241,6 +254,7 @@ private:
     int m_lastOutgoingIndex = 0;
     int m_connectionTries = 0;
     QElapsedTimer m_outConnectionsTimer;
+    std::set<ApiPeerData> m_alivePeers;
 };
 
 } // namespace p2p

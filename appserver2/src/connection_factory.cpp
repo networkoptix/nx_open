@@ -1659,6 +1659,7 @@ void Ec2DirectConnectionFactory::remoteConnectionFinished(
 
     AbstractECConnectionPtr connection(new RemoteEC2Connection(
         this,
+        connectionInfo.serverId(),
         std::make_shared<FixedUrlClientQueryProcessor>(
             &m_remoteQueryProcessor,
             connectionInfoCopy.ecUrl),

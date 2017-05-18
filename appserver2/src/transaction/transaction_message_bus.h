@@ -224,7 +224,6 @@ private:
 
     void addAlivePeerInfo(const ApiPeerData& peerData, const QnUuid& gotFromPeer, int distance);
     void removeAlivePeer(const QnUuid& id, bool sendTran, bool isRecursive = false);
-    bool readApiFullInfoData(QnTransactionTransport* transport, ApiFullInfoData* data);
     bool sendInitialData(QnTransactionTransport* transport);
     void printTranState(const QnTranState& tranState);
     template <class T> void proxyTransaction(const QnTransaction<T> &tran, const QnTransactionTransportHeader &transportHeader);

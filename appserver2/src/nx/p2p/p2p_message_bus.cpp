@@ -60,7 +60,10 @@ MessageBus::MessageBus(
 
     m_thread->setObjectName("P2pMessageBus");
     m_timer = new QTimer();
-    connect(m_timer, &QTimer::timeout, this, &MessageBus::doPeriodicTasks);
+    if (ApiPeerData::isServer(peerType))
+        connect(m_timer, &QTimer::timeout, this, &MessageBus::doPeriodicTasksForServer);
+    else
+        connect(m_timer, &QTimer::timeout, this, &MessageBus::doPeriodicTasksForClient);
     m_timer->start(500);
     m_dbCommitTimer.restart();
 }
@@ -77,7 +80,10 @@ void MessageBus::dropConnections()
     m_connections.clear();
     m_outgoingConnections.clear();
     if (m_peers)
+    {
         m_peers->clear();
+        emitPeerFoundLostSignals();
+    }
 }
 
 
@@ -150,7 +156,7 @@ void MessageBus::addOutgoingConnectionToPeer(const QnUuid& peer, const QUrl& _ur
 void MessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
 {
     QnMutexLocker lock(&m_mutex);
-    for (int i = 0; i < m_remoteUrls.size() - 1; ++i)
+    for (int i = 0; i < m_remoteUrls.size(); ++i)
     {
         if (m_remoteUrls[i].peerId == id)
         {
@@ -182,8 +188,28 @@ void MessageBus::gotConnectionFromRemotePeer(
     const auto remoteId = connection->remotePeer().id;
     m_peers->removePeer(connection->remotePeer());
     m_connections[remoteId] = connection;
+    emitPeerFoundLostSignals();
     connectSignals(connection);
     startReading(connection);
+
+    if (!remotePeer.isServer())
+    {
+        // Clients use simplified logic. The started and subscribed to all updates immediately.
+        context(connection)->isLocalStarted = true;
+        sendInitialDataToClient(connection);
+    }
+}
+
+void MessageBus::sendInitialDataToClient(const P2pConnectionPtr& connection)
+{
+    QnTransaction<ApiFullInfoData> tran(commonModule()->moduleGUID());
+    tran.command = ApiCommand::getFullInfo;
+    if (!readApiFullInfoData(connection->getUserAccessData(), connection->remotePeer(), &tran.params))
+    {
+        connection->setState(Connection::State::Error);
+        return;
+    }
+    sendTransaction(connection, tran);
 }
 
 void MessageBus::connectSignals(const P2pConnectionPtr& connection)
@@ -316,7 +342,7 @@ void MessageBus::printSubscribeMessage(
         cl_logDEBUG1);
 }
 
-void MessageBus::sendAlivePeersMessage()
+void MessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
 {
     QVector<PeerDistanceRecord> records;
     records.reserve(m_peers->allPeerDistances.size());
@@ -331,18 +357,13 @@ void MessageBus::sendAlivePeersMessage()
     QByteArray data = serializePeersMessage(records, 1);
     data.data()[0] = (quint8) MessageType::alivePeers;
 
-    int peersIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>(
-        sendPeersInfoInterval).count();
-    for (const auto& connection : m_connections)
+    auto sendAlivePeersMessage = [this](const P2pConnectionPtr& connection, const QByteArray& data)
     {
-        if (connection->state() != Connection::State::Connected)
-            continue;
-        if (!context(connection)->isRemoteStarted)
-            continue;
-
+        int peersIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+            sendPeersInfoInterval).count();
         auto connectionContext = context(connection);
         if (connectionContext->localPeersTimer.isValid() && !connectionContext->localPeersTimer.hasExpired(peersIntervalMs))
-            continue;
+            return;
         if (data != connectionContext->localPeersMessage)
         {
             connectionContext->localPeersMessage = data;
@@ -351,6 +372,21 @@ void MessageBus::sendAlivePeersMessage()
                 printPeersMessage();
             connection->sendMessage(data);
         }
+    };
+
+    if (connection)
+    {
+        sendAlivePeersMessage(connection, data);
+        return;
+    }
+
+    for (const auto& connection: m_connections)
+    {
+        if (connection->state() != Connection::State::Connected)
+            continue;
+        if (!context(connection)->isRemoteStarted)
+            continue;
+        sendAlivePeersMessage(connection, data);
     }
 }
 
@@ -454,7 +490,7 @@ bool MessageBus::needStartConnection(
 
 bool MessageBus::hasStartingConnections() const
 {
-    for (const auto& connection : m_connections)
+    for (const auto& connection: m_connections)
     {
         auto data = context(connection);
         if (data->isLocalStarted && data->remotePeersMessage.isEmpty())
@@ -617,7 +653,7 @@ void MessageBus::MiscData::update()
     newConnectionsAtOnce = std::max(1, int(std::round(std::sqrt(expectedConnections))) / 2);
 }
 
-void MessageBus::doPeriodicTasks()
+void MessageBus::doPeriodicTasksForServer()
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -630,6 +666,12 @@ void MessageBus::doPeriodicTasks()
     startStopConnections(currentSubscription);
     doSubscribe(currentSubscription);
     commitLazyData();
+}
+
+void MessageBus::doPeriodicTasksForClient()
+{
+    QnMutexLocker lock(&m_mutex);
+    createOutgoingConnections(getCurrentSubscription()); //< open new connections
 }
 
 ApiPeerData MessageBus::localPeer() const
@@ -649,7 +691,7 @@ ApiPeerDataEx MessageBus::localPeerEx() const
     result.persistentId = commonModule()->dbId();
     result.instanceId = commonModule()->runningInstanceGUID();
     result.systemId = commonModule()->globalSettings()->localSystemId();
-    result.peerType = Qn::PT_Server;
+    result.peerType = m_localPeerType;
     result.cloudHost = nx::network::AppInfo::defaultCloudHost();
     result.identityTime = commonModule()->systemIdentityTime();
     result.keepAliveTimeout = commonModule()->globalSettings()->connectionKeepAliveTimeout().count();
@@ -661,6 +703,7 @@ ApiPeerDataEx MessageBus::localPeerEx() const
 void MessageBus::startReading(P2pConnectionPtr connection)
 {
     context(connection)->encode(ApiPersistentIdData(connection->remotePeer()), 0);
+    //emit peerFound(connection->remotePeer());
     connection->startReading();
 }
 
@@ -682,6 +725,7 @@ void MessageBus::at_stateChanged(
             {
                 m_connections[remoteId] = connection;
                 m_outgoingConnections.remove(remoteId);
+                emitPeerFoundLostSignals();
                 startReading(connection);
             }
             break;
@@ -707,6 +751,7 @@ void MessageBus::at_stateChanged(
                     m_connections.remove(remoteId);
                 }
             }
+            emitPeerFoundLostSignals();
             break;
         }
         default:
@@ -875,6 +920,7 @@ bool MessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QB
                 shortPeers.decode(peer.peerNumber),
                 nx::p2p::RoutingRecord(peer.distance + 1, timeMs));
         }
+        emitPeerFoundLostSignals();
         return true;
     }
 
@@ -1326,6 +1372,47 @@ QVector<QnTransportConnectionInfo> MessageBus::connectionsInfo() const
     }
 
     return result;
+}
+
+void MessageBus::emitPeerFoundLostSignals()
+{
+    std::set<ApiPeerData> newAlivePeers;
+
+    for (const auto& connection: m_connections)
+        newAlivePeers.insert(connection->remotePeer());
+
+    for (auto itr = m_peers->allPeerDistances.constBegin(); itr != m_peers->allPeerDistances.constEnd(); ++itr)
+    {
+        const auto& peer = itr.key();
+        if (peer == ApiPersistentIdData(localPeer()))
+            continue;
+        if (itr->minDistance() < kMaxOnlineDistance)
+            newAlivePeers.insert(ApiPeerData(peer, Qn::PT_Server)); // todo: add detecting peer type for remote clients
+    }
+
+    std::vector<ApiPeerData> newPeers;
+    std::set_difference(
+        newAlivePeers.begin(),
+        newAlivePeers.end(),
+        m_alivePeers.begin(),
+        m_alivePeers.end(),
+        std::inserter(newPeers, newPeers.begin()));
+
+    std::vector<ApiPeerData> lostPeers;
+    std::set_difference(
+        m_alivePeers.begin(),
+        m_alivePeers.end(),
+        newAlivePeers.begin(),
+        newAlivePeers.end(),
+        std::inserter(lostPeers, lostPeers.begin()));
+
+    m_alivePeers = newAlivePeers;
+
+    for (const auto& peer: newPeers)
+        emit peerFound(peer);
+
+    for (const auto& peer: lostPeers)
+        emit peerLost(peer);
 }
 
 } // namespace p2p

@@ -898,20 +898,16 @@ void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport
     transport->sendTransaction(requestTran, QnPeerSet() << transport->remotePeer().id << commonModule()->moduleGUID());
 }
 
-bool QnTransactionMessageBus::readApiFullInfoData(
-    QnTransactionTransport* transport, ApiFullInfoData* data)
+bool QnTransactionMessageBusBase::readApiFullInfoData(
+    const Qn::UserAccessData& userAccess,
+    const ec2::ApiPeerData& remotePeer,
+    ApiFullInfoData* outData)
 {
-    const auto& user = transport->getUserAccessData();
     ErrorCode errorCode;
-    if (transport->remotePeer().peerType == Qn::PT_MobileClient)
-    {
-        errorCode = dbManager(m_db, user).readApiFullInfoDataForMobileClient(
-            data, user.userId);
-    }
+    if (remotePeer.peerType == Qn::PT_MobileClient)
+        errorCode = dbManager(m_db, userAccess).readApiFullInfoDataForMobileClient(outData, userAccess.userId);
     else
-    {
-        errorCode = dbManager(m_db, user).readApiFullInfoDataComplete(data);
-    }
+        errorCode = dbManager(m_db, userAccess).readApiFullInfoDataComplete(outData);
 
     if (errorCode != ErrorCode::ok)
     {
@@ -939,7 +935,7 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
         QnTransaction<ApiFullInfoData> tran;
         tran.command = ApiCommand::getFullInfo;
         tran.peerID = commonModule()->moduleGUID();
-        if (!readApiFullInfoData(transport, &tran.params))
+        if (!readApiFullInfoData(transport->getUserAccessData(), transport->remotePeer(), &tran.params))
             return false;
 
         transport->setWriteSync(true);

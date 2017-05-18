@@ -77,6 +77,11 @@ namespace ec2
         void peerLost(ec2::ApiPeerData data);
         void remotePeerUnauthorized(QnUuid id);
     protected:
+        bool readApiFullInfoData(
+            const Qn::UserAccessData& userAccess,
+            const ec2::ApiPeerData& remotePeer,
+            ApiFullInfoData* outData);
+    protected:
         detail::QnDbManager* m_db = nullptr;
         QThread* m_thread = nullptr;
         ECConnectionNotificationManager* m_handler = nullptr;

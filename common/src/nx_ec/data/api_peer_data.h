@@ -59,6 +59,16 @@ struct ApiPeerData: ApiPersistentIdData
     {}
 
     ApiPeerData(
+        const ApiPersistentIdData& peer,
+        Qn::PeerType peerType,
+        Qn::SerializationFormat dataFormat = Qn::UbjsonFormat)
+    :
+        ApiPersistentIdData(peer),
+        peerType(peerType),
+        dataFormat(dataFormat)
+    {}
+
+    ApiPeerData(
         const QnUuid& id,
         const QnUuid& instanceId,
         const QnUuid& persistentId,
