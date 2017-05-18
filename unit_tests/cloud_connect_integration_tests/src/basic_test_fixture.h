@@ -43,6 +43,7 @@ protected:
     virtual void SetUp() override;
 
     void startServer();
+    QUrl relayUrl() const;
 
     void assertConnectionCanBeEstablished();
 
@@ -71,6 +72,7 @@ private:
     std::unique_ptr<nx_http::AsyncClient> m_httpClient;
     nx::utils::SyncQueue<HttpRequestResult> m_httpRequestResults;
     nx_http::BufferType m_expectedMsgBody;
+    QUrl m_relayUrl;
 
     void startHttpServer();
     void onHttpRequestDone();

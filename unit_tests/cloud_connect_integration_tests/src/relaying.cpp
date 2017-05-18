@@ -1,8 +1,12 @@
+#include <thread>
+
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/network/cloud/tunnel/connector_factory.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_client.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/sync_call.h>
 
 #include "basic_test_fixture.h"
 
@@ -16,19 +20,60 @@ class Relaying:
 {
     using base_type = BasicTestFixture;
 
+protected:
+    void assertServerIsListeningOnRelay()
+    {
+        using namespace nx::cloud::relay;
+
+        auto relayClient = api::ClientFactory::create(relayUrl());
+
+        for (;;)
+        {
+            std::promise<
+                std::tuple<api::ResultCode, api::CreateClientSessionResponse>
+            > requestCompletion;
+
+            relayClient->startSession(
+                "",
+                serverSocketCloudAddress(),
+                [this, &requestCompletion](
+                    api::ResultCode resultCode,
+                    api::CreateClientSessionResponse response)
+                {
+                    requestCompletion.set_value(std::make_tuple(resultCode, std::move(response)));
+                });
+
+            const auto result = requestCompletion.get_future().get();
+            if (std::get<0>(result) == api::ResultCode::ok)
+                break;
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+    }
+
 private:
     virtual void SetUp() override
     {
         base_type::SetUp();
 
         // Disabling every method except relaying.
-        //ConnectorFactory::setEnabledCloudConnectMask((int)CloudConnectType::proxy);
+        ConnectorFactory::setEnabledCloudConnectMask((int)CloudConnectType::proxy);
 
         startServer();
     }
 };
 
-TEST_F(Relaying, just_works)
+TEST_F(Relaying, server_socket_registers_itself_on_relay)
+{
+    assertServerIsListeningOnRelay();
+}
+
+TEST_F(Relaying, connection_can_be_established)
+{
+    assertConnectionCanBeEstablished();
+}
+
+TEST_F(Relaying, exchanging_fixed_data)
 {
     startExchangingFixedData();
     assertDataHasBeenExchangedCorrectly();

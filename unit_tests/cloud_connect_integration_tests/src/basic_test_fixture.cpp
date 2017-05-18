@@ -44,8 +44,11 @@ BasicTestFixture::~BasicTestFixture()
 void BasicTestFixture::SetUp()
 {
     ASSERT_TRUE(m_trafficRelay.startAndWaitUntilStarted());
+
     m_mediator.addArg("-trafficRelay/url");
-    m_mediator.addArg(m_trafficRelay.moduleInstance()->httpEndpoints()[0].toStdString().c_str());
+    m_relayUrl = QUrl(lm("http://127.0.0.1:%1/")
+        .arg(m_trafficRelay.moduleInstance()->httpEndpoints()[0].port).toQString());
+    m_mediator.addArg(m_relayUrl.toString().toStdString().c_str());
 
     ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
 
@@ -65,6 +68,11 @@ void BasicTestFixture::startServer()
     m_credentialsProvider.setCredentials(std::move(credentials));
 
     startHttpServer();
+}
+
+QUrl BasicTestFixture::relayUrl() const
+{
+    return m_relayUrl;
 }
 
 void BasicTestFixture::assertConnectionCanBeEstablished()
