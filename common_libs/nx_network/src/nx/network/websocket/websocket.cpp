@@ -63,6 +63,11 @@ void WebSocket::handleSocketRead(SystemError::ErrorCode ecode, size_t bytesRead)
 
     m_parser.consume(m_readBuffer.data(), (int)bytesRead);
     m_readBuffer.resize(0);
+    if (bytesRead == 0)
+    {
+        processReadData(SystemError::connectionAbort);
+        return;
+    }
     if (ecode == SystemError::noError && m_lastError != Error::noError)
     {
         processReadData(toSystemError(m_lastError));
