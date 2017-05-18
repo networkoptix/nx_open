@@ -6,7 +6,7 @@
 #include <boost/optional.hpp>
 
 #include <nx/network/aio/abstract_async_channel.h>
-#include <nx/utils/pipeline.h>
+#include <nx/utils/byte_stream/pipeline.h>
 #include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -31,8 +31,8 @@ public:
     };
 
     AsyncChannel(
-        utils::pipeline::AbstractInput* input,
-        utils::pipeline::AbstractOutput* output,
+        utils::bstream::AbstractInput* input,
+        utils::bstream::AbstractOutput* output,
         InputDepletionPolicy inputDepletionPolicy);
     virtual ~AsyncChannel() override;
 
@@ -63,8 +63,8 @@ public:
     bool isWriteScheduled() const;
 
 private:
-    utils::pipeline::AbstractInput* m_input;
-    utils::pipeline::AbstractOutput* m_output;
+    utils::bstream::AbstractInput* m_input;
+    utils::bstream::AbstractOutput* m_output;
     InputDepletionPolicy m_inputDepletionPolicy;
     boost::optional<SystemError::ErrorCode> m_readErrorState;
     boost::optional<SystemError::ErrorCode> m_sendErrorState;

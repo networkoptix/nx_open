@@ -8,7 +8,7 @@
 
 namespace nx {
 namespace utils {
-namespace bsf {
+namespace bstream {
 namespace gzip {
 
 QByteArray Compressor::compressData(const QByteArray& data)
@@ -42,6 +42,6 @@ QByteArray Compressor::compressData(const QByteArray& data)
 }
 
 } // namespace gzip
-} // namespace bsf
+} // namespace bstream
 } // namespace utils
 } // namespace nx

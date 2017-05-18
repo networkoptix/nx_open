@@ -1,6 +1,6 @@
 #pragma once 
 
-#include <nx/utils/abstract_byte_stream_filter.h>
+#include <nx/utils/byte_stream/abstract_byte_stream_filter.h>
 
 #include "httptypes.h"
 #include "httpstreamreader.h"
@@ -11,7 +11,7 @@ namespace nx_http {
     Pushes message of parsed request to the next filter
 */
 class NX_NETWORK_API HttpMessageStreamParser:
-    public nx::utils::bsf::AbstractByteStreamFilter
+    public nx::utils::bstream::AbstractByteStreamFilter
 {
 public:
     HttpMessageStreamParser();
@@ -22,7 +22,7 @@ public:
 
     //!Returns previous http message
     /*!
-        Message is available only within nx::utils::bsf::AbstractByteStreamFilter::processData call of the next filter
+        Message is available only within nx::utils::bstream::AbstractByteStreamFilter::processData call of the next filter
     */
     nx_http::Message currentMessage() const;
 

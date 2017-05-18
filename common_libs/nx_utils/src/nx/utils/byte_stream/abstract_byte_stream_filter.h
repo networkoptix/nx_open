@@ -6,7 +6,7 @@
 
 namespace nx {
 namespace utils {
-namespace bsf {
+namespace bstream {
 
 /**
  * Interface for class doing something with byte stream.
@@ -60,6 +60,6 @@ NX_UTILS_API AbstractByteStreamFilterPtr insert(
     const AbstractByteStreamFilterPtr& _where,
     AbstractByteStreamFilterPtr what);
 
-} // namespace bsf
+} // namespace bstream
 } // namespace utils
 } // namespace nx

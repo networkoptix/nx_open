@@ -6,8 +6,8 @@ namespace aio {
 namespace test {
 
 AsyncChannel::AsyncChannel(
-    utils::pipeline::AbstractInput* input,
-    utils::pipeline::AbstractOutput* output,
+    utils::bstream::AbstractInput* input,
+    utils::bstream::AbstractOutput* output,
     InputDepletionPolicy inputDepletionPolicy)
     :
     m_input(input),
@@ -252,7 +252,7 @@ void AsyncChannel::performAsyncRead(const QnMutexLockerBase& /*lock*/)
                 return;
             }
 
-            if (bytesRead == utils::pipeline::StreamIoError::osError)
+            if (bytesRead == utils::bstream::StreamIoError::osError)
             {
                 reportIoCompletion(&m_readHandler, SystemError::connectionReset, (size_t)-1);
                 return;

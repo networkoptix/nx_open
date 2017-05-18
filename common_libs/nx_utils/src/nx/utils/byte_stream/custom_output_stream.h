@@ -4,7 +4,7 @@
 
 namespace nx {
 namespace utils {
-namespace bsf {
+namespace bstream {
 
 /**
  * Passes input data to specified function.
@@ -72,6 +72,6 @@ std::shared_ptr<FilterWithFunc<Func>> makeFilterWithFunc(Func func)
     return std::make_shared<FilterWithFunc<Func>>(std::move(func));
 }
 
-} // namespace bsf
+} // namespace bstream
 } // namespace utils
 } // namespace nx
