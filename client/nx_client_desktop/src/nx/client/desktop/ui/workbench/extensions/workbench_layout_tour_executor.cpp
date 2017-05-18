@@ -229,7 +229,7 @@ void LayoutTourExecutor::processTourStepInternal(bool forward, bool force)
                     return;
             }
 
-            m_tour.currentIndex = nextIndex(m_tour.currentIndex, m_tour.items.size());
+            m_tour.currentIndex = nextIndex(m_tour.currentIndex, (int) m_tour.items.size());
             const auto& next = m_tour.items[m_tour.currentIndex];
 
             auto layout = next.layout;

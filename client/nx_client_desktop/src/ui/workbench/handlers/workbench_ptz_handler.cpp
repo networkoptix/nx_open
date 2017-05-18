@@ -160,7 +160,7 @@ QnWorkbenchPtzHandler::~QnWorkbenchPtzHandler()
 
 void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered()
 {
-    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
+    auto widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
     if (!widget || !widget->ptzController())
         return;
     QnResourcePtr resource = widget->resource()->toResourcePtr();
@@ -184,7 +184,7 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered()
 void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
-    QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
+    auto widget = parameters.widget<QnMediaResourceWidget>();
     QString id = parameters.argument<QString>(Qn::PtzObjectIdRole);
 
     if (!widget || !widget->ptzController() || id.isEmpty())
@@ -218,7 +218,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered()
 void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
-    QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
+    auto widget = parameters.widget<QnMediaResourceWidget>();
     if (!widget || !widget->ptzController())
         return;
     QnResourcePtr resource = widget->resource()->toResourcePtr();
@@ -267,7 +267,7 @@ void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered()
 void QnWorkbenchPtzHandler::at_ptzActivateObjectAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
-    QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
+    auto widget = parameters.widget<QnMediaResourceWidget>();
     if (!widget || !widget->ptzController())
         return;
 
@@ -294,7 +294,7 @@ void QnWorkbenchPtzHandler::at_ptzActivateObjectAction_triggered()
 void QnWorkbenchPtzHandler::at_ptzManageAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
-    QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
+    auto widget = parameters.widget<QnMediaResourceWidget>();
 
     if (!widget || !widget->ptzController())
         return;
@@ -318,10 +318,10 @@ void QnWorkbenchPtzHandler::at_ptzManageAction_triggered()
 
 void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered()
 {
-    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
+    auto widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
     if (!widget)
         return;
-    QPointer<QnResourceWidget> guard(widget);
+    QPointer<const QnMediaResourceWidget> guard(widget);
     QnPtzControllerPtr controller = widget->ptzController();
 
     QVector3D position;
@@ -354,7 +354,7 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered()
 
 void QnWorkbenchPtzHandler::at_debugGetPtzPositionAction_triggered()
 {
-    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
+    auto widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
     if (!widget)
         return;
     QnPtzControllerPtr controller = widget->ptzController();

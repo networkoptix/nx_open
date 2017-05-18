@@ -1266,7 +1266,7 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
     if (!resource)
         return;
 
-    QnResourceWidget *widget = parameters.widget();
+    auto widget = parameters.widget();
     if (!widget)
         return;
 
@@ -1771,7 +1771,7 @@ QnAdjustVideoDialog* ActionHandler::adjustVideoDialog() {
 
 void ActionHandler::at_adjustVideoAction_triggered()
 {
-    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
+    auto widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
     if (!widget)
         return;
 
@@ -1782,7 +1782,7 @@ void ActionHandler::at_adjustVideoAction_triggered()
 void ActionHandler::at_createZoomWindowAction_triggered() {
     const auto params = menu()->currentParameters(sender());
 
-    QnMediaResourceWidget *widget = params.widget<QnMediaResourceWidget>();
+    auto widget = params.widget<QnMediaResourceWidget>();
     if (!widget)
         return;
 

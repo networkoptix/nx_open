@@ -1387,7 +1387,7 @@ void QnWorkbenchController::at_checkFileSignatureAction_triggered()
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
     if (widgets.isEmpty())
         return;
-    QnResourceWidget *widget = widgets.at(0);
+    auto widget = widgets.at(0);
     if(widget->resource()->flags() & Qn::network)
         return;
     QScopedPointer<SignDialog> dialog(new SignDialog(widget->resource(), mainWindow()));
@@ -1404,10 +1404,12 @@ void QnWorkbenchController::at_previousItemAction_triggered()
     moveCursor(QPoint(-1, 0), QPoint(0, -1));
 }
 
-void QnWorkbenchController::at_toggleSmartSearchAction_triggered() {
+void QnWorkbenchController::at_toggleSmartSearchAction_triggered()
+{
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
 
-    foreach(QnResourceWidget *widget, widgets) {
+    for (auto widget: widgets)
+    {
         if (!widget->resource()->hasFlags(Qn::motion))
             continue;
 
@@ -1422,12 +1424,15 @@ void QnWorkbenchController::at_toggleSmartSearchAction_triggered() {
     at_stopSmartSearchAction_triggered();
 }
 
-void QnWorkbenchController::at_clearMotionSelectionAction_triggered() {
+void QnWorkbenchController::at_clearMotionSelectionAction_triggered()
+{
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
 
-    foreach(QnResourceWidget *widget, widgets)
-        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+    for (auto widget: widgets)
+    {
+        if (auto mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
             mediaWidget->clearMotionSelection();
+    }
 }
 
 
