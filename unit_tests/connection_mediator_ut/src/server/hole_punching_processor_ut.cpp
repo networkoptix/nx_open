@@ -13,7 +13,7 @@
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/uuid.h>
 
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include <server/hole_punching_processor.h>
 #include <settings.h>
