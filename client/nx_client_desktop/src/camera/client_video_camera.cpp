@@ -9,7 +9,7 @@
 
 #include <nx/streaming/rtsp_client_archive_delegate.h>
 #include <nx/streaming/archive_stream_reader.h>
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 
 #include <recording/time_period.h>
 #include <plugins/resource/avi/thumbnails_stream_reader.h>

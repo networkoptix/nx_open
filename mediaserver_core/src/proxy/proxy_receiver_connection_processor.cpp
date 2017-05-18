@@ -3,7 +3,7 @@
 #include "network/universal_request_processor_p.h"
 #include "network/tcp_connection_priv.h"
 #include "network/universal_tcp_listener.h"
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 
 class QnProxyReceiverConnectionPrivate: public QnTCPConnectionProcessorPrivate
 {

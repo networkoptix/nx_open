@@ -10,7 +10,7 @@
 #include <api/app_server_connection.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/app_info.h>

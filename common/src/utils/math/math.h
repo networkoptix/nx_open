@@ -77,19 +77,6 @@ bool qBetween(const T &min, const T &value, const T &max) {
     return min <= value && value < max;
 }
 
-inline unsigned long long qn_htonll(unsigned long long value) { return qToBigEndian(value); }
-inline unsigned long long qn_ntohll(unsigned long long value) { return qFromBigEndian(value); }
-
-/* Note that we have to use #defines here so that these functions work even if
- * they are also defined in system network headers. */
-#ifndef htonll
-#define htonll qn_htonll
-#endif
-#ifndef ntohll
-#define ntohll qn_ntohll
-#endif
-
-
 /**
  * \param value
  * \returns                             Whether the given value is a power of 2.

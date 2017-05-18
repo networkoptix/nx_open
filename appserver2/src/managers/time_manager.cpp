@@ -19,7 +19,7 @@
 #include <common/common_globals.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include <transaction/transaction_message_bus.h>
 
 #include <nx_ec/data/api_runtime_data.h>

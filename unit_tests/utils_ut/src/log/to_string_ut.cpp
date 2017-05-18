@@ -148,7 +148,8 @@ TEST(ToString, Pointers)
     std::string data("data");
     assertToStringPattern((const void*) data.c_str(), "void(0x*)");
 
-    assertPtrToString<std::string>("std::string(0x*)");
+    assertPtrToString<std::string>("std::*string*(0x*)");
+    assertPtrToString<std::vector<int>>("std::*vector*<*>(0x*)");
     assertPtrToString<CustomStringableType>("nx::utils::test::CustomStringableType(0x*)");
     assertPtrToString<CustomDebugableType>("nx::utils::test::CustomDebugableType(0x*)");
     assertPtrToString<CustomDebugableType>("nx::utils::test::CustomDebugableType(0x*)");

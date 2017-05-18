@@ -21,7 +21,7 @@
 #include <nx_ec/ec_proto_version.h>
 #include <nx/utils/custom_output_stream.h>
 #include <utils/common/util.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include <api/global_settings.h>
 #include <common/common_module.h>
 

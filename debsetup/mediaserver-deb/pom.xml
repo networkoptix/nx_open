@@ -49,7 +49,7 @@
                 </property>
             </activation>
             <properties>
-                <rdep.packages>appserver-2.2.1</rdep.packages>
+                <rdep.packages>appserver-2.2.1 cifs-utils</rdep.packages>
                 <arch.depends>, syslinux</arch.depends>
             </properties>
         </profile>    

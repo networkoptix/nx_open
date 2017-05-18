@@ -6,7 +6,6 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QDateTime>
 
-#include <http/custom_headers.h>
 #include <nx/network/socket_factory.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
@@ -16,6 +15,7 @@
 #include <nx/utils/system_error.h>
 
 #include "auth_tools.h"
+#include "custom_headers.h"
 
 static const int DEFAULT_SEND_TIMEOUT = 3000;
 static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
@@ -26,7 +26,7 @@ namespace {
 
 static bool logTraffic()
 {
-    return nx::network::SocketGlobals::debugConfig().httpClientTraffic;
+    return nx::network::SocketGlobals::debugIni().httpClientTraffic;
 }
 
 } // namespace

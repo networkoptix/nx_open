@@ -34,7 +34,7 @@ def indent(elem, level=0):
         if level and (not elem.tail or not elem.tail.strip()):
             elem.tail = i
 
-def add_prebuild_events(root):
+def add_prebuild_events(root, project):
     """
     <Target Name="BeforeClean">
         <Message Text="Cleaning moc generated files"/>
@@ -49,13 +49,15 @@ def add_prebuild_events(root):
         </PreBuildEvent>
     </ItemDefinitionGroup>    
     """
-    print "Adding custom header with pre-build steps"
-       
-    target = Element('Target', {'Name': 'BeforeClean'})
-    root.append(target)   
-    target.append(Element('Message', {'Text': 'Cleaning moc generated files'}))
-    target.append(Element('Exec', {'Command': 'del $(ProjectDir)..\\{0}\\build\\$(Configuration)\\generated\\moc_*.* /F /Q'.format(arch)}))
-    indent(target, 1)
+    print "Adding custom header with pre-build steps"    
+
+    # nx_kit does not use Qt, and "del" here causes an error because there are no moc files.
+    if not "/nx_kit-" in project:
+        target = Element('Target', {'Name': 'BeforeClean'})
+        root.append(target)   
+        target.append(Element('Message', {'Text': 'Cleaning moc generated files'}))
+        target.append(Element('Exec', {'Command': 'del $(ProjectDir)..\\{0}\\build\\$(Configuration)\\generated\\moc_*.* /F /Q'.format(arch)}))
+        indent(target, 1)
     
     group = Element('ItemDefinitionGroup')
     root.insert(1, group)
@@ -74,7 +76,6 @@ def add_prebuild_events(root):
     
     indent(group, 1)
     
-
 def fix_mocables(root):
     """Disabling moc preprocessor steps, since we do it with jom."""
     #xpath = "./Project/ItemGroup/CustomBuild[contains(@Include,'.h')]"
@@ -172,7 +173,7 @@ def patch_project(project):
     
     fix_qrc(root)
     fix_mocables(root)
-    add_prebuild_events(root)
+    add_prebuild_events(root, project)
     add_qt_path(root)
     enable_fastlink(root)
     ignore_link_4221(root)

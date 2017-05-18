@@ -9,7 +9,7 @@
 
 #define DEBUG_LOG(MESSAGE) do \
 { \
-    if (nx::network::SocketGlobals::debugConfig().addressResolver) \
+    if (nx::network::SocketGlobals::debugIni().addressResolver) \
         NX_LOGX(MESSAGE, cl_logDEBUG1); \
 } while (0)
 
@@ -42,7 +42,7 @@ TypedAddress::TypedAddress(HostAddress address_, AddressType type_)
 
 QString TypedAddress::toString() const
 {
-    return lm("%1(%2)").arg(address).arg(type);
+    return lm("%1(%2)").args(address, type);
 }
 
 AddressAttribute::AddressAttribute(AddressAttributeType type_, quint64 value_)
@@ -114,14 +114,14 @@ AddressResolver::AddressResolver(
 }
 
 void AddressResolver::addFixedAddress(
-    const HostAddress& hostName, const SocketAddress& hostAddress)
+    const HostAddress& hostName, const SocketAddress& endpoint)
 {
     NX_ASSERT(!hostName.isIpAddress(), Q_FUNC_INFO, "Hostname should be unresolved");
-    NX_ASSERT(hostAddress.address.isIpAddress());
-    DEBUG_LOG(lm("Added fixed address for %1: %2").args(hostName, hostAddress));
+    NX_ASSERT(endpoint.address.isIpAddress());
+    DEBUG_LOG(lm("Added fixed address for %1: %2").args(hostName, endpoint));
 
     QnMutexLocker lk(&m_mutex);
-    AddressEntry entry(hostAddress);
+    AddressEntry entry(endpoint);
     auto& entries = m_info.emplace(
         hostName,
         HostAddressInfo(isCloudHostName(&lk, hostName.toString())))
@@ -130,7 +130,7 @@ void AddressResolver::addFixedAddress(
     const auto it = std::find(entries.begin(), entries.end(), entry);
     if (it == entries.end())
     {
-        NX_LOGX(lm("New fixed address for %1: %2").args(hostName, hostAddress), cl_logDEBUG1);
+        NX_LOGX(lm("New fixed address for %1: %2").args(hostName, endpoint), cl_logDEBUG1);
         entries.push_back(std::move(entry));
 
         // we possibly could also grabHandlers() to bring the result before DNS
@@ -140,22 +140,30 @@ void AddressResolver::addFixedAddress(
 }
 
 void AddressResolver::removeFixedAddress(
-    const HostAddress& hostName, const SocketAddress& hostAddress)
+    const HostAddress& hostName, boost::optional<SocketAddress> endpoint)
 {
-    DEBUG_LOG(lm("Removed fixed address for %1: %2").args(hostName, hostAddress));
+    DEBUG_LOG(lm("Removed fixed address for %1: %2").args(hostName, endpoint));
 
     QnMutexLocker lk(&m_mutex);
-    AddressEntry entry(hostAddress);
     const auto record = m_info.find(hostName);
     if (record == m_info.end())
         return;
 
     auto& entries = record->second.fixedEntries;
-    const auto it = std::find(entries.begin(), entries.end(), entry);
-    if (it != entries.end())
+    if (endpoint)
     {
-        NX_LOGX(lm("Removed fixed address for %1: %2").args(hostName, hostAddress), cl_logDEBUG1);
-        entries.erase(it);
+        AddressEntry entry(*endpoint);
+        const auto it = std::find(entries.begin(), entries.end(), entry);
+        if (it != entries.end())
+        {
+            NX_LOGX(lm("Removed fixed address for %1: %2").args(hostName, endpoint), cl_logDEBUG1);
+            entries.erase(it);
+        }
+    }
+    else
+    {
+        NX_LOGX(lm("Removed all fixed address for %1").args(hostName), cl_logDEBUG1);
+        entries.clear();
     }
 }
 
@@ -223,7 +231,7 @@ void AddressResolver::resolveAsync(
         }
     }
 
-    if (SocketGlobals::config().isHostDisabled(hostName))
+    if (SocketGlobals::ini().isHostDisabled(hostName))
         return handler(SystemError::noPermission, std::deque<AddressEntry>());
 
     QnMutexLocker lk(&m_mutex);
@@ -476,7 +484,7 @@ void AddressResolver::dnsResolve(
         [this, info, needMediator, ipVersion](
             SystemError::ErrorCode code, std::deque<HostAddress> ips)
         {
-            NX_LOGX(lm("dnsResolve async done. %1, %2").arg(code).arg(ips.size()), cl_logDEBUG2);
+            NX_LOGX(lm("dnsResolve async done. %1, %2").args(code, ips.size()), cl_logDEBUG2);
 
             std::vector<Guard> guards;
 

@@ -60,6 +60,8 @@
 namespace {
 const qreal kButtonsSize = 24.0;
 
+static const MarginsF kHudMargins(4.0, 0.0, 4.0, 4.0);
+
 /** Default timeout before the video is displayed as "loading", in milliseconds. */
 #ifdef QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
 const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION;
@@ -218,6 +220,7 @@ QnResourceWidget::~QnResourceWidget()
 void QnResourceWidget::setupHud()
 {
     addOverlayWidget(m_hudOverlay, detail::OverlayParams(UserVisible, true, true, InfoLayer));
+    m_hudOverlay->setContentsMargins(kHudMargins);
     setOverlayWidgetVisible(m_hudOverlay, true, /*animate=*/false);
     setOverlayWidgetVisible(m_hudOverlay->details(), false, /*animate=*/false);
     setOverlayWidgetVisible(m_hudOverlay->position(), false, /*animate=*/false);

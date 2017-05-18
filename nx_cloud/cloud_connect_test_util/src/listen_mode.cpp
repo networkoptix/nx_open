@@ -10,8 +10,6 @@
 #include <nx/utils/string.h>
 #include <nx/utils/thread/barrier_handler.h>
 
-#include <utils/common/command_line_parser.h>
-
 #include "dynamic_statistics.h"
 
 namespace nx {

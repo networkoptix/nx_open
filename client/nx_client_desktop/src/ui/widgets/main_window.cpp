@@ -17,7 +17,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/event_processors.h>
-#include <network/module_finder.h>
+#include <nx/vms/discovery/manager.h>
 
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>

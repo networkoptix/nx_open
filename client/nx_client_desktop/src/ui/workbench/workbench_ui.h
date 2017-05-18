@@ -17,7 +17,6 @@
 
 #include "workbench_context_aware.h"
 
-class QGraphicsProxyWidget;
 class QGraphicsWidget;
 class QGraphicsLinearLayout;
 

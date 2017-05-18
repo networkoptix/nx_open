@@ -50,4 +50,5 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::hpm::api, NatTraversalResultCode,
     (nx::hpm::api::NatTraversalResultCode::udtConnectFailed, "endpointVerificationFailure")
     (nx::hpm::api::NatTraversalResultCode::errorConnectingToRelay, "errorConnectingToRelay")
     (nx::hpm::api::NatTraversalResultCode::notFoundOnRelay, "notFoundOnRelay")
+    (nx::hpm::api::NatTraversalResultCode::noSuitableTraversalMethod, "noSuitableTraversalMethod")
 )

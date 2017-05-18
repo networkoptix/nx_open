@@ -17,7 +17,7 @@
 #include "api/app_server_connection.h"
 #include "common/common_module.h"
 #include "core/resource/media_server_resource.h"
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "ldap/ldap_manager.h"
 #include "network/authutil.h"
 #include <nx_ec/dummy_handler.h>

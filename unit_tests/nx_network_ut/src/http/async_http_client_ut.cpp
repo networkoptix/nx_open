@@ -22,7 +22,6 @@
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <common/common_globals.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/custom_output_stream.h>
@@ -262,7 +261,7 @@ TEST_F(AsyncHttpClient, motionJpegRetrieval)
             [&](nx_http::AsyncHttpClientPtr client)
             {
                 ASSERT_TRUE(client->response() != nullptr);
-                ASSERT_EQ(client->response()->statusLine.statusCode, nx_http::StatusCode::ok);
+                ASSERT_EQ(nx_http::StatusCode::ok, client->response()->statusLine.statusCode);
                 auto contentTypeIter = client->response()->headers.find("Content-Type");
                 ASSERT_TRUE(contentTypeIter != client->response()->headers.end());
                 clientCtx.multipartParser.setContentType(contentTypeIter->second);

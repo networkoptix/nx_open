@@ -77,8 +77,8 @@
 
 #include <licensing/license.h>
 
-#include <network/multicast_module_finder.h>
 #include <network/system_description.h>
+#include <network/networkoptixmodulerevealcommon.h>
 
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_lock_data.h>

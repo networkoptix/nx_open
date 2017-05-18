@@ -285,7 +285,7 @@ private:
             parseBytesTillConnectionClosure(errorCode, bytesRead);
     }
 
-    void parseBytesWithHttpReader(SystemError::ErrorCode errorCode, std::size_t bytesRead)
+    void parseBytesWithHttpReader(SystemError::ErrorCode /*errorCode*/, std::size_t bytesRead)
     {
         static const int MIN_SOCKET_READ_SIZE = 4096;
         static const int READ_BUFFER_GROW_STEP = 4096;

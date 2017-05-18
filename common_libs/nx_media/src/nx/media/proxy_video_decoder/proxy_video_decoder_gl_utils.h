@@ -9,7 +9,7 @@
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 
-#include <nx/utils/debug_utils.h>
+#include <nx/kit/debug.h>
 
 #include "proxy_video_decoder_utils.h"
 
@@ -26,8 +26,8 @@ void checkGlError(QOpenGLFunctions* funcs, const char* tag);
 
 #define NX_GL(CALL) do \
 { \
-    if (conf.outputGlCalls) \
-        PRINT << "OpenGL CALL: " << #CALL; \
+    if (ini().outputGlCalls) \
+        NX_PRINT << "OpenGL CALL: " << #CALL; \
     checkGlError(funcs, "{prior to:}" #CALL); \
     CALL; \
     checkGlError(funcs, #CALL); \
@@ -35,21 +35,21 @@ void checkGlError(QOpenGLFunctions* funcs, const char* tag);
 
 #define NX_GL_CHECK(BOOL_CALL) do \
 { \
-    if (conf.outputGlCalls) \
-        PRINT << "OpenGL CALL: " << #BOOL_CALL; \
+    if (ini().outputGlCalls) \
+        NX_PRINT << "OpenGL CALL: " << #BOOL_CALL; \
     checkGlError(funcs, "{prior to:}" #BOOL_CALL); \
     bool result = BOOL_CALL; \
     if (!result) \
-        PRINT << "OpenGL FAILED CALL: " << #BOOL_CALL << " -> false"; \
+        NX_PRINT << "OpenGL FAILED CALL: " << #BOOL_CALL << " -> false"; \
     checkGlError(funcs, #BOOL_CALL); \
     NX_CRITICAL(result); \
 } while (0)
 
 #define NX_GL_DUMP(OBJ) do \
 { \
-    OUTPUT << "OpenGL " #OBJ " BEGIN"; \
-    OUTPUT << OBJ->log(); \
-    OUTPUT << "OpenGL " #OBJ " END"; \
+    NX_OUTPUT << "OpenGL " #OBJ " BEGIN"; \
+    NX_OUTPUT << OBJ->log(); \
+    NX_OUTPUT << "OpenGL " #OBJ " END"; \
 } while (0)
 
 //-------------------------------------------------------------------------------------------------
@@ -61,14 +61,12 @@ typedef std::shared_ptr<QOpenGLFramebufferObject> FboPtr;
 class FboManager
 {
 public:
-    static constexpr const char* OUTPUT_PREFIX = "ProxyVideoDecoder[gl_utils]: ";
-
     FboManager(const QSize& frameSize, int queueSize):
         m_frameSize(frameSize),
         m_index(0),
         m_queueSize(queueSize)
     {
-        OUTPUT << "FboManager::FboManager(frameSize:" << frameSize
+        NX_OUTPUT << "FboManager::FboManager(frameSize:" << frameSize
             << ", queueSize:" << queueSize << ")";
     }
 
@@ -116,4 +114,4 @@ void debugDumpGlPrecision();
 } // namespace media
 } // namespace nx
 
-#endif // ENABLE_PROXY_DECODER
+#endif // defined(ENABLE_PROXY_DECODER)

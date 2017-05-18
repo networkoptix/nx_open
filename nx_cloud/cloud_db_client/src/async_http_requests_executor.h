@@ -12,7 +12,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/std/cpp14.h>
 
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx/utils/thread/stoppable.h>
 
 #include "data/account_data.h"
