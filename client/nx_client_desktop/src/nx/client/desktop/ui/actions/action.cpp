@@ -436,7 +436,7 @@ QString Action::checkConditionalText(const Parameters& parameters) const
         if (conditionalText.condition->check(parameters, context()))
             return conditionalText.text;
     }
-    return normalText();
+    return QString();
 }
 
 Action::ConditionalText::ConditionalText(ConditionWrapper&& condition, const QString &text):

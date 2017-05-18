@@ -268,8 +268,10 @@ void Manager::copyAction(QAction* dst, Action* src, bool forwardSignals)
 
     if (forwardSignals)
     {
-        connect(dst, &QAction::triggered, src, &QAction::trigger);
-        connect(dst, &QAction::toggled, src, &QAction::setChecked);
+        if (src->isCheckable())
+            connect(dst, &QAction::toggled, src, &QAction::setChecked);
+        else
+            connect(dst, &QAction::triggered, src, &QAction::trigger);
     }
 }
 
