@@ -44,7 +44,11 @@ enum class Error
     maskIsZero,
     handshakeError,
     connectionAbort,
+    timedOut,
 };
+
+SystemError::ErrorCode toSystemError(Error ecode);
+Error fromSystemError(SystemError::ErrorCode ecode);
 
 enum class SendMode
 {

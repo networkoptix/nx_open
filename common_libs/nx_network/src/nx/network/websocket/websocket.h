@@ -62,6 +62,7 @@ public:
     void setIsLastFrame();
     void sendCloseAsync(); /**< Send close frame */
     void setPingTimeout(std::chrono::milliseconds timeout);
+    void setSocketTimeouts(std::chrono::milliseconds timeout);
 
 protected:
     int m_pingsReceived = 0;

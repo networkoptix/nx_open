@@ -4,6 +4,9 @@ namespace nx {
 namespace network {
 namespace websocket {
 
+static const auto kPingTimeout = std::chrono::seconds(100);
+static const auto kSocketTimeout = kPingTimeout / 2;
+
 WebSocket::WebSocket(
     std::unique_ptr<AbstractStreamSocket> streamSocket,
     SendMode sendMode,
@@ -18,12 +21,13 @@ WebSocket::WebSocket(
     m_isLastFrame(false),
     m_isFirstFrame(true),
     m_pingTimer(new nx::network::aio::Timer),
-    m_pingTimeout(std::chrono::seconds(100)),
+    m_pingTimeout(kPingTimeout),
     m_lastError(Error::noError)
 {
     AbstractAsyncChannel::bindToAioThread(m_socket->getAioThread());
     m_pingTimer->bindToAioThread(m_socket->getAioThread());
     setPingTimeout(m_pingTimeout);
+    setSocketTimeouts(kSocketTimeout);
     m_readBuffer.reserve(4096);
 }
 
@@ -54,11 +58,14 @@ void WebSocket::setIsLastFrame()
 
 void WebSocket::handleSocketRead(SystemError::ErrorCode ecode, size_t bytesRead)
 {
+    if (ecode == SystemError::noError && bytesRead != 0)
+        setPingTimeout(m_pingTimeout);
+
     m_parser.consume(m_readBuffer.data(), (int)bytesRead);
     m_readBuffer.resize(0);
     if (ecode == SystemError::noError && m_lastError != Error::noError)
     {
-        processReadData(SystemError::connectionAbort);
+        processReadData(toSystemError(m_lastError));
         return;
     }
     processReadData(ecode);
@@ -129,11 +136,9 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, HandlerType handler)
             if (m_lastError != Error::noError)
             {
                 NX_LOG("[WebSocket] readSomeAsync called after connection has been terminated. Ignoring.", cl_logDEBUG1);
-                handler(SystemError::connectionAbort, 0);
+                handler(toSystemError(m_lastError), 0);
                 return;
             }
-
-            setPingTimeout(m_pingTimeout);
 
             bool queueEmpty = m_readQueue.empty();
             nx::Buffer* tmp = buffer;
@@ -151,11 +156,9 @@ void WebSocket::sendAsync(const nx::Buffer& buffer, HandlerType handler)
             if (m_lastError != Error::noError)
             {
                 NX_LOG("[WebSocket] readSomeAsync called after connection has been terminated. Ignoring.", cl_logDEBUG1);
-                handler(SystemError::connectionAbort, 0);
+                handler(toSystemError(m_lastError), 0);
                 return;
             }
-
-            setPingTimeout(m_pingTimeout);
 
             nx::Buffer writeBuffer;
             if (m_sendMode == SendMode::singleMessage)
@@ -182,6 +185,16 @@ void WebSocket::handlePingTimer()
     m_pingTimer->start(m_pingTimeout, [this]() { handlePingTimer(); });
 }
 
+void WebSocket::setSocketTimeouts(std::chrono::milliseconds timeout)
+{
+    dispatch(
+        [this, timeout]()
+        {
+            m_socket->setRecvTimeout(timeout);
+            m_socket->setSendTimeout(timeout);
+        });
+}
+
 void WebSocket::setPingTimeout(std::chrono::milliseconds timeout)
 {
     dispatch(
@@ -205,6 +218,9 @@ void WebSocket::sendCloseAsync()
 
 void WebSocket::handleSocketWrite(SystemError::ErrorCode ecode, size_t /*bytesSent*/)
 {
+    if (ecode == SystemError::noError)
+        setPingTimeout(m_pingTimeout);
+
     auto writeData = m_writeQueue.pop();
     bool queueEmpty = m_writeQueue.empty();
     {
@@ -338,7 +354,7 @@ void WebSocket::sendControlResponse(FrameType requestType, FrameType responseTyp
         {
             if (ecode != SystemError::noError)
             {
-                m_lastError = Error::connectionAbort;
+                m_lastError = fromSystemError(ecode);
                 return;
             }
             NX_LOG(lit("[WebSocket] control response for %1 successfully sent")
@@ -357,7 +373,7 @@ void WebSocket::sendControlRequest(FrameType type)
         {
             if (ecode != SystemError::noError)
             {
-                m_lastError = Error::connectionAbort;
+                m_lastError = fromSystemError(ecode);
                 return;
             }
             NX_LOG(lit("[WebSocket] control request %1 successfully sent")
@@ -398,6 +414,26 @@ QString frameTypeString(FrameType type)
     }
 
     return lit("");
+}
+
+SystemError::ErrorCode toSystemError(Error ecode)
+{
+    switch (ecode)
+    {
+    case Error::noError: return SystemError::noError;
+    case Error::timedOut: return SystemError::timedOut;
+    default: return SystemError::connectionAbort;
+    }
+}
+
+Error fromSystemError(SystemError::ErrorCode ecode)
+{
+    switch (ecode)
+    {
+    case SystemError::noError: return Error::noError;
+    case SystemError::timedOut: return Error::timedOut;
+    default: return Error::connectionAbort;
+    }
 }
 
 } // namespace websocket
