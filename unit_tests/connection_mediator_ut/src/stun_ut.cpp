@@ -28,10 +28,10 @@ using namespace stun;
 class StunCustomTest : public testing::Test
 {
 protected:
-    StunCustomTest()
-        : mediaserverApi(&cloudData, &stunMessageDispatcher)
-        , listeningPeerRegistrator(settings, &cloudData, &stunMessageDispatcher, &listeningPeerPool)
-        , server(
+    StunCustomTest():
+        mediaserverApi(&cloudData, &stunMessageDispatcher),
+        listeningPeerRegistrator(settings, &cloudData, &stunMessageDispatcher, &listeningPeerPool),
+        server(
             &stunMessageDispatcher,
             false,
             nx::network::NatTraversalSupport::disabled)
@@ -41,6 +41,11 @@ protected:
 
         EXPECT_TRUE(server.endpoints().size());
         address = SocketAddress(HostAddress::localhost, server.endpoints().front().port);
+    }
+
+    ~StunCustomTest()
+    {
+        server.pleaseStopSync();
     }
 
     SocketAddress address;
