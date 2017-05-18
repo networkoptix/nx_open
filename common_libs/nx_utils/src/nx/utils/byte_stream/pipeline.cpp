@@ -4,7 +4,7 @@
 
 namespace nx {
 namespace utils {
-namespace pipeline {
+namespace bstream {
 
 //-------------------------------------------------------------------------------------------------
 // AbstractOutputConverter

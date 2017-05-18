@@ -7,7 +7,7 @@
 #include <nx/network/aio/async_channel_bridge.h>
 #include <nx/network/aio/abstract_async_channel.h>
 #include <nx/network/aio/test/aio_test_async_channel.h>
-#include <nx/utils/pipeline.h>
+#include <nx/utils/byte_stream/pipeline.h>
 #include <nx/utils/random.h>
 #include <nx/utils/test_support/test_pipeline.h>
 #include <nx/utils/thread/wait_condition.h>
@@ -150,10 +150,10 @@ protected:
 
 private:
     QByteArray m_originalData;
-    std::unique_ptr<utils::pipeline::AbstractInput> m_leftSource;
-    utils::pipeline::test::NotifyingOutput m_leftDest;
-    std::unique_ptr<utils::pipeline::AbstractInput> m_rightSource;
-    utils::pipeline::test::NotifyingOutput m_rightDest;
+    std::unique_ptr<utils::bstream::AbstractInput> m_leftSource;
+    utils::bstream::test::NotifyingOutput m_leftDest;
+    std::unique_ptr<utils::bstream::AbstractInput> m_rightSource;
+    utils::bstream::test::NotifyingOutput m_rightDest;
     std::unique_ptr<aio::AsyncChannelBridge> m_bridge;
     std::unique_ptr<AsyncChannel> m_leftFile;
     std::unique_ptr<AsyncChannel> m_rightFile;
@@ -175,14 +175,14 @@ private:
 
     void initializeFixedDataInput()
     {
-        m_leftSource = std::make_unique<utils::pipeline::ReflectingPipeline>(m_originalData);
-        m_rightSource = std::make_unique<utils::pipeline::ReflectingPipeline>(m_originalData);
+        m_leftSource = std::make_unique<utils::bstream::ReflectingPipeline>(m_originalData);
+        m_rightSource = std::make_unique<utils::bstream::ReflectingPipeline>(m_originalData);
     }
 
     void initializeInfiniteDataInput()
     {
-        m_leftSource = std::make_unique<utils::pipeline::RandomDataSource>();
-        m_rightSource = std::make_unique<utils::pipeline::RandomDataSource>();
+        m_leftSource = std::make_unique<utils::bstream::RandomDataSource>();
+        m_rightSource = std::make_unique<utils::bstream::RandomDataSource>();
     }
 
     void onBridgeDone(SystemError::ErrorCode sysErrorCode)

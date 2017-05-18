@@ -6,11 +6,11 @@
 
 namespace nx {
 namespace utils {
-namespace pipeline {
+namespace bstream {
 namespace test {
 
 class NX_UTILS_API NotifyingOutput:
-    public utils::pipeline::AbstractOutput
+    public utils::bstream::AbstractOutput
 {
 public:
     virtual int write(const void* data, size_t count) override;
