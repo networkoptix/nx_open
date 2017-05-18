@@ -100,7 +100,6 @@ nx_http::FusionRequestResult resultCodeToFusionRequestResult(api::ResultCode res
     if (resultCode == ResultCode::ok)
         return nx_http::FusionRequestResult();
 
-    //setting correct error class
     nx_http::FusionRequestErrorClass requestResultCode = nx_http::FusionRequestErrorClass::noError;
     switch (resultCode)
     {
