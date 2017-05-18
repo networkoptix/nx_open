@@ -1558,31 +1558,36 @@ void initialize(Manager* manager, Action* root)
         .shortcut(lit("Space"))
         .text(tr("Play"))
         .toggledText(tr("Pause"))
-        .condition(new ArchiveCondition());
+        .condition(ConditionWrapper(new ArchiveCondition())
+            && !condition::tourIsRunning());
 
     factory(PreviousFrameAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
         .shortcut(lit("Ctrl+Left"))
         .text(tr("Previous Frame"))
-        .condition(new ArchiveCondition());
+        .condition(ConditionWrapper(new ArchiveCondition())
+            && !condition::tourIsRunning());
 
     factory(NextFrameAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
         .shortcut(lit("Ctrl+Right"))
         .text(tr("Next Frame"))
-        .condition(new ArchiveCondition());
+        .condition(ConditionWrapper(new ArchiveCondition())
+            && !condition::tourIsRunning());
 
     factory(JumpToStartAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
         .shortcut(lit("Z"))
         .text(tr("To Start"))
-        .condition(new ArchiveCondition());
+        .condition(ConditionWrapper(new ArchiveCondition())
+            && !condition::tourIsRunning());
 
     factory(JumpToEndAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
         .shortcut(lit("X"))
         .text(tr("To End"))
-        .condition(new ArchiveCondition());
+        .condition(ConditionWrapper(new ArchiveCondition())
+            && !condition::tourIsRunning());
 
     factory(VolumeUpAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
