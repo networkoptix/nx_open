@@ -53,21 +53,16 @@ protected:
 Action* checkSender(QObject* sender)
 {
     auto result = qobject_cast<Action*>(sender);
-    if (!result)
-        NX_EXPECT(false, "Cause cannot be determined for non-Action senders.");
+    NX_EXPECT(result, "Cause cannot be determined for non-Action senders.");
     return result;
 }
 
 bool checkType(const QVariant& items)
 {
     ActionParameterType type = ParameterTypes::type(items);
-    if (type == OtherType)
-    {
-        NX_EXPECT(false, lm("Unrecognized action target type '%1'.").arg(items.typeName()));
-        return false;
-    }
-
-    return true;
+    const bool result = (type != OtherType);
+    NX_EXPECT(result, lm("Unrecognized action target type '%1'.").arg(items.typeName()));
+    return result;
 }
 
 } // namespace
