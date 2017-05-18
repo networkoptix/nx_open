@@ -57,7 +57,8 @@ var nativePlayer = new (function () {
         this.destroy();
 
         var videoClass = window.jscd.browser == 'Microsoft Internet Explorer'?'':'class="fullsize"';
-        $currentVideo = $('<video ' + videoClass + ' src="' + url + '" type="' + type + '"><source src="' + url + '" type="' + type + '"></source></video>' ).appendTo(node);
+        var mobileAttrs = window.jscd.mobile ? 'muted controls playsinline': '';
+        $currentVideo = $('<video ' + videoClass + ' src="' + url + '" type="' + type + '"' + mobileAttrs+'><source src="' + url + '" type="' + type + '"></source></video>' ).appendTo(node);
 
         currentVideo = $currentVideo.get(0);
 
