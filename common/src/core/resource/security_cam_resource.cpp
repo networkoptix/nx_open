@@ -23,19 +23,24 @@
 #include <nx/fusion/model_functions.h>
 #include "media_server_user_attributes.h"
 
+#include <nx/utils/log/log.h>
+
 #define SAFE(expr) {QnMutexLocker lock( &m_mutex ); expr;}
 
 
 namespace {
-    static const int defaultMaxFps = 15;
-    static const int defaultReservedSecondStreamFps = 2;
-    static const Qn::StreamFpsSharingMethod defaultStreamFpsSharingMethod = Qn::PixelsFpsSharing;
-    //static const Qn::MotionType defaultMotionType = Qn::MT_MotionWindow;
 
-    static const int defaultSecondStreamFpsLow = 2;
-    static const int defaultSecondStreamFpsMedium = 7;
-    static const int defaultSecondStreamFpsHigh = 12;
-}
+static const int kDefaultMaxFps = 15;
+static const int kShareFpsDefaultReservedSecondStreamFps = 2;
+static const int kSharePixelsDefaultReservedSecondStreamFps = 0;
+static const Qn::StreamFpsSharingMethod kDefaultStreamFpsSharingMethod = Qn::PixelsFpsSharing;
+//static const Qn::MotionType defaultMotionType = Qn::MT_MotionWindow;
+
+static const int kDefaultSecondStreamFpsLow = 2;
+static const int kDefaultSecondStreamFpsMedium = 7;
+static const int kDefaultSecondStreamFpsHigh = 12;
+
+} // namespace
 
 QnUuid QnSecurityCamResource::makeCameraIdFromUniqueId(const QString& uniqueId)
 {
@@ -179,12 +184,35 @@ void QnSecurityCamResource::updateInternal(const QnResourcePtr &other, Qn::Notif
 
 int QnSecurityCamResource::getMaxFps() const {
     QString value = getProperty(lit("MaxFPS"));
-    return value.isNull() ? defaultMaxFps : value.toInt();
+    return value.isNull() ? kDefaultMaxFps : value.toInt();
 }
 
-int QnSecurityCamResource::reservedSecondStreamFps() const {
+int QnSecurityCamResource::reservedSecondStreamFps() const
+{
     QString value = getProperty(lit("reservedSecondStreamFps"));
-    return value.isNull() ? defaultReservedSecondStreamFps : value.toInt();
+
+    if (!value.isNull())
+    {
+        bool ok = false;
+        int reservedSecondStreamFps = value.toInt(&ok);
+
+        if (ok)
+            return reservedSecondStreamFps;
+
+        NX_LOGX(
+            lm("Wrong reserved second stream fps value for camera %1")
+                .arg(getName()),
+            cl_logWARNING);        
+    }
+
+    auto sharingMethod = streamFpsSharingMethod();
+
+    if (sharingMethod == Qn::BasicFpsSharing)
+        return kShareFpsDefaultReservedSecondStreamFps;
+    else if (sharingMethod == Qn::PixelsFpsSharing)
+        return kSharePixelsDefaultReservedSecondStreamFps;
+
+    return 0;
 }
 
 #ifdef ENABLE_DATA_PROVIDERS
@@ -379,7 +407,7 @@ Qn::LicenseType QnSecurityCamResource::licenseType() const
 Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const {
     QString sval = getProperty(Qn::STREAM_FPS_SHARING_PARAM_NAME);
     if (sval.isEmpty())
-        return defaultStreamFpsSharingMethod;
+        return kDefaultStreamFpsSharingMethod;
 
     if (sval == lit("shareFps"))
         return Qn::BasicFpsSharing;
@@ -902,15 +930,15 @@ bool QnSecurityCamResource::isCameraControlDisabled() const {
 int QnSecurityCamResource::desiredSecondStreamFps() const {
     switch (secondaryStreamQuality()) {
     case Qn::SSQualityMedium:
-        return defaultSecondStreamFpsMedium;
+        return kDefaultSecondStreamFpsMedium;
     case Qn::SSQualityLow:
-        return defaultSecondStreamFpsLow;
+        return kDefaultSecondStreamFpsLow;
     case Qn::SSQualityHigh:
-        return defaultSecondStreamFpsHigh;
+        return kDefaultSecondStreamFpsHigh;
     default:
         break;
     }
-    return defaultSecondStreamFpsMedium;
+    return kDefaultSecondStreamFpsMedium;
 }
 
 Qn::StreamQuality QnSecurityCamResource::getSecondaryStreamQuality() const {
