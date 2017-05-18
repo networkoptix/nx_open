@@ -192,7 +192,8 @@ rest::Handle TestPeerManager::downloadChunk(
 
 rest::Handle TestPeerManager::downloadChunkFromInternet(
     const QnUuid& peerId,
-    const QUrl& fileUrl,
+    const QString& fileName,
+    const QUrl& url,
     int chunkIndex,
     int chunkSize,
     AbstractPeerManager::ChunkCallback callback)
@@ -203,26 +204,58 @@ rest::Handle TestPeerManager::downloadChunkFromInternet(
         return 0;
 
     return enqueueRequest(peerId, kDefaultRequestTime,
-        [this, peerId, fileUrl, chunkIndex, chunkSize, callback](rest::Handle handle)
+        [this, peerId, fileName, url, chunkIndex, chunkSize, callback](rest::Handle handle)
         {
+            Storage* storage = nullptr;
+            distributed_file_downloader::FileInformation storageFileInfo;
+
+            auto it = m_peers.find(peerId);
+            if (it != m_peers.end() && it->storage)
+            {
+                storageFileInfo = it->storage->fileInformation(fileName);
+                if (storageFileInfo.isValid()
+                    && storageFileInfo.url == url
+                    && storageFileInfo.chunkSize == chunkSize
+                    && chunkIndex < storageFileInfo.downloadedChunks.size())
+                {
+                    storage = it->storage;
+                }
+            }
+
+            if (storage && storageFileInfo.downloadedChunks[chunkIndex])
+            {
+                QByteArray result;
+                if (storage->readFileChunk(fileName, chunkIndex, result) == ErrorCode::noError)
+                {
+                    callback(true, handle, result);
+                    return;
+                }
+            }
+
             if (!hasInternetConnection(peerId))
             {
                 callback(false, handle, QByteArray());
                 return;
             }
 
-            const auto fileName = m_fileByUrl.value(fileUrl);
-            if (fileName.isEmpty())
+            const auto filePath = m_fileByUrl.value(url);
+            if (filePath.isEmpty())
             {
                 callback(false, handle, QByteArray());
                 return;
             }
 
             FileInformation fileInfo;
-            fileInfo.filePath = fileName;
+            fileInfo.filePath = filePath;
             fileInfo.chunkSize = chunkSize;
 
             auto result = readFileChunk(fileInfo, chunkIndex);
+            m_requestCounter.incrementCounters(peerId,
+                RequestCounter::InternetDownloadRequestsPerformed);
+
+            if (storage)
+                storage->writeFileChunk(fileName, chunkIndex, result);
+
             callback(!result.isNull(), handle, result);
         });
 }
@@ -423,16 +456,15 @@ rest::Handle ProxyTestPeerManager::downloadChunk(
     return m_peerManager->downloadChunk(peer, fileName, chunkIndex, callback);
 }
 
-rest::Handle ProxyTestPeerManager::downloadChunkFromInternet(
-    const QnUuid& peerId,
-    const QUrl& fileUrl,
+rest::Handle ProxyTestPeerManager::downloadChunkFromInternet(const QnUuid& peerId, const QString& fileName,
+    const QUrl& url,
     int chunkIndex,
     int chunkSize,
     AbstractPeerManager::ChunkCallback callback)
 {
     m_requestCounter.incrementCounters(peerId, RequestCounter::DownloadChunkFromInternetRequest);
     return m_peerManager->downloadChunkFromInternet(
-        peerId, fileUrl, chunkIndex, chunkSize, callback);
+        peerId, fileName, url, chunkIndex, chunkSize, callback);
 }
 
 void ProxyTestPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle handle)
@@ -467,12 +499,20 @@ void RequestCounter::printCounters(const QString& header, TestPeerManager* peerM
 {
     QTextStream out(stdout);
 
+    auto printSplit =
+        [&out]()
+        {
+            for (int type = FirstRequestType; type < RequestTypesCount; ++type)
+                out << "----------";
+            out << "-\n";
+        };
+
     out << header << "\n";
-    out << "---------------------------------------------------\n";
+    printSplit();
     for (int type = FirstRequestType; type < RequestTypesCount; ++type)
         out << "|  " << requestTypeShortName(static_cast<RequestType>(type)) << "  ";
     out << "|\n";
-    out << "---------------------------------------------------\n";
+    printSplit();
 
     auto peers = counters[Total].keys();
     std::sort(peers.begin(), peers.end());
@@ -485,7 +525,7 @@ void RequestCounter::printCounters(const QString& header, TestPeerManager* peerM
             << "\n";
     }
 
-    out << "---------------------------------------------------\n";
+    printSplit();
 }
 
 QString RequestCounter::requestTypeShortName(RequestCounter::RequestType requestType)
@@ -500,6 +540,8 @@ QString RequestCounter::requestTypeShortName(RequestCounter::RequestType request
             return "DOWNL";
         case DownloadChunkFromInternetRequest:
             return "DOWNI";
+        case InternetDownloadRequestsPerformed:
+            return "IDOWP";
         case Total:
             return "TOTAL";
         default:

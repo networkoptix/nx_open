@@ -49,7 +49,8 @@ public:
 
     virtual rest::Handle downloadChunkFromInternet(
         const QnUuid& peerId,
-        const QUrl& fileUrl,
+        const QString& fileName,
+        const QUrl& url,
         int chunkIndex,
         int chunkSize,
         ChunkCallback callback) = 0;

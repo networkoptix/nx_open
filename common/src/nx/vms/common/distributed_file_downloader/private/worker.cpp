@@ -626,10 +626,15 @@ void Worker::downloadNextChunk()
             }
         };
 
-    rest::Handle handle;
-
     if (m_subsequentChunksToDownload <= 0)
-        m_subsequentChunksToDownload = kSubsequentChunksToDownload;
+    {
+        if (m_usingInternet && peerId != m_peerManager->selfId())
+            m_subsequentChunksToDownload = 1;
+        else
+            m_subsequentChunksToDownload = kSubsequentChunksToDownload;
+    }
+
+    rest::Handle handle;
 
     if (m_usingInternet)
     {
@@ -638,7 +643,7 @@ void Worker::downloadNextChunk()
                 .arg(chunkIndex).arg(m_peerManager->peerString(peerId)),
             cl_logDEBUG2);
         handle = m_peerManager->downloadChunkFromInternet(
-            peerId, fileInfo.url, chunkIndex, fileInfo.chunkSize, handleReply);
+            peerId, fileInfo.name, fileInfo.url, chunkIndex, fileInfo.chunkSize, handleReply);
     }
     else
     {
@@ -952,8 +957,10 @@ QList<QnUuid> Worker::selectPeersForInternetDownload() const
 
     const auto& peers = peersWithInternetConnection();
 
-    if (m_peers.toSet().intersects(peers.toSet()))
-        return {};
+    const auto& currentPeersWithInternet = peers.toSet() & m_peers.toSet();
+
+    if (!currentPeersWithInternet.isEmpty())
+        return currentPeersWithInternet.toList();
 
     return peers;
 }

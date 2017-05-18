@@ -211,7 +211,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, internetFile)
     bool chunkDownloaded = false;
     QByteArray chunkData;
 
-    peerManager->downloadChunkFromInternet(peerId, url, 0, 1,
+    peerManager->downloadChunkFromInternet(peerId, fileName, url, 0, 1,
     [&](bool success, rest::Handle /*handle*/, const QByteArray& data)
         {
             chunkDownloaded = success;

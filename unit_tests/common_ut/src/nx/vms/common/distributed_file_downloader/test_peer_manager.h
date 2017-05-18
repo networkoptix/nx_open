@@ -25,6 +25,7 @@ struct RequestCounter
         ChecksumsRequest,
         DownloadChunkRequest,
         DownloadChunkFromInternetRequest,
+        InternetDownloadRequestsPerformed,
         Total,
 
         RequestTypesCount
@@ -104,7 +105,8 @@ public:
 
     virtual rest::Handle downloadChunkFromInternet(
         const QnUuid& peerId,
-        const QUrl& fileUrl,
+        const QString& fileName,
+        const QUrl& url,
         int chunkIndex,
         int chunkSize,
         ChunkCallback callback) override;
@@ -185,7 +187,8 @@ public:
 
     virtual rest::Handle downloadChunkFromInternet(
         const QnUuid& peerId,
-        const QUrl& fileUrl,
+        const QString& fileName,
+        const QUrl& url,
         int chunkIndex,
         int chunkSize,
         ChunkCallback callback) override;
