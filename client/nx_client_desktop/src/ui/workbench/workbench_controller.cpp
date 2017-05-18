@@ -111,47 +111,65 @@ using namespace nx::client::desktop::ui;
 #endif
 
 namespace {
-    QPoint invalidDragDelta() {
-        return QPoint(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
+
+QPoint invalidDragDelta()
+{
+    return QPoint(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
+}
+
+QPoint invalidCursorPos()
+{
+    return invalidDragDelta();
+}
+
+QPoint modulo(const QPoint &pos, const QRect &rect)
+{
+    return QPoint(
+        rect.left() + (pos.x() - rect.left() + rect.width()) % rect.width(),
+        rect.top() + (pos.y() - rect.top() + rect.height()) % rect.height()
+    );
+}
+
+int distance(int l, int h, int v)
+{
+    if (l > h)
+        return distance(h, l, v);
+
+    if (v <= l)
+    {
+        return l - v;
     }
-
-    QPoint invalidCursorPos() {
-        return invalidDragDelta();
+    else if (v >= h)
+    {
+        return v - h;
     }
-
-    QPoint modulo(const QPoint &pos, const QRect &rect) {
-        return QPoint(
-            rect.left() + (pos.x() - rect.left() + rect.width())  % rect.width(),
-            rect.top()  + (pos.y() - rect.top()  + rect.height()) % rect.height()
-        );
+    else
+    {
+        return 0;
     }
+}
 
-    int distance(int l, int h, int v) {
-        if(l > h)
-            return distance(h, l, v);
-
-        if(v <= l) {
-            return l - v;
-        } else if(v >= h) {
-            return v - h;
-        } else {
-            return 0;
-        }
+template<class T>
+struct IsInstanceOf
+{
+    template<class Y>
+    bool operator()(const Y *value) const
+    {
+        return dynamic_cast<const T *>(value) != NULL;
     }
+};
 
-    template<class T>
-    struct IsInstanceOf {
-        template<class Y>
-        bool operator()(const Y *value) const {
-            return dynamic_cast<const T *>(value) != NULL;
-        }
-    };
+/** Opacity of video items when they are dragged / resized. */
+const qreal widgetManipulationOpacity = 0.3;
 
-    /** Opacity of video items when they are dragged / resized. */
-    const qreal widgetManipulationOpacity = 0.3;
+const qreal raisedGeometryThreshold = 0.002;
 
-    const qreal raisedGeometryThreshold = 0.002;
-} // anonymous namespace
+bool tourIsRunning(QnWorkbenchContext* context)
+{
+    return context->action(action::ToggleLayoutTourModeAction)->isChecked();
+}
+
+} // namespace
 
 
 /*!
@@ -607,7 +625,9 @@ void QnWorkbenchController::moveCursor(const QPoint &aAxis, const QPoint &bAxis)
     }
 
     Qn::ItemRole role = Qn::ZoomedRole;
-    if(!workbench()->item(role))
+    if (tourIsRunning(context()))
+        role = Qn::SingleSelectedRole;
+    else if (!workbench()->item(role))
         role = Qn::RaisedRole;
 
     display()->scene()->clearSelection();
@@ -671,7 +691,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     case Qt::Key_Left:
         if (e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(-15, 0));
-        else if (action(action::ToggleLayoutTourModeAction)->isChecked())
+        else if (tourIsRunning(context()))
             menu()->trigger(action::LayoutTourPrevStepAction);
         else
             moveCursor(QPoint(-1, 0), QPoint(0, -1));
@@ -679,7 +699,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     case Qt::Key_Right:
         if (e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(15, 0));
-        else if (action(action::ToggleLayoutTourModeAction)->isChecked())
+        else if (tourIsRunning(context()))
             menu()->trigger(action::LayoutTourNextStepAction);
         else
             moveCursor(QPoint(1, 0), QPoint(0, 1));
@@ -1149,7 +1169,7 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
 
     QnWorkbenchItem *workbenchItem = widget->item();
 
-    if (workbench()->item(Qn::RaisedRole) != workbenchItem)
+    if (!tourIsRunning(context()) && workbench()->item(Qn::RaisedRole) != workbenchItem)
     {
         /* Don't raise if there's only one item in the layout. */
         QRectF occupiedGeometry = widget->geometry();
@@ -1187,6 +1207,9 @@ void QnWorkbenchController::at_item_rightClicked(
 
 void QnWorkbenchController::at_item_middleClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &) {
     TRACE("ITEM MCLICKED");
+
+    if (tourIsRunning(context()))
+        return;
 
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
     if(widget == NULL)
@@ -1227,8 +1250,8 @@ void QnWorkbenchController::at_item_doubleClicked(QnResourceWidget *widget)
     QnWorkbenchItem *zoomedItem = workbench()->item(Qn::ZoomedRole);
     if (zoomedItem == workbenchItem)
     {
-        // Stop layout tour if it is running.
-        if (action(action::ToggleLayoutTourModeAction)->isChecked())
+        // Stop single layout tour if it is running.
+        if (tourIsRunning(context()))
         {
             menu()->trigger(action::ToggleLayoutTourModeAction);
             return;
@@ -1251,7 +1274,7 @@ void QnWorkbenchController::at_item_doubleClicked(QnResourceWidget *widget)
             workbench()->setItem(Qn::ZoomedRole, nullptr);
         }
     }
-    else
+    else if (!tourIsRunning(context()))
     {
         workbench()->setItem(Qn::ZoomedRole, workbenchItem);
     }

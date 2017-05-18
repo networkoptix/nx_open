@@ -436,6 +436,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     connect(context->instance<QnWorkbenchRenderWatcher>(), &QnWorkbenchRenderWatcher::widgetChanged,
         this, &QnMediaResourceWidget::at_renderWatcher_widgetChanged);
 
+    // Update buttons for single layout tour start/stop
+    connect(action(action::ToggleLayoutTourModeAction), &QAction::toggled, this,
+        &QnMediaResourceWidget::updateButtonsVisibility);
+
     at_camDisplay_liveChanged();
     at_ptzButton_toggled(false);
     at_histogramButton_toggled(item->imageEnhancement().enabled);
@@ -1723,6 +1727,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
             && item()->layout()
             && accessController()->hasPermissions(item()->layout()->resource(),
                 Qn::WritePermission | Qn::AddRemoveItemsPermission)
+            && !tourIsRunning(context())
             )
             result |= Qn::ZoomWindowButton;
     }
