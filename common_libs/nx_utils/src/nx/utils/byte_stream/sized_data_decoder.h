@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../abstract_byte_stream_filter.h"
+#include "abstract_byte_stream_filter.h"
 
 namespace nx {
 namespace utils {

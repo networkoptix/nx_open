@@ -1,6 +1,6 @@
 #include "pipeline.h"
 
-#include "random.h"
+#include "../random.h"
 
 namespace nx {
 namespace utils {

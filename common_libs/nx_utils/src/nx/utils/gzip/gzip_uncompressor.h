@@ -8,7 +8,7 @@
 #include <QtZlib/zlib.h>
 #endif
 
-#include "../abstract_byte_stream_filter.h"
+#include "../byte_stream/abstract_byte_stream_filter.h"
 
 namespace nx {
 namespace utils {

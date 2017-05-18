@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../pipeline.h"
+#include "../byte_stream/pipeline.h"
 #include "../thread/mutex.h"
 #include "../thread/wait_condition.h"
 
