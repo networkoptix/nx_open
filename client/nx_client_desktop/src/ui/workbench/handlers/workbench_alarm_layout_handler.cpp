@@ -202,7 +202,13 @@ void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout( const QnVirtualCam
     }
 
     if (switchToLayout)
+    {
+        // Stop layout tour if it is running
+        if (action(action::ToggleLayoutTourModeAction)->isChecked())
+            menu()->trigger(action::ToggleLayoutTourModeAction);
+
         workbench()->setCurrentLayout(layout);
+    }
 
 
     if (!wasEmptyLayout || sortedCameras.empty())
