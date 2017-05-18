@@ -28,6 +28,7 @@
         <module>vms_utils_ut</module>
         <module>nx_media_ut</module>
         <module>nx_fusion_ut</module>
+        <module>cloud_connect_integration_tests</module>
     </modules>
 
     <profiles>

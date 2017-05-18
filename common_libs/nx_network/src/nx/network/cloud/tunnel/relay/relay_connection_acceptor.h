@@ -90,6 +90,7 @@ protected:
 private:
     const QUrl m_relayUrl;
     ReverseConnectionAcceptor<detail::ReverseConnection> m_acceptor;
+    bool m_started = false;
 
     std::unique_ptr<detail::ReverseConnection> reverseConnectionFactoryFunc();
 

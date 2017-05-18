@@ -16,7 +16,7 @@
 #include <core/resource/user_resource.h>
 #include <nx/utils/scope_guard.h>
 #include <utils/common/id.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include "access_control/authentication_manager.h"
 #include "access_control/authorization_manager.h"

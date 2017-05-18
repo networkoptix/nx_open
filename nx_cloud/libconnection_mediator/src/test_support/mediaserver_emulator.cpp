@@ -12,7 +12,7 @@
 #include <common/common_globals.h>
 #include <network/module_information.h>
 #include <rest/server/json_rest_result.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 #include <nx/utils/crypt/linux_passwd_crypt.h>
 
 namespace nx {

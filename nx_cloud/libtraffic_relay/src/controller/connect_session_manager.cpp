@@ -254,6 +254,7 @@ void ConnectSessionManager::onOpenTunnelNotificationSent(
         return;
     }
 
+    relaySession.listeningPeerConnection->cancelIOSync(network::aio::etNone);
     startRelaying(std::move(relaySession));
 }
 

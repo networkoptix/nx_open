@@ -705,7 +705,8 @@ public:
 
         startMediatorAndRegister();
         m_factoryFuncBak = cloud::CustomAcceptorFactory::instance().setCustomFunc(
-            std::bind(&CloudServerSocketMultipleAcceptors::customAcceptorFactoryFunc, this, _1));
+            std::bind(&CloudServerSocketMultipleAcceptors::customAcceptorFactoryFunc, this,
+                _1, _2));
     }
 
     ~CloudServerSocketMultipleAcceptors()
@@ -775,6 +776,7 @@ private:
     std::vector<network::test::AcceptorStub*> m_acceptorsCreated;
 
     std::vector<std::unique_ptr<AbstractConnectionAcceptor>> customAcceptorFactoryFunc(
+        const hpm::api::SystemCredentials&,
         const hpm::api::ListenResponse& /*response*/)
     {
         const int acceptorCount = 7;
