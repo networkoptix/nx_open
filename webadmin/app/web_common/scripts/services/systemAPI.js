@@ -170,7 +170,7 @@ angular.module('nxCommon')
         /* Formatting urls */
         ServerConnection.prototype.previewUrl = function(cameraPhysicalId, time, width, height){
             return this.urlBase +
-                '/web/api/image' +
+                '/api/image' +
                 '?physicalId=' + cameraPhysicalId +
                 (width? '&width=' + width:'') +
                 (height? '&height=' + height:'') +

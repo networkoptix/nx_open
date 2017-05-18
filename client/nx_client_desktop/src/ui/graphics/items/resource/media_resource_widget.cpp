@@ -120,6 +120,7 @@ static constexpr qreal kMaxBackwardSpeed = 16.0;
 
 static constexpr int kTriggersSpacing = 4;
 static constexpr int kTriggerButtonSize = 40;
+static constexpr int kTriggersMargin = 8; // overlaps HUD margin, i.e. does not sum up with it
 
 static const char* kTriggerRequestIdProperty = "_qn_triggerRequestId";
 
@@ -737,9 +738,11 @@ void QnMediaResourceWidget::setupHud()
     m_triggersContainer = new QnScrollableItemsWidget(m_hudOverlay->right());
     m_triggersContainer->setAlignment(Qt::AlignRight | Qt::AlignBottom);
 
+    const auto triggersMargin = kTriggersMargin - m_hudOverlay->contentsMargins().right();
+
     m_triggersContainer->setSpacing(kTriggersSpacing);
-    m_triggersContainer->setMaximumWidth(kTriggerButtonSize);
-    m_triggersContainer->setFlag(QGraphicsItem::ItemClipsChildrenToShape, false);
+    m_triggersContainer->setMaximumWidth(kTriggerButtonSize + triggersMargin);
+    m_triggersContainer->setContentsMargins(0, 0, triggersMargin, 0);
     setOverlayWidgetVisible(m_triggersContainer, false, /*animate=*/false);
 
     m_compositeOverlay = new QnGraphicsStackedWidget(m_hudOverlay->right());

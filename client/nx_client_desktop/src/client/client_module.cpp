@@ -78,6 +78,7 @@
 #include <utils/media/voice_spectrum_analyzer.h>
 #include <utils/performance_test.h>
 #include <utils/server_interface_watcher.h>
+#include <nx/client/desktop/utils/applauncher_guard.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -99,6 +100,8 @@
 #endif
 
 #include <watchers/cloud_status_watcher.h>
+
+using namespace nx::client::desktop;
 
 static QtMessageHandler defaultMsgHandler = 0;
 
@@ -289,6 +292,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     /* Shorted initialization if run in self-update mode. */
     if (startupParams.selfUpdateMode)
         return;
+
+    commonModule->store(new ApplauncherGuard());
 
     /* Depends on QnClientSettings. */
     auto clientInstanceManager = commonModule->store(new QnClientInstanceManager());

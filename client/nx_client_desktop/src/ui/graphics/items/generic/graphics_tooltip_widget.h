@@ -7,6 +7,7 @@
 class QnImageProvider;
 class QnTextEditLabel;
 class QnResourcePreviewWidget;
+class QGraphicsProxyWidget;
 
 class QnGraphicsToolTipWidget: public QnStyledTooltipWidget
 {

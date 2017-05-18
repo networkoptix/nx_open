@@ -10,7 +10,6 @@ class QnImageButtonWidget;
 class QnTimeSlider;
 class QnTimeScrollBar;
 class QnWorkbenchNavigator;
-class QGraphicsProxyWidget;
 
 class QnNavigationItem : public QnFramedWidget, public QnWorkbenchContextAware
 {

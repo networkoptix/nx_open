@@ -14,9 +14,9 @@ ConnectionParameters::ConnectionParameters():
     udpTunnelKeepAliveInterval(kUdpTunnelKeepAliveIntervalDefault),
     udpTunnelKeepAliveRetries(kUdpTunnelKeepAliveRetriesDefault),
     tunnelInactivityTimeout(kDefaultTunnelInactivityTimeout),
-    udpHolePunchingStartDelay(std::chrono::milliseconds::zero()),
-    trafficRelayingStartDelay(std::chrono::milliseconds::zero()),
-    directTcpConnectStartDelay(std::chrono::milliseconds::zero())
+    udpHolePunchingStartDelay(kUdpHolePunchingStartDelayDefault),
+    trafficRelayingStartDelay(kTrafficRelayingStartDelayDefault),
+    directTcpConnectStartDelay(kDirectTcpConnectStartDelayDefault)
 {
 }
 

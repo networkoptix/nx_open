@@ -7,6 +7,7 @@ class QnImageButtonWidget;
 class HoverFocusProcessor;
 class AnimatorGroup;
 class VariantAnimator;
+class QGraphicsProxyWidget;
 
 namespace NxUi {
 
