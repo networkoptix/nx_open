@@ -646,7 +646,8 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveSingleMessage)
     serverReadCb =
         [&](SystemError::ErrorCode ecode, size_t transferred)
         {
-            ASSERT_EQ(ecode, SystemError::noError);
+            if (ecode != SystemError::noError || transferred == 0)
+                return;
             ASSERT_EQ(serverReadBuf.size(), kFrameBuffer.size()*kMessageFrameCount);
             receivedMessageCount++;
             serverReadBuf.clear();
@@ -699,7 +700,8 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveFrame)
     serverReadCb =
         [&](SystemError::ErrorCode ecode, size_t transferred)
         {
-            ASSERT_EQ(ecode, SystemError::noError);
+            if (ecode != SystemError::noError || transferred == 0)
+                return;
             ASSERT_EQ(serverReadBuf.size(), kFrameBuffer.size());
             receivedFrameCount++;
             serverReadBuf.clear();
@@ -752,7 +754,8 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveStream)
     serverReadCb =
         [&](SystemError::ErrorCode ecode, size_t transferred)
         {
-            ASSERT_EQ(ecode, SystemError::noError);
+            if (ecode != SystemError::noError || transferred == 0)
+                return;
             receivedDataSize += transferred;
             serverReadBuf.clear();
             serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
@@ -795,7 +798,8 @@ TEST_F(WebSocket, SendMessage_ReceiveStream)
     serverReadCb =
         [&](SystemError::ErrorCode ecode, size_t transferred)
         {
-            ASSERT_EQ(ecode, SystemError::noError);
+            if (ecode != SystemError::noError || transferred == 0)
+                return;
             receivedDataSize += transferred;
             serverReadBuf.clear();
             serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
@@ -997,9 +1001,9 @@ TEST_F(WebSocket, UnexpectedClose_ReadReturnedZero)
     };
 
     serverReadCb =
-        [&](SystemError::ErrorCode ecode, size_t)
+        [&](SystemError::ErrorCode ecode, size_t bytesRead)
     {
-        if (ecode != SystemError::noError)
+        if (bytesRead == 0)
         {
             serverWebSocket.reset();
             try { readyPromise.set_value(); }

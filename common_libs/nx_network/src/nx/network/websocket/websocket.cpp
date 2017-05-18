@@ -5,7 +5,6 @@ namespace network {
 namespace websocket {
 
 static const auto kPingTimeout = std::chrono::seconds(100);
-static const auto kSocketTimeout = kPingTimeout / 2;
 
 WebSocket::WebSocket(
     std::unique_ptr<AbstractStreamSocket> streamSocket,
@@ -21,13 +20,25 @@ WebSocket::WebSocket(
     m_isLastFrame(false),
     m_isFirstFrame(true),
     m_pingTimer(new nx::network::aio::Timer),
-    m_pingTimeout(kPingTimeout),
     m_lastError(Error::noError)
 {
     AbstractAsyncChannel::bindToAioThread(m_socket->getAioThread());
     m_pingTimer->bindToAioThread(m_socket->getAioThread());
+    unsigned socketRecvTimeoutMs;
+    unsigned socketSendTimeoutMs;
+    if (!m_socket->getRecvTimeout(&socketRecvTimeoutMs) || !m_socket->getSendTimeout(&socketSendTimeoutMs))
+    {
+        NX_LOG("[WebSocket] Failed to get socket timeouts. Going to terminated state.", cl_logWARNING);
+        m_lastError = Error::connectionAbort;
+        return;
+    }
+    unsigned minSocketTimeoutMs = 0;
+    if (socketRecvTimeoutMs != 0 && socketSendTimeoutMs != 0)
+        minSocketTimeoutMs = qMin(socketRecvTimeoutMs, socketSendTimeoutMs);
+    else
+        minSocketTimeoutMs = qMax(socketRecvTimeoutMs, socketSendTimeoutMs);
+    m_pingTimeout = minSocketTimeoutMs == 0 ? kPingTimeout : std::chrono::milliseconds(minSocketTimeoutMs / 2);
     setPingTimeout(m_pingTimeout);
-    setSocketTimeouts(kSocketTimeout);
     m_readBuffer.reserve(4096);
 }
 
@@ -59,26 +70,22 @@ void WebSocket::setIsLastFrame()
 void WebSocket::handleSocketRead(SystemError::ErrorCode ecode, size_t bytesRead)
 {
     if (ecode == SystemError::noError && bytesRead != 0)
-        setPingTimeout(m_pingTimeout);
-
-    m_parser.consume(m_readBuffer.data(), (int)bytesRead);
-    m_readBuffer.resize(0);
-    if (bytesRead == 0)
     {
-        processReadData(SystemError::connectionAbort);
-        return;
+        setPingTimeout(m_pingTimeout);
+        m_parser.consume(m_readBuffer.data(), (int)bytesRead);
+        m_readBuffer.resize(0);
     }
     if (ecode == SystemError::noError && m_lastError != Error::noError)
     {
-        processReadData(toSystemError(m_lastError));
+        processReadData(toSystemError(m_lastError), bytesRead);
         return;
     }
-    processReadData(ecode);
+    processReadData(ecode, bytesRead);
 }
 
-void WebSocket::processReadData(SystemError::ErrorCode ecode)
+void WebSocket::processReadData(SystemError::ErrorCode ecode, size_t bytesRead)
 {
-    if (ecode != SystemError::noError)
+    if (ecode != SystemError::noError || bytesRead == 0)
     {
         if (m_readQueue.empty())
             return;
@@ -120,7 +127,7 @@ void WebSocket::readWithoutAddingToQueue()
 {
     if (m_userDataBuffer.readySize() != 0)
     {
-        processReadData(SystemError::noError);
+        processReadData(SystemError::noError, 1 /*< just not 0*/);
     }
     else
     {
@@ -188,16 +195,6 @@ void WebSocket::handlePingTimer()
 {
     sendControlRequest(FrameType::ping);
     m_pingTimer->start(m_pingTimeout, [this]() { handlePingTimer(); });
-}
-
-void WebSocket::setSocketTimeouts(std::chrono::milliseconds timeout)
-{
-    dispatch(
-        [this, timeout]()
-        {
-            m_socket->setRecvTimeout(timeout);
-            m_socket->setSendTimeout(timeout);
-        });
 }
 
 void WebSocket::setPingTimeout(std::chrono::milliseconds timeout)

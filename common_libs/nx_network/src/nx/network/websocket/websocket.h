@@ -62,7 +62,6 @@ public:
     void setIsLastFrame();
     void sendCloseAsync(); /**< Send close frame */
     void setPingTimeout(std::chrono::milliseconds timeout);
-    void setSocketTimeouts(std::chrono::milliseconds timeout);
     AbstractStreamSocket* socket() { return m_socket.get(); }
 
 protected:
@@ -78,7 +77,7 @@ private:
     virtual void handleError(Error err) override;
 
     /** Own helper functions*/
-    void processReadData(SystemError::ErrorCode ecode);
+    void processReadData(SystemError::ErrorCode ecode, size_t bytesRead);
     bool isDataFrame() const;
     void sendPreparedMessage(nx::Buffer* buffer, int writeSize, HandlerType handler);
     void sendControlResponse(FrameType requestType, FrameType responseType);
