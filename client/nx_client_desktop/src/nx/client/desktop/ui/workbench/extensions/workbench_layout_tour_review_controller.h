@@ -54,7 +54,7 @@ private:
 
     void updateOrder();
     void updateButtons(const QnLayoutResourcePtr& layout);
-    void updatePlaceholderPosition();
+    void updatePlaceholders();
 
     void addItemToReviewLayout(
         const QnLayoutResourcePtr& layout,
@@ -79,7 +79,7 @@ private:
     QnDisconnectHelperPtr m_connections;
     QHash<QnUuid, QnLayoutResourcePtr> m_reviewLayouts;
     QScopedPointer<QnUuidPool> m_uuidPool;
-    QPointer<LayoutTourDropPlaceholder> m_dropPlaceholder;
+    QHash<QPoint, QSharedPointer<LayoutTourDropPlaceholder> > m_dropPlaceholders;
 };
 
 } // namespace workbench

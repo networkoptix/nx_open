@@ -578,6 +578,12 @@ const QSet<QnWorkbenchItem *> &QnWorkbenchLayout::items(const QString &resourceU
     return pos == m_itemsByUid.end() ? m_noItems : pos.value();
 }
 
+bool QnWorkbenchLayout::isFreeSlot(const QPointF &gridPos, const QSize &size) const
+{
+    QPoint gridCell = (gridPos - QnGeometry::toPoint(QSizeF(size)) / 2.0).toPoint();
+    return !m_itemMap.isOccupied(QRect(gridCell, size));
+}
+
 QRect QnWorkbenchLayout::closestFreeSlot(const QPointF& gridPos, const QSize& size,
     TypedMagnitudeCalculator<QPoint>* metric) const
 {

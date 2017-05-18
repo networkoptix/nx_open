@@ -296,6 +296,13 @@ public:
     /**
      * \param gridPos                   Desired position, in grid coordinates.
      * \param size                      Desired slot size.
+     * \returns                         True if requested rect is not covered by pinned items.
+     */
+    bool isFreeSlot(const QPointF &gridPos, const QSize &size) const;
+
+    /**
+     * \param gridPos                   Desired position, in grid coordinates.
+     * \param size                      Desired slot size.
      * \param metric                    Metric of the gridspace to use for determining the closest slot.
      *                                  Positions of the top-left corner of the slot at hand will be passed to it.
      * \returns                         Geometry of the free slot of desired size whose upper-left corner
