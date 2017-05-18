@@ -14,10 +14,13 @@ namespace server {
 namespace rest {
 
 /**
- * Given registered path: "/account/{accountId}/systems".
- * When matching path "/account/vpupkin/systems".
- * Then "/account/{accountId}/systems" is found and pathParams contains "vpupkin".
- * Parameter cannot be empty. In that case path is not matched.
+ * Usage example:
+ * - Register path "/account/{accountId}/systems".
+ * - PathMatcher::match("/account/vpupkin/systems") matches to the registered path 
+ *   and adds "vpupkin" to pathParams.
+ *
+ * NOTE: Empty parameter is not matched. 
+ *   E.g., PathMatcher::match("/account//systems") returns boost::none.
  */
 template<typename Mapped>
 class PathMatcher
