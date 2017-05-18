@@ -85,7 +85,7 @@ QString Settings::dataDir() const
 
     #if defined(Q_OS_LINUX)
         QString defVarDirName = QString("/opt/%1/%2/var")
-            .arg(QnAppInfo::linuxOrganizationName()).arg(kModuleName);
+            .arg(nx::utils::AppInfo::linuxOrganizationName()).arg(kModuleName);
         QString varDirName = settings().value("varDir", defVarDirName).toString();
         return varDirName;
     #else
