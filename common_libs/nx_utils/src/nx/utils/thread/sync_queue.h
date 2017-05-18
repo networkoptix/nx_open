@@ -44,7 +44,7 @@ public:
     /**
      * While reader is in terminated status, all pop operations with readerId 
      * supplied return immediately without value.
-     * @warning It is highly recommended to call SyncQueue::removeReaderFromTerminatedList 
+     * WARNING: It is highly recommended to call SyncQueue::removeReaderFromTerminatedList 
      * after termination has been completed (e.g., reader thread has stopped) to prevent 
      * "terminated reader list" from holding redundant information.
      */

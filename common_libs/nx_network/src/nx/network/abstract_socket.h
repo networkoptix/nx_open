@@ -280,8 +280,8 @@ public:
      *   bytesRead is undefined, if errorCode is not SystemError::noError.
      *   bytesRead is 0, if connection has been closed.
      * @return true, if asynchronous read has been issued
-     * @warning If dst->capacity() == 0, false is returned and no bytes read.
-     * @warning Multiple concurrent asynchronous write operations result in undefined behavior.
+     * WARNING: If dst->capacity() == 0, false is returned and no bytes read.
+     * WARNING: Multiple concurrent asynchronous write operations result in undefined behavior.
      */
     virtual void readSomeAsync(
         nx::Buffer* const buffer,
