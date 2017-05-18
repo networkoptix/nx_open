@@ -211,19 +211,19 @@ public:
     void setDisablePrecalculatedAuthorization(bool val);
 
     /** Set socket connect/send timeout. */
-    void setSendTimeoutMs(unsigned int sendTimeoutMs);
+    void setSendTimeout(std::chrono::milliseconds sendTimeout);
     /**
      * @param responseReadTimeoutMs 0 means infinity.
      * By default, 3000 ms.
      * If timeout has been met, connection is closed, state set to failed and AsyncClient::done emitted.
      */
-    void setResponseReadTimeoutMs(unsigned int responseReadTimeoutMs);
+    void setResponseReadTimeout(std::chrono::milliseconds responseReadTimeout);
     /**
      * @param messageBodyReadTimeoutMs 0 means infinity.
      * By default there is no timeout.
      * If timeout has been met, connection is closed, state set to failed and AsyncClient::done emitted.
      */
-    void setMessageBodyReadTimeoutMs(unsigned int messageBodyReadTimeoutMs);
+    void setMessageBodyReadTimeout(std::chrono::milliseconds messageBodyReadTimeout);
 
     const std::unique_ptr<AbstractStreamSocket>& socket();
     /**
@@ -287,9 +287,9 @@ private:
     quint64 m_totalBytesReadPerRequest; //< total read bytes per request
     int m_totalRequestsSentViaCurrentConnection; //< total sent requests via single connection
     bool m_contentEncodingUsed;
-    unsigned int m_sendTimeoutMs;
-    unsigned int m_responseReadTimeoutMs;
-    unsigned int m_msgBodyReadTimeoutMs;
+    std::chrono::milliseconds m_sendTimeout;
+    std::chrono::milliseconds m_responseReadTimeout;
+    std::chrono::milliseconds m_msgBodyReadTimeout;
     AuthType m_authType;
     HttpHeaders m_additionalHeaders;
     int m_awaitedMessageNumber;

@@ -29,9 +29,9 @@ void ReverseConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
 
 void ReverseConnector::setHttpTimeouts(nx_http::AsyncHttpClient::Timeouts timeouts)
 {
-    m_httpClient.setSendTimeoutMs(timeouts.sendTimeout.count());
-    m_httpClient.setResponseReadTimeoutMs(timeouts.responseReadTimeout.count());
-    m_httpClient.setMessageBodyReadTimeoutMs(timeouts.messageBodyReadTimeout.count());
+    m_httpClient.setSendTimeout(timeouts.sendTimeout);
+    m_httpClient.setResponseReadTimeout(timeouts.responseReadTimeout);
+    m_httpClient.setMessageBodyReadTimeout(timeouts.messageBodyReadTimeout);
 }
 
 void ReverseConnector::connect(const SocketAddress& endpoint, ConnectHandler handler)
