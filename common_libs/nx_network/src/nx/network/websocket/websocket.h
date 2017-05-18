@@ -63,12 +63,11 @@ public:
     void sendCloseAsync(); /**< Send close frame */
     void setPingTimeout(std::chrono::milliseconds timeout);
     void setSocketTimeouts(std::chrono::milliseconds timeout);
+    AbstractStreamSocket* socket() { return m_socket.get(); }
 
 protected:
     int m_pingsReceived = 0;
     int m_pongsReceived = 0;
-
-    AbstractStreamSocket* socket() { return m_socket.get(); }
 
 private:
     /** Parser handler implementation */
