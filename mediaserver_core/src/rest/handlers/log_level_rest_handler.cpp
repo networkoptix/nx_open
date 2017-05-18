@@ -23,11 +23,7 @@ int QnLogLevelRestHandler::executeGet(
 
     int logId = 0;
     requireParameter(params, idParam, result, &logId, true);
-
-    std::shared_ptr<nx::utils::log::Logger> logger;
-    if ((size_t) logId < QnLog::kAllLogs.size())
-        logger = nx::utils::log::get(QnLog::kAllLogs[logId], /*allowMain*/ false);
-
+    const auto logger = QnLogs::logger(logId);
     if (!logger)
     {
         result.setError(QnJsonRestResult::InvalidParameter,
@@ -48,7 +44,6 @@ int QnLogLevelRestHandler::executeGet(
 
         QString level = *setValue;
         QnLogLevel logLevel = nx::utils::log::levelFromString(level);
-
         if (logLevel == cl_logUNKNOWN)
         {
             result.setError(QnJsonRestResult::InvalidParameter,
@@ -59,6 +54,7 @@ int QnLogLevelRestHandler::executeGet(
         logger->setDefaultLevel(logLevel);
     }
 
-    result.setReply(nx::utils::log::toString(logger->defaultLevel()));
+    const auto level = logger->defaultLevel();
+    result.setReply(level == nx::utils::log::Level::verbose ? lit("DEBUG2") : toString(level).toUpper());
     return CODE_OK;
 }

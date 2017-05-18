@@ -50,11 +50,8 @@ int QnLogRestHandler::executeGet(
         logId = idIter->second.toInt();
 
     boost::optional<QString> logFilePath;
-    if ((size_t) logId < QnLog::kAllLogs.size())
-    {
-        if (const auto logger = nx::utils::log::get(QnLog::kAllLogs[logId], /*allowMain*/ false))
-            logFilePath = logger->filePath();
-    }
+    if (const auto logger = QnLogs::logger(logId))
+        logFilePath = logger->filePath();
 
     if (!logFilePath)
     {

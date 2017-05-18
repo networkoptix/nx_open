@@ -7,16 +7,6 @@ const QString QnLog::EC2_TRAN_LOG = QLatin1String("EC2_TRAN");
 const QString QnLog::HWID_LOG = QLatin1String("HWID");
 const QString QnLog::PERMISSIONS_LOG = QLatin1String("PERMISSIONS");
 
-std::vector<QString> QnLog::kAllLogs =
-{
-    QnLog::MAIN_LOG_ID,
-    QnLog::CUSTOM_LOG_BASE_ID,
-    QnLog::HTTP_LOG_INDEX,
-    QnLog::EC2_TRAN_LOG,
-    QnLog::HWID_LOG,
-    QnLog::PERMISSIONS_LOG,
-};
-
 void QnLog::initLog(QnLog* /*log*/)
 {
     // No need to initialize any more.
@@ -28,8 +18,30 @@ QnLogs& QnLog::instance()
     return logs;
 }
 
+std::shared_ptr<nx::utils::log::Logger> QnLogs::logger(int id)
+{
+    if (id == 0)
+        return nx::utils::log::main();
+
+    static std::vector<QString> kAllLogs =
+    {
+        QnLog::MAIN_LOG_ID,
+        QnLog::CUSTOM_LOG_BASE_ID,
+        QnLog::HTTP_LOG_INDEX,
+        QnLog::EC2_TRAN_LOG,
+        QnLog::HWID_LOG,
+        QnLog::PERMISSIONS_LOG,
+    };
+
+    if (id < 0 || (size_t) id >= kAllLogs.size())
+        return nullptr;
+
+    return nx::utils::log::get(kAllLogs[id], /*allowMain*/ false);
+}
+
 QnLog* QnLogs::get()
 {
+    // No need to use any more.
     return nullptr;
 }
 
