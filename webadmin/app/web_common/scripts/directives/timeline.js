@@ -203,6 +203,9 @@ angular.module('nxCommon')
                 }
                 function scrollButtonDblClick(left){
                     timelineActions.animateScroll(left ? 0 : 1);
+                    if(!left){
+                        goToLive();
+                    }
                 }
 
 
