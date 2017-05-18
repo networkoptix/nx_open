@@ -100,4 +100,9 @@ private:
  */
 #define MotionSelectionModifiers _id("_qn_motionSelectionModifiers")
 
+/**
+ * Name of the property to set on a graphics item to block motion selection.
+ */
+#define BlockMotionSelection _id("_qn_noBlockMotionSelection")
+
 #endif // QN_MOTION_SELECTION_INSTRUMENT_H

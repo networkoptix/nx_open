@@ -5,6 +5,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
+#include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/blinking_image_widget.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
@@ -69,6 +70,7 @@ T* newCustomShowHideButton(
     button->setFixedSize(QnSkin::maximumSize(button->icon()));
 
     button->setProperty(Qn::NoHandScrollOver, true);
+    button->setProperty(Qn::BlockMotionSelection, true);
 
     setHelpTopic(button, Qn::MainWindow_Pin_Help);
     return button;
