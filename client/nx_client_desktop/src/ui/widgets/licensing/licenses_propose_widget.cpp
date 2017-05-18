@@ -23,7 +23,7 @@ QnLicensesProposeWidget::QnLicensesProposeWidget(QWidget *parent):
 {
     ui->setupUi(this);
 
-    QnCheckbox::autoCleanTristate(ui->useLicenseCheckBox);
+    QnCheckboxUtils::autoClearTristate(ui->useLicenseCheckBox);
 
     connect(ui->useLicenseCheckBox, &QCheckBox::stateChanged, this,
         [this]
@@ -143,7 +143,7 @@ void QnLicensesProposeWidget::updateFromResources()
         {
             return camera->isLicenseUsed() == licenseUsed;
         });
-    QnCheckbox::setupTristateCheckbox(ui->useLicenseCheckBox, sameValue, licenseUsed);
+    QnCheckboxUtils::setupTristateCheckbox(ui->useLicenseCheckBox, sameValue, licenseUsed);
 }
 
 Qt::CheckState QnLicensesProposeWidget::state() const

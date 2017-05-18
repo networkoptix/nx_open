@@ -39,7 +39,7 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     ui->licensingWidget->initializeContext(this);
     ui->cameraScheduleWidget->initializeContext(this);
 
-    QnCheckbox::autoCleanTristate(ui->enableAudioCheckBox);
+    QnCheckboxUtils::autoClearTristate(ui->enableAudioCheckBox);
 
     connect(ui->loginEdit, &QLineEdit::textChanged, this,
         &QnMultipleCameraSettingsWidget::at_dbDataChanged);
@@ -298,7 +298,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources()
         ui->enableAudioCheckBox->setEnabled(audioSupported && !audioForced);
         setTabEnabledSafe(Qn::RecordingSettingsTab, !isDtsBased && recordingSupported);
         setTabEnabledSafe(Qn::ExpertCameraSettingsTab, !isDtsBased && hasVideo);
-        QnCheckbox::setupTristateCheckbox(ui->enableAudioCheckBox, sameAudioEnabled, audioEnabled);
+        QnCheckboxUtils::setupTristateCheckbox(ui->enableAudioCheckBox, sameAudioEnabled, audioEnabled);
 
         {
             QSet<QString> logins, passwords;

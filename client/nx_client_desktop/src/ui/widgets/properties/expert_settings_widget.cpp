@@ -34,7 +34,7 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
     scrollBar->setUseMaximumSpace(true);
 
-    QnCheckbox::autoCleanTristate(ui->checkBoxForceMotionDetection);
+    QnCheckboxUtils::autoClearTristate(ui->checkBoxForceMotionDetection);
 
     setWarningStyle(ui->settingsWarningLabel);
     setWarningStyle(ui->settingsDisabledWarningLabel);
@@ -268,7 +268,7 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
 
     bool gotForcedMotionStream = forcedMotionStreamIndex != -1;
 
-    QnCheckbox::setupTristateCheckbox(
+    QnCheckboxUtils::setupTristateCheckbox(
         ui->checkBoxForceMotionDetection,
         sameMdPolicies,
         gotForcedMotionStream);

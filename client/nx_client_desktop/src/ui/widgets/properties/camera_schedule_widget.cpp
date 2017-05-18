@@ -228,9 +228,9 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
     QnCamLicenseUsageHelper helper(commonModule());
     ui->licensesUsageWidget->init(&helper);
 
-    QnCheckbox::autoCleanTristate(ui->enableRecordingCheckBox);
-    QnCheckbox::autoCleanTristate(ui->checkBoxMinArchive);
-    QnCheckbox::autoCleanTristate(ui->checkBoxMaxArchive);
+    QnCheckboxUtils::autoClearTristate(ui->enableRecordingCheckBox);
+    QnCheckboxUtils::autoClearTristate(ui->checkBoxMinArchive);
+    QnCheckboxUtils::autoClearTristate(ui->checkBoxMaxArchive);
 
     QFont labelFont;
     labelFont.setPixelSize(kRecordingTypeLabelFontSize);
@@ -576,7 +576,7 @@ void QnCameraScheduleWidget::updateScheduleEnabled()
     for (const auto &camera : m_cameras)
         (camera->isScheduleDisabled() ? disabledCount : enabledCount)++;
 
-    QnCheckbox::setupTristateCheckbox(ui->enableRecordingCheckBox,
+    QnCheckboxUtils::setupTristateCheckbox(ui->enableRecordingCheckBox,
         enabledCount == 0 || disabledCount == 0, enabledCount > 0);
 }
 
@@ -604,7 +604,7 @@ void QnCameraScheduleWidget::updateMinDays()
                 : camera->minDays() == minDays;
         });
 
-    QnCheckbox::setupTristateCheckbox(ui->checkBoxMinArchive, sameMinDays, isAuto);
+    QnCheckboxUtils::setupTristateCheckbox(ui->checkBoxMinArchive, sameMinDays, isAuto);
     ui->spinBoxMinDays->setValue(calcMinDays(minDays));
 }
 
@@ -631,7 +631,7 @@ void QnCameraScheduleWidget::updateMaxDays()
             : camera->maxDays() == maxDays;
         });
 
-    QnCheckbox::setupTristateCheckbox(ui->checkBoxMaxArchive, sameMaxDays, isAuto);
+    QnCheckboxUtils::setupTristateCheckbox(ui->checkBoxMaxArchive, sameMaxDays, isAuto);
     ui->spinBoxMaxDays->setValue(calcMaxDays(maxDays));
 }
 
