@@ -62,11 +62,13 @@ public:
     void setIsLastFrame();
     void sendCloseAsync(); /**< Send close frame */
     void setPingTimeout(std::chrono::milliseconds timeout);
-
+    void setSocketTimeouts(std::chrono::milliseconds timeout);
     AbstractStreamSocket* socket() { return m_socket.get(); }
+
 protected:
     int m_pingsReceived = 0;
     int m_pongsReceived = 0;
+
 private:
     /** Parser handler implementation */
     virtual void frameStarted(FrameType type, bool fin) override;

@@ -81,7 +81,8 @@ public:
     {
         m_first = Held();
         m_firstUsed = false;
-        m_queue.swap(QueueType());
+        QueueType tmp;
+        m_queue.swap(tmp);
     }
 
 private:
