@@ -4,7 +4,7 @@
 
 namespace nx {
 namespace utils {
-namespace bsf {
+namespace bstream {
 
 BufferOutputStream::BufferOutputStream():
     AbstractByteStreamFilter(std::shared_ptr<AbstractByteStreamFilter>())
@@ -22,6 +22,6 @@ QByteArray BufferOutputStream::buffer() const
     return m_buffer;
 }
 
-} // namespace bsf
+} // namespace bstream
 } // namespace utils
 } // namespace nx

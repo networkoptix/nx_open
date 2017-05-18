@@ -4,7 +4,7 @@
 
 namespace nx {
 namespace utils {
-namespace bsf {
+namespace bstream {
 
 /**
  * Decodes stream of following blocks:
@@ -19,6 +19,6 @@ public:
     virtual bool processData(const QnByteArrayConstRef& data) override;
 };
 
-} // namespace bsf
+} // namespace bstream
 } // namespace utils
 } // namespace nx

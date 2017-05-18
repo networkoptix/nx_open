@@ -4,7 +4,7 @@
 
 namespace nx {
 namespace utils {
-namespace bsf {
+namespace bstream {
 namespace gzip {
 
 static const int OUTPUT_BUFFER_SIZE = 16 * 1024;
@@ -163,6 +163,6 @@ size_t Uncompressor::flush()
 }
 
 } // namespace gzip
-} // namespace bsf
+} // namespace bstream
 } // namespace utils
 } // namespace nx

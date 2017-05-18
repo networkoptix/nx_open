@@ -12,7 +12,7 @@
 
 namespace nx {
 namespace utils {
-namespace bsf {
+namespace bstream {
 namespace gzip {
 
 /**
@@ -44,6 +44,6 @@ private:
 };
 
 } // namespace gzip
-} // namespace bsf
+} // namespace bstream
 } // namespace utils
 } // namespace nx
