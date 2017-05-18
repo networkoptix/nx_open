@@ -12,14 +12,14 @@
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
-#include <nx/utils/bsf/sized_data_decoder.h>
+#include <nx/utils/byte_stream/sized_data_decoder.h>
 #include <nx/utils/gzip/gzip_compressor.h>
 #include <nx/utils/gzip/gzip_uncompressor.h>
 #include <nx/utils/system_error.h>
 
 #include <cdb/ec2_request_paths.h>
 #include <nx_ec/ec_proto_version.h>
-#include <nx/utils/custom_output_stream.h>
+#include <nx/utils/byte_stream/custom_output_stream.h>
 #include <utils/common/util.h>
 #include <nx/network/http/custom_headers.h>
 #include <api/global_settings.h>
@@ -193,13 +193,13 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     std::weak_ptr<nx_http::HttpMessageStreamParser> incomingTransactionsRequestsParserWeak(
         incomingTransactionsRequestsParser );
 
-    auto extensionHeadersProcessor = nx::utils::bsf::makeFilterWithFunc( //this filter receives single HTTP message
+    auto extensionHeadersProcessor = nx::utils::bstream::makeFilterWithFunc( //this filter receives single HTTP message
         [this, incomingTransactionsRequestsParserWeak]() {
             if( auto incomingTransactionsRequestsParserStrong = incomingTransactionsRequestsParserWeak.lock() )
                 processChunkExtensions( incomingTransactionsRequestsParserStrong->currentMessage().headers() );
         } );
 
-    extensionHeadersProcessor->setNextFilter( nx::utils::bsf::makeCustomOutputStream(
+    extensionHeadersProcessor->setNextFilter( nx::utils::bstream::makeCustomOutputStream(
         std::bind(
             &QnTransactionTransportBase::receivedTransactionNonSafe,
             this,
@@ -245,12 +245,12 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     //creating parser sequence: multipart_parser -> ext_headers_processor -> transaction handler
     m_multipartContentParser = std::make_shared<nx_http::MultipartContentParser>();
     std::weak_ptr<nx_http::MultipartContentParser> multipartContentParserWeak( m_multipartContentParser );
-    auto extensionHeadersProcessor = nx::utils::bsf::makeFilterWithFunc( //this filter receives single multipart message
+    auto extensionHeadersProcessor = nx::utils::bstream::makeFilterWithFunc( //this filter receives single multipart message
         [this, multipartContentParserWeak]() {
             if( auto multipartContentParser = multipartContentParserWeak.lock() )
                 processChunkExtensions( multipartContentParser->prevFrameHeaders() );
         } );
-    extensionHeadersProcessor->setNextFilter( nx::utils::bsf::makeCustomOutputStream(
+    extensionHeadersProcessor->setNextFilter( nx::utils::bstream::makeCustomOutputStream(
         std::bind(
             &QnTransactionTransportBase::receivedTransactionNonSafe,
             this,
@@ -775,8 +775,8 @@ void QnTransactionTransportBase::receivedTransaction(
         //decodedTranData can contain multiple transactions
         if( !m_sizedDecoder )
         {
-            m_sizedDecoder = std::make_shared<nx::utils::bsf::SizedDataDecodingFilter>();
-            m_sizedDecoder->setNextFilter( nx::utils::bsf::makeCustomOutputStream(
+            m_sizedDecoder = std::make_shared<nx::utils::bstream::SizedDataDecodingFilter>();
+            m_sizedDecoder->setNextFilter( nx::utils::bstream::makeCustomOutputStream(
                 std::bind(
                     &QnTransactionTransportBase::receivedTransactionNonSafe,
                     this,
@@ -1044,7 +1044,7 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
             if( m_compressResponseMsgBody )
             {
                 //encoding outgoing message body
-                dataCtx.encodedSourceData = nx::utils::bsf::gzip::Compressor::compressData( dataCtx.encodedSourceData );
+                dataCtx.encodedSourceData = nx::utils::bstream::gzip::Compressor::compressData( dataCtx.encodedSourceData );
             }
         }
         else    //m_peerRole == prOriginating
@@ -1325,7 +1325,7 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
         if( contentEncodingIter->second == "gzip" )
         {
             //enabling decompression of received transactions
-            auto ungzip = std::make_shared<nx::utils::bsf::gzip::Uncompressor>();
+            auto ungzip = std::make_shared<nx::utils::bstream::gzip::Uncompressor>();
             ungzip->setNextFilter( std::move(m_incomingTransactionStreamParser) );
             m_incomingTransactionStreamParser = std::move(ungzip);
         }
@@ -1363,17 +1363,17 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
                 Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true" )
         {
             //inserting base64 decoder before the last filter
-            m_incomingTransactionStreamParser = nx::utils::bsf::insert(
+            m_incomingTransactionStreamParser = nx::utils::bstream::insert(
                 m_incomingTransactionStreamParser,
-                nx::utils::bsf::last( m_incomingTransactionStreamParser ),
+                nx::utils::bstream::last( m_incomingTransactionStreamParser ),
                 std::make_shared<Base64DecoderFilter>() );
 
             //base64-encoded data contains multiple transactions so
             //    inserting sized data decoder after base64 decoder
-            m_incomingTransactionStreamParser = nx::utils::bsf::insert(
+            m_incomingTransactionStreamParser = nx::utils::bstream::insert(
                 m_incomingTransactionStreamParser,
-                nx::utils::bsf::last( m_incomingTransactionStreamParser ),
-                std::make_shared<nx::utils::bsf::SizedDataDecodingFilter>() );
+                nx::utils::bstream::last( m_incomingTransactionStreamParser ),
+                std::make_shared<nx::utils::bstream::SizedDataDecodingFilter>() );
         }
 
         auto keepAliveHeaderIter = m_httpClient->response()->headers.find(Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME);

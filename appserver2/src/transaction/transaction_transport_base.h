@@ -292,8 +292,8 @@ private:
     ConnectionType::Type m_connectionType;
     const PeerRole m_peerRole;
     QByteArray m_contentEncoding;
-    std::shared_ptr<nx::utils::bsf::AbstractByteStreamFilter> m_incomingTransactionStreamParser;
-    std::shared_ptr<nx::utils::bsf::AbstractByteStreamFilter> m_sizedDecoder;
+    std::shared_ptr<nx::utils::bstream::AbstractByteStreamFilter> m_incomingTransactionStreamParser;
+    std::shared_ptr<nx::utils::bstream::AbstractByteStreamFilter> m_sizedDecoder;
     bool m_compressResponseMsgBody;
     QnUuid m_connectionGuid;
     ConnectionGuardSharedState* const m_connectionGuardSharedState;

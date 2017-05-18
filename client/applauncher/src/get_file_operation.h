@@ -84,7 +84,7 @@ namespace detail
         boost::optional<qint64> m_localFileSize;
         boost::optional<qint64> m_remoteFileSize;
         bool m_responseReceivedCalled;
-        std::shared_ptr<nx::utils::bsf::AbstractByteStreamFilter> m_fileDataProcessor;
+        std::shared_ptr<nx::utils::bstream::AbstractByteStreamFilter> m_fileDataProcessor;
         bool m_fileClosePending;
         QString m_filePath;
 

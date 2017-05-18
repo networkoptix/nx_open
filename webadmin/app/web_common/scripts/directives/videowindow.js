@@ -29,7 +29,8 @@ angular.module('nxCommon')
                 vgSrc:"=",
                 player:"=",
                 activeFormat:"=",
-                rotation: "="
+                rotation: "=",
+                playing: "="
             },
             templateUrl: Config.viewsDir + 'components/videowindow.html',// ???
 
@@ -229,6 +230,13 @@ angular.module('nxCommon')
                                         scope.loading = false;
                                     });
                                 }
+                            });
+
+                            scope.vgApi.addEventListener("pause", function(event){
+                                scope.playing = false;
+                            });
+                            scope.vgApi.addEventListener("play", function(event){
+                                scope.playing = true;
                             });
 
                             scope.vgApi.addEventListener("ended",function(event){

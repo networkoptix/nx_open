@@ -18,6 +18,8 @@ public:
     static QString productNameShort();
     static QString productNameLong();
     static QString organizationName();
+    static QString linuxOrganizationName();
+    static QString organizationNameForSettings();
 
     static bool isArm()
     {

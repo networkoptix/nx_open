@@ -23,7 +23,7 @@ namespace {
 namespace nx {
 namespace test {
 
-class IoMonitorParser: public nx::utils::bsf::AbstractByteStreamFilter
+class IoMonitorParser: public nx::utils::bstream::AbstractByteStreamFilter
 {
 public:
     IoMonitorParser(const QnIOStateDataList& data): m_data(data) {}
