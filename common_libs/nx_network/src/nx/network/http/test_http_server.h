@@ -15,7 +15,7 @@
 
 //-------------------------------------------------------------------------------------------------
 
-class TestAuthenticationManager:
+class NX_NETWORK_API TestAuthenticationManager:
     public nx_http::server::BaseAuthenticationManager
 {
     typedef nx_http::server::BaseAuthenticationManager BaseType;
@@ -47,7 +47,26 @@ public:
         nx_http::Response* const /*response*/,
         nx_http::RequestProcessedHandler /*completionHandler*/)>;
 
-    TestHttpServer();
+    TestHttpServer():
+        TestHttpServer(
+            true,
+            nx::network::NatTraversalSupport::disabled)
+    {
+    }
+
+    template<typename... Args>
+    TestHttpServer(Args... args):
+        m_authenticationManager(&m_credentialsProvider)
+    {
+        m_authenticationManager.setAuthenticationEnabled(false);
+
+        m_httpServer.reset(
+            new nx_http::HttpStreamSocketServer(
+                &m_authenticationManager,
+                &m_httpMessageDispatcher,
+                std::move(args)...));
+    }
+
     ~TestHttpServer();
 
     bool bindAndListen(const SocketAddress& endpoint = SocketAddress::anyPrivateAddress);

@@ -100,10 +100,9 @@ CloudServerSocket::~CloudServerSocket()
     //    stopWhileInAioThread();
 }
 
-bool CloudServerSocket::bind(const SocketAddress& localAddress)
+bool CloudServerSocket::bind(const SocketAddress& /*localAddress*/)
 {
-    // Does not make any sense in cloud socket context
-    static_cast<void>(localAddress);
+    // Does not make any sense in cloud socket context.
     return true;
 }
 
