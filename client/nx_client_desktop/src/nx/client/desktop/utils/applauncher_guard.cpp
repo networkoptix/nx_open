@@ -15,7 +15,7 @@ namespace {
 // We hope applaucher will crash not so often
 static const int kCheckIntervalMs = 60 * 1000;
 
-}
+} // namespace
 
 ApplauncherGuard::ApplauncherGuard(QObject* parent):
     base_type(parent)
@@ -26,11 +26,13 @@ ApplauncherGuard::ApplauncherGuard(QObject* parent):
 
 void ApplauncherGuard::timerEvent(QTimerEvent* event)
 {
-    base_type::timerEvent(event);
-
-    // Make sure activeX plugin will not start applaucher.
+    // Make sure activeX plugin will not start applaucher. Checking here because we don't know
+    // current client mode in the constructor.
     if (qnRuntime->isActiveXMode())
+    {
+        killTimer(event->timerId());
         return;
+    }
 
     applauncher::checkOnline();
 }
