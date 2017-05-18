@@ -178,7 +178,7 @@ void LayoutTourReviewController::reviewLayoutTour(const ec2::ApiLayoutTourData& 
     layout->setData(Qn::LayoutTourIsManualRole, tour.settings.manual);
     layout->setCellAspectRatio(kCellAspectRatio);
 
-    for (auto item : tour.items)
+    for (auto item: tour.items)
         addItemToReviewLayout(layout, item);
 
     resourcePool()->addResource(layout);

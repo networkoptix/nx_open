@@ -253,7 +253,12 @@ void clearSensitivityRegion(MotionGrid& grid, const QPoint& at)
     }
 };
 
-} // anonymous namespace
+bool tourIsRunning(QnWorkbenchContext* context)
+{
+    return context->action(action::ToggleLayoutTourModeAction)->isChecked();
+}
+
+} // namespace
 
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWorkbenchItem* item, QGraphicsItem* parent):
     base_type(context, item, parent),
@@ -1131,7 +1136,9 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display)
         m_renderer->setChannelCount(0);
     }
 
-    setOption(QnResourceWidget::WindowRotationForbidden, !hasVideo());
+    const bool canRotate = accessController()->hasPermissions(item()->layout()->resource(),
+        Qn::WritePermission);
+    setOption(QnResourceWidget::WindowRotationForbidden, !hasVideo() || !canRotate);
 
     emit displayChanged();
 }
@@ -1674,8 +1681,12 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     if (!zoomRect().isNull())
         return result;
 
-    if (hasVideo && resource()->toResource()->hasFlags(Qn::motion))
+    if (hasVideo
+        && resource()->toResource()->hasFlags(Qn::motion)
+        && !tourIsRunning(context()))
+    {
         result |= Qn::MotionSearchButton;
+    }
 
     bool isExportedLayout = item()
         && item()->layout()
@@ -1712,8 +1723,6 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
             && item()->layout()
             && accessController()->hasPermissions(item()->layout()->resource(),
                 Qn::WritePermission | Qn::AddRemoveItemsPermission)
-            && menu()->canTrigger(action::CreateZoomWindowAction,
-                QnResourceWidgetList{const_cast<QnMediaResourceWidget*>(this)})
             )
             result |= Qn::ZoomWindowButton;
     }

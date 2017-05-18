@@ -1042,7 +1042,8 @@ void initialize(Manager* manager, Action* root)
         .text(tr("Show Motion/Smart Search"))
         .conditionalText(tr("Show Motion"), new NoArchiveCondition())
         .shortcut(lit("Alt+G"))
-        .condition(new SmartSearchCondition(false));
+        .condition(ConditionWrapper(new SmartSearchCondition(false))
+            && !condition::tourIsRunning());
 
     // TODO: #ynikitenkov remove this action, use StartSmartSearchAction with .checked state!
     factory(StopSmartSearchAction)
@@ -1050,17 +1051,20 @@ void initialize(Manager* manager, Action* root)
         .text(tr("Hide Motion/Smart Search"))
         .conditionalText(tr("Hide Motion"), new NoArchiveCondition())
         .shortcut(lit("Alt+G"))
-        .condition(new SmartSearchCondition(true));
+        .condition(ConditionWrapper(new SmartSearchCondition(true))
+            && !condition::tourIsRunning());
 
     factory(ClearMotionSelectionAction)
         .flags(Scene | SingleTarget | MultiTarget)
         .text(tr("Clear Motion Selection"))
-        .condition(new ClearMotionSelectionCondition());
+        .condition(ConditionWrapper(new ClearMotionSelectionCondition())
+            && !condition::tourIsRunning());
 
     factory(ToggleSmartSearchAction)
         .flags(Scene | SingleTarget | MultiTarget | HotkeyOnly)
         .shortcut(lit("Alt+G"))
-        .condition(new SmartSearchCondition());
+        .condition(ConditionWrapper(new SmartSearchCondition())
+            && !condition::tourIsRunning());
 
     factory(CheckFileSignatureAction)
         .flags(Scene | SingleTarget)
