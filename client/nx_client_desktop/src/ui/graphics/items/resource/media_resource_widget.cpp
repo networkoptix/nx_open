@@ -1710,7 +1710,10 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     {
         if (item()
             && item()->layout()
-            && accessController()->hasPermissions(item()->layout()->resource(), Qn::WritePermission | Qn::AddRemoveItemsPermission)
+            && accessController()->hasPermissions(item()->layout()->resource(),
+                Qn::WritePermission | Qn::AddRemoveItemsPermission)
+            && menu()->canTrigger(action::CreateZoomWindowAction,
+                QnResourceWidgetList{const_cast<QnMediaResourceWidget*>(this)})
             )
             result |= Qn::ZoomWindowButton;
     }
