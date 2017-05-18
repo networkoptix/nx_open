@@ -2,9 +2,8 @@
 
 #include <QtCore/QStandardPaths>
 
+#include <nx/utils/app_info.h>
 #include <nx/utils/timer_manager.h>
-
-#include <utils/common/app_info.h>
 
 #include "libtraffic_relay_app_info.h"
 
@@ -72,7 +71,7 @@ ConnectingPeer::ConnectingPeer():
 
 Settings::Settings():
     base_type(
-        QnAppInfo::organizationNameForSettings(),
+        nx::utils::AppInfo::organizationNameForSettings(),
         AppInfo::applicationName(),
         kModuleName)
 {
@@ -86,7 +85,7 @@ QString Settings::dataDir() const
 
     #if defined(Q_OS_LINUX)
         QString defVarDirName = QString("/opt/%1/%2/var")
-            .arg(QnAppInfo::linuxOrganizationName()).arg(kModuleName);
+            .arg(nx::utils::AppInfo::linuxOrganizationName()).arg(kModuleName);
         QString varDirName = settings().value("varDir", defVarDirName).toString();
         return varDirName;
     #else

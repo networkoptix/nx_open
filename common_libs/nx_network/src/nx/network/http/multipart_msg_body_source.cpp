@@ -1,13 +1,13 @@
 #include "multipart_msg_body_source.h"
 
-#include <nx/utils/custom_output_stream.h>
+#include <nx/utils/byte_stream/custom_output_stream.h>
 
 namespace nx_http {
 
 MultipartMessageBodySource::MultipartMessageBodySource(StringType boundary):
     m_multipartBodySerializer(
         std::move(boundary),
-        nx::utils::bsf::makeCustomOutputStream(
+        nx::utils::bstream::makeCustomOutputStream(
             std::bind(
                 &MultipartMessageBodySource::onSomeDataAvailable, this,
                 std::placeholders::_1))),

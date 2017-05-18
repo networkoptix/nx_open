@@ -3,7 +3,7 @@
 #include "cdb_request_path.h"
 #include "data/system_data.h"
 
-#include <utils/common/app_info.h>
+#include <nx/utils/app_info.h>
 
 namespace nx {
 namespace cdb {
@@ -21,7 +21,7 @@ void SystemManager::bindSystem(
     std::function<void(api::ResultCode, api::SystemData)> completionHandler)
 {
     if (registrationData.customization.empty())
-        registrationData.customization = QnAppInfo::customizationName().toStdString();
+        registrationData.customization = nx::utils::AppInfo::customizationName().toStdString();
     executeRequest(
         kSystemBindPath,
         std::move(registrationData),
@@ -46,7 +46,7 @@ void SystemManager::getSystems(
     api::Filter filter;
     filter.nameToValue.emplace(
         api::FilterField::customization,
-        QnAppInfo::customizationName().toStdString());
+        nx::utils::AppInfo::customizationName().toStdString());
     getSystemsFiltered(filter, std::move(completionHandler));
 }
 

@@ -11,7 +11,7 @@ namespace aio {
 namespace test {
 
 class Converter:
-    public utils::pipeline::Converter
+    public utils::bstream::Converter
 {
 public:
     int write(const void* data, size_t count)
@@ -182,7 +182,7 @@ protected:
             createTransformingChannel();
 
         m_converter->setWriteResultToReportUnconditionally(
-            utils::pipeline::StreamIoError::wouldBlock);
+            utils::bstream::StreamIoError::wouldBlock);
         m_rawDataChannel->pauseSendingData();
 
         prepareRandomInputData();
@@ -258,7 +258,7 @@ private:
     std::unique_ptr<aio::StreamTransformingAsyncChannel> m_channel;
     AsyncChannel* m_rawDataChannel;
     std::unique_ptr<Converter> m_converter;
-    utils::pipeline::ReflectingPipeline m_reflectingPipeline;
+    utils::bstream::ReflectingPipeline m_reflectingPipeline;
     nx::Buffer m_inputData;
     nx::Buffer m_expectedOutputData;
     nx::Buffer m_outputData;
