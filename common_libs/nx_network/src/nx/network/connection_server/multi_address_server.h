@@ -59,7 +59,7 @@ public:
             if (!socketServer->bind(addr))
             {
                 const auto osErrorCode = SystemError::getLastOSErrorCode();
-                NX_LOG(lit("Failed to bind to address %1. %2")
+                NX_LOG(lm("Failed to bind to address %1. %2")
                     .arg(addr.toString()).arg(SystemError::toString(osErrorCode)),
                     cl_logERROR);
                 if (bindToEveryAddress)
