@@ -2,7 +2,12 @@
 
 #include <QtWidgets/QCheckBox>
 
-void QnCheckboxUtils::autoClearTristate(QCheckBox* checkbox)
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+
+void CheckboxUtils::autoClearTristate(QCheckBox* checkbox)
 {
     const auto clearTristate =
         [checkbox]()
@@ -17,7 +22,7 @@ void QnCheckboxUtils::autoClearTristate(QCheckBox* checkbox)
         clearTristate, Qt::DirectConnection);
 }
 
-void QnCheckboxUtils::setupTristateCheckbox(QCheckBox* checkbox, bool sameValue, bool checked)
+void CheckboxUtils::setupTristateCheckbox(QCheckBox* checkbox, bool sameValue, bool checked)
 {
     checkbox->setTristate(!sameValue);
     if (!sameValue)
@@ -25,3 +30,8 @@ void QnCheckboxUtils::setupTristateCheckbox(QCheckBox* checkbox, bool sameValue,
     else
         checkbox->setCheckState(checked ? Qt::Checked : Qt::Unchecked);
 }
+
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx
