@@ -75,12 +75,6 @@ angular.module('nxCommon').controller('ViewCtrl',
                 id: r.data.reply.id
             };
         });
-        
-        if(window.jscd.browser === 'Microsoft Internet Explorer' && ! browserSupports('webm', false, false)){
-            if(window.jscd.osVersion < 10) { //For 10th version webm codec doesn't work
-                $scope.ieNoWebm = true;
-            }
-        }
 
         if(window.jscd.mobile) {
             $scope.mobileStore = window.jscd.os === 'iOS'?'appstore':'googleplay';
@@ -475,10 +469,6 @@ angular.module('nxCommon').controller('ViewCtrl',
             setTimeout(updateHeights,50);
         };
 
-        $scope.ieNoWebmAlertClose = function(){
-            $scope.session.ieNoWebmNotified = true;
-            setTimeout(updateHeights,50);
-        };
         $('.video-icon.pull-left-5').dropdown();
 
     });
