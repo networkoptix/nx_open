@@ -81,7 +81,7 @@ table.webclient-window>tbody>tr>td.alert{
   display:inline-block;
   width:1em;
   text-align: center;
-  font-size:120%;
+  font-size:180%;
   line-height: 1;
 }
 
@@ -91,8 +91,17 @@ table.webclient-window>tbody>tr>td.alert{
 .camera-preview .camera-status{
   position: absolute;
   z-index: 1;
-  top: -5px;
-  left: -4px;
+}
+.camera-status.online-cam{
+  top: -8px;
+  left: -5px;
+}
+
+.camera-status.offline-cam{
+  top: -8px;
+  left: -7px;
+  font-size: 200%;
+  font-weight: bolder;
 }
 
 camera-panel {
@@ -150,8 +159,13 @@ camera-panel {
 
 .video-status{
   width: 24px;
-  font-size: 150%;
+  font-size: 180%;
   line-height: 12px;
+}
+.video-status.offline-video{
+  line-height: 16px;
+  font-size: 200% !important;
+  font-weight: bolder;
 }
 
 .video-icon{

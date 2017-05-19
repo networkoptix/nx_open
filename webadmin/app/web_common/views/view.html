@@ -61,7 +61,7 @@
                                         <span class="visible-xs" ng-click="toggleCameraPanel=true"
                                               ng-class="{'back-button': !toggleCameraPanel}"><span class="glyphicon glyphicon-arrow-left"></span></span>
                                         <span class="caption-row video-name">
-                                            <span ng-if="activeCamera.status!='Recording' && activeCamera.scheduleEnabled" class="danger video-status">&#x25E6;</span>
+                                            <span ng-if="activeCamera.status!='Recording' && activeCamera.scheduleEnabled" class="danger video-status offline-video">&#x25E6;</span>
                                             <span ng-if="activeCamera.status=='Recording' " class="danger video-status">&#x25CF;</span>
                                             <span ng-if="activeCamera.status!='Recording' && !activeCamera.scheduleEnabled" class="video-status">&nbsp;</span>
                                             {{activeCamera.name + " (" + activeResolution + ")"}}
