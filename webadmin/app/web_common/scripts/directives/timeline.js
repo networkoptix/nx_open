@@ -16,7 +16,7 @@ angular.module('nxCommon')
                 volumeLevel: '=',
                 serverTime: '='
             },
-            templateUrl: 'views/components/timeline.html',
+            templateUrl: Config.viewsDirCommon + 'components/timeline.html',
             link: function (scope, element/*, attrs*/) {
                 /**
                  * This is main timeline module.

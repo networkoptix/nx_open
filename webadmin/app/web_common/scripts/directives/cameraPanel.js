@@ -10,7 +10,7 @@ angular.module('nxCommon')
                 "currentResolution": "=",
                 "toggleCameraPanel": "="
             },
-            templateUrl: 'views/components/cameraPanel.html',
+            templateUrl: Config.viewsDirCommon + 'components/cameraPanel.html',
             link: function (scope, element/*, attrs*/) {
                 scope.Config = Config;
                 scope.searchCams = "";

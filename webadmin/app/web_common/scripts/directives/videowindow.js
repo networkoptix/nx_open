@@ -32,7 +32,7 @@ angular.module('nxCommon')
                 rotation: "=",
                 playing: "="
             },
-            templateUrl: Config.viewsDir + 'components/videowindow.html',// ???
+            templateUrl: Config.viewsDirCommon + 'components/videowindow.html',// ???
 
             link: function (scope, element/*, attrs*/) {
                 var mimeTypes = {
@@ -262,9 +262,9 @@ angular.module('nxCommon')
                         playerId = "player0";
                     }
                     
-                    scope.flashSource = "components/flashlsChromeless.swf";
+                    scope.flashSource = "web_common/components/flashlsChromeless.swf";
                     if(scope.debugMode && scope.debugFormat){
-                        scope.flashSource = "components/flashlsChromeless_debug.swf";
+                        scope.flashSource = "web_common/components/flashlsChromeless_debug.swf";
                     }
 
                     var flashlsAPI = new FlashlsAPI(null);
@@ -389,7 +389,7 @@ angular.module('nxCommon')
                 
                 scope.initFlash = function(){
                     var playerId = !scope.playerId ? 'player0': scope.playerId;
-                
+                    // TODO: Nick, remove html from js code
                     var tmp = '<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"codebase="" id="flashvideoembed_'+playerId+'"';
                     tmp += 'width="100%" height="100%">';
                     tmp += '\n\t<param name="movie"  value="'+scope.flashSource+'?inline=1" />';
@@ -407,6 +407,8 @@ angular.module('nxCommon')
                     
                     playerId = !scope.playerId ? '' : '#'+playerId;
                     $('videowindow'+playerId)[0].children[0].children[0].innerHTML = tmp;
+                    // TODO: Nick, that is strange. Why do you do it like this?
+                    // TODO: Also, try ng-bind-html instead of setting innerHTML
                 };
 
                 scope.getRotation = function(){

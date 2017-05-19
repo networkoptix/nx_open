@@ -14,7 +14,7 @@ angular.module('nxCommon')
                 player: "=",
                 currentResolution: "="
             },
-            templateUrl: Config.viewsDir + 'components/cameraLinks.html',
+            templateUrl: Config.viewsDirCommon + 'components/cameraLinks.html',
             link: function (scope, element/*, attrs*/) {
                 scope.position = 0;
                 scope.duration = 5*60;

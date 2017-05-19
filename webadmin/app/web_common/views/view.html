@@ -33,7 +33,6 @@
                             <div class="stick-to-top top-gradient">
                                 <div class="webclient-panel webclient-bottom-border">
                                     <div class="pull-right" >
-                                        <!--REMOVE WHEN NOT DEBUG-->
                                         <div class="min-40 inline">&nbsp;</div>
                                         <div class="btn-group pull-up-5">
                                             <span class="video-icon pull-left-5" data-toggle="dropdown" href="#">
@@ -45,24 +44,22 @@
                                                 <li ng-repeat="resolution in availableResolutions"><a href="#" class="video-settings-20" 
                                                       ng-class="{active:resolution == activeResolution}"
                                                       ng-click="selectResolution(resolution);$event.preventDefault();">{{resolution}}</a></li>
-                                                <li class="video-settings-separation-line" ng-if="debugMode"></li>
-                                                <li class="video-settings-36" ng-if="debugMode"><label>Video Player</label></li>
-                                                <li class="video-settings-separation-line" ng-if="debugMode"></li>
-                                                <li ng-repeat="format in manualFormats" ng-if="debugMode"><a href="#" class="video-settings-20"
+
+                                                <li class="video-settings-separation-line"  ng-if="debugMode"></li>
+                                                <li class="video-settings-36"               ng-if="debugMode"><label>Video Player</label></li>
+                                                <li class="video-settings-separation-line"  ng-if="debugMode"></li>
+                                                <li ng-repeat="format in manualFormats"     ng-if="debugMode"><a href="#" class="video-settings-20"
                                                       ng-class="{active:format == activeFormat}"
                                                       ng-click="selectFormat(format);$event.preventDefault();">{{format}}</a></li>
                                             </ul>
                                         </div>
-                                        <span class="video-icon" ng-if="0">
-                                            <span class="glyphicon glyphicon-search"></span>
-                                        </span>
-                                        <span class="video-icon" ng-if="enableFullScreen"
-                                              ng-click="fullScreen()">
+                                        <span class="video-icon" ng-if="enableFullScreen" ng-click="fullScreen()">
                                             <span class="glyphicon glyphicon-fullscreen"></span>
                                         </span>
                                     </div>
                                     <div class="hide-excess-text video-title-back-button">
-                                        <span class="visible-xs" ng-click="toggleCameraPanel=true" ng-class="{'back-button': !toggleCameraPanel}"><span class="glyphicon glyphicon-arrow-left"></span></span>
+                                        <span class="visible-xs" ng-click="toggleCameraPanel=true"
+                                              ng-class="{'back-button': !toggleCameraPanel}"><span class="glyphicon glyphicon-arrow-left"></span></span>
                                         <span class="caption-row video-name">
                                             <span ng-if="activeCamera.status!='Recording' && activeCamera.scheduleEnabled" class="danger video-status">&#x25E6;</span>
                                             <span ng-if="activeCamera.status=='Recording' " class="danger video-status">&#x25CF;</span>
@@ -88,7 +85,8 @@
                                     iOS does not support video larger than fullHD (2MP: 1920x1080).<br>
                                 </div>
 
-                                <videowindow ng-class="{invisible: iOSVideoTooLarge || !positionSelected && (activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')}"
+                                <videowindow ng-class="{invisible: iOSVideoTooLarge || !positionSelected &&
+                                                        (activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')}"
                                              vg-update-time="updateTime($currentTime, $duration)"
                                              vg-player-ready="playerReady($API)" rotation="rotation" playing="positionProvider.playing"
                                              vg-src="activeVideoSource" player="player" active-format="activeFormat">
@@ -102,7 +100,7 @@
                                     records-provider="activeVideoRecords"
                                     position-handler="switchPosition"
                                     play-handler="switchPlaying" can-view-archive="canViewArchive"
-                                    position-provider="positionProvider" volume-Level="volumeLevel" server-time="serverTime"></timeline>
+                                    position-provider="positionProvider" volume-level="volumeLevel" server-time="serverTime"></timeline>
                             </div>
                         </div>
                     </div>

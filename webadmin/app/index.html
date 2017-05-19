@@ -59,7 +59,7 @@
 
 <!-- build:js scripts/vendor.js -->
 <!-- bower:js -->
-<script src="bower_components/jquery/jquery.js"></script>
+<script src="bower_components/jquery/dist/jquery.js"></script>
 <script src="bower_components/angular/angular.js"></script>
 <script src="bower_components/json3/lib/json3.js"></script>
 <script src="bower_components/sass-bootstrap/dist/js/bootstrap.js"></script>
@@ -96,13 +96,14 @@
 <script src="scripts/vendor/qwebchannel.js"></script>
 
 <script src="scripts/vendor/hls.js"></script>
-<script src="components/flashls.js"></script>
-<script src="components/jshls.js"></script>
-<script src="components/nativeplayer.js"></script>
 
 <!-- endbuild -->
 
 <!-- build:js({.tmp,app}) scripts/common.js -->
+<script src="web_common/components/flashls.js"></script>
+<script src="web_common/components/jshls.js"></script>
+<script src="web_common/components/nativeplayer.js"></script>
+
 <script src="web_common/scripts/module.js"></script>
 
 <script src="web_common/scripts/services/systemAPI.js"></script>

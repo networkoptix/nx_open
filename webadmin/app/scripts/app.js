@@ -88,12 +88,12 @@ angular.module('webadminApp', [
             reloadOnSearch: false
         })
         .when('/view', {
-            templateUrl: Config.viewsDir + 'view.html',
+            templateUrl: Config.viewsDirCommon + 'view.html',
             controller: 'ViewCtrl',
             reloadOnSearch: false
         })
         .when('/view/:cameraId', {
-            templateUrl: Config.viewsDir + 'view.html',
+            templateUrl: Config.viewsDirCommon + 'view.html',
             controller: 'ViewCtrl',
             reloadOnSearch: false
         })
