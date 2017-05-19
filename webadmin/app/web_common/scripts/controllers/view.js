@@ -33,12 +33,6 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.liveOnly = true;
         $scope.activeCamera = null;
 
-
-        mediaserver.systemSettings().then(function(r){
-            $scope.webclientDisabled = r.data.reply.settings.crossdomainEnabled == 'false' ;
-        });
-
-
         var timeCorrection = 0;
         var minTimeLag = 2000;// Two seconds
 

@@ -1,7 +1,7 @@
 <div class="container-fluid dark-theme row">
    <table style="width:100%" class="webclient-window">
         <tbody>
-            <tr class="alerts-row" ng-if="hasMobileApp && !session.mobileAppNotified || webclientDisabled">
+            <tr class="alerts-row" ng-if="hasMobileApp && !session.mobileAppNotified">
                 <td colspan="2" class="alert">
                     <div class="webclient-panel mobile-alert" ng-if="hasMobileApp && !session.mobileAppNotified">
                         <div class="pull-right" >
@@ -17,16 +17,6 @@
                             </span>
                         </div>
                     </div>
-
-                    <div class="webclient-panel mobile-alert" ng-if="webclientDisabled">
-                        <div>
-                            <span class="caption-row ">
-                                Web Client flash player support is disabled. Issues may occur during video playback.
-                            </span>
-                        </div>
-                    </div>
-
-
                 </td>
             </tr>
             <tr>
