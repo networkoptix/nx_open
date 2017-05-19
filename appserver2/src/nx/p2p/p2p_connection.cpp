@@ -168,7 +168,7 @@ void Connection::fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey)
     }
 }
 
-void Connection::cancelConnecting(const QString& reason)
+void Connection::cancelConnecting(State newState, const QString& reason)
 {
     NX_LOG(QnLog::P2P_TRAN_LOG,
         lit("Connection to peer %1 canceled from state %2. Reason: %3")
@@ -176,7 +176,7 @@ void Connection::cancelConnecting(const QString& reason)
         .arg(toString(state()))
         .arg(reason),
         cl_logDEBUG2);
-    setState(State::Error);
+    setState(newState);
 }
 
 void Connection::onHttpClientDone()
@@ -184,7 +184,7 @@ void Connection::onHttpClientDone()
     nx_http::AsyncClient::State state = m_httpClient->state();
     if (state == nx_http::AsyncClient::sFailed)
     {
-        cancelConnecting(lm("Http request failed"));
+        cancelConnecting(State::Error, lm("Http request failed"));
         return;
     }
 
@@ -207,13 +207,13 @@ void Connection::onHttpClientDone()
         }
         else
         {
-            cancelConnecting(lm("Unauthorized"));
+            cancelConnecting(State::Unauthorized, lm("Unauthorized"));
         }
         return;
     }
     else if (!nx_http::StatusCode::isSuccessCode(statusCode)) //< Checking that statusCode is 2xx.
     {
-        cancelConnecting(lm("Not success HTTP status code %1").arg(statusCode));
+        cancelConnecting(State::Error, lm("Not success HTTP status code %1").arg(statusCode));
         return;
     }
 
@@ -226,7 +226,7 @@ void Connection::onHttpClientDone()
                 m_remotePeerUrl,
                 std::bind(&Connection::onHttpClientDone, this));
         else
-            cancelConnecting(lm("tryAcquireConnecting failed"));
+            cancelConnecting(State::Error, lm("tryAcquireConnecting failed"));
         return;
     }
 
@@ -242,7 +242,7 @@ void Connection::onHttpClientDone()
 
     if (remotePeer.id.isNull())
     {
-        cancelConnecting(lm("Remote peer Id is null"));
+        cancelConnecting(State::Error, lm("Remote peer Id is null"));
         return;
     }
 
@@ -254,7 +254,7 @@ void Connection::onHttpClientDone()
 
     if (!m_connectionLockGuard->tryAcquireConnected())
     {
-        cancelConnecting(lm("tryAcquireConnected failed"));
+        cancelConnecting(State::Error, lm("tryAcquireConnected failed"));
         return;
     }
 

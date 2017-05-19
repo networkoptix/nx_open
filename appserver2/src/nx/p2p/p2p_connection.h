@@ -42,7 +42,8 @@ public:
     {
         Connecting,
         Connected,
-        Error
+        Error,
+        Unauthorized
     };
 
     enum class Direction
@@ -94,7 +95,7 @@ signals:
     void stateChanged(QWeakPointer<Connection> connection, Connection::State state);
     void allDataSent(QWeakPointer<Connection> connection);
 private:
-    void cancelConnecting(const QString& reason);
+    void cancelConnecting(State state, const QString& reason);
 
     void onHttpClientDone();
 

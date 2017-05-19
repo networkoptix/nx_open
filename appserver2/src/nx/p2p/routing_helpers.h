@@ -23,7 +23,8 @@ struct AlivePeerInfo
 {
     AlivePeerInfo() {}
 
-    qint32 distanceTo(const ApiPersistentIdData& via) const;
+    qint32 distanceTo(const ApiPersistentIdData& peer) const;
+    qint32 distanceTo(const QnUuid& peerId) const;
 
     RoutingInfo routeTo; // key: route to, value - distance in hops
 };
@@ -59,12 +60,13 @@ struct BidirectionRoutingInfo
     BidirectionRoutingInfo(const ApiPersistentIdData& localPeer);
 
     void clear();
-    void removePeer(const ApiPersistentIdData& id);
+    void removePeer(const ApiPersistentIdData& via);
     void addRecord(
         const ApiPersistentIdData& via,
         const ApiPersistentIdData& to,
         const RoutingRecord& record);
     qint32 distanceTo(const ApiPersistentIdData& peer) const;
+    qint32 distanceTo(const QnUuid& peerId) const;
     void updateLocalDistance(const ApiPersistentIdData& peer, qint32 sequence);
 
     AlivePeersMap alivePeers; //< alive peers in the system. key - route via, value - route to

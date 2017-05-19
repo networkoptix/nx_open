@@ -6,10 +6,19 @@ namespace p2p {
 
 using namespace ec2;
 
-qint32 AlivePeerInfo::distanceTo(const ApiPersistentIdData& via) const
+qint32 AlivePeerInfo::distanceTo(const ApiPersistentIdData& peer) const
 {
-    auto itr = routeTo.find(via);
+    auto itr = routeTo.find(peer);
     return itr != routeTo.end() ? itr.value().distance : kMaxDistance;
+}
+
+qint32 AlivePeerInfo::distanceTo(const QnUuid& peerId) const
+{
+    ApiPersistentIdData peer(peerId, QnUuid());
+    qint32 result = kMaxDistance;
+    for (auto itr = routeTo.lowerBound(peer); itr != routeTo.end() && itr.key().id == peerId; ++itr)
+        result = std::min(result, itr->distance);
+    return result;
 }
 
 qint32 RouteToPeerInfo::minDistance(QVector<ApiPersistentIdData>* outViaList) const
@@ -47,14 +56,14 @@ void BidirectionRoutingInfo::clear()
     allPeerDistances.clear();
 }
 
-void BidirectionRoutingInfo::removePeer(const ApiPersistentIdData& id)
+void BidirectionRoutingInfo::removePeer(const ApiPersistentIdData& via)
 {
-    alivePeers.remove(id);
-    alivePeers[m_localPeer].routeTo.remove(id);
+    alivePeers.remove(via);
+    alivePeers[m_localPeer].routeTo.remove(via);
 
-    allPeerDistances[id].remove(m_localPeer);
+    allPeerDistances[via].remove(m_localPeer);
     for (auto itr = allPeerDistances.begin(); itr != allPeerDistances.end(); ++itr)
-        itr->remove(id);
+        itr->remove(via);
 }
 
 void BidirectionRoutingInfo::addRecord(
@@ -71,6 +80,14 @@ qint32 BidirectionRoutingInfo::distanceTo(const ApiPersistentIdData& peer) const
     qint32 result = kMaxDistance;
     for (const auto& alivePeer : alivePeers)
         result = std::min(result, alivePeer.distanceTo(peer));
+    return result;
+}
+
+qint32 BidirectionRoutingInfo::distanceTo(const QnUuid& peerId) const
+{
+    qint32 result = kMaxDistance;
+    for (const auto& alivePeer : alivePeers)
+        result = std::min(result, alivePeer.distanceTo(peerId));
     return result;
 }
 

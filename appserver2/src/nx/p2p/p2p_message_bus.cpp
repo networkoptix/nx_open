@@ -734,6 +734,7 @@ void MessageBus::at_stateChanged(
                 startReading(connection);
             }
             break;
+        case Connection::State::Unauthorized:
         case Connection::State::Error:
         {
             NX_LOG(QnLog::P2P_TRAN_LOG, lit("Peer %1 has closed connection to %2")
@@ -757,6 +758,8 @@ void MessageBus::at_stateChanged(
                 }
             }
             emitPeerFoundLostSignals();
+            if (connection->state() == Connection::State::Unauthorized)
+                emit remotePeerUnauthorized(connection->remotePeer().id);
             break;
         }
         default:
@@ -1337,10 +1340,12 @@ QnUuid MessageBus::routeToPeerVia(const QnUuid& dstPeer, int* distance) const
     return QnUuid();
 }
 
-int MessageBus::distanceToPeer(const QnUuid& dstPeer) const
+int MessageBus::distanceToPeer(const QnUuid& peerId) const
 {
-    // todo: implement me
-    return 0;
+    QnMutexLocker lock(&m_mutex);
+    if (localPeer().id == peerId)
+        return 0;
+    return m_peers->distanceTo(peerId);
 }
 
 ConnectionContext* MessageBus::context(const P2pConnectionPtr& connection)
