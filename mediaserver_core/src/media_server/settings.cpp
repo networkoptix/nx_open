@@ -65,6 +65,18 @@ QSettings* MSSettings::roSettings()
     return roSettingsInstance.get();
 }
 
+std::chrono::milliseconds MSSettings::hlsTargetDuration()
+{
+    const auto value =
+        std::chrono::milliseconds(roSettings()->value(
+            nx_ms_conf::HLS_TARGET_DURATION_MS,
+            nx_ms_conf::DEFAULT_TARGET_DURATION_MS).toUInt());
+
+    return value > std::chrono::milliseconds::zero()
+        ? value
+        : std::chrono::milliseconds(nx_ms_conf::DEFAULT_TARGET_DURATION_MS);
+}
+
 QString MSSettings::defaultRunTimeSettingsFilePath()
 {
 #ifdef _WIN32
