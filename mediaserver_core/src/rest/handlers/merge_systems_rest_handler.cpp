@@ -350,7 +350,7 @@ int QnMergeSystemsRestHandler::execute(
     }
 
     nx::vms::discovery::Manager::ModuleData module(
-        remoteModuleInformation, {url.host(), remoteModuleInformation.port});
+        remoteModuleInformation, {url.host(), (uint16_t) remoteModuleInformation.port});
     owner->commonModule()->moduleDiscoveryManager()->checkEndpoint(module.endpoint, module.id);
 
     /* Connect to server if it is compatible */

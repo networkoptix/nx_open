@@ -166,7 +166,7 @@ void UdpMulticastFinder::receiveModuleInformation()
             }
             else
             {
-                if (moduleInformation.remoteAddresses.size() || m_moduleHandler)
+                if (moduleInformation.remoteAddresses.size() && m_moduleHandler)
                     m_moduleHandler(moduleInformation, endpoint);
             }
 
