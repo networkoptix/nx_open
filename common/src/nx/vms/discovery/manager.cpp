@@ -27,6 +27,21 @@ Manager::~Manager()
     m_moduleConnector->pleaseStopSync();
 }
 
+void Manager::setReconnectInterval(std::chrono::milliseconds interval)
+{
+    m_moduleConnector->setReconnectInterval(interval);
+}
+
+void Manager::setUpdateInterfacesInterval(std::chrono::milliseconds interval)
+{
+    m_multicastFinder->setUpdateInterfacesInterval(interval);
+}
+
+void Manager::setMulticastInterval(std::chrono::milliseconds interval)
+{
+    m_multicastFinder->setSendInterval(interval);
+}
+
 Manager::ModuleData::ModuleData(QnModuleInformation old, SocketAddress endpoint):
     QnModuleInformation(std::move(old)),
     endpoint(std::move(endpoint))
@@ -117,6 +132,10 @@ void Manager::initializeConnector()
             ModuleData module(std::move(information), std::move(endpoint));
             if (commonModule()->moduleGUID() == module.id)
             {
+                const auto runtimeId = commonModule()->runningInstanceGUID();
+                if (module.runtimeId == runtimeId)
+                    return; // Ignore own record.
+
                 NX_DEBUG(this, lm("Conflict module %1 found on %2").args(module.id, module.endpoint));
                 return conflict(module);
             }
@@ -186,17 +205,6 @@ void Manager::initializeMulticastFinders(bool clientMode)
     m_multicastFinder->listen(
         [this](QnModuleInformationWithAddresses module, SocketAddress endpoint)
         {
-            if (module.id == commonModule()->moduleGUID())
-            {
-                if (module.runtimeId != commonModule()->runningInstanceGUID())
-                {
-                    NX_DEBUG(this, lm("Conflict module %1 multicasted from %2").args(module.id, endpoint));
-                    conflict(ModuleData(std::move(module), std::move(endpoint)));
-                }
-
-                return;
-            }
-
             std::set<SocketAddress> endpoints;
             for (const auto& address: module.remoteAddresses)
                 endpoints.insert(address);
@@ -268,8 +276,9 @@ void Manager::monitorServerUrls()
                                 NX_DEBUG(this, lm("Server %1 resource endpoints: add %2, forbid %3")
                                     .arg(id).container(allowed).container(forbidden));
 
-                                m_moduleConnector->newEndpoints(allowed, id);
                                 m_moduleConnector->setForbiddenEndpoints(std::move(forbidden), id);
+                                if (allowed.size() != 0)
+                                    m_moduleConnector->newEndpoints(allowed, id);
                             });
                     };
 

@@ -23,6 +23,8 @@ public:
         module.version = QnSoftwareVersion(1, 2, 3, 123);
         module.type = lit("test");
         module.name = lit("test");
+        module.port = 7001;
+        module.remoteAddresses.insert("127.0.0.1");
 
         NX_LOGX(lm("New module: %1").arg(module.id), cl_logINFO);
         return module;
