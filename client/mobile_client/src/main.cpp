@@ -48,7 +48,7 @@
 #include <nx/mobile_client/controllers/web_admin_controller.h>
 #include <nx/mobile_client/helpers/inter_client_message.h>
 
-#include <config.h>
+#include <ini.h>
 
 // TODO: #muskov Introduce a convenient cross-platform entity for crash handlers.
 #include <nx/utils/crash_dump/systemexcept.h>
