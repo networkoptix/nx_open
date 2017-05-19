@@ -176,10 +176,6 @@ void BasicTestFixture::onHttpRequestDone(
             (nx_http::StatusCode::Value)httpClient->response()->statusLine.statusCode;
         result.msgBody = httpClient->fetchMessageBodyBuffer();
     }
-    else
-    {
-        int x = 0;
-    }
 
     m_httpRequestResults.push(std::move(result));
 }
