@@ -27,14 +27,16 @@ Manager::~Manager()
     m_moduleConnector->pleaseStopSync();
 }
 
-Manager::ModuleData::ModuleData()
-{
-}
-
 Manager::ModuleData::ModuleData(QnModuleInformation old, SocketAddress endpoint):
     QnModuleInformation(std::move(old)),
     endpoint(std::move(endpoint))
 {
+}
+
+bool Manager::ModuleData::operator==(const ModuleData& rhs) const
+{
+    typedef const QnModuleInformation& BaseRef;
+    return BaseRef(*this) == BaseRef(rhs) && endpoint == rhs.endpoint;
 }
 
 void Manager::start()
@@ -103,27 +105,6 @@ void Manager::checkEndpoint(const QUrl& url, QnUuid expectedId)
     checkEndpoint(SocketAddress(url.host(), (uint16_t) url.port()), std::move(expectedId));
 }
 
-static bool isChanged(const Manager::ModuleData& lhs, const Manager::ModuleData& rhs)
-{
-    return lhs.type == rhs.type
-        && lhs.customization == rhs.customization
-        && lhs.brand == rhs.brand
-        && lhs.version == rhs.version
-        && lhs.systemName == rhs.systemName
-        && lhs.name == rhs.name
-        && lhs.port == rhs.port
-        && lhs.sslAllowed == rhs.sslAllowed
-        && lhs.protoVersion == rhs.protoVersion
-        && lhs.runtimeId == rhs.runtimeId
-        && lhs.serverFlags == rhs.serverFlags
-        && lhs.ecDbReadOnly == rhs.ecDbReadOnly
-        && lhs.cloudSystemId == rhs.cloudSystemId
-        && lhs.cloudPortalUrl == rhs.cloudPortalUrl
-        && lhs.cloudHost == rhs.cloudHost
-        && lhs.localSystemId == rhs.localSystemId
-        && lhs.endpoint == rhs.endpoint;
-}
-
 void Manager::initializeConnector()
 {
     m_moduleConnector = std::make_unique<ModuleConnector>();
@@ -135,7 +116,10 @@ void Manager::initializeConnector()
 
             ModuleData module(std::move(information), std::move(endpoint));
             if (commonModule()->moduleGUID() == module.id)
+            {
+                NX_DEBUG(this, lm("Conflict module %1 found on %2").args(module.id, module.endpoint));
                 return conflict(module);
+            }
 
             const QString newCloudHost = information.cloudId();
             QString oldCloudHost;
@@ -149,7 +133,7 @@ void Manager::initializeConnector()
                 }
                 else
                 {
-                    if (!isChanged(insert.first->second, module))
+                    if (insert.first->second == module)
                         return;
 
                     oldCloudHost = insert.first->second.cloudId();
@@ -159,16 +143,12 @@ void Manager::initializeConnector()
 
             if (isNew)
             {
-                NX_LOGX(lm("Found module %1, endpoint %2").args(information.id, endpoint),
-                    cl_logDEBUG1);
-
+                NX_DEBUG(this, lm("Found module %1 endpoint %2").args(information.id, endpoint));
                 emit found(module);
             }
             else
             {
-                NX_LOGX(lm("Changed module %1, endpoint %2").args(information.id, endpoint),
-                    cl_logDEBUG1);
-
+                NX_DEBUG(this, lm("Changed module %1 endpoint %2").args(information.id, endpoint));
                 emit changed(module);
             }
 
@@ -204,12 +184,16 @@ void Manager::initializeMulticastFinders(bool clientMode)
 {
     m_multicastFinder = std::make_unique<UdpMulticastFinder>(m_moduleConnector->getAioThread());
     m_multicastFinder->listen(
-        [this](QnModuleInformationWithAddresses module)
+        [this](QnModuleInformationWithAddresses module, SocketAddress endpoint)
         {
-            if (module.id == commonModule()->moduleGUID() || module.remoteAddresses.empty())
+            if (module.id == commonModule()->moduleGUID())
             {
-                NX_VERBOSE(this, lm("Reject multicast from %1 with %2 addresses").arg(
-                    module.id).container(module.remoteAddresses));
+                if (module.runtimeId != commonModule()->runningInstanceGUID())
+                {
+                    NX_DEBUG(this, lm("Conflict module %1 multicasted from %2").args(module.id, endpoint));
+                    conflict(ModuleData(std::move(module), std::move(endpoint)));
+                }
+
                 return;
             }
 
@@ -253,7 +237,7 @@ void Manager::monitorServerUrls()
         {
             if (const auto server = resource.dynamicCast<QnMediaServerResource>())
             {
-                connect(server.data(), &QnMediaServerResource::auxUrlsChanged, this,
+                const auto udateEndpoints =
                     [this, server]()
                     {
                         if (server->getId() == commonModule()->moduleGUID())
@@ -265,19 +249,33 @@ void Manager::monitorServerUrls()
                                 });
                         }
 
+                        std::set<SocketAddress> allowedEndpoints;
+                        for (const auto& endpoint: server->getNetAddrList())
+                            allowedEndpoints.emplace(endpoint);
+
                         int port = server->getPort();
-                        std::set<SocketAddress> endpoints;
-                        for (const QUrl &url: server->getIgnoredUrls())
-                            endpoints.emplace(url.host(), url.port(port));
+                        for (const auto& url: server->getAdditionalUrls())
+                            allowedEndpoints.emplace(url.host(), url.port(port));
+
+                        std::set<SocketAddress> forbiddenEndpoints;
+                        for (const auto& url: server->getIgnoredUrls())
+                            forbiddenEndpoints.emplace(url.host(), url.port(port));
 
                         m_moduleConnector->post(
-                            [this, id = server->getId(), endpoints = std::move(endpoints)]()
+                            [this, id = server->getId(), allowed = std::move(allowedEndpoints),
+                                forbidden = std::move(forbiddenEndpoints)]() mutable
                             {
-                                m_moduleConnector->setForbiddenEndpoints(std::move(endpoints), id);
-                            });
-                    });
-            }
+                                NX_DEBUG(this, lm("Server %1 resource endpoints: add %2, forbid %3")
+                                    .arg(id).container(allowed).container(forbidden));
 
+                                m_moduleConnector->newEndpoints(allowed, id);
+                                m_moduleConnector->setForbiddenEndpoints(std::move(forbidden), id);
+                            });
+                    };
+
+                udateEndpoints();
+                connect(server.data(), &QnMediaServerResource::auxUrlsChanged, udateEndpoints);
+            }
         });
 
     connect(m_resourcePool, &QnResourcePool::resourceRemoved, this,

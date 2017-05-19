@@ -13,8 +13,8 @@ QnServerInterfaceWatcher::QnServerInterfaceWatcher(QObject *parent) :
 {
     commonModule()->moduleDiscoveryManager()->onSignals(this,
         &QnServerInterfaceWatcher::at_connectionChanged,
-         &QnServerInterfaceWatcher::at_connectionChanged,
-         &QnServerInterfaceWatcher::at_connectionChangedById);
+        &QnServerInterfaceWatcher::at_connectionChanged,
+        &QnServerInterfaceWatcher::at_connectionChangedById);
 
     connect(resourcePool(), &QnResourcePool::statusChanged,
         this, &QnServerInterfaceWatcher::at_resourcePool_statusChanged);

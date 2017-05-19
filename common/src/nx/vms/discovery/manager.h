@@ -9,7 +9,11 @@ namespace vms {
 namespace discovery {
 
 /**
+ * Discovers VMS modules notifies their module information and availability changes.
  *
+ * - Searchs server for endpoints by multicasts, resource pool and interface methods.
+ * - Tries to maintain connection to each module and access up to date module information.
+ * - Notifies about availability or module information changes.
  */
 class Manager: public QObject, public QnCommonModuleAware
 {
@@ -25,9 +29,8 @@ public:
     struct ModuleData: QnModuleInformation
     {
         SocketAddress endpoint;
-
-        ModuleData();
-        ModuleData(QnModuleInformation old, SocketAddress endpoint);
+        ModuleData(QnModuleInformation old = {}, SocketAddress endpoint = {});
+        bool operator==(const ModuleData& rhs) const;
     };
 
     std::list<ModuleData> getAll() const; //< All accessible modules.
@@ -35,11 +38,13 @@ public:
     boost::optional<ModuleData> getModule(const QnUuid& id) const;
 
     /**
-     * Try for find module on specified endpoint.
+     * Try to find module on the specified endpoint.
+     *
      * @param endpoint Socket address to search for module information on.
-     * @param expectedId If specified address will be added to modules's address list, might not
-     *     be used if module is already found on a different address.
-     * @note If expectedId is not scpecified the endpoint will be pinged just once.
+     * @param expectedId If the specified address is added to module's address list and the module
+     *     is already found on a different address, then this address will not be used until the
+     *     address in use is disconnected. If expectedId is not scpecified, the endpoint will be
+     *     pinged just once.
      */
     void checkEndpoint(SocketAddress endpoint, QnUuid expectedId = QnUuid());
     void checkEndpoint(const QUrl& url, QnUuid expectedId = QnUuid());

@@ -102,8 +102,8 @@ protected:
                     const auto error = lm("Module %1 failed to discover %2").args(
                         server.first, otherServer.first);
 
-                    #ifdef Q_OS_MAC
-                        // Can join different UDT sockets to the same multicast group on OSX
+                    #if defined(Q_OS_MAC)
+                        // Can join different UDT sockets to the same multicast group on OSX...
                         NX_WARNING(this, error);
                     #else
                         FAIL() << error.toStdString();
@@ -112,7 +112,7 @@ protected:
             }
         }
 
-        #ifdef Q_OS_MAC
+        #if defined(Q_OS_MAC)
             EXPECT_GE(totalDiscoveryLinks, m_servers.size() - 1);
         #else
             EXPECT_EQ(m_servers.size() * (m_servers.size() - 1), totalDiscoveryLinks);
