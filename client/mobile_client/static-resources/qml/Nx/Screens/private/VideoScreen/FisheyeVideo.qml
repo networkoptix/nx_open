@@ -213,7 +213,8 @@ Item
                     if (!draggingStarted)
                     {
                         draggingStarted = Math.abs(mouse.x - startX) > drag.threshold
-                                       || Math.abs(mouse.y - startY) > drag.threshold
+                            || Math.abs(mouse.y - startY) > drag.threshold
+
                         if (draggingStarted)
                         {
                             startX = mouse.x
@@ -247,8 +248,7 @@ Item
             {
                 const kSensitivity = 100.0
                 var normalization = kSensitivity / pixelRadius
-                interactor.updateRotation(dy * normalization,
-                                          dx * normalization)
+                interactor.updateRotation(dy * normalization, dx * normalization)
             }
         }
     }
