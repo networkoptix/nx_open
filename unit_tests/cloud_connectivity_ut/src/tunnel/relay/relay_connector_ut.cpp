@@ -49,7 +49,7 @@ protected:
             m_relayUrl,
             AddressEntry(AddressType::cloud, "any_name"),
             "any_connection_id");
-        m_prevClientToRelayConnectionInstanciated.load()->setFailRequests(true);
+        m_prevClientToRelayConnectionInstanciated.load()->setFailRequests();
     }
 
     void givenSilentRelay()
@@ -60,7 +60,7 @@ protected:
             m_relayUrl,
             AddressEntry(AddressType::cloud, "any_name"),
             "any_connection_id");
-        m_prevClientToRelayConnectionInstanciated.load()->setIgnoreRequests(true);
+        m_prevClientToRelayConnectionInstanciated.load()->setIgnoreRequests();
     }
 
     void whenConnectorIsInvoked()

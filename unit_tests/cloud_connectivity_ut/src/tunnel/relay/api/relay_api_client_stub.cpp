@@ -12,9 +12,7 @@ namespace api {
 namespace test {
 
 ClientImpl::ClientImpl():
-    m_scheduledRequestCount(0),
-    m_ignoreRequests(false),
-    m_failRequests(false)
+    m_scheduledRequestCount(0)
 {
 }
 
@@ -34,7 +32,7 @@ void ClientImpl::beginListening(
     nx::cloud::relay::api::BeginListeningHandler handler)
 {
     ++m_scheduledRequestCount;
-    if (m_ignoreRequests)
+    if (m_behavior == RequestProcessingBehavior::ignore)
         return;
 
     post(
@@ -42,9 +40,9 @@ void ClientImpl::beginListening(
         {
             nx::cloud::relay::api::BeginListeningResponse response;
             response.preemptiveConnectionCount = 7;
-            auto resultCode = m_failRequests
-                ? nx::cloud::relay::api::ResultCode::networkError
-                : nx::cloud::relay::api::ResultCode::ok;
+            auto resultCode = m_behavior == RequestProcessingBehavior::succeed
+                ? nx::cloud::relay::api::ResultCode::ok
+                : nx::cloud::relay::api::ResultCode::networkError;
             handler(resultCode, std::move(response), nullptr);
         });
 }
@@ -55,7 +53,7 @@ void ClientImpl::startSession(
     nx::cloud::relay::api::StartClientConnectSessionHandler handler)
 {
     ++m_scheduledRequestCount;
-    if (m_ignoreRequests)
+    if (m_behavior == RequestProcessingBehavior::ignore)
         return;
 
     post(
@@ -63,10 +61,10 @@ void ClientImpl::startSession(
         {
             nx::cloud::relay::api::CreateClientSessionResponse response;
             response.sessionId = desiredSessionId.toStdString();
-            if (m_failRequests)
-                handler(nx::cloud::relay::api::ResultCode::networkError, std::move(response));
-            else
+            if (m_behavior == RequestProcessingBehavior::succeed)
                 handler(nx::cloud::relay::api::ResultCode::ok, std::move(response));
+            else
+                handler(nx::cloud::relay::api::ResultCode::networkError, std::move(response));
         });
 }
 
@@ -75,19 +73,13 @@ void ClientImpl::openConnectionToTheTargetHost(
     nx::cloud::relay::api::OpenRelayConnectionHandler handler)
 {
     ++m_scheduledRequestCount;
-    if (m_ignoreRequests)
+    if (m_behavior == RequestProcessingBehavior::ignore)
         return;
 
     post(
         [this, handler = std::move(handler)]()
         {
-            if (m_failRequests)
-            {
-                handler(
-                    nx::cloud::relay::api::ResultCode::networkError,
-                    nullptr);
-            }
-            else
+            if (m_behavior == RequestProcessingBehavior::succeed)
             {
                 auto connection = std::make_unique<network::cloud::CloudStreamSocket>();
                 connection->bindToAioThread(
@@ -95,6 +87,21 @@ void ClientImpl::openConnectionToTheTargetHost(
                 handler(
                     nx::cloud::relay::api::ResultCode::ok,
                     std::move(connection));
+            }
+            else if (m_behavior == RequestProcessingBehavior::produceLogicError)
+            {
+                auto connection = std::make_unique<network::cloud::CloudStreamSocket>();
+                connection->bindToAioThread(
+                    network::SocketGlobals::aioService().getCurrentAioThread());
+                handler(
+                    nx::cloud::relay::api::ResultCode::notFound,
+                    std::move(connection));
+            }
+            else
+            {
+                handler(
+                    nx::cloud::relay::api::ResultCode::networkError,
+                    nullptr);
             }
         });
 }
@@ -114,14 +121,19 @@ void ClientImpl::setOnBeforeDestruction(nx::utils::MoveOnlyFunc<void()> handler)
     m_onBeforeDestruction = std::move(handler);
 }
 
-void ClientImpl::setIgnoreRequests(bool val)
+void ClientImpl::setBehavior(RequestProcessingBehavior behavior)
 {
-    m_ignoreRequests = val;
+    m_behavior = behavior;
 }
 
-void ClientImpl::setFailRequests(bool val)
+void ClientImpl::setIgnoreRequests()
 {
-    m_failRequests = val;
+    m_behavior = RequestProcessingBehavior::ignore;
+}
+
+void ClientImpl::setFailRequests()
+{
+    m_behavior = RequestProcessingBehavior::fail;
 }
 
 void ClientImpl::stopWhileInAioThread()
