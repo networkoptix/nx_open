@@ -118,11 +118,6 @@ protected:
         ASSERT_NE(nullptr, m_connection);
     }
 
-    //void whenControlConnectionIsBroken()
-    //{
-    //    // TODO
-    //}
-
     void thenRequestToRelayHasBeenIssued()
     {
         ASSERT_GT(m_clientToRelayConnectionCounter.load(), 0);
@@ -192,11 +187,6 @@ protected:
             std::future_status::timeout,
             m_tunnelClosed.get_future().wait_for(*m_tunnelInactivityTimeout * 3));
     }
-
-    //void thenTunnelReopensControlConnection()
-    //{
-    //    // TODO
-    //}
 
     void thenSocketAttributesHaveBeenAppliedToTheResultingSocket()
     {
@@ -422,17 +412,6 @@ TEST_F(RelayOutgoingTunnelConnection, applies_socket_attributes)
     whenReceivedAndSavedConnection();
     thenSocketAttributesHaveBeenAppliedToTheResultingSocket();
 }
-
-//TEST_F(RelayOutgoingTunnelConnection, reopens_control_connection_on_failure)
-//{
-//    givenHappyRelay();
-//    givenIdleTunnel();
-//    whenControlConnectionIsBroken();
-//    thenTunnelReopensControlConnection();
-//}
-//
-//TEST_F(RelayOutgoingTunnelConnection, shuts_down_on_repeated_control_connection_failure)
-//TEST_F(RelayOutgoingTunnelConnection, terminating)
 
 } // namespace test
 } // namespace relay
