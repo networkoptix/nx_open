@@ -32,12 +32,10 @@
 
 #include "connection_guard.h"
 #include <common/common_module_aware.h>
-
+#include "abstract_transaction_transport.h"
 
 namespace ec2
 {
-
-static const QnUuid kCloudPeerId(lit("674BAFD7-4EEC-4BBA-84AA-A1BAEA7FC6DB"));
 
 namespace ConnectionType
 {
@@ -56,7 +54,7 @@ namespace ConnectionType
 
 
 class QnTransactionTransportBase:
-    public QObject,
+    public QnAbstractTransactionTransport,
     public nx::network::aio::BasicPollable
 {
     Q_OBJECT
@@ -158,8 +156,8 @@ public:
     bool isNeedResync() const { return m_needResync; }
     void setNeedResync(bool value)  {m_needResync = value;} // synchronization process in progress
 
-    const ec2::ApiPeerData& localPeer() const;
-    const ec2::ApiPeerData& remotePeer() const;
+    virtual const ec2::ApiPeerData& localPeer() const override;
+    virtual const ec2::ApiPeerData& remotePeer() const override;
     QUrl remoteAddr() const;
     SocketAddress remoteSocketAddr() const;
     int remotePeerProtocolVersion() const;
@@ -209,8 +207,6 @@ public:
     void connectionFailure();
 
     void setKeepAliveEnabled(bool value);
-
-    static bool skipTransactionForMobileClient(ApiCommand::Value command);
 
 signals:
     void gotTransaction(

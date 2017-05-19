@@ -175,6 +175,32 @@ ec2::ApiPeerDataEx P2pConnectionProcessor::deserializeRemotePeerInfo()
     return remotePeer;
 }
 
+Qn::UserAccessData P2pConnectionProcessor::userAccessData(const ec2::ApiPeerDataEx& remotePeer) const
+{
+    Q_D(const P2pConnectionProcessor);
+    // By default all peers have read permissions on all resources
+    auto access = d->accessRights;
+    if (remotePeer.peerType == Qn::PT_Server)
+    {
+        // Here we substitute admin user with SuperAccess user to pass by all access checks unhurt
+        // since server-to-server order of transactions is unpredictable and access check for resource attribute
+        // may come before resource itself is added to the resource pool and this may be restricted by the access
+        // checking mechanics.
+        if (access != Qn::kSystemAccess)
+        {
+            bool authAsOwner = d->accessRights.userId == QnUserResource::kAdminGuid;
+            NX_ASSERT(authAsOwner, "Server must always be authorised as owner");
+            if (authAsOwner)
+                access = Qn::kSystemAccess;
+        }
+    }
+    else
+    {
+        access.access = Qn::UserAccessData::Access::ReadAllResources;
+    }
+    return access;
+}
+
 void P2pConnectionProcessor::run()
 {
     Q_D(P2pConnectionProcessor);
@@ -255,5 +281,6 @@ void P2pConnectionProcessor::run()
     d->messageBus->gotConnectionFromRemotePeer(
         remotePeer,
         std::move(connectionLockGuard),
-        std::move(webSocket));
+        std::move(webSocket),
+        userAccessData(remotePeer));
 }

@@ -4,6 +4,7 @@
 #include "network/tcp_connection_processor.h"
 #include "network/tcp_listener.h"
 #include <nx_ec/data/api_peer_data.h>
+#include <core/resource_access/user_access_data.h>
 
 class P2pConnectionProcessorPrivate;
 
@@ -32,6 +33,7 @@ private:
     bool isDisabledPeer(const ec2::ApiPeerData& remotePeer) const;
     bool isPeerCompatible(const ec2::ApiPeerDataEx& remotePeer) const;
     ec2::ApiPeerDataEx deserializeRemotePeerInfo();
+    Qn::UserAccessData userAccessData(const ec2::ApiPeerDataEx& remotePeer) const;
 private:
     Q_DECLARE_PRIVATE(P2pConnectionProcessor);
 };

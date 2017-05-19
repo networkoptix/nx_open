@@ -115,9 +115,6 @@ public:
         NX_ASSERT(!transaction.isLocal() || remotePeer().isClient(), Q_FUNC_INFO, "Invalid transaction type to send!");
         NX_LOG(QnLog::EC2_TRAN_LOG, lit("send transaction %1 to peer %2").arg(transaction.toString()).arg(remotePeer().id.toString()), cl_logDEBUG1);
 
-        if (remotePeer().peerType == Qn::PT_OldMobileClient && skipTransactionForMobileClient(transaction.command))
-            return;
-
         switch (remotePeer().dataFormat)
         {
         case Qn::JsonFormat:
@@ -147,29 +144,6 @@ private:
     QnTransactionMessageBusBase* m_bus;
     const Qn::UserAccessData m_userAccessData;
     std::function<void()> m_beforeDestructionHandler;
-
-    template<class T>
-    bool transactionShouldBeSentToRemotePeer(const QnTransaction<T>& transaction)
-    {
-        if (remotePeer().peerType == Qn::PT_OldServer)
-            return false;
-
-        if (transaction.isLocal() && !remotePeer().isClient())
-            return false;
-
-        if (remotePeer().peerType == Qn::PT_CloudServer)
-        {
-            if (transaction.transactionType != TransactionType::Cloud &&
-                transaction.command != ApiCommand::tranSyncRequest &&
-                transaction.command != ApiCommand::tranSyncResponse &&
-                transaction.command != ApiCommand::tranSyncDone)
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
 };
 
 }   // namespace ec2

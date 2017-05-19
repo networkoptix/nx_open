@@ -1510,37 +1510,6 @@ qint64 QnTransactionTransportBase::remoteIdentityTime() const
     return m_remoteIdentityTime;
 }
 
-bool QnTransactionTransportBase::skipTransactionForMobileClient(ApiCommand::Value command) {
-    switch (command) {
-    case ApiCommand::getMediaServersEx:
-    case ApiCommand::saveCameras:
-    case ApiCommand::getCamerasEx:
-    case ApiCommand::getUsers:
-    case ApiCommand::saveLayouts:
-    case ApiCommand::getLayouts:
-    case ApiCommand::removeResource:
-    case ApiCommand::removeCamera:
-    case ApiCommand::removeMediaServer:
-    case ApiCommand::removeUser:
-    case ApiCommand::removeLayout:
-    case ApiCommand::saveCamera:
-    case ApiCommand::saveMediaServer:
-    case ApiCommand::saveUser:
-    case ApiCommand::saveLayout:
-    case ApiCommand::setResourceStatus:
-    case ApiCommand::setResourceParam:
-    case ApiCommand::setResourceParams:
-    case ApiCommand::saveCameraUserAttributes:
-    case ApiCommand::saveMediaServerUserAttributes:
-    case ApiCommand::getCameraHistoryItems:
-    case ApiCommand::addCameraHistoryItem:
-        return false;
-    default:
-        break;
-    }
-    return true;
-}
-
 void QnTransactionTransportBase::scheduleAsyncRead()
 {
     if (!m_incomingDataSocket)

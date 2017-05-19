@@ -334,7 +334,6 @@ protected:
 
         NX_LOG(lit("Sync data time: %1 ms").arg(timer.elapsed()), cl_logINFO);
         printReport();
-        std::this_thread::sleep_for(std::chrono::seconds(50000));
     }
 private:
     QnStaticCommonModule staticCommon;

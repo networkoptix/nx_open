@@ -174,7 +174,8 @@ void MessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
 void MessageBus::gotConnectionFromRemotePeer(
     const ec2::ApiPeerDataEx& remotePeer,
     ec2::ConnectionLockGuard connectionLockGuard,
-    nx::network::WebSocketPtr webSocket)
+    nx::network::WebSocketPtr webSocket,
+    const Qn::UserAccessData& userAccessData)
 {
     P2pConnectionPtr connection(new Connection(
         commonModule(),
@@ -182,6 +183,7 @@ void MessageBus::gotConnectionFromRemotePeer(
         localPeerEx(),
         std::move(connectionLockGuard),
         std::move(webSocket),
+        userAccessData,
         std::make_unique<nx::p2p::ConnectionContext>()));
 
     QnMutexLocker lock(&m_mutex);
@@ -204,12 +206,12 @@ void MessageBus::sendInitialDataToClient(const P2pConnectionPtr& connection)
 {
     QnTransaction<ApiFullInfoData> tran(commonModule()->moduleGUID());
     tran.command = ApiCommand::getFullInfo;
-    if (!readApiFullInfoData(connection->getUserAccessData(), connection->remotePeer(), &tran.params))
+    if (!readApiFullInfoData(connection->userAccessData(), connection->remotePeer(), &tran.params))
     {
         connection->setState(Connection::State::Error);
         return;
     }
-    sendTransaction(connection, tran);
+    sendTransactionImpl(connection, tran);
 }
 
 void MessageBus::connectSignals(const P2pConnectionPtr& connection)
@@ -773,7 +775,6 @@ void MessageBus::at_allDataSent(QWeakPointer<Connection> weakRef)
         return;
     if (context(connection)->selectingDataInProgress)
         selectAndSendTransactions(connection, context(connection)->remoteSubscription);
-
 }
 
 void MessageBus::at_gotMessage(
@@ -990,11 +991,19 @@ struct SendTransactionToTransportFastFuction
         const QByteArray& serializedTran,
         const P2pConnectionPtr& connection) const
     {
+        if (connection->userAccessData().userId != Qn::kSystemAccess.userId)
+        {
+            NX_VERBOSE(
+                QnLog::P2P_TRAN_LOG,
+                lit("Permission check failed while sending SERIALIZED transaction to peer %1")
+                .arg(connection->remotePeer().id.toString()));
+            return false;
+        }
+
         connection->sendMessage(MessageType::pushTransactionData, serializedTran);
         return true;
     }
 };
-
 
 bool MessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data)
 {
@@ -1184,7 +1193,7 @@ void MessageBus::gotTransaction(
 
             QByteArray serializedTran =
                 m_ubjsonTranSerializer->serializedTransaction(tran);
-            ErrorCode errorCode = dbManager(m_db, connection->getUserAccessData())
+            ErrorCode errorCode = dbManager(m_db, connection->userAccessData())
                 .executeTransactionNoLock(tran, serializedTran);
             switch (errorCode)
             {

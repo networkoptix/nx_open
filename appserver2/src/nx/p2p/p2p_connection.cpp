@@ -12,7 +12,6 @@
 #include <nx/network/http/buffer_source.h>
 #include <transaction/transaction_message_bus_base.h>
 #include "p2p_serialization.h"
-#include <transaction/transaction_transport_base.h>
 
 namespace nx {
 namespace p2p {
@@ -79,6 +78,7 @@ Connection::Connection(
     const ApiPeerDataEx& localPeer,
     ConnectionLockGuard connectionLockGuard,
     nx::network::WebSocketPtr webSocket,
+    const Qn::UserAccessData& userAccessData,
     std::unique_ptr<QObject> opaqueObject)
 :
     QnCommonModuleAware(commonModule),
@@ -87,6 +87,7 @@ Connection::Connection(
     m_webSocket(std::move(webSocket)),
     m_state(State::Connected),
     m_direction(Direction::incoming),
+    m_userAccessData(userAccessData),
     m_opaqueObject(std::move(opaqueObject))
 {
     m_connectionLockGuard = std::make_unique<ConnectionLockGuard>(

@@ -59,7 +59,8 @@ public:
     void gotConnectionFromRemotePeer(
         const ec2::ApiPeerDataEx& remotePeer,
         ec2::ConnectionLockGuard connectionLockGuard,
-        nx::network::WebSocketPtr webSocket);
+        nx::network::WebSocketPtr webSocket,
+        const Qn::UserAccessData& userAccessData);
 
     virtual void addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& url) override;
     virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) override;
@@ -96,7 +97,7 @@ public:
         }
 
         for (const auto& connection: m_connections)
-            sendTransaction(connection, tran);
+            sendTransactionImpl(connection, tran);
     }
 
     bool isSubscribedTo(const ApiPersistentIdData& peer) const;
@@ -104,8 +105,23 @@ public:
 
 private:
     template<class T>
-    void sendTransaction(const P2pConnectionPtr& connection, const ec2::QnTransaction<T>& tran)
+    void sendTransactionImpl(const P2pConnectionPtr& connection, const ec2::QnTransaction<T>& tran)
     {
+        if (!connection->transactionShouldBeSentToRemotePeer(tran))
+            return; //< this peer doesn't handle transactions of such type
+
+        auto remoteAccess = ec2::getTransactionDescriptorByTransaction(tran)->
+            checkRemotePeerAccessFunc(commonModule(), connection->userAccessData(), tran.params);
+        if (remoteAccess == RemotePeerAccess::Forbidden)
+        {
+            NX_VERBOSE(QnLog::P2P_TRAN_LOG,
+                lm("Permission check failed while sending transaction %1 to peer %2")
+                .arg(tran.toString())
+                .arg(connection->remotePeer().id.toString()));
+            return;
+        }
+
+
         const ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
         const auto context = this->context(connection);
         if (connection->remotePeer().isServer() &&

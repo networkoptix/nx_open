@@ -14,6 +14,7 @@
 #include <transaction/connection_guard.h>
 #include <nx_ec/data/api_tran_state_data.h>
 #include <nx/network/http/http_async_client.h>
+#include <transaction/abstract_transaction_transport.h>
 
 namespace ec2 {
 class QnAbstractTransaction;
@@ -30,7 +31,7 @@ using SendCounters = std::array<std::atomic<qint64>, (int(MessageType::counter))
 
 
 class Connection:
-    public QObject,
+    public QnAbstractTransactionTransport,
     public QnCommonModuleAware,
     public QnFromThisToShared<Connection>
 {
@@ -63,6 +64,7 @@ public:
         const ApiPeerDataEx& localPeer,
         ConnectionLockGuard connectionLockGuard,
         nx::network::WebSocketPtr webSocket,
+        const Qn::UserAccessData& userAccessData,
         std::unique_ptr<QObject> opaqueObject);
     virtual ~Connection();
 
@@ -71,8 +73,8 @@ public:
     /** Peer that opens this connection */
     Direction direction() const { return m_direction; }
 
-    const ApiPeerData& localPeer() const { return m_localPeer; }
-    const ApiPeerData& remotePeer() const { return m_remotePeer; }
+    virtual const ApiPeerData& localPeer() const override { return m_localPeer; }
+    virtual const ApiPeerData& remotePeer() const override { return m_remotePeer; }
 
     State state() const;
     void setState(State state);
@@ -85,7 +87,7 @@ public:
 
     QObject* opaqueObject();
 
-    const Qn::UserAccessData& getUserAccessData() const { return m_userAccessData; }
+    const Qn::UserAccessData& userAccessData() const { return m_userAccessData; }
     QUrl remoteUrl() const;
 signals:
     void gotMessage(QWeakPointer<Connection> connection, nx::p2p::MessageType messageType, const QByteArray& payload);
