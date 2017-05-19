@@ -12,7 +12,7 @@
 
 namespace {
     static const int kByteArrayAlignFactor = sizeof(unsigned);
-    static const int kPeerRecordSize = 6;
+    static const int kPeerRecordSize = 7;
     static const int kResolvePeerResponseRecordSize = 16 * 2 + 2; //< two guid + uncompressed PeerNumber per record
 }
 
@@ -67,9 +67,9 @@ PeerNumberType deserializeCompressPeerNumber(BitStreamReader& reader)
 
 const static std::array<int, 4> compressedSizebitsGroups = { 7, 7, 7, 8 };
 
-void serializeCompressedSize(BitStreamWriter& writer, quint32 peerNumber)
+void serializeCompressedSize(BitStreamWriter& writer, quint32 size)
 {
-    serializeCompressedValue(writer, peerNumber, compressedSizebitsGroups);
+    serializeCompressedValue(writer, size, compressedSizebitsGroups);
 }
 
 quint32 deserializeCompressedSize(BitStreamReader& reader)
@@ -175,13 +175,13 @@ QVector<PeerNumberType> deserializeCompressedPeers(const QByteArray& data, bool*
     return result;
 }
 
-QByteArray serializeSubscribeRequest(const QVector<SubscribeRecord>& request)
+QByteArray serializeSubscribeRequest(const QVector<SubscribeRecord>& request, int reservedSpaceAtFront)
 {
     QByteArray result;
     result.resize(qPower2Ceil(unsigned(request.size() * kPeerRecordSize + 1), kByteArrayAlignFactor));
     BitStreamWriter writer;
     writer.setBuffer((quint8*) result.data(), result.size());
-    writer.putBits(8, (int)MessageType::subscribeForDataUpdates);
+    writer.putBits(reservedSpaceAtFront * 8, 0);
     for (const auto& record: request)
     {
         writer.putBits(16, record.peer);
@@ -235,9 +235,9 @@ QByteArray serializeTransactionList(const QList<QByteArray>& tranList, int reser
     return message;
 }
 
-QVector<QByteArray> deserializeTransactionList(const QByteArray& tranList, bool* success)
+QList<QByteArray> deserializeTransactionList(const QByteArray& tranList, bool* success)
 {
-    QVector<QByteArray> result;
+    QList<QByteArray> result;
     BitStreamReader reader((const quint8*) tranList.data(), tranList.size());
     try
     {

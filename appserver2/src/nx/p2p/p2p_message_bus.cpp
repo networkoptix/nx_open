@@ -429,7 +429,10 @@ void MessageBus::resubscribePeers(
             request.reserve(shortValues.size());
             for (int i = 0; i < shortValues.size(); ++i)
                 request.push_back(SubscribeRecord(shortValues[i], sequences[i]));
-            connection->sendMessage(serializeSubscribeRequest(request));
+            auto serializedData = serializeSubscribeRequest(request);
+            serializedData.data()[0] = (quint8) (MessageType::subscribeForDataUpdates);
+            connection->sendMessage(serializedData);
+
             connectionContext->remoteSelectingDataInProgress = true;
         }
     }
