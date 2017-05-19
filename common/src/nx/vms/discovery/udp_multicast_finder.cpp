@@ -7,7 +7,7 @@ namespace nx {
 namespace vms {
 namespace discovery {
 
-static const int kMaxDatagramSize(1500); // ~MTU
+static const int kMaxDatagramSize(1500); //< Expected MTU size with a little reserve.
 
 const SocketAddress UdpMulticastFinder::kMulticastEndpoint("239.255.11.11:5008");
 const std::chrono::milliseconds UdpMulticastFinder::kUpdateInterfacesInterval = std::chrono::minutes(1);
@@ -51,8 +51,7 @@ void UdpMulticastFinder::multicastInformation(
         });
 }
 
-void UdpMulticastFinder::listen(
-    nx::utils::MoveOnlyFunc<void(const QnModuleInformationWithAddresses& module)> handler)
+void UdpMulticastFinder::listen(ModuleHandler handler)
 {
     m_updateTimer.post(
         [this, handler = std::move(handler)]() mutable
@@ -127,12 +126,12 @@ std::unique_ptr<network::UDPSocket> UdpMulticastFinder::makeSocket(const SocketA
 void UdpMulticastFinder::joinMulticastGroup(const HostAddress& ip)
 {
     if (!m_receiver)
-        return; // Will be fixed in updateInterfaces().
+        return; //< Will be fixed in updateInterfaces().
 
     if (m_receiver->joinGroup(m_multicastEndpoint.address.toString(), ip.toString()))
     {
         NX_LOGX(lm("Joined group %1 on %2").args(m_multicastEndpoint.address, ip), cl_logDEBUG2);
-        return; // Ok.
+        return; //< Ok.
     }
 
     m_receiver.reset();
@@ -143,7 +142,7 @@ void UdpMulticastFinder::joinMulticastGroup(const HostAddress& ip)
 void UdpMulticastFinder::receiveModuleInformation()
 {
     if (!m_receiver)
-        return; // Will be fixed in updateInterfaces().
+        return; //< Will be fixed in updateInterfaces().
 
     m_inData.resize(0);
     m_receiver->recvFromAsync(&m_inData,
@@ -167,9 +166,8 @@ void UdpMulticastFinder::receiveModuleInformation()
             }
             else
             {
-                NX_LOGX(lm("From %1 got module: %2").args(endpoint, m_inData), cl_logDEBUG2);
-                if (m_moduleHandler)
-                    m_moduleHandler(moduleInformation);
+                if (moduleInformation.remoteAddresses.size() || m_moduleHandler)
+                    m_moduleHandler(moduleInformation, endpoint);
             }
 
             receiveModuleInformation();
@@ -189,7 +187,7 @@ void UdpMulticastFinder::sendModuleInformation(Senders::iterator senderIterator)
                     socket->getLocalAddress(), m_multicastEndpoint), cl_logDEBUG1);
 
                 socket->registerTimer(m_sendInterval,
-                    [this, senderIterator]{ sendModuleInformation(senderIterator); });
+                    [this, senderIterator](){ sendModuleInformation(senderIterator); });
             }
             else
             {

@@ -41,7 +41,7 @@ TEST_F(DiscoveryUdpMulticastFinder, Base)
         UdpMulticastFinder::kMulticastEndpoint.address,
         nx::utils::random::number<uint16_t>(6000, 50000)});
 
-    utils::TestSyncQueue<QnModuleInformationWithAddresses> discoveryQueue;
+    utils::TestSyncMultiQueue<QnModuleInformationWithAddresses, SocketAddress> discoveryQueue;
     moduleFinder.updateInterfaces();
     moduleFinder.listen(discoveryQueue.pusher());
 
@@ -53,7 +53,7 @@ TEST_F(DiscoveryUdpMulticastFinder, Base)
             {
                 const auto actual = discoveryQueue.pop();
                 const auto size = discoveryQueue.size();
-                EXPECT_EQ(information, actual);
+                EXPECT_EQ(information, actual.first) << size;
             }
         };
 
@@ -65,14 +65,14 @@ TEST_F(DiscoveryUdpMulticastFinder, Base)
     ASSERT_TRUE(discoveryQueue.isEmpty()); //< Too early.
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    waitForDiscovery(information); //< Multicated again.
+    waitForDiscovery(information); //< Multicasted again.
 
     moduleFinder.pleaseStopSync();
     std::this_thread::sleep_for(std::chrono::seconds(1));
     ASSERT_TRUE(discoveryQueue.isEmpty()); //< Disabled.
 
     moduleFinder.updateInterfaces();
-    waitForDiscovery(information); //< Multicated again.
+    waitForDiscovery(information); //< Multicasted again.
 
     const auto information2 = makeModuleInformation();
     moduleFinder.multicastInformation(information2);
@@ -86,12 +86,12 @@ TEST_F(DiscoveryUdpMulticastFinder, DISABLED_RealUse)
 {
     moduleFinder.updateInterfaces();
     moduleFinder.listen(
-        [this](const QnModuleInformationWithAddresses& module)
+        [this](QnModuleInformationWithAddresses module, SocketAddress endpoint)
         {
-            NX_LOGX(lm("Found module: %1").arg(module.id), cl_logINFO);
+            NX_LOGX(lm("Found module %1 on %2").args(module.id, endpoint), cl_logINFO);
         });
 
-    while (true)
+    for (;;)
     {
         moduleFinder.multicastInformation(makeModuleInformation());
         std::this_thread::sleep_for(std::chrono::seconds(10));
