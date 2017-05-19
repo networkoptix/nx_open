@@ -3,19 +3,19 @@
 #include <nx/network/cloud/tunnel/relay/api/relay_api_client.h>
 
 namespace nx {
-namespace network {
 namespace cloud {
 namespace relay {
+namespace api {
 namespace test {
 
-class ClientToRelayConnection:
-    public nx::cloud::relay::api::Client
+class ClientImpl:
+    public api::Client
 {
-    using base_type = nx::cloud::relay::api::Client;
+    using base_type = api::Client;
 
 public:
-    ClientToRelayConnection();
-    virtual ~ClientToRelayConnection() override;
+    ClientImpl();
+    virtual ~ClientImpl() override;
 
     virtual void beginListening(
         const nx::String& peerName,
@@ -44,7 +44,7 @@ private:
 };
 
 } // namespace test
+} // namespace api
 } // namespace relay
 } // namespace cloud
-} // namespace network
 } // namespace nx

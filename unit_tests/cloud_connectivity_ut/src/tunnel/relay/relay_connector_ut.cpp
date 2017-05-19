@@ -5,7 +5,7 @@
 #include <nx/network/cloud/tunnel/relay/relay_connector.h>
 #include <nx/utils/std/future.h>
 
-#include "client_to_relay_connection.h"
+#include "api/relay_api_client_stub.h"
 #include "cloud_relay_basic_fixture.h"
 
 namespace nx {
@@ -137,16 +137,17 @@ private:
     std::unique_ptr<relay::Connector> m_connector;
     nx::utils::promise<Result> m_connectFinished;
     QUrl m_relayUrl;
-    std::atomic<ClientToRelayConnection*> m_prevClientToRelayConnectionInstanciated;
+    std::atomic<nx::cloud::relay::api::test::ClientImpl*>
+        m_prevClientToRelayConnectionInstanciated;
 
     virtual void onClientToRelayConnectionInstanciated(
-        ClientToRelayConnection* connection) override
+        nx::cloud::relay::api::test::ClientImpl* connection) override
     {
         m_prevClientToRelayConnectionInstanciated = connection;
     }
 
     virtual void onClientToRelayConnectionDestroyed(
-        ClientToRelayConnection* clientToRelayConnection) override
+        nx::cloud::relay::api::test::ClientImpl* clientToRelayConnection) override
     {
         m_prevClientToRelayConnectionInstanciated.compare_exchange_strong(
             clientToRelayConnection, nullptr);

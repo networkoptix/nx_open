@@ -7,8 +7,8 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
 
+#include "api/relay_api_client_stub.h"
 #include "cloud_relay_basic_fixture.h"
-#include "client_to_relay_connection.h"
 
 namespace nx {
 namespace network {
@@ -232,7 +232,7 @@ private:
     nx::network::SocketAttributes m_resultingSocketAttributes;
 
     virtual void onClientToRelayConnectionInstanciated(
-        ClientToRelayConnection* relayClient) override
+        nx::cloud::relay::api::test::ClientImpl* relayClient) override
     {
         switch (m_relayType)
         {

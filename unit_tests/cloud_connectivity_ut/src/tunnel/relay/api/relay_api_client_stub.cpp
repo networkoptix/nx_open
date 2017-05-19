@@ -1,4 +1,4 @@
-#include "client_to_relay_connection.h"
+#include "relay_api_client_stub.h"
 
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/socket_global.h>
@@ -6,19 +6,19 @@
 #include <nx/utils/std/cpp14.h>
 
 namespace nx {
-namespace network {
 namespace cloud {
 namespace relay {
+namespace api {
 namespace test {
 
-ClientToRelayConnection::ClientToRelayConnection():
+ClientImpl::ClientImpl():
     m_scheduledRequestCount(0),
     m_ignoreRequests(false),
     m_failRequests(false)
 {
 }
 
-ClientToRelayConnection::~ClientToRelayConnection()
+ClientImpl::~ClientImpl()
 {
     if (isInSelfAioThread())
         stopWhileInAioThread();
@@ -29,7 +29,7 @@ ClientToRelayConnection::~ClientToRelayConnection()
         handler();
 }
 
-void ClientToRelayConnection::beginListening(
+void ClientImpl::beginListening(
     const nx::String& /*peerName*/,
     nx::cloud::relay::api::BeginListeningHandler handler)
 {
@@ -49,7 +49,7 @@ void ClientToRelayConnection::beginListening(
         });
 }
 
-void ClientToRelayConnection::startSession(
+void ClientImpl::startSession(
     const nx::String& desiredSessionId,
     const nx::String& /*targetPeerName*/,
     nx::cloud::relay::api::StartClientConnectSessionHandler handler)
@@ -70,7 +70,7 @@ void ClientToRelayConnection::startSession(
         });
 }
 
-void ClientToRelayConnection::openConnectionToTheTargetHost(
+void ClientImpl::openConnectionToTheTargetHost(
     const nx::String& /*sessionId*/,
     nx::cloud::relay::api::OpenRelayConnectionHandler handler)
 {
@@ -89,9 +89,9 @@ void ClientToRelayConnection::openConnectionToTheTargetHost(
             }
             else
             {
-                auto connection = std::make_unique<CloudStreamSocket>();
+                auto connection = std::make_unique<network::cloud::CloudStreamSocket>();
                 connection->bindToAioThread(
-                    SocketGlobals::aioService().getCurrentAioThread());
+                    network::SocketGlobals::aioService().getCurrentAioThread());
                 handler(
                     nx::cloud::relay::api::ResultCode::ok,
                     std::move(connection));
@@ -99,38 +99,38 @@ void ClientToRelayConnection::openConnectionToTheTargetHost(
         });
 }
 
-SystemError::ErrorCode ClientToRelayConnection::prevRequestSysErrorCode() const
+SystemError::ErrorCode ClientImpl::prevRequestSysErrorCode() const
 {
     return SystemError::noError;
 }
 
-int ClientToRelayConnection::scheduledRequestCount() const
+int ClientImpl::scheduledRequestCount() const
 {
     return m_scheduledRequestCount;
 }
 
-void ClientToRelayConnection::setOnBeforeDestruction(nx::utils::MoveOnlyFunc<void()> handler)
+void ClientImpl::setOnBeforeDestruction(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_onBeforeDestruction = std::move(handler);
 }
 
-void ClientToRelayConnection::setIgnoreRequests(bool val)
+void ClientImpl::setIgnoreRequests(bool val)
 {
     m_ignoreRequests = val;
 }
 
-void ClientToRelayConnection::setFailRequests(bool val)
+void ClientImpl::setFailRequests(bool val)
 {
     m_failRequests = val;
 }
 
-void ClientToRelayConnection::stopWhileInAioThread()
+void ClientImpl::stopWhileInAioThread()
 {
     // TODO
 }
 
 } // namespace test
+} // namespace api
 } // namespace relay
 } // namespace cloud
-} // namespace network
 } // namespace nx

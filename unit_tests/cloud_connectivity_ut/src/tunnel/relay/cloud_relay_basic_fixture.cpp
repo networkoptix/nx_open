@@ -1,6 +1,6 @@
 #include "cloud_relay_basic_fixture.h"
 
-#include "client_to_relay_connection.h"
+#include "api/relay_api_client_stub.h"
 
 namespace nx {
 namespace network {
@@ -28,7 +28,7 @@ BasicFixture::~BasicFixture()
 std::unique_ptr<api::Client> 
     BasicFixture::clientFactoryFunc(const QUrl& /*relayUrl*/)
 {
-    auto result = std::make_unique<ClientToRelayConnection>();
+    auto result = std::make_unique<nx::cloud::relay::api::test::ClientImpl>();
     result->setOnBeforeDestruction(
         std::bind(&BasicFixture::onClientToRelayConnectionDestroyed, this,
             result.get()));
