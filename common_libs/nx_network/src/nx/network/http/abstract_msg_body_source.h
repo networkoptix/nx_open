@@ -28,13 +28,15 @@ public:
      * Returns full MIME type of content. E.g., application/octet-stream.
      */
     virtual StringType mimeType() const = 0;
+
     /**
      * Returns length of content, provided by this data source.
      * MUST be non-blocking and have constant complexity!
      */
     virtual boost::optional<uint64_t> contentLength() const = 0;
+
     /**
-     * @param completionHandler can be invoked from within this call
+     * @param completionHandler can be invoked from within this call.
      * NOTE: End-of-data is signalled with (SystemError::noError, {empty buffer}).
      */
     virtual void readAsync(

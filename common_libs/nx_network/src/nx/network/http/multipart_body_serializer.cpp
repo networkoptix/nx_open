@@ -4,7 +4,7 @@ namespace nx_http {
 
 MultipartBodySerializer::MultipartBodySerializer(
     StringType boundary,
-    std::shared_ptr<nx::utils::bsf::AbstractByteStreamFilter> outputStream)
+    std::shared_ptr<nx::utils::bstream::AbstractByteStreamFilter> outputStream)
 :
     m_boundary(std::move(boundary)),
     m_delimiter("\r\n--"+m_boundary),

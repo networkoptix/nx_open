@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/aio/test/aio_test_async_channel.h>
-#include <nx/utils/pipeline.h>
+#include <nx/utils/byte_stream/pipeline.h>
 #include <nx/utils/random.h>
 #include <nx/utils/string.h>
 #include <nx/utils/test_support/test_pipeline.h>
@@ -29,8 +29,8 @@ class AsyncChannel:
 
 public:
     AsyncChannel(
-        utils::pipeline::AbstractInput* input,
-        utils::pipeline::AbstractOutput* output)
+        utils::bstream::AbstractInput* input,
+        utils::bstream::AbstractOutput* output)
         :
         base_type(input, output, InputDepletionPolicy::retry)
     {
@@ -90,8 +90,8 @@ protected:
 private:
     struct ChannelContext
     {
-        utils::pipeline::ReflectingPipeline input;
-        utils::pipeline::test::NotifyingOutput output;
+        utils::bstream::ReflectingPipeline input;
+        utils::bstream::test::NotifyingOutput output;
         std::unique_ptr<AsyncChannel> channel;
         AsyncChannel* channelPtr;
 

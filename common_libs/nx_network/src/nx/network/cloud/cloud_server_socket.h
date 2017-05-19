@@ -129,14 +129,15 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
+using CustomAcceptorFactoryFunc = 
+    std::vector<std::unique_ptr<AbstractConnectionAcceptor>>(
+        const nx::hpm::api::SystemCredentials&,
+        const hpm::api::ListenResponse&);
+
 class NX_NETWORK_API CustomAcceptorFactory:
-    public nx::utils::BasicFactory<
-        std::vector<std::unique_ptr<AbstractConnectionAcceptor>>(
-            const hpm::api::ListenResponse&)>
+    public nx::utils::BasicFactory<CustomAcceptorFactoryFunc>
 {
-    using base_type = nx::utils::BasicFactory<
-        std::vector<std::unique_ptr<AbstractConnectionAcceptor>>(
-            const hpm::api::ListenResponse&)>;
+    using base_type = nx::utils::BasicFactory<CustomAcceptorFactoryFunc>;
 
 public:
     CustomAcceptorFactory();
@@ -145,6 +146,7 @@ public:
 
 private:
     std::vector<std::unique_ptr<AbstractConnectionAcceptor>> defaultFactoryFunc(
+        const nx::hpm::api::SystemCredentials&,
         const hpm::api::ListenResponse&);
 };
 

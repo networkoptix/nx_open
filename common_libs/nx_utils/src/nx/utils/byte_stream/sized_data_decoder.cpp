@@ -8,7 +8,7 @@
 
 namespace nx {
 namespace utils {
-namespace bsf {
+namespace bstream {
 
 bool SizedDataDecodingFilter::processData(const QnByteArrayConstRef& data)
 {
@@ -34,6 +34,6 @@ bool SizedDataDecodingFilter::processData(const QnByteArrayConstRef& data)
     return pos == data.size();
 }
 
-} // namespace bsf
+} // namespace bstream
 } // namespace utils
 } // namespace nx

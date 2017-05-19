@@ -1,5 +1,4 @@
 #include <nx/network/ssl_socket.h>
-#include <utils/db/test_support/test_with_db_helper.h>
 
 #define USE_GMOCK
 #include <nx/network/test_support/run_test.h>

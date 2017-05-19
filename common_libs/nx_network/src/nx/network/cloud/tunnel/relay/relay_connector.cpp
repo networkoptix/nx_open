@@ -12,16 +12,15 @@ namespace cloud {
 namespace relay {
 
 Connector::Connector(
-    SocketAddress relayEndpoint,
+    QUrl relayUrl,
     AddressEntry targetHostAddress,
     nx::String connectSessionId)
     :
-    m_relayEndpoint(relayEndpoint),
+    m_relayUrl(std::move(relayUrl)),
     m_targetHostAddress(std::move(targetHostAddress)),
     m_connectSessionId(std::move(connectSessionId)),
     m_relayClient(
-        nx::cloud::relay::api::ClientFactory::create(
-            url::Builder().setScheme("http").setEndpoint(relayEndpoint)))
+        nx::cloud::relay::api::ClientFactory::create(m_relayUrl))
 {
     bindToAioThread(getAioThread());
 }
@@ -101,7 +100,7 @@ void Connector::onStartRelaySessionResponse(
     m_connectSessionId = response.sessionId.c_str();
 
     auto tunnelConnection = std::make_unique<OutgoingTunnelConnection>(
-        m_relayEndpoint,
+        m_relayUrl,
         m_connectSessionId,
         std::move(m_relayClient));
     handler(

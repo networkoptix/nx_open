@@ -37,6 +37,10 @@ public:
     virtual void beginListening(
         const nx::String& peerName,
         BeginListeningHandler completionHandler) = 0;
+    /**
+     * @param desiredSessionId Can be empty. 
+     *   In this case server will generate unique session id itself.
+     */
     virtual void startSession(
         const nx::String& desiredSessionId,
         const nx::String& targetPeerName,

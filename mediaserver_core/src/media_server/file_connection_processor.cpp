@@ -149,7 +149,7 @@ QByteArray QnFileConnectionProcessor::compressMessageBody(const QByteArray& cont
     if (nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->response.messageBody.isEmpty())
     {
         if (!contentType.contains("image")) {
-            d->response.messageBody = nx::utils::bsf::gzip::Compressor::compressData(d->response.messageBody);
+            d->response.messageBody = nx::utils::bstream::gzip::Compressor::compressData(d->response.messageBody);
             return "gzip";
         }
     }

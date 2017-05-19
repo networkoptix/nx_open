@@ -11,11 +11,9 @@
 
 #include <nx/network/socket_common.h>
 #include <nx/network/abstract_socket.h>
+#include <nx/utils/basic_service_settings.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_settings.h>
-#include <nx/utils/settings.h>
-
-#include <utils/common/command_line_parser.h>
 
 namespace nx {
 namespace cloud {
@@ -86,33 +84,30 @@ public:
 /*!
     \note Values specified via command-line have priority over conf file (or win32 registry) values
 */
-class Settings
+class Settings:
+    public nx::utils::BasicServiceSettings
 {
+    using base_type = nx::utils::BasicServiceSettings;
+
 public:
     Settings();
 
     Settings(const Settings&) = delete;
     Settings& operator=(const Settings&) = delete;
 
-    bool showHelp() const;
+    virtual QString dataDir() const override;
+    virtual nx::utils::log::Settings logging() const override;
 
     const General& general() const;
-    const nx::utils::log::Settings& logging() const;
     const Auth& auth() const;
     const Tcp& tcp() const;
     const Http& http() const;
     const CloudConnect& cloudConnect() const;
 
-    //!Loads settings from both command line and conf file (or win32 registry)
-    void load( int argc, const char **argv );
-    //!Prints to std out
-    void printCmdLineArgsHelp();
+protected:
+    virtual void loadSettings() override;
 
 private:
-    QnCommandLineParser m_commandLineParser;
-    QnSettings m_settings;
-    bool m_showHelp;
-
     General m_general;
     nx::utils::log::Settings m_logging;
     Auth m_auth;
@@ -120,7 +115,6 @@ private:
     Http m_http;
     CloudConnect m_cloudConnect;
 
-    void fillSupportedCmdParameters();
     void loadConfiguration();
 };
 

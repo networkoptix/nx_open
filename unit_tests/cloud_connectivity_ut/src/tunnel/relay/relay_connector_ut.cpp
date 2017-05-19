@@ -17,16 +17,16 @@ namespace test {
 //-------------------------------------------------------------------------------------------------
 // Test fixture.
 
-class CloudRelayConnector:
+class RelayConnector:
     public BasicFixture
 {
 public:
-    CloudRelayConnector():
+    RelayConnector():
         m_prevClientToRelayConnectionInstanciated(nullptr)
     {
     }
 
-    ~CloudRelayConnector()
+    ~RelayConnector()
     {
         m_connector->pleaseStopSync();
     }
@@ -34,19 +34,19 @@ public:
 protected:
     void givenHappyRelay()
     {
-        m_relayEndpoint = SocketAddress(HostAddress::localhost, 12345);
+        m_relayUrl = QUrl(lm("http://127.0.0.1:12345"));
 
         m_connector = std::make_unique<relay::Connector>(
-            m_relayEndpoint,
+            m_relayUrl,
             AddressEntry(AddressType::cloud, "any_name"),
             "any_connection_id");
     }
 
     void givenUnhappyRelay()
     {
-        m_relayEndpoint = SocketAddress(HostAddress::localhost, 12345);
+        m_relayUrl = QUrl(lm("http://127.0.0.1:12345"));
         m_connector = std::make_unique<relay::Connector>(
-            m_relayEndpoint,
+            m_relayUrl,
             AddressEntry(AddressType::cloud, "any_name"),
             "any_connection_id");
         m_prevClientToRelayConnectionInstanciated.load()->setFailRequests(true);
@@ -54,10 +54,10 @@ protected:
 
     void givenSilentRelay()
     {
-        m_relayEndpoint = SocketAddress(HostAddress::localhost, 12345);
+        m_relayUrl = QUrl(lm("http://127.0.0.1:12345"));
 
         m_connector = std::make_unique<relay::Connector>(
-            m_relayEndpoint,
+            m_relayUrl,
             AddressEntry(AddressType::cloud, "any_name"),
             "any_connection_id");
         m_prevClientToRelayConnectionInstanciated.load()->setIgnoreRequests(true);
@@ -70,7 +70,7 @@ protected:
         m_connector->connect(
             hpm::api::ConnectResponse(),
             std::chrono::milliseconds::zero(),
-            std::bind(&CloudRelayConnector::onConnectFinished, this, _1, _2, _3));
+            std::bind(&RelayConnector::onConnectFinished, this, _1, _2, _3));
     }
 
     void whenConnectorIsInvokedWithTimeout()
@@ -80,7 +80,7 @@ protected:
         m_connector->connect(
             hpm::api::ConnectResponse(),
             std::chrono::milliseconds(1),
-            std::bind(&CloudRelayConnector::onConnectFinished, this, _1, _2, _3));
+            std::bind(&RelayConnector::onConnectFinished, this, _1, _2, _3));
     }
 
     void assertConnectorProvidedAConnection()
@@ -136,7 +136,7 @@ private:
 
     std::unique_ptr<relay::Connector> m_connector;
     nx::utils::promise<Result> m_connectFinished;
-    SocketAddress m_relayEndpoint;
+    QUrl m_relayUrl;
     std::atomic<ClientToRelayConnection*> m_prevClientToRelayConnectionInstanciated;
 
     virtual void onClientToRelayConnectionInstanciated(
@@ -164,21 +164,21 @@ private:
 //-------------------------------------------------------------------------------------------------
 // Test cases.
 
-TEST_F(CloudRelayConnector, creates_connection_on_success_response_from_relay)
+TEST_F(RelayConnector, creates_connection_on_success_response_from_relay)
 {
     givenHappyRelay();
     whenConnectorIsInvoked();
     assertConnectorProvidedAConnection();
 }
 
-TEST_F(CloudRelayConnector, reports_error_on_relay_request_failure)
+TEST_F(RelayConnector, reports_error_on_relay_request_failure)
 {
     givenUnhappyRelay();
     whenConnectorIsInvoked();
     assertConnectorReportedError();
 }
 
-TEST_F(CloudRelayConnector, reports_timedout_on_relay_request_timeout)
+TEST_F(RelayConnector, reports_timedout_on_relay_request_timeout)
 {
     givenSilentRelay();
     whenConnectorIsInvokedWithTimeout();
