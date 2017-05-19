@@ -74,11 +74,14 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
             return bookmarkParams;
         };
 
-    const auto bookmarksViewer = navigator()->timeSlider()->bookmarksViewer();
+    const QPointer<QnBookmarksViewer> bookmarksViewer(navigator()->timeSlider()->bookmarksViewer());
 
     const auto updateBookmarkActionsAvailability =
         [this, bookmarksViewer]()
         {
+            if (!bookmarksViewer)
+                return;
+
             const bool readonly = qnCommon->isReadOnly()
                 || !accessController()->hasGlobalPermission(Qn::GlobalManageBookmarksPermission);
 
