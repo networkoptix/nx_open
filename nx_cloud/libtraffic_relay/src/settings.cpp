@@ -150,7 +150,7 @@ void Settings::loadListeningPeer()
 
     m_listeningPeer.maxPreemptiveConnectionCount = settings().value(
         kMaxPreemptiveConnectionCount,
-        kDefaultMaxPreemptiveConnectionCount).toInt();
+        m_listeningPeer.recommendedPreemptiveConnectionCount*2).toInt();
 }
 
 void Settings::loadConnectingPeer()

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <memory>
 
 #include <gtest/gtest.h>
@@ -61,6 +62,7 @@ private:
         nx_http::BufferType msgBody;
     };
 
+    QnMutex m_mutex;
     const nx_http::BufferType m_staticMsgBody;
     nx::hpm::MediatorFunctionalTest m_mediator;
     nx::hpm::AbstractCloudDataProvider::System m_cloudSystemCredentials;
@@ -69,13 +71,16 @@ private:
     std::shared_ptr<nx::stun::AsyncClient> m_stunClient;
     std::unique_ptr<TestHttpServer> m_httpServer;
     QUrl m_staticUrl;
-    std::unique_ptr<nx_http::AsyncClient> m_httpClient;
+    std::list<std::unique_ptr<nx_http::AsyncClient>> m_httpClients;
+    std::atomic<int> m_unfinishedRequestsLeft;
+
     nx::utils::SyncQueue<HttpRequestResult> m_httpRequestResults;
     nx_http::BufferType m_expectedMsgBody;
     QUrl m_relayUrl;
 
     void startHttpServer();
-    void onHttpRequestDone();
+    void onHttpRequestDone(
+        std::list<std::unique_ptr<nx_http::AsyncClient>>::iterator clientIter);
 };
 
 } // namespace test
