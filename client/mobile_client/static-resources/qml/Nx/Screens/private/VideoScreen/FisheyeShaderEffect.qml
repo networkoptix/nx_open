@@ -51,7 +51,6 @@ ShaderEffect
     {
         id: shaderSource
         hideSource: true
-        format: ShaderEffectSource.RGB
         visible: false
     }
 
@@ -117,7 +116,6 @@ ShaderEffect
         uniform mat4 textureMatrix;
         uniform mat4 viewRotationMatrix;
         uniform sampler2D sourceTexture;
-        uniform float qt_Opacity;
 
         const float pi = 3.1415926;
 
