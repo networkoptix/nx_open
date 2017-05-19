@@ -18,7 +18,7 @@ nx_add_target(common LIBRARY
     ADDITIONAL_RESOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/resources"
     PUBLIC_LIBS
-        Qt5::Gui Qt5::Concurrent Qt5::Network Qt5::Multimedia
+        Qt5::Gui Qt5::Concurrent Qt5::Multimedia
         Qt5::Xml Qt5::XmlPatterns Qt5::Sql
         ffmpeg
         nx_network nx_utils nx_fusion

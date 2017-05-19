@@ -20,7 +20,7 @@ target_compile_definitions(nx_utils
     INTERFACE NX_UTILS_API=${API_IMPORT_MACRO})
 
 if(WIN32)
-    target_link_libraries(nx_utils PRIVATE DbgHelp)
+    target_link_libraries(nx_utils PRIVATE DbgHelp ws2_32)
 endif()
     
 if(MACOSX)

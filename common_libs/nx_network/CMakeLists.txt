@@ -13,6 +13,7 @@ nx_add_target(nx_network LIBRARY ${library_type}
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/app_info_impl.cpp"
     PUBLIC_LIBS
+        Qt5::Network Qt5::Concurrent
         openssl
         nx_kit
         nx_utils nx_fusion udt
@@ -23,5 +24,5 @@ target_compile_definitions(nx_network
     INTERFACE NX_NETWORK_API=${API_IMPORT_MACRO})
 
 if(WIN32)
-    target_link_libraries(nx_network PRIVATE Iphlpapi)
+    target_link_libraries(nx_network PRIVATE Iphlpapi ws2_32)
 endif()
