@@ -1,27 +1,12 @@
 #pragma once
 
 #include <fstream>
-#include <QtCore/QString>
 #include <nx/utils/thread/mutex.h>
+#include "log_level.h"
 
 namespace nx {
 namespace utils {
 namespace log {
-
-enum class Level
-{
-    undefined,
-    none,
-    always,
-    error,
-    warning,
-    info,
-    debug,
-    verbose
-};
-
-Level NX_UTILS_API levelFromString(const QString& levelString);
-QString NX_UTILS_API toString(Level level);
 
 class NX_UTILS_API AbstractWriter
 {

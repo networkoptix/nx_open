@@ -21,7 +21,7 @@ QnLogs& QnLog::instance()
 std::shared_ptr<nx::utils::log::Logger> QnLogs::logger(int id)
 {
     if (id == 0)
-        return nx::utils::log::main();
+        return nx::utils::log::mainLogger();
 
     static std::vector<QString> kAllLogs =
     {
@@ -36,7 +36,7 @@ std::shared_ptr<nx::utils::log::Logger> QnLogs::logger(int id)
     if (id < 0 || (size_t) id >= kAllLogs.size())
         return nullptr;
 
-    return nx::utils::log::get(kAllLogs[id], /*allowMain*/ false);
+    return nx::utils::log::getLogger(kAllLogs[id], /*allowMain*/ false);
 }
 
 QnLog* QnLogs::get()

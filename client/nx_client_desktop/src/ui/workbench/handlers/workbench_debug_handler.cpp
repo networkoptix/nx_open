@@ -222,7 +222,7 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
 
     auto supressLog = [](const QString& tag)
         {
-            const auto logger = nx::utils::log::add({tag});
+            const auto logger = nx::utils::log::addLogger({tag});
             logger->setDefaultLevel(nx::utils::log::Level::none);
             logger->setWriter(std::make_unique<nx::utils::log::StdOut>());
         };

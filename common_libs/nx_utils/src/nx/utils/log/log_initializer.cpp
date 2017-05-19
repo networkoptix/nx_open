@@ -10,7 +10,7 @@ namespace nx {
 namespace utils {
 namespace log {
 
-static std::atomic<bool> isInitializedGlobaly(false);
+static std::atomic<bool> isInitializedGlobally(false);
 
 void initialize(
     const Settings& settings,
@@ -21,13 +21,13 @@ void initialize(
     std::shared_ptr<Logger> logger)
 {
     if (!logger)
-        logger = main();
+        logger = mainLogger();
 
     if (settings.level == Level::undefined)
         return;
 
-    // Can not be reinitialized if initialized globaly.
-    if (!isInitializedGlobaly.load())
+    // Can not be reinitialized if initialized globally.
+    if (!isInitializedGlobally.load())
     {
         if (settings.level == Level::none)
             return;
@@ -67,10 +67,10 @@ void initialize(
         settings.maxBackupCount, filePath ? *filePath : QString::fromUtf8("-")));
 }
 
-void initializeGlobaly(const nx::utils::ArgumentParser& arguments)
+void initializeGlobally(const nx::utils::ArgumentParser& arguments)
 {
-    const auto logger = main();
-    isInitializedGlobaly = true;
+    const auto logger = mainLogger();
+    isInitializedGlobally = true;
 
     if (const auto value = arguments.get("log-level", "ll"))
     {

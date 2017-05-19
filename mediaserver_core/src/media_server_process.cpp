@@ -2254,17 +2254,17 @@ void MediaServerProcess::serviceModeInit()
     logSettings.level = makeLevel(cmdLineArguments().msgLogLevel, "http-log-level");
     nx::utils::log::initialize(
         logSettings, dataLocation, qApp->applicationName(), binaryPath,
-        QLatin1String("http_log"), nx::utils::log::add({QnLog::HTTP_LOG_INDEX}));
+        QLatin1String("http_log"), nx::utils::log::addLogger({QnLog::HTTP_LOG_INDEX}));
 
     logSettings.level = makeLevel(cmdLineArguments().ec2TranLogLevel, "tranLogLevel");
     nx::utils::log::initialize(
         logSettings, dataLocation, qApp->applicationName(), binaryPath,
-        QLatin1String("ec2_tran"), nx::utils::log::add({QnLog::EC2_TRAN_LOG}));
+        QLatin1String("ec2_tran"), nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG}));
 
     logSettings.level = makeLevel(cmdLineArguments().permissionsLogLevel, "permissionsLogLevel");
     nx::utils::log::initialize(
         logSettings, dataLocation, qApp->applicationName(), binaryPath,
-        QLatin1String("permissions"), nx::utils::log::add({QnLog::PERMISSIONS_LOG}));
+        QLatin1String("permissions"), nx::utils::log::addLogger({QnLog::PERMISSIONS_LOG}));
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 
