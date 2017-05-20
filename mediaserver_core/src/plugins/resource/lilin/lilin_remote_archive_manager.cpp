@@ -208,6 +208,11 @@ bool LilinRemoteArchiveManager::fetchFileList(const QString& directory, std::vec
         if (split.size() != 2)
             continue;
 
+        // Filter files that are being recorded at the moment
+        auto entryExtension = QString::fromLatin1(split[1]);
+        if (entryExtension.endsWith("_ing")) 
+            continue;
+
         outFileLists->push_back(QString::fromLatin1(split[0]));
     }
 

@@ -64,14 +64,24 @@ void RemoteArchiveSynchronizer::at_newResourceAdded(const QnResourcePtr& resourc
     if (m_terminated)
         return;
 
+    auto securityCameraResource = resource.dynamicCast<QnSecurityCamResource>();
+    if (!securityCameraResource)
+        return;
+
     connect(
-        resource.data(),
+        securityCameraResource.data(),
         &QnResource::initializedChanged,
         this,
         &RemoteArchiveSynchronizer::at_resourceInitializationChanged);
 
     connect(
-        resource.data(),
+        securityCameraResource.data(),
+        &QnSecurityCamResource::scheduleDisabledChanged,
+        this,
+        &RemoteArchiveSynchronizer::at_resourceInitializationChanged);
+
+    connect(
+        securityCameraResource.data(),
         &QnResource::parentIdChanged,
         this,
         &RemoteArchiveSynchronizer::at_resourceParentIdChanged);
@@ -87,7 +97,9 @@ void RemoteArchiveSynchronizer::at_resourceInitializationChanged(const QnResourc
         return;
 
     auto archiveCanBeSynchronized = securityCameraResource->isInitialized() 
-        && securityCameraResource->hasCameraCapabilities(Qn::RemoteArchiveCapability); 
+        && securityCameraResource->hasCameraCapabilities(Qn::RemoteArchiveCapability)
+        && securityCameraResource->isLicenseUsed()
+        && !securityCameraResource->isScheduleDisabled(); 
 
     if (!archiveCanBeSynchronized)
     {
@@ -95,9 +107,13 @@ void RemoteArchiveSynchronizer::at_resourceInitializationChanged(const QnResourc
             << "Archive for resource"
             << securityCameraResource->getName()
             << "can not be synchronized. Resource is initialized:" 
-            << securityCameraResource->isInitialized() << "."
+            << securityCameraResource->isInitialized()
             << "Resource has remote archive capability:" 
-            << securityCameraResource->hasCameraCapabilities(Qn::RemoteArchiveCapability);
+            << securityCameraResource->hasCameraCapabilities(Qn::RemoteArchiveCapability)
+            << "License used for resource:"
+            << securityCameraResource->isLicenseUsed()
+            << "Schedule is enabled for resource:"
+            << !securityCameraResource->isScheduleDisabled();
         cancelTaskForResource(securityCameraResource->getId());
         return;
     }
