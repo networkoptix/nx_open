@@ -1,6 +1,8 @@
 #ifndef _MEDIASERVER_SETTINGS_H_
 #define _MEDIASERVER_SETTINGS_H_
 
+#include <chrono>
+
 #include <QtCore/QSettings>
 
 //!Contains constants with names of configuration parameters
@@ -124,6 +126,8 @@ public:
     static void initializeROSettingsFromConfFile( const QString& fileName );
     static void initializeROSettings();
     static QSettings* roSettings();
+
+    static std::chrono::milliseconds hlsTargetDuration();
 
     static QString defaultRunTimeSettingsFilePath();
     static void initializeRunTimeSettingsFromConfFile( const QString& fileName );
