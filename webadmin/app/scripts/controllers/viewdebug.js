@@ -728,7 +728,7 @@ angular.module('webadminApp').controller('ViewdebugCtrl',
             $scope.storage.volumeLevel = $scope.volumeLevel;
         });
 
-        mediaserver.getTime().then(function(result){
+        systemAPI.getTime().then(function(result){
             var serverTime = parseInt(result.data.reply.utcTime);
             var clientTime = (new Date()).getTime();
             if(Math.abs(clientTime - serverTime) > minTimeLag){

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('nxCommon').controller('ViewCtrl',
-    function ($scope, $rootScope, $location, $routeParams, mediaserver, cameraRecords,
+    function ($scope, $rootScope, $location, $routeParams, cameraRecords,
               camerasProvider, $sessionStorage, $localStorage, currentUser, systemAPI) {
 
         if(currentUser === null){
@@ -59,16 +59,9 @@ angular.module('nxCommon').controller('ViewCtrl',
             'application/x-mpegURL'
         ];
 
-        $scope.settings = {id: ''};
         $scope.volumeLevel = typeof($scope.storage.volumeLevel) === 'number' ? $scope.storage.volumeLevel : 50;
 
         $scope.serverTime = {};
-
-        mediaserver.getModuleInformation().then(function (r) {
-            $scope.settings = {
-                id: r.data.reply.id
-            };
-        });
 
         if(window.jscd.mobile) {
             $scope.mobileStore = window.jscd.os === 'iOS'?'appstore':'googleplay';
@@ -245,7 +238,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             var cameraId = $scope.activeCamera.physicalId;
             var serverUrl = '';
 
-            var authParam = '&auth=' + mediaserver.authForMedia();
+            var authParam = '&auth=' + systemAPI.authGet();
 
             var positionMedia = !live ? '&pos=' + (playing) : '';
 
@@ -383,7 +376,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         });
 
 
-        mediaserver.getTime().then(function(result){
+        systemAPI.getTime().then(function(result){
             var clientDate = new Date();
 
             var serverTime = parseInt(result.data.reply.utcTime);
@@ -400,7 +393,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             }
         });
 
-        mediaserver.getCurrentUser().then(function(result) {
+        systemAPI.getCurrentUser().then(function(result) {
             $scope.canViewArchive = result.data.reply.isAdmin || (result.data.reply.permissions.indexOf(Config.globalViewArchivePermission)>=0);
 
             var userId = result.data.reply.id;

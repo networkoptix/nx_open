@@ -4,7 +4,7 @@
 
 
 angular.module('nxCommon')
-    .directive('cameraLinks', ['mediaserver', function (mediaserver) {
+    .directive('cameraLinks', ['systemAPI', function (systemAPI) {
         return {
             restrict: 'E',
             scope: {
@@ -51,8 +51,8 @@ angular.module('nxCommon')
                         replace("{{physicalId}}", camera.physicalId).
                         replace("{{streamIndex}}", stream).
                         replace("{{streamLetter}}", stream?'lo':'hi').
-                        replace("{{auth}}", !scope.useAuth?'':'&auth=' + (transport=='rtsp'?mediaserver.authForRtsp():mediaserver.authForMedia())).
-                        replace("{{auth}}", !scope.useAuth?'':'&auth=' + (mediaserver.authForMedia())).
+                        replace("{{auth}}", !scope.useAuth?'':'&auth=' + (transport=='rtsp'?systemAPI.authPlay():systemAPI.authGet())).
+                        replace("{{auth}}", !scope.useAuth?'':'&auth=' + (systemAPI.authGet())).
                         replace("{{position}}", scope.liveMode || !scope.position?'':'&pos=' + scope.position).
                         replace("{{previewPosition}}", scope.liveMode || !scope.position?'&time=LATEST':'&time=' + scope.position).
                         replace("{{duration}}", scope.duration).

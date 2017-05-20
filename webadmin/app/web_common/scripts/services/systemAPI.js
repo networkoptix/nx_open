@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('nxCommon')
-    .factory('systemAPI', function ($http, $q) {
+    .factory('systemAPI', function ($http, $q, $localStorage) {
 
         /*
         * System API is a unified service for making API requests to media servers
@@ -98,10 +98,32 @@ angular.module('nxCommon')
         /* End of helpers */
 
 
-        ServerConnection.prototype.getCurrentUser = function(){
-            return this._get('/ec2/getCurrentUser');
+        /* Authentication */
+        ServerConnection.prototype.getCurrentUser = function (forcereload){
+            if(!this.cacheCurrentUser || forcereload){
+                this.cacheCurrentUser = this._get('/api/getCurrentUser');
+            }
+            return this.cacheCurrentUser;
         };
 
+        ServerConnection.prototype.setAuthKeys = function(authGet, authPost, authPlay){
+            $localStorage._authGet = authGet;
+            $localStorage._authPost = authPost;
+            $localStorage._authPlay = authPlay;
+        };
+        ServerConnection.prototype.authGet = function(){
+            return $localStorage._authGet ;
+        };
+        ServerConnection.prototype.authPlay = function(){
+            return $localStorage._authPlay; // auth_rtsp
+        };
+        /* End of Authentication  */
+
+        /* Server settings */
+        ServerConnection.prototype.getTime = function(){
+            return this._get('/api/gettime?local');
+        };
+        /* End of Server settings */
 
         /* Working with users*/
         ServerConnection.prototype.getAggregatedUsersData = function(){
