@@ -20,40 +20,47 @@ WebSocket::WebSocket(
     m_isLastFrame(false),
     m_isFirstFrame(true),
     m_pingTimer(new nx::network::aio::Timer),
-    m_lastError(Error::noError)
+    m_lastError(SystemError::noError)
 {
-    AbstractAsyncChannel::bindToAioThread(m_socket->getAioThread());
-    m_pingTimer->bindToAioThread(m_socket->getAioThread());
-    unsigned socketRecvTimeoutMs;
-    unsigned socketSendTimeoutMs;
-    if (!m_socket->getRecvTimeout(&socketRecvTimeoutMs) || !m_socket->getSendTimeout(&socketSendTimeoutMs))
-    {
-        NX_LOG("[WebSocket] Failed to get socket timeouts. Going to terminated state.", cl_logWARNING);
-        m_lastError = Error::connectionAbort;
-        return;
-    }
-    unsigned minSocketTimeoutMs = 0;
-    if (socketRecvTimeoutMs != 0 && socketSendTimeoutMs != 0)
-        minSocketTimeoutMs = qMin(socketRecvTimeoutMs, socketSendTimeoutMs);
-    else
-        minSocketTimeoutMs = qMax(socketRecvTimeoutMs, socketSendTimeoutMs);
-    m_pingTimeout = minSocketTimeoutMs == 0 ? kPingTimeout : std::chrono::milliseconds(minSocketTimeoutMs / 2);
-    setPingTimeout(m_pingTimeout);
+    m_socket->bindToAioThread(getAioThread());
+    m_pingTimer->bindToAioThread(getAioThread());
     m_readBuffer.reserve(4096);
+    resetPingTimeoutBySocketTimeoutSync();
 }
 
 WebSocket::~WebSocket()
 {
+    //std::cout << "before pleaseStop" << std::endl;
     pleaseStopSync();
+    //std::cout << "after pleaseStop" << std::endl;
 }
 
 void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    AbstractAsyncChannel::bindToAioThread(aioThread);
-    m_socket->bindToAioThread(aioThread);
-    m_pingTimer->cancelSync();
-    m_pingTimer->bindToAioThread(aioThread);
-    setPingTimeout(m_pingTimeout);
+    std::promise<void> p;
+    auto f = p.get_future();
+
+    dispatch([this, aioThread, p = std::move(p)]() mutable
+    {
+        AbstractAsyncChannel::bindToAioThread(aioThread);
+        m_socket->bindToAioThread(aioThread);
+        //std::cout << "bind to aio thread" << std::endl;
+        m_pingTimer->cancelSync();
+        m_pingTimer->bindToAioThread(aioThread);
+        m_pingTimer->start(m_pingTimeout, [this]() { handlePingTimer(); });
+    });
+
+    f.wait();
+}
+
+void WebSocket::setPingTimeout()
+{
+    dispatch(
+        [this]()
+        {
+            m_pingTimer->cancelSync();
+            m_pingTimer->start(m_pingTimeout, [this]() { handlePingTimer(); });
+        });
 }
 
 void WebSocket::stopWhileInAioThread()
@@ -67,35 +74,73 @@ void WebSocket::setIsLastFrame()
     dispatch([this]() { m_isLastFrame = true; });
 }
 
-void WebSocket::handleSocketRead(SystemError::ErrorCode ecode, size_t bytesRead)
+void WebSocket::reportErrorIfAny(
+    SystemError::ErrorCode ecode,
+    size_t bytesRead,
+    std::function<void(bool)> continueHandler)
 {
-    if (ecode == SystemError::noError && bytesRead != 0)
+    dispatch([this, ecode, bytesRead, continueHandler = std::move(continueHandler)]()
     {
-        setPingTimeout(m_pingTimeout);
-        m_parser.consume(m_readBuffer.data(), (int)bytesRead);
-        m_readBuffer.resize(0);
-    }
-    if (ecode == SystemError::noError && m_lastError != Error::noError)
-    {
-        processReadData(toSystemError(m_lastError), bytesRead);
-        return;
-    }
-    processReadData(ecode, bytesRead);
+        if (m_lastError == SystemError::noError)
+            m_lastError = ecode;
+
+        if (m_lastError != SystemError::noError || bytesRead == 0)
+        {
+            //std::cout << "report error: " << m_lastError << ", read queue empty: " << m_readQueue.empty() << std::endl;
+            if (!m_readQueue.empty())
+            {
+                auto readData = m_readQueue.pop();
+                readData.handler(ecode, bytesRead);
+                //std::cout << "error read handler completed" << std::endl;
+            }
+            continueHandler(true);
+            //std::cout << "continue handler completed" << std::endl;
+            return;
+        }
+
+        continueHandler(false); //< No error
+    });
 }
 
-void WebSocket::processReadData(SystemError::ErrorCode ecode, size_t bytesRead)
+void WebSocket::handleSocketRead(SystemError::ErrorCode ecode, size_t bytesRead)
 {
-    if (ecode != SystemError::noError || bytesRead == 0)
-    {
-        if (m_readQueue.empty())
-            return;
-        auto readData = m_readQueue.pop();
-        readData.handler(ecode, 0);
-        return;
-    }
+    reportErrorIfAny(
+        ecode,
+        bytesRead,
+        [this, bytesRead](bool errorOccured)
+        {
+            if (errorOccured)
+            {
+                //std::cout << "Read error occured" << std::endl;
+                return;
+            }
 
+            setPingTimeout();
+            m_parser.consume(m_readBuffer.data(), (int)bytesRead);
+            m_readBuffer.resize(0);
+
+            reportErrorIfAny(
+                m_lastError,
+                bytesRead,
+                [this](bool errorOccured)
+                {
+                    if (errorOccured)
+                    {
+                        //std::cout << "Error occured while parsing read data" << std::endl;
+                        return;
+                    }
+
+                    processReadData();
+                });
+        });
+}
+
+void WebSocket::processReadData()
+{
     if (m_userDataBuffer.readySize() == 0)
     {
+        ////std::cout << "ready size is zero, reading again" << std::endl;
+
         m_socket->readSomeAsync(
             &m_readBuffer,
             [this](SystemError::ErrorCode ecode, size_t bytesRead)
@@ -105,14 +150,16 @@ void WebSocket::processReadData(SystemError::ErrorCode ecode, size_t bytesRead)
         return;
     }
 
+    NX_ASSERT(!m_readQueue.empty());
     auto readData = m_readQueue.pop();
     bool queueEmpty = m_readQueue.empty();
     auto handoutBuffer = m_userDataBuffer.popFront();
 
     NX_LOG(lit("[WebSocket] handleRead(): user data size: %1").arg(handoutBuffer.size()), cl_logDEBUG2);
+    ////std::cout << "Handing out buffer" << std::endl;
 
     readData.buffer->append(handoutBuffer);
-    readData.handler(ecode, handoutBuffer.size());
+    readData.handler(SystemError::noError, handoutBuffer.size());
     if (queueEmpty)
         return;
     readWithoutAddingToQueueAsync();
@@ -127,7 +174,7 @@ void WebSocket::readWithoutAddingToQueue()
 {
     if (m_userDataBuffer.readySize() != 0)
     {
-        processReadData(SystemError::noError, 1 /*< just not 0*/);
+        processReadData();
     }
     else
     {
@@ -145,16 +192,17 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, HandlerType handler)
     post(
         [this, buffer, handler = std::move(handler)]() mutable
         {
-            if (m_lastError != Error::noError)
+            if (m_lastError != SystemError::noError)
             {
                 NX_LOG("[WebSocket] readSomeAsync called after connection has been terminated. Ignoring.", cl_logDEBUG1);
-                handler(toSystemError(m_lastError), 0);
+                handler(m_lastError, 0);
                 return;
             }
 
             bool queueEmpty = m_readQueue.empty();
             nx::Buffer* tmp = buffer;
             m_readQueue.emplace(std::move(handler), std::move(tmp));
+            NX_ASSERT(queueEmpty);
             if (queueEmpty)
                 readWithoutAddingToQueue();
         });
@@ -165,10 +213,10 @@ void WebSocket::sendAsync(const nx::Buffer& buffer, HandlerType handler)
     post(
         [this, &buffer, handler = std::move(handler)]() mutable
         {
-            if (m_lastError != Error::noError)
+            if (m_lastError != SystemError::noError)
             {
                 NX_LOG("[WebSocket] readSomeAsync called after connection has been terminated. Ignoring.", cl_logDEBUG1);
-                handler(toSystemError(m_lastError), 0);
+                handler(m_lastError, 0);
                 return;
             }
 
@@ -197,14 +245,39 @@ void WebSocket::handlePingTimer()
     m_pingTimer->start(m_pingTimeout, [this]() { handlePingTimer(); });
 }
 
-void WebSocket::setPingTimeout(std::chrono::milliseconds timeout)
+void WebSocket::resetPingTimeoutBySocketTimeoutSync()
+{
+    std::promise<void> p;
+    auto f = p.get_future();
+    resetPingTimeoutBySocketTimeout([p = std::move(p)]() mutable { p.set_value(); });
+    f.wait();
+}
+
+void WebSocket::resetPingTimeoutBySocketTimeout(nx::utils::MoveOnlyFunc<void()> afterHandler)
+{
+    dispatch([this, afterHandler = std::move(afterHandler)]()
+    {
+        unsigned socketRecvTimeoutMs;
+        if (!m_socket->getRecvTimeout(&socketRecvTimeoutMs))
+            NX_LOG("[WebSocket] Failed to get socket timeouts.", cl_logWARNING);
+
+        m_pingTimeout = socketRecvTimeoutMs == 0
+            ? kPingTimeout
+            : std::chrono::milliseconds(socketRecvTimeoutMs / 4);
+
+        //std::cout << "ping timeout = " << m_pingTimeout.count() << std::endl << std::flush;
+        setPingTimeout();
+        afterHandler();
+    });
+}
+
+void WebSocket::setAliveTimeout(std::chrono::milliseconds timeout)
 {
     dispatch(
         [this, timeout]()
         {
-            m_pingTimer->cancelSync();
-            m_pingTimeout = timeout;
-            m_pingTimer->start(m_pingTimeout, [this]() { handlePingTimer(); });
+            m_socket->setRecvTimeout(timeout);
+            resetPingTimeoutBySocketTimeout([]() {});
         });
 }
 
@@ -214,15 +287,12 @@ void WebSocket::sendCloseAsync()
         [this]()
         {
             sendControlRequest(FrameType::close);
-            m_lastError = Error::connectionAbort;
+            reportErrorIfAny(SystemError::connectionAbort, 0, [](bool) {});
         });
 }
 
 void WebSocket::handleSocketWrite(SystemError::ErrorCode ecode, size_t /*bytesSent*/)
 {
-    if (ecode == SystemError::noError)
-        setPingTimeout(m_pingTimeout);
-
     auto writeData = m_writeQueue.pop();
     bool queueEmpty = m_writeQueue.empty();
     {
@@ -299,6 +369,7 @@ void WebSocket::frameEnded()
 
     if (m_parser.frameType() == FrameType::ping)
     {
+        //std::cout << "ping received" << std::endl;
         m_pingsReceived++;
         sendControlResponse(FrameType::ping, FrameType::pong);
         return;
@@ -306,6 +377,7 @@ void WebSocket::frameEnded()
 
     if (m_parser.frameType() == FrameType::pong)
     {
+        //std::cout << "pong received" << std::endl;
         NX_ASSERT(m_controlBuffer.isEmpty());
         NX_LOG("[WebSocket] Received pong", cl_logDEBUG2);
         m_pongsReceived++;
@@ -314,15 +386,17 @@ void WebSocket::frameEnded()
 
     if (m_parser.frameType() == FrameType::close)
     {
-        if (m_lastError == Error::noError)
+        if (m_lastError == SystemError::noError)
         {
+            //std::cout << "Close request received" << std::endl;
             NX_LOG("[WebSocket] Received close request, responding and terminating", cl_logDEBUG1);
             sendControlResponse(FrameType::close, FrameType::close);
-            m_lastError = Error::connectionAbort;
+            m_lastError = SystemError::connectionAbort;
             return;
         }
         else
         {
+            //std::cout << "Close response received" << std::endl;
             NX_LOG("[WebSocket] Received close response, terminating", cl_logDEBUG1);
             NX_ASSERT(m_controlBuffer.isEmpty());
         }
@@ -337,6 +411,7 @@ void WebSocket::frameEnded()
         return;
     }
 
+    ////std::cout << "data frame ended" << std::endl;
     if (m_receiveMode != ReceiveMode::frame)
         return;
 
@@ -349,18 +424,28 @@ void WebSocket::sendControlResponse(FrameType requestType, FrameType responseTyp
     m_serializer.prepareMessage(m_controlBuffer, responseType, &responseFrame);
     auto writeSize = m_controlBuffer.size();
     m_controlBuffer.resize(0);
+
     sendPreparedMessage(
         &responseFrame,
         writeSize,
         [this, requestType](SystemError::ErrorCode ecode, size_t)
         {
-            if (ecode != SystemError::noError)
-            {
-                m_lastError = fromSystemError(ecode);
-                return;
-            }
-            NX_LOG(lit("[WebSocket] control response for %1 successfully sent")
-                .arg(frameTypeString(requestType)), cl_logDEBUG2);
+            reportErrorIfAny(
+                ecode,
+                1, //< just not zero
+                [this, requestType](bool errorOccured)
+                {
+                    if (errorOccured)
+                    {
+                        NX_LOG(lit("[WebSocket] control response for %1 failed")
+                            .arg(frameTypeString(requestType)), cl_logDEBUG2);
+                        return;
+                    }
+
+                    //std::cout << "pong sent" << std::endl;
+                    NX_LOG(lit("[WebSocket] control response for %1 successfully sent")
+                        .arg(frameTypeString(requestType)), cl_logDEBUG2);
+                });
         });
 }
 
@@ -368,30 +453,50 @@ void WebSocket::sendControlRequest(FrameType type)
 {
     nx::Buffer requestFrame;
     m_serializer.prepareMessage("", type, &requestFrame);
+
     sendPreparedMessage(
         &requestFrame,
         0,
         [this, type](SystemError::ErrorCode ecode, size_t)
         {
-            if (ecode != SystemError::noError)
-            {
-                m_lastError = fromSystemError(ecode);
-                return;
-            }
-            NX_LOG(lit("[WebSocket] control request %1 successfully sent")
-                .arg(frameTypeString(type)), cl_logDEBUG2);
+            reportErrorIfAny(
+                ecode,
+                1, //< just not zero
+                [this, type](bool errorOccured)
+                {
+                    if (errorOccured)
+                    {
+                        //std::cout << "control failed" << std::endl;
+                        NX_LOG(lit("[WebSocket] control request for %1 failed")
+                            .arg(frameTypeString(type)), cl_logDEBUG2);
+                        return;
+                    }
+
+                    //std::cout << "control sent" << std::endl;
+                    NX_LOG(lit("[WebSocket] control request for %1 successfully sent")
+                        .arg(frameTypeString(type)), cl_logDEBUG2);
+                });
         });
 }
 
 void WebSocket::messageEnded()
 {
     NX_LOG(lit("[WebSocket] message ended"), cl_logDEBUG2);
+    //std::cout << "message ended" << std::endl;
 
     if (!isDataFrame())
+    {
+        //std::cout << "message ended, not data frame: " << m_parser.frameType() << std::endl;
         return;
+    }
 
     if (m_receiveMode != ReceiveMode::message)
+    {
+        //std::cout << "message ended, wrong receive mode" << std::endl;
         return;
+    }
+
+    //std::cout << "message ended, LOCKING" << std::endl;
 
     m_userDataBuffer.lock();
 }
@@ -399,8 +504,8 @@ void WebSocket::messageEnded()
 void WebSocket::handleError(Error err)
 {
     NX_LOG(lit("[WebSocket] Parse error %1. Closing connection").arg((int)err), cl_logDEBUG1);
-    sendCloseAsync();
-    m_lastError = err;
+    sendControlRequest(FrameType::close);
+    m_lastError = SystemError::connectionAbort;
 }
 
 QString frameTypeString(FrameType type)
@@ -416,26 +521,6 @@ QString frameTypeString(FrameType type)
     }
 
     return lit("");
-}
-
-SystemError::ErrorCode toSystemError(Error ecode)
-{
-    switch (ecode)
-    {
-    case Error::noError: return SystemError::noError;
-    case Error::timedOut: return SystemError::timedOut;
-    default: return SystemError::connectionAbort;
-    }
-}
-
-Error fromSystemError(SystemError::ErrorCode ecode)
-{
-    switch (ecode)
-    {
-    case SystemError::noError: return Error::noError;
-    case SystemError::timedOut: return Error::timedOut;
-    default: return Error::connectionAbort;
-    }
 }
 
 } // namespace websocket

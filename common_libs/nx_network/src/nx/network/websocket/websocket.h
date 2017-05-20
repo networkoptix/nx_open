@@ -53,15 +53,17 @@ public:
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
-    virtual void stopWhileInAioThread() override;
-
     /**
      * Makes sense only in multiFrameMessage mode.
      * Indicates that the next sendAsync will close current message
      */
     void setIsLastFrame();
     void sendCloseAsync(); /**< Send close frame */
-    void setPingTimeout(std::chrono::milliseconds timeout);
+    /**
+     * After this timeout expired without any read activity
+     * read handler (if any) will be invoked with SystemError::timedOut.
+     */
+    void setAliveTimeout(std::chrono::milliseconds timeout);
     AbstractStreamSocket* socket() { return m_socket.get(); }
 
 protected:
@@ -69,6 +71,8 @@ protected:
     int m_pongsReceived = 0;
 
 private:
+    virtual void stopWhileInAioThread() override;
+
     /** Parser handler implementation */
     virtual void frameStarted(FrameType type, bool fin) override;
     virtual void framePayload(const char* data, int len) override;
@@ -77,7 +81,7 @@ private:
     virtual void handleError(Error err) override;
 
     /** Own helper functions*/
-    void processReadData(SystemError::ErrorCode ecode, size_t bytesRead);
+    void processReadData();
     bool isDataFrame() const;
     void sendPreparedMessage(nx::Buffer* buffer, int writeSize, HandlerType handler);
     void sendControlResponse(FrameType requestType, FrameType responseType);
@@ -87,6 +91,13 @@ private:
     void handlePingTimer();
     void handleSocketRead(SystemError::ErrorCode ecode, size_t bytesRead);
     void handleSocketWrite(SystemError::ErrorCode ecode, size_t bytesSent);
+    void resetPingTimeoutBySocketTimeout(nx::utils::MoveOnlyFunc<void()> afterHandler);
+    void resetPingTimeoutBySocketTimeoutSync();
+    void setPingTimeout();
+    void reportErrorIfAny(
+        SystemError::ErrorCode ecode,
+        size_t bytesRead,
+        std::function<void(bool)> continueHandler);
 
 private:
     std::unique_ptr<AbstractStreamSocket> m_socket;
@@ -104,7 +115,7 @@ private:
     std::unique_ptr<nx::network::aio::Timer> m_pingTimer;
     std::chrono::milliseconds m_pingTimeout;
     nx::utils::ObjectDestructionFlag m_destructionFlag;
-    Error m_lastError;
+    SystemError::ErrorCode m_lastError;
 };
 
 } // namespace websocket
