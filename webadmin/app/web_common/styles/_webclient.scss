@@ -33,23 +33,11 @@
 ::-ms-clear { display: none; }
 
 
-.dark-theme{
-  color:white;
-  background-color: #1C2327;
-  /*position:absolute;
-  top:0px;
-  padding-top:50px;*/
+.webclient{
   height:100%;
   width:100%;
-  margin-top: -20px !important;
-}
-
-.dark-theme .caret{
-  border-top-color:white;
-}
-
-.container-fluid.dark-theme{
   margin: 0;
+  margin-top: -20px !important;
 }
 
 .webclient-window{
@@ -747,7 +735,7 @@ div.text-center{
   margin-top: -2px;
 }
 
-.dark-theme .nav > li.active > a .camera-preview{
+.cameras-panel .nav > li.active > a .camera-preview{
   height: 38px !important;
   width: 68px !important;
   border: 1px solid $light1;
@@ -833,17 +821,17 @@ div.text-center{
   display: inline-block;
 }
 
-.dark-theme .nav > li > a{
+.cameras-panel .nav > li > a{
   color:$dark9;
   font-weight: normal;
 }
-.dark-theme .nav > li > a:hover,
-.dark-theme .nav > li > a:focus {
+.cameras-panel .nav > li > a:hover,
+.cameras-panel .nav > li > a:focus {
   text-decoration: none;
   background-color: rgba(53,70,79,0.2);
 }
 
-.dark-theme .nav > li > a{
+.cameras-panel .nav > li > a{
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -851,11 +839,11 @@ div.text-center{
   padding-left:95px;
 }
 
-.dark-theme .nav > li > a:hover{
+.cameras-panel .nav > li > a:hover{
   background-color: $additional_light3;
 }
 
-.dark-theme .nav > li.active > a{
+.cameras-panel .nav > li.active > a{
   text-decoration: none;
   background-color: $light5;
 }
