@@ -483,6 +483,12 @@ module.exports = function (grunt) {
                 dest: '.tmp/web_common/styles/',
                 src: '{,*/}*.css'
             },
+            json_common: {
+                expand: true,
+                cwd: '<%= yeoman.app %>/web_common',
+                dest: '<%= yeoman.dist%>/',
+                src: '{,*/}*.json'
+            },
             zip:{
                 expand: true,
                 nonull:true,
@@ -521,9 +527,6 @@ module.exports = function (grunt) {
             },
             print_version:{
                 command: 'hg parent'
-            },
-            generate_translation:{
-                command: 'cd translation; ./language_pack.sh'
             },
             localize:{
                 command: 'cd translation; ./localize.sh'
@@ -805,6 +808,7 @@ module.exports = function (grunt) {
         'autoprefixer',
         'concat',
         'ngmin',
+        'copy:json_common',
         'copy:dist',
         'cdnify',
         'cssmin',
@@ -813,7 +817,6 @@ module.exports = function (grunt) {
         'usemin',
         'htmlmin',
         'shell:version',
-        //'shell:generate_translation',
         'shell:localize'
     ]);
 

@@ -24,13 +24,13 @@ angular.module('nxCommon')
                 scope.streamName = function(stream){
                     switch(stream.encoderIndex){
                         case 0:
-                            return L.cameraLinks.highStream;
+                            return L.common.cameraLinks.highStream;
                         case 1:
-                            return L.cameraLinks.lowStream;
+                            return L.common.cameraLinks.lowStream;
                         case -1:
-                            return L.cameraLinks.transcoding;
+                            return L.common.cameraLinks.transcoding;
                     }
-                    return L.cameraLinks.unknown;
+                    return L.common.cameraLinks.unknown;
                 };
 
                 scope.formatLink = function(camera, stream,transport){

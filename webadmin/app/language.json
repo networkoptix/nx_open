@@ -109,12 +109,6 @@
         "installationError": "Updating failed. Cannot execute installation script.",
         "selectFiles": "Select files"
     },
-    "cameraLinks":{
-        "highStream":"High stream",
-        "lowStream":"Low stream",
-        "transcoding": "Transcoding",
-        "unknown": "Unknown"
-    },
     "advanced":{
         "free": "Free",
         "total": "Total",
