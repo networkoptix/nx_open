@@ -33,7 +33,9 @@ module.exports = function (grunt) {
             // configurable paths
             app: require('./bower.json').appPath || 'app',
             config: grunt.file.exists('config.json') && grunt.file.readJSON('config.json'),
-            dist: 'dist'
+            dist: 'dist',
+            web_common: '../../webadmin/app/web_common'
+
         },
 
         // Automatically inject Bower components into the app
@@ -49,7 +51,7 @@ module.exports = function (grunt) {
         // Watches files for changes and runs tasks based on the changed files
         watch: {
             js: {
-                files: ['<%= yeoman.app %>/scripts/**','<%= yeoman.app %>/components/**'],
+                files: ['<%= yeoman.app %>/scripts/**','<%= yeoman.app %>/components/**', '<%= yeoman.web_common %>/**'],
                 tasks: ['newer:jshint:all'],
                 options: {
                     livereload: true
@@ -60,7 +62,9 @@ module.exports = function (grunt) {
                 tasks: ['newer:jshint:test', 'karma']
             },
             compass: {
-                files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}', 'customizations/<%= yeoman.config.customization %>/front_end/{,*/}*.{scss,sass}'],
+                files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}',
+                        'customizations/<%= yeoman.config.customization %>/front_end/{,*/}*.{scss,sass}',
+                        '<%= yeoman.web_common %>/styles/{,*/}*.{scss,sass}'],
                 tasks: ['compass:server', 'autoprefixer']
             },
             gruntfile: {
@@ -71,6 +75,7 @@ module.exports = function (grunt) {
                     livereload: '<%= connect.options.livereload %>'
                 },
                 files: [
+                    '<%= yeoman.web_common %>/**',
                     '<%= yeoman.app %>/**.html',
                     '.tmp/styles/{,*/}*.css',
                     '<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
@@ -88,6 +93,7 @@ module.exports = function (grunt) {
                 livereload: 35729
             },
             rules: [
+                {from: '^/web_common/(.*)$', to: '/$1'},
                 {from: '^((?!\\.).)*$', to: '/index.html'},
                 {from: '^/static/lang_.*?/(.*)$', to: '/$1'},
                 {from: '^/static/(.*)$', to: '/$1'}
@@ -138,7 +144,8 @@ module.exports = function (grunt) {
                     base: [
                         '.tmp',
                         'test',
-                        '<%= yeoman.app %>'
+                        '<%= yeoman.app %>',
+                        '<%= yeoman.web_common %>'
                     ]
                 }
             },
@@ -170,7 +177,8 @@ module.exports = function (grunt) {
                     base: [
                         '.tmp',
                         'test',
-                        '<%= yeoman.app %>'
+                        '<%= yeoman.app %>',
+                        '<%= yeoman.web_common %>'
                     ]
                 }
             },
@@ -214,7 +222,8 @@ module.exports = function (grunt) {
             },
             all: [
                 'Gruntfile.js',
-                '<%= yeoman.app %>/scripts/{,*/}*.js'
+                '<%= yeoman.app %>/scripts/{,*/}*.js',
+                '<%= yeoman.web_common %>/scripts/{,*/}*.js'
             ],
             test: {
                 options: {
@@ -486,6 +495,18 @@ module.exports = function (grunt) {
                         flatten: true,
                         dest: '<%= yeoman.dist %>/fonts',
                         src: ['bower_components/bootstrap-sass/assets/fonts/*']
+                    },
+                    {
+                        expand: true,
+                        cwd: '<%= yeoman.web_common %>',
+                        dest: '<%= yeoman.dist %>/web_common',
+                        src: [
+                            '*.{ico,png,txt}',
+                            'views/**',
+                            '*.json',
+                            'images/**',
+                            'components/*.swf'
+                        ]
                     }
                 ]
             },

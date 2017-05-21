@@ -40,7 +40,8 @@ module.exports = function (grunt) {
         yeoman: {
             // configurable paths
             app: require('./bower.json').appPath || 'app',
-            dist: 'static'
+            dist: 'static',
+            web_common: 'app/web_common'
         },
 
         // Automatically inject Bower components into the app
@@ -56,7 +57,7 @@ module.exports = function (grunt) {
         // Watches files for changes and runs tasks based on the changed files
         watch: {
             js: {
-                files: ['<%= yeoman.app %>/scripts/**','<%= yeoman.app %>/components/**','<%= yeoman.app %>/web_common/**'],
+                files: ['<%= yeoman.app %>/scripts/**','<%= yeoman.web_common %>/**'],
                 tasks: ['newer:jshint:all'],
                 options: {
                     livereload: true
@@ -67,7 +68,7 @@ module.exports = function (grunt) {
                 tasks: ['newer:jshint:test', 'karma']
             },
             compass: {
-                files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
+                files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}', '<%= yeoman.web_common %>/styles/{,*/}*.{scss,sass}'],
                 tasks: ['compass:server', 'autoprefixer']
             },
             gruntfile: {
@@ -79,13 +80,13 @@ module.exports = function (grunt) {
                 },
                 files: [
                     '<%= yeoman.app %>/**/*.html',
+                    '<%= yeoman.web_common %>/**',
                     '<%= yeoman.app %>/views/**',
                     '.tmp/styles/{,*/}*.css',
                     '<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
                 ]
             }
         },
-
         // The actual grunt server settings
         connect: {
             options: {
@@ -217,6 +218,7 @@ module.exports = function (grunt) {
             all: [
                 'Gruntfile.js',
                 '<%= yeoman.app %>/scripts/**/*.js',
+                '<%= yeoman.web_common %>/scripts/**/*.js',
                 '!<%= yeoman.app %>/scripts/vendor/**'
             ],
             test: {
@@ -468,6 +470,18 @@ module.exports = function (grunt) {
                             'bower_components/mediaelement/build/flashmediaelement.swf',
                             'bower_components/locomote/dist/Player.swf']
 
+                    },
+                    {
+                        expand: true,
+                        cwd: '<%= yeoman.web_common %>',
+                        dest: '<%= yeoman.dist %>/web_common',
+                        src: [
+                            '*.{ico,png,txt}',
+                            'views/**',
+                            '*.json',
+                            'images/**',
+                            'components/*.swf'
+                        ]
                     }
                 ]
             },
@@ -479,15 +493,9 @@ module.exports = function (grunt) {
             },
             styles_common: {
                 expand: true,
-                cwd: '<%= yeoman.app %>/web_common/styles',
+                cwd: '<%= yeoman.web_common %>/styles',
                 dest: '.tmp/web_common/styles/',
                 src: '{,*/}*.css'
-            },
-            json_common: {
-                expand: true,
-                cwd: '<%= yeoman.app %>/web_common',
-                dest: '<%= yeoman.dist%>/',
-                src: '{,*/}*.json'
             },
             zip:{
                 expand: true,
@@ -808,7 +816,6 @@ module.exports = function (grunt) {
         'autoprefixer',
         'concat',
         'ngmin',
-        'copy:json_common',
         'copy:dist',
         'cdnify',
         'cssmin',
