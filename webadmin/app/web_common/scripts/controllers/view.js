@@ -2,11 +2,7 @@
 
 angular.module('nxCommon').controller('ViewCtrl',
     function ($scope, $rootScope, $location, $routeParams, cameraRecords,
-              camerasProvider, $sessionStorage, $localStorage, currentUser, systemAPI) {
-
-        if(currentUser === null){
-            return; // Do nothing, user wasn't authorised
-        }
+              camerasProvider, $sessionStorage, $localStorage, systemAPI) {
 
         var channels = {
             Auto: 'lo',
