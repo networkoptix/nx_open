@@ -30,9 +30,7 @@ WebSocket::WebSocket(
 
 WebSocket::~WebSocket()
 {
-    //std::cout << "before pleaseStop" << std::endl;
     pleaseStopSync();
-    //std::cout << "after pleaseStop" << std::endl;
 }
 
 void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
@@ -44,7 +42,6 @@ void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
     {
         AbstractAsyncChannel::bindToAioThread(aioThread);
         m_socket->bindToAioThread(aioThread);
-        //std::cout << "bind to aio thread" << std::endl;
         m_pingTimer->cancelSync();
         m_pingTimer->bindToAioThread(aioThread);
         m_pingTimer->start(m_pingTimeout, [this]() { handlePingTimer(); });
@@ -86,15 +83,17 @@ void WebSocket::reportErrorIfAny(
 
         if (m_lastError != SystemError::noError || bytesRead == 0)
         {
-            //std::cout << "report error: " << m_lastError << ", read queue empty: " << m_readQueue.empty() << std::endl;
+            NX_LOG(lit("[WebSocket] Reporting error %1, read queue empty: %2")
+                .arg(m_lastError)
+                .arg((bool)m_readQueue.empty()), cl_logDEBUG1);
+
             if (!m_readQueue.empty())
             {
                 auto readData = m_readQueue.pop();
                 readData.handler(ecode, bytesRead);
-                //std::cout << "error read handler completed" << std::endl;
+                NX_LOG(lit("[WebSocket] Reporting error, user handler completed"), cl_logDEBUG2);
             }
             continueHandler(true);
-            //std::cout << "continue handler completed" << std::endl;
             return;
         }
 
@@ -107,11 +106,11 @@ void WebSocket::handleSocketRead(SystemError::ErrorCode ecode, size_t bytesRead)
     reportErrorIfAny(
         ecode,
         bytesRead,
-        [this, bytesRead](bool errorOccured)
+        [this, bytesRead, ecode](bool errorOccured)
         {
             if (errorOccured)
             {
-                //std::cout << "Read error occured" << std::endl;
+                NX_LOG(lit("[WebSocket] Handle read error: %1").arg(ecode), cl_logDEBUG1);
                 return;
             }
 
@@ -126,7 +125,8 @@ void WebSocket::handleSocketRead(SystemError::ErrorCode ecode, size_t bytesRead)
                 {
                     if (errorOccured)
                     {
-                        //std::cout << "Error occured while parsing read data" << std::endl;
+                        NX_LOG(lit("[WebSocket] Handle while parsing read data error: %1")
+                            .arg(m_lastError), cl_logDEBUG1);
                         return;
                     }
 
@@ -139,8 +139,7 @@ void WebSocket::processReadData()
 {
     if (m_userDataBuffer.readySize() == 0)
     {
-        ////std::cout << "ready size is zero, reading again" << std::endl;
-
+        NX_LOG("[WebSocket] User buffer is not ready. Continue reading.", cl_logDEBUG2);
         m_socket->readSomeAsync(
             &m_readBuffer,
             [this](SystemError::ErrorCode ecode, size_t bytesRead)
@@ -156,21 +155,20 @@ void WebSocket::processReadData()
     auto handoutBuffer = m_userDataBuffer.popFront();
 
     NX_LOG(lit("[WebSocket] handleRead(): user data size: %1").arg(handoutBuffer.size()), cl_logDEBUG2);
-    ////std::cout << "Handing out buffer" << std::endl;
 
     readData.buffer->append(handoutBuffer);
     readData.handler(SystemError::noError, handoutBuffer.size());
     if (queueEmpty)
         return;
-    readWithoutAddingToQueueAsync();
+    readWithoutAddingToQueue();
 }
 
-void WebSocket::readWithoutAddingToQueueAsync()
+void WebSocket::readWithoutAddingToQueue()
 {
     post([this]() { readWithoutAddingToQueue(); });
 }
 
-void WebSocket::readWithoutAddingToQueue()
+void WebSocket::readWithoutAddingToQueueSync()
 {
     if (m_userDataBuffer.readySize() != 0)
     {
@@ -204,7 +202,7 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, HandlerType handler)
             m_readQueue.emplace(std::move(handler), std::move(tmp));
             NX_ASSERT(queueEmpty);
             if (queueEmpty)
-                readWithoutAddingToQueue();
+                readWithoutAddingToQueueSync();
         });
 }
 
@@ -265,7 +263,10 @@ void WebSocket::resetPingTimeoutBySocketTimeout(nx::utils::MoveOnlyFunc<void()> 
             ? kPingTimeout
             : std::chrono::milliseconds(socketRecvTimeoutMs / 4);
 
-        //std::cout << "ping timeout = " << m_pingTimeout.count() << std::endl << std::flush;
+        NX_LOG(lit("[WebSocket, Ping] Socket read timeout: %1. Ping timeout: %2")
+            .arg(socketRecvTimeoutMs)
+            .arg(m_pingTimeout.count()), cl_logDEBUG1);
+
         setPingTimeout();
         afterHandler();
     });
@@ -283,7 +284,7 @@ void WebSocket::setAliveTimeout(std::chrono::milliseconds timeout)
 
 void WebSocket::sendCloseAsync()
 {
-    dispatch(
+    post(
         [this]()
         {
             sendControlRequest(FrameType::close);
@@ -369,7 +370,7 @@ void WebSocket::frameEnded()
 
     if (m_parser.frameType() == FrameType::ping)
     {
-        //std::cout << "ping received" << std::endl;
+        NX_LOG("[WebSocket] ping received.", cl_logDEBUG2);
         m_pingsReceived++;
         sendControlResponse(FrameType::ping, FrameType::pong);
         return;
@@ -377,9 +378,8 @@ void WebSocket::frameEnded()
 
     if (m_parser.frameType() == FrameType::pong)
     {
-        //std::cout << "pong received" << std::endl;
+        NX_LOG("[WebSocket] pong received.", cl_logDEBUG2);
         NX_ASSERT(m_controlBuffer.isEmpty());
-        NX_LOG("[WebSocket] Received pong", cl_logDEBUG2);
         m_pongsReceived++;
         return;
     }
@@ -388,7 +388,6 @@ void WebSocket::frameEnded()
     {
         if (m_lastError == SystemError::noError)
         {
-            //std::cout << "Close request received" << std::endl;
             NX_LOG("[WebSocket] Received close request, responding and terminating", cl_logDEBUG1);
             sendControlResponse(FrameType::close, FrameType::close);
             m_lastError = SystemError::connectionAbort;
@@ -396,7 +395,6 @@ void WebSocket::frameEnded()
         }
         else
         {
-            //std::cout << "Close response received" << std::endl;
             NX_LOG("[WebSocket] Received close response, terminating", cl_logDEBUG1);
             NX_ASSERT(m_controlBuffer.isEmpty());
         }
@@ -411,7 +409,6 @@ void WebSocket::frameEnded()
         return;
     }
 
-    ////std::cout << "data frame ended" << std::endl;
     if (m_receiveMode != ReceiveMode::frame)
         return;
 
@@ -442,7 +439,6 @@ void WebSocket::sendControlResponse(FrameType requestType, FrameType responseTyp
                         return;
                     }
 
-                    //std::cout << "pong sent" << std::endl;
                     NX_LOG(lit("[WebSocket] control response for %1 successfully sent")
                         .arg(frameTypeString(requestType)), cl_logDEBUG2);
                 });
@@ -466,13 +462,11 @@ void WebSocket::sendControlRequest(FrameType type)
                 {
                     if (errorOccured)
                     {
-                        //std::cout << "control failed" << std::endl;
                         NX_LOG(lit("[WebSocket] control request for %1 failed")
                             .arg(frameTypeString(type)), cl_logDEBUG2);
                         return;
                     }
 
-                    //std::cout << "control sent" << std::endl;
                     NX_LOG(lit("[WebSocket] control request for %1 successfully sent")
                         .arg(frameTypeString(type)), cl_logDEBUG2);
                 });
@@ -481,23 +475,20 @@ void WebSocket::sendControlRequest(FrameType type)
 
 void WebSocket::messageEnded()
 {
-    NX_LOG(lit("[WebSocket] message ended"), cl_logDEBUG2);
-    //std::cout << "message ended" << std::endl;
-
     if (!isDataFrame())
     {
-        //std::cout << "message ended, not data frame: " << m_parser.frameType() << std::endl;
+        NX_LOG(lit("[WebSocket] message ended, not data frame, type: %1")
+            .arg(m_parser.frameType()), cl_logDEBUG2);
         return;
     }
 
     if (m_receiveMode != ReceiveMode::message)
     {
-        //std::cout << "message ended, wrong receive mode" << std::endl;
+        NX_LOG(lit("[WebSocket] message ended, wrong receive mode"), cl_logDEBUG2);
         return;
     }
 
-    //std::cout << "message ended, LOCKING" << std::endl;
-
+    NX_LOG(lit("[WebSocket] message ended, LOCKING user data"), cl_logDEBUG2);
     m_userDataBuffer.lock();
 }
 

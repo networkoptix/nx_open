@@ -86,8 +86,8 @@ private:
     void sendPreparedMessage(nx::Buffer* buffer, int writeSize, HandlerType handler);
     void sendControlResponse(FrameType requestType, FrameType responseType);
     void sendControlRequest(FrameType type);
+    void readWithoutAddingToQueueSync();
     void readWithoutAddingToQueue();
-    void readWithoutAddingToQueueAsync();
     void handlePingTimer();
     void handleSocketRead(SystemError::ErrorCode ecode, size_t bytesRead);
     void handleSocketWrite(SystemError::ErrorCode ecode, size_t bytesSent);
