@@ -8,6 +8,6 @@
     ng-class="{hidden:camera.collapsed}">
     <li ng-repeat="camera in camera.cameras"
         ng-class="{active:activeCamera===camera}"
-        ng-include="'/views/components/cameraNode.html'" >
+        ng-include="Config.viewsDirCommon + 'components/cameraNode.html'" >
     </li>
 </ul>
