@@ -70,6 +70,7 @@
         <!-- <storage_plugin_test_client.guid>{83e8bbad-6976-45da-bdd7-baf8f17fc71c}</storage_plugin_test_client.guid> -->
         <common_ut.guid>{2f2d9175-70c1-404d-82e3-5e797b92263c}</common_ut.guid>
         <cloud_connectivity_ut.guid>{f568398b-8ca3-44cc-9707-d1f63b2aa1c6}</cloud_connectivity_ut.guid>
+        <cloud_connect_integration_tests.guid>{2b60d0be-4d05-4547-a0a9-73c98d720b1a}</cloud_connect_integration_tests.guid>
         <nx_network_ut.guid>{f7dfa168-fa41-4d4a-b475-e785acb4ff45}</nx_network_ut.guid>
         <libcloud_db.guid>{BBA5BB95-B669-42C4-8074-EE0E361C094E}></libcloud_db.guid>
         <time_server.guid>{5640EBAF-8312-4C7C-851E-A48F0B5E2208}</time_server.guid>
@@ -179,7 +180,7 @@
         <vmux.version>1.0.0</vmux.version>
         <cpro.version>1.0.0</cpro.version>
         <server-external.version>default</server-external.version>
-        <help.version>${customization}-${release.version}</help.version>
+        <help.version>${customization}-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</help.version>
         <gcc.version>4.9.4</gcc.version>
 
         <qt.libs/>
@@ -494,6 +495,7 @@
             </activation>
             <modules>
                 <module>unit_tests</module>
+                <module>nx_cloud/tests</module>
             </modules>
         </profile>
         <profile>
@@ -1235,6 +1237,7 @@
             <modules>
                 <module>unit_tests</module>
                 <module>unit_tests_run</module>
+                <module>nx_cloud/tests</module>
             </modules>
         </profile>
         <profile>
@@ -1248,6 +1251,7 @@
             </activation>
             <modules>
                 <module>unit_tests</module>
+                <module>nx_cloud/tests</module>
             </modules>
         </profile>
         <profile>

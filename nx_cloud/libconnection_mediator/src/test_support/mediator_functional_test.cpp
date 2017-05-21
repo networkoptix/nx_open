@@ -17,7 +17,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 #include <nx/utils/crypt/linux_passwd_crypt.h>
 
 #include "http/get_listening_peer_list_handler.h"

@@ -165,6 +165,12 @@ void ConnectionAcceptor::acceptAsync(AcceptCompletionHandler handler)
 {
     using namespace std::placeholders;
 
+    if (!m_started)
+    {
+        m_acceptor.start();
+        m_started = true;
+    }
+
     m_acceptor.acceptAsync(
         [this, handler = std::move(handler)](
             SystemError::ErrorCode sysErrorCode,

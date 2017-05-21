@@ -6,7 +6,7 @@
 
 #include <cdb/connection.h>
 #include <api/app_server_connection.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include <media_server/settings.h>
 

@@ -102,7 +102,7 @@ private:
     std::map<ConnectionType*, std::shared_ptr<ConnectionType>> m_connections;
 };
 
-// TODO #ak It seems to make sense to decouple 
+// TODO: #ak It seems to make sense to decouple 
 //   StreamSocketServer & StreamServerConnectionHolder responsibility.
 
 /**
@@ -112,31 +112,36 @@ private:
 template<class CustomServerType, class ConnectionType>
 class StreamSocketServer:
     public StreamServerConnectionHolder<ConnectionType>,
-    public nx::network::aio::BasicPollable
+    public aio::BasicPollable
 {
     using base_type = StreamServerConnectionHolder<ConnectionType>;
     using self_type = StreamSocketServer<CustomServerType, ConnectionType>;
 
 public:
-    StreamSocketServer(
-        bool sslRequired,
-        nx::network::NatTraversalSupport natTraversalSupport)
-        :
-        m_socket(SocketFactory::createStreamServerSocket(
-            sslRequired,
-            natTraversalSupport))
+    StreamSocketServer(std::unique_ptr<AbstractStreamServerSocket> serverSocket):
+        m_socket(std::move(serverSocket))
     {
         bindToAioThread(getAioThread());
     }
 
-    ~StreamSocketServer()
+    StreamSocketServer(
+        bool sslRequired,
+        nx::network::NatTraversalSupport natTraversalSupport)
+        :
+        StreamSocketServer(SocketFactory::createStreamServerSocket(
+            sslRequired,
+            natTraversalSupport))
+    {
+    }
+
+    virtual ~StreamSocketServer()
     {
         pleaseStopSync(false);
     }
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
     {
-        nx::network::aio::BasicPollable::bindToAioThread(aioThread);
+        aio::BasicPollable::bindToAioThread(aioThread);
         m_socket->bindToAioThread(aioThread);
     }
 

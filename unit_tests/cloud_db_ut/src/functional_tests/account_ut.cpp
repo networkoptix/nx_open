@@ -18,7 +18,7 @@
 #include <nx/utils/time.h>
 #include <utils/common/app_info.h>
 
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include "email_manager_mocked.h"
 #include "test_setup.h"

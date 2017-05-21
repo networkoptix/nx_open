@@ -2,7 +2,7 @@
 
 namespace nx {
 namespace utils {
-namespace bsf {
+namespace bstream {
 
 AbstractByteStreamFilter::AbstractByteStreamFilter(
     const std::shared_ptr<AbstractByteStreamFilter>& nextFilter)
@@ -64,6 +64,6 @@ AbstractByteStreamFilterPtr insert(
     return beginPtr;
 }
 
-} // namespace bsf
+} // namespace bstream
 } // namespace utils
 } // namespace nx

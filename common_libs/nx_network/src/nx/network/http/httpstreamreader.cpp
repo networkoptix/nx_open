@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include <nx/utils/custom_output_stream.h>
+#include <nx/utils/byte_stream/custom_output_stream.h>
 #include <nx/utils/gzip/gzip_uncompressor.h>
 #include <nx/utils/log/assert.h>
 
@@ -351,7 +351,7 @@ bool HttpStreamReader::prepareToReadMessageBody()
     if( contentEncodingIter != m_httpMessage.headers().end() &&
         contentEncodingIter->second != "identity" )
     {
-        nx::utils::bsf::AbstractByteStreamFilter* contentDecoder = 
+        nx::utils::bstream::AbstractByteStreamFilter* contentDecoder = 
             createContentDecoder( contentEncodingIter->second );
         if( contentDecoder == nullptr )
             return false;   //cannot decode message body
@@ -362,7 +362,7 @@ bool HttpStreamReader::prepareToReadMessageBody()
             m_msgBodyBuffer.append( data.constData(), data.size() );
         };
         contentDecoder->setNextFilter(
-            std::make_shared<nx::utils::bsf::CustomOutputStream<decltype(safeAppendToBufferLambda)>>(
+            std::make_shared<nx::utils::bstream::CustomOutputStream<decltype(safeAppendToBufferLambda)>>(
                 safeAppendToBufferLambda ) );
         m_contentDecoder.reset( contentDecoder );
     }
@@ -558,11 +558,11 @@ unsigned int HttpStreamReader::hexCharToInt( BufferType::value_type ch )
     return 0;
 }
 
-nx::utils::bsf::AbstractByteStreamFilter* HttpStreamReader::createContentDecoder(
+nx::utils::bstream::AbstractByteStreamFilter* HttpStreamReader::createContentDecoder(
     const nx_http::StringType& encodingName )
 {
     if( encodingName == "gzip" )
-        return new nx::utils::bsf::gzip::Uncompressor();
+        return new nx::utils::bstream::gzip::Uncompressor();
     return nullptr;
 }
 

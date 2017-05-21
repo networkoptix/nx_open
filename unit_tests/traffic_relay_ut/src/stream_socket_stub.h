@@ -2,7 +2,7 @@
 
 #include <nx/network/socket_delegate.h>
 #include <nx/network/system_socket.h>
-#include <nx/utils/pipeline.h>
+#include <nx/utils/byte_stream/pipeline.h>
 
 namespace nx {
 namespace cloud {
@@ -32,7 +32,7 @@ public:
 private:
     std::function<void(SystemError::ErrorCode, size_t)> m_readHandler;
     nx::network::TCPSocket m_delegatee;
-    nx::utils::pipeline::ReflectingPipeline m_reflectingPipeline;
+    nx::utils::bstream::ReflectingPipeline m_reflectingPipeline;
     SocketAddress m_foreignAddress;
 };
 

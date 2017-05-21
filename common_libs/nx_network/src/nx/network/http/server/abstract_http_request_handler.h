@@ -66,7 +66,7 @@ protected:
     /**
      * Implement this method to handle request
      * @param response Implementation is allowed to modify response as it wishes
-     * @warning This object can be removed in completionHandler 
+     * WARNING: This object can be removed in completionHandler 
      */
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,
