@@ -93,7 +93,6 @@ module.exports = function (grunt) {
                 livereload: 35729
             },
             rules: [
-                {from: '^/web_common/(.*)$', to: '/$1'},
                 {from: '^((?!\\.).)*$', to: '/index.html'},
                 {from: '^/static/lang_.*?/(.*)$', to: '/$1'},
                 {from: '^/static/(.*)$', to: '/$1'}
@@ -522,6 +521,12 @@ module.exports = function (grunt) {
                 cwd: '<%= yeoman.dist %>',
                 dest: '../cloud/static/',
                 src: '**'
+            },
+            web_common:{
+                expand: true,
+                cwd: '<%= yeoman.web_common%>',
+                dest: '.tmp/web_common/',
+                src: '**'
             }
         },
 
@@ -736,6 +741,7 @@ module.exports = function (grunt) {
 
         grunt.task.run([
             'clean:server',
+            'copy:web_common',
             'wiredep',
             'copy:custom',
             'copy:custom_css',
@@ -799,6 +805,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('build', [
         'clean:dist',
+        'copy:web_common',
         'wiredep',
         'useminPrepare',
         'copy:custom_css',
