@@ -30,7 +30,7 @@ public:
         const AddressEntry& desiredHostAddress,
         nx::utils::MoveOnlyFunc<void(VerificationResult)> completionHandler) override;
 
-    virtual SystemError::ErrorCode lastSysErrorCode() const override;
+    virtual SystemError::ErrorCode lastSystemErrorCode() const override;
 
     virtual std::unique_ptr<AbstractStreamSocket> takeSocket() override;
 
@@ -41,7 +41,7 @@ private:
     const nx::String m_connectSessionId;
     boost::optional<std::chrono::milliseconds> m_timeout;
     std::unique_ptr<AbstractStreamSocket> m_connection;
-    SystemError::ErrorCode m_lastSysErrorCode = SystemError::noError;
+    SystemError::ErrorCode m_lastSystemErrorCode = SystemError::noError;
     nx::utils::MoveOnlyFunc<void(VerificationResult)> m_completionHandler;
 
     void onConnectDone(SystemError::ErrorCode sysErrorCode);

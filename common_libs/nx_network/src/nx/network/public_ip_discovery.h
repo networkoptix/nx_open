@@ -8,7 +8,10 @@
 #include <nx/network/http/async_http_client_reply.h>
 #include <nx/utils/thread/mutex.h>
 
-class QnPublicIPDiscovery:
+namespace nx {
+namespace network {
+
+class NX_NETWORK_API PublicIPDiscovery:
     public QObject,
     public nx::network::aio::BasicPollable
 {
@@ -16,8 +19,8 @@ class QnPublicIPDiscovery:
 
 public:
     /** If \a primaryUrls is empty, default urls are used */
-    QnPublicIPDiscovery(QStringList primaryUrls = QStringList());
-    virtual ~QnPublicIPDiscovery() override;
+    PublicIPDiscovery(QStringList primaryUrls = QStringList());
+    virtual ~PublicIPDiscovery() override;
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
@@ -56,3 +59,6 @@ private:
     
     QString toString(Stage value) const;
 };
+
+} // namespace network
+} // namespace nx

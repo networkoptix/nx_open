@@ -20,6 +20,7 @@
 #endif
 
 namespace nx {
+namespace utils {
 
 const bool CurrentProcess::changeUser( const QString& userName )
 {
@@ -39,4 +40,5 @@ const bool CurrentProcess::changeUser( const uint userId )
     #endif
 }
 
+} // namespace utils
 } // namespace nx

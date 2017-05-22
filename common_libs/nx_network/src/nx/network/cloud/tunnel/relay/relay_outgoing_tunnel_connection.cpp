@@ -124,6 +124,8 @@ void OutgoingTunnelConnection::onConnectionOpened(
     m_activeRequests.erase(requestIter);
 
     const auto errorCodeToReport = toSystemError(resultCode);
+    if (resultCode != nx::cloud::relay::api::ResultCode::ok)
+        connection.reset(); //< Connection can be present in case of logic error.
 
     if (connection)
     {

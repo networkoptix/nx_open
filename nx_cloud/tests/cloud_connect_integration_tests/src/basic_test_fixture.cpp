@@ -26,14 +26,21 @@ boost::optional<hpm::api::SystemCredentials>
 //-------------------------------------------------------------------------------------------------
 
 BasicTestFixture::BasicTestFixture():
-    m_staticMsgBody("Hello, hren!")
+    m_staticMsgBody("Hello, hren!"),
+    m_unfinishedRequestsLeft(0)
 {
 }
 
 BasicTestFixture::~BasicTestFixture()
 {
-    if (m_httpClient)
-        m_httpClient->pleaseStopSync();
+    std::list<std::unique_ptr<nx_http::AsyncClient>> httpClients;
+    {
+        QnMutexLocker lock(&m_mutex);
+        httpClients.swap(m_httpClients);
+    }
+
+    for (const auto& httpClient: httpClients)
+        httpClient->pleaseStopSync();
 
     if (m_stunClient)
         m_stunClient->pleaseStopSync();
@@ -95,20 +102,29 @@ void BasicTestFixture::assertConnectionCanBeEstablished()
 
 void BasicTestFixture::startExchangingFixedData()
 {
-    m_httpClient = std::make_unique<nx_http::AsyncClient>();
-    m_httpClient->setSendTimeout(std::chrono::seconds(10));
+    QnMutexLocker lock(&m_mutex);
+
+    m_httpClients.push_back(std::make_unique<nx_http::AsyncClient>());
+    m_httpClients.back()->setSendTimeout(std::chrono::seconds::zero());
+    m_httpClients.back()->setResponseReadTimeout(std::chrono::seconds::zero());
+
+    ++m_unfinishedRequestsLeft;
 
     m_expectedMsgBody = m_staticMsgBody;
-    m_httpClient->doGet(
+    m_httpClients.back()->doGet(
         m_staticUrl,
-        std::bind(&BasicTestFixture::onHttpRequestDone, this));
+        std::bind(&BasicTestFixture::onHttpRequestDone, this, --m_httpClients.end()));
 }
 
 void BasicTestFixture::assertDataHasBeenExchangedCorrectly()
 {
-    const auto result = m_httpRequestResults.pop();
-    ASSERT_EQ(nx_http::StatusCode::ok, result.statusCode);
-    ASSERT_EQ(m_expectedMsgBody, result.msgBody);
+    while (m_unfinishedRequestsLeft > 0)
+    {
+        const auto result = m_httpRequestResults.pop();
+        ASSERT_EQ(nx_http::StatusCode::ok, result.statusCode);
+        ASSERT_EQ(m_expectedMsgBody, result.msgBody);
+        --m_unfinishedRequestsLeft;
+    }
 }
 
 nx::hpm::MediatorFunctionalTest& BasicTestFixture::mediator()
@@ -143,14 +159,23 @@ void BasicTestFixture::startHttpServer()
     ASSERT_TRUE(m_httpServer->bindAndListen());
 }
 
-void BasicTestFixture::onHttpRequestDone()
+void BasicTestFixture::onHttpRequestDone(
+    std::list<std::unique_ptr<nx_http::AsyncClient>>::iterator clientIter)
 {
+    QnMutexLocker lock(&m_mutex);
+
+    if (m_httpClients.empty())
+        return; //< Most likely, current object is being destructed.
+
+    auto httpClient = std::move(*clientIter);
+    m_httpClients.erase(clientIter);
+
     HttpRequestResult result;
-    if (m_httpClient->response())
+    if (httpClient->response())
     {
         result.statusCode = 
-            (nx_http::StatusCode::Value)m_httpClient->response()->statusLine.statusCode;
-        result.msgBody = m_httpClient->fetchMessageBodyBuffer();
+            (nx_http::StatusCode::Value)httpClient->response()->statusLine.statusCode;
+        result.msgBody = httpClient->fetchMessageBodyBuffer();
     }
 
     m_httpRequestResults.push(std::move(result));
