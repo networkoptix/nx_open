@@ -7,6 +7,7 @@
 #include <common/common_module_aware.h>
 
 class QnResourcePool;
+class QnAsyncHttpClientReply;
 
 namespace nx {
 namespace vms {
@@ -54,6 +55,9 @@ public:
 private:
     QnMediaServerResourcePtr getServer(const QnUuid& peerId) const;
     rest::QnConnectionPtr getConnection(const QnUuid& peerId) const;
+
+    rest::Handle m_currentSelfRequestHandle = -1;
+    QHash<rest::Handle, QnAsyncHttpClientReply*> m_replyByHandle;
 };
 
 class ResourcePoolPeerManagerFactory:
