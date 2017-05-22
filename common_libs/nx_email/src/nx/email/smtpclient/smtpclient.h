@@ -22,7 +22,7 @@
 #include <QObject>
 
 #include <nx/network/socket.h>
-#include <nx/network/http/linesplitter.h>
+#include <nx/network/http/line_splitter.h>
 #include <utils/email/email_fwd.h>
 
 #include "mimemessage.h"

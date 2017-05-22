@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/http/linesplitter.h>
+#include <nx/network/http/line_splitter.h>
 
 
 namespace 

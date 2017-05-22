@@ -8,7 +8,7 @@
 #include <nx/utils/byte_stream/abstract_byte_stream_filter.h>
 
 #include "http_types.h"
-#include "linesplitter.h"
+#include "line_splitter.h"
 
 namespace nx_http {
 
