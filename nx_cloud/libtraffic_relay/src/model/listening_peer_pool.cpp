@@ -66,7 +66,7 @@ void ListeningPeerPool::addConnection(
 
         m_takeIdleConnectionRequestTimers.erase(awaitContext.expirationTimerIter);
 
-        addPeerExpirationTimer(lock, peerName, &peerContext);
+        startPeerExpirationTimer(lock, peerName, &peerContext);
 
         giveAwayConnection(
             std::move(connection),
@@ -164,7 +164,7 @@ void ListeningPeerPool::takeIdleConnection(
     peerContext.connections.pop_front();
 
     if (peerContext.connections.empty())
-        addPeerExpirationTimer(lock, peerContextIter->first, &peerContext);
+        startPeerExpirationTimer(lock, peerContextIter->first, &peerContext);
 
     giveAwayConnection(
         std::move(connectionContext.connection),
@@ -264,10 +264,14 @@ void ListeningPeerPool::closeConnection(
             return &context == connectionContextToErase;
         });
     if (connectionContextIter != peerContext.connections.end())
+    {
         peerContext.connections.erase(connectionContextIter);
+        if (peerContext.connections.empty())
+            startPeerExpirationTimer(lock, peerName, &peerContext);
+    }
 }
 
-void ListeningPeerPool::addPeerExpirationTimer(
+void ListeningPeerPool::startPeerExpirationTimer(
     const QnMutexLockerBase& /*lock*/,
     const std::string& peerName,
     ListeningPeerPool::PeerContext* peerContext)
@@ -275,19 +279,23 @@ void ListeningPeerPool::addPeerExpirationTimer(
     NX_ASSERT(!static_cast<bool>(peerContext->expirationTimer));
 
     auto timerIter = m_peerExpirationTimers.emplace(
-        std::chrono::steady_clock::now() + m_settings.listeningPeer().disconnectedPeerTimeout,
+        nx::utils::monotonicTime() + m_settings.listeningPeer().disconnectedPeerTimeout,
         peerName);
     peerContext->expirationTimer = timerIter;
 }
 
 void ListeningPeerPool::processExpirationTimers(const QnMutexLockerBase& /*lock*/)
 {
-    const auto currentTime = std::chrono::steady_clock::now();
+    const auto currentTime = nx::utils::monotonicTime();
     while (!m_peerExpirationTimers.empty() && 
         m_peerExpirationTimers.begin()->first <= currentTime)
     {
         const std::string& peerName = m_peerExpirationTimers.begin()->second;
-        m_peers.erase(peerName);
+
+        auto peerIter = m_peers.find(peerName);
+        NX_ASSERT(peerIter != m_peers.end());
+        NX_ASSERT(peerIter->second.takeConnectionRequestQueue.empty());
+        m_peers.erase(peerIter);
         m_peerExpirationTimers.erase(m_peerExpirationTimers.begin());
     }
 }

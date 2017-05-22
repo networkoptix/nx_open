@@ -17,6 +17,7 @@
 #include <model/listening_peer_pool.h>
 #include <settings.h>
 
+#include "../settings_loader.h"
 #include "../stream_socket_stub.h"
 
 namespace nx {
@@ -91,23 +92,14 @@ class ConnectSessionManager:
 {
 public:
     ConnectSessionManager():
-        m_clientSessionPool(m_settings),
-        m_listeningPeerPool(m_settings),
-        m_connectSessionManager(
-            std::make_unique<controller::ConnectSessionManager>(
-                m_settings,
-                &m_clientSessionPool,
-                &m_listeningPeerPool,
-                &m_trafficRelayStub)),
         m_peerName(nx::utils::generateRandomName(17).toStdString())
     {
-        std::array<const char*, 3> argv{
-            "--listeningPeer/maxPreemptiveConnectionCount=7",
-            "--listeningPeer/recommendedPreemptiveConnectionCount=4",
-            "--connectingPeer/connectSessionIdleTimeout=11s"
-        };
+        addArg("-listeningPeer/maxPreemptiveConnectionCount", "7");
+        addArg("-listeningPeer/recommendedPreemptiveConnectionCount", "4");
+        addArg("-listeningPeer/internalTimerPeriod", "1ms");
+        addArg("-connectingPeer/connectSessionIdleTimeout", "11s");
 
-        m_settings.load(static_cast<int>(argv.size()), argv.data());
+        m_settingsLoader.load();
 
         m_clientEndpoint.address = HostAddress::localhost;
         m_clientEndpoint.port = nx::utils::random::number<int>(10000, 50000);
@@ -115,6 +107,12 @@ public:
 
 protected:
     std::string m_expectedSessionId;
+
+    void addArg(const std::string& name, const std::string& value)
+    {
+        m_settingsLoader.addArg(name, value);
+        m_settingsLoader.load();
+    }
 
     void givenPeerConnectionCountAlreadyAtMaximum()
     {
@@ -126,7 +124,7 @@ protected:
 
         ASSERT_EQ(
             (std::size_t)kMaxPreemptiveConnectionCount,
-            m_listeningPeerPool.getConnectionCountByPeerName(m_peerName));
+            listeningPeerPool().getConnectionCountByPeerName(m_peerName));
     }
 
     void givenListeningPeer()
@@ -173,7 +171,7 @@ protected:
     void thenTcpConnectionHasBeenSavedToThePool()
     {
         ASSERT_EQ(api::ResultCode::ok, m_beginListeningResults.pop());
-        ASSERT_EQ(1U, m_listeningPeerPool.getConnectionCountByPeerName(m_peerName));
+        ASSERT_EQ(1U, listeningPeerPool().getConnectionCountByPeerName(m_peerName));
     }
 
     void thenRequestHasFailed()
@@ -189,6 +187,11 @@ protected:
     void thenConnectHasReportedNotFound()
     {
         ASSERT_EQ(api::ResultCode::notFound, m_connectResults.pop().code);
+    }
+
+    void thenConnectHasFailed()
+    {
+        ASSERT_NE(api::ResultCode::ok, m_connectResults.pop().code);
     }
 
     void thenProxyingHasBeenStarted()
@@ -243,7 +246,16 @@ protected:
 
     model::ClientSessionPool& clientSessionPool()
     {
-        return m_clientSessionPool;
+        if (!m_clientSessionPool)
+        {
+            m_settingsLoader.load();
+
+            m_clientSessionPool =
+                std::make_unique<model::ClientSessionPool>(
+                    m_settingsLoader.settings());
+        }
+
+        return *m_clientSessionPool;
     }
 
     TrafficRelayStub& trafficRelayStub()
@@ -253,7 +265,33 @@ protected:
 
     controller::ConnectSessionManager& connectSessionManager()
     {
+        if (!m_connectSessionManager)
+        {
+            m_settingsLoader.load();
+
+            m_connectSessionManager =
+                std::make_unique<controller::ConnectSessionManager>(
+                    m_settingsLoader.settings(),
+                    &clientSessionPool(),
+                    &listeningPeerPool(),
+                    &m_trafficRelayStub);
+        }
+
         return *m_connectSessionManager;
+    }
+
+    model::ListeningPeerPool& listeningPeerPool()
+    {
+        if (!m_listeningPeerPool)
+        {
+            m_settingsLoader.load();
+
+            m_listeningPeerPool = 
+                std::make_unique<model::ListeningPeerPool>(
+                    m_settingsLoader.settings());
+        }
+
+        return *m_listeningPeerPool;
     }
 
     std::string listeningPeerName() const
@@ -278,7 +316,7 @@ protected:
         api::BeginListeningRequest request;
         request.peerName = std::move(peerName);
 
-        m_connectSessionManager->beginListening(
+        connectSessionManager().beginListening(
             request,
             std::bind(&ConnectSessionManager::onBeginListeningCompletion, this, _1, _2, _3));
     }
@@ -314,9 +352,8 @@ private:
         api::CreateClientSessionResponse response;
     };
 
-    conf::Settings m_settings;
-    model::ClientSessionPool m_clientSessionPool;
-    model::ListeningPeerPool m_listeningPeerPool;
+    std::unique_ptr<model::ClientSessionPool> m_clientSessionPool;
+    std::unique_ptr<model::ListeningPeerPool> m_listeningPeerPool;
     TrafficRelayStub m_trafficRelayStub;
     std::unique_ptr<controller::ConnectSessionManager> m_connectSessionManager;
     std::string m_peerName;
@@ -326,6 +363,7 @@ private:
     relay::test::StreamSocketStub* m_lastClientConnection = nullptr;
     nx::utils::SyncQueue<CreateClientSessionResult> m_createClientSessionResults;
     SocketAddress m_clientEndpoint;
+    SettingsLoader m_settingsLoader;
 
     void onBeginListeningCompletion(
         api::ResultCode resultCode,
@@ -480,10 +518,8 @@ protected:
                         completed.set_value(resultCode);
                     });
                 const auto resultCode = completed.get_future().get();
-                if (resultCode == api::ResultCode::ok)
-                    continue;
-                ASSERT_EQ(api::ResultCode::notFound, resultCode);
-                break;
+                if (resultCode == api::ResultCode::notFound)
+                    break;
             }
         }
     }
@@ -532,6 +568,9 @@ TEST_F(
     ConnectSessionManagerConnectingPeer,
     all_client_sessions_are_closed_when_listening_peer_disappears)
 {
+    addArg("-listeningPeer/disconnectedPeerTimeout", "1ms");
+    addArg("-listeningPeer/takeIdleConnectionTimeout", "1ms");
+
     givenMultipleClientSessions();
     whenListeningPeerDisconnects();
     thenClientSessionsAreClosed();
@@ -587,7 +626,7 @@ protected:
     void thenNoConnectionCouldBeRetrievedWithinSameSession()
     {
         whenRequestedConnectionToPeer();
-        thenConnectHasReportedNotFound();
+        thenConnectHasFailed();
     }
 
 private:
@@ -612,6 +651,8 @@ TEST_F(
     ConnectSessionManagerConnectingByDomainName,
     all_connections_within_session_go_to_the_same_peer)
 {
+    addArg("-listeningPeer/takeIdleConnectionTimeout", "1ms");
+
     givenMultipleListeningPeersWithOneConnectionEach();
     whenRequestedConnectionByDomainName();
     thenConnectRequestSucceeded();
@@ -620,7 +661,7 @@ TEST_F(
 
 TEST_F(
     ConnectSessionManagerConnectingByDomainName,
-    all_connections_within_session_go_to_the_same_peer2)
+    all_connections_within_session_go_to_the_same_peer_2)
 {
     givenMultipleListeningPeersWithMultipleConnectionsEach();
     whenRequestedMultipleConnectionsByDomainName();

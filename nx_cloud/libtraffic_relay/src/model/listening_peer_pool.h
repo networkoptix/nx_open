@@ -125,7 +125,7 @@ private:
         ConnectionContext* connectionContext,
         SystemError::ErrorCode sysErrorCode);
 
-    void addPeerExpirationTimer(
+    void startPeerExpirationTimer(
         const QnMutexLockerBase& lock,
         const std::string& peerName,
         PeerContext* peerContext);

@@ -13,6 +13,7 @@
 #include <model/listening_peer_pool.h>
 #include <settings.h>
 
+#include "../settings_loader.h"
 #include "../stream_socket_stub.h"
 
 namespace nx {
@@ -33,15 +34,15 @@ public:
         m_peerName(nx::utils::generateRandomName(17).toStdString()),
         m_peerConnection(nullptr)
     {
-        m_args.emplace("-listeningPeer/disconnectedPeerTimeout", "1ms");
-        m_args.emplace("-listeningPeer/takeIdleConnectionTimeout", "1ms");
-        m_args.emplace("-listeningPeer/internalTimerPeriod", "1ms");
+        addArg("-listeningPeer/disconnectedPeerTimeout", "1ms");
+        addArg("-listeningPeer/takeIdleConnectionTimeout", "1ms");
+        addArg("-listeningPeer/internalTimerPeriod", "1ms");
     }
 
 protected:
     void addArg(const std::string& name, const std::string& value)
     {
-        m_args[name] = value;
+        m_settingsLoader.addArg(name, value);
     }
 
     void addConnection()
@@ -188,8 +189,7 @@ private:
     std::string m_peerName;
     relay::test::StreamSocketStub* m_peerConnection;
     nx::utils::SyncQueue<TakeIdleConnectionResult> m_takeIdleConnectionResults;
-    conf::Settings m_settings;
-    std::map<std::string, std::string> m_args;
+    SettingsLoader m_settingsLoader;
 
     void onTakeIdleConnectionCompletion(
         api::ResultCode resultCode,
@@ -202,16 +202,9 @@ private:
 
     void initializePool()
     {
-        std::vector<const char*> args;
-        for (const auto& nameAndValue: m_args)
-        {
-            args.push_back(nameAndValue.first.c_str());
-            args.push_back(nameAndValue.second.c_str());
-        }
-
-        m_settings.load((int)args.size(), args.data());
-
-        m_pool = std::make_unique<model::ListeningPeerPool>(m_settings);
+        m_settingsLoader.load();
+        m_pool = std::make_unique<model::ListeningPeerPool>(
+            m_settingsLoader.settings());
     }
 };
 
