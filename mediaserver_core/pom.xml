@@ -34,6 +34,24 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>nx_sdk</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_sdk/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_storage_sdk</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_storage_sdk/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>common</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
@@ -63,10 +81,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_streaming</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
-        </dependency>           
+        </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -76,7 +94,7 @@
             <scope>system</scope>
             <systemPath>${root.dir}/appserver2/pom.xml</systemPath>
         </dependency>
-        
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_fusion</artifactId>
@@ -84,13 +102,13 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_fusion/pom.xml</systemPath>
-        </dependency>         
+        </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_speech_synthesizer</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_speech_synthesizer/pom.xml</systemPath>
         </dependency>
@@ -118,12 +136,12 @@
                                 <argument>-vms-path</argument>
                                 <argument>${root.dir}</argument>
                                 <argument>-template-xml</argument>
-                                <argument>${root.dir}/mediaserver_core/api/api_template.xml</argument>                                
+                                <argument>${root.dir}/mediaserver_core/api/api_template.xml</argument>
                                 <argument>-output-xml</argument>
                                 <argument>${project.build.directory}/resources/static/api.xml</argument>
                             </arguments>
                         </configuration>
-                    </execution>                   
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
