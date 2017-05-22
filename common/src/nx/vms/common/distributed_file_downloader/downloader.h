@@ -57,6 +57,10 @@ public:
 
     QVector<QByteArray> getChunkChecksums(const QString& fileName);
 
+signals:
+    void downloadFinished(const QString& fileName);
+    void downloadFailed(const QString& fileName);
+
 private:
     QScopedPointer<DownloaderPrivate> const d_ptr;
     Q_DECLARE_PRIVATE(Downloader)

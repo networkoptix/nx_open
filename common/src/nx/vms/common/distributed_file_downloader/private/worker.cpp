@@ -129,6 +129,7 @@ Worker::Worker(
 
 Worker::~Worker()
 {
+    NX_VERBOSE(m_logTag, "Deleted.");
 }
 
 void Worker::start()

@@ -25,6 +25,9 @@ public:
     void createWorker(const QString& fileName);
 
 private:
+    void at_workerFinished(const QString& fileName);
+
+private:
     QnMutex mutex;
     QScopedPointer<Storage> storage;
     QHash<QString, Worker*> workers;
@@ -54,8 +57,29 @@ void DownloaderPrivate::createWorker(const QString& fileName)
         auto worker = new Worker(
             fileName, storage.data(), peerManagerFactory->createPeerManager());
         workers[fileName] = worker;
+
+        connect(worker, &Worker::finished, this, &DownloaderPrivate::at_workerFinished);
+        connect(worker, &Worker::failed, this, &DownloaderPrivate::at_workerFinished);
+
         worker->start();
     }
+}
+
+void DownloaderPrivate::at_workerFinished(const QString& fileName)
+{
+    auto worker = workers.take(fileName);
+    if (!worker)
+        return;
+
+    Q_Q(Downloader);
+
+    const auto state = worker->state();
+    if (state == Worker::State::finished)
+        emit q->downloadFinished(fileName);
+    else
+        emit q->downloadFailed(fileName);
+
+    delete worker;
 }
 
 //-------------------------------------------------------------------------------------------------
