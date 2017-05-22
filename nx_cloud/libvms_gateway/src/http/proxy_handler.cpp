@@ -1,6 +1,5 @@
 #include "proxy_handler.h"
 
-#include <nx/network/http/buffer_source.h>
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/ssl_socket.h>
@@ -71,29 +70,19 @@ void ProxyHandler::processRequest(
         std::bind(&ProxyHandler::onConnected, this, requestOptions.target, std::placeholders::_1));
 }
 
-void ProxyHandler::closeConnection(
-    SystemError::ErrorCode closeReason,
-    nx_http::AsyncMessagePipeline* connection)
+void ProxyHandler::setResponse(nx_http::Response responseMessage)
 {
-    NX_LOGX(lm("Connection to target peer %1 has been closed: %2")
-        .arg(connection->socket()->getForeignAddress().toString())
-        .arg(SystemError::toString(closeReason)),
-        cl_logDEBUG1);
-
-    NX_ASSERT(connection == m_targetHostPipeline.get());
-    if (auto handler = std::move(m_requestCompletionHandler))
-        handler(nx_http::StatusCode::serviceUnavailable);
+    *response() = std::move(responseMessage);
 }
 
-ProxyHandler::TargetWithOptions::TargetWithOptions(
-    nx_http::StatusCode::Value status_, SocketAddress target_)
-:
-    status(status_),
-    target(std::move(target_))
+void ProxyHandler::sendResponse(nx_http::RequestResult requestResult)
 {
+    decltype(m_requestCompletionHandler) handler;
+    handler.swap(m_requestCompletionHandler);
+    handler(std::move(requestResult));
 }
 
-ProxyHandler::TargetWithOptions ProxyHandler::cutTargetFromRequest(
+TargetWithOptions ProxyHandler::cutTargetFromRequest(
     const nx_http::HttpServerConnection& connection,
     nx_http::Request* const request)
 {
@@ -140,7 +129,7 @@ ProxyHandler::TargetWithOptions ProxyHandler::cutTargetFromRequest(
     return requestOptions;
 }
 
-ProxyHandler::TargetWithOptions ProxyHandler::cutTargetFromUrl(nx_http::Request* const request)
+TargetWithOptions ProxyHandler::cutTargetFromUrl(nx_http::Request* const request)
 {
     if (!m_settings.http().allowTargetEndpointInUrl)
         return {nx_http::StatusCode::forbidden};
@@ -161,7 +150,7 @@ ProxyHandler::TargetWithOptions ProxyHandler::cutTargetFromUrl(nx_http::Request*
     return {nx_http::StatusCode::ok, std::move(targetEndpoint)};
 }
 
-ProxyHandler::TargetWithOptions ProxyHandler::cutTargetFromPath(nx_http::Request* const request)
+TargetWithOptions ProxyHandler::cutTargetFromPath(nx_http::Request* const request)
 {
     // Parse path, expected format: /target[/some/longer/url].
     const auto path = request->requestLine.url.path();
@@ -220,7 +209,8 @@ ProxyHandler::TargetWithOptions ProxyHandler::cutTargetFromPath(nx_http::Request
 }
 
 void ProxyHandler::onConnected(
-    const SocketAddress& targetAddress, SystemError::ErrorCode errorCode)
+    const SocketAddress& targetAddress,
+    SystemError::ErrorCode errorCode)
 {
     static const auto isSsl =
         [](const std::unique_ptr<AbstractStreamSocket>& s)
@@ -245,61 +235,11 @@ void ProxyHandler::onConnected(
         .args(targetAddress, m_targetPeerSocket->getForeignAddress(), m_request.requestLine.url,
             m_targetPeerSocket->getLocalAddress(), isSsl(m_targetPeerSocket)), cl_logDEBUG2);
 
-    m_targetHostPipeline = std::make_unique<nx_http::AsyncMessagePipeline>(
+    m_requestProxyWorker = std::make_unique<RequestProxyWorker>(
+        TargetWithOptions(),
+        std::move(m_request),
         this,
         std::move(m_targetPeerSocket));
-    m_targetPeerSocket.reset();
-
-    m_targetHostPipeline->setMessageHandler(
-        std::bind(&ProxyHandler::onMessageFromTargetHost, this, std::placeholders::_1));
-    m_targetHostPipeline->startReadingConnection();
-
-    nx_http::Message requestMsg(nx_http::MessageType::request);
-    *requestMsg.request = std::move(m_request);
-    m_targetHostPipeline->sendMessage(std::move(requestMsg));
-}
-
-void ProxyHandler::onMessageFromTargetHost(nx_http::Message message)
-{
-    if (message.type != nx_http::MessageType::response)
-    {
-        NX_LOGX(lm("Received unexpected request from target host %1. Closing connection...")
-            .arg(m_targetHostPipeline->socket()->getForeignAddress()), cl_logDEBUG1);
-
-        auto handler = std::move(m_requestCompletionHandler);
-        handler(nx_http::StatusCode::serviceUnavailable);  //< TODO: #ak better status code.
-        return;
-    }
-
-    std::unique_ptr<nx_http::BufferSource> msgBody;
-    const auto contentTypeIter = message.response->headers.find("Content-Type");
-    if (contentTypeIter != message.response->headers.end())
-    {
-        nx_http::insertOrReplaceHeader(
-            &message.response->headers,
-            nx_http::HttpHeader("Content-Encoding", "identity"));
-        // No support for streaming body yet.
-        message.response->headers.erase("Transfer-Encoding");
-
-        msgBody = std::make_unique<nx_http::BufferSource>(
-            contentTypeIter->second,
-            std::move(message.response->messageBody));
-    }
-
-    const auto statusCode = message.response->statusLine.statusCode;
-
-    NX_LOGX(lm("Received response from target host %1. status %2, Content-Type %3")
-        .arg(m_targetHostPipeline->socket()->getForeignAddress().toString())
-        .arg(nx_http::StatusCode::toString(statusCode))
-        .arg(contentTypeIter != message.response->headers.end() ? contentTypeIter->second : lit("none")),
-        cl_logDEBUG2);
-
-    *response() = std::move(*message.response);
-    auto handler = std::move(m_requestCompletionHandler);
-    handler(
-        nx_http::RequestResult(
-            static_cast<nx_http::StatusCode::Value>(statusCode),
-            std::move(msgBody)));
 }
 
 } // namespace gateway

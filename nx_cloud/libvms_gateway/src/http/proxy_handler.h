@@ -1,8 +1,8 @@
 #pragma once
 
 #include <nx/network/http/server/abstract_http_request_handler.h>
-#include <nx/network/connection_server/base_stream_protocol_connection.h>
 
+#include "request_proxy_worker.h"
 #include "settings.h"
 
 namespace nx {
@@ -17,7 +17,7 @@ class RunTimeOptions;
 
 class ProxyHandler:
     public nx_http::AbstractHttpRequestHandler,
-    public network::server::StreamConnectionHolder<nx_http::AsyncMessagePipeline>
+    public AbstractResponseSender
 {
 public:
     ProxyHandler(
@@ -31,9 +31,8 @@ public:
         nx_http::Response* const response,
         nx_http::RequestProcessedHandler completionHandler) override;
 
-    virtual void closeConnection(
-        SystemError::ErrorCode closeReason,
-        nx_http::AsyncMessagePipeline* connection) override;
+    virtual void setResponse(nx_http::Response response) override;
+    virtual void sendResponse(nx_http::RequestResult requestResult) override;
 
 private:
     const conf::Settings& m_settings;
@@ -42,16 +41,7 @@ private:
     std::unique_ptr<AbstractStreamSocket> m_targetPeerSocket;
     nx_http::Request m_request;
     nx_http::RequestProcessedHandler m_requestCompletionHandler;
-    std::unique_ptr<nx_http::AsyncMessagePipeline> m_targetHostPipeline;
-
-    struct TargetWithOptions
-    {
-        nx_http::StatusCode::Value status = nx_http::StatusCode::notImplemented;
-        SocketAddress target;
-        conf::SslMode sslMode = conf::SslMode::followIncomingConnection;
-
-        TargetWithOptions(nx_http::StatusCode::Value status_, SocketAddress target_ = {});
-    };
+    std::unique_ptr<RequestProxyWorker> m_requestProxyWorker;
 
     TargetWithOptions cutTargetFromRequest(
         const nx_http::HttpServerConnection& connection,
@@ -61,7 +51,6 @@ private:
     TargetWithOptions cutTargetFromPath(nx_http::Request* const request);
 
     void onConnected(const SocketAddress& targetAddress, SystemError::ErrorCode errorCode);
-    void onMessageFromTargetHost(nx_http::Message message);
 };
 
 } // namespace gateway
