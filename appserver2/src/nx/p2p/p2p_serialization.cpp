@@ -110,7 +110,7 @@ QByteArray serializePeersMessage(
         result.truncate(writer.getBytesCount());
         return result;
     }
-    catch (...)
+    catch (const BitStreamException&)
     {
         return QByteArray();
     }
@@ -135,7 +135,7 @@ QVector<PeerDistanceRecord> deserializePeersMessage(const QByteArray& data, bool
             result.push_back(PeerDistanceRecord(peerNumber, distance));
         }
     }
-    catch (...)
+    catch (const BitStreamException&)
     {
         *success = false;
     }
@@ -168,7 +168,7 @@ QVector<PeerNumberType> deserializeCompressedPeers(const QByteArray& data, bool*
         while (reader.bitsLeft() >= 8)
             result.push_back(deserializeCompressPeerNumber(reader));
     }
-    catch (...)
+    catch (const BitStreamException&)
     {
         *success = false;
     }
@@ -207,7 +207,7 @@ QVector<SubscribeRecord> deserializeSubscribeRequest(const QByteArray& data, boo
         }
         *success = true;
     }
-    catch (...)
+    catch (const BitStreamException&)
     {
         *success = false;
     }
@@ -250,7 +250,7 @@ QList<QByteArray> deserializeTransactionList(const QByteArray& tranList, bool* s
         }
         *success = true;
     }
-    catch (...)
+    catch (const BitStreamException&)
     {
         *success = false;
     }
