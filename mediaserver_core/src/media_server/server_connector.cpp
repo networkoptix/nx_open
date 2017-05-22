@@ -47,8 +47,6 @@ void QnServerConnector::addConnection(const nx::vms::discovery::Manager::ModuleD
             NX_VERBOSE(this, lm("Module %1 change does not affect URL %2").args(module.id, newUrl));
             return;
         }
-
-        oldUrl = value;
         value = newUrl;
     }
 
