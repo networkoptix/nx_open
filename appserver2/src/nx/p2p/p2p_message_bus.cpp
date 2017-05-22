@@ -663,7 +663,7 @@ void MessageBus::doPeriodicTasksForServer()
 void MessageBus::doPeriodicTasksForClient()
 {
     QnMutexLocker lock(&m_mutex);
-    createOutgoingConnections(getCurrentSubscription()); //< open new connections
+    createOutgoingConnections(getCurrentSubscription()); //< Open new connections.
 }
 
 ApiPeerData MessageBus::localPeer() const
@@ -1397,14 +1397,14 @@ void MessageBus::emitPeerFoundLostSignals()
     std::set_difference(
         newAlivePeers.begin(),
         newAlivePeers.end(),
-        m_alivePeers.begin(),
-        m_alivePeers.end(),
+        m_lastAlivePeers.begin(),
+        m_lastAlivePeers.end(),
         std::inserter(newPeers, newPeers.begin()));
 
     std::vector<ApiPeerData> lostPeers;
     std::set_difference(
-        m_alivePeers.begin(),
-        m_alivePeers.end(),
+        m_lastAlivePeers.begin(),
+        m_lastAlivePeers.end(),
         newAlivePeers.begin(),
         newAlivePeers.end(),
         std::inserter(lostPeers, lostPeers.begin()));
@@ -1427,7 +1427,7 @@ void MessageBus::emitPeerFoundLostSignals()
         emit peerLost(peer);
     }
 
-    m_alivePeers = newAlivePeers;
+    m_lastAlivePeers = newAlivePeers;
 }
 
 void MessageBus::setDelayIntervals(const DelayIntervals& intervals)

@@ -288,7 +288,7 @@ private:
     int m_lastOutgoingIndex = 0;
     int m_connectionTries = 0;
     QElapsedTimer m_outConnectionsTimer;
-    std::set<ApiPeerData> m_alivePeers;
+    std::set<ApiPeerData> m_lastAlivePeers;
     DelayIntervals m_intervals;
 };
 
