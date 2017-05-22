@@ -972,10 +972,12 @@ namespace nx_hls
             }
         }
 
+        using namespace std::chrono;
+
         std::unique_ptr<HLSSession> newHlsSession(
             new HLSSession(
                 sessionID,
-                qnServerModule->roSettings()->value( nx_ms_conf::HLS_TARGET_DURATION_MS, nx_ms_conf::DEFAULT_TARGET_DURATION_MS).toUInt(),
+                duration_cast<milliseconds>(MSSettings::hlsTargetDuration()).count(),
                 !startTimestamp,   //if no start date specified, providing live stream
                 streamQuality,
                 videoCamera,
