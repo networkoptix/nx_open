@@ -382,14 +382,14 @@ void CloudServerSocket::onListenRequestCompleted(
         return;
     }
 
-    NX_LOGX(lm("Listen request has failed: %1")
-        .arg(QnLexical::serialized(resultCode)), cl_logDEBUG1);
+    NX_LOGX(lm("Listen request has failed: %1").arg(resultCode), cl_logDEBUG1);
 
     if (!m_mediatorRegistrationRetryTimer.scheduleNextTry(
             std::bind(&CloudServerSocket::retryRegistration, this)))
     {
         // It is not supposed to happen in production, is it?
-        NX_LOGX(lm("Stopped mediator registration retries"), cl_logWARNING);
+        NX_LOGX(lm("Stopped mediator registration retries. Last result code %1")
+            .arg(resultCode), cl_logWARNING);
         m_state = State::readyToListen;
         reportResult(SystemError::invalidData); //< TODO: #ak Use better error code.
     }
@@ -447,14 +447,14 @@ void CloudServerSocket::retryRegistration()
     issueRegistrationRequest();
 }
 
-void CloudServerSocket::reportResult(SystemError::ErrorCode sysErrorCode)
+void CloudServerSocket::reportResult(SystemError::ErrorCode systemErrorCode)
 {
     if (!m_savedAcceptHandler)
         return;
 
     decltype(m_savedAcceptHandler) acceptHandler;
     acceptHandler.swap(m_savedAcceptHandler);
-    acceptHandler(sysErrorCode, nullptr);
+    acceptHandler(systemErrorCode, nullptr);
 }
 
 void CloudServerSocket::acceptAsyncInternal(AcceptCompletionHandler handler)
