@@ -6,42 +6,25 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>721</width>
-    <height>88</height>
+    <width>818</width>
+    <height>111</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>Form</string>
-  </property>
-  <layout class="QHBoxLayout" name="horizontalLayout_2">
-   <item>
-    <widget class="QWidget" name="verticalWidget" native="true">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QLabel" name="captionLabel">
-        <property name="text">
-         <string>Some Caption</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="descriptionLabel">
-        <property name="text">
-         <string>Some description</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0,0">
    <item>
     <layout class="QHBoxLayout" name="buttonsLayout">
+     <item>
+      <widget class="QLabel" name="captionLabel">
+       <property name="font">
+        <font>
+         <pointsize>24</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>&lt;Some Caption&gt;</string>
+       </property>
+      </widget>
+     </item>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -56,6 +39,20 @@
       </spacer>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="descriptionLabel">
+     <property name="text">
+      <string>&lt;Some description&gt;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

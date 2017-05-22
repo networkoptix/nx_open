@@ -10,7 +10,6 @@ class QnImageButtonWidget;
 class QnTimeSlider;
 class QnTimeScrollBar;
 class QnWorkbenchNavigator;
-class QGraphicsProxyWidget;
 
 class QnNavigationItem : public QnFramedWidget, public QnWorkbenchContextAware
 {
@@ -57,7 +56,7 @@ protected:
     virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
 private:
-    QnImageButtonWidget* newActionButton(QnActions::IDType id);
+    QnImageButtonWidget* newActionButton(nx::client::desktop::ui::action::IDType id);
 
     bool isTimelineRelevant() const;
 

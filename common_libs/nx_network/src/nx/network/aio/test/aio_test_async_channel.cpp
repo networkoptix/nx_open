@@ -6,21 +6,22 @@ namespace aio {
 namespace test {
 
 AsyncChannel::AsyncChannel(
-    utils::pipeline::AbstractInput* input,
-    utils::pipeline::AbstractOutput* output,
+    utils::bstream::AbstractInput* input,
+    utils::bstream::AbstractOutput* output,
     InputDepletionPolicy inputDepletionPolicy)
     :
     m_input(input),
     m_output(output),
     m_inputDepletionPolicy(inputDepletionPolicy),
-    m_errorState(false),
     m_totalBytesRead(0),
     m_readPaused(false),
     m_readBuffer(nullptr),
     m_sendPaused(false),
     m_sendBuffer(nullptr),
     m_readScheduled(false),
-    m_readSequence(0)
+    m_readSequence(0),
+    m_readErrorsReported(0),
+    m_sendErrorsReported(0)
 {
     bindToAioThread(getAioThread());
 }
@@ -138,7 +139,37 @@ QByteArray AsyncChannel::dataRead() const
 
 void AsyncChannel::setErrorState()
 {
-    m_errorState = true;
+    QnMutexLocker lock(&m_mutex);
+    m_readErrorState = SystemError::connectionReset;
+    m_sendErrorState = SystemError::connectionReset;
+}
+
+void AsyncChannel::setSendErrorState(
+    boost::optional<SystemError::ErrorCode> sendErrorCode)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_sendErrorState = sendErrorCode;
+}
+
+void AsyncChannel::setReadErrorState(
+    boost::optional<SystemError::ErrorCode> sendErrorCode)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_readErrorState = sendErrorCode;
+}
+
+void AsyncChannel::waitForAnotherReadErrorReported()
+{
+    const auto readErrorsReported = m_readErrorsReported.load();
+    while (m_readErrorsReported == readErrorsReported)
+        std::this_thread::yield();
+}
+
+void AsyncChannel::waitForAnotherSendErrorReported()
+{
+    const auto sendErrorsReported = m_sendErrorsReported.load();
+    while (m_sendErrorsReported == sendErrorsReported)
+        std::this_thread::yield();
 }
 
 bool AsyncChannel::isReadScheduled() const
@@ -185,8 +216,18 @@ void AsyncChannel::performAsyncRead(const QnMutexLockerBase& /*lock*/)
     m_reader.post(
         [this]()
         {
-            if (m_errorState)
-                return reportIoCompletion(&m_readHandler, SystemError::connectionReset, (size_t)-1);
+            boost::optional<SystemError::ErrorCode> readErrorState;
+            {
+                QnMutexLocker lock(&m_mutex);
+                readErrorState = m_readErrorState;
+            }
+
+            if (readErrorState)
+            {
+                ++m_readErrorsReported;
+                reportIoCompletion(&m_readHandler, *readErrorState, (size_t)-1);
+                return;
+            }
 
             int bytesRead = m_input->read(
                 m_readBuffer->data() + m_readBuffer->size(),
@@ -201,14 +242,17 @@ void AsyncChannel::performAsyncRead(const QnMutexLockerBase& /*lock*/)
                 m_readBuffer->resize(m_readBuffer->size() + bytesRead);
                 m_readBuffer = nullptr;
 
+                nx::utils::ObjectDestructionFlag::Watcher thisWatcher(&m_destructionFlag);
                 reportIoCompletion(&m_readHandler, SystemError::noError, bytesRead);
+                if (thisWatcher.objectDestroyed())
+                    return;
 
                 if (!m_readScheduled)
                     ++m_readSequence;
                 return;
             }
 
-            if (bytesRead == utils::pipeline::StreamIoError::osError)
+            if (bytesRead == utils::bstream::StreamIoError::osError)
             {
                 reportIoCompletion(&m_readHandler, SystemError::connectionReset, (size_t)-1);
                 return;
@@ -226,9 +270,7 @@ void AsyncChannel::reportIoCompletion(
     if (ioCompletionHandler == &m_readHandler)
         m_readScheduled = false;
 
-    IoCompletionHandler handler;
-    handler.swap(*ioCompletionHandler);
-    handler(sysErrorCode, bytesTransferred);
+    nx::utils::swapAndCall(*ioCompletionHandler, sysErrorCode, bytesTransferred);
 }
 
 void AsyncChannel::performAsyncSend(const QnMutexLockerBase&)
@@ -241,9 +283,15 @@ void AsyncChannel::performAsyncSend(const QnMutexLockerBase&)
     m_writer.post(
         [this, buffer, handler = std::move(handler)]()
         {
-            if (m_errorState)
+            boost::optional<SystemError::ErrorCode> sendErrorState;
             {
-                handler(SystemError::connectionReset, (size_t)-1);
+                QnMutexLocker lock(&m_mutex);
+                sendErrorState = m_sendErrorState;
+            }
+            if (sendErrorState)
+            {
+                handler(*sendErrorState, (size_t)-1);
+                ++m_sendErrorsReported;
                 return;
             }
 

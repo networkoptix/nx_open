@@ -45,6 +45,7 @@ $radio-panels-selected-border: $gray-light;
 body {
   padding-bottom: 20px;
   height:100%;
+  overflow:hidden;
 }
 
 @media only screen and (device-width: 768px) {

@@ -537,7 +537,7 @@ void fromApiToResourceList(const ApiLicenseDataList& src, QnLicenseList& dst)
 
 void deserializeNetAddrList(const QString& source, QList<SocketAddress>& target)
 {
-    for (const auto& addr : source.split(L';'))
+    for (const auto& addr : source.split(L';', QString::SkipEmptyParts))
         target.push_back(addr);
 }
 

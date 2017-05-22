@@ -7,6 +7,8 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/thread/sync_queue.h>
+#include <nx/utils/test_support/test_options.h>
+
 #include <transaction/transaction.h>
 
 #include <api/global_settings.h>
@@ -21,9 +23,9 @@ constexpr static const auto kMaxTimeToWaitForChangesToBePropagatedToCloud = std:
 Ec2MserverCloudSynchronization::Ec2MserverCloudSynchronization()
 {
     const auto tmpDir =
-        (CdbLauncher::temporaryDirectoryPath().isEmpty()
+        (nx::utils::TestOptions::temporaryDirectoryPath().isEmpty()
             ? QDir::homePath()
-            : CdbLauncher::temporaryDirectoryPath()) + "/ec2_cloud_sync_ut.data";
+            : nx::utils::TestOptions::temporaryDirectoryPath()) + "/ec2_cloud_sync_ut.data";
     QDir(tmpDir).removeRecursively();
 
     const QString dbFileArg = lit("--dbFile=%1").arg(tmpDir);
@@ -707,7 +709,7 @@ api::ResultCode Ec2MserverCloudSynchronization::fetchCloudTransactionLog(
     ::ec2::ApiTransactionDataList* const transactionList)
 {
     const QUrl url(lm("http://%1%2?systemId=%3")
-        .str(cdb()->endpoint()).arg(kMaintenanceGetTransactionLog)
+        .arg(cdb()->endpoint()).arg(kMaintenanceGetTransactionLog)
         .arg(registeredSystemData().id));
     return fetchTransactionLog(url, transactionList);
 }
@@ -716,7 +718,7 @@ api::ResultCode Ec2MserverCloudSynchronization::fetchCloudTransactionLogFromMedi
     ::ec2::ApiTransactionDataList* const transactionList)
 {
     QUrl url(lm("http://%1/%2?cloud_only=true")
-        .str(appserver2()->moduleInstance()->endpoint()).arg("ec2/getTransactionLog"));
+        .arg(appserver2()->moduleInstance()->endpoint()).arg("ec2/getTransactionLog"));
     url.setUserName("admin");
     url.setPassword("admin");
     return fetchTransactionLog(url, transactionList);

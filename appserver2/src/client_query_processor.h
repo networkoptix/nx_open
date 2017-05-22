@@ -25,7 +25,7 @@
 #include "transaction/json_transaction_serializer.h"
 #include "transaction/transaction.h"
 #include "nx/fusion/serialization/ubjson.h"
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "api/model/audit/auth_session.h"
 #include <common/common_module.h>
 

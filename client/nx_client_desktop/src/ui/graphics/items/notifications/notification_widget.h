@@ -9,8 +9,8 @@
 #include <ui/graphics/items/generic/styled_tooltip_widget.h>
 #include <ui/graphics/items/generic/graphics_tooltip_widget.h>
 
-#include <ui/actions/actions.h>
-#include <ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 
 class QnProxyLabel;
 class HoverFocusProcessor;
@@ -49,10 +49,11 @@ public:
 
     QString text() const;
 
-    void addActionButton(const QIcon& icon,
-                         QnActions::IDType actionId = QnActions::NoAction,
-                         const QnActionParameters& parameters = QnActionParameters(),
-                         bool defaultAction = false);
+    void addActionButton(
+        const QIcon& icon,
+        nx::client::desktop::ui::action::IDType actionId = nx::client::desktop::ui::action::NoAction,
+        const nx::client::desktop::ui::action::Parameters& parameters = nx::client::desktop::ui::action::Parameters(),
+        bool defaultAction = false);
 
     QnNotificationLevel::Value notificationLevel() const;
     void setNotificationLevel(QnNotificationLevel::Value notificationLevel);
@@ -77,7 +78,8 @@ public:
 signals:
     void notificationLevelChanged();
     void closeTriggered();
-    void actionTriggered(QnActions::IDType actionId, const QnActionParameters& parameters);
+    void actionTriggered(nx::client::desktop::ui::action::IDType actionId,
+        const nx::client::desktop::ui::action::Parameters& parameters);
     void buttonClicked(const QString& alias);
     void linkActivated(const QString& link);
 
@@ -100,12 +102,19 @@ private slots:
 private:
     struct ActionData
     {
-        ActionData(): action(QnActions::NoAction) {}
-        ActionData(QnActions::IDType action) : action(action) {}
-        ActionData(QnActions::IDType action, const QnActionParameters& params): action(action), params(params) {}
+        ActionData(): action(nx::client::desktop::ui::action::NoAction) {}
+        ActionData(nx::client::desktop::ui::action::IDType action) : action(action) {}
+        ActionData(
+            nx::client::desktop::ui::action::IDType action,
+            const nx::client::desktop::ui::action::Parameters& params)
+            :
+            action(action),
+            params(params)
+        {
+        }
 
-        QnActions::IDType action;
-        QnActionParameters params;
+        nx::client::desktop::ui::action::IDType action;
+        nx::client::desktop::ui::action::Parameters params;
     };
 
     QList<ActionData> m_actions;

@@ -10,12 +10,9 @@
 #include "api/app_server_connection.h"
 #include "nx_ec/dummy_handler.h"
 #include "common/common_module.h"
-#include "network/module_finder.h"
+#include "nx/vms/discovery/manager.h"
 #include <nx/utils/log/log.h>
 #include "client/client_settings.h"
-#include "ui/workbench/workbench_context.h"
-#include "ui/actions/action_manager.h"
-#include "ui/actions/action.h"
 #include <network/authutil.h>
 #include <nx/network/http/asynchttpclient.h>
 

@@ -28,8 +28,12 @@ void TestAuthenticationManager::authenticate(
     }
     else
     {
-        completionHandler(
-            true, nx::utils::stree::ResourceContainer(), boost::none, nx_http::HttpHeaders(), nullptr);
+        completionHandler(nx_http::server::AuthenticationResult(
+            true,
+            nx::utils::stree::ResourceContainer(),
+            boost::none,
+            nx_http::HttpHeaders(),
+            nullptr));
     }
 }
 
@@ -40,34 +44,21 @@ void TestAuthenticationManager::setAuthenticationEnabled(bool value)
 
 //-------------------------------------------------------------------------------------------------
 
-TestHttpServer::TestHttpServer():
-    m_authenticationManager(&m_credentialsProvider)
-{
-    m_authenticationManager.setAuthenticationEnabled(false);
-
-    m_httpServer.reset(
-        new nx_http::HttpStreamSocketServer(
-            &m_authenticationManager,
-            &m_httpMessageDispatcher,
-            true,
-            nx::network::NatTraversalSupport::disabled));
-}
-
 TestHttpServer::~TestHttpServer()
 {
     m_httpServer->pleaseStopSync();
     NX_LOGX("Stopped", cl_logINFO);
 }
 
-bool TestHttpServer::bindAndListen()
+bool TestHttpServer::bindAndListen(const SocketAddress& endpoint)
 {
-    if (!m_httpServer->bind(SocketAddress(HostAddress::localhost, 0)))
+    if (!m_httpServer->bind(endpoint))
         return false;
 
     if (!m_httpServer->listen())
         return false;
 
-    NX_LOGX(lm("Started on %1").str(m_httpServer->address()), cl_logINFO);
+    NX_LOGX(lm("Started on %1").arg(m_httpServer->address()), cl_logINFO);
     return true;
 }
 
@@ -143,7 +134,7 @@ bool TestHttpServer::registerRedirectHandler(
 // class RandomlyFailingHttpConnection
 
 RandomlyFailingHttpConnection::RandomlyFailingHttpConnection(
-    StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
+    nx::network::server::StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
     std::unique_ptr<AbstractStreamSocket> sock)
     :
     BaseType(socketServer, std::move(sock)),
@@ -196,7 +187,7 @@ RandomlyFailingHttpServer::RandomlyFailingHttpServer(
     bool sslRequired,
     nx::network::NatTraversalSupport natTraversalSupport)
     :
-    BaseType(sslRequired, natTraversalSupport)
+    base_type(sslRequired, natTraversalSupport)
 {
 }
 

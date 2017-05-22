@@ -85,7 +85,7 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
 
     // TODO: #ak create http server composite class.
     std::unique_ptr<nx_http::MessageDispatcher> httpMessageDispatcher;
-    std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>>
+    std::unique_ptr<nx::network::server::MultiAddressServer<nx_http::HttpStreamSocketServer>>
         multiAddressHttpServer;
 
     launchHttpServerIfNeeded(
@@ -115,6 +115,9 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
     businessLogicComposite.stop();
     stunServerComposite.reset();
 
+    NX_LOGX(lit("%1 is stopped")
+        .arg(QnLibConnectionMediatorAppInfo::applicationDisplayName()), cl_logALWAYS);
+
     return result;
 }
 
@@ -122,8 +125,7 @@ bool MediatorProcess::launchHttpServerIfNeeded(
     const conf::Settings& settings,
     const PeerRegistrator& peerRegistrator,
     std::unique_ptr<nx_http::MessageDispatcher>* const httpMessageDispatcher,
-    std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>>* const
-        multiAddressHttpServer)
+    std::unique_ptr<nx::network::server::MultiAddressServer<nx_http::HttpStreamSocketServer>>* const multiAddressHttpServer)
 {
     if (settings.http().addrToListenList.empty())
         return true;
@@ -138,7 +140,7 @@ bool MediatorProcess::launchHttpServerIfNeeded(
         [&]() { return std::make_unique<http::GetListeningPeerListHandler>(peerRegistrator); });
     
     *multiAddressHttpServer =
-        std::make_unique<MultiAddressServer<nx_http::HttpStreamSocketServer>>(
+        std::make_unique<nx::network::server::MultiAddressServer<nx_http::HttpStreamSocketServer>>(
             nullptr,    //TODO #ak add authentication 
             httpMessageDispatcher->get(),
             false,

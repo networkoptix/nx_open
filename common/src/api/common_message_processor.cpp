@@ -30,6 +30,8 @@
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/status_dictionary.h>
+#include <core/resource_management/layout_tour_manager.h>
+
 #include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -167,6 +169,20 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(discoveryManager, &ec2::AbstractDiscoveryNotificationManager::discoveryInformationChanged, this, &QnCommonMessageProcessor::on_gotDiscoveryData);
     connect(discoveryManager, &ec2::AbstractDiscoveryNotificationManager::discoveredServerChanged, this, &QnCommonMessageProcessor::discoveredServerChanged);
 
+    auto layoutTourManager = connection->getLayoutTourNotificationManager();
+
+    connect(layoutTourManager,
+        &ec2::AbstractLayoutTourNotificationManager::addedOrUpdated,
+        this->layoutTourManager(),
+        &QnLayoutTourManager::addOrUpdateTour,
+        Qt::DirectConnection);
+
+    connect(layoutTourManager,
+        &ec2::AbstractLayoutTourNotificationManager::removed,
+        this->layoutTourManager(),
+        &QnLayoutTourManager::removeTour,
+        Qt::DirectConnection);
+
 #undef on_resourceUpdated
 }
 
@@ -184,11 +200,15 @@ void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
     connection->getDiscoveryNotificationManager()->disconnect(this);
     connection->getTimeNotificationManager()->disconnect(this);
     connection->getMiscNotificationManager()->disconnect(this);
+
+    layoutTourManager()->resetTours();
 }
 
 void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::ApiFullInfoData& fullData)
 {
     onGotInitialNotification(fullData);
+
+    //TODO: #GDM #3.1 logic is not perfect, who will clean them on disconnect?
     on_businessRuleReset(fullData.rules);
 }
 
@@ -202,13 +222,13 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &
     QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(data.id);
     if (!server) {
         if (!data.ignore) {
-            QList<QUrl> urls = QnServerAdditionalAddressesDictionary::instance()->additionalUrls(data.id);
+            QList<QUrl> urls = commonModule()->serverAdditionalAddressesDictionary()->additionalUrls(data.id);
             urls.append(url);
-            QnServerAdditionalAddressesDictionary::instance()->setAdditionalUrls(data.id, urls);
+            commonModule()->serverAdditionalAddressesDictionary()->setAdditionalUrls(data.id, urls);
         } else {
-            QList<QUrl> urls = QnServerAdditionalAddressesDictionary::instance()->ignoredUrls(data.id);
+            QList<QUrl> urls = commonModule()->serverAdditionalAddressesDictionary()->ignoredUrls(data.id);
             urls.append(url);
-            QnServerAdditionalAddressesDictionary::instance()->setIgnoredUrls(data.id, urls);
+            commonModule()->serverAdditionalAddressesDictionary()->setIgnoredUrls(data.id, urls);
         }
         return;
     }
@@ -653,7 +673,7 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
     resourceAccessManager()->beginUpdate();
     resourceAccessProvider()->beginUpdate();
 
-    QnServerAdditionalAddressesDictionary::instance()->clear();
+    commonModule()->serverAdditionalAddressesDictionary()->clear();
 
     resetResourceTypes(fullData.resourceTypes);
     resetResources(fullData);
@@ -666,6 +686,7 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
     resetUserRoles(fullData.userRoles);
     resetLicenses(fullData.licenses);
     resetTime();
+    layoutTourManager()->resetTours(fullData.layoutTours);
 
     resourceAccessProvider()->endUpdate();
     resourceAccessManager()->endUpdate();

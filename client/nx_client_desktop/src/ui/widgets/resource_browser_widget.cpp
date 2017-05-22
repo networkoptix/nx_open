@@ -39,8 +39,7 @@
 
 #include <nx/client/desktop/ui/workbench/workbench_animations.h>
 
-#include <ui/actions/action_manager.h>
-#include <ui/actions/action.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
 #include <ui/delegates/resource_item_delegate.h>
@@ -73,6 +72,8 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -141,9 +142,9 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     /* This is needed so that control's context menu is not embedded into the scene. */
     ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
 
-    m_renameActions.insert(QnActions::RenameResourceAction, new QAction(this));
-    m_renameActions.insert(QnActions::RenameVideowallEntityAction, new QAction(this));
-    m_renameActions.insert(QnActions::RenameLayoutTourAction, new QAction(this));
+    m_renameActions.insert(action::RenameResourceAction, new QAction(this));
+    m_renameActions.insert(action::RenameVideowallEntityAction, new QAction(this));
+    m_renameActions.insert(action::RenameLayoutTourAction, new QAction(this));
 
     setHelpTopic(this, Qn::MainWindow_Tree_Help);
     setHelpTopic(ui->searchTab, Qn::MainWindow_Tree_Search_Help);
@@ -313,21 +314,21 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint& pos, bool ignoreSe
     if (qnRuntime->isVideoWallMode())
         return;
 
-    QnActionManager* manager = context()->menu();
+    auto manager = context()->menu();
 
-    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, nullptr, ignoreSelection
-        ? QnActionParameters().withArgument(Qn::NodeTypeRole, Qn::RootNode)
-        : currentParameters(Qn::TreeScope)));
+    QScopedPointer<QMenu> menu(manager->newMenu(action::TreeScope, nullptr, ignoreSelection
+        ? action::Parameters{Qn::NodeTypeRole, Qn::RootNode}
+        : currentParameters(action::TreeScope)));
 
     if (currentTreeWidget() == ui->searchTreeWidget)
     {
         /* Disable rename action for search view. */
-        for (QnActions::IDType key : m_renameActions.keys())
+        for (action::IDType key : m_renameActions.keys())
             manager->redirectAction(menu.data(), key, nullptr);
     }
     else
     {
-        for (QnActions::IDType key : m_renameActions.keys())
+        for (action::IDType key : m_renameActions.keys())
             manager->redirectAction(menu.data(), key, m_renameActions[key]);
     }
 
@@ -463,9 +464,9 @@ QnVideoWallMatrixIndexList QnResourceBrowserWidget::selectedVideoWallMatrices() 
     return result;
 }
 
-Qn::ActionScope QnResourceBrowserWidget::currentScope() const
+action::ActionScope QnResourceBrowserWidget::currentScope() const
 {
-    return Qn::TreeScope;
+    return action::TreeScope;
 }
 
 QString QnResourceBrowserWidget::toolTipAt(const QPointF& pos) const
@@ -563,17 +564,19 @@ bool QnResourceBrowserWidget::isScrollBarVisible() const
     return currentTreeWidget()->treeView()->verticalScrollBar()->isVisible();
 }
 
-QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope scope) const
+action::Parameters QnResourceBrowserWidget::currentParameters(action::ActionScope scope) const
 {
-    if (scope != Qn::TreeScope)
-        return QnActionParameters();
+    if (scope != action::TreeScope)
+        return action::Parameters();
+
+    //TODO: #GDM #3.1 refactor to a simple switch by node type
 
     QItemSelectionModel* selectionModel = currentSelectionModel();
     QModelIndex index = selectionModel->currentIndex();
 
     Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
 
-    auto withNodeType = [nodeType](QnActionParameters parameters)
+    auto withNodeType = [nodeType](action::Parameters parameters)
         {
             return parameters.withArgument(Qn::NodeTypeRole, nodeType);
         };
@@ -586,8 +589,8 @@ QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope sc
             return withNodeType(selectedVideoWallMatrices());
         case Qn::CloudSystemNode:
         {
-            QnActionParameters result;
-            result.setArgument(Qn::CloudSystemIdRole, index.data(Qn::CloudSystemIdRole).toString());
+            action::Parameters result{Qn::CloudSystemIdRole,
+                index.data(Qn::CloudSystemIdRole).toString()};
             return withNodeType(result);
         }
         case Qn::LayoutItemNode:
@@ -597,7 +600,7 @@ QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope sc
             break;
     }
 
-    QnActionParameters result(selectedResources());
+    action::Parameters result(selectedResources());
 
     /* For working with shared layout links we must know owning user resource. */
     QModelIndex parentIndex = index.parent();
@@ -910,7 +913,7 @@ void QnResourceBrowserWidget::at_thumbnailClicked()
     if (!m_tooltipWidget || !m_tooltipResource)
         return;
 
-    menu()->trigger(QnActions::OpenInCurrentLayoutAction, m_tooltipResource);
+    menu()->trigger(action::OpenInCurrentLayoutAction, m_tooltipResource);
 }
 
 void QnResourceBrowserWidget::setupInitialModelCriteria(QnResourceSearchProxyModel* model) const
@@ -935,16 +938,23 @@ void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool
 
     if (nodeType == Qn::CloudSystemNode)
     {
-        menu()->trigger(QnActions::ConnectToCloudSystemAction, QnActionParameters()
-            .withArgument(Qn::CloudSystemIdRole, index.data(Qn::CloudSystemIdRole).toString()));
+        menu()->trigger(action::ConnectToCloudSystemAction,
+            {Qn::CloudSystemIdRole, index.data(Qn::CloudSystemIdRole).toString()});
         return;
     }
 
     if (nodeType == Qn::VideoWallItemNode)
     {
         auto item = resourcePool()->getVideoWallItemByUuid(index.data(Qn::UuidRole).value<QnUuid>());
-        menu()->triggerIfPossible(QnActions::StartVideoWallControlAction,
+        menu()->triggerIfPossible(action::StartVideoWallControlAction,
             QnVideoWallItemIndexList() << item);
+        return;
+    }
+
+    if (nodeType == Qn::LayoutTourNode)
+    {
+        menu()->triggerIfPossible(action::ReviewLayoutTourAction,
+            {Qn::UuidRole, index.data(Qn::UuidRole).value<QnUuid>()});
         return;
     }
 
@@ -957,7 +967,20 @@ void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool
     if (nodeType == Qn::ResourceNode && resource->hasFlags(Qn::server) && withMouse)
         return;
 
-    menu()->trigger(QnActions::DropResourcesAction, resource);
+    // Layouts are always handled the same way, independently of other circumstances.
+    if (resource->hasFlags(Qn::layout))
+    {
+        menu()->trigger(action::OpenAnyNumberOfLayoutsAction, resource);
+        return;
+    }
+
+    // Double click shouldn't do anything in layout tour review mode.
+    const bool isLayoutTourReviewMode = workbench()->currentLayout()->data()
+        .contains(Qn::LayoutTourUuidRole);
+
+    // Really we should check all special layout modes here
+    if (!isLayoutTourReviewMode)
+        menu()->trigger(action::DropResourcesAction, resource);
 }
 
 void QnResourceBrowserWidget::setTooltipResource(const QnResourcePtr& resource)

@@ -394,7 +394,6 @@ QnConstResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
     {
         m_videoLayout.reset( new QnCustomResourceVideoLayout(QSize(1, 1)) );
 
-        bool found = false;
         m_metadata = QnAviArchiveMetadata::loadFromFile(m_formatContext);
 
         if (QnAviResourcePtr aviRes = m_resource.dynamicCast<QnAviResource>())

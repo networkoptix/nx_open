@@ -62,7 +62,19 @@ const QnRestProcessorPool::Handlers& QnRestProcessorPool::handlers() const
     return m_handlers;
 }
 
+void QnRestProcessorPool::registerRedirectRule( const QString& path, const QString& newPath )
+{
+    m_redirectRules.insert( path, newPath );
+}
 
+boost::optional<QString> QnRestProcessorPool::getRedirectRule( const QString& path )
+{
+    const auto it = m_redirectRules.find( path );
+    if (it != m_redirectRules.end())
+        return it.value();
+    else
+        return boost::none;
+}
 
 class QnRestConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
@@ -152,7 +164,7 @@ void QnRestConnectionProcessor::run()
     if ( nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->response.messageBody.isEmpty() && rez == CODE_OK)
     {
         if (!contentType.contains("image")) {
-            d->response.messageBody = nx::utils::bsf::gzip::Compressor::compressData(d->response.messageBody);
+            d->response.messageBody = nx::utils::bstream::gzip::Compressor::compressData(d->response.messageBody);
             contentEncoding = "gzip";
         }
     }

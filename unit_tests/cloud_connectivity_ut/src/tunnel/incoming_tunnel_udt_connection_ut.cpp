@@ -208,7 +208,7 @@ TEST_F(IncomingTunnelConnectionTest, SynAck)
 
                         size_t processed;
                         ASSERT_EQ(parser.parse(buffer, &processed),
-                                  nx_api::ParserState::done);
+                                  nx::network::server::ParserState::done);
                         ASSERT_EQ(response.header.messageClass,
                                   stun::MessageClass::successResponse);
                         ASSERT_EQ(response.header.method,

@@ -31,6 +31,8 @@ public:
         SharedLayout,
         Layouts,
         SharedLayouts,
+        LayoutTour,
+        LayoutTours,
 
         Camera,
         Cameras,

@@ -28,12 +28,12 @@
 #include "health/system_health.h"
 #include "platform/platform_abstraction.h"
 #include <nx/utils/log/log.h>
+#include <nx/vms/discovery/manager.h>
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
 class QnServerMessageProcessor;
 struct QnModuleInformation;
-class QnModuleFinder;
 struct QnPeerRuntimeInfo;
 class QnLdapManager;
 struct BeforeRestoreDbData;
@@ -129,7 +129,7 @@ private slots:
     void at_archiveBackupFinished(qint64 backedUpToMs, QnBusiness::EventReason code);
     void at_timer();
     void at_connectionOpened();
-    void at_serverModuleConflict(const QnModuleInformation &moduleInformation, const SocketAddress &address);
+    void at_serverModuleConflict(nx::vms::discovery::Manager::ModuleData module);
 
     void at_appStarted();
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
@@ -162,13 +162,11 @@ private:
     void performActionsOnExit();
     void parseCommandLineParameters(int argc, char* argv[]);
     void updateAllowedInterfaces();
-    void addCommandLineParametersFromConfig();
+    void addCommandLineParametersFromConfig(MSSettings* settings);
     void saveServerInfo(const QnMediaServerResourcePtr& server);
 
-    void serviceModePreInit();
-    void initTransactionLog(const QString& logDir, QnLogLevel level);
-    void initPermissionsLog(const QString& logDir, QnLogLevel level);
-    QString hardwareIdAsGuid();
+    void serviceModeInit();
+    QString hardwareIdAsGuid() const;
     void updateGuidIfNeeded();
 private:
     int m_argc;

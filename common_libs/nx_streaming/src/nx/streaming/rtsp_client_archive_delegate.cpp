@@ -30,7 +30,7 @@ extern "C"
 #include <nx/streaming/rtp_stream_parser.h>
 #include <network/ffmpeg_sdp.h>
 #include <QtConcurrent/QtConcurrentFilter>
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/rtsp_client.h>
@@ -208,13 +208,12 @@ void QnRtspClientArchiveDelegate::checkGlobalTimeAsync(const QnSecurityCamResour
 
 void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnSecurityCamResourcePtr &camera)
 {
-    if (!camera && !camera->resourcePool())
+    if (!camera || !camera->resourcePool())
     {
         m_globalMinArchiveTime = qint64(AV_NOPTS_VALUE);
         return;
     }
 
-    auto currentServer = camera->resourcePool()->getResourceById(camera->getParentId());
     QnMediaServerResourceList mediaServerList = camera->commonModule()->cameraHistoryPool()->getCameraFootageData(camera, true);
 
     /* Check if no archive available on any server. */
@@ -574,7 +573,6 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
                         << " expectedTime=" << QDateTime::fromMSecsSinceEpoch(m_lastSeekTime/1000).toString("hh:mm:ss.zzz")
                         << " packetTime=" << QDateTime::fromMSecsSinceEpoch(result->timestamp/1000).toString("hh:mm:ss.zzz");
                     str.flush();
-                    cl_log.log(s, cl_logALWAYS);
                 }
                 m_waitBOF = false;
             }

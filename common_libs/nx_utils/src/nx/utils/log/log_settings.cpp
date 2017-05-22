@@ -1,8 +1,6 @@
 #include "log_settings.h"
 
-#include <QtCore/QDir>
-
-#include "../app_info.h"
+#include <nx/utils/settings.h>
 
 namespace nx {
 namespace utils {
@@ -16,10 +14,14 @@ void Settings::load(const QnSettings& settings, const QString& prefix)
             return QString(lm("%1/%2").arg(prefix).arg(key));
         };
 
-    const auto confLevel = 
-        QnLog::logLevelFromString(settings.value(makeKey("logLevel")).toString());
+    const auto confLevel = levelFromString(settings.value(makeKey("logLevel")).toString());
     if (confLevel != cl_logUNKNOWN)
         level = confLevel;
+
+    const auto filters = settings.value(makeKey("exceptionFilters"))
+        .toString().splitRef(QChar(','));
+    for (const auto& f: filters)
+        exceptionFilers.insert(f.toString());
 
     directory = settings.value(makeKey("logDir")).toString();
     maxBackupCount = (quint8)settings.value(makeKey("maxBackupCount"), 5).toInt();

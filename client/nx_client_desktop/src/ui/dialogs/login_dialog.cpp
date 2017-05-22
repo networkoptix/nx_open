@@ -20,7 +20,7 @@
 
 #include <core/resource/resource.h>
 
-#include <network/module_finder.h>
+#include <nx/vms/discovery/manager.h>
 #include <network/networkoptixmodulerevealcommon.h>
 #include <network/system_helpers.h>
 
@@ -40,7 +40,7 @@
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <plugins/resource/avi/filetypesupport.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/dialogs/connection_name_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h>
@@ -54,6 +54,8 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
 #include <helpers/system_helpers.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -246,15 +248,10 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
     /* Should be done after model resetting to avoid state loss. */
     ui->autoLoginCheckBox->setChecked(qnSettings->autoLogin());
 
-    connect(qnModuleFinder, &QnModuleFinder::moduleChanged, this,
-        &QnLoginDialog::at_moduleFinder_moduleChanged);
-    connect(qnModuleFinder, &QnModuleFinder::moduleAddressFound, this,
-        &QnLoginDialog::at_moduleFinder_moduleChanged);
-    connect(qnModuleFinder, &QnModuleFinder::moduleLost, this,
-        &QnLoginDialog::at_moduleFinder_moduleLost);
-
-    for(const auto& moduleInformation: qnModuleFinder->foundModules())
-        at_moduleFinder_moduleChanged(moduleInformation);
+    commonModule()->moduleDiscoveryManager()->onSignals(this,
+        &QnLoginDialog::at_moduleChanged,
+        &QnLoginDialog::at_moduleChanged,
+        &QnLoginDialog::at_moduleLost);
 }
 
 QnLoginDialog::~QnLoginDialog()
@@ -325,20 +322,20 @@ void QnLoginDialog::accept()
                     qnSettings->save();
 
                     const bool autoLogin = ui->autoLoginCheckBox->isChecked();
-                    QnActionParameters params;
+                    action::Parameters params;
                     const bool storePassword =
                         (haveToStorePassword(connectionInfo.localSystemId, url) || autoLogin);
                     params.setArgument(Qn::UrlRole, url);
                     params.setArgument(Qn::AutoLoginRole, autoLogin);
                     params.setArgument(Qn::StorePasswordRole, storePassword);
                     params.setArgument(Qn::ForceRole, true);
-                    menu()->trigger(QnActions::ConnectAction, params);
+                    menu()->trigger(action::ConnectAction, params);
 
                     break;
                 }
                 case Qn::IncompatibleProtocolConnectionResult:
                 case Qn::IncompatibleCloudHostConnectionResult:
-                    menu()->trigger(QnActions::DelayedForcedExitAction);
+                    menu()->trigger(action::DelayedForcedExitAction);
                     break; // to avoid cycle
                 default:    //error
                     return;
@@ -658,7 +655,7 @@ void QnLoginDialog::at_saveButton_clicked()
             QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, this);
 
         dialog.addCustomButton(QnMessageBoxCustomButton::Overwrite,
-            QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+            QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
         if (dialog.exec() == QDialogButtonBox::Cancel)
             return;
 
@@ -715,7 +712,7 @@ void QnLoginDialog::at_deleteButton_clicked()
         this);
 
     dialog.addCustomButton(QnMessageBoxCustomButton::Delete,
-        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+        QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
@@ -725,10 +722,8 @@ void QnLoginDialog::at_deleteButton_clicked()
     resetConnectionsModel();
 }
 
-void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation)
+void QnLoginDialog::at_moduleChanged(nx::vms::discovery::Manager::ModuleData module)
 {
-    auto addresses = qnModuleFinder->moduleAddresses(moduleInformation.id);
-
     auto isCloudAddress =
         [](const HostAddress& address) -> bool
         {
@@ -743,38 +738,25 @@ void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &mod
         };
 
     bool loopback = false;
-    SocketAddress address;
-
-    for (const auto& current: addresses)
+    if (!isCloudAddress(module.endpoint.address))
     {
-        if (isCloudAddress(current.address))
-            continue;
-
-        address = current;
-
-        loopback = isLoopback(current.address);
-        if (loopback)
-            break;
+        loopback = isLoopback(module.endpoint.address);
     }
-
-    if (address.isNull())
+    else
     {
-        at_moduleFinder_moduleLost(moduleInformation);
+        at_moduleLost(module.id);
         return;
     }
 
     QnFoundSystemData data;
-    data.info = moduleInformation;
+    data.info = module;
     data.url.setScheme(lit("http"));
-    data.url.setHost(address.address.toString());
-    data.url.setPort(address.port);
+    data.url.setHost(module.endpoint.address.toString());
+    data.url.setPort(module.endpoint.port);
 
-    if (m_foundSystems.contains(moduleInformation.id))
+    if (m_foundSystems.contains(module.id))
     {
-        QnFoundSystemData& oldData = m_foundSystems[moduleInformation.id];
-        if (!loopback && addresses.contains(oldData.url.host()))
-            data.url.setHost(oldData.url.host());
-
+        QnFoundSystemData& oldData = m_foundSystems[module.id];
         if (oldData != data)
         {
             oldData = data;
@@ -783,13 +765,13 @@ void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &mod
     }
     else
     {
-        m_foundSystems.insert(moduleInformation.id, data);
+        m_foundSystems.insert(module.id, data);
         resetAutoFoundConnectionsModel();
     }
 }
 
-void QnLoginDialog::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation)
+void QnLoginDialog::at_moduleLost(QnUuid id)
 {
-    if (m_foundSystems.remove(moduleInformation.id))
+    if (m_foundSystems.remove(id))
         resetAutoFoundConnectionsModel();
 }

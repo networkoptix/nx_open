@@ -8,15 +8,6 @@ BufferSource::BufferSource(StringType mimeType, BufferType msgBody):
 {
 }
 
-BufferSource::~BufferSource()
-{
-    stopWhileInAioThread();
-}
-
-void BufferSource::stopWhileInAioThread()
-{
-}
-
 StringType BufferSource::mimeType() const
 {
     return m_mimeType;
@@ -32,8 +23,8 @@ void BufferSource::readAsync(
         void(SystemError::ErrorCode, BufferType)
     > completionHandler)
 {
-    auto outMsgBody = std::move(m_msgBody);
-    m_msgBody = BufferType();   //moving to valid state
+    BufferType outMsgBody;
+    outMsgBody.swap(m_msgBody);
     completionHandler(SystemError::noError, std::move(outMsgBody));
 }
 

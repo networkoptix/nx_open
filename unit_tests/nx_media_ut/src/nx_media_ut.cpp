@@ -240,7 +240,7 @@ protected:
 private:
     void debugLogStreams()
     {
-        if (!QnLog::logs() || QnLog::logs()->get()->logLevel() < cl_logDEBUG1)
+        if (!nx::utils::log::isToBeLogged(nx::utils::log::Level::debug))
             return;
 
         for (const auto& stream: mediaStreams().streams)

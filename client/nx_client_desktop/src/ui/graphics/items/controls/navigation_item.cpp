@@ -4,7 +4,6 @@
 #include <QtCore/QCoreApplication>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QGraphicsLinearLayout>
-#include <QtWidgets/QGraphicsProxyWidget>
 
 #include <common/common_globals.h>
 
@@ -14,7 +13,7 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/synctime.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <ui/common/palette.h>
 #include <ui/style/skin.h>
@@ -48,6 +47,8 @@
 #include "timeline_placeholder.h"
 #include "clock_label.h"
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 
 /* Speed and volume slider tooltip autohide delay: */
@@ -73,43 +74,43 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     setFrameWidth(1.0);
 
     /* Create buttons. */
-    m_jumpBackwardButton = newActionButton(QnActions::JumpToStartAction);
+    m_jumpBackwardButton = newActionButton(action::JumpToStartAction);
     m_jumpBackwardButton->setIcon(qnSkin->icon("slider/navigation/rewind_backward.png"));
     m_jumpBackwardButton->setPreferredSize(32, 32);
 
-    m_stepBackwardButton = newActionButton(QnActions::PreviousFrameAction);
+    m_stepBackwardButton = newActionButton(action::PreviousFrameAction);
     m_stepBackwardButton->setIcon(qnSkin->icon("slider/navigation/step_backward.png"));
     m_stepBackwardButton->setPreferredSize(32, 32);
 
-    m_playButton = newActionButton(QnActions::PlayPauseAction);
+    m_playButton = newActionButton(action::PlayPauseAction);
     m_playButton->setIcon(qnSkin->icon("slider/navigation/play.png", "slider/navigation/pause.png"));
     m_playButton->setPreferredSize(32, 32);
 
-    m_stepForwardButton = newActionButton(QnActions::NextFrameAction);
+    m_stepForwardButton = newActionButton(action::NextFrameAction);
     m_stepForwardButton->setIcon(qnSkin->icon("slider/navigation/step_forward.png"));
     m_stepForwardButton->setPreferredSize(32, 32);
 
-    m_jumpForwardButton = newActionButton(QnActions::JumpToEndAction);
+    m_jumpForwardButton = newActionButton(action::JumpToEndAction);
     m_jumpForwardButton->setIcon(qnSkin->icon("slider/navigation/rewind_forward.png"));
     m_jumpForwardButton->setPreferredSize(32, 32);
 
-    m_muteButton = newActionButton(QnActions::ToggleMuteAction);
+    m_muteButton = newActionButton(action::ToggleMuteAction);
     m_muteButton->setIcon(qnSkin->icon("slider/buttons/unmute.png", "slider/buttons/mute.png"));
     m_muteButton->setPreferredSize(24, 24);
 
-    m_liveButton = newActionButton(QnActions::JumpToLiveAction);
+    m_liveButton = newActionButton(action::JumpToLiveAction);
     m_liveButton->setIcon(qnSkin->icon("slider/buttons/live.png"));
     m_liveButton->setPreferredSize(52, 24);
 
-    m_syncButton = newActionButton(QnActions::ToggleSyncAction);
+    m_syncButton = newActionButton(action::ToggleSyncAction);
     m_syncButton->setIcon(qnSkin->icon("slider/buttons/sync.png"));
     m_syncButton->setPreferredSize(52, 24);
 
-    m_bookmarksModeButton = newActionButton(QnActions::BookmarksModeAction);
+    m_bookmarksModeButton = newActionButton(action::BookmarksModeAction);
     m_bookmarksModeButton->setIcon(qnSkin->icon("slider/buttons/bookmarks.png"));
     m_bookmarksModeButton->setPreferredSize(52, 24);
 
-    m_calendarButton = newActionButton(QnActions::ToggleCalendarAction);
+    m_calendarButton = newActionButton(action::ToggleCalendarAction);
     m_calendarButton->setIcon(qnSkin->icon("slider/buttons/calendar.png"));
     m_calendarButton->setPreferredSize(52, 24);
 
@@ -245,19 +246,19 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     connect(m_speedSlider,      &QnSpeedSlider::roundedSpeedChanged,                this,           &QnNavigationItem::updateNavigatorSpeedFromSpeedSlider);
     connect(m_volumeSlider,     &QnVolumeSlider::valueChanged,                      this,           &QnNavigationItem::updateMuteButtonChecked);
 
-    connect(action(QnActions::PreviousFrameAction), &QAction::triggered,            this,           &QnNavigationItem::at_stepBackwardButton_clicked);
-    connect(action(QnActions::NextFrameAction),     &QAction::triggered,            this,           &QnNavigationItem::at_stepForwardButton_clicked);
-    connect(action(QnActions::JumpToStartAction),   &QAction::triggered,            navigator(),    &QnWorkbenchNavigator::jumpBackward);
-    connect(action(QnActions::JumpToEndAction),     &QAction::triggered,            navigator(),    &QnWorkbenchNavigator::jumpForward);
-    connect(action(QnActions::JumpToLiveAction),    &QAction::triggered,            this,           &QnNavigationItem::at_liveButton_clicked);
-    connect(action(QnActions::ToggleSyncAction),    &QAction::triggered,            this,           &QnNavigationItem::at_syncButton_clicked);
-    connect(action(QnActions::PlayPauseAction),     &QAction::toggled,              navigator(),    &QnWorkbenchNavigator::setPlaying);
-    connect(action(QnActions::PlayPauseAction),     &QAction::toggled,              this,           &QnNavigationItem::updateSpeedSliderParametersFromNavigator);
-    connect(action(QnActions::PlayPauseAction),     &QAction::toggled,              this,           &QnNavigationItem::updatePlaybackButtonsIcons);
+    connect(action(action::PreviousFrameAction), &QAction::triggered,            this,           &QnNavigationItem::at_stepBackwardButton_clicked);
+    connect(action(action::NextFrameAction),     &QAction::triggered,            this,           &QnNavigationItem::at_stepForwardButton_clicked);
+    connect(action(action::JumpToStartAction),   &QAction::triggered,            navigator(),    &QnWorkbenchNavigator::jumpBackward);
+    connect(action(action::JumpToEndAction),     &QAction::triggered,            navigator(),    &QnWorkbenchNavigator::jumpForward);
+    connect(action(action::JumpToLiveAction),    &QAction::triggered,            this,           &QnNavigationItem::at_liveButton_clicked);
+    connect(action(action::ToggleSyncAction),    &QAction::triggered,            this,           &QnNavigationItem::at_syncButton_clicked);
+    connect(action(action::PlayPauseAction),     &QAction::toggled,              navigator(),    &QnWorkbenchNavigator::setPlaying);
+    connect(action(action::PlayPauseAction),     &QAction::toggled,              this,           &QnNavigationItem::updateSpeedSliderParametersFromNavigator);
+    connect(action(action::PlayPauseAction),     &QAction::toggled,              this,           &QnNavigationItem::updatePlaybackButtonsIcons);
 
-    connect(action(QnActions::ToggleMuteAction),    &QAction::toggled,              m_volumeSlider, &QnVolumeSlider::setMute);
-    connect(action(QnActions::VolumeUpAction),      &QAction::triggered,            m_volumeSlider, &QnVolumeSlider::stepForward);
-    connect(action(QnActions::VolumeDownAction),    &QAction::triggered,            m_volumeSlider, &QnVolumeSlider::stepBackward);
+    connect(action(action::ToggleMuteAction),    &QAction::toggled,              m_volumeSlider, &QnVolumeSlider::setMute);
+    connect(action(action::VolumeUpAction),      &QAction::triggered,            m_volumeSlider, &QnVolumeSlider::stepForward);
+    connect(action(action::VolumeDownAction),    &QAction::triggered,            m_volumeSlider, &QnVolumeSlider::stepBackward);
 
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetAboutToBeChanged, this, [this]()
     {
@@ -296,19 +297,19 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this, &QnNavigationItem::updateBookButtonEnabled);
 
     /* Register actions. */
-    addAction(action(QnActions::PreviousFrameAction));
-    addAction(action(QnActions::NextFrameAction));
-    addAction(action(QnActions::PlayPauseAction));
-    addAction(action(QnActions::JumpToStartAction));
-    addAction(action(QnActions::JumpToEndAction));
+    addAction(action(action::PreviousFrameAction));
+    addAction(action(action::NextFrameAction));
+    addAction(action(action::PlayPauseAction));
+    addAction(action(action::JumpToStartAction));
+    addAction(action(action::JumpToEndAction));
 
-    addAction(action(QnActions::VolumeDownAction));
-    addAction(action(QnActions::VolumeUpAction));
+    addAction(action(action::VolumeDownAction));
+    addAction(action(action::VolumeUpAction));
 
-    addAction(action(QnActions::JumpToLiveAction));
-    addAction(action(QnActions::ToggleMuteAction));
-    addAction(action(QnActions::ToggleSyncAction));
-    addAction(action(QnActions::ToggleCalendarAction));
+    addAction(action(action::JumpToLiveAction));
+    addAction(action(action::ToggleMuteAction));
+    addAction(action(action::ToggleSyncAction));
+    addAction(action(action::ToggleCalendarAction));
 
     /* Set help topics. */
     setHelpTopic(this,                  Qn::MainWindow_Playback_Help);
@@ -397,8 +398,8 @@ void QnNavigationItem::updatePlaybackButtonsIcons()
     bool playing = m_playButton->isChecked();
 
     // TODO: #Elric this is cheating!
-    action(QnActions::PreviousFrameAction)->setText(playing ? tr("Speed Down") : tr("Previous Frame"));
-    action(QnActions::NextFrameAction)->setText(playing ? tr("Speed Up") : tr("Next Frame"));
+    action(action::PreviousFrameAction)->setText(playing ? tr("Speed Down") : tr("Previous Frame"));
+    action(action::NextFrameAction)->setText(playing ? tr("Speed Up") : tr("Next Frame"));
 
     m_stepBackwardButton->setIcon(playing
         ? qnSkin->icon("slider/navigation/backward.png")
@@ -415,8 +416,8 @@ void QnNavigationItem::updateJumpButtonsTooltips()
     bool hasPeriods = navigator()->currentWidgetFlags() & QnWorkbenchNavigator::WidgetSupportsPeriods;
 
     // TODO: #Elric this is cheating!
-    action(QnActions::JumpToStartAction)->setText(hasPeriods ? tr("Previous Chunk") : tr("To Start"));
-    action(QnActions::JumpToEndAction)->setText(hasPeriods ? tr("Next Chunk") : tr("To End"));
+    action(action::JumpToStartAction)->setText(hasPeriods ? tr("Previous Chunk") : tr("To Start"));
+    action(action::JumpToEndAction)->setText(hasPeriods ? tr("Next Chunk") : tr("To End"));
 
     updatePlaybackButtonsEnabled(); // TODO: #Elric remove this once buttonwidget <-> action enabled sync is implemented. OR when we disable actions and not buttons.
 }
@@ -435,7 +436,7 @@ void QnNavigationItem::updateBookButtonEnabled()
     const bool bookmarkMode = (bookmarksEnabled && !motionSearchMode
         && layout->data(Qn::LayoutBookmarksModeRole).toBool());
 
-    const auto modeAction = action(QnActions::BookmarksModeAction);
+    const auto modeAction = action(action::BookmarksModeAction);
     modeAction->setEnabled(bookmarksEnabled);
     modeAction->setChecked(bookmarkMode);
 }
@@ -579,7 +580,7 @@ void QnNavigationItem::at_liveButton_clicked()
     /* Reset speed. It MUST be done before setLive(true) is called. */
     navigator()->setSpeed(1.0);
     navigator()->setLive(true);
-    action(QnActions::PlayPauseAction)->setChecked(true);
+    action(action::PlayPauseAction)->setChecked(true);
 
     /* Move time scrollbar so that maximum is visible. */
     m_timeSlider->finishAnimations();
@@ -634,7 +635,7 @@ void QnNavigationItem::at_stepForwardButton_clicked()
     }
 }
 
-QnImageButtonWidget *QnNavigationItem::newActionButton(QnActions::IDType id)
+QnImageButtonWidget *QnNavigationItem::newActionButton(action::IDType id)
 {
     const auto statAlias = lit("%1_%2").arg(lit("navigation_item"), QnLexical::serialized(id));
     QnImageButtonWidget *button = new QnImageButtonWidget();

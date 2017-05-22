@@ -17,16 +17,18 @@ static const QString kPixmapExtension = lit(".png");
 
 QPixmap getTriggerPixmap(const QString& name)
 {
-    return name.isEmpty()
-        ? QPixmap()
-        : qnSkin->pixmap(QnSoftwareTriggerPixmaps::pixmapsPath() + name + kPixmapExtension);
+    if (name.isEmpty())
+        return QPixmap();
+
+    return qnSkin->pixmap(QnSoftwareTriggerPixmaps::pixmapsPath() + name + kPixmapExtension,
+        QSize(), Qt::KeepAspectRatio, Qt::FastTransformation, true);
 }
 
 } // namespace
 
 QString QnSoftwareTriggerPixmaps::pixmapsPath()
 {
-    return lit("soft_triggers") + QDir::separator();
+    return lit("soft_triggers/user_selectable") + QDir::separator();
 }
 
 QString QnSoftwareTriggerPixmaps::defaultPixmapName()

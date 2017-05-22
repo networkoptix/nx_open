@@ -10,11 +10,11 @@
 #include <api/app_server_connection.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/app_info.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/log/log.h>

@@ -7,11 +7,12 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
+#include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/edge_shadow_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
@@ -25,6 +26,8 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace NxUi {
 
 TitleWorkbenchPanel::TitleWorkbenchPanel(
@@ -35,12 +38,13 @@ TitleWorkbenchPanel::TitleWorkbenchPanel(
     base_type(settings, parentWidget, parent),
     item(new QnMaskedProxyWidget(parentWidget)),
     m_showButton(NxUi::newShowHideButton(parentWidget, context(),
-        action(QnActions::ToggleTitleBarAction))),
+        action::ToggleTitleBarAction)),
     m_opacityAnimatorGroup(new AnimatorGroup(this)),
     m_yAnimator(new VariantAnimator(this)),
     m_opacityProcessor(new HoverFocusProcessor(parentWidget))
 {
     item->setProperty(Qn::NoHandScrollOver, true);
+    item->setProperty(Qn::BlockMotionSelection, true);
     item->setWidget(new QnMainWindowTitleBarWidget(nullptr, context()));
     item->setPos(0.0, 0.0);
     item->setVisible(false);
@@ -48,7 +52,7 @@ TitleWorkbenchPanel::TitleWorkbenchPanel(
     connect(item, &QGraphicsWidget::geometryChanged, this,
         &TitleWorkbenchPanel::updateControlsGeometry);
 
-    const auto toggleTitleBarAction = action(QnActions::ToggleTitleBarAction);
+    const auto toggleTitleBarAction = action(action::ToggleTitleBarAction);
     toggleTitleBarAction->setChecked(settings.state == Qn::PaneState::Opened);
     {
         QTransform transform;
@@ -94,7 +98,7 @@ bool TitleWorkbenchPanel::isPinned() const
 
 bool TitleWorkbenchPanel::isOpened() const
 {
-    return action(QnActions::ToggleTitleBarAction)->isChecked();
+    return action(action::ToggleTitleBarAction)->isChecked();
 }
 
 void TitleWorkbenchPanel::setOpened(bool opened, bool animate)
@@ -104,7 +108,7 @@ void TitleWorkbenchPanel::setOpened(bool opened, bool animate)
     ensureAnimationAllowed(&animate);
 
     QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
-    action(QnActions::ToggleTitleBarAction)->setChecked(opened);
+    action(action::ToggleTitleBarAction)->setChecked(opened);
 
     m_yAnimator->stop();
     qnWorkbenchAnimations->setupAnimator(m_yAnimator, opened

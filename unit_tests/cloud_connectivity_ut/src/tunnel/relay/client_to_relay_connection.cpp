@@ -1,5 +1,7 @@
 #include "client_to_relay_connection.h"
 
+#include <nx/network/cloud/cloud_stream_socket.h>
+#include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/std/cpp14.h>
 
@@ -27,6 +29,26 @@ ClientToRelayConnection::~ClientToRelayConnection()
         handler();
 }
 
+void ClientToRelayConnection::beginListening(
+    const nx::String& /*peerName*/,
+    nx::cloud::relay::api::BeginListeningHandler handler)
+{
+    ++m_scheduledRequestCount;
+    if (m_ignoreRequests)
+        return;
+
+    post(
+        [this, handler = std::move(handler)]()
+        {
+            nx::cloud::relay::api::BeginListeningResponse response;
+            response.preemptiveConnectionCount = 7;
+            auto resultCode = m_failRequests
+                ? nx::cloud::relay::api::ResultCode::networkError
+                : nx::cloud::relay::api::ResultCode::ok;
+            handler(resultCode, std::move(response), nullptr);
+        });
+}
+
 void ClientToRelayConnection::startSession(
     const nx::String& desiredSessionId,
     const nx::String& /*targetPeerName*/,
@@ -39,10 +61,12 @@ void ClientToRelayConnection::startSession(
     post(
         [this, handler = std::move(handler), desiredSessionId]()
         {
+            nx::cloud::relay::api::CreateClientSessionResponse response;
+            response.sessionId = desiredSessionId.toStdString();
             if (m_failRequests)
-                handler(nx::cloud::relay::api::ResultCode::networkError, desiredSessionId);
+                handler(nx::cloud::relay::api::ResultCode::networkError, std::move(response));
             else
-                handler(nx::cloud::relay::api::ResultCode::ok, desiredSessionId);
+                handler(nx::cloud::relay::api::ResultCode::ok, std::move(response));
         });
 }
 
@@ -65,9 +89,12 @@ void ClientToRelayConnection::openConnectionToTheTargetHost(
             }
             else
             {
+                auto connection = std::make_unique<CloudStreamSocket>();
+                connection->bindToAioThread(
+                    SocketGlobals::aioService().getCurrentAioThread());
                 handler(
                     nx::cloud::relay::api::ResultCode::ok,
-                    std::make_unique<nx::network::TCPSocket>());
+                    std::move(connection));
             }
         });
 }

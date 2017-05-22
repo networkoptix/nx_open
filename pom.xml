@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hdwitness</artifactId>
     <packaging>pom</packaging>
@@ -70,6 +70,7 @@
         <!-- <storage_plugin_test_client.guid>{83e8bbad-6976-45da-bdd7-baf8f17fc71c}</storage_plugin_test_client.guid> -->
         <common_ut.guid>{2f2d9175-70c1-404d-82e3-5e797b92263c}</common_ut.guid>
         <cloud_connectivity_ut.guid>{f568398b-8ca3-44cc-9707-d1f63b2aa1c6}</cloud_connectivity_ut.guid>
+        <cloud_connect_integration_tests.guid>{2b60d0be-4d05-4547-a0a9-73c98d720b1a}</cloud_connect_integration_tests.guid>
         <nx_network_ut.guid>{f7dfa168-fa41-4d4a-b475-e785acb4ff45}</nx_network_ut.guid>
         <libcloud_db.guid>{BBA5BB95-B669-42C4-8074-EE0E361C094E}></libcloud_db.guid>
         <time_server.guid>{5640EBAF-8312-4C7C-851E-A48F0B5E2208}</time_server.guid>
@@ -85,6 +86,7 @@
         <testcamera.guid>{f98dae04-4b22-4d73-b55a-038cfa0f3cfe}</testcamera.guid>
         <libtraffic_relay.guid>{237676bc-45ea-43cf-a2c1-4048468d92a9}</libtraffic_relay.guid>
         <traffic_relay.guid>{7f7104b2-1f99-4e4f-bff3-ad050eb0db8e}</traffic_relay.guid>
+        <nx_kit.guid>{5db17d17-17fe-4ebe-a14f-ffced5d2c09b}</nx_kit.guid>
 
         <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
@@ -153,7 +155,7 @@
         <packages.dir>${environment.dir}/packages</packages.dir>
         <qt.path>packages/${rdep.target}/qt-${qt.version}</qt.path>
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
-        <ClientHelpSourceDir>${libdir}/bin/release/help</ClientHelpSourceDir>
+        <ClientHelpSourceDir>${libdir}/bin/${build.configuration}/help</ClientHelpSourceDir>
         <ClientVoxSourceDir>${libdir}/bin/release/vox</ClientVoxSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <launcher.version.dir>${libdir}/bin/${build.configuration}</launcher.version.dir>
@@ -166,7 +168,7 @@
         <openssl.version>1.0.2e</openssl.version>
         <openldap.version>2.4.42</openldap.version>
         <sasl2.version>2.1.26</sasl2.version>
-        <protobuf.version>3.0.0-SNAPSHOT</protobuf.version>
+        <protobuf.version>3.0.1-SNAPSHOT</protobuf.version>
         <onvif.version>2.1.2-io2</onvif.version>
         <sigar.version>1.7</sigar.version>
         <festival.version>2.4</festival.version>
@@ -176,12 +178,14 @@
         <libjpeg-turbo.version>1.4.2</libjpeg-turbo.version>
         <libcreateprocess.version>0.1</libcreateprocess.version>
         <vmux.version>1.0.0</vmux.version>
-        <server-external.version>${release.version}</server-external.version>
-        <help.version>${customization}-${release.version}</help.version>
+        <cpro.version>1.0.0</cpro.version>
+        <server-external.version>default</server-external.version>
+        <help.version>${customization}-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</help.version>
         <gcc.version>4.9.4</gcc.version>
 
         <qt.libs/>
         <global.libs/>
+        <subdirectory.global.libs/>
         <windows.oslibs/>
         <linux.oslibs/>
         <mac.oslibs/>
@@ -244,9 +248,12 @@
         -->
         <artifact.name.product>${installer.name}</artifact.name.product>
         <artifact.name.version>${release.version}.${buildNumber}</artifact.name.version>
-        <artifact.name.platform>INVALID_PLATFORM</artifact.name.platform> <!-- will be defined in each platform separately -->
-        <artifact.name.beta.suffix></artifact.name.beta.suffix> <!-- will be defined in artifact-name-beta profile -->
-        <artifact.name.cloud.suffix></artifact.name.cloud.suffix> <!-- will be defined in artifact-name-cloud profile -->
+        <artifact.name.platform>INVALID_PLATFORM</artifact.name.platform>
+        <!-- will be defined in each platform separately -->
+        <artifact.name.beta.suffix/>
+        <!-- will be defined in artifact-name-beta profile -->
+        <artifact.name.cloud.suffix/>
+        <!-- will be defined in artifact-name-cloud profile -->
 
         <artifact.name.prefix>${artifact.name.product}</artifact.name.prefix>
         <artifact.name.suffix>${artifact.name.version}-${artifact.name.platform}${artifact.name.beta.suffix}${artifact.name.cloud.suffix}</artifact.name.suffix>
@@ -269,7 +276,7 @@
         <artifact.name.cloud_debug>${artifact.name.prefix}-cloud_debug-${artifact.name.suffix}</artifact.name.cloud_debug>
         <artifact.name.testcamera>${artifact.name.prefix}-testcamera-${artifact.name.suffix}</artifact.name.testcamera>
 
-        <nxcloud.version>1.0.134</nxcloud.version>
+        <nxcloud.version>1.0.135</nxcloud.version>
     </properties>
 
     <build>
@@ -475,6 +482,7 @@
                 <module>nx_cloud/cloud_db_client</module>
                 <module>common_libs/nx_streaming</module>
                 <module>appserver2</module>
+                <module>nx_kit</module>
             </modules>
         </profile>
         <profile>
@@ -487,6 +495,7 @@
             </activation>
             <modules>
                 <module>unit_tests</module>
+                <module>nx_cloud/tests</module>
             </modules>
         </profile>
         <profile>
@@ -517,7 +526,7 @@
 
                 <!-- <module>plugins/axiscamplugin</module> -->
                 <!-- <module>storage_plugins/ftpstorageplugin</module> -->
-                <module>storage_plugins/teststorageplugin</module> 
+                <module>storage_plugins/teststorageplugin</module>
 
                 <!-- <module>mediaproxy</module> -->
             </modules>
@@ -614,6 +623,31 @@
                 <artifact.name.platform>win86</artifact.name.platform>
             </properties>
         </profile>
+        <!-- Paxton stuff can be built only on Windows x86 -->
+        <profile>
+            <id>paxton</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <property>
+                    <name>arch</name>
+                    <value>x86</value>
+                </property>
+                <file>
+                    <missing>customization/${customization}/paxton.skip</missing>
+                </file>
+            </activation>
+            <modules>
+                <module>client/activex_client</module>
+                <module>plugins/nxinterface</module>
+                <module>plugins/nxcontrol</module>
+                <module>plugins/acs/paxton-plugin</module>
+            </modules>
+            <properties>
+                <paxton>true</paxton>
+            </properties>
+        </profile>
         <profile>
             <id>windows-nomobile</id>
             <activation>
@@ -645,29 +679,7 @@
                 <module>wixsetup</module>
             </modules>
         </profile>
-        <!-- Paxton stuff can be built only on Windows x86 -->
-        <profile>
-            <id>paxton</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-                <property>
-                    <name>arch</name>
-                    <value>x86</value>
-                </property>
-                <file>
-                    <missing>customization/${customization}/paxton.skip</missing>
-                </file>
-            </activation>
-            <modules>
-                <module>client/activex_client</module>
-                <module>plugins/nxinterface</module>
-                <module>plugins/nxcontrol</module>
-                <module>plugins/acs/paxton-plugin</module>
-                <module>plugins/acs/paxton-installer</module>
-            </modules>
-        </profile>
+
         <profile>
             <id>nxtool</id>
             <activation>
@@ -1225,6 +1237,7 @@
             <modules>
                 <module>unit_tests</module>
                 <module>unit_tests_run</module>
+                <module>nx_cloud/tests</module>
             </modules>
         </profile>
         <profile>
@@ -1238,6 +1251,7 @@
             </activation>
             <modules>
                 <module>unit_tests</module>
+                <module>nx_cloud/tests</module>
             </modules>
         </profile>
         <profile>

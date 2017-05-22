@@ -167,7 +167,8 @@ private:
     int handleRecvResult(int recvResult);
 
     std::unique_ptr<aio::AsyncSocketImplHelper<UdtStreamSocket>> m_aioHelper;
-    bool m_noDelay;
+    bool m_noDelay = false;
+    bool m_isInternetConnection = false;
 
 private:
     Q_DISABLE_COPY(UdtStreamSocket)
@@ -188,10 +189,7 @@ public:
     // AbstractStreamServerSocket -------------- interface
     virtual bool listen(int queueLen = 128);
     virtual AbstractStreamSocket* accept();
-    virtual void acceptAsync(
-        nx::utils::MoveOnlyFunc<void(
-            SystemError::ErrorCode,
-            AbstractStreamSocket*)> handler);
+    virtual void acceptAsync(AcceptCompletionHandler handler);
     virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void cancelIOSync() override;
 
@@ -204,6 +202,14 @@ private:
     void stopWhileInAioThread();
 
     Q_DISABLE_COPY(UdtStreamServerSocket)
+};
+
+class NX_NETWORK_API UdtStatistics
+{
+public:
+    std::atomic<size_t> internetBytesTransfered{0};
+
+    static UdtStatistics global;
 };
 
 } // namespace network

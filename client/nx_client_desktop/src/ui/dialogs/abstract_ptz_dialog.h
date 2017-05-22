@@ -8,6 +8,7 @@
 #include <client/client_model_types.h>
 
 #include <core/ptz/ptz_fwd.h>
+#include <core/ptz/ptz_constants.h>
 
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -50,7 +51,7 @@ protected:
 
     bool updateHomePosition(const QnPtzObject &homePosition);
 
-    Qn::PtzCapabilities capabilities();
+    Ptz::Capabilities capabilities();
 
 signals:
     void synchronizeLater(const QString &title);

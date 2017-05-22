@@ -97,7 +97,7 @@ bool overrideLayout(QWidget* parent)
     messageBox.setInformativeText(tr("There is another layout with the same name."));
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
     messageBox.addCustomButton(QnMessageBoxCustomButton::Overwrite,
-        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+        QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
     return messageBox.exec() != QDialogButtonBox::Cancel;
 }
 
@@ -158,7 +158,7 @@ bool deleteSharedLayouts(QWidget* parent, const QnResourceList& layouts)
             "", layouts.size()));
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
     messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
-        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+        QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
 
     return (messageBox.exec() != QDialogButtonBox::Cancel);
 }
@@ -183,7 +183,7 @@ bool removeItemsFromLayout(QWidget* parent,
     messageBox.setIcon(QnMessageBoxIcon::Warning);
     messageBox.setText(tr("Remove %n items from layout?", "", resources.size()));
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
-    messageBox.addButton(tr("Remove"), QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+    messageBox.addButton(tr("Remove"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
     messageBox.addCustomWidget(new QnResourceListView(resources, true, &messageBox));
     messageBox.setCheckBoxEnabled();
     const auto result = messageBox.exec();
@@ -273,7 +273,7 @@ bool deleteResources(QWidget* parent, const QnResourceList& resources)
     messageBox.setInformativeText(extras);
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
     messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
-        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+        QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
     messageBox.addCustomWidget(new QnResourceListView(resources, false, &messageBox));
     messageBox.setCheckBoxEnabled();
 

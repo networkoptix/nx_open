@@ -22,9 +22,9 @@ public:
     QnHudOverlayWidgetPrivate(QnHudOverlayWidget* main);
 
     QnResourceTitleItem* const title;
+    QGraphicsWidget* const content;
     QnHudDetailsItem* const details;
     QnHudPositionItem* const position;
-
     QGraphicsWidget* const left;
     QGraphicsWidget* const right;
 };

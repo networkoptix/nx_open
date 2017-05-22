@@ -18,7 +18,7 @@
 #   include <netinet/tcp.h>
 #endif
 #include "core/resource_management/resource_pool.h"
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "common/common_module.h"
 
 // we need enough size for updates
@@ -130,8 +130,7 @@ void QnTCPConnectionProcessor::parseRequest()
     }
     d->protocol = d->request.requestLine.version.protocol;
     d->requestBody = d->request.messageBody;
-
-    nx_http::HttpModManager::instance()->apply( &d->request );
+    applyModToRequest();
 }
 
 /*
@@ -460,7 +459,7 @@ bool QnTCPConnectionProcessor::readSingleRequest()
             d->protocol = d->request.requestLine.version.protocol;
             d->requestBody = d->httpStreamReader.fetchMessageBody();
 
-            nx_http::HttpModManager::instance()->apply( &d->request );
+            applyModToRequest();
 
             //TODO #ak logging
             //NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").
@@ -516,6 +515,14 @@ int QnTCPConnectionProcessor::redirectTo(const QByteArray& page, QByteArray& con
     d->response.messageBody = "<html><head><title>Moved</title></head><body><h1>Moved</h1></html>";
     d->response.headers.insert(nx_http::HttpHeader("Location", page));
     return CODE_MOVED_PERMANENTLY;
+}
+
+int QnTCPConnectionProcessor::notFound(QByteArray& contentType)
+{
+    Q_D(QnTCPConnectionProcessor);
+    contentType = "text/html; charset=utf-8";
+    d->response.messageBody = "<html><head><title>Not Found</title></head><body><h1>Not Found</h1></html>";
+    return CODE_NOT_FOUND;
 }
 
 bool QnTCPConnectionProcessor::isConnectionCanBePersistent() const
@@ -605,7 +612,7 @@ void QnTCPConnectionProcessor::sendUnauthorizedResponse(nx_http::StatusCode::Val
         {
             contentEncoding = "gzip";
             if( !d->response.messageBody.isEmpty() )
-                d->response.messageBody = nx::utils::bsf::gzip::Compressor::compressData(d->response.messageBody);
+                d->response.messageBody = nx::utils::bstream::gzip::Compressor::compressData(d->response.messageBody);
         }
         else
         {

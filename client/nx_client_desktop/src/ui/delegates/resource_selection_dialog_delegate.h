@@ -4,8 +4,8 @@
 #include <QtWidgets/QLabel>
 
 #include <client_core/connection_context_aware.h>
-
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/uuid.h>
 
 class QnResourceTreeModelCustomColumnDelegate;
 

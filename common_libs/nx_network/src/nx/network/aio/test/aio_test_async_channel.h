@@ -3,8 +3,11 @@
 #include <atomic>
 #include <memory>
 
+#include <boost/optional.hpp>
+
 #include <nx/network/aio/abstract_async_channel.h>
-#include <nx/utils/pipeline.h>
+#include <nx/utils/byte_stream/pipeline.h>
+#include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/thread/mutex.h>
 
 namespace nx {
@@ -28,8 +31,8 @@ public:
     };
 
     AsyncChannel(
-        utils::pipeline::AbstractInput* input,
-        utils::pipeline::AbstractOutput* output,
+        utils::bstream::AbstractInput* input,
+        utils::bstream::AbstractOutput* output,
         InputDepletionPolicy inputDepletionPolicy);
     virtual ~AsyncChannel() override;
 
@@ -50,18 +53,25 @@ public:
     void waitForReadSequenceToBreak();
     QByteArray dataRead() const;
     void setErrorState();
+    void setSendErrorState(boost::optional<SystemError::ErrorCode> sendErrorCode);
+    void setReadErrorState(boost::optional<SystemError::ErrorCode> sendErrorCode);
+
+    void waitForAnotherReadErrorReported();
+    void waitForAnotherSendErrorReported();
 
     bool isReadScheduled() const;
     bool isWriteScheduled() const;
 
 private:
-    utils::pipeline::AbstractInput* m_input;
-    utils::pipeline::AbstractOutput* m_output;
+    utils::bstream::AbstractInput* m_input;
+    utils::bstream::AbstractOutput* m_output;
     InputDepletionPolicy m_inputDepletionPolicy;
-    std::atomic<bool> m_errorState;
+    boost::optional<SystemError::ErrorCode> m_readErrorState;
+    boost::optional<SystemError::ErrorCode> m_sendErrorState;
     std::atomic<std::size_t> m_totalBytesRead;
     mutable QnMutex m_mutex;
     QByteArray m_totalDataRead;
+    nx::utils::ObjectDestructionFlag m_destructionFlag;
 
     IoCompletionHandler m_readHandler;
     bool m_readPaused;
@@ -75,6 +85,8 @@ private:
     BasicPollable m_writer;
     bool m_readScheduled;
     std::atomic<int> m_readSequence;
+    std::atomic<int> m_readErrorsReported;
+    std::atomic<int> m_sendErrorsReported;
 
     virtual void stopWhileInAioThread() override;
 

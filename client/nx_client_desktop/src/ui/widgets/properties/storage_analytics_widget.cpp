@@ -17,8 +17,8 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <ui/actions/action_manager.h>
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <ui/common/widget_anchor.h>
 #include <ui/customization/customized.h>
 #include <ui/delegates/recording_stats_item_delegate.h>
@@ -39,6 +39,8 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/synctime.h>
 #include <set>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -449,14 +451,14 @@ void QnStorageAnalyticsWidget::at_eventsGrid_customContextMenuRequested(const QP
     if (idx.isValid())
     {
         QnResourcePtr resource = table->model()->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
-        QnActionManager *manager = context()->menu();
+        auto manager = context()->menu();
 
         if (resource)
         {
-            QnActionParameters parameters(resource);
+            action::Parameters parameters(resource);
             parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
 
-            menu.reset(manager->newMenu(Qn::TreeScope, nullptr, parameters));
+            menu.reset(manager->newMenu(action::TreeScope, nullptr, parameters));
             foreach(QAction* action, menu->actions())
                 action->setShortcut(QKeySequence());
         }
@@ -574,7 +576,7 @@ QnRecordingStatsReply QnStorageAnalyticsWidget::getForecastData(qint64 extraSize
             cameraForecast.expand &= cameraStats.archiveDurationSecs > 0 && cameraStats.recordedBytes > 0;
             cameraForecast.minDays = qMax(0, camRes->minDays());
             cameraForecast.maxDays = qMax(0, camRes->maxDays());
-            cameraForecast.byterate = cameraStats.recordedBytes / cameraStats.archiveDurationSecs;
+            cameraForecast.byterate = cameraStats.recordedBytes / qMax(1ll, cameraStats.archiveDurationSecs);
 
             if (cameraForecast.expand)
                 hasExpaned = true;

@@ -111,7 +111,7 @@ void QnPtzPresetHotkeyItemDelegate::setModelData(
 
     QnMessageBox messageBox(QnMessageBoxIcon::Warning, message,
         QString(), QDialogButtonBox::Cancel);
-    messageBox.addButton(tr("Reassign"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+    messageBox.addButton(tr("Reassign"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
     if (messageBox.exec() == QDialogButtonBox::Cancel)
         return;
 

@@ -21,8 +21,7 @@
 #include "media_server/serverutil.h"
 #include "media_server/server_connector.h"
 #include "network/tcp_connection_priv.h"
-#include "network/module_finder.h"
-#include "network/direct_module_finder.h"
+#include "nx/vms/discovery/manager.h"
 #include <network/connection_validator.h>
 
 #include "utils/common/app_info.h"
@@ -31,7 +30,7 @@
 #include "api/model/ping_reply.h"
 #include "audit/audit_manager.h"
 #include "rest/server/rest_connection_processor.h"
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 
 #include <rest/helpers/permissions_helper.h>
 #include <network/authenticate_helper.h>
@@ -349,11 +348,14 @@ int QnMergeSystemsRestHandler::execute(
             ec2::DummyHandler::instance(),
             &ec2::DummyHandler::onRequestDone);
     }
-    owner->commonModule()->moduleFinder()->directModuleFinder()->checkUrl(url);
+
+    nx::vms::discovery::Manager::ModuleData module(
+        remoteModuleInformation, {url.host(), (uint16_t) remoteModuleInformation.port});
+    owner->commonModule()->moduleDiscoveryManager()->checkEndpoint(module.endpoint, module.id);
 
     /* Connect to server if it is compatible */
     if (connectionResult == Qn::SuccessConnectionResult && QnServerConnector::instance())
-        QnServerConnector::instance()->addConnection(remoteModuleInformation, SocketAddress(url.host(), remoteModuleInformation.port));
+        QnServerConnector::instance()->addConnection(module);
 
     QnAuditRecord auditRecord = qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_SystemmMerge);
     qnAuditManager->addAuditRecord(auditRecord);

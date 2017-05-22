@@ -28,6 +28,7 @@
 #include "utils/common/util.h"
 
 #include <nx/utils/datetime.h>
+#include <nx/utils/log/log.h>
 
 namespace {
     template<class PointContainer>
@@ -408,6 +409,7 @@ void QnWorkbenchLayout::moveItemInternal(QnWorkbenchItem *item, const QRect &geo
     updateBoundingRectInternal();
 
     item->setGeometryInternal(geometry);
+    emit itemMoved(item);
 }
 
 bool QnWorkbenchLayout::canMoveItems(const QList<QnWorkbenchItem *> &items, const QList<QRect> &geometries, Disposition *disposition) const
@@ -576,11 +578,23 @@ const QSet<QnWorkbenchItem *> &QnWorkbenchLayout::items(const QString &resourceU
     return pos == m_itemsByUid.end() ? m_noItems : pos.value();
 }
 
-QRect QnWorkbenchLayout::closestFreeSlot(const QPointF &gridPos, const QSize &size, TypedMagnitudeCalculator<QPoint> *metric) const {
-    if(metric == NULL) {
+bool QnWorkbenchLayout::isFreeSlot(const QPointF &gridPos, const QSize &size) const
+{
+    QPoint gridCell = (gridPos - QnGeometry::toPoint(QSizeF(size)) / 2.0).toPoint();
+    return !m_itemMap.isOccupied(QRect(gridCell, size));
+}
+
+QRect QnWorkbenchLayout::closestFreeSlot(const QPointF& gridPos, const QSize& size,
+    TypedMagnitudeCalculator<QPoint>* metric) const
+{
+    if (!metric)
+    {
         QnDistanceMagnitudeCalculator metric(gridPos - QnGeometry::toPoint(QSizeF(size)) / 2.0);
         return closestFreeSlot(gridPos, size, &metric); /* Use default metric if none provided. */
     }
+
+    const auto kFreeSlotTag = lit("__freeSlot");
+    NX_DEBUG(kFreeSlotTag, lm("Seek for closestFreeSlot to %1 of size %2").args(gridPos, size));
 
     /* Grid cell where starting search position lies. */
     QPoint gridCell = (gridPos - QnGeometry::toPoint(QSizeF(size)) / 2.0).toPoint();
@@ -589,58 +603,109 @@ QRect QnWorkbenchLayout::closestFreeSlot(const QPointF &gridPos, const QSize &si
     qreal bestDistance = std::numeric_limits<qreal>::max();
     QPoint bestDelta = QPoint(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
 
-    Qt::Edge noEdge = static_cast<Qt::Edge>(0);
+    int noEdge = 0;
     Qt::Edges allEdges = (Qt::TopEdge | Qt::LeftEdge | Qt::RightEdge | Qt::BottomEdge);
 
     /* Border being walked. */
-    Qt::Edge checkedBorder = noEdge;
+    int processingEdge = noEdge;
 
     /* Borders that are known not to contain positions closer to the target than current best. */
-    Qt::Edges checkedBorders = 0;
+    int checkedEdges = 0;
 
+
+    /**
+     * Algorithm works the following way:
+     * Walker checks all available cells.
+     * Expand walker to the best possible edge.
+     * Repeat until we have checked all edged at least once AND did not improve current result.
+     */
     QnWorkbenchGridWalker walker;
-    while(true) {
-        if(walker.hasNext()) {
+    while (true)
+    {
+        if (walker.hasNext())
+        {
             QPoint delta = walker.next();
+            NX_DEBUG(kFreeSlotTag, lm("delta %1").args(delta));
 
             qreal distance = metric->calculate(gridCell + delta);
-            if(distance > bestDistance || qFuzzyEquals(distance, bestDistance))
-                continue;
-            checkedBorder = noEdge;
+            NX_DEBUG(kFreeSlotTag, lm("distance %1").args(distance));
 
-            if(m_itemMap.isOccupied(QRect(gridCell + delta, size)))
+            if (distance > bestDistance || qFuzzyEquals(distance, bestDistance))
                 continue;
 
-            checkedBorders = 0;
+            // We have improved result a bit, do not exclude this edge next time
+            processingEdge = noEdge;
+
+            if (m_itemMap.isOccupied(QRect(gridCell + delta, size)))
+            {
+                NX_DEBUG(kFreeSlotTag, lm("delta %1 is occupied, skip").args(delta));
+                continue;
+            }
+
+            checkedEdges = 0;
             bestDistance = distance;
             bestDelta = delta;
-        } else {
-            checkedBorders |= checkedBorder;
-            if(checkedBorders == allEdges && bestDistance < std::numeric_limits<qreal>::max())
+            NX_DEBUG(kFreeSlotTag, lm("Remember delta %1 as best (distance %2)")
+                .arg(delta)
+                .arg(distance));
+        }
+        else
+        {
+            NX_DEBUG(kFreeSlotTag, lm("Walker has finished the %1").arg(processingEdge));
+            checkedEdges |= processingEdge;
+            if (checkedEdges == allEdges && bestDistance < std::numeric_limits<qreal>::max())
+            {
+                NX_DEBUG(kFreeSlotTag, lm("Best position found: %1 (delta %2, distance %3)")
+                    .arg(QRect(gridCell + bestDelta, size))
+                    .arg(bestDelta)
+                    .arg(bestDistance));
                 return QRect(gridCell + bestDelta, size);
+            }
 
-            struct {
-                Qt::Edge border;
-                QPoint delta;
-            } expansion[4] = {
+            // We have checked all edges but there were no place at all. Let's start over.
+            if (checkedEdges == allEdges)
+                checkedEdges = noEdge;
+
+            using edge_t = std::pair<Qt::Edge, QPoint>;
+            std::array<edge_t, 4> expansion{{
                 {Qt::RightEdge,   QPoint(walker.rect().right() + 1,   gridCell.y())},
                 {Qt::LeftEdge,    QPoint(walker.rect().left() - 1,    gridCell.y())},
                 {Qt::BottomEdge,  QPoint(gridCell.x(),                walker.rect().bottom() + 1)},
                 {Qt::TopEdge,     QPoint(gridCell.x(),                walker.rect().top() - 1)},
-            };
+            }};
 
-            Qt::Edge bestBorder = noEdge;
-            qreal bestBorderDistance = std::numeric_limits<qreal>::max();
-            for(int i = 0; i < 4; i++) {
-                qreal distance = metric->calculate(gridCell + expansion[i].delta);
-                if(distance < bestBorderDistance) {
-                    bestBorderDistance = distance;
-                    bestBorder = expansion[i].border;
-                }
+            std::list<edge_t> edgesToCheck;
+            for (auto v: expansion)
+            {
+                // Rely on the monotonic magnitude nature, do not expand to the same side again
+                if ((checkedEdges & v.first) == v.first)
+                    continue;
+
+                NX_DEBUG(kFreeSlotTag, lm("Checking edge %1: distance %2")
+                    .arg(v.first)
+                    .arg(metric->calculate(gridCell + v.second)));
+                edgesToCheck.push_back(v);
             }
 
-            walker.expand(bestBorder);
-            checkedBorder = bestBorder;
+            NX_EXPECT(!edgesToCheck.empty());
+            if (edgesToCheck.empty())
+            {
+                // Something goes wrong. Let's start over.
+                checkedEdges = noEdge;
+                continue;
+            }
+
+            const auto bestEdgeIter = std::min_element(edgesToCheck.cbegin(), edgesToCheck.cend(),
+                [metric, &gridCell](const edge_t& left, const edge_t& right)
+                {
+                    return metric->calculate(gridCell + left.second)
+                        <  metric->calculate(gridCell + right.second);
+                });
+
+            const Qt::Edge bestEdge = bestEdgeIter->first;
+            NX_DEBUG(kFreeSlotTag, lm("Expanding the best border %1").arg(bestEdge));
+            walker.expand(bestEdge);
+            processingEdge = bestEdge;
         }
     }
 }

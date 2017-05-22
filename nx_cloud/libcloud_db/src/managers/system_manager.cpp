@@ -16,7 +16,7 @@
 #include <core/resource/user_resource.h>
 #include <nx/utils/scope_guard.h>
 #include <utils/common/id.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include "access_control/authentication_manager.h"
 #include "access_control/authorization_manager.h"
@@ -1894,7 +1894,7 @@ nx::db::DBResult SystemManager::processEc2RemoveUser(
     NX_LOGX(
         QnLog::EC2_TRAN_LOG,
         lm("Processing vms transaction removeUser. systemId %1, vms user id %2")
-            .arg(systemId).str(data.id),
+            .arg(systemId).arg(data.id),
         cl_logDEBUG2);
 
     systemSharingData->systemId = systemId.toStdString();
@@ -1910,7 +1910,7 @@ nx::db::DBResult SystemManager::processEc2RemoveUser(
         NX_LOGX(
             QnLog::EC2_TRAN_LOG,
             lm("Failed to remove sharing by vms user id. system %1, vms user id %2. %3")
-                .arg(systemId).str(data.id)
+                .arg(systemId).arg(data.id)
                 .arg(queryContext->connection()->lastError().text()),
             cl_logDEBUG1);
         return dbResult;

@@ -20,8 +20,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
 
-#include <ui/actions/action_manager.h>
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 
 #include <ui/utils/table_export_helper.h>
 #include <ui/common/item_view_hover_tracker.h>
@@ -56,6 +56,8 @@
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 
 #include <ui/workaround/hidpi_workarounds.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace
 {
@@ -632,7 +634,6 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
             resList << res;
     }
 
-    QnActionParameters params(resList);
     if (resList.isEmpty())
     {
         QnMessageBox::warning(this, tr("No archive for this position"));
@@ -643,6 +644,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     period.startTimeMs = record->rangeStartSec * 1000ll;
     period.durationMs = (record->rangeEndSec - record->rangeStartSec) * 1000ll;
 
+    action::Parameters params(resList);
     params.setArgument(Qn::ItemTimeRole, period.startTimeMs);
     if (period.durationMs > 0)
         params.setArgument(Qn::TimePeriodRole, period);
@@ -704,11 +706,11 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     layout->setLocalRange(period);
 
     resourcePool()->addResource(layout);
-    menu()->trigger(QnActions::OpenSingleLayoutAction, layout);
+    menu()->trigger(action::OpenSingleLayoutAction, layout);
 
 }
 
-void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::IDType actionId,
+void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, action::IDType actionId,
     int selectedPage)
 {
     const QnResourceList resList = resourcePool()->getResources(record->resources);
@@ -717,17 +719,17 @@ void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::IDT
         const auto count = static_cast<int>(record->resources.size());
         switch (actionId)
         {
-            case QnActions::CameraSettingsAction:
+            case action::CameraSettingsAction:
                 QnMessageBox::warning(this, QnDeviceDependentStrings::getDefaultNameFromSet(
                     resourcePool(),
                     tr("These devices are removed from System", "", count),
                     tr("These cameras are removed from System", "", count)));
                 break;
-            case QnActions::ServerSettingsAction:
+            case action::ServerSettingsAction:
                 QnMessageBox::warning(this, tr("These servers are removed from System",
                     "", count));
                 break;
-            case QnActions::UserSettingsAction:
+            case action::UserSettingsAction:
                 QnMessageBox::warning(this, tr("These users are removed from System",
                     "", count));
                 break;
@@ -740,7 +742,7 @@ void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::IDT
         return;
     }
 
-    QnActionParameters params(resList);
+    action::Parameters params(resList);
     params.setArgument(Qn::ItemTimeRole, record->rangeStartSec * 1000ll);
     params.setArgument(Qn::FocusTabRole, selectedPage);
     context()->menu()->trigger(actionId, params);
@@ -758,15 +760,15 @@ void QnAuditLogDialog::at_itemButtonClicked(const QModelIndex& index)
         processPlaybackAction(record);
     else if (record->eventType == Qn::AR_UserUpdate)
         triggerAction(record,
-            QnActions::UserSettingsAction,
+            action::UserSettingsAction,
             QnUserSettingsDialog::SettingsPage);
     else if (record->eventType == Qn::AR_ServerUpdate)
         triggerAction(record,
-            QnActions::ServerSettingsAction,
+            action::ServerSettingsAction,
             QnServerSettingsDialog::SettingsPage);
     else if (record->eventType == Qn::AR_CameraUpdate || record->eventType == Qn::AR_CameraInsert)
         triggerAction(record,
-            QnActions::CameraSettingsAction,
+            action::CameraSettingsAction,
             Qn::GeneralSettingsTab);
 
     if (isMaximized())
@@ -917,14 +919,14 @@ void QnAuditLogDialog::at_customContextMenuRequested(const QPoint&)
     if (idx.isValid())
     {
         QnResourcePtr resource = gridMaster->model()->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
-        QnActionManager *manager = context()->menu();
+        auto manager = context()->menu();
 
         if (resource)
         {
-            QnActionParameters parameters(resource);
+            action::Parameters parameters(resource);
             parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
 
-            menu.reset(manager->newMenu(Qn::TreeScope, nullptr, parameters));
+            menu.reset(manager->newMenu(action::TreeScope, nullptr, parameters));
             foreach(QAction* action, menu->actions())
                 action->setShortcut(QKeySequence());
         }

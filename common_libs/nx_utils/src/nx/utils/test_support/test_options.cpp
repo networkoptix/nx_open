@@ -11,6 +11,8 @@
 namespace nx {
 namespace utils {
 
+QString TestOptions::sTemporaryDirectoryPath;
+
 void TestOptions::setTimeoutMultiplier(size_t value)
 {
     s_timeoutMultiplier = value;
@@ -63,6 +65,9 @@ void TestOptions::applyArguments(const utils::ArgumentParser& arguments)
     if (const auto value = arguments.get("load-mode"))
         setLoadMode(*value);
 
+    if (const auto value = arguments.get("tmp"))
+        setTemporaryDirectoryPath(*value);
+
 #ifdef _WIN32
     bool enableCrashDump = true;
     if (arguments.get("disable-crash-dump"))
@@ -78,6 +83,16 @@ void TestOptions::applyArguments(const utils::ArgumentParser& arguments)
         win32_exception::setCreateFullCrashDump(generateFullCrashDump);
     }
 #endif
+}
+
+void TestOptions::setTemporaryDirectoryPath(const QString& path)
+{
+    sTemporaryDirectoryPath = path;
+}
+
+QString TestOptions::temporaryDirectoryPath()
+{
+    return sTemporaryDirectoryPath;
 }
 
 std::atomic<size_t> TestOptions::s_timeoutMultiplier(1);

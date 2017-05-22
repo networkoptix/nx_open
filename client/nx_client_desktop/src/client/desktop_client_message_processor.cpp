@@ -3,8 +3,6 @@
 #include <core/resource_management/incompatible_server_watcher.h>
 #include <core/resource/client_camera_factory.h>
 
-#include <core/resource_management/layout_tour_manager.h>
-
 #include <nx_ec/data/api_full_info_data.h>
 
 QnDesktopClientMessageProcessor::QnDesktopClientMessageProcessor(QObject* parent):
@@ -32,20 +30,6 @@ void QnDesktopClientMessageProcessor::connectToConnection(const ec2::AbstractECC
         &ec2::AbstractDiscoveryNotificationManager::gotInitialDiscoveredServers,
         this,
         &QnDesktopClientMessageProcessor::at_gotInitialDiscoveredServers);
-
-    auto layoutTourManager = connection->getLayoutTourNotificationManager();
-
-    connect(layoutTourManager,
-        &ec2::AbstractLayoutTourNotificationManager::addedOrUpdated,
-        qnLayoutTourManager,
-        &QnLayoutTourManager::addOrUpdateTour,
-        Qt::DirectConnection);
-
-    connect(layoutTourManager,
-        &ec2::AbstractLayoutTourNotificationManager::removed,
-        qnLayoutTourManager,
-        &QnLayoutTourManager::removeTour,
-        Qt::DirectConnection);
 }
 
 void QnDesktopClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection)
@@ -54,14 +38,11 @@ void QnDesktopClientMessageProcessor::disconnectFromConnection(const ec2::Abstra
 
     connection->getDiscoveryNotificationManager()->disconnect(this);
     connection->getLayoutTourNotificationManager()->disconnect(this);
-    qnLayoutTourManager->resetTours();
 }
 
 void QnDesktopClientMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoData& fullData)
 {
-    //TODO: #GDM #3.1 logic is not perfect, we've got tours after initialResourcesReceived. Also: who will clean them on disconnect?
     base_type::onGotInitialNotification(fullData);
-    qnLayoutTourManager->resetTours(fullData.layoutTours);
 }
 
 QnResourceFactory* QnDesktopClientMessageProcessor::getResourceFactory() const

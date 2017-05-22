@@ -12,7 +12,7 @@
 #include <common/common_globals.h>
 #include <network/module_information.h>
 #include <rest/server/json_rest_result.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 #include <nx/utils/crypt/linux_passwd_crypt.h>
 
 namespace nx {
@@ -352,8 +352,8 @@ void MediaServerEmulator::onConnectionAckResponseReceived(
     m_udtStreamServerSocket = std::move(udtStreamServerSocket);
 
     NX_LOGX(lm("Starting rendezvous connect from %1 to %2")
-        .str(m_udtStreamSocket->getLocalAddress())
-        .str(m_connectionRequestedData.udpEndpointList.front()), cl_logDEBUG2);
+        .arg(m_udtStreamSocket->getLocalAddress())
+        .arg(m_connectionRequestedData.udpEndpointList.front()), cl_logDEBUG2);
 
     using namespace std::placeholders;
     m_udtStreamSocket->connectAsync(
@@ -381,9 +381,8 @@ void MediaServerEmulator::onUdtConnectDone(SystemError::ErrorCode errorCode)
 
 void MediaServerEmulator::onUdtConnectionAccepted(
     SystemError::ErrorCode /*errorCode*/,
-    AbstractStreamSocket* acceptedSocket)
+    std::unique_ptr<AbstractStreamSocket> /*acceptedSocket*/)
 {
-    delete acceptedSocket;
 }
 
 void MediaServerEmulator::onMessageReceived(

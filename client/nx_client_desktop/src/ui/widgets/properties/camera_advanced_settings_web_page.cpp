@@ -10,7 +10,7 @@
 
 #include <core/resource/camera_resource.h>
 
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 
 class QnCustomCookieJar: public QNetworkCookieJar
 {

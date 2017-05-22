@@ -9,8 +9,8 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/layout_resource.h>
 
-#include <ui/actions/action_manager.h>
-#include <ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <ui/common/indents.h>
 #include <ui/models/resource_properties/user_roles_settings_model.h>
 #include <ui/style/helper.h>
@@ -20,10 +20,13 @@
 #include <ui/widgets/properties/permissions_widget.h>
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/string.h>
 
+using namespace nx::client::desktop::ui;
 
 QnUserRolesDialog::QnUserRolesDialog(QWidget* parent):
     base_type(parent),
@@ -32,6 +35,8 @@ QnUserRolesDialog::QnUserRolesDialog(QWidget* parent):
 {
     ui->setupUi(this);
     setTabWidget(ui->tabWidget);
+
+    setHelpTopic(this, Qn::UserRoles_Help);
 
     addPage(
         SettingsPage,
@@ -194,8 +199,8 @@ void QnUserRolesDialog::applyChanges()
 
         for (const auto& layout: layoutsToShare)
         {
-            menu()->trigger(QnActions::ShareLayoutAction,
-                QnActionParameters(layout).withArgument(Qn::UuidRole, userRole.id));
+            menu()->trigger(action::ShareLayoutAction,
+                action::Parameters(layout).withArgument(Qn::UuidRole, userRole.id));
         }
 
         qnResourcesChangesManager->saveAccessibleResources(userRole, resources);

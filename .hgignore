@@ -39,6 +39,7 @@ target/*
 target-bpi/*
 packages.config
 .vs
+.vscode
 .git
 TAGS
 *.kdev4
@@ -93,6 +94,8 @@ mediaserver/src/server.pro
 mediaserver/src/*.vsp
 mediaserver/src/server.vcproj
 mediaserver/mediaserver.mak*
+
+nx_kit/src
 
 vmaxproxy/bin
 vmaxproxy/build

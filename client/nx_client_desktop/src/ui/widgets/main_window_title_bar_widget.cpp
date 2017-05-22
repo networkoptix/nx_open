@@ -1,5 +1,7 @@
 #include "main_window_title_bar_widget.h"
 
+#include <QtGui/QDragMoveEvent>
+
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QGraphicsProxyWidget>
 #include <QtWidgets/QGraphicsScene>
@@ -11,19 +13,21 @@
 #include <core/resource/layout_resource.h>
 #include <utils/math/math.h>
 
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <ui/common/geometry.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/helper.h>
 #include <ui/widgets/cloud_status_panel.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/common/tool_button.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workaround/hidpi_workarounds.h>
 
 #include <utils/common/delayed.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -140,22 +144,22 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     setAcceptDrops(true);
 
     d->mainMenuButton = newActionButton(
-        QnActions::MainMenuAction,
+        action::MainMenuAction,
         Qn::MainWindow_TitleBar_MainMenu_Help);
     connect(d->mainMenuButton, &QnToolButton::justPressed, this,
         [this]()
         {
-            action(QnActions::MainMenuAction)->trigger();
+            action(action::MainMenuAction)->trigger();
         });
 
-    connect(action(QnActions::MainMenuAction), &QAction::triggered, this,
+    connect(action(action::MainMenuAction), &QAction::triggered, this,
         [this]()
         {
             Q_D(QnMainWindowTitleBarWidget);
             if (!isWidgetVisible(d->mainMenuButton))
                 return;
             static const QPoint kVerticalOffset(0, 2);
-            d->mainMenuHolder.reset(menu()->newMenu(Qn::MainScope, nullptr));
+            d->mainMenuHolder.reset(menu()->newMenu(action::MainScope, nullptr));
             d->mainMenuButton->setDown(true);
             executeButtonMenu(d->mainMenuButton, d->mainMenuHolder.data(), kVerticalOffset);
         });
@@ -168,7 +172,7 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     connect(d->tabBar, &QnLayoutTabBar::closeRequested, this,
         [this](QnWorkbenchLayout* layout)
         {
-            menu()->trigger(QnActions::CloseLayoutAction,
+            menu()->trigger(action::CloseLayoutAction,
                 QnWorkbenchLayoutList() << layout);
         });
 
@@ -187,19 +191,19 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     layout->addWidget(newVLine());
 
     d->newTabButton = newActionButton(
-        QnActions::OpenNewTabAction,
+        action::OpenNewTabAction,
         Qn::MainWindow_TitleBar_NewLayout_Help,
         kTabBarButtonSize);
 
     d->currentLayoutsButton = newActionButton(
-        QnActions::OpenCurrentUserLayoutMenu,
+        action::OpenCurrentUserLayoutMenu,
         kTabBarButtonSize);
     connect(d->currentLayoutsButton, &QnToolButton::justPressed, this,
         [this]()
         {
             QScopedPointer<QMenu> layoutsMenu(menu()->newMenu(
-                QnActions::OpenCurrentUserLayoutMenu,
-                Qn::TitleBarScope));
+                action::OpenCurrentUserLayoutMenu,
+                action::TitleBarScope));
 
             Q_D(const QnMainWindowTitleBarWidget);
             executeButtonMenu(d->currentLayoutsButton, layoutsMenu.data());
@@ -214,25 +218,25 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     layout->addWidget(newVLine());
 #ifdef ENABLE_LOGIN_TO_ANOTHER_SYSTEM_BUTTON
     layout->addWidget(newActionButton(
-        QnActions::OpenLoginDialogAction,
+        action::OpenLoginDialogAction,
         Qn::Login_Help,
         kControlButtonSize));
 #else
     layout->addSpacing(8);
 #endif
     layout->addWidget(newActionButton(
-        QnActions::WhatsThisAction,
+        action::WhatsThisAction,
         Qn::MainWindow_ContextHelp_Help,
         kControlButtonSize));
     layout->addWidget(newActionButton(
-        QnActions::MinimizeAction,
+        action::MinimizeAction,
         kControlButtonSize));
     layout->addWidget(newActionButton(
-        QnActions::EffectiveMaximizeAction,
+        action::EffectiveMaximizeAction,
         Qn::MainWindow_Fullscreen_Help,
         kControlButtonSize));
     layout->addWidget(newActionButton(
-        QnActions::ExitAction,
+        action::ExitAction,
         kControlButtonSize));
 }
 
@@ -252,7 +256,7 @@ void QnMainWindowTitleBarWidget::setTabBarStuffVisible(bool visible)
     d->tabBar->setVisible(visible);
     d->newTabButton->setVisible(visible);
     d->currentLayoutsButton->setVisible(visible);
-    action(QnActions::OpenNewTabAction)->setEnabled(visible);
+    action(action::OpenNewTabAction)->setEnabled(visible);
 }
 
 void QnMainWindowTitleBarWidget::mouseDoubleClickEvent(QMouseEvent* event)
@@ -268,7 +272,7 @@ void QnMainWindowTitleBarWidget::mouseDoubleClickEvent(QMouseEvent* event)
         return;
     }
 
-    action(QnActions::EffectiveMaximizeAction)->trigger();
+    action(action::EffectiveMaximizeAction)->trigger();
     event->accept();
 #endif
 }
@@ -326,12 +330,12 @@ void QnMainWindowTitleBarWidget::dragLeaveEvent(QDragLeaveEvent* event)
 void QnMainWindowTitleBarWidget::dropEvent(QDropEvent* event)
 {
     Q_D(QnMainWindowTitleBarWidget);
-    menu()->trigger(QnActions::DropResourcesIntoNewLayoutAction, d->dropResources);
+    menu()->trigger(action::DropResourcesIntoNewLayoutAction, d->dropResources);
     event->acceptProposedAction();
 }
 
 QnToolButton* QnMainWindowTitleBarWidget::newActionButton(
-    QnActions::IDType actionId,
+    action::IDType actionId,
     int helpTopicId,
     const QSize& fixedSize)
 {
@@ -350,7 +354,7 @@ QnToolButton* QnMainWindowTitleBarWidget::newActionButton(
 }
 
 QnToolButton* QnMainWindowTitleBarWidget::newActionButton(
-    QnActions::IDType actionId,
+    action::IDType actionId,
     const QSize& fixedSize)
 {
     return newActionButton(actionId, Qn::Empty_Help, fixedSize);

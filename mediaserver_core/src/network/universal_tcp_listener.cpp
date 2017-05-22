@@ -72,7 +72,8 @@ void QnUniversalTcpListener::addProxySenderConnections(
     for (int i = 0; i < size; ++i)
     {
         auto connect = new QnProxySenderConnection(
-            proxyUrl, commonModule()->moduleGUID(), this);
+            proxyUrl, commonModule()->moduleGUID(), this, needAuth());
+
         connect->start();
         addOwnership(connect);
     }
@@ -126,7 +127,10 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
 
     #ifdef ENABLE_SSL
         if (sslNeeded)
-            m_serverSocket.reset(new nx::network::deprecated::SslServerSocket(m_serverSocket.release(), true));
+        {
+            m_serverSocket = std::make_unique<nx::network::deprecated::SslServerSocket>(
+                std::move(m_serverSocket), true);
+        }
     #endif
 
    return m_serverSocket.get();

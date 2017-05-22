@@ -1,9 +1,8 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-
+#include <nx/utils/uuid.h>
 #include <recording/time_period.h>
-
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnSearchBookmarksModel;
@@ -42,9 +41,10 @@ private:
 
     void customContextMenuRequested();
 
-    void openInNewLayout(const QnActionParameters &params, const QnTimePeriod &window);
+    void openInNewLayout(const nx::client::desktop::ui::action::Parameters& params,
+        const QnTimePeriod &window);
 
-    bool fillActionParameters(QnActionParameters &params, QnTimePeriod &window);
+    bool fillActionParameters(nx::client::desktop::ui::action::Parameters &params, QnTimePeriod &window);
 
     bool currentUserHasAllCameras();
 

@@ -13,7 +13,7 @@
 #include "ec2_connection.h"
 #include "ec_connection_notification_manager.h"
 #include "managers/time_manager.h"
-#include "network/module_finder.h"
+#include "nx/vms/discovery/manager.h"
 #include "remote_ec_connection.h"
 #include "settings.h"
 
@@ -633,12 +633,14 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
     QnTranStateKey persistentKey(tran.peerID, tran.persistentInfo.dbID);
     int persistentSeq =  m_db->transactionLog()->getLatestSequence(persistentKey);
 
-    if (QnLog::instance(QnLog::EC2_TRAN_LOG)->logLevel() >= cl_logWARNING)
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::warning, QnLog::EC2_TRAN_LOG))
+    {
         if (!transport->isSyncDone() && transport->isReadSync(ApiCommand::NotDefined) && transportHeader.sender != transport->remotePeer().id)
         {
             NX_LOG(QnLog::EC2_TRAN_LOG, lit("Got transaction from peer %1 while sync with peer %2 in progress").
                 arg(transportHeader.sender.toString()).arg(transport->remotePeer().id.toString()), cl_logWARNING);
         }
+    }
 
     if (tran.persistentInfo.sequence > persistentSeq + 1)
     {
@@ -701,7 +703,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
     // do not perform any logic (aka sequence update) for foreign transaction. Just proxy
     if (!transportHeader.dstPeers.isEmpty() && !transportHeader.dstPeers.contains(commonModule()->moduleGUID()))
     {
-        if (QnLog::instance(QnLog::EC2_TRAN_LOG)->logLevel() >= cl_logDEBUG1)
+        if (nx::utils::log::isToBeLogged(nx::utils::log::Level::debug, QnLog::EC2_TRAN_LOG))
         {
             QString dstPeersStr;
             for (const QnUuid& peer : transportHeader.dstPeers)
@@ -910,7 +912,8 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
         proxyList << transport->remotePeer().id;
     }
 
-    if (QnLog::instance(QnLog::EC2_TRAN_LOG)->logLevel() >= cl_logDEBUG1)
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::debug, QnLog::EC2_TRAN_LOG))
+    {
         if (!proxyList.isEmpty())
         {
             QString proxyListStr;
@@ -918,12 +921,12 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
                 proxyListStr += " " + peer.toString();
             NX_LOG(QnLog::EC2_TRAN_LOG, lit("proxy transaction %1 to (%2)").arg(tran.toString()).arg(proxyListStr), cl_logDEBUG1);
         }
-
+    }
 };
 
 void QnTransactionMessageBus::printTranState(const QnTranState& tranState)
 {
-    if (QnLog::instance(QnLog::EC2_TRAN_LOG)->logLevel() < cl_logDEBUG1)
+    if (!nx::utils::log::isToBeLogged(nx::utils::log::Level::debug, QnLog::EC2_TRAN_LOG))
         return;
 
     for (auto itr = tranState.values.constBegin(); itr != tranState.values.constEnd(); ++itr)
@@ -1232,27 +1235,17 @@ QnTransaction<ApiDiscoveredServerDataList> QnTransactionMessageBus::prepareModul
         commonModule()->moduleGUID());
 
 
-    QnModuleFinder* moduleFinder = commonModule()->moduleFinder();
-    for (const QnModuleInformation &moduleInformation : moduleFinder->foundModules())
+    const auto moduleManager = commonModule()->moduleDiscoveryManager();
+    for (const auto& serverData: getServers(moduleManager))
     {
-        ApiDiscoveredServerData serverData(moduleInformation);
-
-        SocketAddress primaryAddress = moduleFinder->primaryAddress(moduleInformation.id);
-        if (primaryAddress.isNull())
-            continue;
-
-        serverData.status = moduleFinder->moduleStaus(moduleInformation.id);
-        if (serverData.status != Qn::Online &&
-            serverData.status != Qn::Unauthorized &&
-            serverData.status != Qn::Incompatible)
+        if (serverData.status == Qn::Online ||
+            serverData.status == Qn::Unauthorized ||
+            serverData.status == Qn::Incompatible)
         {
-            continue;
+            transaction.params.push_back(std::move(serverData));
         }
-
-        serverData.remoteAddresses.insert(primaryAddress.address.toString());
-        serverData.port = primaryAddress.port;
-        transaction.params.push_back(std::move(serverData));
     }
+
     transaction.peerID = commonModule()->moduleGUID();
     transaction.transactionType = TransactionType::Local;
     return transaction;
@@ -1714,7 +1707,7 @@ void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& _url)
     {
         if (transport->remoteSocketAddr() == urlStr)
         {
-            NX_LOGX(lm("Disconnected from peer %1").str(url), cl_logWARNING);
+            NX_LOGX(lm("Disconnected from peer %1").arg(url), cl_logWARNING);
             transport->setState(QnTransactionTransport::Error);
         }
     }
@@ -1807,7 +1800,7 @@ void QnTransactionMessageBus::reconnectAllPeers(QnMutexLockerBase* const /*lock*
 {
     for (QnTransactionTransport* transport : m_connections)
     {
-        NX_LOGX(lm("Disconnected from peer %1").str(transport->remoteAddr()), cl_logWARNING);
+        NX_LOGX(lm("Disconnected from peer %1").arg(transport->remoteAddr()), cl_logWARNING);
         transport->setState(QnTransactionTransport::Error);
     }
     for (auto transport : m_connectingConnections)

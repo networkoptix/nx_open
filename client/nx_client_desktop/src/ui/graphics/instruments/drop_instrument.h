@@ -7,7 +7,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/videowall_item_index.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 
 class QnWorkbenchContext;
 class DropSurfaceItem;
@@ -44,7 +44,8 @@ protected:
     SceneEventFilterItem *filterItem() const;
 
 private:
-    bool delayedTriggerIfPossible(QnActions::IDType id, const QnActionParameters& parameters);
+    bool delayedTriggerIfPossible(nx::client::desktop::ui::action::IDType id,
+        const nx::client::desktop::ui::action::Parameters& parameters);
 
 private:
     QnResourceList m_resources;

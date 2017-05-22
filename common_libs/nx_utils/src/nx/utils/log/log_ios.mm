@@ -2,7 +2,15 @@
 
 #import <Foundation/Foundation.h>
 
-void QnLog::writeToStdout(const QString& str, QnLogLevel /*logLevel*/)
+namespace nx {
+namespace utils {
+namespace log {
+
+void StdOut::writeImpl(Level /*level*/, const QString& message)
 {
-    NSLog(@"%@", str.toNSString());
+    NSLog(@"%@", message.toNSString());
 }
+
+} // namespace log
+} // namespace utils
+} // namespace nx

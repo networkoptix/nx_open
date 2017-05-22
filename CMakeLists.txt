@@ -16,7 +16,7 @@ option(rdepSync
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
 
-project(vms VERSION 3.0.0)
+project(vms VERSION 3.1.0)
 
 set(releaseVersion ${PROJECT_VERSION})
 set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
@@ -60,14 +60,18 @@ include(cloud_host)
 include(vms_parts)
 include(compiler_options)
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+file(MAKE_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+file(MAKE_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
 nx_rdep_add_package(qt PATH_VARIABLE QT_DIR)
 if(CMAKE_CROSSCOMPILING)
     set(QT_PREFIX "..")
 else()
     set(QT_PREFIX "${QT_DIR}")
+    file(TO_CMAKE_PATH "${QT_PREFIX}" QT_PREFIX)
 endif()
 list(APPEND CMAKE_PREFIX_PATH ${QT_DIR})
 if(MACOSX)
@@ -84,6 +88,8 @@ nx_rdep_add_package(any/boost)
 nx_rdep_add_package(any/qtservice)
 nx_rdep_add_package(any/qtsinglecoreapplication)
 nx_rdep_add_package(any/qtsingleapplication)
+
+nx_rdep_add_package(any/nx_kit)
 
 find_package(Qt5
     COMPONENTS

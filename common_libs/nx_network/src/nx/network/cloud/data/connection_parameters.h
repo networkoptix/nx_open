@@ -22,6 +22,17 @@ constexpr static const size_t kUdpTunnelKeepAliveRetriesDefault = 3;
 constexpr static const std::chrono::seconds 
     kDefaultTunnelInactivityTimeout = std::chrono::minutes(8);
 
+// Nat traversal methods default start delays.
+
+constexpr static const std::chrono::milliseconds 
+    kUdpHolePunchingStartDelayDefault = std::chrono::milliseconds::zero();
+
+constexpr static const std::chrono::milliseconds
+    kTrafficRelayingStartDelayDefault = std::chrono::seconds(2);
+
+constexpr static const std::chrono::milliseconds
+    kDirectTcpConnectStartDelayDefault = std::chrono::milliseconds::zero();
+
 /**
  * @note All fields are optional for backward compatibility.
  */
@@ -40,6 +51,10 @@ public:
 
     nx::network::RetryPolicy tcpReverseRetryPolicy;
     nx_http::AsyncHttpClient::Timeouts tcpReverseHttpTimeouts;
+
+    std::chrono::milliseconds udpHolePunchingStartDelay;
+    std::chrono::milliseconds trafficRelayingStartDelay;
+    std::chrono::milliseconds directTcpConnectStartDelay;
 
     ConnectionParameters();
     bool operator==(const ConnectionParameters& rhs) const;

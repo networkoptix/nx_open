@@ -28,10 +28,10 @@ using namespace stun;
 class StunCustomTest : public testing::Test
 {
 protected:
-    StunCustomTest()
-        : mediaserverApi(&cloudData, &stunMessageDispatcher)
-        , listeningPeerRegistrator(settings, &cloudData, &stunMessageDispatcher, &listeningPeerPool)
-        , server(
+    StunCustomTest():
+        mediaserverApi(&cloudData, &stunMessageDispatcher),
+        listeningPeerRegistrator(settings, &cloudData, &stunMessageDispatcher, &listeningPeerPool),
+        server(
             &stunMessageDispatcher,
             false,
             nx::network::NatTraversalSupport::disabled)
@@ -43,6 +43,11 @@ protected:
         address = SocketAddress(HostAddress::localhost, server.endpoints().front().port);
     }
 
+    ~StunCustomTest()
+    {
+        server.pleaseStopSync();
+    }
+
     SocketAddress address;
     MessageDispatcher stunMessageDispatcher;
     CloudDataProviderMock cloudData;
@@ -50,7 +55,7 @@ protected:
     conf::Settings settings;
     ListeningPeerPool listeningPeerPool;
     PeerRegistrator listeningPeerRegistrator;
-    MultiAddressServer<SocketServer> server;
+    network::server::MultiAddressServer<SocketServer> server;
 };
 
 static const auto SYSTEM_ID = QnUuid::createUuid().toSimpleString().toUtf8();

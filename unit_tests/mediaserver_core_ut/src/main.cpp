@@ -53,8 +53,6 @@ int main(int argc, char** argv)
         argc, argv,
         [](const nx::utils::ArgumentParser& args)
         {
-            if (const auto value = args.get("tmp"))
-                nx::utils::test::TestWithTemporaryDirectory::setTemporaryDirectoryPath(*value);
             return nx::utils::test::DeinitFunctions();
         },
         0);

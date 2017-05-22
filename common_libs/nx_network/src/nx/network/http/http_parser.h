@@ -8,7 +8,7 @@
 namespace nx_http {
 
 /**
- * This class is just a wrapper for use with \a nx_api::BaseStreamProtocolConnection class. 
+ * This class is just a wrapper for use with \a nx::network::server::BaseStreamProtocolConnection class. 
  */
 class NX_NETWORK_API MessageParser
 {
@@ -27,8 +27,8 @@ public:
         \note \a *buf MAY NOT contain whole message, but any part of it (it can be as little as 1 byte)
         \note Reads whole message even if parse error occured
     */
-    nx_api::ParserState parse( const nx::Buffer& buf, size_t* bytesProcessed );
-    nx_api::ParserState processEof();
+    nx::network::server::ParserState parse( const nx::Buffer& buf, size_t* bytesProcessed );
+    nx::network::server::ParserState processEof();
 
     //!Resets parse state and prepares for parsing different data
     void reset();

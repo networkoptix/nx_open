@@ -17,7 +17,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 #include <nx/utils/crypt/linux_passwd_crypt.h>
 
 #include "http/get_listening_peer_list_handler.h"
@@ -64,7 +64,7 @@ MediatorFunctionalTest::MediatorFunctionalTest(int flags):
     QDir().mkpath(m_tmpDir);
 
     const auto stunAddress = findFreeTcpAndUdpLocalAddress();
-    NX_LOGX(lm("STUN TCP & UDP endpoint: %1").str(stunAddress), cl_logINFO);
+    NX_LOGX(lm("STUN TCP & UDP endpoint: %1").arg(stunAddress), cl_logINFO);
 
     addArg("/path/to/bin");
     addArg("-e");
@@ -179,7 +179,7 @@ std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addServer(
         && server->bind() != nx::hpm::api::ResultCode::ok)
     {
         NX_LOGX(lm("Failed to bind server: %1, endpoint=%2")
-            .arg(server->fullName()).str(server->endpoint()), cl_logERROR);
+            .arg(server->fullName()).arg(server->endpoint()), cl_logERROR);
         return nullptr;
     }
 

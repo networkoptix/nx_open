@@ -308,7 +308,9 @@ QString QnUserResource::fullName() const
 ec2::ApiResourceParamWithRefDataList QnUserResource::params() const
 {
     ec2::ApiResourceParamWithRefDataList result;
-    QString value = commonModule()->propertyDictionary()->value(getId(), Qn::USER_FULL_NAME);
+    QString value;
+    if (commonModule())
+        value = commonModule()->propertyDictionary()->value(getId(), Qn::USER_FULL_NAME);
     if (value.isEmpty() && !fullName().isEmpty() && isCloud())
         value = fullName(); //< move fullName to property dictionary to sync data with cloud correctly
     if (!value.isEmpty())

@@ -37,6 +37,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "appserver2-x86", "..\appser
 		${nx_utils.guid} = ${nx_utils.guid}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_kit-x86", "..\nx_kit\src\nx_kit-x86.vcxproj", "${nx_kit.guid}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_email-x86", "..\common_libs\nx_email\src\nx_email-x86.vcxproj", "${nx_email.guid}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_streaming-x86", "..\common_libs\nx_streaming\src\nx_streaming-x86.vcxproj", "${nx_streaming.guid}"
@@ -63,6 +67,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_fusion-x86", "${basedir}
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_utils-x86", "..\common_libs\nx_utils\src\nx_utils-x86.vcxproj", "${nx_utils.guid}"
 	ProjectSection(ProjectDependencies) = postProject
+		${nx_kit.guid} = ${nx_kit.guid}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cloud_db_client-x86", "..\nx_cloud\cloud_db_client\src\cloud_db_client-x86.vcxproj", "${cloud_db_client.guid}"

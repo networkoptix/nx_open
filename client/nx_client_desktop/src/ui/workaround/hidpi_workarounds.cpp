@@ -2,14 +2,15 @@
 
 #include <QtCore/QPointer>
 
+#include <QtGui/QContextMenuEvent>
 #include <QtGui/QGuiApplication>
-#include <QtWidgets/QMenu>
 #include <QtGui/QMovie>
 #include <QtGui/QPixmap>
 #include <QtGui/QScreen>
 #include <QtGui/QWindow>
 
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QMenu>
 #include <QtWidgets/QGraphicsProxyWidget>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>

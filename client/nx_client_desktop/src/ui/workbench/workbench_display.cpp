@@ -5,6 +5,7 @@
 
 #include <QtCore/QtAlgorithms>
 #include <QtWidgets/QAction>
+#include <QtWidgets/QGraphicsProxyWidget>
 #include <QtOpenGL/QGLContext>
 #include <QtOpenGL/QGLWidget>
 
@@ -31,8 +32,8 @@
 #include <camera/client_video_camera.h>
 #include <redass/redass_controller.h>
 
-#include <ui/actions/action_manager.h>
-#include <ui/actions/action_target_provider.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_target_provider.h>
 
 #include <ui/common/notification_levels.h>
 
@@ -56,11 +57,9 @@
 #include <ui/graphics/instruments/widget_layout_instrument.h>
 
 #include <ui/graphics/items/resource/button_ids.h>
+#include <nx/client/desktop/ui/workbench/resource/resource_widget_factory.h>
 #include <ui/graphics/items/resource/resource_widget.h>
-#include <ui/graphics/items/resource/server_resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/graphics/items/resource/videowall_screen_widget.h>
-#include <ui/graphics/items/resource/web_resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h>
 #include <ui/graphics/items/grid/curtain_item.h>
@@ -96,6 +95,8 @@
 #include "watchers/workbench_server_time_watcher.h"
 
 #include <nx/utils/log/log.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -270,19 +271,19 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
         bool isWebView = scene() && dynamic_cast<QnGraphicsWebView*>(scene()->focusItem());
 
         for (auto actionId : {
-            QnActions::JumpToLiveAction, //< L
-            QnActions::ToggleMuteAction, //< M
-            QnActions::ToggleSyncAction, //< S
-            QnActions::JumpToEndAction,  //< X
-            QnActions::JumpToStartAction,//< Z
-            QnActions::PlayPauseAction,  //< Space
+            action::JumpToLiveAction, //< L
+            action::ToggleMuteAction, //< M
+            action::ToggleSyncAction, //< S
+            action::JumpToEndAction,  //< X
+            action::JumpToStartAction,//< Z
 
             /* "Delete" button */
-            QnActions::DeleteVideowallMatrixAction,
-            QnActions::RemoveLayoutItemAction,
-            QnActions::RemoveLayoutItemFromSceneAction,
-            QnActions::RemoveFromServerAction,
-            QnActions::StopSharingLayoutAction
+            action::DeleteVideowallMatrixAction,
+            action::RemoveLayoutItemAction,
+            action::RemoveLayoutItemFromSceneAction,
+            action::RemoveFromServerAction,
+            action::StopSharingLayoutAction,
+            action::RemoveLayoutTourAction
         })
             action(actionId)->setEnabled(!isWebView);
     });
@@ -434,8 +435,8 @@ void QnWorkbenchDisplay::deinitSceneView()
     m_instrumentManager->unregisterScene(m_scene);
 
     disconnect(m_scene, NULL, this, NULL);
-    disconnect(m_scene, NULL, context()->action(QnActions::SelectionChangeAction), NULL);
-    disconnect(action(QnActions::SelectionChangeAction), NULL, this, NULL);
+    disconnect(m_scene, NULL, context()->action(action::SelectionChangeAction), NULL);
+    disconnect(action(action::SelectionChangeAction), NULL, this, NULL);
 
     /* Clear curtain. */
     if (!m_curtainItem.isNull())
@@ -502,11 +503,11 @@ void QnWorkbenchDisplay::initSceneView()
 
     /* Note that selection often changes there and back, and we don't want such changes to
      * affect our logic, so we use queued connections here. */ // TODO: #Elric I don't see queued connections
-    connect(m_scene, SIGNAL(selectionChanged()), context()->action(QnActions::SelectionChangeAction), SLOT(trigger()));
+    connect(m_scene, SIGNAL(selectionChanged()), context()->action(action::SelectionChangeAction), SLOT(trigger()));
     connect(m_scene, SIGNAL(selectionChanged()), this, SLOT(at_scene_selectionChanged()));
     connect(m_scene, SIGNAL(destroyed()), this, SLOT(at_scene_destroyed()));
 
-    connect(action(QnActions::SelectionChangeAction), &QAction::triggered, this, &QnWorkbenchDisplay::updateSelectionFromTree);
+    connect(action(action::SelectionChangeAction), &QAction::triggered, this, &QnWorkbenchDisplay::updateSelectionFromTree);
 
     /* Scene indexing will only slow everything down. */
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
@@ -926,12 +927,12 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout)
 
 void QnWorkbenchDisplay::updateSelectionFromTree()
 {
-    QnActionTargetProvider *provider = menu()->targetProvider();
+    auto provider = menu()->targetProvider();
     if (!provider)
         return;
 
-    Qn::ActionScope scope = provider->currentScope();
-    if (scope != Qn::TreeScope)
+    auto scope = provider->currentScope();
+    if (scope != action::TreeScope)
         return;
 
     /* Just deselect all items for now. See #4480. */
@@ -1073,56 +1074,9 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         return false;
     }
 
-    /* Invalid items may lead to very strange behavior bugs. */
-    if (item->uuid().isNull())
-    {
-	    NX_LOG(lit("QnWorkbenchDisplay::addItemInternal: null item uuid"), cl_logDEBUG1);
-        qnDeleteLater(item);
-        return false;
-    }
-
-    QnResourcePtr resource = resourcePool()->getResourceByUniqueId(item->resourceUid());
-    if (!resource)
-    {
-        NX_LOG(lit("QnWorkbenchDisplay::addItemInternal: invalid resource id %1")
-            .arg(item->resourceUid()), cl_logDEBUG1);
-        qnDeleteLater(item);
-        return false;
-    }
-
-    const auto requiredPermission = QnResourceAccessFilter::isShareableMedia(resource)
-        ? Qn::ViewContentPermission
-        : Qn::ReadPermission;
-
-    if (!accessController()->hasPermissions(resource, requiredPermission))
-    {
-	    NX_LOG(lit("QnWorkbenchDisplay::addItemInternal: insufficient permissions"), cl_logDEBUG1);
-        qnDeleteLater(item);
-        return false;
-    }
-
-    QnResourceWidget *widget = nullptr;
-    if (resource->hasFlags(Qn::server))
-    {
-        widget = new QnServerResourceWidget(context(), item);
-    }
-    else if (resource->hasFlags(Qn::videowall))
-    {
-        widget = new QnVideowallScreenWidget(context(), item);
-    }
-    else if (resource->hasFlags(Qn::media))
-    {
-        widget = new QnMediaResourceWidget(context(), item);
-    }
-    else if (resource->hasFlags(Qn::web_page))
-    {
-        widget = new QnWebResourceWidget(context(), item);
-    }
-
+    auto widget = ResourceWidgetFactory::createWidget(context(), item);
     if (!widget)
     {
-        NX_LOG(lit("QnWorkbenchDisplay::addItemInternal: unsupported resource type %1")
-            .arg(resource->flags()), cl_logDEBUG1);
         qnDeleteLater(item);
         return false;
     }
@@ -1534,11 +1488,6 @@ QRectF QnWorkbenchDisplay::itemGeometry(QnWorkbenchItem *item, QRectF *enclosing
     return geometry;
 }
 
-QRectF QnWorkbenchDisplay::layoutBoundingGeometry() const
-{
-    return fitInViewGeometry();
-}
-
 QRectF QnWorkbenchDisplay::fitInViewGeometry() const
 {
     QRect layoutBoundingRect = workbench()->currentLayout()->boundingRect();
@@ -1550,6 +1499,15 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const
     QRect sceneBoundingRect = (backgroundBoundingRect.isNull())
         ? layoutBoundingRect
         : layoutBoundingRect.united(backgroundBoundingRect);
+
+    static const int kLayoutTourMinimalSize = 3; //< size in cells: 3*3
+    if (workbench()->currentLayout()->data().contains(Qn::LayoutTourUuidRole))
+    {
+        if (sceneBoundingRect.width() < kLayoutTourMinimalSize)
+            sceneBoundingRect.setWidth(kLayoutTourMinimalSize);
+        if (sceneBoundingRect.height() < kLayoutTourMinimalSize)
+            sceneBoundingRect.setHeight(kLayoutTourMinimalSize);
+    }
 
     /* Do not add additional spacing in following cases: */
     bool noAdjust = qnRuntime->isVideoWallMode()                           /*< Videowall client. */
@@ -1758,12 +1716,16 @@ void QnWorkbenchDisplay::synchronizeSceneBounds()
     }
     else
     {
-        moveRect = layoutBoundingGeometry();
+        moveRect = fitInViewGeometry();
         sizeRect = fitInViewGeometry();
     }
 
     m_boundingInstrument->setPositionBounds(m_view, moveRect);
-    m_boundingInstrument->setSizeBounds(m_view, qnGlobals->viewportLowerSizeBound(), Qt::KeepAspectRatioByExpanding, sizeRect.size(), Qt::KeepAspectRatioByExpanding);
+    m_boundingInstrument->setSizeBounds(m_view,
+        qnGlobals->viewportLowerSizeBound(),
+        Qt::KeepAspectRatioByExpanding,
+        sizeRect.size(),
+        Qt::KeepAspectRatioByExpanding);
 }
 
 void QnWorkbenchDisplay::synchronizeSceneBoundsExtension()
@@ -2044,7 +2006,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
         }
     }
 
-    action(QnActions::BookmarksModeAction)->setChecked(layout->data(Qn::LayoutBookmarksModeRole).toBool());
+    action(action::BookmarksModeAction)->setChecked(layout->data(Qn::LayoutBookmarksModeRole).toBool());
 
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
     streamSynchronizer->setState(layout->data(Qn::LayoutSyncStateRole).value<QnStreamSynchronizationState>());

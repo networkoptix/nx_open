@@ -9,7 +9,9 @@ namespace cloud {
 namespace tcp {
 
 IncomingReverseTunnelConnection::IncomingReverseTunnelConnection(
-    String selfHostName, String targetHostName, SocketAddress proxyServiceEndpoint)
+    String selfHostName,
+    String targetHostName,
+    SocketAddress proxyServiceEndpoint)
 :
     m_selfHostName(std::move(selfHostName)),
     m_targetHostName(std::move(targetHostName)),
@@ -17,16 +19,35 @@ IncomingReverseTunnelConnection::IncomingReverseTunnelConnection(
 {
 }
 
+void IncomingReverseTunnelConnection::bindToAioThread(
+    aio::AbstractAioThread* aioThread)
+{
+    base_type::bindToAioThread(aioThread);
+
+    for (auto& connector: m_connectors)
+        connector->bindToAioThread(aioThread);
+
+    for (auto& socket: m_sockets)
+        socket->bindToAioThread(aioThread);
+
+    if (m_timer)
+        m_timer->bindToAioThread(aioThread);
+}
+
 void IncomingReverseTunnelConnection::start(
-    aio::AbstractAioThread* aioThread, RetryPolicy policy, StartHandler handler)
+    RetryPolicy policy,
+    StartHandler handler)
 {
     NX_ASSERT(policy.maxRetryCount > 0); //< TODO: #ak Should refactor and remove this assert.
-    m_timer.reset(new RetryTimer(policy, aioThread));
     m_startHandler = std::move(handler);
+
+    m_timer.reset(new RetryTimer(policy));
+    m_timer->bindToAioThread(getAioThread());
     m_timer->scheduleNextTry([this](){ spawnConnectorIfNeeded(); });
 }
 
-void IncomingReverseTunnelConnection::setHttpTimeouts(nx_http::AsyncHttpClient::Timeouts timeouts)
+void IncomingReverseTunnelConnection::setHttpTimeouts(
+    nx_http::AsyncHttpClient::Timeouts timeouts)
 {
     m_httpTimeouts = timeouts;
 }
@@ -34,7 +55,7 @@ void IncomingReverseTunnelConnection::setHttpTimeouts(nx_http::AsyncHttpClient::
 void IncomingReverseTunnelConnection::accept(AcceptHandler handler)
 {
     NX_EXPECT(!m_acceptHandler);
-    m_timer->dispatch(
+    dispatch(
         [this, handler = std::move(handler)]()
         {
             if (isExhausted())
@@ -47,29 +68,28 @@ void IncomingReverseTunnelConnection::accept(AcceptHandler handler)
         });
 }
 
-void IncomingReverseTunnelConnection::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
+void IncomingReverseTunnelConnection::stopWhileInAioThread()
 {
-    m_timer->pleaseStop(
-        [this, handler = std::move(handler)]()
-        {
-            m_connectors.clear();
-            m_sockets.clear();
-            handler();
-        });
+    m_connectors.clear();
+    m_sockets.clear();
+    m_timer.reset();
 }
 
 void IncomingReverseTunnelConnection::spawnConnectorIfNeeded()
 {
     NX_LOGX(lm("There are %1 connector(s) and %2 socket(s) against %3 pool size")
-        .strs(m_connectors.size(), m_sockets.size(), m_expectedPoolSize), cl_logDEBUG1);
+        .args(m_connectors.size(), m_sockets.size(), m_expectedPoolSize), cl_logDEBUG1);
 
     if (m_connectors.size() + m_sockets.size() >= m_expectedPoolSize)
         return;
 
+    auto connector = std::make_unique<ReverseConnector>(
+        m_selfHostName,
+        m_targetHostName);
+    connector->bindToAioThread(getAioThread());
     const auto connectorIt = m_connectors.insert(
         m_connectors.end(),
-        std::make_unique<ReverseConnector>(
-            m_selfHostName, m_targetHostName, m_timer->getAioThread()));
+        std::move(connector));
 
     NX_LOGX(lm("Start connector(%1)").arg(*connectorIt), cl_logDEBUG2);
     (*connectorIt)->connect(
@@ -111,7 +131,7 @@ void IncomingReverseTunnelConnection::saveConnection(
         if (value != m_keepAliveOptions)
         {
             m_keepAliveOptions = value;
-            NX_LOGX(lm("New keepAliveOptions=%1").str(m_keepAliveOptions), cl_logDEBUG1);
+            NX_LOGX(lm("New keepAliveOptions=%1").arg(m_keepAliveOptions), cl_logDEBUG1);
 
             for (auto it = m_sockets.begin(); it != m_sockets.end(); )
             {

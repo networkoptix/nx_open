@@ -28,8 +28,7 @@ namespace
     const QString kFastRequestKey("fast");
 }
 
-QnStorageSpaceRestHandler::QnStorageSpaceRestHandler():
-    m_monitor(qnPlatform->monitor())
+QnStorageSpaceRestHandler::QnStorageSpaceRestHandler()
 {}
 
 int QnStorageSpaceRestHandler::executeGet(
@@ -111,8 +110,9 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
     };
 
     /* Enumerate auto-generated storages on all possible partitions. */
+    QnPlatformMonitor* monitor = qnPlatform->monitor();
     QList<QnPlatformMonitor::PartitionSpace> partitions =
-        m_monitor->totalPartitionSpaceInfo(
+        monitor->totalPartitionSpaceInfo(
         QnPlatformMonitor::LocalDiskPartition | QnPlatformMonitor::NetworkPartition
         );
 

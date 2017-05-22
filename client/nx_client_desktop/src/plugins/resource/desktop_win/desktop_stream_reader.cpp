@@ -66,7 +66,7 @@ bool QnDesktopStreamreader::init()
     AVCodec* codec = avcodec_find_encoder_by_name(m_encoderCodecName);
     if(codec == 0)
     {
-        cl_log.log(QLatin1String("Can't find encoder"), cl_logWARNING);
+        NX_WARNING(this, "Can't find encoder");
         return false;
     }
 
@@ -89,7 +89,7 @@ bool QnDesktopStreamreader::init()
 
     if (avcodec_open2(m_videoCodecCtx, codec, nullptr) < 0)
     {
-        cl_log.log(QLatin1String("Can't initialize encoder"), cl_logWARNING);
+        NX_WARNING(this, "Can't initialize encoder");
         return false;
     }
 

@@ -37,13 +37,14 @@ public:
     void push(Result result);
     bool isEmpty();
     std::size_t size() const;
+    void clear();
 
     std::function<void(Result)> pusher();
 
     /**
      * While reader is in terminated status, all pop operations with readerId 
      * supplied return immediately without value.
-     * @warning It is highly recommended to call SyncQueue::removeReaderFromTerminatedList 
+     * WARNING: It is highly recommended to call SyncQueue::removeReaderFromTerminatedList 
      * after termination has been completed (e.g., reader thread has stopped) to prevent 
      * "terminated reader list" from holding redundant information.
      */
@@ -165,6 +166,14 @@ std::size_t SyncQueue<Result>::size() const
 {
     QnMutexLocker lock( &m_mutex );
     return m_queue.size();
+}
+
+template< typename Result>
+void SyncQueue<Result>::clear()
+{
+    QnMutexLocker lock( &m_mutex );
+    decltype( m_queue ) queue;
+    std::swap( m_queue, queue );
 }
 
 template<typename Result>

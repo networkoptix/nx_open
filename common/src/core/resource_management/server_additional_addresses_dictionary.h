@@ -2,9 +2,9 @@
 
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/uuid.h>
 
-
-class QnServerAdditionalAddressesDictionary: public QObject, public Singleton<QnServerAdditionalAddressesDictionary>
+class QnServerAdditionalAddressesDictionary: public QObject
 {
     Q_OBJECT
 public:
@@ -25,5 +25,3 @@ private:
     QMap<QnUuid, DiscoveryInfo> m_discoveryInfoById;
     mutable QnMutex m_mutex;
 };
-
-#define qnServerAdditionalAddressesDictionary QnServerAdditionalAddressesDictionary::instance()

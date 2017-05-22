@@ -7,7 +7,7 @@
 #include "core/resource/media_server_resource.h"
 #include "nx/fusion/serialization/json.h"
 #include <nx/fusion/model_functions.h>
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "network/router.h"
 #include "api/app_server_connection.h"
 
@@ -15,7 +15,7 @@ namespace {
     int HTTP_READ_TIMEOUT = 1000 * 10;
 }
 
-class QnMessageBodyParser: public nx::utils::bsf::AbstractByteStreamFilter
+class QnMessageBodyParser: public nx::utils::bstream::AbstractByteStreamFilter
 {
 public:
     QnMessageBodyParser(QnIOModuleMonitor* owner): m_owner(owner) {}

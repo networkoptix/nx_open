@@ -1,6 +1,4 @@
-#include <QCoreApplication>
-
-#include <QDateTime>
+#include <QtCore/QCoreApplication>
 
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/httpclient.h>
@@ -13,18 +11,11 @@
 
 int main(int argc, char** argv)
 {
-    // QCoreApplication::applicationdirPath() is used throughout code (common, appserver2, etc...)
     QCoreApplication application(argc, argv);
 
     const auto resultCode = nx::network::test::runTest(
         argc, argv,
-        [](const nx::utils::ArgumentParser& args)
-        {
-            if (const auto value = args.get("tmp"))
-                nx::cloud::relay::test::RelayTestSetup::setTemporaryDirectoryPath(*value);
-
-            return nx::utils::test::DeinitFunctions();
-        },
+        nullptr,
         nx::network::InitializationFlags::disableUdt);
 
     return resultCode;

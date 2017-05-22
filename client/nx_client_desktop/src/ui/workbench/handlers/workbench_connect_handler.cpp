@@ -3,6 +3,8 @@
 
 #include <QtNetwork/QHostInfo>
 
+#include <QtWidgets/QAction>
+
 #include <api/abstract_connection.h>
 #include <api/app_server_connection.h>
 #include <api/runtime_info_manager.h>
@@ -42,9 +44,7 @@
 
 #include <platform/hardware_information.h>
 
-#include <ui/actions/action.h>
-#include <ui/actions/action_manager.h>
-#include <ui/actions/action_parameter_types.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <ui/dialogs/login_dialog.h>
 #include <ui/dialogs/reconnect_info_dialog.h>
@@ -77,7 +77,7 @@
 #include <utils/common/system_information.h>
 #include <utils/common/url.h>
 #include <utils/common/delayed.h>
-#include <network/module_finder.h>
+#include <nx/vms/discovery/manager.h>
 #include <network/router.h>
 #include <network/system_helpers.h>
 #include <utils/reconnect_helper.h>
@@ -90,6 +90,7 @@
 #include <nx_ec/dummy_handler.h>
 
 using namespace nx::client::desktop;
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -314,24 +315,24 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
             runtimeInfoManager()->updateLocalItem(localInfo);
         });
 
-    connect(action(QnActions::ConnectAction), &QAction::triggered, this,
+    connect(action(action::ConnectAction), &QAction::triggered, this,
         &QnWorkbenchConnectHandler::at_connectAction_triggered);
-    connect(action(QnActions::ConnectToCloudSystemAction), &QAction::triggered, this,
+    connect(action(action::ConnectToCloudSystemAction), &QAction::triggered, this,
         &QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered);
-    connect(action(QnActions::ReconnectAction), &QAction::triggered, this,
+    connect(action(action::ReconnectAction), &QAction::triggered, this,
         &QnWorkbenchConnectHandler::at_reconnectAction_triggered);
-    connect(action(QnActions::DisconnectAction), &QAction::triggered, this,
+    connect(action(action::DisconnectAction), &QAction::triggered, this,
         &QnWorkbenchConnectHandler::at_disconnectAction_triggered);
 
-    connect(action(QnActions::OpenLoginDialogAction), &QAction::triggered, this,
+    connect(action(action::OpenLoginDialogAction), &QAction::triggered, this,
         &QnWorkbenchConnectHandler::showLoginDialog, Qt::QueuedConnection);
-    connect(action(QnActions::BeforeExitAction), &QAction::triggered, this,
+    connect(action(action::BeforeExitAction), &QAction::triggered, this,
         [this]
         {
             disconnectFromServer(DisconnectFlag::Force);
         });
 
-    connect(action(QnActions::LogoutFromCloud), &QAction::triggered, this,
+    connect(action(action::LogoutFromCloud), &QAction::triggered, this,
         [this]
         {
             switch (m_logicalState)
@@ -377,13 +378,17 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
 
     context()->instance<ServerNotificationCache>();
 
-    const auto resourceModeAction = action(QnActions::ResourcesModeAction);
+    QnWorkbenchWelcomeScreen* welcomeScreen = qnRuntime->isDesktopMode()
+        ? context()->instance<QnWorkbenchWelcomeScreen>()
+        : nullptr;
+    const auto resourceModeAction = action(action::ResourcesModeAction);
     connect(resourceModeAction, &QAction::toggled, this,
-        [this, welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>()](bool checked)
+        [this, welcomeScreen](bool checked)
         {
-            welcomeScreen->setVisible(!checked);
+            if (welcomeScreen)
+                welcomeScreen->setVisible(!checked);
             if (workbench()->layouts().isEmpty())
-                action(QnActions::OpenNewTabAction)->trigger();
+                action(action::OpenNewTabAction)->trigger();
         }, Qt::QueuedConnection); //< QueuedConnection is needed here because 2 title bars
                                   // (windowed/welcomescreen and fullscreen) are subscribed
                                   // to MainMenuAction, and main menu must not change
@@ -407,20 +412,32 @@ void QnWorkbenchConnectHandler::handleConnectReply(
 {
     /* Check if we have entered 'connect' method again while were in 'connecting...' state */
     if (m_connecting.handle != handle)
+    {
+        NX_LOG("handleConnectReply: waiting for another request, ignore", cl_logDEBUG1);
         return;
+    }
 
     if (m_logicalState == LogicalState::disconnected)
+    {
+        NX_LOG("handleConnectReply: already disconnected, ignore", cl_logDEBUG1);
         return;
+    }
 
     if (m_physicalState != PhysicalState::testing)
+    {
+        NX_LOG(lm("handleConnectReply: invalid physical state %1").arg(physicalToString(m_physicalState)), cl_logDEBUG1);
         return;
+    }
 
     m_connecting.reset();
 
     /* Preliminary exit if application was closed while we were in the inner loop. */
     NX_ASSERT(!context()->closingDown());
     if (context()->closingDown())
+    {
+        NX_LOG("handleConnectReply: closing application", cl_logDEBUG1);
         return;
+    }
 
     NX_ASSERT(connection || errorCode != ec2::ErrorCode::ok);
     QnConnectionInfo connectionInfo;
@@ -434,6 +451,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
         ? QnConnectionValidator::validateConnection(connectionInfo, errorCode)
         : QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, mainWindow());
     NX_ASSERT(connection || status != Qn::SuccessConnectionResult);
+    NX_LOG(lm("handleConnectReply: connection status %1").arg(status), cl_logDEBUG1);
 
     if (m_logicalState == LogicalState::reconnecting)
     {
@@ -447,9 +465,12 @@ void QnWorkbenchConnectHandler::handleConnectReply(
             if (helpers::isNewSystem(connectionInfo) && !connectionInfo.ecDbReadOnly)
             {
                 disconnectFromServer(DisconnectFlag::Force);
-                auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-                /* Method is called from QML where we are passing QString. */
-                welcomeScreen->setupFactorySystem(connectionInfo.effectiveUrl().toString());
+                if (qnRuntime->isDesktopMode())
+                {
+                    auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+                    /* Method is called from QML where we are passing QString. */
+                    welcomeScreen->setupFactorySystem(connectionInfo.effectiveUrl().toString());
+                }
             }
             else
             {
@@ -458,7 +479,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
             break;
         case Qn::IncompatibleProtocolConnectionResult:
         case Qn::IncompatibleCloudHostConnectionResult:
-            menu()->trigger(QnActions::DelayedForcedExitAction);
+            menu()->trigger(action::DelayedForcedExitAction);
             break;
         default:    //error
             if (!qnRuntime->isDesktopMode())
@@ -469,7 +490,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
                 executeDelayedParented(
                     [this]
                     {
-                        action(QnActions::ExitAction)->trigger();
+                        action(action::ExitAction)->trigger();
                     }, kVideowallCloseTimeoutMSec, this
                 );
             }
@@ -644,13 +665,13 @@ void QnWorkbenchConnectHandler::showWarnMessagesOnce()
     /* Collect and send crash dumps if allowed */
     m_crashReporter.scanAndReportAsync(qnSettings->rawSettings());
 
-    menu()->triggerIfPossible(QnActions::AllowStatisticsReportMessageAction);
+    menu()->triggerIfPossible(action::AllowStatisticsReportMessageAction);
 
     auto watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
     if (!watcher->hasMismatches())
         return;
 
-    menu()->trigger(QnActions::VersionMismatchMessageAction);
+    menu()->trigger(action::VersionMismatchMessageAction);
 }
 
 void QnWorkbenchConnectHandler::stopReconnecting()
@@ -683,8 +704,11 @@ void QnWorkbenchConnectHandler::setPhysicalState(PhysicalState value)
 
 void QnWorkbenchConnectHandler::showPreloader()
 {
+    if (!qnRuntime->isDesktopMode())
+        return;
+
     const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-    const auto resourceModeAction = action(QnActions::ResourcesModeAction);
+    const auto resourceModeAction = action(action::ResourcesModeAction);
 
     resourceModeAction->setChecked(false); //< Shows welcome screen
     welcomeScreen->handleConnectingToSystem();
@@ -694,18 +718,22 @@ void QnWorkbenchConnectHandler::showPreloader()
 void QnWorkbenchConnectHandler::handleStateChanged(LogicalState logicalValue,
     PhysicalState physicalValue)
 {
-    const auto resourceModeAction = action(QnActions::ResourcesModeAction);
-    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+    const auto resourceModeAction = action(action::ResourcesModeAction);
 
     qDebug() << "QnWorkbenchConnectHandler state changed" << logicalValue << physicalValue;
     switch (logicalValue)
     {
         case LogicalState::disconnected:
-            welcomeScreen->handleDisconnectedFromSystem();
-            welcomeScreen->setGlobalPreloaderVisible(false);
+        {
+            if (qnRuntime->isDesktopMode())
+            {
+                const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+                welcomeScreen->handleDisconnectedFromSystem();
+                welcomeScreen->setGlobalPreloaderVisible(false);
+            }
             resourceModeAction->setChecked(false);  //< Shows welcome screen
             break;
-
+        }
         case LogicalState::connecting_to_target:
             showPreloader();
             break;
@@ -737,7 +765,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
     }
     setPhysicalState(PhysicalState::waiting_resources);
 
-    action(QnActions::OpenLoginDialogAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM #Common use conditional texts?
+    action(action::OpenLoginDialogAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM #Common use conditional texts?
 
     connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged, this,
         [this](const QnPeerRuntimeInfo &info)
@@ -839,10 +867,13 @@ void QnWorkbenchConnectHandler::at_messageProcessor_initialResourcesReceived()
 
 void QnWorkbenchConnectHandler::at_connectAction_triggered()
 {
-    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-    welcomeScreen->setVisibleControls(true);
+    if (qnRuntime->isDesktopMode())
+    {
+        const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+        welcomeScreen->setVisibleControls(true);
+    }
 
-    bool directConnection = qnRuntime->isActiveXMode() || qnRuntime->isVideoWallMode();
+    bool directConnection = !qnRuntime->isDesktopMode();
     if (m_logicalState == LogicalState::connected)
     {
         // Ask user if he wants to save changes.
@@ -861,7 +892,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
 
     commonModule()->updateRunningInstanceGuid();
 
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     QUrl url = parameters.argument(Qn::UrlRole, QUrl());
 
     if (directConnection)
@@ -902,7 +933,7 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
         return;
     }
 
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     QString id = parameters.argument(Qn::CloudSystemIdRole).toString();
 
     auto system = qnSystemsFinder->getSystem(id);
@@ -924,7 +955,7 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
     url.setUserName(credentials.user);
     url.setPassword(credentials.password.value());
 
-    menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url));
+    menu()->trigger(action::ConnectAction, {Qn::UrlRole, url});
 }
 
 void QnWorkbenchConnectHandler::at_reconnectAction_triggered()
@@ -943,7 +974,7 @@ void QnWorkbenchConnectHandler::at_reconnectAction_triggered()
 
 void QnWorkbenchConnectHandler::at_disconnectAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
+    const auto parameters = menu()->currentParameters(sender());
     const DisconnectFlags flags = static_cast<DisconnectFlags>(
         parameters.hasArgument(Qn::ForceRole) && parameters.argument(Qn::ForceRole).toBool()
             ? DisconnectFlag::Force | DisconnectFlag::ClearAutoLogin
@@ -1048,7 +1079,7 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(
             break;
         case Qn::IncompatibleProtocolConnectionResult:
         case Qn::IncompatibleCloudHostConnectionResult:
-            menu()->trigger(QnActions::DelayedForcedExitAction);
+            menu()->trigger(action::DelayedForcedExitAction);
             break;
         default:
             disconnectFromServer(static_cast<DisconnectFlags>(
@@ -1081,7 +1112,7 @@ void QnWorkbenchConnectHandler::clearConnection()
     /* Get ready for the next connection. */
     m_warnMessagesDisplayed = false;
 
-    action(QnActions::OpenLoginDialogAction)->setText(tr("Connect to Server..."));
+    action(action::OpenLoginDialogAction)->setText(tr("Connect to Server..."));
 
     /* Remove all remote resources. */
     auto resourcesToRemove = resourcePool()->getResourcesWithFlag(Qn::remote);

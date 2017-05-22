@@ -4,6 +4,7 @@ import Nx.Media 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
 import Nx.Models 1.0
+
 import com.networkoptix.qml 1.0
 
 import "private/VideoScreen"
@@ -179,7 +180,7 @@ PageBase
         }
     }
 
-    ScalableVideo
+    Loader
     {
         id: video
 
@@ -190,12 +191,40 @@ PageBase
         visible: dummyLoader.status != Loader.Ready && !screenshot.visible
         opacity: d.cameraUiOpacity
 
-        mediaPlayer: videoScreenController.mediaPlayer
-        resourceHelper: videoScreenController.resourceHelper
+        sourceComponent:
+            videoScreenController.resourceHelper.fisheyeParams.enabled
+                ? fisheyeVideoComponent
+                : scalableVideoComponent
 
-        videoCenterHeightOffsetFactor: 1 / 3
+        function clear()
+        {
+            if (item)
+                item.clear()
+        }
+    }
 
-        onClicked: toggleUi()
+    Component
+    {
+        id: scalableVideoComponent
+        ScalableVideo 
+        {
+            mediaPlayer: videoScreenController.mediaPlayer
+            resourceHelper: videoScreenController.resourceHelper
+            videoCenterHeightOffsetFactor: 1 / 3
+            onClicked: toggleUi()
+        }
+    }
+
+    Component
+    {
+        id: fisheyeVideoComponent
+        FisheyeVideo 
+        {
+            mediaPlayer: videoScreenController.mediaPlayer
+            resourceHelper: videoScreenController.resourceHelper
+            videoCenterHeightOffsetFactor: 1 / 3
+            onClicked: toggleUi()
+        }
     }
 
     Image
@@ -254,6 +283,17 @@ PageBase
             }
         }
 
+        PtzPanel
+        {
+            id: ptzPanel
+
+            x: 8
+            width: parent.width - x * 2
+            anchors.bottom: parent.bottom
+
+            controller.resourceId: videoScreenController.resourceHelper.resourceId
+        }
+
         Loader
         {
             id: navigationLoader
@@ -261,7 +301,7 @@ PageBase
             anchors.bottom: parent.bottom
             width: parent.width
 
-            visible: opacity > 0
+            visible: opacity > 0 && !ptzPanel.visible
             opacity: Math.min(d.uiOpacity, d.navigationOpacity)
 
             sourceComponent:
@@ -306,6 +346,10 @@ PageBase
                 {
                     videoScreenController: d.controller
                     controlsOpacity: d.cameraUiOpacity
+                    ptzAvailable: ptzPanel.controller.available
+                        && videoScreenController.accessRightsHelper.canManagePtz
+                        && !videoScreenController.offline
+                    onPtzButtonClicked: ptzPanel.visible = true
                 }
             }
 

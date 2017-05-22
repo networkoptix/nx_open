@@ -855,15 +855,17 @@ public:
         m_terminatedFlagPtr = &terminated;
         m_threadHandlerIsRunningIn.store(QThread::currentThreadId(), std::memory_order_release);
         const int acceptAsyncCallCountBak = m_acceptAsyncCallCount;
-        auto acceptHandlerBak = std::move(m_acceptHandler);
+        
+        decltype(m_acceptHandler) acceptHandlerBak;
+        acceptHandlerBak.swap(m_acceptHandler);
 
         auto acceptHandlerBakLocal = 
             [this, sock, acceptHandlerBak = std::move(acceptHandlerBak),
                     &terminated, acceptAsyncCallCountBak](
                 SystemError::ErrorCode errorCode,
-                AbstractStreamSocket* newConnection)
+                std::unique_ptr<AbstractStreamSocket> newConnection)
             {
-                acceptHandlerBak(errorCode, newConnection);
+                acceptHandlerBak(errorCode, std::move(newConnection));
                 if (terminated)
                     return;
                 //if asyncAccept has been called from onNewConnection, no need to call removeFromWatch
@@ -879,10 +881,11 @@ public:
             case aio::etRead:
             {
                 //accepting socket
-                AbstractStreamSocket* newSocket = m_sock->systemAccept();
-                acceptHandlerBakLocal(
-                    newSocket != nullptr ? SystemError::noError : SystemError::getLastOSErrorCode(),
-                    newSocket);
+                std::unique_ptr<AbstractStreamSocket> newSocket(m_sock->systemAccept());
+                const auto resultCode = newSocket != nullptr
+                    ? SystemError::noError
+                    : SystemError::getLastOSErrorCode();
+                acceptHandlerBakLocal(resultCode, std::move(newSocket));
                 break;
             }
 
@@ -904,10 +907,7 @@ public:
         }
     }
 
-    void acceptAsync(
-        nx::utils::MoveOnlyFunc<void(
-            SystemError::ErrorCode,
-            AbstractStreamSocket*)> handler)
+    void acceptAsync(AcceptCompletionHandler handler)
     {
         m_acceptHandler = std::move(handler);
 
@@ -919,7 +919,7 @@ public:
             &lk, m_sock, aio::etRead, this);
     }
 
-    void cancelIOAsync(nx::utils::MoveOnlyFunc< void() > handler)
+    void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
     {
         nx::network::SocketGlobals::aioService().dispatch(
             this->m_sock,
@@ -954,9 +954,7 @@ public:
 private:
     SocketType* m_sock;
     std::atomic<Qt::HANDLE> m_threadHandlerIsRunningIn;
-    nx::utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode,
-        AbstractStreamSocket*)> m_acceptHandler;
+    AcceptCompletionHandler m_acceptHandler;
     std::atomic<int> m_acceptAsyncCallCount;
     bool* m_terminatedFlagPtr;
 };

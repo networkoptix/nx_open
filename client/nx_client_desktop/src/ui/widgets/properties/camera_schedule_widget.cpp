@@ -20,10 +20,10 @@
 
 #include <text/time_strings.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/common/checkbox_utils.h>
 #include <ui/common/palette.h>
 #include <ui/common/read_only.h>
-#include <ui/common/checkbox_utils.h>
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -41,6 +41,8 @@
 
 using boost::algorithm::all_of;
 using boost::algorithm::any_of;
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -226,9 +228,9 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
     QnCamLicenseUsageHelper helper(commonModule());
     ui->licensesUsageWidget->init(&helper);
 
-    QnCheckbox::autoCleanTristate(ui->enableRecordingCheckBox);
-    QnCheckbox::autoCleanTristate(ui->checkBoxMinArchive);
-    QnCheckbox::autoCleanTristate(ui->checkBoxMaxArchive);
+    CheckboxUtils::autoClearTristate(ui->enableRecordingCheckBox);
+    CheckboxUtils::autoClearTristate(ui->checkBoxMinArchive);
+    CheckboxUtils::autoClearTristate(ui->checkBoxMaxArchive);
 
     QFont labelFont;
     labelFont.setPixelSize(kRecordingTypeLabelFontSize);
@@ -541,6 +543,12 @@ void QnCameraScheduleWidget::submitToResources()
         if (minDays != kRecordedDaysDontChange)
             camera->setMinDays(minDays);
 
+        if (canChangeRecording)
+        {
+            camera->setLicenseUsed(enableRecording);
+            camera->setScheduleDisabled(!enableRecording);
+        }
+
         if (camera->isDtsBased())
             continue;
 
@@ -551,12 +559,6 @@ void QnCameraScheduleWidget::submitToResources()
             updateRecordThresholds(scheduleTasks);
         }
         camera->setScheduleTasks(scheduleTasks);
-
-        if (canChangeRecording)
-        {
-            camera->setLicenseUsed(enableRecording);
-            camera->setScheduleDisabled(!enableRecording);
-        }
     }
 
     if (!canChangeRecording)
@@ -574,7 +576,7 @@ void QnCameraScheduleWidget::updateScheduleEnabled()
     for (const auto &camera : m_cameras)
         (camera->isScheduleDisabled() ? disabledCount : enabledCount)++;
 
-    QnCheckbox::setupTristateCheckbox(ui->enableRecordingCheckBox,
+    CheckboxUtils::setupTristateCheckbox(ui->enableRecordingCheckBox,
         enabledCount == 0 || disabledCount == 0, enabledCount > 0);
 }
 
@@ -602,7 +604,7 @@ void QnCameraScheduleWidget::updateMinDays()
                 : camera->minDays() == minDays;
         });
 
-    QnCheckbox::setupTristateCheckbox(ui->checkBoxMinArchive, sameMinDays, isAuto);
+    CheckboxUtils::setupTristateCheckbox(ui->checkBoxMinArchive, sameMinDays, isAuto);
     ui->spinBoxMinDays->setValue(calcMinDays(minDays));
 }
 
@@ -629,7 +631,7 @@ void QnCameraScheduleWidget::updateMaxDays()
             : camera->maxDays() == maxDays;
         });
 
-    QnCheckbox::setupTristateCheckbox(ui->checkBoxMaxArchive, sameMaxDays, isAuto);
+    CheckboxUtils::setupTristateCheckbox(ui->checkBoxMaxArchive, sameMaxDays, isAuto);
     ui->spinBoxMaxDays->setValue(calcMaxDays(maxDays));
 }
 
@@ -1119,7 +1121,7 @@ void QnCameraScheduleWidget::at_displayFpsCheckBox_stateChanged(int state)
 
 void QnCameraScheduleWidget::at_licensesButton_clicked()
 {
-    menu()->trigger(QnActions::PreferencesLicensesTabAction);
+    menu()->trigger(action::PreferencesLicensesTabAction);
 }
 
 void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target)

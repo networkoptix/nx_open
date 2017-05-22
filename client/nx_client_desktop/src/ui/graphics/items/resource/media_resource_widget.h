@@ -1,14 +1,15 @@
 #pragma once
 
 #include <array>
+#include <functional>
 
 #include "resource_widget.h"
 
 #include <QtGui/QStaticText>
 
-#include <camera/camera_bookmarks_manager_fwd.h>
-
+#include <api/server_rest_connection_fwd.h>
 #include <business/business_fwd.h>
+#include <camera/camera_bookmarks_manager_fwd.h>
 #include <core/resource/resource_fwd.h>
 
 struct QnMetaDataV1;
@@ -30,6 +31,23 @@ typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
 #include <utils/color_space/image_correction.h>
 #include <utils/media/sse_helper.h>
 
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+namespace graphics {
+
+class SoftwareTriggerButton;
+
+} // namespace graphics
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx
+
+//TODO: Remove this when QnMediaResourceWidget is refactored and put into proper namespace.
+using QnSoftwareTriggerButton = nx::client::desktop::ui::graphics::SoftwareTriggerButton;
+
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
 class QnFisheyeHomePtzController;
@@ -38,7 +56,6 @@ class QnScrollableItemsWidget;
 class QnScrollableTextItemsWidget;
 class QnGraphicsStackedWidget;
 class QnTwoWayAudioWidget;
-class QnSoftwareTriggerButton;
 
 struct QnHtmlTextItemOptions;
 
@@ -199,7 +216,8 @@ protected:
     void ensureTwoWayAudioWidget();
     bool animationAllowed() const;
 
-    void invokeTrigger(const QString& id,
+    rest::Handle invokeTrigger(const QString& id,
+        std::function<void(bool, rest::Handle)> resultHandler,
         QnBusiness::EventState toggleState = QnBusiness::UndefinedState);
 
 private slots:

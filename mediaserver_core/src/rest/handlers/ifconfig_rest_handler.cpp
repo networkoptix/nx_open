@@ -234,7 +234,7 @@ int QnIfConfigRestHandler::executePost(
     }
 
     bool ok = false;
-    QnNetworkAddressEntryList currentSettings = systemNetworkAddressEntryList(&ok, /* addLoopback */ true);
+    QnNetworkAddressEntryList currentSettings = systemNetworkAddressEntryList(&ok, /* addFromConfig */ true);
     if (!ok)
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't read network settings file"));
@@ -285,7 +285,7 @@ void QnIfConfigRestHandler::afterExecute(const QString &path, const QnRequestPar
         return;
 
     bool ok = false;
-    QnNetworkAddressEntryList currentSettings = systemNetworkAddressEntryList(&ok, /* addLoopback */ true);
+    QnNetworkAddressEntryList currentSettings = systemNetworkAddressEntryList(&ok, /* addFromConfig */ true);
     if (!ok)
         return;
 

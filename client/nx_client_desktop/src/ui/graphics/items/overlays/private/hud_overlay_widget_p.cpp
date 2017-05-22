@@ -9,10 +9,11 @@
 QnHudOverlayWidgetPrivate::QnHudOverlayWidgetPrivate(QnHudOverlayWidget* main):
     q_ptr(main),
     title(new QnResourceTitleItem(main)),
-    details(new QnHudDetailsItem(QString(), QnHtmlTextItemOptions(), main)),
-    position(new QnHudPositionItem(QString(), QnHtmlTextItemOptions(), main)),
-    left(new QGraphicsWidget(main)),
-    right(new QGraphicsWidget(main))
+    content(new QGraphicsWidget(main)),
+    details(new QnHudDetailsItem()),
+    position(new QnHudPositionItem()),
+    left(new QGraphicsWidget(content)),
+    right(new QGraphicsWidget(content))
 {
     auto leftLayout = new QGraphicsLinearLayout(Qt::Vertical);
     left->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding);
@@ -28,16 +29,16 @@ QnHudOverlayWidgetPrivate::QnHudOverlayWidgetPrivate(QnHudOverlayWidget* main):
     rightLayout->addItem(position);
     rightLayout->setAlignment(position, Qt::AlignRight | Qt::AlignBottom);
 
-    auto columnsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    columnsLayout->addItem(leftLayout);
-    columnsLayout->addItem(rightLayout);
+    auto contentLayout = new QGraphicsLinearLayout(Qt::Horizontal, content);
+    contentLayout->addItem(leftLayout);
+    contentLayout->addItem(rightLayout);
 
-    static constexpr int kMargin = 2;
-    columnsLayout->setContentsMargins(kMargin, 0, kMargin, kMargin);
+    content->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding);
+    content->setAcceptedMouseButtons(Qt::NoButton);
 
     auto mainLayout = new QGraphicsLinearLayout(Qt::Vertical, main);
     mainLayout->addItem(title);
-    mainLayout->addItem(columnsLayout);
+    mainLayout->addItem(content);
 
     static constexpr int kBorderRadius = 2;
 

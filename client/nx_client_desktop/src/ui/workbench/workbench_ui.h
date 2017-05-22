@@ -10,14 +10,13 @@
 #include <core/resource/resource_fwd.h>
 
 #include <ui/common/geometry.h>
-#include <ui/actions/action_target_provider.h>
+#include <nx/client/desktop/ui/actions/action_target_provider.h>
 #include <ui/animation/animation_timer_listener.h>
 
 #include <client/client_globals.h>
 
 #include "workbench_context_aware.h"
 
-class QGraphicsProxyWidget;
 class QGraphicsWidget;
 class QGraphicsLinearLayout;
 
@@ -67,7 +66,7 @@ class SpecialLayoutPanel;
 class QnWorkbenchUi:
     public Disconnective<QObject>,
     public QnWorkbenchContextAware,
-    public QnActionTargetProvider,
+    public nx::client::desktop::ui::action::TargetProvider,
     public AnimationTimerListener,
     protected QnGeometry
 {
@@ -104,8 +103,9 @@ public:
 
     virtual ~QnWorkbenchUi();
 
-    virtual Qn::ActionScope currentScope() const override;
-    virtual QnActionParameters currentParameters(Qn::ActionScope scope) const override;
+    virtual nx::client::desktop::ui::action::ActionScope currentScope() const override;
+    virtual nx::client::desktop::ui::action::Parameters currentParameters(
+        nx::client::desktop::ui::action::ActionScope scope) const override;
 
     Flags flags() const;
 
@@ -128,8 +128,6 @@ public:
 
     /** Whether title bar is opened. */
     bool isTitleOpened() const;
-
-    bool isLayoutPanelOpened() const;
 
     /** Whether notification pane is opened. */
     bool isNotificationsOpened() const;

@@ -27,13 +27,12 @@ QString normalizePath(const QString& path)
 {
     // TODO: #ak Introduce proper implementation.
 
-    if (path.startsWith("//"))
-    {
-        QString normalizedPath = path;
-        normalizedPath.remove(0, 1);
-        return normalizedPath;
-    }
-    return path;
+    if (path.indexOf("//") == -1)
+        return path;
+
+    QString normalizedPath = path;
+    normalizedPath.replace("//", "/");
+    return normalizedPath;
 }
 
 } // namespace url

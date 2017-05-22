@@ -26,7 +26,7 @@
 #include <transcoding/filters/contrast_image_filter.h>
 #include <transcoding/filters/fisheye_image_filter.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
@@ -46,6 +46,8 @@
 #include "transcoding/filters/fisheye_image_filter.h"
 #include "transcoding/filters/filter_helper.h"
 #include "transcoding/filters/abstract_image_filter.h"
+
+using namespace nx::client::desktop::ui;
 
 namespace {
     const int showProgressDelay = 1500; // 1.5 sec
@@ -163,7 +165,7 @@ QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent):
     m_progressShowTime(0),
     m_canceled(false)
 {
-    connect(action(QnActions::TakeScreenshotAction), &QAction::triggered, this, &QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered);
+    connect(action(action::TakeScreenshotAction), &QAction::triggered, this, &QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered);
 }
 
 QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters, bool forced) const {
@@ -348,7 +350,7 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
 
 
 void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
-    QnActionParameters actionParameters = menu()->currentParameters(sender());
+    const auto actionParameters = menu()->currentParameters(sender());
     QString filename = actionParameters.argument<QString>(Qn::FileNameRole);
 
     QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(actionParameters.widget());

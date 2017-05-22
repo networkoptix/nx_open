@@ -38,7 +38,6 @@
 
 #include <cloud/cloud_connection.h>
 
-#include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource/client_camera_factory.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource/resource_directory_browser.h>
@@ -51,13 +50,13 @@
 #include <decoders/video/abstract_video_decoder.h>
 
 #include <finders/systems_finder.h>
-#include <network/module_finder.h>
+#include <nx/vms/discovery/manager.h>
 #include <network/router.h>
 
 #include <nx/network/socket_global.h>
 #include <nx/network/http/http_mod_manager.h>
 #include <vms_gateway_embeddable.h>
-#include <nx/utils/log/log.h>
+#include <nx/utils/log/log_initializer.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/ec2_lib.h>
 
@@ -79,6 +78,7 @@
 #include <utils/media/voice_spectrum_analyzer.h>
 #include <utils/performance_test.h>
 #include <utils/server_interface_watcher.h>
+#include <nx/client/desktop/utils/applauncher_guard.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -100,6 +100,8 @@
 #endif
 
 #include <watchers/cloud_status_watcher.h>
+
+using namespace nx::client::desktop;
 
 static QtMessageHandler defaultMsgHandler = 0;
 
@@ -174,8 +176,14 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     initSkin(startupParams);
     initLocalResources(startupParams);
 
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
-    QWebSettings::globalSettings()->enablePersistentStorage();
+    // WebKit initialization must occur only once per application run. Actual for ActiveX module.
+    static bool isWebKitInitialized = false;
+    if (!isWebKitInitialized)
+    {
+        QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
+        QWebSettings::globalSettings()->enablePersistentStorage();
+        isWebKitInitialized = true;
+    }
 }
 
 QnClientModule::~QnClientModule()
@@ -196,6 +204,12 @@ QnClientModule::~QnClientModule()
 
     //restoring default message handler
     qInstallMessageHandler(defaultMsgHandler);
+
+    // First delete clientCore module and commonModule()
+    m_clientCoreModule.reset();
+
+    // Then delete static common.
+    m_staticCommon.reset();
 }
 
 void QnClientModule::initThread()
@@ -235,12 +249,6 @@ void QnClientModule::startLocalSearchers()
 {
     auto commonModule = m_clientCoreModule->commonModule();
     commonModule->resourceDiscoveryManager()->start();
-}
-
-QnPtzControllerPool* QnClientModule::ptzControllerPool() const
-{
-    auto commonModule = m_clientCoreModule->commonModule();
-    return commonModule->instance<QnClientPtzControllerPool>();
 }
 
 QnNetworkProxyFactory* QnClientModule::networkProxyFactory() const
@@ -291,6 +299,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     if (startupParams.selfUpdateMode)
         return;
 
+    commonModule->store(new ApplauncherGuard());
+
     /* Depends on QnClientSettings. */
     auto clientInstanceManager = commonModule->store(new QnClientInstanceManager());
 
@@ -321,7 +331,6 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->instance<QnLayoutTourManager>();
 
     commonModule->store(new QnVoiceSpectrumAnalyzer());
-    commonModule->instance<QnClientPtzControllerPool>();
 
     initializeStatisticsManager(commonModule);
 
@@ -417,6 +426,10 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
         // qnClientInstanceManager is not initialized in self-update mode
         logFileNameSuffix = lit("self_update");
     }
+    else if (qnRuntime->isActiveXMode())
+    {
+        logFileNameSuffix = lit("ax");
+    }
     else if (qnClientInstanceManager && qnClientInstanceManager->isValid())
     {
         int idx = qnClientInstanceManager->instanceIndex();
@@ -424,49 +437,29 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
             logFileNameSuffix = L'_' + QString::number(idx) + L'_';
     }
 
-
-    static const int DEFAULT_MAX_LOG_FILE_SIZE = 10 * 1024 * 1024;
-    static const int DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
-
     const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
 
     if (logLevel.isEmpty())
         logLevel = qnSettings->logLevel();
 
-    QnLog::initLog(logLevel);
-    QString logFileLocation = dataLocation + QLatin1String("/log");
-    QString logFileName = logFileLocation + QLatin1String("/log_file") + logFileNameSuffix;
-    if (!QDir().mkpath(logFileLocation))
-        cl_log.log(lit("Could not create log folder: ") + logFileLocation, cl_logALWAYS);
-    if (!cl_log.create(logFileName, DEFAULT_MAX_LOG_FILE_SIZE, DEFAULT_MSG_LOG_ARCHIVE_SIZE, QnLog::instance()->logLevel()))
-        cl_log.log(lit("Could not create log file") + logFileName, cl_logALWAYS);
-    cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);
+    nx::utils::log::Settings logSettings;
+    logSettings.level = nx::utils::log::levelFromString(logLevel);
+    logSettings.maxFileSize = 10 * 1024 * 1024;
+    logSettings.maxBackupCount = 5;
 
-    if (ec2TranLogLevel.isEmpty())
-        ec2TranLogLevel = qnSettings->ec2TranLogLevel();
+    nx::utils::log::initialize(
+        logSettings, dataLocation, qApp->applicationName(), qApp->applicationFilePath());
 
-    //preparing transaction log
+    const auto ec2logger = nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG});
     if (ec2TranLogLevel != lit("none"))
     {
-        QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
-            dataLocation + QLatin1String("/log/ec2_tran"),
-            DEFAULT_MAX_LOG_FILE_SIZE,
-            DEFAULT_MSG_LOG_ARCHIVE_SIZE,
-            QnLog::logLevelFromString(ec2TranLogLevel));
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
+        logSettings.level = nx::utils::log::levelFromString(ec2TranLogLevel);
+        nx::utils::log::initialize(
+            logSettings, dataLocation, qApp->applicationName(), qApp->applicationFilePath(),
+            QLatin1String("ec2_tran"), ec2logger);
     }
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
-
-    //TODO: #GDM Standartize log header and calling conventions
-    cl_log.log(qApp->applicationDisplayName(), " started", cl_logALWAYS);
-    cl_log.log("Software version: ", QApplication::applicationVersion(), cl_logALWAYS);
-    cl_log.log("binary path: ", qApp->applicationFilePath(), cl_logALWAYS);
 }
 
 void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
@@ -501,7 +494,7 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     runtimeData.videoWallInstanceGuid = startupParams.videoWallItemGuid;
     commonModule->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
 
-    commonModule->moduleFinder()->start();
+    commonModule->moduleDiscoveryManager()->start();
 
     commonModule->instance<QnSystemsFinder>();
     commonModule->store(new QnForgottenSystemsManager());

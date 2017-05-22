@@ -10,7 +10,7 @@
 #include <api/model/cloud_credentials_data.h>
 #include <api/global_settings.h>
 #include <media_server/serverutil.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include <nx_ec/data/api_cloud_system_data.h>
 #include <nx/fusion/model_functions.h>
@@ -224,7 +224,7 @@ bool QnSaveCloudSystemCredentialsHandler::insertCloudOwner(
     if (resultCode != ec2::ErrorCode::ok)
     {
         NX_LOGX(
-            lm("Error inserting cloud owner to the local DB. %1").str(resultCode),
+            lm("Error inserting cloud owner to the local DB. %1").arg(resultCode),
             cl_logWARNING);
         result->setError(
             QnJsonRestResult::CantProcessRequest,

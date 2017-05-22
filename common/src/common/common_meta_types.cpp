@@ -77,8 +77,8 @@
 
 #include <licensing/license.h>
 
-#include <network/multicast_module_finder.h>
 #include <network/system_description.h>
+#include <network/networkoptixmodulerevealcommon.h>
 
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_lock_data.h>
@@ -244,8 +244,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnPtzMapperPtr>();
     qRegisterMetaType<Qn::PtzDataFields>();
     qRegisterMetaType<Qn::PtzCommand>();
-    qRegisterMetaType<Qn::PtzTraits>();
-    qRegisterMetaType<Qn::PtzCapabilities>();
+    qRegisterMetaType<Ptz::Traits>();
+    qRegisterMetaType<Ptz::Capabilities>();
 
     qRegisterMetaType<QnOnvifConfigDataPtr>();
 
@@ -355,8 +355,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<Qn::StatusChangeReason>("Qn::StatusChangeReason");
 
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
-    QnJsonSerializer::registerSerializer<Qn::PtzTraits>();
-    QnJsonSerializer::registerSerializer<Qn::PtzCapabilities>();
+    QnJsonSerializer::registerSerializer<Ptz::Traits>();
+    QnJsonSerializer::registerSerializer<Ptz::Capabilities>();
     QnJsonSerializer::registerSerializer<QList<QMap<QString, QString>>>();
 
     QnJsonSerializer::registerSerializer<QnOnvifConfigDataPtr>();

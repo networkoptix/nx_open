@@ -1,4 +1,3 @@
-nx_rdep_add_package(openssl)
 nx_rdep_add_package(ffmpeg)
 
 nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/qt.conf"
@@ -19,10 +18,11 @@ nx_add_target(common LIBRARY
     ADDITIONAL_RESOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/resources"
     PUBLIC_LIBS
-        Qt5::Gui Qt5::Concurrent Qt5::Network Qt5::Multimedia
+        Qt5::Gui Qt5::Concurrent Qt5::Multimedia
         Qt5::Xml Qt5::XmlPatterns Qt5::Sql
-        openssl ffmpeg
-        nx_utils nx_fusion)
+        ffmpeg
+        nx_network nx_utils nx_fusion
+)
 
 if(NOT ANDROID AND NOT IOS)
     nx_rdep_add_package(quazip)
@@ -33,11 +33,7 @@ target_include_directories(common
     PRIVATE
         ${Qt5Core_PRIVATE_INCLUDE_DIRS}
         "${CMAKE_SOURCE_DIR}/common_libs/nx_streaming/src"
-    PUBLIC
-        "${CMAKE_SOURCE_DIR}/common_libs/nx_network/src")
-
-target_compile_definitions(common
-    PRIVATE NX_NETWORK_API=${API_IMPORT_MACRO})
+)
 
 if(WIN32)
     target_link_libraries(common PUBLIC Winmm)

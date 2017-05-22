@@ -7,6 +7,8 @@
 #include <QtOpenGL/QGLWidget>
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
+
 #include <ui/style/skin.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_messages.h>
@@ -25,6 +27,8 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <utils/common/delayed.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -46,7 +50,7 @@ QnWorkbenchScreenRecordingHandler::QnWorkbenchScreenRecordingHandler(QObject *pa
     m_dataProvider(nullptr),
     m_recorder(nullptr)
 {
-    const auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction);
+    const auto screenRecordingAction = action(action::ToggleScreenRecordingAction);
     if (!screenRecordingAction)
         return;
 
@@ -79,10 +83,13 @@ void QnWorkbenchScreenRecordingHandler::timerEvent(QTimerEvent* event)
         millisecondsLeft = kRecordingCountdownMs - m_countdown.elapsed();
 
     const int seconds = std::max((millisecondsLeft + 500) / 1000, 0);
-    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-
     const auto message = recordingCountdownText(seconds);
-    welcomeScreen->setMessage(seconds > 0 ? message : QString());
+
+    if (qnRuntime->isDesktopMode())
+    {
+        const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+        welcomeScreen->setMessage(seconds > 0 ? message : QString());
+    }
 
     if (m_messageBox)
     {
@@ -109,7 +116,7 @@ bool QnWorkbenchScreenRecordingHandler::isRecording() const
 
 void QnWorkbenchScreenRecordingHandler::startRecordingCountdown()
 {
-    const auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction);
+    const auto screenRecordingAction = action(action::ToggleScreenRecordingAction);
     NX_ASSERT(screenRecordingAction);
     if (!screenRecordingAction)
         return;
@@ -156,8 +163,11 @@ void QnWorkbenchScreenRecordingHandler::stopRecordingCountdown()
     if (m_messageBox)
         m_messageBox->hideImmideately();
 
-    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-    welcomeScreen->setMessage(QString());
+    if (qnRuntime->isDesktopMode())
+    {
+        const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+        welcomeScreen->setMessage(QString());
+    }
 }
 
 bool QnWorkbenchScreenRecordingHandler::isRecordingCountdown() const
@@ -180,7 +190,7 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
         return;
     }
 
-    const auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction);
+    const auto screenRecordingAction = action(action::ToggleScreenRecordingAction);
     if(!screenRecordingAction)
     {
         qnWarning("Screen recording is not supported on this platform.");
@@ -226,7 +236,7 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
     m_dataProvider->start();
 
     if (!m_dataProvider->isInitialized()) {
-        cl_log.log(m_dataProvider->lastErrorStr(), cl_logERROR);
+        NX_ERROR(this, m_dataProvider->lastErrorStr());
 
         onError(m_dataProvider->lastErrorStr());
         return;
@@ -253,7 +263,7 @@ void QnWorkbenchScreenRecordingHandler::onStreamRecordingFinished(
     if (status.lastError == StreamRecorderError::noError)
         return;
 
-    action(QnActions::ToggleScreenRecordingAction)->setChecked(false);
+    action(action::ToggleScreenRecordingAction)->setChecked(false);
 
     const auto errorReason = QnStreamRecorder::errorString(status.lastError);
     onError(errorReason);
@@ -263,7 +273,7 @@ void QnWorkbenchScreenRecordingHandler::stopRecording()
 {
     stopRecordingCountdown();
 
-    const auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction);
+    const auto screenRecordingAction = action(action::ToggleScreenRecordingAction);
     if (!screenRecordingAction)
     {
         qnWarning("Screen recording is not supported on this platform.");

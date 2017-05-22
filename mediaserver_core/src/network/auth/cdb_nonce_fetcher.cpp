@@ -10,7 +10,7 @@
 #include <nx/utils/log/log.h>
 
 #include <cdb/cloud_nonce.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include "cloud/cloud_connection_manager.h"
 

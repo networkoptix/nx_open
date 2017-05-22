@@ -8,11 +8,12 @@
 
 #include <client/client_runtime_settings.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
+#include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/controls/navigation_item.h>
 #include <ui/graphics/items/controls/speed_slider.h>
@@ -38,6 +39,8 @@
 
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -77,7 +80,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_updateResizerGeometryLater(false),
     m_autoHideHeight(0),
     m_showButton(NxUi::newShowHideButton(parentWidget, context(),
-        action(QnActions::ToggleTimelineAction))),
+        action::ToggleTimelineAction)),
     m_resizerWidget(new QnResizerWidget(Qt::Vertical, parentWidget)),
     m_showWidget(new GraphicsWidget(parentWidget)),
     m_zoomButtonsWidget(new GraphicsWidget(parentWidget)),
@@ -89,18 +92,20 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_yAnimator(new VariantAnimator(this))
 {
     m_resizerWidget->setProperty(Qn::NoHandScrollOver, true);
+    m_resizerWidget->setProperty(Qn::BlockMotionSelection, true);
     m_resizerWidget->setZValue(ResizerItemZOrder);
     connect(m_resizerWidget, &QGraphicsWidget::geometryChanged, this,
         &TimelineWorkbenchPanel::at_resizerWidget_geometryChanged);
 
     item->setProperty(Qn::NoHandScrollOver, true);
+    item->setProperty(Qn::BlockMotionSelection, true);
     item->setZValue(ContentItemZOrder);
     connect(item, &QGraphicsWidget::geometryChanged, this,
         &TimelineWorkbenchPanel::updateControlsGeometry);
     connect(item->timeSlider(), &QGraphicsWidget::geometryChanged, this,
         &TimelineWorkbenchPanel::updateControlsGeometry);
 
-    action(QnActions::ToggleTimelineAction)->setChecked(settings.state == Qn::PaneState::Opened);
+    action(action::ToggleTimelineAction)->setChecked(settings.state == Qn::PaneState::Opened);
     {
         QTransform transform;
         transform.rotate(-90);
@@ -108,7 +113,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     }
     m_showButton->setFocusProxy(item);
     m_showButton->setZValue(ControlItemZOrder);
-    connect(action(QnActions::ToggleTimelineAction), &QAction::toggled, this,
+    connect(action(action::ToggleTimelineAction), &QAction::toggled, this,
         [this](bool checked)
         {
             if (!m_ignoreClickEvent)
@@ -116,6 +121,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
         });
 
     m_showWidget->setProperty(Qn::NoHandScrollOver, true);
+    m_showWidget->setProperty(Qn::BlockMotionSelection, true);
     m_showWidget->setFlag(QGraphicsItem::ItemHasNoContents, true);
     m_showWidget->setVisible(false);
     m_showWidget->setZValue(BackgroundItemZOrder);
@@ -172,10 +178,10 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
             if (!isPinned() && isOpened() && !menu()->isMenuVisible())
                 setOpened(false); //TODO: #GDM #high process handlers
         });
-    connect(menu(), &QnActionManager::menuAboutToHide, m_hidingProcessor,
+    connect(menu(), &nx::client::desktop::ui::action::Manager::menuAboutToHide, m_hidingProcessor,
         &HoverFocusProcessor::forceFocusLeave);
 
-    connect(action(QnActions::ToggleThumbnailsAction), &QAction::toggled, this,
+    connect(action(action::ToggleThumbnailsAction), &QAction::toggled, this,
         [this](bool checked)
         {
             setThumbnailsVisible(checked);
@@ -193,10 +199,13 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     }
 
     item->timeSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
+    item->timeSlider()->toolTipItem()->setProperty(Qn::BlockMotionSelection, true);
     item->timeSlider()->toolTipItem()->setZValue(NxUi::TooltipItemZOrder);
     item->speedSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
+    item->speedSlider()->toolTipItem()->setProperty(Qn::BlockMotionSelection, true);
     item->speedSlider()->toolTipItem()->setZValue(NxUi::TooltipItemZOrder);
     item->volumeSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
+    item->volumeSlider()->toolTipItem()->setProperty(Qn::BlockMotionSelection, true);
     item->volumeSlider()->toolTipItem()->setZValue(NxUi::TooltipItemZOrder);
 
     auto sliderZoomOutButton = new QnImageButtonWidget();
@@ -350,7 +359,7 @@ bool TimelineWorkbenchPanel::isPinned() const
 
 bool TimelineWorkbenchPanel::isOpened() const
 {
-    return action(QnActions::ToggleTimelineAction)->isChecked();
+    return action(action::ToggleTimelineAction)->isChecked();
 }
 
 void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
@@ -363,7 +372,7 @@ void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
     m_showingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
     QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
-    action(QnActions::ToggleTimelineAction)->setChecked(opened);
+    action(action::ToggleTimelineAction)->setChecked(opened);
 
     m_yAnimator->stop();
     qnWorkbenchAnimations->setupAnimator(m_yAnimator, opened
@@ -675,7 +684,7 @@ void TimelineWorkbenchPanel::at_resizerWidget_geometryChanged()
     }
 
     updateResizerGeometry();
-    action(QnActions::ToggleThumbnailsAction)->setChecked(isThumbnailsVisible());
+    action(action::ToggleThumbnailsAction)->setChecked(isThumbnailsVisible());
 }
 
 void TimelineWorkbenchPanel::at_sliderResizerWidget_wheelEvent(QObject* /*target*/, QEvent* event)

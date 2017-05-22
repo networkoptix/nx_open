@@ -21,7 +21,8 @@
 #include <client/client_settings.h>
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_module.h>
+
+#include <client_core/client_core_module.h>
 
 #include <common/common_module.h>
 
@@ -48,7 +49,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/collection.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/recording_status_helper.h>
 #include <ui/common/text_pixmap_cache.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
@@ -100,6 +101,8 @@
 #include <utils/media/sse_helper.h>
 #include <plugins/resource/avi/avi_resource.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 
 static constexpr int kMicroInMilliSeconds = 1000;
@@ -117,6 +120,9 @@ static constexpr qreal kMaxBackwardSpeed = 16.0;
 
 static constexpr int kTriggersSpacing = 4;
 static constexpr int kTriggerButtonSize = 40;
+static constexpr int kTriggersMargin = 8; // overlaps HUD margin, i.e. does not sum up with it
+
+static const char* kTriggerRequestIdProperty = "_qn_triggerRequestId";
 
 template<class Cont, class Item>
 bool contains(const Cont& cont, const Item& item)
@@ -247,7 +253,12 @@ void clearSensitivityRegion(MotionGrid& grid, const QPoint& at)
     }
 };
 
-} // anonymous namespace
+bool tourIsRunning(QnWorkbenchContext* context)
+{
+    return context->action(action::ToggleLayoutTourModeAction)->isChecked();
+}
+
+} // namespace
 
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWorkbenchItem* item, QGraphicsItem* parent):
     base_type(context, item, parent),
@@ -425,6 +436,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     connect(context->instance<QnWorkbenchRenderWatcher>(), &QnWorkbenchRenderWatcher::widgetChanged,
         this, &QnMediaResourceWidget::at_renderWatcher_widgetChanged);
 
+    // Update buttons for single layout tour start/stop
+    connect(action(action::ToggleLayoutTourModeAction), &QAction::toggled, this,
+        &QnMediaResourceWidget::updateButtonsVisibility);
+
     at_camDisplay_liveChanged();
     at_ptzButton_toggled(false);
     at_histogramButton_toggled(item->imageEnhancement().enabled);
@@ -559,7 +574,7 @@ void QnMediaResourceWidget::createButtons()
         connect(debugScreenshotButton, &QnImageButtonWidget::clicked, this,
             [this]
             {
-                menu()->trigger(QnActions::TakeScreenshotAction, QnActionParameters(this)
+                menu()->trigger(action::TakeScreenshotAction, action::Parameters(this)
                     .withArgument<QString>(Qn::FileNameRole, lit("_DEBUG_SCREENSHOT_KEY_")));
             });
         titleBar()->rightButtonsBar()->addButton(Qn::DbgScreenshotButton, debugScreenshotButton);
@@ -569,8 +584,8 @@ void QnMediaResourceWidget::createButtons()
 
 void QnMediaResourceWidget::createPtzController()
 {
-    auto threadPool = qnClientModule->ptzControllerPool()->commandThreadPool();
-    auto executorThread = qnClientModule->ptzControllerPool()->executorThread();
+    auto threadPool = qnClientCoreModule->ptzControllerPool()->commandThreadPool();
+    auto executorThread = qnClientCoreModule->ptzControllerPool()->executorThread();
 
     /* Set up PTZ controller. */
     QnPtzControllerPtr fisheyeController;
@@ -732,9 +747,13 @@ void QnMediaResourceWidget::setupHud()
     m_triggersContainer = new QnScrollableItemsWidget(m_hudOverlay->right());
     m_triggersContainer->setAlignment(Qt::AlignRight | Qt::AlignBottom);
 
+    qreal right = 0.0;
+    m_hudOverlay->content()->getContentsMargins(nullptr, nullptr, &right, nullptr);
+    const auto triggersMargin = kTriggersMargin - right;
+
     m_triggersContainer->setSpacing(kTriggersSpacing);
-    m_triggersContainer->setMaximumWidth(kTriggerButtonSize);
-    m_triggersContainer->setFlag(QGraphicsItem::ItemClipsChildrenToShape, false);
+    m_triggersContainer->setMaximumWidth(kTriggerButtonSize + triggersMargin);
+    m_triggersContainer->setContentsMargins(0, 0, triggersMargin, 0);
     setOverlayWidgetVisible(m_triggersContainer, false, /*animate=*/false);
 
     m_compositeOverlay = new QnGraphicsStackedWidget(m_hudOverlay->right());
@@ -762,7 +781,6 @@ void QnMediaResourceWidget::updateHud(bool animate)
 {
     base_type::updateHud(animate);
     setOverlayWidgetVisible(m_triggersContainer, isOverlayWidgetVisible(titleBar()), animate);
-
     updateCompositeOverlayMode();
 }
 
@@ -1122,7 +1140,9 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display)
         m_renderer->setChannelCount(0);
     }
 
-    setOption(QnResourceWidget::WindowRotationForbidden, !hasVideo());
+    const bool canRotate = accessController()->hasPermissions(item()->layout()->resource(),
+        Qn::WritePermission);
+    setOption(QnResourceWidget::WindowRotationForbidden, !hasVideo() || !canRotate);
 
     emit displayChanged();
 }
@@ -1443,7 +1463,7 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const
             return (m_ioModuleOverlayWidget && overlayWidgetVisibility(m_ioModuleOverlayWidget) == OverlayVisibility::Visible);
         };
 
-    if (action(QnActions::ToggleLayoutTourModeAction)->isChecked())
+    if (action(action::ToggleLayoutTourModeAction)->isChecked())
         return Qn::MainWindow_Scene_TourInProgress_Help;
 
     const Qn::ResourceStatusOverlay statusOverlay = statusOverlayController()->statusOverlay();
@@ -1665,8 +1685,12 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     if (!zoomRect().isNull())
         return result;
 
-    if (hasVideo && resource()->toResource()->hasFlags(Qn::motion))
+    if (hasVideo
+        && resource()->toResource()->hasFlags(Qn::motion)
+        && !tourIsRunning(context()))
+    {
         result |= Qn::MotionSearchButton;
+    }
 
     bool isExportedLayout = item()
         && item()->layout()
@@ -1678,8 +1702,8 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         && item()->layout()->isSearchLayout();
 
     if (m_camera
-        && m_camera->hasAnyOfPtzCapabilities(Qn::ContinuousPtzCapabilities)
-        && !m_camera->hasAnyOfPtzCapabilities(Qn::VirtualPtzCapability)
+        && m_camera->hasAnyOfPtzCapabilities(Ptz::ContinuousPtzCapabilities)
+        && !m_camera->hasAnyOfPtzCapabilities(Ptz::VirtualPtzCapability)
         && accessController()->hasPermissions(m_resource->toResourcePtr(), Qn::WritePtzPermission)
         && !isExportedLayout
         && !isPreviewSearchLayout
@@ -1701,7 +1725,9 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     {
         if (item()
             && item()->layout()
-            && accessController()->hasPermissions(item()->layout()->resource(), Qn::WritePermission | Qn::AddRemoveItemsPermission)
+            && accessController()->hasPermissions(item()->layout()->resource(),
+                Qn::WritePermission | Qn::AddRemoveItemsPermission)
+            && !tourIsRunning(context())
             )
             result |= Qn::ZoomWindowButton;
     }
@@ -1841,7 +1867,7 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
 
         case Qn::OfflineOverlay:
         {
-            return menu()->canTrigger(QnActions::CameraDiagnosticsAction, m_camera)
+            return menu()->canTrigger(action::CameraDiagnosticsAction, m_camera)
                 ? Qn::ResourceOverlayButton::Diagnostics
                 : Qn::ResourceOverlayButton::Empty;
         }
@@ -1915,20 +1941,20 @@ void QnMediaResourceWidget::at_camDisplay_liveChanged()
 
 void QnMediaResourceWidget::at_screenshotButton_clicked()
 {
-    menu()->trigger(QnActions::TakeScreenshotAction, this);
+    menu()->trigger(action::TakeScreenshotAction, this);
 }
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked)
 {
     bool ptzEnabled =
-        checked && (m_camera && (m_camera->getPtzCapabilities() & Qn::ContinuousPtzCapabilities));
+        checked && (m_camera && (m_camera->getPtzCapabilities() & Ptz::ContinuousPtzCapabilities));
 
     setOption(ControlPtz, ptzEnabled);
     setOption(DisplayCrosshair, ptzEnabled);
     if (checked)
     {
         titleBar()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton | Qn::ZoomWindowButton, false);
-        action(QnActions::JumpToLiveAction)->trigger(); // TODO: #Elric evil hack! Won't work if SYNC is off and this item is not selected?
+        action(action::JumpToLiveAction)->trigger(); // TODO: #Elric evil hack! Won't work if SYNC is off and this item is not selected?
     }
 }
 
@@ -2095,7 +2121,7 @@ void QnMediaResourceWidget::processDiagnosticsRequest()
     context()->statisticsModule()->registerClick(lit("resource_status_overlay_diagnostics"));
 
     if (m_camera)
-        menu()->trigger(QnActions::CameraDiagnosticsAction, m_camera);
+        menu()->trigger(action::CameraDiagnosticsAction, m_camera);
 }
 
 void QnMediaResourceWidget::processIoEnableRequest()
@@ -2129,7 +2155,7 @@ void QnMediaResourceWidget::processSettingsRequest()
         return;
 
     int selectedTab = Qn::GeneralSettingsTab;
-    menu()->trigger(QnActions::CameraSettingsAction, QnActionParameters(m_camera)
+    menu()->trigger(action::CameraSettingsAction, action::Parameters(m_camera)
         .withArgument(Qn::FocusTabRole, selectedTab));
 }
 
@@ -2137,7 +2163,7 @@ void QnMediaResourceWidget::processMoreLicensesRequest()
 {
     context()->statisticsModule()->registerClick(lit("resource_status_overlay_more_licenses"));
 
-    menu()->trigger(QnActions::PreferencesLicensesTabAction);
+    menu()->trigger(action::PreferencesLicensesTabAction);
 }
 
 void QnMediaResourceWidget::at_item_imageEnhancementChanged()
@@ -2165,6 +2191,8 @@ void QnMediaResourceWidget::updateCompositeOverlayMode()
 
     const bool animate = m_compositeOverlay->scene() != nullptr;
     setOverlayWidgetVisible(m_compositeOverlay, visible, animate);
+
+    m_triggersContainer->setEnabled(isLive);
 }
 
 qint64 QnMediaResourceWidget::getUtcCurrentTimeUsec() const
@@ -2328,26 +2356,62 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
         ? lit("%1 (%2)").arg(name).arg(tr("press and hold", "Software Trigger"))
         : name);
 
+    const auto resultHandler =
+        [button = QPointer<QnSoftwareTriggerButton>(button)](bool success, qint64 requestId)
+        {
+            if (!button || button->property(
+                kTriggerRequestIdProperty).value<rest::Handle>() != requestId)
+            {
+                return;
+            }
+
+            button->setEnabled(true);
+
+            button->setState(success
+                ? QnSoftwareTriggerButton::State::Success
+                : QnSoftwareTriggerButton::State::Failure);
+        };
+
     if (info.prolonged)
     {
-        connect(button, &QnImageButtonWidget::pressed, this,
-            [this, id = info.triggerId]()
+        connect(button, &QnSoftwareTriggerButton::pressed, this,
+            [this, button, resultHandler, id = info.triggerId]()
             {
-                invokeTrigger(id, QnBusiness::ActiveState);
+                const auto requestId = invokeTrigger(id, resultHandler, QnBusiness::ActiveState);
+                const bool success = requestId != rest::Handle();
+                button->setProperty(kTriggerRequestIdProperty, requestId);
+                button->setState(success
+                    ? QnSoftwareTriggerButton::State::Waiting
+                    : QnSoftwareTriggerButton::State::Failure);
             });
 
-        connect(button, &QnImageButtonWidget::released, this,
-            [this, id = info.triggerId]()
+        connect(button, &QnSoftwareTriggerButton::released, this,
+            [this, button, resultHandler, id = info.triggerId]()
             {
-                invokeTrigger(id, QnBusiness::InactiveState);
+                /* In case of activation error don't try to deactivate: */
+                if (button->state() == QnSoftwareTriggerButton::State::Failure)
+                    return;
+
+                const auto requestId = invokeTrigger(id, resultHandler, QnBusiness::InactiveState);
+                const bool success = requestId != rest::Handle();
+                button->setProperty(kTriggerRequestIdProperty, requestId);
+                button->setState(success
+                    ? QnSoftwareTriggerButton::State::Default
+                    : QnSoftwareTriggerButton::State::Failure);
             });
     }
     else
     {
-        connect(button, &QnImageButtonWidget::clicked, this,
-            [this, id = info.triggerId]()
+        connect(button, &QnSoftwareTriggerButton::clicked, this,
+            [this, button, resultHandler, id = info.triggerId]()
             {
-                invokeTrigger(id);
+                const auto requestId = invokeTrigger(id, resultHandler);
+                const bool success = requestId != rest::Handle();
+                button->setProperty(kTriggerRequestIdProperty, requestId);
+                button->setEnabled(!success);
+                button->setState(success
+                    ? QnSoftwareTriggerButton::State::Waiting
+                    : QnSoftwareTriggerButton::State::Failure);
             });
     }
 }
@@ -2397,25 +2461,31 @@ void QnMediaResourceWidget::at_businessRuleChanged(const QnBusinessEventRulePtr&
     }
 };
 
-void QnMediaResourceWidget::invokeTrigger(
+rest::Handle QnMediaResourceWidget::invokeTrigger(
     const QString& id,
+    std::function<void(bool, rest::Handle)> resultHandler,
     QnBusiness::EventState toggleState)
 {
     if (!accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission))
-        return;
+        return rest::Handle();
 
     const auto responseHandler =
-        [this, id](bool success, rest::Handle handle, const QnJsonRestResult& result)
+        [this, resultHandler, id](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             Q_UNUSED(handle);
-            if (success && result.error == QnRestResult::NoError)
-                return;
+            success = success && result.error == QnRestResult::NoError;
 
-            NX_LOG(tr("Failed to invoke trigger %1 (%2)").arg(id).arg(result.errorString),
-                cl_logERROR);
+            if (!success)
+            {
+                NX_LOG(tr("Failed to invoke trigger %1 (%2)")
+                    .arg(id).arg(result.errorString), cl_logERROR);
+            }
+
+            if (resultHandler)
+                resultHandler(success, handle);
         };
 
-    commonModule()->currentServer()->restConnection()->softwareTriggerCommand(
+    return commonModule()->currentServer()->restConnection()->softwareTriggerCommand(
         m_resource->toResource()->getId(), id, toggleState,
         responseHandler, QThread::currentThread());
 }

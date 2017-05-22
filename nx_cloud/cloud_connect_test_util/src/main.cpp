@@ -6,6 +6,7 @@
 #include <nx/network/cloud/tunnel/connector_factory.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/argument_parser.h>
+#include <nx/utils/log/log_initializer.h>
 #include <nx/utils/string.h>
 
 #include "listen_mode.h"
@@ -45,7 +46,7 @@ int main(int argc, const char* argv[])
     SocketGlobals::InitGuard socketGlobalsGuard;
 
     // common options
-    QnLog::applyArguments(args);
+    nx::utils::log::initializeGlobally(args);
     SocketGlobals::applyArguments(args);
 
     if (args.get("disable-udp"))

@@ -2,7 +2,7 @@
 
 #include <rest/server/rest_connection_processor.h>
 #include "nx/network/http/httptypes.h"
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 
 int QnCookieLogoutRestHandler::executeGet(const QString &, const QnRequestParams &/*params*/, QnJsonRestResult &/*result*/, const QnRestConnectionProcessor* owner)
 {

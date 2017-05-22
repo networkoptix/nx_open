@@ -31,7 +31,7 @@ public:
     QAbstractButton* clickedButton;
     QList<QAbstractButton*> customButtons;
     QAbstractButton* defaultButton;
-    QnButtonAccent buttonAccent;
+    Qn::ButtonAccent buttonAccent;
     QAbstractButton* escapeButton;
     QList<QLabel*> informativeLabels;
     QList<QWidget*> customWidgets;
@@ -59,7 +59,7 @@ QnMessageBoxPrivate::QnMessageBoxPrivate(QnMessageBox* parent) :
     q_ptr(parent),
     clickedButton(nullptr),
     defaultButton(nullptr),
-    buttonAccent(QnButtonAccent::Standard),
+    buttonAccent(Qn::ButtonAccent::Standard),
     escapeButton(nullptr),
     icon(QnMessageBoxIcon::NoIcon),
     buttonDetection(QnButtonDetection::DefaultButton)
@@ -167,7 +167,7 @@ void QnMessageBoxPrivate::stylizeButtons()
             continue;
         }
 
-        if (buttonAccent == QnButtonAccent::Warning)
+        if (buttonAccent == Qn::ButtonAccent::Warning)
             setWarningButtonStyle(button);
         else
             setAccentStyle(button);
@@ -301,7 +301,7 @@ void QnMessageBox::addButton(QAbstractButton* button, QDialogButtonBox::ButtonRo
 QPushButton* QnMessageBox::addCustomButton(
     QnMessageBoxCustomButton button,
     QDialogButtonBox::ButtonRole role,
-    QnButtonAccent accent)
+    Qn::ButtonAccent accent)
 {
     switch (button)
     {
@@ -321,14 +321,14 @@ QPushButton* QnMessageBox::addCustomButton(
 QPushButton* QnMessageBox::addButton(
     const QString& text,
     QDialogButtonBox::ButtonRole role,
-    QnButtonAccent accent)
+    Qn::ButtonAccent accent)
 {
     Q_D(QnMessageBox);
 
     QPushButton* result = ui->buttonBox->addButton(text, role);
     d->customButtons.append(result);
 
-    if (accent != QnButtonAccent::NoAccent)
+    if (accent != Qn::ButtonAccent::NoAccent)
     {
         d->buttonAccent = accent;
         NX_ASSERT(!d->defaultButton, "Default button should not be set by now");
@@ -394,7 +394,7 @@ QAbstractButton *QnMessageBox::defaultButton() const
     return d->defaultButton;
 }
 
-void QnMessageBox::setDefaultButton(QAbstractButton* button, QnButtonAccent accent)
+void QnMessageBox::setDefaultButton(QAbstractButton* button, Qn::ButtonAccent accent)
 {
     NX_ASSERT(ui->buttonBox->buttons().contains(button));
     if (!ui->buttonBox->buttons().contains(button))
@@ -418,7 +418,7 @@ void QnMessageBox::setDefaultButton(QAbstractButton* button, QnButtonAccent acce
 
 void QnMessageBox::setDefaultButton(
     QDialogButtonBox::StandardButton button,
-    QnButtonAccent accent)
+    Qn::ButtonAccent accent)
 {
     if (button == QDialogButtonBox::NoButton)
         return;

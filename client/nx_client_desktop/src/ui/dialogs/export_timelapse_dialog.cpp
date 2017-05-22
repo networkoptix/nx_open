@@ -1,15 +1,18 @@
 #include "export_timelapse_dialog.h"
 #include "ui_export_timelapse_dialog.h"
 
+#include <array>
+
 #include <QtGui/QStandardItemModel>
 
 #include <text/time_strings.h>
 
 #include <ui/workaround/widgets_signals_workaround.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/qtimespan.h>
-#include <array>
 
 namespace {
 
@@ -76,6 +79,8 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
     m_filteredUnitsModel(new QStandardItemModel(this))
 {
     ui->setupUi(this);
+
+    setHelpTopic(this, Qn::Rapid_Review_Help);
 
     QFont infoFont(this->font());
     infoFont.setPixelSize(kInfoFontPixelSize);

@@ -27,6 +27,13 @@ void QnGlNativePainting::begin(const QGLContext* context,QPainter *painter) {
         m.ortho(0, sz.width(), sz.height(), 0, -999999, 999999);
         QnOpenGLRendererManager::instance(context)->setProjectionMatrix(m);
         QnOpenGLRendererManager::instance(context)->setModelViewMatrix(QMatrix4x4(painter->deviceTransform()));
+
+        if (painter->hasClipping())
+        {
+            /* This reconfigures OpenGL clipping that was reset in beginNativePainting: */
+            painter->setClipping(false);
+            painter->setClipping(true);
+        }
     }
 }
 

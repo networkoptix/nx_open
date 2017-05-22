@@ -7,7 +7,7 @@
 #include "audit/audit_manager.h"
 #include "common/common_module.h"
 #include "core/resource_management/resource_pool.h"
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "network/tcp_connection_priv.h"
 #include "universal_request_processor_p.h"
 #include <nx/fusion/model_functions.h>
@@ -52,9 +52,9 @@ QnUniversalRequestProcessor::QnUniversalRequestProcessor(
 }
 
 static QByteArray m_unauthorizedPageBody = STATIC_UNAUTHORIZED_HTML;
-static AuthMethod::Values m_unauthorizedPageForMethods = AuthMethod::NotDefined;
+static nx_http::AuthMethod::Values m_unauthorizedPageForMethods = nx_http::AuthMethod::NotDefined;
 
-void QnUniversalRequestProcessor::setUnauthorizedPageBody(const QByteArray& value, AuthMethod::Values methods)
+void QnUniversalRequestProcessor::setUnauthorizedPageBody(const QByteArray& value, nx_http::AuthMethod::Values methods)
 {
     m_unauthorizedPageBody = value;
     m_unauthorizedPageForMethods = methods;
@@ -78,7 +78,7 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
         const bool isProxy = needStandardProxy(d->owner->commonModule(), d->request);
         QElapsedTimer t;
         t.restart();
-        AuthMethod::Value usedMethod = AuthMethod::noAuth;
+        nx_http::AuthMethod::Value usedMethod = nx_http::AuthMethod::noAuth;
         Qn::AuthResult authResult;
         while ((authResult = qnAuthHelper->authenticate(d->request, d->response, isProxy, accessRights, &usedMethod)) != Qn::Auth_OK)
         {
@@ -138,9 +138,9 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
             if (t.elapsed() >= AUTH_TIMEOUT || !d->socket->isConnected())
                 return false; // close connection
         }
-        if (qnAuthHelper->restrictionList()->getAllowedAuthMethods(d->request) & AuthMethod::noAuth)
+        if (qnAuthHelper->restrictionList()->getAllowedAuthMethods(d->request) & nx_http::AuthMethod::noAuth)
             *noAuth = true;
-        if (usedMethod != AuthMethod::noAuth)
+        if (usedMethod != nx_http::AuthMethod::noAuth)
             d->authenticatedOnce = true;
     }
     return true;
@@ -167,21 +167,31 @@ void QnUniversalRequestProcessor::run()
             t.restart();
             parseRequest();
 
-            auto handler = d->owner->findHandler(d->protocol, d->request);
-            bool noAuth = false;
-            if (handler && !authenticate(&d->accessRights, &noAuth))
-                return;
-
-            isKeepAlive = isConnectionCanBePersistent();
-
-
-            // getting a new handler inside is necessary due to possibility of
-            // changing request during authentication
-            if (!processRequest(noAuth))
+            const auto redirect = d->owner->processorPool()->getRedirectRule(
+                d->request.requestLine.url.path());
+            if (redirect)
             {
                 QByteArray contentType;
-                int rez = redirectTo(QnTcpListener::defaultPage(), contentType);
+                int rez = redirectTo(redirect->toUtf8(), contentType);
                 sendResponse(rez, contentType);
+            }
+            else
+            {
+                auto handler = d->owner->findHandler(d->protocol, d->request);
+                bool noAuth = false;
+                if (handler && !authenticate(&d->accessRights, &noAuth))
+                    return;
+
+                isKeepAlive = isConnectionCanBePersistent();
+
+                // getting a new handler inside is necessary due to possibility of
+                // changing request during authentication
+                if (!processRequest(noAuth))
+                {
+                    QByteArray contentType;
+                    int rez = notFound(contentType);
+                    sendResponse(rez, contentType);
+                }
             }
         }
 

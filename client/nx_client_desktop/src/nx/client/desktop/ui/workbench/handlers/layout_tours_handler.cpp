@@ -6,18 +6,19 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/layout_tour_manager.h>
-
-#include <core/resource/layout_resource.h>
+#include <core/resource/user_resource.h>
 
 #include <nx_ec/ec_api.h>
 
-#include <ui/actions/action_manager.h>
-#include <ui/dialogs/layout_tour_dialog.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/style/skin.h>
-#include <ui/workbench/extensions/workbench_layout_tour_controller.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_layout.h>
+#include <nx/client/desktop/ui/workbench/extensions/workbench_layout_tour_executor.h>
+#include <nx/client/desktop/ui/workbench/extensions/workbench_layout_tour_review_controller.h>
 
 #include <nx/utils/string.h>
-
 
 namespace nx {
 namespace client {
@@ -27,143 +28,180 @@ namespace workbench {
 
 LayoutToursHandler::LayoutToursHandler(QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
-    m_controller(new LayoutTourController(this))
+    QnSessionAwareDelegate(parent),
+    m_tourExecutor(new LayoutTourExecutor(this)),
+    m_reviewController(new LayoutTourReviewController(this))
 {
-    connect(qnLayoutTourManager, &QnLayoutTourManager::tourChanged, m_controller,
-        &LayoutTourController::updateTour);
+    connect(layoutTourManager(), &QnLayoutTourManager::tourChanged, m_tourExecutor,
+        &LayoutTourExecutor::updateTour);
 
-    connect(qnLayoutTourManager, &QnLayoutTourManager::tourRemoved, this,
-        [this](const QnUuid& tourId)
-        {
-            m_controller->stopTour(tourId);
-        });
+    connect(layoutTourManager(), &QnLayoutTourManager::tourRemoved, m_tourExecutor,
+        &LayoutTourExecutor::stopTour);
 
-    connect(action(QnActions::NewLayoutTourAction), &QAction::triggered, this,
+    connect(action(action::NewLayoutTourAction), &QAction::triggered, this,
         [this]()
         {
+            NX_EXPECT(context()->user());
+            if (!context()->user())
+                return;
+
             QStringList usedNames;
-            for (const auto& tour: qnLayoutTourManager->tours())
+            for (const auto& tour: layoutTourManager()->tours())
                 usedNames << tour.name;
 
             ec2::ApiLayoutTourData tour;
             tour.id = QnUuid::createUuid();
+            tour.parentId = context()->user()->getId();
             tour.name = nx::utils::generateUniqueString(
                 usedNames, tr("Layout Tour"), tr("Layout Tour %1"));
-            qnLayoutTourManager->addOrUpdateTour(tour);
+            layoutTourManager()->addOrUpdateTour(tour);
             saveTourToServer(tour);
+            menu()->trigger(action::ReviewLayoutTourAction, {Qn::UuidRole, tour.id});
         });
 
-    connect(action(QnActions::RenameLayoutTourAction), &QAction::triggered, this,
+    connect(action(action::MakeLayoutTourAction), &QAction::triggered, this,
         [this]()
         {
-            QnActionParameters parameters = menu()->currentParameters(sender());
+            if (!menu()->triggerIfPossible(action::NewLayoutTourAction))
+                return;
+            const auto parameters = menu()->currentParameters(sender());
+            menu()->trigger(action::DropResourcesAction, parameters);
+            menu()->trigger(action::SaveCurrentLayoutTourAction);
+        });
+
+    connect(action(action::RenameLayoutTourAction), &QAction::triggered, this,
+        [this]()
+        {
+            const auto parameters = menu()->currentParameters(sender());
             auto id = parameters.argument<QnUuid>(Qn::UuidRole);
-            auto tour = qnLayoutTourManager->tour(id);
+            auto tour = layoutTourManager()->tour(id);
             if (!tour.isValid())
                 return;
             tour.name = parameters.argument<QString>(Qn::ResourceNameRole);
-            qnLayoutTourManager->addOrUpdateTour(tour);
+            layoutTourManager()->addOrUpdateTour(tour);
             saveTourToServer(tour);
         });
 
-    connect(action(QnActions::RemoveLayoutTourAction), &QAction::triggered, this,
+    connect(action(action::RemoveLayoutTourAction), &QAction::triggered, this,
         [this]()
         {
-            QnActionParameters parameters = menu()->currentParameters(sender());
+            const auto parameters = menu()->currentParameters(sender());
             auto id = parameters.argument<QnUuid>(Qn::UuidRole);
-            qnLayoutTourManager->removeTour(id);
+            NX_EXPECT(!id.isNull());
+
+            const auto tour = layoutTourManager()->tour(id);
+            if (!tour.name.isEmpty())
+            {
+                //TODO: #GDM #3.1 add to table, fix text and buttons
+                if (QnMessageBox::warning(
+                    mainWindow(),
+                    tr("Are you sure you want to delete %1?").arg(tour.name),
+                    QString(),
+                    QDialogButtonBox::Ok | QDialogButtonBox::Cancel) != QDialogButtonBox::Ok)
+                {
+                    return;
+                }
+            }
+
+            layoutTourManager()->removeTour(id);
             removeTourFromServer(id);
         });
 
-    connect(action(QnActions::LayoutTourSettingsAction), &QAction::triggered, this,
-        [this]()
+    connect(action(action::ToggleLayoutTourModeAction), &QAction::toggled, this,
+        [this](bool toggled)
         {
-            QnActionParameters parameters = menu()->currentParameters(sender());
+            const auto parameters = menu()->currentParameters(sender());
             auto id = parameters.argument<QnUuid>(Qn::UuidRole);
-            auto tour = qnLayoutTourManager->tour(id);
+
+            if (!toggled)
+            {
+                NX_EXPECT(id.isNull());
+                m_tourExecutor->stopCurrentTour();
+            }
+
+            if (toggled && id.isNull())
+            {
+                const auto reviewTourId = workbench()->currentLayout()->data(
+                    Qn::LayoutTourUuidRole).value<QnUuid>();
+
+                // Start Tour on a review layout must start the layout tour
+                if (!reviewTourId.isNull())
+                    id = reviewTourId;
+            }
+
+            if (id.isNull())
+            {
+                if (toggled)
+                    m_tourExecutor->startSingleLayoutTour();
+            }
+            else
+            {
+                NX_EXPECT(toggled);
+                m_tourExecutor->startTour(layoutTourManager()->tour(id));
+            }
+        });
+
+    connect(action(action::LayoutTourPrevStepAction), &QAction::triggered, m_tourExecutor,
+        &LayoutTourExecutor::prevTourStep);
+
+    connect(action(action::LayoutTourNextStepAction), &QAction::triggered, m_tourExecutor,
+        &LayoutTourExecutor::nextTourStep);
+
+    connect(action(action::SaveLayoutTourAction), &QAction::triggered, this,
+        [this]
+        {
+            const auto parameters = menu()->currentParameters(sender());
+            auto id = parameters.argument<QnUuid>(Qn::UuidRole);
+            auto tour = layoutTourManager()->tour(id);
             if (!tour.isValid())
                 return;
-
-            QScopedPointer<QnLayoutTourDialog> dialog(new QnLayoutTourDialog(mainWindow()));
-            dialog->loadData(tour);
-            if (!dialog->exec())
-                return;
-
-            dialog->submitData(&tour);
-            qnLayoutTourManager->addOrUpdateTour(tour);
             saveTourToServer(tour);
         });
 
-    connect(action(QnActions::ToggleLayoutTourModeAction), &QAction::triggered, this,
-        [this](bool toggled)
+    connect(action(action::EscapeHotkeyAction), &QAction::triggered, this,
+        [this]
         {
-            if (!toggled)
-            {
-                m_controller->stopCurrentTour();
-                return;
-            }
+            if (action(action::ToggleLayoutTourModeAction)->isChecked())
+                action(action::ToggleLayoutTourModeAction)->toggle();
 
-            QnActionParameters parameters = menu()->currentParameters(sender());
-            auto id = parameters.argument<QnUuid>(Qn::UuidRole);
-            auto tour = qnLayoutTourManager->tour(id);
-            if (tour.isValid())
-                m_controller->startTour(tour);
-            else
-                m_controller->startSingleLayoutTour();
+            // Just for safety
+            NX_EXPECT(m_tourExecutor->runningTour().isNull());
+            m_tourExecutor->stopCurrentTour();
         });
-
-    connect(action(QnActions::OpenLayoutTourAction), &QAction::triggered, this,
-        &LayoutToursHandler::openToursLayout);
-
-    connect(action(QnActions::EscapeHotkeyAction), &QAction::triggered, m_controller,
-        &LayoutTourController::stopCurrentTour);
 }
 
 LayoutToursHandler::~LayoutToursHandler()
 {
 }
 
-void LayoutToursHandler::openToursLayout()
+bool LayoutToursHandler::tryClose(bool /*force*/)
 {
-    const QList<QnActions::IDType> actions{
-        QnActions::ToggleLayoutTourModeAction,
-        QnActions::RemoveLayoutTourAction
-    };
+    m_tourExecutor->stopCurrentTour();
+    return true;
+}
 
-    const auto resource = QnLayoutResourcePtr(new QnLayoutResource());
-    resource->setData(Qn::IsSpecialLayoutRole, true);
-    resource->setData(Qn::LayoutIconRole, qnSkin->icon(lit("tree/videowall.png")));
-    resource->setData(Qn::CustomPanelActionsRoleRole, QVariant::fromValue(actions));
+void LayoutToursHandler::forcedUpdate()
+{
+    // Do nothing
+}
 
-    const auto startLayoutTourAction = action(QnActions::ToggleLayoutTourModeAction);
-    const auto removeLayoutTourAction = action(QnActions::RemoveLayoutTourAction);
+void LayoutToursHandler::loadState(const QnWorkbenchState& state)
+{
+    if (!state.runningTourId.isNull())
+    {
+        menu()->trigger(action::ToggleLayoutTourModeAction, {Qn::UuidRole, state.runningTourId});
+    }
+}
 
-    const auto updateState =
-        [startLayoutTourAction, removeLayoutTourAction, resource]()
-        {
-            const bool started = startLayoutTourAction->isChecked();
-            removeLayoutTourAction->setEnabled(!started);
-
-            static const auto kStarted = tr(" (STARTED)");
-            resource->setData(Qn::CustomPanelTitleRole, tr("Super Duper Tours Layout Panel")
-                + (started ? kStarted : QString()));
-            resource->setData(Qn::CustomPanelDescriptionRole, tr("Description Of Tour")
-                + (started ? kStarted : QString()));
-            resource->setName(lit("Test Layout Tours") + (started ? kStarted : QString()));
-        };
-
-    updateState();
-    connect(startLayoutTourAction, &QAction::toggled, this, updateState);
-
-    resource->setId(QnUuid::createUuid());
-    resourcePool()->addResource(resource);
-    menu()->trigger(QnActions::OpenSingleLayoutAction, resource);
+void LayoutToursHandler::submitState(QnWorkbenchState* state)
+{
+    if (state)
+        state->runningTourId = m_tourExecutor->runningTour();
 }
 
 void LayoutToursHandler::saveTourToServer(const ec2::ApiLayoutTourData& tour)
 {
-    NX_EXPECT(qnLayoutTourManager->tour(tour.id).isValid());
+    NX_EXPECT(layoutTourManager()->tour(tour.id).isValid());
     if (const auto connection = commonModule()->ec2Connection())
     {
         connection->getLayoutTourManager(Qn::kSystemAccess)->save(tour, this,

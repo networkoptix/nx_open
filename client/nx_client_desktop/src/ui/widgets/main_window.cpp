@@ -17,7 +17,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/event_processors.h>
-#include <network/module_finder.h>
+#include <nx/vms/discovery/manager.h>
 
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -31,7 +31,7 @@
 
 #include <ui/common/palette.h>
 #include <ui/common/frame_section.h>
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/graphics/view/graphics_view.h>
 #include <ui/graphics/view/graphics_scene.h>
 #include <ui/graphics/instruments/instrument_manager.h>
@@ -72,6 +72,7 @@
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_controller.h>
+#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_display.h>
@@ -201,7 +202,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
         }
         updateHelpTopic();
     });
-    connect(action(QnActions::ToggleLayoutTourModeAction), &QAction::toggled, this, &MainWindow::updateHelpTopic);
+    connect(action(action::ToggleLayoutTourModeAction), &QAction::toggled, this, &MainWindow::updateHelpTopic);
     updateHelpTopic();
 
     m_view.reset(new QnGraphicsView(m_scene.data()));
@@ -272,63 +273,62 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
 
     /* Set up actions. Only these actions will be available through hotkeys. */
-    addAction(action(QnActions::NextLayoutAction));
-    addAction(action(QnActions::PreviousLayoutAction));
-    addAction(action(QnActions::SaveCurrentLayoutAction));
-    addAction(action(QnActions::SaveCurrentLayoutAsAction));
-    addAction(action(QnActions::SaveCurrentVideoWallReviewAction));
-    addAction(action(QnActions::ExitAction));
-    addAction(action(QnActions::EscapeHotkeyAction));
-    addAction(action(QnActions::FullscreenMaximizeHotkeyAction));
-    addAction(action(QnActions::AboutAction));
-    addAction(action(QnActions::PreferencesGeneralTabAction));
-    addAction(action(QnActions::OpenBookmarksSearchAction));
-    addAction(action(QnActions::OpenBusinessLogAction));
-    addAction(action(QnActions::CameraListAction));
-    addAction(action(QnActions::BusinessEventsAction));
-    addAction(action(QnActions::OpenFileAction));
-    addAction(action(QnActions::OpenNewTabAction));
-    addAction(action(QnActions::OpenNewWindowAction));
-    addAction(action(QnActions::CloseLayoutAction));
-    addAction(action(QnActions::MainMenuAction));
-    addAction(action(QnActions::OpenLoginDialogAction));
-    addAction(action(QnActions::DisconnectAction));
-    addAction(action(QnActions::OpenInFolderAction));
-    addAction(action(QnActions::RemoveLayoutItemAction));
-    addAction(action(QnActions::RemoveLayoutItemFromSceneAction));
-    addAction(action(QnActions::RemoveFromServerAction));
-    addAction(action(QnActions::StopSharingLayoutAction));
-    addAction(action(QnActions::DeleteVideoWallItemAction));
-    addAction(action(QnActions::DeleteVideowallMatrixAction));
-    addAction(action(QnActions::RemoveLayoutTourAction));
-    addAction(action(QnActions::SelectAllAction));
-    addAction(action(QnActions::CheckFileSignatureAction));
-    addAction(action(QnActions::TakeScreenshotAction));
-    addAction(action(QnActions::AdjustVideoAction));
-    addAction(action(QnActions::TogglePanicModeAction));
-    addAction(action(QnActions::ToggleLayoutTourModeAction));
-    addAction(action(QnActions::OpenLayoutTourAction));
-    addAction(action(QnActions::DebugIncrementCounterAction));
-    addAction(action(QnActions::DebugDecrementCounterAction));
-    addAction(action(QnActions::DebugControlPanelAction));
-    addAction(action(QnActions::SystemAdministrationAction));
-    if (auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction))
+    addAction(action(action::NextLayoutAction));
+    addAction(action(action::PreviousLayoutAction));
+    addAction(action(action::SaveCurrentLayoutAction));
+    addAction(action(action::SaveCurrentLayoutAsAction));
+    addAction(action(action::SaveCurrentLayoutTourAction));
+    addAction(action(action::SaveCurrentVideoWallReviewAction));
+    addAction(action(action::ExitAction));
+    addAction(action(action::EscapeHotkeyAction));
+    addAction(action(action::FullscreenMaximizeHotkeyAction));
+    addAction(action(action::AboutAction));
+    addAction(action(action::PreferencesGeneralTabAction));
+    addAction(action(action::OpenBookmarksSearchAction));
+    addAction(action(action::OpenBusinessLogAction));
+    addAction(action(action::CameraListAction));
+    addAction(action(action::BusinessEventsAction));
+    addAction(action(action::OpenFileAction));
+    addAction(action(action::OpenNewTabAction));
+    addAction(action(action::OpenNewWindowAction));
+    addAction(action(action::CloseLayoutAction));
+    addAction(action(action::MainMenuAction));
+    addAction(action(action::OpenLoginDialogAction));
+    addAction(action(action::DisconnectAction));
+    addAction(action(action::OpenInFolderAction));
+    addAction(action(action::RemoveLayoutItemAction));
+    addAction(action(action::RemoveLayoutItemFromSceneAction));
+    addAction(action(action::RemoveFromServerAction));
+    addAction(action(action::StopSharingLayoutAction));
+    addAction(action(action::DeleteVideoWallItemAction));
+    addAction(action(action::DeleteVideowallMatrixAction));
+    addAction(action(action::RemoveLayoutTourAction));
+    addAction(action(action::SelectAllAction));
+    addAction(action(action::CheckFileSignatureAction));
+    addAction(action(action::TakeScreenshotAction));
+    addAction(action(action::AdjustVideoAction));
+    addAction(action(action::TogglePanicModeAction));
+    addAction(action(action::ToggleLayoutTourModeAction));
+    addAction(action(action::LayoutTourPrevStepAction));
+    addAction(action(action::LayoutTourNextStepAction));
+    addAction(action(action::ReviewLayoutTourAction));
+    addAction(action(action::DebugIncrementCounterAction));
+    addAction(action(action::DebugDecrementCounterAction));
+    addAction(action(action::DebugControlPanelAction));
+    addAction(action(action::SystemAdministrationAction));
+    if (auto screenRecordingAction = action(action::ToggleScreenRecordingAction))
         addAction(screenRecordingAction);
 
-    connect(action(QnActions::MaximizeAction), &QAction::toggled, this,
+    connect(action(action::MaximizeAction), &QAction::toggled, this,
         &MainWindow::setMaximized);
-    connect(action(QnActions::FullscreenAction), &QAction::toggled, this,
+    connect(action(action::FullscreenAction), &QAction::toggled, this,
         &MainWindow::setFullScreen);
-    connect(action(QnActions::MinimizeAction), &QAction::triggered, this,
+    connect(action(action::MinimizeAction), &QAction::triggered, this,
         &QWidget::showMinimized);
-    connect(action(QnActions::FullscreenMaximizeHotkeyAction), &QAction::triggered,
-        action(QnActions::EffectiveMaximizeAction), &QAction::trigger);
+    connect(action(action::FullscreenMaximizeHotkeyAction), &QAction::triggered,
+        action(action::EffectiveMaximizeAction), &QAction::trigger);
 
     menu()->setTargetProvider(m_ui.data());
-
-    const auto welcomeScreen = context->instance<QnWorkbenchWelcomeScreen>();
-    connect(welcomeScreen, &QnWorkbenchWelcomeScreen::visibleChanged,
-        this, &MainWindow::updateWidgetsVisibility);
 
     /* Layouts. */
 
@@ -348,7 +348,14 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
 
     m_currentPageHolder->addWidget(new QWidget());
     m_currentPageHolder->addWidget(m_view.data());
-    m_currentPageHolder->addWidget(welcomeScreen->widget());
+
+    if (qnRuntime->isDesktopMode())
+    {
+        const auto welcomeScreen = context->instance<QnWorkbenchWelcomeScreen>();
+        connect(welcomeScreen, &QnWorkbenchWelcomeScreen::visibleChanged,
+            this, &MainWindow::updateWidgetsVisibility);
+        m_currentPageHolder->addWidget(welcomeScreen->widget());
+    }
 
     // Post-initialize.
     if (nx::utils::AppInfo::isMacOsX())
@@ -358,7 +365,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
 
     // Initialize system-wide menu
     if (nx::utils::AppInfo::isMacOsX())
-        menu()->newMenu(Qn::MainScope);
+        menu()->newMenu(action::MainScope);
 
     /* VSync workaround must always be enabled to limit fps usage in following cases:
      * * VSync is not supported by drivers
@@ -382,11 +389,17 @@ QWidget *MainWindow::viewport() const {
 
 bool MainWindow::isTitleVisible() const
 {
+    if (!qnRuntime->isDesktopMode())
+        return false;
+
     return m_titleVisible || isWelcomeScreenVisible();
 }
 
 bool MainWindow::isWelcomeScreenVisible() const
 {
+    if (!qnRuntime->isDesktopMode())
+        return false;
+
     const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
     return (welcomeScreen && welcomeScreen->isVisible());
 }
@@ -502,7 +515,7 @@ void MainWindow::showFullScreen() {
     updateDecorationsState();
 
     // We have to disable minimize button in Mac OS for application in fullscreen mode
-    action(QnActions::MinimizeAction)->setEnabled(false);
+    action(action::MinimizeAction)->setEnabled(false);
 #else
     QnEmulatedFrameWidget::showFullScreen();
 #endif
@@ -513,7 +526,7 @@ void MainWindow::showNormal() {
     mac_showFullScreen((void*)winId(), false);
     updateDecorationsState();
     // We have to enable minimize button in Mac OS for application in non-fullscreen mode only
-    action(QnActions::MinimizeAction)->setEnabled(true);
+    action(action::MinimizeAction)->setEnabled(true);
 #else
     QnEmulatedFrameWidget::showNormal();
 #endif
@@ -525,7 +538,7 @@ void MainWindow::updateScreenInfo() {
 
 std::pair<int, bool> MainWindow::calculateHelpTopic() const
 {
-    if (action(QnActions::ToggleLayoutTourModeAction)->isChecked())
+    if (action(action::ToggleLayoutTourModeAction)->isChecked())
         return {Qn::MainWindow_Scene_TourInProgress_Help, true};
 
     if (auto layout = workbench()->currentLayout())
@@ -565,7 +578,7 @@ bool MainWindow::handleMessage(const QString &message) {
     if (resources.isEmpty())
         return false;
 
-    menu()->trigger(QnActions::DropResourcesAction, resources);
+    menu()->trigger(action::DropResourcesAction, resources);
     return true;
 }
 
@@ -588,8 +601,8 @@ void MainWindow::updateDecorationsState() {
 #endif
     bool maximized = isMaximized();
 
-    action(QnActions::FullscreenAction)->setChecked(fullScreen);
-    action(QnActions::MaximizeAction)->setChecked(maximized);
+    action(action::FullscreenAction)->setChecked(fullScreen);
+    action(action::MaximizeAction)->setChecked(maximized);
 
 #ifdef Q_OS_MACX
     bool uiTitleUsed = fullScreen;
@@ -606,7 +619,56 @@ void MainWindow::updateDecorationsState() {
     m_currentPageHolder->updateGeometry();
 }
 
-void MainWindow::updateDwmState() {
+bool MainWindow::handleKeyPress(int key)
+{
+    // Qt shortcuts handling works incorrect. If we have a shortcut set for an action, it will
+    // block key event passing in any case (even if we did not handle the event).
+    if (key == Qt::Key_Alt || key == Qt::Key_Control)
+        return false;
+
+    const bool isTourRunning = action(action::ToggleLayoutTourModeAction)->isChecked();
+
+    if (!isTourRunning)
+    {
+        if (key == Qt::Key_Space)
+        {
+            menu()->triggerIfPossible(action::PlayPauseAction,
+                navigator()->currentParameters(action::TimelineScope));
+            return true;
+        }
+
+        // Only running tours are handled further.
+        return false;
+    }
+
+    switch (key)
+    {
+        case Qt::Key_Backspace:
+        case Qt::Key_Left:
+        case Qt::Key_PageUp:
+        {
+            menu()->trigger(action::LayoutTourPrevStepAction);
+            break;
+        }
+        case Qt::Key_Enter:
+        case Qt::Key_Return:
+        case Qt::Key_Space:
+        case Qt::Key_Right:
+        case Qt::Key_PageDown:
+        {
+            menu()->trigger(action::LayoutTourNextStepAction);
+            break;
+        }
+        default:
+            // Stop layout tour if it is running.
+            menu()->trigger(action::ToggleLayoutTourModeAction);
+            break;
+    }
+    return true;
+}
+
+void MainWindow::updateDwmState()
+{
     if (isFullScreen())
     {
         /* Full screen mode. */
@@ -711,7 +773,7 @@ bool MainWindow::event(QEvent *event) {
     }
     else if (event->type() == QnEvent::WinSystemMenu)
     {
-        action(QnActions::MainMenuAction)->trigger();
+        action(action::MainMenuAction)->trigger();
     }
 
     if(m_dwm != NULL)
@@ -723,7 +785,7 @@ bool MainWindow::event(QEvent *event) {
 void MainWindow::closeEvent(QCloseEvent* event)
 {
     event->ignore();
-    menu()->trigger(QnActions::ExitAction);
+    menu()->trigger(action::ExitAction);
 }
 
 void MainWindow::changeEvent(QEvent *event) {
@@ -749,13 +811,7 @@ void MainWindow::paintEvent(QPaintEvent* event)
 void MainWindow::keyPressEvent(QKeyEvent* event)
 {
     base_type::keyPressEvent(event);
-
-    if (event->key() == Qt::Key_Alt || event->key() == Qt::Key_Control)
-        return;
-
-    // Stop layout tour if it is running.
-    if (action(QnActions::ToggleLayoutTourModeAction)->isChecked())
-        menu()->trigger(QnActions::ToggleLayoutTourModeAction);
+    handleKeyPress(event->key());
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {

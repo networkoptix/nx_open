@@ -21,9 +21,6 @@ int main(int argc, char** argv)
         argc, argv,
         [](const nx::utils::ArgumentParser& args)
         {
-            if (const auto value = args.get("tmp"))
-                nx::cdb::CdbFunctionalTest::setTemporaryDirectoryPath(*value);
-
             nx::db::ConnectionOptions connectionOptions;
             QString driverName;
             args.read("db/driverName", &driverName);

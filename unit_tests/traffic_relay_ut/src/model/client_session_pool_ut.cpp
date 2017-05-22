@@ -45,6 +45,11 @@ protected:
         ASSERT_TRUE(m_pool.getPeerNameBySessionId(m_sessionId).empty());
     }
 
+    void assertNothingIsReturnedWhenUsingUnknownId()
+    {
+        ASSERT_TRUE(m_pool.getPeerNameBySessionId("unknown_session_id").empty());
+    }
+
     void setSessionExpirationTimeout(std::chrono::milliseconds timeout)
     {
         std::ostringstream stringStream;
@@ -68,6 +73,11 @@ TEST_F(ClientSessionPool, adding_session)
 {
     addSession();
     assertSessionHasBeenAdded();
+}
+
+TEST_F(ClientSessionPool, get_unknown_session_id)
+{
+    assertNothingIsReturnedWhenUsingUnknownId();
 }
 
 TEST_F(ClientSessionPool, session_expiration)

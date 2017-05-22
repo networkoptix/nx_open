@@ -4,7 +4,7 @@
 #include <QtWidgets/QMainWindow>
 #include <QtCore/QScopedPointer>
 #include <core/resource/resource_fwd.h>
-#include <ui/actions/actions.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/graphics/view/graphics_scene.h>
 
@@ -16,7 +16,6 @@ class QSpacerItem;
 class QToolButton;
 class QStackedWidget;
 
-class QnActionManager;
 class QnLayoutTabBar;
 class QnGraphicsView;
 class QnDwm;
@@ -58,6 +57,13 @@ public:
     QWidget *viewport() const;
 
     void updateDecorationsState();
+
+    /**
+     * Handle key press.
+     * @returns true if key was handled.
+     */
+    bool handleKeyPress(int key);
+
 public slots:
     bool handleMessage(const QString &message);
 

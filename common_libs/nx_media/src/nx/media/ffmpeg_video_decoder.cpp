@@ -1,13 +1,13 @@
 #include <nx/utils/log/log.h>
 
-#include "config.h"
+#include "ini.h"
 #include "ffmpeg_video_decoder.h"
 
 extern "C" {
 #include <libavformat/avformat.h>
 #include <libavutil/pixdesc.h>
 #include <libswscale/swscale.h>
-};
+} // extern "C"
 
 #include <utils/media/ffmpeg_helper.h>
 #include <nx/utils/thread/mutex.h>
@@ -252,10 +252,10 @@ bool FfmpegVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolu
         .arg(resolution.width()).arg(resolution.height()),
         cl_logWARNING);
 
-    if (conf.unlimitFfmpegMaxResolution)
+    if (ini().unlimitFfmpegMaxResolution)
     {
         NX_LOG(lit(
-            "[ffmpeg_video_decoder] Config unlimitFfmpegMaxResolution is true => ignore limit"),
+            "[ffmpeg_video_decoder] .ini unlimitFfmpegMaxResolution is set => ignore limit"),
             cl_logWARNING);
         return true;
     }

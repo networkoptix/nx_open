@@ -28,6 +28,7 @@ endfunction()
 function(nx_rdep_sync_package package)
     cmake_parse_arguments(RDEP "" "RESULT_VARIABLE" "" ${ARGN})
 
+    message(STATUS "Syncing package ${package}")
     execute_process(
         COMMAND
             ${PYTHON_EXECUTABLE}

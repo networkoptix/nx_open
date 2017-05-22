@@ -19,7 +19,7 @@
 
 #include "universal_tcp_listener.h"
 #include <core/resource/media_server_resource.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 
 #include <utils/common/app_info.h>
 
@@ -35,17 +35,17 @@ public:
 
 QnProxySenderConnection::QnProxySenderConnection(
         const SocketAddress& proxyServerUrl, const QnUuid& guid,
-        QnUniversalTcpListener* owner)
+        QnUniversalTcpListener* owner, bool needAuth)
     : QnUniversalRequestProcessor(
           new QnProxySenderConnectionPrivate,
           QSharedPointer<AbstractStreamSocket>(
                 SocketFactory::createStreamSocket().release()),
-          owner, false)
+          owner, needAuth)
 {
     Q_D(QnProxySenderConnection);
     d->proxyServerUrl = proxyServerUrl;
     d->guid = guid;
-    setObjectName( lit("QnProxySenderConnection") );
+    setObjectName(toString(this));
 }
 
 QnProxySenderConnection::~QnProxySenderConnection()
@@ -97,7 +97,8 @@ int QnProxySenderConnection::sendRequest(const QByteArray& data)
     return totalSend;
 }
 
-QByteArray QnProxySenderConnection::makeProxyRequest(const QnUuid& serverUuid, const QUrl& url) const
+QByteArray QnProxySenderConnection::makeProxyRequest(
+    const QnUuid& serverUuid, const SocketAddress& address) const
 {
     const QByteArray H_REALM("NX");
     const QByteArray H_METHOD("CONNECT");
@@ -121,24 +122,22 @@ QByteArray QnProxySenderConnection::makeProxyRequest(const QnUuid& serverUuid, c
         server->getId().toByteArray(),
         server->getAuthKey().toUtf8(),
         boost::none,
-        url.path().toUtf8(),
+        H_PATH,
         authHeader,
         &digestHeader))
     {
         return QByteArray();
     }
 
-    return QString(QLatin1String(
-       "%1 %2 HTTP/1.1\r\n" \
-       "Host: %3:%4\r\n" \
-       "Authorization: %5\r\n"\
-       "%6: %7\r\n" \
-       "\r\n"))
-            .arg(QString::fromUtf8(H_METHOD)).arg(QString::fromUtf8(H_PATH))
-            .arg(url.host()).arg(url.port(nx_http::DEFAULT_HTTP_PORT))
-            .arg(QString::fromUtf8(digestHeader.serialized()))
-            .arg(QLatin1String(Qn::SERVER_GUID_HEADER_NAME)).arg(serverUuid.toString())
-            .toUtf8();
+    static const auto kRequest = lm(
+        "%1 %2 HTTP/1.1\r\n"
+        "Host: %3\r\n"
+        "Authorization: %4\r\n"
+        "%5: %6\r\n"
+        "\r\n");
+
+    return kRequest.args(H_METHOD, H_PATH, address, digestHeader.serialized(),
+        Qn::PROXY_SENDER_HEADER_NAME, serverUuid.toString()).toUtf8();
 }
 
 void QnProxySenderConnection::run()
@@ -147,11 +146,10 @@ void QnProxySenderConnection::run()
 
     initSystemThreadId();
 
-    auto proxyRequest = makeProxyRequest(d->guid, QUrl(d->proxyServerUrl.address.toString()));
+    auto proxyRequest = makeProxyRequest(d->guid, d->proxyServerUrl);
     if (proxyRequest.isEmpty())
     {
-        NX_LOG(lit("QnProxySenderConnection: can not generate request")
-               .arg(d->proxyServerUrl.toString()), cl_logWARNING);
+        NX_WARNING(this, lm("Can not generate request").arg(d->proxyServerUrl));
         return;
     }
 
@@ -164,8 +162,7 @@ void QnProxySenderConnection::run()
     int sended = sendRequest(proxyRequest);
     if (sended < proxyRequest.length())
     {
-        NX_LOG(lit("QnProxySenderConnection: can not send request to %1")
-               .arg(d->proxyServerUrl.toString()), cl_logWARNING);
+        NX_WARNING(this, lm("Can not send request to %1").arg(d->proxyServerUrl));
         d->socket->close();
         return;
     }
@@ -173,8 +170,7 @@ void QnProxySenderConnection::run()
     QByteArray response = readProxyResponse();
     if (response.isEmpty())
     {
-        NX_LOG(lit("QnProxySenderConnection: no response from %1")
-               .arg(d->proxyServerUrl.toString()), cl_logWARNING);
+        NX_WARNING(this, lm("No response from %1").arg(d->proxyServerUrl));
         d->socket->close();
         return;
     }
@@ -206,8 +202,10 @@ void QnProxySenderConnection::run()
     if (!m_needStop && gotRequest)
     {
         parseRequest();
+        NX_VERBOSE(this, lm("Process request %1").arg(d->request.requestLine));
+
         auto handler = d->owner->findHandler(d->protocol, d->request);
-        bool noAuth;
+        bool noAuth = false;
         if (handler && authenticate(&d->accessRights, &noAuth))
             processRequest(noAuth);
     }

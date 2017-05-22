@@ -20,8 +20,7 @@
 #include <api/simple_network_proxy_factory.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <utils/common/app_info.h>
-#include <network/module_finder.h>
-#include <network/multicast_module_finder.h>
+#include <nx/vms/discovery/manager.h>
 #include <network/router.h>
 #include <cloud/cloud_connection.h>
 #include <watchers/user_watcher.h>
@@ -42,6 +41,7 @@
 #include <nx/mobile_client/settings/migration_helper.h>
 #include <nx/mobile_client/settings/settings_migration.h>
 #include <client_core/client_core_settings.h>
+#include <core/ptz/client_ptz_controller_pool.h>
 
 using namespace nx::mobile_client;
 
@@ -87,8 +87,6 @@ QnMobileClientModule::QnMobileClientModule(
     commonModule->instance<QnCameraHistoryPool>();
     commonModule->store(new QnMobileClientCameraFactory());
 
-
-
     auto userWatcher = commonModule->store(new QnUserWatcher());
 
     auto availableCamerasWatcher = commonModule->instance<QnAvailableCamerasWatcher>();
@@ -110,9 +108,6 @@ QnMobileClientModule::QnMobileClientModule(
         runtimeData.videoWallInstanceGuid = startupParameters.videowallInstanceGuid;
     commonModule->runtimeInfoManager()->updateLocalItem(runtimeData);
 
-    commonModule->moduleFinder()->multicastModuleFinder()->setCheckInterfacesTimeout(10 * 1000);
-    commonModule->moduleFinder()->start();
-
     const auto getter = []() { return qnClientCoreSettings->knownServerUrls(); };
     const auto setter =
         [](const QnServerAddressWatcher::UrlsList& values)
@@ -128,15 +123,15 @@ QnMobileClientModule::QnMobileClientModule(
     commonModule->store(new settings::SessionsMigrationHelper());
 
     connect(qApp, &QGuiApplication::applicationStateChanged, this,
-        [moduleFinder = commonModule->moduleFinder()](Qt::ApplicationState state)
+        [moduleManager = commonModule->moduleDiscoveryManager()](Qt::ApplicationState state)
         {
             switch (state)
             {
                 case Qt::ApplicationActive:
-                    moduleFinder->start();
+                    moduleManager->start();
                     break;
                 case Qt::ApplicationSuspended:
-                    moduleFinder->pleaseStop();
+                    moduleManager->stop();
                     break;
                 default:
                     break;

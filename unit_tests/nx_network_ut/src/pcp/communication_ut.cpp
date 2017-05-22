@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
+
 #include <nx/network/pcp/sender.h>
 #include <nx/network/pcp/listener.h>
+
 #include <utils/memory/data_stream_helpers.h>
 
 using namespace pcp;

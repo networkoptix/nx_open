@@ -19,6 +19,12 @@ QnResourceTitleItem* QnHudOverlayWidget::title() const
     return d->title;
 }
 
+QGraphicsWidget* QnHudOverlayWidget::content() const
+{
+    Q_D(const QnHudOverlayWidget);
+    return d->content;
+}
+
 QnHtmlTextItem* QnHudOverlayWidget::details() const
 {
     Q_D(const QnHudOverlayWidget);

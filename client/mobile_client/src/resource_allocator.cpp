@@ -1,7 +1,8 @@
 #include "resource_allocator.h"
 
-#include "config.h"
-using mobile_client::conf;
+#include "ini.h"
+
+using nx::mobile_client::ini;
 
 ResourceAllocator::ResourceAllocator(QQuickWindow *window):
     nx::media::AbstractResourceAllocator(),
@@ -56,9 +57,9 @@ void ResourceAllocator::execAtGlThreadAsync(std::function<void()> lambda)
     if (!m_connectedAsync)
     {
         m_connectedAsync = true;
-        if (conf.execAtGlThreadOnBeforeSynchronizing)
+        if (ini().execAtGlThreadOnBeforeSynchronizing)
             connect(m_window, &QQuickWindow::beforeSynchronizing, this, &ResourceAllocator::at_execLambdaAsync, Qt::DirectConnection);
-        if (conf.execAtGlThreadOnFrameSwapped)
+        if (ini().execAtGlThreadOnFrameSwapped)
             connect(m_window, &QQuickWindow::frameSwapped, this, &ResourceAllocator::at_execLambdaAsync, Qt::DirectConnection);
     }
 

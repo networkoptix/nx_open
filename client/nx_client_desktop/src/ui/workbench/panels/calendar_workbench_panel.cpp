@@ -14,6 +14,7 @@
 #include <ui/animation/variant_animator.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
+#include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/processors/hover_processor.h>
@@ -28,6 +29,8 @@
 
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -58,9 +61,9 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
     m_origin(parentWidget->geometry().bottomRight()),
     m_widget(new QnCalendarWidget()),
     m_pinButton(newPinButton(parentWidget, context(),
-        action(QnActions::PinCalendarAction), true)),
+        action::PinCalendarAction, true)),
     m_dayTimeMinimizeButton(newActionButton(parentWidget, context(),
-        action(QnActions::MinimizeDayTimeViewAction), Qn::Empty_Help)),
+        action::MinimizeDayTimeViewAction, Qn::Empty_Help)),
     m_yAnimator(new VariantAnimator(this)),
     m_pinOffset(-kPinOffsetCellsCount * m_widget->headerHeight(), 0.0),
     m_dayTimeOpened(true),
@@ -84,6 +87,7 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
     item->setWidget(m_widget);
     item->resize(kCalendarSize);
     item->setProperty(Qn::NoHandScrollOver, true);
+    item->setProperty(Qn::BlockMotionSelection, true);
     item->setZValue(ContentItemZOrder);
     opacityAnimator(item)->setTimeLimit(kShowHideAnimationPeriodMs);
     m_widget->installEventFilter(item);
@@ -98,11 +102,11 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
             m_pinButton->setVisible(event->type() == QEvent::Hide);
         });
 
-    action(QnActions::PinCalendarAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
+    action(action::PinCalendarAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
     m_pinButton->setFocusProxy(item);
     m_pinButton->setZValue(ControlItemZOrder);
 
-    const auto toggleCalendarAction = action(QnActions::ToggleCalendarAction);
+    const auto toggleCalendarAction = action(action::ToggleCalendarAction);
     toggleCalendarAction->setChecked(settings.state == Qn::PaneState::Opened);
     connect(toggleCalendarAction, &QAction::toggled, this,
         [this](bool checked)
@@ -115,13 +119,14 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
     m_dayTimeWidget->installEventFilter(item);
     m_dayTimeItem->resize(kDayTimeWidgetSize);
     m_dayTimeItem->setProperty(Qn::NoHandScrollOver, true);
+    m_dayTimeItem->setProperty(Qn::BlockMotionSelection, true);
     m_dayTimeItem->setZValue(ContentItemZOrder);
     opacityAnimator(m_dayTimeItem)->setTimeLimit(kShowHideAnimationPeriodMs);
 
     m_dayTimeMinimizeButton->setFocusProxy(m_dayTimeItem);
     m_dayTimeMinimizeButton->setZValue(ControlItemZOrder);
     opacityAnimator(m_dayTimeMinimizeButton)->setTimeLimit(kShowHideAnimationPeriodMs);
-    connect(action(QnActions::MinimizeDayTimeViewAction), &QAction::triggered, this,
+    connect(action(action::MinimizeDayTimeViewAction), &QAction::triggered, this,
         [this]
         {
             setDayTimeWidgetOpened(false, true);
@@ -168,7 +173,7 @@ QList<QGraphicsItem*> CalendarWorkbenchPanel::activeItems() const
 
 bool CalendarWorkbenchPanel::isEnabled() const
 {
-    return action(QnActions::ToggleCalendarAction)->isEnabled();
+    return action(action::ToggleCalendarAction)->isEnabled();
 }
 
 void CalendarWorkbenchPanel::setEnabled(bool enabled, bool animated)
@@ -176,7 +181,7 @@ void CalendarWorkbenchPanel::setEnabled(bool enabled, bool animated)
     if (isEnabled() == enabled)
         return;
 
-    action(QnActions::ToggleCalendarAction)->setEnabled(enabled);
+    action(action::ToggleCalendarAction)->setEnabled(enabled);
     if (!isOpened())
         return;
 
@@ -218,12 +223,12 @@ void CalendarWorkbenchPanel::setOrigin(const QPointF& position)
 
 bool CalendarWorkbenchPanel::isPinned() const
 {
-    return action(QnActions::PinCalendarAction)->isChecked();
+    return action(action::PinCalendarAction)->isChecked();
 }
 
 bool CalendarWorkbenchPanel::isOpened() const
 {
-    return action(QnActions::ToggleCalendarAction)->isChecked();
+    return action(action::ToggleCalendarAction)->isChecked();
 }
 
 void CalendarWorkbenchPanel::setOpened(bool opened, bool animate)
@@ -233,7 +238,7 @@ void CalendarWorkbenchPanel::setOpened(bool opened, bool animate)
     ensureAnimationAllowed(&animate);
 
     QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
-    action(QnActions::ToggleCalendarAction)->setChecked(opened);
+    action(action::ToggleCalendarAction)->setChecked(opened);
 
     qreal newY = m_origin.y();
     if (!opened)

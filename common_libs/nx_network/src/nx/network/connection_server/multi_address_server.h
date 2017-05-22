@@ -1,10 +1,4 @@
-/**********************************************************
-* 23 dec 2013
-* a.kolesnikov
-***********************************************************/
-
-#ifndef MULTI_ADDRESS_SERVER_H
-#define MULTI_ADDRESS_SERVER_H
+#pragma once
 
 #include <list>
 #include <memory>
@@ -14,6 +8,10 @@
 #include <nx/utils/log/log.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_factory.h>
+
+namespace nx {
+namespace network {
+namespace server {
 
 //!Listens multiple addresses by creating multiple servers (\a SocketServerType)
 template<class SocketServerType>
@@ -61,7 +59,7 @@ public:
             if (!socketServer->bind(addr))
             {
                 const auto osErrorCode = SystemError::getLastOSErrorCode();
-                NX_LOG(lit("Failed to bind to address %1. %2")
+                NX_LOG(lm("Failed to bind to address %1. %2")
                     .arg(addr.toString()).arg(SystemError::toString(osErrorCode)),
                     cl_logERROR);
                 if (bindToEveryAddress)
@@ -127,4 +125,6 @@ private:
     std::vector<SocketAddress> m_endpoints;
 };
 
-#endif  //MULTI_ADDRESS_SERVER_H
+} // namespace server
+} // namespace network
+} // namespace nx

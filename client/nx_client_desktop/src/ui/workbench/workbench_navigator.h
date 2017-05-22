@@ -16,7 +16,7 @@
 
 #include <recording/time_period.h>
 
-#include <ui/actions/action_target_provider.h>
+#include <nx/client/desktop/ui/actions/action_target_provider.h>
 #include <ui/common/speed_range.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -47,7 +47,10 @@ class QnSearchQueryStrategy;
 class QnPendingOperation;
 class VariantAnimator;
 
-class QnWorkbenchNavigator: public Connective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider
+class QnWorkbenchNavigator:
+    public Connective<QObject>,
+    public QnWorkbenchContextAware,
+    public nx::client::desktop::ui::action::TargetProvider
 {
     Q_OBJECT;
 
@@ -120,8 +123,9 @@ public:
     Q_SLOT void stepBackward();
     Q_SLOT void stepForward();
 
-    virtual Qn::ActionScope currentScope() const override;
-    virtual QnActionParameters currentParameters(Qn::ActionScope scope) const override;
+    virtual nx::client::desktop::ui::action::ActionScope currentScope() const override;
+    virtual nx::client::desktop::ui::action::Parameters currentParameters(
+        nx::client::desktop::ui::action::ActionScope scope) const override;
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
@@ -198,7 +202,7 @@ protected slots:
 
     void updateCurrentWidgetFlags();
 
-    void setAutoPaused(bool autoPaused);
+    void updateAutoPaused();
 
     void at_display_widgetChanged(Qn::ItemRole role);
     void at_display_widgetAdded(QnResourceWidget *widget);

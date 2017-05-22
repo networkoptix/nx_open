@@ -78,6 +78,7 @@ private:
     ItemState itemStateForLayoutItem(const QModelIndex& index) const;
     ItemState itemStateForVideoWall(const QModelIndex& index) const;
     ItemState itemStateForVideoWallItem(const QModelIndex& index) const;
+    ItemState itemStateForLayoutTour(const QModelIndex& index) const;
 
     void getDisplayInfo(const QModelIndex& index, QString& baseName, QString& extInfo) const;
 

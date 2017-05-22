@@ -112,11 +112,11 @@ AudioDevice::AudioDevice(QObject *parent)
             alcMakeContextCurrent(m_context);
             alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
 
-            cl_log.log("OpenAL info: ", cl_logINFO);
-            cl_log.log("version: ", versionString(), cl_logINFO);
-            cl_log.log("company: ", company(), cl_logINFO);
-            cl_log.log("Device type: ", static_cast<const char *>(alGetString(AL_RENDERER)), cl_logINFO);
-            cl_log.log("OpenAL extensions: ", static_cast<const char *>(alGetString(AL_EXTENSIONS)), cl_logINFO);
+            NX_INFO(this, "OpenAL info: ");
+            NX_INFO(this, lm("Version: %1").arg(versionString()));
+            NX_INFO(this, lm("Company: %1").arg(company()));
+            NX_INFO(this, lm("Device type: %1").arg(static_cast<const char *>(alGetString(AL_RENDERER))));
+            NX_INFO(this, lm("OpenAL extensions: %1").arg(static_cast<const char *>(alGetString(AL_EXTENSIONS))));
         }
     }
 }

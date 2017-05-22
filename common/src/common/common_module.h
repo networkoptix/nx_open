@@ -18,7 +18,6 @@
 
 class QSettings;
 class QnSessionManager;
-class QnModuleFinder;
 class QnRouter;
 class QnGlobalSettings;
 class QnCommonMessageProcessor;
@@ -31,10 +30,10 @@ class QnMediaServerUserAttributesPool;
 class QnResourcePropertyDictionary;
 class QnResourceStatusDictionary;
 class QnResourceDiscoveryManager;
+class QnServerAdditionalAddressesDictionary;
 
-namespace ec2 {
-    class AbstractECConnection;
-}
+namespace ec2 { class AbstractECConnection; }
+namespace nx { namespace vms { namespace discovery { class Manager; } } }
 
 struct BeforeRestoreDbData
 {
@@ -98,9 +97,9 @@ public:
         return m_globalSettings;
     }
 
-    QnModuleFinder* moduleFinder() const
+    nx::vms::discovery::Manager* moduleDiscoveryManager() const
     {
-        return m_moduleFinder;
+        return m_moduleDiscoveryManager;
     }
 
     QnCameraHistoryPool* cameraHistoryPool() const
@@ -133,6 +132,11 @@ public:
         return m_resourceStatusDictionary;
     }
 
+    QnServerAdditionalAddressesDictionary* serverAdditionalAddressesDictionary() const
+    {
+        return m_serverAdditionalAddressesDictionary;
+    }
+
     QnCameraUserAttributePool* cameraUserAttributesPool() const
     {
         return m_cameraUserAttributesPool;
@@ -148,6 +152,11 @@ public:
     QnResourceDiscoveryManager* resourceDiscoveryManager() const
     {
         return m_resourceDiscoveryManager;
+    }
+
+    QnLayoutTourManager* layoutTourManager() const
+    {
+        return m_layoutTourManager;
     }
 
     QnLicensePool* licensePool() const;
@@ -247,7 +256,7 @@ private:
     QnResourcePool* m_resourcePool = nullptr;
     QnResourceAccessSubjectsCache* m_resourceAccessSubjectCache = nullptr;
     QnSharedResourcesManager* m_sharedResourceManager = nullptr;
-    QnModuleFinder* m_moduleFinder = nullptr;
+    nx::vms::discovery::Manager* m_moduleDiscoveryManager = nullptr;
     QnRouter* m_router = nullptr;
 
     QString m_defaultAdminPassword;
@@ -278,9 +287,11 @@ private:
     QnMediaServerUserAttributesPool* m_mediaServerUserAttributesPool = nullptr;
     QnResourcePropertyDictionary* m_resourcePropertyDictionary = nullptr;
     QnResourceStatusDictionary* m_resourceStatusDictionary = nullptr;
+    QnServerAdditionalAddressesDictionary* m_serverAdditionalAddressesDictionary = nullptr;
     QnGlobalPermissionsManager* m_globalPermissionsManager = nullptr;
     QnUserRolesManager* m_userRolesManager = nullptr;
     QnResourceDiscoveryManager* m_resourceDiscoveryManager = nullptr;
+    QnLayoutTourManager* m_layoutTourManager = nullptr;
 
     QnUuid m_videowallGuid;
     int m_instanceCounter = 0;

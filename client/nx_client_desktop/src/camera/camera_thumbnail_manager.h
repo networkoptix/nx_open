@@ -37,6 +37,10 @@ public:
 
     static QSize sizeHintForCamera(const QnVirtualCameraResourcePtr& camera, const QSize& limit);
 
+    Qn::ThumbnailStatus statusForCamera(const QnVirtualCameraResourcePtr& camera) const;
+    bool hasThumbnailForCamera(const QnVirtualCameraResourcePtr& camera) const;
+    QImage thumbnailForCamera(const QnVirtualCameraResourcePtr& camera) const;
+
 signals:
     void thumbnailReady(const QnUuid& resourceId, const QPixmap& thumbnail);
 

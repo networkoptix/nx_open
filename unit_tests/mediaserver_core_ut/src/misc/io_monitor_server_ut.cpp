@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 #include <api/test_api_requests.h>
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/model_functions.h>
@@ -23,7 +23,7 @@ namespace {
 namespace nx {
 namespace test {
 
-class IoMonitorParser: public nx::utils::bsf::AbstractByteStreamFilter
+class IoMonitorParser: public nx::utils::bstream::AbstractByteStreamFilter
 {
 public:
     IoMonitorParser(const QnIOStateDataList& data): m_data(data) {}
@@ -151,7 +151,7 @@ TEST(IoServerMonitorTest, main)
 
     QObject::connect(
         httpClient.get(), &nx_http::AsyncHttpClient::done,
-        [&allDataProcessed](nx_http::AsyncHttpClientPtr httpClient)
+        [&allDataProcessed](nx_http::AsyncHttpClientPtr /*httpClient*/)
         {
             allDataProcessed.set_value();
         });

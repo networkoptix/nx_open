@@ -56,6 +56,20 @@ QString AppInfo::organizationName()
     return QStringLiteral("${company.name}");
 }
 
+QString AppInfo::linuxOrganizationName()
+{
+    return QStringLiteral("${deb.customization.company.name}");
+}
+
+QString AppInfo::organizationNameForSettings()
+{
+#ifdef _WIN32
+    return organizationName();
+#else
+    return linuxOrganizationName();
+#endif
+}
+
 QString AppInfo::productNameShort()
 {
     return QStringLiteral("${product.name.short}");

@@ -2,11 +2,12 @@
 
 #include <memory>
 
+#include <nx/kit/ini_config.h>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/argument_parser.h>
 #include <nx/utils/std/cpp14.h>
-#include <nx/utils/flag_config.h>
 
 #include "aio/aio_service.h"
 #include "aio/pollset_factory.h"
@@ -25,28 +26,28 @@ namespace network {
 class NX_NETWORK_API SocketGlobals
 {
 public:
-    struct NX_NETWORK_API DebugConfig: nx::utils::FlagConfig
+    struct DebugIni: nx::kit::IniConfig
     {
-        DebugConfig(): nx::utils::FlagConfig("nx_network_debug") { reload(); }
+        DebugIni(): IniConfig("nx_network_debug.ini") { reload(); }
 
-        NX_FLAG(0, multipleServerSocket, "Extra debug info from MultipleServerSocket");
-        NX_FLAG(0, cloudServerSocket, "Extra debug info from cloud::CloudServerSocket");
-        NX_FLAG(0, addressResolver, "Extra debug info from cloud::AddressResolver");
-        NX_FLAG(0, sslSocketWrappers, "Extra debug info from SslSocket* classes");
-        NX_FLAG(0, httpClientTraffic, "Trace HTTP traffic for nx_http::AsyncHttpClient");
+        NX_INI_FLAG(0, multipleServerSocket, "Extra debug info from MultipleServerSocket");
+        NX_INI_FLAG(0, cloudServerSocket, "Extra debug info from cloud::CloudServerSocket");
+        NX_INI_FLAG(0, addressResolver, "Extra debug info from cloud::AddressResolver");
+        NX_INI_FLAG(0, sslSocketWrappers, "Extra debug info from SslSocket* classes");
+        NX_INI_FLAG(0, httpClientTraffic, "Trace HTTP traffic for nx_http::AsyncHttpClient");
 
         // TODO: Should be moved to a different flag config, because module finders live in common.
         // This flag resides here just because there are no other flag configs for logging.
-        NX_FLAG(0, moduleFinders, "Extra debug info for Qn*ModuleFinder classes");
-        NX_INT_PARAM(0, multicastModuleFinderTimeout, "Use timeout instead of poll in QnMMF");
+        NX_INI_FLAG(0, moduleFinders, "Extra debug info for Qn*ModuleFinder classes");
+        NX_INI_INT(0, multicastModuleFinderTimeout, "Use timeout instead of poll in QnMMF");
     };
 
-    struct NX_NETWORK_API Config: nx::utils::FlagConfig
+    struct Ini: nx::kit::IniConfig
     {
-        Config(): nx::utils::FlagConfig("nx_network") { reload(); }
+        Ini(): IniConfig("nx_network.ini") { reload(); }
 
-        NX_FLAG(0, disableCloudSockets, "Use plain TCP sockets instead of Cloud sockets");
-        NX_STRING_PARAM("", disableHosts, "Comma-separated list of forbidden IPs and domains");
+        NX_INI_FLAG(0, disableCloudSockets, "Use plain TCP sockets instead of Cloud sockets");
+        NX_INI_STRING("", disableHosts, "Comma-separated list of forbidden IPs and domains");
 
         bool isHostDisabled(const HostAddress& address) const;
     };
@@ -57,8 +58,8 @@ public:
     typedef cloud::CloudConnectSettings CloudSettings;
     typedef cloud::tcp::ReverseConnectionPool TcpReversePool;
 
-    static Config& config() { return s_instance->m_config; }
-    static DebugConfig& debugConfig() { return s_instance->m_debugConfig; }
+    static Ini& ini() { return s_instance->m_ini; }
+    static DebugIni& debugIni() { return s_instance->m_debugIni; }
     static aio::AIOService& aioService() { return s_instance->m_aioServiceGuard.aioService(); }
     static cloud::AddressResolver& addressResolver() { return *s_instance->m_addressResolver; }
     static AddressPublisher& addressPublisher() { return *s_instance->m_addressPublisher; }
@@ -99,7 +100,7 @@ private:
      */
     SocketGlobals(int initializationFlags);
     ~SocketGlobals();
-    void setDebugConfigTimer();
+    void setDebugIniReloadTimer();
 
     enum class InitState { none, inintializing, done, deinitializing };
 
@@ -129,16 +130,15 @@ private:
     // 2. CloudSocketGlobals (cloud singletones) - required for cloud sockets.
 
     const int m_initializationFlags;
-    Config m_config;
-    DebugConfig m_debugConfig;
-    std::shared_ptr<QnLog::Logs> m_log;
+    Ini m_ini;
+    DebugIni m_debugIni;
 
     // Is unique_ptr because it should be initiated after m_aioService but removed after.
     std::unique_ptr<cloud::AddressResolver> m_addressResolver;
 
     aio::PollSetFactory m_pollSetFactory;
     AioServiceGuard m_aioServiceGuard;
-    std::unique_ptr<aio::Timer> m_debugConfigTimer;
+    std::unique_ptr<aio::Timer> m_debugIniReloadTimer;
 
     // Is unique_ptr becaule it should be initiated before cloud classes but removed before.
     std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;

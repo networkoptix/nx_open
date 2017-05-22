@@ -149,7 +149,7 @@ bool QnTransactionTransport::sendSerializedTransaction(
             break;
         case Qn::UbjsonFormat: {
 
-            if (QnLog::instance(QnLog::EC2_TRAN_LOG)->logLevel() >= cl_logDEBUG1)
+            if (nx::utils::log::isToBeLogged(nx::utils::log::Level::debug, QnLog::EC2_TRAN_LOG))
             {
                 QnAbstractTransaction abtractTran;
                 QnUbjsonReader<QByteArray> stream(&serializedTran);

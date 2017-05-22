@@ -1,4 +1,5 @@
 #include "onvif_searcher_hooks.h"
+#if defined(ENABLE_ONVIF)
 
 namespace nx {
 namespace plugins {
@@ -121,3 +122,5 @@ void hikvisionManufacturerReplacement(EndpointAdditionalInfo* outInfo)
 } // namespace onvif
 } // namespace plugins
 } // namespace nx
+
+#endif // defined(ENABLE_ONVIF)

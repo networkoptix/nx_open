@@ -158,7 +158,7 @@ SyncSslSocket::~SyncSslSocket()
     }
 }
 
-int SyncSslSocket::recv(void* buffer, unsigned int bufferLen, int /*flags*/)
+int SyncSslSocket::recv(void* buffer, unsigned int bytesToRead, int flags)
 {
     if (!SSL_is_init_finished(m_ssl))
     {
@@ -168,7 +168,27 @@ int SyncSslSocket::recv(void* buffer, unsigned int bufferLen, int /*flags*/)
             doClientHandshake();
     }
 
-    return SSL_read(m_ssl, (char*) buffer, bufferLen);
+    if (flags & MSG_WAITALL)
+    {
+        int totalBytesRead = 0;
+        for (;;)
+        {
+            const int bytesRead = SSL_read(m_ssl, (char*)buffer, bytesToRead);
+            if (bytesRead <= 0)
+                return totalBytesRead > 0 ? totalBytesRead : bytesRead;
+
+            totalBytesRead += bytesRead;
+            bytesToRead -= bytesRead;
+            buffer = (char*)buffer + bytesRead;
+
+            if (bytesToRead == 0)
+                return totalBytesRead;
+        }
+    }
+    else
+    {
+        return SSL_read(m_ssl, (char*) buffer, bytesToRead);
+    }
 }
 
 int SyncSslSocket::send(const void* buffer, unsigned int bufferLen)
@@ -188,14 +208,14 @@ void SyncSslSocket::readSomeAsync(
     nx::Buffer* const /*buffer*/,
     std::function<void(SystemError::ErrorCode, size_t)> /*handler*/)
 {
-    NX_CRITICAL(false);
+    NX_CRITICAL(false, "Not implemented and will never be. Use ssl::StreamSocket");
 }
 
 void SyncSslSocket::sendAsync(
     const nx::Buffer& /*buffer*/,
     std::function<void(SystemError::ErrorCode, size_t)> /*handler*/)
 {
-    NX_CRITICAL(false);
+    NX_CRITICAL(false, "Not implemented and will never be. Use ssl::StreamSocket");
 }
 
 int SyncSslSocket::recvInternal(void* buffer, unsigned int bufferLen, int /*flags*/)
@@ -209,14 +229,15 @@ int SyncSslSocket::recvInternal(void* buffer, unsigned int bufferLen, int /*flag
         int readRest = bufferLen - toReadLen;
         if (toReadLen > 0)
         {
-            int readed = m_target->recv((char*) buffer + toReadLen, readRest);
-            if (readed > 0)
-                toReadLen += readed;
+            const int bytesRead = m_target->recv((char*) buffer + toReadLen, readRest);
+            if (bytesRead > 0)
+                toReadLen += bytesRead;
         }
         return toReadLen;
     }
 
-    return m_target->recv(buffer, bufferLen);
+    int bytesRead = m_target->recv(buffer, bufferLen);
+    return bytesRead;
 }
 
 int SyncSslSocket::sendInternal(const void* buffer, unsigned int bufferLen)
@@ -235,9 +256,7 @@ bool SyncSslSocket::doClientHandshake()
 {
     SSL_set_connect_state(m_ssl);
 
-    int ret = SSL_do_handshake(m_ssl);
-    //int err2 = SSL_get_error(m_ssl, ret);
-    //const char* err = ERR_reason_error_string(ERR_get_error());
+    const int ret = SSL_do_handshake(m_ssl);
     return ret == 1;
 }
 
@@ -278,10 +297,10 @@ int QnMixedSSLSocket::recv(void* buffer, unsigned int bufferLen, int flags)
     {
         if (m_extraBufferLen == 0)
         {
-            int readed = m_target->recv(m_extraBuffer, 1);
-            if (readed < 1)
-                return readed;
-            m_extraBufferLen += readed;
+            int bytesRead = m_target->recv(m_extraBuffer, 1);
+            if (bytesRead < 1)
+                return bytesRead;
+            m_extraBufferLen += bytesRead;
         }
 
         if (m_extraBuffer[0] == 0x80)
@@ -291,10 +310,10 @@ int QnMixedSSLSocket::recv(void* buffer, unsigned int bufferLen, int flags)
         }
         else if (m_extraBuffer[0] == 0x16)
         {
-            int readed = m_target->recv(m_extraBuffer+1, 1);
-            if (readed < 1)
-                return readed;
-            m_extraBufferLen += readed;
+            int bytesRead = m_target->recv(m_extraBuffer+1, 1);
+            if (bytesRead < 1)
+                return bytesRead;
+            m_extraBufferLen += bytesRead;
 
             if (m_extraBuffer[1] == 0x03)
                 m_useSSL = true;

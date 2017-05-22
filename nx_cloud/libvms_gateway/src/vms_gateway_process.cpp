@@ -9,21 +9,22 @@
 #include <QtCore/QDir>
 #include <QtSql/QSqlQuery>
 
-#include <nx/network/auth_restriction_list.h>
+#include <nx/network/http/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/ssl_socket.h>
-#include <nx/utils/log/log.h>
 
-#include <api/global_settings.h>
-#include <platform/process/current_process.h>
+#include <nx/utils/app_info.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/stree/stree_manager.h>
-#include <utils/common/app_info.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/scope_guard.h>
-#include <utils/common/public_ip_discovery.h>
 #include <nx/utils/system_error.h>
+
+#include <platform/process/current_process.h>
+#include <utils/common/app_info.h>
+#include <utils/common/public_ip_discovery.h>
 
 #include "access_control/authentication_manager.h"
 #include "http/connect_handler.h"
@@ -93,7 +94,7 @@ int VmsGatewayProcess::exec()
         conf::Settings settings;
         //parsing command line arguments
         settings.load(m_argc, (const char**) m_argv);
-        if (settings.showHelp())
+        if (settings.isShowHelpRequested())
         {
             settings.printCmdLineArgsHelp();
             return 0;
@@ -150,7 +151,7 @@ int VmsGatewayProcess::exec()
         nx_http::MessageDispatcher httpMessageDispatcher;
 
         //TODO #ak move following to stree xml
-        QnAuthMethodRestrictionList authRestrictionList;
+        nx_http::AuthMethodRestrictionList authRestrictionList;
 
         AuthenticationManager authenticationManager(
             authRestrictionList,
@@ -162,11 +163,12 @@ int VmsGatewayProcess::exec()
         if (settings.http().sslSupport)
         {
             network::ssl::Engine::useOrCreateCertificate(
-                settings.http().sslCertPath, QnAppInfo::productName().toUtf8(),
-                "US", QnAppInfo::organizationName().toUtf8());
+                settings.http().sslCertPath, 
+                QnAppInfo::productName().toUtf8(),
+                "US", nx::utils::AppInfo::organizationName().toUtf8());
         }
 
-        MultiAddressServer<nx_http::HttpStreamSocketServer> multiAddressHttpServer(
+        network::server::MultiAddressServer<nx_http::HttpStreamSocketServer> multiAddressHttpServer(
             &authenticationManager,
             &httpMessageDispatcher,
             settings.http().sslSupport,
@@ -197,6 +199,9 @@ int VmsGatewayProcess::exec()
             while (!m_terminated)
                 m_cond.wait(lk.mutex());
         }
+
+        NX_LOG(lm("%1 has been stopped")
+            .arg(QnLibVmsGatewayAppInfo::applicationDisplayName()), cl_logALWAYS);
 
         return 0;
     }

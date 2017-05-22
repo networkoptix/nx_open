@@ -9,7 +9,7 @@
 
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/thread/long_runnable.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 #include <utils/common/util.h>
 
 #include <media_server/media_server_module.h>

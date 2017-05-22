@@ -34,7 +34,17 @@ namespace {
         if (netRes->hasCameraCapabilities(Qn::ShareIpCapability))
             return false; //< don't block
 
-        QnNetworkResourceList existResList = netRes->resourcePool()->getAllNetResourceByHostAddress(netRes->getHostAddress());
+        auto resCommonModule = netRes->commonModule();
+        NX_ASSERT(resCommonModule, lit("Common module should be set for resource"));
+        if (!resCommonModule)
+            return true; //< Don't add resource without properly set common module
+
+        auto resPool = resCommonModule->resourcePool();
+        NX_ASSERT(resPool, "Resource should have correspondent resource pool");
+        if (!resPool)
+            return true; // Don't add resource without properly set resource pool
+
+        QnNetworkResourceList existResList = resPool->getAllNetResourceByHostAddress(netRes->getHostAddress());
         existResList = existResList.filtered(
             [&netRes](const QnNetworkResourcePtr& existRes)
             {
@@ -426,9 +436,8 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const
         case QnManualResourceSearchStatus::CheckingOnline:
         {
             Q_ASSERT(m_hostRangeSize);
-            int currentProgress = m_ipChecker.hostsChecked()
-                * PORT_SCAN_MAX_PROGRESS_PERCENT
-                / m_hostRangeSize;
+            int currentProgress = m_hostRangeSize ?
+                m_ipChecker.hostsChecked() * PORT_SCAN_MAX_PROGRESS_PERCENT / m_hostRangeSize : 0;
 
             result.status = QnManualResourceSearchStatus(m_state, currentProgress, MAX_PERCENT);
 

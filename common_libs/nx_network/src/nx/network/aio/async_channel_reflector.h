@@ -52,6 +52,19 @@ public:
         scheduleRead();
     }
 
+    /**
+     * Calling it not from aio thread results in 
+     * blocking cancellation of I/O on underlying channel.
+     */
+    std::unique_ptr<ChannelToReflectType> takeChannel()
+    {
+        m_channelToReflect->cancelIOSync(aio::etNone);
+
+        decltype(m_channelToReflect) result;
+        result.swap(m_channelToReflect);
+        return result;
+    }
+
 private:
     std::unique_ptr<ChannelToReflectType> m_channelToReflect;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onChannelClosedHandler;
@@ -81,6 +94,9 @@ private:
         {
             return reportDone(sysErrorCode);
         }
+
+        if (sysErrorCode != SystemError::noError)
+            return scheduleRead();  //< Recoverable error. Retrying...
 
         m_readBuffer.resize(static_cast<int>(bytesRead));
         decltype(m_readBuffer) readBuffer;
@@ -118,6 +134,13 @@ private:
             socketCannotRecoverFromError(sysErrorCode))
         {
             return reportDone(sysErrorCode);
+        }
+
+        if (sysErrorCode != SystemError::noError)
+        {
+            // Recoverable error has occured. Retrying operation.
+            sendNextBuffer();
+            return;
         }
 
         NX_ASSERT(bytesSent == (std::size_t)m_sendQueue.front().size());

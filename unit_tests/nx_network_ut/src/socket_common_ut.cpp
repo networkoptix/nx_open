@@ -1,4 +1,3 @@
-
 #ifdef _WIN32
 #include <Winsock2.h>
 typedef ULONG in_addr_t;
@@ -8,8 +7,9 @@ typedef ULONG in_addr_t;
 
 #include <nx/network/socket_common.h>
 
+namespace {
 
-void testHostAddress(
+static void testHostAddress(
     HostAddress host,
     boost::optional<in_addr_t> ipv4,
     boost::optional<in6_addr> ipv6,
@@ -42,7 +42,7 @@ void testHostAddress(
     }
 }
 
-void testHostAddress(
+static void testHostAddress(
     const char* string4,
     const char* string6,
     boost::optional<in_addr_t> ipv4,
@@ -66,7 +66,9 @@ void testHostAddress(
         testHostAddress(*ipv6, ipv4, ipv6, ipv4 ? string4 : string6, true);
 }
 
-TEST(HostAddressTest, Base)
+} // namespace
+
+TEST(HostAddress, Base)
 {
     testHostAddress("0.0.0.0", "::", htonl(INADDR_ANY), in6addr_any);
     testHostAddress("127.0.0.1", "::1", htonl(INADDR_LOOPBACK), in6addr_loopback);
@@ -83,7 +85,7 @@ TEST(HostAddressTest, Base)
     testHostAddress(nullptr, "2001:db8:0:2::1", boost::none, kIpV6b);
 }
 
-TEST(HostAddressTest, IsLocal)
+TEST(HostAddress, IsLocal)
 {
     ASSERT_TRUE(HostAddress("127.0.0.1").isLocal());
     ASSERT_TRUE(HostAddress("10.0.2.103").isLocal());
@@ -100,7 +102,33 @@ TEST(HostAddressTest, IsLocal)
     ASSERT_FALSE(HostAddress("::ffff:12.34.56.78").isLocal());
 }
 
-void testSocketAddress(const char* init, const char* host, int port)
+#if 0 // TODO: #ak CLOUD-1124
+
+TEST(HostAddress, string_that_is_valid_ipv4)
+{
+    HostAddress hostAddress("127.0.0.1");
+    ASSERT_EQ(HostAddress::localhost, hostAddress);
+    // ipv4 string cannot be converted to ipv6 address, but MUST be resolved.
+    ASSERT_FALSE(hostAddress.ipV6());
+    ASSERT_TRUE(hostAddress.ipV4());
+    ASSERT_EQ(htonl(INADDR_LOOPBACK), hostAddress.ipV4()->s_addr);
+}
+
+TEST(HostAddress, isIpAddress)
+{
+    HostAddress hostAddress("127.0.0.1");
+    ASSERT_EQ(
+        hostAddress.isIpAddress(),
+        hostAddress.ipV4() || hostAddress.ipV6());
+}
+
+#endif
+
+//-------------------------------------------------------------------------------------------------
+
+namespace {
+
+static void testSocketAddress(const char* init, const char* host, int port)
 {
     const auto addr = SocketAddress(QString(init));
     ASSERT_EQ(addr.address.toString(), QString(host));
@@ -116,7 +144,9 @@ void testSocketAddress(const char* init, const char* host, int port)
     ASSERT_EQ(addr.port, url.port(0));
 }
 
-TEST(SocketAddressTest, Base)
+} // namespace
+
+TEST(SocketAddress, Base)
 {
     testSocketAddress("ya.ru", "ya.ru", 0);
     testSocketAddress("ya.ru:80", "ya.ru", 80);

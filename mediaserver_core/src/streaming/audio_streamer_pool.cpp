@@ -164,6 +164,7 @@ QnAbstractStreamDataProviderPtr QnAudioStreamerPool::getActionDataProvider(const
     {
         const auto filePath = lit("dbfile://notifications/") + params.url;
         QnAviResourcePtr resource(new QnAviResource(filePath));
+        resource->setCommonModule(commonModule());
         resource->setStatus(Qn::Online);
         provider.reset(resource->createDataProvider(Qn::ConnectionRole::CR_Default));
     }

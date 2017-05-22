@@ -530,8 +530,7 @@ template class UdtSocket<AbstractStreamServerSocket>;
 // =====================================================================
 UdtStreamSocket::UdtStreamSocket(int ipVersion):
     base_type(ipVersion),
-    m_aioHelper(new aio::AsyncSocketImplHelper<UdtStreamSocket>(this, ipVersion)),
-    m_noDelay(false)
+    m_aioHelper(new aio::AsyncSocketImplHelper<UdtStreamSocket>(this, ipVersion))
 {
     open();
 }
@@ -542,9 +541,10 @@ UdtStreamSocket::UdtStreamSocket(
     detail::SocketState state)
     :
     base_type(ipVersion, impl, state),
-    m_aioHelper(new aio::AsyncSocketImplHelper<UdtStreamSocket>(this, ipVersion)),
-    m_noDelay(false)
+    m_aioHelper(new aio::AsyncSocketImplHelper<UdtStreamSocket>(this, ipVersion))
 {
+    if (state == detail::SocketState::connected)
+        m_isInternetConnection = !getForeignAddress().address.isLocal();
 }
 
 UdtStreamSocket::~UdtStreamSocket()
@@ -616,8 +616,8 @@ int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 
 int UdtStreamSocket::send( const void* buffer, unsigned int bufferLen )
 {
-    int sz = UDT::send(m_impl->udtHandle, reinterpret_cast<const char*>(buffer), bufferLen, 0);
-    if (sz == UDT::ERROR)
+    int sendResult = UDT::send(m_impl->udtHandle, reinterpret_cast<const char*>(buffer), bufferLen, 0);
+    if (sendResult == UDT::ERROR)
     {
         const auto sysErrorCode =
             detail::convertToSystemError(UDT::getlasterror().getErrorCode());
@@ -627,12 +627,18 @@ int UdtStreamSocket::send( const void* buffer, unsigned int bufferLen )
 
         SystemError::setLastErrorCode(sysErrorCode);
     }
-    else if (sz == 0)
+    else if (sendResult == 0)
     {
         //connection has been closed
         m_state = detail::SocketState::open;
     }
-    return sz;
+    else if (sendResult > 0)
+    {
+        if (m_isInternetConnection)
+            UdtStatistics::global.internetBytesTransfered += (size_t) sendResult;
+    }
+
+    return sendResult;
 }
 
 SocketAddress UdtStreamSocket::getForeignAddress() const
@@ -783,6 +789,7 @@ bool UdtStreamSocket::connectToIp(
         return false;
     }
     m_state = detail::SocketState::connected;
+    m_isInternetConnection = !getForeignAddress().address.isLocal();
     return true;
 }
 
@@ -862,6 +869,11 @@ int UdtStreamSocket::handleRecvResult(int recvResult)
         //connection has been closed
         m_state = detail::SocketState::open;
     }
+    else if (recvResult > 0)
+    {
+        if (m_isInternetConnection)
+            UdtStatistics::global.internetBytesTransfered += (size_t) recvResult;
+    }
 
     return recvResult;
 }
@@ -910,7 +922,7 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()
 
     //this method always blocks
     nx::utils::promise<
-        std::pair<SystemError::ErrorCode, AbstractStreamSocket*>
+        std::pair<SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>>
     > acceptedSocketPromise;
 
     if (!setNonBlockingMode(true))
@@ -918,14 +930,14 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()
 
     acceptAsync(
         [this, &acceptedSocketPromise](
-            SystemError::ErrorCode errorCode, AbstractStreamSocket* socket)
+            SystemError::ErrorCode errorCode, std::unique_ptr<AbstractStreamSocket> socket)
         {
-            //need post here to be sure that aio subsystem does not use socket anymore
+            // Need post here to be sure that aio subsystem does not use socket anymore.
             post(
-                [&acceptedSocketPromise, errorCode, socket]
+                [&acceptedSocketPromise, errorCode, socket = std::move(socket)]() mutable
                 {
                     acceptedSocketPromise.set_value(
-                        std::make_pair(errorCode, socket));
+                        std::make_pair(errorCode, std::move(socket)));
                 });
         });
 
@@ -939,13 +951,10 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()
         SystemError::setLastErrorCode(acceptedSocketPair.first);
         return nullptr;
     }
-    return acceptedSocketPair.second;
+    return acceptedSocketPair.second.release();
 }
 
-void UdtStreamServerSocket::acceptAsync(
-    nx::utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode,
-        AbstractStreamSocket*)> handler)
+void UdtStreamServerSocket::acceptAsync(AcceptCompletionHandler handler)
 {
     bool nonBlockingMode = false;
     if (!getNonBlockingMode(&nonBlockingMode))
@@ -963,19 +972,18 @@ void UdtStreamServerSocket::acceptAsync(
     return m_aioHelper->acceptAsync(
         [handler = std::move(handler)](
             SystemError::ErrorCode errorCode,
-            AbstractStreamSocket* socket)
+            std::unique_ptr<AbstractStreamSocket> socket)
         {
             //every accepted socket MUST be in blocking mode!
             if (socket)
             {
                 if (!socket->setNonBlockingMode(false))
                 {
-                    delete socket;
-                    socket = nullptr;
+                    socket.reset();
                     errorCode = SystemError::getLastOSErrorCode();
                 }
             }
-            handler(errorCode, socket);
+            handler(errorCode, std::move(socket));
         });
 }
 
@@ -1028,6 +1036,7 @@ AbstractStreamSocket* UdtStreamServerSocket::systemAccept()
         m_ipVersion,
         new detail::UdtSocketImpl(ret),
         detail::SocketState::connected);
+    acceptedSocket->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
 
     if (!acceptedSocket->setSendTimeout(0) || !acceptedSocket->setRecvTimeout(0))
     {
@@ -1042,6 +1051,8 @@ void UdtStreamServerSocket::stopWhileInAioThread()
 {
     m_aioHelper->stopPolling();
 }
+
+UdtStatistics UdtStatistics::global;
 
 } // namespace network
 } // namespace nx

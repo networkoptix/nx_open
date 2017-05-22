@@ -25,12 +25,15 @@ enum class QnLayoutFlag
 {
     Empty               = 0x00,
     NoDrop              = 0x01,
-    NoZoom              = 0x02,
+    FixedViewport       = 0x02, //< Disallow to zoom and hand scroll
     NoMove              = 0x04,
-    NoTimeline          = 0x08,
-    SpecialBackground   = 0x10
+    NoResize            = 0x08,
+    NoTimeline          = 0x10,
+    SpecialBackground   = 0x20,
 };
 Q_DECLARE_FLAGS(QnLayoutFlags, QnLayoutFlag)
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnLayoutFlags)
+Q_DECLARE_METATYPE(QnLayoutFlags)
 
 /**
  * Layout of a workbench.
@@ -293,6 +296,13 @@ public:
     /**
      * \param gridPos                   Desired position, in grid coordinates.
      * \param size                      Desired slot size.
+     * \returns                         True if requested rect is not covered by pinned items.
+     */
+    bool isFreeSlot(const QPointF &gridPos, const QSize &size) const;
+
+    /**
+     * \param gridPos                   Desired position, in grid coordinates.
+     * \param size                      Desired slot size.
      * \param metric                    Metric of the gridspace to use for determining the closest slot.
      *                                  Positions of the top-left corner of the slot at hand will be passed to it.
      * \returns                         Geometry of the free slot of desired size whose upper-left corner
@@ -347,6 +357,8 @@ signals:
      * \param item                      Item that was added.
      */
     void itemAdded(QnWorkbenchItem *item);
+
+    void itemMoved(QnWorkbenchItem *item);
 
     void zoomLinkAdded(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);
     void zoomLinkRemoved(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);

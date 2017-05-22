@@ -43,6 +43,16 @@ protected:
         thenSameDataHasBeenReflected();
     }
 
+    void emulateSendTimeoutOnUnderlyingChannel()
+    {
+        m_channelToReflect->setSendErrorState(SystemError::timedOut);
+    }
+
+    void emulateRecvTimeoutOnUnderlyingChannel()
+    {
+        m_channelToReflect->setReadErrorState(SystemError::timedOut);
+    }
+
     void whenSentSomeData()
     {
         prepareTestData();
@@ -52,6 +62,12 @@ protected:
     void whenEmulateIoErrorOnInput()
     {
         m_channelToReflect->setErrorState();
+    }
+
+    void whenUnderlyingChannelIsFullyFunctionalAgain()
+    {
+        m_channelToReflect->setSendErrorState(boost::none);
+        m_channelToReflect->setReadErrorState(boost::none);
     }
 
     void thenSameDataHasBeenReflected()
@@ -64,10 +80,20 @@ protected:
         ASSERT_NE(SystemError::noError, m_reflectorDone.get_future().get());
     }
 
+    void thenSendTimedoutHasBeenRaisedOnUnderlyingChannel()
+    {
+        m_channelToReflect->waitForAnotherSendErrorReported();
+    }
+
+    void thenRecvTimedoutHasBeenRaisedOnUnderlyingChannel()
+    {
+        m_channelToReflect->waitForAnotherReadErrorReported();
+    }
+
 private:
     std::unique_ptr<BasicPollable> m_reflector;
-    utils::pipeline::ReflectingPipeline m_input;
-    utils::pipeline::test::NotifyingOutput m_output;
+    utils::bstream::ReflectingPipeline m_input;
+    utils::bstream::test::NotifyingOutput m_output;
     nx::Buffer m_testData;
     utils::promise<SystemError::ErrorCode> m_reflectorDone;
     AsyncChannel* m_channelToReflect;
@@ -95,6 +121,28 @@ TEST_F(AsyncChannelReflector, reports_underlying_channel_io_error)
     sendThroughSomeData();
     whenEmulateIoErrorOnInput();
     thenReflectorReportsError();
+}
+
+TEST_F(AsyncChannelReflector, properly_handles_send_timedout)
+{
+    emulateSendTimeoutOnUnderlyingChannel();
+
+    whenSentSomeData();
+    thenSendTimedoutHasBeenRaisedOnUnderlyingChannel();
+
+    whenUnderlyingChannelIsFullyFunctionalAgain();
+    thenSameDataHasBeenReflected();
+}
+
+TEST_F(AsyncChannelReflector, properly_handles_recv_timedout)
+{
+    emulateRecvTimeoutOnUnderlyingChannel();
+
+    whenSentSomeData();
+    thenRecvTimedoutHasBeenRaisedOnUnderlyingChannel();
+
+    whenUnderlyingChannelIsFullyFunctionalAgain();
+    thenSameDataHasBeenReflected();
 }
 
 } // namespace test

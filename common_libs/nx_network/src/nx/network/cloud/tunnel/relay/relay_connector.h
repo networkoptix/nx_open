@@ -5,7 +5,7 @@
 #include <nx/network/aio/timer.h>
 
 #include "../abstract_tunnel_connector.h"
-#include "api/client_to_relay_connection.h"
+#include "api/relay_api_client.h"
 
 namespace nx {
 namespace network {
@@ -19,7 +19,7 @@ class NX_NETWORK_API Connector:
 
 public:
     Connector(
-        SocketAddress relayEndpoint,
+        QUrl relayUrl,
         AddressEntry targetHostAddress,
         nx::String connectSessionId);
     virtual ~Connector() override;
@@ -34,10 +34,10 @@ public:
     virtual const AddressEntry& targetPeerAddress() const override;
 
 private:
-    const SocketAddress m_relayEndpoint;
+    const QUrl m_relayUrl;
     const AddressEntry m_targetHostAddress;
     nx::String m_connectSessionId;
-    std::unique_ptr<nx::cloud::relay::api::ClientToRelayConnection> m_clientToRelayConnection;
+    std::unique_ptr<nx::cloud::relay::api::Client> m_relayClient;
     ConnectCompletionHandler m_handler;
     aio::Timer m_timer;
 
@@ -46,7 +46,7 @@ private:
     void onStartRelaySessionResponse(
         nx::cloud::relay::api::ResultCode resultCode,
         SystemError::ErrorCode sysErrorCode,
-        nx::String sessionId);
+        nx::cloud::relay::api::CreateClientSessionResponse response);
     void connectTimedOut();
 };
 

@@ -9,12 +9,13 @@
 
 #include <nx/client/desktop/ui/workbench/workbench_animations.h>
 
-#include <ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
+#include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/edge_shadow_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
@@ -29,6 +30,8 @@
 #include <ui/workbench/panels/buttons.h>
 
 #include <utils/common/scoped_value_rollback.h>
+
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -53,8 +56,8 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     m_updateResizerGeometryLater(false),
     m_resizerWidget(new QnResizerWidget(Qt::Horizontal, parentWidget)),
     m_backgroundItem(new QnControlBackgroundWidget(Qt::LeftEdge, parentWidget)),
-    m_showButton(newShowHideButton(parentWidget, context(), action(QnActions::ToggleTreeAction))),
-    m_pinButton(newPinButton(parentWidget, context(), action(QnActions::PinTreeAction))),
+    m_showButton(newShowHideButton(parentWidget, context(), action::ToggleTreeAction)),
+    m_pinButton(newPinButton(parentWidget, context(), action::PinTreeAction)),
     m_hidingProcessor(new HoverFocusProcessor(parentWidget)),
     m_showingProcessor(new HoverFocusProcessor(parentWidget)),
     m_opacityProcessor(new HoverFocusProcessor(parentWidget)),
@@ -71,10 +74,10 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
             NX_ASSERT(!m_inSelection);
 
             QScopedValueRollback<bool> guard(m_inSelection, true);
-            action(QnActions::SelectionChangeAction)->trigger();
+            action(action::SelectionChangeAction)->trigger();
         });
 
-    connect(action(QnActions::SelectionChangeAction), &QAction::triggered, this,
+    connect(action(action::SelectionChangeAction), &QAction::triggered, this,
         [this]
         {
             if (m_inSelection)
@@ -98,6 +101,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     widget->setToolTipParent(item);
     item->setFocusPolicy(Qt::StrongFocus);
     item->setProperty(Qn::NoHandScrollOver, true);
+    item->setProperty(Qn::BlockMotionSelection, true);
     item->resize(settings.span, 0.0);
     item->setZValue(ContentItemZOrder);
     connect(item, &QnMaskedProxyWidget::paintRectChanged, this,
@@ -107,20 +111,20 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     connect(item, &QGraphicsWidget::geometryChanged, widget,
         &QnResourceBrowserWidget::hideToolTip);
 
-    action(QnActions::ToggleTreeAction)->setChecked(settings.state == Qn::PaneState::Opened);
+    action(action::ToggleTreeAction)->setChecked(settings.state == Qn::PaneState::Opened);
     m_showButton->setFocusProxy(item);
     m_showButton->setZValue(BackgroundItemZOrder); /*< To make it paint under the tooltip. */
-    connect(action(QnActions::ToggleTreeAction), &QAction::toggled, this,
+    connect(action(action::ToggleTreeAction), &QAction::toggled, this,
         [this](bool checked)
         {
             if (!m_ignoreClickEvent)
                 setOpened(checked, true);
         });
 
-    action(QnActions::PinTreeAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
+    action(action::PinTreeAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
     m_pinButton->setFocusProxy(item);
     m_pinButton->setZValue(ControlItemZOrder);
-    connect(action(QnActions::PinTreeAction), &QAction::toggled, this,
+    connect(action(action::PinTreeAction), &QAction::toggled, this,
         [this](bool checked)
         {
             if (checked)
@@ -129,6 +133,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
         });
 
     m_resizerWidget->setProperty(Qn::NoHandScrollOver, true);
+    m_resizerWidget->setProperty(Qn::BlockMotionSelection, true);
     m_resizerWidget->setZValue(ResizerItemZOrder);
     connect(m_resizerWidget, &QGraphicsWidget::geometryChanged, this,
         &ResourceTreeWorkbenchPanel::at_resizerWidget_geometryChanged);
@@ -146,7 +151,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     m_hidingProcessor->addTargetItem(m_resizerWidget);
     m_hidingProcessor->setHoverLeaveDelay(NxUi::kClosePanelTimeoutMs);
     m_hidingProcessor->setFocusLeaveDelay(NxUi::kClosePanelTimeoutMs);
-    connect(menu(), &QnActionManager::menuAboutToHide, m_hidingProcessor,
+    connect(menu(), &nx::client::desktop::ui::action::Manager::menuAboutToHide, m_hidingProcessor,
         &HoverFocusProcessor::forceFocusLeave);
     connect(m_hidingProcessor, &HoverFocusProcessor::hoverFocusLeft, this,
         [this]
@@ -178,12 +183,12 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
 
 bool ResourceTreeWorkbenchPanel::isPinned() const
 {
-    return action(QnActions::PinTreeAction)->isChecked();
+    return action(action::PinTreeAction)->isChecked();
 }
 
 bool ResourceTreeWorkbenchPanel::isOpened() const
 {
-    return action(QnActions::ToggleTreeAction)->isChecked();
+    return action(action::ToggleTreeAction)->isChecked();
 }
 
 void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
@@ -198,7 +203,7 @@ void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
     m_showingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
     QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
-    action(QnActions::ToggleTreeAction)->setChecked(opened);
+    action(action::ToggleTreeAction)->setChecked(opened);
 
     xAnimator->stop();
     qnWorkbenchAnimations->setupAnimator(xAnimator, opened

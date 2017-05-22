@@ -182,33 +182,33 @@ QList<SocketAddress> QnMediaServerResource::getNetAddrList() const
 void QnMediaServerResource::setAdditionalUrls(const QList<QUrl> &urls)
 {
     QnUuid id = getId();
-    QList<QUrl> oldUrls = qnServerAdditionalAddressesDictionary->additionalUrls(id);
+    QList<QUrl> oldUrls = commonModule()->serverAdditionalAddressesDictionary()->additionalUrls(id);
     if (oldUrls == urls)
         return;
 
-    qnServerAdditionalAddressesDictionary->setAdditionalUrls(id, urls);
+    commonModule()->serverAdditionalAddressesDictionary()->setAdditionalUrls(id, urls);
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
 QList<QUrl> QnMediaServerResource::getAdditionalUrls() const
 {
-    return qnServerAdditionalAddressesDictionary->additionalUrls(getId());
+    return commonModule()->serverAdditionalAddressesDictionary()->additionalUrls(getId());
 }
 
 void QnMediaServerResource::setIgnoredUrls(const QList<QUrl> &urls)
 {
     QnUuid id = getId();
-    QList<QUrl> oldUrls = qnServerAdditionalAddressesDictionary->ignoredUrls(id);
+    QList<QUrl> oldUrls = commonModule()->serverAdditionalAddressesDictionary()->ignoredUrls(id);
     if (oldUrls == urls)
         return;
 
-    qnServerAdditionalAddressesDictionary->setIgnoredUrls(id, urls);
+    commonModule()->serverAdditionalAddressesDictionary()->setIgnoredUrls(id, urls);
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
 QList<QUrl> QnMediaServerResource::getIgnoredUrls() const
 {
-    return qnServerAdditionalAddressesDictionary->ignoredUrls(getId());
+    return commonModule()->serverAdditionalAddressesDictionary()->ignoredUrls(getId());
 }
 
 boost::optional<SocketAddress> QnMediaServerResource::getCloudAddress() const
@@ -527,8 +527,11 @@ void QnMediaServerResource::setSystemInfo(const QnSystemInformation &systemInfo)
 }
 QnModuleInformation QnMediaServerResource::getModuleInformation() const
 {
-    if (getId() == resourcePool()->commonModule()->moduleGUID())
-        return resourcePool()->commonModule()->moduleInformation();
+    if (auto module = commonModule())
+    {
+        if (getId() == module->moduleGUID())
+            return module->moduleInformation();
+    }
 
     // build module information for other server
 
@@ -558,6 +561,15 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const
     moduleInformation.cloudSystemId = settings->cloudSystemId();
 
     return moduleInformation;
+}
+
+QnModuleInformationWithAddresses QnMediaServerResource::getModuleInformationWithAddresses() const
+{
+    QnModuleInformationWithAddresses information = getModuleInformation();
+    for (const auto& endpoint: getAllAvailableAddresses())
+        information.remoteAddresses << endpoint.toString();
+
+    return information;
 }
 
 bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
