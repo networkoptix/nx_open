@@ -1,5 +1,6 @@
 #include "client_to_relay_connection.h"
 
+#include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/std/cpp14.h>
@@ -88,7 +89,7 @@ void ClientToRelayConnection::openConnectionToTheTargetHost(
             }
             else
             {
-                auto connection = std::make_unique<nx::network::TCPSocket>();
+                auto connection = std::make_unique<CloudStreamSocket>();
                 connection->bindToAioThread(
                     SocketGlobals::aioService().getCurrentAioThread());
                 handler(

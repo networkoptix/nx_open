@@ -54,6 +54,10 @@ public:
         m_connectTimeout(std::chrono::milliseconds::zero()),
         m_connectionsToCreateCount(1)
     {
+        m_resultingSocketAttributes.aioThread = 
+            SocketGlobals::aioService().getRandomAioThread();
+        m_resultingSocketAttributes.recvBufferSize = 
+            nx::utils::random::number<unsigned int>(10000, 50000);
     }
 
     ~RelayOutgoingTunnelConnection()
@@ -113,11 +117,6 @@ protected:
         m_connection = std::move(m_connectResultQueue.pop().connection);
         ASSERT_NE(nullptr, m_connection);
     }
-
-    //void whenControlConnectionIsBroken()
-    //{
-    //    // TODO
-    //}
 
     void thenRequestToRelayHasBeenIssued()
     {
@@ -189,10 +188,11 @@ protected:
             m_tunnelClosed.get_future().wait_for(*m_tunnelInactivityTimeout * 3));
     }
 
-    //void thenTunnelReopensControlConnection()
-    //{
-    //    // TODO
-    //}
+    void thenSocketAttributesHaveBeenAppliedToTheResultingSocket()
+    {
+        ASSERT_TRUE(nx::network::verifySocketAttributes(
+            *m_connection, m_resultingSocketAttributes));
+    }
 
     void enableDestroyingTunnelConnectionOnConnectFailure()
     {
@@ -229,6 +229,7 @@ private:
     boost::optional<std::chrono::milliseconds> m_tunnelInactivityTimeout;
     std::unique_ptr<AbstractStreamSocket> m_connection;
     aio::BasicPollable m_aioThreadBinder;
+    nx::network::SocketAttributes m_resultingSocketAttributes;
 
     virtual void onClientToRelayConnectionInstanciated(
         ClientToRelayConnection* relayClient) override
@@ -306,7 +307,7 @@ private:
                 {
                     m_tunnelConnection->establishNewConnection(
                         m_connectTimeout,
-                        nx::network::SocketAttributes(),
+                        m_resultingSocketAttributes,
                         std::bind(&RelayOutgoingTunnelConnection::onConnectDone, this,
                             _1, _2, _3));
                 }
@@ -407,19 +408,10 @@ TEST_F(RelayOutgoingTunnelConnection, provided_connection_destroyed_after_tunnel
 
 TEST_F(RelayOutgoingTunnelConnection, applies_socket_attributes)
 {
-    // TODO
+    givenHappyRelay();
+    whenReceivedAndSavedConnection();
+    thenSocketAttributesHaveBeenAppliedToTheResultingSocket();
 }
-
-//TEST_F(RelayOutgoingTunnelConnection, reopens_control_connection_on_failure)
-//{
-//    givenHappyRelay();
-//    givenIdleTunnel();
-//    whenControlConnectionIsBroken();
-//    thenTunnelReopensControlConnection();
-//}
-//
-//TEST_F(RelayOutgoingTunnelConnection, shuts_down_on_repeated_control_connection_failure)
-//TEST_F(RelayOutgoingTunnelConnection, terminating)
 
 } // namespace test
 } // namespace relay
