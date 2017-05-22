@@ -1320,10 +1320,17 @@ QMap<QnUuid, ApiPeerData> MessageBus::aliveClientPeers(int maxDistance) const
     return QMap<QnUuid, ApiPeerData>();
 }
 
-QnUuid MessageBus::routeToPeerVia(const QnUuid& dstPeer, int* distance) const
+QnUuid MessageBus::routeToPeerVia(const QnUuid& peerId, int* distance) const
 {
-    // todo: implement me
-    return QnUuid();
+    if (localPeer().id == peerId)
+    {
+        *distance = 0;
+        return QnUuid();
+    }
+
+    QVector<ApiPersistentIdData> via;
+    *distance = m_peers->distanceTo(peerId, &via);
+    return via.isEmpty() ? QnUuid() : via[0].id;
 }
 
 int MessageBus::distanceToPeer(const QnUuid& peerId) const

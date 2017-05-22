@@ -52,6 +52,36 @@ TEST(P2pRouting, distanceTo)
     ASSERT_EQ(kMaxDistance, routing.distanceTo(to2));
 }
 
+TEST(P2pRouting, routeTo)
+{
+    BidirectionRoutingInfo routing(genId());
+
+    ec2::ApiPersistentIdData via1 = genId();
+    ec2::ApiPersistentIdData to1 = genId();
+    ec2::ApiPersistentIdData to2 = genId();
+    ec2::ApiPersistentIdData to3 = to2;
+    to3.persistentId = QnUuid::createUuid();
+
+    routing.addRecord(via1, to1, RoutingRecord(1, 0));
+    routing.addRecord(via1, to2, RoutingRecord(2, 0));
+    routing.addRecord(via1, to3, RoutingRecord(3, 0));
+
+    ec2::ApiPersistentIdData via2 = genId();
+    routing.addRecord(via2, to1, RoutingRecord(4, 0));
+    routing.addRecord(via2, to2, RoutingRecord(5, 0));
+    routing.addRecord(via2, to3, RoutingRecord(6, 0));
+
+    QVector<ApiPersistentIdData> viaList;
+    qint32 distance = routing.distanceTo(to3.id, &viaList);
+    ASSERT_EQ(1, viaList.size());
+    ASSERT_EQ(2, distance);
+
+    viaList.clear();
+    distance = routing.distanceTo(to3, &viaList);
+    ASSERT_EQ(1, viaList.size());
+    ASSERT_EQ(3, distance);
+}
+
 } // namespace test
 } // namespace p2p
 } // namespace nx

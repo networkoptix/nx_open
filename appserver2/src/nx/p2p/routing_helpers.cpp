@@ -12,15 +12,6 @@ qint32 AlivePeerInfo::distanceTo(const ApiPersistentIdData& peer) const
     return itr != routeTo.end() ? itr.value().distance : kMaxDistance;
 }
 
-qint32 AlivePeerInfo::distanceTo(const QnUuid& peerId) const
-{
-    ApiPersistentIdData peer(peerId, QnUuid());
-    qint32 result = kMaxDistance;
-    for (auto itr = routeTo.lowerBound(peer); itr != routeTo.end() && itr.key().id == peerId; ++itr)
-        result = std::min(result, itr->distance);
-    return result;
-}
-
 qint32 RouteToPeerInfo::minDistance(QVector<ApiPersistentIdData>* outViaList) const
 {
     if (m_minDistance == kMaxDistance)
@@ -81,19 +72,32 @@ void BidirectionRoutingInfo::addRecord(
     allPeerDistances[to].insert(via, record);
 }
 
-qint32 BidirectionRoutingInfo::distanceTo(const ApiPersistentIdData& peer) const
+qint32 BidirectionRoutingInfo::distanceTo(
+    const ApiPersistentIdData& peer,
+    QVector<ApiPersistentIdData>* outVia) const
 {
-    qint32 result = kMaxDistance;
-    for (const auto& alivePeer : alivePeers)
-        result = std::min(result, alivePeer.distanceTo(peer));
-    return result;
+    auto itr = allPeerDistances.find(peer);
+    return itr != allPeerDistances.end() ? itr->minDistance(outVia) : kMaxDistance;
 }
 
-qint32 BidirectionRoutingInfo::distanceTo(const QnUuid& peerId) const
+qint32 BidirectionRoutingInfo::distanceTo(
+    const QnUuid& peerId,
+    QVector<ApiPersistentIdData>* outVia) const
 {
+    ApiPersistentIdData peer(peerId, QnUuid());
+
     qint32 result = kMaxDistance;
-    for (const auto& alivePeer : alivePeers)
-        result = std::min(result, alivePeer.distanceTo(peerId));
+    for (auto itr = allPeerDistances.lowerBound(peer);
+         itr != allPeerDistances.end() && itr.key().id == peerId;
+         ++itr)
+    {
+        if (itr->minDistance() < result)
+        {
+            if (outVia)
+                outVia->clear();
+            result = itr->minDistance(outVia);
+        }
+    }
     return result;
 }
 
